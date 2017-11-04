@@ -35,9 +35,8 @@ script:
   - |
     if [ "$COVERAGE" == "true" ]; then
         make tc
-        make e2e
     else
-        make tu
+        make test
     fi
 
 notifications:

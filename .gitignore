@@ -4,6 +4,7 @@
 /bin/
 !/bin/box
 !/bin/box.bat
-/vendor
 /composer.lock
+/dist
+/vendor
 /phpunit.xml
