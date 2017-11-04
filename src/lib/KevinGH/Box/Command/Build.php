@@ -8,6 +8,7 @@ use KevinGH\Box\Configuration;
 use RuntimeException;
 use SplFileInfo;
 use Symfony\Component\Console\Helper\DialogHelper;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Traversable;
@@ -606,8 +607,8 @@ HELP
             $passphrase = $this->config->getPrivateKeyPassphrase();
 
             if ($this->config->isPrivateKeyPrompt()) {
-                /** @var $dialog DialogHelper */
-                $dialog = $this->getHelper('dialog');
+                /** @var $dialog QuestionHelper */
+                $dialog = $this->getHelper('question');
                 $passphrase = $dialog->askHiddenResponse(
                     $output,
                     'Private key passphrase:'

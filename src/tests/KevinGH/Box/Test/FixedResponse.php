@@ -3,6 +3,7 @@
 namespace KevinGH\Box\Test;
 
 use Symfony\Component\Console\Helper\DialogHelper;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -10,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Kevin Herrera <kevin@herrera.io>
  */
-class FixedResponse extends DialogHelper
+class FixedResponse extends QuestionHelper
 {
     /**
      * The fixed response.

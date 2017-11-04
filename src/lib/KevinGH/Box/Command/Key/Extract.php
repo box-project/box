@@ -6,6 +6,7 @@ use KevinGH\Box\Helper\PhpSecLibHelper;
 use phpseclib\Crypt\RSA;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\DialogHelper;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -83,8 +84,8 @@ HELP
         }
 
         if ($input->getOption('prompt')) {
-            /** @var $dialog DialogHelper */
-            $dialog = $this->getHelper('dialog');
+            /** @var $dialog QuestionHelper */
+            $dialog = $this->getHelper('question');
 
             $rsa->setPassword(
                 $dialog->askHiddenResponse($output, 'Private key passphrase: ')

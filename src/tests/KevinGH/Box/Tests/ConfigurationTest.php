@@ -8,6 +8,9 @@ use KevinGH\Box\Configuration;
 use Phar;
 use SplFileInfo;
 
+/**
+ * @requires PHP 7.2.0
+ */
 class ConfigurationTest extends TestCase
 {
     /**

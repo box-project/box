@@ -87,18 +87,18 @@ HELP
         $files = $input->getOption('pick') ?: null;
 
         // backslash paths causes segfault
-        if ($files) {
-            array_walk(
-                $files,
-                function (&$file) {
-                    $file = str_replace(
-                        '\\',
-                        '/',
-                        Path::canonical($file)
-                    );
-                }
-            );
-        }
+//        if ($files) {
+//            array_walk(
+//                $files,
+//                function (&$file) {
+//                    $file = str_replace(
+//                        '\\',
+//                        '/',
+//                        Path::canonical($file)
+//                    );
+//                }
+//            );
+//        }
 
         $phar->extractTo($out, $files, true);
 
