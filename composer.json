@@ -39,15 +39,21 @@
 
     "autoload": {
         "psr-0": {
-            "KevinGH\\Box": "src/lib"
+            "KevinGH\\Box": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-0": {
+            "KevinGH\\Box": "tests"
         }
     },
     "bin": [
         "bin/box"
     ],
+
     "config": {
         "bin-dir": "bin",
-        "vendor-dir": "src/vendors"
+        "sort-packages": true
     },
     "extra": {
         "branch-alias": {

@@ -1,18 +1,9 @@
-# box files
 /*.phar
 /*.phar.sig
 /box.json
-
-# composer directories
 /bin/
-/src/vendors/
-
-# composer files
+!/bin/box
+!/bin/box.bat
+/vendor
 /composer.lock
-
-# phpunit files
 /phpunit.xml
-
-# phpstorm files
-/.idea/
-/*.iml
