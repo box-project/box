@@ -38,13 +38,13 @@
     },
 
     "autoload": {
-        "psr-0": {
-            "KevinGH\\Box": "src"
+        "psr-4": {
+            "KevinGH\\Box\\": "src"
         }
     },
     "autoload-dev": {
-        "psr-0": {
-            "KevinGH\\Box": "tests"
+        "psr-4": {
+            "KevinGH\\Box\\": "tests"
         }
     },
     "bin": [
