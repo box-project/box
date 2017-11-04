@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="true"
-         backupStaticAttributes="false"
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/6.0/phpunit.xsd"
+         backupGlobals="true"
          bootstrap="tests/bootstrap.php"
-         colors="true"
-         stopOnError="false"
-         stopOnFailure="false"
-         stopOnIncomplete="false"
-         stopOnSkipped="false"
-         strict="true"
-         verbose="false">
+         colors="true">
+
+    <testsuites>
+        <testsuite name="PHP-Scoper Test Suite">
+            <directory>tests/</directory>
+        </testsuite>
+    </testsuites>
+
     <filter>
         <whitelist>
             <directory suffix=".php">src/</directory>
         </whitelist>
     </filter>
-    <testsuites>
-        <testsuite name="Box Test Suite">
-            <directory>tests/</directory>
-        </testsuite>
-    </testsuites>
+
 </phpunit>
