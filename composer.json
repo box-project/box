@@ -1,21 +1,22 @@
 {
-    "name": "kherge/box",
+    "name": "humbug/box",
     "description": "A tool to simplify building PHARs.",
     "keywords": ["phar"],
-    "homepage": "http://box-project.github.io/box2/",
     "license": "MIT",
     "authors": [
         {
             "name": "Kevin Herrera",
             "email": "kevin@herrera.io",
             "homepage": "http://kevin.herrera.io"
+        },
+        {
+            "name": "Théo Fidry",
+            "email": "theo.fidry@gmail.com"
         }
     ],
-    "support": {
-        "issues": "https://github.com/box-project/box2/issues"
-    },
+
     "require": {
-        "php": ">=5.3.3",
+        "php": "^7.1",
         "herrera-io/annotations": "~1.0",
         "herrera-io/box": "~1.6",
         "herrera-io/json": "~1.0",
@@ -35,6 +36,7 @@
     "suggest": {
         "ext-openssl": "To accelerate private key generation."
     },
+
     "autoload": {
         "psr-0": {
             "KevinGH\\Box": "src/lib"
@@ -45,14 +47,11 @@
     ],
     "config": {
         "bin-dir": "bin",
-        "platform": {
-          "php": "5.3.3"
-        },
         "vendor-dir": "src/vendors"
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.x-dev"
+            "dev-master": "3.x-dev"
         }
     }
 }
