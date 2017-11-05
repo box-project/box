@@ -1,5 +1,17 @@
 <?php
 
+zdeclare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Test;
 
 use Herrera\PHPUnit\TestCase;
@@ -45,18 +57,48 @@ abstract class CommandTestCase extends TestCase
     private $name;
 
     /**
+     * Creates the application.
+     */
+    protected function setUp(): void
+    {
+        $this->cwd = getcwd();
+        $this->dir = $this->createDir();
+
+        chdir($this->dir);
+
+        $this->app = new Application();
+        $this->app->getHelperSet()->set(new Helper\ConfigurationHelper());
+        $this->app->getHelperSet()->set(new Helper\PhpSecLibHelper());
+
+        $command = $this->getCommand();
+        $this->name = $command->getName();
+
+        $this->app->add($command);
+    }
+
+    /**
+     * Restore the current working directory.
+     */
+    protected function tearDown(): void
+    {
+        chdir($this->cwd);
+
+        parent::tearDown();
+    }
+
+    /**
      * Returns the command to be tested.
      *
-     * @return Command The command.
+     * @return Command the command
      */
     abstract protected function getCommand();
 
     /**
      * Returns the output for the tester.
      *
-     * @param CommandTester $tester The tester.
+     * @param CommandTester $tester the tester
      *
-     * @return string The output.
+     * @return string the output
      */
     protected function getOutput(CommandTester $tester)
     {
@@ -72,11 +114,11 @@ abstract class CommandTestCase extends TestCase
         }
 
         $string = preg_replace(
-            array(
+            [
                 '/\x1b(\[|\(|\))[;?0-9]*[0-9A-Za-z]/',
-                '/[\x03|\x1a]/'
-            ),
-            array('', '', ''),
+                '/[\x03|\x1a]/',
+            ],
+            ['', '', ''],
             $string
         );
 
@@ -86,40 +128,10 @@ abstract class CommandTestCase extends TestCase
     /**
      * Returns the tester for the command.
      *
-     * @return CommandTester The tester.
+     * @return CommandTester the tester
      */
     protected function getTester()
     {
         return new CommandTester($this->app->get($this->name));
-    }
-
-    /**
-     * Restore the current working directory.
-     */
-    protected function tearDown()
-    {
-        chdir($this->cwd);
-
-        parent::tearDown();
-    }
-
-    /**
-     * Creates the application.
-     */
-    protected function setUp()
-    {
-        $this->cwd = getcwd();
-        $this->dir = $this->createDir();
-
-        chdir($this->dir);
-
-        $this->app = new Application();
-        $this->app->getHelperSet()->set(new Helper\ConfigurationHelper());
-        $this->app->getHelperSet()->set(new Helper\PhpSecLibHelper());
-
-        $command = $this->getCommand();
-        $this->name = $command->getName();
-
-        $this->app->add($command);
     }
 }

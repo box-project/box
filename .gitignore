@@ -5,6 +5,9 @@
 !/bin/box
 !/bin/box.bat
 /composer.lock
-/dist
-/vendor
+/dist/
+/vendor/
+/vendor-bin/*/composer.lock
+/vendor-bin/*/vendor/
+/.php_cs.cache
 /phpunit.xml

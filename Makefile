@@ -6,6 +6,19 @@ help:
 
 
 ##
+## Commands
+##---------------------------------------------------------------------------
+
+clean:		## Clean all created artifacts
+clean:
+	git clean --exclude=.idea/ -fdx
+
+cs:		## Fix CS
+cs: vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
+	php -d zend.enable_gc=0 vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer fix
+
+
+##
 ## Tests
 ##---------------------------------------------------------------------------
 
@@ -24,5 +37,11 @@ tc: vendor/bin/phpunit
 vendor: composer.lock
 	composer install
 
+vendor/bamarni: composer.lock
+	composer install
+
 vendor/bin/phpunit: composer.lock
 	composer install
+
+vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer: vendor/bamarni
+	composer bin php-cs-fixer install
