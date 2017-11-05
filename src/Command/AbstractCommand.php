@@ -1,5 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Command;
 
 use Symfony\Component\Console\Command\Command;
@@ -33,20 +45,20 @@ abstract class AbstractCommand extends Command
     /**
      * Checks if the output handler is verbose.
      *
-     * @return boolean TRUE if verbose, FALSE if not.
+     * @return bool TRUE if verbose, FALSE if not
      */
     protected function isVerbose()
     {
-        return (OutputInterface::VERBOSITY_VERBOSE <= $this->output->getVerbosity());
+        return OutputInterface::VERBOSITY_VERBOSE <= $this->output->getVerbosity();
     }
 
     /**
      * Outputs a message with a colored prefix.
      *
-     * @param string $prefix  The prefix.
-     * @param string $message The message.
+     * @param string $prefix  the prefix
+     * @param string $message the message
      */
-    protected function putln($prefix, $message)
+    protected function putln($prefix, $message): void
     {
         switch ($prefix) {
             case '!':
@@ -74,8 +86,12 @@ abstract class AbstractCommand extends Command
      * Writes the message only when verbosity is set to VERBOSITY_VERBOSE.
      *
      * @see OutputInterface#write
+     *
+     * @param mixed $message
+     * @param mixed $newline
+     * @param mixed $type
      */
-    protected function verbose($message, $newline = false, $type = 0)
+    protected function verbose($message, $newline = false, $type = 0): void
     {
         if ($this->isVerbose()) {
             $this->output->write($message, $newline, $type);
@@ -83,11 +99,14 @@ abstract class AbstractCommand extends Command
     }
 
     /**
-     * Writes the message only when verbosity is set to VERBOSITY_VERBOSE
+     * Writes the message only when verbosity is set to VERBOSITY_VERBOSE.
      *
      * @see OutputInterface#writeln
+     *
+     * @param mixed $message
+     * @param mixed $type
      */
-    protected function verboseln($message, $type = 0)
+    protected function verboseln($message, $type = 0): void
     {
         $this->verbose($message, true, $type);
     }

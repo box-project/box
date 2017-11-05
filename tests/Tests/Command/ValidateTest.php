@@ -1,5 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Tests\Command;
 
 use Exception;
@@ -7,60 +19,63 @@ use KevinGH\Box\Command\Validate;
 use KevinGH\Box\Test\CommandTestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @coversNothing
+ */
 class ValidateTest extends CommandTestCase
 {
-    public function testExecute()
+    public function testExecute(): void
     {
         file_put_contents('test.json', '{}');
 
         $tester = $this->getTester();
         $tester->execute(
-            array(
+            [
                 'command' => 'validate',
-                '--configuration' => 'test.json'
-            ),
-            array(
-                'verbosity' => OutputInterface::VERBOSITY_VERBOSE
-            )
+                '--configuration' => 'test.json',
+            ],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
         );
 
-        $expected = <<<OUTPUT
+        $expected = <<<'OUTPUT'
 Validating the Box configuration file...
 The configuration file passed validation.
 
 OUTPUT;
 
-        $this->assertEquals($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->getOutput($tester));
     }
 
-    public function testExecuteNotFound()
+    public function testExecuteNotFound(): void
     {
         $tester = $this->getTester();
-        $expected = <<<OUTPUT
+        $expected = <<<'OUTPUT'
 The configuration file failed validation.
 
 OUTPUT;
 
-        $this->assertEquals(1, $tester->execute(array('command' => 'validate')));
-        $this->assertEquals($expected, $this->getOutput($tester));
+        $this->assertSame(1, $tester->execute(['command' => 'validate']));
+        $this->assertSame($expected, $this->getOutput($tester));
     }
 
-    public function testExecuteFailed()
+    public function testExecuteFailed(): void
     {
         file_put_contents('box.json.dist', '{');
 
         $tester = $this->getTester();
-        $exit = $tester->execute(array('command' => 'validate'));
-        $expected = <<<OUTPUT
+        $exit = $tester->execute(['command' => 'validate']);
+        $expected = <<<'OUTPUT'
 The configuration file failed validation.
 
 OUTPUT;
 
-        $this->assertEquals(1, $exit);
-        $this->assertEquals($expected, $this->getOutput($tester));
+        $this->assertSame(1, $exit);
+        $this->assertSame($expected, $this->getOutput($tester));
     }
 
-    public function testExecuteFailedVerbose()
+    public function testExecuteFailedVerbose(): void
     {
         file_put_contents('box.json', '{');
 
@@ -68,42 +83,42 @@ OUTPUT;
 
         try {
             $tester->execute(
-                array(
-                    'command' => 'validate'
-                ),
-                array(
-                    'verbosity' => OutputInterface::VERBOSITY_VERBOSE
-                )
+                [
+                    'command' => 'validate',
+                ],
+                [
+                    'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+                ]
             );
         } catch (Exception $exception) {
         }
 
-        $expected = <<<OUTPUT
+        $expected = <<<'OUTPUT'
 Validating the Box configuration file...
 The configuration file failed validation.
 
 OUTPUT;
 
         $this->assertTrue(isset($exception));
-        $this->assertEquals($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->getOutput($tester));
     }
 
-    public function testExecuteInvalidVerbose()
+    public function testExecuteInvalidVerbose(): void
     {
         file_put_contents('box.json', '{"test": true}');
 
         $tester = $this->getTester();
 
         $tester->execute(
-            array(
-                'command' => 'validate'
-            ),
-            array(
-                'verbosity' => OutputInterface::VERBOSITY_VERBOSE
-            )
+            [
+                'command' => 'validate',
+            ],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
         );
 
-        $expected = <<<OUTPUT
+        $expected = <<<'OUTPUT'
 Validating the Box configuration file...
 The configuration file failed validation.
 
@@ -111,7 +126,7 @@ The configuration file failed validation.
 
 OUTPUT;
 
-        $this->assertEquals($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->getOutput($tester));
     }
 
     protected function getCommand()

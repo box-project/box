@@ -1,11 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box;
 
 use ErrorException;
 use KevinGH\Amend;
-use KevinGH\Box\Command;
-use KevinGH\Box\Helper;
 use Symfony\Component\Console\Application as Base;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,12 +31,15 @@ class Application extends Base
 {
     /**
      * @override
+     *
+     * @param mixed $name
+     * @param mixed $version
      */
     public function __construct($name = 'Box', $version = '@git-version@')
     {
         // convert errors to exceptions
         set_error_handler(
-            function ($code, $message, $file, $line) {
+            function ($code, $message, $file, $line): void {
                 if (error_reporting() & $code) {
                     throw new ErrorException($message, 0, $code, $file, $line);
                 }
@@ -43,7 +56,7 @@ class Application extends Base
      */
     public function getLongVersion()
     {
-        if (('@' . 'git-version@') !== $this->getVersion()) {
+        if (('@'.'git-version@') !== $this->getVersion()) {
             return sprintf(
                 '<info>%s</info> version <comment>%s</comment> build <comment>%s</comment>',
                 $this->getName(),
@@ -52,7 +65,7 @@ class Application extends Base
             );
         }
 
-        return '<info>' . $this->getName() . '</info> (repo)';
+        return '<info>'.$this->getName().'</info> (repo)';
     }
 
     /**
@@ -62,7 +75,7 @@ class Application extends Base
         InputInterface $input = null,
         OutputInterface $output = null
     ) {
-        $output = $output ? : new ConsoleOutput();
+        $output = $output ?: new ConsoleOutput();
 
         $output->getFormatter()->setStyle(
             'error',
@@ -97,7 +110,7 @@ class Application extends Base
         $commands[] = new Command\Validate();
         $commands[] = new Command\Verify();
 
-        if (('@' . 'git-version@') !== $this->getVersion()) {
+        if (('@'.'git-version@') !== $this->getVersion()) {
             $command = new Amend\Command('update');
             $command->setManifestUri('@manifest_url@');
 
@@ -116,7 +129,7 @@ class Application extends Base
         $helperSet->set(new Helper\ConfigurationHelper());
         $helperSet->set(new Helper\PhpSecLibHelper());
 
-        if (('@' . 'git-version@') !== $this->getVersion()) {
+        if (('@'.'git-version@') !== $this->getVersion()) {
             $helperSet->set(new Amend\Helper());
         }
 

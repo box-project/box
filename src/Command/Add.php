@@ -1,5 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Command;
 
 use Herrera\Box\Box;
@@ -35,14 +47,14 @@ class Add extends Configurable
     /**
      * @override
      */
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
         $this->setName('add');
         $this->setDescription('Adds or replaces files to a Phar.');
         $this->setHelp(
-            <<<HELP
+            <<<'HELP'
 The <info>%command.name%</info> will add a new file to an existing Phar, or replace
 an existing file with a new one.
 <comment>
@@ -169,7 +181,7 @@ HELP
         $this->box = Box::create($phar);
 
         // set replacement values, if any
-        if (array() !== ($values = $this->config->getProcessedReplacements())) {
+        if ([] !== ($values = $this->config->getProcessedReplacements())) {
             $this->putln('?', 'Setting replacement values...');
 
             if ($this->isVerbose()) {
@@ -184,7 +196,7 @@ HELP
         }
 
         // register configured compactors
-        if (array() !== ($compactors = $this->config->getCompactors())) {
+        if ([] !== ($compactors = $this->config->getCompactors())) {
             $this->putln('?', 'Registering compactors...');
 
             foreach ($compactors as $compactor) {

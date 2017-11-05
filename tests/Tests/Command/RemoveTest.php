@@ -1,5 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Tests\Command;
 
 use KevinGH\Box\Command\Remove;
@@ -7,9 +19,12 @@ use KevinGH\Box\Test\CommandTestCase;
 use Phar;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @coversNothing
+ */
 class RemoveTest extends CommandTestCase
 {
-    public function testExecute()
+    public function testExecute(): void
     {
         $phar = new Phar('test.phar');
         $phar->addFromString('a.php', '');
@@ -21,27 +36,27 @@ class RemoveTest extends CommandTestCase
 
         $tester = $this->getTester();
         $tester->execute(
-            array(
+            [
                 'command' => 'remove',
                 'phar' => 'test.phar',
-                'file' => array(
+                'file' => [
                     'b.php',
                     'd.php',
-                    'x.php'
-                )
-            ),
-            array(
-                'verbosity' => OutputInterface::VERBOSITY_VERBOSE
-            )
+                    'x.php',
+                ],
+            ],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
         );
 
-        $expected = <<<OUTPUT
+        $expected = <<<'OUTPUT'
 Removing files from the Phar...
 Done.
 
 OUTPUT;
 
-        $this->assertEquals($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->getOutput($tester));
 
         $phar = new Phar('test.phar');
 
@@ -51,27 +66,27 @@ OUTPUT;
         $this->assertFalse(isset($phar['d.php']));
     }
 
-    public function testExecuteNotExist()
+    public function testExecuteNotExist(): void
     {
         $tester = $this->getTester();
         $tester->execute(
-            array(
+            [
                 'command' => 'remove',
                 'phar' => 'test.phar',
-                'file' => array('b.php')
-            ),
-            array(
-                'verbosity' => OutputInterface::VERBOSITY_VERBOSE
-            )
+                'file' => ['b.php'],
+            ],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
         );
 
-        $expected = <<<OUTPUT
+        $expected = <<<'OUTPUT'
 Removing files from the Phar...
 The path "test.phar" is not a file or does not exist.
 
 OUTPUT;
 
-        $this->assertEquals($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->getOutput($tester));
     }
 
     protected function getCommand()

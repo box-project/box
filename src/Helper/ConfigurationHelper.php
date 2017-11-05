@@ -1,5 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Helper;
 
 use Herrera\Json\Json;
@@ -8,12 +20,12 @@ use Phine\Path\Path;
 use RuntimeException;
 use Symfony\Component\Console\Helper\Helper;
 
-/**
+/*
  * The Box schema file path.
  *
  * @var string
  */
-define('BOX_SCHEMA_FILE', BOX_PATH . '/res/schema.json');
+define('BOX_SCHEMA_FILE', BOX_PATH.'/res/schema.json');
 
 /**
  * Manages the acquisition of configuration settings.
@@ -55,20 +67,20 @@ class ConfigurationHelper extends Helper
     /**
      * Returns the file path to the default configuration file.
      *
-     * @return string The file path.
+     * @throws RuntimeException if the default file does not exist
      *
-     * @throws RuntimeException If the default file does not exist.
+     * @return string the file path
      */
     public function getDefaultPath()
     {
         if (false === file_exists(self::FILE_NAME)) {
-            if (false === file_exists(self::FILE_NAME . '.dist')) {
+            if (false === file_exists(self::FILE_NAME.'.dist')) {
                 throw new RuntimeException(
                     sprintf('The configuration file could not be found.')
                 );
             }
 
-            return realpath(self::FILE_NAME . '.dist');
+            return realpath(self::FILE_NAME.'.dist');
         }
 
         return realpath(self::FILE_NAME);
@@ -77,9 +89,9 @@ class ConfigurationHelper extends Helper
     /**
      * Loads the configuration file and returns it.
      *
-     * @param string $file The configuration file path.
+     * @param string $file the configuration file path
      *
-     * @return Configuration The configuration settings.
+     * @return Configuration the configuration settings
      */
     public function loadFile($file = null)
     {
@@ -92,10 +104,10 @@ class ConfigurationHelper extends Helper
         if (isset($json->import)) {
             if (!Path::isAbsolute($json->import)) {
                 $json->import = Path::join(
-                    array(
+                    [
                         dirname($file),
-                        $json->import
-                    )
+                        $json->import,
+                    ]
                 );
             }
 

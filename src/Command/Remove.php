@@ -1,5 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Command;
 
 use Phar;
@@ -19,12 +31,12 @@ class Remove extends Command
     /**
      * @override
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('remove');
         $this->setDescription('Removes files from a Phar.');
         $this->setHelp(
-            <<<HELP
+            <<<'HELP'
 The <info>%command.name%</info> command will remove one or more files from an
 existing Phar, listed as a <info>file</info> argument.
 HELP

@@ -1,25 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Tests\Command;
 
 use KevinGH\Box\Command\Info;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
 
+/**
+ * @coversNothing
+ */
 class InfoTest extends CommandTestCase
 {
-    public function testGetInfo()
+    public function testGetInfo(): void
     {
         $tester = $this->getTester();
         $tester->execute(
-            array(
-                'command' => 'info'
-            )
+            [
+                'command' => 'info',
+            ]
         );
 
         $version = Phar::apiVersion();
-        $compression = '  - ' . join("\n  - ", Phar::getSupportedCompression());
-        $signatures = '  - ' . join("\n  - ", Phar::getSupportedSignatures());
+        $compression = '  - '.implode("\n  - ", Phar::getSupportedCompression());
+        $signatures = '  - '.implode("\n  - ", Phar::getSupportedSignatures());
         $expected = <<<OUTPUT
 API Version: $version
 
@@ -31,10 +46,10 @@ $signatures
 
 OUTPUT;
 
-        $this->assertEquals($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->getOutput($tester));
     }
 
-    public function testGetInfoPhar()
+    public function testGetInfoPhar(): void
     {
         $phar = new Phar('test.phar');
         $phar->addFromString('a/b/c/d.php', '<?php echo "Hello!\n";');
@@ -46,10 +61,10 @@ OUTPUT;
 
         $tester = $this->getTester();
         $tester->execute(
-            array(
+            [
                 'command' => 'info',
-                'phar' => 'test.phar'
-            )
+                'phar' => 'test.phar',
+            ]
         );
 
         $expected = <<<OUTPUT
@@ -63,17 +78,17 @@ Signature Hash: {$signature['hash']}
 
 OUTPUT;
 
-        $this->assertEquals($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->getOutput($tester));
     }
 
-    public function testGetInfoPharList()
+    public function testGetInfoPharList(): void
     {
         $phar = new Phar('test.phar');
         $phar->addFromString('a/b/c/d.php', '<?php echo "Hello!\n";');
         $phar->addFromString('a/b/c/e.php', '<?php echo "Compressed!\n";');
-        $phar->setMetadata(array('test' => 123));
+        $phar->setMetadata(['test' => 123]);
 
-        /** @var \PharFileInfo[] $phar */
+        // @var \PharFileInfo[] $phar
         $phar['a/b/c/e.php']->compress(Phar::BZ2);
 
         /** @var Phar $phar */
@@ -84,12 +99,12 @@ OUTPUT;
 
         $tester = $this->getTester();
         $tester->execute(
-            array(
+            [
                 'command' => 'info',
                 'phar' => 'test.phar',
                 '--list' => true,
                 '--metadata' => true,
-            )
+            ]
         );
 
         $expected = <<<OUTPUT
@@ -115,10 +130,10 @@ array (
 
 OUTPUT;
 
-        $this->assertEquals($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->getOutput($tester));
     }
 
-    public function testGetInfoPharListFlat()
+    public function testGetInfoPharListFlat(): void
     {
         $phar = new Phar('test.phar');
         $phar->addFromString('a/b/c/d.php', '<?php echo "Hello!\n";');
@@ -130,12 +145,12 @@ OUTPUT;
 
         $tester = $this->getTester();
         $tester->execute(
-            array(
+            [
                 'command' => 'info',
                 'phar' => 'test.phar',
                 '--mode' => 'flat',
-                '--list' => true
-            )
+                '--list' => true,
+            ]
         );
 
         $ds = DIRECTORY_SEPARATOR;
@@ -156,7 +171,7 @@ a{$ds}b{$ds}c{$ds}d.php
 
 OUTPUT;
 
-        $this->assertEquals($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->getOutput($tester));
     }
 
     protected function getCommand()

@@ -1,8 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Test;
 
-use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -23,7 +34,7 @@ class FixedResponse extends QuestionHelper
     /**
      * Sets the fixed response.
      *
-     * @param string $response The fixed response.
+     * @param string $response the fixed response
      */
     public function __construct($response)
     {
@@ -32,6 +43,9 @@ class FixedResponse extends QuestionHelper
 
     /**
      * @override
+     *
+     * @param mixed $question
+     * @param mixed $fallback
      */
     public function askHiddenResponse(
         OutputInterface $output,

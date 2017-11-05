@@ -1,5 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Tests;
 
 use Herrera\Annotations\Tokenizer;
@@ -10,6 +22,7 @@ use SplFileInfo;
 
 /**
  * @requires PHP 7.2.0
+ * @coversNothing
  */
 class ConfigurationTest extends TestCase
 {
@@ -22,50 +35,70 @@ class ConfigurationTest extends TestCase
     private $dir;
     private $file;
 
-    public function testGetAlias()
+    protected function setUp(): void
     {
-        $this->assertEquals('default.phar', $this->config->getAlias());
+        $this->cwd = getcwd();
+        $this->dir = $this->createDir();
+        $this->file = $this->dir.DIRECTORY_SEPARATOR.'box.json';
+        $this->config = new Configuration($this->file, (object) []);
+
+        chdir($this->dir);
+        touch($this->file);
     }
 
-    public function testGetAliasSet()
+    protected function tearDown(): void
     {
-        $this->setConfig(array('alias' => 'test.phar'));
+        chdir($this->cwd);
 
-        $this->assertEquals('test.phar', $this->config->getAlias());
+        parent::tearDown();
     }
 
-    public function testGetBasePath()
+    public function testGetAlias(): void
     {
-        $this->assertEquals($this->dir, $this->config->getBasePath());
+        $this->assertSame('default.phar', $this->config->getAlias());
     }
 
-    public function testGetBasePathSet()
+    public function testGetAliasSet(): void
     {
-        mkdir($this->dir . DIRECTORY_SEPARATOR . 'test');
+        $this->setConfig(['alias' => 'test.phar']);
+
+        $this->assertSame('test.phar', $this->config->getAlias());
+    }
+
+    public function testGetBasePath(): void
+    {
+        $this->assertSame($this->dir, $this->config->getBasePath());
+    }
+
+    public function testGetBasePathSet(): void
+    {
+        mkdir($this->dir.DIRECTORY_SEPARATOR.'test');
 
         $this->setConfig(
-            array(
-                'base-path' => $this->dir . DIRECTORY_SEPARATOR . 'test'
-            )
+            [
+                'base-path' => $this->dir.DIRECTORY_SEPARATOR.'test',
+            ]
         );
 
-        $this->assertEquals(
-            $this->dir . DIRECTORY_SEPARATOR . 'test',
+        $this->assertSame(
+            $this->dir.DIRECTORY_SEPARATOR.'test',
             $this->config->getBasePath()
         );
     }
 
-    public function testGetBasePathNotExist()
+    public function testGetBasePathNotExist(): void
     {
         $this->setConfig(
-            array(
-                'base-path' => $this->dir . DIRECTORY_SEPARATOR . 'test'
-            )
+            [
+                'base-path' => $this->dir.DIRECTORY_SEPARATOR.'test',
+            ]
         );
 
-        $this->setExpectedException(
-            'InvalidArgumentException',
-            'The base path "' . $this->dir . DIRECTORY_SEPARATOR . 'test" is not a directory or does not exist.'
+        $this->expectException(
+            'InvalidArgumentException'
+        );
+        $this->expectExceptionMessage(
+            'The base path "'.$this->dir.DIRECTORY_SEPARATOR.'test" is not a directory or does not exist.'
         );
 
         $this->config->getBasePath();
@@ -74,47 +107,47 @@ class ConfigurationTest extends TestCase
     /**
      * @depends testGetBasePath
      */
-    public function testGetBasePathRegex()
+    public function testGetBasePathRegex(): void
     {
-        $this->assertEquals(
-            '/' . preg_quote($this->config->getBasePath() . DIRECTORY_SEPARATOR, '/') . '/',
+        $this->assertSame(
+            '/'.preg_quote($this->config->getBasePath().DIRECTORY_SEPARATOR, '/').'/',
             $this->config->getBasePathRegex()
         );
     }
 
-    public function testGetBinaryDirectories()
+    public function testGetBinaryDirectories(): void
     {
-        $this->assertSame(array(), $this->config->getBinaryDirectories());
+        $this->assertSame([], $this->config->getBinaryDirectories());
     }
 
-    public function testGetBinaryDirectoriesSet()
+    public function testGetBinaryDirectoriesSet(): void
     {
-        mkdir($this->dir . DIRECTORY_SEPARATOR . 'test');
+        mkdir($this->dir.DIRECTORY_SEPARATOR.'test');
 
-        $this->setConfig(array('directories-bin' => 'test'));
+        $this->setConfig(['directories-bin' => 'test']);
 
-        $this->assertEquals(
-            array($this->dir . DIRECTORY_SEPARATOR . 'test'),
+        $this->assertSame(
+            [$this->dir.DIRECTORY_SEPARATOR.'test'],
             $this->config->getBinaryDirectories()
         );
     }
 
-    public function testGetBinaryDirectoriesIterator()
+    public function testGetBinaryDirectoriesIterator(): void
     {
         $this->assertNull($this->config->getBinaryDirectoriesIterator());
     }
 
-    public function testGetBinaryDirectoriesIteratorSet()
+    public function testGetBinaryDirectoriesIteratorSet(): void
     {
         mkdir('alpha');
         touch('alpha/beta.png');
         touch('alpha/gamma.png');
 
         $this->setConfig(
-            array(
+            [
                 'blacklist' => 'alpha/beta.png',
-                'directories-bin' => 'alpha'
-            )
+                'directories-bin' => 'alpha',
+            ]
         );
 
         $iterator = $this->config
@@ -122,49 +155,49 @@ class ConfigurationTest extends TestCase
                          ->getIterator();
 
         foreach ($iterator as $file) {
-            /** @var $file SplFileInfo */
-            $this->assertEquals('gamma.png', $file->getBasename());
+            // @var $file SplFileInfo
+            $this->assertSame('gamma.png', $file->getBasename());
         }
     }
 
-    public function testGetBinaryFiles()
+    public function testGetBinaryFiles(): void
     {
-        $this->assertSame(array(), $this->config->getBinaryFiles());
+        $this->assertSame([], $this->config->getBinaryFiles());
     }
 
-    public function testGetBinaryFilesSet()
+    public function testGetBinaryFilesSet(): void
     {
-        mkdir($this->dir . DIRECTORY_SEPARATOR . 'test');
+        mkdir($this->dir.DIRECTORY_SEPARATOR.'test');
 
-        $this->setConfig(array('files-bin' => 'test.png'));
+        $this->setConfig(['files-bin' => 'test.png']);
 
         foreach ($this->config->getBinaryFiles() as $file) {
-            /** @var $file SplFileInfo */
-            $this->assertEquals('test.png', $file->getBasename());
+            // @var $file SplFileInfo
+            $this->assertSame('test.png', $file->getBasename());
         }
     }
 
-    public function testGetBinaryFilesIterator()
+    public function testGetBinaryFilesIterator(): void
     {
         $this->assertNull($this->config->getBinaryFilesIterator());
     }
 
-    public function testGetBinaryFilesIteratorSet()
+    public function testGetBinaryFilesIteratorSet(): void
     {
-        $this->setConfig(array('files-bin' => 'test.png'));
+        $this->setConfig(['files-bin' => 'test.png']);
 
         foreach ($this->config->getBinaryFilesIterator() as $file) {
-            /** @var $file SplFileInfo */
-            $this->assertEquals('test.png', $file->getBasename());
+            // @var $file SplFileInfo
+            $this->assertSame('test.png', $file->getBasename());
         }
     }
 
-    public function testGetBinaryFinders()
+    public function testGetBinaryFinders(): void
     {
-        $this->assertSame(array(), $this->config->getBinaryFinders());
+        $this->assertSame([], $this->config->getBinaryFinders());
     }
 
-    public function testGetBinaryFindersSet()
+    public function testGetBinaryFindersSet(): void
     {
         touch('bad.jpg');
         touch('test.jpg');
@@ -172,23 +205,23 @@ class ConfigurationTest extends TestCase
         touch('test.php');
 
         $this->setConfig(
-            array(
-                'blacklist' => array('bad.jpg'),
-                'finder-bin' => array(
-                    array(
+            [
+                'blacklist' => ['bad.jpg'],
+                'finder-bin' => [
+                    [
                         'name' => '*.png',
-                        'in' => '.'
-                    ),
-                    array(
+                        'in' => '.',
+                    ],
+                    [
                         'name' => '*.jpg',
-                        'in' => '.'
-                    )
-                )
-            )
+                        'in' => '.',
+                    ],
+                ],
+            ]
         );
 
         /** @var $results \SplFileInfo[] */
-        $results = array();
+        $results = [];
         $finders = $this->config->getBinaryFinders();
 
         foreach ($finders as $finder) {
@@ -197,23 +230,23 @@ class ConfigurationTest extends TestCase
             }
         }
 
-        $this->assertEquals('test.png', $results[0]->getBasename());
-        $this->assertEquals('test.jpg', $results[1]->getBasename());
+        $this->assertSame('test.png', $results[0]->getBasename());
+        $this->assertSame('test.jpg', $results[1]->getBasename());
     }
 
-    public function testGetBlacklist()
+    public function testGetBlacklist(): void
     {
-        $this->assertSame(array(), $this->config->getBlacklist());
+        $this->assertSame([], $this->config->getBlacklist());
     }
 
-    public function testGetBlacklistSet()
+    public function testGetBlacklistSet(): void
     {
-        $this->setConfig(array('blacklist' => array('test')));
+        $this->setConfig(['blacklist' => ['test']]);
 
-        $this->assertEquals(array('test'), $this->config->getBlacklist());
+        $this->assertSame(['test'], $this->config->getBlacklist());
     }
 
-    public function testGetBlacklistFilter()
+    public function testGetBlacklistFilter(): void
     {
         mkdir('sub');
         touch('alpha.php');
@@ -224,7 +257,7 @@ class ConfigurationTest extends TestCase
         $beta = new SplFileInfo('beta.php');
         $sub = new SplFileInfo('sub/alpha.php');
 
-        $this->setConfig(array('blacklist' => 'beta.php'));
+        $this->setConfig(['blacklist' => 'beta.php']);
 
         $callable = $this->config->getBlacklistFilter();
 
@@ -233,35 +266,35 @@ class ConfigurationTest extends TestCase
         $this->assertNull($callable($sub));
     }
 
-    public function testGetBootstrapFile()
+    public function testGetBootstrapFile(): void
     {
         $this->assertNull($this->config->getBootstrapFile());
     }
 
-    public function testGetBootstrapFileSet()
+    public function testGetBootstrapFileSet(): void
     {
-        $this->setconfig(array('bootstrap' => 'test.php'));
+        $this->setconfig(['bootstrap' => 'test.php']);
 
-        $this->assertEquals(
-            $this->dir . DIRECTORY_SEPARATOR . 'test.php',
+        $this->assertSame(
+            $this->dir.DIRECTORY_SEPARATOR.'test.php',
             $this->config->getBootstrapFile()
         );
     }
 
-    public function testGetCompactors()
+    public function testGetCompactors(): void
     {
-        $this->assertSame(array(), $this->config->getCompactors());
+        $this->assertSame([], $this->config->getCompactors());
     }
 
-    public function testGetCompactorsSet()
+    public function testGetCompactorsSet(): void
     {
         $this->setConfig(
-            array(
-                'compactors' => array(
+            [
+                'compactors' => [
                     'Herrera\\Box\\Compactor\\Php',
-                    __NAMESPACE__ . '\\TestCompactor'
-                )
-            )
+                    __NAMESPACE__.'\\TestCompactor',
+                ],
+            ]
         );
 
         $compactors = $this->config->getCompactors();
@@ -271,50 +304,54 @@ class ConfigurationTest extends TestCase
             $compactors[0]
         );
         $this->assertInstanceof(
-            __NAMESPACE__ . '\\TestCompactor',
+            __NAMESPACE__.'\\TestCompactor',
             $compactors[1]
         );
     }
 
-    public function testGetCompactorsNoSuchClass()
+    public function testGetCompactorsNoSuchClass(): void
     {
-        $this->setConfig(array('compactors' => array('NoSuchClass')));
+        $this->setConfig(['compactors' => ['NoSuchClass']]);
 
-        $this->setExpectedException(
-            'InvalidArgumentException',
+        $this->expectException(
+            'InvalidArgumentException'
+        );
+        $this->expectExceptionMessage(
             'The compactor class "NoSuchClass" does not exist.'
         );
 
         $this->config->getCompactors();
     }
 
-    public function testGetCompactorsInvalidClass()
+    public function testGetCompactorsInvalidClass(): void
     {
         $this->setConfig(
-            array('compactors' => array(__NAMESPACE__ . '\\InvalidCompactor'))
+            ['compactors' => [__NAMESPACE__.'\\InvalidCompactor']]
         );
 
-        $this->setExpectedException(
-            'InvalidArgumentException',
-            'The class "' . __NAMESPACE__ . '\\InvalidCompactor" is not a compactor class.'
+        $this->expectException(
+            'InvalidArgumentException'
+        );
+        $this->expectExceptionMessage(
+            'The class "'.__NAMESPACE__.'\\InvalidCompactor" is not a compactor class.'
         );
 
         $this->config->getCompactors();
     }
 
-    public function testGetCompactorsAnnotations()
+    public function testGetCompactorsAnnotations(): void
     {
         $this->setConfig(
-            array(
-                'annotations' => (object) array(
-                    'ignore' => array(
-                        'author'
-                    )
-                ),
-                'compactors' => array(
-                    'Herrera\\Box\\Compactor\\Php'
-                )
-            )
+            [
+                'annotations' => (object) [
+                    'ignore' => [
+                        'author',
+                    ],
+                ],
+                'compactors' => [
+                    'Herrera\\Box\\Compactor\\Php',
+                ],
+            ]
         );
 
         $compactors = $this->config->getCompactors();
@@ -324,89 +361,91 @@ class ConfigurationTest extends TestCase
 
         $this->assertNotNull($tokenizer);
 
-        $this->assertEquals(
-            array('author'),
+        $this->assertSame(
+            ['author'],
             $this->getPropertyValue($tokenizer, 'ignored')
         );
     }
 
-    public function testGetCompressionAlgorithm()
+    public function testGetCompressionAlgorithm(): void
     {
         $this->assertNull($this->config->getCompressionAlgorithm());
     }
 
-    public function testGetCompressionAlgorithmSet()
+    public function testGetCompressionAlgorithmSet(): void
     {
-        $this->setConfig(array('compression' => Phar::BZ2));
+        $this->setConfig(['compression' => Phar::BZ2]);
 
-        $this->assertEquals(Phar::BZ2, $this->config->getCompressionAlgorithm());
+        $this->assertSame(Phar::BZ2, $this->config->getCompressionAlgorithm());
     }
 
-    public function testGetCompressionAlgorithmSetString()
+    public function testGetCompressionAlgorithmSetString(): void
     {
-        $this->setConfig(array('compression' => 'BZ2'));
+        $this->setConfig(['compression' => 'BZ2']);
 
-        $this->assertEquals(Phar::BZ2, $this->config->getCompressionAlgorithm());
+        $this->assertSame(Phar::BZ2, $this->config->getCompressionAlgorithm());
     }
 
-    public function testGetCompressionAlgorithmInvalidString()
+    public function testGetCompressionAlgorithmInvalidString(): void
     {
-        $this->setConfig(array('compression' => 'INVALID'));
+        $this->setConfig(['compression' => 'INVALID']);
 
-        $this->setExpectedException(
-            'InvalidArgumentException',
+        $this->expectException(
+            'InvalidArgumentException'
+        );
+        $this->expectExceptionMessage(
             'The compression algorithm "INVALID" is not supported.'
         );
 
         $this->config->getCompressionAlgorithm();
     }
 
-    public function testGetDirectories()
+    public function testGetDirectories(): void
     {
-        $this->assertSame(array(), $this->config->getDirectories());
+        $this->assertSame([], $this->config->getDirectories());
     }
 
-    public function testGetDirectoriesSet()
+    public function testGetDirectoriesSet(): void
     {
-        $this->setConfig(array('directories' => array('test')));
+        $this->setConfig(['directories' => ['test']]);
 
-        $this->assertEquals(
-            array($this->dir . DIRECTORY_SEPARATOR . 'test'),
+        $this->assertSame(
+            [$this->dir.DIRECTORY_SEPARATOR.'test'],
             $this->config->getDirectories()
         );
     }
 
-    public function testGetDirectoriesTrailingSlashRemoved()
+    public function testGetDirectoriesTrailingSlashRemoved(): void
     {
         $this->setConfig(
-            array('directories' => array('dir/subdir1/', 'dir/subdir2/'))
+            ['directories' => ['dir/subdir1/', 'dir/subdir2/']]
         );
 
-        $this->assertEquals(
-            array(
-                $this->dir . DIRECTORY_SEPARATOR . 'dir/subdir1',
-                $this->dir . DIRECTORY_SEPARATOR . 'dir/subdir2',
-            ),
+        $this->assertSame(
+            [
+                $this->dir.DIRECTORY_SEPARATOR.'dir/subdir1',
+                $this->dir.DIRECTORY_SEPARATOR.'dir/subdir2',
+            ],
             $this->config->getDirectories()
         );
     }
 
-    public function testGetDirectoriesIterator()
+    public function testGetDirectoriesIterator(): void
     {
         $this->assertNull($this->config->getDirectoriesIterator());
     }
 
-    public function testGetDirectoriesIteratorSet()
+    public function testGetDirectoriesIteratorSet(): void
     {
         mkdir('alpha');
         touch('alpha/beta.php');
         touch('alpha/gamma.php');
 
         $this->setConfig(
-            array(
+            [
                 'blacklist' => 'alpha/beta.php',
-                'directories' => 'alpha'
-            )
+                'directories' => 'alpha',
+            ]
         );
 
         $iterator = $this->config
@@ -414,77 +453,79 @@ class ConfigurationTest extends TestCase
                          ->getIterator();
 
         foreach ($iterator as $file) {
-            /** @var $file SplFileInfo */
-            $this->assertEquals('gamma.php', $file->getBasename());
+            // @var $file SplFileInfo
+            $this->assertSame('gamma.php', $file->getBasename());
         }
     }
 
-    public function testGetFileMode()
+    public function testGetFileMode(): void
     {
         $this->assertNull($this->config->getFileMode());
     }
 
-    public function testGetFileModeSet()
+    public function testGetFileModeSet(): void
     {
-        $this->setConfig(array('chmod' => '0755'));
+        $this->setConfig(['chmod' => '0755']);
 
-        $this->assertEquals(0755, $this->config->getFileMode());
+        $this->assertSame(0755, $this->config->getFileMode());
     }
 
-    public function testGetFiles()
+    public function testGetFiles(): void
     {
-        $this->assertSame(array(), $this->config->getFiles());
+        $this->assertSame([], $this->config->getFiles());
     }
 
-    public function testGetFilesNotExist()
+    public function testGetFilesNotExist(): void
     {
-        $this->setConfig(array('files' => array('test.php')));
+        $this->setConfig(['files' => ['test.php']]);
 
-        $this->setExpectedException(
-            'RuntimeException',
+        $this->expectException(
+            'RuntimeException'
+        );
+        $this->expectExceptionMessage(
             'The file "'
-                . $this->dir . DIRECTORY_SEPARATOR
-                . 'test.php" does not exist or is not a file.'
+                .$this->dir.DIRECTORY_SEPARATOR
+                .'test.php" does not exist or is not a file.'
         );
 
         $this->config->getFiles();
     }
 
-    public function testGetFilesSet()
+    public function testGetFilesSet(): void
     {
         touch('test.php');
 
-        $this->setConfig(array('files' => array('test.php')));
+        $this->setConfig(['files' => ['test.php']]);
 
         foreach ($this->config->getFiles() as $file) {
-            /** @var $file SplFileInfo */
-            $this->assertEquals('test.php', $file->getBasename());
+            // @var $file SplFileInfo
+            $this->assertSame('test.php', $file->getBasename());
         }
     }
 
-    public function testGetFilesIterator()
+    public function testGetFilesIterator(): void
     {
         $this->assertNull($this->config->getFilesIterator());
     }
 
-    public function testGetFilesIteratorSet()
+    public function testGetFilesIteratorSet(): void
     {
         touch('test.php');
 
-        $this->setConfig(array('files' => 'test.php'));
+        $this->setConfig(['files' => 'test.php']);
 
         foreach ($this->config->getFilesIterator() as $file) {
-            /** @var $file SplFileInfo */
-            $this->assertEquals('test.php', $file->getBasename());
+            // @var $file SplFileInfo
+            $this->assertSame('test.php', $file->getBasename());
         }
     }
 
-    public function testGetFinders()
+    public function testGetFinders(): void
     {
-        $this->assertSame(array(), $this->config->getFinders());
+        $this->assertSame([], $this->config->getFinders());
     }
 
-    public function testGetFindersSet()
+    public function testGetFindersSet(): void
     {
         touch('bad.php');
         touch('test.html');
@@ -492,23 +533,23 @@ class ConfigurationTest extends TestCase
         touch('test.php');
 
         $this->setConfig(
-            array(
-                'blacklist' => array('bad.php'),
-                'finder' => array(
-                    array(
+            [
+                'blacklist' => ['bad.php'],
+                'finder' => [
+                    [
                         'name' => '*.php',
-                        'in' => '.'
-                    ),
-                    array(
+                        'in' => '.',
+                    ],
+                    [
                         'name' => '*.html',
-                        'in' => '.'
-                    )
-                )
-            )
+                        'in' => '.',
+                    ],
+                ],
+            ]
         );
 
         /** @var $results \SplFileInfo[] */
-        $results = array();
+        $results = [];
         $finders = $this->config->getFinders();
 
         foreach ($finders as $finder) {
@@ -517,11 +558,11 @@ class ConfigurationTest extends TestCase
             }
         }
 
-        $this->assertEquals('test.php', $results[0]->getBasename());
-        $this->assertEquals('test.html', $results[1]->getBasename());
+        $this->assertSame('test.php', $results[0]->getBasename());
+        $this->assertSame('test.html', $results[1]->getBasename());
     }
 
-    public function testGetDatetimeNow()
+    public function testGetDatetimeNow(): void
     {
         $this->assertRegExp(
             '/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/',
@@ -529,7 +570,7 @@ class ConfigurationTest extends TestCase
         );
     }
 
-    public function testGetDatetimeNowFormatted()
+    public function testGetDatetimeNowFormatted(): void
     {
         $this->assertRegExp(
             '/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/',
@@ -537,33 +578,31 @@ class ConfigurationTest extends TestCase
         );
     }
 
-    public function testGetDatetimeNowPlaceHolder()
+    public function testGetDatetimeNowPlaceHolder(): void
     {
         $this->assertNull($this->config->getDatetimeNowPlaceHolder());
 
-        $this->setConfig(array('datetime' => 'date_time'));
+        $this->setConfig(['datetime' => 'date_time']);
 
-        $this->assertEquals(
+        $this->assertSame(
             'date_time',
             $this->config->getDatetimeNowPlaceHolder()
         );
-
     }
 
-    public function testGetDatetimeFormat()
+    public function testGetDatetimeFormat(): void
     {
-        $this->assertEquals('Y-m-d H:i:s', $this->config->getDatetimeFormat());
+        $this->assertSame('Y-m-d H:i:s', $this->config->getDatetimeFormat());
 
-        $this->setConfig(array('datetime_format' => 'Y-m-d'));
+        $this->setConfig(['datetime_format' => 'Y-m-d']);
 
-        $this->assertEquals(
+        $this->assertSame(
             'Y-m-d',
             $this->config->getDatetimeFormat()
         );
-
     }
 
-    public function testGetGitHash()
+    public function testGetGitHash(): void
     {
         touch('test');
         exec('git init');
@@ -583,7 +622,7 @@ class ConfigurationTest extends TestCase
         }
     }
 
-    public function testGetGitHashShort()
+    public function testGetGitHashShort(): void
     {
         touch('test');
         exec('git init');
@@ -603,37 +642,37 @@ class ConfigurationTest extends TestCase
         }
     }
 
-    public function testGetGitHashPlaceholder()
+    public function testGetGitHashPlaceholder(): void
     {
         $this->assertNull($this->config->getGitHashPlaceholder());
     }
 
-    public function testGetGitHashPlaceholderSet()
+    public function testGetGitHashPlaceholderSet(): void
     {
-        $this->setConfig(array('git-commit' => 'git_commit'));
+        $this->setConfig(['git-commit' => 'git_commit']);
 
-        $this->assertEquals(
+        $this->assertSame(
             'git_commit',
             $this->config->getGitHashPlaceholder()
         );
     }
 
-    public function testGetGitShortHashPlaceholder()
+    public function testGetGitShortHashPlaceholder(): void
     {
         $this->assertNull($this->config->getGitShortHashPlaceholder());
     }
 
-    public function testGetGitShortHashPlaceholderSet()
+    public function testGetGitShortHashPlaceholderSet(): void
     {
-        $this->setConfig(array('git-commit-short' => 'git_commit_short'));
+        $this->setConfig(['git-commit-short' => 'git_commit_short']);
 
-        $this->assertEquals(
+        $this->assertSame(
             'git_commit_short',
             $this->config->getGitShortHashPlaceholder()
         );
     }
 
-    public function testGitTag()
+    public function testGitTag(): void
     {
         touch('test');
         exec('git init');
@@ -643,7 +682,7 @@ class ConfigurationTest extends TestCase
         exec('git commit -m "Adding test file."');
         exec('git tag 1.0.0');
 
-        $this->assertEquals('1.0.0', $this->config->getGitTag());
+        $this->assertSame('1.0.0', $this->config->getGitTag());
 
         // some process does not release the git files
         if ($this->isWindows()) {
@@ -651,32 +690,34 @@ class ConfigurationTest extends TestCase
         }
     }
 
-    public function testGetGitTagPlaceholder()
+    public function testGetGitTagPlaceholder(): void
     {
         $this->assertNull($this->config->getGitTagPlaceholder());
     }
 
-    public function testGetGitTagPlaceholderSet()
+    public function testGetGitTagPlaceholderSet(): void
     {
-        $this->setConfig(array('git-tag' => '@git-tag@'));
+        $this->setConfig(['git-tag' => '@git-tag@']);
 
-        $this->assertEquals(
+        $this->assertSame(
             '@git-tag@',
             $this->config->getGitTagPlaceholder()
         );
     }
 
-    public function testGetGitVersion()
+    public function testGetGitVersion(): void
     {
-        $this->setExpectedException(
-            'RuntimeException',
+        $this->expectException(
+            'RuntimeException'
+        );
+        $this->expectExceptionMessage(
             'Not a git repository'
         );
 
         $this->config->getGitVersion();
     }
 
-    public function testGitVersionTag()
+    public function testGitVersionTag(): void
     {
         touch('test');
         exec('git init');
@@ -686,7 +727,7 @@ class ConfigurationTest extends TestCase
         exec('git commit -m "Adding test file."');
         exec('git tag 1.0.0');
 
-        $this->assertEquals('1.0.0', $this->config->getGitVersion());
+        $this->assertSame('1.0.0', $this->config->getGitVersion());
 
         // some process does not release the git files
         if ($this->isWindows()) {
@@ -694,7 +735,7 @@ class ConfigurationTest extends TestCase
         }
     }
 
-    public function testGitVersionCommit()
+    public function testGitVersionCommit(): void
     {
         touch('test');
         exec('git init');
@@ -714,175 +755,177 @@ class ConfigurationTest extends TestCase
         }
     }
 
-    public function testGetVersionPlaceholder()
+    public function testGetVersionPlaceholder(): void
     {
         $this->assertNull($this->config->getGitVersionPlaceholder());
     }
 
-    public function testGetVersionPlaceholderSet()
+    public function testGetVersionPlaceholderSet(): void
     {
-        $this->setConfig(array('git-version' => 'git_version'));
+        $this->setConfig(['git-version' => 'git_version']);
 
-        $this->assertEquals(
+        $this->assertSame(
             'git_version',
             $this->config->getGitVersionPlaceholder()
         );
     }
 
-    public function testGetMainScriptPath()
+    public function testGetMainScriptPath(): void
     {
         $this->assertNull($this->config->getMainScriptPath());
     }
 
-    public function testGetMainScriptPathSet()
+    public function testGetMainScriptPathSet(): void
     {
-        $this->setConfig(array('main' => 'test.php'));
+        $this->setConfig(['main' => 'test.php']);
 
-        $this->assertEquals('test.php', $this->config->getMainScriptPath());
+        $this->assertSame('test.php', $this->config->getMainScriptPath());
     }
 
-    public function testGetMainScriptContents()
+    public function testGetMainScriptContents(): void
     {
         $this->assertNull($this->config->getMainScriptContents());
     }
 
-    public function testGetMainScriptContentsSet()
+    public function testGetMainScriptContentsSet(): void
     {
         file_put_contents('test.php', "#!/usr/bin/env php\ntest");
 
-        $this->setConfig(array('main' => 'test.php'));
+        $this->setConfig(['main' => 'test.php']);
 
-        $this->assertEquals('test', $this->config->getMainScriptContents());
+        $this->assertSame('test', $this->config->getMainScriptContents());
     }
 
-    public function testGetMainScriptContentsReadError()
+    public function testGetMainScriptContentsReadError(): void
     {
-        $this->setConfig(array('main' => 'test.php'));
+        $this->setConfig(['main' => 'test.php']);
 
-        $this->setExpectedException(
-            'RuntimeException',
+        $this->expectException(
+            'RuntimeException'
+        );
+        $this->expectExceptionMessage(
             'No such file'
         );
 
         $this->config->getMainScriptContents();
     }
 
-    public function testGetMap()
+    public function testGetMap(): void
     {
-        $this->assertSame(array(), $this->config->getMap());
+        $this->assertSame([], $this->config->getMap());
     }
 
-    public function testGetMapSet()
+    public function testGetMapSet(): void
     {
         $this->setConfig(
-            array(
-                'map' => array(
-                    array('a' => 'b'),
-                    array('_empty_' => 'c')
-                )
-            )
+            [
+                'map' => [
+                    ['a' => 'b'],
+                    ['_empty_' => 'c'],
+                ],
+            ]
         );
 
-        $this->assertEquals(
-            array(
-                array('a' => 'b'),
-                array('' => 'c')
-            ),
+        $this->assertSame(
+            [
+                ['a' => 'b'],
+                ['' => 'c'],
+            ],
             $this->config->getMap()
         );
     }
 
-    public function testGetMapper()
+    public function testGetMapper(): void
     {
         $this->setConfig(
-            array(
-                'map' => array(
-                    array('first/test/path' => 'a'),
-                    array('' => 'b/')
-                )
-            )
+            [
+                'map' => [
+                    ['first/test/path' => 'a'],
+                    ['' => 'b/'],
+                ],
+            ]
         );
 
         $ds = DIRECTORY_SEPARATOR;
         $mapper = $this->config->getMapper();
 
-        $this->assertEquals(
+        $this->assertSame(
             "a{$ds}sub{$ds}path{$ds}file.php",
             $mapper('first/test/path/sub/path/file.php')
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             "b{$ds}second{$ds}test{$ds}path{$ds}sub{$ds}path{$ds}file.php",
             $mapper('second/test/path/sub/path/file.php')
         );
     }
 
-    public function testGetMetadata()
+    public function testGetMetadata(): void
     {
         $this->assertNull($this->config->getMetadata());
     }
 
-    public function testGetMetadataSet()
+    public function testGetMetadataSet(): void
     {
-        $this->setConfig(array('metadata' => 123));
+        $this->setConfig(['metadata' => 123]);
 
         $this->assertSame(123, $this->config->getMetadata());
     }
 
-    public function testGetMimetypeMapping()
+    public function testGetMimetypeMapping(): void
     {
-        $this->assertSame(array(), $this->config->getMimetypeMapping());
+        $this->assertSame([], $this->config->getMimetypeMapping());
     }
 
-    public function testGetMimetypeMappingSet()
+    public function testGetMimetypeMappingSet(): void
     {
-        $mimetypes = array('phps' => Phar::PHPS);
+        $mimetypes = ['phps' => Phar::PHPS];
 
-        $this->setConfig(array('mimetypes' => $mimetypes));
+        $this->setConfig(['mimetypes' => $mimetypes]);
 
-        $this->assertEquals($mimetypes, $this->config->getMimetypeMapping());
+        $this->assertSame($mimetypes, $this->config->getMimetypeMapping());
     }
 
-    public function testGetMungVariables()
+    public function testGetMungVariables(): void
     {
-        $this->assertSame(array(), $this->config->getMungVariables());
+        $this->assertSame([], $this->config->getMungVariables());
     }
 
-    public function testGetMungVariablesSet()
+    public function testGetMungVariablesSet(): void
     {
-        $mung = array('REQUEST_URI');
+        $mung = ['REQUEST_URI'];
 
-        $this->setConfig(array('mung' => $mung));
+        $this->setConfig(['mung' => $mung]);
 
-        $this->assertEquals($mung, $this->config->getMungVariables());
+        $this->assertSame($mung, $this->config->getMungVariables());
     }
 
-    public function testGetNotFoundScriptPath()
+    public function testGetNotFoundScriptPath(): void
     {
         $this->assertNull($this->config->getNotFoundScriptPath());
     }
 
-    public function testGetNotFoundScriptPathSet()
+    public function testGetNotFoundScriptPathSet(): void
     {
-        $this->setConfig(array('not-found' => 'test.php'));
+        $this->setConfig(['not-found' => 'test.php']);
 
-        $this->assertEquals('test.php', $this->config->getNotFoundScriptPath());
+        $this->assertSame('test.php', $this->config->getNotFoundScriptPath());
     }
 
-    public function testGetOutputPath()
+    public function testGetOutputPath(): void
     {
-        $this->assertEquals(
-            $this->dir . DIRECTORY_SEPARATOR . 'default.phar',
+        $this->assertSame(
+            $this->dir.DIRECTORY_SEPARATOR.'default.phar',
             $this->config->getOutputPath()
         );
     }
 
-    public function testGetOutputPathSet()
+    public function testGetOutputPathSet(): void
     {
-        $this->setConfig(array('output' => 'test.phar'));
+        $this->setConfig(['output' => 'test.phar']);
 
-        $this->assertEquals(
-            $this->dir . DIRECTORY_SEPARATOR . 'test.phar',
+        $this->assertSame(
+            $this->dir.DIRECTORY_SEPARATOR.'test.phar',
             $this->config->getOutputPath()
         );
     }
@@ -890,7 +933,7 @@ class ConfigurationTest extends TestCase
     /**
      * @depends testGetOutputPathSet
      */
-    public function testGetOutputPathGitVersion()
+    public function testGetOutputPathGitVersion(): void
     {
         touch('test');
         exec('git init');
@@ -900,10 +943,10 @@ class ConfigurationTest extends TestCase
         exec('git commit -m "Adding test file."');
         exec('git tag 1.0.0');
 
-        $this->setConfig(array('output' => 'test-@git-version@.phar'));
+        $this->setConfig(['output' => 'test-@git-version@.phar']);
 
-        $this->assertEquals(
-            $this->dir . DIRECTORY_SEPARATOR . 'test-1.0.0.phar',
+        $this->assertSame(
+            $this->dir.DIRECTORY_SEPARATOR.'test-1.0.0.phar',
             $this->config->getOutputPath()
         );
 
@@ -913,43 +956,43 @@ class ConfigurationTest extends TestCase
         }
     }
 
-    public function testGetPrivateKeyPassphrase()
+    public function testGetPrivateKeyPassphrase(): void
     {
         $this->assertNull($this->config->getPrivateKeyPassphrase());
     }
 
-    public function testGetPrivateKeyPassphraseSet()
+    public function testGetPrivateKeyPassphraseSet(): void
     {
-        $this->setConfig(array('key-pass' => 'test'));
+        $this->setConfig(['key-pass' => 'test']);
 
-        $this->assertEquals('test', $this->config->getPrivateKeyPassphrase());
+        $this->assertSame('test', $this->config->getPrivateKeyPassphrase());
     }
 
-    public function testGetPrivateKeyPassphraseSetBoolean()
+    public function testGetPrivateKeyPassphraseSetBoolean(): void
     {
-        $this->setConfig(array('key-pass' => true));
+        $this->setConfig(['key-pass' => true]);
 
         $this->assertNull($this->config->getPrivateKeyPassphrase());
     }
 
-    public function testGetPrivateKeyPath()
+    public function testGetPrivateKeyPath(): void
     {
         $this->assertNull($this->config->getPrivateKeyPath());
     }
 
-    public function testGetPrivateKeyPathSet()
+    public function testGetPrivateKeyPathSet(): void
     {
-        $this->setConfig(array('key' => 'test.pem'));
+        $this->setConfig(['key' => 'test.pem']);
 
-        $this->assertEquals('test.pem', $this->config->getPrivateKeyPath());
+        $this->assertSame('test.pem', $this->config->getPrivateKeyPath());
     }
 
-    public function testGetProcessedReplacements()
+    public function testGetProcessedReplacements(): void
     {
-        $this->assertSame(array(), $this->config->getProcessedReplacements());
+        $this->assertSame([], $this->config->getProcessedReplacements());
     }
 
-    public function testGetProcessedReplacementsSet()
+    public function testGetProcessedReplacementsSet(): void
     {
         touch('test');
         exec('git init');
@@ -960,24 +1003,24 @@ class ConfigurationTest extends TestCase
         exec('git tag 1.0.0');
 
         $this->setConfig(
-            array(
+            [
                 'git-commit' => 'git_commit',
                 'git-commit-short' => 'git_commit_short',
                 'git-tag' => 'git_tag',
                 'git-version' => 'git_version',
-                'replacements' => array('rand' => $rand = rand()),
+                'replacements' => ['rand' => $rand = random_int(0, getrandmax())],
                 'datetime' => 'date_time',
-                'datetime_format' => 'Y:m:d'
-            )
+                'datetime_format' => 'Y:m:d',
+            ]
         );
 
         $values = $this->config->getProcessedReplacements();
 
         $this->assertRegExp('/^[a-f0-9]{40}$/', $values['@git_commit@']);
         $this->assertRegExp('/^[a-f0-9]{7}$/', $values['@git_commit_short@']);
-        $this->assertEquals('1.0.0', $values['@git_tag@']);
-        $this->assertEquals('1.0.0', $values['@git_version@']);
-        $this->assertEquals($rand, $values['@rand@']);
+        $this->assertSame('1.0.0', $values['@git_tag@']);
+        $this->assertSame('1.0.0', $values['@git_version@']);
+        $this->assertSame($rand, $values['@rand@']);
         $this->assertRegExp(
             '/^[0-9]{4}:[0-9]{2}:[0-9]{2}$/',
             $values['@date_time@']
@@ -989,106 +1032,110 @@ class ConfigurationTest extends TestCase
         }
     }
 
-    public function testGetReplacementSigil()
+    public function testGetReplacementSigil(): void
     {
-        $this->assertEquals('@', $this->config->getReplacementSigil());
+        $this->assertSame('@', $this->config->getReplacementSigil());
 
-        $this->setConfig(array('replacement-sigil' => '$'));
+        $this->setConfig(['replacement-sigil' => '$']);
 
-        $this->assertEquals('$', $this->config->getReplacementSigil());
+        $this->assertSame('$', $this->config->getReplacementSigil());
     }
 
-    public function testGetReplacements()
+    public function testGetReplacements(): void
     {
-        $this->assertSame(array(), $this->config->getReplacements());
+        $this->assertSame([], $this->config->getReplacements());
     }
 
-    public function testGetReplacementsSet()
+    public function testGetReplacementsSet(): void
     {
-        $replacements = array('rand' => rand());
+        $replacements = ['rand' => random_int(0, getrandmax())];
 
-        $this->setConfig(array('replacements' => (object) $replacements));
+        $this->setConfig(['replacements' => (object) $replacements]);
 
-        $this->assertEquals($replacements, $this->config->getReplacements());
+        $this->assertSame($replacements, $this->config->getReplacements());
     }
 
-    public function testGetShebang()
+    public function testGetShebang(): void
     {
         $this->assertNull($this->config->getShebang());
     }
 
-    public function testGetShebangSet()
+    public function testGetShebangSet(): void
     {
-        $this->setConfig(array('shebang' => '#!/bin/php'));
+        $this->setConfig(['shebang' => '#!/bin/php']);
 
-        $this->assertEquals('#!/bin/php', $this->config->getShebang());
+        $this->assertSame('#!/bin/php', $this->config->getShebang());
     }
 
-    public function testGetShebangInvalid()
+    public function testGetShebangInvalid(): void
     {
-        $this->setConfig(array('shebang' => '/bin/php'));
+        $this->setConfig(['shebang' => '/bin/php']);
 
-        $this->setExpectedException(
-            'InvalidArgumentException',
+        $this->expectException(
+            'InvalidArgumentException'
+        );
+        $this->expectExceptionMessage(
             'The shebang line must start with "#!": /bin/php'
         );
 
         $this->config->getShebang();
     }
 
-    public function testGetShebangBlank()
+    public function testGetShebangBlank(): void
     {
-        $this->setConfig(array('shebang' => ''));
+        $this->setConfig(['shebang' => '']);
 
-        $this->assertEquals('', $this->config->getShebang());
+        $this->assertSame('', $this->config->getShebang());
     }
 
-    public function testGetShebangFalse()
+    public function testGetShebangFalse(): void
     {
-        $this->setConfig(array('shebang' => false));
+        $this->setConfig(['shebang' => false]);
 
-        $this->assertEquals('', $this->config->getShebang());
+        $this->assertSame('', $this->config->getShebang());
     }
 
-    public function testGetSigningAlgorithm()
+    public function testGetSigningAlgorithm(): void
     {
         $this->assertSame(Phar::SHA1, $this->config->getSigningAlgorithm());
     }
 
-    public function testGetSigningAlgorithmSet()
+    public function testGetSigningAlgorithmSet(): void
     {
-        $this->setConfig(array('algorithm' => Phar::MD5));
+        $this->setConfig(['algorithm' => Phar::MD5]);
 
-        $this->assertEquals(Phar::MD5, $this->config->getSigningAlgorithm());
+        $this->assertSame(Phar::MD5, $this->config->getSigningAlgorithm());
     }
 
-    public function testGetSigningAlgorithmSetString()
+    public function testGetSigningAlgorithmSetString(): void
     {
-        $this->setConfig(array('algorithm' => 'MD5'));
+        $this->setConfig(['algorithm' => 'MD5']);
 
-        $this->assertEquals(Phar::MD5, $this->config->getSigningAlgorithm());
+        $this->assertSame(Phar::MD5, $this->config->getSigningAlgorithm());
     }
 
-    public function testGetSigningAlgorithmInvalidString()
+    public function testGetSigningAlgorithmInvalidString(): void
     {
-        $this->setConfig(array('algorithm' => 'INVALID'));
+        $this->setConfig(['algorithm' => 'INVALID']);
 
-        $this->setExpectedException(
-            'InvalidArgumentException',
+        $this->expectException(
+            'InvalidArgumentException'
+        );
+        $this->expectExceptionMessage(
             'The signing algorithm "INVALID" is not supported.'
         );
 
         $this->config->getSigningAlgorithm();
     }
 
-    public function testGetStubBanner()
+    public function testGetStubBanner(): void
     {
         $this->assertNull($this->config->getStubBanner());
     }
 
-    public function testGetStubBannerSet()
+    public function testGetStubBannerSet(): void
     {
-        $comment = <<<COMMENT
+        $comment = <<<'COMMENT'
 This is a
 
 multiline
@@ -1096,19 +1143,19 @@ multiline
 comment.
 COMMENT;
 
-        $this->setConfig(array('banner' => $comment));
+        $this->setConfig(['banner' => $comment]);
 
-        $this->assertEquals($comment, $this->config->getStubBanner());
+        $this->assertSame($comment, $this->config->getStubBanner());
     }
 
-    public function testGetStubBannerFromFile()
+    public function testGetStubBannerFromFile(): void
     {
         $this->assertNull($this->config->getStubBannerFromFile());
     }
 
-    public function testGetStubBannerFromFileSet()
+    public function testGetStubBannerFromFileSet(): void
     {
-        $comment = <<<COMMENT
+        $comment = <<<'COMMENT'
 This is a
 
 multiline
@@ -1118,192 +1165,180 @@ COMMENT;
 
         file_put_contents('banner', $comment);
 
-        $this->setConfig(array('banner-file' => 'banner'));
+        $this->setConfig(['banner-file' => 'banner']);
 
-        $this->assertEquals($comment, $this->config->getStubBannerFromFile());
+        $this->assertSame($comment, $this->config->getStubBannerFromFile());
     }
 
-    public function testGetStubBannerFromFileReadError()
+    public function testGetStubBannerFromFileReadError(): void
     {
-        $this->setConfig(array('banner-file' => '/does/not/exist'));
+        $this->setConfig(['banner-file' => '/does/not/exist']);
 
-        $this->setExpectedException(
-            'RuntimeException',
+        $this->expectException(
+            'RuntimeException'
+        );
+        $this->expectExceptionMessage(
             'No such file or directory'
         );
 
         $this->config->getStubBannerFromFile();
     }
 
-    public function testGetStubBannerPath()
+    public function testGetStubBannerPath(): void
     {
         $this->assertNull($this->config->getStubBannerPath());
     }
 
-    public function testGetStubBannerPathSet()
+    public function testGetStubBannerPathSet(): void
     {
-        $this->setConfig(array('banner-file' => '/path/to/file'));
+        $this->setConfig(['banner-file' => '/path/to/file']);
 
-        $this->assertEquals(
+        $this->assertSame(
             '/path/to/file',
             $this->config->getStubBannerPath()
         );
     }
 
-    public function testGetStubPath()
+    public function testGetStubPath(): void
     {
         $this->assertNull($this->config->getStubPath());
     }
 
-    public function testGetStubPathSet()
+    public function testGetStubPathSet(): void
     {
-        $this->setConfig(array('stub' => 'test.php'));
+        $this->setConfig(['stub' => 'test.php']);
 
-        $this->assertEquals('test.php', $this->config->getStubPath());
+        $this->assertSame('test.php', $this->config->getStubPath());
     }
 
-    public function testGetStubPathSetBoolean()
+    public function testGetStubPathSetBoolean(): void
     {
-        $this->setConfig(array('stub' => true));
+        $this->setConfig(['stub' => true]);
 
         $this->assertNull($this->config->getStubPath());
     }
 
-    public function testIsExtractable()
+    public function testIsExtractable(): void
     {
         $this->assertFalse($this->config->isExtractable());
     }
 
-    public function testIsExtractableSet()
+    public function testIsExtractableSet(): void
     {
-        $this->setConfig(array('extract' => true));
+        $this->setConfig(['extract' => true]);
 
         $this->assertTrue($this->config->isExtractable());
     }
 
-    public function testIsInterceptFileFuncs()
+    public function testIsInterceptFileFuncs(): void
     {
         $this->assertFalse($this->config->isInterceptFileFuncs());
     }
 
-    public function testIsInterceptFileFuncsSet()
+    public function testIsInterceptFileFuncsSet(): void
     {
-        $this->setConfig(array('intercept' => true));
+        $this->setConfig(['intercept' => true]);
 
         $this->assertTrue($this->config->isInterceptFileFuncs());
     }
 
-    public function testIsPrivateKeyPrompt()
+    public function testIsPrivateKeyPrompt(): void
     {
         $this->assertFalse($this->config->isPrivateKeyPrompt());
     }
 
-    public function testIsPrivateKeyPromptSet()
+    public function testIsPrivateKeyPromptSet(): void
     {
-        $this->setConfig(array('key-pass' => true));
+        $this->setConfig(['key-pass' => true]);
 
         $this->assertTrue($this->config->isPrivateKeyPrompt());
     }
 
-    public function testIsPrivateKeyPromptSetString()
+    public function testIsPrivateKeyPromptSetString(): void
     {
-        $this->setConfig(array('key-pass' => 'test'));
+        $this->setConfig(['key-pass' => 'test']);
 
         $this->assertFalse($this->config->isPrivateKeyPrompt());
     }
 
-    public function testIsStubGenerated()
+    public function testIsStubGenerated(): void
     {
         $this->assertFalse($this->config->isStubGenerated());
     }
 
-    public function testIsStubGeneratedSet()
+    public function testIsStubGeneratedSet(): void
     {
-        $this->setConfig(array('stub' => true));
+        $this->setConfig(['stub' => true]);
 
         $this->assertTrue($this->config->isStubGenerated());
     }
 
-    public function testIsStubGeneratedSetString()
+    public function testIsStubGeneratedSetString(): void
     {
-        $this->setConfig(array('stub' => 'test.php'));
+        $this->setConfig(['stub' => 'test.php']);
 
         $this->assertFalse($this->config->isStubGenerated());
     }
 
-    public function testIsWebPhar()
+    public function testIsWebPhar(): void
     {
         $this->assertFalse($this->config->isWebPhar());
     }
 
-    public function testIsWebPharSet()
+    public function testIsWebPharSet(): void
     {
-        $this->setConfig(array('web' => true));
+        $this->setConfig(['web' => true]);
 
         $this->assertTrue($this->config->isWebPhar());
     }
 
-    public function testLoadBootstrap()
+    public function testLoadBootstrap(): void
     {
         file_put_contents(
             'test.php',
-            <<<CODE
+            <<<'CODE'
 <?php define('TEST_BOOTSTRAP_FILE_LOADED', true);
 CODE
         );
 
-        $this->setConfig(array('bootstrap' => 'test.php'));
+        $this->setConfig(['bootstrap' => 'test.php']);
 
         $this->config->loadBootstrap();
 
         $this->assertTrue(defined('TEST_BOOTSTRAP_FILE_LOADED'));
     }
 
-    public function testLoadBootstrapNotExist()
+    public function testLoadBootstrapNotExist(): void
     {
-        $this->setConfig(array('bootstrap' => 'test.php'));
+        $this->setConfig(['bootstrap' => 'test.php']);
 
-        $this->setExpectedException(
-            'InvalidArgumentException',
-            'The bootstrap path "' . $this->dir . DIRECTORY_SEPARATOR . 'test.php" is not a file or does not exist.'
+        $this->expectException(
+            'InvalidArgumentException'
+        );
+        $this->expectExceptionMessage(
+            'The bootstrap path "'.$this->dir.DIRECTORY_SEPARATOR.'test.php" is not a file or does not exist.'
         );
 
         $this->config->loadBootstrap();
     }
 
-    public function testProcessFindersInvalidMethod()
+    public function testProcessFindersInvalidMethod(): void
     {
         $this->setConfig(
-            array('finder' => array(array('invalidMethod' => 'whargarbl')))
+            ['finder' => [['invalidMethod' => 'whargarbl']]]
         );
 
-        $this->setExpectedException(
-            'InvalidArgumentException',
+        $this->expectException(
+            'InvalidArgumentException'
+        );
+        $this->expectExceptionMessage(
             'The method "Finder::invalidMethod" does not exist.'
         );
 
         $this->config->getFinders();
     }
 
-    protected function tearDown()
-    {
-        chdir($this->cwd);
-
-        parent::tearDown();
-    }
-
-    protected function setUp()
-    {
-        $this->cwd = getcwd();
-        $this->dir = $this->createDir();
-        $this->file = $this->dir . DIRECTORY_SEPARATOR . 'box.json';
-        $this->config = new Configuration($this->file, (object) array());
-
-        chdir($this->dir);
-        touch($this->file);
-    }
-
-    private function setConfig(array $config)
+    private function setConfig(array $config): void
     {
         $this->setPropertyValue($this->config, 'raw', (object) $config);
     }
@@ -1313,6 +1348,7 @@ CODE
         if (false === strpos(strtolower(PHP_OS), 'darwin') && false !== strpos(strtolower(PHP_OS), 'win')) {
             return true;
         }
+
         return false;
     }
 }

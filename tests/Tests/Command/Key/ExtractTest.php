@@ -1,5 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Tests\Command\Key;
 
 use KevinGH\Box\Command\Key\Extract;
@@ -7,13 +19,16 @@ use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\FixedResponse;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @coversNothing
+ */
 class ExtractTest extends CommandTestCase
 {
-    public function testExecute()
+    public function testExecute(): void
     {
         file_put_contents(
             'test.key',
-            <<<KEY
+            <<<'KEY'
 -----BEGIN RSA PRIVATE KEY-----
 Proc-Type: 4,ENCRYPTED
 DEK-Info: DES-EDE3-CBC,FCBE82562DA52F8D
@@ -33,53 +48,53 @@ KEY
 
         $tester = $this->getTester();
         $tester->execute(
-            array(
+            [
                 'command' => 'key:extract',
                 'private' => 'test.key',
                 '--out' => 'test.pub',
-                '--prompt' => true
-            ),
-            array(
-                'verbosity' => OutputInterface::VERBOSITY_VERBOSE
-            )
+                '--prompt' => true,
+            ],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
         );
 
-        $expected = <<<OUTPUT
+        $expected = <<<'OUTPUT'
 Extracting public key...
 Writing public key...
 
 OUTPUT;
 
-        $this->assertEquals($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->getOutput($tester));
 
         $this->assertRegExp('/PUBLIC KEY/', file_get_contents('test.pub'));
     }
 
-    public function testExecuteParseFail()
+    public function testExecuteParseFail(): void
     {
         file_put_contents('test.key', 'bad');
 
         $tester = $this->getTester();
         $exit = $tester->execute(
-            array(
+            [
                 'command' => 'key:extract',
                 'private' => 'test.key',
-                '--out' => 'test.pub'
-            )
+                '--out' => 'test.pub',
+            ]
         );
 
-        $this->assertEquals(1, $exit);
-        $this->assertEquals(
+        $this->assertSame(1, $exit);
+        $this->assertSame(
             "The private key could not be parsed.\n",
             $this->getOutput($tester)
         );
     }
 
-    public function testExecuteExtractFail()
+    public function testExecuteExtractFail(): void
     {
         file_put_contents(
             'test.key',
-            <<<KEY
+            <<<'KEY'
 -----BEGIN RSA PRIVATE KEY-----
 Proc-Type: 4,ENCRYPTED
 DEK-Info: DES-EDE3-CBC,FCBE82562DA52F8D
@@ -100,16 +115,16 @@ KEY
 
         $tester = $this->getTester();
         $exit = $tester->execute(
-            array(
+            [
                 'command' => 'key:extract',
                 'private' => 'test.key',
                 '--out' => 'test.pub',
-                '--prompt' => true
-            )
+                '--prompt' => true,
+            ]
         );
 
-        $this->assertEquals(1, $exit);
-        $this->assertEquals(
+        $this->assertSame(1, $exit);
+        $this->assertSame(
             "The public key could not be retrieved.\n",
             $this->getOutput($tester)
         );

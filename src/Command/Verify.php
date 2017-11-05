@@ -1,5 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Command;
 
 use Exception;
@@ -21,12 +33,12 @@ class Verify extends Command
     /**
      * @override
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('verify');
         $this->setDescription('Verifies the Phar signature.');
         $this->setHelp(
-            <<<HELP
+            <<<'HELP'
 The <info>%command.name%</info> command will verify the signature of the Phar.
 
 By default, the command will use the <comment>phar</comment> extension to perform the
@@ -105,7 +117,7 @@ HELP
             $output->writeln('<info>The Phar passed verification.</info>');
 
             if ($verbose) {
-                $output->writeln($signature['hash_type'] . ' Signature:');
+                $output->writeln($signature['hash_type'].' Signature:');
                 $output->writeln($signature['hash']);
             }
 

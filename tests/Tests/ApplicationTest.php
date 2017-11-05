@@ -1,5 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Tests;
 
 use ErrorException;
@@ -8,14 +20,17 @@ use KevinGH\Box\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\StreamOutput;
 
+/**
+ * @coversNothing
+ */
 class ApplicationTest extends TestCase
 {
-    public function testApp()
+    public function testApp(): void
     {
         $app = new Application();
         $app->setAutoExit(false);
 
-        $input = new ArrayInput(array('--version'));
+        $input = new ArrayInput(['--version']);
         $stream = fopen('php://memory', 'w', false);
         $output = new StreamOutput($stream);
 
@@ -25,16 +40,16 @@ class ApplicationTest extends TestCase
 
         $string = trim(fgets($stream));
         $string = preg_replace(
-            array(
+            [
                 '/\x1b(\[|\(|\))[;?0-9]*[0-9A-Za-z]/',
                 '/\x1b(\[|\(|\))[;?0-9]*[0-9A-Za-z]/',
-                '/[\x03|\x1a]/'
-            ),
-            array('', '', ''),
+                '/[\x03|\x1a]/',
+            ],
+            ['', '', ''],
             $string
         );
 
-        $this->assertEquals('Box (repo)', $string);
+        $this->assertSame('Box (repo)', $string);
 
         $app->setVersion('1.2.3');
 
@@ -46,16 +61,16 @@ class ApplicationTest extends TestCase
 
         $string = trim(fgets($stream));
         $string = preg_replace(
-            array(
+            [
                 '/\x1b(\[|\(|\))[;?0-9]*[0-9A-Za-z]/',
                 '/\x1b(\[|\(|\))[;?0-9]*[0-9A-Za-z]/',
-                '/[\x03|\x1a]/'
-            ),
-            array('', '', ''),
+                '/[\x03|\x1a]/',
+            ],
+            ['', '', ''],
             $string
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             'Box version 1.2.3 build @git-commit@',
             $string
         );
@@ -68,7 +83,7 @@ class ApplicationTest extends TestCase
         $this->assertTrue(isset($exception));
     }
 
-    public function testAppNonRepo()
+    public function testAppNonRepo(): void
     {
         $app = new Application('Test', '1.2.3');
         $app->setAutoExit(false);

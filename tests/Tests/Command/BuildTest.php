@@ -1,5 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Tests\Command;
 
 use KevinGH\Box\Command\Build;
@@ -7,19 +19,25 @@ use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\FixedResponse;
 use Phar;
 use RuntimeException;
-use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Process\PhpExecutableFinder;
-use org\bovigo\vfs\vfsStream;
-use org\bovigo\vfs\vfsStreamWrapper;
 
+/**
+ * @coversNothing
+ */
 class BuildTest extends CommandTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->app->getHelperSet()->set(new FixedResponse('test'));
+    }
+
     public function getPrivateKey()
     {
-        return array(
-            <<<KEY
+        return [
+            <<<'KEY'
 -----BEGIN RSA PRIVATE KEY-----
 Proc-Type: 4,ENCRYPTED
 DEK-Info: DES-EDE3-CBC,3FF97F75E5A8F534
@@ -40,16 +58,16 @@ TnvzVS0y1l8zCsRToUtv5rCBC+r8Q3gnvGGnT4jrsp98ithGIQCbbQ==
 -----END RSA PRIVATE KEY-----
 KEY
         ,
-            'test'
-        );
+            'test',
+        ];
     }
 
-    public function testBuild()
+    public function testBuild(): void
     {
         $key = $this->getPrivateKey();
 
         $php = new PhpExecutableFinder();
-        $php = '#!' . $php->find();
+        $php = '#!'.$php->find();
 
         mkdir('a/deep/test/directory', 0755, true);
         touch('a/deep/test/directory/test.php');
@@ -67,42 +85,42 @@ KEY
         file_put_contents(
             'box.json',
             json_encode(
-                array(
+                [
                     'alias' => 'test.phar',
                     'banner' => 'custom banner',
                     'bootstrap' => 'bootstrap.php',
                     'chmod' => '0755',
-                    'compactors' => array('Herrera\\Box\\Compactor\\Php'),
+                    'compactors' => ['Herrera\\Box\\Compactor\\Php'],
                     'directories' => 'a',
                     'files' => 'test.php',
-                    'finder' => array(array('in' => 'one')),
-                    'finder-bin' => array(array('in' => 'two')),
+                    'finder' => [['in' => 'one']],
+                    'finder-bin' => [['in' => 'two']],
                     'key' => 'private.key',
                     'key-pass' => true,
                     'main' => 'run.php',
-                    'map' => array(
-                        array('a/deep/test/directory' => 'sub'),
-                        array('' => 'other/')
-                    ),
-                    'metadata' => array('rand' => $rand = rand()),
+                    'map' => [
+                        ['a/deep/test/directory' => 'sub'],
+                        ['' => 'other/'],
+                    ],
+                    'metadata' => ['rand' => $rand = random_int(0, getrandmax())],
                     'output' => 'test.phar',
                     'shebang' => $php,
-                    'stub' => true
-                )
+                    'stub' => true,
+                ]
             )
         );
 
         $tester = $this->getTester();
         $tester->execute(
-            array(
-                'command' => 'build'
-            ),
-            array(
-                'verbosity' => OutputInterface::VERBOSITY_VERBOSE
-            )
+            [
+                'command' => 'build',
+            ],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
         );
 
-        $dir = $this->dir . DIRECTORY_SEPARATOR;
+        $dir = $this->dir.DIRECTORY_SEPARATOR;
         $ds = DIRECTORY_SEPARATOR;
         $expected = <<<OUTPUT
 ? Loading bootstrap file: {$dir}bootstrap.php
@@ -138,9 +156,9 @@ KEY
 
 OUTPUT;
 
-        $this->assertEquals($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->getOutput($tester));
 
-        $this->assertEquals(
+        $this->assertSame(
             'Hello, world!',
             exec('php test.phar')
         );
@@ -153,12 +171,12 @@ OUTPUT;
 
         $phar = new Phar('test.phar');
 
-        $this->assertEquals(array('rand' => $rand), $phar->getMetadata());
+        $this->assertSame(['rand' => $rand], $phar->getMetadata());
 
         unset($phar);
     }
 
-    public function testBuildNotReadable()
+    public function testBuildNotReadable(): void
     {
         touch('test.php');
         chmod('test.php', 0000);
@@ -166,9 +184,9 @@ OUTPUT;
         file_put_contents(
             'box.json',
             json_encode(
-                array(
-                    'files' => 'test.php'
-                )
+                [
+                    'files' => 'test.php',
+                ]
             )
         );
 
@@ -176,14 +194,14 @@ OUTPUT;
 
         try {
             $tester->execute(
-                array('command' => 'build'),
-                array('verbosity' => OutputInterface::VERBOSITY_VERBOSE)
+                ['command' => 'build'],
+                ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]
             );
 
             $this->fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
             $this->assertSame(
-                'The file "' . $this->dir . DIRECTORY_SEPARATOR . 'test.php" is not readable.',
+                'The file "'.$this->dir.DIRECTORY_SEPARATOR.'test.php" is not readable.',
                 $exception->getMessage()
             );
         }
@@ -192,28 +210,28 @@ OUTPUT;
     /**
      * @depends testBuild
      */
-    public function testBuildReplacements()
+    public function testBuildReplacements(): void
     {
         file_put_contents('test.php', '<?php echo "Hello, @name@!\n";');
         file_put_contents(
             'box.json',
             json_encode(
-                array(
+                [
                     'files' => 'test.php',
                     'main' => 'test.php',
-                    'replacements' => array('name' => 'world'),
-                    'stub' => true
-                )
+                    'replacements' => ['name' => 'world'],
+                    'stub' => true,
+                ]
             )
         );
 
         $tester = $this->getTester();
         $tester->execute(
-            array('command' => 'build'),
-            array('verbosity' => OutputInterface::VERBOSITY_VERBOSE)
+            ['command' => 'build'],
+            ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]
         );
 
-        $dir = $this->dir . DIRECTORY_SEPARATOR;
+        $dir = $this->dir.DIRECTORY_SEPARATOR;
         $expected = <<<OUTPUT
 * Building...
 ? Output path: {$dir}default.phar
@@ -227,43 +245,43 @@ OUTPUT;
 
 OUTPUT;
 
-        $this->assertEquals($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->getOutput($tester));
 
-        $this->assertEquals(
+        $this->assertSame(
             'Hello, world!',
             exec('php default.phar')
         );
     }
 
-    public function testBuildStubBannerFile()
+    public function testBuildStubBannerFile(): void
     {
         file_put_contents('banner', 'custom banner');
         file_put_contents('test.php', '<?php echo "Hello!";');
         file_put_contents(
             'box.json',
             json_encode(
-                array(
+                [
                     'alias' => 'test.phar',
                     'banner-file' => 'banner',
                     'files' => 'test.php',
                     'main' => 'test.php',
                     'output' => 'test.phar',
-                    'stub' => true
-                )
+                    'stub' => true,
+                ]
             )
         );
 
         $tester = $this->getTester();
         $tester->execute(
-            array(
-                'command' => 'build'
-            ),
-            array(
-                'verbosity' => OutputInterface::VERBOSITY_VERBOSE
-            )
+            [
+                'command' => 'build',
+            ],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
         );
 
-        $dir = $this->dir . DIRECTORY_SEPARATOR;
+        $dir = $this->dir.DIRECTORY_SEPARATOR;
         $expected = <<<OUTPUT
 * Building...
 ? Output path: {$dir}test.phar
@@ -276,41 +294,41 @@ OUTPUT;
 
 OUTPUT;
 
-        $this->assertEquals($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->getOutput($tester));
 
-        $this->assertEquals(
+        $this->assertSame(
             'Hello!',
             exec('php test.phar')
         );
     }
 
-    public function testBuildStubFile()
+    public function testBuildStubFile(): void
     {
         touch('test.php');
         file_put_contents('stub.php', '<?php echo "Hello!"; __HALT_COMPILER();');
         file_put_contents(
             'box.json',
             json_encode(
-                array(
+                [
                     'alias' => 'test.phar',
                     'files' => 'test.php',
                     'output' => 'test.phar',
-                    'stub' => 'stub.php'
-                )
+                    'stub' => 'stub.php',
+                ]
             )
         );
 
         $tester = $this->getTester();
         $tester->execute(
-            array(
-                'command' => 'build'
-            ),
-            array(
-                'verbosity' => OutputInterface::VERBOSITY_VERBOSE
-            )
+            [
+                'command' => 'build',
+            ],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
         );
 
-        $dir = $this->dir . DIRECTORY_SEPARATOR;
+        $dir = $this->dir.DIRECTORY_SEPARATOR;
         $expected = <<<OUTPUT
 * Building...
 ? Output path: {$dir}test.phar
@@ -321,34 +339,34 @@ OUTPUT;
 
 OUTPUT;
 
-        $this->assertEquals($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->getOutput($tester));
     }
 
-    public function testBuildDefaultStub()
+    public function testBuildDefaultStub(): void
     {
         touch('test.php');
         file_put_contents(
             'box.json',
             json_encode(
-                array(
+                [
                     'alias' => 'test.phar',
                     'files' => 'test.php',
-                    'output' => 'test.phar'
-                )
+                    'output' => 'test.phar',
+                ]
             )
         );
 
         $tester = $this->getTester();
         $tester->execute(
-            array(
-                'command' => 'build'
-            ),
-            array(
-                'verbosity' => OutputInterface::VERBOSITY_VERBOSE
-            )
+            [
+                'command' => 'build',
+            ],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
         );
 
-        $dir = $this->dir . DIRECTORY_SEPARATOR;
+        $dir = $this->dir.DIRECTORY_SEPARATOR;
         $expected = <<<OUTPUT
 * Building...
 ? Output path: {$dir}test.phar
@@ -359,37 +377,37 @@ OUTPUT;
 
 OUTPUT;
 
-        $this->assertEquals($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->getOutput($tester));
     }
 
-    public function testBuildCompressed()
+    public function testBuildCompressed(): void
     {
         file_put_contents('test.php', '<?php echo "Hello!";');
         file_put_contents(
             'box.json',
             json_encode(
-                array(
+                [
                     'alias' => 'test.phar',
                     'compression' => 'GZ',
                     'files' => 'test.php',
                     'main' => 'test.php',
                     'output' => 'test.phar',
-                    'stub' => true
-                )
+                    'stub' => true,
+                ]
             )
         );
 
         $tester = $this->getTester();
         $tester->execute(
-            array(
-                'command' => 'build'
-            ),
-            array(
-                'verbosity' => OutputInterface::VERBOSITY_VERBOSE
-            )
+            [
+                'command' => 'build',
+            ],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
         );
 
-        $dir = $this->dir . DIRECTORY_SEPARATOR;
+        $dir = $this->dir.DIRECTORY_SEPARATOR;
         $expected = <<<OUTPUT
 * Building...
 ? Output path: {$dir}test.phar
@@ -402,15 +420,15 @@ OUTPUT;
 
 OUTPUT;
 
-        $this->assertEquals($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->getOutput($tester));
 
-        $this->assertEquals(
+        $this->assertSame(
             'Hello!',
             exec('php test.phar')
         );
     }
 
-    public function testBuildQuiet()
+    public function testBuildQuiet(): void
     {
         mkdir('one');
         file_put_contents('one/test.php', '<?php echo "Hello!";');
@@ -418,31 +436,24 @@ OUTPUT;
         file_put_contents(
             'box.json',
             json_encode(
-                array(
+                [
                     'alias' => 'test.phar',
-                    'finder' => array(array('in'  => 'one')),
+                    'finder' => [['in' => 'one']],
                     'main' => 'run.php',
                     'output' => 'test.phar',
-                    'stub' => true
-                )
+                    'stub' => true,
+                ]
             )
         );
 
         $tester = $this->getTester();
-        $tester->execute(array('command' => 'build'));
+        $tester->execute(['command' => 'build']);
 
-        $this->assertEquals("Building...\n", $this->getOutput($tester));
+        $this->assertSame("Building...\n", $this->getOutput($tester));
     }
 
     protected function getCommand()
     {
         return new Build();
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->app->getHelperSet()->set(new FixedResponse('test'));
     }
 }

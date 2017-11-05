@@ -1,5 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Command;
 
 use Phar;
@@ -20,12 +32,12 @@ class Extract extends Command
     /**
      * @override
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('extract');
         $this->setDescription('Extracts files from a Phar.');
         $this->setHelp(
-            <<<HELP
+            <<<'HELP'
 The <info>%command.name%</info> will extract one or more files from a Phar.
 
 If the <info>--pick|-p</info> option is used, only the file or directories requested
@@ -80,7 +92,7 @@ HELP
         }
 
         if (null === ($out = $input->getOption('out'))) {
-            $out = $phar . '-contents';
+            $out = $phar.'-contents';
         }
 
         $phar = new Phar($phar);

@@ -1,5 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Tests\Command;
 
 use KevinGH\Box\Command\Extract;
@@ -7,11 +19,14 @@ use KevinGH\Box\Test\CommandTestCase;
 use Phar;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @coversNothing
+ */
 class ExtractTest extends CommandTestCase
 {
-    public function testExecute()
+    public function testExecute(): void
     {
-        $rand = 'test-' . rand() . '.phar';
+        $rand = 'test-'.random_int(0, getrandmax()).'.phar';
         $phar = new Phar($rand);
         $phar->addFromString('a/b/c/d.php', '<?php echo "Hello!";');
         $phar->addFromString('a/b/c/e.php', '<?php echo "Goodbye!";');
@@ -20,33 +35,33 @@ class ExtractTest extends CommandTestCase
 
         $tester = $this->getTester();
         $tester->execute(
-            array(
+            [
                 'command' => 'extract',
                 'phar' => $rand,
-                '--pick' => array('a/b/c/e.php'),
-                '--out' => 'extracted'
-            ),
-            array(
-                'verbosity' => OutputInterface::VERBOSITY_VERBOSE
-            )
+                '--pick' => ['a/b/c/e.php'],
+                '--out' => 'extracted',
+            ],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
         );
 
-        $expected = <<<OUTPUT
+        $expected = <<<'OUTPUT'
 Extracting files from the Phar...
 Done.
 
 OUTPUT;
 
-        $this->assertEquals(
+        $this->assertSame(
             '<?php echo "Goodbye!";',
             file_get_contents('extracted/a/b/c/e.php')
         );
-        $this->assertEquals($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->getOutput($tester));
     }
 
-    public function testExecuteAlternate()
+    public function testExecuteAlternate(): void
     {
-        $rand = 'test-' . rand() . '.phar';
+        $rand = 'test-'.random_int(0, getrandmax()).'.phar';
         $phar = new Phar($rand);
         $phar->addFromString('a/b/c/d.php', '<?php echo "Hello!";');
         $phar->addFromString('a/b/c/e.php', '<?php echo "Goodbye!";');
@@ -55,52 +70,52 @@ OUTPUT;
 
         $tester = $this->getTester();
         $tester->execute(
-            array(
+            [
                 'command' => 'extract',
-                'phar' => $rand
-            ),
-            array(
-                'verbosity' => OutputInterface::VERBOSITY_VERBOSE
-            )
+                'phar' => $rand,
+            ],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
         );
 
-        $expected = <<<OUTPUT
+        $expected = <<<'OUTPUT'
 Extracting files from the Phar...
 Done.
 
 OUTPUT;
 
-        $this->assertEquals(
+        $this->assertSame(
             '<?php echo "Hello!";',
             file_get_contents("$rand-contents/a/b/c/d.php")
         );
-        $this->assertEquals(
+        $this->assertSame(
             '<?php echo "Goodbye!";',
             file_get_contents("$rand-contents/a/b/c/e.php")
         );
-        $this->assertEquals($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->getOutput($tester));
     }
 
-    public function testExecuteNotExist()
+    public function testExecuteNotExist(): void
     {
         $tester = $this->getTester();
         $tester->execute(
-            array(
+            [
                 'command' => 'extract',
-                'phar' => 'test.phar'
-            ),
-            array(
-                'verbosity' => OutputInterface::VERBOSITY_VERBOSE
-            )
+                'phar' => 'test.phar',
+            ],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
         );
 
-        $expected = <<<OUTPUT
+        $expected = <<<'OUTPUT'
 Extracting files from the Phar...
 The path "test.phar" is not a file or does not exist.
 
 OUTPUT;
 
-        $this->assertEquals($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->getOutput($tester));
     }
 
     protected function getCommand()

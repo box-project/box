@@ -1,5 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Command;
 
 use KevinGH\Box\Configuration;
@@ -17,7 +29,7 @@ abstract class Configurable extends AbstractCommand
     /**
      * @override
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->addOption(
             'configuration',
@@ -30,9 +42,9 @@ abstract class Configurable extends AbstractCommand
     /**
      * Returns the configuration settings.
      *
-     * @param InputInterface $input The input handler.
+     * @param InputInterface $input the input handler
      *
-     * @return Configuration The configuration settings.
+     * @return Configuration the configuration settings
      */
     protected function getConfig(InputInterface $input)
     {

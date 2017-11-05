@@ -1,11 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Command\Key;
 
 use KevinGH\Box\Helper\PhpSecLibHelper;
 use phpseclib\Crypt\RSA;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,12 +33,12 @@ class Extract extends Command
     /**
      * @override
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('key:extract');
         $this->setDescription('Extracts the public key from a private key.');
         $this->setHelp(
-            <<<HELP
+            <<<'HELP'
 The <info>php %command.name%</info> command will extract the public key from an existing
 private key file. <comment>You may need to generate a new private key using
 <info>key:create</info>.</comment>

@@ -1,5 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Command;
 
 use Exception;
@@ -18,14 +30,14 @@ class Validate extends Configurable
     /**
      * @override
      */
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
         $this->setName('validate');
         $this->setDescription('Validates the configuration file.');
         $this->setHelp(
-            <<<HELP
+            <<<'HELP'
 The <info>%command.name%</info> command will validate the configuration file
 and report any errors found, if any.
 <comment>

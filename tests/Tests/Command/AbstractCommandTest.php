@@ -1,5 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Tests\Command;
 
 use KevinGH\Box\Command\AbstractCommand;
@@ -7,20 +19,23 @@ use KevinGH\Box\Test\CommandTestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @coversNothing
+ */
 class AbstractCommandTest extends CommandTestCase
 {
-    public function testVerbose()
+    public function testVerbose(): void
     {
         $tester = $this->getTester();
         $tester->execute(
-            array('command' => 'test'),
-            array(
-                'verbosity' => OutputInterface::VERBOSITY_VERBOSE
-            )
+            ['command' => 'test'],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
         );
 
-        $this->assertEquals(
-            <<<OUTPUT
+        $this->assertSame(
+            <<<'OUTPUT'
 ! Error
 * Item
 ? Info
@@ -32,13 +47,13 @@ OUTPUT
         );
     }
 
-    public function testVerboseNone()
+    public function testVerboseNone(): void
     {
         $tester = $this->getTester();
-        $tester->execute(array('command' => 'test'));
+        $tester->execute(['command' => 'test']);
 
-        $this->assertEquals(
-            <<<OUTPUT
+        $this->assertSame(
+            <<<'OUTPUT'
 
 OUTPUT
             ,
@@ -54,12 +69,12 @@ OUTPUT
 
 class TestAbstractCommand extends AbstractCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('test');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $this->putln('!', 'Error');
         $this->putln('*', 'Item');

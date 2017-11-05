@@ -1,5 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Command;
 
 use Herrera\Box\Box;
@@ -7,7 +19,6 @@ use Herrera\Box\StubGenerator;
 use KevinGH\Box\Configuration;
 use RuntimeException;
 use SplFileInfo;
-use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -37,7 +48,7 @@ class Build extends Configurable
     /**
      * @override
      */
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
@@ -400,7 +411,7 @@ HELP
     /**
      * @override
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $this->config = $this->getConfig($input);
         $path = $this->config->getOutputPath();
@@ -433,7 +444,7 @@ HELP
         $this->box->getPhar()->startBuffering();
 
         // set replacement values, if any
-        if (array() !== ($values = $this->config->getProcessedReplacements())) {
+        if ([] !== ($values = $this->config->getProcessedReplacements())) {
             $this->putln('?', 'Setting replacement values...');
 
             if ($this->isVerbose()) {
@@ -448,7 +459,7 @@ HELP
         }
 
         // register configured compactors
-        if (array() !== ($compactors = $this->config->getCompactors())) {
+        if ([] !== ($compactors = $this->config->getCompactors())) {
             $this->putln('?', 'Registering compactors...');
 
             foreach ($compactors as $compactor) {
@@ -459,13 +470,13 @@ HELP
         }
 
         // alert about mapped paths
-        if (array() !== ($map = $this->config->getMap())) {
+        if ([] !== ($map = $this->config->getMap())) {
             $this->putln('?', 'Mapping paths:');
 
             foreach ($map as $item) {
                 foreach ($item as $match => $replace) {
                     if (empty($match)) {
-                        $match = "(all)";
+                        $match = '(all)';
                     }
 
                     $this->putln('-', "$match <info>></info> $replace");
@@ -474,7 +485,7 @@ HELP
         }
 
         // start adding files
-        if (array() !== ($iterators = $this->config->getFinders())) {
+        if ([] !== ($iterators = $this->config->getFinders())) {
             $this->putln('?', 'Adding Finder files...');
 
             foreach ($iterators as $iterator) {
@@ -482,7 +493,7 @@ HELP
             }
         }
 
-        if (array() !== ($iterators = $this->config->getBinaryFinders())) {
+        if ([] !== ($iterators = $this->config->getBinaryFinders())) {
             $this->putln('?', 'Adding binary Finder files...');
 
             foreach ($iterators as $iterator) {
@@ -515,7 +526,7 @@ HELP
         if (null !== ($main = $this->config->getMainScriptPath())) {
             $this->putln(
                 '?',
-                'Adding main file: ' . $this->config->getBasePath() . DIRECTORY_SEPARATOR . $main
+                'Adding main file: '.$this->config->getBasePath().DIRECTORY_SEPARATOR.$main
             );
 
             $mapper = $this->config->getMapper();
@@ -548,7 +559,7 @@ HELP
                 ->web($this->config->isWebPhar());
 
             if (null !== ($shebang = $this->config->getShebang())) {
-                $this->putln('-', 'Using custom shebang line: ' . $shebang);
+                $this->putln('-', 'Using custom shebang line: '.$shebang);
 
                 $stub->shebang($shebang);
             }
@@ -561,9 +572,9 @@ HELP
                 $this->putln(
                     '-',
                     'Using custom banner from file: '
-                    . $this->config->getBasePath()
-                    . DIRECTORY_SEPARATOR
-                    . $this->config->getStubBannerPath()
+                    .$this->config->getBasePath()
+                    .DIRECTORY_SEPARATOR
+                    .$this->config->getStubBannerPath()
                 );
 
                 $stub->banner($banner);
@@ -571,7 +582,7 @@ HELP
 
             $this->box->getPhar()->setStub($stub->generate());
         } elseif (null !== ($stub = $this->config->getStubPath())) {
-            $stub = $this->config->getBasePath() . DIRECTORY_SEPARATOR . $stub;
+            $stub = $this->config->getBasePath().DIRECTORY_SEPARATOR.$stub;
 
             $this->putln('?', "Using stub file: $stub");
 
@@ -597,8 +608,8 @@ HELP
         $this->box->getPhar()->stopBuffering();
 
         // sign using private key, if applicable
-        if (file_exists($path . '.pubkey')) {
-            unlink($path . '.pubkey');
+        if (file_exists($path.'.pubkey')) {
+            unlink($path.'.pubkey');
         }
 
         if (null !== ($key = $this->config->getPrivateKeyPath())) {
@@ -643,17 +654,17 @@ HELP
     /**
      * Adds files using an iterator.
      *
-     * @param Traversable $iterator The iterator.
-     * @param string      $message  The message to announce.
-     * @param boolean     $binary   Should the adding be binary-safe?
+     * @param Traversable $iterator the iterator
+     * @param string      $message  the message to announce
+     * @param bool        $binary   Should the adding be binary-safe?
      *
-     * @throws RuntimeException If a file is not readable.
+     * @throws RuntimeException if a file is not readable
      */
     private function add(
         Traversable $iterator = null,
         $message = null,
         $binary = false
-    ) {
+    ): void {
         static $count = 0;
 
         if ($iterator) {
@@ -694,7 +705,7 @@ HELP
                     }
                 }
 
-                $box->addFile($file, $relative);
+                $box->addFile((string) $file, $relative);
             }
         }
     }

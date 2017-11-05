@@ -1,5 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Tests\Command;
 
 use Herrera\Box\Box;
@@ -12,9 +24,12 @@ use org\bovigo\vfs\vfsStreamWrapper;
 use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @coversNothing
+ */
 class AddTest extends CommandTestCase
 {
-    public function testExecute()
+    public function testExecute(): void
     {
         $this->preparePhar();
 
@@ -32,19 +47,19 @@ CODE
 
         $tester = $this->getTester();
         $tester->execute(
-            array(
+            [
                 'command' => 'add',
                 'phar' => 'test.phar',
                 'file' => 'goodbye.php',
                 'local' => 'src/hello.php',
-                '--replace' => true
-            ),
-            array(
-                'verbosity' => OutputInterface::VERBOSITY_VERBOSE
-            )
+                '--replace' => true,
+            ],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
         );
 
-        $dir = $this->dir . DIRECTORY_SEPARATOR;
+        $dir = $this->dir.DIRECTORY_SEPARATOR;
         $expected = <<<OUTPUT
 ? Loading bootstrap file: {$dir}bootstrap.php
 * Adding to the Phar...
@@ -57,15 +72,15 @@ CODE
 
 OUTPUT;
 
-        $this->assertEquals($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->getOutput($tester));
 
-        $this->assertEquals(
+        $this->assertSame(
             'Goodbye, world!',
             trim(exec('php test.phar'))
         );
     }
 
-    public function testExecuteBinary()
+    public function testExecuteBinary(): void
     {
         $this->preparePhar();
 
@@ -83,20 +98,20 @@ CODE
 
         $tester = $this->getTester();
         $tester->execute(
-            array(
+            [
                 'command' => 'add',
                 'phar' => 'test.phar',
                 'file' => 'goodbye.php',
                 'local' => 'src/hello.php',
                 '--binary' => true,
-                '--replace' => true
-            ),
-            array(
-                'verbosity' => OutputInterface::VERBOSITY_VERBOSE
-            )
+                '--replace' => true,
+            ],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
         );
 
-        $dir = $this->dir . DIRECTORY_SEPARATOR;
+        $dir = $this->dir.DIRECTORY_SEPARATOR;
         $expected = <<<OUTPUT
 ? Loading bootstrap file: {$dir}bootstrap.php
 * Adding to the Phar...
@@ -109,15 +124,15 @@ CODE
 
 OUTPUT;
 
-        $this->assertEquals($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->getOutput($tester));
 
-        $this->assertEquals(
+        $this->assertSame(
             'Goodbye, @name@!',
             trim(exec('php test.phar'))
         );
     }
 
-    public function testExecuteStub()
+    public function testExecuteStub(): void
     {
         $this->preparePhar();
 
@@ -128,18 +143,18 @@ OUTPUT;
 
         $tester = $this->getTester();
         $tester->execute(
-            array(
+            [
                 'command' => 'add',
                 'phar' => 'test.phar',
                 'file' => 'stub.php',
-                '--stub' => true
-            ),
-            array(
-                'verbosity' => OutputInterface::VERBOSITY_VERBOSE
-            )
+                '--stub' => true,
+            ],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
         );
 
-        $dir = $this->dir . DIRECTORY_SEPARATOR;
+        $dir = $this->dir.DIRECTORY_SEPARATOR;
         $expected = <<<OUTPUT
 ? Loading bootstrap file: {$dir}bootstrap.php
 * Adding to the Phar...
@@ -152,14 +167,14 @@ OUTPUT;
 
 OUTPUT;
 
-        $this->assertEquals($expected, $this->getOutput($tester));
-        $this->assertEquals(
+        $this->assertSame($expected, $this->getOutput($tester));
+        $this->assertSame(
             'Hello, stub!',
             trim(exec('php test.phar'))
         );
     }
 
-    public function testExecuteMain()
+    public function testExecuteMain(): void
     {
         $this->preparePhar();
 
@@ -178,20 +193,20 @@ CODE
 
         $tester = $this->getTester();
         $tester->execute(
-            array(
+            [
                 'command' => 'add',
                 'phar' => 'test.phar',
                 'file' => 'main.php',
                 'local' => 'bin/run',
                 '--main' => true,
-                '--replace' => true
-            ),
-            array(
-                'verbosity' => OutputInterface::VERBOSITY_VERBOSE
-            )
+                '--replace' => true,
+            ],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
         );
 
-        $dir = $this->dir . DIRECTORY_SEPARATOR;
+        $dir = $this->dir.DIRECTORY_SEPARATOR;
         $expected = <<<OUTPUT
 ? Loading bootstrap file: {$dir}bootstrap.php
 * Adding to the Phar...
@@ -204,75 +219,75 @@ CODE
 
 OUTPUT;
 
-        $this->assertEquals($expected, $this->getOutput($tester));
-        $this->assertEquals(
+        $this->assertSame($expected, $this->getOutput($tester));
+        $this->assertSame(
             'Sup, world!',
             trim(exec('php test.phar'))
         );
     }
 
-    public function testExecuteMissingLocal()
+    public function testExecuteMissingLocal(): void
     {
         $tester = $this->getTester();
         $exit = $tester->execute(
-            array(
+            [
                 'command' => 'add',
                 'phar' => 'test.phar',
-                'file' => 'test.php'
-            )
+                'file' => 'test.php',
+            ]
         );
 
-        $this->assertEquals(1, $exit);
-        $this->assertEquals(
+        $this->assertSame(1, $exit);
+        $this->assertSame(
             "The local argument is required.\n",
             $this->getOutput($tester)
         );
     }
 
-    public function testExecutePharNotExist()
+    public function testExecutePharNotExist(): void
     {
         file_put_contents('box.json', '{}');
 
         $tester = $this->getTester();
         $exit = $tester->execute(
-            array(
+            [
                 'command' => 'add',
                 'phar' => 'test.phar',
                 'file' => 'test.php',
-                'local' => 'test.php'
-            )
+                'local' => 'test.php',
+            ]
         );
 
-        $this->assertEquals(1, $exit);
-        $this->assertEquals(
+        $this->assertSame(1, $exit);
+        $this->assertSame(
             "The path \"test.phar\" is not a file or does not exist.\n",
             $this->getOutput($tester)
         );
     }
 
-    public function testExecuteFileNotExist()
+    public function testExecuteFileNotExist(): void
     {
         file_put_contents('box.json', '{}');
         touch('test.phar');
 
         $tester = $this->getTester();
         $exit = $tester->execute(
-            array(
+            [
                 'command' => 'add',
                 'phar' => 'test.phar',
                 'file' => 'test.php',
-                'local' => 'test.php'
-            )
+                'local' => 'test.php',
+            ]
         );
 
-        $this->assertEquals(1, $exit);
-        $this->assertEquals(
+        $this->assertSame(1, $exit);
+        $this->assertSame(
             "The path \"test.php\" is not a file or does not exist.\n",
             $this->getOutput($tester)
         );
     }
 
-    public function testExecuteExists()
+    public function testExecuteExists(): void
     {
         $this->preparePhar();
 
@@ -280,22 +295,22 @@ OUTPUT;
 
         $tester = $this->getTester();
         $exit = $tester->execute(
-            array(
+            [
                 'command' => 'add',
                 'phar' => 'test.phar',
                 'file' => 'test.php',
-                'local' => 'src/hello.php'
-            )
+                'local' => 'src/hello.php',
+            ]
         );
 
-        $this->assertEquals(1, $exit);
-        $this->assertEquals(
+        $this->assertSame(1, $exit);
+        $this->assertSame(
             "The file \"src/hello.php\" already exists in the Phar.\n",
             $this->getOutput($tester)
         );
     }
 
-    public function testExecuteFileReadError()
+    public function testExecuteFileReadError(): void
     {
         $this->preparePhar();
 
@@ -308,20 +323,20 @@ OUTPUT;
 
         try {
             $tester->execute(
-                array(
+                [
                     'command' => 'add',
                     'phar' => 'test.phar',
                     'file' => 'vfs://test/test.php',
                     'local' => 'bin/run',
                     '--main' => true,
-                    '--replace' => true
-                )
+                    '--replace' => true,
+                ]
             );
         } catch (RuntimeException $exception) {
         }
 
         $this->assertTrue(isset($exception));
-        /** @noinspection PhpUndefinedVariableInspection */
+        // @noinspection PhpUndefinedVariableInspection
         $this->assertRegExp(
             '/failed to open stream/',
             $exception->getMessage()
@@ -333,29 +348,29 @@ OUTPUT;
         return new Add();
     }
 
-    private function preparePhar()
+    private function preparePhar(): void
     {
         touch('bootstrap.php');
 
         file_put_contents(
             'box.json',
             json_encode(
-                array(
+                [
                     'bootstrap' => 'bootstrap.php',
                     'compactors' => 'Herrera\\Box\\Compactor\\Php',
                     'main' => 'bin/run',
-                    'replacements' => array('name' => 'world'),
-                    'stub' => true
-                )
+                    'replacements' => ['name' => 'world'],
+                    'stub' => true,
+                ]
             )
         );
 
         $box = Box::create('test.phar');
         $box->addCompactor(new Php());
-        $box->setValues(array('name' => 'world'));
+        $box->setValues(['name' => 'world']);
         $box->addFromString(
             'bin/run',
-            <<<CODE
+            <<<'CODE'
 #!/usr/bin/run php
 <?php
 

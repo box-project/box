@@ -1,12 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Tests;
 
 use Herrera\PHPUnit\TestCase;
 use KevinGH\Box\Helper\ConfigurationHelper;
 use RuntimeException;
-use Throwable;
 
+/**
+ * @coversNothing
+ */
 class ConfigurationHelperTest extends TestCase
 {
     /**
@@ -17,37 +31,51 @@ class ConfigurationHelperTest extends TestCase
     private $cwd;
     private $dir;
 
-    public function testConstant()
+    protected function setUp(): void
+    {
+        $this->cwd = getcwd();
+        $this->dir = $this->createDir();
+        $this->helper = new ConfigurationHelper();
+
+        chdir($this->dir);
+    }
+
+    protected function tearDown(): void
+    {
+        chdir($this->cwd);
+    }
+
+    public function testConstant(): void
     {
         $this->assertInternalType('string', BOX_SCHEMA_FILE);
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
-        $this->assertEquals('config', $this->helper->getName());
+        $this->assertSame('config', $this->helper->getName());
     }
 
-    public function testGetDefaultPath()
+    public function testGetDefaultPath(): void
     {
         touch('box.json');
 
-        $this->assertEquals(
-            $this->dir . DIRECTORY_SEPARATOR . 'box.json',
+        $this->assertSame(
+            $this->dir.DIRECTORY_SEPARATOR.'box.json',
             $this->helper->getDefaultPath()
         );
     }
 
-    public function testGetDefaultPathDist()
+    public function testGetDefaultPathDist(): void
     {
         touch('box.json.dist');
 
-        $this->assertEquals(
-            $this->dir . DIRECTORY_SEPARATOR . 'box.json.dist',
+        $this->assertSame(
+            $this->dir.DIRECTORY_SEPARATOR.'box.json.dist',
             $this->helper->getDefaultPath()
         );
     }
 
-    public function testLoadFile()
+    public function testLoadFile(): void
     {
         file_put_contents('box.json.dist', '{}');
 
@@ -57,20 +85,20 @@ class ConfigurationHelperTest extends TestCase
         );
     }
 
-    public function testLoadFileImport()
+    public function testLoadFileImport(): void
     {
         file_put_contents('box.json', '{"import": "test.json"}');
         file_put_contents('test.json', '{"alias": "import.phar"}');
 
         $config = $this->helper->loadFile();
 
-        $this->assertEquals(
+        $this->assertSame(
             'import.phar',
             $config->getAlias()
         );
     }
 
-    public function testGetDefaultPathNotExist()
+    public function testGetDefaultPathNotExist(): void
     {
         try {
             $this->helper->getDefaultPath();
@@ -82,19 +110,5 @@ class ConfigurationHelperTest extends TestCase
                 $exception->getMessage()
             );
         }
-    }
-
-    protected function tearDown()
-    {
-        chdir($this->cwd);
-    }
-
-    protected function setUp()
-    {
-        $this->cwd = getcwd();
-        $this->dir = $this->createDir();
-        $this->helper = new ConfigurationHelper();
-
-        chdir($this->dir);
     }
 }
