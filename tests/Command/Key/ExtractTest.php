@@ -12,9 +12,8 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Tests\Command\Key;
+namespace KevinGH\Box\Command\Key;
 
-use KevinGH\Box\Command\Key\Extract;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\FixedResponse;
 use Symfony\Component\Console\Output\OutputInterface;

@@ -12,11 +12,10 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Tests;
+namespace KevinGH\Box;
 
 use Herrera\Annotations\Tokenizer;
 use Herrera\PHPUnit\TestCase;
-use KevinGH\Box\Configuration;
 use Phar;
 use SplFileInfo;
 

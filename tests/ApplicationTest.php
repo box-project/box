@@ -12,11 +12,10 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Tests;
+namespace KevinGH\Box;
 
 use ErrorException;
 use Herrera\PHPUnit\TestCase;
-use KevinGH\Box\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\StreamOutput;
 

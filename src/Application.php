@@ -16,26 +16,31 @@ namespace KevinGH\Box;
 
 use ErrorException;
 use KevinGH\Amend;
-use Symfony\Component\Console\Application as Base;
+use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * Sets up the application.
- *
- * @author Kevin Herrera <kevin@herrera.io>
- */
-class Application extends Base
+final class Application extends SymfonyApplication
 {
+    private const LOGO = <<<'ASCII'
+
+    ____            
+   / __ )____  _  __
+  / __  / __ \| |/_/
+ / /_/ / /_/ />  <  
+/_____/\____/_/|_|  
+                    
+
+
+ASCII;
+
     /**
-     * @override
-     *
-     * @param mixed $name
-     * @param mixed $version
+     * {@inheritdoc}
      */
-    public function __construct($name = 'Box', $version = '@git-version@')
+    public function __construct(string $name = 'Box', string $version = '@git-version@')
     {
         // convert errors to exceptions
         set_error_handler(
@@ -45,14 +50,14 @@ class Application extends Base
                 }
                 // @codeCoverageIgnoreStart
             }
-            // @codeCoverageIgnoreEnd
+        // @codeCoverageIgnoreEnd
         );
 
         parent::__construct($name, $version);
     }
 
     /**
-     * @override
+     * {@inheritdoc}
      */
     public function getLongVersion()
     {
@@ -71,10 +76,8 @@ class Application extends Base
     /**
      * @override
      */
-    public function run(
-        InputInterface $input = null,
-        OutputInterface $output = null
-    ) {
+    public function run(InputInterface $input = null, OutputInterface $output = null)
+    {
         $output = $output ?: new ConsoleOutput();
 
         $output->getFormatter()->setStyle(
@@ -91,9 +94,17 @@ class Application extends Base
     }
 
     /**
-     * @override
+     * {@inheritdoc}
      */
-    protected function getDefaultCommands()
+    public function getHelp(): string
+    {
+        return self::LOGO.parent::getHelp();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getDefaultCommands(): array
     {
         $commands = parent::getDefaultCommands();
 
@@ -121,9 +132,9 @@ class Application extends Base
     }
 
     /**
-     * @override
+     * {@inheritdoc}
      */
-    protected function getDefaultHelperSet()
+    protected function getDefaultHelperSet(): HelperSet
     {
         $helperSet = parent::getDefaultHelperSet();
         $helperSet->set(new Helper\ConfigurationHelper());

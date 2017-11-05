@@ -12,9 +12,8 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Tests\Command;
+namespace KevinGH\Box\Command;
 
-use KevinGH\Box\Command\Info;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
 

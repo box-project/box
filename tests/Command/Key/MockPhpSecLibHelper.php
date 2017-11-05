@@ -12,17 +12,14 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Tests;
+namespace KevinGH\Box\Command\Key;
 
-use Herrera\Box\Compactor\CompactorInterface;
+use KevinGH\Box\Helper\PhpSecLibHelper;
 
-class TestCompactor implements CompactorInterface
+class MockPhpSecLibHelper extends PhpSecLibHelper
 {
-    public function compact($contents): void
+    public function cryptRSA()
     {
-    }
-
-    public function supports($file): void
-    {
+        return new MockCryptRSA();
     }
 }

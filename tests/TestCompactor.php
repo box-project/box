@@ -12,8 +12,17 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Tests;
+namespace KevinGH\Box;
 
-class InvalidCompactor
+use Herrera\Box\Compactor\CompactorInterface;
+
+class TestCompactor implements CompactorInterface
 {
+    public function compact($contents): void
+    {
+    }
+
+    public function supports($file): void
+    {
+    }
 }

@@ -12,14 +12,8 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Tests\Command\Key;
+namespace KevinGH\Box;
 
-use KevinGH\Box\Helper\PhpSecLibHelper;
-
-class MockPhpSecLibHelper extends PhpSecLibHelper
+class InvalidCompactor
 {
-    public function cryptRSA()
-    {
-        return new MockCryptRSA();
-    }
 }

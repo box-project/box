@@ -12,12 +12,11 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Tests\Command;
+namespace KevinGH\Box\Command;
 
 use Herrera\Box\Box;
 use Herrera\Box\Compactor\Php;
 use Herrera\Box\StubGenerator;
-use KevinGH\Box\Command\Add;
 use KevinGH\Box\Test\CommandTestCase;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
