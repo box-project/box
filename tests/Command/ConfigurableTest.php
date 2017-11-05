@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Command;
 
 use KevinGH\Box\Test\CommandTestCase;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 
 /**
@@ -43,7 +44,7 @@ class ConfigurableTest extends CommandTestCase
         );
     }
 
-    protected function getCommand()
+    protected function getCommand(): Command
     {
         return new TestConfigurable('test');
     }

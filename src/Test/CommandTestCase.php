@@ -91,7 +91,7 @@ abstract class CommandTestCase extends TestCase
      *
      * @return Command the command
      */
-    abstract protected function getCommand();
+    abstract protected function getCommand(): Command;
 
     /**
      * Returns the output for the tester.
@@ -125,12 +125,7 @@ abstract class CommandTestCase extends TestCase
         return str_replace(PHP_EOL, "\n", $string);
     }
 
-    /**
-     * Returns the tester for the command.
-     *
-     * @return CommandTester the tester
-     */
-    protected function getTester()
+    protected function getCommandTester(): CommandTester
     {
         return new CommandTester($this->app->get($this->name));
     }

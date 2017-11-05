@@ -15,10 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use ErrorException;
-use Herrera\PHPUnit\TestCase;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\StringInput;
-use Symfony\Component\Console\Output\StreamOutput;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
 /**
@@ -26,7 +23,7 @@ use Symfony\Component\Console\Tester\ApplicationTester;
  */
 class ApplicationTest extends TestCase
 {
-    public function test_it_can_display_the_version_when_no_specific_version_is_given()
+    public function test_it_can_display_the_version_when_no_specific_version_is_given(): void
     {
         $application = new Application();
         $application->setAutoExit(false);
@@ -50,7 +47,7 @@ EOF;
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_can_display_the_version_when_a_specific_version_is_given()
+    public function test_it_can_display_the_version_when_a_specific_version_is_given(): void
     {
         $application = new Application('Box', '1.2.3');
         $application->setAutoExit(false);
@@ -75,7 +72,7 @@ EOF;
     }
 
     //TODO: review that "feature" as it is likely to no longer be necessary in PHP 7.1
-    public function test_errors_are_transformed_into_warnings()
+    public function test_errors_are_transformed_into_warnings(): void
     {
         $application = new Application();
         $application->setAutoExit(false);
@@ -90,7 +87,7 @@ EOF;
         }
     }
 
-    public function test_get_helper_menu()
+    public function test_get_helper_menu(): void
     {
         $application = new Application();
         $application->setAutoExit(false);
@@ -132,7 +129,7 @@ Available commands:
   list         Lists commands
   remove       Removes files from a Phar.
   validate     Validates the configuration file.
-  verify       Verifies the Phar signature.
+  verify       Verifies the PHAR signature.
  key
   key:create   Creates a private key
   key:extract  Extracts the public key from a private key.

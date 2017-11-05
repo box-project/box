@@ -16,6 +16,7 @@ namespace KevinGH\Box\Command;
 
 use Exception;
 use KevinGH\Box\Test\CommandTestCase;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -27,7 +28,7 @@ class ValidateTest extends CommandTestCase
     {
         file_put_contents('test.json', '{}');
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $tester->execute(
             [
                 'command' => 'validate',
@@ -49,7 +50,7 @@ OUTPUT;
 
     public function testExecuteNotFound(): void
     {
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $expected = <<<'OUTPUT'
 The configuration file failed validation.
 
@@ -63,7 +64,7 @@ OUTPUT;
     {
         file_put_contents('box.json.dist', '{');
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $exit = $tester->execute(['command' => 'validate']);
         $expected = <<<'OUTPUT'
 The configuration file failed validation.
@@ -78,7 +79,7 @@ OUTPUT;
     {
         file_put_contents('box.json', '{');
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
 
         try {
             $tester->execute(
@@ -106,7 +107,7 @@ OUTPUT;
     {
         file_put_contents('box.json', '{"test": true}');
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
 
         $tester->execute(
             [
@@ -128,7 +129,7 @@ OUTPUT;
         $this->assertSame($expected, $this->getOutput($tester));
     }
 
-    protected function getCommand()
+    protected function getCommand(): Command
     {
         return new Validate();
     }

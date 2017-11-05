@@ -14,32 +14,71 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Command;
 
-use KevinGH\Box\Test\CommandTestCase;
+use KevinGH\Box\Application;
 use Phar;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
-use UnexpectedValueException;
+use Symfony\Component\Console\Tester\CommandTester;
 
 /**
- * @coversNothing
+ * @covers \KevinGH\Box\Command\Verify
  */
-class VerifyTest extends CommandTestCase
+class VerifyTest extends TestCase
 {
-    public function testExecuteExtension(): void
+    private const FIXTURES = __DIR__.'/../../fixtures/verify';
+
+    /**
+     * @var CommandTester
+     */
+    private $commandTester;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
     {
-        file_put_contents('test.php', '<?php echo "Hello!";');
+        if (true === (bool) ini_get('phar.readonly')) {
+            $this->markTestSkipped(
+                'Requires phar.readonly to be set to 0. Either update your php.ini file or run this test with '
+                .'php -d phar.readonly=0.'
+            );
+        }
 
-        $phar = new Phar('test.phar');
-        $phar->addFile('test.php', 'test.php');
+        $this->commandTester = new CommandTester((new Application())->get('verify'));
+    }
 
-        $signature = $phar->getSignature();
+    /**
+     * @dataProvider providePassingPharPaths
+     */
+    public function test_it_verifies_the_signature_of_the_given_file_using_the_phar_extension(string $pharPath): void
+    {
+        $this->commandTester->execute([
+            'command' => 'verify',
+            'phar' => $pharPath,
+        ]);
 
-        unset($phar);
+        $expected = <<<'OUTPUT'
+The PHAR passed verification.
 
-        $tester = $this->getTester();
-        $tester->execute(
+OUTPUT;
+
+        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $this->assertSame(0, $this->commandTester->getStatusCode());
+    }
+
+    /**
+     * @dataProvider providePassingPharPaths
+     */
+    public function test_it_verifies_the_signature_of_the_given_file_using_the_phar_extension_in_verbose_mode(string $pharPath): void
+    {
+        $signature = (new Phar($pharPath))->getSignature();
+
+        $this->commandTester->execute(
             [
                 'command' => 'verify',
-                'phar' => 'test.phar',
+                'phar' => $pharPath,
             ],
             [
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -47,32 +86,48 @@ class VerifyTest extends CommandTestCase
         );
 
         $expected = <<<OUTPUT
-Verifying the Phar...
-The Phar passed verification.
-{$signature['hash_type']} Signature:
-{$signature['hash']}
+Verifying the PHAR "{$pharPath}"...
+The PHAR passed verification.
+
+{$signature['hash_type']} signature: {$signature['hash']}
 
 OUTPUT;
 
-        $this->assertSame($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $this->assertSame(0, $this->commandTester->getStatusCode());
     }
 
-    public function testExecuteLibrary(): void
+    /**
+     * @dataProvider providePassingPharPaths
+     */
+    public function test_it_verifies_the_signature_of_the_given_file_without_the_phar_extension(string $pharPath): void
     {
-        file_put_contents('test.php', '<?php echo "Hello!";');
+        $this->commandTester->execute([
+            'command' => 'verify',
+            'phar' => $pharPath,
+            '--no-extension' => true,
+        ]);
 
-        $phar = new Phar('test.phar');
-        $phar->addFile('test.php', 'test.php');
+        $expected = <<<'OUTPUT'
+The PHAR passed verification.
 
-        $signature = $phar->getSignature();
+OUTPUT;
 
-        unset($phar);
+        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $this->assertSame(0, $this->commandTester->getStatusCode());
+    }
 
-        $tester = $this->getTester();
-        $tester->execute(
+    /**
+     * @dataProvider providePassingPharPaths
+     */
+    public function test_it_verifies_the_signature_of_the_given_file_without_the_phar_extension_in_verbose_mode(string $pharPath): void
+    {
+        $signature = (new Phar($pharPath))->getSignature();
+
+        $this->commandTester->execute(
             [
                 'command' => 'verify',
-                'phar' => 'test.phar',
+                'phar' => $pharPath,
                 '--no-extension' => true,
             ],
             [
@@ -81,85 +136,97 @@ OUTPUT;
         );
 
         $expected = <<<OUTPUT
-Verifying the Phar...
-The Phar passed verification.
-{$signature['hash_type']} Signature:
-{$signature['hash']}
+Verifying the PHAR "{$pharPath}"...
+The PHAR passed verification.
+
+{$signature['hash_type']} signature: {$signature['hash']}
 
 OUTPUT;
 
-        $this->assertSame($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $this->assertSame(0, $this->commandTester->getStatusCode());
     }
 
-    public function testExecuteNotExist(): void
+    public function test_it_cannot_verify_an_unknown_file(): void
     {
-        $tester = $this->getTester();
-        $tester->execute(
-            [
-                'command' => 'verify',
-                'phar' => 'test.phar',
-            ]
-        );
-
-        $expected = <<<'OUTPUT'
-The path "test.phar" is not a file or does not exist.
-
-OUTPUT;
-
-        $this->assertSame($expected, $this->getOutput($tester));
-    }
-
-    public function testExecuteFailed(): void
-    {
-        file_put_contents('test.phar', 'bad');
-
-        $tester = $this->getTester();
-        $tester->execute(
-            [
-                'command' => 'verify',
-                'phar' => 'test.phar',
-            ]
-        );
-
-        $expected = <<<'OUTPUT'
-The Phar failed verification.
-
-OUTPUT;
-
-        $this->assertSame($expected, $this->getOutput($tester));
-    }
-
-    public function testExecuteFailedVerbose(): void
-    {
-        file_put_contents('test.phar', 'bad');
-
-        $tester = $this->getTester();
-
         try {
-            $tester->execute(
+            $this->commandTester->execute(
                 [
                     'command' => 'verify',
-                    'phar' => 'test.phar',
-                ],
-                [
-                    'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+                    'phar' => 'unknown',
                 ]
             );
-        } catch (UnexpectedValueException $exception) {
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame(
+                'Could not find the file "unknown".',
+                $exception->getMessage()
+            );
+            $this->assertSame(0, $exception->getCode());
+            $this->assertNull($exception->getPrevious());
         }
-
-        $expected = <<<'OUTPUT'
-Verifying the Phar...
-The Phar failed verification.
-
-OUTPUT;
-
-        $this->assertTrue(isset($exception));
-        $this->assertSame($expected, $this->getOutput($tester));
     }
 
-    protected function getCommand()
+    /**
+     * @dataProvider provideFailingPharPaths
+     */
+    public function test_a_corrupted_PHAR_fails_the_verification(string $pharPath): void
     {
-        return new Verify();
+        $execute = function (bool $useExtension) use ($pharPath): void {
+            $input = [
+                'command' => 'verify',
+                'phar' => $pharPath,
+            ];
+
+            if (false === $useExtension) {
+                $input['--no-extension'] = null;
+            }
+
+            $this->commandTester->execute($input);
+
+            $this->assertSame(
+                1,
+                preg_match(
+                    '/^The PHAR failed the verification: .+$/',
+                    $this->commandTester->getDisplay(true)
+                )
+            );
+
+            $this->assertSame(1, $this->commandTester->getStatusCode());
+        };
+
+        $execute(true);
+        $execute(false);
+    }
+
+    public function providePassingPharPaths()
+    {
+        yield 'simple PHAR' => [
+            realpath(self::FIXTURES.'/simple-phar.phar'),
+        ];
+
+        yield 'PHAR signed with OpenSSL' => [
+            realpath(self::FIXTURES.'/openssl-signed/php-scoper.phar'),
+        ];
+    }
+
+    public function provideFailingPharPaths()
+    {
+        yield 'a fake PHAR' => [
+            realpath(self::FIXTURES.'/not-a-phar.phar'),
+        ];
+
+        yield 'a simple PHAR which content has been altered' => [
+            realpath(self::FIXTURES.'/simple-corrupted-phar.phar'),
+        ];
+
+        yield 'an OpenSSL signed PHAR which public key has been altered' => [
+            realpath(self::FIXTURES.'/openssl-signed-with-corrupted-pubkey/php-scoper.phar'),
+        ];
+
+        yield 'an OpenSSL signed PHAR without its public key' => [
+            realpath(self::FIXTURES.'/openssl-signed-without-pubkey/php-scoper.phar'),
+        ];
     }
 }

@@ -21,6 +21,7 @@ use KevinGH\Box\Test\CommandTestCase;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use RuntimeException;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -44,7 +45,7 @@ echo "Goodbye, @name@!\n";
 CODE
         );
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $tester->execute(
             [
                 'command' => 'add',
@@ -95,7 +96,7 @@ echo "Goodbye, @name@!\n";
 CODE
         );
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $tester->execute(
             [
                 'command' => 'add',
@@ -140,7 +141,7 @@ OUTPUT;
             '<?php echo "Hello, stub!\n"; __HALT_COMPILER();'
         );
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $tester->execute(
             [
                 'command' => 'add',
@@ -190,7 +191,7 @@ echo "Sup, @name@!\n";
 CODE
         );
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $tester->execute(
             [
                 'command' => 'add',
@@ -227,7 +228,7 @@ OUTPUT;
 
     public function testExecuteMissingLocal(): void
     {
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $exit = $tester->execute(
             [
                 'command' => 'add',
@@ -247,7 +248,7 @@ OUTPUT;
     {
         file_put_contents('box.json', '{}');
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $exit = $tester->execute(
             [
                 'command' => 'add',
@@ -269,7 +270,7 @@ OUTPUT;
         file_put_contents('box.json', '{}');
         touch('test.phar');
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $exit = $tester->execute(
             [
                 'command' => 'add',
@@ -292,7 +293,7 @@ OUTPUT;
 
         touch('test.php');
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $exit = $tester->execute(
             [
                 'command' => 'add',
@@ -318,7 +319,7 @@ OUTPUT;
 
         vfsStreamWrapper::setRoot($root);
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
 
         try {
             $tester->execute(
@@ -342,7 +343,7 @@ OUTPUT;
         );
     }
 
-    protected function getCommand()
+    protected function getCommand(): Command
     {
         return new Add();
     }

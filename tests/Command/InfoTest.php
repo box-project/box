@@ -16,6 +16,7 @@ namespace KevinGH\Box\Command;
 
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
+use Symfony\Component\Console\Command\Command;
 
 /**
  * @coversNothing
@@ -24,7 +25,7 @@ class InfoTest extends CommandTestCase
 {
     public function testGetInfo(): void
     {
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $tester->execute(
             [
                 'command' => 'info',
@@ -58,7 +59,7 @@ OUTPUT;
 
         unset($phar);
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $tester->execute(
             [
                 'command' => 'info',
@@ -96,7 +97,7 @@ OUTPUT;
 
         unset($phar);
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $tester->execute(
             [
                 'command' => 'info',
@@ -142,7 +143,7 @@ OUTPUT;
 
         unset($phar);
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $tester->execute(
             [
                 'command' => 'info',
@@ -173,7 +174,7 @@ OUTPUT;
         $this->assertSame($expected, $this->getOutput($tester));
     }
 
-    protected function getCommand()
+    protected function getCommand(): Command
     {
         return new Info();
     }

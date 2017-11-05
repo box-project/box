@@ -16,6 +16,7 @@ namespace KevinGH\Box\Command;
 
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -32,7 +33,7 @@ class ExtractTest extends CommandTestCase
 
         unset($phar);
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $tester->execute(
             [
                 'command' => 'extract',
@@ -67,7 +68,7 @@ OUTPUT;
 
         unset($phar);
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $tester->execute(
             [
                 'command' => 'extract',
@@ -97,7 +98,7 @@ OUTPUT;
 
     public function testExecuteNotExist(): void
     {
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $tester->execute(
             [
                 'command' => 'extract',
@@ -117,7 +118,7 @@ OUTPUT;
         $this->assertSame($expected, $this->getOutput($tester));
     }
 
-    protected function getCommand()
+    protected function getCommand(): Command
     {
         return new Extract();
     }

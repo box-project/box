@@ -20,7 +20,6 @@ use Phar;
 use SplFileInfo;
 
 /**
- * @requires PHP 7.2.0
  * @coversNothing
  */
 class ConfigurationTest extends TestCase
@@ -607,6 +606,7 @@ class ConfigurationTest extends TestCase
         exec('git init');
         exec('git config user.name "Test User"');
         exec('git config user.email test@test.test');
+        exec('git config commit.gpgsign false');
         exec('git add test');
         exec('git commit -m "Adding test file."');
 
@@ -627,6 +627,7 @@ class ConfigurationTest extends TestCase
         exec('git init');
         exec('git config user.name "Test User"');
         exec('git config user.email test@test.test');
+        exec('git config commit.gpgsign false');
         exec('git add test');
         exec('git commit -m "Adding test file."');
 
@@ -677,6 +678,7 @@ class ConfigurationTest extends TestCase
         exec('git init');
         exec('git config user.name "Test User"');
         exec('git config user.email test@test.test');
+        exec('git config commit.gpgsign false');
         exec('git add test');
         exec('git commit -m "Adding test file."');
         exec('git tag 1.0.0');
@@ -722,6 +724,7 @@ class ConfigurationTest extends TestCase
         exec('git init');
         exec('git config user.name "Test User"');
         exec('git config user.email test@test.test');
+        exec('git config commit.gpgsign false');
         exec('git add test');
         exec('git commit -m "Adding test file."');
         exec('git tag 1.0.0');
@@ -740,6 +743,7 @@ class ConfigurationTest extends TestCase
         exec('git init');
         exec('git config user.name "Test User"');
         exec('git config user.email test@test.test');
+        exec('git config commit.gpgsign false');
         exec('git add test');
         exec('git commit -m "Adding test file."');
 
@@ -938,6 +942,7 @@ class ConfigurationTest extends TestCase
         exec('git init');
         exec('git config user.name "Test User"');
         exec('git config user.email test@test.test');
+        exec('git config commit.gpgsign false');
         exec('git add test');
         exec('git commit -m "Adding test file."');
         exec('git tag 1.0.0');
@@ -997,6 +1002,7 @@ class ConfigurationTest extends TestCase
         exec('git init');
         exec('git config user.name "Test User"');
         exec('git config user.email test@test.test');
+        exec('git config commit.gpgsign false');
         exec('git add test');
         exec('git commit -m "Adding test file."');
         exec('git tag 1.0.0');

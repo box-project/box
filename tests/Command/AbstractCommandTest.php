@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Command;
 
 use KevinGH\Box\Test\CommandTestCase;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -25,7 +26,7 @@ class AbstractCommandTest extends CommandTestCase
 {
     public function testVerbose(): void
     {
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $tester->execute(
             ['command' => 'test'],
             [
@@ -48,7 +49,7 @@ OUTPUT
 
     public function testVerboseNone(): void
     {
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $tester->execute(['command' => 'test']);
 
         $this->assertSame(
@@ -60,7 +61,7 @@ OUTPUT
         );
     }
 
-    protected function getCommand()
+    protected function getCommand(): Command
     {
         return new TestAbstractCommand();
     }

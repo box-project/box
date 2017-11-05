@@ -16,6 +16,7 @@ namespace KevinGH\Box\Command\Key;
 
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\FixedResponse;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -45,7 +46,7 @@ KEY
 
         $this->app->getHelperSet()->set(new FixedResponse('test'));
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $tester->execute(
             [
                 'command' => 'key:extract',
@@ -73,7 +74,7 @@ OUTPUT;
     {
         file_put_contents('test.key', 'bad');
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $exit = $tester->execute(
             [
                 'command' => 'key:extract',
@@ -112,7 +113,7 @@ KEY
         $this->app->getHelperSet()->set(new FixedResponse('test'));
         $this->app->getHelperSet()->set(new MockPhpSecLibHelper());
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $exit = $tester->execute(
             [
                 'command' => 'key:extract',
@@ -129,7 +130,7 @@ KEY
         );
     }
 
-    protected function getCommand()
+    protected function getCommand(): Command
     {
         return new Extract();
     }

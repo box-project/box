@@ -16,6 +16,7 @@ namespace KevinGH\Box\Command\Key;
 
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\FixedResponse;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -27,7 +28,7 @@ class CreateTest extends CommandTestCase
     {
         $this->app->getHelperSet()->set(new FixedResponse('test'));
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $tester->execute(
             [
                 'command' => 'key:create',
@@ -53,7 +54,7 @@ OUTPUT;
         $this->assertRegExp('/PUBLIC KEY/', file_get_contents('test.pub'));
     }
 
-    protected function getCommand()
+    protected function getCommand(): Command
     {
         return new Create();
     }

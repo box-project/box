@@ -18,6 +18,7 @@ use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\FixedResponse;
 use Phar;
 use RuntimeException;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\PhpExecutableFinder;
 
@@ -109,7 +110,7 @@ KEY
             )
         );
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $tester->execute(
             [
                 'command' => 'build',
@@ -189,7 +190,7 @@ OUTPUT;
             )
         );
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
 
         try {
             $tester->execute(
@@ -224,7 +225,7 @@ OUTPUT;
             )
         );
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $tester->execute(
             ['command' => 'build'],
             ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]
@@ -270,7 +271,7 @@ OUTPUT;
             )
         );
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $tester->execute(
             [
                 'command' => 'build',
@@ -317,7 +318,7 @@ OUTPUT;
             )
         );
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $tester->execute(
             [
                 'command' => 'build',
@@ -355,7 +356,7 @@ OUTPUT;
             )
         );
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $tester->execute(
             [
                 'command' => 'build',
@@ -396,7 +397,7 @@ OUTPUT;
             )
         );
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $tester->execute(
             [
                 'command' => 'build',
@@ -445,13 +446,13 @@ OUTPUT;
             )
         );
 
-        $tester = $this->getTester();
+        $tester = $this->getCommandTester();
         $tester->execute(['command' => 'build']);
 
         $this->assertSame("Building...\n", $this->getOutput($tester));
     }
 
-    protected function getCommand()
+    protected function getCommand(): Command
     {
         return new Build();
     }
