@@ -11,7 +11,7 @@ define('BOX_PATH', dirname(__DIR__));
 if (extension_loaded('phar') && ($uri = Phar::running())) {
     require "$uri/src/vendors/autoload.php";
 } elseif (class_exists('Extract')) {
-    require __DIR__ . '/../src/vendors/autoload.php';
+    require __DIR__.'/../src/vendors/autoload.php';
 } else {
     loadComposerClassloader(realpath($_SERVER['argv'][0]));
 }
@@ -22,12 +22,12 @@ $app->run();
 /**
  * Finds the Composer autoloader and returns it.
  *
- * @param null $dir  The starting directory.
- * @param int  $skip The number of occurrences to skip.
+ * @param null $dir  the starting directory
+ * @param int  $skip the number of occurrences to skip
  *
- * @return Composer\Autoload\ClassLoader The class loader.
+ * @throws RuntimeException if the loader could not be loaded
  *
- * @throws RuntimeException If the loader could not be loaded.
+ * @return Composer\Autoload\ClassLoader the class loader
  */
 function loadComposerClassloader($dir = null, $skip = 0)
 {
@@ -39,7 +39,7 @@ function loadComposerClassloader($dir = null, $skip = 0)
 
         if (file_exists("$dir/composer.json")) {
             if ($skip > $skips) {
-                $skips++;
+                ++$skips;
 
                 continue;
             }
@@ -77,13 +77,13 @@ function loadComposerClassloader($dir = null, $skip = 0)
 
     $path = dirname($path);
 
-    if (isset($json->config) && isset($json->config->{'vendor-dir'})) {
-        $path .= DIRECTORY_SEPARATOR . $json->config->{'vendor-dir'};
+    if (isset($json->config, $json->config->{'vendor-dir'})) {
+        $path .= DIRECTORY_SEPARATOR.$json->config->{'vendor-dir'};
     } else {
-        $path .= DIRECTORY_SEPARATOR . 'vendor';
+        $path .= DIRECTORY_SEPARATOR.'vendor';
     }
 
-    $path .= DIRECTORY_SEPARATOR . 'autoload.php';
+    $path .= DIRECTORY_SEPARATOR.'autoload.php';
 
     if (false === file_exists($path)) {
         throw new RuntimeException(
