@@ -17,81 +17,130 @@ namespace KevinGH\Box;
 use ErrorException;
 use Herrera\PHPUnit\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Tester\ApplicationTester;
 
 /**
- * @coversNothing
+ * @covers \KevinGH\Box\Application
  */
 class ApplicationTest extends TestCase
 {
-    public function testApp(): void
+    public function test_it_can_display_the_version_when_no_specific_version_is_given()
     {
-        $app = new Application();
-        $app->setAutoExit(false);
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
 
-        $input = new ArrayInput(['--version']);
-        $stream = fopen('php://memory', 'w', false);
-        $output = new StreamOutput($stream);
+        $appTester = new ApplicationTester($application);
 
-        $app->run($input, $output);
+        $input = ['--version'];
 
-        rewind($stream);
+        $appTester->run($input);
 
-        $string = trim(fgets($stream));
-        $string = preg_replace(
-            [
-                '/\x1b(\[|\(|\))[;?0-9]*[0-9A-Za-z]/',
-                '/\x1b(\[|\(|\))[;?0-9]*[0-9A-Za-z]/',
-                '/[\x03|\x1a]/',
-            ],
-            ['', '', ''],
-            $string
-        );
+        $this->assertSame(0, $appTester->getStatusCode());
 
-        $this->assertSame('Box (repo)', $string);
+        $expected = <<<'EOF'
+Box (repo)
 
-        $app->setVersion('1.2.3');
+EOF;
 
-        rewind($stream);
+        $actual = $appTester->getDisplay(true);
 
-        $app->run($input, $output);
+        $this->assertSame($expected, $actual);
+    }
 
-        rewind($stream);
+    public function test_it_can_display_the_version_when_a_specific_version_is_given()
+    {
+        $application = new Application('Box', '1.2.3');
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
 
-        $string = trim(fgets($stream));
-        $string = preg_replace(
-            [
-                '/\x1b(\[|\(|\))[;?0-9]*[0-9A-Za-z]/',
-                '/\x1b(\[|\(|\))[;?0-9]*[0-9A-Za-z]/',
-                '/[\x03|\x1a]/',
-            ],
-            ['', '', ''],
-            $string
-        );
+        $appTester = new ApplicationTester($application);
 
-        $this->assertSame(
-            'Box version 1.2.3 build @git-commit@',
-            $string
-        );
+        $input = ['--version'];
+
+        $appTester->run($input);
+
+        $this->assertSame(0, $appTester->getStatusCode());
+
+        $expected = <<<'EOF'
+Box version 1.2.3 build @git-commit@
+
+EOF;
+
+        $actual = $appTester->getDisplay(true);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    //TODO: review that "feature" as it is likely to no longer be necessary in PHP 7.1
+    public function test_errors_are_transformed_into_warnings()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
 
         try {
             trigger_error('Test.', E_USER_WARNING);
-        } catch (ErrorException $exception) {
-        }
 
-        $this->assertTrue(isset($exception));
+            $this->fail('Expected exception to be thrown.');
+        } catch (ErrorException $exception) {
+            $this->assertSame('Test.', $exception->getMessage());
+        }
     }
 
-    public function testAppNonRepo(): void
+    public function test_get_helper_menu()
     {
-        $app = new Application('Test', '1.2.3');
-        $app->setAutoExit(false);
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
 
-        restore_error_handler();
+        $appTester = new ApplicationTester($application);
 
-        $this->assertInstanceOf(
-            'KevinGH\\Amend\\Command',
-            $app->get('update')
-        );
+        $appTester->run([]);
+
+        $expected = <<<'EOF'
+
+    ____            
+   / __ )____  _  __
+  / __  / __ \| |/_/
+ / /_/ / /_/ />  <  
+/_____/\____/_/|_|  
+                    
+
+Box (repo)
+
+Usage:
+  command [options] [arguments]
+
+Options:
+  -h, --help            Display this help message
+  -q, --quiet           Do not output any message
+  -V, --version         Display this application version
+      --ansi            Force ANSI output
+      --no-ansi         Disable ANSI output
+  -n, --no-interaction  Do not ask any interactive question
+  -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+
+Available commands:
+  add          Adds or replaces files to a Phar.
+  build        Builds a new Phar.
+  extract      Extracts files from a Phar.
+  help         Displays help for a command
+  info         Displays information about the Phar extension or file.
+  list         Lists commands
+  remove       Removes files from a Phar.
+  validate     Validates the configuration file.
+  verify       Verifies the Phar signature.
+ key
+  key:create   Creates a private key
+  key:extract  Extracts the public key from a private key.
+
+EOF;
+
+        $actual = $appTester->getDisplay(true);
+
+        $this->assertSame($expected, $actual);
     }
 }
