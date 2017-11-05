@@ -6,6 +6,7 @@ use KevinGH\Box\Command\Build;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\FixedResponse;
 use Phar;
+use RuntimeException;
 use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
@@ -173,15 +174,19 @@ OUTPUT;
 
         $tester = $this->getTester();
 
-        $this->setExpectedException(
-            'RuntimeException',
-            'The file "' . $this->dir . DIRECTORY_SEPARATOR . 'test.php" is not readable.'
-        );
+        try {
+            $tester->execute(
+                array('command' => 'build'),
+                array('verbosity' => OutputInterface::VERBOSITY_VERBOSE)
+            );
 
-        $tester->execute(
-            array('command' => 'build'),
-            array('verbosity' => OutputInterface::VERBOSITY_VERBOSE)
-        );
+            $this->fail('Expected exception to be thrown.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame(
+                'The file "' . $this->dir . DIRECTORY_SEPARATOR . 'test.php" is not readable.',
+                $exception->getMessage()
+            );
+        }
     }
 
     /**
@@ -434,7 +439,7 @@ OUTPUT;
         return new Build();
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

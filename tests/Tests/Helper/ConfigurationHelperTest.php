@@ -4,6 +4,8 @@ namespace KevinGH\Box\Tests;
 
 use Herrera\PHPUnit\TestCase;
 use KevinGH\Box\Helper\ConfigurationHelper;
+use RuntimeException;
+use Throwable;
 
 class ConfigurationHelperTest extends TestCase
 {
@@ -70,12 +72,16 @@ class ConfigurationHelperTest extends TestCase
 
     public function testGetDefaultPathNotExist()
     {
-        $this->setExpectedException(
-            'RuntimeException',
-            'The configuration file could not be found.'
-        );
+        try {
+            $this->helper->getDefaultPath();
 
-        $this->helper->getDefaultPath();
+            $this->fail('Expected exception to be thrown.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame(
+                'The configuration file could not be found.',
+                $exception->getMessage()
+            );
+        }
     }
 
     protected function tearDown()
