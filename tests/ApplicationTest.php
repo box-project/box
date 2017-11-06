@@ -121,13 +121,11 @@ Options:
   -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 
 Available commands:
-  add          Adds or replaces files to a Phar.
   build        Builds a new Phar.
   extract      Extracts files from a Phar.
   help         Displays help for a command
   info         Displays information about the Phar extension or file.
   list         Lists commands
-  remove       Removes files from a Phar.
   validate     Validates the configuration file.
   verify       Verifies the PHAR signature.
  key

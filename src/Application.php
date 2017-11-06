@@ -109,11 +109,9 @@ ASCII;
         $commands = parent::getDefaultCommands();
 
         if (extension_loaded('phar')) {
-            $commands[] = new Command\Add();
             $commands[] = new Command\Build();
             $commands[] = new Command\Extract();
             $commands[] = new Command\Info();
-            $commands[] = new Command\Remove();
         }
 
         $commands[] = new Command\Key\Create();
