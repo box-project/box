@@ -14,22 +14,38 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Command;
 
-use Exception;
+use KevinGH\Box\Application;
 use KevinGH\Box\Test\CommandTestCase;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Tester\CommandTester;
 
 /**
- * @coversNothing
+ * @covers \KevinGH\Box\Command
  */
 class ValidateTest extends CommandTestCase
 {
-    public function testExecute(): void
+    /**
+     * @var CommandTester
+     */
+    private $commandTester;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->commandTester = new CommandTester((new Application())->get('validate'));
+    }
+
+    public function test_it_validates_a_given_file(): void
     {
         file_put_contents('test.json', '{}');
 
-        $tester = $this->getCommandTester();
-        $tester->execute(
+        $this->commandTester->execute(
             [
                 'command' => 'validate',
                 '--configuration' => 'test.json',
@@ -40,49 +56,35 @@ class ValidateTest extends CommandTestCase
         );
 
         $expected = <<<'OUTPUT'
-Validating the Box configuration file...
 The configuration file passed validation.
 
 OUTPUT;
 
-        $this->assertSame($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $this->assertSame(0, $this->commandTester->getStatusCode());
     }
 
-    public function testExecuteNotFound(): void
+    public function test_an_unknown_file_is_invalid(): void
     {
-        $tester = $this->getCommandTester();
+        $this->commandTester->execute(
+            [
+                'command' => 'validate',
+            ]
+        );
+
         $expected = <<<'OUTPUT'
-The configuration file failed validation.
+The configuration file failed validation: The configuration file could not be found.
 
 OUTPUT;
 
-        $this->assertSame(1, $tester->execute(['command' => 'validate']));
-        $this->assertSame($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $this->assertSame(1, $this->commandTester->getStatusCode());
     }
 
-    public function testExecuteFailed(): void
+    public function test_an_unknown_file_is_invalid_in_verbose_mode(): void
     {
-        file_put_contents('box.json.dist', '{');
-
-        $tester = $this->getCommandTester();
-        $exit = $tester->execute(['command' => 'validate']);
-        $expected = <<<'OUTPUT'
-The configuration file failed validation.
-
-OUTPUT;
-
-        $this->assertSame(1, $exit);
-        $this->assertSame($expected, $this->getOutput($tester));
-    }
-
-    public function testExecuteFailedVerbose(): void
-    {
-        file_put_contents('box.json', '{');
-
-        $tester = $this->getCommandTester();
-
         try {
-            $tester->execute(
+            $this->commandTester->execute(
                 [
                     'command' => 'validate',
                 ],
@@ -90,43 +92,113 @@ OUTPUT;
                     'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
                 ]
             );
-        } catch (Exception $exception) {
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame(
+                'The configuration file failed validation: The configuration file could not be found.',
+                $exception->getMessage()
+            );
+            $this->assertSame(0, $exception->getCode());
+            $this->assertNotNull($exception->getPrevious());
         }
-
-        $expected = <<<'OUTPUT'
-Validating the Box configuration file...
-The configuration file failed validation.
-
-OUTPUT;
-
-        $this->assertTrue(isset($exception));
-        $this->assertSame($expected, $this->getOutput($tester));
     }
 
-    public function testExecuteInvalidVerbose(): void
+    public function test_an_invalid_JSON_file_is_invalid(): void
     {
-        file_put_contents('box.json', '{"test": true}');
+        file_put_contents('box.json.dist', '{');
 
-        $tester = $this->getCommandTester();
-
-        $tester->execute(
+        $this->commandTester->execute(
             [
                 'command' => 'validate',
-            ],
-            [
-                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
             ]
         );
 
         $expected = <<<'OUTPUT'
-Validating the Box configuration file...
-The configuration file failed validation.
+The configuration file failed validation: Parse error on line 1:
+{
+^
+Expected one of: 'STRING', '}'
+
+OUTPUT;
+
+        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $this->assertSame(1, $this->commandTester->getStatusCode());
+    }
+
+    public function test_an_invalid_JSON_file_is_invalid_in_verbose_mode(): void
+    {
+        file_put_contents('box.json.dist', '{');
+
+        try {
+            $this->commandTester->execute(
+                [
+                    'command' => 'validate',
+                ],
+                [
+                    'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+                ]
+            );
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (RuntimeException $exception) {
+            $expected = <<<'OUTPUT'
+The configuration file failed validation: Parse error on line 1:
+{
+^
+Expected one of: 'STRING', '}'
+OUTPUT;
+
+            $this->assertSame($expected, $exception->getMessage());
+            $this->assertSame(0, $exception->getCode());
+            $this->assertNotNull($exception->getPrevious());
+        }
+    }
+
+    public function test_an_incorrect_config_file_is_invalid(): void
+    {
+        file_put_contents('box.json', '{"test": true}');
+
+        $this->commandTester->execute(
+            [
+                'command' => 'validate',
+            ]
+        );
+
+        $expected = <<<'OUTPUT'
+The configuration file failed validation: The JSON data did not pass validation.
 
   - The property test is not defined and the definition does not allow additional properties
 
 OUTPUT;
 
-        $this->assertSame($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $this->assertSame(1, $this->commandTester->getStatusCode());
+    }
+
+    public function test_an_incorrect_config_file_is_invalid_in_verbose_mode(): void
+    {
+        file_put_contents('box.json', '{"test": true}');
+
+        try {
+            $this->commandTester->execute(
+                [
+                    'command' => 'validate',
+                ],
+                [
+                    'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+                ]
+            );
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame(
+                'The configuration file failed validation: The JSON data did not pass validation.',
+                $exception->getMessage()
+            );
+            $this->assertSame(0, $exception->getCode());
+            $this->assertNotNull($exception->getPrevious());
+        }
     }
 
     protected function getCommand(): Command
