@@ -110,7 +110,6 @@ ASCII;
 
         if (extension_loaded('phar')) {
             $commands[] = new Command\Build();
-            $commands[] = new Command\Extract();
             $commands[] = new Command\Info();
         }
 
