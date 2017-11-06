@@ -134,7 +134,6 @@ ASCII;
     {
         $helperSet = parent::getDefaultHelperSet();
         $helperSet->set(new Helper\ConfigurationHelper());
-        $helperSet->set(new Helper\PhpSecLibHelper());
 
         if (('@'.'git-version@') !== $this->getVersion()) {
             $helperSet->set(new Amend\Helper());

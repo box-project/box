@@ -68,7 +68,6 @@ abstract class CommandTestCase extends TestCase
 
         $this->app = new Application();
         $this->app->getHelperSet()->set(new Helper\ConfigurationHelper());
-        $this->app->getHelperSet()->set(new Helper\PhpSecLibHelper());
 
         $command = $this->getCommand();
         $this->name = $command->getName();
