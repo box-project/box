@@ -46,7 +46,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "KevinGH\\Box\\": "tests"
+            "KevinGH\\Box\\": ["fixtures", "tests"]
         },
         "files": [
             "src/Test/functions.php"

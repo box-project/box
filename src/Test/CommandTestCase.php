@@ -14,19 +14,20 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Test;
 
-use Herrera\PHPUnit\TestCase;
 use KevinGH\Box\Helper;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\CommandTester;
+use function KevinGH\Box\make_tmp_dir;
+use function KevinGH\Box\remove_dir;
 
 /**
  * Makes it easier to test Box commands.
  *
  * @author Kevin Herrera <kevin@herrera.io>
  */
-abstract class CommandTestCase extends TestCase
+abstract class CommandTestCase extends \PHPUnit\Framework\TestCase
 {
     /**
      * The application.
@@ -47,7 +48,7 @@ abstract class CommandTestCase extends TestCase
      *
      * @var string
      */
-    protected $dir;
+    protected $tmp;
 
     /**
      * The name of the command.
@@ -57,14 +58,14 @@ abstract class CommandTestCase extends TestCase
     private $name;
 
     /**
-     * Creates the application.
+     * {@inheritdoc}
      */
     protected function setUp(): void
     {
         $this->cwd = getcwd();
-        $this->dir = $this->createDir();
+        $this->tmp = make_tmp_dir('box', __CLASS__);
 
-        chdir($this->dir);
+        chdir($this->tmp);
 
         $this->app = new Application();
         $this->app->getHelperSet()->set(new Helper\ConfigurationHelper());
@@ -76,11 +77,13 @@ abstract class CommandTestCase extends TestCase
     }
 
     /**
-     * Restore the current working directory.
+     * {@inheritdoc}
      */
     protected function tearDown(): void
     {
         chdir($this->cwd);
+
+        remove_dir($this->tmp);
 
         parent::tearDown();
     }

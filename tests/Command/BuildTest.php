@@ -23,21 +23,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
- * @coversNothing
+ * @covers \KevinGH\Box\Command\Build
  */
 class BuildTest extends CommandTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->app->getHelperSet()->set(new FixedResponse('test'));
-    }
-
-    public function getPrivateKey()
-    {
-        return [
-            <<<'KEY'
+    private const PRIVATE_KEY = [
+        <<<'KEY'
 -----BEGIN RSA PRIVATE KEY-----
 Proc-Type: 4,ENCRYPTED
 DEK-Info: DES-EDE3-CBC,3FF97F75E5A8F534
@@ -58,13 +49,22 @@ TnvzVS0y1l8zCsRToUtv5rCBC+r8Q3gnvGGnT4jrsp98ithGIQCbbQ==
 -----END RSA PRIVATE KEY-----
 KEY
         ,
-            'test',
-        ];
+        'test',
+    ];
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->app->getHelperSet()->set(new FixedResponse('test'));
     }
 
     public function testBuild(): void
     {
-        $key = $this->getPrivateKey();
+        $key = self::PRIVATE_KEY;
 
         $php = new PhpExecutableFinder();
         $php = '#!'.$php->find();
@@ -120,7 +120,7 @@ KEY
             ]
         );
 
-        $dir = $this->dir.DIRECTORY_SEPARATOR;
+        $dir = $this->tmp.DIRECTORY_SEPARATOR;
         $ds = DIRECTORY_SEPARATOR;
         $expected = <<<OUTPUT
 ? Loading bootstrap file: {$dir}bootstrap.php
@@ -201,7 +201,7 @@ OUTPUT;
             $this->fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
             $this->assertSame(
-                'The file "'.$this->dir.DIRECTORY_SEPARATOR.'test.php" is not readable.',
+                'The file "'.$this->tmp.DIRECTORY_SEPARATOR.'test.php" is not readable.',
                 $exception->getMessage()
             );
         }
@@ -231,7 +231,7 @@ OUTPUT;
             ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]
         );
 
-        $dir = $this->dir.DIRECTORY_SEPARATOR;
+        $dir = $this->tmp.DIRECTORY_SEPARATOR;
         $expected = <<<OUTPUT
 * Building...
 ? Output path: {$dir}default.phar
@@ -281,7 +281,7 @@ OUTPUT;
             ]
         );
 
-        $dir = $this->dir.DIRECTORY_SEPARATOR;
+        $dir = $this->tmp.DIRECTORY_SEPARATOR;
         $expected = <<<OUTPUT
 * Building...
 ? Output path: {$dir}test.phar
@@ -328,7 +328,7 @@ OUTPUT;
             ]
         );
 
-        $dir = $this->dir.DIRECTORY_SEPARATOR;
+        $dir = $this->tmp.DIRECTORY_SEPARATOR;
         $expected = <<<OUTPUT
 * Building...
 ? Output path: {$dir}test.phar
@@ -366,7 +366,7 @@ OUTPUT;
             ]
         );
 
-        $dir = $this->dir.DIRECTORY_SEPARATOR;
+        $dir = $this->tmp.DIRECTORY_SEPARATOR;
         $expected = <<<OUTPUT
 * Building...
 ? Output path: {$dir}test.phar
@@ -407,7 +407,7 @@ OUTPUT;
             ]
         );
 
-        $dir = $this->dir.DIRECTORY_SEPARATOR;
+        $dir = $this->tmp.DIRECTORY_SEPARATOR;
         $expected = <<<OUTPUT
 * Building...
 ? Output path: {$dir}test.phar
