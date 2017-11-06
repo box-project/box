@@ -14,19 +14,36 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Command;
 
-use KevinGH\Box\Test\CommandTestCase;
+use KevinGH\Box\Application;
 use Phar;
-use Symfony\Component\Console\Command\Command;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Tester\CommandTester;
 
 /**
- * @coversNothing
+ * @covers \KevinGH\Box\Command
  */
-class InfoTest extends CommandTestCase
+class InfoTest extends TestCase
 {
-    public function testGetInfo(): void
+    private const FIXTURES = __DIR__.'/../../fixtures/info';
+
+    /**
+     * @var CommandTester
+     */
+    private $commandTester;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setUp(): void
     {
-        $tester = $this->getCommandTester();
-        $tester->execute(
+        parent::setUp();
+
+        $this->commandTester = new CommandTester((new Application())->get('info'));
+    }
+
+    public function test_it_provides_the_phar_API_info(): void
+    {
+        $this->commandTester->execute(
             [
                 'command' => 'info',
             ]
@@ -35,6 +52,7 @@ class InfoTest extends CommandTestCase
         $version = Phar::apiVersion();
         $compression = '  - '.implode("\n  - ", Phar::getSupportedCompression());
         $signatures = '  - '.implode("\n  - ", Phar::getSupportedSignatures());
+
         $expected = <<<OUTPUT
 API Version: $version
 
@@ -46,24 +64,22 @@ $signatures
 
 OUTPUT;
 
-        $this->assertSame($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $this->assertSame(0, $this->commandTester->getStatusCode());
     }
 
-    public function testGetInfoPhar(): void
+    public function test_it_provides_a_phar_info(): void
     {
-        $phar = new Phar('test.phar');
-        $phar->addFromString('a/b/c/d.php', '<?php echo "Hello!\n";');
+        $pharPath = self::FIXTURES.'/simple-phar.phar';
+        $phar = new Phar($pharPath);
 
         $version = $phar->getVersion();
         $signature = $phar->getSignature();
 
-        unset($phar);
-
-        $tester = $this->getCommandTester();
-        $tester->execute(
+        $this->commandTester->execute(
             [
                 'command' => 'info',
-                'phar' => 'test.phar',
+                'phar' => $pharPath,
             ]
         );
 
@@ -78,30 +94,22 @@ Signature Hash: {$signature['hash']}
 
 OUTPUT;
 
-        $this->assertSame($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $this->assertSame(0, $this->commandTester->getStatusCode());
     }
 
-    public function testGetInfoPharList(): void
+    public function test_it_provides_a_phar_info_with_the_tree_of_the_content(): void
     {
-        $phar = new Phar('test.phar');
-        $phar->addFromString('a/b/c/d.php', '<?php echo "Hello!\n";');
-        $phar->addFromString('a/b/c/e.php', '<?php echo "Compressed!\n";');
-        $phar->setMetadata(['test' => 123]);
+        $pharPath = self::FIXTURES.'/tree-phar.phar';
+        $phar = new Phar($pharPath);
 
-        // @var \PharFileInfo[] $phar
-        $phar['a/b/c/e.php']->compress(Phar::BZ2);
-
-        /** @var Phar $phar */
         $version = $phar->getVersion();
         $signature = $phar->getSignature();
 
-        unset($phar);
-
-        $tester = $this->getCommandTester();
-        $tester->execute(
+        $this->commandTester->execute(
             [
                 'command' => 'info',
-                'phar' => 'test.phar',
+                'phar' => $pharPath,
                 '--list' => true,
                 '--metadata' => true,
             ]
@@ -118,10 +126,8 @@ Signature Hash: {$signature['hash']}
 
 Contents:
 a/
-  b/
-    c/
-      d.php
-      e.php [BZ2]
+  bar.php [BZ2]
+foo.php
 
 Metadata:
 array (
@@ -130,30 +136,27 @@ array (
 
 OUTPUT;
 
-        $this->assertSame($expected, $this->getOutput($tester));
+        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $this->assertSame(0, $this->commandTester->getStatusCode());
     }
 
-    public function testGetInfoPharListFlat(): void
+    public function test_it_provides_a_phar_info_with_the_flat_tree_of_the_content(): void
     {
-        $phar = new Phar('test.phar');
-        $phar->addFromString('a/b/c/d.php', '<?php echo "Hello!\n";');
+        $pharPath = self::FIXTURES.'/tree-phar.phar';
+        $phar = new Phar($pharPath);
 
         $version = $phar->getVersion();
         $signature = $phar->getSignature();
 
-        unset($phar);
-
-        $tester = $this->getCommandTester();
-        $tester->execute(
+        $this->commandTester->execute(
             [
                 'command' => 'info',
-                'phar' => 'test.phar',
-                '--mode' => 'flat',
+                'phar' => $pharPath,
                 '--list' => true,
+                '--mode' => 'flat',
             ]
         );
 
-        $ds = DIRECTORY_SEPARATOR;
         $expected = <<<OUTPUT
 API Version: $version
 
@@ -165,17 +168,12 @@ Signature Hash: {$signature['hash']}
 
 Contents:
 a
-a{$ds}b
-a{$ds}b{$ds}c
-a{$ds}b{$ds}c{$ds}d.php
+a/bar.php [BZ2]
+foo.php
 
 OUTPUT;
 
-        $this->assertSame($expected, $this->getOutput($tester));
-    }
-
-    protected function getCommand(): Command
-    {
-        return new Info();
+        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $this->assertSame(0, $this->commandTester->getStatusCode());
     }
 }

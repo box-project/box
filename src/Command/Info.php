@@ -24,19 +24,19 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Traversable;
 
-/**
- * Provides information about the Phar extension or file.
- *
- * @author Kevin Herrera <kevin@herrera.io>
- */
-class Info extends Command
+final class Info extends Command
 {
+    private const PHAR_ARG = 'phar';
+    private const LIST_OPT = 'list';
+    private const METADATA_OPT = 'metadata';
+    private const MODE_OPT = 'mode';
+
     /**
      * The list of recognized compression algorithms.
      *
      * @var array
      */
-    private static $algorithms = [
+    private const ALGORITHMS = [
         Phar::BZ2 => 'BZ2',
         Phar::GZ => 'GZ',
         Phar::TAR => 'TAR',
@@ -48,7 +48,7 @@ class Info extends Command
      *
      * @var array
      */
-    private static $fileAlgorithms = [
+    private const FILE_ALGORITHMS = [
         Phar::BZ2 => 'BZ2',
         Phar::GZ => 'GZ',
     ];
@@ -56,48 +56,9 @@ class Info extends Command
     /**
      * @override
      */
-    public function execute(InputInterface $input, OutputInterface $output): void
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
-        if (null !== ($file = $input->getArgument('phar'))) {
-            $phar = new Phar($file);
-            $signature = $phar->getSignature();
-
-            $this->render(
-                $output,
-                [
-                    'API Version' => $phar->getVersion(),
-                    'Archive Compression' => $phar->isCompressed()
-                        ? self::$algorithms[$phar->isCompressed()]
-                        : 'None',
-                    'Signature' => $signature['hash_type'],
-                    'Signature Hash' => $signature['hash'],
-                ]
-            );
-
-            if ($input->getOption('list')) {
-                $output->writeln('');
-                $output->writeln('<comment>Contents:</comment>');
-
-                $root = 'phar://'.str_replace('\\', '/', realpath($file)).'/';
-
-                $this->contents(
-                    $output,
-                    $phar,
-                    ('indent' === $input->getOption('mode')) ? 0 : false,
-                    $root,
-                    $phar,
-                    $root
-                );
-            }
-
-            if ($input->getOption('metadata')) {
-                $output->writeln('');
-                $output->writeln('<comment>Metadata:</comment>');
-                $output->writeln(var_export($phar->getMetadata(), true));
-            }
-
-            unset($phar);
-        } else {
+        if (null === ($file = $input->getArgument(self::PHAR_ARG))) {
             $this->render(
                 $output,
                 [
@@ -106,117 +67,97 @@ class Info extends Command
                     'Supported Signatures' => Phar::getSupportedSignatures(),
                 ]
             );
+
+            return 0;
         }
+
+        $phar = new Phar($file);
+        $signature = $phar->getSignature();
+
+        $this->render(
+            $output,
+            [
+                'API Version' => $phar->getVersion(),
+                'Archive Compression' => $phar->isCompressed()
+                    ? self::ALGORITHMS[$phar->isCompressed()]
+                    : 'None',
+                'Signature' => $signature['hash_type'],
+                'Signature Hash' => $signature['hash'],
+            ]
+        );
+
+        if ($input->getOption(self::LIST_OPT)) {
+            $output->writeln('');
+            $output->writeln('<comment>Contents:</comment>');
+
+            $root = 'phar://'.str_replace('\\', '/', realpath($file)).'/';
+
+            $this->renderContents(
+                $output,
+                $phar,
+                ('indent' === $input->getOption(self::MODE_OPT)) ? 0 : false,
+                $root,
+                $phar,
+                $root
+            );
+        }
+
+        if ($input->getOption(self::METADATA_OPT)) {
+            $output->writeln('');
+            $output->writeln('<comment>Metadata:</comment>');
+            $output->writeln(var_export($phar->getMetadata(), true));
+        }
+
+        return 0;
     }
 
     /**
-     * @override
+     * {@inheritdoc}
      */
     protected function configure(): void
     {
         $this->setName('info');
         $this->setDescription(
-            'Displays information about the Phar extension or file.'
+            'Displays information about the PHAR extension or file.'
         );
         $this->setHelp(
             <<<'HELP'
 The <info>%command.name%</info> command will display information about the Phar extension,
 or the Phar file if specified.
 
-If the <info>phar</info> argument <comment>(the Phar file path)</comment> is provided, information
-about the Phar file itself will be displayed.
+If the <info>phar</info> argument <comment>(the PHAR file path)</comment> is provided, information
+about the PHAR file itself will be displayed.
 
-If the <info>--list|-l</info> option is used, the contents of the Phar file will
+If the <info>--list|-l</info> option is used, the contents of the PHAR file will
 be listed. By default, the list is shown as an indented tree. You may
 instead choose to view a flat listing, by setting the <info>--mode|-m</info> option
 to <comment>flat</comment>.
 HELP
         );
         $this->addArgument(
-            'phar',
+            self::PHAR_ARG,
             InputArgument::OPTIONAL,
             'The Phar file.'
         );
         $this->addOption(
-            'list',
+            self::LIST_OPT,
             'l',
             InputOption::VALUE_NONE,
             'List the contents of the Phar?'
         );
         $this->addOption(
-            'metadata',
+            self::METADATA_OPT,
             null,
             InputOption::VALUE_NONE,
             'Display metadata?'
         );
         $this->addOption(
-            'mode',
+            self::MODE_OPT,
             'm',
             InputOption::VALUE_OPTIONAL,
             'The listing mode. (default: indent, options: indent, flat)',
             'indent'
         );
-    }
-
-    /**
-     * Renders the contents of an iterator.
-     *
-     * @param OutputInterface $output the output handler
-     * @param Traversable     $list   the traversable list
-     * @param bool|int        $indent the indentation level
-     * @param string          $base   the base path
-     * @param Phar            $phar   the PHP archive
-     * @param string          $root   the root path to remove
-     */
-    private function contents(
-        OutputInterface $output,
-        Traversable $list,
-        $indent,
-        $base,
-        Phar $phar,
-        $root
-    ): void {
-        /** @var PharFileInfo $item */
-        foreach ($list as $item) {
-            $item = $phar[str_replace($root, '', $item->getPathname())];
-
-            if (false !== $indent) {
-                $output->write(str_repeat(' ', $indent));
-
-                $path = $item->getFilename();
-
-                if ($item->isDir()) {
-                    $path .= '/';
-                }
-            } else {
-                $path = str_replace($base, '', $item->getPathname());
-            }
-
-            if ($item->isDir()) {
-                $output->writeln("<info>$path</info>");
-            } else {
-                $compression = '';
-
-                foreach (self::$fileAlgorithms as $code => $name) {
-                    if ($item->isCompressed($code)) {
-                        $compression = " <fg=cyan>[$name]</fg=cyan>";
-                    }
-                }
-
-                $output->writeln($path.$compression);
-            }
-
-            if ($item->isDir()) {
-                $this->contents(
-                    $output,
-                    new DirectoryIterator($item->getPathname()),
-                    (false === $indent) ? $indent : $indent + 2,
-                    $base,
-                    $phar,
-                    $root
-                );
-            }
-        }
     }
 
     /**
@@ -247,6 +188,67 @@ HELP
             }
 
             $out = true;
+        }
+    }
+
+    /**
+     * Renders the contents of an iterator.
+     *
+     * @param OutputInterface $output the output handler
+     * @param Traversable     $list   the traversable list
+     * @param bool|int        $indent the indentation level
+     * @param string          $base   the base path
+     * @param Phar            $phar   the PHP archive
+     * @param string          $root   the root path to remove
+     */
+    private function renderContents(
+        OutputInterface $output,
+        Traversable $list,
+        $indent,
+        string $base,
+        Phar $phar,
+        string $root
+    ): void {
+        foreach ($list as $item) {
+            /** @var PharFileInfo $item */
+            $item = $phar[str_replace($root, '', $item->getPathname())];
+
+            if (false !== $indent) {
+                $output->write(str_repeat(' ', $indent));
+
+                $path = $item->getFilename();
+
+                if ($item->isDir()) {
+                    $path .= '/';
+                }
+            } else {
+                $path = str_replace($base, '', $item->getPathname());
+            }
+
+            if ($item->isDir()) {
+                $output->writeln("<info>$path</info>");
+            } else {
+                $compression = '';
+
+                foreach (self::FILE_ALGORITHMS as $code => $name) {
+                    if ($item->isCompressed($code)) {
+                        $compression = " <fg=cyan>[$name]</fg=cyan>";
+                    }
+                }
+
+                $output->writeln($path.$compression);
+            }
+
+            if ($item->isDir()) {
+                $this->renderContents(
+                    $output,
+                    new DirectoryIterator($item->getPathname()),
+                    (false === $indent) ? $indent : $indent + 2,
+                    $base,
+                    $phar,
+                    $root
+                );
+            }
         }
     }
 }

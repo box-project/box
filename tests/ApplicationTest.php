@@ -124,7 +124,7 @@ Available commands:
   build        Builds a new Phar.
   extract      Extracts files from a Phar.
   help         Displays help for a command
-  info         Displays information about the Phar extension or file.
+  info         Displays information about the PHAR extension or file.
   list         Lists commands
   validate     Validates the configuration file.
   verify       Verifies the PHAR signature.
