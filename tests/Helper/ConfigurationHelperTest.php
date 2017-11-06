@@ -14,12 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use Herrera\PHPUnit\TestCase;
 use KevinGH\Box\Helper\ConfigurationHelper;
+use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 /**
- * @coversNothing
+ * @covers \KevinGH\Box\ConfigurationHelper
  */
 class ConfigurationHelperTest extends TestCase
 {
@@ -28,80 +28,95 @@ class ConfigurationHelperTest extends TestCase
      */
     private $helper;
 
+    /**
+     * @var string
+     */
     private $cwd;
-    private $dir;
 
+    /**
+     * @var string
+     */
+    private $tmp;
+
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp(): void
     {
         $this->cwd = getcwd();
-        $this->dir = $this->createDir();
+
+        $this->tmp = make_tmp_dir('box', __CLASS__);
+
         $this->helper = new ConfigurationHelper();
 
-        chdir($this->dir);
+        chdir($this->tmp);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function tearDown(): void
     {
         chdir($this->cwd);
+
+        remove_dir($this->tmp);
     }
 
-    public function testConstant(): void
+    public function test_schema_constant_is_defined(): void
     {
         $this->assertInternalType('string', BOX_SCHEMA_FILE);
     }
 
-    public function testGetName(): void
+    public function test_it_has_a_name(): void
     {
         $this->assertSame('config', $this->helper->getName());
     }
 
-    public function testGetDefaultPath(): void
+    public function test_it_finds_the_default_path(): void
     {
         touch('box.json');
 
         $this->assertSame(
-            $this->dir.DIRECTORY_SEPARATOR.'box.json',
-            $this->helper->getDefaultPath()
+            $this->tmp.DIRECTORY_SEPARATOR.'box.json',
+            $this->helper->findDefaultPath()
         );
     }
 
-    public function testGetDefaultPathDist(): void
+    public function test_it_finds_the_default_dist_path(): void
     {
         touch('box.json.dist');
 
         $this->assertSame(
-            $this->dir.DIRECTORY_SEPARATOR.'box.json.dist',
-            $this->helper->getDefaultPath()
+            $this->tmp.DIRECTORY_SEPARATOR.'box.json.dist',
+            $this->helper->findDefaultPath()
         );
     }
 
-    public function testLoadFile(): void
+    public function test_it_non_dist_file_takes_priority_over_dist_file(): void
+    {
+        touch('box.json');
+        touch('box.json.dist');
+
+        $this->assertSame(
+            $this->tmp.DIRECTORY_SEPARATOR.'box.json',
+            $this->helper->findDefaultPath()
+        );
+    }
+
+    public function test_it_can_load_a_configuration(): void
     {
         file_put_contents('box.json.dist', '{}');
 
         $this->assertInstanceOf(
-            'KevinGH\\Box\\Configuration',
-            $this->helper->loadFile()
+            Configuration::class,
+            $this->helper->loadFile(null)
         );
     }
 
-    public function testLoadFileImport(): void
-    {
-        file_put_contents('box.json', '{"import": "test.json"}');
-        file_put_contents('test.json', '{"alias": "import.phar"}');
-
-        $config = $this->helper->loadFile();
-
-        $this->assertSame(
-            'import.phar',
-            $config->getAlias()
-        );
-    }
-
-    public function testGetDefaultPathNotExist(): void
+    public function test_it_throws_an_error_if_no_config_path_is_found(): void
     {
         try {
-            $this->helper->getDefaultPath();
+            $this->helper->findDefaultPath();
 
             $this->fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
@@ -109,6 +124,8 @@ class ConfigurationHelperTest extends TestCase
                 'The configuration file could not be found.',
                 $exception->getMessage()
             );
+            $this->assertSame(0, $exception->getCode());
+            $this->assertNull($exception->getPrevious());
         }
     }
 }

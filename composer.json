@@ -32,7 +32,8 @@
         "bamarni/composer-bin-plugin": "^1.2",
         "herrera-io/phpunit-test-case": "1.*",
         "mikey179/vfsStream": "1.1.0",
-        "phpunit/phpunit": "^6.0"
+        "phpunit/phpunit": "^6.0",
+        "symfony/filesystem": "^3.3"
     },
     "suggest": {
         "ext-openssl": "To accelerate private key generation."
@@ -46,7 +47,10 @@
     "autoload-dev": {
         "psr-4": {
             "KevinGH\\Box\\": "tests"
-        }
+        },
+        "files": [
+            "src/Test/functions.php"
+        ]
     },
     "bin": [
         "bin/box"

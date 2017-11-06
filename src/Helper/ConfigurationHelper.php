@@ -27,12 +27,7 @@ use Symfony\Component\Console\Helper\Helper;
  */
 define('BOX_SCHEMA_FILE', BOX_PATH.'/res/schema.json');
 
-/**
- * Manages the acquisition of configuration settings.
- *
- * @author Kevin Herrera <kevin@herrera.io>
- */
-class ConfigurationHelper extends Helper
+final class ConfigurationHelper extends Helper
 {
     /**
      * The name of the default configuration file.
@@ -41,37 +36,22 @@ class ConfigurationHelper extends Helper
      */
     const FILE_NAME = 'box.json';
 
-    /**
-     * The JSON processor.
-     *
-     * @var Json
-     */
     private $json;
 
-    /**
-     * Creates the JSON processor.
-     */
     public function __construct()
     {
         $this->json = new Json();
     }
 
     /**
-     * @override
+     * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'config';
     }
 
-    /**
-     * Returns the file path to the default configuration file.
-     *
-     * @throws RuntimeException if the default file does not exist
-     *
-     * @return string the file path
-     */
-    public function getDefaultPath()
+    public function findDefaultPath(): string
     {
         if (false === file_exists(self::FILE_NAME)) {
             if (false === file_exists(self::FILE_NAME.'.dist')) {
@@ -86,17 +66,10 @@ class ConfigurationHelper extends Helper
         return realpath(self::FILE_NAME);
     }
 
-    /**
-     * Loads the configuration file and returns it.
-     *
-     * @param string $file the configuration file path
-     *
-     * @return Configuration the configuration settings
-     */
-    public function loadFile($file = null)
+    public function loadFile(?string $file): Configuration
     {
         if (null === $file) {
-            $file = $this->getDefaultPath();
+            $file = $this->findDefaultPath();
         }
 
         $json = $this->json->decodeFile($file);
