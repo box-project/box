@@ -121,16 +121,13 @@ Options:
   -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 
 Available commands:
-  build        Builds a new Phar.
-  extract      Extracts files from a Phar.
-  help         Displays help for a command
-  info         Displays information about the PHAR extension or file.
-  list         Lists commands
-  validate     Validates the configuration file.
-  verify       Verifies the PHAR signature.
- key
-  key:create   Creates a private key
-  key:extract  Extracts the public key from a private key.
+  build     Builds a new Phar.
+  extract   Extracts files from a Phar.
+  help      Displays help for a command
+  info      Displays information about the PHAR extension or file.
+  list      Lists commands
+  validate  Validates the configuration file.
+  verify    Verifies the PHAR signature.
 
 EOF;
 

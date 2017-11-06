@@ -114,8 +114,6 @@ ASCII;
             $commands[] = new Command\Info();
         }
 
-        $commands[] = new Command\Key\Create();
-        $commands[] = new Command\Key\Extract();
         $commands[] = new Command\Validate();
         $commands[] = new Command\Verify();
 
