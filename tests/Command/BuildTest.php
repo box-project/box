@@ -20,37 +20,16 @@ use Phar;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\PhpExecutableFinder;
+use Herrera\Box\Compactor\Php;
 
 /**
  * @covers \KevinGH\Box\Command\Build
  */
 class BuildTest extends CommandTestCase
 {
-    private const PRIVATE_KEY = [
-        <<<'KEY'
------BEGIN RSA PRIVATE KEY-----
-Proc-Type: 4,ENCRYPTED
-DEK-Info: DES-EDE3-CBC,3FF97F75E5A8F534
-
-TvEPC5L3OXjy4X5t6SRsW6J4Dfdgw0Mfjqwa4OOI88uk5L8SIezs4sHDYHba9GkG
-RKVnRhA5F+gEHrabsQiVJdWPdS8xKUgpkvHqoAT8Zl5sAy/3e/EKZ+Bd2pS/t5yQ
-aGGqliG4oWecx42QGL8rmyrbs2wnuBZmwQ6iIVIfYabwpiH+lcEmEoxomXjt9A3j
-Sh8IhaDzMLnVS8egk1QvvhFjyXyBIW5mLIue6cdEgINbxzRReNQgjlyHS8BJRLp9
-EvJcZDKJiNJt+VLncbfm4ZhbdKvSsbZbXC/Pqv06YNMY1+m9QwszHJexqjm7AyzB
-MkBFedcxcxqvSb8DaGgQfUkm9rAmbmu+l1Dncd72Cjjf8fIfuodUmKsdfYds3h+n
-Ss7K4YiiNp7u9pqJBMvUdtrVoSsNAo6i7uFa7JQTXec9sbFN1nezgq1FZmcfJYUZ
-rdpc2J1hbHTfUZWtLZebA72GU63Y9zkZzbP3SjFUSWniEEbzWbPy2sAycHrpagND
-itOQNHwZ2Me81MQQB55JOKblKkSha6cNo9nJjd8rpyo/lc/Iay9qlUyba7RO0V/t
-wm9ZeUZL+D2/JQH7zGyLxkKqcMC+CFrNYnVh0U4nk3ftZsM+jcyfl7ScVFTKmcRc
-ypcpLwfS6gyenTqiTiJx/Zca4xmRNA+Fy1EhkymxP3ku0kTU6qutT2tuYOjtz/rW
-k6oIhMcpsXFdB3N9iHT4qqElo3rVW/qLQaNIqxd8+JmE5GkHmF43PhK3HX1PCmRC
-TnvzVS0y1l8zCsRToUtv5rCBC+r8Q3gnvGGnT4jrsp98ithGIQCbbQ==
------END RSA PRIVATE KEY-----
-KEY
-        ,
-        'test',
-    ];
+    private const FIXTURES = __DIR__.'/../../fixtures/build';
 
     /**
      * {@inheritdoc}
@@ -62,26 +41,20 @@ KEY
         $this->app->getHelperSet()->set(new FixedResponse('test'));
     }
 
-    public function testBuild(): void
+    /**
+     * @inheritdoc
+     */
+    protected function getCommand(): Command
     {
-        $key = self::PRIVATE_KEY;
+        return new Build();
+    }
 
-        $php = new PhpExecutableFinder();
-        $php = '#!'.$php->find();
+    public function test_it_can_build_a_PHAR_file(): void
+    {
+        (new Filesystem())->mirror(self::FIXTURES.'/dir000', $this->tmp);
 
-        mkdir('a/deep/test/directory', 0755, true);
-        touch('a/deep/test/directory/test.php');
+        $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
-        mkdir('one');
-        mkdir('two');
-        touch('test.phar');
-        touch('test.phar.pubkey');
-        touch('one/test.php');
-        touch('two/test.png');
-        touch('bootstrap.php');
-        file_put_contents('private.key', $key[0]);
-        file_put_contents('test.php', '<?php echo "Hello, world!\n";');
-        file_put_contents('run.php', '<?php require "test.php";');
         file_put_contents(
             'box.json',
             json_encode(
@@ -90,7 +63,7 @@ KEY
                     'banner' => 'custom banner',
                     'bootstrap' => 'bootstrap.php',
                     'chmod' => '0755',
-                    'compactors' => ['Herrera\\Box\\Compactor\\Php'],
+                    'compactors' => [Php::class],
                     'directories' => 'a',
                     'files' => 'test.php',
                     'finder' => [['in' => 'one']],
@@ -102,52 +75,124 @@ KEY
                         ['a/deep/test/directory' => 'sub'],
                         ['' => 'other/'],
                     ],
-                    'metadata' => ['rand' => $rand = random_int(0, getrandmax())],
+                    'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
-                    'shebang' => $php,
+                    'shebang' => $shebang,
                     'stub' => true,
                 ]
             )
         );
 
-        $tester = $this->getCommandTester();
-        $tester->execute(
-            [
-                'command' => 'build',
-            ],
-            [
-                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            ]
+        $commandTester = $this->getCommandTester();
+        $commandTester->execute(['command' => 'build']);
+
+        $expected = <<<OUTPUT
+Building...
+
+OUTPUT;
+
+        $expected = str_replace('/path/to/tmp', $this->tmp, $expected);
+        $actual = $commandTester->getDisplay(true);
+
+        // Check output logs
+        $this->assertSame($expected, $actual);
+
+        // Check PHAR execution output
+        $this->assertSame(
+            'Hello, world!',
+            exec('php test.phar')
         );
 
-        $dir = $this->tmp.DIRECTORY_SEPARATOR;
-        $ds = DIRECTORY_SEPARATOR;
+        // Check PHAR content
+        $pharContents = file_get_contents('test.phar');
+        $shebang = preg_quote($shebang, '/');
+
+        $this->assertSame(
+            1,
+            preg_match(
+                "/$shebang/",
+                $pharContents
+            )
+        );
+        $this->assertSame(
+            1,
+            preg_match(
+                '/custom banner/',
+                $pharContents
+            )
+        );
+
+        $phar = new Phar('test.phar');
+
+        $this->assertSame(['rand' => $rand], $phar->getMetadata());
+    }
+
+    public function test_it_can_build_a_PHAR_file_in_verbose_mode(): void
+    {
+        (new Filesystem())->mirror(self::FIXTURES.'/dir000', $this->tmp);
+
+        $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
+
+        file_put_contents(
+            'box.json',
+            json_encode(
+                [
+                    'alias' => 'test.phar',
+                    'banner' => 'custom banner',
+                    'bootstrap' => 'bootstrap.php',
+                    'chmod' => '0755',
+                    'compactors' => [Php::class],
+                    'directories' => 'a',
+                    'files' => 'test.php',
+                    'finder' => [['in' => 'one']],
+                    'finder-bin' => [['in' => 'two']],
+                    'key' => 'private.key',
+                    'key-pass' => true,
+                    'main' => 'run.php',
+                    'map' => [
+                        ['a/deep/test/directory' => 'sub'],
+                        ['' => 'other/'],
+                    ],
+                    'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
+                    'output' => 'test.phar',
+                    'shebang' => $shebang,
+                    'stub' => true,
+                ]
+            )
+        );
+
+        $commandTester = $this->getCommandTester();
+        $commandTester->execute(
+            ['command' => 'build'],
+            ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]
+        );
+
         $expected = <<<OUTPUT
-? Loading bootstrap file: {$dir}bootstrap.php
+? Loading bootstrap file: /path/to/tmp/bootstrap.php
 ? Removing previously built Phar...
 * Building...
-? Output path: {$dir}test.phar
+? Output path: /path/to/tmp/test.phar
 ? Registering compactors...
-  + Herrera\\Box\\Compactor\\Php
+  + Herrera\Box\Compactor\Php
 ? Mapping paths:
-  - a{$ds}deep{$ds}test{$ds}directory > sub
+  - a/deep/test/directory > sub
   - (all) > other/
 ? Adding Finder files...
-  + {$dir}one{$ds}test.php
-    > other{$ds}one{$ds}test.php
+  + /path/to/tmp/one/test.php
+    > other/one/test.php
 ? Adding binary Finder files...
-  + {$dir}two{$ds}test.png
-    > other{$ds}two{$ds}test.png
+  + /path/to/tmp/two/test.png
+    > other/two/test.png
 ? Adding directories...
-  + {$dir}a{$ds}deep{$ds}test{$ds}directory{$ds}test.php
-    > sub{$ds}test.php
+  + /path/to/tmp/a/deep/test/directory/test.php
+    > sub/test.php
 ? Adding files...
-  + {$dir}test.php
-    > other{$ds}test.php
-? Adding main file: {$dir}run.php
-    > other{$ds}run.php
+  + /path/to/tmp/test.php
+    > other/test.php
+? Adding main file: /path/to/tmp/run.php
+    > other/run.php
 ? Generating new stub...
-  - Using custom shebang line: $php
+  - Using custom shebang line: $shebang
   - Using custom banner.
 ? Setting metadata...
 ? Signing using a private key...
@@ -156,27 +201,13 @@ KEY
 
 OUTPUT;
 
-        $this->assertSame($expected, $this->getOutput($tester));
+        $expected = str_replace('/path/to/tmp', $this->tmp, $expected);
+        $actual = $commandTester->getDisplay(true);
 
-        $this->assertSame(
-            'Hello, world!',
-            exec('php test.phar')
-        );
-
-        $pharContents = file_get_contents('test.phar');
-        $php = preg_quote($php, '/');
-
-        $this->assertSame(1, preg_match("/$php/", $pharContents));
-        $this->assertSame(1, preg_match('/custom banner/', $pharContents));
-
-        $phar = new Phar('test.phar');
-
-        $this->assertSame(['rand' => $rand], $phar->getMetadata());
-
-        unset($phar);
+        $this->assertSame($expected, $actual);
     }
 
-    public function testBuildNotReadable(): void
+    public function test_it_cannot_build_a_PHAR_using_unreadable_files(): void
     {
         touch('test.php');
         chmod('test.php', 0000);
@@ -190,10 +221,10 @@ OUTPUT;
             )
         );
 
-        $tester = $this->getCommandTester();
+        $commandTester = $this->getCommandTester();
 
         try {
-            $tester->execute(
+            $commandTester->execute(
                 ['command' => 'build'],
                 ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]
             );
@@ -201,51 +232,67 @@ OUTPUT;
             $this->fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
             $this->assertSame(
-                'The file "'.$this->tmp.DIRECTORY_SEPARATOR.'test.php" is not readable.',
+                sprintf(
+                    'The file "%s/test.php" is not readable.',
+                    $this->tmp
+                ),
                 $exception->getMessage()
             );
         }
     }
 
-    /**
-     * @depends testBuild
-     */
-    public function testBuildReplacements(): void
+    public function test_it_can_build_a_PHAR_with_a_replacement_placeholder(): void
     {
-        file_put_contents('test.php', '<?php echo "Hello, @name@!\n";');
-        file_put_contents(
-            'box.json',
-            json_encode(
-                [
-                    'files' => 'test.php',
-                    'main' => 'test.php',
-                    'replacements' => ['name' => 'world'],
-                    'stub' => true,
-                ]
-            )
-        );
+        (new Filesystem())->mirror(self::FIXTURES.'/dir001', $this->tmp);
 
-        $tester = $this->getCommandTester();
-        $tester->execute(
+        $commandTester = $this->getCommandTester();
+
+        $commandTester->execute(['command' => 'build']);
+
+        $expected = <<<OUTPUT
+Building...
+
+OUTPUT;
+
+        $expected = str_replace('/path/to/tmp', $this->tmp, $expected);
+        $actual = $commandTester->getDisplay(true);
+
+        $this->assertSame($expected, $actual);
+
+        $this->assertSame(
+            'Hello, world!',
+            exec('php default.phar')
+        );
+    }
+
+    public function test_it_can_build_a_PHAR_overwriting_an_existing_one_in_verbose_mode(): void
+    {
+        (new Filesystem())->mirror(self::FIXTURES.'/dir001', $this->tmp);
+
+        $commandTester = $this->getCommandTester();
+
+        $commandTester->execute(
             ['command' => 'build'],
             ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]
         );
 
-        $dir = $this->tmp.DIRECTORY_SEPARATOR;
         $expected = <<<OUTPUT
 * Building...
-? Output path: {$dir}default.phar
+? Output path: /path/to/tmp/default.phar
 ? Setting replacement values...
   + @name@: world
 ? Adding files...
-  + {$dir}test.php
-? Adding main file: {$dir}test.php
+  + /path/to/tmp/test.php
+? Adding main file: /path/to/tmp/test.php
 ? Generating new stub...
 * Done.
 
 OUTPUT;
 
-        $this->assertSame($expected, $this->getOutput($tester));
+        $expected = str_replace('/path/to/tmp', $this->tmp, $expected);
+        $actual = $commandTester->getDisplay(true);
+
+        $this->assertSame($expected, $actual);
 
         $this->assertSame(
             'Hello, world!',
@@ -450,10 +497,5 @@ OUTPUT;
         $tester->execute(['command' => 'build']);
 
         $this->assertSame("Building...\n", $this->getOutput($tester));
-    }
-
-    protected function getCommand(): Command
-    {
-        return new Build();
     }
 }

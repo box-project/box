@@ -1,0 +1,8 @@
+{
+    "files": "test.php",
+    "main": "test.php",
+    "replacements": {
+        "name": "world"
+    },
+    "stub": true
+}
