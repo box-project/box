@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Command;
 
+use Herrera\Box\Compactor\Php;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\FixedResponse;
 use Phar;
@@ -22,7 +23,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\PhpExecutableFinder;
-use Herrera\Box\Compactor\Php;
 
 /**
  * @covers \KevinGH\Box\Command\Build
@@ -39,14 +39,6 @@ class BuildTest extends CommandTestCase
         parent::setUp();
 
         $this->app->getHelperSet()->set(new FixedResponse('test'));
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getCommand(): Command
-    {
-        return new Build();
     }
 
     public function test_it_can_build_a_PHAR_file(): void
@@ -86,7 +78,7 @@ class BuildTest extends CommandTestCase
         $commandTester = $this->getCommandTester();
         $commandTester->execute(['command' => 'build']);
 
-        $expected = <<<OUTPUT
+        $expected = <<<'OUTPUT'
 Building...
 
 OUTPUT;
@@ -249,7 +241,7 @@ OUTPUT;
 
         $commandTester->execute(['command' => 'build']);
 
-        $expected = <<<OUTPUT
+        $expected = <<<'OUTPUT'
 Building...
 
 OUTPUT;
@@ -276,7 +268,7 @@ OUTPUT;
             ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]
         );
 
-        $expected = <<<OUTPUT
+        $expected = <<<'OUTPUT'
 * Building...
 ? Output path: /path/to/tmp/default.phar
 ? Setting replacement values...
@@ -497,5 +489,13 @@ OUTPUT;
         $tester->execute(['command' => 'build']);
 
         $this->assertSame("Building...\n", $this->getOutput($tester));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getCommand(): Command
+    {
+        return new Build();
     }
 }
