@@ -52,7 +52,6 @@ final class BuildLogger
             case self::CHEVRON_PREFIX:
                 $prefix = "    <comment>$prefix</comment>";
                 break;
-
             default:
                 throw new InvalidArgumentException('Expected one of the logger constant as a prefix.');
         }

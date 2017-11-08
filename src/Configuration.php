@@ -52,7 +52,7 @@ class Configuration
     private $raw;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $_bootstrapFile = self::UNSET;
 
@@ -530,27 +530,6 @@ class Configuration
         return [];
     }
 
-    private function getDatetimeNow($format)
-    {
-        $now = new DateTimeImmutable('now');
-        $datetime = $now->format($format);
-
-        if (!$datetime) {
-            throw new RuntimeException("'$format' is not a valid PHP date format");
-        }
-
-        return $datetime;
-    }
-
-    private function getDatetimeNowPlaceHolder()
-    {
-        if (isset($this->raw->{'datetime'})) {
-            return $this->raw->{'datetime'};
-        }
-
-        return null;
-    }
-
     public function getDatetimeFormat()
     {
         if (isset($this->raw->{'datetime_format'})) {
@@ -558,75 +537,6 @@ class Configuration
         }
 
         return 'Y-m-d H:i:s';
-    }
-
-    /**
-     * Returns the Git commit hash.
-     *
-     * @param bool $short Use the short version?
-     *
-     * @return string the commit hash
-     */
-    private function getGitHash($short = false): string
-    {
-        return $this->runGitCommand(
-            sprintf(
-                'git log --pretty="%s" -n1 HEAD',
-                $short ? '%h' : '%H'
-            )
-        );
-    }
-
-    /**
-     * Returns the Git commit hash placeholder.
-     *
-     * @return string the placeholder
-     */
-    private function getGitShortHashPlaceholder(): ?string
-    {
-        if (isset($this->raw->{'git-commit-short'})) {
-            return $this->raw->{'git-commit-short'};
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the Git commit hash placeholder.
-     *
-     * @return string the placeholder
-     */
-    private function getGitHashPlaceholder(): ?string
-    {
-        if (isset($this->raw->{'git-commit'})) {
-            return $this->raw->{'git-commit'};
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the most recent Git tag.
-     *
-     * @return string the tag
-     */
-    private function getGitTag(): string
-    {
-        return $this->runGitCommand('git describe --tags HEAD');
-    }
-
-    /**
-     * Returns the Git tag placeholder.
-     *
-     * @return string the placeholder
-     */
-    private function getGitTagPlaceholder(): ?string
-    {
-        if (isset($this->raw->{'git-tag'})) {
-            return $this->raw->{'git-tag'};
-        }
-
-        return null;
     }
 
     /**
@@ -657,20 +567,6 @@ class Configuration
                 );
             }
         }
-    }
-
-    /**
-     * Returns the Git version placeholder.
-     *
-     * @return string the placeholder
-     */
-    private function getGitVersionPlaceholder(): ?string
-    {
-        if (isset($this->raw->{'git-version'})) {
-            return $this->raw->{'git-version'};
-        }
-
-        return null;
     }
 
     /**
@@ -938,20 +834,6 @@ class Configuration
     }
 
     /**
-     * Returns the replacement placeholder sigil.
-     *
-     * @return string the placeholder sigil
-     */
-    private function getReplacementSigil(): string
-    {
-        if (isset($this->raw->{'replacement-sigil'})) {
-            return $this->raw->{'replacement-sigil'};
-        }
-
-        return '@';
-    }
-
-    /**
      * Returns the list of replacement placeholders and their values.
      *
      * @return array the list of replacements
@@ -1163,6 +1045,124 @@ class Configuration
         }
 
         return false;
+    }
+
+    private function getDatetimeNow($format)
+    {
+        $now = new DateTimeImmutable('now');
+        $datetime = $now->format($format);
+
+        if (!$datetime) {
+            throw new RuntimeException("'$format' is not a valid PHP date format");
+        }
+
+        return $datetime;
+    }
+
+    private function getDatetimeNowPlaceHolder()
+    {
+        if (isset($this->raw->{'datetime'})) {
+            return $this->raw->{'datetime'};
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the Git commit hash.
+     *
+     * @param bool $short Use the short version?
+     *
+     * @return string the commit hash
+     */
+    private function getGitHash($short = false): string
+    {
+        return $this->runGitCommand(
+            sprintf(
+                'git log --pretty="%s" -n1 HEAD',
+                $short ? '%h' : '%H'
+            )
+        );
+    }
+
+    /**
+     * Returns the Git commit hash placeholder.
+     *
+     * @return string the placeholder
+     */
+    private function getGitShortHashPlaceholder(): ?string
+    {
+        if (isset($this->raw->{'git-commit-short'})) {
+            return $this->raw->{'git-commit-short'};
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the Git commit hash placeholder.
+     *
+     * @return string the placeholder
+     */
+    private function getGitHashPlaceholder(): ?string
+    {
+        if (isset($this->raw->{'git-commit'})) {
+            return $this->raw->{'git-commit'};
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the most recent Git tag.
+     *
+     * @return string the tag
+     */
+    private function getGitTag(): string
+    {
+        return $this->runGitCommand('git describe --tags HEAD');
+    }
+
+    /**
+     * Returns the Git tag placeholder.
+     *
+     * @return string the placeholder
+     */
+    private function getGitTagPlaceholder(): ?string
+    {
+        if (isset($this->raw->{'git-tag'})) {
+            return $this->raw->{'git-tag'};
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the Git version placeholder.
+     *
+     * @return string the placeholder
+     */
+    private function getGitVersionPlaceholder(): ?string
+    {
+        if (isset($this->raw->{'git-version'})) {
+            return $this->raw->{'git-version'};
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the replacement placeholder sigil.
+     *
+     * @return string the placeholder sigil
+     */
+    private function getReplacementSigil(): string
+    {
+        if (isset($this->raw->{'replacement-sigil'})) {
+            return $this->raw->{'replacement-sigil'};
+        }
+
+        return '@';
     }
 
     /**

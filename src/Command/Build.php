@@ -31,7 +31,7 @@ use Traversable;
 final class Build extends Configurable
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function configure(): void
     {
@@ -406,7 +406,6 @@ HELP
         $config = $this->getConfig($input);
         $path = $config->getOutputPath();
 
-
         $logger = new BuildLogger($io);
 
         $this->loadBootstrapFile($config, $logger);
@@ -434,9 +433,7 @@ HELP
         InputInterface $input,
         OutputInterface $output,
         BuildLogger $logger
-    ): void
-    {
-
+    ): void {
         $box = Box::create($path);
 
         $box->getPhar()->startBuffering();
@@ -660,7 +657,7 @@ HELP
             BuildLogger::QUESTION_MARK_PREFIX,
             sprintf(
                 'Adding main file: %s',
-                $config->getBasePath() . DIRECTORY_SEPARATOR . $main
+                $config->getBasePath().DIRECTORY_SEPARATOR.$main
             ),
             OutputInterface::VERBOSITY_VERBOSE
         );
@@ -699,7 +696,7 @@ HELP
 
             $box->getPhar()->setStub($stub->generate());
         } elseif (null !== ($stub = $config->getStubPath())) {
-            $stub = $config->getBasePath() . DIRECTORY_SEPARATOR . $stub;
+            $stub = $config->getBasePath().DIRECTORY_SEPARATOR.$stub;
 
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
@@ -753,12 +750,11 @@ HELP
         InputInterface $input,
         OutputInterface $output,
         BuildLogger $logger
-    ): void
-    {
+    ): void {
         // sign using private key, if applicable
         //TODO: check that out
-        if (file_exists($path . '.pubkey')) {
-            unlink($path . '.pubkey');
+        if (file_exists($path.'.pubkey')) {
+            unlink($path.'.pubkey');
         }
 
         $key = $config->getPrivateKeyPath();
@@ -784,7 +780,7 @@ HELP
                 throw new RuntimeException(
                     sprintf(
                         'Accessing to the private key "%s" requires a passphrase but none provided. Either '
-                        . 'provide  one or run this command in interactive mode.',
+                        .'provide  one or run this command in interactive mode.',
                         $key
                     )
                 );
@@ -820,11 +816,11 @@ HELP
      * Adds files using an iterator.
      *
      * @param Configuration $config
-     * @param Box $box
-     * @param Traversable $iterator the iterator
-     * @param string $message the message to announce
-     * @param bool $binary Should the adding be binary-safe?
-     * @param BuildLogger $logger
+     * @param Box           $box
+     * @param Traversable   $iterator the iterator
+     * @param string        $message  the message to announce
+     * @param bool          $binary   Should the adding be binary-safe?
+     * @param BuildLogger   $logger
      */
     private function addFilesToBox(
         Configuration $config,
@@ -833,8 +829,7 @@ HELP
         ?string $message,
         bool $binary,
         BuildLogger $logger
-    ): void
-    {
+    ): void {
         static $count = 0;
 
         if (null === $iterator) {
@@ -850,7 +845,7 @@ HELP
         $mapper = $config->getMapper();
 
         foreach ($iterator as $file) {
-            /** @var $file SplFileInfo */
+            // @var $file SplFileInfo
 
             // Forces garbadge collection from time to time
             if (0 === (++$count % 100)) {
@@ -878,12 +873,12 @@ HELP
             } else {
                 $logger->log(
                     BuildLogger::PLUS_PREFIX,
-                    (string)$file,
+                    (string) $file,
                     OutputInterface::VERBOSITY_VERY_VERBOSE
                 );
             }
 
-            $box->addFile((string)$file, $relativePath);
+            $box->addFile((string) $file, $relativePath);
         }
     }
 
@@ -928,7 +923,7 @@ HELP
                 BuildLogger::MINUS_PREFIX,
                 sprintf(
                     'Using custom banner from file: %s',
-                    $config->getBasePath() . DIRECTORY_SEPARATOR . $config->getStubBannerPath()
+                    $config->getBasePath().DIRECTORY_SEPARATOR.$config->getStubBannerPath()
                 ),
                 OutputInterface::VERBOSITY_VERY_VERBOSE
             );
