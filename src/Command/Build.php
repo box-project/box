@@ -17,43 +17,28 @@ namespace KevinGH\Box\Command;
 use Herrera\Box\Box;
 use Herrera\Box\StubGenerator;
 use KevinGH\Box\Configuration;
+use KevinGH\Box\Logger\BuildLogger;
 use RuntimeException;
 use SplFileInfo;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Filesystem\Filesystem;
 use Traversable;
 
-/**
- * Builds a new Phar.
- *
- * @author Kevin Herrera <kevin@herrera.io>
- */
-class Build extends Configurable
+final class Build extends Configurable
 {
     /**
-     * The Box instance.
-     *
-     * @var Box
-     */
-    private $box;
-
-    /**
-     * The configuration settings.
-     *
-     * @var Configuration
-     */
-    private $config;
-
-    /**
-     * @override
+     * @inheritdoc
      */
     protected function configure(): void
     {
         parent::configure();
 
         $this->setName('build');
-        $this->setDescription('Builds a new Phar.');
+        $this->setDescription('Builds a new PHAR.');
         $this->setHelp(
             <<<HELP
 The <info>%command.name%</info> command will build a new Phar based on a variety of settings.
@@ -413,300 +398,544 @@ HELP
      */
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
-        $this->config = $this->getConfig($input);
-        $path = $this->config->getOutputPath();
+        $io = new SymfonyStyle($input, $output);
 
-        // load bootstrap file
-        if (null !== ($bootstrap = $this->config->getBootstrapFile())) {
-            $this->config->loadBootstrap();
-            $this->putln('?', "Loading bootstrap file: $bootstrap");
+        $io->writeln($this->getApplication()->getHelp());
+        $io->writeln('');
 
-            unset($bootstrap);
-        }
+        $config = $this->getConfig($input);
+        $path = $config->getOutputPath();
 
-        // remove any previous work
-        if (file_exists($path)) {
-            $this->putln('?', 'Removing previously built Phar...');
 
-            unlink($path);
-        }
+        $logger = new BuildLogger($io);
 
-        // set up Box
-        if ($this->isVerbose()) {
-            $this->putln('*', 'Building...');
-        } else {
-            $output->writeln('Building...');
-        }
+        $this->loadBootstrapFile($config, $logger);
+        $this->removeExistingPhar($config, $logger);
 
-        $this->putln('?', "Output path: $path");
+        $logger->logStartBuilding($path);
 
-        $this->box = Box::create($path);
-        $this->box->getPhar()->startBuffering();
+        $this->createPhar($path, $config, $input, $output, $logger);
 
-        // set replacement values, if any
-        if ([] !== ($values = $this->config->getProcessedReplacements())) {
-            $this->putln('?', 'Setting replacement values...');
+        $this->correctPermissions($path, $config, $logger);
 
-            if ($this->isVerbose()) {
-                foreach ($values as $key => $value) {
-                    $this->putln('+', "$key: $value");
-                }
-            }
-
-            $this->box->setValues($values);
-
-            unset($values, $key, $value);
-        }
-
-        // register configured compactors
-        if ([] !== ($compactors = $this->config->getCompactors())) {
-            $this->putln('?', 'Registering compactors...');
-
-            foreach ($compactors as $compactor) {
-                $this->putln('+', get_class($compactor));
-
-                $this->box->addCompactor($compactor);
-            }
-        }
-
-        // alert about mapped paths
-        if ([] !== ($map = $this->config->getMap())) {
-            $this->putln('?', 'Mapping paths:');
-
-            foreach ($map as $item) {
-                foreach ($item as $match => $replace) {
-                    if (empty($match)) {
-                        $match = '(all)';
-                    }
-
-                    $this->putln('-', "$match <info>></info> $replace");
-                }
-            }
-        }
-
-        // start adding files
-        if ([] !== ($iterators = $this->config->getFinders())) {
-            $this->putln('?', 'Adding Finder files...');
-
-            foreach ($iterators as $iterator) {
-                $this->add($iterator, null);
-            }
-        }
-
-        if ([] !== ($iterators = $this->config->getBinaryFinders())) {
-            $this->putln('?', 'Adding binary Finder files...');
-
-            foreach ($iterators as $iterator) {
-                $this->add($iterator, null, true);
-            }
-        }
-
-        $this->add(
-            $this->config->getDirectoriesIterator(),
-            'Adding directories...'
+        $logger->log(
+            BuildLogger::STAR_PREFIX,
+            'Done.'
         );
 
-        $this->add(
-            $this->config->getBinaryDirectoriesIterator(),
-            'Adding binary directories...',
-            true
+        if (false === file_exists($path)) {
+            $io->warning('The archive was not generated because it did not have any contents.');
+        }
+    }
+
+    private function createPhar(
+        string $path,
+        Configuration $config,
+        InputInterface $input,
+        OutputInterface $output,
+        BuildLogger $logger
+    ): void
+    {
+
+        $box = Box::create($path);
+
+        $box->getPhar()->startBuffering();
+
+        $this->setReplacementValues($config, $box, $logger);
+        $this->registerCompactors($config, $box, $logger);
+        $this->alertAboutMappedPaths($config, $logger);
+
+        $this->addFiles($config, $box, $logger);
+
+        $main = $this->registerMainScript($config, $box, $logger);
+
+        $this->registerStub($config, $box, $main, $logger);
+        $this->configureMetadata($config, $box, $logger);
+        $this->configureCompressionAlgorithm($config, $box, $logger);
+
+        $box->getPhar()->stopBuffering();
+
+        $this->signPhar($config, $box, $path, $input, $output, $logger);
+    }
+
+    private function loadBootstrapFile(Configuration $config, BuildLogger $logger): void
+    {
+        $file = $config->getBootstrapFile();
+
+        if (null === $file) {
+            return;
+        }
+
+        $logger->log(
+            BuildLogger::QUESTION_MARK_PREFIX,
+            sprintf(
+                'Loading the bootstrap file "%s".',
+                $file
+            ),
+            OutputInterface::VERBOSITY_VERBOSE
         );
 
-        $this->add(
-            $this->config->getFilesIterator(),
-            'Adding files...'
+        $config->loadBootstrap();
+    }
+
+    private function removeExistingPhar(Configuration $config, BuildLogger $logger): void
+    {
+        $path = $config->getOutputPath();
+
+        if (false === file_exists($path)) {
+            return;
+        }
+
+        $logger->log(
+            BuildLogger::QUESTION_MARK_PREFIX,
+            sprintf(
+                'Removing the existing PHAR "%s".',
+                $path
+            ),
+            OutputInterface::VERBOSITY_VERBOSE
         );
 
-        $this->add(
-            $this->config->getBinaryFilesIterator(),
-            'Adding binary files...',
-            true
+        (new Filesystem())->remove($path);
+    }
+
+    private function setReplacementValues(Configuration $config, Box $box, BuildLogger $logger): void
+    {
+        $values = $config->getProcessedReplacements();
+
+        if ([] === $values) {
+            return;
+        }
+
+        $logger->log(
+            BuildLogger::QUESTION_MARK_PREFIX,
+            'Setting replacement values.',
+            OutputInterface::VERBOSITY_VERBOSE
         );
 
-        if (null !== ($main = $this->config->getMainScriptPath())) {
-            $this->putln(
-                '?',
-                'Adding main file: '.$this->config->getBasePath().DIRECTORY_SEPARATOR.$main
-            );
-
-            $mapper = $this->config->getMapper();
-            $pharPath = $mapper($main);
-
-            if (null !== $pharPath) {
-                $this->putln('>', $pharPath);
-
-                $main = $pharPath;
-            }
-
-            $this->box->addFromString(
-                $main,
-                $this->config->getMainScriptContents()
+        foreach ($values as $key => $value) {
+            $logger->log(
+                BuildLogger::PLUS_PREFIX,
+                sprintf(
+                    '%s: %s',
+                    $key,
+                    $value
+                ),
+                OutputInterface::VERBOSITY_VERBOSE
             );
         }
 
-        // set the appropriate stub
-        if (true === $this->config->isStubGenerated()) {
-            $this->putln('?', 'Generating new stub...');
+        $box->setValues($values);
+    }
 
-            $stub = StubGenerator::create()
-                ->alias($this->config->getAlias())
-                ->extract($this->config->isExtractable())
-                ->index($main)
-                ->intercept($this->config->isInterceptFileFuncs())
-                ->mimetypes($this->config->getMimetypeMapping())
-                ->mung($this->config->getMungVariables())
-                ->notFound($this->config->getNotFoundScriptPath())
-                ->web($this->config->isWebPhar());
+    private function registerCompactors(Configuration $config, Box $box, BuildLogger $logger): void
+    {
+        $compactors = $config->getCompactors();
 
-            if (null !== ($shebang = $this->config->getShebang())) {
-                $this->putln('-', 'Using custom shebang line: '.$shebang);
+        if ([] === $compactors) {
+            return;
+        }
 
-                $stub->shebang($shebang);
-            }
+        $logger->log(
+            BuildLogger::QUESTION_MARK_PREFIX,
+            'Registering compactors.',
+            OutputInterface::VERBOSITY_VERBOSE
+        );
 
-            if (null !== ($banner = $this->config->getStubBanner())) {
-                $this->putln('-', 'Using custom banner.');
+        foreach ($compactors as $compactor) {
+            $logger->log(
+                BuildLogger::PLUS_PREFIX,
+                get_class($compactor),
+                OutputInterface::VERBOSITY_VERBOSE
+            );
 
-                $stub->banner($banner);
-            } elseif (null !== ($banner = $this->config->getStubBannerFromFile())) {
-                $this->putln(
-                    '-',
-                    'Using custom banner from file: '
-                    .$this->config->getBasePath()
-                    .DIRECTORY_SEPARATOR
-                    .$this->config->getStubBannerPath()
+            $box->addCompactor($compactor);
+        }
+    }
+
+    private function alertAboutMappedPaths(Configuration $config, BuildLogger $logger): void
+    {
+        $map = $config->getMap();
+
+        if ([] === $map) {
+            return;
+        }
+
+        $logger->log(
+            BuildLogger::QUESTION_MARK_PREFIX,
+            'Mapping paths.',
+            OutputInterface::VERBOSITY_VERBOSE
+        );
+
+        foreach ($map as $item) {
+            foreach ($item as $match => $replace) {
+                if (empty($match)) {
+                    $match = '(all)';
+                }
+
+                $logger->log(
+                    BuildLogger::MINUS_PREFIX,
+                    sprintf(
+                        '%s <info>></info> %s',
+                        $match,
+                        $replace
+                    ),
+                    OutputInterface::VERBOSITY_VERBOSE
                 );
-
-                $stub->banner($banner);
             }
+        }
+    }
 
-            $this->box->getPhar()->setStub($stub->generate());
-        } elseif (null !== ($stub = $this->config->getStubPath())) {
-            $stub = $this->config->getBasePath().DIRECTORY_SEPARATOR.$stub;
+    private function addFiles(Configuration $config, Box $box, BuildLogger $logger): void
+    {
+        if ([] !== ($iterators = $config->getFinders())) {
+            $logger->log(
+                BuildLogger::QUESTION_MARK_PREFIX,
+                'Adding finder files.',
+                OutputInterface::VERBOSITY_VERBOSE
+            );
 
-            $this->putln('?', "Using stub file: $stub");
+            foreach ($iterators as $iterator) {
+                $this->addFilesToBox($config, $box, $iterator, null, false, $logger);
+            }
+        }
 
-            $this->box->setStubUsingFile($stub);
+        if ([] !== ($iterators = $config->getBinaryFinders())) {
+            $logger->log(
+                BuildLogger::QUESTION_MARK_PREFIX,
+                'Adding binary finder files.',
+                OutputInterface::VERBOSITY_VERBOSE
+            );
+
+            foreach ($iterators as $iterator) {
+                $this->addFilesToBox($config, $box, $iterator, null, true, $logger);
+            }
+        }
+
+        $this->addFilesToBox(
+            $config,
+            $box,
+            $config->getDirectoriesIterator(),
+            'Adding directories.',
+            false,
+            $logger
+        );
+
+        $this->addFilesToBox(
+            $config,
+            $box,
+            $config->getBinaryDirectoriesIterator(),
+            'Adding binary directories.',
+            true,
+            $logger
+        );
+
+        $this->addFilesToBox(
+            $config,
+            $box,
+            $config->getFilesIterator(),
+            'Adding files.',
+            false,
+            $logger
+        );
+
+        $this->addFilesToBox(
+            $config,
+            $box,
+            $config->getBinaryFilesIterator(),
+            'Adding binary files.',
+            true,
+            $logger
+        );
+    }
+
+    private function registerMainScript(Configuration $config, Box $box, BuildLogger $logger): ?string
+    {
+        $main = $config->getMainScriptPath();
+
+        if (null !== $main) {
+            return null;
+        }
+
+        $logger->log(
+            BuildLogger::QUESTION_MARK_PREFIX,
+            sprintf(
+                'Adding main file: %s',
+                $config->getBasePath() . DIRECTORY_SEPARATOR . $main
+            ),
+            OutputInterface::VERBOSITY_VERBOSE
+        );
+
+        $mapper = $config->getMapper();
+        $pharPath = $mapper($main);
+
+        if (null !== $pharPath) {
+            $logger->log(
+                BuildLogger::CHEVRON_PREFIX,
+                $pharPath,
+                OutputInterface::VERBOSITY_VERBOSE
+            );
+
+            $main = $pharPath;
+        }
+
+        $box->addFromString(
+            $main,
+            $config->getMainScriptContents()
+        );
+
+        return $main;
+    }
+
+    private function registerStub(Configuration $config, Box $box, ?string $main, BuildLogger $logger): void
+    {
+        if (true === $config->isStubGenerated()) {
+            $logger->log(
+                BuildLogger::QUESTION_MARK_PREFIX,
+                'Generating new stub.',
+                OutputInterface::VERBOSITY_VERBOSE
+            );
+
+            $stub = $this->createStub($config, $main, $logger);
+
+            $box->getPhar()->setStub($stub->generate());
+        } elseif (null !== ($stub = $config->getStubPath())) {
+            $stub = $config->getBasePath() . DIRECTORY_SEPARATOR . $stub;
+
+            $logger->log(
+                BuildLogger::QUESTION_MARK_PREFIX,
+                sprintf(
+                    'Using stub file: %s',
+                    $stub
+                ),
+                OutputInterface::VERBOSITY_VERBOSE
+            );
+
+            $box->setStubUsingFile($stub);
         } else {
-            $this->putln('?', 'Using default stub.');
+            $logger->log(
+                BuildLogger::QUESTION_MARK_PREFIX,
+                'Using default stub.',
+                OutputInterface::VERBOSITY_VERBOSE
+            );
         }
+    }
 
-        // set metadata, if any
-        if (null !== ($metadata = $this->config->getMetadata())) {
-            $this->putln('?', 'Setting metadata...');
+    private function configureMetadata(Configuration $config, Box $box, BuildLogger $logger): void
+    {
+        if (null !== ($metadata = $config->getMetadata())) {
+            $logger->log(
+                BuildLogger::QUESTION_MARK_PREFIX,
+                'Setting metadata.',
+                OutputInterface::VERBOSITY_VERBOSE
+            );
 
-            $this->box->getPhar()->setMetadata($metadata);
+            $box->getPhar()->setMetadata($metadata);
         }
+    }
 
-        // compress, if algorithm set
-        if (null !== ($algorithm = $this->config->getCompressionAlgorithm())) {
-            $this->putln('?', 'Compressing...');
+    private function configureCompressionAlgorithm(Configuration $config, Box $box, BuildLogger $logger): void
+    {
+        if (null !== ($algorithm = $config->getCompressionAlgorithm())) {
+            $logger->log(
+                BuildLogger::QUESTION_MARK_PREFIX,
+                'Compressing.',
+                OutputInterface::VERBOSITY_VERBOSE
+            );
 
-            $this->box->getPhar()->compressFiles($algorithm);
+            $box->getPhar()->compressFiles($algorithm);
         }
+    }
 
-        $this->box->getPhar()->stopBuffering();
-
+    private function signPhar(
+        Configuration $config,
+        Box $box,
+        string $path,
+        InputInterface $input,
+        OutputInterface $output,
+        BuildLogger $logger
+    ): void
+    {
         // sign using private key, if applicable
-        if (file_exists($path.'.pubkey')) {
-            unlink($path.'.pubkey');
+        //TODO: check that out
+        if (file_exists($path . '.pubkey')) {
+            unlink($path . '.pubkey');
         }
 
-        if (null !== ($key = $this->config->getPrivateKeyPath())) {
-            $this->putln('?', 'Signing using a private key...');
+        $key = $config->getPrivateKeyPath();
 
-            $passphrase = $this->config->getPrivateKeyPassphrase();
+        if (null === $key) {
+            if (null !== ($algorithm = $config->getSigningAlgorithm())) {
+                $box->getPhar()->setSignatureAlgorithm($algorithm);
+            }
 
-            if ($this->config->isPrivateKeyPrompt()) {
-                /** @var $dialog QuestionHelper */
-                $dialog = $this->getHelper('question');
-                $passphrase = $dialog->askHiddenResponse(
-                    $output,
-                    'Private key passphrase:'
+            return;
+        }
+
+        $logger->log(
+            BuildLogger::QUESTION_MARK_PREFIX,
+            'Signing using a private key.',
+            OutputInterface::VERBOSITY_VERBOSE
+        );
+
+        $passphrase = $config->getPrivateKeyPassphrase();
+
+        if ($config->isPrivateKeyPrompt()) {
+            if (false === $input->isInteractive()) {
+                throw new RuntimeException(
+                    sprintf(
+                        'Accessing to the private key "%s" requires a passphrase but none provided. Either '
+                        . 'provide  one or run this command in interactive mode.',
+                        $key
+                    )
                 );
             }
 
-            $this->box->signUsingFile($key, $passphrase);
+            /** @var $dialog QuestionHelper */
+            $dialog = $this->getHelper('question');
 
-            // set the signature algorithm if no key is used
-        } elseif (null !== ($algorithm = $this->config->getSigningAlgorithm())) {
-            $this->box->getPhar()->setSignatureAlgorithm($algorithm);
+            $question = new Question('Private key passphrase:');
+            $question->setHidden(false);
+            $question->setHiddenFallback(false);
+
+            $passphrase = $dialog->ask($input, $output, $question);
         }
 
-        unset($this->box);
+        $box->signUsingFile($key, $passphrase);
+    }
 
-        // chmod, if configured
-        if (null !== ($chmod = $this->config->getFileMode())) {
-            $this->putln('?', 'Setting file permissions...');
+    private function correctPermissions(string $path, Configuration $config, BuildLogger $logger): void
+    {
+        if (null !== ($chmod = $config->getFileMode())) {
+            $logger->log(
+                BuildLogger::QUESTION_MARK_PREFIX,
+                'Setting file permissions.',
+                OutputInterface::VERBOSITY_VERBOSE
+            );
 
             chmod($path, $chmod);
-        }
-
-        $this->putln('*', 'Done.');
-
-        if (!file_exists($path)) {
-            $output->writeln(
-                '<fg=yellow>The archive was not generated because it did not have any contents.</fg=yellow>'
-            );
         }
     }
 
     /**
      * Adds files using an iterator.
      *
+     * @param Configuration $config
+     * @param Box $box
      * @param Traversable $iterator the iterator
-     * @param string      $message  the message to announce
-     * @param bool        $binary   Should the adding be binary-safe?
-     *
-     * @throws RuntimeException if a file is not readable
+     * @param string $message the message to announce
+     * @param bool $binary Should the adding be binary-safe?
+     * @param BuildLogger $logger
      */
-    private function add(
-        Traversable $iterator = null,
-        $message = null,
-        $binary = false
-    ): void {
+    private function addFilesToBox(
+        Configuration $config,
+        Box $box,
+        ?Traversable $iterator,
+        ?string $message,
+        bool $binary,
+        BuildLogger $logger
+    ): void
+    {
         static $count = 0;
 
-        if ($iterator) {
-            if ($message) {
-                $this->putln('?', $message);
-            }
-
-            $box = $binary ? $this->box->getPhar() : $this->box;
-            $baseRegex = $this->config->getBasePathRegex();
-            $mapper = $this->config->getMapper();
-
-            /** @var $file SplFileInfo */
-            foreach ($iterator as $file) {
-                if (0 === (++$count % 100)) {
-                    gc_collect_cycles();
-                }
-
-                $relative = preg_replace($baseRegex, '', $file->getPathname());
-
-                if (null !== ($mapped = $mapper($relative))) {
-                    $relative = $mapped;
-                }
-
-                if ($this->isVerbose()) {
-                    if (false === $file->isReadable()) {
-                        throw new RuntimeException(
-                            sprintf(
-                                'The file "%s" is not readable.',
-                                $file->getPathname()
-                            )
-                        );
-                    }
-
-                    $this->putln('+', $file);
-
-                    if (null !== $mapped) {
-                        $this->putln('>', $relative);
-                    }
-                }
-
-                $box->addFile((string) $file, $relative);
-            }
+        if (null === $iterator) {
+            return;
         }
+
+        if (null !== $message) {
+            $logger->log(BuildLogger::QUESTION_MARK_PREFIX, $message);
+        }
+
+        $box = $binary ? $box->getPhar() : $box;
+        $baseRegex = $config->getBasePathRegex();
+        $mapper = $config->getMapper();
+
+        foreach ($iterator as $file) {
+            /** @var $file SplFileInfo */
+
+            // Forces garbadge collection from time to time
+            if (0 === (++$count % 100)) {
+                gc_collect_cycles();
+            }
+
+            $relativePath = preg_replace(
+                $baseRegex,
+                '',
+                $file->getPathname()
+            );
+
+            $mapped = $mapper($relativePath);
+
+            if (null !== $mapped) {
+                $relativePath = $mapped;
+            }
+
+            if (null !== $mapped) {
+                $logger->log(
+                    BuildLogger::CHEVRON_PREFIX,
+                    $relativePath,
+                    OutputInterface::VERBOSITY_VERY_VERBOSE
+                );
+            } else {
+                $logger->log(
+                    BuildLogger::PLUS_PREFIX,
+                    (string)$file,
+                    OutputInterface::VERBOSITY_VERY_VERBOSE
+                );
+            }
+
+            $box->addFile((string)$file, $relativePath);
+        }
+    }
+
+    private function createStub(Configuration $config, ?string $main, BuildLogger $logger): StubGenerator
+    {
+        $stub = StubGenerator::create()
+            ->alias($config->getAlias())
+            ->extract($config->isExtractable())
+            ->index($main)
+            ->intercept($config->isInterceptFileFuncs())
+            ->mimetypes($config->getMimetypeMapping())
+            ->mung($config->getMungVariables())
+            ->notFound($config->getNotFoundScriptPath())
+            ->web($config->isWebPhar());
+
+        if (null !== ($shebang = $config->getShebang())) {
+            $logger->log(
+                BuildLogger::MINUS_PREFIX,
+                sprintf(
+                    'Using custom shebang line: %s',
+                    $shebang
+                ),
+                OutputInterface::VERBOSITY_VERY_VERBOSE
+            );
+
+            $stub->shebang($shebang);
+        }
+
+        if (null !== ($banner = $config->getStubBanner())) {
+            $logger->log(
+                BuildLogger::MINUS_PREFIX,
+                sprintf(
+                    'Using custom banner: %s',
+                    $banner
+                ),
+                OutputInterface::VERBOSITY_VERY_VERBOSE
+            );
+
+            $stub->banner($banner);
+        } elseif (null !== ($banner = $config->getStubBannerFromFile())) {
+            $logger->log(
+                BuildLogger::MINUS_PREFIX,
+                sprintf(
+                    'Using custom banner from file: %s',
+                    $config->getBasePath() . DIRECTORY_SEPARATOR . $config->getStubBannerPath()
+                ),
+                OutputInterface::VERBOSITY_VERY_VERBOSE
+            );
+
+            $stub->banner($banner);
+        }
+
+        return $stub;
     }
 }

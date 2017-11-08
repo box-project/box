@@ -46,6 +46,8 @@ abstract class AbstractCommand extends Command
      * Checks if the output handler is verbose.
      *
      * @return bool TRUE if verbose, FALSE if not
+     *
+     * @deprecated
      */
     protected function isVerbose()
     {
@@ -57,6 +59,8 @@ abstract class AbstractCommand extends Command
      *
      * @param string $prefix  the prefix
      * @param string $message the message
+     *
+     * @deprecated
      */
     protected function putln($prefix, $message): void
     {
@@ -90,10 +94,12 @@ abstract class AbstractCommand extends Command
      * @param mixed $message
      * @param mixed $newline
      * @param mixed $type
+     *
+     * @deprecated
      */
     protected function verbose($message, $newline = false, $type = 0): void
     {
-        if ($this->isVerbose()) {
+        if ($this->output->isVerbose()) {
             $this->output->write($message, $newline, $type);
         }
     }
@@ -105,6 +111,8 @@ abstract class AbstractCommand extends Command
      *
      * @param mixed $message
      * @param mixed $type
+     *
+     * @deprecated
      */
     protected function verboseln($message, $type = 0): void
     {

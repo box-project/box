@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use ArrayIterator;
+use Datetime;
+use DateTimeImmutable;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\CompactorInterface;
 use Herrera\Box\Compactor\Php;
@@ -33,6 +35,8 @@ use Symfony\Component\Process\Process;
  */
 class Configuration
 {
+    private const UNSET = 'unset';
+
     /**
      * The configuration file path.
      *
@@ -46,6 +50,21 @@ class Configuration
      * @var object
      */
     private $raw;
+
+    /**
+     * @var string|null
+     */
+    private $_bootstrapFile = self::UNSET;
+
+    /**
+     * @var string
+     */
+    private $_outputPath;
+
+    /**
+     * @var array
+     */
+    private $_replacements;
 
     /**
      * Sets the raw configuration settings.
@@ -253,14 +272,15 @@ class Configuration
         };
     }
 
-    /**
-     * Returns the bootstrap file path.
-     *
-     * @return string the file path
-     */
-    public function getBootstrapFile()
+    public function getBootstrapFile(): ?string
     {
-        if (isset($this->raw->bootstrap)) {
+        if (self::UNSET !== $this->_bootstrapFile) {
+            return $this->_bootstrapFile;
+        }
+
+        if (false === isset($this->raw->bootstrap)) {
+            $path = null;
+        } else {
             $path = $this->raw->bootstrap;
 
             if (false === Path::isAbsolute($path)) {
@@ -268,11 +288,34 @@ class Configuration
                     $this->getBasePath().DIRECTORY_SEPARATOR.$path
                 );
             }
-
-            return $path;
         }
 
-        return null;
+        $this->_bootstrapFile = $path;
+
+        return $path;
+    }
+
+    /**
+     * Loads the configured bootstrap file if available.
+     */
+    public function loadBootstrap(): void
+    {
+        $file = $this->getBootstrapFile();
+
+        if (null === $file) {
+            return;
+        }
+
+        if (false === file_exists($file)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'The bootstrap path "%s" is not a file or does not exist.',
+                    $file
+                )
+            );
+        }
+
+        include $file;
     }
 
     /**
@@ -487,9 +530,9 @@ class Configuration
         return [];
     }
 
-    public function getDatetimeNow($format)
+    private function getDatetimeNow($format)
     {
-        $now = new \Datetime('now');
+        $now = new DateTimeImmutable('now');
         $datetime = $now->format($format);
 
         if (!$datetime) {
@@ -499,7 +542,7 @@ class Configuration
         return $datetime;
     }
 
-    public function getDatetimeNowPlaceHolder()
+    private function getDatetimeNowPlaceHolder()
     {
         if (isset($this->raw->{'datetime'})) {
             return $this->raw->{'datetime'};
@@ -524,7 +567,7 @@ class Configuration
      *
      * @return string the commit hash
      */
-    public function getGitHash($short = false)
+    private function getGitHash($short = false): string
     {
         return $this->runGitCommand(
             sprintf(
@@ -539,7 +582,7 @@ class Configuration
      *
      * @return string the placeholder
      */
-    public function getGitShortHashPlaceholder()
+    private function getGitShortHashPlaceholder(): ?string
     {
         if (isset($this->raw->{'git-commit-short'})) {
             return $this->raw->{'git-commit-short'};
@@ -553,7 +596,7 @@ class Configuration
      *
      * @return string the placeholder
      */
-    public function getGitHashPlaceholder()
+    private function getGitHashPlaceholder(): ?string
     {
         if (isset($this->raw->{'git-commit'})) {
             return $this->raw->{'git-commit'};
@@ -567,7 +610,7 @@ class Configuration
      *
      * @return string the tag
      */
-    public function getGitTag()
+    private function getGitTag(): string
     {
         return $this->runGitCommand('git describe --tags HEAD');
     }
@@ -577,7 +620,7 @@ class Configuration
      *
      * @return string the placeholder
      */
-    public function getGitTagPlaceholder()
+    private function getGitTagPlaceholder(): ?string
     {
         if (isset($this->raw->{'git-tag'})) {
             return $this->raw->{'git-tag'};
@@ -592,8 +635,10 @@ class Configuration
      * @throws RuntimeException if the version could not be retrieved
      *
      * @return string the tag name or short commit hash
+     *
+     * @deprecated should be made private
      */
-    public function getGitVersion()
+    public function getGitVersion(): string
     {
         try {
             return $this->getGitTag();
@@ -619,7 +664,7 @@ class Configuration
      *
      * @return string the placeholder
      */
-    public function getGitVersionPlaceholder()
+    private function getGitVersionPlaceholder(): ?string
     {
         if (isset($this->raw->{'git-version'})) {
             return $this->raw->{'git-version'};
@@ -660,7 +705,7 @@ class Configuration
      *
      * @return string the file path
      */
-    public function getMainScriptPath()
+    public function getMainScriptPath(): ?string
     {
         if (isset($this->raw->main)) {
             return Path::canonical($this->raw->main);
@@ -790,13 +835,12 @@ class Configuration
         return null;
     }
 
-    /**
-     * Returns the output file path.
-     *
-     * @return string the file path
-     */
-    public function getOutputPath()
+    public function getOutputPath(): string
     {
+        if (null !== $this->_outputPath) {
+            return $this->_outputPath;
+        }
+
         $base = getcwd().DIRECTORY_SEPARATOR;
 
         if (isset($this->raw->output)) {
@@ -812,6 +856,8 @@ class Configuration
         if (false !== strpos($path, '@'.'git-version@')) {
             $path = str_replace('@'.'git-version@', $this->getGitVersion(), $path);
         }
+
+        $this->_outputPath = $path;
 
         return $path;
     }
@@ -852,6 +898,10 @@ class Configuration
      */
     public function getProcessedReplacements()
     {
+        if (null !== $this->_replacements) {
+            return $this->_replacements;
+        }
+
         $values = $this->getReplacements();
 
         if (null !== ($git = $this->getGitHashPlaceholder())) {
@@ -882,7 +932,9 @@ class Configuration
             $values["$sigil$key$sigil"] = $value;
         }
 
-        return $values;
+        $this->_replacements = $values;
+
+        return $this->_replacements;
     }
 
     /**
@@ -890,7 +942,7 @@ class Configuration
      *
      * @return string the placeholder sigil
      */
-    public function getReplacementSigil()
+    private function getReplacementSigil(): string
     {
         if (isset($this->raw->{'replacement-sigil'})) {
             return $this->raw->{'replacement-sigil'};
@@ -1111,26 +1163,6 @@ class Configuration
         }
 
         return false;
-    }
-
-    /**
-     * Loads the configured bootstrap file if available.
-     */
-    public function loadBootstrap(): void
-    {
-        if (null !== ($file = $this->getBootstrapFile())) {
-            if (false === file_exists($file)) {
-                throw new InvalidArgumentException(
-                    sprintf(
-                        'The bootstrap path "%s" is not a file or does not exist.',
-                        $file
-                    )
-                );
-            }
-
-            /** @noinspection PhpIncludeInspection */
-            include $file;
-        }
     }
 
     /**

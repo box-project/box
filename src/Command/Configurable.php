@@ -46,7 +46,7 @@ abstract class Configurable extends AbstractCommand
      *
      * @return Configuration the configuration settings
      */
-    protected function getConfig(InputInterface $input)
+    final protected function getConfig(InputInterface $input)
     {
         /** @var $helper ConfigurationHelper */
         $helper = $this->getHelper('config');
