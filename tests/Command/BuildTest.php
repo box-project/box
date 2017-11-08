@@ -16,7 +16,6 @@ namespace KevinGH\Box\Command;
 
 use Herrera\Box\Compactor\Php;
 use KevinGH\Box\Test\CommandTestCase;
-use KevinGH\Box\Test\FixedResponse;
 use Phar;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
@@ -30,16 +29,6 @@ use Symfony\Component\Process\PhpExecutableFinder;
 class BuildTest extends CommandTestCase
 {
     private const FIXTURES = __DIR__.'/../../fixtures/build';
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->app->getHelperSet()->set(new FixedResponse('test'));
-    }
 
     public function test_it_can_build_a_PHAR_file(): void
     {
