@@ -31,7 +31,7 @@ final class Validate extends Configurable
         parent::configure();
 
         $this->setName('validate');
-        $this->setDescription('Validates the configuration file.');
+        $this->setDescription('Validates the configuration file');
         $this->setHelp(
             <<<'HELP'
 The <info>%command.name%</info> command will validate the configuration file

@@ -121,12 +121,12 @@ Options:
   -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 
 Available commands:
-  build     Builds a new Phar.
+  build     Builds a new PHAR
   help      Displays help for a command
-  info      Displays information about the PHAR extension or file.
+  info      Displays information about the PHAR extension or file
   list      Lists commands
-  validate  Validates the configuration file.
-  verify    Verifies the PHAR signature.
+  validate  Validates the configuration file
+  verify    Verifies the PHAR signature
 
 EOF;
 

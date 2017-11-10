@@ -38,7 +38,7 @@ final class Verify extends Command
     protected function configure(): void
     {
         $this->setName('verify');
-        $this->setDescription('Verifies the PHAR signature.');
+        $this->setDescription('Verifies the PHAR signature');
         $this->setHelp(
             <<<'HELP'
 The <info>%command.name%</info> command will verify the signature of the PHAR.

@@ -14,8 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Test;
 
+use KevinGH\Box\Application;
 use KevinGH\Box\Helper;
-use Symfony\Component\Console\Application;
+use KevinGH\Box\Helper\ConfigurationHelper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -30,30 +31,22 @@ use function KevinGH\Box\remove_dir;
 abstract class CommandTestCase extends \PHPUnit\Framework\TestCase
 {
     /**
-     * The application.
-     *
      * @var Application
      */
-    protected $app;
+    protected $application;
 
     /**
-     * The actual current working directory.
-     *
      * @var string
      */
     protected $cwd;
 
     /**
-     * The test current working directory.
-     *
      * @var string
      */
     protected $tmp;
 
     /**
-     * The name of the command.
-     *
-     * @var string
+     * @var string The name of the command.
      */
     private $name;
 
@@ -67,13 +60,11 @@ abstract class CommandTestCase extends \PHPUnit\Framework\TestCase
 
         chdir($this->tmp);
 
-        $this->app = new Application();
-        $this->app->getHelperSet()->set(new Helper\ConfigurationHelper());
+        $this->application = new Application();
 
-        $command = $this->getCommand();
-        $this->name = $command->getName();
+        $this->name = $this->getCommand()->getName();
 
-        $this->app->add($command);
+        $this->application->add($this->getCommand());
     }
 
     /**
@@ -129,6 +120,6 @@ abstract class CommandTestCase extends \PHPUnit\Framework\TestCase
 
     protected function getCommandTester(): CommandTester
     {
-        return new CommandTester($this->app->get($this->name));
+        return new CommandTester($this->application->get($this->name));
     }
 }

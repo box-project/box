@@ -118,7 +118,7 @@ final class Info extends Command
     {
         $this->setName('info');
         $this->setDescription(
-            'Displays information about the PHAR extension or file.'
+            'Displays information about the PHAR extension or file'
         );
         $this->setHelp(
             <<<'HELP'

@@ -1,0 +1,8 @@
+{
+    "alias": "test.phar",
+    "files": "test.php",
+    "main": "test.php",
+    "output": "test.phar",
+    "stub": "stub.php"
+}
+

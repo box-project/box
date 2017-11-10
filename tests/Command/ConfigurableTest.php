@@ -38,7 +38,7 @@ class ConfigurableTest extends CommandTestCase
         file_put_contents('box.json', '{}');
 
         /** @var TestConfigurable $command */
-        $command = $this->app->get('test');
+        $command = $this->application->get('test');
 
         $input = new ArrayInput([]);
         $input->bind($command->getDefinition());

@@ -38,7 +38,7 @@ final class Build extends Configurable
         parent::configure();
 
         $this->setName('build');
-        $this->setDescription('Builds a new PHAR.');
+        $this->setDescription('Builds a new PHAR');
         $this->setHelp(
             <<<HELP
 The <info>%command.name%</info> command will build a new Phar based on a variety of settings.
@@ -394,7 +394,7 @@ HELP
     }
 
     /**
-     * @override
+     * @inheritdoc
      */
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
@@ -649,7 +649,7 @@ HELP
     {
         $main = $config->getMainScriptPath();
 
-        if (null !== $main) {
+        if (null === $main) {
             return null;
         }
 
@@ -780,7 +780,7 @@ HELP
                 throw new RuntimeException(
                     sprintf(
                         'Accessing to the private key "%s" requires a passphrase but none provided. Either '
-                        .'provide  one or run this command in interactive mode.',
+                        .'provide one or run this command in interactive mode.',
                         $key
                     )
                 );
@@ -794,6 +794,8 @@ HELP
             $question->setHiddenFallback(false);
 
             $passphrase = $dialog->ask($input, $output, $question);
+
+            $output->writeln('');
         }
 
         $box->signUsingFile($key, $passphrase);
