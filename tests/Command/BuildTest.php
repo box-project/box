@@ -16,15 +16,10 @@ namespace KevinGH\Box\Command;
 
 use Herrera\Box\Compactor\Php;
 use Herrera\Box\Exception\FileException;
-use KevinGH\Box\Application;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
-use Prophecy\Prophecy\ObjectProphecy;
-use RuntimeException;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\PhpExecutableFinder;
 
@@ -34,14 +29,6 @@ use Symfony\Component\Process\PhpExecutableFinder;
 class BuildTest extends CommandTestCase
 {
     private const FIXTURES = __DIR__.'/../../fixtures/build';
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getCommand(): Command
-    {
-        return new Build();
-    }
 
     public function test_it_can_build_a_PHAR_file(): void
     {
@@ -702,5 +689,13 @@ OUTPUT;
             'Hello!',
             exec('php test.phar')
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getCommand(): Command
+    {
+        return new Build();
     }
 }

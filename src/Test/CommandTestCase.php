@@ -15,8 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Test;
 
 use KevinGH\Box\Application;
-use KevinGH\Box\Helper;
-use KevinGH\Box\Helper\ConfigurationHelper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -46,7 +44,7 @@ abstract class CommandTestCase extends \PHPUnit\Framework\TestCase
     protected $tmp;
 
     /**
-     * @var string The name of the command.
+     * @var string the name of the command
      */
     private $name;
 
