@@ -15,10 +15,10 @@ declare(strict_types=1);
 namespace KevinGH\Box\Helper;
 
 use KevinGH\Box\Configuration;
-use function KevinGH\Box\make_tmp_dir;
-use function KevinGH\Box\remove_dir;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use function KevinGH\Box\make_tmp_dir;
+use function KevinGH\Box\remove_dir;
 
 /**
  * @covers \KevinGH\Box\Helper\ConfigurationHelper
