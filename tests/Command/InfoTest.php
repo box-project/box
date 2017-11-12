@@ -20,7 +20,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
- * @covers \KevinGH\Box\Command
+ * @covers \KevinGH\Box\Command\Info
  */
 class InfoTest extends TestCase
 {
