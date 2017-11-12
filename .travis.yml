@@ -25,11 +25,7 @@ before_install:
 
 install:
   - set -eo pipefail
-  - composer install --no-interaction --no-progress --no-suggest --prefer-dist $COMPOSER_FLAGS
-
-before_script:
-    - git config --global user.email test@test.com
-    - git config --global user.name "Test User"
+  - composer update --no-interaction --no-progress --no-suggest --prefer-dist $COMPOSER_FLAGS
 
 script:
   - |
@@ -41,5 +37,3 @@ script:
 
 notifications:
     email: false
-
-

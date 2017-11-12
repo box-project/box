@@ -14,11 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use Closure;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\Php;
-use Herrera\PHPUnit\TestCase;
 use InvalidArgumentException;
 use Phar;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \KevinGH\Box\Configuration
@@ -51,7 +52,7 @@ class ConfigurationTest extends TestCase
     protected function setUp(): void
     {
         $this->cwd = getcwd();
-        $this->tmp = $this->createDir();
+        $this->tmp = make_tmp_dir('box', __CLASS__);
 
         $this->file = $this->tmp.DIRECTORY_SEPARATOR.'box.json';
 
@@ -300,15 +301,29 @@ class ConfigurationTest extends TestCase
 
         $compactors = $this->config->getCompactors();
 
-        /** @var Tokenizer $tokenizer */
-        $tokenizer = $this->getPropertyValue($compactors[0], 'tokenizer');
+        $tokenizer = (
+            Closure::bind(
+                function (Php $phpCompactor): Tokenizer {
+                    return $phpCompactor->tokenizer;
+                },
+                null,
+                Php::class
+            )
+        )($compactors[0]);
 
         $this->assertNotNull($tokenizer);
 
-        $this->assertSame(
-            ['author'],
-            $this->getPropertyValue($tokenizer, 'ignored')
-        );
+        $ignored = (
+            Closure::bind(
+                function (Tokenizer $tokenizer): array {
+                    return $tokenizer->ignored;
+                },
+                null,
+                Tokenizer::class
+            )
+        )($tokenizer);
+
+        $this->assertSame(['author'], $ignored);
     }
 
     public function test_get_compression_algorithm(): void
