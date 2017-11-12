@@ -1,99 +1,79 @@
-Box
-===
+# Box
 
-[![Build Status](https://travis-ci.org/box-project/box2.svg?branch=2.0)](https://travis-ci.org/box-project/box2)
+[![Package version](https://img.shields.io/packagist/vpre/humbug/box.svg?style=flat-square)](https://packagist.org/packages/humbug/box)
+[![Travis Build Status](https://img.shields.io/travis/humbug/box.svg?branch=master&style=flat-square)](https://travis-ci.org/humbug/box?branch=master)
+[![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/humbug/box.svg?branch=master&style=flat-square)](https://scrutinizer-ci.com/g/humbug/box/?branch=master)
+[![Slack](https://img.shields.io/badge/slack-%23humbug-red.svg?style=flat-square)](https://symfony.com/slack-invite)
+[![License](https://img.shields.io/badge/license-MIT-red.svg?style=flat-square)](LICENSE)
 
-What is it?
------------
+Fork of the box unmaintained project.
 
-The Box application simplifies the Phar building process. Out of the box (no pun intended), the application can do many great things:
 
-- Add, replace, and remove files and stubs in existing Phars.
-- Extract a whole Phar, or cherry pick which files you want.
-- Retrieve information about the Phar extension, or a Phar file.
-  - List the contents of a Phar.
-- Verify the signature of an existing Phar.
-- Generate RSA (PKCS#1 encoded) private keys for OpenSSL signing.
-  - Extract public keys from existing RSA private keys.
+## Goal
+
+The Box application simplifies the PHAR building process. Out of the box (no pun intended), the application can do many
+great things:
+
+- Add, replace, and remove files and stubs in existing PHARs
+- Extract a whole PHAR or cherry pick which files you want
+- Retrieve information about the PHAR extension or a PHAR file
+- List the contents of a PHAR
+- Verify the signature of an existing PHAR
+- Generate RSA (PKCS#1 encoded) private keys for OpenSSL signing
+- Extract public keys from existing RSA private keys
 - Use Git tags and short commit hashes for versioning.
 
-Since the application is based on the [Box library](https://github.com/herrera-io/php-box), you get its benefits as well:
 
-- On the fly search and replace of placeholders.
-- Compact file contents based on file type.
-- Generate custom stubs.
+## Installation
 
-How do I get started?
----------------------
+### PHAR (preferred but NOT SUPPORTED YET)
 
-You can use Box in one of three ways:
+The preferred method of installation is to use the Box PHAR, which can
+be downloaded from the most recent [Github Release][releases]. Subsequent updates
+can be downloaded by running:
 
-### As a Phar (Recommended)
-
-You may download a ready-to-use version of Box as a Phar:
-
-```sh
-$ curl -LSs https://box-project.github.io/box2/installer.php | php
+```bash
+php-scoper.phar self-update
 ```
 
-The command will check your PHP settings, warn you of any issues, and the download it to the current directory. From there, you may place it anywhere that will make it easier for you to access (such as `/usr/local/bin`) and chmod it to `755`. You can even rename it to just `box` to avoid having to type the `.phar` extension every time.
+As the PHAR is signed, you should also download the matching
+`box.phar.pubkey` to the same location. If you rename `box.phar`
+to `box`, you should also rename `box.pubkey` to `box.pubkey`.
 
-```sh
-$ box --version
+
+### Composer
+
+You can install Box with Composer:
+
+```bash
+composer global require humbug/box:^3.0@dev
 ```
 
-Whenever a new version of the application is released, you can simply run the `update` command to get the latest version:
+If you cannot install it because of a dependency conflict or you prefer to
+install it for your project, we recommend you to take a look at
+[bamarni/composer-bin-plugin][bamarni/composer-bin-plugin]. Example:
 
-```sh
-$ box update
+```bash
+composer require --dev bamarni/composer-bin-plugin
+composer bin box require --dev humbug/box:^3.0@dev
 ```
 
-### As a Global Composer Install
+Keep in mind however that this library is not designed to be extended.
 
-This is probably the best way when you have other tools like phpunit and other tools installed in this way:
 
-```sh
-$ composer global require kherge/box --prefer-source
-```
+## Creating a Phar
 
-### As a Composer Dependency
-
-You may also install Box as a dependency for your Composer managed project:
-
-```sh
-$ composer require --dev kherge/box
-```
-
-(or)
-
-```json
-{
-    "require-dev": {
-        "kherge/box": "~2.5"
-    }
-}
-```
-
-> Be aware that using this approach requires additional configuration steps to prevent Box's own dependencies from accidentally being added to your Phar, causing file size bloat. You can find more information about this [issue on the wiki](https://github.com/kherge/php-box/wiki/App%2C-or-Library%3F).
-
-Once you have installed the application, you can run the `help` command to get detailed information about all of the available commands. This should be your go-to place for information about how to use Box. You may also find additional useful information [on the wiki](https://github.com/kherge/php-box/wiki). If you happen to come across any information that could prove to be useful to others, the wiki is open for you to contribute.
-
-```sh
-$ box help
-```
-
-Creating a Phar
----------------
-
-To get started, you may want to check out the [example application](https://github.com/kherge/php-box-example) that is ready to be built by Box. How your project is structured is entirely up to you. All that Box requires is that you have a file called `box.json` at the root of your project directory. You can find a complete and detailed list of configuration settings available by seeing the help information for the `build` command:
+To get started, you may want to check out the [example application](https://github.com/kherge/php-box-example) that is
+ready to be built by Box. How your project is structured is entirely up to you. All that Box requires is that you have
+a file called `box.json` at the root of your project directory. You can find a complete and detailed list of
+configuration settings available by seeing the help information for the `build` command:
 
 ```sh
 $ box help build
 ```
 
-> You may find example configuration files for popular projects on the wiki.
-
-Once you have configured your project using `box.json` (or `box.json.dist`), you can simply run the `build` command in the directory containing `box.json`:
+Once you have configured your project using `box.json` (or `box.json.dist`), you can simply run the `build`
+command in the directory containing `box.json`:
 
 ```sh
 $ box build -v
@@ -101,20 +81,28 @@ $ box build -v
 
 > The `-v` option enabled verbose output. This will provide you with a lot of useful information for debugging your build process. Once you are satisfied with the results, I recommend not using the verbose option. It may considerably slow down the build process.
 
-Contributing
-------------
 
-You can contribute in one of three ways:
+## Contributing
 
-1. File bug reports using the [issue tracker](https://github.com/kherge/php-box/issues).
-2. Answer questions or fix bugs on the issue tracker.
-3. Contribute new features or update the wiki.
+The project provides a `Makefile` in which the most common commands have been
+registered such as fixing the coding style or running the test.
 
-> The code contribution process is not very formal. You just need to make sure that you follow the PSR-0, PSR-1, and PSR-2 coding guidelines. Any new code contributions must be accompanied by unit tests where applicable.
+```bash
+make
+# or
+make help
+# => will print the list of available commands
+```
 
-GPG Signature
--------------
 
-You can find [kherge's GPG on keybase.io](https://keybase.io/kherge).
+## Credits
 
-    32E4 B747 57B1 D652 34FC 389F 293D 7712 4151 5FE8
+Project originally created by: [Kevin Herrera] ([@kherge]) which hasnow been moved under the [Humbug umbrella][humbug].
+
+
+
+[releases]: https://github.com/humbug/box/releases
+[bamarni/composer-bin-plugin]: https://github.com/bamarni/composer-bin-plugin
+[Kevin Herrera]: https://github.com/kherge
+[@kherge]: https://github.com/kherge
+[humbug]: https://github.com/humbug
