@@ -24,6 +24,16 @@ great things:
 - Use Git tags and short commit hashes for versioning.
 
 
+## Table of Contents
+
+1. [Installation](#installation)
+    1. [PHAR (preferred but NOT SUPPORTED YET)](#phar-preferred-but-not-supported-yet)
+    1. [Composer](#composer)
+1. [Creating a Phar](#creating-a-phar)
+1. [Contributing](#contributing)
+1. [Credits](#credits)
+
+
 ## Installation
 
 ### PHAR (preferred but NOT SUPPORTED YET)
