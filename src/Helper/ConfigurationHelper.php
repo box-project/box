@@ -95,6 +95,6 @@ final class ConfigurationHelper extends Helper
             $json
         );
 
-        return new Configuration($file, $json);
+        return Configuration::create($file, $json);
     }
 }

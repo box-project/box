@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use ArrayIterator;
+use Closure;
 use Datetime;
 use DateTimeImmutable;
 use Herrera\Annotations\Tokenizer;
@@ -25,127 +26,527 @@ use Phar;
 use Phine\Path\Path;
 use RuntimeException;
 use SplFileInfo;
+use stdClass;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
 
-/**
- * Manages the configuration settings.
- *
- * @author Kevin Herrera <kevin@herrera.io>
- */
-class Configuration
+final class Configuration
 {
-    private const UNSET = 'unset';
+    private const DEFAULT_ALIAS = 'default.phar';
+    private const DEFAULT_DATETIME_FORMAT = 'Y-m-d H:i:s';
+    private const DEFAULT_REPLACEMENT_SIGIL = '@';
+
+    private $fileMode;
+    private $alias;
+    private $basePath;
+    private $basePathRegex;
+    private $binaryDirectoriesIterator;
+    private $binaryFilesIterator;
+    private $binaryIterators;
+    private $directoriesIterator;
+    private $filesIterator;
+    private $filesIterators;
+    private $bootstrapFile;
+    private $compactors;
+    private $compressionAlgorithm;
+    private $mainScriptPath;
+    private $mainScriptContent;
+    private $map;
+    private $mapper;
+    private $metadata;
+    private $mimetypeMapping;
+    private $mungVariables;
+    private $notFoundScriptPath;
+    private $outputPath;
+    private $privateKeyPassphrase;
+    private $privateKeyPath;
+    private $isPrivateKeyPrompt;
+    private $processedReplacements;
+    private $shebang;
+    private $signingAlgorithm;
+    private $stubBanner;
+    private $stubBannerPath;
+    private $stubBannerFromFile;
+    private $stubPath;
+    private $isExtractable;
+    private $isInterceptFileFuncs;
+    private $isStubGenerated;
+    private $isWebPhar;
 
     /**
-     * The configuration file path.
-     *
-     * @var string
+     * @param string                     $alias                     TODO: description
+     * @param string                     $basePath                  Path used as the base for all the relative paths used
+     * @param string                     $basePathRegex             Base path escaped to be able to easily extract the relative path from a file path
+     * @param iterable|SplFileInfo[]     $binaryDirectoriesIterator List of directories containing images or other binary data
+     * @param iterable|SplFileInfo[]     $binaryFilesIterator       List of files containing images or other binary data
+     * @param iterable[]|SplFileInfo[][] $binaryIterators           List of file iterators returning binary files
+     * @param iterable|SplFileInfo[]     $directoriesIterator       List of directories
+     * @param iterable|SplFileInfo[]     $filesIterator             List of files
+     * @param iterable[]|SplFileInfo[][] $filesIterators            List of file iterators
+     * @param null|string                $bootstrapFile             The bootstrap file path
+     * @param CompactorInterface[]       $compactors                List of file contents compactors
+     * @param null|int                   $compressionAlgorithm      Compression algorithm constant value. See the \Phar class constants
+     * @param null|int                   $fileMode                  File mode in octal form
+     * @param null|string                $mainScriptPath            The main script file path
+     * @param null|string                $mainScriptContent         The processed content of the main script file
+     * @param string[]                   $map                       The internal file path mapping
+     * @param Closure                    $mapper                    Callable for the configured map
+     * @param mixed                      $metadata                  The PHAR Metadata
+     * @param array                      $mimetypeMapping           The file extension MIME type mapping
+     * @param array                      $mungVariables             The list of server variables to modify for execution
+     * @param null|string                $notFoundScriptPath        The file path to the script to execute when a file is not found
+     * @param string                     $outputPath
+     * @param null|string                $privateKeyPassphrase
+     * @param null|string                $privateKeyPath
+     * @param bool                       $isPrivateKeyPrompt        If the user should be prompted for the private key passphrase
+     * @param array                      $processedReplacements     The processed list of replacement placeholders and their values
+     * @param null|string                $shebang                   The shebang line
+     * @param int                        $signingAlgorithm          The PHAR siging algorithm. See \Phar constants
+     * @param null|string                $stubBanner                The stub banner comment
+     * @param null|string                $stubBannerPath            The path to the stub banner comment file
+     * @param null|string                $stubBannerFromFile        The stub banner comment from the fine
+     * @param null|string                $stubPath                  The PHAR stub file path
+     * @param bool                       $isExtractable             Wether or not StubGenerator::extract() should be used
+     * @param bool                       $isInterceptFileFuncs      wether or not Phar::interceptFileFuncs() should be used
+     * @param bool                       $isStubGenerated           Wether or not if the PHAR stub should be generated
+     * @param bool                       $isWebPhar                 Wether or not the PHAR is going to be used for the web
      */
-    private $file;
+    private function __construct(
+        string $alias,
+        string $basePath,
+        string $basePathRegex,
+        ?iterable $binaryDirectoriesIterator,
+        ?iterable $binaryFilesIterator,
+        array $binaryIterators,
+        ?iterable $directoriesIterator,
+        ?iterable $filesIterator,
+        array $filesIterators,
+        ?string $bootstrapFile,
+        array $compactors,
+        ?int $compressionAlgorithm,
+        ?int $fileMode,
+        ?string $mainScriptPath,
+        ?string $mainScriptContent,
+        array $map,
+        Closure $mapper,
+        $metadata,
+        array $mimetypeMapping,
+        array $mungVariables,
+        ?string $notFoundScriptPath,
+        string $outputPath,
+        ?string $privateKeyPassphrase,
+        ?string $privateKeyPath,
+        bool $isPrivateKeyPrompt,
+        array $processedReplacements,
+        ?string $shebang,
+        int $signingAlgorithm,
+        ?string $stubBanner,
+        ?string $stubBannerPath,
+        ?string $stubBannerFromFile,
+        ?string $stubPath,
+        bool $isExtractable,
+        bool $isInterceptFileFuncs,
+        bool $isStubGenerated,
+        bool $isWebPhar
+    ) {
+        $this->alias = $alias;
+        $this->basePath = $basePath;
+        $this->basePathRegex = $basePathRegex;
+        $this->binaryDirectoriesIterator = $binaryDirectoriesIterator;
+        $this->binaryFilesIterator = $binaryFilesIterator;
+        $this->binaryIterators = $binaryIterators;
+        $this->directoriesIterator = $directoriesIterator;
+        $this->filesIterator = $filesIterator;
+        $this->filesIterators = $filesIterators;
+        $this->bootstrapFile = $bootstrapFile;
+        $this->compactors = $compactors;
+        $this->compressionAlgorithm = $compressionAlgorithm;
+        $this->fileMode = $fileMode;
+        $this->mainScriptPath = $mainScriptPath;
+        $this->mainScriptContent = $mainScriptContent;
+        $this->map = $map;
+        $this->mapper = $mapper;
+        $this->metadata = $metadata;
+        $this->mimetypeMapping = $mimetypeMapping;
+        $this->mungVariables = $mungVariables;
+        $this->notFoundScriptPath = $notFoundScriptPath;
+        $this->outputPath = $outputPath;
+        $this->privateKeyPassphrase = $privateKeyPassphrase;
+        $this->privateKeyPath = $privateKeyPath;
+        $this->isPrivateKeyPrompt = $isPrivateKeyPrompt;
+        $this->processedReplacements = $processedReplacements;
+        $this->shebang = $shebang;
+        $this->signingAlgorithm = $signingAlgorithm;
+        $this->stubBanner = $stubBanner;
+        $this->stubBannerPath = $stubBannerPath;
+        $this->stubBannerFromFile = $stubBannerFromFile;
+        $this->stubPath = $stubPath;
+        $this->isExtractable = $isExtractable;
+        $this->isInterceptFileFuncs = $isInterceptFileFuncs;
+        $this->isStubGenerated = $isStubGenerated;
+        $this->isWebPhar = $isWebPhar;
+    }
 
-    /**
-     * The raw configuration settings.
-     *
-     * @var object
-     */
-    private $raw;
-
-    /**
-     * @var null|string
-     */
-    private $_bootstrapFile = self::UNSET;
-
-    /**
-     * @var string
-     */
-    private $_outputPath;
-
-    /**
-     * @var array
-     */
-    private $_replacements;
-
-    /**
-     * Sets the raw configuration settings.
-     *
-     * @param string $file the configuration file path
-     * @param object $raw  the raw settings
-     */
-    public function __construct($file, $raw)
+    public static function create(string $file, stdClass $raw): self
     {
-        $this->file = $file;
-        $this->raw = $raw;
+        $alias = $raw->alias ?? self::DEFAULT_ALIAS;
+
+        $basePath = self::retrieveBasePath($file, $raw);
+        $basePathRegex = '/'.preg_quote($basePath.DIRECTORY_SEPARATOR, '/').'/';
+
+        $blacklist = self::retrieveBlacklist($raw);
+        $blacklistFilter = self::retrieveBlacklistFilter($basePath, $blacklist);
+
+        $binaryDirectories = self::retrieveBinaryDirectories($raw, $basePath);
+        $binaryDirectoriesIterator = self::retrieveBinaryDirectoriesIterator($binaryDirectories, $blacklistFilter);
+
+        $binaryFiles = self::retrieveBinaryFiles($raw, $basePath);
+        $binaryFilesIterator = self::retrieveBinaryFilesIterator($binaryFiles);
+
+        $binaryIterators = self::retrieveBinaryIterators($raw, $basePath, $blacklistFilter);
+
+        $directories = self::retrieveDirectories($raw, $basePath);
+        $directoriesIterator = self::retrieveDirectoriesIterator($directories, $blacklistFilter);
+
+        $files = self::retrieveFiles($raw, $basePath);
+        $filesIterator = self::retrieveFilesIterator($files);
+
+        $filesIterators = self::retrieveFilesIterators($raw, $basePath, $blacklistFilter);
+
+        $bootstrapFile = self::retrieveBootstrapFile($raw, $basePath);
+
+        $compactors = self::retrieveCompactors($raw);
+        $compressionAlgorithm = self::retrieveCompressionAlgorithm($raw);
+
+        $fileMode = self::retrieveFileMode($raw);
+
+        $mainScriptPath = self::retrieveMainScriptPath($raw);
+        $mainScriptContent = self::retrieveMainScriptContents($mainScriptPath, $basePath);
+
+        $map = self::retrieveMap($raw);
+        $mapper = self::retrieveMapper($map);
+
+        $metadata = self::retrieveMetadata($raw);
+
+        $mimeTypeMapping = self::retrieveMimetypeMapping($raw);
+        $mungVariables = self::retrieveMungVariables($raw);
+        $notFoundScriptPath = self::retrieveNotFoundScriptPath($raw);
+        $outputPath = self::retrieveOutputPath($raw, $file);
+
+        $privateKeyPassphrase = self::retrievePrivateKeyPassphrase($raw);
+        $privateKeyPath = self::retrievePrivateKeyPath($raw);
+        $isPrivateKeyPrompt = self::retrieveIsPrivateKeyPrompt($raw);
+
+        $replacements = self::retrieveReplacements($raw);
+        $processedReplacements = self::retrieveProcessedReplacements($replacements, $raw, $file);
+
+        $shebang = self::retrieveShebang($raw);
+
+        $signingAlgorithm = self::retrieveSigningAlgorithm($raw);
+
+        $stubBanner = self::retrieveStubBanner($raw);
+        $stubBannerPath = self::retrieveStubBannerPath($raw);
+        $stubBannerFromFile = self::retrieveStubBannerFromFile($basePath, $stubBannerPath);
+
+        $stubPath = self::retrieveStubPath($raw);
+
+        $isExtractable = self::retrieveIsExtractable($raw);
+        $isInterceptFileFuncs = self::retrieveIsInterceptFileFuncs($raw);
+        $isStubGenerated = self::retrieveIsStubGenerated($raw);
+        $isWebPhar = self::retrieveIsWebPhar($raw);
+
+        return new self(
+            $alias,
+            $basePath,
+            $basePathRegex,
+            $binaryDirectoriesIterator,
+            $binaryFilesIterator,
+            $binaryIterators,
+            $directoriesIterator,
+            $filesIterator,
+            $filesIterators,
+            $bootstrapFile,
+            $compactors,
+            $compressionAlgorithm,
+            $fileMode,
+            $mainScriptPath,
+            $mainScriptContent,
+            $map,
+            $mapper,
+            $metadata,
+            $mimeTypeMapping,
+            $mungVariables,
+            $notFoundScriptPath,
+            $outputPath,
+            $privateKeyPassphrase,
+            $privateKeyPath,
+            $isPrivateKeyPrompt,
+            $processedReplacements,
+            $shebang,
+            $signingAlgorithm,
+            $stubBanner,
+            $stubBannerPath,
+            $stubBannerFromFile,
+            $stubPath,
+            $isExtractable,
+            $isInterceptFileFuncs,
+            $isStubGenerated,
+            $isWebPhar
+        );
+    }
+
+    public function retrieveRelativeBasePath(string $path): string
+    {
+        return preg_replace(
+            $this->basePathRegex,
+            '',
+            $path
+        );
+    }
+
+    public function getAlias(): string
+    {
+        return $this->alias;
+    }
+
+    public function getBasePath(): string
+    {
+        return $this->basePath;
     }
 
     /**
-     * Returns the Phar alias.
-     *
-     * @return string the alias
+     * @return null|iterable|SplFileInfo[]
      */
-    public function getAlias()
+    public function getBinaryDirectoriesIterator(): ?iterable
     {
-        if (isset($this->raw->alias)) {
-            return $this->raw->alias;
+        return $this->binaryDirectoriesIterator;
+    }
+
+    /**
+     * @return null|iterable|SplFileInfo[]
+     */
+    public function getBinaryFilesIterator(): ?iterable
+    {
+        return $this->binaryFilesIterator;
+    }
+
+    /**
+     * @return iterable[]|SplFileInfo[][]
+     */
+    public function getBinaryIterators(): array
+    {
+        return $this->binaryIterators;
+    }
+
+    /**
+     * @return null|iterable|SplFileInfo[]
+     */
+    public function getDirectoriesIterator(): ?iterable
+    {
+        return $this->directoriesIterator;
+    }
+
+    /**
+     * @return null|iterable|SplFileInfo[]
+     */
+    public function getFilesIterator(): ?iterable
+    {
+        return $this->filesIterator;
+    }
+
+    public function getBootstrapFile(): ?string
+    {
+        return $this->bootstrapFile;
+    }
+
+    public function loadBootstrap(): void
+    {
+        $file = $this->bootstrapFile;
+
+        if (null !== $file) {
+            include $file;
         }
-
-        return 'default.phar';
     }
 
     /**
-     * Returns the base path.
-     *
-     * @throws InvalidArgumentException if the base path is not valid
-     *
-     * @return string the base path
+     * @return CompactorInterface[] the list of compactors
      */
-    public function getBasePath()
+    public function getCompactors(): array
     {
-        if (isset($this->raw->{'base-path'})) {
-            if (false === is_dir($this->raw->{'base-path'})) {
+        return $this->compactors;
+    }
+
+    public function getCompressionAlgorithm(): ?int
+    {
+        return $this->compressionAlgorithm;
+    }
+
+    public function getFileMode(): ?int
+    {
+        return $this->fileMode;
+    }
+
+    public function getMainScriptPath(): ?string
+    {
+        return $this->mainScriptPath;
+    }
+
+    public function getMainScriptContent(): ?string
+    {
+        return $this->mainScriptContent;
+    }
+
+    public function getMimetypeMapping(): array
+    {
+        return $this->mimetypeMapping;
+    }
+
+    public function getMungVariables(): array
+    {
+        return $this->mungVariables;
+    }
+
+    public function getNotFoundScriptPath(): ?string
+    {
+        return $this->notFoundScriptPath;
+    }
+
+    public function getOutputPath(): string
+    {
+        return $this->outputPath;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getMap(): array
+    {
+        return $this->map;
+    }
+
+    public function getMapper(): Closure
+    {
+        return $this->mapper;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMetadata()
+    {
+        return $this->metadata;
+    }
+
+    /**
+     * @return iterable[]|SplFileInfo[][]
+     */
+    public function getFilesIterators()
+    {
+        return $this->filesIterators;
+    }
+
+    public function getPrivateKeyPassphrase(): ?string
+    {
+        return $this->privateKeyPassphrase;
+    }
+
+    public function getPrivateKeyPath(): ?string
+    {
+        return $this->privateKeyPath;
+    }
+
+    public function isPrivateKeyPrompt(): bool
+    {
+        return $this->isPrivateKeyPrompt;
+    }
+
+    public function getProcessedReplacements(): array
+    {
+        return $this->processedReplacements;
+    }
+
+    public function getShebang(): ?string
+    {
+        return $this->shebang;
+    }
+
+    public function getSigningAlgorithm(): int
+    {
+        return $this->signingAlgorithm;
+    }
+
+    public function getStubBanner(): ?string
+    {
+        return $this->stubBanner;
+    }
+
+    public function getStubBannerPath(): ?string
+    {
+        return $this->stubBannerPath;
+    }
+
+    public function getStubBannerFromFile()
+    {
+        return $this->stubBannerFromFile;
+    }
+
+    public function getStubPath(): ?string
+    {
+        return $this->stubPath;
+    }
+
+    public function isExtractable(): bool
+    {
+        return $this->isExtractable;
+    }
+
+    public function isInterceptFileFuncs(): bool
+    {
+        return $this->isInterceptFileFuncs;
+    }
+
+    public function isStubGenerated(): bool
+    {
+        return $this->isStubGenerated;
+    }
+
+    public function isWebPhar(): bool
+    {
+        return $this->isWebPhar;
+    }
+
+    private static function retrieveBasePath(string $file, stdClass $raw): string
+    {
+        if (isset($raw->{'base-path'})) {
+            if (false === is_dir($raw->{'base-path'})) {
                 throw new InvalidArgumentException(
                     sprintf(
                         'The base path "%s" is not a directory or does not exist.',
-                        $this->raw->{'base-path'}
+                        $raw->{'base-path'}
                     )
                 );
             }
 
-            return realpath($this->raw->{'base-path'});
+            return realpath($raw->{'base-path'});
         }
 
-        return realpath(dirname($this->file));
+        return realpath(dirname($file));
     }
 
     /**
-     * Returns the base path as a regular expression for trimming paths.
-     *
-     * @return string the regular expression
+     * @return array|SplFileInfo[]
      */
-    public function getBasePathRegex()
+    private static function retrieveBinaryDirectories(stdClass $raw, string $basePath): array
     {
-        return '/'
-             .preg_quote($this->getBasePath().DIRECTORY_SEPARATOR, '/')
-             .'/';
-    }
-
-    /**
-     * Returns the list of relative directory paths for binary files.
-     *
-     * @return array the list of paths
-     */
-    public function getBinaryDirectories()
-    {
-        if (isset($this->raw->{'directories-bin'})) {
-            $directories = (array) $this->raw->{'directories-bin'};
-            $base = $this->getBasePath();
+        if (isset($raw->{'directories-bin'})) {
+            $directories = (array) $raw->{'directories-bin'};
 
             array_walk(
                 $directories,
-                function (&$directory) use ($base): void {
-                    $directory = $base
-                               .DIRECTORY_SEPARATOR
-                               .Path::canonical($directory);
+                function (&$directory) use ($basePath): void {
+                    $directory = $basePath
+                        .DIRECTORY_SEPARATOR
+                        .Path::canonical($directory);
                 }
             );
 
@@ -156,37 +557,35 @@ class Configuration
     }
 
     /**
-     * Returns the iterator for the binary directory paths.
+     * @param SplFileInfo[] $binaryDirectories
+     * @param Closure       $blacklistFilter
      *
-     * @return Finder the iterator
+     * @return null|iterable|SplFileInfo[] the iterator
      */
-    public function getBinaryDirectoriesIterator()
+    private static function retrieveBinaryDirectoriesIterator(array $binaryDirectories, Closure $blacklistFilter): ?iterable
     {
-        if ([] !== ($directories = $this->getBinaryDirectories())) {
+        if ([] !== $binaryDirectories) {
             return Finder::create()
-                    ->files()
-                    ->filter($this->getBlacklistFilter())
-                    ->ignoreVCS(true)
-                    ->in($directories);
+                ->files()
+                ->filter($blacklistFilter)
+                ->ignoreVCS(true)
+                ->in($binaryDirectories);
         }
 
         return null;
     }
 
     /**
-     * Returns the list of relative paths for binary files.
-     *
-     * @return array the list of paths
+     * @return SplFileInfo[] the list of paths
      */
-    public function getBinaryFiles()
+    private static function retrieveBinaryFiles(stdClass $raw, string $basePath): array
     {
-        if (isset($this->raw->{'files-bin'})) {
-            $base = $this->getBasePath();
+        if (isset($raw->{'files-bin'})) {
             $files = [];
 
-            foreach ((array) $this->raw->{'files-bin'} as $file) {
+            foreach ((array) $raw->{'files-bin'} as $file) {
                 $files[] = new SplFileInfo(
-                    $base.DIRECTORY_SEPARATOR.Path::canonical($file)
+                    $basePath.DIRECTORY_SEPARATOR.Path::canonical($file)
                 );
             }
 
@@ -197,42 +596,24 @@ class Configuration
     }
 
     /**
-     * Returns an iterator for the binary files.
-     *
-     * @return ArrayIterator the iterator
+     * @return null|iterable|SplFileInfo[] the iterator
      */
-    public function getBinaryFilesIterator()
+    private static function retrieveBinaryFilesIterator(array $binaryFiles): ?iterable
     {
-        if ([] !== ($files = $this->getBinaryFiles())) {
-            return new ArrayIterator($files);
+        if ([] !== $binaryFiles) {
+            return new ArrayIterator($binaryFiles);
         }
 
         return null;
     }
 
     /**
-     * Returns the list of configured Finder instances for binary files.
-     *
-     * @return Finder[] the list of Finders
+     * @return string[]
      */
-    public function getBinaryFinders()
+    private static function retrieveBlacklist(stdClass $raw): array
     {
-        if (isset($this->raw->{'finder-bin'})) {
-            return $this->processFinders($this->raw->{'finder-bin'});
-        }
-
-        return [];
-    }
-
-    /**
-     * Returns the list of blacklisted relative file paths.
-     *
-     * @return array the list of paths
-     */
-    public function getBlacklist()
-    {
-        if (isset($this->raw->blacklist)) {
-            $blacklist = (array) $this->raw->blacklist;
+        if (isset($raw->blacklist)) {
+            $blacklist = (array) $raw->blacklist;
 
             array_walk(
                 $blacklist,
@@ -248,18 +629,19 @@ class Configuration
     }
 
     /**
-     * Returns a filter callable for the configured blacklist.
+     * @param string   $basePath
+     * @param string[] $blacklist
      *
-     * @return callable the callable
+     * @return Closure
      */
-    public function getBlacklistFilter()
+    private static function retrieveBlacklistFilter(string $basePath, array $blacklist): Closure
     {
-        $blacklist = $this->getBlacklist();
-        $base = '/^'
-              .preg_quote($this->getBasePath().DIRECTORY_SEPARATOR, '/')
-              .'/';
+        $base = sprintf(
+            '/^%s/',
+            preg_quote($basePath.DIRECTORY_SEPARATOR, '/')
+        );
 
-        return function (SplFileInfo $file) use ($base, $blacklist) {
+        return function (SplFileInfo $file) use ($base, $blacklist): ?bool {
             $path = Path::canonical(
                 preg_replace($base, '', $file->getPathname())
             );
@@ -272,159 +654,39 @@ class Configuration
         };
     }
 
-    public function getBootstrapFile(): ?string
+    /**
+     * @param stdClass $raw
+     * @param string   $basePath
+     * @param Closure  $blacklistFilter
+     *
+     * @return iterable[]|SplFileInfo[][]
+     */
+    private static function retrieveBinaryIterators(stdClass $raw, string $basePath, Closure $blacklistFilter): array
     {
-        if (self::UNSET !== $this->_bootstrapFile) {
-            return $this->_bootstrapFile;
+        if (isset($raw->{'finder-bin'})) {
+            return self::processFinders($raw->{'finder-bin'}, $basePath, $blacklistFilter);
         }
 
-        if (false === isset($this->raw->bootstrap)) {
-            $path = null;
-        } else {
-            $path = $this->raw->bootstrap;
-
-            if (false === Path::isAbsolute($path)) {
-                $path = Path::canonical(
-                    $this->getBasePath().DIRECTORY_SEPARATOR.$path
-                );
-            }
-        }
-
-        $this->_bootstrapFile = $path;
-
-        return $path;
+        return [];
     }
 
     /**
-     * Loads the configured bootstrap file if available.
+     * @param stdClass $raw
+     * @param string   $basePath
+     *
+     * @return string[]
      */
-    public function loadBootstrap(): void
+    private static function retrieveDirectories(stdClass $raw, string $basePath): array
     {
-        $file = $this->getBootstrapFile();
-
-        if (null === $file) {
-            return;
-        }
-
-        if (false === file_exists($file)) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The bootstrap path "%s" is not a file or does not exist.',
-                    $file
-                )
-            );
-        }
-
-        include $file;
-    }
-
-    /**
-     * Returns the list of file contents compactors.
-     *
-     * @throws InvalidArgumentException if a class is not valid
-     *
-     * @return CompactorInterface[] the list of compactors
-     */
-    public function getCompactors()
-    {
-        $compactors = [];
-
-        if (isset($this->raw->compactors)) {
-            foreach ((array) $this->raw->compactors as $class) {
-                if (false === class_exists($class)) {
-                    throw new InvalidArgumentException(
-                        sprintf(
-                            'The compactor class "%s" does not exist.',
-                            $class
-                        )
-                    );
-                }
-
-                $compactor = new $class();
-
-                if (false === ($compactor instanceof CompactorInterface)) {
-                    throw new InvalidArgumentException(
-                        sprintf(
-                            'The class "%s" is not a compactor class.',
-                            $class
-                        )
-                    );
-                }
-
-                if ($compactor instanceof Php) {
-                    if (!empty($this->raw->annotations)) {
-                        $tokenizer = new Tokenizer();
-
-                        if (isset($this->raw->annotations->ignore)) {
-                            $tokenizer->ignore(
-                                (array) $this->raw->annotations->ignore
-                            );
-                        }
-
-                        $compactor->setTokenizer($tokenizer);
-                    }
-                }
-
-                $compactors[] = $compactor;
-            }
-        }
-
-        return $compactors;
-    }
-
-    /**
-     * Returns the Phar compression algorithm.
-     *
-     * @throws InvalidArgumentException if the algorithm is not valid
-     *
-     * @return int the compression algorithm
-     */
-    public function getCompressionAlgorithm()
-    {
-        if (isset($this->raw->compression)) {
-            if (is_string($this->raw->compression)) {
-                if (false === defined('Phar::'.$this->raw->compression)) {
-                    throw new InvalidArgumentException(
-                        sprintf(
-                            'The compression algorithm "%s" is not supported.',
-                            $this->raw->compression
-                        )
-                    );
-                }
-
-                $value = constant('Phar::'.$this->raw->compression);
-
-                // Phar::NONE is not valid for compressFiles()
-                if (Phar::NONE === $value) {
-                    return null;
-                }
-
-                return $value;
-            }
-
-            return $this->raw->compression;
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the list of relative directory paths.
-     *
-     * @return array the list of paths
-     */
-    public function getDirectories()
-    {
-        if (isset($this->raw->directories)) {
-            $directories = (array) $this->raw->directories;
-            $base = $this->getBasePath();
+        if (isset($raw->directories)) {
+            $directories = (array) $raw->directories;
 
             array_walk(
                 $directories,
-                function (&$directory) use ($base): void {
-                    $directory = $base
-                               .DIRECTORY_SEPARATOR
-                               .rtrim(Path::canonical($directory), DIRECTORY_SEPARATOR);
+                function (&$directory) use ($basePath): void {
+                    $directory = $basePath
+                        .DIRECTORY_SEPARATOR
+                        .rtrim(Path::canonical($directory), DIRECTORY_SEPARATOR);
                 }
             );
 
@@ -435,81 +697,64 @@ class Configuration
     }
 
     /**
-     * Returns the iterator for the directory paths.
+     * @param string[] $directories
+     * @param Closure  $blacklistFilter
      *
-     * @return Finder the iterator
+     * @return null|iterable|SplFileInfo[]
      */
-    public function getDirectoriesIterator()
+    private static function retrieveDirectoriesIterator(array $directories, Closure $blacklistFilter): ?iterable
     {
-        if ([] !== ($directories = $this->getDirectories())) {
+        if ([] !== $directories) {
             return Finder::create()
-                    ->files()
-                    ->filter($this->getBlacklistFilter())
-                    ->ignoreVCS(true)
-                    ->in($directories);
+                ->files()
+                ->filter($blacklistFilter)
+                ->ignoreVCS(true)
+                ->in($directories)
+            ;
         }
 
         return null;
     }
 
     /**
-     * Returns the file mode in octal form.
-     *
-     * @return int the file mode
+     * @return SplFileInfo[]
      */
-    public function getFileMode()
+    private static function retrieveFiles(stdClass $raw, string $basePath): array
     {
-        if (isset($this->raw->chmod)) {
-            return intval($this->raw->chmod, 8);
+        if (false === isset($raw->files)) {
+            return [];
         }
 
-        return null;
-    }
+        $files = [];
 
-    /**
-     * Returns the list of relative file paths.
-     *
-     * @throws RuntimeException if one of the files does not exist
-     *
-     * @return array the list of paths
-     */
-    public function getFiles()
-    {
-        if (isset($this->raw->files)) {
-            $base = $this->getBasePath();
-            $files = [];
+        foreach ((array) $raw->files as $file) {
+            $file = new SplFileInfo(
+                $path = $basePath.DIRECTORY_SEPARATOR.Path::canonical($file)
+            );
 
-            foreach ((array) $this->raw->files as $file) {
-                $file = new SplFileInfo(
-                    $path = $base.DIRECTORY_SEPARATOR.Path::canonical($file)
+            if (false === $file->isFile()) {
+                throw new InvalidArgumentException(
+                    sprintf(
+                        'The file "%s" does not exist or is not a file.',
+                        $path
+                    )
                 );
-
-                if (false === $file->isFile()) {
-                    throw new RuntimeException(
-                        sprintf(
-                            'The file "%s" does not exist or is not a file.',
-                            $path
-                        )
-                    );
-                }
-
-                $files[] = $file;
             }
 
-            return $files;
+            $files[] = $file;
         }
 
-        return [];
+        return $files;
     }
 
     /**
-     * Returns an iterator for the files.
+     * @param SplFileInfo[] $files
      *
-     * @return ArrayIterator the iterator
+     * @return null|iterable|SplFileInfo[]
      */
-    public function getFilesIterator()
+    private static function retrieveFilesIterator(array $files): ?iterable
     {
-        if ([] !== ($files = $this->getFiles())) {
+        if ([] !== $files) {
             return new ArrayIterator($files);
         }
 
@@ -517,683 +762,45 @@ class Configuration
     }
 
     /**
-     * Returns the list of configured Finder instances.
+     * @param stdClass $raw
+     * @param string   $basePath
+     * @param Closure  $blacklistFilter
      *
-     * @return Finder[] the list of Finders
+     * @return iterable[]|SplFileInfo[][]
      */
-    public function getFinders()
+    private static function retrieveFilesIterators(stdClass $raw, string $basePath, Closure $blacklistFilter): array
     {
-        if (isset($this->raw->finder)) {
-            return $this->processFinders($this->raw->finder);
-        }
-
-        return [];
-    }
-
-    public function getDatetimeFormat()
-    {
-        if (isset($this->raw->{'datetime_format'})) {
-            return $this->raw->{'datetime_format'};
-        }
-
-        return 'Y-m-d H:i:s';
-    }
-
-    /**
-     * Returns the Git tag name or short commit hash.
-     *
-     * @throws RuntimeException if the version could not be retrieved
-     *
-     * @return string the tag name or short commit hash
-     *
-     * @deprecated should be made private
-     */
-    public function getGitVersion(): string
-    {
-        try {
-            return $this->getGitTag();
-        } catch (RuntimeException $exception) {
-            try {
-                return $this->getGitHash(true);
-            } catch (RuntimeException $exception) {
-                throw new RuntimeException(
-                    sprintf(
-                        'The tag or commit hash could not be retrieved from "%s": %s',
-                        dirname($this->file),
-                        $exception->getMessage()
-                    ),
-                    0,
-                    $exception
-                );
-            }
-        }
-    }
-
-    /**
-     * Returns the processed contents of the main script file.
-     *
-     * @throws RuntimeException if the file could not be read
-     *
-     * @return string the contents
-     */
-    public function getMainScriptContents()
-    {
-        if (null !== ($path = $this->getMainScriptPath())) {
-            $path = $this->getBasePath().DIRECTORY_SEPARATOR.$path;
-
-            if (false === ($contents = @file_get_contents($path))) {
-                $errors = error_get_last();
-                if (null === $errors) {
-                    $errors = ['message' => 'failed to get contents of \''.$path.'\''];
-                }
-
-                throw new RuntimeException($errors['message']);
-            }
-
-            return preg_replace('/^#!.*\s*/', '', $contents);
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the main script file path.
-     *
-     * @return string the file path
-     */
-    public function getMainScriptPath(): ?string
-    {
-        if (isset($this->raw->main)) {
-            return Path::canonical($this->raw->main);
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the internal file path mapping.
-     *
-     * @return array the mapping
-     */
-    public function getMap()
-    {
-        if (isset($this->raw->map)) {
-            $map = [];
-
-            foreach ((array) $this->raw->map as $item) {
-                $processed = [];
-
-                foreach ($item as $match => $replace) {
-                    $processed[Path::canonical($match)] = Path::canonical($replace);
-                }
-
-                if (isset($processed['_empty_'])) {
-                    $processed[''] = $processed['_empty_'];
-
-                    unset($processed['_empty_']);
-                }
-
-                $map[] = $processed;
-            }
-
-            return $map;
+        if (isset($raw->finder)) {
+            return self::processFinders($raw->finder, $basePath, $blacklistFilter);
         }
 
         return [];
     }
 
     /**
-     * Returns a mapping callable for the configured map.
+     * @param array   $findersConfig   the configuration
+     * @param string  $basePath
+     * @param Closure $blacklistFilter
      *
-     * @return callable the mapping callable
+     * @return Finder[]
      */
-    public function getMapper()
+    private static function processFinders(array $findersConfig, string $basePath, Closure $blacklistFilter): array
     {
-        $map = $this->getMap();
-
-        return function ($path) use ($map) {
-            foreach ($map as $item) {
-                foreach ($item as $match => $replace) {
-                    if (empty($match)) {
-                        return $replace.$path;
-                    }
-                    if (0 === strpos($path, $match)) {
-                        return preg_replace(
-                            '/^'.preg_quote($match, '/').'/',
-                            $replace,
-                            $path
-                        );
-                    }
-                }
-            }
-
-            return null;
-        };
-    }
-
-    /**
-     * Returns the Phar metadata.
-     *
-     * @return mixed the metadata
-     */
-    public function getMetadata()
-    {
-        if (isset($this->raw->metadata)) {
-            if (is_object($this->raw->metadata)) {
-                return (array) $this->raw->metadata;
-            }
-
-            return $this->raw->metadata;
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the file extension MIME type mapping.
-     *
-     * @return array the mapping
-     */
-    public function getMimetypeMapping()
-    {
-        if (isset($this->raw->mimetypes)) {
-            return (array) $this->raw->mimetypes;
-        }
-
-        return [];
-    }
-
-    /**
-     * Returns the list of server variables to modify for execution.
-     *
-     * @return array the list of variables
-     */
-    public function getMungVariables()
-    {
-        if (isset($this->raw->mung)) {
-            return (array) $this->raw->mung;
-        }
-
-        return [];
-    }
-
-    /**
-     * Returns the file path to the script to execute when a file is not found.
-     *
-     * @return string the file path
-     */
-    public function getNotFoundScriptPath()
-    {
-        if (isset($this->raw->{'not-found'})) {
-            return $this->raw->{'not-found'};
-        }
-
-        return null;
-    }
-
-    public function getOutputPath(): string
-    {
-        if (null !== $this->_outputPath) {
-            return $this->_outputPath;
-        }
-
-        $base = getcwd().DIRECTORY_SEPARATOR;
-
-        if (isset($this->raw->output)) {
-            $path = $this->raw->output;
-
-            if (false === Path::isAbsolute($path)) {
-                $path = Path::canonical($base.$path);
-            }
-        } else {
-            $path = $base.'default.phar';
-        }
-
-        if (false !== strpos($path, '@'.'git-version@')) {
-            $path = str_replace('@'.'git-version@', $this->getGitVersion(), $path);
-        }
-
-        $this->_outputPath = $path;
-
-        return $path;
-    }
-
-    /**
-     * Returns the private key passphrase.
-     *
-     * @return string the passphrase
-     */
-    public function getPrivateKeyPassphrase()
-    {
-        if (isset($this->raw->{'key-pass'})
-            && is_string($this->raw->{'key-pass'})) {
-            return $this->raw->{'key-pass'};
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the private key file path.
-     *
-     * @return string the file path
-     */
-    public function getPrivateKeyPath()
-    {
-        if (isset($this->raw->key)) {
-            return $this->raw->key;
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the processed list of replacement placeholders and their values.
-     *
-     * @return array the list of replacements
-     */
-    public function getProcessedReplacements()
-    {
-        if (null !== $this->_replacements) {
-            return $this->_replacements;
-        }
-
-        $values = $this->getReplacements();
-
-        if (null !== ($git = $this->getGitHashPlaceholder())) {
-            $values[$git] = $this->getGitHash();
-        }
-
-        if (null !== ($git = $this->getGitShortHashPlaceholder())) {
-            $values[$git] = $this->getGitHash(true);
-        }
-
-        if (null !== ($git = $this->getGitTagPlaceholder())) {
-            $values[$git] = $this->getGitTag();
-        }
-
-        if (null !== ($git = $this->getGitVersionPlaceholder())) {
-            $values[$git] = $this->getGitVersion();
-        }
-
-        if (null !== ($date = $this->getDatetimeNowPlaceHolder())) {
-            $values[$date] = $this->getDatetimeNow($this->getDatetimeFormat());
-        }
-
-        $sigil = $this->getReplacementSigil();
-
-        foreach ($values as $key => $value) {
-            unset($values[$key]);
-
-            $values["$sigil$key$sigil"] = $value;
-        }
-
-        $this->_replacements = $values;
-
-        return $this->_replacements;
-    }
-
-    /**
-     * Returns the list of replacement placeholders and their values.
-     *
-     * @return array the list of replacements
-     */
-    public function getReplacements()
-    {
-        if (isset($this->raw->replacements)) {
-            return (array) $this->raw->replacements;
-        }
-
-        return [];
-    }
-
-    /**
-     * Returns the shebang line.
-     *
-     * @throws InvalidArgumentException if the shebang line is no valid
-     *
-     * @return string the shebang line
-     */
-    public function getShebang()
-    {
-        if (isset($this->raw->shebang)) {
-            if (('' === $this->raw->shebang) || (false === $this->raw->shebang)) {
-                return '';
-            }
-
-            $shebang = trim($this->raw->shebang);
-
-            if ('#!' !== substr($shebang, 0, 2)) {
-                throw new InvalidArgumentException(
-                    sprintf(
-                        'The shebang line must start with "#!": %s',
-                        $shebang
-                    )
-                );
-            }
-
-            return $shebang;
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the Phar signing algorithm.
-     *
-     * @throws InvalidArgumentException if the algorithm is not valid
-     *
-     * @return int the signing algorithm
-     */
-    public function getSigningAlgorithm()
-    {
-        if (isset($this->raw->algorithm)) {
-            if (is_string($this->raw->algorithm)) {
-                if (false === defined('Phar::'.$this->raw->algorithm)) {
-                    throw new InvalidArgumentException(
-                        sprintf(
-                            'The signing algorithm "%s" is not supported.',
-                            $this->raw->algorithm
-                        )
-                    );
-                }
-
-                return constant('Phar::'.$this->raw->algorithm);
-            }
-
-            return $this->raw->algorithm;
-        }
-
-        return Phar::SHA1;
-    }
-
-    /**
-     * Returns the stub banner comment.
-     *
-     * @return string the stub banner comment
-     */
-    public function getStubBanner()
-    {
-        if (isset($this->raw->{'banner'})) {
-            return $this->raw->{'banner'};
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the stub banner comment from the file.
-     *
-     * @throws RuntimeException if the comment file could not be read
-     *
-     * @return string the stub banner comment
-     */
-    public function getStubBannerFromFile()
-    {
-        if (null !== ($path = $this->getStubBannerPath())) {
-            $path = $this->getBasePath().DIRECTORY_SEPARATOR.$path;
-
-            if (false === ($contents = @file_get_contents($path))) {
-                $errors = error_get_last();
-                if (null === $errors) {
-                    $errors = ['message' => 'failed to get contents of \''.$path.'\''];
-                }
-
-                throw new RuntimeException($errors['message']);
-            }
-
-            return $contents;
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the path to the stub banner comment file.
-     *
-     * @return string the stub header comment file path
-     */
-    public function getStubBannerPath()
-    {
-        if (isset($this->raw->{'banner-file'})) {
-            return Path::canonical($this->raw->{'banner-file'});
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the Phar stub file path.
-     *
-     * @return string the file path
-     */
-    public function getStubPath()
-    {
-        if (isset($this->raw->stub) && is_string($this->raw->stub)) {
-            return $this->raw->stub;
-        }
-
-        return null;
-    }
-
-    /**
-     * Checks if StubGenerator->extract() should be used.
-     *
-     * @return bool TRUE if it should be used, FALSE if not
-     */
-    public function isExtractable()
-    {
-        if (isset($this->raw->extract)) {
-            return $this->raw->extract;
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks if Phar::interceptFileFuncs() should be used.
-     *
-     * @return bool TRUE if it should be used, FALSE if not
-     */
-    public function isInterceptFileFuncs()
-    {
-        if (isset($this->raw->intercept)) {
-            return $this->raw->intercept;
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks if the user should be prompted for the private key passphrase.
-     *
-     * @return bool TRUE if they should be prompted, FALSE if not
-     */
-    public function isPrivateKeyPrompt()
-    {
-        if (isset($this->raw->{'key-pass'})
-            && (true === $this->raw->{'key-pass'})) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks if the Phar stub should be generated.
-     *
-     * @return bool TRUE if it should be generated, FALSE if not
-     */
-    public function isStubGenerated()
-    {
-        if (isset($this->raw->stub) && (true === $this->raw->stub)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks if the Phar is going to be used for the web.
-     *
-     * @return bool TRUE if it will be, FALSE if not
-     */
-    public function isWebPhar()
-    {
-        if (isset($this->raw->web)) {
-            return $this->raw->web;
-        }
-
-        return false;
-    }
-
-    private function getDatetimeNow($format)
-    {
-        $now = new DateTimeImmutable('now');
-        $datetime = $now->format($format);
-
-        if (!$datetime) {
-            throw new RuntimeException("'$format' is not a valid PHP date format");
-        }
-
-        return $datetime;
-    }
-
-    private function getDatetimeNowPlaceHolder()
-    {
-        if (isset($this->raw->{'datetime'})) {
-            return $this->raw->{'datetime'};
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the Git commit hash.
-     *
-     * @param bool $short Use the short version?
-     *
-     * @return string the commit hash
-     */
-    private function getGitHash($short = false): string
-    {
-        return $this->runGitCommand(
-            sprintf(
-                'git log --pretty="%s" -n1 HEAD',
-                $short ? '%h' : '%H'
-            )
-        );
-    }
-
-    /**
-     * Returns the Git commit hash placeholder.
-     *
-     * @return string the placeholder
-     */
-    private function getGitShortHashPlaceholder(): ?string
-    {
-        if (isset($this->raw->{'git-commit-short'})) {
-            return $this->raw->{'git-commit-short'};
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the Git commit hash placeholder.
-     *
-     * @return string the placeholder
-     */
-    private function getGitHashPlaceholder(): ?string
-    {
-        if (isset($this->raw->{'git-commit'})) {
-            return $this->raw->{'git-commit'};
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the most recent Git tag.
-     *
-     * @return string the tag
-     */
-    private function getGitTag(): string
-    {
-        return $this->runGitCommand('git describe --tags HEAD');
-    }
-
-    /**
-     * Returns the Git tag placeholder.
-     *
-     * @return string the placeholder
-     */
-    private function getGitTagPlaceholder(): ?string
-    {
-        if (isset($this->raw->{'git-tag'})) {
-            return $this->raw->{'git-tag'};
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the Git version placeholder.
-     *
-     * @return string the placeholder
-     */
-    private function getGitVersionPlaceholder(): ?string
-    {
-        if (isset($this->raw->{'git-version'})) {
-            return $this->raw->{'git-version'};
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the replacement placeholder sigil.
-     *
-     * @return string the placeholder sigil
-     */
-    private function getReplacementSigil(): string
-    {
-        if (isset($this->raw->{'replacement-sigil'})) {
-            return $this->raw->{'replacement-sigil'};
-        }
-
-        return '@';
-    }
-
-    /**
-     * Processes the Finders configuration list.
-     *
-     * @param array $config the configuration
-     *
-     * @throws InvalidArgumentException if the configured method does not exist
-     *
-     * @return Finder[] the list of Finders
-     */
-    private function processFinders(array $config)
-    {
-        $finders = [];
-        $filter = $this->getBlacklistFilter();
-
-        foreach ($config as $methods) {
+        $processFinderConfig = function ($methods) use ($basePath, $blacklistFilter): Finder {
             $finder = Finder::create()
-                        ->files()
-                        ->filter($filter)
-                        ->ignoreVCS(true);
+                ->files()
+                ->filter($blacklistFilter)
+                ->ignoreVCS(true)
+            ;
 
             if (isset($methods->in)) {
-                $base = $this->getBasePath();
                 $methods->in = (array) $methods->in;
 
                 array_walk(
                     $methods->in,
-                    function (&$directory) use ($base): void {
+                    function (&$directory) use ($basePath): void {
                         $directory = Path::canonical(
-                            $base.DIRECTORY_SEPARATOR.$directory
+                            $basePath.DIRECTORY_SEPARATOR.$directory
                         );
                     }
                 );
@@ -1216,10 +823,604 @@ class Configuration
                 }
             }
 
-            $finders[] = $finder;
+            return $finder;
+        };
+
+        return array_map($processFinderConfig, $findersConfig);
+    }
+
+    private static function retrieveBootstrapFile(stdClass $raw, string $basePath): ?string
+    {
+        if (false === isset($raw->bootstrap)) {
+            return null;
         }
 
-        return $finders;
+        $file = $raw->bootstrap;
+
+        if (false === Path::isAbsolute($file)) {
+            $file = Path::canonical(
+                $basePath.DIRECTORY_SEPARATOR.$file
+            );
+        }
+
+        if (false === file_exists($file)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'The bootstrap path "%s" is not a file or does not exist.',
+                    $file
+                )
+            );
+        }
+
+        return $file;
+    }
+
+    /**
+     * @return CompactorInterface[]
+     */
+    private static function retrieveCompactors(stdClass $raw): array
+    {
+        if (false === isset($raw->compactors)) {
+            return [];
+        }
+
+        $compactors = [];
+
+        foreach ((array) $raw->compactors as $class) {
+            if (false === class_exists($class)) {
+                throw new InvalidArgumentException(
+                    sprintf(
+                        'The compactor class "%s" does not exist.',
+                        $class
+                    )
+                );
+            }
+
+            $compactor = new $class();
+
+            if (false === ($compactor instanceof CompactorInterface)) {
+                throw new InvalidArgumentException(
+                    sprintf(
+                        'The class "%s" is not a compactor class.',
+                        $class
+                    )
+                );
+            }
+
+            if ($compactor instanceof Php) {
+                if (false === empty($raw->annotations)) {
+                    $tokenizer = new Tokenizer();
+
+                    if (isset($raw->annotations->ignore)) {
+                        $tokenizer->ignore(
+                            (array) $raw->annotations->ignore
+                        );
+                    }
+
+                    $compactor->setTokenizer($tokenizer);
+                }
+            }
+
+            $compactors[] = $compactor;
+        }
+
+        return $compactors;
+    }
+
+    private static function retrieveCompressionAlgorithm(stdClass $raw): ?int
+    {
+        if (false === isset($raw->compression)) {
+            return null;
+        }
+
+        if (false === is_string($raw->compression)) {
+            return $raw->compression;
+        }
+
+        if (false === defined('Phar::'.$raw->compression)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'The compression algorithm "%s" is not supported.',
+                    $raw->compression
+                )
+            );
+        }
+
+        $value = constant('Phar::'.$raw->compression);
+
+        // Phar::NONE is not valid for compressFiles()
+        if (Phar::NONE === $value) {
+            return null;
+        }
+
+        return $value;
+    }
+
+    private static function retrieveFileMode(stdClass $raw): ?int
+    {
+        if (isset($raw->chmod)) {
+            return intval($raw->chmod, 8);
+        }
+
+        return null;
+    }
+
+    private static function retrieveMainScriptPath(stdClass $raw): ?string
+    {
+        if (isset($raw->main)) {
+            return Path::canonical($raw->main);
+        }
+
+        return null;
+    }
+
+    private static function retrieveMainScriptContents(?string $mainScriptPath, string $basePath): ?string
+    {
+        if (null === $mainScriptPath) {
+            return null;
+        }
+        $mainScriptPath = $basePath.DIRECTORY_SEPARATOR.$mainScriptPath;
+
+        if (false === ($contents = @file_get_contents($mainScriptPath))) {
+            $errors = error_get_last();
+
+            if (null === $errors) {
+                $errors = ['message' => 'Failed to get contents of "'.$mainScriptPath.'""'];
+            }
+
+            throw new InvalidArgumentException($errors['message']);
+        }
+
+        return preg_replace('/^#!.*\s*/', '', $contents);
+    }
+
+    /**
+     * @return string[]
+     */
+    private static function retrieveMap(stdClass $raw): array
+    {
+        if (false === isset($raw->map)) {
+            return [];
+        }
+
+        $map = [];
+
+        foreach ((array) $raw->map as $item) {
+            $processed = [];
+
+            foreach ($item as $match => $replace) {
+                $processed[Path::canonical($match)] = Path::canonical($replace);
+            }
+
+            if (isset($processed['_empty_'])) {
+                $processed[''] = $processed['_empty_'];
+
+                unset($processed['_empty_']);
+            }
+
+            $map[] = $processed;
+        }
+
+        return $map;
+    }
+
+    private static function retrieveMapper(array $map): Closure
+    {
+        return function (string $path) use ($map): ?string {
+            foreach ($map as $item) {
+                foreach ($item as $match => $replace) {
+                    if (empty($match)) {
+                        return $replace.$path;
+                    }
+
+                    if (0 === strpos($path, $match)) {
+                        return preg_replace(
+                            '/^'.preg_quote($match, '/').'/',
+                            $replace,
+                            $path
+                        );
+                    }
+                }
+            }
+
+            return null;
+        };
+    }
+
+    /**
+     * @return mixed
+     */
+    private static function retrieveMetadata(stdClass $raw)
+    {
+        if (isset($raw->metadata)) {
+            if (is_object($raw->metadata)) {
+                return (array) $raw->metadata;
+            }
+
+            return $raw->metadata;
+        }
+
+        return null;
+    }
+
+    private static function retrieveMimetypeMapping(stdClass $raw): array
+    {
+        if (isset($raw->mimetypes)) {
+            return (array) $raw->mimetypes;
+        }
+
+        return [];
+    }
+
+    private static function retrieveMungVariables(stdClass $raw): array
+    {
+        if (isset($raw->mung)) {
+            return (array) $raw->mung;
+        }
+
+        return [];
+    }
+
+    private static function retrieveNotFoundScriptPath(stdClass $raw): ?string
+    {
+        if (isset($raw->{'not-found'})) {
+            return $raw->{'not-found'};
+        }
+
+        return null;
+    }
+
+    private static function retrieveOutputPath(stdClass $raw, string $file): string
+    {
+        $base = getcwd().DIRECTORY_SEPARATOR;
+
+        if (isset($raw->output)) {
+            $path = $raw->output;
+
+            if (false === Path::isAbsolute($path)) {
+                $path = Path::canonical($base.$path);
+            }
+        } else {
+            $path = $base.self::DEFAULT_ALIAS;
+        }
+
+        if (false !== strpos($path, '@'.'git-version@')) {
+            $gitVersion = self::retrieveGitVersion($file);
+
+            $path = str_replace('@'.'git-version@', $gitVersion, $path);
+        }
+
+        return $path;
+    }
+
+    private static function retrievePrivateKeyPassphrase(stdClass $raw): ?string
+    {
+        if (isset($raw->{'key-pass'})
+            && is_string($raw->{'key-pass'})
+        ) {
+            return $raw->{'key-pass'};
+        }
+
+        return null;
+    }
+
+    private static function retrievePrivateKeyPath(stdClass $raw): ?string
+    {
+        if (isset($raw->key)) {
+            return $raw->key;
+        }
+
+        return null;
+    }
+
+    private static function retrieveReplacements(stdClass $raw): array
+    {
+        if (isset($raw->replacements)) {
+            return (array) $raw->replacements;
+        }
+
+        return [];
+    }
+
+    private static function retrieveProcessedReplacements(
+        array $replacements,
+        stdClass $raw,
+        string $file
+    ): array {
+        if (null !== ($git = self::retrieveGitHashPlaceholder($raw))) {
+            $replacements[$git] = self::retrieveGitHash($file);
+        }
+
+        if (null !== ($git = self::retrieveGitShortHashPlaceholder($raw))) {
+            $replacements[$git] = self::retrieveGitHash($file, true);
+        }
+
+        if (null !== ($git = self::retrieveGitTagPlaceholder($raw))) {
+            $replacements[$git] = self::retrieveGitTag($file);
+        }
+
+        if (null !== ($git = self::retrieveGitVersionPlaceholder($raw))) {
+            $replacements[$git] = self::retrieveGitVersion($file);
+        }
+
+        if (null !== ($date = self::retrieveDatetimeNowPlaceHolder($raw))) {
+            $replacements[$date] = self::retrieveDatetimeNow(
+                self::retrieveDatetimeFormat($raw)
+            );
+        }
+
+        $sigil = self::retrieveReplacementSigil($raw);
+
+        foreach ($replacements as $key => $value) {
+            unset($replacements[$key]);
+            $replacements["$sigil$key$sigil"] = $value;
+        }
+
+        return $replacements;
+    }
+
+    private static function retrieveGitHashPlaceholder(stdClass $raw): ?string
+    {
+        if (isset($raw->{'git-commit'})) {
+            return $raw->{'git-commit'};
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $file
+     * @param bool   $short Use the short version
+     *
+     * @return string the commit hash
+     */
+    private static function retrieveGitHash(string $file, bool $short = false): string
+    {
+        return self::runGitCommand(
+            sprintf(
+                'git log --pretty="%s" -n1 HEAD',
+                $short ? '%h' : '%H'
+            ),
+            $file
+        );
+    }
+
+    private static function retrieveGitShortHashPlaceholder(stdClass $raw): ?string
+    {
+        if (isset($raw->{'git-commit-short'})) {
+            return $raw->{'git-commit-short'};
+        }
+
+        return null;
+    }
+
+    private static function retrieveGitTagPlaceholder(stdClass $raw): ?string
+    {
+        if (isset($raw->{'git-tag'})) {
+            return $raw->{'git-tag'};
+        }
+
+        return null;
+    }
+
+    private static function retrieveGitTag(string $file): ?string
+    {
+        return self::runGitCommand('git describe --tags HEAD', $file);
+    }
+
+    private static function retrieveGitVersionPlaceholder(stdClass $raw): ?string
+    {
+        if (isset($raw->{'git-version'})) {
+            return $raw->{'git-version'};
+        }
+
+        return null;
+    }
+
+    private static function retrieveGitVersion(string $file): ?string
+    {
+        try {
+            return self::retrieveGitTag($file);
+        } catch (RuntimeException $exception) {
+            try {
+                return self::retrieveGitHash($file, true);
+            } catch (RuntimeException $exception) {
+                throw new RuntimeException(
+                    sprintf(
+                        'The tag or commit hash could not be retrieved from "%s": %s',
+                        dirname($file),
+                        $exception->getMessage()
+                    ),
+                    0,
+                    $exception
+                );
+            }
+        }
+    }
+
+    private static function retrieveDatetimeNowPlaceHolder(stdClass $raw): ?string
+    {
+        if (isset($raw->{'datetime'})) {
+            return $raw->{'datetime'};
+        }
+
+        return null;
+    }
+
+    private static function retrieveDatetimeNow(string $format)
+    {
+        $now = new DateTimeImmutable('now');
+
+        $datetime = $now->format($format);
+
+        if (!$datetime) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    '""%s" is not a valid PHP date format',
+                    $format
+                )
+            );
+        }
+
+        return $datetime;
+    }
+
+    private static function retrieveDatetimeFormat(stdClass $raw): string
+    {
+        if (isset($raw->{'datetime_format'})) {
+            return $raw->{'datetime_format'};
+        }
+
+        return self::DEFAULT_DATETIME_FORMAT;
+    }
+
+    private static function retrieveReplacementSigil(stdClass $raw)
+    {
+        if (isset($raw->{'replacement-sigil'})) {
+            return $raw->{'replacement-sigil'};
+        }
+
+        return self::DEFAULT_REPLACEMENT_SIGIL;
+    }
+
+    private static function retrieveShebang(stdClass $raw): ?string
+    {
+        if (false === isset($raw->shebang)) {
+            return null;
+        }
+
+        if (('' === $raw->shebang) || (false === $raw->shebang)) {
+            return '';
+        }
+
+        $shebang = trim($raw->shebang);
+
+        if ('#!' !== substr($shebang, 0, 2)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'The shebang line must start with "#!": %s',
+                    $shebang
+                )
+            );
+        }
+
+        return $shebang;
+    }
+
+    private static function retrieveSigningAlgorithm(stdClass $raw): int
+    {
+        if (false === isset($raw->algorithm)) {
+            return Phar::SHA1;
+        }
+
+        if (is_string($raw->algorithm)) {
+            if (false === defined('Phar::'.$raw->algorithm)) {
+                throw new InvalidArgumentException(
+                    sprintf(
+                        'The signing algorithm "%s" is not supported.',
+                        $raw->algorithm
+                    )
+                );
+            }
+
+            return constant('Phar::'.$raw->algorithm);
+        }
+
+        return $raw->algorithm;
+    }
+
+    private static function retrieveStubBanner(stdClass $raw): ?string
+    {
+        if (isset($raw->{'banner'})) {
+            return $raw->{'banner'};
+        }
+
+        return null;
+    }
+
+    private static function retrieveStubBannerPath(stdClass $raw): ?string
+    {
+        if (isset($raw->{'banner-file'})) {
+            return Path::canonical($raw->{'banner-file'});
+        }
+
+        return null;
+    }
+
+    private static function retrieveStubBannerFromFile(string $basePath, ?string $stubBannerPath): ?string
+    {
+        if (null == $stubBannerPath) {
+            return null;
+        }
+
+        $stubBannerPath = $basePath.DIRECTORY_SEPARATOR.$stubBannerPath;
+
+        if (false === ($contents = @file_get_contents($stubBannerPath))) {
+            $errors = error_get_last();
+
+            if (null === $errors) {
+                $errors = ['message' => 'failed to get contents of "'.$stubBannerPath.'""'];
+            }
+
+            throw new InvalidArgumentException($errors['message']);
+        }
+
+        return $contents;
+    }
+
+    private static function retrieveStubPath(stdClass $raw): ?string
+    {
+        if (isset($raw->stub) && is_string($raw->stub)) {
+            return $raw->stub;
+        }
+
+        return null;
+    }
+
+    private static function retrieveIsExtractable(stdClass $raw): bool
+    {
+        if (isset($raw->extract)) {
+            return $raw->extract;
+        }
+
+        return false;
+    }
+
+    private static function retrieveIsInterceptFileFuncs(stdClass $raw): bool
+    {
+        if (isset($raw->intercept)) {
+            return $raw->intercept;
+        }
+
+        return false;
+    }
+
+    private static function retrieveIsPrivateKeyPrompt(stdClass $raw): bool
+    {
+        if (isset($raw->{'key-pass'})
+            && (true === $raw->{'key-pass'})) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static function retrieveIsStubGenerated(stdClass $raw): bool
+    {
+        if (isset($raw->stub) && (true === $raw->stub)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static function retrieveIsWebPhar(stdClass $raw): bool
+    {
+        if (isset($raw->web)) {
+            return $raw->web;
+        }
+
+        return false;
     }
 
     /**
@@ -1227,13 +1428,12 @@ class Configuration
      *
      * @param string $command the command
      *
-     * @throws RuntimeException if the command failed
-     *
      * @return string the trimmed output from the command
      */
-    private function runGitCommand($command)
+    private static function runGitCommand(string $command, string $file): string
     {
-        $path = dirname($this->file);
+        $path = dirname($file);
+
         $process = new Process($command, $path);
 
         if (0 === $process->run()) {

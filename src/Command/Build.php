@@ -26,7 +26,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Filesystem;
-use Traversable;
 
 final class Build extends Configurable
 {
@@ -584,7 +583,7 @@ HELP
 
     private function addFiles(Configuration $config, Box $box, BuildLogger $logger): void
     {
-        if ([] !== ($iterators = $config->getFinders())) {
+        if ([] !== ($iterators = $config->getFilesIterators())) {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
                 'Adding finder files.',
@@ -596,7 +595,7 @@ HELP
             }
         }
 
-        if ([] !== ($iterators = $config->getBinaryFinders())) {
+        if ([] !== ($iterators = $config->getBinaryIterators())) {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
                 'Adding binary finder files.',
@@ -677,7 +676,7 @@ HELP
 
         $box->addFromString(
             $main,
-            $config->getMainScriptContents()
+            $config->getMainScriptContent()
         );
 
         return $main;
@@ -817,17 +816,17 @@ HELP
     /**
      * Adds files using an iterator.
      *
-     * @param Configuration $config
-     * @param Box           $box
-     * @param Traversable   $iterator the iterator
-     * @param string        $message  the message to announce
-     * @param bool          $binary   Should the adding be binary-safe?
-     * @param BuildLogger   $logger
+     * @param Configuration          $config
+     * @param Box                    $box
+     * @param iterable|SplFileInfo[] $iterator the iterator
+     * @param string                 $message  the message to announce
+     * @param bool                   $binary   Should the adding be binary-safe?
+     * @param BuildLogger            $logger
      */
     private function addFilesToBox(
         Configuration $config,
         Box $box,
-        ?Traversable $iterator,
+        ?iterable $iterator,
         ?string $message,
         bool $binary,
         BuildLogger $logger
@@ -843,7 +842,6 @@ HELP
         }
 
         $box = $binary ? $box->getPhar() : $box;
-        $baseRegex = $config->getBasePathRegex();
         $mapper = $config->getMapper();
 
         foreach ($iterator as $file) {
@@ -854,11 +852,7 @@ HELP
                 gc_collect_cycles();
             }
 
-            $relativePath = preg_replace(
-                $baseRegex,
-                '',
-                $file->getPathname()
-            );
+            $relativePath = $config->retrieveRelativeBasePath($file->getPathname());
 
             $mapped = $mapper($relativePath);
 

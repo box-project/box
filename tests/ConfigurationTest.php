@@ -15,12 +15,13 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Herrera\Annotations\Tokenizer;
+use Herrera\Box\Compactor\Php;
 use Herrera\PHPUnit\TestCase;
+use InvalidArgumentException;
 use Phar;
-use SplFileInfo;
 
 /**
- * @coversNothing
+ * @covers \KevinGH\Box\Configuration
  */
 class ConfigurationTest extends TestCase
 {
@@ -29,21 +30,41 @@ class ConfigurationTest extends TestCase
      */
     private $config;
 
+    /**
+     * @var string
+     */
     private $cwd;
-    private $dir;
+
+    /**
+     * @var string
+     */
+    private $tmp;
+
+    /**
+     * @var string
+     */
     private $file;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp(): void
     {
         $this->cwd = getcwd();
-        $this->dir = $this->createDir();
-        $this->file = $this->dir.DIRECTORY_SEPARATOR.'box.json';
-        $this->config = new Configuration($this->file, (object) []);
+        $this->tmp = $this->createDir();
 
-        chdir($this->dir);
+        $this->file = $this->tmp.DIRECTORY_SEPARATOR.'box.json';
+
+        chdir($this->tmp);
+
+        $this->config = Configuration::create($this->file, (object) []);
+
         touch($this->file);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function tearDown(): void
     {
         chdir($this->cwd);
@@ -51,91 +72,73 @@ class ConfigurationTest extends TestCase
         parent::tearDown();
     }
 
-    public function testGetAlias(): void
+    public function test_get_the_alias(): void
     {
         $this->assertSame('default.phar', $this->config->getAlias());
     }
 
-    public function testGetAliasSet(): void
+    public function test_configure_the_alias(): void
     {
         $this->setConfig(['alias' => 'test.phar']);
 
         $this->assertSame('test.phar', $this->config->getAlias());
     }
 
-    public function testGetBasePath(): void
+    public function test_get_the_base_path(): void
     {
-        $this->assertSame($this->dir, $this->config->getBasePath());
+        $this->assertSame($this->tmp, $this->config->getBasePath());
     }
 
-    public function testGetBasePathSet(): void
+    public function test_configure_the_base_path(): void
     {
-        mkdir($this->dir.DIRECTORY_SEPARATOR.'test');
+        mkdir($this->tmp.DIRECTORY_SEPARATOR.'test');
 
         $this->setConfig(
             [
-                'base-path' => $this->dir.DIRECTORY_SEPARATOR.'test',
+                'base-path' => $this->tmp.DIRECTORY_SEPARATOR.'test',
             ]
         );
 
         $this->assertSame(
-            $this->dir.DIRECTORY_SEPARATOR.'test',
+            $this->tmp.DIRECTORY_SEPARATOR.'test',
             $this->config->getBasePath()
         );
     }
 
-    public function testGetBasePathNotExist(): void
+    public function test_it_cannot_get_a_non_existent_base_path(): void
     {
-        $this->setConfig(
-            [
-                'base-path' => $this->dir.DIRECTORY_SEPARATOR.'test',
-            ]
-        );
+        try {
+            $this->setConfig(
+                [
+                    'base-path' => $this->tmp.DIRECTORY_SEPARATOR.'test',
+                ]
+            );
 
-        $this->expectException(
-            'InvalidArgumentException'
-        );
-        $this->expectExceptionMessage(
-            'The base path "'.$this->dir.DIRECTORY_SEPARATOR.'test" is not a directory or does not exist.'
-        );
-
-        $this->config->getBasePath();
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'The base path "'.$this->tmp.DIRECTORY_SEPARATOR.'test" is not a directory or does not exist.',
+                $exception->getMessage()
+            );
+        }
     }
 
-    /**
-     * @depends testGetBasePath
-     */
-    public function testGetBasePathRegex(): void
+    public function test_it_can_provide_the_relative_path_relative_to_the_config_base_path(): void
     {
-        $this->assertSame(
-            '/'.preg_quote($this->config->getBasePath().DIRECTORY_SEPARATOR, '/').'/',
-            $this->config->getBasePathRegex()
-        );
+        $fullPath = $this->config->getBasePath().DIRECTORY_SEPARATOR.'test';
+
+        $expected = 'test';
+        $actual = $this->config->retrieveRelativeBasePath($fullPath);
+
+        $this->assertSame($expected, $actual);
     }
 
-    public function testGetBinaryDirectories(): void
-    {
-        $this->assertSame([], $this->config->getBinaryDirectories());
-    }
-
-    public function testGetBinaryDirectoriesSet(): void
-    {
-        mkdir($this->dir.DIRECTORY_SEPARATOR.'test');
-
-        $this->setConfig(['directories-bin' => 'test']);
-
-        $this->assertSame(
-            [$this->dir.DIRECTORY_SEPARATOR.'test'],
-            $this->config->getBinaryDirectories()
-        );
-    }
-
-    public function testGetBinaryDirectoriesIterator(): void
+    public function test_get_the_binary_directory_iterator(): void
     {
         $this->assertNull($this->config->getBinaryDirectoriesIterator());
     }
 
-    public function testGetBinaryDirectoriesIteratorSet(): void
+    public function test_configure_the_binary_directory_iterator(): void
     {
         mkdir('alpha');
         touch('alpha/beta.png');
@@ -148,54 +151,33 @@ class ConfigurationTest extends TestCase
             ]
         );
 
-        $iterator = $this->config
-                         ->getBinaryDirectoriesIterator()
-                         ->getIterator();
+        $iterator = $this->config->getBinaryDirectoriesIterator();
 
         foreach ($iterator as $file) {
-            // @var $file SplFileInfo
             $this->assertSame('gamma.png', $file->getBasename());
         }
     }
 
-    public function testGetBinaryFiles(): void
-    {
-        $this->assertSame([], $this->config->getBinaryFiles());
-    }
-
-    public function testGetBinaryFilesSet(): void
-    {
-        mkdir($this->dir.DIRECTORY_SEPARATOR.'test');
-
-        $this->setConfig(['files-bin' => 'test.png']);
-
-        foreach ($this->config->getBinaryFiles() as $file) {
-            // @var $file SplFileInfo
-            $this->assertSame('test.png', $file->getBasename());
-        }
-    }
-
-    public function testGetBinaryFilesIterator(): void
+    public function test_get_binary_files_iterator(): void
     {
         $this->assertNull($this->config->getBinaryFilesIterator());
     }
 
-    public function testGetBinaryFilesIteratorSet(): void
+    public function test_configure_binary_files_iterator(): void
     {
         $this->setConfig(['files-bin' => 'test.png']);
 
         foreach ($this->config->getBinaryFilesIterator() as $file) {
-            // @var $file SplFileInfo
             $this->assertSame('test.png', $file->getBasename());
         }
     }
 
-    public function testGetBinaryFinders(): void
+    public function test_get_binary_iterators(): void
     {
-        $this->assertSame([], $this->config->getBinaryFinders());
+        $this->assertSame([], $this->config->getBinaryIterators());
     }
 
-    public function testGetBinaryFindersSet(): void
+    public function test_configure_binary_iterators(): void
     {
         touch('bad.jpg');
         touch('test.jpg');
@@ -218,9 +200,8 @@ class ConfigurationTest extends TestCase
             ]
         );
 
-        /** @var $results \SplFileInfo[] */
         $results = [];
-        $finders = $this->config->getBinaryFinders();
+        $finders = $this->config->getBinaryIterators();
 
         foreach ($finders as $finder) {
             foreach ($finder as $result) {
@@ -232,112 +213,77 @@ class ConfigurationTest extends TestCase
         $this->assertSame('test.jpg', $results[1]->getBasename());
     }
 
-    public function testGetBlacklist(): void
-    {
-        $this->assertSame([], $this->config->getBlacklist());
-    }
-
-    public function testGetBlacklistSet(): void
-    {
-        $this->setConfig(['blacklist' => ['test']]);
-
-        $this->assertSame(['test'], $this->config->getBlacklist());
-    }
-
-    public function testGetBlacklistFilter(): void
-    {
-        mkdir('sub');
-        touch('alpha.php');
-        touch('beta.php');
-        touch('sub/beta.php');
-
-        $alpha = new SplFileInfo('alpha.php');
-        $beta = new SplFileInfo('beta.php');
-        $sub = new SplFileInfo('sub/alpha.php');
-
-        $this->setConfig(['blacklist' => 'beta.php']);
-
-        $callable = $this->config->getBlacklistFilter();
-
-        $this->assertNull($callable($alpha));
-        $this->assertFalse($callable($beta));
-        $this->assertNull($callable($sub));
-    }
-
-    public function testGetBootstrapFile(): void
+    public function test_get_the_bootstrap_file(): void
     {
         $this->assertNull($this->config->getBootstrapFile());
     }
 
-    public function testGetBootstrapFileSet(): void
+    public function test_configure_the_bootstrap_file(): void
     {
+        touch('test.php');
+
         $this->setconfig(['bootstrap' => 'test.php']);
 
         $this->assertSame(
-            $this->dir.DIRECTORY_SEPARATOR.'test.php',
+            $this->tmp.DIRECTORY_SEPARATOR.'test.php',
             $this->config->getBootstrapFile()
         );
     }
 
-    public function testGetCompactors(): void
+    public function test_get_the_compactors(): void
     {
         $this->assertSame([], $this->config->getCompactors());
     }
 
-    public function testGetCompactorsSet(): void
+    public function test_configure_the_compactors(): void
     {
         $this->setConfig(
             [
                 'compactors' => [
-                    'Herrera\\Box\\Compactor\\Php',
-                    __NAMESPACE__.'\\TestCompactor',
+                    Php::class,
+                    TestCompactor::class,
                 ],
             ]
         );
 
         $compactors = $this->config->getCompactors();
 
-        $this->assertInstanceof(
-            'Herrera\\Box\\Compactor\\Php',
-            $compactors[0]
-        );
-        $this->assertInstanceof(
-            __NAMESPACE__.'\\TestCompactor',
-            $compactors[1]
-        );
+        $this->assertInstanceOf(Php::class, $compactors[0]);
+        $this->assertInstanceOf(TestCompactor::class, $compactors[1]);
     }
 
-    public function testGetCompactorsNoSuchClass(): void
+    public function test_it_cannot_get_the_compactors_with_an_invalid_class(): void
     {
-        $this->setConfig(['compactors' => ['NoSuchClass']]);
+        try {
+            $this->setConfig(['compactors' => ['NoSuchClass']]);
 
-        $this->expectException(
-            'InvalidArgumentException'
-        );
-        $this->expectExceptionMessage(
-            'The compactor class "NoSuchClass" does not exist.'
-        );
-
-        $this->config->getCompactors();
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'The compactor class "NoSuchClass" does not exist.',
+                $exception->getMessage()
+            );
+        }
     }
 
-    public function testGetCompactorsInvalidClass(): void
+    public function test_it_cannot_configure_an_invalid_compactor(): void
     {
-        $this->setConfig(
-            ['compactors' => [__NAMESPACE__.'\\InvalidCompactor']]
-        );
+        try {
+            $this->setConfig(['compactors' => [InvalidCompactor::class]]);
 
-        $this->expectException(
-            'InvalidArgumentException'
-        );
-        $this->expectExceptionMessage(
-            'The class "'.__NAMESPACE__.'\\InvalidCompactor" is not a compactor class.'
-        );
-
-        $this->config->getCompactors();
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                sprintf(
+                    'The class "%s" is not a compactor class.',
+                    InvalidCompactor::class
+                ),
+                $exception->getMessage()
+            );
+        }
     }
 
-    public function testGetCompactorsAnnotations(): void
+    public function test_get_compactors_annotations(): void
     {
         $this->setConfig(
             [
@@ -347,7 +293,7 @@ class ConfigurationTest extends TestCase
                     ],
                 ],
                 'compactors' => [
-                    'Herrera\\Box\\Compactor\\Php',
+                    Php::class,
                 ],
             ]
         );
@@ -365,75 +311,40 @@ class ConfigurationTest extends TestCase
         );
     }
 
-    public function testGetCompressionAlgorithm(): void
+    public function test_get_compression_algorithm(): void
     {
         $this->assertNull($this->config->getCompressionAlgorithm());
     }
 
-    public function testGetCompressionAlgorithmSet(): void
+    public function test_configure_compression_algorithm(): void
     {
         $this->setConfig(['compression' => Phar::BZ2]);
 
         $this->assertSame(Phar::BZ2, $this->config->getCompressionAlgorithm());
     }
 
-    public function testGetCompressionAlgorithmSetString(): void
+    public function test_configure_compression_algorithm_with_a_string(): void
     {
         $this->setConfig(['compression' => 'BZ2']);
 
         $this->assertSame(Phar::BZ2, $this->config->getCompressionAlgorithm());
     }
 
-    public function testGetCompressionAlgorithmInvalidString(): void
+    public function test_configure_compression_algorithm_with_an_invalid_algorithm(): void
     {
-        $this->setConfig(['compression' => 'INVALID']);
+        try {
+            $this->setConfig(['compression' => 'INVALID']);
 
-        $this->expectException(
-            'InvalidArgumentException'
-        );
-        $this->expectExceptionMessage(
-            'The compression algorithm "INVALID" is not supported.'
-        );
-
-        $this->config->getCompressionAlgorithm();
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'The compression algorithm "INVALID" is not supported.',
+                $exception->getMessage()
+            );
+        }
     }
 
-    public function testGetDirectories(): void
-    {
-        $this->assertSame([], $this->config->getDirectories());
-    }
-
-    public function testGetDirectoriesSet(): void
-    {
-        $this->setConfig(['directories' => ['test']]);
-
-        $this->assertSame(
-            [$this->dir.DIRECTORY_SEPARATOR.'test'],
-            $this->config->getDirectories()
-        );
-    }
-
-    public function testGetDirectoriesTrailingSlashRemoved(): void
-    {
-        $this->setConfig(
-            ['directories' => ['dir/subdir1/', 'dir/subdir2/']]
-        );
-
-        $this->assertSame(
-            [
-                $this->dir.DIRECTORY_SEPARATOR.'dir/subdir1',
-                $this->dir.DIRECTORY_SEPARATOR.'dir/subdir2',
-            ],
-            $this->config->getDirectories()
-        );
-    }
-
-    public function testGetDirectoriesIterator(): void
-    {
-        $this->assertNull($this->config->getDirectoriesIterator());
-    }
-
-    public function testGetDirectoriesIteratorSet(): void
+    public function test_configure_directories_iterator(): void
     {
         mkdir('alpha');
         touch('alpha/beta.php');
@@ -446,84 +357,47 @@ class ConfigurationTest extends TestCase
             ]
         );
 
-        $iterator = $this->config
-                         ->getDirectoriesIterator()
-                         ->getIterator();
+        $iterator = $this->config->getDirectoriesIterator();
 
         foreach ($iterator as $file) {
-            // @var $file SplFileInfo
             $this->assertSame('gamma.php', $file->getBasename());
         }
     }
 
-    public function testGetFileMode(): void
+    public function test_get_file_mode(): void
     {
         $this->assertNull($this->config->getFileMode());
     }
 
-    public function testGetFileModeSet(): void
+    public function test_configure_file_mode(): void
     {
         $this->setConfig(['chmod' => '0755']);
 
         $this->assertSame(0755, $this->config->getFileMode());
     }
 
-    public function testGetFiles(): void
-    {
-        $this->assertSame([], $this->config->getFiles());
-    }
-
-    public function testGetFilesNotExist(): void
-    {
-        $this->setConfig(['files' => ['test.php']]);
-
-        $this->expectException(
-            'RuntimeException'
-        );
-        $this->expectExceptionMessage(
-            'The file "'
-                .$this->dir.DIRECTORY_SEPARATOR
-                .'test.php" does not exist or is not a file.'
-        );
-
-        $this->config->getFiles();
-    }
-
-    public function testGetFilesSet(): void
-    {
-        touch('test.php');
-
-        $this->setConfig(['files' => ['test.php']]);
-
-        foreach ($this->config->getFiles() as $file) {
-            // @var $file SplFileInfo
-            $this->assertSame('test.php', $file->getBasename());
-        }
-    }
-
-    public function testGetFilesIterator(): void
+    public function test_get_files_iterator(): void
     {
         $this->assertNull($this->config->getFilesIterator());
     }
 
-    public function testGetFilesIteratorSet(): void
+    public function test_configure_files_iterator(): void
     {
         touch('test.php');
 
         $this->setConfig(['files' => 'test.php']);
 
         foreach ($this->config->getFilesIterator() as $file) {
-            // @var $file SplFileInfo
             $this->assertSame('test.php', $file->getBasename());
         }
     }
 
-    public function testGetFinders(): void
+    public function test_get_finders(): void
     {
-        $this->assertSame([], $this->config->getFinders());
+        $this->assertSame([], $this->config->getFilesIterators());
     }
 
-    public function testGetFindersSet(): void
+    public function test_configure_finders(): void
     {
         touch('bad.php');
         touch('test.html');
@@ -546,9 +420,8 @@ class ConfigurationTest extends TestCase
             ]
         );
 
-        /** @var $results \SplFileInfo[] */
         $results = [];
-        $finders = $this->config->getFinders();
+        $finders = $this->config->getFilesIterators();
 
         foreach ($finders as $finder) {
             foreach ($finder as $result) {
@@ -560,265 +433,54 @@ class ConfigurationTest extends TestCase
         $this->assertSame('test.html', $results[1]->getBasename());
     }
 
-    public function testGetDatetimeNow(): void
-    {
-        $this->assertRegExp(
-            '/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/',
-            $this->config->getDatetimeNow('Y-m-d H:i:s')
-        );
-    }
-
-    public function testGetDatetimeNowFormatted(): void
-    {
-        $this->assertRegExp(
-            '/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/',
-            $this->config->getDatetimeNow('Y-m-d')
-        );
-    }
-
-    public function testGetDatetimeNowPlaceHolder(): void
-    {
-        $this->assertNull($this->config->getDatetimeNowPlaceHolder());
-
-        $this->setConfig(['datetime' => 'date_time']);
-
-        $this->assertSame(
-            'date_time',
-            $this->config->getDatetimeNowPlaceHolder()
-        );
-    }
-
-    public function testGetDatetimeFormat(): void
-    {
-        $this->assertSame('Y-m-d H:i:s', $this->config->getDatetimeFormat());
-
-        $this->setConfig(['datetime_format' => 'Y-m-d']);
-
-        $this->assertSame(
-            'Y-m-d',
-            $this->config->getDatetimeFormat()
-        );
-    }
-
-    public function testGetGitHash(): void
-    {
-        touch('test');
-        exec('git init');
-        exec('git config user.name "Test User"');
-        exec('git config user.email test@test.test');
-        exec('git config commit.gpgsign false');
-        exec('git add test');
-        exec('git commit -m "Adding test file."');
-
-        $this->assertRegExp(
-            '/^[a-f0-9]{40}$/',
-            $this->config->getGitHash()
-        );
-
-        // some process does not release the git files
-        if ($this->isWindows()) {
-            exec('rd /S /Q .git');
-        }
-    }
-
-    public function testGetGitHashShort(): void
-    {
-        touch('test');
-        exec('git init');
-        exec('git config user.name "Test User"');
-        exec('git config user.email test@test.test');
-        exec('git config commit.gpgsign false');
-        exec('git add test');
-        exec('git commit -m "Adding test file."');
-
-        $this->assertRegExp(
-            '/^[a-f0-9]{7}$/',
-            $this->config->getGitHash(true)
-        );
-
-        // some process does not release the git files
-        if ($this->isWindows()) {
-            exec('rd /S /Q .git');
-        }
-    }
-
-    public function testGetGitHashPlaceholder(): void
-    {
-        $this->assertNull($this->config->getGitHashPlaceholder());
-    }
-
-    public function testGetGitHashPlaceholderSet(): void
-    {
-        $this->setConfig(['git-commit' => 'git_commit']);
-
-        $this->assertSame(
-            'git_commit',
-            $this->config->getGitHashPlaceholder()
-        );
-    }
-
-    public function testGetGitShortHashPlaceholder(): void
-    {
-        $this->assertNull($this->config->getGitShortHashPlaceholder());
-    }
-
-    public function testGetGitShortHashPlaceholderSet(): void
-    {
-        $this->setConfig(['git-commit-short' => 'git_commit_short']);
-
-        $this->assertSame(
-            'git_commit_short',
-            $this->config->getGitShortHashPlaceholder()
-        );
-    }
-
-    public function testGitTag(): void
-    {
-        touch('test');
-        exec('git init');
-        exec('git config user.name "Test User"');
-        exec('git config user.email test@test.test');
-        exec('git config commit.gpgsign false');
-        exec('git add test');
-        exec('git commit -m "Adding test file."');
-        exec('git tag 1.0.0');
-
-        $this->assertSame('1.0.0', $this->config->getGitTag());
-
-        // some process does not release the git files
-        if ($this->isWindows()) {
-            exec('rd /S /Q .git');
-        }
-    }
-
-    public function testGetGitTagPlaceholder(): void
-    {
-        $this->assertNull($this->config->getGitTagPlaceholder());
-    }
-
-    public function testGetGitTagPlaceholderSet(): void
-    {
-        $this->setConfig(['git-tag' => '@git-tag@']);
-
-        $this->assertSame(
-            '@git-tag@',
-            $this->config->getGitTagPlaceholder()
-        );
-    }
-
-    public function testGetGitVersion(): void
-    {
-        $this->expectException(
-            'RuntimeException'
-        );
-        $this->expectExceptionMessage(
-            'Not a git repository'
-        );
-
-        $this->config->getGitVersion();
-    }
-
-    public function testGitVersionTag(): void
-    {
-        touch('test');
-        exec('git init');
-        exec('git config user.name "Test User"');
-        exec('git config user.email test@test.test');
-        exec('git config commit.gpgsign false');
-        exec('git add test');
-        exec('git commit -m "Adding test file."');
-        exec('git tag 1.0.0');
-
-        $this->assertSame('1.0.0', $this->config->getGitVersion());
-
-        // some process does not release the git files
-        if ($this->isWindows()) {
-            exec('rd /S /Q .git');
-        }
-    }
-
-    public function testGitVersionCommit(): void
-    {
-        touch('test');
-        exec('git init');
-        exec('git config user.name "Test User"');
-        exec('git config user.email test@test.test');
-        exec('git config commit.gpgsign false');
-        exec('git add test');
-        exec('git commit -m "Adding test file."');
-
-        $this->assertRegExp(
-            '/^[a-f0-9]{7}$/',
-            $this->config->getGitVersion()
-        );
-
-        // some process does not release the git files
-        if ($this->isWindows()) {
-            exec('rd /S /Q .git');
-        }
-    }
-
-    public function testGetVersionPlaceholder(): void
-    {
-        $this->assertNull($this->config->getGitVersionPlaceholder());
-    }
-
-    public function testGetVersionPlaceholderSet(): void
-    {
-        $this->setConfig(['git-version' => 'git_version']);
-
-        $this->assertSame(
-            'git_version',
-            $this->config->getGitVersionPlaceholder()
-        );
-    }
-
-    public function testGetMainScriptPath(): void
+    public function test_get_main_script_path(): void
     {
         $this->assertNull($this->config->getMainScriptPath());
     }
 
-    public function testGetMainScriptPathSet(): void
+    public function test_configure_main_script(): void
     {
+        touch('test.php');
+
         $this->setConfig(['main' => 'test.php']);
 
         $this->assertSame('test.php', $this->config->getMainScriptPath());
     }
 
-    public function testGetMainScriptContents(): void
+    public function test_get_main_script_content(): void
     {
-        $this->assertNull($this->config->getMainScriptContents());
+        $this->assertNull($this->config->getMainScriptContent());
     }
 
-    public function testGetMainScriptContentsSet(): void
+    public function test_configure_main_script_content(): void
     {
         file_put_contents('test.php', "#!/usr/bin/env php\ntest");
 
         $this->setConfig(['main' => 'test.php']);
 
-        $this->assertSame('test', $this->config->getMainScriptContents());
+        $this->assertSame('test', $this->config->getMainScriptContent());
     }
 
-    public function testGetMainScriptContentsReadError(): void
+    public function test_it_cannot_get_the_main_script_if_file_doesnt_exists(): void
     {
-        $this->setConfig(['main' => 'test.php']);
+        try {
+            $this->setConfig(['main' => 'test.php']);
 
-        $this->expectException(
-            'RuntimeException'
-        );
-        $this->expectExceptionMessage(
-            'No such file'
-        );
-
-        $this->config->getMainScriptContents();
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertRegExp(
+                '/^Failed to get contents of .+$/i',
+                $exception->getMessage()
+            );
+        }
     }
 
-    public function testGetMap(): void
+    public function test_get_map(): void
     {
         $this->assertSame([], $this->config->getMap());
     }
 
-    public function testGetMapSet(): void
+    public function test_configure_map(): void
     {
         $this->setConfig(
             [
@@ -838,7 +500,7 @@ class ConfigurationTest extends TestCase
         );
     }
 
-    public function testGetMapper(): void
+    public function test_get_mapper(): void
     {
         $this->setConfig(
             [
@@ -849,38 +511,37 @@ class ConfigurationTest extends TestCase
             ]
         );
 
-        $ds = DIRECTORY_SEPARATOR;
         $mapper = $this->config->getMapper();
 
         $this->assertSame(
-            "a{$ds}sub{$ds}path{$ds}file.php",
+            'a/sub/path/file.php',
             $mapper('first/test/path/sub/path/file.php')
         );
 
         $this->assertSame(
-            "b{$ds}second{$ds}test{$ds}path{$ds}sub{$ds}path{$ds}file.php",
+            'b/second/test/path/sub/path/file.php',
             $mapper('second/test/path/sub/path/file.php')
         );
     }
 
-    public function testGetMetadata(): void
+    public function test_get_metadata(): void
     {
         $this->assertNull($this->config->getMetadata());
     }
 
-    public function testGetMetadataSet(): void
+    public function test_configure_metadata(): void
     {
         $this->setConfig(['metadata' => 123]);
 
         $this->assertSame(123, $this->config->getMetadata());
     }
 
-    public function testGetMimetypeMapping(): void
+    public function test_get_mime_type_mapping(): void
     {
         $this->assertSame([], $this->config->getMimetypeMapping());
     }
 
-    public function testGetMimetypeMappingSet(): void
+    public function test_configure_mime_type_mapping(): void
     {
         $mimetypes = ['phps' => Phar::PHPS];
 
@@ -889,12 +550,12 @@ class ConfigurationTest extends TestCase
         $this->assertSame($mimetypes, $this->config->getMimetypeMapping());
     }
 
-    public function testGetMungVariables(): void
+    public function test_get_mung_variables(): void
     {
         $this->assertSame([], $this->config->getMungVariables());
     }
 
-    public function testGetMungVariablesSet(): void
+    public function test_configure_mung_variables(): void
     {
         $mung = ['REQUEST_URI'];
 
@@ -903,40 +564,39 @@ class ConfigurationTest extends TestCase
         $this->assertSame($mung, $this->config->getMungVariables());
     }
 
-    public function testGetNotFoundScriptPath(): void
+    public function test_GetNotFoundScriptPath(): void
     {
+        //TODO: say wat?
         $this->assertNull($this->config->getNotFoundScriptPath());
     }
 
     public function testGetNotFoundScriptPathSet(): void
     {
+        //TODO: say wat?
         $this->setConfig(['not-found' => 'test.php']);
 
         $this->assertSame('test.php', $this->config->getNotFoundScriptPath());
     }
 
-    public function testGetOutputPath(): void
+    public function test_get_output_path(): void
     {
         $this->assertSame(
-            $this->dir.DIRECTORY_SEPARATOR.'default.phar',
+            $this->tmp.DIRECTORY_SEPARATOR.'default.phar',
             $this->config->getOutputPath()
         );
     }
 
-    public function testGetOutputPathSet(): void
+    public function test_configure_output_path(): void
     {
         $this->setConfig(['output' => 'test.phar']);
 
         $this->assertSame(
-            $this->dir.DIRECTORY_SEPARATOR.'test.phar',
+            $this->tmp.DIRECTORY_SEPARATOR.'test.phar',
             $this->config->getOutputPath()
         );
     }
 
-    /**
-     * @depends testGetOutputPathSet
-     */
-    public function testGetOutputPathGitVersion(): void
+    public function test_configure_output_path_with_placeholder(): void
     {
         touch('test');
         exec('git init');
@@ -950,11 +610,11 @@ class ConfigurationTest extends TestCase
         $this->setConfig(['output' => 'test-@git-version@.phar']);
 
         $this->assertSame(
-            $this->dir.DIRECTORY_SEPARATOR.'test-1.0.0.phar',
+            $this->tmp.DIRECTORY_SEPARATOR.'test-1.0.0.phar',
             $this->config->getOutputPath()
         );
 
-        // some process does not release the git files
+        // Some process does not release the git files
         if ($this->isWindows()) {
             exec('rd /S /Q .git');
         }
@@ -1037,29 +697,6 @@ class ConfigurationTest extends TestCase
         }
     }
 
-    public function testGetReplacementSigil(): void
-    {
-        $this->assertSame('@', $this->config->getReplacementSigil());
-
-        $this->setConfig(['replacement-sigil' => '$']);
-
-        $this->assertSame('$', $this->config->getReplacementSigil());
-    }
-
-    public function testGetReplacements(): void
-    {
-        $this->assertSame([], $this->config->getReplacements());
-    }
-
-    public function testGetReplacementsSet(): void
-    {
-        $replacements = ['rand' => random_int(0, getrandmax())];
-
-        $this->setConfig(['replacements' => (object) $replacements]);
-
-        $this->assertSame($replacements, $this->config->getReplacements());
-    }
-
     public function testGetShebang(): void
     {
         $this->assertNull($this->config->getShebang());
@@ -1074,16 +711,16 @@ class ConfigurationTest extends TestCase
 
     public function testGetShebangInvalid(): void
     {
-        $this->setConfig(['shebang' => '/bin/php']);
+        try {
+            $this->setConfig(['shebang' => '/bin/php']);
 
-        $this->expectException(
-            'InvalidArgumentException'
-        );
-        $this->expectExceptionMessage(
-            'The shebang line must start with "#!": /bin/php'
-        );
-
-        $this->config->getShebang();
+            $this->fail('Expected exception ot be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'The shebang line must start with "#!": /bin/php',
+                $exception->getMessage()
+            );
+        }
     }
 
     public function testGetShebangBlank(): void
@@ -1121,16 +758,16 @@ class ConfigurationTest extends TestCase
 
     public function testGetSigningAlgorithmInvalidString(): void
     {
-        $this->setConfig(['algorithm' => 'INVALID']);
+        try {
+            $this->setConfig(['algorithm' => 'INVALID']);
 
-        $this->expectException(
-            'InvalidArgumentException'
-        );
-        $this->expectExceptionMessage(
-            'The signing algorithm "INVALID" is not supported.'
-        );
-
-        $this->config->getSigningAlgorithm();
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'The signing algorithm "INVALID" is not supported.',
+                $exception->getMessage()
+            );
+        }
     }
 
     public function testGetStubBanner(): void
@@ -1177,16 +814,16 @@ COMMENT;
 
     public function testGetStubBannerFromFileReadError(): void
     {
-        $this->setConfig(['banner-file' => '/does/not/exist']);
+        try {
+            $this->setConfig(['banner-file' => '/does/not/exist']);
 
-        $this->expectException(
-            'RuntimeException'
-        );
-        $this->expectExceptionMessage(
-            'No such file or directory'
-        );
-
-        $this->config->getStubBannerFromFile();
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertRegExp(
+                '/^Failed to get contents of .+$/i',
+                $exception->getMessage()
+            );
+        }
     }
 
     public function testGetStubBannerPath(): void
@@ -1196,10 +833,12 @@ COMMENT;
 
     public function testGetStubBannerPathSet(): void
     {
-        $this->setConfig(['banner-file' => '/path/to/file']);
+        touch('path-to-file');
+
+        $this->setConfig(['banner-file' => 'path-to-file']);
 
         $this->assertSame(
-            '/path/to/file',
+            'path-to-file',
             $this->config->getStubBannerPath()
         );
     }
@@ -1315,37 +954,37 @@ CODE
 
     public function testLoadBootstrapNotExist(): void
     {
-        $this->setConfig(['bootstrap' => 'test.php']);
+        try {
+            $this->setConfig(['bootstrap' => 'test.php']);
 
-        $this->expectException(
-            'InvalidArgumentException'
-        );
-        $this->expectExceptionMessage(
-            'The bootstrap path "'.$this->dir.DIRECTORY_SEPARATOR.'test.php" is not a file or does not exist.'
-        );
-
-        $this->config->loadBootstrap();
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'The bootstrap path "'.$this->tmp.DIRECTORY_SEPARATOR.'test.php" is not a file or does not exist.',
+                $exception->getMessage()
+            );
+        }
     }
 
     public function testProcessFindersInvalidMethod(): void
     {
-        $this->setConfig(
-            ['finder' => [['invalidMethod' => 'whargarbl']]]
-        );
+        try {
+            $this->setConfig(
+                ['finder' => [['invalidMethod' => 'whargarbl']]]
+            );
 
-        $this->expectException(
-            'InvalidArgumentException'
-        );
-        $this->expectExceptionMessage(
-            'The method "Finder::invalidMethod" does not exist.'
-        );
-
-        $this->config->getFinders();
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'The method "Finder::invalidMethod" does not exist.',
+                $exception->getMessage()
+            );
+        }
     }
 
     private function setConfig(array $config): void
     {
-        $this->setPropertyValue($this->config, 'raw', (object) $config);
+        $this->config = Configuration::create($this->file, (object) $config);
     }
 
     private function isWindows()
