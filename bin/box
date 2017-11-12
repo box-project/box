@@ -1,11 +1,26 @@
 #!/usr/bin/env php
 <?php
 
-/**
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+/*
  * The project (or Phar) base path.
  *
  * @var string
  */
+
+use Composer\Autoload\ClassLoader;
+
 define('BOX_PATH', dirname(__DIR__));
 
 if (extension_loaded('phar') && ($uri = Phar::running())) {
@@ -13,7 +28,7 @@ if (extension_loaded('phar') && ($uri = Phar::running())) {
 } elseif (class_exists('Extract')) {
     require __DIR__.'/../src/vendors/autoload.php';
 } else {
-    loadComposerClassloader(realpath($_SERVER['argv'][0]));
+    load_composer_class_loader(realpath($_SERVER['argv'][0]));
 }
 
 $app = new KevinGH\Box\Application();
@@ -22,38 +37,56 @@ $app->run();
 /**
  * Finds the Composer autoloader and returns it.
  *
- * @param null $dir  the starting directory
- * @param int  $skip the number of occurrences to skip
+ * @param null|string $dir the starting directory
  *
  * @throws RuntimeException if the loader could not be loaded
  *
- * @return Composer\Autoload\ClassLoader the class loader
+ * @return ClassLoader the class loader
  */
-function loadComposerClassloader($dir = null, $skip = 0)
+function load_composer_class_loader(?string $dir): ClassLoader
 {
     $up = $dir;
-    $skips = 0;
+    $jsonPath = '';
+    $autoloaderPath = '';
 
     do {
         $dir = $up;
 
         if (file_exists("$dir/composer.json")) {
-            if ($skip > $skips) {
-                ++$skips;
-
-                continue;
-            }
-
-            $path = realpath("$dir/composer.json");
+            $jsonPath = realpath("$dir/composer.json");
+            $vendorPath = $dir.DIRECTORY_SEPARATOR.get_vendor_directory_name($jsonPath);
+            $autoloaderPath = $vendorPath.DIRECTORY_SEPARATOR.'autoload.php';
         }
-    } while ($dir !== ($up = dirname($dir)));
 
-    if (empty($path)) {
+        $up = dirname($dir);
+    } while ($dir !== $up && (!file_exists($autoloaderPath)));
+
+    if (empty($jsonPath)) {
         throw new RuntimeException(
             'The composer.json file could not be found.'
         );
     }
 
+    if (empty($autoloaderPath)) {
+        throw new RuntimeException(
+            'The composer autoload.php file could not be found.'
+        );
+    }
+
+    if (false === file_exists($autoloaderPath)) {
+        throw new RuntimeException(
+            sprintf(
+                'The Composer class loader "%s" could not be found.',
+                $autoloaderPath
+            )
+        );
+    }
+
+    return include $autoloaderPath;
+}
+
+function get_vendor_directory_name(string $path): string
+{
     if (false === ($json = file_get_contents($path))) {
         throw new RuntimeException(
             sprintf(
@@ -75,24 +108,9 @@ function loadComposerClassloader($dir = null, $skip = 0)
         );
     }
 
-    $path = dirname($path);
-
     if (isset($json->config, $json->config->{'vendor-dir'})) {
-        $path .= DIRECTORY_SEPARATOR.$json->config->{'vendor-dir'};
-    } else {
-        $path .= DIRECTORY_SEPARATOR.'vendor';
+        return $json->config->{'vendor-dir'};
     }
 
-    $path .= DIRECTORY_SEPARATOR.'autoload.php';
-
-    if (false === file_exists($path)) {
-        throw new RuntimeException(
-            sprintf(
-                'The Composer class loader "%s" could not be found.',
-                $path
-            )
-        );
-    }
-
-    return include $path;
+    return 'vendor';
 }
