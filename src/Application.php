@@ -15,7 +15,9 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use ErrorException;
-use KevinGH\Amend;
+use Humbug\SelfUpdate\Exception\RuntimeException as SelfUpdateRuntimeException;
+use Humbug\SelfUpdate\Updater;
+use KevinGH\Box\Command\SelfUpdateCommand;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -116,11 +118,14 @@ ASCII;
         $commands[] = new Command\Validate();
         $commands[] = new Command\Verify();
 
-        if (('@'.'git-version@') !== $this->getVersion()) {
-            $command = new Amend\Command('update');
-            $command->setManifestUri('@manifest_url@');
-
-            $commands[] = $command;
+        if ('phar:' === substr(__FILE__, 0, 5)) {
+            try {
+                $updater = new Updater();
+            } catch (SelfUpdateRuntimeException $e) {
+                // Allow E2E testing of unsigned phar
+                $updater = new Updater(null, false);
+            }
+            $commands[] = new SelfUpdateCommand($updater);
         }
 
         return $commands;
@@ -133,10 +138,6 @@ ASCII;
     {
         $helperSet = parent::getDefaultHelperSet();
         $helperSet->set(new Helper\ConfigurationHelper());
-
-        if (('@'.'git-version@') !== $this->getVersion()) {
-            $helperSet->set(new Amend\Helper());
-        }
 
         return $helperSet;
     }

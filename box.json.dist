@@ -5,8 +5,7 @@
 
     "directories": ["src"],
     "files": [
-        "res/schema.json",
-        "vendor/herrera-io/phar-update/res/schema.json"
+        "res/schema.json"
     ],
     "finder": [
         {

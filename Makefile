@@ -62,6 +62,9 @@ e2e: bin/box.phar
 ## Rules from files
 ##---------------------------------------------------------------------------
 
+composer.lock:
+	composer install
+
 vendor: composer.lock
 	composer install
 
