@@ -24,9 +24,9 @@ use Composer\Autoload\ClassLoader;
 define('BOX_PATH', dirname(__DIR__));
 
 if (extension_loaded('phar') && ($uri = Phar::running())) {
-    require "$uri/src/vendors/autoload.php";
+    require "$uri/vendor/autoload.php";
 } elseif (class_exists('Extract')) {
-    require __DIR__.'/../src/vendors/autoload.php';
+    require __DIR__.'/../vendor/autoload.php';
 } else {
     load_composer_class_loader(realpath($_SERVER['argv'][0]));
 }

@@ -1,11 +1,10 @@
 {
-    "main": "bin/box",
-    "output": "box-@git-version@.phar",
     "chmod": "0755",
+    "main": "bin/box",
+    "output": "bin/box.phar",
 
     "directories": ["src"],
     "files": [
-        "LICENSE",
         "res/schema.json",
         "vendor/herrera-io/phar-update/res/schema.json"
     ],
@@ -26,8 +25,6 @@
             "in": "vendor"
         }
     ],
-
-    "alias": "box.phar",
 
     "compactors": [
         "Herrera\\Box\\Compactor\\Json",
