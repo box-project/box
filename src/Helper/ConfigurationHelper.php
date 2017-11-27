@@ -16,9 +16,10 @@ namespace KevinGH\Box\Helper;
 
 use Herrera\Json\Json;
 use KevinGH\Box\Configuration;
-use Phine\Path\Path;
 use RuntimeException;
 use Symfony\Component\Console\Helper\Helper;
+use Webmozart\PathUtil\Path;
+use function KevinGH\Box\is_absolute;
 
 /*
  * The Box schema file path.
@@ -75,7 +76,7 @@ final class ConfigurationHelper extends Helper
         $json = $this->json->decodeFile($file);
 
         if (isset($json->import)) {
-            if (!Path::isAbsolute($json->import)) {
+            if (!is_absolute($json->import)) {
                 $json->import = Path::join(
                     [
                         dirname($file),

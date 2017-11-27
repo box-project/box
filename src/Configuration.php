@@ -16,19 +16,18 @@ namespace KevinGH\Box;
 
 use ArrayIterator;
 use Closure;
-use Datetime;
 use DateTimeImmutable;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\CompactorInterface;
 use Herrera\Box\Compactor\Php;
 use InvalidArgumentException;
 use Phar;
-use Phine\Path\Path;
 use RuntimeException;
 use SplFileInfo;
 use stdClass;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
+use Webmozart\PathUtil\Path;
 
 final class Configuration
 {
@@ -534,7 +533,7 @@ final class Configuration
     }
 
     /**
-     * @return array|SplFileInfo[]
+     * @return SplFileInfo[]
      */
     private static function retrieveBinaryDirectories(stdClass $raw, string $basePath): array
     {
@@ -546,7 +545,7 @@ final class Configuration
                 function (&$directory) use ($basePath): void {
                     $directory = $basePath
                         .DIRECTORY_SEPARATOR
-                        .Path::canonical($directory);
+                        .canonicalize($directory);
                 }
             );
 
@@ -585,7 +584,7 @@ final class Configuration
 
             foreach ((array) $raw->{'files-bin'} as $file) {
                 $files[] = new SplFileInfo(
-                    $basePath.DIRECTORY_SEPARATOR.Path::canonical($file)
+                    $basePath.DIRECTORY_SEPARATOR.canonicalize($file)
                 );
             }
 
@@ -618,7 +617,7 @@ final class Configuration
             array_walk(
                 $blacklist,
                 function (&$file): void {
-                    $file = Path::canonical($file);
+                    $file = canonicalize($file);
                 }
             );
 
@@ -642,7 +641,7 @@ final class Configuration
         );
 
         return function (SplFileInfo $file) use ($base, $blacklist): ?bool {
-            $path = Path::canonical(
+            $path = canonicalize(
                 preg_replace($base, '', $file->getPathname())
             );
 
@@ -686,7 +685,7 @@ final class Configuration
                 function (&$directory) use ($basePath): void {
                     $directory = $basePath
                         .DIRECTORY_SEPARATOR
-                        .rtrim(Path::canonical($directory), DIRECTORY_SEPARATOR);
+                        .rtrim(canonicalize($directory), DIRECTORY_SEPARATOR);
                 }
             );
 
@@ -729,7 +728,7 @@ final class Configuration
 
         foreach ((array) $raw->files as $file) {
             $file = new SplFileInfo(
-                $path = $basePath.DIRECTORY_SEPARATOR.Path::canonical($file)
+                $path = $basePath.DIRECTORY_SEPARATOR.canonicalize($file)
             );
 
             if (false === $file->isFile()) {
@@ -799,7 +798,7 @@ final class Configuration
                 array_walk(
                     $methods->in,
                     function (&$directory) use ($basePath): void {
-                        $directory = Path::canonical(
+                        $directory = canonicalize(
                             $basePath.DIRECTORY_SEPARATOR.$directory
                         );
                     }
@@ -837,8 +836,8 @@ final class Configuration
 
         $file = $raw->bootstrap;
 
-        if (false === Path::isAbsolute($file)) {
-            $file = Path::canonical(
+        if (false === is_absolute($file)) {
+            $file = canonicalize(
                 $basePath.DIRECTORY_SEPARATOR.$file
             );
         }
@@ -948,7 +947,7 @@ final class Configuration
     private static function retrieveMainScriptPath(stdClass $raw): ?string
     {
         if (isset($raw->main)) {
-            return Path::canonical($raw->main);
+            return canonicalize($raw->main);
         }
 
         return null;
@@ -989,7 +988,7 @@ final class Configuration
             $processed = [];
 
             foreach ($item as $match => $replace) {
-                $processed[Path::canonical($match)] = Path::canonical($replace);
+                $processed[canonicalize($match)] = canonicalize($replace);
             }
 
             if (isset($processed['_empty_'])) {
@@ -1077,8 +1076,8 @@ final class Configuration
         if (isset($raw->output)) {
             $path = $raw->output;
 
-            if (false === Path::isAbsolute($path)) {
-                $path = Path::canonical($base.$path);
+            if (false === is_absolute($path)) {
+                $path = canonicalize($base.$path);
             }
         } else {
             $path = $base.self::DEFAULT_ALIAS;
@@ -1341,7 +1340,7 @@ final class Configuration
     private static function retrieveStubBannerPath(stdClass $raw): ?string
     {
         if (isset($raw->{'banner-file'})) {
-            return Path::canonical($raw->{'banner-file'});
+            return canonicalize($raw->{'banner-file'});
         }
 
         return null;
