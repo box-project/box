@@ -63,7 +63,7 @@ e2e: bin/box.phar
 ##---------------------------------------------------------------------------
 
 composer.lock:
-	composer install
+	composer update
 
 vendor: composer.lock
 	composer install

@@ -165,12 +165,12 @@ OUTPUT;
             ]
         );
 
-        $expected = <<<'OUTPUT'
-The configuration file failed validation: The JSON data did not pass validation.
-
-  - The property test is not defined and the definition does not allow additional properties
-
-OUTPUT;
+        $expected = str_replace(
+            '/path/to',
+            $this->tmp,
+            'The configuration file failed validation: "/path/to/box.json" does not match the expected JSON '
+            .'schema'.PHP_EOL
+        );
 
         $this->assertSame($expected, $this->commandTester->getDisplay(true));
         $this->assertSame(1, $this->commandTester->getStatusCode());
@@ -193,7 +193,12 @@ OUTPUT;
             $this->fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
             $this->assertSame(
-                'The configuration file failed validation: The JSON data did not pass validation.',
+                str_replace(
+                    '/path/to',
+                    $this->tmp,
+                    'The configuration file failed validation: "/path/to/box.json" does not match the expected '
+                    .'JSON schema'
+                ),
                 $exception->getMessage()
             );
             $this->assertSame(0, $exception->getCode());

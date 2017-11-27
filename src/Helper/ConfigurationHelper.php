@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Helper;
 
-use Herrera\Json\Json;
 use KevinGH\Box\Configuration;
+use KevinGH\Box\Json\Json;
 use RuntimeException;
 use Symfony\Component\Console\Helper\Helper;
 use Webmozart\PathUtil\Path;
@@ -30,12 +30,7 @@ define('BOX_SCHEMA_FILE', BOX_PATH.'/res/schema.json');
 
 final class ConfigurationHelper extends Helper
 {
-    /**
-     * The name of the default configuration file.
-     *
-     * @var string
-     */
-    const FILE_NAME = 'box.json';
+    private const FILE_NAME = 'box.json';
 
     private $json;
 
@@ -75,6 +70,7 @@ final class ConfigurationHelper extends Helper
 
         $json = $this->json->decodeFile($file);
 
+        // Include imports
         if (isset($json->import)) {
             if (!is_absolute($json->import)) {
                 $json->import = Path::join(
@@ -92,8 +88,9 @@ final class ConfigurationHelper extends Helper
         }
 
         $this->json->validate(
-            $this->json->decodeFile(BOX_SCHEMA_FILE),
-            $json
+            $file,
+            $json,
+            $this->json->decodeFile(BOX_SCHEMA_FILE)
         );
 
         return Configuration::create($file, $json);
