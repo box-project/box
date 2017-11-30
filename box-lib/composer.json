@@ -1,0 +1,48 @@
+{
+    "name": "herrera-io/box",
+    "description": "A library for simplifying the PHAR build process.",
+    "keywords": ["phar"],
+    "homepage": "https://github.com/box-project/box2-lib",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kevin Herrera",
+            "email": "kevin@herrera.io",
+            "homepage": "http://kevin.herrera.io"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/box-project/box2-lib/issues"
+    },
+    "require": {
+        "php": ">=5.3.3",
+        "ext-phar": "*",
+        "tedivm/jshrink": "~1.0",
+        "phine/path": "~1.0"
+    },
+    "require-dev": {
+        "herrera-io/annotations": "~1.0",
+        "herrera-io/phpunit-test-case": "1.*",
+        "mikey179/vfsStream": "1.1.0",
+        "phpunit/phpunit": "3.7.*",
+        "phpseclib/phpseclib": "~0.3"
+    },
+    "suggest": {
+        "herrera-io/annotations": "For compacting annotated docblocks.",
+        "phpseclib/phpseclib": "For verifying OpenSSL signed phars without the phar extension."
+    },
+    "autoload": {
+        "psr-0": {
+            "Herrera\\Box": "src/lib"
+        }
+    },
+    "config": {
+        "bin-dir": "bin",
+        "vendor-dir": "src/vendors"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

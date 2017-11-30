@@ -3,7 +3,10 @@
     "main": "bin/box",
     "output": "bin/box.phar",
 
-    "directories": ["src"],
+    "directories": [
+        "src",
+        "box-lib/src/lib"
+    ],
     "files": [
         "res/schema.json"
     ],
