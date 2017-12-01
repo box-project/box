@@ -1,11 +1,25 @@
 <?php
 
-namespace Herrera\Box\Compactor;
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+namespace KevinGH\Box\Compactor;
 
 use Doctrine\Common\Annotations\DocLexer;
+use Exception;
 use Herrera\Annotations\Convert\ToString;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Annotations\Tokens;
+use JShrink\Minifier;
 
 /**
  * A PHP source code compactor copied from Composer.
@@ -13,52 +27,55 @@ use Herrera\Annotations\Tokens;
  * @author Kevin Herrera <kevin@herrera.io>
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @see https://github.com/composer/composer/blob/a8df30c09be550bffc37ba540fb7c7f0383c3944/src/Composer/Compiler.php#L214
  */
-class Php extends Compactor
+final class Php extends FileExtensionCompactor
 {
-    /**
-     * The annotation tokens converter.
-     *
-     * @var ToString
-     */
     private $converter;
-
-    /**
-     * The default list of supported file extensions.
-     *
-     * @var array
-     */
-    protected $extensions = array('php');
-
-    /**
-     * The annotations tokenizer.
-     *
-     * @var Tokenizer
-     */
     private $tokenizer;
 
     /**
-     * {@inheritDoc}
+     * @inheritdoc
      */
-    public function compact($contents)
+    public function __construct(Tokenizer $tokenizer, array $extensions = ['php'])
+    {
+        parent::__construct($extensions);
+
+        $this->converter = new ToString();
+        $this->tokenizer = $tokenizer;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function compact(string $contents): string
     {
         $output = '';
+
         foreach (token_get_all($contents) as $token) {
             if (is_string($token)) {
                 $output .= $token;
             } elseif (in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
                 if ($this->tokenizer && (false !== strpos($token[1], '@'))) {
-                    $output .= $this->compactAnnotations($token[1]);
+                    try {
+                        $output .= $this->compactAnnotations($token[1]);
+                    } catch (Exception $exception) {
+                        $output .= $token[1];
+                    }
                 } else {
                     $output .= str_repeat("\n", substr_count($token[1], "\n"));
                 }
             } elseif (T_WHITESPACE === $token[0]) {
                 // reduce wide spaces
                 $whitespace = preg_replace('{[ \t]+}', ' ', $token[1]);
+
                 // normalize newlines to \n
                 $whitespace = preg_replace('{(?:\r\n|\r|\n)}', "\n", $whitespace);
+
                 // trim leading spaces
                 $whitespace = preg_replace('{\n +}', "\n", $whitespace);
+
                 $output .= $whitespace;
             } else {
                 $output .= $token[1];
@@ -68,30 +85,9 @@ class Php extends Compactor
         return $output;
     }
 
-    /**
-     * Sets the annotations tokenizer.
-     *
-     * @param Tokenizer $tokenizer The tokenizer.
-     */
-    public function setTokenizer(Tokenizer $tokenizer)
+    private function compactAnnotations(string $docblock): string
     {
-        if (null === $this->converter) {
-            $this->converter = new ToString();
-        }
-
-        $this->tokenizer = $tokenizer;
-    }
-
-    /**
-     * Compacts the docblock and its annotations.
-     *
-     * @param string $docblock The docblock.
-     *
-     * @return string The compacted docblock.
-     */
-    private function compactAnnotations($docblock)
-    {
-        $annotations = array();
+        $annotations = [];
         $index = -1;
         $inside = 0;
         $tokens = $this->tokenizer->parse($docblock);
@@ -110,7 +106,7 @@ class Php extends Compactor
             }
 
             if (!isset($annotations[$index])) {
-                $annotations[$index] = array();
+                $annotations[$index] = [];
             }
 
             $annotations[$index][] = $token;

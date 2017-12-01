@@ -36,3 +36,10 @@ function is_absolute(string $path): bool
 
     return $fileSystem->isAbsolutePath($path);
 }
+
+function register_aliases(): void
+{
+    class_alias(\KevinGH\Box\Compactor\Javascript::class, \Herrera\Box\Compactor\Javascript::class);
+    class_alias(\KevinGH\Box\Compactor\Json::class, \Herrera\Box\Compactor\Json::class);
+    class_alias(\KevinGH\Box\Compactor\Php::class, \Herrera\Box\Compactor\Php::class);
+}

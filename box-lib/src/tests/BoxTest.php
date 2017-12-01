@@ -4,13 +4,18 @@ namespace Herrera\Box\Tests;
 
 use ArrayIterator;
 use FilesystemIterator;
+use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Box;
-use Herrera\Box\Compactor\Php;
 use Herrera\Box\StubGenerator;
 use Herrera\PHPUnit\TestCase;
+use KevinGH\Box\Compactor\Compactor;
+use KevinGH\Box\Compactor\DummyCompactor;
+use KevinGH\Box\Compactor\Php;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use Phar;
+use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
@@ -33,6 +38,16 @@ class BoxTest extends TestCase
      * @var Phar
      */
     private $phar;
+
+    /**
+     * @var Compactor|ObjectProphecy
+     */
+    private $compactorProphecy;
+
+    /**
+     * @var Compactor
+     */
+    private $compactor;
 
     public function getPrivateKey()
     {
@@ -64,7 +79,7 @@ KEY
 
     public function testAddCompactor()
     {
-        $compactor = new Compactor();
+        $compactor = new DummyCompactor();
 
         $this->box->addCompactor($compactor);
 
@@ -151,7 +166,7 @@ public function myMethod()
 }
 SOURCE;
 
-        $this->box->addCompactor(new Php());
+        $this->box->addCompactor(new Php(new Tokenizer()));
         $this->box->setValues(
             array(
                 '@thing@' => 'MyClass',
@@ -299,14 +314,20 @@ SOURCE;
      */
     public function testCompactContents()
     {
-        $compactor = new Compactor();
+        $this->box->addCompactor($this->compactor);
 
-        $this->box->addCompactor($compactor);
+        $contents = ' my value ';
+        $expected = 'my value';
 
-        $this->assertEquals(
-            'my value',
-            $this->box->compactContents('test.php', ' my value ')
-        );
+        $this->compactorProphecy->supports('test.php')->willReturn(true);
+        $this->compactorProphecy->compact($contents)->willReturn($expected);
+
+        $actual = $this->box->compactContents('test.php', $contents);
+
+        $this->assertSame($expected, $actual);
+
+        $this->compactorProphecy->supports(Argument::cetera())->shouldHaveBeenCalledTimes(1);
+        $this->compactorProphecy->compact(Argument::cetera())->shouldHaveBeenCalledTimes(1);
     }
 
     public function testCreate()
@@ -539,5 +560,8 @@ STUB
 
         $this->phar = new Phar('test.phar');
         $this->box = new Box($this->phar, 'test.phar');
+
+        $this->compactorProphecy = $this->prophesize(Compactor::class);
+        $this->compactor = $this->compactorProphecy->reveal();
     }
 }

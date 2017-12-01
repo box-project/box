@@ -20,6 +20,8 @@ declare(strict_types=1);
  */
 
 use Composer\Autoload\ClassLoader;
+use KevinGH\Box\Application;
+use function KevinGH\Box\register_aliases;
 
 define('BOX_PATH', dirname(__DIR__));
 
@@ -31,7 +33,9 @@ if (extension_loaded('phar') && ($uri = Phar::running())) {
     load_composer_class_loader(realpath($_SERVER['argv'][0]));
 }
 
-$app = new KevinGH\Box\Application();
+register_aliases();
+
+$app = new Application();
 $app->run();
 
 /**

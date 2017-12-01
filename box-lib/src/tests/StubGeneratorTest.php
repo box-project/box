@@ -2,9 +2,10 @@
 
 namespace Herrera\Box\Tests;
 
-use Herrera\Box\Compactor\Php;
+use Herrera\Annotations\Tokenizer;
 use Herrera\Box\StubGenerator;
 use Herrera\PHPUnit\TestCase;
+use KevinGH\Box\Compactor\Php;
 use Phar;
 
 class StubGeneratorTest extends TestCase
@@ -346,7 +347,7 @@ STUB
             'class' => array(),
         );
 
-        $compactor = new Php();
+        $compactor = new Php(new Tokenizer());
         $code = file_get_contents(__DIR__ . '/../lib/Extract.php');
         $code = $compactor->compact($code);
         $code = preg_replace('/\n+/', "\n", $code);

@@ -12,8 +12,13 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
+use org\bovigo\vfs\vfsStreamWrapper;
+use function KevinGH\Box\register_aliases;
+
 $loader = require __DIR__.'/../vendor/autoload.php';
 
 define('BOX_PATH', realpath(__DIR__).'/../');
 
-org\bovigo\vfs\vfsStreamWrapper::register();
+vfsStreamWrapper::register();
+
+register_aliases();

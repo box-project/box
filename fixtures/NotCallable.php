@@ -14,15 +14,17 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use Herrera\Box\Compactor\CompactorInterface;
+use DomainException;
 
-class TestCompactor implements CompactorInterface
+trait NotCallable
 {
-    public function compact($contents): void
+    public function __call($method, $arguments)
     {
-    }
-
-    public function supports($file): void
-    {
+        throw new DomainException(
+            sprintf(
+                'Did not expect "%s" to be called.',
+                $method
+            )
+        );
     }
 }

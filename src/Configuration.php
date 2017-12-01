@@ -18,16 +18,16 @@ use ArrayIterator;
 use Closure;
 use DateTimeImmutable;
 use Herrera\Annotations\Tokenizer;
-use Herrera\Box\Compactor\CompactorInterface;
-use Herrera\Box\Compactor\Php;
+use Herrera\Box\Compactor\Php as LegacyPhp;
 use InvalidArgumentException;
+use KevinGH\Box\Compactor\Compactor;
+use KevinGH\Box\Compactor\Php;
 use Phar;
 use RuntimeException;
 use SplFileInfo;
 use stdClass;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
-use Webmozart\PathUtil\Path;
 
 final class Configuration
 {
@@ -83,7 +83,7 @@ final class Configuration
      * @param iterable|SplFileInfo[]     $filesIterator             List of files
      * @param iterable[]|SplFileInfo[][] $filesIterators            List of file iterators
      * @param null|string                $bootstrapFile             The bootstrap file path
-     * @param CompactorInterface[]       $compactors                List of file contents compactors
+     * @param Compactor[]                $compactors                List of file contents compactors
      * @param null|int                   $compressionAlgorithm      Compression algorithm constant value. See the \Phar class constants
      * @param null|int                   $fileMode                  File mode in octal form
      * @param null|string                $mainScriptPath            The main script file path
@@ -368,7 +368,7 @@ final class Configuration
     }
 
     /**
-     * @return CompactorInterface[] the list of compactors
+     * @return Compactor[] the list of compactors
      */
     public function getCompactors(): array
     {
@@ -855,7 +855,7 @@ final class Configuration
     }
 
     /**
-     * @return CompactorInterface[]
+     * @return Compactor[]
      */
     private static function retrieveCompactors(stdClass $raw): array
     {
@@ -875,29 +875,19 @@ final class Configuration
                 );
             }
 
-            $compactor = new $class();
+            if ($class === Php::class || $class === LegacyPhp::class) {
+                $compactor = self::createPhpCompactor($raw);
+            } else {
+                $compactor = new $class();
+            }
 
-            if (false === ($compactor instanceof CompactorInterface)) {
+            if (false === ($compactor instanceof Compactor)) {
                 throw new InvalidArgumentException(
                     sprintf(
                         'The class "%s" is not a compactor class.',
                         $class
                     )
                 );
-            }
-
-            if ($compactor instanceof Php) {
-                if (false === empty($raw->annotations)) {
-                    $tokenizer = new Tokenizer();
-
-                    if (isset($raw->annotations->ignore)) {
-                        $tokenizer->ignore(
-                            (array) $raw->annotations->ignore
-                        );
-                    }
-
-                    $compactor->setTokenizer($tokenizer);
-                }
             }
 
             $compactors[] = $compactor;
@@ -1446,5 +1436,18 @@ final class Configuration
                 $process->getErrorOutput()
             )
         );
+    }
+
+    private static function createPhpCompactor(stdClass $raw): Compactor
+    {
+        $tokenizer = new Tokenizer();
+
+        if (false === empty($raw->annotations) && isset($raw->annotations->ignore)) {
+            $tokenizer->ignore(
+                (array) $raw->annotations->ignore
+            );
+        }
+
+        return new Php($tokenizer);
     }
 }

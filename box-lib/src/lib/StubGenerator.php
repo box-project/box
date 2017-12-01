@@ -2,8 +2,9 @@
 
 namespace Herrera\Box;
 
-use Herrera\Box\Compactor\Php;
+use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Exception\InvalidArgumentException;
+use KevinGH\Box\Compactor\Php;
 
 /**
  * Generates a new PHP bootstrap loader stub for a Phar.
@@ -174,7 +175,7 @@ class StubGenerator
                 'class' => array(),
             );
 
-            $compactor = new Php();
+            $compactor = new Php(new Tokenizer());
             $code = file_get_contents(__DIR__ . '/Extract.php');
             $code = $compactor->compact($code);
             $code = preg_replace('/\n+/', "\n", $code);

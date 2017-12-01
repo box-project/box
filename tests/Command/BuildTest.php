@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Command;
 
-use Herrera\Box\Compactor\Php;
+use KevinGH\Box\Compactor\Php;
 use Herrera\Box\Exception\FileException;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
@@ -187,7 +187,7 @@ Box (repo)
 ? Removing the existing PHAR "/path/to/tmp/test.phar".
 * Building the PHAR "/path/to/tmp/test.phar"
 ? Registering compactors.
-  + Herrera\Box\Compactor\Php
+  + KevinGH\Box\Compactor\Php
 ? Mapping paths.
   - a/deep/test/directory > sub
   - (all) > other/
@@ -272,7 +272,7 @@ Box (repo)
 ? Removing the existing PHAR "/path/to/tmp/test.phar".
 * Building the PHAR "/path/to/tmp/test.phar"
 ? Registering compactors.
-  + Herrera\Box\Compactor\Php
+  + KevinGH\Box\Compactor\Php
 ? Mapping paths.
   - a/deep/test/directory > sub
   - (all) > other/

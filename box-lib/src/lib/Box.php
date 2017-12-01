@@ -8,6 +8,7 @@ use Herrera\Box\Exception\FileException;
 use Herrera\Box\Exception\InvalidArgumentException;
 use Herrera\Box\Exception\OpenSslException;
 use Herrera\Box\Exception\UnexpectedValueException;
+use KevinGH\Box\Compactor\Compactor;
 use Phar;
 use Phine\Path\Path;
 use RecursiveDirectoryIterator;
@@ -68,9 +69,9 @@ class Box
     /**
      * Adds a file contents compactor.
      *
-     * @param CompactorInterface $compactor The compactor.
+     * @param Compactor $compactor The compactor.
      */
-    public function addCompactor(CompactorInterface $compactor)
+    public function addCompactor(Compactor $compactor)
     {
         $this->compactors->attach($compactor);
     }

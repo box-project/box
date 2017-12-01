@@ -18,6 +18,7 @@ use Closure;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\Php;
 use InvalidArgumentException;
+use KevinGH\Box\Compactor\DummyCompactor;
 use Phar;
 use PHPUnit\Framework\TestCase;
 
@@ -242,7 +243,7 @@ class ConfigurationTest extends TestCase
             [
                 'compactors' => [
                     Php::class,
-                    TestCompactor::class,
+                    DummyCompactor::class,
                 ],
             ]
         );
@@ -250,7 +251,7 @@ class ConfigurationTest extends TestCase
         $compactors = $this->config->getCompactors();
 
         $this->assertInstanceOf(Php::class, $compactors[0]);
-        $this->assertInstanceOf(TestCompactor::class, $compactors[1]);
+        $this->assertInstanceOf(DummyCompactor::class, $compactors[1]);
     }
 
     public function test_it_cannot_get_the_compactors_with_an_invalid_class(): void
