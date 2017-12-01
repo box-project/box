@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Command;
 
-use Herrera\Box\Signature;
+use KevinGH\Box\Signature;
 use Phar;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;

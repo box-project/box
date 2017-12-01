@@ -1,6 +1,6 @@
 <?php
 
-namespace Herrera\Box\Signature;
+namespace KevinGH\Box\Signature;
 
 /**
  * Buffers the hash as opposed to updating incrementally.

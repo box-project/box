@@ -23,6 +23,16 @@ use Symfony\Component\Console\Tester\ApplicationTester;
  */
 class ApplicationTest extends TestCase
 {
+    /**
+     * @inheritdoc
+     */
+    protected function tearDown()
+    {
+        restore_error_handler();
+
+        parent::tearDown();
+    }
+
     public function test_it_can_display_the_version_when_no_specific_version_is_given(): void
     {
         $application = new Application();

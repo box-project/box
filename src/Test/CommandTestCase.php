@@ -74,6 +74,8 @@ abstract class CommandTestCase extends \PHPUnit\Framework\TestCase
 
         remove_dir($this->tmp);
 
+        restore_error_handler();
+
         parent::tearDown();
     }
 

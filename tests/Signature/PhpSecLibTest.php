@@ -1,12 +1,14 @@
 <?php
 
-namespace Herrera\Box\Tests\Signature;
+namespace KevinGH\Box\Signature;
 
-use Herrera\Box\Signature\PhpSecLib;
+use KevinGH\Box\Signature\PhpSecLib;
 use Herrera\PHPUnit\TestCase;
 
 class PhpSecLibTest extends TestCase
 {
+    private const FIXTURES_DIR = __DIR__.'/../../fixtures/signature';
+
     /**
      * @var PhpSecLib
      */
@@ -14,7 +16,7 @@ class PhpSecLibTest extends TestCase
 
     public function testVerify()
     {
-        $path = RES_DIR . '/openssl.phar';
+        $path = self::FIXTURES_DIR . '/openssl.phar';
 
         $this->hash->init('openssl', $path);
         $this->hash->update(

@@ -1,12 +1,14 @@
 <?php
 
-namespace Herrera\Box\Tests\Signature;
+namespace KevinGH\Box\Signature;
 
-use Herrera\Box\Signature\PublicKeyDelegate;
+use KevinGH\Box\Signature\PublicKeyDelegate;
 use Herrera\PHPUnit\TestCase;
 
 class PublicKeyDelegateTest extends TestCase
 {
+    private const FIXTURES_DIR = __DIR__.'/../../fixtures/signature';
+
     private static $openssl = false;
 
     public function testConstruct()
@@ -17,12 +19,12 @@ class PublicKeyDelegateTest extends TestCase
             self::$openssl = true;
 
             $this->assertInstanceOf(
-                'Herrera\\Box\\Signature\\OpenSsl',
+                OpenSsl::class,
                 $this->getPropertyValue($hash, 'hash')
             );
         } else {
             $this->assertInstanceOf(
-                'Herrera\\Box\\Signature\\PhpSecLib',
+                PhpSecLib::class,
                 $this->getPropertyValue($hash, 'hash')
             );
         }
@@ -30,7 +32,7 @@ class PublicKeyDelegateTest extends TestCase
 
     public function testFunctional()
     {
-        $path = RES_DIR . '/openssl.phar';
+        $path = self::FIXTURES_DIR . '/openssl.phar';
         $hash = new PublicKeyDelegate();
 
         $hash->init('openssl', $path);

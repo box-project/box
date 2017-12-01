@@ -1,15 +1,17 @@
 <?php
 
-namespace Herrera\Box\Tests\Signature;
+namespace KevinGH\Box\Signature;
 
 use Herrera\Box\Exception\OpenSslException;
-use Herrera\Box\Signature\OpenSsl;
+use KevinGH\Box\Signature\OpenSsl;
 use Herrera\PHPUnit\TestCase;
 use PHPUnit\Framework\Error\Warning;
 use Throwable;
 
 class OpenSslTest extends TestCase
 {
+    public const FIXTURES_DIR = __DIR__.'/../../fixtures/signature';
+
     /**
      * @var OpenSsl
      */
@@ -17,7 +19,7 @@ class OpenSslTest extends TestCase
 
     public function testVerify()
     {
-        $path = RES_DIR . '/openssl.phar';
+        $path = self::FIXTURES_DIR . '/openssl.phar';
 
         $this->hash->init('openssl', $path);
         $this->hash->update(
@@ -33,10 +35,12 @@ class OpenSslTest extends TestCase
 
     public function testVerifyErrorHandlingBug()
     {
+        Warning::$enabled = false;
+
         $dir = $this->createDir();
         $path = "$dir/openssl.phar";
 
-        copy(RES_DIR . '/openssl.phar', $path);
+        copy(self::FIXTURES_DIR . '/openssl.phar', $path);
         touch("$path.pubkey");
 
         $this->hash->init('openssl', $path);
@@ -49,17 +53,13 @@ class OpenSslTest extends TestCase
 
             $this->fail('Expected exception to be thrown.');
         } catch (OpenSslException $exception) {
-            //TODO: check why this is not called instead
             $this->assertRegExp(
                 '/cannot be coerced/',
                 $exception->getMessage()
             );
-        } catch (Throwable $throwable) {
-            $this->assertRegExp(
-                '/cannot be coerced/',
-                $throwable->getMessage()
-            );
         }
+
+        Warning::$enabled = true;
     }
 
     protected function setUp()

@@ -1,8 +1,8 @@
 <?php
 
-namespace Herrera\Box\Tests\Signature;
+namespace KevinGH\Box\Signature;
 
-use Herrera\Box\Signature\AbstractPublicKey;
+use KevinGH\Box\Signature\AbstractPublicKey;
 
 class PublicKey extends AbstractPublicKey
 {

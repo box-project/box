@@ -1,9 +1,9 @@
 <?php
 
-namespace Herrera\Box\Tests;
+namespace KevinGH\Box;
 
 use Herrera\Box\Exception\FileException;
-use Herrera\Box\Signature;
+use KevinGH\Box\Signature;
 use Herrera\PHPUnit\TestCase;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
@@ -12,22 +12,24 @@ use PharException;
 
 class SignatureTest extends TestCase
 {
+    public const FIXTURES_DIR = __DIR__.'/../fixtures/signature';
+    
     private $types;
 
     public function getPhars()
     {
         return array(
-            array(RES_DIR . '/md5.phar'),
-            array(RES_DIR . '/sha1.phar'),
-            array(RES_DIR . '/sha256.phar'),
-            array(RES_DIR . '/sha512.phar'),
-            array(RES_DIR . '/openssl.phar'),
+            array(self::FIXTURES_DIR . '/md5.phar'),
+            array(self::FIXTURES_DIR . '/sha1.phar'),
+            array(self::FIXTURES_DIR . '/sha256.phar'),
+            array(self::FIXTURES_DIR . '/sha512.phar'),
+            array(self::FIXTURES_DIR . '/openssl.phar'),
         );
     }
 
     public function testConstruct()
     {
-        $path = RES_DIR . '/example.phar';
+        $path = self::FIXTURES_DIR . '/example.phar';
 
         $sig = new Signature($path);
 
@@ -59,14 +61,14 @@ class SignatureTest extends TestCase
     public function testCreate()
     {
         $this->assertInstanceOf(
-            'Herrera\\Box\\Signature',
-            Signature::create(RES_DIR . '/example.phar')
+            'KevinGH\\Box\\Signature',
+            Signature::create(self::FIXTURES_DIR . '/example.phar')
         );
     }
 
     public function testCreateNoGbmb()
     {
-        $path = realpath(RES_DIR . '/missing.phar');
+        $path = realpath(self::FIXTURES_DIR . '/missing.phar');
         $sig = new Signature($path);
 
         try {
@@ -83,7 +85,7 @@ class SignatureTest extends TestCase
 
     public function testCreateInvalid()
     {
-        $path = realpath(RES_DIR . '/invalid.phar');
+        $path = realpath(self::FIXTURES_DIR . '/invalid.phar');
         $sig = new Signature($path);
 
         try {
@@ -100,7 +102,7 @@ class SignatureTest extends TestCase
 
     public function testCreateMissingNoRequire()
     {
-        $path = realpath(RES_DIR . '/missing.phar');
+        $path = realpath(self::FIXTURES_DIR . '/missing.phar');
         $sig = new Signature($path);
 
         $this->assertNull($sig->get(false));
@@ -197,7 +199,7 @@ class SignatureTest extends TestCase
     protected function setUp()
     {
         $this->types = $this->getPropertyValue(
-            'Herrera\\Box\\Signature',
+            Signature::class,
             'types'
         );
     }
@@ -205,7 +207,7 @@ class SignatureTest extends TestCase
     protected function tearDown()
     {
         $this->setPropertyValue(
-            'Herrera\\Box\\Signature',
+            Signature::class,
             'types',
             $this->types
         );

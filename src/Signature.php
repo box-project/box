@@ -1,11 +1,13 @@
 <?php
 
-namespace Herrera\Box;
+namespace KevinGH\Box;
 
 use Herrera\Box\Exception\Exception;
 use Herrera\Box\Exception\FileException;
 use Herrera\Box\Exception\OpenSslException;
-use Herrera\Box\Signature\VerifyInterface;
+use KevinGH\Box\Signature\Hash;
+use KevinGH\Box\Signature\PublicKeyDelegate;
+use KevinGH\Box\Signature\VerifyInterface;
 use PharException;
 
 /**
@@ -50,31 +52,31 @@ class Signature
             'name' => 'MD5',
             'flag' => 0x01,
             'size' => 16,
-            'class' => 'Herrera\\Box\\Signature\\Hash'
+            'class' => Hash::class,
         ),
         array(
             'name' => 'SHA-1',
             'flag' => 0x02,
             'size' => 20,
-            'class' => 'Herrera\\Box\\Signature\\Hash'
+            'class' => Hash::class,
         ),
         array(
             'name' => 'SHA-256',
             'flag' => 0x03,
             'size' => 32,
-            'class' => 'Herrera\\Box\\Signature\\Hash'
+            'class' => Hash::class,
         ),
         array(
             'name' => 'SHA-512',
             'flag' => 0x04,
             'size' => 64,
-            'class' => 'Herrera\\Box\\Signature\\Hash'
+            'class' => Hash::class,
         ),
         array(
             'name' => 'OpenSSL',
             'flag' => 0x10,
             'size' => null,
-            'class' => 'Herrera\\Box\\Signature\\PublicKeyDelegate'
+            'class' => PublicKeyDelegate::class,
         ),
     );
 

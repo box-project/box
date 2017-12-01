@@ -1,8 +1,8 @@
 <?php
 
-namespace Herrera\Box\Tests\Signature;
+namespace KevinGH\Box\Signature;
 
-use Herrera\Box\Signature\AbstractBufferedHash;
+use KevinGH\Box\Signature\AbstractBufferedHash;
 
 class BufferedHash extends AbstractBufferedHash
 {

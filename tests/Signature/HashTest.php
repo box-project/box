@@ -1,8 +1,8 @@
 <?php
 
-namespace Herrera\Box\Tests\Signature;
+namespace KevinGH\Box\Signature;
 
-use Herrera\Box\Signature\Hash;
+use KevinGH\Box\Signature\Hash;
 use Herrera\PHPUnit\TestCase;
 
 class HashTest extends TestCase

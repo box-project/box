@@ -1,6 +1,6 @@
 <?php
 
-namespace Herrera\Box\Signature;
+namespace KevinGH\Box\Signature;
 
 use Herrera\Box\Exception\OpenSslException;
 

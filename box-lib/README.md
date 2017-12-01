@@ -217,7 +217,7 @@ extension.
 
 ```php
 use Herrera\Box\Exception\SignatureException;
-use Herrera\Box\Signature;
+use KevinGH\Box\Signature;
 
 $sig = new Signature('/path/to/my.phar');
 

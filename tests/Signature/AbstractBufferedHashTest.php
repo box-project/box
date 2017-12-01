@@ -1,6 +1,6 @@
 <?php
 
-namespace Herrera\Box\Tests\Signature;
+namespace KevinGH\Box\Signature;
 
 use Herrera\PHPUnit\TestCase;
 

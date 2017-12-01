@@ -1,6 +1,6 @@
 <?php
 
-namespace Herrera\Box\Tests\Signature;
+namespace KevinGH\Box\Signature;
 
 use Herrera\PHPUnit\TestCase;
 
@@ -27,7 +27,6 @@ class AbstractPublicKeyTest extends TestCase
 
     /**
      * @expectedException \Herrera\Box\Exception\FileException
-     * @expectedExceptionMessage No such file or directory
      */
     public function testInitNotExist()
     {

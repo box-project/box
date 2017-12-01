@@ -21,6 +21,8 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 /**
  * @covers \KevinGH\Box\Command\Info
+ *
+ * @runTestsInSeparateProcesses
  */
 class InfoTest extends TestCase
 {

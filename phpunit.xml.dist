@@ -7,6 +7,19 @@
     <testsuites>
         <testsuite name="PHP-Scoper Test Suite">
             <directory>tests/</directory>
+
+            <!--<exclude>tests/Command/InfoTest.php</exclude>-->
+            <!--<exclude>tests/Command/ValidateTeIst.php</exclude>-->
+            <!--<exclude>tests/Command/VerifyTest.php</exclude>-->
+            <!--<exclude>tests/ApplicationTest.php</exclude>-->
+            <!--<exclude>tests/ConfigurationTest.php</exclude>-->
+            <!--<exclude>tests/Helper/ConfigurationHelperTest.php</exclude>-->
+            <!--<exclude>tests/Signature/AbstractBufferedHashTest.php</exclude>-->
+            <!--&lt;!&ndash;<exclude>tests/Signature/AbstractPublicKeyTest.php</exclude>&ndash;&gt;-->
+            <!--<exclude>tests/Signature/HashTest.php</exclude>-->
+            <!--<exclude>tests/Signature/OpenSslTest.php</exclude>-->
+            <!--<exclude>tests/Signature/PublicKeyDelegateTest.php</exclude>-->
+            <!--<exclude>tests/SignatureTest.php</exclude>-->
         </testsuite>
     </testsuites>
 

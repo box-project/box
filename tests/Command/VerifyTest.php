@@ -27,7 +27,7 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 class VerifyTest extends TestCase
 {
-    private const FIXTURES = __DIR__.'/../../fixtures/verify';
+    private const FIXTURES_DIR = __DIR__.'/../../fixtures/verify';
 
     /**
      * @var CommandTester
@@ -48,6 +48,17 @@ class VerifyTest extends TestCase
 
         $this->commandTester = new CommandTester((new Application())->get('verify'));
     }
+
+    /**
+     * @inheritdoc
+     */
+    protected function tearDown()
+    {
+        restore_error_handler();
+
+        parent::tearDown();
+    }
+
 
     /**
      * @dataProvider providePassingPharPaths
@@ -203,30 +214,30 @@ OUTPUT;
     public function providePassingPharPaths()
     {
         yield 'simple PHAR' => [
-            realpath(self::FIXTURES.'/simple-phar.phar'),
+            realpath(self::FIXTURES_DIR.'/simple-phar.phar'),
         ];
 
         yield 'PHAR signed with OpenSSL' => [
-            realpath(self::FIXTURES.'/openssl-signed/php-scoper.phar'),
+            realpath(self::FIXTURES_DIR.'/openssl-signed/php-scoper.phar'),
         ];
     }
 
     public function provideFailingPharPaths()
     {
         yield 'a fake PHAR' => [
-            realpath(self::FIXTURES.'/not-a-phar.phar'),
+            realpath(self::FIXTURES_DIR.'/not-a-phar.phar'),
         ];
 
         yield 'a simple PHAR which content has been altered' => [
-            realpath(self::FIXTURES.'/simple-corrupted-phar.phar'),
+            realpath(self::FIXTURES_DIR.'/simple-corrupted-phar.phar'),
         ];
 
         yield 'an OpenSSL signed PHAR which public key has been altered' => [
-            realpath(self::FIXTURES.'/openssl-signed-with-corrupted-pubkey/php-scoper.phar'),
+            realpath(self::FIXTURES_DIR.'/openssl-signed-with-corrupted-pubkey/php-scoper.phar'),
         ];
 
         yield 'an OpenSSL signed PHAR without its public key' => [
-            realpath(self::FIXTURES.'/openssl-signed-without-pubkey/php-scoper.phar'),
+            realpath(self::FIXTURES_DIR.'/openssl-signed-without-pubkey/php-scoper.phar'),
         ];
     }
 }

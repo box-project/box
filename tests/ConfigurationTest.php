@@ -485,7 +485,7 @@ class ConfigurationTest extends TestCase
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertRegExp(
-                '/^Failed to get contents of .+$/i',
+                '/failed to open stream/i',
                 $exception->getMessage()
             );
         }
@@ -836,7 +836,7 @@ COMMENT;
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertRegExp(
-                '/^Failed to get contents of .+$/i',
+                '/failed to open stream/i',
                 $exception->getMessage()
             );
         }

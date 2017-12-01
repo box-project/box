@@ -22,3 +22,4 @@ define('BOX_PATH', realpath(__DIR__).'/../');
 vfsStreamWrapper::register();
 
 register_aliases();
+class_alias(\PHPUnit\Framework\TestCase::class, \PHPUnit_Framework_TestCase::class);

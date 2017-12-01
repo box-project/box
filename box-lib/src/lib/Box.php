@@ -9,6 +9,7 @@ use Herrera\Box\Exception\InvalidArgumentException;
 use Herrera\Box\Exception\OpenSslException;
 use Herrera\Box\Exception\UnexpectedValueException;
 use KevinGH\Box\Compactor\Compactor;
+use KevinGH\Box\Signature;
 use Phar;
 use Phine\Path\Path;
 use RecursiveDirectoryIterator;
