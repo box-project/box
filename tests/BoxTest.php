@@ -5,15 +5,13 @@ namespace KevinGH\Box;
 use ArrayIterator;
 use FilesystemIterator;
 use Herrera\Annotations\Tokenizer;
-use KevinGH\Box\Box;
-use KevinGH\Box\StubGenerator;
-use Herrera\PHPUnit\TestCase;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\DummyCompactor;
 use KevinGH\Box\Compactor\Php;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use Phar;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use RecursiveDirectoryIterator;
@@ -25,21 +23,26 @@ use KevinGH\Box\Exception\UnexpectedValueException;
 class BoxTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__.'/../fixtures/signature';
-    
+
     /**
      * @var Box
      */
     private $box;
 
     /**
-     * @var string
-     */
-    private $cwd;
-
-    /**
      * @var Phar
      */
     private $phar;
+
+    /**
+     * @var string
+     */
+    protected $cwd;
+
+    /**
+     * @var string
+     */
+    protected $tmp;
 
     /**
      * @var Compactor|ObjectProphecy
@@ -50,6 +53,39 @@ class BoxTest extends TestCase
      * @var Compactor
      */
     private $compactor;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        $this->cwd = getcwd();
+        $this->tmp = make_tmp_dir('box', __CLASS__);
+
+        chdir($this->tmp);
+
+        $this->phar = new Phar('test.phar');
+        $this->box = new Box($this->phar, 'test.phar');
+
+        $this->compactorProphecy = $this->prophesize(Compactor::class);
+        $this->compactor = $this->compactorProphecy->reveal();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown(): void
+    {
+        unset($this->box, $this->phar);
+
+        chdir($this->cwd);
+
+        remove_dir($this->tmp);
+
+        restore_error_handler();
+
+        parent::tearDown();
+    }
 
     public function getPrivateKey()
     {
@@ -79,21 +115,9 @@ KEY
         );
     }
 
-    public function testAddCompactor()
-    {
-        $compactor = new DummyCompactor();
-
-        $this->box->addCompactor($compactor);
-
-        $this->assertTrue(
-            $this->getPropertyValue($this->box, 'compactors')
-                 ->contains($compactor)
-        );
-    }
-
     public function testAddFile()
     {
-        $file = $this->createFile();
+        touch($file = 'foo');
 
         file_put_contents($file, 'test');
 
@@ -195,7 +219,7 @@ SOURCE;
         );
 
         $this->box->setValues(array('@name@' => 'world'));
-        $this->box->buildFromDirectory($this->cwd, '/\.php$/');
+        $this->box->buildFromDirectory($this->tmp, '/\.php$/');
 
         $this->assertFalse(isset($this->phar['test/sub.txt']));
         $this->assertEquals(
@@ -215,7 +239,7 @@ SOURCE;
 
         $iterator = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator(
-                $this->cwd,
+                $this->tmp,
                 FilesystemIterator::KEY_AS_PATHNAME
                 | FilesystemIterator::CURRENT_AS_FILEINFO
                 | FilesystemIterator::SKIP_DOTS
@@ -223,7 +247,7 @@ SOURCE;
         );
 
         $this->box->setValues(array('@name@' => 'world'));
-        $this->box->buildFromIterator($iterator, $this->cwd);
+        $this->box->buildFromIterator($iterator, $this->tmp);
 
         $this->assertEquals(
             '<?php echo "Hello, world!\n";',
@@ -245,13 +269,13 @@ SOURCE;
         $this->box->buildFromIterator(
             new ArrayIterator(
                 array(
-                    'object' => new SplFileInfo($this->cwd . '/object'),
-                    'string' => $this->cwd . '/string',
-                    'object.php' => new SplFileInfo($this->cwd . '/object.php'),
-                    'string.php' => $this->cwd . '/string.php',
+                    'object' => new SplFileInfo($this->tmp . '/object'),
+                    'string' => $this->tmp . '/string',
+                    'object.php' => new SplFileInfo($this->tmp . '/object.php'),
+                    'string.php' => $this->tmp . '/string.php',
                 )
             ),
-            $this->cwd
+            $this->tmp
         );
 
         /** @var $phar SplFileInfo[] */
@@ -270,7 +294,7 @@ SOURCE;
     public function testBuildFromIteratorBaseRequired()
     {
         $this->box->buildFromIterator(
-            new ArrayIterator(array(new SplFileInfo($this->cwd)))
+            new ArrayIterator(array(new SplFileInfo($this->tmp)))
         );
     }
 
@@ -278,14 +302,14 @@ SOURCE;
     {
         try {
             $this->box->buildFromIterator(
-                new ArrayIterator(array(new SplFileInfo($this->cwd))),
+                new ArrayIterator(array(new SplFileInfo($this->tmp))),
                 __DIR__
             );
 
             $this->fail('Expected exception to be thrown.');
         } catch (UnexpectedValueException $exception) {
             $this->assertSame(
-                "The file \"{$this->cwd}\" is not in the base directory.",
+                "The file \"{$this->tmp}\" is not in the base directory.",
                 $exception->getMessage()
             );
         }
@@ -311,9 +335,6 @@ SOURCE;
         );
     }
 
-    /**
-     * @depends testAddCompactor
-     */
     public function testCompactContents()
     {
         $this->box->addCompactor($this->compactor);
@@ -332,17 +353,6 @@ SOURCE;
         $this->compactorProphecy->compact(Argument::cetera())->shouldHaveBeenCalledTimes(1);
     }
 
-    public function testCreate()
-    {
-        $box = Box::create('test2.phar');
-
-        $this->assertInstanceOf(Box::class, $box);
-        $this->assertEquals(
-            'test2.phar',
-            $this->getPropertyValue($box, 'file')
-        );
-    }
-
     public function testGetPhar()
     {
         $this->assertSame($this->phar, $this->box->getPhar());
@@ -357,20 +367,6 @@ SOURCE;
             $phar->getSignature(),
             Box::getSignature($path)
         );
-    }
-
-    public function testReplaceValues()
-    {
-        $this->setPropertyValue(
-            $this->box,
-            'values',
-            array(
-                '@1@' => 'a',
-                '@2@' => 'b'
-            )
-        );
-
-        $this->assertEquals('ab@3@', $this->box->replaceValues('@1@@2@@3@'));
     }
 
     /**
@@ -397,7 +393,7 @@ SOURCE;
 
     public function testSetStubUsingFile()
     {
-        $file = $this->createFile();
+        touch($file = 'foo');
 
         file_put_contents(
             $file,
@@ -415,18 +411,6 @@ STUB
         $this->assertEquals(
             'replaced',
             exec('php test.phar')
-        );
-    }
-
-    public function testSetValues()
-    {
-        $rand = rand();
-
-        $this->box->setValues(array('@rand@' => $rand));
-
-        $this->assertEquals(
-            array('@rand@' => $rand),
-            $this->getPropertyValue($this->box, 'values')
         );
     }
 
@@ -503,7 +487,7 @@ STUB
 
         list($key, $password) = $this->getPrivateKey();
 
-        $file = $this->createFile();
+        touch($file = 'foo');
 
         file_put_contents($file, $key);
 
@@ -547,23 +531,5 @@ STUB
         vfsStreamWrapper::setRoot($root);
 
         $this->box->signUsingFile('vfs://test/private.key');
-    }
-
-    protected function tearDown()
-    {
-        unset($this->box, $this->phar);
-
-        parent::tearDown();
-    }
-
-    protected function setUp()
-    {
-        chdir($this->cwd = $this->createDir());
-
-        $this->phar = new Phar('test.phar');
-        $this->box = new Box($this->phar, 'test.phar');
-
-        $this->compactorProphecy = $this->prophesize(Compactor::class);
-        $this->compactor = $this->compactorProphecy->reveal();
     }
 }

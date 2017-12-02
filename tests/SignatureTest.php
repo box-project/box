@@ -4,11 +4,11 @@ namespace KevinGH\Box;
 
 use KevinGH\Box\Exception\FileException;
 use KevinGH\Box\Signature;
-use Herrera\PHPUnit\TestCase;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use Phar;
 use PharException;
+use PHPUnit\Framework\TestCase;
 use TypeError;
 
 class SignatureTest extends TestCase
@@ -25,23 +25,6 @@ class SignatureTest extends TestCase
             array(self::FIXTURES_DIR . '/sha256.phar'),
             array(self::FIXTURES_DIR . '/sha512.phar'),
             array(self::FIXTURES_DIR . '/openssl.phar'),
-        );
-    }
-
-    public function testConstruct()
-    {
-        $path = self::FIXTURES_DIR . '/example.phar';
-
-        $sig = new Signature($path);
-
-        $this->assertEquals(
-            realpath($path),
-            $this->getPropertyValue($sig, 'file')
-        );
-
-        $this->assertSame(
-            filesize($path),
-            $this->getPropertyValue($sig, 'size')
         );
     }
 
@@ -62,7 +45,7 @@ class SignatureTest extends TestCase
     public function testCreate()
     {
         $this->assertInstanceOf(
-            'KevinGH\\Box\\Signature',
+            Signature::class,
             Signature::create(self::FIXTURES_DIR . '/example.phar')
         );
     }
@@ -131,88 +114,5 @@ class SignatureTest extends TestCase
         $sig = new Signature($path);
 
         $this->assertTrue($sig->verify());
-    }
-
-    public function testHandle()
-    {
-        $sig = new Signature(__FILE__);
-
-        $this->setPropertyValue($sig, 'file', '/does/not/exist');
-
-        try {
-            $this->callMethod($sig, 'handle');
-
-            $this->fail('Expected exception to be thrown.');
-        } catch (FileException $exception) {
-            $this->assertRegExp(
-                '/No such file or directory/',
-                $exception->getMessage()
-            );
-        }
-    }
-
-    public function testRead()
-    {
-        $sig = new Signature(__FILE__);
-
-        $this->setPropertyValue($sig, 'handle', true);
-
-        try {
-            $this->callMethod($sig, 'read', array(123));
-
-            $this->fail('Expected exception to be thrown.');
-        } catch (TypeError $exception) {
-            $this->assertRegExp(
-                '/boolean given/',
-                $exception->getMessage()
-            );
-        }
-    }
-
-    public function testReadShort()
-    {
-        $file = $this->createFile();
-        $sig = new Signature($file);
-
-        try {
-            $this->callMethod($sig, 'read', array(1));
-
-            $this->fail('Expected exception to be thrown.');
-        } catch (FileException $exception) {
-            $this->assertSame(
-                "Only read 0 of 1 bytes from \"$file\".",
-                $exception->getMessage()
-            );
-        }
-    }
-
-    /**
-     * @expectedException \KevinGH\Box\Exception\FileException
-     */
-    public function testSeek()
-    {
-        $file = $this->createFile();
-        $sig = new Signature($file);
-
-        $this->callMethod($sig, 'seek', array(-1));
-    }
-
-    protected function setUp()
-    {
-        $this->types = $this->getPropertyValue(
-            Signature::class,
-            'types'
-        );
-    }
-
-    protected function tearDown()
-    {
-        $this->setPropertyValue(
-            Signature::class,
-            'types',
-            $this->types
-        );
-
-        parent::tearDown();
     }
 }

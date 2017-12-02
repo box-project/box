@@ -3,32 +3,13 @@
 namespace KevinGH\Box\Signature;
 
 use KevinGH\Box\Signature\PublicKeyDelegate;
-use Herrera\PHPUnit\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class PublicKeyDelegateTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__.'/../../fixtures/signature';
 
     private static $openssl = false;
-
-    public function testConstruct()
-    {
-        $hash = new PublicKeyDelegate();
-
-        if (extension_loaded('openssl')) {
-            self::$openssl = true;
-
-            $this->assertInstanceOf(
-                OpenSsl::class,
-                $this->getPropertyValue($hash, 'hash')
-            );
-        } else {
-            $this->assertInstanceOf(
-                PhpSecLib::class,
-                $this->getPropertyValue($hash, 'hash')
-            );
-        }
-    }
 
     public function testFunctional()
     {

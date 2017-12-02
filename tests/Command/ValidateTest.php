@@ -16,8 +16,8 @@ namespace KevinGH\Box\Command;
 
 use KevinGH\Box\Application;
 use KevinGH\Box\Test\CommandTestCase;
+use RuntimeException;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -82,131 +82,131 @@ OUTPUT;
         $this->assertSame($expected, $this->commandTester->getDisplay(true));
         $this->assertSame(1, $this->commandTester->getStatusCode());
     }
-//
-//    public function test_an_unknown_file_is_invalid_in_verbose_mode(): void
-//    {
-//        try {
-//            $this->commandTester->execute(
-//                [
-//                    'command' => 'validate',
-//                ],
-//                [
-//                    'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-//                ]
-//            );
-//
-//            $this->fail('Expected exception to be thrown.');
-//        } catch (RuntimeException $exception) {
-//            $this->assertSame(
-//                'The configuration file failed validation: The configuration file could not be found.',
-//                $exception->getMessage()
-//            );
-//            $this->assertSame(0, $exception->getCode());
-//            $this->assertNotNull($exception->getPrevious());
-//        }
-//    }
-//
-//    public function test_an_invalid_JSON_file_is_invalid(): void
-//    {
-//        file_put_contents('box.json.dist', '{');
-//
-//        $this->commandTester->execute(
-//            [
-//                'command' => 'validate',
-//            ]
-//        );
-//
-//        $expected = <<<'OUTPUT'
-//The configuration file failed validation: Parse error on line 1:
-//{
-//^
-//Expected one of: 'STRING', '}'
-//
-//OUTPUT;
-//
-//        $this->assertSame($expected, $this->commandTester->getDisplay(true));
-//        $this->assertSame(1, $this->commandTester->getStatusCode());
-//    }
-//
-//    public function test_an_invalid_JSON_file_is_invalid_in_verbose_mode(): void
-//    {
-//        file_put_contents('box.json.dist', '{');
-//
-//        try {
-//            $this->commandTester->execute(
-//                [
-//                    'command' => 'validate',
-//                ],
-//                [
-//                    'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-//                ]
-//            );
-//
-//            $this->fail('Expected exception to be thrown.');
-//        } catch (RuntimeException $exception) {
-//            $expected = <<<'OUTPUT'
-//The configuration file failed validation: Parse error on line 1:
-//{
-//^
-//Expected one of: 'STRING', '}'
-//OUTPUT;
-//
-//            $this->assertSame($expected, $exception->getMessage());
-//            $this->assertSame(0, $exception->getCode());
-//            $this->assertNotNull($exception->getPrevious());
-//        }
-//    }
-//
-//    public function test_an_incorrect_config_file_is_invalid(): void
-//    {
-//        file_put_contents('box.json', '{"test": true}');
-//
-//        $this->commandTester->execute(
-//            [
-//                'command' => 'validate',
-//            ]
-//        );
-//
-//        $expected = str_replace(
-//            '/path/to',
-//            $this->tmp,
-//            'The configuration file failed validation: "/path/to/box.json" does not match the expected JSON '
-//            .'schema'.PHP_EOL
-//        );
-//
-//        $this->assertSame($expected, $this->commandTester->getDisplay(true));
-//        $this->assertSame(1, $this->commandTester->getStatusCode());
-//    }
-//
-//    public function test_an_incorrect_config_file_is_invalid_in_verbose_mode(): void
-//    {
-//        file_put_contents('box.json', '{"test": true}');
-//
-//        try {
-//            $this->commandTester->execute(
-//                [
-//                    'command' => 'validate',
-//                ],
-//                [
-//                    'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-//                ]
-//            );
-//
-//            $this->fail('Expected exception to be thrown.');
-//        } catch (RuntimeException $exception) {
-//            $this->assertSame(
-//                str_replace(
-//                    '/path/to',
-//                    $this->tmp,
-//                    'The configuration file failed validation: "/path/to/box.json" does not match the expected '
-//                    .'JSON schema'
-//                ),
-//                $exception->getMessage()
-//            );
-//            $this->assertSame(0, $exception->getCode());
-//            $this->assertNotNull($exception->getPrevious());
-//        }
-//    }
+
+    public function test_an_unknown_file_is_invalid_in_verbose_mode(): void
+    {
+        try {
+            $this->commandTester->execute(
+                [
+                    'command' => 'validate',
+                ],
+                [
+                    'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+                ]
+            );
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame(
+                'The configuration file failed validation: The configuration file could not be found.',
+                $exception->getMessage()
+            );
+            $this->assertSame(0, $exception->getCode());
+            $this->assertNotNull($exception->getPrevious());
+        }
+    }
+
+    public function test_an_invalid_JSON_file_is_invalid(): void
+    {
+        file_put_contents('box.json.dist', '{');
+
+        $this->commandTester->execute(
+            [
+                'command' => 'validate',
+            ]
+        );
+
+        $expected = <<<'OUTPUT'
+The configuration file failed validation: Parse error on line 1:
+{
+^
+Expected one of: 'STRING', '}'
+
+OUTPUT;
+
+        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $this->assertSame(1, $this->commandTester->getStatusCode());
+    }
+
+    public function test_an_invalid_JSON_file_is_invalid_in_verbose_mode(): void
+    {
+        file_put_contents('box.json.dist', '{');
+
+        try {
+            $this->commandTester->execute(
+                [
+                    'command' => 'validate',
+                ],
+                [
+                    'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+                ]
+            );
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (RuntimeException $exception) {
+            $expected = <<<'OUTPUT'
+The configuration file failed validation: Parse error on line 1:
+{
+^
+Expected one of: 'STRING', '}'
+OUTPUT;
+
+            $this->assertSame($expected, $exception->getMessage());
+            $this->assertSame(0, $exception->getCode());
+            $this->assertNotNull($exception->getPrevious());
+        }
+    }
+
+    public function test_an_incorrect_config_file_is_invalid(): void
+    {
+        file_put_contents('box.json', '{"test": true}');
+
+        $this->commandTester->execute(
+            [
+                'command' => 'validate',
+            ]
+        );
+
+        $expected = str_replace(
+            '/path/to',
+            $this->tmp,
+            'The configuration file failed validation: "/path/to/box.json" does not match the expected JSON '
+            .'schema'.PHP_EOL
+        );
+
+        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $this->assertSame(1, $this->commandTester->getStatusCode());
+    }
+
+    public function test_an_incorrect_config_file_is_invalid_in_verbose_mode(): void
+    {
+        file_put_contents('box.json', '{"test": true}');
+
+        try {
+            $this->commandTester->execute(
+                [
+                    'command' => 'validate',
+                ],
+                [
+                    'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+                ]
+            );
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame(
+                str_replace(
+                    '/path/to',
+                    $this->tmp,
+                    'The configuration file failed validation: "/path/to/box.json" does not match the expected '
+                    .'JSON schema'
+                ),
+                $exception->getMessage()
+            );
+            $this->assertSame(0, $exception->getCode());
+            $this->assertNotNull($exception->getPrevious());
+        }
+    }
 
     protected function getCommand(): Command
     {

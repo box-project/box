@@ -3,7 +3,7 @@
 namespace KevinGH\Box\Exception;
 
 use KevinGH\Box\Exception\OpenSslException;
-use Herrera\PHPUnit\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class OpenSslExceptionTest extends TestCase
 {

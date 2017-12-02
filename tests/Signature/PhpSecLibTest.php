@@ -3,7 +3,7 @@
 namespace KevinGH\Box\Signature;
 
 use KevinGH\Box\Signature\PhpSecLib;
-use Herrera\PHPUnit\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class PhpSecLibTest extends TestCase
 {

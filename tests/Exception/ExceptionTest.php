@@ -3,7 +3,7 @@
 namespace KevinGH\Box\Exception;
 
 use KevinGH\Box\Exception\Exception;
-use Herrera\PHPUnit\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class ExceptionTest extends TestCase
 {

@@ -3,9 +3,11 @@
 namespace KevinGH\Box\Signature;
 
 use KevinGH\Box\Exception\OpenSslException;
+use function KevinGH\Box\make_tmp_dir;
+use function KevinGH\Box\remove_dir;
 use KevinGH\Box\Signature\OpenSsl;
-use Herrera\PHPUnit\TestCase;
 use PHPUnit\Framework\Error\Warning;
+use PHPUnit\Framework\TestCase;
 use Throwable;
 
 class OpenSslTest extends TestCase
@@ -16,6 +18,43 @@ class OpenSslTest extends TestCase
      * @var OpenSsl
      */
     private $hash;
+
+    /**
+     * @var string
+     */
+    protected $cwd;
+
+    /**
+     * @var string
+     */
+    protected $tmp;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        $this->cwd = getcwd();
+        $this->tmp = make_tmp_dir('box', __CLASS__);
+
+        chdir($this->tmp);
+
+        $this->hash = new OpenSsl();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown(): void
+    {
+        unset($this->box, $this->phar);
+
+        chdir($this->cwd);
+
+        remove_dir($this->tmp);
+
+        parent::tearDown();
+    }
 
     public function testVerify()
     {
@@ -37,7 +76,7 @@ class OpenSslTest extends TestCase
     {
         Warning::$enabled = false;
 
-        $dir = $this->createDir();
+        mkdir($dir = 'foo');
         $path = "$dir/openssl.phar";
 
         copy(self::FIXTURES_DIR . '/openssl.phar', $path);
@@ -60,10 +99,5 @@ class OpenSslTest extends TestCase
         }
 
         Warning::$enabled = true;
-    }
-
-    protected function setUp()
-    {
-        $this->hash = new OpenSsl();
     }
 }
