@@ -138,9 +138,6 @@ STUB
         );
     }
 
-    /**
-     * @depends testGenerate
-     */
     public function testGenerateMap(): void
     {
         $this->generator->alias('test.phar');
@@ -164,9 +161,6 @@ STUB
         );
     }
 
-    /**
-     * @depends testGenerate
-     */
     public function testGenerateNoShebang(): void
     {
         $this

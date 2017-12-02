@@ -268,9 +268,6 @@ SOURCE;
         );
     }
 
-    /**
-     * @depends testBuildFromIterator
-     */
     public function testBuildFromIteratorMixed(): void
     {
         mkdir('object');
@@ -430,9 +427,6 @@ STUB
         $this->box->setValues(['stream' => STDOUT]);
     }
 
-    /**
-     * @depends testGetPhar
-     */
     public function testSign(): void
     {
         if (false === extension_loaded('openssl')) {
@@ -460,9 +454,6 @@ STUB
         );
     }
 
-    /**
-     * @depends testSign
-     */
     public function testSignWriteError(): void
     {
         list($key, $password) = $this->getPrivateKey();
@@ -483,9 +474,6 @@ STUB
         }
     }
 
-    /**
-     * @depends testSign
-     */
     public function testSignUsingFile(): void
     {
         if (false === extension_loaded('openssl')) {
