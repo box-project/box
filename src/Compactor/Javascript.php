@@ -25,7 +25,7 @@ use JShrink\Minifier;
 final class Javascript extends FileExtensionCompactor
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __construct(array $extensions = ['js'])
     {
@@ -33,7 +33,7 @@ final class Javascript extends FileExtensionCompactor
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function compact(string $contents): string
     {
@@ -47,7 +47,7 @@ final class Javascript extends FileExtensionCompactor
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function supports(string $file): bool
     {
@@ -55,6 +55,6 @@ final class Javascript extends FileExtensionCompactor
             return false;
         }
 
-        return substr($file, -7) !== '.min.js';
+        return '.min.js' !== substr($file, -7);
     }
 }

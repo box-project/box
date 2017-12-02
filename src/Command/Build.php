@@ -15,9 +15,9 @@ declare(strict_types=1);
 namespace KevinGH\Box\Command;
 
 use KevinGH\Box\Box;
-use KevinGH\Box\StubGenerator;
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Logger\BuildLogger;
+use KevinGH\Box\StubGenerator;
 use RuntimeException;
 use SplFileInfo;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -845,7 +845,7 @@ HELP
         $mapper = $config->getMapper();
 
         foreach ($iterator as $file) {
-            /** @var $file SplFileInfo */
+            // @var $file SplFileInfo
 
             // Forces garbadge collection from time to time
             if (0 === (++$count % 100)) {

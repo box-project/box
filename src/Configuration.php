@@ -875,7 +875,7 @@ final class Configuration
                 );
             }
 
-            if ($class === Php::class || $class === LegacyPhp::class) {
+            if (Php::class === $class || LegacyPhp::class === $class) {
                 $compactor = self::createPhpCompactor($raw);
             } else {
                 $compactor = new $class();

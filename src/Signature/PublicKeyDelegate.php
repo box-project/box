@@ -1,5 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Signature;
 
 use KevinGH\Box\Exception\SignatureException;
@@ -36,22 +48,29 @@ class PublicKeyDelegate implements VerifyInterface
 
     /**
      * @see VerifyInterface::init
+     *
+     * @param mixed $algorithm
+     * @param mixed $path
      */
-    public function init($algorithm, $path)
+    public function init($algorithm, $path): void
     {
         $this->hash->init($algorithm, $path);
     }
 
     /**
      * @see VerifyInterface::update
+     *
+     * @param mixed $data
      */
-    public function update($data)
+    public function update($data): void
     {
         $this->hash->update($data);
     }
 
     /**
      * @see VerifyInterface::verify
+     *
+     * @param mixed $signature
      */
     public function verify($signature)
     {

@@ -1,5 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box;
 
 use KevinGH\Box\Exception\Exception;
@@ -38,7 +50,7 @@ class Signature
     /**
      * The size of the file.
      *
-     * @var integer
+     * @var int
      */
     private $size;
 
@@ -47,46 +59,46 @@ class Signature
      *
      * @var array
      */
-    private static $types = array(
-        array(
+    private static $types = [
+        [
             'name' => 'MD5',
             'flag' => 0x01,
             'size' => 16,
             'class' => Hash::class,
-        ),
-        array(
+        ],
+        [
             'name' => 'SHA-1',
             'flag' => 0x02,
             'size' => 20,
             'class' => Hash::class,
-        ),
-        array(
+        ],
+        [
             'name' => 'SHA-256',
             'flag' => 0x03,
             'size' => 32,
             'class' => Hash::class,
-        ),
-        array(
+        ],
+        [
             'name' => 'SHA-512',
             'flag' => 0x04,
             'size' => 64,
             'class' => Hash::class,
-        ),
-        array(
+        ],
+        [
             'name' => 'OpenSSL',
             'flag' => 0x10,
             'size' => null,
             'class' => PublicKeyDelegate::class,
-        ),
-    );
+        ],
+    ];
 
     /**
      * Sets the phar file path.
      *
-     * @param string $path The phar file path.
+     * @param string $path the phar file path
      *
      * @throws Exception
-     * @throws FileException If the file does not exist.
+     * @throws FileException if the file does not exist
      */
     public function __construct($path)
     {
@@ -115,9 +127,9 @@ class Signature
     /**
      * Creates a new instance of Signature.
      *
-     * @param string $path The phar file path.
+     * @param string $path the phar file path
      *
-     * @return Signature The new instance.
+     * @return Signature the new instance
      */
     public static function create($path)
     {
@@ -131,11 +143,11 @@ class Signature
      * $required is not given, it will default to the `phar.require_hash`
      * current value.
      *
-     * @param boolean $required Is the signature required?
+     * @param bool $required Is the signature required?
      *
-     * @return array The signature.
+     * @throws PharException if the phar is not valid
      *
-     * @throws PharException If the phar is not valid.
+     * @return array the signature
      */
     public function get($required = null)
     {
@@ -197,20 +209,20 @@ class Signature
         $hash = $this->read($type['size']);
         $hash = unpack('H*', $hash);
 
-        return array(
+        return [
             'hash_type' => $type['name'],
-            'hash' => strtoupper($hash[1])
-        );
+            'hash' => strtoupper($hash[1]),
+        ];
     }
 
     /**
      * Verifies the signature of the phar.
      *
-     * @return boolean TRUE if verified, FALSE if not.
-     *
      * @throws Exception
-     * @throws FileException    If the private key could not be read.
-     * @throws OpenSslException If there is an OpenSSL error.
+     * @throws FileException    if the private key could not be read
+     * @throws OpenSslException if there is an OpenSSL error
+     *
+     * @return bool TRUE if verified, FALSE if not
      */
     public function verify()
     {
@@ -262,9 +274,9 @@ class Signature
     /**
      * Closes the open file handle.
      */
-    private function close()
+    private function close(): void
     {
-        if ($this->handle) {
+        if (is_resource($this->handle)) {
             @fclose($this->handle);
 
             $this->handle = null;
@@ -276,10 +288,10 @@ class Signature
      *
      * If the file handle is not opened, it will be automatically opened.
      *
-     * @return resource The file handle.
-     *
      * @throws Exception
-     * @throws FileException If the file could not be opened.
+     * @throws FileException if the file could not be opened
+     *
+     * @return resource the file handle
      */
     private function handle()
     {
@@ -295,12 +307,12 @@ class Signature
     /**
      * Reads a number of bytes from the file.
      *
-     * @param integer $bytes The number of bytes.
-     *
-     * @return string The read bytes.
+     * @param int $bytes the number of bytes
      *
      * @throws Exception
-     * @throws FileException If the file could not be read.
+     * @throws FileException if the file could not be read
+     *
+     * @return string the read bytes
      */
     private function read($bytes)
     {
@@ -323,13 +335,13 @@ class Signature
     /**
      * Seeks to a specific point in the file.
      *
-     * @param integer $offset The offset to seek.
-     * @param integer $whence The direction.
+     * @param int $offset the offset to seek
+     * @param int $whence the direction
      *
      * @throws Exception
-     * @throws FileException If the file could not be seeked.
+     * @throws FileException if the file could not be seeked
      */
-    private function seek($offset, $whence = SEEK_SET)
+    private function seek($offset, $whence = SEEK_SET): void
     {
         if (-1 === @fseek($this->handle(), $offset, $whence)) {
             throw FileException::lastError();

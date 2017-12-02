@@ -22,7 +22,7 @@ abstract class FileExtensionCompactor implements Compactor
     private $extensions;
 
     /**
-     * @param string[] $extensions The list of supported file extensions.
+     * @param string[] $extensions the list of supported file extensions
      */
     public function __construct(array $extensions)
     {
@@ -30,7 +30,7 @@ abstract class FileExtensionCompactor implements Compactor
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function supports(string $file): bool
     {

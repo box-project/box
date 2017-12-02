@@ -28,9 +28,9 @@ interface Compactor
     /**
      * Checks if the file is supported.
      *
-     * @param string $file The file name.
+     * @param string $file the file name
      *
-     * @return boolean
+     * @return bool
      */
     public function supports(string $file): bool;
 }

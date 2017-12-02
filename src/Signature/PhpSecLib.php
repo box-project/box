@@ -1,8 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Signature;
 
-use Crypt_RSA;
 use phpseclib\Crypt\RSA;
 
 /**
@@ -14,6 +25,8 @@ class PhpSecLib extends AbstractPublicKey
 {
     /**
      * @see VerifyInterface::verify
+     *
+     * @param mixed $signature
      */
     public function verify($signature)
     {

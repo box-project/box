@@ -14,16 +14,13 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-use Exception;
-use JShrink\Minifier;
-
 /**
  * Compacts JSON files by re-encoding without pretty print.
  */
 final class Json extends FileExtensionCompactor
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __construct(array $extensions = ['json'])
     {
@@ -31,13 +28,13 @@ final class Json extends FileExtensionCompactor
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function compact(string $contents): string
     {
         $decodedContents = json_decode($contents);
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
+        if (JSON_ERROR_NONE !== json_last_error()) {
             return $contents;
         }
 

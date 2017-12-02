@@ -9,6 +9,7 @@ use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use Phar;
 use PharException;
+use TypeError;
 
 class SignatureTest extends TestCase
 {
@@ -160,7 +161,7 @@ class SignatureTest extends TestCase
             $this->callMethod($sig, 'read', array(123));
 
             $this->fail('Expected exception to be thrown.');
-        } catch (FileException $exception) {
+        } catch (TypeError $exception) {
             $this->assertRegExp(
                 '/boolean given/',
                 $exception->getMessage()

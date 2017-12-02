@@ -53,9 +53,11 @@ tc: vendor/bin/phpunit
 
 e2e:		## Run the end-to-end tests
 e2e: bin/box.phar
-	mv -v bin/box.phar .
+	mv -fv bin/box.phar .
+
 	php -d phar.readonly=0 box.phar build
-	rm bin/box.phar
+
+	rm box.phar bin/box.phar
 
 
 ##
