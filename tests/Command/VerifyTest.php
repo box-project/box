@@ -50,15 +50,14 @@ class VerifyTest extends TestCase
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         restore_error_handler();
 
         parent::tearDown();
     }
-
 
     /**
      * @dataProvider providePassingPharPaths

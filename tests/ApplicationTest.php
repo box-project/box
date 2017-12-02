@@ -24,9 +24,9 @@ use Symfony\Component\Console\Tester\ApplicationTester;
 class ApplicationTest extends TestCase
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         restore_error_handler();
 

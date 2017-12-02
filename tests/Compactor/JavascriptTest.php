@@ -14,12 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use ErrorException;
 use KevinGH\Box\Compactor\Compactor;
-use KevinGH\Box\Compactor\DummyFileExtensionCompactor;
 use KevinGH\Box\Compactor\Javascript;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Tester\ApplicationTester;
 
 /**
  * @covers \KevinGH\Box\Compactor\Javascript
@@ -31,7 +28,7 @@ class JavascriptTest extends TestCase
      */
     private $compactor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->compactor = new Javascript();
     }
@@ -39,7 +36,7 @@ class JavascriptTest extends TestCase
     /**
      * @dataProvider provideFiles
      */
-    public function test_it_supports_javascript_files(string $file, bool $expected)
+    public function test_it_supports_javascript_files(string $file, bool $expected): void
     {
         $actual = $this->compactor->supports($file);
 
@@ -49,7 +46,7 @@ class JavascriptTest extends TestCase
     /**
      * @dataProvider provideJavascriptContent
      */
-    public function test_it_compacts_javascript_files(string $content, string $expected)
+    public function test_it_compacts_javascript_files(string $content, string $expected): void
     {
         $actual = $this->compactor->compact($content);
 
@@ -69,7 +66,7 @@ class JavascriptTest extends TestCase
     {
         yield [
             'new Array();',
-            'new Array();'
+            'new Array();',
         ];
 
         yield [

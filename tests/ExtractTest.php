@@ -1,17 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box;
 
-use KevinGH\Box\Extract;
 use InvalidArgumentException;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
-use PHPUnit\Framework\Error\Warning;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Prophecy\ObjectProphecy;
 use RuntimeException;
-use Throwable;
 
+/**
+ * @coversNothing
+ */
 class ExtractTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__.'/../fixtures/signature';
@@ -53,25 +64,28 @@ class ExtractTest extends TestCase
 
     public function getStubLengths()
     {
-        return array(
-            array(self::FIXTURES_DIR . '/example.phar', 203, null),
-            array(self::FIXTURES_DIR . '/mixed.phar', 6683, "__HALT_COMPILER(); ?>"),
-        );
+        return [
+            [self::FIXTURES_DIR.'/example.phar', 203, null],
+            [self::FIXTURES_DIR.'/mixed.phar', 6683, '__HALT_COMPILER(); ?>'],
+        ];
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage The path "/does/not/exist" is not a file or does not exist.
-     */
-    public function testConstructNotExist()
+    public function testConstructNotExist(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The path "/does/not/exist" is not a file or does not exist.');
+
         new Extract('/does/not/exist', 123);
     }
 
     /**
      * @dataProvider getStubLengths
+     *
+     * @param mixed $file
+     * @param mixed $length
+     * @param mixed $pattern
      */
-    public function testFindStubLength($file, $length, $pattern)
+    public function testFindStubLength($file, $length, $pattern): void
     {
         if ($pattern) {
             $this->assertSame(
@@ -83,9 +97,9 @@ class ExtractTest extends TestCase
         }
     }
 
-    public function testFindStubLengthInvalid()
+    public function testFindStubLengthInvalid(): void
     {
-        $path = self::FIXTURES_DIR . '/example.phar';
+        $path = self::FIXTURES_DIR.'/example.phar';
 
         try {
             Extract::findStubLength($path, 'bad pattern');
@@ -93,13 +107,13 @@ class ExtractTest extends TestCase
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                'The pattern could not be found in "' . $path . '".',
+                'The pattern could not be found in "'.$path.'".',
                 $exception->getMessage()
             );
         }
     }
 
-    public function testFindStubLengthOpenError()
+    public function testFindStubLengthOpenError(): void
     {
         try {
             Extract::findStubLength('/does/not/exist');
@@ -113,59 +127,59 @@ class ExtractTest extends TestCase
         }
     }
 
-    public function testGo()
+    public function testGo(): void
     {
-        $extract = new Extract(self::FIXTURES_DIR . '/mixed.phar', 6683);
+        $extract = new Extract(self::FIXTURES_DIR.'/mixed.phar', 6683);
 
         $dir = $extract->go();
 
         $this->assertFileExists("$dir/test");
 
-        $this->assertEquals(
+        $this->assertSame(
             "<?php\n\necho \"This is a gzip compressed line.\n\";",
             file_get_contents("$dir/gzip/a.php")
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             "<?php\n\necho \"This is a bzip2 compressed line.\n\";",
             file_get_contents("$dir/bzip2/b.php")
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             "<?php\n\necho \"This is not a compressed line.\n\";",
             file_get_contents("$dir/none/c.php")
         );
     }
 
-    public function testGoWithDir()
+    public function testGoWithDir(): void
     {
-        $extract = new Extract(self::FIXTURES_DIR . '/mixed.phar', 6683);
+        $extract = new Extract(self::FIXTURES_DIR.'/mixed.phar', 6683);
         mkdir($dir = 'foo');
 
         $extract->go($dir);
 
         $this->assertFileExists("$dir/test");
 
-        $this->assertEquals(
+        $this->assertSame(
             "<?php\n\necho \"This is a gzip compressed line.\n\";",
             file_get_contents("$dir/gzip/a.php")
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             "<?php\n\necho \"This is a bzip2 compressed line.\n\";",
             file_get_contents("$dir/bzip2/b.php")
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             "<?php\n\necho \"This is not a compressed line.\n\";",
             file_get_contents("$dir/none/c.php")
         );
     }
 
-    public function testGoInvalidLength()
+    public function testGoInvalidLength(): void
     {
         $this->markTestSkipped('Check this one again later.');
-        $path = self::FIXTURES_DIR . '/mixed.phar';
+        $path = self::FIXTURES_DIR.'/mixed.phar';
 
         $extract = new Extract($path, -123);
 
@@ -175,32 +189,32 @@ class ExtractTest extends TestCase
             $this->fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
             $this->assertSame(
-                'Could not seek to -123 in the file "' . $path . '".',
+                'Could not seek to -123 in the file "'.$path.'".',
                 $exception->getMessage()
             );
         }
     }
 
     /**
-     * Issue #7
+     * Issue #7.
      *
      * Files with no content would trigger an exception when extracted.
      */
-    public function testGoEmptyFile()
+    public function testGoEmptyFile(): void
     {
         $this->markTestSkipped('Check this one again later.');
-        $path = self::FIXTURES_DIR . '/empty.phar';
+        $path = self::FIXTURES_DIR.'/empty.phar';
 
         $extract = new Extract($path, Extract::findStubLength($path));
 
         $dir = $extract->go();
 
-        $this->assertFileExists($dir . '/empty.php');
+        $this->assertFileExists($dir.'/empty.php');
 
-        $this->assertEquals('', file_get_contents($dir . '/empty.php'));
+        $this->assertSame('', file_get_contents($dir.'/empty.php'));
     }
 
-    public function testPurge()
+    public function testPurge(): void
     {
         mkdir($dir = 'foo');
 
@@ -212,7 +226,7 @@ class ExtractTest extends TestCase
         $this->assertFileNotExists($dir);
     }
 
-    public function testPurgeUnlinkError()
+    public function testPurgeUnlinkError(): void
     {
         $root = vfsStream::newDirectory('test', 0444);
         $root->addChild(vfsStream::newFile('test', 0000));

@@ -1,9 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Signature;
 
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @coversNothing
+ */
 class AbstractPublicKeyTest extends TestCase
 {
     /**
@@ -11,16 +26,15 @@ class AbstractPublicKeyTest extends TestCase
      */
     private $hash;
 
-    /**
-     * @expectedException \KevinGH\Box\Exception\FileException
-     */
-    public function testInitNotExist()
-    {
-        $this->hash->init('abc', '/does/not/exist');
-    }
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->hash = new PublicKey();
+    }
+
+    public function testInitNotExist(): void
+    {
+        $this->expectException(\KevinGH\Box\Exception\FileException::class);
+
+        $this->hash->init('abc', '/does/not/exist');
     }
 }

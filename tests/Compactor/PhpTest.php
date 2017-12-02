@@ -14,15 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use ErrorException;
 use Herrera\Annotations\Tokenizer;
-use KevinGH\Box\Compactor\Compactor;
-use KevinGH\Box\Compactor\DummyFileExtensionCompactor;
-use KevinGH\Box\Compactor\Javascript;
-use KevinGH\Box\Compactor\Json;
 use KevinGH\Box\Compactor\Php;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Tester\ApplicationTester;
 
 /**
  * @covers \KevinGH\Box\Compactor\Php
@@ -32,7 +26,7 @@ class PhpTest extends TestCase
     /**
      * @dataProvider provideFiles
      */
-    public function test_it_supports_PHP_files(string $file, bool $expected)
+    public function test_it_supports_PHP_files(string $file, bool $expected): void
     {
         $compactor = new Php(new Tokenizer());
 
@@ -44,7 +38,7 @@ class PhpTest extends TestCase
     /**
      * @dataProvider providePhpContent
      */
-    public function test_it_compacts_PHP_files(Tokenizer $tokenizer, string $content, string $expected)
+    public function test_it_compacts_PHP_files(Tokenizer $tokenizer, string $content, string $expected): void
     {
         $compactor = new Php($tokenizer);
 

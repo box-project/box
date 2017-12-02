@@ -1,23 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Signature;
 
 use KevinGH\Box\Exception\OpenSslException;
-use function KevinGH\Box\make_tmp_dir;
-use function KevinGH\Box\remove_dir;
-use KevinGH\Box\Signature\OpenSsl;
 use PHPUnit\Framework\Error\Warning;
 use PHPUnit\Framework\TestCase;
-use Throwable;
+use function KevinGH\Box\make_tmp_dir;
+use function KevinGH\Box\remove_dir;
 
+/**
+ * @coversNothing
+ */
 class OpenSslTest extends TestCase
 {
     public const FIXTURES_DIR = __DIR__.'/../../fixtures/signature';
-
-    /**
-     * @var OpenSsl
-     */
-    private $hash;
 
     /**
      * @var string
@@ -28,6 +36,11 @@ class OpenSslTest extends TestCase
      * @var string
      */
     protected $tmp;
+
+    /**
+     * @var OpenSsl
+     */
+    private $hash;
 
     /**
      * {@inheritdoc}
@@ -56,13 +69,13 @@ class OpenSslTest extends TestCase
         parent::tearDown();
     }
 
-    public function testVerify()
+    public function testVerify(): void
     {
-        $path = self::FIXTURES_DIR . '/openssl.phar';
+        $path = self::FIXTURES_DIR.'/openssl.phar';
 
         $this->hash->init('openssl', $path);
         $this->hash->update(
-            file_get_contents($path, null, null, 0, filesize($path) - 76)
+            file_get_contents($path, false, null, 0, filesize($path) - 76)
         );
 
         $this->assertTrue(
@@ -72,19 +85,19 @@ class OpenSslTest extends TestCase
         );
     }
 
-    public function testVerifyErrorHandlingBug()
+    public function testVerifyErrorHandlingBug(): void
     {
         Warning::$enabled = false;
 
         mkdir($dir = 'foo');
         $path = "$dir/openssl.phar";
 
-        copy(self::FIXTURES_DIR . '/openssl.phar', $path);
+        copy(self::FIXTURES_DIR.'/openssl.phar', $path);
         touch("$path.pubkey");
 
         $this->hash->init('openssl', $path);
         $this->hash->update(
-            file_get_contents($path, null, null, 0, filesize($path) - 76)
+            file_get_contents($path, false, null, 0, filesize($path) - 76)
         );
 
         try {

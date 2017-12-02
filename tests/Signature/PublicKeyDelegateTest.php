@@ -1,24 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Signature;
 
-use KevinGH\Box\Signature\PublicKeyDelegate;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @coversNothing
+ */
 class PublicKeyDelegateTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__.'/../../fixtures/signature';
 
-    private static $openssl = false;
-
-    public function testFunctional()
+    public function testFunctional(): void
     {
-        $path = self::FIXTURES_DIR . '/openssl.phar';
+        $path = self::FIXTURES_DIR.'/openssl.phar';
         $hash = new PublicKeyDelegate();
 
         $hash->init('openssl', $path);
         $hash->update(
-            file_get_contents($path, null, null, 0, filesize($path) - 76)
+            file_get_contents($path, false, null, 0, filesize($path) - 76)
         );
 
         $this->assertTrue(

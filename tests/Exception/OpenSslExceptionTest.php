@@ -1,13 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Exception;
 
-use KevinGH\Box\Exception\OpenSslException;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @coversNothing
+ */
 class OpenSslExceptionTest extends TestCase
 {
-    public function testLastError()
+    protected function setUp(): void
+    {
+        if (false === extension_loaded('openssl')) {
+            $this->markTestSkipped('The "openssl" extension is not available.');
+        }
+    }
+
+    public function testLastError(): void
     {
         if (false === extension_loaded('openssl')) {
             $this->markTestSkipped(
@@ -24,7 +45,7 @@ class OpenSslExceptionTest extends TestCase
         $this->assertRegExp('/PEM routines/', $exception->getMessage());
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         openssl_pkey_get_private('test', 'test');
 
@@ -33,9 +54,9 @@ class OpenSslExceptionTest extends TestCase
         $this->assertEmpty(openssl_error_string());
     }
 
-    public function testResetWarning()
+    public function testResetWarning(): void
     {
-        openssl_pkey_get_private('test' . rand(), 'test' . rand());
+        openssl_pkey_get_private('test'.random_int(0, getrandmax()), 'test'.random_int(0, getrandmax()));
 
         restore_error_handler();
 
@@ -43,16 +64,9 @@ class OpenSslExceptionTest extends TestCase
 
         $error = error_get_last();
 
-        $this->assertEquals(
+        $this->assertSame(
             'The OpenSSL error clearing loop has exceeded 0 rounds.',
             $error['message']
         );
-    }
-
-    protected function setUp()
-    {
-        if (false === extension_loaded('openssl')) {
-            $this->markTestSkipped('The "openssl" extension is not available.');
-        }
     }
 }

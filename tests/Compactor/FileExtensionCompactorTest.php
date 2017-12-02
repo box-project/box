@@ -14,22 +14,19 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use ErrorException;
 use KevinGH\Box\Compactor\DummyFileExtensionCompactor;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Tester\ApplicationTester;
 
 /**
  * @covers \KevinGH\Box\Compactor\FileExtensionCompactor
  */
 class FileExtensionCompactorTest extends TestCase
 {
-    public function test_it_supports_the_given_extensions()
+    public function test_it_supports_the_given_extensions(): void
     {
         $compactor = new DummyFileExtensionCompactor(['php']);
 
         $this->assertTrue($compactor->supports('test.php'));
         $this->assertFalse($compactor->supports('test'));
-
     }
 }

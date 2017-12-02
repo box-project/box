@@ -1,13 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box;
 
 use ArrayIterator;
 use FilesystemIterator;
 use Herrera\Annotations\Tokenizer;
 use KevinGH\Box\Compactor\Compactor;
-use KevinGH\Box\Compactor\DummyCompactor;
 use KevinGH\Box\Compactor\Php;
+use KevinGH\Box\Exception\FileException;
+use KevinGH\Box\Exception\UnexpectedValueException;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use Phar;
@@ -17,22 +30,13 @@ use Prophecy\Prophecy\ObjectProphecy;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
-use KevinGH\Box\Exception\FileException;
-use KevinGH\Box\Exception\UnexpectedValueException;
 
+/**
+ * @coversNothing
+ */
 class BoxTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__.'/../fixtures/signature';
-
-    /**
-     * @var Box
-     */
-    private $box;
-
-    /**
-     * @var Phar
-     */
-    private $phar;
 
     /**
      * @var string
@@ -43,6 +47,16 @@ class BoxTest extends TestCase
      * @var string
      */
     protected $tmp;
+
+    /**
+     * @var Box
+     */
+    private $box;
+
+    /**
+     * @var Phar
+     */
+    private $phar;
 
     /**
      * @var Compactor|ObjectProphecy
@@ -89,8 +103,8 @@ class BoxTest extends TestCase
 
     public function getPrivateKey()
     {
-        return array(
-            <<<KEY
+        return [
+            <<<'KEY'
 -----BEGIN RSA PRIVATE KEY-----
 Proc-Type: 4,ENCRYPTED
 DEK-Info: DES-EDE3-CBC,3FF97F75E5A8F534
@@ -111,11 +125,11 @@ TnvzVS0y1l8zCsRToUtv5rCBC+r8Q3gnvGGnT4jrsp98ithGIQCbbQ==
 -----END RSA PRIVATE KEY-----
 KEY
             ,
-            'test'
-        );
+            'test',
+        ];
     }
 
-    public function testAddFile()
+    public function testAddFile(): void
     {
         touch($file = 'foo');
 
@@ -123,22 +137,21 @@ KEY
 
         $this->box->addFile($file, 'test/test.php');
 
-        $this->assertEquals(
+        $this->assertSame(
             'test',
             file_get_contents('phar://test.phar/test/test.php')
         );
     }
 
-    /**
-     * @expectedException \KevinGH\Box\Exception\FileException
-     * @expectedExceptionMessage The file "/does/not/exist" does not exist or is not a file.
-     */
-    public function testAddFileNotExist()
+    public function testAddFileNotExist(): void
     {
+        $this->expectException(\KevinGH\Box\Exception\FileException::class);
+        $this->expectExceptionMessage('The file "/does/not/exist" does not exist or is not a file.');
+
         $this->box->addFile('/does/not/exist');
     }
 
-    public function testAddFileReadError()
+    public function testAddFileReadError(): void
     {
         vfsStreamWrapper::setRoot($root = vfsStream::newDirectory('test'));
 
@@ -156,9 +169,9 @@ KEY
         }
     }
 
-    public function testAddFromString()
+    public function testAddFromString(): void
     {
-        $original = <<<SOURCE
+        $original = <<<'SOURCE'
 <?php
 
 /**
@@ -175,7 +188,7 @@ class @thing@
 }
 SOURCE;
 
-        $expected = <<<SOURCE
+        $expected = <<<'SOURCE'
 <?php
 
 
@@ -194,21 +207,21 @@ SOURCE;
 
         $this->box->addCompactor(new Php(new Tokenizer()));
         $this->box->setValues(
-            array(
+            [
                 '@thing@' => 'MyClass',
-                '@other_thing@' => 'myMethod'
-            )
+                '@other_thing@' => 'myMethod',
+            ]
         );
 
         $this->box->addFromString('test/test.php', $original);
 
-        $this->assertEquals(
+        $this->assertSame(
             $expected,
             file_get_contents('phar://test.phar/test/test.php')
         );
     }
 
-    public function testBuildFromDirectory()
+    public function testBuildFromDirectory(): void
     {
         mkdir('test/sub', 0755, true);
         touch('test/sub.txt');
@@ -218,17 +231,17 @@ SOURCE;
             '<?php echo "Hello, @name@!\n";'
         );
 
-        $this->box->setValues(array('@name@' => 'world'));
+        $this->box->setValues(['@name@' => 'world']);
         $this->box->buildFromDirectory($this->tmp, '/\.php$/');
 
         $this->assertFalse(isset($this->phar['test/sub.txt']));
-        $this->assertEquals(
+        $this->assertSame(
             '<?php echo "Hello, world!\n";',
             file_get_contents('phar://test.phar/test/sub/test.php')
         );
     }
 
-    public function testBuildFromIterator()
+    public function testBuildFromIterator(): void
     {
         mkdir('test/sub', 0755, true);
 
@@ -246,10 +259,10 @@ SOURCE;
             )
         );
 
-        $this->box->setValues(array('@name@' => 'world'));
+        $this->box->setValues(['@name@' => 'world']);
         $this->box->buildFromIterator($iterator, $this->tmp);
 
-        $this->assertEquals(
+        $this->assertSame(
             '<?php echo "Hello, world!\n";',
             file_get_contents('phar://test.phar/test/sub/test.php')
         );
@@ -258,7 +271,7 @@ SOURCE;
     /**
      * @depends testBuildFromIterator
      */
-    public function testBuildFromIteratorMixed()
+    public function testBuildFromIteratorMixed(): void
     {
         mkdir('object');
         mkdir('string');
@@ -268,12 +281,12 @@ SOURCE;
 
         $this->box->buildFromIterator(
             new ArrayIterator(
-                array(
-                    'object' => new SplFileInfo($this->tmp . '/object'),
-                    'string' => $this->tmp . '/string',
-                    'object.php' => new SplFileInfo($this->tmp . '/object.php'),
-                    'string.php' => $this->tmp . '/string.php',
-                )
+                [
+                    'object' => new SplFileInfo($this->tmp.'/object'),
+                    'string' => $this->tmp.'/string',
+                    'object.php' => new SplFileInfo($this->tmp.'/object.php'),
+                    'string.php' => $this->tmp.'/string.php',
+                ]
             ),
             $this->tmp
         );
@@ -287,22 +300,21 @@ SOURCE;
         $this->assertTrue($phar['string.php']->isFile());
     }
 
-    /**
-     * @expectedException \KevinGH\Box\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The $base argument is required for SplFileInfo values.
-     */
-    public function testBuildFromIteratorBaseRequired()
+    public function testBuildFromIteratorBaseRequired(): void
     {
+        $this->expectException(\KevinGH\Box\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The $base argument is required for SplFileInfo values.');
+
         $this->box->buildFromIterator(
-            new ArrayIterator(array(new SplFileInfo($this->tmp)))
+            new ArrayIterator([new SplFileInfo($this->tmp)])
         );
     }
 
-    public function testBuildFromIteratorOutsideBase()
+    public function testBuildFromIteratorOutsideBase(): void
     {
         try {
             $this->box->buildFromIterator(
-                new ArrayIterator(array(new SplFileInfo($this->tmp))),
+                new ArrayIterator([new SplFileInfo($this->tmp)]),
                 __DIR__
             );
 
@@ -315,27 +327,25 @@ SOURCE;
         }
     }
 
-    /**
-     * @expectedException \KevinGH\Box\Exception\UnexpectedValueException
-     * @expectedExceptionMessage The key returned by the iterator (integer) is not a string.
-     */
-    public function testBuildFromIteratorInvalidKey()
+    public function testBuildFromIteratorInvalidKey(): void
     {
-        $this->box->buildFromIterator(new ArrayIterator(array('test')));
+        $this->expectException(\KevinGH\Box\Exception\UnexpectedValueException::class);
+        $this->expectExceptionMessage('The key returned by the iterator (integer) is not a string.');
+
+        $this->box->buildFromIterator(new ArrayIterator(['test']));
     }
 
-    /**
-     * @expectedException \KevinGH\Box\Exception\UnexpectedValueException
-     * @expectedExceptionMessage The iterator value "resource" was not expected.
-     */
-    public function testBuildFromIteratorInvalid()
+    public function testBuildFromIteratorInvalid(): void
     {
+        $this->expectException(\KevinGH\Box\Exception\UnexpectedValueException::class);
+        $this->expectExceptionMessage('The iterator value "resource" was not expected.');
+
         $this->box->buildFromIterator(
-            new ArrayIterator(array('stream' => STDOUT))
+            new ArrayIterator(['stream' => STDOUT])
         );
     }
 
-    public function testCompactContents()
+    public function testCompactContents(): void
     {
         $this->box->addCompactor($this->compactor);
 
@@ -353,14 +363,14 @@ SOURCE;
         $this->compactorProphecy->compact(Argument::cetera())->shouldHaveBeenCalledTimes(1);
     }
 
-    public function testGetPhar()
+    public function testGetPhar(): void
     {
         $this->assertSame($this->phar, $this->box->getPhar());
     }
 
-    public function testGetSignature()
+    public function testGetSignature(): void
     {
-        $path = self::FIXTURES_DIR . '/example.phar';
+        $path = self::FIXTURES_DIR.'/example.phar';
         $phar = new Phar($path);
 
         $this->assertEquals(
@@ -369,21 +379,19 @@ SOURCE;
         );
     }
 
-    /**
-     * @expectedException \KevinGH\Box\Exception\FileException
-     * @expectedExceptionMessage The file "/does/not/exist" does not exist or is not a file.
-     */
-    public function testSetStubUsingFileNotExist()
+    public function testSetStubUsingFileNotExist(): void
     {
+        $this->expectException(\KevinGH\Box\Exception\FileException::class);
+        $this->expectExceptionMessage('The file "/does/not/exist" does not exist or is not a file.');
+
         $this->box->setStubUsingFile('/does/not/exist');
     }
 
-    /**
-     * @expectedException \KevinGH\Box\Exception\FileException
-     * @expectedExceptionMessage failed to open stream
-     */
-    public function testSetStubUsingFileReadError()
+    public function testSetStubUsingFileReadError(): void
     {
+        $this->expectException(\KevinGH\Box\Exception\FileException::class);
+        $this->expectExceptionMessage('failed to open stream');
+
         vfsStreamWrapper::setRoot($root = vfsStream::newDirectory('test'));
 
         $root->addChild(vfsStream::newFile('test.php', 0000));
@@ -391,13 +399,13 @@ SOURCE;
         $this->box->setStubUsingFile('vfs://test/test.php');
     }
 
-    public function testSetStubUsingFile()
+    public function testSetStubUsingFile(): void
     {
         touch($file = 'foo');
 
         file_put_contents(
             $file,
-            <<<STUB
+            <<<'STUB'
 #!/usr/bin/env php
 <?php
 echo "@replace_me@";
@@ -405,28 +413,27 @@ __HALT_COMPILER();
 STUB
         );
 
-        $this->box->setValues(array('@replace_me@' => 'replaced'));
+        $this->box->setValues(['@replace_me@' => 'replaced']);
         $this->box->setStubUsingFile($file, true);
 
-        $this->assertEquals(
+        $this->assertSame(
             'replaced',
             exec('php test.phar')
         );
     }
 
-    /**
-     * @expectedException \KevinGH\Box\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Non-scalar values (such as resource) are not supported.
-     */
-    public function testSetValuesNonScalar()
+    public function testSetValuesNonScalar(): void
     {
-        $this->box->setValues(array('stream' => STDOUT));
+        $this->expectException(\KevinGH\Box\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Non-scalar values (such as resource) are not supported.');
+
+        $this->box->setValues(['stream' => STDOUT]);
     }
 
     /**
      * @depends testGetPhar
      */
-    public function testSign()
+    public function testSign(): void
     {
         if (false === extension_loaded('openssl')) {
             $this->markTestSkipped('The "openssl" extension is not available.');
@@ -447,7 +454,7 @@ STUB
 
         $this->box->sign($key, $password);
 
-        $this->assertEquals(
+        $this->assertSame(
             'Hello, world!',
             exec('php test.phar')
         );
@@ -456,7 +463,7 @@ STUB
     /**
      * @depends testSign
      */
-    public function testSignWriteError()
+    public function testSignWriteError(): void
     {
         list($key, $password) = $this->getPrivateKey();
 
@@ -479,7 +486,7 @@ STUB
     /**
      * @depends testSign
      */
-    public function testSignUsingFile()
+    public function testSignUsingFile(): void
     {
         if (false === extension_loaded('openssl')) {
             $this->markTestSkipped('The "openssl" extension is not available.');
@@ -504,27 +511,25 @@ STUB
 
         $this->box->signUsingFile($file, $password);
 
-        $this->assertEquals(
+        $this->assertSame(
             'Hello, world!',
             exec('php test.phar')
         );
     }
 
-    /**
-     * @expectedException \KevinGH\Box\Exception\FileException
-     * @expectedExceptionMessage The file "/does/not/exist" does not exist or is not a file.
-     */
-    public function testSignUsingFileNotExist()
+    public function testSignUsingFileNotExist(): void
     {
+        $this->expectException(\KevinGH\Box\Exception\FileException::class);
+        $this->expectExceptionMessage('The file "/does/not/exist" does not exist or is not a file.');
+
         $this->box->signUsingFile('/does/not/exist');
     }
 
-    /**
-     * @expectedException \KevinGH\Box\Exception\FileException
-     * @expectedExceptionMessage failed to open stream
-     */
-    public function testSignUsingFileReadError()
+    public function testSignUsingFileReadError(): void
     {
+        $this->expectException(\KevinGH\Box\Exception\FileException::class);
+        $this->expectExceptionMessage('failed to open stream');
+
         $root = vfsStream::newDirectory('test');
         $root->addChild(vfsStream::newFile('private.key', 0000));
 
