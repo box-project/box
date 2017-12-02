@@ -1,6 +1,6 @@
 <?php
 
-namespace Herrera\Box\Exception;
+namespace KevinGH\Box\Exception;
 
 /**
  * Use for errors when using the OpenSSL extension.

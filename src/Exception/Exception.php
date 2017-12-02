@@ -1,6 +1,6 @@
 <?php
 
-namespace Herrera\Box\Exception;
+namespace KevinGH\Box\Exception;
 
 /**
  * Provides additional functional to the Exception class.

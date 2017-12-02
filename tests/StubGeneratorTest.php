@@ -1,9 +1,9 @@
 <?php
 
-namespace Herrera\Box\Tests;
+namespace KevinGH\Box;
 
 use Herrera\Annotations\Tokenizer;
-use Herrera\Box\StubGenerator;
+use KevinGH\Box\StubGenerator;
 use Herrera\PHPUnit\TestCase;
 use KevinGH\Box\Compactor\Php;
 use Phar;
@@ -290,7 +290,7 @@ STUB
     }
 
     /**
-     * @expectedException \Herrera\Box\Exception\InvalidArgumentException
+     * @expectedException \KevinGH\Box\Exception\InvalidArgumentException
      * @expectedExceptionMessage The $_SERVER variable "test" is not allowed.
      */
     public function testMungInvalid()
@@ -348,7 +348,7 @@ STUB
         );
 
         $compactor = new Php(new Tokenizer());
-        $code = file_get_contents(__DIR__ . '/../lib/Extract.php');
+        $code = file_get_contents(__DIR__ . '/../src/Extract.php');
         $code = $compactor->compact($code);
         $code = preg_replace('/\n+/', "\n", $code);
         $code = explode("\n", $code);

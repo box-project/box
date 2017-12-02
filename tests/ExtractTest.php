@@ -1,8 +1,8 @@
 <?php
 
-namespace Herrera\Box\Tests;
+namespace KevinGH\Box;
 
-use Herrera\Box\Extract;
+use KevinGH\Box\Extract;
 use Herrera\PHPUnit\TestCase;
 use InvalidArgumentException;
 use org\bovigo\vfs\vfsStream;
@@ -14,11 +14,13 @@ use Throwable;
 
 class ExtractTest extends TestCase
 {
+    private const FIXTURES_DIR = __DIR__.'/../fixtures/signature';
+    
     public function getStubLengths()
     {
         return array(
-            array(RES_DIR . '/example.phar', 203, null),
-            array(RES_DIR . '/mixed.phar', 6683, "__HALT_COMPILER(); ?>"),
+            array(self::FIXTURES_DIR . '/example.phar', 203, null),
+            array(self::FIXTURES_DIR . '/mixed.phar', 6683, "__HALT_COMPILER(); ?>"),
         );
     }
 
@@ -63,7 +65,7 @@ class ExtractTest extends TestCase
 
     public function testFindStubLengthInvalid()
     {
-        $path = RES_DIR . '/example.phar';
+        $path = self::FIXTURES_DIR . '/example.phar';
 
         try {
             Extract::findStubLength($path, 'bad pattern');
@@ -93,7 +95,7 @@ class ExtractTest extends TestCase
 
     public function testGo()
     {
-        $extract = new Extract(RES_DIR . '/mixed.phar', 6683);
+        $extract = new Extract(self::FIXTURES_DIR . '/mixed.phar', 6683);
 
         $dir = $extract->go();
 
@@ -117,7 +119,7 @@ class ExtractTest extends TestCase
 
     public function testGoWithDir()
     {
-        $extract = new Extract(RES_DIR . '/mixed.phar', 6683);
+        $extract = new Extract(self::FIXTURES_DIR . '/mixed.phar', 6683);
         $dir = $this->createDir();
 
         $extract->go($dir);
@@ -142,7 +144,7 @@ class ExtractTest extends TestCase
 
     public function testGoInvalidLength()
     {
-        $path = RES_DIR . '/mixed.phar';
+        $path = self::FIXTURES_DIR . '/mixed.phar';
 
         $extract = new Extract($path, -123);
 
@@ -165,7 +167,7 @@ class ExtractTest extends TestCase
      */
     public function testGoEmptyFile()
     {
-        $path = RES_DIR . '/empty.phar';
+        $path = self::FIXTURES_DIR . '/empty.phar';
 
         $extract = new Extract($path, Extract::findStubLength($path));
 

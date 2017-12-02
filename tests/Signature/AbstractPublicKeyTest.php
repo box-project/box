@@ -26,7 +26,7 @@ class AbstractPublicKeyTest extends TestCase
     }
 
     /**
-     * @expectedException \Herrera\Box\Exception\FileException
+     * @expectedException \KevinGH\Box\Exception\FileException
      */
     public function testInitNotExist()
     {

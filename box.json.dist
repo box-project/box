@@ -4,8 +4,7 @@
     "output": "bin/box.phar",
 
     "directories": [
-        "src",
-        "box-lib/src/lib"
+        "src"
     ],
     "files": [
         "res/schema.json"

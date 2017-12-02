@@ -2,7 +2,7 @@
 
 namespace KevinGH\Box\Signature;
 
-use Herrera\Box\Exception\FileException;
+use KevinGH\Box\Exception\FileException;
 
 /**
  * Loads the private key from a file to use for verification.

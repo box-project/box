@@ -1,8 +1,8 @@
 <?php
 
-namespace Herrera\Box\Tests\Exception;
+namespace KevinGH\Box\Exception;
 
-use Herrera\Box\Exception\Exception;
+use KevinGH\Box\Exception\Exception;
 use Herrera\PHPUnit\TestCase;
 
 class ExceptionTest extends TestCase

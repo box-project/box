@@ -1,9 +1,9 @@
 <?php
 
-namespace Herrera\Box;
+namespace KevinGH\Box;
 
 use Herrera\Annotations\Tokenizer;
-use Herrera\Box\Exception\InvalidArgumentException;
+use KevinGH\Box\Exception\InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
 
 /**

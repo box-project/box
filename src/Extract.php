@@ -1,6 +1,6 @@
 <?php
 
-namespace Herrera\Box;
+namespace KevinGH\Box;
 
 use InvalidArgumentException;
 use LengthException;

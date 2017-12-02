@@ -1,6 +1,6 @@
 <?php
 
-namespace Herrera\Box\Exception;
+namespace KevinGH\Box\Exception;
 
 /**
  * Used for errors when using the file system.

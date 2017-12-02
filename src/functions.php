@@ -39,7 +39,15 @@ function is_absolute(string $path): bool
 
 function register_aliases(): void
 {
-    class_alias(\KevinGH\Box\Compactor\Javascript::class, \Herrera\Box\Compactor\Javascript::class);
-    class_alias(\KevinGH\Box\Compactor\Json::class, \Herrera\Box\Compactor\Json::class);
-    class_alias(\KevinGH\Box\Compactor\Php::class, \Herrera\Box\Compactor\Php::class);
+    if (false === class_exists(\Herrera\Box\Compactor\Javascript::class, false)) {
+        class_alias(\KevinGH\Box\Compactor\Javascript::class, \Herrera\Box\Compactor\Javascript::class);
+    }
+
+    if (false === class_exists(\Herrera\Box\Compactor\Json::class, false)) {
+        class_alias(\KevinGH\Box\Compactor\Json::class, \Herrera\Box\Compactor\Json::class);
+    }
+
+    if (false === class_exists(\Herrera\Box\Compactor\Php::class, false)) {
+        class_alias(\KevinGH\Box\Compactor\Php::class, \Herrera\Box\Compactor\Php::class);
+    }
 }

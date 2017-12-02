@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-use Herrera\Box\Compactor\CompactorInterface;
+use KevinGH\Box\Compactor\CompactorInterface;
 use KevinGH\Box\Compactor\Compactor;
 
 class DummyCompactor implements Compactor

@@ -41,11 +41,7 @@ build: bin/box src vendor
 ##---------------------------------------------------------------------------
 
 test:		## Run all the tests
-test: tu test_legacy_lib e2e
-
-test_legacy_lib:## Test the legacy box lib project
-test_legacy_lib:
-	php -d phar.readonly=0 -d zend.enable_gc=0 bin/phpunit -c box-lib/phpunit.xml.dist
+test: tu e2e
 
 tu:		## Run the unit tests
 tu: vendor/bin/phpunit
@@ -59,7 +55,7 @@ e2e:		## Run the end-to-end tests
 e2e: bin/box.phar
 	mv -v bin/box.phar .
 	php -d phar.readonly=0 box.phar build
-	rm box.phar
+	rm bin/box.phar
 
 
 ##

@@ -2,7 +2,7 @@
 
 namespace KevinGH\Box\Signature;
 
-use Herrera\Box\Exception\OpenSslException;
+use KevinGH\Box\Exception\OpenSslException;
 use KevinGH\Box\Signature\OpenSsl;
 use Herrera\PHPUnit\TestCase;
 use PHPUnit\Framework\Error\Warning;

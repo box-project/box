@@ -16,7 +16,7 @@ namespace KevinGH\Box;
 
 use Closure;
 use Herrera\Annotations\Tokenizer;
-use Herrera\Box\Compactor\Php;
+use KevinGH\Box\Compactor\Php;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\DummyCompactor;
 use Phar;

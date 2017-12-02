@@ -1,13 +1,13 @@
 <?php
 
-namespace Herrera\Box;
+namespace KevinGH\Box;
 
 use FilesystemIterator;
-use Herrera\Box\Compactor\CompactorInterface;
-use Herrera\Box\Exception\FileException;
-use Herrera\Box\Exception\InvalidArgumentException;
-use Herrera\Box\Exception\OpenSslException;
-use Herrera\Box\Exception\UnexpectedValueException;
+use KevinGH\Box\Compactor\CompactorInterface;
+use KevinGH\Box\Exception\FileException;
+use KevinGH\Box\Exception\InvalidArgumentException;
+use KevinGH\Box\Exception\OpenSslException;
+use KevinGH\Box\Exception\UnexpectedValueException;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Signature;
 use Phar;

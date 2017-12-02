@@ -2,7 +2,7 @@
 
 namespace KevinGH\Box;
 
-use Herrera\Box\Exception\FileException;
+use KevinGH\Box\Exception\FileException;
 use KevinGH\Box\Signature;
 use Herrera\PHPUnit\TestCase;
 use org\bovigo\vfs\vfsStream;
@@ -186,7 +186,7 @@ class SignatureTest extends TestCase
     }
 
     /**
-     * @expectedException \Herrera\Box\Exception\FileException
+     * @expectedException \KevinGH\Box\Exception\FileException
      */
     public function testSeek()
     {

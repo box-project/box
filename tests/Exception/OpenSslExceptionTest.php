@@ -1,8 +1,8 @@
 <?php
 
-namespace Herrera\Box\Tests\Exception;
+namespace KevinGH\Box\Exception;
 
-use Herrera\Box\Exception\OpenSslException;
+use KevinGH\Box\Exception\OpenSslException;
 use Herrera\PHPUnit\TestCase;
 
 class OpenSslExceptionTest extends TestCase

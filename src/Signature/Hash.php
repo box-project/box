@@ -2,7 +2,7 @@
 
 namespace KevinGH\Box\Signature;
 
-use Herrera\Box\Exception\SignatureException;
+use KevinGH\Box\Exception\SignatureException;
 
 /**
  * Uses the PHP hash library to verify a signature.

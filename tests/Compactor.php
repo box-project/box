@@ -1,8 +1,8 @@
 <?php
 
-namespace Herrera\Box\Tests;
+namespace KevinGH\Box;
 
-use Herrera\Box\Compactor\CompactorInterface;
+use KevinGH\Box\Compactor\CompactorInterface;
 
 class Compactor implements CompactorInterface
 {

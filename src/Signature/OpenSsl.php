@@ -2,7 +2,7 @@
 
 namespace KevinGH\Box\Signature;
 
-use Herrera\Box\Exception\OpenSslException;
+use KevinGH\Box\Exception\OpenSslException;
 
 /**
  * Uses OpenSSL to verify the signature.

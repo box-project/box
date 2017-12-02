@@ -1,6 +1,6 @@
 <?php
 
-namespace Herrera\Box\Exception;
+namespace KevinGH\Box\Exception;
 
 /**
  * Indicates that the exception came from this library.

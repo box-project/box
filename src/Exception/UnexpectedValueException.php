@@ -1,6 +1,6 @@
 <?php
 
-namespace Herrera\Box\Exception;
+namespace KevinGH\Box\Exception;
 
 /**
  * Used if an unexpected value is given.

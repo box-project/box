@@ -2,7 +2,7 @@
 
 namespace KevinGH\Box\Signature;
 
-use Herrera\Box\Exception\SignatureException;
+use KevinGH\Box\Exception\SignatureException;
 
 /**
  * Uses the OpenSSL extension or phpseclib library to verify a signature.

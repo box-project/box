@@ -2,8 +2,8 @@
 
 namespace KevinGH\Box\Signature;
 
-use Herrera\Box\Exception\Exception;
-use Herrera\Box\Exception\SignatureException;
+use KevinGH\Box\Exception\Exception;
+use KevinGH\Box\Exception\SignatureException;
 
 /**
  * Defines how a signature verification class must be implemented.

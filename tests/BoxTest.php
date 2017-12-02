@@ -1,12 +1,12 @@
 <?php
 
-namespace Herrera\Box\Tests;
+namespace KevinGH\Box;
 
 use ArrayIterator;
 use FilesystemIterator;
 use Herrera\Annotations\Tokenizer;
-use Herrera\Box\Box;
-use Herrera\Box\StubGenerator;
+use KevinGH\Box\Box;
+use KevinGH\Box\StubGenerator;
 use Herrera\PHPUnit\TestCase;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\DummyCompactor;
@@ -19,11 +19,13 @@ use Prophecy\Prophecy\ObjectProphecy;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
-use Herrera\Box\Exception\FileException;
-use Herrera\Box\Exception\UnexpectedValueException;
+use KevinGH\Box\Exception\FileException;
+use KevinGH\Box\Exception\UnexpectedValueException;
 
 class BoxTest extends TestCase
 {
+    private const FIXTURES_DIR = __DIR__.'/../fixtures/signature';
+    
     /**
      * @var Box
      */
@@ -104,7 +106,7 @@ KEY
     }
 
     /**
-     * @expectedException \Herrera\Box\Exception\FileException
+     * @expectedException \KevinGH\Box\Exception\FileException
      * @expectedExceptionMessage The file "/does/not/exist" does not exist or is not a file.
      */
     public function testAddFileNotExist()
@@ -262,7 +264,7 @@ SOURCE;
     }
 
     /**
-     * @expectedException \Herrera\Box\Exception\InvalidArgumentException
+     * @expectedException \KevinGH\Box\Exception\InvalidArgumentException
      * @expectedExceptionMessage The $base argument is required for SplFileInfo values.
      */
     public function testBuildFromIteratorBaseRequired()
@@ -290,7 +292,7 @@ SOURCE;
     }
 
     /**
-     * @expectedException \Herrera\Box\Exception\UnexpectedValueException
+     * @expectedException \KevinGH\Box\Exception\UnexpectedValueException
      * @expectedExceptionMessage The key returned by the iterator (integer) is not a string.
      */
     public function testBuildFromIteratorInvalidKey()
@@ -299,7 +301,7 @@ SOURCE;
     }
 
     /**
-     * @expectedException \Herrera\Box\Exception\UnexpectedValueException
+     * @expectedException \KevinGH\Box\Exception\UnexpectedValueException
      * @expectedExceptionMessage The iterator value "resource" was not expected.
      */
     public function testBuildFromIteratorInvalid()
@@ -334,7 +336,7 @@ SOURCE;
     {
         $box = Box::create('test2.phar');
 
-        $this->assertInstanceOf('Herrera\\Box\\Box', $box);
+        $this->assertInstanceOf(Box::class, $box);
         $this->assertEquals(
             'test2.phar',
             $this->getPropertyValue($box, 'file')
@@ -348,7 +350,7 @@ SOURCE;
 
     public function testGetSignature()
     {
-        $path = RES_DIR . '/example.phar';
+        $path = self::FIXTURES_DIR . '/example.phar';
         $phar = new Phar($path);
 
         $this->assertEquals(
@@ -372,7 +374,7 @@ SOURCE;
     }
 
     /**
-     * @expectedException \Herrera\Box\Exception\FileException
+     * @expectedException \KevinGH\Box\Exception\FileException
      * @expectedExceptionMessage The file "/does/not/exist" does not exist or is not a file.
      */
     public function testSetStubUsingFileNotExist()
@@ -381,7 +383,7 @@ SOURCE;
     }
 
     /**
-     * @expectedException \Herrera\Box\Exception\FileException
+     * @expectedException \KevinGH\Box\Exception\FileException
      * @expectedExceptionMessage failed to open stream
      */
     public function testSetStubUsingFileReadError()
@@ -429,7 +431,7 @@ STUB
     }
 
     /**
-     * @expectedException \Herrera\Box\Exception\InvalidArgumentException
+     * @expectedException \KevinGH\Box\Exception\InvalidArgumentException
      * @expectedExceptionMessage Non-scalar values (such as resource) are not supported.
      */
     public function testSetValuesNonScalar()
@@ -525,7 +527,7 @@ STUB
     }
 
     /**
-     * @expectedException \Herrera\Box\Exception\FileException
+     * @expectedException \KevinGH\Box\Exception\FileException
      * @expectedExceptionMessage The file "/does/not/exist" does not exist or is not a file.
      */
     public function testSignUsingFileNotExist()
@@ -534,7 +536,7 @@ STUB
     }
 
     /**
-     * @expectedException \Herrera\Box\Exception\FileException
+     * @expectedException \KevinGH\Box\Exception\FileException
      * @expectedExceptionMessage failed to open stream
      */
     public function testSignUsingFileReadError()

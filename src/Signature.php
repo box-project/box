@@ -2,9 +2,9 @@
 
 namespace KevinGH\Box;
 
-use Herrera\Box\Exception\Exception;
-use Herrera\Box\Exception\FileException;
-use Herrera\Box\Exception\OpenSslException;
+use KevinGH\Box\Exception\Exception;
+use KevinGH\Box\Exception\FileException;
+use KevinGH\Box\Exception\OpenSslException;
 use KevinGH\Box\Signature\Hash;
 use KevinGH\Box\Signature\PublicKeyDelegate;
 use KevinGH\Box\Signature\VerifyInterface;

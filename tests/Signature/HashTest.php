@@ -23,7 +23,7 @@ class HashTest extends TestCase
     }
 
     /**
-     * @expectedException \Herrera\Box\Exception\Exception
+     * @expectedException \KevinGH\Box\Exception\Exception
      * @expectedExceptionMessage Unknown hashing algorithm
      */
     public function testInitBadAlgorithm()
