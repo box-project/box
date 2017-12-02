@@ -171,7 +171,7 @@ class Box
     public function buildFromIterator(Traversable $iterator, $base = null): void
     {
         if ($base) {
-            $base = Path::canonical($base.DIRECTORY_SEPARATOR);
+            $base = canonicalize($base.DIRECTORY_SEPARATOR);
         }
 
         foreach ($iterator as $key => $value) {
@@ -183,8 +183,8 @@ class Box
                     );
                 }
 
-                $key = Path::canonical($key);
-                $value = Path::canonical($value);
+                $key = canonicalize($key);
+                $value = canonicalize($value);
 
                 if (is_dir($value)) {
                     $this->phar->addEmptyDir($key);
