@@ -17,6 +17,7 @@
 
     "require": {
         "php": "^7.1",
+        "ext-phar": "*",
         "herrera-io/annotations": "~1.0",
         "justinrainbow/json-schema": "^1.0",
         "padraic/phar-updater": "^1.0",
@@ -26,23 +27,17 @@
         "symfony/filesystem": "^3.0 || ^4.0",
         "symfony/finder": "^3.0 || ^4.0",
         "symfony/process": "^3.0 || ^4.0",
-        "webmozart/path-util": "^2.3",
-
-        "ext-phar": "*",
-        "tedivm/jshrink": "~1.0"
+        "tedivm/jshrink": "~1.0",
+        "webmozart/path-util": "^2.3"
     },
     "require-dev": {
         "bamarni/composer-bin-plugin": "^1.2",
+        "herrera-io/annotations": "~1.0",
         "mikey179/vfsStream": "^1.1",
-        "phpunit/phpunit": "^6.0",
-
-        "herrera-io/annotations": "~1.0"
+        "phpunit/phpunit": "^6.0"
     },
     "suggest": {
-        "ext-openssl": "To accelerate private key generation.",
-
-        "herrera-io/annotations": "For compacting annotated docblocks.",
-        "phpseclib/phpseclib": "For verifying OpenSSL signed phars without the phar extension."
+        "ext-openssl": "To accelerate private key generation."
     },
 
     "autoload": {
