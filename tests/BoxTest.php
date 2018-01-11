@@ -17,7 +17,7 @@ namespace KevinGH\Box;
 use ArrayIterator;
 use FilesystemIterator;
 use Herrera\Annotations\Tokenizer;
-use KevinGH\Box\Compactor\Compactor;
+use KevinGH\Box\Compactor;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Exception\FileException;
 use KevinGH\Box\Exception\UnexpectedValueException;
@@ -349,14 +349,12 @@ SOURCE;
         $contents = ' my value ';
         $expected = 'my value';
 
-        $this->compactorProphecy->supports('test.php')->willReturn(true);
-        $this->compactorProphecy->compact($contents)->willReturn($expected);
+        $this->compactorProphecy->compact('test.php', $contents)->willReturn($expected);
 
         $actual = $this->box->compactContents('test.php', $contents);
 
         $this->assertSame($expected, $actual);
 
-        $this->compactorProphecy->supports(Argument::cetera())->shouldHaveBeenCalledTimes(1);
         $this->compactorProphecy->compact(Argument::cetera())->shouldHaveBeenCalledTimes(1);
     }
 

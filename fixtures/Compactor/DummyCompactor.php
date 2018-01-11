@@ -15,25 +15,15 @@ declare(strict_types=1);
 namespace KevinGH\Box\Compactor;
 
 use KevinGH\Box\Compactor\CompactorInterface;
-use KevinGH\Box\Compactor\Compactor;
+use KevinGH\Box\Compactor;
 
 class DummyCompactor implements Compactor
 {
-    public function __construct()
-    {
-    }
-
     /**
      * @inheritdoc
      */
-    public function compact(string $contents): string
+    public function compact(string $file, string $contents): string
     {
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function supports(string $file): bool
-    {
+        return $contents;
     }
 }

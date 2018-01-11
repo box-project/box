@@ -23,7 +23,15 @@ class DummyFileExtensionCompactor extends FileExtensionCompactor
     /**
      * @inheritdoc
      */
-    public function compact(string $contents): string
+    protected function compactContent(string $contents): string
+    {
+        $this->__call(__METHOD__, func_get_args());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function supports(string $file): bool
     {
         $this->__call(__METHOD__, func_get_args());
     }

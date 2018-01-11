@@ -26,13 +26,23 @@ class PhpTest extends TestCase
     /**
      * @dataProvider provideFiles
      */
-    public function test_it_supports_PHP_files(string $file, bool $expected): void
+    public function test_it_supports_PHP_files(string $file, bool $supports): void
     {
         $compactor = new Php(new Tokenizer());
 
-        $actual = $compactor->supports($file);
+        $contents = <<<'PHP'
+<?php
 
-        $this->assertSame($expected, $actual);
+
+// PHP file with a lot of spaces
+
+$x = '';
+
+
+PHP;
+        $actual = $compactor->compact($file, $contents);
+
+        $this->assertSame($supports, $contents !== $actual);
     }
 
     /**
@@ -40,9 +50,10 @@ class PhpTest extends TestCase
      */
     public function test_it_compacts_PHP_files(Tokenizer $tokenizer, string $content, string $expected): void
     {
+        $file = 'foo.php';
         $compactor = new Php($tokenizer);
 
-        $actual = $compactor->compact($content);
+        $actual = $compactor->compact($file, $content);
 
         $this->assertSame($expected, $actual);
     }

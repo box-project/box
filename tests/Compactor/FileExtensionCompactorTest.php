@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use KevinGH\Box\Compactor\DummyFileExtensionCompactor;
+use KevinGH\Box\Compactor\FileExtensionCompactor;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -22,11 +23,58 @@ use PHPUnit\Framework\TestCase;
  */
 class FileExtensionCompactorTest extends TestCase
 {
-    public function test_it_supports_the_given_extensions(): void
+    public function test_it_does_not_support_files_with_unknown_extension()
     {
-        $compactor = new DummyFileExtensionCompactor(['php']);
+        $file = '/path/to/file.js';
+        $contents = 'file contents';
 
-        $this->assertTrue($compactor->supports('test.php'));
-        $this->assertFalse($compactor->supports('test'));
+        $expected = $contents;
+
+        $compactor = new class([]) extends FileExtensionCompactor {
+            use NotCallable;
+
+            /**
+             * {@inheritdoc}
+             */
+            protected function compactContent(string $contents): string
+            {
+                $this->__call(__METHOD__, func_get_args());
+            }
+        };
+
+        $actual = $compactor->compact($file, $contents);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_supports_files_with_the_given_extensions()
+    {
+        $file = '/path/to/file.php';
+        $contents = 'file contents';
+
+        $expected = 'compacted contents';
+
+        $compactor = new class($expected) extends FileExtensionCompactor {
+            private $expected;
+
+            public function __construct(string $expected)
+            {
+                parent::__construct(['php']);
+
+                $this->expected = $expected;
+            }
+
+            /**
+             * {@inheritdoc}
+             */
+            protected function compactContent(string $contents): string
+            {
+                return $this->expected;
+            }
+        };
+
+        $actual = $compactor->compact($file, $contents);
+
+        $this->assertSame($expected, $actual);
     }
 }

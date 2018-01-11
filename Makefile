@@ -51,6 +51,10 @@ tc:		## Run the unit tests with code coverage
 tc: vendor/bin/phpunit
 	phpdbg -qrr -d phar.readonly=0 -d zend.enable_gc=0 bin/phpunit --coverage-html=dist/coverage --coverage-text
 
+tm:		## Run Infection
+tm:	vendor/bin/phpunit
+	php -d phar.readonly=0 -d zend.enable_gc=0 bin/infection
+
 e2e:		## Run the end-to-end tests
 e2e: bin/box.phar
 	mv -fv bin/box.phar .

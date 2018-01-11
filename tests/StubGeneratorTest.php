@@ -202,8 +202,11 @@ STUB
         ];
 
         $compactor = new Php(new Tokenizer());
-        $code = file_get_contents(__DIR__.'/../src/Extract.php');
-        $code = $compactor->compact($code);
+
+        $file = __DIR__ . '/../src/Extract.php';
+
+        $code = file_get_contents($file);
+        $code = $compactor->compact($file, $code);
         $code = preg_replace('/\n+/', "\n", $code);
         $code = explode("\n", $code);
         $code = array_slice($code, 2);

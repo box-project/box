@@ -14,8 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use function array_reduce;
+use function file_get_contents;
 use FilesystemIterator;
-use KevinGH\Box\Compactor\Compactor;
+use KevinGH\Box\Compactor;
 use KevinGH\Box\Compactor\CompactorInterface;
 use KevinGH\Box\Exception\FileException;
 use KevinGH\Box\Exception\InvalidArgumentException;
@@ -30,19 +32,14 @@ use SplFileInfo;
 use SplObjectStorage;
 use Traversable;
 
-/**
- * Provides additional, complimentary functionality to the Phar class.
- *
- * @author Kevin Herrera <kevin@herrera.io>
- */
-class Box
+final class Box
 {
     /**
      * The source code compactors.
      *
-     * @var SplObjectStorage
+     * @var Compactor[]
      */
-    private $compactors;
+    private $compactors = [];
 
     /**
      * The path to the Phar file.
@@ -66,16 +63,26 @@ class Box
     private $values = [];
 
     /**
-     * Sets the Phar instance.
+     * Creates a new Phar and Box instance.
      *
-     * @param Phar   $phar the instance
-     * @param string $file the path to the Phar file
+     * @param string $file  the file name
+     * @param int    $flags Flags to pass to the Phar parent class RecursiveDirectoryIterator
+     * @param string $alias Alias with which the Phar archive should be referred to in calls to stream functionality
+     *
+     * @return Box
+     *
+     * @see RecursiveDirectoryIterator
      */
-    public function __construct(Phar $phar, $file)
+    public static function create(string $file, int $flags = null, string $alias = null): self
     {
-        $this->compactors = new SplObjectStorage();
-        $this->file = $file;
+        return new self(new Phar($file, (int) $flags, $alias), $file);
+    }
+
+    //TODO: make private
+    public function __construct(Phar $phar, string $file)
+    {
         $this->phar = $phar;
+        $this->file = $file;
     }
 
     /**
@@ -85,7 +92,7 @@ class Box
      */
     public function addCompactor(Compactor $compactor): void
     {
-        $this->compactors->attach($compactor);
+        $this->compactors[] = $compactor;
     }
 
     /**
@@ -234,28 +241,13 @@ class Box
      */
     public function compactContents($file, $contents)
     {
-        foreach ($this->compactors as $compactor) {
-            /** @var $compactor CompactorInterface */
-            if ($compactor->supports($file)) {
-                $contents = $compactor->compact($contents);
-            }
-        }
-
-        return $contents;
-    }
-
-    /**
-     * Creates a new Phar and Box instance.
-     *
-     * @param string $file  the file name
-     * @param int    $flags the RecursiveDirectoryIterator flags
-     * @param string $alias the Phar alias
-     *
-     * @return Box the Box instance
-     */
-    public static function create($file, $flags = null, $alias = null)
-    {
-        return new self(new Phar($file, (int) $flags, $alias), $file);
+        return array_reduce(
+            $this->compactors,
+            function (string $contents, Compactor $compactor) use ($file): string {
+                return $compactor->compact($file, $contents);
+            },
+            $contents
+        );
     }
 
     /**

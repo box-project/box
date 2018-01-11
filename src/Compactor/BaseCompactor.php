@@ -17,32 +17,23 @@ namespace KevinGH\Box\Compactor;
 use KevinGH\Box\Compactor;
 
 /**
- * An abstract compactor class that handles matching supported file by their types.
+ * Base compactor class providing a slightly simpler API to compact the content only if the file is supported.
  */
-abstract class FileExtensionCompactor implements Compactor
+abstract class BaseCompactor implements Compactor
 {
-    private $extensions;
-
-    /**
-     * @param string[] $extensions the list of supported file extensions
-     */
-    public function __construct(array $extensions)
-    {
-        $this->extensions = $extensions;
-    }
-
     /**
      * {@inheritdoc}
      */
-    protected function supports(string $file): bool
+    public function compact(string $file, string $contents): string
     {
-        return in_array(
-            pathinfo(
-                $file,
-                PATHINFO_EXTENSION
-            ),
-            $this->extensions,
-            true
-        );
+        if (false === $this->supports($file)) {
+            return $contents;
+        }
+
+        return $this->compactContent($contents);
     }
+
+    abstract protected function compactContent(string $contents): string;
+
+    abstract protected function supports(string $file): bool;
 }

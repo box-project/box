@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use KevinGH\Box\Compactor\Compactor;
+use KevinGH\Box\Compactor;
 use KevinGH\Box\Compactor\Json;
 use PHPUnit\Framework\TestCase;
 
@@ -36,11 +36,17 @@ class JsonTest extends TestCase
     /**
      * @dataProvider provideFiles
      */
-    public function test_it_supports_JSON_files(string $file, bool $expected): void
+    public function test_it_supports_JSON_files(string $file, bool $supports): void
     {
-        $actual = $this->compactor->supports($file);
+        $contents = <<<'JSON'
+{
+    "foo": "bar"
+    
+}
+JSON;
+        $actual = $this->compactor->compact($file, $contents);
 
-        $this->assertSame($expected, $actual);
+        $this->assertSame($supports, $contents !== $actual);
     }
 
     /**
@@ -48,7 +54,9 @@ class JsonTest extends TestCase
      */
     public function test_it_compacts_JSON_files(string $content, string $expected): void
     {
-        $actual = $this->compactor->compact($content);
+        $file = 'file.json';
+
+        $actual = $this->compactor->compact($file, $content);
 
         $this->assertSame($expected, $actual);
     }
