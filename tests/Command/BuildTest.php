@@ -186,7 +186,7 @@ Box (repo)
 ? Loading the bootstrap file "/path/to/tmp/bootstrap.php".
 ? Removing the existing PHAR "/path/to/tmp/test.phar".
 * Building the PHAR "/path/to/tmp/test.phar"
-? Registering compactors.
+? Registering compactors
   + KevinGH\Box\Compactor\Php
 ? Mapping paths.
   - a/deep/test/directory > sub
@@ -271,7 +271,7 @@ Box (repo)
 ? Loading the bootstrap file "/path/to/tmp/bootstrap.php".
 ? Removing the existing PHAR "/path/to/tmp/test.phar".
 * Building the PHAR "/path/to/tmp/test.phar"
-? Registering compactors.
+? Registering compactors
   + KevinGH\Box\Compactor\Php
 ? Mapping paths.
   - a/deep/test/directory > sub
@@ -450,6 +450,7 @@ Box (repo)
 * Building the PHAR "/path/to/tmp/default.phar"
 ? Setting replacement values.
   + @name@: world
+? No compactor to register
 ? Adding files.
 ? Adding main file: /path/to/tmp/test.php
 ? Generating new stub.
@@ -496,6 +497,7 @@ Box (repo)
 * Building the PHAR "/path/to/tmp/default.phar"
 ? Setting replacement values.
   + @name@: world
+? No compactor to register
 ? Adding files.
 ? Adding main file: /path/to/tmp/test.php
 ? Generating new stub.
@@ -541,6 +543,7 @@ OUTPUT;
 Box (repo)
 
 * Building the PHAR "/path/to/tmp/test.phar"
+? No compactor to register
 ? Adding files.
   + /path/to/tmp/test.php
 ? Adding main file: /path/to/tmp/test.php
@@ -586,6 +589,7 @@ OUTPUT;
 Box (repo)
 
 * Building the PHAR "/path/to/tmp/test.phar"
+? No compactor to register
 ? Adding files.
 ? Adding main file: /path/to/tmp/test.php
 ? Using stub file: /path/to/tmp/stub.php
@@ -629,6 +633,7 @@ OUTPUT;
 Box (repo)
 
 * Building the PHAR "/path/to/tmp/test.phar"
+? No compactor to register
 ? Adding files.
 ? Using default stub.
 * Done.
@@ -666,6 +671,7 @@ OUTPUT;
 Box (repo)
 
 * Building the PHAR "/path/to/tmp/test.phar"
+? No compactor to register
 ? Adding files.
 ? Adding main file: /path/to/tmp/test.php
 ? Generating new stub.

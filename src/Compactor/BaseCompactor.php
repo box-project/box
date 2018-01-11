@@ -26,11 +26,11 @@ abstract class BaseCompactor implements Compactor
      */
     public function compact(string $file, string $contents): string
     {
-        if (false === $this->supports($file)) {
-            return $contents;
+        if ($this->supports($file)) {
+            return $this->compactContent($contents);
         }
 
-        return $this->compactContent($contents);
+        return $contents;
     }
 
     abstract protected function compactContent(string $contents): string;

@@ -15,21 +15,26 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use ArrayIterator;
+use function chmod;
 use FilesystemIterator;
 use Herrera\Annotations\Tokenizer;
+use InvalidArgumentException;
 use KevinGH\Box\Compactor;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Exception\FileException;
 use KevinGH\Box\Exception\UnexpectedValueException;
+use function mkdir;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use Phar;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
+use function realpath;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
+use function touch;
 
 /**
  * @coversNothing
@@ -129,96 +134,205 @@ KEY
         ];
     }
 
-    public function testAddFile(): void
+    public function test_it_can_add_a_file_to_the_phar(): void
     {
-        touch($file = 'foo');
+        $file = 'foo';
+        $contents = 'test';
 
-        file_put_contents($file, 'test');
+        file_put_contents($file, $contents);
 
-        $this->box->addFile($file, 'test/test.php');
+        $this->box->addFile($file);
 
-        $this->assertSame(
-            'test',
-            file_get_contents('phar://test.phar/test/test.php')
-        );
+        $expectedContents = $contents;
+        $expectedPharPath = 'phar://test.phar/'.$file;
+
+        $this->assertFileExists($expectedPharPath);
+
+        $actualContents = file_get_contents($expectedPharPath);
+
+        $this->assertSame($expectedContents, $actualContents);
     }
 
-    public function testAddFileNotExist(): void
+    public function test_it_can_add_a_file_with_absolute_path_to_the_phar(): void
     {
-        $this->expectException(\KevinGH\Box\Exception\FileException::class);
-        $this->expectExceptionMessage('The file "/does/not/exist" does not exist or is not a file.');
+        mkdir('path-to');
 
-        $this->box->addFile('/does/not/exist');
+        $file = $this->tmp.'/path-to/foo';
+        $contents = 'test';
+
+        file_put_contents($file, $contents);
+
+        $this->box->addFile(realpath($file));
+
+        $expectedContents = $contents;
+        $expectedPharPath = 'phar://test.phar'.$file;
+
+        $this->assertFileExists($expectedPharPath);
+
+        $actualContents = file_get_contents($expectedPharPath);
+
+        $this->assertSame($expectedContents, $actualContents);
     }
 
-    public function testAddFileReadError(): void
+    public function test_it_can_add_a_file_with_a_local_path_to_the_phar(): void
     {
-        vfsStreamWrapper::setRoot($root = vfsStream::newDirectory('test'));
+        $file = 'foo';
+        $contents = 'test';
+        $localPath = 'local/path/foo';
 
-        $root->addChild(vfsStream::newFile('test.php', 0000));
+        file_put_contents($file, $contents);
 
+        $this->box->addFile($file, $localPath);
+
+        $expectedContents = $contents;
+        $expectedPharPath = 'phar://test.phar/'.$localPath;
+
+        $this->assertFileExists($expectedPharPath);
+
+        $actualContents = file_get_contents($expectedPharPath);
+
+        $this->assertSame($expectedContents, $actualContents);
+    }
+
+    public function test_it_compacts_the_file_content_and_replace_placeholders_before_adding_it_to_the_phar(): void
+    {
+        $file = 'foo';
+        $contents = 'original contents @foo_placeholder@';
+        $placeholderMapping = [
+            '@foo_placeholder@' => 'foo_value'
+        ];
+
+        file_put_contents($file, $contents);
+
+        $firstCompactorProphecy = $this->prophesize(Compactor::class);
+        $firstCompactorProphecy
+            ->compact($file, 'original contents foo_value')
+            ->willReturn($firstCompactorOutput = 'first compactor contents')
+        ;
+
+        $secondCompactorProphecy = $this->prophesize(Compactor::class);
+        $secondCompactorProphecy
+            ->compact($file, $firstCompactorOutput)
+            ->willReturn($secondCompactorOutput = 'second compactor contents')
+        ;
+
+        $this->box->registerCompactors([
+            $firstCompactorProphecy->reveal(),
+            $secondCompactorProphecy->reveal(),
+        ]);
+
+        $this->box->setValues($placeholderMapping);
+        $this->box->addFile($file);
+
+        $expectedContents = $secondCompactorOutput;
+        $expectedPharPath = 'phar://test.phar/'.$file;
+
+        $this->assertFileExists($expectedPharPath);
+
+        $actualContents = file_get_contents($expectedPharPath);
+
+        $this->assertSame($expectedContents, $actualContents);
+
+        $firstCompactorProphecy->compact(Argument::cetera())->shouldHaveBeenCalledTimes(1);
+        $secondCompactorProphecy->compact(Argument::cetera())->shouldHaveBeenCalledTimes(1);
+    }
+
+    public function test_it_cannot_add_an_non_existent_file_to_the_phar(): void
+    {
         try {
-            $this->box->addFile('vfs://test/test.php');
+            $this->box->addFile('/nowhere/foo');
 
             $this->fail('Expected exception to be thrown.');
-        } catch (FileException $exception) {
-            $this->assertRegExp(
-                '/failed to open stream/',
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'File "/nowhere/foo" was expected to exist.',
                 $exception->getMessage()
             );
+            $this->assertSame(102, $exception->getCode());
+            $this->assertNull($exception->getPrevious());
         }
     }
 
-    public function testAddFromString(): void
+    public function test_it_cannot_add_a_file_it_fails_to_read(): void
     {
-        $original = <<<'SOURCE'
-<?php
+        $file = 'foo';
+        $contents = 'test';
 
-/**
- * My class.
- */
-class @thing@
-{
-    /**
-     * My method.
-     */
-    public function @other_thing@()
-    {
+        file_put_contents($file, $contents);
+        chmod($file, 0355);
+
+        try {
+            $this->box->addFile($file);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                "Path \"${file}\" was expected to be readable.",
+                $exception->getMessage()
+            );
+            $this->assertSame(103, $exception->getCode());
+            $this->assertNull($exception->getPrevious());
+        }
     }
-}
-SOURCE;
 
-        $expected = <<<'SOURCE'
-<?php
+    public function test_it_can_add_a_file_from_string_to_the_phar(): void
+    {
+        $localPath = 'foo';
+        $contents = 'test';
 
+        $this->box->addFromString($localPath, $contents);
 
+        $expectedContents = $contents;
+        $expectedPharPath = 'phar://test.phar/'.$localPath;
 
+        $this->assertFileExists($expectedPharPath);
 
-class MyClass
-{
+        $actualContents = file_get_contents($expectedPharPath);
 
+        $this->assertSame($expectedContents, $actualContents);
+    }
 
+    public function test_it_compacts_the_contents_before_adding_it_to_the_phar(): void
+    {
+        $localPath = 'foo';
+        $contents = 'original contents @foo_placeholder@';
+        $placeholderMapping = [
+            '@foo_placeholder@' => 'foo_value'
+        ];
 
-public function myMethod()
-{
-}
-}
-SOURCE;
+        file_put_contents($localPath, $contents);
 
-        $this->box->addCompactor(new Php(new Tokenizer()));
-        $this->box->setValues(
-            [
-                '@thing@' => 'MyClass',
-                '@other_thing@' => 'myMethod',
-            ]
-        );
+        $firstCompactorProphecy = $this->prophesize(Compactor::class);
+        $firstCompactorProphecy
+            ->compact($localPath, 'original contents foo_value')
+            ->willReturn($firstCompactorOutput = 'first compactor contents')
+        ;
 
-        $this->box->addFromString('test/test.php', $original);
+        $secondCompactorProphecy = $this->prophesize(Compactor::class);
+        $secondCompactorProphecy
+            ->compact($localPath, $firstCompactorOutput)
+            ->willReturn($secondCompactorOutput = 'second compactor contents')
+        ;
 
-        $this->assertSame(
-            $expected,
-            file_get_contents('phar://test.phar/test/test.php')
-        );
+        $this->box->registerCompactors([
+            $firstCompactorProphecy->reveal(),
+            $secondCompactorProphecy->reveal(),
+        ]);
+
+        $this->box->setValues($placeholderMapping);
+        $this->box->addFromString($localPath, $contents);
+
+        $expectedContents = $secondCompactorOutput;
+        $expectedPharPath = 'phar://test.phar/'.$localPath;
+
+        $this->assertFileExists($expectedPharPath);
+
+        $actualContents = file_get_contents($expectedPharPath);
+
+        $this->assertSame($expectedContents, $actualContents);
+
+        $firstCompactorProphecy->compact(Argument::cetera())->shouldHaveBeenCalledTimes(1);
+        $secondCompactorProphecy->compact(Argument::cetera())->shouldHaveBeenCalledTimes(1);
     }
 
     public function testBuildFromDirectory(): void
@@ -340,22 +454,6 @@ SOURCE;
         $this->box->buildFromIterator(
             new ArrayIterator(['stream' => STDOUT])
         );
-    }
-
-    public function testCompactContents(): void
-    {
-        $this->box->addCompactor($this->compactor);
-
-        $contents = ' my value ';
-        $expected = 'my value';
-
-        $this->compactorProphecy->compact('test.php', $contents)->willReturn($expected);
-
-        $actual = $this->box->compactContents('test.php', $contents);
-
-        $this->assertSame($expected, $actual);
-
-        $this->compactorProphecy->compact(Argument::cetera())->shouldHaveBeenCalledTimes(1);
     }
 
     public function testGetPhar(): void

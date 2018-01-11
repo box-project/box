@@ -15,16 +15,16 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use function array_reduce;
+use Assert\Assert;
+use Assert\Assertion;
 use function file_get_contents;
 use FilesystemIterator;
 use KevinGH\Box\Compactor;
-use KevinGH\Box\Compactor\CompactorInterface;
 use KevinGH\Box\Exception\FileException;
 use KevinGH\Box\Exception\InvalidArgumentException;
 use KevinGH\Box\Exception\OpenSslException;
 use KevinGH\Box\Exception\UnexpectedValueException;
 use Phar;
-use Phine\Path\Path;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RegexIterator;
@@ -86,24 +86,21 @@ final class Box
     }
 
     /**
-     * Adds a file contents compactor.
-     *
-     * @param Compactor $compactor the compactor
+     * @param Compactor[] $compactors
      */
-    public function addCompactor(Compactor $compactor): void
+    public function registerCompactors(array $compactors): void
     {
-        $this->compactors[] = $compactor;
+        Assertion::allIsInstanceOf($compactors, Compactor::class);
+
+        $this->compactors = $compactors;
     }
 
     /**
-     * Adds a file to the Phar, after compacting it and replacing its
-     * placeholders.
+     * Adds the a file to the PHAR. The contents will first be compacted and have its placeholders
+     * replaced.
      *
-     * @param string $file  the file name
-     * @param string $local the local file name
-     *
-     * @throws Exception\Exception
-     * @throws FileException       if the file could not be used
+     * @param string $file  The file name or path
+     * @param string $local The local file name or path
      */
     public function addFile($file, $local = null): void
     {
@@ -111,32 +108,29 @@ final class Box
             $local = $file;
         }
 
-        if (false === is_file($file)) {
-            throw FileException::create(
-                'The file "%s" does not exist or is not a file.',
-                $file
-            );
-        }
+        Assertion::file($file);
+        Assertion::readable($file);
 
-        if (false === ($contents = @file_get_contents($file))) {
-            throw FileException::lastError();
-        }
+        $contents = file_get_contents($file);
 
         $this->addFromString($local, $contents);
     }
 
     /**
-     * Adds the contents from a file to the Phar, after compacting it and
-     * replacing its placeholders.
+     * Adds the contents from a file to the PHAR. The contents will first be compacted and have its placeholders
+     * replaced.
      *
-     * @param string $local    the local name
-     * @param string $contents the contents
+     * @param string $local    The local name or path
+     * @param string $contents The contents
      */
-    public function addFromString($local, $contents): void
+    public function addFromString(string $local, string $contents): void
     {
         $this->phar->addFromString(
             $local,
-            $this->replaceValues($this->compactContents($local, $contents))
+            $this->compactContents(
+                $local,
+                $this->replaceValues($contents)
+            )
         );
     }
 
@@ -146,6 +140,9 @@ final class Box
      *
      * @param string $dir   the directory
      * @param string $regex the regular expression filter
+     *
+     * @deprecated
+     * @internal
      */
     public function buildFromDirectory($dir, $regex = null): void
     {
@@ -174,6 +171,9 @@ final class Box
      *
      * @throws Exception\Exception
      * @throws UnexpectedValueException if the iterator value is unexpected
+     *
+     * @deprecated
+     * @internal
      */
     public function buildFromIterator(Traversable $iterator, $base = null): void
     {
@@ -232,25 +232,6 @@ final class Box
     }
 
     /**
-     * Compacts the file contents using the supported compactors.
-     *
-     * @param string $file     the file name
-     * @param string $contents the file contents
-     *
-     * @return string the compacted contents
-     */
-    public function compactContents($file, $contents)
-    {
-        return array_reduce(
-            $this->compactors,
-            function (string $contents, Compactor $compactor) use ($file): string {
-                return $compactor->compact($file, $contents);
-            },
-            $contents
-        );
-    }
-
-    /**
      * Returns the Phar instance.
      *
      * @return Phar the instance
@@ -268,6 +249,8 @@ final class Box
      * @param string $path the phar file path
      *
      * @return array the signature
+     *
+     * @internal
      */
     public static function getSignature($path)
     {
@@ -280,6 +263,8 @@ final class Box
      * @param string $contents the contents
      *
      * @return string the replaced contents
+     *
+     * @internal
      */
     public function replaceValues($contents)
     {
@@ -350,6 +335,8 @@ final class Box
      * @throws Exception\Exception
      * @throws OpenSslException    if the "openssl" extension could not be used
      *                             or has generated an error
+     *
+     * @internal
      */
     public function sign($key, $password = null): void
     {
@@ -411,5 +398,16 @@ final class Box
         }
 
         $this->sign($key, $password);
+    }
+
+    private function compactContents(string $file, string $contents): string
+    {
+        return array_reduce(
+            $this->compactors,
+            function (string $contents, Compactor $compactor) use ($file): string {
+                return $compactor->compact($file, $contents);
+            },
+            $contents
+        );
     }
 }
