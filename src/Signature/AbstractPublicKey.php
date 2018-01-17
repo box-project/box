@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Signature;
 
-use KevinGH\Box\Exception\FileException;
+use KevinGH\Box\Exception\FileExceptionFactory;
 
 /**
  * Loads the private key from a file to use for verification.
@@ -39,7 +39,7 @@ abstract class AbstractPublicKey extends AbstractBufferedHash
     public function init($algorithm, $path): void
     {
         if (false === ($this->key = @file_get_contents($path.'.pubkey'))) {
-            throw FileException::lastError();
+            throw FileExceptionFactory::createForLastError();
         }
     }
 

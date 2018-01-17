@@ -14,8 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Command;
 
+use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
-use KevinGH\Box\Exception\FileException;
+use KevinGH\Box\Exception\FileExceptionFactory;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
 use Symfony\Component\Console\Command\Command;
@@ -416,7 +417,7 @@ OUTPUT;
             );
 
             $this->fail('Expected exception to be thrown.');
-        } catch (FileException $exception) {
+        } catch (InvalidArgumentException $exception) {
             $this->assertTrue(true);
         }
     }

@@ -20,9 +20,9 @@ use Assert\Assertion;
 use function file_get_contents;
 use FilesystemIterator;
 use KevinGH\Box\Compactor;
-use KevinGH\Box\Exception\FileException;
+use KevinGH\Box\Exception\FileExceptionFactory;
 use KevinGH\Box\Exception\InvalidArgumentException;
-use KevinGH\Box\Exception\OpenSslException;
+use KevinGH\Box\Exception\OpenSslExceptionFactory;
 use KevinGH\Box\Exception\UnexpectedValueException;
 use Phar;
 use RecursiveDirectoryIterator;
@@ -78,8 +78,7 @@ final class Box
         return new self(new Phar($file, (int) $flags, $alias), $file);
     }
 
-    //TODO: make private
-    public function __construct(Phar $phar, string $file)
+    private function __construct(Phar $phar, string $file)
     {
         $this->phar = $phar;
         $this->file = $file;
@@ -145,22 +144,6 @@ final class Box
     }
 
     /**
-     * Returns the signature of the phar.
-     *
-     * This method does not use the extension to extract the phar's signature.
-     *
-     * @param string $path the phar file path
-     *
-     * @return array the signature
-     *
-     * @internal
-     */
-    public static function getSignature($path)
-    {
-        return Signature::create($path)->get();
-    }
-
-    /**
      * Replaces the placeholders with their values.
      *
      * @param string $contents the contents
@@ -185,20 +168,14 @@ final class Box
      * @param bool   $replace Replace placeholders?
      *
      * @throws Exception\Exception
-     * @throws FileException       if the stub file could not be used
+     * @throws FileExceptionFactory       if the stub file could not be used
      */
     public function setStubUsingFile($file, $replace = false): void
     {
-        if (false === is_file($file)) {
-            throw FileException::create(
-                'The file "%s" does not exist or is not a file.',
-                $file
-            );
-        }
+        Assertion::file($file);
+        Assertion::readable($file);
 
-        if (false === ($contents = @file_get_contents($file))) {
-            throw FileException::lastError();
-        }
+        $contents = file_get_contents($file);
 
         if ($replace) {
             $contents = $this->replaceValues($contents);
@@ -230,77 +207,50 @@ final class Box
     }
 
     /**
-     * Signs the Phar using a private key.
+     * Signs the PHAR using a private key file.
+     *
+     * @param string $file     the private key file name
+     * @param string $password the private key password
+     */
+    public function signUsingFile(string $file, string $password = null): void
+    {
+        Assertion::file($file);
+        Assertion::readable($file);
+
+        $this->sign(file_get_contents($file), $password);
+    }
+
+    /**
+     * Signs the PHAR using a private key.
      *
      * @param string $key      the private key
      * @param string $password the private key password
-     *
-     * @throws Exception\Exception
-     * @throws OpenSslException    if the "openssl" extension could not be used
-     *                             or has generated an error
-     *
-     * @internal
      */
-    public function sign($key, $password = null): void
+    public function sign(string $key, ?string $password): void
     {
-        OpenSslException::reset();
+        OpenSslExceptionFactory::reset();
 
-        if (false === extension_loaded('openssl')) {
-            // @codeCoverageIgnoreStart
-            throw OpenSslException::create(
-                'The "openssl" extension is not available.'
-            );
-            // @codeCoverageIgnoreEnd
-        }
+        $pubKey = $this->file.'.pubkey';
+
+        Assertion::extensionLoaded('openssl');
 
         if (false === ($resource = openssl_pkey_get_private($key, $password))) {
-            // @codeCoverageIgnoreStart
-            throw OpenSslException::lastError();
-            // @codeCoverageIgnoreEnd
+            throw OpenSslExceptionFactory::createForLastError();
         }
 
         if (false === openssl_pkey_export($resource, $private)) {
-            // @codeCoverageIgnoreStart
-            throw OpenSslException::lastError();
-            // @codeCoverageIgnoreEnd
+            throw OpenSslExceptionFactory::createForLastError();
         }
 
         if (false === ($details = openssl_pkey_get_details($resource))) {
-            // @codeCoverageIgnoreStart
-            throw OpenSslException::lastError();
-            // @codeCoverageIgnoreEnd
+            throw OpenSslExceptionFactory::createForLastError();
         }
 
         $this->phar->setSignatureAlgorithm(Phar::OPENSSL, $private);
 
-        if (false === @file_put_contents($this->file.'.pubkey', $details['key'])) {
-            throw FileException::lastError();
+        if (false === @file_put_contents($pubKey, $details['key'])) {
+            throw FileExceptionFactory::createForLastError();
         }
-    }
-
-    /**
-     * Signs the Phar using a private key file.
-     *
-     * @param string $file     the private key file name
-     * @param string $password the private key password
-     *
-     * @throws Exception\Exception
-     * @throws FileException       if the private key file could not be read
-     */
-    public function signUsingFile($file, $password = null): void
-    {
-        if (false === is_file($file)) {
-            throw FileException::create(
-                'The file "%s" does not exist or is not a file.',
-                $file
-            );
-        }
-
-        if (false === ($key = @file_get_contents($file))) {
-            throw FileException::lastError();
-        }
-
-        $this->sign($key, $password);
     }
 
     private function compactContents(string $file, string $contents): string

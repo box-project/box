@@ -14,7 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use KevinGH\Box\Exception\FileException;
+use Exception;
+use KevinGH\Box\Exception\FileExceptionFactory;
 use Phar;
 use PharException;
 use PHPUnit\Framework\TestCase;
@@ -45,9 +46,9 @@ class SignatureTest extends TestCase
             new Signature('/does/not/exist');
 
             $this->fail('Expected exception to be thrown.');
-        } catch (FileException $exception) {
+        } catch (Exception $exception) {
             $this->assertSame(
-                'The path "/does/not/exist" does not exist or is not a file.',
+                'File "/does/not/exist" was expected to exist.',
                 $exception->getMessage()
             );
         }

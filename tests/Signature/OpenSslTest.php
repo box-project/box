@@ -14,7 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Signature;
 
-use KevinGH\Box\Exception\OpenSslException;
+use Exception;
+use KevinGH\Box\Exception\OpenSslExceptionFactory;
 use PHPUnit\Framework\Error\Warning;
 use PHPUnit\Framework\TestCase;
 use function KevinGH\Box\make_tmp_dir;
@@ -30,12 +31,12 @@ class OpenSslTest extends TestCase
     /**
      * @var string
      */
-    protected $cwd;
+    private $cwd;
 
     /**
      * @var string
      */
-    protected $tmp;
+    private $tmp;
 
     /**
      * @var OpenSsl
@@ -104,7 +105,7 @@ class OpenSslTest extends TestCase
             $this->hash->verify('it dont matter, aight');
 
             $this->fail('Expected exception to be thrown.');
-        } catch (OpenSslException $exception) {
+        } catch (Exception $exception) {
             $this->assertRegExp(
                 '/cannot be coerced/',
                 $exception->getMessage()

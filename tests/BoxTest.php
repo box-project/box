@@ -16,12 +16,14 @@ namespace KevinGH\Box;
 
 use ArrayIterator;
 use function chmod;
+use Exception;
 use FilesystemIterator;
 use Herrera\Annotations\Tokenizer;
 use InvalidArgumentException;
+use function is_string;
 use KevinGH\Box\Compactor;
 use KevinGH\Box\Compactor\Php;
-use KevinGH\Box\Exception\FileException;
+use KevinGH\Box\Exception\FileExceptionFactory;
 use KevinGH\Box\Exception\UnexpectedValueException;
 use function mkdir;
 use org\bovigo\vfs\vfsStream;
@@ -41,17 +43,15 @@ use function touch;
  */
 class BoxTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__.'/../fixtures/signature';
+    /**
+     * @var string
+     */
+    private $cwd;
 
     /**
      * @var string
      */
-    protected $cwd;
-
-    /**
-     * @var string
-     */
-    protected $tmp;
+    private $tmp;
 
     /**
      * @var Box
@@ -83,8 +83,8 @@ class BoxTest extends TestCase
 
         chdir($this->tmp);
 
-        $this->phar = new Phar('test.phar');
-        $this->box = new Box($this->phar, 'test.phar');
+        $this->box = Box::create('test.phar');
+        $this->phar = $this->box->getPhar();
 
         $this->compactorProphecy = $this->prophesize(Compactor::class);
         $this->compactor = $this->compactorProphecy->reveal();
@@ -95,43 +95,16 @@ class BoxTest extends TestCase
      */
     protected function tearDown(): void
     {
-        unset($this->box, $this->phar);
+        unset($this->box);
 
         chdir($this->cwd);
 
         remove_dir($this->tmp);
 
+        //TODO: see if we need a custom error handler still
         restore_error_handler();
 
         parent::tearDown();
-    }
-
-    public function getPrivateKey()
-    {
-        return [
-            <<<'KEY'
------BEGIN RSA PRIVATE KEY-----
-Proc-Type: 4,ENCRYPTED
-DEK-Info: DES-EDE3-CBC,3FF97F75E5A8F534
-
-TvEPC5L3OXjy4X5t6SRsW6J4Dfdgw0Mfjqwa4OOI88uk5L8SIezs4sHDYHba9GkG
-RKVnRhA5F+gEHrabsQiVJdWPdS8xKUgpkvHqoAT8Zl5sAy/3e/EKZ+Bd2pS/t5yQ
-aGGqliG4oWecx42QGL8rmyrbs2wnuBZmwQ6iIVIfYabwpiH+lcEmEoxomXjt9A3j
-Sh8IhaDzMLnVS8egk1QvvhFjyXyBIW5mLIue6cdEgINbxzRReNQgjlyHS8BJRLp9
-EvJcZDKJiNJt+VLncbfm4ZhbdKvSsbZbXC/Pqv06YNMY1+m9QwszHJexqjm7AyzB
-MkBFedcxcxqvSb8DaGgQfUkm9rAmbmu+l1Dncd72Cjjf8fIfuodUmKsdfYds3h+n
-Ss7K4YiiNp7u9pqJBMvUdtrVoSsNAo6i7uFa7JQTXec9sbFN1nezgq1FZmcfJYUZ
-rdpc2J1hbHTfUZWtLZebA72GU63Y9zkZzbP3SjFUSWniEEbzWbPy2sAycHrpagND
-itOQNHwZ2Me81MQQB55JOKblKkSha6cNo9nJjd8rpyo/lc/Iay9qlUyba7RO0V/t
-wm9ZeUZL+D2/JQH7zGyLxkKqcMC+CFrNYnVh0U4nk3ftZsM+jcyfl7ScVFTKmcRc
-ypcpLwfS6gyenTqiTiJx/Zca4xmRNA+Fy1EhkymxP3ku0kTU6qutT2tuYOjtz/rW
-k6oIhMcpsXFdB3N9iHT4qqElo3rVW/qLQaNIqxd8+JmE5GkHmF43PhK3HX1PCmRC
-TnvzVS0y1l8zCsRToUtv5rCBC+r8Q3gnvGGnT4jrsp98ithGIQCbbQ==
------END RSA PRIVATE KEY-----
-KEY
-            ,
-            'test',
-        ];
     }
 
     public function test_it_can_add_a_file_to_the_phar(): void
@@ -335,40 +308,44 @@ KEY
         $secondCompactorProphecy->compact(Argument::cetera())->shouldHaveBeenCalledTimes(1);
     }
 
-    public function testGetPhar(): void
+    public function test_it_exposes_the_underlying_PHAR(): void
     {
-        $this->assertSame($this->phar, $this->box->getPhar());
+        $expected = new Phar('test.phar');
+        $actual = $this->box->getPhar();
+
+        $this->assertEquals($expected, $actual);
     }
 
-    public function testGetSignature(): void
+    public function test_cannot_set_non_existent_file_as_stub_file(): void
     {
-        $path = self::FIXTURES_DIR.'/example.phar';
-        $phar = new Phar($path);
+        try {
+            $this->box->setStubUsingFile('/does/not/exist');
 
-        $this->assertEquals(
-            $phar->getSignature(),
-            Box::getSignature($path)
-        );
+            $this->fail('Expected exception to be thrown.');
+        } catch (Exception $exception) {
+            $this->assertSame(
+                'File "/does/not/exist" was expected to exist.',
+                $exception->getMessage()
+            );
+        }
     }
 
-    public function testSetStubUsingFileNotExist(): void
+    public function test_cannot_set_non_readable_file_as_stub_file(): void
     {
-        $this->expectException(\KevinGH\Box\Exception\FileException::class);
-        $this->expectExceptionMessage('The file "/does/not/exist" does not exist or is not a file.');
-
-        $this->box->setStubUsingFile('/does/not/exist');
-    }
-
-    public function testSetStubUsingFileReadError(): void
-    {
-        $this->expectException(\KevinGH\Box\Exception\FileException::class);
-        $this->expectExceptionMessage('failed to open stream');
-
         vfsStreamWrapper::setRoot($root = vfsStream::newDirectory('test'));
 
         $root->addChild(vfsStream::newFile('test.php', 0000));
 
-        $this->box->setStubUsingFile('vfs://test/test.php');
+        try {
+            $this->box->setStubUsingFile('vfs://test/test.php');
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (Exception $exception) {
+            $this->assertSame(
+                'Path "vfs://test/test.php" was expected to be readable.',
+                $exception->getMessage()
+            );
+        }
     }
 
     public function testSetStubUsingFile(): void
@@ -402,102 +379,157 @@ STUB
         $this->box->setValues(['stream' => STDOUT]);
     }
 
-    public function testSign(): void
+    /**
+     * @requires extension openssl
+     */
+    public function test_it_can_sign_the_PHAR(): void
     {
-        if (false === extension_loaded('openssl')) {
-            $this->markTestSkipped('The "openssl" extension is not available.');
-        }
+        [$key, $password] = $this->getPrivateKey();
 
-        list($key, $password) = $this->getPrivateKey();
+        $phar = $this->box->getPhar();
 
-        $this->box->getPhar()->addFromString(
-            'test.php',
-            '<?php echo "Hello, world!\n";'
-        );
-
-        $this->box->getPhar()->setStub(
-            StubGenerator::create()
-                ->index('test.php')
-                ->generate()
-        );
+        $this->configureHelloWorldPhar();
 
         $this->box->sign($key, $password);
 
+        $this->assertNotSame([], $phar->getSignature(), 'Expected the PHAR to be signed.');
+        $this->assertTrue(is_string($phar->getSignature()['hash']), 'Expected the PHAR signature hash to be a string.');
+        $this->assertNotEmpty($phar->getSignature()['hash'], 'Expected the PHAR signature hash to not be empty.');
+
+        $this->assertSame('OpenSSL', $phar->getSignature()['hash_type']);
+
         $this->assertSame(
             'Hello, world!',
-            exec('php test.phar')
+            exec('php test.phar'),
+            'Expected PHAR to be executable.'
         );
     }
 
-    public function testSignWriteError(): void
+    public function test_it_cannot_sign_if_cannot_create_the_public_key(): void
     {
-        list($key, $password) = $this->getPrivateKey();
+        [$key, $password] = $this->getPrivateKey();
 
         mkdir('test.phar.pubkey');
 
-        $this->box->getPhar()->addFromString('test.php', '<?php $test = 1;');
+        $this->configureHelloWorldPhar();
 
         try {
             $this->box->sign($key, $password);
 
             $this->fail('Expected exception to be thrown.');
-        } catch (FileException $exception) {
-            $this->assertRegExp(
-                '/failed to open stream/',
+        } catch (Exception $exception) {
+            $this->assertSame(
+                'Undefined index: code',
                 $exception->getMessage()
             );
         }
     }
 
-    public function testSignUsingFile(): void
+    /**
+     * @requires extension openssl
+     */
+    public function test_it_can_sign_the_PHAR_using_a_private_key_with_password(): void
     {
-        if (false === extension_loaded('openssl')) {
-            $this->markTestSkipped('The "openssl" extension is not available.');
-        }
+        $phar = $this->box->getPhar();
 
-        list($key, $password) = $this->getPrivateKey();
+        [$key, $password] = $this->getPrivateKey();
 
-        touch($file = 'foo');
+        file_put_contents($file = 'foo', $key);
 
-        file_put_contents($file, $key);
-
-        $this->box->getPhar()->addFromString(
-            'test.php',
-            '<?php echo "Hello, world!\n";'
-        );
-
-        $this->box->getPhar()->setStub(
-            StubGenerator::create()
-                ->index('test.php')
-                ->generate()
-        );
+        $this->configureHelloWorldPhar();
 
         $this->box->signUsingFile($file, $password);
 
+        $this->assertNotSame([], $phar->getSignature(), 'Expected the PHAR to be signed.');
+        $this->assertTrue(is_string($phar->getSignature()['hash']), 'Expected the PHAR signature hash to be a string.');
+        $this->assertNotEmpty($phar->getSignature()['hash'], 'Expected the PHAR signature hash to not be empty.');
+
+        $this->assertSame('OpenSSL', $phar->getSignature()['hash_type']);
+
         $this->assertSame(
             'Hello, world!',
-            exec('php test.phar')
+            exec('php test.phar'),
+            'Expected the PHAR to be executable.'
         );
     }
 
-    public function testSignUsingFileNotExist(): void
+    public function test_it_cannot_sign_the_PHAR_with_a_non_existent_file_as_private_key(): void
     {
-        $this->expectException(\KevinGH\Box\Exception\FileException::class);
-        $this->expectExceptionMessage('The file "/does/not/exist" does not exist or is not a file.');
+        try {
+            $this->box->signUsingFile('/does/not/exist');
 
-        $this->box->signUsingFile('/does/not/exist');
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'File "/does/not/exist" was expected to exist.',
+                $exception->getMessage()
+            );
+        }
     }
 
-    public function testSignUsingFileReadError(): void
+    public function test_it_cannot_sign_the_PHAR_with_an_unreadable_file_as_a_private_key(): void
     {
-        $this->expectException(\KevinGH\Box\Exception\FileException::class);
-        $this->expectExceptionMessage('failed to open stream');
-
         $root = vfsStream::newDirectory('test');
         $root->addChild(vfsStream::newFile('private.key', 0000));
 
         vfsStreamWrapper::setRoot($root);
 
-        $this->box->signUsingFile('vfs://test/private.key');
+        try {
+            $this->box->signUsingFile('vfs://test/private.key');
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Path "vfs://test/private.key" was expected to be readable.',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    private function getPrivateKey(): array
+    {
+        return [
+            <<<'KEY'
+-----BEGIN RSA PRIVATE KEY-----
+Proc-Type: 4,ENCRYPTED
+DEK-Info: DES-EDE3-CBC,3FF97F75E5A8F534
+
+TvEPC5L3OXjy4X5t6SRsW6J4Dfdgw0Mfjqwa4OOI88uk5L8SIezs4sHDYHba9GkG
+RKVnRhA5F+gEHrabsQiVJdWPdS8xKUgpkvHqoAT8Zl5sAy/3e/EKZ+Bd2pS/t5yQ
+aGGqliG4oWecx42QGL8rmyrbs2wnuBZmwQ6iIVIfYabwpiH+lcEmEoxomXjt9A3j
+Sh8IhaDzMLnVS8egk1QvvhFjyXyBIW5mLIue6cdEgINbxzRReNQgjlyHS8BJRLp9
+EvJcZDKJiNJt+VLncbfm4ZhbdKvSsbZbXC/Pqv06YNMY1+m9QwszHJexqjm7AyzB
+MkBFedcxcxqvSb8DaGgQfUkm9rAmbmu+l1Dncd72Cjjf8fIfuodUmKsdfYds3h+n
+Ss7K4YiiNp7u9pqJBMvUdtrVoSsNAo6i7uFa7JQTXec9sbFN1nezgq1FZmcfJYUZ
+rdpc2J1hbHTfUZWtLZebA72GU63Y9zkZzbP3SjFUSWniEEbzWbPy2sAycHrpagND
+itOQNHwZ2Me81MQQB55JOKblKkSha6cNo9nJjd8rpyo/lc/Iay9qlUyba7RO0V/t
+wm9ZeUZL+D2/JQH7zGyLxkKqcMC+CFrNYnVh0U4nk3ftZsM+jcyfl7ScVFTKmcRc
+ypcpLwfS6gyenTqiTiJx/Zca4xmRNA+Fy1EhkymxP3ku0kTU6qutT2tuYOjtz/rW
+k6oIhMcpsXFdB3N9iHT4qqElo3rVW/qLQaNIqxd8+JmE5GkHmF43PhK3HX1PCmRC
+TnvzVS0y1l8zCsRToUtv5rCBC+r8Q3gnvGGnT4jrsp98ithGIQCbbQ==
+-----END RSA PRIVATE KEY-----
+KEY
+            ,
+            'test',
+        ];
+    }
+
+    private function configureHelloWorldPhar(): void
+    {
+        $this->box->getPhar()->addFromString(
+            'main.php',
+            <<<'PHP'
+<?php
+
+echo 'Hello, world!'.PHP_EOL;
+PHP
+
+        );
+
+        $this->box->getPhar()->setStub(
+            StubGenerator::create()
+                ->index('main.php')
+                ->generate()
+        );
     }
 }

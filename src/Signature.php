@@ -14,9 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use Assert\Assertion;
 use KevinGH\Box\Exception\Exception;
-use KevinGH\Box\Exception\FileException;
-use KevinGH\Box\Exception\OpenSslException;
+use KevinGH\Box\Exception\FileExceptionFactory;
+use KevinGH\Box\Exception\OpenSslExceptionFactory;
 use KevinGH\Box\Signature\Hash;
 use KevinGH\Box\Signature\PublicKeyDelegate;
 use KevinGH\Box\Signature\VerifyInterface;
@@ -98,21 +99,16 @@ class Signature
      * @param string $path the phar file path
      *
      * @throws Exception
-     * @throws FileException if the file does not exist
+     * @throws FileExceptionFactory if the file does not exist
      */
     public function __construct($path)
     {
-        if (!is_file($path)) {
-            throw FileException::create(
-                'The path "%s" does not exist or is not a file.',
-                $path
-            );
-        }
+        Assertion::file($path);
 
         $this->file = realpath($path);
 
         if (false === ($this->size = @filesize($path))) {
-            throw FileException::lastError();
+            throw FileExceptionFactory::createForLastError();
         }
     }
 
@@ -219,8 +215,8 @@ class Signature
      * Verifies the signature of the phar.
      *
      * @throws Exception
-     * @throws FileException    if the private key could not be read
-     * @throws OpenSslException if there is an OpenSSL error
+     * @throws FileExceptionFactory    if the private key could not be read
+     * @throws OpenSslExceptionFactory if there is an OpenSSL error
      *
      * @return bool TRUE if verified, FALSE if not
      */
@@ -289,7 +285,7 @@ class Signature
      * If the file handle is not opened, it will be automatically opened.
      *
      * @throws Exception
-     * @throws FileException if the file could not be opened
+     * @throws FileExceptionFactory if the file could not be opened
      *
      * @return resource the file handle
      */
@@ -297,7 +293,7 @@ class Signature
     {
         if (!$this->handle) {
             if (!($this->handle = @fopen($this->file, 'rb'))) {
-                throw FileException::lastError();
+                throw FileExceptionFactory::lastError();
             }
         }
 
@@ -310,18 +306,18 @@ class Signature
      * @param int $bytes the number of bytes
      *
      * @throws Exception
-     * @throws FileException if the file could not be read
+     * @throws FileExceptionFactory if the file could not be read
      *
      * @return string the read bytes
      */
     private function read($bytes)
     {
         if (false === ($read = @fread($this->handle(), $bytes))) {
-            throw FileException::lastError();
+            throw FileExceptionFactory::lastError();
         }
 
         if (($actual = strlen($read)) !== $bytes) {
-            throw FileException::create(
+            throw FileExceptionFactory::create(
                 'Only read %d of %d bytes from "%s".',
                 $actual,
                 $bytes,
@@ -339,12 +335,12 @@ class Signature
      * @param int $whence the direction
      *
      * @throws Exception
-     * @throws FileException if the file could not be seeked
+     * @throws FileExceptionFactory if the file could not be seeked
      */
     private function seek($offset, $whence = SEEK_SET): void
     {
         if (-1 === @fseek($this->handle(), $offset, $whence)) {
-            throw FileException::lastError();
+            throw FileExceptionFactory::lastError();
         }
     }
 }

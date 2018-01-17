@@ -14,7 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Signature;
 
-use KevinGH\Box\Exception\OpenSslException;
+use KevinGH\Box\Exception\OpenSslExceptionFactory;
+use RuntimeException;
 
 /**
  * Uses OpenSSL to verify the signature.
@@ -30,7 +31,7 @@ class OpenSsl extends AbstractPublicKey
      */
     public function verify($signature)
     {
-        OpenSslException::reset();
+        OpenSslExceptionFactory::reset();
 
         ob_start();
 
@@ -43,10 +44,10 @@ class OpenSsl extends AbstractPublicKey
         $error = trim(ob_get_clean());
 
         if (-1 === $result) {
-            throw OpenSslException::lastError();
+            throw OpenSslExceptionFactory::lastError();
         }
         if (!empty($error)) {
-            throw new OpenSslException($error);
+            throw new RuntimeException($error);
         }
 
         return 1 === $result;

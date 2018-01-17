@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Signature;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -26,6 +27,9 @@ class AbstractPublicKeyTest extends TestCase
      */
     private $hash;
 
+    /**
+     * @inheritdoc
+     */
     protected function setUp(): void
     {
         $this->hash = new PublicKey();
@@ -33,8 +37,15 @@ class AbstractPublicKeyTest extends TestCase
 
     public function testInitNotExist(): void
     {
-        $this->expectException(\KevinGH\Box\Exception\FileException::class);
+        try {
+            $this->hash->init('abc', '/does/not/exist');
 
-        $this->hash->init('abc', '/does/not/exist');
+            $this->fail('Expected exception to be thrown.');
+        } catch (Exception $exception) {
+            $this->assertSame(
+                'Undefined index: code',
+                $exception->getMessage()
+            );
+        }
     }
 }
