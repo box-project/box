@@ -17,8 +17,10 @@ namespace KevinGH\Box;
 use ArrayIterator;
 use function chmod;
 use Exception;
+use function file_put_contents;
 use FilesystemIterator;
 use Herrera\Annotations\Tokenizer;
+use function implode;
 use InvalidArgumentException;
 use function is_string;
 use KevinGH\Box\Compactor;
@@ -29,6 +31,7 @@ use function mkdir;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use Phar;
+use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -194,7 +197,7 @@ class BoxTest extends TestCase
             $secondCompactorProphecy->reveal(),
         ]);
 
-        $this->box->setValues($placeholderMapping);
+        $this->box->registerPlaceholders($placeholderMapping);
         $this->box->addFile($file);
 
         $expectedContents = $secondCompactorOutput;
@@ -292,7 +295,7 @@ class BoxTest extends TestCase
             $secondCompactorProphecy->reveal(),
         ]);
 
-        $this->box->setValues($placeholderMapping);
+        $this->box->registerPlaceholders($placeholderMapping);
         $this->box->addFromString($localPath, $contents);
 
         $expectedContents = $secondCompactorOutput;
@@ -362,7 +365,7 @@ __HALT_COMPILER();
 STUB
         );
 
-        $this->box->setValues(['@replace_me@' => 'replaced']);
+        $this->box->registerPlaceholders(['@replace_me@' => 'replaced']);
         $this->box->setStubUsingFile($file, true);
 
         $this->assertSame(
@@ -371,12 +374,69 @@ STUB
         );
     }
 
-    public function testSetValuesNonScalar(): void
+    public function test_register_placeholders(): void
     {
-        $this->expectException(\KevinGH\Box\Exception\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Non-scalar values (such as resource) are not supported.');
+        file_put_contents(
+            $file = 'foo',
+            <<<'PHP'
+#!/usr/bin/env php
+<?php
 
-        $this->box->setValues(['stream' => STDOUT]);
+echo <<<EOF
+Test replacing placeholders.
+
+String value: @string_placeholder@
+Int value: @int_placeholder@
+Stringable value: @stringable_placeholder@
+
+EOF;
+
+__HALT_COMPILER();
+PHP
+        );
+
+        $stringable = new class() {
+            public function __toString(): string
+            {
+                return 'stringable value';
+            }
+        };
+
+        $this->box->registerPlaceholders([
+            '@string_placeholder@' => 'string value',
+            '@int_placeholder@' => 10,
+            '@stringable_placeholder@' => $stringable,
+        ]);
+
+        $this->box->setStubUsingFile($file, true);
+
+        $expected = <<<'EOF'
+Test replacing placeholders.
+
+String value: string value
+Int value: 10
+Stringable value: stringable value
+EOF;
+
+        exec('php test.phar', $output);
+
+        $actual = implode(PHP_EOL, $output);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function test_cannot_register_non_scalar_placeholders(): void
+    {
+        try {
+            $this->box->registerPlaceholders(['stream' => STDOUT]);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (Exception $exception) {
+            $this->assertSame(
+                'Expected value "stream" to be a scalar or stringable object.',
+                $exception->getMessage()
+            );
+        }
     }
 
     /**

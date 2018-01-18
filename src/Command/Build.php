@@ -522,7 +522,7 @@ HELP
             );
         }
 
-        $box->setValues($values);
+        $box->registerPlaceholders($values);
     }
 
     private function registerCompactors(Configuration $config, Box $box, BuildLogger $logger): void

@@ -19,6 +19,7 @@ use Assert\Assert;
 use Assert\Assertion;
 use function file_get_contents;
 use FilesystemIterator;
+use function is_object;
 use KevinGH\Box\Compactor;
 use KevinGH\Box\Exception\FileExceptionFactory;
 use KevinGH\Box\Exception\InvalidArgumentException;
@@ -60,7 +61,7 @@ final class Box
      *
      * @var array
      */
-    private $values = [];
+    private $placeholders = [];
 
     /**
      * Creates a new Phar and Box instance.
@@ -92,6 +93,30 @@ final class Box
         Assertion::allIsInstanceOf($compactors, Compactor::class);
 
         $this->compactors = $compactors;
+    }
+
+    /**
+     * Sets the placeholder values.
+     *
+     * @param scalar[] $placeholders
+     */
+    public function registerPlaceholders(array $placeholders): void
+    {
+        $message = 'Expected value "%s" to be a scalar or stringable object.';
+
+        foreach ($placeholders as $i => $placeholder) {
+            if (is_object($placeholder)) {
+                Assertion::methodExists('__toString', $placeholder, $message);
+
+                $placeholders[$i] = (string) $placeholder;
+
+                break;
+            }
+
+            Assertion::scalar($placeholder, $message);
+        }
+
+        $this->placeholders = $placeholders;
     }
 
     /**
@@ -128,37 +153,14 @@ final class Box
             $local,
             $this->compactContents(
                 $local,
-                $this->replaceValues($contents)
+                $this->replacePlaceholders($contents)
             )
         );
     }
 
-    /**
-     * Returns the Phar instance.
-     *
-     * @return Phar the instance
-     */
-    public function getPhar()
+    public function getPhar(): Phar
     {
         return $this->phar;
-    }
-
-    /**
-     * Replaces the placeholders with their values.
-     *
-     * @param string $contents the contents
-     *
-     * @return string the replaced contents
-     *
-     * @internal
-     */
-    public function replaceValues($contents)
-    {
-        return str_replace(
-            array_keys($this->values),
-            array_values($this->values),
-            $contents
-        );
     }
 
     /**
@@ -178,32 +180,10 @@ final class Box
         $contents = file_get_contents($file);
 
         if ($replace) {
-            $contents = $this->replaceValues($contents);
+            $contents = $this->replacePlaceholders($contents);
         }
 
         $this->phar->setStub($contents);
-    }
-
-    /**
-     * Sets the placeholder values.
-     *
-     * @param array $values the values
-     *
-     * @throws Exception\Exception
-     * @throws InvalidArgumentException if a non-scalar value is used
-     */
-    public function setValues(array $values): void
-    {
-        foreach ($values as $value) {
-            if (false === is_scalar($value)) {
-                throw InvalidArgumentException::create(
-                    'Non-scalar values (such as %s) are not supported.',
-                    gettype($value)
-                );
-            }
-        }
-
-        $this->values = $values;
     }
 
     /**
@@ -223,8 +203,8 @@ final class Box
     /**
      * Signs the PHAR using a private key.
      *
-     * @param string $key      the private key
-     * @param string $password the private key password
+     * @param string $key      The private key
+     * @param string $password The private key password
      */
     public function sign(string $key, ?string $password): void
     {
@@ -251,6 +231,22 @@ final class Box
         if (false === @file_put_contents($pubKey, $details['key'])) {
             throw FileExceptionFactory::createForLastError();
         }
+    }
+
+    /**
+     * Replaces the placeholders with their values.
+     *
+     * @param string $contents the contents
+     *
+     * @return string the replaced contents
+     */
+    private function replacePlaceholders(string $contents): string
+    {
+        return str_replace(
+            array_keys($this->placeholders),
+            array_values($this->placeholders),
+            $contents
+        );
     }
 
     private function compactContents(string $file, string $contents): string
