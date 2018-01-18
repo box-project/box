@@ -33,40 +33,35 @@ use SplFileInfo;
 use SplObjectStorage;
 use Traversable;
 
+/**
+ * Box is a utility class to generate a PHAR.
+ */
 final class Box
 {
     /**
-     * The source code compactors.
-     *
      * @var Compactor[]
      */
     private $compactors = [];
 
     /**
-     * The path to the Phar file.
-     *
-     * @var string
+     * @var string The path to the PHAR file
      */
     private $file;
 
     /**
-     * The Phar instance.
-     *
-     * @var Phar
+     * @var Phar The PHAR instance
      */
     private $phar;
 
     /**
-     * The placeholder values.
-     *
-     * @var array
+     * @var scalar[] The placeholders with their values
      */
     private $placeholders = [];
 
     /**
-     * Creates a new Phar and Box instance.
+     * Creates a new PHAR and Box instance.
      *
-     * @param string $file  the file name
+     * @param string $file  The PHAR file name
      * @param int    $flags Flags to pass to the Phar parent class RecursiveDirectoryIterator
      * @param string $alias Alias with which the Phar archive should be referred to in calls to stream functionality
      *
