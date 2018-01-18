@@ -716,7 +716,7 @@ HELP
                 OutputInterface::VERBOSITY_VERBOSE
             );
 
-            $box->setStubUsingFile($stub);
+            $box->registerStub($stub);
         } else {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,

@@ -96,8 +96,6 @@ final class Box
     }
 
     /**
-     * Sets the placeholder values.
-     *
      * @param scalar[] $placeholders
      */
     public function registerPlaceholders(array $placeholders): void
@@ -117,6 +115,18 @@ final class Box
         }
 
         $this->placeholders = $placeholders;
+    }
+
+    public function registerStub(string $file): void
+    {
+        Assertion::file($file);
+        Assertion::readable($file);
+
+        $contents = $this->replacePlaceholders(
+            file_get_contents($file)
+        );
+
+        $this->phar->setStub($contents);
     }
 
     /**
@@ -161,29 +171,6 @@ final class Box
     public function getPhar(): Phar
     {
         return $this->phar;
-    }
-
-    /**
-     * Sets the bootstrap loader stub using a file.
-     *
-     * @param string $file    the file path
-     * @param bool   $replace Replace placeholders?
-     *
-     * @throws Exception\Exception
-     * @throws FileExceptionFactory       if the stub file could not be used
-     */
-    public function setStubUsingFile($file, $replace = false): void
-    {
-        Assertion::file($file);
-        Assertion::readable($file);
-
-        $contents = file_get_contents($file);
-
-        if ($replace) {
-            $contents = $this->replacePlaceholders($contents);
-        }
-
-        $this->phar->setStub($contents);
     }
 
     /**

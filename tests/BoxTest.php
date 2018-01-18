@@ -319,61 +319,6 @@ class BoxTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function test_cannot_set_non_existent_file_as_stub_file(): void
-    {
-        try {
-            $this->box->setStubUsingFile('/does/not/exist');
-
-            $this->fail('Expected exception to be thrown.');
-        } catch (Exception $exception) {
-            $this->assertSame(
-                'File "/does/not/exist" was expected to exist.',
-                $exception->getMessage()
-            );
-        }
-    }
-
-    public function test_cannot_set_non_readable_file_as_stub_file(): void
-    {
-        vfsStreamWrapper::setRoot($root = vfsStream::newDirectory('test'));
-
-        $root->addChild(vfsStream::newFile('test.php', 0000));
-
-        try {
-            $this->box->setStubUsingFile('vfs://test/test.php');
-
-            $this->fail('Expected exception to be thrown.');
-        } catch (Exception $exception) {
-            $this->assertSame(
-                'Path "vfs://test/test.php" was expected to be readable.',
-                $exception->getMessage()
-            );
-        }
-    }
-
-    public function testSetStubUsingFile(): void
-    {
-        touch($file = 'foo');
-
-        file_put_contents(
-            $file,
-            <<<'STUB'
-#!/usr/bin/env php
-<?php
-echo "@replace_me@";
-__HALT_COMPILER();
-STUB
-        );
-
-        $this->box->registerPlaceholders(['@replace_me@' => 'replaced']);
-        $this->box->setStubUsingFile($file, true);
-
-        $this->assertSame(
-            'replaced',
-            exec('php test.phar')
-        );
-    }
-
     public function test_register_placeholders(): void
     {
         file_put_contents(
@@ -408,7 +353,7 @@ PHP
             '@stringable_placeholder@' => $stringable,
         ]);
 
-        $this->box->setStubUsingFile($file, true);
+        $this->box->registerStub($file, true);
 
         $expected = <<<'EOF'
 Test replacing placeholders.
@@ -423,6 +368,111 @@ EOF;
         $actual = implode(PHP_EOL, $output);
 
         $this->assertSame($expected, $actual);
+    }
+
+    public function test_register_stub_file(): void
+    {
+        file_put_contents(
+            $file = 'foo',
+            <<<'STUB'
+#!/usr/bin/env php
+<?php
+
+echo 'Hello world!';
+
+__HALT_COMPILER();
+STUB
+        );
+
+        $this->box->registerStub($file);
+
+        $expected = <<<'STUB'
+#!/usr/bin/env php
+<?php
+
+echo 'Hello world!';
+
+__HALT_COMPILER(); ?>
+STUB;
+
+
+        $actual = trim($this->box->getPhar()->getStub());
+
+        $this->assertSame($expected, $actual);
+
+        $expectedOutput = 'Hello world!';
+        $actualOutput = exec('php test.phar');
+
+        $this->assertSame($expectedOutput, $actualOutput, 'Expected the PHAR to be executable.');
+    }
+
+    public function test_placeholders_are_also_replaced_in_stub_file(): void
+    {
+        file_put_contents(
+            $file = 'foo',
+            <<<'STUB'
+#!/usr/bin/env php
+<?php
+
+echo '@message@';
+
+__HALT_COMPILER();
+STUB
+        );
+
+        $this->box->registerPlaceholders(['@message@' => 'Hello world!']);
+        $this->box->registerStub($file);
+
+        $expected = <<<'STUB'
+#!/usr/bin/env php
+<?php
+
+echo 'Hello world!';
+
+__HALT_COMPILER(); ?>
+STUB;
+
+
+        $actual = trim($this->box->getPhar()->getStub());
+
+        $this->assertSame($expected, $actual);
+
+        $expectedOutput = 'Hello world!';
+        $actualOutput = exec('php test.phar');
+
+        $this->assertSame($expectedOutput, $actualOutput, 'Expected the PHAR to be executable.');
+    }
+
+    public function test_cannot_set_non_existent_file_as_stub_file(): void
+    {
+        try {
+            $this->box->registerStub('/does/not/exist');
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (Exception $exception) {
+            $this->assertSame(
+                'File "/does/not/exist" was expected to exist.',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_cannot_set_non_readable_file_as_stub_file(): void
+    {
+        vfsStreamWrapper::setRoot($root = vfsStream::newDirectory('test'));
+
+        $root->addChild(vfsStream::newFile('test.php', 0000));
+
+        try {
+            $this->box->registerStub('vfs://test/test.php');
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (Exception $exception) {
+            $this->assertSame(
+                'Path "vfs://test/test.php" was expected to be readable.',
+                $exception->getMessage()
+            );
+        }
     }
 
     public function test_cannot_register_non_scalar_placeholders(): void
