@@ -24,41 +24,32 @@ use KevinGH\Box\Signature\VerifyInterface;
 use PharException;
 
 /**
- * Retrieves and verifies a phar's signature without using the extension.
+ * Retrieves and verifies a PHAR's signature without using the extension.
  *
- * While the phar extension is not used to retrieve or verify a phar's
- * signature, other extensions may still be needed to properly process
- * the signature.
- *
- * @author Kevin Herrera <kevin@herrera.io>
+ * While the PHAR extension is not used to retrieve or verify a PHAR's signature, other extensions may still be needed
+ * to properly process the signature.
  */
-class Signature
+final class Signature
 {
     /**
-     * The phar file path.
-     *
-     * @var string
+     * @var string The PHAR file path
      */
     private $file;
 
     /**
-     * The file handle.
-     *
-     * @var resource
+     * @var resource The file handle
      */
     private $handle;
 
     /**
-     * The size of the file.
-     *
-     * @var int
+     * @var int The size of the file
      */
     private $size;
 
     /**
      * The recognized signature types.
      *
-     * @var array
+     * @var string
      */
     private static $types = [
         [
@@ -93,15 +84,7 @@ class Signature
         ],
     ];
 
-    /**
-     * Sets the phar file path.
-     *
-     * @param string $path the phar file path
-     *
-     * @throws Exception
-     * @throws FileExceptionFactory if the file does not exist
-     */
-    public function __construct($path)
+    public function __construct(string $path)
     {
         Assertion::file($path);
 
@@ -112,28 +95,13 @@ class Signature
         }
     }
 
-    /**
-     * Closes the open file handle.
-     */
     public function __destruct()
     {
         $this->close();
     }
 
     /**
-     * Creates a new instance of Signature.
-     *
-     * @param string $path the phar file path
-     *
-     * @return Signature the new instance
-     */
-    public static function create($path)
-    {
-        return new self($path);
-    }
-
-    /**
-     * Returns the signature for the phar.
+     * Returns the signature for the PHAR.
      *
      * The value returned is identical to that of `Phar->getSignature()`. If
      * $required is not given, it will default to the `phar.require_hash`
@@ -141,11 +109,11 @@ class Signature
      *
      * @param bool $required Is the signature required?
      *
-     * @throws PharException if the phar is not valid
+     * @throws PharException If the phar is not valid
      *
-     * @return array the signature
+     * @return array|null The signature
      */
-    public function get($required = null)
+    public function get(bool $required = null): ?array
     {
         if (null === $required) {
             $required = (bool) ini_get('phar.require_hash');
@@ -211,16 +179,7 @@ class Signature
         ];
     }
 
-    /**
-     * Verifies the signature of the phar.
-     *
-     * @throws Exception
-     * @throws FileExceptionFactory    if the private key could not be read
-     * @throws OpenSslExceptionFactory if there is an OpenSSL error
-     *
-     * @return bool TRUE if verified, FALSE if not
-     */
-    public function verify()
+    public function verify(): bool
     {
         $signature = $this->get();
 
@@ -280,12 +239,7 @@ class Signature
     }
 
     /**
-     * Returns the file handle.
-     *
-     * If the file handle is not opened, it will be automatically opened.
-     *
-     * @throws Exception
-     * @throws FileExceptionFactory if the file could not be opened
+     * Returns the file handle. If the file handle is not opened, it will be automatically opened.
      *
      * @return resource the file handle
      */
@@ -305,12 +259,9 @@ class Signature
      *
      * @param int $bytes the number of bytes
      *
-     * @throws Exception
-     * @throws FileExceptionFactory if the file could not be read
-     *
      * @return string the read bytes
      */
-    private function read($bytes)
+    private function read(int $bytes): string
     {
         if (false === ($read = @fread($this->handle(), $bytes))) {
             throw FileExceptionFactory::lastError();
@@ -333,11 +284,8 @@ class Signature
      *
      * @param int $offset the offset to seek
      * @param int $whence the direction
-     *
-     * @throws Exception
-     * @throws FileExceptionFactory if the file could not be seeked
      */
-    private function seek($offset, $whence = SEEK_SET): void
+    private function seek(int $offset, int $whence = SEEK_SET): void
     {
         if (-1 === @fseek($this->handle(), $offset, $whence)) {
             throw FileExceptionFactory::lastError();

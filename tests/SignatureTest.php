@@ -21,26 +21,13 @@ use PharException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversNothing
+ * @covers \KevinGH\Box\Signature
  */
 class SignatureTest extends TestCase
 {
     public const FIXTURES_DIR = __DIR__.'/../fixtures/signature';
 
-    private $types;
-
-    public function getPhars()
-    {
-        return [
-            [self::FIXTURES_DIR.'/md5.phar'],
-            [self::FIXTURES_DIR.'/sha1.phar'],
-            [self::FIXTURES_DIR.'/sha256.phar'],
-            [self::FIXTURES_DIR.'/sha512.phar'],
-            [self::FIXTURES_DIR.'/openssl.phar'],
-        ];
-    }
-
-    public function testConstructNotExist(): void
+    public function test_cannot_create_the_signature_of_non_existent_file(): void
     {
         try {
             new Signature('/does/not/exist');
@@ -54,21 +41,14 @@ class SignatureTest extends TestCase
         }
     }
 
-    public function testCreate(): void
-    {
-        $this->assertInstanceOf(
-            Signature::class,
-            Signature::create(self::FIXTURES_DIR.'/example.phar')
-        );
-    }
-
-    public function testCreateNoGbmb(): void
+    public function test_it_cannot_get_the_signature_of_unsigned_PHAR(): void
     {
         $path = realpath(self::FIXTURES_DIR.'/missing.phar');
-        $sig = new Signature($path);
+
+        $signature = new Signature($path);
 
         try {
-            $sig->get();
+            $signature->get();
 
             $this->fail('Expected exception to be thrown.');
         } catch (PharException $exception) {
@@ -79,13 +59,23 @@ class SignatureTest extends TestCase
         }
     }
 
-    public function testCreateInvalid(): void
+    public function test_returns_not_signature_if_PHAR_is_unsigned_and_signature_is_not_required(): void
+    {
+        $path = realpath(self::FIXTURES_DIR.'/missing.phar');
+
+        $signature = new Signature($path);
+
+        $this->assertNull($signature->get(false));
+    }
+
+    public function test_it_cannot_get_the_signature_if_the_PHAR_signature_type_is_unknown(): void
     {
         $path = realpath(self::FIXTURES_DIR.'/invalid.phar');
-        $sig = new Signature($path);
+
+        $signature = new Signature($path);
 
         try {
-            $sig->get(true);
+            $signature->get(true);
 
             $this->fail('Expected exception to be thrown.');
         } catch (PharException $exception) {
@@ -96,39 +86,37 @@ class SignatureTest extends TestCase
         }
     }
 
-    public function testCreateMissingNoRequire(): void
-    {
-        $path = realpath(self::FIXTURES_DIR.'/missing.phar');
-        $sig = new Signature($path);
-
-        $this->assertNull($sig->get(false));
-    }
-
     /**
-     * @dataProvider getPhars
-     *
-     * @param mixed $path
+     * @dataProvider providePHARs
      */
-    public function testGet($path): void
+    public function test_it_can_get_the_PHAR_signature(string $path): void
     {
         $phar = new Phar($path);
-        $sig = new Signature($path);
 
-        $this->assertEquals(
-            $phar->getSignature(),
-            $sig->get()
-        );
+        $signature = new Signature($path);
+
+        $expected = $phar->getSignature();
+        $actual = $signature->get();
+
+        $this->assertEquals($expected, $actual);
     }
 
     /**
-     * @dataProvider getPhars
-     *
-     * @param mixed $path
+     * @dataProvider providePHARs
      */
-    public function testVerify($path): void
+    public function test_it_can_verify_the_PHAR_signature(string $path): void
     {
         $sig = new Signature($path);
 
         $this->assertTrue($sig->verify());
+    }
+
+    public function providePHARs()
+    {
+        yield [self::FIXTURES_DIR.'/md5.phar'];
+        yield [self::FIXTURES_DIR.'/sha1.phar'];
+        yield [self::FIXTURES_DIR.'/sha256.phar'];
+        yield [self::FIXTURES_DIR.'/sha512.phar'];
+        yield [self::FIXTURES_DIR.'/openssl.phar'];
     }
 }

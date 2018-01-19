@@ -42,7 +42,7 @@ use SplFileInfo;
 use function touch;
 
 /**
- * @coversNothing
+ * @covers \KevinGH\Box\Box
  */
 class BoxTest extends TestCase
 {
@@ -513,6 +513,27 @@ STUB;
             exec('php test.phar'),
             'Expected PHAR to be executable.'
         );
+    }
+
+    public function test_it_cannot_sign_if_cannot_get_the_private_key(): void
+    {
+        $key = 'Invalid key';
+        $password = 'test';
+
+        mkdir('test.phar.pubkey');
+
+        $this->configureHelloWorldPhar();
+
+        try {
+            $this->box->sign($key, $password);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (Exception $exception) {
+            $this->assertSame(
+                'error:0906D06C:PEM routines:PEM_read_bio:no start line',
+                $exception->getMessage()
+            );
+        }
     }
 
     public function test_it_cannot_sign_if_cannot_create_the_public_key(): void

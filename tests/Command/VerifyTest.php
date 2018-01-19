@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Command;
 
+use InvalidArgumentException;
 use KevinGH\Box\Application;
 use Phar;
 use PHPUnit\Framework\TestCase;
@@ -54,6 +55,7 @@ class VerifyTest extends TestCase
      */
     protected function tearDown(): void
     {
+        //TODO: check if is still necessary
         restore_error_handler();
 
         parent::tearDown();
@@ -168,13 +170,11 @@ OUTPUT;
             );
 
             $this->fail('Expected exception to be thrown.');
-        } catch (RuntimeException $exception) {
+        } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                'Could not find the file "unknown".',
+                'File "unknown" was expected to exist.',
                 $exception->getMessage()
             );
-            $this->assertSame(0, $exception->getCode());
-            $this->assertNull($exception->getPrevious());
         }
     }
 
