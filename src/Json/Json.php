@@ -41,6 +41,7 @@ final class Json
             }
 
             $this->lint($json);
+
             if (($result = $this->linter->lint($json)) instanceof ParsingException) {
                 throw $result;
             }

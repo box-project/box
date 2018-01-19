@@ -72,6 +72,7 @@ $config = PhpCsFixer\Config::create()
     ])
     ->setFinder(
         PhpCsFixer\Finder::create()
+            ->in('fixtures')
             ->in('src')
             ->in('tests')
             ->append(['bin/box'])
