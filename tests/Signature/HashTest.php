@@ -14,38 +14,63 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Signature;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversNothing
+ * @covers \KevinGH\Box\Signature\Hash
  */
 class HashTest extends TestCase
 {
+    public function test_it_cannot_verify_data_with_an_unknown_algorithm(): void
+    {
+        try {
+            new Hash('bad algorithm', '');
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertRegExp(
+                '/^Expected badalgorithm to be a known algorithm\:.+$/',
+                $exception->getMessage()
+            );
+        }
+    }
+
     /**
-     * @var Hash
+     * @dataProvider provideData
      */
-    private $hash;
-
-    protected function setUp(): void
+    public function test_it_can_verify_data(string $algorithm, string $data, string $hashedData, bool $expected): void
     {
-        $this->hash = new Hash();
+        $hash = new Hash($algorithm, '');
+        
+        $hash->update($data);
+
+        $actual = $hash->verify($hashedData);
+
+        $this->assertSame($expected, $actual);
     }
 
-    public function testInitBadAlgorithm(): void
+    public function provideData()
     {
-        $this->expectException(\KevinGH\Box\Exception\Exception::class);
-        $this->expectExceptionMessage('Unknown hashing algorithm');
+        yield 'md5' => [
+            'md5',
+            'unhashed data',
+            strtoupper(md5('unhashed data')),
+            true,
+        ];
 
-        $this->hash->init('bad algorithm', '');
-    }
+        yield 'md5 with different case' => [
+            'MD5',
+            'unhashed data',
+            strtoupper(md5('unhashed data')),
+            true,
+        ];
 
-    public function testVerify(): void
-    {
-        $this->hash->init('md5', '');
-        $this->hash->update('test');
-
-        $this->assertTrue(
-            $this->hash->verify(strtoupper(md5('test')))
-        );
+        yield 'invalid md5' => [
+            'md5',
+            'unhashed data',
+            strtoupper(md5('different data')),
+            false,
+        ];
     }
 }

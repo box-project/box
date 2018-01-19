@@ -25,7 +25,7 @@ use RuntimeException;
  */
 class ExtractTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__.'/../fixtures/signature';
+    private const FIXTURES_DIR = __DIR__ . '/../fixtures/signed_phars';
 
     /**
      * @var string

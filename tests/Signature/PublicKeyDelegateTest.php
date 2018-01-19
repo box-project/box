@@ -17,18 +17,18 @@ namespace KevinGH\Box\Signature;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversNothing
+ * @covers \KevinGH\Box\Signature\PublicKeyDelegate
  */
 class PublicKeyDelegateTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__.'/../../fixtures/signature';
+    private const FIXTURES_DIR = __DIR__ . '/../../fixtures/signed_phars';
 
     public function testFunctional(): void
     {
         $path = self::FIXTURES_DIR.'/openssl.phar';
-        $hash = new PublicKeyDelegate();
 
-        $hash->init('openssl', $path);
+        $hash = new PublicKeyDelegate('openssl', $path);
+
         $hash->update(
             file_get_contents($path, false, null, 0, filesize($path) - 76)
         );

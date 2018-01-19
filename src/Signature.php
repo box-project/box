@@ -20,7 +20,7 @@ use KevinGH\Box\Exception\FileExceptionFactory;
 use KevinGH\Box\Exception\OpenSslExceptionFactory;
 use KevinGH\Box\Signature\Hash;
 use KevinGH\Box\Signature\PublicKeyDelegate;
-use KevinGH\Box\Signature\VerifyInterface;
+use KevinGH\Box\Signature\Verifier;
 use PharException;
 
 /**
@@ -32,26 +32,11 @@ use PharException;
 final class Signature
 {
     /**
-     * @var string The PHAR file path
-     */
-    private $file;
-
-    /**
-     * @var resource The file handle
-     */
-    private $handle;
-
-    /**
-     * @var int The size of the file
-     */
-    private $size;
-
-    /**
-     * The recognized signature types.
+     * The recognized PHAR signatures types.
      *
      * @var string
      */
-    private static $types = [
+    private const TYPES = [
         [
             'name' => 'MD5',
             'flag' => 0x01,
@@ -83,6 +68,21 @@ final class Signature
             'class' => PublicKeyDelegate::class,
         ],
     ];
+
+    /**
+     * @var string The PHAR file path
+     */
+    private $file;
+
+    /**
+     * @var resource The file handle
+     */
+    private $handle;
+
+    /**
+     * @var int The size of the file
+     */
+    private $size;
 
     public function __construct(string $path)
     {
@@ -139,7 +139,7 @@ final class Signature
         $flag = unpack('V', $this->read(4));
         $flag = $flag[1];
 
-        foreach (self::$types as $type) {
+        foreach (self::TYPES as $type) {
             if ($flag === $type['flag']) {
                 break;
             }
@@ -186,7 +186,7 @@ final class Signature
         $size = $this->size;
         $type = null;
 
-        foreach (self::$types as $type) {
+        foreach (self::TYPES as $type) {
             if ($type['name'] === $signature['hash_type']) {
                 if (0x10 === $type['flag']) {
                     $this->seek(-12, SEEK_END);
@@ -206,9 +206,8 @@ final class Signature
 
         $this->seek(0);
 
-        /** @var $verify VerifyInterface */
-        $verify = new $type['class']();
-        $verify->init($type['name'], $this->file);
+        /** @var $verify Verifier */
+        $verify = new $type['class']($type['name'], $this->file);
 
         $buffer = 64;
 

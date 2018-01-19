@@ -21,19 +21,17 @@ use phpseclib\Crypt\RSA;
  *
  * @author Kevin Herrera <kevin@herrera.io>
  */
-class PhpSecLib extends AbstractPublicKey
+final class PhpSecLib extends PublicKey
 {
     /**
-     * @see VerifyInterface::verify
-     *
-     * @param mixed $signature
+     * @inheritdoc
      */
-    public function verify($signature)
+    public function verify(string $signature): bool
     {
         $rsa = new RSA();
         $rsa->setSignatureMode(RSA::ENCRYPTION_PKCS1);
         $rsa->loadKey($this->getKey());
 
-        return $rsa->verify($this->getData(), pack('H*', $signature));
+        return $rsa->verify($this->getBufferedData(), pack('H*', $signature));
     }
 }

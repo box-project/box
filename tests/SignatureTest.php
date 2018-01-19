@@ -25,7 +25,7 @@ use PHPUnit\Framework\TestCase;
  */
 class SignatureTest extends TestCase
 {
-    public const FIXTURES_DIR = __DIR__.'/../fixtures/signature';
+    public const FIXTURES_DIR = __DIR__ . '/../fixtures/signed_phars';
 
     public function test_cannot_create_the_signature_of_non_existent_file(): void
     {

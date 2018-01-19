@@ -14,13 +14,18 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Signature;
 
-class BufferedHash extends AbstractBufferedHash
+class DummyPublicKey extends PublicKey
 {
-    public function init($algorithm, $path): void
+    /**
+     * @inheritdoc
+     */
+    public function verify(string $signature): bool
     {
+        return true;
     }
 
-    public function verify($signature): void
+    public function getExposedKey(): string
     {
+        return $this->getKey();
     }
 }

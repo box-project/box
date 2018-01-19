@@ -17,28 +17,21 @@ namespace KevinGH\Box\Signature;
 use KevinGH\Box\Exception\SignatureException;
 
 /**
- * Uses the OpenSSL extension or phpseclib library to verify a signature.
- *
- * @author Kevin Herrera <kevin@herrera.io>
+ * Uses the OpenSSL extension or phpseclib library to verify a signed PHAR.
  */
-class PublicKeyDelegate implements VerifyInterface
+final class PublicKeyDelegate implements Verifier
 {
-    /**
-     * The hashing class.
-     *
-     * @var VerifyInterface
-     */
     private $hash;
 
     /**
-     * Selects the appropriate hashing class.
+     * @inheritdoc
      */
-    public function __construct()
+    public function __construct(string $signature, string $path)
     {
         if (extension_loaded('openssl')) {
-            $this->hash = new OpenSsl();
+            $this->hash = new OpenSsl($signature, $path);
         } elseif (class_exists('Crypt_RSA')) {
-            $this->hash = new PhpSeclib();
+            $this->hash = new PhpSeclib($signature, $path);
         } else {
             throw SignatureException::create(
                 'The "openssl" extension and "phpseclib" libraries are not available.'
@@ -47,32 +40,17 @@ class PublicKeyDelegate implements VerifyInterface
     }
 
     /**
-     * @see VerifyInterface::init
-     *
-     * @param mixed $algorithm
-     * @param mixed $path
+     * @inheritdoc
      */
-    public function init($algorithm, $path): void
-    {
-        $this->hash->init($algorithm, $path);
-    }
-
-    /**
-     * @see VerifyInterface::update
-     *
-     * @param mixed $data
-     */
-    public function update($data): void
+    public function update(string $data): void
     {
         $this->hash->update($data);
     }
 
     /**
-     * @see VerifyInterface::verify
-     *
-     * @param mixed $signature
+     * @inheritdoc
      */
-    public function verify($signature)
+    public function verify(string $signature): bool
     {
         return $this->hash->verify($signature);
     }
