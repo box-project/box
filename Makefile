@@ -18,7 +18,7 @@ cs: vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
 	php -d zend.enable_gc=0 vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer fix
 
 build:		## Build the PHAR
-build: bin/box src vendor
+build:
 	# Cleanup existing artefacts
 	rm -f bin/box.phar
 
@@ -83,5 +83,5 @@ vendor/bin/phpunit: composer.lock
 vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer: vendor/bamarni
 	composer bin php-cs-fixer install
 
-bin/box.phar: src
+bin/box.phar: bin/box src vendor
 	$(MAKE) build
