@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Verifier;
 
-use KevinGH\Box\Exception\SignatureException;
 use KevinGH\Box\Verifier;
+use RuntimeException;
 
 /**
  * Uses the OpenSSL extension or phpseclib library to verify a signed PHAR.
@@ -34,9 +34,7 @@ final class PublicKeyDelegate implements Verifier
         } elseif (class_exists('Crypt_RSA')) {
             $this->hash = new PhpSeclib($signature, $path);
         } else {
-            throw SignatureException::create(
-                'The "openssl" extension and "phpseclib" libraries are not available.'
-            );
+            throw new RuntimeException('The "openssl" extension and "phpseclib" libraries are not available.');
         }
     }
 
