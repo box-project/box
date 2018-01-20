@@ -163,8 +163,8 @@ HELP
     /**
      * Renders the list of attributes.
      *
-     * @param OutputInterface $output     the output
-     * @param array           $attributes the list of attributes
+     * @param OutputInterface $output     The output
+     * @param array           $attributes The list of attributes
      */
     private function render(OutputInterface $output, array $attributes): void
     {
@@ -194,12 +194,12 @@ HELP
     /**
      * Renders the contents of an iterator.
      *
-     * @param OutputInterface $output the output handler
-     * @param Traversable     $list   the traversable list
-     * @param bool|int        $indent the indentation level
-     * @param string          $base   the base path
-     * @param Phar            $phar   the PHP archive
-     * @param string          $root   the root path to remove
+     * @param OutputInterface $output The output handler
+     * @param Traversable     $list   The traversable list
+     * @param bool|int        $indent The indentation level
+     * @param string          $base   The base path
+     * @param Phar            $phar   The PHP archive
+     * @param string          $root   The root path to remove
      */
     private function renderContents(
         OutputInterface $output,

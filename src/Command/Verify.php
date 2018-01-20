@@ -28,7 +28,6 @@ use Throwable;
 final class Verify extends Command
 {
     private const PHAR_ARG = 'phar';
-    private const NO_EXTENSION_OPT = 'no-extension';
     private const VERBOSITY_LEVEL = OutputInterface::VERBOSITY_VERBOSE;
 
     /**
@@ -42,15 +41,9 @@ final class Verify extends Command
             <<<'HELP'
 The <info>%command.name%</info> command will verify the signature of the PHAR.
 
-By default, the command will use the <comment>phar</comment> extension to perform the
-verification process. However, if the extension is not available, Box will manually
-extract and verify the PHAR's signature. If you require that Box handle the verification
-process, you will need to use the <comment>--no-extension</comment> option.
-
 <question>Why would I require that box handle the verification process?</question>
 
 If you meet all of the following conditions:
- - The <comment>phar</comment> extension installed
  - The <comment>openssl</comment> extension is not installed
  - You need to verify a PHAR signed using a private key
 
@@ -63,12 +56,6 @@ HELP
             self::PHAR_ARG,
             InputArgument::REQUIRED,
             'The PHAR file'
-        );
-        $this->addOption(
-            self::NO_EXTENSION_OPT,
-            null,
-            InputOption::VALUE_NONE,
-            'Do not use the PHAR extension to verify'
         );
     }
 
@@ -94,17 +81,10 @@ HELP
         );
 
         try {
-            if (!$input->getOption(self::NO_EXTENSION_OPT) && extension_loaded('phar')) {
-                $phar = new Phar($pharPath);
+            $phar = new Phar($pharPath);
 
-                $verified = true;
-                $signature = $phar->getSignature();
-            } else {
-                $phar = new Signature($pharPath);
-
-                $verified = $phar->verify();
-                $signature = $phar->get();
-            }
+            $verified = true;
+            $signature = $phar->getSignature();
         } catch (Throwable $throwable) {
             // Continue
 

@@ -82,7 +82,7 @@ OUTPUT;
     /**
      * @dataProvider providePassingPharPaths
      */
-    public function test_it_verifies_the_signature_of_the_given_file_using_the_phar_extension_in_verbose_mode(string $pharPath): void
+    public function test_it_verifies_the_signature_of_the_given_file_in_verbose_mode(string $pharPath): void
     {
         $signature = (new Phar($pharPath))->getSignature();
 
@@ -90,56 +90,6 @@ OUTPUT;
             [
                 'command' => 'verify',
                 'phar' => $pharPath,
-            ],
-            [
-                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            ]
-        );
-
-        $expected = <<<OUTPUT
-Verifying the PHAR "{$pharPath}"...
-The PHAR passed verification.
-
-{$signature['hash_type']} signature: {$signature['hash']}
-
-OUTPUT;
-
-        $this->assertSame($expected, $this->commandTester->getDisplay(true));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
-    }
-
-    /**
-     * @dataProvider providePassingPharPaths
-     */
-    public function test_it_verifies_the_signature_of_the_given_file_without_the_phar_extension(string $pharPath): void
-    {
-        $this->commandTester->execute([
-            'command' => 'verify',
-            'phar' => $pharPath,
-            '--no-extension' => true,
-        ]);
-
-        $expected = <<<'OUTPUT'
-The PHAR passed verification.
-
-OUTPUT;
-
-        $this->assertSame($expected, $this->commandTester->getDisplay(true));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
-    }
-
-    /**
-     * @dataProvider providePassingPharPaths
-     */
-    public function test_it_verifies_the_signature_of_the_given_file_without_the_phar_extension_in_verbose_mode(string $pharPath): void
-    {
-        $signature = (new Phar($pharPath))->getSignature();
-
-        $this->commandTester->execute(
-            [
-                'command' => 'verify',
-                'phar' => $pharPath,
-                '--no-extension' => true,
             ],
             [
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -182,31 +132,20 @@ OUTPUT;
      */
     public function test_a_corrupted_PHAR_fails_the_verification(string $pharPath): void
     {
-        $execute = function (bool $useExtension) use ($pharPath): void {
-            $input = [
-                'command' => 'verify',
-                'phar' => $pharPath,
-            ];
+        $this->commandTester->execute([
+            'command' => 'verify',
+            'phar' => $pharPath,
+        ]);
 
-            if (false === $useExtension) {
-                $input['--no-extension'] = null;
-            }
+        $this->assertSame(
+            1,
+            preg_match(
+                '/^The PHAR failed the verification: .+$/',
+                $this->commandTester->getDisplay(true)
+            )
+        );
 
-            $this->commandTester->execute($input);
-
-            $this->assertSame(
-                1,
-                preg_match(
-                    '/^The PHAR failed the verification: .+$/',
-                    $this->commandTester->getDisplay(true)
-                )
-            );
-
-            $this->assertSame(1, $this->commandTester->getStatusCode());
-        };
-
-        $execute(true);
-        $execute(false);
+        $this->assertSame(1, $this->commandTester->getStatusCode());
     }
 
     public function providePassingPharPaths()

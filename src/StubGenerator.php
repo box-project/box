@@ -199,7 +199,7 @@ BANNER;
 
             $compactor = new Php(new Tokenizer());
 
-            $file = __DIR__.'/Extract.php';
+            $file = __DIR__.'/Box_Extract.php';
 
             $code = file_get_contents($file);
             $code = $compactor->compact($file, $code);

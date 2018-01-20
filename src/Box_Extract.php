@@ -12,19 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box;
-
-use InvalidArgumentException;
-use LengthException;
-use RuntimeException;
-use UnexpectedValueException;
-
-/*
- * The default stub pattern.
- *
- * @var string
- */
-define('BOX_EXTRACT_PATTERN_DEFAULT', '__HALT'.'_COMPILER(); ?>');
+use Assert\Assertion;
 
 /*
  * The open-ended stub pattern.
@@ -34,94 +22,58 @@ define('BOX_EXTRACT_PATTERN_DEFAULT', '__HALT'.'_COMPILER(); ?>');
 define('BOX_EXTRACT_PATTERN_OPEN', '__HALT'."_COMPILER(); ?>\r\n");
 
 /**
- * Extracts a phar without the extension.
+ * Extracts a PHAR without the extension.
  *
  * This class is a rewrite of the `Extract_Phar` class that is included
  * in the default stub for all phars. The class is designed to work from
  * inside and outside of a phar. Unlike the original class, the stub
  * length must be specified.
  *
- * @author Kevin Herrera <kevin@herrera.io>
- *
  * @see https://github.com/php/php-src/blob/master/ext/phar/shortarc.php
  */
-class Extract
+final class Box_Extract
 {
     /**
-     * The default stub pattern.
-     *
-     * @var string
+     * @var string The open-ended stub pattern
      */
-    const PATTERN_DEFAULT = BOX_EXTRACT_PATTERN_DEFAULT;
+    private const PATTERN_OPEN = BOX_EXTRACT_PATTERN_OPEN;
 
     /**
-     * The open-ended stub pattern.
-     *
-     * @var string
+     * @var int The gzip compression flag
      */
-    const PATTERN_OPEN = BOX_EXTRACT_PATTERN_OPEN;
+    private const GZ = 0x1000;
 
     /**
-     * The gzip compression flag.
-     *
-     * @var int
+     * @var int The bzip2 compression flag
      */
-    const GZ = 0x1000;
-
-    /**
-     * The bzip2 compression flag.
-     *
-     * @var int
-     */
-    const BZ2 = 0x2000;
+    private const BZ2 = 0x2000;
 
     /**
      * @var int
      */
-    const MASK = 0x3000;
+    private const MASK = 0x3000;
 
     /**
-     * The phar file path to extract.
-     *
-     * @var string
+     * @var string The PHAR file path to extract
      */
     private $file;
 
     /**
-     * The open file handle.
-     *
-     * @var resource
+     * @var resource The open file handle
      */
     private $handle;
 
     /**
-     * The length of the stub in the phar.
-     *
-     * @var int
+     * @var int The length of the stub in the PHAR
      */
     private $stub;
 
-    /**
-     * Sets the file to extract and the stub length.
-     *
-     * @param string $file the file path
-     * @param int    $stub the stub length
-     *
-     * @throws InvalidArgumentException if the file does not exist
-     */
-    public function __construct($file, $stub)
+    public function __construct(string $file, int $stubLength)
     {
-        if (!is_file($file)) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The path "%s" is not a file or does not exist.',
-                    $file
-                )
-            );
-        }
+        Assertion::file($file);
 
         $this->file = $file;
-        $this->stub = $stub;
+        $this->stub = $stubLength;
     }
 
     /**
@@ -146,26 +98,20 @@ class Extract
      * pattern as the `$pattern` argument, if you cannot use either of the
      * pattern constants defined.
      *
-     * @param string $file    the phar file path
-     * @param string $pattern the stub end pattern
+     * @param string $file    The PHAR file path
+     * @param string $pattern The stub end pattern
      *
-     * @throws InvalidArgumentException if the pattern could not be found
-     * @throws RuntimeException         if the phar could not be read
-     *
-     * @return int the stub length
+     * @return int The stub length
      */
     public static function findStubLength(
-        $file,
-        $pattern = self::PATTERN_OPEN
-    ) {
-        if (!($fp = fopen($file, 'rb'))) {
-            throw new RuntimeException(
-                sprintf(
-                    'The phar "%s" could not be opened for reading.',
-                    $file
-                )
-            );
-        }
+        string $file,
+        string $pattern = self::PATTERN_OPEN
+    ): int
+    {
+        Assertion::file($file);
+        Assertion::readable($file);
+
+        $fp = fopen($file, 'rb');
 
         $stub = null;
         $offset = 0;
@@ -200,22 +146,19 @@ class Extract
     }
 
     /**
-     * Extracts the phar to the directory path.
+     * Extracts the PHAR to the directory path.
      *
      * If no directory path is given, a temporary one will be generated and
      * returned. If a directory path is given, the returned directory path
      * will be the same.
      *
-     * @param string $dir the directory to extract to
+     * @param string $dir The directory to extract to
      *
-     * @throws LengthException
-     * @throws RuntimeException
-     *
-     * @return string the directory extracted to
+     * @return string The directory extracted to
      */
-    public function go($dir = null)
+    public function go(string $dir = null): string
     {
-        // set up the output directory
+        // Set up the output directory
         if (null === $dir) {
             $dir = rtrim(sys_get_temp_dir(), '\\/')
                 .DIRECTORY_SEPARATOR
@@ -226,7 +169,7 @@ class Extract
             $dir = realpath($dir);
         }
 
-        // skip if already extracted
+        // Skip if already extracted
         $md5 = $dir.DIRECTORY_SEPARATOR.md5_file($this->file);
 
         if (file_exists($md5)) {
@@ -237,7 +180,7 @@ class Extract
             $this->createDir($dir);
         }
 
-        // open the file and skip stub
+        // Open the file and skip stub
         $this->open();
 
         if (-1 === fseek($this->handle, $this->stub)) {
@@ -250,7 +193,7 @@ class Extract
             );
         }
 
-        // read the manifest
+        // Read the manifest
         $info = $this->readManifest();
 
         if ($info['flags'] & self::GZ) {
@@ -272,6 +215,7 @@ class Extract
         }
 
         self::purge($dir);
+
         $this->createDir($dir);
         $this->createFile($md5);
 
@@ -299,11 +243,9 @@ class Extract
     /**
      * Recursively deletes the directory or file path.
      *
-     * @param string $path the path to delete
-     *
-     * @throws RuntimeException if the path could not be deleted
+     * @param string $path The path to delete
      */
-    public static function purge($path): void
+    public static function purge(string $path): void
     {
         if (is_dir($path)) {
             foreach (scandir($path) as $item) {
@@ -337,13 +279,13 @@ class Extract
     /**
      * Creates a new directory.
      *
-     * @param string $path      the directory path
-     * @param int    $chmod     the file mode
+     * @param string $path      The directory path
+     * @param int    $chmod     The file mode
      * @param bool   $recursive Recursively create path?
      *
      * @throws RuntimeException if the path could not be created
      */
-    private function createDir($path, $chmod = 0777, $recursive = true): void
+    private function createDir(string $path, int $chmod = 0777, bool $recursive = true): void
     {
         if (!mkdir($path, $chmod, $recursive)) {
             throw new RuntimeException(
@@ -358,11 +300,9 @@ class Extract
     /**
      * Creates a new file.
      *
-     * @param string $path     the file path
-     * @param string $contents the file contents
-     * @param int    $mode     the file mode
-     *
-     * @throws RuntimeException if the file could not be created
+     * @param string $path     The file path
+     * @param string $contents The file contents
+     * @param int    $mode     The file mode
      */
     private function createFile($path, $contents = '', $mode = 0666): void
     {
@@ -387,17 +327,13 @@ class Extract
     }
 
     /**
-     * Extracts a single file from the phar.
+     * Extracts a single file from the PHAR.
      *
-     * @param array $info the file information
+     * @param array $info The file information
      *
-     * @throws RuntimeException         if the file could not be extracted
-     * @throws UnexpectedValueException if the crc32 checksum does not
-     *                                  match the expected value
-     *
-     * @return string the file data
+     * @return string The file data
      */
-    private function extractFile($info)
+    private function extractFile(array $info): string
     {
         if (0 === $info['size']) {
             return '';
@@ -458,8 +394,6 @@ class Extract
 
     /**
      * Opens the file for reading.
-     *
-     * @throws RuntimeException if the file could not be opened
      */
     private function open(): void
     {
@@ -478,13 +412,11 @@ class Extract
     /**
      * Reads the number of bytes from the file.
      *
-     * @param int $bytes the number of bytes
+     * @param int $bytes The number of bytes
      *
-     * @throws RuntimeException if the read fails
-     *
-     * @return string the binary string read
+     * @return string The binary string read
      */
-    private function read($bytes)
+    private function read(int $bytes): string
     {
         $read = '';
         $total = $bytes;
@@ -523,7 +455,7 @@ class Extract
      *
      * @return array the manifest
      */
-    private function readManifest()
+    private function readManifest(): array
     {
         $size = unpack('V', $this->read(4));
         $size = $size[1];

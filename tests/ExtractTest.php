@@ -14,14 +14,19 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use Box_Extract;
+use function chmod;
+use function chown;
+use Generator;
 use InvalidArgumentException;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use function touch;
 
 /**
- * @coversNothing
+ * @covers \Box_Extract
  */
 class ExtractTest extends TestCase
 {
@@ -30,12 +35,17 @@ class ExtractTest extends TestCase
     /**
      * @var string
      */
-    protected $cwd;
+    private $cwd;
 
     /**
      * @var string
      */
-    protected $tmp;
+    private $tmp;
+
+    /**
+     * @var string
+     */
+    private $sysTmp;
 
     /**
      * {@inheritdoc}
@@ -44,6 +54,7 @@ class ExtractTest extends TestCase
     {
         $this->cwd = getcwd();
         $this->tmp = make_tmp_dir('box', __CLASS__);
+        $this->sysTmp = rtrim(sys_get_temp_dir(), '\\/').DIRECTORY_SEPARATOR.'pharextract';
 
         chdir($this->tmp);
     }
@@ -53,56 +64,48 @@ class ExtractTest extends TestCase
      */
     protected function tearDown(): void
     {
-        unset($this->box, $this->phar);
-
         chdir($this->cwd);
 
         remove_dir($this->tmp);
+        remove_dir($this->sysTmp);
 
         parent::tearDown();
     }
 
-    public function getStubLengths()
+    public function test_it_cannot_be_created_for_a_non_existent_file(): void
     {
-        return [
-            [self::FIXTURES_DIR.'/example.phar', 203, null],
-            [self::FIXTURES_DIR.'/mixed.phar', 6683, '__HALT_COMPILER(); ?>'],
-        ];
-    }
+        try {
+            new Box_Extract('/does/not/exist', 123);
 
-    public function testConstructNotExist(): void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The path "/does/not/exist" is not a file or does not exist.');
-
-        new Extract('/does/not/exist', 123);
-    }
-
-    /**
-     * @dataProvider getStubLengths
-     *
-     * @param mixed $file
-     * @param mixed $length
-     * @param mixed $pattern
-     */
-    public function testFindStubLength($file, $length, $pattern): void
-    {
-        if ($pattern) {
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                $length,
-                Extract::findStubLength($file, $pattern)
+                'File "/does/not/exist" was expected to exist.',
+                $exception->getMessage()
             );
-        } else {
-            $this->assertSame($length, Extract::findStubLength($file));
         }
     }
 
-    public function testFindStubLengthInvalid(): void
+    /**
+     * @dataProvider provideStubLengths
+     */
+    public function test_it_can_find_the_stub_length(string $file, int $expectedLength, ?string $pattern): void
+    {
+        if (null !== $pattern) {
+            $actual = Box_Extract::findStubLength($file, $pattern);
+        } else {
+            $actual = Box_Extract::findStubLength($file);
+        }
+
+        $this->assertSame($expectedLength, $actual);
+    }
+
+    public function test_it_cannot_find_the_stub_length_if_the_pattern_is_not_found(): void
     {
         $path = self::FIXTURES_DIR.'/example.phar';
 
         try {
-            Extract::findStubLength($path, 'bad pattern');
+            Box_Extract::findStubLength($path, 'bad pattern');
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -113,26 +116,44 @@ class ExtractTest extends TestCase
         }
     }
 
-    public function testFindStubLengthOpenError(): void
+    public function test_it_cannot_find_the_stub_length_of_non_existent_file(): void
     {
         try {
-            Extract::findStubLength('/does/not/exist');
+            Box_Extract::findStubLength('/does/not/exist');
 
             $this->fail('Expected exception to be thrown.');
-        } catch (RuntimeException $exception) {
-            $this->assertRegExp(
-                '/No such file or directory/',
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'File "/does/not/exist" was expected to exist.',
                 $exception->getMessage()
             );
         }
     }
 
-    public function testGo(): void
+    public function test_it_cannot_find_the_stub_length_of_unreadable_file(): void
     {
-        $extract = new Extract(self::FIXTURES_DIR.'/mixed.phar', 6683);
+        touch($file = 'unreadable_foo');
+        chmod($file, 0355);
+
+        try {
+            Box_Extract::findStubLength($file);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Path "unreadable_foo" was expected to be readable.',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_it_can_extract_the_PHAR(): void
+    {
+        $extract = new Box_Extract(self::FIXTURES_DIR.'/mixed.phar', 6683);
 
         $dir = $extract->go();
 
+        $this->assertFileExists($dir);
         $this->assertFileExists("$dir/test");
 
         $this->assertSame(
@@ -151,9 +172,9 @@ class ExtractTest extends TestCase
         );
     }
 
-    public function testGoWithDir(): void
+    public function test_it_can_extract_the_PHAR_into_a_directory(): void
     {
-        $extract = new Extract(self::FIXTURES_DIR.'/mixed.phar', 6683);
+        $extract = new Box_Extract(self::FIXTURES_DIR.'/mixed.phar', 6683);
         mkdir($dir = 'foo');
 
         $extract->go($dir);
@@ -176,12 +197,11 @@ class ExtractTest extends TestCase
         );
     }
 
-    public function testGoInvalidLength(): void
+    public function test_test_cannot_extract_the_PHAR_if_the_stub_length_is_invalid(): void
     {
-        $this->markTestSkipped('Check this one again later.');
         $path = self::FIXTURES_DIR.'/mixed.phar';
 
-        $extract = new Extract($path, -123);
+        $extract = new Box_Extract($path, -123);
 
         try {
             $extract->go();
@@ -196,16 +216,15 @@ class ExtractTest extends TestCase
     }
 
     /**
-     * Issue #7.
+     * @ticket https://github.com/box-project/box2-lib/issues/7
      *
      * Files with no content would trigger an exception when extracted.
      */
-    public function testGoEmptyFile(): void
+    public function test_it_can_extract_empty_PHARs(): void
     {
-        $this->markTestSkipped('Check this one again later.');
         $path = self::FIXTURES_DIR.'/empty.phar';
 
-        $extract = new Extract($path, Extract::findStubLength($path));
+        $extract = new Box_Extract($path, Box_Extract::findStubLength($path));
 
         $dir = $extract->go();
 
@@ -214,19 +233,19 @@ class ExtractTest extends TestCase
         $this->assertSame('', file_get_contents($dir.'/empty.php'));
     }
 
-    public function testPurge(): void
+    public function test_it_can_remove_the_extracted_PHAR(): void
     {
         mkdir($dir = 'foo');
 
         mkdir("$dir/a/b/c", 0755, true);
         touch("$dir/a/b/c/d");
 
-        Extract::purge($dir);
+        Box_Extract::purge($dir);
 
         $this->assertFileNotExists($dir);
     }
 
-    public function testPurgeUnlinkError(): void
+    public function test_it_throws_an_exception_if_cannot_purge_a_directory(): void
     {
         $root = vfsStream::newDirectory('test', 0444);
         $root->addChild(vfsStream::newFile('test', 0000));
@@ -234,7 +253,7 @@ class ExtractTest extends TestCase
         vfsStreamWrapper::setRoot($root);
 
         try {
-            Extract::purge('vfs://test/test');
+            Box_Extract::purge('vfs://test/test');
 
             $this->fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
@@ -243,5 +262,11 @@ class ExtractTest extends TestCase
                 $exception->getMessage()
             );
         }
+    }
+
+    public function provideStubLengths(): Generator
+    {
+        yield [self::FIXTURES_DIR.'/example.phar', 203, null];
+        yield [self::FIXTURES_DIR.'/mixed.phar', 6683, '__HALT_COMPILER(); ?>'];
     }
 }
