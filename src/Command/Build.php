@@ -14,9 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Command;
 
+use function is_string;
 use KevinGH\Box\Box;
 use KevinGH\Box\Compactor;
 use KevinGH\Box\Configuration;
+use function KevinGH\Box\formatted_filesize;
 use function KevinGH\Box\get_phar_compression_algorithms;
 use KevinGH\Box\Logger\BuildLogger;
 use KevinGH\Box\StubGenerator;
@@ -28,6 +30,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Filesystem;
+use function var_export;
 
 final class Build extends Configurable
 {
@@ -428,7 +431,8 @@ HELP
         if ($io->getVerbosity() >= OutputInterface::VERBOSITY_NORMAL) {
             $io->comment(
                 sprintf(
-                    '<info>Memory usage: %.2fMB (peak: %.2fMB), time: %.2fs<info>',
+                    "<info>Size: %s\nMemory usage: %.2fMB (peak: %.2fMB), time: %.2fs<info>",
+                    formatted_filesize($path),
                     round(memory_get_usage() / 1024 / 1024, 2),
                     round(memory_get_peak_usage() / 1024 / 1024, 2),
                     round(microtime(true) - $startTime, 2)
@@ -749,6 +753,12 @@ HELP
                 OutputInterface::VERBOSITY_VERBOSE
             );
 
+            $logger->log(
+                BuildLogger::MINUS_PREFIX,
+                is_string($metadata) ? $metadata : var_export($metadata, true),
+                OutputInterface::VERBOSITY_VERBOSE
+            );
+
             $box->getPhar()->setMetadata($metadata);
         }
     }
@@ -838,7 +848,7 @@ HELP
         if (null !== ($chmod = $config->getFileMode())) {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
-                'Setting file permissions',
+                "Setting file permissions to <comment>$chmod</comment>",
                 OutputInterface::VERBOSITY_VERBOSE
             );
 

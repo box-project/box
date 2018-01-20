@@ -88,6 +88,7 @@ Building the PHAR "/path/to/tmp/test.phar"
 Private key passphrase:
 * Done.
 
+ // Size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -199,12 +200,16 @@ Box (repo)
     > other/run.php
 ? Generating new stub
 ? Setting metadata
+  - array (
+  'rand' => $rand,
+)
 ? No compression
 ? Signing using a private key
 Private key passphrase:
-? Setting file permissions
+? Setting file permissions to 493
 * Done.
 
+ // Size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -293,12 +298,16 @@ Box (repo)
   - Using custom shebang line: #!__PHP_EXECUTABLE__
   - Using custom banner: custom banner
 ? Setting metadata
+  - array (
+  'rand' => $rand,
+)
 ? No compression
 ? Signing using a private key
 Private key passphrase:
-? Setting file permissions
+? Setting file permissions to 493
 * Done.
 
+ // Size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -462,6 +471,7 @@ Box (repo)
 ? No compression
 * Done.
 
+ // Size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -513,6 +523,7 @@ Box (repo)
 ? No compression
 * Done.
 
+ // Size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -565,6 +576,7 @@ Box (repo)
 ? No compression
 * Done.
 
+ // Size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -613,6 +625,7 @@ Box (repo)
 ? No compression
 * Done.
 
+ // Size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -660,6 +673,7 @@ Box (repo)
 ? No compression
 * Done.
 
+ // Size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -702,6 +716,7 @@ Box (repo)
 ? Compressing with the algorithm "GZ"
 * Done.
 
+ // Size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -734,6 +749,12 @@ OUTPUT;
     private function normalizeDisplay(string $display)
     {
         $display = str_replace($this->tmp, '/path/to/tmp', $display);
+
+        $display = preg_replace(
+            '/\/\/ Size: \d+\.\d{2}K?B/',
+            '// Size: 100B',
+            $display
+        );
 
         $display = preg_replace(
             '/\/\/ Memory usage: \d+\.\d{2}MB \(peak: \d+\.\d{2}MB\), time: \d+\.\d{2}s/',

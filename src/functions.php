@@ -14,8 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use Assert\Assertion;
 use Phar;
 use ReflectionClass;
+use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\PathUtil\Path;
 
@@ -51,6 +53,26 @@ function get_phar_compression_algorithms(): array
     ];
 
     return $algorithms;
+}
+
+function formatted_filesize(string $path)
+{
+    Assertion::file($path);
+
+    $size = filesize($path);
+    $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    $power = $size > 0 ? floor(log($size, 1024)) : 0;
+
+    return sprintf(
+        '%s%s',
+        number_format(
+            $size / (1024 ** $power),
+            2,
+            '.',
+            ','
+        ),
+        $units[$power]
+    );
 }
 
 function register_aliases(): void
