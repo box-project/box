@@ -15,9 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
-use KevinGH\Box\Exception\Exception;
 use KevinGH\Box\Exception\FileExceptionFactory;
-use KevinGH\Box\Exception\OpenSslExceptionFactory;
 use KevinGH\Box\Signature\Hash;
 use KevinGH\Box\Signature\PublicKeyDelegate;
 use KevinGH\Box\Signature\Verifier;
@@ -111,7 +109,7 @@ final class Signature
      *
      * @throws PharException If the phar is not valid
      *
-     * @return array|null The signature
+     * @return null|array The signature
      */
     public function get(bool $required = null): ?array
     {

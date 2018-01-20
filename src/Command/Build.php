@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Command;
 
-use function array_map;
 use KevinGH\Box\Box;
 use KevinGH\Box\Compactor;
 use KevinGH\Box\Configuration;

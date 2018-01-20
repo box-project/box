@@ -2,21 +2,29 @@
 
 declare(strict_types=1);
 
-namespace KevinGH\Box\Signature;
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
-use KevinGH\Box\Exception\SignatureException;
+namespace KevinGH\Box\Signature;
 
 final class DummyBufferedHash extends BufferedHash
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __construct(string $algorithm, string $path)
     {
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function verify(string $signature): bool
     {

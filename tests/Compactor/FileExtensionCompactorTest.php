@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use KevinGH\Box\Compactor\DummyFileExtensionCompactor;
 use KevinGH\Box\Compactor\FileExtensionCompactor;
 use PHPUnit\Framework\TestCase;
 
@@ -23,7 +22,7 @@ use PHPUnit\Framework\TestCase;
  */
 class FileExtensionCompactorTest extends TestCase
 {
-    public function test_it_does_not_support_files_with_unknown_extension()
+    public function test_it_does_not_support_files_with_unknown_extension(): void
     {
         $file = '/path/to/file.js';
         $contents = 'file contents';
@@ -47,7 +46,7 @@ class FileExtensionCompactorTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_supports_files_with_the_given_extensions()
+    public function test_it_supports_files_with_the_given_extensions(): void
     {
         $file = '/path/to/file.php';
         $contents = 'file contents';

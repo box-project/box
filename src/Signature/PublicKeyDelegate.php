@@ -24,7 +24,7 @@ final class PublicKeyDelegate implements Verifier
     private $hash;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __construct(string $signature, string $path)
     {
@@ -40,7 +40,7 @@ final class PublicKeyDelegate implements Verifier
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function update(string $data): void
     {
@@ -48,7 +48,7 @@ final class PublicKeyDelegate implements Verifier
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function verify(string $signature): bool
     {

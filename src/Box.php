@@ -14,24 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use function array_reduce;
-use Assert\Assert;
 use Assert\Assertion;
-use function file_get_contents;
-use FilesystemIterator;
-use function is_object;
-use KevinGH\Box\Compactor;
 use KevinGH\Box\Exception\FileExceptionFactory;
-use KevinGH\Box\Exception\InvalidArgumentException;
 use KevinGH\Box\Exception\OpenSslExceptionFactory;
-use KevinGH\Box\Exception\UnexpectedValueException;
 use Phar;
 use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use RegexIterator;
-use SplFileInfo;
-use SplObjectStorage;
-use Traversable;
 
 /**
  * Box is a utility class to generate a PHAR.
@@ -58,6 +45,12 @@ final class Box
      */
     private $placeholders = [];
 
+    private function __construct(Phar $phar, string $file)
+    {
+        $this->phar = $phar;
+        $this->file = $file;
+    }
+
     /**
      * Creates a new PHAR and Box instance.
      *
@@ -72,12 +65,6 @@ final class Box
     public static function create(string $file, int $flags = null, string $alias = null): self
     {
         return new self(new Phar($file, (int) $flags, $alias), $file);
-    }
-
-    private function __construct(Phar $phar, string $file)
-    {
-        $this->phar = $phar;
-        $this->file = $file;
     }
 
     /**

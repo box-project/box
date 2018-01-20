@@ -24,7 +24,7 @@ use phpseclib\Crypt\RSA;
 final class PhpSecLib extends PublicKey
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function verify(string $signature): bool
     {

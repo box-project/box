@@ -42,7 +42,7 @@ class HashTest extends TestCase
     public function test_it_can_verify_data(string $algorithm, string $data, string $hashedData, bool $expected): void
     {
         $hash = new Hash($algorithm, '');
-        
+
         $hash->update($data);
 
         $actual = $hash->verify($hashedData);

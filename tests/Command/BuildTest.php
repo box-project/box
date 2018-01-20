@@ -16,7 +16,6 @@ namespace KevinGH\Box\Command;
 
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
-use KevinGH\Box\Exception\FileExceptionFactory;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
 use Symfony\Component\Console\Command\Command;

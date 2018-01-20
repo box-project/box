@@ -14,25 +14,18 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Signature;
 
-use const E_ALL;
-use const E_ERROR;
-use function error_reporting;
 use Exception;
-use KevinGH\Box\Exception\OpenSslExceptionFactory;
-use function ob_clean;
-use function ob_flush;
 use PHPUnit\Framework\Error\Warning;
 use PHPUnit\Framework\TestCase;
 use function KevinGH\Box\make_tmp_dir;
 use function KevinGH\Box\remove_dir;
-use function set_error_handler;
 
 /**
  * @covers \KevinGH\Box\Signature\OpenSsl
  */
 class OpenSslTest extends TestCase
 {
-    public const FIXTURES_DIR = __DIR__ . '/../../fixtures/signed_phars';
+    public const FIXTURES_DIR = __DIR__.'/../../fixtures/signed_phars';
 
     /**
      * @var string

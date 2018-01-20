@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class PublicKeyDelegateTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__ . '/../../fixtures/signed_phars';
+    private const FIXTURES_DIR = __DIR__.'/../../fixtures/signed_phars';
 
     public function testFunctional(): void
     {

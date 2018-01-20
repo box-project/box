@@ -21,7 +21,7 @@ class DummyFileExtensionCompactor extends FileExtensionCompactor
     use NotCallable;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function compactContent(string $contents): string
     {
@@ -29,7 +29,7 @@ class DummyFileExtensionCompactor extends FileExtensionCompactor
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function supports(string $file): bool
     {

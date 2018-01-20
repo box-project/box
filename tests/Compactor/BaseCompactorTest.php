@@ -22,7 +22,7 @@ use PHPUnit\Framework\TestCase;
  */
 class BaseCompactorTest extends TestCase
 {
-    public function test_it_returns_the_contents_unchanged_if_does_not_support_the_file()
+    public function test_it_returns_the_contents_unchanged_if_does_not_support_the_file(): void
     {
         $file = '/path/to/file';
         $contents = 'file contents';
@@ -54,7 +54,7 @@ class BaseCompactorTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_returns_the_compacted_contents_if_it_supports_the_file()
+    public function test_it_returns_the_compacted_contents_if_it_supports_the_file(): void
     {
         $file = '/path/to/file';
         $contents = 'file contents';

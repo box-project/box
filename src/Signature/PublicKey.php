@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Signature;
 
 use Assert\Assertion;
-use KevinGH\Box\Exception\FileExceptionFactory;
 
 /**
  * Loads the private key from a file to use for verification.
@@ -28,11 +27,11 @@ abstract class PublicKey extends BufferedHash
     private $key;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     final public function __construct(string $algorithm, string $path)
     {
-        $keyPath = $path . '.pubkey';
+        $keyPath = $path.'.pubkey';
 
         Assertion::file($keyPath);
         Assertion::readable($keyPath);
@@ -41,7 +40,7 @@ abstract class PublicKey extends BufferedHash
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     final protected function getKey(): string
     {

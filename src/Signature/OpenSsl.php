@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Signature;
 
 use KevinGH\Box\Exception\OpenSslExceptionFactory;
-use function ob_clean;
 use RuntimeException;
 
 /**
@@ -26,7 +25,7 @@ use RuntimeException;
 final class OpenSsl extends PublicKey
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function verify(string $signature): bool
     {

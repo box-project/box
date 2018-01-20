@@ -14,13 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-use KevinGH\Box\Compactor\CompactorInterface;
 use KevinGH\Box\Compactor;
 
 class DummyCompactor implements Compactor
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function compact(string $file, string $contents): string
     {

@@ -15,8 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Signature;
 
 use Assert\Assertion;
-use function implode;
-use KevinGH\Box\Exception\SignatureException;
 
 /**
  * Uses the PHP hash library to verify a signature.
@@ -31,7 +29,7 @@ final class Hash implements Verifier
     private $context;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __construct(string $algorithm, string $path)
     {
@@ -55,7 +53,7 @@ final class Hash implements Verifier
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function update(string $data): void
     {
@@ -65,7 +63,7 @@ final class Hash implements Verifier
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function verify(string $signature): bool
     {

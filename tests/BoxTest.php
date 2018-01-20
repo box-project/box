@@ -14,32 +14,15 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use ArrayIterator;
-use function chmod;
 use Exception;
-use function file_put_contents;
-use FilesystemIterator;
-use Herrera\Annotations\Tokenizer;
-use function implode;
 use InvalidArgumentException;
-use function is_string;
-use KevinGH\Box\Compactor;
 use KevinGH\Box\Compactor\Php;
-use KevinGH\Box\Exception\FileExceptionFactory;
-use KevinGH\Box\Exception\UnexpectedValueException;
-use function mkdir;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use Phar;
-use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
-use function realpath;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use SplFileInfo;
-use function touch;
 
 /**
  * @covers \KevinGH\Box\Box
@@ -175,7 +158,7 @@ class BoxTest extends TestCase
         $file = 'foo';
         $contents = 'original contents @foo_placeholder@';
         $placeholderMapping = [
-            '@foo_placeholder@' => 'foo_value'
+            '@foo_placeholder@' => 'foo_value',
         ];
 
         file_put_contents($file, $contents);
@@ -273,7 +256,7 @@ class BoxTest extends TestCase
         $localPath = 'foo';
         $contents = 'original contents @foo_placeholder@';
         $placeholderMapping = [
-            '@foo_placeholder@' => 'foo_value'
+            '@foo_placeholder@' => 'foo_value',
         ];
 
         file_put_contents($localPath, $contents);
@@ -395,7 +378,6 @@ echo 'Hello world!';
 __HALT_COMPILER(); ?>
 STUB;
 
-
         $actual = trim($this->box->getPhar()->getStub());
 
         $this->assertSame($expected, $actual);
@@ -431,7 +413,6 @@ echo 'Hello world!';
 
 __HALT_COMPILER(); ?>
 STUB;
-
 
         $actual = trim($this->box->getPhar()->getStub());
 
@@ -494,7 +475,7 @@ STUB;
      */
     public function test_it_can_sign_the_PHAR(): void
     {
-        [$key, $password] = $this->getPrivateKey();
+        list($key, $password) = $this->getPrivateKey();
 
         $phar = $this->box->getPhar();
 
@@ -503,7 +484,7 @@ STUB;
         $this->box->sign($key, $password);
 
         $this->assertNotSame([], $phar->getSignature(), 'Expected the PHAR to be signed.');
-        $this->assertTrue(is_string($phar->getSignature()['hash']), 'Expected the PHAR signature hash to be a string.');
+        $this->assertInternalType('string', $phar->getSignature()['hash'], 'Expected the PHAR signature hash to be a string.');
         $this->assertNotEmpty($phar->getSignature()['hash'], 'Expected the PHAR signature hash to not be empty.');
 
         $this->assertSame('OpenSSL', $phar->getSignature()['hash_type']);
@@ -538,7 +519,7 @@ STUB;
 
     public function test_it_cannot_sign_if_cannot_create_the_public_key(): void
     {
-        [$key, $password] = $this->getPrivateKey();
+        list($key, $password) = $this->getPrivateKey();
 
         mkdir('test.phar.pubkey');
 
@@ -563,7 +544,7 @@ STUB;
     {
         $phar = $this->box->getPhar();
 
-        [$key, $password] = $this->getPrivateKey();
+        list($key, $password) = $this->getPrivateKey();
 
         file_put_contents($file = 'foo', $key);
 
@@ -572,7 +553,7 @@ STUB;
         $this->box->signUsingFile($file, $password);
 
         $this->assertNotSame([], $phar->getSignature(), 'Expected the PHAR to be signed.');
-        $this->assertTrue(is_string($phar->getSignature()['hash']), 'Expected the PHAR signature hash to be a string.');
+        $this->assertInternalType('string', $phar->getSignature()['hash'], 'Expected the PHAR signature hash to be a string.');
         $this->assertNotEmpty($phar->getSignature()['hash'], 'Expected the PHAR signature hash to not be empty.');
 
         $this->assertSame('OpenSSL', $phar->getSignature()['hash_type']);
@@ -654,7 +635,6 @@ KEY
 
 echo 'Hello, world!'.PHP_EOL;
 PHP
-
         );
 
         $this->box->getPhar()->setStub(

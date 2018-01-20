@@ -17,7 +17,7 @@ namespace KevinGH\Box\Signature;
 class DummyPublicKey extends PublicKey
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function verify(string $signature): bool
     {

@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 
 namespace KevinGH\Box\Exception;
+
 use Exception;
 
 /**

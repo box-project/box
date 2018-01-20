@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Signature;
 
-use KevinGH\Box\Exception\Exception;
 use KevinGH\Box\Exception\SignatureException;
 
 /**

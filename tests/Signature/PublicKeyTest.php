@@ -14,13 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Signature;
 
-use function chmod;
 use Exception;
-use function file_put_contents;
 use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 use function KevinGH\Box\make_tmp_dir;
 use function KevinGH\Box\remove_dir;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \KevinGH\Box\Signature\PublicKey
@@ -60,7 +58,7 @@ class PublicKeyTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_it_cannot_be_initialised_with_a_non_existent_file()
+    public function test_it_cannot_be_initialised_with_a_non_existent_file(): void
     {
         try {
             $hash = new DummyPublicKey('data', '/nowhere/foo');
@@ -74,7 +72,7 @@ class PublicKeyTest extends TestCase
         }
     }
 
-    public function test_it_cannot_be_initialised_with_a_non_readablefile()
+    public function test_it_cannot_be_initialised_with_a_non_readablefile(): void
     {
         $file = 'foo';
         $key = $file.'.pubkey';
@@ -94,7 +92,7 @@ class PublicKeyTest extends TestCase
         }
     }
 
-    public function test_it_retrieves_the_content_of_the_file_public_key_on_init()
+    public function test_it_retrieves_the_content_of_the_file_public_key_on_init(): void
     {
         $file = 'foo';
         $key = $file.'.pubkey';

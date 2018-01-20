@@ -25,7 +25,7 @@ abstract class BufferedHash implements Verifier
     private $data;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     final public function update(string $data): void
     {

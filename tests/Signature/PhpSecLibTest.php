@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class PhpSecLibTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__ . '/../../fixtures/signed_phars';
+    private const FIXTURES_DIR = __DIR__.'/../../fixtures/signed_phars';
 
     public function test_it_can_verify_a_file(): void
     {

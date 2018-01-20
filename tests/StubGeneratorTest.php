@@ -31,14 +31,14 @@ class StubGeneratorTest extends TestCase
     private $generator;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function setUp(): void
     {
         $this->generator = new StubGenerator();
     }
 
-    public function test_it_can_be_created()
+    public function test_it_can_be_created(): void
     {
         $this->assertInstanceOf(
             StubGenerator::class,
@@ -46,7 +46,7 @@ class StubGeneratorTest extends TestCase
         );
     }
 
-    public function test_it_can_generate_a_stub()
+    public function test_it_can_generate_a_stub(): void
     {
         $code = $this->getExtractCode();
 
@@ -222,7 +222,7 @@ STUB
 
         $compactor = new Php(new Tokenizer());
 
-        $file = __DIR__ . '/../src/Extract.php';
+        $file = __DIR__.'/../src/Extract.php';
 
         $code = file_get_contents($file);
         $code = $compactor->compact($file, $code);
