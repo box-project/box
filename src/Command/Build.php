@@ -409,6 +409,8 @@ HELP
 
         $logger = new BuildLogger($io);
 
+        $startTime = microtime(true);
+
         $this->loadBootstrapFile($config, $logger);
         $this->removeExistingPhar($config, $logger);
 
@@ -423,9 +425,20 @@ HELP
             'Done.'
         );
 
+        if ($io->getVerbosity() >= OutputInterface::VERBOSITY_NORMAL) {
+            $io->comment(
+                sprintf(
+                    '<info>Memory usage: %.2fMB (peak: %.2fMB), time: %.2fs<info>',
+                    round(memory_get_usage() / 1024 / 1024, 2),
+                    round(memory_get_peak_usage() / 1024 / 1024, 2),
+                    round(microtime(true) - $startTime, 2)
+                )
+            );
+        }
+
         if (false === file_exists($path)) {
             //TODO: check that one
-            $io->warning('The archive was not generated because it did not have any contents.');
+            $io->warning('The archive was not generated because it did not have any contents');
         }
     }
 
@@ -468,7 +481,7 @@ HELP
         $logger->log(
             BuildLogger::QUESTION_MARK_PREFIX,
             sprintf(
-                'Loading the bootstrap file "%s".',
+                'Loading the bootstrap file "%s"',
                 $file
             ),
             OutputInterface::VERBOSITY_VERBOSE
@@ -488,7 +501,7 @@ HELP
         $logger->log(
             BuildLogger::QUESTION_MARK_PREFIX,
             sprintf(
-                'Removing the existing PHAR "%s".',
+                'Removing the existing PHAR "%s"',
                 $path
             ),
             OutputInterface::VERBOSITY_VERBOSE
@@ -507,7 +520,7 @@ HELP
 
         $logger->log(
             BuildLogger::QUESTION_MARK_PREFIX,
-            'Setting replacement values.',
+            'Setting replacement values',
             OutputInterface::VERBOSITY_VERBOSE
         );
 
@@ -569,7 +582,7 @@ HELP
 
         $logger->log(
             BuildLogger::QUESTION_MARK_PREFIX,
-            'Mapping paths.',
+            'Mapping paths',
             OutputInterface::VERBOSITY_VERBOSE
         );
 
@@ -597,7 +610,7 @@ HELP
         if ([] !== ($iterators = $config->getFilesIterators())) {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
-                'Adding finder files.',
+                'Adding finder files',
                 OutputInterface::VERBOSITY_VERBOSE
             );
 
@@ -609,7 +622,7 @@ HELP
         if ([] !== ($iterators = $config->getBinaryIterators())) {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
-                'Adding binary finder files.',
+                'Adding binary finder files',
                 OutputInterface::VERBOSITY_VERBOSE
             );
 
@@ -622,7 +635,7 @@ HELP
             $config,
             $box,
             $config->getDirectoriesIterator(),
-            'Adding directories.',
+            'Adding directories',
             false,
             $logger
         );
@@ -631,7 +644,7 @@ HELP
             $config,
             $box,
             $config->getBinaryDirectoriesIterator(),
-            'Adding binary directories.',
+            'Adding binary directories',
             true,
             $logger
         );
@@ -640,7 +653,7 @@ HELP
             $config,
             $box,
             $config->getFilesIterator(),
-            'Adding files.',
+            'Adding files',
             false,
             $logger
         );
@@ -649,7 +662,7 @@ HELP
             $config,
             $box,
             $config->getBinaryFilesIterator(),
-            'Adding binary files.',
+            'Adding binary files',
             true,
             $logger
         );
@@ -698,7 +711,7 @@ HELP
         if (true === $config->isStubGenerated()) {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
-                'Generating new stub.',
+                'Generating new stub',
                 OutputInterface::VERBOSITY_VERBOSE
             );
 
@@ -721,7 +734,7 @@ HELP
         } else {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
-                'Using default stub.',
+                'Using default stub',
                 OutputInterface::VERBOSITY_VERBOSE
             );
         }
@@ -732,7 +745,7 @@ HELP
         if (null !== ($metadata = $config->getMetadata())) {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
-                'Setting metadata.',
+                'Setting metadata',
                 OutputInterface::VERBOSITY_VERBOSE
             );
 
@@ -788,7 +801,7 @@ HELP
 
         $logger->log(
             BuildLogger::QUESTION_MARK_PREFIX,
-            'Signing using a private key.',
+            'Signing using a private key',
             OutputInterface::VERBOSITY_VERBOSE
         );
 
@@ -825,7 +838,7 @@ HELP
         if (null !== ($chmod = $config->getFileMode())) {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
-                'Setting file permissions.',
+                'Setting file permissions',
                 OutputInterface::VERBOSITY_VERBOSE
             );
 
