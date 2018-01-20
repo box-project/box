@@ -70,6 +70,7 @@ blackfire: bin/box src vendor
 
 	# Re-dump the loader to account for the prefixing
 	# and optimize the loader
+	composer install --no-dev
 	composer dump-autoload --classmap-authoritative --no-dev
 
 	# Profile building the PHAR from the source code
@@ -78,6 +79,9 @@ blackfire: bin/box src vendor
 	# Profile building the PHAR from the PHAR
 	mv -fv bin/box.phar .
 	blackfire --reference=2 --samples=5 run php -d zend.enable_gc=0 -d phar.readonly=0 box.phar build
+
+	# Cleanup
+	composer install
 	rm box.phar
 
 
