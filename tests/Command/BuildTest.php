@@ -74,12 +74,12 @@ class BuildTest extends CommandTestCase
 
         $expected = <<<'OUTPUT'
 
-    ____            
+    ____
    / __ )____  _  __
   / __  / __ \| |/_/
- / /_/ / /_/ />  <  
-/_____/\____/_/|_|  
-                    
+ / /_/ / /_/ />  <
+/_____/\____/_/|_|
+
 
 Box (repo)
 
@@ -87,18 +87,20 @@ Building the PHAR "/path/to/tmp/test.phar"
 Private key passphrase:
 * Done.
 
+ // Size: 100B
+ // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
+
+
 OUTPUT;
 
-        $expected = str_replace('/path/to/tmp', $this->tmp, $expected);
-        $actual = $commandTester->getDisplay(true);
+        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
 
-        // Check output logs
-        $this->assertSame($expected, $actual);
+        $this->assertSame($expected, $actual, 'Expected logs to be identical');
 
-        // Check PHAR execution output
         $this->assertSame(
             'Hello, world!',
-            exec('php test.phar')
+            exec('php test.phar'),
+            'Expected PHAR to be executable'
         );
 
         // Check PHAR content
@@ -172,41 +174,47 @@ OUTPUT;
 
         $expected = <<<OUTPUT
 
-    ____            
+    ____
    / __ )____  _  __
   / __  / __ \| |/_/
- / /_/ / /_/ />  <  
-/_____/\____/_/|_|  
-                    
+ / /_/ / /_/ />  <
+/_____/\____/_/|_|
+
 
 Box (repo)
 
-? Loading the bootstrap file "/path/to/tmp/bootstrap.php".
-? Removing the existing PHAR "/path/to/tmp/test.phar".
+? Loading the bootstrap file "/path/to/tmp/bootstrap.php"
+? Removing the existing PHAR "/path/to/tmp/test.phar"
 * Building the PHAR "/path/to/tmp/test.phar"
 ? Registering compactors
   + KevinGH\Box\Compactor\Php
-? Mapping paths.
+? Mapping paths
   - a/deep/test/directory > sub
   - (all) > other/
-? Adding finder files.
-? Adding binary finder files.
-? Adding directories.
-? Adding files.
+? Adding finder files
+? Adding binary finder files
+? Adding directories
+? Adding files
 ? Adding main file: /path/to/tmp/run.php
     > other/run.php
-? Generating new stub.
-? Setting metadata.
+? Generating new stub
+? Setting metadata
+  - array (
+  'rand' => $rand,
+)
 ? No compression
-? Signing using a private key.
+? Signing using a private key
 Private key passphrase:
-? Setting file permissions.
+? Setting file permissions to 493
 * Done.
+
+ // Size: 100B
+ // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
+
 
 OUTPUT;
 
-        $expected = str_replace('/path/to/tmp', $this->tmp, $expected);
-        $actual = $commandTester->getDisplay(true);
+        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual);
     }
@@ -258,51 +266,58 @@ OUTPUT;
 
         $expected = <<<OUTPUT
 
-    ____            
+    ____
    / __ )____  _  __
   / __  / __ \| |/_/
- / /_/ / /_/ />  <  
-/_____/\____/_/|_|  
-                    
+ / /_/ / /_/ />  <
+/_____/\____/_/|_|
+
 
 Box (repo)
 
-? Loading the bootstrap file "/path/to/tmp/bootstrap.php".
-? Removing the existing PHAR "/path/to/tmp/test.phar".
+? Loading the bootstrap file "/path/to/tmp/bootstrap.php"
+? Removing the existing PHAR "/path/to/tmp/test.phar"
 * Building the PHAR "/path/to/tmp/test.phar"
 ? Registering compactors
   + KevinGH\Box\Compactor\Php
-? Mapping paths.
+? Mapping paths
   - a/deep/test/directory > sub
   - (all) > other/
-? Adding finder files.
+? Adding finder files
     > other/one/test.php
-? Adding binary finder files.
+? Adding binary finder files
     > other/two/test.png
-? Adding directories.
+? Adding directories
     > sub/test.php
-? Adding files.
+? Adding files
     > other/test.php
 ? Adding main file: /path/to/tmp/run.php
     > other/run.php
-? Generating new stub.
+? Generating new stub
   - Using custom shebang line: #!__PHP_EXECUTABLE__
   - Using custom banner: custom banner
-? Setting metadata.
+? Setting metadata
+  - array (
+  'rand' => $rand,
+)
 ? No compression
-? Signing using a private key.
+? Signing using a private key
 Private key passphrase:
-? Setting file permissions.
+? Setting file permissions to 493
 * Done.
+
+ // Size: 100B
+ // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
+
 
 OUTPUT;
 
         $expected = str_replace(
-            ['/path/to/tmp', '__PHP_EXECUTABLE__'],
-            [$this->tmp, (new PhpExecutableFinder())->find()],
+            '__PHP_EXECUTABLE__',
+            (new PhpExecutableFinder())->find(),
             $expected
         );
-        $actual = $commandTester->getDisplay(true);
+        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual);
     }
@@ -354,16 +369,14 @@ OUTPUT;
 
         $expected = '';
 
-        $expected = str_replace('/path/to/tmp', $this->tmp, $expected);
         $actual = $commandTester->getDisplay(true);
 
-        // Check output logs
-        $this->assertSame($expected, $actual);
+        $this->assertSame($expected, $actual, 'Expected output logs to be identical');
 
-        // Check PHAR execution output
         $this->assertSame(
             'Hello, world!',
-            exec('php test.phar')
+            exec('php test.phar'),
+            'Expected PHAR to be executable'
         );
 
         // Check PHAR content
@@ -437,36 +450,40 @@ OUTPUT;
 
         $expected = <<<'OUTPUT'
 
-    ____            
+    ____
    / __ )____  _  __
   / __  / __ \| |/_/
- / /_/ / /_/ />  <  
-/_____/\____/_/|_|  
-                    
+ / /_/ / /_/ />  <
+/_____/\____/_/|_|
+
 
 Box (repo)
 
-? Removing the existing PHAR "/path/to/tmp/default.phar".
+? Removing the existing PHAR "/path/to/tmp/default.phar"
 * Building the PHAR "/path/to/tmp/default.phar"
-? Setting replacement values.
+? Setting replacement values
   + @name@: world
 ? No compactor to register
-? Adding files.
+? Adding files
 ? Adding main file: /path/to/tmp/test.php
-? Generating new stub.
+? Generating new stub
 ? No compression
 * Done.
 
+ // Size: 100B
+ // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
+
+
 OUTPUT;
 
-        $expected = str_replace('/path/to/tmp', $this->tmp, $expected);
-        $actual = $commandTester->getDisplay(true);
+        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual);
 
         $this->assertSame(
             'Hello, world!',
-            exec('php default.phar')
+            exec('php default.phar'),
+            'Expected PHAR to be executable'
         );
     }
 
@@ -486,35 +503,39 @@ OUTPUT;
 
         $expected = <<<'OUTPUT'
 
-    ____            
+    ____
    / __ )____  _  __
   / __  / __ \| |/_/
- / /_/ / /_/ />  <  
-/_____/\____/_/|_|  
-                    
+ / /_/ / /_/ />  <
+/_____/\____/_/|_|
+
 
 Box (repo)
 
 * Building the PHAR "/path/to/tmp/default.phar"
-? Setting replacement values.
+? Setting replacement values
   + @name@: world
 ? No compactor to register
-? Adding files.
+? Adding files
 ? Adding main file: /path/to/tmp/test.php
-? Generating new stub.
+? Generating new stub
 ? No compression
 * Done.
 
+ // Size: 100B
+ // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
+
+
 OUTPUT;
 
-        $expected = str_replace('/path/to/tmp', $this->tmp, $expected);
-        $actual = $commandTester->getDisplay(true);
+        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual);
 
         $this->assertSame(
             'Hello, world!',
-            exec('php default.phar')
+            exec('php default.phar'),
+            'Expected PHAR to be executable'
         );
     }
 
@@ -535,35 +556,39 @@ OUTPUT;
 
         $expected = <<<OUTPUT
 
-    ____            
+    ____
    / __ )____  _  __
   / __  / __ \| |/_/
- / /_/ / /_/ />  <  
-/_____/\____/_/|_|  
-                    
+ / /_/ / /_/ />  <
+/_____/\____/_/|_|
+
 
 Box (repo)
 
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
-? Adding files.
+? Adding files
   + /path/to/tmp/test.php
 ? Adding main file: /path/to/tmp/test.php
-? Generating new stub.
+? Generating new stub
   - Using custom banner from file: /path/to/tmp/banner
 ? No compression
 * Done.
 
+ // Size: 100B
+ // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
+
+
 OUTPUT;
 
-        $expected = str_replace('/path/to/tmp', $this->tmp, $expected);
-        $actual = $commandTester->getDisplay(true);
+        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual);
 
         $this->assertSame(
             'Hello!',
-            exec('php test.phar')
+            exec('php test.phar'),
+            'Expected PHAR to be executable'
         );
     }
 
@@ -582,33 +607,37 @@ OUTPUT;
 
         $expected = <<<OUTPUT
 
-    ____            
+    ____
    / __ )____  _  __
   / __  / __ \| |/_/
- / /_/ / /_/ />  <  
-/_____/\____/_/|_|  
-                    
+ / /_/ / /_/ />  <
+/_____/\____/_/|_|
+
 
 Box (repo)
 
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
-? Adding files.
+? Adding files
 ? Adding main file: /path/to/tmp/test.php
 ? Using stub file: /path/to/tmp/stub.php
 ? No compression
 * Done.
 
+ // Size: 100B
+ // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
+
+
 OUTPUT;
 
-        $expected = str_replace('/path/to/tmp', $this->tmp, $expected);
-        $actual = $commandTester->getDisplay(true);
+        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual);
 
         $this->assertSame(
             'Hello!',
-            exec('php test.phar')
+            exec('php test.phar'),
+            'Expected PHAR to be executable'
         );
     }
 
@@ -627,26 +656,29 @@ OUTPUT;
 
         $expected = <<<OUTPUT
 
-    ____            
+    ____
    / __ )____  _  __
   / __  / __ \| |/_/
- / /_/ / /_/ />  <  
-/_____/\____/_/|_|  
-                    
+ / /_/ / /_/ />  <
+/_____/\____/_/|_|
+
 
 Box (repo)
 
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
-? Adding files.
-? Using default stub.
+? Adding files
+? Using default stub
 ? No compression
 * Done.
 
+ // Size: 100B
+ // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
+
+
 OUTPUT;
 
-        $expected = str_replace('/path/to/tmp', $this->tmp, $expected);
-        $actual = $commandTester->getDisplay(true);
+        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual);
     }
@@ -666,27 +698,30 @@ OUTPUT;
 
         $expected = <<<OUTPUT
 
-    ____            
+    ____
    / __ )____  _  __
   / __  / __ \| |/_/
- / /_/ / /_/ />  <  
-/_____/\____/_/|_|  
-                    
+ / /_/ / /_/ />  <
+/_____/\____/_/|_|
+
 
 Box (repo)
 
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
-? Adding files.
+? Adding files
 ? Adding main file: /path/to/tmp/test.php
-? Generating new stub.
+? Generating new stub
 ? Compressing with the algorithm "GZ"
 * Done.
 
+ // Size: 100B
+ // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
+
+
 OUTPUT;
 
-        $expected = str_replace('/path/to/tmp', $this->tmp, $expected);
-        $actual = $commandTester->getDisplay(true);
+        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual);
 
@@ -698,7 +733,7 @@ OUTPUT;
         $this->assertSame(
             'Hello!',
             exec('php test.phar'),
-            'Expected the PHAR to be executable.'
+            'Expected the PHAR to be executable'
         );
     }
 
@@ -708,5 +743,31 @@ OUTPUT;
     protected function getCommand(): Command
     {
         return new Build();
+    }
+
+    private function normalizeDisplay(string $display)
+    {
+        $display = str_replace($this->tmp, '/path/to/tmp', $display);
+
+        $display = preg_replace(
+            '/\/\/ Size: \d+\.\d{2}K?B/',
+            '// Size: 100B',
+            $display
+        );
+
+        $display = preg_replace(
+            '/\/\/ Memory usage: \d+\.\d{2}MB \(peak: \d+\.\d{2}MB\), time: \d+\.\d{2}s/',
+            '// Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s',
+            $display
+        );
+
+        $lines = explode("\n", $display);
+
+        $lines = array_map(
+            'rtrim',
+            $lines
+        );
+
+        return implode("\n", $lines);
     }
 }
