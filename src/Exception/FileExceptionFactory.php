@@ -20,6 +20,7 @@ use Exception;
 /**
  * @private
  * TODO: it should be possible to get rid of those classes with the error handler registered in Application
+ * TODO: move under a throwable namespace?
  */
 final class FileExceptionFactory
 {
