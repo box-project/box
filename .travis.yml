@@ -30,7 +30,7 @@ install:
 script:
   - |
     if [ "$COVERAGE" == "true" ]; then
-        make tc
+        make tm
     else
         make test
     fi

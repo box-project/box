@@ -2,10 +2,10 @@
     "timeout": 10,
     "source": {
         "directories": [
-            "src/Compactor"
+            "src"
         ]
     },
     "logs": {
-        "text": "dist\/infection.log"
+        "text": "dist\/infection-log.txt"
     }
 }
