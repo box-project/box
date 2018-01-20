@@ -63,6 +63,18 @@ e2e: bin/box.phar
 
 	rm box.phar
 
+blackfire:	## Profiles the build step
+blackfire: bin/box src vendor
+	# Cleanup existing artefacts
+	rm -f bin/box.phar
+
+	# Re-dump the loader to account for the prefixing
+	# and optimize the loader
+	composer dump-autoload --classmap-authoritative --no-dev
+
+	# Build the PHAR
+	blackfire --reference=1 run php -d zend.enable_gc=0 -d phar.readonly=0 bin/box build
+
 
 ##
 ## Rules from files
