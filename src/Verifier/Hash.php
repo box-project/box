@@ -12,9 +12,10 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Signature;
+namespace KevinGH\Box\Verifier;
 
 use Assert\Assertion;
+use KevinGH\Box\Verifier;
 
 /**
  * Uses the PHP hash library to verify a signature.

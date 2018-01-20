@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Signature;
+namespace KevinGH\Box\Verifier;
 
 use Exception;
 use InvalidArgumentException;
@@ -21,7 +21,7 @@ use function KevinGH\Box\make_tmp_dir;
 use function KevinGH\Box\remove_dir;
 
 /**
- * @covers \KevinGH\Box\Signature\PublicKey
+ * @covers \KevinGH\Box\Verifier\PublicKey
  */
 class PublicKeyTest extends TestCase
 {

@@ -12,12 +12,12 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Signature;
+namespace KevinGH\Box\Verifier;
 
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \KevinGH\Box\Signature\BufferedHash
+ * @covers \KevinGH\Box\Verifier\BufferedHash
  */
 class BufferedHashTest extends TestCase
 {

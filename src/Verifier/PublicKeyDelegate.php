@@ -12,9 +12,10 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Signature;
+namespace KevinGH\Box\Verifier;
 
 use KevinGH\Box\Exception\SignatureException;
+use KevinGH\Box\Verifier;
 
 /**
  * Uses the OpenSSL extension or phpseclib library to verify a signed PHAR.

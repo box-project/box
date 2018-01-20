@@ -12,22 +12,22 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Signature;
+namespace KevinGH\Box\Verifier;
 
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \KevinGH\Box\Signature\PhpSecLib
+ * @covers \KevinGH\Box\Verifier\PublicKeyDelegate
  */
-class PhpSecLibTest extends TestCase
+class PublicKeyDelegateTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__.'/../../fixtures/signed_phars';
 
-    public function test_it_can_verify_a_file(): void
+    public function testFunctional(): void
     {
         $path = self::FIXTURES_DIR.'/openssl.phar';
 
-        $hash = new PhpSecLib('openssl', $path);
+        $hash = new PublicKeyDelegate('openssl', $path);
 
         $hash->update(
             file_get_contents($path, false, null, 0, filesize($path) - 76)

@@ -16,9 +16,9 @@ namespace KevinGH\Box;
 
 use Assert\Assertion;
 use KevinGH\Box\Exception\FileExceptionFactory;
-use KevinGH\Box\Signature\Hash;
-use KevinGH\Box\Signature\PublicKeyDelegate;
-use KevinGH\Box\Signature\Verifier;
+use KevinGH\Box\Verifier\Hash;
+use KevinGH\Box\Verifier\PublicKeyDelegate;
+use KevinGH\Box\Verifier;
 use PharException;
 
 /**

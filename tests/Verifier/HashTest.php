@@ -12,13 +12,13 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Signature;
+namespace KevinGH\Box\Verifier;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \KevinGH\Box\Signature\Hash
+ * @covers \KevinGH\Box\Verifier\Hash
  */
 class HashTest extends TestCase
 {
