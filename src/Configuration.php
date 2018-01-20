@@ -14,11 +14,14 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use function array_keys;
 use ArrayIterator;
+use Assert\Assertion;
 use Closure;
 use DateTimeImmutable;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\Php as LegacyPhp;
+use function implode;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
 use Phar;
@@ -147,6 +150,15 @@ final class Configuration
         bool $isStubGenerated,
         bool $isWebPhar
     ) {
+        Assertion::nullOrInArray(
+            $compressionAlgorithm,
+            get_phar_compression_algorithms(),
+            sprintf(
+                'Invalid compression algorithm "%%s", use one of "%s" instead.',
+                implode('", "', array_keys(get_phar_compression_algorithms()))
+            )
+        );
+
         $this->alias = $alias;
         $this->basePath = $basePath;
         $this->basePathRegex = $basePathRegex;
@@ -902,19 +914,26 @@ final class Configuration
         }
 
         if (false === is_string($raw->compression)) {
+            Assertion::integer(
+                $raw->compression,
+                'Expected compression to be an algorithm name, found %s instead.'
+            );
+
             return $raw->compression;
         }
 
-        if (false === defined('Phar::'.$raw->compression)) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The compression algorithm "%s" is not supported.',
-                    $raw->compression
-                )
-            );
-        }
+        $knownAlgorithmNames = array_keys(get_phar_compression_algorithms());
 
-        $value = constant('Phar::'.$raw->compression);
+        Assertion::inArray(
+            $raw->compression,
+            $knownAlgorithmNames,
+            sprintf(
+                'Invalid compression algorithm "%%s", use one of "%s" instead.',
+                implode('", "', $knownAlgorithmNames)
+            )
+        );
+
+        $value = get_phar_compression_algorithms()[$raw->compression];
 
         // Phar::NONE is not valid for compressFiles()
         if (Phar::NONE === $value) {

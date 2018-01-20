@@ -15,12 +15,14 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Closure;
+use Generator;
 use Herrera\Annotations\Tokenizer;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\DummyCompactor;
 use KevinGH\Box\Compactor\Php;
 use Phar;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 /**
  * @covers \KevinGH\Box\Configuration
@@ -346,15 +348,18 @@ class ConfigurationTest extends TestCase
         $this->assertSame(Phar::BZ2, $this->config->getCompressionAlgorithm());
     }
 
-    public function test_configure_compression_algorithm_with_an_invalid_algorithm(): void
+    /**
+     * @dataProvider provideInvalidCompressionAlgorithms
+     */
+    public function test_configure_compression_algorithm_with_an_invalid_algorithm($compression, string $errorMessage): void
     {
         try {
-            $this->setConfig(['compression' => 'INVALID']);
+            $this->setConfig(['compression' => $compression]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                'The compression algorithm "INVALID" is not supported.',
+                $errorMessage,
                 $exception->getMessage()
             );
         }
@@ -996,6 +1001,29 @@ CODE
                 $exception->getMessage()
             );
         }
+    }
+
+    public function provideInvalidCompressionAlgorithms(): Generator
+    {
+        yield 'Invalid string key' => [
+            'INVALID',
+            'Invalid compression algorithm "INVALID", use one of "GZ", "BZ2", "NONE" instead.',
+        ];
+
+        yield 'Invalid constant value' => [
+            10,
+            'Invalid compression algorithm "10", use one of "GZ", "BZ2", "NONE" instead.',
+        ];
+
+        yield 'Invalid type 1' => [
+            [],
+            'Expected compression to be an algorithm name, found <ARRAY> instead.',
+        ];
+
+        yield 'Invalid type 2' => [
+            new stdClass(),
+            'Expected compression to be an algorithm name, found stdClass instead.',
+        ];
     }
 
     private function setConfig(array $config): void

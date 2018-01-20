@@ -17,6 +17,7 @@ namespace KevinGH\Box\Command;
 use KevinGH\Box\Box;
 use KevinGH\Box\Compactor;
 use KevinGH\Box\Configuration;
+use function KevinGH\Box\get_phar_compression_algorithms;
 use KevinGH\Box\Logger\BuildLogger;
 use KevinGH\Box\StubGenerator;
 use RuntimeException;
@@ -423,6 +424,7 @@ HELP
         );
 
         if (false === file_exists($path)) {
+            //TODO: check that one
             $io->warning('The archive was not generated because it did not have any contents.');
         }
     }
@@ -743,11 +745,20 @@ HELP
         if (null !== ($algorithm = $config->getCompressionAlgorithm())) {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
-                'Compressing.',
+                sprintf(
+                    'Compressing with the algorithm "<comment>%s</comment>"',
+                    array_search($algorithm, get_phar_compression_algorithms())
+                ),
                 OutputInterface::VERBOSITY_VERBOSE
             );
 
             $box->getPhar()->compressFiles($algorithm);
+        } else {
+            $logger->log(
+                BuildLogger::QUESTION_MARK_PREFIX,
+                '<error>No compression</error>',
+                OutputInterface::VERBOSITY_VERBOSE
+            );
         }
     }
 
@@ -847,7 +858,7 @@ HELP
         }
 
         if (null !== $message) {
-            $logger->log(BuildLogger::QUESTION_MARK_PREFIX, $message);
+            $logger->log(BuildLogger::QUESTION_MARK_PREFIX, $message, OutputInterface::VERBOSITY_VERBOSE);
         }
 
         $box = $binary ? $box->getPhar() : $box;

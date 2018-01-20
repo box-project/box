@@ -83,5 +83,5 @@ vendor/bin/phpunit: composer.lock
 vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer: vendor/bamarni
 	composer bin php-cs-fixer install
 
-bin/box.phar:
+bin/box.phar: src
 	$(MAKE) build
