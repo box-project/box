@@ -453,6 +453,7 @@ HELP
         BuildLogger $logger
     ): void {
         $box = Box::create($path);
+        $box->registerCompressionAlgorithm($config->getCompressionAlgorithm());
 
         $box->getPhar()->startBuffering();
 
@@ -466,7 +467,7 @@ HELP
 
         $this->registerStub($config, $box, $main, $logger);
         $this->configureMetadata($config, $box, $logger);
-        $this->configureCompressionAlgorithm($config, $box, $logger);
+        //$this->configureCompressionAlgorithm($config, $box, $logger);
 
         $box->getPhar()->stopBuffering();
 
