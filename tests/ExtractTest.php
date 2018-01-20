@@ -15,15 +15,12 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Box_Extract;
-use function chmod;
-use function chown;
 use Generator;
 use InvalidArgumentException;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use function touch;
 
 /**
  * @covers \Box_Extract

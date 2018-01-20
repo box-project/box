@@ -106,8 +106,7 @@ final class Box_Extract
     public static function findStubLength(
         string $file,
         string $pattern = self::PATTERN_OPEN
-    ): int
-    {
+    ): int {
         Assertion::file($file);
         Assertion::readable($file);
 
