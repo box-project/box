@@ -14,14 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use function array_keys;
 use ArrayIterator;
 use Assert\Assertion;
 use Closure;
 use DateTimeImmutable;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\Php as LegacyPhp;
-use function implode;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
 use Phar;

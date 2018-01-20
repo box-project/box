@@ -14,12 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Command;
 
-use function is_string;
 use KevinGH\Box\Box;
 use KevinGH\Box\Compactor;
 use KevinGH\Box\Configuration;
-use function KevinGH\Box\formatted_filesize;
-use function KevinGH\Box\get_phar_compression_algorithms;
 use KevinGH\Box\Logger\BuildLogger;
 use KevinGH\Box\StubGenerator;
 use RuntimeException;
@@ -30,7 +27,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Filesystem;
-use function var_export;
+use function KevinGH\Box\formatted_filesize;
+use function KevinGH\Box\get_phar_compression_algorithms;
 
 final class Build extends Configurable
 {
@@ -770,7 +768,7 @@ HELP
                 BuildLogger::QUESTION_MARK_PREFIX,
                 sprintf(
                     'Compressing with the algorithm "<comment>%s</comment>"',
-                    array_search($algorithm, get_phar_compression_algorithms())
+                    array_search($algorithm, get_phar_compression_algorithms(), true)
                 ),
                 OutputInterface::VERBOSITY_VERBOSE
             );

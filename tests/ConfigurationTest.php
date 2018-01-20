@@ -350,6 +350,8 @@ class ConfigurationTest extends TestCase
 
     /**
      * @dataProvider provideInvalidCompressionAlgorithms
+     *
+     * @param mixed $compression
      */
     public function test_configure_compression_algorithm_with_an_invalid_algorithm($compression, string $errorMessage): void
     {

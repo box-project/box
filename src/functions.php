@@ -16,8 +16,6 @@ namespace KevinGH\Box;
 
 use Assert\Assertion;
 use Phar;
-use ReflectionClass;
-use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\PathUtil\Path;
 
@@ -42,7 +40,7 @@ function is_absolute(string $path): bool
 }
 
 /**
- * TODO: this function should be pushed down to the PHAR extension
+ * TODO: this function should be pushed down to the PHAR extension.
  */
 function get_phar_compression_algorithms(): array
 {

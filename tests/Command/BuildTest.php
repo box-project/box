@@ -72,7 +72,6 @@ class BuildTest extends CommandTestCase
             ['interactive' => true]
         );
 
-
         $expected = <<<'OUTPUT'
 
     ____
