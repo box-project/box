@@ -21,7 +21,10 @@ matrix:
   fast_finish: true
 
 before_install:
-    - phpenv config-rm xdebug.ini || true
+    - |
+      if [ "$COVERAGE" != "true" ]; then
+          phpenv config-rm xdebug.ini || true
+      fi
 
 install:
   - set -eo pipefail
@@ -30,7 +33,7 @@ install:
 script:
   - |
     if [ "$COVERAGE" == "true" ]; then
-        make tc
+        make tm
     else
         make test
     fi
