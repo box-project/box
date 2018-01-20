@@ -737,6 +737,55 @@ OUTPUT;
         );
     }
 
+    public function test_it_can_build_a_PHAR_in_a_non_existent_directory(): void
+    {
+        (new Filesystem())->mirror(self::FIXTURES_DIR.'/dir007', $this->tmp);
+
+        $commandTester = $this->getCommandTester();
+        $commandTester->execute(
+            ['command' => 'build'],
+            [
+                'interactive' => false,
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
+        );
+
+        $expected = <<<OUTPUT
+
+    ____
+   / __ )____  _  __
+  / __  / __ \| |/_/
+ / /_/ / /_/ />  <
+/_____/\____/_/|_|
+
+
+Box (repo)
+
+* Building the PHAR "/path/to/tmp/foo/bar/test.phar"
+? No compactor to register
+? Adding files
+? Adding main file: /path/to/tmp/test.php
+? Generating new stub
+? No compression
+* Done.
+
+ // Size: 100B
+ // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
+
+
+OUTPUT;
+
+        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
+
+        $this->assertSame($expected, $actual);
+
+        $this->assertSame(
+            'Hello!',
+            exec('php foo/bar/test.phar'),
+            'Expected the PHAR to be executable'
+        );
+    }
+
     /**
      * {@inheritdoc}
      */

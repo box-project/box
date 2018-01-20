@@ -1,7 +1,7 @@
 {
     "chmod": "0755",
     "main": "bin/box",
-    "output": "bin/box.phar",
+    "output": "new/deep/one/box.phar",
 
     "directories": [
         "src"

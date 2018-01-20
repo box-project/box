@@ -15,10 +15,12 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
+use function dirname;
 use KevinGH\Box\Exception\FileExceptionFactory;
 use KevinGH\Box\Exception\OpenSslExceptionFactory;
 use Phar;
 use RecursiveDirectoryIterator;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Box is a utility class to generate a PHAR.
@@ -64,6 +66,10 @@ final class Box
      */
     public static function create(string $file, int $flags = null, string $alias = null): self
     {
+        // Ensure the parent directory of the PHAR file exists as `new \Phar()` does not create it and would fail
+        // otherwise.
+        (new Filesystem())->mkdir(dirname($file));
+
         return new self(new Phar($file, (int) $flags, $alias), $file);
     }
 
