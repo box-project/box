@@ -84,8 +84,6 @@ class BuildTest extends CommandTestCase
 Box (repo)
 
 Building the PHAR "/path/to/tmp/test.phar"
-? Adding directories.
-? Adding files.
 Private key passphrase:
 * Done.
 
@@ -199,6 +197,7 @@ Box (repo)
     > other/run.php
 ? Generating new stub.
 ? Setting metadata.
+? No compression
 ? Signing using a private key.
 Private key passphrase:
 ? Setting file permissions.
@@ -290,6 +289,7 @@ Box (repo)
   - Using custom shebang line: #!__PHP_EXECUTABLE__
   - Using custom banner: custom banner
 ? Setting metadata.
+? No compression
 ? Signing using a private key.
 Private key passphrase:
 ? Setting file permissions.
@@ -454,6 +454,7 @@ Box (repo)
 ? Adding files.
 ? Adding main file: /path/to/tmp/test.php
 ? Generating new stub.
+? No compression
 * Done.
 
 OUTPUT;
@@ -501,6 +502,7 @@ Box (repo)
 ? Adding files.
 ? Adding main file: /path/to/tmp/test.php
 ? Generating new stub.
+? No compression
 * Done.
 
 OUTPUT;
@@ -549,6 +551,7 @@ Box (repo)
 ? Adding main file: /path/to/tmp/test.php
 ? Generating new stub.
   - Using custom banner from file: /path/to/tmp/banner
+? No compression
 * Done.
 
 OUTPUT;
@@ -593,6 +596,7 @@ Box (repo)
 ? Adding files.
 ? Adding main file: /path/to/tmp/test.php
 ? Using stub file: /path/to/tmp/stub.php
+? No compression
 * Done.
 
 OUTPUT;
@@ -636,6 +640,7 @@ Box (repo)
 ? No compactor to register
 ? Adding files.
 ? Using default stub.
+? No compression
 * Done.
 
 OUTPUT;
@@ -675,7 +680,7 @@ Box (repo)
 ? Adding files.
 ? Adding main file: /path/to/tmp/test.php
 ? Generating new stub.
-? Compressing.
+? Compressing with the algorithm "GZ"
 * Done.
 
 OUTPUT;
@@ -685,9 +690,15 @@ OUTPUT;
 
         $this->assertSame($expected, $actual);
 
+        $builtPhar = new Phar('test.phar');
+
+        $this->assertFalse($builtPhar->isCompressed()); // TODO: this is a bug, see https://github.com/humbug/box/issues/20
+        $this->assertTrue($builtPhar['test.php']->isCompressed());
+
         $this->assertSame(
             'Hello!',
-            exec('php test.phar')
+            exec('php test.phar'),
+            'Expected the PHAR to be executable.'
         );
     }
 
