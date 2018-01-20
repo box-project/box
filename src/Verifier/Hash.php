@@ -12,16 +12,15 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Signature;
+namespace KevinGH\Box\Verifier;
 
-use KevinGH\Box\Exception\SignatureException;
+use Assert\Assertion;
+use KevinGH\Box\Verifier;
 
 /**
  * Uses the PHP hash library to verify a signature.
- *
- * @author Kevin Herrera <kevin@herrera.io>
  */
-class Hash implements VerifyInterface
+final class Hash implements Verifier
 {
     /**
      * The hash context.
@@ -31,12 +30,9 @@ class Hash implements VerifyInterface
     private $context;
 
     /**
-     * @see VerifyInterface::init
-     *
-     * @param mixed $algorithm
-     * @param mixed $path
+     * {@inheritdoc}
      */
-    public function init($algorithm, $path): void
+    public function __construct(string $algorithm, string $path)
     {
         $algorithm = strtolower(
             preg_replace(
@@ -46,29 +42,31 @@ class Hash implements VerifyInterface
             )
         );
 
-        if (false === ($this->context = @hash_init($algorithm))) {
-            $this->context = null;
+        Assertion::inArray(
+            $algorithm,
+            hash_algos(),
+            'Expected %s to be a known algorithm: "'
+            .implode('", "', hash_algos())
+            .'"'
+        );
 
-            throw SignatureException::lastError();
-        }
+        $this->context = hash_init($algorithm);
     }
 
     /**
-     * @see VerifyInterface::update
-     *
-     * @param mixed $data
+     * {@inheritdoc}
      */
-    public function update($data): void
+    public function update(string $data): void
     {
+        Assertion::notNull($this->context, 'Expected to be initialised before being updated.');
+
         hash_update($this->context, $data);
     }
 
     /**
-     * @see VerifyInterface::verify
-     *
-     * @param mixed $signature
+     * {@inheritdoc}
      */
-    public function verify($signature)
+    public function verify(string $signature): bool
     {
         return $signature === strtoupper(hash_final($this->context));
     }

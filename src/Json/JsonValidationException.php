@@ -21,6 +21,9 @@ final class JsonValidationException extends UnexpectedValueException
 {
     private $errors;
 
+    /**
+     * {@inheritdoc}
+     */
     public function __construct(string $message, $errors = [], Exception $previous = null)
     {
         $this->errors = $errors;

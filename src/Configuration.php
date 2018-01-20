@@ -20,7 +20,6 @@ use DateTimeImmutable;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\Php as LegacyPhp;
 use InvalidArgumentException;
-use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Php;
 use Phar;
 use RuntimeException;

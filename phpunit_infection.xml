@@ -2,6 +2,7 @@
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/6.4/phpunit.xsd"
          bootstrap="tests/bootstrap.php"
+         stopOnFailure="true"
          colors="true">
 
     <testsuites>
@@ -12,13 +13,7 @@
 
     <filter>
         <whitelist>
-            <directory suffix=".php">src/</directory>
-
-            <exclude>
-                <file>src/functions.php</file>
-                <directory>src/Logger</directory>
-                <directory>src/Test</directory>
-            </exclude>
+            <directory suffix=".php">src/Compactor</directory>
         </whitelist>
     </filter>
 

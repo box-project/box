@@ -17,50 +17,38 @@ namespace KevinGH\Box\Exception;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversNothing
+ * @covers \KevinGH\Box\Exception\OpenSslExceptionFactory
+ * @requires extension openssl
  */
-class OpenSslExceptionTest extends TestCase
+class OpenSslExceptionFactoryTest extends TestCase
 {
-    protected function setUp(): void
+    public function test_it_can_create_an_exception_for_the_last_error(): void
     {
-        if (false === extension_loaded('openssl')) {
-            $this->markTestSkipped('The "openssl" extension is not available.');
-        }
-    }
-
-    public function testLastError(): void
-    {
-        if (false === extension_loaded('openssl')) {
-            $this->markTestSkipped(
-                'The "openssl" extension is required to test the exception.'
-            );
-        }
-
-        OpenSslException::reset();
+        OpenSslExceptionFactory::reset();
 
         openssl_pkey_get_private('test', 'test');
 
-        $exception = OpenSslException::lastError();
+        $exception = OpenSslExceptionFactory::createForLastError();
 
         $this->assertRegExp('/PEM routines/', $exception->getMessage());
     }
 
-    public function testReset(): void
+    public function test_it_can_reset_the_stack_of_errors(): void
     {
         openssl_pkey_get_private('test', 'test');
 
-        OpenSslException::reset();
+        OpenSslExceptionFactory::reset();
 
         $this->assertEmpty(openssl_error_string());
     }
 
-    public function testResetWarning(): void
+    public function test_it_triggers_a_warning_to_prevent_broken_looping(): void
     {
         openssl_pkey_get_private('test'.random_int(0, getrandmax()), 'test'.random_int(0, getrandmax()));
 
         restore_error_handler();
 
-        @OpenSslException::reset(0);
+        @OpenSslExceptionFactory::reset(0);
 
         $error = error_get_last();
 

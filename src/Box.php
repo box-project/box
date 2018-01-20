@@ -14,89 +14,109 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use FilesystemIterator;
-use KevinGH\Box\Compactor\Compactor;
-use KevinGH\Box\Compactor\CompactorInterface;
-use KevinGH\Box\Exception\FileException;
-use KevinGH\Box\Exception\InvalidArgumentException;
-use KevinGH\Box\Exception\OpenSslException;
-use KevinGH\Box\Exception\UnexpectedValueException;
+use Assert\Assertion;
+use KevinGH\Box\Exception\FileExceptionFactory;
+use KevinGH\Box\Exception\OpenSslExceptionFactory;
 use Phar;
-use Phine\Path\Path;
 use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use RegexIterator;
-use SplFileInfo;
-use SplObjectStorage;
-use Traversable;
 
 /**
- * Provides additional, complimentary functionality to the Phar class.
- *
- * @author Kevin Herrera <kevin@herrera.io>
+ * Box is a utility class to generate a PHAR.
  */
-class Box
+final class Box
 {
     /**
-     * The source code compactors.
-     *
-     * @var SplObjectStorage
+     * @var Compactor[]
      */
-    private $compactors;
+    private $compactors = [];
 
     /**
-     * The path to the Phar file.
-     *
-     * @var string
+     * @var string The path to the PHAR file
      */
     private $file;
 
     /**
-     * The Phar instance.
-     *
-     * @var Phar
+     * @var Phar The PHAR instance
      */
     private $phar;
 
     /**
-     * The placeholder values.
-     *
-     * @var array
+     * @var scalar[] The placeholders with their values
      */
-    private $values = [];
+    private $placeholders = [];
 
-    /**
-     * Sets the Phar instance.
-     *
-     * @param Phar   $phar the instance
-     * @param string $file the path to the Phar file
-     */
-    public function __construct(Phar $phar, $file)
+    private function __construct(Phar $phar, string $file)
     {
-        $this->compactors = new SplObjectStorage();
-        $this->file = $file;
         $this->phar = $phar;
+        $this->file = $file;
     }
 
     /**
-     * Adds a file contents compactor.
+     * Creates a new PHAR and Box instance.
      *
-     * @param Compactor $compactor the compactor
+     * @param string $file  The PHAR file name
+     * @param int    $flags Flags to pass to the Phar parent class RecursiveDirectoryIterator
+     * @param string $alias Alias with which the Phar archive should be referred to in calls to stream functionality
+     *
+     * @return Box
+     *
+     * @see RecursiveDirectoryIterator
      */
-    public function addCompactor(Compactor $compactor): void
+    public static function create(string $file, int $flags = null, string $alias = null): self
     {
-        $this->compactors->attach($compactor);
+        return new self(new Phar($file, (int) $flags, $alias), $file);
     }
 
     /**
-     * Adds a file to the Phar, after compacting it and replacing its
-     * placeholders.
+     * @param Compactor[] $compactors
+     */
+    public function registerCompactors(array $compactors): void
+    {
+        Assertion::allIsInstanceOf($compactors, Compactor::class);
+
+        $this->compactors = $compactors;
+    }
+
+    /**
+     * @param scalar[] $placeholders
+     */
+    public function registerPlaceholders(array $placeholders): void
+    {
+        $message = 'Expected value "%s" to be a scalar or stringable object.';
+
+        foreach ($placeholders as $i => $placeholder) {
+            if (is_object($placeholder)) {
+                Assertion::methodExists('__toString', $placeholder, $message);
+
+                $placeholders[$i] = (string) $placeholder;
+
+                break;
+            }
+
+            Assertion::scalar($placeholder, $message);
+        }
+
+        $this->placeholders = $placeholders;
+    }
+
+    public function registerStub(string $file): void
+    {
+        Assertion::file($file);
+        Assertion::readable($file);
+
+        $contents = $this->replacePlaceholders(
+            file_get_contents($file)
+        );
+
+        $this->phar->setStub($contents);
+    }
+
+    /**
+     * Adds the a file to the PHAR. The contents will first be compacted and have its placeholders
+     * replaced.
      *
-     * @param string $file  the file name
-     * @param string $local the local file name
-     *
-     * @throws Exception\Exception
-     * @throws FileException       if the file could not be used
+     * @param string $file  The file name or path
+     * @param string $local The local file name or path
      */
     public function addFile($file, $local = null): void
     {
@@ -104,182 +124,82 @@ class Box
             $local = $file;
         }
 
-        if (false === is_file($file)) {
-            throw FileException::create(
-                'The file "%s" does not exist or is not a file.',
-                $file
-            );
-        }
+        Assertion::file($file);
+        Assertion::readable($file);
 
-        if (false === ($contents = @file_get_contents($file))) {
-            throw FileException::lastError();
-        }
+        $contents = file_get_contents($file);
 
         $this->addFromString($local, $contents);
     }
 
     /**
-     * Adds the contents from a file to the Phar, after compacting it and
-     * replacing its placeholders.
+     * Adds the contents from a file to the PHAR. The contents will first be compacted and have its placeholders
+     * replaced.
      *
-     * @param string $local    the local name
-     * @param string $contents the contents
+     * @param string $local    The local name or path
+     * @param string $contents The contents
      */
-    public function addFromString($local, $contents): void
+    public function addFromString(string $local, string $contents): void
     {
         $this->phar->addFromString(
             $local,
-            $this->replaceValues($this->compactContents($local, $contents))
-        );
-    }
-
-    /**
-     * Similar to Phar::buildFromDirectory(), except the files will be
-     * compacted and their placeholders replaced.
-     *
-     * @param string $dir   the directory
-     * @param string $regex the regular expression filter
-     */
-    public function buildFromDirectory($dir, $regex = null): void
-    {
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator(
-                $dir,
-                FilesystemIterator::KEY_AS_PATHNAME
-                | FilesystemIterator::CURRENT_AS_FILEINFO
-                | FilesystemIterator::SKIP_DOTS
+            $this->compactContents(
+                $local,
+                $this->replacePlaceholders($contents)
             )
         );
-
-        if ($regex) {
-            $iterator = new RegexIterator($iterator, $regex);
-        }
-
-        $this->buildFromIterator($iterator, $dir);
     }
 
-    /**
-     * Similar to Phar::buildFromIterator(), except the files will be compacted
-     * and their placeholders replaced.
-     *
-     * @param Traversable $iterator the iterator
-     * @param string      $base     the base directory path
-     *
-     * @throws Exception\Exception
-     * @throws UnexpectedValueException if the iterator value is unexpected
-     */
-    public function buildFromIterator(Traversable $iterator, $base = null): void
-    {
-        if ($base) {
-            $base = canonicalize($base.DIRECTORY_SEPARATOR);
-        }
-
-        foreach ($iterator as $key => $value) {
-            if (is_string($value)) {
-                if (false === is_string($key)) {
-                    throw UnexpectedValueException::create(
-                        'The key returned by the iterator (%s) is not a string.',
-                        gettype($key)
-                    );
-                }
-
-                $key = canonicalize($key);
-                $value = canonicalize($value);
-
-                if (is_dir($value)) {
-                    $this->phar->addEmptyDir($key);
-                } else {
-                    $this->addFile($value, $key);
-                }
-            } elseif ($value instanceof SplFileInfo) {
-                if (null === $base) {
-                    throw InvalidArgumentException::create(
-                        'The $base argument is required for SplFileInfo values.'
-                    );
-                }
-
-                /** @var $value SplFileInfo */
-                $real = $value->getRealPath();
-
-                if (0 !== strpos($real, $base)) {
-                    throw UnexpectedValueException::create(
-                        'The file "%s" is not in the base directory.',
-                        $real
-                    );
-                }
-
-                $local = str_replace($base, '', $real);
-
-                if ($value->isDir()) {
-                    $this->phar->addEmptyDir($local);
-                } else {
-                    $this->addFile($real, $local);
-                }
-            } else {
-                throw UnexpectedValueException::create(
-                    'The iterator value "%s" was not expected.',
-                    gettype($value)
-                );
-            }
-        }
-    }
-
-    /**
-     * Compacts the file contents using the supported compactors.
-     *
-     * @param string $file     the file name
-     * @param string $contents the file contents
-     *
-     * @return string the compacted contents
-     */
-    public function compactContents($file, $contents)
-    {
-        foreach ($this->compactors as $compactor) {
-            /** @var $compactor CompactorInterface */
-            if ($compactor->supports($file)) {
-                $contents = $compactor->compact($contents);
-            }
-        }
-
-        return $contents;
-    }
-
-    /**
-     * Creates a new Phar and Box instance.
-     *
-     * @param string $file  the file name
-     * @param int    $flags the RecursiveDirectoryIterator flags
-     * @param string $alias the Phar alias
-     *
-     * @return Box the Box instance
-     */
-    public static function create($file, $flags = null, $alias = null)
-    {
-        return new self(new Phar($file, (int) $flags, $alias), $file);
-    }
-
-    /**
-     * Returns the Phar instance.
-     *
-     * @return Phar the instance
-     */
-    public function getPhar()
+    public function getPhar(): Phar
     {
         return $this->phar;
     }
 
     /**
-     * Returns the signature of the phar.
+     * Signs the PHAR using a private key file.
      *
-     * This method does not use the extension to extract the phar's signature.
-     *
-     * @param string $path the phar file path
-     *
-     * @return array the signature
+     * @param string $file     the private key file name
+     * @param string $password the private key password
      */
-    public static function getSignature($path)
+    public function signUsingFile(string $file, string $password = null): void
     {
-        return Signature::create($path)->get();
+        Assertion::file($file);
+        Assertion::readable($file);
+
+        $this->sign(file_get_contents($file), $password);
+    }
+
+    /**
+     * Signs the PHAR using a private key.
+     *
+     * @param string $key      The private key
+     * @param string $password The private key password
+     */
+    public function sign(string $key, ?string $password): void
+    {
+        OpenSslExceptionFactory::reset();
+
+        $pubKey = $this->file.'.pubkey';
+
+        Assertion::extensionLoaded('openssl');
+
+        if (false === ($resource = openssl_pkey_get_private($key, $password))) {
+            throw OpenSslExceptionFactory::createForLastError();
+        }
+
+        if (false === openssl_pkey_export($resource, $private)) {
+            throw OpenSslExceptionFactory::createForLastError();
+        }
+
+        if (false === ($details = openssl_pkey_get_details($resource))) {
+            throw OpenSslExceptionFactory::createForLastError();
+        }
+
+        $this->phar->setSignatureAlgorithm(Phar::OPENSSL, $private);
+
+        if (false === @file_put_contents($pubKey, $details['key'])) {
+            throw FileExceptionFactory::createForLastError();
+        }
     }
 
     /**
@@ -289,135 +209,23 @@ class Box
      *
      * @return string the replaced contents
      */
-    public function replaceValues($contents)
+    private function replacePlaceholders(string $contents): string
     {
         return str_replace(
-            array_keys($this->values),
-            array_values($this->values),
+            array_keys($this->placeholders),
+            array_values($this->placeholders),
             $contents
         );
     }
 
-    /**
-     * Sets the bootstrap loader stub using a file.
-     *
-     * @param string $file    the file path
-     * @param bool   $replace Replace placeholders?
-     *
-     * @throws Exception\Exception
-     * @throws FileException       if the stub file could not be used
-     */
-    public function setStubUsingFile($file, $replace = false): void
+    private function compactContents(string $file, string $contents): string
     {
-        if (false === is_file($file)) {
-            throw FileException::create(
-                'The file "%s" does not exist or is not a file.',
-                $file
-            );
-        }
-
-        if (false === ($contents = @file_get_contents($file))) {
-            throw FileException::lastError();
-        }
-
-        if ($replace) {
-            $contents = $this->replaceValues($contents);
-        }
-
-        $this->phar->setStub($contents);
-    }
-
-    /**
-     * Sets the placeholder values.
-     *
-     * @param array $values the values
-     *
-     * @throws Exception\Exception
-     * @throws InvalidArgumentException if a non-scalar value is used
-     */
-    public function setValues(array $values): void
-    {
-        foreach ($values as $value) {
-            if (false === is_scalar($value)) {
-                throw InvalidArgumentException::create(
-                    'Non-scalar values (such as %s) are not supported.',
-                    gettype($value)
-                );
-            }
-        }
-
-        $this->values = $values;
-    }
-
-    /**
-     * Signs the Phar using a private key.
-     *
-     * @param string $key      the private key
-     * @param string $password the private key password
-     *
-     * @throws Exception\Exception
-     * @throws OpenSslException    if the "openssl" extension could not be used
-     *                             or has generated an error
-     */
-    public function sign($key, $password = null): void
-    {
-        OpenSslException::reset();
-
-        if (false === extension_loaded('openssl')) {
-            // @codeCoverageIgnoreStart
-            throw OpenSslException::create(
-                'The "openssl" extension is not available.'
-            );
-            // @codeCoverageIgnoreEnd
-        }
-
-        if (false === ($resource = openssl_pkey_get_private($key, $password))) {
-            // @codeCoverageIgnoreStart
-            throw OpenSslException::lastError();
-            // @codeCoverageIgnoreEnd
-        }
-
-        if (false === openssl_pkey_export($resource, $private)) {
-            // @codeCoverageIgnoreStart
-            throw OpenSslException::lastError();
-            // @codeCoverageIgnoreEnd
-        }
-
-        if (false === ($details = openssl_pkey_get_details($resource))) {
-            // @codeCoverageIgnoreStart
-            throw OpenSslException::lastError();
-            // @codeCoverageIgnoreEnd
-        }
-
-        $this->phar->setSignatureAlgorithm(Phar::OPENSSL, $private);
-
-        if (false === @file_put_contents($this->file.'.pubkey', $details['key'])) {
-            throw FileException::lastError();
-        }
-    }
-
-    /**
-     * Signs the Phar using a private key file.
-     *
-     * @param string $file     the private key file name
-     * @param string $password the private key password
-     *
-     * @throws Exception\Exception
-     * @throws FileException       if the private key file could not be read
-     */
-    public function signUsingFile($file, $password = null): void
-    {
-        if (false === is_file($file)) {
-            throw FileException::create(
-                'The file "%s" does not exist or is not a file.',
-                $file
-            );
-        }
-
-        if (false === ($key = @file_get_contents($file))) {
-            throw FileException::lastError();
-        }
-
-        $this->sign($key, $password);
+        return array_reduce(
+            $this->compactors,
+            function (string $contents, Compactor $compactor) use ($file): string {
+                return $compactor->compact($file, $contents);
+            },
+            $contents
+        );
     }
 }

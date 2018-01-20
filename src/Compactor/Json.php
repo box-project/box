@@ -30,7 +30,7 @@ final class Json extends FileExtensionCompactor
     /**
      * {@inheritdoc}
      */
-    public function compact(string $contents): string
+    protected function compactContent(string $contents): string
     {
         $decodedContents = json_decode($contents);
 

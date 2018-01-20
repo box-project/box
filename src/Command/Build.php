@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Command;
 
 use KevinGH\Box\Box;
+use KevinGH\Box\Compactor;
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Logger\BuildLogger;
 use KevinGH\Box\StubGenerator;
@@ -520,7 +521,7 @@ HELP
             );
         }
 
-        $box->setValues($values);
+        $box->registerPlaceholders($values);
     }
 
     private function registerCompactors(Configuration $config, Box $box, BuildLogger $logger): void
@@ -528,24 +529,32 @@ HELP
         $compactors = $config->getCompactors();
 
         if ([] === $compactors) {
+            $logger->log(
+                BuildLogger::QUESTION_MARK_PREFIX,
+                'No compactor to register',
+                OutputInterface::VERBOSITY_VERBOSE
+            );
+
             return;
         }
 
         $logger->log(
             BuildLogger::QUESTION_MARK_PREFIX,
-            'Registering compactors.',
+            'Registering compactors',
             OutputInterface::VERBOSITY_VERBOSE
         );
 
-        foreach ($compactors as $compactor) {
+        $logCompactors = function (Compactor $compactor) use ($logger): void {
             $logger->log(
                 BuildLogger::PLUS_PREFIX,
                 get_class($compactor),
                 OutputInterface::VERBOSITY_VERBOSE
             );
+        };
 
-            $box->addCompactor($compactor);
-        }
+        array_map($logCompactors, $compactors);
+
+        $box->registerCompactors($compactors);
     }
 
     private function alertAboutMappedPaths(Configuration $config, BuildLogger $logger): void
@@ -706,7 +715,7 @@ HELP
                 OutputInterface::VERBOSITY_VERBOSE
             );
 
-            $box->setStubUsingFile($stub);
+            $box->registerStub($stub);
         } else {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,

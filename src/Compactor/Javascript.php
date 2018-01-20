@@ -35,7 +35,7 @@ final class Javascript extends FileExtensionCompactor
     /**
      * {@inheritdoc}
      */
-    public function compact(string $contents): string
+    protected function compactContent(string $contents): string
     {
         try {
             return Minifier::minify($contents);
@@ -49,7 +49,7 @@ final class Javascript extends FileExtensionCompactor
     /**
      * {@inheritdoc}
      */
-    public function supports(string $file): bool
+    protected function supports(string $file): bool
     {
         if (!parent::supports($file)) {
             return false;

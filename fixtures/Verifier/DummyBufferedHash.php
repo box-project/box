@@ -12,27 +12,26 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Compactor;
+namespace KevinGH\Box\Verifier;
 
-use KevinGH\Box\NotCallable;
-
-class DummyFileExtensionCompactor extends FileExtensionCompactor
+final class DummyBufferedHash extends BufferedHash
 {
-    use NotCallable;
-
     /**
      * {@inheritdoc}
      */
-    protected function compactContent(string $contents): string
+    public function __construct(string $algorithm, string $path)
     {
-        $this->__call(__METHOD__, func_get_args());
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function supports(string $file): bool
+    public function verify(string $signature): bool
     {
-        $this->__call(__METHOD__, func_get_args());
+    }
+
+    public function getPublicBufferedData(): string
+    {
+        return $this->getBufferedData();
     }
 }

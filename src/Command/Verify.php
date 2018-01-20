@@ -14,10 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Command;
 
+use Assert\Assertion;
 use KevinGH\Box\Signature;
 use Phar;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -29,7 +29,6 @@ final class Verify extends Command
 {
     private const PHAR_ARG = 'phar';
     private const NO_EXTENSION_OPT = 'no-extension';
-
     private const VERBOSITY_LEVEL = OutputInterface::VERBOSITY_VERBOSE;
 
     /**
@@ -44,17 +43,16 @@ final class Verify extends Command
 The <info>%command.name%</info> command will verify the signature of the PHAR.
 
 By default, the command will use the <comment>phar</comment> extension to perform the
-verification process. However, if the extension is not available,
-Box will manually extract and verify the phar's signature. If you
-require that Box handle the verification process, you will need
-to use the <comment>--no-extension</comment> option.
+verification process. However, if the extension is not available, Box will manually
+extract and verify the PHAR's signature. If you require that Box handle the verification
+process, you will need to use the <comment>--no-extension</comment> option.
 
 <question>Why would I require that box handle the verification process?</question>
 
 If you meet all of the following conditions:
- - the <comment>phar</comment> extension installed
- - the <comment>openssl</comment> extension is not installed
- - you need to verify a PHAR signed using a private key
+ - The <comment>phar</comment> extension installed
+ - The <comment>openssl</comment> extension is not installed
+ - You need to verify a PHAR signed using a private key
 
 Box supports verifying private key signed PHARs without using
 either extensions. <error>Note however, that the entire PHAR will need
@@ -64,13 +62,13 @@ HELP
         $this->addArgument(
             self::PHAR_ARG,
             InputArgument::REQUIRED,
-            'The PHAR file.'
+            'The PHAR file'
         );
         $this->addOption(
             self::NO_EXTENSION_OPT,
             null,
             InputOption::VALUE_NONE,
-            'Do not use the PHAR extension to verify.'
+            'Do not use the PHAR extension to verify'
         );
     }
 
@@ -83,14 +81,7 @@ HELP
 
         $pharPath = $input->getArgument(self::PHAR_ARG);
 
-        if (false === is_file($pharPath)) {
-            throw new RuntimeException(
-                sprintf(
-                    'Could not find the file "%s".',
-                    $pharPath
-                )
-            );
-        }
+        Assertion::file($pharPath);
 
         $pharPath = false !== realpath($pharPath) ? realpath($pharPath) : $pharPath;
 

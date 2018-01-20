@@ -16,7 +16,6 @@ $config = PhpCsFixer\Config::create()
         '@PHP71Migration:risky' => true,
         '@PHP70Migration:risky' => true,
         '@PHP56Migration' => true,
-        '@PHPUnit60Migration:risky' => true,
         '@Symfony' => true,
         '@Symfony:risky' => true,
         'align_multiline_comment' => true,
@@ -60,7 +59,6 @@ $config = PhpCsFixer\Config::create()
         'no_useless_return' => true,
         'ordered_class_elements' => true,
         'ordered_imports' => true,
-        'php_unit_strict' => true,
         'php_unit_test_class_requires_covers' => true,
         'phpdoc_add_missing_param_annotation' => true,
         'phpdoc_order' => true,
@@ -72,6 +70,7 @@ $config = PhpCsFixer\Config::create()
     ])
     ->setFinder(
         PhpCsFixer\Finder::create()
+            ->in('fixtures')
             ->in('src')
             ->in('tests')
             ->append(['bin/box'])

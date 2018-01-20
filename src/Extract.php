@@ -1,6 +1,6 @@
 <?php
 
-// TODO: placing a declare statement here, e.g. for strict types, currently breaks everything. Need to find out why.
+declare(strict_types=1);
 
 /*
  * This file is part of the box project.
@@ -173,7 +173,7 @@ class Extract
 
         while (!feof($fp)) {
             if (fgetc($fp) === $combo[$offset]) {
-                $offset++;
+                ++$offset;
 
                 if (!isset($combo[$offset])) {
                     $stub = ftell($fp);
@@ -550,7 +550,7 @@ class Extract
             'flags' => 0,
         ];
 
-        for ($i = 0; $i < $count; $i++) {
+        for ($i = 0; $i < $count; ++$i) {
             $length = unpack('V', substr($raw, $start, 4));
             $length = $length[1];
             $start += 4;

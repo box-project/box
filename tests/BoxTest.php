@@ -14,39 +14,30 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use ArrayIterator;
-use FilesystemIterator;
-use Herrera\Annotations\Tokenizer;
-use KevinGH\Box\Compactor\Compactor;
+use Exception;
+use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
-use KevinGH\Box\Exception\FileException;
-use KevinGH\Box\Exception\UnexpectedValueException;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use Phar;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use SplFileInfo;
 
 /**
- * @coversNothing
+ * @covers \KevinGH\Box\Box
  */
 class BoxTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__.'/../fixtures/signature';
+    /**
+     * @var string
+     */
+    private $cwd;
 
     /**
      * @var string
      */
-    protected $cwd;
-
-    /**
-     * @var string
-     */
-    protected $tmp;
+    private $tmp;
 
     /**
      * @var Box
@@ -78,8 +69,8 @@ class BoxTest extends TestCase
 
         chdir($this->tmp);
 
-        $this->phar = new Phar('test.phar');
-        $this->box = new Box($this->phar, 'test.phar');
+        $this->box = Box::create('test.phar');
+        $this->phar = $this->box->getPhar();
 
         $this->compactorProphecy = $this->prophesize(Compactor::class);
         $this->compactor = $this->compactorProphecy->reveal();
@@ -90,18 +81,524 @@ class BoxTest extends TestCase
      */
     protected function tearDown(): void
     {
-        unset($this->box, $this->phar);
+        unset($this->box);
 
         chdir($this->cwd);
 
         remove_dir($this->tmp);
 
+        //TODO: see if we need a custom error handler still
         restore_error_handler();
 
         parent::tearDown();
     }
 
-    public function getPrivateKey()
+    public function test_it_can_add_a_file_to_the_phar(): void
+    {
+        $file = 'foo';
+        $contents = 'test';
+
+        file_put_contents($file, $contents);
+
+        $this->box->addFile($file);
+
+        $expectedContents = $contents;
+        $expectedPharPath = 'phar://test.phar/'.$file;
+
+        $this->assertFileExists($expectedPharPath);
+
+        $actualContents = file_get_contents($expectedPharPath);
+
+        $this->assertSame($expectedContents, $actualContents);
+    }
+
+    public function test_it_can_add_a_file_with_absolute_path_to_the_phar(): void
+    {
+        mkdir('path-to');
+
+        $file = $this->tmp.'/path-to/foo';
+        $contents = 'test';
+
+        file_put_contents($file, $contents);
+
+        $this->box->addFile(realpath($file));
+
+        $expectedContents = $contents;
+        $expectedPharPath = 'phar://test.phar'.$file;
+
+        $this->assertFileExists($expectedPharPath);
+
+        $actualContents = file_get_contents($expectedPharPath);
+
+        $this->assertSame($expectedContents, $actualContents);
+    }
+
+    public function test_it_can_add_a_file_with_a_local_path_to_the_phar(): void
+    {
+        $file = 'foo';
+        $contents = 'test';
+        $localPath = 'local/path/foo';
+
+        file_put_contents($file, $contents);
+
+        $this->box->addFile($file, $localPath);
+
+        $expectedContents = $contents;
+        $expectedPharPath = 'phar://test.phar/'.$localPath;
+
+        $this->assertFileExists($expectedPharPath);
+
+        $actualContents = file_get_contents($expectedPharPath);
+
+        $this->assertSame($expectedContents, $actualContents);
+    }
+
+    public function test_it_compacts_the_file_content_and_replace_placeholders_before_adding_it_to_the_phar(): void
+    {
+        $file = 'foo';
+        $contents = 'original contents @foo_placeholder@';
+        $placeholderMapping = [
+            '@foo_placeholder@' => 'foo_value',
+        ];
+
+        file_put_contents($file, $contents);
+
+        $firstCompactorProphecy = $this->prophesize(Compactor::class);
+        $firstCompactorProphecy
+            ->compact($file, 'original contents foo_value')
+            ->willReturn($firstCompactorOutput = 'first compactor contents')
+        ;
+
+        $secondCompactorProphecy = $this->prophesize(Compactor::class);
+        $secondCompactorProphecy
+            ->compact($file, $firstCompactorOutput)
+            ->willReturn($secondCompactorOutput = 'second compactor contents')
+        ;
+
+        $this->box->registerCompactors([
+            $firstCompactorProphecy->reveal(),
+            $secondCompactorProphecy->reveal(),
+        ]);
+
+        $this->box->registerPlaceholders($placeholderMapping);
+        $this->box->addFile($file);
+
+        $expectedContents = $secondCompactorOutput;
+        $expectedPharPath = 'phar://test.phar/'.$file;
+
+        $this->assertFileExists($expectedPharPath);
+
+        $actualContents = file_get_contents($expectedPharPath);
+
+        $this->assertSame($expectedContents, $actualContents);
+
+        $firstCompactorProphecy->compact(Argument::cetera())->shouldHaveBeenCalledTimes(1);
+        $secondCompactorProphecy->compact(Argument::cetera())->shouldHaveBeenCalledTimes(1);
+    }
+
+    public function test_it_cannot_add_an_non_existent_file_to_the_phar(): void
+    {
+        try {
+            $this->box->addFile('/nowhere/foo');
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'File "/nowhere/foo" was expected to exist.',
+                $exception->getMessage()
+            );
+            $this->assertSame(102, $exception->getCode());
+            $this->assertNull($exception->getPrevious());
+        }
+    }
+
+    public function test_it_cannot_add_a_file_it_fails_to_read(): void
+    {
+        $file = 'foo';
+        $contents = 'test';
+
+        file_put_contents($file, $contents);
+        chmod($file, 0355);
+
+        try {
+            $this->box->addFile($file);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                "Path \"${file}\" was expected to be readable.",
+                $exception->getMessage()
+            );
+            $this->assertSame(103, $exception->getCode());
+            $this->assertNull($exception->getPrevious());
+        }
+    }
+
+    public function test_it_can_add_a_file_from_string_to_the_phar(): void
+    {
+        $localPath = 'foo';
+        $contents = 'test';
+
+        $this->box->addFromString($localPath, $contents);
+
+        $expectedContents = $contents;
+        $expectedPharPath = 'phar://test.phar/'.$localPath;
+
+        $this->assertFileExists($expectedPharPath);
+
+        $actualContents = file_get_contents($expectedPharPath);
+
+        $this->assertSame($expectedContents, $actualContents);
+    }
+
+    public function test_it_compacts_the_contents_before_adding_it_to_the_phar(): void
+    {
+        $localPath = 'foo';
+        $contents = 'original contents @foo_placeholder@';
+        $placeholderMapping = [
+            '@foo_placeholder@' => 'foo_value',
+        ];
+
+        file_put_contents($localPath, $contents);
+
+        $firstCompactorProphecy = $this->prophesize(Compactor::class);
+        $firstCompactorProphecy
+            ->compact($localPath, 'original contents foo_value')
+            ->willReturn($firstCompactorOutput = 'first compactor contents')
+        ;
+
+        $secondCompactorProphecy = $this->prophesize(Compactor::class);
+        $secondCompactorProphecy
+            ->compact($localPath, $firstCompactorOutput)
+            ->willReturn($secondCompactorOutput = 'second compactor contents')
+        ;
+
+        $this->box->registerCompactors([
+            $firstCompactorProphecy->reveal(),
+            $secondCompactorProphecy->reveal(),
+        ]);
+
+        $this->box->registerPlaceholders($placeholderMapping);
+        $this->box->addFromString($localPath, $contents);
+
+        $expectedContents = $secondCompactorOutput;
+        $expectedPharPath = 'phar://test.phar/'.$localPath;
+
+        $this->assertFileExists($expectedPharPath);
+
+        $actualContents = file_get_contents($expectedPharPath);
+
+        $this->assertSame($expectedContents, $actualContents);
+
+        $firstCompactorProphecy->compact(Argument::cetera())->shouldHaveBeenCalledTimes(1);
+        $secondCompactorProphecy->compact(Argument::cetera())->shouldHaveBeenCalledTimes(1);
+    }
+
+    public function test_it_exposes_the_underlying_PHAR(): void
+    {
+        $expected = new Phar('test.phar');
+        $actual = $this->box->getPhar();
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function test_register_placeholders(): void
+    {
+        file_put_contents(
+            $file = 'foo',
+            <<<'PHP'
+#!/usr/bin/env php
+<?php
+
+echo <<<EOF
+Test replacing placeholders.
+
+String value: @string_placeholder@
+Int value: @int_placeholder@
+Stringable value: @stringable_placeholder@
+
+EOF;
+
+__HALT_COMPILER();
+PHP
+        );
+
+        $stringable = new class() {
+            public function __toString(): string
+            {
+                return 'stringable value';
+            }
+        };
+
+        $this->box->registerPlaceholders([
+            '@string_placeholder@' => 'string value',
+            '@int_placeholder@' => 10,
+            '@stringable_placeholder@' => $stringable,
+        ]);
+
+        $this->box->registerStub($file, true);
+
+        $expected = <<<'EOF'
+Test replacing placeholders.
+
+String value: string value
+Int value: 10
+Stringable value: stringable value
+EOF;
+
+        exec('php test.phar', $output);
+
+        $actual = implode(PHP_EOL, $output);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function test_register_stub_file(): void
+    {
+        file_put_contents(
+            $file = 'foo',
+            <<<'STUB'
+#!/usr/bin/env php
+<?php
+
+echo 'Hello world!';
+
+__HALT_COMPILER();
+STUB
+        );
+
+        $this->box->registerStub($file);
+
+        $expected = <<<'STUB'
+#!/usr/bin/env php
+<?php
+
+echo 'Hello world!';
+
+__HALT_COMPILER(); ?>
+STUB;
+
+        $actual = trim($this->box->getPhar()->getStub());
+
+        $this->assertSame($expected, $actual);
+
+        $expectedOutput = 'Hello world!';
+        $actualOutput = exec('php test.phar');
+
+        $this->assertSame($expectedOutput, $actualOutput, 'Expected the PHAR to be executable.');
+    }
+
+    public function test_placeholders_are_also_replaced_in_stub_file(): void
+    {
+        file_put_contents(
+            $file = 'foo',
+            <<<'STUB'
+#!/usr/bin/env php
+<?php
+
+echo '@message@';
+
+__HALT_COMPILER();
+STUB
+        );
+
+        $this->box->registerPlaceholders(['@message@' => 'Hello world!']);
+        $this->box->registerStub($file);
+
+        $expected = <<<'STUB'
+#!/usr/bin/env php
+<?php
+
+echo 'Hello world!';
+
+__HALT_COMPILER(); ?>
+STUB;
+
+        $actual = trim($this->box->getPhar()->getStub());
+
+        $this->assertSame($expected, $actual);
+
+        $expectedOutput = 'Hello world!';
+        $actualOutput = exec('php test.phar');
+
+        $this->assertSame($expectedOutput, $actualOutput, 'Expected the PHAR to be executable.');
+    }
+
+    public function test_cannot_set_non_existent_file_as_stub_file(): void
+    {
+        try {
+            $this->box->registerStub('/does/not/exist');
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (Exception $exception) {
+            $this->assertSame(
+                'File "/does/not/exist" was expected to exist.',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_cannot_set_non_readable_file_as_stub_file(): void
+    {
+        vfsStreamWrapper::setRoot($root = vfsStream::newDirectory('test'));
+
+        $root->addChild(vfsStream::newFile('test.php', 0000));
+
+        try {
+            $this->box->registerStub('vfs://test/test.php');
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (Exception $exception) {
+            $this->assertSame(
+                'Path "vfs://test/test.php" was expected to be readable.',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_cannot_register_non_scalar_placeholders(): void
+    {
+        try {
+            $this->box->registerPlaceholders(['stream' => STDOUT]);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (Exception $exception) {
+            $this->assertSame(
+                'Expected value "stream" to be a scalar or stringable object.',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    /**
+     * @requires extension openssl
+     */
+    public function test_it_can_sign_the_PHAR(): void
+    {
+        list($key, $password) = $this->getPrivateKey();
+
+        $phar = $this->box->getPhar();
+
+        $this->configureHelloWorldPhar();
+
+        $this->box->sign($key, $password);
+
+        $this->assertNotSame([], $phar->getSignature(), 'Expected the PHAR to be signed.');
+        $this->assertInternalType('string', $phar->getSignature()['hash'], 'Expected the PHAR signature hash to be a string.');
+        $this->assertNotEmpty($phar->getSignature()['hash'], 'Expected the PHAR signature hash to not be empty.');
+
+        $this->assertSame('OpenSSL', $phar->getSignature()['hash_type']);
+
+        $this->assertSame(
+            'Hello, world!',
+            exec('php test.phar'),
+            'Expected PHAR to be executable.'
+        );
+    }
+
+    public function test_it_cannot_sign_if_cannot_get_the_private_key(): void
+    {
+        $key = 'Invalid key';
+        $password = 'test';
+
+        mkdir('test.phar.pubkey');
+
+        $this->configureHelloWorldPhar();
+
+        try {
+            $this->box->sign($key, $password);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (Exception $exception) {
+            $this->assertSame(
+                'error:0906D06C:PEM routines:PEM_read_bio:no start line',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_it_cannot_sign_if_cannot_create_the_public_key(): void
+    {
+        list($key, $password) = $this->getPrivateKey();
+
+        mkdir('test.phar.pubkey');
+
+        $this->configureHelloWorldPhar();
+
+        try {
+            $this->box->sign($key, $password);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (Exception $exception) {
+            $this->assertSame(
+                'Undefined index: code',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    /**
+     * @requires extension openssl
+     */
+    public function test_it_can_sign_the_PHAR_using_a_private_key_with_password(): void
+    {
+        $phar = $this->box->getPhar();
+
+        list($key, $password) = $this->getPrivateKey();
+
+        file_put_contents($file = 'foo', $key);
+
+        $this->configureHelloWorldPhar();
+
+        $this->box->signUsingFile($file, $password);
+
+        $this->assertNotSame([], $phar->getSignature(), 'Expected the PHAR to be signed.');
+        $this->assertInternalType('string', $phar->getSignature()['hash'], 'Expected the PHAR signature hash to be a string.');
+        $this->assertNotEmpty($phar->getSignature()['hash'], 'Expected the PHAR signature hash to not be empty.');
+
+        $this->assertSame('OpenSSL', $phar->getSignature()['hash_type']);
+
+        $this->assertSame(
+            'Hello, world!',
+            exec('php test.phar'),
+            'Expected the PHAR to be executable.'
+        );
+    }
+
+    public function test_it_cannot_sign_the_PHAR_with_a_non_existent_file_as_private_key(): void
+    {
+        try {
+            $this->box->signUsingFile('/does/not/exist');
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'File "/does/not/exist" was expected to exist.',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_it_cannot_sign_the_PHAR_with_an_unreadable_file_as_a_private_key(): void
+    {
+        $root = vfsStream::newDirectory('test');
+        $root->addChild(vfsStream::newFile('private.key', 0000));
+
+        vfsStreamWrapper::setRoot($root);
+
+        try {
+            $this->box->signUsingFile('vfs://test/private.key');
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Path "vfs://test/private.key" was expected to be readable.',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    private function getPrivateKey(): array
     {
         return [
             <<<'KEY'
@@ -129,400 +626,21 @@ KEY
         ];
     }
 
-    public function testAddFile(): void
+    private function configureHelloWorldPhar(): void
     {
-        touch($file = 'foo');
-
-        file_put_contents($file, 'test');
-
-        $this->box->addFile($file, 'test/test.php');
-
-        $this->assertSame(
-            'test',
-            file_get_contents('phar://test.phar/test/test.php')
-        );
-    }
-
-    public function testAddFileNotExist(): void
-    {
-        $this->expectException(\KevinGH\Box\Exception\FileException::class);
-        $this->expectExceptionMessage('The file "/does/not/exist" does not exist or is not a file.');
-
-        $this->box->addFile('/does/not/exist');
-    }
-
-    public function testAddFileReadError(): void
-    {
-        vfsStreamWrapper::setRoot($root = vfsStream::newDirectory('test'));
-
-        $root->addChild(vfsStream::newFile('test.php', 0000));
-
-        try {
-            $this->box->addFile('vfs://test/test.php');
-
-            $this->fail('Expected exception to be thrown.');
-        } catch (FileException $exception) {
-            $this->assertRegExp(
-                '/failed to open stream/',
-                $exception->getMessage()
-            );
-        }
-    }
-
-    public function testAddFromString(): void
-    {
-        $original = <<<'SOURCE'
-<?php
-
-/**
- * My class.
- */
-class @thing@
-{
-    /**
-     * My method.
-     */
-    public function @other_thing@()
-    {
-    }
-}
-SOURCE;
-
-        $expected = <<<'SOURCE'
-<?php
-
-
-
-
-class MyClass
-{
-
-
-
-public function myMethod()
-{
-}
-}
-SOURCE;
-
-        $this->box->addCompactor(new Php(new Tokenizer()));
-        $this->box->setValues(
-            [
-                '@thing@' => 'MyClass',
-                '@other_thing@' => 'myMethod',
-            ]
-        );
-
-        $this->box->addFromString('test/test.php', $original);
-
-        $this->assertSame(
-            $expected,
-            file_get_contents('phar://test.phar/test/test.php')
-        );
-    }
-
-    public function testBuildFromDirectory(): void
-    {
-        mkdir('test/sub', 0755, true);
-        touch('test/sub.txt');
-
-        file_put_contents(
-            'test/sub/test.php',
-            '<?php echo "Hello, @name@!\n";'
-        );
-
-        $this->box->setValues(['@name@' => 'world']);
-        $this->box->buildFromDirectory($this->tmp, '/\.php$/');
-
-        $this->assertFalse(isset($this->phar['test/sub.txt']));
-        $this->assertSame(
-            '<?php echo "Hello, world!\n";',
-            file_get_contents('phar://test.phar/test/sub/test.php')
-        );
-    }
-
-    public function testBuildFromIterator(): void
-    {
-        mkdir('test/sub', 0755, true);
-
-        file_put_contents(
-            'test/sub/test.php',
-            '<?php echo "Hello, @name@!\n";'
-        );
-
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator(
-                $this->tmp,
-                FilesystemIterator::KEY_AS_PATHNAME
-                | FilesystemIterator::CURRENT_AS_FILEINFO
-                | FilesystemIterator::SKIP_DOTS
-            )
-        );
-
-        $this->box->setValues(['@name@' => 'world']);
-        $this->box->buildFromIterator($iterator, $this->tmp);
-
-        $this->assertSame(
-            '<?php echo "Hello, world!\n";',
-            file_get_contents('phar://test.phar/test/sub/test.php')
-        );
-    }
-
-    public function testBuildFromIteratorMixed(): void
-    {
-        mkdir('object');
-        mkdir('string');
-
-        touch('object.php');
-        touch('string.php');
-
-        $this->box->buildFromIterator(
-            new ArrayIterator(
-                [
-                    'object' => new SplFileInfo($this->tmp.'/object'),
-                    'string' => $this->tmp.'/string',
-                    'object.php' => new SplFileInfo($this->tmp.'/object.php'),
-                    'string.php' => $this->tmp.'/string.php',
-                ]
-            ),
-            $this->tmp
-        );
-
-        /** @var $phar SplFileInfo[] */
-        $phar = $this->phar;
-
-        $this->assertTrue($phar['object']->isDir());
-        $this->assertTrue($phar['string']->isDir());
-        $this->assertTrue($phar['object.php']->isFile());
-        $this->assertTrue($phar['string.php']->isFile());
-    }
-
-    public function testBuildFromIteratorBaseRequired(): void
-    {
-        $this->expectException(\KevinGH\Box\Exception\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The $base argument is required for SplFileInfo values.');
-
-        $this->box->buildFromIterator(
-            new ArrayIterator([new SplFileInfo($this->tmp)])
-        );
-    }
-
-    public function testBuildFromIteratorOutsideBase(): void
-    {
-        try {
-            $this->box->buildFromIterator(
-                new ArrayIterator([new SplFileInfo($this->tmp)]),
-                __DIR__
-            );
-
-            $this->fail('Expected exception to be thrown.');
-        } catch (UnexpectedValueException $exception) {
-            $this->assertSame(
-                "The file \"{$this->tmp}\" is not in the base directory.",
-                $exception->getMessage()
-            );
-        }
-    }
-
-    public function testBuildFromIteratorInvalidKey(): void
-    {
-        $this->expectException(\KevinGH\Box\Exception\UnexpectedValueException::class);
-        $this->expectExceptionMessage('The key returned by the iterator (integer) is not a string.');
-
-        $this->box->buildFromIterator(new ArrayIterator(['test']));
-    }
-
-    public function testBuildFromIteratorInvalid(): void
-    {
-        $this->expectException(\KevinGH\Box\Exception\UnexpectedValueException::class);
-        $this->expectExceptionMessage('The iterator value "resource" was not expected.');
-
-        $this->box->buildFromIterator(
-            new ArrayIterator(['stream' => STDOUT])
-        );
-    }
-
-    public function testCompactContents(): void
-    {
-        $this->box->addCompactor($this->compactor);
-
-        $contents = ' my value ';
-        $expected = 'my value';
-
-        $this->compactorProphecy->supports('test.php')->willReturn(true);
-        $this->compactorProphecy->compact($contents)->willReturn($expected);
-
-        $actual = $this->box->compactContents('test.php', $contents);
-
-        $this->assertSame($expected, $actual);
-
-        $this->compactorProphecy->supports(Argument::cetera())->shouldHaveBeenCalledTimes(1);
-        $this->compactorProphecy->compact(Argument::cetera())->shouldHaveBeenCalledTimes(1);
-    }
-
-    public function testGetPhar(): void
-    {
-        $this->assertSame($this->phar, $this->box->getPhar());
-    }
-
-    public function testGetSignature(): void
-    {
-        $path = self::FIXTURES_DIR.'/example.phar';
-        $phar = new Phar($path);
-
-        $this->assertEquals(
-            $phar->getSignature(),
-            Box::getSignature($path)
-        );
-    }
-
-    public function testSetStubUsingFileNotExist(): void
-    {
-        $this->expectException(\KevinGH\Box\Exception\FileException::class);
-        $this->expectExceptionMessage('The file "/does/not/exist" does not exist or is not a file.');
-
-        $this->box->setStubUsingFile('/does/not/exist');
-    }
-
-    public function testSetStubUsingFileReadError(): void
-    {
-        $this->expectException(\KevinGH\Box\Exception\FileException::class);
-        $this->expectExceptionMessage('failed to open stream');
-
-        vfsStreamWrapper::setRoot($root = vfsStream::newDirectory('test'));
-
-        $root->addChild(vfsStream::newFile('test.php', 0000));
-
-        $this->box->setStubUsingFile('vfs://test/test.php');
-    }
-
-    public function testSetStubUsingFile(): void
-    {
-        touch($file = 'foo');
-
-        file_put_contents(
-            $file,
-            <<<'STUB'
-#!/usr/bin/env php
-<?php
-echo "@replace_me@";
-__HALT_COMPILER();
-STUB
-        );
-
-        $this->box->setValues(['@replace_me@' => 'replaced']);
-        $this->box->setStubUsingFile($file, true);
-
-        $this->assertSame(
-            'replaced',
-            exec('php test.phar')
-        );
-    }
-
-    public function testSetValuesNonScalar(): void
-    {
-        $this->expectException(\KevinGH\Box\Exception\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Non-scalar values (such as resource) are not supported.');
-
-        $this->box->setValues(['stream' => STDOUT]);
-    }
-
-    public function testSign(): void
-    {
-        if (false === extension_loaded('openssl')) {
-            $this->markTestSkipped('The "openssl" extension is not available.');
-        }
-
-        list($key, $password) = $this->getPrivateKey();
-
         $this->box->getPhar()->addFromString(
-            'test.php',
-            '<?php echo "Hello, world!\n";'
+            'main.php',
+            <<<'PHP'
+<?php
+
+echo 'Hello, world!'.PHP_EOL;
+PHP
         );
 
         $this->box->getPhar()->setStub(
             StubGenerator::create()
-                ->index('test.php')
+                ->index('main.php')
                 ->generate()
         );
-
-        $this->box->sign($key, $password);
-
-        $this->assertSame(
-            'Hello, world!',
-            exec('php test.phar')
-        );
-    }
-
-    public function testSignWriteError(): void
-    {
-        list($key, $password) = $this->getPrivateKey();
-
-        mkdir('test.phar.pubkey');
-
-        $this->box->getPhar()->addFromString('test.php', '<?php $test = 1;');
-
-        try {
-            $this->box->sign($key, $password);
-
-            $this->fail('Expected exception to be thrown.');
-        } catch (FileException $exception) {
-            $this->assertRegExp(
-                '/failed to open stream/',
-                $exception->getMessage()
-            );
-        }
-    }
-
-    public function testSignUsingFile(): void
-    {
-        if (false === extension_loaded('openssl')) {
-            $this->markTestSkipped('The "openssl" extension is not available.');
-        }
-
-        list($key, $password) = $this->getPrivateKey();
-
-        touch($file = 'foo');
-
-        file_put_contents($file, $key);
-
-        $this->box->getPhar()->addFromString(
-            'test.php',
-            '<?php echo "Hello, world!\n";'
-        );
-
-        $this->box->getPhar()->setStub(
-            StubGenerator::create()
-                ->index('test.php')
-                ->generate()
-        );
-
-        $this->box->signUsingFile($file, $password);
-
-        $this->assertSame(
-            'Hello, world!',
-            exec('php test.phar')
-        );
-    }
-
-    public function testSignUsingFileNotExist(): void
-    {
-        $this->expectException(\KevinGH\Box\Exception\FileException::class);
-        $this->expectExceptionMessage('The file "/does/not/exist" does not exist or is not a file.');
-
-        $this->box->signUsingFile('/does/not/exist');
-    }
-
-    public function testSignUsingFileReadError(): void
-    {
-        $this->expectException(\KevinGH\Box\Exception\FileException::class);
-        $this->expectExceptionMessage('failed to open stream');
-
-        $root = vfsStream::newDirectory('test');
-        $root->addChild(vfsStream::newFile('private.key', 0000));
-
-        vfsStreamWrapper::setRoot($root);
-
-        $this->box->signUsingFile('vfs://test/private.key');
     }
 }

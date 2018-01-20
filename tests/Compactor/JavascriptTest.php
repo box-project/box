@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Javascript;
 use PHPUnit\Framework\TestCase;
 
@@ -36,11 +35,21 @@ class JavascriptTest extends TestCase
     /**
      * @dataProvider provideFiles
      */
-    public function test_it_supports_javascript_files(string $file, bool $expected): void
+    public function test_it_supports_javascript_files(string $file, bool $supports): void
     {
-        $actual = $this->compactor->supports($file);
+        $contents = <<<'JS'
 
-        $this->assertSame($expected, $actual);
+
+var foo = function (  ) {
+    // with a lot of spaces
+    
+    var bar = ' ';
+}
+
+JS;
+        $actual = $this->compactor->compact($file, $contents);
+
+        $this->assertSame($supports, $contents !== $actual);
     }
 
     /**
@@ -48,7 +57,9 @@ class JavascriptTest extends TestCase
      */
     public function test_it_compacts_javascript_files(string $content, string $expected): void
     {
-        $actual = $this->compactor->compact($content);
+        $file = 'foo.js';
+
+        $actual = $this->compactor->compact($file, $content);
 
         $this->assertSame($expected, $actual);
     }

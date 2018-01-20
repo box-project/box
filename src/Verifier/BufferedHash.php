@@ -12,38 +12,29 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Signature;
+namespace KevinGH\Box\Verifier;
+
+use KevinGH\Box\Verifier;
 
 /**
  * Buffers the hash as opposed to updating incrementally.
- *
- * @author Kevin Herrera <kevin@herrera.io>
  */
-abstract class AbstractBufferedHash implements VerifyInterface
+abstract class BufferedHash implements Verifier
 {
     /**
-     * The buffered data.
-     *
-     * @var string
+     * @var string The buffered data
      */
     private $data;
 
     /**
-     * @see VerifyInterface::update
-     *
-     * @param mixed $data
+     * {@inheritdoc}
      */
-    public function update($data): void
+    final public function update(string $data): void
     {
         $this->data .= $data;
     }
 
-    /**
-     * Returns the buffered data.
-     *
-     * @return string the data
-     */
-    protected function getData()
+    final protected function getBufferedData(): string
     {
         return $this->data;
     }

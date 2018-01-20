@@ -14,10 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
+use Assert\Assertion;
+
 /**
  * An abstract compactor class that handles matching supported file by their types.
  */
-abstract class FileExtensionCompactor implements Compactor
+abstract class FileExtensionCompactor extends BaseCompactor
 {
     private $extensions;
 
@@ -26,13 +28,15 @@ abstract class FileExtensionCompactor implements Compactor
      */
     public function __construct(array $extensions)
     {
+        Assertion::allString($extensions);
+
         $this->extensions = $extensions;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supports(string $file): bool
+    protected function supports(string $file): bool
     {
         return in_array(
             pathinfo(

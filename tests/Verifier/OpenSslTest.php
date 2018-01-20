@@ -12,35 +12,30 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Signature;
+namespace KevinGH\Box\Verifier;
 
-use KevinGH\Box\Exception\OpenSslException;
+use Exception;
 use PHPUnit\Framework\Error\Warning;
 use PHPUnit\Framework\TestCase;
 use function KevinGH\Box\make_tmp_dir;
 use function KevinGH\Box\remove_dir;
 
 /**
- * @coversNothing
+ * @covers \KevinGH\Box\Verifier\OpenSsl
  */
 class OpenSslTest extends TestCase
 {
-    public const FIXTURES_DIR = __DIR__.'/../../fixtures/signature';
+    public const FIXTURES_DIR = __DIR__.'/../../fixtures/signed_phars';
 
     /**
      * @var string
      */
-    protected $cwd;
+    private $cwd;
 
     /**
      * @var string
      */
-    protected $tmp;
-
-    /**
-     * @var OpenSsl
-     */
-    private $hash;
+    private $tmp;
 
     /**
      * {@inheritdoc}
@@ -51,8 +46,6 @@ class OpenSslTest extends TestCase
         $this->tmp = make_tmp_dir('box', __CLASS__);
 
         chdir($this->tmp);
-
-        $this->hash = new OpenSsl();
     }
 
     /**
@@ -69,48 +62,47 @@ class OpenSslTest extends TestCase
         parent::tearDown();
     }
 
-    public function testVerify(): void
+    public function test_it_can_verify_files(): void
     {
         $path = self::FIXTURES_DIR.'/openssl.phar';
 
-        $this->hash->init('openssl', $path);
-        $this->hash->update(
+        $hash = new OpenSsl('openssl', $path);
+
+        $hash->update(
             file_get_contents($path, false, null, 0, filesize($path) - 76)
         );
 
         $this->assertTrue(
-            $this->hash->verify(
+            $hash->verify(
                 '54AF1D4E5459D3A77B692E46FDB9C965D1C7579BD1F2AD2BECF4973677575444FE21E104B7655BA3D088090C28DF63D14876B277C423C8BFBCDB9E3E63F9D61A'
             )
         );
     }
 
-    public function testVerifyErrorHandlingBug(): void
+    public function test_it_can_detect_incorrectly_encoded_data(): void
     {
-        Warning::$enabled = false;
+        $file = 'openssl.phar';
 
-        mkdir($dir = 'foo');
-        $path = "$dir/openssl.phar";
+        copy(self::FIXTURES_DIR.'/openssl.phar', $file);
+        touch($file.'.pubkey');
 
-        copy(self::FIXTURES_DIR.'/openssl.phar', $path);
-        touch("$path.pubkey");
+        $hash = new OpenSsl('openssl', $file);
 
-        $this->hash->init('openssl', $path);
-        $this->hash->update(
-            file_get_contents($path, false, null, 0, filesize($path) - 76)
+        $hash->update(
+            file_get_contents($file, false, null, 0, filesize($file) - 76)
         );
 
         try {
-            $this->hash->verify('it dont matter, aight');
+            $hash->verify('it doesn\'t matter, aight');
 
             $this->fail('Expected exception to be thrown.');
-        } catch (OpenSslException $exception) {
+        } catch (Warning $exception) {
             $this->assertRegExp(
                 '/cannot be coerced/',
                 $exception->getMessage()
             );
         }
 
-        Warning::$enabled = true;
+        ob_end_flush();
     }
 }

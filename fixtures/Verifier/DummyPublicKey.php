@@ -12,13 +12,20 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Exception;
+namespace KevinGH\Box\Verifier;
 
-/**
- * Used for errors related to phar signatures.
- *
- * @author Kevin Herrera <kevin@herrera.io>
- */
-class SignatureException extends Exception
+class DummyPublicKey extends PublicKey
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function verify(string $signature): bool
+    {
+        return true;
+    }
+
+    public function getExposedKey(): string
+    {
+        return $this->getKey();
+    }
 }

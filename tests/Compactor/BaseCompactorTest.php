@@ -14,22 +14,22 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use KevinGH\Box\Compactor\FileExtensionCompactor;
+use KevinGH\Box\Compactor\BaseCompactor;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \KevinGH\Box\Compactor\FileExtensionCompactor
+ * @covers \KevinGH\Box\Compactor\BaseCompactor
  */
-class FileExtensionCompactorTest extends TestCase
+class BaseCompactorTest extends TestCase
 {
-    public function test_it_does_not_support_files_with_unknown_extension(): void
+    public function test_it_returns_the_contents_unchanged_if_does_not_support_the_file(): void
     {
-        $file = '/path/to/file.js';
+        $file = '/path/to/file';
         $contents = 'file contents';
 
         $expected = $contents;
 
-        $compactor = new class([]) extends FileExtensionCompactor {
+        $compactor = new class($expected) extends BaseCompactor {
             use NotCallable;
 
             /**
@@ -39,6 +39,14 @@ class FileExtensionCompactorTest extends TestCase
             {
                 $this->__call(__METHOD__, func_get_args());
             }
+
+            /**
+             * {@inheritdoc}
+             */
+            protected function supports(string $file): bool
+            {
+                return false;
+            }
         };
 
         $actual = $compactor->compact($file, $contents);
@@ -46,20 +54,18 @@ class FileExtensionCompactorTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_supports_files_with_the_given_extensions(): void
+    public function test_it_returns_the_compacted_contents_if_it_supports_the_file(): void
     {
-        $file = '/path/to/file.php';
+        $file = '/path/to/file';
         $contents = 'file contents';
 
         $expected = 'compacted contents';
 
-        $compactor = new class($expected) extends FileExtensionCompactor {
+        $compactor = new class($expected) extends BaseCompactor {
             private $expected;
 
             public function __construct(string $expected)
             {
-                parent::__construct(['php']);
-
                 $this->expected = $expected;
             }
 
@@ -69,6 +75,14 @@ class FileExtensionCompactorTest extends TestCase
             protected function compactContent(string $contents): string
             {
                 return $this->expected;
+            }
+
+            /**
+             * {@inheritdoc}
+             */
+            protected function supports(string $file): bool
+            {
+                return true;
             }
         };
 

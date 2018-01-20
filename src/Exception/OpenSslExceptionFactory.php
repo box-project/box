@@ -14,32 +14,29 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Exception;
 
+use Exception;
+
 /**
- * Use for errors when using the OpenSSL extension.
+ * The OpenSSL exceptions API is a bit lacking/inconvenient to use so this factory mostly serves as an helper to get
+ * around it.
  *
- * @author Kevin Herrera <kevin@herrera.io>
+ * @private
  */
-class OpenSslException extends Exception
+final class OpenSslExceptionFactory
 {
-    /**
-     * Creates an exception for the last OpenSSL error.
-     *
-     * @return OpenSslException the exception
-     */
-    public static function lastError()
+    public static function createForLastError(): Exception
     {
-        return new static(openssl_error_string());
+        return new Exception(openssl_error_string());
     }
 
     /**
-     * Clears the error buffer, preventing unassociated error messages from
-     * being used by the lastError() method. This is required for lsatError()
-     * to function properly. If the clearing loop continues beyond a certain
-     * number, a warning will be triggered before the loop is broken.
+     * Clears the error buffer, preventing unassociated error messages from being used by the `lastError()` method. This
+     * is required for `lastError()` to function properly. If the clearing loop continues beyond a certain number, a
+     * warning will be triggered before the loop is broken.
      *
      * @param int $count the maximum number of rounds
      */
-    public static function reset($count = 100): void
+    public static function reset(int $count = 100): void
     {
         $counter = 0;
 

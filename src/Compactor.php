@@ -12,25 +12,21 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Compactor;
+namespace KevinGH\Box;
 
+/**
+ * A compactor is a class called to process a file contents before adding it to the PHAR. This make it possible to for
+ * example strip down the file from useless phpdoc.
+ */
 interface Compactor
 {
     /**
      * Compacts the file contents.
      *
+     * @param string $file     The file name
      * @param string $contents The file contents
      *
      * @return string The compacted contents
      */
-    public function compact(string $contents): string;
-
-    /**
-     * Checks if the file is supported.
-     *
-     * @param string $file the file name
-     *
-     * @return bool
-     */
-    public function supports(string $file): bool;
+    public function compact(string $file, string $contents): string;
 }

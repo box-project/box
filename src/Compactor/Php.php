@@ -48,7 +48,7 @@ final class Php extends FileExtensionCompactor
     /**
      * {@inheritdoc}
      */
-    public function compact(string $contents): string
+    protected function compactContent(string $contents): string
     {
         $output = '';
 

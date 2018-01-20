@@ -12,30 +12,29 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Signature;
+namespace KevinGH\Box\Verifier;
 
-use KevinGH\Box\Exception\OpenSslException;
+use KevinGH\Box\Exception\OpenSslExceptionFactory;
+use RuntimeException;
 
 /**
  * Uses OpenSSL to verify the signature.
  *
  * @author Kevin Herrera <kevin@herrera.io>
  */
-class OpenSsl extends AbstractPublicKey
+final class OpenSsl extends PublicKey
 {
     /**
-     * @see VerifyInterface::verify
-     *
-     * @param mixed $signature
+     * {@inheritdoc}
      */
-    public function verify($signature)
+    public function verify(string $signature): bool
     {
-        OpenSslException::reset();
+        OpenSslExceptionFactory::reset();
 
         ob_start();
 
         $result = openssl_verify(
-            $this->getData(),
+            $this->getBufferedData(),
             @pack('H*', $signature),
             $this->getKey()
         );
@@ -43,10 +42,10 @@ class OpenSsl extends AbstractPublicKey
         $error = trim(ob_get_clean());
 
         if (-1 === $result) {
-            throw OpenSslException::lastError();
+            throw OpenSslExceptionFactory::createForLastError();
         }
         if (!empty($error)) {
-            throw new OpenSslException($error);
+            throw new RuntimeException($error);
         }
 
         return 1 === $result;
