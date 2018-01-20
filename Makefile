@@ -61,7 +61,7 @@ e2e: bin/box.phar
 
 	php -d phar.readonly=0 box.phar build
 
-	rm box.phar bin/box.phar
+	rm box.phar
 
 
 ##

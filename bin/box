@@ -24,7 +24,7 @@ use function KevinGH\Box\register_aliases;
  */
 define('BOX_PATH', dirname(__DIR__));
 
-if (extension_loaded('phar') && ($uri = Phar::running())) {
+if ($uri = Phar::running()) {
     require "$uri/vendor/autoload.php";
 } elseif (class_exists('Extract')) {
     require __DIR__.'/../vendor/autoload.php';

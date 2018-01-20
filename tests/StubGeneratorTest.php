@@ -222,7 +222,7 @@ STUB
 
         $compactor = new Php(new Tokenizer());
 
-        $file = __DIR__.'/../src/Extract.php';
+        $file = __DIR__.'/../src/Box_Extract.php';
 
         $code = file_get_contents($file);
         $code = $compactor->compact($file, $code);
