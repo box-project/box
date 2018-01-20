@@ -25,6 +25,11 @@ $findAutoloader = function () {
         return $autoload;
     }
 
+    if (file_exists($autoload = __DIR__.'/../scoper-autoload.php')) {
+        // Is scoped (in PHAR or build directory)
+        return $autoload;
+    }
+
     if (file_exists($autoload = __DIR__.'/../vendor/autoload.php')) {
         // Is installed locally
         return $autoload;

@@ -16,6 +16,8 @@ namespace KevinGH\Box;
 
 use Assert\Assertion;
 use KevinGH\Box\Composer\ComposerOrchestrator;
+use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
+use KevinGH\Box\Compactor\PhpScoper;
 use Phar;
 use RecursiveDirectoryIterator;
 use SplFileInfo;
@@ -177,6 +179,19 @@ final class Box
                 [$file, $contents] = $fileWithContents;
 
                 dump_file($file, $contents);
+            }
+
+            // TODO: move that in ComposerOrchestrator::dumpAutoload?
+            // Dump PHP-Scoper autoloader when appropriate
+            foreach ($this->compactors as $compactor) {
+                if ($compactor instanceof PhpScoper) {
+                    $phpScoperConfig = $compactor->getConfiguration();
+
+                    $autoload = (new ScoperAutoloadGenerator($phpScoperConfig->getWhitelist()))->dump('TODOAllowNullPrefix');
+
+                    // TODO: handle custom vendor dir
+                    dump_file('vendor/scoper-autoload.php', $autoload);
+                }
             }
 
             ComposerOrchestrator::dumpAutoload();   // Dump autoload without dev dependencies

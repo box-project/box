@@ -19,8 +19,10 @@ use Closure;
 use DateTimeImmutable;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\Php as LegacyPhp;
+use Humbug\PhpScoper\Console\Configuration as PhpScoperConfiguration;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
+use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Composer\ComposerConfiguration;
 use Phar;
 use RuntimeException;
@@ -28,6 +30,7 @@ use SplFileInfo;
 use stdClass;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
+use function Humbug\PhpScoper\create_scoper;
 use function iter\chain;
 use function KevinGH\Box\FileSystem\canonicalize;
 use function KevinGH\Box\FileSystem\file_contents;
@@ -55,6 +58,7 @@ BANNER;
         'finder',
         'finder-bin',
     ];
+    private const PHP_SCOPER_CONFIG = 'scoper.inc.php';
 
     private $fileMode;
     private $alias;
@@ -203,7 +207,7 @@ BANNER;
 
         $bootstrapFile = self::retrieveBootstrapFile($raw, $basePath);
 
-        $compactors = self::retrieveCompactors($raw);
+        $compactors = self::retrieveCompactors($raw, $basePath);
         $compressionAlgorithm = self::retrieveCompressionAlgorithm($raw);
 
         $fileMode = self::retrieveFileMode($raw);
@@ -863,29 +867,34 @@ BANNER;
     /**
      * @return Compactor[]
      */
-    private static function retrieveCompactors(stdClass $raw): array
+    private static function retrieveCompactors(stdClass $raw, string $basePath): array
     {
         // TODO: only accept arrays when set unlike the doc says (it allows a string).
         if (false === isset($raw->compactors)) {
             return [];
         }
 
-        $compactors = [];
+        $compactorClasses = array_unique((array) $raw->compactors);
 
-        foreach ((array) $raw->compactors as $class) {
-            Assertion::classExists($class, 'The compactor class "%s" does not exist.');
-            Assertion::implementsInterface($class, Compactor::class, 'The class "%s" is not a compactor class.');
+        return array_map(
+            function (string $class) use ($raw, $basePath): Compactor {
+                Assertion::classExists($class, 'The compactor class "%s" does not exist.');
+                Assertion::implementsInterface($class, Compactor::class, 'The class "%s" is not a compactor class.');
 
-            if (Php::class === $class || LegacyPhp::class === $class) {
-                $compactor = self::createPhpCompactor($raw);
-            } else {
-                $compactor = new $class();
-            }
+                if (Php::class === $class || LegacyPhp::class === $class) {
+                    return self::createPhpCompactor($raw);
+                }
 
-            $compactors[] = $compactor;
-        }
+                if (PhpScoper::class === $class) {
+                    $phpScoperConfig = self::retrievePhpScoperConfig($raw, $basePath);
 
-        return $compactors;
+                    return new PhpScoper(create_scoper(), $phpScoperConfig);
+                }
+
+                return new $class();
+            },
+            $compactorClasses
+        );
     }
 
     private static function retrieveCompressionAlgorithm(stdClass $raw): ?int
@@ -1366,6 +1375,29 @@ BANNER;
         }
 
         return false;
+    }
+
+    private static function retrievePhpScoperConfig(stdClass $raw, string $basePath): PhpScoperConfiguration
+    {
+        if (!isset($raw->{'php-scoper'})) {
+            $configFilePath = $basePath.DIRECTORY_SEPARATOR.self::PHP_SCOPER_CONFIG;
+
+            return file_exists($configFilePath)
+                ? PhpScoperConfiguration::load($configFilePath)
+                : PhpScoperConfiguration::load()
+             ;
+        }
+
+        $configFile = $raw->phpScoper;
+
+        Assertion::string($configFile);
+
+        $configFilePath = make_path_absolute($configFile, $basePath);
+
+        Assertion::file($configFilePath);
+        Assertion::readable($configFilePath);
+
+        return PhpScoperConfiguration::load($configFilePath);
     }
 
     /**
