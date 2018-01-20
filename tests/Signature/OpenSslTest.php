@@ -102,5 +102,7 @@ class OpenSslTest extends TestCase
                 $exception->getMessage()
             );
         }
+
+        ob_end_flush();
     }
 }
