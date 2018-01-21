@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
-use function dirname;
 use KevinGH\Box\Exception\FileExceptionFactory;
 use KevinGH\Box\Exception\OpenSslExceptionFactory;
 use Phar;

@@ -14,14 +14,17 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Command;
 
+use DirectoryIterator;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
+use PharFileInfo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\PhpExecutableFinder;
+use Traversable;
 
 /**
  * @covers \KevinGH\Box\Command\Build
@@ -40,7 +43,7 @@ class BuildTest extends CommandTestCase
             'box.json',
             json_encode(
                 [
-                    'alias' => 'test.phar',
+                    'alias' => 'alias-test.phar',
                     'banner' => 'custom banner',
                     'bootstrap' => 'bootstrap.php',
                     'chmod' => '0755',
@@ -103,28 +106,47 @@ OUTPUT;
             'Expected PHAR to be executable'
         );
 
-        // Check PHAR content
-        $pharContents = file_get_contents('test.phar');
-        $shebang = preg_quote($shebang, '/');
-
-        $this->assertSame(
-            1,
-            preg_match(
-                "/$shebang/",
-                $pharContents
-            )
-        );
-        $this->assertSame(
-            1,
-            preg_match(
-                '/custom banner/',
-                $pharContents
-            )
-        );
-
         $phar = new Phar('test.phar');
 
-        $this->assertSame(['rand' => $rand], $phar->getMetadata());
+        // Check PHAR content
+        $actualStub = $this->normalizeDisplay($phar->getStub());
+        $expectedStub = <<<PHP
+$shebang
+<?php
+/**
+ * custom banner
+ */
+if (class_exists('Phar')) {
+Phar::mapPhar('alias-test.phar');
+require 'phar://' . __FILE__ . '/other/run.php';
+}
+__HALT_COMPILER(); ?>
+
+PHP;
+
+        $this->assertSame($expectedStub, $actualStub);
+
+        $this->assertSame(
+            ['rand' => $rand],
+            $phar->getMetadata(),
+            'Expected PHAR metadata to be set'
+        );
+
+        $expectedFiles = [
+            '/other/',
+            '/other/one/',
+            '/other/one/test.php',
+            '/other/run.php',
+            '/other/test.php',
+            '/other/two/',
+            '/other/two/test.png',
+            '/sub/',
+            '/sub/test.php',
+        ];
+
+        $actualFiles = $this->retrievePharFiles($phar);
+
+        $this->assertSame($expectedFiles, $actualFiles);
     }
 
     public function test_it_can_build_a_PHAR_file_in_verbose_mode(): void
@@ -401,6 +423,129 @@ OUTPUT;
         $phar = new Phar('test.phar');
 
         $this->assertSame(['rand' => $rand], $phar->getMetadata());
+    }
+
+    public function test_it_can_build_a_PHAR_file_using_the_PHAR_default_stub(): void
+    {
+        (new Filesystem())->mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+
+        $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
+
+        file_put_contents(
+            'box.json',
+            json_encode(
+                [
+                    'alias' => 'alias-test.phar',
+                    'banner' => 'custom banner',
+                    'bootstrap' => 'bootstrap.php',
+                    'chmod' => '0755',
+                    'compactors' => [Php::class],
+                    'directories' => 'a',
+                    'files' => 'test.php',
+                    'finder' => [['in' => 'one']],
+                    'finder-bin' => [['in' => 'two']],
+                    'key' => 'private.key',
+                    'key-pass' => true,
+                    'main' => 'run.php',
+                    'map' => [
+                        ['a/deep/test/directory' => 'sub'],
+                        ['' => 'other/'],
+                    ],
+                    'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
+                    'output' => 'test.phar',
+                    'shebang' => $shebang,
+                    'stub' => false,
+                ]
+            )
+        );
+
+        $commandTester = $this->getCommandTester();
+
+        $commandTester->setInputs(['test']);
+        $commandTester->execute(
+            ['command' => 'build'],
+            ['interactive' => true]
+        );
+
+        $this->assertSame(
+            'Hello, world!',
+            exec('php test.phar'),
+            'Expected PHAR to be executable'
+        );
+    }
+
+    public function test_it_can_build_a_PHAR_file_using_a_custom_stub(): void
+    {
+        (new Filesystem())->mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+
+        $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
+
+        file_put_contents(
+            'custom_stub',
+            $stub = <<<'PHP'
+#!/usr/bin/php
+<?php
+
+//
+// This is a custom stub: shebang & custom banner are not applied
+//
+
+if (class_exists('Phar')) {
+    Phar::mapPhar('alias-test.phar');
+    require 'phar://' . __FILE__ . '/other/run.php';
+}
+__HALT_COMPILER(); ?>
+
+PHP
+        );
+
+        file_put_contents(
+            'box.json',
+            json_encode(
+                [
+                    'alias' => 'alias-test.phar',
+                    'banner' => 'custom banner',
+                    'bootstrap' => 'bootstrap.php',
+                    'chmod' => '0755',
+                    'compactors' => [Php::class],
+                    'directories' => 'a',
+                    'files' => 'test.php',
+                    'finder' => [['in' => 'one']],
+                    'finder-bin' => [['in' => 'two']],
+                    'key' => 'private.key',
+                    'key-pass' => true,
+                    'main' => 'run.php',
+                    'map' => [
+                        ['a/deep/test/directory' => 'sub'],
+                        ['' => 'other/'],
+                    ],
+                    'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
+                    'output' => 'test.phar',
+                    'shebang' => $shebang,
+                    'stub' => 'custom_stub',
+                ]
+            )
+        );
+
+        $commandTester = $this->getCommandTester();
+
+        $commandTester->setInputs(['test']);
+        $commandTester->execute(
+            ['command' => 'build'],
+            ['interactive' => true]
+        );
+
+        $this->assertSame(
+            'Hello, world!',
+            exec('php test.phar'),
+            'Expected PHAR to be executable'
+        );
+
+        $phar = new Phar('test.phar');
+
+        $actualStub = $this->normalizeDisplay($phar->getStub());
+
+        $this->assertSame($stub, $actualStub);
     }
 
     public function test_it_cannot_build_a_PHAR_using_unreadable_files(): void
@@ -818,5 +963,41 @@ OUTPUT;
         );
 
         return implode("\n", $lines);
+    }
+
+    private function retrievePharFiles(Phar $phar, Traversable $traversable = null): array
+    {
+        $root = 'phar://'.str_replace('\\', '/', realpath($phar->getPath())).'/';
+
+        if (null === $traversable) {
+            $traversable = $phar;
+        }
+
+        $paths = [];
+
+        foreach ($traversable as $fileInfo) {
+            /** @var PharFileInfo $fileInfo */
+            $fileInfo = $phar[str_replace($root, '', $fileInfo->getPathname())];
+
+            $path = substr($fileInfo->getPathname(), strlen($root) - 1);
+
+            if ($fileInfo->isDir()) {
+                $path .= '/';
+
+                $paths = array_merge(
+                    $paths,
+                    $this->retrievePharFiles(
+                        $phar,
+                        new DirectoryIterator($fileInfo->getPathname())
+                    )
+                );
+            }
+
+            $paths[] = $path;
+        }
+
+        sort($paths);
+
+        return array_unique($paths);
     }
 }
