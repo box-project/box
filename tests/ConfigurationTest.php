@@ -132,7 +132,7 @@ class ConfigurationTest extends TestCase
         $fullPath = $this->config->getBasePath().DIRECTORY_SEPARATOR.'test';
 
         $expected = 'test';
-        $actual = $this->config->retrieveRelativeBasePath($fullPath);
+        $actual = $this->config->getBasePathRetriever()($fullPath);
 
         $this->assertSame($expected, $actual);
     }

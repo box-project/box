@@ -37,8 +37,7 @@ final class Configuration
 
     private $fileMode;
     private $alias;
-    private $basePath;
-    private $basePathRegex;
+    private $basePathRetriever;
     private $binaryDirectoriesIterator;
     private $binaryFilesIterator;
     private $binaryIterators;
@@ -74,8 +73,7 @@ final class Configuration
 
     /**
      * @param string                     $alias                     TODO: description
-     * @param string                     $basePath                  Path used as the base for all the relative paths used
-     * @param string                     $basePathRegex             Base path escaped to be able to easily extract the relative path from a file path
+     * @param RetrieveRelativeBasePath   $basePathRetriever   Utility to private the base path used and be able to retrieve a path relative to it (the base path)
      * @param iterable|SplFileInfo[]     $binaryDirectoriesIterator List of directories containing images or other binary data
      * @param iterable|SplFileInfo[]     $binaryFilesIterator       List of files containing images or other binary data
      * @param iterable[]|SplFileInfo[][] $binaryIterators           List of file iterators returning binary files
@@ -112,8 +110,7 @@ final class Configuration
      */
     private function __construct(
         string $alias,
-        string $basePath,
-        string $basePathRegex,
+        RetrieveRelativeBasePath $basePathRetriever,
         ?iterable $binaryDirectoriesIterator,
         ?iterable $binaryFilesIterator,
         array $binaryIterators,
@@ -158,8 +155,7 @@ final class Configuration
         );
 
         $this->alias = $alias;
-        $this->basePath = $basePath;
-        $this->basePathRegex = $basePathRegex;
+        $this->basePathRetriever = $basePathRetriever;
         $this->binaryDirectoriesIterator = $binaryDirectoriesIterator;
         $this->binaryFilesIterator = $binaryFilesIterator;
         $this->binaryIterators = $binaryIterators;
@@ -200,7 +196,7 @@ final class Configuration
         $alias = $raw->alias ?? self::DEFAULT_ALIAS;
 
         $basePath = self::retrieveBasePath($file, $raw);
-        $basePathRegex = '/'.preg_quote($basePath.DIRECTORY_SEPARATOR, '/').'/';
+        $basePathRetriever = new RetrieveRelativeBasePath($basePath);
 
         $blacklist = self::retrieveBlacklist($raw);
         $blacklistFilter = self::retrieveBlacklistFilter($basePath, $blacklist);
@@ -265,8 +261,7 @@ final class Configuration
 
         return new self(
             $alias,
-            $basePath,
-            $basePathRegex,
+            $basePathRetriever,
             $binaryDirectoriesIterator,
             $binaryFilesIterator,
             $binaryIterators,
@@ -303,13 +298,9 @@ final class Configuration
         );
     }
 
-    public function retrieveRelativeBasePath(string $path): string
+    public function getBasePathRetriever(): RetrieveRelativeBasePath
     {
-        return preg_replace(
-            $this->basePathRegex,
-            '',
-            $path
-        );
+        return $this->basePathRetriever;
     }
 
     public function getAlias(): string
@@ -319,7 +310,7 @@ final class Configuration
 
     public function getBasePath(): string
     {
-        return $this->basePath;
+        return $this->basePathRetriever->getBasePath();
     }
 
     /**

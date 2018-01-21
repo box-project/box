@@ -18,6 +18,7 @@ use KevinGH\Box\Box;
 use KevinGH\Box\Compactor;
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Logger\BuildLogger;
+use KevinGH\Box\RetrieveRelativeBasePath;
 use KevinGH\Box\StubGenerator;
 use RuntimeException;
 use SplFileInfo;
@@ -617,7 +618,7 @@ HELP
             );
 
             foreach ($iterators as $iterator) {
-                $this->addFilesToBox($config, $box, $iterator, null, false, $logger);
+                $this->addFilesToBox($config, $box, $iterator, null, false, $config->getBasePathRetriever(), $logger);
             }
         }
 
@@ -629,7 +630,7 @@ HELP
             );
 
             foreach ($iterators as $iterator) {
-                $this->addFilesToBox($config, $box, $iterator, null, true, $logger);
+                $this->addFilesToBox($config, $box, $iterator, null, true, $config->getBasePathRetriever(), $logger);
             }
         }
 
@@ -639,6 +640,7 @@ HELP
             $config->getDirectoriesIterator(),
             'Adding directories',
             false,
+            $config->getBasePathRetriever(),
             $logger
         );
 
@@ -648,6 +650,7 @@ HELP
             $config->getBinaryDirectoriesIterator(),
             'Adding binary directories',
             true,
+            $config->getBasePathRetriever(),
             $logger
         );
 
@@ -657,6 +660,7 @@ HELP
             $config->getFilesIterator(),
             'Adding files',
             false,
+            $config->getBasePathRetriever(),
             $logger
         );
 
@@ -666,6 +670,7 @@ HELP
             $config->getBinaryFilesIterator(),
             'Adding binary files',
             true,
+            $config->getBasePathRetriever(),
             $logger
         );
     }
@@ -861,12 +866,13 @@ HELP
     /**
      * Adds files using an iterator.
      *
-     * @param Configuration          $config
-     * @param Box                    $box
+     * @param Configuration $config
+     * @param Box $box
      * @param iterable|SplFileInfo[] $iterator the iterator
-     * @param string                 $message  the message to announce
-     * @param bool                   $binary   Should the adding be binary-safe?
-     * @param BuildLogger            $logger
+     * @param string $message the message to announce
+     * @param bool $binary Should the adding be binary-safe?
+     * @param RetrieveRelativeBasePath $retrieveRelativeBasePath
+     * @param BuildLogger $logger
      */
     private function addFilesToBox(
         Configuration $config,
@@ -874,6 +880,7 @@ HELP
         ?iterable $iterator,
         ?string $message,
         bool $binary,
+        RetrieveRelativeBasePath $retrieveRelativeBasePath,
         BuildLogger $logger
     ): void {
         static $count = 0;
@@ -897,7 +904,7 @@ HELP
                 gc_collect_cycles();
             }
 
-            $relativePath = $config->retrieveRelativeBasePath($file->getPathname());
+            $relativePath = $retrieveRelativeBasePath($file->getPathname());
 
             $mapped = $mapper($relativePath);
 
