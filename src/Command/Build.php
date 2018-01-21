@@ -734,6 +734,10 @@ HELP
 
             $box->registerStub($stub);
         } else {
+            if (null !== $main) {
+                $box->getPhar()->setDefaultStub($main, $main);
+            }
+
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
                 'Using default stub',
