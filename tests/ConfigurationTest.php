@@ -534,16 +534,16 @@ class ConfigurationTest extends TestCase
             ]
         );
 
-        $mapper = $this->config->getMapper();
+        $mapFile = $this->config->getFileMapper();
 
         $this->assertSame(
             'a/sub/path/file.php',
-            $mapper('first/test/path/sub/path/file.php')
+            $mapFile('first/test/path/sub/path/file.php')
         );
 
         $this->assertSame(
             'b/second/test/path/sub/path/file.php',
-            $mapper('second/test/path/sub/path/file.php')
+            $mapFile('second/test/path/sub/path/file.php')
         );
     }
 

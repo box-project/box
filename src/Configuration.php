@@ -50,7 +50,7 @@ final class Configuration
     private $mainScriptPath;
     private $mainScriptContent;
     private $map;
-    private $mapper;
+    private $fileMapper;
     private $metadata;
     private $mimetypeMapping;
     private $mungVariables;
@@ -86,8 +86,7 @@ final class Configuration
      * @param null|int                   $fileMode                  File mode in octal form
      * @param null|string                $mainScriptPath            The main script file path
      * @param null|string                $mainScriptContent         The processed content of the main script file
-     * @param string[]                   $map                       The internal file path mapping
-     * @param Closure                    $mapper                    Callable for the configured map
+     * @param MapFile                    $fileMapper                Utility to map the files from outside and inside the PHAR
      * @param mixed                      $metadata                  The PHAR Metadata
      * @param array                      $mimetypeMapping           The file extension MIME type mapping
      * @param array                      $mungVariables             The list of server variables to modify for execution
@@ -123,8 +122,7 @@ final class Configuration
         ?int $fileMode,
         ?string $mainScriptPath,
         ?string $mainScriptContent,
-        array $map,
-        Closure $mapper,
+        MapFile $fileMapper,
         $metadata,
         array $mimetypeMapping,
         array $mungVariables,
@@ -168,8 +166,7 @@ final class Configuration
         $this->fileMode = $fileMode;
         $this->mainScriptPath = $mainScriptPath;
         $this->mainScriptContent = $mainScriptContent;
-        $this->map = $map;
-        $this->mapper = $mapper;
+        $this->fileMapper = $fileMapper;
         $this->metadata = $metadata;
         $this->mimetypeMapping = $mimetypeMapping;
         $this->mungVariables = $mungVariables;
@@ -228,7 +225,7 @@ final class Configuration
         $mainScriptContent = self::retrieveMainScriptContents($mainScriptPath, $basePath);
 
         $map = self::retrieveMap($raw);
-        $mapper = self::retrieveMapper($map);
+        $fileMapper = new MapFile($map);
 
         $metadata = self::retrieveMetadata($raw);
 
@@ -274,8 +271,7 @@ final class Configuration
             $fileMode,
             $mainScriptPath,
             $mainScriptContent,
-            $map,
-            $mapper,
+            $fileMapper,
             $metadata,
             $mimeTypeMapping,
             $mungVariables,
@@ -420,12 +416,12 @@ final class Configuration
      */
     public function getMap(): array
     {
-        return $this->map;
+        return $this->fileMapper->getMap();
     }
 
-    public function getMapper(): Closure
+    public function getFileMapper(): MapFile
     {
-        return $this->mapper;
+        return $this->fileMapper;
     }
 
     /**
@@ -971,7 +967,7 @@ final class Configuration
     }
 
     /**
-     * @return string[]
+     * @return string[][]
      */
     private static function retrieveMap(stdClass $raw): array
     {
@@ -985,7 +981,7 @@ final class Configuration
             $processed = [];
 
             foreach ($item as $match => $replace) {
-                $processed[canonicalize($match)] = canonicalize($replace);
+                $processed[canonicalize(trim($match))] = canonicalize(trim($replace));
             }
 
             if (isset($processed['_empty_'])) {
@@ -998,29 +994,6 @@ final class Configuration
         }
 
         return $map;
-    }
-
-    private static function retrieveMapper(array $map): Closure
-    {
-        return function (string $path) use ($map): ?string {
-            foreach ($map as $item) {
-                foreach ($item as $match => $replace) {
-                    if (empty($match)) {
-                        return $replace.$path;
-                    }
-
-                    if (0 === strpos($path, $match)) {
-                        return preg_replace(
-                            '/^'.preg_quote($match, '/').'/',
-                            $replace,
-                            $path
-                        );
-                    }
-                }
-            }
-
-            return null;
-        };
     }
 
     /**

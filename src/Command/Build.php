@@ -692,8 +692,8 @@ HELP
             OutputInterface::VERBOSITY_VERBOSE
         );
 
-        $mapper = $config->getMapper();
-        $pharPath = $mapper($main);
+        $mapFile = $config->getFileMapper();
+        $pharPath = $mapFile($main);
 
         if (null !== $pharPath) {
             $logger->log(
@@ -894,7 +894,7 @@ HELP
         }
 
         $box = $binary ? $box->getPhar() : $box;
-        $mapper = $config->getMapper();
+        $mapFile = $config->getFileMapper();
 
         foreach ($iterator as $file) {
             // @var $file SplFileInfo
@@ -906,7 +906,7 @@ HELP
 
             $relativePath = $retrieveRelativeBasePath($file->getPathname());
 
-            $mapped = $mapper($relativePath);
+            $mapped = $mapFile($relativePath);
 
             if (null !== $mapped) {
                 $relativePath = $mapped;
