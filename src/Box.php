@@ -37,7 +37,7 @@ final class Box
     private $file;
 
     /**
-     * @var int The compression algorithm used
+     * @var int|null The compression algorithm used
      */
     private $compressionAlgorithm;
 
@@ -124,6 +124,10 @@ final class Box
     public function registerCompressionAlgorithm(?int $algorithm): void
     {
         Assertion::nullOrInArray($algorithm, get_phar_compression_algorithms());
+
+        if (Phar::NONE === $algorithm) {
+            $algorithm = null;
+        }
 
         $this->compressionAlgorithm = $algorithm;
     }
