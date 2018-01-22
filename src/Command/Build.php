@@ -866,13 +866,13 @@ HELP
     /**
      * Adds files using an iterator.
      *
-     * @param Configuration $config
-     * @param Box $box
-     * @param iterable|SplFileInfo[] $iterator the iterator
-     * @param string $message the message to announce
-     * @param bool $binary Should the adding be binary-safe?
+     * @param Configuration            $config
+     * @param Box                      $box
+     * @param iterable|SplFileInfo[]   $iterator                 the iterator
+     * @param string                   $message                  the message to announce
+     * @param bool                     $binary                   Should the adding be binary-safe?
      * @param RetrieveRelativeBasePath $retrieveRelativeBasePath
-     * @param BuildLogger $logger
+     * @param BuildLogger              $logger
      */
     private function addFilesToBox(
         Configuration $config,

@@ -73,7 +73,7 @@ final class Configuration
 
     /**
      * @param string                     $alias                     TODO: description
-     * @param RetrieveRelativeBasePath   $basePathRetriever   Utility to private the base path used and be able to retrieve a path relative to it (the base path)
+     * @param RetrieveRelativeBasePath   $basePathRetriever         Utility to private the base path used and be able to retrieve a path relative to it (the base path)
      * @param iterable|SplFileInfo[]     $binaryDirectoriesIterator List of directories containing images or other binary data
      * @param iterable|SplFileInfo[]     $binaryFilesIterator       List of files containing images or other binary data
      * @param iterable[]|SplFileInfo[][] $binaryIterators           List of file iterators returning binary files
