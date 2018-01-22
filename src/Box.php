@@ -37,6 +37,11 @@ final class Box
     private $file;
 
     /**
+     * @var int|null The compression algorithm used
+     */
+    private $compressionAlgorithm;
+
+    /**
      * @var Phar The PHAR instance
      */
     private $phar;
@@ -116,6 +121,17 @@ final class Box
         $this->phar->setStub($contents);
     }
 
+    public function registerCompressionAlgorithm(?int $algorithm): void
+    {
+        Assertion::nullOrInArray($algorithm, get_phar_compression_algorithms());
+
+        if (Phar::NONE === $algorithm) {
+            $algorithm = null;
+        }
+
+        $this->compressionAlgorithm = $algorithm;
+    }
+
     /**
      * Adds the a file to the PHAR. The contents will first be compacted and have its placeholders
      * replaced.
@@ -153,6 +169,10 @@ final class Box
                 $this->replacePlaceholders($contents)
             )
         );
+
+        if (null !== $this->compressionAlgorithm) {
+            $this->phar[$local]->compress($this->compressionAlgorithm);
+        }
     }
 
     public function getPhar(): Phar
