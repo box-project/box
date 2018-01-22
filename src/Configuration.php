@@ -37,8 +37,7 @@ final class Configuration
 
     private $fileMode;
     private $alias;
-    private $basePath;
-    private $basePathRegex;
+    private $basePathRetriever;
     private $binaryDirectoriesIterator;
     private $binaryFilesIterator;
     private $binaryIterators;
@@ -51,7 +50,7 @@ final class Configuration
     private $mainScriptPath;
     private $mainScriptContent;
     private $map;
-    private $mapper;
+    private $fileMapper;
     private $metadata;
     private $mimetypeMapping;
     private $mungVariables;
@@ -74,8 +73,7 @@ final class Configuration
 
     /**
      * @param string                     $alias                     TODO: description
-     * @param string                     $basePath                  Path used as the base for all the relative paths used
-     * @param string                     $basePathRegex             Base path escaped to be able to easily extract the relative path from a file path
+     * @param RetrieveRelativeBasePath   $basePathRetriever         Utility to private the base path used and be able to retrieve a path relative to it (the base path)
      * @param iterable|SplFileInfo[]     $binaryDirectoriesIterator List of directories containing images or other binary data
      * @param iterable|SplFileInfo[]     $binaryFilesIterator       List of files containing images or other binary data
      * @param iterable[]|SplFileInfo[][] $binaryIterators           List of file iterators returning binary files
@@ -88,8 +86,7 @@ final class Configuration
      * @param null|int                   $fileMode                  File mode in octal form
      * @param null|string                $mainScriptPath            The main script file path
      * @param null|string                $mainScriptContent         The processed content of the main script file
-     * @param string[]                   $map                       The internal file path mapping
-     * @param Closure                    $mapper                    Callable for the configured map
+     * @param MapFile                    $fileMapper                Utility to map the files from outside and inside the PHAR
      * @param mixed                      $metadata                  The PHAR Metadata
      * @param array                      $mimetypeMapping           The file extension MIME type mapping
      * @param array                      $mungVariables             The list of server variables to modify for execution
@@ -112,8 +109,7 @@ final class Configuration
      */
     private function __construct(
         string $alias,
-        string $basePath,
-        string $basePathRegex,
+        RetrieveRelativeBasePath $basePathRetriever,
         ?iterable $binaryDirectoriesIterator,
         ?iterable $binaryFilesIterator,
         array $binaryIterators,
@@ -126,8 +122,7 @@ final class Configuration
         ?int $fileMode,
         ?string $mainScriptPath,
         ?string $mainScriptContent,
-        array $map,
-        Closure $mapper,
+        MapFile $fileMapper,
         $metadata,
         array $mimetypeMapping,
         array $mungVariables,
@@ -158,8 +153,7 @@ final class Configuration
         );
 
         $this->alias = $alias;
-        $this->basePath = $basePath;
-        $this->basePathRegex = $basePathRegex;
+        $this->basePathRetriever = $basePathRetriever;
         $this->binaryDirectoriesIterator = $binaryDirectoriesIterator;
         $this->binaryFilesIterator = $binaryFilesIterator;
         $this->binaryIterators = $binaryIterators;
@@ -172,8 +166,7 @@ final class Configuration
         $this->fileMode = $fileMode;
         $this->mainScriptPath = $mainScriptPath;
         $this->mainScriptContent = $mainScriptContent;
-        $this->map = $map;
-        $this->mapper = $mapper;
+        $this->fileMapper = $fileMapper;
         $this->metadata = $metadata;
         $this->mimetypeMapping = $mimetypeMapping;
         $this->mungVariables = $mungVariables;
@@ -200,7 +193,7 @@ final class Configuration
         $alias = $raw->alias ?? self::DEFAULT_ALIAS;
 
         $basePath = self::retrieveBasePath($file, $raw);
-        $basePathRegex = '/'.preg_quote($basePath.DIRECTORY_SEPARATOR, '/').'/';
+        $basePathRetriever = new RetrieveRelativeBasePath($basePath);
 
         $blacklist = self::retrieveBlacklist($raw);
         $blacklistFilter = self::retrieveBlacklistFilter($basePath, $blacklist);
@@ -232,7 +225,7 @@ final class Configuration
         $mainScriptContent = self::retrieveMainScriptContents($mainScriptPath, $basePath);
 
         $map = self::retrieveMap($raw);
-        $mapper = self::retrieveMapper($map);
+        $fileMapper = new MapFile($map);
 
         $metadata = self::retrieveMetadata($raw);
 
@@ -265,8 +258,7 @@ final class Configuration
 
         return new self(
             $alias,
-            $basePath,
-            $basePathRegex,
+            $basePathRetriever,
             $binaryDirectoriesIterator,
             $binaryFilesIterator,
             $binaryIterators,
@@ -279,8 +271,7 @@ final class Configuration
             $fileMode,
             $mainScriptPath,
             $mainScriptContent,
-            $map,
-            $mapper,
+            $fileMapper,
             $metadata,
             $mimeTypeMapping,
             $mungVariables,
@@ -303,13 +294,9 @@ final class Configuration
         );
     }
 
-    public function retrieveRelativeBasePath(string $path): string
+    public function getBasePathRetriever(): RetrieveRelativeBasePath
     {
-        return preg_replace(
-            $this->basePathRegex,
-            '',
-            $path
-        );
+        return $this->basePathRetriever;
     }
 
     public function getAlias(): string
@@ -319,7 +306,7 @@ final class Configuration
 
     public function getBasePath(): string
     {
-        return $this->basePath;
+        return $this->basePathRetriever->getBasePath();
     }
 
     /**
@@ -429,12 +416,12 @@ final class Configuration
      */
     public function getMap(): array
     {
-        return $this->map;
+        return $this->fileMapper->getMap();
     }
 
-    public function getMapper(): Closure
+    public function getFileMapper(): MapFile
     {
-        return $this->mapper;
+        return $this->fileMapper;
     }
 
     /**
@@ -980,7 +967,7 @@ final class Configuration
     }
 
     /**
-     * @return string[]
+     * @return string[][]
      */
     private static function retrieveMap(stdClass $raw): array
     {
@@ -994,7 +981,7 @@ final class Configuration
             $processed = [];
 
             foreach ($item as $match => $replace) {
-                $processed[canonicalize($match)] = canonicalize($replace);
+                $processed[canonicalize(trim($match))] = canonicalize(trim($replace));
             }
 
             if (isset($processed['_empty_'])) {
@@ -1007,29 +994,6 @@ final class Configuration
         }
 
         return $map;
-    }
-
-    private static function retrieveMapper(array $map): Closure
-    {
-        return function (string $path) use ($map): ?string {
-            foreach ($map as $item) {
-                foreach ($item as $match => $replace) {
-                    if (empty($match)) {
-                        return $replace.$path;
-                    }
-
-                    if (0 === strpos($path, $match)) {
-                        return preg_replace(
-                            '/^'.preg_quote($match, '/').'/',
-                            $replace,
-                            $path
-                        );
-                    }
-                }
-            }
-
-            return null;
-        };
     }
 
     /**

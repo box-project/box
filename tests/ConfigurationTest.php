@@ -132,7 +132,7 @@ class ConfigurationTest extends TestCase
         $fullPath = $this->config->getBasePath().DIRECTORY_SEPARATOR.'test';
 
         $expected = 'test';
-        $actual = $this->config->retrieveRelativeBasePath($fullPath);
+        $actual = $this->config->getBasePathRetriever()($fullPath);
 
         $this->assertSame($expected, $actual);
     }
@@ -534,16 +534,16 @@ class ConfigurationTest extends TestCase
             ]
         );
 
-        $mapper = $this->config->getMapper();
+        $mapFile = $this->config->getFileMapper();
 
         $this->assertSame(
             'a/sub/path/file.php',
-            $mapper('first/test/path/sub/path/file.php')
+            $mapFile('first/test/path/sub/path/file.php')
         );
 
         $this->assertSame(
             'b/second/test/path/sub/path/file.php',
-            $mapper('second/test/path/sub/path/file.php')
+            $mapFile('second/test/path/sub/path/file.php')
         );
     }
 
