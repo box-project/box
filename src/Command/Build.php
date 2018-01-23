@@ -395,11 +395,10 @@ used by the PHAR class will be used.
 The <info>web</info> <comment>(boolean)</comment> setting is used when generating a new stub. If <comment>true</comment> is
 provided, <comment>Phar::webPhar()</comment> will be called in the stub.
 HELP;
-// TODO: do not mention when an option is optional but add a red asterix with a foot note for the mandatory
-// fields.
-// TODO add a test for the doc, if only for the alignment it's already way better than checking manually
-// in the consoleg
-
+    // TODO: do not mention when an option is optional but add a red asterix with a foot note for the mandatory
+    // fields.
+    // TODO add a test for the doc, if only for the alignment it's already way better than checking manually
+    // in the consoleg
 
     /**
      * {@inheritdoc}
