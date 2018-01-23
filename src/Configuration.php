@@ -32,6 +32,7 @@ use Symfony\Component\Process\Process;
 final class Configuration
 {
     private const DEFAULT_ALIAS = 'default.phar';
+    private const DEFAULT_MAIN = 'index.php';   // See Phar::setDefaultStub()
     private const DEFAULT_DATETIME_FORMAT = 'Y-m-d H:i:s';
     private const DEFAULT_REPLACEMENT_SIGIL = '@';
 
@@ -607,6 +608,7 @@ final class Configuration
      */
     private static function retrieveBlacklist(stdClass $raw): array
     {
+        // TODO: only allow arrays if is set unlike the doc which says it can be a string
         if (isset($raw->blacklist)) {
             $blacklist = (array) $raw->blacklist;
 
@@ -673,6 +675,8 @@ final class Configuration
      */
     private static function retrieveDirectories(stdClass $raw, string $basePath): array
     {
+        // TODO: do not accept strings unlike the doc says and document that BC break
+        // Need to do the same for bin, directories-bin, files, ~~directories~~
         if (isset($raw->directories)) {
             $directories = (array) $raw->directories;
 
@@ -765,6 +769,8 @@ final class Configuration
      */
     private static function retrieveFilesIterators(stdClass $raw, string $basePath, Closure $blacklistFilter): array
     {
+        // TODO: double check the way all files are included to make sure none is missing if one element is
+        // misconfigured
         if (isset($raw->finder)) {
             return self::processFinders($raw->finder, $basePath, $blacklistFilter);
         }
@@ -781,6 +787,8 @@ final class Configuration
      */
     private static function processFinders(array $findersConfig, string $basePath, Closure $blacklistFilter): array
     {
+        // TODO: add an example in the doc about the finder and a mention in `finder-bin` to look at finder
+
         $processFinderConfig = function ($methods) use ($basePath, $blacklistFilter): Finder {
             $finder = Finder::create()
                 ->files()
@@ -826,6 +834,8 @@ final class Configuration
 
     private static function retrieveBootstrapFile(stdClass $raw, string $basePath): ?string
     {
+        // TODO: deprecate its usage & document this BC break. Compactors will not be configurable
+        // through that extension point so this is pretty much useless unless proven otherwise.
         if (false === isset($raw->bootstrap)) {
             return null;
         }
@@ -855,6 +865,7 @@ final class Configuration
      */
     private static function retrieveCompactors(stdClass $raw): array
     {
+        // TODO: only accept arrays when set unlike the doc says (it allows a string).
         if (false === isset($raw->compactors)) {
             return [];
         }
@@ -894,6 +905,13 @@ final class Configuration
 
     private static function retrieveCompressionAlgorithm(stdClass $raw): ?int
     {
+        // TODO: if in dev mode (when added), do not comment about the compression.
+        // If not, add a warning to notify the user if no compression algorithm is used
+        // provided the PHAR is not configured for web purposes.
+        // If configured for the web, add a warning when a compression algorithm is used
+        // as this can result in an overhead. Add a doc link explaining this.
+        //
+        // Unlike the doc: do not accept integers and document this BC break.
         if (false === isset($raw->compression)) {
             return null;
         }
@@ -939,6 +957,9 @@ final class Configuration
 
     private static function retrieveMainScriptPath(stdClass $raw): ?string
     {
+        // TODO: check if is used for the web as well when web is set to true
+        // If that the case make this field mandatory otherwise adjust the check
+        // rules accordinly to ensure we do not have an empty PHAR
         if (isset($raw->main)) {
             return canonicalize($raw->main);
         }
@@ -997,6 +1018,10 @@ final class Configuration
      */
     private static function retrieveMetadata(stdClass $raw)
     {
+        // TODO: the doc currently say this can be any value; check if true
+        // and if not add checks accordingly
+        //
+        // Also review the doc as I don't find it very helpful...
         if (isset($raw->metadata)) {
             if (is_object($raw->metadata)) {
                 return (array) $raw->metadata;
@@ -1010,6 +1035,7 @@ final class Configuration
 
     private static function retrieveMimetypeMapping(stdClass $raw): array
     {
+        // TODO: this parameter is not clear to me: review usage, doc & checks
         if (isset($raw->mimetypes)) {
             return (array) $raw->mimetypes;
         }
@@ -1019,6 +1045,8 @@ final class Configuration
 
     private static function retrieveMungVariables(stdClass $raw): array
     {
+        // TODO: this parameter is not clear to me: review usage, doc & checks
+        // TODO: add error/warning if used when web is not enabled
         if (isset($raw->mung)) {
             return (array) $raw->mung;
         }
@@ -1028,6 +1056,8 @@ final class Configuration
 
     private static function retrieveNotFoundScriptPath(stdClass $raw): ?string
     {
+        // TODO: this parameter is not clear to me: review usage, doc & checks
+        // TODO: add error/warning if used when web is not enabled
         if (isset($raw->{'not-found'})) {
             return $raw->{'not-found'};
         }
@@ -1037,6 +1067,9 @@ final class Configuration
 
     private static function retrieveOutputPath(stdClass $raw, string $file): string
     {
+        // TODO: make this path relative to the base path like everything else
+        // otherwise this is really confusing. This is a BC break that needs to be
+        // documented though (and update the doc accordingly as well)
         $base = getcwd().DIRECTORY_SEPARATOR;
 
         if (isset($raw->output)) {
@@ -1060,6 +1093,7 @@ final class Configuration
 
     private static function retrievePrivateKeyPassphrase(stdClass $raw): ?string
     {
+        // TODO: add check to not allow this setting without the private key path
         if (isset($raw->{'key-pass'})
             && is_string($raw->{'key-pass'})
         ) {
@@ -1071,6 +1105,9 @@ final class Configuration
 
     private static function retrievePrivateKeyPath(stdClass $raw): ?string
     {
+        // TODO: If passed need to check its existence
+        // Also need
+
         if (isset($raw->key)) {
             return $raw->key;
         }
@@ -1080,6 +1117,8 @@ final class Configuration
 
     private static function retrieveReplacements(stdClass $raw): array
     {
+        // TODO: add exmample in the doc
+        // Add checks against the values
         if (isset($raw->replacements)) {
             return (array) $raw->replacements;
         }
@@ -1184,6 +1223,9 @@ final class Configuration
 
     private static function retrieveGitVersion(string $file): ?string
     {
+        // TODO: check if is still relevant as IMO we are better off using OcramiusVersionPackage
+        // to avoid messing around with that
+
         try {
             return self::retrieveGitTag($file);
         } catch (RuntimeException $exception) {
@@ -1205,6 +1247,20 @@ final class Configuration
 
     private static function retrieveDatetimeNowPlaceHolder(stdClass $raw): ?string
     {
+        // TODO: double check why this is done and how it is used it's not completely clear to me.
+        // Also make sure the documentation is up to date after.
+        // Instead of having two sistinct doc entries for `datetime` and `datetime-format`, it would
+        // be better to have only one element IMO like:
+        //
+        // "datetime": {
+        //   "value": "val",
+        //   "format": "Y-m-d"
+        // }
+        //
+        // Also add a check that one cannot be provided without the other. Or maybe it should? I guess
+        // if the datetime format is the default one it's ok; but in any case the format should not
+        // be added without the datetime value...
+
         if (isset($raw->{'datetime'})) {
             return $raw->{'datetime'};
         }
@@ -1250,6 +1306,8 @@ final class Configuration
 
     private static function retrieveShebang(stdClass $raw): ?string
     {
+        // TODO: unlike the doc says do not allow empty strings.
+        // Leverage `Assertion` here?
         if (false === isset($raw->shebang)) {
             return null;
         }
@@ -1274,6 +1332,9 @@ final class Configuration
 
     private static function retrieveSigningAlgorithm(stdClass $raw): int
     {
+        // TODO: trigger warning: if no signing algorithm is given provided we are not in dev mode
+        // TODO: trigger a warning if the signing algorithm used is weak
+        // TODO: no longer accept strings & document BC break
         if (false === isset($raw->algorithm)) {
             return Phar::SHA1;
         }
@@ -1305,6 +1366,13 @@ final class Configuration
 
     private static function retrieveStubBannerPath(stdClass $raw): ?string
     {
+        // TODO: if provided check its existence here or should it be defered to later?
+        // Works case this check can be duplicated...
+        //
+        // Check if is relative to base path: if not make it so (may be a BC break to document).
+        // Once checked, a mention in the doc that this path is relative to base-path (unless
+        // absolute).
+        // Check that the path is not provided if a banner is already provided.
         if (isset($raw->{'banner-file'})) {
             return canonicalize($raw->{'banner-file'});
         }
@@ -1314,6 +1382,8 @@ final class Configuration
 
     private static function retrieveStubBannerFromFile(string $basePath, ?string $stubBannerPath): ?string
     {
+        // TODO: Add checks
+        // TODO: The documentation is not clear enough IMO
         if (null == $stubBannerPath) {
             return null;
         }
@@ -1344,6 +1414,7 @@ final class Configuration
 
     private static function retrieveIsExtractable(stdClass $raw): bool
     {
+        // TODO: look it up, really not clear to me neither is the doc
         if (isset($raw->extract)) {
             return $raw->extract;
         }
@@ -1381,6 +1452,8 @@ final class Configuration
 
     private static function retrieveIsWebPhar(stdClass $raw): bool
     {
+        // TODO: doc is not clear enough
+        // Also check if is compatible web + CLI
         if (isset($raw->web)) {
             return $raw->web;
         }
@@ -1416,6 +1489,7 @@ final class Configuration
 
     private static function createPhpCompactor(stdClass $raw): Compactor
     {
+        // TODO: false === not set; check & add test/doc
         $tokenizer = new Tokenizer();
 
         if (false === empty($raw->annotations) && isset($raw->annotations->ignore)) {

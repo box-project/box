@@ -345,6 +345,21 @@ BANNER;
      */
     private function getBanner(): string
     {
+        // TODO: review how the banner is processed. Right now the doc says it can be a string
+        // already enclosed in comments and if not it will be enclosed automatically.
+        //
+        // What needs to be done here?
+        // - Test with a simple one liner banner
+        // - Test with a banner enclosed in comments
+        // - Test with a banner enclosed in phpdoc
+        //
+        // Then comes the question of multiline banners: I guess it works if contains `\n`?
+        // Need tests for that anyway.
+        //
+        // Maybe a more user-friendly way to deal with multi-line banners would be to allow
+        // an array of strings instead of just a string.
+        //
+
         $banner = "/**\n * ";
         $banner .= str_replace(
             " \n",

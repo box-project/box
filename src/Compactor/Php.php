@@ -50,6 +50,15 @@ final class Php extends FileExtensionCompactor
      */
     protected function compactContent(string $contents): string
     {
+        // TODO: refactor this piece of code
+        // - strip down blank spaces
+        // - remove useless spaces
+        // - strip down comments except Doctrine style annotations unless whitelisted -> BC break to document;
+        //   Alternatively provide an easy way to strip down all "regular" annotations such as @package, @param
+        //   & co.
+        // - completely remove comments & docblocks if empty
+        // TODO regarding the doc: it current has its own `annotations` entry. Maybe it would be best to
+        // include it as a sub element of `compactors`
         $output = '';
 
         foreach (token_get_all($contents) as $token) {
