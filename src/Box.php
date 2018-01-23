@@ -61,8 +61,8 @@ final class Box
         $this->phar = $phar;
         $this->file = $file;
 
-        $this->retrieveRelativeBasePath = function () {};
-        $this->mapFile = function () {};
+        $this->retrieveRelativeBasePath = function (): void {};
+        $this->mapFile = function (): void {};
     }
 
     /**
@@ -139,9 +139,9 @@ final class Box
      * Adds the a file to the PHAR. The contents will first be compacted and have its placeholders
      * replaced.
      *
-     * @param string $file
-     * @param string|null $contents If null the content of the file will be used
-     * @param bool $binary When true means the file content shouldn't be processed
+     * @param string      $file
+     * @param null|string $contents If null the content of the file will be used
+     * @param bool        $binary   When true means the file content shouldn't be processed
      *
      * @return string File local path
      */

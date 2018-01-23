@@ -14,19 +14,16 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use function dirname;
 use Exception;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\FakeCompactor;
 use KevinGH\Box\Compactor\Php;
-use LogicException;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use Phar;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
-use function realpath;
 
 /**
  * @covers \KevinGH\Box\Box
