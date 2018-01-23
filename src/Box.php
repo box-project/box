@@ -140,14 +140,17 @@ final class Box
      * replaced.
      *
      * @param string $file
-     * @param bool   $binary When true means the file content shouldn't be processed
+     * @param string|null $contents If null the content of the file will be used
+     * @param bool $binary When true means the file content shouldn't be processed
+     *
+     * @return string File local path
      */
-    public function addFile(string $file, bool $binary = false): void
+    public function addFile(string $file, string $contents = null, bool $binary = false): string
     {
         Assertion::file($file);
         Assertion::readable($file);
 
-        $contents = file_get_contents($file);
+        $contents = null === $contents ? file_get_contents($file) : $contents;
 
         $relativePath = ($this->retrieveRelativeBasePath)($file);
         $local = ($this->mapFile)($relativePath);
@@ -161,24 +164,8 @@ final class Box
         } else {
             $this->addFromString($local, $contents);
         }
-    }
 
-    /**
-     * Adds the contents from a file to the PHAR. The contents will first be compacted and have its placeholders
-     * replaced.
-     *
-     * @param string $local    The local name or path
-     * @param string $contents The contents
-     */
-    public function addFromString(string $local, string $contents): void
-    {
-        $this->phar->addFromString(
-            $local,
-            $this->compactContents(
-                $local,
-                $this->replacePlaceholders($contents)
-            )
-        );
+        return $local;
     }
 
     public function getPhar(): Phar
@@ -231,6 +218,24 @@ final class Box
         if (false === @file_put_contents($pubKey, $details['key'])) {
             throw FileExceptionFactory::createForLastError();
         }
+    }
+
+    /**
+     * Adds the contents from a file to the PHAR. The contents will first be compacted and have its placeholders
+     * replaced.
+     *
+     * @param string $local    The local name or path
+     * @param string $contents The contents
+     */
+    private function addFromString(string $local, string $contents): void
+    {
+        $this->phar->addFromString(
+            $local,
+            $this->compactContents(
+                $local,
+                $this->replacePlaceholders($contents)
+            )
+        );
     }
 
     /**

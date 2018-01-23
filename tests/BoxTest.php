@@ -179,7 +179,7 @@ class BoxTest extends TestCase
 
         $this->box->registerFileMapping($basePathRetriever, $fileMapper);
 
-        $this->box->addFile($file, true);
+        $this->box->addFile($file, null, true);
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$localPath;
@@ -200,7 +200,7 @@ class BoxTest extends TestCase
 
         $this->box->registerCompactors([new FakeCompactor()]);
 
-        $this->box->addFile($file, true);
+        $this->box->addFile($file, null, true);
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
@@ -293,42 +293,25 @@ class BoxTest extends TestCase
         }
     }
 
-    public function test_it_can_add_a_file_from_string_to_the_phar(): void
-    {
-        $localPath = 'foo';
-        $contents = 'test';
-
-        $this->box->addFromString($localPath, $contents);
-
-        $expectedContents = $contents;
-        $expectedPharPath = 'phar://test.phar/'.$localPath;
-
-        $this->assertFileExists($expectedPharPath);
-
-        $actualContents = file_get_contents($expectedPharPath);
-
-        $this->assertSame($expectedContents, $actualContents);
-    }
-
     public function test_it_compacts_the_contents_before_adding_it_to_the_phar(): void
     {
-        $localPath = 'foo';
+        $file = 'foo';
         $contents = 'original contents @foo_placeholder@';
         $placeholderMapping = [
             '@foo_placeholder@' => 'foo_value',
         ];
 
-        file_put_contents($localPath, $contents);
+        file_put_contents($file, $contents);
 
         $firstCompactorProphecy = $this->prophesize(Compactor::class);
         $firstCompactorProphecy
-            ->compact($localPath, 'original contents foo_value')
+            ->compact($file, 'original contents foo_value')
             ->willReturn($firstCompactorOutput = 'first compactor contents')
         ;
 
         $secondCompactorProphecy = $this->prophesize(Compactor::class);
         $secondCompactorProphecy
-            ->compact($localPath, $firstCompactorOutput)
+            ->compact($file, $firstCompactorOutput)
             ->willReturn($secondCompactorOutput = 'second compactor contents')
         ;
 
@@ -338,10 +321,10 @@ class BoxTest extends TestCase
         ]);
 
         $this->box->registerPlaceholders($placeholderMapping);
-        $this->box->addFromString($localPath, $contents);
+        $this->box->addFile($file, $contents);
 
         $expectedContents = $secondCompactorOutput;
-        $expectedPharPath = 'phar://test.phar/'.$localPath;
+        $expectedPharPath = 'phar://test.phar/'.$file;
 
         $this->assertFileExists($expectedPharPath);
 

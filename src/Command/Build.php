@@ -664,25 +664,20 @@ HELP
             OutputInterface::VERBOSITY_VERBOSE
         );
 
-        $mapFile = $config->getFileMapper();
-        $pharPath = $mapFile($main);
-
-        if (null !== $pharPath) {
-            $logger->log(
-                BuildLogger::CHEVRON_PREFIX,
-                $pharPath,
-                OutputInterface::VERBOSITY_VERBOSE
-            );
-
-            $main = $pharPath;
-        }
-
-        $box->addFromString(
+        $localMain = $box->addFile(
             $main,
             $config->getMainScriptContent()
         );
 
-        return $main;
+        if ($localMain !== $main) {
+            $logger->log(
+                BuildLogger::CHEVRON_PREFIX,
+                $localMain,
+                OutputInterface::VERBOSITY_VERBOSE
+            );
+        }
+
+        return $localMain;
     }
 
     private function registerStub(Configuration $config, Box $box, ?string $main, BuildLogger $logger): void
@@ -871,7 +866,7 @@ HELP
                 gc_collect_cycles();
             }
 
-            $box->addFile((string) $file, $binary);
+            $box->addFile((string) $file, null, $binary);
         }
     }
 
