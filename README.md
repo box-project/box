@@ -6,7 +6,11 @@
 [![Slack](https://img.shields.io/badge/slack-%23humbug-red.svg?style=flat-square)](https://symfony.com/slack-invite)
 [![License](https://img.shields.io/badge/license-MIT-red.svg?style=flat-square)](LICENSE)
 
-Fork of the box unmaintained project.
+Fork of the box unmaintained project. This project needs your help!
+
+Roadmap:
+  - [Project board](https://github.com/humbug/box/projects/1)
+  - [Medium article](https://medium.com/@tfidry/phars-roadmap-870671a847c1)
 
 
 ## Goal
