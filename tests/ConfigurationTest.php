@@ -477,6 +477,15 @@ class ConfigurationTest extends TestCase
 
     public function test_configure_main_script_content(): void
     {
+        file_put_contents('test.php', 'script content');
+
+        $this->setConfig(['main' => 'test.php']);
+
+        $this->assertSame('script content', $this->config->getMainScriptContent());
+    }
+
+    public function test_main_script_content_ignores_shebang_line(): void
+    {
         file_put_contents('test.php', "#!/usr/bin/env php\ntest");
 
         $this->setConfig(['main' => 'test.php']);
@@ -491,8 +500,8 @@ class ConfigurationTest extends TestCase
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertRegExp(
-                '/failed to open stream/i',
+            $this->assertSame(
+                "Path \"{$this->tmp}/test.php\" was expected to be readable.",
                 $exception->getMessage()
             );
         }

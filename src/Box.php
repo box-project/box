@@ -46,10 +46,23 @@ final class Box
      */
     private $placeholders = [];
 
+    /**
+     * @var RetrieveRelativeBasePath
+     */
+    private $retrieveRelativeBasePath;
+
+    /**
+     * @var MapFile
+     */
+    private $mapFile;
+
     private function __construct(Phar $phar, string $file)
     {
         $this->phar = $phar;
         $this->file = $file;
+
+        $this->retrieveRelativeBasePath = function (string $path) { return $path; };
+        $this->mapFile = function (): void { };
     }
 
     /**
@@ -104,6 +117,12 @@ final class Box
         $this->placeholders = $placeholders;
     }
 
+    public function registerFileMapping(RetrieveRelativeBasePath $retrieveRelativeBasePath, MapFile $fileMapper): void
+    {
+        $this->retrieveRelativeBasePath = $retrieveRelativeBasePath;
+        $this->mapFile = $fileMapper;
+    }
+
     public function registerStub(string $file): void
     {
         Assertion::file($file);
@@ -120,39 +139,38 @@ final class Box
      * Adds the a file to the PHAR. The contents will first be compacted and have its placeholders
      * replaced.
      *
-     * @param string $file  The file name or path
-     * @param string $local The local file name or path
+     * @param string      $file
+     * @param null|string $contents If null the content of the file will be used
+     * @param bool        $binary   When true means the file content shouldn't be processed
+     *
+     * @return string File local path
      */
-    public function addFile($file, $local = null): void
+    public function addFile(string $file, string $contents = null, bool $binary = false): string
     {
-        if (null === $local) {
-            $local = $file;
-        }
-
         Assertion::file($file);
         Assertion::readable($file);
 
-        $contents = file_get_contents($file);
+        $contents = null === $contents ? file_get_contents($file) : $contents;
 
-        $this->addFromString($local, $contents);
-    }
+        $relativePath = ($this->retrieveRelativeBasePath)($file);
+        $local = ($this->mapFile)($relativePath);
 
-    /**
-     * Adds the contents from a file to the PHAR. The contents will first be compacted and have its placeholders
-     * replaced.
-     *
-     * @param string $local    The local name or path
-     * @param string $contents The contents
-     */
-    public function addFromString(string $local, string $contents): void
-    {
-        $this->phar->addFromString(
-            $local,
-            $this->compactContents(
+        if (null === $local) {
+            $local = $relativePath;
+        }
+
+        if ($binary) {
+            $this->phar->addFile($file, $local);
+        } else {
+            $processedContents = $this->compactContents(
                 $local,
                 $this->replacePlaceholders($contents)
-            )
-        );
+            );
+
+            $this->phar->addFromString($local, $processedContents);
+        }
+
+        return $local;
     }
 
     public function getPhar(): Phar

@@ -57,6 +57,120 @@ class BuildTest extends CommandTestCase
                     'main' => 'run.php',
                     'map' => [
                         ['a/deep/test/directory' => 'sub'],
+                    ],
+                    'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
+                    'output' => 'test.phar',
+                    'shebang' => $shebang,
+                    'stub' => true,
+                ]
+            )
+        );
+
+        $commandTester = $this->getCommandTester();
+
+        $commandTester->setInputs(['test']);
+        $commandTester->execute(
+            ['command' => 'build'],
+            ['interactive' => true]
+        );
+
+        $expected = <<<'OUTPUT'
+
+    ____
+   / __ )____  _  __
+  / __  / __ \| |/_/
+ / /_/ / /_/ />  <
+/_____/\____/_/|_|
+
+
+Box (repo)
+
+Building the PHAR "/path/to/tmp/test.phar"
+Private key passphrase:
+* Done.
+
+ // Size: 100B
+ // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
+
+
+OUTPUT;
+
+        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
+
+        $this->assertSame($expected, $actual, 'Expected logs to be identical');
+
+        $this->assertSame(
+            'Hello, world!',
+            exec('php test.phar'),
+            'Expected PHAR to be executable'
+        );
+
+        $phar = new Phar('test.phar');
+
+        // Check PHAR content
+        $actualStub = $this->normalizeDisplay($phar->getStub());
+        $expectedStub = <<<PHP
+$shebang
+<?php
+/**
+ * custom banner
+ */
+if (class_exists('Phar')) {
+Phar::mapPhar('alias-test.phar');
+require 'phar://' . __FILE__ . '/run.php';
+}
+__HALT_COMPILER(); ?>
+
+PHP;
+
+        $this->assertSame($expectedStub, $actualStub);
+
+        $this->assertSame(
+            ['rand' => $rand],
+            $phar->getMetadata(),
+            'Expected PHAR metadata to be set'
+        );
+
+        $expectedFiles = [
+            '/one/',
+            '/one/test.php',
+            '/run.php',
+            '/sub/',
+            '/sub/test.php',
+            '/test.php',
+            '/two/',
+            '/two/test.png',
+        ];
+
+        $actualFiles = $this->retrievePharFiles($phar);
+
+        $this->assertSame($expectedFiles, $actualFiles);
+    }
+
+    public function test_it_can_build_a_PHAR_with_complete_mapping(): void
+    {
+        (new Filesystem())->mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+
+        $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
+
+        file_put_contents(
+            'box.json',
+            json_encode(
+                [
+                    'alias' => 'alias-test.phar',
+                    'banner' => 'custom banner',
+                    'bootstrap' => 'bootstrap.php',
+                    'chmod' => '0755',
+                    'compactors' => [Php::class],
+                    'directories' => 'a',
+                    'files' => 'test.php',
+                    'finder' => [['in' => 'one']],
+                    'finder-bin' => [['in' => 'two']],
+                    'key' => 'private.key',
+                    'key-pass' => true,
+                    'main' => 'run.php',
+                    'map' => [
+                        ['a/deep/test/directory' => 'sub'],
                         ['' => 'other/'],
                     ],
                     'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
@@ -306,13 +420,9 @@ Box (repo)
   - a/deep/test/directory > sub
   - (all) > other/
 ? Adding finder files
-    > other/one/test.php
 ? Adding binary finder files
-    > other/two/test.png
 ? Adding directories
-    > sub/test.php
 ? Adding files
-    > other/test.php
 ? Adding main file: /path/to/tmp/run.php
     > other/run.php
 ? Generating new stub
@@ -713,7 +823,6 @@ Box (repo)
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
 ? Adding files
-  + /path/to/tmp/test.php
 ? Adding main file: /path/to/tmp/test.php
 ? Generating new stub
   - Using custom banner from file: /path/to/tmp/banner

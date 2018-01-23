@@ -14,6 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+/**
+ * @internal
+ */
 final class RetrieveRelativeBasePath
 {
     private $basePath;

@@ -16,7 +16,7 @@ namespace KevinGH\Box;
 
 use Exception;
 use InvalidArgumentException;
-use KevinGH\Box\Compactor\Php;
+use KevinGH\Box\Compactor\FakeCompactor;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use Phar;
@@ -141,10 +141,65 @@ class BoxTest extends TestCase
 
         file_put_contents($file, $contents);
 
-        $this->box->addFile($file, $localPath);
+        $basePathRetriever = new RetrieveRelativeBasePath(realpath(dirname('test.phar')));
+        $fileMapper = new MapFile([
+            [$file => $localPath],
+        ]);
+
+        $this->box->registerFileMapping($basePathRetriever, $fileMapper);
+
+        $this->box->addFile($file);
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$localPath;
+
+        $this->assertFileExists($expectedPharPath);
+
+        $actualContents = file_get_contents($expectedPharPath);
+
+        $this->assertSame($expectedContents, $actualContents);
+    }
+
+    public function test_it_can_add_a_binary_file_with_a_local_path_to_the_phar(): void
+    {
+        $file = 'foo';
+        $contents = 'test';
+        $localPath = 'local/path/foo';
+
+        file_put_contents($file, $contents);
+
+        $basePathRetriever = new RetrieveRelativeBasePath(realpath(dirname('test.phar')));
+        $fileMapper = new MapFile([
+            [$file => $localPath],
+        ]);
+
+        $this->box->registerFileMapping($basePathRetriever, $fileMapper);
+
+        $this->box->addFile($file, null, true);
+
+        $expectedContents = $contents;
+        $expectedPharPath = 'phar://test.phar/'.$localPath;
+
+        $this->assertFileExists($expectedPharPath);
+
+        $actualContents = file_get_contents($expectedPharPath);
+
+        $this->assertSame($expectedContents, $actualContents);
+    }
+
+    public function test_it_can_add_a_binary_file_to_the_phar(): void
+    {
+        $file = 'foo';
+        $contents = 'test';
+
+        file_put_contents($file, $contents);
+
+        $this->box->registerCompactors([new FakeCompactor()]);
+
+        $this->box->addFile($file, null, true);
+
+        $expectedContents = $contents;
+        $expectedPharPath = 'phar://test.phar/'.$file;
 
         $this->assertFileExists($expectedPharPath);
 
@@ -234,42 +289,25 @@ class BoxTest extends TestCase
         }
     }
 
-    public function test_it_can_add_a_file_from_string_to_the_phar(): void
-    {
-        $localPath = 'foo';
-        $contents = 'test';
-
-        $this->box->addFromString($localPath, $contents);
-
-        $expectedContents = $contents;
-        $expectedPharPath = 'phar://test.phar/'.$localPath;
-
-        $this->assertFileExists($expectedPharPath);
-
-        $actualContents = file_get_contents($expectedPharPath);
-
-        $this->assertSame($expectedContents, $actualContents);
-    }
-
     public function test_it_compacts_the_contents_before_adding_it_to_the_phar(): void
     {
-        $localPath = 'foo';
+        $file = 'foo';
         $contents = 'original contents @foo_placeholder@';
         $placeholderMapping = [
             '@foo_placeholder@' => 'foo_value',
         ];
 
-        file_put_contents($localPath, $contents);
+        file_put_contents($file, $contents);
 
         $firstCompactorProphecy = $this->prophesize(Compactor::class);
         $firstCompactorProphecy
-            ->compact($localPath, 'original contents foo_value')
+            ->compact($file, 'original contents foo_value')
             ->willReturn($firstCompactorOutput = 'first compactor contents')
         ;
 
         $secondCompactorProphecy = $this->prophesize(Compactor::class);
         $secondCompactorProphecy
-            ->compact($localPath, $firstCompactorOutput)
+            ->compact($file, $firstCompactorOutput)
             ->willReturn($secondCompactorOutput = 'second compactor contents')
         ;
 
@@ -279,10 +317,10 @@ class BoxTest extends TestCase
         ]);
 
         $this->box->registerPlaceholders($placeholderMapping);
-        $this->box->addFromString($localPath, $contents);
+        $this->box->addFile($file, $contents);
 
         $expectedContents = $secondCompactorOutput;
-        $expectedPharPath = 'phar://test.phar/'.$localPath;
+        $expectedPharPath = 'phar://test.phar/'.$file;
 
         $this->assertFileExists($expectedPharPath);
 
