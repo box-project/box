@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Command;
 
+use Assert\Assertion;
 use KevinGH\Box\Box;
 use KevinGH\Box\Compactor;
 use KevinGH\Box\Configuration;
@@ -102,7 +103,19 @@ Further help:
 The <info>alias</info> <comment>(string)</comment> setting is used when generating a new stub to call the
 <comment>Phar::mapPhar()</comment> method if the PHAR is for the CLI and the method
 <comment>Phar::webPhar()</comment> if the PHAR is configured for the web. This makes it easier to
-refer to files in the PHAR.
+refer to files in the PHAR and ensure the access to internal files will
+always work regardless of the location of the PHAR on the file system.
+
+Example:
+<comment>
+$phar = new Phar('index.phar');
+$phar->setAlias('foo.phar');
+$phar->addFile('LICENSE');
+
+file_get_contents('phar://foo.phar/LICENSE');
+</comment>
+
+If no alias is provided, the value <comment>"default.phar"</comment> will be used.
 
 Further help:
 <comment>
@@ -687,6 +700,16 @@ HELP;
 
     private function registerStub(Configuration $config, Box $box, ?string $main, BuildLogger $logger): void
     {
+        $aliasWasAdded = $box->getPhar()->setAlias($config->getAlias());
+
+        Assertion::true(
+            $aliasWasAdded,
+            sprintf(
+                'The alias "%s" is invalid. See Phar::setAlias() documentation for more information.',
+                $config->getAlias()
+            )
+        );
+
         if (true === $config->isStubGenerated()) {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,

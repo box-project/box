@@ -73,7 +73,7 @@ final class Configuration
     private $isWebPhar;
 
     /**
-     * @param string                     $alias                     TODO: description
+     * @param string                     $alias
      * @param RetrieveRelativeBasePath   $basePathRetriever         Utility to private the base path used and be able to retrieve a path relative to it (the base path)
      * @param iterable|SplFileInfo[]     $binaryDirectoriesIterator List of directories containing images or other binary data
      * @param iterable|SplFileInfo[]     $binaryFilesIterator       List of files containing images or other binary data
@@ -191,7 +191,7 @@ final class Configuration
 
     public static function create(string $file, stdClass $raw): self
     {
-        $alias = $raw->alias ?? self::DEFAULT_ALIAS;
+        $alias = self::retrieveAlias($raw);
 
         $basePath = self::retrieveBasePath($file, $raw);
         $basePathRetriever = new RetrieveRelativeBasePath($basePath);
@@ -509,6 +509,19 @@ final class Configuration
     public function isWebPhar(): bool
     {
         return $this->isWebPhar;
+    }
+
+    private static function retrieveAlias(stdClass $raw): string
+    {
+        $alias = $raw->alias ?? self::DEFAULT_ALIAS;
+
+        Assertion::string($alias, 'Expected PHAR alias to be a string, got "%s" instead.');
+
+        $alias = trim($alias);
+
+        Assertion::notEmpty($alias, 'A PHAR alias cannot be empty.');
+
+        return $alias;
     }
 
     private static function retrieveBasePath(string $file, stdClass $raw): string
