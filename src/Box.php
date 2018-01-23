@@ -156,7 +156,7 @@ final class Box
         $local = ($this->mapFile)($relativePath);
 
         if (null === $local) {
-            $local = $file;
+            $local = $relativePath;
         }
 
         if ($binary) {
