@@ -951,18 +951,14 @@ final class Configuration
         if (null === $mainScriptPath) {
             return null;
         }
+
         $mainScriptPath = $basePath.DIRECTORY_SEPARATOR.$mainScriptPath;
 
-        if (false === ($contents = @file_get_contents($mainScriptPath))) {
-            $errors = error_get_last();
+        Assertion::readable($mainScriptPath);
 
-            if (null === $errors) {
-                $errors = ['message' => 'Failed to get contents of "'.$mainScriptPath.'""'];
-            }
+        $contents = file_get_contents($mainScriptPath);
 
-            throw new InvalidArgumentException($errors['message']);
-        }
-
+        // Remove the shebang line
         return preg_replace('/^#!.*\s*/', '', $contents);
     }
 
