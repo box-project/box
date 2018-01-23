@@ -61,8 +61,8 @@ final class Box
         $this->phar = $phar;
         $this->file = $file;
 
-        $this->retrieveRelativeBasePath = function (): void {};
-        $this->mapFile = function (): void {};
+        $this->retrieveRelativeBasePath = function (string $path) { return $path; };
+        $this->mapFile = function (): void { };
     }
 
     /**
@@ -162,7 +162,12 @@ final class Box
         if ($binary) {
             $this->phar->addFile($file, $local);
         } else {
-            $this->addFromString($local, $contents);
+            $processedContents = $this->compactContents(
+                $local,
+                $this->replacePlaceholders($contents)
+            );
+
+            $this->phar->addFromString($local, $processedContents);
         }
 
         return $local;
@@ -218,24 +223,6 @@ final class Box
         if (false === @file_put_contents($pubKey, $details['key'])) {
             throw FileExceptionFactory::createForLastError();
         }
-    }
-
-    /**
-     * Adds the contents from a file to the PHAR. The contents will first be compacted and have its placeholders
-     * replaced.
-     *
-     * @param string $local    The local name or path
-     * @param string $contents The contents
-     */
-    private function addFromString(string $local, string $contents): void
-    {
-        $this->phar->addFromString(
-            $local,
-            $this->compactContents(
-                $local,
-                $this->replacePlaceholders($contents)
-            )
-        );
     }
 
     /**

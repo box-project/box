@@ -17,7 +17,6 @@ namespace KevinGH\Box;
 use Exception;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\FakeCompactor;
-use KevinGH\Box\Compactor\Php;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use Phar;
