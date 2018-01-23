@@ -46,10 +46,23 @@ final class Box
      */
     private $placeholders = [];
 
+    /**
+     * @var RetrieveRelativeBasePath
+     */
+    private $retrieveRelativeBasePath;
+
+    /**
+     * @var MapFile
+     */
+    private $mapFile;
+
     private function __construct(Phar $phar, string $file)
     {
         $this->phar = $phar;
         $this->file = $file;
+
+        $this->retrieveRelativeBasePath = function () {};
+        $this->mapFile = function () {};
     }
 
     /**
@@ -104,6 +117,12 @@ final class Box
         $this->placeholders = $placeholders;
     }
 
+    public function registerFileMapping(RetrieveRelativeBasePath $retrieveRelativeBasePath, MapFile $fileMapper): void
+    {
+        $this->retrieveRelativeBasePath = $retrieveRelativeBasePath;
+        $this->mapFile = $fileMapper;
+    }
+
     public function registerStub(string $file): void
     {
         Assertion::file($file);
@@ -120,21 +139,28 @@ final class Box
      * Adds the a file to the PHAR. The contents will first be compacted and have its placeholders
      * replaced.
      *
-     * @param string $file  The file name or path
-     * @param string $local The local file name or path
+     * @param string $file
+     * @param bool   $binary When true means the file content shouldn't be processed
      */
-    public function addFile($file, $local = null): void
+    public function addFile(string $file, bool $binary = false): void
     {
-        if (null === $local) {
-            $local = $file;
-        }
-
         Assertion::file($file);
         Assertion::readable($file);
 
         $contents = file_get_contents($file);
 
-        $this->addFromString($local, $contents);
+        $relativePath = ($this->retrieveRelativeBasePath)($file);
+        $local = ($this->mapFile)($relativePath);
+
+        if (null === $local) {
+            $local = $file;
+        }
+
+        if ($binary) {
+            $this->phar->addFile($file, $local);
+        } else {
+            $this->addFromString($local, $contents);
+        }
     }
 
     /**

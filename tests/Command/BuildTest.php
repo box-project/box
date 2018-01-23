@@ -306,13 +306,9 @@ Box (repo)
   - a/deep/test/directory > sub
   - (all) > other/
 ? Adding finder files
-    > other/one/test.php
 ? Adding binary finder files
-    > other/two/test.png
 ? Adding directories
-    > sub/test.php
 ? Adding files
-    > other/test.php
 ? Adding main file: /path/to/tmp/run.php
     > other/run.php
 ? Generating new stub
@@ -713,7 +709,6 @@ Box (repo)
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
 ? Adding files
-  + /path/to/tmp/test.php
 ? Adding main file: /path/to/tmp/test.php
 ? Generating new stub
   - Using custom banner from file: /path/to/tmp/banner

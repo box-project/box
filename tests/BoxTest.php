@@ -14,15 +14,19 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use function dirname;
 use Exception;
 use InvalidArgumentException;
+use KevinGH\Box\Compactor\FakeCompactor;
 use KevinGH\Box\Compactor\Php;
+use LogicException;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use Phar;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
+use function realpath;
 
 /**
  * @covers \KevinGH\Box\Box
@@ -141,10 +145,65 @@ class BoxTest extends TestCase
 
         file_put_contents($file, $contents);
 
-        $this->box->addFile($file, $localPath);
+        $basePathRetriever = new RetrieveRelativeBasePath(realpath(dirname('test.phar')));
+        $fileMapper = new MapFile([
+            [$file => $localPath],
+        ]);
+
+        $this->box->registerFileMapping($basePathRetriever, $fileMapper);
+
+        $this->box->addFile($file);
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$localPath;
+
+        $this->assertFileExists($expectedPharPath);
+
+        $actualContents = file_get_contents($expectedPharPath);
+
+        $this->assertSame($expectedContents, $actualContents);
+    }
+
+    public function test_it_can_add_a_binary_file_with_a_local_path_to_the_phar(): void
+    {
+        $file = 'foo';
+        $contents = 'test';
+        $localPath = 'local/path/foo';
+
+        file_put_contents($file, $contents);
+
+        $basePathRetriever = new RetrieveRelativeBasePath(realpath(dirname('test.phar')));
+        $fileMapper = new MapFile([
+            [$file => $localPath],
+        ]);
+
+        $this->box->registerFileMapping($basePathRetriever, $fileMapper);
+
+        $this->box->addFile($file, true);
+
+        $expectedContents = $contents;
+        $expectedPharPath = 'phar://test.phar/'.$localPath;
+
+        $this->assertFileExists($expectedPharPath);
+
+        $actualContents = file_get_contents($expectedPharPath);
+
+        $this->assertSame($expectedContents, $actualContents);
+    }
+
+    public function test_it_can_add_a_binary_file_to_the_phar(): void
+    {
+        $file = 'foo';
+        $contents = 'test';
+
+        file_put_contents($file, $contents);
+
+        $this->box->registerCompactors([new FakeCompactor()]);
+
+        $this->box->addFile($file, true);
+
+        $expectedContents = $contents;
+        $expectedPharPath = 'phar://test.phar/'.$file;
 
         $this->assertFileExists($expectedPharPath);
 

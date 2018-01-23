@@ -18,6 +18,7 @@ use KevinGH\Box\Box;
 use KevinGH\Box\Compactor;
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Logger\BuildLogger;
+use KevinGH\Box\MapFile;
 use KevinGH\Box\RetrieveRelativeBasePath;
 use KevinGH\Box\StubGenerator;
 use RuntimeException;
@@ -458,7 +459,7 @@ HELP
 
         $this->setReplacementValues($config, $box, $logger);
         $this->registerCompactors($config, $box, $logger);
-        $this->alertAboutMappedPaths($config, $logger);
+        $this->registerFileMapping($config, $box, $logger);
 
         $this->addFiles($config, $box, $logger);
 
@@ -575,37 +576,16 @@ HELP
         $box->registerCompactors($compactors);
     }
 
-    private function alertAboutMappedPaths(Configuration $config, BuildLogger $logger): void
+    private function registerFileMapping(Configuration $config, Box $box, BuildLogger $logger): void
     {
-        $map = $config->getMap();
+        $fileMapper = $config->getFileMapper();
 
-        if ([] === $map) {
-            return;
-        }
+        $this->logMap($fileMapper, $logger);
 
-        $logger->log(
-            BuildLogger::QUESTION_MARK_PREFIX,
-            'Mapping paths',
-            OutputInterface::VERBOSITY_VERBOSE
+        $box->registerFileMapping(
+            $config->getBasePathRetriever(),
+            $fileMapper
         );
-
-        foreach ($map as $item) {
-            foreach ($item as $match => $replace) {
-                if (empty($match)) {
-                    $match = '(all)';
-                }
-
-                $logger->log(
-                    BuildLogger::MINUS_PREFIX,
-                    sprintf(
-                        '%s <info>></info> %s',
-                        $match,
-                        $replace
-                    ),
-                    OutputInterface::VERBOSITY_VERBOSE
-                );
-            }
-        }
     }
 
     private function addFiles(Configuration $config, Box $box, BuildLogger $logger): void
@@ -618,7 +598,7 @@ HELP
             );
 
             foreach ($iterators as $iterator) {
-                $this->addFilesToBox($config, $box, $iterator, null, false, $config->getBasePathRetriever(), $logger);
+                $this->addFilesToBox($box, $iterator, null, false, $logger);
             }
         }
 
@@ -630,47 +610,39 @@ HELP
             );
 
             foreach ($iterators as $iterator) {
-                $this->addFilesToBox($config, $box, $iterator, null, true, $config->getBasePathRetriever(), $logger);
+                $this->addFilesToBox($box, $iterator, null, true, $logger);
             }
         }
 
         $this->addFilesToBox(
-            $config,
             $box,
             $config->getDirectoriesIterator(),
             'Adding directories',
             false,
-            $config->getBasePathRetriever(),
             $logger
         );
 
         $this->addFilesToBox(
-            $config,
             $box,
             $config->getBinaryDirectoriesIterator(),
             'Adding binary directories',
             true,
-            $config->getBasePathRetriever(),
             $logger
         );
 
         $this->addFilesToBox(
-            $config,
             $box,
             $config->getFilesIterator(),
             'Adding files',
             false,
-            $config->getBasePathRetriever(),
             $logger
         );
 
         $this->addFilesToBox(
-            $config,
             $box,
             $config->getBinaryFilesIterator(),
             'Adding binary files',
             true,
-            $config->getBasePathRetriever(),
             $logger
         );
     }
@@ -875,12 +847,10 @@ HELP
      * @param BuildLogger              $logger
      */
     private function addFilesToBox(
-        Configuration $config,
         Box $box,
         ?iterable $iterator,
         ?string $message,
         bool $binary,
-        RetrieveRelativeBasePath $retrieveRelativeBasePath,
         BuildLogger $logger
     ): void {
         static $count = 0;
@@ -893,9 +863,6 @@ HELP
             $logger->log(BuildLogger::QUESTION_MARK_PREFIX, $message, OutputInterface::VERBOSITY_VERBOSE);
         }
 
-        $box = $binary ? $box->getPhar() : $box;
-        $mapFile = $config->getFileMapper();
-
         foreach ($iterator as $file) {
             // @var $file SplFileInfo
 
@@ -904,29 +871,7 @@ HELP
                 gc_collect_cycles();
             }
 
-            $relativePath = $retrieveRelativeBasePath($file->getPathname());
-
-            $mapped = $mapFile($relativePath);
-
-            if (null !== $mapped) {
-                $relativePath = $mapped;
-            }
-
-            if (null !== $mapped) {
-                $logger->log(
-                    BuildLogger::CHEVRON_PREFIX,
-                    $relativePath,
-                    OutputInterface::VERBOSITY_VERY_VERBOSE
-                );
-            } else {
-                $logger->log(
-                    BuildLogger::PLUS_PREFIX,
-                    (string) $file,
-                    OutputInterface::VERBOSITY_VERY_VERBOSE
-                );
-            }
-
-            $box->addFile((string) $file, $relativePath);
+            $box->addFile((string) $file, $binary);
         }
     }
 
@@ -940,7 +885,8 @@ HELP
             ->mimetypes($config->getMimetypeMapping())
             ->mung($config->getMungVariables())
             ->notFound($config->getNotFoundScriptPath())
-            ->web($config->isWebPhar());
+            ->web($config->isWebPhar())
+        ;
 
         if (null !== ($shebang = $config->getShebang())) {
             $logger->log(
@@ -980,5 +926,38 @@ HELP
         }
 
         return $stub;
+    }
+
+    private function logMap(MapFile $fileMapper, BuildLogger $logger): void
+    {
+        $map = $fileMapper->getMap();
+
+        if ([] === $map) {
+            return;
+        }
+
+        $logger->log(
+            BuildLogger::QUESTION_MARK_PREFIX,
+            'Mapping paths',
+            OutputInterface::VERBOSITY_VERBOSE
+        );
+
+        foreach ($map as $item) {
+            foreach ($item as $match => $replace) {
+                if (empty($match)) {
+                    $match = '(all)';
+                }
+
+                $logger->log(
+                    BuildLogger::MINUS_PREFIX,
+                    sprintf(
+                        '%s <info>></info> %s',
+                        $match,
+                        $replace
+                    ),
+                    OutputInterface::VERBOSITY_VERBOSE
+                );
+            }
+        }
     }
 }
