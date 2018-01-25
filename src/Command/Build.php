@@ -84,9 +84,9 @@ Note that all settings are optional.
   }
 </comment>
 
-The (optional) <info>algorithm</info> <comment>(string)</comment> setting is the signing algorithm
-to use when the PHAR is built <comment>(Phar::setSignatureAlgorithm())</comment>. The
-following is a list of the signature algorithms available::
+The (optional) <info>algorithm</info> <comment>(string)</comment> setting is the signing algorithm to use when
+the PHAR is built <comment>(Phar::setSignatureAlgorithm())</comment>. The following is a list of
+the signature algorithms available:
 <comment>
   - MD5 (Phar::MD5)
   - SHA1 (Phar::SHA1)
@@ -99,10 +99,10 @@ Further help:
   https://secure.php.net/manual/en/phar.setsignaturealgorithm.php
 </comment>
 
-The <info>alias</info> <comment>(string)</comment> setting is used when generating a new stub to
-call the <comment>Phar::mapPhar()</comment> method if the PHAR is for the CLI and the
-method <comment>Phar::webPhar()</comment> if the PHAR is configured for the web. This
-makes it easier to refer to files in the PHAR.
+The <info>alias</info> <comment>(string)</comment> setting is used when generating a new stub to call the
+<comment>Phar::mapPhar()</comment> method if the PHAR is for the CLI and the method
+<comment>Phar::webPhar()</comment> if the PHAR is configured for the web. This makes it easier to
+refer to files in the PHAR.
 
 Further help:
 <comment>
@@ -113,8 +113,8 @@ Further help:
 The <info>annotations</info> <comment>(boolean, object)</comment> setting is used to enable compacting
 annotations in PHP source code. By setting it to <info>true</info>, all Doctrine-style
 annotations are compacted in PHP files. You may also specify a list of
-annotations to ignore, which will be stripped while protecting the
-remaining annotations:
+annotations to ignore, which will be stripped while protecting the remaining
+annotations:
 <comment>
   {
       "annotations": {
@@ -127,31 +127,30 @@ remaining annotations:
       }
   }
 </comment>
-You may want to see this website for a list of annotations which are
-commonly ignored:
+You may want to see this website for a list of annotations which are commonly
+ignored:
 <comment>
   https://github.com/herrera-io/php-annotations
 </comment>
 
-The <info>banner</info> <comment>(string)</comment> setting is the banner comment that will be used when
-a new stub is generated. The value of this setting must not already be
-enclosed within a comment block, as it will be automatically done for
-you.
+The <info>banner</info> <comment>(string)</comment> setting is the banner comment that will be used when a new
+stub is generated. The value of this setting must not already be enclosed
+within a comment block, as it will be automatically done for you.
 
-The <info>banner-file</info> <comment>(string)</comment> setting is like <info>banner</info>, except it is a
-path to the file that will contain the comment. Like <info>banner</info>, the
-comment must not already be enclosed in a comment block.
+The <info>banner-file</info> <comment>(string)</comment> setting is like <info>banner</info>, except it is a path to the
+file that will contain the comment. Like <info>banner</info>, the comment must not already
+be enclosed in a comment block.
 
-The <info>base-path</info> <comment>(string)</comment> setting is used to specify where all of the
-relative file paths should resolve to. This does not, however, alter
-where the built PHAR will be stored <comment>(see: <info>output</info>)</comment>. By default, the
-base path is the directory containing the configuration file.
+The <info>base-path</info> <comment>(string)</comment> setting is used to specify where all of the relative 
+file paths should resolve to. This does not, however, alter where the built
+PHAR will be stored <comment>(see: <info>output</info>)</comment>. By default, the base path is the directory
+containing the configuration file.
 
-The <info>blacklist</info> <comment>(string[])</comment> setting is a list of files that must
-not be added. The files blacklisted are the ones found using the other
-available configuration settings: <info>directories, directories-bin, files,
-files-bin, finder, finder-bin</info>. Note that directory separators are
-automatically corrected to the platform specific version.
+The <info>blacklist</info> <comment>(string[])</comment> setting is a list of files that must not be added.
+The files blacklisted are the ones found using the other available
+configuration settings: <info>directories, directories-bin, files, files-bin,
+finder, finder-bin</info>. Note that directory separators are automatically corrected
+to the platform specific version.
 
 Assuming that the base directory path is <comment>/home/user/project</comment>:
 <comment>
@@ -174,23 +173,22 @@ But not these files:
   - /home/user/project/src/another/path/to/file/2
 </comment>
 
-The <info>bootstrap</info> <comment>(string)</comment> setting allows you to specify a PHP file that
-will be loaded before the <info>build</info> or <info>add</info> commands are used. This is
-useful for loading third-party file contents compacting classes that
-were configured using the <info>compactors</info> setting.
+The <info>bootstrap</info> <comment>(string)</comment> setting allows you to specify a PHP file that will be
+loaded before the <info>build</info> or <info>add</info> commands are used. This is useful for loading
+third-party file contents compacting classes that were configured using the
+<info>compactors</info> setting.
 
-The <info>chmod</info> <comment>(string)</comment> setting is used to change the file permissions of
-the newly built PHAR. The string contains an octal value: <comment>0750</comment>.
+The <info>chmod</info> <comment>(string)</comment> setting is used to change the file permissions of the newly
+built PHAR. The string contains an octal value: <comment>0750</comment>.
 
 Check the following link for more on the possible values:
 <comment>
   https://secure.php.net/manual/en/function.chmod.php
 </comment>
 
-The <info>compactors</info> <comment>(string[])</comment> setting is a list of file contents
-compacting classes that must be registered. A file compacting class
-is used to reduce the size of a specific file type. The following is
-a simple example:
+The <info>compactors</info> <comment>(string[])</comment> setting is a list of file contents compacting
+classes that must be registered. A file compacting class is used to reduce the
+size of a specific file type. The following is a simple example:
 <comment>
   use Herrera\\Box\\Compactor\\CompactorInterface;
 
@@ -213,51 +211,48 @@ The following compactors are included with Box:
   - Herrera\\Box\\Compactor\\Php
 </comment>
 
-The <info>compression</info> <comment>(string)</comment> setting is the compression algorithm
-to use when the PHAR is built. The compression affects the individual
-files within the PHAR, and not the PHAR as a whole <comment>(Phar::compressFiles())</comment>.
-The following is a list of the signature algorithms listed on the help
-page:
+The <info>compression</info> <comment>(string)</comment> setting is the compression algorithm to use when the
+PHAR is built. The compression affects the individual files within the PHAR,
+and not the PHAR as a whole <comment>(Phar::compressFiles())</comment>. The following is a list
+of the signature algorithms listed on the help page:
 <comment>
   - BZ2 (Phar::BZ2)
   - GZ (Phar::GZ)
   - NONE (Phar::NONE)
 </comment>
 
-The <info>directories</info> <comment>(string[])</comment> setting is a list of directory paths
-relative to <info>base-path</info>. All files ending in <comment>.php</comment> will be automatically
-compacted, have their placeholder values replaced, and added to the
-PHAR. Files listed in the <info>blacklist</info> setting will not be added.
+The <info>directories</info> <comment>(string[])</comment> setting is a list of directory paths relative to
+<info>base-path</info>. All files ending in <comment>.php</comment> will be automatically compacted, have
+their placeholder values replaced, and added to the PHAR. Files listed in the
+<info>blacklist</info> setting will not be added.
 
-The <info>directories-bin</info> <comment>(string[])</comment> setting is similar to <info>directories</info>,
-except all file types are added to the PHAR unmodified. This is suitable
-for directories containing images or other binary data.
+The <info>directories-bin</info> <comment>(string[])</comment> setting is similar to <info>directories</info>, except all
+file types are added to the PHAR unmodified. This is suitable for directories
+containing images or other binary data.
 
-The <info>extract</info> <comment>(boolean)</comment> setting determines whether or not the generated
-stub should include a class to extract the PHAR. This class would be
-used if the PHAR is not available. (Increases stub file size.)
+The <info>extract</info> <comment>(boolean)</comment> setting determines whether or not the generated stub
+should include a class to extract the PHAR. This class would be used if the
+PHAR is not available. (Increases stub file size.)
 
-The <info>files</info> <comment>(string[])</comment> setting is a list of files paths relative to
-<info>base-path</info>. Each file will be compacted, have their placeholder files
-replaced, and added to the PHAR. This setting is not affected by the
-<info>blacklist</info> setting.
+The <info>files</info> <comment>(string[])</comment> setting is a list of files paths relative to <info>base-path</info>.
+Each file will be compacted, have their placeholder files replaced, and added
+to the PHAR. This setting is not affected by the <info>blacklist</info> setting.
 
-The <info>files-bin</info> <comment>(string[])</comment> setting is similar to <info>files</info>, except that
-all files are added to the PHAR unmodified. This is suitable for files
-such as images or those that contain binary data.
+The <info>files-bin</info> <comment>(string[])</comment> setting is similar to <info>files</info>, except that all files
+are added to the PHAR unmodified. This is suitable for files such as images or
+those that contain binary data.
 
-The <info>finder</info> <comment>(array)</comment> setting is a list of JSON objects. Each object key
-is a name, and each value an argument for the methods in the
-<comment>Symfony\\Component\\Finder\\Finder</comment> class. If an array of values is provided
-for a single key, the method will be called once per value in the array.
-Note that the paths specified for the "in" method are relative to
-<info>base-path</info>.
+The <info>finder</info> <comment>(array)</comment> setting is a list of JSON objects. Each object key is a
+name, and each value an argument for the methods in
+the <comment>Symfony\Component\Finder\Finder</comment> class. If an array of values is provided
+for a single key, the method will be called once per value in the array. Note
+that the paths specified for the "in" method are relative to <info>base-path</info>.
 
-The <info>finder-bin</info> <comment>(array)</comment> setting performs the same function, except all
-files found by the finder will be treated as binary files, leaving them unmodified.
+The <info>finder-bin</info> <comment>(array)</comment> setting performs the same function, except all files
+found by the finder will be treated as binary files, leaving them unmodified.
 
-The <info>datetime</info> <comment>(string)</comment> setting is the name of a placeholder value that
-will be replaced in all non-binary files by the current datetime.
+The <info>datetime</info> <comment>(string)</comment> setting is the name of a placeholder value that will be
+replaced in all non-binary files by the current datetime.
 
 Example: <comment>2015-01-28 14:55:23</comment>
 
@@ -265,68 +260,65 @@ The <info>datetime_format</info> <comment>(string)</comment> setting accepts a v
 
 Example: <comment>Y-m-d H:i:s</comment>
 
-The <info>git-commit</info> <comment>(string)</comment> setting is the name of a placeholder value that
-will be replaced in all non-binary files by the current Git commit hash
-of the repository.
+The <info>git-commit</info> <comment>(string)</comment> setting is the name of a placeholder value that will
+be replaced in all non-binary files by the current Git commit hash of the
+repository.
 
 Example: <comment>e558e335f1d165bc24d43fdf903cdadd3c3cbd03</comment>
 
-The <info>git-commit-short</info> <comment>(string)</comment> setting is the name of a placeholder value
-that will be replaced in all non-binary files by the current Git short
-commit hash of the repository.
+The <info>git-commit-short</info> <comment>(string)</comment> setting is the name of a placeholder value that
+will be replaced in all non-binary files by the current Git short commit hash
+of the repository.
 
 Example: <comment>e558e33</comment>
 
-The <info>git-tag</info> <comment>(string)</comment> setting is the name of a placeholder value that will
-be replaced in all non-binary files by the current Git tag of the
-repository.
+The <info>git-tag</info> <comment>(string)</comment> setting is the name of a placeholder value that will be
+replaced in all non-binary files by the current Git tag of the repository.
 
 Examples:
 <comment>
  - 2.0.0
  - 2.0.0-2-ge558e33
 </comment>
-The <info>git-version</info> <comment>(string)</comment> setting is the name of a placeholder value that
-will be replaced in all non-binary files by the one of the following (in
-order):
+
+The <info>git-version</info> <comment>(string)</comment> setting is the name of a placeholder value that will
+be replaced in all non-binary files by the one of the following (in order):
 
   - The git repository's most recent tag.
   - The git repository's current short commit hash.
 
 The short commit hash will only be used if no tag is available.
 
-The <info>intercept</info> <comment>(boolean)</comment> setting is used when generating a new stub. If
-setting is set to <comment>true</comment>, the <comment>Phar::interceptFileFuncs();</comment> method will be
-called in the stub.
+The <info>intercept</info> <comment>(boolean)</comment> setting is used when generating a new stub. If setting
+is set to <comment>true</comment>, the <comment>Phar::interceptFileFuncs();</comment> method will be called in the
+stub.
 
 For more information:
 <comment>
   https://secure.php.net/manual/en/phar.interceptfilefuncs.php
 </comment>
 
-The <info>key</info> <comment>(string)</comment> setting is used to specify the path to the private key
-file. The private key file will be used to sign the PHAR using the
-<comment>OPENSSL</comment> signature algorithm. If an absolute path is not provided, the
-path will be relative to the current working directory.
+The <info>key</info> <comment>(string)</comment> setting is used to specify the path to the private key file.
+The private key file will be used to sign the PHAR using the <comment>OPENSSL</comment> signature
+algorithm. If an absolute path is not provided, the path will be relative to
+the current working directory.
 
-The <info>key-pass</info> <comment>(string, boolean)</comment> setting is used to specify the passphrase
-for the private <info>key</info>. If a <comment>string</comment> is provided, it will be used as is as
-the passphrase. If <comment>true</comment> is provided, you will be prompted for the
-passphrase.
+The <info>key-pass</info> <comment>(string, boolean)</comment> setting is used to specify the passphrase for
+the private <info>key</info>. If a <comment>string</comment> is provided, it will be used as is as the
+passphrase. If <comment>true</comment> is provided, you will be prompted for the passphrase.
 
-The <info>main</info> <comment>(string)</comment> setting is used to specify the file (relative to
-<info>base-path</info>) that will be run when the PHAR is executed from the command
-line. If the file was not added by any of the other file adding settings,
-it will be automatically added after it has been compacted and had its
-placeholder values replaced. The shebang line <comment>#!</comment> will be automatically
-removed if present.
+The <info>main</info> <comment>(string)</comment> setting is used to specify the file (relative to <info>base-path</info>)
+that will be run when the PHAR is executed from the command line. If the file
+was not added by any of the other file adding settings, it will be
+automatically added after it has been compacted and had its placeholder values
+replaced. The shebang line <comment>#!</comment> will be automatically removed if present.
 
-The <info>map</info> <comment>(array)</comment> setting is used to change where some (or all) files are
-stored inside the PHAR. The key is a beginning of the relative path that
-will be matched against the file being added to the PHAR. If the key is
-a match, the matched segment will be replaced with the value. If the key
-is empty, the value will be prefixed to all paths (except for those
-already matched by an earlier key).
+The <info>map</info> <comment>(array)</comment> setting is used to change where some (or all) files are stored
+inside the PHAR. The key is a beginning of the relative path that will be
+matched against the file being added to the PHAR. If the key is a match, the
+matched segment will be replaced with the value. If the key is empty, the
+value will be prefixed to all paths (except for those already matched by an
+earlier key).
 
 <comment>
   {
@@ -356,49 +348,47 @@ already matched by an earlier key).
 The <info>metadata</info> <comment>(any)</comment> setting can be any value. This value will be stored as
 metadata that can be retrieved from the built PHAR <comment>(Phar::getMetadata())</comment>.
 
-The <info>mimetypes</info> <comment>(object)</comment> setting is used when generating a new stub. It is
-a map of file extensions and their mimetypes. To see a list of the default
-mapping, please visit:
+The <info>mimetypes</info> <comment>(object)</comment> setting is used when generating a new stub. It is a map
+of file extensions and their mimetypes. To see a list of the default mapping,
+please visit:
 
   <comment>http://www.php.net/manual/en/phar.webphar.php</comment>
 
-The <info>mung</info> <comment>(array)</comment> setting is used when generating a new stub. It is a list
-of server variables to modify for the PHAR. This setting is only useful
-when the <info>web</info> setting is enabled.
+The <info>mung</info> <comment>(array)</comment> setting is used when generating a new stub. It is a list of
+server variables to modify for the PHAR. This setting is only useful when the
+<info>web</info> setting is enabled.
 
 The <info>not-found</info> <comment>(string)</comment> setting is used when generating a new stub. It
-specifies the file that will be used when a file is not found inside the
-PHAR. This setting is only useful when <info>web</info> setting is enabled.
+specifies the file that will be used when a file is not found inside the PHAR.
+This setting is only useful when <info>web</info> setting is enabled.
 
 The <info>output</info> <comment>(string)</comment> setting specifies the file name and path of the newly
-built PHAR. If the value of the setting is not an absolute path, the path
-will be relative to the current working directory.
+built PHAR. If the value of the setting is not an absolute path, the path will
+be relative to the current working directory.
 
-The <info>replacements</info> <comment>(object)</comment> setting is a map of placeholders and their
-values. The placeholders are replaced in all non-binary files with the
-specified values.
+The <info>replacements</info> <comment>(object)</comment> setting is a map of placeholders and their values.
+The placeholders are replaced in all non-binary files with the specified
+values.
 
-The <info>shebang</info> <comment>(string)</comment> setting is used to specify the shebang line used
-when generating a new stub. By default, this line is used:
+The <info>shebang</info> <comment>(string)</comment> setting is used to specify the shebang line used when
+generating a new stub. By default, this line is used:
 
   <comment>#!/usr/bin/env php</comment>
 
-The shebang line can be removed altogether if <comment>false</comment> or an empty string
-is provided.
+The shebang line can be removed altogether if <comment>false</comment> or an empty string is
+provided.
 
-The <info>stub</info> <comment>(string, boolean)</comment> setting is used to specify the location of a
-stub file, or if one should be generated. If a path is provided, the stub
-file will be used as is inside the PHAR. If <comment>true</comment> is provided, a new stub
-will be generated. If <comment>false (or nothing)</comment> is provided, the default stub
-used by the PHAR class will be used.
+The <info>stub</info> <comment>(string, boolean)</comment> setting is used to specify the location of a stub
+file, or if one should be generated. If a path is provided, the stub file will
+be used as is inside the PHAR. If <comment>true</comment> is provided, a new stub will be
+generated. If <comment>false (or nothing)</comment> is provided, the default stub used by the
+PHAR class will be used.
 
 The <info>web</info> <comment>(boolean)</comment> setting is used when generating a new stub. If <comment>true</comment> is
 provided, <comment>Phar::webPhar()</comment> will be called in the stub.
 HELP;
     // TODO: do not mention when an option is optional but add a red asterix with a foot note for the mandatory
     // fields.
-    // TODO add a test for the doc, if only for the alignment it's already way better than checking manually
-    // in the consoleg
 
     /**
      * {@inheritdoc}
