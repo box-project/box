@@ -30,7 +30,7 @@ build:
 	composer dump-autoload --classmap-authoritative --no-dev
 
 	# Build the PHAR
-	php -d zend.enable_gc=0 -d phar.readonly=0 bin/box build
+	php -d zend.enable_gc=0 -d phar.readonly=0 bin/box build $(args)
 
 	# Install back all the dependencies
 	composer install
@@ -56,7 +56,9 @@ tm:	vendor/bin/phpunit
 	php -d phar.readonly=0 -d zend.enable_gc=0 bin/infection
 
 e2e:		## Run the end-to-end tests
-e2e: bin/box.phar
+e2e: box_dev.json
+	$(MAKE) build args='--config=box_dev.json'
+
 	mv -fv bin/box.phar .
 
 	php -d phar.readonly=0 box.phar build
@@ -106,3 +108,6 @@ vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer: vendor/bamarni
 
 bin/box.phar: bin/box src vendor
 	$(MAKE) build
+
+box_dev.json:
+	cat box.json.dist | sed -E 's/\"key\": \".+\",//g' | sed -E 's/\"algorithm\": \".+\",//g' | sed -E 's/\"alias\": \".+\",//g' > box_dev.json

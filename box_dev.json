@@ -2,7 +2,6 @@
     "chmod": "0755",
     "main": "bin/box",
     "output": "bin/box.phar",
-    "alias": "box.phar",
 
     "directories": [
         "src"
