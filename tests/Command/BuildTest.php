@@ -77,7 +77,7 @@ class BuildTest extends CommandTestCase
             ['interactive' => true]
         );
 
-        $expected = <<<'OUTPUT'
+        $expected = <<<OUTPUT
 
     ____
    / __ )____  _  __
@@ -88,8 +88,27 @@ class BuildTest extends CommandTestCase
 
 Box (repo)
 
+? Loading the bootstrap file "/path/to/tmp/bootstrap.php"
+? Removing the existing PHAR "/path/to/tmp/test.phar"
 Building the PHAR "/path/to/tmp/test.phar"
+? Registering compactors
+  + KevinGH\Box\Compactor\Php
+? Mapping paths
+  - a/deep/test/directory > sub
+? Adding finder files
+? Adding binary finder files
+? Adding directories
+? Adding files
+? Adding main file: /path/to/tmp/run.php
+? Generating new stub
+? Setting metadata
+  - array (
+  'rand' => $rand,
+)
+? No compression
+? Signing using a private key
 Private key passphrase:
+? Setting file permissions to 493
 * Done.
 
  // Size: 100B
@@ -192,7 +211,7 @@ PHP;
             ['interactive' => true]
         );
 
-        $expected = <<<'OUTPUT'
+        $expected = <<<OUTPUT
 
     ____
    / __ )____  _  __
@@ -203,8 +222,29 @@ PHP;
 
 Box (repo)
 
+? Loading the bootstrap file "/path/to/tmp/bootstrap.php"
+? Removing the existing PHAR "/path/to/tmp/test.phar"
 Building the PHAR "/path/to/tmp/test.phar"
+? Registering compactors
+  + KevinGH\Box\Compactor\Php
+? Mapping paths
+  - a/deep/test/directory > sub
+  - (all) > other/
+? Adding finder files
+? Adding binary finder files
+? Adding directories
+? Adding files
+? Adding main file: /path/to/tmp/run.php
+    > other/run.php
+? Generating new stub
+? Setting metadata
+  - array (
+  'rand' => $rand,
+)
+? No compression
+? Signing using a private key
 Private key passphrase:
+? Setting file permissions to 493
 * Done.
 
  // Size: 100B

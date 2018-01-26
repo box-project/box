@@ -153,8 +153,7 @@ HELP;
             sprintf(
                 'Loading the bootstrap file "%s"',
                 $file
-            ),
-            OutputInterface::VERBOSITY_VERBOSE
+            )
         );
 
         $config->loadBootstrap();
@@ -173,8 +172,7 @@ HELP;
             sprintf(
                 'Removing the existing PHAR "%s"',
                 $path
-            ),
-            OutputInterface::VERBOSITY_VERBOSE
+            )
         );
 
         (new Filesystem())->remove($path);
@@ -190,8 +188,7 @@ HELP;
 
         $logger->log(
             BuildLogger::QUESTION_MARK_PREFIX,
-            'Setting replacement values',
-            OutputInterface::VERBOSITY_VERBOSE
+            'Setting replacement values'
         );
 
         foreach ($values as $key => $value) {
@@ -201,8 +198,7 @@ HELP;
                     '%s: %s',
                     $key,
                     $value
-                ),
-                OutputInterface::VERBOSITY_VERBOSE
+                )
             );
         }
 
@@ -216,8 +212,7 @@ HELP;
         if ([] === $compactors) {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
-                'No compactor to register',
-                OutputInterface::VERBOSITY_VERBOSE
+                'No compactor to register'
             );
 
             return;
@@ -225,15 +220,13 @@ HELP;
 
         $logger->log(
             BuildLogger::QUESTION_MARK_PREFIX,
-            'Registering compactors',
-            OutputInterface::VERBOSITY_VERBOSE
+            'Registering compactors'
         );
 
         $logCompactors = function (Compactor $compactor) use ($logger): void {
             $logger->log(
                 BuildLogger::PLUS_PREFIX,
-                get_class($compactor),
-                OutputInterface::VERBOSITY_VERBOSE
+                get_class($compactor)
             );
         };
 
@@ -259,8 +252,7 @@ HELP;
         if ([] !== ($iterators = $config->getFilesIterators())) {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
-                'Adding finder files',
-                OutputInterface::VERBOSITY_VERBOSE
+                'Adding finder files'
             );
 
             foreach ($iterators as $iterator) {
@@ -271,8 +263,7 @@ HELP;
         if ([] !== ($iterators = $config->getBinaryIterators())) {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
-                'Adding binary finder files',
-                OutputInterface::VERBOSITY_VERBOSE
+                'Adding binary finder files'
             );
 
             foreach ($iterators as $iterator) {
@@ -326,8 +317,7 @@ HELP;
             sprintf(
                 'Adding main file: %s',
                 $config->getBasePath().DIRECTORY_SEPARATOR.$main
-            ),
-            OutputInterface::VERBOSITY_VERBOSE
+            )
         );
 
         $localMain = $box->addFile(
@@ -338,8 +328,7 @@ HELP;
         if ($localMain !== $main) {
             $logger->log(
                 BuildLogger::CHEVRON_PREFIX,
-                $localMain,
-                OutputInterface::VERBOSITY_VERBOSE
+                $localMain
             );
         }
 
@@ -351,8 +340,7 @@ HELP;
         if (true === $config->isStubGenerated()) {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
-                'Generating new stub',
-                OutputInterface::VERBOSITY_VERBOSE
+                'Generating new stub'
             );
 
             $stub = $this->createStub($config, $main, $logger);
@@ -366,8 +354,7 @@ HELP;
                 sprintf(
                     'Using stub file: %s',
                     $stub
-                ),
-                OutputInterface::VERBOSITY_VERBOSE
+                )
             );
 
             $box->registerStub($stub);
@@ -388,8 +375,7 @@ HELP;
 
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
-                'Using default stub',
-                OutputInterface::VERBOSITY_VERBOSE
+                'Using default stub'
             );
         }
     }
@@ -399,14 +385,12 @@ HELP;
         if (null !== ($metadata = $config->getMetadata())) {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
-                'Setting metadata',
-                OutputInterface::VERBOSITY_VERBOSE
+                'Setting metadata'
             );
 
             $logger->log(
                 BuildLogger::MINUS_PREFIX,
-                is_string($metadata) ? $metadata : var_export($metadata, true),
-                OutputInterface::VERBOSITY_VERBOSE
+                is_string($metadata) ? $metadata : var_export($metadata, true)
             );
 
             $box->getPhar()->setMetadata($metadata);
@@ -421,16 +405,14 @@ HELP;
                 sprintf(
                     'Compressing with the algorithm "<comment>%s</comment>"',
                     array_search($algorithm, get_phar_compression_algorithms(), true)
-                ),
-                OutputInterface::VERBOSITY_VERBOSE
+                )
             );
 
             $box->getPhar()->compressFiles($algorithm);
         } else {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
-                '<error>No compression</error>',
-                OutputInterface::VERBOSITY_VERBOSE
+                '<error>No compression</error>'
             );
         }
     }
@@ -461,8 +443,7 @@ HELP;
 
         $logger->log(
             BuildLogger::QUESTION_MARK_PREFIX,
-            'Signing using a private key',
-            OutputInterface::VERBOSITY_VERBOSE
+            'Signing using a private key'
         );
 
         $passphrase = $config->getPrivateKeyPassphrase();
@@ -498,8 +479,7 @@ HELP;
         if (null !== ($chmod = $config->getFileMode())) {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
-                "Setting file permissions to <comment>$chmod</comment>",
-                OutputInterface::VERBOSITY_VERBOSE
+                "Setting file permissions to <comment>$chmod</comment>"
             );
 
             chmod($path, $chmod);
@@ -531,7 +511,7 @@ HELP;
         }
 
         if (null !== $message) {
-            $logger->log(BuildLogger::QUESTION_MARK_PREFIX, $message, OutputInterface::VERBOSITY_VERBOSE);
+            $logger->log(BuildLogger::QUESTION_MARK_PREFIX, $message);
         }
 
         foreach ($iterator as $file) {
@@ -609,8 +589,7 @@ HELP;
 
         $logger->log(
             BuildLogger::QUESTION_MARK_PREFIX,
-            'Mapping paths',
-            OutputInterface::VERBOSITY_VERBOSE
+            'Mapping paths'
         );
 
         foreach ($map as $item) {
@@ -625,8 +604,7 @@ HELP;
                         '%s <info>></info> %s',
                         $match,
                         $replace
-                    ),
-                    OutputInterface::VERBOSITY_VERBOSE
+                    )
                 );
             }
         }
