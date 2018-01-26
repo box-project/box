@@ -35,6 +35,8 @@ use function KevinGH\Box\get_phar_compression_algorithms;
 
 final class Build extends Configurable
 {
+    use ChangeableWorkingDirectory;
+
     private const HELP = <<<'HELP'
 The <info>%command.name%</info> command will build a new PHAR based on a variety of settings.
 <comment>
@@ -61,6 +63,8 @@ HELP;
         $this->setName('build');
         $this->setDescription('Builds a new PHAR');
         $this->setHelp(self::HELP);
+
+        $this->configureWorkingDirOption();
     }
 
     /**
@@ -68,6 +72,8 @@ HELP;
      */
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
+        $this->changeWorkingDirectory($input);
+
         $io = new SymfonyStyle($input, $output);
 
         $io->writeln($this->getApplication()->getHelp());

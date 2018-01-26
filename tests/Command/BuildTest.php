@@ -169,6 +169,59 @@ PHP;
         $this->assertSame($expectedFiles, $actualFiles);
     }
 
+    public function test_it_can_build_a_PHAR_from_a_different_directory(): void
+    {
+        (new Filesystem())->mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+
+        $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
+
+        file_put_contents(
+            'box.json',
+            json_encode(
+                [
+                    'alias' => 'alias-test.phar',
+                    'banner' => 'custom banner',
+                    'bootstrap' => 'bootstrap.php',
+                    'chmod' => '0755',
+                    'compactors' => [Php::class],
+                    'directories' => 'a',
+                    'files' => 'test.php',
+                    'finder' => [['in' => 'one']],
+                    'finder-bin' => [['in' => 'two']],
+                    'key' => 'private.key',
+                    'key-pass' => true,
+                    'main' => 'run.php',
+                    'map' => [
+                        ['a/deep/test/directory' => 'sub'],
+                    ],
+                    'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
+                    'output' => 'test.phar',
+                    'shebang' => $shebang,
+                    'stub' => true,
+                ]
+            )
+        );
+
+        chdir($this->cwd);
+
+        $commandTester = $this->getCommandTester();
+
+        $commandTester->setInputs(['test']);
+        $commandTester->execute(
+            [
+                'command' => 'build',
+                '--working-dir' => $this->tmp,
+            ],
+            ['interactive' => true]
+        );
+
+        $this->assertSame(
+            'Hello, world!',
+            exec('php test.phar'),
+            'Expected PHAR to be executable'
+        );
+    }
+
     public function test_it_can_build_a_PHAR_with_complete_mapping(): void
     {
         (new Filesystem())->mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
