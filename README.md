@@ -33,8 +33,11 @@ great things:
 1. [Installation](#installation)
     1. [PHAR (preferred but NOT SUPPORTED YET)](#phar-preferred-but-not-supported-yet)
     1. [Composer](#composer)
-1. [Creating a Phar](#creating-a-phar)
+1. [Creating a PHAR](#creating-a-phar)
+1. [Configuration](doc/configuration.md)
+    1. [Alias](doc/configuration.md#alias)
 1. [Contributing](#contributing)
+1. [Upgrade](#upgrade)
 1. [Credits](#credits)
 
 
@@ -107,6 +110,10 @@ make
 make help
 # => will print the list of available commands
 ```
+
+## Upgrade
+
+Check the [upgrade guide](UPGRADE.md).
 
 
 ## Credits

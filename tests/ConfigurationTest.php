@@ -76,16 +76,51 @@ class ConfigurationTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_get_the_alias(): void
+    public function test_a_default_alias_is_provided_when_non_has_been_configured(): void
     {
         $this->assertSame('default.phar', $this->config->getAlias());
     }
 
-    public function test_configure_the_alias(): void
+    public function test_the_alias_can_be_configured(): void
     {
         $this->setConfig(['alias' => 'test.phar']);
 
         $this->assertSame('test.phar', $this->config->getAlias());
+    }
+
+    public function test_the_alias_value_is_normalized(): void
+    {
+        $this->setConfig(['alias' => '  test.phar  ']);
+
+        $this->assertSame('test.phar', $this->config->getAlias());
+    }
+
+    public function test_the_alias_cannot_be_empty(): void
+    {
+        try {
+            $this->setConfig(['alias' => '']);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'A PHAR alias cannot be empty.',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_the_alias_must_be_a_string(): void
+    {
+        try {
+            $this->setConfig(['alias' => true]);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Expected PHAR alias to be a string, got "<TRUE>" instead.',
+                $exception->getMessage()
+            );
+        }
     }
 
     public function test_get_the_base_path(): void

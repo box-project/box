@@ -26,13 +26,15 @@ use Symfony\Component\Console\Input\InputOption;
  */
 abstract class Configurable extends AbstractCommand
 {
+    private const CONFIG_PARAM = 'config';
+
     /**
      * @override
      */
     protected function configure(): void
     {
         $this->addOption(
-            'configuration',
+            self::CONFIG_PARAM,
             'c',
             InputOption::VALUE_REQUIRED,
             'The alternative configuration file path.'
@@ -51,6 +53,6 @@ abstract class Configurable extends AbstractCommand
         /** @var $helper ConfigurationHelper */
         $helper = $this->getHelper('config');
 
-        return $helper->loadFile($input->getOption('configuration'));
+        return $helper->loadFile($input->getOption(self::CONFIG_PARAM));
     }
 }

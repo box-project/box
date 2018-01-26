@@ -50,7 +50,7 @@ class ValidateTest extends CommandTestCase
         $this->commandTester->execute(
             [
                 'command' => 'validate',
-                '--configuration' => 'test.json',
+                '--config' => 'test.json',
             ],
             [
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,

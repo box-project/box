@@ -74,6 +74,7 @@ $config = PhpCsFixer\Config::create()
             ->in('src')
             ->in('tests')
             ->append(['bin/box'])
+            ->notName('default_stub.php')
     )
 ;
 
