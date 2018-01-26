@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use AppendIterator;
+use function array_map;
 use ArrayIterator;
 use Assert\Assertion;
 use Closure;
@@ -21,6 +23,7 @@ use DateTimeImmutable;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\Php as LegacyPhp;
 use InvalidArgumentException;
+use Iterator;
 use KevinGH\Box\Compactor\Php;
 use Phar;
 use RuntimeException;
@@ -39,12 +42,8 @@ final class Configuration
     private $fileMode;
     private $alias;
     private $basePathRetriever;
-    private $binaryDirectoriesIterator;
-    private $binaryFilesIterator;
-    private $binaryIterators;
-    private $directoriesIterator;
-    private $filesIterator;
-    private $filesIterators;
+    private $files;
+    private $binaryFiles;
     private $bootstrapFile;
     private $compactors;
     private $compressionAlgorithm;
@@ -111,12 +110,8 @@ final class Configuration
     private function __construct(
         string $alias,
         RetrieveRelativeBasePath $basePathRetriever,
-        ?iterable $binaryDirectoriesIterator,
-        ?iterable $binaryFilesIterator,
-        array $binaryIterators,
-        ?iterable $directoriesIterator,
-        ?iterable $filesIterator,
-        array $filesIterators,
+        Iterator $files,
+        Iterator $binaryFiles,
         ?string $bootstrapFile,
         array $compactors,
         ?int $compressionAlgorithm,
@@ -155,12 +150,8 @@ final class Configuration
 
         $this->alias = $alias;
         $this->basePathRetriever = $basePathRetriever;
-        $this->binaryDirectoriesIterator = $binaryDirectoriesIterator;
-        $this->binaryFilesIterator = $binaryFilesIterator;
-        $this->binaryIterators = $binaryIterators;
-        $this->directoriesIterator = $directoriesIterator;
-        $this->filesIterator = $filesIterator;
-        $this->filesIterators = $filesIterators;
+        $this->files = $files;
+        $this->binaryFiles = $binaryFiles;
         $this->bootstrapFile = $bootstrapFile;
         $this->compactors = $compactors;
         $this->compressionAlgorithm = $compressionAlgorithm;
@@ -199,21 +190,17 @@ final class Configuration
         $blacklist = self::retrieveBlacklist($raw);
         $blacklistFilter = self::retrieveBlacklistFilter($basePath, $blacklist);
 
-        $binaryDirectories = self::retrieveBinaryDirectories($raw, $basePath);
-        $binaryDirectoriesIterator = self::retrieveBinaryDirectoriesIterator($binaryDirectories, $blacklistFilter);
+        $files = self::retrieveFiles($raw, 'files', $basePath);
+        $directories = self::retrieveDirectories($raw, 'directories', $basePath, $blacklistFilter);
+        $filesFromFinders = self::retrieveFilesFromFinders($raw, 'finder', $basePath, $blacklistFilter);
 
-        $binaryFiles = self::retrieveBinaryFiles($raw, $basePath);
-        $binaryFilesIterator = self::retrieveBinaryFilesIterator($binaryFiles);
+        $filesAggregate = iterables_to_iterator($files, $directories, ...$filesFromFinders);
 
-        $binaryIterators = self::retrieveBinaryIterators($raw, $basePath, $blacklistFilter);
+        $binaryFiles = self::retrieveFiles($raw, 'files-bin', $basePath);
+        $binaryDirectories = self::retrieveDirectories($raw, 'directories-bin', $basePath, $blacklistFilter);
+        $binaryFilesFromFinders = self::retrieveFilesFromFinders($raw, 'finder-bin', $basePath, $blacklistFilter);
 
-        $directories = self::retrieveDirectories($raw, $basePath);
-        $directoriesIterator = self::retrieveDirectoriesIterator($directories, $blacklistFilter);
-
-        $files = self::retrieveFiles($raw, $basePath);
-        $filesIterator = self::retrieveFilesIterator($files);
-
-        $filesIterators = self::retrieveFilesIterators($raw, $basePath, $blacklistFilter);
+        $binaryFilesAggregate = iterables_to_iterator($binaryFiles, $binaryDirectories, ...$binaryFilesFromFinders);
 
         $bootstrapFile = self::retrieveBootstrapFile($raw, $basePath);
 
@@ -260,12 +247,8 @@ final class Configuration
         return new self(
             $alias,
             $basePathRetriever,
-            $binaryDirectoriesIterator,
-            $binaryFilesIterator,
-            $binaryIterators,
-            $directoriesIterator,
-            $filesIterator,
-            $filesIterators,
+            $filesAggregate,
+            $binaryFilesAggregate,
             $bootstrapFile,
             $compactors,
             $compressionAlgorithm,
@@ -311,43 +294,19 @@ final class Configuration
     }
 
     /**
-     * @return null|iterable|SplFileInfo[]
+     * @return Iterator|SplFileInfo[]
      */
-    public function getBinaryDirectoriesIterator(): ?iterable
+    public function getFiles(): Iterator
     {
-        return $this->binaryDirectoriesIterator;
+        return $this->files;
     }
 
     /**
-     * @return null|iterable|SplFileInfo[]
+     * @return Iterator|SplFileInfo[]
      */
-    public function getBinaryFilesIterator(): ?iterable
+    public function getBinaryFiles(): Iterator
     {
-        return $this->binaryFilesIterator;
-    }
-
-    /**
-     * @return iterable[]|SplFileInfo[][]
-     */
-    public function getBinaryIterators(): array
-    {
-        return $this->binaryIterators;
-    }
-
-    /**
-     * @return null|iterable|SplFileInfo[]
-     */
-    public function getDirectoriesIterator(): ?iterable
-    {
-        return $this->directoriesIterator;
-    }
-
-    /**
-     * @return null|iterable|SplFileInfo[]
-     */
-    public function getFilesIterator(): ?iterable
-    {
-        return $this->filesIterator;
+        return $this->binaryFiles;
     }
 
     public function getBootstrapFile(): ?string
@@ -431,14 +390,6 @@ final class Configuration
     public function getMetadata()
     {
         return $this->metadata;
-    }
-
-    /**
-     * @return iterable[]|SplFileInfo[][]
-     */
-    public function getFilesIterators()
-    {
-        return $this->filesIterators;
     }
 
     public function getPrivateKeyPassphrase(): ?string
@@ -543,7 +494,7 @@ final class Configuration
     }
 
     /**
-     * @return SplFileInfo[]
+     * @return SplFileInfo[] The binary directories added
      */
     private static function retrieveBinaryDirectories(stdClass $raw, string $basePath): array
     {
@@ -563,57 +514,6 @@ final class Configuration
         }
 
         return [];
-    }
-
-    /**
-     * @param SplFileInfo[] $binaryDirectories
-     * @param Closure       $blacklistFilter
-     *
-     * @return null|iterable|SplFileInfo[] the iterator
-     */
-    private static function retrieveBinaryDirectoriesIterator(array $binaryDirectories, Closure $blacklistFilter): ?iterable
-    {
-        if ([] !== $binaryDirectories) {
-            return Finder::create()
-                ->files()
-                ->filter($blacklistFilter)
-                ->ignoreVCS(true)
-                ->in($binaryDirectories);
-        }
-
-        return null;
-    }
-
-    /**
-     * @return SplFileInfo[] the list of paths
-     */
-    private static function retrieveBinaryFiles(stdClass $raw, string $basePath): array
-    {
-        if (isset($raw->{'files-bin'})) {
-            $files = [];
-
-            foreach ((array) $raw->{'files-bin'} as $file) {
-                $files[] = new SplFileInfo(
-                    $basePath.DIRECTORY_SEPARATOR.canonicalize($file)
-                );
-            }
-
-            return $files;
-        }
-
-        return [];
-    }
-
-    /**
-     * @return null|iterable|SplFileInfo[] the iterator
-     */
-    private static function retrieveBinaryFilesIterator(array $binaryFiles): ?iterable
-    {
-        if ([] !== $binaryFiles) {
-            return new ArrayIterator($binaryFiles);
-        }
-
-        return null;
     }
 
     /**
@@ -666,31 +566,16 @@ final class Configuration
 
     /**
      * @param stdClass $raw
-     * @param string   $basePath
-     * @param Closure  $blacklistFilter
-     *
-     * @return iterable[]|SplFileInfo[][]
-     */
-    private static function retrieveBinaryIterators(stdClass $raw, string $basePath, Closure $blacklistFilter): array
-    {
-        if (isset($raw->{'finder-bin'})) {
-            return self::processFinders($raw->{'finder-bin'}, $basePath, $blacklistFilter);
-        }
-
-        return [];
-    }
-
-    /**
-     * @param stdClass $raw
-     * @param string   $basePath
+     * @param string $key
+     * @param string $basePath
      *
      * @return string[]
      */
-    private static function retrieveDirectories(stdClass $raw, string $basePath): array
+    private static function retrieveDirectoryPaths(stdClass $raw, string $key, string $basePath): array
     {
         // TODO: do not accept strings unlike the doc says and document that BC break
         // Need to do the same for bin, directories-bin, files, ~~directories~~
-        if (isset($raw->directories)) {
+        if (isset($raw->$key)) {
             $directories = (array) $raw->directories;
 
             array_walk(
@@ -709,13 +594,16 @@ final class Configuration
     }
 
     /**
-     * @param string[] $directories
-     * @param Closure  $blacklistFilter
+     * @param stdClass $raw
+     * @param string $basePath
+     * @param Closure $blacklistFilter
      *
-     * @return null|iterable|SplFileInfo[]
+     * @return iterable|SplFileInfo[]
      */
-    private static function retrieveDirectoriesIterator(array $directories, Closure $blacklistFilter): ?iterable
+    private static function retrieveDirectories(stdClass $raw, string $key, string $basePath, Closure $blacklistFilter): iterable
     {
+        $directories = self::retrieveDirectoryPaths($raw, $key, $basePath);
+
         if ([] !== $directories) {
             return Finder::create()
                 ->files()
@@ -725,52 +613,35 @@ final class Configuration
             ;
         }
 
-        return null;
+        return [];
     }
 
     /**
+     * @param stdClass $raw
+     * @param string $key
+     * @param string $basePath
+     *
      * @return SplFileInfo[]
      */
-    private static function retrieveFiles(stdClass $raw, string $basePath): array
+    private static function retrieveFiles(stdClass $raw, string $key, string $basePath): array
     {
-        if (false === isset($raw->files)) {
+        if (null !== $files = $raw->$key) {
             return [];
         }
 
-        $files = [];
+        Assertion::isArray($files);
+        Assertion::allString($files);
 
-        foreach ((array) $raw->files as $file) {
-            $file = new SplFileInfo(
-                $path = $basePath.DIRECTORY_SEPARATOR.canonicalize($file)
-            );
+        return array_map(
+            function (string $file) use ($basePath): SplFileInfo {
+                $path = $basePath.DIRECTORY_SEPARATOR.canonicalize($file);
 
-            if (false === $file->isFile()) {
-                throw new InvalidArgumentException(
-                    sprintf(
-                        'The file "%s" does not exist or is not a file.',
-                        $path
-                    )
-                );
-            }
+                Assertion::file($file);
 
-            $files[] = $file;
-        }
-
-        return $files;
-    }
-
-    /**
-     * @param SplFileInfo[] $files
-     *
-     * @return null|iterable|SplFileInfo[]
-     */
-    private static function retrieveFilesIterator(array $files): ?iterable
-    {
-        if ([] !== $files) {
-            return new ArrayIterator($files);
-        }
-
-        return null;
+                return new SplFileInfo($path);
+            },
+            (array) $raw->$key
+        );
     }
 
     /**
@@ -780,12 +651,11 @@ final class Configuration
      *
      * @return iterable[]|SplFileInfo[][]
      */
-    private static function retrieveFilesIterators(stdClass $raw, string $basePath, Closure $blacklistFilter): array
+    private static function retrieveFilesFromFinders(stdClass $raw, string $key, string $basePath, Closure $blacklistFilter): array
     {
-        // TODO: double check the way all files are included to make sure none is missing if one element is
-        // misconfigured
+        // TODO: double check the way all files are included to make sure none is missing if one element is misconfigured
         if (isset($raw->finder)) {
-            return self::processFinders($raw->finder, $basePath, $blacklistFilter);
+            return self::processFinders($raw->$key, $basePath, $blacklistFilter);
         }
 
         return [];
@@ -796,13 +666,12 @@ final class Configuration
      * @param string  $basePath
      * @param Closure $blacklistFilter
      *
-     * @return Finder[]
+     * @return iterable[]|SplFileInfo[][]
      */
     private static function processFinders(array $findersConfig, string $basePath, Closure $blacklistFilter): array
     {
         // TODO: add an example in the doc about the finder and a mention in `finder-bin` to look at finder
-
-        $processFinderConfig = function ($methods) use ($basePath, $blacklistFilter): Finder {
+        $processFinderConfig = function ($methods) use ($basePath, $blacklistFilter) {
             $finder = Finder::create()
                 ->files()
                 ->filter($blacklistFilter)
