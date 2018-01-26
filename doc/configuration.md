@@ -57,11 +57,58 @@ The configuration file is actually a JSON object saved to a file. Note that all 
 
 ## Alias
 
-The `alias` (`string) setting is used when generating a new stub to call the [`Phar::mapPhar()`](phar.mapphar) method if the PHAR is for the
-CLI and the method [`Phar::webPhar()`][phar.webphar] if the PHAR is configured for the web. This makes it easier to refer to files in the
-PHAR and ensure the access to internal files will always work regardless of the location of the PHAR on the file system.
+The `alias` (`string`) setting is used when generating a new stub to call the [`Phar::mapPhar()`](phar.mapphar) method if the PHAR is for
+the CLI and the method [`Phar::webPhar()`][phar.webphar] if the PHAR is configured for the web. This makes it easier to refer to files in
+the PHAR and ensure the access to internal files will always work regardless of the location of the PHAR on the file system.
 
 If no alias is provided, the value `default.phar` will be used.
+
+Example:
+
+```php
+// .phar.stub
+
+#!/usr/bin/env php
+<?php
+
+if (class_exists('Phar')) {
+    Phar::mapPhar('alias.phar');
+    require 'phar://' . __FILE__ . '/index.php';
+}
+
+__HALT_COMPILER(); ?>
+
+
+// index.php
+<?php
+
+if (!isset($GLOBALS['EXECUTE'])) {
+    $GLOBALS['EXECUTE'] = true;
+}
+
+// On the first execution, we require that other file while
+// on the second we will echo "Hello world!"
+if ($GLOBALS['EXECUTE']) {
+    require 'foo.php';
+} else {
+    echo 'Hello world!';
+}
+
+
+// foo.php
+<?php
+
+$GLOBALS['EXECUTE'] = false;
+
+// Notice how we are using `phar://alias.phar` here. This will
+// always work. This allows you to not have to find where the file
+// is located in the PHAR neither finding the PHAR file path
+require 'phar://alias.phar/index.php';
+
+```
+
+If you are using the default stub, [`Phar::setAlias()`][phar.setalias] will be used. Note however that this will behave slightly
+differently.
 
 Example:
 
@@ -77,7 +124,7 @@ file_get_contents('phar://foo.phar/LICENSE');   // Will work both inside the PHA
                                                 // in-memory.
 ```
 
-As you can see above, loading a PHAR which has an alias result in a non-negligeable side effect. A typical case where this might be an issue
+As you can see above, loading a PHAR which has an alias result in a non-negligible side effect. A typical case where this might be an issue
 can be illustrated with box itself. For its end-to-end test, the process is along the lines of:
 
 - 1. Build a PHAR `box.phar` from the source code
@@ -89,10 +136,17 @@ to that new PHAR but as the alias is already used, an error will be thrown.
 
 
 
+
+
 <br />
 <hr />
 
+
+« [Creating a PHAR](../README.md#creating-a-phar) • [Table of Contents](../README.md#table-of-contents) »
+
+
 [phar.mapphar]: https://secure.php.net/manual/en/phar.mapphar.php
+[phar.setalias]: https://secure.php.net/manual/en/phar.setalias.php
 [phar.webphar]: https://secure.php.net/manual/en/phar.webphar.php
 
 

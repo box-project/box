@@ -348,16 +348,6 @@ HELP;
 
     private function registerStub(Configuration $config, Box $box, ?string $main, BuildLogger $logger): void
     {
-        $aliasWasAdded = $box->getPhar()->setAlias($config->getAlias());
-
-        Assertion::true(
-            $aliasWasAdded,
-            sprintf(
-                'The alias "%s" is invalid. See Phar::setAlias() documentation for more information.',
-                $config->getAlias()
-            )
-        );
-
         if (true === $config->isStubGenerated()) {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
@@ -382,6 +372,16 @@ HELP;
 
             $box->registerStub($stub);
         } else {
+            $aliasWasAdded = $box->getPhar()->setAlias($config->getAlias());
+
+            Assertion::true(
+                $aliasWasAdded,
+                sprintf(
+                    'The alias "%s" is invalid. See Phar::setAlias() documentation for more information.',
+                    $config->getAlias()
+                )
+            );
+
             if (null !== $main) {
                 $box->getPhar()->setDefaultStub($main, $main);
             }

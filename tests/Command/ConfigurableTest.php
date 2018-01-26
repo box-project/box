@@ -30,7 +30,7 @@ class ConfigurableTest extends CommandTestCase
     {
         $definition = $this->getCommand()->getDefinition();
 
-        $this->assertTrue($definition->hasOption('configuration'));
+        $this->assertTrue($definition->hasOption('config'));
     }
 
     public function test_it_can_get_the_configuration(): void

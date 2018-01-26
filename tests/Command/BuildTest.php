@@ -1087,14 +1087,14 @@ OUTPUT;
 
         $phar = new Phar('default.phar');
 
-        $this->assertSame($alias, $phar->getAlias());
-
         // Check the stub content
         $actualStub = $this->normalizeStub($phar->getStub());
         $defaultStub = $this->normalizeStub(file_get_contents(self::FIXTURES_DIR.'/../default_stub.php'));
 
         if ($web) {
             if ($stub) {
+                $this->assertSame($phar->getPath(), $phar->getAlias());
+
                 $this->assertRegExp(
                     '/Phar::webPhar\(\'alias-test\.phar\', "index\.php"\);/',
                     $actualStub
@@ -1104,6 +1104,8 @@ OUTPUT;
                     $actualStub
                 );
             } else {
+                $this->assertSame($alias, $phar->getAlias());
+
                 $this->assertSame($defaultStub, $actualStub);
 
                 // No alias is found: I find it weird but well, that's the default stub so there is not much that can
@@ -1115,6 +1117,8 @@ OUTPUT;
             }
         } else {
             if ($stub) {
+                $this->assertSame($phar->getPath(), $phar->getAlias());
+
                 $this->assertNotRegExp(
                     '/Phar::webPhar\(.*\);/',
                     $actualStub
@@ -1124,6 +1128,8 @@ OUTPUT;
                     $actualStub
                 );
             } else {
+                $this->assertSame($alias, $phar->getAlias());
+
                 $this->assertSame($defaultStub, $actualStub);
 
                 // No alias is found: I find it weird but well, that's the default stub so there is not much that can
