@@ -257,15 +257,35 @@ HELP;
     {
         $logger->log(BuildLogger::QUESTION_MARK_PREFIX, 'Adding binary files');
 
+        $count = 0;
+
         foreach ($config->getBinaryFiles() as $file) {
+            $count++;
             $box->addFile((string) $file, null, true);
         }
 
+        $logger->log(
+            BuildLogger::CHEVRON_PREFIX,
+            0 === $count
+                ? 'No file found'
+                : sprintf('%d file(s)', $count)
+        );
+
         $logger->log(BuildLogger::QUESTION_MARK_PREFIX, 'Adding files');
 
+        $count = 0;
+
         foreach ($config->getFiles() as $file) {
+            $count++;
             $box->addFile((string) $file);
         }
+
+        $logger->log(
+            BuildLogger::CHEVRON_PREFIX,
+            0 === $count
+                ? 'No file found'
+                : sprintf('%d file(s)', $count)
+        );
     }
 
     private function registerMainScript(Configuration $config, Box $box, BuildLogger $logger): ?string

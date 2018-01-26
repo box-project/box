@@ -494,29 +494,6 @@ final class Configuration
     }
 
     /**
-     * @return SplFileInfo[] The binary directories added
-     */
-    private static function retrieveBinaryDirectories(stdClass $raw, string $basePath): array
-    {
-        if (isset($raw->{'directories-bin'})) {
-            $directories = (array) $raw->{'directories-bin'};
-
-            array_walk(
-                $directories,
-                function (&$directory) use ($basePath): void {
-                    $directory = $basePath
-                        .DIRECTORY_SEPARATOR
-                        .canonicalize($directory);
-                }
-            );
-
-            return $directories;
-        }
-
-        return [];
-    }
-
-    /**
      * @return string[]
      */
     private static function retrieveBlacklist(stdClass $raw): array
@@ -566,7 +543,7 @@ final class Configuration
 
     /**
      * @param stdClass $raw
-     * @param string $key
+     * @param string $key Config property name
      * @param string $basePath
      *
      * @return string[]
@@ -575,8 +552,8 @@ final class Configuration
     {
         // TODO: do not accept strings unlike the doc says and document that BC break
         // Need to do the same for bin, directories-bin, files, ~~directories~~
-        if (isset($raw->$key)) {
-            $directories = (array) $raw->directories;
+        if (isset($raw->{$key})) {
+            $directories = (array) $raw->{$key};
 
             array_walk(
                 $directories,
@@ -595,6 +572,7 @@ final class Configuration
 
     /**
      * @param stdClass $raw
+     * @param string $key Config property name
      * @param string $basePath
      * @param Closure $blacklistFilter
      *
@@ -618,18 +596,19 @@ final class Configuration
 
     /**
      * @param stdClass $raw
-     * @param string $key
+     * @param string $key  Config property name
      * @param string $basePath
      *
      * @return SplFileInfo[]
      */
     private static function retrieveFiles(stdClass $raw, string $key, string $basePath): array
     {
-        if (null !== $files = $raw->$key) {
+        if (false === isset($raw->{$key})) {
             return [];
         }
 
-        Assertion::isArray($files);
+        $files = (array) $raw->{$key};
+
         Assertion::allString($files);
 
         return array_map(
@@ -640,7 +619,7 @@ final class Configuration
 
                 return new SplFileInfo($path);
             },
-            (array) $raw->$key
+            $files
         );
     }
 
@@ -654,8 +633,8 @@ final class Configuration
     private static function retrieveFilesFromFinders(stdClass $raw, string $key, string $basePath, Closure $blacklistFilter): array
     {
         // TODO: double check the way all files are included to make sure none is missing if one element is misconfigured
-        if (isset($raw->finder)) {
-            return self::processFinders($raw->$key, $basePath, $blacklistFilter);
+        if (isset($raw->{$key})) {
+            return self::processFinders($raw->{$key}, $basePath, $blacklistFilter);
         }
 
         return [];

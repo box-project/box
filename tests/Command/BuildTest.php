@@ -95,10 +95,10 @@ Building the PHAR "/path/to/tmp/test.phar"
   + KevinGH\Box\Compactor\Php
 ? Mapping paths
   - a/deep/test/directory > sub
-? Adding finder files
-? Adding binary finder files
-? Adding directories
+? Adding binary files
+    > 1 file(s)
 ? Adding files
+    > 3 file(s)
 ? Adding main file: /path/to/tmp/run.php
 ? Generating new stub
 ? Setting metadata
@@ -283,10 +283,10 @@ Building the PHAR "/path/to/tmp/test.phar"
 ? Mapping paths
   - a/deep/test/directory > sub
   - (all) > other/
-? Adding finder files
-? Adding binary finder files
-? Adding directories
+? Adding binary files
+    > 1 file(s)
 ? Adding files
+    > 3 file(s)
 ? Adding main file: /path/to/tmp/run.php
     > other/run.php
 ? Generating new stub
@@ -423,10 +423,10 @@ Box (repo)
 ? Mapping paths
   - a/deep/test/directory > sub
   - (all) > other/
-? Adding finder files
-? Adding binary finder files
-? Adding directories
+? Adding binary files
+    > 1 file(s)
 ? Adding files
+    > 3 file(s)
 ? Adding main file: /path/to/tmp/run.php
     > other/run.php
 ? Generating new stub
@@ -515,10 +515,10 @@ Box (repo)
 ? Mapping paths
   - a/deep/test/directory > sub
   - (all) > other/
-? Adding finder files
-? Adding binary finder files
-? Adding directories
+? Adding binary files
+    > 1 file(s)
 ? Adding files
+    > 3 file(s)
 ? Adding main file: /path/to/tmp/run.php
     > other/run.php
 ? Generating new stub
@@ -815,7 +815,10 @@ Box (repo)
 ? Setting replacement values
   + @name@: world
 ? No compactor to register
+? Adding binary files
+    > No file found
 ? Adding files
+    > 1 file(s)
 ? Adding main file: /path/to/tmp/test.php
 ? Generating new stub
 ? No compression
@@ -867,7 +870,10 @@ Box (repo)
 ? Setting replacement values
   + @name@: world
 ? No compactor to register
+? Adding binary files
+    > No file found
 ? Adding files
+    > 1 file(s)
 ? Adding main file: /path/to/tmp/test.php
 ? Generating new stub
 ? No compression
@@ -918,7 +924,10 @@ Box (repo)
 
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
+? Adding binary files
+    > No file found
 ? Adding files
+    > 1 file(s)
 ? Adding main file: /path/to/tmp/test.php
 ? Generating new stub
   - Using custom banner from file: /path/to/tmp/banner
@@ -968,7 +977,10 @@ Box (repo)
 
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
+? Adding binary files
+    > No file found
 ? Adding files
+    > 1 file(s)
 ? Adding main file: /path/to/tmp/test.php
 ? Using stub file: /path/to/tmp/stub.php
 ? No compression
@@ -1017,7 +1029,10 @@ Box (repo)
 
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
+? Adding binary files
+    > No file found
 ? Adding files
+    > 1 file(s)
 ? Using default stub
 ? No compression
 * Done.
@@ -1059,7 +1074,10 @@ Box (repo)
 
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
+? Adding binary files
+    > No file found
 ? Adding files
+    > 1 file(s)
 ? Adding main file: /path/to/tmp/test.php
 ? Generating new stub
 ? Compressing with the algorithm "GZ"
@@ -1113,7 +1131,10 @@ Box (repo)
 
 * Building the PHAR "/path/to/tmp/foo/bar/test.phar"
 ? No compactor to register
+? Adding binary files
+    > No file found
 ? Adding files
+    > 1 file(s)
 ? Adding main file: /path/to/tmp/test.php
 ? Generating new stub
 ? No compression
