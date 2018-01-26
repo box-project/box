@@ -7,9 +7,12 @@ Migration path from [`kherge/box`][box2] to `humbug/box ^3.0`.
 
 - The option `configuration|c` of the command `build` has been changed for `config|c`
 
+
 <br />
 <hr />
 
+
 « [Table of Contents](README.md#table-of-contents) »
+
 
 [box2]: https://github.com/box-project/box2

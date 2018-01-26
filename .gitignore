@@ -1,6 +1,7 @@
 /*.phar
 /*.phar.sig
 /box.json
+/box_dev.json
 /bin/
 !/bin/box
 !/bin/box.bat
