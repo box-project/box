@@ -191,8 +191,6 @@ class ConfigurationTest extends TestCase
 
     public function test_configure_the_files_iterator(): void
     {
-        //TODO: document 'files' & 'directories' (same for bin) are relative to base path
-        //TODO: document blacklist doesn't apply to 'files'
         touch('file0');
         touch('file1');
 

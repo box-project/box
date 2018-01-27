@@ -1,5 +1,14 @@
 # Configuration
 
+1. [Alias][alis]
+1. [Base path][base-path]
+1. [Including files][including-files]
+    1. [Files (`files` and `files-bin`)][files]
+    1. [Directories (`directories` and `directories-bin`)][directories]
+    1. [Finder (`finder` and `finder-bin`)][finder]
+    1. [Blacklist (`blacklist`)][blacklist]
+
+
 // TODO: do not mention when an option is optional but add a red asterix with a foot note for the mandatory
 // fields.
 // TODO: right now this documentation is a copy/paste of the doc from the comment. This needs to be reworked
@@ -158,7 +167,7 @@ The `files` (`string[]`) setting is a list of files paths relative to `base-path
 processed by the compactors (see: `compactors`), have their placeholder values replaced (see: `replacements`) and added
 to the PHAR.
 
-This setting is not affected by the `blacklist` setting.
+This setting is not affected by the [`blacklist`][blacklist] setting.
 
 `files-bin` is analogue to `files` except the files are added to the PHAR unmodified. This is suitable for the files
 such as images, those that contain binary data or simply a file you do not want to alter at all despite using
@@ -171,7 +180,7 @@ The directories (`string[]`) setting is a list of directory paths relative to `b
 by the compactors (see: `compactors`), have their placeholder values replaced (see: `replacements`) and added to the
 PHAR.
 
-Files listed in the `blacklist` will not be added to the PHAR.
+Files listed in the [`blacklist`][blacklist] will not be added to the PHAR.
 
 `directories-bin` is analogue to `directories` except the files are added to the PHAR unmodified. This is suitable for
 the files such as images, those that contain binary data or simply a file you do not want to alter at all despite using
@@ -184,8 +193,8 @@ The finder (`object[]`) setting is a list of JSON objects. Each object (key, val
 of the [Symfony Finder][symfony-finder] used by Box. If an array of values is provided for a single key, the method will
 be called once per value in the array.
  
-Note that the paths specified for the `in` method are relative to `base-path` and that the finder will account for the
-files registered in the `blacklist`.
+Note that the paths specified for the `in` method are relative to [`base-path`][base-path] and that the finder will
+account for the files registered in the [`blacklist`][blacklist].
 
 `finder-bin` is analogue to `finder` except the files are added to the PHAR unmodified. This is suitable for the files
 such as images, those that contain binary data or simply a file you do not want to alter at all despite using
@@ -195,8 +204,8 @@ compactors.
 ### Blacklist (`blacklist`)
 
 The `blacklist` (`string[]`) setting is a list of files that must not be added. The files blacklisted are the ones found
-using the other available configuration settings: `files`, `files-bin`, `directories`, `directories-bin`, `finder`,
-`finder-bin`.
+using the other available configuration settings: [`files`][files], [`files-bin`][files], [`directories`][directories],
+[`directories-bin`][directories], [`finder`][finder], [`finder-bin`][finder].
 
 
 
@@ -214,6 +223,13 @@ TODO: for the Finder:
 « [Creating a PHAR](../README.md#creating-a-phar) • [Table of Contents](../README.md#table-of-contents) »
 
 
+[alias]: #alias-alias
+[base-path]: #base-path-base-path
+[including-files]: #including-files
+[files]: #files-files-and-files-bin
+[directories]: #directories-directories-and-directories-bin
+[finder]: #finder-finder-and-finder-bin
+[blacklist]: #blacklist-blacklist
 [phar.mapphar]: https://secure.php.net/manual/en/phar.mapphar.php
 [phar.setalias]: https://secure.php.net/manual/en/phar.setalias.php
 [phar.webphar]: https://secure.php.net/manual/en/phar.webphar.php
