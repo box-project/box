@@ -14,20 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use function array_map;
-use function array_values;
-use function chdir;
 use Closure;
-use const DIRECTORY_SEPARATOR;
-use function file_put_contents;
 use Generator;
 use Herrera\Annotations\Tokenizer;
 use InvalidArgumentException;
-use function iter\fn\method;
-use Iterator;
-use function iterator_to_array;
-use function json_encode;
-use const JSON_PRETTY_PRINT;
 use KevinGH\Box\Compactor\DummyCompactor;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Helper\ConfigurationHelper;
@@ -35,11 +25,9 @@ use KevinGH\Box\Json\JsonValidationException;
 use Phar;
 use PHPUnit\Framework\TestCase;
 use SplFileInfo;
-use function sprintf;
 use stdClass;
-use function str_replace;
 use Symfony\Component\Finder\Finder;
-use function touch;
+use function iter\fn\method;
 
 /**
  * @covers \KevinGH\Box\Configuration
@@ -235,6 +223,8 @@ EOF
 
     /**
      * @dataProvider provideJsonValidNonStringValues
+     *
+     * @param mixed $value
      */
     public function test_the_base_path_value_must_be_a_string($value): void
     {
@@ -999,6 +989,8 @@ EOF
 
     /**
      * @dataProvider provideJsonValidNonStringArray
+     *
+     * @param mixed $value
      */
     public function test_blacklist_value_must_be_an_array_of_strings($value): void
     {
@@ -1046,6 +1038,8 @@ EOF
 
     /**
      * @dataProvider provideJsonValidNonStringArray
+     *
+     * @param mixed $value
      */
     public function test_files_value_must_be_an_array_of_strings($value): void
     {
@@ -1067,6 +1061,8 @@ EOF
 
     /**
      * @dataProvider provideJsonValidNonStringArray
+     *
+     * @param mixed $value
      */
     public function test_bin_files_value_must_be_an_array_of_strings($value): void
     {
@@ -1116,6 +1112,8 @@ EOF
 
     /**
      * @dataProvider provideJsonValidNonStringArray
+     *
+     * @param mixed $value
      */
     public function test_directories_value_must_be_an_array_of_strings($value): void
     {
@@ -1137,6 +1135,8 @@ EOF
 
     /**
      * @dataProvider provideJsonValidNonStringArray
+     *
+     * @param mixed $value
      */
     public function test_bin_directories_value_must_be_an_array_of_strings($value): void
     {
@@ -1187,6 +1187,8 @@ EOF
 
     /**
      * @dataProvider provideJsonValidNonObjectArray
+     *
+     * @param mixed $value
      */
     public function test_finder_value_must_be_an_array_of_objects($value): void
     {
@@ -1234,8 +1236,8 @@ EOF
         $finderConfig = [
             [
                 ' in ' => [' A ', ' B ', ' D '],
-                ' exclude ' => [ ' D/D0 ', ' D/D1 ' ],
-                ' append ' => [ ' oof ', ' rab ' ],
+                ' exclude ' => [' D/D0 ', ' D/D1 '],
+                ' append ' => [' oof ', ' rab '],
             ],
         ];
 

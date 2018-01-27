@@ -17,7 +17,6 @@ namespace KevinGH\Box;
 use AppendIterator;
 use ArrayIterator;
 use Assert\Assertion;
-use function is_array;
 use Iterator;
 use IteratorAggregate;
 use Phar;

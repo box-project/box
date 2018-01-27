@@ -20,10 +20,8 @@ use KevinGH\Box\Compactor;
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Logger\BuildLogger;
 use KevinGH\Box\MapFile;
-use KevinGH\Box\RetrieveRelativeBasePath;
 use KevinGH\Box\StubGenerator;
 use RuntimeException;
-use SplFileInfo;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -260,7 +258,7 @@ HELP;
         $count = 0;
 
         foreach ($config->getBinaryFiles() as $file) {
-            $count++;
+            ++$count;
             $box->addFile((string) $file, null, true);
         }
 
@@ -276,7 +274,7 @@ HELP;
         $count = 0;
 
         foreach ($config->getFiles() as $file) {
-            $count++;
+            ++$count;
             $box->addFile((string) $file);
         }
 

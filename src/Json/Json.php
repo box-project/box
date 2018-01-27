@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Json;
 
-use function implode;
 use InvalidArgumentException;
 use JsonSchema\Validator;
 use Seld\JsonLint\JsonParser;
@@ -106,7 +105,7 @@ final class Json
             }
 
             $message = [] !== $errors
-                ? "\"$file\" does not match the expected JSON schema:\n  - " . implode("\n  - ", $errors)
+                ? "\"$file\" does not match the expected JSON schema:\n  - ".implode("\n  - ", $errors)
                 : "\"$file\" does not match the expected JSON schema."
             ;
 

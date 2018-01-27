@@ -14,28 +14,16 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use AppendIterator;
-use function array_map;
-use function array_unique;
-use ArrayIterator;
-use Assert\Assert;
 use Assert\Assertion;
 use Closure;
 use DateTimeImmutable;
-use const DIRECTORY_SEPARATOR;
-use function file_exists;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\Php as LegacyPhp;
-use function in_array;
 use InvalidArgumentException;
-use function is_file;
-use Iterator;
-use function iterator_to_array;
 use KevinGH\Box\Compactor\Php;
 use Phar;
 use RuntimeException;
 use SplFileInfo;
-use function sprintf;
 use stdClass;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -49,7 +37,7 @@ final class Configuration
     private const DEFAULT_REPLACEMENT_SIGIL = '@';
 
     /**
-     * @var Filesystem|null Available only when the Configuration is being instantiated
+     * @var null|Filesystem Available only when the Configuration is being instantiated
      */
     private static $fileSystem;
 
@@ -86,36 +74,36 @@ final class Configuration
     private $isWebPhar;
 
     /**
-     * @param string                     $alias
-     * @param RetrieveRelativeBasePath   $basePathRetriever         Utility to private the base path used and be able to retrieve a path relative to it (the base path)
-     * @param SplFileInfo[]     $files             List of files
-     * @param SplFileInfo[] $binaryFiles            List of binary files
-     * @param null|string                $bootstrapFile             The bootstrap file path
-     * @param Compactor[]                $compactors                List of file contents compactors
-     * @param null|int                   $compressionAlgorithm      Compression algorithm constant value. See the \Phar class constants
-     * @param null|int                   $fileMode                  File mode in octal form
-     * @param null|string                $mainScriptPath            The main script file path
-     * @param null|string                $mainScriptContent         The processed content of the main script file
-     * @param MapFile                    $fileMapper                Utility to map the files from outside and inside the PHAR
-     * @param mixed                      $metadata                  The PHAR Metadata
-     * @param array                      $mimetypeMapping           The file extension MIME type mapping
-     * @param array                      $mungVariables             The list of server variables to modify for execution
-     * @param null|string                $notFoundScriptPath        The file path to the script to execute when a file is not found
-     * @param string                     $outputPath
-     * @param null|string                $privateKeyPassphrase
-     * @param null|string                $privateKeyPath
-     * @param bool                       $isPrivateKeyPrompt        If the user should be prompted for the private key passphrase
-     * @param array                      $processedReplacements     The processed list of replacement placeholders and their values
-     * @param null|string                $shebang                   The shebang line
-     * @param int                        $signingAlgorithm          The PHAR siging algorithm. See \Phar constants
-     * @param null|string                $stubBanner                The stub banner comment
-     * @param null|string                $stubBannerPath            The path to the stub banner comment file
-     * @param null|string                $stubBannerFromFile        The stub banner comment from the fine
-     * @param null|string                $stubPath                  The PHAR stub file path
-     * @param bool                       $isExtractable             Wether or not StubGenerator::extract() should be used
-     * @param bool                       $isInterceptFileFuncs      wether or not Phar::interceptFileFuncs() should be used
-     * @param bool                       $isStubGenerated           Wether or not if the PHAR stub should be generated
-     * @param bool                       $isWebPhar                 Wether or not the PHAR is going to be used for the web
+     * @param string                   $alias
+     * @param RetrieveRelativeBasePath $basePathRetriever     Utility to private the base path used and be able to retrieve a path relative to it (the base path)
+     * @param SplFileInfo[]            $files                 List of files
+     * @param SplFileInfo[]            $binaryFiles           List of binary files
+     * @param null|string              $bootstrapFile         The bootstrap file path
+     * @param Compactor[]              $compactors            List of file contents compactors
+     * @param null|int                 $compressionAlgorithm  Compression algorithm constant value. See the \Phar class constants
+     * @param null|int                 $fileMode              File mode in octal form
+     * @param null|string              $mainScriptPath        The main script file path
+     * @param null|string              $mainScriptContent     The processed content of the main script file
+     * @param MapFile                  $fileMapper            Utility to map the files from outside and inside the PHAR
+     * @param mixed                    $metadata              The PHAR Metadata
+     * @param array                    $mimetypeMapping       The file extension MIME type mapping
+     * @param array                    $mungVariables         The list of server variables to modify for execution
+     * @param null|string              $notFoundScriptPath    The file path to the script to execute when a file is not found
+     * @param string                   $outputPath
+     * @param null|string              $privateKeyPassphrase
+     * @param null|string              $privateKeyPath
+     * @param bool                     $isPrivateKeyPrompt    If the user should be prompted for the private key passphrase
+     * @param array                    $processedReplacements The processed list of replacement placeholders and their values
+     * @param null|string              $shebang               The shebang line
+     * @param int                      $signingAlgorithm      The PHAR siging algorithm. See \Phar constants
+     * @param null|string              $stubBanner            The stub banner comment
+     * @param null|string              $stubBannerPath        The path to the stub banner comment file
+     * @param null|string              $stubBannerFromFile    The stub banner comment from the fine
+     * @param null|string              $stubPath              The PHAR stub file path
+     * @param bool                     $isExtractable         Wether or not StubGenerator::extract() should be used
+     * @param bool                     $isInterceptFileFuncs  wether or not Phar::interceptFileFuncs() should be used
+     * @param bool                     $isStubGenerated       Wether or not if the PHAR stub should be generated
+     * @param bool                     $isWebPhar             Wether or not the PHAR is going to be used for the web
      */
     private function __construct(
         string $alias,
@@ -504,7 +492,7 @@ final class Configuration
 
     /**
      * @param stdClass $raw
-     * @param string $basePath
+     * @param string   $basePath
      *
      * @return Closure
      */
@@ -536,7 +524,7 @@ final class Configuration
             $file = trim($file);
 
             if (false === self::$fileSystem->isAbsolutePath($file)) {
-                $file = $basePath . DIRECTORY_SEPARATOR . canonicalize($file);
+                $file = $basePath.DIRECTORY_SEPARATOR.canonicalize($file);
             }
 
             return $file;
@@ -547,8 +535,8 @@ final class Configuration
 
     /**
      * @param stdClass $raw
-     * @param string $key  Config property name
-     * @param string $basePath
+     * @param string   $key      Config property name
+     * @param string   $basePath
      *
      * @return SplFileInfo[]
      */
@@ -566,7 +554,7 @@ final class Configuration
             $file = trim($file);
 
             if (false === self::$fileSystem->isAbsolutePath($file)) {
-                $file = $basePath . DIRECTORY_SEPARATOR . canonicalize($file);
+                $file = $basePath.DIRECTORY_SEPARATOR.canonicalize($file);
             }
 
             Assertion::file(
@@ -585,9 +573,9 @@ final class Configuration
 
     /**
      * @param stdClass $raw
-     * @param string $key Config property name
-     * @param string $basePath
-     * @param Closure $blacklistFilter
+     * @param string   $key             Config property name
+     * @param string   $basePath
+     * @param Closure  $blacklistFilter
      *
      * @return iterable|SplFileInfo[]
      */
@@ -645,7 +633,7 @@ final class Configuration
                 if (false === self::$fileSystem->isAbsolutePath($directory)) {
                     $directory = sprintf(
                         '%s%s',
-                        $basePath . DIRECTORY_SEPARATOR,
+                        $basePath.DIRECTORY_SEPARATOR,
                         rtrim(
                             canonicalize($directory),
                             DIRECTORY_SEPARATOR
@@ -662,7 +650,7 @@ final class Configuration
                 if (false === self::$fileSystem->isAbsolutePath($fileOrDirectory)) {
                     $fileOrDirectory = sprintf(
                         '%s%s',
-                        $basePath . DIRECTORY_SEPARATOR,
+                        $basePath.DIRECTORY_SEPARATOR,
                         rtrim(
                             canonicalize($fileOrDirectory),
                             DIRECTORY_SEPARATOR
@@ -722,8 +710,8 @@ final class Configuration
 
     /**
      * @param stdClass $raw
-     * @param string $key Config property name
-     * @param string $basePath
+     * @param string   $key      Config property name
+     * @param string   $basePath
      *
      * @return string[]
      */
@@ -741,7 +729,7 @@ final class Configuration
             if (false === self::$fileSystem->isAbsolutePath($directory)) {
                 $directory = sprintf(
                     '%s%s',
-                    $basePath . DIRECTORY_SEPARATOR,
+                    $basePath.DIRECTORY_SEPARATOR,
                     rtrim(
                         canonicalize($directory),
                         DIRECTORY_SEPARATOR
