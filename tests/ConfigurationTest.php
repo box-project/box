@@ -941,6 +941,62 @@ EOF
         }
     }
 
+    public function test_the_cannot_be_included_twice(): void
+    {
+        mkdir('A');
+        touch('A/foo');
+
+        mkdir('B');
+        touch('B/bar');
+
+        $this->setConfig(
+            [
+                'files' => [
+                    'A/foo',
+                    'B/bar',
+                ],
+                'directories' => ['A', 'B'],
+                'finder' => [
+                    [
+                        'in' => ['A', 'B'],
+                    ],
+                    [
+                        'in' => ['A', 'B'],
+                    ],
+                ],
+
+                'files-bin' => [
+                    'A/foo',
+                    'B/bar',
+                ],
+                'directories-bin' => ['A', 'B'],
+                'finder-bin' => [
+                    [
+                        'in' => ['A', 'B'],
+                    ],
+                    [
+                        'in' => ['A', 'B'],
+                    ],
+                ],
+            ]
+        );
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'A/foo',
+            'B/bar',
+        ];
+
+        $this->assertSame(
+            $expected,
+            $this->normalizeConfigPaths($this->config->getFiles())
+        );
+        $this->assertSame(
+            $expected,
+            $this->normalizeConfigPaths($this->config->getBinaryFiles())
+        );
+    }
+
     /**
      * @dataProvider provideJsonValidNonStringArray
      */
@@ -2054,9 +2110,11 @@ CODE
     }
 
     /**
+     * @param SplFileInfo[] $files
+     *
      * @return string[] File real paths relative to the current temporary directory
      */
-    private function normalizeConfigPaths(Iterator $files): array
+    private function normalizeConfigPaths(array $files): array
     {
         $root = $this->tmp;
 
@@ -2067,7 +2125,7 @@ CODE
 
                     return str_replace($root.DIRECTORY_SEPARATOR, '', $path);
                 },
-                iterator_to_array($files)
+                $files
             )
         );
     }

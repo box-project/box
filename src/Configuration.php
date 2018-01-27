@@ -16,6 +16,7 @@ namespace KevinGH\Box;
 
 use AppendIterator;
 use function array_map;
+use function array_unique;
 use ArrayIterator;
 use Assert\Assert;
 use Assert\Assertion;
@@ -29,6 +30,7 @@ use function in_array;
 use InvalidArgumentException;
 use function is_file;
 use Iterator;
+use function iterator_to_array;
 use KevinGH\Box\Compactor\Php;
 use Phar;
 use RuntimeException;
@@ -86,12 +88,8 @@ final class Configuration
     /**
      * @param string                     $alias
      * @param RetrieveRelativeBasePath   $basePathRetriever         Utility to private the base path used and be able to retrieve a path relative to it (the base path)
-     * @param iterable|SplFileInfo[]     $binaryDirectoriesIterator List of directories containing images or other binary data
-     * @param iterable|SplFileInfo[]     $binaryFilesIterator       List of files containing images or other binary data
-     * @param iterable[]|SplFileInfo[][] $binaryIterators           List of file iterators returning binary files
-     * @param iterable|SplFileInfo[]     $directoriesIterator       List of directories
-     * @param iterable|SplFileInfo[]     $filesIterator             List of files
-     * @param iterable[]|SplFileInfo[][] $filesIterators            List of file iterators
+     * @param SplFileInfo[]     $files             List of files
+     * @param SplFileInfo[] $binaryFiles            List of binary files
      * @param null|string                $bootstrapFile             The bootstrap file path
      * @param Compactor[]                $compactors                List of file contents compactors
      * @param null|int                   $compressionAlgorithm      Compression algorithm constant value. See the \Phar class constants
@@ -122,8 +120,8 @@ final class Configuration
     private function __construct(
         string $alias,
         RetrieveRelativeBasePath $basePathRetriever,
-        Iterator $files,
-        Iterator $binaryFiles,
+        array $files,
+        array $binaryFiles,
         ?string $bootstrapFile,
         array $compactors,
         ?int $compressionAlgorithm,
@@ -207,13 +205,13 @@ final class Configuration
         $directories = self::retrieveDirectories($raw, 'directories', $basePath, $blacklistFilter);
         $filesFromFinders = self::retrieveFilesFromFinders($raw, 'finder', $basePath, $blacklistFilter);
 
-        $filesAggregate = iterables_to_iterator($files, $directories, ...$filesFromFinders);
+        $filesAggregate = array_unique(iterator_to_array(iterables_to_iterator($files, $directories, ...$filesFromFinders)));
 
         $binaryFiles = self::retrieveFiles($raw, 'files-bin', $basePath);
         $binaryDirectories = self::retrieveDirectories($raw, 'directories-bin', $basePath, $blacklistFilter);
         $binaryFilesFromFinders = self::retrieveFilesFromFinders($raw, 'finder-bin', $basePath, $blacklistFilter);
 
-        $binaryFilesAggregate = iterables_to_iterator($binaryFiles, $binaryDirectories, ...$binaryFilesFromFinders);
+        $binaryFilesAggregate = array_unique(iterator_to_array(iterables_to_iterator($binaryFiles, $binaryDirectories, ...$binaryFilesFromFinders)));
 
         $bootstrapFile = self::retrieveBootstrapFile($raw, $basePath);
 
@@ -309,17 +307,17 @@ final class Configuration
     }
 
     /**
-     * @return Iterator|SplFileInfo[]
+     * @return SplFileInfo[]
      */
-    public function getFiles(): Iterator
+    public function getFiles(): array
     {
         return $this->files;
     }
 
     /**
-     * @return Iterator|SplFileInfo[]
+     * @return SplFileInfo[]
      */
-    public function getBinaryFiles(): Iterator
+    public function getBinaryFiles(): array
     {
         return $this->binaryFiles;
     }
