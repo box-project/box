@@ -1,6 +1,6 @@
 {
     "alias": "test.phar",
-    "files": "test.php",
+    "files": ["test.php"],
     "output": "test.phar"
 }
 

@@ -104,10 +104,12 @@ final class Json
                 $errors[] = ($error['property'] ? $error['property'].' : ' : '').$error['message'];
             }
 
-            throw new JsonValidationException(
-                '"'.$file.'" does not match the expected JSON schema',
-                $errors
-            );
+            $message = [] !== $errors
+                ? "\"$file\" does not match the expected JSON schema:\n  - ".implode("\n  - ", $errors)
+                : "\"$file\" does not match the expected JSON schema."
+            ;
+
+            throw new JsonValidationException($message, $file, $errors);
         }
     }
 }

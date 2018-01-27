@@ -20,10 +20,8 @@ use KevinGH\Box\Compactor;
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Logger\BuildLogger;
 use KevinGH\Box\MapFile;
-use KevinGH\Box\RetrieveRelativeBasePath;
 use KevinGH\Box\StubGenerator;
 use RuntimeException;
-use SplFileInfo;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -255,58 +253,36 @@ HELP;
 
     private function addFiles(Configuration $config, Box $box, BuildLogger $logger): void
     {
-        if ([] !== ($iterators = $config->getFilesIterators())) {
-            $logger->log(
-                BuildLogger::QUESTION_MARK_PREFIX,
-                'Adding finder files'
-            );
+        $logger->log(BuildLogger::QUESTION_MARK_PREFIX, 'Adding binary files');
 
-            foreach ($iterators as $iterator) {
-                $this->addFilesToBox($box, $iterator, null, false, $logger);
-            }
+        $count = 0;
+
+        foreach ($config->getBinaryFiles() as $file) {
+            ++$count;
+            $box->addFile((string) $file, null, true);
         }
 
-        if ([] !== ($iterators = $config->getBinaryIterators())) {
-            $logger->log(
-                BuildLogger::QUESTION_MARK_PREFIX,
-                'Adding binary finder files'
-            );
+        $logger->log(
+            BuildLogger::CHEVRON_PREFIX,
+            0 === $count
+                ? 'No file found'
+                : sprintf('%d file(s)', $count)
+        );
 
-            foreach ($iterators as $iterator) {
-                $this->addFilesToBox($box, $iterator, null, true, $logger);
-            }
+        $logger->log(BuildLogger::QUESTION_MARK_PREFIX, 'Adding files');
+
+        $count = 0;
+
+        foreach ($config->getFiles() as $file) {
+            ++$count;
+            $box->addFile((string) $file);
         }
 
-        $this->addFilesToBox(
-            $box,
-            $config->getDirectoriesIterator(),
-            'Adding directories',
-            false,
-            $logger
-        );
-
-        $this->addFilesToBox(
-            $box,
-            $config->getBinaryDirectoriesIterator(),
-            'Adding binary directories',
-            true,
-            $logger
-        );
-
-        $this->addFilesToBox(
-            $box,
-            $config->getFilesIterator(),
-            'Adding files',
-            false,
-            $logger
-        );
-
-        $this->addFilesToBox(
-            $box,
-            $config->getBinaryFilesIterator(),
-            'Adding binary files',
-            true,
-            $logger
+        $logger->log(
+            BuildLogger::CHEVRON_PREFIX,
+            0 === $count
+                ? 'No file found'
+                : sprintf('%d file(s)', $count)
         );
     }
 
@@ -489,46 +465,6 @@ HELP;
             );
 
             chmod($path, $chmod);
-        }
-    }
-
-    /**
-     * Adds files using an iterator.
-     *
-     * @param Configuration            $config
-     * @param Box                      $box
-     * @param iterable|SplFileInfo[]   $iterator                 the iterator
-     * @param string                   $message                  the message to announce
-     * @param bool                     $binary                   Should the adding be binary-safe?
-     * @param RetrieveRelativeBasePath $retrieveRelativeBasePath
-     * @param BuildLogger              $logger
-     */
-    private function addFilesToBox(
-        Box $box,
-        ?iterable $iterator,
-        ?string $message,
-        bool $binary,
-        BuildLogger $logger
-    ): void {
-        static $count = 0;
-
-        if (null === $iterator) {
-            return;
-        }
-
-        if (null !== $message) {
-            $logger->log(BuildLogger::QUESTION_MARK_PREFIX, $message);
-        }
-
-        foreach ($iterator as $file) {
-            // @var $file SplFileInfo
-
-            // Forces garbadge collection from time to time
-            if (0 === (++$count % 100)) {
-                gc_collect_cycles();
-            }
-
-            $box->addFile((string) $file, null, $binary);
         }
     }
 

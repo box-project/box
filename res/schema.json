@@ -37,11 +37,11 @@
             "type": "string"
         },
         "blacklist": {
-            "description": "A list of relative file paths to skip.",
+            "description": "A list of file paths to skip.",
             "items": {
                 "type": "string"
             },
-            "type": ["array", "string"]
+            "type": ["array"]
         },
         "bootstrap": {
             "description": "A file used to load third-party class compactors.",
@@ -71,43 +71,49 @@
             "type": "string"
         },
         "directories": {
-            "description": "A list of relative directory paths to search for scripts.",
+            "description": "A list of directory paths to search for scripts.",
             "items": {
                 "type": "string"
             },
-            "type": ["array", "string"]
+            "type": ["array"]
         },
         "directories-bin": {
-            "description": "(binary safe) A list of relative directory paths to search for files.",
+            "description": "A list of directory paths to search for binary safe files.",
             "items": {
                 "type": "string"
             },
-            "type": ["array", "string"]
+            "type": ["array"]
         },
         "extract": {
             "description": "The flag to embed an extraction class into the stub.",
             "type": "boolean"
         },
         "files": {
-            "description": "A list of relative file paths to include.",
+            "description": "A list of file paths to include.",
             "items": {
                 "type": "string"
             },
-            "type": ["array", "string"]
+            "type": ["array"]
         },
         "files-bin": {
-            "description": "(binary safe) A list of relative file paths to include.",
+            "description": "A list of binary safe file paths to include.",
             "items": {
                 "type": "string"
             },
-            "type": ["array", "string"]
+            "type": ["array"]
         },
         "finder": {
             "description": "A list of Finder configuration settings.",
+            "items": {
+                "type": "object"
+            },
             "type": "array"
         },
         "finder-bin": {
-            "description": "(binary safe) A list of Finder configuration settings.",
+            "description": "A list of Finder configuration settings for binary safe files.",
+            "items": {
+                "type": "object"
+            },
             "type": "array"
         },
         "git-commit": {

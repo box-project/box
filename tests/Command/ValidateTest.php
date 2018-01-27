@@ -170,8 +170,12 @@ OUTPUT;
         $expected = str_replace(
             '/path/to',
             $this->tmp,
-            'The configuration file failed validation: "/path/to/box.json" does not match the expected JSON '
-            .'schema'.PHP_EOL
+            <<<'EOF'
+The configuration file failed validation: "/path/to/box.json" does not match the expected JSON schema:
+
+  - The property test is not defined and the definition does not allow additional properties
+
+EOF
         );
 
         $this->assertSame($expected, $this->commandTester->getDisplay(true));
@@ -198,8 +202,10 @@ OUTPUT;
                 str_replace(
                     '/path/to',
                     $this->tmp,
-                    'The configuration file failed validation: "/path/to/box.json" does not match the expected '
-                    .'JSON schema'
+                    <<<'EOF'
+The configuration file failed validation: "/path/to/box.json" does not match the expected JSON schema:
+  - The property test is not defined and the definition does not allow additional properties
+EOF
                 ),
                 $exception->getMessage()
             );

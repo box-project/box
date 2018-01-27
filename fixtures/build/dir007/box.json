@@ -1,6 +1,6 @@
 {
     "alias": "test.phar",
-    "files": "test.php",
+    "files": ["test.php"],
     "main": "test.php",
     "output": "foo/bar/test.phar",
     "stub": true

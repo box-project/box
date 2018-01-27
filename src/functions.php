@@ -14,7 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use AppendIterator;
+use ArrayIterator;
 use Assert\Assertion;
+use Iterator;
+use IteratorAggregate;
 use Phar;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\PathUtil\Path;
@@ -51,6 +55,25 @@ function get_phar_compression_algorithms(): array
     ];
 
     return $algorithms;
+}
+
+function iterables_to_iterator(iterable ...$iterables): Iterator
+{
+    $iterator = new AppendIterator();
+
+    foreach ($iterables as $iterable) {
+        if (is_array($iterable)) {
+            $iterator->append(new ArrayIterator($iterable));
+        } elseif ($iterable instanceof IteratorAggregate) {
+            $iterator->append($iterable->getIterator());
+        } else {
+            Assertion::isInstanceOf($iterable, Iterator::class);
+
+            $iterator->append($iterable);
+        }
+    }
+
+    return $iterator;
 }
 
 function formatted_filesize(string $path)

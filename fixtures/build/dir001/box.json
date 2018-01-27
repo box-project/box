@@ -1,5 +1,5 @@
 {
-    "files": "test.php",
+    "files": ["test.php"],
     "main": "test.php",
     "replacements": {
         "name": "world"
