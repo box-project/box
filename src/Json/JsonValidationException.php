@@ -20,6 +20,7 @@ use UnexpectedValueException;
 
 final class JsonValidationException extends UnexpectedValueException
 {
+    private $validatedFile;
     private $errors;
 
     /**
@@ -27,13 +28,13 @@ final class JsonValidationException extends UnexpectedValueException
      *
      * @param string[] $errors
      */
-    public function __construct(string $message, $errors = [], Exception $previous = null)
+    public function __construct(string $message, string $file = null, $errors = [], Exception $previous = null)
     {
+        Assertion::file($file);
         Assertion::allString($errors);
 
+        $this->validatedFile = $file;
         $this->errors = $errors;
-
-
 
         parent::__construct($message, 0, $previous);
     }
@@ -68,6 +69,11 @@ final class JsonValidationException extends UnexpectedValueException
         }
 
         return new self('JSON decoding failed: '.$msg);
+    }
+
+    public function getValidatedFile(): ?string
+    {
+        return $this->validatedFile;
     }
 
     /**

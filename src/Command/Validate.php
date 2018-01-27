@@ -15,7 +15,8 @@ declare(strict_types=1);
 namespace KevinGH\Box\Command;
 
 use Exception;
-use Herrera\Json\Exception\JsonException;
+use KevinGH\Box\Json\Json;
+use KevinGH\Box\Json\JsonValidationException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -80,24 +81,32 @@ HELP
             );
         }
 
-        $errorMessage = isset($exception)
-            ? sprintf('The configuration file failed validation: %s', $exception->getMessage())
-            : 'The configuration file failed validation.'
-        ;
+        if ($exception instanceof JsonValidationException) {
+            $output->writeln(
+                sprintf(
+                    '<error>The configuration file failed validation: "%s" does not match the expected JSON '
+                    .'schema:</error>',
+                    $exception->getValidatedFile()
+                )
+            );
 
-        $output->writeln(
-            sprintf(
-                '<error>%s</error>',
-                $errorMessage
-            )
-        );
-
-        if ($exception instanceof JsonException) {
             $output->writeln('');
 
             foreach ($exception->getErrors() as $error) {
                 $output->writeln("<comment>  - $error</comment>");
             }
+        } else {
+            $errorMessage = isset($exception)
+                ? sprintf('The configuration file failed validation: %s', $exception->getMessage())
+                : 'The configuration file failed validation.'
+            ;
+
+            $output->writeln(
+                sprintf(
+                    '<error>%s</error>',
+                    $errorMessage
+                )
+            );
         }
 
         return 1;

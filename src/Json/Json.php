@@ -107,10 +107,10 @@ final class Json
 
             $message = [] !== $errors
                 ? "\"$file\" does not match the expected JSON schema:\n  - " . implode("\n  - ", $errors)
-                : '"$file" does not match the expected JSON schema.'
+                : "\"$file\" does not match the expected JSON schema."
             ;
 
-            throw new JsonValidationException($message, $errors);
+            throw new JsonValidationException($message, $file, $errors);
         }
     }
 }
