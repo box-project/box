@@ -144,7 +144,7 @@ EOF
         }
     }
 
-    public function test_get_the_base_path(): void
+    public function test_the_default_base_path_used_is_the_current_working_directory(): void
     {
         $this->assertSame($this->tmp, $this->config->getBasePath());
     }
@@ -165,7 +165,7 @@ EOF
         );
     }
 
-    public function test_it_cannot_get_a_non_existent_base_path(): void
+    public function test_it_cannot_use_a_non_existent_directory_as_abase_path(): void
     {
         try {
             $this->setConfig(
@@ -178,6 +178,77 @@ EOF
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The base path "'.$this->tmp.DIRECTORY_SEPARATOR.'test" is not a directory or does not exist.',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_it_cannot_a_path_as_a_base_path(): void
+    {
+        touch('foo');
+
+        try {
+            $this->setConfig(
+                [
+                    'base-path' => $this->tmp.DIRECTORY_SEPARATOR.'foo',
+                ]
+            );
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'The base path "'.$this->tmp.DIRECTORY_SEPARATOR.'foo" is not a directory or does not exist.',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_if_the_base_path_is_relative_then_it_is_relative_to_the_current_working_directory(): void
+    {
+        mkdir('dir');
+
+        $this->setConfig(
+            [
+                'base-path' => 'dir',
+            ]
+        );
+
+        $expected = $this->tmp.DIRECTORY_SEPARATOR.'dir';
+
+        $this->assertSame($expected, $this->config->getBasePath());
+    }
+
+    public function test_the_base_path_value_is_normalized(): void
+    {
+        mkdir('dir');
+
+        $this->setConfig(
+            [
+                'base-path' => ' dir ',
+            ]
+        );
+
+        $expected = $this->tmp.DIRECTORY_SEPARATOR.'dir';
+
+        $this->assertSame($expected, $this->config->getBasePath());
+    }
+
+    /**
+     * @dataProvider provideJsonValidNonStringValues
+     */
+    public function test_the_base_path_value_must_be_a_string($value): void
+    {
+        try {
+            $this->setConfig(
+                [
+                    'base-path' => $value,
+                ]
+            );
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (JsonValidationException $exception) {
+            $this->assertRegExp(
+                '/does not match the expected JSON schema:/',
                 $exception->getMessage()
             );
         }
@@ -868,6 +939,313 @@ EOF
                 $exception->getMessage()
             );
         }
+    }
+
+    /**
+     * @dataProvider provideJsonValidNonStringArray
+     */
+    public function test_blacklist_value_must_be_an_array_of_strings($value): void
+    {
+        try {
+            $this->setConfig(
+                [
+                    'blacklist' => $value,
+                ]
+            );
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (JsonValidationException $exception) {
+            $this->assertRegExp(
+                '/does not match the expected JSON schema:/',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_the_blacklist_input_is_normalized(): void
+    {
+        mkdir('B');
+        touch('B/fileB0');
+        touch('B/fileB1');
+
+        $this->setConfig(
+            [
+                'directories' => [
+                    'B',
+                ],
+                'blacklist' => [
+                    ' B/fileB1 ',
+                ],
+            ]
+        );
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'B/fileB0',
+        ];
+        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @dataProvider provideJsonValidNonStringArray
+     */
+    public function test_files_value_must_be_an_array_of_strings($value): void
+    {
+        try {
+            $this->setConfig(
+                [
+                    'files' => $value,
+                ]
+            );
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (JsonValidationException $exception) {
+            $this->assertRegExp(
+                '/does not match the expected JSON schema:/',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    /**
+     * @dataProvider provideJsonValidNonStringArray
+     */
+    public function test_bin_files_value_must_be_an_array_of_strings($value): void
+    {
+        try {
+            $this->setConfig(
+                [
+                    'files-bin' => $value,
+                ]
+            );
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (JsonValidationException $exception) {
+            $this->assertRegExp(
+                '/does not match the expected JSON schema:/',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_the_files_and_bin_files_input_is_normalized(): void
+    {
+        touch('foo');
+
+        $this->setConfig(
+            [
+                'files' => [
+                    ' foo ',
+                ],
+                'files-bin' => [
+                    ' foo ',
+                ],
+            ]
+        );
+
+        // Relative to the current working directory for readability
+        $expected = ['foo'];
+
+        $this->assertSame(
+            $expected,
+            $this->normalizeConfigPaths($this->config->getFiles())
+        );
+        $this->assertSame(
+            $expected,
+            $this->normalizeConfigPaths($this->config->getBinaryFiles())
+        );
+    }
+
+    /**
+     * @dataProvider provideJsonValidNonStringArray
+     */
+    public function test_directories_value_must_be_an_array_of_strings($value): void
+    {
+        try {
+            $this->setConfig(
+                [
+                    'directories' => $value,
+                ]
+            );
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (JsonValidationException $exception) {
+            $this->assertRegExp(
+                '/does not match the expected JSON schema:/',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    /**
+     * @dataProvider provideJsonValidNonStringArray
+     */
+    public function test_bin_directories_value_must_be_an_array_of_strings($value): void
+    {
+        try {
+            $this->setConfig(
+                [
+                    'directories-bin' => $value,
+                ]
+            );
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (JsonValidationException $exception) {
+            $this->assertRegExp(
+                '/does not match the expected JSON schema:/',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_the_directories_and_bin_directories_input_is_normalized(): void
+    {
+        mkdir('A');
+        touch('A/foo');
+
+        $this->setConfig(
+            [
+                'directories' => [
+                    ' A ',
+                ],
+                'directories-bin' => [
+                    ' A ',
+                ],
+            ]
+        );
+
+        // Relative to the current working directory for readability
+        $expected = ['A/foo'];
+
+        $this->assertSame(
+            $expected,
+            $this->normalizeConfigPaths($this->config->getFiles())
+        );
+        $this->assertSame(
+            $expected,
+            $this->normalizeConfigPaths($this->config->getBinaryFiles())
+        );
+    }
+
+    /**
+     * @dataProvider provideJsonValidNonObjectArray
+     */
+    public function test_finder_value_must_be_an_array_of_objects($value): void
+    {
+        try {
+            $this->setConfig(
+                [
+                    'finder' => $value,
+                ]
+            );
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (JsonValidationException $exception) {
+            $this->assertRegExp(
+                '/does not match the expected JSON schema:/',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_finder_and_bin_finder_input_is_normalized(): void
+    {
+        mkdir('sub-dir');
+        chdir('sub-dir');
+
+        mkdir('A');
+        touch('A/foo');
+
+        mkdir('B');
+        touch('B/bar');
+
+        mkdir('D');
+        touch('D/doo');
+
+        mkdir('D/D0');
+        touch('D/D0/d0o');
+
+        mkdir('D/D1');
+        touch('D/D1/d1o');
+
+        touch('oof');
+        touch('rab');
+
+        chdir($this->tmp);
+
+        $finderConfig = [
+            [
+                ' in ' => [' A ', ' B ', ' D '],
+                ' exclude ' => [ ' D/D0 ', ' D/D1 ' ],
+                ' append ' => [ ' oof ', ' rab ' ],
+            ],
+        ];
+
+        $this->setConfig(
+            [
+                'base-path' => 'sub-dir',
+                'finder' => $finderConfig,
+                'finder-bin' => $finderConfig,
+            ]
+        );
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'sub-dir/A/foo',
+            'sub-dir/B/bar',
+            // TODO: this should not be here... but see https://github.com/symfony/symfony/issues/25945
+            'sub-dir/D/D0/d0o',
+            'sub-dir/D/D1/d1o',
+            // --TODO
+            'sub-dir/D/doo',
+            'sub-dir/oof',
+            'sub-dir/rab',
+        ];
+
+        $this->assertSame(
+            $expected,
+            $this->normalizeConfigPaths($this->config->getFiles())
+        );
+        $this->assertSame(
+            $expected,
+            $this->normalizeConfigPaths($this->config->getBinaryFiles())
+        );
+    }
+
+    public function test_finder_array_arguments_are_called_as_single_arguments(): void
+    {
+        mkdir('A');
+        touch('A/foo');
+
+        mkdir('B');
+        touch('B/bar');
+
+        $this->setConfig(
+            [
+                'finder' => [
+                    [
+                        // This would cause a failure on the Finder as `Finder::name()` accepts only a string value. But
+                        // instead here we will do multiple call of `Finder::name()` with each value
+                        'name' => [
+                            'fo*',
+                            'bar*',
+                        ],
+                        'in' => $this->tmp,
+                    ],
+                ],
+            ]
+        );
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'A/foo',
+            'B/bar',
+        ];
+        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+
+        $this->assertSame($expected, $actual);
     }
 
     public function test_get_the_bootstrap_file(): void
@@ -1616,6 +1994,49 @@ CODE
             new stdClass(),
             'Expected compression to be an algorithm name, found stdClass instead.',
         ];
+    }
+
+    public function provideJsonValidNonStringValues(): Generator
+    {
+        foreach ($this->provideJsonPrimitives() as $key => $value) {
+            if ('string' === $key) {
+                continue;
+            }
+
+            yield $key => [$value];
+        }
+    }
+
+    public function provideJsonValidNonStringArray(): Generator
+    {
+        foreach ($this->provideJsonPrimitives() as $key => $values) {
+            if ('string' === $key) {
+                continue;
+            }
+
+            yield $key.'[]' => [[$values]];
+        }
+    }
+
+    public function provideJsonValidNonObjectArray()
+    {
+        foreach ($this->provideJsonPrimitives() as $key => $values) {
+            if ('object' === $key) {
+                continue;
+            }
+
+            yield $key.'[]' => [[$values]];
+        }
+    }
+
+    private function provideJsonPrimitives(): Generator
+    {
+        yield 'null' => null;
+        yield 'bool' => true;
+        yield 'number' => 30;
+        yield 'string' => 'foo';
+        yield 'object' => ['foo' => 'bar'];
+        yield 'array' => ['foo', 'bar'];
     }
 
     private function setConfig(array $config): void

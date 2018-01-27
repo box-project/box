@@ -151,10 +151,10 @@ to that new PHAR but as the alias is already used, an error will be thrown.
 The `base-path` (`string`) setting is used to specify where all of the relative file paths should resolve to. This does
 not, however, alter where the built PHAR will be stored (see: `output`).
 
-By default, the base path is the directory containing the configuration file.
+By default, the base path used is the directory containing the configuration file or if not specified the current
+working directory.
 
 TODO: exclude output from the exception
-TODO: add test when using both working-dir option & config option
 
 
 ## Including files
@@ -199,6 +199,31 @@ account for the files registered in the [`blacklist`][blacklist].
 `finder-bin` is analogue to `finder` except the files are added to the PHAR unmodified. This is suitable for the files
 such as images, those that contain binary data or simply a file you do not want to alter at all despite using
 compactors.
+
+Example:
+
+```json
+{
+  "finder": [
+        {
+            "notName": "/LICENSE|.*\\.md|.*\\.dist|Makefile|composer\\.json|composer\\.lock/",
+            "exclude": [
+                "doc",
+                "test",
+                "test_old",
+                "tests",
+                "Tests",
+                "vendor-bin"
+            ],
+            "in": "vendor"
+        },
+        {
+            "name": "composer.json",
+            "in": "."
+        }
+    ]
+}
+```
 
 
 ### Blacklist (`blacklist`)

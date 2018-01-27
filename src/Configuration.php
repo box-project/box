@@ -17,18 +17,23 @@ namespace KevinGH\Box;
 use AppendIterator;
 use function array_map;
 use ArrayIterator;
+use Assert\Assert;
 use Assert\Assertion;
 use Closure;
 use DateTimeImmutable;
 use const DIRECTORY_SEPARATOR;
+use function file_exists;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\Php as LegacyPhp;
+use function in_array;
 use InvalidArgumentException;
+use function is_file;
 use Iterator;
 use KevinGH\Box\Compactor\Php;
 use Phar;
 use RuntimeException;
 use SplFileInfo;
+use function sprintf;
 use stdClass;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -485,20 +490,18 @@ final class Configuration
 
     private static function retrieveBasePath(string $file, stdClass $raw): string
     {
-        if (isset($raw->{'base-path'})) {
-            if (false === is_dir($raw->{'base-path'})) {
-                throw new InvalidArgumentException(
-                    sprintf(
-                        'The base path "%s" is not a directory or does not exist.',
-                        $raw->{'base-path'}
-                    )
-                );
-            }
-
-            return realpath($raw->{'base-path'});
+        if (false === isset($raw->{'base-path'})) {
+            return realpath(dirname($file));
         }
 
-        return realpath(dirname($file));
+        $basePath = trim($raw->{'base-path'});
+
+        Assertion::directory(
+            $basePath,
+            'The base path "%s" is not a directory or does not exist.'
+        );
+
+        return realpath($basePath);
     }
 
     /**
@@ -525,23 +528,23 @@ final class Configuration
      */
     private static function retrieveBlacklist(stdClass $raw, string $basePath): array
     {
-        // TODO: only allow arrays if is set unlike the doc which says it can be a string
-        if (isset($raw->blacklist)) {
-            $blacklist = (array) $raw->blacklist;
-
-            array_walk(
-                $blacklist,
-                function (&$file) use ($basePath): void {
-                    if (false === self::$fileSystem->isAbsolutePath($file)) {
-                        $file = $basePath.DIRECTORY_SEPARATOR.canonicalize($file);
-                    }
-                }
-            );
-
-            return $blacklist;
+        if (false === isset($raw->blacklist)) {
+            return [];
         }
 
-        return [];
+        $blacklist = $raw->blacklist;
+
+        $normalizePath = function ($file) use ($basePath): string {
+            $file = trim($file);
+
+            if (false === self::$fileSystem->isAbsolutePath($file)) {
+                $file = $basePath . DIRECTORY_SEPARATOR . canonicalize($file);
+            }
+
+            return $file;
+        };
+
+        return array_map($normalizePath, $blacklist);
     }
 
     /**
@@ -561,24 +564,25 @@ final class Configuration
 
         Assertion::allString($files);
 
-        return array_map(
-            function (string $file) use ($basePath, $key): SplFileInfo {
-                if (false === self::$fileSystem->isAbsolutePath($file)) {
-                    $file = $basePath.DIRECTORY_SEPARATOR.canonicalize($file);
-                }
+        $normalizePath = function (string $file) use ($basePath, $key): SplFileInfo {
+            $file = trim($file);
 
-                Assertion::file(
-                    $file,
-                    sprintf(
-                        '"%s" must contain a list of existing files. Could not find "%%s".',
-                        $key
-                    )
-                );
+            if (false === self::$fileSystem->isAbsolutePath($file)) {
+                $file = $basePath . DIRECTORY_SEPARATOR . canonicalize($file);
+            }
 
-                return new SplFileInfo($file);
-            },
-            $files
-        );
+            Assertion::file(
+                $file,
+                sprintf(
+                    '"%s" must contain a list of existing files. Could not find "%%s".',
+                    $key
+                )
+            );
+
+            return new SplFileInfo($file);
+        };
+
+        return array_map($normalizePath, $files);
     }
 
     /**
@@ -614,7 +618,6 @@ final class Configuration
      */
     private static function retrieveFilesFromFinders(stdClass $raw, string $key, string $basePath, Closure $blacklistFilter): array
     {
-        // TODO: double check the way all files are included to make sure none is missing if one element is misconfigured
         if (isset($raw->{$key})) {
             return self::processFinders($raw->{$key}, $basePath, $blacklistFilter);
         }
@@ -631,7 +634,6 @@ final class Configuration
      */
     private static function processFinders(array $findersConfig, string $basePath, Closure $blacklistFilter): array
     {
-        // TODO: add an example in the doc about the finder and a mention in `finder-bin` to look at finder
         $processFinderConfig = function ($methods) use ($basePath, $blacklistFilter) {
             $finder = Finder::create()
                 ->files()
@@ -639,29 +641,57 @@ final class Configuration
                 ->ignoreVCS(true)
             ;
 
-            if (isset($methods->in)) {
-                $methods->in = (array) $methods->in;
+            $normalizeDirectory = function (string &$directory) use ($basePath): void {
+                $directory = trim($directory);
 
-                array_walk(
-                    $methods->in,
-                    function (&$directory) use ($basePath): void {
-                        if (false === self::$fileSystem->isAbsolutePath($directory)) {
-                            $directory = sprintf(
-                                '%s%s',
-                                $basePath.DIRECTORY_SEPARATOR,
-                                rtrim(
-                                    canonicalize($directory),
-                                    DIRECTORY_SEPARATOR
-                                )
-                            );
-                        }
+                if (false === self::$fileSystem->isAbsolutePath($directory)) {
+                    $directory = sprintf(
+                        '%s%s',
+                        $basePath . DIRECTORY_SEPARATOR,
+                        rtrim(
+                            canonicalize($directory),
+                            DIRECTORY_SEPARATOR
+                        )
+                    );
+                }
 
-                        Assertion::directory($directory);
-                    }
-                );
-            }
+                Assertion::directory($directory);
+            };
+
+            $normalizeFileOrDirectory = function (string &$fileOrDirectory) use ($basePath): void {
+                $fileOrDirectory = trim($fileOrDirectory);
+
+                if (false === self::$fileSystem->isAbsolutePath($fileOrDirectory)) {
+                    $fileOrDirectory = sprintf(
+                        '%s%s',
+                        $basePath . DIRECTORY_SEPARATOR,
+                        rtrim(
+                            canonicalize($fileOrDirectory),
+                            DIRECTORY_SEPARATOR
+                        )
+                    );
+                }
+
+                if (false === file_exists($fileOrDirectory)) {
+                    throw new InvalidArgumentException(
+                        sprintf(
+                            'Path "%s" was expected to be a file or directory.',
+                            $fileOrDirectory
+                        )
+                    );
+                }
+
+                if (false === is_file($fileOrDirectory)) {
+                    Assertion::directory($fileOrDirectory);
+                } else {
+                    Assertion::file($fileOrDirectory);
+                }
+            };
 
             foreach ($methods as $method => $arguments) {
+                $method = trim($method);
+                $arguments = (array) $arguments;
+
                 if (false === method_exists($finder, $method)) {
                     throw new InvalidArgumentException(
                         sprintf(
@@ -671,7 +701,15 @@ final class Configuration
                     );
                 }
 
-                $arguments = (array) $arguments;
+                if (in_array($method, ['in', 'exclude'], true)) {
+                    array_walk($arguments, $normalizeDirectory);
+                }
+
+                if ('append' === $method || 'exclude' === $method) {
+                    array_walk($arguments, $normalizeFileOrDirectory);
+
+                    $arguments = [$arguments];
+                }
 
                 foreach ($arguments as $argument) {
                     $finder->$method($argument);
@@ -693,39 +731,38 @@ final class Configuration
      */
     private static function retrieveDirectoryPaths(stdClass $raw, string $key, string $basePath): array
     {
-        // TODO: do not accept strings unlike the doc says and document that BC break
-        // Need to do the same for bin, directories-bin, files, ~~directories~~
-        if (isset($raw->{$key})) {
-            $directories = (array) $raw->{$key};
-
-            array_walk(
-                $directories,
-                function (&$directory) use ($basePath, $key): void {
-                    if (false === self::$fileSystem->isAbsolutePath($directory)) {
-                        $directory = sprintf(
-                            '%s%s',
-                            $basePath.DIRECTORY_SEPARATOR,
-                            rtrim(
-                                canonicalize($directory),
-                                DIRECTORY_SEPARATOR
-                            )
-                        );
-                    }
-
-                    Assertion::directory(
-                        $directory,
-                        sprintf(
-                            '"%s" must contain a list of existing directories. Could not find "%%s".',
-                            $key
-                        )
-                    );
-                }
-            );
-
-            return $directories;
+        if (false === isset($raw->{$key})) {
+            return [];
         }
 
-        return [];
+        $directories = $raw->{$key};
+
+        $normalizeDirectory = function (string $directory) use ($basePath, $key): string {
+            $directory = trim($directory);
+
+            if (false === self::$fileSystem->isAbsolutePath($directory)) {
+                $directory = sprintf(
+                    '%s%s',
+                    $basePath . DIRECTORY_SEPARATOR,
+                    rtrim(
+                        canonicalize($directory),
+                        DIRECTORY_SEPARATOR
+                    )
+                );
+            }
+
+            Assertion::directory(
+                $directory,
+                sprintf(
+                    '"%s" must contain a list of existing directories. Could not find "%%s".',
+                    $key
+                )
+            );
+
+            return $directory;
+        };
+
+        return array_map($normalizeDirectory, $directories);
     }
 
     private static function retrieveBootstrapFile(stdClass $raw, string $basePath): ?string
