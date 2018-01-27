@@ -19,14 +19,19 @@ use function array_values;
 use function chdir;
 use Closure;
 use const DIRECTORY_SEPARATOR;
+use function file_put_contents;
 use Generator;
 use Herrera\Annotations\Tokenizer;
 use InvalidArgumentException;
 use function iter\fn\method;
 use Iterator;
 use function iterator_to_array;
+use function json_encode;
+use const JSON_PRETTY_PRINT;
 use KevinGH\Box\Compactor\DummyCompactor;
 use KevinGH\Box\Compactor\Php;
+use KevinGH\Box\Helper\ConfigurationHelper;
+use KevinGH\Box\Json\JsonValidationException;
 use Phar;
 use PHPUnit\Framework\TestCase;
 use SplFileInfo;
@@ -127,9 +132,13 @@ class ConfigurationTest extends TestCase
             $this->setConfig(['alias' => true]);
 
             $this->fail('Expected exception to be thrown.');
-        } catch (InvalidArgumentException $exception) {
+        } catch (JsonValidationException $exception) {
             $this->assertSame(
-                'Expected PHAR alias to be a string, got "<TRUE>" instead.',
+                <<<EOF
+"$this->file" does not match the expected JSON schema:
+  - alias : Boolean value found, but a string is required
+EOF
+                ,
                 $exception->getMessage()
             );
         }
@@ -223,18 +232,18 @@ class ConfigurationTest extends TestCase
                     'C',
                 ],
                 'finder' => [
-                    StdClassFactory::create([
+                    [
                         'in' => [
                             'D',
                         ],
                         'name' => 'fileD*',
-                    ]),
-                    StdClassFactory::create([
+                    ],
+                    [
                         'in' => [
                             'E',
                         ],
                         'name' => 'fileE*',
-                    ]),
+                    ],
                 ],
                 'blacklist' => [
                     'file1',
@@ -302,18 +311,18 @@ class ConfigurationTest extends TestCase
                     'C',
                 ],
                 'finder' => [
-                    StdClassFactory::create([
+                    [
                         'in' => [
                             'D',
                         ],
                         'name' => 'fileD*',
-                    ]),
-                    StdClassFactory::create([
+                    ],
+                    [
                         'in' => [
                             'E',
                         ],
                         'name' => 'fileE*',
-                    ]),
+                    ],
                 ],
                 'blacklist' => [
                     'file1',
@@ -382,18 +391,18 @@ class ConfigurationTest extends TestCase
                     $basePath.'C',
                 ],
                 'finder' => [
-                    StdClassFactory::create([
+                    [
                         'in' => [
                             $basePath.'D',
                         ],
                         'name' => 'fileD*',
-                    ]),
-                    StdClassFactory::create([
+                    ],
+                    [
                         'in' => [
                             $basePath.'E',
                         ],
                         'name' => 'fileE*',
-                    ]),
+                    ],
                 ],
                 'blacklist' => [
                     $basePath.'file1',
@@ -559,18 +568,18 @@ class ConfigurationTest extends TestCase
                     'C',
                 ],
                 'finder-bin' => [
-                    StdClassFactory::create([
+                    [
                         'in' => [
                             'D',
                         ],
                         'name' => 'fileD*',
-                    ]),
-                    StdClassFactory::create([
+                    ],
+                    [
                         'in' => [
                             'E',
                         ],
                         'name' => 'fileE*',
-                    ]),
+                    ],
                 ],
                 'blacklist' => [
                     'file1',
@@ -638,18 +647,18 @@ class ConfigurationTest extends TestCase
                     'C',
                 ],
                 'finder-bin' => [
-                    StdClassFactory::create([
+                    [
                         'in' => [
                             'D',
                         ],
                         'name' => 'fileD*',
-                    ]),
-                    StdClassFactory::create([
+                    ],
+                    [
                         'in' => [
                             'E',
                         ],
                         'name' => 'fileE*',
-                    ]),
+                    ],
                 ],
                 'blacklist' => [
                     'file1',
@@ -718,18 +727,18 @@ class ConfigurationTest extends TestCase
                     $basePath.'C',
                 ],
                 'finder-bin' => [
-                    StdClassFactory::create([
+                    [
                         'in' => [
                             $basePath.'D',
                         ],
                         'name' => 'fileD*',
-                    ]),
-                    StdClassFactory::create([
+                    ],
+                    [
                         'in' => [
                             $basePath.'E',
                         ],
                         'name' => 'fileE*',
-                    ]),
+                    ],
                 ],
                 'blacklist' => [
                     $basePath.'file1',
@@ -1006,6 +1015,11 @@ class ConfigurationTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 $errorMessage,
+                $exception->getMessage()
+            );
+        } catch (JsonValidationException $exception) {
+            $this->assertRegExp(
+                '/does not match the expected JSON schema:/',
                 $exception->getMessage()
             );
         }
@@ -1606,7 +1620,11 @@ CODE
 
     private function setConfig(array $config): void
     {
-        $this->config = Configuration::create($this->file, (object) $config);
+        file_put_contents($this->file, json_encode($config, JSON_PRETTY_PRINT));
+
+        $configHelper = new ConfigurationHelper();
+
+        $this->config = $configHelper->loadFile($this->file);
     }
 
     private function isWindows(): bool

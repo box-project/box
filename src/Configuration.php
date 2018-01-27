@@ -476,8 +476,6 @@ final class Configuration
     {
         $alias = $raw->alias ?? self::DEFAULT_ALIAS;
 
-        Assertion::string($alias, 'Expected PHAR alias to be a string, got "%s" instead.');
-
         $alias = trim($alias);
 
         Assertion::notEmpty($alias, 'A PHAR alias cannot be empty.');

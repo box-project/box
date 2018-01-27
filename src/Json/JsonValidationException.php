@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Json;
 
+use Assert\Assertion;
 use Exception;
 use UnexpectedValueException;
 
@@ -23,10 +24,16 @@ final class JsonValidationException extends UnexpectedValueException
 
     /**
      * {@inheritdoc}
+     *
+     * @param string[] $errors
      */
     public function __construct(string $message, $errors = [], Exception $previous = null)
     {
+        Assertion::allString($errors);
+
         $this->errors = $errors;
+
+
 
         parent::__construct($message, 0, $previous);
     }
@@ -63,7 +70,10 @@ final class JsonValidationException extends UnexpectedValueException
         return new self('JSON decoding failed: '.$msg);
     }
 
-    public function getErrors()
+    /**
+     * @return string[]
+     */
+    public function getErrors(): array
     {
         return $this->errors;
     }
