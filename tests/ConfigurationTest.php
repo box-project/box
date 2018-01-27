@@ -1253,22 +1253,30 @@ EOF
         $expected = [
             'sub-dir/A/foo',
             'sub-dir/B/bar',
+            'sub-dir/D/doo',
             // TODO: this should not be here... but see https://github.com/symfony/symfony/issues/25945
             'sub-dir/D/D0/d0o',
             'sub-dir/D/D1/d1o',
             // --TODO
-            'sub-dir/D/doo',
             'sub-dir/oof',
             'sub-dir/rab',
         ];
 
-        $this->assertSame(
+        $this->assertEquals(
             $expected,
-            $this->normalizeConfigPaths($this->config->getFiles())
+            $this->normalizeConfigPaths($this->config->getFiles()),
+            '',
+            .0,
+            10,
+            true
         );
-        $this->assertSame(
+        $this->assertEquals(
             $expected,
-            $this->normalizeConfigPaths($this->config->getBinaryFiles())
+            $this->normalizeConfigPaths($this->config->getBinaryFiles()),
+            '',
+            .0,
+            10,
+            true
         );
     }
 
