@@ -55,7 +55,7 @@ The configuration file is actually a JSON object saved to a file. Note that all 
 ```
 
 
-## Alias
+## Alias (`alias`)
 
 The `alias` (`string`) setting is used when generating a new stub to call the [`Phar::mapPhar()`](phar.mapphar) method if the PHAR is for
 the CLI and the method [`Phar::webPhar()`][phar.webphar] if the PHAR is configured for the web. This makes it easier to refer to files in
@@ -107,7 +107,8 @@ require 'phar://alias.phar/index.php';
 
 ```
 
-If you are using the default stub, [`Phar::setAlias()`][phar.setalias] will be used. Note however that this will behave slightly
+If you are using the default stub, [`Phar::setAlias()`][phar.setalias] will be used. Note however that this will behave
+slightly
 differently.
 
 Example:
@@ -115,13 +116,14 @@ Example:
 ```php
 <?php
 
-$phar = new Phar('index.phar'); // Warning: creating a Phar instance results in *loading* the file. From this point, the PHAR stub file
-                                // has been loaded and as a result, if the PHAR had an alias the alias will be registered.
+$phar = new Phar('index.phar'); // Warning: creating a Phar instance results in *loading* the file. From this point, the
+                                // PHAR stub file has been loaded and as a result, if the PHAR had an alias the alias
+                                // will be registered.
 $phar->setAlias('foo.phar');
 $phar->addFile('LICENSE');
 
-file_get_contents('phar://foo.phar/LICENSE');   // Will work both inside the PHAR but as well as outside as soon as the PHAR is loaded
-                                                // in-memory.
+file_get_contents('phar://foo.phar/LICENSE'); // Will work both inside the PHAR but as well as outside as soon as the
+                                              // PHAR is loaded in-memory.
 ```
 
 As you can see above, loading a PHAR which has an alias result in a non-negligible side effect. A typical case where this might be an issue
@@ -135,6 +137,73 @@ PHAR is loaded which loads the alias `box-alias.phar`. When creating the second 
 to that new PHAR but as the alias is already used, an error will be thrown.
 
 
+## Base-path (`base-path`)
+
+The `base-path` (`string`) setting is used to specify where all of the relative file paths should resolve to. This does
+not, however, alter where the built PHAR will be stored (see: `output`).
+
+By default, the base path is the directory containing the configuration file.
+
+TODO: exclude output from the exception
+TODO: add test when using both working-dir option & config option
+
+
+## Including files
+
+There is multiple config entries for including files:
+
+### Files (`files` and `files-bin`)
+
+The `files` (`string[]`) setting is a list of files paths relative to `base-path` unless absolute. Each file will be
+processed by the compactors (see: `compactors`), have their placeholder values replaced (see: `replacements`) and added
+to the PHAR.
+
+This setting is not affected by the `blacklist` setting.
+
+`files-bin` is analogue to `files` except the files are added to the PHAR unmodified. This is suitable for the files
+such as images, those that contain binary data or simply a file you do not want to alter at all despite using
+compactors.
+
+
+### Directories (`directories` and `directories-bin`)
+
+The directories (`string[]`) setting is a list of directory paths relative to `base-path`. All files will be processed
+by the compactors (see: `compactors`), have their placeholder values replaced (see: `replacements`) and added to the
+PHAR.
+
+Files listed in the `blacklist` will not be added to the PHAR.
+
+`directories-bin` is analogue to `directories` except the files are added to the PHAR unmodified. This is suitable for
+the files such as images, those that contain binary data or simply a file you do not want to alter at all despite using
+compactors.
+
+
+### Finder (`finder` and `finder-bin`)
+
+The finder (`object[]`) setting is a list of JSON objects. Each object (key, value) tuple is a (method, arguments)
+of the [Symfony Finder][symfony-finder] used by Box. If an array of values is provided for a single key, the method will
+be called once per value in the array.
+ 
+Note that the paths specified for the `in` method are relative to `base-path` and that the finder will account for the
+files registered in the `blacklist`.
+
+`finder-bin` is analogue to `finder` except the files are added to the PHAR unmodified. This is suitable for the files
+such as images, those that contain binary data or simply a file you do not want to alter at all despite using
+compactors.
+
+
+### Blacklist (`blacklist`)
+
+The `blacklist` (`string[]`) setting is a list of files that must not be added. The files blacklisted are the ones found
+using the other available configuration settings: `files`, `files-bin`, `directories`, `directories-bin`, `finder`,
+`finder-bin`.
+
+
+
+TODO: double check all the links
+TODO: for the Finder:
+    - add tests regarding the note about (key, arguments)
+    - paths should be relative not only for `in` but the others as well, double check that
 
 
 
@@ -148,6 +217,7 @@ to that new PHAR but as the alias is already used, an error will be thrown.
 [phar.mapphar]: https://secure.php.net/manual/en/phar.mapphar.php
 [phar.setalias]: https://secure.php.net/manual/en/phar.setalias.php
 [phar.webphar]: https://secure.php.net/manual/en/phar.webphar.php
+[symfony-finder]: https://symfony.com/doc/current//components/finder.html
 
 
 //TODO: rework the rest
@@ -200,36 +270,9 @@ The banner-file (string) setting is like banner, except it is a path to the
 file that will contain the comment. Like banner, the comment must not already
 be enclosed in a comment block.
 
-The base-path (string) setting is used to specify where all of the relative
-file paths should resolve to. This does not, however, alter where the built
-PHAR will be stored (see: output). By default, the base path is the directory
-containing the configuration file.
 
-The blacklist (string[]) setting is a list of files that must not be added.
-The files blacklisted are the ones found using the other available
-configuration settings: directories, directories-bin, files, files-bin,
-finder, finder-bin. Note that directory separators are automatically corrected
-to the platform specific version.
 
-Assuming that the base directory path is /home/user/project:
 
-{
-    "blacklist": [
-        "path/to/file/1"
-        "path/to/file/2"
-    ],
-    "directories": ["src"]
-}
-
-The following files will be blacklisted:
-
-- /home/user/project/src/path/to/file/1
-- /home/user/project/src/path/to/file/2
-
-But not these files:
-
-- /home/user/project/src/another/path/to/file/1
-- /home/user/project/src/another/path/to/file/2
 
 
 The bootstrap (string) setting allows you to specify a PHP file that will be
@@ -280,35 +323,11 @@ of the signature algorithms listed on the help page:
 - NONE (Phar::NONE)
 
 
-The directories (string[]) setting is a list of directory paths relative to
-base-path. All files ending in .php will be automatically compacted, have
-their placeholder values replaced, and added to the PHAR. Files listed in the
-blacklist setting will not be added.
 
-The directories-bin (string[]) setting is similar to directories, except all
-file types are added to the PHAR unmodified. This is suitable for directories
-containing images or other binary data.
 
 The extract (boolean) setting determines whether or not the generated stub
 should include a class to extract the PHAR. This class would be used if the
 PHAR is not available. (Increases stub file size.)
-
-The files (string[]) setting is a list of files paths relative to base-path.
-Each file will be compacted, have their placeholder files replaced, and added
-to the PHAR. This setting is not affected by the blacklist setting.
-
-The files-bin (string[]) setting is similar to files, except that all files
-are added to the PHAR unmodified. This is suitable for files such as images or
-those that contain binary data.
-
-The finder (array) setting is a list of JSON objects. Each object key is a
-name, and each value an argument for the methods in
-the Symfony\Component\Finder\Finder class. If an array of values is provided
-for a single key, the method will be called once per value in the array. Note
-that the paths specified for the "in" method are relative to base-path.
-
-The finder-bin (array) setting performs the same function, except all files
-found by the finder will be treated as binary files, leaving them unmodified.
 
 The datetime (string) setting is the name of a placeholder value that will be
 replaced in all non-binary files by the current datetime.
