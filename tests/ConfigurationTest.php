@@ -1280,6 +1280,46 @@ EOF
         );
     }
 
+    public function test_finder_and_bin_finder_exclude_files_or_directories_may_not_exists(): void
+    {
+        mkdir('A');
+        touch('A/foo');
+
+        $finderConfig = [
+            [
+                'in' => ['A'],
+                'exclude' => ['unknown'],
+            ],
+        ];
+
+        $this->setConfig(
+            [
+                'finder' => $finderConfig,
+                'finder-bin' => $finderConfig,
+            ]
+        );
+
+        // Relative to the current working directory for readability
+        $expected = ['A/foo'];
+
+        $this->assertEquals(
+            $expected,
+            $this->normalizeConfigPaths($this->config->getFiles()),
+            '',
+            .0,
+            10,
+            true
+        );
+        $this->assertEquals(
+            $expected,
+            $this->normalizeConfigPaths($this->config->getBinaryFiles()),
+            '',
+            .0,
+            10,
+            true
+        );
+    }
+
     public function test_finder_array_arguments_are_called_as_single_arguments(): void
     {
         mkdir('A');

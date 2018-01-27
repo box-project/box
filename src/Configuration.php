@@ -627,21 +627,26 @@ final class Configuration
                 ->ignoreVCS(true)
             ;
 
-            $normalizeDirectory = function (string &$directory) use ($basePath): void {
-                $directory = trim($directory);
+            // TODO: refactor those check functions once https://github.com/symfony/symfony/issues/25945#issuecomment-361002235 is clarified
+            $createNormalizeDirectory = function (bool $checkIfExists) use ($basePath): Closure {
+                return function (string &$directory) use ($checkIfExists, $basePath): void {
+                    $directory = trim($directory);
 
-                if (false === self::$fileSystem->isAbsolutePath($directory)) {
-                    $directory = sprintf(
-                        '%s%s',
-                        $basePath.DIRECTORY_SEPARATOR,
-                        rtrim(
-                            canonicalize($directory),
-                            DIRECTORY_SEPARATOR
-                        )
-                    );
-                }
+                    if (false === self::$fileSystem->isAbsolutePath($directory)) {
+                        $directory = sprintf(
+                            '%s%s',
+                            $basePath.DIRECTORY_SEPARATOR,
+                            rtrim(
+                                canonicalize($directory),
+                                DIRECTORY_SEPARATOR
+                            )
+                        );
+                    }
 
-                Assertion::directory($directory);
+                    if ($checkIfExists) {
+                        Assertion::directory($directory);
+                    }
+                };
             };
 
             $normalizeFileOrDirectory = function (string &$fileOrDirectory) use ($basePath): void {
@@ -687,11 +692,15 @@ final class Configuration
                     );
                 }
 
-                if (in_array($method, ['in', 'exclude'], true)) {
-                    array_walk($arguments, $normalizeDirectory);
+                if ('in' === $method) {
+                    array_walk($arguments, $createNormalizeDirectory(true));
                 }
 
-                if ('append' === $method || 'exclude' === $method) {
+                if ('exclude' === $method) {
+                    array_walk($arguments, $createNormalizeDirectory(false));
+                }
+
+                if ('append' === $method) {
                     array_walk($arguments, $normalizeFileOrDirectory);
 
                     $arguments = [$arguments];
