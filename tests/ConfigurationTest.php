@@ -14,15 +14,27 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use function array_map;
+use function array_values;
+use function chdir;
 use Closure;
+use const DIRECTORY_SEPARATOR;
 use Generator;
 use Herrera\Annotations\Tokenizer;
 use InvalidArgumentException;
+use function iter\fn\method;
+use Iterator;
+use function iterator_to_array;
 use KevinGH\Box\Compactor\DummyCompactor;
 use KevinGH\Box\Compactor\Php;
 use Phar;
 use PHPUnit\Framework\TestCase;
+use SplFileInfo;
+use function sprintf;
 use stdClass;
+use function str_replace;
+use Symfony\Component\Finder\Finder;
+use function touch;
 
 /**
  * @covers \KevinGH\Box\Configuration
@@ -172,84 +184,683 @@ class ConfigurationTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function test_get_the_binary_directory_iterator(): void
+    public function test_there_is_no_file_configured_by_default(): void
     {
-        $this->assertNull($this->config->getBinaryDirectoriesIterator());
+        $this->assertCount(0, $this->config->getFiles());
     }
 
-    public function test_configure_the_binary_directory_iterator(): void
+    public function test_configure_the_files_iterator(): void
     {
-        mkdir('alpha');
-        touch('alpha/beta.png');
-        touch('alpha/gamma.png');
+        //TODO: document 'files' & 'directories' (same for bin) are relative to base path
+        //TODO: document blacklist doesn't apply to 'files'
+        touch('file0');
+        touch('file1');
+
+        mkdir('B');
+        touch('B/fileB0');
+        touch('B/fileB1');
+
+        mkdir('C');
+        touch('C/fileC0');
+        touch('C/fileC1');
+
+        mkdir('D');
+        touch('D/fileD0');
+        touch('D/fileD1');
+        touch('D/finder_excluded_file');
+
+        mkdir('E');
+        touch('E/fileE0');
+        touch('E/fileE1');
+        touch('E/finder_excluded_file');
 
         $this->setConfig(
             [
-                'blacklist' => 'alpha/beta.png',
-                'directories-bin' => 'alpha',
-            ]
-        );
-
-        $iterator = $this->config->getBinaryDirectoriesIterator();
-
-        foreach ($iterator as $file) {
-            $this->assertSame('gamma.png', $file->getBasename());
-        }
-    }
-
-    public function test_get_binary_files_iterator(): void
-    {
-        $this->assertNull($this->config->getBinaryFilesIterator());
-    }
-
-    public function test_configure_binary_files_iterator(): void
-    {
-        $this->setConfig(['files-bin' => 'test.png']);
-
-        foreach ($this->config->getBinaryFilesIterator() as $file) {
-            $this->assertSame('test.png', $file->getBasename());
-        }
-    }
-
-    public function test_get_binary_iterators(): void
-    {
-        $this->assertSame([], $this->config->getBinaryIterators());
-    }
-
-    public function test_configure_binary_iterators(): void
-    {
-        touch('bad.jpg');
-        touch('test.jpg');
-        touch('test.png');
-        touch('test.php');
-
-        $this->setConfig(
-            [
-                'blacklist' => ['bad.jpg'],
-                'finder-bin' => [
-                    [
-                        'name' => '*.png',
-                        'in' => '.',
-                    ],
-                    [
-                        'name' => '*.jpg',
-                        'in' => '.',
-                    ],
+                'files' => [
+                    'file0',
+                    'file1',
+                ],
+                'directories' => [
+                    'B',
+                    'C',
+                ],
+                'finder' => [
+                    StdClassFactory::create([
+                        'in' => [
+                            'D',
+                        ],
+                        'name' => 'fileD*',
+                    ]),
+                    StdClassFactory::create([
+                        'in' => [
+                            'E',
+                        ],
+                        'name' => 'fileE*',
+                    ]),
+                ],
+                'blacklist' => [
+                    'file1',
+                    'B/fileB1',
+                    'C/fileC1',
+                    'D/fileD1',
+                    'E/fileE1',
                 ],
             ]
         );
 
-        $results = [];
-        $finders = $this->config->getBinaryIterators();
+        // Relative to the current working directory for readability
+        $expected = [
+            'file0',
+            'file1',    // 'files' & 'files-bin' are not affected by the blacklist filter
+            'B/fileB0',
+            'C/fileC0',
+            'D/fileD0',
+            'E/fileE0',
+        ];
 
-        foreach ($finders as $finder) {
-            foreach ($finder as $result) {
-                $results[] = $result;
-            }
+        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+
+        $this->assertSame($expected, $actual);
+        $this->assertCount(0, $this->config->getBinaryFiles());
+    }
+
+    public function test_configured_files_are_relative_to_base_path(): void
+    {
+        mkdir('sub-dir');
+        chdir('sub-dir');
+
+        touch('file0');
+        touch('file1');
+
+        mkdir('B');
+        touch('B/fileB0');
+        touch('B/fileB1');
+
+        mkdir('C');
+        touch('C/fileC0');
+        touch('C/fileC1');
+
+        mkdir('D');
+        touch('D/fileD0');
+        touch('D/fileD1');
+        touch('D/finder_excluded_file');
+
+        mkdir('E');
+        touch('E/fileE0');
+        touch('E/fileE1');
+        touch('E/finder_excluded_file');
+
+        chdir($this->tmp);
+
+        $this->setConfig(
+            [
+                'base-path' => 'sub-dir',
+                'files' => [
+                    'file0',
+                    'file1',
+                ],
+                'directories' => [
+                    'B',
+                    'C',
+                ],
+                'finder' => [
+                    StdClassFactory::create([
+                        'in' => [
+                            'D',
+                        ],
+                        'name' => 'fileD*',
+                    ]),
+                    StdClassFactory::create([
+                        'in' => [
+                            'E',
+                        ],
+                        'name' => 'fileE*',
+                    ]),
+                ],
+                'blacklist' => [
+                    'file1',
+                    'B/fileB1',
+                    'C/fileC1',
+                    'D/fileD1',
+                    'E/fileE1',
+                ],
+            ]
+        );
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'sub-dir/file0',
+            'sub-dir/file1',
+            'sub-dir/B/fileB0',
+            'sub-dir/C/fileC0',
+            'sub-dir/D/fileD0',
+            'sub-dir/E/fileE0',
+        ];
+
+        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+
+        $this->assertSame($expected, $actual);
+        $this->assertCount(0, $this->config->getBinaryFiles());
+    }
+
+    public function test_configured_files_are_relative_to_base_path_unless_they_are_absolute_paths(): void
+    {
+        mkdir('sub-dir');
+        chdir('sub-dir');
+
+        touch('file0');
+        touch('file1');
+
+        mkdir('B');
+        touch('B/fileB0');
+        touch('B/fileB1');
+
+        mkdir('C');
+        touch('C/fileC0');
+        touch('C/fileC1');
+
+        mkdir('D');
+        touch('D/fileD0');
+        touch('D/fileD1');
+        touch('D/finder_excluded_file');
+
+        mkdir('E');
+        touch('E/fileE0');
+        touch('E/fileE1');
+        touch('E/finder_excluded_file');
+
+        chdir($this->tmp);
+
+        $basePath = $this->tmp.DIRECTORY_SEPARATOR.'sub-dir'.DIRECTORY_SEPARATOR;
+
+        $this->setConfig(
+            [
+                'files' => [
+                    $basePath.'file0',
+                    $basePath.'file1',
+                ],
+                'directories' => [
+                    $basePath.'B',
+                    $basePath.'C',
+                ],
+                'finder' => [
+                    StdClassFactory::create([
+                        'in' => [
+                            $basePath.'D',
+                        ],
+                        'name' => 'fileD*',
+                    ]),
+                    StdClassFactory::create([
+                        'in' => [
+                            $basePath.'E',
+                        ],
+                        'name' => 'fileE*',
+                    ]),
+                ],
+                'blacklist' => [
+                    $basePath.'file1',
+                    $basePath.'B/fileB1',
+                    $basePath.'C/fileC1',
+                    $basePath.'D/fileD1',
+                    $basePath.'E/fileE1',
+                ],
+            ]
+        );
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'sub-dir/file0',
+            'sub-dir/file1',
+            'sub-dir/B/fileB0',
+            'sub-dir/C/fileC0',
+            'sub-dir/D/fileD0',
+            'sub-dir/E/fileE0',
+        ];
+
+        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+
+        $this->assertSame($expected, $actual);
+        $this->assertCount(0, $this->config->getBinaryFiles());
+    }
+
+    public function test_cannot_add_a_non_existent_file_to_the_list_of_files(): void
+    {
+        try {
+            $this->setConfig(
+                [
+                    'files' => [
+                        'non-existent',
+                    ],
+                ]
+            );
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $filePath = $this->tmp.DIRECTORY_SEPARATOR.'non-existent';
+
+            $this->assertSame(
+                sprintf(
+                    '"files" must contain a list of existing files. Could not find "%s".',
+                    $filePath
+                ),
+                $exception->getMessage()
+            );
         }
+    }
 
-        $this->assertSame('test.png', $results[0]->getBasename());
-        $this->assertSame('test.jpg', $results[1]->getBasename());
+    public function test_cannot_add_a_directory_to_the_list_of_files(): void
+    {
+        mkdir('dirA');
+
+        try {
+            $this->setConfig(
+                [
+                    'files' => [
+                        'dirA',
+                    ],
+                ]
+            );
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $filePath = $this->tmp.DIRECTORY_SEPARATOR.'dirA';
+
+            $this->assertSame(
+                sprintf(
+                    '"files" must contain a list of existing files. Could not find "%s".',
+                    $filePath
+                ),
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_cannot_add_a_non_existent_directory_to_the_list_of_directories(): void
+    {
+        try {
+            $this->setConfig(
+                [
+                    'directories' => [
+                        'non-existent',
+                    ],
+                ]
+            );
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $dirPath = $this->tmp.DIRECTORY_SEPARATOR.'non-existent';
+
+            $this->assertSame(
+                sprintf(
+                    '"directories" must contain a list of existing directories. Could not find "%s".',
+                    $dirPath
+                ),
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_cannot_add_a_file_to_the_list_of_directories(): void
+    {
+        touch('foo');
+
+        try {
+            $this->setConfig(
+                [
+                    'directories' => [
+                        'foo',
+                    ],
+                ]
+            );
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $dirPath = $this->tmp.DIRECTORY_SEPARATOR.'foo';
+
+            $this->assertSame(
+                sprintf(
+                    '"directories" must contain a list of existing directories. Could not find "%s".',
+                    $dirPath
+                ),
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_configure_the_bin_files_iterator(): void
+    {
+        touch('file0');
+        touch('file1');
+
+        mkdir('B');
+        touch('B/fileB0');
+        touch('B/fileB1');
+
+        mkdir('C');
+        touch('C/fileC0');
+        touch('C/fileC1');
+
+        mkdir('D');
+        touch('D/fileD0');
+        touch('D/fileD1');
+        touch('D/finder_excluded_file');
+
+        mkdir('E');
+        touch('E/fileE0');
+        touch('E/fileE1');
+        touch('E/finder_excluded_file');
+
+        $this->setConfig(
+            [
+                'files-bin' => [
+                    'file0',
+                    'file1',
+                ],
+                'directories-bin' => [
+                    'B',
+                    'C',
+                ],
+                'finder-bin' => [
+                    StdClassFactory::create([
+                        'in' => [
+                            'D',
+                        ],
+                        'name' => 'fileD*',
+                    ]),
+                    StdClassFactory::create([
+                        'in' => [
+                            'E',
+                        ],
+                        'name' => 'fileE*',
+                    ]),
+                ],
+                'blacklist' => [
+                    'file1',
+                    'B/fileB1',
+                    'C/fileC1',
+                    'D/fileD1',
+                    'E/fileE1',
+                ],
+            ]
+        );
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'file0',
+            'file1',    // 'files' & 'files-bin' are not affected by the blacklist filter
+            'B/fileB0',
+            'C/fileC0',
+            'D/fileD0',
+            'E/fileE0',
+        ];
+
+        $actual = $this->normalizeConfigPaths($this->config->getBinaryFiles());
+
+        $this->assertSame($expected, $actual);
+        $this->assertCount(0, $this->config->getFiles());
+    }
+
+    public function test_configured_bin_files_are_relative_to_base_path(): void
+    {
+        mkdir('sub-dir');
+        chdir('sub-dir');
+
+        touch('file0');
+        touch('file1');
+
+        mkdir('B');
+        touch('B/fileB0');
+        touch('B/fileB1');
+
+        mkdir('C');
+        touch('C/fileC0');
+        touch('C/fileC1');
+
+        mkdir('D');
+        touch('D/fileD0');
+        touch('D/fileD1');
+        touch('D/finder_excluded_file');
+
+        mkdir('E');
+        touch('E/fileE0');
+        touch('E/fileE1');
+        touch('E/finder_excluded_file');
+
+        chdir($this->tmp);
+
+        $this->setConfig(
+            [
+                'base-path' => 'sub-dir',
+                'files-bin' => [
+                    'file0',
+                    'file1',
+                ],
+                'directories-bin' => [
+                    'B',
+                    'C',
+                ],
+                'finder-bin' => [
+                    StdClassFactory::create([
+                        'in' => [
+                            'D',
+                        ],
+                        'name' => 'fileD*',
+                    ]),
+                    StdClassFactory::create([
+                        'in' => [
+                            'E',
+                        ],
+                        'name' => 'fileE*',
+                    ]),
+                ],
+                'blacklist' => [
+                    'file1',
+                    'B/fileB1',
+                    'C/fileC1',
+                    'D/fileD1',
+                    'E/fileE1',
+                ],
+            ]
+        );
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'sub-dir/file0',
+            'sub-dir/file1',
+            'sub-dir/B/fileB0',
+            'sub-dir/C/fileC0',
+            'sub-dir/D/fileD0',
+            'sub-dir/E/fileE0',
+        ];
+
+        $actual = $this->normalizeConfigPaths($this->config->getBinaryFiles());
+
+        $this->assertSame($expected, $actual);
+        $this->assertCount(0, $this->config->getFiles());
+    }
+
+    public function test_configured_bin_files_are_relative_to_base_path_unless_they_are_absolute_paths(): void
+    {
+        mkdir('sub-dir');
+        chdir('sub-dir');
+
+        touch('file0');
+        touch('file1');
+
+        mkdir('B');
+        touch('B/fileB0');
+        touch('B/fileB1');
+
+        mkdir('C');
+        touch('C/fileC0');
+        touch('C/fileC1');
+
+        mkdir('D');
+        touch('D/fileD0');
+        touch('D/fileD1');
+        touch('D/finder_excluded_file');
+
+        mkdir('E');
+        touch('E/fileE0');
+        touch('E/fileE1');
+        touch('E/finder_excluded_file');
+
+        chdir($this->tmp);
+
+        $basePath = $this->tmp.DIRECTORY_SEPARATOR.'sub-dir'.DIRECTORY_SEPARATOR;
+
+        $this->setConfig(
+            [
+                'files-bin' => [
+                    $basePath.'file0',
+                    $basePath.'file1',
+                ],
+                'directories-bin' => [
+                    $basePath.'B',
+                    $basePath.'C',
+                ],
+                'finder-bin' => [
+                    StdClassFactory::create([
+                        'in' => [
+                            $basePath.'D',
+                        ],
+                        'name' => 'fileD*',
+                    ]),
+                    StdClassFactory::create([
+                        'in' => [
+                            $basePath.'E',
+                        ],
+                        'name' => 'fileE*',
+                    ]),
+                ],
+                'blacklist' => [
+                    $basePath.'file1',
+                    $basePath.'B/fileB1',
+                    $basePath.'C/fileC1',
+                    $basePath.'D/fileD1',
+                    $basePath.'E/fileE1',
+                ],
+            ]
+        );
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'sub-dir/file0',
+            'sub-dir/file1',
+            'sub-dir/B/fileB0',
+            'sub-dir/C/fileC0',
+            'sub-dir/D/fileD0',
+            'sub-dir/E/fileE0',
+        ];
+
+        $actual = $this->normalizeConfigPaths($this->config->getBinaryFiles());
+
+        $this->assertSame($expected, $actual);
+        $this->assertCount(0, $this->config->getFiles());
+    }
+
+    public function test_cannot_add_a_non_existent_bin_file_to_the_list_of_files(): void
+    {
+        try {
+            $this->setConfig(
+                [
+                    'files-bin' => [
+                        'non-existent',
+                    ],
+                ]
+            );
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $filePath = $this->tmp.DIRECTORY_SEPARATOR.'non-existent';
+
+            $this->assertSame(
+                sprintf(
+                    '"files-bin" must contain a list of existing files. Could not find "%s".',
+                    $filePath
+                ),
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_cannot_add_a_directory_to_the_list_of_bin_files(): void
+    {
+        mkdir('dirA');
+
+        try {
+            $this->setConfig(
+                [
+                    'files-bin' => [
+                        'dirA',
+                    ],
+                ]
+            );
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $filePath = $this->tmp.DIRECTORY_SEPARATOR.'dirA';
+
+            $this->assertSame(
+                sprintf(
+                    '"files-bin" must contain a list of existing files. Could not find "%s".',
+                    $filePath
+                ),
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_cannot_add_a_non_existent_directory_to_the_list_of_bin_directories(): void
+    {
+        try {
+            $this->setConfig(
+                [
+                    'directories-bin' => [
+                        'non-existent',
+                    ],
+                ]
+            );
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $dirPath = $this->tmp.DIRECTORY_SEPARATOR.'non-existent';
+
+            $this->assertSame(
+                sprintf(
+                    '"directories-bin" must contain a list of existing directories. Could not find "%s".',
+                    $dirPath
+                ),
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_cannot_add_a_file_to_the_list_of_bin_directories(): void
+    {
+        touch('foo');
+
+        try {
+            $this->setConfig(
+                [
+                    'directories-bin' => [
+                        'foo',
+                    ],
+                ]
+            );
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $dirPath = $this->tmp.DIRECTORY_SEPARATOR.'foo';
+
+            $this->assertSame(
+                sprintf(
+                    '"directories-bin" must contain a list of existing directories. Could not find "%s".',
+                    $dirPath
+                ),
+                $exception->getMessage()
+            );
+        }
     }
 
     public function test_get_the_bootstrap_file(): void
@@ -402,26 +1013,6 @@ class ConfigurationTest extends TestCase
         }
     }
 
-    public function test_configure_directories_iterator(): void
-    {
-        mkdir('alpha');
-        touch('alpha/beta.php');
-        touch('alpha/gamma.php');
-
-        $this->setConfig(
-            [
-                'blacklist' => 'alpha/beta.php',
-                'directories' => 'alpha',
-            ]
-        );
-
-        $iterator = $this->config->getDirectoriesIterator();
-
-        foreach ($iterator as $file) {
-            $this->assertSame('gamma.php', $file->getBasename());
-        }
-    }
-
     public function test_get_file_mode(): void
     {
         $this->assertNull($this->config->getFileMode());
@@ -432,63 +1023,6 @@ class ConfigurationTest extends TestCase
         $this->setConfig(['chmod' => '0755']);
 
         $this->assertSame(0755, $this->config->getFileMode());
-    }
-
-    public function test_get_files_iterator(): void
-    {
-        $this->assertNull($this->config->getFilesIterator());
-    }
-
-    public function test_configure_files_iterator(): void
-    {
-        touch('test.php');
-
-        $this->setConfig(['files' => 'test.php']);
-
-        foreach ($this->config->getFilesIterator() as $file) {
-            $this->assertSame('test.php', $file->getBasename());
-        }
-    }
-
-    public function test_get_finders(): void
-    {
-        $this->assertSame([], $this->config->getFilesIterators());
-    }
-
-    public function test_configure_finders(): void
-    {
-        touch('bad.php');
-        touch('test.html');
-        touch('test.txt');
-        touch('test.php');
-
-        $this->setConfig(
-            [
-                'blacklist' => ['bad.php'],
-                'finder' => [
-                    [
-                        'name' => '*.php',
-                        'in' => '.',
-                    ],
-                    [
-                        'name' => '*.html',
-                        'in' => '.',
-                    ],
-                ],
-            ]
-        );
-
-        $results = [];
-        $finders = $this->config->getFilesIterators();
-
-        foreach ($finders as $finder) {
-            foreach ($finder as $result) {
-                $results[] = $result;
-            }
-        }
-
-        $this->assertSame('test.php', $results[0]->getBasename());
-        $this->assertSame('test.html', $results[1]->getBasename());
     }
 
     public function test_get_main_script_path(): void
@@ -1077,12 +1611,27 @@ CODE
         $this->config = Configuration::create($this->file, (object) $config);
     }
 
-    private function isWindows()
+    private function isWindows(): bool
     {
-        if (false === strpos(strtolower(PHP_OS), 'darwin') && false !== strpos(strtolower(PHP_OS), 'win')) {
-            return true;
-        }
+        return false === strpos(strtolower(PHP_OS), 'darwin') && false !== strpos(strtolower(PHP_OS), 'win');
+    }
 
-        return false;
+    /**
+     * @return string[] File real paths relative to the current temporary directory
+     */
+    private function normalizeConfigPaths(Iterator $files): array
+    {
+        $root = $this->tmp;
+
+        return array_values(
+            array_map(
+                function (SplFileInfo $fileInfo) use ($root): string {
+                    $path = $fileInfo->getRealPath();
+
+                    return str_replace($root.DIRECTORY_SEPARATOR, '', $path);
+                },
+                iterator_to_array($files)
+            )
+        );
     }
 }

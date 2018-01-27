@@ -20,6 +20,7 @@ use ArrayIterator;
 use Assert\Assertion;
 use Closure;
 use DateTimeImmutable;
+use const DIRECTORY_SEPARATOR;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\Php as LegacyPhp;
 use InvalidArgumentException;
@@ -29,6 +30,7 @@ use Phar;
 use RuntimeException;
 use SplFileInfo;
 use stdClass;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
 
@@ -38,6 +40,11 @@ final class Configuration
     private const DEFAULT_MAIN = 'index.php';   // See Phar::setDefaultStub()
     private const DEFAULT_DATETIME_FORMAT = 'Y-m-d H:i:s';
     private const DEFAULT_REPLACEMENT_SIGIL = '@';
+
+    /**
+     * @var Filesystem|null Available only when the Configuration is being instantiated
+     */
+    private static $fileSystem;
 
     private $fileMode;
     private $alias;
@@ -182,13 +189,14 @@ final class Configuration
 
     public static function create(string $file, stdClass $raw): self
     {
+        self::$fileSystem = new Filesystem();
+
         $alias = self::retrieveAlias($raw);
 
         $basePath = self::retrieveBasePath($file, $raw);
         $basePathRetriever = new RetrieveRelativeBasePath($basePath);
 
-        $blacklist = self::retrieveBlacklist($raw);
-        $blacklistFilter = self::retrieveBlacklistFilter($basePath, $blacklist);
+        $blacklistFilter = self::retrieveBlacklistFilter($raw, $basePath);
 
         $files = self::retrieveFiles($raw, 'files', $basePath);
         $directories = self::retrieveDirectories($raw, 'directories', $basePath, $blacklistFilter);
@@ -243,6 +251,8 @@ final class Configuration
         $isInterceptFileFuncs = self::retrieveIsInterceptFileFuncs($raw);
         $isStubGenerated = self::retrieveIsStubGenerated($raw);
         $isWebPhar = self::retrieveIsWebPhar($raw);
+
+        self::$fileSystem = null;
 
         return new self(
             $alias,
@@ -494,9 +504,28 @@ final class Configuration
     }
 
     /**
+     * @param stdClass $raw
+     * @param string $basePath
+     *
+     * @return Closure
+     */
+    private static function retrieveBlacklistFilter(stdClass $raw, string $basePath): Closure
+    {
+        $blacklist = self::retrieveBlacklist($raw, $basePath);
+
+        return function (SplFileInfo $file) use ($blacklist): ?bool {
+            if (in_array($file->getRealPath(), $blacklist, true)) {
+                return false;
+            }
+
+            return null;
+        };
+    }
+
+    /**
      * @return string[]
      */
-    private static function retrieveBlacklist(stdClass $raw): array
+    private static function retrieveBlacklist(stdClass $raw, string $basePath): array
     {
         // TODO: only allow arrays if is set unlike the doc which says it can be a string
         if (isset($raw->blacklist)) {
@@ -504,8 +533,10 @@ final class Configuration
 
             array_walk(
                 $blacklist,
-                function (&$file): void {
-                    $file = canonicalize($file);
+                function (&$file) use ($basePath): void {
+                    if (false === self::$fileSystem->isAbsolutePath($file)) {
+                        $file = $basePath.DIRECTORY_SEPARATOR.canonicalize($file);
+                    }
                 }
             );
 
@@ -516,58 +547,40 @@ final class Configuration
     }
 
     /**
-     * @param string   $basePath
-     * @param string[] $blacklist
-     *
-     * @return Closure
-     */
-    private static function retrieveBlacklistFilter(string $basePath, array $blacklist): Closure
-    {
-        $base = sprintf(
-            '/^%s/',
-            preg_quote($basePath.DIRECTORY_SEPARATOR, '/')
-        );
-
-        return function (SplFileInfo $file) use ($base, $blacklist): ?bool {
-            $path = canonicalize(
-                preg_replace($base, '', $file->getPathname())
-            );
-
-            if (in_array($path, $blacklist, true)) {
-                return false;
-            }
-
-            return null;
-        };
-    }
-
-    /**
      * @param stdClass $raw
-     * @param string $key Config property name
+     * @param string $key  Config property name
      * @param string $basePath
      *
-     * @return string[]
+     * @return SplFileInfo[]
      */
-    private static function retrieveDirectoryPaths(stdClass $raw, string $key, string $basePath): array
+    private static function retrieveFiles(stdClass $raw, string $key, string $basePath): array
     {
-        // TODO: do not accept strings unlike the doc says and document that BC break
-        // Need to do the same for bin, directories-bin, files, ~~directories~~
-        if (isset($raw->{$key})) {
-            $directories = (array) $raw->{$key};
-
-            array_walk(
-                $directories,
-                function (&$directory) use ($basePath): void {
-                    $directory = $basePath
-                        .DIRECTORY_SEPARATOR
-                        .rtrim(canonicalize($directory), DIRECTORY_SEPARATOR);
-                }
-            );
-
-            return $directories;
+        if (false === isset($raw->{$key})) {
+            return [];
         }
 
-        return [];
+        $files = (array) $raw->{$key};
+
+        Assertion::allString($files);
+
+        return array_map(
+            function (string $file) use ($basePath, $key): SplFileInfo {
+                if (false === self::$fileSystem->isAbsolutePath($file)) {
+                    $file = $basePath.DIRECTORY_SEPARATOR.canonicalize($file);
+                }
+
+                Assertion::file(
+                    $file,
+                    sprintf(
+                        '"%s" must contain a list of existing files. Could not find "%%s".',
+                        $key
+                    )
+                );
+
+                return new SplFileInfo($file);
+            },
+            $files
+        );
     }
 
     /**
@@ -592,35 +605,6 @@ final class Configuration
         }
 
         return [];
-    }
-
-    /**
-     * @param stdClass $raw
-     * @param string $key  Config property name
-     * @param string $basePath
-     *
-     * @return SplFileInfo[]
-     */
-    private static function retrieveFiles(stdClass $raw, string $key, string $basePath): array
-    {
-        if (false === isset($raw->{$key})) {
-            return [];
-        }
-
-        $files = (array) $raw->{$key};
-
-        Assertion::allString($files);
-
-        return array_map(
-            function (string $file) use ($basePath): SplFileInfo {
-                $path = $basePath.DIRECTORY_SEPARATOR.canonicalize($file);
-
-                Assertion::file($file);
-
-                return new SplFileInfo($path);
-            },
-            $files
-        );
     }
 
     /**
@@ -663,9 +647,18 @@ final class Configuration
                 array_walk(
                     $methods->in,
                     function (&$directory) use ($basePath): void {
-                        $directory = canonicalize(
-                            $basePath.DIRECTORY_SEPARATOR.$directory
-                        );
+                        if (false === self::$fileSystem->isAbsolutePath($directory)) {
+                            $directory = sprintf(
+                                '%s%s',
+                                $basePath.DIRECTORY_SEPARATOR,
+                                rtrim(
+                                    canonicalize($directory),
+                                    DIRECTORY_SEPARATOR
+                                )
+                            );
+                        }
+
+                        Assertion::directory($directory);
                     }
                 );
             }
@@ -691,6 +684,50 @@ final class Configuration
         };
 
         return array_map($processFinderConfig, $findersConfig);
+    }
+
+    /**
+     * @param stdClass $raw
+     * @param string $key Config property name
+     * @param string $basePath
+     *
+     * @return string[]
+     */
+    private static function retrieveDirectoryPaths(stdClass $raw, string $key, string $basePath): array
+    {
+        // TODO: do not accept strings unlike the doc says and document that BC break
+        // Need to do the same for bin, directories-bin, files, ~~directories~~
+        if (isset($raw->{$key})) {
+            $directories = (array) $raw->{$key};
+
+            array_walk(
+                $directories,
+                function (&$directory) use ($basePath, $key): void {
+                    if (false === self::$fileSystem->isAbsolutePath($directory)) {
+                        $directory = sprintf(
+                            '%s%s',
+                            $basePath.DIRECTORY_SEPARATOR,
+                            rtrim(
+                                canonicalize($directory),
+                                DIRECTORY_SEPARATOR
+                            )
+                        );
+                    }
+
+                    Assertion::directory(
+                        $directory,
+                        sprintf(
+                            '"%s" must contain a list of existing directories. Could not find "%%s".',
+                            $key
+                        )
+                    );
+                }
+            );
+
+            return $directories;
+        }
+
+        return [];
     }
 
     private static function retrieveBootstrapFile(stdClass $raw, string $basePath): ?string
