@@ -1,6 +1,6 @@
 # Configuration
 
-1. [Alias][alis]
+1. [Alias][alias]
 1. [Base path][base-path]
 1. [Including files][including-files]
     1. [Files (`files` and `files-bin`)][files]
@@ -163,9 +163,9 @@ There is multiple config entries for including files:
 
 ### Files (`files` and `files-bin`)
 
-The `files` (`string[]`) setting is a list of files paths relative to `base-path` unless absolute. Each file will be
-processed by the compactors (see: `compactors`), have their placeholder values replaced (see: `replacements`) and added
-to the PHAR.
+The `files` (`string[]`) setting is a list of files paths relative to [`base-path`][base-path] unless absolute. Each
+file will be processed by the compactors (see: `compactors`), have their placeholder values replaced
+(see: `replacements`) and added to the PHAR.
 
 This setting is not affected by the [`blacklist`][blacklist] setting.
 
@@ -176,9 +176,9 @@ compactors.
 
 ### Directories (`directories` and `directories-bin`)
 
-The directories (`string[]`) setting is a list of directory paths relative to `base-path`. All files will be processed
-by the compactors (see: `compactors`), have their placeholder values replaced (see: `replacements`) and added to the
-PHAR.
+The directories (`string[]`) setting is a list of directory paths relative to [`base-path`][base-path]. All files will
+be processed by the compactors (see: `compactors`), have their placeholder values replaced (see: `replacements`) and
+added to the PHAR.
 
 Files listed in the [`blacklist`][blacklist] will not be added to the PHAR.
 
