@@ -61,6 +61,7 @@ e2e: box_dev.json
 
 	mv -fv bin/box.phar .
 
+	# TODO: use the build step again otherwise it is going to include the dev files
 	php -d phar.readonly=0 box.phar build
 
 	rm box.phar
