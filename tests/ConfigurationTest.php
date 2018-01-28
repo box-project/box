@@ -1216,6 +1216,12 @@ EOF
         mkdir('A');
         touch('A/foo');
 
+        mkdir('A/D0');
+        touch('A/D0/da0');
+
+        mkdir('A/D1');
+        touch('A/D1/da1');
+
         mkdir('B');
         touch('B/bar');
 
@@ -1236,7 +1242,7 @@ EOF
         $finderConfig = [
             [
                 ' in ' => [' A ', ' B ', ' D '],
-                ' exclude ' => [' D/D0 ', ' D/D1 '],
+                ' exclude ' => [' D0 ', ' D1 '],
                 ' append ' => [' oof ', ' rab '],
             ],
         ];
@@ -1254,10 +1260,6 @@ EOF
             'sub-dir/A/foo',
             'sub-dir/B/bar',
             'sub-dir/D/doo',
-            // TODO: this should not be here... but see https://github.com/symfony/symfony/issues/25945
-            'sub-dir/D/D0/d0o',
-            'sub-dir/D/D1/d1o',
-            // --TODO
             'sub-dir/oof',
             'sub-dir/rab',
         ];
@@ -1352,6 +1354,22 @@ EOF
         $actual = $this->normalizeConfigPaths($this->config->getFiles());
 
         $this->assertSame($expected, $actual);
+    }
+
+    public function test_the_finder_config_cannot_include_invalid_methods(): void
+    {
+        try {
+            $this->setConfig(
+                ['finder' => [['invalidMethod' => 'whargarbl']]]
+            );
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'The method "Finder::invalidMethod" does not exist.',
+                $exception->getMessage()
+            );
+        }
     }
 
     public function test_get_the_bootstrap_file(): void
@@ -2058,22 +2076,6 @@ CODE
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The bootstrap path "'.$this->tmp.DIRECTORY_SEPARATOR.'test.php" is not a file or does not exist.',
-                $exception->getMessage()
-            );
-        }
-    }
-
-    public function testProcessFindersInvalidMethod(): void
-    {
-        try {
-            $this->setConfig(
-                ['finder' => [['invalidMethod' => 'whargarbl']]]
-            );
-
-            $this->fail('Expected exception to be thrown.');
-        } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
-                'The method "Finder::invalidMethod" does not exist.',
                 $exception->getMessage()
             );
         }
