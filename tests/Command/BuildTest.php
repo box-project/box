@@ -14,9 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Command;
 
+use Amp\MultiReasonException;
+use Amp\Parallel\Worker\TaskException;
+use Assert\InvalidArgumentException as AssertInvalidArgumentException;
 use DirectoryIterator;
 use Generator;
-use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
@@ -780,8 +782,13 @@ PHP
             );
 
             $this->fail('Expected exception to be thrown.');
-        } catch (InvalidArgumentException $exception) {
-            $this->assertTrue(true);
+        } catch (MultiReasonException $exception) {
+            $this->assertCount(1, $exception->getReasons());
+
+            /** @var TaskException $reason */
+            $reason = $exception->getReasons()[0];
+
+            $this->assertSame(AssertInvalidArgumentException::class, $reason->getName());
         }
     }
 

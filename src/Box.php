@@ -21,6 +21,8 @@ use Phar;
 use RecursiveDirectoryIterator;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
+use function Amp\ParallelFunctions\parallelMap;
+use function Amp\Promise\wait;
 
 /**
  * Box is a utility class to generate a PHAR.
@@ -129,7 +131,8 @@ final class Box
         Assertion::file($file);
         Assertion::readable($file);
 
-        $contents = $this->replacePlaceholders(
+        $contents = self::replacePlaceholders(
+            $this->placeholders,
             file_get_contents($file)
         );
 
@@ -142,8 +145,27 @@ final class Box
      */
     public function addFiles(array $files, bool $binary): void
     {
-        foreach ($files as $file) {
-            $this->addFile((string) $file, null, $binary);
+        if ($binary) {
+            foreach ($files as $file) {
+                $this->addFile((string) $file, null, $binary);
+            }
+
+            return;
+        }
+
+        $tuples = $this->processContents(
+            array_map(
+                function ($file): string {
+                    return (string) $file;
+                },
+                $files
+            )
+        );
+
+        foreach ($tuples as $tuple) {
+            list($path, $contents) = $tuple;
+
+            $this->phar->addFromString($path, $contents);
         }
     }
 
@@ -174,9 +196,10 @@ final class Box
         if ($binary) {
             $this->phar->addFile($file, $local);
         } else {
-            $processedContents = $this->compactContents(
+            $processedContents = self::compactContents(
+                $this->compactors,
                 $local,
-                $this->replacePlaceholders($contents)
+                self::replacePlaceholders($this->placeholders, $contents)
             );
 
             $this->phar->addFromString($local, $processedContents);
@@ -238,25 +261,63 @@ final class Box
     }
 
     /**
+     * @param string[]
+     *
+     * @return array
+     */
+    private function processContents(array $files): array
+    {
+        $retrieveRelativeBasePath = $this->retrieveRelativeBasePath;
+        $mapFile = $this->mapFile;
+        $placeholders = $this->placeholders;
+        $compactors = $this->compactors;
+
+        $processFile = function (string $file) use ($retrieveRelativeBasePath, $mapFile, $placeholders, $compactors): array {
+            Assertion::file($file);
+            Assertion::readable($file);
+
+            $contents = file_get_contents($file);
+
+            $relativePath = $retrieveRelativeBasePath($file);
+            $local = $mapFile($relativePath);
+
+            if (null === $local) {
+                $local = $relativePath;
+            }
+
+            $processedContents = self::compactContents(
+                $compactors,
+                $local,
+                self::replacePlaceholders($placeholders, $contents)
+            );
+
+            return [$local, $processedContents];
+        };
+
+        return wait(parallelMap($files, $processFile));
+    }
+
+    /**
      * Replaces the placeholders with their values.
      *
-     * @param string $contents the contents
+     * @param array  $placeholders
+     * @param string $contents     the contents
      *
      * @return string the replaced contents
      */
-    private function replacePlaceholders(string $contents): string
+    private static function replacePlaceholders(array $placeholders, string $contents): string
     {
         return str_replace(
-            array_keys($this->placeholders),
-            array_values($this->placeholders),
+            array_keys($placeholders),
+            array_values($placeholders),
             $contents
         );
     }
 
-    private function compactContents(string $file, string $contents): string
+    private static function compactContents(array $compactors, string $file, string $contents): string
     {
         return array_reduce(
-            $this->compactors,
+            $compactors,
             function (string $contents, Compactor $compactor) use ($file): string {
                 return $compactor->compact($file, $contents);
             },
