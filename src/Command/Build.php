@@ -257,7 +257,7 @@ HELP;
 
         $count = count($config->getBinaryFiles());
 
-        $box->addFiles($config->getFiles(), true);
+        $box->addFiles($config->getBinaryFiles(), true);
 
         $logger->log(
             BuildLogger::CHEVRON_PREFIX,

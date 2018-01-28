@@ -19,6 +19,7 @@ use KevinGH\Box\Exception\FileExceptionFactory;
 use KevinGH\Box\Exception\OpenSslExceptionFactory;
 use Phar;
 use RecursiveDirectoryIterator;
+use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -136,13 +137,13 @@ final class Box
     }
 
     /**
-     * @param string[] $files
-     * @param bool     $binary
+     * @param SplFileInfo[]|string[] $files
+     * @param bool                   $binary
      */
     public function addFiles(array $files, bool $binary): void
     {
         foreach ($files as $file) {
-            $this->addFile($file, null, $binary);
+            $this->addFile((string) $file, null, $binary);
         }
     }
 
