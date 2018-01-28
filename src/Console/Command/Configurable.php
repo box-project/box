@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use KevinGH\Box\Configuration;
-use KevinGH\Box\Console\ConfigurationHelper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -28,7 +27,7 @@ abstract class Configurable extends Command
     private const CONFIG_PARAM = 'config';
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function configure(): void
     {

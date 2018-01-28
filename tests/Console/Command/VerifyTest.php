@@ -27,7 +27,7 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 class VerifyTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__ . '/../../../fixtures/verify';
+    private const FIXTURES_DIR = __DIR__.'/../../../fixtures/verify';
 
     /**
      * @var CommandTester

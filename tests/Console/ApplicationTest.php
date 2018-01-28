@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console;
 
 use ErrorException;
-use KevinGH\Box\Console\Application;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\ApplicationTester;
 

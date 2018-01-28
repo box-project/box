@@ -26,7 +26,7 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 class InfoTest extends TestCase
 {
-    private const FIXTURES = __DIR__ . '/../../../fixtures/info';
+    private const FIXTURES = __DIR__.'/../../../fixtures/info';
 
     /**
      * @var CommandTester

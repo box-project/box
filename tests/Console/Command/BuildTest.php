@@ -36,7 +36,7 @@ use Traversable;
  */
 class BuildTest extends CommandTestCase
 {
-    private const FIXTURES_DIR = __DIR__ . '/../../../fixtures/build';
+    private const FIXTURES_DIR = __DIR__.'/../../../fixtures/build';
 
     public function test_it_can_build_a_PHAR_file(): void
     {

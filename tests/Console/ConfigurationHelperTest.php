@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console;
 
 use KevinGH\Box\Configuration;
-use KevinGH\Box\Console\ConfigurationHelper;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use function KevinGH\Box\make_tmp_dir;
