@@ -50,17 +50,6 @@ class VerifyTest extends TestCase
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function tearDown(): void
-    {
-        //TODO: check if is still necessary
-        restore_error_handler();
-
-        parent::tearDown();
-    }
-
-    /**
      * @dataProvider providePassingPharPaths
      */
     public function test_it_verifies_the_signature_of_the_given_file_using_the_phar_extension(string $pharPath): void

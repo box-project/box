@@ -87,9 +87,6 @@ class BoxTest extends TestCase
 
         remove_dir($this->tmp);
 
-        //TODO: see if we need a custom error handler still
-        restore_error_handler();
-
         parent::tearDown();
     }
 
@@ -547,9 +544,9 @@ STUB;
             $this->box->sign($key, $password);
 
             $this->fail('Expected exception to be thrown.');
-        } catch (Exception $exception) {
+        } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                'error:0906D06C:PEM routines:PEM_read_bio:no start line',
+                'Cannot create public key: "test.phar.pubkey" already exists and is not a file.',
                 $exception->getMessage()
             );
         }
@@ -567,9 +564,9 @@ STUB;
             $this->box->sign($key, $password);
 
             $this->fail('Expected exception to be thrown.');
-        } catch (Exception $exception) {
+        } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                'Undefined index: code',
+                'Cannot create public key: "test.phar.pubkey" already exists and is not a file.',
                 $exception->getMessage()
             );
         }

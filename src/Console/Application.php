@@ -14,16 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
-use ErrorException;
 use Humbug\SelfUpdate\Exception\RuntimeException as SelfUpdateRuntimeException;
 use Humbug\SelfUpdate\Updater;
 use KevinGH\Box\Console\Command\SelfUpdateCommand;
 use Symfony\Component\Console\Application as SymfonyApplication;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\HelperSet;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\Console\Output\OutputInterface;
 
 final class Application extends SymfonyApplication
 {
@@ -44,17 +39,6 @@ ASCII;
      */
     public function __construct(string $name = 'Box', string $version = '@git-version@')
     {
-        // convert errors to exceptions
-        set_error_handler(
-            function ($code, $message, $file, $line): void {
-                if (error_reporting() & $code) {
-                    throw new ErrorException($message, 0, $code, $file, $line);
-                }
-                // @codeCoverageIgnoreStart
-            }
-        // @codeCoverageIgnoreEnd
-        );
-
         parent::__construct($name, $version);
     }
 
@@ -73,26 +57,6 @@ ASCII;
         }
 
         return '<info>'.$this->getName().'</info> (repo)';
-    }
-
-    /**
-     * @override
-     */
-    public function run(InputInterface $input = null, OutputInterface $output = null)
-    {
-        $output = $output ?: new ConsoleOutput();
-
-        $output->getFormatter()->setStyle(
-            'error',
-            new OutputFormatterStyle('red')
-        );
-
-        $output->getFormatter()->setStyle(
-            'question',
-            new OutputFormatterStyle('cyan')
-        );
-
-        return parent::run($input, $output);
     }
 
     /**

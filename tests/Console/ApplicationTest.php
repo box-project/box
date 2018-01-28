@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
-use ErrorException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
@@ -23,16 +22,6 @@ use Symfony\Component\Console\Tester\ApplicationTester;
  */
 class ApplicationTest extends TestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown(): void
-    {
-        restore_error_handler();
-
-        parent::tearDown();
-    }
-
     public function test_it_can_display_the_version_when_no_specific_version_is_given(): void
     {
         $application = new Application();
@@ -79,22 +68,6 @@ EOF;
         $actual = $appTester->getDisplay(true);
 
         $this->assertSame($expected, $actual);
-    }
-
-    //TODO: review that "feature" as it is likely to no longer be necessary in PHP 7.1
-    public function test_errors_are_transformed_into_warnings(): void
-    {
-        $application = new Application();
-        $application->setAutoExit(false);
-        $application->setCatchExceptions(false);
-
-        try {
-            trigger_error('Test.', E_USER_WARNING);
-
-            $this->fail('Expected exception to be thrown.');
-        } catch (ErrorException $exception) {
-            $this->assertSame('Test.', $exception->getMessage());
-        }
     }
 
     public function test_get_helper_menu(): void

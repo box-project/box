@@ -27,6 +27,15 @@ if ($uri = Phar::running()) {
 
 register_aliases();
 
+// Convert errors to exceptions
+set_error_handler(
+    function ($code, $message, $file, $line): void {
+        if (error_reporting() & $code) {
+            throw new ErrorException($message, 0, $code, $file, $line);
+        }
+    }
+);
+
 $app = new Application();
 $app->run();
 

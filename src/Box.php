@@ -15,8 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
-use KevinGH\Box\Exception\FileExceptionFactory;
-use KevinGH\Box\Exception\OpenSslExceptionFactory;
 use Phar;
 use RecursiveDirectoryIterator;
 use SplFileInfo;
@@ -235,29 +233,27 @@ final class Box
      */
     public function sign(string $key, ?string $password): void
     {
-        OpenSslExceptionFactory::reset();
-
         $pubKey = $this->file.'.pubkey';
 
+        Assertion::writeable(dirname($pubKey));
         Assertion::extensionLoaded('openssl');
 
-        if (false === ($resource = openssl_pkey_get_private($key, $password))) {
-            throw OpenSslExceptionFactory::createForLastError();
+        if (file_exists($pubKey)) {
+            Assertion::file(
+                $pubKey,
+                'Cannot create public key: "%s" already exists and is not a file.'
+            );
         }
 
-        if (false === openssl_pkey_export($resource, $private)) {
-            throw OpenSslExceptionFactory::createForLastError();
-        }
+        $resource = openssl_pkey_get_private($key, (string) $password);
 
-        if (false === ($details = openssl_pkey_get_details($resource))) {
-            throw OpenSslExceptionFactory::createForLastError();
-        }
+        openssl_pkey_export($resource, $private);
+
+        $details = openssl_pkey_get_details($resource);
 
         $this->phar->setSignatureAlgorithm(Phar::OPENSSL, $private);
 
-        if (false === @file_put_contents($pubKey, $details['key'])) {
-            throw FileExceptionFactory::createForLastError();
-        }
+        file_put_contents($pubKey, $details['key']);
     }
 
     /**
