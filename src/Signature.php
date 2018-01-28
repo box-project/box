@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
-use KevinGH\Box\Exception\FileExceptionFactory;
 use KevinGH\Box\Verifier\Hash;
 use KevinGH\Box\Verifier\PublicKeyDelegate;
 use PharException;
@@ -87,9 +86,7 @@ final class Signature
 
         $this->file = realpath($path);
 
-        if (false === ($this->size = @filesize($path))) {
-            throw FileExceptionFactory::createForLastError();
-        }
+        $this->size = filesize($path);
     }
 
     public function __destruct()
@@ -228,7 +225,7 @@ final class Signature
     private function close(): void
     {
         if (is_resource($this->handle)) {
-            @fclose($this->handle);
+            fclose($this->handle);
 
             $this->handle = null;
         }
@@ -242,9 +239,7 @@ final class Signature
     private function handle()
     {
         if (!$this->handle) {
-            if (!($this->handle = @fopen($this->file, 'rb'))) {
-                throw FileExceptionFactory::lastError();
-            }
+            $this->handle = fopen($this->file, 'rb');
         }
 
         return $this->handle;
@@ -259,18 +254,9 @@ final class Signature
      */
     private function read(int $bytes): string
     {
-        if (false === ($read = @fread($this->handle(), $bytes))) {
-            throw FileExceptionFactory::lastError();
-        }
+        $read = fread($this->handle(), $bytes);
 
-        if (($actual = strlen($read)) !== $bytes) {
-            throw FileExceptionFactory::create(
-                'Only read %d of %d bytes from "%s".',
-                $actual,
-                $bytes,
-                $this->file
-            );
-        }
+        Assertion::same(strlen($read), $bytes);
 
         return $read;
     }
@@ -283,8 +269,6 @@ final class Signature
      */
     private function seek(int $offset, int $whence = SEEK_SET): void
     {
-        if (-1 === @fseek($this->handle(), $offset, $whence)) {
-            throw FileExceptionFactory::lastError();
-        }
+        fseek($this->handle(), $offset, $whence);
     }
 }

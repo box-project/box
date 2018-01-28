@@ -74,9 +74,6 @@ abstract class CommandTestCase extends \PHPUnit\Framework\TestCase
 
         remove_dir($this->tmp);
 
-        // TODO: check if this is still necessary
-        restore_error_handler();
-
         parent::tearDown();
     }
 
