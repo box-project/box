@@ -12,12 +12,12 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box;
+namespace KevinGH\Box\Console;
 
 use ErrorException;
 use Humbug\SelfUpdate\Exception\RuntimeException as SelfUpdateRuntimeException;
 use Humbug\SelfUpdate\Updater;
-use KevinGH\Box\Command\SelfUpdateCommand;
+use KevinGH\Box\Console\Command\SelfUpdateCommand;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -134,7 +134,7 @@ ASCII;
     protected function getDefaultHelperSet(): HelperSet
     {
         $helperSet = parent::getDefaultHelperSet();
-        $helperSet->set(new Helper\ConfigurationHelper());
+        $helperSet->set(new \KevinGH\Box\Console\ConfigurationHelper());
 
         return $helperSet;
     }

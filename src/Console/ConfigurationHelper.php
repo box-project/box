@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Helper;
+namespace KevinGH\Box\Console;
 
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Json\Json;

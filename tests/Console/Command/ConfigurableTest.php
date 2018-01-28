@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Command;
+namespace KevinGH\Box\Console\Command;
 
 use Closure;
 use KevinGH\Box\Configuration;
@@ -22,7 +22,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 
 /**
- * @covers \KevinGH\Box\Command\Configurable
+ * @covers \KevinGH\Box\Console\Command\Configurable
  */
 class ConfigurableTest extends CommandTestCase
 {

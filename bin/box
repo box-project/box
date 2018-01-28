@@ -14,7 +14,7 @@ declare(strict_types=1);
  */
 
 use Composer\Autoload\ClassLoader;
-use KevinGH\Box\Application;
+use KevinGH\Box\Console\Application;
 use function KevinGH\Box\register_aliases;
 
 /*

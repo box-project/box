@@ -12,10 +12,10 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Command;
+namespace KevinGH\Box\Console\Command;
 
 use Humbug\SelfUpdate\Updater;
-use KevinGH\Box\Logger\UpdateConsoleLogger;
+use KevinGH\Box\Console\Logger\UpdateConsoleLogger;
 use PHAR;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

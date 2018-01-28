@@ -12,10 +12,10 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Command;
+namespace KevinGH\Box\Console\Command;
 
 use InvalidArgumentException;
-use KevinGH\Box\Application;
+use KevinGH\Box\Console\Application;
 use Phar;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
@@ -23,11 +23,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
- * @covers \KevinGH\Box\Command\Verify
+ * @covers \KevinGH\Box\Console\Command\Verify
  */
 class VerifyTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__.'/../../fixtures/verify';
+    private const FIXTURES_DIR = __DIR__.'/../../../fixtures/verify';
 
     /**
      * @var CommandTester
