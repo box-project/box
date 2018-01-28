@@ -136,6 +136,17 @@ final class Box
     }
 
     /**
+     * @param string[] $files
+     * @param bool     $binary
+     */
+    public function addFiles(array $files, bool $binary): void
+    {
+        foreach ($files as $file) {
+            $this->addFile($file, null, $binary);
+        }
+    }
+
+    /**
      * Adds the a file to the PHAR. The contents will first be compacted and have its placeholders
      * replaced.
      *

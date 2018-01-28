@@ -255,12 +255,9 @@ HELP;
     {
         $logger->log(BuildLogger::QUESTION_MARK_PREFIX, 'Adding binary files');
 
-        $count = 0;
+        $count = count($config->getBinaryFiles());
 
-        foreach ($config->getBinaryFiles() as $file) {
-            ++$count;
-            $box->addFile((string) $file, null, true);
-        }
+        $box->addFiles($config->getFiles(), true);
 
         $logger->log(
             BuildLogger::CHEVRON_PREFIX,
@@ -271,12 +268,9 @@ HELP;
 
         $logger->log(BuildLogger::QUESTION_MARK_PREFIX, 'Adding files');
 
-        $count = 0;
+        $count = count($config->getFiles());
 
-        foreach ($config->getFiles() as $file) {
-            ++$count;
-            $box->addFile((string) $file);
-        }
+        $box->addFiles($config->getFiles(), false);
 
         $logger->log(
             BuildLogger::CHEVRON_PREFIX,
