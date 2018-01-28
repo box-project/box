@@ -14,13 +14,6 @@ declare(strict_types=1);
 
 use Assert\Assertion;
 
-/*
- * The open-ended stub pattern.
- *
- * @var string
- */
-define('BOX_EXTRACT_PATTERN_OPEN', '__HALT'."_COMPILER(); ?>\r\n");
-
 /**
  * Extracts a PHAR without the extension.
  *
@@ -36,7 +29,7 @@ final class Box_Extract
     /**
      * @var string The open-ended stub pattern
      */
-    private const PATTERN_OPEN = BOX_EXTRACT_PATTERN_OPEN;
+    private const PATTERN_OPEN = '__HALT'."_COMPILER(); ?>\r\n";
 
     /**
      * @var int The gzip compression flag

@@ -17,13 +17,6 @@ use Composer\Autoload\ClassLoader;
 use KevinGH\Box\Console\Application;
 use function KevinGH\Box\register_aliases;
 
-/*
- * The project (or Phar) base path.
- *
- * @var string
- */
-define('BOX_PATH', dirname(__DIR__));
-
 if ($uri = Phar::running()) {
     require "$uri/vendor/autoload.php";
 } elseif (class_exists('Extract')) {

@@ -64,11 +64,6 @@ class ConfigurationHelperTest extends TestCase
         remove_dir($this->tmp);
     }
 
-    public function test_schema_constant_is_defined(): void
-    {
-        $this->assertInternalType('string', BOX_SCHEMA_FILE);
-    }
-
     public function test_it_has_a_name(): void
     {
         $this->assertSame('config', $this->helper->getName());

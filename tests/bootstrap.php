@@ -16,9 +16,8 @@ use org\bovigo\vfs\vfsStreamWrapper;
 use function KevinGH\Box\register_aliases;
 
 $loader = require __DIR__.'/../vendor/autoload.php';
-require_once __DIR__.'/../src/Box_Extract.php';
 
-define('BOX_PATH', realpath(__DIR__).'/../');
+require_once __DIR__.'/../src/Box_Extract.php';
 
 vfsStreamWrapper::register();
 
