@@ -16,20 +16,19 @@ namespace KevinGH\Box\Command;
 
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Helper\ConfigurationHelper;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
  * Allows a configuration file path to be specified for a command.
- *
- * @author Kevin Herrera <kevin@herrera.io>
  */
-abstract class Configurable extends AbstractCommand
+abstract class Configurable extends Command
 {
     private const CONFIG_PARAM = 'config';
 
     /**
-     * @override
+     * @inheritdoc
      */
     protected function configure(): void
     {
@@ -48,7 +47,7 @@ abstract class Configurable extends AbstractCommand
      *
      * @return Configuration the configuration settings
      */
-    final protected function getConfig(InputInterface $input)
+    final protected function getConfig(InputInterface $input): Configuration
     {
         /** @var $helper ConfigurationHelper */
         $helper = $this->getHelper('config');
