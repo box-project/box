@@ -21,16 +21,10 @@ use Symfony\Component\Console\Helper\Helper;
 use Webmozart\PathUtil\Path;
 use function KevinGH\Box\is_absolute;
 
-/*
- * The Box schema file path.
- *
- * @var string
- */
-define('BOX_SCHEMA_FILE', BOX_PATH.'/res/schema.json');
-
 final class ConfigurationHelper extends Helper
 {
     private const FILE_NAME = 'box.json';
+    private const SCHEMA_FILE = __DIR__.'/../../res/schema.json';
 
     private $json;
 
@@ -90,7 +84,7 @@ final class ConfigurationHelper extends Helper
         $this->json->validate(
             $file,
             $json,
-            $this->json->decodeFile(BOX_SCHEMA_FILE)
+            $this->json->decodeFile(self::SCHEMA_FILE)
         );
 
         return Configuration::create($file, $json);
