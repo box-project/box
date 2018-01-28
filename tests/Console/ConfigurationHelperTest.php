@@ -12,16 +12,17 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Helper;
+namespace KevinGH\Box\Console;
 
 use KevinGH\Box\Configuration;
+use KevinGH\Box\Console\ConfigurationHelper;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use function KevinGH\Box\make_tmp_dir;
 use function KevinGH\Box\remove_dir;
 
 /**
- * @covers \KevinGH\Box\Helper\ConfigurationHelper
+ * @covers \KevinGH\Box\Console\ConfigurationHelper
  */
 class ConfigurationHelperTest extends TestCase
 {

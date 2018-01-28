@@ -12,14 +12,15 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box;
+namespace KevinGH\Box\Console;
 
 use ErrorException;
+use KevinGH\Box\Console\Application;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
 /**
- * @covers \KevinGH\Box\Application
+ * @covers \KevinGH\Box\Console\Application
  */
 class ApplicationTest extends TestCase
 {

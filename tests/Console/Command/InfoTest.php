@@ -12,21 +12,21 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Command;
+namespace KevinGH\Box\Console\Command;
 
-use KevinGH\Box\Application;
+use KevinGH\Box\Console\Application;
 use Phar;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
- * @covers \KevinGH\Box\Command\Info
+ * @covers \KevinGH\Box\Console\Command\Info
  *
  * @runTestsInSeparateProcesses
  */
 class InfoTest extends TestCase
 {
-    private const FIXTURES = __DIR__.'/../../fixtures/info';
+    private const FIXTURES = __DIR__ . '/../../../fixtures/info';
 
     /**
      * @var CommandTester

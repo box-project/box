@@ -12,9 +12,9 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Command;
+namespace KevinGH\Box\Console\Command;
 
-use KevinGH\Box\Application;
+use KevinGH\Box\Console\Application;
 use KevinGH\Box\Test\CommandTestCase;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
@@ -22,7 +22,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
- * @covers \KevinGH\Box\Command\Validate
+ * @covers \KevinGH\Box\Console\Command\Validate
  *
  * @runTestsInSeparateProcesses
  */

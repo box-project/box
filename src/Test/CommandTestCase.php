@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Test;
 
-use KevinGH\Box\Application;
+use KevinGH\Box\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\CommandTester;

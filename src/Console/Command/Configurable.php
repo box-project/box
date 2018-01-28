@@ -12,10 +12,10 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Command;
+namespace KevinGH\Box\Console\Command;
 
 use KevinGH\Box\Configuration;
-use KevinGH\Box\Helper\ConfigurationHelper;
+use KevinGH\Box\Console\ConfigurationHelper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -49,7 +49,7 @@ abstract class Configurable extends Command
      */
     final protected function getConfig(InputInterface $input): Configuration
     {
-        /** @var $helper ConfigurationHelper */
+        /** @var $helper \KevinGH\Box\Console\ConfigurationHelper */
         $helper = $this->getHelper('config');
 
         return $helper->loadFile($input->getOption(self::CONFIG_PARAM));

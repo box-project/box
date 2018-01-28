@@ -16,7 +16,7 @@
 
             <exclude>
                 <file>src/functions.php</file>
-                <directory>src/Logger</directory>
+                <directory>src/Console/Logger</directory>
                 <directory>src/Test</directory>
             </exclude>
         </whitelist>

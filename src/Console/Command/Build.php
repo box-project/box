@@ -12,13 +12,13 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Command;
+namespace KevinGH\Box\Console\Command;
 
 use Assert\Assertion;
 use KevinGH\Box\Box;
 use KevinGH\Box\Compactor;
 use KevinGH\Box\Configuration;
-use KevinGH\Box\Logger\BuildLogger;
+use KevinGH\Box\Console\Logger\BuildLogger;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\StubGenerator;
 use RuntimeException;

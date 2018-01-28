@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Command;
+namespace KevinGH\Box\Console\Command;
 
 use Amp\MultiReasonException;
 use Amp\Parallel\Worker\TaskException;
@@ -30,13 +30,13 @@ use Symfony\Component\Process\PhpExecutableFinder;
 use Traversable;
 
 /**
- * @covers \KevinGH\Box\Command\Build
+ * @covers \KevinGH\Box\Console\Command\Build
  * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
  *                              can create undesirable side-effects.
  */
 class BuildTest extends CommandTestCase
 {
-    private const FIXTURES_DIR = __DIR__.'/../../fixtures/build';
+    private const FIXTURES_DIR = __DIR__ . '/../../../fixtures/build';
 
     public function test_it_can_build_a_PHAR_file(): void
     {
