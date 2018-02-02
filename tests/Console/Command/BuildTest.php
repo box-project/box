@@ -73,7 +73,7 @@ class BuildTest extends CommandTestCase
 
         $commandTester = $this->getCommandTester();
 
-        $commandTester->setInputs(['test']);
+        $commandTester->setInputs(['test']);    // Set input for the passphrase
         $commandTester->execute(
             ['command' => 'build'],
             ['interactive' => true]
@@ -208,7 +208,7 @@ PHP;
 
         $commandTester = $this->getCommandTester();
 
-        $commandTester->setInputs(['test']);
+        $commandTester->setInputs(['test']);    // Set input for the passphrase
         $commandTester->execute(
             [
                 'command' => 'build',
@@ -260,7 +260,7 @@ PHP;
 
         $commandTester = $this->getCommandTester();
 
-        $commandTester->setInputs(['test']);
+        $commandTester->setInputs(['test']);    // Set input for the passphrase
         $commandTester->execute(
             ['command' => 'build'],
             ['interactive' => true]
@@ -397,7 +397,7 @@ PHP;
 
         $commandTester = $this->getCommandTester();
 
-        $commandTester->setInputs(['test']);
+        $commandTester->setInputs(['test']);    // Set input for the passphrase
         $commandTester->execute(
             ['command' => 'build'],
             [
@@ -489,7 +489,7 @@ OUTPUT;
 
         $commandTester = $this->getCommandTester();
 
-        $commandTester->setInputs(['test']);
+        $commandTester->setInputs(['test']);    // Set input for the passphrase
         $commandTester->execute(
             ['command' => 'build'],
             [
@@ -669,7 +669,7 @@ OUTPUT;
 
         $commandTester = $this->getCommandTester();
 
-        $commandTester->setInputs(['test']);
+        $commandTester->setInputs(['test']);    // Set input for the passphrase
         $commandTester->execute(
             ['command' => 'build'],
             ['interactive' => true]
@@ -737,7 +737,7 @@ PHP
 
         $commandTester = $this->getCommandTester();
 
-        $commandTester->setInputs(['test']);
+        $commandTester->setInputs(['test']);    // Set input for the passphrase
         $commandTester->execute(
             ['command' => 'build'],
             ['interactive' => true]
@@ -1185,7 +1185,6 @@ OUTPUT;
 
         $commandTester = $this->getCommandTester();
 
-        $commandTester->setInputs(['test']);
         $commandTester->execute(
             ['command' => 'build'],
             ['interactive' => true]
