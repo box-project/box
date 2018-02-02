@@ -15,18 +15,14 @@ declare(strict_types=1);
 namespace KevinGH\Box\Test;
 
 use KevinGH\Box\Console\Application;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 use function KevinGH\Box\make_tmp_dir;
 use function KevinGH\Box\remove_dir;
 
-/**
- * Makes it easier to test Box commands.
- *
- * @author Kevin Herrera <kevin@herrera.io>
- */
-abstract class CommandTestCase extends \PHPUnit\Framework\TestCase
+abstract class CommandTestCase extends TestCase
 {
     /**
      * @var Application
