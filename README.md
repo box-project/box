@@ -9,7 +9,7 @@
 [![Slack](https://img.shields.io/badge/slack-%23humbug-red.svg?style=flat-square)](https://symfony.com/slack-invite)
 [![License](https://img.shields.io/badge/license-MIT-red.svg?style=flat-square)](LICENSE)
 
-Fork of the box unmaintained project. This project needs your help!
+Fork of the unmaintained [box2 project](https://github.com/box-project/box2). This project needs your help!
 
 Roadmap:
   - [Project board](https://github.com/humbug/box/projects/1)
