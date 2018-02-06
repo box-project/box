@@ -5,7 +5,6 @@
 /bin/
 !/bin/box
 !/bin/box.bat
-/composer.lock
 /dist/
 /vendor/
 /vendor-bin/*/composer.lock

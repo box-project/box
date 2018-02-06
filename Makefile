@@ -110,5 +110,5 @@ vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer: vendor/bamarni
 bin/box.phar: bin/box src vendor
 	$(MAKE) build
 
-box_dev.json:
+box_dev.json: box.json.dist
 	cat box.json.dist | sed -E 's/\"key\": \".+\",//g' | sed -E 's/\"algorithm\": \".+\",//g' | sed -E 's/\"alias\": \".+\",//g' > box_dev.json
