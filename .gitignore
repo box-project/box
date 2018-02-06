@@ -3,9 +3,11 @@
 /box.json
 /box_dev.json
 /bin/
+!/bin/generate_default_stub
 !/bin/box
 !/bin/box.bat
 /dist/
+/fixtures/default_stub.php
 /vendor/
 /vendor-bin/*/composer.lock
 /vendor-bin/*/vendor/
