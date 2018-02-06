@@ -1,3 +1,9 @@
+<p align="center">
+    <img src="doc/img/box.png" width=300 />
+</p>
+
+<h1 align=center>Box - Building and managing your PHARs</h1>
+
 # Box
 
 [![Package version](https://img.shields.io/packagist/vpre/humbug/box.svg?style=flat-square)](https://packagist.org/packages/humbug/box)
