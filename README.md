@@ -1,4 +1,7 @@
-# Box
+<p align="center">
+    <img src="doc/img/box.png" width=900 />
+</p>
+
 
 [![Package version](https://img.shields.io/packagist/vpre/humbug/box.svg?style=flat-square)](https://packagist.org/packages/humbug/box)
 [![Travis Build Status](https://img.shields.io/travis/humbug/box.svg?branch=master&style=flat-square)](https://travis-ci.org/humbug/box?branch=master)
