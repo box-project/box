@@ -1,0 +1,24 @@
+#!/usr/bin/env php
+<?php
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+declare(strict_types=1);
+
+$phar = new Phar('tmp.phar');
+$phar->setDefaultStub();
+
+file_put_contents(
+    __DIR__.'/../fixtures/default_stub.php',
+    $phar->getStub()
+);
+
+unlink('tmp.phar');

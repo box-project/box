@@ -44,7 +44,7 @@ test:		## Run all the tests
 test: tu e2e
 
 tu:		## Run the unit tests
-tu: vendor/bin/phpunit
+tu: vendor/bin/phpunit fixtures/default_stub.php
 	php -d phar.readonly=0 -d zend.enable_gc=0 bin/phpunit
 
 tc:		## Run the unit tests with code coverage
@@ -52,7 +52,7 @@ tc: vendor/bin/phpunit
 	phpdbg -qrr -d phar.readonly=0 -d zend.enable_gc=0 bin/phpunit --coverage-html=dist/coverage --coverage-text
 
 tm:		## Run Infection
-tm:	vendor/bin/phpunit
+tm:	vendor/bin/phpunit fixtures/default_stub.php
 	php -d phar.readonly=0 -d zend.enable_gc=0 bin/infection
 
 e2e:		## Run the end-to-end tests
@@ -110,5 +110,8 @@ vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer: vendor/bamarni
 bin/box.phar: bin/box src vendor
 	$(MAKE) build
 
-box_dev.json:
+box_dev.json: box.json.dist
 	cat box.json.dist | sed -E 's/\"key\": \".+\",//g' | sed -E 's/\"algorithm\": \".+\",//g' | sed -E 's/\"alias\": \".+\",//g' > box_dev.json
+
+fixtures/default_stub.php:
+	bin/generate_default_stub
