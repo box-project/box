@@ -52,7 +52,7 @@ tc: vendor/bin/phpunit
 	phpdbg -qrr -d phar.readonly=0 -d zend.enable_gc=0 bin/phpunit --coverage-html=dist/coverage --coverage-text
 
 tm:		## Run Infection
-tm:	vendor/bin/phpunit
+tm:	vendor/bin/phpunit fixtures/default_stub.php
 	php -d phar.readonly=0 -d zend.enable_gc=0 bin/infection
 
 e2e:		## Run the end-to-end tests
