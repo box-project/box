@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="doc/img/box.png" width=300 />
+    <img src="doc/img/box.png" width=900 />
 </p>
 
 <h1 align=center>Box - Building and managing your PHARs</h1>
