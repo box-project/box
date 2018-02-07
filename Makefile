@@ -92,8 +92,8 @@ blackfire: bin/box src vendor
 ## Rules from files
 ##---------------------------------------------------------------------------
 
-composer.lock:
-	composer update
+composer.lock: composer.json
+	composer install
 
 vendor: composer.lock
 	composer install

@@ -28,6 +28,7 @@ use stdClass;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
+use function iter\chain;
 
 final class Configuration
 {
@@ -193,13 +194,13 @@ final class Configuration
         $directories = self::retrieveDirectories($raw, 'directories', $basePath, $blacklistFilter);
         $filesFromFinders = self::retrieveFilesFromFinders($raw, 'finder', $basePath, $blacklistFilter);
 
-        $filesAggregate = array_unique(iterator_to_array(iterables_to_iterator($files, $directories, ...$filesFromFinders)));
+        $filesAggregate = array_unique(iterator_to_array(chain($files, $directories, ...$filesFromFinders)));
 
         $binaryFiles = self::retrieveFiles($raw, 'files-bin', $basePath);
         $binaryDirectories = self::retrieveDirectories($raw, 'directories-bin', $basePath, $blacklistFilter);
         $binaryFilesFromFinders = self::retrieveFilesFromFinders($raw, 'finder-bin', $basePath, $blacklistFilter);
 
-        $binaryFilesAggregate = array_unique(iterator_to_array(iterables_to_iterator($binaryFiles, $binaryDirectories, ...$binaryFilesFromFinders)));
+        $binaryFilesAggregate = array_unique(iterator_to_array(chain($binaryFiles, $binaryDirectories, ...$binaryFilesFromFinders)));
 
         $bootstrapFile = self::retrieveBootstrapFile($raw, $basePath);
 
@@ -805,28 +806,13 @@ final class Configuration
         $compactors = [];
 
         foreach ((array) $raw->compactors as $class) {
-            if (false === class_exists($class)) {
-                throw new InvalidArgumentException(
-                    sprintf(
-                        'The compactor class "%s" does not exist.',
-                        $class
-                    )
-                );
-            }
+            Assertion::classExists($class, 'The compactor class "%s" does not exist.');
+            Assertion::implementsInterface($class, Compactor::class, 'The class "%s" is not a compactor class.');
 
             if (Php::class === $class || LegacyPhp::class === $class) {
                 $compactor = self::createPhpCompactor($raw);
             } else {
                 $compactor = new $class();
-            }
-
-            if (false === ($compactor instanceof Compactor)) {
-                throw new InvalidArgumentException(
-                    sprintf(
-                        'The class "%s" is not a compactor class.',
-                        $class
-                    )
-                );
             }
 
             $compactors[] = $compactor;
