@@ -22,6 +22,7 @@
         "beberlei/assert": "^2.8",
         "herrera-io/annotations": "~1.0",
         "justinrainbow/json-schema": "^5.2",
+        "nikic/iter": "^1.6",
         "padraic/phar-updater": "^1.0",
         "phpseclib/phpseclib": "~2.0",
         "seld/jsonlint": "^1.6",
@@ -56,10 +57,7 @@
                 "fixtures",
                 "tests"
             ]
-        },
-        "files": [
-            "src/Test/functions.php"
-        ]
+        }
     },
     "bin": [
         "bin/box"
