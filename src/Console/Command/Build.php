@@ -27,7 +27,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Filesystem\Filesystem;
+use function KevinGH\Box\FileSystem\chmod;
+use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\formatted_filesize;
 use function KevinGH\Box\get_phar_compression_algorithms;
 
@@ -179,7 +180,7 @@ HELP;
             )
         );
 
-        (new Filesystem())->remove($path);
+        remove($path);
     }
 
     private function setReplacementValues(Configuration $config, Box $box, BuildLogger $logger): void
@@ -403,9 +404,7 @@ HELP;
     ): void {
         // sign using private key, if applicable
         //TODO: check that out
-        if (file_exists($path.'.pubkey')) {
-            unlink($path.'.pubkey');
-        }
+        remove($path.'.pubkey');
 
         $key = $config->getPrivateKeyPath();
 

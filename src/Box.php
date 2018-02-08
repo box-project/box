@@ -18,9 +18,11 @@ use Assert\Assertion;
 use Phar;
 use RecursiveDirectoryIterator;
 use SplFileInfo;
-use Symfony\Component\Filesystem\Filesystem;
 use function Amp\ParallelFunctions\parallelMap;
 use function Amp\Promise\wait;
+use function KevinGH\Box\FileSystem\dump_file;
+use function KevinGH\Box\FileSystem\file_contents;
+use function KevinGH\Box\FileSystem\mkdir;
 
 /**
  * Box is a utility class to generate a PHAR.
@@ -81,7 +83,7 @@ final class Box
     {
         // Ensure the parent directory of the PHAR file exists as `new \Phar()` does not create it and would fail
         // otherwise.
-        (new Filesystem())->mkdir(dirname($file));
+        mkdir(dirname($file));
 
         return new self(new Phar($file, (int) $flags, $alias), $file);
     }
@@ -126,12 +128,9 @@ final class Box
 
     public function registerStub(string $file): void
     {
-        Assertion::file($file);
-        Assertion::readable($file);
-
         $contents = self::replacePlaceholders(
             $this->placeholders,
-            file_get_contents($file)
+            file_contents($file)
         );
 
         $this->phar->setStub($contents);
@@ -219,10 +218,7 @@ final class Box
      */
     public function signUsingFile(string $file, string $password = null): void
     {
-        Assertion::file($file);
-        Assertion::readable($file);
-
-        $this->sign(file_get_contents($file), $password);
+        $this->sign(file_contents($file), $password);
     }
 
     /**
@@ -253,7 +249,7 @@ final class Box
 
         $this->phar->setSignatureAlgorithm(Phar::OPENSSL, $private);
 
-        file_put_contents($pubKey, $details['key']);
+        dump_file($pubKey, $details['key']);
     }
 
     /**
@@ -269,10 +265,7 @@ final class Box
         $compactors = $this->compactors;
 
         $processFile = function (string $file) use ($retrieveRelativeBasePath, $mapFile, $placeholders, $compactors): array {
-            Assertion::file($file);
-            Assertion::readable($file);
-
-            $contents = file_get_contents($file);
+            $contents = file_contents($file);
 
             $relativePath = $retrieveRelativeBasePath($file);
             $local = $mapFile($relativePath);

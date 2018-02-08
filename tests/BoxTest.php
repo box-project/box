@@ -23,6 +23,8 @@ use Phar;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
+use function KevinGH\Box\FileSystem\make_tmp_dir;
+use function KevinGH\Box\FileSystem\remove;
 
 /**
  * @covers \KevinGH\Box\Box
@@ -85,7 +87,7 @@ class BoxTest extends TestCase
 
         chdir($this->cwd);
 
-        remove_dir($this->tmp);
+        remove($this->tmp);
 
         parent::tearDown();
     }

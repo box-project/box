@@ -25,22 +25,19 @@ use Phar;
 use RuntimeException;
 use SplFileInfo;
 use stdClass;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
 use function iter\chain;
+use function KevinGH\Box\FileSystem\canonicalize;
+use function KevinGH\Box\FileSystem\file_contents;
+use function KevinGH\Box\FileSystem\is_absolute_path;
+use function KevinGH\Box\FileSystem\make_path_absolute;
 
 final class Configuration
 {
     private const DEFAULT_ALIAS = 'default.phar';
-    private const DEFAULT_MAIN = 'index.php';   // See Phar::setDefaultStub()
     private const DEFAULT_DATETIME_FORMAT = 'Y-m-d H:i:s';
     private const DEFAULT_REPLACEMENT_SIGIL = '@';
-
-    /**
-     * @var null|Filesystem Available only when the Configuration is being instantiated
-     */
-    private static $fileSystem;
 
     private $fileMode;
     private $alias;
@@ -181,8 +178,6 @@ final class Configuration
 
     public static function create(string $file, stdClass $raw): self
     {
-        self::$fileSystem = new Filesystem();
-
         $alias = self::retrieveAlias($raw);
 
         $basePath = self::retrieveBasePath($file, $raw);
@@ -243,8 +238,6 @@ final class Configuration
         $isInterceptFileFuncs = self::retrieveIsInterceptFileFuncs($raw);
         $isStubGenerated = self::retrieveIsStubGenerated($raw);
         $isWebPhar = self::retrieveIsWebPhar($raw);
-
-        self::$fileSystem = null;
 
         return new self(
             $alias,
@@ -674,6 +667,7 @@ final class Configuration
                 );
             }
 
+            //TODO: add fileExists (as file or directory) to Assert
             if (false === is_file($fileOrDirectory)) {
                 Assertion::directory($fileOrDirectory);
             } else {
@@ -740,8 +734,8 @@ final class Configuration
     {
         $file = trim($file);
 
-        if (false === self::$fileSystem->isAbsolutePath($file)) {
-            $file = $basePath.DIRECTORY_SEPARATOR.canonicalize($file);
+        if (false === is_absolute_path($file)) {
+            $file = make_path_absolute($file, $basePath);
         }
 
         return $file;
@@ -751,7 +745,7 @@ final class Configuration
     {
         $directory = trim($directory);
 
-        if (false === self::$fileSystem->isAbsolutePath($directory)) {
+        if (false === is_absolute_path($directory)) {
             $directory = sprintf(
                 '%s%s',
                 $basePath.DIRECTORY_SEPARATOR,
@@ -775,20 +769,11 @@ final class Configuration
 
         $file = $raw->bootstrap;
 
-        if (false === is_absolute($file)) {
-            $file = canonicalize(
-                $basePath.DIRECTORY_SEPARATOR.$file
-            );
+        if (false === is_absolute_path($file)) {
+            $file = canonicalize(make_path_absolute($file, $basePath));
         }
 
-        if (false === file_exists($file)) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The bootstrap path "%s" is not a file or does not exist.',
-                    $file
-                )
-            );
-        }
+        Assertion::file($file, 'The bootstrap path "%s" is not a file or does not exist.');
 
         return $file;
     }
@@ -893,9 +878,7 @@ final class Configuration
 
         $mainScriptPath = $basePath.DIRECTORY_SEPARATOR.$mainScriptPath;
 
-        Assertion::readable($mainScriptPath);
-
-        $contents = file_get_contents($mainScriptPath);
+        $contents = file_contents($mainScriptPath);
 
         // Remove the shebang line
         return preg_replace('/^#!.*\s*/', '', $contents);
@@ -993,7 +976,7 @@ final class Configuration
         if (isset($raw->output)) {
             $path = $raw->output;
 
-            if (false === is_absolute($path)) {
+            if (false === is_absolute_path($path)) {
                 $path = canonicalize($base.$path);
             }
         } else {
@@ -1306,19 +1289,9 @@ final class Configuration
             return null;
         }
 
-        $stubBannerPath = $basePath.DIRECTORY_SEPARATOR.$stubBannerPath;
+        $stubBannerPath = make_path_absolute($stubBannerPath, $basePath);
 
-        if (false === ($contents = @file_get_contents($stubBannerPath))) {
-            $errors = error_get_last();
-
-            if (null === $errors) {
-                $errors = ['message' => 'failed to get contents of "'.$stubBannerPath.'""'];
-            }
-
-            throw new InvalidArgumentException($errors['message']);
-        }
-
-        return $contents;
+        return file_contents($stubBannerPath);
     }
 
     private static function retrieveStubPath(stdClass $raw): ?string

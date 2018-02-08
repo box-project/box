@@ -14,11 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Json;
 
-use InvalidArgumentException;
 use JsonSchema\Validator;
 use Seld\JsonLint\JsonParser;
 use Seld\JsonLint\ParsingException;
 use stdClass;
+use function KevinGH\Box\FileSystem\file_contents;
 
 final class Json
 {
@@ -52,24 +52,7 @@ final class Json
 
     public function decodeFile(string $file): stdClass
     {
-        if (false === is_file($file)) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The file "%s" does not exist.',
-                    $file
-                )
-            );
-        }
-
-        if (false === ($json = @file_get_contents($file))) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Could not read the file "%s": %s',
-                    $file,
-                    error_get_last()['message']
-                )
-            );
-        }
+        $json = file_contents($file);
 
         return $this->decode($json);
     }

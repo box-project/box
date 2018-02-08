@@ -13,6 +13,8 @@ declare(strict_types=1);
  */
 
 use Assert\Assertion;
+use function KevinGH\Box\FileSystem\make_path_absolute;
+use function KevinGH\Box\FileSystem\make_tmp_dir;
 
 /**
  * Extracts a PHAR without the extension.
@@ -67,6 +69,11 @@ final class Box_Extract
 
         $this->file = $file;
         $this->stub = $stubLength;
+    }
+
+    public static function getTmpDir(): string
+    {
+        return make_tmp_dir('box_pharextract', __CLASS__);
     }
 
     /**
@@ -152,11 +159,7 @@ final class Box_Extract
     {
         // Set up the output directory
         if (null === $dir) {
-            $dir = rtrim(sys_get_temp_dir(), '\\/')
-                .DIRECTORY_SEPARATOR
-                .'pharextract'
-                .DIRECTORY_SEPARATOR
-                .basename($this->file, '.phar');
+            $dir = make_path_absolute(basename($this->file, '.phar'), self::getTmpDir());
         } else {
             $dir = realpath($dir);
         }

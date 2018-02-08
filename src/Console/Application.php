@@ -98,7 +98,7 @@ ASCII;
     protected function getDefaultHelperSet(): HelperSet
     {
         $helperSet = parent::getDefaultHelperSet();
-        $helperSet->set(new \KevinGH\Box\Console\ConfigurationHelper());
+        $helperSet->set(new ConfigurationHelper());
 
         return $helperSet;
     }
