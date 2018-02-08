@@ -19,6 +19,11 @@ use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Webmozart\PathUtil\Path;
 
+/**
+ * @author Fabien Potencier <fabien@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Thomas Schulz <mail@king2500.net>
+ */
 final class FileSystem extends SymfonyFilesystem
 {
     /**
