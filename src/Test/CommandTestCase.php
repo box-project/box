@@ -19,8 +19,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\CommandTester;
-use function KevinGH\Box\make_tmp_dir;
-use function KevinGH\Box\remove_dir;
+use function KevinGH\Box\FileSystem\make_tmp_dir;
+use function KevinGH\Box\FileSystem\remove;
 
 abstract class CommandTestCase extends TestCase
 {
@@ -68,7 +68,7 @@ abstract class CommandTestCase extends TestCase
     {
         chdir($this->cwd);
 
-        remove_dir($this->tmp);
+        remove($this->tmp);
 
         parent::tearDown();
     }

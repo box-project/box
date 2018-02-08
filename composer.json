@@ -48,6 +48,7 @@
             "KevinGH\\Box\\": "src"
         },
         "files": [
+            "src/FileSystem/file_system.php",
             "src/functions.php"
         ]
     },

@@ -17,8 +17,8 @@ namespace KevinGH\Box\Console;
 use KevinGH\Box\Configuration;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use function KevinGH\Box\make_tmp_dir;
-use function KevinGH\Box\remove_dir;
+use function KevinGH\Box\FileSystem\make_tmp_dir;
+use function KevinGH\Box\FileSystem\remove;
 
 /**
  * @covers \KevinGH\Box\Console\ConfigurationHelper
@@ -61,7 +61,7 @@ class ConfigurationHelperTest extends TestCase
     {
         chdir($this->cwd);
 
-        remove_dir($this->tmp);
+        remove($this->tmp);
     }
 
     public function test_it_has_a_name(): void

@@ -21,6 +21,8 @@ use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use function KevinGH\Box\FileSystem\make_tmp_dir;
+use function KevinGH\Box\FileSystem\remove;
 
 /**
  * @covers \Box_Extract
@@ -42,7 +44,7 @@ class ExtractTest extends TestCase
     /**
      * @var string
      */
-    private $sysTmp;
+    private $extractTmp;
 
     /**
      * {@inheritdoc}
@@ -51,7 +53,7 @@ class ExtractTest extends TestCase
     {
         $this->cwd = getcwd();
         $this->tmp = make_tmp_dir('box', __CLASS__);
-        $this->sysTmp = rtrim(sys_get_temp_dir(), '\\/').DIRECTORY_SEPARATOR.'pharextract';
+        $this->extractTmp = Box_Extract::getTmpDir();
 
         chdir($this->tmp);
     }
@@ -63,8 +65,7 @@ class ExtractTest extends TestCase
     {
         chdir($this->cwd);
 
-        remove_dir($this->tmp);
-        remove_dir($this->sysTmp);
+        remove([$this->tmp, $this->extractTmp]);
 
         parent::tearDown();
     }

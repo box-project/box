@@ -18,8 +18,7 @@ use KevinGH\Box\Configuration;
 use KevinGH\Box\Json\Json;
 use RuntimeException;
 use Symfony\Component\Console\Helper\Helper;
-use Webmozart\PathUtil\Path;
-use function KevinGH\Box\is_absolute;
+use function KevinGH\Box\FileSystem\is_absolute_path;
 
 final class ConfigurationHelper extends Helper
 {
@@ -66,8 +65,8 @@ final class ConfigurationHelper extends Helper
 
         // Include imports
         if (isset($json->import)) {
-            if (!is_absolute($json->import)) {
-                $json->import = Path::join(
+            if (!is_absolute_path($json->import)) {
+                $json->import = implode(
                     [
                         dirname($file),
                         $json->import,

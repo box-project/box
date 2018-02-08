@@ -17,8 +17,8 @@ namespace KevinGH\Box\Verifier;
 use Exception;
 use PHPUnit\Framework\Error\Warning;
 use PHPUnit\Framework\TestCase;
-use function KevinGH\Box\make_tmp_dir;
-use function KevinGH\Box\remove_dir;
+use function KevinGH\Box\FileSystem\make_tmp_dir;
+use function KevinGH\Box\FileSystem\remove;
 
 /**
  * @covers \KevinGH\Box\Verifier\OpenSsl
@@ -57,7 +57,7 @@ class OpenSslTest extends TestCase
 
         chdir($this->cwd);
 
-        remove_dir($this->tmp);
+        remove($this->tmp);
 
         parent::tearDown();
     }

@@ -29,6 +29,8 @@ use SplFileInfo;
 use stdClass;
 use Symfony\Component\Finder\Finder;
 use function iter\fn\method;
+use function KevinGH\Box\FileSystem\make_tmp_dir;
+use function KevinGH\Box\FileSystem\remove;
 
 /**
  * @covers \KevinGH\Box\Configuration
@@ -78,6 +80,8 @@ class ConfigurationTest extends TestCase
     protected function tearDown(): void
     {
         chdir($this->cwd);
+
+        remove($this->tmp);
 
         parent::tearDown();
     }
@@ -1585,7 +1589,7 @@ EOF
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                "Path \"{$this->tmp}/test.php\" was expected to be readable.",
+                "File \"{$this->tmp}/test.php\" was expected to exist.",
                 $exception->getMessage()
             );
         }
@@ -1935,8 +1939,8 @@ COMMENT;
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertRegExp(
-                '/failed to open stream/i',
+            $this->assertSame(
+                'File "/does/not/exist" was expected to exist.',
                 $exception->getMessage()
             );
         }
