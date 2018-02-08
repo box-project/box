@@ -102,7 +102,7 @@ HELP;
         if ($io->getVerbosity() >= OutputInterface::VERBOSITY_NORMAL) {
             $io->comment(
                 sprintf(
-                    "<info>Size: %s\nMemory usage: %.2fMB (peak: %.2fMB), time: %.2fs<info>",
+                    "<info>PHAR size: %s\nMemory usage: %.2fMB (peak: %.2fMB), time: %.2fs<info>",
                     formatted_filesize($path),
                     round(memory_get_usage() / 1024 / 1024, 2),
                     round(memory_get_peak_usage() / 1024 / 1024, 2),
