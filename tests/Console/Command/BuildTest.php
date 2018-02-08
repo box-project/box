@@ -113,7 +113,7 @@ Private key passphrase:
 ? Setting file permissions to 493
 * Done.
 
- // Size: 100B
+ // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -302,7 +302,7 @@ Private key passphrase:
 ? Setting file permissions to 493
 * Done.
 
- // Size: 100B
+ // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -442,7 +442,7 @@ Private key passphrase:
 ? Setting file permissions to 493
 * Done.
 
- // Size: 100B
+ // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -536,7 +536,7 @@ Private key passphrase:
 ? Setting file permissions to 493
 * Done.
 
- // Size: 100B
+ // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -831,7 +831,7 @@ Box (repo)
 ? No compression
 * Done.
 
- // Size: 100B
+ // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -886,7 +886,7 @@ Box (repo)
 ? No compression
 * Done.
 
- // Size: 100B
+ // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -941,7 +941,7 @@ Box (repo)
 ? No compression
 * Done.
 
- // Size: 100B
+ // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -993,7 +993,7 @@ Box (repo)
 ? No compression
 * Done.
 
- // Size: 100B
+ // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -1044,7 +1044,7 @@ Box (repo)
 ? No compression
 * Done.
 
- // Size: 100B
+ // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -1090,7 +1090,7 @@ Box (repo)
 ? Compressing with the algorithm "GZ"
 * Done.
 
- // Size: 100B
+ // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -1147,7 +1147,7 @@ Box (repo)
 ? No compression
 * Done.
 
- // Size: 100B
+ // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -1294,8 +1294,8 @@ OUTPUT;
         $display = str_replace($this->tmp, '/path/to/tmp', $display);
 
         $display = preg_replace(
-            '/\/\/ Size: \d+\.\d{2}K?B/',
-            '// Size: 100B',
+            '/\/\/ PHAR size: \d+\.\d{2}K?B/',
+            '// PHAR size: 100B',
             $display
         );
 
