@@ -23,34 +23,23 @@ use KevinGH\Box\Compactor\InvalidCompactor;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Console\ConfigurationHelper;
 use KevinGH\Box\Json\JsonValidationException;
+use KevinGH\Box\Test\FileSystemTestCase;
 use Phar;
-use PHPUnit\Framework\TestCase;
 use SplFileInfo;
 use stdClass;
 use Symfony\Component\Finder\Finder;
 use function iter\fn\method;
-use function KevinGH\Box\FileSystem\make_tmp_dir;
-use function KevinGH\Box\FileSystem\remove;
+use function KevinGH\Box\FileSystem\make_path_absolute;
 
 /**
  * @covers \KevinGH\Box\Configuration
  */
-class ConfigurationTest extends TestCase
+class ConfigurationTest extends FileSystemTestCase
 {
     /**
      * @var Configuration
      */
     private $config;
-
-    /**
-     * @var string
-     */
-    private $cwd;
-
-    /**
-     * @var string
-     */
-    private $tmp;
 
     /**
      * @var string
@@ -62,28 +51,12 @@ class ConfigurationTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->cwd = getcwd();
-        $this->tmp = make_tmp_dir('box', __CLASS__);
+        parent::setUp();
 
-        $this->file = $this->tmp.DIRECTORY_SEPARATOR.'box.json';
-
-        chdir($this->tmp);
+        $this->file = make_path_absolute('box.json', $this->tmp);
+        touch($this->file);
 
         $this->config = Configuration::create($this->file, (object) []);
-
-        touch($this->file);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown(): void
-    {
-        chdir($this->cwd);
-
-        remove($this->tmp);
-
-        parent::tearDown();
     }
 
     public function test_a_default_alias_is_provided_when_non_has_been_configured(): void
@@ -509,7 +482,7 @@ EOF
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $filePath = $this->tmp.DIRECTORY_SEPARATOR.'non-existent';
+            $filePath = make_path_absolute('non-existent', $this->tmp);
 
             $this->assertSame(
                 sprintf(

@@ -486,9 +486,14 @@ final class FileSystem extends SymfonyFilesystem
         $systemTempDir = str_replace('\\', '/', realpath(sys_get_temp_dir()));
         $basePath = $systemTempDir.'/'.$namespace.'/'.$shortClass;
 
-        while (false === @mkdir($tmpDir = $this->escapePath($basePath.random_int(10000, 99999)), 0777, true)) {
-            // Run until we are able to create a directory
-        }
+        $attemps = 0;
+
+        do {
+            $tmpDir = $this->escapePath($basePath.random_int(10000, 99999));
+
+            $result = $this->mkdir($tmpDir, 0777, true);
+            ++$attemps;
+        } while (false === $result && $attemps <= 10);
 
         return $tmpDir;
     }
@@ -509,9 +514,11 @@ final class FileSystem extends SymfonyFilesystem
         }
         $files = array_reverse($files);
         foreach ($files as $file) {
+            // MODIFIED CODE
             if (defined('PHP_WINDOWS_VERSION_BUILD')) {
                 //TODO: https://github.com/humbug/php-scoper/pull/19/files#r118838268
                 exec(sprintf('rd /s /q %s', escapeshellarg($file)));
+            // - MODIFIED CODE
             } elseif (is_link($file)) {
                 // See https://bugs.php.net/52176
                 if (!@(unlink($file) || '\\' !== DIRECTORY_SEPARATOR || rmdir($file)) && file_exists($file)) {
@@ -531,6 +538,10 @@ final class FileSystem extends SymfonyFilesystem
                 $error = error_get_last();
 
                 throw new IOException(sprintf('Failed to remove file "%s": %s.', $file, $error['message']));
+            // MODIFIED CODE
+            } elseif (file_exists($file)) {
+                throw new IOException(sprintf('Failed to remove file "%s".', $file));
+                // - MODIFIED CODE
             }
         }
     }

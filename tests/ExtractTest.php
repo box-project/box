@@ -17,29 +17,18 @@ namespace KevinGH\Box;
 use Box_Extract;
 use Generator;
 use InvalidArgumentException;
+use KevinGH\Box\Test\FileSystemTestCase;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
-use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\remove;
 
 /**
  * @covers \Box_Extract
  */
-class ExtractTest extends TestCase
+class ExtractTest extends FileSystemTestCase
 {
     private const FIXTURES_DIR = __DIR__.'/../fixtures/signed_phars';
-
-    /**
-     * @var string
-     */
-    private $cwd;
-
-    /**
-     * @var string
-     */
-    private $tmp;
 
     /**
      * @var string
@@ -51,11 +40,9 @@ class ExtractTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->cwd = getcwd();
-        $this->tmp = make_tmp_dir('box', __CLASS__);
-        $this->extractTmp = Box_Extract::getTmpDir();
+        parent::setUp();
 
-        chdir($this->tmp);
+        $this->extractTmp = Box_Extract::getTmpDir();
     }
 
     /**
@@ -63,11 +50,9 @@ class ExtractTest extends TestCase
      */
     protected function tearDown(): void
     {
-        chdir($this->cwd);
+        parent::tearDown();
 
         remove([$this->tmp, $this->extractTmp]);
-
-        parent::tearDown();
     }
 
     public function test_it_cannot_be_created_for_a_non_existent_file(): void

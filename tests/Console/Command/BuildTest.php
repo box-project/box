@@ -25,9 +25,9 @@ use Phar;
 use PharFileInfo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Traversable;
+use function KevinGH\Box\FileSystem\mirror;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Build
@@ -40,7 +40,7 @@ class BuildTest extends CommandTestCase
 
     public function test_it_can_build_a_PHAR_file(): void
     {
-        (new Filesystem())->mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
@@ -97,11 +97,11 @@ Building the PHAR "/path/to/tmp/test.phar"
   + KevinGH\Box\Compactor\Php
 ? Mapping paths
   - a/deep/test/directory > sub
+? Adding main file: /path/to/tmp/run.php
 ? Adding binary files
     > 1 file(s)
 ? Adding files
     > 3 file(s)
-? Adding main file: /path/to/tmp/run.php
 ? Generating new stub
 ? Setting metadata
   - array (
@@ -173,7 +173,7 @@ PHP;
 
     public function test_it_can_build_a_PHAR_from_a_different_directory(): void
     {
-        (new Filesystem())->mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
@@ -226,7 +226,7 @@ PHP;
 
     public function test_it_can_build_a_PHAR_with_complete_mapping(): void
     {
-        (new Filesystem())->mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
@@ -285,12 +285,12 @@ Building the PHAR "/path/to/tmp/test.phar"
 ? Mapping paths
   - a/deep/test/directory > sub
   - (all) > other/
+? Adding main file: /path/to/tmp/run.php
+    > other/run.php
 ? Adding binary files
     > 1 file(s)
 ? Adding files
     > 3 file(s)
-? Adding main file: /path/to/tmp/run.php
-    > other/run.php
 ? Generating new stub
 ? Setting metadata
   - array (
@@ -363,7 +363,7 @@ PHP;
 
     public function test_it_can_build_a_PHAR_file_in_verbose_mode(): void
     {
-        (new Filesystem())->mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
@@ -425,12 +425,12 @@ Box (repo)
 ? Mapping paths
   - a/deep/test/directory > sub
   - (all) > other/
+? Adding main file: /path/to/tmp/run.php
+    > other/run.php
 ? Adding binary files
     > 1 file(s)
 ? Adding files
     > 3 file(s)
-? Adding main file: /path/to/tmp/run.php
-    > other/run.php
 ? Generating new stub
 ? Setting metadata
   - array (
@@ -455,7 +455,7 @@ OUTPUT;
 
     public function test_it_can_build_a_PHAR_file_in_very_verbose_mode(): void
     {
-        (new Filesystem())->mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
@@ -517,12 +517,12 @@ Box (repo)
 ? Mapping paths
   - a/deep/test/directory > sub
   - (all) > other/
+? Adding main file: /path/to/tmp/run.php
+    > other/run.php
 ? Adding binary files
     > 1 file(s)
 ? Adding files
     > 3 file(s)
-? Adding main file: /path/to/tmp/run.php
-    > other/run.php
 ? Generating new stub
   - Using custom shebang line: #!__PHP_EXECUTABLE__
   - Using custom banner: custom banner
@@ -554,7 +554,7 @@ OUTPUT;
 
     public function test_it_can_build_a_PHAR_file_in_quiet_mode(): void
     {
-        (new Filesystem())->mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
@@ -635,7 +635,7 @@ OUTPUT;
 
     public function test_it_can_build_a_PHAR_file_using_the_PHAR_default_stub(): void
     {
-        (new Filesystem())->mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
@@ -684,7 +684,7 @@ OUTPUT;
 
     public function test_it_can_build_a_PHAR_file_using_a_custom_stub(): void
     {
-        (new Filesystem())->mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
@@ -794,7 +794,7 @@ PHP
 
     public function test_it_can_build_a_PHAR_overwriting_an_existing_one_in_verbose_mode(): void
     {
-        (new Filesystem())->mirror(self::FIXTURES_DIR.'/dir002', $this->tmp);
+        mirror(self::FIXTURES_DIR.'/dir002', $this->tmp);
 
         $commandTester = $this->getCommandTester();
 
@@ -822,11 +822,11 @@ Box (repo)
 ? Setting replacement values
   + @name@: world
 ? No compactor to register
+? Adding main file: /path/to/tmp/test.php
 ? Adding binary files
     > No file found
 ? Adding files
     > 1 file(s)
-? Adding main file: /path/to/tmp/test.php
 ? Generating new stub
 ? No compression
 * Done.
@@ -850,7 +850,7 @@ OUTPUT;
 
     public function test_it_can_build_a_PHAR_with_a_replacement_placeholder(): void
     {
-        (new Filesystem())->mirror(self::FIXTURES_DIR.'/dir001', $this->tmp);
+        mirror(self::FIXTURES_DIR.'/dir001', $this->tmp);
 
         $commandTester = $this->getCommandTester();
 
@@ -877,11 +877,11 @@ Box (repo)
 ? Setting replacement values
   + @name@: world
 ? No compactor to register
+? Adding main file: /path/to/tmp/test.php
 ? Adding binary files
     > No file found
 ? Adding files
     > 1 file(s)
-? Adding main file: /path/to/tmp/test.php
 ? Generating new stub
 ? No compression
 * Done.
@@ -905,7 +905,7 @@ OUTPUT;
 
     public function test_it_can_build_a_PHAR_with_a_custom_banner(): void
     {
-        (new Filesystem())->mirror(self::FIXTURES_DIR.'/dir003', $this->tmp);
+        mirror(self::FIXTURES_DIR.'/dir003', $this->tmp);
 
         $commandTester = $this->getCommandTester();
         $commandTester->execute(
@@ -931,11 +931,11 @@ Box (repo)
 
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
+? Adding main file: /path/to/tmp/test.php
 ? Adding binary files
     > No file found
 ? Adding files
     > 1 file(s)
-? Adding main file: /path/to/tmp/test.php
 ? Generating new stub
   - Using custom banner from file: /path/to/tmp/banner
 ? No compression
@@ -960,7 +960,7 @@ OUTPUT;
 
     public function test_it_can_build_a_PHAR_with_a_stub_file(): void
     {
-        (new Filesystem())->mirror(self::FIXTURES_DIR.'/dir004', $this->tmp);
+        mirror(self::FIXTURES_DIR.'/dir004', $this->tmp);
 
         $commandTester = $this->getCommandTester();
         $commandTester->execute(
@@ -984,11 +984,11 @@ Box (repo)
 
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
+? Adding main file: /path/to/tmp/test.php
 ? Adding binary files
     > No file found
 ? Adding files
     > 1 file(s)
-? Adding main file: /path/to/tmp/test.php
 ? Using stub file: /path/to/tmp/stub.php
 ? No compression
 * Done.
@@ -1012,7 +1012,7 @@ OUTPUT;
 
     public function test_it_can_build_a_PHAR_with_the_default_stub_file(): void
     {
-        (new Filesystem())->mirror(self::FIXTURES_DIR.'/dir005', $this->tmp);
+        mirror(self::FIXTURES_DIR.'/dir005', $this->tmp);
 
         $commandTester = $this->getCommandTester();
         $commandTester->execute(
@@ -1057,7 +1057,7 @@ OUTPUT;
 
     public function test_it_can_build_a_PHAR_with_compressed_code(): void
     {
-        (new Filesystem())->mirror(self::FIXTURES_DIR.'/dir006', $this->tmp);
+        mirror(self::FIXTURES_DIR.'/dir006', $this->tmp);
 
         $commandTester = $this->getCommandTester();
         $commandTester->execute(
@@ -1081,11 +1081,11 @@ Box (repo)
 
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
+? Adding main file: /path/to/tmp/test.php
 ? Adding binary files
     > No file found
 ? Adding files
     > 1 file(s)
-? Adding main file: /path/to/tmp/test.php
 ? Generating new stub
 ? Compressing with the algorithm "GZ"
 * Done.
@@ -1114,7 +1114,7 @@ OUTPUT;
 
     public function test_it_can_build_a_PHAR_in_a_non_existent_directory(): void
     {
-        (new Filesystem())->mirror(self::FIXTURES_DIR.'/dir007', $this->tmp);
+        mirror(self::FIXTURES_DIR.'/dir007', $this->tmp);
 
         $commandTester = $this->getCommandTester();
         $commandTester->execute(
@@ -1138,11 +1138,11 @@ Box (repo)
 
 * Building the PHAR "/path/to/tmp/foo/bar/test.phar"
 ? No compactor to register
+? Adding main file: /path/to/tmp/test.php
 ? Adding binary files
     > No file found
 ? Adding files
     > 1 file(s)
-? Adding main file: /path/to/tmp/test.php
 ? Generating new stub
 ? No compression
 * Done.
@@ -1169,7 +1169,7 @@ OUTPUT;
      */
     public function test_it_configures_the_PHAR_alias(bool $stub, bool $web): void
     {
-        (new Filesystem())->mirror(self::FIXTURES_DIR.'/dir008', $this->tmp);
+        mirror(self::FIXTURES_DIR.'/dir008', $this->tmp);
 
         file_put_contents(
             'box.json',

@@ -15,29 +15,16 @@ declare(strict_types=1);
 namespace KevinGH\Box\Test;
 
 use KevinGH\Box\Console\Application;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\CommandTester;
-use function KevinGH\Box\FileSystem\make_tmp_dir;
-use function KevinGH\Box\FileSystem\remove;
 
-abstract class CommandTestCase extends TestCase
+abstract class CommandTestCase extends FileSystemTestCase
 {
     /**
      * @var Application
      */
     protected $application;
-
-    /**
-     * @var string
-     */
-    protected $cwd;
-
-    /**
-     * @var string
-     */
-    protected $tmp;
 
     /**
      * @var string the name of the command
@@ -49,10 +36,7 @@ abstract class CommandTestCase extends TestCase
      */
     protected function setUp(): void
     {
-        $this->cwd = getcwd();
-        $this->tmp = make_tmp_dir('box', __CLASS__);
-
-        chdir($this->tmp);
+        parent::setUp();
 
         $this->application = new Application();
 
@@ -66,11 +50,9 @@ abstract class CommandTestCase extends TestCase
      */
     protected function tearDown(): void
     {
-        chdir($this->cwd);
-
-        remove($this->tmp);
-
         parent::tearDown();
+
+        $this->application = null;
     }
 
     /**

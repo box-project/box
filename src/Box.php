@@ -22,7 +22,10 @@ use function Amp\ParallelFunctions\parallelMap;
 use function Amp\Promise\wait;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
+use function KevinGH\Box\FileSystem\make_path_absolute;
+use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\mkdir;
+use function KevinGH\Box\FileSystem\remove;
 
 /**
  * Box is a utility class to generate a PHAR.
@@ -150,19 +153,31 @@ final class Box
             return;
         }
 
-        $tuples = $this->processContents(
+        $tmp = make_tmp_dir('box', __CLASS__);
+
+        $fileWithContents = $this->processContents(
             array_map(
                 function ($file): string {
+                    // Convert files to string as SplFileInfo is not serializable
                     return (string) $file;
                 },
                 $files
             )
         );
 
-        foreach ($tuples as $tuple) {
-            list($path, $contents) = $tuple;
+        try {
+            foreach ($fileWithContents as $fileWithContents) {
+                [$file, $contents] = $fileWithContents;
 
-            $this->phar->addFromString($path, $contents);
+                dump_file(
+                    make_path_absolute($file, $tmp),
+                    $contents
+                );
+            }
+
+            $this->phar->buildFromDirectory($tmp);
+        } finally {
+            remove($tmp);
         }
     }
 
@@ -253,9 +268,10 @@ final class Box
     }
 
     /**
-     * @param string[]
+     * @param string[] $files
      *
-     * @return array
+     * @return array array of tuples where the first element is the local file path (path inside the PHAR) and the
+     *               second element is the processed contents
      */
     private function processContents(array $files): array
     {

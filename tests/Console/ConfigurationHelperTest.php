@@ -15,15 +15,13 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console;
 
 use KevinGH\Box\Configuration;
-use PHPUnit\Framework\TestCase;
+use KevinGH\Box\Test\FileSystemTestCase;
 use RuntimeException;
-use function KevinGH\Box\FileSystem\make_tmp_dir;
-use function KevinGH\Box\FileSystem\remove;
 
 /**
  * @covers \KevinGH\Box\Console\ConfigurationHelper
  */
-class ConfigurationHelperTest extends TestCase
+class ConfigurationHelperTest extends FileSystemTestCase
 {
     /**
      * @var ConfigurationHelper
@@ -31,37 +29,13 @@ class ConfigurationHelperTest extends TestCase
     private $helper;
 
     /**
-     * @var string
-     */
-    private $cwd;
-
-    /**
-     * @var string
-     */
-    private $tmp;
-
-    /**
      * {@inheritdoc}
      */
     protected function setUp(): void
     {
-        $this->cwd = getcwd();
-
-        $this->tmp = make_tmp_dir('box', __CLASS__);
+        parent::setUp();
 
         $this->helper = new ConfigurationHelper();
-
-        chdir($this->tmp);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown(): void
-    {
-        chdir($this->cwd);
-
-        remove($this->tmp);
     }
 
     public function test_it_has_a_name(): void
