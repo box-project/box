@@ -16,48 +16,13 @@ namespace KevinGH\Box\Verifier;
 
 use Exception;
 use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
-use function KevinGH\Box\FileSystem\make_tmp_dir;
-use function KevinGH\Box\FileSystem\remove;
+use KevinGH\Box\Test\FileSystemTestCase;
 
 /**
  * @covers \KevinGH\Box\Verifier\PublicKey
  */
-class PublicKeyTest extends TestCase
+class PublicKeyTest extends FileSystemTestCase
 {
-    /**
-     * @var string
-     */
-    private $cwd;
-
-    /**
-     * @var string
-     */
-    private $tmp;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        $this->cwd = getcwd();
-        $this->tmp = make_tmp_dir('box', __CLASS__);
-
-        chdir($this->tmp);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown(): void
-    {
-        chdir($this->cwd);
-
-        remove($this->tmp);
-
-        parent::tearDown();
-    }
-
     public function test_it_cannot_be_initialised_with_a_non_existent_file(): void
     {
         try {

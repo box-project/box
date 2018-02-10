@@ -15,52 +15,15 @@ declare(strict_types=1);
 namespace KevinGH\Box\Verifier;
 
 use Exception;
+use KevinGH\Box\Test\FileSystemTestCase;
 use PHPUnit\Framework\Error\Warning;
-use PHPUnit\Framework\TestCase;
-use function KevinGH\Box\FileSystem\make_tmp_dir;
-use function KevinGH\Box\FileSystem\remove;
 
 /**
  * @covers \KevinGH\Box\Verifier\OpenSsl
  */
-class OpenSslTest extends TestCase
+class OpenSslTest extends FileSystemTestCase
 {
     public const FIXTURES_DIR = __DIR__.'/../../fixtures/signed_phars';
-
-    /**
-     * @var string
-     */
-    private $cwd;
-
-    /**
-     * @var string
-     */
-    private $tmp;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        $this->cwd = getcwd();
-        $this->tmp = make_tmp_dir('box', __CLASS__);
-
-        chdir($this->tmp);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown(): void
-    {
-        unset($this->box, $this->phar);
-
-        chdir($this->cwd);
-
-        remove($this->tmp);
-
-        parent::tearDown();
-    }
 
     public function test_it_can_verify_files(): void
     {

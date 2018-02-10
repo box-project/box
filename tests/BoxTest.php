@@ -17,30 +17,19 @@ namespace KevinGH\Box;
 use Exception;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\FakeCompactor;
+use KevinGH\Box\Test\FileSystemTestCase;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use Phar;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
-use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\remove;
 
 /**
  * @covers \KevinGH\Box\Box
  */
-class BoxTest extends TestCase
+class BoxTest extends FileSystemTestCase
 {
-    /**
-     * @var string
-     */
-    private $cwd;
-
-    /**
-     * @var string
-     */
-    private $tmp;
-
     /**
      * @var Box
      */
@@ -66,10 +55,7 @@ class BoxTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->cwd = getcwd();
-        $this->tmp = make_tmp_dir('box', __CLASS__);
-
-        chdir($this->tmp);
+        parent::setUp();
 
         $this->box = Box::create('test.phar');
         $this->phar = $this->box->getPhar();
@@ -83,13 +69,11 @@ class BoxTest extends TestCase
      */
     protected function tearDown(): void
     {
-        unset($this->box);
-
-        chdir($this->cwd);
-
-        remove($this->tmp);
-
         parent::tearDown();
+
+        remove($this->box->getPhar());
+
+        unset($this->box);
     }
 
     public function test_it_can_add_a_file_to_the_phar(): void
@@ -512,7 +496,7 @@ STUB;
      */
     public function test_it_can_sign_the_PHAR(): void
     {
-        list($key, $password) = $this->getPrivateKey();
+        [$key, $password] = $this->getPrivateKey();
 
         $phar = $this->box->getPhar();
 
@@ -556,7 +540,7 @@ STUB;
 
     public function test_it_cannot_sign_if_cannot_create_the_public_key(): void
     {
-        list($key, $password) = $this->getPrivateKey();
+        [$key, $password] = $this->getPrivateKey();
 
         mkdir('test.phar.pubkey');
 
@@ -581,7 +565,7 @@ STUB;
     {
         $phar = $this->box->getPhar();
 
-        list($key, $password) = $this->getPrivateKey();
+        [$key, $password] = $this->getPrivateKey();
 
         file_put_contents($file = 'foo', $key);
 

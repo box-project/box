@@ -50,6 +50,9 @@
         "files": [
             "src/FileSystem/file_system.php",
             "src/functions.php"
+        ],
+        "exclude-from-classmap": [
+            "/Test/"
         ]
     },
     "autoload-dev": {

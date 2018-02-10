@@ -34,7 +34,7 @@ $config = PhpCsFixer\Config::create()
         'compact_nullable_typehint' => true,
         'header_comment' => ['header' => $header],
         'heredoc_to_nowdoc' => true,
-        'list_syntax' => ['syntax' => 'long'],
+        'list_syntax' => ['syntax' => 'short'],
         'method_argument_space' => ['ensure_fully_multiline' => true],
         'no_extra_consecutive_blank_lines' => [
             'tokens' => [
@@ -57,6 +57,7 @@ $config = PhpCsFixer\Config::create()
         'no_unreachable_default_argument_value' => true,
         'no_useless_else' => true,
         'no_useless_return' => true,
+        'no_unused_imports' => true,
         'ordered_class_elements' => true,
         'ordered_imports' => true,
         'php_unit_test_class_requires_covers' => true,

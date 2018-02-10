@@ -132,9 +132,9 @@ HELP;
         $this->registerCompactors($config, $box, $logger);
         $this->registerFileMapping($config, $box, $logger);
 
-        $this->addFiles($config, $box, $logger);
-
         $main = $this->registerMainScript($config, $box, $logger);
+
+        $this->addFiles($config, $box, $logger);
 
         $this->registerStub($config, $box, $main, $logger);
         $this->configureMetadata($config, $box, $logger);
