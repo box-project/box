@@ -468,10 +468,6 @@ HELP;
             ->extract($config->isExtractable())
             ->index($main)
             ->intercept($config->isInterceptFileFuncs())
-            ->mimetypes($config->getMimetypeMapping())
-            ->mung($config->getMungVariables())
-            ->notFound($config->getNotFoundScriptPath())
-            ->web($config->isWebPhar())
         ;
 
         if (null !== ($shebang = $config->getShebang())) {

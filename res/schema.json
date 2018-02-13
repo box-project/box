@@ -162,18 +162,6 @@
         "metadata": {
             "description": "Extra PHAR metadata."
         },
-        "mimetypes": {
-            "description": "The mapping from file extension to MIME type.",
-            "type": "object"
-        },
-        "mung": {
-            "description": "The list of server variables to modify for execution.",
-            "type": "array"
-        },
-        "not-found": {
-            "description": "The file path to the script to execute when a file is not found.",
-            "type": "string"
-        },
         "output": {
             "description": "The file name or path of the new PHAR.",
             "type": "string"
@@ -193,10 +181,6 @@
         "stub": {
             "description": "The relative file path to the stub file, or the flag to use the default stub.",
             "type": ["boolean", "string"]
-        },
-        "web": {
-            "description": "Is the Phar going to be used for the web?",
-            "type": "boolean"
         }
     }
 }

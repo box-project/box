@@ -52,9 +52,6 @@ final class Configuration
     private $map;
     private $fileMapper;
     private $metadata;
-    private $mimetypeMapping;
-    private $mungVariables;
-    private $notFoundScriptPath;
     private $outputPath;
     private $privateKeyPassphrase;
     private $privateKeyPath;
@@ -69,7 +66,6 @@ final class Configuration
     private $isExtractable;
     private $isInterceptFileFuncs;
     private $isStubGenerated;
-    private $isWebPhar;
 
     /**
      * @param string                   $alias
@@ -84,9 +80,6 @@ final class Configuration
      * @param null|string              $mainScriptContent     The processed content of the main script file
      * @param MapFile                  $fileMapper            Utility to map the files from outside and inside the PHAR
      * @param mixed                    $metadata              The PHAR Metadata
-     * @param array                    $mimetypeMapping       The file extension MIME type mapping
-     * @param array                    $mungVariables         The list of server variables to modify for execution
-     * @param null|string              $notFoundScriptPath    The file path to the script to execute when a file is not found
      * @param string                   $outputPath
      * @param null|string              $privateKeyPassphrase
      * @param null|string              $privateKeyPath
@@ -101,7 +94,6 @@ final class Configuration
      * @param bool                     $isExtractable         Wether or not StubGenerator::extract() should be used
      * @param bool                     $isInterceptFileFuncs  wether or not Phar::interceptFileFuncs() should be used
      * @param bool                     $isStubGenerated       Wether or not if the PHAR stub should be generated
-     * @param bool                     $isWebPhar             Wether or not the PHAR is going to be used for the web
      */
     private function __construct(
         string $alias,
@@ -116,9 +108,6 @@ final class Configuration
         ?string $mainScriptContent,
         MapFile $fileMapper,
         $metadata,
-        array $mimetypeMapping,
-        array $mungVariables,
-        ?string $notFoundScriptPath,
         string $outputPath,
         ?string $privateKeyPassphrase,
         ?string $privateKeyPath,
@@ -132,8 +121,7 @@ final class Configuration
         ?string $stubPath,
         bool $isExtractable,
         bool $isInterceptFileFuncs,
-        bool $isStubGenerated,
-        bool $isWebPhar
+        bool $isStubGenerated
     ) {
         Assertion::nullOrInArray(
             $compressionAlgorithm,
@@ -156,9 +144,6 @@ final class Configuration
         $this->mainScriptContent = $mainScriptContent;
         $this->fileMapper = $fileMapper;
         $this->metadata = $metadata;
-        $this->mimetypeMapping = $mimetypeMapping;
-        $this->mungVariables = $mungVariables;
-        $this->notFoundScriptPath = $notFoundScriptPath;
         $this->outputPath = $outputPath;
         $this->privateKeyPassphrase = $privateKeyPassphrase;
         $this->privateKeyPath = $privateKeyPath;
@@ -173,7 +158,6 @@ final class Configuration
         $this->isExtractable = $isExtractable;
         $this->isInterceptFileFuncs = $isInterceptFileFuncs;
         $this->isStubGenerated = $isStubGenerated;
-        $this->isWebPhar = $isWebPhar;
     }
 
     public static function create(string $file, stdClass $raw): self
@@ -212,9 +196,6 @@ final class Configuration
 
         $metadata = self::retrieveMetadata($raw);
 
-        $mimeTypeMapping = self::retrieveMimetypeMapping($raw);
-        $mungVariables = self::retrieveMungVariables($raw);
-        $notFoundScriptPath = self::retrieveNotFoundScriptPath($raw);
         $outputPath = self::retrieveOutputPath($raw, $file);
 
         $privateKeyPassphrase = self::retrievePrivateKeyPassphrase($raw);
@@ -237,7 +218,6 @@ final class Configuration
         $isExtractable = self::retrieveIsExtractable($raw);
         $isInterceptFileFuncs = self::retrieveIsInterceptFileFuncs($raw);
         $isStubGenerated = self::retrieveIsStubGenerated($raw);
-        $isWebPhar = self::retrieveIsWebPhar($raw);
 
         return new self(
             $alias,
@@ -252,9 +232,6 @@ final class Configuration
             $mainScriptContent,
             $fileMapper,
             $metadata,
-            $mimeTypeMapping,
-            $mungVariables,
-            $notFoundScriptPath,
             $outputPath,
             $privateKeyPassphrase,
             $privateKeyPath,
@@ -268,8 +245,7 @@ final class Configuration
             $stubPath,
             $isExtractable,
             $isInterceptFileFuncs,
-            $isStubGenerated,
-            $isWebPhar
+            $isStubGenerated
         );
     }
 
@@ -346,21 +322,6 @@ final class Configuration
         return $this->mainScriptContent;
     }
 
-    public function getMimetypeMapping(): array
-    {
-        return $this->mimetypeMapping;
-    }
-
-    public function getMungVariables(): array
-    {
-        return $this->mungVariables;
-    }
-
-    public function getNotFoundScriptPath(): ?string
-    {
-        return $this->notFoundScriptPath;
-    }
-
     public function getOutputPath(): string
     {
         return $this->outputPath;
@@ -427,7 +388,7 @@ final class Configuration
         return $this->stubBannerPath;
     }
 
-    public function getStubBannerFromFile()
+    public function getStubBannerFromFile(): ?string
     {
         return $this->stubBannerFromFile;
     }
@@ -450,11 +411,6 @@ final class Configuration
     public function isStubGenerated(): bool
     {
         return $this->isStubGenerated;
-    }
-
-    public function isWebPhar(): bool
-    {
-        return $this->isWebPhar;
     }
 
     private static function retrieveAlias(stdClass $raw): string
@@ -596,7 +552,7 @@ final class Configuration
     }
 
     /**
-     * @param array   $findersConfig   the configuration
+     * @param array   $findersConfig
      * @param string  $basePath
      * @param Closure $blacklistFilter
      *
@@ -612,8 +568,8 @@ final class Configuration
     }
 
     /**
-     * @param array   $findersConfig   the configuration
-     * @param string  $basePath
+     * @param stdClass $config
+     * @param string $basePath
      * @param Closure $blacklistFilter
      *
      * @return Finder
@@ -929,38 +885,6 @@ final class Configuration
             }
 
             return $raw->metadata;
-        }
-
-        return null;
-    }
-
-    private static function retrieveMimetypeMapping(stdClass $raw): array
-    {
-        // TODO: this parameter is not clear to me: review usage, doc & checks
-        if (isset($raw->mimetypes)) {
-            return (array) $raw->mimetypes;
-        }
-
-        return [];
-    }
-
-    private static function retrieveMungVariables(stdClass $raw): array
-    {
-        // TODO: this parameter is not clear to me: review usage, doc & checks
-        // TODO: add error/warning if used when web is not enabled
-        if (isset($raw->mung)) {
-            return (array) $raw->mung;
-        }
-
-        return [];
-    }
-
-    private static function retrieveNotFoundScriptPath(stdClass $raw): ?string
-    {
-        // TODO: this parameter is not clear to me: review usage, doc & checks
-        // TODO: add error/warning if used when web is not enabled
-        if (isset($raw->{'not-found'})) {
-            return $raw->{'not-found'};
         }
 
         return null;
@@ -1336,17 +1260,6 @@ final class Configuration
     {
         if (isset($raw->stub) && (true === $raw->stub)) {
             return true;
-        }
-
-        return false;
-    }
-
-    private static function retrieveIsWebPhar(stdClass $raw): bool
-    {
-        // TODO: doc is not clear enough
-        // Also check if is compatible web + CLI
-        if (isset($raw->web)) {
-            return $raw->web;
         }
 
         return false;

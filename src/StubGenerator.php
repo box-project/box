@@ -24,19 +24,9 @@ use KevinGH\Box\Compactor\Php;
 final class StubGenerator
 {
     /**
-     * @var string[] the list of server variables that are allowed to be modified
-     */
-    private const ALLOWED_MUNG = [
-        'PHP_SELF',
-        'REQUEST_URI',
-        'SCRIPT_FILENAME',
-        'SCRIPT_NAME',
-    ];
-
-    /**
      * @var string The alias to be used in "phar://" URLs
      */
-    private $alias = '';
+    private $alias;
 
     /**
      * @var null|string The top header comment banner text
@@ -60,11 +50,6 @@ BANNER;
     private $extractCode = [];
 
     /**
-     * @var bool Force the use of the Extract class?
-     */
-    private $extractForce = false;
-
-    /**
      * @var null|string The location within the PHAR of index script
      */
     private $index;
@@ -75,38 +60,9 @@ BANNER;
     private $intercept = false;
 
     /**
-     * @var array The map for file extensions and their mimetypes
-     */
-    private $mimetypes = [];
-
-    /**
-     * The list of server variables to modify.
-     *
-     * @var array
-     */
-    private $mung = [];
-
-    /**
-     * @var null|string The location of the script to run when a file is not found
-     */
-    private $notFound;
-
-    /**
-     * @var null|string The rewrite function name
-     */
-    private $rewrite;
-
-    /**
      * @var string The shebang line
      */
     private $shebang = '#!/usr/bin/env php';
-
-    /**
-     * Use Phar::webPhar() instead of Phar::mapPhar()?
-     *
-     * @var bool
-     */
-    private $web = false;
 
     /**
      * Creates a new instance of the stub generator.
@@ -138,31 +94,22 @@ BANNER;
         if ($this->extract) {
             $stub[] = implode("\n", $this->extractCode['constants']);
 
-            if ($this->extractForce) {
-                $stub = array_merge($stub, $this->getExtractSections());
-            }
         }
 
-        $stub = array_merge($stub, $this->getPharSections());
+        $stub = array_merge($stub, $this->getPharSectionStmts());
 
         if ($this->extract) {
-            if ($this->extractForce) {
-                if ($this->index && !$this->web) {
-                    $stub[] = "require \"\$dir/{$this->index}\";";
-                }
-            } else {
-                end($stub);
+            end($stub);
 
-                $stub[key($stub)] .= ' else {';
+            $stub[key($stub)] .= ' else {';
 
-                $stub = array_merge($stub, $this->getExtractSections());
+            $stub = array_merge($stub, $this->getExtractSections());
 
-                if ($this->index) {
-                    $stub[] = "require \"\$dir/{$this->index}\";";
-                }
-
-                $stub[] = '}';
+            if ($this->index) {
+                $stub[] = "require \"\$dir/{$this->index}\";";
             }
+
+            $stub[] = '}';
 
             $stub[] = implode("\n", $this->extractCode['class']);
         }
@@ -186,10 +133,9 @@ BANNER;
         return $this;
     }
 
-    public function extract(bool $extract, bool $force = false): self
+    public function extract(bool $extract): self
     {
         $this->extract = $extract;
-        $this->extractForce = $force;
 
         if ($extract) {
             $this->extractCode = [
@@ -237,50 +183,11 @@ BANNER;
         return $this;
     }
 
-    public function mimetypes(array $mimetypes): self
-    {
-        $this->mimetypes = $mimetypes;
-
-        return $this;
-    }
-
-    public function mung(array $list): self
-    {
-        Assertion::allInArray(
-            $list,
-            self::ALLOWED_MUNG,
-            'The $_SERVER variable "%s" is not allowed.'
-        );
-
-        $this->mung = $list;
-
-        return $this;
-    }
-
-    public function notFound(?string $script): self
-    {
-        $this->notFound = $script;
-
-        return $this;
-    }
-
-    public function rewrite(?string $function): self
-    {
-        $this->rewrite = $function;
-
-        return $this;
-    }
-
     public function shebang(string $shebang): self
     {
+        Assertion::notEmpty($shebang, 'Cannot use an empty string for the shebang.');
+
         $this->shebang = $shebang;
-
-        return $this;
-    }
-
-    public function web(bool $web): self
-    {
-        $this->web = $web;
 
         return $this;
     }
@@ -298,46 +205,9 @@ BANNER;
         return $quote.addcslashes($arg, $quote).$quote;
     }
 
-    /**
-     * @return string The alias map
-     */
-    private function getAlias(): string
+    private function getAliasStmt(): ?string
     {
-        $stub = '';
-        $prefix = '';
-
-        if ($this->extractForce) {
-            $prefix = '$dir/';
-        }
-
-        if ($this->web) {
-            $stub .= 'Phar::webPhar('.$this->arg($this->alias);
-
-            if ($this->index) {
-                $stub .= ', '.$this->arg($prefix.$this->index, '"');
-
-                if ($this->notFound) {
-                    $stub .= ', '.$this->arg($prefix.$this->notFound, '"');
-
-                    if ($this->mimetypes) {
-                        $stub .= ', '.var_export(
-                            $this->mimetypes,
-                            true
-                        );
-
-                        if ($this->rewrite) {
-                            $stub .= ', '.$this->arg($this->rewrite);
-                        }
-                    }
-                }
-            }
-
-            $stub .= ');';
-        } else {
-            $stub .= 'Phar::mapPhar('.$this->arg($this->alias).');';
-        }
-
-        return $stub;
+        return null !== $this->alias ? 'Phar::mapPhar('.$this->arg($this->alias).');' : null;
     }
 
     /**
@@ -387,22 +257,21 @@ BANNER;
     /**
      * @return string[] The sections of the stub that use the PHAR class
      */
-    private function getPharSections(): array
+    private function getPharSectionStmts(): array
     {
         $stub = [
             'if (class_exists(\'Phar\')) {',
-            $this->getAlias(),
         ];
+
+        if (null !== $aliasStmt = $this->getAliasStmt()) {
+            $stub[] = $aliasStmt;
+        }
 
         if ($this->intercept) {
             $stub[] = 'Phar::interceptFileFuncs();';
         }
 
-        if ($this->mung) {
-            $stub[] = 'Phar::mungServer('.var_export($this->mung, true).');';
-        }
-
-        if ($this->index && !$this->web && !$this->extractForce) {
+        if ($this->index) {
             $stub[] = "require 'phar://' . __FILE__ . '/{$this->index}';";
         }
 

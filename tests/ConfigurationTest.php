@@ -1629,48 +1629,6 @@ EOF
         $this->assertSame(123, $this->config->getMetadata());
     }
 
-    public function test_get_mime_type_mapping(): void
-    {
-        $this->assertSame([], $this->config->getMimetypeMapping());
-    }
-
-    public function test_configure_mime_type_mapping(): void
-    {
-        $mimetypes = ['phps' => Phar::PHPS];
-
-        $this->setConfig(['mimetypes' => $mimetypes]);
-
-        $this->assertSame($mimetypes, $this->config->getMimetypeMapping());
-    }
-
-    public function test_get_mung_variables(): void
-    {
-        $this->assertSame([], $this->config->getMungVariables());
-    }
-
-    public function test_configure_mung_variables(): void
-    {
-        $mung = ['REQUEST_URI'];
-
-        $this->setConfig(['mung' => $mung]);
-
-        $this->assertSame($mung, $this->config->getMungVariables());
-    }
-
-    public function test_GetNotFoundScriptPath(): void
-    {
-        //TODO: say wat?
-        $this->assertNull($this->config->getNotFoundScriptPath());
-    }
-
-    public function testGetNotFoundScriptPathSet(): void
-    {
-        //TODO: say wat?
-        $this->setConfig(['not-found' => 'test.php']);
-
-        $this->assertSame('test.php', $this->config->getNotFoundScriptPath());
-    }
-
     public function test_get_output_path(): void
     {
         $this->assertSame(
@@ -2015,18 +1973,6 @@ COMMENT;
         $this->setConfig(['stub' => 'test.php']);
 
         $this->assertFalse($this->config->isStubGenerated());
-    }
-
-    public function testIsWebPhar(): void
-    {
-        $this->assertFalse($this->config->isWebPhar());
-    }
-
-    public function testIsWebPharSet(): void
-    {
-        $this->setConfig(['web' => true]);
-
-        $this->assertTrue($this->config->isWebPhar());
     }
 
     public function testLoadBootstrap(): void
