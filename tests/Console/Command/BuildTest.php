@@ -136,11 +136,14 @@ OUTPUT;
         $expectedStub = <<<PHP
 $shebang
 <?php
-/**
+
+/*
  * custom banner
  */
+
 Phar::mapPhar('alias-test.phar');
 require 'phar://' . __FILE__ . '/run.php';
+
 __HALT_COMPILER(); ?>
 
 PHP;
@@ -323,11 +326,14 @@ OUTPUT;
         $expectedStub = <<<PHP
 $shebang
 <?php
-/**
+
+/*
  * custom banner
  */
+
 Phar::mapPhar('alias-test.phar');
 require 'phar://' . __FILE__ . '/other/run.php';
+
 __HALT_COMPILER(); ?>
 
 PHP;
