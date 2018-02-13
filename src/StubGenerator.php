@@ -132,9 +132,11 @@ BANNER;
         return $this;
     }
 
-    public function shebang(string $shebang): self
+    public function shebang(?string $shebang): self
     {
-        Assertion::notEmpty($shebang, 'Cannot use an empty string for the shebang.');
+        if (null !== $shebang) {
+            Assertion::notEmpty($shebang, 'Cannot use an empty string for the shebang.');
+        }
 
         $this->shebang = $shebang;
 

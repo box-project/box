@@ -1120,26 +1120,20 @@ final class Configuration
 
     private static function retrieveShebang(stdClass $raw): ?string
     {
-        // TODO: unlike the doc says do not allow empty strings.
-        // Leverage `Assertion` here?
         if (false === isset($raw->shebang)) {
             return null;
         }
 
-        if (('' === $raw->shebang) || (false === $raw->shebang)) {
-            return '';
-        }
-
         $shebang = trim($raw->shebang);
 
-        if ('#!' !== substr($shebang, 0, 2)) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The shebang line must start with "#!": %s',
-                    $shebang
-                )
-            );
-        }
+        Assertion::notEmpty($shebang, 'The shebang should not be empty.');
+        Assertion::true(
+            '#!' === substr($shebang, 0, 2),
+            sprintf(
+                'The shebang line must start with "#!". Got "%s" instead',
+                $shebang
+            )
+        );
 
         return $shebang;
     }

@@ -1748,19 +1748,21 @@ EOF
         }
     }
 
-    public function testGetShebang(): void
+    public function test_the_config_has_no_default_shebang(): void
     {
         $this->assertNull($this->config->getShebang());
     }
 
-    public function testGetShebangSet(): void
+    public function test_the_shebang_can_be_configured(): void
     {
-        $this->setConfig(['shebang' => '#!/bin/php']);
+        $this->setConfig(['shebang' => $expected = '#!/bin/php']);
 
-        $this->assertSame('#!/bin/php', $this->config->getShebang());
+        $actual = $this->config->getShebang();
+
+        $this->assertSame($expected, $actual);
     }
 
-    public function testGetShebangInvalid(): void
+    public function test_cannot_register_an_invalid_shebang(): void
     {
         try {
             $this->setConfig(['shebang' => '/bin/php']);
@@ -1768,24 +1770,46 @@ EOF
             $this->fail('Expected exception ot be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                'The shebang line must start with "#!": /bin/php',
+                'The shebang line must start with "#!". Got "/bin/php" instead',
                 $exception->getMessage()
             );
         }
     }
 
-    public function testGetShebangBlank(): void
+    public function test_cannot_register_an_empty_shebang(): void
     {
-        $this->setConfig(['shebang' => '']);
+        try {
+            $this->setConfig(['shebang' => '']);
 
-        $this->assertSame('', $this->config->getShebang());
+            $this->fail('Expected exception ot be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'The shebang should not be empty.',
+                $exception->getMessage()
+            );
+        }
+
+        try {
+            $this->setConfig(['shebang' => ' ']);
+
+            $this->fail('Expected exception ot be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'The shebang should not be empty.',
+                $exception->getMessage()
+            );
+        }
     }
 
-    public function testGetShebangFalse(): void
+    public function test_the_shebang_value_is_normalized(): void
     {
-        $this->setConfig(['shebang' => false]);
+        $this->setConfig(['shebang' => ' #!/bin/php ']);
 
-        $this->assertSame('', $this->config->getShebang());
+        $expected = '#!/bin/php';
+
+        $actual = $this->config->getShebang();
+
+        $this->assertSame($expected, $actual);
     }
 
     public function testGetSigningAlgorithm(): void

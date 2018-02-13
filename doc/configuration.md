@@ -40,7 +40,6 @@ The configuration file is actually a JSON object saved to a file. Note that all 
     "datetime_format": "?",
     "directories": "?",
     "directories-bin": "?",
-    "extract": "?",
     "files": "?",
     "files-bin": "?",
     "finder": "?",
@@ -52,7 +51,6 @@ The configuration file is actually a JSON object saved to a file. Note that all 
     "main": "?",
     "map": "?",
     "metadata": "?",
-    "not-found": "?",
     "output": "?",
     "replacements": "?",
     "shebang": "?"
@@ -228,6 +226,17 @@ The `blacklist` (`string[]`) setting is a list of files that must not be added. 
 using the other available configuration settings: [`files`][files], [`files-bin`][files], [`directories`][directories],
 [`directories-bin`][directories], [`finder`][finder], [`finder-bin`][finder].
 
+
+### Shebang (`shebang`)
+
+The shebang (`string`) setting is used to specify the shebang line used when generating a new stub. By default, this
+line is used:
+
+```
+#!/usr/bin/env php
+```
+
+The shebang line can be removed altogether if null.
 
 
 TODO: double check all the links
@@ -467,13 +476,7 @@ The replacements (object) setting is a map of placeholders and their values.
 The placeholders are replaced in all non-binary files with the specified
 values.
 
-The shebang (string) setting is used to specify the shebang line used when
-generating a new stub. By default, this line is used:
 
-#!/usr/bin/env php
-
-The shebang line can be removed altogether if false or an empty string is
-provided.
 
 The stub (string, boolean) setting is used to specify the location of a stub
 file, or if one should be generated. If a path is provided, the stub file will

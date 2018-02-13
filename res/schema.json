@@ -172,7 +172,7 @@
         },
         "shebang": {
             "description": "The shebang line to use for the generated stub.",
-            "type": ["boolean", "string"]
+            "type": ["string"]
         },
         "stub": {
             "description": "The relative file path to the stub file, or the flag to use the default stub.",
