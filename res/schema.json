@@ -84,10 +84,6 @@
             },
             "type": ["array"]
         },
-        "extract": {
-            "description": "The flag to embed an extraction class into the stub.",
-            "type": "boolean"
-        },
         "files": {
             "description": "A list of file paths to include.",
             "items": {

@@ -17,8 +17,6 @@ use function KevinGH\Box\register_aliases;
 
 $loader = require __DIR__.'/../vendor/autoload.php';
 
-require_once __DIR__.'/../src/Box_Extract.php';
-
 vfsStreamWrapper::register();
 
 register_aliases();

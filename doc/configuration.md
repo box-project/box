@@ -362,10 +362,6 @@ of the signature algorithms listed on the help page:
 
 
 
-The extract (boolean) setting determines whether or not the generated stub
-should include a class to extract the PHAR. This class would be used if the
-PHAR is not available. (Increases stub file size.)
-
 The datetime (string) setting is the name of a placeholder value that will be
 replaced in all non-binary files by the current datetime.
 

@@ -465,7 +465,6 @@ HELP;
     {
         $stub = StubGenerator::create()
             ->alias($config->getAlias())
-            ->extract($config->isExtractable())
             ->index($main)
             ->intercept($config->isInterceptFileFuncs())
         ;

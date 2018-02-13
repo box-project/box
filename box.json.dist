@@ -33,7 +33,6 @@
         "Herrera\\Box\\Compactor\\Json",
         "Herrera\\Box\\Compactor\\Php"
     ],
-    "extract": true,
     "git-commit": "git-commit",
     "git-version": "git-version",
 

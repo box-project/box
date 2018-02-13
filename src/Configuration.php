@@ -63,7 +63,6 @@ final class Configuration
     private $stubBannerPath;
     private $stubBannerFromFile;
     private $stubPath;
-    private $isExtractable;
     private $isInterceptFileFuncs;
     private $isStubGenerated;
 
@@ -91,7 +90,6 @@ final class Configuration
      * @param null|string              $stubBannerPath        The path to the stub banner comment file
      * @param null|string              $stubBannerFromFile    The stub banner comment from the fine
      * @param null|string              $stubPath              The PHAR stub file path
-     * @param bool                     $isExtractable         Wether or not StubGenerator::extract() should be used
      * @param bool                     $isInterceptFileFuncs  wether or not Phar::interceptFileFuncs() should be used
      * @param bool                     $isStubGenerated       Wether or not if the PHAR stub should be generated
      */
@@ -119,7 +117,6 @@ final class Configuration
         ?string $stubBannerPath,
         ?string $stubBannerFromFile,
         ?string $stubPath,
-        bool $isExtractable,
         bool $isInterceptFileFuncs,
         bool $isStubGenerated
     ) {
@@ -155,7 +152,6 @@ final class Configuration
         $this->stubBannerPath = $stubBannerPath;
         $this->stubBannerFromFile = $stubBannerFromFile;
         $this->stubPath = $stubPath;
-        $this->isExtractable = $isExtractable;
         $this->isInterceptFileFuncs = $isInterceptFileFuncs;
         $this->isStubGenerated = $isStubGenerated;
     }
@@ -215,7 +211,6 @@ final class Configuration
 
         $stubPath = self::retrieveStubPath($raw);
 
-        $isExtractable = self::retrieveIsExtractable($raw);
         $isInterceptFileFuncs = self::retrieveIsInterceptFileFuncs($raw);
         $isStubGenerated = self::retrieveIsStubGenerated($raw);
 
@@ -243,7 +238,6 @@ final class Configuration
             $stubBannerPath,
             $stubBannerFromFile,
             $stubPath,
-            $isExtractable,
             $isInterceptFileFuncs,
             $isStubGenerated
         );
@@ -396,11 +390,6 @@ final class Configuration
     public function getStubPath(): ?string
     {
         return $this->stubPath;
-    }
-
-    public function isExtractable(): bool
-    {
-        return $this->isExtractable;
     }
 
     public function isInterceptFileFuncs(): bool
@@ -1225,16 +1214,6 @@ final class Configuration
         }
 
         return null;
-    }
-
-    private static function retrieveIsExtractable(stdClass $raw): bool
-    {
-        // TODO: look it up, really not clear to me neither is the doc
-        if (isset($raw->extract)) {
-            return $raw->extract;
-        }
-
-        return false;
     }
 
     private static function retrieveIsInterceptFileFuncs(stdClass $raw): bool
