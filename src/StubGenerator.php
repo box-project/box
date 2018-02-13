@@ -180,9 +180,7 @@ BANNER;
      */
     private function getPharSectionStmts(): array
     {
-        $stub = [
-            'if (class_exists(\'Phar\')) {',
-        ];
+        $stub = [];
 
         if (null !== $aliasStmt = $this->getAliasStmt()) {
             $stub[] = $aliasStmt;
@@ -195,8 +193,6 @@ BANNER;
         if ($this->index) {
             $stub[] = "require 'phar://' . __FILE__ . '/{$this->index}';";
         }
-
-        $stub[] = '}';
 
         return $stub;
     }

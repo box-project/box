@@ -139,10 +139,8 @@ $shebang
 /**
  * custom banner
  */
-if (class_exists('Phar')) {
 Phar::mapPhar('alias-test.phar');
 require 'phar://' . __FILE__ . '/run.php';
-}
 __HALT_COMPILER(); ?>
 
 PHP;
@@ -328,10 +326,8 @@ $shebang
 /**
  * custom banner
  */
-if (class_exists('Phar')) {
 Phar::mapPhar('alias-test.phar');
 require 'phar://' . __FILE__ . '/other/run.php';
-}
 __HALT_COMPILER(); ?>
 
 PHP;

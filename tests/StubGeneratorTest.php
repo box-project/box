@@ -58,8 +58,6 @@ class StubGeneratorTest extends TestCase
  * @link https://github.com/humbug/box
  * 
  */
-if (class_exists('Phar')) {
-}
 __HALT_COMPILER();
 STUB;
         $actual = $this->generator->generate();
@@ -84,8 +82,6 @@ TEXT
  *
  * Yolo
  */
-if (class_exists('Phar')) {
-}
 __HALT_COMPILER();
 STUB;
         $actual = $this->generator->generate();
@@ -107,8 +103,6 @@ STUB;
  * @link https://github.com/humbug/box
  * 
  */
-if (class_exists('Phar')) {
-}
 __HALT_COMPILER();
 STUB;
         $actual = $this->generator->generate();
@@ -130,9 +124,7 @@ STUB;
  * @link https://github.com/humbug/box
  * 
  */
-if (class_exists('Phar')) {
 Phar::mapPhar('acme.phar');
-}
 __HALT_COMPILER();
 STUB;
         $actual = $this->generator->generate();
@@ -154,9 +146,7 @@ STUB;
  * @link https://github.com/humbug/box
  * 
  */
-if (class_exists('Phar')) {
 require 'phar://' . __FILE__ . '/acme.php';
-}
 __HALT_COMPILER();
 STUB;
         $actual = $this->generator->generate();
@@ -178,9 +168,7 @@ STUB;
  * @link https://github.com/humbug/box
  * 
  */
-if (class_exists('Phar')) {
 Phar::interceptFileFuncs();
-}
 __HALT_COMPILER();
 STUB;
         $actual = $this->generator->generate();
@@ -211,11 +199,9 @@ TEXT
  *
  * Yolo
  */
-if (class_exists('Phar')) {
 Phar::mapPhar('test.phar');
 Phar::interceptFileFuncs();
 require 'phar://' . __FILE__ . '/index.php';
-}
 __HALT_COMPILER();
 STUB;
         $actual = $this->generator->generate();
