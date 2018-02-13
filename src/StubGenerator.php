@@ -88,7 +88,7 @@ BANNER;
         $stub[] = '<?php';
 
         if (null !== $this->banner) {
-            $stub[] = $this->getBanner();
+            $stub[] = $this->getBannerStmt();
         }
 
         if ($this->extract) {
@@ -103,7 +103,7 @@ BANNER;
 
             $stub[key($stub)] .= ' else {';
 
-            $stub = array_merge($stub, $this->getExtractSections());
+            $stub = array_merge($stub, $this->getExtractSectionStmts());
 
             if ($this->index) {
                 $stub[] = "require \"\$dir/{$this->index}\";";
@@ -213,7 +213,7 @@ BANNER;
     /**
      * @return string the processed banner
      */
-    private function getBanner(): string
+    private function getBannerStmt(): string
     {
         // TODO: review how the banner is processed. Right now the doc says it can be a string
         // already enclosed in comments and if not it will be enclosed automatically.
@@ -245,7 +245,7 @@ BANNER;
     /**
      * @return string[] The self extracting sections of the stub
      */
-    private function getExtractSections(): array
+    private function getExtractSectionStmts(): array
     {
         return [
             '$extract = new Extract(__FILE__, Extract::findStubLength(__FILE__));',

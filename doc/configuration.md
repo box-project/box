@@ -52,14 +52,10 @@ The configuration file is actually a JSON object saved to a file. Note that all 
     "main": "?",
     "map": "?",
     "metadata": "?",
-    "mimetypes": "?",
-    "mung": "?",
     "not-found": "?",
     "output": "?",
     "replacements": "?",
-    "shebang": "?",
-    "stub": "?",
-    "web": "?"
+    "shebang": "?"
 }
 ```
 
@@ -467,20 +463,6 @@ earlier key).
 The metadata (any) setting can be any value. This value will be stored as
 metadata that can be retrieved from the built PHAR (Phar::getMetadata()).
 
-The mimetypes (object) setting is used when generating a new stub. It is a map
-of file extensions and their mimetypes. To see a list of the default mapping,
-please visit:
-
-http://www.php.net/manual/en/phar.webphar.php
-
-The mung (array) setting is used when generating a new stub. It is a list of
-server variables to modify for the PHAR. This setting is only useful when the
-web setting is enabled.
-
-The not-found (string) setting is used when generating a new stub. It
-specifies the file that will be used when a file is not found inside the PHAR.
-This setting is only useful when web setting is enabled.
-
 The output (string) setting specifies the file name and path of the newly
 built PHAR. If the value of the setting is not an absolute path, the path will
 be relative to the current working directory.
@@ -502,6 +484,3 @@ file, or if one should be generated. If a path is provided, the stub file will
 be used as is inside the PHAR. If true is provided, a new stub will be
 generated. If false (or nothing) is provided, the default stub used by the
 PHAR class will be used.
-
-The web (boolean) setting is used when generating a new stub. If true is
-provided, Phar::webPhar() will be called in the stub.
