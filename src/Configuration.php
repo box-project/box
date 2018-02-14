@@ -209,7 +209,7 @@ final class Configuration
         $stubBannerPath = self::retrieveStubBannerPath($raw);
         $stubBannerFromFile = self::retrieveStubBannerFromFile($basePath, $stubBannerPath);
 
-        $stubPath = self::retrieveStubPath($raw);
+        $stubPath = self::retrieveStubPath($raw, $basePath);
 
         $isInterceptFileFuncs = self::retrieveIsInterceptFileFuncs($raw);
         $isStubGenerated = self::retrieveIsStubGenerated($raw);
@@ -1201,10 +1201,14 @@ final class Configuration
         return file_contents($stubBannerPath);
     }
 
-    private static function retrieveStubPath(stdClass $raw): ?string
+    private static function retrieveStubPath(stdClass $raw, string $basePath): ?string
     {
         if (isset($raw->stub) && is_string($raw->stub)) {
-            return $raw->stub;
+            $stubPath = make_path_absolute($raw->stub, $basePath);
+
+            Assertion::file($stubPath);
+
+            return $stubPath;
         }
 
         return null;

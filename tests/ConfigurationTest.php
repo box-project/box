@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Closure;
+use const DIRECTORY_SEPARATOR;
+use function file_put_contents;
 use Generator;
 use Herrera\Annotations\Tokenizer;
 use InvalidArgumentException;
@@ -1918,16 +1920,19 @@ COMMENT;
         );
     }
 
-    public function testGetStubPath(): void
+    public function test_by_default_there_is_no_stub_and_the_stub_is_not_generated(): void
     {
         $this->assertNull($this->config->getStubPath());
+        $this->assertFalse($this->config->isStubGenerated());
     }
 
-    public function testGetStubPathSet(): void
+    public function test_a_custom_stub_can_be_provided(): void
     {
-        $this->setConfig(['stub' => 'test.php']);
+        file_put_contents('custom-stub.php', '');
 
-        $this->assertSame('test.php', $this->config->getStubPath());
+        $this->setConfig(['stub' => 'custom-stub.php']);
+
+        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'test.php', $this->config->getStubPath());
     }
 
     public function testGetStubPathSetBoolean(): void

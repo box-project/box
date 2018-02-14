@@ -10,3 +10,4 @@ doc
 bc break
 review banner
 add validation in stub generator
+check that the options make sense

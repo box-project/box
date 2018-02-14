@@ -7,6 +7,8 @@
     1. [Directories (`directories` and `directories-bin`)][directories]
     1. [Finder (`finder` and `finder-bin`)][finder]
     1. [Blacklist (`blacklist`)][blacklist]
+1. [Stub][stub]
+    1. [Shebang (`shebang`)][shebang]
 
 
 // TODO: do not mention when an option is optional but add a red asterix with a foot note for the mandatory
@@ -227,6 +229,14 @@ using the other available configuration settings: [`files`][files], [`files-bin`
 [`directories-bin`][directories], [`finder`][finder], [`finder-bin`][finder].
 
 
+## Stub
+
+The PHAR stub file is the PHAR bootstrapping file, i.e. the very first file executed whenever the PHAR is executed. It
+usually contains things like the PHAR configuration and executing the main script file.
+
+The default PHAR stub file can be used but Box also propose a couple of options to customize the stub used. 
+
+
 ### Shebang (`shebang`)
 
 The shebang (`string`) setting is used to specify the shebang line used when generating a new stub. By default, this
@@ -237,6 +247,13 @@ line is used:
 ```
 
 The shebang line can be removed altogether if null.
+
+
+### Stub (`stub`)
+
+The stub (`string`, `boolean`) setting is used to specify the location of a stub file, or if one should be generated. If
+a path is provided, the stub file will be used as is inside the PHAR. If `true` is provided, a new stub will be
+generated. If `false` (or nothing) is provided, the default stub used by the PHAR class will be used.
 
 
 TODO: double check all the links
@@ -260,6 +277,8 @@ TODO: for the Finder:
 [directories]: #directories-directories-and-directories-bin
 [finder]: #finder-finder-and-finder-bin
 [blacklist]: #blacklist-blacklist
+[stub]: #stub
+[shebang]: #shebang-shebang
 [phar.mapphar]: https://secure.php.net/manual/en/phar.mapphar.php
 [phar.setalias]: https://secure.php.net/manual/en/phar.setalias.php
 [phar.webphar]: https://secure.php.net/manual/en/phar.webphar.php
@@ -478,8 +497,4 @@ values.
 
 
 
-The stub (string, boolean) setting is used to specify the location of a stub
-file, or if one should be generated. If a path is provided, the stub file will
-be used as is inside the PHAR. If true is provided, a new stub will be
-generated. If false (or nothing) is provided, the default stub used by the
-PHAR class will be used.
+
