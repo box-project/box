@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Assert\Assertion;
+use function explode;
+use function implode;
 use KevinGH\Box\Box;
 use KevinGH\Box\Compactor;
 use KevinGH\Box\Configuration;
@@ -324,8 +326,6 @@ HELP;
 
             $box->getPhar()->setStub($stub->generate());
         } elseif (null !== ($stub = $config->getStubPath())) {
-            $stub = $config->getBasePath().DIRECTORY_SEPARATOR.$stub;
-
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
                 sprintf(
@@ -475,33 +475,44 @@ HELP;
                 sprintf(
                     'Using custom shebang line: %s',
                     $shebang
-                ),
-                OutputInterface::VERBOSITY_VERY_VERBOSE
+                )
             );
 
             $stub->shebang($shebang);
-        }
-
-        if (null !== ($banner = $config->getStubBanner())) {
+        } else {
             $logger->log(
                 BuildLogger::MINUS_PREFIX,
                 sprintf(
-                    'Using custom banner: %s',
-                    $banner
-                ),
-                OutputInterface::VERBOSITY_VERY_VERBOSE
+                    'Using default shebang line: %s',
+                    $stub->getShebang()
+                )
             );
+        }
 
-            $stub->banner($banner);
-        } elseif (null !== ($banner = $config->getStubBannerFromFile())) {
+        if (null !== ($bannerPath = $config->getStubBannerPath())) {
             $logger->log(
                 BuildLogger::MINUS_PREFIX,
                 sprintf(
                     'Using custom banner from file: %s',
-                    $config->getBasePath().DIRECTORY_SEPARATOR.$config->getStubBannerPath()
-                ),
-                OutputInterface::VERBOSITY_VERY_VERBOSE
+                    $bannerPath
+                )
             );
+
+            $stub->banner($config->getStubBannerContents());
+        } elseif (null !== ($banner = $config->getStubBannerContents())) {
+            $logger->log(
+                BuildLogger::MINUS_PREFIX,
+                'Using custom banner:'
+            );
+
+            $bannerLines = explode("\n", $banner);
+
+            foreach ($bannerLines as $bannerLine) {
+                $logger->log(
+                    BuildLogger::CHEVRON_PREFIX,
+                    $bannerLine
+                );
+            }
 
             $stub->banner($banner);
         }

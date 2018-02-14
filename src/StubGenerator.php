@@ -38,7 +38,7 @@ __HALT_COMPILER(); ?>
 STUB;
 
     /**
-     * @var string The alias to be used in "phar://" URLs
+     * @var string|null The alias to be used in "phar://" URLs
      */
     private $alias;
 
@@ -104,7 +104,7 @@ BANNER;
         return $stub;
     }
 
-    public function alias(string $alias): self
+    public function alias(?string $alias): self
     {
         $this->alias = $alias;
 
@@ -141,6 +141,11 @@ BANNER;
         $this->shebang = $shebang;
 
         return $this;
+    }
+
+    public function getShebang(): ?string
+    {
+        return $this->shebang;
     }
 
     /**

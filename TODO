@@ -6,8 +6,6 @@ if (\strlen($val) > 100) {
 This is silly, should rely on log_errors_max_len instead
 
 
-doc
-bc break
-review banner
 add validation in stub generator
 check that the options make sense
+more user-friendly errors when the config file is invalid

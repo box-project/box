@@ -14,12 +14,17 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use function array_map;
 use Assert\Assertion;
 use Closure;
 use DateTimeImmutable;
+use function explode;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\Php as LegacyPhp;
+use function implode;
 use InvalidArgumentException;
+use function is_array;
+use function is_string;
 use KevinGH\Box\Compactor\Php;
 use Phar;
 use RuntimeException;
@@ -59,15 +64,14 @@ final class Configuration
     private $processedReplacements;
     private $shebang;
     private $signingAlgorithm;
-    private $stubBanner;
+    private $stubBannerContents;
     private $stubBannerPath;
-    private $stubBannerFromFile;
     private $stubPath;
     private $isInterceptFileFuncs;
     private $isStubGenerated;
 
     /**
-     * @param string                   $alias
+     * @param string|null                   $alias
      * @param RetrieveRelativeBasePath $basePathRetriever     Utility to private the base path used and be able to retrieve a path relative to it (the base path)
      * @param SplFileInfo[]            $files                 List of files
      * @param SplFileInfo[]            $binaryFiles           List of binary files
@@ -86,15 +90,14 @@ final class Configuration
      * @param array                    $processedReplacements The processed list of replacement placeholders and their values
      * @param null|string              $shebang               The shebang line
      * @param int                      $signingAlgorithm      The PHAR siging algorithm. See \Phar constants
-     * @param null|string              $stubBanner            The stub banner comment
+     * @param string|null              $stubBannerContents            The stub banner comment
      * @param null|string              $stubBannerPath        The path to the stub banner comment file
-     * @param null|string              $stubBannerFromFile    The stub banner comment from the fine
      * @param null|string              $stubPath              The PHAR stub file path
      * @param bool                     $isInterceptFileFuncs  wether or not Phar::interceptFileFuncs() should be used
      * @param bool                     $isStubGenerated       Wether or not if the PHAR stub should be generated
      */
     private function __construct(
-        string $alias,
+        ?string $alias,
         RetrieveRelativeBasePath $basePathRetriever,
         array $files,
         array $binaryFiles,
@@ -113,9 +116,8 @@ final class Configuration
         array $processedReplacements,
         ?string $shebang,
         int $signingAlgorithm,
-        ?string $stubBanner,
+        ?string $stubBannerContents,
         ?string $stubBannerPath,
-        ?string $stubBannerFromFile,
         ?string $stubPath,
         bool $isInterceptFileFuncs,
         bool $isStubGenerated
@@ -148,9 +150,8 @@ final class Configuration
         $this->processedReplacements = $processedReplacements;
         $this->shebang = $shebang;
         $this->signingAlgorithm = $signingAlgorithm;
-        $this->stubBanner = $stubBanner;
+        $this->stubBannerContents = $stubBannerContents;
         $this->stubBannerPath = $stubBannerPath;
-        $this->stubBannerFromFile = $stubBannerFromFile;
         $this->stubPath = $stubPath;
         $this->isInterceptFileFuncs = $isInterceptFileFuncs;
         $this->isStubGenerated = $isStubGenerated;
@@ -205,9 +206,14 @@ final class Configuration
 
         $signingAlgorithm = self::retrieveSigningAlgorithm($raw);
 
-        $stubBanner = self::retrieveStubBanner($raw);
-        $stubBannerPath = self::retrieveStubBannerPath($raw);
-        $stubBannerFromFile = self::retrieveStubBannerFromFile($basePath, $stubBannerPath);
+        $stubBannerContents = self::retrieveStubBannerContents($raw);
+        $stubBannerPath = self::retrieveStubBannerPath($raw, $basePath);
+
+        if (null !== $stubBannerPath) {
+            $stubBannerContents = file_contents($stubBannerPath);
+        }
+
+        $stubBannerContents = self::normalizeStubBannerContents($stubBannerContents);
 
         $stubPath = self::retrieveStubPath($raw, $basePath);
 
@@ -234,9 +240,8 @@ final class Configuration
             $processedReplacements,
             $shebang,
             $signingAlgorithm,
-            $stubBanner,
+            $stubBannerContents,
             $stubBannerPath,
-            $stubBannerFromFile,
             $stubPath,
             $isInterceptFileFuncs,
             $isStubGenerated
@@ -248,7 +253,7 @@ final class Configuration
         return $this->basePathRetriever;
     }
 
-    public function getAlias(): string
+    public function getAlias(): ?string
     {
         return $this->alias;
     }
@@ -372,19 +377,14 @@ final class Configuration
         return $this->signingAlgorithm;
     }
 
-    public function getStubBanner(): ?string
+    public function getStubBannerContents(): ?string
     {
-        return $this->stubBanner;
+        return $this->stubBannerContents;
     }
 
     public function getStubBannerPath(): ?string
     {
         return $this->stubBannerPath;
-    }
-
-    public function getStubBannerFromFile(): ?string
-    {
-        return $this->stubBannerFromFile;
     }
 
     public function getStubPath(): ?string
@@ -402,13 +402,15 @@ final class Configuration
         return $this->isStubGenerated;
     }
 
-    private static function retrieveAlias(stdClass $raw): string
+    private static function retrieveAlias(stdClass $raw): ?string
     {
-        $alias = $raw->alias ?? self::DEFAULT_ALIAS;
+        if (false === isset($raw->alias)) {
+            return null;
+        }
 
-        $alias = trim($alias);
+        $alias = trim($raw->alias);
 
-        Assertion::notEmpty($alias, 'A PHAR alias cannot be empty.');
+        Assertion::notEmpty($alias, 'A PHAR alias cannot be empty when provided.');
 
         return $alias;
     }
@@ -1163,42 +1165,44 @@ final class Configuration
         return $raw->algorithm;
     }
 
-    private static function retrieveStubBanner(stdClass $raw): ?string
+    private static function retrieveStubBannerContents(stdClass $raw): ?string
     {
-        if (isset($raw->{'banner'})) {
-            return $raw->{'banner'};
-        }
-
-        return null;
-    }
-
-    private static function retrieveStubBannerPath(stdClass $raw): ?string
-    {
-        // TODO: if provided check its existence here or should it be defered to later?
-        // Works case this check can be duplicated...
-        //
-        // Check if is relative to base path: if not make it so (may be a BC break to document).
-        // Once checked, a mention in the doc that this path is relative to base-path (unless
-        // absolute).
-        // Check that the path is not provided if a banner is already provided.
-        if (isset($raw->{'banner-file'})) {
-            return canonicalize($raw->{'banner-file'});
-        }
-
-        return null;
-    }
-
-    private static function retrieveStubBannerFromFile(string $basePath, ?string $stubBannerPath): ?string
-    {
-        // TODO: Add checks
-        // TODO: The documentation is not clear enough IMO
-        if (null == $stubBannerPath) {
+        if (false === isset($raw->banner)) {
             return null;
         }
 
-        $stubBannerPath = make_path_absolute($stubBannerPath, $basePath);
+        $banner = $raw->banner;
 
-        return file_contents($stubBannerPath);
+        if (is_array($banner)) {
+            $banner = implode("\n", $banner);
+        }
+
+        return $banner;
+    }
+
+    private static function retrieveStubBannerPath(stdClass $raw, string $basePath): ?string
+    {
+        if (false === isset($raw->{'banner-file'})) {
+            return null;
+        }
+
+        $bannerFile = make_path_absolute($raw->{'banner-file'}, $basePath);
+
+        Assertion::file($bannerFile);
+
+        return $bannerFile;
+    }
+
+    private static function normalizeStubBannerContents(?string $contents): ?string
+    {
+        if (null === $contents) {
+            return null;
+        }
+
+        $banner = explode("\n", $contents);
+        $banner = array_map('trim', $banner);
+
+        return implode("\n", $banner);
     }
 
     private static function retrieveStubPath(stdClass $raw, string $basePath): ?string

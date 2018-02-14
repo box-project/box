@@ -61,9 +61,9 @@ class ConfigurationTest extends FileSystemTestCase
         $this->config = Configuration::create($this->file, (object) []);
     }
 
-    public function test_a_default_alias_is_provided_when_non_has_been_configured(): void
+    public function test_no_alias_is_registered_by_default()
     {
-        $this->assertSame('default.phar', $this->config->getAlias());
+        $this->assertNull($this->config->getAlias());
     }
 
     public function test_the_alias_can_be_configured(): void
@@ -88,7 +88,7 @@ class ConfigurationTest extends FileSystemTestCase
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                'A PHAR alias cannot be empty.',
+                'A PHAR alias cannot be empty when provided.',
                 $exception->getMessage()
             );
         }
@@ -1847,12 +1847,75 @@ EOF
         }
     }
 
-    public function testGetStubBanner(): void
+    public function test_there_is_no_banner_registered_by_default(): void
     {
-        $this->assertNull($this->config->getStubBanner());
+        $this->assertNull($this->config->getStubBannerContents());
+        $this->assertNull($this->config->getStubBannerPath());
     }
 
-    public function testGetStubBannerSet(): void
+    /**
+     * @dataProvider provideCustomBanner
+     */
+    public function test_a_custom_banner_can_be_registered(string $banner): void
+    {
+        $this->setConfig(['banner' => $banner]);
+
+        $this->assertSame($banner, $this->config->getStubBannerContents());
+        $this->assertNull($this->config->getStubBannerPath());
+    }
+
+    /**
+     * @dataProvider provideUnormalizedCustomBanner
+     */
+    public function test_the_content_of_the_banner_is_normalized(string $banner, string $expected): void
+    {
+        $this->setConfig(['banner' => $banner]);
+
+        $this->assertSame($expected, $this->config->getStubBannerContents());
+        $this->assertNull($this->config->getStubBannerPath());
+    }
+
+    public function provideCustomBanner(): Generator
+    {
+        yield ['Simple banner'];
+
+        yield [<<<'COMMENT'
+This is a
+
+multiline
+
+banner.
+COMMENT
+        ];
+    }
+
+    public function provideUnormalizedCustomBanner(): Generator
+    {
+        yield [
+            ' Simple banner ',
+            'Simple banner'
+        ];
+
+        yield [
+            <<<'COMMENT'
+ This is a 
+ 
+ multiline 
+ 
+ banner. 
+COMMENT
+            ,
+            <<<'COMMENT'
+This is a
+
+multiline
+
+banner.
+COMMENT
+        ];
+    }
+
+    public function test_a_custom_multiline_banner_can_be_registered(): void
     {
         $comment = <<<'COMMENT'
 This is a
@@ -1864,15 +1927,11 @@ COMMENT;
 
         $this->setConfig(['banner' => $comment]);
 
-        $this->assertSame($comment, $this->config->getStubBanner());
+        $this->assertSame($comment, $this->config->getStubBannerContents());
+        $this->assertNull($this->config->getStubBannerPath());
     }
 
-    public function testGetStubBannerFromFile(): void
-    {
-        $this->assertNull($this->config->getStubBannerFromFile());
-    }
-
-    public function testGetStubBannerFromFileSet(): void
+    public function test_a_custom_banner_from_a_file_can_be_registered(): void
     {
         $comment = <<<'COMMENT'
 This is a
@@ -1886,10 +1945,37 @@ COMMENT;
 
         $this->setConfig(['banner-file' => 'banner']);
 
-        $this->assertSame($comment, $this->config->getStubBannerFromFile());
+        $this->assertSame($comment, $this->config->getStubBannerContents());
+        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'banner', $this->config->getStubBannerPath());
     }
 
-    public function testGetStubBannerFromFileReadError(): void
+    public function test_the_content_of_the_custom_banner_file_is_normalized(): void
+    {
+        $comment = <<<'COMMENT'
+ This is a 
+ 
+ multiline 
+ 
+ comment. 
+COMMENT;
+
+        $expected = <<<'COMMENT'
+This is a
+
+multiline
+
+comment.
+COMMENT;
+
+        file_put_contents('banner', $comment);
+
+        $this->setConfig(['banner-file' => 'banner']);
+
+        $this->assertSame($expected, $this->config->getStubBannerContents());
+        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'banner', $this->config->getStubBannerPath());
+    }
+
+    public function test_the_custom_banner_file_must_exists_when_provided(): void
     {
         try {
             $this->setConfig(['banner-file' => '/does/not/exist']);
@@ -1901,23 +1987,6 @@ COMMENT;
                 $exception->getMessage()
             );
         }
-    }
-
-    public function testGetStubBannerPath(): void
-    {
-        $this->assertNull($this->config->getStubBannerPath());
-    }
-
-    public function testGetStubBannerPathSet(): void
-    {
-        touch('path-to-file');
-
-        $this->setConfig(['banner-file' => 'path-to-file']);
-
-        $this->assertSame(
-            'path-to-file',
-            $this->config->getStubBannerPath()
-        );
     }
 
     public function test_by_default_there_is_no_stub_and_the_stub_is_not_generated(): void
@@ -1932,14 +2001,24 @@ COMMENT;
 
         $this->setConfig(['stub' => 'custom-stub.php']);
 
-        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'test.php', $this->config->getStubPath());
+        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'custom-stub.php', $this->config->getStubPath());
+        $this->assertFalse($this->config->isStubGenerated());
     }
 
-    public function testGetStubPathSetBoolean(): void
+    public function test_the_stub_can_be_generated(): void
     {
         $this->setConfig(['stub' => true]);
 
         $this->assertNull($this->config->getStubPath());
+        $this->assertTrue($this->config->isStubGenerated());
+    }
+
+    public function test_the_default_stub_can_be_used(): void
+    {
+        $this->setConfig(['stub' => false]);
+
+        $this->assertNull($this->config->getStubPath());
+        $this->assertFalse($this->config->isStubGenerated());
     }
 
     public function testIsInterceptFileFuncs(): void
@@ -1971,25 +2050,6 @@ COMMENT;
         $this->setConfig(['key-pass' => 'test']);
 
         $this->assertFalse($this->config->isPrivateKeyPrompt());
-    }
-
-    public function testIsStubGenerated(): void
-    {
-        $this->assertFalse($this->config->isStubGenerated());
-    }
-
-    public function testIsStubGeneratedSet(): void
-    {
-        $this->setConfig(['stub' => true]);
-
-        $this->assertTrue($this->config->isStubGenerated());
-    }
-
-    public function testIsStubGeneratedSetString(): void
-    {
-        $this->setConfig(['stub' => 'test.php']);
-
-        $this->assertFalse($this->config->isStubGenerated());
     }
 
     public function testLoadBootstrap(): void

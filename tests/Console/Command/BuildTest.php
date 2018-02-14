@@ -103,6 +103,9 @@ Building the PHAR "/path/to/tmp/test.phar"
 ? Adding files
     > 3 file(s)
 ? Generating new stub
+  - Using custom shebang line: $shebang
+  - Using custom banner:
+    > custom banner
 ? Setting metadata
   - array (
   'rand' => $rand,
@@ -293,6 +296,9 @@ Building the PHAR "/path/to/tmp/test.phar"
 ? Adding files
     > 3 file(s)
 ? Generating new stub
+  - Using custom shebang line: $shebang
+  - Using custom banner:
+    > custom banner
 ? Setting metadata
   - array (
   'rand' => $rand,
@@ -434,6 +440,9 @@ Box (repo)
 ? Adding files
     > 3 file(s)
 ? Generating new stub
+  - Using custom shebang line: $shebang
+  - Using custom banner:
+    > custom banner
 ? Setting metadata
   - array (
   'rand' => $rand,
@@ -466,7 +475,10 @@ OUTPUT;
             json_encode(
                 [
                     'alias' => 'test.phar',
-                    'banner' => 'custom banner',
+                    'banner' => [
+                        'multiline',
+                        'custom banner',
+                    ],
                     'bootstrap' => 'bootstrap.php',
                     'chmod' => '0755',
                     'compactors' => [Php::class],
@@ -527,7 +539,9 @@ Box (repo)
     > 3 file(s)
 ? Generating new stub
   - Using custom shebang line: #!__PHP_EXECUTABLE__
-  - Using custom banner: custom banner
+  - Using custom banner:
+    > multiline
+    > custom banner
 ? Setting metadata
   - array (
   'rand' => $rand,
@@ -704,6 +718,7 @@ if (class_exists('Phar')) {
     Phar::mapPhar('alias-test.phar');
     require 'phar://' . __FILE__ . '/other/run.php';
 }
+
 __HALT_COMPILER(); ?>
 
 PHP
@@ -830,6 +845,7 @@ Box (repo)
 ? Adding files
     > 1 file(s)
 ? Generating new stub
+  - Using default shebang line: #!/usr/bin/env php
 ? No compression
 * Done.
 
@@ -885,6 +901,7 @@ Box (repo)
 ? Adding files
     > 1 file(s)
 ? Generating new stub
+  - Using default shebang line: #!/usr/bin/env php
 ? No compression
 * Done.
 
@@ -939,6 +956,7 @@ Box (repo)
 ? Adding files
     > 1 file(s)
 ? Generating new stub
+  - Using default shebang line: #!/usr/bin/env php
   - Using custom banner from file: /path/to/tmp/banner
 ? No compression
 * Done.
@@ -1089,6 +1107,7 @@ Box (repo)
 ? Adding files
     > 1 file(s)
 ? Generating new stub
+  - Using default shebang line: #!/usr/bin/env php
 ? Compressing with the algorithm "GZ"
 * Done.
 
@@ -1146,6 +1165,7 @@ Box (repo)
 ? Adding files
     > 1 file(s)
 ? Generating new stub
+  - Using default shebang line: #!/usr/bin/env php
 ? No compression
 * Done.
 
