@@ -22,7 +22,6 @@ The Box application simplifies the PHAR building process. Out of the box (no pun
 great things:
 
 - Add, replace, and remove files and stubs in existing PHARs
-- Extract a whole PHAR or cherry pick which files you want
 - Retrieve information about the PHAR extension or a PHAR file
 - List the contents of a PHAR
 - Verify the signature of an existing PHAR
@@ -38,13 +37,18 @@ great things:
     1. [Composer](#composer)
 1. [Creating a PHAR](#creating-a-phar)
 1. [Configuration](doc/configuration.md)
-    1. [Alias](doc/configuration.md#alias-alias)
     1. [Base path](doc/configuration.md#base-path-base-path)
     1. [Including files](doc/configuration.md#including-files)
         1. [Files (`files` and `files-bin`)](doc/configuration.md#files-files-and-files-bin)
         1. [Directories (`directories` and `directories-bin`)](doc/configuration.md#directories-directories-and-directories-bin)
         1. [Finder (`finder` and `finder-bin`)](doc/configuration.md#finder-finder-and-finder-bin)
         1. [Blacklist (`blacklist`)](doc/configuration.md#blacklist-blacklist)
+    1. [Stub](doc/configuration.md#stub)
+        1. [Stub (`stub`)](doc/configuration.md#stub-stub)
+        1. [Alias (`alias`)](doc/configuration.md#alias-alias)
+        1. [Shebang (`shebang`)](doc/configuration.md#shebang-shebang)
+        1. [Banner (`banner`)](doc/configuration.md#banner-banner)
+        1. [Banner file (`banner-file`)](doc/configuration.md#banner-file-banner-file)
 1. [Contributing](#contributing)
 1. [Upgrade](#upgrade)
 1. [Credits](#credits)

@@ -1,12 +1,17 @@
 # Configuration
 
-1. [Alias][alias]
 1. [Base path][base-path]
 1. [Including files][including-files]
     1. [Files (`files` and `files-bin`)][files]
     1. [Directories (`directories` and `directories-bin`)][directories]
     1. [Finder (`finder` and `finder-bin`)][finder]
     1. [Blacklist (`blacklist`)][blacklist]
+1. [Stub][stub]
+    1. [Stub (`stub`)][stub-stub]
+    1. [Alias (`alias`)][alias]
+    1. [Shebang (`shebang`)][shebang]
+    1. [Banner (`banner`)][banner]
+    1. [Banner file (`banner-file`)][banner-file]
 
 
 // TODO: do not mention when an option is optional but add a red asterix with a foot note for the mandatory
@@ -40,7 +45,6 @@ The configuration file is actually a JSON object saved to a file. Note that all 
     "datetime_format": "?",
     "directories": "?",
     "directories-bin": "?",
-    "extract": "?",
     "files": "?",
     "files-bin": "?",
     "finder": "?",
@@ -52,25 +56,142 @@ The configuration file is actually a JSON object saved to a file. Note that all 
     "main": "?",
     "map": "?",
     "metadata": "?",
-    "mimetypes": "?",
-    "mung": "?",
-    "not-found": "?",
     "output": "?",
     "replacements": "?",
-    "shebang": "?",
-    "stub": "?",
-    "web": "?"
+    "shebang": "?"
 }
 ```
 
 
-## Alias (`alias`)
+## Base-path (`base-path`)
 
-The `alias` (`string`) setting is used when generating a new stub to call the [`Phar::mapPhar()`](phar.mapphar) method if the PHAR is for
-the CLI and the method [`Phar::webPhar()`][phar.webphar] if the PHAR is configured for the web. This makes it easier to refer to files in
-the PHAR and ensure the access to internal files will always work regardless of the location of the PHAR on the file system.
+The `base-path` (`string`) setting is used to specify where all of the relative file paths should resolve to. This does
+not, however, alter where the built PHAR will be stored (see: `output`).
 
-If no alias is provided, the value `default.phar` will be used.
+By default, the base path used is the directory containing the configuration file or if not specified the current
+working directory.
+
+TODO: exclude output from the exception
+
+
+## Including files
+
+There is multiple config entries for including files:
+
+### Files (`files` and `files-bin`)
+
+The `files` (`string[]`) setting is a list of files paths relative to [`base-path`][base-path] unless absolute. Each
+file will be processed by the compactors (see: `compactors`), have their placeholder values replaced
+(see: `replacements`) and added to the PHAR.
+
+This setting is not affected by the [`blacklist`][blacklist] setting.
+
+`files-bin` is analogue to `files` except the files are added to the PHAR unmodified. This is suitable for the files
+such as images, those that contain binary data or simply a file you do not want to alter at all despite using
+compactors.
+
+
+### Directories (`directories` and `directories-bin`)
+
+The directories (`string[]`) setting is a list of directory paths relative to [`base-path`][base-path]. All files will
+be processed by the compactors (see: `compactors`), have their placeholder values replaced (see: `replacements`) and
+added to the PHAR.
+
+Files listed in the [`blacklist`][blacklist] will not be added to the PHAR.
+
+`directories-bin` is analogue to `directories` except the files are added to the PHAR unmodified. This is suitable for
+the files such as images, those that contain binary data or simply a file you do not want to alter at all despite using
+compactors.
+
+
+### Finder (`finder` and `finder-bin`)
+
+The finder (`object[]`) setting is a list of JSON objects. Each object (key, value) tuple is a (method, arguments)
+of the [Symfony Finder][symfony-finder] used by Box. If an array of values is provided for a single key, the method will
+be called once per value in the array.
+ 
+Note that the paths specified for the `in` method are relative to [`base-path`][base-path] and that the finder will
+account for the files registered in the [`blacklist`][blacklist].
+
+`finder-bin` is analogue to `finder` except the files are added to the PHAR unmodified. This is suitable for the files
+such as images, those that contain binary data or simply a file you do not want to alter at all despite using
+compactors.
+
+Example:
+
+```json
+{
+    "finder": [
+          {
+              "notName": "/LICENSE|.*\\.md|.*\\.dist|Makefile|composer\\.json|composer\\.lock/",
+              "exclude": [
+                  "doc",
+                  "test",
+                  "test_old",
+                  "tests",
+                  "Tests",
+                  "vendor-bin"
+              ],
+              "in": "vendor"
+          },
+          {
+              "name": "composer.json",
+              "in": "."
+          }
+    ]
+}
+```
+
+
+### Blacklist (`blacklist`)
+
+The `blacklist` (`string[]`) setting is a list of files that must not be added. The files blacklisted are the ones found
+using the other available configuration settings: [`files`][files], [`files-bin`][files], [`directories`][directories],
+[`directories-bin`][directories], [`finder`][finder], [`finder-bin`][finder].
+
+
+## Stub
+
+The [PHAR stub][phar.fileformat.stub] file is the PHAR bootstrapping file, i.e. the very first file executed whenever
+the PHAR is executed. It usually contains things like the PHAR configuration and executing the main script file.
+
+The default PHAR stub file can be used but Box also propose a couple of options to customize the stub used. 
+
+
+### Stub (`stub`)
+
+The stub (`string`, `boolean`) setting is used to specify the location of a stub file, or if one should be generated. If
+a path is provided, the stub file will be used as is inside the PHAR. If `true` is provided, a new stub will be
+generated. If `false` (or nothing) is provided, the default stub used by the PHAR class will be used.
+
+If a custom stub file is provided, none of the other options are used.
+
+
+### Shebang (`shebang`)
+
+The shebang (`string`) setting is used to specify the shebang line used when generating a new stub. By default, this
+line is used:
+
+```
+#!/usr/bin/env php
+```
+
+The shebang line can be removed altogether if null.
+
+
+### Intercept (`intercept`)
+
+The intercept (`boolean`) setting is used when generating a new stub. If setting is set to `true`, the 
+[Phar::interceptFileFuncs()][phar.interceptfilefuncs] method will be called in the stub.
+
+
+### Alias (`alias`)
+
+The `alias` (`string`) setting is used when generating a new stub to call the [`Phar::mapPhar()`](phar.mapphar). This
+makes it easier to refer to files in the PHAR and ensure the access to internal files will always work regardless of the
+location of the PHAR on the file system.
+
+No alias is configured by default.
 
 Example:
 
@@ -146,104 +267,59 @@ PHAR is loaded which loads the alias `box-alias.phar`. When creating the second 
 to that new PHAR but as the alias is already used, an error will be thrown.
 
 
-## Base-path (`base-path`)
+### Banner (`banner`)
 
-The `base-path` (`string`) setting is used to specify where all of the relative file paths should resolve to. This does
-not, however, alter where the built PHAR will be stored (see: `output`).
+The banner (`string` or `string[]`) setting is the banner comment that will be used when a new stub is generated. The
+value of this setting must not already be enclosed within a comment block as it will be automatically done for you.
 
-By default, the base path used is the directory containing the configuration file or if not specified the current
-working directory.
+For example `Custom banner` will result in the stub file:
 
-TODO: exclude output from the exception
+```
+/*
+ * Custom banner
+ */
+```
 
-
-## Including files
-
-There is multiple config entries for including files:
-
-### Files (`files` and `files-bin`)
-
-The `files` (`string[]`) setting is a list of files paths relative to [`base-path`][base-path] unless absolute. Each
-file will be processed by the compactors (see: `compactors`), have their placeholder values replaced
-(see: `replacements`) and added to the PHAR.
-
-This setting is not affected by the [`blacklist`][blacklist] setting.
-
-`files-bin` is analogue to `files` except the files are added to the PHAR unmodified. This is suitable for the files
-such as images, those that contain binary data or simply a file you do not want to alter at all despite using
-compactors.
-
-
-### Directories (`directories` and `directories-bin`)
-
-The directories (`string[]`) setting is a list of directory paths relative to [`base-path`][base-path]. All files will
-be processed by the compactors (see: `compactors`), have their placeholder values replaced (see: `replacements`) and
-added to the PHAR.
-
-Files listed in the [`blacklist`][blacklist] will not be added to the PHAR.
-
-`directories-bin` is analogue to `directories` except the files are added to the PHAR unmodified. This is suitable for
-the files such as images, those that contain binary data or simply a file you do not want to alter at all despite using
-compactors.
-
-
-### Finder (`finder` and `finder-bin`)
-
-The finder (`object[]`) setting is a list of JSON objects. Each object (key, value) tuple is a (method, arguments)
-of the [Symfony Finder][symfony-finder] used by Box. If an array of values is provided for a single key, the method will
-be called once per value in the array.
- 
-Note that the paths specified for the `in` method are relative to [`base-path`][base-path] and that the finder will
-account for the files registered in the [`blacklist`][blacklist].
-
-`finder-bin` is analogue to `finder` except the files are added to the PHAR unmodified. This is suitable for the files
-such as images, those that contain binary data or simply a file you do not want to alter at all despite using
-compactors.
-
-Example:
+An array of strings can be used for multilines banner:
 
 ```json
 {
-  "finder": [
-        {
-            "notName": "/LICENSE|.*\\.md|.*\\.dist|Makefile|composer\\.json|composer\\.lock/",
-            "exclude": [
-                "doc",
-                "test",
-                "test_old",
-                "tests",
-                "Tests",
-                "vendor-bin"
-            ],
-            "in": "vendor"
-        },
-        {
-            "name": "composer.json",
-            "in": "."
-        }
+    "banner": [
+          "This file is part of the box project.",
+          "",
+          "(c) Kevin Herrera <kevin@herrera.io>",
+          "Théo Fidry <theo.fidry@gmail.com>",
+          "",
+          "This source file is subject to the MIT license that is bundled",
+          "with this source code in the file LICENSE."
     ]
 }
 ```
 
+Will result in:
 
-### Blacklist (`blacklist`)
+```php
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+```
 
-The `blacklist` (`string[]`) setting is a list of files that must not be added. The files blacklisted are the ones found
-using the other available configuration settings: [`files`][files], [`files-bin`][files], [`directories`][directories],
-[`directories-bin`][directories], [`finder`][finder], [`finder-bin`][finder].
 
+### Banner file (`banner-file`)
 
+The banner-file (`string`) setting is like banner, except it is a path (relative to [the base path][base-path]) to the
+file that will contain the comment.
 
-TODO: double check all the links
-TODO: for the Finder:
-    - add tests regarding the note about (key, arguments)
-    - paths should be relative not only for `in` but the others as well, double check that
-
-
+Like banner, the comment must not already be enclosed in a comment block.
 
 <br />
 <hr />
-
 
 « [Creating a PHAR](../README.md#creating-a-phar) • [Table of Contents](../README.md#table-of-contents) »
 
@@ -255,11 +331,22 @@ TODO: for the Finder:
 [directories]: #directories-directories-and-directories-bin
 [finder]: #finder-finder-and-finder-bin
 [blacklist]: #blacklist-blacklist
+[stub]: #stub
+[stub-stub]: #stub-stub
+[shebang]: #shebang-shebang
+[banner]: #banner-banner
+[banner-file]: #banner-file-banner-file
 [phar.mapphar]: https://secure.php.net/manual/en/phar.mapphar.php
 [phar.setalias]: https://secure.php.net/manual/en/phar.setalias.php
 [phar.webphar]: https://secure.php.net/manual/en/phar.webphar.php
+[phar.fileformat.stub]: https://secure.php.net/manual/en/phar.fileformat.stub.php
+[phar.interceptfilefuncs]: https://secure.php.net/manual/en/phar.interceptfilefuncs.php
 [symfony-finder]: https://symfony.com/doc/current//components/finder.html
 
+TODO: double check all the links
+TODO: for the Finder:
+    - add tests regarding the note about (key, arguments)
+    - paths should be relative not only for `in` but the others as well, double check that
 
 //TODO: rework the rest
 
@@ -301,17 +388,6 @@ You may want to see this website for a list of annotations which are commonly
 ignored:
 
 https://github.com/herrera-io/php-annotations
-
-
-The banner (string) setting is the banner comment that will be used when a new
-stub is generated. The value of this setting must not already be enclosed
-within a comment block, as it will be automatically done for you.
-
-The banner-file (string) setting is like banner, except it is a path to the
-file that will contain the comment. Like banner, the comment must not already
-be enclosed in a comment block.
-
-
 
 
 
@@ -366,10 +442,6 @@ of the signature algorithms listed on the help page:
 
 
 
-The extract (boolean) setting determines whether or not the generated stub
-should include a class to extract the PHAR. This class would be used if the
-PHAR is not available. (Increases stub file size.)
-
 The datetime (string) setting is the name of a placeholder value that will be
 replaced in all non-binary files by the current datetime.
 
@@ -408,13 +480,7 @@ be replaced in all non-binary files by the one of the following (in order):
 
 The short commit hash will only be used if no tag is available.
 
-The intercept (boolean) setting is used when generating a new stub. If setting
-is set to true, the Phar::interceptFileFuncs(); method will be called in the
-stub.
 
-For more information:
-
-https://secure.php.net/manual/en/phar.interceptfilefuncs.php
 
 
 The key (string) setting is used to specify the path to the private key file.
@@ -467,20 +533,6 @@ earlier key).
 The metadata (any) setting can be any value. This value will be stored as
 metadata that can be retrieved from the built PHAR (Phar::getMetadata()).
 
-The mimetypes (object) setting is used when generating a new stub. It is a map
-of file extensions and their mimetypes. To see a list of the default mapping,
-please visit:
-
-http://www.php.net/manual/en/phar.webphar.php
-
-The mung (array) setting is used when generating a new stub. It is a list of
-server variables to modify for the PHAR. This setting is only useful when the
-web setting is enabled.
-
-The not-found (string) setting is used when generating a new stub. It
-specifies the file that will be used when a file is not found inside the PHAR.
-This setting is only useful when web setting is enabled.
-
 The output (string) setting specifies the file name and path of the newly
 built PHAR. If the value of the setting is not an absolute path, the path will
 be relative to the current working directory.
@@ -489,19 +541,6 @@ The replacements (object) setting is a map of placeholders and their values.
 The placeholders are replaced in all non-binary files with the specified
 values.
 
-The shebang (string) setting is used to specify the shebang line used when
-generating a new stub. By default, this line is used:
 
-#!/usr/bin/env php
 
-The shebang line can be removed altogether if false or an empty string is
-provided.
 
-The stub (string, boolean) setting is used to specify the location of a stub
-file, or if one should be generated. If a path is provided, the stub file will
-be used as is inside the PHAR. If true is provided, a new stub will be
-generated. If false (or nothing) is provided, the default stub used by the
-PHAR class will be used.
-
-The web (boolean) setting is used when generating a new stub. If true is
-provided, Phar::webPhar() will be called in the stub.

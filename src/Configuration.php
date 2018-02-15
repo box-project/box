@@ -14,12 +14,17 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use function array_map;
 use Assert\Assertion;
 use Closure;
 use DateTimeImmutable;
+use function explode;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\Php as LegacyPhp;
+use function implode;
 use InvalidArgumentException;
+use function is_array;
+use function is_string;
 use KevinGH\Box\Compactor\Php;
 use Phar;
 use RuntimeException;
@@ -52,9 +57,6 @@ final class Configuration
     private $map;
     private $fileMapper;
     private $metadata;
-    private $mimetypeMapping;
-    private $mungVariables;
-    private $notFoundScriptPath;
     private $outputPath;
     private $privateKeyPassphrase;
     private $privateKeyPath;
@@ -62,17 +64,14 @@ final class Configuration
     private $processedReplacements;
     private $shebang;
     private $signingAlgorithm;
-    private $stubBanner;
+    private $stubBannerContents;
     private $stubBannerPath;
-    private $stubBannerFromFile;
     private $stubPath;
-    private $isExtractable;
     private $isInterceptFileFuncs;
     private $isStubGenerated;
-    private $isWebPhar;
 
     /**
-     * @param string                   $alias
+     * @param string|null                   $alias
      * @param RetrieveRelativeBasePath $basePathRetriever     Utility to private the base path used and be able to retrieve a path relative to it (the base path)
      * @param SplFileInfo[]            $files                 List of files
      * @param SplFileInfo[]            $binaryFiles           List of binary files
@@ -84,9 +83,6 @@ final class Configuration
      * @param null|string              $mainScriptContent     The processed content of the main script file
      * @param MapFile                  $fileMapper            Utility to map the files from outside and inside the PHAR
      * @param mixed                    $metadata              The PHAR Metadata
-     * @param array                    $mimetypeMapping       The file extension MIME type mapping
-     * @param array                    $mungVariables         The list of server variables to modify for execution
-     * @param null|string              $notFoundScriptPath    The file path to the script to execute when a file is not found
      * @param string                   $outputPath
      * @param null|string              $privateKeyPassphrase
      * @param null|string              $privateKeyPath
@@ -94,17 +90,14 @@ final class Configuration
      * @param array                    $processedReplacements The processed list of replacement placeholders and their values
      * @param null|string              $shebang               The shebang line
      * @param int                      $signingAlgorithm      The PHAR siging algorithm. See \Phar constants
-     * @param null|string              $stubBanner            The stub banner comment
+     * @param string|null              $stubBannerContents            The stub banner comment
      * @param null|string              $stubBannerPath        The path to the stub banner comment file
-     * @param null|string              $stubBannerFromFile    The stub banner comment from the fine
      * @param null|string              $stubPath              The PHAR stub file path
-     * @param bool                     $isExtractable         Wether or not StubGenerator::extract() should be used
      * @param bool                     $isInterceptFileFuncs  wether or not Phar::interceptFileFuncs() should be used
      * @param bool                     $isStubGenerated       Wether or not if the PHAR stub should be generated
-     * @param bool                     $isWebPhar             Wether or not the PHAR is going to be used for the web
      */
     private function __construct(
-        string $alias,
+        ?string $alias,
         RetrieveRelativeBasePath $basePathRetriever,
         array $files,
         array $binaryFiles,
@@ -116,9 +109,6 @@ final class Configuration
         ?string $mainScriptContent,
         MapFile $fileMapper,
         $metadata,
-        array $mimetypeMapping,
-        array $mungVariables,
-        ?string $notFoundScriptPath,
         string $outputPath,
         ?string $privateKeyPassphrase,
         ?string $privateKeyPath,
@@ -126,14 +116,11 @@ final class Configuration
         array $processedReplacements,
         ?string $shebang,
         int $signingAlgorithm,
-        ?string $stubBanner,
+        ?string $stubBannerContents,
         ?string $stubBannerPath,
-        ?string $stubBannerFromFile,
         ?string $stubPath,
-        bool $isExtractable,
         bool $isInterceptFileFuncs,
-        bool $isStubGenerated,
-        bool $isWebPhar
+        bool $isStubGenerated
     ) {
         Assertion::nullOrInArray(
             $compressionAlgorithm,
@@ -156,9 +143,6 @@ final class Configuration
         $this->mainScriptContent = $mainScriptContent;
         $this->fileMapper = $fileMapper;
         $this->metadata = $metadata;
-        $this->mimetypeMapping = $mimetypeMapping;
-        $this->mungVariables = $mungVariables;
-        $this->notFoundScriptPath = $notFoundScriptPath;
         $this->outputPath = $outputPath;
         $this->privateKeyPassphrase = $privateKeyPassphrase;
         $this->privateKeyPath = $privateKeyPath;
@@ -166,14 +150,11 @@ final class Configuration
         $this->processedReplacements = $processedReplacements;
         $this->shebang = $shebang;
         $this->signingAlgorithm = $signingAlgorithm;
-        $this->stubBanner = $stubBanner;
+        $this->stubBannerContents = $stubBannerContents;
         $this->stubBannerPath = $stubBannerPath;
-        $this->stubBannerFromFile = $stubBannerFromFile;
         $this->stubPath = $stubPath;
-        $this->isExtractable = $isExtractable;
         $this->isInterceptFileFuncs = $isInterceptFileFuncs;
         $this->isStubGenerated = $isStubGenerated;
-        $this->isWebPhar = $isWebPhar;
     }
 
     public static function create(string $file, stdClass $raw): self
@@ -212,9 +193,6 @@ final class Configuration
 
         $metadata = self::retrieveMetadata($raw);
 
-        $mimeTypeMapping = self::retrieveMimetypeMapping($raw);
-        $mungVariables = self::retrieveMungVariables($raw);
-        $notFoundScriptPath = self::retrieveNotFoundScriptPath($raw);
         $outputPath = self::retrieveOutputPath($raw, $file);
 
         $privateKeyPassphrase = self::retrievePrivateKeyPassphrase($raw);
@@ -228,16 +206,19 @@ final class Configuration
 
         $signingAlgorithm = self::retrieveSigningAlgorithm($raw);
 
-        $stubBanner = self::retrieveStubBanner($raw);
-        $stubBannerPath = self::retrieveStubBannerPath($raw);
-        $stubBannerFromFile = self::retrieveStubBannerFromFile($basePath, $stubBannerPath);
+        $stubBannerContents = self::retrieveStubBannerContents($raw);
+        $stubBannerPath = self::retrieveStubBannerPath($raw, $basePath);
 
-        $stubPath = self::retrieveStubPath($raw);
+        if (null !== $stubBannerPath) {
+            $stubBannerContents = file_contents($stubBannerPath);
+        }
 
-        $isExtractable = self::retrieveIsExtractable($raw);
+        $stubBannerContents = self::normalizeStubBannerContents($stubBannerContents);
+
+        $stubPath = self::retrieveStubPath($raw, $basePath);
+
         $isInterceptFileFuncs = self::retrieveIsInterceptFileFuncs($raw);
         $isStubGenerated = self::retrieveIsStubGenerated($raw);
-        $isWebPhar = self::retrieveIsWebPhar($raw);
 
         return new self(
             $alias,
@@ -252,9 +233,6 @@ final class Configuration
             $mainScriptContent,
             $fileMapper,
             $metadata,
-            $mimeTypeMapping,
-            $mungVariables,
-            $notFoundScriptPath,
             $outputPath,
             $privateKeyPassphrase,
             $privateKeyPath,
@@ -262,14 +240,11 @@ final class Configuration
             $processedReplacements,
             $shebang,
             $signingAlgorithm,
-            $stubBanner,
+            $stubBannerContents,
             $stubBannerPath,
-            $stubBannerFromFile,
             $stubPath,
-            $isExtractable,
             $isInterceptFileFuncs,
-            $isStubGenerated,
-            $isWebPhar
+            $isStubGenerated
         );
     }
 
@@ -278,7 +253,7 @@ final class Configuration
         return $this->basePathRetriever;
     }
 
-    public function getAlias(): string
+    public function getAlias(): ?string
     {
         return $this->alias;
     }
@@ -346,21 +321,6 @@ final class Configuration
         return $this->mainScriptContent;
     }
 
-    public function getMimetypeMapping(): array
-    {
-        return $this->mimetypeMapping;
-    }
-
-    public function getMungVariables(): array
-    {
-        return $this->mungVariables;
-    }
-
-    public function getNotFoundScriptPath(): ?string
-    {
-        return $this->notFoundScriptPath;
-    }
-
     public function getOutputPath(): string
     {
         return $this->outputPath;
@@ -417,9 +377,9 @@ final class Configuration
         return $this->signingAlgorithm;
     }
 
-    public function getStubBanner(): ?string
+    public function getStubBannerContents(): ?string
     {
-        return $this->stubBanner;
+        return $this->stubBannerContents;
     }
 
     public function getStubBannerPath(): ?string
@@ -427,19 +387,9 @@ final class Configuration
         return $this->stubBannerPath;
     }
 
-    public function getStubBannerFromFile()
-    {
-        return $this->stubBannerFromFile;
-    }
-
     public function getStubPath(): ?string
     {
         return $this->stubPath;
-    }
-
-    public function isExtractable(): bool
-    {
-        return $this->isExtractable;
     }
 
     public function isInterceptFileFuncs(): bool
@@ -452,18 +402,15 @@ final class Configuration
         return $this->isStubGenerated;
     }
 
-    public function isWebPhar(): bool
+    private static function retrieveAlias(stdClass $raw): ?string
     {
-        return $this->isWebPhar;
-    }
+        if (false === isset($raw->alias)) {
+            return null;
+        }
 
-    private static function retrieveAlias(stdClass $raw): string
-    {
-        $alias = $raw->alias ?? self::DEFAULT_ALIAS;
+        $alias = trim($raw->alias);
 
-        $alias = trim($alias);
-
-        Assertion::notEmpty($alias, 'A PHAR alias cannot be empty.');
+        Assertion::notEmpty($alias, 'A PHAR alias cannot be empty when provided.');
 
         return $alias;
     }
@@ -596,7 +543,7 @@ final class Configuration
     }
 
     /**
-     * @param array   $findersConfig   the configuration
+     * @param array   $findersConfig
      * @param string  $basePath
      * @param Closure $blacklistFilter
      *
@@ -612,8 +559,8 @@ final class Configuration
     }
 
     /**
-     * @param array   $findersConfig   the configuration
-     * @param string  $basePath
+     * @param stdClass $config
+     * @param string $basePath
      * @param Closure $blacklistFilter
      *
      * @return Finder
@@ -934,38 +881,6 @@ final class Configuration
         return null;
     }
 
-    private static function retrieveMimetypeMapping(stdClass $raw): array
-    {
-        // TODO: this parameter is not clear to me: review usage, doc & checks
-        if (isset($raw->mimetypes)) {
-            return (array) $raw->mimetypes;
-        }
-
-        return [];
-    }
-
-    private static function retrieveMungVariables(stdClass $raw): array
-    {
-        // TODO: this parameter is not clear to me: review usage, doc & checks
-        // TODO: add error/warning if used when web is not enabled
-        if (isset($raw->mung)) {
-            return (array) $raw->mung;
-        }
-
-        return [];
-    }
-
-    private static function retrieveNotFoundScriptPath(stdClass $raw): ?string
-    {
-        // TODO: this parameter is not clear to me: review usage, doc & checks
-        // TODO: add error/warning if used when web is not enabled
-        if (isset($raw->{'not-found'})) {
-            return $raw->{'not-found'};
-        }
-
-        return null;
-    }
-
     private static function retrieveOutputPath(stdClass $raw, string $file): string
     {
         // TODO: make this path relative to the base path like everything else
@@ -1207,26 +1122,20 @@ final class Configuration
 
     private static function retrieveShebang(stdClass $raw): ?string
     {
-        // TODO: unlike the doc says do not allow empty strings.
-        // Leverage `Assertion` here?
         if (false === isset($raw->shebang)) {
             return null;
         }
 
-        if (('' === $raw->shebang) || (false === $raw->shebang)) {
-            return '';
-        }
-
         $shebang = trim($raw->shebang);
 
-        if ('#!' !== substr($shebang, 0, 2)) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The shebang line must start with "#!": %s',
-                    $shebang
-                )
-            );
-        }
+        Assertion::notEmpty($shebang, 'The shebang should not be empty.');
+        Assertion::true(
+            '#!' === substr($shebang, 0, 2),
+            sprintf(
+                'The shebang line must start with "#!". Got "%s" instead',
+                $shebang
+            )
+        );
 
         return $shebang;
     }
@@ -1256,61 +1165,57 @@ final class Configuration
         return $raw->algorithm;
     }
 
-    private static function retrieveStubBanner(stdClass $raw): ?string
+    private static function retrieveStubBannerContents(stdClass $raw): ?string
     {
-        if (isset($raw->{'banner'})) {
-            return $raw->{'banner'};
-        }
-
-        return null;
-    }
-
-    private static function retrieveStubBannerPath(stdClass $raw): ?string
-    {
-        // TODO: if provided check its existence here or should it be defered to later?
-        // Works case this check can be duplicated...
-        //
-        // Check if is relative to base path: if not make it so (may be a BC break to document).
-        // Once checked, a mention in the doc that this path is relative to base-path (unless
-        // absolute).
-        // Check that the path is not provided if a banner is already provided.
-        if (isset($raw->{'banner-file'})) {
-            return canonicalize($raw->{'banner-file'});
-        }
-
-        return null;
-    }
-
-    private static function retrieveStubBannerFromFile(string $basePath, ?string $stubBannerPath): ?string
-    {
-        // TODO: Add checks
-        // TODO: The documentation is not clear enough IMO
-        if (null == $stubBannerPath) {
+        if (false === isset($raw->banner)) {
             return null;
         }
 
-        $stubBannerPath = make_path_absolute($stubBannerPath, $basePath);
+        $banner = $raw->banner;
 
-        return file_contents($stubBannerPath);
+        if (is_array($banner)) {
+            $banner = implode("\n", $banner);
+        }
+
+        return $banner;
     }
 
-    private static function retrieveStubPath(stdClass $raw): ?string
+    private static function retrieveStubBannerPath(stdClass $raw, string $basePath): ?string
+    {
+        if (false === isset($raw->{'banner-file'})) {
+            return null;
+        }
+
+        $bannerFile = make_path_absolute($raw->{'banner-file'}, $basePath);
+
+        Assertion::file($bannerFile);
+
+        return $bannerFile;
+    }
+
+    private static function normalizeStubBannerContents(?string $contents): ?string
+    {
+        if (null === $contents) {
+            return null;
+        }
+
+        $banner = explode("\n", $contents);
+        $banner = array_map('trim', $banner);
+
+        return implode("\n", $banner);
+    }
+
+    private static function retrieveStubPath(stdClass $raw, string $basePath): ?string
     {
         if (isset($raw->stub) && is_string($raw->stub)) {
-            return $raw->stub;
+            $stubPath = make_path_absolute($raw->stub, $basePath);
+
+            Assertion::file($stubPath);
+
+            return $stubPath;
         }
 
         return null;
-    }
-
-    private static function retrieveIsExtractable(stdClass $raw): bool
-    {
-        // TODO: look it up, really not clear to me neither is the doc
-        if (isset($raw->extract)) {
-            return $raw->extract;
-        }
-
-        return false;
     }
 
     private static function retrieveIsInterceptFileFuncs(stdClass $raw): bool
@@ -1336,17 +1241,6 @@ final class Configuration
     {
         if (isset($raw->stub) && (true === $raw->stub)) {
             return true;
-        }
-
-        return false;
-    }
-
-    private static function retrieveIsWebPhar(stdClass $raw): bool
-    {
-        // TODO: doc is not clear enough
-        // Also check if is compatible web + CLI
-        if (isset($raw->web)) {
-            return $raw->web;
         }
 
         return false;

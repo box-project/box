@@ -6,7 +6,10 @@ Migration path from [`kherge/box`][box2] to `humbug/box ^3.0`.
 ### Backward-compatibility (BC) breaks
 
 - The option `configuration|c` of the command `build` has been changed for `config|c`
-
+- Remove support for PHAR used for web purposes, which translates to the removal of the following elements of the
+  `box.json.dist` configuration: `mimetypes`, `mung`, `not-found` and `web`.
+- The entry `shebang` in `box.json.dist` no longer accept a boolean value or an empty string. To remove the shebang line
+  the value `null` should be provided.
 
 <br />
 <hr />

@@ -26,7 +26,7 @@
         },
         "banner": {
             "description": "The header comment for the generated stub.",
-            "type": "string"
+            "type": ["array", "string"]
         },
         "banner-file": {
             "description": "The header comment file for the generated stub.",
@@ -83,10 +83,6 @@
                 "type": "string"
             },
             "type": ["array"]
-        },
-        "extract": {
-            "description": "The flag to embed an extraction class into the stub.",
-            "type": "boolean"
         },
         "files": {
             "description": "A list of file paths to include.",
@@ -162,18 +158,6 @@
         "metadata": {
             "description": "Extra PHAR metadata."
         },
-        "mimetypes": {
-            "description": "The mapping from file extension to MIME type.",
-            "type": "object"
-        },
-        "mung": {
-            "description": "The list of server variables to modify for execution.",
-            "type": "array"
-        },
-        "not-found": {
-            "description": "The file path to the script to execute when a file is not found.",
-            "type": "string"
-        },
         "output": {
             "description": "The file name or path of the new PHAR.",
             "type": "string"
@@ -188,15 +172,11 @@
         },
         "shebang": {
             "description": "The shebang line to use for the generated stub.",
-            "type": ["boolean", "string"]
+            "type": ["string"]
         },
         "stub": {
             "description": "The relative file path to the stub file, or the flag to use the default stub.",
             "type": ["boolean", "string"]
-        },
-        "web": {
-            "description": "Is the Phar going to be used for the web?",
-            "type": "boolean"
         }
     }
 }

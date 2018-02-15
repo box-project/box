@@ -103,6 +103,9 @@ Building the PHAR "/path/to/tmp/test.phar"
 ? Adding files
     > 3 file(s)
 ? Generating new stub
+  - Using custom shebang line: $shebang
+  - Using custom banner:
+    > custom banner
 ? Setting metadata
   - array (
   'rand' => $rand,
@@ -136,13 +139,14 @@ OUTPUT;
         $expectedStub = <<<PHP
 $shebang
 <?php
-/**
+
+/*
  * custom banner
  */
-if (class_exists('Phar')) {
+
 Phar::mapPhar('alias-test.phar');
 require 'phar://' . __FILE__ . '/run.php';
-}
+
 __HALT_COMPILER(); ?>
 
 PHP;
@@ -292,6 +296,9 @@ Building the PHAR "/path/to/tmp/test.phar"
 ? Adding files
     > 3 file(s)
 ? Generating new stub
+  - Using custom shebang line: $shebang
+  - Using custom banner:
+    > custom banner
 ? Setting metadata
   - array (
   'rand' => $rand,
@@ -325,13 +332,14 @@ OUTPUT;
         $expectedStub = <<<PHP
 $shebang
 <?php
-/**
+
+/*
  * custom banner
  */
-if (class_exists('Phar')) {
+
 Phar::mapPhar('alias-test.phar');
 require 'phar://' . __FILE__ . '/other/run.php';
-}
+
 __HALT_COMPILER(); ?>
 
 PHP;
@@ -432,6 +440,9 @@ Box (repo)
 ? Adding files
     > 3 file(s)
 ? Generating new stub
+  - Using custom shebang line: $shebang
+  - Using custom banner:
+    > custom banner
 ? Setting metadata
   - array (
   'rand' => $rand,
@@ -464,7 +475,10 @@ OUTPUT;
             json_encode(
                 [
                     'alias' => 'test.phar',
-                    'banner' => 'custom banner',
+                    'banner' => [
+                        'multiline',
+                        'custom banner',
+                    ],
                     'bootstrap' => 'bootstrap.php',
                     'chmod' => '0755',
                     'compactors' => [Php::class],
@@ -525,7 +539,9 @@ Box (repo)
     > 3 file(s)
 ? Generating new stub
   - Using custom shebang line: #!__PHP_EXECUTABLE__
-  - Using custom banner: custom banner
+  - Using custom banner:
+    > multiline
+    > custom banner
 ? Setting metadata
   - array (
   'rand' => $rand,
@@ -702,6 +718,7 @@ if (class_exists('Phar')) {
     Phar::mapPhar('alias-test.phar');
     require 'phar://' . __FILE__ . '/other/run.php';
 }
+
 __HALT_COMPILER(); ?>
 
 PHP
@@ -828,6 +845,7 @@ Box (repo)
 ? Adding files
     > 1 file(s)
 ? Generating new stub
+  - Using default shebang line: #!/usr/bin/env php
 ? No compression
 * Done.
 
@@ -883,6 +901,7 @@ Box (repo)
 ? Adding files
     > 1 file(s)
 ? Generating new stub
+  - Using default shebang line: #!/usr/bin/env php
 ? No compression
 * Done.
 
@@ -937,6 +956,7 @@ Box (repo)
 ? Adding files
     > 1 file(s)
 ? Generating new stub
+  - Using default shebang line: #!/usr/bin/env php
   - Using custom banner from file: /path/to/tmp/banner
 ? No compression
 * Done.
@@ -1087,6 +1107,7 @@ Box (repo)
 ? Adding files
     > 1 file(s)
 ? Generating new stub
+  - Using default shebang line: #!/usr/bin/env php
 ? Compressing with the algorithm "GZ"
 * Done.
 
@@ -1144,6 +1165,7 @@ Box (repo)
 ? Adding files
     > 1 file(s)
 ? Generating new stub
+  - Using default shebang line: #!/usr/bin/env php
 ? No compression
 * Done.
 
@@ -1167,7 +1189,7 @@ OUTPUT;
     /**
      * @dataProvider provideAliasConfig
      */
-    public function test_it_configures_the_PHAR_alias(bool $stub, bool $web): void
+    public function test_it_configures_the_PHAR_alias(bool $stub): void
     {
         mirror(self::FIXTURES_DIR.'/dir008', $this->tmp);
 
@@ -1178,7 +1200,6 @@ OUTPUT;
                     'alias' => $alias = 'alias-test.phar',
                     'main' => 'index.php',
                     'stub' => $stub,
-                    'web' => $web,
                 ]
             )
         );
@@ -1211,54 +1232,28 @@ OUTPUT;
         $actualStub = $this->normalizeStub($phar->getStub());
         $defaultStub = $this->normalizeStub(file_get_contents(self::FIXTURES_DIR.'/../default_stub.php'));
 
-        if ($web) {
-            if ($stub) {
-                $this->assertSame($phar->getPath(), $phar->getAlias());
+        if ($stub) {
+            $this->assertSame($phar->getPath(), $phar->getAlias());
 
-                $this->assertRegExp(
-                    '/Phar::webPhar\(\'alias-test\.phar\', "index\.php"\);/',
-                    $actualStub
-                );
-                $this->assertNotRegExp(
-                    '/Phar::mapPhar\(.*\);/',
-                    $actualStub
-                );
-            } else {
-                $this->assertSame($alias, $phar->getAlias());
-
-                $this->assertSame($defaultStub, $actualStub);
-
-                // No alias is found: I find it weird but well, that's the default stub so there is not much that can
-                // be done here. Maybe there is a valid reason I'm not aware of.
-                $this->assertNotRegExp(
-                    '/alias-test\.phar/',
-                    $actualStub
-                );
-            }
+            $this->assertNotRegExp(
+                '/Phar::webPhar\(.*\);/',
+                $actualStub
+            );
+            $this->assertRegExp(
+                '/Phar::mapPhar\(\'alias-test\.phar\'\);/',
+                $actualStub
+            );
         } else {
-            if ($stub) {
-                $this->assertSame($phar->getPath(), $phar->getAlias());
+            $this->assertSame($alias, $phar->getAlias());
 
-                $this->assertNotRegExp(
-                    '/Phar::webPhar\(.*\);/',
-                    $actualStub
-                );
-                $this->assertRegExp(
-                    '/Phar::mapPhar\(\'alias-test\.phar\'\);/',
-                    $actualStub
-                );
-            } else {
-                $this->assertSame($alias, $phar->getAlias());
+            $this->assertSame($defaultStub, $actualStub);
 
-                $this->assertSame($defaultStub, $actualStub);
-
-                // No alias is found: I find it weird but well, that's the default stub so there is not much that can
-                // be done here. Maybe there is a valid reason I'm not aware of.
-                $this->assertNotRegExp(
-                    '/alias-test\.phar/',
-                    $actualStub
-                );
-            }
+            // No alias is found: I find it weird but well, that's the default stub so there is not much that can
+            // be done here. Maybe there is a valid reason I'm not aware of.
+            $this->assertNotRegExp(
+                '/alias-test\.phar/',
+                $actualStub
+            );
         }
 
         $expectedFiles = [
@@ -1272,13 +1267,8 @@ OUTPUT;
 
     public function provideAliasConfig(): Generator
     {
-        $values = [true, false];
-
-        foreach ($values as $value0) {
-            foreach ($values as $value1) {
-                yield [$value0, $value1];
-            }
-        }
+        yield [true];
+        yield [false];
     }
 
     /**
