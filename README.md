@@ -63,12 +63,12 @@ be downloaded from the most recent [Github Release][releases]. Subsequent update
 can be downloaded by running:
 
 ```bash
-php-scoper.phar self-update
+box.phar self-update
 ```
 
 As the PHAR is signed, you should also download the matching
 `box.phar.pubkey` to the same location. If you rename `box.phar`
-to `box`, you should also rename `box.pubkey` to `box.pubkey`.
+to `box`, you should also rename `box.phar.pubkey` to `box.pubkey`.
 
 
 ### Composer
