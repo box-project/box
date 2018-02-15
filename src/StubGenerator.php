@@ -166,27 +166,10 @@ BANNER;
         return null !== $this->alias ? 'Phar::mapPhar('.$this->arg($this->alias).');' : null;
     }
 
-    /**
-     * @return string the processed banner
-     */
     private function generateBannerStmt(): string
     {
-        // TODO: review how the banner is processed. Right now the doc says it can be a string
-        // already enclosed in comments and if not it will be enclosed automatically.
-        //
-        // What needs to be done here?
-        // - Test with a simple one liner banner
-        // - Test with a banner enclosed in comments
-        // - Test with a banner enclosed in phpdoc
-        //
-        // Then comes the question of multiline banners: I guess it works if contains `\n`?
-        // Need tests for that anyway.
-        //
-        // Maybe a more user-friendly way to deal with multi-line banners would be to allow
-        // an array of strings instead of just a string.
-        //
-
         $banner = "/*\n * ";
+
         $banner .= str_replace(
             " \n",
             "\n",
@@ -198,9 +181,6 @@ BANNER;
         return $banner."\n";
     }
 
-    /**
-     * @return string[] The sections of the stub that use the PHAR class
-     */
     private function generatePharConfigStmt(): ?string
     {
         $stub = [];
@@ -213,7 +193,7 @@ BANNER;
             $stub[] = 'Phar::interceptFileFuncs();';
         }
 
-        if ($this->index) {
+        if (null !== $this->index) {
             $stub[] = "require 'phar://' . __FILE__ . '/{$this->index}';";
         }
 
