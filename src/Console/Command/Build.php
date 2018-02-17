@@ -535,8 +535,9 @@ HELP;
 
         foreach ($map as $item) {
             foreach ($item as $match => $replace) {
-                if (empty($match)) {
+                if ('' === $match) {
                     $match = '(all)';
+                    $replace .= '/';
                 }
 
                 $logger->log(

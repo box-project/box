@@ -429,7 +429,7 @@ EOF
                 ],
                 'directories' => [
                     $basePath.'B',
-                    $basePath.'C',
+                    $basePath.'../sub-dir/C/',
                 ],
                 'finder' => [
                     [

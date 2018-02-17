@@ -679,31 +679,12 @@ final class Configuration
 
     private static function normalizeFilePath(string $file, string $basePath): string
     {
-        $file = trim($file);
-
-        if (false === is_absolute_path($file)) {
-            $file = make_path_absolute($file, $basePath);
-        }
-
-        return $file;
+        return make_path_absolute(trim($file), $basePath);
     }
 
     private static function normalizeDirectoryPath(string $directory, string $basePath): string
     {
-        $directory = trim($directory);
-
-        if (false === is_absolute_path($directory)) {
-            $directory = sprintf(
-                '%s%s',
-                $basePath.DIRECTORY_SEPARATOR,
-                rtrim(
-                    canonicalize($directory),
-                    DIRECTORY_SEPARATOR
-                )
-            );
-        }
-
-        return $directory;
+        return make_path_absolute(trim($directory), $basePath);
     }
 
     private static function retrieveBootstrapFile(stdClass $raw, string $basePath): ?string
@@ -714,11 +695,7 @@ final class Configuration
             return null;
         }
 
-        $file = $raw->bootstrap;
-
-        if (false === is_absolute_path($file)) {
-            $file = canonicalize(make_path_absolute($file, $basePath));
-        }
+        $file = self::normalizeFilePath($raw->bootstrap, $basePath);
 
         Assertion::file($file, 'The bootstrap path "%s" is not a file or does not exist.');
 
