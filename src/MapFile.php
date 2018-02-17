@@ -34,7 +34,7 @@ final class MapFile
         foreach ($this->map as $item) {
             foreach ($item as $match => $replace) {
                 if ('' === $match) {
-                    return $replace.$path;
+                    return $replace.'/'.$path;
                 }
 
                 if (0 === strpos($path, $match)) {

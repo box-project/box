@@ -49,11 +49,7 @@ final class FileSystem extends SymfonyFilesystem
      */
     public function canonicalize(string $path): string
     {
-        $lastChar = substr($path, -1);
-
-        $canonical = Path::canonicalize($path);
-
-        return '/' === $lastChar ? $canonical.$lastChar : $canonical;
+        return Path::canonicalize($path);
     }
 
     /**
