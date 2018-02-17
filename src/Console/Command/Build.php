@@ -339,15 +339,17 @@ HELP;
 
             $box->registerStub($stub);
         } else {
-            $aliasWasAdded = $box->getPhar()->setAlias($config->getAlias());
+            if (null !== $config->getAlias()) {
+                $aliasWasAdded = $box->getPhar()->setAlias($config->getAlias());
 
-            Assertion::true(
-                $aliasWasAdded,
-                sprintf(
-                    'The alias "%s" is invalid. See Phar::setAlias() documentation for more information.',
-                    $config->getAlias()
-                )
-            );
+                Assertion::true(
+                    $aliasWasAdded,
+                    sprintf(
+                        'The alias "%s" is invalid. See Phar::setAlias() documentation for more information.',
+                        $config->getAlias()
+                    )
+                );
+            }
 
             if (null !== $main) {
                 $box->getPhar()->setDefaultStub($main, $main);

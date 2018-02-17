@@ -773,6 +773,42 @@ PHP
         $this->assertSame($stub, $actualStub);
     }
 
+    public function test_it_can_build_a_PHAR_file_using_the_default_stub(): void
+    {
+        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+
+        file_put_contents(
+            'box.json',
+            json_encode(
+                [
+                    'directories' => ['a'],
+                    'files' => ['test.php'],
+                    'finder' => [['in' => 'one']],
+                    'finder-bin' => [['in' => 'two']],
+                    'main' => 'run.php',
+                    'map' => [
+                        ['a/deep/test/directory' => 'sub'],
+                        ['' => 'other/'],
+                    ],
+                    'output' => 'test.phar',
+                ]
+            )
+        );
+
+        $commandTester = $this->getCommandTester();
+
+        $commandTester->execute(
+            ['command' => 'build'],
+            ['interactive' => true]
+        );
+
+        $this->assertSame(
+            'Hello, world!',
+            exec('php test.phar'),
+            'Expected PHAR to be executable'
+        );
+    }
+
     public function test_it_cannot_build_a_PHAR_using_unreadable_files(): void
     {
         touch('test.php');
