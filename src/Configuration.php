@@ -185,8 +185,8 @@ final class Configuration
 
         $fileMode = self::retrieveFileMode($raw);
 
-        $mainScriptPath = self::retrieveMainScriptPath($raw);
-        $mainScriptContent = self::retrieveMainScriptContents($mainScriptPath, $basePath);
+        $mainScriptPath = self::retrieveMainScriptPath($raw, $basePath);
+        $mainScriptContent = self::retrieveMainScriptContents($mainScriptPath);
 
         $map = self::retrieveMap($raw);
         $fileMapper = new MapFile($map);
@@ -782,25 +782,21 @@ final class Configuration
         return null;
     }
 
-    private static function retrieveMainScriptPath(stdClass $raw): ?string
+    private static function retrieveMainScriptPath(stdClass $raw, string $basePath): ?string
     {
-        // TODO: check if is used for the web as well when web is set to true
-        // If that the case make this field mandatory otherwise adjust the check
-        // rules accordinly to ensure we do not have an empty PHAR
         if (isset($raw->main)) {
-            return canonicalize($raw->main);
+//            return canonicalize($raw->main);
+            return make_path_absolute($raw->main, $basePath);
         }
 
         return null;
     }
 
-    private static function retrieveMainScriptContents(?string $mainScriptPath, string $basePath): ?string
+    private static function retrieveMainScriptContents(?string $mainScriptPath): ?string
     {
         if (null === $mainScriptPath) {
             return null;
         }
-
-        $mainScriptPath = $basePath.DIRECTORY_SEPARATOR.$mainScriptPath;
 
         $contents = file_contents($mainScriptPath);
 

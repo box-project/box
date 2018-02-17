@@ -21,6 +21,7 @@ use KevinGH\Box\Box;
 use KevinGH\Box\Compactor;
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Console\Logger\BuildLogger;
+use function KevinGH\Box\FileSystem\make_path_relative;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\StubGenerator;
 use RuntimeException;
@@ -295,7 +296,7 @@ HELP;
             BuildLogger::QUESTION_MARK_PREFIX,
             sprintf(
                 'Adding main file: %s',
-                $config->getBasePath().DIRECTORY_SEPARATOR.$main
+                $main
             )
         );
 
@@ -304,7 +305,9 @@ HELP;
             $config->getMainScriptContent()
         );
 
-        if ($localMain !== $main) {
+        $relativeMain = make_path_relative($main, $config->getBasePath());
+
+        if ($localMain !== $relativeMain) {
             $logger->log(
                 BuildLogger::CHEVRON_PREFIX,
                 $localMain
