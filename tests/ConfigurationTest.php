@@ -1530,7 +1530,7 @@ EOF
 
         $this->setConfig(['main' => 'test.php']);
 
-        $this->assertSame('test.php', $this->config->getMainScriptPath());
+        $this->assertSame($this->tmp.'/test.php', $this->config->getMainScriptPath());
     }
 
     public function test_get_main_script_content(): void
