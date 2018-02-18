@@ -13,19 +13,29 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-use Composer\Autoload\ClassLoader;
+namespace KevinGH\Box;
+
+use ErrorException;
 use KevinGH\Box\Console\Application;
-use function KevinGH\Box\register_aliases;
+use RuntimeException;
 
-if ($uri = Phar::running()) {
-    require "$uri/vendor/autoload.php";
-} elseif (class_exists('Extract')) {
-    require __DIR__.'/../vendor/autoload.php';
-} else {
-    load_composer_class_loader(realpath($_SERVER['argv'][0]));
-}
+$findAutoloader = function () {
+    if (file_exists($autoload = __DIR__.'/../../../autoload.php')) {
+        // Is installed via composer
+        return $autoload;
+    }
 
-register_aliases();
+    if (file_exists($autoload = __DIR__.'/../vendor/autoload.php')) {
+        // Is installed locally
+        return $autoload;
+    }
+
+    throw new RuntimeException('Unable to find the Composer or PHP-Scoper autoloader.');
+};
+
+require $findAutoloader();
+
+register_compactor_aliases();
 
 // Convert errors to exceptions
 set_error_handler(
@@ -38,84 +48,3 @@ set_error_handler(
 
 $app = new Application();
 $app->run();
-
-/**
- * Finds the Composer autoloader and returns it.
- *
- * @param null|string $dir the starting directory
- *
- * @throws RuntimeException if the loader could not be loaded
- *
- * @return ClassLoader the class loader
- */
-function load_composer_class_loader(?string $dir): ClassLoader
-{
-    $up = $dir;
-    $jsonPath = '';
-    $autoloaderPath = '';
-
-    do {
-        $dir = $up;
-
-        if (file_exists("$dir/composer.json")) {
-            $jsonPath = realpath("$dir/composer.json");
-            $vendorPath = $dir.DIRECTORY_SEPARATOR.get_vendor_directory_name($jsonPath);
-            $autoloaderPath = $vendorPath.DIRECTORY_SEPARATOR.'autoload.php';
-        }
-
-        $up = dirname($dir);
-    } while ($dir !== $up && (!file_exists($autoloaderPath)));
-
-    if (empty($jsonPath)) {
-        throw new RuntimeException(
-            'The composer.json file could not be found.'
-        );
-    }
-
-    if (empty($autoloaderPath)) {
-        throw new RuntimeException(
-            'The composer autoload.php file could not be found.'
-        );
-    }
-
-    if (false === file_exists($autoloaderPath)) {
-        throw new RuntimeException(
-            sprintf(
-                'The Composer class loader "%s" could not be found.',
-                $autoloaderPath
-            )
-        );
-    }
-
-    return include $autoloaderPath;
-}
-
-function get_vendor_directory_name(string $path): string
-{
-    if (false === ($json = file_get_contents($path))) {
-        throw new RuntimeException(
-            sprintf(
-                'The file "%s" could not be read.',
-                $path
-            )
-        );
-    }
-
-    $json = json_decode($json);
-
-    if (JSON_ERROR_NONE !== ($code = json_last_error())) {
-        throw new RuntimeException(
-            sprintf(
-                'The file "%s" could not be parsed [%d].',
-                $path,
-                $code
-            )
-        );
-    }
-
-    if (isset($json->config, $json->config->{'vendor-dir'})) {
-        return $json->config->{'vendor-dir'};
-    }
-
-    return 'vendor';
-}

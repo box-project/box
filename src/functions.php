@@ -51,7 +51,7 @@ function formatted_filesize(string $path)
     );
 }
 
-function register_aliases(): void
+function register_compactor_aliases(): void
 {
     if (false === class_exists(\Herrera\Box\Compactor\Javascript::class, false)) {
         class_alias(\KevinGH\Box\Compactor\Javascript::class, \Herrera\Box\Compactor\Javascript::class);
