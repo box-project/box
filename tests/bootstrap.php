@@ -13,10 +13,10 @@ declare(strict_types=1);
  */
 
 use org\bovigo\vfs\vfsStreamWrapper;
-use function KevinGH\Box\register_aliases;
+use function KevinGH\Box\register_compactor_aliases;
 
 $loader = require __DIR__.'/../vendor/autoload.php';
 
 vfsStreamWrapper::register();
 
-register_aliases();
+register_compactor_aliases();
