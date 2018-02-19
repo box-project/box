@@ -169,14 +169,14 @@ If a custom stub file is provided, none of the other options are used.
 
 ### Shebang (`shebang`)
 
-The shebang (`string`) setting is used to specify the shebang line used when generating a new stub. By default, this
+The shebang (`string`|`null`) setting is used to specify the shebang line used when generating a new stub. By default, this
 line is used:
 
 ```
 #!/usr/bin/env php
 ```
 
-The shebang line can be removed altogether if null.
+The shebang line can be removed altogether if set to `null`.
 
 
 ### Intercept (`intercept`)
@@ -256,15 +256,15 @@ file_get_contents('phar://foo.phar/LICENSE'); // Will work both inside the PHAR 
                                               // PHAR is loaded in-memory.
 ```
 
-As you can see above, loading a PHAR which has an alias result in a non-negligible side effect. A typical case where this might be an issue
-can be illustrated with box itself. For its end-to-end test, the process is along the lines of:
+As you can see above, loading a PHAR which has an alias result in a non-negligible side effect. A typical case where this
+might be an issue can be illustrated with box itself. For its end-to-end test, the process is along the lines of:
 
 - 1. Build a PHAR `box.phar` from the source code
 - 2. Build the PHAR `box.phar` from the source again but using the previous PHAR this time
 
-If an alias `box-alias.phar` was registered for both for example, the building would fail. Indeed when building the second PHAR, the first
-PHAR is loaded which loads the alias `box-alias.phar`. When creating the second PHAR, box would try to register the alias `box-alias.phar`
-to that new PHAR but as the alias is already used, an error will be thrown.
+If an alias `box-alias.phar` was registered for both for example, the building would fail. Indeed when building the second
+PHAR, the first PHAR is loaded which loads the alias `box-alias.phar`. When creating the second PHAR, box would try to register
+the alias `box-alias.phar` to that new PHAR but as the alias is already used, an error will be thrown.
 
 
 ### Banner (`banner`)
