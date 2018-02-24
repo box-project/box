@@ -48,8 +48,7 @@ class StubGeneratorTest extends TestCase
 
     public function test_it_can_generate_an_empty_stub(): void
     {
-        $expected = <<<STUB
-#!/usr/bin/env php
+        $expected = <<<'STUB'
 <?php
 
 /*
@@ -77,8 +76,7 @@ Yolo
 TEXT
         );
 
-        $expected = <<<STUB
-#!/usr/bin/env php
+        $expected = <<<'STUB'
 <?php
 
 /*
@@ -101,7 +99,7 @@ STUB;
     {
         $this->generator->shebang('#!/usr/local/bin/env php');
 
-        $expected = <<<STUB
+        $expected = <<<'STUB'
 #!/usr/local/bin/env php
 <?php
 
@@ -125,7 +123,7 @@ STUB;
     {
         $this->generator->shebang(null);
 
-        $expected = <<<STUB
+        $expected = <<<'STUB'
 <?php
 
 /*
@@ -148,8 +146,7 @@ STUB;
     {
         $this->generator->alias('acme.phar');
 
-        $expected = <<<STUB
-#!/usr/bin/env php
+        $expected = <<<'STUB'
 <?php
 
 /*
@@ -172,8 +169,7 @@ STUB;
     {
         $this->generator->alias(null);
 
-        $expected = <<<STUB
-#!/usr/bin/env php
+        $expected = <<<'STUB'
 <?php
 
 /*
@@ -197,7 +193,6 @@ STUB;
         $this->generator->index('acme.php');
 
         $expected = <<<STUB
-#!/usr/bin/env php
 <?php
 
 /*
@@ -221,7 +216,6 @@ STUB;
         $this->generator->intercept(true);
 
         $expected = <<<STUB
-#!/usr/bin/env php
 <?php
 
 /*
@@ -255,7 +249,7 @@ TEXT
             ->intercept(true)
         ;
 
-        $expected = <<<STUB
+        $expected = <<<'STUB'
 #!/usr/local/bin/env php
 <?php
 

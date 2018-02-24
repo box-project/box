@@ -18,7 +18,12 @@ use Amp\MultiReasonException;
 use Amp\Parallel\Worker\TaskException;
 use Assert\InvalidArgumentException as AssertInvalidArgumentException;
 use DirectoryIterator;
+use function file_get_contents;
+use function file_put_contents;
 use Generator;
+use function json_decode;
+use function json_encode;
+use const JSON_PRETTY_PRINT;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Test\CommandTestCase;
 use function ob_flush;
@@ -105,7 +110,7 @@ Building the PHAR "/path/to/tmp/test.phar"
 ? Adding files
     > 3 file(s)
 ? Generating new stub
-  - Using custom shebang line: $shebang
+  - Using shebang line: $shebang
   - Using custom banner:
     > custom banner
 ? Setting metadata
@@ -298,7 +303,7 @@ Building the PHAR "/path/to/tmp/test.phar"
 ? Adding files
     > 3 file(s)
 ? Generating new stub
-  - Using custom shebang line: $shebang
+  - Using shebang line: $shebang
   - Using custom banner:
     > custom banner
 ? Setting metadata
@@ -442,7 +447,7 @@ Box (repo)
 ? Adding files
     > 3 file(s)
 ? Generating new stub
-  - Using custom shebang line: $shebang
+  - Using shebang line: $shebang
   - Using custom banner:
     > custom banner
 ? Setting metadata
@@ -540,7 +545,7 @@ Box (repo)
 ? Adding files
     > 3 file(s)
 ? Generating new stub
-  - Using custom shebang line: #!__PHP_EXECUTABLE__
+  - Using shebang line: #!__PHP_EXECUTABLE__
   - Using custom banner:
     > multiline
     > custom banner
@@ -887,7 +892,7 @@ Box (repo)
 ? Adding files
     > 1 file(s)
 ? Generating new stub
-  - Using default shebang line: #!/usr/bin/env php
+  - Using shebang line: #!/usr/bin/env php
 ? No compression
 * Done.
 
@@ -943,7 +948,7 @@ Box (repo)
 ? Adding files
     > 1 file(s)
 ? Generating new stub
-  - Using default shebang line: #!/usr/bin/env php
+  - Using shebang line: #!/usr/bin/env php
 ? No compression
 * Done.
 
@@ -998,7 +1003,7 @@ Box (repo)
 ? Adding files
     > 1 file(s)
 ? Generating new stub
-  - Using default shebang line: #!/usr/bin/env php
+  - Using shebang line: #!/usr/bin/env php
   - Using custom banner from file: /path/to/tmp/banner
 ? No compression
 * Done.
@@ -1149,7 +1154,7 @@ Box (repo)
 ? Adding files
     > 1 file(s)
 ? Generating new stub
-  - Using default shebang line: #!/usr/bin/env php
+  - Using shebang line: #!/usr/bin/env php
 ? Compressing with the algorithm "GZ"
 * Done.
 
@@ -1207,7 +1212,7 @@ Box (repo)
 ? Adding files
     > 1 file(s)
 ? Generating new stub
-  - Using default shebang line: #!/usr/bin/env php
+  - Using shebang line: #!/usr/bin/env php
 ? No compression
 * Done.
 
@@ -1305,6 +1310,68 @@ OUTPUT;
         $actualFiles = $this->retrievePharFiles($phar);
 
         $this->assertSame($expectedFiles, $actualFiles);
+    }
+
+    public function test_it_can_build_a_PHAR_file_without_a_shebang_line(): void
+    {
+        mirror(self::FIXTURES_DIR.'/dir006', $this->tmp);
+
+        $boxRawConfig = json_decode(file_get_contents('box.json'), true, 512, JSON_PRETTY_PRINT);
+        $boxRawConfig['shebang'] = null;
+        file_put_contents('box.json', json_encode($boxRawConfig), JSON_PRETTY_PRINT);
+
+        $commandTester = $this->getCommandTester();
+        $commandTester->execute(
+            ['command' => 'build'],
+            [
+                'interactive' => false,
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
+        );
+
+        $expected = <<<OUTPUT
+
+    ____
+   / __ )____  _  __
+  / __  / __ \| |/_/
+ / /_/ / /_/ />  <
+/_____/\____/_/|_|
+
+
+Box (repo)
+
+* Building the PHAR "/path/to/tmp/test.phar"
+? No compactor to register
+? Adding main file: /path/to/tmp/test.php
+? Adding binary files
+    > No file found
+? Adding files
+    > 1 file(s)
+? Generating new stub
+  - No shebang line
+? Compressing with the algorithm "GZ"
+* Done.
+
+ // PHAR size: 100B
+ // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
+
+
+OUTPUT;
+
+        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
+
+        $this->assertSame($expected, $actual);
+
+        $builtPhar = new Phar('test.phar');
+
+        $this->assertFalse($builtPhar->isCompressed()); // TODO: this is a bug, see https://github.com/humbug/box/issues/20
+        $this->assertTrue($builtPhar['test.php']->isCompressed());
+
+        $this->assertSame(
+            'Hello!',
+            exec('php test.phar'),
+            'Expected the PHAR to be executable'
+        );
     }
 
     public function provideAliasConfig(): Generator

@@ -478,7 +478,7 @@ HELP;
             $logger->log(
                 BuildLogger::MINUS_PREFIX,
                 sprintf(
-                    'Using custom shebang line: %s',
+                    'Using shebang line: %s',
                     $shebang
                 )
             );
@@ -487,10 +487,7 @@ HELP;
         } else {
             $logger->log(
                 BuildLogger::MINUS_PREFIX,
-                sprintf(
-                    'Using default shebang line: %s',
-                    $stub->getShebang()
-                )
+                'No shebang line'
             );
         }
 

@@ -64,7 +64,7 @@ BANNER;
     /**
      * @var string|null The shebang line
      */
-    private $shebang = '#!/usr/bin/env php';
+    private $shebang;
 
     /**
      * Creates a new instance of the stub generator.

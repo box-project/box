@@ -158,17 +158,19 @@ The default PHAR stub file can be used but Box also propose a couple of options 
 
 ### Stub (`stub`)
 
-The stub (`string`, `boolean`) setting is used to specify the location of a stub file, or if one should be generated. If
-a path is provided, the stub file will be used as is inside the PHAR. If `true` is provided, a new stub will be
-generated. If `false` (or nothing) is provided, the default stub used by the PHAR class will be used.
+The stub (`string`|`boolean`) setting is used to specify the location of a stub file or if one should be generated:
+- `string`: Path to the stub file will be used as is inside the PHAR
+- `true`: A new stub will be generated
+- `false`: The default stub used by the PHAR class will be used
 
-If a custom stub file is provided, none of the other options are used.
+If a custom stub file is provided, none of the other options ([`shebang`][shebang], [`intercept`][intercept] and
+[`alias`][alias]) are used.
 
 
 ### Shebang (`shebang`)
 
-The shebang (`string`|`null`) setting is used to specify the shebang line used when generating a new stub. By default, this
-line is used:
+The shebang (`string`|`null`) setting is used to specify the shebang line used when generating a new stub. By default,
+this line is used:
 
 ```
 #!/usr/bin/env php

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use function array_key_exists;
 use function array_map;
 use Assert\Assertion;
 use Closure;
@@ -37,13 +38,13 @@ use function KevinGH\Box\FileSystem\canonicalize;
 use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\is_absolute_path;
 use function KevinGH\Box\FileSystem\make_path_absolute;
-use function var_dump;
 
 final class Configuration
 {
     private const DEFAULT_ALIAS = 'default.phar';
     private const DEFAULT_DATETIME_FORMAT = 'Y-m-d H:i:s';
     private const DEFAULT_REPLACEMENT_SIGIL = '@';
+    private const DEFAULT_SHEBANG = '#!/usr/bin/env php';
 
     private $fileMode;
     private $alias;
@@ -1099,7 +1100,11 @@ final class Configuration
 
     private static function retrieveShebang(stdClass $raw): ?string
     {
-        if (false === isset($raw->shebang)) {
+        if (false === array_key_exists('shebang', (array) $raw)) {
+            return self::DEFAULT_SHEBANG;
+        }
+
+        if (null === $raw->shebang) {
             return null;
         }
 
