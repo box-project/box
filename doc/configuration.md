@@ -2,6 +2,7 @@
 
 1. [Base path][base-path]
 1. [Output][output]
+1. [Main][main]
 1. [Including files][including-files]
     1. [Files (`files` and `files-bin`)][files]
     1. [Directories (`directories` and `directories-bin`)][directories]
@@ -77,6 +78,19 @@ The output (`string`) setting specifies the file name and path of the newly buil
 not an absolute path, the path will be relative to the base path.
 
 If not provided, the default value used will be `default.phar`.
+
+
+## Main (`main`)
+
+The main (`string`) setting is used to specify the file (relative to [`base-path`][base-path]) that will be run when the
+PHAR is executed from the command line (To not confuse with the [stub][stub] which is the PHAR bootstrapping file).
+
+The default file used is `index.php`.
+
+The main file contents is processed by the compactors as the other files. 
+
+If the main file starts with a shebang line (`#!`), it will be automatically removed (the shebang line goes in the
+[stub][stub] for a PHAR and is configured by the [shebang][shebang] setting).
 
 
 ## Including files
@@ -158,7 +172,7 @@ using the other available configuration settings: [`files`][files], [`files-bin`
 ## Stub
 
 The [PHAR stub][phar.fileformat.stub] file is the PHAR bootstrapping file, i.e. the very first file executed whenever
-the PHAR is executed. It usually contains things like the PHAR configuration and executing the main script file.
+the PHAR is executed. It usually contains things like the PHAR configuration and executing the [main script file][main].
 
 The default PHAR stub file can be used but Box also propose a couple of options to customize the stub used. 
 
@@ -342,6 +356,7 @@ If this parameter is set, then the value of [`banner`][banner] will be discarded
 [alias]: #alias-alias
 [base-path]: #base-path-base-path
 [output]: #output-output
+[main]: #main-main
 [including-files]: #including-files
 [files]: #files-files-and-files-bin
 [directories]: #directories-directories-and-directories-bin
@@ -507,12 +522,6 @@ the current working directory.
 The key-pass (string, boolean) setting is used to specify the passphrase for
 the private key. If a string is provided, it will be used as is as the
 passphrase. If true is provided, you will be prompted for the passphrase.
-
-The main (string) setting is used to specify the file (relative to base-path)
-that will be run when the PHAR is executed from the command line. If the file
-was not added by any of the other file adding settings, it will be
-automatically added after it has been compacted and had its placeholder values
-replaced. The shebang line #! will be automatically removed if present.
 
 The map (array) setting is used to change where some (or all) files are stored
 inside the PHAR. The key is a beginning of the relative path that will be

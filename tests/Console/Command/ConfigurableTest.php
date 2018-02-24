@@ -37,9 +37,9 @@ class ConfigurableTest extends CommandTestCase
 
     public function test_it_can_get_the_configuration(): void
     {
-        touch('foo');
+        touch('index.php');
 
-        file_put_contents('box.json', '{"files": ["foo"]}');
+        file_put_contents('box.json', '{}');
 
         /** @var TestConfigurable $command */
         $command = $this->application->get('test');

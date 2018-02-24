@@ -35,6 +35,7 @@ use function KevinGH\Box\FileSystem\make_path_absolute;
 final class Configuration
 {
     private const DEFAULT_ALIAS = 'default.phar';
+    private const DEFAULT_MAIN_SCRIPT = 'index.php';
     private const DEFAULT_DATETIME_FORMAT = 'Y-m-d H:i:s';
     private const DEFAULT_REPLACEMENT_SIGIL = '@';
     private const DEFAULT_SHEBANG = '#!/usr/bin/env php';
@@ -53,7 +54,7 @@ BANNER;
     private $compactors;
     private $compressionAlgorithm;
     private $mainScriptPath;
-    private $mainScriptContent;
+    private $mainScriptContents;
     private $map;
     private $fileMapper;
     private $metadata;
@@ -79,8 +80,8 @@ BANNER;
      * @param Compactor[]              $compactors            List of file contents compactors
      * @param null|int                 $compressionAlgorithm  Compression algorithm constant value. See the \Phar class constants
      * @param null|int                 $fileMode              File mode in octal form
-     * @param null|string              $mainScriptPath        The main script file path
-     * @param null|string              $mainScriptContent     The processed content of the main script file
+     * @param string                   $mainScriptPath        The main script file path
+     * @param string                   $mainScriptContents    The processed content of the main script file
      * @param MapFile                  $fileMapper            Utility to map the files from outside and inside the PHAR
      * @param mixed                    $metadata              The PHAR Metadata
      * @param string                   $outputPath
@@ -105,8 +106,8 @@ BANNER;
         array $compactors,
         ?int $compressionAlgorithm,
         ?int $fileMode,
-        ?string $mainScriptPath,
-        ?string $mainScriptContent,
+        string $mainScriptPath,
+        string $mainScriptContents,
         MapFile $fileMapper,
         $metadata,
         string $outputPath,
@@ -130,9 +131,6 @@ BANNER;
                 implode('", "', array_keys(get_phar_compression_algorithms()))
             )
         );
-        if (null === $mainScriptPath) {
-            Assertion::greaterThan(count($files), 0, 'Expected to find at least 1 non binary file, none found.');
-        }
 
         $this->alias = $alias;
         $this->basePathRetriever = $basePathRetriever;
@@ -143,7 +141,7 @@ BANNER;
         $this->compressionAlgorithm = $compressionAlgorithm;
         $this->fileMode = $fileMode;
         $this->mainScriptPath = $mainScriptPath;
-        $this->mainScriptContent = $mainScriptContent;
+        $this->mainScriptContents = $mainScriptContents;
         $this->fileMapper = $fileMapper;
         $this->metadata = $metadata;
         $this->outputPath = $outputPath;
@@ -189,7 +187,7 @@ BANNER;
         $fileMode = self::retrieveFileMode($raw);
 
         $mainScriptPath = self::retrieveMainScriptPath($raw, $basePath);
-        $mainScriptContent = self::retrieveMainScriptContents($mainScriptPath);
+        $mainScriptContents = self::retrieveMainScriptContents($mainScriptPath);
 
         $map = self::retrieveMap($raw);
         $fileMapper = new MapFile($map);
@@ -233,7 +231,7 @@ BANNER;
             $compressionAlgorithm,
             $fileMode,
             $mainScriptPath,
-            $mainScriptContent,
+            $mainScriptContents,
             $fileMapper,
             $metadata,
             $outputPath,
@@ -314,14 +312,14 @@ BANNER;
         return $this->fileMode;
     }
 
-    public function getMainScriptPath(): ?string
+    public function getMainScriptPath(): string
     {
         return $this->mainScriptPath;
     }
 
-    public function getMainScriptContent(): ?string
+    public function getMainScriptContents(): string
     {
-        return $this->mainScriptContent;
+        return $this->mainScriptContents;
     }
 
     public function getOutputPath(): string
@@ -785,21 +783,15 @@ BANNER;
         return null;
     }
 
-    private static function retrieveMainScriptPath(stdClass $raw, string $basePath): ?string
+    private static function retrieveMainScriptPath(stdClass $raw, string $basePath): string
     {
-        if (isset($raw->main)) {
-            return make_path_absolute($raw->main, $basePath);
-        }
+        $main = isset($raw->main) ? $raw->main : self::DEFAULT_MAIN_SCRIPT;
 
-        return null;
+        return self::normalizeFilePath($main, $basePath);
     }
 
-    private static function retrieveMainScriptContents(?string $mainScriptPath): ?string
+    private static function retrieveMainScriptContents(string $mainScriptPath): string
     {
-        if (null === $mainScriptPath) {
-            return null;
-        }
-
         $contents = file_contents($mainScriptPath);
 
         // Remove the shebang line: the shebang line in a PHAR should be located in the stub file which is the real

@@ -11,7 +11,9 @@ Migration path from [`kherge/box`][box2] to `humbug/box ^3.0`.
 - The entry `shebang` in `box.json.dist` no longer accept a boolean value or an empty string. To remove the shebang line
   the value `null` should be provided.
 - The output directory specified by `output` is now relative to the base path (`base-path`)
-- No longer support git version placeholders in the output path
+- No longer support git version placeholders in the output path (`output`)
+- The default main script has been changed to `index.php`
+- The main script is now required
 
 <br />
 <hr />
