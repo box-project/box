@@ -56,15 +56,24 @@ abstract class Configurable extends Command
         /** @var $helper \KevinGH\Box\Console\ConfigurationHelper */
         $helper = $this->getHelper('config');
 
+        $io = new SymfonyStyle($input, $output);
+
         $configPath = null !== $input->getOption(self::CONFIG_PARAM)
             ? $input->getOption(self::CONFIG_PARAM)
             : $helper->findDefaultPath()
         ;
 
         try {
+            $io->comment(
+                sprintf(
+                    'Loading the configuration file "<comment>%s</comment>".',
+                    $configPath
+                )
+            );
+
             return $helper->loadFile($configPath);
         } catch (InvalidArgumentException $exception) {
-            (new SymfonyStyle($input, $output))->error(
+            $io->error(
                 sprintf(
                     'The configuration file "%s" is invalid.',
                     $configPath
