@@ -2,11 +2,24 @@
 
 declare(strict_types=1);
 
-namespace KevinGH\Box\Console;
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
+namespace KevinGH\Box\Console;
 
 final class DisplayNormalizer
 {
+    private function __construct()
+    {
+    }
+
     public static function removeTrailingSpaces(string $display): string
     {
         $lines = explode("\n", $display);
@@ -17,9 +30,5 @@ final class DisplayNormalizer
         );
 
         return implode("\n", $lines);
-    }
-
-    private function __construct()
-    {
     }
 }

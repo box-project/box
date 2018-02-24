@@ -10,6 +10,8 @@ Migration path from [`kherge/box`][box2] to `humbug/box ^3.0`.
   `box.json.dist` configuration: `mimetypes`, `mung`, `not-found` and `web`.
 - The entry `shebang` in `box.json.dist` no longer accept a boolean value or an empty string. To remove the shebang line
   the value `null` should be provided.
+- The output directory specified by `output` is now relative to the base path (`base-path`)
+- No longer support git version placeholders in the output path
 
 <br />
 <hr />

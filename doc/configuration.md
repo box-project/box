@@ -1,6 +1,7 @@
 # Configuration
 
 1. [Base path][base-path]
+1. [Output][output]
 1. [Including files][including-files]
     1. [Files (`files` and `files-bin`)][files]
     1. [Directories (`directories` and `directories-bin`)][directories]
@@ -69,7 +70,13 @@ This does not, however, alter where the built PHAR will be stored (see: `output`
 If set to `null` or not specified, the base path used is the directory containing the configuration file when a specific
 configuration file is given or the current working directory otherwise.
 
-TODO: exclude output from the exception
+
+## Output (`output`)
+
+The output (`string`) setting specifies the file name and path of the newly built PHAR. If the value of the setting is
+not an absolute path, the path will be relative to the base path.
+
+If not provided, the default value used will be `default.phar`.
 
 
 ## Including files
@@ -334,6 +341,7 @@ If this parameter is set, then the value of [`banner`][banner] will be discarded
 
 [alias]: #alias-alias
 [base-path]: #base-path-base-path
+[output]: #output-output
 [including-files]: #including-files
 [files]: #files-files-and-files-bin
 [directories]: #directories-directories-and-directories-bin
@@ -540,10 +548,6 @@ earlier key).
 
 The metadata (any) setting can be any value. This value will be stored as
 metadata that can be retrieved from the built PHAR (Phar::getMetadata()).
-
-The output (string) setting specifies the file name and path of the newly
-built PHAR. If the value of the setting is not an absolute path, the path will
-be relative to the current working directory.
 
 The replacements (object) setting is a map of placeholders and their values.
 The placeholders are replaced in all non-binary files with the specified

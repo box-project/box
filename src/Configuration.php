@@ -30,7 +30,6 @@ use Symfony\Component\Process\Process;
 use function iter\chain;
 use function KevinGH\Box\FileSystem\canonicalize;
 use function KevinGH\Box\FileSystem\file_contents;
-use function KevinGH\Box\FileSystem\is_absolute_path;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 
 final class Configuration
@@ -197,7 +196,7 @@ BANNER;
 
         $metadata = self::retrieveMetadata($raw);
 
-        $outputPath = self::retrieveOutputPath($raw, $file);
+        $outputPath = self::retrieveOutputPath($raw, $basePath);
 
         $privateKeyPassphrase = self::retrievePrivateKeyPassphrase($raw);
         $privateKeyPath = self::retrievePrivateKeyPath($raw);
@@ -858,30 +857,15 @@ BANNER;
         return null;
     }
 
-    private static function retrieveOutputPath(stdClass $raw, string $file): string
+    private static function retrieveOutputPath(stdClass $raw, string $basePath): string
     {
-        // TODO: make this path relative to the base path like everything else
-        // otherwise this is really confusing. This is a BC break that needs to be
-        // documented though (and update the doc accordingly as well)
-        $base = getcwd().DIRECTORY_SEPARATOR;
-
         if (isset($raw->output)) {
             $path = $raw->output;
-
-            if (false === is_absolute_path($path)) {
-                $path = canonicalize($base.$path);
-            }
         } else {
-            $path = $base.self::DEFAULT_ALIAS;
+            $path = self::DEFAULT_ALIAS;
         }
 
-        if (false !== strpos($path, '@'.'git-version@')) {
-            $gitVersion = self::retrieveGitVersion($file);
-
-            $path = str_replace('@'.'git-version@', $gitVersion, $path);
-        }
-
-        return $path;
+        return make_path_absolute($path, $basePath);
     }
 
     private static function retrievePrivateKeyPassphrase(stdClass $raw): ?string
