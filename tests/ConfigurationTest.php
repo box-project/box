@@ -1663,7 +1663,7 @@ EOF
         $this->assertSame(123, $this->config->getMetadata());
     }
 
-    public function test_get_output_path(): void
+    public function test_get_default_output_path(): void
     {
         $this->assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'default.phar',
@@ -1684,31 +1684,38 @@ EOF
         );
     }
 
-    public function test_configure_output_path_with_placeholder(): void
+    public function test_the_output_path_is_relative_to_the_base_path(): void
     {
-        touch('test');
-        exec('git init');
-        exec('git config user.name "Test User"');
-        exec('git config user.email test@test.test');
-        exec('git config commit.gpgsign false');
-        exec('git add test');
-        exec('git commit -m "Adding test file."');
-        exec('git tag 1.0.0');
+        mkdir('bdir');
+        touch('bdir/foo');
 
         $this->setConfig([
             'files' => [self::DEFAULT_FILE],
-            'output' => 'test-@git-version@.phar',
+            'output' => 'test.phar',
+            'base-path' => 'bdir',
         ]);
 
         $this->assertSame(
-            $this->tmp.DIRECTORY_SEPARATOR.'test-1.0.0.phar',
+            $this->tmp.'/bdir/test.phar',
             $this->config->getOutputPath()
         );
+    }
 
-        // Some process does not release the git files
-        if ($this->isWindows()) {
-            exec('rd /S /Q .git');
-        }
+    public function test_the_output_path_is_not_relative_to_the_base_path_if_is_absolute(): void
+    {
+        mkdir('bdir');
+        touch('bdir/foo');
+
+        $this->setConfig([
+            'files' => [self::DEFAULT_FILE],
+            'output' => $this->tmp.'/test.phar',
+            'base-path' => 'bdir',
+        ]);
+
+        $this->assertSame(
+            $this->tmp.'/test.phar',
+            $this->config->getOutputPath()
+        );
     }
 
     public function testGetPrivateKeyPassphrase(): void

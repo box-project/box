@@ -64,7 +64,7 @@ e2e: box_dev.json
 	# TODO: use the build step again otherwise it is going to include the dev files
 	php -d phar.readonly=0 box.phar build
 
-	rm box.phar
+	rm box.phar bin/box.phar
 
 blackfire:	## Profiles the build step
 blackfire: bin/box src vendor
