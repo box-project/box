@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Amp\MultiReasonException;
 use Assert\Assertion;
 use KevinGH\Box\Box;
 use KevinGH\Box\Compactor;
@@ -91,7 +92,7 @@ HELP;
 
         $logger->logStartBuilding($path);
 
-        $this->createPhar($path, $config, $input, $output, $logger);
+        $this->createPhar($path, $config, $input, $output, $logger, $io);
 
         $this->correctPermissions($path, $config, $logger);
 
@@ -116,7 +117,8 @@ HELP;
         Configuration $config,
         InputInterface $input,
         OutputInterface $output,
-        BuildLogger $logger
+        BuildLogger $logger,
+        SymfonyStyle $io
     ): void {
         $box = Box::create($path);
 
@@ -128,7 +130,7 @@ HELP;
 
         $main = $this->registerMainScript($config, $box, $logger);
 
-        $this->addFiles($config, $box, $logger);
+        $this->addFiles($config, $box, $logger, $io);
 
         $this->registerStub($config, $box, $main, $logger);
         $this->configureMetadata($config, $box, $logger);
@@ -246,7 +248,7 @@ HELP;
         );
     }
 
-    private function addFiles(Configuration $config, Box $box, BuildLogger $logger): void
+    private function addFiles(Configuration $config, Box $box, BuildLogger $logger, SymfonyStyle $io): void
     {
         $logger->log(BuildLogger::QUESTION_MARK_PREFIX, 'Adding binary files');
 
@@ -265,7 +267,16 @@ HELP;
 
         $count = count($config->getFiles());
 
-        $box->addFiles($config->getFiles(), false);
+        try {
+            $box->addFiles($config->getFiles(), false);
+        } catch (MultiReasonException $exception) {
+            // This exception is handled a different way to give me meaningful feedback to the user
+            foreach ($exception->getReasons() as $reason) {
+                $io->error($reason);
+            }
+
+            throw $exception;
+        }
 
         $logger->log(
             BuildLogger::CHEVRON_PREFIX,

@@ -274,7 +274,7 @@ BANNER;
     }
 
     /**
-     * @return SplFileInfo[]
+     * @return string[]
      */
     public function getFiles(): array
     {
@@ -282,7 +282,7 @@ BANNER;
     }
 
     /**
-     * @return SplFileInfo[]
+     * @return string[]
      */
     public function getBinaryFiles(): array
     {
@@ -502,6 +502,16 @@ BANNER;
         $normalizePath = function (string $file) use ($basePath, $key): SplFileInfo {
             $file = self::normalizeFilePath($file, $basePath);
 
+            if (is_link($file)) {
+                // TODO: add this to baberlei/assert
+                throw new InvalidArgumentException(
+                    sprintf(
+                        'Cannot add the link "%s": links are not supported.',
+                        $file
+                    )
+                );
+            }
+
             Assertion::file(
                 $file,
                 sprintf(
@@ -601,8 +611,18 @@ BANNER;
             return $normalizedConfig;
         })((array) $config, $finder);
 
-        $createNormalizedDirectories = function (string $directory) use ($basePath): string {
+        $createNormalizedDirectories = function (string $directory) use ($basePath): ?string {
             $directory = self::normalizeDirectoryPath($directory, $basePath);
+
+            if (is_link($directory)) {
+                // TODO: add this to baberlei/assert
+                throw new InvalidArgumentException(
+                    sprintf(
+                        'Cannot append the link "%s" to the Finder: links are not supported.',
+                        $directory
+                    )
+                );
+            }
 
             Assertion::directory($directory);
 
@@ -612,10 +632,21 @@ BANNER;
         $normalizeFileOrDirectory = function (string &$fileOrDirectory) use ($basePath): void {
             $fileOrDirectory = self::normalizeDirectoryPath($fileOrDirectory, $basePath);
 
+            if (is_link($fileOrDirectory)) {
+                // TODO: add this to baberlei/assert
+                throw new InvalidArgumentException(
+                    sprintf(
+                        'Cannot append the link "%s" to the Finder: links are not supported.',
+                        $fileOrDirectory
+                    )
+                );
+            }
+
+            // TODO: add this to baberlei/assert
             if (false === file_exists($fileOrDirectory)) {
                 throw new InvalidArgumentException(
                     sprintf(
-                        'Path "%s" was expected to be a file or directory.',
+                        'Path "%s" was expected to be a file or directory. It may be a symlink (which are unsupported).',
                         $fileOrDirectory
                     )
                 );
@@ -668,7 +699,18 @@ BANNER;
             ->ignoreVCS(true)
         ;
 
-        return array_unique(iterator_to_array($finder));
+        return array_filter(
+            array_unique(
+                array_map(
+                    function (SplFileInfo $fileInfo): ?string {
+                        return false !== $fileInfo->getRealPath() ? $fileInfo->getRealPath() : null;
+                    },
+                    iterator_to_array(
+                        $finder
+                    )
+                )
+            )
+        );
     }
 
     /**
@@ -688,6 +730,16 @@ BANNER;
 
         $normalizeDirectory = function (string $directory) use ($basePath, $key): string {
             $directory = self::normalizeDirectoryPath($directory, $basePath);
+
+            if (is_link($directory)) {
+                // TODO: add this to baberlei/assert
+                throw new InvalidArgumentException(
+                    sprintf(
+                        'Cannot add the link "%s": links are not supported.',
+                        $directory
+                    )
+                );
+            }
 
             Assertion::directory(
                 $directory,

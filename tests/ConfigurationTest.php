@@ -25,11 +25,11 @@ use KevinGH\Box\Console\ConfigurationHelper;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\Test\FileSystemTestCase;
 use Phar;
-use SplFileInfo;
 use stdClass;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\rename;
+use function KevinGH\Box\FileSystem\symlink;
 
 /**
  * @covers \KevinGH\Box\Configuration
@@ -541,6 +541,181 @@ EOF
                     '"files" must contain a list of existing files. Could not find "%s".',
                     $filePath
                 ),
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_symlinks_are_not_supported_in_finder_in_setting(): void
+    {
+        mkdir('sub-dir');
+
+        rename(self::DEFAULT_FILE, 'sub-dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
+
+        mkdir('F');
+        touch('F/fileF0');
+        touch('F/fileF1');
+        touch('F/finder_excluded_file');
+
+        symlink('F', 'sub-dir/F');
+
+        try {
+            $this->setConfig([
+                'base-path' => 'sub-dir',
+                'finder' => [
+                    [
+                        'in' => [
+                            'F',
+                        ],
+                        'name' => 'fileF*',
+                    ],
+                ],
+            ]);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $link = $this->tmp.'/sub-dir/F';
+
+            $this->assertSame(
+                "Cannot append the link \"$link\" to the Finder: links are not supported.",
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_appending_a_file_from_a_symlinked_directory_is_not_supported(): void
+    {
+        mkdir('sub-dir');
+
+        rename(self::DEFAULT_FILE, 'sub-dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
+
+        mkdir('F');
+        touch('F/fileF0');
+        touch('F/fileF1');
+        touch('F/finder_excluded_file');
+
+        symlink('F', 'sub-dir/F');
+
+        try {
+            $this->setConfig([
+                'base-path' => 'sub-dir',
+                'finder' => [
+                    [
+                        'append' => [
+                            'F/fileF0',
+                        ],
+                        'name' => 'fileF*',
+                    ],
+                ],
+            ]);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $link = $this->tmp.'/sub-dir/F/fileF0';
+
+            $this->assertSame(
+                "Path \"$link\" was expected to be a file or directory. It may be a symlink (which are unsupported).",
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_appending_a_symlinked_file_is_not_supported(): void
+    {
+        mkdir('sub-dir');
+
+        rename(self::DEFAULT_FILE, 'sub-dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
+
+        mkdir('F');
+        touch('F/fileF0');
+        touch('F/fileF1');
+        touch('F/finder_excluded_file');
+
+        symlink('F/fileF0', 'sub-dir/F/fileF0');
+
+        try {
+            $this->setConfig([
+                'base-path' => 'sub-dir',
+                'finder' => [
+                    [
+                        'append' => [
+                            'F/fileF0',
+                        ],
+                        'name' => 'fileF*',
+                    ],
+                ],
+            ]);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $link = $this->tmp.'/sub-dir/F/fileF0';
+
+            $this->assertSame(
+                "Cannot append the link \"$link\" to the Finder: links are not supported.",
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_configuring_a_symlink_file_is_not_supported(): void
+    {
+        mkdir('sub-dir');
+
+        rename(self::DEFAULT_FILE, 'sub-dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
+
+        mkdir('F');
+        touch('F/fileF0');
+        touch('F/fileF1');
+        touch('F/finder_excluded_file');
+
+        symlink('F/fileF0', 'sub-dir/F/fileF0');
+
+        try {
+            $this->setConfig([
+                'base-path' => 'sub-dir',
+                'files' => [
+                    'F/fileF0',
+                ],
+            ]);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $link = $this->tmp.'/sub-dir/F/fileF0';
+
+            $this->assertSame(
+                "Cannot add the link \"$link\": links are not supported.",
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_configuring_a_symlink_directory_is_not_supported(): void
+    {
+        mkdir('sub-dir');
+
+        rename(self::DEFAULT_FILE, 'sub-dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
+
+        mkdir('F');
+        touch('F/fileF0');
+        touch('F/fileF1');
+        touch('F/finder_excluded_file');
+
+        symlink('F', 'sub-dir/F');
+
+        try {
+            $this->setConfig([
+                'base-path' => 'sub-dir',
+                'directories' => [
+                    'F',
+                ],
+            ]);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $link = $this->tmp.'/sub-dir/F';
+
+            $this->assertSame(
+                "Cannot add the link \"$link\": links are not supported.",
                 $exception->getMessage()
             );
         }
@@ -2328,7 +2503,7 @@ COMMENT
     }
 
     /**
-     * @param SplFileInfo[] $files
+     * @param string[] $files
      *
      * @return string[] File real paths relative to the current temporary directory
      */
@@ -2338,10 +2513,8 @@ COMMENT
 
         return array_values(
             array_map(
-                function (SplFileInfo $fileInfo) use ($root): string {
-                    $path = $fileInfo->getRealPath();
-
-                    return str_replace($root.DIRECTORY_SEPARATOR, '', $path);
+                function (string $file) use ($root): string {
+                    return str_replace($root.DIRECTORY_SEPARATOR, '', $file);
                 },
                 $files
             )
