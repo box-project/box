@@ -55,12 +55,8 @@ final class ConfigurationHelper extends Helper
         return realpath(self::FILE_NAME);
     }
 
-    public function loadFile(?string $file): Configuration
+    public function loadFile(string $file): Configuration
     {
-        if (null === $file) {
-            $file = $this->findDefaultPath();
-        }
-
         $json = $this->json->decodeFile($file);
 
         // Include imports

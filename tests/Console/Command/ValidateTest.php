@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use KevinGH\Box\Console\Application;
+use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\CommandTestCase;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
@@ -45,7 +46,8 @@ class ValidateTest extends CommandTestCase
 
     public function test_it_validates_a_given_file(): void
     {
-        file_put_contents('test.json', '{}');
+        touch('foo');
+        file_put_contents('test.json', '{"files": ["foo"]}');
 
         $this->commandTester->execute(
             [
@@ -58,11 +60,14 @@ class ValidateTest extends CommandTestCase
         );
 
         $expected = <<<'OUTPUT'
+
+ // Loading the configuration file "test.json".
+
 The configuration file passed validation.
 
 OUTPUT;
 
-        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(0, $this->commandTester->getStatusCode());
     }
 
@@ -117,6 +122,9 @@ OUTPUT;
         );
 
         $expected = <<<'OUTPUT'
+
+ // Loading the configuration file "box.json.dist".
+
 The configuration file failed validation: Parse error on line 1:
 {
 ^
@@ -124,7 +132,15 @@ Expected one of: 'STRING', '}'
 
 OUTPUT;
 
-        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
+
+        $actual = preg_replace(
+            '/\s\/\/ Loading the configuration file(\n.+)+box\.json\.dist[comment\<\>\n\s\/]*"\./',
+            ' // Loading the configuration file "box.json.dist".',
+            $actual
+        );
+
+        $this->assertSame($expected, $actual);
         $this->assertSame(1, $this->commandTester->getStatusCode());
     }
 
@@ -171,6 +187,9 @@ OUTPUT;
             '/path/to',
             $this->tmp,
             <<<'EOF'
+
+ // Loading the configuration file "box.json.dist".
+
 The configuration file failed validation: "/path/to/box.json" does not match the expected JSON schema:
 
   - The property test is not defined and the definition does not allow additional properties
@@ -178,7 +197,15 @@ The configuration file failed validation: "/path/to/box.json" does not match the
 EOF
         );
 
-        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
+
+        $actual = preg_replace(
+            '/\s\/\/ Loading the configuration file(\n.+)+box\.json[comment\<\>\n\s\/]*"\./',
+            ' // Loading the configuration file "box.json.dist".',
+            $actual
+        );
+
+        $this->assertSame($expected, $actual);
         $this->assertSame(1, $this->commandTester->getStatusCode());
     }
 
@@ -214,6 +241,9 @@ EOF
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function getCommand(): Command
     {
         return new Validate();

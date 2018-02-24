@@ -15,13 +15,10 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Assert\Assertion;
-use function explode;
-use function implode;
 use KevinGH\Box\Box;
 use KevinGH\Box\Compactor;
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Console\Logger\BuildLogger;
-use function KevinGH\Box\FileSystem\make_path_relative;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\StubGenerator;
 use RuntimeException;
@@ -31,6 +28,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use function KevinGH\Box\FileSystem\chmod;
+use function KevinGH\Box\FileSystem\make_path_relative;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\formatted_filesize;
 use function KevinGH\Box\get_phar_compression_algorithms;
@@ -81,7 +79,7 @@ HELP;
         $io->writeln($this->getApplication()->getHelp());
         $io->writeln('');
 
-        $config = $this->getConfig($input);
+        $config = $this->getConfig($input, $output);
         $path = $config->getOutputPath();
 
         $logger = new BuildLogger($io);
@@ -478,7 +476,7 @@ HELP;
             $logger->log(
                 BuildLogger::MINUS_PREFIX,
                 sprintf(
-                    'Using custom shebang line: %s',
+                    'Using shebang line: %s',
                     $shebang
                 )
             );
@@ -487,10 +485,7 @@ HELP;
         } else {
             $logger->log(
                 BuildLogger::MINUS_PREFIX,
-                sprintf(
-                    'Using default shebang line: %s',
-                    $stub->getShebang()
-                )
+                'No shebang line'
             );
         }
 
@@ -507,7 +502,7 @@ HELP;
         } elseif (null !== ($banner = $config->getStubBannerContents())) {
             $logger->log(
                 BuildLogger::MINUS_PREFIX,
-                'Using custom banner:'
+                'Using banner:'
             );
 
             $bannerLines = explode("\n", $banner);

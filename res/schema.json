@@ -26,7 +26,7 @@
         },
         "banner": {
             "description": "The header comment for the generated stub.",
-            "type": ["array", "string"]
+            "type": ["array", "string", "null"]
         },
         "banner-file": {
             "description": "The header comment file for the generated stub.",
@@ -34,7 +34,7 @@
         },
         "base-path": {
             "description": "The base path where relative paths are resolved to.",
-            "type": "string"
+            "type": ["string", "null"]
         },
         "blacklist": {
             "description": "A list of file paths to skip.",
@@ -172,7 +172,7 @@
         },
         "shebang": {
             "description": "The shebang line to use for the generated stub.",
-            "type": ["string"]
+            "type": ["string", "null"]
         },
         "stub": {
             "description": "The relative file path to the stub file, or the flag to use the default stub.",

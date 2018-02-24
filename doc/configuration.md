@@ -20,11 +20,9 @@
 
 The build command will build a new PHAR based on a variety of settings.
 
-    This command relies on a configuration file for loading
-    PHAR packaging settings. If a configuration file is not
-    specified through the --configuration|-c option, one of
-    the following files will be used (in order): box.json,
-    box.json.dist
+This command relies on a configuration file for loading PHAR packaging settings. If a configuration file is not
+specified through the `--configuration|-c option`, one of the following files will be used (in order): `box.json`,
+`box.json.dist`
 
 The configuration file is actually a JSON object saved to a file. Note that all settings are optional.
 //TODO: update this last bit of information as this is not true
@@ -65,18 +63,18 @@ The configuration file is actually a JSON object saved to a file. Note that all 
 
 ## Base-path (`base-path`)
 
-The `base-path` (`string`) setting is used to specify where all of the relative file paths should resolve to. This does
-not, however, alter where the built PHAR will be stored (see: `output`).
+The `base-path` (`string`|`null`) setting is used to specify where all of the relative file paths should resolve to.
+This does not, however, alter where the built PHAR will be stored (see: `output`).
 
-By default, the base path used is the directory containing the configuration file or if not specified the current
-working directory.
+If set to `null` or not specified, the base path used is the directory containing the configuration file when a specific
+configuration file is given or the current working directory otherwise.
 
 TODO: exclude output from the exception
 
 
 ## Including files
 
-There is multiple config entries for including files:
+Files can be included with a combination of the following options:
 
 ### Files (`files` and `files-bin`)
 
@@ -160,17 +158,19 @@ The default PHAR stub file can be used but Box also propose a couple of options 
 
 ### Stub (`stub`)
 
-The stub (`string`, `boolean`) setting is used to specify the location of a stub file, or if one should be generated. If
-a path is provided, the stub file will be used as is inside the PHAR. If `true` is provided, a new stub will be
-generated. If `false` (or nothing) is provided, the default stub used by the PHAR class will be used.
+The stub (`string`|`boolean`) setting is used to specify the location of a stub file or if one should be generated:
+- `string`: Path to the stub file will be used as is inside the PHAR
+- `true`: A new stub will be generated
+- `false`: The default stub used by the PHAR class will be used
 
-If a custom stub file is provided, none of the other options are used.
+If a custom stub file is provided, none of the other options ([`shebang`][shebang], [`intercept`][intercept] and
+[`alias`][alias]) are used.
 
 
 ### Shebang (`shebang`)
 
-The shebang (`string`|`null`) setting is used to specify the shebang line used when generating a new stub. By default, this
-line is used:
+The shebang (`string`|`null`) setting is used to specify the shebang line used when generating a new stub. By default,
+this line is used:
 
 ```
 #!/usr/bin/env php
@@ -184,6 +184,8 @@ The shebang line can be removed altogether if set to `null`.
 The intercept (`boolean`) setting is used when generating a new stub. If setting is set to `true`, the 
 [Phar::interceptFileFuncs()][phar.interceptfilefuncs] method will be called in the stub.
 
+This setting is set to `false` by default.
+
 
 ### Alias (`alias`)
 
@@ -191,7 +193,7 @@ The `alias` (`string`) setting is used when generating a new stub to call the [`
 makes it easier to refer to files in the PHAR and ensure the access to internal files will always work regardless of the
 location of the PHAR on the file system.
 
-No alias is configured by default.
+No alias is used by default.
 
 Example:
 
@@ -263,13 +265,13 @@ might be an issue can be illustrated with box itself. For its end-to-end test, t
 - 2. Build the PHAR `box.phar` from the source again but using the previous PHAR this time
 
 If an alias `box-alias.phar` was registered for both for example, the building would fail. Indeed when building the second
-PHAR, the first PHAR is loaded which loads the alias `box-alias.phar`. When creating the second PHAR, box would try to register
-the alias `box-alias.phar` to that new PHAR but as the alias is already used, an error will be thrown.
+PHAR, the first PHAR is loaded which loads the alias `box-alias.phar`. When creating the second PHAR, box would try to
+register the alias `box-alias.phar` to that new PHAR but as the alias is already used, an error will be thrown.
 
 
 ### Banner (`banner`)
 
-The banner (`string` or `string[]`) setting is the banner comment that will be used when a new stub is generated. The
+The banner (`string`|`string[]`|`null`) setting is the banner comment that will be used when a new stub is generated. The
 value of this setting must not already be enclosed within a comment block as it will be automatically done for you.
 
 For example `Custom banner` will result in the stub file:
@@ -310,6 +312,10 @@ Will result in:
  */
 ```
 
+By default, the Box banner is used. If set to `null`, no banner at all will be used.
+
+The content of this value is discarded if [`banner-file`][banner-file] is set.
+
 
 ### Banner file (`banner-file`)
 
@@ -317,6 +323,8 @@ The banner-file (`string`) setting is like banner, except it is a path (relative
 file that will contain the comment.
 
 Like banner, the comment must not already be enclosed in a comment block.
+
+If this parameter is set, then the value of [`banner`][banner] will be discarded.
 
 <br />
 <hr />

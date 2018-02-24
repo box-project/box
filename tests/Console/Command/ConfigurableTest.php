@@ -20,6 +20,8 @@ use KevinGH\Box\Test\CommandTestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Configurable
@@ -35,7 +37,9 @@ class ConfigurableTest extends CommandTestCase
 
     public function test_it_can_get_the_configuration(): void
     {
-        file_put_contents('box.json', '{}');
+        touch('foo');
+
+        file_put_contents('box.json', '{"files": ["foo"]}');
 
         /** @var TestConfigurable $command */
         $command = $this->application->get('test');
@@ -43,13 +47,15 @@ class ConfigurableTest extends CommandTestCase
         $input = new ArrayInput([]);
         $input->bind($command->getDefinition());
 
+        $output = new NullOutput();
+
         $config = (Closure::bind(
-            function (Configurable $command, InputInterface $input) {
-                return $command->getConfig($input);
+            function (Configurable $command, InputInterface $input, OutputInterface $output) {
+                return $command->getConfig($input, $output);
             },
             null,
             TestConfigurable::class
-        )($command, $input));
+        )($command, $input, $output));
 
         $this->assertInstanceOf(
             Configuration::class,

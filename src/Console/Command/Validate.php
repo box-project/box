@@ -59,7 +59,7 @@ HELP
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
-            $this->getConfig($input);
+            $this->getConfig($input, $output);
 
             $output->writeln(
                 '<info>The configuration file passed validation.</info>'
