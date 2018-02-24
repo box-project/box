@@ -790,7 +790,6 @@ final class Configuration
     private static function retrieveMainScriptPath(stdClass $raw, string $basePath): ?string
     {
         if (isset($raw->main)) {
-//            return canonicalize($raw->main);
             return make_path_absolute($raw->main, $basePath);
         }
 
@@ -805,7 +804,8 @@ final class Configuration
 
         $contents = file_contents($mainScriptPath);
 
-        // Remove the shebang line
+        // Remove the shebang line: the shebang line in a PHAR should be located in the stub file which is the real
+        // PHAR entry point file.
         return preg_replace('/^#!.*\s*/', '', $contents);
     }
 
