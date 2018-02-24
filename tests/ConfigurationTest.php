@@ -24,6 +24,7 @@ use KevinGH\Box\Compactor\DummyCompactor;
 use KevinGH\Box\Compactor\InvalidCompactor;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Console\ConfigurationHelper;
+use function KevinGH\Box\FileSystem\remove;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\Test\FileSystemTestCase;
 use Phar;
@@ -38,6 +39,8 @@ use function KevinGH\Box\FileSystem\make_path_absolute;
  */
 class ConfigurationTest extends FileSystemTestCase
 {
+    private const DEFAULT_FILE = 'foo';
+
     /**
      * @var Configuration
      */
@@ -56,9 +59,11 @@ class ConfigurationTest extends FileSystemTestCase
         parent::setUp();
 
         $this->file = make_path_absolute('box.json', $this->tmp);
+
+        touch($defaultFile = self::DEFAULT_FILE);
         touch($this->file);
 
-        $this->config = Configuration::create($this->file, (object) []);
+        $this->config = Configuration::create($this->file, (object) ['files' => [self::DEFAULT_FILE]]);
     }
 
     public function test_no_alias_is_registered_by_default()
@@ -68,14 +73,20 @@ class ConfigurationTest extends FileSystemTestCase
 
     public function test_the_alias_can_be_configured(): void
     {
-        $this->setConfig(['alias' => 'test.phar']);
+        $this->setConfig([
+            'alias' => 'test.phar',
+            'files' => [self::DEFAULT_FILE],
+        ]);
 
         $this->assertSame('test.phar', $this->config->getAlias());
     }
 
     public function test_the_alias_value_is_normalized(): void
     {
-        $this->setConfig(['alias' => '  test.phar  ']);
+        $this->setConfig([
+            'alias' => '  test.phar  ',
+            'files' => [self::DEFAULT_FILE],
+        ]);
 
         $this->assertSame('test.phar', $this->config->getAlias());
     }
@@ -83,7 +94,10 @@ class ConfigurationTest extends FileSystemTestCase
     public function test_the_alias_cannot_be_empty(): void
     {
         try {
-            $this->setConfig(['alias' => '']);
+            $this->setConfig([
+                'alias' => '',
+                'files' => [self::DEFAULT_FILE],
+            ]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -97,7 +111,10 @@ class ConfigurationTest extends FileSystemTestCase
     public function test_the_alias_must_be_a_string(): void
     {
         try {
-            $this->setConfig(['alias' => true]);
+            $this->setConfig([
+                'alias' => true,
+                'files' => [self::DEFAULT_FILE],
+            ]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (JsonValidationException $exception) {
@@ -124,6 +141,7 @@ EOF
         $this->setConfig(
             [
                 'base-path' => $this->tmp.DIRECTORY_SEPARATOR.'test',
+                'files' => [make_path_absolute(self::DEFAULT_FILE, $this->tmp)],
             ]
         );
 
@@ -139,6 +157,7 @@ EOF
             $this->setConfig(
                 [
                     'base-path' => $this->tmp.DIRECTORY_SEPARATOR.'test',
+                    'files' => [self::DEFAULT_FILE],
                 ]
             );
 
@@ -159,6 +178,7 @@ EOF
             $this->setConfig(
                 [
                     'base-path' => $this->tmp.DIRECTORY_SEPARATOR.'foo',
+                    'files' => [self::DEFAULT_FILE],
                 ]
             );
 
@@ -178,6 +198,7 @@ EOF
         $this->setConfig(
             [
                 'base-path' => 'dir',
+                'files' => [make_path_absolute(self::DEFAULT_FILE, $this->tmp)],
             ]
         );
 
@@ -193,35 +214,13 @@ EOF
         $this->setConfig(
             [
                 'base-path' => ' dir ',
+                'files' => [make_path_absolute(self::DEFAULT_FILE, $this->tmp)],
             ]
         );
 
         $expected = $this->tmp.DIRECTORY_SEPARATOR.'dir';
 
         $this->assertSame($expected, $this->config->getBasePath());
-    }
-
-    /**
-     * @dataProvider provideJsonValidNonStringValues
-     *
-     * @param mixed $value
-     */
-    public function test_the_base_path_value_must_be_a_string($value): void
-    {
-        try {
-            $this->setConfig(
-                [
-                    'base-path' => $value,
-                ]
-            );
-
-            $this->fail('Expected exception to be thrown.');
-        } catch (JsonValidationException $exception) {
-            $this->assertRegExp(
-                '/does not match the expected JSON schema:/',
-                $exception->getMessage()
-            );
-        }
     }
 
     public function test_it_can_provide_the_relative_path_relative_to_the_config_base_path(): void
@@ -234,13 +233,10 @@ EOF
         $this->assertSame($expected, $actual);
     }
 
-    public function test_there_is_no_file_configured_by_default(): void
-    {
-        $this->assertCount(0, $this->config->getFiles());
-    }
-
     public function test_configure_the_files_iterator(): void
     {
+        remove(self::DEFAULT_FILE);
+
         touch('file0');
         touch('file1');
 
@@ -314,6 +310,8 @@ EOF
 
     public function test_configured_files_are_relative_to_base_path(): void
     {
+        remove(self::DEFAULT_FILE);
+
         mkdir('sub-dir');
         chdir('sub-dir');
 
@@ -393,6 +391,8 @@ EOF
 
     public function test_configured_files_are_relative_to_base_path_unless_they_are_absolute_paths(): void
     {
+        remove(self::DEFAULT_FILE);
+
         mkdir('sub-dir');
         chdir('sub-dir');
 
@@ -600,6 +600,7 @@ EOF
 
         $this->setConfig(
             [
+                'files' => [self::DEFAULT_FILE],
                 'files-bin' => [
                     'file0',
                     'file1',
@@ -645,7 +646,7 @@ EOF
         $actual = $this->normalizeConfigPaths($this->config->getBinaryFiles());
 
         $this->assertSame($expected, $actual);
-        $this->assertCount(0, $this->config->getFiles());
+        $this->assertCount(1, $this->config->getFiles());
     }
 
     public function test_configured_bin_files_are_relative_to_base_path(): void
@@ -679,6 +680,7 @@ EOF
         $this->setConfig(
             [
                 'base-path' => 'sub-dir',
+                'files' => [make_path_absolute(self::DEFAULT_FILE, $this->tmp)],
                 'files-bin' => [
                     'file0',
                     'file1',
@@ -724,7 +726,7 @@ EOF
         $actual = $this->normalizeConfigPaths($this->config->getBinaryFiles());
 
         $this->assertSame($expected, $actual);
-        $this->assertCount(0, $this->config->getFiles());
+        $this->assertCount(1, $this->config->getFiles());
     }
 
     public function test_configured_bin_files_are_relative_to_base_path_unless_they_are_absolute_paths(): void
@@ -759,6 +761,7 @@ EOF
 
         $this->setConfig(
             [
+                'files' => [self::DEFAULT_FILE],
                 'files-bin' => [
                     $basePath.'file0',
                     $basePath.'file1',
@@ -804,7 +807,7 @@ EOF
         $actual = $this->normalizeConfigPaths($this->config->getBinaryFiles());
 
         $this->assertSame($expected, $actual);
-        $this->assertCount(0, $this->config->getFiles());
+        $this->assertCount(1, $this->config->getFiles());
     }
 
     public function test_cannot_add_a_non_existent_bin_file_to_the_list_of_files(): void
@@ -1304,6 +1307,8 @@ EOF
 
     public function test_finder_array_arguments_are_called_as_single_arguments(): void
     {
+        remove(self::DEFAULT_FILE);
+
         mkdir('A');
         touch('A/foo');
 
@@ -1312,6 +1317,7 @@ EOF
 
         $this->setConfig(
             [
+                'files' => [],
                 'finder' => [
                     [
                         // This would cause a failure on the Finder as `Finder::name()` accepts only a string value. But
@@ -1361,7 +1367,10 @@ EOF
     {
         touch('test.php');
 
-        $this->setconfig(['bootstrap' => 'test.php']);
+        $this->setconfig([
+            'bootstrap' => 'test.php',
+            'files' => [self::DEFAULT_FILE],
+        ]);
 
         $this->assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'test.php',
@@ -1378,6 +1387,7 @@ EOF
     {
         $this->setConfig(
             [
+                'files' => [self::DEFAULT_FILE],
                 'compactors' => [
                     Php::class,
                     DummyCompactor::class,
@@ -1394,7 +1404,10 @@ EOF
     public function test_it_cannot_get_the_compactors_with_an_invalid_class(): void
     {
         try {
-            $this->setConfig(['compactors' => ['NoSuchClass']]);
+            $this->setConfig([
+                'files' => [self::DEFAULT_FILE],
+                'compactors' => ['NoSuchClass']
+            ]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -1408,7 +1421,10 @@ EOF
     public function test_it_cannot_configure_an_invalid_compactor(): void
     {
         try {
-            $this->setConfig(['compactors' => [InvalidCompactor::class]]);
+            $this->setConfig([
+                'compactors' => [InvalidCompactor::class],
+                'files' => [self::DEFAULT_FILE],
+            ]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -1426,6 +1442,7 @@ EOF
     {
         $this->setConfig(
             [
+                'files' => [self::DEFAULT_FILE],
                 'annotations' => (object) [
                     'ignore' => [
                         'author',
@@ -1471,14 +1488,20 @@ EOF
 
     public function test_configure_compression_algorithm(): void
     {
-        $this->setConfig(['compression' => Phar::BZ2]);
+        $this->setConfig([
+            'files' => [self::DEFAULT_FILE],
+            'compression' => Phar::BZ2
+        ]);
 
         $this->assertSame(Phar::BZ2, $this->config->getCompressionAlgorithm());
     }
 
     public function test_configure_compression_algorithm_with_a_string(): void
     {
-        $this->setConfig(['compression' => 'BZ2']);
+        $this->setConfig([
+            'files' => [self::DEFAULT_FILE],
+            'compression' => 'BZ2'
+        ]);
 
         $this->assertSame(Phar::BZ2, $this->config->getCompressionAlgorithm());
     }
@@ -1491,7 +1514,10 @@ EOF
     public function test_configure_compression_algorithm_with_an_invalid_algorithm($compression, string $errorMessage): void
     {
         try {
-            $this->setConfig(['compression' => $compression]);
+            $this->setConfig([
+                'files' => [self::DEFAULT_FILE],
+                'compression' => $compression
+            ]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -1514,7 +1540,10 @@ EOF
 
     public function test_configure_file_mode(): void
     {
-        $this->setConfig(['chmod' => '0755']);
+        $this->setConfig([
+            'files' => [self::DEFAULT_FILE],
+            'chmod' => '0755'
+        ]);
 
         $this->assertSame(0755, $this->config->getFileMode());
     }
@@ -1579,6 +1608,7 @@ EOF
     {
         $this->setConfig(
             [
+                'files' => [self::DEFAULT_FILE],
                 'map' => [
                     ['a' => 'b'],
                     ['_empty_' => 'c'],
@@ -1599,6 +1629,7 @@ EOF
     {
         $this->setConfig(
             [
+                'files' => [self::DEFAULT_FILE],
                 'map' => [
                     ['first/test/path' => 'a'],
                     ['' => 'b/'],
@@ -1626,7 +1657,10 @@ EOF
 
     public function test_configure_metadata(): void
     {
-        $this->setConfig(['metadata' => 123]);
+        $this->setConfig([
+            'files' => [self::DEFAULT_FILE],
+            'metadata' => 123
+        ]);
 
         $this->assertSame(123, $this->config->getMetadata());
     }
@@ -1641,7 +1675,10 @@ EOF
 
     public function test_configure_output_path(): void
     {
-        $this->setConfig(['output' => 'test.phar']);
+        $this->setConfig([
+            'files' => [self::DEFAULT_FILE],
+            'output' => 'test.phar'
+        ]);
 
         $this->assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'test.phar',
@@ -1660,7 +1697,10 @@ EOF
         exec('git commit -m "Adding test file."');
         exec('git tag 1.0.0');
 
-        $this->setConfig(['output' => 'test-@git-version@.phar']);
+        $this->setConfig([
+            'files' => [self::DEFAULT_FILE],
+            'output' => 'test-@git-version@.phar',
+        ]);
 
         $this->assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'test-1.0.0.phar',
@@ -1680,14 +1720,20 @@ EOF
 
     public function testGetPrivateKeyPassphraseSet(): void
     {
-        $this->setConfig(['key-pass' => 'test']);
+        $this->setConfig([
+            'key-pass' => 'test',
+            'files' => [self::DEFAULT_FILE],
+        ]);
 
         $this->assertSame('test', $this->config->getPrivateKeyPassphrase());
     }
 
     public function testGetPrivateKeyPassphraseSetBoolean(): void
     {
-        $this->setConfig(['key-pass' => true]);
+        $this->setConfig([
+            'key-pass' => true,
+            'files' => [self::DEFAULT_FILE],
+        ]);
 
         $this->assertNull($this->config->getPrivateKeyPassphrase());
     }
@@ -1699,7 +1745,10 @@ EOF
 
     public function testGetPrivateKeyPathSet(): void
     {
-        $this->setConfig(['key' => 'test.pem']);
+        $this->setConfig([
+            'key' => 'test.pem',
+            'files' => [self::DEFAULT_FILE],
+        ]);
 
         $this->assertSame('test.pem', $this->config->getPrivateKeyPath());
     }
@@ -1722,6 +1771,7 @@ EOF
 
         $this->setConfig(
             [
+                'files' => [self::DEFAULT_FILE],
                 'git-commit' => 'git_commit',
                 'git-commit-short' => 'git_commit_short',
                 'git-tag' => 'git_tag',
@@ -1757,7 +1807,10 @@ EOF
 
     public function test_the_shebang_can_be_configured(): void
     {
-        $this->setConfig(['shebang' => $expected = '#!/bin/php']);
+        $this->setConfig([
+            'shebang' => $expected = '#!/bin/php',
+            'files' => [self::DEFAULT_FILE],
+        ]);
 
         $actual = $this->config->getShebang();
 
@@ -1767,7 +1820,10 @@ EOF
     public function test_cannot_register_an_invalid_shebang(): void
     {
         try {
-            $this->setConfig(['shebang' => '/bin/php']);
+            $this->setConfig([
+                'shebang' => '/bin/php',
+                'files' => [self::DEFAULT_FILE],
+            ]);
 
             $this->fail('Expected exception ot be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -1781,7 +1837,10 @@ EOF
     public function test_cannot_register_an_empty_shebang(): void
     {
         try {
-            $this->setConfig(['shebang' => '']);
+            $this->setConfig([
+                'shebang' => '',
+                'files' => [self::DEFAULT_FILE],
+            ]);
 
             $this->fail('Expected exception ot be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -1792,7 +1851,10 @@ EOF
         }
 
         try {
-            $this->setConfig(['shebang' => ' ']);
+            $this->setConfig([
+                'shebang' => ' ',
+                'files' => [self::DEFAULT_FILE],
+            ]);
 
             $this->fail('Expected exception ot be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -1805,7 +1867,10 @@ EOF
 
     public function test_the_shebang_value_is_normalized(): void
     {
-        $this->setConfig(['shebang' => ' #!/bin/php ']);
+        $this->setConfig([
+            'shebang' => ' #!/bin/php ',
+            'files' => [self::DEFAULT_FILE],
+        ]);
 
         $expected = '#!/bin/php';
 
@@ -1821,14 +1886,20 @@ EOF
 
     public function testGetSigningAlgorithmSet(): void
     {
-        $this->setConfig(['algorithm' => Phar::MD5]);
+        $this->setConfig([
+            'algorithm' => Phar::MD5,
+            'files' => [self::DEFAULT_FILE],
+        ]);
 
         $this->assertSame(Phar::MD5, $this->config->getSigningAlgorithm());
     }
 
     public function testGetSigningAlgorithmSetString(): void
     {
-        $this->setConfig(['algorithm' => 'MD5']);
+        $this->setConfig([
+            'algorithm' => 'MD5',
+            'files' => [self::DEFAULT_FILE],
+        ]);
 
         $this->assertSame(Phar::MD5, $this->config->getSigningAlgorithm());
     }
@@ -1836,7 +1907,10 @@ EOF
     public function testGetSigningAlgorithmInvalidString(): void
     {
         try {
-            $this->setConfig(['algorithm' => 'INVALID']);
+            $this->setConfig([
+                'algorithm' => 'INVALID',
+                'files' => [self::DEFAULT_FILE],
+            ]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -1858,7 +1932,10 @@ EOF
      */
     public function test_a_custom_banner_can_be_registered(string $banner): void
     {
-        $this->setConfig(['banner' => $banner]);
+        $this->setConfig([
+            'banner' => $banner,
+            'files' => [self::DEFAULT_FILE],
+        ]);
 
         $this->assertSame($banner, $this->config->getStubBannerContents());
         $this->assertNull($this->config->getStubBannerPath());
@@ -1869,7 +1946,10 @@ EOF
      */
     public function test_the_content_of_the_banner_is_normalized(string $banner, string $expected): void
     {
-        $this->setConfig(['banner' => $banner]);
+        $this->setConfig([
+            'banner' => $banner,
+            'files' => [self::DEFAULT_FILE],
+        ]);
 
         $this->assertSame($expected, $this->config->getStubBannerContents());
         $this->assertNull($this->config->getStubBannerPath());
@@ -1925,7 +2005,10 @@ multiline
 comment.
 COMMENT;
 
-        $this->setConfig(['banner' => $comment]);
+        $this->setConfig([
+            'banner' => $comment,
+            'files' => [self::DEFAULT_FILE],
+        ]);
 
         $this->assertSame($comment, $this->config->getStubBannerContents());
         $this->assertNull($this->config->getStubBannerPath());
@@ -1943,7 +2026,10 @@ COMMENT;
 
         file_put_contents('banner', $comment);
 
-        $this->setConfig(['banner-file' => 'banner']);
+        $this->setConfig([
+            'banner-file' => 'banner',
+            'files' => [self::DEFAULT_FILE],
+        ]);
 
         $this->assertSame($comment, $this->config->getStubBannerContents());
         $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'banner', $this->config->getStubBannerPath());
@@ -1969,7 +2055,10 @@ COMMENT;
 
         file_put_contents('banner', $comment);
 
-        $this->setConfig(['banner-file' => 'banner']);
+        $this->setConfig([
+            'banner-file' => 'banner',
+            'files' => [self::DEFAULT_FILE],
+        ]);
 
         $this->assertSame($expected, $this->config->getStubBannerContents());
         $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'banner', $this->config->getStubBannerPath());
@@ -1978,7 +2067,10 @@ COMMENT;
     public function test_the_custom_banner_file_must_exists_when_provided(): void
     {
         try {
-            $this->setConfig(['banner-file' => '/does/not/exist']);
+            $this->setConfig([
+                'banner-file' => '/does/not/exist',
+                'files' => [self::DEFAULT_FILE],
+            ]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -1999,7 +2091,10 @@ COMMENT;
     {
         file_put_contents('custom-stub.php', '');
 
-        $this->setConfig(['stub' => 'custom-stub.php']);
+        $this->setConfig([
+            'stub' => 'custom-stub.php',
+            'files' => [self::DEFAULT_FILE],
+        ]);
 
         $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'custom-stub.php', $this->config->getStubPath());
         $this->assertFalse($this->config->isStubGenerated());
@@ -2007,7 +2102,10 @@ COMMENT;
 
     public function test_the_stub_can_be_generated(): void
     {
-        $this->setConfig(['stub' => true]);
+        $this->setConfig([
+            'stub' => true,
+            'files' => [self::DEFAULT_FILE],
+        ]);
 
         $this->assertNull($this->config->getStubPath());
         $this->assertTrue($this->config->isStubGenerated());
@@ -2015,7 +2113,10 @@ COMMENT;
 
     public function test_the_default_stub_can_be_used(): void
     {
-        $this->setConfig(['stub' => false]);
+        $this->setConfig([
+            'stub' => false,
+            'files' => [self::DEFAULT_FILE],
+        ]);
 
         $this->assertNull($this->config->getStubPath());
         $this->assertFalse($this->config->isStubGenerated());
@@ -2028,7 +2129,10 @@ COMMENT;
 
     public function testIsInterceptFileFuncsSet(): void
     {
-        $this->setConfig(['intercept' => true]);
+        $this->setConfig([
+            'intercept' => true,
+            'files' => [self::DEFAULT_FILE],
+        ]);
 
         $this->assertTrue($this->config->isInterceptFileFuncs());
     }
@@ -2040,14 +2144,20 @@ COMMENT;
 
     public function testIsPrivateKeyPromptSet(): void
     {
-        $this->setConfig(['key-pass' => true]);
+        $this->setConfig([
+            'key-pass' => true,
+            'files' => [self::DEFAULT_FILE],
+        ]);
 
         $this->assertTrue($this->config->isPrivateKeyPrompt());
     }
 
     public function testIsPrivateKeyPromptSetString(): void
     {
-        $this->setConfig(['key-pass' => 'test']);
+        $this->setConfig([
+            'key-pass' => 'test',
+            'files' => [self::DEFAULT_FILE],
+        ]);
 
         $this->assertFalse($this->config->isPrivateKeyPrompt());
     }
@@ -2061,7 +2171,10 @@ COMMENT;
 CODE
         );
 
-        $this->setConfig(['bootstrap' => 'test.php']);
+        $this->setConfig([
+            'bootstrap' => 'test.php',
+            'files' => [self::DEFAULT_FILE],
+        ]);
 
         $this->config->loadBootstrap();
 
@@ -2071,7 +2184,10 @@ CODE
     public function testLoadBootstrapNotExist(): void
     {
         try {
-            $this->setConfig(['bootstrap' => 'test.php']);
+            $this->setConfig([
+                'bootstrap' => 'test.php',
+                'files' => [self::DEFAULT_FILE],
+            ]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {

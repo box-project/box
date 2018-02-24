@@ -37,6 +37,7 @@ use function KevinGH\Box\FileSystem\canonicalize;
 use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\is_absolute_path;
 use function KevinGH\Box\FileSystem\make_path_absolute;
+use function var_dump;
 
 final class Configuration
 {
@@ -130,6 +131,9 @@ final class Configuration
                 implode('", "', array_keys(get_phar_compression_algorithms()))
             )
         );
+        if (null === $mainScriptPath) {
+            Assertion::greaterThan(count($files), 0, 'Expected to find at least 1 non binary file, none found.');
+        }
 
         $this->alias = $alias;
         $this->basePathRetriever = $basePathRetriever;

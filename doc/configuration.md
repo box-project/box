@@ -20,11 +20,9 @@
 
 The build command will build a new PHAR based on a variety of settings.
 
-    This command relies on a configuration file for loading
-    PHAR packaging settings. If a configuration file is not
-    specified through the --configuration|-c option, one of
-    the following files will be used (in order): box.json,
-    box.json.dist
+This command relies on a configuration file for loading PHAR packaging settings. If a configuration file is not
+specified through the `--configuration|-c option`, one of the following files will be used (in order): `box.json`,
+`box.json.dist`
 
 The configuration file is actually a JSON object saved to a file. Note that all settings are optional.
 //TODO: update this last bit of information as this is not true
@@ -65,18 +63,18 @@ The configuration file is actually a JSON object saved to a file. Note that all 
 
 ## Base-path (`base-path`)
 
-The `base-path` (`string`) setting is used to specify where all of the relative file paths should resolve to. This does
-not, however, alter where the built PHAR will be stored (see: `output`).
+The `base-path` (`string`|`null`) setting is used to specify where all of the relative file paths should resolve to.
+This does not, however, alter where the built PHAR will be stored (see: `output`).
 
-By default, the base path used is the directory containing the configuration file or if not specified the current
-working directory.
+If set to `null` or not specified, the base path used is the directory containing the configuration file when a specific
+configuration file is given or the current working directory otherwise.
 
 TODO: exclude output from the exception
 
 
 ## Including files
 
-There is multiple config entries for including files:
+Files can be included with a combination of the following options:
 
 ### Files (`files` and `files-bin`)
 

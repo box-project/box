@@ -21,6 +21,7 @@ use DirectoryIterator;
 use Generator;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Test\CommandTestCase;
+use function ob_flush;
 use Phar;
 use PharFileInfo;
 use Symfony\Component\Console\Command\Command;
@@ -28,6 +29,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Traversable;
 use function KevinGH\Box\FileSystem\mirror;
+use function var_dump;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Build
@@ -811,14 +813,15 @@ PHP
 
     public function test_it_cannot_build_a_PHAR_using_unreadable_files(): void
     {
-        touch('test.php');
-        chmod('test.php', 0000);
+        touch('foo');
+        touch('unreadable-file.php');
+        chmod('unreadable-file.php', 0000);
 
         file_put_contents(
             'box.json',
             json_encode(
                 [
-                    'files' => ['test.php'],
+                    'files' => ['foo', 'unreadable-file.php'],
                 ]
             )
         );
@@ -839,9 +842,12 @@ PHP
             $this->assertCount(1, $exception->getReasons());
 
             /** @var TaskException $reason */
-            $reason = $exception->getReasons()[0];
+            $reason = current($exception->getReasons());
 
-            $this->assertSame(AssertInvalidArgumentException::class, $reason->getName());
+            $this->assertRegExp(
+                '/^Uncaught .+?ArgumentException in worker with message "Path ".+?" was expected to be readable\." and code "\d+" in ".+$/',
+                $reason->getMessage()
+            );
         }
     }
 

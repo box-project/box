@@ -26,7 +26,7 @@
         },
         "banner": {
             "description": "The header comment for the generated stub.",
-            "type": ["array", "string"]
+            "type": ["array", "string", "null"]
         },
         "banner-file": {
             "description": "The header comment file for the generated stub.",
@@ -34,7 +34,7 @@
         },
         "base-path": {
             "description": "The base path where relative paths are resolved to.",
-            "type": "string"
+            "type": ["string", "null"]
         },
         "blacklist": {
             "description": "A list of file paths to skip.",
