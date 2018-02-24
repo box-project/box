@@ -39,6 +39,7 @@ great things:
 1. [Configuration](doc/configuration.md)
     1. [Base path](doc/configuration.md#base-path-base-path)
     1. [Output](doc/configuration.md#output-output)
+    1. [Main](doc/configuration.md#main-main)
     1. [Including files](doc/configuration.md#including-files)
         1. [Files (`files` and `files-bin`)](doc/configuration.md#files-files-and-files-bin)
         1. [Directories (`directories` and `directories-bin`)](doc/configuration.md#directories-directories-and-directories-bin)

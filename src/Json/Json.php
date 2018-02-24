@@ -47,7 +47,7 @@ final class Json
             }
         }
 
-        return $data;
+        return (object) $data;
     }
 
     public function decodeFile(string $file): stdClass

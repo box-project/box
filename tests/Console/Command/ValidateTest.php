@@ -46,8 +46,8 @@ class ValidateTest extends CommandTestCase
 
     public function test_it_validates_a_given_file(): void
     {
-        touch('foo');
-        file_put_contents('test.json', '{"files": ["foo"]}');
+        touch('index.php');
+        file_put_contents('test.json', '{}');
 
         $this->commandTester->execute(
             [

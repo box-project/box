@@ -279,10 +279,6 @@ HELP;
     {
         $main = $config->getMainScriptPath();
 
-        if (null === $main) {
-            return null;
-        }
-
         $logger->log(
             BuildLogger::QUESTION_MARK_PREFIX,
             sprintf(
@@ -308,7 +304,7 @@ HELP;
         return $localMain;
     }
 
-    private function registerStub(Configuration $config, Box $box, ?string $main, BuildLogger $logger): void
+    private function registerStub(Configuration $config, Box $box, string $main, BuildLogger $logger): void
     {
         if (true === $config->isStubGenerated()) {
             $logger->log(
@@ -342,9 +338,7 @@ HELP;
                 );
             }
 
-            if (null !== $main) {
-                $box->getPhar()->setDefaultStub($main, $main);
-            }
+            $box->getPhar()->setDefaultStub($main, $main);
 
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,

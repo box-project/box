@@ -823,7 +823,7 @@ PHP
 
     public function test_it_cannot_build_a_PHAR_using_unreadable_files(): void
     {
-        touch('foo');
+        touch('index.php');
         touch('unreadable-file.php');
         chmod('unreadable-file.php', 0000);
 
@@ -831,7 +831,7 @@ PHP
             'box.json',
             json_encode(
                 [
-                    'files' => ['foo', 'unreadable-file.php'],
+                    'files' => ['unreadable-file.php'],
                 ]
             )
         );
@@ -1131,6 +1131,7 @@ Box (repo)
 
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
+? Adding main file: /path/to/tmp/index.php
 ? Adding binary files
     > No file found
 ? Adding files

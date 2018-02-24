@@ -76,8 +76,8 @@ class ConfigurationHelperTest extends FileSystemTestCase
 
     public function test_it_can_load_a_configuration(): void
     {
-        touch('foo');
-        file_put_contents('box.json.dist', '{"files": ["foo"]}');
+        touch('index.php');
+        file_put_contents('box.json.dist', '{}');
 
         $this->assertInstanceOf(
             Configuration::class,
