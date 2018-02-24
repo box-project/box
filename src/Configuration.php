@@ -31,6 +31,7 @@ use function iter\chain;
 use function KevinGH\Box\FileSystem\canonicalize;
 use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\make_path_absolute;
+use function KevinGH\Box\FileSystem\make_path_relative;
 
 final class Configuration
 {
@@ -72,6 +73,7 @@ BANNER;
     private $isStubGenerated;
 
     /**
+     * @param null|string              $file
      * @param null|string              $alias
      * @param RetrieveRelativeBasePath $basePathRetriever     Utility to private the base path used and be able to retrieve a path relative to it (the base path)
      * @param SplFileInfo[]            $files                 List of files
@@ -98,6 +100,7 @@ BANNER;
      * @param bool                     $isStubGenerated       Wether or not if the PHAR stub should be generated
      */
     private function __construct(
+        ?string $file,
         ?string $alias,
         RetrieveRelativeBasePath $basePathRetriever,
         array $files,
@@ -158,26 +161,34 @@ BANNER;
         $this->isStubGenerated = $isStubGenerated;
     }
 
-    public static function create(string $file, stdClass $raw): self
+    public static function create(?string $file, stdClass $raw): self
     {
         $alias = self::retrieveAlias($raw);
 
         $basePath = self::retrieveBasePath($file, $raw);
         $basePathRetriever = new RetrieveRelativeBasePath($basePath);
 
-        $blacklistFilter = self::retrieveBlacklistFilter($raw, $basePath);
+        $mainScriptPath = self::retrieveMainScriptPath($raw, $basePath);
+        $mainScriptContents = self::retrieveMainScriptContents($mainScriptPath);
 
-        $files = self::retrieveFiles($raw, 'files', $basePath);
-        $directories = self::retrieveDirectories($raw, 'directories', $basePath, $blacklistFilter);
-        $filesFromFinders = self::retrieveFilesFromFinders($raw, 'finder', $basePath, $blacklistFilter);
+        if (null !== $file) {
+            $blacklistFilter = self::retrieveBlacklistFilter($raw, $basePath);
 
-        $filesAggregate = array_unique(iterator_to_array(chain($files, $directories, ...$filesFromFinders)));
+            $files = self::retrieveFiles($raw, 'files', $basePath);
+            $directories = self::retrieveDirectories($raw, 'directories', $basePath, $blacklistFilter);
+            $filesFromFinders = self::retrieveFilesFromFinders($raw, 'finder', $basePath, $blacklistFilter);
 
-        $binaryFiles = self::retrieveFiles($raw, 'files-bin', $basePath);
-        $binaryDirectories = self::retrieveDirectories($raw, 'directories-bin', $basePath, $blacklistFilter);
-        $binaryFilesFromFinders = self::retrieveFilesFromFinders($raw, 'finder-bin', $basePath, $blacklistFilter);
+            $filesAggregate = array_unique(iterator_to_array(chain($files, $directories, ...$filesFromFinders)));
 
-        $binaryFilesAggregate = array_unique(iterator_to_array(chain($binaryFiles, $binaryDirectories, ...$binaryFilesFromFinders)));
+            $binaryFiles = self::retrieveFiles($raw, 'files-bin', $basePath);
+            $binaryDirectories = self::retrieveDirectories($raw, 'directories-bin', $basePath, $blacklistFilter);
+            $binaryFilesFromFinders = self::retrieveFilesFromFinders($raw, 'finder-bin', $basePath, $blacklistFilter);
+
+            $binaryFilesAggregate = array_unique(iterator_to_array(chain($binaryFiles, $binaryDirectories, ...$binaryFilesFromFinders)));
+        } else {
+            $filesAggregate = self::retrieveAllFiles($basePath, $mainScriptPath);
+            $binaryFilesAggregate = [];
+        }
 
         $bootstrapFile = self::retrieveBootstrapFile($raw, $basePath);
 
@@ -185,9 +196,6 @@ BANNER;
         $compressionAlgorithm = self::retrieveCompressionAlgorithm($raw);
 
         $fileMode = self::retrieveFileMode($raw);
-
-        $mainScriptPath = self::retrieveMainScriptPath($raw, $basePath);
-        $mainScriptContents = self::retrieveMainScriptContents($mainScriptPath);
 
         $map = self::retrieveMap($raw);
         $fileMapper = new MapFile($map);
@@ -222,6 +230,7 @@ BANNER;
         $isStubGenerated = self::retrieveIsStubGenerated($raw);
 
         return new self(
+            $file,
             $alias,
             $basePathRetriever,
             $filesAggregate,
@@ -416,8 +425,12 @@ BANNER;
         return $alias;
     }
 
-    private static function retrieveBasePath(string $file, stdClass $raw): string
+    private static function retrieveBasePath(?string $file, stdClass $raw): string
     {
+        if (null === $file) {
+            return getcwd();
+        }
+
         if (false === isset($raw->{'base-path'})) {
             return realpath(dirname($file));
         }
@@ -559,13 +572,6 @@ BANNER;
         return array_map($processFinderConfig, $findersConfig);
     }
 
-    /**
-     * @param stdClass $config
-     * @param string   $basePath
-     * @param Closure  $blacklistFilter
-     *
-     * @return Finder
-     */
     private static function processFinder(stdClass $config, string $basePath, Closure $blacklistFilter): Finder
     {
         $finder = Finder::create()
@@ -644,6 +650,25 @@ BANNER;
         }
 
         return $finder;
+    }
+
+    /**
+     * @param string $basePath
+     *
+     * @return SplFileInfo[]
+     */
+    private static function retrieveAllFiles(string $basePath, string $mainScriptPath): array
+    {
+        $finder = Finder::create()
+            ->files()
+            ->in($basePath)
+            ->notPath(
+                make_path_relative($mainScriptPath, $basePath)
+            )
+            ->ignoreVCS(true)
+        ;
+
+        return array_unique(iterator_to_array($finder));
     }
 
     /**
@@ -898,8 +923,12 @@ BANNER;
     private static function retrieveProcessedReplacements(
         array $replacements,
         stdClass $raw,
-        string $file
+        ?string $file
     ): array {
+        if (null === $file) {
+            return [];
+        }
+
         if (null !== ($git = self::retrieveGitHashPlaceholder($raw))) {
             $replacements[$git] = self::retrieveGitHash($file);
         }

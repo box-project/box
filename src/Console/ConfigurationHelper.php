@@ -16,7 +16,8 @@ namespace KevinGH\Box\Console;
 
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Json\Json;
-use RuntimeException;
+use KevinGH\Box\Throwable\Exception\NoConfigurationFound;
+use stdClass;
 use Symfony\Component\Console\Helper\Helper;
 use function KevinGH\Box\FileSystem\is_absolute_path;
 
@@ -44,9 +45,7 @@ final class ConfigurationHelper extends Helper
     {
         if (false === file_exists(self::FILE_NAME)) {
             if (false === file_exists(self::FILE_NAME.'.dist')) {
-                throw new RuntimeException(
-                    sprintf('The configuration file could not be found.')
-                );
+                throw new NoConfigurationFound();
             }
 
             return realpath(self::FILE_NAME.'.dist');
@@ -55,8 +54,12 @@ final class ConfigurationHelper extends Helper
         return realpath(self::FILE_NAME);
     }
 
-    public function loadFile(string $file): Configuration
+    public function loadFile(?string $file): Configuration
     {
+        if (null === $file) {
+            return Configuration::create(null, new stdClass());
+        }
+
         $json = $this->json->decodeFile($file);
 
         // Include imports
