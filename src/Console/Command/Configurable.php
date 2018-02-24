@@ -72,12 +72,7 @@ abstract class Configurable extends Command
 
             return $helper->loadFile($configPath);
         } catch (InvalidArgumentException $exception) {
-            $io->error(
-                sprintf(
-                    'The configuration file "%s" is invalid.',
-                    $configPath
-                )
-            );
+            $io->error('The configuration file is invalid.');
 
             throw $exception;
         }
