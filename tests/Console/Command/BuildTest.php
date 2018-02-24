@@ -855,7 +855,7 @@ PHP
             $reason = current($exception->getReasons());
 
             $this->assertRegExp(
-                '/^Uncaught .+?ArgumentException in worker with message "Path ".+?" was expected to be readable\." and code "\d+" in ".+$/',
+                '/^Uncaught .+?ArgumentException in worker with message ".+?" was expected to be readable\.".*$/',
                 $reason->getMessage()
             );
         }
