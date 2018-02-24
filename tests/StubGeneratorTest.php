@@ -15,8 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use InvalidArgumentException;
-use KevinGH\Box\Compactor\Php;
-use Phar;
 use PHPUnit\Framework\TestCase;
 
 /**

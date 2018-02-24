@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
-use KevinGH\Box\Compactor\Php;
 
 /**
  * Generates a new PHP bootstrap loader stub for a PHAR.

@@ -18,7 +18,6 @@ use InvalidArgumentException;
 use KevinGH\Box\Console\Application;
 use Phar;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
