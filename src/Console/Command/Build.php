@@ -504,7 +504,7 @@ HELP;
         } elseif (null !== ($banner = $config->getStubBannerContents())) {
             $logger->log(
                 BuildLogger::MINUS_PREFIX,
-                'Using custom banner:'
+                'Using banner:'
             );
 
             $bannerLines = explode("\n", $banner);

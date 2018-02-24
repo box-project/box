@@ -265,13 +265,13 @@ might be an issue can be illustrated with box itself. For its end-to-end test, t
 - 2. Build the PHAR `box.phar` from the source again but using the previous PHAR this time
 
 If an alias `box-alias.phar` was registered for both for example, the building would fail. Indeed when building the second
-PHAR, the first PHAR is loaded which loads the alias `box-alias.phar`. When creating the second PHAR, box would try to register
-the alias `box-alias.phar` to that new PHAR but as the alias is already used, an error will be thrown.
+PHAR, the first PHAR is loaded which loads the alias `box-alias.phar`. When creating the second PHAR, box would try to
+register the alias `box-alias.phar` to that new PHAR but as the alias is already used, an error will be thrown.
 
 
 ### Banner (`banner`)
 
-The banner (`string` or `string[]`) setting is the banner comment that will be used when a new stub is generated. The
+The banner (`string`|`string[]`|`null`) setting is the banner comment that will be used when a new stub is generated. The
 value of this setting must not already be enclosed within a comment block as it will be automatically done for you.
 
 For example `Custom banner` will result in the stub file:
@@ -312,6 +312,10 @@ Will result in:
  */
 ```
 
+By default, the Box banner is used. If set to `null`, no banner at all will be used.
+
+The content of this value is discarded if [`banner-file`][banner-file] is set.
+
 
 ### Banner file (`banner-file`)
 
@@ -319,6 +323,8 @@ The banner-file (`string`) setting is like banner, except it is a path (relative
 file that will contain the comment.
 
 Like banner, the comment must not already be enclosed in a comment block.
+
+If this parameter is set, then the value of [`banner`][banner] will be discarded.
 
 <br />
 <hr />
