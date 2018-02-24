@@ -16,17 +16,10 @@ namespace KevinGH\Box\Console\Command;
 
 use Amp\MultiReasonException;
 use Amp\Parallel\Worker\TaskException;
-use Assert\InvalidArgumentException as AssertInvalidArgumentException;
 use DirectoryIterator;
-use function file_get_contents;
-use function file_put_contents;
 use Generator;
-use function json_decode;
-use function json_encode;
-use const JSON_PRETTY_PRINT;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Test\CommandTestCase;
-use function ob_flush;
 use Phar;
 use PharFileInfo;
 use Symfony\Component\Console\Command\Command;
@@ -34,7 +27,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Traversable;
 use function KevinGH\Box\FileSystem\mirror;
-use function var_dump;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Build
@@ -334,7 +326,7 @@ OUTPUT;
 
         // Check PHAR content
         $actualStub = $this->normalizeDisplay($phar->getStub());
-        $expectedStub = <<<PHP
+        $expectedStub = <<<'PHP'
 #!/usr/bin/env php
 <?php
 

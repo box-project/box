@@ -15,10 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
-use Herrera\Annotations\Tokenizer;
-use function implode;
 use KevinGH\Box\Compactor\Php;
-use function str_replace;
 
 /**
  * Generates a new PHP bootstrap loader stub for a PHAR.
@@ -37,7 +34,7 @@ __HALT_COMPILER(); ?>
 STUB;
 
     /**
-     * @var string|null The alias to be used in "phar://" URLs
+     * @var null|string The alias to be used in "phar://" URLs
      */
     private $alias;
 
@@ -57,7 +54,7 @@ STUB;
     private $intercept = false;
 
     /**
-     * @var string|null The shebang line
+     * @var null|string The shebang line
      */
     private $shebang;
 

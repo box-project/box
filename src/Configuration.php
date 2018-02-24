@@ -14,18 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use function array_key_exists;
-use function array_map;
 use Assert\Assertion;
 use Closure;
 use DateTimeImmutable;
-use function explode;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\Php as LegacyPhp;
-use function implode;
 use InvalidArgumentException;
-use function is_array;
-use function is_string;
 use KevinGH\Box\Compactor\Php;
 use Phar;
 use RuntimeException;
@@ -78,7 +72,7 @@ BANNER;
     private $isStubGenerated;
 
     /**
-     * @param string|null                   $alias
+     * @param null|string              $alias
      * @param RetrieveRelativeBasePath $basePathRetriever     Utility to private the base path used and be able to retrieve a path relative to it (the base path)
      * @param SplFileInfo[]            $files                 List of files
      * @param SplFileInfo[]            $binaryFiles           List of binary files
@@ -97,7 +91,7 @@ BANNER;
      * @param array                    $processedReplacements The processed list of replacement placeholders and their values
      * @param null|string              $shebang               The shebang line
      * @param int                      $signingAlgorithm      The PHAR siging algorithm. See \Phar constants
-     * @param string|null              $stubBannerContents            The stub banner comment
+     * @param null|string              $stubBannerContents    The stub banner comment
      * @param null|string              $stubBannerPath        The path to the stub banner comment file
      * @param null|string              $stubPath              The PHAR stub file path
      * @param bool                     $isInterceptFileFuncs  wether or not Phar::interceptFileFuncs() should be used
@@ -570,8 +564,8 @@ BANNER;
 
     /**
      * @param stdClass $config
-     * @param string $basePath
-     * @param Closure $blacklistFilter
+     * @param string   $basePath
+     * @param Closure  $blacklistFilter
      *
      * @return Finder
      */

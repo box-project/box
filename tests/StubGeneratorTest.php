@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use Herrera\Annotations\Tokenizer;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
 use Phar;
@@ -63,7 +62,8 @@ STUB;
 
     public function test_it_can_generate_a_stub_with_a_custom_banner(): void
     {
-        $this->generator->banner(<<<'TEXT'
+        $this->generator->banner(
+            <<<'TEXT'
 Custom Banner
 
 Yolo
@@ -162,7 +162,7 @@ STUB;
     {
         $this->generator->index('acme.php');
 
-        $expected = <<<STUB
+        $expected = <<<'STUB'
 <?php
 
 require 'phar://' . __FILE__ . '/acme.php';
@@ -179,7 +179,7 @@ STUB;
     {
         $this->generator->intercept(true);
 
-        $expected = <<<STUB
+        $expected = <<<'STUB'
 <?php
 
 Phar::interceptFileFuncs();
@@ -195,7 +195,8 @@ STUB;
     public function test_it_can_generate_a_complete_stub(): void
     {
         $this->generator
-            ->banner(<<<'TEXT'
+            ->banner(
+                <<<'TEXT'
 Custom Banner
 
 Yolo

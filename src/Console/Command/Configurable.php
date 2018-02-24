@@ -16,7 +16,6 @@ namespace KevinGH\Box\Console\Command;
 
 use InvalidArgumentException;
 use KevinGH\Box\Configuration;
-use function sprintf;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -46,7 +45,7 @@ abstract class Configurable extends Command
     /**
      * Returns the configuration settings.
      *
-     * @param InputInterface $input the input handler
+     * @param InputInterface  $input  the input handler
      * @param OutputInterface $output
      *
      * @return Configuration the configuration settings
