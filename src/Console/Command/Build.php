@@ -81,7 +81,7 @@ HELP;
         $io->writeln($this->getApplication()->getHelp());
         $io->writeln('');
 
-        $config = $this->getConfig($input);
+        $config = $this->getConfig($input, $output);
         $path = $config->getOutputPath();
 
         $logger = new BuildLogger($io);

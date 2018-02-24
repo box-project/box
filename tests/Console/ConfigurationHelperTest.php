@@ -81,7 +81,9 @@ class ConfigurationHelperTest extends FileSystemTestCase
 
         $this->assertInstanceOf(
             Configuration::class,
-            $this->helper->loadFile(null)
+            $this->helper->loadFile(
+                $this->helper->findDefaultPath()
+            )
         );
     }
 
