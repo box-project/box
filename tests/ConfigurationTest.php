@@ -27,8 +27,6 @@ use KevinGH\Box\Test\FileSystemTestCase;
 use Phar;
 use SplFileInfo;
 use stdClass;
-use Symfony\Component\Finder\Finder;
-use function iter\fn\method;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\rename;
