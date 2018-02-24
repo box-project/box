@@ -289,7 +289,7 @@ HELP;
 
         $localMain = $box->addFile(
             $main,
-            $config->getMainScriptContent()
+            $config->getMainScriptContents()
         );
 
         $relativeMain = make_path_relative($main, $config->getBasePath());

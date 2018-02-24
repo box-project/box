@@ -54,7 +54,7 @@ BANNER;
     private $compactors;
     private $compressionAlgorithm;
     private $mainScriptPath;
-    private $mainScriptContent;
+    private $mainScriptContents;
     private $map;
     private $fileMapper;
     private $metadata;
@@ -80,8 +80,8 @@ BANNER;
      * @param Compactor[]              $compactors            List of file contents compactors
      * @param null|int                 $compressionAlgorithm  Compression algorithm constant value. See the \Phar class constants
      * @param null|int                 $fileMode              File mode in octal form
-     * @param null|string              $mainScriptPath        The main script file path
-     * @param null|string              $mainScriptContent     The processed content of the main script file
+     * @param string                   $mainScriptPath        The main script file path
+     * @param string                   $mainScriptContents    The processed content of the main script file
      * @param MapFile                  $fileMapper            Utility to map the files from outside and inside the PHAR
      * @param mixed                    $metadata              The PHAR Metadata
      * @param string                   $outputPath
@@ -107,7 +107,7 @@ BANNER;
         ?int $compressionAlgorithm,
         ?int $fileMode,
         string $mainScriptPath,
-        string $mainScriptContent,
+        string $mainScriptContents,
         MapFile $fileMapper,
         $metadata,
         string $outputPath,
@@ -141,7 +141,7 @@ BANNER;
         $this->compressionAlgorithm = $compressionAlgorithm;
         $this->fileMode = $fileMode;
         $this->mainScriptPath = $mainScriptPath;
-        $this->mainScriptContent = $mainScriptContent;
+        $this->mainScriptContents = $mainScriptContents;
         $this->fileMapper = $fileMapper;
         $this->metadata = $metadata;
         $this->outputPath = $outputPath;
@@ -187,7 +187,7 @@ BANNER;
         $fileMode = self::retrieveFileMode($raw);
 
         $mainScriptPath = self::retrieveMainScriptPath($raw, $basePath);
-        $mainScriptContent = self::retrieveMainScriptContents($mainScriptPath);
+        $mainScriptContents = self::retrieveMainScriptContents($mainScriptPath);
 
         $map = self::retrieveMap($raw);
         $fileMapper = new MapFile($map);
@@ -231,7 +231,7 @@ BANNER;
             $compressionAlgorithm,
             $fileMode,
             $mainScriptPath,
-            $mainScriptContent,
+            $mainScriptContents,
             $fileMapper,
             $metadata,
             $outputPath,
@@ -317,9 +317,9 @@ BANNER;
         return $this->mainScriptPath;
     }
 
-    public function getMainScriptContent(): ?string
+    public function getMainScriptContents(): string
     {
-        return $this->mainScriptContent;
+        return $this->mainScriptContents;
     }
 
     public function getOutputPath(): string
@@ -790,7 +790,7 @@ BANNER;
         return self::normalizeFilePath($main, $basePath);
     }
 
-    private static function retrieveMainScriptContents(string $mainScriptPath): ?string
+    private static function retrieveMainScriptContents(string $mainScriptPath): string
     {
         $contents = file_contents($mainScriptPath);
 

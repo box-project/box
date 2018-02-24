@@ -151,12 +151,10 @@ EOF
     public function test_it_cannot_use_a_non_existent_directory_as_abase_path(): void
     {
         try {
-            $this->setConfig(
-                [
-                    'base-path' => $this->tmp.DIRECTORY_SEPARATOR.'test',
-                    'files' => [self::DEFAULT_FILE],
-                ]
-            );
+            $this->setConfig([
+                'base-path' => $this->tmp.DIRECTORY_SEPARATOR.'test',
+                'files' => [self::DEFAULT_FILE],
+            ]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -172,12 +170,10 @@ EOF
         touch('foo');
 
         try {
-            $this->setConfig(
-                [
-                    'base-path' => $this->tmp.DIRECTORY_SEPARATOR.'foo',
-                    'files' => [self::DEFAULT_FILE],
-                ]
-            );
+            $this->setConfig([
+                'base-path' => $this->tmp.DIRECTORY_SEPARATOR.'foo',
+                'files' => [self::DEFAULT_FILE],
+            ]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -194,7 +190,7 @@ EOF
         rename(self::DEFAULT_FILE, 'dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
 
         $this->setConfig([
-                'base-path' => 'dir',
+            'base-path' => 'dir',
         ]);
 
         $expected = $this->tmp.DIRECTORY_SEPARATOR.'dir';
@@ -208,7 +204,7 @@ EOF
         rename(self::DEFAULT_FILE, 'dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
 
         $this->setConfig([
-                'base-path' => ' dir ',
+            'base-path' => ' dir ',
         ]);
 
         $expected = $this->tmp.DIRECTORY_SEPARATOR.'dir';
@@ -249,39 +245,37 @@ EOF
         touch('E/fileE1');
         touch('E/finder_excluded_file');
 
-        $this->setConfig(
-            [
-                'files' => [
-                    'file0',
-                    'file1',
-                ],
-                'directories' => [
-                    'B',
-                    'C',
-                ],
-                'finder' => [
-                    [
-                        'in' => [
-                            'D',
-                        ],
-                        'name' => 'fileD*',
+        $this->setConfig([
+            'files' => [
+                'file0',
+                'file1',
+            ],
+            'directories' => [
+                'B',
+                'C',
+            ],
+            'finder' => [
+                [
+                    'in' => [
+                        'D',
                     ],
-                    [
-                        'in' => [
-                            'E',
-                        ],
-                        'name' => 'fileE*',
+                    'name' => 'fileD*',
+                ],
+                [
+                    'in' => [
+                        'E',
                     ],
+                    'name' => 'fileE*',
                 ],
-                'blacklist' => [
-                    'file1',
-                    'B/fileB1',
-                    'C/fileC1',
-                    'D/fileD1',
-                    'E/fileE1',
-                ],
-            ]
-        );
+            ],
+            'blacklist' => [
+                'file1',
+                'B/fileB1',
+                'C/fileC1',
+                'D/fileD1',
+                'E/fileE1',
+            ],
+        ]);
 
         // Relative to the current working directory for readability
         $expected = [
@@ -460,13 +454,11 @@ EOF
     public function test_cannot_add_a_non_existent_file_to_the_list_of_files(): void
     {
         try {
-            $this->setConfig(
-                [
-                    'files' => [
-                        'non-existent',
-                    ],
-                ]
-            );
+            $this->setConfig([
+                'files' => [
+                    'non-existent',
+                ],
+            ]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -487,13 +479,11 @@ EOF
         mkdir('dirA');
 
         try {
-            $this->setConfig(
-                [
-                    'files' => [
-                        'dirA',
-                    ],
-                ]
-            );
+            $this->setConfig([
+                'files' => [
+                    'dirA',
+                ],
+            ]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -512,13 +502,11 @@ EOF
     public function test_cannot_add_a_non_existent_directory_to_the_list_of_directories(): void
     {
         try {
-            $this->setConfig(
-                [
-                    'directories' => [
-                        'non-existent',
-                    ],
-                ]
-            );
+            $this->setConfig([
+                'directories' => [
+                    'non-existent',
+                ],
+            ]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -539,13 +527,11 @@ EOF
         touch('foo');
 
         try {
-            $this->setConfig(
-                [
-                    'directories' => [
-                        'foo',
-                    ],
-                ]
-            );
+            $this->setConfig([
+                'directories' => [
+                    'foo',
+                ],
+            ]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -584,40 +570,38 @@ EOF
         touch('E/fileE1');
         touch('E/finder_excluded_file');
 
-        $this->setConfig(
-            [
-                'files' => [self::DEFAULT_FILE],
-                'files-bin' => [
-                    'file0',
-                    'file1',
-                ],
-                'directories-bin' => [
-                    'B',
-                    'C',
-                ],
-                'finder-bin' => [
-                    [
-                        'in' => [
-                            'D',
-                        ],
-                        'name' => 'fileD*',
+        $this->setConfig([
+            'files' => [self::DEFAULT_FILE],
+            'files-bin' => [
+                'file0',
+                'file1',
+            ],
+            'directories-bin' => [
+                'B',
+                'C',
+            ],
+            'finder-bin' => [
+                [
+                    'in' => [
+                        'D',
                     ],
-                    [
-                        'in' => [
-                            'E',
-                        ],
-                        'name' => 'fileE*',
+                    'name' => 'fileD*',
+                ],
+                [
+                    'in' => [
+                        'E',
                     ],
+                    'name' => 'fileE*',
                 ],
-                'blacklist' => [
-                    'file1',
-                    'B/fileB1',
-                    'C/fileC1',
-                    'D/fileD1',
-                    'E/fileE1',
-                ],
-            ]
-        );
+            ],
+            'blacklist' => [
+                'file1',
+                'B/fileB1',
+                'C/fileC1',
+                'D/fileD1',
+                'E/fileE1',
+            ],
+        ]);
 
         // Relative to the current working directory for readability
         $expected = [
@@ -745,40 +729,38 @@ EOF
 
         $basePath = $this->tmp.DIRECTORY_SEPARATOR.'sub-dir'.DIRECTORY_SEPARATOR;
 
-        $this->setConfig(
-            [
-                'files' => [self::DEFAULT_FILE],
-                'files-bin' => [
-                    $basePath.'file0',
-                    $basePath.'file1',
-                ],
-                'directories-bin' => [
-                    $basePath.'B',
-                    $basePath.'C',
-                ],
-                'finder-bin' => [
-                    [
-                        'in' => [
-                            $basePath.'D',
-                        ],
-                        'name' => 'fileD*',
+        $this->setConfig([
+            'files' => [self::DEFAULT_FILE],
+            'files-bin' => [
+                $basePath.'file0',
+                $basePath.'file1',
+            ],
+            'directories-bin' => [
+                $basePath.'B',
+                $basePath.'C',
+            ],
+            'finder-bin' => [
+                [
+                    'in' => [
+                        $basePath.'D',
                     ],
-                    [
-                        'in' => [
-                            $basePath.'E',
-                        ],
-                        'name' => 'fileE*',
+                    'name' => 'fileD*',
+                ],
+                [
+                    'in' => [
+                        $basePath.'E',
                     ],
+                    'name' => 'fileE*',
                 ],
-                'blacklist' => [
-                    $basePath.'file1',
-                    $basePath.'B/fileB1',
-                    $basePath.'C/fileC1',
-                    $basePath.'D/fileD1',
-                    $basePath.'E/fileE1',
-                ],
-            ]
-        );
+            ],
+            'blacklist' => [
+                $basePath.'file1',
+                $basePath.'B/fileB1',
+                $basePath.'C/fileC1',
+                $basePath.'D/fileD1',
+                $basePath.'E/fileE1',
+            ],
+        ]);
 
         // Relative to the current working directory for readability
         $expected = [
@@ -799,13 +781,11 @@ EOF
     public function test_cannot_add_a_non_existent_bin_file_to_the_list_of_files(): void
     {
         try {
-            $this->setConfig(
-                [
-                    'files-bin' => [
-                        'non-existent',
-                    ],
-                ]
-            );
+            $this->setConfig([
+                'files-bin' => [
+                    'non-existent',
+                ],
+            ]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -826,13 +806,11 @@ EOF
         mkdir('dirA');
 
         try {
-            $this->setConfig(
-                [
-                    'files-bin' => [
-                        'dirA',
-                    ],
-                ]
-            );
+            $this->setConfig([
+                'files-bin' => [
+                    'dirA',
+                ],
+            ]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -851,13 +829,11 @@ EOF
     public function test_cannot_add_a_non_existent_directory_to_the_list_of_bin_directories(): void
     {
         try {
-            $this->setConfig(
-                [
-                    'directories-bin' => [
-                        'non-existent',
-                    ],
-                ]
-            );
+            $this->setConfig([
+                'directories-bin' => [
+                    'non-existent',
+                ],
+            ]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -878,13 +854,11 @@ EOF
         touch('foo');
 
         try {
-            $this->setConfig(
-                [
-                    'directories-bin' => [
-                        'foo',
-                    ],
-                ]
-            );
+            $this->setConfig([
+                'directories-bin' => [
+                    'foo',
+                ],
+            ]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -908,37 +882,35 @@ EOF
         mkdir('B');
         touch('B/bar');
 
-        $this->setConfig(
-            [
-                'files' => [
-                    'A/foo',
-                    'B/bar',
+        $this->setConfig([
+            'files' => [
+                'A/foo',
+                'B/bar',
+            ],
+            'directories' => ['A', 'B'],
+            'finder' => [
+                [
+                    'in' => ['A', 'B'],
                 ],
-                'directories' => ['A', 'B'],
-                'finder' => [
-                    [
-                        'in' => ['A', 'B'],
-                    ],
-                    [
-                        'in' => ['A', 'B'],
-                    ],
+                [
+                    'in' => ['A', 'B'],
                 ],
+            ],
 
-                'files-bin' => [
-                    'A/foo',
-                    'B/bar',
+            'files-bin' => [
+                'A/foo',
+                'B/bar',
+            ],
+            'directories-bin' => ['A', 'B'],
+            'finder-bin' => [
+                [
+                    'in' => ['A', 'B'],
                 ],
-                'directories-bin' => ['A', 'B'],
-                'finder-bin' => [
-                    [
-                        'in' => ['A', 'B'],
-                    ],
-                    [
-                        'in' => ['A', 'B'],
-                    ],
+                [
+                    'in' => ['A', 'B'],
                 ],
-            ]
-        );
+            ],
+        ]);
 
         // Relative to the current working directory for readability
         $expected = [
@@ -964,11 +936,9 @@ EOF
     public function test_blacklist_value_must_be_an_array_of_strings($value): void
     {
         try {
-            $this->setConfig(
-                [
-                    'blacklist' => $value,
-                ]
-            );
+            $this->setConfig([
+                'blacklist' => $value,
+            ]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (JsonValidationException $exception) {
@@ -985,16 +955,14 @@ EOF
         touch('B/fileB0');
         touch('B/fileB1');
 
-        $this->setConfig(
-            [
-                'directories' => [
-                    'B',
-                ],
-                'blacklist' => [
-                    ' B/fileB1 ',
-                ],
-            ]
-        );
+        $this->setConfig([
+            'directories' => [
+                'B',
+            ],
+            'blacklist' => [
+                ' B/fileB1 ',
+            ],
+        ]);
 
         // Relative to the current working directory for readability
         $expected = [
@@ -1013,11 +981,9 @@ EOF
     public function test_files_value_must_be_an_array_of_strings($value): void
     {
         try {
-            $this->setConfig(
-                [
-                    'files' => $value,
-                ]
-            );
+            $this->setConfig([
+                'files' => $value,
+            ]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (JsonValidationException $exception) {
@@ -1036,11 +1002,9 @@ EOF
     public function test_bin_files_value_must_be_an_array_of_strings($value): void
     {
         try {
-            $this->setConfig(
-                [
-                    'files-bin' => $value,
-                ]
-            );
+            $this->setConfig([
+                'files-bin' => $value,
+            ]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (JsonValidationException $exception) {
@@ -1055,16 +1019,14 @@ EOF
     {
         touch('foo');
 
-        $this->setConfig(
-            [
-                'files' => [
-                    ' foo ',
-                ],
-                'files-bin' => [
-                    ' foo ',
-                ],
-            ]
-        );
+        $this->setConfig([
+            'files' => [
+                ' foo ',
+            ],
+            'files-bin' => [
+                ' foo ',
+            ],
+        ]);
 
         // Relative to the current working directory for readability
         $expected = ['foo'];
@@ -1087,11 +1049,9 @@ EOF
     public function test_directories_value_must_be_an_array_of_strings($value): void
     {
         try {
-            $this->setConfig(
-                [
-                    'directories' => $value,
-                ]
-            );
+            $this->setConfig([
+                'directories' => $value,
+            ]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (JsonValidationException $exception) {
@@ -1110,11 +1070,9 @@ EOF
     public function test_bin_directories_value_must_be_an_array_of_strings($value): void
     {
         try {
-            $this->setConfig(
-                [
-                    'directories-bin' => $value,
-                ]
-            );
+            $this->setConfig([
+                'directories-bin' => $value,
+            ]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (JsonValidationException $exception) {
@@ -1130,16 +1088,14 @@ EOF
         mkdir('A');
         touch('A/foo');
 
-        $this->setConfig(
-            [
-                'directories' => [
-                    ' A ',
-                ],
-                'directories-bin' => [
-                    ' A ',
-                ],
-            ]
-        );
+        $this->setConfig([
+            'directories' => [
+                ' A ',
+            ],
+            'directories-bin' => [
+                ' A ',
+            ],
+        ]);
 
         // Relative to the current working directory for readability
         $expected = ['A/foo'];
@@ -1162,11 +1118,9 @@ EOF
     public function test_finder_value_must_be_an_array_of_objects($value): void
     {
         try {
-            $this->setConfig(
-                [
-                    'finder' => $value,
-                ]
-            );
+            $this->setConfig([
+                'finder' => $value,
+            ]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (JsonValidationException $exception) {
@@ -1219,13 +1173,11 @@ EOF
             ],
         ];
 
-        $this->setConfig(
-            [
-                'base-path' => 'sub-dir',
-                'finder' => $finderConfig,
-                'finder-bin' => $finderConfig,
-            ]
-        );
+        $this->setConfig([
+            'base-path' => 'sub-dir',
+            'finder' => $finderConfig,
+            'finder-bin' => $finderConfig,
+        ]);
 
         // Relative to the current working directory for readability
         $expected = [
@@ -1266,12 +1218,10 @@ EOF
             ],
         ];
 
-        $this->setConfig(
-            [
-                'finder' => $finderConfig,
-                'finder-bin' => $finderConfig,
-            ]
-        );
+        $this->setConfig([
+            'finder' => $finderConfig,
+            'finder-bin' => $finderConfig,
+        ]);
 
         // Relative to the current working directory for readability
         $expected = ['A/foo'];
@@ -1302,22 +1252,20 @@ EOF
         mkdir('B');
         touch('B/bar');
 
-        $this->setConfig(
-            [
-                'files' => [],
-                'finder' => [
-                    [
-                        // This would cause a failure on the Finder as `Finder::name()` accepts only a string value. But
-                        // instead here we will do multiple call of `Finder::name()` with each value
-                        'name' => [
-                            'fo*',
-                            'bar*',
-                        ],
-                        'in' => $this->tmp,
+        $this->setConfig([
+            'files' => [],
+            'finder' => [
+                [
+                    // This would cause a failure on the Finder as `Finder::name()` accepts only a string value. But
+                    // instead here we will do multiple call of `Finder::name()` with each value
+                    'name' => [
+                        'fo*',
+                        'bar*',
                     ],
+                    'in' => $this->tmp,
                 ],
-            ]
-        );
+            ],
+        ]);
 
         // Relative to the current working directory for readability
         $expected = [
@@ -1332,9 +1280,11 @@ EOF
     public function test_the_finder_config_cannot_include_invalid_methods(): void
     {
         try {
-            $this->setConfig(
-                ['finder' => [['invalidMethod' => 'whargarbl']]]
-            );
+            $this->setConfig([
+                'finder' => [
+                    ['invalidMethod' => 'whargarbl'],
+                ],
+            ]);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -1372,15 +1322,13 @@ EOF
 
     public function test_configure_the_compactors(): void
     {
-        $this->setConfig(
-            [
-                'files' => [self::DEFAULT_FILE],
-                'compactors' => [
-                    Php::class,
-                    DummyCompactor::class,
-                ],
-            ]
-        );
+        $this->setConfig([
+            'files' => [self::DEFAULT_FILE],
+            'compactors' => [
+                Php::class,
+                DummyCompactor::class,
+            ],
+        ]);
 
         $compactors = $this->config->getCompactors();
 
@@ -1427,19 +1375,17 @@ EOF
 
     public function test_get_compactors_annotations(): void
     {
-        $this->setConfig(
-            [
-                'files' => [self::DEFAULT_FILE],
-                'annotations' => (object) [
-                    'ignore' => [
-                        'author',
-                    ],
+        $this->setConfig([
+            'files' => [self::DEFAULT_FILE],
+            'annotations' => (object) [
+                'ignore' => [
+                    'author',
                 ],
-                'compactors' => [
-                    Php::class,
-                ],
-            ]
-        );
+            ],
+            'compactors' => [
+                Php::class,
+            ],
+        ]);
 
         $compactors = $this->config->getCompactors();
 
@@ -1564,7 +1510,7 @@ EOF
 
         $this->setConfig([]);
 
-        $this->assertSame($expected, $this->config->getMainScriptContent());
+        $this->assertSame($expected, $this->config->getMainScriptContents());
     }
 
     public function test_configure_main_script_content(): void
@@ -1573,7 +1519,7 @@ EOF
 
         $this->setConfig(['main' => 'test.php']);
 
-        $this->assertSame('script content', $this->config->getMainScriptContent());
+        $this->assertSame('script content', $this->config->getMainScriptContents());
     }
 
     public function test_main_script_content_ignores_shebang_line(): void
@@ -1582,7 +1528,7 @@ EOF
 
         $this->setConfig(['main' => 'test.php']);
 
-        $this->assertSame('test', $this->config->getMainScriptContent());
+        $this->assertSame('test', $this->config->getMainScriptContents());
     }
 
     public function test_it_cannot_get_the_main_script_if_file_doesnt_exists(): void
@@ -1606,15 +1552,13 @@ EOF
 
     public function test_configure_map(): void
     {
-        $this->setConfig(
-            [
-                'files' => [self::DEFAULT_FILE],
-                'map' => [
-                    ['a' => 'b'],
-                    ['_empty_' => 'c'],
-                ],
-            ]
-        );
+        $this->setConfig([
+            'files' => [self::DEFAULT_FILE],
+            'map' => [
+                ['a' => 'b'],
+                ['_empty_' => 'c'],
+            ],
+        ]);
 
         $this->assertSame(
             [
@@ -1627,15 +1571,13 @@ EOF
 
     public function test_get_mapper(): void
     {
-        $this->setConfig(
-            [
-                'files' => [self::DEFAULT_FILE],
-                'map' => [
-                    ['first/test/path' => 'a'],
-                    ['' => 'b/'],
-                ],
-            ]
-        );
+        $this->setConfig([
+            'files' => [self::DEFAULT_FILE],
+            'map' => [
+                ['first/test/path' => 'a'],
+                ['' => 'b/'],
+            ],
+        ]);
 
         $mapFile = $this->config->getFileMapper();
 
@@ -1774,18 +1716,16 @@ EOF
         exec('git commit -m "Adding test file."');
         exec('git tag 1.0.0');
 
-        $this->setConfig(
-            [
-                'files' => [self::DEFAULT_FILE],
-                'git-commit' => 'git_commit',
-                'git-commit-short' => 'git_commit_short',
-                'git-tag' => 'git_tag',
-                'git-version' => 'git_version',
-                'replacements' => ['rand' => $rand = random_int(0, getrandmax())],
-                'datetime' => 'date_time',
-                'datetime_format' => 'Y:m:d',
-            ]
-        );
+        $this->setConfig([
+            'files' => [self::DEFAULT_FILE],
+            'git-commit' => 'git_commit',
+            'git-commit-short' => 'git_commit_short',
+            'git-tag' => 'git_tag',
+            'git-version' => 'git_version',
+            'replacements' => ['rand' => $rand = random_int(0, getrandmax())],
+            'datetime' => 'date_time',
+            'datetime_format' => 'Y:m:d',
+        ]);
 
         $values = $this->config->getProcessedReplacements();
 
@@ -1985,46 +1925,6 @@ BANNER;
 
         $this->assertSame($expected, $this->config->getStubBannerContents());
         $this->assertNull($this->config->getStubBannerPath());
-    }
-
-    public function provideCustomBanner(): Generator
-    {
-        yield ['Simple banner'];
-
-        yield [<<<'COMMENT'
-This is a
-
-multiline
-
-banner.
-COMMENT
-        ];
-    }
-
-    public function provideUnormalizedCustomBanner(): Generator
-    {
-        yield [
-            ' Simple banner ',
-            'Simple banner',
-        ];
-
-        yield [
-            <<<'COMMENT'
- This is a 
- 
- multiline 
- 
- banner. 
-COMMENT
-            ,
-            <<<'COMMENT'
-This is a
-
-multiline
-
-banner.
-COMMENT
-        ];
     }
 
     public function test_a_custom_multiline_banner_can_be_registered(): void
@@ -2286,7 +2186,7 @@ CODE
         }
     }
 
-    private function provideJsonPrimitives(): Generator
+    public function provideJsonPrimitives(): Generator
     {
         yield 'null' => null;
         yield 'bool' => true;
@@ -2294,6 +2194,46 @@ CODE
         yield 'string' => 'foo';
         yield 'object' => ['foo' => 'bar'];
         yield 'array' => ['foo', 'bar'];
+    }
+
+    public function provideCustomBanner(): Generator
+    {
+        yield ['Simple banner'];
+
+        yield [<<<'COMMENT'
+This is a
+
+multiline
+
+banner.
+COMMENT
+        ];
+    }
+
+    public function provideUnormalizedCustomBanner(): Generator
+    {
+        yield [
+            ' Simple banner ',
+            'Simple banner',
+        ];
+
+        yield [
+            <<<'COMMENT'
+ This is a 
+ 
+ multiline 
+ 
+ banner. 
+COMMENT
+            ,
+            <<<'COMMENT'
+This is a
+
+multiline
+
+banner.
+COMMENT
+        ];
     }
 
     private function setConfig(array $config): void
