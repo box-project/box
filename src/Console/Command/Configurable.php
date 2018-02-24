@@ -16,6 +16,7 @@ namespace KevinGH\Box\Console\Command;
 
 use InvalidArgumentException;
 use KevinGH\Box\Configuration;
+use KevinGH\Box\Throwable\Exception\NoConfigurationFound;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -45,31 +46,40 @@ abstract class Configurable extends Command
     /**
      * Returns the configuration settings.
      *
-     * @param InputInterface  $input  the input handler
+     * @param InputInterface  $input
      * @param OutputInterface $output
+     * @param bool            $allowNoFile Load the config nonetheless if not file is found when true
      *
-     * @return Configuration the configuration settings
+     * @return Configuration
      */
-    final protected function getConfig(InputInterface $input, OutputInterface $output): Configuration
+    final protected function getConfig(InputInterface $input, OutputInterface $output, bool $allowNoFile = false): Configuration
     {
         /** @var $helper \KevinGH\Box\Console\ConfigurationHelper */
         $helper = $this->getHelper('config');
 
         $io = new SymfonyStyle($input, $output);
 
-        $configPath = null !== $input->getOption(self::CONFIG_PARAM)
-            ? $input->getOption(self::CONFIG_PARAM)
-            : $helper->findDefaultPath()
-        ;
-
         try {
+            $configPath = null !== $input->getOption(self::CONFIG_PARAM)
+                ? $input->getOption(self::CONFIG_PARAM)
+                : $helper->findDefaultPath()
+            ;
+
             $io->comment(
                 sprintf(
                     'Loading the configuration file "<comment>%s</comment>".',
                     $configPath
                 )
             );
+        } catch (NoConfigurationFound $exception) {
+            if (false === $allowNoFile) {
+                throw $exception;
+            }
 
+            $configPath = null;
+        }
+
+        try {
             return $helper->loadFile($configPath);
         } catch (InvalidArgumentException $exception) {
             $io->error('The configuration file is invalid.');

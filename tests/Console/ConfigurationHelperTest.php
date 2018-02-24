@@ -16,7 +16,7 @@ namespace KevinGH\Box\Console;
 
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Test\FileSystemTestCase;
-use RuntimeException;
+use KevinGH\Box\Throwable\Exception\NoConfigurationFound;
 
 /**
  * @covers \KevinGH\Box\Console\ConfigurationHelper
@@ -87,13 +87,23 @@ class ConfigurationHelperTest extends FileSystemTestCase
         );
     }
 
+    public function test_it_can_load_a_configuration_without_a_file(): void
+    {
+        touch('index.php');
+
+        $this->assertInstanceOf(
+            Configuration::class,
+            $this->helper->loadFile(null)
+        );
+    }
+
     public function test_it_throws_an_error_if_no_config_path_is_found(): void
     {
         try {
             $this->helper->findDefaultPath();
 
             $this->fail('Expected exception to be thrown.');
-        } catch (RuntimeException $exception) {
+        } catch (NoConfigurationFound $exception) {
             $this->assertSame(
                 'The configuration file could not be found.',
                 $exception->getMessage()

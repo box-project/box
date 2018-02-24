@@ -28,6 +28,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Traversable;
 use function KevinGH\Box\FileSystem\mirror;
+use function KevinGH\Box\FileSystem\rename;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Build
@@ -229,6 +230,94 @@ PHP;
             exec('php test.phar'),
             'Expected PHAR to be executable'
         );
+    }
+
+    public function test_it_can_build_an_empty_PHAR_file(): void
+    {
+        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+
+        rename('run.php', 'index.php');
+
+        $commandTester = $this->getCommandTester();
+
+        $commandTester->execute(
+            ['command' => 'build'],
+            ['interactive' => true]
+        );
+
+        $expected = <<<OUTPUT
+
+    ____
+   / __ )____  _  __
+  / __  / __ \| |/_/
+ / /_/ / /_/ />  <
+/_____/\____/_/|_|
+
+
+Box (repo)
+
+Building the PHAR "/path/to/tmp/default.phar"
+? No compactor to register
+? Adding main file: /path/to/tmp/index.php
+? Adding binary files
+    > No file found
+? Adding files
+    > 9 file(s)
+? Using default stub
+? No compression
+* Done.
+
+ // PHAR size: 100B
+ // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
+
+
+OUTPUT;
+
+        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
+
+        $this->assertSame($expected, $actual, 'Expected logs to be identical');
+
+        $this->assertSame(
+            'Hello, world!',
+            exec('php default.phar'),
+            'Expected PHAR to be executable'
+        );
+
+        $phar = new Phar('default.phar');
+
+        // Check PHAR content
+        $actualStub = $this->normalizeDisplay($phar->getStub());
+        $expectedStub = DisplayNormalizer::removeTrailingSpaces(file_get_contents(self::FIXTURES_DIR.'/../default_stub.php'));
+
+        $this->assertSame($expectedStub, $actualStub);
+
+        $this->assertNull(
+            $phar->getMetadata(),
+            'Expected PHAR metadata to be set'
+        );
+
+        $expectedFiles = [
+            '/a/',
+            '/a/deep/',
+            '/a/deep/test/',
+            '/a/deep/test/directory/',
+            '/a/deep/test/directory/test.php',
+            '/one/',
+            '/one/test.php',
+            '/two/',
+            '/two/test.png',
+            '/binary',
+            '/bootstrap.php',
+            '/private.key',
+            '/test.phar',
+            '/test.phar.pubkey',
+            '/test.php',
+            '/index.php',
+        ];
+
+        $actualFiles = $this->retrievePharFiles($phar);
+
+        $this->assertEquals($expectedFiles, $actualFiles, '', .0, 10, true);
     }
 
     public function test_it_can_build_a_PHAR_with_complete_mapping(): void
@@ -1319,8 +1408,8 @@ OUTPUT;
         $phar = new Phar('default.phar');
 
         // Check the stub content
-        $actualStub = $this->normalizeStub($phar->getStub());
-        $defaultStub = $this->normalizeStub(file_get_contents(self::FIXTURES_DIR.'/../default_stub.php'));
+        $actualStub = DisplayNormalizer::removeTrailingSpaces($phar->getStub());
+        $defaultStub = DisplayNormalizer::removeTrailingSpaces(file_get_contents(self::FIXTURES_DIR.'/../default_stub.php'));
 
         if ($stub) {
             $this->assertSame($phar->getPath(), $phar->getAlias());
@@ -1497,16 +1586,5 @@ OUTPUT;
         sort($paths);
 
         return array_unique($paths);
-    }
-
-    private function normalizeStub(string $stub): string
-    {
-        return implode(
-            "\n",
-            array_map(
-                'trim',
-                preg_split('/\n/', $stub)
-            )
-        );
     }
 }

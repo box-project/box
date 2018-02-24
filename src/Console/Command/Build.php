@@ -79,7 +79,7 @@ HELP;
         $io->writeln($this->getApplication()->getHelp());
         $io->writeln('');
 
-        $config = $this->getConfig($input, $output);
+        $config = $this->getConfig($input, $output, true);
         $path = $config->getOutputPath();
 
         $logger = new BuildLogger($io);
@@ -338,7 +338,7 @@ HELP;
                 );
             }
 
-            $box->getPhar()->setDefaultStub($main, $main);
+            $box->getPhar()->setDefaultStub($main);
 
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,

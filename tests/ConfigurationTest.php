@@ -60,12 +60,20 @@ class ConfigurationTest extends FileSystemTestCase
         touch($defaultFile = self::DEFAULT_FILE);
         touch($this->file);
 
-        $this->config = Configuration::create($this->file, (object) ['files' => [self::DEFAULT_FILE]]);
+        $this->config = Configuration::create($this->file, new stdClass());
+    }
+
+    public function test_it_can_be_created_without_a_file(): void
+    {
+        Configuration::create(null, new stdClass());
+
+        $this->assertTrue(true);
     }
 
     public function test_no_alias_is_registered_by_default(): void
     {
         $this->assertNull($this->config->getAlias());
+        $this->assertNull($this->getNoFileConfig()->getAlias());
     }
 
     public function test_the_alias_can_be_configured(): void
@@ -126,12 +134,24 @@ EOF
         }
     }
 
-    public function test_the_default_base_path_used_is_the_current_working_directory(): void
+    public function test_the_default_base_path_used_is_the_configuration_file_location(): void
     {
-        $this->assertSame($this->tmp, $this->config->getBasePath());
+        dump_file('sub-dir/box.json', '{}');
+        dump_file('sub-dir/index.php');
+
+        $this->file = $this->tmp.'/sub-dir/box.json';
+
+        $this->setConfig([]);
+
+        $this->assertSame($this->tmp.'/sub-dir', $this->config->getBasePath());
     }
 
-    public function test_configure_the_base_path(): void
+    public function test_if_there_is_no_file_the_default_base_path_used_is_the_current_working_directory(): void
+    {
+        $this->assertSame($this->tmp, $this->getNoFileConfig()->getBasePath());
+    }
+
+    public function test_the_base_path_can_be_configured(): void
     {
         mkdir($basePath = $this->tmp.DIRECTORY_SEPARATOR.'test');
         rename(self::DEFAULT_FILE, $basePath.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
@@ -146,7 +166,7 @@ EOF
         );
     }
 
-    public function test_it_cannot_use_a_non_existent_directory_as_abase_path(): void
+    public function test_a_non_existent_directory_cannot_be_used_as_a_base_path(): void
     {
         try {
             $this->setConfig([
@@ -163,7 +183,7 @@ EOF
         }
     }
 
-    public function test_it_cannot_a_path_as_a_base_path(): void
+    public function test_a_file_path_cannot_be_used_as_a_base_path(): void
     {
         touch('foo');
 
@@ -220,7 +240,61 @@ EOF
         $this->assertSame($expected, $actual);
     }
 
-    public function test_configure_the_files_iterator(): void
+    public function test_no_files_are_configured_by_default(): void
+    {
+        $this->assertSame([], $this->normalizeConfigPaths($this->config->getFiles()));
+        $this->assertCount(0, $this->config->getBinaryFiles());
+    }
+
+    public function test_all_the_files_found_in_the_current_directory_are_taken_by_default_with_no_config_file_is_used(): void
+    {
+        touch('file0');
+        touch('file1');
+
+        mkdir('B');
+        touch('B/fileB0');
+        touch('B/fileB1');
+
+        mkdir('C');
+        touch('C/fileC0');
+        touch('C/fileC1');
+
+        mkdir('D');
+        touch('D/fileD0');
+        touch('D/fileD1');
+        touch('D/finder_excluded_file');
+
+        mkdir('E');
+        touch('E/fileE0');
+        touch('E/fileE1');
+        touch('E/finder_excluded_file');
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'box.json',
+            'file0',
+            'file1',
+            'B/fileB0',
+            'B/fileB1',
+            'C/fileC0',
+            'C/fileC1',
+            'D/fileD0',
+            'D/fileD1',
+            'D/finder_excluded_file',
+            'E/fileE0',
+            'E/fileE1',
+            'E/finder_excluded_file',
+        ];
+
+        $noFileConfig = $this->getNoFileConfig();
+
+        $actual = $this->normalizeConfigPaths($noFileConfig->getFiles());
+
+        $this->assertEquals($expected, $actual, '', .0, 10, true);
+        $this->assertCount(0, $noFileConfig->getBinaryFiles());
+    }
+
+    public function test_the_files_can_be_configured(): void
     {
         touch('file0');
         touch('file1');
@@ -449,7 +523,7 @@ EOF
         $this->assertCount(0, $this->config->getBinaryFiles());
     }
 
-    public function test_cannot_add_a_non_existent_file_to_the_list_of_files(): void
+    public function test_a_non_existent_file_cannot_be_added_to_the_list_of_files(): void
     {
         try {
             $this->setConfig([
@@ -545,7 +619,7 @@ EOF
         }
     }
 
-    public function test_configure_the_bin_files_iterator(): void
+    public function test_the_bin_files_iterator_can_be_configured(): void
     {
         touch('file0');
         touch('file1');
@@ -1293,9 +1367,10 @@ EOF
         }
     }
 
-    public function test_get_the_bootstrap_file(): void
+    public function test_no_bootstrap_file_is_configured_by_default(): void
     {
         $this->assertNull($this->config->getBootstrapFile());
+        $this->assertNull($this->getNoFileConfig()->getBootstrapFile());
     }
 
     public function test_configure_the_bootstrap_file(): void
@@ -1313,9 +1388,10 @@ EOF
         );
     }
 
-    public function test_get_the_compactors(): void
+    public function test_no_compactors_is_configured_by_default(): void
     {
         $this->assertSame([], $this->config->getCompactors());
+        $this->assertSame([], $this->getNoFileConfig()->getCompactors());
     }
 
     public function test_configure_the_compactors(): void
@@ -1412,12 +1488,13 @@ EOF
         $this->assertSame(['author'], $ignored);
     }
 
-    public function test_get_compression_algorithm(): void
+    public function test_no_compression_algorithm_is_configured_by_default(): void
     {
         $this->assertNull($this->config->getCompressionAlgorithm());
+        $this->assertNull($this->getNoFileConfig()->getCompressionAlgorithm());
     }
 
-    public function test_configure_compression_algorithm(): void
+    public function test_the_compression_algorithm_can_be_configured(): void
     {
         $this->setConfig([
             'files' => [self::DEFAULT_FILE],
@@ -1427,7 +1504,7 @@ EOF
         $this->assertSame(Phar::BZ2, $this->config->getCompressionAlgorithm());
     }
 
-    public function test_configure_compression_algorithm_with_a_string(): void
+    public function test_the_compression_algorithm_with_a_string(): void
     {
         $this->setConfig([
             'files' => [self::DEFAULT_FILE],
@@ -1442,7 +1519,7 @@ EOF
      *
      * @param mixed $compression
      */
-    public function test_configure_compression_algorithm_with_an_invalid_algorithm($compression, string $errorMessage): void
+    public function test_the_compression_algorithm_cannot_be_an_invalid_algorithm($compression, string $errorMessage): void
     {
         try {
             $this->setConfig([
@@ -1464,9 +1541,10 @@ EOF
         }
     }
 
-    public function test_get_file_mode(): void
+    public function test_no_file_mode_is_configured_by_default(): void
     {
         $this->assertNull($this->config->getFileMode());
+        $this->assertNull($this->getNoFileConfig()->getFileMode());
     }
 
     public function test_configure_file_mode(): void
@@ -1482,6 +1560,7 @@ EOF
     public function test_a_main_script_path_is_configured_by_default(): void
     {
         $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'index.php', $this->config->getMainScriptPath());
+        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'index.php', $this->getNoFileConfig()->getMainScriptPath());
     }
 
     public function test_main_script_can_be_configured(): void
@@ -2267,5 +2346,10 @@ COMMENT
                 $files
             )
         );
+    }
+
+    private function getNoFileConfig(): Configuration
+    {
+        return Configuration::create(null, new stdClass());
     }
 }
