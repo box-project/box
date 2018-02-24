@@ -19,6 +19,7 @@ use Amp\Parallel\Worker\TaskException;
 use DirectoryIterator;
 use Generator;
 use KevinGH\Box\Compactor\Php;
+use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
 use PharFileInfo;
@@ -1458,14 +1459,7 @@ OUTPUT;
             $display
         );
 
-        $lines = explode("\n", $display);
-
-        $lines = array_map(
-            'rtrim',
-            $lines
-        );
-
-        return implode("\n", $lines);
+        return DisplayNormalizer::removeTrailingSpaces($display);
     }
 
     private function retrievePharFiles(Phar $phar, Traversable $traversable = null): array
