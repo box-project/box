@@ -100,22 +100,15 @@ HELP;
             'Done.'
         );
 
-        if ($io->getVerbosity() >= OutputInterface::VERBOSITY_NORMAL) {
-            $io->comment(
-                sprintf(
-                    "<info>PHAR size: %s\nMemory usage: %.2fMB (peak: %.2fMB), time: %.2fs<info>",
-                    formatted_filesize($path),
-                    round(memory_get_usage() / 1024 / 1024, 2),
-                    round(memory_get_peak_usage() / 1024 / 1024, 2),
-                    round(microtime(true) - $startTime, 2)
-                )
-            );
-        }
-
-        if (false === file_exists($path)) {
-            //TODO: check that one
-            $io->warning('The archive was not generated because it did not have any contents');
-        }
+        $io->comment(
+            sprintf(
+                "<info>PHAR size: %s\nMemory usage: %.2fMB (peak: %.2fMB), time: %.2fs<info>",
+                formatted_filesize($path),
+                round(memory_get_usage() / 1024 / 1024, 2),
+                round(memory_get_peak_usage() / 1024 / 1024, 2),
+                round(microtime(true) - $startTime, 2)
+            )
+        );
     }
 
     private function createPhar(
