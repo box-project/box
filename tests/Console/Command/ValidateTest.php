@@ -59,11 +59,14 @@ class ValidateTest extends CommandTestCase
         );
 
         $expected = <<<'OUTPUT'
+
+ // Loading the configuration file "test.json".
+
 The configuration file passed validation.
 
 OUTPUT;
 
-        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $this->assertSame($expected, $this->normalizeDisplay($this->commandTester->getDisplay(true)));
         $this->assertSame(0, $this->commandTester->getStatusCode());
     }
 
@@ -118,6 +121,9 @@ OUTPUT;
         );
 
         $expected = <<<'OUTPUT'
+
+ // Loading the configuration file "box.json.dist".
+
 The configuration file failed validation: Parse error on line 1:
 {
 ^
@@ -125,7 +131,15 @@ Expected one of: 'STRING', '}'
 
 OUTPUT;
 
-        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
+
+        $actual = preg_replace(
+            '/\s\/\/ Loading the configuration file(\n.+)+box\.json\.dist[comment\<\>\n\s\/]*"\./',
+            ' // Loading the configuration file "box.json.dist".',
+            $actual
+        );
+
+        $this->assertSame($expected, $actual);
         $this->assertSame(1, $this->commandTester->getStatusCode());
     }
 
@@ -172,6 +186,9 @@ OUTPUT;
             '/path/to',
             $this->tmp,
             <<<'EOF'
+
+ // Loading the configuration file "box.json.dist".
+
 The configuration file failed validation: "/path/to/box.json" does not match the expected JSON schema:
 
   - The property test is not defined and the definition does not allow additional properties
@@ -179,7 +196,15 @@ The configuration file failed validation: "/path/to/box.json" does not match the
 EOF
         );
 
-        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
+
+        $actual = preg_replace(
+            '/\s\/\/ Loading the configuration file(\n.+)+box\.json[comment\<\>\n\s\/]*"\./',
+            ' // Loading the configuration file "box.json.dist".',
+            $actual
+        );
+
+        $this->assertSame($expected, $actual);
         $this->assertSame(1, $this->commandTester->getStatusCode());
     }
 
@@ -215,8 +240,23 @@ EOF
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function getCommand(): Command
     {
         return new Validate();
+    }
+
+    private function normalizeDisplay(string $display): string
+    {
+        $lines = explode("\n", $display);
+
+        $lines = array_map(
+            'rtrim',
+            $lines
+        );
+
+        return implode("\n", $lines);
     }
 }

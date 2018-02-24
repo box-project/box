@@ -89,6 +89,9 @@ class BuildTest extends CommandTestCase
 
 Box (repo)
 
+
+ // Loading the configuration file "/path/to/box.json.dist".
+
 ? Loading the bootstrap file "/path/to/tmp/bootstrap.php"
 ? Removing the existing PHAR "/path/to/tmp/test.phar"
 Building the PHAR "/path/to/tmp/test.phar"
@@ -276,6 +279,9 @@ PHP;
 
 Box (repo)
 
+
+ // Loading the configuration file "/path/to/box.json.dist".
+
 ? Loading the bootstrap file "/path/to/tmp/bootstrap.php"
 ? Removing the existing PHAR "/path/to/tmp/test.phar"
 Building the PHAR "/path/to/tmp/test.phar"
@@ -424,6 +430,9 @@ PHP;
 
 Box (repo)
 
+
+ // Loading the configuration file "/path/to/box.json.dist".
+
 ? Loading the bootstrap file "/path/to/tmp/bootstrap.php"
 ? Removing the existing PHAR "/path/to/tmp/test.phar"
 * Building the PHAR "/path/to/tmp/test.phar"
@@ -521,6 +530,9 @@ OUTPUT;
 
 
 Box (repo)
+
+
+ // Loading the configuration file "/path/to/box.json.dist".
 
 ? Loading the bootstrap file "/path/to/tmp/bootstrap.php"
 ? Removing the existing PHAR "/path/to/tmp/test.phar"
@@ -873,6 +885,9 @@ PHP
 
 Box (repo)
 
+
+ // Loading the configuration file "/path/to/box.json.dist".
+
 ? Removing the existing PHAR "/path/to/tmp/default.phar"
 * Building the PHAR "/path/to/tmp/default.phar"
 ? Setting replacement values
@@ -933,6 +948,9 @@ OUTPUT;
 
 
 Box (repo)
+
+
+ // Loading the configuration file "/path/to/box.json.dist".
 
 * Building the PHAR "/path/to/tmp/default.phar"
 ? Setting replacement values
@@ -995,6 +1013,9 @@ OUTPUT;
 
 Box (repo)
 
+
+ // Loading the configuration file "/path/to/box.json.dist".
+
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
 ? Adding main file: /path/to/tmp/test.php
@@ -1049,6 +1070,9 @@ OUTPUT;
 
 Box (repo)
 
+
+ // Loading the configuration file "/path/to/box.json.dist".
+
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
 ? Adding main file: /path/to/tmp/test.php
@@ -1101,6 +1125,9 @@ OUTPUT;
 
 Box (repo)
 
+
+ // Loading the configuration file "/path/to/box.json.dist".
+
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
 ? Adding binary files
@@ -1145,6 +1172,9 @@ OUTPUT;
 
 
 Box (repo)
+
+
+ // Loading the configuration file "/path/to/box.json.dist".
 
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
@@ -1207,6 +1237,9 @@ OUTPUT;
 
 
 Box (repo)
+
+
+ // Loading the configuration file "/path/to/box.json.dist".
 
 * Building the PHAR "/path/to/tmp/foo/bar/test.phar"
 ? No compactor to register
@@ -1348,6 +1381,9 @@ OUTPUT;
 
 Box (repo)
 
+
+ // Loading the configuration file "/path/to/box.json.dist".
+
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
 ? Adding main file: /path/to/tmp/test.php
@@ -1403,6 +1439,12 @@ OUTPUT;
     private function normalizeDisplay(string $display)
     {
         $display = str_replace($this->tmp, '/path/to/tmp', $display);
+
+        $display = preg_replace(
+            '/Loading the configuration file[\s\n]+.*[\s\n\/]+.*box\.json[comment\<\>\n\s\/]*"\./',
+            'Loading the configuration file "/path/to/box.json.dist".',
+            $display
+        );
 
         $display = preg_replace(
             '/\/\/ PHAR size: \d+\.\d{2}K?B/',
