@@ -184,6 +184,8 @@ The shebang line can be removed altogether if set to `null`.
 The intercept (`boolean`) setting is used when generating a new stub. If setting is set to `true`, the 
 [Phar::interceptFileFuncs()][phar.interceptfilefuncs] method will be called in the stub.
 
+This setting is set to `false` by default.
+
 
 ### Alias (`alias`)
 
@@ -191,7 +193,7 @@ The `alias` (`string`) setting is used when generating a new stub to call the [`
 makes it easier to refer to files in the PHAR and ensure the access to internal files will always work regardless of the
 location of the PHAR on the file system.
 
-No alias is configured by default.
+No alias is used by default.
 
 Example:
 
