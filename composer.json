@@ -38,7 +38,7 @@
         "infection/infection": "^0.7.0",
         "mikey179/vfsStream": "^1.1",
         "phpunit/phpunit": "^7.0",
-        "symfony/var-dumper": "^4.0"
+        "symfony/var-dumper": "^3.4 || ^4.0"
     },
     "suggest": {
         "ext-openssl": "To accelerate private key generation."

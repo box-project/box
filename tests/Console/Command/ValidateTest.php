@@ -197,7 +197,7 @@ The configuration file failed validation: "/path/to/box.json" does not match the
 EOF
         );
 
-        $actual = DisplayNormalizer::removeTrailingSpaces(($this->commandTester->getDisplay(true));
+        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
         $actual = preg_replace(
             '/\s\/\/ Loading the configuration file(\n.+)+box\.json[comment\<\>\n\s\/]*"\./',
