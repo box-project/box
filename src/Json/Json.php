@@ -23,17 +23,23 @@ use function KevinGH\Box\FileSystem\file_contents;
 final class Json
 {
     private $linter;
-    private $validator;
 
     public function __construct()
     {
         $this->linter = new JsonParser();
-        $this->validator = new Validator();
     }
 
-    public function decode(string $json): stdClass
+    /**
+     * @param string $json
+     * @param bool $assoc
+     *
+     * @throws ParsingException
+     *
+     * @return stdClass|array
+     */
+    public function decode(string $json, bool $assoc = false)
     {
-        $data = json_decode($json);
+        $data = json_decode($json, $assoc);
 
         if (JSON_ERROR_NONE !== ($error = json_last_error())) {
             if (JSON_ERROR_UTF8 === $error) {
@@ -47,14 +53,15 @@ final class Json
             }
         }
 
-        return (object) $data;
+        return false === $assoc ? (object) $data : $data;   // If JSON is an empty JSON json_decode returns an empty
+                                                            // array instead of an stdClass instance
     }
 
-    public function decodeFile(string $file): stdClass
+    public function decodeFile(string $file, bool $assoc = false): stdClass
     {
         $json = file_contents($file);
 
-        return $this->decode($json);
+        return $this->decode($json, $assoc );
     }
 
     public function lint(string $json): void

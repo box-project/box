@@ -15,6 +15,9 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
+use function chdir;
+use Composer\Console\Application as ComposerApplication;
+use function getcwd;
 use Phar;
 use RecursiveDirectoryIterator;
 use SplFileInfo;
@@ -26,6 +29,8 @@ use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
 
 /**
  * Box is a utility class to generate a PHAR.
@@ -174,6 +179,13 @@ final class Box
                     $contents
                 );
             }
+
+            $cwd = getcwd();
+            chdir($tmp);
+
+            $this->dumpAutoload();  // Dump autoload without dev dependencies
+
+            chdir($cwd);
 
             $this->phar->buildFromDirectory($tmp);
         } finally {
@@ -328,5 +340,23 @@ final class Box
             },
             $contents
         );
+    }
+
+    private function dumpAutoload(): void
+    {
+        $composerApplication = new ComposerApplication();
+        $composerApplication->doRun(new ArrayInput([]), new NullOutput());
+
+        $composer = $composerApplication->getComposer();
+        $installationManager = $composer->getInstallationManager();
+        $localRepo = $composer->getRepositoryManager()->getLocalRepository();
+        $package = $composer->getPackage();
+        $config = $composer->getConfig();
+
+        $generator = $composer->getAutoloadGenerator();
+        $generator->setDevMode(false);
+        $generator->setClassMapAuthoritative(true);
+
+        $generator->dump($config, $localRepo, $package, $installationManager, 'composer', true);
     }
 }

@@ -14,13 +14,21 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use function array_key_exists;
+use function array_map;
+use function array_merge;
+use function array_unique;
 use Assert\Assertion;
 use Closure;
 use DateTimeImmutable;
+use function file_exists;
+use function file_get_contents;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\Php as LegacyPhp;
 use InvalidArgumentException;
+use function is_link;
 use KevinGH\Box\Compactor\Php;
+use KevinGH\Box\Composer\ComposerConfiguration;
 use Phar;
 use RuntimeException;
 use SplFileInfo;
@@ -179,10 +187,12 @@ BANNER;
         $mainScriptPath = self::retrieveMainScriptPath($raw, $basePath);
         $mainScriptContents = self::retrieveMainScriptContents($mainScriptPath);
 
+        $devPackages = ComposerConfiguration::retrieveDevPackages($basePath);
+
         $blacklistFilter = self::retrieveBlacklistFilter($raw, $basePath);
 
         if (self::shouldRetrieveAllFiles($file, $raw)) {
-            $filesAggregate = self::retrieveAllFiles($basePath, $mainScriptPath, $blacklistFilter);
+            $filesAggregate = self::retrieveAllFiles($basePath, $mainScriptPath, $blacklistFilter, $devPackages);
             $binaryFilesAggregate = [];
         } else {
             $files = self::retrieveFiles($raw, 'files', $basePath);
@@ -491,6 +501,9 @@ BANNER;
     }
 
     /**
+     * @param stdClass $raw
+     * @param string $basePath
+     *
      * @return string[]
      */
     private static function retrieveBlacklist(stdClass $raw, string $basePath): array
@@ -505,7 +518,7 @@ BANNER;
             return self::normalizeFilePath($file, $basePath);
         };
 
-        return array_map($normalizePath, $blacklist);
+        return array_unique(array_map($normalizePath, $blacklist));
     }
 
     /**
@@ -556,11 +569,18 @@ BANNER;
      * @param stdClass $raw
      * @param string   $key             Config property name
      * @param string   $basePath
+     * @param string[]   $devPackages
      * @param Closure  $blacklistFilter
      *
      * @return iterable|SplFileInfo[]
      */
-    private static function retrieveDirectories(stdClass $raw, string $key, string $basePath, Closure $blacklistFilter): iterable
+    private static function retrieveDirectories(
+        stdClass $raw,
+        string $key,
+        string $basePath,
+        Closure $blacklistFilter,
+        array $devPackages
+    ): iterable
     {
         $directories = self::retrieveDirectoryPaths($raw, $key, $basePath);
 
@@ -569,6 +589,7 @@ BANNER;
                 ->files()
                 ->filter($blacklistFilter)
                 ->ignoreVCS(true)
+                ->exclude($devPackages)
                 ->in($directories)
             ;
         }
@@ -608,11 +629,20 @@ BANNER;
         return array_map($processFinderConfig, $findersConfig);
     }
 
-    private static function processFinder(stdClass $config, string $basePath, Closure $blacklistFilter): Finder
+    /**
+     * @param stdClass $config
+     * @param string $basePath
+     * @param Closure $blacklistFilter
+     * @param string[] $devPackages
+     *
+     * @return Finder|SplFileInfo[]
+     */
+    private static function processFinder(stdClass $config, string $basePath, Closure $blacklistFilter, array $devPackages): Finder
     {
         $finder = Finder::create()
             ->files()
             ->filter($blacklistFilter)
+            ->exclude($devPackages)
             ->ignoreVCS(true)
         ;
 
@@ -711,18 +741,32 @@ BANNER;
 
     /**
      * @param string $basePath
+     * @param string $mainScriptPath
+     * @param Closure $blacklistFilter
+     * @param string[] $devPackages
      *
      * @return SplFileInfo[]
      */
-    private static function retrieveAllFiles(string $basePath, string $mainScriptPath, Closure $blacklistFilter): array
+    private static function retrieveAllFiles(
+        string $basePath,
+        string $mainScriptPath,
+        Closure $blacklistFilter,
+        array $devPackages
+    ): array
     {
+        $relativeDevPackages = array_map(
+            function (string $packagePath) use ($basePath): string {
+                return make_path_relative($packagePath, $basePath);
+            },
+            $devPackages
+        );
+
         $finder = Finder::create()
             ->files()
             ->in($basePath)
-            ->notPath(
-                make_path_relative($mainScriptPath, $basePath)
-            )
+            ->notPath(make_path_relative($mainScriptPath, $basePath))
             ->filter($blacklistFilter)
+            ->exclude($relativeDevPackages)
             ->ignoreVCS(true)
         ;
 
@@ -730,6 +774,10 @@ BANNER;
             array_unique(
                 array_map(
                     function (SplFileInfo $fileInfo): ?string {
+                        if (is_link((string) $fileInfo)) {
+                            return null;
+                        }
+
                         return false !== $fileInfo->getRealPath() ? $fileInfo->getRealPath() : null;
                     },
                     iterator_to_array(
@@ -790,6 +838,13 @@ BANNER;
     private static function normalizeDirectoryPath(string $directory, string $basePath): string
     {
         return make_path_absolute(trim($directory), $basePath);
+    }
+
+    private static function retrieveComposerLockFileContents(string $basePath): ?string
+    {
+        $composerLockFile = make_path_absolute('composer.lock', $basePath);
+
+        return file_exists($composerLockFile) ? file_contents($composerLockFile) : null;
     }
 
     private static function retrieveBootstrapFile(stdClass $raw, string $basePath): ?string
