@@ -240,60 +240,6 @@ EOF
         $this->assertSame($expected, $actual);
     }
 
-    public function test_no_files_are_configured_by_default(): void
-    {
-        $this->assertSame([], $this->normalizeConfigPaths($this->config->getFiles()));
-        $this->assertCount(0, $this->config->getBinaryFiles());
-    }
-
-    public function test_all_the_files_found_in_the_current_directory_are_taken_by_default_with_no_config_file_is_used(): void
-    {
-        touch('file0');
-        touch('file1');
-
-        mkdir('B');
-        touch('B/fileB0');
-        touch('B/fileB1');
-
-        mkdir('C');
-        touch('C/fileC0');
-        touch('C/fileC1');
-
-        mkdir('D');
-        touch('D/fileD0');
-        touch('D/fileD1');
-        touch('D/finder_excluded_file');
-
-        mkdir('E');
-        touch('E/fileE0');
-        touch('E/fileE1');
-        touch('E/finder_excluded_file');
-
-        // Relative to the current working directory for readability
-        $expected = [
-            'box.json',
-            'file0',
-            'file1',
-            'B/fileB0',
-            'B/fileB1',
-            'C/fileC0',
-            'C/fileC1',
-            'D/fileD0',
-            'D/fileD1',
-            'D/finder_excluded_file',
-            'E/fileE0',
-            'E/fileE1',
-            'E/finder_excluded_file',
-        ];
-
-        $noFileConfig = $this->getNoFileConfig();
-
-        $actual = $this->normalizeConfigPaths($noFileConfig->getFiles());
-
-        $this->assertEquals($expected, $actual, '', .0, 10, true);
-        $this->assertCount(0, $noFileConfig->getBinaryFiles());
-    }
-
     public function test_the_files_can_be_configured(): void
     {
         touch('file0');
@@ -1540,6 +1486,153 @@ EOF
                 $exception->getMessage()
             );
         }
+    }
+
+    public function test_all_the_files_found_in_the_current_directory_are_taken_by_default_with_no_config_file_is_used(): void
+    {
+        touch('file0');
+        touch('file1');
+
+        mkdir('B');
+        touch('B/fileB0');
+        touch('B/fileB1');
+
+        mkdir('C');
+        touch('C/fileC0');
+        touch('C/fileC1');
+
+        mkdir('D');
+        touch('D/fileD0');
+        touch('D/fileD1');
+        touch('D/finder_excluded_file');
+
+        mkdir('E');
+        touch('E/fileE0');
+        touch('E/fileE1');
+        touch('E/finder_excluded_file');
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'box.json',
+            'file0',
+            'file1',
+            'B/fileB0',
+            'B/fileB1',
+            'C/fileC0',
+            'C/fileC1',
+            'D/fileD0',
+            'D/fileD1',
+            'D/finder_excluded_file',
+            'E/fileE0',
+            'E/fileE1',
+            'E/finder_excluded_file',
+        ];
+
+        $noFileConfig = $this->getNoFileConfig();
+
+        $actual = $this->normalizeConfigPaths($noFileConfig->getFiles());
+
+        $this->assertEquals($expected, $actual, '', .0, 10, true);
+        $this->assertCount(0, $noFileConfig->getBinaryFiles());
+    }
+
+    public function test_all_the_files_found_in_the_current_directory_are_taken_by_default_if_no_file_setting_is_used(): void
+    {
+        touch('file0');
+        touch('file1');
+
+        mkdir('B');
+        touch('B/fileB0');
+        touch('B/fileB1');
+
+        mkdir('C');
+        touch('C/fileC0');
+        touch('C/fileC1');
+
+        mkdir('D');
+        touch('D/fileD0');
+        touch('D/fileD1');
+        touch('D/finder_excluded_file');
+
+        mkdir('E');
+        touch('E/fileE0');
+        touch('E/fileE1');
+        touch('E/finder_excluded_file');
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'box.json',
+            'file0',
+            'file1',
+            'B/fileB0',
+            'B/fileB1',
+            'C/fileC0',
+            'C/fileC1',
+            'D/fileD0',
+            'D/fileD1',
+            'D/finder_excluded_file',
+            'E/fileE0',
+            'E/fileE1',
+            'E/finder_excluded_file',
+        ];
+
+        $this->setConfig([]);
+
+        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+
+        $this->assertEquals($expected, $actual, '', .0, 10, true);
+        $this->assertCount(0, $this->config->getBinaryFiles());
+    }
+
+    public function test_the_blacklist_setting_is_applied_to_all_the_files_found_in_the_current_directory_are_taken_by_default_if_no_file_setting_is_used(): void
+    {
+        touch('file0');
+        touch('file1');
+
+        mkdir('B');
+        touch('B/fileB0');
+        touch('B/fileB1');
+
+        mkdir('C');
+        touch('C/fileC0');
+        touch('C/fileC1');
+
+        mkdir('D');
+        touch('D/fileD0');
+        touch('D/fileD1');
+        touch('D/finder_excluded_file');
+
+        mkdir('E');
+        touch('E/fileE0');
+        touch('E/fileE1');
+        touch('E/finder_excluded_file');
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'file0',
+            'file1',
+            'B/fileB0',
+            'B/fileB1',
+            'C/fileC0',
+            'C/fileC1',
+            'D/fileD0',
+            'D/fileD1',
+            'E/fileE0',
+            'E/fileE1',
+        ];
+
+        $this->setConfig([
+            'blacklist' => [
+                'box.json',
+                'D/finder_excluded_file',
+                'E/finder_excluded_file',
+            ],
+        ]);
+
+        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+
+        $this->assertEquals($expected, $actual, '', .0, 10, true);
+        $this->assertCount(0, $this->config->getBinaryFiles());
     }
 
     public function test_no_bootstrap_file_is_configured_by_default(): void
