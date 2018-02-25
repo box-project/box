@@ -24,9 +24,9 @@ The build command will build a new PHAR based on a variety of settings.
 
 This command relies on a configuration file for loading PHAR packaging settings. If a configuration file is not
 specified through the `--configuration|-c option`, one of the following files will be used (in order): `box.json`,
-`box.json.dist`
+`box.json.dist`. If no configuration file is found, Box will proceed with the default settings.
 
-The configuration file is actually a JSON object saved to a file. Note that all settings are optional.
+The configuration file is a JSON object saved to a file. Note that all settings are optional.
 //TODO: update this last bit of information as this is not true
 
 ```json
@@ -95,7 +95,16 @@ If the main file starts with a shebang line (`#!`), it will be automatically rem
 
 ## Including files
 
-Files can be included with a combination of the following options:
+There is two ways to include files. The first one is to not be picky about which files are shipped in the PHAR. If you
+omit any of the following options, _all_ the files found. The base directory used to find the files is either the
+configuration file if one is used/specified or the current working directory otherwise. The [`blacklist`][blacklist]
+setting can be used to filter out some files from that selection.
+
+If you however want a more granular selection, you can use a combination of the following options: [`files`][files],
+[`files-bin`][files], [`directories`][directories], [`directories-bin`][directories], [`finder`][finder],
+[`finder-bin`][finder], [`blacklist`][blacklist].
+If any of the settings above except for [`blacklist`][blacklist] is set (this includes empty values), those settings
+will be used in order to collect the files instead to collect all the files available.
 
 ### Files (`files` and `files-bin`)
 

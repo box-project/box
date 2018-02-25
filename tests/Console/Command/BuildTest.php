@@ -1379,6 +1379,7 @@ OUTPUT;
                     'alias' => $alias = 'alias-test.phar',
                     'main' => 'index.php',
                     'stub' => $stub,
+                    'blacklist' => ['box.json'],
                 ]
             )
         );
