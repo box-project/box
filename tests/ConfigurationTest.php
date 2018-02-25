@@ -459,6 +459,106 @@ EOF
         $this->assertCount(0, $this->config->getBinaryFiles());
     }
 
+    public function test_the_files_belonging_to_dev_packages_are_ignored_only_in_the_finder_config(): void
+    {
+        dump_file('composer.json', '{}');
+        dump_file(
+            'composer.lock',
+            <<<'JSON'
+{
+    "packages-dev": [
+        {"name": "acme/foo"},
+        {"name": "acme/bar"},
+        {"name": "acme/oof"}
+    ]
+}
+JSON
+);
+
+        touch('file0');
+        touch('file1');
+
+        dump_file('vendor/acme/foo/af0');
+        dump_file('vendor/acme/foo/af1');
+
+        dump_file('vendor/acme/bar/ab0');
+        dump_file('vendor/acme/bar/ab1');
+
+        dump_file('vendor/acme/oof/ao0');
+        dump_file('vendor/acme/oof/ao1');
+
+        mkdir('C');
+        touch('C/fileC0');
+        touch('C/fileC1');
+
+        mkdir('D');
+        touch('D/fileD0');
+        touch('D/fileD1');
+        touch('D/finder_excluded_file');
+
+        mkdir('E');
+        touch('E/fileE0');
+        touch('E/fileE1');
+        touch('E/finder_excluded_file');
+
+        $this->setConfig([
+            'files' => [
+                'file0',
+                'file1',
+                'vendor/acme/foo/af0',
+                'vendor/acme/foo/af1',
+            ],
+            'directories' => [
+                'vendor/acme/bar',
+                'C',
+            ],
+            'finder' => [
+                [
+                    'in' => [
+                        'D',
+                    ],
+                    'name' => 'fileD*',
+                ],
+                [
+                    'in' => [
+                        'E',
+                    ],
+                    'name' => 'fileE*',
+                ],
+                [
+                    'in' => [
+                        'vendor/acme/oof',
+                    ],
+                ],
+            ],
+            'blacklist' => [
+                'file1',
+                'B/fileB1',
+                'C/fileC1',
+                'D/fileD1',
+                'E/fileE1',
+            ],
+        ]);
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'file0',
+            'file1',    // 'files' & 'files-bin' are not affected by the blacklist filter
+            'vendor/acme/foo/af0',
+            'vendor/acme/foo/af1',
+            'vendor/acme/bar/ab0',
+            'vendor/acme/bar/ab1',
+            'C/fileC0',
+            'D/fileD0',
+            'E/fileE0',
+        ];
+
+        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+
+        $this->assertSame($expected, $actual);
+        $this->assertCount(0, $this->config->getBinaryFiles());
+    }
+
     public function test_a_non_existent_file_cannot_be_added_to_the_list_of_files(): void
     {
         try {

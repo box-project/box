@@ -401,13 +401,13 @@ function make_path_absolute(string $path, string $basePath): string
  */
 function make_path_relative(string $path, string $basePath): string
 {
-    static $fileSystem;
+//    static $fileSystem;
+//
+//    if (null === $fileSystem) {
+//        $fileSystem = new FileSystem();
+//    }
 
-    if (null === $fileSystem) {
-        $fileSystem = new FileSystem();
-    }
-
-    return $fileSystem->makeRelative($path, $basePath);
+    return (new FileSystem())->makeRelative($path, $basePath);
 }
 
 /**

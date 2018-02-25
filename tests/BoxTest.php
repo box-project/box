@@ -24,24 +24,19 @@ use org\bovigo\vfs\vfsStreamWrapper;
 use Phar;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
+use function KevinGH\Box\FileSystem\canonicalize;
+use function KevinGH\Box\FileSystem\dump_file;
+use function KevinGH\Box\FileSystem\mkdir;
+use function KevinGH\Box\FileSystem\remove;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
 use function array_filter;
 use function current;
 use function in_array;
-use function KevinGH\Box\FileSystem\canonicalize;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\make_tmp_dir;
-use function KevinGH\Box\FileSystem\mkdir;
 use function realpath;
 
-///**
-// * @covers \KevinGH\Box\Box
-// * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
-// *                             can create undesirable side-effects.
-// */
 /**
- * @coversNothing
+ * @covers \KevinGH\Box\Box
  */
 class BoxTest extends FileSystemTestCase
 {
@@ -628,45 +623,6 @@ class BoxTest extends FileSystemTestCase
             );
             $this->assertSame(103, $exception->getCode());
             $this->assertNull($exception->getPrevious());
-        }
-    }
-
-    public function test_the_temporary_directory_created_for_box_is_removed_upon_failure(): void
-    {
-        $boxTmp = make_tmp_dir('box', Box::class);
-
-        try {
-            $this->box->addFiles(['/nowhere/foo'], false);
-
-            $this->fail('Expected exception to be thrown.');
-        } catch (MultiReasonException $exception) {
-            $tmpDirs = iterator_to_array(
-                Finder::create()
-                    ->directories()
-                    ->depth(0)
-                    ->in(dirname($boxTmp))
-            );
-
-            $boxDir = current(
-                array_filter(
-                    $tmpDirs,
-                    function (SplFileInfo $fileInfo) use ($boxTmp): bool {
-                        return false === in_array(
-                            $fileInfo->getRealPath(),
-                            [realpath($boxTmp), realpath($this->tmp)],
-                            true
-                        );
-                    }
-                )
-            );
-
-            $this->assertFalse(
-                $boxDir,
-                sprintf(
-                    'Did not expect to find the directory "%s".',
-                    $boxDir
-                )
-            );
         }
     }
 
