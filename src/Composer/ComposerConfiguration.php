@@ -2,23 +2,24 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Composer;
 
-use function array_filter;
-use function array_map;
 use Assert\Assertion;
-use const DIRECTORY_SEPARATOR;
-use function dirname;
-use function file_exists;
 use InvalidArgumentException;
-use function KevinGH\Box\FileSystem\canonicalize;
+use KevinGH\Box\Json\Json;
+use Seld\JsonLint\ParsingException;
 use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\make_path_absolute;
-use function KevinGH\Box\FileSystem\make_path_relative;
-use KevinGH\Box\Json\Json;
-use function realpath;
-use Seld\JsonLint\ParsingException;
-use function sprintf;
 
 final class ComposerConfiguration
 {
@@ -72,8 +73,7 @@ final class ComposerConfiguration
         string $composerFileContents,
         string $composerLockFile,
         string $composerLockFileContents
-    ): array
-    {
+    ): array {
         $vendorDir = make_path_absolute(
             self::getVendorDir($composerFile, $composerFileContents),
             $basePath

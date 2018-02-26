@@ -15,25 +15,19 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Amp\MultiReasonException;
-use function array_keys;
-use function array_values;
-use const DIRECTORY_SEPARATOR;
 use Exception;
-use function func_get_args;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\FakeCompactor;
-use function KevinGH\Box\FileSystem\canonicalize;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\make_path_relative;
 use KevinGH\Box\Test\FileSystemTestCase;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use Phar;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
-use function KevinGH\Box\FileSystem\remove;
+use function KevinGH\Box\FileSystem\canonicalize;
+use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\mkdir;
-use function str_replace;
+use function KevinGH\Box\FileSystem\remove;
 
 /**
  * @covers \KevinGH\Box\Box
@@ -402,7 +396,7 @@ class BoxTest extends FileSystemTestCase
 
         foreach ($files as $file => $contents) {
             $expectedContents = $contents;
-            $expectedPharPath = 'phar://test.phar' . str_replace($this->tmp, '', $file);
+            $expectedPharPath = 'phar://test.phar'.str_replace($this->tmp, '', $file);
 
             $this->assertFileExists($expectedPharPath);
 
@@ -438,7 +432,8 @@ class BoxTest extends FileSystemTestCase
         try {
             $this->box->addFiles(['foo', 'bar'], false);
         } catch (MultiReasonException $e) {
-            dump($e->getReasons());die;
+            dump($e->getReasons());
+            die;
         }
 
         foreach ($files as $file => $item) {
@@ -452,7 +447,6 @@ class BoxTest extends FileSystemTestCase
             $this->assertSame($expectedContents, $actualContents);
         }
     }
-
 
     public function test_it_can_add_binary_files_to_the_phar(): void
     {
@@ -478,6 +472,7 @@ class BoxTest extends FileSystemTestCase
             $this->assertSame($expectedContents, $actualContents);
         }
     }
+
     public function test_it_can_add_binary_files_with_a_local_path_to_the_phar(): void
     {
         $fileMapper = new MapFile([

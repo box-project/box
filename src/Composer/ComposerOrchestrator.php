@@ -2,6 +2,16 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Composer;
 
 use Composer\Console\Application as ComposerApplication;
@@ -10,6 +20,10 @@ use Symfony\Component\Console\Output\NullOutput;
 
 final class ComposerOrchestrator
 {
+    private function __construct()
+    {
+    }
+
     public static function dumpAutoload(): void
     {
         $composerApplication = new ComposerApplication();
@@ -31,9 +45,5 @@ final class ComposerOrchestrator
         $generator->setClassMapAuthoritative(true);
 
         $generator->dump($config, $localRepo, $package, $installationManager, 'composer', true);
-    }
-
-    private function __construct()
-    {
     }
 }

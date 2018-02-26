@@ -31,11 +31,11 @@ final class Json
 
     /**
      * @param string $json
-     * @param bool $assoc
+     * @param bool   $assoc
      *
      * @throws ParsingException
      *
-     * @return stdClass|array
+     * @return array|stdClass
      */
     public function decode(string $json, bool $assoc = false)
     {
@@ -61,7 +61,7 @@ final class Json
     {
         $json = file_contents($file);
 
-        return $this->decode($json, $assoc );
+        return $this->decode($json, $assoc);
     }
 
     public function lint(string $json): void

@@ -14,20 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use function array_key_exists;
-use function array_map;
-use function array_merge;
-use function array_unique;
 use Assert\Assertion;
 use Closure;
 use DateTimeImmutable;
-use function file_exists;
-use function file_get_contents;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\Php as LegacyPhp;
 use InvalidArgumentException;
-use function is_link;
-use function KevinGH\Box\FileSystem\longest_common_base_path;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Composer\ComposerConfiguration;
 use Phar;
@@ -39,6 +31,7 @@ use Symfony\Component\Process\Process;
 use function iter\chain;
 use function KevinGH\Box\FileSystem\canonicalize;
 use function KevinGH\Box\FileSystem\file_contents;
+use function KevinGH\Box\FileSystem\longest_common_base_path;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\make_path_relative;
 
@@ -90,31 +83,31 @@ BANNER;
     private $isStubGenerated;
 
     /**
-     * @param null|string              $file
-     * @param null|string              $alias
-     * @param string $basePath     Utility to private the base path used and be able to retrieve a path relative to it (the base path)
-     * @param SplFileInfo[]            $files                 List of files
-     * @param SplFileInfo[]            $binaryFiles           List of binary files
-     * @param null|string              $bootstrapFile         The bootstrap file path
-     * @param Compactor[]              $compactors            List of file contents compactors
-     * @param null|int                 $compressionAlgorithm  Compression algorithm constant value. See the \Phar class constants
-     * @param null|int                 $fileMode              File mode in octal form
-     * @param string                   $mainScriptPath        The main script file path
-     * @param string                   $mainScriptContents    The processed content of the main script file
-     * @param MapFile                  $fileMapper            Utility to map the files from outside and inside the PHAR
-     * @param mixed                    $metadata              The PHAR Metadata
-     * @param string                   $outputPath
-     * @param null|string              $privateKeyPassphrase
-     * @param null|string              $privateKeyPath
-     * @param bool                     $isPrivateKeyPrompt    If the user should be prompted for the private key passphrase
-     * @param array                    $processedReplacements The processed list of replacement placeholders and their values
-     * @param null|string              $shebang               The shebang line
-     * @param int                      $signingAlgorithm      The PHAR siging algorithm. See \Phar constants
-     * @param null|string              $stubBannerContents    The stub banner comment
-     * @param null|string              $stubBannerPath        The path to the stub banner comment file
-     * @param null|string              $stubPath              The PHAR stub file path
-     * @param bool                     $isInterceptFileFuncs  wether or not Phar::interceptFileFuncs() should be used
-     * @param bool                     $isStubGenerated       Wether or not if the PHAR stub should be generated
+     * @param null|string   $file
+     * @param null|string   $alias
+     * @param string        $basePath              Utility to private the base path used and be able to retrieve a path relative to it (the base path)
+     * @param SplFileInfo[] $files                 List of files
+     * @param SplFileInfo[] $binaryFiles           List of binary files
+     * @param null|string   $bootstrapFile         The bootstrap file path
+     * @param Compactor[]   $compactors            List of file contents compactors
+     * @param null|int      $compressionAlgorithm  Compression algorithm constant value. See the \Phar class constants
+     * @param null|int      $fileMode              File mode in octal form
+     * @param string        $mainScriptPath        The main script file path
+     * @param string        $mainScriptContents    The processed content of the main script file
+     * @param MapFile       $fileMapper            Utility to map the files from outside and inside the PHAR
+     * @param mixed         $metadata              The PHAR Metadata
+     * @param string        $outputPath
+     * @param null|string   $privateKeyPassphrase
+     * @param null|string   $privateKeyPath
+     * @param bool          $isPrivateKeyPrompt    If the user should be prompted for the private key passphrase
+     * @param array         $processedReplacements The processed list of replacement placeholders and their values
+     * @param null|string   $shebang               The shebang line
+     * @param int           $signingAlgorithm      The PHAR siging algorithm. See \Phar constants
+     * @param null|string   $stubBannerContents    The stub banner comment
+     * @param null|string   $stubBannerPath        The path to the stub banner comment file
+     * @param null|string   $stubPath              The PHAR stub file path
+     * @param bool          $isInterceptFileFuncs  wether or not Phar::interceptFileFuncs() should be used
+     * @param bool          $isStubGenerated       Wether or not if the PHAR stub should be generated
      */
     private function __construct(
         ?string $file,
@@ -497,7 +490,7 @@ BANNER;
 
     /**
      * @param stdClass $raw
-     * @param string $basePath
+     * @param string   $basePath
      *
      * @return string[]
      */
@@ -573,8 +566,7 @@ BANNER;
         string $key,
         string $basePath,
         Closure $blacklistFilter
-    ): iterable
-    {
+    ): iterable {
         $directories = self::retrieveDirectoryPaths($raw, $key, $basePath);
 
         if ([] !== $directories) {
@@ -593,7 +585,7 @@ BANNER;
      * @param stdClass $raw
      * @param string   $basePath
      * @param Closure  $blacklistFilter
-     * @param string[]  $devPackages
+     * @param string[] $devPackages
      *
      * @return iterable[]|SplFileInfo[][]
      */
@@ -603,8 +595,7 @@ BANNER;
         string $basePath,
         Closure $blacklistFilter,
         array $devPackages
-    ): array
-    {
+    ): array {
         if (isset($raw->{$key})) {
             return self::processFinders($raw->{$key}, $basePath, $blacklistFilter, $devPackages);
         }
@@ -613,9 +604,9 @@ BANNER;
     }
 
     /**
-     * @param array   $findersConfig
-     * @param string  $basePath
-     * @param Closure $blacklistFilter
+     * @param array    $findersConfig
+     * @param string   $basePath
+     * @param Closure  $blacklistFilter
      * @param string[] $devPackages
      *
      * @return Finder[]|SplFileInfo[][]
@@ -625,8 +616,7 @@ BANNER;
         string $basePath,
         Closure $blacklistFilter,
         array $devPackages
-    ): array
-    {
+    ): array {
         $processFinderConfig = function (stdClass $config) use ($basePath, $blacklistFilter, $devPackages) {
             return self::processFinder($config, $basePath, $blacklistFilter, $devPackages);
         };
@@ -636,8 +626,8 @@ BANNER;
 
     /**
      * @param stdClass $config
-     * @param string $basePath
-     * @param Closure $blacklistFilter
+     * @param string   $basePath
+     * @param Closure  $blacklistFilter
      * @param string[] $devPackages
      *
      * @return Finder|SplFileInfo[]
@@ -756,9 +746,9 @@ BANNER;
     }
 
     /**
-     * @param string $basePath
-     * @param string $mainScriptPath
-     * @param Closure $blacklistFilter
+     * @param string   $basePath
+     * @param string   $mainScriptPath
+     * @param Closure  $blacklistFilter
      * @param string[] $devPackages
      *
      * @return SplFileInfo[]
@@ -768,8 +758,7 @@ BANNER;
         string $mainScriptPath,
         Closure $blacklistFilter,
         array $devPackages
-    ): array
-    {
+    ): array {
         $relativeDevPackages = array_map(
             function (string $packagePath) use ($basePath): string {
                 return make_path_relative($packagePath, $basePath);

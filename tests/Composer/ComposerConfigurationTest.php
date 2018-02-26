@@ -2,15 +2,22 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Composer;
 
-use const DIRECTORY_SEPARATOR;
 use InvalidArgumentException;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\symlink;
-use function KevinGH\Box\FileSystem\mkdir;
 use KevinGH\Box\Test\FileSystemTestCase;
-use PHPUnit\Framework\TestCase;
+use function KevinGH\Box\FileSystem\dump_file;
+use function KevinGH\Box\FileSystem\mkdir;
 
 /**
  * @covers \KevinGH\Box\Composer\ComposerConfiguration
@@ -211,7 +218,7 @@ class ComposerConfigurationTest extends FileSystemTestCase
 }
 JSON;
 
-    public function test_it_returns_an_empty_list_when_trying_to_retrieve_the_list_of_dev_packages_when_no_composer_json_file_is_found()
+    public function test_it_returns_an_empty_list_when_trying_to_retrieve_the_list_of_dev_packages_when_no_composer_json_file_is_found(): void
     {
         $this->assertSame([], ComposerConfiguration::retrieveDevPackages($this->tmp));
 
@@ -220,7 +227,7 @@ JSON;
         $this->assertSame([], ComposerConfiguration::retrieveDevPackages($this->tmp));
     }
 
-    public function test_it_requires_the_composer_file_to_be_a_file_when_found()
+    public function test_it_requires_the_composer_file_to_be_a_file_when_found(): void
     {
         mkdir('composer.json');
 
@@ -238,7 +245,7 @@ JSON;
         }
     }
 
-    public function test_it_requires_the_composer_file_to_be_readable_when_found()
+    public function test_it_requires_the_composer_file_to_be_readable_when_found(): void
     {
         dump_file($file = 'composer.json');
         chmod($file, 0355);
@@ -257,7 +264,7 @@ JSON;
         }
     }
 
-    public function test_it_requires_the_lock_file_if_the_json_file_is_found()
+    public function test_it_requires_the_lock_file_if_the_json_file_is_found(): void
     {
         dump_file('composer.json', '{}');
 
@@ -275,7 +282,7 @@ JSON;
         }
     }
 
-    public function test_it_requires_the_composer_lock_to_be_a_file_when_found()
+    public function test_it_requires_the_composer_lock_to_be_a_file_when_found(): void
     {
         dump_file('composer.json');
         mkdir('composer.lock');
@@ -294,7 +301,7 @@ JSON;
         }
     }
 
-    public function test_it_cannot_retrieve_the_dev_packages_if_the_composer_file_is_invalid()
+    public function test_it_cannot_retrieve_the_dev_packages_if_the_composer_file_is_invalid(): void
     {
         dump_file('composer.json'); // Invalid JSON
         dump_file('composer.lock');
@@ -306,7 +313,8 @@ JSON;
         } catch (InvalidArgumentException $exception) {
             $path = $this->tmp.'/composer.json';
 
-            $this->assertSame(<<<EOF
+            $this->assertSame(
+                <<<EOF
 Expected the file "$path" to be a valid composer.json file but an error has been found: Parse error on line 1:
 
 ^
@@ -318,7 +326,7 @@ EOF
         }
     }
 
-    public function test_it_cannot_retrieve_the_dev_packages_if_the_composer_lock_file_is_invalid()
+    public function test_it_cannot_retrieve_the_dev_packages_if_the_composer_lock_file_is_invalid(): void
     {
         dump_file('composer.json', '{}');
         dump_file('composer.lock'); // Invalid JSON
@@ -330,7 +338,8 @@ EOF
         } catch (InvalidArgumentException $exception) {
             $path = $this->tmp.'/composer.lock';
 
-            $this->assertSame(<<<EOF
+            $this->assertSame(
+                <<<EOF
 Expected the file "$path" to be a valid composer.json file but an error has been found: Parse error on line 1:
 
 ^
@@ -342,7 +351,7 @@ EOF
         }
     }
 
-    public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file()
+    public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file(): void
     {
         dump_file('composer.json', '{}');
         dump_file('composer.lock', self::COMPOSER_LOCK_SAMPLE);
@@ -360,7 +369,7 @@ EOF
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file_2()
+    public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file_2(): void
     {
         dump_file('composer.json', '{"config": {}}');
         dump_file('composer.lock', self::COMPOSER_LOCK_SAMPLE);
@@ -378,7 +387,7 @@ EOF
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_ignores_non_existent_dev_packages_found_in_the_lock_file()
+    public function test_it_ignores_non_existent_dev_packages_found_in_the_lock_file(): void
     {
         dump_file('composer.json', '{}');
         dump_file('composer.lock', self::COMPOSER_LOCK_SAMPLE);
@@ -395,7 +404,7 @@ EOF
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file_in_a_custom_vendor_directory()
+    public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file_in_a_custom_vendor_directory(): void
     {
         dump_file(
             'composer.json',
@@ -421,7 +430,7 @@ JSON
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file_even_if_no_dev_package_is_registered()
+    public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file_even_if_no_dev_package_is_registered(): void
     {
         dump_file('composer.json', '{}');
         dump_file(

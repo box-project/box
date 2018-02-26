@@ -15,11 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
-use function chdir;
-use Composer\Console\Application as ComposerApplication;
-use function getcwd;
 use KevinGH\Box\Composer\ComposerOrchestrator;
-use function KevinGH\Box\FileSystem\make_path_relative;
 use Phar;
 use RecursiveDirectoryIterator;
 use SplFileInfo;
@@ -27,12 +23,10 @@ use function Amp\ParallelFunctions\parallelMap;
 use function Amp\Promise\wait;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
-use function KevinGH\Box\FileSystem\make_path_absolute;
+use function KevinGH\Box\FileSystem\make_path_relative;
 use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\NullOutput;
 
 /**
  * Box is a utility class to generate a PHAR.
@@ -69,6 +63,15 @@ final class Box
      */
     private $mapFile;
 
+    private function __construct(Phar $phar, string $file)
+    {
+        $this->phar = $phar;
+        $this->file = $file;
+
+        $this->basePath = getcwd();
+        $this->mapFile = function (): void { };
+    }
+
     /**
      * Creates a new PHAR and Box instance.
      *
@@ -87,15 +90,6 @@ final class Box
         mkdir(dirname($file));
 
         return new self(new Phar($file, (int) $flags, $alias), $file);
-    }
-
-    private function __construct(Phar $phar, string $file)
-    {
-        $this->phar = $phar;
-        $this->file = $file;
-
-        $this->basePath = getcwd();
-        $this->mapFile = function (): void { };
     }
 
     /**
