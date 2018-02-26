@@ -245,7 +245,7 @@ HELP;
         $this->logMap($fileMapper, $logger);
 
         $box->registerFileMapping(
-            $config->getBasePathRetriever(),
+            $config->getBasePath(),
             $fileMapper
         );
     }

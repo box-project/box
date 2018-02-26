@@ -4,17 +4,21 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
+use function array_filter;
 use function array_map;
 use Assert\Assertion;
 use const DIRECTORY_SEPARATOR;
 use function dirname;
 use function file_exists;
+use InvalidArgumentException;
 use function KevinGH\Box\FileSystem\canonicalize;
 use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use KevinGH\Box\Json\Json;
 use function realpath;
+use Seld\JsonLint\ParsingException;
+use function sprintf;
 
 final class ComposerConfiguration
 {
@@ -34,13 +38,20 @@ final class ComposerConfiguration
         $composerLockFile = make_path_absolute('composer.lock', $basePath);
 
         if (file_exists($composerFile)) {
+            Assertion::readable($composerFile);
             Assertion::file($composerFile, 'Expected "%s" to be a file. Directory or link found.');
-            Assertion::file($composerLockFile, 'Expected "%s" to exists. The file is either missing or a ditectory/link has been found instead.');
+            Assertion::file($composerLockFile, 'Expected "%s" to exists. The file is either missing or a directory/link has been found instead.');
 
             $composerFileContents = file_contents($composerFile);
             $composerLockFileContents = file_contents($composerLockFile);
 
-            return self::getDevPackagePaths($basePath, $composerFileContents, $composerLockFileContents);
+            return self::getDevPackagePaths(
+                $basePath,
+                $composerFile,
+                $composerFileContents,
+                $composerLockFile,
+                $composerLockFileContents
+            );
         }
 
         return [];
@@ -48,35 +59,55 @@ final class ComposerConfiguration
 
     /**
      * @param string $basePath
+     * @param string $composerFile
      * @param string $composerFileContents
+     * @param string $composerLockFile
      * @param string $composerLockFileContents
      *
      * @return string[] Dev packages paths
      */
     private static function getDevPackagePaths(
         string $basePath,
+        string $composerFile,
         string $composerFileContents,
+        string $composerLockFile,
         string $composerLockFileContents
     ): array
     {
         $vendorDir = make_path_absolute(
-            self::getVendorDir($composerFileContents),
+            self::getVendorDir($composerFile, $composerFileContents),
             $basePath
         );
 
-        $packageNames = self::getDevPackageNames($composerLockFileContents);
+        $packageNames = self::getDevPackageNames($composerLockFile, $composerLockFileContents);
 
-        return array_map(
-            function (string $packageName) use ($vendorDir): string {
-                return realpath($vendorDir.DIRECTORY_SEPARATOR.$packageName);
-            },
-            $packageNames
+        return array_filter(
+            array_map(
+                function (string $packageName) use ($vendorDir): ?string {
+                    $realPath = realpath($vendorDir.DIRECTORY_SEPARATOR.$packageName);
+
+                    return false !== $realPath ? $realPath : null;
+                },
+                $packageNames
+            )
         );
     }
 
-    private static function getVendorDir(string $composerFileContents): string
+    private static function getVendorDir(string $composerFile, string $composerFileContents): string
     {
-        $config = (new Json())->decode($composerFileContents, true);
+        try {
+            $config = (new Json())->decode($composerFileContents, true);
+        } catch (ParsingException $exception) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Expected the file "%s" to be a valid composer.json file but an error has been found: %s',
+                    $composerFile,
+                    $exception->getMessage()
+                ),
+                0,
+                $exception->getPrevious()
+            );
+        }
 
         if (!array_key_exists('config', $config)) {
             return 'vendor';
@@ -90,13 +121,26 @@ final class ComposerConfiguration
     }
 
     /**
+     * @param string $composerLockFile
      * @param string $composerLockFileContents
      *
      * @return string[] Names of the dev packages
      */
-    private static function getDevPackageNames(string $composerLockFileContents): array
+    private static function getDevPackageNames(string $composerLockFile, string $composerLockFileContents): array
     {
-        $config = (new Json())->decode($composerLockFileContents, true);
+        try {
+            $config = (new Json())->decode($composerLockFileContents, true);
+        } catch (ParsingException $exception) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Expected the file "%s" to be a valid composer.json file but an error has been found: %s',
+                    $composerLockFile,
+                    $exception->getMessage()
+                ),
+                0,
+                $exception->getPrevious()
+            );
+        }
 
         if (!array_key_exists('packages-dev', $config)) {
             return [];

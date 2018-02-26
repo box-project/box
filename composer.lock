@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "4fe5847735d6283133e35739003e5c73",
+    "content-hash": "c9ae998336c74a11e44be3255b6abceb",
     "packages": [
         {
             "name": "amphp/amp",
@@ -963,47 +963,6 @@
                 "schema"
             ],
             "time": "2017-10-21T13:15:38+00:00"
-        },
-        {
-            "name": "mindplay/composer-locator",
-            "version": "2.1.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mindplay-dk/composer-locator.git",
-                "reference": "629988d5305cd8ef11adbd6bb485660219c599fc"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mindplay-dk/composer-locator/zipball/629988d5305cd8ef11adbd6bb485660219c599fc",
-                "reference": "629988d5305cd8ef11adbd6bb485660219c599fc",
-                "shasum": ""
-            },
-            "require": {
-                "composer-plugin-api": "^1",
-                "php": ">= 5.4"
-            },
-            "require-dev": {
-                "composer/composer": "^1",
-                "mindplay/testies": "^0.3.0",
-                "symfony/filesystem": "^2.7 || ^3.0",
-                "symfony/process": "^2.7 || ^3.0"
-            },
-            "type": "composer-plugin",
-            "extra": {
-                "class": "mindplay\\composer_locator\\Plugin"
-            },
-            "autoload": {
-                "classmap": [
-                    "src/ComposerLocator.php",
-                    "src/Plugin.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Locates Composer package root folders by package name",
-            "time": "2017-05-08T12:12:31+00:00"
         },
         {
             "name": "nikic/iter",

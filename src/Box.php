@@ -18,6 +18,8 @@ use Assert\Assertion;
 use function chdir;
 use Composer\Console\Application as ComposerApplication;
 use function getcwd;
+use KevinGH\Box\Composer\ComposerOrchestrator;
+use function KevinGH\Box\FileSystem\make_path_relative;
 use Phar;
 use RecursiveDirectoryIterator;
 use SplFileInfo;
@@ -58,23 +60,14 @@ final class Box
     private $placeholders = [];
 
     /**
-     * @var RetrieveRelativeBasePath
+     * @var string
      */
-    private $retrieveRelativeBasePath;
+    private $basePath;
 
     /**
      * @var MapFile
      */
     private $mapFile;
-
-    private function __construct(Phar $phar, string $file)
-    {
-        $this->phar = $phar;
-        $this->file = $file;
-
-        $this->retrieveRelativeBasePath = function (string $path) { return $path; };
-        $this->mapFile = function (): void { };
-    }
 
     /**
      * Creates a new PHAR and Box instance.
@@ -94,6 +87,15 @@ final class Box
         mkdir(dirname($file));
 
         return new self(new Phar($file, (int) $flags, $alias), $file);
+    }
+
+    private function __construct(Phar $phar, string $file)
+    {
+        $this->phar = $phar;
+        $this->file = $file;
+
+        $this->basePath = getcwd();
+        $this->mapFile = function (): void { };
     }
 
     /**
@@ -128,9 +130,9 @@ final class Box
         $this->placeholders = $placeholders;
     }
 
-    public function registerFileMapping(RetrieveRelativeBasePath $retrieveRelativeBasePath, MapFile $fileMapper): void
+    public function registerFileMapping(string $basePath, MapFile $fileMapper): void
     {
-        $this->retrieveRelativeBasePath = $retrieveRelativeBasePath;
+        $this->basePath = $basePath;
         $this->mapFile = $fileMapper;
     }
 
@@ -160,7 +162,7 @@ final class Box
 
         $tmp = make_tmp_dir('box', __CLASS__);
 
-        $fileWithContents = $this->processContents(
+        $filesWithContents = $this->processContents(
             array_map(
                 function ($file): string {
                     // Convert files to string as SplFileInfo is not serializable
@@ -171,19 +173,16 @@ final class Box
         );
 
         try {
-            foreach ($fileWithContents as $fileWithContents) {
-                [$file, $contents] = $fileWithContents;
-
-                dump_file(
-                    make_path_absolute($file, $tmp),
-                    $contents
-                );
-            }
-
             $cwd = getcwd();
             chdir($tmp);
 
-            $this->dumpAutoload();  // Dump autoload without dev dependencies
+            foreach ($filesWithContents as $fileWithContents) {
+                [$file, $contents] = $fileWithContents;
+
+                dump_file($file, $contents);
+            }
+
+            ComposerOrchestrator::dumpAutoload();   // Dump autoload without dev dependencies
 
             chdir($cwd);
 
@@ -210,7 +209,7 @@ final class Box
 
         $contents = null === $contents ? file_get_contents($file) : $contents;
 
-        $relativePath = ($this->retrieveRelativeBasePath)($file);
+        $relativePath = make_path_relative($file, $this->basePath);
         $local = ($this->mapFile)($relativePath);
 
         if (null === $local) {
@@ -287,15 +286,15 @@ final class Box
      */
     private function processContents(array $files): array
     {
-        $retrieveRelativeBasePath = $this->retrieveRelativeBasePath;
+        $basePath = getcwd();
         $mapFile = $this->mapFile;
         $placeholders = $this->placeholders;
         $compactors = $this->compactors;
 
-        $processFile = function (string $file) use ($retrieveRelativeBasePath, $mapFile, $placeholders, $compactors): array {
+        $processFile = function (string $file) use ($basePath, $mapFile, $placeholders, $compactors): array {
             $contents = file_contents($file);
 
-            $relativePath = $retrieveRelativeBasePath($file);
+            $relativePath = make_path_relative($file, $basePath);
             $local = $mapFile($relativePath);
 
             if (null === $local) {
@@ -340,23 +339,5 @@ final class Box
             },
             $contents
         );
-    }
-
-    private function dumpAutoload(): void
-    {
-        $composerApplication = new ComposerApplication();
-        $composerApplication->doRun(new ArrayInput([]), new NullOutput());
-
-        $composer = $composerApplication->getComposer();
-        $installationManager = $composer->getInstallationManager();
-        $localRepo = $composer->getRepositoryManager()->getLocalRepository();
-        $package = $composer->getPackage();
-        $config = $composer->getConfig();
-
-        $generator = $composer->getAutoloadGenerator();
-        $generator->setDevMode(false);
-        $generator->setClassMapAuthoritative(true);
-
-        $generator->dump($config, $localRepo, $package, $installationManager, 'composer', true);
     }
 }
