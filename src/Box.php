@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use function array_map;
 use Assert\Assertion;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 use Phar;
@@ -304,6 +305,7 @@ final class Box
             return [$local, $processedContents];
         };
 
+        return array_map($processFile, $files);
         return wait(parallelMap($files, $processFile));
     }
 
