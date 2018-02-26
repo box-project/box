@@ -305,7 +305,6 @@ final class Box
             return [$local, $processedContents];
         };
 
-        return array_map($processFile, $files);
         return wait(parallelMap($files, $processFile));
     }
 
