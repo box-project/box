@@ -37,10 +37,6 @@
             "in": "vendor"
         }
     ],
-    "map": [
-        { "my/test/path": "src/Test" },
-        { "": "src/Another" }
-    ],
 
     "compression": "GZ",
     "compactors": [

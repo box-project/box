@@ -280,7 +280,7 @@ final class Box
      */
     private function processContents(array $files): array
     {
-        $basePath = getcwd();
+        $basePath = $this->basePath;
         $mapFile = $this->mapFile;
         $placeholders = $this->placeholders;
         $compactors = $this->compactors;
