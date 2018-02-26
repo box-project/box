@@ -429,12 +429,7 @@ class BoxTest extends FileSystemTestCase
             dump_file($file, $item['contents']);
         }
 
-        try {
-            $this->box->addFiles(['foo', 'bar'], false);
-        } catch (MultiReasonException $e) {
-            dump($e->getReasons());
-            die;
-        }
+        $this->box->addFiles(['foo', 'bar'], false);
 
         foreach ($files as $file => $item) {
             $expectedContents = $item['contents'];
