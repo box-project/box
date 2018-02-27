@@ -35,13 +35,8 @@ use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\mkdir;
 use function realpath;
 
-///**
-// * @covers \KevinGH\Box\Box
-// * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
-// *                             can create undesirable side-effects.
-// */
 /**
- * @coversNothing
+ * @covers \KevinGH\Box\Box
  */
 class BoxTest extends FileSystemTestCase
 {
@@ -648,22 +643,22 @@ class BoxTest extends FileSystemTestCase
             );
 
             $boxDir = current(
-                array_filter(
-                    $tmpDirs,
-                    function (SplFileInfo $fileInfo) use ($boxTmp): bool {
-                        return false === in_array(
-                            $fileInfo->getRealPath(),
-                            [realpath($boxTmp), realpath($this->tmp)],
+                    array_filter(
+                            $tmpDirs,
+                            function (SplFileInfo $fileInfo) use ($boxTmp): bool {
+                                return false === in_array(
+                                            $fileInfo->getRealPath(),
+                                            [realpath($boxTmp), realpath($this->tmp)],
                             true
-                        );
-                    }
+                                    );
+                            }
                 )
             );
 
             $this->assertFalse(
-                $boxDir,
+                    $boxDir,
                 sprintf(
-                    'Did not expect to find the directory "%s".',
+                        'Did not expect to find the directory "%s".',
                     $boxDir
                 )
             );

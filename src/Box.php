@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
+use KevinGH\Box\Composer\ComposerOrchestrator;
 use Phar;
 use RecursiveDirectoryIterator;
 use SplFileInfo;
@@ -177,6 +178,8 @@ final class Box
 
                 dump_file($file, $contents);
             }
+
+            ComposerOrchestrator::dumpAutoload();   // Dump autoload without dev dependencies
 
             chdir($cwd);
 
