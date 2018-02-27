@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use function array_map;
 use Assert\Assertion;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 use Phar;
