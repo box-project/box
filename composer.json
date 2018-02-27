@@ -20,7 +20,6 @@
         "ext-phar": "*",
         "amphp/parallel-functions": "^0.1.2",
         "beberlei/assert": "^2.8",
-        "composer/composer": "^1.6",
         "herrera-io/annotations": "~1.0",
         "justinrainbow/json-schema": "^5.2",
         "nikic/iter": "^1.6",

@@ -77,7 +77,9 @@ class BoxTest extends FileSystemTestCase
     {
         parent::tearDown();
 
-        remove($this->box->getPhar());
+        if (false !== $pharPath = $this->box->getPhar()->getRealPath()) {
+            Phar::unlinkArchive($pharPath);
+        }
 
         unset($this->box);
     }

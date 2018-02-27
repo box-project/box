@@ -106,10 +106,6 @@ If you however want a more granular selection, you can use a combination of the 
 If any of the settings above except for [`blacklist`][blacklist] is set (this includes empty values), those settings
 will be used in order to collect the files instead to collect all the files available.
 
-**Note:** By default, dev dependencies are excluded for both strategies. However if you still which to include a file
-or directory from a dev dependency, you can do so by adding it via one of the following setting: [`files`][files],
-[`files-bin`][files], [`directories`][directories] or [`directories-bin`][directories].
-
 ### Files (`files` and `files-bin`)
 
 The `files` (`string[]`) setting is a list of files paths relative to [`base-path`][base-path] unless absolute. Each

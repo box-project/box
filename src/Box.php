@@ -177,8 +177,6 @@ final class Box
                 dump_file($file, $contents);
             }
 
-            ComposerOrchestrator::dumpAutoload();   // Dump autoload without dev dependencies
-
             chdir($cwd);
 
             $this->phar->buildFromDirectory($tmp);
