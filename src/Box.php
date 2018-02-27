@@ -292,7 +292,7 @@ final class Box
         $compactors = $this->compactors;
 
         $processFile = function (string $file) use ($cwd, $basePath, $mapFile, $placeholders, $compactors): array {
-            chdir($cwd);
+//            chdir($cwd);
 
             $contents = file_contents($file);
 
