@@ -20,9 +20,11 @@ use RecursiveDirectoryIterator;
 use SplFileInfo;
 use function Amp\ParallelFunctions\parallelMap;
 use function Amp\Promise\wait;
+use function array_map;
+use function chdir;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
-use function KevinGH\Box\FileSystem\make_path_absolute;
+use function KevinGH\Box\FileSystem\make_path_relative;
 use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
@@ -53,9 +55,9 @@ final class Box
     private $placeholders = [];
 
     /**
-     * @var RetrieveRelativeBasePath
+     * @var string
      */
-    private $retrieveRelativeBasePath;
+    private $basePath;
 
     /**
      * @var MapFile
@@ -67,7 +69,7 @@ final class Box
         $this->phar = $phar;
         $this->file = $file;
 
-        $this->retrieveRelativeBasePath = function (string $path) { return $path; };
+        $this->basePath = getcwd();
         $this->mapFile = function (): void { };
     }
 
@@ -123,9 +125,9 @@ final class Box
         $this->placeholders = $placeholders;
     }
 
-    public function registerFileMapping(RetrieveRelativeBasePath $retrieveRelativeBasePath, MapFile $fileMapper): void
+    public function registerFileMapping(string $basePath, MapFile $fileMapper): void
     {
-        $this->retrieveRelativeBasePath = $retrieveRelativeBasePath;
+        $this->basePath = $basePath;
         $this->mapFile = $fileMapper;
     }
 
@@ -153,27 +155,30 @@ final class Box
             return;
         }
 
-        $tmp = make_tmp_dir('box', __CLASS__);
+        $cwd = getcwd();
 
-        $fileWithContents = $this->processContents(
+        $filesWithContents = $this->processContents(
             array_map(
                 function ($file): string {
                     // Convert files to string as SplFileInfo is not serializable
                     return (string) $file;
                 },
                 $files
-            )
+            ),
+            $cwd
         );
 
+        $tmp = make_tmp_dir('box', __CLASS__);
+        chdir($tmp);
+
         try {
-            foreach ($fileWithContents as $fileWithContents) {
+            foreach ($filesWithContents as $fileWithContents) {
                 [$file, $contents] = $fileWithContents;
 
-                dump_file(
-                    make_path_absolute($file, $tmp),
-                    $contents
-                );
+                dump_file($file, $contents);
             }
+
+            chdir($cwd);
 
             $this->phar->buildFromDirectory($tmp);
         } finally {
@@ -198,7 +203,7 @@ final class Box
 
         $contents = null === $contents ? file_get_contents($file) : $contents;
 
-        $relativePath = ($this->retrieveRelativeBasePath)($file);
+        $relativePath = make_path_relative($file, $this->basePath);
         $local = ($this->mapFile)($relativePath);
 
         if (null === $local) {
@@ -269,21 +274,28 @@ final class Box
 
     /**
      * @param string[] $files
+     * @param string   $cwd   Current working directory. As the processes are spawned for parallel processing, the
+     *                        working directory may change so we pass the working directory in which the processing
+     *                        is supposed to happen. This should not happen during regular usage as all the files are
+     *                        absolute but it's possible this class is used with relative paths in which case this is
+     *                        an issue.
      *
      * @return array array of tuples where the first element is the local file path (path inside the PHAR) and the
      *               second element is the processed contents
      */
-    private function processContents(array $files): array
+    private function processContents(array $files, string $cwd): array
     {
-        $retrieveRelativeBasePath = $this->retrieveRelativeBasePath;
+        $basePath = $this->basePath;
         $mapFile = $this->mapFile;
         $placeholders = $this->placeholders;
         $compactors = $this->compactors;
 
-        $processFile = function (string $file) use ($retrieveRelativeBasePath, $mapFile, $placeholders, $compactors): array {
+        $processFile = function (string $file) use ($cwd, $basePath, $mapFile, $placeholders, $compactors): array {
+            chdir($cwd);
+
             $contents = file_contents($file);
 
-            $relativePath = $retrieveRelativeBasePath($file);
+            $relativePath = make_path_relative($file, $basePath);
             $local = $mapFile($relativePath);
 
             if (null === $local) {

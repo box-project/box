@@ -56,7 +56,7 @@ BANNER;
 
     private $fileMode;
     private $alias;
-    private $basePathRetriever;
+    private $basePath;
     private $files;
     private $binaryFiles;
     private $bootstrapFile;
@@ -81,36 +81,36 @@ BANNER;
     private $isStubGenerated;
 
     /**
-     * @param null|string              $file
-     * @param null|string              $alias
-     * @param RetrieveRelativeBasePath $basePathRetriever     Utility to private the base path used and be able to retrieve a path relative to it (the base path)
-     * @param SplFileInfo[]            $files                 List of files
-     * @param SplFileInfo[]            $binaryFiles           List of binary files
-     * @param null|string              $bootstrapFile         The bootstrap file path
-     * @param Compactor[]              $compactors            List of file contents compactors
-     * @param null|int                 $compressionAlgorithm  Compression algorithm constant value. See the \Phar class constants
-     * @param null|int                 $fileMode              File mode in octal form
-     * @param string                   $mainScriptPath        The main script file path
-     * @param string                   $mainScriptContents    The processed content of the main script file
-     * @param MapFile                  $fileMapper            Utility to map the files from outside and inside the PHAR
-     * @param mixed                    $metadata              The PHAR Metadata
-     * @param string                   $outputPath
-     * @param null|string              $privateKeyPassphrase
-     * @param null|string              $privateKeyPath
-     * @param bool                     $isPrivateKeyPrompt    If the user should be prompted for the private key passphrase
-     * @param array                    $processedReplacements The processed list of replacement placeholders and their values
-     * @param null|string              $shebang               The shebang line
-     * @param int                      $signingAlgorithm      The PHAR siging algorithm. See \Phar constants
-     * @param null|string              $stubBannerContents    The stub banner comment
-     * @param null|string              $stubBannerPath        The path to the stub banner comment file
-     * @param null|string              $stubPath              The PHAR stub file path
-     * @param bool                     $isInterceptFileFuncs  wether or not Phar::interceptFileFuncs() should be used
-     * @param bool                     $isStubGenerated       Wether or not if the PHAR stub should be generated
+     * @param null|string   $file
+     * @param null|string   $alias
+     * @param string        $basePath              Utility to private the base path used and be able to retrieve a path relative to it (the base path)
+     * @param SplFileInfo[] $files                 List of files
+     * @param SplFileInfo[] $binaryFiles           List of binary files
+     * @param null|string   $bootstrapFile         The bootstrap file path
+     * @param Compactor[]   $compactors            List of file contents compactors
+     * @param null|int      $compressionAlgorithm  Compression algorithm constant value. See the \Phar class constants
+     * @param null|int      $fileMode              File mode in octal form
+     * @param string        $mainScriptPath        The main script file path
+     * @param string        $mainScriptContents    The processed content of the main script file
+     * @param MapFile       $fileMapper            Utility to map the files from outside and inside the PHAR
+     * @param mixed         $metadata              The PHAR Metadata
+     * @param string        $outputPath
+     * @param null|string   $privateKeyPassphrase
+     * @param null|string   $privateKeyPath
+     * @param bool          $isPrivateKeyPrompt    If the user should be prompted for the private key passphrase
+     * @param array         $processedReplacements The processed list of replacement placeholders and their values
+     * @param null|string   $shebang               The shebang line
+     * @param int           $signingAlgorithm      The PHAR siging algorithm. See \Phar constants
+     * @param null|string   $stubBannerContents    The stub banner comment
+     * @param null|string   $stubBannerPath        The path to the stub banner comment file
+     * @param null|string   $stubPath              The PHAR stub file path
+     * @param bool          $isInterceptFileFuncs  wether or not Phar::interceptFileFuncs() should be used
+     * @param bool          $isStubGenerated       Wether or not if the PHAR stub should be generated
      */
     private function __construct(
         ?string $file,
         ?string $alias,
-        RetrieveRelativeBasePath $basePathRetriever,
+        string $basePath,
         array $files,
         array $binaryFiles,
         ?string $bootstrapFile,
@@ -144,7 +144,7 @@ BANNER;
         );
 
         $this->alias = $alias;
-        $this->basePathRetriever = $basePathRetriever;
+        $this->basePath = $basePath;
         $this->files = $files;
         $this->binaryFiles = $binaryFiles;
         $this->bootstrapFile = $bootstrapFile;
@@ -174,7 +174,6 @@ BANNER;
         $alias = self::retrieveAlias($raw);
 
         $basePath = self::retrieveBasePath($file, $raw);
-        $basePathRetriever = new RetrieveRelativeBasePath($basePath);
 
         $mainScriptPath = self::retrieveMainScriptPath($raw, $basePath);
         $mainScriptContents = self::retrieveMainScriptContents($mainScriptPath);
@@ -240,7 +239,7 @@ BANNER;
         return new self(
             $file,
             $alias,
-            $basePathRetriever,
+            $basePath,
             $filesAggregate,
             $binaryFilesAggregate,
             $bootstrapFile,
@@ -266,11 +265,6 @@ BANNER;
         );
     }
 
-    public function getBasePathRetriever(): RetrieveRelativeBasePath
-    {
-        return $this->basePathRetriever;
-    }
-
     public function getAlias(): ?string
     {
         return $this->alias;
@@ -278,7 +272,7 @@ BANNER;
 
     public function getBasePath(): string
     {
-        return $this->basePathRetriever->getBasePath();
+        return $this->basePath;
     }
 
     /**
@@ -491,6 +485,9 @@ BANNER;
     }
 
     /**
+     * @param stdClass $raw
+     * @param string   $basePath
+     *
      * @return string[]
      */
     private static function retrieveBlacklist(stdClass $raw, string $basePath): array
@@ -505,7 +502,7 @@ BANNER;
             return self::normalizeFilePath($file, $basePath);
         };
 
-        return array_map($normalizePath, $blacklist);
+        return array_unique(array_map($normalizePath, $blacklist));
     }
 
     /**
@@ -608,6 +605,13 @@ BANNER;
         return array_map($processFinderConfig, $findersConfig);
     }
 
+    /**
+     * @param stdClass $config
+     * @param string   $basePath
+     * @param Closure  $blacklistFilter
+     *
+     * @return Finder|SplFileInfo[]
+     */
     private static function processFinder(stdClass $config, string $basePath, Closure $blacklistFilter): Finder
     {
         $finder = Finder::create()
@@ -710,7 +714,9 @@ BANNER;
     }
 
     /**
-     * @param string $basePath
+     * @param string  $basePath
+     * @param string  $mainScriptPath
+     * @param Closure $blacklistFilter
      *
      * @return SplFileInfo[]
      */
@@ -719,9 +725,7 @@ BANNER;
         $finder = Finder::create()
             ->files()
             ->in($basePath)
-            ->notPath(
-                make_path_relative($mainScriptPath, $basePath)
-            )
+            ->notPath(make_path_relative($mainScriptPath, $basePath))
             ->filter($blacklistFilter)
             ->ignoreVCS(true)
         ;
@@ -730,6 +734,10 @@ BANNER;
             array_unique(
                 array_map(
                     function (SplFileInfo $fileInfo): ?string {
+                        if (is_link((string) $fileInfo)) {
+                            return null;
+                        }
+
                         return false !== $fileInfo->getRealPath() ? $fileInfo->getRealPath() : null;
                     },
                     iterator_to_array(

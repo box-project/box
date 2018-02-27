@@ -34,6 +34,8 @@ use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\formatted_filesize;
 use function KevinGH\Box\get_phar_compression_algorithms;
 
+// TODO: rename to compile
+// TODO: add friendly error message for when phar.readonly = 1
 final class Build extends Configurable
 {
     use ChangeableWorkingDirectory;
@@ -243,7 +245,7 @@ HELP;
         $this->logMap($fileMapper, $logger);
 
         $box->registerFileMapping(
-            $config->getBasePathRetriever(),
+            $config->getBasePath(),
             $fileMapper
         );
     }

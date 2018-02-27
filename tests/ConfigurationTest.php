@@ -230,16 +230,6 @@ EOF
         $this->assertSame($expected, $this->config->getBasePath());
     }
 
-    public function test_it_can_provide_the_relative_path_relative_to_the_config_base_path(): void
-    {
-        $fullPath = $this->config->getBasePath().DIRECTORY_SEPARATOR.'test';
-
-        $expected = 'test';
-        $actual = $this->config->getBasePathRetriever()($fullPath);
-
-        $this->assertSame($expected, $actual);
-    }
-
     public function test_the_files_can_be_configured(): void
     {
         touch('file0');

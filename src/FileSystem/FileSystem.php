@@ -482,14 +482,14 @@ final class FileSystem extends SymfonyFilesystem
         $systemTempDir = str_replace('\\', '/', realpath(sys_get_temp_dir()));
         $basePath = $systemTempDir.'/'.$namespace.'/'.$shortClass;
 
-        $attemps = 0;
+        $attempts = 0;
 
         do {
             $tmpDir = $this->escapePath($basePath.random_int(10000, 99999));
 
             $result = $this->mkdir($tmpDir, 0777, true);
-            ++$attemps;
-        } while (false === $result && $attemps <= 10);
+            ++$attempts;
+        } while (false === $result && $attempts <= 10);
 
         return $tmpDir;
     }

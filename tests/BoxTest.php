@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use Amp\MultiReasonException;
 use Exception;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\FakeCompactor;
@@ -23,10 +24,24 @@ use org\bovigo\vfs\vfsStreamWrapper;
 use Phar;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
-use function KevinGH\Box\FileSystem\remove;
+use SplFileInfo;
+use Symfony\Component\Finder\Finder;
+use function array_filter;
+use function current;
+use function in_array;
+use function KevinGH\Box\FileSystem\canonicalize;
+use function KevinGH\Box\FileSystem\dump_file;
+use function KevinGH\Box\FileSystem\make_tmp_dir;
+use function KevinGH\Box\FileSystem\mkdir;
+use function realpath;
 
+///**
+// * @covers \KevinGH\Box\Box
+// * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
+// *                             can create undesirable side-effects.
+// */
 /**
- * @covers \KevinGH\Box\Box
+ * @coversNothing
  */
 class BoxTest extends FileSystemTestCase
 {
@@ -71,7 +86,9 @@ class BoxTest extends FileSystemTestCase
     {
         parent::tearDown();
 
-        remove($this->box->getPhar());
+        if (false !== $pharPath = $this->box->getPhar()->getRealPath()) {
+            Phar::unlinkArchive($pharPath);
+        }
 
         unset($this->box);
     }
@@ -97,17 +114,16 @@ class BoxTest extends FileSystemTestCase
 
     public function test_it_can_add_a_file_with_absolute_path_to_the_phar(): void
     {
-        mkdir('path-to');
-
-        $file = $this->tmp.'/path-to/foo';
+        $relativePath = 'path-to/foo';
+        $file = canonicalize($this->tmp.DIRECTORY_SEPARATOR.$relativePath);
         $contents = 'test';
 
-        file_put_contents($file, $contents);
+        dump_file($file, $contents);
 
-        $this->box->addFile(realpath($file));
+        $this->box->addFile($file);
 
         $expectedContents = $contents;
-        $expectedPharPath = 'phar://test.phar'.$file;
+        $expectedPharPath = 'phar://test.phar/'.$relativePath;
 
         $this->assertFileExists($expectedPharPath);
 
@@ -124,41 +140,13 @@ class BoxTest extends FileSystemTestCase
 
         file_put_contents($file, $contents);
 
-        $basePathRetriever = new RetrieveRelativeBasePath(realpath(dirname('test.phar')));
         $fileMapper = new MapFile([
             [$file => $localPath],
         ]);
 
-        $this->box->registerFileMapping($basePathRetriever, $fileMapper);
+        $this->box->registerFileMapping($this->tmp, $fileMapper);
 
         $this->box->addFile($file);
-
-        $expectedContents = $contents;
-        $expectedPharPath = 'phar://test.phar/'.$localPath;
-
-        $this->assertFileExists($expectedPharPath);
-
-        $actualContents = file_get_contents($expectedPharPath);
-
-        $this->assertSame($expectedContents, $actualContents);
-    }
-
-    public function test_it_can_add_a_binary_file_with_a_local_path_to_the_phar(): void
-    {
-        $file = 'foo';
-        $contents = 'test';
-        $localPath = 'local/path/foo';
-
-        file_put_contents($file, $contents);
-
-        $basePathRetriever = new RetrieveRelativeBasePath(realpath(dirname('test.phar')));
-        $fileMapper = new MapFile([
-            [$file => $localPath],
-        ]);
-
-        $this->box->registerFileMapping($basePathRetriever, $fileMapper);
-
-        $this->box->addFile($file, null, true);
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$localPath;
@@ -183,6 +171,32 @@ class BoxTest extends FileSystemTestCase
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
+
+        $this->assertFileExists($expectedPharPath);
+
+        $actualContents = file_get_contents($expectedPharPath);
+
+        $this->assertSame($expectedContents, $actualContents);
+    }
+
+    public function test_it_can_add_a_binary_file_with_a_local_path_to_the_phar(): void
+    {
+        $file = 'foo';
+        $contents = 'test';
+        $localPath = 'local/path/foo';
+
+        file_put_contents($file, $contents);
+
+        $fileMapper = new MapFile([
+            [$file => $localPath],
+        ]);
+
+        $this->box->registerFileMapping($this->tmp, $fileMapper);
+
+        $this->box->addFile($file, null, true);
+
+        $expectedContents = $contents;
+        $expectedPharPath = 'phar://test.phar/'.$localPath;
 
         $this->assertFileExists($expectedPharPath);
 
@@ -234,6 +248,44 @@ class BoxTest extends FileSystemTestCase
         $secondCompactorProphecy->compact(Argument::cetera())->shouldHaveBeenCalledTimes(1);
     }
 
+    public function test_it_maps_the_file_before_adding_it_to_the_phar(): void
+    {
+        $map = new MapFile([
+            ['acme' => 'src/Foo'],
+            ['' => 'lib'],
+        ]);
+
+        $files = [
+            'acme/foo' => 'src/Foo/foo',
+            'acme/bar' => 'src/Foo/bar',
+            'f1' => 'lib/f1',
+            'f2' => 'lib/f2',
+        ];
+
+        $this->box->registerFileMapping($this->tmp, $map);
+
+        foreach ($files as $file => $expectedLocal) {
+            dump_file($file);
+
+            $local = $this->box->addFile($file);
+
+            $this->assertSame($expectedLocal, $local);
+
+            $this->assertFileExists(
+                (string) $this->box->getPhar()[$local],
+                'Expected to find the file "%s" in the PHAR.'
+            );
+
+            $pathInPhar = str_replace(
+                'phar://'.$this->box->getPhar()->getPath().'/',
+                '',
+                (string) $this->box->getPhar()[$local]
+            );
+
+            $this->assertSame($expectedLocal, $pathInPhar);
+        }
+    }
+
     public function test_it_cannot_add_an_non_existent_file_to_the_phar(): void
     {
         try {
@@ -250,7 +302,7 @@ class BoxTest extends FileSystemTestCase
         }
     }
 
-    public function test_it_cannot_add_a_file_it_fails_to_read(): void
+    public function test_it_cannot_add_an_unreadable_file(): void
     {
         $file = 'foo';
         $contents = 'test';
@@ -313,6 +365,309 @@ class BoxTest extends FileSystemTestCase
 
         $firstCompactorProphecy->compact(Argument::cetera())->shouldHaveBeenCalledTimes(1);
         $secondCompactorProphecy->compact(Argument::cetera())->shouldHaveBeenCalledTimes(1);
+    }
+
+    public function test_it_can_add_files_to_the_phar(): void
+    {
+        $files = [
+            'foo' => 'foo contents',
+            'bar' => 'bar contents',
+        ];
+
+        foreach ($files as $file => $contents) {
+            dump_file($file, $contents);
+        }
+
+        $this->box->addFiles(['foo', 'bar'], false);
+
+        foreach ($files as $file => $contents) {
+            $expectedContents = $contents;
+            $expectedPharPath = 'phar://test.phar/'.$file;
+
+            $this->assertFileExists($expectedPharPath);
+
+            $actualContents = file_get_contents($expectedPharPath);
+
+            $this->assertSame($expectedContents, $actualContents);
+        }
+    }
+
+    public function test_it_can_add_files_with_absolute_path_to_the_phar(): void
+    {
+        $files = [
+            $f1 = $this->tmp.'/sub-dir/foo' => 'foo contents',
+            $f2 = $this->tmp.'/sub-dir/bar' => 'bar contents',
+        ];
+
+        foreach ($files as $file => $contents) {
+            dump_file($file, $contents);
+        }
+
+        $this->box->addFiles([$f1, $f2], false);
+
+        foreach ($files as $file => $contents) {
+            $expectedContents = $contents;
+            $expectedPharPath = 'phar://test.phar'.str_replace($this->tmp, '', $file);
+
+            $this->assertFileExists($expectedPharPath);
+
+            $actualContents = file_get_contents($expectedPharPath);
+
+            $this->assertSame($expectedContents, $actualContents);
+        }
+    }
+
+    public function test_it_can_add_files_with_a_local_path_to_the_phar(): void
+    {
+        $fileMapper = new MapFile([
+            ['' => 'local'],
+        ]);
+
+        $this->box->registerFileMapping($this->tmp, $fileMapper);
+
+        $files = [
+            'foo' => [
+                'contents' => 'foo contents',
+                'local' => 'local/foo',
+            ],
+            'bar' => [
+                'contents' => 'bar contents',
+                'local' => 'local/bar',
+            ],
+        ];
+
+        foreach ($files as $file => $item) {
+            dump_file($file, $item['contents']);
+        }
+
+        $this->box->addFiles(['foo', 'bar'], false);
+
+        foreach ($files as $file => $item) {
+            $expectedContents = $item['contents'];
+            $expectedPharPath = 'phar://test.phar/'.$item['local'];
+
+            $this->assertFileExists($expectedPharPath);
+
+            $actualContents = file_get_contents($expectedPharPath);
+
+            $this->assertSame($expectedContents, $actualContents);
+        }
+    }
+
+    public function test_it_can_add_binary_files_to_the_phar(): void
+    {
+        $files = [
+            'foo' => 'foo contents',
+            'bar' => 'bar contents',
+        ];
+
+        foreach ($files as $file => $contents) {
+            dump_file($file, $contents);
+        }
+
+        $this->box->addFiles(['foo', 'bar'], true);
+
+        foreach ($files as $file => $contents) {
+            $expectedContents = $contents;
+            $expectedPharPath = 'phar://test.phar/'.$file;
+
+            $this->assertFileExists($expectedPharPath);
+
+            $actualContents = file_get_contents($expectedPharPath);
+
+            $this->assertSame($expectedContents, $actualContents);
+        }
+    }
+
+    public function test_it_can_add_binary_files_with_a_local_path_to_the_phar(): void
+    {
+        $fileMapper = new MapFile([
+            ['' => 'local'],
+        ]);
+
+        $this->box->registerFileMapping($this->tmp, $fileMapper);
+
+        $files = [
+            'foo' => [
+                'contents' => 'foo contents',
+                'local' => 'local/foo',
+            ],
+            'bar' => [
+                'contents' => 'bar contents',
+                'local' => 'local/bar',
+            ],
+        ];
+
+        foreach ($files as $file => $item) {
+            dump_file($file, $item['contents']);
+        }
+
+        $this->box->addFiles(['foo', 'bar'], true);
+
+        foreach ($files as $file => $item) {
+            $expectedContents = $item['contents'];
+            $expectedPharPath = 'phar://test.phar/'.$item['local'];
+
+            $this->assertFileExists($expectedPharPath);
+
+            $actualContents = file_get_contents($expectedPharPath);
+
+            $this->assertSame($expectedContents, $actualContents);
+        }
+    }
+
+    public function test_it_compacts_the_files_contents_and_replace_placeholders_before_adding_them_to_the_phar(): void
+    {
+        $files = [
+            'foo' => '@foo_placeholder@',
+            'bar' => '@bar_placeholder@',
+        ];
+
+        $placeholderMapping = [
+            '@foo_placeholder@' => 'foo_value',
+            '@bar_placeholder@' => 'bar_value',
+        ];
+
+        $this->box->registerPlaceholders($placeholderMapping);
+
+        foreach ($files as $file => $contents) {
+            dump_file($file, $contents);
+        }
+
+        // Cannot test the compactors: there is a bug with the serialization of the Prophecy objects which prevents
+        // their correct serialization
+
+        $this->box->addFiles(array_keys($files), false);
+
+        $expected = [
+            'foo' => 'foo_value',
+            'bar' => 'bar_value',
+        ];
+
+        foreach ($expected as $file => $expectedContents) {
+            $expectedPharPath = 'phar://test.phar/'.$file;
+
+            $this->assertFileExists($expectedPharPath);
+
+            $actualContents = file_get_contents($expectedPharPath);
+
+            $this->assertSame($expectedContents, $actualContents);
+        }
+    }
+
+    public function test_it_maps_the_files_before_adding_it_to_the_phar(): void
+    {
+        $map = new MapFile([
+            ['acme' => 'src/Foo'],
+            ['' => 'lib'],
+        ]);
+
+        $files = [
+            'acme/foo' => 'src/Foo/foo',
+            'acme/bar' => 'src/Foo/bar',
+            'f1' => 'lib/f1',
+            'f2' => 'lib/f2',
+        ];
+
+        $this->box->registerFileMapping($this->tmp, $map);
+
+        foreach ($files as $file => $expectedLocal) {
+            dump_file($file);
+        }
+
+        $this->box->addFiles(array_keys($files), true);
+
+        foreach ($files as $expectedLocal) {
+            $this->assertFileExists(
+                (string) $this->box->getPhar()[$expectedLocal],
+                'Expected to find the file "%s" in the PHAR.'
+            );
+
+            $pathInPhar = str_replace(
+                'phar://'.$this->box->getPhar()->getPath().'/',
+                '',
+                (string) $this->box->getPhar()[$expectedLocal]
+            );
+
+            $this->assertSame($expectedLocal, $pathInPhar);
+        }
+    }
+
+    public function test_it_cannot_add_an_non_existent_files_to_the_phar(): void
+    {
+        try {
+            $this->box->addFiles(['/nowhere/foo'], true);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'File "/nowhere/foo" was expected to exist.',
+                $exception->getMessage()
+            );
+            $this->assertSame(102, $exception->getCode());
+            $this->assertNull($exception->getPrevious());
+        }
+    }
+
+    public function test_it_cannot_add_unreadable_files(): void
+    {
+        $file = 'foo';
+        $contents = 'test';
+
+        file_put_contents($file, $contents);
+        chmod($file, 0355);
+
+        try {
+            $this->box->addFiles([$file], true);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                "Path \"${file}\" was expected to be readable.",
+                $exception->getMessage()
+            );
+            $this->assertSame(103, $exception->getCode());
+            $this->assertNull($exception->getPrevious());
+        }
+    }
+
+    public function test_the_temporary_directory_created_for_box_is_removed_upon_failure(): void
+    {
+        $boxTmp = make_tmp_dir('box', Box::class);
+
+        try {
+            $this->box->addFiles(['/nowhere/foo'], false);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (MultiReasonException $exception) {
+            $tmpDirs = iterator_to_array(
+                Finder::create()
+                    ->directories()
+                    ->depth(0)
+                    ->in(dirname($boxTmp))
+            );
+
+            $boxDir = current(
+                array_filter(
+                    $tmpDirs,
+                    function (SplFileInfo $fileInfo) use ($boxTmp): bool {
+                        return false === in_array(
+                            $fileInfo->getRealPath(),
+                            [realpath($boxTmp), realpath($this->tmp)],
+                            true
+                        );
+                    }
+                )
+            );
+
+            $this->assertFalse(
+                $boxDir,
+                sprintf(
+                    'Did not expect to find the directory "%s".',
+                    $boxDir
+                )
+            );
+        }
     }
 
     public function test_it_exposes_the_underlying_PHAR(): void
