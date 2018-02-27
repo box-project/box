@@ -15,32 +15,34 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Amp\MultiReasonException;
-use function array_filter;
-use function current;
 use Exception;
-use function in_array;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\FakeCompactor;
-use function KevinGH\Box\FileSystem\make_tmp_dir;
 use KevinGH\Box\Test\FileSystemTestCase;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use Phar;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
-use function KevinGH\Box\FileSystem\canonicalize;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\mkdir;
-use function KevinGH\Box\FileSystem\remove;
-use function realpath;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
+use function array_filter;
+use function current;
+use function in_array;
+use function KevinGH\Box\FileSystem\canonicalize;
+use function KevinGH\Box\FileSystem\dump_file;
+use function KevinGH\Box\FileSystem\make_tmp_dir;
+use function KevinGH\Box\FileSystem\mkdir;
+use function realpath;
 
 ///**
 // * @covers \KevinGH\Box\Box
 // * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
 // *                             can create undesirable side-effects.
 // */
+/**
+ * @coversNothing
+ */
 class BoxTest extends FileSystemTestCase
 {
     /**

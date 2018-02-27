@@ -21,7 +21,6 @@ use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\Php as LegacyPhp;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
-use KevinGH\Box\Composer\ComposerConfiguration;
 use Phar;
 use RuntimeException;
 use SplFileInfo;
@@ -31,7 +30,6 @@ use Symfony\Component\Process\Process;
 use function iter\chain;
 use function KevinGH\Box\FileSystem\canonicalize;
 use function KevinGH\Box\FileSystem\file_contents;
-use function KevinGH\Box\FileSystem\longest_common_base_path;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\make_path_relative;
 
@@ -582,7 +580,8 @@ BANNER;
      *
      * @return iterable[]|SplFileInfo[][]
      */
-    private static function retrieveFilesFromFinders(stdClass $raw, string $key, string $basePath, Closure $blacklistFilter): array {
+    private static function retrieveFilesFromFinders(stdClass $raw, string $key, string $basePath, Closure $blacklistFilter): array
+    {
         if (isset($raw->{$key})) {
             return self::processFinders($raw->{$key}, $basePath, $blacklistFilter);
         }
@@ -591,9 +590,9 @@ BANNER;
     }
 
     /**
-     * @param array    $findersConfig
-     * @param string   $basePath
-     * @param Closure  $blacklistFilter
+     * @param array   $findersConfig
+     * @param string  $basePath
+     * @param Closure $blacklistFilter
      *
      * @return Finder[]|SplFileInfo[][]
      */
@@ -715,9 +714,9 @@ BANNER;
     }
 
     /**
-     * @param string   $basePath
-     * @param string   $mainScriptPath
-     * @param Closure  $blacklistFilter
+     * @param string  $basePath
+     * @param string  $mainScriptPath
+     * @param Closure $blacklistFilter
      *
      * @return SplFileInfo[]
      */
