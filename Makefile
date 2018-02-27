@@ -11,7 +11,7 @@ help:
 
 clean:		## Clean all created artifacts
 clean:
-	git clean --exclude=.idea/ -fdx
+	git clean --exclude=.idea/ -ffdx
 
 cs:		## Fix CS
 cs: vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
