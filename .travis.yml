@@ -10,6 +10,9 @@ cache:
   directories:
     - $HOME/.composer/cache/files
 
+env:
+  - COMPOSER_FLAGS='--no-interaction --no-progress --no-suggest --prefer-dist'
+
 matrix:
   include:
     - php: '7.2'
@@ -34,7 +37,12 @@ before_install:
     fi
 
 install:
-  - composer update --no-interaction --no-progress --no-suggest --prefer-dist $COMPOSER_FLAGS
+  - |
+    if [ -n "$SYMFONY_VERSION" ]; then
+        composer update $COMPOSER_FLAGS
+    else
+        composer install $COMPOSER_FLAGS
+    fi
 
 script:
   - |
