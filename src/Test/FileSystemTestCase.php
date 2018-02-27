@@ -37,6 +37,10 @@ abstract class FileSystemTestCase extends TestCase
     {
         parent::setUp();
 
+        // Cleans up whatever was there before. Indeed upon failure PHPUnit fails to trigger the `tearDown()` method
+        // and as a result some temporary files may still remain.
+        remove(str_replace('\\', '/', realpath(sys_get_temp_dir())).'/box');
+
         $this->cwd = getcwd();
         $this->tmp = make_tmp_dir('box', __CLASS__);
 

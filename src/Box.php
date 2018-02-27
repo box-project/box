@@ -16,6 +16,7 @@ namespace KevinGH\Box;
 
 use function array_map;
 use Assert\Assertion;
+use function chdir;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 use Phar;
 use RecursiveDirectoryIterator;
@@ -155,7 +156,7 @@ final class Box
             return;
         }
 
-        $tmp = make_tmp_dir('box', __CLASS__);
+        $cwd = getcwd();
 
         $filesWithContents = $this->processContents(
             array_map(
@@ -164,13 +165,14 @@ final class Box
                     return (string) $file;
                 },
                 $files
-            )
+            ),
+            $cwd
         );
 
-        try {
-            $cwd = getcwd();
-            chdir($tmp);
+        $tmp = make_tmp_dir('box', __CLASS__);
+        chdir($tmp);
 
+        try {
             foreach ($filesWithContents as $fileWithContents) {
                 [$file, $contents] = $fileWithContents;
 
@@ -273,18 +275,25 @@ final class Box
 
     /**
      * @param string[] $files
+     * @param string   $cwd   Current working directory. As the processes are spawned for parallel processing, the
+     *                        working directory may change so we pass the working directory in which the processing
+     *                        is supposed to happen. This should not happen during regular usage as all the files are
+     *                        absolute but it's possible this class is used with relative paths in which case this is
+     *                        an issue.
      *
      * @return array array of tuples where the first element is the local file path (path inside the PHAR) and the
      *               second element is the processed contents
      */
-    private function processContents(array $files): array
+    private function processContents(array $files, string $cwd): array
     {
         $basePath = $this->basePath;
         $mapFile = $this->mapFile;
         $placeholders = $this->placeholders;
         $compactors = $this->compactors;
 
-        $processFile = function (string $file) use ($basePath, $mapFile, $placeholders, $compactors): array {
+        $processFile = function (string $file) use ($cwd, $basePath, $mapFile, $placeholders, $compactors): array {
+            chdir($cwd);
+
             $contents = file_contents($file);
 
             $relativePath = make_path_relative($file, $basePath);
