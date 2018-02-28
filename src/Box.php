@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
+use Humbug\PhpScoper\Console\Configuration as PhpScoperConfiguration;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use KevinGH\Box\Compactor\PhpScoper;
@@ -67,6 +68,11 @@ final class Box
      */
     private $mapFile;
 
+    /**
+     * @var PhpScoperConfiguration|null
+     */
+    private $phpScoperConfig;
+
     private function __construct(Phar $phar, string $file)
     {
         $this->phar = $phar;
@@ -104,6 +110,14 @@ final class Box
         Assertion::allIsInstanceOf($compactors, Compactor::class);
 
         $this->compactors = $compactors;
+
+        foreach ($this->compactors as $compactor) {
+            if ($compactor instanceof PhpScoper) {
+                $this->phpScoperConfig = $compactor->getConfiguration();
+
+                break;
+            }
+        }
     }
 
     /**
@@ -181,20 +195,8 @@ final class Box
                 dump_file($file, $contents);
             }
 
-            // TODO: move that in ComposerOrchestrator::dumpAutoload?
-            // Dump PHP-Scoper autoloader when appropriate
-            foreach ($this->compactors as $compactor) {
-                if ($compactor instanceof PhpScoper) {
-                    $phpScoperConfig = $compactor->getConfiguration();
-
-                    $autoload = (new ScoperAutoloadGenerator($phpScoperConfig->getWhitelist()))->dump('TODOAllowNullPrefix');
-
-                    // TODO: handle custom vendor dir
-                    dump_file('vendor/scoper-autoload.php', $autoload);
-                }
-            }
-
-            ComposerOrchestrator::dumpAutoload();   // Dump autoload without dev dependencies
+            // Dump autoload without dev dependencies
+            ComposerOrchestrator::dumpAutoload($this->phpScoperConfig);
 
             chdir($cwd);
 

@@ -1380,7 +1380,7 @@ BANNER;
     private static function retrievePhpScoperConfig(stdClass $raw, string $basePath): PhpScoperConfiguration
     {
         if (!isset($raw->{'php-scoper'})) {
-            $configFilePath = $basePath.DIRECTORY_SEPARATOR.self::PHP_SCOPER_CONFIG;
+            $configFilePath = make_path_absolute(self::PHP_SCOPER_CONFIG, $basePath);
 
             return file_exists($configFilePath)
                 ? PhpScoperConfiguration::load($configFilePath)

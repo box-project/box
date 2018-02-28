@@ -37,7 +37,7 @@ final class PhpScoper implements Compactor
         return $this->scoper->scope(
             $file,
             $contents,
-            'TODOAllowNullPrefix',
+            '_HumbugBox',
             $this->config->getPatchers(),
             $this->config->getWhitelist()
         );
