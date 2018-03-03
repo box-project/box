@@ -146,6 +146,8 @@ HELP;
         $this->registerCompactors($config, $box, $logger);
         $this->registerFileMapping($config, $box, $logger);
 
+        // Registering the main script _before_ adding the rest if of the files is _very_ important. The temporary
+        // file used for debugging purposes and the Composer dump autoloading will not work correctly otherwise.
         $main = $this->registerMainScript($config, $box, $logger);
 
         $this->addFiles($config, $box, $logger, $io);

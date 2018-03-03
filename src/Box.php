@@ -16,6 +16,7 @@ namespace KevinGH\Box;
 
 use Assert\Assertion;
 use Humbug\PhpScoper\Console\Configuration as PhpScoperConfiguration;
+use function is_file;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 use Phar;
@@ -25,6 +26,7 @@ use function Amp\ParallelFunctions\parallelMap;
 use function Amp\Promise\wait;
 use function array_map;
 use function chdir;
+use function KevinGH\Box\FileSystem\copy;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\make_path_relative;
@@ -205,7 +207,7 @@ final class Box
             $this->phar->buildFromDirectory($tmp);
         } finally {
             if (is_debug_enabled()) {
-                rename($tmp, self::DEBUG_DIR, true);
+                $this->dumpFiles($tmp);
             }
 
             remove($tmp);
@@ -246,6 +248,11 @@ final class Box
             );
 
             $this->phar->addFromString($local, $processedContents);
+        }
+
+        if (is_debug_enabled()) {
+            remove(self::DEBUG_DIR);    // Cleanup previous temporary debug directory
+            copy($relativePath, self::DEBUG_DIR.'/'.$relativePath, true);
         }
 
         return $local;
@@ -369,5 +376,29 @@ final class Box
             },
             $contents
         );
+    }
+
+    /**
+     * Dumps the files added to the PHAR into a directory at the project level to allow the user to easily have a look.
+     * At this point only the main script should have already been registered into the dump target.
+     */
+    private function dumpFiles(string $tmp): void
+    {
+        $mainScript = current(
+            array_filter(
+                scandir(self::DEBUG_DIR, 1),
+                function (string $file): bool {
+                    return false === in_array($file, ['.', '..'], true);
+                }
+            )
+        );
+
+        if (is_file($mainScript)) {
+            copy($mainScript, $tmp . '/' . $mainScript);
+        } else {
+            rename($mainScript, $tmp . '/' . $mainScript);
+        }
+
+        rename($tmp, self::DEBUG_DIR, true);
     }
 }
