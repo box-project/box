@@ -1360,21 +1360,12 @@ BANNER;
 
     private static function retrieveIsPrivateKeyPrompt(stdClass $raw): bool
     {
-        if (isset($raw->{'key-pass'})
-            && (true === $raw->{'key-pass'})) {
-            return true;
-        }
-
-        return false;
+        return isset($raw->{'key-pass'}) && (true === $raw->{'key-pass'});
     }
 
     private static function retrieveIsStubGenerated(stdClass $raw): bool
     {
-        if (isset($raw->stub) && (true === $raw->stub)) {
-            return true;
-        }
-
-        return false;
+        return isset($raw->stub) && (true === $raw->stub);
     }
 
     private static function retrievePhpScoperConfig(stdClass $raw, string $basePath): PhpScoperConfiguration

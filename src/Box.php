@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use const Amp\ParallelFunctions\AMP_PARALLEL_FUNCTION_DEBUG;
 use Assert\Assertion;
 use Humbug\PhpScoper\Console\Configuration as PhpScoperConfiguration;
 use KevinGH\Box\Composer\ComposerOrchestrator;
@@ -32,6 +33,7 @@ use function KevinGH\Box\FileSystem\make_path_relative;
 use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
+use function xdebug_break;
 
 /**
  * Box is a utility class to generate a PHAR.
@@ -311,6 +313,7 @@ final class Box
         $compactors = $this->compactors;
 
         $processFile = function (string $file) use ($cwd, $basePath, $mapFile, $placeholders, $compactors): array {
+            xdebug_break();
             chdir($cwd);
 
             $contents = file_contents($file);

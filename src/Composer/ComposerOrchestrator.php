@@ -45,7 +45,7 @@ final class ComposerOrchestrator
 
         if (null !== $configuration) {
             // TODO: make prefix configurable
-            $autoload = (new ScoperAutoloadGenerator($configuration))->dump('_HumbugBox');
+            $autoload = (new ScoperAutoloadGenerator($configuration->getWhitelist()))->dump('_HumbugBox');
 
             // TODO: handle custom vendor dir
             // TODO: expose the scoper autoload file name via a constant
