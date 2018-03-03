@@ -75,6 +75,7 @@ ASCII;
         $commands = parent::getDefaultCommands();
 
         $commands[] = new Command\Build();
+        $commands[] = new Command\Compile();
         $commands[] = new Command\Info();
         $commands[] = new Command\Validate();
         $commands[] = new Command\Verify();

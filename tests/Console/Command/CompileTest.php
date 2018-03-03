@@ -31,11 +31,11 @@ use function KevinGH\Box\FileSystem\mirror;
 use function KevinGH\Box\FileSystem\rename;
 
 /**
- * @covers \KevinGH\Box\Console\Command\Build
+ * @covers \KevinGH\Box\Console\Command\Compile
  * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
  *                              can create undesirable side-effects.
  */
-class BuildTest extends CommandTestCase
+class CompileTest extends CommandTestCase
 {
     private const FIXTURES_DIR = __DIR__.'/../../../fixtures/build';
 
@@ -76,7 +76,7 @@ class BuildTest extends CommandTestCase
 
         $commandTester->setInputs(['test']);    // Set input for the passphrase
         $commandTester->execute(
-            ['command' => 'build'],
+            ['command' => 'compile'],
             ['interactive' => true]
         );
 
@@ -219,7 +219,7 @@ PHP;
         $commandTester->setInputs(['test']);    // Set input for the passphrase
         $commandTester->execute(
             [
-                'command' => 'build',
+                'command' => 'compile',
                 '--working-dir' => $this->tmp,
             ],
             ['interactive' => true]
@@ -241,7 +241,7 @@ PHP;
         $commandTester = $this->getCommandTester();
 
         $commandTester->execute(
-            ['command' => 'build'],
+            ['command' => 'compile'],
             ['interactive' => true]
         );
 
@@ -354,7 +354,7 @@ OUTPUT;
 
         $commandTester->setInputs(['test']);    // Set input for the passphrase
         $commandTester->execute(
-            ['command' => 'build'],
+            ['command' => 'compile'],
             ['interactive' => true]
         );
 
@@ -502,7 +502,7 @@ PHP;
 
         $commandTester->setInputs(['test']);    // Set input for the passphrase
         $commandTester->execute(
-            ['command' => 'build'],
+            ['command' => 'compile'],
             [
                 'interactive' => true,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -603,7 +603,7 @@ OUTPUT;
 
         $commandTester->setInputs(['test']);    // Set input for the passphrase
         $commandTester->execute(
-            ['command' => 'build'],
+            ['command' => 'compile'],
             [
                 'interactive' => true,
                 'verbosity' => OutputInterface::VERBOSITY_VERY_VERBOSE,
@@ -707,7 +707,7 @@ OUTPUT;
 
         $commandTester->setInputs(['test']);
         $commandTester->execute(
-            ['command' => 'build'],
+            ['command' => 'compile'],
             [
                 'interactive' => true,
                 'verbosity' => OutputInterface::VERBOSITY_QUIET,
@@ -788,7 +788,7 @@ OUTPUT;
 
         $commandTester->setInputs(['test']);    // Set input for the passphrase
         $commandTester->execute(
-            ['command' => 'build'],
+            ['command' => 'compile'],
             ['interactive' => true]
         );
 
@@ -857,7 +857,7 @@ PHP
 
         $commandTester->setInputs(['test']);    // Set input for the passphrase
         $commandTester->execute(
-            ['command' => 'build'],
+            ['command' => 'compile'],
             ['interactive' => true]
         );
 
@@ -899,7 +899,7 @@ PHP
         $commandTester = $this->getCommandTester();
 
         $commandTester->execute(
-            ['command' => 'build'],
+            ['command' => 'compile'],
             ['interactive' => true]
         );
 
@@ -929,7 +929,7 @@ PHP
 
         try {
             $commandTester->execute(
-                ['command' => 'build'],
+                ['command' => 'compile'],
                 [
                     'interactive' => false,
                     'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -957,7 +957,7 @@ PHP
         $commandTester = $this->getCommandTester();
 
         $commandTester->execute(
-            ['command' => 'build'],
+            ['command' => 'compile'],
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -1021,7 +1021,7 @@ OUTPUT;
         $commandTester = $this->getCommandTester();
 
         $commandTester->execute(
-            ['command' => 'build'],
+            ['command' => 'compile'],
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -1084,7 +1084,7 @@ OUTPUT;
         $commandTester = $this->getCommandTester();
         $commandTester->execute(
             [
-                'command' => 'build',
+                'command' => 'compile',
             ],
             [
                 'interactive' => false,
@@ -1142,7 +1142,7 @@ OUTPUT;
 
         $commandTester = $this->getCommandTester();
         $commandTester->execute(
-            ['command' => 'build'],
+            ['command' => 'compile'],
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -1197,7 +1197,7 @@ OUTPUT;
 
         $commandTester = $this->getCommandTester();
         $commandTester->execute(
-            ['command' => 'build'],
+            ['command' => 'compile'],
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -1246,7 +1246,7 @@ OUTPUT;
 
         $commandTester = $this->getCommandTester();
         $commandTester->execute(
-            ['command' => 'build'],
+            ['command' => 'compile'],
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -1311,7 +1311,7 @@ OUTPUT;
 
         $commandTester = $this->getCommandTester();
         $commandTester->execute(
-            ['command' => 'build'],
+            ['command' => 'compile'],
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -1387,7 +1387,7 @@ OUTPUT;
         $commandTester = $this->getCommandTester();
 
         $commandTester->execute(
-            ['command' => 'build'],
+            ['command' => 'compile'],
             ['interactive' => true]
         );
 
@@ -1455,7 +1455,7 @@ OUTPUT;
 
         $commandTester = $this->getCommandTester();
         $commandTester->execute(
-            ['command' => 'build'],
+            ['command' => 'compile'],
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -1525,7 +1525,7 @@ OUTPUT;
      */
     protected function getCommand(): Command
     {
-        return new Build();
+        return new Compile();
     }
 
     private function normalizeDisplay(string $display)

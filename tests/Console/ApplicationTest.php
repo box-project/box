@@ -105,6 +105,7 @@ Options:
 
 Available commands:
   build     Builds a new PHAR
+  compile   Compile an application into a PHAR
   help      Displays help for a command
   info      Displays information about the PHAR extension or file
   list      Lists commands
