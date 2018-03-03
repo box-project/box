@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
+use const DIRECTORY_SEPARATOR;
 use Humbug\PhpScoper\Console\Configuration as PhpScoperConfiguration;
-use function is_file;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 use Phar;
@@ -26,6 +26,7 @@ use function Amp\ParallelFunctions\parallelMap;
 use function Amp\Promise\wait;
 use function array_map;
 use function chdir;
+use function is_file;
 use function KevinGH\Box\FileSystem\copy;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
@@ -393,10 +394,13 @@ final class Box
             )
         );
 
+        $sourceMainScript = self::DEBUG_DIR.DIRECTORY_SEPARATOR.$mainScript;
+        $targetMainScript = $tmp.DIRECTORY_SEPARATOR.$mainScript;
+
         if (is_file($mainScript)) {
-            copy($mainScript, $tmp . '/' . $mainScript);
+            copy($sourceMainScript, $targetMainScript);
         } else {
-            rename($mainScript, $tmp . '/' . $mainScript);
+            rename($sourceMainScript, $targetMainScript);
         }
 
         rename($tmp, self::DEBUG_DIR, true);
