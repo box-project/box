@@ -21,10 +21,13 @@ use RuntimeException;
 
 $findAutoloader = function () {
     if (file_exists($autoload = __DIR__.'/../../../autoload.php')) {
-        // Is installed via composer
+        // Is installed via Composer
         return $autoload;
     }
-
+    if (file_exists($autoload = __DIR__.'/../vendor/scoper-autoload.php')) {
+        // Is scoped (in PHAR or dumped directory)
+        return $autoload;
+    }
     if (file_exists($autoload = __DIR__.'/../vendor/autoload.php')) {
         // Is installed locally
         return $autoload;

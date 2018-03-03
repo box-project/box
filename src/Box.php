@@ -252,8 +252,12 @@ final class Box
         }
 
         if (is_debug_enabled()) {
+            if (false === $processedContents) {
+                $processedContents = $contents;
+            }
+
             remove(self::DEBUG_DIR);    // Cleanup previous temporary debug directory
-            copy($relativePath, self::DEBUG_DIR.'/'.$relativePath, true);
+            dump_file(self::DEBUG_DIR.DIRECTORY_SEPARATOR.$relativePath, $processedContents);
         }
 
         return $local;

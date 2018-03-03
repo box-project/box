@@ -43,6 +43,34 @@ return [
                 $contents
             );
         },
+        function (string $filePath, string $prefix, string $contents): string {
+            $files = [
+                'src/functions.php',
+                'src/Configuration.php',
+            ];
+
+            if (false === in_array($filePath, $files, true)) {
+                return $contents;
+            }
+
+            $contents = preg_replace(
+                sprintf(
+                    '/\\\\'.$prefix.'\\\\Herrera\\\\Box\\\\Compactor/',
+                    $prefix
+                ),
+                '\\Herrera\\\Box\\Compactor',
+                $contents
+            );
+
+            return preg_replace(
+                sprintf(
+                    '/\\\\'.$prefix.'\\\\KevinGH\\\\Box\\\\Compactor\\\\/',
+                    $prefix
+                ),
+                '\\KevinGH\\\Box\\Compactor\\',
+                $contents
+            );
+        },
     ],
     'whitelist' => [
         \Herrera\Box\Compactor\Javascript::class,
