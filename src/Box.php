@@ -16,9 +16,8 @@ namespace KevinGH\Box;
 
 use Assert\Assertion;
 use Humbug\PhpScoper\Console\Configuration as PhpScoperConfiguration;
-use KevinGH\Box\Composer\ComposerOrchestrator;
-use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use KevinGH\Box\Compactor\PhpScoper;
+use KevinGH\Box\Composer\ComposerOrchestrator;
 use Phar;
 use RecursiveDirectoryIterator;
 use SplFileInfo;
@@ -72,7 +71,7 @@ final class Box
     private $mapFile;
 
     /**
-     * @var PhpScoperConfiguration|null
+     * @var null|PhpScoperConfiguration
      */
     private $phpScoperConfig;
 

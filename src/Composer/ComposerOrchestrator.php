@@ -17,12 +17,16 @@ namespace KevinGH\Box\Composer;
 use Composer\Console\Application as ComposerApplication;
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
-use function KevinGH\Box\FileSystem\dump_file;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
+use function KevinGH\Box\FileSystem\dump_file;
 
 final class ComposerOrchestrator
 {
+    private function __construct()
+    {
+    }
+
     public static function dumpAutoload(?PhpScoperConfiguration $configuration): void
     {
         $composerApplication = new ComposerApplication();
@@ -53,9 +57,5 @@ final class ComposerOrchestrator
         }
 
         $generator->dump($config, $localRepo, $package, $installationManager, 'composer', true);
-    }
-
-    private function __construct()
-    {
     }
 }
