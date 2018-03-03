@@ -20,11 +20,13 @@ use KevinGH\Box\Box;
 use KevinGH\Box\Compactor;
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Console\Logger\BuildLogger;
+use function KevinGH\Box\enable_debug;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\StubGenerator;
 use RuntimeException;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -58,6 +60,8 @@ information check the documentation online:
 </comment>
 HELP;
 
+    private const DEV_OPTION = 'debug';
+
     /**
      * {@inheritdoc}
      */
@@ -69,6 +73,12 @@ HELP;
         $this->setDescription('Compile an application into a PHAR');
         $this->setHelp(self::HELP);
 
+        $this->addOption(
+            self::DEV_OPTION,
+            null,
+            InputOption::VALUE_NONE
+        );
+
         $this->configureWorkingDirOption();
     }
 
@@ -77,6 +87,10 @@ HELP;
      */
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
+        if (true === $input->getOption(self::DEV_OPTION)) {
+            enable_debug();
+        }
+
         $this->changeWorkingDirectory($input);
 
         $io = new SymfonyStyle($input, $output);

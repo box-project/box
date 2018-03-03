@@ -15,7 +15,15 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
+use function constant;
 use Phar;
+use function define;
+use function defined;
+
+/**
+ * @internal
+ */
+const DEBUG_CONST = 'KevinGH\Box\BOX_DEBUG';
 
 /**
  * TODO: this function should be pushed down to the PHAR extension.
@@ -64,4 +72,14 @@ function register_compactor_aliases(): void
     if (false === class_exists(\Herrera\Box\Compactor\Php::class, false)) {
         class_alias(\KevinGH\Box\Compactor\Php::class, \Herrera\Box\Compactor\Php::class);
     }
+}
+
+function enable_debug(): void
+{
+    define(DEBUG_CONST, true);
+}
+
+function is_debug_enabled(): bool
+{
+    return defined(DEBUG_CONST) && true === constant(DEBUG_CONST);
 }

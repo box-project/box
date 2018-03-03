@@ -314,7 +314,10 @@ final class Box
             return [$local, $processedContents];
         };
 
-        return wait(parallelMap($files, $processFile));
+        return is_debug_enabled()
+            ? array_map($processFile, $files)
+            : wait(parallelMap($files, $processFile))
+        ;
     }
 
     /**
