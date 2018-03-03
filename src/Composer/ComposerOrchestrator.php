@@ -16,7 +16,7 @@ namespace KevinGH\Box\Composer;
 
 use Composer\Console\Application as ComposerApplication;
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
-use Humbug\PhpScoper\Console\Configuration as PhpScoperConfiguration;
+use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
 use function KevinGH\Box\FileSystem\dump_file;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;

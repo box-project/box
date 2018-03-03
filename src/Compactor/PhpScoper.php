@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-use Humbug\PhpScoper\Console\Configuration as PhpScoperConfiguration;
+use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
 use Humbug\PhpScoper\Scoper;
 use KevinGH\Box\Compactor;
 

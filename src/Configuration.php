@@ -19,7 +19,7 @@ use Closure;
 use DateTimeImmutable;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\Php as LegacyPhp;
-use Humbug\PhpScoper\Console\Configuration as PhpScoperConfiguration;
+use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Compactor\PhpScoper;

@@ -1,5 +1,4 @@
 .DEFAULT_GOAL := help
-.PHONY: build
 
 
 help:
@@ -18,8 +17,8 @@ cs:		## Fix CS
 cs: vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
 	php -d zend.enable_gc=0 vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer fix
 
-build:		## Build the PHAR
-build:
+compile:		## Compile the application into the PHAR
+compile:
 	# Cleanup existing artefacts
 	rm -f bin/box.phar
 
@@ -31,7 +30,7 @@ build:
 	composer dump-autoload --classmap-authoritative --no-dev
 
 	# Build the PHAR
-	php -d zend.enable_gc=0 -d phar.readonly=0 bin/box build $(args)
+	php -d zend.enable_gc=0 -d phar.readonly=0 bin/box compile $(args)
 
 	# Install back all the dependencies
 	composer install
@@ -58,16 +57,16 @@ tm:	vendor/bin/phpunit fixtures/default_stub.php
 
 e2e:		## Run the end-to-end tests
 e2e: box_dev.json
-	$(MAKE) build args='--config=box_dev.json'
+	$(MAKE) compile args='--config=box_dev.json'
 
 	mv -fv bin/box.phar .
 
 	# TODO: use the build step again otherwise it is going to include the dev files
-	php -d phar.readonly=0 box.phar build
+	php -d phar.readonly=0 box.phar compile
 
 	rm box.phar bin/box.phar
 
-blackfire:	## Profiles the build step
+blackfire:	## Profiles the compile step
 blackfire: bin/box src vendor
 	# Cleanup existing artefacts
 	rm -f bin/box.phar
@@ -77,12 +76,12 @@ blackfire: bin/box src vendor
 	composer install
 	composer dump-autoload --classmap-authoritative
 
-	# Profile building the PHAR from the source code
-	blackfire --reference=1 --samples=5 run php -d zend.enable_gc=0 -d phar.readonly=0 bin/box build --quiet
+	# Profile compiling the PHAR from the source code
+	blackfire --reference=1 --samples=5 run php -d zend.enable_gc=0 -d phar.readonly=0 bin/box compile --quiet
 
-	# Profile building the PHAR from the PHAR
+	# Profile compiling the PHAR from the PHAR
 	mv -fv bin/box.phar .
-	blackfire --reference=2 --samples=5 run php -d zend.enable_gc=0 -d phar.readonly=0 box.phar build --quiet
+	blackfire --reference=2 --samples=5 run php -d zend.enable_gc=0 -d phar.readonly=0 box.phar compile --quiet
 
 	# Cleanup
 	composer install
@@ -109,7 +108,7 @@ vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer: vendor/bamarni
 	composer bin php-cs-fixer install
 
 bin/box.phar: bin/box src vendor
-	$(MAKE) build
+	$(MAKE) compile
 
 box_dev.json: box.json.dist
 	cat box.json.dist | sed -E 's/\"key\": \".+\",//g' | sed -E 's/\"algorithm\": \".+\",//g' | sed -E 's/\"alias\": \".+\",//g' > box_dev.json
