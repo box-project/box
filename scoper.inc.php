@@ -15,19 +15,6 @@ declare(strict_types=1);
 return [
     'patchers' => [
         function (string $filePath, string $prefix, string $contents): string {
-            $file = 'vendor/justinrainbow/json-schema/src/JsonSchema/Constraints/Factory.php';
-
-            if ($filePath !== $file) {
-                return $contents;
-            }
-
-            return preg_replace(
-                "/'JsonSchema\\\\/",
-                "'".$prefix.'\\\\\\JsonSchema\\\\',
-                $contents
-            );
-        },
-        function (string $filePath, string $prefix, string $contents): string {
             $file = 'vendor/beberlei/assert/lib/Assert/Assertion.php';
 
             if ($filePath !== $file) {
