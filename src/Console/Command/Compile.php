@@ -20,7 +20,6 @@ use KevinGH\Box\Box;
 use KevinGH\Box\Compactor;
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Console\Logger\BuildLogger;
-use function KevinGH\Box\enable_debug;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\StubGenerator;
 use RuntimeException;
@@ -30,6 +29,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use function KevinGH\Box\enable_debug;
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use function KevinGH\Box\FileSystem\remove;
@@ -146,6 +146,8 @@ HELP;
         $this->registerCompactors($config, $box, $logger);
         $this->registerFileMapping($config, $box, $logger);
 
+        // Registering the main script _before_ adding the rest if of the files is _very_ important. The temporary
+        // file used for debugging purposes and the Composer dump autoloading will not work correctly otherwise.
         $main = $this->registerMainScript($config, $box, $logger);
 
         $this->addFiles($config, $box, $logger, $io);

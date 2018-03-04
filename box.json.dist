@@ -14,15 +14,16 @@
         "with this source code in the file LICENSE."
     ],
 
-    "directories": [
-        "src"
-    ],
     "files": [
-        "res/schema.json"
+        "vendor/composer/composer/LICENSE"
+    ],
+    "directories": [
+        "res",
+        "src"
     ],
     "finder": [
         {
-            "name": "*.php",
+            "notName": "/LICENSE|.*\\.md|.*\\.dist|Makefile|composer\\.json|composer\\.lock/",
             "exclude": [
                 "File",
                 "mikey179",
@@ -32,15 +33,32 @@
                 "Tester",
                 "Tests",
                 "tests",
-                "yaml"
+                "vendor",
+                "build",
+                "fixtures",
+                "yaml",
+                "test",
+                "Test",
+                "demo",
+                "doc",
+                "docs",
+                "test_old",
+                "travis",
+                ".travis"
             ],
             "in": "vendor"
+        },
+        {
+            "name": "composer.json",
+            "in": ".",
+            "exclude": "vendor-bin"
         }
     ],
 
     "compression": "GZ",
     "compactors": [
         "Herrera\\Box\\Compactor\\Json",
+        "KevinGH\\Box\\Compactor\\PhpScoper",
         "Herrera\\Box\\Compactor\\Php"
     ],
     "git-commit": "git-commit",

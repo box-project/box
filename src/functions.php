@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
-use function constant;
 use Phar;
+use function constant;
 use function define;
 use function defined;
 

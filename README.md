@@ -51,6 +51,7 @@ great things:
         1. [Shebang (`shebang`)](doc/configuration.md#shebang-shebang)
         1. [Banner (`banner`)](doc/configuration.md#banner-banner)
         1. [Banner file (`banner-file`)](doc/configuration.md#banner-file-banner-file)
+    1. [Compactors (`compactors`)](doc/configuration.md#compactors-compactors)
 1. [Contributing](#contributing)
 1. [Upgrade](#upgrade)
 1. [Credits](#credits)
@@ -93,7 +94,7 @@ composer bin box require --dev humbug/box:^3.0@dev
 Keep in mind however that this library is not designed to be extended.
 
 
-## Creating a Phar
+## Creating a PHAR
 
 To get started, you may want to check out the [example application](https://github.com/kherge/php-box-example) that is
 ready to be built by Box. How your project is structured is entirely up to you. All that Box requires is that you have
@@ -121,9 +122,6 @@ registered such as fixing the coding style or running the test.
 
 ```bash
 make
-# or
-make help
-# => will print the list of available commands
 ```
 
 ## Upgrade
@@ -133,7 +131,7 @@ Check the [upgrade guide](UPGRADE.md).
 
 ## Credits
 
-Project originally created by: [Kevin Herrera] ([@kherge]) which hasnow been moved under the [Humbug umbrella][humbug].
+Project originally created by: [Kevin Herrera] ([@kherge]) which has now been moved under the [Humbug umbrella][humbug].
 
 
 

@@ -14,6 +14,7 @@
     1. [Shebang (`shebang`)][shebang]
     1. [Banner (`banner`)][banner]
     1. [Banner file (`banner-file`)][banner-file]
+1. [Compactors (`compactors`)][compactors]
 
 
 // TODO: do not mention when an option is optional but add a red asterix with a foot note for the mandatory
@@ -87,7 +88,7 @@ PHAR is executed from the command line (To not confuse with the [stub][stub] whi
 
 The default file used is `index.php`.
 
-The main file contents is processed by the compactors as the other files. 
+The main file contents is processed by the [compactors][compactors] as the other files. 
 
 If the main file starts with a shebang line (`#!`), it will be automatically removed (the shebang line goes in the
 [stub][stub] for a PHAR and is configured by the [shebang][shebang] setting).
@@ -113,21 +114,21 @@ or directory from a dev dependency, you can do so by adding it via one of the fo
 ### Files (`files` and `files-bin`)
 
 The `files` (`string[]`) setting is a list of files paths relative to [`base-path`][base-path] unless absolute. Each
-file will be processed by the compactors (see: `compactors`), have their placeholder values replaced
-(see: `replacements`) and added to the PHAR.
+file will be processed by the [compactors][compactors], have their placeholder values replaced (see: `replacements`)
+and added to the PHAR.
 
 This setting is not affected by the [`blacklist`][blacklist] setting.
 
 `files-bin` is analogue to `files` except the files are added to the PHAR unmodified. This is suitable for the files
 such as images, those that contain binary data or simply a file you do not want to alter at all despite using
-compactors.
+[compactors][compactors].
 
 
 ### Directories (`directories` and `directories-bin`)
 
 The directories (`string[]`) setting is a list of directory paths relative to [`base-path`][base-path]. All files will
-be processed by the compactors (see: `compactors`), have their placeholder values replaced (see: `replacements`) and
-added to the PHAR.
+be processed by the [compactors][compactors], have their placeholder values replaced (see: `replacements`) and added to
+the PHAR.
 
 Files listed in the [`blacklist`][blacklist] will not be added to the PHAR.
 
@@ -147,7 +148,7 @@ account for the files registered in the [`blacklist`][blacklist].
 
 `finder-bin` is analogue to `finder` except the files are added to the PHAR unmodified. This is suitable for the files
 such as images, those that contain binary data or simply a file you do not want to alter at all despite using
-compactors.
+[compactors][compactors].
 
 Example:
 
@@ -360,8 +361,47 @@ Like banner, the comment must not already be enclosed in a comment block.
 
 If this parameter is set, then the value of [`banner`][banner] will be discarded.
 
+
+## Compactors (`compactors`)
+
+The compactors (`string[]) setting is a list of file contents compacting classes that must be registered. A file
+compacting class is used to reduce the size of a specific file type. The following is a simple example:
+
+```php
+<?php
+
+namespace Acme;
+
+use KevinGH\Box\Compactor;
+
+class MyCompactor implements Compactor
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function compact(string $file, string $contents): string
+    {
+        if (preg_match('/\.txt/', \$file)) {
+            return trim($contents);
+        }
+
+        return $contents;
+    }
+}
+```
+
+The following compactors are included with Box:
+
+- `KevinGH\Box\Compactor\Json`: compress JSON files
+- `KevinGH\Box\Compactor\Php`: strip down classes from phpdocs & comments
+- `KevinGH\Box\Compactor\PhpScoper`: isolate the code using [PhpScoper][phpscoper]
+
+
+
+
 <br />
 <hr />
+
 
 « [Creating a PHAR](../README.md#creating-a-phar) • [Table of Contents](../README.md#table-of-contents) »
 
@@ -386,6 +426,8 @@ If this parameter is set, then the value of [`banner`][banner] will be discarded
 [phar.fileformat.stub]: https://secure.php.net/manual/en/phar.fileformat.stub.php
 [phar.interceptfilefuncs]: https://secure.php.net/manual/en/phar.interceptfilefuncs.php
 [symfony-finder]: https://symfony.com/doc/current//components/finder.html
+[phpscoper]: https://github.com/humbug/php-scoper
+[compactors]: #compactors-compactors
 
 TODO: double check all the links
 TODO: for the Finder:
@@ -449,29 +491,7 @@ Check the following link for more on the possible values:
 https://secure.php.net/manual/en/function.chmod.php
 
 
-The compactors (string[]) setting is a list of file contents compacting
-classes that must be registered. A file compacting class is used to reduce the
-size of a specific file type. The following is a simple example:
 
-use Herrera\\Box\\Compactor\\CompactorInterface;
-
-class MyCompactor implements CompactorInterface
-{
-    public function compact(\$contents)
-    {
-        return trim(\$contents);
-    }
-
-    public function supports(\$file)
-    {
-        return (bool) preg_match('/\.txt/', \$file);
-    }
-}
-
-The following compactors are included with Box:
-
-- Herrera\\Box\\Compactor\\Json
-- Herrera\\Box\\Compactor\\Php
 
 
 The compression (string) setting is the compression algorithm to use when the

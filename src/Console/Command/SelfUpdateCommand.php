@@ -16,7 +16,7 @@ namespace KevinGH\Box\Console\Command;
 
 use Humbug\SelfUpdate\Updater;
 use KevinGH\Box\Console\Logger\UpdateConsoleLogger;
-use PHAR;
+use Phar;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;

@@ -22,6 +22,7 @@
         "beberlei/assert": "^2.8",
         "composer/composer": "^1.6",
         "herrera-io/annotations": "~1.0",
+        "humbug/php-scoper": "^1.0@dev",
         "justinrainbow/json-schema": "^5.2",
         "nikic/iter": "^1.6",
         "padraic/phar-updater": "^1.0",
@@ -51,7 +52,8 @@
         },
         "files": [
             "src/FileSystem/file_system.php",
-            "src/functions.php"
+            "src/functions.php",
+            "vendor/humbug/php-scoper/src/functions.php"
         ],
         "exclude-from-classmap": [
             "/Test/"

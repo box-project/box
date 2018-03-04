@@ -15,26 +15,35 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
+use Humbug\PhpScoper\Console\Configuration as PhpScoperConfiguration;
+use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 use Phar;
 use RecursiveDirectoryIterator;
 use SplFileInfo;
+use const DIRECTORY_SEPARATOR;
 use function Amp\ParallelFunctions\parallelMap;
 use function Amp\Promise\wait;
 use function array_map;
 use function chdir;
+use function is_file;
+use function KevinGH\Box\FileSystem\copy;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
+use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
+use function KevinGH\Box\FileSystem\rename;
 
 /**
  * Box is a utility class to generate a PHAR.
  */
 final class Box
 {
+    private const DEBUG_DIR = '.box';
+
     /**
      * @var Compactor[]
      */
@@ -64,6 +73,11 @@ final class Box
      * @var MapFile
      */
     private $mapFile;
+
+    /**
+     * @var null|PhpScoperConfiguration
+     */
+    private $phpScoperConfig;
 
     private function __construct(Phar $phar, string $file)
     {
@@ -102,6 +116,14 @@ final class Box
         Assertion::allIsInstanceOf($compactors, Compactor::class);
 
         $this->compactors = $compactors;
+
+        foreach ($this->compactors as $compactor) {
+            if ($compactor instanceof PhpScoper) {
+                $this->phpScoperConfig = $compactor->getConfiguration();
+
+                break;
+            }
+        }
     }
 
     /**
@@ -179,12 +201,20 @@ final class Box
                 dump_file($file, $contents);
             }
 
-            ComposerOrchestrator::dumpAutoload();   // Dump autoload without dev dependencies
+            // Dump autoload without dev dependencies
+            ComposerOrchestrator::dumpAutoload($this->phpScoperConfig);
 
             chdir($cwd);
 
             $this->phar->buildFromDirectory($tmp);
         } finally {
+            if (is_debug_enabled()) {
+                $this->dumpFiles(
+                    make_path_absolute(self::DEBUG_DIR, $cwd),
+                    $tmp
+                );
+            }
+
             remove($tmp);
         }
     }
@@ -223,6 +253,15 @@ final class Box
             );
 
             $this->phar->addFromString($local, $processedContents);
+        }
+
+        if (is_debug_enabled()) {
+            if (false === $processedContents) {
+                $processedContents = $contents;
+            }
+
+            remove(self::DEBUG_DIR);    // Cleanup previous temporary debug directory
+            dump_file(self::DEBUG_DIR.DIRECTORY_SEPARATOR.$relativePath, $processedContents);
         }
 
         return $local;
@@ -346,5 +385,32 @@ final class Box
             },
             $contents
         );
+    }
+
+    /**
+     * Dumps the files added to the PHAR into a directory at the project level to allow the user to easily have a look.
+     * At this point only the main script should have already been registered into the dump target.
+     */
+    private function dumpFiles(string $debugDir, string $tmp): void
+    {
+        $mainScript = current(
+            array_filter(
+                scandir($debugDir, 1),
+                function (string $file): bool {
+                    return false === in_array($file, ['.', '..'], true);
+                }
+            )
+        );
+
+        $sourceMainScript = $debugDir.DIRECTORY_SEPARATOR.$mainScript;
+        $targetMainScript = $tmp.DIRECTORY_SEPARATOR.$mainScript;
+
+        if (is_file($mainScript)) {
+            copy($sourceMainScript, $targetMainScript);
+        } else {
+            rename($sourceMainScript, $targetMainScript);
+        }
+
+        rename($tmp, $debugDir, true);
     }
 }

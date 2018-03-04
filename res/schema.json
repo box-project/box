@@ -177,6 +177,10 @@
         "stub": {
             "description": "The relative file path to the stub file, or the flag to use the default stub.",
             "type": ["boolean", "string"]
+        },
+        "php-scoper": {
+            "description": "Path to the PHP-Scoper configuration file.",
+            "type": ["string"]
         }
     }
 }
