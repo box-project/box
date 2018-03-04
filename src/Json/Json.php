@@ -57,7 +57,10 @@ final class Json
                                                             // array instead of an stdClass instance
     }
 
-    public function decodeFile(string $file, bool $assoc = false): stdClass
+    /**
+     * @return array|stdClass
+     */
+    public function decodeFile(string $file, bool $assoc = false)
     {
         $json = file_contents($file);
 

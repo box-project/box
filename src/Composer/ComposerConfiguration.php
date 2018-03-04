@@ -96,7 +96,7 @@ final class ComposerConfiguration
     private static function getVendorDir(string $composerFile, string $composerFileContents): string
     {
         try {
-            $config = (new Json())->decode($composerFileContents, true);
+            $config = (array) (new Json())->decode($composerFileContents, true);
         } catch (ParsingException $exception) {
             throw new InvalidArgumentException(
                 sprintf(
