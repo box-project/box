@@ -29,10 +29,12 @@ final class ComposerOrchestrator
 
     public static function dumpAutoload(?PhpScoperConfiguration $configuration): void
     {
+        // TODO: we are running Composer a first time to assign ComposerApplication#io. However it should be possible
+        // to do without by patching Composer at the core to construct the application with a NullIO
         $composerApplication = new ComposerApplication();
-        $composerApplication->doRun(new ArrayInput([]), new NullOutput());
+        $composerApplication->doRun(new ArrayInput(['--no-plugins' => null]), new NullOutput());
 
-        $composer = $composerApplication->getComposer(false);
+        $composer = $composerApplication->getComposer(false, true);
 
         if (null === $composer) {
             return; // No autoload to dump

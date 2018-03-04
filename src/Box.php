@@ -19,6 +19,7 @@ use const DIRECTORY_SEPARATOR;
 use Humbug\PhpScoper\Console\Configuration as PhpScoperConfiguration;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Composer\ComposerOrchestrator;
+use function KevinGH\Box\FileSystem\make_path_absolute;
 use Phar;
 use RecursiveDirectoryIterator;
 use SplFileInfo;
@@ -208,7 +209,10 @@ final class Box
             $this->phar->buildFromDirectory($tmp);
         } finally {
             if (is_debug_enabled()) {
-                $this->dumpFiles($tmp);
+                $this->dumpFiles(
+                    make_path_absolute(self::DEBUG_DIR, $cwd),
+                    $tmp
+                );
             }
 
             remove($tmp);
@@ -387,18 +391,18 @@ final class Box
      * Dumps the files added to the PHAR into a directory at the project level to allow the user to easily have a look.
      * At this point only the main script should have already been registered into the dump target.
      */
-    private function dumpFiles(string $tmp): void
+    private function dumpFiles(string $debugDir, string $tmp): void
     {
         $mainScript = current(
             array_filter(
-                scandir(self::DEBUG_DIR, 1),
+                scandir($debugDir, 1),
                 function (string $file): bool {
                     return false === in_array($file, ['.', '..'], true);
                 }
             )
         );
 
-        $sourceMainScript = self::DEBUG_DIR.DIRECTORY_SEPARATOR.$mainScript;
+        $sourceMainScript = $debugDir.DIRECTORY_SEPARATOR.$mainScript;
         $targetMainScript = $tmp.DIRECTORY_SEPARATOR.$mainScript;
 
         if (is_file($mainScript)) {
@@ -407,6 +411,6 @@ final class Box
             rename($sourceMainScript, $targetMainScript);
         }
 
-        rename($tmp, self::DEBUG_DIR, true);
+        rename($tmp, $debugDir, true);
     }
 }

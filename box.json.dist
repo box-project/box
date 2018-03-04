@@ -14,6 +14,9 @@
         "with this source code in the file LICENSE."
     ],
 
+    "files": [
+        "vendor/composer/composer/LICENSE"
+    ],
     "directories": [
         "res",
         "src"
