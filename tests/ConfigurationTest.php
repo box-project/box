@@ -2048,9 +2048,13 @@ JSON
             $this->tmp.DIRECTORY_SEPARATOR.'default.phar',
             $this->config->getOutputPath()
         );
+        $this->assertSame(
+            $this->tmp.DIRECTORY_SEPARATOR.'default.phar',
+            $this->config->getTmpOutputPath()
+        );
     }
 
-    public function test_configure_output_path(): void
+    public function test_the_output_path_is_configurable(): void
     {
         $this->setConfig([
             'files' => [self::DEFAULT_FILE],
@@ -2060,6 +2064,10 @@ JSON
         $this->assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'test.phar',
             $this->config->getOutputPath()
+        );
+        $this->assertSame(
+            $this->tmp.DIRECTORY_SEPARATOR.'test.phar',
+            $this->config->getTmpOutputPath()
         );
     }
 
@@ -2077,6 +2085,10 @@ JSON
             $this->tmp.'/sub-dir/test.phar',
             $this->config->getOutputPath()
         );
+        $this->assertSame(
+            $this->tmp.'/sub-dir/test.phar',
+            $this->config->getTmpOutputPath()
+        );
     }
 
     public function test_the_output_path_is_not_relative_to_the_base_path_if_is_absolute(): void
@@ -2092,6 +2104,44 @@ JSON
         $this->assertSame(
             $this->tmp.'/test.phar',
             $this->config->getOutputPath()
+        );
+        $this->assertSame(
+            $this->tmp.'/test.phar',
+            $this->config->getTmpOutputPath()
+        );
+    }
+
+    public function test_the_output_path_is_normalized(): void
+    {
+        $this->setConfig([
+            'files' => [self::DEFAULT_FILE],
+            'output' => ' test.phar ',
+        ]);
+
+        $this->assertSame(
+            $this->tmp.DIRECTORY_SEPARATOR.'test.phar',
+            $this->config->getOutputPath()
+        );
+        $this->assertSame(
+            $this->tmp.DIRECTORY_SEPARATOR.'test.phar',
+            $this->config->getTmpOutputPath()
+        );
+    }
+
+    public function test_the_output_path_can_not_have_a_PHAR_extension(): void
+    {
+        $this->setConfig([
+            'files' => [self::DEFAULT_FILE],
+            'output' => 'test',
+        ]);
+
+        $this->assertSame(
+            $this->tmp.DIRECTORY_SEPARATOR.'test',
+            $this->config->getOutputPath()
+        );
+        $this->assertSame(
+            $this->tmp.DIRECTORY_SEPARATOR.'test.phar',
+            $this->config->getTmpOutputPath()
         );
     }
 

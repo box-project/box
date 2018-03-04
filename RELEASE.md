@@ -29,7 +29,8 @@
 - Include all files when no file setting is used
 - Exclude dev dependencies when building the PHAR
 - Add debug mode which allows to debug the parallel processing or having access to a dump of the files added to the PHAR
-- Add a PHP-Scoper integration which allows to isolate the dependnecies bundled in the PHAR
+- Add a PHP-Scoper integration which allows to isolate the dependencies bundled in the PHAR
+- Allow the output PHAR to have a name without the extension `.phar`
 
 
 ### Bugfixes
@@ -53,8 +54,9 @@
     - `finder` (as well as the `Finder::append()` and `Finder::exclude()` arguments)
     - `finder-bin` (as well as the `Finder::append()` and `Finder::exclude()` arguments)
 - Make main script mandatory (the value, not the setting)
-- Normalize the main script path
+- Normalize the main script path (`main`)
 - Add a friendly error message when an invalid symlink is being used for a file and exclude symlinks whenever possible
+- Normalize the output path (`output`)
 
 
 ### Misc changes
