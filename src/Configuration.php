@@ -507,7 +507,7 @@ BANNER;
         $blacklist = $raw->blacklist;
 
         $normalizePath = function ($file) use ($basePath): string {
-            return self::normalizeFilePath($file, $basePath);
+            return self::normalizePath($file, $basePath);
         };
 
         return array_unique(array_map($normalizePath, $blacklist));
@@ -531,7 +531,7 @@ BANNER;
         Assertion::allString($files);
 
         $normalizePath = function (string $file) use ($basePath, $key): SplFileInfo {
-            $file = self::normalizeFilePath($file, $basePath);
+            $file = self::normalizePath($file, $basePath);
 
             if (is_link($file)) {
                 // TODO: add this to baberlei/assert
@@ -678,7 +678,7 @@ BANNER;
         })((array) $config, $finder);
 
         $createNormalizedDirectories = function (string $directory) use ($basePath): ?string {
-            $directory = self::normalizeDirectoryPath($directory, $basePath);
+            $directory = self::normalizePath($directory, $basePath);
 
             if (is_link($directory)) {
                 // TODO: add this to baberlei/assert
@@ -696,7 +696,7 @@ BANNER;
         };
 
         $normalizeFileOrDirectory = function (string &$fileOrDirectory) use ($basePath): void {
-            $fileOrDirectory = self::normalizeDirectoryPath($fileOrDirectory, $basePath);
+            $fileOrDirectory = self::normalizePath($fileOrDirectory, $basePath);
 
             if (is_link($fileOrDirectory)) {
                 // TODO: add this to baberlei/assert
@@ -813,7 +813,7 @@ BANNER;
         $directories = $raw->{$key};
 
         $normalizeDirectory = function (string $directory) use ($basePath, $key): string {
-            $directory = self::normalizeDirectoryPath($directory, $basePath);
+            $directory = self::normalizePath($directory, $basePath);
 
             if (is_link($directory)) {
                 // TODO: add this to baberlei/assert
@@ -839,14 +839,9 @@ BANNER;
         return array_map($normalizeDirectory, $directories);
     }
 
-    private static function normalizeFilePath(string $file, string $basePath): string
+    private static function normalizePath(string $file, string $basePath): string
     {
         return make_path_absolute(trim($file), $basePath);
-    }
-
-    private static function normalizeDirectoryPath(string $directory, string $basePath): string
-    {
-        return make_path_absolute(trim($directory), $basePath);
     }
 
     private static function retrieveBootstrapFile(stdClass $raw, string $basePath): ?string
@@ -857,7 +852,7 @@ BANNER;
             return null;
         }
 
-        $file = self::normalizeFilePath($raw->bootstrap, $basePath);
+        $file = self::normalizePath($raw->bootstrap, $basePath);
 
         Assertion::file($file, 'The bootstrap path "%s" is not a file or does not exist.');
 
@@ -953,7 +948,7 @@ BANNER;
     {
         $main = isset($raw->main) ? $raw->main : self::DEFAULT_MAIN_SCRIPT;
 
-        return self::normalizeFilePath($main, $basePath);
+        return self::normalizePath($main, $basePath);
     }
 
     private static function retrieveMainScriptContents(string $mainScriptPath): string
