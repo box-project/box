@@ -256,7 +256,7 @@ final class Box
         }
 
         if (is_debug_enabled()) {
-            if (false === $processedContents) {
+            if (false === isset($processedContents)) {
                 $processedContents = $contents;
             }
 
