@@ -15,6 +15,7 @@
     ],
 
     "files": [
+        "composer.json",
         "vendor/composer/composer/LICENSE"
     ],
     "directories": [
