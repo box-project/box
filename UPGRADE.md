@@ -1,10 +1,28 @@
-## From box2 to 3.0
+## From box2 to 3.0.0-alpha.0
 
 Migration path from [`kherge/box`][box2] to `humbug/box ^3.0`.
- 
- 
+
+
 ### Backward-compatibility (BC) breaks
 
+- Moved Box2 under the Humbug umbrella:
+    - Change of project
+    - The new Composer package is now `humbug/box`
+- The minimal new PHP version is 7.1
+- Bump the minimal Symfony dependencies from 3.0 to 3.4
+- Dropped the following commands:
+    - `add`
+    - `remove`
+    - `extract`
+    - `key:create`
+    - `key:extract`
+- Process the configuration when loading it instead of lazily processing it
+- Dropped the following deprecated packages:
+    - `kherge/amend` which has been replaced by `padraic/phar-updater`
+    - `phine/path`
+    - `herrora-io/json`
+    - `herrora-io/phpunit-test-case`
+- Move the `Herrora\Box` namespace to `KevinGH\Box`
 - The option `configuration|c` of the command `build` has been changed for `config|c`
 - Remove support for PHAR used for web purposes, which translates to the removal of the following elements of the
   `box.json.dist` configuration: `mimetypes`, `mung`, `not-found` and `web`.
@@ -14,6 +32,15 @@ Migration path from [`kherge/box`][box2] to `humbug/box ^3.0`.
 - No longer support git version placeholders in the output path (`output`)
 - The default main script has been changed to `index.php`
 - The main script is now required
+- Do not allow a string value for the blacklist (`blacklist`) anymore
+- Remove usage of global Box constants: `BOX_PATH`, `BOX_SCHEMA_FILE`, `BOX_EXTRACT_PATTERN_OPEN`
+- Remove support for web PHARs
+- Remove support for extractable PHARs
+- Make the main script path relative to the base path
+- Do not allow a config with no file registered
+- Make main script mandatory (the value, not the setting)
+- Exclude symlinks
+
 
 <br />
 <hr />
