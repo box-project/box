@@ -28,6 +28,7 @@ use Phar;
 use RuntimeException;
 use SplFileInfo;
 use stdClass;
+use function substr;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
 use function Humbug\PhpScoper\create_scoper;
@@ -484,7 +485,19 @@ BANNER;
         $blacklist = self::retrieveBlacklist($raw, $basePath);
 
         return function (SplFileInfo $file) use ($blacklist): ?bool {
-            if (in_array($file->getRealPath(), $blacklist, true)) {
+            if (false === $filePath = $file->getRealPath()) {
+                return null;
+            }
+
+            foreach ($blacklist as $blacklistedFileOrDirectory) {
+                $base = longest_common_base_path([$blacklistedFileOrDirectory, $filePath]);
+
+                if ($base === substr($blacklistedFileOrDirectory, 0, -1)) {
+                    return false;
+                }
+            }
+
+            if (in_array($filePath, $blacklist, true)) {
                 return false;
             }
 
@@ -504,13 +517,14 @@ BANNER;
             return [];
         }
 
-        $blacklist = $raw->blacklist;
+        $blacklist = [];
 
-        $normalizePath = function ($file) use ($basePath): string {
-            return self::normalizeFilePath($file, $basePath);
-        };
+        foreach ($raw->blacklist as $path) {
+            $blacklist[] = self::normalizeFilePath($path, $basePath);
+            $blacklist[] = self::normalizeDirectoryPath($path, $basePath);
+        }
 
-        return array_unique(array_map($normalizePath, $blacklist));
+        return array_unique($blacklist);
     }
 
     /**
@@ -678,7 +692,7 @@ BANNER;
         })((array) $config, $finder);
 
         $createNormalizedDirectories = function (string $directory) use ($basePath): ?string {
-            $directory = self::normalizeDirectoryPath($directory, $basePath);
+            $directory = self::normalizeFilePath($directory, $basePath);
 
             if (is_link($directory)) {
                 // TODO: add this to baberlei/assert
@@ -696,7 +710,7 @@ BANNER;
         };
 
         $normalizeFileOrDirectory = function (string &$fileOrDirectory) use ($basePath): void {
-            $fileOrDirectory = self::normalizeDirectoryPath($fileOrDirectory, $basePath);
+            $fileOrDirectory = self::normalizeFilePath($fileOrDirectory, $basePath);
 
             if (is_link($fileOrDirectory)) {
                 // TODO: add this to baberlei/assert
@@ -813,7 +827,7 @@ BANNER;
         $directories = $raw->{$key};
 
         $normalizeDirectory = function (string $directory) use ($basePath, $key): string {
-            $directory = self::normalizeDirectoryPath($directory, $basePath);
+            $directory = self::normalizeFilePath($directory, $basePath);
 
             if (is_link($directory)) {
                 // TODO: add this to baberlei/assert
@@ -846,7 +860,7 @@ BANNER;
 
     private static function normalizeDirectoryPath(string $directory, string $basePath): string
     {
-        return make_path_absolute(trim($directory), $basePath);
+        return make_path_absolute(trim($directory), $basePath).'/';
     }
 
     private static function retrieveBootstrapFile(stdClass $raw, string $basePath): ?string

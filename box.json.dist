@@ -2,7 +2,7 @@
     "chmod": "0755",
     "main": "bin/box",
     "output": "bin/box.phar",
-    "alias": "box.phar",
+    "stub": true,
 
     "banner": [
         "This file is part of the box project.",
@@ -23,8 +23,27 @@
     ],
     "finder": [
         {
-            "notName": "/LICENSE|.*\\.md|.*\\.dist|Makefile|composer\\.json|composer\\.lock/",
+            "notName":[
+                "LICENSE*",
+                "CHANGELOG*",
+                "CONTRIBUTING*",
+                "README*",
+                "UPGRADE*",
+                "Makefile",
+                "appveyor*",
+                "phpdoc*",
+                "phpunit.xml*",
+                "phpcs.xml*",
+                "phpstan.neon*",
+                "box.json*",
+                "infection.json*",
+                "humbug.json*",
+                "phpbench.json*",
+                "Vagrantfile",
+                "composer.*"
+            ],
             "exclude": [
+                "bin",
                 "File",
                 "mikey179",
                 "Net",
@@ -43,15 +62,13 @@
                 "doc",
                 "docs",
                 "test_old",
+                "specs",
+                "dist",
                 "travis",
-                ".travis"
+                ".travis",
+                "examples"
             ],
             "in": "vendor"
-        },
-        {
-            "name": "composer.json",
-            "in": ".",
-            "exclude": "vendor-bin"
         }
     ],
 
@@ -62,10 +79,5 @@
         "Herrera\\Box\\Compactor\\Php"
     ],
     "git-commit": "git-commit",
-    "git-version": "git-version",
-
-    "replacements": {
-        "manifest_url": "https://box-project.github.io/box2/manifest.json"
-    },
-    "stub": true
+    "git-version": "git-version"
 }

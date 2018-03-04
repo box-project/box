@@ -17,23 +17,13 @@ cs:		## Fix CS
 cs: vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
 	php -d zend.enable_gc=0 vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer fix
 
-compile:		## Compile the application into the PHAR
+compile:	## Compile the application into the PHAR
 compile:
 	# Cleanup existing artefacts
 	rm -f bin/box.phar
 
-	# Remove unnecessary packages
-	composer install --no-dev --prefer-dist
-
-	# Re-dump the loader to account for the prefixing
-	# and optimize the loader
-	composer dump-autoload --classmap-authoritative --no-dev
-
 	# Build the PHAR
 	php -d zend.enable_gc=0 -d phar.readonly=0 bin/box compile $(args)
-
-	# Install back all the dependencies
-	composer install
 
 
 ##
