@@ -52,8 +52,7 @@
         },
         "files": [
             "src/FileSystem/file_system.php",
-            "src/functions.php",
-            "vendor/humbug/php-scoper/src/functions.php"
+            "src/functions.php"
         ],
         "exclude-from-classmap": [
             "/Test/"

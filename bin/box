@@ -24,10 +24,12 @@ $findAutoloader = function () {
         // Is installed via Composer
         return $autoload;
     }
+
     if (file_exists($autoload = __DIR__.'/../vendor/scoper-autoload.php')) {
         // Is scoped (in PHAR or dumped directory)
         return $autoload;
     }
+
     if (file_exists($autoload = __DIR__.'/../vendor/autoload.php')) {
         // Is installed locally
         return $autoload;
@@ -36,7 +38,28 @@ $findAutoloader = function () {
     throw new RuntimeException('Unable to find the Composer or PHP-Scoper autoloader.');
 };
 
-require $findAutoloader();
+// TODO: update PHP-Scoper to get rid of this horrible hack at some point
+$findPhpScoperFunctions = function () {
+    if (file_exists($autoload = __DIR__.'/../../php-scoper/src/functions.php')) {
+        // Is installed via Composer
+        return $autoload;
+    }
+
+    if (file_exists($autoload = __DIR__.'/../vendor/humbug/php-scoper/src/functions.php')) {
+        // Is scoped (in PHAR or dumped directory) or is installed locally
+        return $autoload;
+    }
+
+    throw new RuntimeException('Unable to find the PHP-Scoper functions.');
+};
+
+$bootstrap = function () use ($findAutoloader, $findPhpScoperFunctions) {
+    require_once $findAutoloader();
+    require_once $findPhpScoperFunctions();
+};
+$bootstrap();
+
+$GLOBALS['bootstrap'] = $bootstrap;
 
 register_compactor_aliases();
 

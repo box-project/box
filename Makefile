@@ -23,7 +23,7 @@ compile:
 	rm -f bin/box.phar
 
 	# Build the PHAR
-	php -d zend.enable_gc=0 -d phar.readonly=0 bin/box compile $(args)
+	php -d phar.readonly=0 bin/box compile $(args)
 
 
 ##
@@ -49,7 +49,8 @@ e2e:		## Run the end-to-end tests
 e2e: box_dev.json
 	$(MAKE) compile args='--config=box_dev.json'
 
-	mv -fv bin/box.phar .
+	rm box.phar || true
+	mv -v bin/box.phar .
 
 	# TODO: use the build step again otherwise it is going to include the dev files
 	php -d phar.readonly=0 box.phar compile
