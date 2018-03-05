@@ -106,7 +106,6 @@ HELP;
 
         $startTime = microtime(true);
 
-        $this->loadBootstrapFile($config, $logger);
         $this->removeExistingPhar($config, $logger);
 
         $logger->logStartBuilding($path);
@@ -165,25 +164,6 @@ HELP;
         if ($config->getTmpOutputPath() !== $config->getOutputPath()) {
             rename($config->getTmpOutputPath(), $config->getOutputPath());
         }
-    }
-
-    private function loadBootstrapFile(Configuration $config, BuildLogger $logger): void
-    {
-        $file = $config->getBootstrapFile();
-
-        if (null === $file) {
-            return;
-        }
-
-        $logger->log(
-            BuildLogger::QUESTION_MARK_PREFIX,
-            sprintf(
-                'Loading the bootstrap file "%s"',
-                $file
-            )
-        );
-
-        $config->loadBootstrap();
     }
 
     private function removeExistingPhar(Configuration $config, BuildLogger $logger): void

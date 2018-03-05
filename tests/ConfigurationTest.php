@@ -1725,27 +1725,6 @@ JSON
         $this->assertCount(0, $this->config->getBinaryFiles());
     }
 
-    public function test_no_bootstrap_file_is_configured_by_default(): void
-    {
-        $this->assertNull($this->config->getBootstrapFile());
-        $this->assertNull($this->getNoFileConfig()->getBootstrapFile());
-    }
-
-    public function test_configure_the_bootstrap_file(): void
-    {
-        touch('test.php');
-
-        $this->setconfig([
-            'bootstrap' => 'test.php',
-            'files' => [self::DEFAULT_FILE],
-        ]);
-
-        $this->assertSame(
-            $this->tmp.DIRECTORY_SEPARATOR.'test.php',
-            $this->config->getBootstrapFile()
-        );
-    }
-
     public function test_no_compactors_is_configured_by_default(): void
     {
         $this->assertSame([], $this->config->getCompactors());
@@ -2577,42 +2556,6 @@ COMMENT;
         ]);
 
         $this->assertFalse($this->config->isPrivateKeyPrompt());
-    }
-
-    public function testLoadBootstrap(): void
-    {
-        file_put_contents(
-            'test.php',
-            <<<'CODE'
-<?php define('TEST_BOOTSTRAP_FILE_LOADED', true);
-CODE
-        );
-
-        $this->setConfig([
-            'bootstrap' => 'test.php',
-            'files' => [self::DEFAULT_FILE],
-        ]);
-
-        $this->config->loadBootstrap();
-
-        $this->assertTrue(defined('TEST_BOOTSTRAP_FILE_LOADED'));
-    }
-
-    public function testLoadBootstrapNotExist(): void
-    {
-        try {
-            $this->setConfig([
-                'bootstrap' => 'test.php',
-                'files' => [self::DEFAULT_FILE],
-            ]);
-
-            $this->fail('Expected exception to be thrown.');
-        } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
-                'The bootstrap path "'.$this->tmp.DIRECTORY_SEPARATOR.'test.php" is not a file or does not exist.',
-                $exception->getMessage()
-            );
-        }
     }
 
     public function provideInvalidCompressionAlgorithms(): Generator
