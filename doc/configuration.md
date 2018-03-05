@@ -3,6 +3,7 @@
 1. [Base path][base-path]
 1. [Output][output]
 1. [Main][main]
+1. [Permissions][permissions]
 1. [Including files][including-files]
     1. [Files (`files` and `files-bin`)][files]
     1. [Directories (`directories` and `directories-bin`)][directories]
@@ -15,6 +16,8 @@
     1. [Banner (`banner`)][banner]
     1. [Banner file (`banner-file`)][banner-file]
 1. [Compactors (`compactors`)][compactors]
+1. [Compression algorithm (`compression`)][compression]
+1. [Signing algorithm (`algorithm`)][algorithm]
 
 
 // TODO: do not mention when an option is optional but add a red asterix with a foot note for the mandatory
@@ -38,7 +41,6 @@ The configuration file is a JSON object saved to a file. Note that all settings 
     "banner-file": "?",
     "base-path": "?",
     "blacklist": "?",
-    "bootstrap": "?",
     "chmod": "?",
     "compactors": "?",
     "compression": "?",
@@ -92,6 +94,15 @@ The main file contents is processed by the [compactors][compactors] as the other
 
 If the main file starts with a shebang line (`#!`), it will be automatically removed (the shebang line goes in the
 [stub][stub] for a PHAR and is configured by the [shebang][shebang] setting).
+
+
+## Permissions (`chmod`)
+
+The chmod (`string`|`null`) setting is used to change the file permissions of the newly built PHAR. The string contains
+an octal value e.g. `0750`. By default the permissions of the created PHAR are unchanged so it should be `0644`.
+
+Check the following [link](https://secure.php.net/manual/en/function.chmod.php) for more on the possible values.
+
 
 
 ## Including files
@@ -364,7 +375,7 @@ If this parameter is set, then the value of [`banner`][banner] will be discarded
 
 ## Compactors (`compactors`)
 
-The compactors (`string[]) setting is a list of file contents compacting classes that must be registered. A file
+The compactors (`string[]`) setting is a list of file contents compacting classes that must be registered. A file
 compacting class is used to reduce the size of a specific file type. The following is a simple example:
 
 ```php
@@ -397,6 +408,30 @@ The following compactors are included with Box:
 - `KevinGH\Box\Compactor\PhpScoper`: isolate the code using [PhpScoper][phpscoper]
 
 
+## Compression algorithm (`compression`)
+
+The compression (`string`|`null`) setting is the compression algorithm to use when the PHAR is built. The compression
+affects the individual files within the PHAR and not the PHAR as a whole ([`Phar::compressFiles()`][phar.compress]). The
+following is a list of the signature algorithms available:
+
+- `BZ2`
+- `GZ` (the most efficient most of the time)
+- `NONE` (default)
+
+
+## Signing algorithm (`algorithm`)
+
+The algorithm (`string`|`null`) setting is the signing algorithm to use when the PHAR is built (
+[`Phar::setSignatureAlgorithm()`][phar.setsignaturealgorithm]). The following is a list of the signature algorithms
+available:
+
+- `MD5`
+- `SHA1`
+- `SHA256`
+- `SHA512`
+- `OPENSSL`
+
+By default the PHAR is not signed.
 
 
 <br />
@@ -425,32 +460,21 @@ The following compactors are included with Box:
 [phar.webphar]: https://secure.php.net/manual/en/phar.webphar.php
 [phar.fileformat.stub]: https://secure.php.net/manual/en/phar.fileformat.stub.php
 [phar.interceptfilefuncs]: https://secure.php.net/manual/en/phar.interceptfilefuncs.php
+[phar.setsignaturealgorithm]: https://secure.php.net/manual/en/phar.setsignaturealgorithm.php
+[phar.compress]: https://secure.php.net/manual/en/phar.compress.php
 [symfony-finder]: https://symfony.com/doc/current//components/finder.html
 [phpscoper]: https://github.com/humbug/php-scoper
 [compactors]: #compactors-compactors
+[permissions]: #permissions-chmod
+[compression]: #compression-algorithm-compression
+[algorithm]: #signing-algorithm-algorithm
 
-TODO: double check all the links
-TODO: for the Finder:
-    - add tests regarding the note about (key, arguments)
-    - paths should be relative not only for `in` but the others as well, double check that
+
+
 
 //TODO: rework the rest
 
 
-
-The (optional) algorithm (string) setting is the signing algorithm to use when
-the PHAR is built (Phar::setSignatureAlgorithm()). The following is a list of
-the signature algorithms available:
-
-- MD5 (Phar::MD5)
-- SHA1 (Phar::SHA1)
-- SHA256 (Phar::SHA256)
-- SHA512 (Phar::SHA512)
-- OPENSSL (Phar::OPENSSL)
-
-Further help:
-
-https://secure.php.net/manual/en/phar.setsignaturealgorithm.php
 
 
 The annotations (boolean, object) setting is used to enable compacting
@@ -478,30 +502,9 @@ https://github.com/herrera-io/php-annotations
 
 
 
-The bootstrap (string) setting allows you to specify a PHP file that will be
-loaded before the build or add commands are used. This is useful for loading
-third-party file contents compacting classes that were configured using the
-compactors setting.
-
-The chmod (string) setting is used to change the file permissions of the newly
-built PHAR. The string contains an octal value: 0750.
-
-Check the following link for more on the possible values:
-
-https://secure.php.net/manual/en/function.chmod.php
 
 
 
-
-
-The compression (string) setting is the compression algorithm to use when the
-PHAR is built. The compression affects the individual files within the PHAR,
-and not the PHAR as a whole (Phar::compressFiles()). The following is a list
-of the signature algorithms listed on the help page:
-
-- BZ2 (Phar::BZ2)
-- GZ (Phar::GZ)
-- NONE (Phar::NONE)
 
 
 

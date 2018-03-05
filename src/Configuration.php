@@ -878,15 +878,6 @@ BANNER;
             return null;
         }
 
-        if (false === is_string($raw->compression)) {
-            Assertion::integer(
-                $raw->compression,
-                'Expected compression to be an algorithm name, found %s instead.'
-            );
-
-            return $raw->compression;
-        }
-
         $knownAlgorithmNames = array_keys(get_phar_compression_algorithms());
 
         Assertion::inArray(
@@ -1253,20 +1244,16 @@ BANNER;
             return Phar::SHA1;
         }
 
-        if (is_string($raw->algorithm)) {
-            if (false === defined('Phar::'.$raw->algorithm)) {
-                throw new InvalidArgumentException(
-                    sprintf(
-                        'The signing algorithm "%s" is not supported.',
-                        $raw->algorithm
-                    )
-                );
-            }
-
-            return constant('Phar::'.$raw->algorithm);
+        if (false === defined('Phar::'.$raw->algorithm)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'The signing algorithm "%s" is not supported.',
+                    $raw->algorithm
+                )
+            );
         }
 
-        return $raw->algorithm;
+        return constant('Phar::'.$raw->algorithm);
     }
 
     private static function retrieveStubBannerContents(stdClass $raw): ?string

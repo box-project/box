@@ -5,7 +5,7 @@
     "properties": {
         "algorithm": {
             "description": "The algorithm to use for signing the PHAR.",
-            "type": ["string", "number"]
+            "type": ["string", "null"]
         },
         "alias": {
             "description": "The internal PHAR alias used for I/O streams.",
@@ -49,7 +49,7 @@
         },
         "chmod": {
             "description": "The permission mode for the new PHAR.",
-            "type": "string"
+            "type": ["string", "null"]
         },
         "compactors": {
             "description": "The list of file contents compactor classes to register.",
@@ -60,7 +60,7 @@
         },
         "compression": {
             "description": "The compression algorithm to use for the PHAR.",
-            "type": ["string", "number"]
+            "type": ["string", "null"]
         },
         "datetime": {
             "description": "The replacement date for the current date and time.",
@@ -162,6 +162,10 @@
             "description": "The file name or path of the new PHAR.",
             "type": "string"
         },
+        "php-scoper": {
+            "description": "Path to the PHP-Scoper configuration file.",
+            "type": ["string"]
+        },
         "replacement-sigil": {
             "description": "The sigil that surrounds the replacement names.",
             "type": "string"
@@ -177,10 +181,6 @@
         "stub": {
             "description": "The relative file path to the stub file, or the flag to use the default stub.",
             "type": ["boolean", "string"]
-        },
-        "php-scoper": {
-            "description": "Path to the PHP-Scoper configuration file.",
-            "type": ["string"]
         }
     }
 }
