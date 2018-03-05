@@ -1,3 +1,12 @@
+## From 3.0.0-alpha.0 to 3.0.0-alpha.1
+
+### Backward-compatibility (BC) breaks
+
+- The option `compactors` no longer accepts a string value
+- No longer accept `number` for `algorithm`
+- No longer accept `integer` for `compression`
+
+
 ## From box2 to 3.0.0-alpha.0
 
 Migration path from [`kherge/box`][box2] to `humbug/box ^3.0`.
@@ -39,7 +48,7 @@ Migration path from [`kherge/box`][box2] to `humbug/box ^3.0`.
 - Make the main script path relative to the base path
 - Do not allow a config with no file registered
 - Make main script mandatory (the value, not the setting)
-- Exclude symlinks
+- Exclude symlinks from the files collected
 
 
 <br />

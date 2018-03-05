@@ -1831,16 +1831,6 @@ JSON
         $this->assertNull($this->getNoFileConfig()->getCompressionAlgorithm());
     }
 
-    public function test_the_compression_algorithm_can_be_configured(): void
-    {
-        $this->setConfig([
-            'files' => [self::DEFAULT_FILE],
-            'compression' => Phar::BZ2,
-        ]);
-
-        $this->assertSame(Phar::BZ2, $this->config->getCompressionAlgorithm());
-    }
-
     public function test_the_compression_algorithm_with_a_string(): void
     {
         $this->setConfig([
@@ -2301,16 +2291,6 @@ JSON
     public function testGetSigningAlgorithm(): void
     {
         $this->assertSame(Phar::SHA1, $this->config->getSigningAlgorithm());
-    }
-
-    public function testGetSigningAlgorithmSet(): void
-    {
-        $this->setConfig([
-            'algorithm' => Phar::MD5,
-            'files' => [self::DEFAULT_FILE],
-        ]);
-
-        $this->assertSame(Phar::MD5, $this->config->getSigningAlgorithm());
     }
 
     public function testGetSigningAlgorithmSetString(): void

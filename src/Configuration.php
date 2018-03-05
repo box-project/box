@@ -838,7 +838,6 @@ BANNER;
      */
     private static function retrieveCompactors(stdClass $raw, string $basePath): array
     {
-        // TODO: only accept arrays when set unlike the doc says (it allows a string).
         if (false === isset($raw->compactors)) {
             return [];
         }
@@ -877,15 +876,6 @@ BANNER;
         // Unlike the doc: do not accept integers and document this BC break.
         if (false === isset($raw->compression)) {
             return null;
-        }
-
-        if (false === is_string($raw->compression)) {
-            Assertion::integer(
-                $raw->compression,
-                'Expected compression to be an algorithm name, found %s instead.'
-            );
-
-            return $raw->compression;
         }
 
         $knownAlgorithmNames = array_keys(get_phar_compression_algorithms());
@@ -1254,20 +1244,16 @@ BANNER;
             return Phar::SHA1;
         }
 
-        if (is_string($raw->algorithm)) {
-            if (false === defined('Phar::'.$raw->algorithm)) {
-                throw new InvalidArgumentException(
-                    sprintf(
-                        'The signing algorithm "%s" is not supported.',
-                        $raw->algorithm
-                    )
-                );
-            }
-
-            return constant('Phar::'.$raw->algorithm);
+        if (false === defined('Phar::'.$raw->algorithm)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'The signing algorithm "%s" is not supported.',
+                    $raw->algorithm
+                )
+            );
         }
 
-        return $raw->algorithm;
+        return constant('Phar::'.$raw->algorithm);
     }
 
     private static function retrieveStubBannerContents(stdClass $raw): ?string
