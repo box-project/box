@@ -38,6 +38,7 @@ $findAutoloader = function () {
     throw new RuntimeException('Unable to find the Composer or PHP-Scoper autoloader.');
 };
 
+// TODO: update PHP-Scoper to get rid of this horrible hack at some point
 $findPhpScoperFunctions = function () {
     if (file_exists($autoload = __DIR__.'/../../php-scoper/src/functions.php')) {
         // Is installed via Composer
@@ -52,8 +53,13 @@ $findPhpScoperFunctions = function () {
     throw new RuntimeException('Unable to find the PHP-Scoper functions.');
 };
 
-require $findAutoloader();
-require $findPhpScoperFunctions();
+$bootstrap = function () use ($findAutoloader, $findPhpScoperFunctions) {
+    require_once $findAutoloader();
+    require_once $findPhpScoperFunctions();
+};
+$bootstrap();
+
+$GLOBALS['bootstrap'] = $bootstrap;
 
 register_compactor_aliases();
 

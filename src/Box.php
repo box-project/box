@@ -331,9 +331,11 @@ final class Box
         $mapFile = $this->mapFile;
         $placeholders = $this->placeholders;
         $compactors = $this->compactors;
+        $bootstrap = $GLOBALS['bootstrap'];
 
-        $processFile = function (string $file) use ($cwd, $basePath, $mapFile, $placeholders, $compactors): array {
+        $processFile = function (string $file) use ($cwd, $basePath, $mapFile, $placeholders, $compactors, $bootstrap): array {
             chdir($cwd);
+            $bootstrap();
 
             $contents = file_contents($file);
 
