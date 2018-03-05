@@ -867,13 +867,6 @@ BANNER;
 
     private static function retrieveCompressionAlgorithm(stdClass $raw): ?int
     {
-        // TODO: if in dev mode (when added), do not comment about the compression.
-        // If not, add a warning to notify the user if no compression algorithm is used
-        // provided the PHAR is not configured for web purposes.
-        // If configured for the web, add a warning when a compression algorithm is used
-        // as this can result in an overhead. Add a doc link explaining this.
-        //
-        // Unlike the doc: do not accept integers and document this BC break.
         if (false === isset($raw->compression)) {
             return null;
         }
