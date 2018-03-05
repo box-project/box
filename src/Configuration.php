@@ -73,6 +73,7 @@ BANNER;
     private $map;
     private $fileMapper;
     private $metadata;
+    private $tmpOutputPath;
     private $outputPath;
     private $privateKeyPassphrase;
     private $privateKeyPath;
@@ -100,6 +101,7 @@ BANNER;
      * @param string        $mainScriptContents    The processed content of the main script file
      * @param MapFile       $fileMapper            Utility to map the files from outside and inside the PHAR
      * @param mixed         $metadata              The PHAR Metadata
+     * @param string        $tmpOutputPath
      * @param string        $outputPath
      * @param null|string   $privateKeyPassphrase
      * @param null|string   $privateKeyPath
@@ -127,6 +129,7 @@ BANNER;
         string $mainScriptContents,
         MapFile $fileMapper,
         $metadata,
+        string $tmpOutputPath,
         string $outputPath,
         ?string $privateKeyPassphrase,
         ?string $privateKeyPath,
@@ -161,6 +164,7 @@ BANNER;
         $this->mainScriptContents = $mainScriptContents;
         $this->fileMapper = $fileMapper;
         $this->metadata = $metadata;
+        $this->tmpOutputPath = $tmpOutputPath;
         $this->outputPath = $outputPath;
         $this->privateKeyPassphrase = $privateKeyPassphrase;
         $this->privateKeyPath = $privateKeyPath;
@@ -217,7 +221,7 @@ BANNER;
 
         $metadata = self::retrieveMetadata($raw);
 
-        $outputPath = self::retrieveOutputPath($raw, $basePath);
+        [$tmpOutputPath, $outputPath] = self::retrieveOutputPath($raw, $basePath);
 
         $privateKeyPassphrase = self::retrievePrivateKeyPassphrase($raw);
         $privateKeyPath = self::retrievePrivateKeyPath($raw);
@@ -258,6 +262,7 @@ BANNER;
             $mainScriptContents,
             $fileMapper,
             $metadata,
+            $tmpOutputPath,
             $outputPath,
             $privateKeyPassphrase,
             $privateKeyPath,
@@ -339,6 +344,11 @@ BANNER;
     public function getMainScriptContents(): string
     {
         return $this->mainScriptContents;
+    }
+
+    public function getTmpOutputPath(): string
+    {
+        return $this->tmpOutputPath;
     }
 
     public function getOutputPath(): string
@@ -1010,7 +1020,10 @@ BANNER;
         return null;
     }
 
-    private static function retrieveOutputPath(stdClass $raw, string $basePath): string
+    /**
+     * @return string[] The first element is the temporary output path and the second the real one
+     */
+    private static function retrieveOutputPath(stdClass $raw, string $basePath): array
     {
         if (isset($raw->output)) {
             $path = $raw->output;
@@ -1018,7 +1031,13 @@ BANNER;
             $path = self::DEFAULT_ALIAS;
         }
 
-        return make_path_absolute($path, $basePath);
+        $tmp = $real = self::normalizePath($path, $basePath);
+
+        if ('.phar' !== substr($real, -5)) {
+            $tmp .= '.phar';
+        }
+
+        return [$tmp, $real];
     }
 
     private static function retrievePrivateKeyPassphrase(stdClass $raw): ?string

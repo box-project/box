@@ -232,7 +232,7 @@ PHP;
         );
     }
 
-    public function test_it_can_build_an_empty_PHAR_file(): void
+    public function test_it_can_build_a_PHAR_without_any_configuration(): void
     {
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
@@ -1511,6 +1511,74 @@ OUTPUT;
             'Hello!',
             exec('php test.phar'),
             'Expected the PHAR to be executable'
+        );
+    }
+
+    public function test_it_can_build_a_PHAR_with_an_output_which_does_not_have_a_PHAR_extension(): void
+    {
+        mirror(self::FIXTURES_DIR.'/dir004', $this->tmp);
+
+        file_put_contents(
+            'box.json',
+            json_encode(
+                array_merge(
+                    json_decode(
+                        file_get_contents('box.json'),
+                        true
+                    ),
+                    ['output' => 'test']
+                )
+            )
+        );
+
+        $commandTester = $this->getCommandTester();
+        $commandTester->execute(
+            ['command' => 'compile'],
+            [
+                'interactive' => false,
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
+        );
+
+        $expected = <<<OUTPUT
+
+    ____
+   / __ )____  _  __
+  / __  / __ \| |/_/
+ / /_/ / /_/ />  <
+/_____/\____/_/|_|
+
+
+Box (repo)
+
+
+ // Loading the configuration file "/path/to/box.json.dist".
+
+* Building the PHAR "/path/to/tmp/test"
+? No compactor to register
+? Adding main file: /path/to/tmp/test.php
+? Adding binary files
+    > No file found
+? Adding files
+    > 1 file(s)
+? Using stub file: /path/to/tmp/stub.php
+? No compression
+* Done.
+
+ // PHAR size: 100B
+ // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
+
+
+OUTPUT;
+
+        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
+
+        $this->assertSame($expected, $actual);
+
+        $this->assertSame(
+            'Hello!',
+            exec('php test'),
+            'Expected PHAR to be executable'
         );
     }
 

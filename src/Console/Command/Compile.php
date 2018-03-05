@@ -33,6 +33,7 @@ use function KevinGH\Box\enable_debug;
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use function KevinGH\Box\FileSystem\remove;
+use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\formatted_filesize;
 use function KevinGH\Box\get_phar_compression_algorithms;
 
@@ -110,7 +111,7 @@ HELP;
 
         $logger->logStartBuilding($path);
 
-        $this->createPhar($path, $config, $input, $output, $logger, $io);
+        $this->createPhar($config, $input, $output, $logger, $io);
 
         $this->correctPermissions($path, $config, $logger);
 
@@ -131,14 +132,15 @@ HELP;
     }
 
     private function createPhar(
-        string $path,
         Configuration $config,
         InputInterface $input,
         OutputInterface $output,
         BuildLogger $logger,
         SymfonyStyle $io
     ): void {
-        $box = Box::create($path);
+        $box = Box::create(
+            $config->getTmpOutputPath()
+        );
 
         $box->getPhar()->startBuffering();
 
@@ -158,7 +160,11 @@ HELP;
 
         $box->getPhar()->stopBuffering();
 
-        $this->signPhar($config, $box, $path, $input, $output, $logger);
+        $this->signPhar($config, $box, $config->getTmpOutputPath(), $input, $output, $logger);
+
+        if ($config->getTmpOutputPath() !== $config->getOutputPath()) {
+            rename($config->getTmpOutputPath(), $config->getOutputPath());
+        }
     }
 
     private function loadBootstrapFile(Configuration $config, BuildLogger $logger): void
