@@ -838,7 +838,6 @@ BANNER;
      */
     private static function retrieveCompactors(stdClass $raw, string $basePath): array
     {
-        // TODO: only accept arrays when set unlike the doc says (it allows a string).
         if (false === isset($raw->compactors)) {
             return [];
         }

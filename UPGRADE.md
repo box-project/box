@@ -1,3 +1,10 @@
+## From 3.0.0-alpha.0 to 3.0.0-alpha.1
+
+### Backward-compatibility (BC) breaks
+
+- The option `compactors` no longer accepts a string value
+
+
 ## From box2 to 3.0.0-alpha.0
 
 Migration path from [`kherge/box`][box2] to `humbug/box ^3.0`.
