@@ -51,7 +51,6 @@ class CompileTest extends CommandTestCase
                 [
                     'alias' => 'alias-test.phar',
                     'banner' => 'custom banner',
-                    'bootstrap' => 'bootstrap.php',
                     'chmod' => '0755',
                     'compactors' => [Php::class],
                     'directories' => ['a'],
@@ -94,7 +93,6 @@ Box (repo)
 
  // Loading the configuration file "/path/to/box.json.dist".
 
-? Loading the bootstrap file "/path/to/tmp/bootstrap.php"
 ? Removing the existing PHAR "/path/to/tmp/test.phar"
 Building the PHAR "/path/to/tmp/test.phar"
 ? Registering compactors
@@ -191,7 +189,6 @@ PHP;
                 [
                     'alias' => 'alias-test.phar',
                     'banner' => 'custom banner',
-                    'bootstrap' => 'bootstrap.php',
                     'chmod' => '0755',
                     'compactors' => [Php::class],
                     'directories' => ['a'],
@@ -302,12 +299,12 @@ OUTPUT;
             '/a/deep/test/',
             '/a/deep/test/directory/',
             '/a/deep/test/directory/test.php',
+            '/bootstrap.php',
             '/one/',
             '/one/test.php',
             '/two/',
             '/two/test.png',
             '/binary',
-            '/bootstrap.php',
             '/private.key',
             '/test.phar',
             '/test.phar.pubkey',
@@ -329,7 +326,6 @@ OUTPUT;
             json_encode(
                 [
                     'alias' => 'alias-test.phar',
-                    'bootstrap' => 'bootstrap.php',
                     'chmod' => '0755',
                     'compactors' => [Php::class],
                     'directories' => ['a'],
@@ -372,7 +368,6 @@ Box (repo)
 
  // Loading the configuration file "/path/to/box.json.dist".
 
-? Loading the bootstrap file "/path/to/tmp/bootstrap.php"
 ? Removing the existing PHAR "/path/to/tmp/test.phar"
 Building the PHAR "/path/to/tmp/test.phar"
 ? Registering compactors
@@ -476,7 +471,6 @@ PHP;
                 [
                     'alias' => 'test.phar',
                     'banner' => 'custom banner',
-                    'bootstrap' => 'bootstrap.php',
                     'chmod' => '0755',
                     'compactors' => [Php::class],
                     'directories' => ['a'],
@@ -523,7 +517,6 @@ Box (repo)
 
  // Loading the configuration file "/path/to/box.json.dist".
 
-? Loading the bootstrap file "/path/to/tmp/bootstrap.php"
 ? Removing the existing PHAR "/path/to/tmp/test.phar"
 * Building the PHAR "/path/to/tmp/test.phar"
 ? Registering compactors
@@ -577,7 +570,6 @@ OUTPUT;
                         'multiline',
                         'custom banner',
                     ],
-                    'bootstrap' => 'bootstrap.php',
                     'chmod' => '0755',
                     'compactors' => [Php::class],
                     'directories' => ['a'],
@@ -624,7 +616,6 @@ Box (repo)
 
  // Loading the configuration file "/path/to/box.json.dist".
 
-? Loading the bootstrap file "/path/to/tmp/bootstrap.php"
 ? Removing the existing PHAR "/path/to/tmp/test.phar"
 * Building the PHAR "/path/to/tmp/test.phar"
 ? Registering compactors
@@ -681,7 +672,6 @@ OUTPUT;
                 [
                     'alias' => 'test.phar',
                     'banner' => 'custom banner',
-                    'bootstrap' => 'bootstrap.php',
                     'chmod' => '0755',
                     'compactors' => [Php::class],
                     'directories' => ['a'],
@@ -762,7 +752,6 @@ OUTPUT;
                 [
                     'alias' => 'alias-test.phar',
                     'banner' => 'custom banner',
-                    'bootstrap' => 'bootstrap.php',
                     'chmod' => '0755',
                     'compactors' => [Php::class],
                     'directories' => ['a'],
@@ -831,7 +820,6 @@ PHP
                 [
                     'alias' => 'alias-test.phar',
                     'banner' => 'custom banner',
-                    'bootstrap' => 'bootstrap.php',
                     'chmod' => '0755',
                     'compactors' => [Php::class],
                     'directories' => ['a'],

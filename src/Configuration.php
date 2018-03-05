@@ -65,7 +65,6 @@ BANNER;
     private $basePath;
     private $files;
     private $binaryFiles;
-    private $bootstrapFile;
     private $compactors;
     private $compressionAlgorithm;
     private $mainScriptPath;
@@ -93,7 +92,6 @@ BANNER;
      * @param string        $basePath              Utility to private the base path used and be able to retrieve a path relative to it (the base path)
      * @param SplFileInfo[] $files                 List of files
      * @param SplFileInfo[] $binaryFiles           List of binary files
-     * @param null|string   $bootstrapFile         The bootstrap file path
      * @param Compactor[]   $compactors            List of file contents compactors
      * @param null|int      $compressionAlgorithm  Compression algorithm constant value. See the \Phar class constants
      * @param null|int      $fileMode              File mode in octal form
@@ -121,7 +119,6 @@ BANNER;
         string $basePath,
         array $files,
         array $binaryFiles,
-        ?string $bootstrapFile,
         array $compactors,
         ?int $compressionAlgorithm,
         ?int $fileMode,
@@ -156,7 +153,6 @@ BANNER;
         $this->basePath = $basePath;
         $this->files = $files;
         $this->binaryFiles = $binaryFiles;
-        $this->bootstrapFile = $bootstrapFile;
         $this->compactors = $compactors;
         $this->compressionAlgorithm = $compressionAlgorithm;
         $this->fileMode = $fileMode;
@@ -209,8 +205,6 @@ BANNER;
             $binaryFilesAggregate = array_unique(iterator_to_array(chain($binaryFiles, $binaryDirectories, ...$binaryFilesFromFinders)));
         }
 
-        $bootstrapFile = self::retrieveBootstrapFile($raw, $basePath);
-
         $compactors = self::retrieveCompactors($raw, $basePath);
         $compressionAlgorithm = self::retrieveCompressionAlgorithm($raw);
 
@@ -254,7 +248,6 @@ BANNER;
             $basePath,
             $filesAggregate,
             $binaryFilesAggregate,
-            $bootstrapFile,
             $compactors,
             $compressionAlgorithm,
             $fileMode,
@@ -302,20 +295,6 @@ BANNER;
     public function getBinaryFiles(): array
     {
         return $this->binaryFiles;
-    }
-
-    public function getBootstrapFile(): ?string
-    {
-        return $this->bootstrapFile;
-    }
-
-    public function loadBootstrap(): void
-    {
-        $file = $this->bootstrapFile;
-
-        if (null !== $file) {
-            include $file;
-        }
     }
 
     /**
@@ -728,7 +707,7 @@ BANNER;
                 );
             }
 
-            //TODO: add fileExists (as file or directory) to Assert
+            // TODO: add fileExists (as file or directory) to Assert
             if (false === is_file($fileOrDirectory)) {
                 Assertion::directory($fileOrDirectory);
             } else {
@@ -852,21 +831,6 @@ BANNER;
     private static function normalizePath(string $file, string $basePath): string
     {
         return make_path_absolute(trim($file), $basePath);
-    }
-
-    private static function retrieveBootstrapFile(stdClass $raw, string $basePath): ?string
-    {
-        // TODO: deprecate its usage & document this BC break. Compactors will not be configurable
-        // through that extension point so this is pretty much useless unless proven otherwise.
-        if (false === isset($raw->bootstrap)) {
-            return null;
-        }
-
-        $file = self::normalizePath($raw->bootstrap, $basePath);
-
-        Assertion::file($file, 'The bootstrap path "%s" is not a file or does not exist.');
-
-        return $file;
     }
 
     /**
