@@ -189,7 +189,10 @@ STUB;
         }
 
         if (null !== $this->index) {
-            $stub[] = "require 'phar://' . __FILE__ . '/{$this->index}';";
+            $stub[] = null === $this->alias
+                ? "require 'phar://' . __FILE__ . '/{$this->index}';"
+                : "require 'phar://{$this->alias}/{$this->index}';"
+            ;
         }
 
         if ([] === $stub) {

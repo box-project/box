@@ -53,7 +53,7 @@ $findPhpScoperFunctions = function () {
     throw new RuntimeException('Unable to find the PHP-Scoper functions.');
 };
 
-$bootstrap = function () use ($findAutoloader, $findPhpScoperFunctions) {
+$bootstrap = function () use ($findAutoloader, $findPhpScoperFunctions): void {
     require_once $findAutoloader();
     require_once $findPhpScoperFunctions();
 };

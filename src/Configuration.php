@@ -37,6 +37,7 @@ use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\longest_common_base_path;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\make_path_relative;
+use function uniqid;
 
 final class Configuration
 {
@@ -115,7 +116,7 @@ BANNER;
      */
     private function __construct(
         ?string $file,
-        ?string $alias,
+        string $alias,
         string $basePath,
         array $files,
         array $binaryFiles,
@@ -271,7 +272,7 @@ BANNER;
         );
     }
 
-    public function getAlias(): ?string
+    public function getAlias(): string
     {
         return $this->alias;
     }
@@ -411,10 +412,10 @@ BANNER;
         return $this->isStubGenerated;
     }
 
-    private static function retrieveAlias(stdClass $raw): ?string
+    private static function retrieveAlias(stdClass $raw): string
     {
         if (false === isset($raw->alias)) {
-            return null;
+            return uniqid('box-auto-generated-alias-').'.phar';
         }
 
         $alias = trim($raw->alias);

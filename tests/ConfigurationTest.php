@@ -70,10 +70,10 @@ class ConfigurationTest extends FileSystemTestCase
         $this->assertTrue(true);
     }
 
-    public function test_no_alias_is_registered_by_default(): void
+    public function test_a_default_alias_is_generted_if_no_alias_is_registered(): void
     {
-        $this->assertNull($this->config->getAlias());
-        $this->assertNull($this->getNoFileConfig()->getAlias());
+        $this->assertRegExp('/^box-auto-generated-alias-[\da-zA-Z]{13}\.phar$/', $this->config->getAlias());
+        $this->assertRegExp('/^box-auto-generated-alias-[\da-zA-Z]{13}\.phar$/', $this->getNoFileConfig()->getAlias());
     }
 
     public function test_the_alias_can_be_configured(): void
