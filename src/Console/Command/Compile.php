@@ -61,7 +61,8 @@ information check the documentation online:
 </comment>
 HELP;
 
-    private const DEV_OPTION = 'debug';
+    private const DEBUG_OPTION = 'debug';
+    private const DEV_OPTION = 'dev';
 
     /**
      * {@inheritdoc}
@@ -74,6 +75,11 @@ HELP;
         $this->setDescription('Compile an application into a PHAR');
         $this->setHelp(self::HELP);
 
+        $this->addOption(
+            self::DEBUG_OPTION,
+            null,
+            InputOption::VALUE_NONE
+        );
         $this->addOption(
             self::DEV_OPTION,
             null,
@@ -88,7 +94,7 @@ HELP;
      */
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
-        if (true === $input->getOption(self::DEV_OPTION)) {
+        if (true === $input->getOption(self::DEBUG_OPTION)) {
             enable_debug();
         }
 
@@ -140,7 +146,6 @@ HELP;
         $box = Box::create(
             $config->getTmpOutputPath()
         );
-
         $box->getPhar()->startBuffering();
 
         $this->setReplacementValues($config, $box, $logger);
@@ -155,7 +160,8 @@ HELP;
 
         $this->registerStub($config, $box, $main, $logger);
         $this->configureMetadata($config, $box, $logger);
-        $this->configureCompressionAlgorithm($config, $box, $logger);
+
+        $this->configureCompressionAlgorithm($config, $box, $input->getOption(self::DEV_OPTION), $logger);
 
         $box->getPhar()->stopBuffering();
 
@@ -381,7 +387,7 @@ HELP;
         }
     }
 
-    private function configureCompressionAlgorithm(Configuration $config, Box $box, BuildLogger $logger): void
+    private function configureCompressionAlgorithm(Configuration $config, Box $box, bool $dev, BuildLogger $logger): void
     {
         if (null !== ($algorithm = $config->getCompressionAlgorithm())) {
             $logger->log(
@@ -396,7 +402,9 @@ HELP;
         } else {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
-                '<error>No compression</error>'
+                $dev
+                    ? 'No compression'
+                    : '<error>No compression</error>'
             );
         }
     }
