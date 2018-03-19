@@ -206,7 +206,7 @@ The default PHAR stub file can be used but Box also propose a couple of options 
 
 The stub (`string`|`boolean`) setting is used to specify the location of a stub file or if one should be generated:
 - `string`: Path to the stub file will be used as is inside the PHAR
-- `true`: A new stub will be generated
+- `true` (default): A new stub will be generated
 - `false`: The default stub used by the PHAR class will be used
 
 If a custom stub file is provided, none of the other options ([`shebang`][shebang], [`intercept`][intercept] and
@@ -239,7 +239,8 @@ The `alias` (`string`) setting is used when generating a new stub to call the [`
 makes it easier to refer to files in the PHAR and ensure the access to internal files will always work regardless of the
 location of the PHAR on the file system.
 
-No alias is used by default.
+If no alias is provided, a generated unique name will be used for it in order to map the [main file][main]. Note that this
+may have undesirable effects if you are using the generated [stub][stub-stub]
 
 Example:
 

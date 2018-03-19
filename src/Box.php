@@ -331,7 +331,7 @@ final class Box
         $mapFile = $this->mapFile;
         $placeholders = $this->placeholders;
         $compactors = $this->compactors;
-        $bootstrap = $GLOBALS['bootstrap'] ?? function () {};
+        $bootstrap = $GLOBALS['bootstrap'] ?? function (): void {};
 
         $processFile = function (string $file) use ($cwd, $basePath, $mapFile, $placeholders, $compactors, $bootstrap): array {
             chdir($cwd);

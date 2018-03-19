@@ -218,7 +218,7 @@ TEXT
 
 Phar::mapPhar('test.phar');
 Phar::interceptFileFuncs();
-require 'phar://' . __FILE__ . '/index.php';
+require 'phar://test.phar/index.php';
 
 __HALT_COMPILER(); ?>
 
