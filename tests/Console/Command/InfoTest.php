@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use KevinGH\Box\Console\Application;
+use KevinGH\Box\Console\DisplayNormalizer;
 use Phar;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -56,6 +57,7 @@ class InfoTest extends TestCase
         $signatures = '  - '.implode("\n  - ", Phar::getSupportedSignatures());
 
         $expected = <<<OUTPUT
+
 API Version: $version
 
 Supported Compression:
@@ -64,9 +66,13 @@ $compression
 Supported Signatures:
 $signatures
 
+ // Run the command with the PHAR path as an argument to get details on the
+ // PHAR.
+
+
 OUTPUT;
 
-        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(0, $this->commandTester->getStatusCode());
     }
 
@@ -86,17 +92,24 @@ OUTPUT;
         );
 
         $expected = <<<OUTPUT
+
 API Version: $version
 
 Archive Compression: None
 
 Signature: {$signature['hash_type']}
-
 Signature Hash: {$signature['hash']}
+
+Metadata: None
+
+Contents: 1 file (6.61KB)
+
+ // Use the --list|-l option to list the content of the PHAR.
+
 
 OUTPUT;
 
-        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(0, $this->commandTester->getStatusCode());
     }
 
@@ -118,27 +131,29 @@ OUTPUT;
         );
 
         $expected = <<<OUTPUT
+
 API Version: $version
 
-Archive Compression: None
+Archive Compression:
+  - BZ2 (50.00%)
+  - None (50.00%)
 
 Signature: {$signature['hash_type']}
-
 Signature Hash: {$signature['hash']}
-
-Contents:
-a/
-  bar.php [BZ2]
-foo.php
 
 Metadata:
 array (
   'test' => 123,
 )
 
+Contents: 2 files (6.71KB)
+a/
+  bar.php [BZ2]
+foo.php [NONE]
+
 OUTPUT;
 
-        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(0, $this->commandTester->getStatusCode());
     }
 
@@ -160,22 +175,28 @@ OUTPUT;
         );
 
         $expected = <<<OUTPUT
+
 API Version: $version
 
-Archive Compression: None
+Archive Compression:
+  - BZ2 (50.00%)
+  - None (50.00%)
 
 Signature: {$signature['hash_type']}
-
 Signature Hash: {$signature['hash']}
 
-Contents:
-a
+Metadata:
+array (
+  'test' => 123,
+)
+
+Contents: 2 files (6.71KB)
 a/bar.php [BZ2]
-foo.php
+foo.php [NONE]
 
 OUTPUT;
 
-        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(0, $this->commandTester->getStatusCode());
     }
 }
