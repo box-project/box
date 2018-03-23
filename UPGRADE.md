@@ -1,3 +1,9 @@
+## From 3.0.0-alpha.1 to 3.0.0-alpha.2
+
+### Backward-compatibility (BC) breaks
+
+- The command `info` no longer supports ZIP & TAR based PHARs
+
 ## From 3.0.0-alpha.0 to 3.0.0-alpha.1
 
 ### Backward-compatibility (BC) breaks
