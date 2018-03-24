@@ -1996,12 +1996,12 @@ JSON
         );
     }
 
-    public function test_get_metadata(): void
+    public function test_no_metadata_is_configured_by_default(): void
     {
         $this->assertNull($this->config->getMetadata());
     }
 
-    public function test_configure_metadata(): void
+    public function test_can_configure_metadata(): void
     {
         $this->setConfig([
             'files' => [self::DEFAULT_FILE],
