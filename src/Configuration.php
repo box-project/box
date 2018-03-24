@@ -953,10 +953,6 @@ BANNER;
      */
     private static function retrieveMetadata(stdClass $raw)
     {
-        // TODO: the doc currently say this can be any value; check if true
-        // and if not add checks accordingly
-        //
-        // Also review the doc as I don't find it very helpful...
         if (isset($raw->metadata)) {
             if (is_object($raw->metadata)) {
                 return (array) $raw->metadata;

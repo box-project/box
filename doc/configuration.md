@@ -18,6 +18,7 @@
 1. [Compactors (`compactors`)][compactors]
 1. [Compression algorithm (`compression`)][compression]
 1. [Signing algorithm (`algorithm`)][algorithm]
+1. [Metadata (`metadata`)][metadata]
 
 
 // TODO: do not mention when an option is optional but add a red asterix with a foot note for the mandatory
@@ -439,6 +440,12 @@ By default the PHAR is not signed.
 <hr />
 
 
+## Metadata (`metadata`)
+
+The metadata (`any`) setting can be any value. This value will be stored as metadata that can be retrieved from the built PHAR (
+[`Phar::getMetadata()][phar.getmetadata]).
+
+
 « [Creating a PHAR](../README.md#creating-a-phar) • [Table of Contents](../README.md#table-of-contents) »
 
 
@@ -463,12 +470,14 @@ By default the PHAR is not signed.
 [phar.interceptfilefuncs]: https://secure.php.net/manual/en/phar.interceptfilefuncs.php
 [phar.setsignaturealgorithm]: https://secure.php.net/manual/en/phar.setsignaturealgorithm.php
 [phar.compress]: https://secure.php.net/manual/en/phar.compress.php
+[phar.getmetadata]: htthttps://secure.php.net/manual/en/phar.getmetadata.php
 [symfony-finder]: https://symfony.com/doc/current//components/finder.html
 [phpscoper]: https://github.com/humbug/php-scoper
 [compactors]: #compactors-compactors
 [permissions]: #permissions-chmod
 [compression]: #compression-algorithm-compression
 [algorithm]: #signing-algorithm-algorithm
+[metadata]: #metadata-metadata
 
 
 
@@ -591,9 +600,6 @@ earlier key).
 2. src/Test/some/other.php
 3. src/Another/my/test/another.php
 
-
-The metadata (any) setting can be any value. This value will be stored as
-metadata that can be retrieved from the built PHAR (Phar::getMetadata()).
 
 The replacements (object) setting is a map of placeholders and their values.
 The placeholders are replaced in all non-binary files with the specified
