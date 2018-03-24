@@ -14,12 +14,15 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
-use Composer\Console\Application as ComposerApplication;
+use Composer\Factory;
+use Composer\IO\NullIO;
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\NullOutput;
+use InvalidArgumentException;
 use function KevinGH\Box\FileSystem\dump_file;
+use function KevinGH\Box\FileSystem\file_contents;
+use function preg_match;
+use function preg_replace;
 
 final class ComposerOrchestrator
 {
@@ -27,37 +30,63 @@ final class ComposerOrchestrator
     {
     }
 
-    public static function dumpAutoload(?PhpScoperConfiguration $configuration): void
+    public static function dumpAutoload(?PhpScoperConfiguration $phpScoperConfig): void
     {
-        // TODO: we are running Composer a first time to assign ComposerApplication#io. However it should be possible
-        // to do without by patching Composer at the core to construct the application with a NullIO
-        $composerApplication = new ComposerApplication();
-        $composerApplication->doRun(new ArrayInput(['--no-plugins' => null]), new NullOutput());
+        try {
+            $composer = Factory::create(new NullIO(), null, true);
+        } catch (InvalidArgumentException $exception) {
+            if (1 !== preg_match('//', 'could not find a composer\.json file')) {
+                throw $exception;
+            }
 
-        $composer = $composerApplication->getComposer(false, true);
-
-        if (null === $composer) {
             return; // No autoload to dump
         }
 
         $installationManager = $composer->getInstallationManager();
-        $localRepo = $composer->getRepositoryManager()->getLocalRepository();
+        $localRepository = $composer->getRepositoryManager()->getLocalRepository();
         $package = $composer->getPackage();
-        $config = $composer->getConfig();
+        $composerConfig = $composer->getConfig();
 
         $generator = $composer->getAutoloadGenerator();
         $generator->setDevMode(false);
         $generator->setClassMapAuthoritative(true);
 
-        if (null !== $configuration) {
-            // TODO: make prefix configurable
-            $autoload = (new ScoperAutoloadGenerator($configuration->getWhitelist()))->dump('_HumbugBox');
+        $generator->dump($composerConfig, $localRepository, $package, $installationManager, 'composer', true);
 
-            // TODO: handle custom vendor dir
-            // TODO: expose the scoper autoload file name via a constant
-            dump_file('vendor/scoper-autoload.php', $autoload);
+        if (null !== $phpScoperConfig) {
+            $autoloadFile = $composerConfig->get('vendor-dir').'/autoload.php';
+
+            $autoloadContents = self::generateAutoloadStatements(
+                $phpScoperConfig,
+                file_contents($autoloadFile)
+            );
+
+            dump_file($autoloadFile, $autoloadContents);
         }
+    }
 
-        $generator->dump($config, $localRepo, $package, $installationManager, 'composer', true);
+    private static function generateAutoloadStatements(PhpScoperConfiguration $config, string $autoload): string
+    {
+        // TODO: make prefix configurable: https://github.com/humbug/php-scoper/issues/178
+        $whitelistStatements = (new ScoperAutoloadGenerator($config->getWhitelist()))->dump('_HumbugBox');
+
+        $whitelistStatements = preg_replace(
+            '/(\\$loader \= .*)|(return \\$loader;)/',
+            '',
+            str_replace('<?php', '', $whitelistStatements)
+        );
+
+        return preg_replace(
+            '/return (ComposerAutoloaderInit.+::getLoader\(\));/',
+            <<<PHP
+\$loader = \$1;
+
+$whitelistStatements
+
+return \$loader;
+PHP
+            ,
+            $autoload
+        );
     }
 }

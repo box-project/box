@@ -148,7 +148,7 @@ HELP
         );
 
         $io->writeln('');
-        $io->comment('Run the command with the PHAR path as an argument to get details on the PHAR.');
+        $io->comment('Get a PHAR details by giving its path as an argument.');
 
         return 0;
     }
