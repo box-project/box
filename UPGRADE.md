@@ -3,6 +3,8 @@
 ### Backward-compatibility (BC) breaks
 
 - The command `info` no longer supports ZIP & TAR based PHARs
+- When using the `PhpScoper` compactor the `scoper-autoload.php` file is no longer dumped. Instead the whitelist statements are directly
+  appended to the existing autoloader which avoids nay extra work for the user.
 
 ## From 3.0.0-alpha.0 to 3.0.0-alpha.1
 

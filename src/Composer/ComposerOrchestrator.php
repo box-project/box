@@ -14,12 +14,13 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
-use Composer\Console\Application as ComposerApplication;
+use Composer\Factory;
+use Composer\IO\NullIO;
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\NullOutput;
-use function KevinGH\Box\FileSystem\dump_file;
+use InvalidArgumentException;
+use function KevinGH\Box\FileSystem\append_to_file;
+use function preg_match;
 
 final class ComposerOrchestrator
 {
@@ -29,14 +30,13 @@ final class ComposerOrchestrator
 
     public static function dumpAutoload(?PhpScoperConfiguration $configuration): void
     {
-        // TODO: we are running Composer a first time to assign ComposerApplication#io. However it should be possible
-        // to do without by patching Composer at the core to construct the application with a NullIO
-        $composerApplication = new ComposerApplication();
-        $composerApplication->doRun(new ArrayInput(['--no-plugins' => null]), new NullOutput());
+        try {
+            $composer = Factory::create(new NullIO(), null, true);
+        } catch (InvalidArgumentException $exception) {
+            if (1 !== preg_match('//', 'could not find a composer\.json file')) {
+                throw $exception;
+            }
 
-        $composer = $composerApplication->getComposer(false, true);
-
-        if (null === $composer) {
             return; // No autoload to dump
         }
 
@@ -49,15 +49,27 @@ final class ComposerOrchestrator
         $generator->setDevMode(false);
         $generator->setClassMapAuthoritative(true);
 
-        if (null !== $configuration) {
-            // TODO: make prefix configurable
-            $autoload = (new ScoperAutoloadGenerator($configuration->getWhitelist()))->dump('_HumbugBox');
-
-            // TODO: handle custom vendor dir
-            // TODO: expose the scoper autoload file name via a constant
-            dump_file('vendor/scoper-autoload.php', $autoload);
-        }
-
         $generator->dump($config, $localRepo, $package, $installationManager, 'composer', true);
+
+        if (null !== $configuration) {
+            $autoload = self::generateAutoloadStatements($configuration);
+
+            append_to_file(
+                $config->get('vendor-dir').'/composer/autoload_real.php',
+                $autoload
+            );
+        }
+    }
+
+    private static function generateAutoloadStatements(PhpScoperConfiguration $configuration): string
+    {
+        // TODO: make prefix configurable: https://github.com/humbug/php-scoper/issues/178
+        $autoload = (new ScoperAutoloadGenerator($configuration->getWhitelist()))->dump('_HumbugBox');
+
+        return preg_replace(
+            '/(\\$loader \= .*)|(return \\$loader;)/',
+            '',
+            str_replace('<?php', '', $autoload)
+        );
     }
 }

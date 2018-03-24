@@ -66,8 +66,7 @@ $compression
 Supported Signatures:
 $signatures
 
- // Run the command with the PHAR path as an argument to get details on the
- // PHAR.
+ // Get a PHAR details by giving its path as an argument.
 
 
 OUTPUT;
