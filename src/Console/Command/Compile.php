@@ -78,12 +78,14 @@ HELP;
         $this->addOption(
             self::DEBUG_OPTION,
             null,
-            InputOption::VALUE_NONE
+            InputOption::VALUE_NONE,
+            'Dump the files added to the PHAR in a `.box` directory'
         );
         $this->addOption(
             self::DEV_OPTION,
             null,
-            InputOption::VALUE_NONE
+            InputOption::VALUE_NONE,
+            'Skips the compression step'
         );
 
         $this->configureWorkingDirOption();

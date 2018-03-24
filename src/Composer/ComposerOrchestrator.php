@@ -19,8 +19,10 @@ use Composer\IO\NullIO;
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
 use InvalidArgumentException;
-use function KevinGH\Box\FileSystem\append_to_file;
+use function KevinGH\Box\FileSystem\dump_file;
+use function KevinGH\Box\FileSystem\file_contents;
 use function preg_match;
+use function preg_replace;
 
 final class ComposerOrchestrator
 {
@@ -28,7 +30,7 @@ final class ComposerOrchestrator
     {
     }
 
-    public static function dumpAutoload(?PhpScoperConfiguration $configuration): void
+    public static function dumpAutoload(?PhpScoperConfiguration $phpScoperConfig): void
     {
         try {
             $composer = Factory::create(new NullIO(), null, true);
@@ -41,35 +43,50 @@ final class ComposerOrchestrator
         }
 
         $installationManager = $composer->getInstallationManager();
-        $localRepo = $composer->getRepositoryManager()->getLocalRepository();
+        $localRepository = $composer->getRepositoryManager()->getLocalRepository();
         $package = $composer->getPackage();
-        $config = $composer->getConfig();
+        $composerConfig = $composer->getConfig();
 
         $generator = $composer->getAutoloadGenerator();
         $generator->setDevMode(false);
         $generator->setClassMapAuthoritative(true);
 
-        $generator->dump($config, $localRepo, $package, $installationManager, 'composer', true);
+        $generator->dump($composerConfig, $localRepository, $package, $installationManager, 'composer', true);
 
-        if (null !== $configuration) {
-            $autoload = self::generateAutoloadStatements($configuration);
+        if (null !== $phpScoperConfig) {
+            $autoloadFile = $composerConfig->get('vendor-dir').'/autoload.php';
 
-            append_to_file(
-                $config->get('vendor-dir').'/composer/autoload_real.php',
-                $autoload
+            $autoloadContents = self::generateAutoloadStatements(
+                $phpScoperConfig,
+                file_contents($autoloadFile)
             );
+
+            dump_file($autoloadFile, $autoloadContents);
         }
     }
 
-    private static function generateAutoloadStatements(PhpScoperConfiguration $configuration): string
+    private static function generateAutoloadStatements(PhpScoperConfiguration $config, string $autoload): string
     {
         // TODO: make prefix configurable: https://github.com/humbug/php-scoper/issues/178
-        $autoload = (new ScoperAutoloadGenerator($configuration->getWhitelist()))->dump('_HumbugBox');
+        $whitelistStatements = (new ScoperAutoloadGenerator($config->getWhitelist()))->dump('_HumbugBox');
 
-        return preg_replace(
+        $whitelistStatements = preg_replace(
             '/(\\$loader \= .*)|(return \\$loader;)/',
             '',
-            str_replace('<?php', '', $autoload)
+            str_replace('<?php', '', $whitelistStatements)
+        );
+
+        return preg_replace(
+            '/return (ComposerAutoloaderInit.+::getLoader\(\));/',
+            <<<PHP
+\$loader = \$1;
+
+$whitelistStatements
+
+return \$loader;
+PHP
+            ,
+            $autoload
         );
     }
 }
