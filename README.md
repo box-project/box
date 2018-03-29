@@ -21,7 +21,6 @@ Roadmap:
 The Box application simplifies the PHAR building process. Out of the box (no pun intended), the application can do many
 great things:
 
-- Add, replace, and remove files and stubs in existing PHARs
 - Retrieve information about the PHAR extension or a PHAR file
 - List the contents of a PHAR
 - Verify the signature of an existing PHAR
