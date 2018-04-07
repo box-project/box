@@ -2457,10 +2457,10 @@ COMMENT;
         }
     }
 
-    public function test_by_default_there_is_no_stub_and_the_stub_is_not_generated(): void
+    public function test_by_default_there_is_no_stub_and_the_stub_is_generated(): void
     {
         $this->assertNull($this->config->getStubPath());
-        $this->assertFalse($this->config->isStubGenerated());
+        $this->assertTrue($this->config->isStubGenerated());
     }
 
     public function test_a_custom_stub_can_be_provided(): void

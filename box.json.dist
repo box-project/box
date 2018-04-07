@@ -2,7 +2,6 @@
     "chmod": "0755",
     "main": "bin/box",
     "output": "bin/box.phar",
-    "stub": true,
 
     "banner": [
         "This file is part of the box project.",

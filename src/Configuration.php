@@ -241,7 +241,7 @@ BANNER;
         $stubPath = self::retrieveStubPath($raw, $basePath);
 
         $isInterceptFileFuncs = self::retrieveIsInterceptFileFuncs($raw);
-        $isStubGenerated = self::retrieveIsStubGenerated($raw);
+        $isStubGenerated = self::retrieveIsStubGenerated($raw, $stubPath);
 
         return new self(
             $file,
@@ -1317,9 +1317,9 @@ BANNER;
         return isset($raw->{'key-pass'}) && (true === $raw->{'key-pass'});
     }
 
-    private static function retrieveIsStubGenerated(stdClass $raw): bool
+    private static function retrieveIsStubGenerated(stdClass $raw, ?string $stubPath): bool
     {
-        return isset($raw->stub) && (true === $raw->stub);
+        return null === $stubPath && (false === isset($raw->stub) || false !== $raw->stub);
     }
 
     private static function retrievePhpScoperConfig(stdClass $raw, string $basePath): PhpScoperConfiguration
