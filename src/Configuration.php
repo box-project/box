@@ -37,6 +37,7 @@ use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\longest_common_base_path;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\make_path_relative;
+use function preg_quote;
 use function uniqid;
 
 final class Configuration
@@ -187,21 +188,21 @@ BANNER;
 
         $devPackages = ComposerConfiguration::retrieveDevPackages($basePath);
 
-        $blacklistFilter = self::retrieveBlacklistFilter($raw, $basePath);
+        [$excludedPaths, $blacklistFilter] = self::retrieveBlacklistFilter($raw, $basePath);
 
         if (self::shouldRetrieveAllFiles($file, $raw)) {
-            $filesAggregate = self::retrieveAllFiles($basePath, $mainScriptPath, $blacklistFilter, $devPackages);
+            $filesAggregate = self::retrieveAllFiles($basePath, $mainScriptPath, $blacklistFilter, $excludedPaths, $devPackages);
             $binaryFilesAggregate = [];
         } else {
             $files = self::retrieveFiles($raw, 'files', $basePath);
-            $directories = self::retrieveDirectories($raw, 'directories', $basePath, $blacklistFilter);
-            $filesFromFinders = self::retrieveFilesFromFinders($raw, 'finder', $basePath, $blacklistFilter, $devPackages);
+            $directories = self::retrieveDirectories($raw, 'directories', $basePath, $blacklistFilter, $excludedPaths);
+            $filesFromFinders = self::retrieveFilesFromFinders($raw, 'finder', $basePath, $blacklistFilter, $excludedPaths, $devPackages);
 
             $filesAggregate = array_unique(iterator_to_array(chain($files, $directories, ...$filesFromFinders)));
 
             $binaryFiles = self::retrieveFiles($raw, 'files-bin', $basePath);
-            $binaryDirectories = self::retrieveDirectories($raw, 'directories-bin', $basePath, $blacklistFilter);
-            $binaryFilesFromFinders = self::retrieveFilesFromFinders($raw, 'finder-bin', $basePath, $blacklistFilter, $devPackages);
+            $binaryDirectories = self::retrieveDirectories($raw, 'directories-bin', $basePath, $blacklistFilter, $excludedPaths);
+            $binaryFilesFromFinders = self::retrieveFilesFromFinders($raw, 'finder-bin', $basePath, $blacklistFilter, $excludedPaths, $devPackages);
 
             $binaryFilesAggregate = array_unique(iterator_to_array(chain($binaryFiles, $binaryDirectories, ...$binaryFilesFromFinders)));
         }
@@ -463,23 +464,19 @@ BANNER;
         return true;
     }
 
-    /**
-     * @param stdClass $raw
-     * @param string   $basePath
-     *
-     * @return Closure
-     */
-    private static function retrieveBlacklistFilter(stdClass $raw, string $basePath): Closure
+    private static function retrieveBlacklistFilter(stdClass $raw, string $basePath): array
     {
         $blacklist = self::retrieveBlacklist($raw, $basePath);
 
-        return function (SplFileInfo $file) use ($blacklist): ?bool {
+        $blacklistFilter = function (SplFileInfo $file) use ($blacklist): ?bool {
             if (in_array($file->getRealPath(), $blacklist, true)) {
                 return false;
             }
 
             return null;
         };
+
+        return [$blacklist, $blacklistFilter];
     }
 
     /**
@@ -494,13 +491,39 @@ BANNER;
             return [];
         }
 
+        /** @var string[] $blacklist */
         $blacklist = $raw->blacklist;
 
-        $normalizePath = function ($file) use ($basePath): string {
+        $normalizePath = function (string $file) use ($basePath): string {
             return self::normalizePath($file, $basePath);
         };
 
-        return array_unique(array_map($normalizePath, $blacklist));
+        $normalizedBlacklist = [];
+
+        foreach ($blacklist as $file) {
+            $normalizedBlacklist[] = self::normalizePath($file, $basePath);
+            $normalizedBlacklist[] = canonicalize(make_path_relative(trim($file), $basePath));
+        }
+
+        return array_unique($normalizedBlacklist);
+    }
+
+    /**
+     * @return string[]
+     */
+    private static function retrieveExcludes(stdClass $raw, string $basePath): array
+    {
+        if (false === isset($raw->exclude)) {
+            return [];
+        }
+
+        $exclude = $raw->exclude;
+
+        $normalizePath = function (string $file) use ($basePath): string {
+            return canonicalize(make_path_relative(trim($file), $basePath));
+        };
+
+        return array_unique(array_map($normalizePath, $exclude));
     }
 
     /**
@@ -552,6 +575,7 @@ BANNER;
      * @param string   $key             Config property name
      * @param string   $basePath
      * @param Closure  $blacklistFilter
+     * @param string[] $excludedPaths
      *
      * @return iterable|SplFileInfo[]
      */
@@ -559,17 +583,24 @@ BANNER;
         stdClass $raw,
         string $key,
         string $basePath,
-        Closure $blacklistFilter
+        Closure $blacklistFilter,
+        array $excludedPaths
     ): iterable {
         $directories = self::retrieveDirectoryPaths($raw, $key, $basePath);
 
         if ([] !== $directories) {
-            return Finder::create()
+            $finder = Finder::create()
                 ->files()
                 ->filter($blacklistFilter)
                 ->ignoreVCS(true)
                 ->in($directories)
             ;
+
+            foreach ($excludedPaths as $excludedPath) {
+                $finder->notPath(preg_quote($excludedPath, '/'));
+            }
+
+            return $finder;
         }
 
         return [];
@@ -577,8 +608,10 @@ BANNER;
 
     /**
      * @param stdClass $raw
+     * @param string   $key
      * @param string   $basePath
      * @param Closure  $blacklistFilter
+     * @param string[] $excludedPaths
      * @param string[] $devPackages
      *
      * @return iterable[]|SplFileInfo[][]
@@ -588,10 +621,11 @@ BANNER;
         string $key,
         string $basePath,
         Closure $blacklistFilter,
+        array $excludedPaths,
         array $devPackages
     ): array {
         if (isset($raw->{$key})) {
-            return self::processFinders($raw->{$key}, $basePath, $blacklistFilter, $devPackages);
+            return self::processFinders($raw->{$key}, $basePath, $blacklistFilter, $excludedPaths, $devPackages);
         }
 
         return [];
@@ -601,6 +635,7 @@ BANNER;
      * @param array    $findersConfig
      * @param string   $basePath
      * @param Closure  $blacklistFilter
+     * @param string[] $excludedPaths
      * @param string[] $devPackages
      *
      * @return Finder[]|SplFileInfo[][]
@@ -609,10 +644,11 @@ BANNER;
         array $findersConfig,
         string $basePath,
         Closure $blacklistFilter,
+        array $excludedPaths,
         array $devPackages
     ): array {
-        $processFinderConfig = function (stdClass $config) use ($basePath, $blacklistFilter, $devPackages) {
-            return self::processFinder($config, $basePath, $blacklistFilter, $devPackages);
+        $processFinderConfig = function (stdClass $config) use ($basePath, $blacklistFilter, $excludedPaths, $devPackages) {
+            return self::processFinder($config, $basePath, $blacklistFilter, $excludedPaths, $devPackages);
         };
 
         return array_map($processFinderConfig, $findersConfig);
@@ -622,12 +658,18 @@ BANNER;
      * @param stdClass $config
      * @param string   $basePath
      * @param Closure  $blacklistFilter
+     * @param string[] $excludedPaths
      * @param string[] $devPackages
      *
      * @return Finder|SplFileInfo[]
      */
-    private static function processFinder(stdClass $config, string $basePath, Closure $blacklistFilter, array $devPackages): Finder
-    {
+    private static function processFinder(
+        stdClass $config,
+        string $basePath,
+        Closure $blacklistFilter,
+        array $excludedPaths,
+        array $devPackages
+    ): Finder {
         $finder = Finder::create()
             ->files()
             ->filter($blacklistFilter)
@@ -645,6 +687,10 @@ BANNER;
             )
             ->ignoreVCS(true)
         ;
+
+        foreach ($excludedPaths as $excludedPath) {
+            $finder->notPath(preg_quote($excludedPath, '/'));
+        }
 
         $normalizedConfig = (function (array $config, Finder $finder): array {
             $normalizedConfig = [];
@@ -743,6 +789,7 @@ BANNER;
      * @param string   $basePath
      * @param string   $mainScriptPath
      * @param Closure  $blacklistFilter
+     * @param string[] $excludedPaths
      * @param string[] $devPackages
      *
      * @return SplFileInfo[]
@@ -751,6 +798,7 @@ BANNER;
         string $basePath,
         string $mainScriptPath,
         Closure $blacklistFilter,
+        array $excludedPaths,
         array $devPackages
     ): array {
         $relativeDevPackages = array_map(
@@ -769,6 +817,10 @@ BANNER;
             ->ignoreVCS(true)
         ;
 
+        foreach ($excludedPaths as $excludedPath) {
+            $finder->notPath(preg_quote($excludedPath, '/'));
+        }
+
         return array_filter(
             array_unique(
                 array_map(
@@ -779,9 +831,7 @@ BANNER;
 
                         return false !== $fileInfo->getRealPath() ? $fileInfo->getRealPath() : null;
                     },
-                    iterator_to_array(
-                        $finder
-                    )
+                    iterator_to_array($finder)
                 )
             )
         );
