@@ -16,7 +16,6 @@ namespace KevinGH\Box\Console\Command;
 
 use Amp\MultiReasonException;
 use Assert\Assertion;
-use function ini_get;
 use KevinGH\Box\Box;
 use KevinGH\Box\Compactor;
 use KevinGH\Box\Configuration;
