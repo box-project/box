@@ -4,6 +4,10 @@
          bootstrap="tests/bootstrap.php"
          colors="true">
 
+    <php>
+        <env name="BOX_ALLOW_XDEBUG" value="1"/>
+    </php>
+
     <testsuites>
         <testsuite name="Box Test Suite">
             <directory>tests/</directory>

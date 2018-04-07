@@ -16,16 +16,19 @@ namespace KevinGH\Box\Console\Command;
 
 use Amp\MultiReasonException;
 use Assert\Assertion;
+use function ini_get;
 use KevinGH\Box\Box;
 use KevinGH\Box\Compactor;
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Console\Logger\BuildLogger;
 use KevinGH\Box\MapFile;
+use KevinGH\Box\PhpSettingsHandler;
 use KevinGH\Box\StubGenerator;
 use RuntimeException;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -96,6 +99,8 @@ HELP;
      */
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
+        (new PhpSettingsHandler(new ConsoleLogger($output)))->check();
+
         if (true === $input->getOption(self::DEBUG_OPTION)) {
             enable_debug();
         }

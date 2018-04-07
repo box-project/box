@@ -21,6 +21,7 @@
         "amphp/parallel-functions": "^0.1.2",
         "beberlei/assert": "^2.8",
         "composer/composer": "^1.6",
+        "composer/xdebug-handler": "dev-master",
         "herrera-io/annotations": "~1.0",
         "humbug/php-scoper": "^1.0@dev",
         "justinrainbow/json-schema": "^5.2",
@@ -37,7 +38,7 @@
     },
     "require-dev": {
         "bamarni/composer-bin-plugin": "^1.2",
-        "infection/infection": "^0.7.0",
+        "infection/infection": "^0.8",
         "mikey179/vfsStream": "^1.1",
         "phpunit/phpunit": "^7.0",
         "symfony/var-dumper": "^3.4 || ^4.0"
