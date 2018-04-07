@@ -23,6 +23,7 @@ use function file_put_contents;
 
 final class PhpSettingsHandler extends XdebugHandler
 {
+    private $logger;
     private $required;
 
     /**
@@ -33,6 +34,7 @@ final class PhpSettingsHandler extends XdebugHandler
         parent::__construct('box', '--ansi');
 
         $this->setLogger($logger);
+        $this->logger = $logger;
 
         $this->required = (bool) ini_get('phar.readonly');
     }
@@ -60,7 +62,7 @@ final class PhpSettingsHandler extends XdebugHandler
                 );
             }
 
-            // TODO: log that phar.readonly was appended: https://github.com/composer/xdebug-handler/pull/51
+            $this->logger->debug('Configured `phar.readonly=0`');
         }
 
         parent::restart($command);
