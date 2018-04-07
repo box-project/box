@@ -17,9 +17,7 @@ namespace KevinGH\Box;
 
 use ErrorException;
 use KevinGH\Box\Console\Application;
-use KevinGH\Box\Php\PhpSettingsHandler;
 use RuntimeException;
-use Symfony\Component\Console\Logger\ConsoleLogger;
 
 $findAutoloader = function () {
     if (file_exists($autoload = __DIR__.'/../../../autoload.php')) {
@@ -69,10 +67,5 @@ set_error_handler(
     }
 );
 
-[$input, $output] = Application::createIO();
-$logger = new ConsoleLogger($output);
-
-(new PhpSettingsHandler('box', '--ansi', $logger))->check();
-
 $app = new Application();
-$app->run($input, $output);
+$app->run();

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "ebf5cfb2fa80a86a1362d061487de46e",
+    "content-hash": "e140cc7b922032aaf61ed62dc1bd7500",
     "packages": [
         {
             "name": "amphp/amp",
@@ -724,16 +724,16 @@
         },
         {
             "name": "composer/xdebug-handler",
-            "version": "1.0.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/xdebug-handler.git",
-                "reference": "1852e549ad0d6f2910f89c27fec833dda1b25b4a"
+                "reference": "e5d43e216d0008b60dc4addbe616a1df48778eea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/xdebug-handler/zipball/1852e549ad0d6f2910f89c27fec833dda1b25b4a",
-                "reference": "1852e549ad0d6f2910f89c27fec833dda1b25b4a",
+                "url": "https://api.github.com/repos/composer/xdebug-handler/zipball/e5d43e216d0008b60dc4addbe616a1df48778eea",
+                "reference": "e5d43e216d0008b60dc4addbe616a1df48778eea",
                 "shasum": ""
             },
             "require": {
@@ -764,7 +764,7 @@
                 "Xdebug",
                 "performance"
             ],
-            "time": "2018-03-08T13:09:50+00:00"
+            "time": "2018-04-04T17:39:46+00:00"
         },
         {
             "name": "doctrine/annotations",
@@ -4067,6 +4067,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "composer/xdebug-handler": 20,
         "humbug/php-scoper": 20
     },
     "prefer-stable": false,

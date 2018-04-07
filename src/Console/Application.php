@@ -19,10 +19,6 @@ use Humbug\SelfUpdate\Updater;
 use KevinGH\Box\Console\Command\SelfUpdateCommand;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Helper\HelperSet;
-use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\Console\Output\OutputInterface;
 
 final class Application extends SymfonyApplication
 {
@@ -44,17 +40,6 @@ ASCII;
     public function __construct(string $name = 'Box', string $version = '@git-version@')
     {
         parent::__construct($name, $version);
-    }
-
-    public static function createIO(): array
-    {
-        $input = new ArgvInput();
-        $output = new ConsoleOutput();
-
-        // TODO: see if this could not be made static & public...
-        (new self())->configureIO($input, $output);
-
-        return [$input, $output];
     }
 
     /**
