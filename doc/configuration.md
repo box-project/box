@@ -123,6 +123,7 @@ will be used in order to collect the files instead to collect all the files avai
 or directory from a dev dependency, you can do so by adding it via one of the following setting: [`files`][files],
 [`files-bin`][files], [`directories`][directories] or [`directories-bin`][directories].
 
+
 ### Files (`files` and `files-bin`)
 
 The `files` (`string[]`) setting is a list of files paths relative to [`base-path`][base-path] unless absolute. Each
@@ -193,6 +194,47 @@ Example:
 The `blacklist` (`string[]`) setting is a list of files that must not be added. The files blacklisted are the ones found
 using the other available configuration settings: [`files`][files], [`files-bin`][files], [`directories`][directories],
 [`directories-bin`][directories], [`finder`][finder], [`finder-bin`][finder].
+
+Note that all the blacklisted paths are relative to the settings configured above. For example if you have the following
+file structure:
+
+```
+project/
+├── box.json.dist
+├── A/
+|   ├── A00
+|   └── A01
+└── B/
+    ├── B00
+    ├── B01
+    └── A/
+        └── BA00
+```
+
+With:
+
+```json
+{
+    # other non file related settings
+
+    "blacklist": [
+        "A"
+    ]
+}
+```
+
+Box will try to collect all the files found in `project` (cf. [Including files][including-files]) but will exclude `A/`
+and 'B/A' resulting in the following files being collected:
+
+```
+project/
+├── box.json.dist
+└── B/
+    ├── B00
+    └── B01
+```
+
+You you want a more granular blacklist leverage the [Finders configuration][finder] instead.
 
 
 ## Stub

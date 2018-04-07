@@ -236,6 +236,7 @@ EOF
         touch('file1');
 
         mkdir('B');
+        touch('B/file1');
         touch('B/fileB0');
         touch('B/fileB1');
 
@@ -1256,6 +1257,23 @@ JSON
         $this->assertSame($expected, $actual);
     }
 
+    public function test_the_blacklist_input_may_refer_to_non_existent_paths(): void
+    {
+        $this->setConfig([
+            'blacklist' => [
+                '/nowhere',
+            ],
+        ]);
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'box.json',
+        ];
+        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+
+        $this->assertSame($expected, $actual);
+    }
+
     /**
      * @dataProvider provideJsonValidNonStringArray
      *
@@ -1705,8 +1723,6 @@ JSON
             'B/fileB1',
             'C/fileC0',
             'C/fileC1',
-            'D/fileD0',
-            'D/fileD1',
             'E/fileE0',
             'E/fileE1',
         ];
@@ -1714,6 +1730,7 @@ JSON
         $this->setConfig([
             'blacklist' => [
                 'box.json',
+                'D',
                 'D/finder_excluded_file',
                 'E/finder_excluded_file',
             ],
