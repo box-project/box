@@ -45,6 +45,9 @@ final class PhpSettingsHandler extends XdebugHandler
         return $this->required || $isLoaded;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function restart($command): void
     {
         if ($this->required) {
