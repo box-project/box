@@ -341,6 +341,19 @@ PHP;
         $actualFiles = $this->retrievePharFiles($phar);
 
         $this->assertEquals($expectedFiles, $actualFiles, '', .0, 10, true);
+
+        // Executes the compilation again
+
+        $commandTester->execute(
+            ['command' => 'compile'],
+            ['interactive' => true]
+        );
+
+        $this->assertSame(
+            'Hello, world!',
+            exec('php default.phar'),
+            'Expected PHAR to be executable'
+        );
     }
 
     public function test_it_can_build_a_PHAR_with_complete_mapping(): void

@@ -32,6 +32,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
 use function array_filter;
 use function array_map;
+use function array_merge;
 use function array_unique;
 use function Humbug\PhpScoper\create_scoper;
 use function iter\chain;
@@ -192,12 +193,14 @@ BANNER;
 
         $basePath = self::retrieveBasePath($file, $raw);
 
+        [$tmpOutputPath, $outputPath] = self::retrieveOutputPath($raw, $basePath);
+
         $mainScriptPath = self::retrieveMainScriptPath($raw, $basePath);
         $mainScriptContents = self::retrieveMainScriptContents($mainScriptPath);
 
         $devPackages = ComposerConfiguration::retrieveDevPackages($basePath);
 
-        [$excludedPaths, $blacklistFilter] = self::retrieveBlacklistFilter($raw, $basePath);
+        [$excludedPaths, $blacklistFilter] = self::retrieveBlacklistFilter($raw, $basePath, $tmpOutputPath, $outputPath);
 
         if (self::shouldRetrieveAllFiles($file, $raw)) {
             $filesAggregate = self::retrieveAllFiles($basePath, $mainScriptPath, $blacklistFilter, $excludedPaths, $devPackages);
@@ -225,8 +228,6 @@ BANNER;
         $fileMapper = new MapFile($map);
 
         $metadata = self::retrieveMetadata($raw);
-
-        [$tmpOutputPath, $outputPath] = self::retrieveOutputPath($raw, $basePath);
 
         $privateKeyPassphrase = self::retrievePrivateKeyPassphrase($raw);
         $privateKeyPath = self::retrievePrivateKeyPath($raw);
@@ -478,9 +479,9 @@ BANNER;
         return true;
     }
 
-    private static function retrieveBlacklistFilter(stdClass $raw, string $basePath): array
+    private static function retrieveBlacklistFilter(stdClass $raw, string $basePath, string ...$excludedPaths): array
     {
-        $blacklist = self::retrieveBlacklist($raw, $basePath);
+        $blacklist = self::retrieveBlacklist($raw, $basePath, ...$excludedPaths);
 
         $blacklistFilter = function (SplFileInfo $file) use ($blacklist): ?bool {
             if ($file->isLink()) {
@@ -504,17 +505,14 @@ BANNER;
     /**
      * @param stdClass $raw
      * @param string   $basePath
+     * @param string[] $excludedPaths
      *
      * @return string[]
      */
-    private static function retrieveBlacklist(stdClass $raw, string $basePath): array
+    private static function retrieveBlacklist(stdClass $raw, string $basePath, string ...$excludedPaths): array
     {
-        if (false === isset($raw->blacklist)) {
-            return [];
-        }
-
         /** @var string[] $blacklist */
-        $blacklist = $raw->blacklist;
+        $blacklist = array_merge($excludedPaths, $raw->blacklist ?? []);
 
         $normalizedBlacklist = [];
 
