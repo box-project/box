@@ -62,6 +62,7 @@ BANNER;
     ];
     private const PHP_SCOPER_CONFIG = 'scoper.inc.php';
 
+    private $file;
     private $fileMode;
     private $alias;
     private $basePath;
@@ -151,6 +152,7 @@ BANNER;
             )
         );
 
+        $this->file = $file;
         $this->alias = $alias;
         $this->basePath = $basePath;
         $this->files = $files;
@@ -271,6 +273,11 @@ BANNER;
             $isInterceptFileFuncs,
             $isStubGenerated
         );
+    }
+
+    public function getFile(): ?string
+    {
+        return $this->file;
     }
 
     public function getAlias(): string

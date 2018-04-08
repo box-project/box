@@ -19,6 +19,7 @@ use Phar;
 use function constant;
 use function define;
 use function defined;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
@@ -74,9 +75,11 @@ function register_compactor_aliases(): void
     }
 }
 
-function enable_debug(): void
+function enable_debug(OutputInterface $output): void
 {
     define(DEBUG_CONST, true);
+
+    $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
 }
 
 function is_debug_enabled(): bool
