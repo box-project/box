@@ -16,10 +16,10 @@ namespace KevinGH\Box;
 
 use Assert\Assertion;
 use Phar;
+use Symfony\Component\Console\Output\OutputInterface;
 use function constant;
 use function define;
 use function defined;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
