@@ -1742,6 +1742,36 @@ JSON
         $this->assertCount(0, $this->config->getBinaryFiles());
     }
 
+    public function test_the_box_debug_directory_is_always_excluded(): void
+    {
+        touch('file0');
+        touch('file1');
+
+        mkdir('.box');
+        touch('.box/file0');
+        touch('.box/file1');
+
+        mkdir('A');
+        touch('A/fileA0');
+        touch('A/fileA1');
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'box.json',
+            'file0',
+            'file1',
+            'A/fileA0',
+            'A/fileA1',
+        ];
+
+        $noFileConfig = $this->getNoFileConfig();
+
+        $actual = $this->normalizeConfigPaths($noFileConfig->getFiles());
+
+        $this->assertEquals($expected, $actual, '', .0, 10, true);
+        $this->assertCount(0, $noFileConfig->getBinaryFiles());
+    }
+
     public function test_no_compactors_is_configured_by_default(): void
     {
         $this->assertSame([], $this->config->getCompactors());
