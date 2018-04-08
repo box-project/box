@@ -246,6 +246,8 @@ EOF
         touch('B/file1');
         touch('B/fileB0');
         touch('B/fileB1');
+        touch('B/glob_finder_excluded_file');
+        touch('B/glob-finder_excluded_file');
 
         mkdir('C');
         touch('C/fileC0');
@@ -260,6 +262,13 @@ EOF
         touch('E/fileE0');
         touch('E/fileE1');
         touch('E/finder_excluded_file');
+
+        mkdir('vendor');
+        touch('vendor/glob_finder_excluded_file');
+        touch('vendor/glob-finder_excluded_file');
+
+        mkdir('vendor-bin');
+        touch('vendor-bin/file1');
 
         $this->setConfig([
             'files' => [
@@ -290,6 +299,9 @@ EOF
                 'C/fileC1',
                 'D/fileD1',
                 'E/fileE1',
+                'glob_finder_excluded_file',
+                'glob-finder_excluded_file',
+                'vendor-bin',
             ],
         ]);
 
@@ -323,6 +335,8 @@ EOF
         mkdir('B');
         touch('B/fileB0');
         touch('B/fileB1');
+        touch('B/glob_finder_excluded_file');
+        touch('B/glob-finder_excluded_file');
 
         mkdir('C');
         touch('C/fileC0');
@@ -337,6 +351,13 @@ EOF
         touch('E/fileE0');
         touch('E/fileE1');
         touch('E/finder_excluded_file');
+
+        mkdir('vendor');
+        touch('vendor/glob_finder_excluded_file');
+        touch('vendor/glob-finder_excluded_file');
+
+        mkdir('vendor-bin');
+        touch('vendor-bin/file1');
 
         chdir($this->tmp);
 
@@ -370,6 +391,9 @@ EOF
                 'C/fileC1',
                 'D/fileD1',
                 'E/fileE1',
+                'glob_finder_excluded_file',
+                'glob-finder_excluded_file',
+                'vendor-bin',
             ],
         ]);
 
@@ -1707,6 +1731,8 @@ JSON
         mkdir('B');
         touch('B/fileB0');
         touch('B/fileB1');
+        touch('B/glob_finder_excluded_file');
+        touch('B/glob-finder_excluded_file');
 
         mkdir('C');
         touch('C/fileC0');
@@ -1721,6 +1747,14 @@ JSON
         touch('E/fileE0');
         touch('E/fileE1');
         touch('E/finder_excluded_file');
+
+        mkdir('vendor');
+        touch('vendor/glob_finder_excluded_file');
+        touch('vendor/glob-finder_excluded_file');
+
+        mkdir('vendor-bin');
+        touch('vendor-bin/file0');
+        touch('vendor-bin/file1');
 
         // Relative to the current working directory for readability
         $expected = [
@@ -1740,6 +1774,10 @@ JSON
                 'D',
                 'D/finder_excluded_file',
                 'E/finder_excluded_file',
+                'vendor-bin',
+                'vendor-bin-file1',
+                'glob_finder_excluded_file',
+                'glob-finder_excluded_file',
             ],
         ]);
 
