@@ -476,6 +476,10 @@ BANNER;
         $blacklist = self::retrieveBlacklist($raw, $basePath);
 
         $blacklistFilter = function (SplFileInfo $file) use ($blacklist): ?bool {
+            if ($file->isLink()) {
+                return false;
+            }
+
             if (in_array($file->getRealPath(), $blacklist, true)) {
                 return false;
             }
