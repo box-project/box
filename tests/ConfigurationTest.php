@@ -1787,6 +1787,39 @@ JSON
         $this->assertCount(0, $this->config->getBinaryFiles());
     }
 
+    public function test_the_existing_phars_are_ignored_when_all_the_files_are_collected(): void
+    {
+        touch('default.phar');
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'box.json',
+        ];
+
+        $this->setConfig([]);
+
+        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+
+        $this->assertEquals($expected, $actual, '', .0, 10, true);
+        $this->assertCount(0, $this->config->getBinaryFiles());
+
+        touch('default');
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'box.json',
+        ];
+
+        $this->setConfig([
+            'output' => 'default',
+        ]);
+
+        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+
+        $this->assertEquals($expected, $actual, '', .0, 10, true);
+        $this->assertCount(0, $this->config->getBinaryFiles());
+    }
+
     public function test_the_box_debug_directory_is_always_excluded(): void
     {
         touch('file0');
