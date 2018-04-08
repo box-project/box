@@ -16,6 +16,8 @@ namespace KevinGH\Box\Console\Command;
 
 use Amp\MultiReasonException;
 use Assert\Assertion;
+use DateTimeImmutable;
+use DateTimeZone;
 use KevinGH\Box\Box;
 use KevinGH\Box\Compactor;
 use KevinGH\Box\Configuration;
@@ -31,13 +33,19 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\VarDumper\Dumper\CliDumper;
+use const DATE_ATOM;
+use function count;
 use function KevinGH\Box\enable_debug;
 use function KevinGH\Box\FileSystem\chmod;
+use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\formatted_filesize;
 use function KevinGH\Box\get_phar_compression_algorithms;
+use function KevinGH\Box\is_debug_enabled;
 
 /**
  * @final
@@ -81,7 +89,7 @@ HELP;
             self::DEBUG_OPTION,
             null,
             InputOption::VALUE_NONE,
-            'Dump the files added to the PHAR in a `.box` directory'
+            'Dump the files added to the PHAR in a `'.Box::DEBUG_DIR.'` directory'
         );
         $this->addOption(
             self::DEV_OPTION,
@@ -101,7 +109,7 @@ HELP;
         (new PhpSettingsHandler(new ConsoleLogger($output)))->check();
 
         if (true === $input->getOption(self::DEBUG_OPTION)) {
-            enable_debug();
+            enable_debug($output);
         }
 
         $this->changeWorkingDirectory($input);
@@ -118,7 +126,7 @@ HELP;
 
         $startTime = microtime(true);
 
-        $this->removeExistingPhar($config, $logger);
+        $this->removeExistingArtefacts($config, $logger);
 
         $logger->logStartBuilding($path);
 
@@ -178,9 +186,32 @@ HELP;
         }
     }
 
-    private function removeExistingPhar(Configuration $config, BuildLogger $logger): void
+    private function removeExistingArtefacts(Configuration $config, BuildLogger $logger): void
     {
         $path = $config->getOutputPath();
+
+        if (is_debug_enabled()) {
+            $date = (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format(DATE_ATOM);
+            $file = null !== $config->getFile() ? $config->getFile() : 'No config file';
+
+            remove(Box::DEBUG_DIR);
+
+            dump_file(
+                Box::DEBUG_DIR.'/.box_configuration',
+                <<<EOF
+//
+// Processed content of the configuration file "$file" dumped for debugging purposes
+// Time: $date
+//
+
+
+EOF
+                .(new CliDumper())->dump(
+                    (new VarCloner())->cloneVar($config),
+                    true
+                )
+            );
+        }
 
         if (false === file_exists($path)) {
             return;

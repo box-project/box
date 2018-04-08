@@ -63,11 +63,18 @@ class ConfigurationTest extends FileSystemTestCase
         $this->config = Configuration::create($this->file, new stdClass());
     }
 
+    public function test_it_can_be_created_with_a_file(): void
+    {
+        $config = Configuration::create('box.json', new stdClass());
+
+        $this->assertSame('box.json', $config->getFile());
+    }
+
     public function test_it_can_be_created_without_a_file(): void
     {
-        Configuration::create(null, new stdClass());
+        $config = Configuration::create(null, new stdClass());
 
-        $this->assertTrue(true);
+        $this->assertNull($config->getFile());
     }
 
     public function test_a_default_alias_is_generted_if_no_alias_is_registered(): void

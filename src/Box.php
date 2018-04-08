@@ -26,23 +26,19 @@ use function Amp\ParallelFunctions\parallelMap;
 use function Amp\Promise\wait;
 use function array_map;
 use function chdir;
-use function is_file;
-use function KevinGH\Box\FileSystem\copy;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
-use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
-use function KevinGH\Box\FileSystem\rename;
 
 /**
  * Box is a utility class to generate a PHAR.
  */
 final class Box
 {
-    private const DEBUG_DIR = '.box';
+    public const DEBUG_DIR = '.box';
 
     /**
      * @var Compactor[]
@@ -170,9 +166,17 @@ final class Box
      */
     public function addFiles(array $files, bool $binary): void
     {
+        $files = array_map(
+            function ($file): string {
+                // Convert files to string as SplFileInfo is not serializable
+                return (string) $file;
+            },
+            $files
+        );
+
         if ($binary) {
             foreach ($files as $file) {
-                $this->addFile((string) $file, null, $binary);
+                $this->addFile($file, null, $binary);
             }
 
             return;
@@ -180,16 +184,7 @@ final class Box
 
         $cwd = getcwd();
 
-        $filesWithContents = $this->processContents(
-            array_map(
-                function ($file): string {
-                    // Convert files to string as SplFileInfo is not serializable
-                    return (string) $file;
-                },
-                $files
-            ),
-            $cwd
-        );
+        $filesWithContents = $this->processContents($files, $cwd);
 
         $tmp = make_tmp_dir('box', __CLASS__);
         chdir($tmp);
@@ -199,6 +194,10 @@ final class Box
                 [$file, $contents] = $fileWithContents;
 
                 dump_file($file, $contents);
+
+                if (is_debug_enabled()) {
+                    dump_file($cwd.'/'.self::DEBUG_DIR.'/'.$file, $contents);
+                }
             }
 
             // Dump autoload without dev dependencies
@@ -208,13 +207,6 @@ final class Box
 
             $this->phar->buildFromDirectory($tmp);
         } finally {
-            if (is_debug_enabled()) {
-                $this->dumpFiles(
-                    make_path_absolute(self::DEBUG_DIR, $cwd),
-                    $tmp
-                );
-            }
-
             remove($tmp);
         }
     }
@@ -226,6 +218,7 @@ final class Box
      * @param string      $file
      * @param null|string $contents If null the content of the file will be used
      * @param bool        $binary   When true means the file content shouldn't be processed
+     * @param string      $root
      *
      * @return string File local path
      */
@@ -260,7 +253,6 @@ final class Box
                 $processedContents = $contents;
             }
 
-            remove(self::DEBUG_DIR);    // Cleanup previous temporary debug directory
             dump_file(self::DEBUG_DIR.DIRECTORY_SEPARATOR.$relativePath, $processedContents);
         }
 
@@ -387,32 +379,5 @@ final class Box
             },
             $contents
         );
-    }
-
-    /**
-     * Dumps the files added to the PHAR into a directory at the project level to allow the user to easily have a look.
-     * At this point only the main script should have already been registered into the dump target.
-     */
-    private function dumpFiles(string $debugDir, string $tmp): void
-    {
-        $mainScript = current(
-            array_filter(
-                scandir($debugDir, 1),
-                function (string $file): bool {
-                    return false === in_array($file, ['.', '..'], true);
-                }
-            )
-        );
-
-        $sourceMainScript = $debugDir.DIRECTORY_SEPARATOR.$mainScript;
-        $targetMainScript = $tmp.DIRECTORY_SEPARATOR.$mainScript;
-
-        if (is_file($mainScript)) {
-            copy($sourceMainScript, $targetMainScript);
-        } else {
-            rename($sourceMainScript, $targetMainScript);
-        }
-
-        rename($tmp, $debugDir, true);
     }
 }
