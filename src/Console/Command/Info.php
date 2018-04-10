@@ -44,6 +44,9 @@ use function realpath;
 use function sprintf;
 use function sys_get_temp_dir;
 
+/**
+ * @private
+ */
 final class Info extends Command
 {
     private const PHAR_ARG = 'phar';
@@ -122,7 +125,7 @@ HELP
     }
 
     /**
-     * @override
+     * {@inheritdoc}
      */
     public function execute(InputInterface $input, OutputInterface $output): int
     {

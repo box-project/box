@@ -24,6 +24,8 @@ use PharException;
  *
  * While the PHAR extension is not used to retrieve or verify a PHAR's signature, other extensions may still be needed
  * to properly process the signature.
+ *
+ * @private
  */
 final class Signature
 {

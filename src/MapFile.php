@@ -16,6 +16,7 @@ namespace KevinGH\Box;
 
 /**
  * @internal
+ * @private
  */
 final class MapFile
 {

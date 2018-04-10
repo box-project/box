@@ -16,6 +16,8 @@ namespace KevinGH\Box\Compactor;
 
 /**
  * Compacts JSON files by re-encoding without pretty print.
+ *
+ * @private
  */
 final class Json extends FileExtensionCompactor
 {

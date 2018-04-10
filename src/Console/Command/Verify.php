@@ -23,6 +23,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 
+/**
+ * @private
+ */
 final class Verify extends Command
 {
     private const PHAR_ARG = 'phar';

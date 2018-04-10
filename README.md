@@ -56,6 +56,7 @@ great things:
     1. [Signing algorithm (`algorithm`)](doc/configuration.md#signing-algorithm-algorithm)
 1. [Contributing](#contributing)
 1. [Upgrade](#upgrade)
+1. [Backward Compatibility Promise (BCP)](#backward-compatibility-promise-bcp)
 1. [Credits](#credits)
 
 
@@ -129,6 +130,12 @@ make
 ## Upgrade
 
 Check the [upgrade guide](UPGRADE.md).
+
+
+## Backward Compatibility Promise (BCP)
+
+The policy is for the major part following the same as [Symfony's one][symfony-bc-policy]. Note that the code marked
+as `@private` or `@internal` are excluded from the BCP. 
 
 
 ## Credits

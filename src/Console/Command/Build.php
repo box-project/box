@@ -22,6 +22,7 @@ use function trigger_error;
 
 /**
  * @deprecated
+ * @private
  */
 final class Build extends Compile
 {

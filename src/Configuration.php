@@ -48,6 +48,9 @@ use function KevinGH\Box\FileSystem\make_path_relative;
 use function substr;
 use function uniqid;
 
+/**
+ * @private
+ */
 final class Configuration
 {
     private const DEFAULT_ALIAS = 'default.phar';

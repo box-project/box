@@ -21,6 +21,9 @@ use const FILE_APPEND;
 use const PHP_EOL;
 use function file_put_contents;
 
+/**
+ * @private
+ */
 final class PhpSettingsHandler extends XdebugHandler
 {
     private $logger;

@@ -18,6 +18,8 @@ use Assert\Assertion;
 
 /**
  * Generates a new PHP bootstrap loader stub for a PHAR.
+ *
+ * @private
  */
 final class StubGenerator
 {

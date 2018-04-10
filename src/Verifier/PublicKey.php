@@ -18,6 +18,8 @@ use Assert\Assertion;
 
 /**
  * Loads the private key from a file to use for verification.
+ *
+ * @private
  */
 abstract class PublicKey extends BufferedHash
 {

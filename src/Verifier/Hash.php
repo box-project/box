@@ -19,6 +19,8 @@ use KevinGH\Box\Verifier;
 
 /**
  * Uses the PHP hash library to verify a signature.
+ *
+ * @private
  */
 final class Hash implements Verifier
 {

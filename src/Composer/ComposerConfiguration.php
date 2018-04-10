@@ -21,6 +21,9 @@ use Seld\JsonLint\ParsingException;
 use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 
+/**
+ * @private
+ */
 final class ComposerConfiguration
 {
     /**

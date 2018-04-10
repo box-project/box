@@ -23,6 +23,8 @@ use Webmozart\PathUtil\Path;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Thomas Schulz <mail@king2500.net>
+ *
+ * @private
  */
 final class FileSystem extends SymfonyFilesystem
 {

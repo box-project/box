@@ -17,6 +17,8 @@ namespace KevinGH\Box;
 /**
  * A compactor is a class called to process a file contents before adding it to the PHAR. This make it possible to for
  * example strip down the file from useless phpdoc.
+ *
+ * @private
  */
 interface Compactor
 {

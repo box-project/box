@@ -23,11 +23,13 @@ use function defined;
 
 /**
  * @internal
+ * @private
  */
 const DEBUG_CONST = 'KevinGH\Box\BOX_DEBUG';
 
 /**
  * TODO: this function should be pushed down to the PHAR extension.
+ * @private
  */
 function get_phar_compression_algorithms(): array
 {
@@ -40,6 +42,9 @@ function get_phar_compression_algorithms(): array
     return $algorithms;
 }
 
+/**
+ * @private
+ */
 function formatted_filesize(string $path)
 {
     Assertion::file($path);
@@ -60,6 +65,9 @@ function formatted_filesize(string $path)
     );
 }
 
+/**
+ * @private
+ */
 function register_compactor_aliases(): void
 {
     if (false === class_exists(\Herrera\Box\Compactor\Javascript::class, false)) {
@@ -75,6 +83,9 @@ function register_compactor_aliases(): void
     }
 }
 
+/**
+ * @private
+ */
 function enable_debug(OutputInterface $output): void
 {
     define(DEBUG_CONST, true);
@@ -82,6 +93,9 @@ function enable_debug(OutputInterface $output): void
     $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
 }
 
+/**
+ * @private
+ */
 function is_debug_enabled(): bool
 {
     return defined(DEBUG_CONST) && true === constant(DEBUG_CONST);

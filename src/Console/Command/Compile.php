@@ -49,6 +49,7 @@ use function KevinGH\Box\is_debug_enabled;
 
 /**
  * @final
+ * @private
  * TODO: make final when Build is removed
  */
 class Compile extends Configurable
