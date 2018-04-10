@@ -102,7 +102,7 @@ want to change. The most basic configuration is the following:
 ```json
 # box.json.dist
 {
-    "main": "bin/acme.php"
+    "main": "bin/acme.php",
     "output": "bin/acme.phar"
 }
 ```
