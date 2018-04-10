@@ -19,6 +19,9 @@ use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 
+/**
+ * @private
+ */
 trait ChangeableWorkingDirectory
 {
     /**

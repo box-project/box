@@ -19,6 +19,8 @@ use RuntimeException;
 
 /**
  * Uses the OpenSSL extension or phpseclib library to verify a signed PHAR.
+ *
+ * @private
  */
 final class PublicKeyDelegate implements Verifier
 {

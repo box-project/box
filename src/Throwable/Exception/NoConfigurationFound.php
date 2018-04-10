@@ -17,6 +17,9 @@ namespace KevinGH\Box\Throwable\Exception;
 use RuntimeException;
 use Throwable;
 
+/**
+ * @private
+ */
 final class NoConfigurationFound extends RuntimeException
 {
     /**

@@ -21,6 +21,7 @@ use JShrink\Minifier;
  * Compacts Javascript files using JShrink.
  *
  * @author Robert Hafner <tedivm@tedivm.com>
+ * @private
  */
 final class Javascript extends FileExtensionCompactor
 {

@@ -20,6 +20,9 @@ use KevinGH\Box\Console\Command\SelfUpdateCommand;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Helper\HelperSet;
 
+/**
+ * @private
+ */
 final class Application extends SymfonyApplication
 {
     private const LOGO = <<<'ASCII'

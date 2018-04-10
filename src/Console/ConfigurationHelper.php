@@ -21,6 +21,9 @@ use stdClass;
 use Symfony\Component\Console\Helper\Helper;
 use function KevinGH\Box\FileSystem\is_absolute_path;
 
+/**
+ * @private
+ */
 final class ConfigurationHelper extends Helper
 {
     private const FILE_NAME = 'box.json';

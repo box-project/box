@@ -18,7 +18,11 @@ use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
 use Humbug\PhpScoper\Scoper;
 use KevinGH\Box\Compactor;
 use Throwable;
+use function uniqid;
 
+/**
+ * @private
+ */
 final class PhpScoper implements Compactor
 {
     private $scoper;
@@ -39,7 +43,7 @@ final class PhpScoper implements Compactor
             return $this->scoper->scope(
                 $file,
                 $contents,
-                '_HumbugBox',
+                uniqid('_HumbugBox', false),
                 $this->config->getPatchers(),
                 $this->config->getWhitelist()
             );

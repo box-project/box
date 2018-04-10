@@ -18,6 +18,9 @@ use PHPUnit\Framework\TestCase;
 use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\remove;
 
+/**
+ * @private
+ */
 abstract class FileSystemTestCase extends TestCase
 {
     /**

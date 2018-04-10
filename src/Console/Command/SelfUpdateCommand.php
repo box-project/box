@@ -24,6 +24,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 
+/**
+ * @private
+ */
 final class SelfUpdateCommand extends Command
 {
     private const REMOTE_FILENAME = 'box.phar';

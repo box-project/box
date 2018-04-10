@@ -38,6 +38,8 @@ use Traversable;
  * @param string $path A path string
  *
  * @return string The canonical path
+ *
+ * @private
  */
 function canonicalize(string $path): string
 {
@@ -64,6 +66,8 @@ function canonicalize(string $path): string
  * @param string $path a path string
  *
  * @return string the normalized path
+ *
+ * @private
  */
 function normalize(string $path): string
 {
@@ -100,6 +104,8 @@ function normalize(string $path): string
  *                if the root directory is passed. Returns an empty string
  *                if a relative path is passed that contains no slashes.
  *                Returns an empty string if an empty string is passed.
+ *
+ * @private
  */
 function directory(string $path): string
 {
@@ -125,6 +131,8 @@ function directory(string $path): string
  * The result is a canonical path.
  *
  * @return string The canonical home directory
+ *
+ * @private
  */
 function home_directory(): string
 {
@@ -146,6 +154,8 @@ function home_directory(): string
  *
  * @return string The canonical root directory. Returns an empty string if
  *                the given path is relative or empty.
+ *
+ * @private
  */
 function root(string $path): string
 {
@@ -164,6 +174,8 @@ function root(string $path): string
  * @param string $path the path string
  *
  * @return string The file name
+ *
+ * @private
  */
 function filename(string $path): string
 {
@@ -184,6 +196,8 @@ function filename(string $path): string
  *                               off (may contain leading dot)
  *
  * @return string the file name without extension
+ *
+ * @private
  */
 function filename_without_extension($path, $extension = null)
 {
@@ -205,6 +219,8 @@ function filename_without_extension($path, $extension = null)
  *                               multi-byte character handling in extension)
  *
  * @return string the extension of the file path (without leading dot)
+ *
+ * @private
  */
 function extension(string $path, bool $forceLowerCase = false): string
 {
@@ -233,6 +249,8 @@ function extension(string $path, bool $forceLowerCase = false): string
  *
  * @return bool returns `true` if the path has an (or the specified)
  *              extension and `false` otherwise
+ *
+ * @private
  */
 function has_extension(string $path, $extensions = null, bool $ignoreCase = false): bool
 {
@@ -252,6 +270,8 @@ function has_extension(string $path, $extensions = null, bool $ignoreCase = fals
  * @param string $extension new extension (with or without leading dot)
  *
  * @return string the path string with new file extension
+ *
+ * @private
  */
 function change_extension(string $path, string $extension): string
 {
@@ -270,6 +290,8 @@ function change_extension(string $path, string $extension): string
  * @param string $path a path string
  *
  * @return bool
+ *
+ * @private
  */
 function is_absolute_path(string $path): bool
 {
@@ -289,6 +311,8 @@ function is_absolute_path(string $path): bool
  *
  * @return bool returns true if the path is relative or empty, false if
  *              it is absolute
+ *
+ * @private
  */
 function is_relative_path(string $path): bool
 {
@@ -336,6 +360,8 @@ function is_relative_path(string $path): bool
  * @param string $basePath an absolute base path
  *
  * @return string an absolute path in canonical form
+ *
+ * @private
  */
 function make_path_absolute(string $path, string $basePath): string
 {
@@ -398,6 +424,8 @@ function make_path_absolute(string $path, string $basePath): string
  * @param string $basePath a base path
  *
  * @return string a relative path in canonical form
+ *
+ * @private
  */
 function make_path_relative(string $path, string $basePath): string
 {
@@ -416,6 +444,8 @@ function make_path_relative(string $path, string $basePath): string
  * @param string $path a path string
  *
  * @return bool returns true if the path is local, false for a URL
+ *
+ * @private
  */
 function is_local(string $path): bool
 {
@@ -468,6 +498,8 @@ function is_local(string $path): bool
  * @return null|string the longest common base path in canonical form or
  *                     `null` if the paths are on different Windows
  *                     partitions
+ *
+ * @private
  */
 function longest_common_base_path(array $paths): ?string
 {
@@ -488,6 +520,8 @@ function longest_common_base_path(array $paths): ?string
  * @param string|string[] $paths path parts as parameters or array
  *
  * @return string the joint path
+ *
+ * @private
  */
 function join($paths): string
 {
@@ -524,6 +558,8 @@ function join($paths): string
  * @param string $ofPath   the other path
  *
  * @return bool whether the base path is a base path of the other path
+ *
+ * @private
  */
 function is_base_path(string $basePath, string $ofPath): bool
 {
@@ -536,6 +572,9 @@ function is_base_path(string $basePath, string $ofPath): bool
     return $fileSystem->isBasePath($basePath, $ofPath);
 }
 
+/**
+ * @private
+ */
 function escape_path(string $path): string
 {
     static $fileSystem;
@@ -555,6 +594,8 @@ function escape_path(string $path): string
  * @throws IOException If the file cannot be read
  *
  * @return string File contents
+ *
+ * @private
  */
 function file_contents(string $file): string
 {
@@ -580,6 +621,8 @@ function file_contents(string $file): string
  *
  * @throws FileNotFoundException When originFile doesn't exist
  * @throws IOException           When copy fails
+ *
+ * @private
  */
 function copy(string $originFile, string $targetFile, bool $overwriteNewerFiles = false): void
 {
@@ -599,6 +642,8 @@ function copy(string $originFile, string $targetFile, bool $overwriteNewerFiles 
  * @param int             $mode The directory mode
  *
  * @throws IOException On any directory creation failure
+ *
+ * @private
  */
 function mkdir($dirs, int $mode = 0777): void
 {
@@ -617,6 +662,8 @@ function mkdir($dirs, int $mode = 0777): void
  * @param iterable|string $files A filename, an array of files, or a \Traversable instance to remove
  *
  * @throws IOException When removal fails
+ *
+ * @private
  */
 function remove($files): void
 {
@@ -635,6 +682,8 @@ function remove($files): void
  * @param iterable|string $files A filename, an array of files, or a \Traversable instance to check
  *
  * @return bool true if the file exists, false otherwise
+ *
+ * @private
  */
 function exists($files): bool
 {
@@ -655,6 +704,8 @@ function exists($files): bool
  * @param int             $atime The access time as a Unix timestamp
  *
  * @throws IOException When touch fails
+ *
+ * @private
  */
 function touch($files, int $time = null, int $atime = null): void
 {
@@ -676,6 +727,8 @@ function touch($files, int $time = null, int $atime = null): void
  * @param bool            $recursive Whether change the mod recursively or not
  *
  * @throws IOException When the change fail
+ *
+ * @private
  */
 function chmod($files, int $mode, int $umask = 0000, bool $recursive = false): void
 {
@@ -696,6 +749,8 @@ function chmod($files, int $mode, int $umask = 0000, bool $recursive = false): v
  * @param bool            $recursive Whether change the owner recursively or not
  *
  * @throws IOException When the change fail
+ *
+ * @private
  */
 function chown($files, string $user, bool $recursive = false): void
 {
@@ -716,6 +771,8 @@ function chown($files, string $user, bool $recursive = false): void
  * @param bool            $recursive Whether change the group recursively or not
  *
  * @throws IOException When the change fail
+ *
+ * @private
  */
 function chgrp($files, string $group, bool $recursive = false): void
 {
@@ -737,6 +794,8 @@ function chgrp($files, string $group, bool $recursive = false): void
  *
  * @throws IOException When target file or directory already exists
  * @throws IOException When origin cannot be renamed
+ *
+ * @private
  */
 function rename(string $origin, string $target, bool $overwrite = false): void
 {
@@ -757,6 +816,8 @@ function rename(string $origin, string $target, bool $overwrite = false): void
  * @param bool   $copyOnWindows Whether to copy files if on Windows
  *
  * @throws IOException When symlink fails
+ *
+ * @private
  */
 function symlink(string $originDir, string $targetDir, bool $copyOnWindows = false): void
 {
@@ -777,6 +838,8 @@ function symlink(string $originDir, string $targetDir, bool $copyOnWindows = fal
  *
  * @throws FileNotFoundException When original file is missing or not a file
  * @throws IOException           When link fails, including if link already exists
+ *
+ * @private
  */
 function hardlink(string $originFile, string $targetFiles): void
 {
@@ -804,6 +867,8 @@ function hardlink(string $originFile, string $targetFiles): void
  * @param bool   $canonicalize Whether or not to return a canonicalized path
  *
  * @return null|string
+ *
+ * @private
  */
 function readlink(string $path, bool $canonicalize = false): ?string
 {
@@ -829,6 +894,8 @@ function readlink(string $path, bool $canonicalize = false): ?string
  *                               - $options['delete'] Whether to delete files that are not in the source directory (defaults to false)
  *
  * @throws IOException When file type is unknown
+ *
+ * @private
  */
 function mirror(string $originDir, string $targetDir, Traversable $iterator = null, array $options = []): void
 {
@@ -848,6 +915,8 @@ function mirror(string $originDir, string $targetDir, Traversable $iterator = nu
  * @param string $className the name of the test class
  *
  * @return string the path to the created directory
+ *
+ * @private
  */
 function make_tmp_dir(string $namespace, string $className): string
 {
@@ -868,6 +937,8 @@ function make_tmp_dir(string $namespace, string $className): string
  *                       Note: Windows uses only the first three characters of prefix
  *
  * @return string The new temporary filename (with path), or throw an exception on failure
+ *
+ * @private
  */
 function tempnam($dir, $prefix)
 {
@@ -887,6 +958,8 @@ function tempnam($dir, $prefix)
  * @param null|string $content  The data to write into the file
  *
  * @throws IOException if the file cannot be written to
+ *
+ * @private
  */
 function dump_file(string $filename, string $content = null): void
 {
@@ -906,6 +979,8 @@ function dump_file(string $filename, string $content = null): void
  * @param string $content  The content to append
  *
  * @throws IOException If the file is not writable
+ *
+ * @private
  */
 function append_to_file(string $filename, string $content): void
 {

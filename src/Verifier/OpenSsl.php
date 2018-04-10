@@ -16,6 +16,8 @@ namespace KevinGH\Box\Verifier;
 
 /**
  * Uses OpenSSL to verify the signature.
+ *
+ * @private
  */
 final class OpenSsl extends PublicKey
 {

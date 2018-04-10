@@ -18,6 +18,8 @@ use Assert\Assertion;
 
 /**
  * An abstract compactor class that handles matching supported file by their types.
+ *
+ * @private
  */
 abstract class FileExtensionCompactor extends BaseCompactor
 {

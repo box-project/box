@@ -131,6 +131,12 @@ make
 Check the [upgrade guide](UPGRADE.md).
 
 
+## Backward Compatibility Promise (BCP)
+
+The policy is for the major part following the same as [Symfony's one][symfony-bc-policy]. Note that the code marked
+as `@private` or `@internal` are excluded from the BCP. 
+
+
 ## Credits
 
 Project originally created by: [Kevin Herrera] ([@kherge]) which has now been moved under the [Humbug umbrella][humbug].

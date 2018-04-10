@@ -16,6 +16,8 @@ namespace KevinGH\Box;
 
 /**
  * Defines how a signature verification class must be implemented.
+ *
+ * @private
  */
 interface Verifier
 {

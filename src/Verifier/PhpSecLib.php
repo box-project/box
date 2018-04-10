@@ -19,7 +19,7 @@ use phpseclib\Crypt\RSA;
 /**
  * Uses the phpseclib library to verify a signature.
  *
- * @author Kevin Herrera <kevin@herrera.io>
+ * @private
  */
 final class PhpSecLib extends PublicKey
 {

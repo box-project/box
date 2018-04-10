@@ -18,6 +18,8 @@ use KevinGH\Box\Verifier;
 
 /**
  * Buffers the hash as opposed to updating incrementally.
+ *
+ * @private
  */
 abstract class BufferedHash implements Verifier
 {

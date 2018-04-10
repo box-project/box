@@ -18,6 +18,9 @@ use Assert\Assertion;
 use Exception;
 use UnexpectedValueException;
 
+/**
+ * @private
+ */
 final class JsonValidationException extends UnexpectedValueException
 {
     private $validatedFile;

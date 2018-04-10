@@ -28,6 +28,7 @@ use Herrera\Annotations\Tokens;
  * @author Jordi Boggiano <j.boggiano@seld.be>
  *
  * @see https://github.com/composer/composer/blob/a8df30c09be550bffc37ba540fb7c7f0383c3944/src/Composer/Compiler.php#L214
+ * @private
  */
 final class Php extends FileExtensionCompactor
 {

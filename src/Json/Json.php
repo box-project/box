@@ -20,6 +20,9 @@ use Seld\JsonLint\ParsingException;
 use stdClass;
 use function KevinGH\Box\FileSystem\file_contents;
 
+/**
+ * @private
+ */
 final class Json
 {
     private $linter;

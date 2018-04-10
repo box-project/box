@@ -35,6 +35,8 @@ use function KevinGH\Box\FileSystem\remove;
 
 /**
  * Box is a utility class to generate a PHAR.
+ *
+ * @private
  */
 final class Box
 {

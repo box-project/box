@@ -19,6 +19,9 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 
+/**
+ * @private
+ */
 abstract class CommandTestCase extends FileSystemTestCase
 {
     /**

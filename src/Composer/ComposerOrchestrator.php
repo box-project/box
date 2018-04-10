@@ -24,6 +24,9 @@ use function KevinGH\Box\FileSystem\file_contents;
 use function preg_match;
 use function preg_replace;
 
+/**
+ * @private
+ */
 final class ComposerOrchestrator
 {
     private function __construct()

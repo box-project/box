@@ -25,6 +25,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Allows a configuration file path to be specified for a command.
+ *
+ * @private
  */
 abstract class Configurable extends Command
 {
