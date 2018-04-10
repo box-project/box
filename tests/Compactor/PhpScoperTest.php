@@ -79,7 +79,7 @@ JSON;
             ->scope(
                 $file,
                 $contents,
-                '_HumbugBox',
+                Argument::containingString('_HumbugBox'),
                 [],
                 ['Whitelisted\Foo']
             )
