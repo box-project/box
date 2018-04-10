@@ -56,6 +56,7 @@ great things:
     1. [Signing algorithm (`algorithm`)](doc/configuration.md#signing-algorithm-algorithm)
 1. [Contributing](#contributing)
 1. [Upgrade](#upgrade)
+1. [Backward Compatibility Promise (BCP)](#backward-compatibility-promise-bcp)
 1. [Credits](#credits)
 
 
