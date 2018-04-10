@@ -1,18 +1,14 @@
-## From 3.0.0-alpha.1 to 3.0.0-alpha.2
-
-### Backward-compatibility (BC) breaks
-
-- The command `info` no longer supports ZIP & TAR based PHARs
-- When using the `PhpScoper` compactor the `scoper-autoload.php` file is no longer dumped. Instead the whitelist statements are directly
-  appended to the existing autoloader which avoids nay extra work for the user.
-
 ## From 3.0.0-alpha.0 to 3.0.0-alpha.1
 
 ### Backward-compatibility (BC) breaks
 
-- The option `compactors` no longer accepts a string value
-- No longer accept `number` for `algorithm`
-- No longer accept `integer` for `compression`
+- Remove support for the `bootstrap` setting (#88)
+- The option `compactors` no longer accepts a string value (#89)
+- No longer accept `number` for `algorithm` (#89)
+- No longer accept `integer` for `compression` (#89)
+- The command `info` no longer supports ZIP & TAR based PHARs (#93)
+- When using the `PhpScoper` compactor the `scoper-autoload.php` file is no longer dumped. Instead the whitelist statements are directly
+  appended to the existing autoloader which avoids nay extra work for the user. (#94)
 
 
 ## From box2 to 3.0.0-alpha.0
