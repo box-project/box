@@ -64,17 +64,15 @@ great things:
 
 ### PHAR (preferred but NOT SUPPORTED YET)
 
-The preferred method of installation is to use the Box PHAR, which can
-be downloaded from the most recent [Github Release][releases]. Subsequent updates
-can be downloaded by running:
+The preferred method of installation is to use the Box PHAR, which can be downloaded from the most recent
+[Github Release][releases]. Subsequent updates can be downloaded by running:
 
 ```bash
-box.phar self-update
+box self-update
 ```
 
-As the PHAR is signed, you should also download the matching
-`box.phar.pubkey` to the same location. If you rename `box.phar`
-to `box`, you should also rename `box.phar.pubkey` to `box.pubkey`.
+As the PHAR is signed, you should also download the matching `box.phar.pubkey` to the same location. If you
+rename `box.phar` to `box`, you should also rename `box.phar.pubkey` to `box.pubkey`.
 
 
 ### Composer
@@ -85,9 +83,8 @@ You can install Box with Composer:
 composer global require humbug/box:^3.0@dev
 ```
 
-If you cannot install it because of a dependency conflict or you prefer to
-install it for your project, we recommend you to take a look at
-[bamarni/composer-bin-plugin][bamarni/composer-bin-plugin]. Example:
+If you cannot install it because of a dependency conflict or you prefer to install it for your project, we recommend
+you to take a look at [bamarni/composer-bin-plugin][bamarni/composer-bin-plugin]. Example:
 
 ```bash
 composer require --dev bamarni/composer-bin-plugin
@@ -99,29 +96,29 @@ Keep in mind however that this library is not designed to be extended.
 
 ## Creating a PHAR
 
-To get started, you may want to check out the [example application](https://github.com/kherge/php-box-example) that is
-ready to be built by Box. How your project is structured is entirely up to you. All that Box requires is that you have
-a file called `box.json` at the root of your project directory. You can find a complete and detailed list of
-configuration settings available by seeing the help information for the `build` command:
+Creating a PHAR should be as simple as running `box compile`. It will however assume some defaults that you might
+want to change. The most basic configuration is the following:
 
-```sh
-$ box help build
+```json
+# box.json.dist
+{
+    "main": "bin/acme.php",
+    "output": "bin/acme.phar"
+}
 ```
 
-Once you have configured your project using `box.json` (or `box.json.dist`), you can simply run the `build`
-command in the directory containing `box.json`:
+You can then find more advanced configuration settings in [the configuration documentation](doc/configuration.md).
+For more information on which command or options is available, you can run:
 
-```sh
-$ box build -v
 ```
-
-> The `-v` option enabled verbose output. This will provide you with a lot of useful information for debugging your build process. Once you are satisfied with the results, I recommend not using the verbose option. It may considerably slow down the build process.
+box help
+``` 
 
 
 ## Contributing
 
-The project provides a `Makefile` in which the most common commands have been
-registered such as fixing the coding style or running the test.
+The project provides a `Makefile` in which the most common commands have been registered such as fixing the coding
+style or running the test.
 
 ```bash
 make
