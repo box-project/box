@@ -43,7 +43,7 @@ final class PhpScoper implements Compactor
             return $this->scoper->scope(
                 $file,
                 $contents,
-                uniqid('_HumbugBox', false),
+                '_HumbugBox',
                 $this->config->getPatchers(),
                 $this->config->getWhitelist()
             );
