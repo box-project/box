@@ -14,8 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use DateTimeImmutable;
 use DirectoryIterator;
 use Phar;
+use PharData;
 use PharFileInfo;
 use RecursiveIteratorIterator;
 use Symfony\Component\Console\Command\Command;
@@ -24,17 +26,23 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Throwable;
+use UnexpectedValueException;
 use function array_fill_keys;
 use function array_filter;
 use function array_reduce;
 use function array_sum;
+use function count;
 use function end;
 use function is_array;
 use function iterator_to_array;
+use function KevinGH\Box\FileSystem\copy;
+use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\formatted_filesize;
 use function key;
 use function realpath;
 use function sprintf;
+use function sys_get_temp_dir;
 
 final class Info extends Command
 {
@@ -63,29 +71,6 @@ final class Info extends Command
         Phar::BZ2 => 'BZ2',
         Phar::GZ => 'GZ',
     ];
-
-    /**
-     * @override
-     */
-    public function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $io = new SymfonyStyle($input, $output);
-        $io->writeln('');
-
-        if (null === ($file = $input->getArgument(self::PHAR_ARG))) {
-            return $this->executeShowGlobalInfo($output, $io);
-        }
-
-        $phar = new Phar($file);
-
-        return $this->executeShowPharInfo(
-            $phar,
-            $input->getOption(self::LIST_OPT),
-            'indent' === $input->getOption(self::MODE_OPT),
-            $output,
-            $io
-        );
-    }
 
     /**
      * {@inheritdoc}
@@ -136,7 +121,74 @@ HELP
         );
     }
 
-    private function executeShowGlobalInfo(OutputInterface $output, SymfonyStyle $io): int
+    /**
+     * @override
+     */
+    public function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $io = new SymfonyStyle($input, $output);
+        $io->writeln('');
+
+        if (null === ($file = $input->getArgument(self::PHAR_ARG))) {
+            return $this->showGlobalInfo($output, $io);
+        }
+
+        $file = realpath($file);
+
+        if (false === $file) {
+            $io->error(
+                sprintf(
+                    'The file "%s" could not be found.',
+                    $input->getArgument(self::PHAR_ARG)
+                )
+            );
+
+            return 1;
+        }
+
+        if ('' === pathinfo($file, PATHINFO_EXTENSION)) {
+            // It is likely to be a PHAR without extension
+            copy($file, $tmpFile = sys_get_temp_dir().'/'.(new DateTimeImmutable())->getTimestamp().$file.'.phar');
+
+            try {
+                return $this->showInfo($tmpFile, $file, $input, $output, $io);
+            } finally {
+                remove($tmpFile);
+            }
+        }
+
+        return $this->showInfo($file, $file, $input, $output, $io);
+    }
+
+    public function showInfo(string $file, string $originalFile, InputInterface $input, OutputInterface $output, SymfonyStyle $io): int
+    {
+        try {
+            try {
+                $phar = new Phar($file);
+            } catch (UnexpectedValueException $exception) {
+                $phar = new PharData($file);
+            }
+
+            return $this->showPharInfo(
+                $phar,
+                $input->getOption(self::LIST_OPT),
+                'indent' === $input->getOption(self::MODE_OPT),
+                $output,
+                $io
+            );
+        } catch (Throwable $throwable) {
+            $io->error(
+                sprintf(
+                    'Could not read the file "%s".',
+                    $originalFile
+                )
+            );
+
+            return 1;
+        }
+    }
+
+    private function showGlobalInfo(OutputInterface $output, SymfonyStyle $io): int
     {
         $this->render(
             $output,
@@ -153,7 +205,10 @@ HELP
         return 0;
     }
 
-    private function executeShowPharInfo(Phar $phar, bool $content, bool $indent, OutputInterface $output, SymfonyStyle $io): int
+    /**
+     * @param Phar|PharData $phar
+     */
+    private function showPharInfo($phar, bool $content, bool $indent, OutputInterface $output, SymfonyStyle $io): int
     {
         $signature = $phar->getSignature();
 
@@ -177,12 +232,16 @@ HELP
         return 0;
     }
 
-    private function showPharGlobalInfo(Phar $phar, SymfonyStyle $io, $signature): void
+    /**
+     * @param Phar|PharData $phar
+     * @param mixed         $signature
+     */
+    private function showPharGlobalInfo($phar, SymfonyStyle $io, $signature): void
     {
         $io->writeln(
             sprintf(
                 '<comment>API Version:</comment> %s',
-                $phar->getVersion()
+                '' !== $phar->getVersion() ? $phar->getVersion() : 'No information found'
             )
         );
         $io->writeln('');
@@ -225,19 +284,21 @@ HELP
         }
         $io->writeln('');
 
-        $io->writeln(
-            sprintf(
-                '<comment>Signature:</comment> %s',
-                $signature['hash_type']
-            )
-        );
-        $io->writeln(
-            sprintf(
-                '<comment>Signature Hash:</comment> %s',
-                $signature['hash']
-            )
-        );
-        $io->writeln('');
+        if (false !== $signature) {
+            $io->writeln(
+                sprintf(
+                    '<comment>Signature:</comment> %s',
+                    $signature['hash_type']
+                )
+            );
+            $io->writeln(
+                sprintf(
+                    '<comment>Signature Hash:</comment> %s',
+                    $signature['hash']
+                )
+            );
+            $io->writeln('');
+        }
 
         $metadata = var_export($phar->getMetadata(), true);
 
@@ -344,12 +405,21 @@ HELP
         }
     }
 
-    private function retrieveCompressionCount(Phar $phar): array
+    /**
+     * @param Phar|PharData $phar
+     */
+    private function retrieveCompressionCount($phar): array
     {
         $count = array_fill_keys(
            self::ALGORITHMS,
             0
         );
+
+        if ($phar instanceof PharData) {
+            $count[self::ALGORITHMS[$phar->isCompressed()]] = 1;
+
+            return $count;
+        }
 
         $countFile = function (array $count, PharFileInfo $file) {
             if (false === $file->isCompressed()) {

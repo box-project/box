@@ -58,7 +58,6 @@ $config = PhpCsFixer\Config::create()
         'no_useless_else' => true,
         'no_useless_return' => true,
         'no_unused_imports' => true,
-        'ordered_class_elements' => true,
         'ordered_imports' => true,
         'php_unit_test_class_requires_covers' => true,
         'phpdoc_add_missing_param_annotation' => true,

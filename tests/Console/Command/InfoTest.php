@@ -19,6 +19,7 @@ use KevinGH\Box\Console\DisplayNormalizer;
 use Phar;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use function realpath;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Info
@@ -44,7 +45,7 @@ class InfoTest extends TestCase
         $this->commandTester = new CommandTester((new Application())->get('info'));
     }
 
-    public function test_it_provides_the_phar_API_info(): void
+    public function test_it_provides_info_about_the_phar_API(): void
     {
         $this->commandTester->execute(
             [
@@ -75,7 +76,7 @@ OUTPUT;
         $this->assertSame(0, $this->commandTester->getStatusCode());
     }
 
-    public function test_it_provides_a_phar_info(): void
+    public function test_it_provides_info_about_a_phar(): void
     {
         $pharPath = self::FIXTURES.'/simple-phar.phar';
         $phar = new Phar($pharPath);
@@ -110,6 +111,153 @@ OUTPUT;
 
         $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(0, $this->commandTester->getStatusCode());
+    }
+
+    public function test_it_provides_info_about_a_phar_without_extension(): void
+    {
+        $pharPath = self::FIXTURES.'/simple-phar';
+        $phar = new Phar($pharPath.'.phar');
+
+        $version = $phar->getVersion();
+        $signature = $phar->getSignature();
+
+        $this->commandTester->execute(
+            [
+                'command' => 'info',
+                'phar' => $pharPath,
+            ]
+        );
+
+        $expected = <<<OUTPUT
+
+API Version: $version
+
+Archive Compression: None
+
+Signature: {$signature['hash_type']}
+Signature Hash: {$signature['hash']}
+
+Metadata: None
+
+Contents: 1 file (6.61KB)
+
+ // Use the --list|-l option to list the content of the PHAR.
+
+
+OUTPUT;
+
+        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
+        $this->assertSame(0, $this->commandTester->getStatusCode());
+    }
+
+    public function test_it_cannot_provide_info_about_an_invalid_phar_without_extension(): void
+    {
+        $file = self::FIXTURES.'/foo';
+
+        $this->commandTester->execute(
+            [
+                'command' => 'info',
+                'phar' => $file,
+            ]
+        );
+
+        $expectedPath = realpath($file);
+
+        $expected = <<<OUTPUT
+
+ [ERROR] Could not read the file
+         "$expectedPath".
+
+
+OUTPUT;
+
+        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
+        $this->assertSame(1, $this->commandTester->getStatusCode());
+    }
+
+    public function test_it_provides_info_about_a_targz_phar(): void
+    {
+        $pharPath = self::FIXTURES.'/simple-phar.tar.gz';
+
+        $this->commandTester->execute(
+            [
+                'command' => 'info',
+                'phar' => $pharPath,
+            ]
+        );
+
+        $expected = <<<'OUTPUT'
+
+API Version: No information found
+
+Archive Compression: GZ
+
+Metadata: None
+
+Contents: 1 file (2.56KB)
+
+ // Use the --list|-l option to list the content of the PHAR.
+
+
+OUTPUT;
+
+        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
+        $this->assertSame(0, $this->commandTester->getStatusCode());
+    }
+
+    public function test_it_provides_info_about_a_tarbz2_phar(): void
+    {
+        $pharPath = self::FIXTURES.'/simple-phar.tar.bz2';
+
+        $this->commandTester->execute(
+            [
+                'command' => 'info',
+                'phar' => $pharPath,
+            ]
+        );
+
+        $expected = <<<'OUTPUT'
+
+API Version: No information found
+
+Archive Compression: BZ2
+
+Metadata: None
+
+Contents: 1 file (2.71KB)
+
+ // Use the --list|-l option to list the content of the PHAR.
+
+
+OUTPUT;
+
+        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
+        $this->assertSame(0, $this->commandTester->getStatusCode());
+    }
+
+    public function test_it_provides_a_zip_phar_info(): void
+    {
+        $pharPath = self::FIXTURES.'/new-simple-phar.zip';
+
+        $this->commandTester->execute(
+            [
+                'command' => 'info',
+                'phar' => $pharPath,
+            ]
+        );
+
+        $canonicalizedPath = realpath($pharPath);
+
+        $expected = <<<OUTPUT
+
+ [ERROR] Could not read the file
+         "$canonicalizedPath".
+
+
+OUTPUT;
+
+        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
+        $this->assertSame(1, $this->commandTester->getStatusCode());
     }
 
     public function test_it_provides_a_phar_info_with_the_tree_of_the_content(): void
