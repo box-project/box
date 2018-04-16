@@ -19,6 +19,7 @@ use KevinGH\Box\Console\DisplayNormalizer;
 use Phar;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use function preg_replace;
 use function realpath;
 
 /**
@@ -165,13 +166,15 @@ OUTPUT;
 
         $expected = <<<OUTPUT
 
- [ERROR] Could not read the file
-         "$expectedPath".
+ [ERROR] Could not read the file "$expectedPath".
 
 
 OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
+        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
+        $actual = preg_replace('/file[\ \n]+"/', 'file "', $actual);
+
+        $this->assertSame($expected, $actual);
         $this->assertSame(1, $this->commandTester->getStatusCode());
     }
 
@@ -250,13 +253,15 @@ OUTPUT;
 
         $expected = <<<OUTPUT
 
- [ERROR] Could not read the file
-         "$canonicalizedPath".
+ [ERROR] Could not read the file "$canonicalizedPath".
 
 
 OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
+        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
+        $actual = preg_replace('/file[\ \n]+"/', 'file "', $actual);
+
+        $this->assertSame($expected, $actual);
         $this->assertSame(1, $this->commandTester->getStatusCode());
     }
 
