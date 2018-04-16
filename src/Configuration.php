@@ -22,8 +22,9 @@ use Herrera\Box\Compactor\Php as LegacyPhp;
 use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
-use KevinGH\Box\Compactor\PhpScoper;
+use KevinGH\Box\Compactor\PhpScoper as PhpScoperCompactor;
 use KevinGH\Box\Composer\ComposerConfiguration;
+use KevinGH\Box\PhpScoper\SimpleScoper;
 use Phar;
 use RuntimeException;
 use SplFileInfo;
@@ -903,10 +904,17 @@ BANNER;
                     return self::createPhpCompactor($raw);
                 }
 
-                if (PhpScoper::class === $class) {
+                if (PhpScoperCompactor::class === $class) {
                     $phpScoperConfig = self::retrievePhpScoperConfig($raw, $basePath);
 
-                    return new PhpScoper(create_scoper(), $phpScoperConfig);
+                    return new PhpScoperCompactor(
+                        new SimpleScoper(
+                            create_scoper(),
+                            uniqid('_HumbugBox', false),
+                            $phpScoperConfig->getWhitelist(),
+                            $phpScoperConfig->getPatchers()
+                        )
+                    );
                 }
 
                 return new $class();
