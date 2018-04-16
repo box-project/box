@@ -107,6 +107,23 @@ class BoxTest extends FileSystemTestCase
         $this->assertSame($expectedContents, $actualContents);
     }
 
+    public function test_it_can_add_a_non_exitent_file_with_contents_to_the_phar(): void
+    {
+        $file = 'foo';
+        $contents = 'test';
+
+        $this->box->addFile($file, $contents);
+
+        $expectedContents = $contents;
+        $expectedPharPath = 'phar://test.phar/'.$file;
+
+        $this->assertFileExists($expectedPharPath);
+
+        $actualContents = file_get_contents($expectedPharPath);
+
+        $this->assertSame($expectedContents, $actualContents);
+    }
+
     public function test_it_can_add_a_file_with_absolute_path_to_the_phar(): void
     {
         $relativePath = 'path-to/foo';
