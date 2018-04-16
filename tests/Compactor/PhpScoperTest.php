@@ -36,7 +36,7 @@ class PhpScoperTest extends TestCase
 }
 JSON;
 
-        /** @var Scoper|ObjectProphecy $scoper */
+        /** @var ObjectProphecy|Scoper $scoper */
         $scoperProphecy = $this->prophesize(Scoper::class);
         $scoperProphecy->scope($file, $contents)->willReturn($expected = 'Scoped contents');
         /** @var Scoper $scoper */
@@ -61,7 +61,7 @@ JSON;
 }
 JSON;
 
-        /** @var Scoper|ObjectProphecy $scoper */
+        /** @var ObjectProphecy|Scoper $scoper */
         $scoperProphecy = $this->prophesize(Scoper::class);
         $scoperProphecy->scope($file, $contents)->willThrow(new Error());
         /** @var Scoper $scoper */

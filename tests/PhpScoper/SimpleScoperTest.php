@@ -2,10 +2,18 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\PhpScoper;
 
-use Error;
-use Humbug\PhpScoper\Configuration;
 use Humbug\PhpScoper\Scoper;
 use KevinGH\Box\Compactor\PhpScoper;
 use PHPUnit\Framework\TestCase;
@@ -31,7 +39,7 @@ JSON;
         $whitelist = ['Whitelisted\Foo'];
         $patchers = [];
 
-        /** @var PhpScoper|ObjectProphecy $phpScoperProphecy */
+        /** @var ObjectProphecy|PhpScoper $phpScoperProphecy */
         $phpScoperProphecy = $this->prophesize(Scoper::class);
         $phpScoperProphecy
             ->scope($file, $contents, $prefix, $patchers, $whitelist)
@@ -51,7 +59,7 @@ JSON;
         $phpScoperProphecy->scope(Argument::cetera())->shouldHaveBeenCalledTimes(1);
     }
 
-    public function test_it_exposes_some_elements_of_the_scoping_config()
+    public function test_it_exposes_some_elements_of_the_scoping_config(): void
     {
         $prefix = 'HumbugBox';
         $whitelist = ['Whitelisted\Foo'];

@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
-use Humbug\PhpScoper\Console\Configuration as PhpScoperConfiguration;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 use KevinGH\Box\PhpScoper\NullScoper;

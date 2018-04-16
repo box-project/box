@@ -17,7 +17,6 @@ namespace KevinGH\Box\Composer;
 use Composer\Factory;
 use Composer\IO\NullIO;
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
-use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
 use InvalidArgumentException;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;

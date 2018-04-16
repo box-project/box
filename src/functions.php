@@ -29,6 +29,7 @@ const DEBUG_CONST = 'KevinGH\Box\BOX_DEBUG';
 
 /**
  * TODO: this function should be pushed down to the PHAR extension.
+ *
  * @private
  */
 function get_phar_compression_algorithms(): array
