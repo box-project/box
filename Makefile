@@ -1,6 +1,7 @@
 .DEFAULT_GOAL := help
 
 
+.PHONY: help
 help:
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
 
@@ -9,14 +10,17 @@ help:
 ## Commands
 ##---------------------------------------------------------------------------
 
+.PHONY: clean
 clean:		## Clean all created artifacts
 clean:
 	git clean --exclude=.idea/ -ffdx
 
+.PHONY: cs
 cs:		## Fix CS
 cs: vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
 	php -d zend.enable_gc=0 vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer fix
 
+.PHONY: compile
 compile:	## Compile the application into the PHAR
 compile:
 	# Cleanup existing artefacts
@@ -30,21 +34,26 @@ compile:
 ## Tests
 ##---------------------------------------------------------------------------
 
+.PHONY: test
 test:		## Run all the tests
 test: tu e2e
 
+.PHONY: tu
 tu:		## Run the unit tests
 tu: vendor/bin/phpunit fixtures/default_stub.php
 	php -d phar.readonly=0 -d zend.enable_gc=0 bin/phpunit
 
+.PHONY: tc
 tc:		## Run the unit tests with code coverage
 tc: vendor/bin/phpunit
 	phpdbg -qrr -d phar.readonly=0 -d zend.enable_gc=0 bin/phpunit --coverage-html=dist/coverage --coverage-text
 
+.PHONY: tm
 tm:		## Run Infection
 tm:	vendor/bin/phpunit fixtures/default_stub.php
 	php -d phar.readonly=0 -d zend.enable_gc=0 bin/infection
 
+.PHONY: e2e
 e2e:		## Run the end-to-end tests
 e2e: box_dev.json
 	$(MAKE) compile args='--config=box_dev.json'
@@ -57,6 +66,7 @@ e2e: box_dev.json
 
 	rm box.phar bin/box.phar
 
+.PHONY: blackfire
 blackfire:	## Profiles the compile step
 blackfire: bin/box src vendor
 	# Cleanup existing artefacts
