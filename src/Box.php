@@ -18,6 +18,8 @@ use Assert\Assertion;
 use Humbug\PhpScoper\Console\Configuration as PhpScoperConfiguration;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Composer\ComposerOrchestrator;
+use KevinGH\Box\PhpScoper\NullScoper;
+use KevinGH\Box\PhpScoper\Scoper;
 use Phar;
 use RecursiveDirectoryIterator;
 use SplFileInfo;
@@ -73,9 +75,9 @@ final class Box
     private $mapFile;
 
     /**
-     * @var null|PhpScoperConfiguration
+     * @var Scoper
      */
-    private $phpScoperConfig;
+    private $scoper;
 
     private function __construct(Phar $phar, string $file)
     {
@@ -84,6 +86,7 @@ final class Box
 
         $this->basePath = getcwd();
         $this->mapFile = function (): void { };
+        $this->scoper = new NullScoper();
     }
 
     /**
@@ -117,7 +120,7 @@ final class Box
 
         foreach ($this->compactors as $compactor) {
             if ($compactor instanceof PhpScoper) {
-                $this->phpScoperConfig = $compactor->getConfiguration();
+                $this->scoper = $compactor->getScoper();
 
                 break;
             }
@@ -203,7 +206,7 @@ final class Box
             }
 
             // Dump autoload without dev dependencies
-            ComposerOrchestrator::dumpAutoload($this->phpScoperConfig);
+            ComposerOrchestrator::dumpAutoload($this->scoper->getWhitelist(), $this->scoper->getPrefix());
 
             chdir($cwd);
 

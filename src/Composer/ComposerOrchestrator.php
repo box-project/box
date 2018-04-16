@@ -33,7 +33,10 @@ final class ComposerOrchestrator
     {
     }
 
-    public static function dumpAutoload(?PhpScoperConfiguration $phpScoperConfig): void
+    /**
+     * @param string[] $whitelist
+     */
+    public static function dumpAutoload(array $whitelist, string $prefix): void
     {
         try {
             $composer = Factory::create(new NullIO(), null, true);
@@ -56,11 +59,12 @@ final class ComposerOrchestrator
 
         $generator->dump($composerConfig, $localRepository, $package, $installationManager, 'composer', true);
 
-        if (null !== $phpScoperConfig) {
+        if ('' !== $prefix) {
             $autoloadFile = $composerConfig->get('vendor-dir').'/autoload.php';
 
             $autoloadContents = self::generateAutoloadStatements(
-                $phpScoperConfig,
+                $whitelist,
+                $prefix,
                 file_contents($autoloadFile)
             );
 
@@ -68,10 +72,17 @@ final class ComposerOrchestrator
         }
     }
 
-    private static function generateAutoloadStatements(PhpScoperConfiguration $config, string $autoload): string
+    /**
+     * @param string[] $whitelist
+     */
+    private static function generateAutoloadStatements(array $whitelist, string $prefix, string $autoload): string
     {
         // TODO: make prefix configurable: https://github.com/humbug/php-scoper/issues/178
-        $whitelistStatements = (new ScoperAutoloadGenerator($config->getWhitelist()))->dump('_HumbugBox');
+        $whitelistStatements = (new ScoperAutoloadGenerator($whitelist))->dump($prefix);
+
+        if ([] === $whitelistStatements) {
+            return $autoload;
+        }
 
         $whitelistStatements = preg_replace(
             '/(\\$loader \= .*)|(return \\$loader;)/',

@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace KevinGH\Box\Compactor;
 
 use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
-use Humbug\PhpScoper\Scoper;
 use KevinGH\Box\Compactor;
+use KevinGH\Box\PhpScoper\Scoper;
 use Throwable;
 use function uniqid;
 
@@ -26,12 +26,10 @@ use function uniqid;
 final class PhpScoper implements Compactor
 {
     private $scoper;
-    private $config;
 
-    public function __construct(Scoper $scoper, PhpScoperConfiguration $config)
+    public function __construct(Scoper $scoper)
     {
         $this->scoper = $scoper;
-        $this->config = $config;
     }
 
     /**
@@ -40,20 +38,14 @@ final class PhpScoper implements Compactor
     public function compact(string $file, string $contents): string
     {
         try {
-            return $this->scoper->scope(
-                $file,
-                $contents,
-                '_HumbugBox',
-                $this->config->getPatchers(),
-                $this->config->getWhitelist()
-            );
+            return $this->scoper->scope($file, $contents);
         } catch (Throwable $throwable) {
             return $contents;
         }
     }
 
-    public function getConfiguration(): PhpScoperConfiguration
+    public function getScoper(): Scoper
     {
-        return $this->config;
+        return $this->scoper;
     }
 }
