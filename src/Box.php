@@ -226,10 +226,9 @@ final class Box
      */
     public function addFile(string $file, string $contents = null, bool $binary = false): string
     {
-        Assertion::file($file);
-        Assertion::readable($file);
-
-        $contents = null === $contents ? file_get_contents($file) : $contents;
+        if (null === $contents) {
+            $contents = file_contents($file);
+        }
 
         $relativePath = make_path_relative($file, $this->basePath);
         $local = ($this->mapFile)($relativePath);
