@@ -35,7 +35,10 @@ use function array_filter;
 use function array_map;
 use function array_merge;
 use function array_unique;
+use function file_exists;
 use function Humbug\PhpScoper\create_scoper;
+use function is_file;
+use function is_readable;
 use function iter\chain;
 use function iter\fn\method;
 use function iter\map;
@@ -202,7 +205,9 @@ BANNER;
         $mainScriptPath = self::retrieveMainScriptPath($raw, $basePath);
         $mainScriptContents = self::retrieveMainScriptContents($mainScriptPath);
 
-        $devPackages = ComposerConfiguration::retrieveDevPackages($basePath);
+        [$composerJson, $composerLock] = self::retrieveComposerFiles($basePath);
+
+        $devPackages = ComposerConfiguration::retrieveDevPackages($basePath, $composerJson, $composerLock);
 
         [$excludedPaths, $blacklistFilter] = self::retrieveBlacklistFilter($raw, $basePath, $tmpOutputPath, $outputPath);
 
@@ -973,6 +978,22 @@ BANNER;
         // Remove the shebang line: the shebang line in a PHAR should be located in the stub file which is the real
         // PHAR entry point file.
         return preg_replace('/^#!.*\s*/', '', $contents);
+    }
+
+    private static function retrieveComposerFiles(string $basePath): array
+    {
+        $composerJson = canonicalize($basePath.'/composer.json');
+        $composerLock = canonicalize($basePath.'/composer.lock');
+
+        if (false === file_exists($composerJson) || false === is_file($composerJson) || false === is_readable($composerJson)) {
+            $composerJson = null;
+        }
+
+        if (false === file_exists($composerLock) || false === is_file($composerLock) || false === is_readable($composerLock)) {
+            $composerLock = null;
+        }
+
+        return [$composerJson, $composerLock];
     }
 
     /**

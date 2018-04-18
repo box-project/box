@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
-use Assert\Assertion;
 use InvalidArgumentException;
 use KevinGH\Box\Json\Json;
 use Seld\JsonLint\ParsingException;
@@ -30,35 +29,24 @@ final class ComposerConfiguration
      * Attempts to locate the `composer.json` and `composer.lock` files in the provided base-path in order to collect
      * all the dev packages.
      *
-     * @param string $basePath
-     *
      * @return string[] Dev package paths
      */
-    public static function retrieveDevPackages(string $basePath): array
+    public static function retrieveDevPackages(string $basePath, ?string $composerJson, ?string $composerLock): array
     {
-        Assertion::directory($basePath);
-
-        $composerFile = make_path_absolute('composer.json', $basePath);
-        $composerLockFile = make_path_absolute('composer.lock', $basePath);
-
-        if (file_exists($composerFile)) {
-            Assertion::readable($composerFile);
-            Assertion::file($composerFile, 'Expected "%s" to be a file. Directory or link found.');
-            Assertion::file($composerLockFile, 'Expected "%s" to exists. The file is either missing or a directory/link has been found instead.');
-
-            $composerFileContents = file_contents($composerFile);
-            $composerLockFileContents = file_contents($composerLockFile);
-
-            return self::getDevPackagePaths(
-                $basePath,
-                $composerFile,
-                $composerFileContents,
-                $composerLockFile,
-                $composerLockFileContents
-            );
+        if (null === $composerJson || null === $composerLock) {
+            return [];
         }
 
-        return [];
+        $composerJsonContents = file_contents($composerJson);
+        $composerLockContents = file_contents($composerLock);
+
+        return self::getDevPackagePaths(
+            $basePath,
+            $composerJson,
+            $composerJsonContents,
+            $composerLock,
+            $composerLockContents
+        );
     }
 
     /**

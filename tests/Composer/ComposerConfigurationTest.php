@@ -220,85 +220,11 @@ JSON;
 
     public function test_it_returns_an_empty_list_when_trying_to_retrieve_the_list_of_dev_packages_when_no_composer_json_file_is_found(): void
     {
-        $this->assertSame([], ComposerConfiguration::retrieveDevPackages($this->tmp));
+        $this->assertSame([], ComposerConfiguration::retrieveDevPackages($this->tmp, null, null));
 
         dump_file('composer.lock', '{}');
 
-        $this->assertSame([], ComposerConfiguration::retrieveDevPackages($this->tmp));
-    }
-
-    public function test_it_requires_the_composer_file_to_be_a_file_when_found(): void
-    {
-        mkdir('composer.json');
-
-        try {
-            ComposerConfiguration::retrieveDevPackages($this->tmp);
-
-            $this->fail('Expected exception to be thrown.');
-        } catch (InvalidArgumentException $exception) {
-            $path = $this->tmp.'/composer.json';
-
-            $this->assertSame(
-                "Expected \"$path\" to be a file. Directory or link found.",
-                $exception->getMessage()
-            );
-        }
-    }
-
-    public function test_it_requires_the_composer_file_to_be_readable_when_found(): void
-    {
-        dump_file($file = 'composer.json');
-        chmod($file, 0355);
-
-        try {
-            ComposerConfiguration::retrieveDevPackages($this->tmp);
-
-            $this->fail('Expected exception to be thrown.');
-        } catch (InvalidArgumentException $exception) {
-            $path = $this->tmp.DIRECTORY_SEPARATOR.$file;
-
-            $this->assertSame(
-                "Path \"$path\" was expected to be readable.",
-                $exception->getMessage()
-            );
-        }
-    }
-
-    public function test_it_requires_the_lock_file_if_the_json_file_is_found(): void
-    {
-        dump_file('composer.json', '{}');
-
-        try {
-            ComposerConfiguration::retrieveDevPackages($this->tmp);
-
-            $this->fail('Expected exception to be thrown.');
-        } catch (InvalidArgumentException $exception) {
-            $path = $this->tmp.'/composer.lock';
-
-            $this->assertSame(
-                "Expected \"$path\" to exists. The file is either missing or a directory/link has been found instead.",
-                $exception->getMessage()
-            );
-        }
-    }
-
-    public function test_it_requires_the_composer_lock_to_be_a_file_when_found(): void
-    {
-        dump_file('composer.json');
-        mkdir('composer.lock');
-
-        try {
-            ComposerConfiguration::retrieveDevPackages($this->tmp);
-
-            $this->fail('Expected exception to be thrown.');
-        } catch (InvalidArgumentException $exception) {
-            $path = $this->tmp.'/composer.lock';
-
-            $this->assertSame(
-                "Expected \"$path\" to exists. The file is either missing or a directory/link has been found instead.",
-                $exception->getMessage()
-            );
-        }
+        $this->assertSame([], ComposerConfiguration::retrieveDevPackages($this->tmp, $this->tmp.'/composer.json', null));
     }
 
     public function test_it_cannot_retrieve_the_dev_packages_if_the_composer_file_is_invalid(): void
@@ -307,7 +233,7 @@ JSON;
         dump_file('composer.lock');
 
         try {
-            ComposerConfiguration::retrieveDevPackages($this->tmp);
+            ComposerConfiguration::retrieveDevPackages($this->tmp, $this->tmp.'/composer.json', $this->tmp.'/composer.lock');
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -332,7 +258,7 @@ EOF
         dump_file('composer.lock'); // Invalid JSON
 
         try {
-            ComposerConfiguration::retrieveDevPackages($this->tmp);
+            ComposerConfiguration::retrieveDevPackages($this->tmp, $this->tmp.'/composer.json', $this->tmp.'/composer.lock');
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -364,7 +290,7 @@ EOF
             $this->tmp.'/vendor/doctrine/instantiator',
         ];
 
-        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp);
+        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $this->tmp.'/composer.json', $this->tmp.'/composer.lock');
 
         $this->assertSame($expected, $actual);
     }
@@ -382,7 +308,7 @@ EOF
             $this->tmp.'/vendor/doctrine/instantiator',
         ];
 
-        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp);
+        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $this->tmp.'/composer.json', $this->tmp.'/composer.lock');
 
         $this->assertSame($expected, $actual);
     }
@@ -399,7 +325,7 @@ EOF
             $this->tmp.'/vendor/bamarni/composer-bin-plugin',
         ];
 
-        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp);
+        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $this->tmp.'/composer.json', $this->tmp.'/composer.lock');
 
         $this->assertSame($expected, $actual);
     }
@@ -425,7 +351,7 @@ JSON
             $this->tmp.'/custom-vendor/bamarni/composer-bin-plugin',
         ];
 
-        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp);
+        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $this->tmp.'/composer.json', $this->tmp.'/composer.lock');
 
         $this->assertSame($expected, $actual);
     }
@@ -540,7 +466,7 @@ JSON
 
         $expected = [];
 
-        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp);
+        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $this->tmp.'/composer.json', $this->tmp.'/composer.lock');
 
         $this->assertSame($expected, $actual);
     }
