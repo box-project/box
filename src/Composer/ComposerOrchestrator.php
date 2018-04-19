@@ -17,10 +17,8 @@ namespace KevinGH\Box\Composer;
 use Composer\Factory;
 use Composer\IO\NullIO;
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
-use InvalidArgumentException;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
-use function preg_match;
 use function preg_replace;
 
 /**
@@ -37,15 +35,7 @@ final class ComposerOrchestrator
      */
     public static function dumpAutoload(array $whitelist, string $prefix): void
     {
-        try {
-            $composer = Factory::create(new NullIO(), null, true);
-        } catch (InvalidArgumentException $exception) {
-            if (1 !== preg_match('//', 'could not find a composer\.json file')) {
-                throw $exception;
-            }
-
-            return; // No autoload to dump
-        }
+        $composer = Factory::create(new NullIO(), null, true);
 
         $installationManager = $composer->getInstallationManager();
         $localRepository = $composer->getRepositoryManager()->getLocalRepository();

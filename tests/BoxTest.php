@@ -27,7 +27,9 @@ use Prophecy\Prophecy\ObjectProphecy;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
 use function array_filter;
+use function array_keys;
 use function current;
+use function file_put_contents;
 use function in_array;
 use function KevinGH\Box\FileSystem\canonicalize;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -466,6 +468,47 @@ class BoxTest extends FileSystemTestCase
         }
     }
 
+    public function test_it_can_dump_the_autoloader_when_adding_files_to_the_phar(): void
+    {
+        $files = [
+            'foo' => 'foo contents',
+            'bar' => 'bar contents',
+            'composer.json' => '{}',
+        ];
+
+        foreach ($files as $file => $contents) {
+            dump_file($file, $contents);
+        }
+
+        $this->box->addFiles(array_keys($files), false, true);
+
+        foreach ($files as $file => $contents) {
+            $expectedContents = $contents;
+            $expectedPharPath = 'phar://test.phar/'.$file;
+
+            $this->assertFileExists($expectedPharPath);
+
+            $actualContents = file_get_contents($expectedPharPath);
+
+            $this->assertSame($expectedContents, $actualContents);
+        }
+
+        $this->assertFileExists('phar://test.phar/vendor/autoload.php');
+    }
+
+    public function test_it_cannot_dump_the_autoloader_when_adding_files_to_the_phar_if_the_composer_json_file_could_not_be_found(): void
+    {
+        try {
+            $this->box->addFiles([], false, true);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertStringStartsWith('Composer could not find a composer.json file in', $exception->getMessage());
+            $this->assertSame(0, $exception->getCode());
+            $this->assertNull($exception->getPrevious());
+        }
+    }
+
     public function test_it_can_add_binary_files_to_the_phar(): void
     {
         $files = [
@@ -489,6 +532,25 @@ class BoxTest extends FileSystemTestCase
 
             $this->assertSame($expectedContents, $actualContents);
         }
+    }
+
+    public function test_the_autoloader_is_not_dumped_when_adding_binary_files_regardless_of_the_setting(): void
+    {
+        $file = 'foo';
+        $contents = 'foo contents';
+
+        dump_file($file, $contents);
+
+        $this->box->addFiles(['foo'], true, true);
+
+        $expectedContents = $contents;
+        $expectedPharPath = 'phar://test.phar/'.$file;
+
+        $this->assertFileExists($expectedPharPath);
+
+        $actualContents = file_get_contents($expectedPharPath);
+
+        $this->assertSame($expectedContents, $actualContents);
     }
 
     public function test_it_can_add_binary_files_with_a_local_path_to_the_phar(): void

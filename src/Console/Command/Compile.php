@@ -318,7 +318,7 @@ EOF
         $count = count($config->getFiles());
 
         try {
-            $box->addFiles($config->getFiles(), false);
+            $box->addFiles($config->getFiles(), false, null !== $config->getComposerJson());
         } catch (MultiReasonException $exception) {
             // This exception is handled a different way to give me meaningful feedback to the user
             foreach ($exception->getReasons() as $reason) {

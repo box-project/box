@@ -61,6 +61,8 @@ final class Json
     }
 
     /**
+     * @throws ParsingException
+     *
      * @return array|stdClass
      */
     public function decodeFile(string $file, bool $assoc = false)
