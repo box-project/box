@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
+use function file_exists;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 use KevinGH\Box\PhpScoper\NullScoper;
@@ -240,7 +241,10 @@ final class Box
         }
 
         if ($binary) {
-            $this->phar->addFile($file, $local);
+            true === file_exists($file)
+                ? $this->phar->addFile($file, $local)
+                : $this->phar->addFromString($local, $contents)
+            ;
         } else {
             $processedContents = self::compactContents(
                 $this->compactors,
