@@ -24,9 +24,11 @@ use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Compactor\PhpScoper as PhpScoperCompactor;
 use KevinGH\Box\Composer\ComposerConfiguration;
+use KevinGH\Box\Json\Json;
 use KevinGH\Box\PhpScoper\SimpleScoper;
 use Phar;
 use RuntimeException;
+use Seld\JsonLint\ParsingException;
 use SplFileInfo;
 use stdClass;
 use Symfony\Component\Finder\Finder;
@@ -81,6 +83,8 @@ BANNER;
     private $fileMode;
     private $alias;
     private $basePath;
+    private $composerJson;
+    private $composerLock;
     private $files;
     private $binaryFiles;
     private $compactors;
@@ -105,36 +109,40 @@ BANNER;
     private $isStubGenerated;
 
     /**
-     * @param null|string   $file
-     * @param null|string   $alias
-     * @param string        $basePath              Utility to private the base path used and be able to retrieve a path relative to it (the base path)
-     * @param SplFileInfo[] $files                 List of files
-     * @param SplFileInfo[] $binaryFiles           List of binary files
-     * @param Compactor[]   $compactors            List of file contents compactors
-     * @param null|int      $compressionAlgorithm  Compression algorithm constant value. See the \Phar class constants
-     * @param null|int      $fileMode              File mode in octal form
-     * @param string        $mainScriptPath        The main script file path
-     * @param string        $mainScriptContents    The processed content of the main script file
-     * @param MapFile       $fileMapper            Utility to map the files from outside and inside the PHAR
-     * @param mixed         $metadata              The PHAR Metadata
-     * @param string        $tmpOutputPath
-     * @param string        $outputPath
-     * @param null|string   $privateKeyPassphrase
-     * @param null|string   $privateKeyPath
-     * @param bool          $isPrivateKeyPrompt    If the user should be prompted for the private key passphrase
-     * @param array         $processedReplacements The processed list of replacement placeholders and their values
-     * @param null|string   $shebang               The shebang line
-     * @param int           $signingAlgorithm      The PHAR siging algorithm. See \Phar constants
-     * @param null|string   $stubBannerContents    The stub banner comment
-     * @param null|string   $stubBannerPath        The path to the stub banner comment file
-     * @param null|string   $stubPath              The PHAR stub file path
-     * @param bool          $isInterceptFileFuncs  wether or not Phar::interceptFileFuncs() should be used
-     * @param bool          $isStubGenerated       Wether or not if the PHAR stub should be generated
+     * @param null|string     $file
+     * @param null|string     $alias
+     * @param string          $basePath              Utility to private the base path used and be able to retrieve a path relative to it (the base path)
+     * @param null[]|string[] $composerJson
+     * @param null[]|string[] $composerLock
+     * @param SplFileInfo[]   $files                 List of files
+     * @param SplFileInfo[]   $binaryFiles           List of binary files
+     * @param Compactor[]     $compactors            List of file contents compactors
+     * @param null|int        $compressionAlgorithm  Compression algorithm constant value. See the \Phar class constants
+     * @param null|int        $fileMode              File mode in octal form
+     * @param string          $mainScriptPath        The main script file path
+     * @param string          $mainScriptContents    The processed content of the main script file
+     * @param MapFile         $fileMapper            Utility to map the files from outside and inside the PHAR
+     * @param mixed           $metadata              The PHAR Metadata
+     * @param string          $tmpOutputPath
+     * @param string          $outputPath
+     * @param null|string     $privateKeyPassphrase
+     * @param null|string     $privateKeyPath
+     * @param bool            $isPrivateKeyPrompt    If the user should be prompted for the private key passphrase
+     * @param array           $processedReplacements The processed list of replacement placeholders and their values
+     * @param null|string     $shebang               The shebang line
+     * @param int             $signingAlgorithm      The PHAR siging algorithm. See \Phar constants
+     * @param null|string     $stubBannerContents    The stub banner comment
+     * @param null|string     $stubBannerPath        The path to the stub banner comment file
+     * @param null|string     $stubPath              The PHAR stub file path
+     * @param bool            $isInterceptFileFuncs  Whether or not Phar::interceptFileFuncs() should be used
+     * @param bool            $isStubGenerated       Whether or not if the PHAR stub should be generated
      */
     private function __construct(
         ?string $file,
         string $alias,
         string $basePath,
+        array $composerJson,
+        array $composerLock,
         array $files,
         array $binaryFiles,
         array $compactors,
@@ -170,6 +178,8 @@ BANNER;
         $this->file = $file;
         $this->alias = $alias;
         $this->basePath = $basePath;
+        $this->composerJson = $composerJson;
+        $this->composerLock = $composerLock;
         $this->files = $files;
         $this->binaryFiles = $binaryFiles;
         $this->compactors = $compactors;
@@ -205,9 +215,12 @@ BANNER;
         $mainScriptPath = self::retrieveMainScriptPath($raw, $basePath);
         $mainScriptContents = self::retrieveMainScriptContents($mainScriptPath);
 
-        [$composerJson, $composerLock] = self::retrieveComposerFiles($basePath);
+        $composerFiles = self::retrieveComposerFiles($basePath);
 
-        $devPackages = ComposerConfiguration::retrieveDevPackages($basePath, $composerJson, $composerLock);
+        $composerJson = $composerFiles[0];
+        $composerLock = $composerFiles[1];
+
+        $devPackages = ComposerConfiguration::retrieveDevPackages($basePath, $composerJson[1], $composerLock[1]);
 
         [$excludedPaths, $blacklistFilter] = self::retrieveBlacklistFilter($raw, $basePath, $tmpOutputPath, $outputPath);
 
@@ -215,7 +228,8 @@ BANNER;
             $filesAggregate = self::retrieveAllFiles($basePath, $mainScriptPath, $blacklistFilter, $excludedPaths, $devPackages);
             $binaryFilesAggregate = [];
         } else {
-            $files = self::retrieveFiles($raw, 'files', $basePath);
+            $files = self::retrieveFiles($raw, 'files', $basePath, $composerFiles);
+
             $directories = self::retrieveDirectories($raw, 'directories', $basePath, $blacklistFilter, $excludedPaths);
             $filesFromFinders = self::retrieveFilesFromFinders($raw, 'finder', $basePath, $blacklistFilter, $devPackages);
 
@@ -267,6 +281,8 @@ BANNER;
             $file,
             $alias,
             $basePath,
+            $composerJson,
+            $composerLock,
             $filesAggregate,
             $binaryFilesAggregate,
             $compactors,
@@ -305,6 +321,26 @@ BANNER;
     public function getBasePath(): string
     {
         return $this->basePath;
+    }
+
+    public function getComposerJson(): ?string
+    {
+        return $this->composerJson[0];
+    }
+
+    public function getComposerJsonDecodedContents(): ?array
+    {
+        return $this->composerJson[1];
+    }
+
+    public function getComposerLock(): ?string
+    {
+        return $this->composerLock[0];
+    }
+
+    public function getComposerLockDecodedContents(): ?array
+    {
+        return $this->composerLock[1];
     }
 
     /**
@@ -440,7 +476,7 @@ BANNER;
     private static function retrieveAlias(stdClass $raw): string
     {
         if (false === isset($raw->alias)) {
-            return uniqid('box-auto-generated-alias-').'.phar';
+            return uniqid('box-auto-generated-alias-', false).'.phar';
         }
 
         $alias = trim($raw->alias);
@@ -534,19 +570,25 @@ BANNER;
     }
 
     /**
-     * @param stdClass $raw
-     * @param string   $key      Config property name
-     * @param string   $basePath
-     *
      * @return SplFileInfo[]
      */
-    private static function retrieveFiles(stdClass $raw, string $key, string $basePath): array
+    private static function retrieveFiles(stdClass $raw, string $key, string $basePath, array $composerFiles = []): array
     {
+        $files = [];
+
+        if (isset($composerFiles[0][0])) {
+            $files[] = $composerFiles[0][0];
+        }
+
+        if (isset($composerFiles[1][1])) {
+            $files[] = $composerFiles[1][0];
+        }
+
         if (false === isset($raw->{$key})) {
             return [];
         }
 
-        $files = (array) $raw->{$key};
+        $files = array_merge((array) $raw->{$key}, $files);
 
         Assertion::allString($files);
 
@@ -982,18 +1024,37 @@ BANNER;
 
     private static function retrieveComposerFiles(string $basePath): array
     {
-        $composerJson = canonicalize($basePath.'/composer.json');
-        $composerLock = canonicalize($basePath.'/composer.lock');
+        $retrieveFileAndContents = function (string $file): array {
+            $json = new Json();
 
-        if (false === file_exists($composerJson) || false === is_file($composerJson) || false === is_readable($composerJson)) {
-            $composerJson = null;
-        }
+            if (false === file_exists($file) || false === is_file($file) || false === is_readable($file)) {
+                return [null, null];
+            }
 
-        if (false === file_exists($composerLock) || false === is_file($composerLock) || false === is_readable($composerLock)) {
-            $composerLock = null;
-        }
+            try {
+                $contents = $json->decodeFile($file, true);
+            } catch (ParsingException $exception) {
+                throw new InvalidArgumentException(
+                    sprintf(
+                        'Expected the file "%s" to be a valid composer.json file but an error has been found: %s',
+                        $file,
+                        $exception->getMessage()
+                    ),
+                    0,
+                    $exception
+                );
+            }
 
-        return [$composerJson, $composerLock];
+            return [$file, $contents];
+        };
+
+        [$composerJson, $composerJsonContents] = $retrieveFileAndContents(canonicalize($basePath.'/composer.json'));
+        [$composerLock, $composerLockContents] = $retrieveFileAndContents(canonicalize($basePath.'/composer.lock'));
+
+        return [
+            [$composerJson, $composerJsonContents],
+            [$composerLock, $composerLockContents],
+        ];
     }
 
     /**

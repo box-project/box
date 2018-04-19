@@ -114,5 +114,6 @@ bin/box.phar: bin/box src vendor
 box_dev.json: box.json.dist
 	cat box.json.dist | sed -E 's/\"key\": \".+\",//g' | sed -E 's/\"algorithm\": \".+\",//g' | sed -E 's/\"alias\": \".+\",//g' > box_dev.json
 
+.PHONY: fixtures/default_stub.php
 fixtures/default_stub.php:
 	bin/generate_default_stub

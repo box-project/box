@@ -14,9 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
-use InvalidArgumentException;
 use KevinGH\Box\Test\FileSystemTestCase;
-use function KevinGH\Box\FileSystem\dump_file;
+use function json_decode;
 use function KevinGH\Box\FileSystem\mkdir;
 
 /**
@@ -221,66 +220,13 @@ JSON;
     public function test_it_returns_an_empty_list_when_trying_to_retrieve_the_list_of_dev_packages_when_no_composer_json_file_is_found(): void
     {
         $this->assertSame([], ComposerConfiguration::retrieveDevPackages($this->tmp, null, null));
-
-        dump_file('composer.lock', '{}');
-
-        $this->assertSame([], ComposerConfiguration::retrieveDevPackages($this->tmp, $this->tmp.'/composer.json', null));
-    }
-
-    public function test_it_cannot_retrieve_the_dev_packages_if_the_composer_file_is_invalid(): void
-    {
-        dump_file('composer.json'); // Invalid JSON
-        dump_file('composer.lock');
-
-        try {
-            ComposerConfiguration::retrieveDevPackages($this->tmp, $this->tmp.'/composer.json', $this->tmp.'/composer.lock');
-
-            $this->fail('Expected exception to be thrown.');
-        } catch (InvalidArgumentException $exception) {
-            $path = $this->tmp.'/composer.json';
-
-            $this->assertSame(
-                <<<EOF
-Expected the file "$path" to be a valid composer.json file but an error has been found: Parse error on line 1:
-
-^
-Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
-EOF
-                ,
-                $exception->getMessage()
-            );
-        }
-    }
-
-    public function test_it_cannot_retrieve_the_dev_packages_if_the_composer_lock_file_is_invalid(): void
-    {
-        dump_file('composer.json', '{}');
-        dump_file('composer.lock'); // Invalid JSON
-
-        try {
-            ComposerConfiguration::retrieveDevPackages($this->tmp, $this->tmp.'/composer.json', $this->tmp.'/composer.lock');
-
-            $this->fail('Expected exception to be thrown.');
-        } catch (InvalidArgumentException $exception) {
-            $path = $this->tmp.'/composer.lock';
-
-            $this->assertSame(
-                <<<EOF
-Expected the file "$path" to be a valid composer.json file but an error has been found: Parse error on line 1:
-
-^
-Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
-EOF
-                ,
-                $exception->getMessage()
-            );
-        }
+        $this->assertSame([], ComposerConfiguration::retrieveDevPackages($this->tmp, [], null));
     }
 
     public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file(): void
     {
-        dump_file('composer.json', '{}');
-        dump_file('composer.lock', self::COMPOSER_LOCK_SAMPLE);
+        $decodedComposerJson = [];
+        $decodedComposerLock = json_decode(self::COMPOSER_LOCK_SAMPLE, true);
 
         mkdir('vendor/bamarni/composer-bin-plugin');
         mkdir('vendor/doctrine/instantiator');
@@ -290,15 +236,15 @@ EOF
             $this->tmp.'/vendor/doctrine/instantiator',
         ];
 
-        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $this->tmp.'/composer.json', $this->tmp.'/composer.lock');
+        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock);
 
         $this->assertSame($expected, $actual);
     }
 
     public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file_2(): void
     {
-        dump_file('composer.json', '{"config": {}}');
-        dump_file('composer.lock', self::COMPOSER_LOCK_SAMPLE);
+        $decodedComposerJson = ['config' => []];
+        $decodedComposerLock = json_decode(self::COMPOSER_LOCK_SAMPLE, true);
 
         mkdir('vendor/bamarni/composer-bin-plugin');
         mkdir('vendor/doctrine/instantiator');
@@ -308,15 +254,15 @@ EOF
             $this->tmp.'/vendor/doctrine/instantiator',
         ];
 
-        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $this->tmp.'/composer.json', $this->tmp.'/composer.lock');
+        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock);
 
         $this->assertSame($expected, $actual);
     }
 
     public function test_it_ignores_non_existent_dev_packages_found_in_the_lock_file(): void
     {
-        dump_file('composer.json', '{}');
-        dump_file('composer.lock', self::COMPOSER_LOCK_SAMPLE);
+        $decodedComposerJson = [];
+        $decodedComposerLock = json_decode(self::COMPOSER_LOCK_SAMPLE, true);
 
         mkdir('vendor/bamarni/composer-bin-plugin');
         // Doctrine Instantiator vendor does not exists
@@ -325,24 +271,19 @@ EOF
             $this->tmp.'/vendor/bamarni/composer-bin-plugin',
         ];
 
-        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $this->tmp.'/composer.json', $this->tmp.'/composer.lock');
+        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock);
 
         $this->assertSame($expected, $actual);
     }
 
     public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file_in_a_custom_vendor_directory(): void
     {
-        dump_file(
-            'composer.json',
-            <<<'JSON'
-{
-    "config": {
-        "vendor-dir": "custom-vendor"
-    }
-}
-JSON
-        );
-        dump_file('composer.lock', self::COMPOSER_LOCK_SAMPLE);
+        $decodedComposerJson = [
+            'config' => [
+                'vendor-dir' => 'custom-vendor',
+            ],
+        ];
+        $decodedComposerLock = json_decode(self::COMPOSER_LOCK_SAMPLE, true);
 
         mkdir('custom-vendor/bamarni/composer-bin-plugin');
         mkdir('vendor/doctrine/instantiator');  // Wrong directory
@@ -351,16 +292,16 @@ JSON
             $this->tmp.'/custom-vendor/bamarni/composer-bin-plugin',
         ];
 
-        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $this->tmp.'/composer.json', $this->tmp.'/composer.lock');
+        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock);
 
         $this->assertSame($expected, $actual);
     }
 
     public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file_even_if_no_dev_package_is_registered(): void
     {
-        dump_file('composer.json', '{}');
-        dump_file(
-            'composer.lock',
+        $decodedComposerJson = [];
+
+        $decodedComposerLock = json_decode(
             <<<'JSON'
 {
     "_readme": [
@@ -459,6 +400,8 @@ JSON
     "platform-dev": []
 }
 JSON
+            ,
+            true
         );
 
         mkdir('custom-vendor/bamarni/composer-bin-plugin');
@@ -466,7 +409,7 @@ JSON
 
         $expected = [];
 
-        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $this->tmp.'/composer.json', $this->tmp.'/composer.lock');
+        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock);
 
         $this->assertSame($expected, $actual);
     }

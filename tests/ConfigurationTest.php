@@ -25,11 +25,14 @@ use KevinGH\Box\Console\ConfigurationHelper;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\Test\FileSystemTestCase;
 use Phar;
+use Seld\JsonLint\ParsingException;
 use stdClass;
+use function file_put_contents;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\FileSystem\symlink;
+use const DIRECTORY_SEPARATOR;
 
 /**
  * @covers \KevinGH\Box\Configuration
@@ -58,7 +61,7 @@ class ConfigurationTest extends FileSystemTestCase
         $this->file = make_path_absolute('box.json', $this->tmp);
 
         touch($defaultFile = self::DEFAULT_FILE);
-        touch($this->file);
+        file_put_contents($this->file, '{}');
 
         $this->config = Configuration::create($this->file, new stdClass());
     }
@@ -148,7 +151,7 @@ EOF
 
         $this->file = $this->tmp.'/sub-dir/box.json';
 
-        $this->setConfig([]);
+        $this->reloadConfig();
 
         $this->assertSame($this->tmp.'/sub-dir', $this->config->getBasePath());
     }
@@ -235,6 +238,85 @@ EOF
         $expected = $this->tmp.DIRECTORY_SEPARATOR.'dir';
 
         $this->assertSame($expected, $this->config->getBasePath());
+    }
+
+    /**
+     * @dataProvider provideJsonFiles
+     */
+    public function test_it_attempts_to_get_and_decode_the_json_and_lock_files(
+        callable $setup,
+        ?string $expectedJson,
+        ?array $expectedJsonContents,
+        ?string $expectedLock,
+        ?array $expectedLockContents
+    ): void {
+        $setup();
+
+        if (null !== $expectedJson) {
+            $expectedJson = $this->tmp.DIRECTORY_SEPARATOR.$expectedJson;
+        }
+
+        if (null !== $expectedLock) {
+            $expectedLock = $this->tmp.DIRECTORY_SEPARATOR.$expectedLock;
+        }
+
+        $this->reloadConfig();
+
+        $this->assertSame($expectedJson, $this->config->getComposerJson());
+        $this->assertSame($expectedJsonContents, $this->config->getComposerJsonDecodedContents());
+
+        $this->assertSame($expectedLock, $this->config->getComposerLock());
+        $this->assertSame($expectedLockContents, $this->config->getComposerLockDecodedContents());
+    }
+
+    public function test_it_throws_an_error_when_a_composer_file_is_found_but_invalid(): void
+    {
+        file_put_contents('composer.json', '');
+
+        try {
+            $this->reloadConfig();
+        } catch (InvalidArgumentException $exception) {
+            $composerJson = $this->tmp.'/composer.json';
+
+            $this->assertSame(
+                <<<EOF
+Expected the file "$composerJson" to be a valid composer.json file but an error has been found: Parse error on line 1:
+
+^
+Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
+EOF
+                ,
+                $exception->getMessage()
+            );
+            $this->assertSame(0, $exception->getCode());
+            $this->assertInstanceOf(ParsingException::class, $exception->getPrevious());
+        }
+    }
+
+    public function test_it_throws_an_error_when_a_composer_lock_is_found_but_invalid(): void
+    {
+        file_put_contents('composer.lock', '');
+
+        try {
+            $this->reloadConfig();
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $composerLock = $this->tmp.'/composer.lock';
+
+            $this->assertSame(
+                <<<EOF
+Expected the file "$composerLock" to be a valid composer.json file but an error has been found: Parse error on line 1:
+
+^
+Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
+EOF
+                ,
+                $exception->getMessage()
+            );
+            $this->assertSame(0, $exception->getCode());
+            $this->assertInstanceOf(ParsingException::class, $exception->getPrevious());
+        }
     }
 
     public function test_the_files_can_be_configured(): void
@@ -578,6 +660,8 @@ JSON
             'file1',    // 'files' & 'files-bin' are not affected by the blacklist filter
             'vendor/acme/foo/af0',
             'vendor/acme/foo/af1',
+            'composer.json',
+            'composer.lock',
             'vendor/acme/bar/ab0',
             'vendor/acme/bar/ab1',
             'C/fileC0',
@@ -1715,7 +1799,7 @@ JSON
             'E/finder_excluded_file',
         ];
 
-        $this->setConfig([]);
+        $this->reloadConfig();
 
         $actual = $this->normalizeConfigPaths($this->config->getFiles());
 
@@ -1796,7 +1880,7 @@ JSON
             'box.json',
         ];
 
-        $this->setConfig([]);
+        $this->reloadConfig();
 
         $actual = $this->normalizeConfigPaths($this->config->getFiles());
 
@@ -2037,7 +2121,7 @@ JSON
     {
         dump_file(self::DEFAULT_FILE, $expected = 'Default main script content');
 
-        $this->setConfig([]);
+        $this->reloadConfig();
 
         $this->assertSame($expected, $this->config->getMainScriptContents());
     }
@@ -2769,10 +2853,119 @@ COMMENT
         ];
     }
 
+    public function provideJsonFiles()
+    {
+        yield [
+            function (): void {},
+            null,
+            null,
+            null,
+            null,
+        ];
+
+        yield [
+            function (): void {
+                file_put_contents('composer.json', '{}');
+            },
+            'composer.json',
+            [],
+            null,
+            null,
+        ];
+
+        yield [
+            function (): void {
+                file_put_contents('composer.json', '{"name": "acme/foo"}');
+            },
+            'composer.json',
+            ['name' => 'acme/foo'],
+            null,
+            null,
+        ];
+
+        yield [
+            function (): void {
+                file_put_contents('composer.lock', '{}');
+            },
+            null,
+            null,
+            'composer.lock',
+            [],
+        ];
+
+        yield [
+            function (): void {
+                file_put_contents('composer.lock', '{"name": "acme/foo"}');
+            },
+            null,
+            null,
+            'composer.lock',
+            ['name' => 'acme/foo'],
+        ];
+
+        yield [
+            function (): void {
+                file_put_contents('composer.json', '{"name": "acme/foo"}');
+                file_put_contents('composer.lock', '{"name": "acme/bar"}');
+            },
+            'composer.json',
+            ['name' => 'acme/foo'],
+            'composer.lock',
+            ['name' => 'acme/bar'],
+        ];
+
+        yield [
+            function (): void {
+                mkdir('composer.json');
+            },
+            null,
+            null,
+            null,
+            null,
+        ];
+
+        yield [
+            function (): void {
+                mkdir('composer.lock');
+            },
+            null,
+            null,
+            null,
+            null,
+        ];
+
+        yield [
+            function (): void {
+                touch('composer.json');
+                chmod('composer.json', 0000);
+            },
+            null,
+            null,
+            null,
+            null,
+        ];
+
+        yield [
+            function (): void {
+                touch('composer.lock');
+                chmod('composer.lock', 0000);
+            },
+            null,
+            null,
+            null,
+            null,
+        ];
+    }
+
     private function setConfig(array $config): void
     {
         file_put_contents($this->file, json_encode($config, JSON_PRETTY_PRINT));
 
+        $this->reloadConfig();
+    }
+
+    private function reloadConfig(): void
+    {
         $configHelper = new ConfigurationHelper();
 
         $this->config = $configHelper->loadFile($this->file);

@@ -166,9 +166,8 @@ final class Box
 
     /**
      * @param SplFileInfo[]|string[] $files
-     * @param bool                   $binary
      */
-    public function addFiles(array $files, bool $binary): void
+    public function addFiles(array $files, bool $binary, bool $dumpAutoload = false): void
     {
         $files = array_map(
             function ($file): string {
@@ -204,8 +203,10 @@ final class Box
                 }
             }
 
-            // Dump autoload without dev dependencies
-            ComposerOrchestrator::dumpAutoload($this->scoper->getWhitelist(), $this->scoper->getPrefix());
+            if ($dumpAutoload) {
+                // Dump autoload without dev dependencies
+                ComposerOrchestrator::dumpAutoload($this->scoper->getWhitelist(), $this->scoper->getPrefix());
+            }
 
             chdir($cwd);
 
@@ -222,7 +223,6 @@ final class Box
      * @param string      $file
      * @param null|string $contents If null the content of the file will be used
      * @param bool        $binary   When true means the file content shouldn't be processed
-     * @param string      $root
      *
      * @return string File local path
      */

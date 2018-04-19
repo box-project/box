@@ -14,10 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
-use InvalidArgumentException;
-use KevinGH\Box\Json\Json;
-use Seld\JsonLint\ParsingException;
-use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 
 /**
@@ -31,46 +27,33 @@ final class ComposerConfiguration
      *
      * @return string[] Dev package paths
      */
-    public static function retrieveDevPackages(string $basePath, ?string $composerJson, ?string $composerLock): array
+    public static function retrieveDevPackages(string $basePath, ?array $composerJsonDecodedContents, ?array $composerLockDecodedContents): array
     {
-        if (null === $composerJson || null === $composerLock) {
+        if (null === $composerJsonDecodedContents || null === $composerLockDecodedContents) {
             return [];
         }
 
-        $composerJsonContents = file_contents($composerJson);
-        $composerLockContents = file_contents($composerLock);
-
         return self::getDevPackagePaths(
             $basePath,
-            $composerJson,
-            $composerJsonContents,
-            $composerLock,
-            $composerLockContents
+            $composerJsonDecodedContents,
+            $composerLockDecodedContents
         );
     }
 
     /**
-     * @param string $basePath
-     * @param string $composerFile
-     * @param string $composerFileContents
-     * @param string $composerLockFile
-     * @param string $composerLockFileContents
-     *
      * @return string[] Dev packages paths
      */
     private static function getDevPackagePaths(
         string $basePath,
-        string $composerFile,
-        string $composerFileContents,
-        string $composerLockFile,
-        string $composerLockFileContents
+        array $composerJsonDecodedContents,
+        array $composerLockDecodedContents
     ): array {
         $vendorDir = make_path_absolute(
-            self::getVendorDir($composerFile, $composerFileContents),
+            self::retrieveVendorDir($composerJsonDecodedContents),
             $basePath
         );
 
-        $packageNames = self::getDevPackageNames($composerLockFile, $composerLockFileContents);
+        $packageNames = self::retrieveDevPackageNames($composerLockDecodedContents);
 
         return array_filter(
             array_map(
@@ -84,56 +67,25 @@ final class ComposerConfiguration
         );
     }
 
-    private static function getVendorDir(string $composerFile, string $composerFileContents): string
+    private static function retrieveVendorDir(array $composerJsonDecodedContents): string
     {
-        try {
-            $config = (array) (new Json())->decode($composerFileContents, true);
-        } catch (ParsingException $exception) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Expected the file "%s" to be a valid composer.json file but an error has been found: %s',
-                    $composerFile,
-                    $exception->getMessage()
-                ),
-                0,
-                $exception->getPrevious()
-            );
-        }
-
-        if (!array_key_exists('config', $config)) {
+        if (!array_key_exists('config', $composerJsonDecodedContents)) {
             return 'vendor';
         }
 
-        if (!array_key_exists('vendor-dir', $config['config'])) {
+        if (!array_key_exists('vendor-dir', $composerJsonDecodedContents['config'])) {
             return 'vendor';
         }
 
-        return $config['config']['vendor-dir'];
+        return $composerJsonDecodedContents['config']['vendor-dir'];
     }
 
     /**
-     * @param string $composerLockFile
-     * @param string $composerLockFileContents
-     *
      * @return string[] Names of the dev packages
      */
-    private static function getDevPackageNames(string $composerLockFile, string $composerLockFileContents): array
+    private static function retrieveDevPackageNames(array $composerLockDecodedContents): array
     {
-        try {
-            $config = (new Json())->decode($composerLockFileContents, true);
-        } catch (ParsingException $exception) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Expected the file "%s" to be a valid composer.json file but an error has been found: %s',
-                    $composerLockFile,
-                    $exception->getMessage()
-                ),
-                0,
-                $exception->getPrevious()
-            );
-        }
-
-        if (!array_key_exists('packages-dev', $config)) {
+        if (!array_key_exists('packages-dev', $composerLockDecodedContents)) {
             return [];
         }
 
@@ -141,7 +93,7 @@ final class ComposerConfiguration
             function (array $package): string {
                 return $package['name'];
             },
-            $config['packages-dev']
+            $composerLockDecodedContents['packages-dev']
         );
     }
 }
