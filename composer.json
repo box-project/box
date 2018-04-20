@@ -21,7 +21,7 @@
         "amphp/parallel-functions": "^0.1.2",
         "beberlei/assert": "^2.8",
         "composer/composer": "^1.6",
-        "composer/xdebug-handler": "dev-master",
+        "composer/xdebug-handler": "^1.1.0",
         "herrera-io/annotations": "~1.0",
         "humbug/php-scoper": "^1.0@dev",
         "justinrainbow/json-schema": "^5.2",
