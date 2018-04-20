@@ -1,10 +1,10 @@
 ## From 3.0.0-alpha.1 to 3.0.0-alpha.2
 
-- Change the default PHAR output from `default.phar` to `index.phar`
+- Change the default PHAR output from `default.phar` to `index.phar` (#127)
 - When no configuration is provided or when the setting `main` is omitted, the value found in `composer.json#bin` will have the priority
-  over the default `index.php`
+  over the default `index.php` (#127)
 - When no configuraiton is provided or when the setting `output` is omitted, the default value will depend in the `input` value as opposed
-  to systematically `default.phar`
+  to systematically `default.phar` (#127)
 
 
 ## From 3.0.0-alpha.0 to 3.0.0-alpha.1
