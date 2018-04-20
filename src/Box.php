@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
-use function file_exists;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 use KevinGH\Box\PhpScoper\NullScoper;
@@ -28,6 +27,7 @@ use function Amp\ParallelFunctions\parallelMap;
 use function Amp\Promise\wait;
 use function array_map;
 use function chdir;
+use function file_exists;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\make_path_relative;

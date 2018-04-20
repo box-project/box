@@ -34,6 +34,7 @@ use stdClass;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
 use function array_filter;
+use function array_key_exists;
 use function array_map;
 use function array_merge;
 use function array_unique;
@@ -51,6 +52,7 @@ use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\longest_common_base_path;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\make_path_relative;
+use function preg_match;
 use function substr;
 use function uniqid;
 
@@ -59,7 +61,7 @@ use function uniqid;
  */
 final class Configuration
 {
-    private const DEFAULT_ALIAS = 'default.phar';
+    private const DEFAULT_ALIAS = 'test.phar';
     private const DEFAULT_MAIN_SCRIPT = 'index.php';
     private const DEFAULT_DATETIME_FORMAT = 'Y-m-d H:i:s';
     private const DEFAULT_REPLACEMENT_SIGIL = '@';
@@ -210,12 +212,12 @@ BANNER;
 
         $basePath = self::retrieveBasePath($file, $raw);
 
-        [$tmpOutputPath, $outputPath] = self::retrieveOutputPath($raw, $basePath);
+        $composerFiles = self::retrieveComposerFiles($basePath);
 
-        $mainScriptPath = self::retrieveMainScriptPath($raw, $basePath);
+        $mainScriptPath = self::retrieveMainScriptPath($raw, $basePath, $composerFiles[0][1]);
         $mainScriptContents = self::retrieveMainScriptContents($mainScriptPath);
 
-        $composerFiles = self::retrieveComposerFiles($basePath);
+        [$tmpOutputPath, $outputPath] = self::retrieveOutputPath($raw, $basePath, $mainScriptPath);
 
         $composerJson = $composerFiles[0];
         $composerLock = $composerFiles[1];
@@ -1006,9 +1008,18 @@ BANNER;
         return null;
     }
 
-    private static function retrieveMainScriptPath(stdClass $raw, string $basePath): string
+    private static function retrieveMainScriptPath(stdClass $raw, string $basePath, ?array $decodedJsonContents): string
     {
-        $main = isset($raw->main) ? $raw->main : self::DEFAULT_MAIN_SCRIPT;
+        if (isset($raw->main)) {
+            $main = $raw->main;
+        } else {
+            if (null === $decodedJsonContents
+                || false === array_key_exists('bin', $decodedJsonContents)
+                || false === $main = current($decodedJsonContents['bin'])
+            ) {
+                $main = self::DEFAULT_MAIN_SCRIPT;
+            }
+        }
 
         return self::normalizePath($main, $basePath);
     }
@@ -1106,12 +1117,17 @@ BANNER;
     /**
      * @return string[] The first element is the temporary output path and the second the real one
      */
-    private static function retrieveOutputPath(stdClass $raw, string $basePath): array
+    private static function retrieveOutputPath(stdClass $raw, string $basePath, string $mainScriptPath): array
     {
         if (isset($raw->output)) {
             $path = $raw->output;
         } else {
-            $path = self::DEFAULT_ALIAS;
+            if (1 === preg_match('/^(?<main>.*?)(?:\.[\p{L}\d]+)?$/', $mainScriptPath, $matches)) {
+                $path = $matches['main'].'.phar';
+            } else {
+                // Last resort, should not happen
+                $path = self::DEFAULT_ALIAS;
+            }
         }
 
         $tmp = $real = self::normalizePath($path, $basePath);
