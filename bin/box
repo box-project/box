@@ -51,12 +51,12 @@ $findPhpScoperFunctions = function () {
 $bootstrap = function () use ($findAutoloader, $findPhpScoperFunctions): void {
     require_once $findAutoloader();
     require_once $findPhpScoperFunctions();
+
+    \KevinGH\Box\register_aliases();
 };
 $bootstrap();
 
 $GLOBALS['bootstrap'] = $bootstrap;
-
-register_compactor_aliases();
 
 // Convert errors to exceptions
 set_error_handler(
