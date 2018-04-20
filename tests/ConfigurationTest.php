@@ -27,12 +27,13 @@ use KevinGH\Box\Test\FileSystemTestCase;
 use Phar;
 use Seld\JsonLint\ParsingException;
 use stdClass;
+use const DIRECTORY_SEPARATOR;
 use function file_put_contents;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_absolute;
+use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\FileSystem\symlink;
-use const DIRECTORY_SEPARATOR;
 
 /**
  * @covers \KevinGH\Box\Configuration
@@ -1873,7 +1874,7 @@ JSON
 
     public function test_the_existing_phars_are_ignored_when_all_the_files_are_collected(): void
     {
-        touch('default.phar');
+        touch('index.phar');
 
         // Relative to the current working directory for readability
         $expected = [
@@ -1887,6 +1888,7 @@ JSON
         $this->assertEquals($expected, $actual, '', .0, 10, true);
         $this->assertCount(0, $this->config->getBinaryFiles());
 
+        remove('index.phar');
         touch('default');
 
         // Relative to the current working directory for readability
@@ -2097,11 +2099,54 @@ JSON
     {
         $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'index.php', $this->config->getMainScriptPath());
         $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'index.php', $this->getNoFileConfig()->getMainScriptPath());
+
+        dump_file('composer.json', '{"bin": []}');
+
+        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'index.php', $this->config->getMainScriptPath());
+        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'index.php', $this->getNoFileConfig()->getMainScriptPath());
+    }
+
+    public function test_a_main_script_path_is_inferred_by_the_composer_json_by_default(): void
+    {
+        dump_file('bin/foo');
+        dump_file('bin/bar');
+
+        dump_file(
+            'composer.json',
+            <<<'JSON'
+{
+    "bin": [
+        "bin/foo",
+        "bin/bar"
+    ]
+}
+JSON
+        );
+
+        $this->reloadConfig();
+
+        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'bin/foo', $this->config->getMainScriptPath());
+        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'bin/foo', $this->getNoFileConfig()->getMainScriptPath());
     }
 
     public function test_main_script_can_be_configured(): void
     {
         touch('test.php');
+
+        dump_file('bin/foo');
+        dump_file('bin/bar');
+
+        dump_file(
+            'composer.json',
+            <<<'JSON'
+{
+    "bin": [
+        "bin/foo",
+        "bin/bar"
+    ]
+}
+JSON
+        );
 
         $this->setConfig(['main' => 'test.php']);
 
@@ -2223,11 +2268,11 @@ JSON
     public function test_get_default_output_path(): void
     {
         $this->assertSame(
-            $this->tmp.DIRECTORY_SEPARATOR.'default.phar',
+            $this->tmp.DIRECTORY_SEPARATOR.'index.phar',
             $this->config->getOutputPath()
         );
         $this->assertSame(
-            $this->tmp.DIRECTORY_SEPARATOR.'default.phar',
+            $this->tmp.DIRECTORY_SEPARATOR.'index.phar',
             $this->config->getTmpOutputPath()
         );
     }
@@ -2306,7 +2351,7 @@ JSON
         );
     }
 
-    public function test_the_output_path_can_not_have_a_PHAR_extension(): void
+    public function test_the_output_path_can_omit_the_PHAR_extension(): void
     {
         $this->setConfig([
             'files' => [self::DEFAULT_FILE],
@@ -2320,6 +2365,20 @@ JSON
         $this->assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'test.phar',
             $this->config->getTmpOutputPath()
+        );
+    }
+
+    public function test_get_default_output_path_depends_on_the_input(): void
+    {
+        dump_file('bin/acme');
+
+        $this->setConfig([
+            'main' => 'bin/acme',
+        ]);
+
+        $this->assertSame(
+            $this->tmp.'/bin/acme.phar',
+            $this->config->getOutputPath()
         );
     }
 

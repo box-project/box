@@ -1,8 +1,8 @@
 # Configuration
 
 1. [Base path][base-path]
-1. [Output][output]
 1. [Main][main]
+1. [Output][output]
 1. [Permissions][permissions]
 1. [Including files][including-files]
     1. [Files (`files` and `files-bin`)][files]
@@ -76,25 +76,28 @@ If set to `null` or not specified, the base path used is the directory containin
 configuration file is given or the current working directory otherwise.
 
 
-## Output (`output`)
-
-The output (`string`) setting specifies the file name and path of the newly built PHAR. If the value of the setting is
-not an absolute path, the path will be relative to the base path.
-
-If not provided, the default value used will be `default.phar`.
-
-
 ## Main (`main`)
 
 The main (`string`) setting is used to specify the file (relative to [`base-path`][base-path]) that will be run when the
 PHAR is executed from the command line (To not confuse with the [stub][stub] which is the PHAR bootstrapping file).
 
-The default file used is `index.php`.
+When the parameter is not given, Box tries to guess the binary of the application with the `composer.json` file. If the
+[Composer `bin`][composer-bin] is set, Box will pick the first value provided. Otherwise it will fallback on the
+[PHAR][phar class] default file used which is `index.php`.
 
 The main file contents is processed by the [compactors][compactors] as the other files. 
 
 If the main file starts with a shebang line (`#!`), it will be automatically removed (the shebang line goes in the
 [stub][stub] for a PHAR and is configured by the [shebang][shebang] setting).
+
+
+## Output (`output`)
+
+The output (`string`) setting specifies the file name and path of the newly built PHAR. If the value of the setting is
+not an absolute path, the path will be relative to the base path.
+
+If not provided, the default value used will based on the [`main`][main]. For example if the main file is `bin/acme.php`
+or `bin/acme` then the output will be `bin/acme.phar`.
 
 
 ## Permissions (`chmod`)
@@ -505,6 +508,7 @@ The metadata (`any`) setting can be any value. This value will be stored as meta
 [shebang]: #shebang-shebang
 [banner]: #banner-banner
 [banner-file]: #banner-file-banner-file
+[phar class]: https://secure.php.net/manual/en/class.phar.php
 [phar.mapphar]: https://secure.php.net/manual/en/phar.mapphar.php
 [phar.setalias]: https://secure.php.net/manual/en/phar.setalias.php
 [phar.webphar]: https://secure.php.net/manual/en/phar.webphar.php
@@ -520,7 +524,7 @@ The metadata (`any`) setting can be any value. This value will be stored as meta
 [compression]: #compression-algorithm-compression
 [algorithm]: #signing-algorithm-algorithm
 [metadata]: #metadata-metadata
-
+[composer-bin]: https://getcomposer.org/doc/04-schema.md#bin
 
 
 
