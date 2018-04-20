@@ -68,6 +68,8 @@ e2e: box_dev.json
 
 	php box.phar compile
 
+	php bin/box.phar compile --working-dir fixtures/build/dir010
+
 	rm box.phar bin/box.phar
 
 .PHONY: blackfire
