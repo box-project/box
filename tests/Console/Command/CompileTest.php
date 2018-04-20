@@ -254,7 +254,7 @@ PHP;
 
 Box (repo)
 
-Building the PHAR "/path/to/tmp/default.phar"
+Building the PHAR "/path/to/tmp/index.phar"
 ? No compactor to register
 ? Adding main file: /path/to/tmp/index.php
 ? Adding binary files
@@ -282,11 +282,11 @@ OUTPUT;
 
         $this->assertSame(
             'Hello, world!',
-            exec('php default.phar'),
+            exec('php index.phar'),
             'Expected PHAR to be executable'
         );
 
-        $phar = new Phar('default.phar');
+        $phar = new Phar('index.phar');
 
         // Check PHAR content
         $actualStub = preg_replace(
@@ -351,7 +351,7 @@ PHP;
 
         $this->assertSame(
             'Hello, world!',
-            exec('php default.phar'),
+            exec('php index.phar'),
             'Expected PHAR to be executable'
         );
     }
@@ -1080,8 +1080,8 @@ Box (repo)
 
  // Loading the configuration file "/path/to/box.json.dist".
 
-? Removing the existing PHAR "/path/to/tmp/default.phar"
-* Building the PHAR "/path/to/tmp/default.phar"
+? Removing the existing PHAR "/path/to/tmp/test.phar"
+* Building the PHAR "/path/to/tmp/test.phar"
 ? Setting replacement values
   + @name@: world
 ? No compactor to register
@@ -1111,7 +1111,7 @@ OUTPUT;
 
         $this->assertSame(
             'Hello, world!',
-            exec('php default.phar'),
+            exec('php test.phar'),
             'Expected PHAR to be executable'
         );
     }
@@ -1144,7 +1144,7 @@ Box (repo)
 
  // Loading the configuration file "/path/to/box.json.dist".
 
-* Building the PHAR "/path/to/tmp/default.phar"
+* Building the PHAR "/path/to/tmp/test.phar"
 ? Setting replacement values
   + @name@: world
 ? No compactor to register
@@ -1174,7 +1174,7 @@ OUTPUT;
 
         $this->assertSame(
             'Hello, world!',
-            exec('php default.phar'),
+            exec('php test.phar'),
             'Expected PHAR to be executable'
         );
     }
@@ -1509,11 +1509,11 @@ OUTPUT;
 
         $this->assertSame(
             '',
-            exec('php default.phar'),
+            exec('php index.phar'),
             'Expected PHAR to be executable'
         );
 
-        $phar = new Phar('default.phar');
+        $phar = new Phar('index.phar');
 
         // Check the stub content
         $actualStub = DisplayNormalizer::removeTrailingSpaces($phar->getStub());

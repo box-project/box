@@ -61,7 +61,7 @@ use function uniqid;
  */
 final class Configuration
 {
-    private const DEFAULT_ALIAS = 'default.phar';
+    private const DEFAULT_ALIAS = 'test.phar';
     private const DEFAULT_MAIN_SCRIPT = 'index.php';
     private const DEFAULT_DATETIME_FORMAT = 'Y-m-d H:i:s';
     private const DEFAULT_REPLACEMENT_SIGIL = '@';
