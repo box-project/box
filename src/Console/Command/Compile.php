@@ -26,6 +26,7 @@ use KevinGH\Box\MapFile;
 use KevinGH\Box\PhpSettingsHandler;
 use KevinGH\Box\StubGenerator;
 use RuntimeException;
+use stdClass;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -74,6 +75,7 @@ HELP;
 
     private const DEBUG_OPTION = 'debug';
     private const DEV_OPTION = 'dev';
+    private const NO_CONFIG_OPTION = 'no-config';
 
     /**
      * {@inheritdoc}
@@ -98,6 +100,12 @@ HELP;
             InputOption::VALUE_NONE,
             'Skips the compression step'
         );
+        $this->addOption(
+            self::NO_CONFIG_OPTION,
+            null,
+            InputOption::VALUE_NONE,
+            'Ignore the config file even when one is specified with the --config option'
+        );
 
         $this->configureWorkingDirOption();
     }
@@ -120,7 +128,10 @@ HELP;
         $io->writeln($this->getApplication()->getHelp());
         $io->writeln('');
 
-        $config = $this->getConfig($input, $output, true);
+        $config = $input->getOption(self::NO_CONFIG_OPTION)
+            ? Configuration::create(null, new stdClass())
+            : $this->getConfig($input, $output, true)
+        ;
         $path = $config->getOutputPath();
 
         $logger = new BuildLogger($io);

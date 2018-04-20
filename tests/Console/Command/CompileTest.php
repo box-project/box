@@ -1689,6 +1689,49 @@ OUTPUT;
         );
     }
 
+    public function test_it_can_build_a_PHAR_ignoring_the_configuration(): void
+    {
+        mirror(self::FIXTURES_DIR.'/dir009', $this->tmp);
+
+        $commandTester = $this->getCommandTester();
+
+        $commandTester->execute(
+            [
+                'command' => 'compile',
+                '--no-config' => null,
+            ],
+            ['interactive' => true]
+        );
+
+        $this->assertSame(
+            'Index',
+            exec('php index.phar'),
+            'Expected PHAR to be executable'
+        );
+    }
+
+    public function test_it_ignores_the_config_given_when_the_no_config_setting_is_set(): void
+    {
+        mirror(self::FIXTURES_DIR.'/dir009', $this->tmp);
+
+        $commandTester = $this->getCommandTester();
+
+        $commandTester->execute(
+            [
+                'command' => 'compile',
+                '--config' => 'box.json',
+                '--no-config' => null,
+            ],
+            ['interactive' => true]
+        );
+
+        $this->assertSame(
+            'Index',
+            exec('php index.phar'),
+            'Expected PHAR to be executable'
+        );
+    }
+
     public function provideAliasConfig(): Generator
     {
         yield [true];
