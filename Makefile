@@ -27,7 +27,7 @@ compile:
 	rm -f bin/box.phar
 
 	# Build the PHAR
-	php -d phar.readonly=0 bin/box compile $(args)
+	php bin/box compile $(args)
 
 
 ##
@@ -41,17 +41,17 @@ test: tu e2e
 .PHONY: tu
 tu:		## Run the unit tests
 tu: vendor/bin/phpunit fixtures/default_stub.php
-	php -d phar.readonly=0 -d zend.enable_gc=0 bin/phpunit
+	php -d zend.enable_gc=0 bin/phpunit
 
 .PHONY: tc
 tc:		## Run the unit tests with code coverage
 tc: vendor/bin/phpunit
-	phpdbg -qrr -d phar.readonly=0 -d zend.enable_gc=0 bin/phpunit --coverage-html=dist/coverage --coverage-text
+	phpdbg -qrr -d zend.enable_gc=0 bin/phpunit --coverage-html=dist/coverage --coverage-text
 
 .PHONY: tm
 tm:		## Run Infection
 tm:	vendor/bin/phpunit fixtures/default_stub.php
-	php -d phar.readonly=0 -d zend.enable_gc=0 bin/infection
+	php -d zend.enable_gc=0 bin/infection
 
 .PHONY: e2e
 e2e:		## Run the end-to-end tests
@@ -61,8 +61,12 @@ e2e: box_dev.json
 	rm box.phar || true
 	mv -v bin/box.phar .
 
-	# TODO: use the build step again otherwise it is going to include the dev files
-	php -d phar.readonly=0 box.phar compile
+	php box.phar compile
+
+	rm box.phar || true
+	mv -v bin/box.phar .
+
+	php box.phar compile
 
 	rm box.phar bin/box.phar
 
@@ -78,11 +82,11 @@ blackfire: bin/box src vendor
 	composer dump-autoload --classmap-authoritative
 
 	# Profile compiling the PHAR from the source code
-	blackfire --reference=1 --samples=5 run php -d zend.enable_gc=0 -d phar.readonly=0 bin/box compile --quiet
+	blackfire --reference=1 --samples=5 run php -d zend.enable_gc=0 bin/box compile --quiet
 
 	# Profile compiling the PHAR from the PHAR
 	mv -fv bin/box.phar .
-	blackfire --reference=2 --samples=5 run php -d zend.enable_gc=0 -d phar.readonly=0 box.phar compile --quiet
+	blackfire --reference=2 --samples=5 run php -d zend.enable_gc=0 box.phar compile --quiet
 
 	# Cleanup
 	composer install

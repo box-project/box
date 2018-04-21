@@ -12,6 +12,8 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
+$classLoaderContents = file_get_contents(__DIR__.'/vendor/composer/composer/src/Composer/Autoload/ClassLoader.php');
+
 return [
     'patchers' => [
         function (string $filePath, string $prefix, string $contents): string {
@@ -57,6 +59,23 @@ return [
                 '\\KevinGH\\\Box\\Compactor\\',
                 $contents
             );
+        },
+        function (string $filePath, string $prefix, string $contents): string {
+            if ('vendor/composer/composer/src/Composer/Autoload/AutoloadGenerator.php' !== $filePath) {
+                return $contents;
+            }
+
+            return preg_replace(
+                sprintf(
+                    '/\$loader = new \\\\%s\\\\Composer\\\\Autoload\\\\ClassLoader\(\)/',
+                    $prefix
+                ),
+                '$loader = new \Composer\Autoload\ClassLoader();',
+                $contents
+            );
+        },
+        function (string $filePath, string $prefix, string $contents) use ($classLoaderContents): string {
+            return 'vendor/composer/composer/src/Composer/Autoload/ClassLoader.php' === $filePath ? $classLoaderContents : $contents;
         },
     ],
     'whitelist' => [
