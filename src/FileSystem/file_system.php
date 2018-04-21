@@ -17,6 +17,7 @@ namespace KevinGH\Box\FileSystem;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Traversable;
+use Webmozart\PathUtil\Path;
 
 /**
  * Canonicalizes the given path.
@@ -295,13 +296,7 @@ function change_extension(string $path, string $extension): string
  */
 function is_absolute_path(string $path): bool
 {
-    static $fileSystem;
-
-    if (null === $fileSystem) {
-        $fileSystem = new FileSystem();
-    }
-
-    return $fileSystem->isAbsolutePath($path);
+    return Path::isAbsolute($path);
 }
 
 /**

@@ -13,10 +13,9 @@ declare(strict_types=1);
  */
 
 use org\bovigo\vfs\vfsStreamWrapper;
-use function KevinGH\Box\register_compactor_aliases;
 
-$loader = require __DIR__.'/../vendor/autoload.php';
+$loader = require __DIR__.'/../src/bootstrap.php';
+
+restore_error_handler();
 
 vfsStreamWrapper::register();
-
-register_compactor_aliases();

@@ -12,10 +12,17 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
+use Isolated\Symfony\Component\Finder\Finder;
+
 $classLoaderContents = file_get_contents(__DIR__.'/vendor/composer/composer/src/Composer/Autoload/ClassLoader.php');
 
 return [
     'patchers' => [
+        function (string $filePath, string $prefix, string $contents): string {
+            $finderClass = sprintf('\%s\%s', $prefix, Finder::class);
+
+            return str_replace($finderClass, '\\'.Finder::class, $contents);
+        },
         function (string $filePath, string $prefix, string $contents): string {
             $file = 'vendor/beberlei/assert/lib/Assert/Assertion.php';
 
@@ -79,6 +86,8 @@ return [
         },
     ],
     'whitelist' => [
+        \Composer\Autoload\ClassLoader::class,
+
         \Herrera\Box\Compactor\Javascript::class,
         \KevinGH\Box\Compactor\Javascript::class,
         \Herrera\Box\Compactor\Json::class,

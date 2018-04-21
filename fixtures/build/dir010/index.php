@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 
 declare(strict_types=1);
@@ -13,11 +12,4 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box;
-
-use KevinGH\Box\Console\Application;
-
-require __DIR__.'/../src/bootstrap.php';
-
-$app = new Application();
-$app->run();
+echo 'Index';

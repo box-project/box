@@ -69,8 +69,14 @@ function formatted_filesize(string $path)
 /**
  * @private
  */
-function register_compactor_aliases(): void
+function register_aliases(): void
 {
+    // Exposes the finder used by PHP-Scoper PHAR to allow its usage in the configuration file.
+    if (false === class_exists(\Isolated\Symfony\Component\Finder\Finder::class)) {
+        class_alias(\Symfony\Component\Finder\Finder::class, \Isolated\Symfony\Component\Finder\Finder::class);
+    }
+
+    // Register compactors aliases
     if (false === class_exists(\Herrera\Box\Compactor\Javascript::class, false)) {
         class_alias(\KevinGH\Box\Compactor\Javascript::class, \Herrera\Box\Compactor\Javascript::class);
     }

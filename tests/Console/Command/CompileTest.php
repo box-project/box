@@ -1732,6 +1732,24 @@ OUTPUT;
         );
     }
 
+    public function test_it_can_build_a_PHAR_with_a_PHPScoper_config(): void
+    {
+        mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
+
+        $commandTester = $this->getCommandTester();
+
+        $commandTester->execute(
+            ['command' => 'compile'],
+            ['interactive' => true]
+        );
+
+        $this->assertSame(
+            'Index',
+            exec('php index.phar'),
+            'Expected PHAR to be executable'
+        );
+    }
+
     public function provideAliasConfig(): Generator
     {
         yield [true];
