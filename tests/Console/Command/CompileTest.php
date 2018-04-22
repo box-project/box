@@ -174,16 +174,11 @@ PHP;
         $expectedFiles = [
             '/.box/',
             '/.box/.requirements.php',
-            '/.box/actual_terminal_diff',
             '/.box/bin/',
             '/.box/bin/check-requirements.php',
-            '/.box/box.json.dist',
             '/.box/check_requirements.php',
             '/.box/composer.json',
             '/.box/composer.lock',
-            '/.box/expected_terminal_diff',
-            '/.box/phpunit.xml.dist',
-            '/.box/scoper.inc.php',
             '/.box/src/',
             '/.box/src/Checker.php',
             '/.box/src/IO.php',
@@ -191,13 +186,6 @@ PHP;
             '/.box/src/Requirement.php',
             '/.box/src/RequirementCollection.php',
             '/.box/src/Terminal.php',
-            '/.box/tests/',
-            '/.box/tests/CheckerTest.php',
-            '/.box/tests/DisplayNormalizer.php',
-            '/.box/tests/IOTest.php',
-            '/.box/tests/PrinterTest.php',
-            '/.box/tests/RequirementCollectionTest.php',
-            '/.box/tests/RequirementTest.php',
             '/.box/vendor/',
             '/.box/vendor/autoload.php',
             '/.box/vendor/composer/',
@@ -210,10 +198,6 @@ PHP;
             '/.box/vendor/composer/autoload_static.php',
             '/.box/vendor/composer/installed.json',
             '/.box/vendor/composer/semver/',
-            '/.box/vendor/composer/semver/CHANGELOG.md',
-            '/.box/vendor/composer/semver/LICENSE',
-            '/.box/vendor/composer/semver/README.md',
-            '/.box/vendor/composer/semver/composer.json',
             '/.box/vendor/composer/semver/src/',
             '/.box/vendor/composer/semver/src/Comparator.php',
             '/.box/vendor/composer/semver/src/Constraint/',
@@ -396,22 +380,28 @@ PHP;
         );
 
         $expectedFiles = [
-            '/a/',
-            '/a/deep/',
-            '/a/deep/test/',
-            '/a/deep/test/directory/',
-            '/a/deep/test/directory/test.php',
             '/bootstrap.php',
+            '/composer.json',
+            '/index.php',
             '/one/',
             '/one/test.php',
             '/two/',
             '/two/test.png',
+            '/vendor/',
+            '/vendor/autoload.php',
+            '/vendor/composer/',
+            '/vendor/composer/ClassLoader.php',
+            '/vendor/composer/LICENSE',
+            '/vendor/composer/autoload_classmap.php',
+            '/vendor/composer/autoload_namespaces.php',
+            '/vendor/composer/autoload_psr4.php',
+            '/vendor/composer/autoload_real.php',
+            '/vendor/composer/autoload_static.php',
             '/binary',
             '/private.key',
             '/test.phar',
             '/test.phar.pubkey',
             '/test.php',
-            '/index.php',
         ];
 
         $actualFiles = $this->retrievePharFiles($phar);
@@ -450,7 +440,6 @@ PHP;
                     'main' => 'run.php',
                     'map' => [
                         ['a/deep/test/directory' => 'sub'],
-                        ['' => 'other/'],
                     ],
                     'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
@@ -486,13 +475,11 @@ Building the PHAR "/path/to/tmp/test.phar"
   + KevinGH\Box\Compactor\Php
 ? Mapping paths
   - a/deep/test/directory > sub
-  - (all) > other/
 ? Adding main file: /path/to/tmp/run.php
-    > other/run.php
 ? Adding binary files
     > 1 file(s)
 ? Adding files
-    > 3 file(s)
+    > 4 file(s)
 ? Generating new stub
   - Using shebang line: #!/usr/bin/env php
   - Using banner:
@@ -545,7 +532,7 @@ OUTPUT;
 
 Phar::mapPhar('alias-test.phar');
 
-require 'phar://alias-test.phar/other/run.php';
+require 'phar://alias-test.phar/run.php';
 
 __HALT_COMPILER(); ?>
 
@@ -560,15 +547,25 @@ PHP;
         );
 
         $expectedFiles = [
-            '/other/',
-            '/other/one/',
-            '/other/one/test.php',
-            '/other/run.php',
-            '/other/test.php',
-            '/other/two/',
-            '/other/two/test.png',
+            '/composer.json',
+            '/one/',
+            '/one/test.php',
+            '/run.php',
             '/sub/',
             '/sub/test.php',
+            '/test.php',
+            '/two/',
+            '/two/test.png',
+            '/vendor/',
+            '/vendor/autoload.php',
+            '/vendor/composer/',
+            '/vendor/composer/ClassLoader.php',
+            '/vendor/composer/LICENSE',
+            '/vendor/composer/autoload_classmap.php',
+            '/vendor/composer/autoload_namespaces.php',
+            '/vendor/composer/autoload_psr4.php',
+            '/vendor/composer/autoload_real.php',
+            '/vendor/composer/autoload_static.php',
         ];
 
         $actualFiles = $this->retrievePharFiles($phar);
@@ -593,7 +590,6 @@ PHP;
                     'main' => 'run.php',
                     'map' => [
                         ['a/deep/test/directory' => 'sub'],
-                        ['' => 'other/'],
                     ],
                     'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
@@ -642,7 +638,7 @@ PHP;
 
 Phar::mapPhar('box-auto-generated-alias-__uniqid__.phar');
 
-require 'phar://box-auto-generated-alias-__uniqid__.phar/other/run.php';
+require 'phar://box-auto-generated-alias-__uniqid__.phar/run.php';
 
 __HALT_COMPILER(); ?>
 
@@ -674,7 +670,6 @@ PHP;
                     'main' => 'run.php',
                     'map' => [
                         ['a/deep/test/directory' => 'sub'],
-                        ['' => 'other/'],
                     ],
                     'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
@@ -715,13 +710,11 @@ Box (repo)
   + KevinGH\Box\Compactor\Php
 ? Mapping paths
   - a/deep/test/directory > sub
-  - (all) > other/
 ? Adding main file: /path/to/tmp/run.php
-    > other/run.php
 ? Adding binary files
     > 1 file(s)
 ? Adding files
-    > 3 file(s)
+    > 4 file(s)
 ? Generating new stub
   - Using shebang line: $shebang
   - Using banner:
@@ -773,7 +766,6 @@ OUTPUT;
                     'main' => 'run.php',
                     'map' => [
                         ['a/deep/test/directory' => 'sub'],
-                        ['' => 'other/'],
                     ],
                     'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
@@ -814,13 +806,11 @@ Box (repo)
   + KevinGH\Box\Compactor\Php
 ? Mapping paths
   - a/deep/test/directory > sub
-  - (all) > other/
 ? Adding main file: /path/to/tmp/run.php
-    > other/run.php
 ? Adding binary files
     > 1 file(s)
 ? Adding files
-    > 3 file(s)
+    > 4 file(s)
 ? Generating new stub
   - Using shebang line: #!__PHP_EXECUTABLE__
   - Using banner:
@@ -875,7 +865,6 @@ OUTPUT;
                     'main' => 'run.php',
                     'map' => [
                         ['a/deep/test/directory' => 'sub'],
-                        ['' => 'other/'],
                     ],
                     'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
@@ -955,7 +944,6 @@ OUTPUT;
                     'main' => 'run.php',
                     'map' => [
                         ['a/deep/test/directory' => 'sub'],
-                        ['' => 'other/'],
                     ],
                     'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
@@ -998,7 +986,7 @@ OUTPUT;
 
 if (class_exists('Phar')) {
     Phar::mapPhar('alias-test.phar');
-    require 'phar://' . __FILE__ . '/other/run.php';
+    require 'phar://' . __FILE__ . '/run.php';
 }
 
 __HALT_COMPILER(); ?>
@@ -1023,7 +1011,6 @@ PHP
                     'main' => 'run.php',
                     'map' => [
                         ['a/deep/test/directory' => 'sub'],
-                        ['' => 'other/'],
                     ],
                     'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
@@ -1069,7 +1056,6 @@ PHP
                     'main' => 'run.php',
                     'map' => [
                         ['a/deep/test/directory' => 'sub'],
-                        ['' => 'other/'],
                     ],
                     'output' => 'test.phar',
                 ]

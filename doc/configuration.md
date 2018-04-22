@@ -143,8 +143,9 @@ setting can be used to filter out some files from that selection.
 If you however want a more granular selection, you can use a combination of the following options: [`files`][files],
 [`files-bin`][files], [`directories`][directories], [`directories-bin`][directories], [`finder`][finder],
 [`finder-bin`][finder], [`blacklist`][blacklist].
-If any of the settings above except for [`blacklist`][blacklist] is set (this includes empty values), those settings
-will be used in order to collect the files instead to collect all the files available.
+
+If [`directories`][directories] or [`finder`][finder] is set (this includes empty values), Box will no longer try to
+guess which files should be included or not and will give you full control on it instead.
 
 **Note:** By default, dev dependencies are excluded for both strategies. However if you still which to include a file
 or directory from a dev dependency, you can do so by adding it via one of the following setting: [`files`][files],
