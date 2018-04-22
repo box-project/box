@@ -15,6 +15,30 @@
         }
     ],
 
+    "bin": [
+        "bin/box"
+    ],
+    "autoload": {
+        "psr-4": {
+            "KevinGH\\Box\\": "src"
+        },
+        "files": [
+            "src/FileSystem/file_system.php",
+            "src/functions.php"
+        ],
+        "exclude-from-classmap": [
+            "/Test/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "KevinGH\\Box\\": [
+                "fixtures",
+                "tests"
+            ]
+        }
+    },
+
     "require": {
         "php": "^7.1",
         "ext-phar": "*",
@@ -46,30 +70,6 @@
     "suggest": {
         "ext-openssl": "To accelerate private key generation."
     },
-
-    "autoload": {
-        "psr-4": {
-            "KevinGH\\Box\\": "src"
-        },
-        "files": [
-            "src/FileSystem/file_system.php",
-            "src/functions.php"
-        ],
-        "exclude-from-classmap": [
-            "/Test/"
-        ]
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "KevinGH\\Box\\": [
-                "fixtures",
-                "tests"
-            ]
-        }
-    },
-    "bin": [
-        "bin/box"
-    ],
 
     "config": {
         "bin-dir": "bin",
