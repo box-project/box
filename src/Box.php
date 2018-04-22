@@ -42,7 +42,7 @@ use function KevinGH\Box\FileSystem\remove;
  */
 final class Box
 {
-    public const DEBUG_DIR = '.box';
+    public const DEBUG_DIR = '.box_dump';
 
     /**
      * @var Compactor[]
