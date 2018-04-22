@@ -42,7 +42,7 @@ tu: tu_box tu_requirement_checker
 
 .PHONY: tu_box
 tu_box:			## Run the unit tests
-tu_box: bin/phpunit fixtures/default_stub.php
+tu_box: bin/phpunit fixtures/default_stub.php .requirement-checker
 	$(PHPNOGC) bin/phpunit
 
 .PHONY: tu_requirement_checker
