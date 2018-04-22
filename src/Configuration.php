@@ -14,8 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use function array_column;
-use function array_flip;
 use Assert\Assertion;
 use Closure;
 use DateTimeImmutable;
@@ -23,12 +21,9 @@ use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\Php as LegacyPhp;
 use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
 use InvalidArgumentException;
-use function is_array;
-use function iter\values;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Compactor\PhpScoper as PhpScoperCompactor;
 use KevinGH\Box\Composer\ComposerConfiguration;
-use function KevinGH\Box\FileSystem\is_absolute_path;
 use KevinGH\Box\Json\Json;
 use KevinGH\Box\PhpScoper\SimpleScoper;
 use Phar;
@@ -38,22 +33,25 @@ use SplFileInfo;
 use stdClass;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
+use function array_column;
 use function array_filter;
+use function array_flip;
 use function array_key_exists;
 use function array_map;
 use function array_merge;
 use function array_unique;
 use function file_exists;
 use function Humbug\PhpScoper\create_scoper;
+use function is_array;
 use function is_file;
 use function is_readable;
-use function iter\chain;
 use function iter\fn\method;
 use function iter\map;
 use function iter\toArray;
-use function iterator_to_array;
+use function iter\values;
 use function KevinGH\Box\FileSystem\canonicalize;
 use function KevinGH\Box\FileSystem\file_contents;
+use function KevinGH\Box\FileSystem\is_absolute_path;
 use function KevinGH\Box\FileSystem\longest_common_base_path;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\make_path_relative;
@@ -896,6 +894,11 @@ BANNER;
     ): array {
         $excludedPaths = array_flip($excludedPaths);
 
+        $toString = function ($file): string {
+            // @param string|SplFileInfo $file
+            return (string) $file;
+        };
+
         if (null !== $decodedJsonContents && array_key_exists('vendor-dir', $decodedJsonContents)) {
             $vendorDir = self::normalizePath($decodedJsonContents['vendor-dir'], $basePath);
         } else {
@@ -906,26 +909,18 @@ BANNER;
             $filesToAppend[] = self::normalizePath($vendorDir.'/composer/installed.json', $basePath);
 
             $vendorPackages = toArray(values(map(
-                function ($file): string {
-                    // Convert files to string as SplFileInfo is not serializable
-                    return (string) $file;
-                },
-                iterator_to_array(
-                    Finder::create()
-                        ->in($vendorDir)
-                        ->directories()
-                        ->depth(1)
-                )
+                $toString,
+                Finder::create()
+                    ->in($vendorDir)
+                    ->directories()
+                    ->depth(1)
             )));
 
             $vendorPackages = array_diff($vendorPackages, $devPackages);
 
             if (null === $decodedJsonContents || false === array_key_exists('autoload', $decodedJsonContents)) {
                 $files = toArray(values(map(
-                /** @param string|SplFileInfo $file */
-                    function ($file): string {
-                        return (string) $file;
-                    },
+                    $toString,
                     Finder::create()
                         ->in($basePath)
                         ->files()
@@ -933,10 +928,7 @@ BANNER;
                 )));
 
                 $directories = toArray(values(map(
-                /** @param string|SplFileInfo $file */
-                    function ($file): string {
-                        return (string) $file;
-                    },
+                    $toString,
                     Finder::create()
                         ->in($basePath)
                         ->notPath('vendor')
@@ -946,7 +938,7 @@ BANNER;
 
                 return [
                     array_merge($files, $filesToAppend),
-                    array_merge($directories, $vendorPackages)
+                    array_merge($directories, $vendorPackages),
                 ];
             }
 
@@ -983,7 +975,7 @@ BANNER;
 
         if (array_key_exists('classmap', $autoload)) {
             foreach ($autoload['classmap'] as $path) {
-                /** @var string $path */
+                // @var string $path
                 $paths[] = $path;
             }
         }
@@ -1060,21 +1052,50 @@ BANNER;
             ->ignoreVCS(true)
             ->ignoreDotFiles(true)
             // Remove build files
+            ->notName('composer.json')
             ->notName('Makefile')
+            ->notName('Vagrantfile')
+            ->notName('phpstan.neon*')
+            ->notName('infection*.json*')
+            ->notName('humbug*.json*')
+            ->notName('easy-coding-standard.neon*')
+            ->notName('phpbench.json*')
+            ->notName('phpcs.xml*')
+            ->notName('scoper.inc*')
+            ->notName('box*.json*')
+            ->notName('codecov.yml*')
+            ->exclude('build')
+            ->exclude('dist')
+            ->exclude('example')
+            ->exclude('examples')
             // Remove documentation
             ->notName('*.md')
-            ->exclude('doc')
-            ->exclude('docs')
+            ->notName('README*')
+            ->notName('LICENSE*')
+            ->notName('UPGRADE*')
+            ->notName('CONTRIBUTING*')
+            ->notName('CHANGELOG*')
+            ->notName('AUTHOR*')
+            ->notName('CONDUCT*')
+            ->notName('TODO*')
+            ->notPath('/doc.*/i')
             // Remove backup files
             ->notName('*~')
             ->notName('*.back')
             ->notName('*.swp')
-            // Remove PHPUnit tests
+            // Remove tests
             ->notName('*Test.php')
-            ->exclude('Tests')
-            ->exclude('tests')
-            ->exclude('test')
-            ->exclude('test_old')
+            ->notPath('/test.*/i')
+            ->notName('/phpunit.*\.xml(.dist)?/')
+            ->notName('/behat.*\.yml(.dist)?/')
+            ->exclude('spec')
+            ->exclude('specs')
+            ->exclude('features')
+            // Remove CI config
+            ->exclude('travis')
+            ->notName('travis.yml')
+            ->notName('appveyor.yml')
+            ->notName('build.xml*')
         ;
 
         $finder->append($files);

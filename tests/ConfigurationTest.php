@@ -1821,7 +1821,6 @@ JSON
     }
 }
 JSON
-
         );
 
         // Relative to the current working directory for readability
@@ -1938,7 +1937,6 @@ JSON
     }
 }
 JSON
-
         );
 
         $this->setConfig([
@@ -1965,7 +1963,193 @@ JSON
         $this->assertEquals($expected, $actual, '', .0, 10, true);
         $this->assertCount(0, $this->config->getBinaryFiles());
 
+        $actual = $this->normalizeConfigPaths($this->config->getFiles());
 
+        $this->assertEquals($expected, $actual, '', .0, 10, true);
+        $this->assertCount(0, $this->config->getBinaryFiles());
+    }
+
+    public function test_it_ignores_the_most_common_non_needed_files_when_guess_the_files_from_the_composer_json_file(): void
+    {
+        touch('main.php~');
+        touch('main.php.back');
+        touch('main.php.swp');
+
+        touch('phpunit.xml.dist');
+        touch('phpunit.xml');
+        touch('phpunit_infection.xml.dist');
+
+        touch('LICENSE');
+        touch('LICENSE.md');
+        touch('license');
+
+        touch('README');
+        touch('README.md');
+        touch('README_ru.md');
+        touch('README.rst');
+        touch('readme');
+
+        touch('UPGRADE');
+        touch('UPGRADE.md');
+        touch('upgrade');
+
+        touch('CHANGELOG');
+        touch('ChangeLog-7.1.md');
+        touch('CHANGELOG.md');
+        touch('changelog');
+
+        touch('CONTRIBUTING');
+        touch('CONTRIBUTING.md');
+        touch('contributing');
+
+        touch('TODO');
+        touch('TODO.md');
+        touch('todo');
+
+        touch('CONDUCT');
+        touch('CONDUCT.md');
+        touch('conduct');
+
+        touch('CODE_OF_CONDUCT.md');
+
+        touch('AUTHORS');
+        touch('AUTHORS.md');
+        touch('authors');
+
+        touch('MainTest.php');
+
+        touch('Makefile');
+
+        mkdir('doc');
+        touch('doc/file0');
+
+        mkdir('docs');
+        touch('docs/file0');
+
+        mkdir('src');
+        touch('src/.fileB0');
+        touch('src/foo.php');
+        touch('src/doc.md');
+        touch('src/doc.rst');
+        touch('src/composer.json');
+
+        mkdir('test');
+        touch('test/file0');
+
+        mkdir('tests');
+        touch('tests/file0');
+
+        mkdir('travis');
+        touch('travis/install-ev.sh');
+
+        mkdir('.travis');
+        touch('.travis/install-ev.sh');
+
+        touch('.travis.yml');
+        touch('appveyor.yml');
+
+        touch('phpdoc.dist.xml');
+        touch('phpdoc.xml');
+
+        touch('Vagrantfile');
+
+        touch('phpstan.neon.dist');
+        touch('phpstan.neon');
+        touch('phpstan-test.neon');
+
+        touch('infection.json.dist');
+        touch('infection.json');
+
+        touch('humbug.json.dist');
+        touch('humbug.json');
+
+        touch('easy-coding-standard.neon');
+        touch('easy-coding-standard.neon.dist');
+
+        touch('phpbench.json.dist');
+        touch('phpbench.json');
+
+        touch('phpcs.xml.dist');
+        touch('phpcs.xml');
+
+        touch('.php_cs.dist');
+        touch('.php_cs');
+        touch('.php_cs.cache');
+
+        touch('scoper.inc.php.dist');
+        touch('scoper.inc.php');
+
+        mkdir('example');
+        touch('example/file0');
+
+        mkdir('examples');
+        touch('examples/file0');
+
+        mkdir('build');
+        touch('build/file0');
+
+        mkdir('dist');
+        touch('dist/file0');
+
+        mkdir('specs');
+        touch('specs/file0');
+
+        mkdir('spec');
+        touch('spec/MainSpec.php');
+
+        mkdir('features');
+        touch('features/acme.feature');
+
+        touch('build.xml.dist');
+        touch('build.xml');
+
+        touch('.editorconfig');
+        touch('.gitattributes');
+        touch('.gitignore');
+
+        touch('behat.yml.dist');
+        touch('behat.yml');
+
+        touch('box.json.dist');
+        touch('box.json');
+        touch('box_dev.json');
+
+        touch('Dockerfile');
+
+        touch('codecov.yml.dist');
+        touch('codecov.yml');
+
+        touch('.styleci.yml.dist');
+        touch('.styleci.yml');
+
+        touch('.scrutiziner.yml.dist');
+        touch('.scrutiziner.yml');
+
+        file_put_contents(
+            'composer.json',
+            <<<'JSON'
+{
+    "autoload": {
+        "classmap": ["./"]
+    }
+}
+JSON
+        );
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'composer.json',
+            'src/foo.php',
+        ];
+
+        $noFileConfig = $this->getNoFileConfig();
+
+        $actual = $this->normalizeConfigPaths($noFileConfig->getFiles());
+
+        $this->assertEquals($expected, $actual, '', .0, 10, true);
+        $this->assertCount(0, $noFileConfig->getBinaryFiles());
+
+        $this->reloadConfig();
 
         $actual = $this->normalizeConfigPaths($this->config->getFiles());
 
@@ -2025,7 +2209,6 @@ JSON
     }
 }
 JSON
-
         );
 
         // Relative to the current working directory for readability

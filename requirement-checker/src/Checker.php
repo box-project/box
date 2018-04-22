@@ -19,7 +19,7 @@ namespace KevinGH\RequirementChecker;
  */
 final class Checker
 {
-    /** @var string|null */
+    /** @var null|string */
     private static $requirementsConfig;
 
     /**
