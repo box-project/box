@@ -327,7 +327,7 @@ EOF
         $logCompactors = function (Compactor $compactor) use ($logger): void {
             $compactorClassParts = explode('\\', get_class($compactor));
 
-            if (substr($compactorClassParts[0], 0, strlen('_HumbugBox'))) {
+            if ('_HumbugBox' === substr($compactorClassParts[0], 0, strlen('_HumbugBox'))) {
                 array_shift($compactorClassParts);
             }
 
