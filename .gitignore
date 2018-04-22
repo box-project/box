@@ -1,4 +1,4 @@
-/.box
+/.box_dump
 /*.phar
 /*.phar.sig
 /box.json

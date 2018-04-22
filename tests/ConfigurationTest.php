@@ -1911,9 +1911,9 @@ JSON
         touch('file0');
         touch('file1');
 
-        mkdir('.box');
-        touch('.box/file0');
-        touch('.box/file1');
+        mkdir('.box_dump');
+        touch('.box_dump/file0');
+        touch('.box_dump/file1');
 
         mkdir('A');
         touch('A/fileA0');
