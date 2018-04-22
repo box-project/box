@@ -419,8 +419,6 @@ EOF
 
         $actual = $this->normalizeConfigPaths($this->config->getFiles());
 
-        sort($actual);
-
         $this->assertSame($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());
     }
@@ -503,12 +501,12 @@ EOF
 
         // Relative to the current working directory for readability
         $expected = [
-            'sub-dir/file0',
-            'sub-dir/file1',
             'sub-dir/B/fileB0',
             'sub-dir/C/fileC0',
             'sub-dir/D/fileD0',
             'sub-dir/E/fileE0',
+            'sub-dir/file0',
+            'sub-dir/file1',
         ];
 
         $actual = $this->normalizeConfigPaths($this->config->getFiles());
@@ -581,12 +579,12 @@ EOF
 
         // Relative to the current working directory for readability
         $expected = [
-            'sub-dir/file0',
-            'sub-dir/file1',
             'sub-dir/B/fileB0',
             'sub-dir/C/fileC0',
             'sub-dir/D/fileD0',
             'sub-dir/E/fileE0',
+            'sub-dir/file0',
+            'sub-dir/file1',
         ];
 
         $actual = $this->normalizeConfigPaths($this->config->getFiles());
@@ -692,8 +690,6 @@ JSON
         ];
 
         $actual = $this->normalizeConfigPaths($this->config->getFiles());
-
-        sort($actual);
 
         $this->assertSame($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());
@@ -1046,8 +1042,6 @@ JSON
 
         $actual = $this->normalizeConfigPaths($this->config->getBinaryFiles());
 
-        sort($actual);
-
         $this->assertSame($expected, $actual);
         $this->assertCount(1, $this->config->getFiles());
     }
@@ -1118,12 +1112,12 @@ JSON
 
         // Relative to the current working directory for readability
         $expected = [
-            'sub-dir/file0',
-            'sub-dir/file1',
             'sub-dir/B/fileB0',
             'sub-dir/C/fileC0',
             'sub-dir/D/fileD0',
             'sub-dir/E/fileE0',
+            'sub-dir/file0',
+            'sub-dir/file1',
         ];
 
         $actual = $this->normalizeConfigPaths($this->config->getBinaryFiles());
@@ -1197,12 +1191,12 @@ JSON
 
         // Relative to the current working directory for readability
         $expected = [
-            'sub-dir/file0',
-            'sub-dir/file1',
             'sub-dir/B/fileB0',
             'sub-dir/C/fileC0',
             'sub-dir/D/fileD0',
             'sub-dir/E/fileE0',
+            'sub-dir/file0',
+            'sub-dir/file1',
         ];
 
         $actual = $this->normalizeConfigPaths($this->config->getBinaryFiles());
@@ -1848,14 +1842,14 @@ JSON
 
         $actual = $this->normalizeConfigPaths($noFileConfig->getFiles());
 
-        $this->assertEquals($expected, $actual, '', .0, 10, true);
+        $this->assertEquals($expected, $actual);
         $this->assertCount(0, $noFileConfig->getBinaryFiles());
 
         $this->reloadConfig();
 
         $actual = $this->normalizeConfigPaths($this->config->getFiles());
 
-        $this->assertEquals($expected, $actual, '', .0, 10, true);
+        $this->assertEquals($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());
     }
 
@@ -1960,12 +1954,12 @@ JSON
 
         $actual = $this->normalizeConfigPaths($this->config->getFiles());
 
-        $this->assertEquals($expected, $actual, '', .0, 10, true);
+        $this->assertEquals($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());
 
         $actual = $this->normalizeConfigPaths($this->config->getFiles());
 
-        $this->assertEquals($expected, $actual, '', .0, 10, true);
+        $this->assertEquals($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());
     }
 
@@ -2146,14 +2140,14 @@ JSON
 
         $actual = $this->normalizeConfigPaths($noFileConfig->getFiles());
 
-        $this->assertEquals($expected, $actual, '', .0, 10, true);
+        $this->assertEquals($expected, $actual);
         $this->assertCount(0, $noFileConfig->getBinaryFiles());
 
         $this->reloadConfig();
 
         $actual = $this->normalizeConfigPaths($this->config->getFiles());
 
-        $this->assertEquals($expected, $actual, '', .0, 10, true);
+        $this->assertEquals($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());
     }
 
@@ -2168,7 +2162,7 @@ JSON
 
         $actual = $this->normalizeConfigPaths($this->config->getFiles());
 
-        $this->assertEquals($expected, $actual, '', .0, 10, true);
+        $this->assertEquals($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());
 
         remove('index.phar');
@@ -2183,7 +2177,7 @@ JSON
 
         $actual = $this->normalizeConfigPaths($this->config->getFiles());
 
-        $this->assertEquals($expected, $actual, '', .0, 10, true);
+        $this->assertEquals($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());
     }
 
@@ -2213,19 +2207,18 @@ JSON
 
         // Relative to the current working directory for readability
         $expected = [
-            'box.json',
-            'file0',
-            'file1',
-            'composer.json',
             'A/fileA0',
             'A/fileA1',
+            'composer.json',
+            'file0',
+            'file1',
         ];
 
         $noFileConfig = $this->getNoFileConfig();
 
         $actual = $this->normalizeConfigPaths($noFileConfig->getFiles());
 
-        $this->assertEquals($expected, $actual, '', .0, 10, true);
+        $this->assertEquals($expected, $actual);
         $this->assertCount(0, $noFileConfig->getBinaryFiles());
     }
 
@@ -3366,7 +3359,7 @@ COMMENT
     {
         $root = $this->tmp;
 
-        return array_values(
+        $files = array_values(
             array_map(
                 function (string $file) use ($root): string {
                     return str_replace($root.DIRECTORY_SEPARATOR, '', $file);
@@ -3374,6 +3367,10 @@ COMMENT
                 $files
             )
         );
+
+        sort($files);
+
+        return $files;
     }
 
     private function getNoFileConfig(): Configuration
