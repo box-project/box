@@ -4,6 +4,7 @@
 1. [Main][main]
 1. [Output][output]
 1. [Permissions][permissions]
+1. [Check requirements][check-requirements]
 1. [Including files][including-files]
     1. [Files (`files` and `files-bin`)][files]
     1. [Directories (`directories` and `directories-bin`)][directories]
@@ -42,6 +43,7 @@ The configuration file is a JSON object saved to a file. Note that all settings 
     "banner-file": "?",
     "base-path": "?",
     "blacklist": "?",
+    "check-requirements": "?",
     "chmod": "?",
     "compactors": "?",
     "compression": "?",
@@ -107,6 +109,28 @@ an octal value e.g. `0750`. By default the permissions of the created PHAR are u
 
 Check the following [link](https://secure.php.net/manual/en/function.chmod.php) for more on the possible values.
 
+
+## Check requirements (`check-requirements`)
+
+The check requirements setting (`boolean`, `true` by default) is used to allow the PHAR to check for the application
+constraint before running. For example if the application shipped in the PHAR requires PHP 7.2+ and the extension
+`iconv`:
+
+```json
+{
+    "require": {
+        "php": "^7.2",
+        "ext-iconv": "*"
+    }
+}
+```
+
+When running the PHAR, before running the actual application, the PHAR will check that the PHP version used is PHP 7.2+ and
+that the extension `iconv` is loaded. If those requirements are not met, then a user friendly error message will be given
+to the user.
+
+This check will work for PHP 5.3+ and requires the existence of the `composer.lock` file. If no `composer.lock` file is found
+then the requirements check will not be added to the PHAR.
 
 
 ## Including files
@@ -524,6 +548,7 @@ The metadata (`any`) setting can be any value. This value will be stored as meta
 [compression]: #compression-algorithm-compression
 [algorithm]: #signing-algorithm-algorithm
 [metadata]: #metadata-metadata
+[check-requirements]: #check-requirements-check-requirements
 [composer-bin]: https://getcomposer.org/doc/04-schema.md#bin
 
 

@@ -27,9 +27,11 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Traversable;
+use function file_put_contents;
 use function KevinGH\Box\FileSystem\mirror;
 use function KevinGH\Box\FileSystem\rename;
 use function preg_replace;
+use function sort;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Compile
@@ -43,6 +45,9 @@ class CompileTest extends CommandTestCase
     public function test_it_can_build_a_PHAR_file(): void
     {
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+
+        file_put_contents('composer.json', '{}');
+        file_put_contents('composer.lock', '{}');
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
@@ -101,10 +106,11 @@ Building the PHAR "/path/to/tmp/test.phar"
 ? Mapping paths
   - a/deep/test/directory > sub
 ? Adding main file: /path/to/tmp/run.php
+? Adding requirements checker
 ? Adding binary files
     > 1 file(s)
 ? Adding files
-    > 3 file(s)
+    > 5 file(s)
 ? Generating new stub
   - Using shebang line: $shebang
   - Using banner:
@@ -148,6 +154,9 @@ $shebang
  */
 
 Phar::mapPhar('alias-test.phar');
+
+require 'phar://alias-test.phar/.box/check_requirements.php';
+
 require 'phar://alias-test.phar/run.php';
 
 __HALT_COMPILER(); ?>
@@ -163,6 +172,60 @@ PHP;
         );
 
         $expectedFiles = [
+            '/.box/',
+            '/.box/.requirements.php',
+            '/.box/actual_terminal_diff',
+            '/.box/bin/',
+            '/.box/bin/check-requirements.php',
+            '/.box/box.json.dist',
+            '/.box/check_requirements.php',
+            '/.box/composer.json',
+            '/.box/composer.lock',
+            '/.box/expected_terminal_diff',
+            '/.box/phpunit.xml.dist',
+            '/.box/scoper.inc.php',
+            '/.box/src/',
+            '/.box/src/Checker.php',
+            '/.box/src/IO.php',
+            '/.box/src/Printer.php',
+            '/.box/src/Requirement.php',
+            '/.box/src/RequirementCollection.php',
+            '/.box/src/Terminal.php',
+            '/.box/tests/',
+            '/.box/tests/CheckerTest.php',
+            '/.box/tests/DisplayNormalizer.php',
+            '/.box/tests/IOTest.php',
+            '/.box/tests/PrinterTest.php',
+            '/.box/tests/RequirementCollectionTest.php',
+            '/.box/tests/RequirementTest.php',
+            '/.box/vendor/',
+            '/.box/vendor/autoload.php',
+            '/.box/vendor/composer/',
+            '/.box/vendor/composer/ClassLoader.php',
+            '/.box/vendor/composer/LICENSE',
+            '/.box/vendor/composer/autoload_classmap.php',
+            '/.box/vendor/composer/autoload_namespaces.php',
+            '/.box/vendor/composer/autoload_psr4.php',
+            '/.box/vendor/composer/autoload_real.php',
+            '/.box/vendor/composer/autoload_static.php',
+            '/.box/vendor/composer/installed.json',
+            '/.box/vendor/composer/semver/',
+            '/.box/vendor/composer/semver/CHANGELOG.md',
+            '/.box/vendor/composer/semver/LICENSE',
+            '/.box/vendor/composer/semver/README.md',
+            '/.box/vendor/composer/semver/composer.json',
+            '/.box/vendor/composer/semver/src/',
+            '/.box/vendor/composer/semver/src/Comparator.php',
+            '/.box/vendor/composer/semver/src/Constraint/',
+            '/.box/vendor/composer/semver/src/Constraint/AbstractConstraint.php',
+            '/.box/vendor/composer/semver/src/Constraint/Constraint.php',
+            '/.box/vendor/composer/semver/src/Constraint/ConstraintInterface.php',
+            '/.box/vendor/composer/semver/src/Constraint/EmptyConstraint.php',
+            '/.box/vendor/composer/semver/src/Constraint/MultiConstraint.php',
+            '/.box/vendor/composer/semver/src/Semver.php',
+            '/.box/vendor/composer/semver/src/VersionParser.php',
+            '/composer.json',
+            '/composer.lock',
             '/one/',
             '/one/test.php',
             '/run.php',
@@ -171,9 +234,21 @@ PHP;
             '/test.php',
             '/two/',
             '/two/test.png',
+            '/vendor/',
+            '/vendor/autoload.php',
+            '/vendor/composer/',
+            '/vendor/composer/ClassLoader.php',
+            '/vendor/composer/LICENSE',
+            '/vendor/composer/autoload_classmap.php',
+            '/vendor/composer/autoload_namespaces.php',
+            '/vendor/composer/autoload_psr4.php',
+            '/vendor/composer/autoload_real.php',
+            '/vendor/composer/autoload_static.php',
         ];
 
         $actualFiles = $this->retrievePharFiles($phar);
+
+        sort($actualFiles);
 
         $this->assertSame($expectedFiles, $actualFiles);
     }
@@ -306,6 +381,7 @@ OUTPUT;
  */
 
 Phar::mapPhar('box-auto-generated-alias-__uniqid__.phar');
+
 require 'phar://box-auto-generated-alias-__uniqid__.phar/index.php';
 
 __HALT_COMPILER(); ?>
@@ -468,6 +544,7 @@ OUTPUT;
  */
 
 Phar::mapPhar('alias-test.phar');
+
 require 'phar://alias-test.phar/other/run.php';
 
 __HALT_COMPILER(); ?>
@@ -564,6 +641,7 @@ PHP;
  */
 
 Phar::mapPhar('box-auto-generated-alias-__uniqid__.phar');
+
 require 'phar://box-auto-generated-alias-__uniqid__.phar/other/run.php';
 
 __HALT_COMPILER(); ?>

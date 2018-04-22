@@ -22,7 +22,6 @@ use KevinGH\Box\PhpScoper\Scoper;
 use Phar;
 use RecursiveDirectoryIterator;
 use SplFileInfo;
-use const DIRECTORY_SEPARATOR;
 use function Amp\ParallelFunctions\parallelMap;
 use function Amp\Promise\wait;
 use function array_map;

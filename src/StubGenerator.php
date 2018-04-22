@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
+use KevinGH\Box\RequirementChecker\RequirementsDumper;
 
 /**
  * Generates a new PHP bootstrap loader stub for a PHAR.
@@ -23,6 +24,8 @@ use Assert\Assertion;
  */
 final class StubGenerator
 {
+    private const CHECK_FILE_NAME = RequirementsDumper::CHECK_FILE_NAME;
+
     private const STUB_TEMPLATE = <<<'STUB'
 __BOX_SHEBANG__
 <?php
@@ -58,6 +61,8 @@ STUB;
      * @var null|string The shebang line
      */
     private $shebang;
+
+    private $checkRequirements = true;
 
     /**
      * Creates a new instance of the stub generator.
@@ -141,6 +146,13 @@ STUB;
         return $this->shebang;
     }
 
+    public function checkRequirements(bool $checkRequirements): self
+    {
+        $this->checkRequirements = $checkRequirements;
+
+        return $this;
+    }
+
     /**
      * Escapes an argument so it can be written as a string in a call.
      *
@@ -180,17 +192,41 @@ STUB;
 
     private function generatePharConfigStmt(): ?string
     {
+        $previous = false;
         $stub = [];
 
         if (null !== $aliasStmt = $this->getAliasStmt()) {
             $stub[] = $aliasStmt;
+
+            $previous = true;
         }
 
         if ($this->intercept) {
             $stub[] = 'Phar::interceptFileFuncs();';
+
+            $previous = true;
+        }
+
+        if (false !== $this->checkRequirements) {
+            if ($previous) {
+                $stub[] = '';
+            }
+
+            $checkRequirementsFile = self::CHECK_FILE_NAME;
+
+            $stub[] = null === $this->alias
+                ? "require 'phar://' . __FILE__ . '/.box/{$checkRequirementsFile}';"
+                : "require 'phar://{$this->alias}/.box/{$checkRequirementsFile}';"
+            ;
+
+            $previous = true;
         }
 
         if (null !== $this->index) {
+            if ($previous) {
+                $stub[] = '';
+            }
+
             $stub[] = null === $this->alias
                 ? "require 'phar://' . __FILE__ . '/{$this->index}';"
                 : "require 'phar://{$this->alias}/{$this->index}';"

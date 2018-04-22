@@ -1,0 +1,40 @@
+{
+    "name": "humbug/requirement-checker",
+    "description": "A tool to check the PHARs dependency requirements.",
+    "keywords": ["phar"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Théo Fidry",
+            "email": "theo.fidry@gmail.com"
+        }
+    ],
+
+    "bin": [
+        "bin/check-requirements.php"
+    ],
+    "autoload": {
+        "psr-4": {
+            "KevinGH\\RequirementChecker\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "KevinGH\\RequirementChecker\\": "tests"
+        }
+    },
+
+    "require": {
+        "php": "^5.3 || ^7.0",
+        "ext-phar": "*",
+        "composer/semver": "^1.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.0"
+    },
+
+    "config": {
+        "bin-dir": "bin",
+        "sort-packages": true
+    }
+}

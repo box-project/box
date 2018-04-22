@@ -1,0 +1,36 @@
+{
+    "packages": [
+        {
+            "name": "package-with-extensions",
+            "require": {
+                "php": ">=5.3",
+                "ext-json": "*",
+                "ext-ldap": "*",
+                "ext-random": "*"
+            }
+        },
+        {
+            "name": "polyfill",
+            "require-dev": {
+                "symfony/polyfill-random": "*"
+            }
+        }
+    ],
+    "packages-dev": [
+        {
+            "name": "dev-package",
+            "require": {
+                "php": "^7.2",
+                "ext-gettext": "*"
+            },
+            "require-dev": {
+                "php": "^7.3",
+                "ext-interbase": "*"
+            }
+        }
+    ],
+    "platform": {
+        "php": "^10",
+        "ext-phar": "*"
+    }
+}

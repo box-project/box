@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -euf -o pipefail
+
+readonly DOCKER=$(which docker)
+
+# Globals
+# PWD
+
+if [[ "$(docker images -q box_php53 2> /dev/null)" == "" ]]; then
+    $DOCKER build -t box_php53 -f "$PWD/.docker/php53" .
+fi
+
+if [[ "$(docker images -q box_php72 2> /dev/null)" == "" ]]; then
+    $DOCKER build -t box_php72 -f "$PWD/.docker/php72" .
+fi

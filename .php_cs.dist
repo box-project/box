@@ -75,6 +75,7 @@ $config = PhpCsFixer\Config::create()
             ->in('tests')
             ->append(['bin/box'])
             ->notName('default_stub.php')
+            ->exclude('check-requirements')
     )
 ;
 
