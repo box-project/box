@@ -15,9 +15,13 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Amp\MultiReasonException;
+use function array_shift;
 use Assert\Assertion;
 use DateTimeImmutable;
 use DateTimeZone;
+use function explode;
+use function get_class;
+use function implode;
 use KevinGH\Box\Box;
 use KevinGH\Box\Compactor;
 use KevinGH\Box\Configuration;
@@ -321,9 +325,15 @@ EOF
         );
 
         $logCompactors = function (Compactor $compactor) use ($logger): void {
+            $compactorClassParts = explode('\\', get_class($compactor));
+
+            if (substr($compactorClassParts, 0, strlen('_HumbugBox'))) {
+                array_shift($compactorClassParts);
+            }
+
             $logger->log(
                 BuildLogger::PLUS_PREFIX,
-                get_class($compactor)
+                implode('\\', $compactorClassParts)
             );
         };
 
