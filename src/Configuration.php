@@ -1078,7 +1078,9 @@ BANNER;
             ->notName('AUTHOR*')
             ->notName('CONDUCT*')
             ->notName('TODO*')
-            ->notPath('/doc.*/i')
+            ->exclude('doc')
+            ->exclude('docs')
+            ->exclude('documentation')
             // Remove backup files
             ->notName('*~')
             ->notName('*.back')

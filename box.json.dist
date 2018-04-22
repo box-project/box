@@ -1,7 +1,5 @@
 {
     "chmod": "0755",
-    "main": "bin/box",
-    "output": "bin/box.phar",
 
     "banner": [
         "This file is part of the box project.",
@@ -13,9 +11,8 @@
         "with this source code in the file LICENSE."
     ],
 
-    "directories-bin": [
-        ".requirement-checker"
-    ],
+    "files": ["res/schema.json"],
+    "directories-bin": [".requirement-checker"],
 
     "compression": "GZ",
     "compactors": [
