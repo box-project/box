@@ -135,7 +135,7 @@ final class Checker
         $requirements = new RequirementCollection();
 
         foreach ($config as $constraint) {
-            \call_user_func_array(array($requirements, 'addRequirement'), $constraint);
+            call_user_func_array(array($requirements, 'addRequirement'), $constraint);
         }
 
         return $requirements;

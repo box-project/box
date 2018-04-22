@@ -75,12 +75,12 @@ final class IO
         $values = (array) $values;
 
         foreach ($values as $value) {
-            $regexp = \sprintf(
+            $regexp = sprintf(
                 '/\s%s\b/',
-                \str_replace(' ', '\s+', \preg_quote($value, '/'))
+                str_replace(' ', '\s+', preg_quote($value, '/'))
             );
 
-            if (1 === \preg_match($regexp, $this->options)) {
+            if (1 === preg_match($regexp, $this->options)) {
                 return true;
             }
         }
@@ -103,8 +103,8 @@ final class IO
             return false;
         }
 
-        if (\function_exists('posix_isatty')) {
-            if (!@\posix_isatty(STDOUT) && false === \getenv('SHELL_INTERACTIVE')) {
+        if (function_exists('posix_isatty')) {
+            if (!@posix_isatty(STDOUT) && false === \getenv('SHELL_INTERACTIVE')) {
                 return false;
             }
         }
@@ -117,7 +117,7 @@ final class IO
      */
     private function configureVerbosity()
     {
-        switch ($shellVerbosity = (int) \getenv('SHELL_VERBOSITY')) {
+        switch ($shellVerbosity = (int) getenv('SHELL_VERBOSITY')) {
             case -1:
                 $this->verbosity = self::VERBOSITY_QUIET;
                 break;
@@ -178,23 +178,23 @@ final class IO
 
         if (DIRECTORY_SEPARATOR === '\\') {
             return (
-                    \function_exists('sapi_windows_vt100_support')
-                    && \sapi_windows_vt100_support(STDOUT)
+                    function_exists('sapi_windows_vt100_support')
+                    && sapi_windows_vt100_support(STDOUT)
                 )
-                || false !== \getenv('ANSICON')
-                || 'ON' === \getenv('ConEmuANSI')
-                || 'xterm' === \getenv('TERM');
+                || false !== getenv('ANSICON')
+                || 'ON' === getenv('ConEmuANSI')
+                || 'xterm' === getenv('TERM');
         }
 
-        if (\function_exists('stream_isatty')) {
-            return \stream_isatty(STDOUT);
+        if (function_exists('stream_isatty')) {
+            return stream_isatty(STDOUT);
         }
 
-        if (\function_exists('posix_isatty')) {
-            return \posix_isatty(STDOUT);
+        if (function_exists('posix_isatty')) {
+            return posix_isatty(STDOUT);
         }
 
-        $stat = \fstat(STDOUT);
+        $stat = fstat(STDOUT);
 
         // Check if formatted mode is S_IFCHR
         return $stat ? 0020000 === ($stat['mode'] & 0170000) : false;

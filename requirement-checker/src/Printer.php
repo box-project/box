@@ -41,7 +41,7 @@ final class Printer
     {
         if (null === $width) {
             $terminal = new Terminal();
-            $width = \min($terminal->getWidth(), 80);
+            $width = min($terminal->getWidth(), 80);
         }
 
         $this->verbosity = $verbosity;
@@ -79,9 +79,9 @@ final class Printer
         $this->printvln('', $verbosity, $style);
         $this->printvln($title, $verbosity, $style);
         $this->printvln(
-            \str_repeat(
+            str_repeat(
                 '=',
-                \min(\strlen($title), $this->width)
+                min(strlen($title), $this->width)
             ),
             $verbosity,
             $style
@@ -100,7 +100,7 @@ final class Printer
             return null;
         }
 
-        $errorMessage = \wordwrap($requirement->getTestMessage(), $this->width - 3, \PHP_EOL.'   ').\PHP_EOL;
+        $errorMessage = wordwrap($requirement->getTestMessage(), $this->width - 3, PHP_EOL.'   ').PHP_EOL;
 
         return $errorMessage;
     }
@@ -114,31 +114,31 @@ final class Printer
     public function block($title, $message, $verbosity, $style = null)
     {
         $prefix = ' ['.$title.'] ';
-        $message = $prefix.\trim($message);
+        $message = $prefix.trim($message);
 
         $lines = array();
 
         $remainingMessage = $message;
 
-        while (\strlen($remainingMessage) > 0) {
-            $wrapped = \wordwrap($remainingMessage, $this->width - 3, '¬');
-            $exploded = \explode('¬', $wrapped);
+        while (strlen($remainingMessage) > 0) {
+            $wrapped = wordwrap($remainingMessage, $this->width - 3, '¬');
+            $exploded = explode('¬', $wrapped);
             $line = $exploded[0];
-            $remainingMessage = \ltrim(\substr($remainingMessage, \strlen($line)));
+            $remainingMessage = ltrim(substr($remainingMessage, strlen($line)));
 
-            if (\strlen($remainingMessage) > 0) {
-                $remainingMessage = \str_repeat(' ', \strlen($prefix)).$remainingMessage;
+            if (strlen($remainingMessage) > 0) {
+                $remainingMessage = str_repeat(' ', strlen($prefix)).$remainingMessage;
             }
 
-            $lines[] = \str_pad($line, $this->width, ' ', STR_PAD_RIGHT);
+            $lines[] = str_pad($line, $this->width, ' ', STR_PAD_RIGHT);
         }
 
         $this->printvln('', $verbosity);
-        $this->printvln(\str_repeat(' ', $this->width), $verbosity, $style);
+        $this->printvln(str_repeat(' ', $this->width), $verbosity, $style);
         foreach ($lines as $line) {
             $this->printvln($line, $verbosity, $style);
         }
-        $this->printv(\str_repeat(' ', $this->width), $verbosity, $style);
+        $this->printv(str_repeat(' ', $this->width), $verbosity, $style);
         $this->printvln('', $verbosity);
     }
 
@@ -150,7 +150,7 @@ final class Printer
     public function printvln($message, $verbosity, $style = null)
     {
         $this->printv($message, $verbosity, $style);
-        $this->printv(\PHP_EOL, $verbosity, null);
+        $this->printv(PHP_EOL, $verbosity, null);
     }
 
     /**
@@ -164,9 +164,9 @@ final class Printer
             return;
         }
 
-        $message = \wordwrap($message, $this->width);
+        $message = wordwrap($message, $this->width);
 
-        $message = \sprintf(
+        $message = sprintf(
             '%s%s%s',
             $this->supportColors && isset($this->styles[$style]) ? $this->styles[$style] : '',
             $message,
