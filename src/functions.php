@@ -25,7 +25,7 @@ use function defined;
  * @internal
  * @private
  */
-const DEBUG_CONST = 'KevinGH\Box\BOX_DEBUG';
+const NO_PARALLEL_PROCESSING = 'KevinGH\Box\BOX_NO_PARALLEL_PROCESSING';
 
 /**
  * TODO: this function should be pushed down to the PHAR extension.
@@ -93,17 +93,15 @@ function register_aliases(): void
 /**
  * @private
  */
-function enable_debug(OutputInterface $output): void
+function disable_parallel_processing(): void
 {
-    define(DEBUG_CONST, true);
-
-    $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
+    define(NO_PARALLEL_PROCESSING, true);
 }
 
 /**
  * @private
  */
-function is_debug_enabled(): bool
+function is_parallel_processing_enabled(): bool
 {
-    return defined(DEBUG_CONST) && true === constant(DEBUG_CONST);
+    return false === defined(NO_PARALLEL_PROCESSING) || false === constant(NO_PARALLEL_PROCESSING);
 }

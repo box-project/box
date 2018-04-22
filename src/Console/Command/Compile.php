@@ -22,9 +22,11 @@ use KevinGH\Box\Box;
 use KevinGH\Box\Compactor;
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Console\Logger\BuildLogger;
+use function KevinGH\Box\disable_parallel_processing;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\PhpSettingsHandler;
 use KevinGH\Box\StubGenerator;
+use function putenv;
 use RuntimeException;
 use stdClass;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -38,7 +40,6 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use const DATE_ATOM;
 use function count;
-use function KevinGH\Box\enable_debug;
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_relative;
@@ -46,7 +47,6 @@ use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\formatted_filesize;
 use function KevinGH\Box\get_phar_compression_algorithms;
-use function KevinGH\Box\is_debug_enabled;
 
 /**
  * @final
@@ -74,9 +74,13 @@ information check the documentation online:
 HELP;
 
     private const DEBUG_OPTION = 'debug';
+    private const NO_PARALLEL_PROCESSING_OPTION = 'no-parallel';
+    private const NO_RESTART_OPTION = 'no-restart';
     private const DEV_OPTION = 'dev';
     private const NO_CONFIG_OPTION = 'no-config';
 
+    private const DEBUG_DIR = '.box_dump';
+    
     /**
      * {@inheritdoc}
      */
@@ -92,7 +96,19 @@ HELP;
             self::DEBUG_OPTION,
             null,
             InputOption::VALUE_NONE,
-            'Dump the files added to the PHAR in a `'.Box::DEBUG_DIR.'` directory'
+            'Dump the files added to the PHAR in a `'.self::DEBUG_DIR.'` directory'
+        );
+        $this->addOption(
+            self::NO_PARALLEL_PROCESSING_OPTION,
+            null,
+            InputOption::VALUE_NONE,
+            'Disable the parallel processing'
+        );
+        $this->addOption(
+            self::NO_RESTART_OPTION,
+            null,
+            InputOption::VALUE_NONE,
+            'Do not restart the PHP process. Box restarts the process by default to disable xdebug and set `phar.readonly=0`'
         );
         $this->addOption(
             self::DEV_OPTION,
@@ -115,15 +131,24 @@ HELP;
      */
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
+        $io = new SymfonyStyle($input, $output);
+
+        if ($input->getOption(self::NO_RESTART_OPTION)) {
+            putenv('BOX_ALLOW_XDEBUG=1');
+        }
+
+        if ($debug = $input->getOption(self::DEBUG_OPTION)) {
+            $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
+        }
+
         (new PhpSettingsHandler(new ConsoleLogger($output)))->check();
 
-        if (true === $input->getOption(self::DEBUG_OPTION)) {
-            enable_debug($output);
+        if ($input->getOption(self::NO_PARALLEL_PROCESSING_OPTION)) {
+            disable_parallel_processing();
+            $io->writeln('<info>[debug] Disabled parallel processing</info>', OutputInterface::VERBOSITY_DEBUG);
         }
 
         $this->changeWorkingDirectory($input);
-
-        $io = new SymfonyStyle($input, $output);
 
         $io->writeln($this->getApplication()->getHelp());
         $io->writeln('');
@@ -138,11 +163,11 @@ HELP;
 
         $startTime = microtime(true);
 
-        $this->removeExistingArtefacts($config, $logger);
+        $this->removeExistingArtefacts($config, $logger, $debug);
 
         $logger->logStartBuilding($path);
 
-        $this->createPhar($config, $input, $output, $logger, $io);
+        $this->createPhar($config, $input, $output, $logger, $io, $debug);
 
         $this->correctPermissions($path, $config, $logger);
 
@@ -167,7 +192,8 @@ HELP;
         InputInterface $input,
         OutputInterface $output,
         BuildLogger $logger,
-        SymfonyStyle $io
+        SymfonyStyle $io,
+        bool $debug
     ): void {
         $box = Box::create(
             $config->getTmpOutputPath()
@@ -191,6 +217,10 @@ HELP;
 
         $box->getPhar()->stopBuffering();
 
+        if ($debug) {
+            $box->getPhar()->extractTo(self::DEBUG_DIR, null, true);
+        }
+
         $this->signPhar($config, $box, $config->getTmpOutputPath(), $input, $output, $logger);
 
         if ($config->getTmpOutputPath() !== $config->getOutputPath()) {
@@ -198,18 +228,20 @@ HELP;
         }
     }
 
-    private function removeExistingArtefacts(Configuration $config, BuildLogger $logger): void
+    private function removeExistingArtefacts(Configuration $config, BuildLogger $logger, bool $debug): void
     {
         $path = $config->getOutputPath();
 
-        if (is_debug_enabled()) {
+        if ($debug) {
+            remove(self::DEBUG_DIR);
+
             $date = (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format(DATE_ATOM);
             $file = null !== $config->getFile() ? $config->getFile() : 'No config file';
 
-            remove(Box::DEBUG_DIR);
+            remove(self::DEBUG_DIR);
 
             dump_file(
-                Box::DEBUG_DIR.'/.box_configuration',
+                self::DEBUG_DIR.'/.box_configuration',
                 <<<EOF
 //
 // Processed content of the configuration file "$file" dumped for debugging purposes
