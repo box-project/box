@@ -241,10 +241,7 @@ final class Box
         }
 
         if ($binary) {
-            true === file_exists($file)
-                ? $this->phar->addFile($file, $local)
-                : $this->phar->addFromString($local, $contents)
-            ;
+            $this->phar->addFromString($local, $contents);
         } else {
             $processedContents = self::compactContents(
                 $this->compactors,

@@ -109,10 +109,29 @@ class BoxTest extends FileSystemTestCase
         $this->assertSame($expectedContents, $actualContents);
     }
 
-    public function test_it_can_add_a_non_exitent_file_with_contents_to_the_phar(): void
+    public function test_it_can_add_a_non_existent_file_with_contents_to_the_phar(): void
     {
         $file = 'foo';
         $contents = 'test';
+
+        $this->box->addFile($file, $contents);
+
+        $expectedContents = $contents;
+        $expectedPharPath = 'phar://test.phar/'.$file;
+
+        $this->assertFileExists($expectedPharPath);
+
+        $actualContents = file_get_contents($expectedPharPath);
+
+        $this->assertSame($expectedContents, $actualContents);
+    }
+
+    public function test_it_can_add_an_existent_file_with_contents_to_the_phar(): void
+    {
+        $file = 'foo';
+        $contents = 'test';
+
+        file_put_contents($file, 'tset');
 
         $this->box->addFile($file, $contents);
 
@@ -130,6 +149,25 @@ class BoxTest extends FileSystemTestCase
     {
         $file = 'foo';
         $contents = 'test';
+
+        $this->box->addFile($file, $contents, true);
+
+        $expectedContents = $contents;
+        $expectedPharPath = 'phar://test.phar/'.$file;
+
+        $this->assertFileExists($expectedPharPath);
+
+        $actualContents = file_get_contents($expectedPharPath);
+
+        $this->assertSame($expectedContents, $actualContents);
+    }
+
+    public function test_it_can_add_an_existent_bin_file_with_contents_to_the_phar(): void
+    {
+        $file = 'foo';
+        $contents = 'test';
+
+        file_put_contents($file, 'tset');
 
         $this->box->addFile($file, $contents, true);
 
