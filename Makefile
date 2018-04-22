@@ -59,7 +59,7 @@ tc: bin/phpunit
 
 .PHONY: tm
 tm:			## Run Infection
-tm:	bin/phpunit fixtures/default_stub.php .requirement-checker requirement-checker/actual_terminal_diff
+tm:	bin/phpunit fixtures/default_stub.php tu_requirement_checker .requirement-checker
 	$(PHPNOGC) bin/infection
 
 .PHONY: e2e
