@@ -347,6 +347,12 @@ EOF
         touch('E/fileE1');
         touch('E/finder_excluded_file');
 
+        mkdir('F');
+        touch('F/fileF0');
+        touch('F/fileF1');
+        touch('F/fileF2');
+        touch('F/fileF3');
+
         mkdir('vendor');
         touch('vendor/glob_finder_excluded_file');
         touch('vendor/glob-finder_excluded_file');
@@ -369,12 +375,20 @@ EOF
                         'D',
                     ],
                     'name' => 'fileD*',
+                    'append' => [
+                        'F/fileF0',
+                        'F/fileF1',
+                    ],
                 ],
                 [
                     'in' => [
                         'E',
                     ],
                     'name' => 'fileE*',
+                    'append' => [
+                        'F/fileF2',
+                        'F/fileF3',
+                    ],
                 ],
             ],
             'blacklist' => [
@@ -391,15 +405,21 @@ EOF
 
         // Relative to the current working directory for readability
         $expected = [
-            'file0',
-            'file1',    // 'files' & 'files-bin' are not affected by the blacklist filter
             'B/fileB0',
             'C/fileC0',
             'D/fileD0',
             'E/fileE0',
+            'F/fileF0',
+            'F/fileF1',
+            'F/fileF2',
+            'F/fileF3',
+            'file0',
+            'file1',    // 'files' & 'files-bin' are not affected by the blacklist filter
         ];
 
         $actual = $this->normalizeConfigPaths($this->config->getFiles());
+
+        sort($actual);
 
         $this->assertSame($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());
@@ -973,6 +993,10 @@ JSON
         touch('E/fileE1');
         touch('E/finder_excluded_file');
 
+        mkdir('F');
+        touch('F/fileF0');
+        touch('F/fileF1');
+
         $this->setConfig([
             'files' => [self::DEFAULT_FILE],
             'files-bin' => [
@@ -989,12 +1013,14 @@ JSON
                         'D',
                     ],
                     'name' => 'fileD*',
+                    'append' => ['F/fileF0'],
                 ],
                 [
                     'in' => [
                         'E',
                     ],
                     'name' => 'fileE*',
+                    'append' => ['F/fileF1'],
                 ],
             ],
             'blacklist' => [
@@ -1008,15 +1034,19 @@ JSON
 
         // Relative to the current working directory for readability
         $expected = [
-            'file0',
-            'file1',    // 'files' & 'files-bin' are not affected by the blacklist filter
             'B/fileB0',
             'C/fileC0',
             'D/fileD0',
             'E/fileE0',
+            'F/fileF0',
+            'F/fileF1',
+            'file0',
+            'file1',    // 'files' & 'files-bin' are not affected by the blacklist filter
         ];
 
         $actual = $this->normalizeConfigPaths($this->config->getBinaryFiles());
+
+        sort($actual);
 
         $this->assertSame($expected, $actual);
         $this->assertCount(1, $this->config->getFiles());

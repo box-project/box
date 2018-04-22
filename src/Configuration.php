@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use function array_values;
 use Assert\Assertion;
 use Closure;
 use DateTimeImmutable;
@@ -21,6 +22,8 @@ use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\Php as LegacyPhp;
 use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
 use InvalidArgumentException;
+use function iter\flatMap;
+use function iter\values;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Compactor\PhpScoper as PhpScoperCompactor;
 use KevinGH\Box\Composer\ComposerConfiguration;
@@ -239,13 +242,13 @@ BANNER;
             $directories = self::retrieveDirectories($raw, 'directories', $basePath, $blacklistFilter, $excludedPaths);
             $filesFromFinders = self::retrieveFilesFromFinders($raw, 'finder', $basePath, $blacklistFilter, $devPackages);
 
-            $filesAggregate = array_unique(iterator_to_array(chain($files, $directories, ...$filesFromFinders)));
+            $filesAggregate = self::retrieveFilesAggregate($files, $directories, ...$filesFromFinders);
 
             $binaryFiles = self::retrieveFiles($raw, 'files-bin', $basePath);
             $binaryDirectories = self::retrieveDirectories($raw, 'directories-bin', $basePath, $blacklistFilter, $excludedPaths);
             $binaryFilesFromFinders = self::retrieveFilesFromFinders($raw, 'finder-bin', $basePath, $blacklistFilter, $devPackages);
 
-            $binaryFilesAggregate = array_unique(iterator_to_array(chain($binaryFiles, $binaryDirectories, ...$binaryFilesFromFinders)));
+            $binaryFilesAggregate = self::retrieveFilesAggregate($binaryFiles, $binaryDirectories, ...$binaryFilesFromFinders);
         }
 
         $compactors = self::retrieveCompactors($raw, $basePath);
@@ -694,6 +697,24 @@ BANNER;
         }
 
         return [];
+    }
+
+    /**
+     * @param iterable[]|SplFileInfo[][] $fileIterators
+     *
+     * @return SplFileInfo[]
+     */
+    private static function retrieveFilesAggregate(iterable ...$fileIterators): array
+    {
+        $files = [];
+
+        foreach ($fileIterators as $fileIterator) {
+            foreach ($fileIterator as $file) {
+                $files[$file->getPathname()] = $file;
+            }
+        }
+
+        return array_values($files);
     }
 
     /**
