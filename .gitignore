@@ -2,7 +2,6 @@
 /*.phar
 /*.phar.sig
 /box.json
-/box_dev.json
 /bin/
 !/bin/generate_default_stub
 !/bin/box

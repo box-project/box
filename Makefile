@@ -12,18 +12,18 @@ help:
 ##---------------------------------------------------------------------------
 
 .PHONY: clean
-clean:		## Clean all created artifacts
+clean: 	 ## Clean all created artifacts
 clean:
 	git clean --exclude=.idea/ -ffdx
 
 .PHONY: cs
 PHPCSFIXER=vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
-cs:		## Fix CS
+cs:	 ## Fix CS
 cs: vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
 	$(PHPNOGC) $(PHPCSFIXER) fix
 
 .PHONY: compile
-compile:	## Compile the application into the PHAR
+compile: ## Compile the application into the PHAR
 compile:
 	# Cleanup existing artefacts
 	rm -f bin/box.phar
@@ -37,35 +37,35 @@ compile:
 ##---------------------------------------------------------------------------
 
 .PHONY: test
-test:		## Run all the tests
+test:		  ## Run all the tests
 test: tu e2e
 
 .PHONY: tu
-tu:		## Run the unit tests
+tu:		  ## Run the unit tests
 tu: bin/phpunit fixtures/default_stub.php
 	$(PHPNOGC) bin/phpunit
 
 .PHONY: tc
-tc:		## Run the unit tests with code coverage
+tc:		  ## Run the unit tests with code coverage
 tc: bin/phpunit
 	phpdbg -qrr -d zend.enable_gc=0 bin/phpunit --coverage-html=dist/coverage --coverage-text
 
 .PHONY: tm
-tm:		## Run Infection
+tm:		  ## Run Infection
 tm:	bin/phpunit fixtures/default_stub.php
 	$(PHPNOGC) bin/infection
 
 .PHONY: e2e
-e2e:		## Run the end-to-end tests
+e2e:		  ## Run the end-to-end tests
 e2e: e2e_scoper_alias
 
 .PHONY: e2e_scoper_alias
-e2e_scoper_alias: 	## Runs the end-to-end tests to check that the PHP-Scoper config API is working
+e2e_scoper_alias: ## Runs the end-to-end tests to check that the PHP-Scoper config API is working
 e2e_scoper_alias: box.phar
 	php box.phar compile --working-dir fixtures/build/dir010
 
 .PHONY: blackfire
-blackfire:	## Profiles the compile step
+blackfire:	  ## Profiles the compile step
 blackfire: box.phar
 	# Profile compiling the PHAR from the source code
 	blackfire --reference=1 --samples=5 run $(PHPNOGC) bin/box compile --quiet
