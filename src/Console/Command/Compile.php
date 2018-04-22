@@ -18,19 +18,14 @@ use Amp\MultiReasonException;
 use Assert\Assertion;
 use DateTimeImmutable;
 use DateTimeZone;
-use Humbug\PhpScoper\PhpParser\TraverserFactory;
-use Humbug\PhpScoper\Scoper\NullScoper;
-use Humbug\PhpScoper\Scoper\PhpScoper;
 use KevinGH\Box\Box;
 use KevinGH\Box\Compactor;
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Console\Logger\BuildLogger;
 use KevinGH\Box\MapFile;
-use KevinGH\Box\PhpScoper\SimpleScoper;
 use KevinGH\Box\PhpSettingsHandler;
 use KevinGH\Box\RequirementChecker\RequirementsDumper;
 use KevinGH\Box\StubGenerator;
-use PhpParser\ParserFactory;
 use RuntimeException;
 use stdClass;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -43,7 +38,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use function count;
-use function Humbug\PhpScoper\create_reflector;
 use function KevinGH\Box\disable_parallel_processing;
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -674,19 +668,5 @@ EOF
                 );
             }
         }
-    }
-
-    private function createScoper(): SimpleScoper
-    {
-        return new SimpleScoper(
-            new PhpScoper(
-                (new ParserFactory())->create(ParserFactory::ONLY_PHP5),
-                new NullScoper(),
-                new TraverserFactory(create_reflector())
-            ),
-            '_HumbugBox',
-            [],
-            []
-        );
     }
 }
