@@ -1,0 +1,37 @@
+4c4
+<  * This file is part of the Symfony package.
+---
+>  * This file is part of the box project.
+6c6,7
+<  * (c) Fabien Potencier <fabien@symfony.com>
+---
+>  * (c) Kevin Herrera <kevin@herrera.io>
+>  *     Théo Fidry <theo.fidry@gmail.com>
+8,9c9,10
+<  * For the full copyright and license information, please view the LICENSE
+<  * file that was distributed with this source code.
+---
+>  * This source file is subject to the MIT license that is bundled
+>  * with this source code in the file LICENSE.
+12c13
+< namespace Symfony\Component\Console;
+---
+> namespace KevinGH\RequirementChecker;
+13a15,20
+> /**
+>  * This file is copy/pasted from the Symfony project to avoid a dependency on `symfony/console` which would be too big for just using this
+>  * class.
+>  *
+>  * @license MIT (c) Fabien Potencier <fabien@symfony.com>
+>  */
+86c93
+<      * @return int[]|null An array composed of the width and the height or null if it could not be parsed
+---
+>      * @return null|int[] An array composed of the width and the height or null if it could not be parsed
+114c121
+<      * @return string|null
+---
+>      * @return null|string
+135a143,144
+> 
+>         return null;

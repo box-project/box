@@ -27,13 +27,14 @@ use KevinGH\Box\Test\FileSystemTestCase;
 use Phar;
 use Seld\JsonLint\ParsingException;
 use stdClass;
-use const DIRECTORY_SEPARATOR;
 use function file_put_contents;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\FileSystem\symlink;
+use function sort;
+use const DIRECTORY_SEPARATOR;
 
 /**
  * @covers \KevinGH\Box\Configuration
@@ -657,20 +658,22 @@ JSON
 
         // Relative to the current working directory for readability
         $expected = [
-            'file0',
-            'file1',    // 'files' & 'files-bin' are not affected by the blacklist filter
-            'vendor/acme/foo/af0',
-            'vendor/acme/foo/af1',
-            'composer.json',
-            'composer.lock',
-            'vendor/acme/bar/ab0',
-            'vendor/acme/bar/ab1',
             'C/fileC0',
             'D/fileD0',
             'E/fileE0',
+            'composer.json',
+            'composer.lock',
+            'file0',
+            'file1',    // 'files' & 'files-bin' are not affected by the blacklist filter
+            'vendor/acme/bar/ab0',
+            'vendor/acme/bar/ab1',
+            'vendor/acme/foo/af0',
+            'vendor/acme/foo/af1',
         ];
 
         $actual = $this->normalizeConfigPaths($this->config->getFiles());
+
+        sort($actual);
 
         $this->assertSame($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());
@@ -2804,6 +2807,35 @@ COMMENT;
         ]);
 
         $this->assertFalse($this->config->isPrivateKeyPrompt());
+    }
+
+    public function test_the_requirement_checker_is_enabled_by_default(): void
+    {
+        $this->assertFalse($this->config->checkRequirements());
+    }
+
+    public function test_the_requirement_checker_is_enabled_by_default_if_a_composer_lock_file_is_found(): void
+    {
+        file_put_contents('composer.lock', '{}');
+
+        $this->reloadConfig();
+
+        $this->assertTrue($this->config->checkRequirements());
+    }
+
+    public function test_the_requirement_checker_can_be_disabled(): void
+    {
+        $this->setConfig([
+            'check-requirements' => false,
+        ]);
+
+        $this->assertFalse($this->config->checkRequirements());
+
+        file_put_contents('composer.lock', '{}');
+
+        $this->reloadConfig();
+
+        $this->assertFalse($this->config->checkRequirements());
     }
 
     public function provideInvalidCompressionAlgorithms(): Generator

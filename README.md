@@ -40,6 +40,7 @@ great things:
     1. [Main](doc/configuration.md#main-main)
     1. [Output](doc/configuration.md#output-output)
     1. [Permissions](doc/configuration.md#permissions-chmod)
+    1. [Check requirements](doc/configuration.md#check-requirements-check-requirements)
     1. [Including files](doc/configuration.md#including-files)
         1. [Files (`files` and `files-bin`)](doc/configuration.md#files-files-and-files-bin)
         1. [Directories (`directories` and `directories-bin`)](doc/configuration.md#directories-directories-and-directories-bin)

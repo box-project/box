@@ -1145,6 +1145,7 @@ PHP
         $this->box->getPhar()->setStub(
             StubGenerator::create()
                 ->index('main.php')
+                ->checkRequirements(false)
                 ->generate()
         );
     }

@@ -13,6 +13,9 @@
         "with this source code in the file LICENSE."
     ],
 
+    "directories-bin": [
+        ".requirement-checker"
+    ],
     "files": [
         "composer.json",
         "vendor/composer/composer/LICENSE"

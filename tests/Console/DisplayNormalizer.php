@@ -16,10 +16,6 @@ namespace KevinGH\Box\Console;
 
 final class DisplayNormalizer
 {
-    private function __construct()
-    {
-    }
-
     public static function removeTrailingSpaces(string $display): string
     {
         $lines = explode("\n", $display);
@@ -30,5 +26,9 @@ final class DisplayNormalizer
         );
 
         return implode("\n", $lines);
+    }
+
+    private function __construct()
+    {
     }
 }

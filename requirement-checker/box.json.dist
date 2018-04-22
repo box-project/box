@@ -1,0 +1,7 @@
+{
+    "check-requirements": false,
+    "shebang": null,
+    "compactors": [
+        "KevinGH\\Box\\Compactor\\PhpScoper"
+    ]
+}

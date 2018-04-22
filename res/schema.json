@@ -47,6 +47,10 @@
             "description": "A file used to load third-party class compactors.",
             "type": "string"
         },
+        "check-requirements": {
+            "description": "If enabled, the PHAR will be able to check if the PHP environment used meets all the requirements to run the application.",
+            "type": ["boolean"]
+        },
         "chmod": {
             "description": "The permission mode for the new PHAR.",
             "type": ["string", "null"]

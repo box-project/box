@@ -18,15 +18,19 @@ use Amp\MultiReasonException;
 use Assert\Assertion;
 use DateTimeImmutable;
 use DateTimeZone;
+use Humbug\PhpScoper\PhpParser\TraverserFactory;
+use Humbug\PhpScoper\Scoper\NullScoper;
+use Humbug\PhpScoper\Scoper\PhpScoper;
 use KevinGH\Box\Box;
 use KevinGH\Box\Compactor;
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Console\Logger\BuildLogger;
-use function KevinGH\Box\disable_parallel_processing;
 use KevinGH\Box\MapFile;
+use KevinGH\Box\PhpScoper\SimpleScoper;
 use KevinGH\Box\PhpSettingsHandler;
+use KevinGH\Box\RequirementChecker\RequirementsDumper;
 use KevinGH\Box\StubGenerator;
-use function putenv;
+use PhpParser\ParserFactory;
 use RuntimeException;
 use stdClass;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -38,8 +42,9 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
-use const DATE_ATOM;
 use function count;
+use function Humbug\PhpScoper\create_reflector;
+use function KevinGH\Box\disable_parallel_processing;
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_relative;
@@ -47,6 +52,8 @@ use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\formatted_filesize;
 use function KevinGH\Box\get_phar_compression_algorithms;
+use function putenv;
+use const DATE_ATOM;
 
 /**
  * @final
@@ -80,7 +87,7 @@ HELP;
     private const NO_CONFIG_OPTION = 'no-config';
 
     private const DEBUG_DIR = '.box_dump';
-    
+
     /**
      * {@inheritdoc}
      */
@@ -208,9 +215,11 @@ HELP;
         // file used for debugging purposes and the Composer dump autoloading will not work correctly otherwise.
         $main = $this->registerMainScript($config, $box, $logger);
 
+        $check = $this->registerRequirementsChecker($config, $box, $logger);
+
         $this->addFiles($config, $box, $logger, $io);
 
-        $this->registerStub($config, $box, $main, $logger);
+        $this->registerStub($config, $box, $main, $check, $logger);
         $this->configureMetadata($config, $box, $logger);
 
         $this->configureCompressionAlgorithm($config, $box, $input->getOption(self::DEV_OPTION), $logger);
@@ -408,15 +417,37 @@ EOF
         return $localMain;
     }
 
-    private function registerStub(Configuration $config, Box $box, string $main, BuildLogger $logger): void
+    private function registerRequirementsChecker(Configuration $config, Box $box, BuildLogger $logger): bool
     {
-        if (true === $config->isStubGenerated()) {
+        if (false === $config->checkRequirements()) {
+            return false;
+        }
+
+        $logger->log(
+            BuildLogger::QUESTION_MARK_PREFIX,
+            'Adding requirements checker'
+        );
+
+        $checkFiles = RequirementsDumper::dump($config->getComposerLockDecodedContents());
+
+        foreach ($checkFiles as $fileWithContents) {
+            [$file, $contents] = $fileWithContents;
+
+            $box->addFile('.box/'.$file, $contents, true);
+        }
+
+        return true;
+    }
+
+    private function registerStub(Configuration $config, Box $box, string $main, bool $checkRequirements, BuildLogger $logger): void
+    {
+        if ($config->isStubGenerated()) {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
                 'Generating new stub'
             );
 
-            $stub = $this->createStub($config, $main, $logger);
+            $stub = $this->createStub($config, $main, $checkRequirements, $logger);
 
             $box->getPhar()->setStub($stub->generate());
         } elseif (null !== ($stub = $config->getStubPath())) {
@@ -430,6 +461,7 @@ EOF
 
             $box->registerStub($stub);
         } else {
+            // TODO: add warning that the check requirements could not be added
             $aliasWasAdded = $box->getPhar()->setAlias($config->getAlias());
 
             Assertion::true(
@@ -555,12 +587,13 @@ EOF
         }
     }
 
-    private function createStub(Configuration $config, ?string $main, BuildLogger $logger): StubGenerator
+    private function createStub(Configuration $config, ?string $main, bool $checkRequirements, BuildLogger $logger): StubGenerator
     {
         $stub = StubGenerator::create()
             ->alias($config->getAlias())
             ->index($main)
             ->intercept($config->isInterceptFileFuncs())
+            ->checkRequirements($checkRequirements)
         ;
 
         if (null !== ($shebang = $config->getShebang())) {
@@ -641,5 +674,19 @@ EOF
                 );
             }
         }
+    }
+
+    private function createScoper(): SimpleScoper
+    {
+        return new SimpleScoper(
+            new PhpScoper(
+                (new ParserFactory())->create(ParserFactory::ONLY_PHP5),
+                new NullScoper(),
+                new TraverserFactory(create_reflector())
+            ),
+            '_HumbugBox',
+            [],
+            []
+        );
     }
 }
