@@ -1415,9 +1415,7 @@ JSON
         ]);
 
         // Relative to the current working directory for readability
-        $expected = [
-            'box.json',
-        ];
+        $expected = [];
         $actual = $this->normalizeConfigPaths($this->config->getFiles());
 
         $this->assertSame($expected, $actual);
@@ -1745,44 +1743,106 @@ JSON
         }
     }
 
-    public function test_all_the_files_found_in_the_current_directory_are_taken_by_default_with_no_config_file_is_used(): void
+    public function test_all_the_files_found_in_the_composer_json_are_taken_by_default_with_no_config_file_is_used(): void
     {
         touch('file0');
         touch('file1');
+        touch('file2');
 
         mkdir('B');
         touch('B/fileB0');
         touch('B/fileB1');
 
-        mkdir('C');
-        touch('C/fileC0');
-        touch('C/fileC1');
+        mkdir('PSR4_0');
+        touch('PSR4_0/file0');
+        touch('PSR4_0/file1');
 
-        mkdir('D');
-        touch('D/fileD0');
-        touch('D/fileD1');
-        touch('D/finder_excluded_file');
+        mkdir('PSR4_1');
+        touch('PSR4_1/file0');
+        touch('PSR4_1/file1');
 
-        mkdir('E');
-        touch('E/fileE0');
-        touch('E/fileE1');
-        touch('E/finder_excluded_file');
+        mkdir('PSR4_2');
+        touch('PSR4_2/file0');
+        touch('PSR4_2/file1');
+
+        mkdir('DEV_PSR4_0');
+        touch('DEV_PSR4_0/file0');
+        touch('DEV_PSR4_0/file1');
+
+        mkdir('PSR0_0');
+        touch('PSR0_0/file0');
+        touch('PSR0_0/file1');
+
+        mkdir('PSR0_1');
+        touch('PSR0_1/file0');
+        touch('PSR0_1/file1');
+
+        mkdir('PSR0_2');
+        touch('PSR0_2/file0');
+        touch('PSR0_2/file1');
+
+        mkdir('DEV_PSR0_0');
+        touch('DEV_PSR0_0/file0');
+        touch('DEV_PSR0_0/file1');
+
+        mkdir('CLASSMAP_DIR');
+        touch('CLASSMAP_DIR/file0');
+        touch('CLASSMAP_DIR/file1');
+
+        mkdir('CLASSMAP_DEV_DIR');
+        touch('CLASSMAP_DEV_DIR/file0');
+        touch('CLASSMAP_DEV_DIR/file1');
+
+        file_put_contents(
+            'composer.json',
+            <<<'JSON'
+{
+    "autoload": {
+        "files": ["file0", "file1"],
+        "psr-4": {
+            "Acme\\": "PSR4_0",
+            "Bar\\": ["PSR4_1", "PSR4_2"]
+        },
+        "psr-0": {
+            "Acme\\": "PSR0_0",
+            "Bar\\": ["PSR0_1", "PSR0_2"]
+        },
+        "classmap": ["CLASSMAP_DIR"]
+    },
+    "autoload-dev": {
+        "files": ["file2"],
+        "psr-4": {
+            "Acme\\": "DEV_PSR4_0"
+        },
+        "psr-0": {
+            "Acme\\": "DEV_PSR0_0"
+        },
+        "classmap": ["CLASSMAP_DEV_DIR"]
+    }
+}
+JSON
+
+        );
 
         // Relative to the current working directory for readability
         $expected = [
-            'box.json',
+            'CLASSMAP_DIR/file0',
+            'CLASSMAP_DIR/file1',
+            'PSR0_0/file0',
+            'PSR0_0/file1',
+            'PSR0_1/file0',
+            'PSR0_1/file1',
+            'PSR0_2/file0',
+            'PSR0_2/file1',
+            'PSR4_0/file0',
+            'PSR4_0/file1',
+            'PSR4_1/file0',
+            'PSR4_1/file1',
+            'PSR4_2/file0',
+            'PSR4_2/file1',
+            'composer.json',
             'file0',
             'file1',
-            'B/fileB0',
-            'B/fileB1',
-            'C/fileC0',
-            'C/fileC1',
-            'D/fileD0',
-            'D/fileD1',
-            'D/finder_excluded_file',
-            'E/fileE0',
-            'E/fileE1',
-            'E/finder_excluded_file',
         ];
 
         $noFileConfig = $this->getNoFileConfig();
@@ -1791,47 +1851,6 @@ JSON
 
         $this->assertEquals($expected, $actual, '', .0, 10, true);
         $this->assertCount(0, $noFileConfig->getBinaryFiles());
-    }
-
-    public function test_all_the_files_found_in_the_current_directory_are_taken_by_default_if_no_file_setting_is_used(): void
-    {
-        touch('file0');
-        touch('file1');
-
-        mkdir('B');
-        touch('B/fileB0');
-        touch('B/fileB1');
-
-        mkdir('C');
-        touch('C/fileC0');
-        touch('C/fileC1');
-
-        mkdir('D');
-        touch('D/fileD0');
-        touch('D/fileD1');
-        touch('D/finder_excluded_file');
-
-        mkdir('E');
-        touch('E/fileE0');
-        touch('E/fileE1');
-        touch('E/finder_excluded_file');
-
-        // Relative to the current working directory for readability
-        $expected = [
-            'box.json',
-            'file0',
-            'file1',
-            'B/fileB0',
-            'B/fileB1',
-            'C/fileC0',
-            'C/fileC1',
-            'D/fileD0',
-            'D/fileD1',
-            'D/finder_excluded_file',
-            'E/fileE0',
-            'E/fileE1',
-            'E/finder_excluded_file',
-        ];
 
         $this->reloadConfig();
 
@@ -1845,59 +1864,108 @@ JSON
     {
         touch('file0');
         touch('file1');
+        touch('file2');
 
         mkdir('B');
         touch('B/fileB0');
         touch('B/fileB1');
-        touch('B/glob_finder_excluded_file');
-        touch('B/glob-finder_excluded_file');
 
-        mkdir('C');
-        touch('C/fileC0');
-        touch('C/fileC1');
+        mkdir('PSR4_0');
+        touch('PSR4_0/file0');
+        touch('PSR4_0/file1');
 
-        mkdir('D');
-        touch('D/fileD0');
-        touch('D/fileD1');
-        touch('D/finder_excluded_file');
+        mkdir('PSR4_1');
+        touch('PSR4_1/file0');
+        touch('PSR4_1/file1');
 
-        mkdir('E');
-        touch('E/fileE0');
-        touch('E/fileE1');
-        touch('E/finder_excluded_file');
+        mkdir('PSR4_2');
+        touch('PSR4_2/file0');
+        touch('PSR4_2/file1');
 
-        mkdir('vendor');
-        touch('vendor/glob_finder_excluded_file');
-        touch('vendor/glob-finder_excluded_file');
+        mkdir('DEV_PSR4_0');
+        touch('DEV_PSR4_0/file0');
+        touch('DEV_PSR4_0/file1');
 
-        mkdir('vendor-bin');
-        touch('vendor-bin/file0');
-        touch('vendor-bin/file1');
+        mkdir('PSR0_0');
+        touch('PSR0_0/file0');
+        touch('PSR0_0/file1');
 
-        // Relative to the current working directory for readability
-        $expected = [
-            'file0',
-            'file1',
-            'B/fileB0',
-            'B/fileB1',
-            'C/fileC0',
-            'C/fileC1',
-            'E/fileE0',
-            'E/fileE1',
-        ];
+        mkdir('PSR0_1');
+        touch('PSR0_1/file0');
+        touch('PSR0_1/file1');
+
+        mkdir('PSR0_2');
+        touch('PSR0_2/file0');
+        touch('PSR0_2/file1');
+
+        mkdir('DEV_PSR0_0');
+        touch('DEV_PSR0_0/file0');
+        touch('DEV_PSR0_0/file1');
+
+        mkdir('CLASSMAP_DIR');
+        touch('CLASSMAP_DIR/file0');
+        touch('CLASSMAP_DIR/file1');
+
+        mkdir('CLASSMAP_DEV_DIR');
+        touch('CLASSMAP_DEV_DIR/file0');
+        touch('CLASSMAP_DEV_DIR/file1');
+
+        file_put_contents(
+            'composer.json',
+            <<<'JSON'
+{
+    "autoload": {
+        "files": ["file0", "file1"],
+        "psr-4": {
+            "Acme\\": "PSR4_0",
+            "Bar\\": ["PSR4_1", "PSR4_2"]
+        },
+        "psr-0": {
+            "Acme\\": "PSR0_0",
+            "Bar\\": ["PSR0_1", "PSR0_2"]
+        },
+        "classmap": ["CLASSMAP_DIR"]
+    },
+    "autoload-dev": {
+        "files": ["file2"],
+        "psr-4": {
+            "Acme\\": "DEV_PSR4_0"
+        },
+        "psr-0": {
+            "Acme\\": "DEV_PSR0_0"
+        },
+        "classmap": ["CLASSMAP_DEV_DIR"]
+    }
+}
+JSON
+
+        );
 
         $this->setConfig([
             'blacklist' => [
-                'box.json',
-                'D',
-                'D/finder_excluded_file',
-                'E/finder_excluded_file',
-                'vendor-bin',
-                'vendor-bin-file1',
-                'glob_finder_excluded_file',
-                'glob-finder_excluded_file',
+                'file1',
             ],
         ]);
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'CLASSMAP_DIR/file0',
+            'PSR0_0/file0',
+            'PSR0_1/file0',
+            'PSR0_2/file0',
+            'PSR4_0/file0',
+            'PSR4_1/file0',
+            'PSR4_2/file0',
+            'composer.json',
+            'file0',
+        ];
+
+        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+
+        $this->assertEquals($expected, $actual, '', .0, 10, true);
+        $this->assertCount(0, $this->config->getBinaryFiles());
+
+
 
         $actual = $this->normalizeConfigPaths($this->config->getFiles());
 
@@ -1910,9 +1978,7 @@ JSON
         touch('index.phar');
 
         // Relative to the current working directory for readability
-        $expected = [
-            'box.json',
-        ];
+        $expected = [];
 
         $this->reloadConfig();
 
@@ -1925,9 +1991,7 @@ JSON
         touch('default');
 
         // Relative to the current working directory for readability
-        $expected = [
-            'box.json',
-        ];
+        $expected = [];
 
         $this->setConfig([
             'output' => 'default',
@@ -1952,11 +2016,24 @@ JSON
         touch('A/fileA0');
         touch('A/fileA1');
 
+        file_put_contents(
+            'composer.json',
+            <<<'JSON'
+{
+    "autoload": {
+        "classmap": ["./"]
+    }
+}
+JSON
+
+        );
+
         // Relative to the current working directory for readability
         $expected = [
             'box.json',
             'file0',
             'file1',
+            'composer.json',
             'A/fileA0',
             'A/fileA1',
         ];

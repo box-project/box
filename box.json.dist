@@ -16,64 +16,6 @@
     "directories-bin": [
         ".requirement-checker"
     ],
-    "files": [
-        "composer.json",
-        "vendor/composer/composer/LICENSE"
-    ],
-    "directories": [
-        "res",
-        "src"
-    ],
-    "finder": [
-        {
-            "notName":[
-                "LICENSE*",
-                "CHANGELOG*",
-                "CONTRIBUTING*",
-                "README*",
-                "UPGRADE*",
-                "Makefile",
-                "appveyor*",
-                "phpdoc*",
-                "phpunit.xml*",
-                "phpcs.xml*",
-                "phpstan.neon*",
-                "box.json*",
-                "infection.json*",
-                "humbug.json*",
-                "phpbench.json*",
-                "Vagrantfile",
-                "composer.*"
-            ],
-            "exclude": [
-                "bin",
-                "File",
-                "mikey179",
-                "Net",
-                "phpunit",
-                "phpunit-test-case",
-                "Tester",
-                "Tests",
-                "tests",
-                "vendor",
-                "build",
-                "fixtures",
-                "yaml",
-                "test",
-                "Test",
-                "demo",
-                "doc",
-                "docs",
-                "test_old",
-                "specs",
-                "dist",
-                "travis",
-                ".travis",
-                "examples"
-            ],
-            "in": "vendor"
-        }
-    ],
 
     "compression": "GZ",
     "compactors": [
