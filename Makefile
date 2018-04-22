@@ -38,7 +38,7 @@ test: tu e2e
 
 .PHONY: tu
 tu:			## Run the unit tests
-tu: tu_box tu_requirement_checker
+tu: tu_requirement_checker tu_box
 
 .PHONY: tu_box
 tu_box:			## Run the unit tests
