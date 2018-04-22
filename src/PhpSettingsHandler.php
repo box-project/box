@@ -17,9 +17,9 @@ namespace KevinGH\Box;
 use Composer\XdebugHandler\XdebugHandler;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
-use function file_put_contents;
 use const FILE_APPEND;
 use const PHP_EOL;
+use function file_put_contents;
 
 /**
  * @private

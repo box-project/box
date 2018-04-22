@@ -1055,7 +1055,7 @@ BANNER;
             ->notName('composer.json')
             ->notName('Makefile')
             ->notName('Vagrantfile')
-            ->notName('phpstan.neon*')
+            ->notName('phpstan*.neon*')
             ->notName('infection*.json*')
             ->notName('humbug*.json*')
             ->notName('easy-coding-standard.neon*')
@@ -1085,7 +1085,8 @@ BANNER;
             ->notName('*.swp')
             // Remove tests
             ->notName('*Test.php')
-            ->notPath('/test.*/i')
+            ->exclude('test')
+            ->exclude('tests')
             ->notName('/phpunit.*\.xml(.dist)?/')
             ->notName('/behat.*\.yml(.dist)?/')
             ->exclude('spec')
