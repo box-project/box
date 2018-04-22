@@ -47,10 +47,9 @@ tu_box: bin/phpunit fixtures/default_stub.php .requirement-checker
 
 .PHONY: tu_requirement_checker
 tu_requirement_checker:	## Run the unit tests
-tu_requirement_checker: requirement-checker/bin/phpunit requirement-checker/tests/DisplayNormalizer.php
+tu_requirement_checker: requirement-checker/bin/phpunit requirement-checker/tests/DisplayNormalizer.php requirement-checker/actual_terminal_diff
 	cd requirement-checker && $(PHPNOGC) bin/phpunit
 
-	diff vendor/symfony/console/Terminal.php requirement-checker/src/Terminal.php > requirement-checker/actual_terminal_diff || true
 	diff requirement-checker/expected_terminal_diff requirement-checker/actual_terminal_diff
 
 .PHONY: tc
@@ -165,6 +164,11 @@ requirement-checker/tests/DisplayNormalizer.php: tests/Console/DisplayNormalizer
 	bin/box compile --working-dir requirement-checker
 
 	php bin/dump-requirements-checker.php
+
+requirement-checker/actual_terminal_diff: requirement-checker/src/Terminal.php vendor/symfony/console/Terminal.php
+	diff vendor/symfony/console/Terminal.php requirement-checker/src/Terminal.php > requirement-checker/actual_terminal_diff || true
+
+vendor/symfony/console/Terminal.php: vendor
 
 box.phar: bin src res vendor box.json.dist scoper.inc.php .requirement-checker
 	# Compile Box
