@@ -1,5 +1,6 @@
 .DEFAULT_GOAL := help
 
+PHPNOGC=php -d zend.enable_gc=0
 
 .PHONY: help
 help:
@@ -16,9 +17,10 @@ clean:
 	git clean --exclude=.idea/ -ffdx
 
 .PHONY: cs
+PHPCSFIXER=vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
 cs:		## Fix CS
 cs: vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
-	php -d zend.enable_gc=0 vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer fix
+	$(PHPNOGC) $(PHPCSFIXER) fix
 
 .PHONY: compile
 compile:	## Compile the application into the PHAR
@@ -40,64 +42,42 @@ test: tu e2e
 
 .PHONY: tu
 tu:		## Run the unit tests
-tu: vendor/bin/phpunit fixtures/default_stub.php
-	php -d zend.enable_gc=0 bin/phpunit
+tu: bin/phpunit fixtures/default_stub.php
+	$(PHPNOGC) bin/phpunit
 
 .PHONY: tc
 tc:		## Run the unit tests with code coverage
-tc: vendor/bin/phpunit
+tc: bin/phpunit
 	phpdbg -qrr -d zend.enable_gc=0 bin/phpunit --coverage-html=dist/coverage --coverage-text
 
 .PHONY: tm
 tm:		## Run Infection
-tm:	vendor/bin/phpunit fixtures/default_stub.php
-	php -d zend.enable_gc=0 bin/infection
+tm:	bin/phpunit fixtures/default_stub.php
+	$(PHPNOGC) bin/infection
 
 .PHONY: e2e
 e2e:		## Run the end-to-end tests
-e2e: box_dev.json
-	$(MAKE) compile args='--config=box_dev.json'
+e2e: e2e_scoper_alias
 
-	rm box.phar || true
-	mv -v bin/box.phar .
-
-	php box.phar compile
-
-	rm box.phar || true
-	mv -v bin/box.phar .
-
-	php box.phar compile
-
-	php bin/box.phar compile --working-dir fixtures/build/dir010
-
-	rm box.phar bin/box.phar
+.PHONY: e2e_scoper_alias
+e2e_scoper_alias: 	## Runs the end-to-end tests to check that the PHP-Scoper config API is working
+e2e_scoper_alias: box.phar
+	php box.phar compile --working-dir fixtures/build/dir010
 
 .PHONY: blackfire
 blackfire:	## Profiles the compile step
-blackfire: bin/box src vendor
-	# Cleanup existing artefacts
-	rm -f bin/box.phar
-
-	# Re-dump the loader to account for the prefixing
-	# and optimize the loader
-	composer install
-	composer dump-autoload --classmap-authoritative
-
+blackfire: box.phar
 	# Profile compiling the PHAR from the source code
-	blackfire --reference=1 --samples=5 run php -d zend.enable_gc=0 bin/box compile --quiet
+	blackfire --reference=1 --samples=5 run $(PHPNOGC) bin/box compile --quiet
 
 	# Profile compiling the PHAR from the PHAR
 	mv -fv bin/box.phar .
-	blackfire --reference=2 --samples=5 run php -d zend.enable_gc=0 box.phar compile --quiet
-
-	# Cleanup
-	composer install
-	rm box.phar
+	blackfire --reference=2 --samples=5 run $(PHPNOGC) box.phar compile --quiet
 
 
-##
-## Rules from files
-##---------------------------------------------------------------------------
+#
+# Rules from files
+#---------------------------------------------------------------------------
 
 composer.lock: composer.json
 	composer install
@@ -108,7 +88,7 @@ vendor: composer.lock
 vendor/bamarni: composer.lock
 	composer install
 
-vendor/bin/phpunit: composer.lock
+bin/phpunit: composer.lock
 	composer install
 
 vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer: vendor/bamarni
@@ -117,9 +97,24 @@ vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer: vendor/bamarni
 bin/box.phar: bin/box src vendor
 	$(MAKE) compile
 
-box_dev.json: box.json.dist
-	cat box.json.dist | sed -E 's/\"key\": \".+\",//g' | sed -E 's/\"algorithm\": \".+\",//g' | sed -E 's/\"alias\": \".+\",//g' > box_dev.json
-
 .PHONY: fixtures/default_stub.php
 fixtures/default_stub.php:
 	bin/generate_default_stub
+
+box.phar: bin src res vendor box.json.dist scoper.inc.php
+	# Compile Box
+	bin/box compile
+
+	rm bin/_box.phar || true
+	mv -v bin/box.phar bin/_box.phar
+
+	# Compile Box with the isolated Box PHAR
+	php bin/_box.phar compile
+
+	rm box.phar || true
+	mv -v bin/box.phar .
+
+	# Test the PHAR which has been created by the isolated PHAR
+	php box.phar compile
+
+	rm bin/_box.phar
