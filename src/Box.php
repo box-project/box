@@ -198,10 +198,6 @@ final class Box
                 [$file, $contents] = $fileWithContents;
 
                 dump_file($file, $contents);
-
-                if (is_debug_enabled()) {
-                    dump_file($cwd.'/'.self::DEBUG_DIR.'/'.$file, $contents);
-                }
             }
 
             if ($dumpAutoload) {
@@ -250,14 +246,6 @@ final class Box
             );
 
             $this->phar->addFromString($local, $processedContents);
-        }
-
-        if (is_debug_enabled()) {
-            if (false === isset($processedContents)) {
-                $processedContents = $contents;
-            }
-
-            dump_file(self::DEBUG_DIR.DIRECTORY_SEPARATOR.$relativePath, $processedContents);
         }
 
         return $local;
@@ -351,9 +339,9 @@ final class Box
             return [$local, $processedContents];
         };
 
-        return is_debug_enabled()
-            ? array_map($processFile, $files)
-            : wait(parallelMap($files, $processFile))
+        return is_parallel_processing_enabled()
+            ? wait(parallelMap($files, $processFile))
+            : array_map($processFile, $files)
         ;
     }
 
