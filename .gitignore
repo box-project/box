@@ -12,14 +12,12 @@
 /fixtures/build/dir010/*.phar
 /fixtures/check-requirements/*/actual-output
 /fixtures/check-requirements/*/*.phar
-/.requirement-checker/
 /requirement-checker/bin/*
 !/requirement-checker/bin/check-requirments.php
 /requirement-checker/actual_terminal_diff
 /requirement-checker/.box/
 /requirement-checker/tests/DisplayNormalizer.php
 /requirement-checker/vendor/
-/src/.requirement-checker/
 /vendor/
 /vendor-bin/*/composer.lock
 /vendor-bin/*/vendor/
