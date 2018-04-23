@@ -14,27 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use Closure;
-use Generator;
-use Herrera\Annotations\Tokenizer;
-use InvalidArgumentException;
-use KevinGH\Box\Compactor\DummyCompactor;
-use KevinGH\Box\Compactor\InvalidCompactor;
 use KevinGH\Box\Compactor\Php;
-use KevinGH\Box\Console\ConfigurationHelper;
-use KevinGH\Box\Json\JsonValidationException;
-use KevinGH\Box\Test\FileSystemTestCase;
 use Phar;
-use Seld\JsonLint\ParsingException;
-use stdClass;
-use const DIRECTORY_SEPARATOR;
 use function file_put_contents;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\remove;
-use function KevinGH\Box\FileSystem\rename;
-use function KevinGH\Box\FileSystem\symlink;
-use function sort;
 
 /**
  * @covers \KevinGH\Box\Configuration
