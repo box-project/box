@@ -21,13 +21,13 @@ Roadmap:
 The Box application simplifies the PHAR building process. Out of the box (no pun intended), the application can do many
 great things:
 
-- ⚡ Fast application bundling
-- 🔨PHAR isolation
-- ⚙️Zero configuration by default
+- ⚡  Fast application bundling
+- 🔨 PHAR isolation
+- ⚙️ Zero configuration by default
 - 🚔 Requirements checker
 - 🚨 Friendly error logging experience 
 - 🔍 Retrieve information about the PHAR extension or a PHAR file and its contents
-- 🕵️‍♀️Verify the signature of an existing PHAR
+- 🕵️‍♀️ Verify the signature of an existing PHAR
 - 📝 Use Git tags and short commit hashes for versioning.
 
 
