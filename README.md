@@ -21,12 +21,14 @@ Roadmap:
 The Box application simplifies the PHAR building process. Out of the box (no pun intended), the application can do many
 great things:
 
-- Retrieve information about the PHAR extension or a PHAR file
-- List the contents of a PHAR
-- Verify the signature of an existing PHAR
-- Generate RSA (PKCS#1 encoded) private keys for OpenSSL signing
-- Extract public keys from existing RSA private keys
-- Use Git tags and short commit hashes for versioning.
+- ⚡  Fast application bundling
+- 🔨 PHAR isolation
+- ⚙️ Zero configuration by default
+- 🚔 Requirements checker
+- 🚨 Friendly error logging experience 
+- 🔍 Retrieve information about the PHAR extension or a PHAR file and its contents
+- 🕵️‍♀️ Verify the signature of an existing PHAR
+- 📝 Use Git tags and short commit hashes for versioning.
 
 
 ## Table of Contents
@@ -55,6 +57,7 @@ great things:
     1. [Compactors (`compactors`)](doc/configuration.md#compactors-compactors)
     1. [Compression algorithm (`compression`)](doc/configuration.md#compression-algorithm-compression)
     1. [Signing algorithm (`algorithm`)](doc/configuration.md#signing-algorithm-algorithm)
+1. [Requirements checker](#requirements-checker)
 1. [PHAR code isolation](#phar-code-isolation)
     1. [Why/Explanation](#whyexplanation)
     1. [Isolating the PHAR](#isolating-the-phar)
@@ -69,23 +72,27 @@ great things:
 
 ### PHAR (preferred but NOT SUPPORTED YET)
 
-The preferred method of installation is to use the Box PHAR, which can be downloaded from the most recent
-[Github Release][releases]. Subsequent updates can be downloaded by running:
+<details>
+  <summary>Coming soon.</summary>
 
-```bash
-box self-update
-```
-
-As the PHAR is signed, you should also download the matching `box.phar.pubkey` to the same location. If you
-rename `box.phar` to `box`, you should also rename `box.phar.pubkey` to `box.pubkey`.
+  The preferred method of installation is to use the Box PHAR, which can be downloaded from the most recent
+  [Github Release][releases]. Subsequent updates can be downloaded by running:
+  
+  ```bash
+  box self-update
+  ```
+  
+  As the PHAR is signed, you should also download the matching `box.phar.pubkey` to the same location. If you
+  rename `box.phar` to `box`, you should also rename `box.phar.pubkey` to `box.pubkey`.
+</details>
 
 
 ### Composer
 
-You can install Box with Composer:
+You can install Box with [Composer][composer]:
 
 ```bash
-composer global require humbug/box:^3.0@dev
+composer global require humbug/box:^3.0@alpha
 ```
 
 If you cannot install it because of a dependency conflict or you prefer to install it for your project, we recommend
@@ -93,7 +100,7 @@ you to take a look at [bamarni/composer-bin-plugin][bamarni/composer-bin-plugin]
 
 ```bash
 composer require --dev bamarni/composer-bin-plugin
-composer bin box require --dev humbug/box:^3.0@dev
+composer bin box require --dev humbug/box:^3.0@alpha
 ```
 
 Keep in mind however that this library is not designed to be extended.
@@ -101,14 +108,13 @@ Keep in mind however that this library is not designed to be extended.
 
 ## Creating a PHAR
 
-Creating a PHAR should be as simple as running `box compile`. It will however assume some defaults that you might
-want to change. The most basic configuration is the following:
+Creating a PHAR should be as simple as running `box compile` (no config required!). It will however assume some defaults
+that you might want to change. Box will by default be looking in order for the files `box.json` and `box.json.dist` in
+the current working directory. A basic configuration could be for example changing the PHAR permissions:
 
 ```json
-# box.json.dist
 {
-    "main": "bin/acme.php",
-    "output": "bin/acme.phar"
+    "chmod": "0755"
 }
 ```
 
@@ -118,6 +124,23 @@ For more information on which command or options is available, you can run:
 ```
 box help
 ```
+
+
+## Requirements checker
+
+Unlike when installing a library with [Composer][composer], no constraint check is done by default with a PHAR. As a result
+if you are using a PHAR of an application compatible with PHP 7.2 in PHP 7.0 or a PHP environment which does not have a 
+required extension, it will simply break with a non-friendly error.
+
+By default, when building your PHAR with Box, Box will look up for the PHP versions and extensions required to execute your
+application and add a micro [requirements checker][check-requirements] which will be executed when starting your PHAR.
+
+The following are screenshots of the output when an error occurs (left) in a non-quiet verbosity and when all requirements
+are passing on the right in debug verbosity.
+
+<p align="center">
+    <img src="doc/img/requirement-checker.png" width=900 />
+</p>
 
 
 ## PHAR code isolation
@@ -218,3 +241,5 @@ Project originally created by: [Kevin Herrera] ([@kherge]) which has now been mo
 [phpunit]: https://github.com/sebastianbergmann/phpunit
 [sensiolabs-insight]: https://insight.sensiolabs.com/
 [php-scoper]: https://github.com/humbug/php-scoper
+[composer]: https://getcomposer.org/
+[check-requirements]: doc/configuration.md#check-requirements-check-requirements
