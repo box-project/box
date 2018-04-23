@@ -1,6 +1,6 @@
 {
     "name": "humbug/box",
-    "description": "A tool to simplify building PHARs.",
+    "description": "Fast, zero config application bundler with PHARs.",
     "keywords": ["phar"],
     "license": "MIT",
     "authors": [
