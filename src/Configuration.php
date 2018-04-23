@@ -914,6 +914,16 @@ BANNER;
                     ->in($vendorDir)
                     ->directories()
                     ->depth(1)
+                    ->ignoreUnreadableDirs()
+                    ->filter(
+                        function (SplFileInfo $fileInfo): ?bool {
+                            if ($fileInfo->isLink()) {
+                                return false;
+                            }
+
+                            return null;
+                        }
+                    )
             )));
 
             $vendorPackages = array_diff($vendorPackages, $devPackages);

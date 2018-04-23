@@ -39,35 +39,8 @@ use function sort;
 /**
  * @covers \KevinGH\Box\Configuration
  */
-class ConfigurationTest extends FileSystemTestCase
+class ConfigurationTest extends ConfigurationTestCase
 {
-    private const DEFAULT_FILE = 'index.php';
-
-    /**
-     * @var Configuration
-     */
-    private $config;
-
-    /**
-     * @var string
-     */
-    private $file;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->file = make_path_absolute('box.json', $this->tmp);
-
-        touch($defaultFile = self::DEFAULT_FILE);
-        file_put_contents($this->file, '{}');
-
-        $this->config = Configuration::create($this->file, new stdClass());
-    }
-
     public function test_it_can_be_created_with_a_file(): void
     {
         $config = Configuration::create('box.json', new stdClass());
@@ -3333,52 +3306,5 @@ COMMENT
             null,
             null,
         ];
-    }
-
-    private function setConfig(array $config): void
-    {
-        file_put_contents($this->file, json_encode($config, JSON_PRETTY_PRINT));
-
-        $this->reloadConfig();
-    }
-
-    private function reloadConfig(): void
-    {
-        $configHelper = new ConfigurationHelper();
-
-        $this->config = $configHelper->loadFile($this->file);
-    }
-
-    private function isWindows(): bool
-    {
-        return false === strpos(strtolower(PHP_OS), 'darwin') && false !== strpos(strtolower(PHP_OS), 'win');
-    }
-
-    /**
-     * @param string[] $files
-     *
-     * @return string[] File real paths relative to the current temporary directory
-     */
-    private function normalizeConfigPaths(array $files): array
-    {
-        $root = $this->tmp;
-
-        $files = array_values(
-            array_map(
-                function (string $file) use ($root): string {
-                    return str_replace($root.DIRECTORY_SEPARATOR, '', $file);
-                },
-                $files
-            )
-        );
-
-        sort($files);
-
-        return $files;
-    }
-
-    private function getNoFileConfig(): Configuration
-    {
-        return Configuration::create(null, new stdClass());
     }
 }
