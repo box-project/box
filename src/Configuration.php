@@ -622,7 +622,7 @@ BANNER;
         }
 
         if (false === isset($raw->{$key})) {
-            return [];
+            return $files;
         }
 
         $files = array_merge((array) $raw->{$key}, $files);

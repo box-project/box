@@ -19,6 +19,7 @@ use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Json\JsonValidationException;
 use const DIRECTORY_SEPARATOR;
+use function file_put_contents;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\rename;
@@ -1443,6 +1444,59 @@ JSON
                 $exception->getMessage()
             );
         }
+    }
+
+    public function test_the_composer_json_and_lock_files_are_always_included_even_when_the_user_configure_which_files_to_pick(): void
+    {
+        touch('file0');
+        touch('file1');
+
+        mkdir('B');
+        touch('B/fileB0');
+        touch('B/fileB1');
+
+        file_put_contents('composer.json', '{}');
+        file_put_contents('composer.lock', '{}');
+
+        $this->setConfig([
+            'files' => [
+                'file0',
+                'file1',
+            ],
+            'directories' => ['B'],
+        ]);
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'B/fileB0',
+            'B/fileB1',
+            'composer.json',
+            'composer.lock',
+            'file0',
+            'file1',
+        ];
+
+        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+
+        $this->assertSame($expected, $actual);
+        $this->assertCount(0, $this->config->getBinaryFiles());
+
+        $this->setConfig([
+            'directories' => ['B'],
+        ]);
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'B/fileB0',
+            'B/fileB1',
+            'composer.json',
+            'composer.lock',
+        ];
+
+        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+
+        $this->assertSame($expected, $actual);
+        $this->assertCount(0, $this->config->getBinaryFiles());
     }
 
     public function provideJsonValidNonStringArray(): Generator
