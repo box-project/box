@@ -726,7 +726,7 @@ BANNER;
 
         foreach ($fileIterators as $fileIterator) {
             foreach ($fileIterator as $file) {
-                $files[$file->getPathname()] = $file;
+                $files[(string) $file] = $file;
             }
         }
 
