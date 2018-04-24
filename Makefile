@@ -180,6 +180,5 @@ box: bin src res vendor box.json.dist scoper.inc.php .requirement-checker
 
 	# Test the PHAR which has been created by the isolated PHAR
 	./box compile
-	./box compile
 
 	rm bin/_box.phar

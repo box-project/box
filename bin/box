@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use function file_exists;
 use KevinGH\Box\Console\Application;
 use RuntimeException;
 
