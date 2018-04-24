@@ -14,47 +14,67 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use function bin2hex;
+use function copy;
+use function defined;
+use function dirname;
 use ErrorException;
+use function random_bytes;
+use function register_shutdown_function;
 use RuntimeException;
-
-$findAutoloader = function () {
-    if (file_exists($autoload = __DIR__.'/../../../autoload.php')) {
-        // Is installed via Composer
-        return $autoload;
-    }
-
-    if (file_exists($autoload = __DIR__.'/../vendor/autoload.php')) {
-        // Is installed locally
-        return $autoload;
-    }
-
-    throw new RuntimeException('Unable to find the Composer or PHP-Scoper autoloader.');
-};
+use function substr;
+use function sys_get_temp_dir;
+use function unlink;
 
 // TODO: update PHP-Scoper to get rid of this horrible hack at some point
-$findPhpScoperFunctions = function () {
+$findPhpScoperFunctions = function (): void {
     if (file_exists($autoload = __DIR__.'/../../php-scoper/src/functions.php')) {
         // Is installed via Composer
-        return $autoload;
+        require_once $autoload;
+
+        return;
     }
 
     if (file_exists($autoload = __DIR__.'/../vendor/humbug/php-scoper/src/functions.php')) {
         // Is scoped (in PHAR or dumped directory) or is installed locally
-        return $autoload;
+        require_once $autoload;
+
+        return;
+    }
+
+    if ('phar://' === substr(__FILE__, 0, 7)) {
+        // Is in the PHAR but the PHAR has been renamed without the extension `.phar`. As a result the PHAR protocol
+        // `phar://path/to/file/in/PHAR` will not work.
+        // See https://github.com/amphp/parallel/commit/732694688461936bec02c0ccf020dfee10c4f7ee
+        if (defined('PHAR_COPY')) {
+            return;
+        }
+
+        $pharPath = dirname(substr(__FILE__, 7), 2);
+        define('PHAR_COPY', sys_get_temp_dir().'/phar-'.bin2hex(random_bytes(10)). '.phar');
+
+        copy($pharPath, \PHAR_COPY);
+
+        $autoload = 'phar://'.\PHAR_COPY. '/vendor/humbug/php-scoper/src/functions.php';
+
+        register_shutdown_function(static function () {
+            @unlink(\PHAR_COPY);
+        });
+
+        require_once $autoload;
+
+        return;
     }
 
     throw new RuntimeException('Unable to find the PHP-Scoper functions.');
 };
 
-$bootstrap = function () use ($findAutoloader, $findPhpScoperFunctions): void {
-    require_once $findAutoloader();
-    require_once $findPhpScoperFunctions();
+$GLOBALS['_BOX_BOOTSTRAP'] = function () use ($findPhpScoperFunctions): void {
+    $findPhpScoperFunctions();
 
     \KevinGH\Box\register_aliases();
 };
-$bootstrap();
-
-$GLOBALS['bootstrap'] = $bootstrap;
+$GLOBALS['_BOX_BOOTSTRAP']();
 
 // Convert errors to exceptions
 set_error_handler(

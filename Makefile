@@ -24,8 +24,8 @@ cs: vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
 	$(PHPNOGC) $(PHPCSFIXER) fix --config .php_cs_53.dist
 
 compile: ## Compile the application into the PHAR
-compile: box.phar
-	cp -f box.phar bin/box.phar
+compile: box
+	cp -f box bin/box.phar
 
 
 ##
@@ -68,8 +68,8 @@ e2e: e2e_scoper_alias e2e_check_requirements
 
 .PHONY: e2e_scoper_alias
 e2e_scoper_alias: 	## Runs the end-to-end tests to check that the PHP-Scoper config API is working
-e2e_scoper_alias: box.phar
-	php box.phar compile --working-dir fixtures/build/dir010
+e2e_scoper_alias: box
+	./box compile --working-dir fixtures/build/dir010
 
 
 .PHONY: e2e_check_requirements
@@ -77,8 +77,8 @@ DOCKER=docker run -i --rm -w /opt/box
 PHP7PHAR=box_php72 php index.phar -vvv --no-ansi
 PHP5PHAR=box_php53 php index.phar -vvv --no-ansi
 e2e_check_requirements:	## Runs the end-to-end tests for the check requirements feature
-e2e_check_requirements: box.phar
-	.docker/build
+e2e_check_requirements: box
+	./.docker/build
 
 	bin/box compile --working-dir fixtures/check-requirements/pass-no-config/
 
@@ -113,13 +113,12 @@ e2e_check_requirements: box.phar
 
 .PHONY: blackfire
 blackfire:		## Profiles the compile step
-blackfire: box.phar
+blackfire: box
 	# Profile compiling the PHAR from the source code
 	blackfire --reference=1 --samples=5 run $(PHPNOGC) -d bin/box compile --quiet
 
 	# Profile compiling the PHAR from the PHAR
-	mv -fv bin/box.phar .
-	blackfire --reference=2 --samples=5 run $(PHPNOGC) -d box.phar compile --quiet
+	blackfire --reference=2 --samples=5 run $(PHPNOGC) -d box compile --quiet
 
 
 #
@@ -150,9 +149,6 @@ requirement-checker/vendor:
 vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer: vendor/bamarni
 	composer bin php-cs-fixer install
 
-bin/box.phar: bin/box src vendor
-	$(MAKE) compile
-
 .PHONY: fixtures/default_stub.php
 fixtures/default_stub.php:
 	bin/generate_default_stub
@@ -170,7 +166,7 @@ requirement-checker/actual_terminal_diff: requirement-checker/src/Terminal.php v
 
 vendor/symfony/console/Terminal.php: vendor
 
-box.phar: bin src res vendor box.json.dist scoper.inc.php .requirement-checker
+box: bin src res vendor box.json.dist scoper.inc.php .requirement-checker
 	# Compile Box
 	bin/box compile
 
@@ -180,10 +176,9 @@ box.phar: bin src res vendor box.json.dist scoper.inc.php .requirement-checker
 	# Compile Box with the isolated Box PHAR
 	php bin/_box.phar compile
 
-	rm box.phar || true
-	mv -v bin/box.phar .
+	mv -fv bin/box.phar box
 
 	# Test the PHAR which has been created by the isolated PHAR
-	php box.phar compile
+	./box compile
 
 	rm bin/_box.phar

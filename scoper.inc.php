@@ -84,6 +84,20 @@ return [
         function (string $filePath, string $prefix, string $contents) use ($classLoaderContents): string {
             return 'vendor/composer/composer/src/Composer/Autoload/ClassLoader.php' === $filePath ? $classLoaderContents : $contents;
         },
+        function (string $filePath, string $prefix, string $contents): string {
+            if ('src/bootstrap.php' !== $filePath) {
+                return $contents;
+            }
+
+            return preg_replace(
+                sprintf(
+                    '/\\\\%s\\\\PHAR_COPY/',
+                    $prefix
+                ),
+                '\\PHAR_COPY',
+                $contents
+            );
+        },
     ],
     'whitelist' => [
         \Composer\Autoload\ClassLoader::class,
