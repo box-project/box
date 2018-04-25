@@ -449,9 +449,6 @@ EOF
 
     public function test_a_main_script_path_is_configured_by_default(): void
     {
-        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'index.php', $this->config->getMainScriptPath());
-        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'index.php', $this->getNoFileConfig()->getMainScriptPath());
-
         dump_file('composer.json', '{"bin": []}');
 
         $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'index.php', $this->config->getMainScriptPath());
@@ -459,6 +456,25 @@ EOF
     }
 
     public function test_a_main_script_path_is_inferred_by_the_composer_json_by_default(): void
+    {
+        dump_file('bin/foo');
+
+        dump_file(
+            'composer.json',
+            <<<'JSON'
+{
+    "bin": "bin/foo"
+}
+JSON
+        );
+
+        $this->reloadConfig();
+
+        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'bin/foo', $this->config->getMainScriptPath());
+        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'bin/foo', $this->getNoFileConfig()->getMainScriptPath());
+    }
+
+    public function test_the_first_composer_bin_is_used_as_the_main_script_by_default(): void
     {
         dump_file('bin/foo');
         dump_file('bin/bar');

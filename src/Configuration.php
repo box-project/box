@@ -1291,7 +1291,7 @@ BANNER;
         } else {
             if (null === $decodedJsonContents
                 || false === array_key_exists('bin', $decodedJsonContents)
-                || false === $main = current($decodedJsonContents['bin'])
+                || false === $main = current((array) $decodedJsonContents['bin'])
             ) {
                 $main = self::DEFAULT_MAIN_SCRIPT;
             }
