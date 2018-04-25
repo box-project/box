@@ -42,8 +42,8 @@ great things:
     1. [Main](doc/configuration.md#main-main)
     1. [Output](doc/configuration.md#output-output)
     1. [Permissions](doc/configuration.md#permissions-chmod)
-    1. [Check requirements](doc/configuration.md#check-requirements-check-requirements)
-    1. [Including files](doc/configuration.md#including-files)
+    1. [Check requirements][check-requirements]
+    1. [Including files][include-files]
         1. [Files (`files` and `files-bin`)](doc/configuration.md#files-files-and-files-bin)
         1. [Directories (`directories` and `directories-bin`)](doc/configuration.md#directories-directories-and-directories-bin)
         1. [Finder (`finder` and `finder-bin`)](doc/configuration.md#finder-finder-and-finder-bin)
@@ -54,10 +54,14 @@ great things:
         1. [Shebang (`shebang`)](doc/configuration.md#shebang-shebang)
         1. [Banner (`banner`)](doc/configuration.md#banner-banner)
         1. [Banner file (`banner-file`)](doc/configuration.md#banner-file-banner-file)
-    1. [Compactors (`compactors`)](doc/configuration.md#compactors-compactors)
-    1. [Compression algorithm (`compression`)](doc/configuration.md#compression-algorithm-compression)
+    1. [Compactors (`compactors`)][compactors]
+    1. [Compression algorithm (`compression`)][compression-algorithm]
     1. [Signing algorithm (`algorithm`)](doc/configuration.md#signing-algorithm-algorithm)
 1. [Requirements checker](#requirements-checker)
+1. [Optimize your PHAR](#optimize-your-phar)
+    1. [Review your files](#review-your-files)
+    1. [Compress your PHAR](#compress-your-phar)
+    1. [Optimize your code](#optimize-your-code)
 1. [PHAR code isolation](#phar-code-isolation)
     1. [Why/Explanation](#whyexplanation)
     1. [Isolating the PHAR](#isolating-the-phar)
@@ -133,7 +137,8 @@ if you are using a PHAR of an application compatible with PHP 7.2 in PHP 7.0 or 
 required extension, it will simply break with a non-friendly error.
 
 By default, when building your PHAR with Box, Box will look up for the PHP versions and extensions required to execute your
-application and add a micro [requirements checker][check-requirements] which will be executed when starting your PHAR.
+application according to your `composer.json` and `composer.lock` files and ship a micro
+[requirements checker][check-requirements] which will be executed when starting your PHAR.
 
 The following are screenshots of the output when an error occurs (left) in a non-quiet verbosity and when all requirements
 are passing on the right in debug verbosity.
@@ -141,6 +146,71 @@ are passing on the right in debug verbosity.
 <p align="center">
     <img src="doc/img/requirement-checker.png" width=900 />
 </p>
+
+
+## Optimize your PHAR
+
+### Review your files
+
+By default Box try to be smart about which files are required and will attempt to use only the necessary files. You can
+list the files of your PHAR with the box `info --list` command. It is however possible you want a finer control in which
+case you can adapt the included files thanks to the [configuration options][include-files].
+
+All the files in the PHAR are loaded in-memory when executing a PHAR. As a result, the more content there is to load,
+the bigger the overhead will be and unlike your regular application, a PHAR will not benefit from the opcache optimisations.
+The difference should however be minimal unless you have dozens of thousands of files in which case you might either
+accept it, consider an alternative or contribute to the PHAR extension in order to optimise it.
+
+
+### Compress your PHAR
+
+You can also greatly enhance the size of your PHAR by compressing it:
+
+- The [compression algorithm setting][compression-algorithm]. It is very efficient, however note that a compressed PHAR
+  requires the `zip` PHP extension and has a (micro) overhead since PHP needs to uncompress the archive before using it
+- [Compactors][compactors] can also help to compress some contents for example by removing the unnecessary comments and
+  spaces in PHP and JSON files.
+
+
+### Optimize your code
+
+Another code performance optimisation that can be done is always use fully qualified symbols or use statements. For
+example the following:
+
+```php
+<?php
+
+namespace Acme;
+
+use class stdClass;
+use const BAR;
+use function foo;
+
+new stdClass();
+foo(BAR);
+```
+
+Will be more performant than:
+
+```php
+<?php
+
+namespace Acme;
+
+use class stdClass;
+
+new stdClass();
+foo(BAR);
+```
+
+Indeed in the second case, PHP is unable to know from where `foo` or `BAR` comes from. So it will first try to find
+`\Acme\foo` and `\Acme\BAR` and if not found will fallback to `\foo` and `BAR`. This fallback lookup creates a
+minor overhead. Besides some functions such as `count` are optimised by opcache so using a fully qualified call
+`\count` or importing it via a use statement `use function count` will be even more optimised.
+
+However you may not want to care and change your code for such micro optimisations. But if you do, know that
+[isolating your PHAR code](#phar-code-isolation) will transform every call into a fully qualified call whenever
+possible enabling that optimisation for your PHAR.
 
 
 ## PHAR code isolation
@@ -243,3 +313,6 @@ Project originally created by: [Kevin Herrera] ([@kherge]) which has now been mo
 [php-scoper]: https://github.com/humbug/php-scoper
 [composer]: https://getcomposer.org/
 [check-requirements]: doc/configuration.md#check-requirements-check-requirements
+[include-files]: doc/configuration.md#including-files
+[compression-algorithm]: doc/configuration.md#compression-algorithm-compression
+[compactors]: doc/configuration.md#compactors-compactors
