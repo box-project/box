@@ -168,6 +168,14 @@ final class AppRequirementsFactory
                 }
             }
 
+            if ('paragonie/sodium_compat' === $packageInfo['name']) {
+                $polyfills['libsodium'] = true;
+            }
+
+            if ('phpseclib/mcrypt_compat' === $packageInfo['name']) {
+                $polyfills['mcrypt'] = true;
+            }
+
             foreach ($packageRequire as $package => $constraint) {
                 if (1 === preg_match('/^ext-(?<extension>.+)$/', $package, $matches)) {
                     $extension = $matches['extension'];
