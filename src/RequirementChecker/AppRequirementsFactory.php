@@ -33,11 +33,12 @@ final class AppRequirementsFactory
      *
      * @return array Serialized configured requirements
      */
-    public static function create(array $composerLockDecodedContents): array
+    public static function create(array $composerLockDecodedContents, bool $compressed): array
     {
         return self::configureExtensionRequirements(
             self::configurePhpVersionRequirements([], $composerLockDecodedContents),
-            $composerLockDecodedContents
+            $composerLockDecodedContents,
+            $compressed
         );
     }
 
@@ -88,9 +89,9 @@ final class AppRequirementsFactory
         return $requirements;
     }
 
-    private static function configureExtensionRequirements(array $requirements, array $composerLockContents): array
+    private static function configureExtensionRequirements(array $requirements, array $composerLockContents, bool $compressed): array
     {
-        $extensionRequirements = self::collectExtensionRequirements($composerLockContents);
+        $extensionRequirements = self::collectExtensionRequirements($composerLockContents, $compressed);
 
         foreach ($extensionRequirements as $extension => $packages) {
             foreach ($packages as $package) {
@@ -135,10 +136,14 @@ final class AppRequirementsFactory
      *
      * @return array Associative array containing the list of extensions required
      */
-    private static function collectExtensionRequirements(array $composerLockContents): array
+    private static function collectExtensionRequirements(array $composerLockContents, bool $compressed): array
     {
         $requirements = [];
         $polyfills = [];
+
+        if ($compressed) {
+            $requirements['zip'] = [self::SELF_PACKAGE];
+        }
 
         $platform = $composerLockContents['platform'] ?? [];
 

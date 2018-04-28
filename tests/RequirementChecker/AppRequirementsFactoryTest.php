@@ -20,14 +20,14 @@ use function json_decode;
 /**
  * @coversNothing
  */
-class AppRequirementsFactoryTest extends TestCase
+class pAppRequirementsFactoryTest extends TestCase
 {
     /**
      * @dataProvider provideLockContents
      */
-    public function test_it_can_generate_and_serialized_requirements_from_a_composer_lock_file(string $composerLockContents, array $expected): void
+    public function test_it_can_generate_and_serialized_requirements_from_a_composer_lock_file(string $composerLockContents, bool $compressed, array $expected): void
     {
-        $actual = AppRequirementsFactory::create(json_decode($composerLockContents, true));
+        $actual = AppRequirementsFactory::create(json_decode($composerLockContents, true), $compressed);
 
         $this->assertSame($expected, $actual);
     }
@@ -36,7 +36,20 @@ class AppRequirementsFactoryTest extends TestCase
     {
         yield 'empty lock file' => [
             '{}',
+            false,
             [],
+        ];
+
+        yield 'empty lock file (compressed PHAR)' => [
+            '{}',
+            true,
+            [
+                [
+                    "return \\extension_loaded('zip');",
+                    'The application requires the extension "zip". Enable it or install a polyfill.',
+                    'The application requires the extension "zip".',
+                ],
+            ],
         ];
 
         yield 'lock file platform requirements' => [
@@ -50,6 +63,7 @@ class AppRequirementsFactoryTest extends TestCase
 }
 JSON
             ,
+            false,
             [
                 [
                     <<<'PHP'
@@ -78,6 +92,51 @@ PHP
             ],
         ];
 
+        yield 'lock file platform requirements (compressed PHAR)' => [
+            <<<'JSON'
+{
+    "platform": {
+        "php": "^7.1",
+        "ext-phar": "*"
+    },
+    "platform-dev": []
+}
+JSON
+            ,
+            true,
+            [
+                [
+                    <<<'PHP'
+require_once __DIR__.'/../vendor/composer/semver/src/Semver.php';
+require_once __DIR__.'/../vendor/composer/semver/src/VersionParser.php';
+require_once __DIR__.'/../vendor/composer/semver/src/Constraint/ConstraintInterface.php';
+require_once __DIR__.'/../vendor/composer/semver/src/Constraint/EmptyConstraint.php';
+require_once __DIR__.'/../vendor/composer/semver/src/Constraint/MultiConstraint.php';
+require_once __DIR__.'/../vendor/composer/semver/src/Constraint/Constraint.php';
+
+return \Composer\Semver\Semver::satisfies(
+    sprintf('%d.%d.%d', \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION, \PHP_RELEASE_VERSION),
+    '^7.1'
+);
+
+PHP
+                    ,
+                    'The application requires the version "^7.1" or greater.',
+                    'The application requires the version "^7.1" or greater.',
+                ],
+                [
+                    "return \\extension_loaded('zip');",
+                    'The application requires the extension "zip". Enable it or install a polyfill.',
+                    'The application requires the extension "zip".',
+                ],
+                [
+                    "return \\extension_loaded('phar');",
+                    'The application requires the extension "phar". Enable it or install a polyfill.',
+                    'The application requires the extension "phar".',
+                ],
+            ],
+        ];
+
         yield 'lock file platform dev requirements are ignored' => [
             <<<'JSON'
 {
@@ -89,7 +148,29 @@ PHP
 }
 JSON
             ,
+            false,
             [],
+        ];
+
+        yield 'lock file platform dev requirements are ignored (compressed PHAR)' => [
+            <<<'JSON'
+{
+    "platform": [],
+    "platform-dev": {
+        "php": "^7.3",
+        "ext-json": "*"
+    }
+}
+JSON
+            ,
+            true,
+            [
+                [
+                    "return \\extension_loaded('zip');",
+                    'The application requires the extension "zip". Enable it or install a polyfill.',
+                    'The application requires the extension "zip".',
+                ],
+            ],
         ];
 
         yield 'lock file packages requirements' => [
@@ -130,6 +211,7 @@ JSON
 }
 JSON
             ,
+            false,
             [
                 [
                     <<<'PHP'
@@ -222,6 +304,7 @@ PHP
 }
 JSON
             ,
+            false,
             [],
         ];
 
@@ -262,6 +345,7 @@ JSON
 }
 JSON
             ,
+            false,
             [
                 [
                     <<<'PHP'
@@ -368,6 +452,7 @@ PHP
 }
 JSON
             ,
+            false,
             [
                 [
                     <<<'PHP'

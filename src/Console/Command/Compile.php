@@ -432,7 +432,7 @@ EOF
             'Adding requirements checker'
         );
 
-        $checkFiles = RequirementsDumper::dump($config->getComposerLockDecodedContents());
+        $checkFiles = RequirementsDumper::dump($config->getComposerLockDecodedContents(), null !== $config->getCompressionAlgorithm());
 
         foreach ($checkFiles as $fileWithContents) {
             [$file, $contents] = $fileWithContents;
