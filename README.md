@@ -58,6 +58,8 @@ great things:
     1. [Compression algorithm (`compression`)][compression-algorithm]
     1. [Signing algorithm (`algorithm`)](doc/configuration.md#signing-algorithm-algorithm)
 1. [Requirements checker](#requirements-checker)
+    1. [Usage](#usage)
+    1. [Polyfills](#polyfills)
 1. [Optimize your PHAR](#optimize-your-phar)
     1. [Review your files](#review-your-files)
     1. [Compress your PHAR](#compress-your-phar)
@@ -132,6 +134,8 @@ box help
 
 ## Requirements checker
 
+### Usage
+
 Unlike when installing a library with [Composer][composer], no constraint check is done by default with a PHAR. As a result
 if you are using a PHAR of an application compatible with PHP 7.2 in PHP 7.0 or a PHP environment which does not have a 
 required extension, it will simply break with a non-friendly error.
@@ -146,6 +150,17 @@ are passing on the right in debug verbosity.
 <p align="center">
     <img src="doc/img/requirement-checker.png" width=900 />
 </p>
+
+
+### Polyfills
+
+Box supports the following polyfills:
+
+- `symfony/polyfill-<extension-name>` for any extension
+- [paragonie/sodium_compat](https://github.com/paragonie/sodium_compat) for the `libsodium` extension
+- [phpseclib/mcrypt_compat](https://github.com/phpseclib/mcrypt_compat) for the `mcrypt` extension
+
+Functions requirements/polyfills are not supported at the moment, see [#131](https://github.com/humbug/box/issues/131).
 
 
 ## Optimize your PHAR

@@ -490,5 +490,43 @@ PHP
                 ],
             ],
         ];
+
+        yield 'libsodium polyfill' => [
+            <<<'JSON'
+{
+    "platform": {
+        "ext-libsodium": "*"
+    },
+    "packages": [
+        {
+            "name": "paragonie/sodium_compat",
+            "version": "1.0.0"
+        }
+    ]
+}
+JSON
+            ,
+            false,
+            [],
+        ];
+
+        yield 'mcrypt polyfill' => [
+            <<<'JSON'
+{
+    "platform": {
+        "ext-mcrypt": "*"
+    },
+    "packages": [
+        {
+            "name": "phpseclib/mcrypt_compat",
+            "version": "1.0.0"
+        }
+    ]
+}
+JSON
+            ,
+            false,
+            [],
+        ];
     }
 }
