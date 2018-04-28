@@ -57,10 +57,10 @@ PHP;
     /**
      * @return string[][]
      */
-    public static function dump(array $composerLockDecodedContents): array
+    public static function dump(array $composerLockDecodedContents, bool $compressed): array
     {
         $filesWithContents = [
-            self::dumpRequirementsConfig($composerLockDecodedContents),
+            self::dumpRequirementsConfig($composerLockDecodedContents, $compressed),
             [self::CHECK_FILE_NAME, self::REQUIREMENTS_CHECKER_TEMPLATE],
         ];
 
@@ -80,9 +80,9 @@ PHP;
         return $filesWithContents;
     }
 
-    private static function dumpRequirementsConfig(array $composerLockDecodedContents): array
+    private static function dumpRequirementsConfig(array $composerLockDecodedContents, bool $compressed): array
     {
-        $config = AppRequirementsFactory::create($composerLockDecodedContents);
+        $config = AppRequirementsFactory::create($composerLockDecodedContents, $compressed);
 
         return [
             '.requirements.php',
