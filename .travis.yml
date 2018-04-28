@@ -14,14 +14,13 @@ env:
 
 matrix:
   include:
-    - php: '7.2'
+    - php: '7.1'
       env: DEPLOY=true
+    - php: '7.2'
     - php: '7.2'
       env: COVERAGE='true'
     - php: '7.2'
       env: SYMFONY_VERSION='v3'
-    - php: nightly
-  allow_failures:
     - php: nightly
   fast_finish: true
 

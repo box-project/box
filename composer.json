@@ -50,13 +50,11 @@
         "humbug/php-scoper": "^1.0@dev",
         "justinrainbow/json-schema": "^5.2",
         "nikic/iter": "^1.6",
-        "padraic/phar-updater": "^1.0",
         "phpseclib/phpseclib": "~2.0",
         "seld/jsonlint": "^1.6",
         "symfony/console": "^3.4 || ^4.0",
         "symfony/filesystem": "^3.4 || ^4.0",
         "symfony/finder": "^3.4 || ^4.0",
-        "symfony/process": "^3.4 || ^4.0",
         "symfony/var-dumper": "^3.4 || ^4.0",
         "webmozart/path-util": "^2.3"
     },

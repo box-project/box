@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a79228b0119a9f3dbcd3ade691c7ad33",
+    "content-hash": "720dd89c24948ad1d8fd3304c6b16ef2",
     "packages": [
         {
             "name": "amphp/amp",
@@ -948,12 +948,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/humbug/php-scoper.git",
-                "reference": "561bcde3f65146f2fef771fcf3783b22d0c83bf4"
+                "reference": "450fe36a7457847d0cb431e7379b5df9d05992a4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/561bcde3f65146f2fef771fcf3783b22d0c83bf4",
-                "reference": "561bcde3f65146f2fef771fcf3783b22d0c83bf4",
+                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/450fe36a7457847d0cb431e7379b5df9d05992a4",
+                "reference": "450fe36a7457847d0cb431e7379b5df9d05992a4",
                 "shasum": ""
             },
             "require": {
@@ -964,8 +964,7 @@
                 "roave/better-reflection": "^2.0",
                 "symfony/console": "^3.2 || ^4.0",
                 "symfony/filesystem": "^3.2 || ^4.0",
-                "symfony/finder": "^3.2 || ^4.0",
-                "symfony/requirements-checker": "^1.0"
+                "symfony/finder": "^3.2 || ^4.0"
             },
             "require-dev": {
                 "bamarni/composer-bin-plugin": "^1.1",
@@ -984,12 +983,12 @@
                 }
             },
             "autoload": {
+                "files": [
+                    "src/functions.php"
+                ],
                 "psr-4": {
                     "Humbug\\PhpScoper\\": "src/"
-                },
-                "files": [
-                    "src/check.php"
-                ]
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -1010,7 +1009,7 @@
                 }
             ],
             "description": "Prefixes all PHP namespaces in a file or directory.",
-            "time": "2018-03-04T12:43:00+00:00"
+            "time": "2018-04-25T21:59:07+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -2255,54 +2254,6 @@
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
             "time": "2018-04-03T05:24:00+00:00"
-        },
-        {
-            "name": "symfony/requirements-checker",
-            "version": "v1.0.5",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/requirements-checker.git",
-                "reference": "4cad41f35d5c561d84b6385c627a3785c55fec1d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/requirements-checker/zipball/4cad41f35d5c561d84b6385c627a3785c55fec1d",
-                "reference": "4cad41f35d5c561d84b6385c627a3785c55fec1d",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.9"
-            },
-            "bin": [
-                "bin/requirements-checker"
-            ],
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Requirements\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                }
-            ],
-            "description": "Check Symfony requirements and give recommendations",
-            "keywords": [
-                "configuration",
-                "distribution"
-            ],
-            "time": "2018-04-17T12:14:14+00:00"
         },
         {
             "name": "symfony/var-dumper",
