@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use Amp\MultiReasonException;
 use Exception;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\FakeCompactor;
@@ -768,7 +767,7 @@ class BoxTest extends FileSystemTestCase
             $this->box->addFiles(['/nowhere/foo'], false);
 
             $this->fail('Expected exception to be thrown.');
-        } catch (MultiReasonException $exception) {
+        } catch (InvalidArgumentException $exception) {
             $tmpDirs = iterator_to_array(
                 Finder::create()
                     ->directories()
@@ -777,20 +776,20 @@ class BoxTest extends FileSystemTestCase
             );
 
             $boxDir = current(
-                    array_filter(
-                            $tmpDirs,
-                            function (SplFileInfo $fileInfo) use ($boxTmp): bool {
-                                return false === in_array(
-                                            $fileInfo->getRealPath(),
-                                            [realpath($boxTmp), realpath($this->tmp)],
-                            true
-                                    );
-                            }
+                array_filter(
+                    $tmpDirs,
+                    function (SplFileInfo $fileInfo) use ($boxTmp): bool {
+                        return false === in_array(
+                            $fileInfo->getRealPath(),
+                            [realpath($boxTmp), realpath($this->tmp)],
+                        true
+                        );
+                    }
                 )
             );
 
             $this->assertFalse(
-                    $boxDir,
+                $boxDir,
                 sprintf(
                         'Did not expect to find the directory "%s".',
                     $boxDir
