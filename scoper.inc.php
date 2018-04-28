@@ -102,8 +102,6 @@ return [
     'whitelist' => [
         \Composer\Autoload\ClassLoader::class,
 
-        \Herrera\Box\Compactor\Javascript::class,
-        \KevinGH\Box\Compactor\Javascript::class,
         \Herrera\Box\Compactor\Json::class,
         \KevinGH\Box\Compactor\Json::class,
         \Herrera\Box\Compactor\Php::class,
