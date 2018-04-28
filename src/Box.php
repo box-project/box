@@ -338,7 +338,7 @@ final class Box
             return [$local, $processedContents];
         };
 
-        return is_parallel_processing_enabled()
+        return is_parallel_processing_enabled() && false === ($this->scoper instanceof NullScoper)
             ? wait(parallelMap($files, $processFile))
             : array_map($processFile, $files)
         ;

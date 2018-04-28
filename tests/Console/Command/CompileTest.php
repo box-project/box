@@ -14,10 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use Amp\MultiReasonException;
-use Amp\Parallel\Worker\TaskException;
 use DirectoryIterator;
 use Generator;
+use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\CommandTestCase;
@@ -33,10 +32,13 @@ use function KevinGH\Box\FileSystem\rename;
 use function preg_replace;
 use function sort;
 
+///**
+// * @covers \KevinGH\Box\Console\Command\Compile
+// * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
+// *                              can create undesirable side-effects.
+// */
 /**
- * @covers \KevinGH\Box\Console\Command\Compile
- * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
- *                              can create undesirable side-effects.
+ * @coversNothing
  */
 class CompileTest extends CommandTestCase
 {
@@ -408,6 +410,8 @@ PHP;
 
         $this->assertEquals($expectedFiles, $actualFiles, '', .0, 10, true);
 
+        unset($phar);
+        Phar::unlinkArchive('index.phar');
         // Executes the compilation again
 
         $commandTester->execute(
@@ -1103,15 +1107,10 @@ PHP
             );
 
             $this->fail('Expected exception to be thrown.');
-        } catch (MultiReasonException $exception) {
-            $this->assertCount(1, $exception->getReasons());
-
-            /** @var TaskException $reason */
-            $reason = current($exception->getReasons());
-
+        } catch (InvalidArgumentException $exception) {
             $this->assertRegExp(
-                '/^Uncaught .+?ArgumentException in worker with message ".+?" was expected to be readable\.".*$/',
-                $reason->getMessage()
+                '/^Path ".+?" was expected to be readable\.$/',
+                $exception->getMessage()
             );
         }
     }
