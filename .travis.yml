@@ -21,6 +21,7 @@ matrix:
       env: COVERAGE='true'
     - php: '7.2'
       env: SYMFONY_VERSION='v3'
+  allow_failures:
     - php: nightly
   fast_finish: true
 
