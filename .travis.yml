@@ -41,7 +41,9 @@ before_install:
 install:
   - |
     if [ -n "$SYMFONY_VERSION" ]; then
-        composer update $COMPOSER_FLAGS
+        composer install $COMPOSER_FLAGS
+
+        composer update $(composer show | grep symfony | awk '{print $1}' | xargs)
     else
         composer install $COMPOSER_FLAGS
     fi
