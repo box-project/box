@@ -15,9 +15,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use function file_exists;
 use KevinGH\Box\Console\Application;
 use RuntimeException;
+use function file_exists;
 
 (function (): void {
     if (file_exists($autoload = __DIR__.'/../../../autoload.php')) {

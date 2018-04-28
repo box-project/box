@@ -227,9 +227,9 @@ BANNER;
 
         $devPackages = ComposerConfiguration::retrieveDevPackages($basePath, $composerJson[1], $composerLock[1]);
 
-        [$excludedPaths, $blacklistFilter] = self::retrieveBlacklistFilter($raw, $basePath, $tmpOutputPath, $outputPath);
+        [$excludedPaths, $blacklistFilter] = self::retrieveBlacklistFilter($raw, $basePath, $tmpOutputPath, $outputPath, $mainScriptPath);
 
-        $files = self::retrieveFiles($raw, 'files', $basePath, $composerFiles);
+        $files = self::retrieveFiles($raw, 'files', $basePath, $composerFiles, $mainScriptPath);
 
         if (self::shouldRetrieveAllFiles($file, $raw)) {
             [$files, $directories] = self::retrieveAllDirectoriesToInclude(
@@ -261,7 +261,7 @@ BANNER;
             $filesAggregate = self::retrieveFilesAggregate($files, $directories, ...$filesFromFinders);
         }
 
-        $binaryFiles = self::retrieveFiles($raw, 'files-bin', $basePath);
+        $binaryFiles = self::retrieveFiles($raw, 'files-bin', $basePath, [], $mainScriptPath);
         $binaryDirectories = self::retrieveDirectories($raw, 'directories-bin', $basePath, $blacklistFilter, $excludedPaths);
         $binaryFilesFromFinders = self::retrieveFilesFromFinders($raw, 'finder-bin', $basePath, $blacklistFilter, $devPackages);
 
@@ -561,7 +561,7 @@ BANNER;
         return true;
     }
 
-    private static function retrieveBlacklistFilter(stdClass $raw, string $basePath, string ...$excludedPaths): array
+    private static function retrieveBlacklistFilter(stdClass $raw, string $basePath, ?string ...$excludedPaths): array
     {
         $blacklist = self::retrieveBlacklist($raw, $basePath, ...$excludedPaths);
 
@@ -585,16 +585,19 @@ BANNER;
     }
 
     /**
-     * @param stdClass $raw
-     * @param string   $basePath
-     * @param string[] $excludedPaths
+     * @param stdClass        $raw
+     * @param string          $basePath
+     * @param null[]|string[] $excludedPaths
      *
      * @return string[]
      */
-    private static function retrieveBlacklist(stdClass $raw, string $basePath, string ...$excludedPaths): array
+    private static function retrieveBlacklist(stdClass $raw, string $basePath, ?string ...$excludedPaths): array
     {
         /** @var string[] $blacklist */
-        $blacklist = array_merge($excludedPaths, $raw->blacklist ?? []);
+        $blacklist = array_merge(
+            array_filter($excludedPaths),
+            $raw->blacklist ?? []
+        );
 
         $normalizedBlacklist = [];
 
@@ -609,8 +612,13 @@ BANNER;
     /**
      * @return SplFileInfo[]
      */
-    private static function retrieveFiles(stdClass $raw, string $key, string $basePath, array $composerFiles = []): array
-    {
+    private static function retrieveFiles(
+        stdClass $raw,
+        string $key,
+        string $basePath,
+        array $composerFiles,
+        ?string $mainScriptPath
+    ): array {
         $files = [];
 
         if (isset($composerFiles[0][0])) {
@@ -629,7 +637,7 @@ BANNER;
 
         Assertion::allString($files);
 
-        $normalizePath = function (string $file) use ($basePath, $key): SplFileInfo {
+        $normalizePath = function (string $file) use ($basePath, $key, $mainScriptPath): ?SplFileInfo {
             $file = self::normalizePath($file, $basePath);
 
             if (is_link($file)) {
@@ -650,10 +658,10 @@ BANNER;
                 )
             );
 
-            return new SplFileInfo($file);
+            return $mainScriptPath === $file ? null : new SplFileInfo($file);
         };
 
-        return array_map($normalizePath, $files);
+        return array_filter(array_map($normalizePath, $files));
     }
 
     /**
@@ -825,7 +833,7 @@ BANNER;
             return $directory;
         };
 
-        $normalizeFileOrDirectory = function (string &$fileOrDirectory) use ($basePath): void {
+        $normalizeFileOrDirectory = function (string &$fileOrDirectory) use ($basePath, $blacklistFilter): void {
             $fileOrDirectory = self::normalizePath($fileOrDirectory, $basePath);
 
             if (is_link($fileOrDirectory)) {
@@ -854,6 +862,10 @@ BANNER;
             } else {
                 Assertion::file($fileOrDirectory);
             }
+
+            if (false === $blacklistFilter(new SplFileInfo($fileOrDirectory))) {
+                $fileOrDirectory = null;
+            }
         };
 
         foreach ($normalizedConfig as $method => $arguments) {
@@ -868,7 +880,7 @@ BANNER;
             if ('append' === $method) {
                 array_walk($arguments, $normalizeFileOrDirectory);
 
-                $arguments = [$arguments];
+                $arguments = [array_filter($arguments)];
             }
 
             foreach ($arguments as $argument) {

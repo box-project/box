@@ -152,6 +152,10 @@ or directory from a dev dependency, you can do so by adding it via one of the fo
 [`files-bin`][files], [`directories`][directories] or [`directories-bin`][directories].
 
 
+**Warning:** binary files are added _before_ regular files. As a result if a file is found in both regular files and
+binary files, the regular file will take precedence.
+
+
 ### Files (`files` and `files-bin`)
 
 The `files` (`string[]`) setting is a list of files paths relative to [`base-path`][base-path] unless absolute. Each
