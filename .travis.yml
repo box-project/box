@@ -41,7 +41,9 @@ before_install:
 install:
   - |
     if [ -n "$SYMFONY_VERSION" ]; then
-        composer update $COMPOSER_FLAGS
+        composer install $COMPOSER_FLAGS
+
+        composer update symfony/console symfony/filesystem symfony/finder symfony/process symfony/var-dumper $COMPOSER_FLAGS
     else
         composer install $COMPOSER_FLAGS
     fi
