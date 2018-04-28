@@ -20,7 +20,7 @@ use function json_decode;
 /**
  * @coversNothing
  */
-class pAppRequirementsFactoryTest extends TestCase
+class AppRequirementsFactoryTest extends TestCase
 {
     /**
      * @dataProvider provideLockContents

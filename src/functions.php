@@ -76,10 +76,6 @@ function register_aliases(): void
     }
 
     // Register compactors aliases
-    if (false === class_exists(\Herrera\Box\Compactor\Javascript::class, false)) {
-        class_alias(\KevinGH\Box\Compactor\Javascript::class, \Herrera\Box\Compactor\Javascript::class);
-    }
-
     if (false === class_exists(\Herrera\Box\Compactor\Json::class, false)) {
         class_alias(\KevinGH\Box\Compactor\Json::class, \Herrera\Box\Compactor\Json::class);
     }

@@ -58,7 +58,6 @@
         "symfony/finder": "^3.4 || ^4.0",
         "symfony/process": "^3.4 || ^4.0",
         "symfony/var-dumper": "^3.4 || ^4.0",
-        "tedivm/jshrink": "~1.0",
         "webmozart/path-util": "^2.3"
     },
     "require-dev": {
