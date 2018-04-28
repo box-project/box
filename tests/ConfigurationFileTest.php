@@ -132,6 +132,22 @@ class ConfigurationFileTest extends ConfigurationTestCase
         $this->assertCount(0, $this->config->getBinaryFiles());
     }
 
+    /**
+     * @dataProvider provideConfigWithMainScript
+     */
+    public function test_the_main_script_file_is_always_ignored(callable $setUp, array $config, array $expectedFiles, array $expectedBinFiles): void
+    {
+        $setUp();
+
+        $this->setConfig($config);
+
+        $actualFiles = $this->normalizeConfigPaths($this->config->getFiles());
+        $actualBinFiles = $this->normalizeConfigPaths($this->config->getBinaryFiles());
+
+        $this->assertSame($expectedFiles, $actualFiles);
+        $this->assertSame($expectedBinFiles, $actualBinFiles);
+    }
+
     public function test_configured_files_are_relative_to_base_path(): void
     {
         mkdir('sub-dir');
@@ -703,7 +719,6 @@ JSON
         touch('F/fileF1');
 
         $this->setConfig([
-            'files' => [self::DEFAULT_FILE],
             'files-bin' => [
                 'file0',
                 'file1',
@@ -752,7 +767,7 @@ JSON
         $actual = $this->normalizeConfigPaths($this->config->getBinaryFiles());
 
         $this->assertSame($expected, $actual);
-        $this->assertCount(1, $this->config->getFiles());
+        $this->assertCount(0, $this->config->getFiles());
     }
 
     public function test_configured_bin_files_are_relative_to_base_path(): void
@@ -866,7 +881,6 @@ JSON
         $basePath = $this->tmp.DIRECTORY_SEPARATOR.'sub-dir'.DIRECTORY_SEPARATOR;
 
         $this->setConfig([
-            'files' => [self::DEFAULT_FILE],
             'files-bin' => [
                 $basePath.'file0',
                 $basePath.'file1',
@@ -911,7 +925,7 @@ JSON
         $actual = $this->normalizeConfigPaths($this->config->getBinaryFiles());
 
         $this->assertSame($expected, $actual);
-        $this->assertCount(1, $this->config->getFiles());
+        $this->assertCount(0, $this->config->getFiles());
     }
 
     public function test_cannot_add_a_non_existent_bin_file_to_the_list_of_files(): void
@@ -1497,6 +1511,154 @@ JSON
 
         $this->assertSame($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());
+    }
+
+    public function provideConfigWithMainScript()
+    {
+        yield [
+            function (): void {
+                touch('main-script');
+                touch('file0');
+                touch('file1');
+            },
+            [
+                'main' => 'main-script',
+                'files' => [
+                    'main-script',
+                    'file0',
+                ],
+                'files-bin' => [
+                    'main-script',
+                    'file1',
+                ],
+            ],
+            ['file0'],
+            ['file1'],
+        ];
+
+        yield [
+            function (): void {
+                mkdir('sub-dir');
+
+                touch('sub-dir/main-script');
+                touch('sub-dir/file0');
+                touch('sub-dir/file1');
+            },
+            [
+                'base-path' => 'sub-dir',
+                'main' => 'main-script',
+                'files' => [
+                    'main-script',
+                    'file0',
+                ],
+                'files-bin' => [
+                    'main-script',
+                    'file1',
+                ],
+            ],
+            ['sub-dir/file0'],
+            ['sub-dir/file1'],
+        ];
+
+        yield [
+            function (): void {
+                mkdir('A');
+                touch('A/main-script');
+                touch('A/file0');
+                touch('A/file1');
+            },
+            [
+                'main' => 'A/main-script',
+                'directories' => [
+                    'A',
+                ],
+                'directories-bin' => [
+                    'A',
+                ],
+            ],
+            ['A/file0', 'A/file1'],
+            ['A/file0', 'A/file1'],
+        ];
+
+        yield [
+            function (): void {
+                mkdir('sub-dir');
+                mkdir('sub-dir/A');
+                touch('sub-dir/A/main-script');
+                touch('sub-dir/A/file0');
+                touch('sub-dir/A/file1');
+            },
+            [
+                'base-path' => 'sub-dir',
+                'main' => 'A/main-script',
+                'directories' => [
+                    'A',
+                ],
+                'directories-bin' => [
+                    'A',
+                ],
+            ],
+            ['sub-dir/A/file0', 'sub-dir/A/file1'],
+            ['sub-dir/A/file0', 'sub-dir/A/file1'],
+        ];
+
+        yield [
+            function (): void {
+                mkdir('A');
+
+                touch('A/main-script');
+                touch('A/file0');
+                touch('A/file1');
+            },
+            [
+                'main' => 'A/main-script',
+                'finder' => [
+                    [
+                        'in' => [
+                            'A',
+                        ],
+                    ],
+                ],
+                'finder-bin' => [
+                    [
+                        'in' => [
+                            'A',
+                        ],
+                    ],
+                ],
+            ],
+            ['A/file0', 'A/file1'],
+            ['A/file0', 'A/file1'],
+        ];
+
+        yield [
+            function (): void {
+                touch('main-script');
+                touch('file0');
+                touch('file1');
+            },
+            [
+                'main' => 'main-script',
+                'finder' => [
+                    [
+                        'append' => [
+                            'main-script',
+                            'file0',
+                        ],
+                    ],
+                ],
+                'finder-bin' => [
+                    [
+                        'append' => [
+                            'main-script',
+                            'file1',
+                        ],
+                    ],
+                ],
+            ],
+            ['file0'],
+            ['file1'],
+        ];
     }
 
     public function provideJsonValidNonStringArray(): Generator

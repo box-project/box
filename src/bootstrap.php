@@ -14,14 +14,14 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use ErrorException;
+use RuntimeException;
 use function bin2hex;
 use function copy;
 use function defined;
 use function dirname;
-use ErrorException;
 use function random_bytes;
 use function register_shutdown_function;
-use RuntimeException;
 use function substr;
 use function sys_get_temp_dir;
 use function unlink;
@@ -51,13 +51,13 @@ $findPhpScoperFunctions = function (): void {
         }
 
         $pharPath = dirname(substr(__FILE__, 7), 2);
-        define('PHAR_COPY', sys_get_temp_dir().'/phar-'.bin2hex(random_bytes(10)). '.phar');
+        define('PHAR_COPY', sys_get_temp_dir().'/phar-'.bin2hex(random_bytes(10)).'.phar');
 
         copy($pharPath, \PHAR_COPY);
 
-        $autoload = 'phar://'.\PHAR_COPY. '/vendor/humbug/php-scoper/src/functions.php';
+        $autoload = 'phar://'.\PHAR_COPY.'/vendor/humbug/php-scoper/src/functions.php';
 
-        register_shutdown_function(static function () {
+        register_shutdown_function(static function (): void {
             @unlink(\PHAR_COPY);
         });
 

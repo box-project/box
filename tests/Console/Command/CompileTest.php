@@ -1153,7 +1153,7 @@ Box (repo)
 ? Adding binary files
     > No file found
 ? Adding files
-    > 1 file(s)
+    > No file found
 ? Generating new stub
   - Using shebang line: #!/usr/bin/env php
   - Using banner:
@@ -1216,7 +1216,7 @@ Box (repo)
 ? Adding binary files
     > No file found
 ? Adding files
-    > 1 file(s)
+    > No file found
 ? Generating new stub
   - Using shebang line: #!/usr/bin/env php
   - Using banner:
@@ -1278,7 +1278,7 @@ Box (repo)
 ? Adding binary files
     > No file found
 ? Adding files
-    > 1 file(s)
+    > No file found
 ? Generating new stub
   - Using shebang line: #!/usr/bin/env php
   - Using custom banner from file: /path/to/tmp/banner
@@ -1335,7 +1335,7 @@ Box (repo)
 ? Adding binary files
     > No file found
 ? Adding files
-    > 1 file(s)
+    > No file found
 ? Using stub file: /path/to/tmp/stub.php
 ? No compression
 * Done.
@@ -1444,7 +1444,7 @@ Box (repo)
 ? Adding binary files
     > No file found
 ? Adding files
-    > 1 file(s)
+    > No file found
 ? Generating new stub
   - Using shebang line: #!/usr/bin/env php
   - Using banner:
@@ -1509,7 +1509,7 @@ Box (repo)
 ? Adding binary files
     > No file found
 ? Adding files
-    > 1 file(s)
+    > No file found
 ? Generating new stub
   - Using shebang line: #!/usr/bin/env php
   - Using banner:
@@ -1653,7 +1653,7 @@ Box (repo)
 ? Adding binary files
     > No file found
 ? Adding files
-    > 1 file(s)
+    > No file found
 ? Generating new stub
   - No shebang line
   - Using banner:
@@ -1731,7 +1731,7 @@ Box (repo)
 ? Adding binary files
     > No file found
 ? Adding files
-    > 1 file(s)
+    > No file found
 ? Using stub file: /path/to/tmp/stub.php
 ? No compression
 * Done.
