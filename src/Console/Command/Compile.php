@@ -206,7 +206,7 @@ HELP;
     private static function checkPhpSettings(SymfonyStyle $io, OutputInterface $output): void
     {
         if (function_exists('ini_set')) {
-            $memoryInBytes = function (string $value): string {
+            $memoryInBytes = function (string $value): int {
                 $unit = strtolower($value[strlen($value) - 1]);
 
                 $value = (int) $value;
