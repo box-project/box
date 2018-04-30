@@ -16,8 +16,16 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use KevinGH\Box\Console\Application;
+use const PHP_EOL;
+use const PHP_SAPI;
 use RuntimeException;
 use function file_exists;
+
+if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
+    echo PHP_EOL.'Box may only be invoked from a command line'.\PHP_EOL;
+
+    exit(1);
+}
 
 (function (): void {
     if (file_exists($autoload = __DIR__.'/../../../autoload.php')) {
