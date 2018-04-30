@@ -42,7 +42,10 @@ use function KevinGH\Box\formatted_filesize;
 use function key;
 use function realpath;
 use function sprintf;
+use function str_repeat;
+use function str_replace;
 use function sys_get_temp_dir;
+use function var_export;
 
 /**
  * @private
@@ -62,7 +65,7 @@ final class Info extends Command
     private const ALGORITHMS = [
         Phar::BZ2 => 'BZ2',
         Phar::GZ => 'GZ',
-        'NONE' => 'None',
+        Phar::NONE => 'None',
     ];
 
     /**
@@ -350,9 +353,9 @@ HELP
     /**
      * @param OutputInterface         $output
      * @param iterable|PharFileInfo[] $list
-     * @param bool|int                $indent Nbr of indent or `false`
+     * @param false|int               $indent Nbr of indent or `false`
      * @param string                  $base
-     * @param Phar                    $phar
+     * @param Phar|PharData           $phar
      * @param string                  $root
      */
     private function renderContents(
@@ -360,7 +363,7 @@ HELP
         iterable $list,
         $indent,
         string $base,
-        Phar $phar,
+        $phar,
         string $root
     ): void {
         foreach ($list as $item) {
@@ -424,7 +427,7 @@ HELP
             return $count;
         }
 
-        $countFile = function (array $count, PharFileInfo $file) {
+        $countFile = function (array $count, PharFileInfo $file): array {
             if (false === $file->isCompressed()) {
                 ++$count['None'];
 

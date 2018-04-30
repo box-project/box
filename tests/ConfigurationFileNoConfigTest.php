@@ -14,8 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use KevinGH\Box\Compactor\Php;
-use Phar;
 use function file_put_contents;
 use function KevinGH\Box\FileSystem\remove;
 

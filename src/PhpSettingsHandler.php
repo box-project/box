@@ -20,6 +20,8 @@ use Symfony\Component\Filesystem\Exception\IOException;
 use const FILE_APPEND;
 use const PHP_EOL;
 use function file_put_contents;
+use function ini_get;
+use function sprintf;
 
 /**
  * @private

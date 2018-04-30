@@ -18,6 +18,17 @@ use Assert\Assertion;
 use KevinGH\Box\Verifier\Hash;
 use KevinGH\Box\Verifier\PublicKeyDelegate;
 use PharException;
+use function fclose;
+use function filesize;
+use function fopen;
+use function fread;
+use function ini_get;
+use function is_resource;
+use function realpath;
+use function sprintf;
+use function strlen;
+use function strtoupper;
+use function unpack;
 
 /**
  * Retrieves and verifies a PHAR's signature without using the extension.

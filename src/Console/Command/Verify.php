@@ -22,6 +22,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
+use function realpath;
+use function sprintf;
 
 /**
  * @private
@@ -94,7 +96,7 @@ HELP
         }
 
         if (false === $verified) {
-            $message = isset($throwable) && '' !== $throwable->getMessage()
+            isset($throwable) && '' !== $message = $throwable->getMessage()
                 ? $throwable->getMessage()
                 : 'Unknown reason.'
             ;
@@ -106,7 +108,7 @@ HELP
                 )
             );
 
-            if ($output->isVerbose() && isset($throwable)) {
+            if (isset($throwable) && $output->isVerbose()) {
                 throw $throwable;
             }
 

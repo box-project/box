@@ -22,9 +22,9 @@ use ErrorException;
 
 // Convert errors to exceptions
 set_error_handler(
-    function ($code, $message, $file, $line): void {
+    function (int $code, string $message, string $file = '', int $line = -1): void {
         if (error_reporting() & $code) {
-            throw new ErrorException($message, 0, $code, $file, $line);
+            throw new ErrorException($message, 0, $code, (string) $file, $line);
         }
     }
 );

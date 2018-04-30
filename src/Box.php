@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
+use Closure;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 use KevinGH\Box\PhpScoper\NullScoper;
@@ -69,7 +70,7 @@ final class Box
     private $basePath;
 
     /**
-     * @var MapFile
+     * @var Closure|MapFile
      */
     private $mapFile;
 

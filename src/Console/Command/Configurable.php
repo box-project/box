@@ -16,12 +16,14 @@ namespace KevinGH\Box\Console\Command;
 
 use InvalidArgumentException;
 use KevinGH\Box\Configuration;
+use KevinGH\Box\Console\ConfigurationHelper;
 use KevinGH\Box\Throwable\Exception\NoConfigurationFound;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use function sprintf;
 
 /**
  * Allows a configuration file path to be specified for a command.
@@ -56,7 +58,7 @@ abstract class Configurable extends Command
      */
     final protected function getConfig(InputInterface $input, OutputInterface $output, bool $allowNoFile = false): Configuration
     {
-        /** @var $helper \KevinGH\Box\Console\ConfigurationHelper */
+        /** @var ConfigurationHelper $helper */
         $helper = $this->getHelper('config');
 
         $io = new SymfonyStyle($input, $output);

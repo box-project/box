@@ -69,7 +69,7 @@ final class ComposerOrchestrator
         // TODO: make prefix configurable: https://github.com/humbug/php-scoper/issues/178
         $whitelistStatements = (new ScoperAutoloadGenerator($whitelist))->dump($prefix);
 
-        if ([] === $whitelistStatements) {
+        if ('' === $whitelistStatements) {
             return $autoload;
         }
 
