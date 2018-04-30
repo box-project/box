@@ -27,9 +27,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Traversable;
 use function file_put_contents;
+use function ini_get;
+use function ini_set;
 use function KevinGH\Box\FileSystem\mirror;
 use function KevinGH\Box\FileSystem\rename;
+use function preg_match;
 use function preg_replace;
+use function putenv;
 use function sort;
 
 ///**
@@ -1811,6 +1815,73 @@ OUTPUT;
             exec('php index.phar'),
             'Expected PHAR to be executable'
         );
+    }
+
+    /**
+     * @dataProvider provideMemoryLimits
+     */
+    public function test_it_bumps_the_memory_limit_when_necessary(string $initialMemoryLimit, ?string $boxMemoryLimit, string $expectedMemoryLimit): void
+    {
+        $originalMemoryLimit = ini_get('memory_limit');
+
+        try {
+            mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
+
+            ini_set('memory_limit', $initialMemoryLimit);
+
+            if (null !== $boxMemoryLimit) {
+                putenv('BOX_MEMORY_LIMIT='.$boxMemoryLimit);
+            }
+
+            $from = ini_get('memory_limit');
+
+            $commandTester = $this->getCommandTester();
+
+            $commandTester->execute(
+                ['command' => 'compile'],
+                ['verbosity' => OutputInterface::VERBOSITY_DEBUG]
+            );
+
+            $this->assertSame(
+                'Index',
+                exec('php index.phar'),
+                'Expected PHAR to be executable'
+            );
+
+            $display = $this->normalizeDisplay($commandTester->getDisplay(true));
+
+            if (1 === preg_match(
+                '/\[debug\] Bumped the memory limit from "(?<from>.+?)" to (?:BOX_MEMORY_LIMIT=)?"(?<to>.+?)"\./',
+                $display,
+                $matches
+            )
+            ) {
+                [$from, $to] = [$matches['from'], $matches['to']];
+            } else {
+                $to = ini_get('memory_limit');
+            }
+
+            $this->assertSame($initialMemoryLimit, $from, 'Expected the initial memory limit to have been correctly set.');
+            $this->assertSame($expectedMemoryLimit, $to, 'Expected the memory limit to have been correctly set.');
+        } finally {
+            ini_set('memory_limit', $originalMemoryLimit);
+            putenv('BOX_MEMORY_LIMIT');
+        }
+    }
+
+    public function provideMemoryLimits()
+    {
+        yield ['126M', null, '512M'];
+        yield ['126M', '252M', '252M'];
+        yield ['126M', '638M', '638M'];
+
+        yield ['512M', null, '512M'];
+        yield ['512M', '252M', '252M'];
+        yield ['512M', '638M', '638M'];
+
+        yield ['1024M', null, '1024M'];
+        yield ['1024M', '252M', '252M'];
+        yield ['1024M', '1150M', '1150M'];
     }
 
     public function provideAliasConfig(): Generator
