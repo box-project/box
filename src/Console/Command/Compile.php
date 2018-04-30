@@ -227,7 +227,7 @@ HELP;
             $memoryLimit = trim(ini_get('memory_limit'));
 
             // Increase memory_limit if it is lower than 500MB
-            if ($memoryLimit !== '-1' && $memoryInBytes($memoryLimit) < 1024 * 1024 * 512 && false === getenv('BOX_MEMORY_LIMIT')) {
+            if ('-1' !== $memoryLimit && $memoryInBytes($memoryLimit) < 1024 * 1024 * 512 && false === getenv('BOX_MEMORY_LIMIT')) {
                 @ini_set('memory_limit', '512M');
 
                 $io->writeln(
