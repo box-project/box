@@ -458,7 +458,7 @@ EOF
         );
     }
 
-    private function registerMainScript(Configuration $config, Box $box, BuildLogger $logger): ?string
+    private function registerMainScript(Configuration $config, Box $box, BuildLogger $logger): string
     {
         $main = $config->getMainScriptPath();
 

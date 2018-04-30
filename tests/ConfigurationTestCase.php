@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Console\ConfigurationHelper;
 use KevinGH\Box\Test\FileSystemTestCase;
 use stdClass;

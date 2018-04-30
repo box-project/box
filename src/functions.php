@@ -45,13 +45,13 @@ function get_phar_compression_algorithms(): array
 /**
  * @private
  */
-function formatted_filesize(string $path)
+function formatted_filesize(string $path): string
 {
     Assertion::file($path);
 
     $size = filesize($path);
     $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-    $power = $size > 0 ? floor(log($size, 1024)) : 0;
+    $power = $size > 0 ? (int) floor(log($size, 1024)) : 0;
 
     return sprintf(
         '%s%s',

@@ -190,7 +190,7 @@ STUB;
         return "\n".$banner."\n";
     }
 
-    private function generatePharConfigStmt(): ?string
+    private function generatePharConfigStmt(): string
     {
         $previous = false;
         $stub = [];

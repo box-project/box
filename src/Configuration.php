@@ -1075,6 +1075,7 @@ BANNER;
             ->ignoreDotFiles(true)
             // Remove build files
             ->notName('composer.json')
+            ->notName('composer.lock')
             ->notName('Makefile')
             ->notName('Vagrantfile')
             ->notName('phpstan*.neon*')
@@ -1131,6 +1132,7 @@ BANNER;
             ->notName('*Test.php')
             ->exclude('test')
             ->exclude('tests')
+            ->exclude('Tests')
             ->notName('/phpunit.*\.xml(.dist)?/')
             ->notName('/behat.*\.yml(.dist)?/')
             ->exclude('spec')
@@ -1547,7 +1549,7 @@ BANNER;
         return null;
     }
 
-    private static function retrieveGitTag(string $file): ?string
+    private static function retrieveGitTag(string $file): string
     {
         return self::runGitCommand('git describe --tags HEAD', $file);
     }
@@ -1608,16 +1610,16 @@ BANNER;
         return null;
     }
 
-    private static function retrieveDatetimeNow(string $format)
+    private static function retrieveDatetimeNow(string $format): string
     {
         $now = new DateTimeImmutable('now');
 
         $datetime = $now->format($format);
 
-        if (!$datetime) {
+        if ('' === $datetime) {
             throw new InvalidArgumentException(
                 sprintf(
-                    '""%s" is not a valid PHP date format',
+                    '"%s" is not a valid PHP date format',
                     $format
                 )
             );
@@ -1635,7 +1637,7 @@ BANNER;
         return self::DEFAULT_DATETIME_FORMAT;
     }
 
-    private static function retrieveReplacementSigil(stdClass $raw)
+    private static function retrieveReplacementSigil(stdClass $raw): string
     {
         if (isset($raw->{'replacement-sigil'})) {
             return $raw->{'replacement-sigil'};

@@ -16,7 +16,6 @@ namespace KevinGH\Box;
 
 use Generator;
 use InvalidArgumentException;
-use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Json\JsonValidationException;
 use const DIRECTORY_SEPARATOR;
 use function file_put_contents;
