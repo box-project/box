@@ -180,6 +180,10 @@ JSON
         touch('DEV_PSR0_0/file0');
         touch('DEV_PSR0_0/file1');
 
+        mkdir('BLACKLISTED_CLASSMAP_DIR');
+        touch('BLACKLISTED_CLASSMAP_DIR/file0');
+        touch('BLACKLISTED_CLASSMAP_DIR/file1');
+
         mkdir('CLASSMAP_DIR');
         touch('CLASSMAP_DIR/file0');
         touch('CLASSMAP_DIR/file1');
@@ -202,7 +206,10 @@ JSON
             "Acme\\": "PSR0_0",
             "Bar\\": ["PSR0_1", "PSR0_2"]
         },
-        "classmap": ["CLASSMAP_DIR"]
+        "classmap": [
+            "BLACKLISTED_CLASSMAP_DIR",
+            "CLASSMAP_DIR"
+        ]
     },
     "autoload-dev": {
         "files": ["file2"],
@@ -221,6 +228,7 @@ JSON
         $this->setConfig([
             'blacklist' => [
                 'file1',
+                'BLACKLISTED_CLASSMAP_DIR',
             ],
         ]);
 

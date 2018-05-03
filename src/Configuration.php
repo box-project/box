@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use function array_diff;
+use function array_diff_key;
 use Assert\Assertion;
 use Closure;
 use DateTimeImmutable;
@@ -904,10 +906,8 @@ BANNER;
         array $filesToAppend,
         array $excludedPaths
     ): array {
-        $excludedPaths = array_flip($excludedPaths);
-
         $toString = function ($file): string {
-            // @param string|SplFileInfo $file
+            /** @param string|SplFileInfo $file */
             return (string) $file;
         };
 
@@ -997,7 +997,7 @@ BANNER;
 
         if (array_key_exists('classmap', $autoload)) {
             foreach ($autoload['classmap'] as $path) {
-                // @var string $path
+                /** @var string $path */
                 $paths[] = $path;
             }
         }
@@ -1012,11 +1012,7 @@ BANNER;
         if (array_key_exists('files', $autoload)) {
             foreach ($autoload['files'] as $path) {
                 /** @var string $path */
-                $path = $normalizePath($path);
-
-                if (false === array_key_exists($path, $excludedPaths)) {
-                    $filesToAppend[] = $path;
-                }
+                $filesToAppend[] = $normalizePath($path);
             }
         }
 
@@ -1033,9 +1029,14 @@ BANNER;
             }
         }
 
-        return [
+        [$files, $directories] = [
             array_unique($files),
             array_unique($directories),
+        ];
+
+        return [
+            array_diff($files, $excludedPaths),
+            array_diff($directories, $excludedPaths),
         ];
     }
 
