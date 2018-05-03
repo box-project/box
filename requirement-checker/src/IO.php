@@ -13,8 +13,6 @@
 namespace KevinGH\RequirementChecker;
 
 /**
- * The code in this file must be PHP 5.3+ compatible as is used to know if the application can be run.
- *
  * @private
  */
 final class IO
@@ -165,6 +163,7 @@ final class IO
      * @return bool true if the stream supports colorization, false otherwise
      *
      * @see \Symfony\Component\Console\Output\StreamOutput
+     * @license MIT (c) Fabien Potencier <fabien@symfony.com>
      */
     private function checkColorSupport()
     {

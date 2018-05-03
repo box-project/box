@@ -18,9 +18,10 @@ use IteratorAggregate;
 use Traversable;
 
 /**
- * The code in this file must be PHP 5.3+ compatible as is used to know if the application can be run.
- *
  * @private
+ * @see \Symfony\Requirements\RequirementCollection
+ * @package symfony/requirements-checker
+ * @license MIT (c) Fabien Potencier <fabien@symfony.com>
  */
 final class RequirementCollection implements IteratorAggregate, Countable
 {

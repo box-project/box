@@ -1,21 +1,10 @@
 <?php
 
-/*
- * This file is part of the box project.
- *
- * (c) Kevin Herrera <kevin@herrera.io>
- *     Théo Fidry <theo.fidry@gmail.com>
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
-namespace _HumbugBox5addf3ce683e7\KevinGH\RequirementChecker;
+namespace _HumbugBox5aeb92ac2e46b\KevinGH\RequirementChecker;
 
 /**
- * The code in this file must be PHP 5.3+ compatible as is used to know if the application can be run.
- *
- * @private
- */
+@private
+*/
 final class Printer
 {
     private $styles = array('reset' => "\33[0m", 'red' => "\33[31m", 'green' => "\33[32m", 'yellow' => "\33[33m", 'title' => "\33[33m", 'error' => "\33[37;41m", 'success' => "\33[30;42m");
@@ -23,14 +12,14 @@ final class Printer
     private $supportColors;
     private $width;
     /**
-     * @param int      $verbosity
-     * @param bool     $supportColors
-     * @param null|int $width
-     */
+    @param
+    @param
+    @param
+    */
     public function __construct($verbosity, $supportColors, $width = null)
     {
         if (null === $width) {
-            $terminal = new \_HumbugBox5addf3ce683e7\KevinGH\RequirementChecker\Terminal();
+            $terminal = new \_HumbugBox5aeb92ac2e46b\KevinGH\RequirementChecker\Terminal();
             $width = \min($terminal->getWidth(), 80);
         }
         $this->verbosity = $verbosity;
@@ -38,24 +27,24 @@ final class Printer
         $this->width = $width;
     }
     /**
-     * @return int
-     */
+    @return
+    */
     public function getVerbosity()
     {
         return $this->verbosity;
     }
     /**
-     * @param int $verbosity
-     */
+    @param
+    */
     public function setVerbosity($verbosity)
     {
         $this->verbosity = $verbosity;
     }
     /**
-     * @param string      $title
-     * @param int         $verbosity
-     * @param null|string $style
-     */
+    @param
+    @param
+    @param
+    */
     public function title($title, $verbosity, $style = null)
     {
         if (null === $style) {
@@ -67,11 +56,10 @@ final class Printer
         $this->printvln('', $verbosity, $style);
     }
     /**
-     * @param Requirement $requirement
-     *
-     * @return null|string
-     */
-    public function getRequirementErrorMessage(\_HumbugBox5addf3ce683e7\KevinGH\RequirementChecker\Requirement $requirement)
+    @param
+    @return
+    */
+    public function getRequirementErrorMessage(\_HumbugBox5aeb92ac2e46b\KevinGH\RequirementChecker\Requirement $requirement)
     {
         if ($requirement->isFulfilled()) {
             return null;
@@ -80,11 +68,11 @@ final class Printer
         return $errorMessage;
     }
     /**
-     * @param string      $title
-     * @param string      $message
-     * @param int         $verbosity
-     * @param null|string $style
-     */
+    @param
+    @param
+    @param
+    @param
+    */
     public function block($title, $message, $verbosity, $style = null)
     {
         $prefix = ' [' . $title . '] ';
@@ -110,20 +98,20 @@ final class Printer
         $this->printvln('', $verbosity);
     }
     /**
-     * @param string      $message
-     * @param int         $verbosity
-     * @param null|string $style
-     */
+    @param
+    @param
+    @param
+    */
     public function printvln($message, $verbosity, $style = null)
     {
         $this->printv($message, $verbosity, $style);
         $this->printv(\PHP_EOL, $verbosity, null);
     }
     /**
-     * @param string      $message
-     * @param int         $verbosity
-     * @param null|string $style
-     */
+    @param
+    @param
+    @param
+    */
     public function printv($message, $verbosity, $style = null)
     {
         if ($verbosity > $this->verbosity) {

@@ -1,21 +1,10 @@
 <?php
 
-/*
- * This file is part of the box project.
- *
- * (c) Kevin Herrera <kevin@herrera.io>
- *     Théo Fidry <theo.fidry@gmail.com>
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
-namespace _HumbugBox5addf3ce683e7\KevinGH\RequirementChecker;
+namespace _HumbugBox5aeb92ac2e46b\KevinGH\RequirementChecker;
 
 /**
- * The code in this file must be PHP 5.3+ compatible as is used to know if the application can be run.
- *
- * @private
- */
+@private
+*/
 final class IO
 {
     const VERBOSITY_QUIET = 16;
@@ -35,32 +24,31 @@ final class IO
         $this->colorSupport = $this->checkColorSupport();
     }
     /**
-     * @return bool
-     */
+    @return
+    */
     public function isInteractive()
     {
         return $this->interactive;
     }
     /**
-     * @return int
-     */
+    @return
+    */
     public function getVerbosity()
     {
         return $this->verbosity;
     }
     /**
-     * @return bool
-     */
+    @return
+    */
     public function hasColorSupport()
     {
         return $this->colorSupport;
     }
     /**
-     * @param mixed
-     * @param mixed $values
-     *
-     * @return bool
-     */
+    @param
+    @param
+    @return
+    */
     public function hasParameter($values)
     {
         $values = (array) $values;
@@ -73,10 +61,9 @@ final class IO
         return \false;
     }
     /**
-     * @param int $shellVerbosity
-     *
-     * @return bool
-     */
+    @param
+    @return
+    */
     private function checkInteractivity($shellVerbosity)
     {
         if (-1 === $shellVerbosity) {
@@ -93,8 +80,8 @@ final class IO
         return \true;
     }
     /**
-     * @return int
-     */
+    @return
+    */
     private function configureVerbosity()
     {
         switch ($shellVerbosity = (int) \getenv('SHELL_VERBOSITY')) {
@@ -132,17 +119,10 @@ final class IO
         return $shellVerbosity;
     }
     /**
-     * Returns true if the stream supports colorization.
-     *
-     * Colorization is disabled if not supported by the stream:
-     *
-     *  -  Windows != 10.0.10586 without Ansicon, ConEmu or Mintty
-     *  -  non tty consoles
-     *
-     * @return bool true if the stream supports colorization, false otherwise
-     *
-     * @see \Symfony\Component\Console\Output\StreamOutput
-     */
+    @return
+    @see
+    @license
+    */
     private function checkColorSupport()
     {
         if ($this->hasParameter(array('--ansi'))) {
@@ -155,13 +135,12 @@ final class IO
             return \function_exists('sapi_windows_vt100_support') && sapi_windows_vt100_support(\STDOUT) || \false !== \getenv('ANSICON') || 'ON' === \getenv('ConEmuANSI') || 'xterm' === \getenv('TERM');
         }
         if (\function_exists('stream_isatty')) {
-            return \stream_isatty(\STDOUT);
+            return stream_isatty(\STDOUT);
         }
         if (\function_exists('posix_isatty')) {
             return \posix_isatty(\STDOUT);
         }
         $stat = \fstat(\STDOUT);
-        // Check if formatted mode is S_IFCHR
         return $stat ? 020000 === ($stat['mode'] & 0170000) : \false;
     }
 }

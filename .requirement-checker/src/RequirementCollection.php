@@ -1,98 +1,77 @@
 <?php
 
-/*
- * This file is part of the box project.
- *
- * (c) Kevin Herrera <kevin@herrera.io>
- *     Théo Fidry <theo.fidry@gmail.com>
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
-namespace _HumbugBox5addf3ce683e7\KevinGH\RequirementChecker;
+namespace _HumbugBox5aeb92ac2e46b\KevinGH\RequirementChecker;
 
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
 use Traversable;
 /**
- * The code in this file must be PHP 5.3+ compatible as is used to know if the application can be run.
- *
- * @private
- */
+@private
+@see
+@package
+@license
+*/
 final class RequirementCollection implements \IteratorAggregate, \Countable
 {
     /**
-     * @var Requirement[]
-     */
+    @var
+    */
     private $requirements = array();
     /**
-     * {@inheritdoc}
-     *
-     * @return Requirement[]|Traversable
-     */
+    @return
+    */
     public function getIterator()
     {
         return new \ArrayIterator($this->requirements);
     }
-    /**
-     * {@inheritdoc}
-     */
     public function count()
     {
         return \count($this->requirements);
     }
     /**
-     * @param Requirement $requirement
-     */
-    public function add(\_HumbugBox5addf3ce683e7\KevinGH\RequirementChecker\Requirement $requirement)
+    @param
+    */
+    public function add(\_HumbugBox5aeb92ac2e46b\KevinGH\RequirementChecker\Requirement $requirement)
     {
         $this->requirements[] = $requirement;
     }
     /**
-     * Adds a mandatory requirement evaluated lazily.
-     *
-     * @param string $checkIsFulfilled whether the requirement is fulfilled; This string is will be evaluated with `eval()` because
-     *                                 PHP does not support the serialization or the export of closures
-     * @param string $testMessage      The message for testing the requirement
-     * @param string $helpText         The help text (when null, it will be inferred from $helpHtml, i.e. stripped from HTML tags)
-     */
+    @param
+    @param
+    @param
+    */
     public function addRequirement($checkIsFulfilled, $testMessage, $helpText)
     {
-        $this->add(new \_HumbugBox5addf3ce683e7\KevinGH\RequirementChecker\Requirement($checkIsFulfilled, $testMessage, $helpText));
+        $this->add(new \_HumbugBox5aeb92ac2e46b\KevinGH\RequirementChecker\Requirement($checkIsFulfilled, $testMessage, $helpText));
     }
     /**
-     * Returns all mandatory requirements.
-     *
-     * @return Requirement[]
-     */
+    @return
+    */
     public function getRequirements()
     {
         return $this->requirements;
     }
     /**
-     * Returns the PHP configuration file (php.ini) path.
-     *
-     * @return false|string php.ini file path
-     */
+    @return
+    */
     public function getPhpIniPath()
     {
         return \get_cfg_var('cfg_file_path');
     }
     /**
-     * @return bool
-     */
+    @return
+    */
     public function evaluateRequirements()
     {
         return \array_reduce(
             $this->requirements,
             /**
-             * @param bool        $checkPassed
-             * @param Requirement $requirement
-             *
-             * @return bool
-             */
-            function ($checkPassed, \_HumbugBox5addf3ce683e7\KevinGH\RequirementChecker\Requirement $requirement) {
+            @param
+            @param
+            @return
+            */
+            function ($checkPassed, \_HumbugBox5aeb92ac2e46b\KevinGH\RequirementChecker\Requirement $requirement) {
                 return $checkPassed && $requirement->isFulfilled();
             },
             \true

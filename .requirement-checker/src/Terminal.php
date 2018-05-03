@@ -1,31 +1,17 @@
 <?php
 
-/*
- * This file is part of the box project.
- *
- * (c) Kevin Herrera <kevin@herrera.io>
- *     Théo Fidry <theo.fidry@gmail.com>
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
-namespace _HumbugBox5addf3ce683e7\KevinGH\RequirementChecker;
+namespace _HumbugBox5aeb92ac2e46b\KevinGH\RequirementChecker;
 
 /**
- * This file is copy/pasted from the Symfony project to avoid a dependency on `symfony/console` which would be too big for just using this
- * class.
- *
- * @license MIT (c) Fabien Potencier <fabien@symfony.com>
- */
+@license
+*/
 class Terminal
 {
     private static $width;
     private static $height;
     /**
-     * Gets the terminal width.
-     *
-     * @return int
-     */
+    @return
+    */
     public function getWidth()
     {
         $width = \getenv('COLUMNS');
@@ -38,10 +24,8 @@ class Terminal
         return self::$width ?: 80;
     }
     /**
-     * Gets the terminal height.
-     *
-     * @return int
-     */
+    @return
+    */
     public function getHeight()
     {
         $height = \getenv('LINES');
@@ -57,32 +41,25 @@ class Terminal
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             if (\preg_match('/^(\\d+)x(\\d+)(?: \\((\\d+)x(\\d+)\\))?$/', \trim(\getenv('ANSICON')), $matches)) {
-                // extract [w, H] from "wxh (WxH)"
-                // or [w, h] from "wxh"
                 self::$width = (int) $matches[1];
                 self::$height = isset($matches[4]) ? (int) $matches[4] : (int) $matches[2];
             } elseif (null !== ($dimensions = self::getConsoleMode())) {
-                // extract [w, h] from "wxh"
                 self::$width = (int) $dimensions[0];
                 self::$height = (int) $dimensions[1];
             }
         } elseif ($sttyString = self::getSttyColumns()) {
             if (\preg_match('/rows.(\\d+);.columns.(\\d+);/i', $sttyString, $matches)) {
-                // extract [w, h] from "rows h; columns w;"
                 self::$width = (int) $matches[2];
                 self::$height = (int) $matches[1];
             } elseif (\preg_match('/;.(\\d+).rows;.(\\d+).columns/i', $sttyString, $matches)) {
-                // extract [w, h] from "; h rows; w columns"
                 self::$width = (int) $matches[2];
                 self::$height = (int) $matches[1];
             }
         }
     }
     /**
-     * Runs and parses mode CON if it's available, suppressing any error output.
-     *
-     * @return null|int[] An array composed of the width and the height or null if it could not be parsed
-     */
+    @return
+    */
     private static function getConsoleMode()
     {
         if (!\function_exists('proc_open')) {
@@ -101,10 +78,8 @@ class Terminal
         }
     }
     /**
-     * Runs and parses stty -a if it's available, suppressing any error output.
-     *
-     * @return null|string
-     */
+    @return
+    */
     private static function getSttyColumns()
     {
         if (!\function_exists('proc_open')) {

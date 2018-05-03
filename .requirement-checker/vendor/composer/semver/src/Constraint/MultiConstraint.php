@@ -1,62 +1,53 @@
 <?php
 
-/*
- * This file is part of composer/semver.
- *
- * (c) Composer <https://github.com/composer>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
- */
-namespace _HumbugBox5addf3ce683e7\Composer\Semver\Constraint;
+namespace _HumbugBox5aeb92ac2e46b\Composer\Semver\Constraint;
 
-/**
- * Defines a conjunctive or disjunctive set of constraints.
- */
-class MultiConstraint implements \_HumbugBox5addf3ce683e7\Composer\Semver\Constraint\ConstraintInterface
+class MultiConstraint implements \_HumbugBox5aeb92ac2e46b\Composer\Semver\Constraint\ConstraintInterface
 {
-    /** @var ConstraintInterface[] */
+    /**
+    @var */
     protected $constraints;
-    /** @var string */
+    /**
+    @var */
     protected $prettyString;
-    /** @var bool */
+    /**
+    @var */
     protected $conjunctive;
     /**
-     * @param ConstraintInterface[] $constraints A set of constraints
-     * @param bool $conjunctive Whether the constraints should be treated as conjunctive or disjunctive
-     */
+    @param
+    @param
+    */
     public function __construct(array $constraints, $conjunctive = \true)
     {
         $this->constraints = $constraints;
         $this->conjunctive = $conjunctive;
     }
     /**
-     * @return ConstraintInterface[]
-     */
+    @return
+    */
     public function getConstraints()
     {
         return $this->constraints;
     }
     /**
-     * @return bool
-     */
+    @return
+    */
     public function isConjunctive()
     {
         return $this->conjunctive;
     }
     /**
-     * @return bool
-     */
+    @return
+    */
     public function isDisjunctive()
     {
         return !$this->conjunctive;
     }
     /**
-     * @param ConstraintInterface $provider
-     *
-     * @return bool
-     */
-    public function matches(\_HumbugBox5addf3ce683e7\Composer\Semver\Constraint\ConstraintInterface $provider)
+    @param
+    @return
+    */
+    public function matches(\_HumbugBox5aeb92ac2e46b\Composer\Semver\Constraint\ConstraintInterface $provider)
     {
         if (\false === $this->conjunctive) {
             foreach ($this->constraints as $constraint) {
@@ -74,15 +65,15 @@ class MultiConstraint implements \_HumbugBox5addf3ce683e7\Composer\Semver\Constr
         return \true;
     }
     /**
-     * @param string $prettyString
-     */
+    @param
+    */
     public function setPrettyString($prettyString)
     {
         $this->prettyString = $prettyString;
     }
     /**
-     * @return string
-     */
+    @return
+    */
     public function getPrettyString()
     {
         if ($this->prettyString) {
@@ -91,8 +82,8 @@ class MultiConstraint implements \_HumbugBox5addf3ce683e7\Composer\Semver\Constr
         return $this->__toString();
     }
     /**
-     * @return string
-     */
+    @return
+    */
     public function __toString()
     {
         $constraints = array();

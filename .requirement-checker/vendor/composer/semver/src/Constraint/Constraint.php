@@ -1,21 +1,9 @@
 <?php
 
-/*
- * This file is part of composer/semver.
- *
- * (c) Composer <https://github.com/composer>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
- */
-namespace _HumbugBox5addf3ce683e7\Composer\Semver\Constraint;
+namespace _HumbugBox5aeb92ac2e46b\Composer\Semver\Constraint;
 
-/**
- * Defines a constraint.
- */
-class Constraint implements \_HumbugBox5addf3ce683e7\Composer\Semver\Constraint\ConstraintInterface
+class Constraint implements \_HumbugBox5aeb92ac2e46b\Composer\Semver\Constraint\ConstraintInterface
 {
-    /* operator integer values */
     const OP_EQ = 0;
     const OP_LT = 1;
     const OP_LE = 2;
@@ -23,46 +11,43 @@ class Constraint implements \_HumbugBox5addf3ce683e7\Composer\Semver\Constraint\
     const OP_GE = 4;
     const OP_NE = 5;
     /**
-     * Operator to integer translation table.
-     *
-     * @var array
-     */
+    @var
+    */
     private static $transOpStr = array('=' => self::OP_EQ, '==' => self::OP_EQ, '<' => self::OP_LT, '<=' => self::OP_LE, '>' => self::OP_GT, '>=' => self::OP_GE, '<>' => self::OP_NE, '!=' => self::OP_NE);
     /**
-     * Integer to operator translation table.
-     *
-     * @var array
-     */
+    @var
+    */
     private static $transOpInt = array(self::OP_EQ => '==', self::OP_LT => '<', self::OP_LE => '<=', self::OP_GT => '>', self::OP_GE => '>=', self::OP_NE => '!=');
-    /** @var string */
+    /**
+    @var */
     protected $operator;
-    /** @var string */
+    /**
+    @var */
     protected $version;
-    /** @var string */
+    /**
+    @var */
     protected $prettyString;
     /**
-     * @param ConstraintInterface $provider
-     *
-     * @return bool
-     */
-    public function matches(\_HumbugBox5addf3ce683e7\Composer\Semver\Constraint\ConstraintInterface $provider)
+    @param
+    @return
+    */
+    public function matches(\_HumbugBox5aeb92ac2e46b\Composer\Semver\Constraint\ConstraintInterface $provider)
     {
         if ($provider instanceof $this) {
             return $this->matchSpecific($provider);
         }
-        // turn matching around to find a match
         return $provider->matches($this);
     }
     /**
-     * @param string $prettyString
-     */
+    @param
+    */
     public function setPrettyString($prettyString)
     {
         $this->prettyString = $prettyString;
     }
     /**
-     * @return string
-     */
+    @return
+    */
     public function getPrettyString()
     {
         if ($this->prettyString) {
@@ -71,22 +56,17 @@ class Constraint implements \_HumbugBox5addf3ce683e7\Composer\Semver\Constraint\
         return $this->__toString();
     }
     /**
-     * Get all supported comparison operators.
-     *
-     * @return array
-     */
+    @return
+    */
     public static function getSupportedOperators()
     {
         return \array_keys(self::$transOpStr);
     }
     /**
-     * Sets operator and version to compare with.
-     *
-     * @param string $operator
-     * @param string $version
-     *
-     * @throws \InvalidArgumentException if invalid operator is given.
-     */
+    @param
+    @param
+    @throws
+    */
     public function __construct($operator, $version)
     {
         if (!isset(self::$transOpStr[$operator])) {
@@ -96,15 +76,13 @@ class Constraint implements \_HumbugBox5addf3ce683e7\Composer\Semver\Constraint\
         $this->version = $version;
     }
     /**
-     * @param string $a
-     * @param string $b
-     * @param string $operator
-     * @param bool $compareBranches
-     *
-     * @throws \InvalidArgumentException if invalid operator is given.
-     *
-     * @return bool
-     */
+    @param
+    @param
+    @param
+    @param
+    @throws
+    @return
+    */
     public function versionCompare($a, $b, $operator, $compareBranches = \false)
     {
         if (!isset(self::$transOpStr[$operator])) {
@@ -115,19 +93,17 @@ class Constraint implements \_HumbugBox5addf3ce683e7\Composer\Semver\Constraint\
         if ($aIsBranch && $bIsBranch) {
             return $operator === '==' && $a === $b;
         }
-        // when branches are not comparable, we make sure dev branches never match anything
         if (!$compareBranches && ($aIsBranch || $bIsBranch)) {
             return \false;
         }
         return \version_compare($a, $b, $operator);
     }
     /**
-     * @param Constraint $provider
-     * @param bool $compareBranches
-     *
-     * @return bool
-     */
-    public function matchSpecific(\_HumbugBox5addf3ce683e7\Composer\Semver\Constraint\Constraint $provider, $compareBranches = \false)
+    @param
+    @param
+    @return
+    */
+    public function matchSpecific(\_HumbugBox5aeb92ac2e46b\Composer\Semver\Constraint\Constraint $provider, $compareBranches = \false)
     {
         $noEqualOp = \str_replace('=', '', self::$transOpInt[$this->operator]);
         $providerNoEqualOp = \str_replace('=', '', self::$transOpInt[$provider->operator]);
@@ -135,19 +111,13 @@ class Constraint implements \_HumbugBox5addf3ce683e7\Composer\Semver\Constraint\
         $isNonEqualOp = self::OP_NE === $this->operator;
         $isProviderEqualOp = self::OP_EQ === $provider->operator;
         $isProviderNonEqualOp = self::OP_NE === $provider->operator;
-        // '!=' operator is match when other operator is not '==' operator or version is not match
-        // these kinds of comparisons always have a solution
         if ($isNonEqualOp || $isProviderNonEqualOp) {
             return !$isEqualOp && !$isProviderEqualOp || $this->versionCompare($provider->version, $this->version, '!=', $compareBranches);
         }
-        // an example for the condition is <= 2.0 & < 1.0
-        // these kinds of comparisons always have a solution
         if ($this->operator !== self::OP_EQ && $noEqualOp === $providerNoEqualOp) {
             return \true;
         }
         if ($this->versionCompare($provider->version, $this->version, self::$transOpInt[$this->operator], $compareBranches)) {
-            // special case, e.g. require >= 1.0 and provide < 1.0
-            // 1.0 >= 1.0 but 1.0 is outside of the provided interval
             if ($provider->version === $this->version && self::$transOpInt[$provider->operator] === $providerNoEqualOp && self::$transOpInt[$this->operator] !== $noEqualOp) {
                 return \false;
             }
@@ -156,8 +126,8 @@ class Constraint implements \_HumbugBox5addf3ce683e7\Composer\Semver\Constraint\
         return \false;
     }
     /**
-     * @return string
-     */
+    @return
+    */
     public function __toString()
     {
         return self::$transOpInt[$this->operator] . ' ' . $this->version;
