@@ -1,21 +1,13 @@
 <?php
 
-/*
- * This file is part of the box project.
- *
- * (c) Kevin Herrera <kevin@herrera.io>
- *     Théo Fidry <theo.fidry@gmail.com>
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
-namespace _HumbugBox5addf3ce683e7\KevinGH\RequirementChecker;
+namespace _HumbugBox5aeb92ac2e46b\KevinGH\RequirementChecker;
 
 /**
- * The code in this file must be PHP 5.3+ compatible as is used to know if the application can be run.
- *
- * @private
- */
+@private
+@see
+@package
+@license
+*/
 final class Requirement
 {
     private $checkIsFulfilled;
@@ -23,11 +15,10 @@ final class Requirement
     private $testMessage;
     private $helpText;
     /**
-     * @param string $checkIsFulfilled Callable as a string (it will be evaluated with `eval()` returning a `bool` value telling whether the
-     *                                 requirement is fulfilled or not. The condition is evaluated lazily.
-     * @param string $testMessage      The message for testing the requirement
-     * @param string $helpText         The help text (when null, it will be inferred from $helpHtml, i.e. stripped from HTML tags)
-     */
+    @param
+    @param
+    @param
+    */
     public function __construct($checkIsFulfilled, $testMessage, $helpText)
     {
         $this->checkIsFulfilled = $checkIsFulfilled;
@@ -40,25 +31,24 @@ final class Requirement
             $this->fulfilled = eval($this->checkIsFulfilled);
         }
         return (bool) $this->fulfilled;
-        // Cast to boolean, `(bool)` and `boolval()` are not available in PHP 5.3
     }
     /**
-     * @return string
-     */
+    @return
+    */
     public function getIsFullfilledChecker()
     {
         return $this->checkIsFulfilled;
     }
     /**
-     * @return string
-     */
+    @return
+    */
     public function getTestMessage()
     {
         return $this->testMessage;
     }
     /**
-     * @return string
-     */
+    @return
+    */
     public function getHelpText()
     {
         return $this->helpText;
