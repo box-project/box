@@ -19,8 +19,9 @@ use Traversable;
 
 /**
  * @private
+ *
  * @see \Symfony\Requirements\RequirementCollection
- * @package symfony/requirements-checker
+ *
  * @license MIT (c) Fabien Potencier <fabien@symfony.com>
  */
 final class RequirementCollection implements IteratorAggregate, Countable

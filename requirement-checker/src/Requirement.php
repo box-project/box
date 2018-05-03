@@ -14,8 +14,9 @@ namespace KevinGH\RequirementChecker;
 
 /**
  * @private
+ *
  * @see \Symfony\Requirements\Requirement
- * @package symfony/requirements-checker
+ *
  * @license MIT (c) Fabien Potencier <fabien@symfony.com>
  */
 final class Requirement
