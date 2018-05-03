@@ -14,8 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use function array_diff;
-use function array_diff_key;
 use Assert\Assertion;
 use Closure;
 use DateTimeImmutable;
@@ -36,8 +34,8 @@ use stdClass;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
 use function array_column;
+use function array_diff;
 use function array_filter;
-use function array_flip;
 use function array_key_exists;
 use function array_map;
 use function array_merge;
@@ -907,7 +905,7 @@ BANNER;
         array $excludedPaths
     ): array {
         $toString = function ($file): string {
-            /** @param string|SplFileInfo $file */
+            // @param string|SplFileInfo $file
             return (string) $file;
         };
 
@@ -997,7 +995,7 @@ BANNER;
 
         if (array_key_exists('classmap', $autoload)) {
             foreach ($autoload['classmap'] as $path) {
-                /** @var string $path */
+                // @var string $path
                 $paths[] = $path;
             }
         }
@@ -1011,7 +1009,7 @@ BANNER;
 
         if (array_key_exists('files', $autoload)) {
             foreach ($autoload['files'] as $path) {
-                /** @var string $path */
+                // @var string $path
                 $filesToAppend[] = $normalizePath($path);
             }
         }

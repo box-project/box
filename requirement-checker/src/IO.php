@@ -163,6 +163,7 @@ final class IO
      * @return bool true if the stream supports colorization, false otherwise
      *
      * @see \Symfony\Component\Console\Output\StreamOutput
+     *
      * @license MIT (c) Fabien Potencier <fabien@symfony.com>
      */
     private function checkColorSupport()
