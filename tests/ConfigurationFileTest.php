@@ -401,10 +401,10 @@ JSON
         // Relative to the current working directory for readability
         $expected = [
             'C/fileC0',
-            'D/fileD0',
-            'E/fileE0',
             'composer.json',
             'composer.lock',
+            'D/fileD0',
+            'E/fileE0',
             'file0',
             'file1',    // 'files' & 'files-bin' are not affected by the blacklist filter
             'vendor/acme/bar/ab0',

@@ -106,6 +106,9 @@ JSON
         $expected = [
             'CLASSMAP_DIR/file0',
             'CLASSMAP_DIR/file1',
+            'composer.json',
+            'file0',
+            'file1',
             'PSR0_0/file0',
             'PSR0_0/file1',
             'PSR0_1/file0',
@@ -118,9 +121,6 @@ JSON
             'PSR4_1/file1',
             'PSR4_2/file0',
             'PSR4_2/file1',
-            'composer.json',
-            'file0',
-            'file1',
         ];
 
         $noFileConfig = $this->getNoFileConfig();
@@ -227,14 +227,14 @@ JSON
         // Relative to the current working directory for readability
         $expected = [
             'CLASSMAP_DIR/file0',
+            'composer.json',
+            'file0',
             'PSR0_0/file0',
             'PSR0_1/file0',
             'PSR0_2/file0',
             'PSR4_0/file0',
             'PSR4_1/file0',
             'PSR4_2/file0',
-            'composer.json',
-            'file0',
         ];
 
         $actual = $this->normalizeConfigPaths($this->config->getFiles());
@@ -265,6 +265,9 @@ JSON
         touch('LICENSE');
         touch('LICENSE.md');
         touch('license');
+        touch('LICENSE_GECKO');
+
+        touch('LicenseCommand.php');
 
         touch('README');
         touch('README.md');
@@ -272,32 +275,45 @@ JSON
         touch('README.rst');
         touch('readme');
 
+        touch('ReadmeCommand.php');
+
         touch('UPGRADE');
         touch('UPGRADE.md');
         touch('upgrade');
+
+        touch('UpgradeCommand.php');
 
         touch('CHANGELOG');
         touch('ChangeLog-7.1.md');
         touch('CHANGELOG.md');
         touch('changelog');
 
+        touch('ChangelogCommand.php');
+
         touch('CONTRIBUTING');
         touch('CONTRIBUTING.md');
         touch('contributing');
+
+        touch('ContributingCommand.php');
 
         touch('TODO');
         touch('TODO.md');
         touch('todo');
 
+        touch('TodoCommand.php');
+
         touch('CONDUCT');
         touch('CONDUCT.md');
         touch('conduct');
-
         touch('CODE_OF_CONDUCT.md');
+
+        touch('ConductCommand.php');
 
         touch('AUTHORS');
         touch('AUTHORS.md');
         touch('authors');
+
+        touch('AuthorCommand.php');
 
         touch('MainTest.php');
 
@@ -322,6 +338,12 @@ JSON
         mkdir('tests');
         touch('tests/file0');
 
+        mkdir('src/Test');
+        touch('src/Test/file0');
+
+        mkdir('src/Tests');
+        touch('src/Tests/file0');
+
         mkdir('travis');
         touch('travis/install-ev.sh');
 
@@ -333,6 +355,8 @@ JSON
 
         touch('phpdoc.dist.xml');
         touch('phpdoc.xml');
+
+        touch('psalm.xml');
 
         touch('Vagrantfile');
 
@@ -421,26 +445,35 @@ JSON
 
         // Relative to the current working directory for readability
         $expected = [
+            'AuthorCommand.php',
+            'ChangelogCommand.php',
             'composer.json',
+            'ConductCommand.php',
+            'ContributingCommand.php',
+            'LicenseCommand.php',
+            'LICENSE_GECKO',
+            'ReadmeCommand.php',
             'src/foo.php',
+            'TodoCommand.php',
+            'UpgradeCommand.php',
         ];
 
         $noFileConfig = $this->getNoFileConfig();
 
         $actual = $this->normalizeConfigPaths($noFileConfig->getFiles());
 
-        $this->assertEquals($expected, $actual);
+        $this->assertSame($expected, $actual);
         $this->assertCount(0, $noFileConfig->getBinaryFiles());
 
         $this->reloadConfig();
 
         $actual = $this->normalizeConfigPaths($this->config->getFiles());
 
-        $this->assertEquals($expected, $actual);
+        $this->assertSame($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());
     }
 
-    public function test_the_existing_phars_are_ignored_when_all_the_files_are_collected(): void
+    public function test_the_existing_PHARs_are_ignored_when_all_the_files_are_collected(): void
     {
         touch('index.phar');
 

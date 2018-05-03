@@ -20,7 +20,7 @@ use stdClass;
 use const DIRECTORY_SEPARATOR;
 use function file_put_contents;
 use function KevinGH\Box\FileSystem\make_path_absolute;
-use function sort;
+use function natcasesort;
 
 abstract class ConfigurationTestCase extends FileSystemTestCase
 {
@@ -88,9 +88,9 @@ abstract class ConfigurationTestCase extends FileSystemTestCase
             )
         );
 
-        sort($files);
+        natcasesort($files);
 
-        return $files;
+        return array_values($files);
     }
 
     final protected function getNoFileConfig(): Configuration
