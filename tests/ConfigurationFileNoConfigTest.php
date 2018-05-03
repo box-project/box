@@ -106,6 +106,9 @@ JSON
         $expected = [
             'CLASSMAP_DIR/file0',
             'CLASSMAP_DIR/file1',
+            'composer.json',
+            'file0',
+            'file1',
             'PSR0_0/file0',
             'PSR0_0/file1',
             'PSR0_1/file0',
@@ -118,9 +121,6 @@ JSON
             'PSR4_1/file1',
             'PSR4_2/file0',
             'PSR4_2/file1',
-            'composer.json',
-            'file0',
-            'file1',
         ];
 
         $noFileConfig = $this->getNoFileConfig();
@@ -227,14 +227,14 @@ JSON
         // Relative to the current working directory for readability
         $expected = [
             'CLASSMAP_DIR/file0',
+            'composer.json',
+            'file0',
             'PSR0_0/file0',
             'PSR0_1/file0',
             'PSR0_2/file0',
             'PSR4_0/file0',
             'PSR4_1/file0',
             'PSR4_2/file0',
-            'composer.json',
-            'file0',
         ];
 
         $actual = $this->normalizeConfigPaths($this->config->getFiles());
