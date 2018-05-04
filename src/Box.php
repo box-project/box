@@ -28,6 +28,7 @@ use function Amp\Promise\wait;
 use function array_map;
 use function chdir;
 use function file_exists;
+use function getcwd;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\make_path_relative;
@@ -79,6 +80,10 @@ final class Box
      */
     private $scoper;
 
+    private $buffering = false;
+
+    private $bufferedFiles = [];
+
     private function __construct(Phar $phar, string $file)
     {
         $this->phar = $phar;
@@ -107,6 +112,46 @@ final class Box
         mkdir(dirname($file));
 
         return new self(new Phar($file, (int) $flags, $alias), $file);
+    }
+
+    public function startBuffering(): void
+    {
+        Assertion::false($this->buffering, 'The buffering must be ended before starting it again');
+
+        $this->buffering = true;
+
+        $this->phar->startBuffering();
+    }
+
+    public function endBuffering(bool $dumpAutoload): void
+    {
+        Assertion::true($this->buffering, 'The buffering must be started before ending it');
+
+        $cwd = getcwd();
+
+        $tmp = make_tmp_dir('box', __CLASS__);
+        chdir($tmp);
+
+        try {
+            foreach ($this->bufferedFiles as $file => $contents) {
+                dump_file($file, $contents);
+            }
+
+            if ($dumpAutoload) {
+                // Dump autoload without dev dependencies
+                ComposerOrchestrator::dumpAutoload($this->scoper->getWhitelist(), $this->scoper->getPrefix());
+            }
+
+            chdir($cwd);
+
+            $this->phar->buildFromDirectory($tmp);
+        } finally {
+            remove($tmp);
+        }
+
+        $this->buffering = false;
+
+        $this->phar->stopBuffering();
     }
 
     /**
@@ -168,8 +213,10 @@ final class Box
     /**
      * @param SplFileInfo[]|string[] $files
      */
-    public function addFiles(array $files, bool $binary, bool $dumpAutoload = false): void
+    public function addFiles(array $files, bool $binary): void
     {
+        Assertion::true($this->buffering, 'Cannot add files if the buffering has not started.');
+
         $files = array_map(
             function ($file): string {
                 // Convert files to string as SplFileInfo is not serializable
@@ -186,30 +233,12 @@ final class Box
             return;
         }
 
-        $cwd = getcwd();
+        $filesWithContents = $this->processContents($files);
 
-        $filesWithContents = $this->processContents($files, $cwd);
+        foreach ($filesWithContents as $fileWithContents) {
+            [$file, $contents] = $fileWithContents;
 
-        $tmp = make_tmp_dir('box', __CLASS__);
-        chdir($tmp);
-
-        try {
-            foreach ($filesWithContents as $fileWithContents) {
-                [$file, $contents] = $fileWithContents;
-
-                dump_file($file, $contents);
-            }
-
-            if ($dumpAutoload) {
-                // Dump autoload without dev dependencies
-                ComposerOrchestrator::dumpAutoload($this->scoper->getWhitelist(), $this->scoper->getPrefix());
-            }
-
-            chdir($cwd);
-
-            $this->phar->buildFromDirectory($tmp);
-        } finally {
-            remove($tmp);
+            $this->bufferedFiles[$file] = $contents;
         }
     }
 
@@ -225,6 +254,8 @@ final class Box
      */
     public function addFile(string $file, string $contents = null, bool $binary = false): string
     {
+        Assertion::true($this->buffering, 'Cannot add files if the buffering has not started.');
+
         if (null === $contents) {
             $contents = file_contents($file);
         }
@@ -237,7 +268,7 @@ final class Box
         }
 
         if ($binary) {
-            $this->phar->addFromString($local, $contents);
+            $this->bufferedFiles[$local] = $contents;
         } else {
             $processedContents = self::compactContents(
                 $this->compactors,
@@ -245,7 +276,7 @@ final class Box
                 self::replacePlaceholders($this->placeholders, $contents)
             );
 
-            $this->phar->addFromString($local, $processedContents);
+            $this->bufferedFiles[$local] = $processedContents;
         }
 
         return $local;
@@ -300,22 +331,18 @@ final class Box
 
     /**
      * @param string[] $files
-     * @param string   $cwd   Current working directory. As the processes are spawned for parallel processing, the
-     *                        working directory may change so we pass the working directory in which the processing
-     *                        is supposed to happen. This should not happen during regular usage as all the files are
-     *                        absolute but it's possible this class is used with relative paths in which case this is
-     *                        an issue.
      *
      * @return array array of tuples where the first element is the local file path (path inside the PHAR) and the
      *               second element is the processed contents
      */
-    private function processContents(array $files, string $cwd): array
+    private function processContents(array $files): array
     {
         $basePath = $this->basePath;
         $mapFile = $this->mapFile;
         $placeholders = $this->placeholders;
         $compactors = $this->compactors;
         $bootstrap = $GLOBALS['_BOX_BOOTSTRAP'] ?? function (): void {};
+        $cwd = getcwd();
 
         $processFile = function (string $file) use ($cwd, $basePath, $mapFile, $placeholders, $compactors, $bootstrap): array {
             chdir($cwd);
