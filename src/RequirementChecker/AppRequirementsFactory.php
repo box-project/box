@@ -16,6 +16,7 @@ namespace KevinGH\Box\RequirementChecker;
 
 use function array_diff_key;
 use function array_key_exists;
+use Phar;
 use function sprintf;
 use function substr;
 
@@ -34,13 +35,13 @@ final class AppRequirementsFactory
      *
      * @return array Serialized configured requirements
      */
-    public static function create(array $composerJsonDecodedContents, array $composerLockDecodedContents, bool $compressed): array
+    public static function create(array $composerJsonDecodedContents, array $composerLockDecodedContents, ?int $compressionAlgorithm): array
     {
         return self::configureExtensionRequirements(
             self::retrievePhpVersionRequirements([], $composerJsonDecodedContents, $composerLockDecodedContents),
             $composerJsonDecodedContents,
             $composerLockDecodedContents,
-            $compressed
+            $compressionAlgorithm
         );
     }
 
@@ -116,9 +117,9 @@ final class AppRequirementsFactory
         array $requirements,
         array $composerJsonContents,
         array $composerLockContents,
-        bool $compressed
+        ?int $compressionAlgorithm
     ): array {
-        $extensionRequirements = self::collectExtensionRequirements($composerJsonContents, $composerLockContents, $compressed);
+        $extensionRequirements = self::collectExtensionRequirements($composerJsonContents, $composerLockContents, $compressionAlgorithm);
 
         foreach ($extensionRequirements as $extension => $packages) {
             foreach ($packages as $package) {
@@ -161,13 +162,21 @@ final class AppRequirementsFactory
      *
      * @return array Associative array containing the list of extensions required
      */
-    private static function collectExtensionRequirements(array $composerJsonContents, array $composerLockContents, bool $compressed): array
+    private static function collectExtensionRequirements(
+        array $composerJsonContents,
+        array $composerLockContents,
+        ?int $compressionAlgorithm
+    ): array
     {
         $requirements = [];
         $polyfills = [];
 
-        if ($compressed) {
-            $requirements['zip'] = [self::SELF_PACKAGE];
+        if (Phar::BZ2 === $compressionAlgorithm) {
+            $requirements['bz2'] = [self::SELF_PACKAGE];
+        }
+
+        if (Phar::GZ === $compressionAlgorithm) {
+            $requirements['zlib'] = [self::SELF_PACKAGE];
         }
 
         $platform = $composerLockContents['platform'] ?? [];

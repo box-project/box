@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
+use Phar;
 use PHPUnit\Framework\TestCase;
 use function json_decode;
 
@@ -28,13 +29,13 @@ class AppRequirementsFactoryTest extends TestCase
     public function test_it_can_generate_and_serialized_requirements_from_a_composer_lock_file(
         ?string $composerJsonContents,
         ?string $composerLockContents,
-        bool $compressed,
+        ?int $compressionAlgorithm,
         array $expected
     ): void {
         $actual = AppRequirementsFactory::create(
             null === $composerJsonContents ? [] : json_decode($composerJsonContents, true),
             null === $composerLockContents ? [] : json_decode($composerLockContents, true),
-            $compressed
+            $compressionAlgorithm
         );
 
         $this->assertSame($expected, $actual);
@@ -45,59 +46,98 @@ class AppRequirementsFactoryTest extends TestCase
         yield 'empty json file' => [
             '{}',
             null,
-            false,
+            null,
             [],
         ];
 
         yield 'empty lock file' => [
             null,
             '{}',
-            false,
+            null,
             [],
         ];
 
         yield 'empty json & lock file' => [
             '{}',
             '{}',
-            false,
+            null,
             [],
         ];
 
-        yield 'empty json file (compressed PHAR)' => [
+        yield 'empty json file (compressed PHAR GZ)' => [
             '{}',
             null,
-            true,
+            Phar::GZ,
             [
                 [
-                    "return \\extension_loaded('zip');",
-                    'The application requires the extension "zip". Enable it or install a polyfill.',
-                    'The application requires the extension "zip".',
+                    "return \\extension_loaded('zlib');",
+                    'The application requires the extension "zlib". Enable it or install a polyfill.',
+                    'The application requires the extension "zlib".',
                 ],
             ],
         ];
 
-        yield 'empty lock file (compressed PHAR)' => [
-            null,
+        yield 'empty json file (compressed PHAR BZ2)' => [
             '{}',
-            true,
+            null,
+            Phar::BZ2,
             [
                 [
-                    "return \\extension_loaded('zip');",
-                    'The application requires the extension "zip". Enable it or install a polyfill.',
-                    'The application requires the extension "zip".',
+                    "return \\extension_loaded('bz2');",
+                    'The application requires the extension "bz2". Enable it or install a polyfill.',
+                    'The application requires the extension "bz2".',
                 ],
             ],
         ];
 
-        yield 'empty json & lock file (compressed PHAR)' => [
+        yield 'empty lock file (compressed PHAR GZ)' => [
+            null,
             '{}',
-            '{}',
-            true,
+            Phar::GZ,
             [
                 [
-                    "return \\extension_loaded('zip');",
-                    'The application requires the extension "zip". Enable it or install a polyfill.',
-                    'The application requires the extension "zip".',
+                    "return \\extension_loaded('zlib');",
+                    'The application requires the extension "zlib". Enable it or install a polyfill.',
+                    'The application requires the extension "zlib".',
+                ],
+            ],
+        ];
+
+        yield 'empty lock file (compressed PHAR BZ2)' => [
+            null,
+            '{}',
+            Phar::BZ2,
+            [
+                [
+                    "return \\extension_loaded('bz2');",
+                    'The application requires the extension "bz2". Enable it or install a polyfill.',
+                    'The application requires the extension "bz2".',
+                ],
+            ],
+        ];
+
+        yield 'empty json & lock file (compressed PHAR GZ)' => [
+            '{}',
+            '{}',
+            Phar::GZ,
+            [
+                [
+                    "return \\extension_loaded('zlib');",
+                    'The application requires the extension "zlib". Enable it or install a polyfill.',
+                    'The application requires the extension "zlib".',
+                ],
+            ],
+        ];
+
+        yield 'empty json & lock file (compressed PHAR BZ2)' => [
+            '{}',
+            '{}',
+            Phar::BZ2,
+            [
+                [
+                    "return \\extension_loaded('bz2');",
+                    'The application requires the extension "bz2". Enable it or install a polyfill.',
+                    'The application requires the extension "bz2".',
                 ],
             ],
         ];
@@ -115,7 +155,7 @@ class AppRequirementsFactoryTest extends TestCase
 JSON
             ,
             null,
-            false,
+            null,
             [
                 [
                     <<<'PHP'
@@ -156,7 +196,7 @@ PHP
 }
 JSON
             ,
-            false,
+            null,
             [
                 [
                     <<<'PHP'
@@ -207,7 +247,7 @@ JSON
 }
 JSON
             ,
-            false,
+            null,
             [
                 [
                     <<<'PHP'
@@ -248,7 +288,7 @@ PHP
 JSON
             ,
             null,
-            true,
+            Phar::GZ,
             [
                 [
                     <<<'PHP'
@@ -270,9 +310,9 @@ PHP
                     'The application requires the version "^7.1" or greater.',
                 ],
                 [
-                    "return \\extension_loaded('zip');",
-                    'The application requires the extension "zip". Enable it or install a polyfill.',
-                    'The application requires the extension "zip".',
+                    "return \\extension_loaded('zlib');",
+                    'The application requires the extension "zlib". Enable it or install a polyfill.',
+                    'The application requires the extension "zlib".',
                 ],
                 [
                     "return \\extension_loaded('phar');",
@@ -294,7 +334,7 @@ PHP
 }
 JSON
             ,
-            true,
+            Phar::GZ,
             [
                 [
                     <<<'PHP'
@@ -316,9 +356,9 @@ PHP
                     'The application requires the version "^7.1" or greater.',
                 ],
                 [
-                    "return \\extension_loaded('zip');",
-                    'The application requires the extension "zip". Enable it or install a polyfill.',
-                    'The application requires the extension "zip".',
+                    "return \\extension_loaded('zlib');",
+                    'The application requires the extension "zlib". Enable it or install a polyfill.',
+                    'The application requires the extension "zlib".',
                 ],
                 [
                     "return \\extension_loaded('phar');",
@@ -349,7 +389,7 @@ JSON
 }
 JSON
             ,
-            true,
+            Phar::GZ,
             [
                 [
                     <<<'PHP'
@@ -371,9 +411,9 @@ PHP
                     'The application requires the version "^7.1" or greater.',
                 ],
                 [
-                    "return \\extension_loaded('zip');",
-                    'The application requires the extension "zip". Enable it or install a polyfill.',
-                    'The application requires the extension "zip".',
+                    "return \\extension_loaded('zlib');",
+                    'The application requires the extension "zlib". Enable it or install a polyfill.',
+                    'The application requires the extension "zlib".',
                 ],
                 [
                     "return \\extension_loaded('phar');",
@@ -395,7 +435,7 @@ PHP
 JSON
             ,
             null,
-            false,
+            null,
             [],
         ];
 
@@ -411,7 +451,7 @@ JSON
 }
 JSON
             ,
-            false,
+            null,
             [],
         ];
 
@@ -436,7 +476,7 @@ JSON
 }
 JSON
             ,
-            false,
+            null,
             [],
         ];
 
@@ -452,12 +492,12 @@ JSON
 JSON
             ,
             null,
-            true,
+            Phar::GZ,
             [
                 [
-                    "return \\extension_loaded('zip');",
-                    'The application requires the extension "zip". Enable it or install a polyfill.',
-                    'The application requires the extension "zip".',
+                    "return \\extension_loaded('zlib');",
+                    'The application requires the extension "zlib". Enable it or install a polyfill.',
+                    'The application requires the extension "zlib".',
                 ],
             ],
         ];
@@ -474,12 +514,12 @@ JSON
 }
 JSON
             ,
-            true,
+            Phar::GZ,
             [
                 [
-                    "return \\extension_loaded('zip');",
-                    'The application requires the extension "zip". Enable it or install a polyfill.',
-                    'The application requires the extension "zip".',
+                    "return \\extension_loaded('zlib');",
+                    'The application requires the extension "zlib". Enable it or install a polyfill.',
+                    'The application requires the extension "zlib".',
                 ],
             ],
         ];
@@ -505,12 +545,12 @@ JSON
 }
 JSON
             ,
-            true,
+            Phar::GZ,
             [
                 [
-                    "return \\extension_loaded('zip');",
-                    'The application requires the extension "zip". Enable it or install a polyfill.',
-                    'The application requires the extension "zip".',
+                    "return \\extension_loaded('zlib');",
+                    'The application requires the extension "zlib". Enable it or install a polyfill.',
+                    'The application requires the extension "zlib".',
                 ],
             ],
         ];
@@ -530,7 +570,7 @@ JSON
 JSON
             ,
             null,
-            false,
+            null,
             [
                 [
                     <<<'PHP'
@@ -613,7 +653,7 @@ PHP
 }
 JSON
             ,
-            false,
+            null,
             [
                 [
                     <<<'PHP'
@@ -727,7 +767,7 @@ JSON
 }
 JSON
             ,
-            false,
+            null,
             [
                 [
                     <<<'PHP'
@@ -802,7 +842,7 @@ PHP
 JSON
             ,
             null,
-            false,
+            null,
             [],
         ];
 
@@ -837,7 +877,7 @@ JSON
 }
 JSON
             ,
-            false,
+            null,
             [],
         ];
 
@@ -881,7 +921,7 @@ JSON
 }
 JSON
             ,
-            false,
+            null,
             [],
         ];
 
@@ -923,7 +963,7 @@ JSON
 }
 JSON
             ,
-            false,
+            null,
             [
                 [
                     <<<'PHP'
@@ -993,7 +1033,7 @@ PHP
 JSON
             ,
             null,
-            false,
+            null,
             [
                 [
                     <<<'PHP'
@@ -1076,7 +1116,7 @@ PHP
 }
 JSON
             ,
-            false,
+            null,
             [
                 [
                     <<<'PHP'
@@ -1126,7 +1166,7 @@ PHP
 JSON
             ,
             null,
-            false,
+            null,
             [],
         ];
 
@@ -1146,7 +1186,7 @@ JSON
 }
 JSON
             ,
-            false,
+            null,
             [],
         ];
 
@@ -1161,7 +1201,7 @@ JSON
 JSON
             ,
             null,
-            false,
+            null,
             [],
         ];
 
@@ -1181,7 +1221,7 @@ JSON
 }
 JSON
             ,
-            false,
+            null,
             [],
         ];
     }

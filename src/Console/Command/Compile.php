@@ -500,7 +500,7 @@ EOF
         $checkFiles = RequirementsDumper::dump(
             $config->getComposerJsonDecodedContents() ?? [],
             $config->getComposerLockDecodedContents() ?? [],
-            null !== $config->getCompressionAlgorithm()
+            $config->getCompressionAlgorithm()
         );
 
         foreach ($checkFiles as $fileWithContents) {
