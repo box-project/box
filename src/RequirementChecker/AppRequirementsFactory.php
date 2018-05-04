@@ -181,14 +181,14 @@ final class AppRequirementsFactory
         }
 
         [$polyfills, $requirements] = [] === $composerLockContents
-            ? self::collectComposerJsonExtensionRequirements($composerJsonContents, $matches, $polyfills, $requirements)
-            : self::collectComposerLockExtensionRequirements($composerLockContents, $matches, $polyfills, $requirements)
+            ? self::collectComposerJsonExtensionRequirements($composerJsonContents, $polyfills, $requirements)
+            : self::collectComposerLockExtensionRequirements($composerLockContents, $polyfills, $requirements)
         ;
 
         return array_diff_key($requirements, $polyfills);
     }
 
-    private static function collectComposerJsonExtensionRequirements(array $composerJsonContents, $matches, $polyfills, $requirements): array
+    private static function collectComposerJsonExtensionRequirements(array $composerJsonContents, $polyfills, $requirements): array
     {
         $packages = $composerJsonContents['require'] ?? [];
 
@@ -223,7 +223,7 @@ final class AppRequirementsFactory
         return [$polyfills, $requirements];
     }
 
-    private static function collectComposerLockExtensionRequirements(array $composerLockContents, $matches, $polyfills, $requirements): array
+    private static function collectComposerLockExtensionRequirements(array $composerLockContents, $polyfills, $requirements): array
     {
         $packages = $composerLockContents['packages'] ?? [];
 
