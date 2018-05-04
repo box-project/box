@@ -439,9 +439,18 @@ EOF
 
     public function test_configure_file_mode(): void
     {
+        // Octal value provided
         $this->setConfig([
             'files' => [self::DEFAULT_FILE],
             'chmod' => '0755',
+        ]);
+
+        $this->assertSame(0755, $this->config->getFileMode());
+
+        // Decimal value provided
+        $this->setConfig([
+            'files' => [self::DEFAULT_FILE],
+            'chmod' => '755',
         ]);
 
         $this->assertSame(0755, $this->config->getFileMode());

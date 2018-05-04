@@ -40,6 +40,7 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
 use const DATE_ATOM;
 use function array_shift;
 use function count;
+use function decoct;
 use function explode;
 use function function_exists;
 use function get_class;
@@ -187,15 +188,7 @@ HELP;
             'Done.'
         );
 
-        $io->comment(
-            sprintf(
-                "<info>PHAR size: %s\nMemory usage: %.2fMB (peak: %.2fMB), time: %.2fs<info>",
-                formatted_filesize($path),
-                round(memory_get_usage() / 1024 / 1024, 2),
-                round(memory_get_peak_usage() / 1024 / 1024, 2),
-                round(microtime(true) - $startTime, 2)
-            )
-        );
+        $this->logCommandResourcesUsage($io, $path, $startTime);
     }
 
     /**
@@ -650,7 +643,10 @@ EOF
         if (null !== ($chmod = $config->getFileMode())) {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
-                "Setting file permissions to <comment>$chmod</comment>"
+                sprintf(
+                    'Setting file permissions to <comment>%s</comment>',
+                    '0'.decoct($chmod)
+                )
             );
 
             chmod($path, $chmod);
@@ -744,5 +740,18 @@ EOF
                 );
             }
         }
+    }
+
+    private function logCommandResourcesUsage(SymfonyStyle $io, string $path, float $startTime)
+    {
+        return $io->comment(
+            sprintf(
+                "<info>PHAR size: %s\nMemory usage: %.2fMB (peak: %.2fMB), time: %.2fs<info>",
+                formatted_filesize($path),
+                round(memory_get_usage() / 1024 / 1024, 2),
+                round(memory_get_peak_usage() / 1024 / 1024, 2),
+                round(microtime(true) - $startTime, 2)
+            )
+        );
     }
 }
