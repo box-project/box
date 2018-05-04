@@ -17,12 +17,12 @@ namespace KevinGH\Box;
 use Generator;
 use InvalidArgumentException;
 use KevinGH\Box\Json\JsonValidationException;
+use const DIRECTORY_SEPARATOR;
 use function file_put_contents;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\FileSystem\symlink;
-use const DIRECTORY_SEPARATOR;
 
 /**
  * @covers \KevinGH\Box\Configuration

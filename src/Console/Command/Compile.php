@@ -16,6 +16,7 @@ namespace KevinGH\Box\Console\Command;
 
 use Amp\MultiReasonException;
 use Assert\Assertion;
+use BadMethodCallException;
 use DateTimeImmutable;
 use DateTimeZone;
 use KevinGH\Box\Box;
@@ -37,6 +38,9 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
+use const DATE_ATOM;
+use const POSIX_RLIMIT_INFINITY;
+use const POSIX_RLIMIT_NOFILE;
 use function array_shift;
 use function count;
 use function decoct;
@@ -53,12 +57,12 @@ use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\formatted_filesize;
 use function KevinGH\Box\get_phar_compression_algorithms;
+use function posix_setrlimit;
 use function putenv;
 use function strlen;
 use function strtolower;
 use function substr;
 use function trim;
-use const DATE_ATOM;
 
 /**
  * @final
@@ -200,6 +204,8 @@ HELP;
      */
     private static function checkPhpSettings(SymfonyStyle $io, OutputInterface $output): void
     {
+        (new PhpSettingsHandler(new ConsoleLogger($output)))->check();
+
         if (function_exists('ini_set')) {
             $memoryInBytes = function (string $value): int {
                 $unit = strtolower($value[strlen($value) - 1]);
@@ -249,8 +255,6 @@ HELP;
                 );
             }
         }
-
-        (new PhpSettingsHandler(new ConsoleLogger($output)))->check();
     }
 
     private function createPhar(
@@ -283,7 +287,7 @@ HELP;
 
         $box->endBuffering(null !== $config->getComposerJson());
 
-        $this->configureCompressionAlgorithm($config, $box, $input->getOption(self::DEV_OPTION), $logger);
+        $this->configureCompressionAlgorithm($config, $box, $input->getOption(self::DEV_OPTION), $io, $logger);
 
         if ($debug) {
             $box->getPhar()->extractTo(self::DEBUG_DIR, null, true);
@@ -566,25 +570,87 @@ EOF
         }
     }
 
-    private function configureCompressionAlgorithm(Configuration $config, Box $box, bool $dev, BuildLogger $logger): void
+    private function configureCompressionAlgorithm(Configuration $config, Box $box, bool $dev, SymfonyStyle $io, BuildLogger $logger): void
     {
-        if (null !== ($algorithm = $config->getCompressionAlgorithm())) {
-            $logger->log(
-                BuildLogger::QUESTION_MARK_PREFIX,
-                sprintf(
-                    'Compressing with the algorithm "<comment>%s</comment>"',
-                    array_search($algorithm, get_phar_compression_algorithms(), true)
-                )
-            );
-
-            $box->getPhar()->compressFiles($algorithm);
-        } else {
+        if (null === ($algorithm = $config->getCompressionAlgorithm())) {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
                 $dev
                     ? 'No compression'
                     : '<error>No compression</error>'
             );
+
+            return;
+        }
+
+        $logger->log(
+            BuildLogger::QUESTION_MARK_PREFIX,
+            sprintf(
+                'Compressing with the algorithm "<comment>%s</comment>"',
+                array_search($algorithm, get_phar_compression_algorithms(), true)
+            )
+        );
+
+        $filesCount = count($config->getBinaryFiles()) + count($config->getFiles()) + 128;  // Add a little extra for good measure
+
+        if (function_exists('posix_getrlimit') && function_exists('posix_setrlimit')) {
+            $softLimit = posix_getrlimit()['soft openfiles'];
+            $hardLimit = posix_getrlimit()['hard openfiles'];
+
+            if ($softLimit < $filesCount) {
+                $io->writeln(
+                    sprintf(
+                        '<info>[debug] Increased the maximum number of open file descriptors from ("%s", "%s") to ("%s", "%s")'
+                        .'</info>',
+                        $softLimit,
+                        $hardLimit,
+                        $filesCount,
+                        'unlimited'
+                    ),
+                    OutputInterface::VERBOSITY_DEBUG
+                );
+
+                posix_setrlimit(
+                    POSIX_RLIMIT_NOFILE,
+                    $filesCount,
+                    'unlimited' === $hardLimit ? POSIX_RLIMIT_INFINITY : $hardLimit
+                );
+            }
+        } else {
+            $io->writeln(
+                '<info>[debug] Could not check the maximum number of open file descriptors: the functions "posix_getrlimit()" and '
+                .'"posix_setrlimit" could not be found.</info>',
+                OutputInterface::VERBOSITY_DEBUG
+            );
+        }
+
+        try {
+            $box->getPhar()->compressFiles($algorithm);
+        } catch (BadMethodCallException $exception) {
+            if ('unable to create temporary file' !== $exception->getMessage()) {
+                throw $exception;
+            }
+
+            $io->error(
+                sprintf(
+                    'Could not compress the PHAR: the compression requires too many file descriptors to be opened (%s). Check '
+                    .'your system limits or install the posix extension to allow Box to automatically configure it during the compression',
+                    $filesCount
+                )
+            );
+        } finally {
+            if (function_exists('posix_setrlimit') && isset($softLimit, $hardLimit)) {
+                posix_setrlimit(
+                    POSIX_RLIMIT_NOFILE,
+                    $softLimit,
+                    'unlimited' === $hardLimit ? POSIX_RLIMIT_INFINITY : $hardLimit
+                );
+
+                $io->writeln(
+                    '<info>[debug] Restored the maximum number of open file descriptors</info>',
+                    OutputInterface::VERBOSITY_DEBUG
+                );
+            }
         }
     }
 
