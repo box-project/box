@@ -1934,6 +1934,12 @@ OUTPUT;
         );
 
         $display = preg_replace(
+            '/You can inspect the generated PHAR( | *\n *\/\/ *)with( | *\n *\/\/ *)the( | *\n *\/\/ *)"info"( | *\n *\/\/ *)command/',
+            'You can inspect the generated PHAR with the "info" command',
+            $display
+        );
+
+        $display = preg_replace(
             '/\/\/ PHAR size: \d+\.\d{2}K?B/',
             '// PHAR size: 100B',
             $display
