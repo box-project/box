@@ -71,7 +71,6 @@ e2e_scoper_alias: 	## Runs the end-to-end tests to check that the PHP-Scoper con
 e2e_scoper_alias: box
 	./box compile --working-dir fixtures/build/dir010
 
-
 .PHONY: e2e_check_requirements
 DOCKER=docker run -i --rm -w /opt/box
 PHP7PHAR=box_php72 php index.phar -vvv --no-ansi
@@ -109,7 +108,6 @@ e2e_check_requirements: box
 	rm fixtures/check-requirements/fail-complete/actual-output || true
 	$(DOCKER) -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP7PHAR) > fixtures/check-requirements/fail-complete/actual-output || true
 	diff fixtures/check-requirements/fail-complete/expected-output-72 fixtures/check-requirements/fail-complete/actual-output
-
 
 .PHONY: blackfire
 blackfire:		## Profiles the compile step
