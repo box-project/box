@@ -321,6 +321,7 @@ Box (repo)
 Building the PHAR "/path/to/tmp/index.phar"
 ? No compactor to register
 ? Adding main file: /path/to/tmp/index.php
+? Adding requirements checker
 ? Adding binary files
     > No file found
 ? Adding files
@@ -373,6 +374,8 @@ OUTPUT;
 
 Phar::mapPhar('box-auto-generated-alias-__uniqid__.phar');
 
+require 'phar://box-auto-generated-alias-__uniqid__.phar/.box/check_requirements.php';
+
 require 'phar://box-auto-generated-alias-__uniqid__.phar/index.php';
 
 __HALT_COMPILER(); ?>
@@ -387,6 +390,42 @@ PHP;
         );
 
         $expectedFiles = [
+            '/.box/',
+            '/.box/.requirements.php',
+            '/.box/bin/',
+            '/.box/bin/check-requirements.php',
+            '/.box/check_requirements.php',
+            '/.box/composer.json',
+            '/.box/composer.lock',
+            '/.box/src/',
+            '/.box/src/Checker.php',
+            '/.box/src/IO.php',
+            '/.box/src/Printer.php',
+            '/.box/src/Requirement.php',
+            '/.box/src/RequirementCollection.php',
+            '/.box/src/Terminal.php',
+            '/.box/vendor/',
+            '/.box/vendor/autoload.php',
+            '/.box/vendor/composer/',
+            '/.box/vendor/composer/ClassLoader.php',
+            '/.box/vendor/composer/LICENSE',
+            '/.box/vendor/composer/autoload_classmap.php',
+            '/.box/vendor/composer/autoload_namespaces.php',
+            '/.box/vendor/composer/autoload_psr4.php',
+            '/.box/vendor/composer/autoload_real.php',
+            '/.box/vendor/composer/autoload_static.php',
+            '/.box/vendor/composer/installed.json',
+            '/.box/vendor/composer/semver/',
+            '/.box/vendor/composer/semver/src/',
+            '/.box/vendor/composer/semver/src/Comparator.php',
+            '/.box/vendor/composer/semver/src/Constraint/',
+            '/.box/vendor/composer/semver/src/Constraint/AbstractConstraint.php',
+            '/.box/vendor/composer/semver/src/Constraint/Constraint.php',
+            '/.box/vendor/composer/semver/src/Constraint/ConstraintInterface.php',
+            '/.box/vendor/composer/semver/src/Constraint/EmptyConstraint.php',
+            '/.box/vendor/composer/semver/src/Constraint/MultiConstraint.php',
+            '/.box/vendor/composer/semver/src/Semver.php',
+            '/.box/vendor/composer/semver/src/VersionParser.php',
             '/bootstrap.php',
             '/composer.json',
             '/index.php',
@@ -440,6 +479,7 @@ PHP;
             json_encode(
                 [
                     'alias' => 'alias-test.phar',
+                    'check-requirements' => false,
                     'chmod' => '0755',
                     'compactors' => [Php::class],
                     'directories' => ['a'],
@@ -592,6 +632,7 @@ PHP;
             'box.json',
             json_encode(
                 [
+                    'check-requirements' => false,
                     'chmod' => '0755',
                     'compactors' => [Php::class],
                     'directories' => ['a'],
@@ -722,6 +763,7 @@ Box (repo)
 ? Mapping paths
   - a/deep/test/directory > sub
 ? Adding main file: /path/to/tmp/run.php
+? Adding requirements checker
 ? Adding binary files
     > 1 file(s)
 ? Adding files
@@ -820,6 +862,7 @@ Box (repo)
 ? Mapping paths
   - a/deep/test/directory > sub
 ? Adding main file: /path/to/tmp/run.php
+? Adding requirements checker
 ? Adding binary files
     > 1 file(s)
 ? Adding files

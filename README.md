@@ -142,8 +142,8 @@ if you are using a PHAR of an application compatible with PHP 7.2 in PHP 7.0 or 
 required extension, it will simply break with a non-friendly error.
 
 By default, when building your PHAR with Box, Box will look up for the PHP versions and extensions required to execute your
-application according to your `composer.json` and `composer.lock` files and ship a micro
-[requirements checker][check-requirements] which will be executed when starting your PHAR.
+application according to your `composer.json` and `composer.lock` files and ship a micro (>300KB uncompressed and >40KB
+compressed) [requirements checker][check-requirements] which will be executed when starting your PHAR.
 
 The following are screenshots of the output when an error occurs (left) in a non-quiet verbosity and when all requirements
 are passing on the right in debug verbosity.

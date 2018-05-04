@@ -17,7 +17,7 @@ namespace KevinGH\Box\PhpScoper;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversNothing
+ * @covers \KevinGH\Box\PhpScoper\NullScoper
  */
 class NullScoperTest extends TestCase
 {

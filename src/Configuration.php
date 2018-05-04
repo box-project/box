@@ -305,6 +305,7 @@ BANNER;
 
         $checkRequirements = self::retrieveCheckRequirements(
             $raw,
+            null !== $composerJson[0],
             null !== $composerLock[0],
             $isStubGenerated
         );
@@ -1768,11 +1769,11 @@ BANNER;
         return null === $stubPath && (false === isset($raw->stub) || false !== $raw->stub);
     }
 
-    private static function retrieveCheckRequirements(stdClass $raw, bool $hasComposerLock, bool $generateStub): bool
+    private static function retrieveCheckRequirements(stdClass $raw, bool $hasComposerJson, bool $hasComposerLock, bool $generateStub): bool
     {
         // TODO: emit warning when stub is not generated and check requirements is explicitly set to true
         // TODO: emit warning when no composer lock is found but check requirements is explicitely set to true
-        if (false === $hasComposerLock) {
+        if (false === $hasComposerJson && false === $hasComposerLock) {
             return false;
         }
 

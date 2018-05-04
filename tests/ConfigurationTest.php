@@ -28,6 +28,7 @@ use stdClass;
 use const DIRECTORY_SEPARATOR;
 use function file_put_contents;
 use function KevinGH\Box\FileSystem\dump_file;
+use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
 
 /**
@@ -288,7 +289,7 @@ EOF
         }
     }
 
-    public function test_the_autoloader_is_dumped_by_default_if_a_composer_json_file_is_found()
+    public function test_the_autoloader_is_dumped_by_default_if_a_composer_json_file_is_found(): void
     {
         $this->assertFalse($this->config->dumpAutoload());
         $this->assertFalse($this->getNoFileConfig()->dumpAutoload());
@@ -309,7 +310,7 @@ EOF
         $this->assertTrue($this->config->dumpAutoload());
     }
 
-    public function test_the_autoloader_is_can_be_configured()
+    public function test_the_autoloader_is_can_be_configured(): void
     {
         file_put_contents('composer.json', '{}');
 
@@ -328,7 +329,7 @@ EOF
         $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
     }
 
-    public function test_the_autoloader_cannot_be_dumped_if_no_composer_json_file_is_found()
+    public function test_the_autoloader_cannot_be_dumped_if_no_composer_json_file_is_found(): void
     {
         $this->setConfig([
             'dump-autoload' => true,
@@ -1232,14 +1233,23 @@ COMMENT;
         $this->assertFalse($this->config->isPrivateKeyPrompt());
     }
 
-    public function test_the_requirement_checker_is_enabled_by_default(): void
+    public function test_the_requirement_checker_is_enabled_by_default_if_a_composer_lock_or_json_file_is_found(): void
     {
         $this->assertFalse($this->config->checkRequirements());
-    }
 
-    public function test_the_requirement_checker_is_enabled_by_default_if_a_composer_lock_file_is_found(): void
-    {
         file_put_contents('composer.lock', '{}');
+
+        $this->reloadConfig();
+
+        $this->assertTrue($this->config->checkRequirements());
+
+        file_put_contents('composer.json', '{}');
+
+        $this->reloadConfig();
+
+        $this->assertTrue($this->config->checkRequirements());
+
+        remove('composer.lock');
 
         $this->reloadConfig();
 
