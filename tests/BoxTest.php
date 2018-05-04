@@ -89,6 +89,50 @@ class BoxTest extends FileSystemTestCase
         unset($this->box);
     }
 
+    public function test_it_cannot_start_the_buffering_if_it_is_already_started(): void
+    {
+        $this->box->startBuffering();
+
+        try {
+            $this->box->startBuffering();
+
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'The buffering must be ended before starting it again',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_it_cannot_end_the_buffering_if_it_is_already_ended(): void
+    {
+        try {
+            $this->box->endBuffering(false);
+
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'The buffering must be started before ending it',
+                $exception->getMessage()
+            );
+        }
+
+        $this->box->startBuffering();
+        $this->box->endBuffering(false);
+
+        try {
+            $this->box->endBuffering(false);
+
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'The buffering must be started before ending it',
+                $exception->getMessage()
+            );
+        }
+    }
+
     public function test_it_can_add_a_file_to_the_phar(): void
     {
         $file = 'foo';
@@ -96,7 +140,9 @@ class BoxTest extends FileSystemTestCase
 
         file_put_contents($file, $contents);
 
+        $this->box->startBuffering();
         $this->box->addFile($file);
+        $this->box->endBuffering(false);
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
@@ -108,12 +154,33 @@ class BoxTest extends FileSystemTestCase
         $this->assertSame($expectedContents, $actualContents);
     }
 
+    public function test_it_cannot_add_a_file_to_the_phar_if_the_buffering_did_not_start(): void
+    {
+        $file = 'foo';
+        $contents = 'test';
+
+        file_put_contents($file, $contents);
+
+        try {
+            $this->box->addFile($file);
+
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Cannot add files if the buffering has not started.',
+                $exception->getMessage()
+            );
+        }
+    }
+
     public function test_it_can_add_a_non_existent_file_with_contents_to_the_phar(): void
     {
         $file = 'foo';
         $contents = 'test';
 
+        $this->box->startBuffering();
         $this->box->addFile($file, $contents);
+        $this->box->endBuffering(false);
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
@@ -132,7 +199,9 @@ class BoxTest extends FileSystemTestCase
 
         file_put_contents($file, 'tset');
 
+        $this->box->startBuffering();
         $this->box->addFile($file, $contents);
+        $this->box->endBuffering(false);
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
@@ -149,7 +218,9 @@ class BoxTest extends FileSystemTestCase
         $file = 'foo';
         $contents = 'test';
 
+        $this->box->startBuffering();
         $this->box->addFile($file, $contents, true);
+        $this->box->endBuffering(false);
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
@@ -168,7 +239,9 @@ class BoxTest extends FileSystemTestCase
 
         file_put_contents($file, 'tset');
 
+        $this->box->startBuffering();
         $this->box->addFile($file, $contents, true);
+        $this->box->endBuffering(false);
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
@@ -188,7 +261,9 @@ class BoxTest extends FileSystemTestCase
 
         dump_file($file, $contents);
 
+        $this->box->startBuffering();
         $this->box->addFile($file);
+        $this->box->endBuffering(false);
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$relativePath;
@@ -214,7 +289,9 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->registerFileMapping($this->tmp, $fileMapper);
 
+        $this->box->startBuffering();
         $this->box->addFile($file);
+        $this->box->endBuffering(false);
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$localPath;
@@ -235,7 +312,9 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->registerCompactors([new FakeCompactor()]);
 
+        $this->box->startBuffering();
         $this->box->addFile($file, null, true);
+        $this->box->endBuffering(false);
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
@@ -261,7 +340,9 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->registerFileMapping($this->tmp, $fileMapper);
 
+        $this->box->startBuffering();
         $this->box->addFile($file, null, true);
+        $this->box->endBuffering(false);
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$localPath;
@@ -301,7 +382,10 @@ class BoxTest extends FileSystemTestCase
         ]);
 
         $this->box->registerPlaceholders($placeholderMapping);
+
+        $this->box->startBuffering();
         $this->box->addFile($file);
+        $this->box->endBuffering(false);
 
         $expectedContents = $secondCompactorOutput;
         $expectedPharPath = 'phar://test.phar/'.$file;
@@ -335,7 +419,9 @@ class BoxTest extends FileSystemTestCase
         foreach ($files as $file => $expectedLocal) {
             dump_file($file);
 
+            $this->box->startBuffering();
             $local = $this->box->addFile($file);
+            $this->box->endBuffering(false);
 
             $this->assertSame($expectedLocal, $local);
 
@@ -357,6 +443,7 @@ class BoxTest extends FileSystemTestCase
     public function test_it_cannot_add_an_non_existent_file_to_the_phar(): void
     {
         try {
+            $this->box->startBuffering();
             $this->box->addFile('/nowhere/foo');
 
             $this->fail('Expected exception to be thrown.');
@@ -379,7 +466,9 @@ class BoxTest extends FileSystemTestCase
         chmod($file, 0355);
 
         try {
+            $this->box->startBuffering();
             $this->box->addFile($file);
+            $this->box->endBuffering(false);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -420,7 +509,10 @@ class BoxTest extends FileSystemTestCase
         ]);
 
         $this->box->registerPlaceholders($placeholderMapping);
+
+        $this->box->startBuffering();
         $this->box->addFile($file, $contents);
+        $this->box->endBuffering(false);
 
         $expectedContents = $secondCompactorOutput;
         $expectedPharPath = 'phar://test.phar/'.$file;
@@ -446,7 +538,9 @@ class BoxTest extends FileSystemTestCase
             dump_file($file, $contents);
         }
 
+        $this->box->startBuffering();
         $this->box->addFiles(['foo', 'bar'], false);
+        $this->box->endBuffering(false);
 
         foreach ($files as $file => $contents) {
             $expectedContents = $contents;
@@ -457,6 +551,29 @@ class BoxTest extends FileSystemTestCase
             $actualContents = file_get_contents($expectedPharPath);
 
             $this->assertSame($expectedContents, $actualContents);
+        }
+    }
+
+    public function test_it_cannot_add_files_to_the_phar_if_the_buffering_did_not_start(): void
+    {
+        $files = [
+            'foo' => 'foo contents',
+            'bar' => 'bar contents',
+        ];
+
+        foreach ($files as $file => $contents) {
+            dump_file($file, $contents);
+        }
+
+        try {
+            $this->box->addFiles(['foo', 'bar'], false);
+
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Cannot add files if the buffering has not started.',
+                $exception->getMessage()
+            );
         }
     }
 
@@ -471,7 +588,9 @@ class BoxTest extends FileSystemTestCase
             dump_file($file, $contents);
         }
 
+        $this->box->startBuffering();
         $this->box->addFiles([$f1, $f2], false);
+        $this->box->endBuffering(false);
 
         foreach ($files as $file => $contents) {
             $expectedContents = $contents;
@@ -508,7 +627,9 @@ class BoxTest extends FileSystemTestCase
             dump_file($file, $item['contents']);
         }
 
+        $this->box->startBuffering();
         $this->box->addFiles(['foo', 'bar'], false);
+        $this->box->endBuffering(false);
 
         foreach ($files as $file => $item) {
             $expectedContents = $item['contents'];
@@ -534,7 +655,9 @@ class BoxTest extends FileSystemTestCase
             dump_file($file, $contents);
         }
 
-        $this->box->addFiles(array_keys($files), false, true);
+        $this->box->startBuffering();
+        $this->box->addFiles(array_keys($files), false);
+        $this->box->endBuffering(true);
 
         foreach ($files as $file => $contents) {
             $expectedContents = $contents;
@@ -553,7 +676,9 @@ class BoxTest extends FileSystemTestCase
     public function test_it_cannot_dump_the_autoloader_when_adding_files_to_the_phar_if_the_composer_json_file_could_not_be_found(): void
     {
         try {
-            $this->box->addFiles([], false, true);
+            $this->box->startBuffering();
+            $this->box->addFiles([], false);
+            $this->box->endBuffering(true);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -574,7 +699,9 @@ class BoxTest extends FileSystemTestCase
             dump_file($file, $contents);
         }
 
+        $this->box->startBuffering();
         $this->box->addFiles(['foo', 'bar'], true);
+        $this->box->endBuffering(false);
 
         foreach ($files as $file => $contents) {
             $expectedContents = $contents;
@@ -586,25 +713,6 @@ class BoxTest extends FileSystemTestCase
 
             $this->assertSame($expectedContents, $actualContents);
         }
-    }
-
-    public function test_the_autoloader_is_not_dumped_when_adding_binary_files_regardless_of_the_setting(): void
-    {
-        $file = 'foo';
-        $contents = 'foo contents';
-
-        dump_file($file, $contents);
-
-        $this->box->addFiles(['foo'], true, true);
-
-        $expectedContents = $contents;
-        $expectedPharPath = 'phar://test.phar/'.$file;
-
-        $this->assertFileExists($expectedPharPath);
-
-        $actualContents = file_get_contents($expectedPharPath);
-
-        $this->assertSame($expectedContents, $actualContents);
     }
 
     public function test_it_can_add_binary_files_with_a_local_path_to_the_phar(): void
@@ -630,7 +738,9 @@ class BoxTest extends FileSystemTestCase
             dump_file($file, $item['contents']);
         }
 
+        $this->box->startBuffering();
         $this->box->addFiles(['foo', 'bar'], true);
+        $this->box->endBuffering(false);
 
         foreach ($files as $file => $item) {
             $expectedContents = $item['contents'];
@@ -665,7 +775,9 @@ class BoxTest extends FileSystemTestCase
         // Cannot test the compactors: there is a bug with the serialization of the Prophecy objects which prevents
         // their correct serialization
 
+        $this->box->startBuffering();
         $this->box->addFiles(array_keys($files), false);
+        $this->box->endBuffering(false);
 
         $expected = [
             'foo' => 'foo_value',
@@ -703,7 +815,9 @@ class BoxTest extends FileSystemTestCase
             dump_file($file);
         }
 
+        $this->box->startBuffering();
         $this->box->addFiles(array_keys($files), true);
+        $this->box->endBuffering(false);
 
         foreach ($files as $expectedLocal) {
             $this->assertFileExists(
@@ -724,6 +838,7 @@ class BoxTest extends FileSystemTestCase
     public function test_it_cannot_add_an_non_existent_files_to_the_phar(): void
     {
         try {
+            $this->box->startBuffering();
             $this->box->addFiles(['/nowhere/foo'], true);
 
             $this->fail('Expected exception to be thrown.');
@@ -746,6 +861,7 @@ class BoxTest extends FileSystemTestCase
         chmod($file, 0355);
 
         try {
+            $this->box->startBuffering();
             $this->box->addFiles([$file], true);
 
             $this->fail('Expected exception to be thrown.');
@@ -764,6 +880,7 @@ class BoxTest extends FileSystemTestCase
         $boxTmp = make_tmp_dir('box', Box::class);
 
         try {
+            $this->box->startBuffering();
             $this->box->addFiles(['/nowhere/foo'], false);
 
             $this->fail('Expected exception to be thrown.');

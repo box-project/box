@@ -37,7 +37,6 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
-use const DATE_ATOM;
 use function array_shift;
 use function count;
 use function decoct;
@@ -59,6 +58,7 @@ use function strlen;
 use function strtolower;
 use function substr;
 use function trim;
+use const DATE_ATOM;
 
 /**
  * @final
@@ -188,6 +188,8 @@ HELP;
             'Done.'
         );
 
+        $io->comment('You can inspect the generated PHAR with the "<comment>info</comment>" command.');
+
         $this->logCommandResourcesUsage($io, $path, $startTime);
     }
 
@@ -262,7 +264,7 @@ HELP;
         $box = Box::create(
             $config->getTmpOutputPath()
         );
-        $box->getPhar()->startBuffering();
+        $box->startBuffering();
 
         $this->setReplacementValues($config, $box, $logger);
         $this->registerCompactors($config, $box, $logger);
@@ -279,9 +281,9 @@ HELP;
         $this->registerStub($config, $box, $main, $check, $logger);
         $this->configureMetadata($config, $box, $logger);
 
-        $this->configureCompressionAlgorithm($config, $box, $input->getOption(self::DEV_OPTION), $logger);
+        $box->endBuffering(null !== $config->getComposerJson());
 
-        $box->getPhar()->stopBuffering();
+        $this->configureCompressionAlgorithm($config, $box, $input->getOption(self::DEV_OPTION), $logger);
 
         if ($debug) {
             $box->getPhar()->extractTo(self::DEBUG_DIR, null, true);
@@ -433,7 +435,7 @@ EOF
         $count = count($config->getFiles());
 
         try {
-            $box->addFiles($config->getFiles(), false, null !== $config->getComposerJson());
+            $box->addFiles($config->getFiles(), false);
         } catch (MultiReasonException $exception) {
             // This exception is handled a different way to give me meaningful feedback to the user
             foreach ($exception->getReasons() as $reason) {
@@ -491,7 +493,10 @@ EOF
             'Adding requirements checker'
         );
 
-        $checkFiles = RequirementsDumper::dump($config->getComposerLockDecodedContents(), null !== $config->getCompressionAlgorithm());
+        $checkFiles = RequirementsDumper::dump(
+            $config->getComposerLockDecodedContents(),
+            null !== $config->getCompressionAlgorithm()
+        );
 
         foreach ($checkFiles as $fileWithContents) {
             [$file, $contents] = $fileWithContents;

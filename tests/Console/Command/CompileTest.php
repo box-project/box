@@ -36,13 +36,10 @@ use function preg_replace;
 use function putenv;
 use function sort;
 
-///**
-// * @covers \KevinGH\Box\Console\Command\Compile
-// * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
-// *                              can create undesirable side-effects.
-// */
 /**
- * @coversNothing
+ * @covers \KevinGH\Box\Console\Command\Compile
+ * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
+ *                              can create undesirable side-effects.
  */
 class CompileTest extends CommandTestCase
 {
@@ -130,6 +127,8 @@ Building the PHAR "/path/to/tmp/test.phar"
 Private key passphrase:
 ? Setting file permissions to 0755
 * Done.
+
+ // You can inspect the generated PHAR with the "info" command.
 
  // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -335,6 +334,8 @@ Building the PHAR "/path/to/tmp/index.phar"
 ? No compression
 * Done.
 
+ // You can inspect the generated PHAR with the "info" command.
+
  // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
@@ -501,6 +502,8 @@ Building the PHAR "/path/to/tmp/test.phar"
 ? No compression
 ? Setting file permissions to 0755
 * Done.
+
+ // You can inspect the generated PHAR with the "info" command.
 
  // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -737,6 +740,8 @@ Private key passphrase:
 ? Setting file permissions to 0755
 * Done.
 
+ // You can inspect the generated PHAR with the "info" command.
+
  // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
@@ -833,6 +838,8 @@ Box (repo)
 Private key passphrase:
 ? Setting file permissions to 0755
 * Done.
+
+ // You can inspect the generated PHAR with the "info" command.
 
  // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -1166,6 +1173,8 @@ Box (repo)
 ? No compression
 * Done.
 
+ // You can inspect the generated PHAR with the "info" command.
+
  // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
@@ -1229,6 +1238,8 @@ Box (repo)
 ? No compression
 * Done.
 
+ // You can inspect the generated PHAR with the "info" command.
+
  // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
@@ -1288,6 +1299,8 @@ Box (repo)
 ? No compression
 * Done.
 
+ // You can inspect the generated PHAR with the "info" command.
+
  // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
@@ -1342,6 +1355,8 @@ Box (repo)
 ? Using stub file: /path/to/tmp/stub.php
 ? No compression
 * Done.
+
+ // You can inspect the generated PHAR with the "info" command.
 
  // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -1403,6 +1418,8 @@ Box (repo)
 ? No compression
 * Done.
 
+ // You can inspect the generated PHAR with the "info" command.
+
  // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
@@ -1456,6 +1473,8 @@ Box (repo)
     > @link https://github.com/humbug/box
 ? Compressing with the algorithm "GZ"
 * Done.
+
+ // You can inspect the generated PHAR with the "info" command.
 
  // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -1521,6 +1540,8 @@ Box (repo)
     > @link https://github.com/humbug/box
 ? No compression
 * Done.
+
+ // You can inspect the generated PHAR with the "info" command.
 
  // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -1666,6 +1687,8 @@ Box (repo)
 ? Compressing with the algorithm "GZ"
 * Done.
 
+ // You can inspect the generated PHAR with the "info" command.
+
  // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
@@ -1738,6 +1761,8 @@ Box (repo)
 ? Using stub file: /path/to/tmp/stub.php
 ? No compression
 * Done.
+
+ // You can inspect the generated PHAR with the "info" command.
 
  // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -1905,6 +1930,12 @@ OUTPUT;
         $display = preg_replace(
             '/Loading the configuration file[\s\n]+.*[\s\n\/]+.*box\.json[comment\<\>\n\s\/]*"\./',
             'Loading the configuration file "/path/to/box.json.dist".',
+            $display
+        );
+
+        $display = preg_replace(
+            '/You can inspect the generated PHAR( | *\n *\/\/ *)with( | *\n *\/\/ *)the( | *\n *\/\/ *)"info"( | *\n *\/\/ *)command/',
+            'You can inspect the generated PHAR with the "info" command',
             $display
         );
 
