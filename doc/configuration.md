@@ -16,6 +16,7 @@
     1. [Shebang (`shebang`)][shebang]
     1. [Banner (`banner`)][banner]
     1. [Banner file (`banner-file`)][banner-file]
+1. [Dumping the Composer autoloader (`dump-autoload`)][dump-autoload]
 1. [Compactors (`compactors`)][compactors]
 1. [Compression algorithm (`compression`)][compression]
 1. [Signing algorithm (`algorithm`)][algorithm]
@@ -449,6 +450,18 @@ Like banner, the comment must not already be enclosed in a comment block.
 If this parameter is set, then the value of [`banner`][banner] will be discarded.
 
 
+## Dumping the Composer autoloader (`dump-autoload`)
+
+By default, Box will dump the Composer autoload with the [classmap authoritative mode][composer-classmap-authoritative]
+and the [`--no-dev` option][composer-no-dev-option] which disables the `autoload-dev` rules. This is however done only
+if a `composer.json` file could be found.
+
+The dumping of the autoloader will be _ignored_ if the `composer.json` file could be found.
+
+The autoloader is dumped at the end of the process to ensure it will take into account the eventual modifications done
+by the [compactors][compactors] process.
+
+
 ## Compactors (`compactors`)
 
 The compactors (`string[]`) setting is a list of file contents compacting classes that must be registered. A file
@@ -548,6 +561,7 @@ The metadata (`any`) setting can be any value. This value will be stored as meta
 [phar.getmetadata]: htthttps://secure.php.net/manual/en/phar.getmetadata.php
 [symfony-finder]: https://symfony.com/doc/current//components/finder.html
 [phpscoper]: https://github.com/humbug/php-scoper
+[dump-autoload]: #dumping-the-composer-autoloader-dump-autoload
 [compactors]: #compactors-compactors
 [permissions]: #permissions-chmod
 [compression]: #compression-algorithm-compression
@@ -555,7 +569,8 @@ The metadata (`any`) setting can be any value. This value will be stored as meta
 [metadata]: #metadata-metadata
 [check-requirements]: #check-requirements-check-requirements
 [composer-bin]: https://getcomposer.org/doc/04-schema.md#bin
-
+[composer-classmap-authoritative]: https://getcomposer.org/doc/articles/autoloader-optimization.md#optimization-level-2-a-authoritative-class-maps
+[composer-no-dev-option]: https://getcomposer.org/doc/03-cli.md#dump-autoload-dumpautoload-
 
 
 //TODO: rework the rest

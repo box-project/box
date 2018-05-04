@@ -54,6 +54,7 @@ great things:
         1. [Shebang (`shebang`)](doc/configuration.md#shebang-shebang)
         1. [Banner (`banner`)](doc/configuration.md#banner-banner)
         1. [Banner file (`banner-file`)](doc/configuration.md#banner-file-banner-file)
+    1. [Dumping the Composer autoloader (`dump-autoload`)](doc/configuration.md#dumping-the-composer-autoloader-dump-autoload)
     1. [Compactors (`compactors`)][compactors]
     1. [Compression algorithm (`compression`)][compression-algorithm]
     1. [Signing algorithm (`algorithm`)](doc/configuration.md#signing-algorithm-algorithm)

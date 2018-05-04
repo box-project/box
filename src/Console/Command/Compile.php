@@ -285,7 +285,7 @@ HELP;
         $this->registerStub($config, $box, $main, $check, $logger);
         $this->configureMetadata($config, $box, $logger);
 
-        $box->endBuffering(null !== $config->getComposerJson());
+        $box->endBuffering($config->dumpAutoload());
 
         $this->configureCompressionAlgorithm($config, $box, $input->getOption(self::DEV_OPTION), $io, $logger);
 
