@@ -128,7 +128,7 @@ Building the PHAR "/path/to/tmp/test.phar"
 ? No compression
 ? Signing using a private key
 Private key passphrase:
-? Setting file permissions to 493
+? Setting file permissions to 0755
 * Done.
 
  // PHAR size: 100B
@@ -499,7 +499,7 @@ Building the PHAR "/path/to/tmp/test.phar"
   'rand' => $rand,
 )
 ? No compression
-? Setting file permissions to 493
+? Setting file permissions to 0755
 * Done.
 
  // PHAR size: 100B
@@ -734,7 +734,7 @@ Box (repo)
 ? No compression
 ? Signing using a private key
 Private key passphrase:
-? Setting file permissions to 493
+? Setting file permissions to 0755
 * Done.
 
  // PHAR size: 100B
@@ -831,7 +831,7 @@ Box (repo)
 ? No compression
 ? Signing using a private key
 Private key passphrase:
-? Setting file permissions to 493
+? Setting file permissions to 0755
 * Done.
 
  // PHAR size: 100B
