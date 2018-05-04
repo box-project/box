@@ -20,6 +20,8 @@ use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
 use function preg_replace;
+use RuntimeException;
+use Throwable;
 
 /**
  * @private
@@ -35,29 +37,37 @@ final class ComposerOrchestrator
      */
     public static function dumpAutoload(array $whitelist, string $prefix): void
     {
-        $composer = Factory::create(new NullIO(), null, true);
+        try {
+            $composer = Factory::create(new NullIO(), null, true);
 
-        $installationManager = $composer->getInstallationManager();
-        $localRepository = $composer->getRepositoryManager()->getLocalRepository();
-        $package = $composer->getPackage();
-        $composerConfig = $composer->getConfig();
+            $installationManager = $composer->getInstallationManager();
+            $localRepository = $composer->getRepositoryManager()->getLocalRepository();
+            $package = $composer->getPackage();
+            $composerConfig = $composer->getConfig();
 
-        $generator = $composer->getAutoloadGenerator();
-        $generator->setDevMode(false);
-        $generator->setClassMapAuthoritative(true);
+            $generator = $composer->getAutoloadGenerator();
+            $generator->setDevMode(false);
+            $generator->setClassMapAuthoritative(true);
 
-        $generator->dump($composerConfig, $localRepository, $package, $installationManager, 'composer', true);
+            $generator->dump($composerConfig, $localRepository, $package, $installationManager, 'composer', true);
 
-        if ('' !== $prefix) {
-            $autoloadFile = $composerConfig->get('vendor-dir').'/autoload.php';
+            if ('' !== $prefix) {
+                $autoloadFile = $composerConfig->get('vendor-dir').'/autoload.php';
 
-            $autoloadContents = self::generateAutoloadStatements(
-                $whitelist,
-                $prefix,
-                file_contents($autoloadFile)
+                $autoloadContents = self::generateAutoloadStatements(
+                    $whitelist,
+                    $prefix,
+                    file_contents($autoloadFile)
+                );
+
+                dump_file($autoloadFile, $autoloadContents);
+            }
+        } catch (Throwable $throwable) {
+            throw new RuntimeException(
+                'Could not dump the autoload: '.$throwable->getMessage(),
+                $throwable->getCode(),
+                $throwable
             );
-
-            dump_file($autoloadFile, $autoloadContents);
         }
     }
 

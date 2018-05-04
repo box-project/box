@@ -23,6 +23,7 @@ use org\bovigo\vfs\vfsStreamWrapper;
 use Phar;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
+use RuntimeException;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
 use function array_filter;
@@ -96,7 +97,7 @@ class BoxTest extends FileSystemTestCase
         try {
             $this->box->startBuffering();
 
-            $this->fail();
+            $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The buffering must be ended before starting it again',
@@ -110,7 +111,7 @@ class BoxTest extends FileSystemTestCase
         try {
             $this->box->endBuffering(false);
 
-            $this->fail();
+            $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The buffering must be started before ending it',
@@ -124,7 +125,7 @@ class BoxTest extends FileSystemTestCase
         try {
             $this->box->endBuffering(false);
 
-            $this->fail();
+            $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The buffering must be started before ending it',
@@ -164,7 +165,7 @@ class BoxTest extends FileSystemTestCase
         try {
             $this->box->addFile($file);
 
-            $this->fail();
+            $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Cannot add files if the buffering has not started.',
@@ -568,7 +569,7 @@ class BoxTest extends FileSystemTestCase
         try {
             $this->box->addFiles(['foo', 'bar'], false);
 
-            $this->fail();
+            $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Cannot add files if the buffering has not started.',
@@ -681,10 +682,46 @@ class BoxTest extends FileSystemTestCase
             $this->box->endBuffering(true);
 
             $this->fail('Expected exception to be thrown.');
-        } catch (InvalidArgumentException $exception) {
-            $this->assertStringStartsWith('Composer could not find a composer.json file in', $exception->getMessage());
+        } catch (RuntimeException $exception) {
+            $this->assertStringStartsWith(
+                'Could not dump the autoload: Composer could not find a composer.json file in',
+                $exception->getMessage()
+            );
             $this->assertSame(0, $exception->getCode());
-            $this->assertNull($exception->getPrevious());
+            $this->assertNotNull($exception->getPrevious());
+        }
+    }
+
+    public function test_it_fails_gracefully_when_the_autoloader_failed_to_be_dumped(): void
+    {
+        $this->box->startBuffering();
+        $this->box->addFile(
+            'composer.json',
+            <<<'JSON'
+{
+    "autoload": {
+        "classmap": ["unknown"]
+    }
+}
+JSON
+        );
+
+        try {
+            $this->box->endBuffering(true);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame(
+                'Could not dump the autoload: Could not scan for classes inside "unknown" which does not appear to be a file nor a folder',
+                $exception->getMessage()
+            );
+            $this->assertSame(0, $exception->getCode());
+            $this->assertNotNull($exception->getPrevious());
+
+            $this->assertSame(
+                'Could not scan for classes inside "unknown" which does not appear to be a file nor a folder',
+                $exception->getPrevious()->getMessage()
+            );
         }
     }
 
