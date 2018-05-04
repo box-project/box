@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
+use Phar;
 use function array_diff_key;
 use function array_key_exists;
-use Phar;
 use function sprintf;
 use function substr;
 
@@ -166,8 +166,7 @@ final class AppRequirementsFactory
         array $composerJsonContents,
         array $composerLockContents,
         ?int $compressionAlgorithm
-    ): array
-    {
+    ): array {
         $requirements = [];
         $polyfills = [];
 

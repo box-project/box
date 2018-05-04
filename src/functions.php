@@ -16,6 +16,7 @@ namespace KevinGH\Box;
 
 use Assert\Assertion;
 use Phar;
+use function array_key_exists;
 use function constant;
 use function define;
 use function defined;
@@ -45,6 +46,22 @@ function get_phar_compression_algorithms(): array
 /**
  * @private
  */
+function get_phar_compression_algorithm_extension(int $algorithm): ?string
+{
+    static $extensions = [
+        Phar::GZ => 'zlib',
+        Phar::BZ2 => 'bz2',
+        Phar::NONE => null,
+    ];
+
+    Assertion::true(array_key_exists($algorithm, $extensions));
+
+    return $extensions[$algorithm];
+}
+
+/**
+ * @private
+ */
 function formatted_filesize(string $path): string
 {
     Assertion::file($path);
@@ -63,6 +80,28 @@ function formatted_filesize(string $path): string
         ),
         $units[$power]
     );
+}
+
+/**
+ * @private Converts a memory string, e.g. '2000M' to bytes
+ */
+function memory_to_bytes(string $value): int
+{
+    $unit = strtolower($value[strlen($value) - 1]);
+
+    $value = (int) $value;
+    switch ($unit) {
+        case 'g':
+            $value *= 1024;
+        // no break (cumulative multiplier)
+        case 'm':
+            $value *= 1024;
+        // no break (cumulative multiplier)
+        case 'k':
+            $value *= 1024;
+    }
+
+    return $value;
 }
 
 /**

@@ -1515,6 +1515,7 @@ Box (repo)
     >
     > @link https://github.com/humbug/box
 ? Compressing with the algorithm "GZ"
+    > Warning: the extension "zlib" will no be required to excute the PHAR
 * Done.
 
  // You can inspect the generated PHAR with the "info" command.
@@ -1728,6 +1729,7 @@ Box (repo)
     >
     > @link https://github.com/humbug/box
 ? Compressing with the algorithm "GZ"
+    > Warning: the extension "zlib" will no be required to excute the PHAR
 * Done.
 
  // You can inspect the generated PHAR with the "info" command.

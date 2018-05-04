@@ -52,6 +52,7 @@ The configuration file is a JSON object saved to a file. Note that all settings 
     "datetime_format": "?",
     "directories": "?",
     "directories-bin": "?",
+    "dump-autoload": "?",
     "files": "?",
     "files-bin": "?",
     "finder": "?",
@@ -139,6 +140,10 @@ regardless of the content of the `composer.json`.
 If a `composer.json` is found without a `composer.lock`, the it will be taken as the source of truth for establishing the
 requirements regardless of whether there is no `composer.lock` because there is no dependencies or because it has been
 removed.
+
+**Warning**: this check is still done within the PHAR. As a result, if [the required extension to open the PHAR][compression]
+due to the compression algorithm is not loaded, a hard failure will still appear: the requirement checker _cannot_ be
+executed before that.
 
 
 ## Including files
@@ -510,9 +515,13 @@ The compression (`string`|`null`) setting is the compression algorithm to use wh
 affects the individual files within the PHAR and not the PHAR as a whole ([`Phar::compressFiles()`][phar.compress]). The
 following is a list of the signature algorithms available:
 
-- `BZ2`
 - `GZ` (the most efficient most of the time)
+- `BZ2`
 - `NONE` (default)
+
+**Warning**: be aware that if compressed, the PHAR will required the appropriate extension ([`zlib`][zlib-extension] for
+`GZ` and [`bz2`][bz2-extension] for `BZ2`) to execute the PHAR. Without it, PHP will _not_ be able to open the PHAR at
+all.
 
 
 ## Signing algorithm (`algorithm`)
@@ -578,6 +587,8 @@ The metadata (`any`) setting can be any value. This value will be stored as meta
 [composer-bin]: https://getcomposer.org/doc/04-schema.md#bin
 [composer-classmap-authoritative]: https://getcomposer.org/doc/articles/autoloader-optimization.md#optimization-level-2-a-authoritative-class-maps
 [composer-no-dev-option]: https://getcomposer.org/doc/03-cli.md#dump-autoload-dumpautoload-
+[zlib-extension]: https://secure.php.net/manual/en/book.zlib.php
+[bz2-extension]: https://secure.php.net/manual/en/book.bzip2.php
 
 
 //TODO: rework the rest
