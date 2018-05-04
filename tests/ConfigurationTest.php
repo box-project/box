@@ -288,6 +288,47 @@ EOF
         }
     }
 
+    public function test_the_autoloader_is_dumped_by_default_if_a_composer_json_file_is_found()
+    {
+        $this->assertFalse($this->config->dumpAutoload());
+        $this->assertFalse($this->getNoFileConfig()->dumpAutoload());
+
+        file_put_contents('composer.json', '{}');
+
+        $this->reloadConfig();
+
+        $this->assertTrue($this->config->dumpAutoload());
+        $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
+    }
+
+    public function test_the_autoloader_is_can_be_configured()
+    {
+        file_put_contents('composer.json', '{}');
+
+        $this->setConfig([
+            'dump-autoload' => false,
+        ]);
+
+        $this->assertFalse($this->config->dumpAutoload());
+        $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
+
+        $this->setConfig([
+            'dump-autoload' => true,
+        ]);
+
+        $this->assertTrue($this->config->dumpAutoload());
+        $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
+    }
+
+    public function test_the_autoloader_cannot_be_dumped_if_no_composer_json_file_is_found()
+    {
+        $this->setConfig([
+            'dump-autoload' => true,
+        ]);
+
+        $this->assertFalse($this->config->dumpAutoload());
+    }
+
     public function test_no_compactors_is_configured_by_default(): void
     {
         $this->assertSame([], $this->config->getCompactors());

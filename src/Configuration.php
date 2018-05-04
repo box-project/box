@@ -88,6 +88,7 @@ BANNER;
     private $composerLock;
     private $files;
     private $binaryFiles;
+    private $dumpAutoload;
     private $compactors;
     private $compressionAlgorithm;
     private $mainScriptPath;
@@ -125,10 +126,6 @@ BANNER;
      * @param string          $mainScriptContents    The processed content of the main script file
      * @param MapFile         $fileMapper            Utility to map the files from outside and inside the PHAR
      * @param mixed           $metadata              The PHAR Metadata
-     * @param string          $tmpOutputPath
-     * @param string          $outputPath
-     * @param null|string     $privateKeyPassphrase
-     * @param null|string     $privateKeyPath
      * @param bool            $isPrivateKeyPrompt    If the user should be prompted for the private key passphrase
      * @param array           $processedReplacements The processed list of replacement placeholders and their values
      * @param null|string     $shebang               The shebang line
@@ -148,6 +145,7 @@ BANNER;
         array $composerLock,
         array $files,
         array $binaryFiles,
+        bool $dumpAutoload,
         array $compactors,
         ?int $compressionAlgorithm,
         ?int $fileMode,
@@ -186,6 +184,7 @@ BANNER;
         $this->composerLock = $composerLock;
         $this->files = $files;
         $this->binaryFiles = $binaryFiles;
+        $this->dumpAutoload = $dumpAutoload;
         $this->compactors = $compactors;
         $this->compressionAlgorithm = $compressionAlgorithm;
         $this->fileMode = $fileMode;
@@ -267,6 +266,8 @@ BANNER;
 
         $binaryFilesAggregate = self::retrieveFilesAggregate($binaryFiles, $binaryDirectories, ...$binaryFilesFromFinders);
 
+        $dumpAutoload = self::retrieveDumpAutoload($raw, null !== $composerJson[0]);
+
         $compactors = self::retrieveCompactors($raw, $basePath);
         $compressionAlgorithm = self::retrieveCompressionAlgorithm($raw);
 
@@ -316,6 +317,7 @@ BANNER;
             $composerLock,
             $filesAggregate,
             $binaryFilesAggregate,
+            $dumpAutoload,
             $compactors,
             $compressionAlgorithm,
             $fileMode,
@@ -389,6 +391,11 @@ BANNER;
     public function getBinaryFiles(): array
     {
         return $this->binaryFiles;
+    }
+
+    public function dumpAutoload(): bool
+    {
+        return $this->dumpAutoload;
     }
 
     /**
@@ -1205,6 +1212,16 @@ BANNER;
     private static function normalizePath(string $file, string $basePath): string
     {
         return make_path_absolute(trim($file), $basePath);
+    }
+
+    private static function retrieveDumpAutoload(stdClass $raw, bool $composerJson): bool
+    {
+        $dumpAutoload = $raw->{'dump-autoload'} ?? true;
+
+        // TODO: add warning when the dump autoload parameter is explicitly set that it has been ignored because no `composer.json` file
+        // could have been found.
+
+        return $composerJson ? $dumpAutoload : false;
     }
 
     /**

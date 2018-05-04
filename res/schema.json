@@ -88,6 +88,10 @@
             },
             "type": ["array"]
         },
+        "dump-autoload": {
+            "description": "Will dump the optimized Composer autoloader.",
+            "type": ["boolean", "null"]
+        },
         "files": {
             "description": "A list of file paths to include.",
             "items": {
