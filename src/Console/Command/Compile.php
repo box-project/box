@@ -63,7 +63,6 @@ use function strlen;
 use function strtolower;
 use function substr;
 use function trim;
-use const DATE_ATOM;
 
 /**
  * @final
