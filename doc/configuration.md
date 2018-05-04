@@ -130,8 +130,15 @@ When running the PHAR, before running the actual application, the PHAR will chec
 that the extension `iconv` is loaded. If those requirements are not met, then a user friendly error message will be given
 to the user.
 
-This check will work for PHP 5.3+ and requires the existence of the `composer.lock` file. If no `composer.lock` file is found
-then the requirements check will not be added to the PHAR.
+This check will work for PHP 5.3+ and requires the existence of the `composer.json` or `composer.lock` file. If neither of
+those files are found then the requirements check will not be added to the PHAR.
+
+Be wary that when a `composer.lock` file is found, it will be taken as the source of truth for establishing the requirements
+regardless of the content of the `composer.json`.
+
+If a `composer.json` is found without a `composer.lock`, the it will be taken as the source of truth for establishing the
+requirements regardless of whether there is no `composer.lock` because there is no dependencies or because it has been
+removed.
 
 
 ## Including files

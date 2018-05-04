@@ -38,9 +38,6 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
-use const DATE_ATOM;
-use const POSIX_RLIMIT_INFINITY;
-use const POSIX_RLIMIT_NOFILE;
 use function array_shift;
 use function count;
 use function decoct;
@@ -63,6 +60,9 @@ use function strlen;
 use function strtolower;
 use function substr;
 use function trim;
+use const DATE_ATOM;
+use const POSIX_RLIMIT_INFINITY;
+use const POSIX_RLIMIT_NOFILE;
 
 /**
  * @final
@@ -498,7 +498,8 @@ EOF
         );
 
         $checkFiles = RequirementsDumper::dump(
-            $config->getComposerLockDecodedContents(),
+            $config->getComposerJsonDecodedContents() ?? [],
+            $config->getComposerLockDecodedContents() ?? [],
             null !== $config->getCompressionAlgorithm()
         );
 
