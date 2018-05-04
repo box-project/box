@@ -17,10 +17,12 @@ namespace KevinGH\Box;
 use Exception;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\FakeCompactor;
+use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\FileSystemTestCase;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use Phar;
+use PharFileInfo;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use RuntimeException;
@@ -29,6 +31,7 @@ use Symfony\Component\Finder\Finder;
 use function array_filter;
 use function array_keys;
 use function current;
+use function extension_loaded;
 use function file_put_contents;
 use function in_array;
 use function KevinGH\Box\FileSystem\canonicalize;
@@ -147,6 +150,41 @@ class BoxTest extends FileSystemTestCase
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
+
+        $this->assertFileExists($expectedPharPath);
+
+        $actualContents = file_get_contents($expectedPharPath);
+
+        $this->assertSame($expectedContents, $actualContents);
+    }
+
+    public function test_it_can_add_a_file_to_the_phar_in_a_new_buffering_process_does_not_remove_the_previous_files(): void
+    {
+        $file0 = 'file0';
+        $file0Contents = 'file0 contents';
+
+        $this->box->startBuffering();
+        $this->box->addFile($file0, $file0Contents);
+        $this->box->endBuffering(false);
+
+        $expectedContents = $file0Contents;
+        $expectedPharPath = 'phar://test.phar/'.$file0;
+
+        $this->assertFileExists($expectedPharPath);
+
+        $actualContents = file_get_contents($expectedPharPath);
+
+        $this->assertSame($expectedContents, $actualContents);
+
+        $file1 = 'file1';
+        $file1Contents = 'file1 contents';
+
+        $this->box->startBuffering();
+        $this->box->addFile($file1, $file1Contents);
+        $this->box->endBuffering(false);
+
+        $expectedContents = $file1Contents;
+        $expectedPharPath = 'phar://test.phar/'.$file1;
 
         $this->assertFileExists($expectedPharPath);
 
@@ -1128,6 +1166,152 @@ STUB;
         }
     }
 
+    public function test_it_cannot_compress_the_PHAR_while_buffering(): void
+    {
+        try {
+            $this->box->startBuffering();
+            $this->box->compress(Phar::NONE);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Cannot compress files while buffering.',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    /**
+     * @dataProvider provideCompressionAlgorithms
+     *
+     * @requires extension zlib
+     * @requires extension bz2
+     */
+    public function test_it_cannot_compress_the_PHAR_with_an_unknown_algorithm(int $algorithm, bool $supportedAlgorithm): void
+    {
+        try {
+            $this->box->compress($algorithm);
+
+            if (false === $supportedAlgorithm) {
+                $this->fail('Expected exception to be thrown.');
+            }
+        } catch (InvalidArgumentException $exception) {
+            if ($supportedAlgorithm) {
+                $this->fail('Did not expect exception to be thrown.');
+            }
+
+            $this->assertSame(
+                sprintf(
+                    'Value "%s" is not an element of the valid values: 4096, 8192, 0',
+                    $algorithm
+                ),
+                $exception->getMessage()
+            );
+        }
+
+        $this->assertTrue(true);
+    }
+
+    public function test_it_cannot_compress_if_the_required_extension_is_not_loaded(): void
+    {
+        if (extension_loaded('bz2')) {
+            $this->markTestSkipped('Requires the extension bz2 to not be loaded.');
+        }
+
+        try {
+            $this->box->compress(Phar::BZ2);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame(
+                'Cannot compress the PHAR with the compression algorithm "BZ2": the extension "bz2" is required but appear to not '
+                .'be loaded',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    /**
+     * @requires extension zlib
+     */
+    public function test_it_compresses_all_the_files_with_the_given_algorithm(): void
+    {
+        $this->box->startBuffering();
+
+        $this->box->addFile('file0', 'file0 contents');
+        $this->box->addFile('file1', 'file1 contents');
+        $this->box->getPhar()->setStub(
+            $stub = <<<'PHP'
+<?php
+
+echo 'Yo';
+
+__HALT_COMPILER(); ?>
+
+PHP
+        );
+
+        $this->box->endBuffering(false);
+
+        $this->assertCount(2, $this->box);
+
+        /** @var PharFileInfo[] $files */
+        $files = [
+            $this->box->getPhar()['file0'],
+            $this->box->getPhar()['file1'],
+        ];
+
+        foreach ($files as $file) {
+            $this->assertFalse($file->isCompressed());
+        }
+
+        $this->assertSame(
+            $stub,
+            DisplayNormalizer::removeTrailingSpaces($this->box->getPhar()->getStub()),
+            'Did not expect the stub to be affected by the compression.'
+        );
+
+        $extensionRequired = $this->box->compress(Phar::GZ);
+
+        $this->assertSame('zlib', $extensionRequired);
+
+        /** @var PharFileInfo[] $files */
+        $files = [
+            $this->box->getPhar()['file0'],
+            $this->box->getPhar()['file1'],
+        ];
+
+        foreach ($files as $file) {
+            $this->assertTrue($file->isCompressed(Phar::GZ));
+        }
+
+        $this->assertSame(
+            $stub,
+            DisplayNormalizer::removeTrailingSpaces($this->box->getPhar()->getStub()),
+            'Did not expect the stub to be affected by the compression.'
+        );
+
+        $extensionRequired = $this->box->compress(Phar::NONE);
+
+        $this->assertNull($extensionRequired);
+
+        /** @var PharFileInfo[] $files */
+        $files = [
+            $this->box->getPhar()['file0'],
+            $this->box->getPhar()['file1'],
+        ];
+
+        foreach ($files as $file) {
+            $this->assertFalse($file->isCompressed());
+        }
+
+        $this->assertSame(
+            $stub,
+            DisplayNormalizer::removeTrailingSpaces($this->box->getPhar()->getStub()),
+            'Did not expect the stub to be affected by the compression.'
+        );
+    }
+
     /**
      * @requires extension openssl
      */
@@ -1253,6 +1437,17 @@ STUB;
                 'Path "vfs://test/private.key" was expected to be readable.',
                 $exception->getMessage()
             );
+        }
+    }
+
+    public function provideCompressionAlgorithms()
+    {
+        foreach (get_phar_compression_algorithms() as $algorithm) {
+            yield [$algorithm, true];
+        }
+
+        foreach ([-1, 1] as $algorithm) {
+            yield [$algorithm, false];
         }
     }
 

@@ -17,11 +17,11 @@ namespace KevinGH\Box\Composer;
 use Composer\Factory;
 use Composer\IO\NullIO;
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
+use RuntimeException;
+use Throwable;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
 use function preg_replace;
-use RuntimeException;
-use Throwable;
 
 /**
  * @private

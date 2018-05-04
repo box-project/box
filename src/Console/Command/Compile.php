@@ -16,7 +16,6 @@ namespace KevinGH\Box\Console\Command;
 
 use Amp\MultiReasonException;
 use Assert\Assertion;
-use BadMethodCallException;
 use DateTimeImmutable;
 use DateTimeZone;
 use KevinGH\Box\Box;
@@ -38,6 +37,9 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
+use const DATE_ATOM;
+use const POSIX_RLIMIT_INFINITY;
+use const POSIX_RLIMIT_NOFILE;
 use function array_shift;
 use function count;
 use function decoct;
@@ -54,15 +56,13 @@ use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\formatted_filesize;
 use function KevinGH\Box\get_phar_compression_algorithms;
+use function KevinGH\Box\memory_to_bytes;
 use function posix_setrlimit;
 use function putenv;
+use function sprintf;
 use function strlen;
-use function strtolower;
 use function substr;
 use function trim;
-use const DATE_ATOM;
-use const POSIX_RLIMIT_INFINITY;
-use const POSIX_RLIMIT_NOFILE;
 
 /**
  * @final
@@ -179,7 +179,7 @@ HELP;
 
         $startTime = microtime(true);
 
-        $this->removeExistingArtefacts($config, $logger, $debug);
+        $this->removeExistingArtifacts($config, $logger, $debug);
 
         $logger->logStartBuilding($path);
 
@@ -207,28 +207,10 @@ HELP;
         (new PhpSettingsHandler(new ConsoleLogger($output)))->check();
 
         if (function_exists('ini_set')) {
-            $memoryInBytes = function (string $value): int {
-                $unit = strtolower($value[strlen($value) - 1]);
-
-                $value = (int) $value;
-                switch ($unit) {
-                    case 'g':
-                        $value *= 1024;
-                    // no break (cumulative multiplier)
-                    case 'm':
-                        $value *= 1024;
-                    // no break (cumulative multiplier)
-                    case 'k':
-                        $value *= 1024;
-                }
-
-                return $value;
-            };
-
             $memoryLimit = trim(ini_get('memory_limit'));
 
             // Increase memory_limit if it is lower than 500MB
-            if ('-1' !== $memoryLimit && $memoryInBytes($memoryLimit) < 1024 * 1024 * 512 && false === getenv('BOX_MEMORY_LIMIT')) {
+            if ('-1' !== $memoryLimit && memory_to_bytes($memoryLimit) < 1024 * 1024 * 512 && false === getenv('BOX_MEMORY_LIMIT')) {
                 @ini_set('memory_limit', '512M');
 
                 $io->writeln(
@@ -254,6 +236,9 @@ HELP;
                     OutputInterface::VERBOSITY_DEBUG
                 );
             }
+
+            // Note that there is no need to restore since those changes will be applied only to the current process which will die once
+            // the compilation is done.
         }
     }
 
@@ -270,7 +255,7 @@ HELP;
         );
         $box->startBuffering();
 
-        $this->setReplacementValues($config, $box, $logger);
+        $this->registerReplacementValues($config, $box, $logger);
         $this->registerCompactors($config, $box, $logger);
         $this->registerFileMapping($config, $box, $logger);
 
@@ -300,7 +285,7 @@ HELP;
         }
     }
 
-    private function removeExistingArtefacts(Configuration $config, BuildLogger $logger, bool $debug): void
+    private function removeExistingArtifacts(Configuration $config, BuildLogger $logger, bool $debug): void
     {
         $path = $config->getOutputPath();
 
@@ -344,7 +329,7 @@ EOF
         remove($path);
     }
 
-    private function setReplacementValues(Configuration $config, Box $box, BuildLogger $logger): void
+    private function registerReplacementValues(Configuration $config, Box $box, BuildLogger $logger): void
     {
         $values = $config->getProcessedReplacements();
 
@@ -393,6 +378,7 @@ EOF
             $compactorClassParts = explode('\\', get_class($compactor));
 
             if ('_HumbugBox' === substr($compactorClassParts[0], 0, strlen('_HumbugBox'))) {
+                // Keep the non prefixed class name for the user
                 array_shift($compactorClassParts);
             }
 
@@ -523,7 +509,10 @@ EOF
             $stub = $this->createStub($config, $main, $checkRequirements, $logger);
 
             $box->getPhar()->setStub($stub->generate());
-        } elseif (null !== ($stub = $config->getStubPath())) {
+
+            return;
+        }
+        if (null !== ($stub = $config->getStubPath())) {
             $logger->log(
                 BuildLogger::QUESTION_MARK_PREFIX,
                 sprintf(
@@ -533,25 +522,27 @@ EOF
             );
 
             $box->registerStub($stub);
-        } else {
-            // TODO: add warning that the check requirements could not be added
-            $aliasWasAdded = $box->getPhar()->setAlias($config->getAlias());
 
-            Assertion::true(
-                $aliasWasAdded,
-                sprintf(
-                    'The alias "%s" is invalid. See Phar::setAlias() documentation for more information.',
-                    $config->getAlias()
-                )
-            );
-
-            $box->getPhar()->setDefaultStub($main);
-
-            $logger->log(
-                BuildLogger::QUESTION_MARK_PREFIX,
-                'Using default stub'
-            );
+            return;
         }
+
+        // TODO: add warning that the check requirements could not be added
+        $aliasWasAdded = $box->getPhar()->setAlias($config->getAlias());
+
+        Assertion::true(
+            $aliasWasAdded,
+            sprintf(
+                'The alias "%s" is invalid. See Phar::setAlias() documentation for more information.',
+                $config->getAlias()
+            )
+        );
+
+        $box->getPhar()->setDefaultStub($main);
+
+        $logger->log(
+            BuildLogger::QUESTION_MARK_PREFIX,
+            'Using default stub'
+        );
     }
 
     private function configureMetadata(Configuration $config, Box $box, BuildLogger $logger): void
@@ -592,7 +583,37 @@ EOF
             )
         );
 
-        $filesCount = count($config->getBinaryFiles()) + count($config->getFiles()) + 128;  // Add a little extra for good measure
+        $restoreLimit = $this->bumpOpenFileDescriptorLimit($box, $io);
+
+        try {
+            $extension = $box->compress($algorithm);
+
+            if (null !== $extension) {
+                $logger->log(
+                    BuildLogger::CHEVRON_PREFIX,
+                    sprintf(
+                        '<info>Warning: the extension "%s" will no be required to excute the PHAR</info>',
+                        $extension
+                    )
+                );
+            }
+        } catch (RuntimeException $exception) {
+            $io->error($exception->getMessage());
+
+            // Continue: the compression failure should not result in completely bailing out the compilation process
+        } finally {
+            $restoreLimit();
+        }
+    }
+
+    /**
+     * Bumps the maximum number of open file descriptor if necessary.
+     *
+     * @return callable callable to call to restore the original maximum number of open files descriptors
+     */
+    private function bumpOpenFileDescriptorLimit(Box $box, SymfonyStyle $io): callable
+    {
+        $filesCount = count($box) + 128;  // Add a little extra for good measure
 
         if (function_exists('posix_getrlimit') && function_exists('posix_setrlimit')) {
             $softLimit = posix_getrlimit()['soft openfiles'];
@@ -625,21 +646,7 @@ EOF
             );
         }
 
-        try {
-            $box->getPhar()->compressFiles($algorithm);
-        } catch (BadMethodCallException $exception) {
-            if ('unable to create temporary file' !== $exception->getMessage()) {
-                throw $exception;
-            }
-
-            $io->error(
-                sprintf(
-                    'Could not compress the PHAR: the compression requires too many file descriptors to be opened (%s). Check '
-                    .'your system limits or install the posix extension to allow Box to automatically configure it during the compression',
-                    $filesCount
-                )
-            );
-        } finally {
+        return function () use ($io, $softLimit, $hardLimit): void {
             if (function_exists('posix_setrlimit') && isset($softLimit, $hardLimit)) {
                 posix_setrlimit(
                     POSIX_RLIMIT_NOFILE,
@@ -652,7 +659,7 @@ EOF
                     OutputInterface::VERBOSITY_DEBUG
                 );
             }
-        }
+        };
     }
 
     private function signPhar(

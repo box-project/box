@@ -15,18 +15,23 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
+use BadMethodCallException;
 use Closure;
+use Countable;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 use KevinGH\Box\PhpScoper\NullScoper;
 use KevinGH\Box\PhpScoper\Scoper;
 use Phar;
 use RecursiveDirectoryIterator;
+use RuntimeException;
 use SplFileInfo;
 use function Amp\ParallelFunctions\parallelMap;
 use function Amp\Promise\wait;
+use function array_flip;
 use function array_map;
 use function chdir;
+use function extension_loaded;
 use function file_exists;
 use function getcwd;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -35,13 +40,14 @@ use function KevinGH\Box\FileSystem\make_path_relative;
 use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
+use function sprintf;
 
 /**
  * Box is a utility class to generate a PHAR.
  *
  * @private
  */
-final class Box
+final class Box implements Countable
 {
     public const DEBUG_DIR = '.box_dump';
 
@@ -152,6 +158,49 @@ final class Box
         $this->buffering = false;
 
         $this->phar->stopBuffering();
+    }
+
+    /**
+     * @return null|string The required extension to execute the PHAR now that it is compressed
+     */
+    public function compress(int $compressionAlgorithm): ?string
+    {
+        Assertion::false($this->buffering, 'Cannot compress files while buffering.');
+        Assertion::inArray($compressionAlgorithm, get_phar_compression_algorithms());
+
+        $extensionRequired = get_phar_compression_algorithm_extension($compressionAlgorithm);
+
+        if (null !== $extensionRequired && false === extension_loaded($extensionRequired)) {
+            throw new RuntimeException(
+                sprintf(
+                    'Cannot compress the PHAR with the compression algorithm "%s": the extension "%s" is required but appear to not '
+                    .'be loaded',
+                    array_flip(get_phar_compression_algorithms())[$compressionAlgorithm],
+                    $extensionRequired
+                )
+            );
+        }
+
+        try {
+            if (Phar::NONE === $compressionAlgorithm) {
+                $this->getPhar()->decompressFiles();
+            } else {
+                $this->phar->compressFiles($compressionAlgorithm);
+            }
+        } catch (BadMethodCallException $exception) {
+            $exceptionMessage = 'unable to create temporary file' !== $exception->getMessage()
+                ? 'Could not compress the PHAR: '.$exception->getMessage()
+                : sprintf(
+                    'Could not compress the PHAR: the compression requires too many file descriptors to be opened (%s). Check '
+                    .'your system limits or install the posix extension to allow Box to automatically configure it during the compression',
+                    $this->phar->count()
+                )
+            ;
+
+            throw new RuntimeException($exceptionMessage, $exception->getCode(), $exception);
+        }
+
+        return $extensionRequired;
     }
 
     /**
@@ -398,5 +447,15 @@ final class Box
             },
             $contents
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function count(): int
+    {
+        Assertion::false($this->buffering, 'Cannot count the number of files in the PHAR when buffering');
+
+        return $this->phar->count();
     }
 }
