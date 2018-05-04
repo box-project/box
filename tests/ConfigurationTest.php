@@ -293,12 +293,20 @@ EOF
         $this->assertFalse($this->config->dumpAutoload());
         $this->assertFalse($this->getNoFileConfig()->dumpAutoload());
 
+        $this->setConfig(['dump-autoload' => null]);
+
+        $this->assertFalse($this->config->dumpAutoload());
+
         file_put_contents('composer.json', '{}');
 
-        $this->reloadConfig();
+        $this->setConfig([]);
 
         $this->assertTrue($this->config->dumpAutoload());
         $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
+
+        $this->setConfig(['dump-autoload' => null]);
+
+        $this->assertTrue($this->config->dumpAutoload());
     }
 
     public function test_the_autoloader_is_can_be_configured()
