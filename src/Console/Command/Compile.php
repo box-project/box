@@ -592,7 +592,7 @@ EOF
                 $logger->log(
                     BuildLogger::CHEVRON_PREFIX,
                     sprintf(
-                        '<info>Warning: the extension "%s" will no be required to excute the PHAR</info>',
+                        '<info>Warning: the extension "%s" will not be required to execute the PHAR</info>',
                         $extension
                     )
                 );
