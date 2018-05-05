@@ -28,7 +28,7 @@ great things:
 - 🚨 Friendly error logging experience 
 - 🔍 Retrieve information about the PHAR extension or a PHAR file and its contents
 - 🕵️‍♀️ Verify the signature of an existing PHAR
-- 📝 Use Git tags and short commit hashes for versioning.
+- 📝 Use Git tags and short commit hashes for versioning
 
 
 ## Table of Contents
