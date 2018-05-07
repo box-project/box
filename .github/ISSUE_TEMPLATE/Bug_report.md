@@ -1,3 +1,11 @@
+---
+name: 🐛 Bug Report
+about: If something isn't working as expected 🤔.
+
+---
+
+## Bug report
+
 | Question    | Answer
 | ------------| ---------------
 | Box version | x.y.z <!-- (`box.phar -V` or `composer show | grep humbug/box`) -->
