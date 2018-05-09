@@ -38,12 +38,12 @@ class RequirementCollectionTest extends TestCase
 
         $reqs = [
             $requirementA = new Requirement(
-                'return true;',
+                new ConditionIsFulfilled(),
                 'req tA',
                 'req hA'
             ),
             $requirementB = new Requirement(
-                'return true;',
+                new ConditionIsFulfilled(),
                 'req tB',
                 'req hB'
             ),
@@ -59,7 +59,7 @@ class RequirementCollectionTest extends TestCase
         $this->assertTrue($requirements->evaluateRequirements());
 
         $requirements->addRequirement(
-            'return false;',
+            $check = new ConditionIsNotFulfilled(),
             'req tC',
             'req hC'
         );
@@ -76,7 +76,7 @@ class RequirementCollectionTest extends TestCase
 
         $requirementC = $retrievedRequirements[2];
 
-        $this->assertSame('return false;', $requirementC->getIsFullfilledChecker());
+        $this->assertSame($check, $requirementC->getIsFullfilledChecker());
         $this->assertTrue($requirement->isFulfilled());
         $this->assertSame('req tC', $requirementC->getTestMessage());
         $this->assertSame('req hC', $requirementC->getHelpText());

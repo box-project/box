@@ -70,9 +70,10 @@ class AppRequirementsFactoryTest extends TestCase
             Phar::GZ,
             [
                 [
-                    "return \\extension_loaded('zlib');",
-                    'The application requires the extension "zlib". Enable it or install a polyfill.',
-                    'The application requires the extension "zlib".',
+                    'type' => 'extension',
+                    'condition' => 'zlib',
+                    'message' => 'The application requires the extension "zlib". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "zlib".',
                 ],
             ],
         ];
@@ -83,9 +84,10 @@ class AppRequirementsFactoryTest extends TestCase
             Phar::BZ2,
             [
                 [
-                    "return \\extension_loaded('bz2');",
-                    'The application requires the extension "bz2". Enable it or install a polyfill.',
-                    'The application requires the extension "bz2".',
+                    'type' => 'extension',
+                    'condition' => 'bz2',
+                    'message' => 'The application requires the extension "bz2". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "bz2".',
                 ],
             ],
         ];
@@ -96,9 +98,10 @@ class AppRequirementsFactoryTest extends TestCase
             Phar::GZ,
             [
                 [
-                    "return \\extension_loaded('zlib');",
-                    'The application requires the extension "zlib". Enable it or install a polyfill.',
-                    'The application requires the extension "zlib".',
+                    'type' => 'extension',
+                    'condition' => 'zlib',
+                    'message' => 'The application requires the extension "zlib". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "zlib".',
                 ],
             ],
         ];
@@ -109,9 +112,10 @@ class AppRequirementsFactoryTest extends TestCase
             Phar::BZ2,
             [
                 [
-                    "return \\extension_loaded('bz2');",
-                    'The application requires the extension "bz2". Enable it or install a polyfill.',
-                    'The application requires the extension "bz2".',
+                    'type' => 'extension',
+                    'condition' => 'bz2',
+                    'message' => 'The application requires the extension "bz2". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "bz2".',
                 ],
             ],
         ];
@@ -122,9 +126,10 @@ class AppRequirementsFactoryTest extends TestCase
             Phar::GZ,
             [
                 [
-                    "return \\extension_loaded('zlib');",
-                    'The application requires the extension "zlib". Enable it or install a polyfill.',
-                    'The application requires the extension "zlib".',
+                    'type' => 'extension',
+                    'condition' => 'zlib',
+                    'message' => 'The application requires the extension "zlib". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "zlib".',
                 ],
             ],
         ];
@@ -135,9 +140,10 @@ class AppRequirementsFactoryTest extends TestCase
             Phar::BZ2,
             [
                 [
-                    "return \\extension_loaded('bz2');",
-                    'The application requires the extension "bz2". Enable it or install a polyfill.',
-                    'The application requires the extension "bz2".',
+                    'type' => 'extension',
+                    'condition' => 'bz2',
+                    'message' => 'The application requires the extension "bz2". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "bz2".',
                 ],
             ],
         ];
@@ -158,28 +164,16 @@ JSON
             null,
             [
                 [
-                    <<<'PHP'
-require_once __DIR__.'/../vendor/composer/semver/src/Semver.php';
-require_once __DIR__.'/../vendor/composer/semver/src/VersionParser.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/ConstraintInterface.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/EmptyConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/MultiConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/Constraint.php';
-
-return \Composer\Semver\Semver::satisfies(
-    sprintf('%d.%d.%d', \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION, \PHP_RELEASE_VERSION),
-    '^7.1'
-);
-
-PHP
-                    ,
-                    'The application requires the version "^7.1" or greater.',
-                    'The application requires the version "^7.1" or greater.',
+                    'type' => 'php',
+                    'condition' => '^7.1',
+                    'message' => 'The application requires the version "^7.1" or greater.',
+                    'helpMessage' => 'The application requires the version "^7.1" or greater.',
                 ],
                 [
-                    "return \\extension_loaded('phar');",
-                    'The application requires the extension "phar". Enable it or install a polyfill.',
-                    'The application requires the extension "phar".',
+                    'type' => 'extension',
+                    'condition' => 'phar',
+                    'message' => 'The application requires the extension "phar". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "phar".',
                 ],
             ],
         ];
@@ -199,28 +193,16 @@ JSON
             null,
             [
                 [
-                    <<<'PHP'
-require_once __DIR__.'/../vendor/composer/semver/src/Semver.php';
-require_once __DIR__.'/../vendor/composer/semver/src/VersionParser.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/ConstraintInterface.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/EmptyConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/MultiConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/Constraint.php';
-
-return \Composer\Semver\Semver::satisfies(
-    sprintf('%d.%d.%d', \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION, \PHP_RELEASE_VERSION),
-    '^7.1'
-);
-
-PHP
-                    ,
-                    'The application requires the version "^7.1" or greater.',
-                    'The application requires the version "^7.1" or greater.',
+                    'type' => 'php',
+                    'condition' => '^7.1',
+                    'message' => 'The application requires the version "^7.1" or greater.',
+                    'helpMessage' => 'The application requires the version "^7.1" or greater.',
                 ],
                 [
-                    "return \\extension_loaded('phar');",
-                    'The application requires the extension "phar". Enable it or install a polyfill.',
-                    'The application requires the extension "phar".',
+                    'type' => 'extension',
+                    'condition' => 'phar',
+                    'message' => 'The application requires the extension "phar". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "phar".',
                 ],
             ],
         ];
@@ -250,28 +232,16 @@ JSON
             null,
             [
                 [
-                    <<<'PHP'
-require_once __DIR__.'/../vendor/composer/semver/src/Semver.php';
-require_once __DIR__.'/../vendor/composer/semver/src/VersionParser.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/ConstraintInterface.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/EmptyConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/MultiConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/Constraint.php';
-
-return \Composer\Semver\Semver::satisfies(
-    sprintf('%d.%d.%d', \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION, \PHP_RELEASE_VERSION),
-    '^7.1'
-);
-
-PHP
-                    ,
-                    'The application requires the version "^7.1" or greater.',
-                    'The application requires the version "^7.1" or greater.',
+                    'type' => 'php',
+                    'condition' => '^7.1',
+                    'message' => 'The application requires the version "^7.1" or greater.',
+                    'helpMessage' => 'The application requires the version "^7.1" or greater.',
                 ],
                 [
-                    "return \\extension_loaded('phar');",
-                    'The application requires the extension "phar". Enable it or install a polyfill.',
-                    'The application requires the extension "phar".',
+                    'type' => 'extension',
+                    'condition' => 'phar',
+                    'message' => 'The application requires the extension "phar". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "phar".',
                 ],
             ],
         ];
@@ -291,33 +261,22 @@ JSON
             Phar::GZ,
             [
                 [
-                    <<<'PHP'
-require_once __DIR__.'/../vendor/composer/semver/src/Semver.php';
-require_once __DIR__.'/../vendor/composer/semver/src/VersionParser.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/ConstraintInterface.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/EmptyConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/MultiConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/Constraint.php';
-
-return \Composer\Semver\Semver::satisfies(
-    sprintf('%d.%d.%d', \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION, \PHP_RELEASE_VERSION),
-    '^7.1'
-);
-
-PHP
-                    ,
-                    'The application requires the version "^7.1" or greater.',
-                    'The application requires the version "^7.1" or greater.',
+                    'type' => 'php',
+                    'condition' => '^7.1',
+                    'message' => 'The application requires the version "^7.1" or greater.',
+                    'helpMessage' => 'The application requires the version "^7.1" or greater.',
                 ],
                 [
-                    "return \\extension_loaded('zlib');",
-                    'The application requires the extension "zlib". Enable it or install a polyfill.',
-                    'The application requires the extension "zlib".',
+                    'type' => 'extension',
+                    'condition' => 'zlib',
+                    'message' => 'The application requires the extension "zlib". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "zlib".',
                 ],
                 [
-                    "return \\extension_loaded('phar');",
-                    'The application requires the extension "phar". Enable it or install a polyfill.',
-                    'The application requires the extension "phar".',
+                    'type' => 'extension',
+                    'condition' => 'phar',
+                    'message' => 'The application requires the extension "phar". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "phar".',
                 ],
             ],
         ];
@@ -337,33 +296,22 @@ JSON
             Phar::GZ,
             [
                 [
-                    <<<'PHP'
-require_once __DIR__.'/../vendor/composer/semver/src/Semver.php';
-require_once __DIR__.'/../vendor/composer/semver/src/VersionParser.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/ConstraintInterface.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/EmptyConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/MultiConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/Constraint.php';
-
-return \Composer\Semver\Semver::satisfies(
-    sprintf('%d.%d.%d', \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION, \PHP_RELEASE_VERSION),
-    '^7.1'
-);
-
-PHP
-                    ,
-                    'The application requires the version "^7.1" or greater.',
-                    'The application requires the version "^7.1" or greater.',
+                    'type' => 'php',
+                    'condition' => '^7.1',
+                    'message' => 'The application requires the version "^7.1" or greater.',
+                    'helpMessage' => 'The application requires the version "^7.1" or greater.',
                 ],
                 [
-                    "return \\extension_loaded('zlib');",
-                    'The application requires the extension "zlib". Enable it or install a polyfill.',
-                    'The application requires the extension "zlib".',
+                    'type' => 'extension',
+                    'condition' => 'zlib',
+                    'message' => 'The application requires the extension "zlib". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "zlib".',
                 ],
                 [
-                    "return \\extension_loaded('phar');",
-                    'The application requires the extension "phar". Enable it or install a polyfill.',
-                    'The application requires the extension "phar".',
+                    'type' => 'extension',
+                    'condition' => 'phar',
+                    'message' => 'The application requires the extension "phar". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "phar".',
                 ],
             ],
         ];
@@ -392,33 +340,22 @@ JSON
             Phar::GZ,
             [
                 [
-                    <<<'PHP'
-require_once __DIR__.'/../vendor/composer/semver/src/Semver.php';
-require_once __DIR__.'/../vendor/composer/semver/src/VersionParser.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/ConstraintInterface.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/EmptyConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/MultiConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/Constraint.php';
-
-return \Composer\Semver\Semver::satisfies(
-    sprintf('%d.%d.%d', \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION, \PHP_RELEASE_VERSION),
-    '^7.1'
-);
-
-PHP
-                    ,
-                    'The application requires the version "^7.1" or greater.',
-                    'The application requires the version "^7.1" or greater.',
+                    'type' => 'php',
+                    'condition' => '^7.1',
+                    'message' => 'The application requires the version "^7.1" or greater.',
+                    'helpMessage' => 'The application requires the version "^7.1" or greater.',
                 ],
                 [
-                    "return \\extension_loaded('zlib');",
-                    'The application requires the extension "zlib". Enable it or install a polyfill.',
-                    'The application requires the extension "zlib".',
+                    'type' => 'extension',
+                    'condition' => 'zlib',
+                    'message' => 'The application requires the extension "zlib". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "zlib".',
                 ],
                 [
-                    "return \\extension_loaded('phar');",
-                    'The application requires the extension "phar". Enable it or install a polyfill.',
-                    'The application requires the extension "phar".',
+                    'type' => 'extension',
+                    'condition' => 'phar',
+                    'message' => 'The application requires the extension "phar". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "phar".',
                 ],
             ],
         ];
@@ -495,9 +432,10 @@ JSON
             Phar::GZ,
             [
                 [
-                    "return \\extension_loaded('zlib');",
-                    'The application requires the extension "zlib". Enable it or install a polyfill.',
-                    'The application requires the extension "zlib".',
+                    'type' => 'extension',
+                    'condition' => 'zlib',
+                    'message' => 'The application requires the extension "zlib". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "zlib".',
                 ],
             ],
         ];
@@ -517,9 +455,10 @@ JSON
             Phar::GZ,
             [
                 [
-                    "return \\extension_loaded('zlib');",
-                    'The application requires the extension "zlib". Enable it or install a polyfill.',
-                    'The application requires the extension "zlib".',
+                    'type' => 'extension',
+                    'condition' => 'zlib',
+                    'message' => 'The application requires the extension "zlib". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "zlib".',
                 ],
             ],
         ];
@@ -548,9 +487,10 @@ JSON
             Phar::GZ,
             [
                 [
-                    "return \\extension_loaded('zlib');",
-                    'The application requires the extension "zlib". Enable it or install a polyfill.',
-                    'The application requires the extension "zlib".',
+                    'type' => 'extension',
+                    'condition' => 'zlib',
+                    'message' => 'The application requires the extension "zlib". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "zlib".',
                 ],
             ],
         ];
@@ -573,43 +513,34 @@ JSON
             null,
             [
                 [
-                    <<<'PHP'
-require_once __DIR__.'/../vendor/composer/semver/src/Semver.php';
-require_once __DIR__.'/../vendor/composer/semver/src/VersionParser.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/ConstraintInterface.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/EmptyConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/MultiConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/Constraint.php';
-
-return \Composer\Semver\Semver::satisfies(
-    sprintf('%d.%d.%d', \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION, \PHP_RELEASE_VERSION),
-    '>=5.3'
-);
-
-PHP
-                    ,
-                    'The application requires the version ">=5.3" or greater.',
-                    'The application requires the version ">=5.3" or greater.',
+                    'type' => 'php',
+                    'condition' => '>=5.3',
+                    'message' => 'The application requires the version ">=5.3" or greater.',
+                    'helpMessage' => 'The application requires the version ">=5.3" or greater.',
                 ],
                 [
-                    "return \\extension_loaded('mbstring');",
-                    'The application requires the extension "mbstring". Enable it or install a polyfill.',
-                    'The application requires the extension "mbstring".',
+                    'type' => 'extension',
+                    'condition' => 'mbstring',
+                    'message' => 'The application requires the extension "mbstring". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "mbstring".',
                 ],
                 [
-                    "return \\extension_loaded('openssl');",
-                    'The application requires the extension "openssl". Enable it or install a polyfill.',
-                    'The application requires the extension "openssl".',
+                    'type' => 'extension',
+                    'condition' => 'openssl',
+                    'message' => 'The application requires the extension "openssl". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "openssl".',
                 ],
                 [
-                    "return \\extension_loaded('pcre');",
-                    'The application requires the extension "pcre". Enable it or install a polyfill.',
-                    'The application requires the extension "pcre".',
+                    'type' => 'extension',
+                    'condition' => 'pcre',
+                    'message' => 'The application requires the extension "pcre". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "pcre".',
                 ],
                 [
-                    "return \\extension_loaded('pdo_sqlite3');",
-                    'The application requires the extension "pdo_sqlite3". Enable it or install a polyfill.',
-                    'The application requires the extension "pdo_sqlite3".',
+                    'type' => 'extension',
+                    'condition' => 'pdo_sqlite3',
+                    'message' => 'The application requires the extension "pdo_sqlite3". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "pdo_sqlite3".',
                 ],
             ],
         ];
@@ -656,62 +587,40 @@ JSON
             null,
             [
                 [
-                    <<<'PHP'
-require_once __DIR__.'/../vendor/composer/semver/src/Semver.php';
-require_once __DIR__.'/../vendor/composer/semver/src/VersionParser.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/ConstraintInterface.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/EmptyConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/MultiConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/Constraint.php';
-
-return \Composer\Semver\Semver::satisfies(
-    sprintf('%d.%d.%d', \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION, \PHP_RELEASE_VERSION),
-    '>=5.3'
-);
-
-PHP
-                    ,
-                    'The package "beberlei/assert" requires the version ">=5.3" or greater.',
-                    'The package "beberlei/assert" requires the version ">=5.3" or greater.',
+                    'type' => 'php',
+                    'condition' => '>=5.3',
+                    'message' => 'The package "beberlei/assert" requires the version ">=5.3" or greater.',
+                    'helpMessage' => 'The package "beberlei/assert" requires the version ">=5.3" or greater.',
                 ],
                 [
-                    <<<'PHP'
-require_once __DIR__.'/../vendor/composer/semver/src/Semver.php';
-require_once __DIR__.'/../vendor/composer/semver/src/VersionParser.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/ConstraintInterface.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/EmptyConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/MultiConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/Constraint.php';
-
-return \Composer\Semver\Semver::satisfies(
-    sprintf('%d.%d.%d', \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION, \PHP_RELEASE_VERSION),
-    '^5.3.2 || ^7.0'
-);
-
-PHP
-                    ,
-                    'The package "composer/ca-bundle" requires the version "^5.3.2 || ^7.0" or greater.',
-                    'The package "composer/ca-bundle" requires the version "^5.3.2 || ^7.0" or greater.',
+                    'type' => 'php',
+                    'condition' => '^5.3.2 || ^7.0',
+                    'message' => 'The package "composer/ca-bundle" requires the version "^5.3.2 || ^7.0" or greater.',
+                    'helpMessage' => 'The package "composer/ca-bundle" requires the version "^5.3.2 || ^7.0" or greater.',
                 ],
                 [
-                    "return \\extension_loaded('mbstring');",
-                    'The package "beberlei/assert" requires the extension "mbstring". Enable it or install a polyfill.',
-                    'The package "beberlei/assert" requires the extension "mbstring".',
+                    'type' => 'extension',
+                    'condition' => 'mbstring',
+                    'message' => 'The package "beberlei/assert" requires the extension "mbstring". Enable it or install a polyfill.',
+                    'helpMessage' => 'The package "beberlei/assert" requires the extension "mbstring".',
                 ],
                 [
-                    "return \\extension_loaded('openssl');",
-                    'The package "composer/ca-bundle" requires the extension "openssl". Enable it or install a polyfill.',
-                    'The package "composer/ca-bundle" requires the extension "openssl".',
+                    'type' => 'extension',
+                    'condition' => 'openssl',
+                    'message' => 'The package "composer/ca-bundle" requires the extension "openssl". Enable it or install a polyfill.',
+                    'helpMessage' => 'The package "composer/ca-bundle" requires the extension "openssl".',
                 ],
                 [
-                    "return \\extension_loaded('openssl');",
-                    'The package "acme/foo" requires the extension "openssl". Enable it or install a polyfill.',
-                    'The package "acme/foo" requires the extension "openssl".',
+                    'type' => 'extension',
+                    'condition' => 'openssl',
+                    'message' => 'The package "acme/foo" requires the extension "openssl". Enable it or install a polyfill.',
+                    'helpMessage' => 'The package "acme/foo" requires the extension "openssl".',
                 ],
                 [
-                    "return \\extension_loaded('pcre');",
-                    'The package "composer/ca-bundle" requires the extension "pcre". Enable it or install a polyfill.',
-                    'The package "composer/ca-bundle" requires the extension "pcre".',
+                    'type' => 'extension',
+                    'condition' => 'pcre',
+                    'message' => 'The package "composer/ca-bundle" requires the extension "pcre". Enable it or install a polyfill.',
+                    'helpMessage' => 'The package "composer/ca-bundle" requires the extension "pcre".',
                 ],
             ],
         ];
@@ -770,62 +679,40 @@ JSON
             null,
             [
                 [
-                    <<<'PHP'
-require_once __DIR__.'/../vendor/composer/semver/src/Semver.php';
-require_once __DIR__.'/../vendor/composer/semver/src/VersionParser.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/ConstraintInterface.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/EmptyConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/MultiConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/Constraint.php';
-
-return \Composer\Semver\Semver::satisfies(
-    sprintf('%d.%d.%d', \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION, \PHP_RELEASE_VERSION),
-    '>=5.3'
-);
-
-PHP
-                    ,
-                    'The package "beberlei/assert" requires the version ">=5.3" or greater.',
-                    'The package "beberlei/assert" requires the version ">=5.3" or greater.',
+                    'type' => 'php',
+                    'condition' => '>=5.3',
+                    'message' => 'The package "beberlei/assert" requires the version ">=5.3" or greater.',
+                    'helpMessage' => 'The package "beberlei/assert" requires the version ">=5.3" or greater.',
                 ],
                 [
-                    <<<'PHP'
-require_once __DIR__.'/../vendor/composer/semver/src/Semver.php';
-require_once __DIR__.'/../vendor/composer/semver/src/VersionParser.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/ConstraintInterface.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/EmptyConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/MultiConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/Constraint.php';
-
-return \Composer\Semver\Semver::satisfies(
-    sprintf('%d.%d.%d', \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION, \PHP_RELEASE_VERSION),
-    '^5.3.2 || ^7.0'
-);
-
-PHP
-                    ,
-                    'The package "composer/ca-bundle" requires the version "^5.3.2 || ^7.0" or greater.',
-                    'The package "composer/ca-bundle" requires the version "^5.3.2 || ^7.0" or greater.',
+                    'type' => 'php',
+                    'condition' => '^5.3.2 || ^7.0',
+                    'message' => 'The package "composer/ca-bundle" requires the version "^5.3.2 || ^7.0" or greater.',
+                    'helpMessage' => 'The package "composer/ca-bundle" requires the version "^5.3.2 || ^7.0" or greater.',
                 ],
                 [
-                    "return \\extension_loaded('mbstring');",
-                    'The package "beberlei/assert" requires the extension "mbstring". Enable it or install a polyfill.',
-                    'The package "beberlei/assert" requires the extension "mbstring".',
+                    'type' => 'extension',
+                    'condition' => 'mbstring',
+                    'message' => 'The package "beberlei/assert" requires the extension "mbstring". Enable it or install a polyfill.',
+                    'helpMessage' => 'The package "beberlei/assert" requires the extension "mbstring".',
                 ],
                 [
-                    "return \\extension_loaded('openssl');",
-                    'The package "composer/ca-bundle" requires the extension "openssl". Enable it or install a polyfill.',
-                    'The package "composer/ca-bundle" requires the extension "openssl".',
+                    'type' => 'extension',
+                    'condition' => 'openssl',
+                    'message' => 'The package "composer/ca-bundle" requires the extension "openssl". Enable it or install a polyfill.',
+                    'helpMessage' => 'The package "composer/ca-bundle" requires the extension "openssl".',
                 ],
                 [
-                    "return \\extension_loaded('openssl');",
-                    'The package "acme/foo" requires the extension "openssl". Enable it or install a polyfill.',
-                    'The package "acme/foo" requires the extension "openssl".',
+                    'type' => 'extension',
+                    'condition' => 'openssl',
+                    'message' => 'The package "acme/foo" requires the extension "openssl". Enable it or install a polyfill.',
+                    'helpMessage' => 'The package "acme/foo" requires the extension "openssl".',
                 ],
                 [
-                    "return \\extension_loaded('pcre');",
-                    'The package "composer/ca-bundle" requires the extension "pcre". Enable it or install a polyfill.',
-                    'The package "composer/ca-bundle" requires the extension "pcre".',
+                    'type' => 'extension',
+                    'condition' => 'pcre',
+                    'message' => 'The package "composer/ca-bundle" requires the extension "pcre". Enable it or install a polyfill.',
+                    'helpMessage' => 'The package "composer/ca-bundle" requires the extension "pcre".',
                 ],
             ],
         ];
@@ -966,53 +853,46 @@ JSON
             null,
             [
                 [
-                    <<<'PHP'
-require_once __DIR__.'/../vendor/composer/semver/src/Semver.php';
-require_once __DIR__.'/../vendor/composer/semver/src/VersionParser.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/ConstraintInterface.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/EmptyConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/MultiConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/Constraint.php';
-
-return \Composer\Semver\Semver::satisfies(
-    sprintf('%d.%d.%d', \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION, \PHP_RELEASE_VERSION),
-    '^7.3'
-);
-
-PHP
-                    ,
-                    'The application requires the version "^7.3" or greater.',
-                    'The application requires the version "^7.3" or greater.',
+                    'type' => 'php',
+                    'condition' => '^7.3',
+                    'message' => 'The application requires the version "^7.3" or greater.',
+                    'helpMessage' => 'The application requires the version "^7.3" or greater.',
                 ],
                 [
-                    "return \\extension_loaded('mbstring');",
-                    'The application requires the extension "mbstring". Enable it or install a polyfill.',
-                    'The application requires the extension "mbstring".',
+                    'type' => 'extension',
+                    'condition' => 'mbstring',
+                    'message' => 'The application requires the extension "mbstring". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "mbstring".',
                 ],
                 [
-                    "return \\extension_loaded('mbstring');",
-                    'The package "beberlei/assert" requires the extension "mbstring". Enable it or install a polyfill.',
-                    'The package "beberlei/assert" requires the extension "mbstring".',
+                    'type' => 'extension',
+                    'condition' => 'mbstring',
+                    'message' => 'The package "beberlei/assert" requires the extension "mbstring". Enable it or install a polyfill.',
+                    'helpMessage' => 'The package "beberlei/assert" requires the extension "mbstring".',
                 ],
                 [
-                    "return \\extension_loaded('mbstring');",
-                    'The package "composer/ca-bundle" requires the extension "mbstring". Enable it or install a polyfill.',
-                    'The package "composer/ca-bundle" requires the extension "mbstring".',
+                    'type' => 'extension',
+                    'condition' => 'mbstring',
+                    'message' => 'The package "composer/ca-bundle" requires the extension "mbstring". Enable it or install a polyfill.',
+                    'helpMessage' => 'The package "composer/ca-bundle" requires the extension "mbstring".',
                 ],
                 [
-                    "return \\extension_loaded('json');",
-                    'The application requires the extension "json". Enable it or install a polyfill.',
-                    'The application requires the extension "json".',
+                    'type' => 'extension',
+                    'condition' => 'json',
+                    'message' => 'The application requires the extension "json". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "json".',
                 ],
                 [
-                    "return \\extension_loaded('json');",
-                    'The package "beberlei/assert" requires the extension "json". Enable it or install a polyfill.',
-                    'The package "beberlei/assert" requires the extension "json".',
+                    'type' => 'extension',
+                    'condition' => 'json',
+                    'message' => 'The package "beberlei/assert" requires the extension "json". Enable it or install a polyfill.',
+                    'helpMessage' => 'The package "beberlei/assert" requires the extension "json".',
                 ],
                 [
-                    "return \\extension_loaded('json');",
-                    'The package "composer/ca-bundle" requires the extension "json". Enable it or install a polyfill.',
-                    'The package "composer/ca-bundle" requires the extension "json".',
+                    'type' => 'extension',
+                    'condition' => 'json',
+                    'message' => 'The package "composer/ca-bundle" requires the extension "json". Enable it or install a polyfill.',
+                    'helpMessage' => 'The package "composer/ca-bundle" requires the extension "json".',
                 ],
             ],
         ];
@@ -1036,28 +916,16 @@ JSON
             null,
             [
                 [
-                    <<<'PHP'
-require_once __DIR__.'/../vendor/composer/semver/src/Semver.php';
-require_once __DIR__.'/../vendor/composer/semver/src/VersionParser.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/ConstraintInterface.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/EmptyConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/MultiConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/Constraint.php';
-
-return \Composer\Semver\Semver::satisfies(
-    sprintf('%d.%d.%d', \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION, \PHP_RELEASE_VERSION),
-    '^7.3'
-);
-
-PHP
-                    ,
-                    'The application requires the version "^7.3" or greater.',
-                    'The application requires the version "^7.3" or greater.',
+                    'type' => 'php',
+                    'condition' => '^7.3',
+                    'message' => 'The application requires the version "^7.3" or greater.',
+                    'helpMessage' => 'The application requires the version "^7.3" or greater.',
                 ],
                 [
-                    "return \\extension_loaded('json');",
-                    'The application requires the extension "json". Enable it or install a polyfill.',
-                    'The application requires the extension "json".',
+                    'type' => 'extension',
+                    'condition' => 'json',
+                    'message' => 'The application requires the extension "json". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "json".',
                 ],
             ],
         ];
@@ -1119,38 +987,28 @@ JSON
             null,
             [
                 [
-                    <<<'PHP'
-require_once __DIR__.'/../vendor/composer/semver/src/Semver.php';
-require_once __DIR__.'/../vendor/composer/semver/src/VersionParser.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/ConstraintInterface.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/EmptyConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/MultiConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/Constraint.php';
-
-return \Composer\Semver\Semver::satisfies(
-    sprintf('%d.%d.%d', \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION, \PHP_RELEASE_VERSION),
-    '^7.3'
-);
-
-PHP
-                    ,
-                    'The application requires the version "^7.3" or greater.',
-                    'The application requires the version "^7.3" or greater.',
+                    'type' => 'php',
+                    'condition' => '^7.3',
+                    'message' => 'The application requires the version "^7.3" or greater.',
+                    'helpMessage' => 'The application requires the version "^7.3" or greater.',
                 ],
                 [
-                    "return \\extension_loaded('json');",
-                    'The application requires the extension "json". Enable it or install a polyfill.',
-                    'The application requires the extension "json".',
+                    'type' => 'extension',
+                    'condition' => 'json',
+                    'message' => 'The application requires the extension "json". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "json".',
                 ],
                 [
-                    "return \\extension_loaded('json');",
-                    'The package "beberlei/assert" requires the extension "json". Enable it or install a polyfill.',
-                    'The package "beberlei/assert" requires the extension "json".',
+                    'type' => 'extension',
+                    'condition' => 'json',
+                    'message' => 'The package "beberlei/assert" requires the extension "json". Enable it or install a polyfill.',
+                    'helpMessage' => 'The package "beberlei/assert" requires the extension "json".',
                 ],
                 [
-                    "return \\extension_loaded('json');",
-                    'The package "composer/ca-bundle" requires the extension "json". Enable it or install a polyfill.',
-                    'The package "composer/ca-bundle" requires the extension "json".',
+                    'type' => 'extension',
+                    'condition' => 'json',
+                    'message' => 'The package "composer/ca-bundle" requires the extension "json". Enable it or install a polyfill.',
+                    'helpMessage' => 'The package "composer/ca-bundle" requires the extension "json".',
                 ],
             ],
         ];

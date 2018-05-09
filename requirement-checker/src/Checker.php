@@ -137,7 +137,13 @@ final class Checker
         $requirements = new RequirementCollection();
 
         foreach ($config as $constraint) {
-            call_user_func_array(array($requirements, 'addRequirement'), $constraint);
+            $requirements->addRequirement(
+                'php' === $constraint['type']
+                    ? new IsPhpVersionFulfilled($constraint['condition'])
+                    : new IsExtensionFulfilled($constraint['condition']),
+                $constraint['message'],
+                $constraint['helpMessage']
+            );
         }
 
         return $requirements;

@@ -1,6 +1,6 @@
 <?php
 
-namespace _HumbugBox5aeb92ac2e46b\KevinGH\RequirementChecker;
+namespace _HumbugBox5af2be5c4ef55\KevinGH\RequirementChecker;
 
 /**
 @private
@@ -135,7 +135,7 @@ final class IO
             return \function_exists('sapi_windows_vt100_support') && sapi_windows_vt100_support(\STDOUT) || \false !== \getenv('ANSICON') || 'ON' === \getenv('ConEmuANSI') || 'xterm' === \getenv('TERM');
         }
         if (\function_exists('stream_isatty')) {
-            return stream_isatty(\STDOUT);
+            return \stream_isatty(\STDOUT);
         }
         if (\function_exists('posix_isatty')) {
             return \posix_isatty(\STDOUT);

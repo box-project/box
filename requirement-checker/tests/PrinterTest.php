@@ -174,7 +174,7 @@ EOF
     {
         yield [
             new Requirement(
-                'return true;',
+                new ConditionIsFulfilled(),
                 'Test message',
                 'Help message'
             ),
@@ -186,7 +186,7 @@ EOF
 
         yield [
             new Requirement(
-                'return false;',
+                new ConditionIsNotFulfilled(),
                 'Test message',
                 'Help message'
             ),
@@ -201,7 +201,7 @@ EOF
 
         yield [
             new Requirement(
-                'return false;',
+                new ConditionIsNotFulfilled(),
                 'Test message',
                 'Help message'
             ),

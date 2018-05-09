@@ -1,11 +1,10 @@
 <?php
 
-namespace _HumbugBox5aeb92ac2e46b\KevinGH\RequirementChecker;
+namespace _HumbugBox5af2be5c4ef55\KevinGH\RequirementChecker;
 
 /**
 @private
 @see
-@package
 @license
 */
 final class Requirement
@@ -28,7 +27,7 @@ final class Requirement
     public function isFulfilled()
     {
         if (null === $this->fulfilled) {
-            $this->fulfilled = eval($this->checkIsFulfilled);
+            $this->fulfilled = ($this->checkIsFulfilled)();
         }
         return (bool) $this->fulfilled;
     }
