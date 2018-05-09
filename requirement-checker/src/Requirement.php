@@ -44,7 +44,7 @@ final class Requirement
     public function isFulfilled()
     {
         if (null === $this->fulfilled) {
-            $this->fulfilled = ($this->checkIsFulfilled)();
+            $this->fulfilled = $this->checkIsFulfilled->__invoke();
         }
 
         return (bool) $this->fulfilled;  // Cast to boolean, `(bool)` and `boolval()` are not available in PHP 5.3

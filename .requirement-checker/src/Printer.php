@@ -1,6 +1,6 @@
 <?php
 
-namespace _HumbugBox5af2be5c4ef55\KevinGH\RequirementChecker;
+namespace _HumbugBox5af37057079ab\KevinGH\RequirementChecker;
 
 /**
 @private
@@ -19,7 +19,7 @@ final class Printer
     public function __construct($verbosity, $supportColors, $width = null)
     {
         if (null === $width) {
-            $terminal = new \_HumbugBox5af2be5c4ef55\KevinGH\RequirementChecker\Terminal();
+            $terminal = new \_HumbugBox5af37057079ab\KevinGH\RequirementChecker\Terminal();
             $width = \min($terminal->getWidth(), 80);
         }
         $this->verbosity = $verbosity;
@@ -59,7 +59,7 @@ final class Printer
     @param
     @return
     */
-    public function getRequirementErrorMessage(\_HumbugBox5af2be5c4ef55\KevinGH\RequirementChecker\Requirement $requirement)
+    public function getRequirementErrorMessage(\_HumbugBox5af37057079ab\KevinGH\RequirementChecker\Requirement $requirement)
     {
         if ($requirement->isFulfilled()) {
             return null;
