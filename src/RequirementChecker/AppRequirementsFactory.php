@@ -69,17 +69,7 @@ final class AppRequirementsFactory
             ? $composerJsonContents['require']['php']
             : $composerLockContents['platform']['php'];
 
-        $requirements[] = [
-            self::generatePhpCheckStatement((string) $requiredPhpVersion),
-            sprintf(
-                'The application requires the version "%s" or greater.',
-                $requiredPhpVersion
-            ),
-            sprintf(
-                'The application requires the version "%s" or greater.',
-                $requiredPhpVersion
-            ),
-        ];
+        $requirements[] = self::generatePhpCheckRequirement((string) $requiredPhpVersion, null);
 
         return $requirements;
     }
@@ -95,19 +85,7 @@ final class AppRequirementsFactory
                 continue;
             }
 
-            $requirements[] = [
-                self::generatePhpCheckStatement((string) $requiredPhpVersion),
-                sprintf(
-                    'The package "%s" requires the version "%s" or greater.',
-                    $packageInfo['name'],
-                    $requiredPhpVersion
-                ),
-                sprintf(
-                    'The package "%s" requires the version "%s" or greater.',
-                    $packageInfo['name'],
-                    $requiredPhpVersion
-                ),
-            ];
+            $requirements[] = self::generatePhpCheckRequirement((string) $requiredPhpVersion, $packageInfo['name']);
         }
 
         return $requirements;
@@ -146,9 +124,10 @@ final class AppRequirementsFactory
                 }
 
                 $requirements[] = [
-                    self::generateExtensionCheckStatement($extension),
-                    $message,
-                    $helpMessage,
+                    'type' => 'extension',
+                    'condition' => $extension,
+                    'message' => $message,
+                    'helpMessage' => $helpMessage,
                 ];
             }
         }
@@ -270,26 +249,34 @@ final class AppRequirementsFactory
         return [$polyfills, $requirements];
     }
 
-    private static function generatePhpCheckStatement(string $requiredPhpVersion): string
+    /**
+     * @return string[]
+     */
+    private static function generatePhpCheckRequirement(string $requiredPhpVersion, ?string $packageName): array
     {
-        return <<<PHP
-require_once __DIR__.'/../vendor/composer/semver/src/Semver.php';
-require_once __DIR__.'/../vendor/composer/semver/src/VersionParser.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/ConstraintInterface.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/EmptyConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/MultiConstraint.php';
-require_once __DIR__.'/../vendor/composer/semver/src/Constraint/Constraint.php';
-
-return \Composer\Semver\Semver::satisfies(
-    sprintf('%d.%d.%d', \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION, \PHP_RELEASE_VERSION),
-    '$requiredPhpVersion'
-);
-
-PHP;
-    }
-
-    private static function generateExtensionCheckStatement(string $extension): string
-    {
-        return "return \\extension_loaded('$extension');";
+        return [
+            'type' => 'php',
+            'condition' => $requiredPhpVersion,
+            'message' => null === $packageName
+                ? sprintf(
+                    'The application requires the version "%s" or greater.',
+                    $requiredPhpVersion
+                )
+                : sprintf(
+                    'The package "%s" requires the version "%s" or greater.',
+                    $packageName,
+                    $requiredPhpVersion
+                ),
+            'helpMessage' => null === $packageName
+                ? sprintf(
+                'The application requires the version "%s" or greater.',
+                $requiredPhpVersion
+            )
+                : sprintf(
+                'The package "%s" requires the version "%s" or greater.',
+                $packageName,
+                $requiredPhpVersion
+            ),
+        ];
     }
 }

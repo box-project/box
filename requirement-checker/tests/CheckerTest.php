@@ -128,12 +128,17 @@ EOF
             $requirements = new RequirementCollection();
 
             $requirements->addRequirement(
-                'return true;',
+                new ConditionIsFulfilled(),
                 'The application requires the version "7.2.0" or greater. Got "7.2.2"',
                 'The application requires the version "7.2.0" or greater.'
             );
             $requirements->addRequirement(
-                'return true;',
+                new class implements IsFulfilled {
+                    public function __invoke()
+                    {
+                        return true;
+                    }
+                },
                 'The package "acme/foo" requires the extension "random". Enable it or install a polyfill.',
                 'The package "acme/foo" requires the extension "random".'
             );
@@ -168,12 +173,12 @@ EOF
             $requirements = new RequirementCollection();
 
             $requirements->addRequirement(
-                'return true;',
+                new ConditionIsFulfilled(),
                 'The application requires the version "7.2.0" or greater. Got "7.2.2"',
                 'The application requires the version "7.2.0" or greater.'
             );
             $requirements->addRequirement(
-                'return true;',
+                new ConditionIsFulfilled(),
                 'The package "acme/foo" requires the extension "random". Enable it or install a polyfill.',
                 'The package "acme/foo" requires the extension "random".'
             );
@@ -208,12 +213,12 @@ EOF
                 $requirements = new RequirementCollection();
 
                 $requirements->addRequirement(
-                    'return true;',
+                    new ConditionIsFulfilled(),
                     'The application requires the version "7.2.0" or greater. Got "7.2.2"',
                     'The application requires the version "7.2.0" or greater.'
                 );
                 $requirements->addRequirement(
-                    'return true;',
+                    new ConditionIsFulfilled(),
                     'The package "acme/foo" requires the extension "random". Enable it or install a polyfill.',
                     'The package "acme/foo" requires the extension "random".'
                 );
@@ -231,12 +236,12 @@ EOF
             $requirements = new RequirementCollection();
 
             $requirements->addRequirement(
-                'return true;',
+                new ConditionIsFulfilled(),
                 'The application requires the version "7.2.0" or greater. Got "7.2.2"',
                 'The application requires the version "7.2.0" or greater.'
             );
             $requirements->addRequirement(
-                'return false;',
+                new ConditionIsNotFulfilled(),
                 'The package "acme/foo" requires the extension "random". Enable it or install a polyfill.',
                 'The package "acme/foo" requires the extension "random".'
             );
@@ -279,12 +284,12 @@ EOF
                 $requirements = new RequirementCollection();
 
                 $requirements->addRequirement(
-                    'return true;',
+                    new ConditionIsFulfilled(),
                     'The application requires the version "7.2.0" or greater. Got "7.2.2"',
                     'The application requires the version "7.2.0" or greater.'
                 );
                 $requirements->addRequirement(
-                    'return false;',
+                    new ConditionIsNotFulfilled(),
                     'The package "acme/foo" requires the extension "random". Enable it or install a polyfill.',
                     'The package "acme/foo" requires the extension "random".'
                 );
@@ -325,12 +330,12 @@ EOF
             $requirements = new RequirementCollection();
 
             $requirements->addRequirement(
-                'return true;',
+                new ConditionIsFulfilled(),
                 'The application requires the version "7.2.0" or greater. Got "7.2.2"',
                 'The application requires the version "7.2.0" or greater.'
             );
             $requirements->addRequirement(
-                'return false;',
+                new ConditionIsNotFulfilled(),
                 'The package "acme/foo" requires the extension "random". Enable it or install a polyfill.',
                 'The package "acme/foo" requires the extension "random".'
             );

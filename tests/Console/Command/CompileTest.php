@@ -187,6 +187,9 @@ PHP;
             '/.box/src/',
             '/.box/src/Checker.php',
             '/.box/src/IO.php',
+            '/.box/src/IsExtensionFulfilled.php',
+            '/.box/src/IsFulfilled.php',
+            '/.box/src/IsPhpVersionFulfilled.php',
             '/.box/src/Printer.php',
             '/.box/src/Requirement.php',
             '/.box/src/RequirementCollection.php',
@@ -236,8 +239,6 @@ PHP;
         ];
 
         $actualFiles = $this->retrievePharFiles($phar);
-
-        sort($actualFiles);
 
         $this->assertSame($expectedFiles, $actualFiles);
     }
@@ -400,6 +401,9 @@ PHP;
             '/.box/src/',
             '/.box/src/Checker.php',
             '/.box/src/IO.php',
+            '/.box/src/IsExtensionFulfilled.php',
+            '/.box/src/IsFulfilled.php',
+            '/.box/src/IsPhpVersionFulfilled.php',
             '/.box/src/Printer.php',
             '/.box/src/Requirement.php',
             '/.box/src/RequirementCollection.php',
@@ -426,11 +430,16 @@ PHP;
             '/.box/vendor/composer/semver/src/Constraint/MultiConstraint.php',
             '/.box/vendor/composer/semver/src/Semver.php',
             '/.box/vendor/composer/semver/src/VersionParser.php',
+            '/binary',
             '/bootstrap.php',
             '/composer.json',
             '/index.php',
             '/one/',
             '/one/test.php',
+            '/private.key',
+            '/test.phar',
+            '/test.phar.pubkey',
+            '/test.php',
             '/two/',
             '/two/test.png',
             '/vendor/',
@@ -443,16 +452,11 @@ PHP;
             '/vendor/composer/autoload_psr4.php',
             '/vendor/composer/autoload_real.php',
             '/vendor/composer/autoload_static.php',
-            '/binary',
-            '/private.key',
-            '/test.phar',
-            '/test.phar.pubkey',
-            '/test.php',
         ];
 
         $actualFiles = $this->retrievePharFiles($phar);
 
-        $this->assertEquals($expectedFiles, $actualFiles, '', .0, 10, true);
+        $this->assertSame($expectedFiles, $actualFiles);
 
         unset($phar);
         Phar::unlinkArchive('index.phar');
