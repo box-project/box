@@ -924,8 +924,6 @@ BANNER;
         }
 
         if (file_exists($vendorDir)) {
-            $filesToAppend[] = self::normalizePath($vendorDir.'/composer/installed.json', $basePath);
-
             $vendorPackages = toArray(values(map(
                 $toString,
                 Finder::create()
