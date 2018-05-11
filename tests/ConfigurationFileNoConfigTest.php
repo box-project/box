@@ -14,8 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use InvalidArgumentException;
 use function file_put_contents;
 use function KevinGH\Box\FileSystem\remove;
+use function symlink;
 
 /**
  * @covers \KevinGH\Box\Configuration
@@ -136,6 +138,107 @@ JSON
 
         $this->assertEquals($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());
+    }
+
+    public function test_throws_an_error_if_a_non_existent_file_is_found_via_the_composer_json(): void
+    {
+        touch('file0');
+
+        file_put_contents(
+            'composer.json',
+            <<<'JSON'
+{
+    "autoload": {
+        "files": ["file0", "file1"]
+    }
+}
+JSON
+        );
+
+        try {
+            $this->getNoFileConfig();
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'File "'.$this->tmp.'/file1" was expected to exist.',
+                $exception->getMessage()
+            );
+        }
+
+        file_put_contents(
+            'composer.json',
+            <<<'JSON'
+{
+    "autoload": {
+        "classmap": ["CLASSMAP_DIR"]
+    }
+}
+JSON
+        );
+
+        try {
+            $this->getNoFileConfig();
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'File or directory "'.$this->tmp.'/CLASSMAP_DIR" was expected to exist.',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_throws_an_error_if_a_symlink_is_used(): void
+    {
+        touch('file0');
+        symlink('file0', 'file1');
+
+        file_put_contents(
+            'composer.json',
+            <<<'JSON'
+{
+    "autoload": {
+        "files": ["file0", "file1"]
+    }
+}
+JSON
+        );
+
+        try {
+            $this->getNoFileConfig();
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Cannot add the link "'.$this->tmp.'/file1": links are not supported.',
+                $exception->getMessage()
+            );
+        }
+
+        file_put_contents(
+            'composer.json',
+            <<<'JSON'
+{
+    "autoload": {
+        "classmap": ["CLASSMAP_DIR"]
+    }
+}
+JSON
+        );
+        mkdir('original_dir');
+        symlink('original_dir', 'CLASSMAP_DIR');
+
+        try {
+            $this->getNoFileConfig();
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Cannot add the link "'.$this->tmp.'/CLASSMAP_DIR": links are not supported.',
+                $exception->getMessage()
+            );
+        }
     }
 
     public function test_the_blacklist_setting_is_applied_to_all_the_files_found_in_the_current_directory_are_taken_by_default_if_no_file_setting_is_used(): void
