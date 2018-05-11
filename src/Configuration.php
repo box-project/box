@@ -44,6 +44,7 @@ use function file_exists;
 use function Humbug\PhpScoper\create_scoper;
 use function is_array;
 use function is_file;
+use function is_link;
 use function is_readable;
 use function iter\fn\method;
 use function iter\map;
@@ -924,7 +925,13 @@ BANNER;
         }
 
         if (file_exists($vendorDir)) {
-            $filesToAppend[] = self::normalizePath($vendorDir.'/composer/installed.json', $basePath);
+            // The installed.json file is necessary for dumping the autoload correctly. Note however that it will not exists if no
+            // dependencies are included in the `composer.json`
+            $installedJsonFiles = self::normalizePath($vendorDir.'/composer/installed.json', $basePath);
+
+            if (file_exists($installedJsonFiles)) {
+                $filesToAppend[] = $installedJsonFiles;
+            }
 
             $vendorPackages = toArray(values(map(
                 $toString,
@@ -1018,7 +1025,12 @@ BANNER;
         if (array_key_exists('files', $autoload)) {
             foreach ($autoload['files'] as $path) {
                 // @var string $path
-                $filesToAppend[] = $normalizePath($path);
+                $path = $normalizePath($path);
+
+                Assertion::file($path);
+                Assertion::false(is_link($path), 'Cannot add the link "'.$path.'": links are not supported.');
+
+                $filesToAppend[] = $path;
             }
         }
 
@@ -1027,6 +1039,9 @@ BANNER;
 
         foreach ($paths as $path) {
             $path = $normalizePath($path);
+
+            Assertion::true(file_exists($path), 'File or directory "'.$path.'" was expected to exist.');
+            Assertion::false(is_link($path), 'Cannot add the link "'.$path.'": links are not supported.');
 
             if (is_file($path)) {
                 $files[] = $path;
