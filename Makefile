@@ -155,6 +155,7 @@ requirement-checker/tests/DisplayNormalizer.php: tests/Console/DisplayNormalizer
 	cat tests/Console/DisplayNormalizer.php | sed -E 's/namespace KevinGH\\Box\\Console;/namespace KevinGH\\RequirementChecker;/g' > requirement-checker/tests/DisplayNormalizer.php
 
 .requirement-checker: requirement-checker requirement-checker/vendor
+	rm rf .requirement-checker || true
 	bin/box compile --working-dir requirement-checker
 
 	php bin/dump-requirements-checker.php
