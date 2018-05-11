@@ -1,6 +1,6 @@
 <?php
 
-namespace _HumbugBox5af37057079ab\KevinGH\RequirementChecker;
+namespace _HumbugBox5af55af77d4cf\KevinGH\RequirementChecker;
 
 use ArrayIterator;
 use Countable;
@@ -31,7 +31,7 @@ final class RequirementCollection implements \IteratorAggregate, \Countable
     /**
     @param
     */
-    public function add(\_HumbugBox5af37057079ab\KevinGH\RequirementChecker\Requirement $requirement)
+    public function add(\_HumbugBox5af55af77d4cf\KevinGH\RequirementChecker\Requirement $requirement)
     {
         $this->requirements[] = $requirement;
     }
@@ -42,7 +42,7 @@ final class RequirementCollection implements \IteratorAggregate, \Countable
     */
     public function addRequirement($checkIsFulfilled, $testMessage, $helpText)
     {
-        $this->add(new \_HumbugBox5af37057079ab\KevinGH\RequirementChecker\Requirement($checkIsFulfilled, $testMessage, $helpText));
+        $this->add(new \_HumbugBox5af55af77d4cf\KevinGH\RequirementChecker\Requirement($checkIsFulfilled, $testMessage, $helpText));
     }
     /**
     @return
@@ -70,7 +70,7 @@ final class RequirementCollection implements \IteratorAggregate, \Countable
             @param
             @return
             */
-            function ($checkPassed, \_HumbugBox5af37057079ab\KevinGH\RequirementChecker\Requirement $requirement) {
+            function ($checkPassed, \_HumbugBox5af55af77d4cf\KevinGH\RequirementChecker\Requirement $requirement) {
                 return $checkPassed && $requirement->isFulfilled();
             },
             \true
