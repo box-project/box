@@ -4,7 +4,7 @@
 
 require_once __DIR__ . '/composer/autoload_real.php';
 
-$loader = ComposerAutoloaderInitd0d605bbe43181d4cbaccc78c5ea23ab::getLoader();
+$loader = ComposerAutoloaderInitb3427d2564583967456f7a16e0a5984c::getLoader();
 
 
 
@@ -12,7 +12,7 @@ $loader = ComposerAutoloaderInitd0d605bbe43181d4cbaccc78c5ea23ab::getLoader();
 
 
 
-class_exists('_HumbugBox5af55af77d4cf\Composer\Semver\Semver');
+class_exists('_HumbugBox5af565a878e76\Composer\Semver\Semver');
 
 
 

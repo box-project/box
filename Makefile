@@ -12,20 +12,29 @@ help:
 ##---------------------------------------------------------------------------
 
 .PHONY: clean
-clean: 	 ## Clean all created artifacts
+clean: 	 		  ## Clean all created artifacts
 clean:
 	git clean --exclude=.idea/ -ffdx
 
 .PHONY: cs
 PHPCSFIXER=vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
-cs:	 ## Fix CS
+cs:	 		  ## Fix CS
 cs: vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
 	$(PHPNOGC) $(PHPCSFIXER) fix
 	$(PHPNOGC) $(PHPCSFIXER) fix --config .php_cs_53.dist
 
-compile: ## Compile the application into the PHAR
+.PHONY: compile
+compile: 		  ## Compile the application into the PHAR
 compile: box
 	cp -f box bin/box.phar
+
+.PHONY: dump-requirement-checker
+dump-requirement-checker: ## Dumps the requirement checker
+dump-requirement-checker: requirement-checker requirement-checker/vendor
+	rm rf .requirement-checker || true
+	bin/box compile --working-dir requirement-checker
+
+	php bin/dump-requirements-checker.php
 
 
 ##
@@ -154,10 +163,8 @@ fixtures/default_stub.php:
 requirement-checker/tests/DisplayNormalizer.php: tests/Console/DisplayNormalizer.php
 	cat tests/Console/DisplayNormalizer.php | sed -E 's/namespace KevinGH\\Box\\Console;/namespace KevinGH\\RequirementChecker;/g' > requirement-checker/tests/DisplayNormalizer.php
 
-.requirement-checker: requirement-checker requirement-checker/vendor
-	bin/box compile --working-dir requirement-checker
-
-	php bin/dump-requirements-checker.php
+.requirement-checker:
+	$(MAKE) dump-requirement-checker
 
 requirement-checker/actual_terminal_diff: requirement-checker/src/Terminal.php vendor/symfony/console/Terminal.php
 	diff vendor/symfony/console/Terminal.php requirement-checker/src/Terminal.php > requirement-checker/actual_terminal_diff || true
