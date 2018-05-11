@@ -925,7 +925,13 @@ BANNER;
         }
 
         if (file_exists($vendorDir)) {
-            $filesToAppend[] = self::normalizePath($vendorDir.'/composer/installed.json', $basePath);
+            // The installed.json file is necessary for dumping the autoload correctly. Note however that it will not exists if no
+            // dependencies are included in the `composer.json`
+            $installedJsonFiles = self::normalizePath($vendorDir.'/composer/installed.json', $basePath);
+
+            if (file_exists($installedJsonFiles)) {
+                $filesToAppend[] = $installedJsonFiles;
+            }
 
             $vendorPackages = toArray(values(map(
                 $toString,

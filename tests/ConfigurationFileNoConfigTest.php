@@ -16,6 +16,7 @@ namespace KevinGH\Box;
 
 use InvalidArgumentException;
 use function file_put_contents;
+use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\remove;
 use function symlink;
 
@@ -653,5 +654,40 @@ JSON
 
         $this->assertEquals($expected, $actual);
         $this->assertCount(0, $noFileConfig->getBinaryFiles());
+    }
+
+    public function test_it_includes_the_vendor_files_when_found(): void
+    {
+        dump_file('vendor/composer/installed.json');
+
+        file_put_contents(
+            'composer.json',
+            <<<'JSON'
+{
+}
+JSON
+        );
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'box.json',
+            'composer.json',
+            'index.php',
+            'vendor/composer/installed.json',
+        ];
+
+        $noFileConfig = $this->getNoFileConfig();
+
+        $actual = $this->normalizeConfigPaths($noFileConfig->getFiles());
+
+        $this->assertEquals($expected, $actual);
+        $this->assertCount(0, $noFileConfig->getBinaryFiles());
+
+        $this->reloadConfig();
+
+        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+
+        $this->assertEquals($expected, $actual);
+        $this->assertCount(0, $this->config->getBinaryFiles());
     }
 }
