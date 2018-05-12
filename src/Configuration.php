@@ -1263,10 +1263,17 @@ BANNER;
                 if (PhpScoperCompactor::class === $class) {
                     $phpScoperConfig = self::retrievePhpScoperConfig($raw, $basePath);
 
+                    $phpScoperConfig = self::retrievePhpScoperConfig($raw, $basePath);
+
+                    $prefix = null === $phpScoperConfig->getPrefix()
+                        ? uniqid('_HumbugBox', false)
+                        : $phpScoperConfig->getPrefix()
+                    ;
+                    
                     return new PhpScoperCompactor(
                         new SimpleScoper(
                             create_scoper(),
-                            uniqid('_HumbugBox', false),
+                            $prefix,
                             $phpScoperConfig->getWhitelist(),
                             $phpScoperConfig->getPatchers()
                         )
