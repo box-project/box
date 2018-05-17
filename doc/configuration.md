@@ -549,7 +549,10 @@ The metadata (`any`) setting can be any value. This value will be stored as meta
 [`Phar::getMetadata()][phar.getmetadata]).
 
 
-« [Creating a PHAR](../README.md#creating-a-phar) • [Table of Contents](../README.md#table-of-contents) »
+<br />
+<hr />
+
+« [Installation](installation.md) • [Requirement Checker](requirement-checker.md) »
 
 
 [alias]: #alias-alias

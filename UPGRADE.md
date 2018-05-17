@@ -1,3 +1,5 @@
+# From 2.7 to 3.0
+
 ## From 3.0.0-alpha.1 to 3.0.0-alpha.2
 
 - Change the default PHAR output from `default.phar` to `index.phar` (#127)
