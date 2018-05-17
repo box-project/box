@@ -115,31 +115,7 @@ Check the following [link](https://secure.php.net/manual/en/function.chmod.php) 
 ## Check requirements (`check-requirements`)
 
 The check requirements setting (`boolean`, `true` by default) is used to allow the PHAR to check for the application
-constraint before running. For example if the application shipped in the PHAR requires PHP 7.2+ and the extension
-`iconv`:
-
-```json
-{
-    "require": {
-        "php": "^7.2",
-        "ext-iconv": "*"
-    }
-}
-```
-
-When running the PHAR, before running the actual application, the PHAR will check that the PHP version used is PHP 7.2+ and
-that the extension `iconv` is loaded. If those requirements are not met, then a user friendly error message will be given
-to the user.
-
-This check will work for PHP 5.3+ and requires the existence of the `composer.json` or `composer.lock` file. If neither of
-those files are found then the requirements check will not be added to the PHAR.
-
-Be wary that when a `composer.lock` file is found, it will be taken as the source of truth for establishing the requirements
-regardless of the content of the `composer.json`.
-
-If a `composer.json` is found without a `composer.lock`, the it will be taken as the source of truth for establishing the
-requirements regardless of whether there is no `composer.lock` because there is no dependencies or because it has been
-removed.
+constraint before running. See more information about it [here][requirement-checker].
 
 **Warning**: this check is still done within the PHAR. As a result, if [the required extension to open the PHAR][compression]
 due to the compression algorithm is not loaded, a hard failure will still appear: the requirement checker _cannot_ be
@@ -464,9 +440,9 @@ If this parameter is set, then the value of [`banner`][banner] will be discarded
 
 ## Dumping the Composer autoloader (`dump-autoload`)
 
-By default, Box will dump the Composer autoload with the [classmap authoritative mode][composer-classmap-authoritative]
-and the [`--no-dev` option][composer-no-dev-option] which disables the `autoload-dev` rules. This is however done only
-if a `composer.json` file could be found.
+The `dump-autoload` (`boolean`|`null`, default `true`) setting will result in Box dump the Composer autoload with the
+[classmap authoritative mode][composer-classmap-authoritative] and the [`--no-dev` option][composer-no-dev-option] which
+disables the `autoload-dev` rules. This is however done only if a `composer.json` file could be found.
 
 The dumping of the autoloader will be _ignored_ if the `composer.json` file could be found.
 
@@ -592,6 +568,7 @@ The metadata (`any`) setting can be any value. This value will be stored as meta
 [composer-no-dev-option]: https://getcomposer.org/doc/03-cli.md#dump-autoload-dumpautoload-
 [zlib-extension]: https://secure.php.net/manual/en/book.zlib.php
 [bz2-extension]: https://secure.php.net/manual/en/book.bzip2.php
+[requirement-checker]: requirement-checker.md#requirements-checker
 
 
 //TODO: rework the rest

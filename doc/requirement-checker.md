@@ -22,6 +22,10 @@ requirements are passing on the right in debug verbosity.
     <img src="img/requirement-checker.png" width=900 />
 </p>
 
+**Warning**: this check is still done within the PHAR. As a result, if
+[the required extension to open the PHAR][compression] due to the compression algorithm is not loaded, a hard failure
+will still appear: the requirement checker _cannot_ be executed before that.
+
 
 ## Configuration
 
@@ -127,6 +131,7 @@ PHP 5.3+ compatible, it will fail before the requirements are being checked.
 
 
 [composer]: https://getcomposer.org/
+[compression]: configuration.md#compression-algorithm-compression
 [check-requirements]: doc/configuration.md#check-requirements-check-requirements
 [composer-platform-php]: https://getcomposer.org/doc/06-config.md#platform
 [paragonie sodium_compat]: https://github.com/paragonie/sodium_compat
