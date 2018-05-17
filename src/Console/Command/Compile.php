@@ -26,6 +26,7 @@ use KevinGH\Box\MapFile;
 use KevinGH\Box\PhpSettingsHandler;
 use KevinGH\Box\RequirementChecker\RequirementsDumper;
 use KevinGH\Box\StubGenerator;
+use const PHP_EOL;
 use RuntimeException;
 use stdClass;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -183,18 +184,11 @@ HELP;
 
         $logger->logStartBuilding($path);
 
-        $this->createPhar($config, $input, $output, $logger, $io, $debug);
+        $box = $this->createPhar($config, $input, $output, $logger, $io, $debug);
 
         $this->correctPermissions($path, $config, $logger);
 
-        $logger->log(
-            BuildLogger::STAR_PREFIX,
-            'Done.'
-        );
-
-        $io->comment('You can inspect the generated PHAR with the "<comment>info</comment>" command.');
-
-        $this->logCommandResourcesUsage($io, $path, $startTime);
+        $this->logEndBuilding($logger, $io, $box, $path, $startTime);
     }
 
     /**
@@ -249,7 +243,7 @@ HELP;
         BuildLogger $logger,
         SymfonyStyle $io,
         bool $debug
-    ): void {
+    ): Box {
         $box = Box::create(
             $config->getTmpOutputPath()
         );
@@ -283,6 +277,8 @@ HELP;
         if ($config->getTmpOutputPath() !== $config->getOutputPath()) {
             rename($config->getTmpOutputPath(), $config->getOutputPath());
         }
+
+        return $box;
     }
 
     private function removeExistingArtifacts(Configuration $config, BuildLogger $logger, bool $debug): void
@@ -821,12 +817,26 @@ EOF
         }
     }
 
-    private function logCommandResourcesUsage(SymfonyStyle $io, string $path, float $startTime)
+    private function logEndBuilding(BuildLogger $logger, SymfonyStyle $io, Box $box, string $path, float $startTime): void
     {
-        return $io->comment(
+        $logger->log(
+            BuildLogger::STAR_PREFIX,
+            'Done.'
+        );
+
+        $io->comment(
             sprintf(
-                "<info>PHAR size: %s\nMemory usage: %.2fMB (peak: %.2fMB), time: %.2fs<info>",
-                formatted_filesize($path),
+                'PHAR: %s (%s)',
+                $box->count() > 1 ? $box->count() . ' files' : $box->count() . ' file',
+                formatted_filesize($path)
+            )
+            .PHP_EOL
+            .'You can inspect the generated PHAR with the "<comment>info</comment>" command.'
+        );
+
+        $io->comment(
+            sprintf(
+                "<info>Memory usage: %.2fMB (peak: %.2fMB), time: %.2fs<info>",
                 round(memory_get_usage() / 1024 / 1024, 2),
                 round(memory_get_peak_usage() / 1024 / 1024, 2),
                 round(microtime(true) - $startTime, 2)
