@@ -128,9 +128,9 @@ Private key passphrase:
 ? Setting file permissions to 0755
 * Done.
 
+ // PHAR: 46 files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
- // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -336,9 +336,9 @@ Building the PHAR "/path/to/tmp/index.phar"
 ? No compression
 * Done.
 
+ // PHAR: 49 files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
- // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -547,9 +547,9 @@ Building the PHAR "/path/to/tmp/test.phar"
 ? Setting file permissions to 0755
 * Done.
 
+ // PHAR: 14 files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
- // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -786,9 +786,9 @@ Private key passphrase:
 ? Setting file permissions to 0755
 * Done.
 
+ // PHAR: 45 files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
- // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -886,9 +886,9 @@ Private key passphrase:
 ? Setting file permissions to 0755
 * Done.
 
+ // PHAR: 45 files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
- // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -1220,9 +1220,9 @@ Box (repo)
 ? No compression
 * Done.
 
+ // PHAR: 1 file (100B)
  // You can inspect the generated PHAR with the "info" command.
 
- // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -1285,9 +1285,9 @@ Box (repo)
 ? No compression
 * Done.
 
+ // PHAR: 1 file (100B)
  // You can inspect the generated PHAR with the "info" command.
 
- // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -1346,9 +1346,9 @@ Box (repo)
 ? No compression
 * Done.
 
+ // PHAR: 1 file (100B)
  // You can inspect the generated PHAR with the "info" command.
 
- // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -1403,9 +1403,9 @@ Box (repo)
 ? No compression
 * Done.
 
+ // PHAR: 1 file (100B)
  // You can inspect the generated PHAR with the "info" command.
 
- // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -1465,9 +1465,9 @@ Box (repo)
 ? No compression
 * Done.
 
+ // PHAR: 2 files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
- // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -1522,9 +1522,9 @@ Box (repo)
     > Warning: the extension "zlib" will now be required to execute the PHAR
 * Done.
 
+ // PHAR: 1 file (100B)
  // You can inspect the generated PHAR with the "info" command.
 
- // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -1589,9 +1589,9 @@ Box (repo)
 ? No compression
 * Done.
 
+ // PHAR: 1 file (100B)
  // You can inspect the generated PHAR with the "info" command.
 
- // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -1736,9 +1736,9 @@ Box (repo)
     > Warning: the extension "zlib" will now be required to execute the PHAR
 * Done.
 
+ // PHAR: 1 file (100B)
  // You can inspect the generated PHAR with the "info" command.
 
- // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -1811,9 +1811,9 @@ Box (repo)
 ? No compression
 * Done.
 
+ // PHAR: 1 file (100B)
  // You can inspect the generated PHAR with the "info" command.
 
- // PHAR size: 100B
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
 
 
@@ -1989,8 +1989,8 @@ OUTPUT;
         );
 
         $display = preg_replace(
-            '/\/\/ PHAR size: \d+\.\d{2}K?B/',
-            '// PHAR size: 100B',
+            '/\/\/ PHAR: (\d+ files?) \(\d+\.\d{2}K?B\)/',
+            '// PHAR: $1 (100B)',
             $display
         );
 
