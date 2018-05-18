@@ -26,7 +26,6 @@ use KevinGH\Box\MapFile;
 use KevinGH\Box\PhpSettingsHandler;
 use KevinGH\Box\RequirementChecker\RequirementsDumper;
 use KevinGH\Box\StubGenerator;
-use const PHP_EOL;
 use RuntimeException;
 use stdClass;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -38,9 +37,6 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
-use const DATE_ATOM;
-use const POSIX_RLIMIT_INFINITY;
-use const POSIX_RLIMIT_NOFILE;
 use function array_shift;
 use function count;
 use function decoct;
@@ -48,7 +44,6 @@ use function explode;
 use function function_exists;
 use function get_class;
 use function implode;
-use function ini_get;
 use function KevinGH\Box\disable_parallel_processing;
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -57,13 +52,16 @@ use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\formatted_filesize;
 use function KevinGH\Box\get_phar_compression_algorithms;
-use function KevinGH\Box\memory_to_bytes;
 use function posix_setrlimit;
 use function putenv;
 use function sprintf;
 use function strlen;
 use function substr;
-use function trim;
+use const DATE_ATOM;
+use const KevinGH\Box\BOX_ALLOW_XDEBUG;
+use const PHP_EOL;
+use const POSIX_RLIMIT_INFINITY;
+use const POSIX_RLIMIT_NOFILE;
 
 /**
  * @final
@@ -151,14 +149,14 @@ HELP;
         $io = new SymfonyStyle($input, $output);
 
         if ($input->getOption(self::NO_RESTART_OPTION)) {
-            putenv('BOX_ALLOW_XDEBUG=1');
+            putenv(BOX_ALLOW_XDEBUG.'=1');
         }
 
         if ($debug = $input->getOption(self::DEBUG_OPTION)) {
             $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
         }
 
-        self::checkPhpSettings($io, $output);
+        (new PhpSettingsHandler(new ConsoleLogger($output)))->check();
 
         if ($input->getOption(self::NO_PARALLEL_PROCESSING_OPTION)) {
             disable_parallel_processing();
@@ -189,51 +187,6 @@ HELP;
         $this->correctPermissions($path, $config, $logger);
 
         $this->logEndBuilding($logger, $io, $box, $path, $startTime);
-    }
-
-    /**
-     * Taken from Composer.
-     *
-     * @see https://github.com/composer/composer/blob/34c371f5f23e25eb9aa54ccc65136cf50930612e/bin/composer#L20-L50
-     */
-    private static function checkPhpSettings(SymfonyStyle $io, OutputInterface $output): void
-    {
-        (new PhpSettingsHandler(new ConsoleLogger($output)))->check();
-
-        if (function_exists('ini_set')) {
-            $memoryLimit = trim(ini_get('memory_limit'));
-
-            // Increase memory_limit if it is lower than 500MB
-            if ('-1' !== $memoryLimit && memory_to_bytes($memoryLimit) < 1024 * 1024 * 512 && false === getenv('BOX_MEMORY_LIMIT')) {
-                @ini_set('memory_limit', '512M');
-
-                $io->writeln(
-                    sprintf(
-                        '<info>[debug] Bumped the memory limit from "%s" to "%s".</info>',
-                        $memoryLimit,
-                        '512M'
-                    ),
-                    OutputInterface::VERBOSITY_DEBUG
-                );
-            }
-
-            // Set user defined memory limit
-            if ($newMemoryLimit = getenv('BOX_MEMORY_LIMIT')) {
-                @ini_set('memory_limit', $newMemoryLimit);
-
-                $io->writeln(
-                    sprintf(
-                        '<info>[debug] Bumped the memory limit from "%s" to BOX_MEMORY_LIMIT="%s".</info>',
-                        $memoryLimit,
-                        $newMemoryLimit
-                    ),
-                    OutputInterface::VERBOSITY_DEBUG
-                );
-            }
-
-            // Note that there is no need to restore since those changes will be applied only to the current process which will die once
-            // the compilation is done.
-        }
     }
 
     private function createPhar(

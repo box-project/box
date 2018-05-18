@@ -22,12 +22,6 @@ use function define;
 use function defined;
 
 /**
- * @internal
- * @private
- */
-const NO_PARALLEL_PROCESSING = 'KevinGH\Box\BOX_NO_PARALLEL_PROCESSING';
-
-/**
  * TODO: this function should be pushed down to the PHAR extension.
  *
  * @private
