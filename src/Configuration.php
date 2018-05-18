@@ -1263,8 +1263,6 @@ BANNER;
                 if (PhpScoperCompactor::class === $class) {
                     $phpScoperConfig = self::retrievePhpScoperConfig($raw, $basePath);
 
-                    $phpScoperConfig = self::retrievePhpScoperConfig($raw, $basePath);
-
                     $prefix = null === $phpScoperConfig->getPrefix()
                         ? uniqid('_HumbugBox', false)
                         : $phpScoperConfig->getPrefix()

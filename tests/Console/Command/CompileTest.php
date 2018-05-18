@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use DirectoryIterator;
+use function file_get_contents;
 use Generator;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
@@ -22,6 +23,7 @@ use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
 use PharFileInfo;
+use function sprintf;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\PhpExecutableFinder;
@@ -1889,6 +1891,62 @@ OUTPUT;
             exec('php index.phar'),
             'Expected PHAR to be executable'
         );
+
+        $this->assertSame(
+            1,
+            preg_match(
+                '/namespace (?<namespace>.*);/',
+                $indexContents = file_get_contents('phar://index.phar/index.php'),
+                $matches
+            ),
+            sprintf(
+                'Expected the content of the PHAR index.php file to match the given regex. The following '
+                .'contents does not: "%s"',
+                $indexContents
+            )
+        );
+
+        $phpScoperNamespace = $matches['namespace'];
+
+        $this->assertStringStartsWith('_HumbugBox', $phpScoperNamespace);
+    }
+
+    public function test_it_can_build_a_PHAR_with_a_PHPScoper_config_with_a_specific_prefix(): void
+    {
+        mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
+
+        rename('scoper-fixed-prefix.inc.php', 'scoper.inc.php', true);
+
+        $commandTester = $this->getCommandTester();
+
+        $commandTester->execute(
+            ['command' => 'compile'],
+            ['interactive' => true]
+        );
+
+        $this->assertSame(
+            'Index',
+            exec('php index.phar'),
+            'Expected PHAR to be executable'
+        );
+
+        $this->assertSame(
+            1,
+            preg_match(
+                '/namespace (?<namespace>.*);/',
+                $indexContents = file_get_contents('phar://index.phar/index.php'),
+                $matches
+            ),
+            sprintf(
+                'Expected the content of the PHAR index.php file to match the given regex. The following '
+                .'contents does not: "%s"',
+                $indexContents
+            )
+        );
+
+        $phpScoperNamespace = $matches['namespace'];
+
+        $this->assertSame('Acme', $phpScoperNamespace);
     }
 
     /**
