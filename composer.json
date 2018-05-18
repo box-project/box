@@ -24,6 +24,7 @@
         },
         "files": [
             "src/FileSystem/file_system.php",
+            "src/consts.php",
             "src/functions.php"
         ],
         "exclude-from-classmap": [
