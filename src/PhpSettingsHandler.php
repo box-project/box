@@ -17,13 +17,13 @@ namespace KevinGH\Box;
 use Composer\XdebugHandler\Process;
 use Composer\XdebugHandler\XdebugHandler;
 use Psr\Log\LoggerInterface;
+use const PHP_EOL;
 use function function_exists;
 use function getenv;
 use function ini_get;
 use function KevinGH\Box\FileSystem\append_to_file;
 use function sprintf;
 use function trim;
-use const PHP_EOL;
 
 /**
  * @private
@@ -46,7 +46,7 @@ final class PhpSettingsHandler extends XdebugHandler
     /**
      * {@inheritdoc}
      */
-    public function check()
+    public function check(): void
     {
         parent::check();
 
@@ -89,6 +89,9 @@ final class PhpSettingsHandler extends XdebugHandler
         }
     }
 
+    /**
+     * @see https://github.com/composer/composer/blob/34c371f5f23e25eb9aa54ccc65136cf50930612e/bin/composer#L20-L50
+     */
     private function bumpMemoryLimit(): void
     {
         $memoryLimit = trim(ini_get('memory_limit'));

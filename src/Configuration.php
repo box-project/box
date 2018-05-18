@@ -1267,7 +1267,7 @@ BANNER;
                         ? uniqid('_HumbugBox', false)
                         : $phpScoperConfig->getPrefix()
                     ;
-                    
+
                     return new PhpScoperCompactor(
                         new SimpleScoper(
                             create_scoper(),

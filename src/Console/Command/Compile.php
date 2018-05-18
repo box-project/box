@@ -37,6 +37,11 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
+use const DATE_ATOM;
+use const KevinGH\Box\BOX_ALLOW_XDEBUG;
+use const PHP_EOL;
+use const POSIX_RLIMIT_INFINITY;
+use const POSIX_RLIMIT_NOFILE;
 use function array_shift;
 use function count;
 use function decoct;
@@ -57,11 +62,6 @@ use function putenv;
 use function sprintf;
 use function strlen;
 use function substr;
-use const DATE_ATOM;
-use const KevinGH\Box\BOX_ALLOW_XDEBUG;
-use const PHP_EOL;
-use const POSIX_RLIMIT_INFINITY;
-use const POSIX_RLIMIT_NOFILE;
 
 /**
  * @final
@@ -780,7 +780,7 @@ EOF
         $io->comment(
             sprintf(
                 'PHAR: %s (%s)',
-                $box->count() > 1 ? $box->count() . ' files' : $box->count() . ' file',
+                $box->count() > 1 ? $box->count().' files' : $box->count().' file',
                 formatted_filesize($path)
             )
             .PHP_EOL
@@ -789,7 +789,7 @@ EOF
 
         $io->comment(
             sprintf(
-                "<info>Memory usage: %.2fMB (peak: %.2fMB), time: %.2fs<info>",
+                '<info>Memory usage: %.2fMB (peak: %.2fMB), time: %.2fs<info>',
                 round(memory_get_usage() / 1024 / 1024, 2),
                 round(memory_get_peak_usage() / 1024 / 1024, 2),
                 round(microtime(true) - $startTime, 2)

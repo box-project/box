@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use DirectoryIterator;
-use function file_get_contents;
 use Generator;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
@@ -23,11 +22,11 @@ use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
 use PharFileInfo;
-use function sprintf;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Traversable;
+use function file_get_contents;
 use function file_put_contents;
 use function ini_get;
 use function ini_set;
@@ -37,6 +36,7 @@ use function preg_match;
 use function preg_replace;
 use function putenv;
 use function sort;
+use function sprintf;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Compile
