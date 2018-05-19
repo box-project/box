@@ -17,13 +17,13 @@ namespace KevinGH\Box;
 use Composer\XdebugHandler\Process;
 use Composer\XdebugHandler\XdebugHandler;
 use Psr\Log\LoggerInterface;
+use const PHP_EOL;
 use function function_exists;
 use function getenv;
 use function ini_get;
 use function KevinGH\Box\FileSystem\append_to_file;
 use function sprintf;
 use function trim;
-use const PHP_EOL;
 
 /**
  * @private

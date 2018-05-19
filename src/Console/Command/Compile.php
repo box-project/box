@@ -37,6 +37,11 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
+use const DATE_ATOM;
+use const KevinGH\Box\BOX_ALLOW_XDEBUG;
+use const PHP_EOL;
+use const POSIX_RLIMIT_INFINITY;
+use const POSIX_RLIMIT_NOFILE;
 use function array_shift;
 use function count;
 use function decoct;
@@ -57,11 +62,6 @@ use function putenv;
 use function sprintf;
 use function strlen;
 use function substr;
-use const DATE_ATOM;
-use const KevinGH\Box\BOX_ALLOW_XDEBUG;
-use const PHP_EOL;
-use const POSIX_RLIMIT_INFINITY;
-use const POSIX_RLIMIT_NOFILE;
 
 /**
  * @final
@@ -217,7 +217,7 @@ HELP;
         $this->registerStub($config, $box, $main, $check, $logger);
         $this->configureMetadata($config, $box, $logger);
 
-        $box->endBuffering($config->dumpAutoload());
+        $this->commit($box, $config, $logger);
 
         $this->configureCompressionAlgorithm($config, $box, $input->getOption(self::DEV_OPTION), $io, $logger);
 
@@ -433,6 +433,11 @@ EOF
     private function registerRequirementsChecker(Configuration $config, Box $box, BuildLogger $logger): bool
     {
         if (false === $config->checkRequirements()) {
+            $logger->log(
+                BuildLogger::QUESTION_MARK_PREFIX,
+                'Skip requirements checker'
+            );
+
             return false;
         }
 
@@ -518,6 +523,18 @@ EOF
 
             $box->getPhar()->setMetadata($metadata);
         }
+    }
+
+    private function commit(Box $box, Configuration $config, BuildLogger $logger): void
+    {
+        $message = $config->dumpAutoload()
+            ? 'Dumping the Composer autoloader'
+            : 'Skipping dumping the Composer autoloader'
+        ;
+
+        $logger->log(BuildLogger::QUESTION_MARK_PREFIX, $message);
+
+        $box->endBuffering($config->dumpAutoload());
     }
 
     private function configureCompressionAlgorithm(Configuration $config, Box $box, bool $dev, SymfonyStyle $io, BuildLogger $logger): void
