@@ -4,32 +4,33 @@ PHPNOGC=php -d zend.enable_gc=0
 
 .PHONY: help
 help:
-	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
+	@echo "\033[33mUsage:\033[0m\n  make TARGET\n\n\033[32m#\n# Commands\n#---------------------------------------------------------------------------\033[0m\n"
+	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//' | awk 'BEGIN {FS = ":"}; {printf "\033[33m%s:\033[0m%s\n", $$1, $$2}'
 
 
-##
-## Commands
-##---------------------------------------------------------------------------
+#
+# Commands
+#---------------------------------------------------------------------------
 
 .PHONY: clean
-clean: 	 		  ## Clean all created artifacts
+clean: 	 		 ## Clean all created artifacts
 clean:
 	git clean --exclude=.idea/ -ffdx
 
 .PHONY: cs
 PHPCSFIXER=vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
-cs:	 		  ## Fix CS
-cs: vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
+cs:	 		 ## Fix CS
+cs: $(PHPCSFIXER)
 	$(PHPNOGC) $(PHPCSFIXER) fix
 	$(PHPNOGC) $(PHPCSFIXER) fix --config .php_cs_53.dist
 
 .PHONY: compile
-compile: 		  ## Compile the application into the PHAR
+compile: 		 ## Compile the application into the PHAR
 compile: box
 	cp -f box bin/box.phar
 
 .PHONY: dump-requirement-checker
-dump-requirement-checker: ## Dumps the requirement checker
+dump-requirement-checker:## Dumps the requirement checker
 dump-requirement-checker: requirement-checker requirement-checker/vendor
 	rm rf .requirement-checker || true
 	bin/box compile --working-dir requirement-checker
@@ -37,46 +38,46 @@ dump-requirement-checker: requirement-checker requirement-checker/vendor
 	php bin/dump-requirements-checker.php
 
 
-##
-## Tests
-##---------------------------------------------------------------------------
+#
+# Tests
+#---------------------------------------------------------------------------
 
 .PHONY: test
-test:		  	## Run all the tests
+test:		  	 ## Run all the tests
 test: tu e2e
 
 .PHONY: tu
-tu:			## Run the unit tests
+tu:			 ## Run the unit tests
 tu: tu_requirement_checker tu_box
 
 .PHONY: tu_box
-tu_box:			## Run the unit tests
+tu_box:			 ## Run the unit tests
 tu_box: bin/phpunit fixtures/default_stub.php .requirement-checker
 	$(PHPNOGC) bin/phpunit
 
 .PHONY: tu_requirement_checker
-tu_requirement_checker:	## Run the unit tests
+tu_requirement_checker:	 ## Run the unit tests
 tu_requirement_checker: requirement-checker/bin/phpunit requirement-checker/tests/DisplayNormalizer.php requirement-checker/actual_terminal_diff
 	cd requirement-checker && $(PHPNOGC) bin/phpunit
 
 	diff requirement-checker/expected_terminal_diff requirement-checker/actual_terminal_diff
 
 .PHONY: tc
-tc:			## Run the unit tests with code coverage
+tc:			 ## Run the unit tests with code coverage
 tc: bin/phpunit
 	phpdbg -qrr -d zend.enable_gc=0 bin/phpunit --coverage-html=dist/coverage --coverage-text
 
 .PHONY: tm
-tm:			## Run Infection
+tm:			 ## Run Infection
 tm:	bin/phpunit fixtures/default_stub.php tu_requirement_checker .requirement-checker
 	$(PHPNOGC) bin/infection
 
 .PHONY: e2e
-e2e:			## Runs all the end-to-end tests
+e2e:			 ## Runs all the end-to-end tests
 e2e: e2e_scoper_alias e2e_check_requirements
 
 .PHONY: e2e_scoper_alias
-e2e_scoper_alias: 	## Runs the end-to-end tests to check that the PHP-Scoper config API is working
+e2e_scoper_alias: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API is working
 e2e_scoper_alias: box
 	./box compile --working-dir fixtures/build/dir010
 
@@ -84,7 +85,7 @@ e2e_scoper_alias: box
 DOCKER=docker run -i --rm -w /opt/box
 PHP7PHAR=box_php72 php index.phar -vvv --no-ansi
 PHP5PHAR=box_php53 php index.phar -vvv --no-ansi
-e2e_check_requirements:	## Runs the end-to-end tests for the check requirements feature
+e2e_check_requirements:	 ## Runs the end-to-end tests for the check requirements feature
 e2e_check_requirements: box
 	./.docker/build
 
@@ -119,7 +120,7 @@ e2e_check_requirements: box
 	diff fixtures/check-requirements/fail-complete/expected-output-72 fixtures/check-requirements/fail-complete/actual-output
 
 .PHONY: blackfire
-blackfire:		## Profiles the compile step
+blackfire:		 ## Profiles the compile step
 blackfire: box
 	# Profile compiling the PHAR from the source code
 	blackfire --reference=1 --samples=5 run $(PHPNOGC) -d bin/box compile --quiet
@@ -134,27 +135,34 @@ blackfire: box
 
 composer.lock: composer.json
 	composer install
+	touch $@
 
 requirement-checker/composer.lock: requirement-checker/composer.json
 	composer install --working-dir requirement-checker
+	touch $@
 
 vendor: composer.lock
 	composer install
 
 vendor/bamarni: composer.lock
 	composer install
+	touch $@
 
 bin/phpunit: composer.lock
 	composer install
+	touch $@
 
 requirement-checker/bin/phpunit: requirement-checker/composer.lock
 	composer install --working-dir requirement-checker
+	touch $@
 
-requirement-checker/vendor:
+requirement-checker/vendor: requirement-checker/composer.json
 	composer install --working-dir requirement-checker
+	touch $@
 
 vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer: vendor/bamarni
 	composer bin php-cs-fixer install
+	touch $@
 
 .PHONY: fixtures/default_stub.php
 fixtures/default_stub.php:
@@ -163,7 +171,7 @@ fixtures/default_stub.php:
 requirement-checker/tests/DisplayNormalizer.php: tests/Console/DisplayNormalizer.php
 	cat tests/Console/DisplayNormalizer.php | sed -E 's/namespace KevinGH\\Box\\Console;/namespace KevinGH\\RequirementChecker;/g' > requirement-checker/tests/DisplayNormalizer.php
 
-.requirement-checker:
+.requirement-checker: requirement-checker
 	$(MAKE) dump-requirement-checker
 
 requirement-checker/actual_terminal_diff: requirement-checker/src/Terminal.php vendor/symfony/console/Terminal.php
