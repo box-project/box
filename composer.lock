@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9d4a74824e7abd878a1c4bb34671843e",
+    "content-hash": "8a1ff6cf6be6ce2e25366f4078e84083",
     "packages": [
         {
             "name": "amphp/amp",
@@ -948,12 +948,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/humbug/php-scoper.git",
-                "reference": "b8fbd6462e0f72363dd8f50a3338acafbe2cc5a7"
+                "reference": "c0384b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/b8fbd6462e0f72363dd8f50a3338acafbe2cc5a7",
-                "reference": "b8fbd6462e0f72363dd8f50a3338acafbe2cc5a7",
+                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/c0384b6",
+                "reference": "c0384b6",
                 "shasum": ""
             },
             "require": {
@@ -1012,7 +1012,7 @@
                 }
             ],
             "description": "Prefixes all PHP namespaces in a file or directory.",
-            "time": "2018-05-13T20:22:04+00:00"
+            "time": "2018-05-19T09:00:55+00:00"
         },
         {
             "name": "justinrainbow/json-schema",

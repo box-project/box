@@ -37,6 +37,10 @@ before_install:
     if [ -n "$SYMFONY_VERSION" ]; then
         composer require --no-update "symfony/lts:${SYMFONY_VERSION}"
     fi
+  - |
+    if [ "DEPLOY" != "true" ]; then
+        composer config --unset platform.php
+    fi
 
 install:
   - |
