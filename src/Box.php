@@ -138,6 +138,12 @@ final class Box implements Countable
         $tmp = make_tmp_dir('box', __CLASS__);
         chdir($tmp);
 
+        if ([] === $this->bufferedFiles) {
+            $this->bufferedFiles = [
+                '.box_empty' => 'A PHAR cannot be empty so Box adds this file to ensure the PHAR is created still.',
+            ];
+        }
+
         try {
             foreach ($this->bufferedFiles as $file => $contents) {
                 dump_file($file, $contents);

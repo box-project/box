@@ -1547,6 +1547,82 @@ OUTPUT;
         );
     }
 
+    public function test_it_can_build_an_empty_PHAR(): void
+    {
+        mirror(self::FIXTURES_DIR.'/dir004', $this->tmp);
+
+        dump_file(
+            'box.json',
+            <<<'JSON'
+{
+    "stub": "stub.php",
+    "main": false
+}
+JSON
+
+        );
+
+        $commandTester = $this->getCommandTester();
+        $commandTester->execute(
+            ['command' => 'compile'],
+            [
+                'interactive' => false,
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
+        );
+
+        $expected = <<<OUTPUT
+
+    ____
+   / __ )____  _  __
+  / __  / __ \| |/_/
+ / /_/ / /_/ />  <
+/_____/\____/_/|_|
+
+
+Box (repo)
+
+
+ // Loading the configuration file "/path/to/box.json.dist".
+
+* Building the PHAR "/path/to/tmp/test.phar"
+? No compactor to register
+? No main script path configured
+? Adding binary files
+    > No file found
+? Adding files
+    > No file found
+? Using stub file: /path/to/tmp/stub.php
+? No compression
+* Done.
+
+ // PHAR: 1 file (100B)
+ // You can inspect the generated PHAR with the "info" command.
+
+ // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
+
+
+OUTPUT;
+
+        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
+
+        $this->assertSame($expected, $actual);
+
+        $this->assertSame(
+            'Hello!',
+            exec('php test.phar'),
+            'Expected PHAR to be executable'
+        );
+
+        $expectedFiles = [
+            '/.box_empty',
+        ];
+
+        $actualFiles = $this->retrievePharFiles(new Phar('test.phar'));
+
+        $this->assertSame($expectedFiles, $actualFiles);
+    }
+
     public function test_it_can_build_a_PHAR_with_compressed_code(): void
     {
         mirror(self::FIXTURES_DIR.'/dir006', $this->tmp);
