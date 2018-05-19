@@ -82,8 +82,19 @@ configuration file is given or the current working directory otherwise.
 
 ## Main (`main`)
 
-The main (`string`) setting is used to specify the file (relative to [`base-path`][base-path]) that will be run when the
-PHAR is executed from the command line (To not confuse with the [stub][stub] which is the PHAR bootstrapping file).
+The main (`string`|`false`) setting is used to specify the file (relative to [`base-path`][base-path]) that will be run
+when the PHAR is executed from the command line (To not confuse with the [stub][stub] which is the PHAR bootstrapping
+file).
+
+When you have a main script file that can be used as a [stub][stub], you can disable the main script by setting it to
+false:
+
+```
+{
+    "stub": "bin/acme.php",
+    "main": false
+}
+```
 
 When the parameter is not given, Box tries to guess the binary of the application with the `composer.json` file. If the
 [Composer `bin`][composer-bin] is set, Box will pick the first value provided. Otherwise it will fallback on the

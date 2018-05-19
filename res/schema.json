@@ -154,7 +154,7 @@
         },
         "main": {
             "description": "The file path to the main script.",
-            "type": "string"
+            "type": ["boolean", "string"]
         },
         "map": {
             "description": "The mapping of file system paths to phar paths.",

@@ -37,11 +37,6 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
-use const DATE_ATOM;
-use const KevinGH\Box\BOX_ALLOW_XDEBUG;
-use const PHP_EOL;
-use const POSIX_RLIMIT_INFINITY;
-use const POSIX_RLIMIT_NOFILE;
 use function array_shift;
 use function count;
 use function decoct;
@@ -62,6 +57,11 @@ use function putenv;
 use function sprintf;
 use function strlen;
 use function substr;
+use const DATE_ATOM;
+use const KevinGH\Box\BOX_ALLOW_XDEBUG;
+use const PHP_EOL;
+use const POSIX_RLIMIT_INFINITY;
+use const POSIX_RLIMIT_NOFILE;
 
 /**
  * @final
@@ -392,8 +392,17 @@ EOF
         );
     }
 
-    private function registerMainScript(Configuration $config, Box $box, BuildLogger $logger): string
+    private function registerMainScript(Configuration $config, Box $box, BuildLogger $logger): ?string
     {
+        if (false === $config->hasMainScript()) {
+            $logger->log(
+                BuildLogger::QUESTION_MARK_PREFIX,
+                'No main script path configured'
+            );
+
+            return null;
+        }
+
         $main = $config->getMainScriptPath();
 
         $logger->log(
@@ -447,7 +456,7 @@ EOF
         return true;
     }
 
-    private function registerStub(Configuration $config, Box $box, string $main, bool $checkRequirements, BuildLogger $logger): void
+    private function registerStub(Configuration $config, Box $box, ?string $main, bool $checkRequirements, BuildLogger $logger): void
     {
         if ($config->isStubGenerated()) {
             $logger->log(
