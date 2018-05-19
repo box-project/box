@@ -43,6 +43,7 @@ use function array_unique;
 use function file_exists;
 use function Humbug\PhpScoper\create_scoper;
 use function is_array;
+use function is_bool;
 use function is_file;
 use function is_link;
 use function is_readable;
@@ -150,8 +151,8 @@ BANNER;
         array $compactors,
         ?int $compressionAlgorithm,
         ?int $fileMode,
-        string $mainScriptPath,
-        string $mainScriptContents,
+        ?string $mainScriptPath,
+        ?string $mainScriptContents,
         MapFile $fileMapper,
         $metadata,
         string $tmpOutputPath,
@@ -177,6 +178,12 @@ BANNER;
                 implode('", "', array_keys(get_phar_compression_algorithms()))
             )
         );
+
+        if (null === $mainScriptPath) {
+            Assertion::null($mainScriptContents);
+        } else {
+            Assertion::notNull($mainScriptContents);
+        }
 
         $this->file = $file;
         $this->alias = $alias;
@@ -418,13 +425,28 @@ BANNER;
         return $this->fileMode;
     }
 
+    public function hasMainScript(): bool
+    {
+        return null !== $this->mainScriptPath;
+    }
+
     public function getMainScriptPath(): string
     {
+        Assertion::notNull(
+            $this->mainScriptPath,
+            'Cannot retrieve the main script path: no main script configured.'
+        );
+
         return $this->mainScriptPath;
     }
 
     public function getMainScriptContents(): string
     {
+        Assertion::notNull(
+            $this->mainScriptPath,
+            'Cannot retrieve the main script contents: no main script configured.'
+        );
+
         return $this->mainScriptContents;
     }
 
@@ -1062,11 +1084,8 @@ BANNER;
     }
 
     /**
-     * @param string   $basePath
      * @param string[] $files
      * @param string[] $directories
-     * @param string   $mainScriptPath
-     * @param Closure  $blacklistFilter
      * @param string[] $excludedPaths
      * @param string[] $devPackages
      *
@@ -1076,7 +1095,7 @@ BANNER;
         string $basePath,
         array $files,
         array $directories,
-        string $mainScriptPath,
+        ?string $mainScriptPath,
         Closure $blacklistFilter,
         array $excludedPaths,
         array $devPackages
@@ -1090,7 +1109,6 @@ BANNER;
 
         $finder = Finder::create()
             ->files()
-            ->notPath(make_path_relative($mainScriptPath, $basePath))
             ->filter($blacklistFilter)
             ->exclude($relativeDevPackages)
             ->ignoreVCS(true)
@@ -1151,6 +1169,10 @@ BANNER;
             ->notName('appveyor.yml')
             ->notName('build.xml*')
         ;
+
+        if (null !== $mainScriptPath) {
+            $finder->notPath(make_path_relative($mainScriptPath, $basePath));
+        }
 
         $finder->append($files);
         $finder->in($directories);
@@ -1320,7 +1342,7 @@ BANNER;
         return null;
     }
 
-    private static function retrieveMainScriptPath(stdClass $raw, string $basePath, ?array $decodedJsonContents): string
+    private static function retrieveMainScriptPath(stdClass $raw, string $basePath, ?array $decodedJsonContents): ?string
     {
         if (isset($raw->main)) {
             $main = $raw->main;
@@ -1333,11 +1355,24 @@ BANNER;
             }
         }
 
+        if (is_bool($main)) {
+            Assertion::false(
+                $main,
+                'Cannot "enable" a main script: either disable it with `false` or give the main script file path.'
+            );
+
+            return null;
+        }
+
         return self::normalizePath($main, $basePath);
     }
 
-    private static function retrieveMainScriptContents(string $mainScriptPath): string
+    private static function retrieveMainScriptContents(?string $mainScriptPath): ?string
     {
+        if (null === $mainScriptPath) {
+            return null;
+        }
+
         $contents = file_contents($mainScriptPath);
 
         // Remove the shebang line: the shebang line in a PHAR should be located in the stub file which is the real
@@ -1429,12 +1464,14 @@ BANNER;
     /**
      * @return string[] The first element is the temporary output path and the second the real one
      */
-    private static function retrieveOutputPath(stdClass $raw, string $basePath, string $mainScriptPath): array
+    private static function retrieveOutputPath(stdClass $raw, string $basePath, ?string $mainScriptPath): array
     {
         if (isset($raw->output)) {
             $path = $raw->output;
         } else {
-            if (1 === preg_match('/^(?<main>.*?)(?:\.[\p{L}\d]+)?$/', $mainScriptPath, $matches)) {
+            if (null !== $mainScriptPath
+                && 1 === preg_match('/^(?<main>.*?)(?:\.[\p{L}\d]+)?$/', $mainScriptPath, $matches)
+            ) {
                 $path = $matches['main'].'.phar';
             } else {
                 // Last resort, should not happen

@@ -25,11 +25,11 @@ use KevinGH\Box\Json\JsonValidationException;
 use Phar;
 use Seld\JsonLint\ParsingException;
 use stdClass;
-use const DIRECTORY_SEPARATOR;
 use function file_put_contents;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
+use const DIRECTORY_SEPARATOR;
 
 /**
  * @covers \KevinGH\Box\Configuration
@@ -510,6 +510,7 @@ EOF
     {
         dump_file('composer.json', '{"bin": []}');
 
+        $this->assertTrue($this->config->hasMainScript());
         $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'index.php', $this->config->getMainScriptPath());
         $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'index.php', $this->getNoFileConfig()->getMainScriptPath());
     }
@@ -529,7 +530,10 @@ JSON
 
         $this->reloadConfig();
 
+        $this->assertTrue($this->config->hasMainScript());
         $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'bin/foo', $this->config->getMainScriptPath());
+
+        $this->assertTrue($this->getNoFileConfig()->hasMainScript());
         $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'bin/foo', $this->getNoFileConfig()->getMainScriptPath());
     }
 
@@ -552,13 +556,14 @@ JSON
 
         $this->reloadConfig();
 
+        $this->assertTrue($this->config->hasMainScript());
         $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'bin/foo', $this->config->getMainScriptPath());
         $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'bin/foo', $this->getNoFileConfig()->getMainScriptPath());
     }
 
-    public function test_main_script_can_be_configured(): void
+    public function test_the_main_script_can_be_configured(): void
     {
-        touch('test.php');
+        dump_file('test.php', 'Main script contents');
 
         dump_file('bin/foo');
         dump_file('bin/bar');
@@ -577,34 +582,18 @@ JSON
 
         $this->setConfig(['main' => 'test.php']);
 
+        $this->assertTrue($this->config->hasMainScript());
         $this->assertSame($this->tmp.'/test.php', $this->config->getMainScriptPath());
+        $this->assertSame('Main script contents', $this->config->getMainScriptContents());
     }
 
-    public function test_main_script_path_is_normalized(): void
+    public function test_the_main_script_path_is_normalized(): void
     {
         touch('test.php');
 
         $this->setConfig(['main' => ' test.php ']);
 
         $this->assertSame($this->tmp.'/test.php', $this->config->getMainScriptPath());
-    }
-
-    public function test_get_main_script_content(): void
-    {
-        dump_file(self::DEFAULT_FILE, $expected = 'Default main script content');
-
-        $this->reloadConfig();
-
-        $this->assertSame($expected, $this->config->getMainScriptContents());
-    }
-
-    public function test_configure_main_script_content(): void
-    {
-        file_put_contents('test.php', 'script content');
-
-        $this->setConfig(['main' => 'test.php']);
-
-        $this->assertSame('script content', $this->config->getMainScriptContents());
     }
 
     public function test_main_script_content_ignores_shebang_line(): void
@@ -616,7 +605,7 @@ JSON
         $this->assertSame('test', $this->config->getMainScriptContents());
     }
 
-    public function test_it_cannot_get_the_main_script_if_file_doesnt_exists(): void
+    public function test_it_cannot_get_the_main_script_if_file_does_not_exists(): void
     {
         try {
             $this->setConfig(['main' => 'test.php']);
@@ -625,6 +614,64 @@ JSON
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 "File \"{$this->tmp}/test.php\" was expected to exist.",
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_the_main_script_can_be_disabled(): void
+    {
+        dump_file('bin/foo');
+        dump_file('bin/bar');
+
+        dump_file(
+            'composer.json',
+            <<<'JSON'
+{
+    "bin": [
+        "bin/foo",
+        "bin/bar"
+    ]
+}
+JSON
+        );
+
+        $this->setConfig(['main' => false]);
+
+        $this->assertFalse($this->config->hasMainScript());
+
+        try {
+            $this->config->getMainScriptPath();
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Cannot retrieve the main script path: no main script configured.',
+                $exception->getMessage()
+            );
+        }
+
+        try {
+            $this->config->getMainScriptContents();
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Cannot retrieve the main script contents: no main script configured.',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_the_main_script_cannot_be_enabled(): void
+    {
+        try {
+            $this->setConfig(['main' => true]);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Cannot "enable" a main script: either disable it with `false` or give the main script file path.',
                 $exception->getMessage()
             );
         }

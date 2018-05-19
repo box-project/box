@@ -28,13 +28,11 @@ use Symfony\Component\Process\PhpExecutableFinder;
 use Traversable;
 use function file_get_contents;
 use function file_put_contents;
-use function ini_get;
-use function ini_set;
+use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\mirror;
 use function KevinGH\Box\FileSystem\rename;
 use function preg_match;
 use function preg_replace;
-use function putenv;
 use function sort;
 use function sprintf;
 
@@ -1478,6 +1476,75 @@ OUTPUT;
         $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_can_build_a_PHAR_without_a_main_script(): void
+    {
+        mirror(self::FIXTURES_DIR.'/dir004', $this->tmp);
+
+        dump_file(
+            'box.json',
+            <<<'JSON'
+{
+    "files-bin": ["test.php"],
+    "stub": "stub.php",
+    "main": false
+}
+JSON
+
+        );
+
+        $commandTester = $this->getCommandTester();
+        $commandTester->execute(
+            ['command' => 'compile'],
+            [
+                'interactive' => false,
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
+        );
+
+        $expected = <<<OUTPUT
+
+    ____
+   / __ )____  _  __
+  / __  / __ \| |/_/
+ / /_/ / /_/ />  <
+/_____/\____/_/|_|
+
+
+Box (repo)
+
+
+ // Loading the configuration file "/path/to/box.json.dist".
+
+* Building the PHAR "/path/to/tmp/test.phar"
+? No compactor to register
+? No main script path configured
+? Adding binary files
+    > 1 file(s)
+? Adding files
+    > No file found
+? Using stub file: /path/to/tmp/stub.php
+? No compression
+* Done.
+
+ // PHAR: 1 file (100B)
+ // You can inspect the generated PHAR with the "info" command.
+
+ // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
+
+
+OUTPUT;
+
+        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
+
+        $this->assertSame($expected, $actual);
+
+        $this->assertSame(
+            'Hello!',
+            exec('php test.phar'),
+            'Expected PHAR to be executable'
+        );
     }
 
     public function test_it_can_build_a_PHAR_with_compressed_code(): void
