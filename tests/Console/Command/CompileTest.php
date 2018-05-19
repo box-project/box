@@ -529,6 +529,7 @@ Building the PHAR "/path/to/tmp/test.phar"
 ? Mapping paths
   - a/deep/test/directory > sub
 ? Adding main file: /path/to/tmp/run.php
+? Skip requirements checker
 ? Adding binary files
     > 1 file(s)
 ? Adding files
@@ -1207,6 +1208,7 @@ Box (repo)
   + @name@: world
 ? No compactor to register
 ? Adding main file: /path/to/tmp/test.php
+? Skip requirements checker
 ? Adding binary files
     > No file found
 ? Adding files
@@ -1272,6 +1274,7 @@ Box (repo)
   + @name@: world
 ? No compactor to register
 ? Adding main file: /path/to/tmp/test.php
+? Skip requirements checker
 ? Adding binary files
     > No file found
 ? Adding files
@@ -1336,6 +1339,7 @@ Box (repo)
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
 ? Adding main file: /path/to/tmp/test.php
+? Skip requirements checker
 ? Adding binary files
     > No file found
 ? Adding files
@@ -1395,6 +1399,7 @@ Box (repo)
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
 ? Adding main file: /path/to/tmp/test.php
+? Skip requirements checker
 ? Adding binary files
     > No file found
 ? Adding files
@@ -1452,6 +1457,7 @@ Box (repo)
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
 ? Adding main file: /path/to/tmp/index.php
+? Skip requirements checker
 ? Adding binary files
     > No file found
 ? Adding files
@@ -1520,6 +1526,7 @@ Box (repo)
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
 ? No main script path configured
+? Skip requirements checker
 ? Adding binary files
     > 1 file(s)
 ? Adding files
@@ -1588,6 +1595,7 @@ Box (repo)
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
 ? No main script path configured
+? Skip requirements checker
 ? Adding binary files
     > No file found
 ? Adding files
@@ -1653,6 +1661,7 @@ Box (repo)
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
 ? Adding main file: /path/to/tmp/test.php
+? Skip requirements checker
 ? Adding binary files
     > No file found
 ? Adding files
@@ -1721,6 +1730,7 @@ Box (repo)
 * Building the PHAR "/path/to/tmp/foo/bar/test.phar"
 ? No compactor to register
 ? Adding main file: /path/to/tmp/test.php
+? Skip requirements checker
 ? Adding binary files
     > No file found
 ? Adding files
@@ -1867,6 +1877,7 @@ Box (repo)
 * Building the PHAR "/path/to/tmp/test.phar"
 ? No compactor to register
 ? Adding main file: /path/to/tmp/test.php
+? Skip requirements checker
 ? Adding binary files
     > No file found
 ? Adding files
@@ -1948,6 +1959,7 @@ Box (repo)
 * Building the PHAR "/path/to/tmp/test"
 ? No compactor to register
 ? Adding main file: /path/to/tmp/test.php
+? Skip requirements checker
 ? Adding binary files
     > No file found
 ? Adding files

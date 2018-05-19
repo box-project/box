@@ -433,6 +433,11 @@ EOF
     private function registerRequirementsChecker(Configuration $config, Box $box, BuildLogger $logger): bool
     {
         if (false === $config->checkRequirements()) {
+            $logger->log(
+                BuildLogger::QUESTION_MARK_PREFIX,
+                'Skip requirements checker'
+            );
+
             return false;
         }
 
