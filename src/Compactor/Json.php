@@ -24,7 +24,7 @@ final class Json extends FileExtensionCompactor
     /**
      * {@inheritdoc}
      */
-    public function __construct(array $extensions = ['json'])
+    public function __construct(array $extensions = ['json', 'lock'])
     {
         parent::__construct($extensions);
     }

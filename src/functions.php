@@ -123,7 +123,7 @@ function register_aliases(): void
  */
 function disable_parallel_processing(): void
 {
-    define(NO_PARALLEL_PROCESSING, true);
+    define(_NO_PARALLEL_PROCESSING, true);
 }
 
 /**
@@ -131,5 +131,5 @@ function disable_parallel_processing(): void
  */
 function is_parallel_processing_enabled(): bool
 {
-    return false === defined(NO_PARALLEL_PROCESSING) || false === constant(NO_PARALLEL_PROCESSING);
+    return false === defined(_NO_PARALLEL_PROCESSING) || false === constant(_NO_PARALLEL_PROCESSING);
 }
