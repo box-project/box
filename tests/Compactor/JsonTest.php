@@ -60,6 +60,18 @@ JSON;
         $this->assertSame($expected, $actual);
     }
 
+    /**
+     * @dataProvider provideJsonContent
+     */
+    public function test_it_compacts_Composer_lock_files(string $content, string $expected): void
+    {
+        $file = 'composer.lock';
+
+        $actual = $this->compactor->compact($file, $content);
+
+        $this->assertSame($expected, $actual);
+    }
+
     public function provideFiles()
     {
         yield 'no extension' => ['test', false];

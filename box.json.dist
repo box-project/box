@@ -17,9 +17,9 @@
 
     "compression": "GZ",
     "compactors": [
-        "Herrera\\Box\\Compactor\\Json",
+        "Herrera\\Box\\Compactor\\Php",
         "KevinGH\\Box\\Compactor\\PhpScoper",
-        "Herrera\\Box\\Compactor\\Php"
+        "Herrera\\Box\\Compactor\\Json"
     ],
     "git-commit": "git-commit",
     "git-version": "git-version"
