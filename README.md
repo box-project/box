@@ -33,7 +33,7 @@ great things:
 1. [Installation](doc/installation.md#installation)
     1. [PHAR](doc/installation.md#phar)
     1. [Composer](doc/installation.md#composer)
-1. [Uage](#usage)
+1. [Usage](#usage)
 1. [Configuration](doc/configuration.md#configuration)
     1. [Base path](doc/configuration.md#base-path-base-path)
     1. [Main](doc/configuration.md#main-main)
