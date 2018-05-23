@@ -67,13 +67,13 @@ final class ComposerConfiguration
         );
     }
 
-    private static function retrieveVendorDir(array $composerJsonDecodedContents): string
+    public static function retrieveVendorDir(array $composerJsonDecodedContents): string
     {
-        if (!array_key_exists('config', $composerJsonDecodedContents)) {
+        if (false === array_key_exists('config', $composerJsonDecodedContents)) {
             return 'vendor';
         }
 
-        if (!array_key_exists('vendor-dir', $composerJsonDecodedContents['config'])) {
+        if (false === array_key_exists('vendor-dir', $composerJsonDecodedContents['config'])) {
             return 'vendor';
         }
 
@@ -85,7 +85,7 @@ final class ComposerConfiguration
      */
     private static function retrieveDevPackageNames(array $composerLockDecodedContents): array
     {
-        if (!array_key_exists('packages-dev', $composerLockDecodedContents)) {
+        if (false === array_key_exists('packages-dev', $composerLockDecodedContents)) {
             return [];
         }
 

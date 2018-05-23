@@ -20,6 +20,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use KevinGH\Box\Box;
 use KevinGH\Box\Compactor;
+use KevinGH\Box\Composer\ComposerConfiguration;
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Console\Logger\BuildLogger;
 use KevinGH\Box\MapFile;
@@ -218,6 +219,8 @@ HELP;
         $this->configureMetadata($config, $box, $logger);
 
         $this->commit($box, $config, $logger);
+
+        $this->checkComposerFiles($box, $config, $logger);
 
         $this->configureCompressionAlgorithm($config, $box, $input->getOption(self::DEV_OPTION), $io, $logger);
 
@@ -535,6 +538,24 @@ EOF
         $logger->log(BuildLogger::QUESTION_MARK_PREFIX, $message);
 
         $box->endBuffering($config->dumpAutoload());
+    }
+
+    private function checkComposerFiles(Box $box, Configuration $config, BuildLogger $logger): void
+    {
+        $message = $config->excludeComposerFiles()
+            ? 'Removing the Composer dump artefacts'
+            : 'Keep the Composer dump artefacts'
+        ;
+
+        $logger->log(BuildLogger::QUESTION_MARK_PREFIX, $message);
+
+        if ($config->excludeComposerFiles()) {
+            $box->removeComposerArtefacts(
+                ComposerConfiguration::retrieveVendorDir(
+                    $config->getComposerJsonDecodedContents() ?? []
+                )
+            );
+        }
     }
 
     private function configureCompressionAlgorithm(Configuration $config, Box $box, bool $dev, SymfonyStyle $io, BuildLogger $logger): void

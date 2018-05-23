@@ -338,6 +338,31 @@ EOF
         $this->assertFalse($this->config->dumpAutoload());
     }
 
+    public function test_it_excludes_the_composer_files_by_default(): void
+    {
+        $this->setConfig([
+            'exclude-composer-files' => null,
+        ]);
+
+        $this->assertTrue($this->config->excludeComposerFiles());
+        $this->assertTrue($this->getNoFileConfig()->excludeComposerFiles());
+    }
+
+    public function test_excluding_the_composer_files_can_be_configured(): void
+    {
+        $this->setConfig([
+            'exclude-composer-files' => true,
+        ]);
+
+        $this->assertTrue($this->config->excludeComposerFiles());
+
+        $this->setConfig([
+            'exclude-composer-files' => false,
+        ]);
+
+        $this->assertFalse($this->config->excludeComposerFiles());
+    }
+
     public function test_no_compactors_is_configured_by_default(): void
     {
         $this->assertSame([], $this->config->getCompactors());

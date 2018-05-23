@@ -166,6 +166,34 @@ final class Box implements Countable
         $this->phar->stopBuffering();
     }
 
+    public function removeComposerArtefacts(string $vendorDir): void
+    {
+        Assertion::false($this->buffering, 'The buffering must have ended before removing the Composer artefacts');
+
+        $composerFiles = [
+            'composer.json',
+            'composer.lock',
+            $vendorDir.'/composer/installed.json',
+        ];
+
+        $this->phar->startBuffering();
+
+        foreach ($composerFiles as $composerFile) {
+            // TODO: the file map could return the unchanged path when no mapping is found...
+            $localComposerFile = ($this->mapFile)($composerFile);
+
+            if (null === $localComposerFile) {
+                $localComposerFile = $composerFile;
+            }
+
+            if (file_exists('phar://'.$this->phar->getPath().'/'.$localComposerFile)) {
+                $this->phar->delete($localComposerFile);
+            }
+        }
+
+        $this->phar->stopBuffering();
+    }
+
     /**
      * @return null|string The required extension to execute the PHAR now that it is compressed
      */

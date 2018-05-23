@@ -91,6 +91,7 @@ BANNER;
     private $files;
     private $binaryFiles;
     private $dumpAutoload;
+    private $excludeComposerFiles;
     private $compactors;
     private $compressionAlgorithm;
     private $mainScriptPath;
@@ -116,11 +117,15 @@ BANNER;
     /**
      * @param null|string     $file
      * @param null|string     $alias
-     * @param string          $basePath              Utility to private the base path used and be able to retrieve a path relative to it (the base path)
+     * @param string          $basePath              Utility to private the base path used and be able to retrieve a
+     *                                               path relative to it (the base path)
      * @param null[]|string[] $composerJson
      * @param null[]|string[] $composerLock
      * @param SplFileInfo[]   $files                 List of files
      * @param SplFileInfo[]   $binaryFiles           List of binary files
+     * @param bool            $dumpAutoload          Whether or not the Composer autoloader should be dumped
+     * @param bool            $excludeComposerFiles  Whether or not the Composer files composer.json, composer.lock and
+     *                                               installed.json should be removed from the PHAR
      * @param Compactor[]     $compactors            List of file contents compactors
      * @param null|int        $compressionAlgorithm  Compression algorithm constant value. See the \Phar class constants
      * @param null|int        $fileMode              File mode in octal form
@@ -137,7 +142,8 @@ BANNER;
      * @param null|string     $stubPath              The PHAR stub file path
      * @param bool            $isInterceptFileFuncs  Whether or not Phar::interceptFileFuncs() should be used
      * @param bool            $isStubGenerated       Whether or not if the PHAR stub should be generated
-     * @param bool            $checkRequirements     Whether the PHAR will check the application requirements before running
+     * @param bool            $checkRequirements     Whether the PHAR will check the application requirements before
+     *                                               running
      */
     private function __construct(
         ?string $file,
@@ -148,6 +154,7 @@ BANNER;
         array $files,
         array $binaryFiles,
         bool $dumpAutoload,
+        bool $excludeComposerFiles,
         array $compactors,
         ?int $compressionAlgorithm,
         ?int $fileMode,
@@ -193,6 +200,7 @@ BANNER;
         $this->files = $files;
         $this->binaryFiles = $binaryFiles;
         $this->dumpAutoload = $dumpAutoload;
+        $this->excludeComposerFiles = $excludeComposerFiles;
         $this->compactors = $compactors;
         $this->compressionAlgorithm = $compressionAlgorithm;
         $this->fileMode = $fileMode;
@@ -276,6 +284,8 @@ BANNER;
 
         $dumpAutoload = self::retrieveDumpAutoload($raw, null !== $composerJson[0]);
 
+        $excludeComposerFiles = self::retrieveExcludeComposerFiles($raw);
+
         $compactors = self::retrieveCompactors($raw, $basePath);
         $compressionAlgorithm = self::retrieveCompressionAlgorithm($raw);
 
@@ -327,6 +337,7 @@ BANNER;
             $filesAggregate,
             $binaryFilesAggregate,
             $dumpAutoload,
+            $excludeComposerFiles,
             $compactors,
             $compressionAlgorithm,
             $fileMode,
@@ -405,6 +416,11 @@ BANNER;
     public function dumpAutoload(): bool
     {
         return $this->dumpAutoload;
+    }
+
+    public function excludeComposerFiles(): bool
+    {
+        return $this->excludeComposerFiles;
     }
 
     /**
@@ -1260,6 +1276,11 @@ BANNER;
         // could have been found.
 
         return $composerJson ? $dumpAutoload : false;
+    }
+
+    private static function retrieveExcludeComposerFiles(stdClass $raw): bool
+    {
+        return $raw->{'exclude-composer-files'} ?? true;
     }
 
     /**
