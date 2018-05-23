@@ -17,6 +17,7 @@
     1. [Banner (`banner`)][banner]
     1. [Banner file (`banner-file`)][banner-file]
 1. [Dumping the Composer autoloader (`dump-autoload`)][dump-autoload]
+1. [Excluding the Composer files (`exclude-composer-files`)][exclude-composer-files]
 1. [Compactors (`compactors`)][compactors]
 1. [Compression algorithm (`compression`)][compression]
 1. [Signing algorithm (`algorithm`)][algorithm]
@@ -34,7 +35,8 @@ specified through the `--configuration|-c option`, one of the following files wi
 `box.json.dist`. If no configuration file is found, Box will proceed with the default settings.
 
 The configuration file is a JSON object saved to a file. Note that all settings are optional.
-//TODO: update this last bit of information as this is not true
+// TODO: update this last bit of information as this is not true
+// TODO: add a test to ensure this schema is always up to date with the actual schema file
 
 ```json
 {
@@ -53,6 +55,7 @@ The configuration file is a JSON object saved to a file. Note that all settings 
     "directories": "?",
     "directories-bin": "?",
     "dump-autoload": "?",
+    "exclude-composer-files": "?",
     "files": "?",
     "files-bin": "?",
     "finder": "?",
@@ -450,6 +453,18 @@ If this parameter is set, then the value of [`banner`][banner] will be discarded
 
 
 ## Dumping the Composer autoloader (`dump-autoload`)
+
+The `dump-autoload` (`boolean`|`null`, default `true`) setting will result in Box dump the Composer autoload with the
+[classmap authoritative mode][composer-classmap-authoritative] and the [`--no-dev` option][composer-no-dev-option] which
+disables the `autoload-dev` rules. This is however done only if a `composer.json` file could be found.
+
+The dumping of the autoloader will be _ignored_ if the `composer.json` file could be found.
+
+The autoloader is dumped at the end of the process to ensure it will take into account the eventual modifications done
+by the [compactors][compactors] process.
+
+
+## Excluding the Composer files (`exclude-composer-files`)
 
 The `dump-autoload` (`boolean`|`null`, default `true`) setting will result in Box dump the Composer autoload with the
 [classmap authoritative mode][composer-classmap-authoritative] and the [`--no-dev` option][composer-no-dev-option] which

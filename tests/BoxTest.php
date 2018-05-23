@@ -16,6 +16,7 @@ namespace KevinGH\Box;
 
 use Exception;
 use InvalidArgumentException;
+use function iterator_to_array;
 use KevinGH\Box\Compactor\FakeCompactor;
 use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\FileSystemTestCase;
@@ -727,6 +728,116 @@ class BoxTest extends FileSystemTestCase
             );
             $this->assertSame(0, $exception->getCode());
             $this->assertNotNull($exception->getPrevious());
+        }
+    }
+
+    public function test_it_can_remove_the_composer_files(): void
+    {
+        $files = [
+            'composer.json' => '{}',
+            'composer.lock' => '{}',
+            'vendor/composer/installed.json' => '{}',
+        ];
+
+        foreach ($files as $file => $contents) {
+            dump_file($file, $contents);
+        }
+
+        $this->box->startBuffering();
+        $this->box->addFiles(array_keys($files), true);
+        $this->box->endBuffering(true);
+
+        foreach ($files as $file => $contents) {
+            $this->assertFileExists('phar://test.phar/'.$file);
+        }
+
+        $this->box->removeComposerArtefacts('vendor');
+
+        foreach ($files as $file => $contents) {
+            $this->assertFileNotExists('phar://test.phar/'.$file);
+        }
+    }
+
+    public function test_it_can_remove_the_composer_files_with_a_custom_vendor_directory(): void
+    {
+        $files = [
+            'composer.json' => <<<'JSON'
+{
+    "config": {
+        "vendor-dir": "my-vendor"
+    }
+}
+JSON
+            ,
+            'composer.lock' => '{}',
+            'my-vendor/composer/installed.json' => '{}',
+        ];
+
+        foreach ($files as $file => $contents) {
+            dump_file($file, $contents);
+        }
+
+        $this->box->startBuffering();
+        $this->box->addFiles(array_keys($files), true);
+        $this->box->endBuffering(true);
+
+        foreach ($files as $file => $contents) {
+            $this->assertFileExists('phar://test.phar/'.$file);
+        }
+
+        $this->box->removeComposerArtefacts('my-vendor');
+
+        foreach ($files as $file => $contents) {
+            $this->assertFileNotExists('phar://test.phar/'.$file);
+        }
+    }
+
+    public function test_it_can_remove_the_composer_files_mapped_with_a_different_path(): void
+    {
+        $files = [
+            'composer.json' => '{}',
+            'composer.lock' => '{}',
+            'vendor/composer/installed.json' => '{}',
+        ];
+
+        foreach ($files as $file => $contents) {
+            dump_file($file, $contents);
+        }
+
+        $map = new MapFile([
+            ['' => 'lib'],
+        ]);
+
+        $this->box->registerFileMapping($this->tmp, $map);
+
+        $this->box->startBuffering();
+        $this->box->addFiles(array_keys($files), true);
+        $this->box->endBuffering(false);
+
+        foreach ($files as $file => $contents) {
+            $this->assertFileExists('phar://test.phar/lib/'.$file);
+        }
+
+        $this->box->removeComposerArtefacts('vendor');
+
+        foreach ($files as $file => $contents) {
+            $this->assertFileNotExists('phar://test.phar/lib/'.$file);
+        }
+    }
+
+    public function test_it_cannot_remove_the_composer_files_when_buffering(): void
+    {
+        $this->box->startBuffering();
+
+        try {
+            $this->box->removeComposerArtefacts('vendor');
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'The buffering must have ended before removing the Composer artefacts',
+                $exception->getMessage()
+            );
         }
     }
 
