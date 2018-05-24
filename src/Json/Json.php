@@ -33,6 +33,18 @@ final class Json
     }
 
     /**
+     * @throws ParsingException
+     */
+    public function lint(string $json): void
+    {
+        $result = $this->linter->lint($json);
+
+        if ($result instanceof ParsingException) {
+            throw $result;
+        }
+    }
+
+    /**
      * @param string $json
      * @param bool   $assoc
      *
@@ -45,15 +57,12 @@ final class Json
         $data = json_decode($json, $assoc);
 
         if (JSON_ERROR_NONE !== ($error = json_last_error())) {
+            // Swallow the UTF-8 error and relies on the lint instead otherwise
             if (JSON_ERROR_UTF8 === $error) {
-                throw JsonValidationException::createDecodeException($error);
+                throw new ParsingException('JSON decoding failed: Malformed UTF-8 characters, possibly incorrectly encoded');
             }
 
             $this->lint($json);
-
-            if (($result = $this->linter->lint($json)) instanceof ParsingException) {
-                throw $result;
-            }
         }
 
         return false === $assoc ? (object) $data : $data;   // If JSON is an empty JSON json_decode returns an empty
@@ -70,15 +79,6 @@ final class Json
         $json = file_contents($file);
 
         return $this->decode($json, $assoc);
-    }
-
-    public function lint(string $json): void
-    {
-        $result = $this->linter->lint($json);
-
-        if ($result instanceof ParsingException) {
-            throw $result;
-        }
     }
 
     /**

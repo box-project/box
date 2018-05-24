@@ -16,6 +16,7 @@ namespace KevinGH\Box\Json;
 
 use Assert\Assertion;
 use Exception;
+use Throwable;
 use UnexpectedValueException;
 
 /**
@@ -31,47 +32,22 @@ final class JsonValidationException extends UnexpectedValueException
      *
      * @param string[] $errors
      */
-    public function __construct(string $message, string $file = null, $errors = [], Exception $previous = null)
-    {
-        Assertion::file($file);
+    public function __construct(
+        string $message,
+        string $file = null,
+        array $errors = [],
+        int $code = 0,
+        Throwable $previous = null
+    ) {
+        if (null !== $file) {
+            Assertion::file($file);
+        }
         Assertion::allString($errors);
 
         $this->validatedFile = $file;
         $this->errors = $errors;
 
-        parent::__construct($message, 0, $previous);
-    }
-
-    /**
-     * Creates an exception according to a given code with a customized message.
-     *
-     * @param int $code return code of json_last_error function
-     *
-     * @return static
-     */
-    public static function createDecodeException(int $code): self
-    {
-        switch ($code) {
-            case JSON_ERROR_CTRL_CHAR:
-                $msg = 'Control character error, possibly incorrectly encoded.';
-                break;
-            case JSON_ERROR_DEPTH:
-                $msg = 'The maximum stack depth has been exceeded.';
-                break;
-            case JSON_ERROR_STATE_MISMATCH:
-                $msg = 'Invalid or malformed JSON.';
-                break;
-            case JSON_ERROR_SYNTAX:
-                $msg = 'Syntax error.';
-                break;
-            case JSON_ERROR_UTF8:
-                $msg = 'Malformed UTF-8 characters, possibly incorrectly encoded.';
-                break;
-            default:
-                $msg = 'Unknown error';
-        }
-
-        return new self('JSON decoding failed: '.$msg);
+        parent::__construct($message, $code, $previous);
     }
 
     public function getValidatedFile(): ?string
