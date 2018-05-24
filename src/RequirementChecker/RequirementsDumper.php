@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
+use Assert\Assertion;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use function KevinGH\Box\FileSystem\file_contents;
@@ -52,22 +53,24 @@ PHP;
 return __CONFIG__;
 PHP;
 
-    private const REQUIRMEMENT_CHECKER_PATH = __DIR__.'/../../.requirement-checker';
+    private const REQUIREMENT_CHECKER_PATH = __DIR__.'/../../.requirement-checker';
 
     /**
      * @return string[][]
      */
-    public static function dump(array $composerJsonDecodedContents, array $composerLockDecodedContents, ?int $compressionAlgorithm): array
+    public static function dump(array $decodedComposerJsonContents, array $decodedComposerLockContents, ?int $compressionAlgorithm): array
     {
+        Assertion::directory(self::REQUIREMENT_CHECKER_PATH, 'Expected the requirement checker to have been dumped');
+
         $filesWithContents = [
-            self::dumpRequirementsConfig($composerJsonDecodedContents, $composerLockDecodedContents, $compressionAlgorithm),
+            self::dumpRequirementsConfig($decodedComposerJsonContents, $decodedComposerLockContents, $compressionAlgorithm),
             [self::CHECK_FILE_NAME, self::REQUIREMENTS_CHECKER_TEMPLATE],
         ];
 
         /** @var SplFileInfo[] $requirementCheckerFiles */
         $requirementCheckerFiles = Finder::create()
             ->files()
-            ->in(self::REQUIRMEMENT_CHECKER_PATH)
+            ->in(self::REQUIREMENT_CHECKER_PATH)
         ;
 
         foreach ($requirementCheckerFiles as $file) {

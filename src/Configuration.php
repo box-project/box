@@ -382,7 +382,7 @@ BANNER;
         return $this->composerJson[0];
     }
 
-    public function getComposerJsonDecodedContents(): ?array
+    public function getDecodedComposerJsonContents(): ?array
     {
         return $this->composerJson[1];
     }
@@ -392,7 +392,7 @@ BANNER;
         return $this->composerLock[0];
     }
 
-    public function getComposerLockDecodedContents(): ?array
+    public function getDecodedComposerLockContents(): ?array
     {
         return $this->composerLock[1];
     }
