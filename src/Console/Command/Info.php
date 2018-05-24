@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Assert\Assertion;
 use DateTimeImmutable;
 use DirectoryIterator;
 use Phar;
@@ -34,11 +35,12 @@ use function array_reduce;
 use function array_sum;
 use function count;
 use function end;
+use function filesize;
 use function is_array;
 use function iterator_to_array;
 use function KevinGH\Box\FileSystem\copy;
 use function KevinGH\Box\FileSystem\remove;
-use function KevinGH\Box\formatted_filesize;
+use function KevinGH\Box\format_size;
 use function key;
 use function realpath;
 use function sprintf;
@@ -56,6 +58,7 @@ final class Info extends Command
     private const LIST_OPT = 'list';
     private const METADATA_OPT = 'metadata';
     private const MODE_OPT = 'mode';
+    private const DEPTH_OPT = 'depth';
 
     /**
      * The list of recognized compression algorithms.
@@ -121,9 +124,16 @@ HELP
         $this->addOption(
             self::MODE_OPT,
             'm',
-            InputOption::VALUE_OPTIONAL,
+            InputOption::VALUE_REQUIRED,
             'The listing mode. (default: indent, options: indent, flat)',
             'indent'
+        );
+        $this->addOption(
+            self::DEPTH_OPT,
+            'd',
+            InputOption::VALUE_REQUIRED,
+            'The depth of the tree displayed',
+            -1
         );
     }
 
@@ -168,6 +178,10 @@ HELP
 
     public function showInfo(string $file, string $originalFile, InputInterface $input, OutputInterface $output, SymfonyStyle $io): int
     {
+        $depth = (int) $input->getOption(self::DEPTH_OPT);
+
+        Assertion::greaterOrEqualThan($depth, -1, 'Expected the depth to be a positive integer or -1, got "%d"');
+
         try {
             try {
                 $phar = new Phar($file);
@@ -178,11 +192,16 @@ HELP
             return $this->showPharInfo(
                 $phar,
                 $input->getOption(self::LIST_OPT),
+                $depth,
                 'indent' === $input->getOption(self::MODE_OPT),
                 $output,
                 $io
             );
         } catch (Throwable $throwable) {
+            if ($output->isDebug()) {
+                throw $throwable;
+            }
+
             $io->error(
                 sprintf(
                     'Could not read the file "%s".',
@@ -214,8 +233,14 @@ HELP
     /**
      * @param Phar|PharData $phar
      */
-    private function showPharInfo($phar, bool $content, bool $indent, OutputInterface $output, SymfonyStyle $io): int
-    {
+    private function showPharInfo(
+        $phar,
+        bool $content,
+        int $depth,
+        bool $indent,
+        OutputInterface $output,
+        SymfonyStyle $io
+    ): int {
         $signature = $phar->getSignature();
 
         $this->showPharGlobalInfo($phar, $io, $signature);
@@ -226,6 +251,8 @@ HELP
             $this->renderContents(
                 $output,
                 $phar,
+                0,
+                $depth,
                 $indent ? 0 : false,
                 $root,
                 $phar,
@@ -320,7 +347,9 @@ HELP
             sprintf(
                 '<comment>Contents:</comment>%s (%s)',
                 1 === $totalCount ? ' 1 file' : " $totalCount files",
-                formatted_filesize($phar->getPath())
+                format_size(
+                    filesize($phar->getPath())
+                )
             )
         );
     }
@@ -361,11 +390,17 @@ HELP
     private function renderContents(
         OutputInterface $output,
         iterable $list,
+        int $depth,
+        int $maxDepth,
         $indent,
         string $base,
         $phar,
         string $root
     ): void {
+        if (-1 !== $maxDepth && $depth > $maxDepth) {
+            return;
+        }
+
         foreach ($list as $item) {
             $item = $phar[str_replace($root, '', $item->getPathname())];
 
@@ -386,22 +421,33 @@ HELP
                     $output->writeln("<info>$path</info>");
                 }
             } else {
-                $compression = ' <fg=red>[NONE]</fg=red>';
+                $compression = '<fg=red>[NONE]</fg=red>';
 
                 foreach (self::FILE_ALGORITHMS as $code => $name) {
                     if ($item->isCompressed($code)) {
-                        $compression = " <fg=cyan>[$name]</fg=cyan>";
+                        $compression = "<fg=cyan>[$name]</fg=cyan>";
                         break;
                     }
                 }
 
-                $output->writeln($path.$compression);
+                $fileSize = format_size($item->getCompressedSize());
+
+                $output->writeln(
+                    sprintf(
+                        '%s %s - %s',
+                        $path,
+                        $compression,
+                        $fileSize
+                    )
+                );
             }
 
             if ($item->isDir()) {
                 $this->renderContents(
                     $output,
                     new DirectoryIterator($item->getPathname()),
+                    $depth + 1,
+                    $maxDepth,
                     (false === $indent) ? $indent : $indent + 2,
                     $base,
                     $phar,

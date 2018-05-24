@@ -16,7 +16,6 @@ namespace KevinGH\Box;
 
 use Exception;
 use InvalidArgumentException;
-use function iterator_to_array;
 use KevinGH\Box\Compactor\FakeCompactor;
 use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\FileSystemTestCase;
@@ -35,6 +34,7 @@ use function current;
 use function extension_loaded;
 use function file_put_contents;
 use function in_array;
+use function iterator_to_array;
 use function KevinGH\Box\FileSystem\canonicalize;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_tmp_dir;

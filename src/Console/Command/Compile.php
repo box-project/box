@@ -47,6 +47,7 @@ use function array_shift;
 use function count;
 use function decoct;
 use function explode;
+use function filesize;
 use function function_exists;
 use function get_class;
 use function implode;
@@ -56,7 +57,7 @@ use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
-use function KevinGH\Box\formatted_filesize;
+use function KevinGH\Box\format_size;
 use function KevinGH\Box\get_phar_compression_algorithms;
 use function posix_setrlimit;
 use function putenv;
@@ -828,7 +829,9 @@ EOF
             sprintf(
                 'PHAR: %s (%s)',
                 $box->count() > 1 ? $box->count().' files' : $box->count().' file',
-                formatted_filesize($path)
+                format_size(
+                    filesize($path)
+                )
             )
             .PHP_EOL
             .'You can inspect the generated PHAR with the "<comment>info</comment>" command.'
