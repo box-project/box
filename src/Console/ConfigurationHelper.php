@@ -65,23 +65,6 @@ final class ConfigurationHelper extends Helper
 
         $json = $this->json->decodeFile($file);
 
-        // Include imports
-        if (isset($json->import)) {
-            if (!is_absolute_path($json->import)) {
-                $json->import = implode(
-                    [
-                        dirname($file),
-                        $json->import,
-                    ]
-                );
-            }
-
-            $json = (object) array_merge(
-                (array) $this->json->decodeFile($json->import),
-                (array) $json
-            );
-        }
-
         $this->json->validate(
             $file,
             $json,
