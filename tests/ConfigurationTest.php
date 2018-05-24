@@ -33,6 +33,7 @@ use const DIRECTORY_SEPARATOR;
 
 /**
  * @covers \KevinGH\Box\Configuration
+ * @covers \KevinGH\Box\MapFile
  */
 class ConfigurationTest extends ConfigurationTestCase
 {
@@ -702,31 +703,16 @@ JSON
         }
     }
 
-    public function test_get_map(): void
+    public function test_there_is_no_file_map_configured_by_default(): void
     {
-        $this->assertSame([], $this->config->getMap());
+        $mapFile = $this->config->getFileMapper();
+
+        $this->assertSame([], $mapFile->getMap());
+
+        $this->assertNull($mapFile('first/test/path/sub/path/file.php'));
     }
 
-    public function test_configure_map(): void
-    {
-        $this->setConfig([
-            'files' => [self::DEFAULT_FILE],
-            'map' => [
-                ['a' => 'b'],
-                ['_empty_' => 'c'],
-            ],
-        ]);
-
-        $this->assertSame(
-            [
-                ['a' => 'b'],
-                ['' => 'c'],
-            ],
-            $this->config->getMap()
-        );
-    }
-
-    public function test_get_mapper(): void
+    public function test_the_file_map_can_be_configured(): void
     {
         $this->setConfig([
             'files' => [self::DEFAULT_FILE],
@@ -737,6 +723,14 @@ JSON
         ]);
 
         $mapFile = $this->config->getFileMapper();
+
+        $this->assertSame(
+            [
+                ['first/test/path' => 'a'],
+                ['' => 'b'],
+            ],
+            $mapFile->getMap()
+        );
 
         $this->assertSame(
             'a/sub/path/file.php',

@@ -481,14 +481,6 @@ BANNER;
         return $this->outputPath;
     }
 
-    /**
-     * @return string[]
-     */
-    public function getMap(): array
-    {
-        return $this->fileMapper->getMap();
-    }
-
     public function getFileMapper(): MapFile
     {
         return $this->fileMapper;
