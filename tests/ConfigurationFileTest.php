@@ -125,7 +125,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
             'file1',    // 'files' & 'files-bin' are not affected by the blacklist filter
         ];
 
-        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+        $actual = $this->normalizePaths($this->config->getFiles());
 
         $this->assertSame($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());
@@ -140,8 +140,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $this->setConfig($config);
 
-        $actualFiles = $this->normalizeConfigPaths($this->config->getFiles());
-        $actualBinFiles = $this->normalizeConfigPaths($this->config->getBinaryFiles());
+        $actualFiles = $this->normalizePaths($this->config->getFiles());
+        $actualBinFiles = $this->normalizePaths($this->config->getBinaryFiles());
 
         $this->assertSame($expectedFiles, $actualFiles);
         $this->assertSame($expectedBinFiles, $actualBinFiles);
@@ -233,7 +233,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
             'sub-dir/file1',
         ];
 
-        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+        $actual = $this->normalizePaths($this->config->getFiles());
 
         $this->assertSame($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());
@@ -311,7 +311,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
             'sub-dir/file1',
         ];
 
-        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+        $actual = $this->normalizePaths($this->config->getFiles());
 
         $this->assertSame($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());
@@ -413,7 +413,7 @@ JSON
             'vendor/acme/foo/af1',
         ];
 
-        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+        $actual = $this->normalizePaths($this->config->getFiles());
 
         $this->assertSame($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());
@@ -763,7 +763,7 @@ JSON
             'file1',    // 'files' & 'files-bin' are not affected by the blacklist filter
         ];
 
-        $actual = $this->normalizeConfigPaths($this->config->getBinaryFiles());
+        $actual = $this->normalizePaths($this->config->getBinaryFiles());
 
         $this->assertSame($expected, $actual);
         $this->assertCount(0, $this->config->getFiles());
@@ -843,7 +843,7 @@ JSON
             'sub-dir/file1',
         ];
 
-        $actual = $this->normalizeConfigPaths($this->config->getBinaryFiles());
+        $actual = $this->normalizePaths($this->config->getBinaryFiles());
 
         $this->assertSame($expected, $actual);
         $this->assertCount(0, $this->config->getFiles());
@@ -921,7 +921,7 @@ JSON
             'sub-dir/file1',
         ];
 
-        $actual = $this->normalizeConfigPaths($this->config->getBinaryFiles());
+        $actual = $this->normalizePaths($this->config->getBinaryFiles());
 
         $this->assertSame($expected, $actual);
         $this->assertCount(0, $this->config->getFiles());
@@ -1069,11 +1069,11 @@ JSON
 
         $this->assertSame(
             $expected,
-            $this->normalizeConfigPaths($this->config->getFiles())
+            $this->normalizePaths($this->config->getFiles())
         );
         $this->assertSame(
             $expected,
-            $this->normalizeConfigPaths($this->config->getBinaryFiles())
+            $this->normalizePaths($this->config->getBinaryFiles())
         );
     }
 
@@ -1117,7 +1117,7 @@ JSON
         $expected = [
             'B/fileB0',
         ];
-        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+        $actual = $this->normalizePaths($this->config->getFiles());
 
         $this->assertSame($expected, $actual);
     }
@@ -1132,7 +1132,7 @@ JSON
 
         // Relative to the current working directory for readability
         $expected = [];
-        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+        $actual = $this->normalizePaths($this->config->getFiles());
 
         $this->assertSame($expected, $actual);
     }
@@ -1197,11 +1197,11 @@ JSON
 
         $this->assertSame(
             $expected,
-            $this->normalizeConfigPaths($this->config->getFiles())
+            $this->normalizePaths($this->config->getFiles())
         );
         $this->assertSame(
             $expected,
-            $this->normalizeConfigPaths($this->config->getBinaryFiles())
+            $this->normalizePaths($this->config->getBinaryFiles())
         );
     }
 
@@ -1266,11 +1266,11 @@ JSON
 
         $this->assertSame(
             $expected,
-            $this->normalizeConfigPaths($this->config->getFiles())
+            $this->normalizePaths($this->config->getFiles())
         );
         $this->assertSame(
             $expected,
-            $this->normalizeConfigPaths($this->config->getBinaryFiles())
+            $this->normalizePaths($this->config->getBinaryFiles())
         );
     }
 
@@ -1354,7 +1354,7 @@ JSON
 
         $this->assertEquals(
             $expected,
-            $this->normalizeConfigPaths($this->config->getFiles()),
+            $this->normalizePaths($this->config->getFiles()),
             '',
             .0,
             10,
@@ -1362,7 +1362,7 @@ JSON
         );
         $this->assertEquals(
             $expected,
-            $this->normalizeConfigPaths($this->config->getBinaryFiles()),
+            $this->normalizePaths($this->config->getBinaryFiles()),
             '',
             .0,
             10,
@@ -1392,7 +1392,7 @@ JSON
 
         $this->assertEquals(
             $expected,
-            $this->normalizeConfigPaths($this->config->getFiles()),
+            $this->normalizePaths($this->config->getFiles()),
             '',
             .0,
             10,
@@ -1400,7 +1400,7 @@ JSON
         );
         $this->assertEquals(
             $expected,
-            $this->normalizeConfigPaths($this->config->getBinaryFiles()),
+            $this->normalizePaths($this->config->getBinaryFiles()),
             '',
             .0,
             10,
@@ -1436,7 +1436,7 @@ JSON
             'A/foo',
             'B/bar',
         ];
-        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+        $actual = $this->normalizePaths($this->config->getFiles());
 
         $this->assertSame($expected, $actual);
     }
@@ -1489,7 +1489,7 @@ JSON
             'file1',
         ];
 
-        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+        $actual = $this->normalizePaths($this->config->getFiles());
 
         $this->assertSame($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());
@@ -1506,7 +1506,7 @@ JSON
             'composer.lock',
         ];
 
-        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+        $actual = $this->normalizePaths($this->config->getFiles());
 
         $this->assertSame($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());

@@ -128,14 +128,14 @@ JSON
 
         $noFileConfig = $this->getNoFileConfig();
 
-        $actual = $this->normalizeConfigPaths($noFileConfig->getFiles());
+        $actual = $this->normalizePaths($noFileConfig->getFiles());
 
         $this->assertEquals($expected, $actual);
         $this->assertCount(0, $noFileConfig->getBinaryFiles());
 
         $this->reloadConfig();
 
-        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+        $actual = $this->normalizePaths($this->config->getFiles());
 
         $this->assertEquals($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());
@@ -349,12 +349,12 @@ JSON
             'PSR4_2/file0',
         ];
 
-        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+        $actual = $this->normalizePaths($this->config->getFiles());
 
         $this->assertEquals($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());
 
-        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+        $actual = $this->normalizePaths($this->config->getFiles());
 
         $this->assertEquals($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());
@@ -572,14 +572,14 @@ JSON
 
         $noFileConfig = $this->getNoFileConfig();
 
-        $actual = $this->normalizeConfigPaths($noFileConfig->getFiles());
+        $actual = $this->normalizePaths($noFileConfig->getFiles());
 
         $this->assertSame($expected, $actual);
         $this->assertCount(0, $noFileConfig->getBinaryFiles());
 
         $this->reloadConfig();
 
-        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+        $actual = $this->normalizePaths($this->config->getFiles());
 
         $this->assertSame($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());
@@ -594,7 +594,7 @@ JSON
 
         $this->reloadConfig();
 
-        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+        $actual = $this->normalizePaths($this->config->getFiles());
 
         $this->assertEquals($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());
@@ -609,7 +609,7 @@ JSON
             'output' => 'default',
         ]);
 
-        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+        $actual = $this->normalizePaths($this->config->getFiles());
 
         $this->assertEquals($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());
@@ -650,7 +650,7 @@ JSON
 
         $noFileConfig = $this->getNoFileConfig();
 
-        $actual = $this->normalizeConfigPaths($noFileConfig->getFiles());
+        $actual = $this->normalizePaths($noFileConfig->getFiles());
 
         $this->assertEquals($expected, $actual);
         $this->assertCount(0, $noFileConfig->getBinaryFiles());
@@ -678,14 +678,14 @@ JSON
 
         $noFileConfig = $this->getNoFileConfig();
 
-        $actual = $this->normalizeConfigPaths($noFileConfig->getFiles());
+        $actual = $this->normalizePaths($noFileConfig->getFiles());
 
         $this->assertEquals($expected, $actual);
         $this->assertCount(0, $noFileConfig->getBinaryFiles());
 
         $this->reloadConfig();
 
-        $actual = $this->normalizeConfigPaths($this->config->getFiles());
+        $actual = $this->normalizePaths($this->config->getFiles());
 
         $this->assertEquals($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());

@@ -70,29 +70,6 @@ abstract class ConfigurationTestCase extends FileSystemTestCase
         return false === strpos(strtolower(PHP_OS), 'darwin') && false !== strpos(strtolower(PHP_OS), 'win');
     }
 
-    /**
-     * @param string[] $files
-     *
-     * @return string[] File real paths relative to the current temporary directory
-     */
-    final protected function normalizeConfigPaths(array $files): array
-    {
-        $root = $this->tmp;
-
-        $files = array_values(
-            array_map(
-                function (string $file) use ($root): string {
-                    return str_replace($root.DIRECTORY_SEPARATOR, '', $file);
-                },
-                $files
-            )
-        );
-
-        natcasesort($files);
-
-        return array_values($files);
-    }
-
     final protected function getNoFileConfig(): Configuration
     {
         return Configuration::create(null, new stdClass());
