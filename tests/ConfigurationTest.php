@@ -234,10 +234,10 @@ EOF
         $this->reloadConfig();
 
         $this->assertSame($expectedJson, $this->config->getComposerJson());
-        $this->assertSame($expectedJsonContents, $this->config->getComposerJsonDecodedContents());
+        $this->assertSame($expectedJsonContents, $this->config->getDecodedComposerJsonContents());
 
         $this->assertSame($expectedLock, $this->config->getComposerLock());
-        $this->assertSame($expectedLockContents, $this->config->getComposerLockDecodedContents());
+        $this->assertSame($expectedLockContents, $this->config->getDecodedComposerLockContents());
     }
 
     public function test_it_throws_an_error_when_a_composer_file_is_found_but_invalid(): void
