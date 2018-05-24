@@ -25,13 +25,10 @@ use UnexpectedValueException;
 use function preg_replace;
 use function realpath;
 
-///**
-// * @covers \KevinGH\Box\Console\Command\Info
-// *
-// * @runTestsInSeparateProcesses
-// */
 /**
- * @coversNothing
+ * @covers \KevinGH\Box\Console\Command\Info
+ *
+ * @runTestsInSeparateProcesses
  */
 class InfoTest extends TestCase
 {
