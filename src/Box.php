@@ -77,7 +77,7 @@ final class Box implements Countable
     private $basePath;
 
     /**
-     * @var Closure|MapFile
+     * @var MapFile
      */
     private $mapFile;
 
@@ -96,7 +96,7 @@ final class Box implements Countable
         $this->file = $file;
 
         $this->basePath = getcwd();
-        $this->mapFile = function (): void { };
+        $this->mapFile = new MapFile([]);
         $this->scoper = new NullScoper();
     }
 
@@ -179,12 +179,7 @@ final class Box implements Countable
         $this->phar->startBuffering();
 
         foreach ($composerFiles as $composerFile) {
-            // TODO: the file map could return the unchanged path when no mapping is found...
             $localComposerFile = ($this->mapFile)($composerFile);
-
-            if (null === $localComposerFile) {
-                $localComposerFile = $composerFile;
-            }
 
             if (file_exists('phar://'.$this->phar->getPath().'/'.$localComposerFile)) {
                 $this->phar->delete($localComposerFile);
@@ -345,10 +340,6 @@ final class Box implements Countable
 
         $relativePath = make_path_relative($file, $this->basePath);
         $local = ($this->mapFile)($relativePath);
-
-        if (null === $local) {
-            $local = $relativePath;
-        }
 
         if ($binary) {
             $this->bufferedFiles[$local] = $contents;

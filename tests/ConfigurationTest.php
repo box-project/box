@@ -709,7 +709,10 @@ JSON
 
         $this->assertSame([], $mapFile->getMap());
 
-        $this->assertNull($mapFile('first/test/path/sub/path/file.php'));
+        $this->assertSame(
+            'first/test/path/sub/path/file.php',
+            $mapFile('first/test/path/sub/path/file.php')
+        );
     }
 
     public function test_the_file_map_can_be_configured(): void
