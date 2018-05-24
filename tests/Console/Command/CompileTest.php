@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use const DIRECTORY_SEPARATOR;
 use DirectoryIterator;
 use Generator;
 use InvalidArgumentException;
