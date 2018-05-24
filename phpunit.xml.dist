@@ -19,6 +19,8 @@
             <directory suffix=".php">src/</directory>
 
             <exclude>
+                <file>src/bootstrap.php</file>
+                <file>src/consts.php</file>
                 <file>src/functions.php</file>
                 <directory>src/Console/Logger</directory>
                 <directory>src/Test</directory>
