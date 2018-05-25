@@ -1373,6 +1373,12 @@ EOF;
         );
 
         $actualDumpedConfig = preg_replace(
+            '/perms: \d+/',
+            'perms: 0100644',
+            $actualDumpedConfig
+        );
+
+        $actualDumpedConfig = preg_replace(
             '/owner: \d+/',
             'owner: 501',
             $actualDumpedConfig
