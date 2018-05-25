@@ -10,6 +10,7 @@
 !/bin/dump-requirements-checker.php
 /dist/
 /fixtures/default_stub.php
+/fixtures/composer-dump/dir001/vendor/
 /fixtures/build/dir010/*.phar
 /fixtures/check-requirements/*/actual-output
 /fixtures/check-requirements/*/*.phar
