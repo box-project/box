@@ -34,10 +34,12 @@ class RequirementsDumperTest extends TestCase
     ): void {
         $checkFiles = RequirementsDumper::dump($decodedComposerJsonContents, $decodedComposerLockContents, $compressionAlgorithm);
 
+        sort($checkFiles);
+
         $expectedFiles = [
             '.requirements.php',
-            'check_requirements.php',
             'bin/check-requirements.php',
+            'check_requirements.php',
             'composer.json',
             'composer.lock',
             'src/Checker.php',
@@ -67,6 +69,8 @@ class RequirementsDumperTest extends TestCase
             'vendor/composer/semver/src/Semver.php',
             'vendor/composer/semver/src/VersionParser.php',
         ];
+
+        sort($expectedFiles);
 
         $this->assertSame(
             $expectedFiles,
