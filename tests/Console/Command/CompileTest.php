@@ -1095,8 +1095,7 @@ OUTPUT;
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
-        $this->assertSame(
-            <<<EOF
+        $expectedDumpedConfig = <<<EOF
 //
 // Processed content of the configuration file "/path/to/box.json" dumped for debugging purposes
 // Time: 2018-05-24T20:59:15+00:00
@@ -1341,30 +1340,51 @@ KevinGH\Box\Configuration {#140
   -checkRequirements: true
 }
 
-EOF
-            ,
-            preg_replace(
-                '/inode: \d+/',
-                'inode: 33452869',
-                preg_replace(
-                    '/([a-z]Time): \d{4,}-\d{2,}-\d{2,} \d{2,}:\d{2,}:\d{2,}/',
-                    '$1: 2018-05-24 20:59:15',
-                    preg_replace(
-                        '/Time: \d{4,}-\d{2,}-\d{2,}T\d{2,}:\d{2,}:\d{2,}\+\d{2,}:\d{2,}/',
-                        'Time: 2018-05-24T20:59:15+00:00',
-                        preg_replace(
-                            '/ \{#\d{3,}/',
-                            ' {#140',
-                            str_replace(
-                                $this->tmp,
-                                '/path/to',
-                                file_contents('.box_dump/.box_configuration')
-                            )
-                        )
-                    )
-                )
-            )
+EOF;
+
+        $actualDumpedConfig = str_replace(
+            $this->tmp,
+            '/path/to',
+            file_contents('.box_dump/.box_configuration')
         );
+
+        $actualDumpedConfig = preg_replace(
+            '/ \{#\d{3,}/',
+            ' {#140',
+            $actualDumpedConfig
+        );
+
+        $actualDumpedConfig = preg_replace(
+            '/Time: \d{4,}-\d{2,}-\d{2,}T\d{2,}:\d{2,}:\d{2,}\+\d{2,}:\d{2,}/',
+            'Time: 2018-05-24T20:59:15+00:00',
+            $actualDumpedConfig
+        );
+
+        $actualDumpedConfig = preg_replace(
+            '/([a-z]Time): \d{4,}-\d{2,}-\d{2,} \d{2,}:\d{2,}:\d{2,}/',
+            '$1: 2018-05-24 20:59:15',
+            $actualDumpedConfig
+        );
+
+        $actualDumpedConfig = preg_replace(
+            '/inode: \d+/',
+            'inode: 33452869',
+            $actualDumpedConfig
+        );
+
+        $actualDumpedConfig = preg_replace(
+            '/owner: \d+/',
+            'owner: 501',
+            $actualDumpedConfig
+        );
+
+        $actualDumpedConfig = preg_replace(
+            '/group: \d+/',
+            'group: 20',
+            $actualDumpedConfig
+        );
+
+        $this->assertSame($expectedDumpedConfig, $actualDumpedConfig);
     }
 
     public function test_it_can_build_a_PHAR_file_in_quiet_mode(): void
