@@ -21,6 +21,7 @@ use function constant;
 use function define;
 use function defined;
 
+//TODO: add tests
 /**
  * TODO: this function should be pushed down to the PHAR extension.
  *

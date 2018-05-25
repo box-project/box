@@ -17,6 +17,7 @@ namespace KevinGH\Box\Console\Command;
 use InvalidArgumentException;
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Console\ConfigurationHelper;
+use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\Throwable\Exception\NoConfigurationFound;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -53,6 +54,8 @@ abstract class Configurable extends Command
      * @param InputInterface  $input
      * @param OutputInterface $output
      * @param bool            $allowNoFile Load the config nonetheless if not file is found when true
+     *
+     * @throws JsonValidationException
      *
      * @return Configuration
      */
