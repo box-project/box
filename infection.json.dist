@@ -6,7 +6,7 @@
         ]
     },
     "logs": {
-        "text": "dist\/infection-log.txt"
+        "text": "dist/infection-log.txt"
     },
     "phpunit": {
         "customPath": "bin/phpunit"
