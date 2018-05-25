@@ -2,15 +2,28 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box;
 
 use InvalidArgumentException;
 use Phar;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @coversNothing
+ */
 class FunctionsTest extends TestCase
 {
-    public function test_it_can_provide_the_PHARs_algorithms()
+    public function test_it_can_provide_the_PHARs_algorithms(): void
     {
         $expected = [
             'GZ' => Phar::GZ,
@@ -25,8 +38,10 @@ class FunctionsTest extends TestCase
 
     /**
      * @dataProvider providePharCompressionAlgorithm
+     *
+     * @param mixed $expected
      */
-    public function test_it_can_provide_the_PHARs_algorithm_extensions(int $algorithm, $expected)
+    public function test_it_can_provide_the_PHARs_algorithm_extensions(int $algorithm, $expected): void
     {
         try {
             $actual = get_phar_compression_algorithm_extension($algorithm);
@@ -47,7 +62,7 @@ class FunctionsTest extends TestCase
     /**
      * @dataProvider provideBytes
      */
-    public function test_it_can_format_bytes(int $bytes, string $expected)
+    public function test_it_can_format_bytes(int $bytes, string $expected): void
     {
         $actual = format_size($bytes);
 
@@ -57,7 +72,7 @@ class FunctionsTest extends TestCase
     /**
      * @dataProvider provideMemory
      */
-    public function test_it_can_convet_a_memory_limit_amount_to_bytes(string $memory, int $expected)
+    public function test_it_can_convet_a_memory_limit_amount_to_bytes(string $memory, int $expected): void
     {
         $actual = memory_to_bytes($memory);
 

@@ -16,7 +16,6 @@ namespace KevinGH\Box;
 
 use Assert\Assertion;
 use BadMethodCallException;
-use Closure;
 use Countable;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Composer\ComposerOrchestrator;

@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Json;
 
 use Assert\Assertion;
-use Exception;
 use Throwable;
 use UnexpectedValueException;
 

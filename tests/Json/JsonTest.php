@@ -2,19 +2,28 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Json;
 
 use Assert\Assertion;
+use KevinGH\Box\Test\FileSystemTestCase;
+use PHPUnit\Framework\AssertionFailedError;
+use Seld\JsonLint\ParsingException;
+use stdClass;
+use Throwable;
 use function get_class;
 use function is_object;
 use function json_decode;
 use function KevinGH\Box\FileSystem\dump_file;
-use KevinGH\Box\Test\FileSystemTestCase;
-use PHPUnit\Framework\AssertionFailedError;
-use PHPUnit\Framework\TestCase;
-use Seld\JsonLint\ParsingException;
-use stdClass;
-use Throwable;
 
 /**
  * @covers \KevinGH\Box\Json\Json
@@ -40,7 +49,7 @@ class JsonTest extends FileSystemTestCase
     /**
      * @dataProvider provideJsonToLint
      */
-    public function test_it_can_lint_a_json_string(string $json, ?Throwable $expectedThrowable)
+    public function test_it_can_lint_a_json_string(string $json, ?Throwable $expectedThrowable): void
     {
         try {
             $this->json->lint($json);
@@ -64,8 +73,10 @@ class JsonTest extends FileSystemTestCase
 
     /**
      * @dataProvider provideJsonToDecode
+     *
+     * @param mixed $expected
      */
-    public function test_it_can_decode_a_json_string(string $json, bool $assoc, $expected, ?Throwable $expectedThrowable)
+    public function test_it_can_decode_a_json_string(string $json, bool $assoc, $expected, ?Throwable $expectedThrowable): void
     {
         if (null === $expected) {
             Assertion::notNull($expectedThrowable);
@@ -99,7 +110,7 @@ class JsonTest extends FileSystemTestCase
         }
     }
 
-    public function test_it_can_decode_a_file()
+    public function test_it_can_decode_a_file(): void
     {
         dump_file('data.json', '{}');
 
@@ -125,9 +136,10 @@ class JsonTest extends FileSystemTestCase
         }
     }
 
-    public function test_it_can_validate_a_file_against_a_schema()
+    public function test_it_can_validate_a_file_against_a_schema(): void
     {
-        $schema = json_decode(<<<'JSON'
+        $schema = json_decode(
+            <<<'JSON'
 {
     "description": "Schema description",
     "properties": {
@@ -208,7 +220,7 @@ Parse error on line 1:
 ^
 Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
 EOF
-            )
+            ),
         ];
     }
 
@@ -236,7 +248,7 @@ JSON
                     'far' => [],
                 ],
             ],
-            null
+            null,
         ];
 
         yield [
@@ -260,7 +272,7 @@ JSON
 
                 return $data;
             })(),
-            null
+            null,
         ];
 
         yield [
@@ -274,21 +286,21 @@ Parse error on line 1:
 ^
 Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
 EOF
-            )
+            ),
         ];
 
         yield [
             mb_convert_encoding('ü', 'latin1', 'auto'),
             true,
             null,
-            new ParsingException('JSON decoding failed: Malformed UTF-8 characters, possibly incorrectly encoded')
+            new ParsingException('JSON decoding failed: Malformed UTF-8 characters, possibly incorrectly encoded'),
         ];
 
         yield [
             "\xEF\xBB\xBF".'{"foo": "bar"}',
             true,
             null,
-            new ParsingException('BOM detected, make sure your input does not include a Unicode Byte-Order-Mark')
+            new ParsingException('BOM detected, make sure your input does not include a Unicode Byte-Order-Mark'),
         ];
     }
 }

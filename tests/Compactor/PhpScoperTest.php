@@ -16,7 +16,6 @@ namespace KevinGH\Box;
 
 use Error;
 use KevinGH\Box\Compactor\PhpScoper;
-use KevinGH\Box\PhpScoper\FakePhpScoper;
 use KevinGH\Box\PhpScoper\FakeScoper;
 use KevinGH\Box\PhpScoper\Scoper;
 use PHPUnit\Framework\TestCase;

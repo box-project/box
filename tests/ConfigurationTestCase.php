@@ -19,8 +19,6 @@ use KevinGH\Box\Test\FileSystemTestCase;
 use stdClass;
 use function file_put_contents;
 use function KevinGH\Box\FileSystem\make_path_absolute;
-use function natcasesort;
-use const DIRECTORY_SEPARATOR;
 
 abstract class ConfigurationTestCase extends FileSystemTestCase
 {

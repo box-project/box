@@ -14,18 +14,14 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use function array_map;
 use DirectoryIterator;
 use Generator;
 use InvalidArgumentException;
-use function iterator_to_array;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Console\DisplayNormalizer;
-use function KevinGH\Box\FileSystem\file_contents;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
 use PharFileInfo;
-use function str_replace;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
@@ -33,13 +29,16 @@ use Symfony\Component\Process\PhpExecutableFinder;
 use Traversable;
 use function file_get_contents;
 use function file_put_contents;
+use function iterator_to_array;
 use function KevinGH\Box\FileSystem\dump_file;
+use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\mirror;
 use function KevinGH\Box\FileSystem\rename;
 use function preg_match;
 use function preg_replace;
 use function sort;
 use function sprintf;
+use function str_replace;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Compile

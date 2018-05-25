@@ -17,13 +17,13 @@ namespace KevinGH\Box\Composer;
 use Composer\Factory;
 use Composer\IO\NullIO;
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
-use const PHP_EOL;
 use RuntimeException;
-use function str_replace;
 use Throwable;
+use const PHP_EOL;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
 use function preg_replace;
+use function str_replace;
 
 /**
  * @private

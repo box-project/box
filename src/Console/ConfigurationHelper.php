@@ -19,7 +19,6 @@ use KevinGH\Box\Json\Json;
 use KevinGH\Box\Throwable\Exception\NoConfigurationFound;
 use stdClass;
 use Symfony\Component\Console\Helper\Helper;
-use function KevinGH\Box\FileSystem\is_absolute_path;
 
 /**
  * @private

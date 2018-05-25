@@ -2,16 +2,26 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Composer;
 
+use KevinGH\Box\Test\FileSystemTestCase;
+use RuntimeException;
+use Symfony\Component\Finder\Finder;
 use function Humbug\get_contents;
 use function iterator_to_array;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\mirror;
-use KevinGH\Box\Test\FileSystemTestCase;
 use function preg_replace;
-use RuntimeException;
-use Symfony\Component\Finder\Finder;
 
 /**
  * @covers \KevinGH\Box\Composer\ComposerOrchestrator
@@ -28,8 +38,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
         array $whitelist,
         string $prefix,
         string $expectedAutoloadContents
-    ): void
-    {
+    ): void {
         dump_file('composer.json', '{}');
 
         ComposerOrchestrator::dumpAutoload($whitelist, $prefix);
@@ -87,8 +96,7 @@ PHP
     public function test_it_cannot_dump_the_autoloader_with_an_invalid_composer_json(
         array $whitelist,
         string $prefix
-    ): void
-    {
+    ): void {
         mirror(self::FIXTURES.'/dir000', $this->tmp);
 
         dump_file('composer.json', '');
@@ -105,7 +113,7 @@ PHP
         }
     }
 
-    public function test_it_can_dump_the_autoloader_with_a_composer_json_with_a_dependency()
+    public function test_it_can_dump_the_autoloader_with_a_composer_json_with_a_dependency(): void
     {
         mirror(self::FIXTURES.'/dir000', $this->tmp);
 
@@ -174,8 +182,7 @@ PHP
     public function test_it_cannot_dump_the_autoloader_if_the_composer_json_file_is_missing(
         array $whitelist,
         string $prefix
-    ): void
-    {
+    ): void {
         try {
             ComposerOrchestrator::dumpAutoload($whitelist, $prefix);
 
@@ -195,8 +202,7 @@ PHP
         array $whitelist,
         string $prefix,
         string $expectedAutoloadContents
-    ): void
-    {
+    ): void {
         mirror(self::FIXTURES.'/dir001', $this->tmp);
 
         ComposerOrchestrator::dumpAutoload($whitelist, $prefix);
@@ -270,8 +276,7 @@ PHP
         array $whitelist,
         string $prefix,
         string $expectedAutoloadContents
-    ): void
-    {
+    ): void {
         mirror(self::FIXTURES.'/dir002', $this->tmp);
 
         ComposerOrchestrator::dumpAutoload($whitelist, $prefix);

@@ -2,11 +2,21 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\RequirementChecker;
 
-use function array_column;
 use Phar;
 use PHPUnit\Framework\TestCase;
+use function array_column;
 
 /**
  * @covers \KevinGH\Box\RequirementChecker\RequirementsDumper
@@ -21,8 +31,7 @@ class RequirementsDumperTest extends TestCase
         array $decodedComposerLockContents,
         ?int $compressionAlgorithm,
         string $expectedRequirement
-    ): void
-    {
+    ): void {
         $checkFiles = RequirementsDumper::dump($decodedComposerJsonContents, $decodedComposerLockContents, $compressionAlgorithm);
 
         $expectedFiles = [
@@ -92,7 +101,7 @@ PHP
                             'ext-json' => '*',
                         ],
                     ],
-                ]
+                ],
             ],
             Phar::GZ,
             <<<'PHP'

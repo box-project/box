@@ -2,21 +2,29 @@
 
 declare(strict_types=1);
 
-namespace KevinGH\Box\Json;
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
+namespace KevinGH\Box\Json;
 
 use Error;
 use InvalidArgumentException;
-use function KevinGH\Box\FileSystem\dump_file;
 use KevinGH\Box\Test\FileSystemTestCase;
-use PHPUnit\Framework\TestCase;
+use function KevinGH\Box\FileSystem\dump_file;
 
 /**
  * @covers \KevinGH\Box\Json\JsonValidationException
  */
 class JsonValidationExceptionTest extends FileSystemTestCase
 {
-    public function test_it_cannot_be_created_with_a_non_existent_file()
+    public function test_it_cannot_be_created_with_a_non_existent_file(): void
     {
         try {
             new JsonValidationException('message', 'unknown file');
@@ -30,7 +38,7 @@ class JsonValidationExceptionTest extends FileSystemTestCase
         }
     }
 
-    public function test_it_cannot_be_created_with_a_non_valid_errors()
+    public function test_it_cannot_be_created_with_a_non_valid_errors(): void
     {
         try {
             new JsonValidationException('message', null, [false]);
@@ -44,7 +52,7 @@ class JsonValidationExceptionTest extends FileSystemTestCase
         }
     }
 
-    public function test_it_cannot_be_instantiated()
+    public function test_it_cannot_be_instantiated(): void
     {
         $message = 'my message';
 

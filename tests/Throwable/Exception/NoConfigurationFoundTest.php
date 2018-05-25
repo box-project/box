@@ -2,6 +2,16 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Throwable\Exception;
 
 use Error;
@@ -12,7 +22,7 @@ use PHPUnit\Framework\TestCase;
  */
 class NoConfigurationFoundTest extends TestCase
 {
-    public function test_it_can_be_created_with_a_default_error_message()
+    public function test_it_can_be_created_with_a_default_error_message(): void
     {
         $exception = new NoConfigurationFound();
 
@@ -24,7 +34,7 @@ class NoConfigurationFoundTest extends TestCase
         $this->assertNull($exception->getPrevious());
     }
 
-    public function test_it_can_be_created_with_overridden_values()
+    public function test_it_can_be_created_with_overridden_values(): void
     {
         $message = 'My message';
         $code = 120;
