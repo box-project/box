@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use DirectoryIterator;
+use function extension_loaded;
 use Generator;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
@@ -966,10 +967,15 @@ OUTPUT;
             ]
         );
 
+        $xdebugLog = extension_loaded('xdebug')
+            ? '[debug] The xdebug extension is loaded (2.6.0)
+[debug] No restart (BOX_ALLOW_XDEBUG=1)'
+            : '[debug] The xdebug extension is not loaded'
+        ;
+
         $expected = <<<OUTPUT
 [debug] Checking BOX_ALLOW_XDEBUG
-[debug] The xdebug extension is loaded (2.6.0)
-[debug] No restart (BOX_ALLOW_XDEBUG=1)
+$xdebugLog
 
     ____
    / __ )____  _  __
