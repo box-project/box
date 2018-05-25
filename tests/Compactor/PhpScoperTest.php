@@ -16,6 +16,7 @@ namespace KevinGH\Box;
 
 use Error;
 use KevinGH\Box\Compactor\PhpScoper;
+use KevinGH\Box\PhpScoper\FakeScoper;
 use KevinGH\Box\PhpScoper\Scoper;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -72,5 +73,14 @@ JSON;
         $actual = $compactor->compact($file, $contents);
 
         $this->assertSame($contents, $actual);
+    }
+
+    public function test_it_exposes_the_scoper(): void
+    {
+        $scoper = new FakeScoper();
+
+        $compactor = new PhpScoper($scoper);
+
+        $this->assertSame($scoper, $compactor->getScoper());
     }
 }

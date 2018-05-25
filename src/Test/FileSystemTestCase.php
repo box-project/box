@@ -61,4 +61,27 @@ abstract class FileSystemTestCase extends TestCase
 
         remove($this->tmp);
     }
+
+    /**
+     * @param string[] $files
+     *
+     * @return string[] File real paths relative to the current temporary directory
+     */
+    final protected function normalizePaths(array $files): array
+    {
+        $root = $this->tmp;
+
+        $files = array_values(
+            array_map(
+                function (string $file) use ($root): string {
+                    return str_replace($root.DIRECTORY_SEPARATOR, '', $file);
+                },
+                $files
+            )
+        );
+
+        natcasesort($files);
+
+        return array_values($files);
+    }
 }

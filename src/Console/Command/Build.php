@@ -17,8 +17,8 @@ namespace KevinGH\Box\Console\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use function trigger_error;
 use const E_USER_DEPRECATED;
+use function trigger_error;
 
 /**
  * @deprecated

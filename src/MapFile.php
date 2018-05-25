@@ -48,7 +48,7 @@ final class MapFile
             }
         }
 
-        return null;
+        return $path;
     }
 
     public function getMap(): array

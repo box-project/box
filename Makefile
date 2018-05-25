@@ -52,7 +52,8 @@ tu: tu_requirement_checker tu_box
 
 .PHONY: tu_box
 tu_box:			 ## Run the unit tests
-tu_box: bin/phpunit fixtures/default_stub.php .requirement-checker
+TU_BOX_DEPS = bin/phpunit fixtures/default_stub.php .requirement-checker fixtures/composer-dump/dir001/vendor
+tu_box: $(TU_BOX_DEPS)
 	$(PHPNOGC) bin/phpunit
 
 .PHONY: tu_requirement_checker
@@ -69,7 +70,7 @@ tc: bin/phpunit
 
 .PHONY: tm
 tm:			 ## Run Infection
-tm:	bin/phpunit fixtures/default_stub.php tu_requirement_checker .requirement-checker
+tm:	$(TU_BOX_DEPS)
 	$(PHPNOGC) bin/infection
 
 .PHONY: e2e
@@ -162,6 +163,14 @@ requirement-checker/vendor: requirement-checker/composer.json
 
 vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer: vendor/bamarni
 	composer bin php-cs-fixer install
+	touch $@
+
+fixtures/composer-dump/dir001/composer.lock:	fixtures/composer-dump/dir001/composer.json
+	composer install --working-dir fixtures/composer-dump/dir001
+	touch $@
+
+fixtures/composer-dump/dir001/vendor:	fixtures/composer-dump/dir001/composer.lock
+	composer install --working-dir fixtures/composer-dump/dir001
 	touch $@
 
 .PHONY: fixtures/default_stub.php

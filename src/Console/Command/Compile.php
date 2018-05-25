@@ -451,8 +451,8 @@ EOF
         );
 
         $checkFiles = RequirementsDumper::dump(
-            $config->getComposerJsonDecodedContents() ?? [],
-            $config->getComposerLockDecodedContents() ?? [],
+            $config->getDecodedComposerJsonContents() ?? [],
+            $config->getDecodedComposerLockContents() ?? [],
             $config->getCompressionAlgorithm()
         );
 
@@ -553,7 +553,7 @@ EOF
         if ($config->excludeComposerFiles()) {
             $box->removeComposerArtefacts(
                 ComposerConfiguration::retrieveVendorDir(
-                    $config->getComposerJsonDecodedContents() ?? []
+                    $config->getDecodedComposerJsonContents() ?? []
                 )
             );
         }

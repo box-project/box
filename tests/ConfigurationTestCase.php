@@ -19,8 +19,6 @@ use KevinGH\Box\Test\FileSystemTestCase;
 use stdClass;
 use function file_put_contents;
 use function KevinGH\Box\FileSystem\make_path_absolute;
-use function natcasesort;
-use const DIRECTORY_SEPARATOR;
 
 abstract class ConfigurationTestCase extends FileSystemTestCase
 {
@@ -68,29 +66,6 @@ abstract class ConfigurationTestCase extends FileSystemTestCase
     final protected function isWindows(): bool
     {
         return false === strpos(strtolower(PHP_OS), 'darwin') && false !== strpos(strtolower(PHP_OS), 'win');
-    }
-
-    /**
-     * @param string[] $files
-     *
-     * @return string[] File real paths relative to the current temporary directory
-     */
-    final protected function normalizeConfigPaths(array $files): array
-    {
-        $root = $this->tmp;
-
-        $files = array_values(
-            array_map(
-                function (string $file) use ($root): string {
-                    return str_replace($root.DIRECTORY_SEPARATOR, '', $file);
-                },
-                $files
-            )
-        );
-
-        natcasesort($files);
-
-        return array_values($files);
     }
 
     final protected function getNoFileConfig(): Configuration

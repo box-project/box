@@ -25,14 +25,15 @@ use KevinGH\Box\Json\JsonValidationException;
 use Phar;
 use Seld\JsonLint\ParsingException;
 use stdClass;
+use const DIRECTORY_SEPARATOR;
 use function file_put_contents;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
-use const DIRECTORY_SEPARATOR;
 
 /**
  * @covers \KevinGH\Box\Configuration
+ * @covers \KevinGH\Box\MapFile
  */
 class ConfigurationTest extends ConfigurationTestCase
 {
@@ -233,10 +234,10 @@ EOF
         $this->reloadConfig();
 
         $this->assertSame($expectedJson, $this->config->getComposerJson());
-        $this->assertSame($expectedJsonContents, $this->config->getComposerJsonDecodedContents());
+        $this->assertSame($expectedJsonContents, $this->config->getDecodedComposerJsonContents());
 
         $this->assertSame($expectedLock, $this->config->getComposerLock());
-        $this->assertSame($expectedLockContents, $this->config->getComposerLockDecodedContents());
+        $this->assertSame($expectedLockContents, $this->config->getDecodedComposerLockContents());
     }
 
     public function test_it_throws_an_error_when_a_composer_file_is_found_but_invalid(): void
@@ -702,31 +703,19 @@ JSON
         }
     }
 
-    public function test_get_map(): void
+    public function test_there_is_no_file_map_configured_by_default(): void
     {
-        $this->assertSame([], $this->config->getMap());
-    }
+        $mapFile = $this->config->getFileMapper();
 
-    public function test_configure_map(): void
-    {
-        $this->setConfig([
-            'files' => [self::DEFAULT_FILE],
-            'map' => [
-                ['a' => 'b'],
-                ['_empty_' => 'c'],
-            ],
-        ]);
+        $this->assertSame([], $mapFile->getMap());
 
         $this->assertSame(
-            [
-                ['a' => 'b'],
-                ['' => 'c'],
-            ],
-            $this->config->getMap()
+            'first/test/path/sub/path/file.php',
+            $mapFile('first/test/path/sub/path/file.php')
         );
     }
 
-    public function test_get_mapper(): void
+    public function test_the_file_map_can_be_configured(): void
     {
         $this->setConfig([
             'files' => [self::DEFAULT_FILE],
@@ -737,6 +726,14 @@ JSON
         ]);
 
         $mapFile = $this->config->getFileMapper();
+
+        $this->assertSame(
+            [
+                ['first/test/path' => 'a'],
+                ['' => 'b'],
+            ],
+            $mapFile->getMap()
+        );
 
         $this->assertSame(
             'a/sub/path/file.php',

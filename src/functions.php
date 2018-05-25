@@ -20,6 +20,7 @@ use function array_key_exists;
 use function constant;
 use function define;
 use function defined;
+use function sprintf;
 
 /**
  * TODO: this function should be pushed down to the PHAR extension.
@@ -48,7 +49,10 @@ function get_phar_compression_algorithm_extension(int $algorithm): ?string
         Phar::NONE => null,
     ];
 
-    Assertion::true(array_key_exists($algorithm, $extensions));
+    Assertion::true(
+        array_key_exists($algorithm, $extensions),
+        sprintf('Unknown compression algorithm code "%d"', $algorithm)
+    );
 
     return $extensions[$algorithm];
 }

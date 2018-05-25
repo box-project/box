@@ -19,7 +19,6 @@ use KevinGH\Box\Json\Json;
 use KevinGH\Box\Throwable\Exception\NoConfigurationFound;
 use stdClass;
 use Symfony\Component\Console\Helper\Helper;
-use function KevinGH\Box\FileSystem\is_absolute_path;
 
 /**
  * @private
@@ -64,23 +63,6 @@ final class ConfigurationHelper extends Helper
         }
 
         $json = $this->json->decodeFile($file);
-
-        // Include imports
-        if (isset($json->import)) {
-            if (!is_absolute_path($json->import)) {
-                $json->import = implode(
-                    [
-                        dirname($file),
-                        $json->import,
-                    ]
-                );
-            }
-
-            $json = (object) array_merge(
-                (array) $this->json->decodeFile($json->import),
-                (array) $json
-            );
-        }
 
         $this->json->validate(
             $file,
