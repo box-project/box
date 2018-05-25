@@ -24,9 +24,9 @@
                 <file>src/functions.php</file>
                 <file>src/Console/Command/Build.php</file>
                 <file>src/Console/Command/ChangeableWorkingDirectory.php</file>
+                <file>src/PhpSettingsHandler.php</file>
                 <directory>src/Console/Logger</directory>
                 <directory>src/FileSystem</directory>
-                <directory>src/PhpSettingsHandler</directory>
                 <directory>src/Test</directory>
             </exclude>
         </whitelist>
