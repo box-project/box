@@ -1344,7 +1344,7 @@ KevinGH\Box\Configuration {#140
 EOF
             ,
             preg_replace(
-                '/inode: \d{8,}/',
+                '/inode: \d+/',
                 'inode: 33452869',
                 preg_replace(
                     '/([a-z]Time): \d{4,}-\d{2,}-\d{2,} \d{2,}:\d{2,}:\d{2,}/',
