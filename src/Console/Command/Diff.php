@@ -1,0 +1,101 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+namespace KevinGH\Box\Console\Command;
+
+use Exception;
+use KevinGH\Box\Json\JsonValidationException;
+use ParagonIE\Pharaoh\Pharaoh;
+use ParagonIE\Pharaoh\PharDiff;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+
+/**
+ * @private
+ */
+final class Diff extends Command
+{
+    private const FIRST_PHAR_ARG = 'pharA';
+    private const SECOND_PHAR_ARG = 'pharB';
+
+    private const GNU_DIFF_OPTION = 'gnu-diff';
+    private const CHECK_OPTION = 'check';
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function configure(): void
+    {
+        parent::configure();
+
+        $this->setName('diff');
+        $this->setDescription('Display the differences between all of the files in two PHARs');
+
+        $this->addArgument(
+            self::FIRST_PHAR_ARG,
+            InputArgument::OPTIONAL,
+            'The first PHAR'
+        );
+        $this->addArgument(
+            self::SECOND_PHAR_ARG,
+            InputArgument::OPTIONAL,
+            'The second PHAR'
+        );
+
+        $this->addOption(
+            self::GNU_DIFF_OPTION,
+            'd',
+            InputOption::VALUE_NONE,
+            'Displays a GNU diff instead of the default git diff'
+        );
+        $this->addOption(
+            self::CHECK_OPTION,
+            'c',
+            InputOption::VALUE_OPTIONAL,
+            'Verify the authenticity of the contents between the two PHARs with the given hash function.',
+            'sha384'
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $phars = [
+            new Pharaoh($input->getArgument(self::FIRST_PHAR_ARG)),
+            new Pharaoh($input->getArgument(self::SECOND_PHAR_ARG)),
+        ];
+
+        $diff = new PharDiff(...$phars);
+
+        if ($output->isVerbose()) {
+            $diff->setVerbose(true);
+        }
+
+        if ($input->hasParameterOption(['-c', '--check'])) {
+            return $diff->listChecksums($input->getOption(self::CHECK_OPTION) ?? 'sha384');
+        }
+
+        if ($input->getOption(self::GNU_DIFF_OPTION)) {
+            return $diff->printGnuDiff();
+        }
+
+        return $diff->printGitDiff();
+    }
+}
