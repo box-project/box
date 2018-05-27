@@ -14,22 +14,26 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use Exception;
-use KevinGH\Box\Json\JsonValidationException;
+use Assert\Assertion;
 use ParagonIE\Pharaoh\Pharaoh;
 use ParagonIE\Pharaoh\PharDiff;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Throwable;
+use function array_map;
+use function KevinGH\Box\FileSystem\remove;
 
 /**
  * @private
  */
 final class Diff extends Command
 {
+    use CreateTemporaryPharFile;
+
     private const FIRST_PHAR_ARG = 'pharA';
     private const SECOND_PHAR_ARG = 'pharB';
 
@@ -77,15 +81,50 @@ final class Diff extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $phars = [
-            new Pharaoh($input->getArgument(self::FIRST_PHAR_ARG)),
-            new Pharaoh($input->getArgument(self::SECOND_PHAR_ARG)),
+        $io = new SymfonyStyle($input, $output);
+
+        $paths = [
+            $input->getArgument(self::FIRST_PHAR_ARG),
+            $input->getArgument(self::SECOND_PHAR_ARG),
         ];
 
-        $diff = new PharDiff(...$phars);
+        Assertion::allFile($paths);
 
-        if ($output->isVerbose()) {
+        $tmpFiles = [];
+
+        try {
+            $diff = new PharDiff(
+                ...array_map(
+                    function (string $path) use (&$tmpFiles): Pharaoh {
+                        $path = false !== realpath($path) ? realpath($path) : $path;
+
+                        $tmpPath = $this->createTemporaryPhar($path);
+
+                        if ($path !== $tmpPath) {
+                            $tmpFiles[] = $tmpPath;
+                        }
+
+                        return new Pharaoh($tmpPath);
+                    },
+                    $paths
+                )
+            );
             $diff->setVerbose(true);
+        } catch (Throwable $throwable) {
+            if ($output->isDebug()) {
+                throw $throwable;
+            }
+
+            $io->writeln(
+                sprintf(
+                    '<error>Could not check the PHARs: %s</error>',
+                    $throwable->getMessage()
+                )
+            );
+
+            return 1;
+        } finally {
+            remove($tmpFiles);
         }
 
         if ($input->hasParameterOption(['-c', '--check'])) {

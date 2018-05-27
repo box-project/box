@@ -104,8 +104,9 @@ Options:
   -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 
 Available commands:
-  build     Builds a new PHAR
+  build     Builds a new PHAR (deprecated, use "compile" instead)
   compile   Compile an application into a PHAR
+  diff      Display the differences between all of the files in two PHARs
   help      Displays help for a command
   info      Displays information about the PHAR extension or file
   list      Lists commands
