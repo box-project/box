@@ -566,7 +566,7 @@ The following compactors are included with Box:
 
 - `KevinGH\Box\Compactor\Json`: compress JSON files
 - `KevinGH\Box\Compactor\Php`: strip down classes from phpdocs & comments
-- `KevinGH\Box\Compactor\PhpScoper`: isolate the code using [PhpScoper][phpscoper]
+- `KevinGH\Box\Compactor\PhpScoper`: isolate the code using [PHP-Scoper][phpscoper]
 
 ### Annotations (`annotations`)
 
@@ -682,7 +682,7 @@ The replacements (`object`) setting is a map of placeholders and their values. T
 // TODO: add better/more comprehensive links on how to use placeholders
 
 The replacement sigil (`string`, default `@`) is the character used to delimit the placeholders. See the
-[replacement][replacement] setting for examples of placeholders.
+[replacements][replacements] setting for examples of placeholders.
 
 
 ### Datetime placeholder (`datetime`)
@@ -757,61 +757,62 @@ The short commit hash will only be used if no tag is available.
 « [Installation](installation.md) • [Requirement Checker](requirement-checker.md) »
 
 
-[alias]: #alias-alias
-[base-path]: #base-path-base-path
-[output]: #output-output
-[main]: #main-main
-[including-files]: #including-files
-[files]: #files-files-and-files-bin
-[directories]: #directories-directories-and-directories-bin
-[finder]: #finder-finder-and-finder-bin
-[blacklist]: #blacklist-blacklist
-[stub]: #stub
-[stub-stub]: #stub-stub
-[shebang]: #shebang-shebang
-[banner]: #banner-banner
-[banner-file]: #banner-file-banner-file
-[phar class]: https://secure.php.net/manual/en/class.phar.php
-[phar.mapphar]: https://secure.php.net/manual/en/phar.mapphar.php
-[phar.setalias]: https://secure.php.net/manual/en/phar.setalias.php
-[phar.webphar]: https://secure.php.net/manual/en/phar.webphar.php
-[phar.fileformat.stub]: https://secure.php.net/manual/en/phar.fileformat.stub.php
-[phar.interceptfilefuncs]: https://secure.php.net/manual/en/phar.interceptfilefuncs.php
-[phar.setsignaturealgorithm]: https://secure.php.net/manual/en/phar.setsignaturealgorithm.php
-[phar.compress]: https://secure.php.net/manual/en/phar.compress.php
-[phar.getmetadata]: htthttps://secure.php.net/manual/en/phar.getmetadata.php
-[symfony-finder]: https://symfony.com/doc/current//components/finder.html
-[phpscoper]: https://github.com/humbug/php-scoper
-[dump-autoload]: #dumping-the-composer-autoloader-dump-autoload
-[compactors]: #compactors-compactors
-[permissions]: #permissions-chmod
-[compression]: #compression-algorithm-compression
+[PHAR code isolation]: code-isolation.md#phar-code-isolation
 [algorithm]: #signing-algorithm-algorithm
-[metadata]: #metadata-metadata
+[alias]: #alias-alias
+[annotations-compactor]: #annotations-annotations
+[banner-file]: #banner-file-banner-file
+[banner]: #banner-banner
+[base-path]: #base-path-base-path
+[blacklist]: #blacklist-blacklist
+[bz2-extension]: https://secure.php.net/manual/en/book.bzip2.php
 [check-requirements]: #check-requirements-check-requirements
+[compactors]: #compactors-compactors
 [composer-bin]: https://getcomposer.org/doc/04-schema.md#bin
 [composer-classmap-authoritative]: https://getcomposer.org/doc/articles/autoloader-optimization.md#optimization-level-2-a-authoritative-class-maps
 [composer-no-dev-option]: https://getcomposer.org/doc/03-cli.md#dump-autoload-dumpautoload-
-[zlib-extension]: https://secure.php.net/manual/en/book.zlib.php
-[bz2-extension]: https://secure.php.net/manual/en/book.bzip2.php
-[requirement-checker]: requirement-checker.md#requirements-checker
-[herrera-io/php-annotations]: https://github.com/herrera-io/php-annotations
-[php-scoper-configuration]: https://github.com/humbug/php-scoper#configuration
-[PHAR code isolation]: code-isolation.md#phar-code-isolation
-[php-scoper-official-doc]: https://github.com/humbug/php-scoper
-[php-date-format]: https://secure.php.net/manual/en/function.date.php
-[map]: #map-map
-[annotations-compactor]: #annotations-annotations
-[php-scoper-compactor]: #php-scoper-php-scoper
-[security]: #security
-[key]: #the-private-key-key
-[key-pass]: #the-private-key-password-key-pass
-[placeholders]: #replaceable-placeholders
-[replacements]: #replacements-replacements
-[replacement-sigil]: #replacement-sigil-replacement-sigil
-[datetime–placeholder]: #datetime-placeholder-datetime
+[compression]: #compression-algorithm-compression
 [datetime-placeholder-format]: #datetime-placeholder-format-datetime_format
+[datetime–placeholder]: #datetime-placeholder-datetime
+[directories]: #directories-directories-and-directories-bin
+[dump-autoload]: #dumping-the-composer-autoloader-dump-autoload
+[exclude-composer-files]: #excluding-the-composer-files-exclude-composer-files
+[files]: #files-files-and-files-bin
+[finder]: #finder-finder-and-finder-bin
 [git-commit-placeholder]: #git-commit-placeholder-git-commit
 [git-commit-short]: #short-git-commit-placeholder-git-commit-short
 [git-tag-placeholder]: #git-tag-placeholder-git-tag
 [git-version-placeholder]: #git-version-placeholder-git-version
+[herrera-io/php-annotations]: https://github.com/herrera-io/php-annotations
+[including-files]: #including-files
+[key-pass]: #the-private-key-password-key-pass
+[key]: #the-private-key-key
+[main]: #main-main
+[map]: #map-map
+[metadata]: #metadata-metadata
+[output]: #output-output
+[permissions]: #permissions-chmod
+[phar class]: https://secure.php.net/manual/en/class.phar.php
+[phar.compress]: https://secure.php.net/manual/en/phar.compress.php
+[phar.fileformat.stub]: https://secure.php.net/manual/en/phar.fileformat.stub.php
+[phar.getmetadata]: htthttps://secure.php.net/manual/en/phar.getmetadata.php
+[phar.interceptfilefuncs]: https://secure.php.net/manual/en/phar.interceptfilefuncs.php
+[phar.mapphar]: https://secure.php.net/manual/en/phar.mapphar.php
+[phar.setalias]: https://secure.php.net/manual/en/phar.setalias.php
+[phar.setsignaturealgorithm]: https://secure.php.net/manual/en/phar.setsignaturealgorithm.php
+[phar.webphar]: https://secure.php.net/manual/en/phar.webphar.php
+[php-date-format]: https://secure.php.net/manual/en/function.date.php
+[php-scoper-compactor]: #php-scoper-php-scoper
+[php-scoper-configuration]: https://github.com/humbug/php-scoper#configuration
+[php-scoper-official-doc]: https://github.com/humbug/php-scoper
+[phpscoper]: https://github.com/humbug/php-scoper
+[placeholders]: #replaceable-placeholders
+[replacement-sigil]: #replacement-sigil-replacement-sigil
+[replacements]: #replacements-replacements
+[requirement-checker]: requirement-checker.md#requirements-checker
+[security]: #security
+[shebang]: #shebang-shebang
+[stub-stub]: #stub-stub
+[stub]: #stub
+[symfony-finder]: https://symfony.com/doc/current//components/finder.html
+[zlib-extension]: https://secure.php.net/manual/en/book.zlib.php
