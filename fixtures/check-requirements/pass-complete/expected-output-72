@@ -2,7 +2,7 @@
 Box Requirements Checker
 ========================
 
-> Using PHP 7.2.5
+> Using PHP 7.2.6
 > PHP is using the following php.ini file:
   WARNING: No configuration file (php.ini) used by PHP!
 
