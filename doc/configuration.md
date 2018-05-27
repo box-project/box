@@ -10,6 +10,7 @@
     1. [Directories (`directories` and `directories-bin`)][directories]
     1. [Finder (`finder` and `finder-bin`)][finder]
     1. [Blacklist (`blacklist`)][blacklist]
+    1. [Map (`map`)][map]
 1. [Stub][stub]
     1. [Stub (`stub`)][stub-stub]
     1. [Alias (`alias`)][alias]
@@ -19,14 +20,29 @@
 1. [Dumping the Composer autoloader (`dump-autoload`)][dump-autoload]
 1. [Excluding the Composer files (`exclude-composer-files`)][exclude-composer-files]
 1. [Compactors (`compactors`)][compactors]
+    1. [Annotations (`annotations`)][annotations-compactor]
+    1. [PHP-Scoper (`php-scoper`)][php-scoper-compactor]
 1. [Compression algorithm (`compression`)][compression]
-1. [Signing algorithm (`algorithm`)][algorithm]
+1. [Security][security]
+    1. [Signing algorithm (`algorithm`)][algorithm]
+    1. [The private key (`key`)][key]
+    1. [The private key password (`key-pass`)][key-pass]
 1. [Metadata (`metadata`)][metadata]
+1. [Replaceable placeholders][placeholders]
+    1. [Replacements (`replacements`)][replacements]
+    1. [Replacement sigil (`replacement-sigil`)][replacement-sigil]
+    1. [Datetime placeholder (`datetime`)][datetime–placeholder]
+    1. [Datetime placeholder format (`datetime_format`)][datetime-placeholder-format]
+    1. [Git commit placeholder (`git-commit`)][git-commit-placeholder]
+    1. [Short git commit placeholder (`git-commit-short`)][git-commit-short]
+    1. [Git tag placeholder (`git-tag`)][git-tag-placeholder]
+    1. [Git version placeholder (`git-version`)][git-version-placeholder]
 
 
 // TODO: do not mention when an option is optional but add a red asterix with a foot note for the mandatory
 // fields.
 // TODO: right now this documentation is a copy/paste of the doc from the comment. This needs to be reworked
+// TODO: add a test to keep in sync the type declared here and the one in the schema
 
 The build command will build a new PHAR based on a variety of settings.
 
@@ -42,6 +58,7 @@ The configuration file is a JSON object saved to a file. Note that all settings 
 {
     "algorithm": "?",
     "alias": "?",
+    "annotations": "?",
     "banner": "?",
     "banner-file": "?",
     "base-path": "?",
@@ -60,6 +77,9 @@ The configuration file is a JSON object saved to a file. Note that all settings 
     "files-bin": "?",
     "finder": "?",
     "finder-bin": "?",
+    "git-commit": "?",
+    "git-commit-short": "?",
+    "git-tag": "?",
     "git-version": "?",
     "intercept": "?",
     "key": "?",
@@ -68,8 +88,11 @@ The configuration file is a JSON object saved to a file. Note that all settings 
     "map": "?",
     "metadata": "?",
     "output": "?",
+    "php-scoper": "?",
+    "replacement-sigil": "?",
     "replacements": "?",
-    "shebang": "?"
+    "shebang": "?",
+    "stub": "?"
 }
 ```
 
@@ -270,6 +293,41 @@ project/
 ```
 
 You you want a more granular blacklist leverage the [Finders configuration][finder] instead.
+
+
+### Map (`map`)
+
+// TODO: review this setting + doc, default value...]
+
+The map (`array`) setting is used to change where some (or all) files are stored inside the PHAR. The key is a beginning
+of the relative path that will be matched against the file being added to the PHAR. If the key is a match, the matched 
+segment will be replaced with the value. If the key is empty, the value will be prefixed to all paths (except for those 
+already matched by an earlier key).
+
+For example, with the following configuration excerpt:
+
+```json
+{
+  "map": [
+    { "my/test/path": "src/Test" },
+    { "": "src/Another" }
+  ]
+}
+```
+
+
+with the following files added to the PHAR:
+
+- `my/test/path/file.php`
+- `my/test/path/some/other.php`
+- `my/test/another.php`
+
+
+the above files will be stored with the following paths in the PHAR:
+
+- `src/Test/file.php`
+- `src/Test/some/other.php`
+- `src/Another/my/test/another.php`
 
 
 ## Stub
@@ -510,6 +568,44 @@ The following compactors are included with Box:
 - `KevinGH\Box\Compactor\Php`: strip down classes from phpdocs & comments
 - `KevinGH\Box\Compactor\PhpScoper`: isolate the code using [PhpScoper][phpscoper]
 
+### Annotations (`annotations`)
+
+// TODO: review this setting + doc, default value...]
+
+The annotations (`boolean`|`object`) setting is used to enable compacting annotations in PHP source code. By setting it
+to `true`, all Doctrine-style annotations are compacted in PHP files. You may also specify a list of annotations to 
+ignore, which will be stripped while protecting the remaining annotations:
+
+```json
+{
+    "annotations": {
+        "ignore": [
+            "author",
+            "package",
+            "version",
+            "see"
+        ]
+    }
+}
+```
+
+You may want to see this website for a list of annotations which are commonly ignored on
+[herrera-io/php-annotations][herrera-io/php-annotations]:
+
+Note that this setting is used only if the compactor `KevinGH\Box\Compactor\Php` is registered.
+
+
+### PHP-Scoper (`php-scoper`)
+
+// TODO: review this setting + doc, default value...]
+
+The PHP-Scoper setting (`string`) points to the path to the [PHP-Scoper configuration][php-scoper-configuration] file.
+By default, Box will use the default PHP-Scoper file `php-scoper.inc.php`. For more documentation regarding PHP-Scoper,
+you can head to [PHAR code isolation][PHAR code isolation] or
+[PHP-Scoper official documentation][php-scoper-official-doc].
+
+Note that this setting is used only if the compactor `KevinGH\Box\Compactor\PhpScoper` is registered.
+
 
 ## Compression algorithm (`compression`)
 
@@ -526,11 +622,15 @@ following is a list of the signature algorithms available:
 all.
 
 
-## Signing algorithm (`algorithm`)
+## Security
+
+### Signing algorithm (`algorithm`)
 
 The algorithm (`string`|`null`) setting is the signing algorithm to use when the PHAR is built (
 [`Phar::setSignatureAlgorithm()`][phar.setsignaturealgorithm]). The following is a list of the signature algorithms
 available:
+
+// TODO: review which signing algorithm is recommended or should absolutely not be used
 
 - `MD5`
 - `SHA1`
@@ -538,17 +638,117 @@ available:
 - `SHA512`
 - `OPENSSL`
 
-By default the PHAR is not signed.
+By default PHARs are `SHA1` signed.
 
 
-<br />
-<hr />
+### The private key (`key`)
+
+// TODO: review this setting + doc, default value...]
+
+The key (`string`) setting is used to specify the path to the private key file. The private key file will be used to
+sign the PHAR using the `OPENSSL` signature algorithm (see [Signing algorithm][algorithm]) and the setting will be
+completely ignored otherwise. If an absolute path is not provided, the path will be relative to the current working
+directory.
+
+
+### The private key password (`key-pass`)
+
+// TODO: review this setting + doc, default value...]
+
+The private key password  (`string`|`boolean`) setting is used to specify the pass-phrase for the private key. If a
+string is provided, it will be used as is as the pass-phrase. If `true` is provided, you will be prompted for the
+passphrase.
 
 
 ## Metadata (`metadata`)
 
 The metadata (`any`) setting can be any value. This value will be stored as metadata that can be retrieved from the built PHAR (
 [`Phar::getMetadata()][phar.getmetadata]).
+
+
+## Replaceable placeholders
+
+### Replacements (`replacements`)
+
+// TODO: review this setting + doc, default value...]
+
+The replacements (`object`) setting is a map of placeholders and their values. The placeholders are replaced in all
+[non-binary files][including-files] with the specified values.
+
+
+### Replacement sigil (`replacement-sigil`)
+
+// TODO: review this setting + doc, default value...]
+// TODO: add better/more comprehensive links on how to use placeholders
+
+The replacement sigil (`string`, default `@`) is the character used to delimit the placeholders. See the
+[replacement][replacement] setting for examples of placeholders.
+
+
+### Datetime placeholder (`datetime`)
+
+// TODO: review this setting + doc, default value...]
+
+The datetime (`string`) setting is the name of a placeholder value that will be replaced in all
+[non-binary files][including-files] by the current datetime.
+
+Example: `2015-01-28 14:55:23`
+
+
+### Datetime placeholder format (`datetime_format`)
+
+// TODO: review this setting + doc, default value...]
+
+The datetime format placeholder (`string`) setting accepts a valid [PHP date format][php-date-format]. It can be used to
+change the format for the [`datetime`][datetime–placeholder] setting.
+
+Example: `Y-m-d H:i:s`
+
+
+### Git commit placeholder (`git-commit`)
+
+// TODO: review this setting + doc, default value...]
+
+The git commit (`string`) setting is the name of a placeholder value that will be replaced in all
+[non-binary files][including-files] by the current git commit hash of the repository.
+
+Example: `e558e335f1d165bc24d43fdf903cdadd3c3cbd03`
+
+
+### Short git commit placeholder (`git-commit-short`)
+
+// TODO: review this setting + doc, default value...]
+
+The short git commit (`string`) setting is the name of a placeholder value that will be replaced in all
+[non-binary files][including-files] by the current git short commit hash of the repository.
+
+Example: `e558e33`
+
+
+### Git tag placeholder (`git-tag`)
+
+// TODO: review this setting + doc, default value...]
+
+The git tag placeholder (`string`) setting is the name of a placeholder value that will be replaced in all 
+[non-binary files][including-files] by the current git tag of the repository.
+
+Examples:
+
+- `2.0.0`
+- `2.0.0-2-ge558e33`
+
+
+### Git version placeholder (`git-version`)
+
+// TODO: review this setting + doc, default value...]
+
+The git version (`string`) setting is the name of a placeholder value that will be replaced in all
+[non-binary files][including-files] by the one of the following (in order):
+
+- The git repository's most recent tag.
+- The git repository's current short commit hash.
+
+The short commit hash will only be used if no tag is available.
 
 
 <br />
@@ -595,131 +795,23 @@ The metadata (`any`) setting can be any value. This value will be stored as meta
 [zlib-extension]: https://secure.php.net/manual/en/book.zlib.php
 [bz2-extension]: https://secure.php.net/manual/en/book.bzip2.php
 [requirement-checker]: requirement-checker.md#requirements-checker
-
-
-//TODO: rework the rest
-
-
-
-
-The annotations (boolean, object) setting is used to enable compacting
-annotations in PHP source code. By setting it to true, all Doctrine-style
-annotations are compacted in PHP files. You may also specify a list of
-annotations to ignore, which will be stripped while protecting the remaining
-annotations:
-
-{
-    "annotations": {
-        "ignore": [
-            "author",
-            "package",
-            "version",
-            "see"
-        ]
-    }
-}
-
-You may want to see this website for a list of annotations which are commonly
-ignored:
-
-https://github.com/herrera-io/php-annotations
-
-
-
-
-
-
-
-
-
-
-
-The datetime (string) setting is the name of a placeholder value that will be
-replaced in all non-binary files by the current datetime.
-
-Example: 2015-01-28 14:55:23
-
-The datetime_format (string) setting accepts a valid PHP date format. It can be used to change the format for the datetime setting.
-
-Example: Y-m-d H:i:s
-
-The git-commit (string) setting is the name of a placeholder value that will
-be replaced in all non-binary files by the current Git commit hash of the
-repository.
-
-Example: e558e335f1d165bc24d43fdf903cdadd3c3cbd03
-
-The git-commit-short (string) setting is the name of a placeholder value that
-will be replaced in all non-binary files by the current Git short commit hash
-of the repository.
-
-Example: e558e33
-
-The git-tag (string) setting is the name of a placeholder value that will be
-replaced in all non-binary files by the current Git tag of the repository.
-
-Examples:
-
-- 2.0.0
-- 2.0.0-2-ge558e33
-
-
-The git-version (string) setting is the name of a placeholder value that will
-be replaced in all non-binary files by the one of the following (in order):
-
-- The git repository's most recent tag.
-- The git repository's current short commit hash.
-
-The short commit hash will only be used if no tag is available.
-
-
-
-
-The key (string) setting is used to specify the path to the private key file.
-The private key file will be used to sign the PHAR using the OPENSSL signature
-algorithm. If an absolute path is not provided, the path will be relative to
-the current working directory.
-
-The key-pass (string, boolean) setting is used to specify the passphrase for
-the private key. If a string is provided, it will be used as is as the
-passphrase. If true is provided, you will be prompted for the passphrase.
-
-The map (array) setting is used to change where some (or all) files are stored
-inside the PHAR. The key is a beginning of the relative path that will be
-matched against the file being added to the PHAR. If the key is a match, the
-matched segment will be replaced with the value. If the key is empty, the
-value will be prefixed to all paths (except for those already matched by an
-earlier key).
-
-
-{
-  "map": [
-    { "my/test/path": "src/Test" },
-    { "": "src/Another" }
-  ]
-}
-
-
-(with the files)
-
-
-1. my/test/path/file.php
-2. my/test/path/some/other.php
-3. my/test/another.php
-
-
-(will be stored as)
-
-
-1. src/Test/file.php
-2. src/Test/some/other.php
-3. src/Another/my/test/another.php
-
-
-The replacements (object) setting is a map of placeholders and their values.
-The placeholders are replaced in all non-binary files with the specified
-values.
-
-
-
-
+[herrera-io/php-annotations]: https://github.com/herrera-io/php-annotations
+[php-scoper-configuration]: https://github.com/humbug/php-scoper#configuration
+[PHAR code isolation]: code-isolation.md#phar-code-isolation
+[php-scoper-official-doc]: https://github.com/humbug/php-scoper
+[php-date-format]: https://secure.php.net/manual/en/function.date.php
+[map]: #map-map
+[annotations-compactor]: #annotations-annotations
+[php-scoper-compactor]: #php-scoper-php-scoper
+[security]: #security
+[key]: #the-private-key-key
+[key-pass]: #the-private-key-password-key-pass
+[placeholders]: #replaceable-placeholders
+[replacements]: #replacements-replacements
+[replacement-sigil]: #replacement-sigil-replacement-sigil
+[datetime–placeholder]: #datetime-placeholder-datetime
+[datetime-placeholder-format]: #datetime-placeholder-format-datetime_format
+[git-commit-placeholder]: #git-commit-placeholder-git-commit
+[git-commit-short]: #short-git-commit-placeholder-git-commit-short
+[git-tag-placeholder]: #git-tag-placeholder-git-tag
+[git-version-placeholder]: #git-version-placeholder-git-version
