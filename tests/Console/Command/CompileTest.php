@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use DirectoryIterator;
-use function extension_loaded;
 use Generator;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
@@ -28,6 +27,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Traversable;
+use function extension_loaded;
 use function file_get_contents;
 use function file_put_contents;
 use function iterator_to_array;

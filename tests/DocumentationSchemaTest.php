@@ -2,25 +2,36 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box;
 
+use Assert\Assertion;
+use PHPUnit\Framework\TestCase;
 use function array_diff;
 use function array_filter;
 use function array_merge;
 use function array_unique;
-use Assert\Assertion;
-use function hash_final;
 use function json_decode;
 use function KevinGH\Box\FileSystem\file_contents;
-use PHPUnit\Framework\TestCase;
 use function preg_match;
 use function preg_match_all;
-use const PREG_UNMATCHED_AS_NULL;
 use function sort;
 
+/**
+ * @coversNothing
+ */
 class DocumentationSchemaTest extends TestCase
 {
-    public function test_the_schema_keys_are_ordered_lexicographically()
+    public function test_the_schema_keys_are_ordered_lexicographically(): void
     {
         $schemaKeys = $this->retrieveSchemaKeys();
 
@@ -30,7 +41,7 @@ class DocumentationSchemaTest extends TestCase
         $this->assertSame($expectedKeys, $schemaKeys);
     }
 
-    public function test_the_documentation_schema_is_up_to_date()
+    public function test_the_documentation_schema_is_up_to_date(): void
     {
         $docKeys = $this->retrieveDocSchemaKeys();
         $schemaKeys = $this->retrieveSchemaKeys();
@@ -38,7 +49,7 @@ class DocumentationSchemaTest extends TestCase
         $this->assertSame($schemaKeys, $docKeys);
     }
 
-    public function test_all_the_doc_keys_are_valid()
+    public function test_all_the_doc_keys_are_valid(): void
     {
         $docKeys = $this->retrieveDocKeys();
 
@@ -57,7 +68,7 @@ class DocumentationSchemaTest extends TestCase
         );
     }
 
-    public function test_there_is_a_doc_entry_for_each_schema_key()
+    public function test_there_is_a_doc_entry_for_each_schema_key(): void
     {
         $docKeys = $this->retrieveDocKeys();
 
@@ -106,8 +117,7 @@ class DocumentationSchemaTest extends TestCase
         preg_match_all(
             '/#+ [\p{L}-\s]+\(`(.*?)`(?:[\p{L}-\s]+`(.*?)`)?\)/',
             file_contents(__DIR__.'/../doc/configuration.md'),
-            $matches,
-            PREG_UNMATCHED_AS_NULL
+            $matches
         );
 
         return array_filter(
