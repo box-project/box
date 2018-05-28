@@ -30,6 +30,11 @@ abstract class CommandTestCase extends FileSystemTestCase
     protected $application;
 
     /**
+     * @var CommandTester
+     */
+    protected $commandTester;
+
+    /**
      * @var string the name of the command
      */
     private $name;
@@ -46,6 +51,8 @@ abstract class CommandTestCase extends FileSystemTestCase
         $this->name = $this->getCommand()->getName();
 
         $this->application->add($this->getCommand());
+
+        $this->commandTester = new CommandTester($this->application->get($this->name));
     }
 
     /**
@@ -95,10 +102,5 @@ abstract class CommandTestCase extends FileSystemTestCase
         );
 
         return str_replace(PHP_EOL, "\n", $string);
-    }
-
-    protected function getCommandTester(): CommandTester
-    {
-        return new CommandTester($this->application->get($this->name));
     }
 }
