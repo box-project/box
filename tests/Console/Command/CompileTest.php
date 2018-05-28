@@ -19,6 +19,7 @@ use Generator;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Console\DisplayNormalizer;
+use KevinGH\Box\RequiresPharReadonlyOff;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
 use PharFileInfo;
@@ -48,7 +49,19 @@ use function str_replace;
  */
 class CompileTest extends CommandTestCase
 {
+    use RequiresPharReadonlyOff;
+
     private const FIXTURES_DIR = __DIR__.'/../../../fixtures/build';
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        $this->markAsSkippedIfPharReadonlyIsOn();
+
+        parent::setUp();
+    }
 
     public function test_it_can_build_a_PHAR_file(): void
     {

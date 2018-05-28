@@ -46,6 +46,8 @@ use function realpath;
  */
 class BoxTest extends FileSystemTestCase
 {
+    use RequiresPharReadonlyOff;
+
     /**
      * @var Box
      */
@@ -71,6 +73,8 @@ class BoxTest extends FileSystemTestCase
      */
     protected function setUp(): void
     {
+        $this->markAsSkippedIfPharReadonlyIsOn();
+
         parent::setUp();
 
         $this->box = Box::create('test.phar');
