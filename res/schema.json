@@ -43,10 +43,6 @@
             },
             "type": ["array"]
         },
-        "bootstrap": {
-            "description": "A file used to load third-party class compactors.",
-            "type": "string"
-        },
         "check-requirements": {
             "description": "If enabled, the PHAR will be able to check if the PHP environment used meets all the requirements to run the application.",
             "type": ["boolean"]
@@ -138,10 +134,6 @@
         },
         "git-version": {
             "description": "The replacement name for the current Git tag or commit hash.",
-            "type": "string"
-        },
-        "import": {
-            "description": "The path to a Box configuration file for importing.",
             "type": "string"
         },
         "intercept": {
