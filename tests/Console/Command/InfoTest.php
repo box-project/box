@@ -15,12 +15,11 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use InvalidArgumentException;
-use KevinGH\Box\Console\Application;
 use KevinGH\Box\Console\DisplayNormalizer;
+use KevinGH\Box\Test\CommandTestCase;
 use Phar;
-use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Tester\CommandTester;
 use UnexpectedValueException;
 use function preg_replace;
 use function realpath;
@@ -30,23 +29,16 @@ use function realpath;
  *
  * @runTestsInSeparateProcesses
  */
-class InfoTest extends TestCase
+class InfoTest extends CommandTestCase
 {
     private const FIXTURES = __DIR__.'/../../../fixtures/info';
 
     /**
-     * @var CommandTester
-     */
-    private $commandTester;
-
-    /**
      * {@inheritdoc}
      */
-    public function setUp(): void
+    protected function getCommand(): Command
     {
-        parent::setUp();
-
-        $this->commandTester = new CommandTester((new Application())->get('info'));
+        return new Info();
     }
 
     public function test_it_provides_info_about_the_phar_API(): void
@@ -548,7 +540,6 @@ OUTPUT;
     public function test_it_cannot_accept_an_invalid_depth(): void
     {
         $pharPath = self::FIXTURES.'/tree-phar.phar';
-        $phar = new Phar($pharPath);
 
         try {
             $this->commandTester->execute(

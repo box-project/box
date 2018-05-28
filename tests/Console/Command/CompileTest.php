@@ -19,8 +19,8 @@ use Generator;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Console\DisplayNormalizer;
-use KevinGH\Box\RequiresPharReadonlyOff;
 use KevinGH\Box\Test\CommandTestCase;
+use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
 use PharFileInfo;
 use Symfony\Component\Console\Command\Command;
@@ -63,6 +63,14 @@ class CompileTest extends CommandTestCase
         parent::setUp();
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function getCommand(): Command
+    {
+        return new Compile();
+    }
+
     public function test_it_can_build_a_PHAR_file(): void
     {
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
@@ -98,10 +106,8 @@ class CompileTest extends CommandTestCase
             )
         );
 
-        $commandTester = $this->getCommandTester();
-
-        $commandTester->setInputs(['test']);    // Set input for the passphrase
-        $commandTester->execute(
+        $this->commandTester->setInputs(['test']);    // Set input for the passphrase
+        $this->commandTester->execute(
             ['command' => 'compile'],
             ['interactive' => true]
         );
@@ -156,7 +162,7 @@ Private key passphrase:
 
 OUTPUT;
 
-        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
+        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual, 'Expected logs to be identical');
 
@@ -295,10 +301,8 @@ PHP;
 
         chdir($this->cwd);
 
-        $commandTester = $this->getCommandTester();
-
-        $commandTester->setInputs(['test']);    // Set input for the passphrase
-        $commandTester->execute(
+        $this->commandTester->setInputs(['test']);    // Set input for the passphrase
+        $this->commandTester->execute(
             [
                 'command' => 'compile',
                 '--working-dir' => $this->tmp,
@@ -319,9 +323,7 @@ PHP;
 
         rename('run.php', 'index.php');
 
-        $commandTester = $this->getCommandTester();
-
-        $commandTester->execute(
+        $this->commandTester->execute(
             ['command' => 'compile'],
             ['interactive' => true]
         );
@@ -364,7 +366,7 @@ Building the PHAR "/path/to/tmp/index.phar"
 
 OUTPUT;
 
-        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
+        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual, 'Expected logs to be identical');
 
@@ -481,7 +483,7 @@ PHP;
         Phar::unlinkArchive('index.phar');
         // Executes the compilation again
 
-        $commandTester->execute(
+        $this->commandTester->execute(
             ['command' => 'compile'],
             ['interactive' => true]
         );
@@ -520,9 +522,7 @@ PHP;
             )
         );
 
-        $commandTester = $this->getCommandTester();
-
-        $commandTester->execute(
+        $this->commandTester->execute(
             ['command' => 'compile'],
             ['interactive' => true]
         );
@@ -577,7 +577,7 @@ Building the PHAR "/path/to/tmp/test.phar"
 
 OUTPUT;
 
-        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
+        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual, 'Expected logs to be identical');
 
@@ -675,9 +675,7 @@ PHP;
             )
         );
 
-        $commandTester = $this->getCommandTester();
-
-        $commandTester->execute(
+        $this->commandTester->execute(
             ['command' => 'compile'],
             ['interactive' => true]
         );
@@ -756,10 +754,8 @@ PHP;
             )
         );
 
-        $commandTester = $this->getCommandTester();
-
-        $commandTester->setInputs(['test']);    // Set input for the passphrase
-        $commandTester->execute(
+        $this->commandTester->setInputs(['test']);    // Set input for the passphrase
+        $this->commandTester->execute(
             ['command' => 'compile'],
             [
                 'interactive' => true,
@@ -817,7 +813,7 @@ Private key passphrase:
 
 OUTPUT;
 
-        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
+        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual);
     }
@@ -857,10 +853,8 @@ OUTPUT;
             )
         );
 
-        $commandTester = $this->getCommandTester();
-
-        $commandTester->setInputs(['test']);    // Set input for the passphrase
-        $commandTester->execute(
+        $this->commandTester->setInputs(['test']);    // Set input for the passphrase
+        $this->commandTester->execute(
             ['command' => 'compile'],
             [
                 'interactive' => true,
@@ -924,7 +918,7 @@ OUTPUT;
             (new PhpExecutableFinder())->find(),
             $expected
         );
-        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
+        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual);
     }
@@ -966,10 +960,8 @@ OUTPUT;
 
         $this->assertDirectoryNotExists('.box_dump');
 
-        $commandTester = $this->getCommandTester();
-
-        $commandTester->setInputs(['test']);    // Set input for the passphrase
-        $commandTester->execute(
+        $this->commandTester->setInputs(['test']);    // Set input for the passphrase
+        $this->commandTester->execute(
             [
                 'command' => 'compile',
                 '--debug' => null,
@@ -1044,7 +1036,7 @@ OUTPUT;
             (new PhpExecutableFinder())->find(),
             $expected
         );
-        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
+        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual);
 
@@ -1438,10 +1430,8 @@ EOF;
             )
         );
 
-        $commandTester = $this->getCommandTester();
-
-        $commandTester->setInputs(['test']);
-        $commandTester->execute(
+        $this->commandTester->setInputs(['test']);
+        $this->commandTester->execute(
             ['command' => 'compile'],
             [
                 'interactive' => true,
@@ -1451,7 +1441,7 @@ EOF;
 
         $expected = '';
 
-        $actual = $commandTester->getDisplay(true);
+        $actual = $this->commandTester->getDisplay(true);
 
         $this->assertSame($expected, $actual, 'Expected output logs to be identical');
 
@@ -1517,10 +1507,8 @@ EOF;
             )
         );
 
-        $commandTester = $this->getCommandTester();
-
-        $commandTester->setInputs(['test']);    // Set input for the passphrase
-        $commandTester->execute(
+        $this->commandTester->setInputs(['test']);    // Set input for the passphrase
+        $this->commandTester->execute(
             ['command' => 'compile'],
             ['interactive' => true]
         );
@@ -1584,10 +1572,8 @@ PHP
             )
         );
 
-        $commandTester = $this->getCommandTester();
-
-        $commandTester->setInputs(['test']);    // Set input for the passphrase
-        $commandTester->execute(
+        $this->commandTester->setInputs(['test']);    // Set input for the passphrase
+        $this->commandTester->execute(
             ['command' => 'compile'],
             ['interactive' => true]
         );
@@ -1626,9 +1612,7 @@ PHP
             )
         );
 
-        $commandTester = $this->getCommandTester();
-
-        $commandTester->execute(
+        $this->commandTester->execute(
             ['command' => 'compile'],
             ['interactive' => true]
         );
@@ -1655,10 +1639,8 @@ PHP
             )
         );
 
-        $commandTester = $this->getCommandTester();
-
         try {
-            $commandTester->execute(
+            $this->commandTester->execute(
                 ['command' => 'compile'],
                 [
                     'interactive' => false,
@@ -1679,9 +1661,7 @@ PHP
     {
         mirror(self::FIXTURES_DIR.'/dir002', $this->tmp);
 
-        $commandTester = $this->getCommandTester();
-
-        $commandTester->execute(
+        $this->commandTester->execute(
             ['command' => 'compile'],
             [
                 'interactive' => false,
@@ -1733,7 +1713,7 @@ Box (repo)
 
 OUTPUT;
 
-        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
+        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual);
 
@@ -1750,16 +1730,14 @@ OUTPUT;
 
         rename('run.php', 'index.php');
 
-        $commandTester = $this->getCommandTester();
-
         $this->assertFileNotExists($this->tmp.'/vendor/autoload.php');
 
-        $commandTester->execute(
+        $this->commandTester->execute(
             ['command' => 'compile'],
             ['interactive' => true]
         );
 
-        $output = $this->normalizeDisplay($commandTester->getDisplay(true));
+        $output = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
         $this->assertSame(
             1,
@@ -1790,8 +1768,6 @@ OUTPUT;
 
         rename('run.php', 'index.php');
 
-        $commandTester = $this->getCommandTester();
-
         $this->assertFileNotExists($this->tmp.'/vendor/autoload.php');
 
         file_put_contents(
@@ -1803,12 +1779,12 @@ OUTPUT;
             )
         );
 
-        $commandTester->execute(
+        $this->commandTester->execute(
             ['command' => 'compile'],
             ['interactive' => true]
         );
 
-        $output = $this->normalizeDisplay($commandTester->getDisplay(true));
+        $output = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
         $this->assertSame(
             1,
@@ -1839,16 +1815,14 @@ OUTPUT;
 
         rename('run.php', 'index.php');
 
-        $commandTester = $this->getCommandTester();
-
         $this->assertFileNotExists($this->tmp.'/vendor/autoload.php');
 
-        $commandTester->execute(
+        $this->commandTester->execute(
             ['command' => 'compile'],
             ['interactive' => true]
         );
 
-        $output = $this->normalizeDisplay($commandTester->getDisplay(true));
+        $output = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
         $this->assertSame(
             1,
@@ -1894,16 +1868,14 @@ OUTPUT;
             json_encode(['exclude-composer-files' => false])
         );
 
-        $commandTester = $this->getCommandTester();
-
         $this->assertFileNotExists($this->tmp.'/vendor/autoload.php');
 
-        $commandTester->execute(
+        $this->commandTester->execute(
             ['command' => 'compile'],
             ['interactive' => true]
         );
 
-        $output = $this->normalizeDisplay($commandTester->getDisplay(true));
+        $output = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
         $this->assertSame(
             1,
@@ -1944,8 +1916,7 @@ OUTPUT;
     {
         mirror(self::FIXTURES_DIR.'/dir003', $this->tmp);
 
-        $commandTester = $this->getCommandTester();
-        $commandTester->execute(
+        $this->commandTester->execute(
             [
                 'command' => 'compile',
             ],
@@ -1993,7 +1964,7 @@ Box (repo)
 
 OUTPUT;
 
-        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
+        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual);
 
@@ -2008,8 +1979,7 @@ OUTPUT;
     {
         mirror(self::FIXTURES_DIR.'/dir004', $this->tmp);
 
-        $commandTester = $this->getCommandTester();
-        $commandTester->execute(
+        $this->commandTester->execute(
             ['command' => 'compile'],
             [
                 'interactive' => false,
@@ -2053,7 +2023,7 @@ Box (repo)
 
 OUTPUT;
 
-        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
+        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual);
 
@@ -2068,8 +2038,7 @@ OUTPUT;
     {
         mirror(self::FIXTURES_DIR.'/dir005', $this->tmp);
 
-        $commandTester = $this->getCommandTester();
-        $commandTester->execute(
+        $this->commandTester->execute(
             ['command' => 'compile'],
             [
                 'interactive' => false,
@@ -2118,7 +2087,7 @@ Box (repo)
 
 OUTPUT;
 
-        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
+        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual);
     }
@@ -2138,8 +2107,7 @@ OUTPUT;
 JSON
         );
 
-        $commandTester = $this->getCommandTester();
-        $commandTester->execute(
+        $this->commandTester->execute(
             ['command' => 'compile'],
             [
                 'interactive' => false,
@@ -2183,7 +2151,7 @@ Box (repo)
 
 OUTPUT;
 
-        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
+        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual);
 
@@ -2208,8 +2176,7 @@ OUTPUT;
 JSON
         );
 
-        $commandTester = $this->getCommandTester();
-        $commandTester->execute(
+        $this->commandTester->execute(
             ['command' => 'compile'],
             [
                 'interactive' => false,
@@ -2253,7 +2220,7 @@ Box (repo)
 
 OUTPUT;
 
-        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
+        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual);
 
@@ -2276,8 +2243,7 @@ OUTPUT;
     {
         mirror(self::FIXTURES_DIR.'/dir006', $this->tmp);
 
-        $commandTester = $this->getCommandTester();
-        $commandTester->execute(
+        $this->commandTester->execute(
             ['command' => 'compile'],
             [
                 'interactive' => false,
@@ -2327,7 +2293,7 @@ Box (repo)
 
 OUTPUT;
 
-        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
+        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual);
 
@@ -2347,8 +2313,7 @@ OUTPUT;
     {
         mirror(self::FIXTURES_DIR.'/dir007', $this->tmp);
 
-        $commandTester = $this->getCommandTester();
-        $commandTester->execute(
+        $this->commandTester->execute(
             ['command' => 'compile'],
             [
                 'interactive' => false,
@@ -2397,7 +2362,7 @@ Box (repo)
 
 OUTPUT;
 
-        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
+        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual);
 
@@ -2427,19 +2392,17 @@ OUTPUT;
             )
         );
 
-        $commandTester = $this->getCommandTester();
-
-        $commandTester->execute(
+        $this->commandTester->execute(
             ['command' => 'compile'],
             ['interactive' => true]
         );
 
         $this->assertSame(
             0,
-            $commandTester->getStatusCode(),
+            $this->commandTester->getStatusCode(),
             sprintf(
                 'Expected the command to successfully run. Got: %s',
-                $this->normalizeDisplay($commandTester->getDisplay(true))
+                $this->normalizeDisplay($this->commandTester->getDisplay(true))
             )
         );
 
@@ -2496,8 +2459,7 @@ OUTPUT;
         $boxRawConfig['shebang'] = null;
         file_put_contents('box.json', json_encode($boxRawConfig), JSON_PRETTY_PRINT);
 
-        $commandTester = $this->getCommandTester();
-        $commandTester->execute(
+        $this->commandTester->execute(
             ['command' => 'compile'],
             [
                 'interactive' => false,
@@ -2547,7 +2509,7 @@ Box (repo)
 
 OUTPUT;
 
-        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
+        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual);
 
@@ -2580,8 +2542,7 @@ OUTPUT;
             )
         );
 
-        $commandTester = $this->getCommandTester();
-        $commandTester->execute(
+        $this->commandTester->execute(
             ['command' => 'compile'],
             [
                 'interactive' => false,
@@ -2625,7 +2586,7 @@ Box (repo)
 
 OUTPUT;
 
-        $actual = $this->normalizeDisplay($commandTester->getDisplay(true));
+        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual);
 
@@ -2640,9 +2601,7 @@ OUTPUT;
     {
         mirror(self::FIXTURES_DIR.'/dir009', $this->tmp);
 
-        $commandTester = $this->getCommandTester();
-
-        $commandTester->execute(
+        $this->commandTester->execute(
             [
                 'command' => 'compile',
                 '--no-config' => null,
@@ -2661,9 +2620,7 @@ OUTPUT;
     {
         mirror(self::FIXTURES_DIR.'/dir009', $this->tmp);
 
-        $commandTester = $this->getCommandTester();
-
-        $commandTester->execute(
+        $this->commandTester->execute(
             [
                 'command' => 'compile',
                 '--config' => 'box.json',
@@ -2683,9 +2640,7 @@ OUTPUT;
     {
         mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
 
-        $commandTester = $this->getCommandTester();
-
-        $commandTester->execute(
+        $this->commandTester->execute(
             ['command' => 'compile'],
             ['interactive' => true]
         );
@@ -2721,9 +2676,7 @@ OUTPUT;
 
         rename('scoper-fixed-prefix.inc.php', 'scoper.inc.php', true);
 
-        $commandTester = $this->getCommandTester();
-
-        $commandTester->execute(
+        $this->commandTester->execute(
             ['command' => 'compile'],
             ['interactive' => true]
         );
@@ -2757,14 +2710,6 @@ OUTPUT;
     {
         yield [true];
         yield [false];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getCommand(): Command
-    {
-        return new Compile();
     }
 
     private function normalizeDisplay(string $display)

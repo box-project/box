@@ -31,6 +31,14 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ConfigurableTest extends CommandTestCase
 {
+    /**
+     * {@inheritdoc}
+     */
+    protected function getCommand(): Command
+    {
+        return new TestConfigurable('test');
+    }
+
     public function test_it_has_a_configure_option(): void
     {
         $definition = $this->getCommand()->getDefinition();
@@ -220,13 +228,5 @@ class ConfigurableTest extends CommandTestCase
                 $exception->getMessage()
             );
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getCommand(): Command
-    {
-        return new TestConfigurable('test');
     }
 }

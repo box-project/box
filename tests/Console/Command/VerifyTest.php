@@ -15,37 +15,37 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use InvalidArgumentException;
-use KevinGH\Box\Console\Application;
+use KevinGH\Box\Test\CommandTestCase;
+use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
-use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Tester\CommandTester;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Verify
  */
-class VerifyTest extends TestCase
+class VerifyTest extends CommandTestCase
 {
-    private const FIXTURES_DIR = __DIR__.'/../../../fixtures/verify';
+    use RequiresPharReadonlyOff;
 
-    /**
-     * @var CommandTester
-     */
-    private $commandTester;
+    private const FIXTURES_DIR = __DIR__.'/../../../fixtures/verify';
 
     /**
      * {@inheritdoc}
      */
     protected function setUp(): void
     {
-        if (true === (bool) ini_get('phar.readonly')) {
-            $this->markTestSkipped(
-                'Requires phar.readonly to be set to 0. Either update your php.ini file or run this test with '
-                .'php -d phar.readonly=0.'
-            );
-        }
+        $this->markAsSkippedIfPharReadonlyIsOn();
 
-        $this->commandTester = new CommandTester((new Application())->get('verify'));
+        parent::setUp();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getCommand(): Command
+    {
+        return new Verify();
     }
 
     /**
