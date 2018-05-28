@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Assert\Assertion;
-use DateTimeImmutable;
 use DirectoryIterator;
 use Phar;
 use PharData;
@@ -38,7 +37,6 @@ use function end;
 use function filesize;
 use function is_array;
 use function iterator_to_array;
-use function KevinGH\Box\FileSystem\copy;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\format_size;
 use function key;
@@ -46,7 +44,6 @@ use function realpath;
 use function sprintf;
 use function str_repeat;
 use function str_replace;
-use function sys_get_temp_dir;
 use function var_export;
 
 /**
@@ -54,6 +51,8 @@ use function var_export;
  */
 final class Info extends Command
 {
+    use CreateTemporaryPharFile;
+
     private const PHAR_ARG = 'phar';
     private const LIST_OPT = 'list';
     private const METADATA_OPT = 'metadata';
@@ -162,18 +161,15 @@ HELP
             return 1;
         }
 
-        if ('' === pathinfo($file, PATHINFO_EXTENSION)) {
-            // It is likely to be a PHAR without extension
-            copy($file, $tmpFile = sys_get_temp_dir().'/'.(new DateTimeImmutable())->getTimestamp().$file.'.phar');
+        $tmpFile = $this->createTemporaryPhar($file);
 
-            try {
-                return $this->showInfo($tmpFile, $file, $input, $output, $io);
-            } finally {
+        try {
+            return $this->showInfo($tmpFile, $file, $input, $output, $io);
+        } finally {
+            if ($file !== $tmpFile) {
                 remove($tmpFile);
             }
         }
-
-        return $this->showInfo($file, $file, $input, $output, $io);
     }
 
     public function showInfo(string $file, string $originalFile, InputInterface $input, OutputInterface $output, SymfonyStyle $io): int

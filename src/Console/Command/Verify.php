@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Assert\Assertion;
+use function KevinGH\Box\FileSystem\remove;
 use Phar;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -30,6 +31,8 @@ use function sprintf;
  */
 final class Verify extends Command
 {
+    use CreateTemporaryPharFile;
+
     private const PHAR_ARG = 'phar';
     private const VERBOSITY_LEVEL = OutputInterface::VERBOSITY_VERBOSE;
 
@@ -83,8 +86,10 @@ HELP
             self::VERBOSITY_LEVEL
         );
 
+        $tmpPharPath = $this->createTemporaryPhar($pharPath);
+
         try {
-            $phar = new Phar($pharPath);
+            $phar = new Phar($tmpPharPath);
 
             $verified = true;
             $signature = $phar->getSignature();
@@ -93,6 +98,10 @@ HELP
 
             $verified = false;
             $signature = null;
+        } finally {
+            if ($tmpPharPath !== $pharPath) {
+                remove($tmpPharPath);
+            }
         }
 
         if (false === $verified) {
@@ -108,7 +117,7 @@ HELP
                 )
             );
 
-            if (isset($throwable) && $output->isVerbose()) {
+            if (isset($throwable) && $output->isDebug()) {
                 throw $throwable;
             }
 
