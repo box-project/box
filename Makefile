@@ -56,6 +56,11 @@ TU_BOX_DEPS = bin/phpunit fixtures/default_stub.php .requirement-checker fixture
 tu_box: $(TU_BOX_DEPS)
 	$(PHPNOGC) bin/phpunit
 
+.PHONY: tu_box_phar_readonly
+tu_box_phar_readonly: 	## Runs the unit tests with the setting `phar.readonly` to `On`
+tu_box_phar_readonly: $(TU_BOX_DEPS)
+	php -d zend.enable_gc=0 -d phar.readonly=1 bin/phpunit
+
 .PHONY: tu_requirement_checker
 tu_requirement_checker:	 ## Run the unit tests
 tu_requirement_checker: requirement-checker/bin/phpunit requirement-checker/tests/DisplayNormalizer.php requirement-checker/actual_terminal_diff

@@ -18,6 +18,8 @@ matrix:
       env: DEPLOY=true
     - php: '7.2'
     - php: '7.2'
+      env: PHAR_READONLY='true'
+    - php: '7.2'
       env: COVERAGE='true'
     - php: '7.2'
       env: SYMFONY_VERSION='v3'
@@ -56,6 +58,8 @@ script:
   - |
     if [ "$COVERAGE" == "true" ]; then
         make tm
+    elif [ "PHAR_READONLY" == "true" ]; then
+        make tu_box_phar_readonly
     else
         make test
     fi
