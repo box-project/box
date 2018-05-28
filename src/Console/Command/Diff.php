@@ -15,12 +15,14 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Assert\Assertion;
+use KevinGH\Box\PhpSettingsHandler;
 use ParagonIE\Pharaoh\Pharaoh;
 use ParagonIE\Pharaoh\PharDiff;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
@@ -82,6 +84,8 @@ final class Diff extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
+
+        (new PhpSettingsHandler(new ConsoleLogger($output)))->check();
 
         $paths = [
             $input->getArgument(self::FIRST_PHAR_ARG),
