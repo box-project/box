@@ -17,6 +17,7 @@ namespace KevinGH\Box\Console\Command;
 use InvalidArgumentException;
 use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\CommandTestCase;
+use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use UnexpectedValueException;
@@ -24,16 +25,15 @@ use function ob_get_clean;
 use function ob_start;
 use function realpath;
 
-///**
-// * @covers \KevinGH\Box\Console\Command\Diff
-// *
-// * @runTestsInSeparateProcesses
-// */
 /**
- * @coversNothing
+ * @covers \KevinGH\Box\Console\Command\Diff
+ *
+ * @runTestsInSeparateProcesses
  */
 class DiffTest extends CommandTestCase
 {
+    use RequiresPharReadonlyOff;
+
     private const FIXTURES_DIR = __DIR__.'/../../../fixtures/diff';
 
     /**
@@ -41,12 +41,7 @@ class DiffTest extends CommandTestCase
      */
     public function setUp(): void
     {
-//        if (true === (bool) ini_get('phar.readonly')) {
-//            $this->markTestSkipped(
-//                'Requires phar.readonly to be set to 0. Either update your php.ini file or run this test with '
-//                .'php -d phar.readonly=0.'
-//            );
-//        }
+        $this->markAsSkippedIfPharReadonlyIsOn();
 
         parent::setUp();
     }
