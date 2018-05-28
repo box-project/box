@@ -19,8 +19,8 @@ use Generator;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Console\DisplayNormalizer;
-use KevinGH\Box\RequiresPharReadonlyOff;
 use KevinGH\Box\Test\CommandTestCase;
+use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
 use PharFileInfo;
 use Symfony\Component\Console\Command\Command;
@@ -61,6 +61,14 @@ class CompileTest extends CommandTestCase
         $this->markAsSkippedIfPharReadonlyIsOn();
 
         parent::setUp();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getCommand(): Command
+    {
+        return new Compile();
     }
 
     public function test_it_can_build_a_PHAR_file(): void
@@ -2702,14 +2710,6 @@ OUTPUT;
     {
         yield [true];
         yield [false];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getCommand(): Command
-    {
-        return new Compile();
     }
 
     private function normalizeDisplay(string $display)

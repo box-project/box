@@ -19,6 +19,7 @@ use InvalidArgumentException;
 use KevinGH\Box\Compactor\FakeCompactor;
 use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\FileSystemTestCase;
+use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use Phar;

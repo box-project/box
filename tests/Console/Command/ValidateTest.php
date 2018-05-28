@@ -14,13 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use KevinGH\Box\Console\Application;
 use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\CommandTestCase;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Tester\CommandTester;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Validate
@@ -30,18 +28,11 @@ use Symfony\Component\Console\Tester\CommandTester;
 class ValidateTest extends CommandTestCase
 {
     /**
-     * @var CommandTester
-     */
-    private $commandTester;
-
-    /**
      * {@inheritdoc}
      */
-    public function setUp(): void
+    protected function getCommand(): Command
     {
-        parent::setUp();
-
-        $this->commandTester = new CommandTester((new Application())->get('validate'));
+        return new Validate();
     }
 
     public function test_it_validates_a_given_file(): void
@@ -239,13 +230,5 @@ EOF
             $this->assertSame(0, $exception->getCode());
             $this->assertNotNull($exception->getPrevious());
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getCommand(): Command
-    {
-        return new Validate();
     }
 }
