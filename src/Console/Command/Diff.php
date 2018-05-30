@@ -54,12 +54,12 @@ final class Diff extends Command
 
         $this->addArgument(
             self::FIRST_PHAR_ARG,
-            InputArgument::OPTIONAL,
+            InputArgument::REQUIRED,
             'The first PHAR'
         );
         $this->addArgument(
             self::SECOND_PHAR_ARG,
-            InputArgument::OPTIONAL,
+            InputArgument::REQUIRED,
             'The second PHAR'
         );
 
