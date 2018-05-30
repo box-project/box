@@ -138,7 +138,7 @@ BANNER;
      * @param MapFile         $fileMapper            Utility to map the files from outside and inside the PHAR
      * @param mixed           $metadata              The PHAR Metadata
      * @param bool            $isPrivateKeyPrompt    If the user should be prompted for the private key passphrase
-     * @param array           $processedReplacements The processed list of replacement placeholders and their values
+     * @param scalar[]        $replacements          The processed list of replacement placeholders and their values
      * @param null|string     $shebang               The shebang line
      * @param int             $signingAlgorithm      The PHAR siging algorithm. See \Phar constants
      * @param null|string     $stubBannerContents    The stub banner comment
@@ -171,7 +171,7 @@ BANNER;
         ?string $privateKeyPassphrase,
         ?string $privateKeyPath,
         bool $isPrivateKeyPrompt,
-        array $processedReplacements,
+        array $replacements,
         ?string $shebang,
         int $signingAlgorithm,
         ?string $stubBannerContents,
@@ -217,7 +217,7 @@ BANNER;
         $this->privateKeyPassphrase = $privateKeyPassphrase;
         $this->privateKeyPath = $privateKeyPath;
         $this->isPrivateKeyPrompt = $isPrivateKeyPrompt;
-        $this->processedReplacements = $processedReplacements;
+        $this->processedReplacements = $replacements;
         $this->shebang = $shebang;
         $this->signingAlgorithm = $signingAlgorithm;
         $this->stubBannerContents = $stubBannerContents;
@@ -304,8 +304,7 @@ BANNER;
         $privateKeyPath = self::retrievePrivateKeyPath($raw);
         $isPrivateKeyPrompt = self::retrieveIsPrivateKeyPrompt($raw);
 
-        $replacements = self::retrieveReplacements($raw);
-        $processedReplacements = self::retrieveProcessedReplacements($replacements, $raw, $file);
+        $replacements = self::retrieveReplacements($raw, $file);
 
         $shebang = self::retrieveShebang($raw);
 
@@ -354,7 +353,7 @@ BANNER;
             $privateKeyPassphrase,
             $privateKeyPath,
             $isPrivateKeyPrompt,
-            $processedReplacements,
+            $replacements,
             $shebang,
             $signingAlgorithm,
             $stubBannerContents,
@@ -513,7 +512,10 @@ BANNER;
         return $this->isPrivateKeyPrompt;
     }
 
-    public function getProcessedReplacements(): array
+    /**
+     * @return scalar[]
+     */
+    public function getReplacements(): array
     {
         return $this->processedReplacements;
     }
@@ -1529,25 +1531,16 @@ BANNER;
         return null;
     }
 
-    private static function retrieveReplacements(stdClass $raw): array
+    /**
+     * @return scalar[]
+     */
+    private static function retrieveReplacements(stdClass $raw, ?string $file): array
     {
-        // TODO: add exmample in the doc
-        // Add checks against the values
-        if (isset($raw->replacements)) {
-            return (array) $raw->replacements;
-        }
-
-        return [];
-    }
-
-    private static function retrieveProcessedReplacements(
-        array $replacements,
-        stdClass $raw,
-        ?string $file
-    ): array {
         if (null === $file) {
             return [];
         }
+
+        $replacements = isset($raw->replacements) ? (array) $raw->replacements : [];
 
         if (null !== ($git = self::retrieveGitHashPlaceholder($raw))) {
             $replacements[$git] = self::retrieveGitHash($file);
@@ -1575,7 +1568,7 @@ BANNER;
 
         foreach ($replacements as $key => $value) {
             unset($replacements[$key]);
-            $replacements["$sigil$key$sigil"] = $value;
+            $replacements[$sigil.$key.$sigil] = $value;
         }
 
         return $replacements;

@@ -918,9 +918,9 @@ JSON
         $this->assertSame('test.pem', $this->config->getPrivateKeyPath());
     }
 
-    public function testGetProcessedReplacements(): void
+    public function test_no_replacements_are_configured_by_default(): void
     {
-        $this->assertSame([], $this->config->getProcessedReplacements());
+        $this->assertSame([], $this->config->getReplacements());
     }
 
     public function testGetProcessedReplacementsSet(): void
@@ -945,7 +945,7 @@ JSON
             'datetime_format' => 'Y:m:d',
         ]);
 
-        $values = $this->config->getProcessedReplacements();
+        $values = $this->config->getReplacements();
 
         $this->assertRegExp('/^[a-f0-9]{40}$/', $values['@git_commit@']);
         $this->assertRegExp('/^[a-f0-9]{7}$/', $values['@git_commit_short@']);

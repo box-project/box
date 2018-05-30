@@ -284,7 +284,7 @@ EOF
 
     private function registerReplacementValues(Configuration $config, Box $box, BuildLogger $logger): void
     {
-        $values = $config->getProcessedReplacements();
+        $values = $config->getReplacements();
 
         if ([] === $values) {
             return;
