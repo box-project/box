@@ -475,7 +475,7 @@ EOF
 
             $stub = $this->createStub($config, $main, $checkRequirements, $logger);
 
-            $box->getPhar()->setStub($stub->generate());
+            $box->getPhar()->setStub($stub);
 
             return;
         }
@@ -729,7 +729,7 @@ EOF
         }
     }
 
-    private function createStub(Configuration $config, ?string $main, bool $checkRequirements, BuildLogger $logger): StubGenerator
+    private function createStub(Configuration $config, ?string $main, bool $checkRequirements, BuildLogger $logger): string
     {
         $stub = StubGenerator::create()
             ->alias($config->getAlias())
@@ -783,7 +783,7 @@ EOF
             $stub->banner($banner);
         }
 
-        return $stub;
+        return $stub->generate();
     }
 
     private function logMap(MapFile $fileMapper, BuildLogger $logger): void

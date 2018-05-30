@@ -119,8 +119,12 @@ BANNER;
      * @param null|string     $alias
      * @param string          $basePath              Utility to private the base path used and be able to retrieve a
      *                                               path relative to it (the base path)
-     * @param null[]|string[] $composerJson
-     * @param null[]|string[] $composerLock
+     * @param array           $composerJson          The first element is the path to the `composer.json` file as a
+     *                                               string and the second element its decoded contents as an
+     *                                               associative array.
+     * @param array           $composerLock          The first element is the path to the `composer.lock` file as a
+     *                                               string and the second element its decoded contents as an
+     *                                               associative array.
      * @param SplFileInfo[]   $files                 List of files
      * @param SplFileInfo[]   $binaryFiles           List of binary files
      * @param bool            $dumpAutoload          Whether or not the Composer autoloader should be dumped
