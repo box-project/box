@@ -13,19 +13,19 @@ help:
 #---------------------------------------------------------------------------
 
 .PHONY: clean
-clean: 	 		 ## Clean all created artifacts
+clean: 	 		 ## Cleans all created artifacts
 clean:
 	git clean --exclude=.idea/ -ffdx
 
 .PHONY: cs
 PHPCSFIXER=vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
-cs:	 		 ## Fix CS
+cs:	 		 ## Fixes CS
 cs: $(PHPCSFIXER)
 	$(PHPNOGC) $(PHPCSFIXER) fix
 	$(PHPNOGC) $(PHPCSFIXER) fix --config .php_cs_53.dist
 
 .PHONY: compile
-compile: 		 ## Compile the application into the PHAR
+compile: 		 ## Compiles the application into the PHAR
 compile: box
 	cp -f box bin/box.phar
 
@@ -43,38 +43,38 @@ dump-requirement-checker: requirement-checker requirement-checker/vendor
 #---------------------------------------------------------------------------
 
 .PHONY: test
-test:		  	 ## Run all the tests
+test:		  	 ## Runs all the tests
 test: tu e2e
 
 .PHONY: tu
-tu:			 ## Run the unit tests
+tu:			 ## Runs the unit tests
 tu: tu_requirement_checker tu_box
 
 .PHONY: tu_box
-tu_box:			 ## Run the unit tests
+tu_box:			 ## Runs the unit tests
 TU_BOX_DEPS = bin/phpunit fixtures/default_stub.php .requirement-checker fixtures/composer-dump/dir001/vendor
 tu_box: $(TU_BOX_DEPS)
 	$(PHPNOGC) bin/phpunit
 
 .PHONY: tu_box_phar_readonly
-tu_box_phar_readonly: 	## Runs the unit tests with the setting `phar.readonly` to `On`
+tu_box_phar_readonly: 	 ## Runs the unit tests with the setting `phar.readonly` to `On`
 tu_box_phar_readonly: $(TU_BOX_DEPS)
 	php -d zend.enable_gc=0 -d phar.readonly=1 bin/phpunit
 
 .PHONY: tu_requirement_checker
-tu_requirement_checker:	 ## Run the unit tests
+tu_requirement_checker:	 ## Runs the unit tests
 tu_requirement_checker: requirement-checker/bin/phpunit requirement-checker/tests/DisplayNormalizer.php requirement-checker/actual_terminal_diff
 	cd requirement-checker && $(PHPNOGC) bin/phpunit
 
 	diff requirement-checker/expected_terminal_diff requirement-checker/actual_terminal_diff
 
 .PHONY: tc
-tc:			 ## Run the unit tests with code coverage
+tc:			 ## Runs the unit tests with code coverage
 tc: bin/phpunit
 	phpdbg -qrr -d zend.enable_gc=0 bin/phpunit --coverage-html=dist/coverage --coverage-text
 
 .PHONY: tm
-tm:			 ## Run Infection
+tm:			 ## Runs Infection
 tm:	$(TU_BOX_DEPS)
 	$(PHPNOGC) bin/infection
 

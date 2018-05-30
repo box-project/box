@@ -67,10 +67,26 @@ OUTPUT;
         $this->assertSame(0, $this->commandTester->getStatusCode());
     }
 
+    public function test_it_can_verify_a_PHAR_which_does_not_have_the_PHAR_extension(): void
+    {
+        $this->commandTester->execute([
+            'command' => 'verify',
+            'phar' => realpath(self::FIXTURES_DIR.'/simple-phar'),
+        ]);
+
+        $expected = <<<'OUTPUT'
+The PHAR passed verification.
+
+OUTPUT;
+
+        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $this->assertSame(0, $this->commandTester->getStatusCode());
+    }
+
     /**
      * @dataProvider providePassingPharPaths
      */
-    public function test_it_verifies_the_signature_of_the_given_file_in_verbose_mode(string $pharPath): void
+    public function test_it_verifies_the_signature_of_the_given_file_in_debug_mode(string $pharPath): void
     {
         $signature = (new Phar($pharPath))->getSignature();
 
