@@ -32,7 +32,8 @@
     1. [Replacements (`replacements`)][replacements]
     1. [Replacement sigil (`replacement-sigil`)][replacement-sigil]
     1. [Datetime placeholder (`datetime`)][datetime–placeholder]
-    1. [Datetime placeholder format (`datetime_format`)][datetime-placeholder-format]
+    1. [Datetime placeholder format (`datetime-format`)][datetime-placeholder-format]
+    1. [Pretty git commit placeholder (`git`)][git]
     1. [Git commit placeholder (`git-commit`)][git-commit-placeholder]
     1. [Short git commit placeholder (`git-commit-short`)][git-commit-short]
     1. [Git tag placeholder (`git-tag`)][git-tag-placeholder]
@@ -68,7 +69,7 @@ The configuration file is a JSON object saved to a file. Note that all settings 
     "compactors": "?",
     "compression": "?",
     "datetime": "?",
-    "datetime_format": "?",
+    "datetime-format": "?",
     "directories": "?",
     "directories-bin": "?",
     "dump-autoload": "?",
@@ -77,6 +78,7 @@ The configuration file is a JSON object saved to a file. Note that all settings 
     "files-bin": "?",
     "finder": "?",
     "finder-bin": "?",
+    "git": "?",
     "git-commit": "?",
     "git-commit-short": "?",
     "git-tag": "?",
@@ -662,80 +664,136 @@ passphrase.
 
 ## Metadata (`metadata`)
 
-The metadata (`any`) setting can be any value. This value will be stored as metadata that can be retrieved from the built PHAR (
-[`Phar::getMetadata()][phar.getmetadata]).
+The metadata (`any`) setting can be any value. This value will be stored as metadata that can be retrieved from the
+built PHAR ([`Phar::getMetadata()][phar.getmetadata]).
 
 
 ## Replaceable placeholders
 
+This feature allows you to set placeholders in your code which will be replaced by different values by Box when building
+the PHAR.
+
+For example, if you take the following code:
+
+```php
+<?php
+
+class Application
+{
+    public function getVersion(): string
+    {
+        return '@git_commit_short@';
+    }
+}
+```
+
+With the configuration excerpt:
+
+```json
+{
+    "git-commit-short": "git_commit_short"
+}
+```
+
+Then the actual code shipped in the PHAR will be:
+
+```php
+<?php
+
+class Application
+{
+    public function getVersion(): string
+    {
+        return 'a6c5d93';
+    }
+}
+```
+
+The `@` is the default value of the [sigil][replacement-sigil] which is the placeholders delimited and
+[`git-commit-short`][git-commit-short] is one of the built in placeholder. Box ships a few buit-in placeholders
+which you can find bellow, but you can also specify any replacement value via the
+[`replacements` setting][replacements].
+
+
 ### Replacements (`replacements`)
 
-// TODO: review this setting + doc, default value...]
+The replacements (`object`, default `{}`) setting is a map of placeholders (as keys) and their values. The placeholders
+are replaced in all [non-binary files][including-files] with the specified values.
 
-The replacements (`object`) setting is a map of placeholders and their values. The placeholders are replaced in all
-[non-binary files][including-files] with the specified values.
+For example:
+
+```json
+{
+    "replacements": {
+        "foo": "bar"
+    }
+}
+```
+
+Will result in the string `@foo@` in your code to be replaced by `'bar'`. The delimiter `@` being the
+[sigil][replacement-sigil].
 
 
 ### Replacement sigil (`replacement-sigil`)
 
-// TODO: review this setting + doc, default value...]
-// TODO: add better/more comprehensive links on how to use placeholders
-
-The replacement sigil (`string`, default `@`) is the character used to delimit the placeholders. See the
-[replacements][replacements] setting for examples of placeholders.
+The replacement sigil (`string`, default `@`) is the character or chain of characters used to delimit the placeholders.
+See the @[replacements][replacements] setting for examples of placeholders.
 
 
 ### Datetime placeholder (`datetime`)
 
-// TODO: review this setting + doc, default value...]
+The datetime (`string|null` default `null`) setting is the name of a placeholder value that will be replaced in all
+[non-binary files][including-files] by the current datetime. If no value is given (`null`) then this placeholder will
+be ignored.
 
-The datetime (`string`) setting is the name of a placeholder value that will be replaced in all
-[non-binary files][including-files] by the current datetime.
+Example value the placeholder will be replaced with: `2015-01-28 14:55:23`
 
-Example: `2015-01-28 14:55:23`
-
-
-### Datetime placeholder format (`datetime_format`)
-
-// TODO: review this setting + doc, default value...]
-
-The datetime format placeholder (`string`) setting accepts a valid [PHP date format][php-date-format]. It can be used to
-change the format for the [`datetime`][datetime–placeholder] setting.
-
-Example: `Y-m-d H:i:s`
+The format of the date used is defined by the [`datetime-format` setting][datetime-placeholder-format].
 
 
-### Git commit placeholder (`git-commit`)
+### Datetime placeholder format (`datetime-format`)
 
-// TODO: review this setting + doc, default value...]
-
-The git commit (`string`) setting is the name of a placeholder value that will be replaced in all
-[non-binary files][including-files] by the current git commit hash of the repository.
-
-Example: `e558e335f1d165bc24d43fdf903cdadd3c3cbd03`
+The datetime format placeholder (`string`|`null`, default `Y-m-d H:i:s`) setting accepts a valid
+[PHP date format][php-date-format]. It can be used to change the format for the
+[`datetime`][datetime–placeholder] setting.
 
 
-### Short git commit placeholder (`git-commit-short`)
-
-// TODO: review this setting + doc, default value...]
-
-The short git commit (`string`) setting is the name of a placeholder value that will be replaced in all
-[non-binary files][including-files] by the current git short commit hash of the repository.
-
-Example: `e558e33`
-
-
-### Git tag placeholder (`git-tag`)
-
-// TODO: review this setting + doc, default value...]
+### Pretty git tag placeholder (`git`)
 
 The git tag placeholder (`string`) setting is the name of a placeholder value that will be replaced in all 
 [non-binary files][including-files] by the current git tag of the repository.
 
-Examples:
+Example of value the placeholder will be replaced with:
 
-- `2.0.0`
-- `2.0.0-2-ge558e33`
+- `2.0.0` on an exact tag match
+- `2.0.0@e558e33` on a commit following a tag
+
+
+### Git commit placeholder (`git-commit`)
+
+The git commit (`string`) setting is the name of a placeholder value that will be replaced in all
+[non-binary files][including-files] by the current git commit hash of the repository.
+
+Example of value the placeholder will be replaced with: `e558e335f1d165bc24d43fdf903cdadd3c3cbd03`
+
+
+### Short git commit placeholder (`git-commit-short`)
+
+The short git commit (`string`) setting is the name of a placeholder value that will be replaced in all
+[non-binary files][including-files] by the current git short commit hash of the repository.
+
+Example of value the placeholder will be replaced with: `e558e33`
+
+
+### Git tag placeholder (`git-tag`)
+
+The git tag placeholder (`string`) setting is the name of a placeholder value that will be replaced in all 
+[non-binary files][including-files] by the current git tag of the repository.
+
+Example of value the placeholder will be replaced with:
+
+- `2.0.0` on an exact tag match
+- `2.0.0-2-ge558e33` on a commit following a tag
 
 
 ### Git version placeholder (`git-version`)
@@ -772,13 +830,14 @@ The short commit hash will only be used if no tag is available.
 [composer-classmap-authoritative]: https://getcomposer.org/doc/articles/autoloader-optimization.md#optimization-level-2-a-authoritative-class-maps
 [composer-no-dev-option]: https://getcomposer.org/doc/03-cli.md#dump-autoload-dumpautoload-
 [compression]: #compression-algorithm-compression
-[datetime-placeholder-format]: #datetime-placeholder-format-datetime_format
+[datetime-placeholder-format]: #datetime-placeholder-format-datetime-format
 [datetime–placeholder]: #datetime-placeholder-datetime
 [directories]: #directories-directories-and-directories-bin
 [dump-autoload]: #dumping-the-composer-autoloader-dump-autoload
 [exclude-composer-files]: #excluding-the-composer-files-exclude-composer-files
 [files]: #files-files-and-files-bin
 [finder]: #finder-finder-and-finder-bin
+[git]: #git-commit-placeholder-git
 [git-commit-placeholder]: #git-commit-placeholder-git-commit
 [git-commit-short]: #short-git-commit-placeholder-git-commit-short
 [git-tag-placeholder]: #git-tag-placeholder-git-tag

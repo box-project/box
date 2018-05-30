@@ -17,6 +17,8 @@ namespace KevinGH\Box;
 use Assert\Assertion;
 use Closure;
 use DateTimeImmutable;
+use DateTimeZone;
+use const E_USER_DEPRECATED;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\Php as LegacyPhp;
 use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
@@ -30,6 +32,7 @@ use Phar;
 use RuntimeException;
 use Seld\JsonLint\ParsingException;
 use SplFileInfo;
+use function sprintf;
 use stdClass;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
@@ -59,6 +62,7 @@ use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use function preg_match;
 use function substr;
+use function trigger_error;
 use function uniqid;
 
 /**
@@ -1542,6 +1546,10 @@ BANNER;
 
         $replacements = isset($raw->replacements) ? (array) $raw->replacements : [];
 
+        if (null !== ($git = self::retrievePrettyGitPlaceholder($raw))) {
+            $replacements[$git] = self::retrievePrettyGitTag($file);
+        }
+
         if (null !== ($git = self::retrieveGitHashPlaceholder($raw))) {
             $replacements[$git] = self::retrieveGitHash($file);
         }
@@ -1558,9 +1566,11 @@ BANNER;
             $replacements[$git] = self::retrieveGitVersion($file);
         }
 
+        $datetimeFormat = self::retrieveDatetimeFormat($raw);
+
         if (null !== ($date = self::retrieveDatetimeNowPlaceHolder($raw))) {
             $replacements[$date] = self::retrieveDatetimeNow(
-                self::retrieveDatetimeFormat($raw)
+                $datetimeFormat
             );
         }
 
@@ -1574,13 +1584,14 @@ BANNER;
         return $replacements;
     }
 
+    private static function retrievePrettyGitPlaceholder(stdClass $raw): ?string
+    {
+        return isset($raw->{'git'}) ? $raw->{'git'} : null;
+    }
+
     private static function retrieveGitHashPlaceholder(stdClass $raw): ?string
     {
-        if (isset($raw->{'git-commit'})) {
-            return $raw->{'git-commit'};
-        }
-
-        return null;
+        return isset($raw->{'git-commit'}) ? $raw->{'git-commit'} : null;
     }
 
     /**
@@ -1602,20 +1613,12 @@ BANNER;
 
     private static function retrieveGitShortHashPlaceholder(stdClass $raw): ?string
     {
-        if (isset($raw->{'git-commit-short'})) {
-            return $raw->{'git-commit-short'};
-        }
-
-        return null;
+        return isset($raw->{'git-commit-short'}) ? $raw->{'git-commit-short'} : null;
     }
 
     private static function retrieveGitTagPlaceholder(stdClass $raw): ?string
     {
-        if (isset($raw->{'git-tag'})) {
-            return $raw->{'git-tag'};
-        }
-
-        return null;
+        return isset($raw->{'git-tag'}) ? $raw->{'git-tag'} : null;
     }
 
     private static function retrieveGitTag(string $file): string
@@ -1623,13 +1626,20 @@ BANNER;
         return self::runGitCommand('git describe --tags HEAD', $file);
     }
 
-    private static function retrieveGitVersionPlaceholder(stdClass $raw): ?string
+    private static function retrievePrettyGitTag(string $file): string
     {
-        if (isset($raw->{'git-version'})) {
-            return $raw->{'git-version'};
+        $version = self::retrieveGitTag($file);
+
+        if (preg_match('/^(?<tag>.+)-\d+-g(?<hash>[a-f0-9]{7})$/', $version, $matches)) {
+            return sprintf('%s@%s', $matches['tag'], $matches['hash']);
         }
 
-        return null;
+        return $version;
+    }
+
+    private static function retrieveGitVersionPlaceholder(stdClass $raw): ?string
+    {
+        return isset($raw->{'git-version'}) ? $raw->{'git-version'} : null;
     }
 
     private static function retrieveGitVersion(string $file): ?string
@@ -1658,49 +1668,45 @@ BANNER;
 
     private static function retrieveDatetimeNowPlaceHolder(stdClass $raw): ?string
     {
-        // TODO: double check why this is done and how it is used it's not completely clear to me.
-        // Also make sure the documentation is up to date after.
-        // Instead of having two sistinct doc entries for `datetime` and `datetime-format`, it would
-        // be better to have only one element IMO like:
-        //
-        // "datetime": {
-        //   "value": "val",
-        //   "format": "Y-m-d"
-        // }
-        //
-        // Also add a check that one cannot be provided without the other. Or maybe it should? I guess
-        // if the datetime format is the default one it's ok; but in any case the format should not
-        // be added without the datetime value...
-
-        if (isset($raw->{'datetime'})) {
-            return $raw->{'datetime'};
-        }
-
-        return null;
+        return isset($raw->{'datetime'}) ? $raw->{'datetime'} : null;
     }
 
     private static function retrieveDatetimeNow(string $format): string
     {
-        $now = new DateTimeImmutable('now');
+        // TODO: document the BC break: time is now always taken as UTC
+        $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
 
-        $datetime = $now->format($format);
-
-        if ('' === $datetime) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    '"%s" is not a valid PHP date format',
-                    $format
-                )
-            );
-        }
-
-        return $datetime;
+        return $now->format($format);
     }
 
     private static function retrieveDatetimeFormat(stdClass $raw): string
     {
-        if (isset($raw->{'datetime_format'})) {
-            return $raw->{'datetime_format'};
+        // TODO: document BC break: datetime format is now always evaluated even if the datetime placeholder is not used
+        // TODO: ducument that invalid datetime format now throws an error
+        if (isset($raw->{'datetime-format'})) {
+            $format = $raw->{'datetime-format'};
+        } elseif (isset($raw->{'datetime_format'})) {
+            // TODO: make sure this deprecation message correctly appear to the user
+            @trigger_error(
+                'The setting "datetime_format" is deprecated, use "datetime-format" instead.',
+                E_USER_DEPRECATED
+            );
+
+            $format = $raw->{'datetime_format'};
+        }
+
+        if (isset($format)) {
+            $formattedDate = (new DateTimeImmutable())->format($format);
+
+            Assertion::false(
+                false === $formattedDate || $formattedDate === $format,
+                sprintf(
+                    'Expected the datetime format to be a valid format: "%s" is not',
+                    $format
+                )
+            );
+
+            return $format;
         }
 
         return self::DEFAULT_DATETIME_FORMAT;
@@ -1708,11 +1714,7 @@ BANNER;
 
     private static function retrieveReplacementSigil(stdClass $raw): string
     {
-        if (isset($raw->{'replacement-sigil'})) {
-            return $raw->{'replacement-sigil'};
-        }
-
-        return self::DEFAULT_REPLACEMENT_SIGIL;
+        return isset($raw->{'replacement-sigil'}) ? $raw->{'replacement-sigil'} : self::DEFAULT_REPLACEMENT_SIGIL;
     }
 
     private static function retrieveShebang(stdClass $raw): ?string

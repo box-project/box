@@ -14,7 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use function abs;
 use Closure;
+use function date_default_timezone_set;
+use DateTimeImmutable;
+use DateTimeZone;
 use Generator;
 use Herrera\Annotations\Tokenizer;
 use InvalidArgumentException;
@@ -921,9 +925,19 @@ JSON
     public function test_no_replacements_are_configured_by_default(): void
     {
         $this->assertSame([], $this->config->getReplacements());
+
+        $this->setConfig([
+            'replacements' => new stdClass(),
+            'datetime' => null,
+            'datetime-format' => null,
+            'datetime_format' => null,
+            'replacement-sigil' => null,
+        ]);
+
+        $this->assertSame([], $this->config->getReplacements());
     }
 
-    public function testGetProcessedReplacementsSet(): void
+    public function test_the_replacement_map_can_be_configured(): void
     {
         touch('test');
         exec('git init');
@@ -936,6 +950,7 @@ JSON
 
         $this->setConfig([
             'files' => [self::DEFAULT_FILE],
+            'git' => 'git',
             'git-commit' => 'git_commit',
             'git-commit-short' => 'git_commit_short',
             'git-tag' => 'git_tag',
@@ -947,6 +962,7 @@ JSON
 
         $values = $this->config->getReplacements();
 
+        $this->assertSame('1.0.0', $values['@git@']);
         $this->assertRegExp('/^[a-f0-9]{40}$/', $values['@git_commit@']);
         $this->assertRegExp('/^[a-f0-9]{7}$/', $values['@git_commit_short@']);
         $this->assertSame('1.0.0', $values['@git_tag@']);
@@ -956,11 +972,114 @@ JSON
             '/^[0-9]{4}:[0-9]{2}:[0-9]{2}$/',
             $values['@date_time@']
         );
+        $this->assertCount(7, $values);
 
-        // some process does not release the git files
+        touch('foo');
+        exec('git add foo');
+        exec('git commit -m "Adding another test file."');
+
+        $this->setConfig([
+            'files' => [self::DEFAULT_FILE],
+            'git' => 'git',
+            'git-commit' => 'git_commit',
+            'git-commit-short' => 'git_commit_short',
+            'git-tag' => 'git_tag',
+            'git-version' => 'git_version',
+            'replacements' => ['rand' => $rand = random_int(0, getrandmax())],
+            'replacement-sigil' => '$',
+            'datetime' => 'date_time',
+            'datetime_format' => 'Y:m:d',
+        ]);
+
+        $values = $this->config->getReplacements();
+
+        $this->assertRegExp('/^.+@[a-f0-9]{7}$/', $values['$git$']);
+        $this->assertRegExp('/^[a-f0-9]{40}$/', $values['$git_commit$']);
+        $this->assertRegExp('/^[a-f0-9]{7}$/', $values['$git_commit_short$']);
+        $this->assertRegExp('/^.+-\d+-g[a-f0-9]{7}$/', $values['$git_tag$']);
+        $this->assertRegExp('/^.+-\d+-g[a-f0-9]{7}$/', $values['$git_version$']);
+        $this->assertSame($rand, $values['$rand$']);
+        $this->assertRegExp(
+            '/^[0-9]{4}:[0-9]{2}:[0-9]{2}$/',
+            $values['$date_time$']
+        );
+        $this->assertCount(7, $values);
+
+        // Some process does not release the git files
         if ($this->isWindows()) {
             exec('rd /S /Q .git');
         }
+    }
+
+    public function test_the_datetime_replacement_has_a_default_date_format()
+    {
+        $this->setConfig(['datetime' => 'date_time']);
+
+        $this->assertRegExp(
+            '/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/',
+            $this->config->getReplacements()['@date_time@']
+        );
+        $this->assertCount(1, $this->config->getReplacements());
+    }
+
+    public function test_the_datetime_is_converted_to_UTC()
+    {
+        date_default_timezone_set('UTC');
+
+        $now = new DateTimeImmutable();
+
+        date_default_timezone_set('Asia/Tokyo');
+
+        $this->setConfig(['datetime' => 'date_time']);
+
+        date_default_timezone_set('UTC');
+
+        $configDateTime = new DateTimeImmutable($this->config->getReplacements()['@date_time@']);
+
+        $this->assertLessThan(10, abs($configDateTime->getTimestamp() - $now->getTimestamp()));
+    }
+
+    public function test_the_datetime_format_must_be_valid()
+    {
+        try {
+            $this->setConfig(['datetime_format' => 'ü']);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Expected the datetime format to be a valid format: "ü" is not',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_the_new_datetime_format_setting_takes_precedence_over_the_old_one(): void
+    {
+        $this->setConfig([
+            'datetime' => 'date_time',
+            'datetime_format' => 'Y:m:d',
+            'datetime-format' => 'Y-m-d',
+        ]);
+
+        $values = $this->config->getReplacements();
+
+        $this->assertRegExp(
+            '/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/',
+            $values['@date_time@']
+        );
+    }
+
+    public function test_the_replacement_sigil_can_be_a_chain_of_characters(): void
+    {
+        $this->setConfig([
+            'replacements' => ['foo' => 'bar'],
+            'replacement-sigil' => '__',
+        ]);
+
+        $this->assertSame(
+            ['__foo__' => 'bar'],
+            $this->config->getReplacements()
+        );
     }
 
     public function test_the_config_has_a_default_shebang(): void
