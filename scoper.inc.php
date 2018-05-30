@@ -98,6 +98,42 @@ return [
                 $contents
             );
         },
+        function (string $filePath, string $prefix, string $contents): string {
+            if ('vendor/paragonie/sodium_compat/autoload.php' !== $filePath) {
+                return $contents;
+            }
+
+            return preg_replace(
+                '/\'sodiumCompatAutoloader\'/',
+                sprintf(
+                    '\'%s\\%s\'',
+                    $prefix,
+                    'sodiumCompatAutoloader'
+                ),
+                preg_replace(
+                    '/\$namespace = \'ParagonIE_Sodium_\';/',
+                    sprintf(
+                        '$namespace = \'%s\\ParagonIE_Sodium_\';',
+                        $prefix
+                    ),
+                    $contents
+                )
+            );
+        },
+        function (string $filePath, string $prefix, string $contents): string {
+            if ('vendor/paragonie/sodium_compat/lib/php72compat.php' !== $filePath) {
+                return $contents;
+            }
+
+            return preg_replace(
+                '/\\\\define\\("SODIUM_{\\$constant}", \\\\constant\\("ParagonIE_Sodium_Compat::{\\$constant}"\\)\\);/',
+                sprintf(
+                    '\define("SODIUM_{$constant}", \constant("%s\\ParagonIE_Sodium_Compat::{$constant}"));',
+                    $prefix
+                ),
+                $contents
+            );
+        },
     ],
     'whitelist' => [
         \Composer\Autoload\ClassLoader::class,

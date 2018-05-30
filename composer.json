@@ -51,6 +51,7 @@
         "humbug/php-scoper": "dev-master#c0384b6",
         "justinrainbow/json-schema": "^5.2",
         "nikic/iter": "^1.6",
+        "paragonie/pharaoh": "^0.3.1",
         "phpseclib/phpseclib": "~2.0",
         "seld/jsonlint": "^1.6",
         "symfony/console": "^3.4 || ^4.0",

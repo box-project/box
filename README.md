@@ -23,7 +23,7 @@ great things:
 - ⚙️ Zero configuration by default
 - 🚔 [Requirements checker](doc/requirement-checker.md#requirements-checker)
 - 🚨 Friendly error logging experience 
-- 🔍 Retrieve information about the PHAR extension or a PHAR file and its contents (`box info`)
+- 🔍 Retrieve information about the PHAR extension or a PHAR file and its contents (`box info` or `box diff`)
 - 🕵️‍♀️ Verify the signature of an existing PHAR (`box verify`)
 - 📝 Use Git tags and short commit hashes for versioning
 
