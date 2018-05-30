@@ -44,7 +44,15 @@ class DocumentationSchemaTest extends TestCase
     public function test_the_documentation_schema_is_up_to_date(): void
     {
         $docKeys = $this->retrieveDocSchemaKeys();
-        $schemaKeys = $this->retrieveSchemaKeys();
+
+        $schemaKeys = array_values(
+            array_filter(
+                $this->retrieveSchemaKeys(),
+                function (string $key): bool {
+                    return 'datetime_format' !== $key;
+                }
+            )
+        );
 
         $this->assertSame($schemaKeys, $docKeys);
     }
@@ -74,7 +82,14 @@ class DocumentationSchemaTest extends TestCase
 
         sort($docKeys);
 
-        $schemaKeys = $this->retrieveSchemaKeys();
+        $schemaKeys = array_values(
+            array_filter(
+                $this->retrieveSchemaKeys(),
+                function (string $key): bool {
+                    return 'datetime_format' !== $key;
+                }
+            )
+        );
 
         $this->assertEquals($schemaKeys, $docKeys);
     }

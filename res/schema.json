@@ -66,11 +66,11 @@
             "description": "The replacement date for the current date and time.",
             "type": ["string", "null"]
         },
-        "datetime_format": {
+        "datetime-format": {
             "description": "The format for the current date and time.",
             "type": ["string", "null"]
         },
-        "datetime-format": {
+        "datetime_format": {
             "description": "The format for the current date and time.",
             "type": ["string", "null"]
         },
