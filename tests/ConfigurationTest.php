@@ -14,11 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use function abs;
 use Closure;
-use function date_default_timezone_set;
 use DateTimeImmutable;
-use DateTimeZone;
 use Generator;
 use Herrera\Annotations\Tokenizer;
 use InvalidArgumentException;
@@ -27,9 +24,13 @@ use KevinGH\Box\Compactor\InvalidCompactor;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Json\JsonValidationException;
 use Phar;
+use RuntimeException;
 use Seld\JsonLint\ParsingException;
 use stdClass;
 use const DIRECTORY_SEPARATOR;
+use const PHP_EOL;
+use function abs;
+use function date_default_timezone_set;
 use function file_put_contents;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\remove;
@@ -1011,7 +1012,7 @@ JSON
         }
     }
 
-    public function test_the_datetime_replacement_has_a_default_date_format()
+    public function test_the_datetime_replacement_has_a_default_date_format(): void
     {
         $this->setConfig(['datetime' => 'date_time']);
 
@@ -1022,7 +1023,7 @@ JSON
         $this->assertCount(1, $this->config->getReplacements());
     }
 
-    public function test_the_datetime_is_converted_to_UTC()
+    public function test_the_datetime_is_converted_to_UTC(): void
     {
         date_default_timezone_set('UTC');
 
@@ -1039,7 +1040,7 @@ JSON
         $this->assertLessThan(10, abs($configDateTime->getTimestamp() - $now->getTimestamp()));
     }
 
-    public function test_the_datetime_format_must_be_valid()
+    public function test_the_datetime_format_must_be_valid(): void
     {
         try {
             $this->setConfig(['datetime_format' => 'ü']);
@@ -1097,6 +1098,28 @@ JSON
         $actual = $this->config->getShebang();
 
         $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_cannot_retrieve_the_git_hash_if_not_in_a_git_repository(): void
+    {
+        try {
+            $this->setConfig([
+                'git' => 'git',
+            ]);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (RuntimeException $exception) {
+            $tmp = $this->tmp;
+
+            $this->assertSame(
+                sprintf(
+                    'The tag or commit hash could not be retrieved from "%s": fatal: Not a git repository (or '
+                    .'any of the parent directories): .git'.PHP_EOL,
+                    $tmp
+                ),
+                $exception->getMessage()
+            );
+        }
     }
 
     public function test_the_shebang_can_be_disabled(): void

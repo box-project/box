@@ -18,7 +18,6 @@ use Assert\Assertion;
 use Closure;
 use DateTimeImmutable;
 use DateTimeZone;
-use const E_USER_DEPRECATED;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\Php as LegacyPhp;
 use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
@@ -32,10 +31,10 @@ use Phar;
 use RuntimeException;
 use Seld\JsonLint\ParsingException;
 use SplFileInfo;
-use function sprintf;
 use stdClass;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
+use const E_USER_DEPRECATED;
 use function array_column;
 use function array_diff;
 use function array_filter;
@@ -61,6 +60,7 @@ use function KevinGH\Box\FileSystem\longest_common_base_path;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use function preg_match;
+use function sprintf;
 use function substr;
 use function trigger_error;
 use function uniqid;
@@ -119,39 +119,39 @@ BANNER;
     private $checkRequirements;
 
     /**
-     * @param null|string     $file
-     * @param null|string     $alias
-     * @param string          $basePath              Utility to private the base path used and be able to retrieve a
-     *                                               path relative to it (the base path)
-     * @param array           $composerJson          The first element is the path to the `composer.json` file as a
-     *                                               string and the second element its decoded contents as an
-     *                                               associative array.
-     * @param array           $composerLock          The first element is the path to the `composer.lock` file as a
-     *                                               string and the second element its decoded contents as an
-     *                                               associative array.
-     * @param SplFileInfo[]   $files                 List of files
-     * @param SplFileInfo[]   $binaryFiles           List of binary files
-     * @param bool            $dumpAutoload          Whether or not the Composer autoloader should be dumped
-     * @param bool            $excludeComposerFiles  Whether or not the Composer files composer.json, composer.lock and
-     *                                               installed.json should be removed from the PHAR
-     * @param Compactor[]     $compactors            List of file contents compactors
-     * @param null|int        $compressionAlgorithm  Compression algorithm constant value. See the \Phar class constants
-     * @param null|int        $fileMode              File mode in octal form
-     * @param string          $mainScriptPath        The main script file path
-     * @param string          $mainScriptContents    The processed content of the main script file
-     * @param MapFile         $fileMapper            Utility to map the files from outside and inside the PHAR
-     * @param mixed           $metadata              The PHAR Metadata
-     * @param bool            $isPrivateKeyPrompt    If the user should be prompted for the private key passphrase
-     * @param scalar[]        $replacements          The processed list of replacement placeholders and their values
-     * @param null|string     $shebang               The shebang line
-     * @param int             $signingAlgorithm      The PHAR siging algorithm. See \Phar constants
-     * @param null|string     $stubBannerContents    The stub banner comment
-     * @param null|string     $stubBannerPath        The path to the stub banner comment file
-     * @param null|string     $stubPath              The PHAR stub file path
-     * @param bool            $isInterceptFileFuncs  Whether or not Phar::interceptFileFuncs() should be used
-     * @param bool            $isStubGenerated       Whether or not if the PHAR stub should be generated
-     * @param bool            $checkRequirements     Whether the PHAR will check the application requirements before
-     *                                               running
+     * @param null|string   $file
+     * @param null|string   $alias
+     * @param string        $basePath             Utility to private the base path used and be able to retrieve a
+     *                                            path relative to it (the base path)
+     * @param array         $composerJson         The first element is the path to the `composer.json` file as a
+     *                                            string and the second element its decoded contents as an
+     *                                            associative array.
+     * @param array         $composerLock         The first element is the path to the `composer.lock` file as a
+     *                                            string and the second element its decoded contents as an
+     *                                            associative array.
+     * @param SplFileInfo[] $files                List of files
+     * @param SplFileInfo[] $binaryFiles          List of binary files
+     * @param bool          $dumpAutoload         Whether or not the Composer autoloader should be dumped
+     * @param bool          $excludeComposerFiles Whether or not the Composer files composer.json, composer.lock and
+     *                                            installed.json should be removed from the PHAR
+     * @param Compactor[]   $compactors           List of file contents compactors
+     * @param null|int      $compressionAlgorithm Compression algorithm constant value. See the \Phar class constants
+     * @param null|int      $fileMode             File mode in octal form
+     * @param string        $mainScriptPath       The main script file path
+     * @param string        $mainScriptContents   The processed content of the main script file
+     * @param MapFile       $fileMapper           Utility to map the files from outside and inside the PHAR
+     * @param mixed         $metadata             The PHAR Metadata
+     * @param bool          $isPrivateKeyPrompt   If the user should be prompted for the private key passphrase
+     * @param scalar[]      $replacements         The processed list of replacement placeholders and their values
+     * @param null|string   $shebang              The shebang line
+     * @param int           $signingAlgorithm     The PHAR siging algorithm. See \Phar constants
+     * @param null|string   $stubBannerContents   The stub banner comment
+     * @param null|string   $stubBannerPath       The path to the stub banner comment file
+     * @param null|string   $stubPath             The PHAR stub file path
+     * @param bool          $isInterceptFileFuncs Whether or not Phar::interceptFileFuncs() should be used
+     * @param bool          $isStubGenerated      Whether or not if the PHAR stub should be generated
+     * @param bool          $checkRequirements    Whether the PHAR will check the application requirements before
+     *                                            running
      */
     private function __construct(
         ?string $file,
@@ -1644,9 +1644,6 @@ BANNER;
 
     private static function retrieveGitVersion(string $file): ?string
     {
-        // TODO: check if is still relevant as IMO we are better off using OcramiusVersionPackage
-        // to avoid messing around with that
-
         try {
             return self::retrieveGitTag($file);
         } catch (RuntimeException $exception) {
@@ -1673,7 +1670,6 @@ BANNER;
 
     private static function retrieveDatetimeNow(string $format): string
     {
-        // TODO: document the BC break: time is now always taken as UTC
         $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
 
         return $now->format($format);
@@ -1681,8 +1677,6 @@ BANNER;
 
     private static function retrieveDatetimeFormat(stdClass $raw): string
     {
-        // TODO: document BC break: datetime format is now always evaluated even if the datetime placeholder is not used
-        // TODO: ducument that invalid datetime format now throws an error
         if (isset($raw->{'datetime-format'})) {
             $format = $raw->{'datetime-format'};
         } elseif (isset($raw->{'datetime_format'})) {
