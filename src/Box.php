@@ -18,6 +18,7 @@ use Assert\Assertion;
 use BadMethodCallException;
 use Countable;
 use KevinGH\Box\Compactor\PhpScoper;
+use KevinGH\Box\Compactor\Placeholder;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 use KevinGH\Box\PhpScoper\NullScoper;
 use Phar;
@@ -28,6 +29,7 @@ use function Amp\ParallelFunctions\parallelMap;
 use function Amp\Promise\wait;
 use function array_flip;
 use function array_map;
+use function array_unshift;
 use function chdir;
 use function extension_loaded;
 use function file_exists;
@@ -49,11 +51,6 @@ final class Box implements Countable
     public const DEBUG_DIR = '.box_dump';
 
     /**
-     * @var Compactor[]
-     */
-    private $compactors = [];
-
-    /**
      * @var string The path to the PHAR file
      */
     private $file;
@@ -63,11 +60,8 @@ final class Box implements Countable
      */
     private $phar;
 
-    /**
-     * @var scalar[] The placeholders with their values
-     */
-    private $placeholders = [];
-
+    private $compactors;
+    private $placeholderCompactor;
     private $mapFile;
     private $scoper;
     private $buffering = false;
@@ -78,6 +72,8 @@ final class Box implements Countable
         $this->phar = $phar;
         $this->file = $file;
 
+        $this->compactors = new Compactors();
+        $this->placeholderCompactor = new Placeholder([]);
         $this->mapFile = new MapFile(getcwd(), []);
         $this->scoper = new NullScoper();
     }
@@ -221,15 +217,21 @@ final class Box implements Countable
     {
         Assertion::allIsInstanceOf($compactors, Compactor::class);
 
-        $this->compactors = $compactors;
-
-        foreach ($this->compactors as $compactor) {
+        foreach ($compactors as $index => $compactor) {
             if ($compactor instanceof PhpScoper) {
                 $this->scoper = $compactor->getScoper();
 
-                break;
+                continue;
+            }
+
+            if ($compactor instanceof Placeholder) {
+                unset($compactors[$index]);
             }
         }
+
+        array_unshift($compactors, $this->placeholderCompactor);
+
+        $this->compactors = new Compactors(...$compactors);
     }
 
     /**
@@ -251,7 +253,8 @@ final class Box implements Countable
             Assertion::scalar($placeholder, $message);
         }
 
-        $this->placeholders = $placeholders;
+        $this->placeholderCompactor = new Placeholder($placeholders);
+        $this->registerCompactors($this->compactors->toArray());
     }
 
     public function registerFileMapping(MapFile $fileMapper): void
@@ -261,8 +264,8 @@ final class Box implements Countable
 
     public function registerStub(string $file): void
     {
-        $contents = self::replacePlaceholders(
-            $this->placeholders,
+        $contents = $this->placeholderCompactor->compact(
+            $file,
             file_contents($file)
         );
 
@@ -321,17 +324,7 @@ final class Box implements Countable
 
         $local = ($this->mapFile)($file);
 
-        if ($binary) {
-            $this->bufferedFiles[$local] = $contents;
-        } else {
-            $processedContents = self::compactContents(
-                $this->compactors,
-                $local,
-                self::replacePlaceholders($this->placeholders, $contents)
-            );
-
-            $this->bufferedFiles[$local] = $processedContents;
-        }
+        $this->bufferedFiles[$local] = $binary ? $contents : $this->compactors->compactContents($local, $contents);
 
         return $local;
     }
@@ -392,12 +385,11 @@ final class Box implements Countable
     private function processContents(array $files): array
     {
         $mapFile = $this->mapFile;
-        $placeholders = $this->placeholders;
         $compactors = $this->compactors;
         $bootstrap = $GLOBALS['_BOX_BOOTSTRAP'] ?? function (): void {};
         $cwd = getcwd();
 
-        $processFile = function (string $file) use ($cwd, $mapFile, $placeholders, $compactors, $bootstrap): array {
+        $processFile = function (string $file) use ($cwd, $mapFile, $compactors, $bootstrap): array {
             chdir($cwd);
             $bootstrap();
 
@@ -405,11 +397,7 @@ final class Box implements Countable
 
             $local = $mapFile($file);
 
-            $processedContents = self::compactContents(
-                $compactors,
-                $local,
-                self::replacePlaceholders($placeholders, $contents)
-            );
+            $processedContents = $compactors->compactContents($local, $contents);
 
             return [$local, $processedContents];
         };
@@ -418,34 +406,6 @@ final class Box implements Countable
             ? wait(parallelMap($files, $processFile))
             : array_map($processFile, $files)
         ;
-    }
-
-    /**
-     * Replaces the placeholders with their values.
-     *
-     * @param array  $placeholders
-     * @param string $contents     the contents
-     *
-     * @return string the replaced contents
-     */
-    private static function replacePlaceholders(array $placeholders, string $contents): string
-    {
-        return str_replace(
-            array_keys($placeholders),
-            array_values($placeholders),
-            $contents
-        );
-    }
-
-    private static function compactContents(array $compactors, string $file, string $contents): string
-    {
-        return array_reduce(
-            $compactors,
-            function (string $contents, Compactor $compactor) use ($file): string {
-                return $compactor->compact($file, $contents);
-            },
-            $contents
-        );
     }
 
     /**
