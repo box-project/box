@@ -46,7 +46,8 @@ This command relies on a configuration file for loading PHAR packaging settings.
 specified through the `--configuration|-c option`, one of the following files will be used (in order): `box.json`,
 `box.json.dist`. If no configuration file is found, Box will proceed with the default settings.
 
-The configuration file is a JSON object saved to a file. Note that all settings are optional.
+The configuration file is a JSON object saved to a file. Note that **all settings are optional**. If a setting is set
+to `null`, then its default value will be picked and is strictly equivalent to not setting the value.
 
 ```json
 {
@@ -103,9 +104,9 @@ configuration file is given or the current working directory otherwise.
 
 ## Main (`main`)
 
-The main (`string`|`false`) setting is used to specify the file (relative to [`base-path`][base-path]) that will be run
-when the PHAR is executed from the command line (To not confuse with the [stub][stub] which is the PHAR bootstrapping
-file).
+The main (`string`|`false`|`null`) setting is used to specify the file (relative to [`base-path`][base-path]) that will
+be run when the PHAR is executed from the command line (To not confuse with the [stub][stub] which is the PHAR
+bootstrapping file).
 
 When you have a main script file that can be used as a [stub][stub], you can disable the main script by setting it to
 false:
@@ -117,9 +118,9 @@ false:
 }
 ```
 
-When the parameter is not given, Box tries to guess the binary of the application with the `composer.json` file. If the
-[Composer `bin`][composer-bin] is set, Box will pick the first value provided. Otherwise it will fallback on the
-[PHAR][phar class] default file used which is `index.php`.
+When the parameter is not given or set to `null`, Box tries to guess the binary of the application with the
+`composer.json` file. If the [Composer `bin`][composer-bin] is set, Box will pick the first value provided. Otherwise it
+will fallback on the [PHAR][phar class] default file used which is `index.php`.
 
 The main file contents is processed by the [compactors][compactors] as the other files. 
 
@@ -129,11 +130,11 @@ If the main file starts with a shebang line (`#!`), it will be automatically rem
 
 ## Output (`output`)
 
-The output (`string`) setting specifies the file name and path of the newly built PHAR. If the value of the setting is
-not an absolute path, the path will be relative to the base path.
+The output (`string`|`null`) setting specifies the file name and path of the newly built PHAR. If the value of the
+setting is not an absolute path, the path will be relative to the base path.
 
-If not provided, the default value used will based on the [`main`][main]. For example if the main file is `bin/acme.php`
-or `bin/acme` then the output will be `bin/acme.phar`.
+If not provided or set to `null`, the default value used will based on the [`main`][main]. For example if the main file
+is `bin/acme.php` or `bin/acme` then the output will be `bin/acme.phar`.
 
 
 ## Permissions (`chmod`)
@@ -146,12 +147,14 @@ Check the following [link](https://secure.php.net/manual/en/function.chmod.php) 
 
 ## Check requirements (`check-requirements`)
 
-The check requirements setting (`boolean`, `true` by default) is used to allow the PHAR to check for the application
-constraint before running. See more information about it [here][requirement-checker].
+The check requirements setting (`boolean`|`null`, default `true`) is used to allow the PHAR to check for the application
+constraint before running. See more information about it [here][requirement-checker]. If not set or set to `null`, then
+the requirement checker will be added. Note that this is true only if either the `composer.json`  or `composer.lock`
+could have been found.
 
-**Warning**: this check is still done within the PHAR. As a result, if [the required extension to open the PHAR][compression]
-due to the compression algorithm is not loaded, a hard failure will still appear: the requirement checker _cannot_ be
-executed before that.
+**Warning**: this check is still done within the PHAR. As a result, if 
+[the required extension to open the PHAR][compression] due to the compression algorithm is not loaded, a hard failure
+will still appear: the requirement checker _cannot_ be executed before that.
 
 
 ## Including files
@@ -179,9 +182,9 @@ binary files, the regular file will take precedence.
 
 ### Files (`files` and `files-bin`)
 
-The `files` (`string[]`) setting is a list of files paths relative to [`base-path`][base-path] unless absolute. Each
-file will be processed by the [compactors][compactors], have their placeholder values replaced (see: `replacements`)
-and added to the PHAR.
+The `files` (`string[]`|`null` default `[]`) setting is a list of files paths relative to [`base-path`][base-path]
+unless absolute. Each file will be processed by the [compactors][compactors], have their placeholder values replaced
+(see: [`replacements`][placeholders]) and added to the PHAR.
 
 This setting is not affected by the [`blacklist`][blacklist] setting.
 
@@ -192,9 +195,9 @@ such as images, those that contain binary data or simply a file you do not want 
 
 ### Directories (`directories` and `directories-bin`)
 
-The directories (`string[]`) setting is a list of directory paths relative to [`base-path`][base-path]. All files will
-be processed by the [compactors][compactors], have their placeholder values replaced (see: `replacements`) and added to
-the PHAR.
+The directories (`string[]`|`null` default `[]`) setting is a list of directory paths relative to
+[`base-path`][base-path]. All files will be processed by the [compactors][compactors], have their placeholder values
+replaced (see: [`replacements`][placeholders]) and added to the PHAR.
 
 Files listed in the [`blacklist`][blacklist] will not be added to the PHAR.
 
@@ -205,9 +208,9 @@ compactors.
 
 ### Finder (`finder` and `finder-bin`)
 
-The finder (`object[]`) setting is a list of JSON objects. Each object (key, value) tuple is a (method, arguments)
-of the [Symfony Finder][symfony-finder] used by Box. If an array of values is provided for a single key, the method will
-be called once per value in the array.
+The finder (`object[]`|`null` default `[]`) setting is a list of JSON objects. Each object (key, value) tuple is a
+(method, arguments) of the [Symfony Finder][symfony-finder] used by Box. If an array of values is provided for a single
+key, the method will be called once per value in the array.
  
 Note that the paths specified for the `in` method are relative to [`base-path`][base-path] and that the finder will
 account for the files registered in the [`blacklist`][blacklist].
@@ -244,9 +247,9 @@ Example:
 
 ### Blacklist (`blacklist`)
 
-The `blacklist` (`string[]`) setting is a list of files that must not be added. The files blacklisted are the ones found
-using the other available configuration settings: [`files`][files], [`files-bin`][files], [`directories`][directories],
-[`directories-bin`][directories], [`finder`][finder], [`finder-bin`][finder].
+The `blacklist` (`string[]`|`null` default `[]`) setting is a list of files that must not be added. The files
+blacklisted are the ones found using the other available configuration settings: [`files`][files], [`files-bin`][files],
+[`directories`][directories], [`directories-bin`][directories], [`finder`][finder], [`finder-bin`][finder].
 
 Note that all the blacklisted paths are relative to the settings configured above. For example if you have the following
 file structure:
@@ -333,7 +336,8 @@ The default PHAR stub file can be used but Box also propose a couple of options 
 
 ### Stub (`stub`)
 
-The stub (`string`|`boolean`) setting is used to specify the location of a stub file or if one should be generated:
+The stub (`string`|`boolean`|`null` default `true`) setting is used to specify the location of a stub file or if one
+should be generated:
 - `string`: Path to the stub file will be used as is inside the PHAR
 - `true` (default): A new stub will be generated
 - `false`: The default stub used by the PHAR class will be used
@@ -344,29 +348,27 @@ If a custom stub file is provided, none of the other options ([`shebang`][sheban
 
 ### Shebang (`shebang`)
 
-The shebang (`string`|`null`) setting is used to specify the shebang line used when generating a new stub. By default,
-this line is used:
+The shebang (`string`|`false`|`null`) setting is used to specify the shebang line used when generating a new stub. By
+default, this line is used:
 
 ```
 #!/usr/bin/env php
 ```
 
-The shebang line can be removed altogether if set to `null`.
+The shebang line can be removed altogether if set to `false`.
 
 
 ### Intercept (`intercept`)
 
-The intercept (`boolean`) setting is used when generating a new stub. If setting is set to `true`, the 
-[Phar::interceptFileFuncs()][phar.interceptfilefuncs] method will be called in the stub.
-
-This setting is set to `false` by default.
+The intercept (`boolean`|`null` default `false`) setting is used when generating a new stub. If setting is set to
+`true`, the [Phar::interceptFileFuncs()][phar.interceptfilefuncs] method will be called in the stub.
 
 
 ### Alias (`alias`)
 
-The `alias` (`string`) setting is used when generating a new stub to call the [`Phar::mapPhar()`](phar.mapphar). This
-makes it easier to refer to files in the PHAR and ensure the access to internal files will always work regardless of the
-location of the PHAR on the file system.
+The `alias` (`string`|`null`) setting is used when generating a new stub to call the [`Phar::mapPhar()`](phar.mapphar).
+This makes it easier to refer to files in the PHAR and ensure the access to internal files will always work regardless
+of the location of the PHAR on the file system.
 
 If no alias is provided, a generated unique name will be used for it in order to map the [main file][main]. Note that this
 may have undesirable effects if you are using the generated [stub][stub-stub]
@@ -416,8 +418,7 @@ require 'phar://alias.phar/index.php';
 ```
 
 If you are using the default stub, [`Phar::setAlias()`][phar.setalias] will be used. Note however that this will behave
-slightly
-differently.
+slightly differently.
 
 Example:
 
@@ -447,8 +448,9 @@ register the alias `box-alias.phar` to that new PHAR but as the alias is already
 
 ### Banner (`banner`)
 
-The banner (`string`|`string[]`|`null`) setting is the banner comment that will be used when a new stub is generated. The
-value of this setting must not already be enclosed within a comment block as it will be automatically done for you.
+The banner (`string`|`string[]`|`false`|`null`) setting is the banner comment that will be used when a new stub is
+generated. The value of this setting must not already be enclosed within a comment block as it will be automatically
+done for you.
 
 For example `Custom banner` will result in the stub file:
 
@@ -488,19 +490,19 @@ Will result in:
  */
 ```
 
-By default, the Box banner is used. If set to `null`, no banner at all will be used.
+By default, the Box banner is used. If set to `false`, no banner at all will be used.
 
 The content of this value is discarded if [`banner-file`][banner-file] is set.
 
 
 ### Banner file (`banner-file`)
 
-The banner-file (`string`) setting is like banner, except it is a path (relative to [the base path][base-path]) to the
-file that will contain the comment.
+The banner-file (`string`|`null` ignored by default) setting is like banner, except it is a path (relative to
+[the base path][base-path]) to the file that will contain the comment.
 
 Like banner, the comment must not already be enclosed in a comment block.
 
-If this parameter is set, then the value of [`banner`][banner] will be discarded.
+If this parameter is set to a different value than `null`, then the value of [`banner`][banner] will be discarded.
 
 
 ## Dumping the Composer autoloader (`dump-autoload`)
@@ -529,8 +531,9 @@ by the [compactors][compactors] process.
 
 ## Compactors (`compactors`)
 
-The compactors (`string[]`) setting is a list of file contents compacting classes that must be registered. A file
-compacting class is used to reduce the size of a specific file type. The following is a simple example:
+The compactors (`string[]`|`null` default `[]`) setting is a list of file contents compacting classes that must be
+registered. A file compacting class is used to reduce the size of a specific file type. The following is a simple
+example:
 
 ```php
 <?php
@@ -569,9 +572,9 @@ command ✨.
 
 // TODO: review this setting + doc, default value...]
 
-The annotations (`boolean`|`object`) setting is used to enable compacting annotations in PHP source code. By setting it
-to `true`, all Doctrine-style annotations are compacted in PHP files. You may also specify a list of annotations to 
-ignore, which will be stripped while protecting the remaining annotations:
+The annotations (`boolean`|`object`|`null` default `{}`) setting is used to enable compacting annotations in PHP source
+code. By setting it to `true`, all Doctrine-style annotations are compacted in PHP files. You may also specify a list of
+annotations to ignore, which will be stripped while protecting the remaining annotations:
 
 ```json
 {
@@ -594,7 +597,7 @@ Note that this setting is used only if the compactor `KevinGH\Box\Compactor\Php`
 
 ### PHP-Scoper (`php-scoper`)
 
-The PHP-Scoper setting (`string` default `scoper.inc.php`) points to the path to the
+The PHP-Scoper setting (`string`|`null` default `scoper.inc.php`) points to the path to the
 [PHP-Scoper configuration][php-scoper-configuration] file. For more documentation regarding PHP-Scoper, you can head to
 [PHAR code isolation][PHAR code isolation] or [PHP-Scoper official documentation][php-scoper-official-doc].
 
@@ -603,9 +606,9 @@ Note that this setting is used only if the compactor `KevinGH\Box\Compactor\PhpS
 
 ## Compression algorithm (`compression`)
 
-The compression (`string`|`null`) setting is the compression algorithm to use when the PHAR is built. The compression
-affects the individual files within the PHAR and not the PHAR as a whole ([`Phar::compressFiles()`][phar.compress]). The
-following is a list of the signature algorithms available:
+The compression (`string`|`null` default `NONE`) setting is the compression algorithm to use when the PHAR is built. The
+compression affects the individual files within the PHAR and not the PHAR as a whole
+([`Phar::compressFiles()`][phar.compress]). The following is a list of the signature algorithms available:
 
 - `GZ` (the most efficient most of the time)
 - `BZ2`
@@ -620,8 +623,8 @@ all.
 
 ### Signing algorithm (`algorithm`)
 
-The algorithm (`string`|`null`) setting is the signing algorithm to use when the PHAR is built (
-[`Phar::setSignatureAlgorithm()`][phar.setsignaturealgorithm]). The following is a list of the signature algorithms
+The algorithm (`string`|`null` default `SHA1`) setting is the signing algorithm to use when the PHAR is built
+([`Phar::setSignatureAlgorithm()`][phar.setsignaturealgorithm]). The following is a list of the signature algorithms
 available:
 
 // TODO: review which signing algorithm is recommended or should absolutely not be used
@@ -639,25 +642,25 @@ By default PHARs are `SHA1` signed.
 
 // TODO: review this setting + doc, default value...]
 
-The key (`string`) setting is used to specify the path to the private key file. The private key file will be used to
-sign the PHAR using the `OPENSSL` signature algorithm (see [Signing algorithm][algorithm]) and the setting will be
-completely ignored otherwise. If an absolute path is not provided, the path will be relative to the current working
-directory.
+The key (`string`|`null` default none) setting is used to specify the path to the private key file. The private key file
+will be used to sign the PHAR using the `OPENSSL` signature algorithm (see [Signing algorithm][algorithm]) and the
+setting will be completely ignored otherwise. If an absolute path is not provided, the path will be relative to the
+current working directory.
 
 
 ### The private key password (`key-pass`)
 
 // TODO: review this setting + doc, default value...]
 
-The private key password  (`string`|`boolean`) setting is used to specify the pass-phrase for the private key. If a
-string is provided, it will be used as is as the pass-phrase. If `true` is provided, you will be prompted for the
-passphrase.
+The private key password  (`string`|`boolean`|`null` default none) setting is used to specify the pass-phrase for the
+private key. If a string is provided, it will be used as is as the pass-phrase. If `true` is provided, you will be
+prompted for the passphrase.
 
 
 ## Metadata (`metadata`)
 
-The metadata (`any`) setting can be any value. This value will be stored as metadata that can be retrieved from the
-built PHAR ([`Phar::getMetadata()][phar.getmetadata]).
+The metadata (`any` default none) setting can be any value. This value will be stored as metadata that can be retrieved
+from the built PHAR ([`Phar::getMetadata()][phar.getmetadata]).
 
 
 ## Replaceable placeholders
@@ -712,8 +715,8 @@ command ✨.
 
 ### Replacements (`replacements`)
 
-The replacements (`object`, default `{}`) setting is a map of placeholders (as keys) and their values. The placeholders
-are replaced in all [non-binary files][including-files] with the specified values.
+The replacements (`object`|`null`, default `{}`) setting is a map of placeholders (as keys) and their values. The
+placeholders are replaced in all [non-binary files][including-files] with the specified values.
 
 For example:
 
@@ -731,13 +734,13 @@ Will result in the string `@foo@` in your code to be replaced by `'bar'`. The de
 
 ### Replacement sigil (`replacement-sigil`)
 
-The replacement sigil (`string`, default `@`) is the character or chain of characters used to delimit the placeholders.
-See the @[replacements][replacements] setting for examples of placeholders.
+The replacement sigil (`string`|`null` default `@`) is the character or chain of characters used to delimit the
+placeholders. See the @[replacements][replacements] setting for examples of placeholders.
 
 
 ### Datetime placeholder (`datetime`)
 
-The datetime (`string|null` default `null`) setting is the name of a placeholder value that will be replaced in all
+The datetime (`string`|`null` default `null`) setting is the name of a placeholder value that will be replaced in all
 [non-binary files][including-files] by the current datetime. If no value is given (`null`) then this placeholder will
 be ignored.
 
@@ -755,8 +758,8 @@ The datetime format placeholder (`string`|`null`, default `Y-m-d H:i:s`) setting
 
 ### Pretty git tag placeholder (`git`)
 
-The git tag placeholder (`string`) setting is the name of a placeholder value that will be replaced in all 
-[non-binary files][including-files] by the current git tag of the repository.
+The git tag placeholder (`string`|`null` default none) setting is the name of a placeholder value that will be replaced
+in all [non-binary files][including-files] by the current git tag of the repository.
 
 Example of value the placeholder will be replaced with:
 
@@ -766,7 +769,7 @@ Example of value the placeholder will be replaced with:
 
 ### Git commit placeholder (`git-commit`)
 
-The git commit (`string`) setting is the name of a placeholder value that will be replaced in all
+The git commit (`string`|`null` default none) setting is the name of a placeholder value that will be replaced in all
 [non-binary files][including-files] by the current git commit hash of the repository.
 
 Example of value the placeholder will be replaced with: `e558e335f1d165bc24d43fdf903cdadd3c3cbd03`
@@ -774,16 +777,16 @@ Example of value the placeholder will be replaced with: `e558e335f1d165bc24d43fd
 
 ### Short git commit placeholder (`git-commit-short`)
 
-The short git commit (`string`) setting is the name of a placeholder value that will be replaced in all
-[non-binary files][including-files] by the current git short commit hash of the repository.
+The short git commit (`string`|`null` default none) setting is the name of a placeholder value that will be replaced in
+all [non-binary files][including-files] by the current git short commit hash of the repository.
 
 Example of value the placeholder will be replaced with: `e558e33`
 
 
 ### Git tag placeholder (`git-tag`)
 
-The git tag placeholder (`string`) setting is the name of a placeholder value that will be replaced in all 
-[non-binary files][including-files] by the current git tag of the repository.
+The git tag placeholder (`string`|`null` default none) setting is the name of a placeholder value that will be replaced
+in all [non-binary files][including-files] by the current git tag of the repository.
 
 Example of value the placeholder will be replaced with:
 
@@ -793,7 +796,7 @@ Example of value the placeholder will be replaced with:
 
 ### Git version placeholder (`git-version`)
 
-The git version (`string`) setting is the name of a placeholder value that will be replaced in all
+The git version (`string`|`null` default none) setting is the name of a placeholder value that will be replaced in all
 [non-binary files][including-files] by the one of the following (in order):
 
 - The git repository's most recent tag.

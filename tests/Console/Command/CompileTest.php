@@ -2460,7 +2460,7 @@ OUTPUT;
         mirror(self::FIXTURES_DIR.'/dir006', $this->tmp);
 
         $boxRawConfig = json_decode(file_get_contents('box.json'), true, 512, JSON_PRETTY_PRINT);
-        $boxRawConfig['shebang'] = null;
+        $boxRawConfig['shebang'] = false;
         file_put_contents('box.json', json_encode($boxRawConfig), JSON_PRETTY_PRINT);
 
         $this->commandTester->execute(

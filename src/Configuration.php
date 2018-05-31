@@ -49,6 +49,7 @@ use function is_bool;
 use function is_file;
 use function is_link;
 use function is_readable;
+use function is_string;
 use function iter\fn\method;
 use function iter\map;
 use function iter\toArray;
@@ -369,7 +370,7 @@ BANNER;
         );
     }
 
-    public function getFile(): ?string
+    public function getConfigurationFile(): ?string
     {
         return $this->file;
     }
@@ -1717,11 +1718,19 @@ BANNER;
             return self::DEFAULT_SHEBANG;
         }
 
-        if (null === $raw->shebang) {
+        $shebang = $raw->shebang;
+
+        if (false === $shebang) {
             return null;
         }
 
-        $shebang = trim($raw->shebang);
+        if (null === $shebang) {
+            $shebang = self::DEFAULT_SHEBANG;
+        }
+
+        Assertion::string($shebang, 'Expected shebang to be either a string, false or null, found true');
+
+        $shebang = trim($shebang);
 
         Assertion::notEmpty($shebang, 'The shebang should not be empty.');
         Assertion::true(
@@ -1758,15 +1767,17 @@ BANNER;
 
     private static function retrieveStubBannerContents(stdClass $raw): ?string
     {
-        if (false === array_key_exists('banner', (array) $raw)) {
+        if (false === array_key_exists('banner', (array) $raw) || null === $raw->banner) {
             return self::DEFAULT_BANNER;
         }
 
-        if (null === $raw->banner) {
+        $banner = $raw->banner;
+
+        if (false === $banner) {
             return null;
         }
 
-        $banner = $raw->banner;
+        Assertion::true(is_string($banner) || is_array($banner), 'The banner cannot accept true as a value');
 
         if (is_array($banner)) {
             $banner = implode("\n", $banner);
