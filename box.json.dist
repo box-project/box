@@ -21,6 +21,5 @@
         "KevinGH\\Box\\Compactor\\PhpScoper",
         "Herrera\\Box\\Compactor\\Json"
     ],
-    "git-commit": "git-commit",
-    "git-version": "git-version"
+    "datetime": "release-date"
 }
