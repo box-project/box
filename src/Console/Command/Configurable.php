@@ -83,6 +83,8 @@ abstract class Configurable extends Command
                 throw $exception;
             }
 
+            $io->comment('Loading without a configuration file.');
+
             $configPath = null;
         }
 

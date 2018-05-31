@@ -339,6 +339,9 @@ PHP;
 
 Box (repo)
 
+
+ // Loading without a configuration file.
+
 Building the PHAR "/path/to/tmp/index.phar"
 ? No compactor to register
 ? Adding main file: /path/to/tmp/index.php

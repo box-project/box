@@ -2,61 +2,40 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Console\Command;
 
-use Amp\MultiReasonException;
-use function array_unshift;
-use Assert\Assertion;
-use DateTimeImmutable;
-use DateTimeZone;
-use function getcwd;
 use KevinGH\Box\Box;
 use KevinGH\Box\Compactor;
 use KevinGH\Box\Compactor\Placeholder;
 use KevinGH\Box\Compactors;
-use KevinGH\Box\Composer\ComposerConfiguration;
 use KevinGH\Box\Configuration;
-use KevinGH\Box\Console\Logger\BuildLogger;
-use function KevinGH\Box\FileSystem\file_contents;
-use function KevinGH\Box\FileSystem\make_path_absolute;
-use KevinGH\Box\MapFile;
 use KevinGH\Box\PhpSettingsHandler;
-use KevinGH\Box\RequirementChecker\RequirementsDumper;
-use KevinGH\Box\StubGenerator;
-use RuntimeException;
 use stdClass;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\VarDumper\Cloner\VarCloner;
-use Symfony\Component\VarDumper\Dumper\CliDumper;
-use const DATE_ATOM;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
-use const PHP_EOL;
-use const POSIX_RLIMIT_INFINITY;
-use const POSIX_RLIMIT_NOFILE;
 use function array_shift;
-use function count;
-use function decoct;
+use function array_unshift;
 use function explode;
-use function filesize;
-use function function_exists;
 use function get_class;
+use function getcwd;
 use function implode;
-use function KevinGH\Box\disable_parallel_processing;
-use function KevinGH\Box\FileSystem\chmod;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\make_path_relative;
-use function KevinGH\Box\FileSystem\remove;
-use function KevinGH\Box\FileSystem\rename;
-use function KevinGH\Box\format_size;
-use function KevinGH\Box\get_phar_compression_algorithms;
-use function posix_setrlimit;
+use function KevinGH\Box\FileSystem\file_contents;
+use function KevinGH\Box\FileSystem\make_path_absolute;
 use function putenv;
 use function sprintf;
 use function strlen;
@@ -66,8 +45,9 @@ final class Process extends Configurable
 {
     use ChangeableWorkingDirectory;
 
-    private const NO_RESTART_OPTION = 'no-restart';
     private const FILE_ARGUMENT = 'file';
+
+    private const NO_RESTART_OPTION = 'no-restart';
     private const NO_CONFIG_OPTION = 'no-config';
 
     /**
@@ -151,7 +131,7 @@ final class Process extends Configurable
             '',
             '<comment>"""</comment>',
             $fileProcessedContents,
-            '<comment>"""</comment>'
+            '<comment>"""</comment>',
         ]);
     }
 
@@ -195,6 +175,23 @@ final class Process extends Configurable
 
     private function logCompactors(SymfonyStyle $io, Compactors $compactors): void
     {
+        $compactors = $compactors->toArray();
+
+        foreach ($compactors as $index => $compactor) {
+            if ($compactor instanceof Placeholder) {
+                unset($compactors[$index]);
+            }
+        }
+
+        if ([] === $compactors) {
+            $io->writeln([
+                'No compactor registered',
+                '',
+            ]);
+
+            return;
+        }
+
         $io->writeln('Registered compactors:');
 
         $logCompactors = function (Compactor $compactor) use ($io): void {
@@ -213,7 +210,7 @@ final class Process extends Configurable
             );
         };
 
-        array_map($logCompactors, $compactors->toArray());
+        array_map($logCompactors, $compactors);
         $io->writeln('');
     }
 }

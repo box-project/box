@@ -65,7 +65,7 @@ there is two recommendations:
 - Make use of Box `--debug` option in the `compile` command. It dumps the code added to the PHAR in a `.box-dump`
   directory. This allows you to more easily inspect, alter and test the code shipped in the PHAR. This way, you can
   make sure the code shipped is working before worrying about whether that code is going to work inside a PHAR.
-- Use the `diff` command on a specific file to check the result and the effects of the configuration on it
+- Use the `process` command on a specific file to check the result and the effects of the configuration on it
 
 
 <br />
