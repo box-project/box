@@ -300,7 +300,7 @@ BANNER;
         $fileMode = self::retrieveFileMode($raw);
 
         $map = self::retrieveMap($raw);
-        $fileMapper = new MapFile($map);
+        $fileMapper = new MapFile($basePath, $map);
 
         $metadata = self::retrieveMetadata($raw);
 

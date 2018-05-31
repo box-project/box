@@ -352,10 +352,7 @@ EOF
 
         $this->logMap($fileMapper, $logger);
 
-        $box->registerFileMapping(
-            $config->getBasePath(),
-            $fileMapper
-        );
+        $box->registerFileMapping($fileMapper);
     }
 
     private function addFiles(Configuration $config, Box $box, BuildLogger $logger, SymfonyStyle $io): void

@@ -1317,6 +1317,7 @@ KevinGH\Box\Configuration {#140
     """
   -map: null
   -fileMapper: KevinGH\Box\MapFile {#140
+    -basePath: "/path/to"
     -map: array:1 [
       0 => array:1 [
         "a/deep/test/directory" => "sub"
