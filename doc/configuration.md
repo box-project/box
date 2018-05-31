@@ -570,6 +570,10 @@ The following compactors are included with Box:
 - `KevinGH\Box\Compactor\Php`: strip down classes from phpdocs & comments
 - `KevinGH\Box\Compactor\PhpScoper`: isolate the code using [PHP-Scoper][phpscoper]
 
+The effects of the [compactors][compactors] and [replacement values][placeholders] can be tested with the `process`
+command ✨.
+
+
 ### Annotations (`annotations`)
 
 // TODO: review this setting + doc, default value...]
@@ -713,6 +717,9 @@ The `@` is the default value of the [sigil][replacement-sigil] which is the plac
 [`git-commit-short`][git-commit-short] is one of the built in placeholder. Box ships a few buit-in placeholders
 which you can find bellow, but you can also specify any replacement value via the
 [`replacements` setting][replacements].
+
+The effects of the [compactors][compactors] and [replacement values][placeholders] can be tested with the `process`
+command ✨.
 
 
 ### Replacements (`replacements`)

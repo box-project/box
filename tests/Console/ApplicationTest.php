@@ -110,6 +110,7 @@ Available commands:
   help      Displays help for a command
   info      Displays information about the PHAR extension or file
   list      Lists commands
+  process   Apply the registered compactors and replacement values on a file
   validate  Validates the configuration file
   verify    Verifies the PHAR signature
 
