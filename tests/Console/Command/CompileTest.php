@@ -121,7 +121,7 @@ class CompileTest extends CommandTestCase
 /_____/\____/_/|_|
 
 
-Box (repo)
+Box version 3.x-dev@151e40a
 
 
  // Loading the configuration file "/path/to/box.json.dist".
@@ -337,7 +337,7 @@ PHP;
 /_____/\____/_/|_|
 
 
-Box (repo)
+Box version 3.x-dev@151e40a
 
 
  // Loading without a configuration file.
@@ -539,7 +539,7 @@ PHP;
 /_____/\____/_/|_|
 
 
-Box (repo)
+Box version 3.x-dev@151e40a
 
 
  // Loading the configuration file "/path/to/box.json.dist".
@@ -775,7 +775,7 @@ PHP;
 /_____/\____/_/|_|
 
 
-Box (repo)
+Box version 3.x-dev@151e40a
 
 
  // Loading the configuration file "/path/to/box.json.dist".
@@ -874,7 +874,7 @@ OUTPUT;
 /_____/\____/_/|_|
 
 
-Box (repo)
+Box version 3.x-dev@151e40a
 
 
  // Loading the configuration file "/path/to/box.json.dist".
@@ -992,7 +992,7 @@ $xdebugLog
 /_____/\____/_/|_|
 
 
-Box (repo)
+Box version 3.x-dev@151e40a
 
 
  // Loading the configuration file "/path/to/box.json.dist".
@@ -1682,7 +1682,7 @@ PHP
 /_____/\____/_/|_|
 
 
-Box (repo)
+Box version 3.x-dev@151e40a
 
 
  // Loading the configuration file "/path/to/box.json.dist".
@@ -1939,7 +1939,7 @@ OUTPUT;
 /_____/\____/_/|_|
 
 
-Box (repo)
+Box version 3.x-dev@151e40a
 
 
  // Loading the configuration file "/path/to/box.json.dist".
@@ -2000,7 +2000,7 @@ OUTPUT;
 /_____/\____/_/|_|
 
 
-Box (repo)
+Box version 3.x-dev@151e40a
 
 
  // Loading the configuration file "/path/to/box.json.dist".
@@ -2059,7 +2059,7 @@ OUTPUT;
 /_____/\____/_/|_|
 
 
-Box (repo)
+Box version 3.x-dev@151e40a
 
 
  // Loading the configuration file "/path/to/box.json.dist".
@@ -2128,7 +2128,7 @@ JSON
 /_____/\____/_/|_|
 
 
-Box (repo)
+Box version 3.x-dev@151e40a
 
 
  // Loading the configuration file "/path/to/box.json.dist".
@@ -2197,7 +2197,7 @@ JSON
 /_____/\____/_/|_|
 
 
-Box (repo)
+Box version 3.x-dev@151e40a
 
 
  // Loading the configuration file "/path/to/box.json.dist".
@@ -2264,7 +2264,7 @@ OUTPUT;
 /_____/\____/_/|_|
 
 
-Box (repo)
+Box version 3.x-dev@151e40a
 
 
  // Loading the configuration file "/path/to/box.json.dist".
@@ -2334,7 +2334,7 @@ OUTPUT;
 /_____/\____/_/|_|
 
 
-Box (repo)
+Box version 3.x-dev@151e40a
 
 
  // Loading the configuration file "/path/to/box.json.dist".
@@ -2480,7 +2480,7 @@ OUTPUT;
 /_____/\____/_/|_|
 
 
-Box (repo)
+Box version 3.x-dev@151e40a
 
 
  // Loading the configuration file "/path/to/box.json.dist".
@@ -2563,7 +2563,7 @@ OUTPUT;
 /_____/\____/_/|_|
 
 
-Box (repo)
+Box version 3.x-dev@151e40a
 
 
  // Loading the configuration file "/path/to/box.json.dist".
@@ -2741,6 +2741,12 @@ OUTPUT;
         $display = preg_replace(
             '/\/\/ Memory usage: \d+\.\d{2}MB \(peak: \d+\.\d{2}MB\), time: \d+\.\d{2}s/',
             '// Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s',
+            $display
+        );
+
+        $display = preg_replace(
+            '/Box version .+@[a-z\d]{7}/',
+            'Box version 3.x-dev@151e40a',
             $display
         );
 

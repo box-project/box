@@ -37,18 +37,22 @@ class ApplicationTest extends TestCase
         $this->assertSame(0, $appTester->getStatusCode());
 
         $expected = <<<'EOF'
-Box (repo)
+Box version 3.x-dev@151e40a
 
 EOF;
 
-        $actual = $appTester->getDisplay(true);
+        $actual = preg_replace(
+            '/Box version .+@[a-z\d]{7}/',
+            'Box version 3.x-dev@151e40a',
+            $appTester->getDisplay(true)
+        );
 
         $this->assertSame($expected, $actual);
     }
 
     public function test_it_can_display_the_version_when_a_specific_version_is_given(): void
     {
-        $application = new Application('Box', '1.2.3');
+        $application = new Application('Box', '1.2.3', '2018-04-29 19:33:12');
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
 
@@ -61,7 +65,7 @@ EOF;
         $this->assertSame(0, $appTester->getStatusCode());
 
         $expected = <<<'EOF'
-Box version 1.2.3 build @git-commit@
+Box version 1.2.3 2018-04-29 19:33:12
 
 EOF;
 
@@ -89,7 +93,7 @@ EOF;
 /_____/\____/_/|_|  
                     
 
-Box (repo)
+Box version 3.x-dev@151e40a
 
 Usage:
   command [options] [arguments]
@@ -116,7 +120,11 @@ Available commands:
 
 EOF;
 
-        $actual = $appTester->getDisplay(true);
+        $actual = preg_replace(
+            '/Box version .+@[a-z\d]{7}/',
+            'Box version 3.x-dev@151e40a',
+            $appTester->getDisplay(true)
+        );
 
         $this->assertSame($expected, $actual);
     }
