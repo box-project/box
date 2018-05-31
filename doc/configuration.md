@@ -40,11 +40,6 @@
     1. [Git version placeholder (`git-version`)][git-version-placeholder]
 
 
-// TODO: do not mention when an option is optional but add a red asterix with a foot note for the mandatory
-// fields.
-// TODO: right now this documentation is a copy/paste of the doc from the comment. This needs to be reworked
-// TODO: add a test to keep in sync the type declared here and the one in the schema
-
 The build command will build a new PHAR based on a variety of settings.
 
 This command relies on a configuration file for loading PHAR packaging settings. If a configuration file is not
@@ -52,8 +47,6 @@ specified through the `--configuration|-c option`, one of the following files wi
 `box.json.dist`. If no configuration file is found, Box will proceed with the default settings.
 
 The configuration file is a JSON object saved to a file. Note that all settings are optional.
-// TODO: update this last bit of information as this is not true
-// TODO: add a test to ensure this schema is always up to date with the actual schema file
 
 ```json
 {
@@ -299,12 +292,10 @@ You you want a more granular blacklist leverage the [Finders configuration][find
 
 ### Map (`map`)
 
-// TODO: review this setting + doc, default value...]
-
-The map (`array`) setting is used to change where some (or all) files are stored inside the PHAR. The key is a beginning
-of the relative path that will be matched against the file being added to the PHAR. If the key is a match, the matched 
-segment will be replaced with the value. If the key is empty, the value will be prefixed to all paths (except for those 
-already matched by an earlier key).
+The map (`object[]` default `[]`) setting is used to change where some (or all) files are stored inside the PHAR. The key
+is a beginning of the relative path that will be matched against the file being added to the PHAR. If the key is a
+match, the matched segment will be replaced with the value. If the key is empty, the value will be prefixed to all paths
+(except for those already matched by an earlier key).
 
 For example, with the following configuration excerpt:
 
@@ -603,12 +594,9 @@ Note that this setting is used only if the compactor `KevinGH\Box\Compactor\Php`
 
 ### PHP-Scoper (`php-scoper`)
 
-// TODO: review this setting + doc, default value...]
-
-The PHP-Scoper setting (`string`) points to the path to the [PHP-Scoper configuration][php-scoper-configuration] file.
-By default, Box will use the default PHP-Scoper file `php-scoper.inc.php`. For more documentation regarding PHP-Scoper,
-you can head to [PHAR code isolation][PHAR code isolation] or
-[PHP-Scoper official documentation][php-scoper-official-doc].
+The PHP-Scoper setting (`string` default `scoper.inc.php`) points to the path to the
+[PHP-Scoper configuration][php-scoper-configuration] file. For more documentation regarding PHP-Scoper, you can head to
+[PHAR code isolation][PHAR code isolation] or [PHP-Scoper official documentation][php-scoper-official-doc].
 
 Note that this setting is used only if the compactor `KevinGH\Box\Compactor\PhpScoper` is registered.
 
@@ -804,8 +792,6 @@ Example of value the placeholder will be replaced with:
 
 
 ### Git version placeholder (`git-version`)
-
-// TODO: review this setting + doc, default value...]
 
 The git version (`string`) setting is the name of a placeholder value that will be replaced in all
 [non-binary files][including-files] by the one of the following (in order):
