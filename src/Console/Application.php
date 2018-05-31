@@ -14,8 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
+use PackageVersions\Versions;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Helper\HelperSet;
+use function strpos;
+use function substr;
+use function trim;
 
 /**
  * @private
@@ -34,29 +38,39 @@ final class Application extends SymfonyApplication
 
 ASCII;
 
+    private $releaseDate;
+
     /**
      * {@inheritdoc}
      */
-    public function __construct(string $name = 'Box', string $version = '@git-version@')
+    public function __construct(string $name = 'Box', string $version = null, string $releaseDate = '@release-date@')
     {
+        if (null === $version) {
+            $rawVersion = Versions::getVersion('humbug/box');
+
+            [$prettyVersion, $commitHash] = explode('@', $rawVersion);
+
+            $version = $prettyVersion.'@'.substr($commitHash, 0, 7);
+        }
+
+        $this->releaseDate = false === strpos($releaseDate, '@') ? $releaseDate : '';
+
         parent::__construct($name, $version);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getLongVersion()
+    public function getLongVersion(): string
     {
-        if (('@'.'git-version@') !== $this->getVersion()) {
-            return sprintf(
-                '<info>%s</info> version <comment>%s</comment> build <comment>%s</comment>',
+        return trim(
+            sprintf(
+                '<info>%s</info> version <comment>%s</comment> %s',
                 $this->getName(),
                 $this->getVersion(),
-                '@git-commit@'
-            );
-        }
-
-        return '<info>'.$this->getName().'</info> (repo)';
+                $this->releaseDate
+            )
+        );
     }
 
     /**
