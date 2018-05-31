@@ -17,6 +17,7 @@ namespace KevinGH\Box;
 use Assert\Assertion;
 use Closure;
 use DateTimeImmutable;
+use DateTimeZone;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\Php as LegacyPhp;
 use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
@@ -33,6 +34,7 @@ use SplFileInfo;
 use stdClass;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
+use const E_USER_DEPRECATED;
 use function array_column;
 use function array_diff;
 use function array_filter;
@@ -58,7 +60,9 @@ use function KevinGH\Box\FileSystem\longest_common_base_path;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use function preg_match;
+use function sprintf;
 use function substr;
+use function trigger_error;
 use function uniqid;
 
 /**
@@ -115,39 +119,39 @@ BANNER;
     private $checkRequirements;
 
     /**
-     * @param null|string     $file
-     * @param null|string     $alias
-     * @param string          $basePath              Utility to private the base path used and be able to retrieve a
-     *                                               path relative to it (the base path)
-     * @param array           $composerJson          The first element is the path to the `composer.json` file as a
-     *                                               string and the second element its decoded contents as an
-     *                                               associative array.
-     * @param array           $composerLock          The first element is the path to the `composer.lock` file as a
-     *                                               string and the second element its decoded contents as an
-     *                                               associative array.
-     * @param SplFileInfo[]   $files                 List of files
-     * @param SplFileInfo[]   $binaryFiles           List of binary files
-     * @param bool            $dumpAutoload          Whether or not the Composer autoloader should be dumped
-     * @param bool            $excludeComposerFiles  Whether or not the Composer files composer.json, composer.lock and
-     *                                               installed.json should be removed from the PHAR
-     * @param Compactor[]     $compactors            List of file contents compactors
-     * @param null|int        $compressionAlgorithm  Compression algorithm constant value. See the \Phar class constants
-     * @param null|int        $fileMode              File mode in octal form
-     * @param string          $mainScriptPath        The main script file path
-     * @param string          $mainScriptContents    The processed content of the main script file
-     * @param MapFile         $fileMapper            Utility to map the files from outside and inside the PHAR
-     * @param mixed           $metadata              The PHAR Metadata
-     * @param bool            $isPrivateKeyPrompt    If the user should be prompted for the private key passphrase
-     * @param array           $processedReplacements The processed list of replacement placeholders and their values
-     * @param null|string     $shebang               The shebang line
-     * @param int             $signingAlgorithm      The PHAR siging algorithm. See \Phar constants
-     * @param null|string     $stubBannerContents    The stub banner comment
-     * @param null|string     $stubBannerPath        The path to the stub banner comment file
-     * @param null|string     $stubPath              The PHAR stub file path
-     * @param bool            $isInterceptFileFuncs  Whether or not Phar::interceptFileFuncs() should be used
-     * @param bool            $isStubGenerated       Whether or not if the PHAR stub should be generated
-     * @param bool            $checkRequirements     Whether the PHAR will check the application requirements before
-     *                                               running
+     * @param null|string   $file
+     * @param null|string   $alias
+     * @param string        $basePath             Utility to private the base path used and be able to retrieve a
+     *                                            path relative to it (the base path)
+     * @param array         $composerJson         The first element is the path to the `composer.json` file as a
+     *                                            string and the second element its decoded contents as an
+     *                                            associative array.
+     * @param array         $composerLock         The first element is the path to the `composer.lock` file as a
+     *                                            string and the second element its decoded contents as an
+     *                                            associative array.
+     * @param SplFileInfo[] $files                List of files
+     * @param SplFileInfo[] $binaryFiles          List of binary files
+     * @param bool          $dumpAutoload         Whether or not the Composer autoloader should be dumped
+     * @param bool          $excludeComposerFiles Whether or not the Composer files composer.json, composer.lock and
+     *                                            installed.json should be removed from the PHAR
+     * @param Compactor[]   $compactors           List of file contents compactors
+     * @param null|int      $compressionAlgorithm Compression algorithm constant value. See the \Phar class constants
+     * @param null|int      $fileMode             File mode in octal form
+     * @param string        $mainScriptPath       The main script file path
+     * @param string        $mainScriptContents   The processed content of the main script file
+     * @param MapFile       $fileMapper           Utility to map the files from outside and inside the PHAR
+     * @param mixed         $metadata             The PHAR Metadata
+     * @param bool          $isPrivateKeyPrompt   If the user should be prompted for the private key passphrase
+     * @param scalar[]      $replacements         The processed list of replacement placeholders and their values
+     * @param null|string   $shebang              The shebang line
+     * @param int           $signingAlgorithm     The PHAR siging algorithm. See \Phar constants
+     * @param null|string   $stubBannerContents   The stub banner comment
+     * @param null|string   $stubBannerPath       The path to the stub banner comment file
+     * @param null|string   $stubPath             The PHAR stub file path
+     * @param bool          $isInterceptFileFuncs Whether or not Phar::interceptFileFuncs() should be used
+     * @param bool          $isStubGenerated      Whether or not if the PHAR stub should be generated
+     * @param bool          $checkRequirements    Whether the PHAR will check the application requirements before
+     *                                            running
      */
     private function __construct(
         ?string $file,
@@ -171,7 +175,7 @@ BANNER;
         ?string $privateKeyPassphrase,
         ?string $privateKeyPath,
         bool $isPrivateKeyPrompt,
-        array $processedReplacements,
+        array $replacements,
         ?string $shebang,
         int $signingAlgorithm,
         ?string $stubBannerContents,
@@ -217,7 +221,7 @@ BANNER;
         $this->privateKeyPassphrase = $privateKeyPassphrase;
         $this->privateKeyPath = $privateKeyPath;
         $this->isPrivateKeyPrompt = $isPrivateKeyPrompt;
-        $this->processedReplacements = $processedReplacements;
+        $this->processedReplacements = $replacements;
         $this->shebang = $shebang;
         $this->signingAlgorithm = $signingAlgorithm;
         $this->stubBannerContents = $stubBannerContents;
@@ -304,8 +308,7 @@ BANNER;
         $privateKeyPath = self::retrievePrivateKeyPath($raw);
         $isPrivateKeyPrompt = self::retrieveIsPrivateKeyPrompt($raw);
 
-        $replacements = self::retrieveReplacements($raw);
-        $processedReplacements = self::retrieveProcessedReplacements($replacements, $raw, $file);
+        $replacements = self::retrieveReplacements($raw, $file);
 
         $shebang = self::retrieveShebang($raw);
 
@@ -354,7 +357,7 @@ BANNER;
             $privateKeyPassphrase,
             $privateKeyPath,
             $isPrivateKeyPrompt,
-            $processedReplacements,
+            $replacements,
             $shebang,
             $signingAlgorithm,
             $stubBannerContents,
@@ -513,7 +516,10 @@ BANNER;
         return $this->isPrivateKeyPrompt;
     }
 
-    public function getProcessedReplacements(): array
+    /**
+     * @return scalar[]
+     */
+    public function getReplacements(): array
     {
         return $this->processedReplacements;
     }
@@ -1529,24 +1535,19 @@ BANNER;
         return null;
     }
 
-    private static function retrieveReplacements(stdClass $raw): array
+    /**
+     * @return scalar[]
+     */
+    private static function retrieveReplacements(stdClass $raw, ?string $file): array
     {
-        // TODO: add exmample in the doc
-        // Add checks against the values
-        if (isset($raw->replacements)) {
-            return (array) $raw->replacements;
-        }
-
-        return [];
-    }
-
-    private static function retrieveProcessedReplacements(
-        array $replacements,
-        stdClass $raw,
-        ?string $file
-    ): array {
         if (null === $file) {
             return [];
+        }
+
+        $replacements = isset($raw->replacements) ? (array) $raw->replacements : [];
+
+        if (null !== ($git = self::retrievePrettyGitPlaceholder($raw))) {
+            $replacements[$git] = self::retrievePrettyGitTag($file);
         }
 
         if (null !== ($git = self::retrieveGitHashPlaceholder($raw))) {
@@ -1565,9 +1566,11 @@ BANNER;
             $replacements[$git] = self::retrieveGitVersion($file);
         }
 
+        $datetimeFormat = self::retrieveDatetimeFormat($raw);
+
         if (null !== ($date = self::retrieveDatetimeNowPlaceHolder($raw))) {
             $replacements[$date] = self::retrieveDatetimeNow(
-                self::retrieveDatetimeFormat($raw)
+                $datetimeFormat
             );
         }
 
@@ -1575,19 +1578,20 @@ BANNER;
 
         foreach ($replacements as $key => $value) {
             unset($replacements[$key]);
-            $replacements["$sigil$key$sigil"] = $value;
+            $replacements[$sigil.$key.$sigil] = $value;
         }
 
         return $replacements;
     }
 
+    private static function retrievePrettyGitPlaceholder(stdClass $raw): ?string
+    {
+        return isset($raw->{'git'}) ? $raw->{'git'} : null;
+    }
+
     private static function retrieveGitHashPlaceholder(stdClass $raw): ?string
     {
-        if (isset($raw->{'git-commit'})) {
-            return $raw->{'git-commit'};
-        }
-
-        return null;
+        return isset($raw->{'git-commit'}) ? $raw->{'git-commit'} : null;
     }
 
     /**
@@ -1609,20 +1613,12 @@ BANNER;
 
     private static function retrieveGitShortHashPlaceholder(stdClass $raw): ?string
     {
-        if (isset($raw->{'git-commit-short'})) {
-            return $raw->{'git-commit-short'};
-        }
-
-        return null;
+        return isset($raw->{'git-commit-short'}) ? $raw->{'git-commit-short'} : null;
     }
 
     private static function retrieveGitTagPlaceholder(stdClass $raw): ?string
     {
-        if (isset($raw->{'git-tag'})) {
-            return $raw->{'git-tag'};
-        }
-
-        return null;
+        return isset($raw->{'git-tag'}) ? $raw->{'git-tag'} : null;
     }
 
     private static function retrieveGitTag(string $file): string
@@ -1630,20 +1626,24 @@ BANNER;
         return self::runGitCommand('git describe --tags HEAD', $file);
     }
 
-    private static function retrieveGitVersionPlaceholder(stdClass $raw): ?string
+    private static function retrievePrettyGitTag(string $file): string
     {
-        if (isset($raw->{'git-version'})) {
-            return $raw->{'git-version'};
+        $version = self::retrieveGitTag($file);
+
+        if (preg_match('/^(?<tag>.+)-\d+-g(?<hash>[a-f0-9]{7})$/', $version, $matches)) {
+            return sprintf('%s@%s', $matches['tag'], $matches['hash']);
         }
 
-        return null;
+        return $version;
+    }
+
+    private static function retrieveGitVersionPlaceholder(stdClass $raw): ?string
+    {
+        return isset($raw->{'git-version'}) ? $raw->{'git-version'} : null;
     }
 
     private static function retrieveGitVersion(string $file): ?string
     {
-        // TODO: check if is still relevant as IMO we are better off using OcramiusVersionPackage
-        // to avoid messing around with that
-
         try {
             return self::retrieveGitTag($file);
         } catch (RuntimeException $exception) {
@@ -1665,49 +1665,42 @@ BANNER;
 
     private static function retrieveDatetimeNowPlaceHolder(stdClass $raw): ?string
     {
-        // TODO: double check why this is done and how it is used it's not completely clear to me.
-        // Also make sure the documentation is up to date after.
-        // Instead of having two sistinct doc entries for `datetime` and `datetime-format`, it would
-        // be better to have only one element IMO like:
-        //
-        // "datetime": {
-        //   "value": "val",
-        //   "format": "Y-m-d"
-        // }
-        //
-        // Also add a check that one cannot be provided without the other. Or maybe it should? I guess
-        // if the datetime format is the default one it's ok; but in any case the format should not
-        // be added without the datetime value...
-
-        if (isset($raw->{'datetime'})) {
-            return $raw->{'datetime'};
-        }
-
-        return null;
+        return isset($raw->{'datetime'}) ? $raw->{'datetime'} : null;
     }
 
     private static function retrieveDatetimeNow(string $format): string
     {
-        $now = new DateTimeImmutable('now');
+        $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
 
-        $datetime = $now->format($format);
-
-        if ('' === $datetime) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    '"%s" is not a valid PHP date format',
-                    $format
-                )
-            );
-        }
-
-        return $datetime;
+        return $now->format($format);
     }
 
     private static function retrieveDatetimeFormat(stdClass $raw): string
     {
-        if (isset($raw->{'datetime_format'})) {
-            return $raw->{'datetime_format'};
+        if (isset($raw->{'datetime-format'})) {
+            $format = $raw->{'datetime-format'};
+        } elseif (isset($raw->{'datetime_format'})) {
+            // TODO: make sure this deprecation message correctly appear to the user
+            @trigger_error(
+                'The setting "datetime_format" is deprecated, use "datetime-format" instead.',
+                E_USER_DEPRECATED
+            );
+
+            $format = $raw->{'datetime_format'};
+        }
+
+        if (isset($format)) {
+            $formattedDate = (new DateTimeImmutable())->format($format);
+
+            Assertion::false(
+                false === $formattedDate || $formattedDate === $format,
+                sprintf(
+                    'Expected the datetime format to be a valid format: "%s" is not',
+                    $format
+                )
+            );
+
+            return $format;
         }
 
         return self::DEFAULT_DATETIME_FORMAT;
@@ -1715,11 +1708,7 @@ BANNER;
 
     private static function retrieveReplacementSigil(stdClass $raw): string
     {
-        if (isset($raw->{'replacement-sigil'})) {
-            return $raw->{'replacement-sigil'};
-        }
-
-        return self::DEFAULT_REPLACEMENT_SIGIL;
+        return isset($raw->{'replacement-sigil'}) ? $raw->{'replacement-sigil'} : self::DEFAULT_REPLACEMENT_SIGIL;
     }
 
     private static function retrieveShebang(stdClass $raw): ?string

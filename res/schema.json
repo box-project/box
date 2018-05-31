@@ -64,11 +64,15 @@
         },
         "datetime": {
             "description": "The replacement date for the current date and time.",
-            "type": "string"
+            "type": ["string", "null"]
+        },
+        "datetime-format": {
+            "description": "The format for the current date and time.",
+            "type": ["string", "null"]
         },
         "datetime_format": {
             "description": "The format for the current date and time.",
-            "type": "string"
+            "type": ["string", "null"]
         },
         "directories": {
             "description": "A list of directory paths to search for scripts.",
@@ -120,20 +124,24 @@
             },
             "type": "array"
         },
+        "git": {
+            "description": "The replacement name for the current pretty git version format.",
+            "type": "string"
+        },
         "git-commit": {
-            "description": "The replacement name for the current Git full commit hash.",
+            "description": "The replacement name for the current git full commit hash.",
             "type": "string"
         },
         "git-commit-short": {
-            "description": "The replacement name for the current Git short commit hash.",
+            "description": "The replacement name for the current git short commit hash.",
             "type": "string"
         },
         "git-tag": {
-            "description": "The replacement name for the current Git tag.",
+            "description": "The replacement name for the current git tag.",
             "type": "string"
         },
         "git-version": {
-            "description": "The replacement name for the current Git tag or commit hash.",
+            "description": "The replacement name for the current git tag or commit hash.",
             "type": "string"
         },
         "intercept": {
@@ -172,7 +180,7 @@
         },
         "replacement-sigil": {
             "description": "The sigil that surrounds the replacement names.",
-            "type": "string"
+            "type": ["string", "null"]
         },
         "replacements": {
             "description": "A list of replacement names and their values.",
