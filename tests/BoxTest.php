@@ -328,11 +328,14 @@ class BoxTest extends FileSystemTestCase
 
         file_put_contents($file, $contents);
 
-        $fileMapper = new MapFile([
-            [$file => $localPath],
-        ]);
+        $fileMapper = new MapFile(
+            $this->tmp,
+            [
+                [$file => $localPath],
+            ]
+        );
 
-        $this->box->registerFileMapping($this->tmp, $fileMapper);
+        $this->box->registerFileMapping($fileMapper);
 
         $this->box->startBuffering();
         $this->box->addFile($file);
@@ -379,11 +382,14 @@ class BoxTest extends FileSystemTestCase
 
         file_put_contents($file, $contents);
 
-        $fileMapper = new MapFile([
-            [$file => $localPath],
-        ]);
+        $fileMapper = new MapFile(
+            $this->tmp,
+            [
+                [$file => $localPath],
+            ]
+        );
 
-        $this->box->registerFileMapping($this->tmp, $fileMapper);
+        $this->box->registerFileMapping($fileMapper);
 
         $this->box->startBuffering();
         $this->box->addFile($file, null, true);
@@ -447,10 +453,13 @@ class BoxTest extends FileSystemTestCase
 
     public function test_it_maps_the_file_before_adding_it_to_the_phar(): void
     {
-        $map = new MapFile([
-            ['acme' => 'src/Foo'],
-            ['' => 'lib'],
-        ]);
+        $map = new MapFile(
+            $this->tmp,
+            [
+                ['acme' => 'src/Foo'],
+                ['' => 'lib'],
+            ]
+        );
 
         $files = [
             'acme/foo' => 'src/Foo/foo',
@@ -459,7 +468,7 @@ class BoxTest extends FileSystemTestCase
             'f2' => 'lib/f2',
         ];
 
-        $this->box->registerFileMapping($this->tmp, $map);
+        $this->box->registerFileMapping($map);
 
         foreach ($files as $file => $expectedLocal) {
             dump_file($file);
@@ -651,11 +660,14 @@ class BoxTest extends FileSystemTestCase
 
     public function test_it_can_add_files_with_a_local_path_to_the_phar(): void
     {
-        $fileMapper = new MapFile([
-            ['' => 'local'],
-        ]);
+        $fileMapper = new MapFile(
+            $this->tmp,
+            [
+                ['' => 'local'],
+            ]
+        );
 
-        $this->box->registerFileMapping($this->tmp, $fileMapper);
+        $this->box->registerFileMapping($fileMapper);
 
         $files = [
             'foo' => [
@@ -809,11 +821,14 @@ JSON
             dump_file($file, $contents);
         }
 
-        $map = new MapFile([
-            ['' => 'lib'],
-        ]);
+        $map = new MapFile(
+            $this->tmp,
+            [
+                ['' => 'lib'],
+            ]
+        );
 
-        $this->box->registerFileMapping($this->tmp, $map);
+        $this->box->registerFileMapping($map);
 
         $this->box->startBuffering();
         $this->box->addFiles(array_keys($files), true);
@@ -908,11 +923,14 @@ JSON
 
     public function test_it_can_add_binary_files_with_a_local_path_to_the_phar(): void
     {
-        $fileMapper = new MapFile([
-            ['' => 'local'],
-        ]);
+        $fileMapper = new MapFile(
+            $this->tmp,
+            [
+                ['' => 'local'],
+            ]
+        );
 
-        $this->box->registerFileMapping($this->tmp, $fileMapper);
+        $this->box->registerFileMapping($fileMapper);
 
         $files = [
             'foo' => [
@@ -988,10 +1006,13 @@ JSON
 
     public function test_it_maps_the_files_before_adding_it_to_the_phar(): void
     {
-        $map = new MapFile([
-            ['acme' => 'src/Foo'],
-            ['' => 'lib'],
-        ]);
+        $map = new MapFile(
+            $this->tmp,
+            [
+                ['acme' => 'src/Foo'],
+                ['' => 'lib'],
+            ]
+        );
 
         $files = [
             'acme/foo' => 'src/Foo/foo',
@@ -1000,7 +1021,7 @@ JSON
             'f2' => 'lib/f2',
         ];
 
-        $this->box->registerFileMapping($this->tmp, $map);
+        $this->box->registerFileMapping($map);
 
         foreach ($files as $file => $expectedLocal) {
             dump_file($file);

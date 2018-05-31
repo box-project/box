@@ -20,7 +20,6 @@ use Countable;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 use KevinGH\Box\PhpScoper\NullScoper;
-use KevinGH\Box\PhpScoper\Scoper;
 use Phar;
 use RecursiveDirectoryIterator;
 use RuntimeException;
@@ -35,7 +34,6 @@ use function file_exists;
 use function getcwd;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
-use function KevinGH\Box\FileSystem\make_path_relative;
 use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
@@ -70,23 +68,9 @@ final class Box implements Countable
      */
     private $placeholders = [];
 
-    /**
-     * @var string
-     */
-    private $basePath;
-
-    /**
-     * @var MapFile
-     */
     private $mapFile;
-
-    /**
-     * @var Scoper
-     */
     private $scoper;
-
     private $buffering = false;
-
     private $bufferedFiles = [];
 
     private function __construct(Phar $phar, string $file)
@@ -94,8 +78,7 @@ final class Box implements Countable
         $this->phar = $phar;
         $this->file = $file;
 
-        $this->basePath = getcwd();
-        $this->mapFile = new MapFile([]);
+        $this->mapFile = new MapFile(getcwd(), []);
         $this->scoper = new NullScoper();
     }
 
@@ -271,9 +254,8 @@ final class Box implements Countable
         $this->placeholders = $placeholders;
     }
 
-    public function registerFileMapping(string $basePath, MapFile $fileMapper): void
+    public function registerFileMapping(MapFile $fileMapper): void
     {
-        $this->basePath = $basePath;
         $this->mapFile = $fileMapper;
     }
 
@@ -337,8 +319,7 @@ final class Box implements Countable
             $contents = file_contents($file);
         }
 
-        $relativePath = make_path_relative($file, $this->basePath);
-        $local = ($this->mapFile)($relativePath);
+        $local = ($this->mapFile)($file);
 
         if ($binary) {
             $this->bufferedFiles[$local] = $contents;
@@ -410,25 +391,19 @@ final class Box implements Countable
      */
     private function processContents(array $files): array
     {
-        $basePath = $this->basePath;
         $mapFile = $this->mapFile;
         $placeholders = $this->placeholders;
         $compactors = $this->compactors;
         $bootstrap = $GLOBALS['_BOX_BOOTSTRAP'] ?? function (): void {};
         $cwd = getcwd();
 
-        $processFile = function (string $file) use ($cwd, $basePath, $mapFile, $placeholders, $compactors, $bootstrap): array {
+        $processFile = function (string $file) use ($cwd, $mapFile, $placeholders, $compactors, $bootstrap): array {
             chdir($cwd);
             $bootstrap();
 
             $contents = file_contents($file);
 
-            $relativePath = make_path_relative($file, $basePath);
-            $local = $mapFile($relativePath);
-
-            if (null === $local) {
-                $local = $relativePath;
-            }
+            $local = $mapFile($file);
 
             $processedContents = self::compactContents(
                 $compactors,

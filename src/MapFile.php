@@ -14,41 +14,47 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use function KevinGH\Box\FileSystem\make_path_relative;
+
 /**
  * @internal
  * @private
  */
 final class MapFile
 {
+    private $basePath;
     private $map;
 
     /**
      * @param string[][] $map
      */
-    public function __construct(array $map)
+    public function __construct(string $basePath, array $map)
     {
+        $this->basePath = $basePath;
         $this->map = $map;
     }
 
     public function __invoke(string $path): ?string
     {
+        $relativePath = make_path_relative($path, $this->basePath);
+
         foreach ($this->map as $item) {
             foreach ($item as $match => $replace) {
                 if ('' === $match) {
-                    return $replace.'/'.$path;
+                    return $replace.'/'.$relativePath;
                 }
 
-                if (0 === strpos($path, $match)) {
+                if (0 === strpos($relativePath, $match)) {
                     return preg_replace(
                         '/^'.preg_quote($match, '/').'/',
                         $replace,
-                        $path
+                        $relativePath
                     );
                 }
             }
         }
 
-        return $path;
+        return $relativePath;
     }
 
     public function getMap(): array
