@@ -161,6 +161,7 @@ OUTPUT;
 
         $expected = <<<OUTPUT
 
+
  [ERROR] Could not read the file "$expectedPath".
 
 
@@ -266,6 +267,7 @@ OUTPUT;
         $canonicalizedPath = realpath($pharPath);
 
         $expected = <<<OUTPUT
+
 
  [ERROR] Could not read the file "$canonicalizedPath".
 

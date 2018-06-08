@@ -16,7 +16,9 @@ namespace KevinGH\Box\Composer;
 
 use Composer\Factory;
 use Composer\IO\NullIO;
+use function count;
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
+use Humbug\PhpScoper\Whitelist;
 use RuntimeException;
 use Throwable;
 use const PHP_EOL;
@@ -34,10 +36,7 @@ final class ComposerOrchestrator
     {
     }
 
-    /**
-     * @param string[] $whitelist
-     */
-    public static function dumpAutoload(array $whitelist, string $prefix): void
+    public static function dumpAutoload(Whitelist $whitelist, string $prefix): void
     {
         try {
             $composer = Factory::create(new NullIO(), null, true);
@@ -73,12 +72,9 @@ final class ComposerOrchestrator
         }
     }
 
-    /**
-     * @param string[] $whitelist
-     */
-    private static function generateAutoloadStatements(array $whitelist, string $prefix, string $autoload): string
+    private static function generateAutoloadStatements(Whitelist $whitelist, string $prefix, string $autoload): string
     {
-        if ([] === $whitelist) {
+        if (0 === count($whitelist->getClassWhitelistArray())) {
             return $autoload;
         }
 

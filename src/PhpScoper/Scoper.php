@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PhpScoper;
 
+use Humbug\PhpScoper\Whitelist;
+
 interface Scoper
 {
     /**
@@ -29,7 +31,7 @@ interface Scoper
     /**
      * @return string[]
      */
-    public function getWhitelist(): array;
+    public function getWhitelist(): Whitelist;
 
     public function getPrefix(): string;
 }

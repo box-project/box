@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PhpScoper;
 
+use Humbug\PhpScoper\Whitelist;
+
 final class NullScoper implements Scoper
 {
     /**
@@ -27,9 +29,9 @@ final class NullScoper implements Scoper
     /**
      * @return string[]
      */
-    public function getWhitelist(): array
+    public function getWhitelist(): Whitelist
     {
-        return [];
+        return Whitelist::create();
     }
 
     public function getPrefix(): string
