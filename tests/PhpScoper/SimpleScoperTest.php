@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\PhpScoper;
 
 use Humbug\PhpScoper\Scoper;
+use Humbug\PhpScoper\Whitelist;
 use KevinGH\Box\Compactor\PhpScoper;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -36,7 +37,7 @@ class SimpleScoperTest extends TestCase
 JSON;
 
         $prefix = 'HumbugBox';
-        $whitelist = ['Whitelisted\Foo'];
+        $whitelist = Whitelist::create('Whitelisted\Foo');
         $patchers = [];
 
         /** @var ObjectProphecy|PhpScoper $phpScoperProphecy */
@@ -62,7 +63,7 @@ JSON;
     public function test_it_exposes_some_elements_of_the_scoping_config(): void
     {
         $prefix = 'HumbugBox';
-        $whitelist = ['Whitelisted\Foo'];
+        $whitelist = Whitelist::create('Whitelisted\Foo');
         $patchers = [];
 
         $scoper = new SimpleScoper(new FakePhpScoper(), $prefix, $whitelist, $patchers);

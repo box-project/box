@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PhpScoper;
 
+use Humbug\PhpScoper\Whitelist;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -43,6 +44,6 @@ JSON;
         $scoper = new NullScoper();
 
         $this->assertSame('', $scoper->getPrefix());
-        $this->assertSame([], $scoper->getWhitelist());
+        $this->assertEquals(Whitelist::create(), $scoper->getWhitelist());
     }
 }

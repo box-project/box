@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
+use Humbug\PhpScoper\Whitelist;
 use KevinGH\Box\Test\FileSystemTestCase;
 use RuntimeException;
 use Symfony\Component\Finder\Finder;
@@ -35,7 +36,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
      * @dataProvider provideComposerAutoload
      */
     public function test_it_can_dump_the_autoloader_with_an_empty_composer_json(
-        array $whitelist,
+        Whitelist $whitelist,
         string $prefix,
         string $expectedAutoloadContents
     ): void {
@@ -94,7 +95,7 @@ PHP
      * @dataProvider provideComposerAutoload
      */
     public function test_it_cannot_dump_the_autoloader_with_an_invalid_composer_json(
-        array $whitelist,
+        Whitelist $whitelist,
         string $prefix
     ): void {
         mirror(self::FIXTURES.'/dir000', $this->tmp);
@@ -117,7 +118,7 @@ PHP
     {
         mirror(self::FIXTURES.'/dir000', $this->tmp);
 
-        ComposerOrchestrator::dumpAutoload([], '');
+        ComposerOrchestrator::dumpAutoload(Whitelist::create(), '');
 
         $expectedPaths = [
             'composer.json',
@@ -180,7 +181,7 @@ PHP
      * @dataProvider provideComposerAutoload
      */
     public function test_it_cannot_dump_the_autoloader_if_the_composer_json_file_is_missing(
-        array $whitelist,
+        Whitelist $whitelist,
         string $prefix
     ): void {
         try {
@@ -199,7 +200,7 @@ PHP
      * @dataProvider provideComposerAutoload
      */
     public function test_it_can_dump_the_autoloader_with_a_composer_json_lock_and_installed_with_a_dependency(
-        array $whitelist,
+        Whitelist $whitelist,
         string $prefix,
         string $expectedAutoloadContents
     ): void {
@@ -273,7 +274,7 @@ PHP
      * @dataProvider provideComposerAutoload
      */
     public function test_it_can_dump_the_autoloader_with_a_composer_json_and_lock_with_a_dependency(
-        array $whitelist,
+        Whitelist $whitelist,
         string $prefix,
         string $expectedAutoloadContents
     ): void {
@@ -345,7 +346,7 @@ PHP
         $composerAutoloaderName = self::COMPOSER_AUTOLOADER_NAME;
 
         yield [
-            [],
+            Whitelist::create(),
             '',
             <<<PHP
 <?php
@@ -360,7 +361,7 @@ PHP
         ];
 
         yield [
-            ['Acme\Foo'],   // Whitelist is ignored when prefix is empty
+            Whitelist::create('Acme\Foo'),  // Whitelist is ignored when prefix is empty
             '',
             <<<PHP
 <?php
@@ -375,7 +376,7 @@ PHP
         ];
 
         yield [
-            [],
+            Whitelist::create(),
             '_Box',
             <<<PHP
 <?php
@@ -390,7 +391,7 @@ PHP
         ];
 
         yield [
-            ['Acme\Foo'],
+            Whitelist::create('Acme\Foo'),
             '_Box',
             <<<PHP
 <?php

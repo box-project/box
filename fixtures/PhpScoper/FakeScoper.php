@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PhpScoper;
 
+use Humbug\PhpScoper\Whitelist;
 use KevinGH\Box\NotCallable;
 
 final class FakeScoper implements Scoper
@@ -31,7 +32,7 @@ final class FakeScoper implements Scoper
     /**
      * {@inheritdoc}
      */
-    public function getWhitelist(): array
+    public function getWhitelist(): Whitelist
     {
         $this->__call(__METHOD__, func_get_args());
     }
