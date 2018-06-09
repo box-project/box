@@ -48,7 +48,7 @@
         "composer/composer": "^1.6",
         "composer/xdebug-handler": "^1.1.0",
         "herrera-io/annotations": "~1.0",
-        "humbug/php-scoper": "dev-master#4f40b5a",
+        "humbug/php-scoper": "^0.8",
         "justinrainbow/json-schema": "^5.2",
         "nikic/iter": "^1.6",
         "ocramius/package-versions": "^1.3",

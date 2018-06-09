@@ -118,7 +118,7 @@ PHP
     {
         mirror(self::FIXTURES.'/dir000', $this->tmp);
 
-        ComposerOrchestrator::dumpAutoload(Whitelist::create(), '');
+        ComposerOrchestrator::dumpAutoload(Whitelist::create(true), '');
 
         $expectedPaths = [
             'composer.json',
@@ -346,7 +346,7 @@ PHP
         $composerAutoloaderName = self::COMPOSER_AUTOLOADER_NAME;
 
         yield [
-            Whitelist::create(),
+            Whitelist::create(true),
             '',
             <<<PHP
 <?php
@@ -361,7 +361,7 @@ PHP
         ];
 
         yield [
-            Whitelist::create('Acme\Foo'),  // Whitelist is ignored when prefix is empty
+            Whitelist::create(true, 'Acme\Foo'),  // Whitelist is ignored when prefix is empty
             '',
             <<<PHP
 <?php
@@ -376,7 +376,7 @@ PHP
         ];
 
         yield [
-            Whitelist::create(),
+            Whitelist::create(true),
             '_Box',
             <<<PHP
 <?php
@@ -391,7 +391,7 @@ PHP
         ];
 
         yield [
-            Whitelist::create('Acme\Foo'),
+            Whitelist::create(true, 'Acme\Foo'),
             '_Box',
             <<<PHP
 <?php
