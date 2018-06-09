@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8ed956d436e7d0c7fdf852a469d8bd72",
+    "content-hash": "b39195aa414ba81ddb1d9c925068aa7d",
     "packages": [
         {
             "name": "amphp/amp",
@@ -947,16 +947,16 @@
         },
         {
             "name": "humbug/php-scoper",
-            "version": "dev-master",
+            "version": "0.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/humbug/php-scoper.git",
-                "reference": "4f40b5a"
+                "reference": "21bd501440454614dd0436b18e1049e0a581d205"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/4f40b5a",
-                "reference": "4f40b5a",
+                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/21bd501440454614dd0436b18e1049e0a581d205",
+                "reference": "21bd501440454614dd0436b18e1049e0a581d205",
                 "shasum": ""
             },
             "require": {
@@ -1015,7 +1015,7 @@
                 }
             ],
             "description": "Prefixes all PHP namespaces in a file or directory.",
-            "time": "2018-06-08T12:39:43+00:00"
+            "time": "2018-06-09T14:56:03+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -4321,7 +4321,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "humbug/php-scoper": 20,
         "infection/infection": 20
     },
     "prefer-stable": false,
