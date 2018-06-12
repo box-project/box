@@ -1865,7 +1865,7 @@ BANNER;
              ;
         }
 
-        $configFile = $raw->phpScoper;
+        $configFile = $raw->{'php-scoper'};
 
         Assertion::string($configFile);
 

@@ -22,6 +22,7 @@ use InvalidArgumentException;
 use KevinGH\Box\Compactor\DummyCompactor;
 use KevinGH\Box\Compactor\InvalidCompactor;
 use KevinGH\Box\Compactor\Php;
+use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Json\JsonValidationException;
 use Phar;
 use RuntimeException;
@@ -469,6 +470,21 @@ EOF
         )($tokenizer);
 
         $this->assertSame(['author'], $ignored);
+    }
+
+    public function test_custom_php_scoper_configuration_location_is_used(): void
+    {
+        file_put_contents(__DIR__ . '/custom.scoper.ini.php', "<?php return ['prefix' => 'custom'];");
+
+        $this->setConfig([
+            'php-scoper' => __DIR__ . '/custom.scoper.ini.php',
+            'compactors' => [
+                PhpScoper::class,
+            ],
+        ]);
+
+        $compactors = $this->config->getCompactors();
+        $this->assertSame('custom', $compactors[0]->getScoper()->getPrefix());
     }
 
     public function test_no_compression_algorithm_is_configured_by_default(): void
