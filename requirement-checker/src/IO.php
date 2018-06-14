@@ -176,7 +176,7 @@ final class IO
             return false;
         }
 
-        if (DIRECTORY_SEPARATOR === '\\') {
+        if (\DIRECTORY_SEPARATOR === '\\') {
             return (
                     function_exists('sapi_windows_vt100_support')
                     && sapi_windows_vt100_support(STDOUT)

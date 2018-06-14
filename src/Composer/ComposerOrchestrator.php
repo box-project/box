@@ -16,12 +16,12 @@ namespace KevinGH\Box\Composer;
 
 use Composer\Factory;
 use Composer\IO\NullIO;
-use function count;
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use Humbug\PhpScoper\Whitelist;
 use RuntimeException;
 use Throwable;
 use const PHP_EOL;
+use function count;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
 use function preg_replace;

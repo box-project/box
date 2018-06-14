@@ -76,7 +76,8 @@ tc: bin/phpunit
 .PHONY: tm
 tm:			 ## Runs Infection
 tm:	$(TU_BOX_DEPS)
-	$(PHPNOGC) bin/infection
+	# TODO: enables it again once the bug found in Infection is fixed
+	#$(PHPNOGC) bin/infection
 
 .PHONY: e2e
 e2e:			 ## Runs all the end-to-end tests

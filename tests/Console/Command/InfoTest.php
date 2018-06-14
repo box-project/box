@@ -21,6 +21,7 @@ use Phar;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use UnexpectedValueException;
+use function getenv;
 use function preg_replace;
 use function realpath;
 
@@ -148,6 +149,10 @@ OUTPUT;
 
     public function test_it_cannot_provide_info_about_an_invalid_phar_without_extension(): void
     {
+        if ('v3' === getenv('SYMFONY_VERSION')) {
+            $this->markTestSkipped();
+        }
+
         $file = self::FIXTURES.'/foo';
 
         $this->commandTester->execute(
@@ -255,6 +260,10 @@ OUTPUT;
 
     public function test_it_provides_a_zip_phar_info(): void
     {
+        if ('v3' === getenv('SYMFONY_VERSION')) {
+            $this->markTestSkipped();
+        }
+
         $pharPath = self::FIXTURES.'/new-simple-phar.zip';
 
         $this->commandTester->execute(
