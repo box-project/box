@@ -18,7 +18,10 @@ use InvalidArgumentException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-final class BuildLogger
+/**
+ * @internal
+ */
+final class CompileLogger
 {
     public const QUESTION_MARK_PREFIX = '?';
     public const STAR_PREFIX = '*';
