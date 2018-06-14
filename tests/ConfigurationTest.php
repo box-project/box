@@ -472,12 +472,12 @@ EOF
         $this->assertSame(['author'], $ignored);
     }
 
-    public function test_custom_php_scoper_configuration_location_is_used(): void
+    public function test_the_php_scoper_configuration_location_can_be_configured(): void
     {
-        file_put_contents(__DIR__.'/custom.scoper.ini.php', "<?php return ['prefix' => 'custom'];");
+        dump_file('custom.scoper.ini.php', "<?php return ['prefix' => 'custom'];");
 
         $this->setConfig([
-            'php-scoper' => __DIR__.'/custom.scoper.ini.php',
+            'php-scoper' => 'custom.scoper.ini.php',
             'compactors' => [
                 PhpScoper::class,
             ],

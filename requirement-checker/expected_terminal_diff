@@ -24,6 +24,10 @@
 >  *
 >  * @license MIT (c) Fabien Potencier <fabien@symfony.com>
 >  */
+59c66
+<         if ('\\' === DIRECTORY_SEPARATOR) {
+---
+>         if ('\\' === \DIRECTORY_SEPARATOR) {
 86c93
 <      * @return int[]|null An array composed of the width and the height or null if it could not be parsed
 ---
