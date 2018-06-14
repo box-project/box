@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use function getenv;
 use InvalidArgumentException;
 use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\CommandTestCase;
@@ -148,6 +149,10 @@ OUTPUT;
 
     public function test_it_cannot_provide_info_about_an_invalid_phar_without_extension(): void
     {
+        if ('v3' === getenv('SYMFONY_VERSION')) {
+            $this->markTestSkipped();
+        }
+
         $file = self::FIXTURES.'/foo';
 
         $this->commandTester->execute(
@@ -255,6 +260,10 @@ OUTPUT;
 
     public function test_it_provides_a_zip_phar_info(): void
     {
+        if ('v3' === getenv('SYMFONY_VERSION')) {
+            $this->markTestSkipped();
+        }
+
         $pharPath = self::FIXTURES.'/new-simple-phar.zip';
 
         $this->commandTester->execute(
