@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use const DIRECTORY_SEPARATOR;
 use Exception;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\FakeCompactor;

@@ -474,10 +474,10 @@ EOF
 
     public function test_custom_php_scoper_configuration_location_is_used(): void
     {
-        file_put_contents(__DIR__ . '/custom.scoper.ini.php', "<?php return ['prefix' => 'custom'];");
+        file_put_contents(__DIR__.'/custom.scoper.ini.php', "<?php return ['prefix' => 'custom'];");
 
         $this->setConfig([
-            'php-scoper' => __DIR__ . '/custom.scoper.ini.php',
+            'php-scoper' => __DIR__.'/custom.scoper.ini.php',
             'compactors' => [
                 PhpScoper::class,
             ],

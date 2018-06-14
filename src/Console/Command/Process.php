@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use KevinGH\Box\Box;
 use KevinGH\Box\Compactor;
 use KevinGH\Box\Compactor\Placeholder;
 use KevinGH\Box\Compactors;

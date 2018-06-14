@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
+use const DIRECTORY_SEPARATOR;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 
 /**
