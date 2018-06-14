@@ -509,7 +509,8 @@ If this parameter is set to a different value than `null`, then the value of [`b
 
 The `dump-autoload` (`boolean`|`null`, default `true`) setting will result in Box dump the Composer autoload with the
 [classmap authoritative mode][composer-classmap-authoritative] and the [`--no-dev` option][composer-no-dev-option] which
-disables the `autoload-dev` rules. This is however done only if a `composer.json` file could be found.
+disables the `autoload-dev` rules. This is however done only if a `composer.json` file could be found. If a
+`composer.lock` file is found as well, the file `vendor/composer/installed.json` will be required too.
 
 The dumping of the autoloader will be _ignored_ if the `composer.json` file could be found.
 
@@ -519,14 +520,9 @@ by the [compactors][compactors] process.
 
 ## Excluding the Composer files (`exclude-composer-files`)
 
-The `dump-autoload` (`boolean`|`null`, default `true`) setting will result in Box dump the Composer autoload with the
-[classmap authoritative mode][composer-classmap-authoritative] and the [`--no-dev` option][composer-no-dev-option] which
-disables the `autoload-dev` rules. This is however done only if a `composer.json` file could be found.
-
-The dumping of the autoloader will be _ignored_ if the `composer.json` file could be found.
-
-The autoloader is dumped at the end of the process to ensure it will take into account the eventual modifications done
-by the [compactors][compactors] process.
+The `exclude-composer-files` (`boolean`|`null`, default `true`) setting will result in removing the Composer files
+`composer.json`, `composer.lock` and `vendor/composer/installed.json` if they are found regardless of whether or not
+they were found by Box alone or explicitly included.
 
 
 ## Compactors (`compactors`)
