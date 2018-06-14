@@ -1,5 +1,56 @@
 # From 2.7 to 3.0
 
+The change from 2.x to 3.x is quite significant but should be really smooth for the user. The main changes are:
+
+- Box is more verbose and provides more useful information during the compilation
+- Box is _significantly_ faster (+200%!)
+- The configuration is optional
+- Box can figure out itself which files to include
+- Automatically remove the dev dependencies
+- No longer requires a `phar.readonly` or `ulimit` setting change from the user
+- [Allows to scope the PHAR](doc/code-isolation.md#phar-code-isolation)
+- [Allows to ship with a requirements checker](doc/requirement-checker.md#requirements-checker) 
+
+
+A few more features landed as well and a range of settings were added more, the whole list of BC breaks can be found
+bellow.
+
+
+## From 3.0.0-alpha.1 to 3.0.0-beta.2
+
+- There is some possible BC breaks in how the PHAR is being scoped due to PHP-Scoper introducing a couple of BC breaks (cf. PHP-Scoper 0.8.0 release notes) (#255)
+
+## From 3.0.0-alpha.7 to 3.0.0-beta.0
+
+- The datetime value used for the datetime placeholder is now always in UTC (#245)
+- The settings `datetime-format` and `datetime_format` are now always evaluated even if the `datetime` setting is not used or null (#245)
+- The settings `datetime-format` and `datetime_format` now throw an exception when the format is invalid (#245)
+- Disabling the shebang requires to set `shebang` to `false` instead of `null` (#251)
+- Disabling the banner requires to set `banner` to `false` instead of `null` (#251)
+
+
+## From 3.0.0-alpha.6 to 3.0.0-alpha.7
+
+- Add missing doc elements and doc related tests (#240)
+- Skip the tests when they require `phar.readonly` off but it is on (#241)
+
+
+## From 3.0.0-alpha.5 to 3.0.0-alpha.6
+
+- The `Json` compactor now also attempts to compress `.lock` files (e.g. the `composer.lock`) (#228)
+- Remove the config JSON imports support (#237)
+
+
+## From 3.0.0-alpha.3 to 3.0.0-alpha.4
+
+- Remove the JS minifier compactor (#173)
+
+
+## From 3.0.0-alpha.2 to 3.0.0-alpha.3
+
+- Ignore the symlinks in the `vendor` directory (#157)
+
+
 ## From 3.0.0-alpha.1 to 3.0.0-alpha.2
 
 - Change the default PHAR output from `default.phar` to `index.phar` (#127)
