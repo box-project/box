@@ -609,34 +609,36 @@ EOF
     {
         $filesCount = count($box) + 128;  // Add a little extra for good measure
 
-        if (function_exists('posix_getrlimit') && function_exists('posix_setrlimit')) {
-            $softLimit = posix_getrlimit()['soft openfiles'];
-            $hardLimit = posix_getrlimit()['hard openfiles'];
-
-            if ($softLimit < $filesCount) {
-                $io->writeln(
-                    sprintf(
-                        '<info>[debug] Increased the maximum number of open file descriptors from ("%s", "%s") to ("%s", "%s")'
-                        .'</info>',
-                        $softLimit,
-                        $hardLimit,
-                        $filesCount,
-                        'unlimited'
-                    ),
-                    OutputInterface::VERBOSITY_DEBUG
-                );
-
-                posix_setrlimit(
-                    POSIX_RLIMIT_NOFILE,
-                    $filesCount,
-                    'unlimited' === $hardLimit ? POSIX_RLIMIT_INFINITY : $hardLimit
-                );
-            }
-        } else {
+        if (false === function_exists('posix_getrlimit') || false === function_exists('posix_setrlimit')) {
             $io->writeln(
                 '<info>[debug] Could not check the maximum number of open file descriptors: the functions "posix_getrlimit()" and '
                 .'"posix_setrlimit" could not be found.</info>',
                 OutputInterface::VERBOSITY_DEBUG
+            );
+
+            return function () {};
+        }
+
+        $softLimit = posix_getrlimit()['soft openfiles'];
+        $hardLimit = posix_getrlimit()['hard openfiles'];
+
+        if ($softLimit < $filesCount) {
+            $io->writeln(
+                sprintf(
+                    '<info>[debug] Increased the maximum number of open file descriptors from ("%s", "%s") to ("%s", "%s")'
+                    .'</info>',
+                    $softLimit,
+                    $hardLimit,
+                    $filesCount,
+                    'unlimited'
+                ),
+                OutputInterface::VERBOSITY_DEBUG
+            );
+
+            posix_setrlimit(
+                POSIX_RLIMIT_NOFILE,
+                $filesCount,
+                'unlimited' === $hardLimit ? POSIX_RLIMIT_INFINITY : $hardLimit
             );
         }
 
