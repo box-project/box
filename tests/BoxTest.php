@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use const DIRECTORY_SEPARATOR;
 use Exception;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\FakeCompactor;
@@ -30,6 +29,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 use RuntimeException;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
+use const DIRECTORY_SEPARATOR;
 use function array_filter;
 use function array_keys;
 use function current;

@@ -14,10 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
-use const DIRECTORY_SEPARATOR;
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Test\FileSystemTestCase;
 use KevinGH\Box\Throwable\Exception\NoConfigurationFound;
+use const DIRECTORY_SEPARATOR;
 
 /**
  * @covers \KevinGH\Box\Console\ConfigurationHelper
