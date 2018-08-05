@@ -13,6 +13,7 @@
 /fixtures/composer-dump/dir001/vendor/
 /fixtures/build/dir010/*.phar
 /fixtures/check-requirements/*/actual-output
+/fixtures/check-requirements/*/expected-output-*
 /fixtures/check-requirements/*/*.phar
 /.phpunit*
 /.requirement-checker/

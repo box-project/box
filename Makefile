@@ -93,34 +93,77 @@ DOCKER=docker run -i --rm -w /opt/box
 PHP7PHAR=box_php72 php index.phar -vvv --no-ansi
 PHP5PHAR=box_php53 php index.phar -vvv --no-ansi
 e2e_check_requirements:	 ## Runs the end-to-end tests for the check requirements feature
-e2e_check_requirements: box
+#e2e_check_requirements: box
+e2e_check_requirements:
 	./.docker/build
 
+	#
+	# Pass no config
+	#
+
 	bin/box compile --working-dir fixtures/check-requirements/pass-no-config/
+
+	# 5.3
+	sed "s/PHP_VERSION/$$($(DOCKER) box_php53 php -r 'echo PHP_VERSION;')/" \
+		fixtures/check-requirements/pass-no-config/expected-output-53-dist \
+		> fixtures/check-requirements/pass-no-config/expected-output-53
 
 	rm fixtures/check-requirements/pass-no-config/actual-output || true
 	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-no-config":/opt/box $(PHP5PHAR) > fixtures/check-requirements/pass-no-config/actual-output
 	diff fixtures/check-requirements/pass-no-config/expected-output-53 fixtures/check-requirements/pass-no-config/actual-output
 
+	# 7.2
+	sed "s/PHP_VERSION/$$($(DOCKER) box_php72 php -r 'echo PHP_VERSION;')/" \
+		fixtures/check-requirements/pass-no-config/expected-output-72-dist \
+		> fixtures/check-requirements/pass-no-config/expected-output-72
+
 	rm fixtures/check-requirements/pass-no-config/actual-output || true
 	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-no-config":/opt/box $(PHP7PHAR) > fixtures/check-requirements/pass-no-config/actual-output
 	diff fixtures/check-requirements/pass-no-config/expected-output-72 fixtures/check-requirements/pass-no-config/actual-output
 
+	#
+	# Pass complete
+	#
+
 	bin/box compile --working-dir fixtures/check-requirements/pass-complete/
+
+	# 5.3
+	sed "s/PHP_VERSION/$$($(DOCKER) box_php53 php -r 'echo PHP_VERSION;')/" \
+		fixtures/check-requirements/pass-complete/expected-output-53-dist \
+		> fixtures/check-requirements/pass-complete/expected-output-53
 
 	rm fixtures/check-requirements/pass-complete/actual-output || true
 	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-complete":/opt/box $(PHP5PHAR) > fixtures/check-requirements/pass-complete/actual-output
 	diff fixtures/check-requirements/pass-complete/expected-output-53 fixtures/check-requirements/pass-complete/actual-output
 
+	# 7.2
+	sed "s/PHP_VERSION/$$($(DOCKER) box_php72 php -r 'echo PHP_VERSION;')/" \
+		fixtures/check-requirements/pass-complete/expected-output-72-dist \
+		> fixtures/check-requirements/pass-complete/expected-output-72
+
 	rm fixtures/check-requirements/pass-complete/actual-output || true
 	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-complete":/opt/box $(PHP7PHAR) > fixtures/check-requirements/pass-complete/actual-output
 	diff fixtures/check-requirements/pass-complete/expected-output-72 fixtures/check-requirements/pass-complete/actual-output
 
+	#
+	# Fail complete
+	#
+
 	bin/box compile --working-dir fixtures/check-requirements/fail-complete/
+
+	# 5.3
+	sed "s/PHP_VERSION/$$($(DOCKER) box_php53 php -r 'echo PHP_VERSION;')/" \
+    		fixtures/check-requirements/fail-complete/expected-output-53-dist \
+    		> fixtures/check-requirements/fail-complete/expected-output-53
 
 	rm fixtures/check-requirements/fail-complete/actual-output || true
 	$(DOCKER) -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP5PHAR) > fixtures/check-requirements/fail-complete/actual-output || true
 	diff fixtures/check-requirements/fail-complete/expected-output-53 fixtures/check-requirements/fail-complete/actual-output
+
+	# 7.2
+	sed "s/PHP_VERSION/$$($(DOCKER) box_php72 php -r 'echo PHP_VERSION;')/" \
+		fixtures/check-requirements/fail-complete/expected-output-72-dist \
+		> fixtures/check-requirements/fail-complete/expected-output-72
 
 	rm fixtures/check-requirements/fail-complete/actual-output || true
 	$(DOCKER) -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP7PHAR) > fixtures/check-requirements/fail-complete/actual-output || true
