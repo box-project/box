@@ -25,6 +25,7 @@ use Phar;
 use PharFileInfo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Traversable;
@@ -61,6 +62,20 @@ class CompileTest extends CommandTestCase
         $this->markAsSkippedIfPharReadonlyIsOn();
 
         parent::setUp();
+
+        $this->commandTester = new class($this->application->get($this->getCommand()->getName())) extends CommandTester {
+            /**
+             * {@inheritdoc}
+             */
+            public function execute(array $input, array $options = array())
+            {
+                if ('compile' === $input['command']) {
+                    $input['--no-parallel'] = null;
+                }
+
+                return parent::execute($input, $options);
+            }
+        };
     }
 
     /**
@@ -984,6 +999,7 @@ OUTPUT;
         $expected = <<<OUTPUT
 [debug] Checking BOX_ALLOW_XDEBUG
 $xdebugLog
+[debug] Disabled parallel processing
 
     ____
    / __ )____  _  __

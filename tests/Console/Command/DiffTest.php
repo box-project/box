@@ -166,7 +166,7 @@ OUTPUT;
                 '--check' => null,
             ]
         );
-        $output = DisplayNormalizer::removeTrailingSpaces(ob_get_clean());
+        ob_get_clean();
 
         $expected = <<<'OUTPUT'
 No differences encountered.
@@ -207,12 +207,9 @@ OUTPUT;
             ]
         );
 
-        $expected = <<<OUTPUT
-Could not check the PHARs: internal corruption of phar "$pharB" (__HALT_COMPILER(); not found)
+        $expected = '/^Could not check the PHARs: internal corruption of phar \".*\.phar\" \(__HALT_COMPILER\(\); not found\)/';
 
-OUTPUT;
-
-        $this->assertSame($expected, $this->commandTester->getDisplay(true));
+        $this->assertRegExp($expected, $this->commandTester->getDisplay(true));
         $this->assertSame(1, $this->commandTester->getStatusCode());
     }
 
@@ -253,8 +250,8 @@ OUTPUT;
 
             $this->fail('Expected exception to be thrown.');
         } catch (UnexpectedValueException $exception) {
-            $this->assertSame(
-                "internal corruption of phar \"$pharB\" (__HALT_COMPILER(); not found)",
+            $this->assertRegExp(
+                '/^internal corruption of phar \".*\.phar\" \(__HALT_COMPILER\(\); not found\)/',
                 $exception->getMessage()
             );
         }
