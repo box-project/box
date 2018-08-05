@@ -63,7 +63,7 @@
     },
     "require-dev": {
         "bamarni/composer-bin-plugin": "^1.2",
-        "infection/infection": "dev-master",
+        "infection/infection": "^0.9.2",
         "mikey179/vfsStream": "^1.1",
         "phpunit/phpunit": "^7.0"
     },
