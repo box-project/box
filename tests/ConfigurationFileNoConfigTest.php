@@ -562,6 +562,7 @@ JSON
             'composer.json',
             'ConductCommand.php',
             'ContributingCommand.php',
+            'LICENSE',
             'LicenseCommand.php',
             'LICENSE_GECKO',
             'ReadmeCommand.php',

@@ -12,7 +12,6 @@
     ],
 
     "files": ["res/schema.json"],
-    "files-bin": ["vendor/composer/composer/LICENSE"],
     "directories-bin": [".requirement-checker"],
 
     "compression": "GZ",
