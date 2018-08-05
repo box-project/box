@@ -42,6 +42,7 @@ before_install:
   - |
     if [ "DEPLOY" != "true" ]; then
         composer config --unset platform.php
+        composer update --lock
     fi
 
 install:
