@@ -110,7 +110,6 @@ final class Diff extends Command
 
                                 \Phar::unlinkArchive($path);
                             }
-
                         };
                     },
                     $paths

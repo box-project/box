@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console;
 
 use function preg_match;
-use function preg_match_all;
 use function str_replace;
 
 final class DisplayNormalizer

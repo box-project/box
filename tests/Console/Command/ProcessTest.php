@@ -16,11 +16,11 @@ namespace KevinGH\Box\Console\Command;
 
 use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\CommandTestCase;
+use Symfony\Component\Console\Command\Command;
+use function KevinGH\Box\FileSystem\dump_file;
 use function preg_match;
 use function preg_replace;
 use function str_replace;
-use Symfony\Component\Console\Command\Command;
-use function KevinGH\Box\FileSystem\dump_file;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Process

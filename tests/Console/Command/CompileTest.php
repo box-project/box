@@ -67,7 +67,7 @@ class CompileTest extends CommandTestCase
             /**
              * {@inheritdoc}
              */
-            public function execute(array $input, array $options = array())
+            public function execute(array $input, array $options = [])
             {
                 if ('compile' === $input['command']) {
                     $input['--no-parallel'] = null;
