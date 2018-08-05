@@ -283,8 +283,11 @@ OUTPUT;
 
 OUTPUT;
 
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-        $actual = preg_replace('/file[\ \n]+"/', 'file "', $actual);
+        $actual = DisplayNormalizer::removeMiddleStringLineReturns(
+            DisplayNormalizer::removeTrailingSpaces(
+                $this->commandTester->getDisplay(true)
+            )
+        );
 
         $this->assertSame($expected, $actual);
         $this->assertSame(1, $this->commandTester->getStatusCode());

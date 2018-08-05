@@ -16,6 +16,9 @@ namespace KevinGH\Box\Console\Command;
 
 use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\CommandTestCase;
+use function preg_match;
+use function preg_replace;
+use function str_replace;
 use Symfony\Component\Console\Command\Command;
 use function KevinGH\Box\FileSystem\dump_file;
 
@@ -24,8 +27,6 @@ use function KevinGH\Box\FileSystem\dump_file;
  */
 class ProcessTest extends CommandTestCase
 {
-    private const FIXTURES_DIR = __DIR__.'/../../../fixtures/diff';
-
     /**
      * {@inheritdoc}
      */
@@ -103,6 +104,18 @@ JSON
             ]
         );
         $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
+
+        if (1 === preg_match('/\/\/ Loading the configuration file\n \/\/ "(?<file>[\s\S]*?)"./', $actual, $matches)) {
+            $file = $matches['file'];
+
+            $actual = str_replace(
+                $file,
+                preg_replace('/\n \/\/ /', '', $file),
+                $actual
+            );
+
+            DisplayNormalizer::removeMiddleStringLineReturns($actual);
+        }
 
         $expectedConfigPath = $this->tmp.'/box.json';
         $expectedFilePath = $this->tmp.'/acme.json';
