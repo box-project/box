@@ -36,10 +36,6 @@ before_install:
   - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
   - composer validate
   - |
-    if [ -n "$SYMFONY_VERSION" ]; then
-        composer require --no-update "symfony/lts:${SYMFONY_VERSION}"
-    fi
-  - |
     if [ "DEPLOY" != "true" ]; then
         composer config --unset platform.php
         composer update --lock
@@ -49,6 +45,7 @@ install:
   - |
     if [ -n "$SYMFONY_VERSION" ]; then
         composer install $COMPOSER_FLAGS
+        composer require --no-update "symfony/lts:${SYMFONY_VERSION}"
 
         composer update $(composer show | grep symfony | awk '{print $1}' | xargs)
     else
