@@ -134,6 +134,26 @@ return [
                 $contents
             );
         },
+        // `stream_isatty()` is a PHP 7.2 function hence not defined in PHP 7.1. Unlike its function call, the string
+        // in `function_exists()` is prefixed because the name can be resolved to a FQCN and appears as a user-land
+        // function.
+        function (string $filePath, string $prefix, string $contents): string {
+            $files = [
+                'vendor/symfony/console/Output/StreamOutput.php',
+                'vendor/symfony/var-dumper/Dumper/CliDumper.php',
+                'vendor/composer/xdebug-handler/src/Process.php',
+            ];
+
+            if (false === in_array($filePath, $files, true)) {
+                return $contents;
+            }
+
+            return preg_replace(
+                '/function_exists\(\''.$prefix.'\\\\\\\\stream_isatty\'\)/',
+                "function_exists('stream_isatty')",
+                $contents
+            );
+        },
     ],
     'whitelist' => [
         \Composer\Autoload\ClassLoader::class,
