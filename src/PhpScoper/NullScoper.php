@@ -31,7 +31,7 @@ final class NullScoper implements Scoper
      */
     public function getWhitelist(): Whitelist
     {
-        return Whitelist::create(true);
+        return Whitelist::create(true, true, true);
     }
 
     public function getPrefix(): string

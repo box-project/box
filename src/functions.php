@@ -126,7 +126,9 @@ function register_aliases(): void
  */
 function disable_parallel_processing(): void
 {
-    define(_NO_PARALLEL_PROCESSING, true);
+    if (false == defined(_NO_PARALLEL_PROCESSING)) {
+        define(_NO_PARALLEL_PROCESSING, true);
+    }
 }
 
 /**

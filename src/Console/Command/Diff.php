@@ -94,21 +94,23 @@ final class Diff extends Command
 
         Assertion::allFile($paths);
 
-        $tmpFiles = [];
-
         try {
             $diff = new PharDiff(
                 ...array_map(
-                    function (string $path) use (&$tmpFiles): Pharaoh {
+                    function (string $path): Pharaoh {
                         $path = false !== realpath($path) ? realpath($path) : $path;
 
-                        $tmpPath = $this->createTemporaryPhar($path);
+                        return new class($path) extends Pharaoh {
+                            // TODO: remove this once https://github.com/paragonie/pharaoh/pull/9 is merged
+                            public function __destruct()
+                            {
+                                $path = $this->phar->getPath();
 
-                        if ($path !== $tmpPath) {
-                            $tmpFiles[] = $tmpPath;
-                        }
+                                unset($this->phar);
 
-                        return new Pharaoh($tmpPath);
+                                \Phar::unlinkArchive($path);
+                            }
+                        };
                     },
                     $paths
                 )
@@ -127,8 +129,6 @@ final class Diff extends Command
             );
 
             return 1;
-        } finally {
-            remove($tmpFiles);
         }
 
         if ($input->hasParameterOption(['-c', '--check'])) {

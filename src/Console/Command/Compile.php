@@ -616,7 +616,7 @@ EOF
                 OutputInterface::VERBOSITY_DEBUG
             );
 
-            return function () {};
+            return function (): void {};
         }
 
         $softLimit = posix_getrlimit()['soft openfiles'];

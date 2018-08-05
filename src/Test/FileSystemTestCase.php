@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Test;
 
-use const DIRECTORY_SEPARATOR;
 use PHPUnit\Framework\TestCase;
+use const DIRECTORY_SEPARATOR;
 use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\remove;
 

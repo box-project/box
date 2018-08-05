@@ -15,10 +15,10 @@ declare(strict_types=1);
 namespace KevinGH\Box\FileSystem;
 
 use Assert\Assertion;
-use const DIRECTORY_SEPARATOR;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Webmozart\PathUtil\Path;
+use const DIRECTORY_SEPARATOR;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>

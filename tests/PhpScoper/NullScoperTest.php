@@ -44,6 +44,6 @@ JSON;
         $scoper = new NullScoper();
 
         $this->assertSame('', $scoper->getPrefix());
-        $this->assertEquals(Whitelist::create(true), $scoper->getWhitelist());
+        $this->assertEquals(Whitelist::create(true, true, true), $scoper->getWhitelist());
     }
 }
