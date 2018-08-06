@@ -363,7 +363,7 @@ JSON
     public function test_it_ignores_the_most_common_non_needed_files_when_guess_the_files_from_the_composer_json_file(): void
     {
         // Depending on the test machine: the following command might be needed:
-        // docker run -i --rm -w /opt/box -v "$PWD":/opt/box box_php72 bin/phpunit tests/ConfigurationTest.php --filter test_it_ignores_the_most_common_non_needed_files_when_guess_the_files_from_the_composer_json_file
+        // docker run -i --rm -w /opt/box -v "$PWD":/opt/box box_php72 bin/phpunit tests/ConfigurationFileNoConfigTest.php --filter test_it_ignores_the_most_common_non_needed_files_when_guess_the_files_from_the_composer_json_file
         // Indeed OSX is case insensitive...
 
         touch('main.php~');
@@ -562,6 +562,7 @@ JSON
             'composer.json',
             'ConductCommand.php',
             'ContributingCommand.php',
+            'license',
             'LICENSE',
             'LicenseCommand.php',
             'LICENSE_GECKO',
