@@ -530,10 +530,10 @@ EOF
         }
     }
 
-    public function test_no_file_mode_is_configured_by_default(): void
+    public function test_a_file_mode_is_configured_by_default(): void
     {
-        $this->assertNull($this->config->getFileMode());
-        $this->assertNull($this->getNoFileConfig()->getFileMode());
+        $this->assertSame(493, $this->config->getFileMode());
+        $this->assertSame(493, $this->getNoFileConfig()->getFileMode());
     }
 
     public function test_configure_file_mode(): void
@@ -541,18 +541,18 @@ EOF
         // Octal value provided
         $this->setConfig([
             'files' => [self::DEFAULT_FILE],
-            'chmod' => '0755',
+            'chmod' => '0644',
         ]);
 
-        $this->assertSame(0755, $this->config->getFileMode());
+        $this->assertSame(420, $this->config->getFileMode());
 
         // Decimal value provided
         $this->setConfig([
             'files' => [self::DEFAULT_FILE],
-            'chmod' => '755',
+            'chmod' => '0644',
         ]);
 
-        $this->assertSame(0755, $this->config->getFileMode());
+        $this->assertSame(420, $this->config->getFileMode());
     }
 
     public function test_a_main_script_path_is_configured_by_default(): void
@@ -1593,7 +1593,7 @@ COMMENT;
             new MapFile($this->tmp, []),
             $this->config->getFileMapper()
         );
-        $this->assertNull($this->config->getFileMode());
+        $this->assertSame(493, $this->config->getFileMode());
         $this->assertSame([], $this->config->getFiles());
         $this->assertSame('', $this->config->getMainScriptContents());
         $this->assertSame($this->tmp.'/index.php', $this->config->getMainScriptPath());

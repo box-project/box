@@ -1362,7 +1362,7 @@ BANNER;
             return intval($raw->chmod, 8);
         }
 
-        return null;
+        return intval(0755, 8);
     }
 
     private static function retrieveMainScriptPath(stdClass $raw, string $basePath, ?array $decodedJsonContents): ?string

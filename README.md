@@ -102,7 +102,7 @@ permissions:
 
 ```json
 {
-    "chmod": "0755"
+    "chmod": "0700"
 }
 ```
 
