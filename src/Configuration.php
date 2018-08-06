@@ -1157,7 +1157,6 @@ BANNER;
             ->notName('*.md')
             ->notName('*.rst')
             ->notName('/^readme(\..*+)?$/i')
-            ->notName('/^license(\..*+)?$/i')
             ->notName('/^upgrade(\..*+)?$/i')
             ->notName('/^contributing(\..*+)?$/i')
             ->notName('/^changelog(\..*+)?$/i')

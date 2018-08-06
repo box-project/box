@@ -60,6 +60,7 @@ class RequirementsDumperTest extends TestCase
             'vendor/composer/ClassLoader.php',
             'vendor/composer/installed.json',
             'vendor/composer/LICENSE',
+            'vendor/composer/semver/LICENSE',
             'vendor/composer/semver/src/Comparator.php',
             'vendor/composer/semver/src/Constraint/AbstractConstraint.php',
             'vendor/composer/semver/src/Constraint/Constraint.php',

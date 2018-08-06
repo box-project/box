@@ -169,7 +169,7 @@ Private key passphrase:
 ? Setting file permissions to 0755
 * Done.
 
- // PHAR: 44 files (100B)
+ // PHAR: 45 files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -247,6 +247,7 @@ PHP;
             '/.box/vendor/composer/autoload_static.php',
             '/.box/vendor/composer/installed.json',
             '/.box/vendor/composer/semver/',
+            '/.box/vendor/composer/semver/LICENSE',
             '/.box/vendor/composer/semver/src/',
             '/.box/vendor/composer/semver/src/Comparator.php',
             '/.box/vendor/composer/semver/src/Constraint/',
@@ -376,7 +377,7 @@ Building the PHAR "/path/to/tmp/index.phar"
 ? No compression
 * Done.
 
- // PHAR: 48 files (100B)
+ // PHAR: 49 files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -460,6 +461,7 @@ PHP;
             '/.box/vendor/composer/autoload_static.php',
             '/.box/vendor/composer/installed.json',
             '/.box/vendor/composer/semver/',
+            '/.box/vendor/composer/semver/LICENSE',
             '/.box/vendor/composer/semver/src/',
             '/.box/vendor/composer/semver/src/Comparator.php',
             '/.box/vendor/composer/semver/src/Constraint/',
@@ -823,7 +825,7 @@ Private key passphrase:
 ? Setting file permissions to 0755
 * Done.
 
- // PHAR: 44 files (100B)
+ // PHAR: 45 files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -923,7 +925,7 @@ Private key passphrase:
 ? Setting file permissions to 0755
 * Done.
 
- // PHAR: 44 files (100B)
+ // PHAR: 45 files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -1042,7 +1044,7 @@ Private key passphrase:
 ? Setting file permissions to 0755
 * Done.
 
- // PHAR: 44 files (100B)
+ // PHAR: 45 files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -1085,6 +1087,7 @@ OUTPUT;
             '.box_dump/.box/vendor/composer/ClassLoader.php',
             '.box_dump/.box/vendor/composer/installed.json',
             '.box_dump/.box/vendor/composer/LICENSE',
+            '.box_dump/.box/vendor/composer/semver/LICENSE',
             '.box_dump/.box/vendor/composer/semver/src/Comparator.php',
             '.box_dump/.box/vendor/composer/semver/src/Constraint/AbstractConstraint.php',
             '.box_dump/.box/vendor/composer/semver/src/Constraint/Constraint.php',
