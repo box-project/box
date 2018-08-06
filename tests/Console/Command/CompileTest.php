@@ -375,6 +375,7 @@ Building the PHAR "/path/to/tmp/index.phar"
 ? Dumping the Composer autoloader
 ? Removing the Composer dump artefacts
 ? No compression
+? Setting file permissions to 0755
 * Done.
 
  // PHAR: 49 files (100B)
@@ -1726,6 +1727,7 @@ Box version 3.x-dev@151e40a
 ? Skipping dumping the Composer autoloader
 ? Removing the Composer dump artefacts
 ? No compression
+? Setting file permissions to 0755
 * Done.
 
  // PHAR: 1 file (100B)
@@ -1977,6 +1979,7 @@ Box version 3.x-dev@151e40a
 ? Skipping dumping the Composer autoloader
 ? Removing the Composer dump artefacts
 ? No compression
+? Setting file permissions to 0755
 * Done.
 
  // PHAR: 1 file (100B)
@@ -2036,6 +2039,7 @@ Box version 3.x-dev@151e40a
 ? Skipping dumping the Composer autoloader
 ? Removing the Composer dump artefacts
 ? No compression
+? Setting file permissions to 0755
 * Done.
 
  // PHAR: 1 file (100B)
@@ -2100,6 +2104,7 @@ Box version 3.x-dev@151e40a
 ? Skipping dumping the Composer autoloader
 ? Removing the Composer dump artefacts
 ? No compression
+? Setting file permissions to 0755
 * Done.
 
  // PHAR: 2 files (100B)
@@ -2164,6 +2169,7 @@ Box version 3.x-dev@151e40a
 ? Skipping dumping the Composer autoloader
 ? Removing the Composer dump artefacts
 ? No compression
+? Setting file permissions to 0755
 * Done.
 
  // PHAR: 1 file (100B)
@@ -2233,6 +2239,7 @@ Box version 3.x-dev@151e40a
 ? Skipping dumping the Composer autoloader
 ? Removing the Composer dump artefacts
 ? No compression
+? Setting file permissions to 0755
 * Done.
 
  // PHAR: 1 file (100B)
@@ -2306,6 +2313,7 @@ Box version 3.x-dev@151e40a
 ? Removing the Composer dump artefacts
 ? Compressing with the algorithm "GZ"
     > Warning: the extension "zlib" will now be required to execute the PHAR
+? Setting file permissions to 0755
 * Done.
 
  // PHAR: 1 file (100B)
@@ -2375,6 +2383,7 @@ Box version 3.x-dev@151e40a
 ? Skipping dumping the Composer autoloader
 ? Removing the Composer dump artefacts
 ? No compression
+? Setting file permissions to 0755
 * Done.
 
  // PHAR: 1 file (100B)
@@ -2522,6 +2531,7 @@ Box version 3.x-dev@151e40a
 ? Removing the Composer dump artefacts
 ? Compressing with the algorithm "GZ"
     > Warning: the extension "zlib" will now be required to execute the PHAR
+? Setting file permissions to 0755
 * Done.
 
  // PHAR: 1 file (100B)
@@ -2599,6 +2609,7 @@ Box version 3.x-dev@151e40a
 ? Skipping dumping the Composer autoloader
 ? Removing the Composer dump artefacts
 ? No compression
+? Setting file permissions to 0755
 * Done.
 
  // PHAR: 1 file (100B)
