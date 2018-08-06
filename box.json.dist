@@ -1,6 +1,4 @@
 {
-    "chmod": "0755",
-
     "banner": [
         "This file is part of the box project.",
         "",
