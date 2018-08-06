@@ -101,7 +101,7 @@ class CompileTest extends CommandTestCase
                 [
                     'alias' => 'alias-test.phar',
                     'banner' => 'custom banner',
-                    'chmod' => '0755',
+                    'chmod' => '0700',
                     'compactors' => [Php::class],
                     'directories' => ['a'],
                     'files' => ['test.php'],
@@ -166,7 +166,7 @@ Building the PHAR "/path/to/tmp/test.phar"
 ? No compression
 ? Signing using a private key
 Private key passphrase:
-? Setting file permissions to 0755
+? Setting file permissions to 0700
 * Done.
 
  // PHAR: 45 files (100B)
