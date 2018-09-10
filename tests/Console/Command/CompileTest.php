@@ -29,6 +29,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Traversable;
+use function extension_loaded;
 use function file_get_contents;
 use function file_put_contents;
 use function iterator_to_array;
@@ -41,6 +42,7 @@ use function preg_replace;
 use function sort;
 use function sprintf;
 use function str_replace;
+use function strlen;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Compile
@@ -992,7 +994,7 @@ OUTPUT;
             ]
         );
 
-        $xdebugLog = \extension_loaded('xdebug')
+        $xdebugLog = extension_loaded('xdebug')
             ? '[debug] The xdebug extension is loaded (2.6.0)
 [debug] No restart (BOX_ALLOW_XDEBUG=1)'
             : '[debug] The xdebug extension is not loaded'
@@ -2796,7 +2798,7 @@ OUTPUT;
             /** @var PharFileInfo $fileInfo */
             $fileInfo = $phar[str_replace($root, '', $fileInfo->getPathname())];
 
-            $path = substr($fileInfo->getPathname(), \strlen($root) - 1);
+            $path = substr($fileInfo->getPathname(), strlen($root) - 1);
 
             if ($fileInfo->isDir()) {
                 $path .= '/';

@@ -16,6 +16,7 @@ namespace KevinGH\Box;
 
 use KevinGH\Box\Compactor\FileExtensionCompactor;
 use PHPUnit\Framework\TestCase;
+use function func_get_args;
 
 /**
  * @covers \KevinGH\Box\Compactor\FileExtensionCompactor
@@ -37,7 +38,7 @@ class FileExtensionCompactorTest extends TestCase
              */
             protected function compactContent(string $contents): string
             {
-                $this->__call(__METHOD__, \func_get_args());
+                $this->__call(__METHOD__, func_get_args());
             }
         };
 

@@ -610,7 +610,7 @@ EOF
     {
         $filesCount = count($box) + 128;  // Add a little extra for good measure
 
-        if (false === function_exists('posix_getrlimit') || false === \function_exists('posix_setrlimit')) {
+        if (false === function_exists('posix_getrlimit') || false === function_exists('posix_setrlimit')) {
             $io->writeln(
                 '<info>[debug] Could not check the maximum number of open file descriptors: the functions "posix_getrlimit()" and '
                 .'"posix_setrlimit" could not be found.</info>',
