@@ -21,6 +21,8 @@ use DateTimeZone;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\Php as LegacyPhp;
 use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
+use Humbug\PhpScoper\Console\ApplicationFactory;
+use Humbug\PhpScoper\Scoper;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Compactor\PhpScoper as PhpScoperCompactor;
@@ -1321,7 +1323,13 @@ BANNER;
 
                     return new PhpScoperCompactor(
                         new SimpleScoper(
-                            create_scoper(),
+                            (new class() extends ApplicationFactory {
+                                public static function createScoper(): Scoper
+                                {
+                                    return parent::createScoper();
+                                }
+
+                            })::createScoper(),
                             $prefix,
                             $phpScoperConfig->getWhitelist(),
                             $phpScoperConfig->getPatchers()
