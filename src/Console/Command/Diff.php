@@ -27,7 +27,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 use function array_map;
-use function KevinGH\Box\FileSystem\remove;
 
 /**
  * @private

@@ -73,7 +73,7 @@ final class ComposerOrchestrator
 
     private static function generateAutoloadStatements(Whitelist $whitelist, string $prefix, string $autoload): string
     {
-        if (0 === \count($whitelist->getClassWhitelistArray())) {
+        if ([] === $whitelist->getClassWhitelistArray()) {
             return $autoload;
         }
 

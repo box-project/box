@@ -30,12 +30,14 @@ use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 use function array_shift;
 use function array_unshift;
 use function explode;
+use function get_class;
 use function getcwd;
 use function implode;
 use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function putenv;
 use function sprintf;
+use function strlen;
 use function substr;
 
 final class Process extends Configurable
@@ -192,9 +194,9 @@ final class Process extends Configurable
         $io->writeln('Registered compactors:');
 
         $logCompactors = function (Compactor $compactor) use ($io): void {
-            $compactorClassParts = explode('\\', \get_class($compactor));
+            $compactorClassParts = explode('\\', get_class($compactor));
 
-            if ('_HumbugBox' === substr($compactorClassParts[0], 0, \strlen('_HumbugBox'))) {
+            if ('_HumbugBox' === substr($compactorClassParts[0], 0, strlen('_HumbugBox'))) {
                 // Keep the non prefixed class name for the user
                 array_shift($compactorClassParts);
             }

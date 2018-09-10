@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Compactor;
 
 use KevinGH\Box\NotCallable;
+use function func_get_args;
 
 class DummyFileExtensionCompactor extends FileExtensionCompactor
 {
@@ -25,7 +26,7 @@ class DummyFileExtensionCompactor extends FileExtensionCompactor
      */
     protected function compactContent(string $contents): string
     {
-        $this->__call(__METHOD__, \func_get_args());
+        $this->__call(__METHOD__, func_get_args());
     }
 
     /**
@@ -33,6 +34,6 @@ class DummyFileExtensionCompactor extends FileExtensionCompactor
      */
     protected function supports(string $file): bool
     {
-        $this->__call(__METHOD__, \func_get_args());
+        $this->__call(__METHOD__, func_get_args());
     }
 }

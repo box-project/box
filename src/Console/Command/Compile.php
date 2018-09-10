@@ -44,10 +44,14 @@ use const PHP_EOL;
 use const POSIX_RLIMIT_INFINITY;
 use const POSIX_RLIMIT_NOFILE;
 use function array_shift;
+use function count;
 use function decoct;
 use function explode;
 use function filesize;
+use function function_exists;
+use function get_class;
 use function implode;
+use function is_string;
 use function KevinGH\Box\disable_parallel_processing;
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -59,6 +63,7 @@ use function KevinGH\Box\get_phar_compression_algorithms;
 use function posix_setrlimit;
 use function putenv;
 use function sprintf;
+use function strlen;
 use function substr;
 
 /**
@@ -324,9 +329,9 @@ EOF
         );
 
         $logCompactors = function (Compactor $compactor) use ($logger): void {
-            $compactorClassParts = explode('\\', \get_class($compactor));
+            $compactorClassParts = explode('\\', get_class($compactor));
 
-            if ('_HumbugBox' === substr($compactorClassParts[0], 0, \strlen('_HumbugBox'))) {
+            if ('_HumbugBox' === substr($compactorClassParts[0], 0, strlen('_HumbugBox'))) {
                 // Keep the non prefixed class name for the user
                 array_shift($compactorClassParts);
             }
@@ -355,7 +360,7 @@ EOF
     {
         $logger->log(CompileLogger::QUESTION_MARK_PREFIX, 'Adding binary files');
 
-        $count = \count($config->getBinaryFiles());
+        $count = count($config->getBinaryFiles());
 
         $box->addFiles($config->getBinaryFiles(), true);
 
@@ -368,7 +373,7 @@ EOF
 
         $logger->log(CompileLogger::QUESTION_MARK_PREFIX, 'Adding files');
 
-        $count = \count($config->getFiles());
+        $count = count($config->getFiles());
 
         try {
             $box->addFiles($config->getFiles(), false);
@@ -515,7 +520,7 @@ EOF
 
             $logger->log(
                 CompileLogger::MINUS_PREFIX,
-                \is_string($metadata) ? $metadata : var_export($metadata, true)
+                is_string($metadata) ? $metadata : var_export($metadata, true)
             );
 
             $box->getPhar()->setMetadata($metadata);
@@ -603,9 +608,9 @@ EOF
      */
     private function bumpOpenFileDescriptorLimit(Box $box, SymfonyStyle $io): callable
     {
-        $filesCount = \count($box) + 128;  // Add a little extra for good measure
+        $filesCount = count($box) + 128;  // Add a little extra for good measure
 
-        if (false === \function_exists('posix_getrlimit') || false === \function_exists('posix_setrlimit')) {
+        if (false === function_exists('posix_getrlimit') || false === \function_exists('posix_setrlimit')) {
             $io->writeln(
                 '<info>[debug] Could not check the maximum number of open file descriptors: the functions "posix_getrlimit()" and '
                 .'"posix_setrlimit" could not be found.</info>',
@@ -639,7 +644,7 @@ EOF
         }
 
         return function () use ($io, $softLimit, $hardLimit): void {
-            if (\function_exists('posix_setrlimit') && isset($softLimit, $hardLimit)) {
+            if (function_exists('posix_setrlimit') && isset($softLimit, $hardLimit)) {
                 posix_setrlimit(
                     POSIX_RLIMIT_NOFILE,
                     $softLimit,

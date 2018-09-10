@@ -23,8 +23,10 @@ use function filesize;
 use function fopen;
 use function fread;
 use function ini_get;
+use function is_resource;
 use function realpath;
 use function sprintf;
+use function strlen;
 use function strtoupper;
 use function unpack;
 
@@ -235,7 +237,7 @@ final class Signature
      */
     private function close(): void
     {
-        if (\is_resource($this->handle)) {
+        if (is_resource($this->handle)) {
             fclose($this->handle);
 
             $this->handle = null;
@@ -267,7 +269,7 @@ final class Signature
     {
         $read = fread($this->handle(), $bytes);
 
-        Assertion::same(\strlen($read), $bytes);
+        Assertion::same(strlen($read), $bytes);
 
         return $read;
     }

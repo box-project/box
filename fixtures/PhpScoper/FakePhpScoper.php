@@ -17,6 +17,7 @@ namespace KevinGH\Box\PhpScoper;
 use Humbug\PhpScoper\Scoper;
 use Humbug\PhpScoper\Whitelist;
 use KevinGH\Box\NotCallable;
+use function func_get_args;
 
 final class FakePhpScoper implements Scoper
 {
@@ -27,6 +28,6 @@ final class FakePhpScoper implements Scoper
      */
     public function scope(string $filePath, string $contents, string $prefix, array $patchers, Whitelist $whitelist): string
     {
-        $this->__call(__METHOD__, \func_get_args());
+        $this->__call(__METHOD__, func_get_args());
     }
 }

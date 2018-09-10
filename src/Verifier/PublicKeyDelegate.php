@@ -17,6 +17,7 @@ namespace KevinGH\Box\Verifier;
 use KevinGH\Box\Verifier;
 use RuntimeException;
 use function class_exists;
+use function extension_loaded;
 
 /**
  * Uses the OpenSSL extension or phpseclib library to verify a signed PHAR.
@@ -32,7 +33,7 @@ final class PublicKeyDelegate implements Verifier
      */
     public function __construct(string $signature, string $path)
     {
-        if (\extension_loaded('openssl')) {
+        if (extension_loaded('openssl')) {
             $this->hash = new OpenSsl($signature, $path);
         } elseif (class_exists('Crypt_RSA')) {
             $this->hash = new PhpSeclib($signature, $path);

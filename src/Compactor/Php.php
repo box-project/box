@@ -19,6 +19,9 @@ use Exception;
 use Herrera\Annotations\Convert\ToString;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Annotations\Tokens;
+use function count;
+use function in_array;
+use function is_string;
 
 /**
  * A PHP source code compactor copied from Composer.
@@ -63,9 +66,9 @@ final class Php extends FileExtensionCompactor
         $output = '';
 
         foreach (token_get_all($contents) as $token) {
-            if (\is_string($token)) {
+            if (is_string($token)) {
                 $output .= $token;
-            } elseif (\in_array($token[0], [T_COMMENT, T_DOC_COMMENT], true)) {
+            } elseif (in_array($token[0], [T_COMMENT, T_DOC_COMMENT], true)) {
                 if ($this->tokenizer && (false !== strpos($token[1], '@'))) {
                     try {
                         $output .= $this->compactAnnotations($token[1]);
@@ -129,7 +132,7 @@ final class Php extends FileExtensionCompactor
             $docblock .= "\n".$this->converter->convert($annotation);
         }
 
-        $breaks -= \count($annotations);
+        $breaks -= count($annotations);
 
         if ($breaks > 0) {
             $docblock .= str_repeat("\n", $breaks - 1);

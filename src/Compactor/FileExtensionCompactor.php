@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Compactor;
 
 use Assert\Assertion;
+use function in_array;
 
 /**
  * An abstract compactor class that handles matching supported file by their types.
@@ -40,7 +41,7 @@ abstract class FileExtensionCompactor extends BaseCompactor
      */
     protected function supports(string $file): bool
     {
-        return \in_array(
+        return in_array(
             pathinfo(
                 $file,
                 PATHINFO_EXTENSION
