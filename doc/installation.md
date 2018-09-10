@@ -14,7 +14,7 @@ The preferred method of installation is to use the Box PHAR which can be downloa
 You can install Box with [Composer][composer]:
 
 ```bash
-composer global require humbug/box:^3.0@alpha
+composer global require humbug/box
 ```
 
 If you cannot install it because of a dependency conflict or you prefer to install it for your project, we recommend
@@ -22,7 +22,7 @@ you to take a look at [bamarni/composer-bin-plugin][bamarni/composer-bin-plugin]
 
 ```bash
 composer require --dev bamarni/composer-bin-plugin
-composer bin box require --dev humbug/box:^3.0@alpha
+composer bin box require --dev humbug/box
 
 $ vendor/bin/box
 ```
