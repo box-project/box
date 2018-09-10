@@ -23,6 +23,7 @@ use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
 use PharFileInfo;
+use function substr;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -996,7 +997,11 @@ OUTPUT;
         );
 
         if (extension_loaded('xdebug')) {
-            $xdebugVersion = phpversion('xdebug');
+            $xdebugVersion = sprintf(
+                '(%s)',
+                phpversion('xdebug')
+            );
+
             $xdebugLog = "[debug] The xdebug extension is loaded $xdebugVersion
 [debug] No restart (BOX_ALLOW_XDEBUG=1)";
         } else {
