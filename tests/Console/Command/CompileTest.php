@@ -23,6 +23,7 @@ use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
 use PharFileInfo;
+use function substr;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -37,11 +38,13 @@ use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\mirror;
 use function KevinGH\Box\FileSystem\rename;
+use function phpversion;
 use function preg_match;
 use function preg_replace;
 use function sort;
 use function sprintf;
 use function str_replace;
+use function strlen;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Compile
@@ -993,11 +996,17 @@ OUTPUT;
             ]
         );
 
-        $xdebugLog = extension_loaded('xdebug')
-            ? '[debug] The xdebug extension is loaded (2.6.0)
-[debug] No restart (BOX_ALLOW_XDEBUG=1)'
-            : '[debug] The xdebug extension is not loaded'
-        ;
+        if (extension_loaded('xdebug')) {
+            $xdebugVersion = sprintf(
+                '(%s)',
+                phpversion('xdebug')
+            );
+
+            $xdebugLog = "[debug] The xdebug extension is loaded $xdebugVersion
+[debug] No restart (BOX_ALLOW_XDEBUG=1)";
+        } else {
+            $xdebugLog = '[debug] The xdebug extension is not loaded';
+        }
 
         $expected = <<<OUTPUT
 [debug] Checking BOX_ALLOW_XDEBUG

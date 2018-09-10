@@ -19,6 +19,9 @@ use Exception;
 use Herrera\Annotations\Convert\ToString;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Annotations\Tokens;
+use function count;
+use function in_array;
+use function is_string;
 
 /**
  * A PHP source code compactor copied from Composer.

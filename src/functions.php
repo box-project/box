@@ -21,6 +21,7 @@ use function constant;
 use function define;
 use function defined;
 use function sprintf;
+use function strlen;
 
 /**
  * TODO: this function should be pushed down to the PHAR extension.

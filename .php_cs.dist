@@ -36,6 +36,7 @@ $config = PhpCsFixer\Config::create()
         'heredoc_to_nowdoc' => true,
         'list_syntax' => ['syntax' => 'short'],
         'method_argument_space' => ['ensure_fully_multiline' => true],
+        'native_function_invocation' => false,
         'no_extra_consecutive_blank_lines' => [
             'tokens' => [
                 'break',

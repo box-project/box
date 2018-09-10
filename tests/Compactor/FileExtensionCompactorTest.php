@@ -16,6 +16,7 @@ namespace KevinGH\Box;
 
 use KevinGH\Box\Compactor\FileExtensionCompactor;
 use PHPUnit\Framework\TestCase;
+use function func_get_args;
 
 /**
  * @covers \KevinGH\Box\Compactor\FileExtensionCompactor

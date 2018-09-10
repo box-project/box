@@ -1,6 +1,6 @@
 <?php
 
-namespace _HumbugBox5af565a878e76\KevinGH\RequirementChecker;
+namespace _HumbugBox5b963fb2bb9ba\KevinGH\RequirementChecker;
 
 /**
 @license
@@ -63,7 +63,7 @@ class Terminal
     private static function getConsoleMode()
     {
         if (!\function_exists('proc_open')) {
-            return;
+            return null;
         }
         $descriptorspec = array(1 => array('pipe', 'w'), 2 => array('pipe', 'w'));
         $process = \proc_open('mode CON', $descriptorspec, $pipes, null, null, array('suppress_errors' => \true));
@@ -76,6 +76,7 @@ class Terminal
                 return array((int) $matches[2], (int) $matches[1]);
             }
         }
+        return null;
     }
     /**
     @return

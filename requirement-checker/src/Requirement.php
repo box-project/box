@@ -41,6 +41,9 @@ final class Requirement
         $this->helpText = $helpText;
     }
 
+    /**
+     * @return bool
+     */
     public function isFulfilled()
     {
         if (null === $this->fulfilled) {
@@ -51,7 +54,7 @@ final class Requirement
     }
 
     /**
-     * @return string
+     * @return IsFulfilled
      */
     public function getIsFullfilledChecker()
     {

@@ -132,6 +132,7 @@ final class Checker
             self::$requirementsConfig = __DIR__.'/../.requirements.php';
         }
 
+        /** @var string[] $config */
         $config = require self::$requirementsConfig;
 
         $requirements = new RequirementCollection();

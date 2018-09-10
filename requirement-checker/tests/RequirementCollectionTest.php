@@ -77,7 +77,7 @@ class RequirementCollectionTest extends TestCase
         $requirementC = $retrievedRequirements[2];
 
         $this->assertSame($check, $requirementC->getIsFullfilledChecker());
-        $this->assertTrue($requirement->isFulfilled());
+        $this->assertFalse($requirementC->isFulfilled());
         $this->assertSame('req tC', $requirementC->getTestMessage());
         $this->assertSame('req hC', $requirementC->getHelpText());
     }

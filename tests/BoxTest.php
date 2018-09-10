@@ -33,6 +33,7 @@ use const DIRECTORY_SEPARATOR;
 use function array_filter;
 use function array_keys;
 use function current;
+use function dirname;
 use function extension_loaded;
 use function file_put_contents;
 use function in_array;

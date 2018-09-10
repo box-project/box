@@ -27,7 +27,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 use function array_map;
-use function KevinGH\Box\FileSystem\remove;
 
 /**
  * @private
@@ -100,17 +99,7 @@ final class Diff extends Command
                     function (string $path): Pharaoh {
                         $path = false !== realpath($path) ? realpath($path) : $path;
 
-                        return new class($path) extends Pharaoh {
-                            // TODO: remove this once https://github.com/paragonie/pharaoh/pull/9 is merged
-                            public function __destruct()
-                            {
-                                $path = $this->phar->getPath();
-
-                                unset($this->phar);
-
-                                \Phar::unlinkArchive($path);
-                            }
-                        };
+                        return new Pharaoh($path);
                     },
                     $paths
                 )

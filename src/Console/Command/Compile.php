@@ -51,6 +51,7 @@ use function filesize;
 use function function_exists;
 use function get_class;
 use function implode;
+use function is_string;
 use function KevinGH\Box\disable_parallel_processing;
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;

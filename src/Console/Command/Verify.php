@@ -88,6 +88,10 @@ HELP
 
         $tmpPharPath = $this->createTemporaryPhar($pharPath);
 
+        $verified = false;
+        $signature = null;
+        $throwable = null;
+
         try {
             $phar = new Phar($tmpPharPath);
 
@@ -95,17 +99,14 @@ HELP
             $signature = $phar->getSignature();
         } catch (Throwable $throwable) {
             // Continue
-
-            $verified = false;
-            $signature = null;
         } finally {
             if ($tmpPharPath !== $pharPath) {
                 remove($tmpPharPath);
             }
         }
 
-        if (false === $verified) {
-            isset($throwable) && '' !== $message = $throwable->getMessage()
+        if (false === $verified || null === $signature) {
+            $message = null !== $throwable && '' !== $throwable->getMessage()
                 ? $throwable->getMessage()
                 : 'Unknown reason.'
             ;
@@ -117,7 +118,7 @@ HELP
                 )
             );
 
-            if (isset($throwable) && $output->isDebug()) {
+            if (null !== $throwable && $output->isDebug()) {
                 throw $throwable;
             }
 

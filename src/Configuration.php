@@ -21,6 +21,8 @@ use DateTimeZone;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\Php as LegacyPhp;
 use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
+use Humbug\PhpScoper\Console\ApplicationFactory;
+use Humbug\PhpScoper\Scoper;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Compactor\PhpScoper as PhpScoperCompactor;
@@ -42,12 +44,17 @@ use function array_key_exists;
 use function array_map;
 use function array_merge;
 use function array_unique;
+use function constant;
+use function defined;
+use function dirname;
 use function file_exists;
-use function Humbug\PhpScoper\create_scoper;
+use function in_array;
+use function intval;
 use function is_array;
 use function is_bool;
 use function is_file;
 use function is_link;
+use function is_object;
 use function is_readable;
 use function is_string;
 use function iter\fn\method;
@@ -1315,7 +1322,12 @@ BANNER;
 
                     return new PhpScoperCompactor(
                         new SimpleScoper(
-                            create_scoper(),
+                            (new class() extends ApplicationFactory {
+                                public static function createScoper(): Scoper
+                                {
+                                    return parent::createScoper();
+                                }
+                            })::createScoper(),
                             $prefix,
                             $phpScoperConfig->getWhitelist(),
                             $phpScoperConfig->getPatchers()
