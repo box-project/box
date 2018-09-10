@@ -129,6 +129,8 @@ make
 The policy is for the major part following the same as [Symfony's one][symfony-bc-policy]. Note that the code marked
 as `@private` or `@internal` are excluded from the BCP. 
 
+The text displayed by the commands (e.g. `compile` or `info`) or the content of the error/exception messages are also not subject to the BCP.
+
 
 ## Credits
 
@@ -139,3 +141,4 @@ Project originally created by: [Kevin Herrera] ([@kherge]) which has now been mo
 [Kevin Herrera]: https://github.com/kherge
 [@kherge]: https://github.com/kherge
 [humbug]: https://github.com/humbug
+[symfony-bc-policy]: https://symfony.com/doc/current/contributing/code/bc.html
