@@ -48,7 +48,6 @@ use function constant;
 use function defined;
 use function dirname;
 use function file_exists;
-use function Humbug\PhpScoper\create_scoper;
 use function in_array;
 use function intval;
 use function is_array;
@@ -1328,7 +1327,6 @@ BANNER;
                                 {
                                     return parent::createScoper();
                                 }
-
                             })::createScoper(),
                             $prefix,
                             $phpScoperConfig->getWhitelist(),
