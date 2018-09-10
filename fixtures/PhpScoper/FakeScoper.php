@@ -26,7 +26,7 @@ final class FakeScoper implements Scoper
      */
     public function scope(string $filePath, string $contents): string
     {
-        $this->__call(__METHOD__, func_get_args());
+        $this->__call(__METHOD__, \func_get_args());
     }
 
     /**
@@ -34,7 +34,7 @@ final class FakeScoper implements Scoper
      */
     public function getWhitelist(): Whitelist
     {
-        $this->__call(__METHOD__, func_get_args());
+        $this->__call(__METHOD__, \func_get_args());
     }
 
     /**
@@ -42,6 +42,6 @@ final class FakeScoper implements Scoper
      */
     public function getPrefix(): string
     {
-        $this->__call(__METHOD__, func_get_args());
+        $this->__call(__METHOD__, \func_get_args());
     }
 }

@@ -17,9 +17,6 @@ namespace KevinGH\Box;
 use Assert\Assertion;
 use Phar;
 use function array_key_exists;
-use function constant;
-use function define;
-use function defined;
 use function sprintf;
 
 /**
@@ -84,7 +81,7 @@ function format_size(int $size): string
  */
 function memory_to_bytes(string $value): int
 {
-    $unit = strtolower($value[strlen($value) - 1]);
+    $unit = strtolower($value[\strlen($value) - 1]);
 
     $value = (int) $value;
     switch ($unit) {
@@ -126,8 +123,8 @@ function register_aliases(): void
  */
 function disable_parallel_processing(): void
 {
-    if (false == defined(_NO_PARALLEL_PROCESSING)) {
-        define(_NO_PARALLEL_PROCESSING, true);
+    if (false == \defined(_NO_PARALLEL_PROCESSING)) {
+        \define(_NO_PARALLEL_PROCESSING, true);
     }
 }
 
@@ -136,5 +133,5 @@ function disable_parallel_processing(): void
  */
 function is_parallel_processing_enabled(): bool
 {
-    return false === defined(_NO_PARALLEL_PROCESSING) || false === constant(_NO_PARALLEL_PROCESSING);
+    return false === \defined(_NO_PARALLEL_PROCESSING) || false === \constant(_NO_PARALLEL_PROCESSING);
 }

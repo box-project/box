@@ -508,13 +508,13 @@ final class FileSystem extends SymfonyFilesystem
     {
         if ($files instanceof \Traversable) {
             $files = iterator_to_array($files, false);
-        } elseif (!is_array($files)) {
+        } elseif (!\is_array($files)) {
             $files = [$files];
         }
         $files = array_reverse($files);
         foreach ($files as $file) {
             // MODIFIED CODE
-            if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            if (\defined('PHP_WINDOWS_VERSION_BUILD')) {
                 //TODO: https://github.com/humbug/php-scoper/pull/19/files#r118838268
                 exec(sprintf('rd /s /q %s', escapeshellarg($file)));
             // - MODIFIED CODE

@@ -33,9 +33,7 @@ use const DIRECTORY_SEPARATOR;
 use function array_filter;
 use function array_keys;
 use function current;
-use function extension_loaded;
 use function file_put_contents;
-use function in_array;
 use function iterator_to_array;
 use function KevinGH\Box\FileSystem\canonicalize;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -1102,14 +1100,14 @@ JSON
                 Finder::create()
                     ->directories()
                     ->depth(0)
-                    ->in(dirname($boxTmp))
+                    ->in(\dirname($boxTmp))
             );
 
             $boxDir = current(
                 array_filter(
                     $tmpDirs,
                     function (SplFileInfo $fileInfo) use ($boxTmp): bool {
-                        return false === in_array(
+                        return false === \in_array(
                             $fileInfo->getRealPath(),
                             [realpath($boxTmp), realpath($this->tmp)],
                         true
@@ -1352,7 +1350,7 @@ STUB;
 
     public function test_it_cannot_compress_if_the_required_extension_is_not_loaded(): void
     {
-        if (extension_loaded('bz2')) {
+        if (\extension_loaded('bz2')) {
             $this->markTestSkipped('Requires the extension bz2 to not be loaded.');
         }
 

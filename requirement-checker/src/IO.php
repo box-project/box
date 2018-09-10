@@ -101,7 +101,7 @@ final class IO
             return false;
         }
 
-        if (function_exists('posix_isatty')) {
+        if (\function_exists('posix_isatty')) {
             if (!@posix_isatty(STDOUT) && false === \getenv('SHELL_INTERACTIVE')) {
                 return false;
             }
@@ -178,7 +178,7 @@ final class IO
 
         if (\DIRECTORY_SEPARATOR === '\\') {
             return (
-                    function_exists('sapi_windows_vt100_support')
+                    \function_exists('sapi_windows_vt100_support')
                     && sapi_windows_vt100_support(STDOUT)
                 )
                 || false !== getenv('ANSICON')
@@ -186,11 +186,11 @@ final class IO
                 || 'xterm' === getenv('TERM');
         }
 
-        if (function_exists('stream_isatty')) {
+        if (\function_exists('stream_isatty')) {
             return stream_isatty(STDOUT);
         }
 
-        if (function_exists('posix_isatty')) {
+        if (\function_exists('posix_isatty')) {
             return posix_isatty(STDOUT);
         }
 

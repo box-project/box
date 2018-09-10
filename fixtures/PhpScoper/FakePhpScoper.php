@@ -27,6 +27,6 @@ final class FakePhpScoper implements Scoper
      */
     public function scope(string $filePath, string $contents, string $prefix, array $patchers, Whitelist $whitelist): string
     {
-        $this->__call(__METHOD__, func_get_args());
+        $this->__call(__METHOD__, \func_get_args());
     }
 }

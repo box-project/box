@@ -32,10 +32,8 @@ use function array_fill_keys;
 use function array_filter;
 use function array_reduce;
 use function array_sum;
-use function count;
 use function end;
 use function filesize;
-use function is_array;
 use function iterator_to_array;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\format_size;
@@ -278,7 +276,7 @@ HELP
         $count = array_filter($this->retrieveCompressionCount($phar));
         $totalCount = array_sum($count);
 
-        if (1 === count($count)) {
+        if (1 === \count($count)) {
             $io->writeln(
                 sprintf(
                     '<comment>Archive Compression:</comment> %s',
@@ -361,7 +359,7 @@ HELP
 
             $output->write("<comment>$name:</comment>");
 
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $output->writeln('');
 
                 foreach ($value as $v) {

@@ -26,6 +26,6 @@ class FakeCompactor implements Compactor
      */
     public function compact(string $file, string $contents): string
     {
-        $this->__call(__METHOD__, func_get_args());
+        $this->__call(__METHOD__, \func_get_args());
     }
 }

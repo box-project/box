@@ -46,7 +46,7 @@ final class RequirementCollection implements IteratorAggregate, Countable
      */
     public function count()
     {
-        return count($this->requirements);
+        return \count($this->requirements);
     }
 
     /**

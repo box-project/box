@@ -37,7 +37,7 @@ class FileExtensionCompactorTest extends TestCase
              */
             protected function compactContent(string $contents): string
             {
-                $this->__call(__METHOD__, func_get_args());
+                $this->__call(__METHOD__, \func_get_args());
             }
         };
 

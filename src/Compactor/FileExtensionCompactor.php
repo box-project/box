@@ -40,7 +40,7 @@ abstract class FileExtensionCompactor extends BaseCompactor
      */
     protected function supports(string $file): bool
     {
-        return in_array(
+        return \in_array(
             pathinfo(
                 $file,
                 PATHINFO_EXTENSION

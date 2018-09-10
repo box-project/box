@@ -52,7 +52,7 @@
         "justinrainbow/json-schema": "^5.2",
         "nikic/iter": "^1.6",
         "ocramius/package-versions": "^1.3",
-        "paragonie/pharaoh": "^0.4.0",
+        "paragonie/pharaoh": "dev-master#45f139d",
         "phpseclib/phpseclib": "~2.0",
         "seld/jsonlint": "^1.6",
         "symfony/console": "^3.4 || ^4.0",

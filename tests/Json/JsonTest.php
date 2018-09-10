@@ -20,8 +20,6 @@ use PHPUnit\Framework\AssertionFailedError;
 use Seld\JsonLint\ParsingException;
 use stdClass;
 use Throwable;
-use function get_class;
-use function is_object;
 use function json_decode;
 use function KevinGH\Box\FileSystem\dump_file;
 
@@ -62,7 +60,7 @@ class JsonTest extends FileSystemTestCase
                 $this->fail('Did not except throwable to be thrown.');
             }
 
-            $this->assertSame(get_class($expectedThrowable), get_class($throwable));
+            $this->assertSame(\get_class($expectedThrowable), \get_class($throwable));
             $this->assertSame($expectedThrowable->getMessage(), $throwable->getMessage());
 
             return;
@@ -97,13 +95,13 @@ class JsonTest extends FileSystemTestCase
                 $this->fail('Did not except throwable to be thrown: '.$throwable->getMessage());
             }
 
-            $this->assertSame(get_class($expectedThrowable), get_class($throwable));
+            $this->assertSame(\get_class($expectedThrowable), \get_class($throwable));
             $this->assertSame($expectedThrowable->getMessage(), $throwable->getMessage());
 
             return;
         }
 
-        if (is_object($expected)) {
+        if (\is_object($expected)) {
             $this->assertEquals($expected, $actual);
         } else {
             $this->assertSame($expected, $actual);

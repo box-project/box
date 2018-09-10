@@ -31,7 +31,6 @@ use function array_flip;
 use function array_map;
 use function array_unshift;
 use function chdir;
-use function extension_loaded;
 use function file_exists;
 use function getcwd;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -93,7 +92,7 @@ final class Box implements Countable
     {
         // Ensure the parent directory of the PHAR file exists as `new \Phar()` does not create it and would fail
         // otherwise.
-        mkdir(dirname($file));
+        mkdir(\dirname($file));
 
         return new self(new Phar($file, (int) $flags, $alias), $file);
     }
@@ -177,7 +176,7 @@ final class Box implements Countable
 
         $extensionRequired = get_phar_compression_algorithm_extension($compressionAlgorithm);
 
-        if (null !== $extensionRequired && false === extension_loaded($extensionRequired)) {
+        if (null !== $extensionRequired && false === \extension_loaded($extensionRequired)) {
             throw new RuntimeException(
                 sprintf(
                     'Cannot compress the PHAR with the compression algorithm "%s": the extension "%s" is required but appear to not '
@@ -242,7 +241,7 @@ final class Box implements Countable
         $message = 'Expected value "%s" to be a scalar or stringable object.';
 
         foreach ($placeholders as $i => $placeholder) {
-            if (is_object($placeholder)) {
+            if (\is_object($placeholder)) {
                 Assertion::methodExists('__toString', $placeholder, $message);
 
                 $placeholders[$i] = (string) $placeholder;
@@ -355,7 +354,7 @@ final class Box implements Countable
     {
         $pubKey = $this->file.'.pubkey';
 
-        Assertion::writeable(dirname($pubKey));
+        Assertion::writeable(\dirname($pubKey));
         Assertion::extensionLoaded('openssl');
 
         if (file_exists($pubKey)) {

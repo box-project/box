@@ -79,7 +79,7 @@ final class Printer
         $this->printvln(
             str_repeat(
                 '=',
-                min(strlen($title), $this->width)
+                min(\strlen($title), $this->width)
             ),
             $verbosity,
             $style
@@ -118,14 +118,14 @@ final class Printer
 
         $remainingMessage = $message;
 
-        while (strlen($remainingMessage) > 0) {
+        while (\strlen($remainingMessage) > 0) {
             $wrapped = wordwrap($remainingMessage, $this->width - 3, '¬');
             $exploded = explode('¬', $wrapped);
             $line = $exploded[0];
-            $remainingMessage = ltrim(substr($remainingMessage, strlen($line)));
+            $remainingMessage = ltrim(substr($remainingMessage, \strlen($line)));
 
-            if (strlen($remainingMessage) > 0) {
-                $remainingMessage = str_repeat(' ', strlen($prefix)).$remainingMessage;
+            if (\strlen($remainingMessage) > 0) {
+                $remainingMessage = str_repeat(' ', \strlen($prefix)).$remainingMessage;
             }
 
             $lines[] = str_pad($line, $this->width, ' ', STR_PAD_RIGHT);

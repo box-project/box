@@ -44,12 +44,9 @@ use function array_merge;
 use function array_unique;
 use function file_exists;
 use function Humbug\PhpScoper\create_scoper;
-use function is_array;
-use function is_bool;
 use function is_file;
 use function is_link;
 use function is_readable;
-use function is_string;
 use function iter\fn\method;
 use function iter\map;
 use function iter\toArray;
@@ -580,7 +577,7 @@ BANNER;
         }
 
         if (false === isset($raw->{'base-path'})) {
-            return realpath(dirname($file));
+            return realpath(\dirname($file));
         }
 
         $basePath = trim($raw->{'base-path'});
@@ -624,7 +621,7 @@ BANNER;
                 return false;
             }
 
-            if (in_array($file->getRealPath(), $blacklist, true)) {
+            if (\in_array($file->getRealPath(), $blacklist, true)) {
                 return false;
             }
 
@@ -1359,10 +1356,10 @@ BANNER;
     private static function retrieveFileMode(stdClass $raw): ?int
     {
         if (isset($raw->chmod)) {
-            return intval($raw->chmod, 8);
+            return \intval($raw->chmod, 8);
         }
 
-        return intval(0755, 8);
+        return \intval(0755, 8);
     }
 
     private static function retrieveMainScriptPath(stdClass $raw, string $basePath, ?array $decodedJsonContents): ?string
@@ -1378,7 +1375,7 @@ BANNER;
             }
         }
 
-        if (is_bool($main)) {
+        if (\is_bool($main)) {
             Assertion::false(
                 $main,
                 'Cannot "enable" a main script: either disable it with `false` or give the main script file path.'
@@ -1474,7 +1471,7 @@ BANNER;
     private static function retrieveMetadata(stdClass $raw)
     {
         if (isset($raw->metadata)) {
-            if (is_object($raw->metadata)) {
+            if (\is_object($raw->metadata)) {
                 return (array) $raw->metadata;
             }
 
@@ -1515,7 +1512,7 @@ BANNER;
     {
         // TODO: add check to not allow this setting without the private key path
         if (isset($raw->{'key-pass'})
-            && is_string($raw->{'key-pass'})
+            && \is_string($raw->{'key-pass'})
         ) {
             return $raw->{'key-pass'};
         }
@@ -1653,7 +1650,7 @@ BANNER;
                 throw new RuntimeException(
                     sprintf(
                         'The tag or commit hash could not be retrieved from "%s": %s',
-                        dirname($file),
+                        \dirname($file),
                         $exception->getMessage()
                     ),
                     0,
@@ -1752,7 +1749,7 @@ BANNER;
             return Phar::SHA1;
         }
 
-        if (false === defined('Phar::'.$raw->algorithm)) {
+        if (false === \defined('Phar::'.$raw->algorithm)) {
             throw new InvalidArgumentException(
                 sprintf(
                     'The signing algorithm "%s" is not supported.',
@@ -1761,7 +1758,7 @@ BANNER;
             );
         }
 
-        return constant('Phar::'.$raw->algorithm);
+        return \constant('Phar::'.$raw->algorithm);
     }
 
     private static function retrieveStubBannerContents(stdClass $raw): ?string
@@ -1776,9 +1773,9 @@ BANNER;
             return null;
         }
 
-        Assertion::true(is_string($banner) || is_array($banner), 'The banner cannot accept true as a value');
+        Assertion::true(\is_string($banner) || \is_array($banner), 'The banner cannot accept true as a value');
 
-        if (is_array($banner)) {
+        if (\is_array($banner)) {
             $banner = implode("\n", $banner);
         }
 
@@ -1812,7 +1809,7 @@ BANNER;
 
     private static function retrieveStubPath(stdClass $raw, string $basePath): ?string
     {
-        if (isset($raw->stub) && is_string($raw->stub)) {
+        if (isset($raw->stub) && \is_string($raw->stub)) {
             $stubPath = make_path_absolute($raw->stub, $basePath);
 
             Assertion::file($stubPath);
@@ -1885,7 +1882,7 @@ BANNER;
      */
     private static function runGitCommand(string $command, string $file): string
     {
-        $path = dirname($file);
+        $path = \dirname($file);
 
         $process = new Process($command, $path);
 

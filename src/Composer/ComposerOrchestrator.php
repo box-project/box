@@ -21,7 +21,6 @@ use Humbug\PhpScoper\Whitelist;
 use RuntimeException;
 use Throwable;
 use const PHP_EOL;
-use function count;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
 use function preg_replace;
@@ -74,7 +73,7 @@ final class ComposerOrchestrator
 
     private static function generateAutoloadStatements(Whitelist $whitelist, string $prefix, string $autoload): string
     {
-        if (0 === count($whitelist->getClassWhitelistArray())) {
+        if (0 === \count($whitelist->getClassWhitelistArray())) {
             return $autoload;
         }
 

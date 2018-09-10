@@ -18,7 +18,6 @@ use Composer\XdebugHandler\Process;
 use Composer\XdebugHandler\XdebugHandler;
 use Psr\Log\LoggerInterface;
 use const PHP_EOL;
-use function function_exists;
 use function getenv;
 use function ini_get;
 use function KevinGH\Box\FileSystem\append_to_file;
@@ -69,7 +68,7 @@ final class PhpSettingsHandler extends XdebugHandler
      */
     protected function restart($command): void
     {
-        if (function_exists('ini_get')) {
+        if (\function_exists('ini_get')) {
             // Disable phar.readonly if set
             $this->disablePharReadonly();
 
