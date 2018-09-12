@@ -33,6 +33,7 @@ install:
     - echo extension=php_openssl.dll >> php.ini
     - echo extension=php_mbstring.dll >> php.ini
     - echo extension=php_fileinfo.dll >> php.ini
+    - echo extension=php_bz2.dll >> php.ini
     - cd c:\projects\box
     - IF NOT EXIST composer.phar (appveyor-retry appveyor DownloadFile https://github.com/composer/composer/releases/download/1.7.1/composer.phar)
     - php composer.phar self-update
