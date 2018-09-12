@@ -6,12 +6,8 @@ version: '{build}.{branch}'
 
 environment:
   matrix:
-  - dependencies: lowest
-    php_ver_target: 7.1
-  - dependencies: current
-    php_ver_target: 7.2
-  - dependencies: highest
-    php_ver_target: 7.3
+  - php_ver_target: 7.1
+  - php_ver_target: 7.2
 
 cache:
     - '%LOCALAPPDATA%\Composer\files'
@@ -41,9 +37,7 @@ install:
     - IF NOT EXIST composer.phar (appveyor-retry appveyor DownloadFile https://github.com/composer/composer/releases/download/1.7.1/composer.phar)
     - php composer.phar self-update
     - IF %APPVEYOR_REPO_BRANCH%==master (SET COMPOSER_ROOT_VERSION=dev-master) ELSE (SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev)
-    - IF %dependencies%==lowest appveyor-retry php composer.phar update --prefer-lowest --no-progress --ansi --no-suggest --prefer-dist -n
-    - IF %dependencies%==current appveyor-retry php composer.phar update --no-progress --ansi --no-suggest --prefer-dist -n
-    - IF %dependencies%==highest appveyor-retry php composer.phar update --no-progress -n --ansi --no-suggest --prefer-dist -n
+    - appveyor-retry php composer.phar install --no-interaction --no-progress --no-suggest --prefer-dist
 
 test_script:
     - cd c:\projects\box
