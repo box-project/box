@@ -15,6 +15,7 @@ environment:
 
 cache:
     - '%LOCALAPPDATA%\Composer\files'
+    - composer.phar
     - C:\ProgramData\chocolatey\bin -> .appveyor.yml
     - C:\ProgramData\chocolatey\lib -> .appveyor.yml
     - c:\tools\php -> .appveyor.yml
@@ -37,9 +38,12 @@ install:
     - echo extension=php_mbstring.dll >> php.ini
     - echo extension=php_fileinfo.dll >> php.ini
     - cd c:\projects\box
-    - IF %dependencies%==lowest appveyor-retry php bin/composer update --prefer-lowest --no-progress --ansi --no-suggest --prefer-dist -n
-    - IF %dependencies%==current appveyor-retry php bin/composer install --no-progress --ansi -n
-    - IF %dependencies%==highest appveyor-retry php bin/composer update --no-progress -n --ansi --no-suggest --prefer-dist -n
+    - IF NOT EXIST composer.phar (appveyor-retry appveyor DownloadFile https://github.com/composer/composer/releases/download/1.7.1/composer.phar)
+    - php composer.phar self-update
+    - IF %APPVEYOR_REPO_BRANCH%==master (SET COMPOSER_ROOT_VERSION=dev-master) ELSE (SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev)
+    - IF %dependencies%==lowest appveyor-retry php composer.phar update --prefer-lowest --no-progress --ansi --no-suggest --prefer-dist -n
+    - IF %dependencies%==current appveyor-retry php composer.phar update --no-progress --ansi --no-suggest --prefer-dist -n
+    - IF %dependencies%==highest appveyor-retry php composer.phar update --no-progress -n --ansi --no-suggest --prefer-dist -n
 
 test_script:
     - cd c:\projects\box
