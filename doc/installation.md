@@ -2,6 +2,7 @@
 
 1. [PHAR](#phar)
 1. [Composer](#composer)
+1. [Homebrew](#homebrew)
 
 ## PHAR
 
@@ -9,7 +10,7 @@ The preferred method of installation is to use the Box PHAR which can be downloa
 [Github Release][releases]. This method ensures you will not have any dependency conflict issue.
 
 
-### Composer
+## Composer
 
 You can install Box with [Composer][composer]:
 
@@ -27,6 +28,25 @@ composer bin box require --dev humbug/box
 $ vendor/bin/box
 ```
 
+## Homebrew
+
+To install box using [Homebrew](https://brew.sh), you need to tap the box formula first
+
+```bash
+$ brew tap humbug/box
+```
+
+Then you can install box using
+
+```bash
+$ brew install box
+```
+
+The `box` command is now available to run from anywhere in the system
+
+```bash
+$ box -v
+```
 
 <br />
 <hr />
