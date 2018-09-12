@@ -30,7 +30,6 @@ install:
     - IF NOT EXIST c:\php mkdir c:\php
     - IF NOT EXIST c:\php\%php_ver_target% mkdir c:\php\%php_ver_target%
     - ps: appveyor-retry cinst --params '""/InstallDir:C:\tools\php\%php_ver_target%""' --ignore-checksums -y php --version ((choco search php --exact --all-versions -r | select-string -pattern $env:php_ver_target | sort { [version]($_ -split '\|' | select -last 1) } -Descending | Select-Object -first 1) -replace '[php|]','')
-    - choco install make
     - cd c:\tools\php\%php_ver_target%
     - copy php.ini-production php.ini /Y
     - echo date.timezone="UTC" >> php.ini
@@ -49,4 +48,4 @@ install:
 
 test_script:
     - cd c:\projects\box
-    - make test
+    - bin\phpunit
