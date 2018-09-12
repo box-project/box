@@ -14,14 +14,14 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
+use KevinGH\Box\Test\FileSystemTestCase;
 use Phar;
-use PHPUnit\Framework\TestCase;
 use function array_column;
 
 /**
  * @covers \KevinGH\Box\RequirementChecker\RequirementsDumper
  */
-class RequirementsDumperTest extends TestCase
+class RequirementsDumperTest extends FileSystemTestCase
 {
     /**
      * @dataProvider provideJsonAndLockContents
@@ -75,7 +75,7 @@ class RequirementsDumperTest extends TestCase
 
         $this->assertSame(
             $expectedFiles,
-            array_column($checkFiles, 0)
+            $this->normalizePaths(array_column($checkFiles, 0))
         );
 
         $this->assertSame($expectedRequirement, $checkFiles[0][1]);
