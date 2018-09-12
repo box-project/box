@@ -217,8 +217,6 @@ class ComposerConfigurationTest extends FileSystemTestCase
 }
 JSON;
 
-    private $ds = DIRECTORY_SEPARATOR;
-
     public function test_it_returns_an_empty_list_when_trying_to_retrieve_the_list_of_dev_packages_when_no_composer_json_file_is_found(): void
     {
         $this->assertSame([], ComposerConfiguration::retrieveDevPackages($this->tmp, null, null));

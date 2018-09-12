@@ -35,6 +35,11 @@ abstract class FileSystemTestCase extends TestCase
     protected $tmp;
 
     /**
+     * @var string
+     */
+    protected $ds = DIRECTORY_SEPARATOR;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp(): void
@@ -75,7 +80,7 @@ abstract class FileSystemTestCase extends TestCase
         $files = array_values(
             array_map(
                 function (string $file) use ($root): string {
-                    return str_replace($root.DIRECTORY_SEPARATOR, '', $file);
+                    return str_replace([$root.DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR], ['', '/'], $file);
                 },
                 $files
             )
