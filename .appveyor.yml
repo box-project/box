@@ -47,4 +47,4 @@ install:
 
 test_script:
     - cd c:\projects\box
-    - php bin/phpunit
+    - bin/phpunit
