@@ -43,4 +43,4 @@ install:
 
 test_script:
     - cd c:\projects\box
-    - bin/phpunit
+    - make test
