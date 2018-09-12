@@ -36,16 +36,22 @@ To install box using [Homebrew](https://brew.sh), you need to tap the box formul
 $ brew tap humbug/box
 ```
 
-Then you can install box using
+Then you can install box using:
 
 ```bash
 $ brew install box
 ```
 
-The `box` command is now available to run from anywhere in the system
+The `box` command is now available to run from anywhere in the system:
 
 ```bash
 $ box -v
+```
+
+To upgrade `box` use the following command:
+
+```bash
+$ brew upgrade box
 ```
 
 <br />
