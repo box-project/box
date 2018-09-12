@@ -217,6 +217,8 @@ class ComposerConfigurationTest extends FileSystemTestCase
 }
 JSON;
 
+    private $ds = DIRECTORY_SEPARATOR;
+
     public function test_it_returns_an_empty_list_when_trying_to_retrieve_the_list_of_dev_packages_when_no_composer_json_file_is_found(): void
     {
         $this->assertSame([], ComposerConfiguration::retrieveDevPackages($this->tmp, null, null));
@@ -228,12 +230,12 @@ JSON;
         $decodedComposerJson = [];
         $decodedComposerLock = json_decode(self::COMPOSER_LOCK_SAMPLE, true);
 
-        mkdir('vendor/bamarni/composer-bin-plugin');
-        mkdir('vendor/doctrine/instantiator');
+        mkdir("vendor{$this->ds}bamarni{$this->ds}composer-bin-plugin");
+        mkdir("vendor{$this->ds}doctrine{$this->ds}instantiator");
 
         $expected = [
-            $this->tmp.'/vendor/bamarni/composer-bin-plugin',
-            $this->tmp.'/vendor/doctrine/instantiator',
+            $this->tmp."{$this->ds}vendor{$this->ds}bamarni{$this->ds}composer-bin-plugin",
+            $this->tmp."{$this->ds}vendor{$this->ds}doctrine{$this->ds}instantiator",
         ];
 
         $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock);
@@ -246,12 +248,12 @@ JSON;
         $decodedComposerJson = ['config' => []];
         $decodedComposerLock = json_decode(self::COMPOSER_LOCK_SAMPLE, true);
 
-        mkdir('vendor/bamarni/composer-bin-plugin');
-        mkdir('vendor/doctrine/instantiator');
+        mkdir("vendor{$this->ds}bamarni{$this->ds}composer-bin-plugin");
+        mkdir("vendor{$this->ds}doctrine{$this->ds}instantiator");
 
         $expected = [
-            $this->tmp.'/vendor/bamarni/composer-bin-plugin',
-            $this->tmp.'/vendor/doctrine/instantiator',
+            $this->tmp."{$this->ds}vendor{$this->ds}bamarni{$this->ds}composer-bin-plugin",
+            $this->tmp."{$this->ds}vendor{$this->ds}doctrine{$this->ds}instantiator",
         ];
 
         $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock);
@@ -264,11 +266,11 @@ JSON;
         $decodedComposerJson = [];
         $decodedComposerLock = json_decode(self::COMPOSER_LOCK_SAMPLE, true);
 
-        mkdir('vendor/bamarni/composer-bin-plugin');
+        mkdir("vendor{$this->ds}bamarni{$this->ds}composer-bin-plugin");
         // Doctrine Instantiator vendor does not exists
 
         $expected = [
-            $this->tmp.'/vendor/bamarni/composer-bin-plugin',
+            $this->tmp."{$this->ds}vendor{$this->ds}bamarni{$this->ds}composer-bin-plugin",
         ];
 
         $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock);
@@ -285,11 +287,11 @@ JSON;
         ];
         $decodedComposerLock = json_decode(self::COMPOSER_LOCK_SAMPLE, true);
 
-        mkdir('custom-vendor/bamarni/composer-bin-plugin');
-        mkdir('vendor/doctrine/instantiator');  // Wrong directory
+        mkdir("custom-vendor{$this->ds}bamarni{$this->ds}composer-bin-plugin");
+        mkdir("vendor{$this->ds}doctrine{$this->ds}instantiator");  // Wrong directory
 
         $expected = [
-            $this->tmp.'/custom-vendor/bamarni/composer-bin-plugin',
+            $this->tmp."{$this->ds}custom-vendor{$this->ds}bamarni{$this->ds}composer-bin-plugin",
         ];
 
         $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock);
@@ -404,8 +406,8 @@ JSON
             true
         );
 
-        mkdir('custom-vendor/bamarni/composer-bin-plugin');
-        mkdir('vendor/doctrine/instantiator');  // Wrong directory
+        mkdir("custom-vendor{$this->ds}bamarni{$this->ds}composer-bin-plugin");
+        mkdir("vendor{$this->ds}doctrine{$this->ds}instantiator");  // Wrong directory
 
         $expected = [];
 
