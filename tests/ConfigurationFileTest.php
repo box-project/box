@@ -1512,7 +1512,28 @@ JSON
         $this->assertCount(0, $this->config->getBinaryFiles());
     }
 
-    public function provideConfigWithMainScript()
+    public function test_files_are_autodiscovered_by_default(): void
+    {
+        $this->assertTrue($this->config->hasAutodiscoveredFiles());
+    }
+
+    /**
+     * @dataProvider provideFilesAutodiscoveryConfig
+     */
+    public function test_files_are_autodiscovered_unless_directory_or_finder_config_is_provided(
+        callable $setUp,
+        array $config,
+        bool $expectedFilesAutodiscovery
+    ): void
+    {
+        $setUp();
+
+        $this->setConfig($config);
+
+        $this->assertSame($expectedFilesAutodiscovery, $this->config->hasAutodiscoveredFiles());
+    }
+
+    public function provideConfigWithMainScript(): Generator
     {
         yield [
             function (): void {
@@ -1671,7 +1692,7 @@ JSON
         }
     }
 
-    public function provideJsonValidNonObjectArray()
+    public function provideJsonValidNonObjectArray(): Generator
     {
         foreach ($this->provideJsonPrimitives() as $key => $values) {
             if ('object' === $key) {
@@ -1690,5 +1711,77 @@ JSON
         yield 'string' => 'foo';
         yield 'object' => ['foo' => 'bar'];
         yield 'array' => ['foo', 'bar'];
+    }
+
+    public function provideFilesAutodiscoveryConfig(): Generator
+    {
+        yield [
+            function (): void {},
+            [],
+            true,
+        ];
+
+        yield [
+            function (): void {
+                touch('main-script');
+                touch('file0');
+                touch('file-bin0');
+                dump_file('directory-bin0/file00');
+                dump_file('directory-bin1/file10');
+            },
+            [
+                'main' => 'main-script',
+                'files' => ['file0'],
+                'files-bin' => ['file-bin0'],
+                'directories-bin' => ['directory-bin0'],
+                'finder-bin' => [
+                    [
+                        'in' => ['directory-bin1'],
+                    ],
+                ],
+                'blacklist' => ['unknown'],
+            ],
+            true,
+        ];
+
+        yield [
+            function (): void {
+                dump_file('directory0/file00');
+            },
+            [
+                'directories' => ['directory0'],
+            ],
+            false,
+        ];
+
+        yield [
+            function (): void {
+                dump_file('directory1/file10');
+            },
+            [
+                'finder' => [
+                    [
+                        'in' => ['directory1'],
+                    ],
+                ],
+            ],
+            false,
+        ];
+
+        yield [
+            function (): void {
+                dump_file('directory0/file00');
+                dump_file('directory1/file10');
+            },
+            [
+                'directories' => ['directory0'],
+                'finder' => [
+                    [
+                        'in' => ['directory1'],
+                    ],
+                ],
+            ],
+            false,
+        ];
     }
 }

@@ -371,6 +371,13 @@ EOF
                 : sprintf('%d file(s)', $count)
         );
 
+        $logger->log(
+            CompileLogger::QUESTION_MARK_PREFIX,
+            sprintf(
+                'Auto-discover files? %s',
+                $config->hasAutodiscoveredFiles() ? 'Yes' : 'No'
+            )
+        );
         $logger->log(CompileLogger::QUESTION_MARK_PREFIX, 'Adding files');
 
         $count = count($config->getFiles());
@@ -606,7 +613,7 @@ EOF
      *
      * @return callable callable to call to restore the original maximum number of open files descriptors
      */
-    private function bumpOpenFileDescriptorLimit(Box $box, SymfonyStyle $io): callable
+    private static function bumpOpenFileDescriptorLimit(Box $box, SymfonyStyle $io): callable
     {
         $filesCount = count($box) + 128;  // Add a little extra for good measure
 

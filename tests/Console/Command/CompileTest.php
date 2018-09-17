@@ -154,6 +154,7 @@ Building the PHAR "/path/to/tmp/test.phar"
 ? Adding requirements checker
 ? Adding binary files
     > 1 file(s)
+? Auto-discover files? No
 ? Adding files
     > 5 file(s)
 ? Generating new stub
@@ -367,6 +368,7 @@ Building the PHAR "/path/to/tmp/index.phar"
 ? Adding requirements checker
 ? Adding binary files
     > No file found
+? Auto-discover files? Yes
 ? Adding files
     > 9 file(s)
 ? Generating new stub
@@ -575,6 +577,7 @@ Building the PHAR "/path/to/tmp/test.phar"
 ? Skip requirements checker
 ? Adding binary files
     > 1 file(s)
+? Auto-discover files? No
 ? Adding files
     > 4 file(s)
 ? Generating new stub
@@ -811,6 +814,7 @@ Box version 3.x-dev@151e40a
 ? Adding requirements checker
 ? Adding binary files
     > 1 file(s)
+? Auto-discover files? No
 ? Adding files
     > 4 file(s)
 ? Generating new stub
@@ -910,6 +914,7 @@ Box version 3.x-dev@151e40a
 ? Adding requirements checker
 ? Adding binary files
     > 1 file(s)
+? Auto-discover files? No
 ? Adding files
     > 4 file(s)
 ? Generating new stub
@@ -1035,6 +1040,7 @@ Box version 3.x-dev@151e40a
 ? Adding requirements checker
 ? Adding binary files
     > 1 file(s)
+? Auto-discover files? No
 ? Adding files
     > 4 file(s)
 ? Generating new stub
@@ -1282,6 +1288,7 @@ KevinGH\Box\Configuration {#140
       link: false
     }
   ]
+  -autodiscoveredFiles: false
   -dumpAutoload: true
   -excludeComposerFiles: true
   -compactors: array:1 [
@@ -1725,6 +1732,7 @@ Box version 3.x-dev@151e40a
 ? Skip requirements checker
 ? Adding binary files
     > No file found
+? Auto-discover files? Yes
 ? Adding files
     > No file found
 ? Generating new stub
@@ -1980,6 +1988,7 @@ Box version 3.x-dev@151e40a
 ? Skip requirements checker
 ? Adding binary files
     > No file found
+? Auto-discover files? Yes
 ? Adding files
     > No file found
 ? Generating new stub
@@ -2042,6 +2051,7 @@ Box version 3.x-dev@151e40a
 ? Skip requirements checker
 ? Adding binary files
     > No file found
+? Auto-discover files? Yes
 ? Adding files
     > No file found
 ? Using stub file: /path/to/tmp/stub.php
@@ -2102,6 +2112,7 @@ Box version 3.x-dev@151e40a
 ? Skip requirements checker
 ? Adding binary files
     > No file found
+? Auto-discover files? Yes
 ? Adding files
     > 1 file(s)
 ? Generating new stub
@@ -2172,6 +2183,7 @@ Box version 3.x-dev@151e40a
 ? Skip requirements checker
 ? Adding binary files
     > 1 file(s)
+? Auto-discover files? Yes
 ? Adding files
     > No file found
 ? Using stub file: /path/to/tmp/stub.php
@@ -2242,6 +2254,7 @@ Box version 3.x-dev@151e40a
 ? Skip requirements checker
 ? Adding binary files
     > No file found
+? Auto-discover files? Yes
 ? Adding files
     > No file found
 ? Using stub file: /path/to/tmp/stub.php
@@ -2310,6 +2323,7 @@ Box version 3.x-dev@151e40a
 ? Skip requirements checker
 ? Adding binary files
     > No file found
+? Auto-discover files? Yes
 ? Adding files
     > No file found
 ? Generating new stub
@@ -2381,6 +2395,7 @@ Box version 3.x-dev@151e40a
 ? Skip requirements checker
 ? Adding binary files
     > No file found
+? Auto-discover files? Yes
 ? Adding files
     > No file found
 ? Generating new stub
@@ -2528,6 +2543,7 @@ Box version 3.x-dev@151e40a
 ? Skip requirements checker
 ? Adding binary files
     > No file found
+? Auto-discover files? Yes
 ? Adding files
     > No file found
 ? Generating new stub
@@ -2612,6 +2628,7 @@ Box version 3.x-dev@151e40a
 ? Skip requirements checker
 ? Adding binary files
     > No file found
+? Auto-discover files? Yes
 ? Adding files
     > No file found
 ? Using stub file: /path/to/tmp/stub.php

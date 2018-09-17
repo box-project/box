@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use function array_keys;
 use Assert\Assertion;
 use Closure;
 use DateTimeImmutable;
@@ -102,6 +103,7 @@ BANNER;
     private $composerLock;
     private $files;
     private $binaryFiles;
+    private $autodiscoveredFiles;
     private $dumpAutoload;
     private $excludeComposerFiles;
     private $compactors;
@@ -126,120 +128,6 @@ BANNER;
     private $isStubGenerated;
     private $checkRequirements;
 
-    /**
-     * @param null|string   $file
-     * @param null|string   $alias
-     * @param string        $basePath             Utility to private the base path used and be able to retrieve a
-     *                                            path relative to it (the base path)
-     * @param array         $composerJson         The first element is the path to the `composer.json` file as a
-     *                                            string and the second element its decoded contents as an
-     *                                            associative array.
-     * @param array         $composerLock         The first element is the path to the `composer.lock` file as a
-     *                                            string and the second element its decoded contents as an
-     *                                            associative array.
-     * @param SplFileInfo[] $files                List of files
-     * @param SplFileInfo[] $binaryFiles          List of binary files
-     * @param bool          $dumpAutoload         Whether or not the Composer autoloader should be dumped
-     * @param bool          $excludeComposerFiles Whether or not the Composer files composer.json, composer.lock and
-     *                                            installed.json should be removed from the PHAR
-     * @param Compactor[]   $compactors           List of file contents compactors
-     * @param null|int      $compressionAlgorithm Compression algorithm constant value. See the \Phar class constants
-     * @param null|int      $fileMode             File mode in octal form
-     * @param string        $mainScriptPath       The main script file path
-     * @param string        $mainScriptContents   The processed content of the main script file
-     * @param MapFile       $fileMapper           Utility to map the files from outside and inside the PHAR
-     * @param mixed         $metadata             The PHAR Metadata
-     * @param bool          $isPrivateKeyPrompt   If the user should be prompted for the private key passphrase
-     * @param scalar[]      $replacements         The processed list of replacement placeholders and their values
-     * @param null|string   $shebang              The shebang line
-     * @param int           $signingAlgorithm     The PHAR siging algorithm. See \Phar constants
-     * @param null|string   $stubBannerContents   The stub banner comment
-     * @param null|string   $stubBannerPath       The path to the stub banner comment file
-     * @param null|string   $stubPath             The PHAR stub file path
-     * @param bool          $isInterceptFileFuncs Whether or not Phar::interceptFileFuncs() should be used
-     * @param bool          $isStubGenerated      Whether or not if the PHAR stub should be generated
-     * @param bool          $checkRequirements    Whether the PHAR will check the application requirements before
-     *                                            running
-     */
-    private function __construct(
-        ?string $file,
-        string $alias,
-        string $basePath,
-        array $composerJson,
-        array $composerLock,
-        array $files,
-        array $binaryFiles,
-        bool $dumpAutoload,
-        bool $excludeComposerFiles,
-        array $compactors,
-        ?int $compressionAlgorithm,
-        ?int $fileMode,
-        ?string $mainScriptPath,
-        ?string $mainScriptContents,
-        MapFile $fileMapper,
-        $metadata,
-        string $tmpOutputPath,
-        string $outputPath,
-        ?string $privateKeyPassphrase,
-        ?string $privateKeyPath,
-        bool $isPrivateKeyPrompt,
-        array $replacements,
-        ?string $shebang,
-        int $signingAlgorithm,
-        ?string $stubBannerContents,
-        ?string $stubBannerPath,
-        ?string $stubPath,
-        bool $isInterceptFileFuncs,
-        bool $isStubGenerated,
-        bool $checkRequirements
-    ) {
-        Assertion::nullOrInArray(
-            $compressionAlgorithm,
-            get_phar_compression_algorithms(),
-            sprintf(
-                'Invalid compression algorithm "%%s", use one of "%s" instead.',
-                implode('", "', array_keys(get_phar_compression_algorithms()))
-            )
-        );
-
-        if (null === $mainScriptPath) {
-            Assertion::null($mainScriptContents);
-        } else {
-            Assertion::notNull($mainScriptContents);
-        }
-
-        $this->file = $file;
-        $this->alias = $alias;
-        $this->basePath = $basePath;
-        $this->composerJson = $composerJson;
-        $this->composerLock = $composerLock;
-        $this->files = $files;
-        $this->binaryFiles = $binaryFiles;
-        $this->dumpAutoload = $dumpAutoload;
-        $this->excludeComposerFiles = $excludeComposerFiles;
-        $this->compactors = $compactors;
-        $this->compressionAlgorithm = $compressionAlgorithm;
-        $this->fileMode = $fileMode;
-        $this->mainScriptPath = $mainScriptPath;
-        $this->mainScriptContents = $mainScriptContents;
-        $this->fileMapper = $fileMapper;
-        $this->metadata = $metadata;
-        $this->tmpOutputPath = $tmpOutputPath;
-        $this->outputPath = $outputPath;
-        $this->privateKeyPassphrase = $privateKeyPassphrase;
-        $this->privateKeyPath = $privateKeyPath;
-        $this->isPrivateKeyPrompt = $isPrivateKeyPrompt;
-        $this->processedReplacements = $replacements;
-        $this->shebang = $shebang;
-        $this->signingAlgorithm = $signingAlgorithm;
-        $this->stubBannerContents = $stubBannerContents;
-        $this->stubBannerPath = $stubBannerPath;
-        $this->stubPath = $stubPath;
-        $this->isInterceptFileFuncs = $isInterceptFileFuncs;
-        $this->isStubGenerated = $isStubGenerated;
-        $this->checkRequirements = $checkRequirements;
-    }
-
     public static function create(?string $file, stdClass $raw): self
     {
         $alias = self::retrieveAlias($raw);
@@ -262,7 +150,9 @@ BANNER;
 
         $files = self::retrieveFiles($raw, 'files', $basePath, $composerFiles, $mainScriptPath);
 
-        if (self::shouldRetrieveAllFiles($file, $raw)) {
+        $autodiscoverFiles = self::autodiscoverFiles($file, $raw);
+
+        if ($autodiscoverFiles) {
             [$files, $directories] = self::retrieveAllDirectoriesToInclude(
                 $basePath,
                 $composerJson[1],
@@ -351,6 +241,7 @@ BANNER;
             $composerLock,
             $filesAggregate,
             $binaryFilesAggregate,
+            $autodiscoverFiles,
             $dumpAutoload,
             $excludeComposerFiles,
             $compactors,
@@ -375,6 +266,122 @@ BANNER;
             $isStubGenerated,
             $checkRequirements
         );
+    }
+
+    /**
+     * @param null|string   $file
+     * @param null|string   $alias
+     * @param string        $basePath             Utility to private the base path used and be able to retrieve a
+     *                                            path relative to it (the base path)
+     * @param array         $composerJson         The first element is the path to the `composer.json` file as a
+     *                                            string and the second element its decoded contents as an
+     *                                            associative array.
+     * @param array         $composerLock         The first element is the path to the `composer.lock` file as a
+     *                                            string and the second element its decoded contents as an
+     *                                            associative array.
+     * @param SplFileInfo[] $files                List of files
+     * @param SplFileInfo[] $binaryFiles          List of binary files
+     * @param bool          $dumpAutoload         Whether or not the Composer autoloader should be dumped
+     * @param bool          $excludeComposerFiles Whether or not the Composer files composer.json, composer.lock and
+     *                                            installed.json should be removed from the PHAR
+     * @param Compactor[]   $compactors           List of file contents compactors
+     * @param null|int      $compressionAlgorithm Compression algorithm constant value. See the \Phar class constants
+     * @param null|int      $fileMode             File mode in octal form
+     * @param string        $mainScriptPath       The main script file path
+     * @param string        $mainScriptContents   The processed content of the main script file
+     * @param MapFile       $fileMapper           Utility to map the files from outside and inside the PHAR
+     * @param mixed         $metadata             The PHAR Metadata
+     * @param bool          $isPrivateKeyPrompt   If the user should be prompted for the private key passphrase
+     * @param scalar[]      $replacements         The processed list of replacement placeholders and their values
+     * @param null|string   $shebang              The shebang line
+     * @param int           $signingAlgorithm     The PHAR siging algorithm. See \Phar constants
+     * @param null|string   $stubBannerContents   The stub banner comment
+     * @param null|string   $stubBannerPath       The path to the stub banner comment file
+     * @param null|string   $stubPath             The PHAR stub file path
+     * @param bool          $isInterceptFileFuncs Whether or not Phar::interceptFileFuncs() should be used
+     * @param bool          $isStubGenerated      Whether or not if the PHAR stub should be generated
+     * @param bool          $checkRequirements    Whether the PHAR will check the application requirements before
+     *                                            running
+     */
+    private function __construct(
+        ?string $file,
+        string $alias,
+        string $basePath,
+        array $composerJson,
+        array $composerLock,
+        array $files,
+        array $binaryFiles,
+        bool $autodiscoveredFiles,
+        bool $dumpAutoload,
+        bool $excludeComposerFiles,
+        array $compactors,
+        ?int $compressionAlgorithm,
+        ?int $fileMode,
+        ?string $mainScriptPath,
+        ?string $mainScriptContents,
+        MapFile $fileMapper,
+        $metadata,
+        string $tmpOutputPath,
+        string $outputPath,
+        ?string $privateKeyPassphrase,
+        ?string $privateKeyPath,
+        bool $isPrivateKeyPrompt,
+        array $replacements,
+        ?string $shebang,
+        int $signingAlgorithm,
+        ?string $stubBannerContents,
+        ?string $stubBannerPath,
+        ?string $stubPath,
+        bool $isInterceptFileFuncs,
+        bool $isStubGenerated,
+        bool $checkRequirements
+    ) {
+        Assertion::nullOrInArray(
+            $compressionAlgorithm,
+            get_phar_compression_algorithms(),
+            sprintf(
+                'Invalid compression algorithm "%%s", use one of "%s" instead.',
+                implode('", "', array_keys(get_phar_compression_algorithms()))
+            )
+        );
+
+        if (null === $mainScriptPath) {
+            Assertion::null($mainScriptContents);
+        } else {
+            Assertion::notNull($mainScriptContents);
+        }
+
+        $this->file = $file;
+        $this->alias = $alias;
+        $this->basePath = $basePath;
+        $this->composerJson = $composerJson;
+        $this->composerLock = $composerLock;
+        $this->files = $files;
+        $this->binaryFiles = $binaryFiles;
+        $this->autodiscoveredFiles = $autodiscoveredFiles;
+        $this->dumpAutoload = $dumpAutoload;
+        $this->excludeComposerFiles = $excludeComposerFiles;
+        $this->compactors = $compactors;
+        $this->compressionAlgorithm = $compressionAlgorithm;
+        $this->fileMode = $fileMode;
+        $this->mainScriptPath = $mainScriptPath;
+        $this->mainScriptContents = $mainScriptContents;
+        $this->fileMapper = $fileMapper;
+        $this->metadata = $metadata;
+        $this->tmpOutputPath = $tmpOutputPath;
+        $this->outputPath = $outputPath;
+        $this->privateKeyPassphrase = $privateKeyPassphrase;
+        $this->privateKeyPath = $privateKeyPath;
+        $this->isPrivateKeyPrompt = $isPrivateKeyPrompt;
+        $this->processedReplacements = $replacements;
+        $this->shebang = $shebang;
+        $this->signingAlgorithm = $signingAlgorithm;
+        $this->stubBannerContents = $stubBannerContents;
+        $this->stubBannerPath = $stubBannerPath;
+        $this->stubPath = $stubPath;
+        $this->isInterceptFileFuncs = $isInterceptFileFuncs;
+        $this->isStubGenerated = $isStubGenerated;
+        $this->checkRequirements = $checkRequirements;
     }
 
     public function getConfigurationFile(): ?string
@@ -426,6 +433,11 @@ BANNER;
     public function getBinaryFiles(): array
     {
         return $this->binaryFiles;
+    }
+
+    public function hasAutodiscoveredFiles(): bool
+    {
+        return $this->autodiscoveredFiles;
     }
 
     public function dumpAutoload(): bool
@@ -600,7 +612,7 @@ BANNER;
         return realpath($basePath);
     }
 
-    private static function shouldRetrieveAllFiles(?string $file, stdClass $raw): bool
+    private static function autodiscoverFiles(?string $file, stdClass $raw): bool
     {
         if (null === $file) {
             return true;
@@ -609,13 +621,7 @@ BANNER;
         // TODO: config should be casted into an array: it is easier to do and we need an array in several places now
         $rawConfig = (array) $raw;
 
-        foreach (self::FILES_SETTINGS as $key) {
-            if (array_key_exists($key, $rawConfig)) {
-                return false;
-            }
-        }
-
-        return true;
+        return self::FILES_SETTINGS === array_diff(self::FILES_SETTINGS, array_keys($rawConfig));
     }
 
     private static function retrieveBlacklistFilter(stdClass $raw, string $basePath, ?string ...$excludedPaths): array
