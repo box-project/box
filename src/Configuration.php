@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use function array_keys;
 use Assert\Assertion;
 use Closure;
 use DateTimeImmutable;
@@ -42,6 +41,7 @@ use function array_column;
 use function array_diff;
 use function array_filter;
 use function array_key_exists;
+use function array_keys;
 use function array_map;
 use function array_merge;
 use function array_unique;
@@ -58,7 +58,6 @@ use function is_link;
 use function is_object;
 use function is_readable;
 use function is_string;
-use function iter\fn\method;
 use function iter\map;
 use function iter\toArray;
 use function iter\values;
@@ -71,7 +70,6 @@ use function KevinGH\Box\FileSystem\make_path_relative;
 use function preg_match;
 use function sprintf;
 use function substr;
-use Traversable;
 use function trigger_error;
 use function uniqid;
 
@@ -148,8 +146,8 @@ BANNER;
         $devPackages = ComposerConfiguration::retrieveDevPackages($basePath, $composerJson[1], $composerLock[1]);
 
         /**
-         * @var string[] $excludedPaths
-         * @var Closure $blacklistFilter
+         * @var string[]
+         * @var Closure  $blacklistFilter
          */
         [$excludedPaths, $blacklistFilter] = self::retrieveBlacklistFilter($raw, $basePath, $tmpOutputPath, $outputPath, $mainScriptPath);
 
@@ -683,8 +681,7 @@ BANNER;
         array $composerJson,
         bool $autodiscoverFiles,
         bool $forceFilesAutodiscovery
-    ): array
-    {
+    ): array {
         $files = [self::retrieveFiles($raw, 'files', $basePath, $composerFiles, $mainScriptPath)];
 
         if ($autodiscoverFiles || $forceFilesAutodiscovery) {
@@ -737,8 +734,7 @@ BANNER;
         Closure $blacklistFilter,
         array $excludedPaths,
         array $devPackages
-    ): array
-    {
+    ): array {
         $binaryFiles = self::retrieveFiles($raw, 'files-bin', $basePath, [], $mainScriptPath);
         $binaryDirectories = self::retrieveDirectories($raw, 'directories-bin', $basePath, $blacklistFilter, $excludedPaths);
         $binaryFilesFromFinders = self::retrieveFilesFromFinders($raw, 'finder-bin', $basePath, $blacklistFilter, $devPackages);
@@ -802,7 +798,7 @@ BANNER;
     }
 
     /**
-     * @param string   $key             Config property name
+     * @param string   $key           Config property name
      * @param string[] $excludedPaths
      *
      * @return iterable|SplFileInfo[]

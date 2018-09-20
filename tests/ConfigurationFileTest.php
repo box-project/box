@@ -1524,8 +1524,7 @@ JSON
         callable $setUp,
         array $config,
         bool $expectedFilesAutodiscovery
-    ): void
-    {
+    ): void {
         $setUp();
 
         $this->setConfig($config);
@@ -1657,7 +1656,7 @@ JSON
             'blacklist' => [
                 'dir0/blacklisted_file',
                 'dir1/blacklisted_file',
-            ]
+            ],
         ]);
 
         $actual = $this->normalizePaths($this->config->getFiles());
@@ -1666,7 +1665,7 @@ JSON
 
         $this->assertCount(0, $this->config->getBinaryFiles());
     }
-    
+
     public function provideConfigWithMainScript(): Generator
     {
         yield [

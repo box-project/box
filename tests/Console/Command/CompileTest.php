@@ -23,7 +23,6 @@ use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
 use PharFileInfo;
-use function substr;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -45,6 +44,7 @@ use function sort;
 use function sprintf;
 use function str_replace;
 use function strlen;
+use function substr;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Compile
