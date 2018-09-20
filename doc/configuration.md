@@ -6,6 +6,7 @@
 1. [Permissions][permissions]
 1. [Check requirements][check-requirements]
 1. [Including files][including-files]
+    1. [Force auto-discovery (`auto-discovery`)][force-autodiscovery]
     1. [Files (`files` and `files-bin`)][files]
     1. [Directories (`directories` and `directories-bin`)][directories]
     1. [Finder (`finder` and `finder-bin`)][finder]
@@ -54,6 +55,7 @@ to `null`, then its default value will be picked and is strictly equivalent to n
     "algorithm": "?",
     "alias": "?",
     "annotations": "?",
+    "auto-discovery": "?",
     "banner": "?",
     "banner-file": "?",
     "base-path": "?",
@@ -169,7 +171,8 @@ If you however want a more granular selection, you can use a combination of the 
 [`finder-bin`][finder], [`blacklist`][blacklist].
 
 If [`directories`][directories] or [`finder`][finder] is set (this includes empty values), Box will no longer try to
-guess which files should be included or not and will give you full control on it instead.
+guess which files should be included or not (unless you [force the auto-discovery][force-autodiscovery]) and will give
+you full control on it instead.
 
 **Note:** By default, dev dependencies are excluded for both strategies. However if you still which to include a file
 or directory from a dev dependency, you can do so by adding it via one of the following setting: [`files`][files],
@@ -178,6 +181,16 @@ or directory from a dev dependency, you can do so by adding it via one of the fo
 
 **Warning:** binary files are added _before_ regular files. As a result if a file is found in both regular files and
 binary files, the regular file will take precedence.
+
+
+### Force auto-discovery (`auto-discovery`)
+
+The `auto-discovery` (`bool` default `false`) setting forces Box to attempt to find which files to include even though
+you are using the [`directories`][directories] or [`finder`][finder] setting.
+
+When Box tries to find which files to include, it may remove some files such as readmes or test files. If however you
+are using the [`directories`][directories] or [`finder`][finder], Box will _append_ the found files to the ones you 
+listed.
 
 
 ### Files (`files` and `files-bin`)
@@ -827,9 +840,10 @@ The short commit hash will only be used if no tag is available.
 [directories]: #directories-directories-and-directories-bin
 [dump-autoload]: #dumping-the-composer-autoloader-dump-autoload
 [exclude-composer-files]: #excluding-the-composer-files-exclude-composer-files
+[force-autodiscovery]: #force-auto-discovery-auto-discovery
 [files]: #files-files-and-files-bin
 [finder]: #finder-finder-and-finder-bin
-[git]: #git-commit-placeholder-git
+[git]: #pretty-git-tag-placeholder-git
 [git-commit-placeholder]: #git-commit-placeholder-git-commit
 [git-commit-short]: #short-git-commit-placeholder-git-commit-short
 [git-tag-placeholder]: #git-tag-placeholder-git-tag

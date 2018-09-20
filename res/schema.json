@@ -24,6 +24,10 @@
                 }
             }
         },
+        "auto-discovery": {
+            "description": "Forces the auto-discovery of files.",
+            "type": ["boolean", "null"]
+        },
         "banner": {
             "description": "The header comment for the generated stub.",
             "type": ["array", "boolean", "string", "null"]
