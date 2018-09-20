@@ -71,6 +71,7 @@ use function KevinGH\Box\FileSystem\make_path_relative;
 use function preg_match;
 use function sprintf;
 use function substr;
+use Traversable;
 use function trigger_error;
 use function uniqid;
 
@@ -146,47 +147,35 @@ BANNER;
 
         $devPackages = ComposerConfiguration::retrieveDevPackages($basePath, $composerJson[1], $composerLock[1]);
 
+        /**
+         * @var string[] $excludedPaths
+         * @var Closure $blacklistFilter
+         */
         [$excludedPaths, $blacklistFilter] = self::retrieveBlacklistFilter($raw, $basePath, $tmpOutputPath, $outputPath, $mainScriptPath);
 
-        $files = self::retrieveFiles($raw, 'files', $basePath, $composerFiles, $mainScriptPath);
-
         $autodiscoverFiles = self::autodiscoverFiles($file, $raw);
+        $forceFilesAutodiscovery = self::retrieveForceFilesAutodiscovery($raw);
 
-        if ($autodiscoverFiles) {
-            [$files, $directories] = self::retrieveAllDirectoriesToInclude(
-                $basePath,
-                $composerJson[1],
-                $devPackages,
-                array_merge(
-                    $files,
-                    array_filter(
-                        array_column($composerFiles, 0)
-                    )
-                ),
-                $excludedPaths
-            );
-
-            $filesAggregate = self::retrieveAllFiles(
-                $basePath,
-                $files,
-                $directories,
-                $mainScriptPath,
-                $blacklistFilter,
-                $excludedPaths,
-                $devPackages
-            );
-        } else {
-            $directories = self::retrieveDirectories($raw, 'directories', $basePath, $blacklistFilter, $excludedPaths);
-            $filesFromFinders = self::retrieveFilesFromFinders($raw, 'finder', $basePath, $blacklistFilter, $devPackages);
-
-            $filesAggregate = self::retrieveFilesAggregate($files, $directories, ...$filesFromFinders);
-        }
-
-        $binaryFiles = self::retrieveFiles($raw, 'files-bin', $basePath, [], $mainScriptPath);
-        $binaryDirectories = self::retrieveDirectories($raw, 'directories-bin', $basePath, $blacklistFilter, $excludedPaths);
-        $binaryFilesFromFinders = self::retrieveFilesFromFinders($raw, 'finder-bin', $basePath, $blacklistFilter, $devPackages);
-
-        $binaryFilesAggregate = self::retrieveFilesAggregate($binaryFiles, $binaryDirectories, ...$binaryFilesFromFinders);
+        $filesAggregate = self::collectFiles(
+            $raw,
+            $basePath,
+            $mainScriptPath,
+            $blacklistFilter,
+            $excludedPaths,
+            $devPackages,
+            $composerFiles,
+            $composerJson,
+            $autodiscoverFiles,
+            $forceFilesAutodiscovery
+        );
+        $binaryFilesAggregate = self::collectBinaryFiles(
+            $raw,
+            $basePath,
+            $mainScriptPath,
+            $blacklistFilter,
+            $excludedPaths,
+            $devPackages
+        );
 
         $dumpAutoload = self::retrieveDumpAutoload($raw, null !== $composerJson[0]);
 
@@ -624,6 +613,11 @@ BANNER;
         return self::FILES_SETTINGS === array_diff(self::FILES_SETTINGS, array_keys($rawConfig));
     }
 
+    private static function retrieveForceFilesAutodiscovery(stdClass $raw): bool
+    {
+        return $raw->{'auto-discovery'} ?? false;
+    }
+
     private static function retrieveBlacklistFilter(stdClass $raw, string $basePath, ?string ...$excludedPaths): array
     {
         $blacklist = self::retrieveBlacklist($raw, $basePath, ...$excludedPaths);
@@ -670,6 +664,84 @@ BANNER;
         }
 
         return array_unique($normalizedBlacklist);
+    }
+
+    /**
+     * @param string[] $excludedPaths
+     * @param string[] $devPackages
+     *
+     * @return SplFileInfo[]
+     */
+    private static function collectFiles(
+        stdClass $raw,
+        string $basePath,
+        ?string $mainScriptPath,
+        Closure $blacklistFilter,
+        array $excludedPaths,
+        array $devPackages,
+        array $composerFiles,
+        array $composerJson,
+        bool $autodiscoverFiles,
+        bool $forceFilesAutodiscovery
+    ): array
+    {
+        $files = [self::retrieveFiles($raw, 'files', $basePath, $composerFiles, $mainScriptPath)];
+
+        if ($autodiscoverFiles) {
+            [$filesToAppend, $directories] = self::retrieveAllDirectoriesToInclude(
+                $basePath,
+                $composerJson[1],
+                $devPackages,
+                array_filter(
+                    array_column($composerFiles, 0)
+                ),
+                $excludedPaths
+            );
+
+            $files[] = $filesToAppend;
+
+            $files[] = self::retrieveAllFiles(
+                $basePath,
+                $directories,
+                $mainScriptPath,
+                $blacklistFilter,
+                $excludedPaths,
+                $devPackages
+            );
+        } else {
+            $files[] = self::retrieveDirectories($raw, 'directories', $basePath, $blacklistFilter, $excludedPaths);
+
+            $filesFromFinders = self::retrieveFilesFromFinders($raw, 'finder', $basePath, $blacklistFilter, $devPackages);
+
+            foreach ($filesFromFinders as $filesFromFinder) {
+                // Avoid an array_merge here as it can be quite expansive at this stage depending of the number of files
+                $files[] = $filesFromFinder;
+            }
+        }
+
+        return self::retrieveFilesAggregate(...$files);
+    }
+
+    /**
+     * @param string[] $excludedPaths
+     * @param string[] $devPackages
+     *
+     * @return SplFileInfo[]
+     */
+    private static function collectBinaryFiles(
+        stdClass $raw,
+        string $basePath,
+        ?string $mainScriptPath,
+        Closure $blacklistFilter,
+        array $excludedPaths,
+        array $devPackages
+    ): array
+    {
+        $binaryFiles = self::retrieveFiles($raw, 'files-bin', $basePath, [], $mainScriptPath);
+        $binaryDirectories = self::retrieveDirectories($raw, 'directories-bin', $basePath, $blacklistFilter, $excludedPaths);
+        $binaryFilesFromFinders = self::retrieveFilesFromFinders($raw, 'finder-bin', $basePath, $blacklistFilter, $devPackages);
+
+        return self::retrieveFilesAggregate($binaryFiles, $binaryDirectories, ...$binaryFilesFromFinders);
     }
 
     /**
@@ -728,10 +800,7 @@ BANNER;
     }
 
     /**
-     * @param stdClass $raw
      * @param string   $key             Config property name
-     * @param string   $basePath
-     * @param Closure  $blacklistFilter
      * @param string[] $excludedPaths
      *
      * @return iterable|SplFileInfo[]
@@ -764,10 +833,6 @@ BANNER;
     }
 
     /**
-     * @param stdClass $raw
-     * @param string   $key
-     * @param string   $basePath
-     * @param Closure  $blacklistFilter
      * @param string[] $devPackages
      *
      * @return iterable[]|SplFileInfo[][]
@@ -805,9 +870,6 @@ BANNER;
     }
 
     /**
-     * @param array    $findersConfig
-     * @param string   $basePath
-     * @param Closure  $blacklistFilter
      * @param string[] $devPackages
      *
      * @return Finder[]|SplFileInfo[][]
@@ -826,9 +888,6 @@ BANNER;
     }
 
     /**
-     * @param stdClass $config
-     * @param string   $basePath
-     * @param Closure  $blacklistFilter
      * @param string[] $devPackages
      *
      * @return Finder|SplFileInfo[]
@@ -1125,13 +1184,16 @@ BANNER;
      */
     private static function retrieveAllFiles(
         string $basePath,
-        array $files,
         array $directories,
         ?string $mainScriptPath,
         Closure $blacklistFilter,
         array $excludedPaths,
         array $devPackages
-    ): array {
+    ): iterable {
+        if ([] === $directories) {
+            return [];
+        }
+
         $relativeDevPackages = array_map(
             function (string $packagePath) use ($basePath): string {
                 return make_path_relative($packagePath, $basePath);
@@ -1205,7 +1267,6 @@ BANNER;
             $finder->notPath(make_path_relative($mainScriptPath, $basePath));
         }
 
-        $finder->append($files);
         $finder->in($directories);
 
         $excludedPaths = array_unique(
@@ -1226,14 +1287,7 @@ BANNER;
             $finder->notPath($excludedPath);
         }
 
-        return array_unique(
-            toArray(
-                map(
-                    method('getRealPath'),
-                    $finder
-                )
-            )
-        );
+        return $finder;
     }
 
     /**
@@ -1421,6 +1475,9 @@ BANNER;
         return preg_replace('/^#!.*\s*/', '', $contents);
     }
 
+    /**
+     * @return string|null[][]
+     */
     private static function retrieveComposerFiles(string $basePath): array
     {
         $retrieveFileAndContents = function (string $file): array {
