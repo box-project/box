@@ -230,7 +230,7 @@ BANNER;
             $composerLock,
             $filesAggregate,
             $binaryFilesAggregate,
-            $autodiscoverFiles,
+            $autodiscoverFiles || $forceFilesAutodiscovery,
             $dumpAutoload,
             $excludeComposerFiles,
             $compactors,
@@ -687,7 +687,7 @@ BANNER;
     {
         $files = [self::retrieveFiles($raw, 'files', $basePath, $composerFiles, $mainScriptPath)];
 
-        if ($autodiscoverFiles) {
+        if ($autodiscoverFiles || $forceFilesAutodiscovery) {
             [$filesToAppend, $directories] = self::retrieveAllDirectoriesToInclude(
                 $basePath,
                 $composerJson[1],
@@ -708,7 +708,9 @@ BANNER;
                 $excludedPaths,
                 $devPackages
             );
-        } else {
+        }
+
+        if (false === $autodiscoverFiles) {
             $files[] = self::retrieveDirectories($raw, 'directories', $basePath, $blacklistFilter, $excludedPaths);
 
             $filesFromFinders = self::retrieveFilesFromFinders($raw, 'finder', $basePath, $blacklistFilter, $devPackages);

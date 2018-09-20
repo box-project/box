@@ -1533,6 +1533,140 @@ JSON
         $this->assertSame($expectedFilesAutodiscovery, $this->config->hasAutodiscoveredFiles());
     }
 
+    public function test_append_autodiscovered_files_to_configured_files_if_the_autodiscovery_is_forced(): void
+    {
+        touch('file0');
+        touch('file1');
+        touch('file2');
+
+        mkdir('B');
+        touch('B/fileB0');
+        touch('B/fileB1');
+
+        mkdir('PSR4_0');
+        touch('PSR4_0/file0');
+        touch('PSR4_0/file1');
+
+        mkdir('PSR4_1');
+        touch('PSR4_1/file0');
+        touch('PSR4_1/file1');
+
+        mkdir('PSR4_2');
+        touch('PSR4_2/file0');
+        touch('PSR4_2/file1');
+
+        mkdir('DEV_PSR4_0');
+        touch('DEV_PSR4_0/file0');
+        touch('DEV_PSR4_0/file1');
+
+        mkdir('PSR0_0');
+        touch('PSR0_0/file0');
+        touch('PSR0_0/file1');
+
+        mkdir('PSR0_1');
+        touch('PSR0_1/file0');
+        touch('PSR0_1/file1');
+
+        mkdir('PSR0_2');
+        touch('PSR0_2/file0');
+        touch('PSR0_2/file1');
+
+        mkdir('DEV_PSR0_0');
+        touch('DEV_PSR0_0/file0');
+        touch('DEV_PSR0_0/file1');
+
+        mkdir('CLASSMAP_DIR');
+        touch('CLASSMAP_DIR/file0');
+        touch('CLASSMAP_DIR/file1');
+
+        mkdir('CLASSMAP_DEV_DIR');
+        touch('CLASSMAP_DEV_DIR/file0');
+        touch('CLASSMAP_DEV_DIR/file1');
+
+        mkdir('dir0');
+        touch('dir0/file0');
+        touch('dir0/file1');
+        touch('dir0/blacklisted_file');
+
+        mkdir('dir1');
+        touch('dir1/file0');
+        touch('dir1/file1');
+        touch('dir1/blacklisted_file');
+
+        file_put_contents(
+            'composer.json',
+            <<<'JSON'
+{
+    "autoload": {
+        "files": ["file0", "file1"],
+        "psr-4": {
+            "Acme\\": "PSR4_0",
+            "Bar\\": ["PSR4_1", "PSR4_2"]
+        },
+        "psr-0": {
+            "Acme\\": "PSR0_0",
+            "Bar\\": ["PSR0_1", "PSR0_2"]
+        },
+        "classmap": ["CLASSMAP_DIR"]
+    },
+    "autoload-dev": {
+        "files": ["file2"],
+        "psr-4": {
+            "Acme\\": "DEV_PSR4_0"
+        },
+        "psr-0": {
+            "Acme\\": "DEV_PSR0_0"
+        },
+        "classmap": ["CLASSMAP_DEV_DIR"]
+    }
+}
+JSON
+        );
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'CLASSMAP_DIR/file0',
+            'CLASSMAP_DIR/file1',
+            'composer.json',
+            'dir0/file0',
+            'dir0/file1',
+            'dir1/file0',
+            'dir1/file1',
+            'file0',
+            'file1',
+            'PSR0_0/file0',
+            'PSR0_0/file1',
+            'PSR0_1/file0',
+            'PSR0_1/file1',
+            'PSR0_2/file0',
+            'PSR0_2/file1',
+            'PSR4_0/file0',
+            'PSR4_0/file1',
+            'PSR4_1/file0',
+            'PSR4_1/file1',
+            'PSR4_2/file0',
+            'PSR4_2/file1',
+        ];
+
+        $this->setConfig([
+            'directories' => ['dir0'],
+            'finder' => [
+                ['in' => ['dir1']],
+            ],
+            'auto-discovery' => true,
+            'blacklist' => [
+                'dir0/blacklisted_file',
+                'dir1/blacklisted_file',
+            ]
+        ]);
+
+        $actual = $this->normalizePaths($this->config->getFiles());
+
+        $this->assertEquals($expected, $actual);
+
+        $this->assertCount(0, $this->config->getBinaryFiles());
+    }
+    
     public function provideConfigWithMainScript(): Generator
     {
         yield [
@@ -1721,25 +1855,89 @@ JSON
             true,
         ];
 
+        foreach ([true, false] as $booleanValue) {
+            yield [
+                function (): void {
+                },
+                [
+                    'auto-discovery' => $booleanValue,
+                ],
+                true,
+            ];
+        }
+
+        foreach ([true, false] as $booleanValue) {
+            yield [
+                function (): void {
+                    touch('main-script');
+                    touch('file0');
+                    touch('file-bin0');
+                    dump_file('directory-bin0/file00');
+                    dump_file('directory-bin1/file10');
+                },
+                [
+                    'main' => 'main-script',
+                    'files' => ['file0'],
+                    'files-bin' => ['file-bin0'],
+                    'directories-bin' => ['directory-bin0'],
+                    'finder-bin' => [
+                        [
+                            'in' => ['directory-bin1'],
+                        ],
+                    ],
+                    'auto-discovery' => $booleanValue,
+                    'blacklist' => ['unknown'],
+                ],
+                true,
+            ];
+        }
+
         yield [
             function (): void {
-                touch('main-script');
-                touch('file0');
-                touch('file-bin0');
-                dump_file('directory-bin0/file00');
-                dump_file('directory-bin1/file10');
+                dump_file('directory0/file00');
             },
             [
-                'main' => 'main-script',
-                'files' => ['file0'],
-                'files-bin' => ['file-bin0'],
-                'directories-bin' => ['directory-bin0'],
-                'finder-bin' => [
+                'directories' => ['directory0'],
+            ],
+            false,
+        ];
+
+        yield [
+            function (): void {
+                dump_file('directory0/file00');
+            },
+            [
+                'directories' => ['directory0'],
+                'auto-discovery' => true,
+            ],
+            true,
+        ];
+
+        yield [
+            function (): void {
+                dump_file('directory1/file10');
+            },
+            [
+                'finder' => [
                     [
-                        'in' => ['directory-bin1'],
+                        'in' => ['directory1'],
                     ],
                 ],
-                'blacklist' => ['unknown'],
+            ],
+            false,
+        ];
+
+        yield [
+            function (): void {
+                dump_file('directory1/file10');
+            },
+            [
+                'finder' => [
+                    [
+                        'in' => ['directory1'],
+                    ],
+                ],
+                'auto-discovery' => true,
             ],
             true,
         ];
@@ -1747,18 +1945,10 @@ JSON
         yield [
             function (): void {
                 dump_file('directory0/file00');
-            },
-            [
-                'directories' => ['directory0'],
-            ],
-            false,
-        ];
-
-        yield [
-            function (): void {
                 dump_file('directory1/file10');
             },
             [
+                'directories' => ['directory0'],
                 'finder' => [
                     [
                         'in' => ['directory1'],
@@ -1780,8 +1970,9 @@ JSON
                         'in' => ['directory1'],
                     ],
                 ],
+                'auto-discovery' => true,
             ],
-            false,
+            true,
         ];
     }
 }
