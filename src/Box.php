@@ -369,6 +369,8 @@ final class Box implements Countable
 
         $resource = openssl_pkey_get_private($key, (string) $password);
 
+        Assertion::isResource($resource, 'Could not retrieve the private key, check that the password is correct.');
+
         openssl_pkey_export($resource, $private);
 
         $details = openssl_pkey_get_details($resource);

@@ -50,6 +50,9 @@ class ConfigurationTest extends ConfigurationTestCase
         $config = Configuration::create('box.json', new stdClass());
 
         $this->assertSame('box.json', $config->getConfigurationFile());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_it_can_be_created_without_a_file(): void
@@ -57,9 +60,12 @@ class ConfigurationTest extends ConfigurationTestCase
         $config = Configuration::create(null, new stdClass());
 
         $this->assertNull($config->getConfigurationFile());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
-    public function test_a_default_alias_is_generted_if_no_alias_is_registered(): void
+    public function test_a_default_alias_is_generated_if_no_alias_is_registered(): void
     {
         $this->assertRegExp('/^box-auto-generated-alias-[\da-zA-Z]{13}\.phar$/', $this->config->getAlias());
         $this->assertRegExp('/^box-auto-generated-alias-[\da-zA-Z]{13}\.phar$/', $this->getNoFileConfig()->getAlias());
@@ -73,6 +79,9 @@ class ConfigurationTest extends ConfigurationTestCase
         ]);
 
         $this->assertSame('test.phar', $this->config->getAlias());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_alias_value_is_normalized(): void
@@ -83,6 +92,9 @@ class ConfigurationTest extends ConfigurationTestCase
         ]);
 
         $this->assertSame('test.phar', $this->config->getAlias());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_alias_cannot_be_empty(): void
@@ -133,6 +145,9 @@ EOF
         $this->reloadConfig();
 
         $this->assertSame($this->tmp.'/sub-dir', $this->config->getBasePath());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_if_there_is_no_file_the_default_base_path_used_is_the_current_working_directory(): void
@@ -146,13 +161,16 @@ EOF
         rename(self::DEFAULT_FILE, $basePath.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
 
         $this->setConfig([
-                'base-path' => $basePath,
+            'base-path' => $basePath,
         ]);
 
         $this->assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'test',
             $this->config->getBasePath()
         );
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_non_existent_directory_cannot_be_used_as_a_base_path(): void
@@ -203,6 +221,9 @@ EOF
         $expected = $this->tmp.DIRECTORY_SEPARATOR.'dir';
 
         $this->assertSame($expected, $this->config->getBasePath());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_base_path_value_is_normalized(): void
@@ -217,6 +238,9 @@ EOF
         $expected = $this->tmp.DIRECTORY_SEPARATOR.'dir';
 
         $this->assertSame($expected, $this->config->getBasePath());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     /**
@@ -246,6 +270,9 @@ EOF
 
         $this->assertSame($expectedLock, $this->config->getComposerLock());
         $this->assertSame($expectedLockContents, $this->config->getDecodedComposerLockContents());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_it_throws_an_error_when_a_composer_file_is_found_but_invalid(): void
@@ -307,6 +334,9 @@ EOF
 
         $this->assertFalse($this->config->dumpAutoload());
 
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+
         file_put_contents('composer.json', '{}');
 
         $this->setConfig([]);
@@ -317,9 +347,12 @@ EOF
         $this->setConfig(['dump-autoload' => null]);
 
         $this->assertTrue($this->config->dumpAutoload());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
-    public function test_the_autoloader_is_can_be_configured(): void
+    public function test_the_autoloader_dumping_can_be_configured(): void
     {
         file_put_contents('composer.json', '{}');
 
@@ -330,12 +363,21 @@ EOF
         $this->assertFalse($this->config->dumpAutoload());
         $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
 
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+
         $this->setConfig([
             'dump-autoload' => true,
         ]);
 
         $this->assertTrue($this->config->dumpAutoload());
         $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
+
+        $this->assertSame(
+            ['The "dump-autoload" setting has been set but is unnecessary since its value is the default value.'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_autoloader_cannot_be_dumped_if_no_composer_json_file_is_found(): void
@@ -345,6 +387,15 @@ EOF
         ]);
 
         $this->assertFalse($this->config->dumpAutoload());
+
+        $this->assertSame(
+            ['The "dump-autoload" setting has been set but is unnecessary since its value is the default value.'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame(
+            ['The "dump-autoload" setting has been set but has been ignored because the composer.json file necessary for it could not be found'],
+            $this->config->getWarnings()
+        );
     }
 
     public function test_it_excludes_the_composer_files_by_default(): void
@@ -355,6 +406,9 @@ EOF
 
         $this->assertTrue($this->config->excludeComposerFiles());
         $this->assertTrue($this->getNoFileConfig()->excludeComposerFiles());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_excluding_the_composer_files_can_be_configured(): void
@@ -365,11 +419,17 @@ EOF
 
         $this->assertTrue($this->config->excludeComposerFiles());
 
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+
         $this->setConfig([
             'exclude-composer-files' => false,
         ]);
 
         $this->assertFalse($this->config->excludeComposerFiles());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_no_compactors_is_configured_by_default(): void
@@ -392,6 +452,9 @@ EOF
 
         $this->assertInstanceOf(Php::class, $compactors[0]);
         $this->assertInstanceOf(DummyCompactor::class, $compactors[1]);
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_it_cannot_get_the_compactors_with_an_invalid_class(): void
@@ -484,7 +547,11 @@ EOF
         ]);
 
         $compactors = $this->config->getCompactors();
+
         $this->assertSame('custom', $compactors[0]->getScoper()->getPrefix());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_no_compression_algorithm_is_configured_by_default(): void
@@ -501,6 +568,9 @@ EOF
         ]);
 
         $this->assertSame(Phar::BZ2, $this->config->getCompressionAlgorithm());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     /**
@@ -546,6 +616,9 @@ EOF
 
         $this->assertSame(420, $this->config->getFileMode());
 
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+
         // Decimal value provided
         $this->setConfig([
             'files' => [self::DEFAULT_FILE],
@@ -553,6 +626,9 @@ EOF
         ]);
 
         $this->assertSame(420, $this->config->getFileMode());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_main_script_path_is_configured_by_default(): void
@@ -584,6 +660,9 @@ JSON
 
         $this->assertTrue($this->getNoFileConfig()->hasMainScript());
         $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'bin/foo', $this->getNoFileConfig()->getMainScriptPath());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_first_composer_bin_is_used_as_the_main_script_by_default(): void
@@ -608,6 +687,9 @@ JSON
         $this->assertTrue($this->config->hasMainScript());
         $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'bin/foo', $this->config->getMainScriptPath());
         $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'bin/foo', $this->getNoFileConfig()->getMainScriptPath());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_main_script_can_be_configured(): void
@@ -634,6 +716,9 @@ JSON
         $this->assertTrue($this->config->hasMainScript());
         $this->assertSame($this->tmp.'/test.php', $this->config->getMainScriptPath());
         $this->assertSame('Main script contents', $this->config->getMainScriptContents());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_main_script_path_is_normalized(): void
@@ -643,6 +728,9 @@ JSON
         $this->setConfig(['main' => ' test.php ']);
 
         $this->assertSame($this->tmp.'/test.php', $this->config->getMainScriptPath());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_main_script_content_ignores_shebang_line(): void
@@ -652,6 +740,9 @@ JSON
         $this->setConfig(['main' => 'test.php']);
 
         $this->assertSame('test', $this->config->getMainScriptContents());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_it_cannot_get_the_main_script_if_file_does_not_exists(): void
@@ -710,6 +801,9 @@ JSON
                 $exception->getMessage()
             );
         }
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_main_script_cannot_be_enabled(): void
@@ -767,6 +861,9 @@ JSON
             'b/second/test/path/sub/path/file.php',
             $mapFile('second/test/path/sub/path/file.php')
         );
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_no_metadata_is_configured_by_default(): void
@@ -782,6 +879,9 @@ JSON
         ]);
 
         $this->assertSame(123, $this->config->getMetadata());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_get_default_output_path(): void
@@ -794,6 +894,9 @@ JSON
             $this->tmp.DIRECTORY_SEPARATOR.'index.phar',
             $this->config->getTmpOutputPath()
         );
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_output_path_is_configurable(): void
@@ -811,6 +914,9 @@ JSON
             $this->tmp.DIRECTORY_SEPARATOR.'test.phar',
             $this->config->getTmpOutputPath()
         );
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_output_path_is_relative_to_the_base_path(): void
@@ -831,6 +937,9 @@ JSON
             $this->tmp.'/sub-dir/test.phar',
             $this->config->getTmpOutputPath()
         );
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_output_path_is_not_relative_to_the_base_path_if_is_absolute(): void
@@ -851,6 +960,9 @@ JSON
             $this->tmp.'/test.phar',
             $this->config->getTmpOutputPath()
         );
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_output_path_is_normalized(): void
@@ -868,6 +980,9 @@ JSON
             $this->tmp.DIRECTORY_SEPARATOR.'test.phar',
             $this->config->getTmpOutputPath()
         );
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_output_path_can_omit_the_PHAR_extension(): void
@@ -885,6 +1000,9 @@ JSON
             $this->tmp.DIRECTORY_SEPARATOR.'test.phar',
             $this->config->getTmpOutputPath()
         );
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_get_default_output_path_depends_on_the_input(): void
@@ -899,46 +1017,9 @@ JSON
             $this->tmp.'/bin/acme.phar',
             $this->config->getOutputPath()
         );
-    }
 
-    public function testGetPrivateKeyPassphrase(): void
-    {
-        $this->assertNull($this->config->getPrivateKeyPassphrase());
-    }
-
-    public function testGetPrivateKeyPassphraseSet(): void
-    {
-        $this->setConfig([
-            'key-pass' => 'test',
-            'files' => [self::DEFAULT_FILE],
-        ]);
-
-        $this->assertSame('test', $this->config->getPrivateKeyPassphrase());
-    }
-
-    public function testGetPrivateKeyPassphraseSetBoolean(): void
-    {
-        $this->setConfig([
-            'key-pass' => true,
-            'files' => [self::DEFAULT_FILE],
-        ]);
-
-        $this->assertNull($this->config->getPrivateKeyPassphrase());
-    }
-
-    public function testGetPrivateKeyPath(): void
-    {
-        $this->assertNull($this->config->getPrivateKeyPath());
-    }
-
-    public function testGetPrivateKeyPathSet(): void
-    {
-        $this->setConfig([
-            'key' => 'test.pem',
-            'files' => [self::DEFAULT_FILE],
-        ]);
-
-        $this->assertSame('test.pem', $this->config->getPrivateKeyPath());
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_no_replacements_are_configured_by_default(): void
@@ -954,6 +1035,9 @@ JSON
         ]);
 
         $this->assertSame([], $this->config->getReplacements());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_replacement_map_can_be_configured(): void
@@ -976,7 +1060,7 @@ JSON
             'git-version' => 'git_version',
             'replacements' => ['rand' => $rand = random_int(0, getrandmax())],
             'datetime' => 'date_time',
-            'datetime_format' => 'Y:m:d',
+            'datetime-format' => 'Y:m:d',
         ]);
 
         $values = $this->config->getReplacements();
@@ -993,6 +1077,9 @@ JSON
         );
         $this->assertCount(7, $values);
 
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+
         touch('foo');
         exec('git add foo');
         exec('git commit -m "Adding another test file."');
@@ -1007,7 +1094,7 @@ JSON
             'replacements' => ['rand' => $rand = random_int(0, getrandmax())],
             'replacement-sigil' => '$',
             'datetime' => 'date_time',
-            'datetime_format' => 'Y:m:d',
+            'datetime-format' => 'Y:m:d',
         ]);
 
         $values = $this->config->getReplacements();
@@ -1028,6 +1115,9 @@ JSON
         if ($this->isWindows()) {
             exec('rd /S /Q .git');
         }
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_datetime_replacement_has_a_default_date_format(): void
@@ -1039,6 +1129,9 @@ JSON
             $this->config->getReplacements()['@date_time@']
         );
         $this->assertCount(1, $this->config->getReplacements());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_datetime_is_converted_to_UTC(): void
@@ -1056,12 +1149,15 @@ JSON
         $configDateTime = new DateTimeImmutable($this->config->getReplacements()['@date_time@']);
 
         $this->assertLessThan(10, abs($configDateTime->getTimestamp() - $now->getTimestamp()));
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_datetime_format_must_be_valid(): void
     {
         try {
-            $this->setConfig(['datetime_format' => 'ü']);
+            $this->setConfig(['datetime-format' => 'ü']);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -1072,6 +1168,9 @@ JSON
         }
     }
 
+    /**
+     * @group legacy
+     */
     public function test_the_new_datetime_format_setting_takes_precedence_over_the_old_one(): void
     {
         $this->setConfig([
@@ -1086,6 +1185,9 @@ JSON
             '/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/',
             $values['@date_time@']
         );
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_replacement_sigil_can_be_a_chain_of_characters(): void
@@ -1099,6 +1201,9 @@ JSON
             ['__foo__' => 'bar'],
             $this->config->getReplacements()
         );
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_config_has_a_default_shebang(): void
@@ -1116,6 +1221,9 @@ JSON
         $actual = $this->config->getShebang();
 
         $this->assertSame($expected, $actual);
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_it_cannot_retrieve_the_git_hash_if_not_in_a_git_repository(): void
@@ -1148,6 +1256,9 @@ JSON
         ]);
 
         $this->assertNull($this->config->getShebang());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_cannot_register_an_invalid_shebang(): void
@@ -1224,38 +1335,9 @@ JSON
         $actual = $this->config->getShebang();
 
         $this->assertSame($expected, $actual);
-    }
 
-    public function testGetSigningAlgorithm(): void
-    {
-        $this->assertSame(Phar::SHA1, $this->config->getSigningAlgorithm());
-    }
-
-    public function testGetSigningAlgorithmSetString(): void
-    {
-        $this->setConfig([
-            'algorithm' => 'MD5',
-            'files' => [self::DEFAULT_FILE],
-        ]);
-
-        $this->assertSame(Phar::MD5, $this->config->getSigningAlgorithm());
-    }
-
-    public function testGetSigningAlgorithmInvalidString(): void
-    {
-        try {
-            $this->setConfig([
-                'algorithm' => 'INVALID',
-                'files' => [self::DEFAULT_FILE],
-            ]);
-
-            $this->fail('Expected exception to be thrown.');
-        } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
-                'The signing algorithm "INVALID" is not supported.',
-                $exception->getMessage()
-            );
-        }
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_there_is_a_banner_registered_by_default(): void
@@ -1282,6 +1364,9 @@ BANNER;
 
         $this->assertSame($expected, $this->config->getStubBannerContents());
         $this->assertNull($this->config->getStubBannerPath());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     /**
@@ -1296,6 +1381,9 @@ BANNER;
 
         $this->assertSame($banner, $this->config->getStubBannerContents());
         $this->assertNull($this->config->getStubBannerPath());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_banner_can_be_disabled(): void
@@ -1307,6 +1395,9 @@ BANNER;
 
         $this->assertNull($this->config->getStubBannerContents());
         $this->assertNull($this->config->getStubBannerPath());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_banner_must_be_a_valid_value(): void
@@ -1338,6 +1429,9 @@ BANNER;
 
         $this->assertSame($expected, $this->config->getStubBannerContents());
         $this->assertNull($this->config->getStubBannerPath());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_custom_multiline_banner_can_be_registered(): void
@@ -1357,6 +1451,9 @@ COMMENT;
 
         $this->assertSame($comment, $this->config->getStubBannerContents());
         $this->assertNull($this->config->getStubBannerPath());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_custom_banner_from_a_file_can_be_registered(): void
@@ -1378,6 +1475,9 @@ COMMENT;
 
         $this->assertSame($comment, $this->config->getStubBannerContents());
         $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'banner', $this->config->getStubBannerPath());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_banner_value_is_discarded_if_a_banner_file_is_registered(): void
@@ -1400,6 +1500,9 @@ COMMENT;
 
         $this->assertSame($comment, $this->config->getStubBannerContents());
         $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'banner', $this->config->getStubBannerPath());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_content_of_the_custom_banner_file_is_normalized(): void
@@ -1429,6 +1532,9 @@ COMMENT;
 
         $this->assertSame($expected, $this->config->getStubBannerContents());
         $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'banner', $this->config->getStubBannerPath());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_custom_banner_file_must_exists_when_provided(): void
@@ -1465,6 +1571,9 @@ COMMENT;
 
         $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'custom-stub.php', $this->config->getStubPath());
         $this->assertFalse($this->config->isStubGenerated());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_stub_can_be_generated(): void
@@ -1476,6 +1585,9 @@ COMMENT;
 
         $this->assertNull($this->config->getStubPath());
         $this->assertTrue($this->config->isStubGenerated());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_default_stub_can_be_used(): void
@@ -1487,6 +1599,9 @@ COMMENT;
 
         $this->assertNull($this->config->getStubPath());
         $this->assertFalse($this->config->isStubGenerated());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function testIsInterceptFileFuncs(): void
@@ -1502,31 +1617,30 @@ COMMENT;
         ]);
 
         $this->assertTrue($this->config->isInterceptFileFuncs());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
-    public function testIsPrivateKeyPrompt(): void
-    {
-        $this->assertFalse($this->config->isPrivateKeyPrompt());
-    }
-
-    public function testIsPrivateKeyPromptSet(): void
+    public function test_the_requirement_checker_can_be_disabled(): void
     {
         $this->setConfig([
-            'key-pass' => true,
-            'files' => [self::DEFAULT_FILE],
+            'check-requirements' => false,
         ]);
 
-        $this->assertTrue($this->config->isPrivateKeyPrompt());
-    }
+        $this->assertFalse($this->config->checkRequirements());
 
-    public function testIsPrivateKeyPromptSetString(): void
-    {
-        $this->setConfig([
-            'key-pass' => 'test',
-            'files' => [self::DEFAULT_FILE],
-        ]);
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
 
-        $this->assertFalse($this->config->isPrivateKeyPrompt());
+        file_put_contents('composer.lock', '{}');
+
+        $this->reloadConfig();
+
+        $this->assertFalse($this->config->checkRequirements());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_requirement_checker_is_enabled_by_default_if_a_composer_lock_or_json_file_is_found(): void
@@ -1539,32 +1653,63 @@ COMMENT;
 
         $this->assertTrue($this->config->checkRequirements());
 
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+
         file_put_contents('composer.json', '{}');
-
-        $this->reloadConfig();
-
-        $this->assertTrue($this->config->checkRequirements());
-
         remove('composer.lock');
 
         $this->reloadConfig();
 
         $this->assertTrue($this->config->checkRequirements());
-    }
 
-    public function test_the_requirement_checker_can_be_disabled(): void
-    {
-        $this->setConfig([
-            'check-requirements' => false,
-        ]);
-
-        $this->assertFalse($this->config->checkRequirements());
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
 
         file_put_contents('composer.lock', '{}');
 
         $this->reloadConfig();
 
+        $this->assertTrue($this->config->checkRequirements());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_the_requirement_checker_can_be_enabled(): void
+    {
+        file_put_contents('composer.json', '{}');
+        file_put_contents('composer.lock', '{}');
+
+        $this->setConfig([
+            'check-requirements' => true,
+        ]);
+
+        $this->assertTrue($this->config->checkRequirements());
+
+        $this->assertSame(
+            ['The "check-requirements" setting has been set but is unnecessary since its value is the default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_the_requirement_checker_is_forcibly_disabled_if_the_composer_files_could_not_be_found(): void
+    {
+        $this->setConfig([
+            'check-requirements' => true,
+        ]);
+
         $this->assertFalse($this->config->checkRequirements());
+
+        $this->assertSame(
+            ['The "check-requirements" setting has been set but is unnecessary since its value is the default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame(
+            ['The requirement checker could not be used because the composer.json and composer.lock file could not be found.'],
+            $this->config->getWarnings()
+        );
     }
 
     public function test_it_can_be_created_with_only_default_values(): void
@@ -1583,6 +1728,7 @@ COMMENT;
         $this->assertSame($this->tmp, $this->config->getBasePath());
         $this->assertSame([], $this->config->getBinaryFiles());
         $this->assertSame([], $this->config->getCompactors());
+        $this->assertFalse($this->config->hasAutodiscoveredFiles());
         $this->assertNull($this->config->getComposerJson());
         $this->assertNull($this->config->getComposerLock());
         $this->assertNull($this->config->getCompressionAlgorithm());
@@ -1829,6 +1975,14 @@ COMMENT
             null,
             null,
         ];
+    }
+
+    public function providePassFileFreeSigningAlgorithm(): Generator
+    {
+        yield ['MD5', Phar::MD5];
+        yield ['SHA1', Phar::SHA1];
+        yield ['SHA256', Phar::SHA256];
+        yield ['SHA512', Phar::SHA512];
     }
 
     /**

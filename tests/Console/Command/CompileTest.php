@@ -110,6 +110,7 @@ class CompileTest extends CommandTestCase
                     'files' => ['test.php'],
                     'finder' => [['in' => 'one']],
                     'finder-bin' => [['in' => 'two']],
+                    'algorithm' => 'OPENSSL',
                     'key' => 'private.key',
                     'key-pass' => true,
                     'main' => 'run.php',
@@ -192,6 +193,8 @@ OUTPUT;
         );
 
         $phar = new Phar('test.phar');
+
+        $this->assertSame('OpenSSL', $phar->getSignature()['hash_type']);
 
         // Check PHAR content
         $actualStub = $this->normalizeDisplay($phar->getStub());
@@ -305,6 +308,7 @@ PHP;
                     'files' => ['test.php'],
                     'finder' => [['in' => 'one']],
                     'finder-bin' => [['in' => 'two']],
+                    'algorithm' => 'OPENSSL',
                     'key' => 'private.key',
                     'key-pass' => true,
                     'main' => 'run.php',
@@ -402,6 +406,8 @@ OUTPUT;
         );
 
         $phar = new Phar('index.phar');
+
+        $this->assertSame('SHA-1', $phar->getSignature()['hash_type']);
 
         // Check PHAR content
         $actualStub = preg_replace(
@@ -767,6 +773,7 @@ PHP;
                     'files' => ['test.php'],
                     'finder' => [['in' => 'one']],
                     'finder-bin' => [['in' => 'two']],
+                    'algorithm' => 'OPENSSL',
                     'key' => 'private.key',
                     'key-pass' => true,
                     'main' => 'run.php',
@@ -867,6 +874,7 @@ OUTPUT;
                     'files' => ['test.php'],
                     'finder' => [['in' => 'one']],
                     'finder-bin' => [['in' => 'two']],
+                    'algorithm' => 'OPENSSL',
                     'key' => 'private.key',
                     'key-pass' => true,
                     'main' => 'run.php',
@@ -973,6 +981,7 @@ OUTPUT;
                     'files' => ['test.php'],
                     'finder' => [['in' => 'one']],
                     'finder-bin' => [['in' => 'two']],
+                    'algorithm' => 'OPENSSL',
                     'key' => 'private.key',
                     'key-pass' => true,
                     'main' => 'run.php',
@@ -1369,11 +1378,11 @@ KevinGH\Box\Configuration {#140
   -tmpOutputPath: "/path/to/test.phar"
   -outputPath: "/path/to/test.phar"
   -privateKeyPassphrase: null
-  -privateKeyPath: "private.key"
-  -isPrivateKeyPrompt: true
+  -privateKeyPath: "/path/to/private.key"
+  -promptForPrivateKey: true
   -processedReplacements: []
   -shebang: "$shebang"
-  -signingAlgorithm: 2
+  -signingAlgorithm: 16
   -stubBannerContents: """
     multiline\\n
     custom banner
@@ -1383,6 +1392,8 @@ KevinGH\Box\Configuration {#140
   -isInterceptFileFuncs: false
   -isStubGenerated: true
   -checkRequirements: true
+  -warnings: []
+  -recommendations: []
 }
 
 EOF;
@@ -1456,6 +1467,7 @@ EOF;
                     'files' => ['test.php'],
                     'finder' => [['in' => 'one']],
                     'finder-bin' => [['in' => 'two']],
+                    'algorithm' => 'OPENSSL',
                     'key' => 'private.key',
                     'key-pass' => true,
                     'main' => 'run.php',
@@ -1598,6 +1610,7 @@ PHP
                     'files' => ['test.php'],
                     'finder' => [['in' => 'one']],
                     'finder-bin' => [['in' => 'two']],
+                    'algorithm' => 'OPENSSL',
                     'key' => 'private.key',
                     'key-pass' => true,
                     'main' => 'run.php',
@@ -2764,6 +2777,36 @@ OUTPUT;
         $phpScoperNamespace = $matches['namespace'];
 
         $this->assertSame('Acme', $phpScoperNamespace);
+    }
+
+    public function test_it_cannot_sign_a_PHAR_with_the_OpenSSL_algorithm_without_a_private_key(): void
+    {
+        mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
+
+        file_put_contents(
+            'box.json',
+            json_encode(
+                [
+                    'algorithm' => 'OPENSSL',
+                ]
+            )
+        );
+
+        $this->commandTester->setInputs(['test']);    // Set input for the passphrase
+
+        try {
+            $this->commandTester->execute(
+                ['command' => 'compile'],
+                ['interactive' => true]
+            );
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Expected to have a private key for OpenSSL signing but none have been provided.',
+                $exception->getMessage()
+            );
+        }
     }
 
     public function provideAliasConfig(): Generator

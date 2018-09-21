@@ -636,8 +636,6 @@ The algorithm (`string`|`null` default `SHA1`) setting is the signing algorithm 
 ([`Phar::setSignatureAlgorithm()`][phar.setsignaturealgorithm]). The following is a list of the signature algorithms
 available:
 
-// TODO: review which signing algorithm is recommended or should absolutely not be used
-
 - `MD5`
 - `SHA1`
 - `SHA256`
@@ -646,12 +644,12 @@ available:
 
 By default PHARs are `SHA1` signed.
 
+The `OPENSSL` algorithm will require to provide [a key][key]. 
+
 
 ### The private key (`key`)
 
-// TODO: review this setting + doc, default value...]
-
-The key (`string`|`null` default none) setting is used to specify the path to the private key file. The private key file
+The key (`string`|`null` default `null`) setting is used to specify the path to the private key file. The private key file
 will be used to sign the PHAR using the `OPENSSL` signature algorithm (see [Signing algorithm][algorithm]) and the
 setting will be completely ignored otherwise. If an absolute path is not provided, the path will be relative to the
 current working directory.
@@ -659,11 +657,11 @@ current working directory.
 
 ### The private key password (`key-pass`)
 
-// TODO: review this setting + doc, default value...]
-
-The private key password  (`string`|`boolean`|`null` default none) setting is used to specify the pass-phrase for the
+The private key password  (`string`|`boolean`|`null` default `null`) setting is used to specify the pass-phrase for the
 private key. If a string is provided, it will be used as is as the pass-phrase. If `true` is provided, you will be
-prompted for the passphrase.
+prompted for the passphrase unless you are not in an interactive environment.
+
+This setting will be ignored if no [key][key] has been provided.
 
 
 ## Metadata (`metadata`)

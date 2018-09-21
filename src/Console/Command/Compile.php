@@ -674,8 +674,7 @@ EOF
         OutputInterface $output,
         CompileLogger $logger
     ): void {
-        // sign using private key, if applicable
-        //TODO: check that out
+        // Sign using private key when applicable
         remove($path.'.pubkey');
 
         $key = $config->getPrivateKeyPath();
@@ -695,7 +694,7 @@ EOF
 
         $passphrase = $config->getPrivateKeyPassphrase();
 
-        if ($config->isPrivateKeyPrompt()) {
+        if ($config->promptForPrivateKey()) {
             if (false === $input->isInteractive()) {
                 throw new RuntimeException(
                     sprintf(

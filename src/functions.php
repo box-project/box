@@ -24,9 +24,9 @@ use function sprintf;
 use function strlen;
 
 /**
- * TODO: this function should be pushed down to the PHAR extension.
- *
  * @private
+ *
+ * @return <string, int>
  */
 function get_phar_compression_algorithms(): array
 {
@@ -56,6 +56,24 @@ function get_phar_compression_algorithm_extension(int $algorithm): ?string
     );
 
     return $extensions[$algorithm];
+}
+
+/**
+ * @private
+ *
+ * @return <string, int>
+ */
+function get_phar_signing_algorithms(): array
+{
+    static $algorithms = [
+        'MD5' => Phar::MD5,
+        'SHA1' => Phar::SHA1,
+        'SHA256' => Phar::SHA256,
+        'SHA512' => Phar::SHA512,
+        'OPENSSL' => Phar::OPENSSL,
+    ];
+
+    return $algorithms;
 }
 
 /**

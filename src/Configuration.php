@@ -69,6 +69,7 @@ use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use function preg_match;
 use function sprintf;
+use function strtoupper;
 use function substr;
 use function trigger_error;
 use function uniqid;
@@ -93,6 +94,7 @@ BANNER;
         'finder',
     ];
     private const PHP_SCOPER_CONFIG = 'scoper.inc.php';
+    private const DEFAULT_SIGNING_ALGORITHM = Phar::SHA1;
 
     private $file;
     private $fileMode;
@@ -116,7 +118,7 @@ BANNER;
     private $outputPath;
     private $privateKeyPassphrase;
     private $privateKeyPath;
-    private $isPrivateKeyPrompt;
+    private $promptForPrivateKey;
     private $processedReplacements;
     private $shebang;
     private $signingAlgorithm;
@@ -126,9 +128,13 @@ BANNER;
     private $isInterceptFileFuncs;
     private $isStubGenerated;
     private $checkRequirements;
+    private $warnings;
+    private $recommendations;
 
     public static function create(?string $file, stdClass $raw): self
     {
+        $logger = new ConfigurationLogger();
+
         $alias = self::retrieveAlias($raw);
 
         $basePath = self::retrieveBasePath($file, $raw);
@@ -175,7 +181,7 @@ BANNER;
             $devPackages
         );
 
-        $dumpAutoload = self::retrieveDumpAutoload($raw, null !== $composerJson[0]);
+        $dumpAutoload = self::retrieveDumpAutoload($raw, null !== $composerJson[0], $logger);
 
         $excludeComposerFiles = self::retrieveExcludeComposerFiles($raw);
 
@@ -189,15 +195,14 @@ BANNER;
 
         $metadata = self::retrieveMetadata($raw);
 
-        $privateKeyPassphrase = self::retrievePrivateKeyPassphrase($raw);
-        $privateKeyPath = self::retrievePrivateKeyPath($raw);
-        $isPrivateKeyPrompt = self::retrieveIsPrivateKeyPrompt($raw);
+        $signingAlgorithm = self::retrieveSigningAlgorithm($raw);
+        $promptForPrivateKey = self::retrievePromptForPrivateKey($raw, $signingAlgorithm, $logger);
+        $privateKeyPath = self::retrievePrivateKeyPath($raw, $basePath, $signingAlgorithm, $logger);
+        $privateKeyPassphrase = self::retrievePrivateKeyPassphrase($raw, $signingAlgorithm, $logger);
 
-        $replacements = self::retrieveReplacements($raw, $file);
+        $replacements = self::retrieveReplacements($raw, $file, $logger);
 
         $shebang = self::retrieveShebang($raw);
-
-        $signingAlgorithm = self::retrieveSigningAlgorithm($raw);
 
         $stubBannerContents = self::retrieveStubBannerContents($raw);
         $stubBannerPath = self::retrieveStubBannerPath($raw, $basePath);
@@ -217,7 +222,7 @@ BANNER;
             $raw,
             null !== $composerJson[0],
             null !== $composerLock[0],
-            $isStubGenerated
+            $logger
         );
 
         return new self(
@@ -242,7 +247,7 @@ BANNER;
             $outputPath,
             $privateKeyPassphrase,
             $privateKeyPath,
-            $isPrivateKeyPrompt,
+            $promptForPrivateKey,
             $replacements,
             $shebang,
             $signingAlgorithm,
@@ -251,7 +256,9 @@ BANNER;
             $stubPath,
             $isInterceptFileFuncs,
             $isStubGenerated,
-            $checkRequirements
+            $checkRequirements,
+            $logger->getWarnings(),
+            $logger->getRecommendations()
         );
     }
 
@@ -278,7 +285,7 @@ BANNER;
      * @param string        $mainScriptContents   The processed content of the main script file
      * @param MapFile       $fileMapper           Utility to map the files from outside and inside the PHAR
      * @param mixed         $metadata             The PHAR Metadata
-     * @param bool          $isPrivateKeyPrompt   If the user should be prompted for the private key passphrase
+     * @param bool          $promptForPrivateKey  If the user should be prompted for the private key passphrase
      * @param scalar[]      $replacements         The processed list of replacement placeholders and their values
      * @param null|string   $shebang              The shebang line
      * @param int           $signingAlgorithm     The PHAR siging algorithm. See \Phar constants
@@ -289,6 +296,8 @@ BANNER;
      * @param bool          $isStubGenerated      Whether or not if the PHAR stub should be generated
      * @param bool          $checkRequirements    Whether the PHAR will check the application requirements before
      *                                            running
+     * @param string[]      $warnings
+     * @param string[]      $recommendations
      */
     private function __construct(
         ?string $file,
@@ -312,7 +321,7 @@ BANNER;
         string $outputPath,
         ?string $privateKeyPassphrase,
         ?string $privateKeyPath,
-        bool $isPrivateKeyPrompt,
+        bool $promptForPrivateKey,
         array $replacements,
         ?string $shebang,
         int $signingAlgorithm,
@@ -321,7 +330,9 @@ BANNER;
         ?string $stubPath,
         bool $isInterceptFileFuncs,
         bool $isStubGenerated,
-        bool $checkRequirements
+        bool $checkRequirements,
+        array $warnings,
+        array $recommendations
     ) {
         Assertion::nullOrInArray(
             $compressionAlgorithm,
@@ -359,7 +370,7 @@ BANNER;
         $this->outputPath = $outputPath;
         $this->privateKeyPassphrase = $privateKeyPassphrase;
         $this->privateKeyPath = $privateKeyPath;
-        $this->isPrivateKeyPrompt = $isPrivateKeyPrompt;
+        $this->promptForPrivateKey = $promptForPrivateKey;
         $this->processedReplacements = $replacements;
         $this->shebang = $shebang;
         $this->signingAlgorithm = $signingAlgorithm;
@@ -369,6 +380,8 @@ BANNER;
         $this->isInterceptFileFuncs = $isInterceptFileFuncs;
         $this->isStubGenerated = $isStubGenerated;
         $this->checkRequirements = $checkRequirements;
+        $this->warnings = $warnings;
+        $this->recommendations = $recommendations;
     }
 
     public function getConfigurationFile(): ?string
@@ -518,9 +531,17 @@ BANNER;
         return $this->privateKeyPath;
     }
 
+    /**
+     * @deprecated Use promptForPrivateKey() instead
+     */
     public function isPrivateKeyPrompt(): bool
     {
-        return $this->isPrivateKeyPrompt;
+        return $this->promptForPrivateKey;
+    }
+
+    public function promptForPrivateKey(): bool
+    {
+        return $this->promptForPrivateKey;
     }
 
     /**
@@ -564,6 +585,22 @@ BANNER;
     public function isStubGenerated(): bool
     {
         return $this->isStubGenerated;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getWarnings(): array
+    {
+        return $this->warnings;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getRecommendations(): array
+    {
+        return $this->recommendations;
     }
 
     private static function retrieveAlias(stdClass $raw): string
@@ -1335,14 +1372,32 @@ BANNER;
         return make_path_absolute(trim($file), $basePath);
     }
 
-    private static function retrieveDumpAutoload(stdClass $raw, bool $composerJson): bool
+    private static function retrieveDumpAutoload(stdClass $raw, bool $composerJson, ConfigurationLogger $logger): bool
     {
-        $dumpAutoload = $raw->{'dump-autoload'} ?? true;
+        $raw = (array) $raw;
 
-        // TODO: add warning when the dump autoload parameter is explicitly set that it has been ignored because no `composer.json` file
-        // could have been found.
+        if (false === array_key_exists('dump-autoload', $raw)) {
+            return $composerJson;
+        }
 
-        return $composerJson ? $dumpAutoload : false;
+        $dumpAutoload = $raw['dump-autoload'];
+
+        if ($dumpAutoload) {
+            $logger->addRecommendation(
+                'The "dump-autoload" setting has been set but is unnecessary since its value is the default value.'
+            );
+        }
+
+        if (false === $composerJson && $dumpAutoload) {
+            $logger->addWarning(
+                'The "dump-autoload" setting has been set but has been ignored because the composer.json file necessary'
+                .' for it could not be found'
+            );
+
+            return false;
+        }
+
+        return $composerJson && false !== $dumpAutoload;
     }
 
     private static function retrieveExcludeComposerFiles(stdClass $raw): bool
@@ -1584,25 +1639,64 @@ BANNER;
         return [$tmp, $real];
     }
 
-    private static function retrievePrivateKeyPassphrase(stdClass $raw): ?string
-    {
-        // TODO: add check to not allow this setting without the private key path
-        if (isset($raw->{'key-pass'})
-            && is_string($raw->{'key-pass'})
-        ) {
-            return $raw->{'key-pass'};
+    private static function retrievePrivateKeyPath(
+        stdClass $raw,
+        string $basePath,
+        int $signingAlgorithm,
+        ConfigurationLogger $logger
+    ): ?string {
+        $raw = (array) $raw;
+
+        if (array_key_exists('key', $raw) && Phar::OPENSSL !== $signingAlgorithm) {
+            if (null === $raw['key']) {
+                $logger->addRecommendation(
+                    'The setting "key" has been set but is unnecessary since the signing algorithm is not "OPENSSL".'
+                );
+            } else {
+                $logger->addWarning(
+                    'The setting "key" has been set but is ignored since the signing algorithm is not "OPENSSL".'
+                );
+            }
+
+            return null;
         }
 
-        return null;
+        if (!isset($raw['key'])) {
+            Assertion::true(
+                Phar::OPENSSL !== $signingAlgorithm,
+                'Expected to have a private key for OpenSSL signing but none have been provided.'
+            );
+
+            return null;
+        }
+
+        $path = self::normalizePath($raw['key'], $basePath);
+
+        Assertion::file($path);
+
+        return $path;
     }
 
-    private static function retrievePrivateKeyPath(stdClass $raw): ?string
-    {
-        // TODO: If passed need to check its existence
-        // Also need
+    private static function retrievePrivateKeyPassphrase(
+        stdClass $raw,
+        int $algorithm,
+        ConfigurationLogger $logger
+    ): ?string {
+        $raw = (array) $raw;
 
-        if (isset($raw->key)) {
-            return $raw->key;
+        if (array_key_exists('key-pass', $raw) && Phar::OPENSSL !== $algorithm) {
+            if (false === $raw['key-pass'] || null === $raw['key-pass']) {
+                $logger->addRecommendation(
+                    'The setting "key-pass" has been set but is unnecessary since the signing algorithm is not '
+                    .'"OPENSSL".'
+                );
+            } else {
+                $logger->addWarning(
+                    'The setting "key-pass" has been set but ignored the signing algorithm is not "OPENSSL".'
+                );
+            }
+
+            return null;
         }
 
         return null;
@@ -1611,7 +1705,7 @@ BANNER;
     /**
      * @return scalar[]
      */
-    private static function retrieveReplacements(stdClass $raw, ?string $file): array
+    private static function retrieveReplacements(stdClass $raw, ?string $file, ConfigurationLogger $logger): array
     {
         if (null === $file) {
             return [];
@@ -1639,7 +1733,7 @@ BANNER;
             $replacements[$git] = self::retrieveGitVersion($file);
         }
 
-        $datetimeFormat = self::retrieveDatetimeFormat($raw);
+        $datetimeFormat = self::retrieveDatetimeFormat($raw, $logger);
 
         if (null !== ($date = self::retrieveDatetimeNowPlaceHolder($raw))) {
             $replacements[$date] = self::retrieveDatetimeNow(
@@ -1748,16 +1842,16 @@ BANNER;
         return $now->format($format);
     }
 
-    private static function retrieveDatetimeFormat(stdClass $raw): string
+    private static function retrieveDatetimeFormat(stdClass $raw, ConfigurationLogger $logger): string
     {
         if (isset($raw->{'datetime-format'})) {
             $format = $raw->{'datetime-format'};
         } elseif (isset($raw->{'datetime_format'})) {
-            // TODO: make sure this deprecation message correctly appear to the user
             @trigger_error(
                 'The setting "datetime_format" is deprecated, use "datetime-format" instead.',
                 E_USER_DEPRECATED
             );
+            $logger->addWarning('The setting "datetime_format" is deprecated, use "datetime-format" instead.');
 
             $format = $raw->{'datetime_format'};
         }
@@ -1818,23 +1912,23 @@ BANNER;
 
     private static function retrieveSigningAlgorithm(stdClass $raw): int
     {
-        // TODO: trigger warning: if no signing algorithm is given provided we are not in dev mode
-        // TODO: trigger a warning if the signing algorithm used is weak
-        // TODO: no longer accept strings & document BC break
         if (false === isset($raw->algorithm)) {
-            return Phar::SHA1;
+            return self::DEFAULT_SIGNING_ALGORITHM;
         }
 
-        if (false === defined('Phar::'.$raw->algorithm)) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The signing algorithm "%s" is not supported.',
-                    $raw->algorithm
-                )
-            );
-        }
+        $algorithm = strtoupper($raw->algorithm);
 
-        return constant('Phar::'.$raw->algorithm);
+        Assertion::inArray($algorithm, array_keys(get_phar_signing_algorithms()));
+
+        Assertion::true(
+            defined('Phar::'.$algorithm),
+            sprintf(
+                'The signing algorithm "%s" is not supported by your current PHAR version.',
+                $algorithm
+            )
+        );
+
+        return constant('Phar::'.$algorithm);
     }
 
     private static function retrieveStubBannerContents(stdClass $raw): ?string
@@ -1905,9 +1999,25 @@ BANNER;
         return false;
     }
 
-    private static function retrieveIsPrivateKeyPrompt(stdClass $raw): bool
-    {
-        return isset($raw->{'key-pass'}) && (true === $raw->{'key-pass'});
+    private static function retrievePromptForPrivateKey(
+        stdClass $raw,
+        int $signingAlgorithm,
+        ConfigurationLogger $logger
+    ): bool {
+        if (isset($raw->{'key-pass'}) && true === $raw->{'key-pass'}) {
+            if (Phar::OPENSSL !== $signingAlgorithm) {
+                $logger->addWarning(
+                    'A prompt for password for the private key has been requested but ignored since the signing '
+                    .'algorithm used is not "OPENSSL.'
+                );
+
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     private static function retrieveIsStubGenerated(stdClass $raw, ?string $stubPath): bool
@@ -1915,15 +2025,41 @@ BANNER;
         return null === $stubPath && (false === isset($raw->stub) || false !== $raw->stub);
     }
 
-    private static function retrieveCheckRequirements(stdClass $raw, bool $hasComposerJson, bool $hasComposerLock, bool $generateStub): bool
-    {
-        // TODO: emit warning when stub is not generated and check requirements is explicitly set to true
-        // TODO: emit warning when no composer lock is found but check requirements is explicitely set to true
-        if (false === $hasComposerJson && false === $hasComposerLock) {
+    private static function retrieveCheckRequirements(
+        stdClass $raw,
+        bool $hasComposerJson,
+        bool $hasComposerLock,
+        ConfigurationLogger $logger
+    ): bool {
+        $raw = (array) $raw;
+
+        if (false === array_key_exists('check-requirements', $raw)) {
+            return $hasComposerJson || $hasComposerLock;
+        }
+
+        /** @var null|bool $checkRequirements */
+        $checkRequirements = $raw['check-requirements'];
+
+        if ($checkRequirements) {
+            $logger->addRecommendation(
+                'The "check-requirements" setting has been set but is unnecessary since its value is the default value'
+            );
+        }
+
+        if (null === $checkRequirements) {
+            $checkRequirements = true;
+        }
+
+        if ($checkRequirements && false === $hasComposerJson && false === $hasComposerLock) {
+            $logger->addWarning(
+                'The requirement checker could not be used because the composer.json and composer.lock file could not '
+                .'be found.'
+            );
+
             return false;
         }
 
-        return $raw->{'check-requirements'} ?? true;
+        return $checkRequirements;
     }
 
     private static function retrievePhpScoperConfig(stdClass $raw, string $basePath): PhpScoperConfiguration
