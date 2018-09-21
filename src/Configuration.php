@@ -202,8 +202,6 @@ BANNER;
         $privateKeyPath = self::retrievePrivateKeyPath($raw, $basePath, $signingAlgorithm, $messages);
         $privateKeyPassphrase = self::retrievePrivateKeyPassphrase($raw, $privateKeyPath, $signingAlgorithm, $messages);
 
-        $signingAlgorithm = self::checkSigningAlgorithm($raw, $signingAlgorithm, $privateKeyPath, $messages);
-
         $replacements = self::retrieveReplacements($raw, $file, $messages);
 
         $shebang = self::retrieveShebang($raw);
@@ -1943,23 +1941,6 @@ BANNER;
         return constant('Phar::'.$raw->algorithm);
     }
 
-    private static function checkSigningAlgorithm(
-        stdClass $raw,
-        int $signingAlgorithm,
-        ?string $privateKeyPath,
-        array &$messages
-    ): int
-    {
-        if (null === $privateKeyPath && Phar::OPENSSL === $signingAlgorithm) {
-            $messages['warning'][] = 'The signing algorithm has been switched back to the default algorithm because not'
-                .' private key could be found for the OpenSSL signing.';
-
-            return self::DEFAULT_SIGNING_ALGORITHM;
-        }
-
-        return $signingAlgorithm;
-    }
-
     private static function retrieveStubBannerContents(stdClass $raw): ?string
     {
         if (false === array_key_exists('banner', (array) $raw) || null === $raw->banner) {
@@ -2032,8 +2013,8 @@ BANNER;
     {
         if (isset($raw->{'key-pass'}) && true === $raw->{'key-pass'}) {
             if (Phar::OPENSSL !== $signingAlgorithm) {
-                $messages['warning'][] = 'A prompt for password for the private key has been requested but the signing '
-                    .'algorithm used is not "OPENSSL.';
+                $messages['warning'][] = 'A prompt for password for the private key has been requested but ignored '
+                    .'since the signing algorithm used is not "OPENSSL.';
 
                 return false;
             }

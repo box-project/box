@@ -119,7 +119,10 @@ class ConfigurationSigningTest extends ConfigurationTestCase
 
         $this->assertSame([], $this->config->getRecommendations());
         $this->assertSame(
-            ['The setting "key-pass" has been set but ignored the signing algorithm is not "OPENSSL".'],
+            [
+                'A prompt for password for the private key has been requested but ignored since the signing algorithm used is not "OPENSSL.',
+                'The setting "key-pass" has been set but ignored the signing algorithm is not "OPENSSL".',
+            ],
             $this->config->getWarnings()
         );
 
@@ -152,10 +155,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
             'key' => 'key-file',
         ]);
 
-        $this->assertSame(
-            $this->tmp.'/key-file',
-            $this->config->getPrivateKeyPath()
-        );
+        $this->assertNull($this->config->getPrivateKeyPath());
 
         $this->assertSame([], $this->config->getRecommendations());
         $this->assertSame(
