@@ -352,7 +352,7 @@ EOF
         $this->assertSame([], $this->config->getWarnings());
     }
 
-    public function test_the_autoloader_is_can_be_configured(): void
+    public function test_the_autoloader_dumping_can_be_configured(): void
     {
         file_put_contents('composer.json', '{}');
 
@@ -373,7 +373,10 @@ EOF
         $this->assertTrue($this->config->dumpAutoload());
         $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
 
-        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame(
+            ['The "dump-autoload" setting has been set but is unnecessary since its value is the default value.'],
+            $this->config->getRecommendations()
+        );
         $this->assertSame([], $this->config->getWarnings());
     }
 
@@ -385,8 +388,14 @@ EOF
 
         $this->assertFalse($this->config->dumpAutoload());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        $this->assertSame(
+            ['The "dump-autoload" setting has been set but is unnecessary since its value is the default value.'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame(
+            ['The "dump-autoload" setting has been set but has been ignored because the composer.json file necessary for it could not be found'],
+            $this->config->getWarnings()
+        );
     }
 
     public function test_it_excludes_the_composer_files_by_default(): void

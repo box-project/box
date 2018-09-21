@@ -182,7 +182,7 @@ BANNER;
             $devPackages
         );
 
-        $dumpAutoload = self::retrieveDumpAutoload($raw, null !== $composerJson[0]);
+        $dumpAutoload = self::retrieveDumpAutoload($raw, null !== $composerJson[0], $messages);
 
         $excludeComposerFiles = self::retrieveExcludeComposerFiles($raw);
 
@@ -1373,14 +1373,29 @@ BANNER;
         return make_path_absolute(trim($file), $basePath);
     }
 
-    private static function retrieveDumpAutoload(stdClass $raw, bool $composerJson): bool
+    private static function retrieveDumpAutoload(stdClass $raw, bool $composerJson, array &$messages): bool
     {
-        $dumpAutoload = $raw->{'dump-autoload'} ?? true;
+        $raw = (array) $raw;
 
-        // TODO: add warning when the dump autoload parameter is explicitly set that it has been ignored because no `composer.json` file
-        // could have been found.
+        if (false === array_key_exists('dump-autoload', $raw)) {
+            return $composerJson;
+        }
 
-        return $composerJson ? $dumpAutoload : false;
+        $dumpAutoload = $raw['dump-autoload'];
+
+        if ($dumpAutoload) {
+            $messages['recommendation'][] = 'The "dump-autoload" setting has been set but is unnecessary since its '
+                .'value is the default value.';
+        }
+
+        if (false === $composerJson && $dumpAutoload) {
+            $messages['warning'][] = 'The "dump-autoload" setting has been set but has been ignored because the '
+                .'composer.json file necessary for it could not be found';
+
+            return false;
+        }
+
+        return $composerJson && false !== $dumpAutoload;
     }
 
     private static function retrieveExcludeComposerFiles(stdClass $raw): bool
