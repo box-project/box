@@ -1705,7 +1705,7 @@ BANNER;
     /**
      * @return scalar[]
      */
-    private static function retrieveReplacements(stdClass $raw, ?string $file, array &$messages): array
+    private static function retrieveReplacements(stdClass $raw, ?string $file, ConfigurationLogger $logger): array
     {
         if (null === $file) {
             return [];
@@ -1733,7 +1733,7 @@ BANNER;
             $replacements[$git] = self::retrieveGitVersion($file);
         }
 
-        $datetimeFormat = self::retrieveDatetimeFormat($raw, $messages);
+        $datetimeFormat = self::retrieveDatetimeFormat($raw, $logger);
 
         if (null !== ($date = self::retrieveDatetimeNowPlaceHolder($raw))) {
             $replacements[$date] = self::retrieveDatetimeNow(
