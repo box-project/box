@@ -34,7 +34,6 @@ use RuntimeException;
 use Seld\JsonLint\ParsingException;
 use SplFileInfo;
 use stdClass;
-use function strtoupper;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
 use const E_USER_DEPRECATED;
@@ -70,6 +69,7 @@ use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use function preg_match;
 use function sprintf;
+use function strtoupper;
 use function substr;
 use function trigger_error;
 use function uniqid;
@@ -285,7 +285,7 @@ BANNER;
      * @param string        $mainScriptContents   The processed content of the main script file
      * @param MapFile       $fileMapper           Utility to map the files from outside and inside the PHAR
      * @param mixed         $metadata             The PHAR Metadata
-     * @param bool          $promptForPrivateKey   If the user should be prompted for the private key passphrase
+     * @param bool          $promptForPrivateKey  If the user should be prompted for the private key passphrase
      * @param scalar[]      $replacements         The processed list of replacement placeholders and their values
      * @param null|string   $shebang              The shebang line
      * @param int           $signingAlgorithm     The PHAR siging algorithm. See \Phar constants
@@ -1644,8 +1644,7 @@ BANNER;
         string $basePath,
         int $signingAlgorithm,
         ConfigurationLogger $logger
-    ): ?string
-    {
+    ): ?string {
         $raw = (array) $raw;
 
         if (array_key_exists('key', $raw) && Phar::OPENSSL !== $signingAlgorithm) {
@@ -1682,10 +1681,9 @@ BANNER;
         stdClass $raw,
         int $algorithm,
         ConfigurationLogger $logger
-    ): ?string
-    {
+    ): ?string {
         $raw = (array) $raw;
-        
+
         if (array_key_exists('key-pass', $raw) && Phar::OPENSSL !== $algorithm) {
             if (false === $raw['key-pass'] || null === $raw['key-pass']) {
                 $logger->addRecommendation(
@@ -1923,14 +1921,14 @@ BANNER;
         Assertion::inArray($algorithm, array_keys(get_phar_signing_algorithms()));
 
         Assertion::true(
-            defined('Phar::'. $algorithm),
+            defined('Phar::'.$algorithm),
             sprintf(
                 'The signing algorithm "%s" is not supported by your current PHAR version.',
                 $algorithm
             )
         );
 
-        return constant('Phar::'. $algorithm);
+        return constant('Phar::'.$algorithm);
     }
 
     private static function retrieveStubBannerContents(stdClass $raw): ?string
@@ -2005,8 +2003,7 @@ BANNER;
         stdClass $raw,
         int $signingAlgorithm,
         ConfigurationLogger $logger
-    ): bool
-    {
+    ): bool {
         if (isset($raw->{'key-pass'}) && true === $raw->{'key-pass'}) {
             if (Phar::OPENSSL !== $signingAlgorithm) {
                 $logger->addWarning(
@@ -2033,15 +2030,14 @@ BANNER;
         bool $hasComposerJson,
         bool $hasComposerLock,
         ConfigurationLogger $logger
-    ): bool
-    {
+    ): bool {
         $raw = (array) $raw;
 
         if (false === array_key_exists('check-requirements', $raw)) {
             return $hasComposerJson || $hasComposerLock;
         }
 
-        /** @var bool|null $checkRequirements */
+        /** @var null|bool $checkRequirements */
         $checkRequirements = $raw['check-requirements'];
 
         if ($checkRequirements) {

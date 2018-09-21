@@ -14,30 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use Closure;
-use DateTimeImmutable;
 use Generator;
-use Herrera\Annotations\Tokenizer;
 use InvalidArgumentException;
-use KevinGH\Box\Compactor\DummyCompactor;
-use KevinGH\Box\Compactor\InvalidCompactor;
-use KevinGH\Box\Compactor\Php;
-use KevinGH\Box\Compactor\PhpScoper;
-use KevinGH\Box\Json\JsonValidationException;
 use Phar;
-use RuntimeException;
-use Seld\JsonLint\ParsingException;
-use stdClass;
-use const DIRECTORY_SEPARATOR;
-use const PHP_EOL;
-use function abs;
-use function array_fill_keys;
-use function date_default_timezone_set;
-use function file_put_contents;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\file_contents;
-use function KevinGH\Box\FileSystem\remove;
-use function KevinGH\Box\FileSystem\rename;
 
 /**
  * @covers \KevinGH\Box\Configuration
