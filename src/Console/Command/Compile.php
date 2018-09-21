@@ -23,6 +23,7 @@ use KevinGH\Box\Compactor;
 use KevinGH\Box\Composer\ComposerConfiguration;
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Console\Logger\CompileLogger;
+use KevinGH\Box\Console\OutputConfigurator;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\PhpSettingsHandler;
 use KevinGH\Box\RequirementChecker\RequirementsDumper;
@@ -151,6 +152,8 @@ HELP;
     {
         $io = new SymfonyStyle($input, $output);
 
+        OutputConfigurator::configure($output);
+
         if ($input->getOption(self::NO_RESTART_OPTION)) {
             putenv(BOX_ALLOW_XDEBUG.'=1');
         }
@@ -169,7 +172,7 @@ HELP;
         $this->changeWorkingDirectory($input);
 
         $io->writeln($this->getApplication()->getHelp());
-        $io->writeln('');
+        $io->newLine();
 
         $config = $input->getOption(self::NO_CONFIG_OPTION)
             ? Configuration::create(null, new stdClass())
@@ -189,7 +192,7 @@ HELP;
 
         $this->correctPermissions($path, $config, $logger);
 
-        $this->logEndBuilding($logger, $io, $box, $path, $startTime);
+        $this->logEndBuilding($config, $logger, $io, $box, $path, $startTime);
     }
 
     private function createPhar(
@@ -569,9 +572,7 @@ EOF
         if (null === ($algorithm = $config->getCompressionAlgorithm())) {
             $logger->log(
                 CompileLogger::QUESTION_MARK_PREFIX,
-                $dev
-                    ? 'No compression'
-                    : '<error>No compression</error>'
+                'No compression'
             );
 
             return;
@@ -585,7 +586,12 @@ EOF
             )
         );
 
-        $restoreLimit = $this->bumpOpenFileDescriptorLimit($box, $io);
+        if ($dev) {
+            // Skips the compression step in dev mode
+            return;
+        }
+
+        $restoreLimit = self::bumpOpenFileDescriptorLimit($box, $io);
 
         try {
             $extension = $box->compress($algorithm);
@@ -824,12 +830,21 @@ EOF
         }
     }
 
-    private function logEndBuilding(CompileLogger $logger, SymfonyStyle $io, Box $box, string $path, float $startTime): void
-    {
+    private function logEndBuilding(
+        Configuration $config,
+        CompileLogger $logger,
+        SymfonyStyle $io,
+        Box $box,
+        string $path,
+        float $startTime
+    ): void {
         $logger->log(
             CompileLogger::STAR_PREFIX,
             'Done.'
         );
+        $io->newLine();
+
+        $this->renderMessages($config, $io);
 
         $io->comment(
             sprintf(
@@ -851,5 +866,31 @@ EOF
                 round(microtime(true) - $startTime, 2)
             )
         );
+    }
+
+    private function renderMessages(Configuration $config, SymfonyStyle $io): void
+    {
+        $recommendations = $config->getRecommendations();
+        $warnings = $config->getWarnings();
+
+        if ([] === $recommendations) {
+            $io->writeln('No recommendation found.');
+        } else {
+            $io->writeln('Recommendations:');
+
+            foreach ($recommendations as $recommendation) {
+                $io->writeln("    - <recommendation>$recommendation</recommendation>");
+            }
+        }
+
+        if ([] === $warnings) {
+            $io->writeln('No warning found.');
+        } else {
+            $io->writeln('Warnings:');
+
+            foreach ($warnings as $warning) {
+                $io->writeln("    - <warning>$warning</warning>");
+            }
+        }
     }
 }
