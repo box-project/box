@@ -133,10 +133,7 @@ BANNER;
 
     public static function create(?string $file, stdClass $raw): self
     {
-        $messages = [
-            'recommendation' => [],
-            'warning' => [],
-        ];
+        $logger = new ConfigurationLogger();
 
         $alias = self::retrieveAlias($raw);
 
@@ -184,7 +181,7 @@ BANNER;
             $devPackages
         );
 
-        $dumpAutoload = self::retrieveDumpAutoload($raw, null !== $composerJson[0], $messages);
+        $dumpAutoload = self::retrieveDumpAutoload($raw, null !== $composerJson[0], $logger);
 
         $excludeComposerFiles = self::retrieveExcludeComposerFiles($raw);
 
@@ -199,11 +196,11 @@ BANNER;
         $metadata = self::retrieveMetadata($raw);
 
         $signingAlgorithm = self::retrieveSigningAlgorithm($raw);
-        $promptForPrivateKey = self::retrievePromptForPrivateKey($raw, $signingAlgorithm, $messages);
-        $privateKeyPath = self::retrievePrivateKeyPath($raw, $basePath, $signingAlgorithm, $messages);
-        $privateKeyPassphrase = self::retrievePrivateKeyPassphrase($raw, $privateKeyPath, $signingAlgorithm, $messages);
+        $promptForPrivateKey = self::retrievePromptForPrivateKey($raw, $signingAlgorithm, $logger);
+        $privateKeyPath = self::retrievePrivateKeyPath($raw, $basePath, $signingAlgorithm, $logger);
+        $privateKeyPassphrase = self::retrievePrivateKeyPassphrase($raw, $signingAlgorithm, $logger);
 
-        $replacements = self::retrieveReplacements($raw, $file, $messages);
+        $replacements = self::retrieveReplacements($raw, $file, $logger);
 
         $shebang = self::retrieveShebang($raw);
 
@@ -225,7 +222,7 @@ BANNER;
             $raw,
             null !== $composerJson[0],
             null !== $composerLock[0],
-            $messages
+            $logger
         );
 
         return new self(
@@ -260,8 +257,8 @@ BANNER;
             $isInterceptFileFuncs,
             $isStubGenerated,
             $checkRequirements,
-            $messages['warning'],
-            $messages['recommendation']
+            $logger->getWarnings(),
+            $logger->getRecommendations()
         );
     }
 
@@ -1375,7 +1372,7 @@ BANNER;
         return make_path_absolute(trim($file), $basePath);
     }
 
-    private static function retrieveDumpAutoload(stdClass $raw, bool $composerJson, array &$messages): bool
+    private static function retrieveDumpAutoload(stdClass $raw, bool $composerJson, ConfigurationLogger $logger): bool
     {
         $raw = (array) $raw;
 
@@ -1386,13 +1383,16 @@ BANNER;
         $dumpAutoload = $raw['dump-autoload'];
 
         if ($dumpAutoload) {
-            $messages['recommendation'][] = 'The "dump-autoload" setting has been set but is unnecessary since its '
-                .'value is the default value.';
+            $logger->addRecommendation(
+                'The "dump-autoload" setting has been set but is unnecessary since its value is the default value.'
+            );
         }
 
         if (false === $composerJson && $dumpAutoload) {
-            $messages['warning'][] = 'The "dump-autoload" setting has been set but has been ignored because the '
-                .'composer.json file necessary for it could not be found';
+            $logger->addWarning(
+                'The "dump-autoload" setting has been set but has been ignored because the composer.json file necessary'
+                .' for it could not be found'
+            );
 
             return false;
         }
@@ -1643,16 +1643,20 @@ BANNER;
         stdClass $raw,
         string $basePath,
         int $signingAlgorithm,
-        array &$messages
+        ConfigurationLogger $logger
     ): ?string
     {
         $raw = (array) $raw;
 
         if (array_key_exists('key', $raw) && Phar::OPENSSL !== $signingAlgorithm) {
             if (null === $raw['key']) {
-                $messages['recommendation'][] = 'The setting "key" has been set but is unnecessary since the signing algorithm is not "OPENSSL".';
+                $logger->addRecommendation(
+                    'The setting "key" has been set but is unnecessary since the signing algorithm is not "OPENSSL".'
+                );
             } else {
-                $messages['warning'][] = 'The setting "key" has been set but is ignored since the signing algorithm is not "OPENSSL".';
+                $logger->addWarning(
+                    'The setting "key" has been set but is ignored since the signing algorithm is not "OPENSSL".'
+                );
             }
 
             return null;
@@ -1676,41 +1680,28 @@ BANNER;
 
     private static function retrievePrivateKeyPassphrase(
         stdClass $raw,
-        ?string $privateKeyPath,
         int $algorithm,
-        array &$messages
+        ConfigurationLogger $logger
     ): ?string
     {
         $raw = (array) $raw;
         
         if (array_key_exists('key-pass', $raw) && Phar::OPENSSL !== $algorithm) {
             if (false === $raw['key-pass'] || null === $raw['key-pass']) {
-                $messages['recommendation'][] = 'The setting "key-pass" has been set but is unnecessary since the signing algorithm is not "OPENSSL".';
+                $logger->addRecommendation(
+                    'The setting "key-pass" has been set but is unnecessary since the signing algorithm is not '
+                    .'"OPENSSL".'
+                );
             } else {
-                $messages['warning'][] = 'The setting "key-pass" has been set but ignored the signing algorithm is not "OPENSSL".';
+                $logger->addWarning(
+                    'The setting "key-pass" has been set but ignored the signing algorithm is not "OPENSSL".'
+                );
             }
 
             return null;
         }
 
         return null;
-//        if (null === $privateKeyPath) {
-//            $messages['warning'][] = 'The setting "key-pass" has been set but not "key".';
-//
-//            return null;
-//        }
-//
-//        if (isset($raw['key-pass'])
-//            && is_string($raw['key-pass'])
-//        ) {
-//            if (null === $privateKeyPath) {
-//                $messages['warning'][] = 'The setting "key-pass" has been set but not "key".';
-//            }
-//
-//            return $raw['key-pass'];
-//        }
-//
-//        return null;
     }
 
     /**
@@ -1853,7 +1844,7 @@ BANNER;
         return $now->format($format);
     }
 
-    private static function retrieveDatetimeFormat(stdClass $raw, array &$messages): string
+    private static function retrieveDatetimeFormat(stdClass $raw, ConfigurationLogger $logger): string
     {
         if (isset($raw->{'datetime-format'})) {
             $format = $raw->{'datetime-format'};
@@ -1862,7 +1853,7 @@ BANNER;
                 'The setting "datetime_format" is deprecated, use "datetime-format" instead.',
                 E_USER_DEPRECATED
             );
-            $messages['warning'][] = 'The setting "datetime_format" is deprecated, use "datetime-format" instead.';
+            $logger->addWarning('The setting "datetime_format" is deprecated, use "datetime-format" instead.');
 
             $format = $raw->{'datetime_format'};
         }
@@ -2010,12 +2001,18 @@ BANNER;
         return false;
     }
 
-    private static function retrievePromptForPrivateKey(stdClass $raw, int $signingAlgorithm, array &$messages): bool
+    private static function retrievePromptForPrivateKey(
+        stdClass $raw,
+        int $signingAlgorithm,
+        ConfigurationLogger $logger
+    ): bool
     {
         if (isset($raw->{'key-pass'}) && true === $raw->{'key-pass'}) {
             if (Phar::OPENSSL !== $signingAlgorithm) {
-                $messages['warning'][] = 'A prompt for password for the private key has been requested but ignored '
-                    .'since the signing algorithm used is not "OPENSSL.';
+                $logger->addWarning(
+                    'A prompt for password for the private key has been requested but ignored since the signing '
+                    .'algorithm used is not "OPENSSL.'
+                );
 
                 return false;
             }
@@ -2035,7 +2032,7 @@ BANNER;
         stdClass $raw,
         bool $hasComposerJson,
         bool $hasComposerLock,
-        array &$messages
+        ConfigurationLogger $logger
     ): bool
     {
         $raw = (array) $raw;
@@ -2048,8 +2045,9 @@ BANNER;
         $checkRequirements = $raw['check-requirements'];
 
         if ($checkRequirements) {
-            $messages['recommendation'][] = 'The "check-requirements" setting has been set but is unnecessary since '
-                .'its value is the default value';
+            $logger->addRecommendation(
+                'The "check-requirements" setting has been set but is unnecessary since its value is the default value'
+            );
         }
 
         if (null === $checkRequirements) {
@@ -2057,8 +2055,10 @@ BANNER;
         }
 
         if ($checkRequirements && false === $hasComposerJson && false === $hasComposerLock) {
-            $messages['warning'][] = 'The requirement checker could not be used because the composer.json and '
-                .'composer.lock file could not be found.';
+            $logger->addWarning(
+                'The requirement checker could not be used because the composer.json and composer.lock file could not '
+                .'be found.'
+            );
 
             return false;
         }

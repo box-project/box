@@ -644,6 +644,8 @@ available:
 
 By default PHARs are `SHA1` signed.
 
+The `OPENSSL` algorithm will require to provide [a key][key]. 
+
 
 ### The private key (`key`)
 
@@ -657,7 +659,9 @@ current working directory.
 
 The private key password  (`string`|`boolean`|`null` default `null`) setting is used to specify the pass-phrase for the
 private key. If a string is provided, it will be used as is as the pass-phrase. If `true` is provided, you will be
-prompted for the passphrase.
+prompted for the passphrase unless you are not in an interactive environment.
+
+This setting will be ignored if no [key][key] has been provided.
 
 
 ## Metadata (`metadata`)
