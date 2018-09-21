@@ -2766,6 +2766,36 @@ OUTPUT;
         $this->assertSame('Acme', $phpScoperNamespace);
     }
 
+    public function test_it_cannot_sign_a_PHAR_with_the_OpenSSL_algorithm_without_a_private_key(): void
+    {
+        mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
+
+        file_put_contents(
+            'box.json',
+            json_encode(
+                [
+                    'algorithm' => 'OPENSSL',
+                ]
+            )
+        );
+
+        $this->commandTester->setInputs(['test']);    // Set input for the passphrase
+
+        try {
+            $this->commandTester->execute(
+                ['command' => 'compile'],
+                ['interactive' => true]
+            );
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Expected to have a private key for OpenSSL signing but none have been provided.',
+                $exception->getMessage()
+            );
+        }
+    }
+
     public function provideAliasConfig(): Generator
     {
         yield [true];

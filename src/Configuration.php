@@ -116,7 +116,7 @@ BANNER;
     private $outputPath;
     private $privateKeyPassphrase;
     private $privateKeyPath;
-    private $isPrivateKeyPrompt;
+    private $promptForPrivateKey;
     private $processedReplacements;
     private $shebang;
     private $signingAlgorithm;
@@ -126,9 +126,16 @@ BANNER;
     private $isInterceptFileFuncs;
     private $isStubGenerated;
     private $checkRequirements;
+    private $warnings;
+    private $recommendations;
 
     public static function create(?string $file, stdClass $raw): self
     {
+        $messages = [
+            'recommendation' => [],
+            'warning' => [],
+        ];
+
         $alias = self::retrieveAlias($raw);
 
         $basePath = self::retrieveBasePath($file, $raw);
@@ -189,15 +196,14 @@ BANNER;
 
         $metadata = self::retrieveMetadata($raw);
 
-        $privateKeyPassphrase = self::retrievePrivateKeyPassphrase($raw);
-        $privateKeyPath = self::retrievePrivateKeyPath($raw);
-        $isPrivateKeyPrompt = self::retrieveIsPrivateKeyPrompt($raw);
+        $signingAlgorithm = self::retrieveSigningAlgorithm($raw);
+        $promptForPrivateKey = self::retrievePromptForPrivateKey($raw, $signingAlgorithm);
+        $privateKeyPath = self::retrievePrivateKeyPath($raw, $basePath, $signingAlgorithm, $messages);
+        $privateKeyPassphrase = self::retrievePrivateKeyPassphrase($raw, $privateKeyPath, $signingAlgorithm, $messages);
 
         $replacements = self::retrieveReplacements($raw, $file);
 
         $shebang = self::retrieveShebang($raw);
-
-        $signingAlgorithm = self::retrieveSigningAlgorithm($raw);
 
         $stubBannerContents = self::retrieveStubBannerContents($raw);
         $stubBannerPath = self::retrieveStubBannerPath($raw, $basePath);
@@ -242,7 +248,7 @@ BANNER;
             $outputPath,
             $privateKeyPassphrase,
             $privateKeyPath,
-            $isPrivateKeyPrompt,
+            $promptForPrivateKey,
             $replacements,
             $shebang,
             $signingAlgorithm,
@@ -251,7 +257,9 @@ BANNER;
             $stubPath,
             $isInterceptFileFuncs,
             $isStubGenerated,
-            $checkRequirements
+            $checkRequirements,
+            $messages['warning'],
+            $messages['recommendation']
         );
     }
 
@@ -278,7 +286,7 @@ BANNER;
      * @param string        $mainScriptContents   The processed content of the main script file
      * @param MapFile       $fileMapper           Utility to map the files from outside and inside the PHAR
      * @param mixed         $metadata             The PHAR Metadata
-     * @param bool          $isPrivateKeyPrompt   If the user should be prompted for the private key passphrase
+     * @param bool          $promptForPrivateKey   If the user should be prompted for the private key passphrase
      * @param scalar[]      $replacements         The processed list of replacement placeholders and their values
      * @param null|string   $shebang              The shebang line
      * @param int           $signingAlgorithm     The PHAR siging algorithm. See \Phar constants
@@ -289,6 +297,8 @@ BANNER;
      * @param bool          $isStubGenerated      Whether or not if the PHAR stub should be generated
      * @param bool          $checkRequirements    Whether the PHAR will check the application requirements before
      *                                            running
+     * @param string[]      $warnings
+     * @param string[]      $recommendations
      */
     private function __construct(
         ?string $file,
@@ -312,7 +322,7 @@ BANNER;
         string $outputPath,
         ?string $privateKeyPassphrase,
         ?string $privateKeyPath,
-        bool $isPrivateKeyPrompt,
+        bool $promptForPrivateKey,
         array $replacements,
         ?string $shebang,
         int $signingAlgorithm,
@@ -321,7 +331,9 @@ BANNER;
         ?string $stubPath,
         bool $isInterceptFileFuncs,
         bool $isStubGenerated,
-        bool $checkRequirements
+        bool $checkRequirements,
+        array $warnings,
+        array $recommendations
     ) {
         Assertion::nullOrInArray(
             $compressionAlgorithm,
@@ -359,7 +371,7 @@ BANNER;
         $this->outputPath = $outputPath;
         $this->privateKeyPassphrase = $privateKeyPassphrase;
         $this->privateKeyPath = $privateKeyPath;
-        $this->isPrivateKeyPrompt = $isPrivateKeyPrompt;
+        $this->promptForPrivateKey = $promptForPrivateKey;
         $this->processedReplacements = $replacements;
         $this->shebang = $shebang;
         $this->signingAlgorithm = $signingAlgorithm;
@@ -369,6 +381,8 @@ BANNER;
         $this->isInterceptFileFuncs = $isInterceptFileFuncs;
         $this->isStubGenerated = $isStubGenerated;
         $this->checkRequirements = $checkRequirements;
+        $this->warnings = $warnings;
+        $this->recommendations = $recommendations;
     }
 
     public function getConfigurationFile(): ?string
@@ -518,9 +532,17 @@ BANNER;
         return $this->privateKeyPath;
     }
 
+    /**
+     * @deprecated Use promptForPrivateKey() instead
+     */
     public function isPrivateKeyPrompt(): bool
     {
-        return $this->isPrivateKeyPrompt;
+        return $this->promptForPrivateKey;
+    }
+
+    public function promptForPrivateKey(): bool
+    {
+        return $this->promptForPrivateKey;
     }
 
     /**
@@ -564,6 +586,22 @@ BANNER;
     public function isStubGenerated(): bool
     {
         return $this->isStubGenerated;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getWarnings(): array
+    {
+        return $this->warnings;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getRecommendations(): array
+    {
+        return $this->recommendations;
     }
 
     private static function retrieveAlias(stdClass $raw): string
@@ -1584,28 +1622,76 @@ BANNER;
         return [$tmp, $real];
     }
 
-    private static function retrievePrivateKeyPassphrase(stdClass $raw): ?string
+    private static function retrievePrivateKeyPath(
+        stdClass $raw,
+        string $basePath,
+        int $signingAlgorithm,
+        array &$messages
+    ): ?string
     {
-        // TODO: add check to not allow this setting without the private key path
-        if (isset($raw->{'key-pass'})
-            && is_string($raw->{'key-pass'})
-        ) {
-            return $raw->{'key-pass'};
+        $raw = (array) $raw;
+
+        if (array_key_exists('key', $raw) && Phar::OPENSSL !== $signingAlgorithm) {
+            if (null === $raw['key']) {
+                $messages['recommendation'][] = 'The setting "key" has been set but is unnecessary since the signing algorithm is not "OPENSSL".';
+            } else {
+                $messages['warning'][] = 'The setting "key" has been set but is ignored since the signing algorithm is not "OPENSSL".';
+            }
         }
 
-        return null;
+        if (!isset($raw['key'])) {
+            Assertion::true(
+                Phar::OPENSSL !== $signingAlgorithm,
+                'Expected to have a private key for OpenSSL signing but none have been provided.'
+            );
+
+            return null;
+        }
+
+        $path = self::normalizePath($raw['key'], $basePath);
+
+        Assertion::file($path);
+
+        return $path;
     }
 
-    private static function retrievePrivateKeyPath(stdClass $raw): ?string
+    private static function retrievePrivateKeyPassphrase(
+        stdClass $raw,
+        ?string $privateKeyPath,
+        int $algorithm,
+        array &$messages
+    ): ?string
     {
-        // TODO: If passed need to check its existence
-        // Also need
+        $raw = (array) $raw;
+        
+        if (array_key_exists('key-pass', $raw) && Phar::OPENSSL !== $algorithm) {
+            if (false === $raw['key-pass'] || null === $raw['key-pass']) {
+                $messages['recommendation'][] = 'The setting "key-pass" has been set but is unnecessary since the signing algorithm is not "OPENSSL".';
+            } else {
+                $messages['warning'][] = 'The setting "key-pass" has been set but ignored the signing algorithm is not "OPENSSL".';
+            }
 
-        if (isset($raw->key)) {
-            return $raw->key;
+            return null;
         }
 
         return null;
+//        if (null === $privateKeyPath) {
+//            $messages['warning'][] = 'The setting "key-pass" has been set but not "key".';
+//
+//            return null;
+//        }
+//
+//        if (isset($raw['key-pass'])
+//            && is_string($raw['key-pass'])
+//        ) {
+//            if (null === $privateKeyPath) {
+//                $messages['warning'][] = 'The setting "key-pass" has been set but not "key".';
+//            }
+//
+//            return $raw['key-pass'];
+//        }
+//
+//        return null;
     }
 
     /**
@@ -1905,9 +1991,9 @@ BANNER;
         return false;
     }
 
-    private static function retrieveIsPrivateKeyPrompt(stdClass $raw): bool
+    private static function retrievePromptForPrivateKey(stdClass $raw, int $signingAlgorithm): bool
     {
-        return isset($raw->{'key-pass'}) && (true === $raw->{'key-pass'});
+        return Phar::OPENSSL === $signingAlgorithm && isset($raw->{'key-pass'}) && true === $raw->{'key-pass'};
     }
 
     private static function retrieveIsStubGenerated(stdClass $raw, ?string $stubPath): bool
