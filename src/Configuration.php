@@ -34,6 +34,7 @@ use RuntimeException;
 use Seld\JsonLint\ParsingException;
 use SplFileInfo;
 use stdClass;
+use function strtoupper;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
 use const E_USER_DEPRECATED;
@@ -224,7 +225,7 @@ BANNER;
             $raw,
             null !== $composerJson[0],
             null !== $composerLock[0],
-            $isStubGenerated
+            $messages
         );
 
         return new self(
@@ -1922,23 +1923,23 @@ BANNER;
 
     private static function retrieveSigningAlgorithm(stdClass $raw): int
     {
-        // TODO: trigger warning: if no signing algorithm is given provided we are not in dev mode
-        // TODO: trigger a warning if the signing algorithm used is weak
-        // TODO: no longer accept strings & document BC break
         if (false === isset($raw->algorithm)) {
             return self::DEFAULT_SIGNING_ALGORITHM;
         }
 
-        if (false === defined('Phar::'.$raw->algorithm)) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The signing algorithm "%s" is not supported.',
-                    $raw->algorithm
-                )
-            );
-        }
+        $algorithm = strtoupper($raw->algorithm);
 
-        return constant('Phar::'.$raw->algorithm);
+        Assertion::inArray($algorithm, array_keys(get_phar_signing_algorithms()));
+
+        Assertion::true(
+            defined('Phar::'. $algorithm),
+            sprintf(
+                'The signing algorithm "%s" is not supported by your current PHAR version.',
+                $algorithm
+            )
+        );
+
+        return constant('Phar::'. $algorithm);
     }
 
     private static function retrieveStubBannerContents(stdClass $raw): ?string
@@ -2030,15 +2031,39 @@ BANNER;
         return null === $stubPath && (false === isset($raw->stub) || false !== $raw->stub);
     }
 
-    private static function retrieveCheckRequirements(stdClass $raw, bool $hasComposerJson, bool $hasComposerLock, bool $generateStub): bool
+    private static function retrieveCheckRequirements(
+        stdClass $raw,
+        bool $hasComposerJson,
+        bool $hasComposerLock,
+        array &$messages
+    ): bool
     {
-        // TODO: emit warning when stub is not generated and check requirements is explicitly set to true
-        // TODO: emit warning when no composer lock is found but check requirements is explicitely set to true
-        if (false === $hasComposerJson && false === $hasComposerLock) {
+        $raw = (array) $raw;
+
+        if (false === array_key_exists('check-requirements', $raw)) {
+            return $hasComposerJson || $hasComposerLock;
+        }
+
+        /** @var bool|null $checkRequirements */
+        $checkRequirements = $raw['check-requirements'];
+
+        if ($checkRequirements) {
+            $messages['recommendation'][] = 'The "check-requirements" setting has been set but is unnecessary since '
+                .'its value is the default value';
+        }
+
+        if (null === $checkRequirements) {
+            $checkRequirements = true;
+        }
+
+        if ($checkRequirements && false === $hasComposerJson && false === $hasComposerLock) {
+            $messages['warning'][] = 'The requirement checker could not be used because the composer.json and '
+                .'composer.lock file could not be found.';
+
             return false;
         }
 
-        return $raw->{'check-requirements'} ?? true;
+        return $checkRequirements;
     }
 
     private static function retrievePhpScoperConfig(stdClass $raw, string $basePath): PhpScoperConfiguration

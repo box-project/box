@@ -1622,38 +1622,6 @@ COMMENT;
         $this->assertSame([], $this->config->getWarnings());
     }
 
-    public function test_the_requirement_checker_is_enabled_by_default_if_a_composer_lock_or_json_file_is_found(): void
-    {
-        $this->assertFalse($this->config->checkRequirements());
-
-        file_put_contents('composer.lock', '{}');
-
-        $this->reloadConfig();
-
-        $this->assertTrue($this->config->checkRequirements());
-
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
-
-        file_put_contents('composer.json', '{}');
-
-        $this->reloadConfig();
-
-        $this->assertTrue($this->config->checkRequirements());
-
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
-
-        remove('composer.lock');
-
-        $this->reloadConfig();
-
-        $this->assertTrue($this->config->checkRequirements());
-
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
-    }
-
     public function test_the_requirement_checker_can_be_disabled(): void
     {
         $this->setConfig([
@@ -1673,6 +1641,75 @@ COMMENT;
 
         $this->assertSame([], $this->config->getRecommendations());
         $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_the_requirement_checker_is_enabled_by_default_if_a_composer_lock_or_json_file_is_found(): void
+    {
+        $this->assertFalse($this->config->checkRequirements());
+
+        file_put_contents('composer.lock', '{}');
+
+        $this->reloadConfig();
+
+        $this->assertTrue($this->config->checkRequirements());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+
+        file_put_contents('composer.json', '{}');
+        remove('composer.lock');
+
+        $this->reloadConfig();
+
+        $this->assertTrue($this->config->checkRequirements());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+
+        file_put_contents('composer.lock', '{}');
+
+        $this->reloadConfig();
+
+        $this->assertTrue($this->config->checkRequirements());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_the_requirement_checker_can_be_enabled(): void
+    {
+        file_put_contents('composer.json', '{}');
+        file_put_contents('composer.lock', '{}');
+
+        $this->setConfig([
+            'check-requirements' => true,
+        ]);
+
+        $this->assertTrue($this->config->checkRequirements());
+
+        $this->assertSame(
+            ['The "check-requirements" setting has been set but is unnecessary since its value is the default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_the_requirement_checker_is_forcibly_disabled_if_the_composer_files_could_not_be_found(): void
+    {
+        $this->setConfig([
+            'check-requirements' => true,
+        ]);
+
+        $this->assertFalse($this->config->checkRequirements());
+
+        $this->assertSame(
+            ['The "check-requirements" setting has been set but is unnecessary since its value is the default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame(
+            ['The requirement checker could not be used because the composer.json and composer.lock file could not be found.'],
+            $this->config->getWarnings()
+        );
     }
 
     public function test_it_can_be_created_with_only_default_values(): void

@@ -82,7 +82,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                'The signing algorithm "INVALID" is not supported.',
+                'Value "INVALID" is not an element of the valid values: MD5, SHA1, SHA256, SHA512, OPENSSL',
                 $exception->getMessage()
             );
         }
