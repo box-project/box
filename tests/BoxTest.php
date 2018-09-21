@@ -1546,6 +1546,30 @@ PHP
         );
     }
 
+    /**
+     * @requires extension openssl
+     */
+    public function test_it_cannot_sign_the_PHAR_using_a_private_key_with_the_wrong_password(): void
+    {
+        $key = $this->getPrivateKey()[0];
+        $password = 'wrong password';
+
+        file_put_contents($file = 'foo', $key);
+
+        $this->configureHelloWorldPhar();
+
+        try {
+            $this->box->signUsingFile($file, $password);
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Could not retrieve the private key, check that the password is correct.',
+                $exception->getMessage()
+            );
+        }
+    }
+
     public function test_it_cannot_sign_the_PHAR_with_a_non_existent_file_as_private_key(): void
     {
         try {

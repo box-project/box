@@ -93,6 +93,7 @@ BANNER;
         'finder',
     ];
     private const PHP_SCOPER_CONFIG = 'scoper.inc.php';
+    private const DEFAULT_SIGNING_ALGORITHM = Phar::SHA1;
 
     private $file;
     private $fileMode;
@@ -197,11 +198,13 @@ BANNER;
         $metadata = self::retrieveMetadata($raw);
 
         $signingAlgorithm = self::retrieveSigningAlgorithm($raw);
-        $promptForPrivateKey = self::retrievePromptForPrivateKey($raw, $signingAlgorithm);
+        $promptForPrivateKey = self::retrievePromptForPrivateKey($raw, $signingAlgorithm, $messages);
         $privateKeyPath = self::retrievePrivateKeyPath($raw, $basePath, $signingAlgorithm, $messages);
         $privateKeyPassphrase = self::retrievePrivateKeyPassphrase($raw, $privateKeyPath, $signingAlgorithm, $messages);
 
-        $replacements = self::retrieveReplacements($raw, $file);
+        $signingAlgorithm = self::checkSigningAlgorithm($raw, $signingAlgorithm, $privateKeyPath, $messages);
+
+        $replacements = self::retrieveReplacements($raw, $file, $messages);
 
         $shebang = self::retrieveShebang($raw);
 
@@ -1652,6 +1655,8 @@ BANNER;
             } else {
                 $messages['warning'][] = 'The setting "key" has been set but is ignored since the signing algorithm is not "OPENSSL".';
             }
+
+            return null;
         }
 
         if (!isset($raw['key'])) {
@@ -1712,7 +1717,7 @@ BANNER;
     /**
      * @return scalar[]
      */
-    private static function retrieveReplacements(stdClass $raw, ?string $file): array
+    private static function retrieveReplacements(stdClass $raw, ?string $file, array &$messages): array
     {
         if (null === $file) {
             return [];
@@ -1740,7 +1745,7 @@ BANNER;
             $replacements[$git] = self::retrieveGitVersion($file);
         }
 
-        $datetimeFormat = self::retrieveDatetimeFormat($raw);
+        $datetimeFormat = self::retrieveDatetimeFormat($raw, $messages);
 
         if (null !== ($date = self::retrieveDatetimeNowPlaceHolder($raw))) {
             $replacements[$date] = self::retrieveDatetimeNow(
@@ -1849,16 +1854,16 @@ BANNER;
         return $now->format($format);
     }
 
-    private static function retrieveDatetimeFormat(stdClass $raw): string
+    private static function retrieveDatetimeFormat(stdClass $raw, array &$messages): string
     {
         if (isset($raw->{'datetime-format'})) {
             $format = $raw->{'datetime-format'};
         } elseif (isset($raw->{'datetime_format'})) {
-            // TODO: make sure this deprecation message correctly appear to the user
             @trigger_error(
                 'The setting "datetime_format" is deprecated, use "datetime-format" instead.',
                 E_USER_DEPRECATED
             );
+            $messages['warning'][] = 'The setting "datetime_format" is deprecated, use "datetime-format" instead.';
 
             $format = $raw->{'datetime_format'};
         }
@@ -1923,7 +1928,7 @@ BANNER;
         // TODO: trigger a warning if the signing algorithm used is weak
         // TODO: no longer accept strings & document BC break
         if (false === isset($raw->algorithm)) {
-            return Phar::SHA1;
+            return self::DEFAULT_SIGNING_ALGORITHM;
         }
 
         if (false === defined('Phar::'.$raw->algorithm)) {
@@ -1936,6 +1941,23 @@ BANNER;
         }
 
         return constant('Phar::'.$raw->algorithm);
+    }
+
+    private static function checkSigningAlgorithm(
+        stdClass $raw,
+        int $signingAlgorithm,
+        ?string $privateKeyPath,
+        array &$messages
+    ): int
+    {
+        if (null === $privateKeyPath && Phar::OPENSSL === $signingAlgorithm) {
+            $messages['warning'][] = 'The signing algorithm has been switched back to the default algorithm because not'
+                .' private key could be found for the OpenSSL signing.';
+
+            return self::DEFAULT_SIGNING_ALGORITHM;
+        }
+
+        return $signingAlgorithm;
     }
 
     private static function retrieveStubBannerContents(stdClass $raw): ?string
@@ -2006,9 +2028,20 @@ BANNER;
         return false;
     }
 
-    private static function retrievePromptForPrivateKey(stdClass $raw, int $signingAlgorithm): bool
+    private static function retrievePromptForPrivateKey(stdClass $raw, int $signingAlgorithm, array &$messages): bool
     {
-        return Phar::OPENSSL === $signingAlgorithm && isset($raw->{'key-pass'}) && true === $raw->{'key-pass'};
+        if (isset($raw->{'key-pass'}) && true === $raw->{'key-pass'}) {
+            if (Phar::OPENSSL !== $signingAlgorithm) {
+                $messages['warning'][] = 'A prompt for password for the private key has been requested but the signing '
+                    .'algorithm used is not "OPENSSL.';
+
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     private static function retrieveIsStubGenerated(stdClass $raw, ?string $stubPath): bool

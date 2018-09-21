@@ -1060,7 +1060,7 @@ JSON
             'git-version' => 'git_version',
             'replacements' => ['rand' => $rand = random_int(0, getrandmax())],
             'datetime' => 'date_time',
-            'datetime_format' => 'Y:m:d',
+            'datetime-format' => 'Y:m:d',
         ]);
 
         $values = $this->config->getReplacements();
@@ -1094,7 +1094,7 @@ JSON
             'replacements' => ['rand' => $rand = random_int(0, getrandmax())],
             'replacement-sigil' => '$',
             'datetime' => 'date_time',
-            'datetime_format' => 'Y:m:d',
+            'datetime-format' => 'Y:m:d',
         ]);
 
         $values = $this->config->getReplacements();
@@ -1157,7 +1157,7 @@ JSON
     public function test_the_datetime_format_must_be_valid(): void
     {
         try {
-            $this->setConfig(['datetime_format' => 'ü']);
+            $this->setConfig(['datetime-format' => 'ü']);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -1168,6 +1168,9 @@ JSON
         }
     }
 
+    /**
+     * @group legacy
+     */
     public function test_the_new_datetime_format_setting_takes_precedence_over_the_old_one(): void
     {
         $this->setConfig([
