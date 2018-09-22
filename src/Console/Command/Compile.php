@@ -23,6 +23,7 @@ use KevinGH\Box\Compactor;
 use KevinGH\Box\Composer\ComposerConfiguration;
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Console\Logger\CompileLogger;
+use KevinGH\Box\Console\MessageRenderer;
 use KevinGH\Box\Console\OutputConfigurator;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\PhpSettingsHandler;
@@ -578,6 +579,12 @@ EOF
             return;
         }
 
+        if ($dev) {
+            $logger->log(CompileLogger::QUESTION_MARK_PREFIX, 'Dev mode detected: skipping the compression');
+
+            return;
+        }
+
         $logger->log(
             CompileLogger::QUESTION_MARK_PREFIX,
             sprintf(
@@ -585,11 +592,6 @@ EOF
                 array_search($algorithm, get_phar_compression_algorithms(), true)
             )
         );
-
-        if ($dev) {
-            // Skips the compression step in dev mode
-            return;
-        }
 
         $restoreLimit = self::bumpOpenFileDescriptorLimit($box, $io);
 
@@ -844,7 +846,7 @@ EOF
         );
         $io->newLine();
 
-        $this->renderMessages($config, $io);
+        MessageRenderer::render($io, $config->getRecommendations(), $config->getWarnings());
 
         $io->comment(
             sprintf(
@@ -866,31 +868,5 @@ EOF
                 round(microtime(true) - $startTime, 2)
             )
         );
-    }
-
-    private function renderMessages(Configuration $config, SymfonyStyle $io): void
-    {
-        $recommendations = $config->getRecommendations();
-        $warnings = $config->getWarnings();
-
-        if ([] === $recommendations) {
-            $io->writeln('No recommendation found.');
-        } else {
-            $io->writeln('Recommendations:');
-
-            foreach ($recommendations as $recommendation) {
-                $io->writeln("    - <recommendation>$recommendation</recommendation>");
-            }
-        }
-
-        if ([] === $warnings) {
-            $io->writeln('No warning found.');
-        } else {
-            $io->writeln('Warnings:');
-
-            foreach ($warnings as $warning) {
-                $io->writeln("    - <warning>$warning</warning>");
-            }
-        }
     }
 }

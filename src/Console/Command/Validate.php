@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Exception;
+use KevinGH\Box\Console\MessageRenderer;
 use KevinGH\Box\Console\OutputConfigurator;
 use KevinGH\Box\Json\JsonValidationException;
 use Symfony\Component\Console\Exception\RuntimeException;
@@ -81,25 +82,7 @@ HELP
             $recommendations = $config->getRecommendations();
             $warnings = $config->getWarnings();
 
-            if ([] === $recommendations) {
-                $output->writeln('No recommendation found.');
-            } else {
-                $output->writeln('Recommendations:');
-
-                foreach ($recommendations as $recommendation) {
-                    $io->writeln("    - <recommendation>$recommendation</recommendation>");
-                }
-            }
-
-            if ([] === $warnings) {
-                $output->writeln('No warning found.');
-            } else {
-                $output->writeln('Warnings:');
-
-                foreach ($warnings as $warning) {
-                    $io->writeln("    - <warning>$warning</warning>");
-                }
-            }
+            MessageRenderer::render($io, $recommendations, $warnings);
 
             $output->writeln('');
             $output->writeln(

@@ -22,6 +22,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Validate
+ * @covers \KevinGH\Box\Console\Command\MessageRenderer
  *
  * @runTestsInSeparateProcesses
  */
