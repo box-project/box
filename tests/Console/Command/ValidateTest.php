@@ -301,7 +301,7 @@ OUTPUT;
 
     public function test_an_invalid_JSON_file_is_invalid(): void
     {
-        file_put_contents('box.json.dist', '{');
+        file_put_contents('box.json', '{');
 
         $this->commandTester->execute(
             [
@@ -311,7 +311,7 @@ OUTPUT;
 
         $expected = <<<'OUTPUT'
 
- // Loading the configuration file "box.json.dist".
+ // Loading the configuration file "box.json".
 
 The configuration file failed validation: Parse error on line 1:
 {
@@ -323,8 +323,8 @@ OUTPUT;
         $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
         $actual = preg_replace(
-            '/\s\/\/ Loading the configuration file(\n.+)+box\.json\.dist[comment\<\>\n\s\/]*"\./',
-            ' // Loading the configuration file "box.json.dist".',
+            '/\s\/\/ Loading the configuration file(\n.*)+box\.json[comment\<\>\n\s\/]*"\./',
+            ' // Loading the configuration file "box.json".',
             $actual
         );
 
@@ -376,7 +376,7 @@ OUTPUT;
             $this->tmp,
             <<<'EOF'
 
- // Loading the configuration file "box.json.dist".
+ // Loading the configuration file "box.json".
 
 The configuration file failed validation: "/path/to/box.json" does not match the expected JSON schema:
 
@@ -388,8 +388,8 @@ EOF
         $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
         $actual = preg_replace(
-            '/\s\/\/ Loading the configuration file(\n.+)+box\.json[comment\<\>\n\s\/]*"\./',
-            ' // Loading the configuration file "box.json.dist".',
+            '/\s\/\/ Loading the configuration file(\n.*)+box\.json[comment\<\>\n\s\/]*"\./',
+            ' // Loading the configuration file "box.json".',
             $actual
         );
 
