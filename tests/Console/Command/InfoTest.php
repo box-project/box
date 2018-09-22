@@ -283,10 +283,8 @@ OUTPUT;
 
 OUTPUT;
 
-        $actual = DisplayNormalizer::removeMiddleStringLineReturns(
-            DisplayNormalizer::removeTrailingSpaces(
-                $this->commandTester->getDisplay(true)
-            )
+        $actual = DisplayNormalizer::removeTrailingSpaces(
+            $this->commandTester->getDisplay(true)
         );
 
         $this->assertSame($expected, $actual);

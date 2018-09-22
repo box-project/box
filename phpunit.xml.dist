@@ -7,6 +7,7 @@
     <php>
         <env name="BOX_ALLOW_XDEBUG" value="1"/>
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak_vendors" />
+        <env name="COLUMNS" value="250" />
     </php>
 
     <testsuites>

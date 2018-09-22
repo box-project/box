@@ -113,8 +113,6 @@ JSON
                 preg_replace('/\n \/\/ /', '', $file),
                 $actual
             );
-
-            DisplayNormalizer::removeMiddleStringLineReturns($actual);
         }
 
         $expectedConfigPath = $this->tmp.'/box.json';
