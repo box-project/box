@@ -36,6 +36,7 @@ use function iterator_to_array;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\mirror;
+use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
 use function phpversion;
 use function preg_match;
@@ -48,6 +49,7 @@ use function substr;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Compile
+ * @covers \KevinGH\Box\Console\MessageRenderer
  * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
  *                              can create undesirable side-effects.
  */
@@ -173,6 +175,9 @@ Building the PHAR "/path/to/tmp/test.phar"
 Private key passphrase:
 ? Setting file permissions to 0700
 * Done.
+
+No recommendation found.
+No warning found.
 
  // PHAR: 45 files (100B)
  // You can inspect the generated PHAR with the "info" command.
@@ -386,6 +391,9 @@ Building the PHAR "/path/to/tmp/index.phar"
 ? No compression
 ? Setting file permissions to 0755
 * Done.
+
+No recommendation found.
+No warning found.
 
  // PHAR: 49 files (100B)
  // You can inspect the generated PHAR with the "info" command.
@@ -601,6 +609,9 @@ Building the PHAR "/path/to/tmp/test.phar"
 ? No compression
 ? Setting file permissions to 0755
 * Done.
+
+No recommendation found.
+No warning found.
 
  // PHAR: 13 files (100B)
  // You can inspect the generated PHAR with the "info" command.
@@ -840,6 +851,9 @@ Private key passphrase:
 ? Setting file permissions to 0755
 * Done.
 
+No recommendation found.
+No warning found.
+
  // PHAR: 45 files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
@@ -941,6 +955,9 @@ Box version 3.x-dev@151e40a
 Private key passphrase:
 ? Setting file permissions to 0755
 * Done.
+
+No recommendation found.
+No warning found.
 
  // PHAR: 45 files (100B)
  // You can inspect the generated PHAR with the "info" command.
@@ -1068,6 +1085,9 @@ Box version 3.x-dev@151e40a
 Private key passphrase:
 ? Setting file permissions to 0755
 * Done.
+
+No recommendation found.
+No warning found.
 
  // PHAR: 45 files (100B)
  // You can inspect the generated PHAR with the "info" command.
@@ -1760,6 +1780,9 @@ Box version 3.x-dev@151e40a
 ? Setting file permissions to 0755
 * Done.
 
+No recommendation found.
+No warning found.
+
  // PHAR: 1 file (100B)
  // You can inspect the generated PHAR with the "info" command.
 
@@ -2013,6 +2036,9 @@ Box version 3.x-dev@151e40a
 ? Setting file permissions to 0755
 * Done.
 
+No recommendation found.
+No warning found.
+
  // PHAR: 1 file (100B)
  // You can inspect the generated PHAR with the "info" command.
 
@@ -2073,6 +2099,9 @@ Box version 3.x-dev@151e40a
 ? No compression
 ? Setting file permissions to 0755
 * Done.
+
+No recommendation found.
+No warning found.
 
  // PHAR: 1 file (100B)
  // You can inspect the generated PHAR with the "info" command.
@@ -2140,6 +2169,9 @@ Box version 3.x-dev@151e40a
 ? Setting file permissions to 0755
 * Done.
 
+No recommendation found.
+No warning found.
+
  // PHAR: 2 files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
@@ -2205,6 +2237,9 @@ Box version 3.x-dev@151e40a
 ? No compression
 ? Setting file permissions to 0755
 * Done.
+
+No recommendation found.
+No warning found.
 
  // PHAR: 1 file (100B)
  // You can inspect the generated PHAR with the "info" command.
@@ -2276,6 +2311,9 @@ Box version 3.x-dev@151e40a
 ? No compression
 ? Setting file permissions to 0755
 * Done.
+
+No recommendation found.
+No warning found.
 
  // PHAR: 1 file (100B)
  // You can inspect the generated PHAR with the "info" command.
@@ -2352,6 +2390,9 @@ Box version 3.x-dev@151e40a
 ? Setting file permissions to 0755
 * Done.
 
+No recommendation found.
+No warning found.
+
  // PHAR: 1 file (100B)
  // You can inspect the generated PHAR with the "info" command.
 
@@ -2422,6 +2463,9 @@ Box version 3.x-dev@151e40a
 ? No compression
 ? Setting file permissions to 0755
 * Done.
+
+No recommendation found.
+No warning found.
 
  // PHAR: 1 file (100B)
  // You can inspect the generated PHAR with the "info" command.
@@ -2572,6 +2616,9 @@ Box version 3.x-dev@151e40a
 ? Setting file permissions to 0755
 * Done.
 
+No recommendation found.
+No warning found.
+
  // PHAR: 1 file (100B)
  // You can inspect the generated PHAR with the "info" command.
 
@@ -2650,6 +2697,9 @@ Box version 3.x-dev@151e40a
 ? No compression
 ? Setting file permissions to 0755
 * Done.
+
+No recommendation found.
+No warning found.
 
  // PHAR: 1 file (100B)
  // You can inspect the generated PHAR with the "info" command.
@@ -2792,8 +2842,6 @@ OUTPUT;
             )
         );
 
-        $this->commandTester->setInputs(['test']);    // Set input for the passphrase
-
         try {
             $this->commandTester->execute(
                 ['command' => 'compile'],
@@ -2809,13 +2857,158 @@ OUTPUT;
         }
     }
 
+    public function test_it_displays_recommendations_and_warnings(): void
+    {
+        mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
+
+        remove('composer.json');
+
+        file_put_contents(
+            'box.json',
+            json_encode(
+                [
+                    'check-requirements' => true,
+                ]
+            )
+        );
+
+        $this->commandTester->execute(
+            ['command' => 'compile'],
+            ['interactive' => true]
+        );
+
+        $expected = <<<OUTPUT
+
+    ____
+   / __ )____  _  __
+  / __  / __ \| |/_/
+ / /_/ / /_/ />  <
+/_____/\____/_/|_|
+
+
+Box version 3.x-dev@151e40a
+
+
+ // Loading the configuration file "/path/to/box.json.dist".
+
+Building the PHAR "/path/to/tmp/index.phar"
+? No compactor to register
+? Adding main file: /path/to/tmp/index.php
+? Skip requirements checker
+? Adding binary files
+    > No file found
+? Auto-discover files? Yes
+? Adding files
+    > No file found
+? Generating new stub
+  - Using shebang line: #!/usr/bin/env php
+  - Using banner:
+    > Generated by Humbug Box.
+    >
+    > @link https://github.com/humbug/box
+? Skipping dumping the Composer autoloader
+? Removing the Composer dump artefacts
+? No compression
+? Setting file permissions to 0755
+* Done.
+
+Recommendations:
+    - The "check-requirements" setting has been set but is unnecessary since its value is the default value
+Warnings:
+    - The requirement checker could not be used because the composer.json and composer.lock file could not be found.
+
+ // PHAR: 1 file (100B)
+ // You can inspect the generated PHAR with the "info" command.
+
+ // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
+
+
+OUTPUT;
+
+        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
+
+        $this->assertSame($expected, $actual, 'Expected logs to be identical');
+    }
+
+    public function test_it_skips_the_compression_when_in_dev_mode(): void
+    {
+        mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
+
+        file_put_contents(
+            'box.json',
+            json_encode(
+                [
+                    'compression' => 'GZ',
+                ]
+            )
+        );
+
+        $this->commandTester->execute(
+            [
+                'command' => 'compile',
+                '--dev' => null,
+            ],
+            ['interactive' => true]
+        );
+
+        $expected = <<<OUTPUT
+
+    ____
+   / __ )____  _  __
+  / __  / __ \| |/_/
+ / /_/ / /_/ />  <
+/_____/\____/_/|_|
+
+
+Box version 3.x-dev@151e40a
+
+
+ // Loading the configuration file "/path/to/box.json.dist".
+
+Building the PHAR "/path/to/tmp/index.phar"
+? No compactor to register
+? Adding main file: /path/to/tmp/index.php
+? Skip requirements checker
+? Adding binary files
+    > No file found
+? Auto-discover files? Yes
+? Adding files
+    > No file found
+? Generating new stub
+  - Using shebang line: #!/usr/bin/env php
+  - Using banner:
+    > Generated by Humbug Box.
+    >
+    > @link https://github.com/humbug/box
+? Skipping dumping the Composer autoloader
+? Removing the Composer dump artefacts
+? Dev mode detected: skipping the compression
+? Setting file permissions to 0755
+* Done.
+
+No recommendation found.
+No warning found.
+
+ // PHAR: 1 file (100B)
+ // You can inspect the generated PHAR with the "info" command.
+
+ // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
+
+
+OUTPUT;
+
+        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
+
+        $this->assertSame($expected, $actual, 'Expected logs to be identical');
+    }
+
     public function provideAliasConfig(): Generator
     {
         yield [true];
         yield [false];
     }
 
-    private function normalizeDisplay(string $display)
+    private function normalizeDisplay(string $display): string
     {
         $display = str_replace($this->tmp, '/path/to/tmp', $display);
 

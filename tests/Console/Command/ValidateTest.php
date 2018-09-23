@@ -22,6 +22,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Validate
+ * @covers \KevinGH\Box\Console\MessageRenderer
  *
  * @runTestsInSeparateProcesses
  */
@@ -54,12 +55,208 @@ class ValidateTest extends CommandTestCase
 
  // Loading the configuration file "test.json".
 
+No recommendation found.
+No warning found.
+
 The configuration file passed validation.
 
 OUTPUT;
 
         $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(0, $this->commandTester->getStatusCode());
+    }
+
+    public function test_it_reports_the_recommendations_found(): void
+    {
+        touch('index.php');
+        file_put_contents(
+            'test.json',
+            <<<'JSON'
+{
+    "key": null
+}
+JSON
+        );
+
+        $this->commandTester->execute(
+            [
+                'command' => 'validate',
+                '--config' => 'test.json',
+            ],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
+        );
+
+        $expected = <<<'OUTPUT'
+
+ // Loading the configuration file "test.json".
+
+Recommendations:
+    - The setting "key" has been set but is unnecessary since the signing algorithm is not "OPENSSL".
+No warning found.
+
+The configuration file passed validation.
+
+OUTPUT;
+
+        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
+        $this->assertSame(1, $this->commandTester->getStatusCode());
+    }
+
+    public function test_it_does_not_fail_when_recommendations_are_found_but_ignore_message_is_passed(): void
+    {
+        touch('index.php');
+        file_put_contents(
+            'test.json',
+            <<<'JSON'
+{
+    "key": null
+}
+JSON
+        );
+
+        $this->commandTester->execute(
+            [
+                'command' => 'validate',
+                '--config' => 'test.json',
+                '--ignore-recommendations-and-warnings' => null,
+            ],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
+        );
+
+        $expected = <<<'OUTPUT'
+
+ // Loading the configuration file "test.json".
+
+Recommendations:
+    - The setting "key" has been set but is unnecessary since the signing algorithm is not "OPENSSL".
+No warning found.
+
+The configuration file passed validation.
+
+OUTPUT;
+
+        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
+        $this->assertSame(0, $this->commandTester->getStatusCode());
+    }
+
+    public function test_it_reports_the_warnings_found(): void
+    {
+        touch('index.php');
+        file_put_contents(
+            'test.json',
+            <<<'JSON'
+{
+    "key": "key-file"
+}
+JSON
+        );
+
+        $this->commandTester->execute(
+            [
+                'command' => 'validate',
+                '--config' => 'test.json',
+            ],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
+        );
+
+        $expected = <<<'OUTPUT'
+
+ // Loading the configuration file "test.json".
+
+No recommendation found.
+Warnings:
+    - The setting "key" has been set but is ignored since the signing algorithm is not "OPENSSL".
+
+The configuration file passed validation.
+
+OUTPUT;
+
+        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
+        $this->assertSame(1, $this->commandTester->getStatusCode());
+    }
+
+    public function test_it_does_not_fail_when_warnings_are_found_but_ignore_message_is_passed(): void
+    {
+        touch('index.php');
+        file_put_contents(
+            'test.json',
+            <<<'JSON'
+{
+    "key": "key-file"
+}
+JSON
+        );
+
+        $this->commandTester->execute(
+            [
+                'command' => 'validate',
+                '--config' => 'test.json',
+                '--ignore-recommendations-and-warnings' => null,
+            ],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
+        );
+
+        $expected = <<<'OUTPUT'
+
+ // Loading the configuration file "test.json".
+
+No recommendation found.
+Warnings:
+    - The setting "key" has been set but is ignored since the signing algorithm is not "OPENSSL".
+
+The configuration file passed validation.
+
+OUTPUT;
+
+        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
+        $this->assertSame(0, $this->commandTester->getStatusCode());
+    }
+
+    public function test_it_reports_the_recommendations_and_warnings_found(): void
+    {
+        touch('index.php');
+        file_put_contents(
+            'test.json',
+            <<<'JSON'
+{
+    "check-requirements": true
+}
+JSON
+        );
+
+        $this->commandTester->execute(
+            [
+                'command' => 'validate',
+                '--config' => 'test.json',
+            ],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ]
+        );
+
+        $expected = <<<'OUTPUT'
+
+ // Loading the configuration file "test.json".
+
+Recommendations:
+    - The "check-requirements" setting has been set but is unnecessary since its value is the default value
+Warnings:
+    - The requirement checker could not be used because the composer.json and composer.lock file could not be found.
+
+The configuration file passed validation.
+
+OUTPUT;
+
+        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
+        $this->assertSame(1, $this->commandTester->getStatusCode());
     }
 
     public function test_an_unknown_file_is_invalid(): void
@@ -104,7 +301,7 @@ OUTPUT;
 
     public function test_an_invalid_JSON_file_is_invalid(): void
     {
-        file_put_contents('box.json.dist', '{');
+        file_put_contents('box.json', '{');
 
         $this->commandTester->execute(
             [
@@ -114,7 +311,7 @@ OUTPUT;
 
         $expected = <<<'OUTPUT'
 
- // Loading the configuration file "box.json.dist".
+ // Loading the configuration file "box.json".
 
 The configuration file failed validation: Parse error on line 1:
 {
@@ -126,8 +323,8 @@ OUTPUT;
         $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
         $actual = preg_replace(
-            '/\s\/\/ Loading the configuration file(\n.+)+box\.json\.dist[comment\<\>\n\s\/]*"\./',
-            ' // Loading the configuration file "box.json.dist".',
+            '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
+            ' // Loading the configuration file "box.json".',
             $actual
         );
 
@@ -179,7 +376,7 @@ OUTPUT;
             $this->tmp,
             <<<'EOF'
 
- // Loading the configuration file "box.json.dist".
+ // Loading the configuration file "box.json".
 
 The configuration file failed validation: "/path/to/box.json" does not match the expected JSON schema:
 
@@ -191,8 +388,8 @@ EOF
         $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
         $actual = preg_replace(
-            '/\s\/\/ Loading the configuration file(\n.+)+box\.json[comment\<\>\n\s\/]*"\./',
-            ' // Loading the configuration file "box.json.dist".',
+            '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
+            ' // Loading the configuration file "box.json".',
             $actual
         );
 

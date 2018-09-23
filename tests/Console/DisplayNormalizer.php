@@ -14,9 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
-use function preg_match;
-use function str_replace;
-
 final class DisplayNormalizer
 {
     public static function removeTrailingSpaces(string $display): string
@@ -29,19 +26,6 @@ final class DisplayNormalizer
         );
 
         return implode("\n", $lines);
-    }
-
-    public static function removeMiddleStringLineReturns(string $string): string
-    {
-        if (1 === preg_match('/^[\S\n]*(?<innerString>[\s\S]+?)[\S\n]*$/', $string, $matches)) {
-            $innerString = $matches['innerString'];
-
-            $normalizedInnerString = preg_replace('/[\n\t\s]+/', ' ', $innerString);
-
-            return str_replace($innerString, $normalizedInnerString, $string);
-        }
-
-        return $string;
     }
 
     private function __construct()

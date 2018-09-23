@@ -15,17 +15,23 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Exception;
+use KevinGH\Box\Console\MessageRenderer;
+use KevinGH\Box\Console\OutputConfigurator;
 use KevinGH\Box\Json\JsonValidationException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * @private
  */
 final class Validate extends Configurable
 {
+    private const IGNORE_MESSAGES_OPTION = 'ignore-recommendations-and-warnings';
+
     /**
      * {@inheritdoc}
      */
@@ -53,6 +59,12 @@ HELP
             InputArgument::OPTIONAL,
             'The configuration file. (default: box.json, box.json.dist)'
         );
+        $this->addOption(
+            self::IGNORE_MESSAGES_OPTION,
+            'i',
+            InputOption::VALUE_NONE,
+            'Will not return a faulty code when a recommendation or warning is found'
+        );
     }
 
     /**
@@ -60,14 +72,24 @@ HELP
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        try {
-            $this->getConfig($input, $output);
+        $io = new SymfonyStyle($input, $output);
 
+        OutputConfigurator::configure($output);
+
+        try {
+            $config = $this->getConfig($input, $output);
+
+            $recommendations = $config->getRecommendations();
+            $warnings = $config->getWarnings();
+
+            MessageRenderer::render($io, $recommendations, $warnings);
+
+            $output->writeln('');
             $output->writeln(
                 '<info>The configuration file passed validation.</info>'
             );
 
-            return 0;
+            return (([] === $recommendations && [] === $warnings) || $input->getOption(self::IGNORE_MESSAGES_OPTION)) ? 0 : 1;
         } catch (Exception $exception) {
             // Continue
         }
