@@ -273,18 +273,22 @@ OUTPUT;
             ]
         );
 
-        $canonicalizedPath = realpath($pharPath);
-
-        $expected = <<<OUTPUT
+        $expected = <<<'OUTPUT'
 
 
- [ERROR] Could not read the file "$canonicalizedPath".
+ [ERROR] Could not read the file "new-simple-phar.zip".
 
 
 OUTPUT;
 
         $actual = DisplayNormalizer::removeTrailingSpaces(
             $this->commandTester->getDisplay(true)
+        );
+
+        $actual = preg_replace(
+            '/\s\[ERROR\] Could not read the file([\s\S]*)new\-simple\-phar\.zip[comment\<\>\n\s\/]*"\./',
+            ' [ERROR] Could not read the file "new-simple-phar.zip".',
+            $actual
         );
 
         $this->assertSame($expected, $actual);
