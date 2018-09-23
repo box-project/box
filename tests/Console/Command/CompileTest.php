@@ -47,12 +47,12 @@ use function str_replace;
 use function strlen;
 use function substr;
 
-///**
-// * @covers \KevinGH\Box\Console\Command\Compile
-// * @covers \KevinGH\Box\Console\Command\MessageRenderer
-// * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
-// *                              can create undesirable side-effects.
-// */
+/**
+ * @covers \KevinGH\Box\Console\Command\Compile
+ * @covers \KevinGH\Box\Console\Command\MessageRenderer
+ * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
+ *                              can create undesirable side-effects.
+ */
 class CompileTest extends CommandTestCase
 {
     use RequiresPharReadonlyOff;
@@ -2891,7 +2891,6 @@ Box version 3.x-dev@151e40a
 
  // Loading the configuration file "/path/to/box.json.dist".
 
-? Removing the existing PHAR "/path/to/tmp/index.phar"
 Building the PHAR "/path/to/tmp/index.phar"
 ? No compactor to register
 ? Adding main file: /path/to/tmp/index.php
@@ -2966,7 +2965,6 @@ Box version 3.x-dev@151e40a
 
  // Loading the configuration file "/path/to/box.json.dist".
 
-? Removing the existing PHAR "/path/to/tmp/index.phar"
 Building the PHAR "/path/to/tmp/index.phar"
 ? No compactor to register
 ? Adding main file: /path/to/tmp/index.php
