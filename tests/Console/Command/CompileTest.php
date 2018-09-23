@@ -49,7 +49,7 @@ use function substr;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Compile
- * @covers \KevinGH\Box\Console\Command\MessageRenderer
+ * @covers \KevinGH\Box\Console\MessageRenderer
  * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
  *                              can create undesirable side-effects.
  */
