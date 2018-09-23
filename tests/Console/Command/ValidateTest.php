@@ -323,7 +323,7 @@ OUTPUT;
         $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
         $actual = preg_replace(
-            '/\s\/\/ Loading the configuration file(\n.*)+box\.json[comment\<\>\n\s\/]*"\./',
+            '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
             ' // Loading the configuration file "box.json".',
             $actual
         );
@@ -388,7 +388,7 @@ EOF
         $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
         $actual = preg_replace(
-            '/\s\/\/ Loading the configuration file(\n.*)+box\.json[comment\<\>\n\s\/]*"\./',
+            '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
             ' // Loading the configuration file "box.json".',
             $actual
         );

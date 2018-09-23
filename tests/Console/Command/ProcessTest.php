@@ -105,24 +105,18 @@ JSON
         );
         $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
-        if (1 === preg_match('/\/\/ Loading the configuration file\n \/\/ "(?<file>[\s\S]*?)"./', $actual, $matches)) {
-            $file = $matches['file'];
+        $actual = preg_replace(
+            '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
+            ' // Loading the configuration file "box.json".',
+            $actual
+        );
 
-            $actual = str_replace(
-                $file,
-                preg_replace('/\n \/\/ /', '', $file),
-                $actual
-            );
-        }
-
-        $expectedConfigPath = $this->tmp.'/box.json';
         $expectedFilePath = $this->tmp.'/acme.json';
 
         $expected = <<<OUTPUT
 
 
- // Loading the configuration file
- // "$expectedConfigPath".
+ // Loading the configuration file "box.json".
 
 Processing the contents of the file $expectedFilePath
 
