@@ -48,7 +48,7 @@ class StubGeneratorTest extends TestCase
         $expected = <<<'STUB'
 <?php
 
-require 'phar://' . __FILE__ . '/.box/check_requirements.php';
+require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 
 __HALT_COMPILER(); ?>
 
@@ -94,7 +94,7 @@ TEXT
  * Yolo
  */
 
-require 'phar://' . __FILE__ . '/.box/check_requirements.php';
+require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 
 __HALT_COMPILER(); ?>
 
@@ -132,7 +132,7 @@ STUB;
 #!/usr/local/bin/env php
 <?php
 
-require 'phar://' . __FILE__ . '/.box/check_requirements.php';
+require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 
 __HALT_COMPILER(); ?>
 
@@ -164,7 +164,7 @@ STUB;
         $expected = <<<'STUB'
 <?php
 
-require 'phar://' . __FILE__ . '/.box/check_requirements.php';
+require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 
 __HALT_COMPILER(); ?>
 
@@ -197,7 +197,7 @@ STUB;
 
 Phar::mapPhar('acme.phar');
 
-require 'phar://acme.phar/.box/check_requirements.php';
+require 'phar://acme.phar/.box/bin/check-requirements.php';
 
 __HALT_COMPILER(); ?>
 
@@ -228,7 +228,7 @@ STUB;
         $expected = <<<'STUB'
 <?php
 
-require 'phar://' . __FILE__ . '/.box/check_requirements.php';
+require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 
 __HALT_COMPILER(); ?>
 
@@ -259,7 +259,7 @@ STUB;
         $expected = <<<'STUB'
 <?php
 
-require 'phar://' . __FILE__ . '/.box/check_requirements.php';
+require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 
 require 'phar://' . __FILE__ . '/acme.php';
 
@@ -294,7 +294,7 @@ STUB;
 
 Phar::interceptFileFuncs();
 
-require 'phar://' . __FILE__ . '/.box/check_requirements.php';
+require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 
 __HALT_COMPILER(); ?>
 
@@ -348,7 +348,7 @@ TEXT
 Phar::mapPhar('test.phar');
 Phar::interceptFileFuncs();
 
-require 'phar://test.phar/.box/check_requirements.php';
+require 'phar://test.phar/.box/bin/check-requirements.php';
 
 require 'phar://test.phar/index.php';
 
