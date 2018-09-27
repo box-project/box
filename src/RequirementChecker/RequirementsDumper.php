@@ -26,27 +26,6 @@ use function var_export;
  */
 final class RequirementsDumper
 {
-    public const CHECK_FILE_NAME = 'check_requirements.php';
-
-    private const REQUIREMENTS_CHECKER_TEMPLATE = <<<'PHP'
-<?php
-
-/*
- * This file is part of the box project.
- *
- * (c) Kevin Herrera <kevin@herrera.io>
- *     Théo Fidry <theo.fidry@gmail.com>
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
-
-namespace KevinGH\Box\RequirementChecker;
-
-require 'bin/check-requirements.php';
-
-PHP;
-
     private const REQUIREMENTS_CONFIG_TEMPLATE = <<<'PHP'
 <?php
 
@@ -64,7 +43,6 @@ PHP;
 
         $filesWithContents = [
             self::dumpRequirementsConfig($decodedComposerJsonContents, $decodedComposerLockContents, $compressionAlgorithm),
-            [self::CHECK_FILE_NAME, self::REQUIREMENTS_CHECKER_TEMPLATE],
         ];
 
         /** @var SplFileInfo[] $requirementCheckerFiles */

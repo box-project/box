@@ -179,7 +179,7 @@ Private key passphrase:
 No recommendation found.
 No warning found.
 
- // PHAR: 45 files (100B)
+ // PHAR: 44 files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -213,7 +213,7 @@ $shebang
 
 Phar::mapPhar('alias-test.phar');
 
-require 'phar://alias-test.phar/.box/check_requirements.php';
+require 'phar://alias-test.phar/.box/bin/check-requirements.php';
 
 require 'phar://alias-test.phar/run.php';
 
@@ -234,7 +234,6 @@ PHP;
             '/.box/.requirements.php',
             '/.box/bin/',
             '/.box/bin/check-requirements.php',
-            '/.box/check_requirements.php',
             '/.box/composer.json',
             '/.box/composer.lock',
             '/.box/src/',
@@ -395,7 +394,7 @@ Building the PHAR "/path/to/tmp/index.phar"
 No recommendation found.
 No warning found.
 
- // PHAR: 49 files (100B)
+ // PHAR: 48 files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -436,7 +435,7 @@ OUTPUT;
 
 Phar::mapPhar('box-auto-generated-alias-__uniqid__.phar');
 
-require 'phar://box-auto-generated-alias-__uniqid__.phar/.box/check_requirements.php';
+require 'phar://box-auto-generated-alias-__uniqid__.phar/.box/bin/check-requirements.php';
 
 require 'phar://box-auto-generated-alias-__uniqid__.phar/index.php';
 
@@ -456,7 +455,6 @@ PHP;
             '/.box/.requirements.php',
             '/.box/bin/',
             '/.box/bin/check-requirements.php',
-            '/.box/check_requirements.php',
             '/.box/composer.json',
             '/.box/composer.lock',
             '/.box/src/',
@@ -854,7 +852,7 @@ Private key passphrase:
 No recommendation found.
 No warning found.
 
- // PHAR: 45 files (100B)
+ // PHAR: 44 files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -959,7 +957,7 @@ Private key passphrase:
 No recommendation found.
 No warning found.
 
- // PHAR: 45 files (100B)
+ // PHAR: 44 files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -1089,7 +1087,7 @@ Private key passphrase:
 No recommendation found.
 No warning found.
 
- // PHAR: 45 files (100B)
+ // PHAR: 44 files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -1111,7 +1109,6 @@ OUTPUT;
         $expectedFiles = [
             '.box_dump/.box/.requirements.php',
             '.box_dump/.box/bin/check-requirements.php',
-            '.box_dump/.box/check_requirements.php',
             '.box_dump/.box/composer.json',
             '.box_dump/.box/composer.lock',
             '.box_dump/.box/src/Checker.php',

@@ -39,7 +39,6 @@ class RequirementsDumperTest extends TestCase
         $expectedFiles = [
             '.requirements.php',
             'bin/check-requirements.php',
-            'check_requirements.php',
             'composer.json',
             'composer.lock',
             'src/Checker.php',
