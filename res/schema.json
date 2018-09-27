@@ -24,10 +24,6 @@
                 }
             }
         },
-        "auto-discovery": {
-            "description": "Forces the auto-discovery of files.",
-            "type": ["boolean", "null"]
-        },
         "banner": {
             "description": "The header comment for the generated stub.",
             "type": ["array", "boolean", "string", "null"]
@@ -127,6 +123,10 @@
                 "type": "object"
             },
             "type": ["array", "null"]
+        },
+        "force-autodiscovery": {
+            "description": "Forces the auto-discovery of files.",
+            "type": ["boolean", "null"]
         },
         "git": {
             "description": "The replacement name for the current pretty git version format.",

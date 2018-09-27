@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use const DIRECTORY_SEPARATOR;
 use Generator;
 use InvalidArgumentException;
 use Phar;
@@ -120,6 +121,20 @@ class ConfigurationSigningTest extends ConfigurationTestCase
             );
             $this->assertSame([], $this->config->getWarnings());
         }
+
+        $this->setConfig([
+            'algorithm' => $algorithm,
+            'key-pass' => 'weak-password',
+        ]);
+
+        $this->assertNull($this->config->getPrivateKeyPassphrase());
+        $this->assertFalse($this->config->promptForPrivateKey());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame(
+            ['The setting "key-pass" has been set but ignored the signing algorithm is not "OPENSSL".'],
+            $this->config->getWarnings()
+        );
     }
 
     /**
@@ -165,6 +180,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
             'key' => 'key-file',
         ]);
 
+        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'key-file', $this->config->getPrivateKeyPath());
         $this->assertNull($this->config->getPrivateKeyPassphrase());
         $this->assertFalse($this->config->promptForPrivateKey());
 
@@ -182,6 +198,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
             'key-pass' => true,
         ]);
 
+        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'key-file', $this->config->getPrivateKeyPath());
         $this->assertNull($this->config->getPrivateKeyPassphrase());
         $this->assertTrue($this->config->promptForPrivateKey());
 
@@ -195,12 +212,26 @@ class ConfigurationSigningTest extends ConfigurationTestCase
                 'key-pass' => $keyPass,
             ]);
 
+            $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'key-file', $this->config->getPrivateKeyPath());
             $this->assertNull($this->config->getPrivateKeyPassphrase());
             $this->assertFalse($this->config->promptForPrivateKey());
 
             $this->assertSame([], $this->config->getRecommendations());
             $this->assertSame([], $this->config->getWarnings());
         }
+
+        $this->setConfig([
+            'algorithm' => 'OPENSSL',
+            'key' => 'key-file',
+            'key-pass' => 'weak-password',
+        ]);
+
+        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'key-file', $this->config->getPrivateKeyPath());
+        $this->assertSame('weak-password', $this->config->getPrivateKeyPassphrase());
+        $this->assertFalse($this->config->promptForPrivateKey());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function providePassFileFreeSigningAlgorithm(): Generator

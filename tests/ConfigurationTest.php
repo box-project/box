@@ -17,6 +17,7 @@ namespace KevinGH\Box;
 use Closure;
 use DateTimeImmutable;
 use Generator;
+use function getcwd;
 use Herrera\Annotations\Tokenizer;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\DummyCompactor;
@@ -170,6 +171,24 @@ EOF
         );
 
         $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_recommendation_is_given_when_the_default_base_path_is_explicitely_used(): void
+    {
+        $this->setConfig([
+            'base-path' => getcwd(),
+        ]);
+
+        $this->assertSame(
+            getcwd(),
+            $this->config->getBasePath()
+        );
+
+        $this->assertSame(
+            ['The "base-path" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
         $this->assertSame([], $this->config->getWarnings());
     }
 
@@ -335,7 +354,10 @@ EOF
         $this->assertFalse($this->config->dumpAutoload());
 
         $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        $this->assertSame(
+            ['The "dump-autoload" setting has been set but has been ignored because the composer.json file necessary for it could not be found'],
+            $this->config->getWarnings()
+        );
 
         file_put_contents('composer.json', '{}');
 
@@ -374,7 +396,7 @@ EOF
         $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
 
         $this->assertSame(
-            ['The "dump-autoload" setting has been set but is unnecessary since its value is the default value.'],
+            ['The "dump-autoload" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations()
         );
         $this->assertSame([], $this->config->getWarnings());
@@ -389,7 +411,7 @@ EOF
         $this->assertFalse($this->config->dumpAutoload());
 
         $this->assertSame(
-            ['The "dump-autoload" setting has been set but is unnecessary since its value is the default value.'],
+            ['The "dump-autoload" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations()
         );
         $this->assertSame(
@@ -830,6 +852,31 @@ JSON
             'first/test/path/sub/path/file.php',
             $mapFile('first/test/path/sub/path/file.php')
         );
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_recommendation_is_given_when_the_default_map_is_given(): void
+    {
+        $this->setConfig([
+            'map' => [],
+        ]);
+
+        $mapFile = $this->config->getFileMapper();
+
+        $this->assertSame([], $mapFile->getMap());
+
+        $this->assertSame(
+            'first/test/path/sub/path/file.php',
+            $mapFile('first/test/path/sub/path/file.php')
+        );
+
+        $this->assertSame(
+            ['The "map" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_file_map_can_be_configured(): void
@@ -869,6 +916,9 @@ JSON
     public function test_no_metadata_is_configured_by_default(): void
     {
         $this->assertNull($this->config->getMetadata());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_can_configure_metadata(): void
@@ -881,6 +931,21 @@ JSON
         $this->assertSame(123, $this->config->getMetadata());
 
         $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_recommendation_is_given_if_the_default_metadata_is_provided(): void
+    {
+        $this->setConfig([
+            'metadata' => null,
+        ]);
+
+        $this->assertNull($this->config->getMetadata());
+
+        $this->assertSame(
+            ['The "metadata" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
         $this->assertSame([], $this->config->getWarnings());
     }
 
@@ -916,6 +981,28 @@ JSON
         );
 
         $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_recommendation_is_given_when_the_default_path_is_given(): void
+    {
+        $this->setConfig([
+            'output' => 'index.phar',
+        ]);
+
+        $this->assertSame(
+            $this->tmp.DIRECTORY_SEPARATOR.'index.phar',
+            $this->config->getOutputPath()
+        );
+        $this->assertSame(
+            $this->tmp.DIRECTORY_SEPARATOR.'index.phar',
+            $this->config->getTmpOutputPath()
+        );
+
+        $this->assertSame(
+            ['The "output" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
         $this->assertSame([], $this->config->getWarnings());
     }
 
@@ -1025,19 +1112,6 @@ JSON
     public function test_no_replacements_are_configured_by_default(): void
     {
         $this->assertSame([], $this->config->getReplacements());
-
-        $this->setConfig([
-            'replacements' => new stdClass(),
-            'datetime' => null,
-            'datetime-format' => null,
-            'datetime_format' => null,
-            'replacement-sigil' => null,
-        ]);
-
-        $this->assertSame([], $this->config->getReplacements());
-
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_replacement_map_can_be_configured(): void
@@ -1117,6 +1191,21 @@ JSON
         }
 
         $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_recommendation_is_given_if_the_default_replacements_setting_is_provided(): void
+    {
+        $this->setConfig([
+            'replacements' => new stdClass(),
+        ]);
+
+        $this->assertSame([], $this->config->getReplacements());
+
+        $this->assertSame(
+            ['The "replacements" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
         $this->assertSame([], $this->config->getWarnings());
     }
 
