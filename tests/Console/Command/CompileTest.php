@@ -2910,7 +2910,7 @@ Building the PHAR "/path/to/tmp/index.phar"
 * Done.
 
 Recommendations:
-    - The "check-requirements" setting has been set but is unnecessary since its value is the default value
+    - The "check-requirements" setting can be omitted since is set to its default value
 Warnings:
     - The requirement checker could not be used because the composer.json and composer.lock file could not be found.
 
