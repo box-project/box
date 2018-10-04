@@ -14,14 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use function array_push;
-use function array_shift;
-use function array_unshift;
-use const DIRECTORY_SEPARATOR;
 use Generator;
-use function in_array;
 use InvalidArgumentException;
 use Phar;
+use const DIRECTORY_SEPARATOR;
+use function array_unshift;
+use function in_array;
 
 /**
  * @covers \KevinGH\Box\Configuration
@@ -75,7 +73,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
 
         $this->assertSame($expected, $this->config->getSigningAlgorithm());
 
-        if (false === in_array($algorithm, ['SHA1', false])) {
+        if (false === in_array($algorithm, ['SHA1', false], true)) {
             $this->assertSame([], $this->config->getRecommendations());
         }
         $this->assertSame([], $this->config->getWarnings());
@@ -126,7 +124,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
         $this->assertNull($this->config->getPrivateKeyPassphrase());
         $this->assertFalse($this->config->promptForPrivateKey());
 
-        if (false === in_array($algorithm, ['SHA1', false])) {
+        if (false === in_array($algorithm, ['SHA1', false], true)) {
             $this->assertSame([], $this->config->getRecommendations());
         }
         $this->assertSame(
@@ -150,7 +148,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
                 'The setting "key-pass" has been set but is unnecessary since the signing algorithm is not "OPENSSL".',
             ];
 
-            if (in_array($algorithm, ['SHA1', false])) {
+            if (in_array($algorithm, ['SHA1', false], true)) {
                 array_unshift(
                     $expectedRecommendation,
                     'The "algorithm" setting can be omitted since is set to its default value'
@@ -169,7 +167,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
         $this->assertNull($this->config->getPrivateKeyPassphrase());
         $this->assertFalse($this->config->promptForPrivateKey());
 
-        if (false === in_array($algorithm, ['SHA1', false])) {
+        if (false === in_array($algorithm, ['SHA1', false], true)) {
             $this->assertSame([], $this->config->getRecommendations());
         }
         $this->assertSame(
@@ -192,7 +190,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
 
         $this->assertNull($this->config->getPrivateKeyPath());
 
-        if (false === in_array($algorithm, ['SHA1', false])) {
+        if (false === in_array($algorithm, ['SHA1', false], true)) {
             $this->assertSame([], $this->config->getRecommendations());
         }
         $this->assertSame(
@@ -211,7 +209,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
             'The setting "key" has been set but is unnecessary since the signing algorithm is not "OPENSSL".',
         ];
 
-        if (in_array($algorithm, ['SHA1', false])) {
+        if (in_array($algorithm, ['SHA1', false], true)) {
             array_unshift(
                 $expectedRecommendation,
                 'The "algorithm" setting can be omitted since is set to its default value'

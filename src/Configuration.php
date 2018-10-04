@@ -30,9 +30,6 @@ use KevinGH\Box\Composer\ComposerConfiguration;
 use KevinGH\Box\Json\Json;
 use KevinGH\Box\PhpScoper\SimpleScoper;
 use Phar;
-use phpDocumentor\Reflection\Types\Self_;
-use function property_exists;
-use function realpath;
 use RuntimeException;
 use Seld\JsonLint\ParsingException;
 use SplFileInfo;
@@ -71,6 +68,8 @@ use function KevinGH\Box\FileSystem\longest_common_base_path;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use function preg_match;
+use function property_exists;
+use function realpath;
 use function sprintf;
 use function strtoupper;
 use function substr;
@@ -139,7 +138,7 @@ BANNER;
     private const REPLACEMENTS_KEY = 'replacements';
     private const SHEBANG_KEY = 'shebang';
     private const STUB_KEY = 'stub';
-    
+
     private $file;
     private $fileMode;
     private $alias;
@@ -737,8 +736,7 @@ BANNER;
         string $basePath,
         ConfigurationLogger $logger,
         ?string ...$excludedPaths
-    ): array
-    {
+    ): array {
         $blacklist = self::retrieveBlacklist($raw, $basePath, $logger, ...$excludedPaths);
 
         $blacklistFilter = function (SplFileInfo $file) use ($blacklist): ?bool {
@@ -772,8 +770,7 @@ BANNER;
         string $basePath,
         ConfigurationLogger $logger,
         ?string ...$excludedPaths
-    ): array
-    {
+    ): array {
         if (property_exists($raw, self::BLACKLIST_KEY) && [] === $raw->{self::BLACKLIST_KEY}) {
             self::addRecommendationForDefaultValue($logger, self::BLACKLIST_KEY);
         }
@@ -1470,8 +1467,7 @@ BANNER;
         string $key,
         string $basePath,
         ConfigurationLogger $logger
-    ): array
-    {
+    ): array {
         if (false === isset($raw->{$key})) {
             return [];
         }
@@ -1644,7 +1640,7 @@ BANNER;
         $defaultChmod = intval(0755, 8);
 
         if (isset($raw->{self::CHMOD_KEY})) {
-            $chmod =  intval($raw->{self::CHMOD_KEY}, 8);
+            $chmod = intval($raw->{self::CHMOD_KEY}, 8);
 
             if ($defaultChmod === $chmod) {
                 self::addRecommendationForDefaultValue($logger, self::CHMOD_KEY);
@@ -1657,23 +1653,22 @@ BANNER;
     }
 
     private static function retrieveMainScriptPath(
-        stdClass $raw, 
-        string $basePath, 
+        stdClass $raw,
+        string $basePath,
         ?array $decodedJsonContents,
         ConfigurationLogger $logger
-    ): ?string
-    {
+    ): ?string {
         $firstBin = false;
 
         if (null !== $decodedJsonContents && array_key_exists('bin', $decodedJsonContents)) {
-            /** @var string|false $firstBin */
+            /** @var false|string $firstBin */
             $firstBin = current((array) $decodedJsonContents['bin']);
-            
+
             if (false !== $firstBin) {
                 $firstBin = self::normalizePath($firstBin, $basePath);
             }
         }
-        
+
         if (isset($raw->{self::MAIN_KEY})) {
             $main = $raw->{self::MAIN_KEY};
 
@@ -1816,8 +1811,7 @@ BANNER;
         string $basePath,
         ?string $mainScriptPath,
         ConfigurationLogger $logger
-    ): array
-    {
+    ): array {
         $defaultPath = null;
 
         if (null !== $mainScriptPath
@@ -1893,7 +1887,7 @@ BANNER;
             return null;
         }
 
-        /** @var string|false|null $keyPass */
+        /** @var null|false|string $keyPass */
         $keyPass = $raw->{self::KEY_PASS_KEY};
 
         if (Phar::OPENSSL !== $algorithm) {
@@ -1956,8 +1950,8 @@ BANNER;
         }
 
         /**
-         * @var string $datetimeFormat
-         * @var bool $valueSetByUser
+         * @var string
+         * @var bool   $valueSetByUser
          */
         [$datetimeFormat, $valueSetByUser] = self::retrieveDatetimeFormat($raw, $logger);
 
@@ -2098,13 +2092,12 @@ BANNER;
         } else {
             $format = null;
         }
-        /** @var string|null $format */
-
-        if ($format === self::DEFAULT_DATETIME_FORMAT) {
+        /** @var null|string $format */
+        if (self::DEFAULT_DATETIME_FORMAT === $format) {
             self::addRecommendationForDefaultValue($logger, self::DATETIME_FORMAT_KEY);
         }
 
-        if ($format !== null) {
+        if (null !== $format) {
             $formattedDate = (new DateTimeImmutable())->format($format);
 
             Assertion::false(
@@ -2407,8 +2400,8 @@ BANNER;
 
         return new Php($tokenizer);
     }
-    
-    private static function addRecommendationForDefaultValue(ConfigurationLogger $logger, string $key): void 
+
+    private static function addRecommendationForDefaultValue(ConfigurationLogger $logger, string $key): void
     {
         $logger->addRecommendation(
             sprintf(
