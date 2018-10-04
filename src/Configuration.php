@@ -240,7 +240,7 @@ BANNER;
 
         $excludeComposerFiles = self::retrieveExcludeComposerFiles($raw);
 
-        $compactors = self::retrieveCompactors($raw, $basePath);
+        $compactors = self::retrieveCompactors($raw, $basePath, $logger);
         $compressionAlgorithm = self::retrieveCompressionAlgorithm($raw);
 
         $fileMode = self::retrieveFileMode($raw);
@@ -250,17 +250,17 @@ BANNER;
 
         $metadata = self::retrieveMetadata($raw, $logger);
 
-        $signingAlgorithm = self::retrieveSigningAlgorithm($raw);
+        $signingAlgorithm = self::retrieveSigningAlgorithm($raw, $logger);
         $promptForPrivateKey = self::retrievePromptForPrivateKey($raw, $signingAlgorithm, $logger);
         $privateKeyPath = self::retrievePrivateKeyPath($raw, $basePath, $signingAlgorithm, $logger);
         $privateKeyPassphrase = self::retrievePrivateKeyPassphrase($raw, $signingAlgorithm, $logger);
 
         $replacements = self::retrieveReplacements($raw, $file, $logger);
 
-        $shebang = self::retrieveShebang($raw);
+        $shebang = self::retrieveShebang($raw, $logger);
 
-        $stubBannerContents = self::retrieveStubBannerContents($raw);
-        $stubBannerPath = self::retrieveStubBannerPath($raw, $basePath);
+        $stubBannerContents = self::retrieveStubBannerContents($raw, $logger);
+        $stubBannerPath = self::retrieveStubBannerPath($raw, $basePath, $logger);
 
         if (null !== $stubBannerPath) {
             $stubBannerContents = file_contents($stubBannerPath);
@@ -268,9 +268,10 @@ BANNER;
 
         $stubBannerContents = self::normalizeStubBannerContents($stubBannerContents);
 
-        $stubPath = self::retrieveStubPath($raw, $basePath);
+        $stubPath = self::retrieveStubPath($raw, $basePath, $logger);
 
-        $isInterceptFileFuncs = self::retrieveIsInterceptFileFuncs($raw);
+        // TODO: add warning related to the stub generation
+        $interceptsFileFuncs = self::retrieveInterceptsFileFuncs($raw, $logger);
         $isStubGenerated = self::retrieveIsStubGenerated($raw, $stubPath);
 
         $checkRequirements = self::retrieveCheckRequirements(
@@ -309,7 +310,7 @@ BANNER;
             $stubBannerContents,
             $stubBannerPath,
             $stubPath,
-            $isInterceptFileFuncs,
+            $interceptsFileFuncs,
             $isStubGenerated,
             $checkRequirements,
             $logger->getWarnings(),
@@ -633,6 +634,16 @@ BANNER;
     }
 
     public function isInterceptFileFuncs(): bool
+    {
+        @trigger_error(
+            'The function "Configuration::isInterceptFileFuncs()" is deprecated, use "Configuration::interceptsFileFuncs()" instead.',
+            E_USER_DEPRECATED
+        );
+
+        return $this->interceptsFileFuncs();
+    }
+
+    public function interceptsFileFuncs(): bool
     {
         return $this->isInterceptFileFuncs;
     }
@@ -1535,16 +1546,22 @@ BANNER;
     /**
      * @return Compactor[]
      */
-    private static function retrieveCompactors(stdClass $raw, string $basePath): array
+    private static function retrieveCompactors(stdClass $raw, string $basePath, ConfigurationLogger $logger): array
     {
+        if (property_exists($raw, self::COMPACTORS_KEY)
+            && (null === $raw->{self::COMPACTORS_KEY} || [] === $raw->{self::COMPACTORS_KEY})
+        ) {
+            self::addRecommendationForDefaultValue($logger, self::COMPACTORS_KEY);
+        }
+
         if (false === isset($raw->compactors)) {
             return [];
         }
 
-        $compactorClasses = array_unique((array) $raw->compactors);
+        $compactorClasses = array_unique((array) $raw->{self::COMPACTORS_KEY});
 
         return array_map(
-            function (string $class) use ($raw, $basePath): Compactor {
+            function (string $class) use ($raw, $basePath, $logger): Compactor {
                 Assertion::classExists($class, 'The compactor class "%s" does not exist.');
                 Assertion::implementsInterface($class, Compactor::class, 'The class "%s" is not a compactor class.');
 
@@ -1553,7 +1570,7 @@ BANNER;
                 }
 
                 if (PhpScoperCompactor::class === $class) {
-                    $phpScoperConfig = self::retrievePhpScoperConfig($raw, $basePath);
+                    $phpScoperConfig = self::retrievePhpScoperConfig($raw, $basePath, $logger);
 
                     $prefix = null === $phpScoperConfig->getPrefix()
                         ? uniqid('_HumbugBox', false)
@@ -1896,35 +1913,45 @@ BANNER;
 
         $replacements = isset($raw->replacements) ? (array) $raw->replacements : [];
 
-        if (null !== ($git = self::retrievePrettyGitPlaceholder($raw))) {
+        if (null !== ($git = self::retrievePrettyGitPlaceholder($raw, $logger))) {
             $replacements[$git] = self::retrievePrettyGitTag($file);
         }
 
-        if (null !== ($git = self::retrieveGitHashPlaceholder($raw))) {
+        if (null !== ($git = self::retrieveGitHashPlaceholder($raw, $logger))) {
             $replacements[$git] = self::retrieveGitHash($file);
         }
 
-        if (null !== ($git = self::retrieveGitShortHashPlaceholder($raw))) {
+        if (null !== ($git = self::retrieveGitShortHashPlaceholder($raw, $logger))) {
             $replacements[$git] = self::retrieveGitHash($file, true);
         }
 
-        if (null !== ($git = self::retrieveGitTagPlaceholder($raw))) {
+        if (null !== ($git = self::retrieveGitTagPlaceholder($raw, $logger))) {
             $replacements[$git] = self::retrieveGitTag($file);
         }
 
-        if (null !== ($git = self::retrieveGitVersionPlaceholder($raw))) {
+        if (null !== ($git = self::retrieveGitVersionPlaceholder($raw, $logger))) {
             $replacements[$git] = self::retrieveGitVersion($file);
         }
 
-        $datetimeFormat = self::retrieveDatetimeFormat($raw, $logger);
+        /**
+         * @var string $datetimeFormat
+         * @var bool $valueSetByUser
+         */
+        [$datetimeFormat, $valueSetByUser] = self::retrieveDatetimeFormat($raw, $logger);
 
-        if (null !== ($date = self::retrieveDatetimeNowPlaceHolder($raw))) {
-            $replacements[$date] = self::retrieveDatetimeNow(
-                $datetimeFormat
+        if (null !== ($date = self::retrieveDatetimeNowPlaceHolder($raw, $logger))) {
+            $replacements[$date] = self::retrieveDatetimeNow($datetimeFormat);
+        } elseif ($valueSetByUser) {
+            $logger->addRecommendation(
+                sprintf(
+                    'The setting "%s" has been set but is unnecessary because the setting "%s" is not set.',
+                    self::DATETIME_FORMAT_KEY,
+                    self::DATETIME_KEY
+                )
             );
         }
 
-        $sigil = self::retrieveReplacementSigil($raw);
+        $sigil = self::retrieveReplacementSigil($raw, $logger);
 
         foreach ($replacements as $key => $value) {
             unset($replacements[$key]);
@@ -1934,14 +1961,14 @@ BANNER;
         return $replacements;
     }
 
-    private static function retrievePrettyGitPlaceholder(stdClass $raw): ?string
+    private static function retrievePrettyGitPlaceholder(stdClass $raw, ConfigurationLogger $logger): ?string
     {
-        return isset($raw->{'git'}) ? $raw->{'git'} : null;
+        return self::retrievePlaceholder($raw, $logger, self::GIT_KEY);
     }
 
-    private static function retrieveGitHashPlaceholder(stdClass $raw): ?string
+    private static function retrieveGitHashPlaceholder(stdClass $raw, ConfigurationLogger $logger): ?string
     {
-        return isset($raw->{'git-commit'}) ? $raw->{'git-commit'} : null;
+        return self::retrievePlaceholder($raw, $logger, self::GIT_COMMIT_KEY);
     }
 
     /**
@@ -1961,14 +1988,23 @@ BANNER;
         );
     }
 
-    private static function retrieveGitShortHashPlaceholder(stdClass $raw): ?string
+    private static function retrieveGitShortHashPlaceholder(stdClass $raw, ConfigurationLogger $logger): ?string
     {
-        return isset($raw->{'git-commit-short'}) ? $raw->{'git-commit-short'} : null;
+        return self::retrievePlaceholder($raw, $logger, self::GIT_COMMIT_SHORT_KEY);
     }
 
-    private static function retrieveGitTagPlaceholder(stdClass $raw): ?string
+    private static function retrieveGitTagPlaceholder(stdClass $raw, ConfigurationLogger $logger): ?string
     {
-        return isset($raw->{'git-tag'}) ? $raw->{'git-tag'} : null;
+        return self::retrievePlaceholder($raw, $logger, self::GIT_TAG_KEY);
+    }
+
+    private static function retrievePlaceholder(stdClass $raw, ConfigurationLogger $logger, string $key): ?string
+    {
+        if (property_exists($raw, $key) && null === $raw->{$key}) {
+            self::addRecommendationForDefaultValue($logger, $key);
+        }
+
+        return $raw->{$key} ?? null;
     }
 
     private static function retrieveGitTag(string $file): string
@@ -1987,9 +2023,9 @@ BANNER;
         return $version;
     }
 
-    private static function retrieveGitVersionPlaceholder(stdClass $raw): ?string
+    private static function retrieveGitVersionPlaceholder(stdClass $raw, ConfigurationLogger $logger): ?string
     {
-        return isset($raw->{'git-version'}) ? $raw->{'git-version'} : null;
+        return self::retrievePlaceholder($raw, $logger, self::GIT_VERSION_KEY);
     }
 
     private static function retrieveGitVersion(string $file): ?string
@@ -2013,9 +2049,9 @@ BANNER;
         }
     }
 
-    private static function retrieveDatetimeNowPlaceHolder(stdClass $raw): ?string
+    private static function retrieveDatetimeNowPlaceHolder(stdClass $raw, ConfigurationLogger $logger): ?string
     {
-        return isset($raw->{'datetime'}) ? $raw->{'datetime'} : null;
+        return self::retrievePlaceholder($raw, $logger, self::DATETIME_KEY);
     }
 
     private static function retrieveDatetimeNow(string $format): string
@@ -2025,21 +2061,28 @@ BANNER;
         return $now->format($format);
     }
 
-    private static function retrieveDatetimeFormat(stdClass $raw, ConfigurationLogger $logger): string
+    private static function retrieveDatetimeFormat(stdClass $raw, ConfigurationLogger $logger): array
     {
-        if (isset($raw->{'datetime-format'})) {
-            $format = $raw->{'datetime-format'};
-        } elseif (isset($raw->{'datetime_format'})) {
+        if (isset($raw->{self::DATETIME_FORMAT_KEY})) {
+            $format = $raw->{self::DATETIME_FORMAT_KEY};
+        } elseif (isset($raw->{self::DATETIME_FORMAT_DEPRECATED_KEY})) {
             @trigger_error(
                 'The "datetime_format" is deprecated, use "datetime-format" setting instead.',
                 E_USER_DEPRECATED
             );
             $logger->addWarning('The "datetime_format" is deprecated, use "datetime-format" setting instead.');
 
-            $format = $raw->{'datetime_format'};
+            $format = $raw->{self::DATETIME_FORMAT_DEPRECATED_KEY};
+        } else {
+            $format = null;
+        }
+        /** @var string|null $format */
+
+        if ($format === self::DEFAULT_DATETIME_FORMAT) {
+            self::addRecommendationForDefaultValue($logger, self::DATETIME_FORMAT_KEY);
         }
 
-        if (isset($format)) {
+        if ($format !== null) {
             $formattedDate = (new DateTimeImmutable())->format($format);
 
             Assertion::false(
@@ -2050,30 +2093,32 @@ BANNER;
                 )
             );
 
-            return $format;
+            return [$format, true];
         }
 
-        return self::DEFAULT_DATETIME_FORMAT;
+        return [self::DEFAULT_DATETIME_FORMAT, false];
     }
 
-    private static function retrieveReplacementSigil(stdClass $raw): string
+    private static function retrieveReplacementSigil(stdClass $raw, ConfigurationLogger $logger): string
     {
-        return isset($raw->{'replacement-sigil'}) ? $raw->{'replacement-sigil'} : self::DEFAULT_REPLACEMENT_SIGIL;
+        return self::retrievePlaceholder($raw, $logger, self::REPLACEMENT_SIGIL_KEY) ?? self::DEFAULT_REPLACEMENT_SIGIL;
     }
 
-    private static function retrieveShebang(stdClass $raw): ?string
+    private static function retrieveShebang(stdClass $raw, ConfigurationLogger $logger): ?string
     {
-        if (false === array_key_exists('shebang', (array) $raw)) {
+        if (false === array_key_exists(self::SHEBANG_KEY, (array) $raw)) {
             return self::DEFAULT_SHEBANG;
         }
 
-        $shebang = $raw->shebang;
+        $shebang = $raw->{self::SHEBANG_KEY};
 
         if (false === $shebang) {
             return null;
         }
 
         if (null === $shebang) {
+            self::addRecommendationForDefaultValue($logger, self::SHEBANG_KEY);
+
             $shebang = self::DEFAULT_SHEBANG;
         }
 
@@ -2090,16 +2135,24 @@ BANNER;
             )
         );
 
+        if (self::DEFAULT_SHEBANG === $shebang) {
+            self::addRecommendationForDefaultValue($logger, self::SHEBANG_KEY);
+        }
+
         return $shebang;
     }
 
-    private static function retrieveSigningAlgorithm(stdClass $raw): int
+    private static function retrieveSigningAlgorithm(stdClass $raw, ConfigurationLogger $logger): int
     {
-        if (false === isset($raw->algorithm)) {
+        if (property_exists($raw, self::ALGORITHM_KEY) && null === $raw->{self::ALGORITHM_KEY}) {
+            self::addRecommendationForDefaultValue($logger, self::ALGORITHM_KEY);
+        }
+
+        if (false === isset($raw->{self::ALGORITHM_KEY})) {
             return self::DEFAULT_SIGNING_ALGORITHM;
         }
 
-        $algorithm = strtoupper($raw->algorithm);
+        $algorithm = strtoupper($raw->{self::ALGORITHM_KEY});
 
         Assertion::inArray($algorithm, array_keys(get_phar_signing_algorithms()));
 
@@ -2111,16 +2164,30 @@ BANNER;
             )
         );
 
-        return constant('Phar::'.$algorithm);
+        $algorithm = constant('Phar::'.$algorithm);
+
+        if (self::DEFAULT_SIGNING_ALGORITHM === $algorithm) {
+            self::addRecommendationForDefaultValue($logger, self::ALGORITHM_KEY);
+        }
+
+        return $algorithm;
     }
 
-    private static function retrieveStubBannerContents(stdClass $raw): ?string
+    private static function retrieveStubBannerContents(stdClass $raw, ConfigurationLogger $logger): ?string
     {
-        if (false === array_key_exists('banner', (array) $raw) || null === $raw->banner) {
+        if (property_exists($raw, self::BANNER_KEY) && null === $raw->{self::BANNER_KEY}) {
+            self::addRecommendationForDefaultValue($logger, self::BANNER_KEY);
+        }
+
+        if (false === isset($raw->{self::BANNER_KEY})) {
             return self::DEFAULT_BANNER;
         }
 
-        $banner = $raw->banner;
+        $banner = $raw->{self::BANNER_KEY};
+
+        if (self::DEFAULT_BANNER === $banner) {
+            self::addRecommendationForDefaultValue($logger, self::BANNER_KEY);
+        }
 
         if (false === $banner) {
             return null;
@@ -2135,8 +2202,12 @@ BANNER;
         return $banner;
     }
 
-    private static function retrieveStubBannerPath(stdClass $raw, string $basePath): ?string
+    private static function retrieveStubBannerPath(stdClass $raw, string $basePath, ConfigurationLogger $logger): ?string
     {
+        if (property_exists($raw, self::BANNER_FILE_KEY) && null === $raw->{self::BANNER_FILE_KEY}) {
+            self::addRecommendationForDefaultValue($logger, self::BANNER_FILE_KEY);
+        }
+
         if (false === isset($raw->{'banner-file'})) {
             return null;
         }
@@ -2160,8 +2231,12 @@ BANNER;
         return implode("\n", $banner);
     }
 
-    private static function retrieveStubPath(stdClass $raw, string $basePath): ?string
+    private static function retrieveStubPath(stdClass $raw, string $basePath, ConfigurationLogger $logger): ?string
     {
+        if (property_exists($raw, self::STUB_KEY) && null === $raw->{self::STUB_KEY}) {
+            self::addRecommendationForDefaultValue($logger, self::STUB_KEY);
+        }
+
         if (isset($raw->stub) && is_string($raw->stub)) {
             $stubPath = make_path_absolute($raw->stub, $basePath);
 
@@ -2173,13 +2248,15 @@ BANNER;
         return null;
     }
 
-    private static function retrieveIsInterceptFileFuncs(stdClass $raw): bool
+    private static function retrieveInterceptsFileFuncs(stdClass $raw, ConfigurationLogger $logger): bool
     {
-        if (isset($raw->intercept)) {
-            return $raw->intercept;
+        if (property_exists($raw, self::INTERCEPT_KEY)
+            && (null === $raw->{self::INTERCEPT_KEY} || false === $raw->{self::INTERCEPT_KEY})
+        ) {
+            self::addRecommendationForDefaultValue($logger, self::INTERCEPT_KEY);
         }
 
-        return false;
+        return $raw->{self::INTERCEPT_KEY} ?? false;
     }
 
     private static function retrievePromptForPrivateKey(
@@ -2214,24 +2291,18 @@ BANNER;
         bool $hasComposerLock,
         ConfigurationLogger $logger
     ): bool {
-        $raw = (array) $raw;
+        if (property_exists($raw, self::CHECK_REQUIREMENTS_KEY)
+            && (null === $raw->{self::CHECK_REQUIREMENTS_KEY} || true === $raw->{self::CHECK_REQUIREMENTS_KEY})
+        ) {
+            self::addRecommendationForDefaultValue($logger, self::CHECK_REQUIREMENTS_KEY);
+        }
 
-        if (false === array_key_exists('check-requirements', $raw)) {
+        if (false === property_exists($raw, self::CHECK_REQUIREMENTS_KEY)) {
             return $hasComposerJson || $hasComposerLock;
         }
 
         /** @var null|bool $checkRequirements */
-        $checkRequirements = $raw['check-requirements'];
-
-        if ($checkRequirements) {
-            $logger->addRecommendation(
-                'The "check-requirements" setting has been set but is unnecessary since its value is the default value'
-            );
-        }
-
-        if (null === $checkRequirements) {
-            $checkRequirements = true;
-        }
+        $checkRequirements = $raw->{self::CHECK_REQUIREMENTS_KEY} ?? true;
 
         if ($checkRequirements && false === $hasComposerJson && false === $hasComposerLock) {
             $logger->addWarning(
@@ -2245,9 +2316,16 @@ BANNER;
         return $checkRequirements;
     }
 
-    private static function retrievePhpScoperConfig(stdClass $raw, string $basePath): PhpScoperConfiguration
+    private static function retrievePhpScoperConfig(stdClass $raw, string $basePath, ConfigurationLogger $logger): PhpScoperConfiguration
     {
-        if (!isset($raw->{'php-scoper'})) {
+        // TODO: add recommendations regarding the order
+        if (property_exists($raw, self::PHP_SCOPER_KEY)
+            && (null === $raw->{self::PHP_SCOPER_KEY} || self::PHP_SCOPER_CONFIG === $raw->{self::PHP_SCOPER_KEY})
+        ) {
+            self::addRecommendationForDefaultValue($logger, self::PHP_SCOPER_KEY);
+        }
+
+        if (!isset($raw->{self::PHP_SCOPER_KEY})) {
             $configFilePath = make_path_absolute(self::PHP_SCOPER_CONFIG, $basePath);
 
             return file_exists($configFilePath)
@@ -2256,7 +2334,7 @@ BANNER;
              ;
         }
 
-        $configFile = $raw->{'php-scoper'};
+        $configFile = $raw->{self::PHP_SCOPER_KEY};
 
         Assertion::string($configFile);
 

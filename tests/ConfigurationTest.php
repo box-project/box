@@ -458,6 +458,30 @@ EOF
     {
         $this->assertSame([], $this->config->getCompactors());
         $this->assertSame([], $this->getNoFileConfig()->getCompactors());
+
+        $this->setConfig([
+            'compactors' => null,
+        ]);
+
+        $this->assertSame([], $this->config->getCompactors());
+
+        $this->assertSame(
+            ['The "compactors" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+
+        $this->setConfig([
+            'compactors' => [],
+        ]);
+
+        $this->assertSame([], $this->config->getCompactors());
+
+        $this->assertSame(
+            ['The "compactors" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_configure_the_compactors(): void
@@ -573,6 +597,58 @@ EOF
         $this->assertSame('custom', $compactors[0]->getScoper()->getPrefix());
 
         $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_default_scoper_path_is_configured_by_default(): void
+    {
+        dump_file('scoper.inc.php', "<?php return ['prefix' => 'custom'];");
+
+        $this->setConfig([
+            'compactors' => [
+                PhpScoper::class,
+            ],
+        ]);
+
+        $compactors = $this->config->getCompactors();
+
+        $this->assertSame('custom', $compactors[0]->getScoper()->getPrefix());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+
+        $this->setConfig([
+            'php-scoper' => 'scoper.inc.php',
+            'compactors' => [
+                PhpScoper::class,
+            ],
+        ]);
+
+        $compactors = $this->config->getCompactors();
+
+        $this->assertSame('custom', $compactors[0]->getScoper()->getPrefix());
+
+        $this->assertSame(
+            ['The "php-scoper" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+
+        $this->setConfig([
+            'php-scoper' => null,
+            'compactors' => [
+                PhpScoper::class,
+            ],
+        ]);
+
+        $compactors = $this->config->getCompactors();
+
+        $this->assertSame('custom', $compactors[0]->getScoper()->getPrefix());
+
+        $this->assertSame(
+            ['The "php-scoper" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
         $this->assertSame([], $this->config->getWarnings());
     }
 
@@ -1337,6 +1413,144 @@ JSON
         }
     }
 
+    public function test_a_recommendation_is_given_if_the_configured_git_placeholder_is_the_default_value(): void
+    {
+        $this->setConfig([
+            'git' => null,
+        ]);
+
+        $this->assertSame([], $this->config->getReplacements());
+
+        $this->assertSame(
+            ['The "git" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_recommendation_is_given_if_the_configured_git_commit_placeholder_is_the_default_value(): void
+    {
+        $this->setConfig([
+            'git-commit' => null,
+        ]);
+
+        $this->assertSame([], $this->config->getReplacements());
+
+        $this->assertSame(
+            ['The "git-commit" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_recommendation_is_given_if_the_configured_git_short_hash_placeholder_is_the_default_value(): void
+    {
+        $this->setConfig([
+            'git-commit-short' => null,
+        ]);
+
+        $this->assertSame([], $this->config->getReplacements());
+
+        $this->assertSame(
+            ['The "git-commit-short" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_recommendation_is_given_if_the_configured_git_tag_placeholder_is_the_default_value(): void
+    {
+        $this->setConfig([
+            'git-tag' => null,
+        ]);
+
+        $this->assertSame([], $this->config->getReplacements());
+
+        $this->assertSame(
+            ['The "git-tag" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_recommendation_is_given_if_the_configured_git_version_placeholder_is_the_default_value(): void
+    {
+        $this->setConfig([
+            'git-version' => null,
+        ]);
+
+        $this->assertSame([], $this->config->getReplacements());
+
+        $this->assertSame(
+            ['The "git-version" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_recommendation_is_given_if_the_configured_datetime_format_is_the_default_value(): void
+    {
+        $this->setConfig([
+            'datetime-format' => 'Y-m-d H:i:s',
+        ]);
+
+        $this->assertSame([], $this->config->getReplacements());
+
+        $this->assertSame(
+            [
+                'The "datetime-format" setting can be omitted since is set to its default value',
+                'The setting "datetime-format" has been set but is unnecessary because the setting "datetime" is not set.',
+            ],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_recommendation_is_given_if_the_configured_datetime_is_the_default_value(): void
+    {
+        $this->setConfig([
+            'datetime' => null,
+        ]);
+
+        $this->assertSame([], $this->config->getReplacements());
+
+        $this->assertSame(
+            ['The "datetime" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_recommendation_is_given_if_the_datetime_format_is_configured_but_no_datetime_placeholder_is_not_provided(): void
+    {
+        $this->setConfig([
+            'datetime-format' => 'Y-m-d H:i',
+        ]);
+
+        $this->assertSame([], $this->config->getReplacements());
+
+        $this->assertSame(
+            ['The setting "datetime-format" has been set but is unnecessary because the setting "datetime" is not set.'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_recommendation_is_given_if_the_configured_replacement_sigil_is_the_default_value(): void
+    {
+        $this->setConfig([
+            'replacement-sigil' => null,
+        ]);
+
+        $this->assertSame([], $this->config->getReplacements());
+
+        $this->assertSame(
+            ['The "replacement-sigil" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
     public function test_the_shebang_can_be_disabled(): void
     {
         $this->setConfig([
@@ -1347,6 +1561,33 @@ JSON
         $this->assertNull($this->config->getShebang());
 
         $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_recommendation_is_given_if_the_shebang_is_the_default_value(): void
+    {
+        $this->setConfig([
+            'shebang' => null,
+        ]);
+
+        $this->assertSame('#!/usr/bin/env php', $this->config->getShebang());
+
+        $this->assertSame(
+            ['The "shebang" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+
+        $this->setConfig([
+            'shebang' => '#!/usr/bin/env php',
+        ]);
+
+        $this->assertSame('#!/usr/bin/env php', $this->config->getShebang());
+
+        $this->assertSame(
+            ['The "shebang" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
         $this->assertSame([], $this->config->getWarnings());
     }
 
@@ -1454,7 +1695,38 @@ BANNER;
         $this->assertSame($expected, $this->config->getStubBannerContents());
         $this->assertNull($this->config->getStubBannerPath());
 
-        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame(
+            ['The "banner" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_recommendation_is_given_if_the_banner_is_the_default_value(): void
+    {
+        $this->setConfig([
+            'banner' => null,
+        ]);
+
+        $this->assertSame(
+            ['The "banner" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+
+        $this->setConfig([
+            'banner' => <<<'BANNER'
+Generated by Humbug Box.
+
+@link https://github.com/humbug/box
+BANNER
+            ,
+        ]);
+
+        $this->assertSame(
+            ['The "banner" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
         $this->assertSame([], $this->config->getWarnings());
     }
 
@@ -1569,6 +1841,30 @@ COMMENT;
         $this->assertSame([], $this->config->getWarnings());
     }
 
+    public function test_a_recommendation_is_given_if_the_default_stub_banner_path_is_configured(): void
+    {
+        $this->setConfig([
+            'banner-file' => null,
+        ]);
+
+        $this->assertSame(
+            <<<'BANNER'
+Generated by Humbug Box.
+
+@link https://github.com/humbug/box
+BANNER
+            ,
+            $this->config->getStubBannerContents()
+        );
+        $this->assertNull($this->config->getStubBannerPath());
+
+        $this->assertSame(
+            ['The "banner-file" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
     public function test_the_banner_value_is_discarded_if_a_banner_file_is_registered(): void
     {
         $comment = <<<'COMMENT'
@@ -1647,6 +1943,19 @@ COMMENT;
     {
         $this->assertNull($this->config->getStubPath());
         $this->assertTrue($this->config->isStubGenerated());
+
+        $this->setConfig([
+            'stub' => null,
+        ]);
+
+        $this->assertNull($this->config->getStubPath());
+        $this->assertTrue($this->config->isStubGenerated());
+
+        $this->assertSame(
+            ['The "stub" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_custom_stub_can_be_provided(): void
@@ -1693,19 +2002,42 @@ COMMENT;
         $this->assertSame([], $this->config->getWarnings());
     }
 
-    public function testIsInterceptFileFuncs(): void
+    public function test_funcs_are_not_intercepted_by_default(): void
     {
-        $this->assertFalse($this->config->isInterceptFileFuncs());
+        $this->assertFalse($this->config->interceptsFileFuncs());
+
+        $this->setConfig([
+            'intercept' => null,
+        ]);
+
+        $this->assertFalse($this->config->interceptsFileFuncs());
+
+        $this->assertSame(
+            ['The "intercept" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+
+        $this->setConfig([
+            'intercept' => false,
+        ]);
+
+        $this->assertFalse($this->config->interceptsFileFuncs());
+
+        $this->assertSame(
+            ['The "intercept" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
     }
 
-    public function testIsInterceptFileFuncsSet(): void
+    public function test_the_intercept_funcs_can_be_enabled(): void
     {
         $this->setConfig([
             'intercept' => true,
-            'files' => [self::DEFAULT_FILE],
         ]);
 
-        $this->assertTrue($this->config->isInterceptFileFuncs());
+        $this->assertTrue($this->config->interceptsFileFuncs());
 
         $this->assertSame([], $this->config->getRecommendations());
         $this->assertSame([], $this->config->getWarnings());
@@ -1777,7 +2109,7 @@ COMMENT;
         $this->assertTrue($this->config->checkRequirements());
 
         $this->assertSame(
-            ['The "check-requirements" setting has been set but is unnecessary since its value is the default value'],
+            ['The "check-requirements" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations()
         );
         $this->assertSame([], $this->config->getWarnings());
@@ -1792,13 +2124,73 @@ COMMENT;
         $this->assertFalse($this->config->checkRequirements());
 
         $this->assertSame(
-            ['The "check-requirements" setting has been set but is unnecessary since its value is the default value'],
+            ['The "check-requirements" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations()
         );
         $this->assertSame(
             ['The requirement checker could not be used because the composer.json and composer.lock file could not be found.'],
             $this->config->getWarnings()
         );
+    }
+
+    public function test_a_recommendation_is_given_if_the_default_check_requirement_value_is_given(): void
+    {
+        $this->setConfig([
+            'check-requirements' => null,
+        ]);
+
+        $this->assertFalse($this->config->checkRequirements());
+
+        $this->assertSame(
+            ['The "check-requirements" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame(
+            ['The requirement checker could not be used because the composer.json and composer.lock file could not be found.'],
+            $this->config->getWarnings()
+        );
+
+        $this->setConfig([
+            'check-requirements' => true,
+        ]);
+
+        $this->assertFalse($this->config->checkRequirements());
+
+        $this->assertSame(
+            ['The "check-requirements" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame(
+            ['The requirement checker could not be used because the composer.json and composer.lock file could not be found.'],
+            $this->config->getWarnings()
+        );
+
+        file_put_contents('composer.json', '{}');
+        file_put_contents('composer.lock', '{}');
+
+        $this->setConfig([
+            'check-requirements' => null,
+        ]);
+
+        $this->assertTrue($this->config->checkRequirements());
+
+        $this->assertSame(
+            ['The "check-requirements" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+
+        $this->setConfig([
+            'check-requirements' => true,
+        ]);
+
+        $this->assertTrue($this->config->checkRequirements());
+
+        $this->assertSame(
+            ['The "check-requirements" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_it_can_be_created_with_only_default_values(): void
@@ -1851,7 +2243,7 @@ BANNER
         $this->assertNull($this->config->getStubPath());
         $this->assertSame($this->tmp.'/index.phar', $this->config->getTmpOutputPath());
         $this->assertTrue($this->config->hasMainScript());
-        $this->assertFalse($this->config->isInterceptFileFuncs());
+        $this->assertFalse($this->config->interceptsFileFuncs());
         $this->assertFalse($this->config->isPrivateKeyPrompt());
         $this->assertTrue($this->config->isStubGenerated());
     }

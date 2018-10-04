@@ -14,8 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use function array_push;
+use function array_shift;
+use function array_unshift;
 use const DIRECTORY_SEPARATOR;
 use Generator;
+use function in_array;
 use InvalidArgumentException;
 use Phar;
 
@@ -37,6 +41,29 @@ class ConfigurationSigningTest extends ConfigurationTestCase
         $this->assertSame([], $this->config->getWarnings());
     }
 
+    public function test_a_recommendation_is_given_if_the_configured_algorithm_is_the_default_value(): void
+    {
+        $this->setConfig([
+            'algorithm' => 'SHA1',
+        ]);
+
+        $this->assertSame(
+            ['The "algorithm" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+
+        $this->setConfig([
+            'algorithm' => null,
+        ]);
+
+        $this->assertSame(
+            ['The "algorithm" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
     /**
      * @dataProvider providePassFileFreeSigningAlgorithm
      */
@@ -48,7 +75,9 @@ class ConfigurationSigningTest extends ConfigurationTestCase
 
         $this->assertSame($expected, $this->config->getSigningAlgorithm());
 
-        $this->assertSame([], $this->config->getRecommendations());
+        if (false === in_array($algorithm, ['SHA1', false])) {
+            $this->assertSame([], $this->config->getRecommendations());
+        }
         $this->assertSame([], $this->config->getWarnings());
     }
 
@@ -97,7 +126,9 @@ class ConfigurationSigningTest extends ConfigurationTestCase
         $this->assertNull($this->config->getPrivateKeyPassphrase());
         $this->assertFalse($this->config->promptForPrivateKey());
 
-        $this->assertSame([], $this->config->getRecommendations());
+        if (false === in_array($algorithm, ['SHA1', false])) {
+            $this->assertSame([], $this->config->getRecommendations());
+        }
         $this->assertSame(
             [
                 'A prompt for password for the private key has been requested but ignored since the signing algorithm used is not "OPENSSL.',
@@ -115,10 +146,18 @@ class ConfigurationSigningTest extends ConfigurationTestCase
             $this->assertNull($this->config->getPrivateKeyPassphrase());
             $this->assertFalse($this->config->promptForPrivateKey());
 
-            $this->assertSame(
-                ['The setting "key-pass" has been set but is unnecessary since the signing algorithm is not "OPENSSL".'],
-                $this->config->getRecommendations()
-            );
+            $expectedRecommendation = [
+                'The setting "key-pass" has been set but is unnecessary since the signing algorithm is not "OPENSSL".',
+            ];
+
+            if (in_array($algorithm, ['SHA1', false])) {
+                array_unshift(
+                    $expectedRecommendation,
+                    'The "algorithm" setting can be omitted since is set to its default value'
+                );
+            }
+
+            $this->assertSame($expectedRecommendation, $this->config->getRecommendations());
             $this->assertSame([], $this->config->getWarnings());
         }
 
@@ -130,7 +169,9 @@ class ConfigurationSigningTest extends ConfigurationTestCase
         $this->assertNull($this->config->getPrivateKeyPassphrase());
         $this->assertFalse($this->config->promptForPrivateKey());
 
-        $this->assertSame([], $this->config->getRecommendations());
+        if (false === in_array($algorithm, ['SHA1', false])) {
+            $this->assertSame([], $this->config->getRecommendations());
+        }
         $this->assertSame(
             ['The setting "key-pass" has been set but ignored the signing algorithm is not "OPENSSL".'],
             $this->config->getWarnings()
@@ -151,7 +192,9 @@ class ConfigurationSigningTest extends ConfigurationTestCase
 
         $this->assertNull($this->config->getPrivateKeyPath());
 
-        $this->assertSame([], $this->config->getRecommendations());
+        if (false === in_array($algorithm, ['SHA1', false])) {
+            $this->assertSame([], $this->config->getRecommendations());
+        }
         $this->assertSame(
             ['The setting "key" has been set but is ignored since the signing algorithm is not "OPENSSL".'],
             $this->config->getWarnings()
@@ -164,10 +207,18 @@ class ConfigurationSigningTest extends ConfigurationTestCase
 
         $this->assertNull($this->config->getPrivateKeyPath());
 
-        $this->assertSame(
-            ['The setting "key" has been set but is unnecessary since the signing algorithm is not "OPENSSL".'],
-            $this->config->getRecommendations()
-        );
+        $expectedRecommendation = [
+            'The setting "key" has been set but is unnecessary since the signing algorithm is not "OPENSSL".',
+        ];
+
+        if (in_array($algorithm, ['SHA1', false])) {
+            array_unshift(
+                $expectedRecommendation,
+                'The "algorithm" setting can be omitted since is set to its default value'
+            );
+        }
+
+        $this->assertSame($expectedRecommendation, $this->config->getRecommendations());
         $this->assertSame([], $this->config->getWarnings());
     }
 

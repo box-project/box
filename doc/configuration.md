@@ -765,7 +765,7 @@ The datetime format placeholder (`string`|`null`, default `Y-m-d H:i:s`) setting
 
 ### Pretty git tag placeholder (`git`)
 
-The git tag placeholder (`string`|`null` default none) setting is the name of a placeholder value that will be replaced
+The git tag placeholder (`string`|`null` default `null`) setting is the name of a placeholder value that will be replaced
 in all [non-binary files][including-files] by the current git tag of the repository.
 
 Example of value the placeholder will be replaced with:
@@ -776,7 +776,7 @@ Example of value the placeholder will be replaced with:
 
 ### Git commit placeholder (`git-commit`)
 
-The git commit (`string`|`null` default none) setting is the name of a placeholder value that will be replaced in all
+The git commit (`string`|`null` default `null`) setting is the name of a placeholder value that will be replaced in all
 [non-binary files][including-files] by the current git commit hash of the repository.
 
 Example of value the placeholder will be replaced with: `e558e335f1d165bc24d43fdf903cdadd3c3cbd03`
@@ -784,7 +784,7 @@ Example of value the placeholder will be replaced with: `e558e335f1d165bc24d43fd
 
 ### Short git commit placeholder (`git-commit-short`)
 
-The short git commit (`string`|`null` default none) setting is the name of a placeholder value that will be replaced in
+The short git commit (`string`|`null` default `null`) setting is the name of a placeholder value that will be replaced in
 all [non-binary files][including-files] by the current git short commit hash of the repository.
 
 Example of value the placeholder will be replaced with: `e558e33`
@@ -792,7 +792,7 @@ Example of value the placeholder will be replaced with: `e558e33`
 
 ### Git tag placeholder (`git-tag`)
 
-The git tag placeholder (`string`|`null` default none) setting is the name of a placeholder value that will be replaced
+The git tag placeholder (`string`|`null` default `null`) setting is the name of a placeholder value that will be replaced
 in all [non-binary files][including-files] by the current git tag of the repository.
 
 Example of value the placeholder will be replaced with:
@@ -803,7 +803,7 @@ Example of value the placeholder will be replaced with:
 
 ### Git version placeholder (`git-version`)
 
-The git version (`string`|`null` default none) setting is the name of a placeholder value that will be replaced in all
+The git version (`string`|`null` default `null`) setting is the name of a placeholder value that will be replaced in all
 [non-binary files][including-files] by the one of the following (in order):
 
 - The git repository's most recent tag.
