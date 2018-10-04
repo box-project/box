@@ -748,7 +748,7 @@ EOF
         $stub = StubGenerator::create()
             ->alias($config->getAlias())
             ->index($main)
-            ->intercept($config->interceptsFileFuncs())
+            ->intercept($config->isInterceptFileFuncs())
             ->checkRequirements($checkRequirements)
         ;
 

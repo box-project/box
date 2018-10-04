@@ -634,16 +634,6 @@ BANNER;
 
     public function isInterceptFileFuncs(): bool
     {
-        @trigger_error(
-            'The function "Configuration::isInterceptFileFuncs()" is deprecated, use "Configuration::interceptsFileFuncs()" instead.',
-            E_USER_DEPRECATED
-        );
-
-        return $this->interceptsFileFuncs();
-    }
-
-    public function interceptsFileFuncs(): bool
-    {
         return $this->isInterceptFileFuncs;
     }
 

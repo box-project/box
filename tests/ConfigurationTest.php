@@ -2059,13 +2059,13 @@ COMMENT;
 
     public function test_funcs_are_not_intercepted_by_default(): void
     {
-        $this->assertFalse($this->config->interceptsFileFuncs());
+        $this->assertFalse($this->config->isInterceptFileFuncs());
 
         $this->setConfig([
             'intercept' => null,
         ]);
 
-        $this->assertFalse($this->config->interceptsFileFuncs());
+        $this->assertFalse($this->config->isInterceptFileFuncs());
 
         $this->assertSame(
             ['The "intercept" setting can be omitted since is set to its default value'],
@@ -2077,7 +2077,7 @@ COMMENT;
             'intercept' => false,
         ]);
 
-        $this->assertFalse($this->config->interceptsFileFuncs());
+        $this->assertFalse($this->config->isInterceptFileFuncs());
 
         $this->assertSame(
             ['The "intercept" setting can be omitted since is set to its default value'],
@@ -2092,7 +2092,7 @@ COMMENT;
             'intercept' => true,
         ]);
 
-        $this->assertTrue($this->config->interceptsFileFuncs());
+        $this->assertTrue($this->config->isInterceptFileFuncs());
 
         $this->assertSame([], $this->config->getRecommendations());
         $this->assertSame([], $this->config->getWarnings());
@@ -2298,7 +2298,7 @@ BANNER
         $this->assertNull($this->config->getStubPath());
         $this->assertSame($this->tmp.'/index.phar', $this->config->getTmpOutputPath());
         $this->assertTrue($this->config->hasMainScript());
-        $this->assertFalse($this->config->interceptsFileFuncs());
+        $this->assertFalse($this->config->isInterceptFileFuncs());
         $this->assertFalse($this->config->isPrivateKeyPrompt());
         $this->assertTrue($this->config->isStubGenerated());
     }
