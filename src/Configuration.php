@@ -238,12 +238,12 @@ BANNER;
 
         $dumpAutoload = self::retrieveDumpAutoload($raw, null !== $composerJson[0], $logger);
 
-        $excludeComposerFiles = self::retrieveExcludeComposerFiles($raw);
+        $excludeComposerFiles = self::retrieveExcludeComposerFiles($raw, $logger);
 
         $compactors = self::retrieveCompactors($raw, $basePath, $logger);
-        $compressionAlgorithm = self::retrieveCompressionAlgorithm($raw);
+        $compressionAlgorithm = self::retrieveCompressionAlgorithm($raw, $logger);
 
-        $fileMode = self::retrieveFileMode($raw);
+        $fileMode = self::retrieveFileMode($raw, $logger);
 
         $map = self::retrieveMap($raw, $logger);
         $fileMapper = new MapFile($basePath, $map);
@@ -781,7 +781,7 @@ BANNER;
         /** @var string[] $blacklist */
         $blacklist = array_merge(
             array_filter($excludedPaths),
-            $raw->blacklist ?? []
+            $raw->{self::BLACKLIST_KEY} ?? []
         );
 
         $normalizedBlacklist = [];
@@ -1538,9 +1538,15 @@ BANNER;
         return $composerJson && false !== $dumpAutoload;
     }
 
-    private static function retrieveExcludeComposerFiles(stdClass $raw): bool
+    private static function retrieveExcludeComposerFiles(stdClass $raw, ConfigurationLogger $logger): bool
     {
-        return $raw->{'exclude-composer-files'} ?? true;
+        if (property_exists($raw, self::EXCLUDE_COMPOSER_FILES_KEY)
+            && (null === $raw->{self::EXCLUDE_COMPOSER_FILES_KEY} || true === $raw->{self::EXCLUDE_COMPOSER_FILES_KEY})
+        ) {
+            self::addRecommendationForDefaultValue($logger, self::EXCLUDE_COMPOSER_FILES_KEY);
+        }
+
+        return $raw->{self::EXCLUDE_COMPOSER_FILES_KEY} ?? true;
     }
 
     /**
@@ -1554,7 +1560,7 @@ BANNER;
             self::addRecommendationForDefaultValue($logger, self::COMPACTORS_KEY);
         }
 
-        if (false === isset($raw->compactors)) {
+        if (false === isset($raw->{self::COMPACTORS_KEY})) {
             return [];
         }
 
@@ -1598,16 +1604,20 @@ BANNER;
         );
     }
 
-    private static function retrieveCompressionAlgorithm(stdClass $raw): ?int
+    private static function retrieveCompressionAlgorithm(stdClass $raw, ConfigurationLogger $logger): ?int
     {
-        if (false === isset($raw->compression)) {
+        if (property_exists($raw, self::COMPRESSION_KEY) && null === $raw->{self::COMPRESSION_KEY}) {
+            self::addRecommendationForDefaultValue($logger, self::COMPRESSION_KEY);
+        }
+
+        if (false === isset($raw->{self::COMPRESSION_KEY})) {
             return null;
         }
 
         $knownAlgorithmNames = array_keys(get_phar_compression_algorithms());
 
         Assertion::inArray(
-            $raw->compression,
+            $raw->{self::COMPRESSION_KEY},
             $knownAlgorithmNames,
             sprintf(
                 'Invalid compression algorithm "%%s", use one of "%s" instead.',
@@ -1615,7 +1625,7 @@ BANNER;
             )
         );
 
-        $value = get_phar_compression_algorithms()[$raw->compression];
+        $value = get_phar_compression_algorithms()[$raw->{self::COMPRESSION_KEY}];
 
         // Phar::NONE is not valid for compressFiles()
         if (Phar::NONE === $value) {
@@ -1625,13 +1635,25 @@ BANNER;
         return $value;
     }
 
-    private static function retrieveFileMode(stdClass $raw): ?int
+    private static function retrieveFileMode(stdClass $raw, ConfigurationLogger $logger): ?int
     {
-        if (isset($raw->chmod)) {
-            return intval($raw->chmod, 8);
+        if (property_exists($raw, self::CHMOD_KEY) && null === $raw->{self::CHMOD_KEY}) {
+            self::addRecommendationForDefaultValue($logger, self::CHMOD_KEY);
         }
 
-        return intval(0755, 8);
+        $defaultChmod = intval(0755, 8);
+
+        if (isset($raw->{self::CHMOD_KEY})) {
+            $chmod =  intval($raw->{self::CHMOD_KEY}, 8);
+
+            if ($defaultChmod === $chmod) {
+                self::addRecommendationForDefaultValue($logger, self::CHMOD_KEY);
+            }
+
+            return $chmod;
+        }
+
+        return $defaultChmod;
     }
 
     private static function retrieveMainScriptPath(
@@ -1652,8 +1674,8 @@ BANNER;
             }
         }
         
-        if (isset($raw->main)) {
-            $main = $raw->main;
+        if (isset($raw->{self::MAIN_KEY})) {
+            $main = $raw->{self::MAIN_KEY};
 
             if (is_string($main)) {
                 $main = self::normalizePath($main, $basePath);
@@ -1911,7 +1933,7 @@ BANNER;
             return [];
         }
 
-        $replacements = isset($raw->replacements) ? (array) $raw->replacements : [];
+        $replacements = isset($raw->{self::REPLACEMENTS_KEY}) ? (array) $raw->{self::REPLACEMENTS_KEY} : [];
 
         if (null !== ($git = self::retrievePrettyGitPlaceholder($raw, $logger))) {
             $replacements[$git] = self::retrievePrettyGitTag($file);
@@ -2208,11 +2230,11 @@ BANNER;
             self::addRecommendationForDefaultValue($logger, self::BANNER_FILE_KEY);
         }
 
-        if (false === isset($raw->{'banner-file'})) {
+        if (false === isset($raw->{self::BANNER_FILE_KEY})) {
             return null;
         }
 
-        $bannerFile = make_path_absolute($raw->{'banner-file'}, $basePath);
+        $bannerFile = make_path_absolute($raw->{self::BANNER_FILE_KEY}, $basePath);
 
         Assertion::file($bannerFile);
 
@@ -2237,8 +2259,8 @@ BANNER;
             self::addRecommendationForDefaultValue($logger, self::STUB_KEY);
         }
 
-        if (isset($raw->stub) && is_string($raw->stub)) {
-            $stubPath = make_path_absolute($raw->stub, $basePath);
+        if (isset($raw->{self::STUB_KEY}) && is_string($raw->{self::STUB_KEY})) {
+            $stubPath = make_path_absolute($raw->{self::STUB_KEY}, $basePath);
 
             Assertion::file($stubPath);
 
@@ -2264,7 +2286,7 @@ BANNER;
         int $signingAlgorithm,
         ConfigurationLogger $logger
     ): bool {
-        if (isset($raw->{'key-pass'}) && true === $raw->{'key-pass'}) {
+        if (isset($raw->{self::KEY_PASS_KEY}) && true === $raw->{self::KEY_PASS_KEY}) {
             if (Phar::OPENSSL !== $signingAlgorithm) {
                 $logger->addWarning(
                     'A prompt for password for the private key has been requested but ignored since the signing '
@@ -2282,7 +2304,7 @@ BANNER;
 
     private static function retrieveIsStubGenerated(stdClass $raw, ?string $stubPath): bool
     {
-        return null === $stubPath && (false === isset($raw->stub) || false !== $raw->stub);
+        return null === $stubPath && (false === isset($raw->{self::STUB_KEY}) || false !== $raw->{self::STUB_KEY});
     }
 
     private static function retrieveCheckRequirements(
@@ -2377,9 +2399,9 @@ BANNER;
         // TODO: false === not set; check & add test/doc
         $tokenizer = new Tokenizer();
 
-        if (false === empty($raw->annotations) && isset($raw->annotations->ignore)) {
+        if (false === empty($raw->{self::ANNOTATIONS_KEY}) && isset($raw->{self::ANNOTATIONS_KEY}->ignore)) {
             $tokenizer->ignore(
-                (array) $raw->annotations->ignore
+                (array) $raw->{self::ANNOTATIONS_KEY}->ignore
             );
         }
 

@@ -429,7 +429,23 @@ EOF
         $this->assertTrue($this->config->excludeComposerFiles());
         $this->assertTrue($this->getNoFileConfig()->excludeComposerFiles());
 
-        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame(
+            ['The "exclude-composer-files" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+
+        $this->setConfig([
+            'exclude-composer-files' => true,
+        ]);
+
+        $this->assertTrue($this->config->excludeComposerFiles());
+        $this->assertTrue($this->getNoFileConfig()->excludeComposerFiles());
+
+        $this->assertSame(
+            ['The "exclude-composer-files" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
         $this->assertSame([], $this->config->getWarnings());
     }
 
@@ -441,7 +457,10 @@ EOF
 
         $this->assertTrue($this->config->excludeComposerFiles());
 
-        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame(
+            ['The "exclude-composer-files" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
         $this->assertSame([], $this->config->getWarnings());
 
         $this->setConfig([
@@ -656,6 +675,18 @@ EOF
     {
         $this->assertNull($this->config->getCompressionAlgorithm());
         $this->assertNull($this->getNoFileConfig()->getCompressionAlgorithm());
+
+        $this->setConfig([
+            'compression' => null,
+        ]);
+
+        $this->assertNull($this->config->getCompressionAlgorithm());
+
+        $this->assertSame(
+            ['The "compression" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_compression_algorithm_with_a_string(): void
@@ -702,6 +733,30 @@ EOF
     {
         $this->assertSame(493, $this->config->getFileMode());
         $this->assertSame(493, $this->getNoFileConfig()->getFileMode());
+
+        $this->setConfig([
+            'chmod' => '0755',
+        ]);
+
+        $this->assertSame(493, $this->config->getFileMode());
+
+        $this->assertSame(
+            ['The "chmod" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+
+        $this->setConfig([
+            'chmod' => '755',
+        ]);
+
+        $this->assertSame(493, $this->config->getFileMode());
+
+        $this->assertSame(
+            ['The "chmod" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_configure_file_mode(): void
