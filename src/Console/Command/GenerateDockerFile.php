@@ -47,7 +47,6 @@ final class GenerateDockerFile extends Command
     use CreateTemporaryPharFile;
 
     private const PHAR_ARG = 'phar';
-    private const VERBOSITY_LEVEL = OutputInterface::VERBOSITY_VERBOSE;
 
     private const DOCKER_FILE_TEMPLATE = <<<'Dockerfile'
 FROM php:__BASE_PHP_IMAGE_TOKEN__
@@ -74,7 +73,7 @@ Dockerfile;
     protected function configure(): void
     {
         $this->setName('docker');
-        $this->setDescription('Generates a Dockerfile for the given PHAR');
+        $this->setDescription('Generates a Dockerfile for the given PHAR 🐳');
         $this->addArgument(
             self::PHAR_ARG,
             InputArgument::REQUIRED,
@@ -95,12 +94,11 @@ Dockerfile;
 
         $pharPath = false !== realpath($pharPath) ? realpath($pharPath) : $pharPath;
 
-        $io->writeln(
+        $io->comment(
             sprintf(
-                'Generating a Dockerfile for the PHAR "<comment>%s</comment>"...',
+                'Generating a Dockerfile for the PHAR "<comment>%s</comment>" 🐳',
                 $pharPath
-            ),
-            self::VERBOSITY_LEVEL
+            )
         );
 
         $tmpPharPath = $this->createTemporaryPhar($pharPath);
@@ -160,19 +158,17 @@ Dockerfile;
                 }
             }
 
-            if ($io->getVerbosity() >= self::VERBOSITY_LEVEL) {
-                $io->success('Done');
+            $io->success('Done');
 
-                $io->writeln(
-                    [
-                        sprintf(
-                            'You can now inspect your <comment>%s</comment> file or build your container with:',
-                            self::DOCKER_FILE_NAME
-                        ),
-                        '$ <comment>docker build .</comment>',
-                    ]
-                );
-            }
+            $io->writeln(
+                [
+                    sprintf(
+                        'You can now inspect your <comment>%s</comment> file or build your container with:',
+                        self::DOCKER_FILE_NAME
+                    ),
+                    '$ <comment>docker build .</comment>',
+                ]
+            );
         } finally {
             if ($tmpPharPath !== $pharPath) {
                 remove($tmpPharPath);
