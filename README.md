@@ -27,6 +27,7 @@ great things:
 - 🔐️ Verify the signature of an existing PHAR (`box verify`)
 - 📝 Use Git tags and short commit hashes for versioning
 - 🕵️️ Get recommendations and warnings about regarding your configuration
+- 🐳 Docker support (`box docker`)
 
 
 ## Table of Contents
