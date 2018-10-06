@@ -714,9 +714,7 @@ BANNER;
 
     private static function retrieveForceFilesAutodiscovery(stdClass $raw, ConfigurationLogger $logger): bool
     {
-        if (property_exists($raw, self::AUTO_DISCOVERY_KEY) && false === $raw->{self::AUTO_DISCOVERY_KEY}) {
-            self::addRecommendationForDefaultValue($logger, self::AUTO_DISCOVERY_KEY);
-        }
+        self::checkIfDefaultValue($logger, $raw, self::AUTO_DISCOVERY_KEY, false);
 
         return $raw->{self::AUTO_DISCOVERY_KEY} ?? false;
     }
@@ -761,9 +759,7 @@ BANNER;
         ConfigurationLogger $logger,
         ?string ...$excludedPaths
     ): array {
-        if (property_exists($raw, self::BLACKLIST_KEY) && [] === $raw->{self::BLACKLIST_KEY}) {
-            self::addRecommendationForDefaultValue($logger, self::BLACKLIST_KEY);
-        }
+        self::checkIfDefaultValue($logger, $raw, self::BLACKLIST_KEY, []);
 
         /** @var string[] $blacklist */
         $blacklist = array_merge(
@@ -902,6 +898,8 @@ BANNER;
         ?string $mainScriptPath,
         ConfigurationLogger $logger
     ): array {
+        self::checkIfDefaultValue($logger, $raw, $key, []);
+
         $files = [];
 
         if (isset($composerFiles[0][0])) {
@@ -917,8 +915,6 @@ BANNER;
         }
 
         if ([] === (array) $raw->{$key}) {
-            self::addRecommendationForDefaultValue($logger, $key);
-
             return $files;
         }
 
@@ -998,19 +994,15 @@ BANNER;
         array $devPackages,
         ConfigurationLogger $logger
     ): array {
-        if (isset($raw->{$key})) {
-            $finder = $raw->{$key};
+        self::checkIfDefaultValue($logger, $raw, $key, []);
 
-            if ([] === $finder) {
-                self::addRecommendationForDefaultValue($logger, $key);
-
-                return [];
-            }
-
-            return self::processFinders($finder, $basePath, $blacklistFilter, $devPackages);
+        if (false === isset($raw->{$key})) {
+            return [];
         }
 
-        return [];
+        $finder = $raw->{$key};
+
+        return self::processFinders($finder, $basePath, $blacklistFilter, $devPackages);
     }
 
     /**
@@ -1458,17 +1450,13 @@ BANNER;
         string $basePath,
         ConfigurationLogger $logger
     ): array {
+        self::checkIfDefaultValue($logger, $raw, $key, []);
+
         if (false === isset($raw->{$key})) {
             return [];
         }
 
         $directories = $raw->{$key};
-
-        if ([] === $directories) {
-            self::addRecommendationForDefaultValue($logger, $key);
-
-            return [];
-        }
 
         $normalizeDirectory = function (string $directory) use ($basePath, $key): string {
             $directory = self::normalizePath($directory, $basePath);
@@ -1502,9 +1490,7 @@ BANNER;
 
     private static function retrieveDumpAutoload(stdClass $raw, bool $composerJson, ConfigurationLogger $logger): bool
     {
-        if (property_exists($raw, self::DUMP_AUTOLOAD_KEY) && true === $raw->{self::DUMP_AUTOLOAD_KEY}) {
-            self::addRecommendationForDefaultValue($logger, self::DUMP_AUTOLOAD_KEY);
-        }
+        self::checkIfDefaultValue($logger, $raw, self::DUMP_AUTOLOAD_KEY, true);
 
         if (false === property_exists($raw, self::DUMP_AUTOLOAD_KEY)) {
             return $composerJson;
@@ -1526,11 +1512,7 @@ BANNER;
 
     private static function retrieveExcludeComposerFiles(stdClass $raw, ConfigurationLogger $logger): bool
     {
-        if (property_exists($raw, self::EXCLUDE_COMPOSER_FILES_KEY)
-            && (null === $raw->{self::EXCLUDE_COMPOSER_FILES_KEY} || true === $raw->{self::EXCLUDE_COMPOSER_FILES_KEY})
-        ) {
-            self::addRecommendationForDefaultValue($logger, self::EXCLUDE_COMPOSER_FILES_KEY);
-        }
+        self::checkIfDefaultValue($logger, $raw, self::EXCLUDE_COMPOSER_FILES_KEY, true);
 
         return $raw->{self::EXCLUDE_COMPOSER_FILES_KEY} ?? true;
     }
@@ -1540,11 +1522,7 @@ BANNER;
      */
     private static function retrieveCompactors(stdClass $raw, string $basePath, ConfigurationLogger $logger): array
     {
-        if (property_exists($raw, self::COMPACTORS_KEY)
-            && (null === $raw->{self::COMPACTORS_KEY} || [] === $raw->{self::COMPACTORS_KEY})
-        ) {
-            self::addRecommendationForDefaultValue($logger, self::COMPACTORS_KEY);
-        }
+        self::checkIfDefaultValue($logger, $raw, self::COMPACTORS_KEY, []);
 
         if (false === isset($raw->{self::COMPACTORS_KEY})) {
             return [];
@@ -1592,9 +1570,7 @@ BANNER;
 
     private static function retrieveCompressionAlgorithm(stdClass $raw, ConfigurationLogger $logger): ?int
     {
-        if (property_exists($raw, self::COMPRESSION_KEY) && null === $raw->{self::COMPRESSION_KEY}) {
-            self::addRecommendationForDefaultValue($logger, self::COMPRESSION_KEY);
-        }
+        self::checkIfDefaultValue($logger, $raw, self::COMPRESSION_KEY);
 
         if (false === isset($raw->{self::COMPRESSION_KEY})) {
             return null;
@@ -1745,16 +1721,14 @@ BANNER;
      */
     private static function retrieveMap(stdClass $raw, ConfigurationLogger $logger): array
     {
+        self::checkIfDefaultValue($logger, $raw, self::MAP_KEY, []);
+
         if (false === isset($raw->{self::MAP_KEY})) {
             return [];
         }
 
         $map = [];
         $rawMap = (array) $raw->{self::MAP_KEY};
-
-        if ([] === $rawMap) {
-            self::addRecommendationForDefaultValue($logger, self::MAP_KEY);
-        }
 
         foreach ($rawMap as $item) {
             $processed = [];
@@ -1780,9 +1754,7 @@ BANNER;
      */
     private static function retrieveMetadata(stdClass $raw, ConfigurationLogger $logger)
     {
-        if (property_exists($raw, self::METADATA_KEY) && null === $raw->{self::METADATA_KEY}) {
-            self::addRecommendationForDefaultValue($logger, self::METADATA_KEY);
-        }
+        self::checkIfDefaultValue($logger, $raw, self::METADATA_KEY);
 
         if (false === isset($raw->{self::METADATA_KEY})) {
             return null;
@@ -1873,6 +1845,8 @@ BANNER;
         int $algorithm,
         ConfigurationLogger $logger
     ): ?string {
+        self::checkIfDefaultValue($logger, $raw, self::KEY_PASS_KEY);
+
         if (false === property_exists($raw, self::KEY_PASS_KEY)) {
             return null;
         }
@@ -1909,9 +1883,7 @@ BANNER;
      */
     private static function retrieveReplacements(stdClass $raw, ?string $file, ConfigurationLogger $logger): array
     {
-        if (property_exists($raw, self::REPLACEMENTS_KEY) && new stdClass() == $raw->{self::REPLACEMENTS_KEY}) {
-            self::addRecommendationForDefaultValue($logger, self::REPLACEMENTS_KEY);
-        }
+        self::checkIfDefaultValue($logger, $raw, self::REPLACEMENTS_KEY, new stdClass());
 
         if (null === $file) {
             return [];
@@ -2006,9 +1978,7 @@ BANNER;
 
     private static function retrievePlaceholder(stdClass $raw, ConfigurationLogger $logger, string $key): ?string
     {
-        if (property_exists($raw, $key) && null === $raw->{$key}) {
-            self::addRecommendationForDefaultValue($logger, $key);
-        }
+        self::checkIfDefaultValue($logger, $raw, $key);
 
         return $raw->{$key} ?? null;
     }
@@ -2069,6 +2039,9 @@ BANNER;
 
     private static function retrieveDatetimeFormat(stdClass $raw, ConfigurationLogger $logger): array
     {
+        self::checkIfDefaultValue($logger, $raw, self::DATETIME_FORMAT_KEY, self::DEFAULT_DATETIME_FORMAT);
+        self::checkIfDefaultValue($logger, $raw, self::DATETIME_FORMAT_KEY, self::DATETIME_FORMAT_DEPRECATED_KEY);
+
         if (isset($raw->{self::DATETIME_FORMAT_KEY})) {
             $format = $raw->{self::DATETIME_FORMAT_KEY};
         } elseif (isset($raw->{self::DATETIME_FORMAT_DEPRECATED_KEY})) {
@@ -2081,10 +2054,6 @@ BANNER;
             $format = $raw->{self::DATETIME_FORMAT_DEPRECATED_KEY};
         } else {
             $format = null;
-        }
-        /** @var null|string $format */
-        if (self::DEFAULT_DATETIME_FORMAT === $format) {
-            self::addRecommendationForDefaultValue($logger, self::DATETIME_FORMAT_KEY);
         }
 
         if (null !== $format) {
@@ -2111,6 +2080,8 @@ BANNER;
 
     private static function retrieveShebang(stdClass $raw, ConfigurationLogger $logger): ?string
     {
+        self::checkIfDefaultValue($logger, $raw, self::SHEBANG_KEY, self::DEFAULT_SHEBANG);
+
         if (false === array_key_exists(self::SHEBANG_KEY, (array) $raw)) {
             return self::DEFAULT_SHEBANG;
         }
@@ -2122,8 +2093,6 @@ BANNER;
         }
 
         if (null === $shebang) {
-            self::addRecommendationForDefaultValue($logger, self::SHEBANG_KEY);
-
             $shebang = self::DEFAULT_SHEBANG;
         }
 
@@ -2139,10 +2108,6 @@ BANNER;
                 $shebang
             )
         );
-
-        if (self::DEFAULT_SHEBANG === $shebang) {
-            self::addRecommendationForDefaultValue($logger, self::SHEBANG_KEY);
-        }
 
         return $shebang;
     }
@@ -2180,19 +2145,13 @@ BANNER;
 
     private static function retrieveStubBannerContents(stdClass $raw, ConfigurationLogger $logger): ?string
     {
-        if (property_exists($raw, self::BANNER_KEY) && null === $raw->{self::BANNER_KEY}) {
-            self::addRecommendationForDefaultValue($logger, self::BANNER_KEY);
-        }
+        self::checkIfDefaultValue($logger, $raw, self::BANNER_KEY, self::DEFAULT_BANNER);
 
         if (false === isset($raw->{self::BANNER_KEY})) {
             return self::DEFAULT_BANNER;
         }
 
         $banner = $raw->{self::BANNER_KEY};
-
-        if (self::DEFAULT_BANNER === $banner) {
-            self::addRecommendationForDefaultValue($logger, self::BANNER_KEY);
-        }
 
         if (false === $banner) {
             return null;
@@ -2209,9 +2168,7 @@ BANNER;
 
     private static function retrieveStubBannerPath(stdClass $raw, string $basePath, ConfigurationLogger $logger): ?string
     {
-        if (property_exists($raw, self::BANNER_FILE_KEY) && null === $raw->{self::BANNER_FILE_KEY}) {
-            self::addRecommendationForDefaultValue($logger, self::BANNER_FILE_KEY);
-        }
+        self::checkIfDefaultValue($logger, $raw, self::BANNER_FILE_KEY);
 
         if (false === isset($raw->{self::BANNER_FILE_KEY})) {
             return null;
@@ -2238,9 +2195,7 @@ BANNER;
 
     private static function retrieveStubPath(stdClass $raw, string $basePath, ConfigurationLogger $logger): ?string
     {
-        if (property_exists($raw, self::STUB_KEY) && null === $raw->{self::STUB_KEY}) {
-            self::addRecommendationForDefaultValue($logger, self::STUB_KEY);
-        }
+        self::checkIfDefaultValue($logger, $raw, self::STUB_KEY);
 
         if (isset($raw->{self::STUB_KEY}) && is_string($raw->{self::STUB_KEY})) {
             $stubPath = make_path_absolute($raw->{self::STUB_KEY}, $basePath);
@@ -2255,11 +2210,7 @@ BANNER;
 
     private static function retrieveInterceptsFileFuncs(stdClass $raw, ConfigurationLogger $logger): bool
     {
-        if (property_exists($raw, self::INTERCEPT_KEY)
-            && (null === $raw->{self::INTERCEPT_KEY} || false === $raw->{self::INTERCEPT_KEY})
-        ) {
-            self::addRecommendationForDefaultValue($logger, self::INTERCEPT_KEY);
-        }
+        self::checkIfDefaultValue($logger, $raw, self::INTERCEPT_KEY, false);
 
         return $raw->{self::INTERCEPT_KEY} ?? false;
     }
@@ -2287,9 +2238,7 @@ BANNER;
 
     private static function retrieveIsStubGenerated(stdClass $raw, ?string $stubPath, ConfigurationLogger $logger): bool
     {
-        if (property_exists($raw, self::STUB_KEY) && true === $raw->{self::STUB_KEY}) {
-            self::addRecommendationForDefaultValue($logger, self::STUB_KEY);
-        }
+        self::checkIfDefaultValue($logger, $raw, self::STUB_KEY, true);
 
         return null === $stubPath && (false === isset($raw->{self::STUB_KEY}) || false !== $raw->{self::STUB_KEY});
     }
@@ -2300,11 +2249,7 @@ BANNER;
         bool $hasComposerLock,
         ConfigurationLogger $logger
     ): bool {
-        if (property_exists($raw, self::CHECK_REQUIREMENTS_KEY)
-            && (null === $raw->{self::CHECK_REQUIREMENTS_KEY} || true === $raw->{self::CHECK_REQUIREMENTS_KEY})
-        ) {
-            self::addRecommendationForDefaultValue($logger, self::CHECK_REQUIREMENTS_KEY);
-        }
+        self::checkIfDefaultValue($logger, $raw, self::CHECK_REQUIREMENTS_KEY, true);
 
         if (false === property_exists($raw, self::CHECK_REQUIREMENTS_KEY)) {
             return $hasComposerJson || $hasComposerLock;
@@ -2328,11 +2273,7 @@ BANNER;
     private static function retrievePhpScoperConfig(stdClass $raw, string $basePath, ConfigurationLogger $logger): PhpScoperConfiguration
     {
         // TODO: add recommendations regarding the order
-        if (property_exists($raw, self::PHP_SCOPER_KEY)
-            && (null === $raw->{self::PHP_SCOPER_KEY} || self::PHP_SCOPER_CONFIG === $raw->{self::PHP_SCOPER_KEY})
-        ) {
-            self::addRecommendationForDefaultValue($logger, self::PHP_SCOPER_KEY);
-        }
+        self::checkIfDefaultValue($logger, $raw, self::PHP_SCOPER_KEY, self::PHP_SCOPER_CONFIG);
 
         if (!isset($raw->{self::PHP_SCOPER_KEY})) {
             $configFilePath = make_path_absolute(self::PHP_SCOPER_CONFIG, $basePath);
@@ -2393,6 +2334,31 @@ BANNER;
         }
 
         return new Php($tokenizer);
+    }
+
+    private static function checkIfDefaultValue(
+        ConfigurationLogger $logger,
+        stdClass $raw,
+        string $key,
+        $defaultValue = null
+    ): void {
+        if (false === property_exists($raw, $key)) {
+            return;
+        }
+
+        $value = $raw->{$key};
+
+        if (null === $value
+            || (false === is_object($defaultValue) && $defaultValue === $value)
+            || (is_object($defaultValue) && $defaultValue == $value)
+        ) {
+            $logger->addRecommendation(
+                sprintf(
+                    'The "%s" setting can be omitted since is set to its default value',
+                    $key
+                )
+            );
+        }
     }
 
     private static function addRecommendationForDefaultValue(ConfigurationLogger $logger, string $key): void

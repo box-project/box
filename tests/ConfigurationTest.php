@@ -353,7 +353,10 @@ EOF
 
         $this->assertFalse($this->config->dumpAutoload());
 
-        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame(
+            ['The "dump-autoload" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
         $this->assertSame(
             ['The "dump-autoload" setting has been set but has been ignored because the composer.json file necessary for it could not be found'],
             $this->config->getWarnings()
@@ -370,7 +373,10 @@ EOF
 
         $this->assertTrue($this->config->dumpAutoload());
 
-        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame(
+            ['The "dump-autoload" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
         $this->assertSame([], $this->config->getWarnings());
     }
 
