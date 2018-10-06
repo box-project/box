@@ -2255,7 +2255,7 @@ BANNER;
             return $hasComposerJson || $hasComposerLock;
         }
 
-        /** @var null|bool $checkRequirements */
+        /** @var bool $checkRequirements */
         $checkRequirements = $raw->{self::CHECK_REQUIREMENTS_KEY} ?? true;
 
         if ($checkRequirements && false === $hasComposerJson && false === $hasComposerLock) {
