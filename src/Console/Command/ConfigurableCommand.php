@@ -31,7 +31,7 @@ use function sprintf;
  *
  * @private
  */
-abstract class Configurable extends Command
+abstract class ConfigurableCommand extends Command
 {
     private const CONFIG_PARAM = 'config';
 

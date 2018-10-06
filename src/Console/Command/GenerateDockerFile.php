@@ -16,11 +16,10 @@ namespace KevinGH\Box\Console\Command;
 
 use Assert\Assertion;
 use Composer\Semver\Semver;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use UnexpectedValueException;
@@ -37,12 +36,11 @@ use function KevinGH\Box\FileSystem\remove;
 use function realpath;
 use function sprintf;
 use function str_replace;
-use function var_dump;
 
 /**
  * @private
  */
-final class GenerateDockerFile extends Command
+final class GenerateDockerFile extends ConfigurableCommand
 {
     use CreateTemporaryPharFile;
 
@@ -72,11 +70,13 @@ Dockerfile;
      */
     protected function configure(): void
     {
+        parent::configure();
+
         $this->setName('docker');
         $this->setDescription('Generates a Dockerfile for the given PHAR 🐳');
         $this->addArgument(
             self::PHAR_ARG,
-            InputArgument::REQUIRED,
+            InputArgument::OPTIONAL,
             'The PHAR file'
         );
     }
@@ -89,6 +89,14 @@ Dockerfile;
         $io = new SymfonyStyle($input, $output);
 
         $pharPath = $input->getArgument(self::PHAR_ARG);
+
+        if (null === $pharPath) {
+            $pharPath = $this->guessPharPath($input, $output, $io);
+        }
+
+        if (null === $pharPath) {
+            return 1;
+        }
 
         Assertion::file($pharPath);
 
@@ -232,5 +240,49 @@ Dockerfile;
                 $extensions
             )
         );
+    }
+
+    private function guessPharPath(InputInterface $input, OutputInterface $output, SymfonyStyle $io): ?string
+    {
+        $config = $this->getConfig($input, $output, true);
+
+        if (file_exists($config->getOutputPath())) {
+            return $config->getOutputPath();
+        }
+
+        $compile = $io->askQuestion(
+            new ConfirmationQuestion(
+                'The output PHAR could not be found, do you wish to generate it by running "<comment>box '
+                .'compile</comment>"?',
+                true
+            )
+        );
+
+        if (false === $compile) {
+            $io->error('Could not find the PHAR to generate the docker file for');
+
+            return null;
+        }
+
+        $compileCommand = $this->getApplication()->find('compile');
+
+        if ($output->isQuiet()) {
+            $compileInput = '--quiet';
+        } elseif ($output->isVerbose()) {
+            $compileInput = '--verbose 1';
+        } elseif ($output->isVeryVerbose()) {
+            $compileInput = '--verbose 2';
+        } elseif ($output->isDebug()) {
+            $compileInput = '--verbose 3';
+        } else {
+            $compileInput = '';
+        }
+
+        $compileInput = new StringInput($compileInput);
+        $compileInput->setInteractive(false);
+
+        $compileCommand->run($compileInput, $output);
+
+        return $config->getOutputPath();
     }
 }

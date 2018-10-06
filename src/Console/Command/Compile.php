@@ -72,7 +72,7 @@ use function substr;
  * @final
  * @private
  */
-class Compile extends Configurable
+class Compile extends ConfigurableCommand
 {
     use ChangeableWorkingDirectory;
 
