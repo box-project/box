@@ -2,7 +2,5 @@
     "alias": "test.phar",
     "compression": "GZ",
     "files": ["test.php"],
-    "main": "test.php",
-    "output": "test.phar",
-    "stub": true
+    "main": "test.php"
 }

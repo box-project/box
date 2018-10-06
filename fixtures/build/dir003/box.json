@@ -2,8 +2,6 @@
     "alias": "test.phar",
     "banner-file": "banner",
     "files": ["test.php"],
-    "main": "test.php",
-    "output": "test.phar",
-    "stub": true
+    "main": "test.php"
 }
 

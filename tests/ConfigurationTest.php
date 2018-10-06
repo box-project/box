@@ -734,6 +734,9 @@ EOF
         $this->assertSame(493, $this->config->getFileMode());
         $this->assertSame(493, $this->getNoFileConfig()->getFileMode());
 
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+
         $this->setConfig([
             'chmod' => '0755',
         ]);
@@ -791,6 +794,9 @@ EOF
         $this->assertTrue($this->config->hasMainScript());
         $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'index.php', $this->config->getMainScriptPath());
         $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'index.php', $this->getNoFileConfig()->getMainScriptPath());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_main_script_path_is_inferred_by_the_composer_json_by_default(): void
@@ -1243,6 +1249,9 @@ JSON
     public function test_no_replacements_are_configured_by_default(): void
     {
         $this->assertSame([], $this->config->getReplacements());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_replacement_map_can_be_configured(): void
@@ -1999,8 +2008,24 @@ COMMENT;
         $this->assertNull($this->config->getStubPath());
         $this->assertTrue($this->config->isStubGenerated());
 
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+
         $this->setConfig([
             'stub' => null,
+        ]);
+
+        $this->assertNull($this->config->getStubPath());
+        $this->assertTrue($this->config->isStubGenerated());
+
+        $this->assertSame(
+            ['The "stub" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+
+        $this->setConfig([
+            'stub' => true,
         ]);
 
         $this->assertNull($this->config->getStubPath());
@@ -2032,7 +2057,6 @@ COMMENT;
     public function test_the_stub_can_be_generated(): void
     {
         $this->setConfig([
-            'stub' => true,
             'files' => [self::DEFAULT_FILE],
         ]);
 
@@ -2041,6 +2065,16 @@ COMMENT;
 
         $this->assertSame([], $this->config->getRecommendations());
         $this->assertSame([], $this->config->getWarnings());
+
+        foreach ([true, null] as $stub) {
+            $this->setConfig([
+                'stub' => $stub,
+                'files' => [self::DEFAULT_FILE],
+            ]);
+
+            $this->assertNull($this->config->getStubPath());
+            $this->assertTrue($this->config->isStubGenerated());
+        }
     }
 
     public function test_the_default_stub_can_be_used(): void

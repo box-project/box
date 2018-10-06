@@ -271,7 +271,7 @@ BANNER;
 
         // TODO: add warning related to the stub generation
         $interceptsFileFuncs = self::retrieveInterceptsFileFuncs($raw, $logger);
-        $isStubGenerated = self::retrieveIsStubGenerated($raw, $stubPath);
+        $isStubGenerated = self::retrieveIsStubGenerated($raw, $stubPath, $logger);
 
         $checkRequirements = self::retrieveCheckRequirements(
             $raw,
@@ -1126,7 +1126,7 @@ BANNER;
                 )
             );
 
-            Assertion::false(
+            Assertion::true(
                 file_exists($fileOrDirectory),
                 sprintf(
                     'Path "%s" was expected to be a file or directory. It may be a symlink (which are unsupported).',
@@ -2285,8 +2285,12 @@ BANNER;
         return false;
     }
 
-    private static function retrieveIsStubGenerated(stdClass $raw, ?string $stubPath): bool
+    private static function retrieveIsStubGenerated(stdClass $raw, ?string $stubPath, ConfigurationLogger $logger): bool
     {
+        if (property_exists($raw, self::STUB_KEY) && true === $raw->{self::STUB_KEY}) {
+            self::addRecommendationForDefaultValue($logger, self::STUB_KEY);
+        }
+
         return null === $stubPath && (false === isset($raw->{self::STUB_KEY}) || false !== $raw->{self::STUB_KEY});
     }
 
