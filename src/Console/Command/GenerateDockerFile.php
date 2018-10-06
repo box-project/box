@@ -55,7 +55,7 @@ RUN $(php -r '$extensionInstalled = array_map("strtolower", \get_loaded_extensio
 
 COPY __PHAR_FILE_PATH_TOKEN__ /__PHAR_FILE_NAME_TOKEN__
 
-ENTRYPOINT ["__PHAR_FILE_NAME_TOKEN__"]
+ENTRYPOINT ["/__PHAR_FILE_NAME_TOKEN__"]
 
 Dockerfile;
 
