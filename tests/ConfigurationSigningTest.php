@@ -148,6 +148,13 @@ class ConfigurationSigningTest extends ConfigurationTestCase
                 'The setting "key-pass" has been set but is unnecessary since the signing algorithm is not "OPENSSL".',
             ];
 
+            if (null === $keyPass) {
+                array_unshift(
+                    $expectedRecommendation,
+                    'The "key-pass" setting can be omitted since is set to its default value'
+                );
+            }
+
             if (in_array($algorithm, ['SHA1', false], true)) {
                 array_unshift(
                     $expectedRecommendation,
@@ -265,7 +272,13 @@ class ConfigurationSigningTest extends ConfigurationTestCase
             $this->assertNull($this->config->getPrivateKeyPassphrase());
             $this->assertFalse($this->config->promptForPrivateKey());
 
-            $this->assertSame([], $this->config->getRecommendations());
+            if (null === $keyPass) {
+                $this->assertSame(
+                    ['The "key-pass" setting can be omitted since is set to its default value'],
+                    $this->config->getRecommendations()
+                );
+            }
+
             $this->assertSame([], $this->config->getWarnings());
         }
 
