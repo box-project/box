@@ -185,8 +185,8 @@ binary files, the regular file will take precedence.
 
 ### Force auto-discovery (`force-autodiscovery`)
 
-The `auto-discovery` (`bool` default `false`) setting forces Box to attempt to find which files to include even though
-you are using the [`directories`][directories] or [`finder`][finder] setting.
+The `force-autodiscovery` (`bool` default `false`) setting forces Box to attempt to find which files to include even
+though you are using the [`directories`][directories] or [`finder`][finder] setting.
 
 When Box tries to find which files to include, it may remove some files such as readmes or test files. If however you
 are using the [`directories`][directories] or [`finder`][finder], Box will _append_ the found files to the ones you 
