@@ -3010,6 +3010,10 @@ OUTPUT;
 
     public function test_it_can_generate_a_PHAR_with_docker(): void
     {
+        if (extension_loaded('xdebug')) {
+            $this->markTestSkipped('Skipping this test since xdebug has an include wrapper causing this test to fail');
+        }
+
         mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
 
         dump_file('box.json', '{}');
