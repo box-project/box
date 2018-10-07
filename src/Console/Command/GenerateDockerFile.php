@@ -73,7 +73,7 @@ Dockerfile;
         parent::configure();
 
         $this->setName('docker');
-        $this->setDescription('Generates a Dockerfile for the given PHAR 🐳');
+        $this->setDescription('🐳  Generates a Dockerfile for the given PHAR');
         $this->addArgument(
             self::PHAR_ARG,
             InputArgument::OPTIONAL,
@@ -102,9 +102,10 @@ Dockerfile;
 
         $pharPath = false !== realpath($pharPath) ? realpath($pharPath) : $pharPath;
 
-        $io->comment(
+        $io->newLine();
+        $io->writeln(
             sprintf(
-                'Generating a Dockerfile for the PHAR "<comment>%s</comment>" 🐳',
+                '🐳  Generating a Dockerfile for the PHAR "<comment>%s</comment>"',
                 $pharPath
             )
         );
