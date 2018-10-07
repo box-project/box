@@ -36,7 +36,7 @@ great things:
     1. [PHAR](doc/installation.md#phar)
     1. [Composer](doc/installation.md#composer)
 1. [Usage](#usage)
-1. [Configuration](doc/configuration.md#configuration)
+1. [Configuration][configuration]
     1. [Base path](doc/configuration.md#base-path-base-path)
     1. [Main](doc/configuration.md#main-main)
     1. [Output](doc/configuration.md#output-output)
@@ -109,7 +109,7 @@ permissions:
 }
 ```
 
-You can then find more advanced configuration settings in [the configuration documentation](doc/configuration.md).
+You can then find more advanced configuration settings in [the configuration documentation][configuration].
 For more information on which command or options is available, you can run:
 
 ```
@@ -141,6 +141,7 @@ Project originally created by: [Kevin Herrera] ([@kherge]) which has now been mo
 
 
 [box2]: https://github.com/box-project/box2
+[configuration]: doc/configuration.md#configuration
 [Kevin Herrera]: https://github.com/kherge
 [@kherge]: https://github.com/kherge
 [humbug]: https://github.com/humbug

@@ -57,7 +57,7 @@ $ brew upgrade box
 <br />
 <hr />
 
-« [Table of Contents](../README.md#table-of-contents) • [Configuration](configuration.md) »
+« [Table of Contents](../README.md#table-of-contents) • [Configuration](configuration.md#configuration) »
 
 
 [releases]: https://github.com/humbug/box/releases

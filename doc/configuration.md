@@ -815,7 +815,7 @@ The short commit hash will only be used if no tag is available.
 <br />
 <hr />
 
-« [Installation](installation.md) • [Requirement Checker](requirement-checker.md) »
+« [Installation](installation.md#installation) • [Requirement Checker](requirement-checker.md#requirements-checker) »
 
 
 [PHAR code isolation]: code-isolation.md#phar-code-isolation
