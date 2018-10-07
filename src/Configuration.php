@@ -270,7 +270,7 @@ BANNER;
         $stubPath = self::retrieveStubPath($raw, $basePath, $logger);
 
         // TODO: add warning related to the stub generation
-        $interceptsFileFuncs = self::retrieveInterceptsFileFuncs($raw, $logger);
+        $isInterceptsFileFuncs = self::retrieveInterceptsFileFuncs($raw, $logger);
         $isStubGenerated = self::retrieveIsStubGenerated($raw, $stubPath, $logger);
 
         $checkRequirements = self::retrieveCheckRequirements(
@@ -309,7 +309,7 @@ BANNER;
             $stubBannerContents,
             $stubBannerPath,
             $stubPath,
-            $interceptsFileFuncs,
+            $isInterceptsFileFuncs,
             $isStubGenerated,
             $checkRequirements,
             $logger->getWarnings(),
