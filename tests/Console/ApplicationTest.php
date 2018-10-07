@@ -109,14 +109,14 @@ Options:
 
 Available commands:
   build     Builds a new PHAR (deprecated, use "compile" instead)
-  compile   Compile an application into a PHAR
-  diff      Display the differences between all of the files in two PHARs
+  compile   🔨  Compiles an application into a PHAR
+  diff      🕵  Displays the differences between all of the files in two PHARs
   help      Displays help for a command
-  info      Displays information about the PHAR extension or file
+  info      🔍  Displays information about the PHAR extension or file
   list      Lists commands
-  process   Apply the registered compactors and replacement values on a file
-  validate  Validates the configuration file
-  verify    Verifies the PHAR signature
+  process   ⚡  Applies the registered compactors and replacement values on a file
+  validate  ⚙  Validates the configuration file
+  verify    🔐️  Verifies the PHAR signature
 
 EOF;
 

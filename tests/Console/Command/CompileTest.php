@@ -146,8 +146,9 @@ Box version 3.x-dev@151e40a
 
  // Loading the configuration file "/path/to/box.json.dist".
 
+🔨  Building the PHAR "/path/to/tmp/test.phar"
+
 ? Removing the existing PHAR "/path/to/tmp/test.phar"
-Building the PHAR "/path/to/tmp/test.phar"
 ? Registering compactors
   + KevinGH\Box\Compactor\Php
 ? Mapping paths
@@ -368,7 +369,8 @@ Box version 3.x-dev@151e40a
 
  // Loading without a configuration file.
 
-Building the PHAR "/path/to/tmp/index.phar"
+🔨  Building the PHAR "/path/to/tmp/index.phar"
+
 ? No compactor to register
 ? Adding main file: /path/to/tmp/index.php
 ? Adding requirements checker
@@ -576,8 +578,9 @@ Box version 3.x-dev@151e40a
 
  // Loading the configuration file "/path/to/box.json.dist".
 
+🔨  Building the PHAR "/path/to/tmp/test.phar"
+
 ? Removing the existing PHAR "/path/to/tmp/test.phar"
-Building the PHAR "/path/to/tmp/test.phar"
 ? Registering compactors
   + KevinGH\Box\Compactor\Php
 ? Mapping paths
@@ -815,8 +818,9 @@ Box version 3.x-dev@151e40a
 
  // Loading the configuration file "/path/to/box.json.dist".
 
+🔨  Building the PHAR "/path/to/tmp/test.phar"
+
 ? Removing the existing PHAR "/path/to/tmp/test.phar"
-* Building the PHAR "/path/to/tmp/test.phar"
 ? Registering compactors
   + KevinGH\Box\Compactor\Php
 ? Mapping paths
@@ -918,8 +922,9 @@ Box version 3.x-dev@151e40a
 
  // Loading the configuration file "/path/to/box.json.dist".
 
+🔨  Building the PHAR "/path/to/tmp/test.phar"
+
 ? Removing the existing PHAR "/path/to/tmp/test.phar"
-* Building the PHAR "/path/to/tmp/test.phar"
 ? Registering compactors
   + KevinGH\Box\Compactor\Php
 ? Mapping paths
@@ -1047,8 +1052,9 @@ Box version 3.x-dev@151e40a
 
  // Loading the configuration file "/path/to/box.json.dist".
 
+🔨  Building the PHAR "/path/to/tmp/test.phar"
+
 ? Removing the existing PHAR "/path/to/tmp/test.phar"
-* Building the PHAR "/path/to/tmp/test.phar"
 ? Registering compactors
   + KevinGH\Box\Compactor\Php
 ? Mapping paths
@@ -1745,8 +1751,9 @@ Box version 3.x-dev@151e40a
 
  // Loading the configuration file "/path/to/box.json.dist".
 
+🔨  Building the PHAR "/path/to/tmp/test.phar"
+
 ? Removing the existing PHAR "/path/to/tmp/test.phar"
-* Building the PHAR "/path/to/tmp/test.phar"
 ? Setting replacement values
   + @name@: world
 ? No compactor to register
@@ -2007,7 +2014,8 @@ Box version 3.x-dev@151e40a
 
  // Loading the configuration file "/path/to/box.json.dist".
 
-* Building the PHAR "/path/to/tmp/test.phar"
+🔨  Building the PHAR "/path/to/tmp/test.phar"
+
 ? No compactor to register
 ? Adding main file: /path/to/tmp/test.php
 ? Skip requirements checker
@@ -2073,7 +2081,8 @@ Box version 3.x-dev@151e40a
 
  // Loading the configuration file "/path/to/box.json.dist".
 
-* Building the PHAR "/path/to/tmp/test.phar"
+🔨  Building the PHAR "/path/to/tmp/test.phar"
+
 ? No compactor to register
 ? Adding main file: /path/to/tmp/test.php
 ? Skip requirements checker
@@ -2137,7 +2146,8 @@ Box version 3.x-dev@151e40a
 
  // Loading the configuration file "/path/to/box.json.dist".
 
-* Building the PHAR "/path/to/tmp/test.phar"
+🔨  Building the PHAR "/path/to/tmp/test.phar"
+
 ? No compactor to register
 ? Adding main file: /path/to/tmp/index.php
 ? Skip requirements checker
@@ -2211,7 +2221,8 @@ Box version 3.x-dev@151e40a
 
  // Loading the configuration file "/path/to/box.json.dist".
 
-* Building the PHAR "/path/to/tmp/test.phar"
+🔨  Building the PHAR "/path/to/tmp/test.phar"
+
 ? No compactor to register
 ? No main script path configured
 ? Skip requirements checker
@@ -2285,7 +2296,8 @@ Box version 3.x-dev@151e40a
 
  // Loading the configuration file "/path/to/box.json.dist".
 
-* Building the PHAR "/path/to/tmp/test.phar"
+🔨  Building the PHAR "/path/to/tmp/test.phar"
+
 ? No compactor to register
 ? No main script path configured
 ? Skip requirements checker
@@ -2357,7 +2369,8 @@ Box version 3.x-dev@151e40a
 
  // Loading the configuration file "/path/to/box.json.dist".
 
-* Building the PHAR "/path/to/tmp/test.phar"
+🔨  Building the PHAR "/path/to/tmp/test.phar"
+
 ? No compactor to register
 ? Adding main file: /path/to/tmp/test.php
 ? Skip requirements checker
@@ -2432,7 +2445,8 @@ Box version 3.x-dev@151e40a
 
  // Loading the configuration file "/path/to/box.json.dist".
 
-* Building the PHAR "/path/to/tmp/foo/bar/test.phar"
+🔨  Building the PHAR "/path/to/tmp/foo/bar/test.phar"
+
 ? No compactor to register
 ? Adding main file: /path/to/tmp/test.php
 ? Skip requirements checker
@@ -2583,7 +2597,8 @@ Box version 3.x-dev@151e40a
 
  // Loading the configuration file "/path/to/box.json.dist".
 
-* Building the PHAR "/path/to/tmp/test.phar"
+🔨  Building the PHAR "/path/to/tmp/test.phar"
+
 ? No compactor to register
 ? Adding main file: /path/to/tmp/test.php
 ? Skip requirements checker
@@ -2671,7 +2686,8 @@ Box version 3.x-dev@151e40a
 
  // Loading the configuration file "/path/to/box.json.dist".
 
-* Building the PHAR "/path/to/tmp/test"
+🔨  Building the PHAR "/path/to/tmp/test"
+
 ? No compactor to register
 ? Adding main file: /path/to/tmp/test.php
 ? Skip requirements checker
@@ -2880,7 +2896,8 @@ Box version 3.x-dev@151e40a
 
  // Loading the configuration file "/path/to/box.json.dist".
 
-Building the PHAR "/path/to/tmp/index.phar"
+🔨  Building the PHAR "/path/to/tmp/index.phar"
+
 ? No compactor to register
 ? Adding main file: /path/to/tmp/index.php
 ? Skip requirements checker
@@ -2901,9 +2918,9 @@ Building the PHAR "/path/to/tmp/index.phar"
 ? Setting file permissions to 0755
 * Done.
 
-Recommendations:
+💡  1 recommendation found:
     - The "check-requirements" setting can be omitted since is set to its default value
-Warnings:
+⚠️  1 warning found:
     - The requirement checker could not be used because the composer.json and composer.lock file could not be found.
 
  // PHAR: 1 file (100B)
@@ -2954,7 +2971,8 @@ Box version 3.x-dev@151e40a
 
  // Loading the configuration file "/path/to/box.json.dist".
 
-Building the PHAR "/path/to/tmp/index.phar"
+🔨  Building the PHAR "/path/to/tmp/index.phar"
+
 ? No compactor to register
 ? Adding main file: /path/to/tmp/index.php
 ? Skip requirements checker

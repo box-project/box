@@ -58,7 +58,8 @@ class ValidateTest extends CommandTestCase
 No recommendation found.
 No warning found.
 
-The configuration file passed validation.
+ [OK] The configuration file passed the validation.
+
 
 OUTPUT;
 
@@ -92,11 +93,12 @@ JSON
 
  // Loading the configuration file "test.json".
 
-Recommendations:
+💡  1 recommendation found:
     - The setting "key" has been set but is unnecessary since the signing algorithm is not "OPENSSL".
 No warning found.
 
-The configuration file passed validation.
+ ! [CAUTION] The configuration file passed the validation with recommendations.
+
 
 OUTPUT;
 
@@ -131,11 +133,12 @@ JSON
 
  // Loading the configuration file "test.json".
 
-Recommendations:
+💡  1 recommendation found:
     - The setting "key" has been set but is unnecessary since the signing algorithm is not "OPENSSL".
 No warning found.
 
-The configuration file passed validation.
+ ! [CAUTION] The configuration file passed the validation with recommendations.
+
 
 OUTPUT;
 
@@ -170,10 +173,11 @@ JSON
  // Loading the configuration file "test.json".
 
 No recommendation found.
-Warnings:
+⚠️  0 warning found:
     - The setting "key" has been set but is ignored since the signing algorithm is not "OPENSSL".
 
-The configuration file passed validation.
+ ! [CAUTION] The configuration file passed the validation with warnings.
+
 
 OUTPUT;
 
@@ -209,10 +213,11 @@ JSON
  // Loading the configuration file "test.json".
 
 No recommendation found.
-Warnings:
+⚠️  0 warning found:
     - The setting "key" has been set but is ignored since the signing algorithm is not "OPENSSL".
 
-The configuration file passed validation.
+ ! [CAUTION] The configuration file passed the validation with warnings.
+
 
 OUTPUT;
 
@@ -246,12 +251,14 @@ JSON
 
  // Loading the configuration file "test.json".
 
-Recommendations:
+💡  1 recommendation found:
     - The "check-requirements" setting can be omitted since is set to its default value
-Warnings:
+⚠️  1 warning found:
     - The requirement checker could not be used because the composer.json and composer.lock file could not be found.
 
-The configuration file passed validation.
+ ! [CAUTION] The configuration file passed the validation with recommendations
+ !           and warnings.
+
 
 OUTPUT;
 

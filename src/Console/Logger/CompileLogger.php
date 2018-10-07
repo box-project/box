@@ -67,18 +67,12 @@ final class CompileLogger
 
     public function logStartBuilding(string $path): void
     {
-        $message = sprintf(
-            'Building the PHAR "<comment>%s</comment>"',
-            $path
+        $this->io->writeln(
+            sprintf(
+                '🔨  Building the PHAR "<comment>%s</comment>"',
+                $path
+            )
         );
-
-        if ($this->io->isVerbose()) {
-            $this->log(
-                self::STAR_PREFIX,
-                $message
-            );
-        } else {
-            $this->io->writeln($message);
-        }
+        $this->io->newLine();
     }
 }

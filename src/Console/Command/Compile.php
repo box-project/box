@@ -109,7 +109,7 @@ HELP;
         parent::configure();
 
         $this->setName('compile');
-        $this->setDescription('Compile an application into a PHAR');
+        $this->setDescription('🔨  Compiles an application into a PHAR');
         $this->setHelp(self::HELP);
 
         $this->addOption(
@@ -185,9 +185,9 @@ HELP;
 
         $startTime = microtime(true);
 
-        $this->removeExistingArtifacts($config, $logger, $debug);
-
         $logger->logStartBuilding($path);
+
+        $this->removeExistingArtifacts($config, $logger, $debug);
 
         $box = $this->createPhar($config, $input, $output, $logger, $io, $debug);
 

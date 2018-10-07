@@ -53,13 +53,20 @@ class VerifyTest extends CommandTestCase
      */
     public function test_it_verifies_the_signature_of_the_given_file_using_the_phar_extension(string $pharPath): void
     {
+        $signature = (new Phar($pharPath))->getSignature();
+
         $this->commandTester->execute([
             'command' => 'verify',
             'phar' => $pharPath,
         ]);
 
-        $expected = <<<'OUTPUT'
+        $expected = <<<OUTPUT
+
+🔐️  Verifying the PHAR "{$pharPath}"
+
 The PHAR passed verification.
+
+{$signature['hash_type']} signature: {$signature['hash']}
 
 OUTPUT;
 
@@ -69,13 +76,20 @@ OUTPUT;
 
     public function test_it_can_verify_a_PHAR_which_does_not_have_the_PHAR_extension(): void
     {
+        $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar');
+
         $this->commandTester->execute([
             'command' => 'verify',
-            'phar' => realpath(self::FIXTURES_DIR.'/simple-phar'),
+            'phar' => $pharPath,
         ]);
 
-        $expected = <<<'OUTPUT'
+        $expected = <<<OUTPUT
+
+🔐️  Verifying the PHAR "{$pharPath}"
+
 The PHAR passed verification.
+
+SHA-1 signature: 191723EE056C62E3179FDE1B792AA03040FCEF92
 
 OUTPUT;
 
@@ -101,7 +115,9 @@ OUTPUT;
         );
 
         $expected = <<<OUTPUT
-Verifying the PHAR "{$pharPath}"...
+
+🔐️  Verifying the PHAR "{$pharPath}"
+
 The PHAR passed verification.
 
 {$signature['hash_type']} signature: {$signature['hash']}
@@ -144,9 +160,10 @@ OUTPUT;
         $this->assertSame(
             1,
             preg_match(
-                '/^The PHAR failed the verification: .+$/',
+                '/The PHAR failed the verification: .+/',
                 $this->commandTester->getDisplay(true)
-            )
+            ),
+            $this->commandTester->getDisplay(true)
         );
 
         $this->assertSame(1, $this->commandTester->getStatusCode());

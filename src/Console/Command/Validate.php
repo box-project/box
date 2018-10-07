@@ -40,7 +40,7 @@ final class Validate extends Configurable
         parent::configure();
 
         $this->setName('validate');
-        $this->setDescription('Validates the configuration file');
+        $this->setDescription('⚙  Validates the configuration file');
         $this->setHelp(
             <<<'HELP'
 The <info>%command.name%</info> command will validate the configuration file
@@ -84,12 +84,21 @@ HELP
 
             MessageRenderer::render($io, $recommendations, $warnings);
 
-            $output->writeln('');
-            $output->writeln(
-                '<info>The configuration file passed validation.</info>'
-            );
+            $hasRecommendationsOrWarnings = [] === $recommendations && [] === $warnings;
 
-            return (([] === $recommendations && [] === $warnings) || $input->getOption(self::IGNORE_MESSAGES_OPTION)) ? 0 : 1;
+            if (false === $hasRecommendationsOrWarnings) {
+                if ([] === $recommendations) {
+                    $io->caution('The configuration file passed the validation with warnings.');
+                } elseif ([] === $warnings) {
+                    $io->caution('The configuration file passed the validation with recommendations.');
+                } else {
+                    $io->caution('The configuration file passed the validation with recommendations and warnings.');
+                }
+            } else {
+                $io->success('The configuration file passed the validation.');
+            }
+
+            return ($hasRecommendationsOrWarnings || $input->getOption(self::IGNORE_MESSAGES_OPTION)) ? 0 : 1;
         } catch (Exception $exception) {
             // Continue
         }

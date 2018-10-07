@@ -16,6 +16,7 @@ namespace KevinGH\Box\Console;
 
 use Symfony\Component\Console\Style\SymfonyStyle;
 use function array_map;
+use function count;
 
 /**
  * @private
@@ -27,12 +28,18 @@ final class MessageRenderer
         if ([] === $recommendations) {
             $io->writeln('No recommendation found.');
         } else {
-            $io->writeln('Recommendations:');
+            $io->writeln(
+                sprintf(
+                    '💡  <recommendation>%d %s found:</recommendation>',
+                    count($recommendations),
+                    count($recommendations) > 1 ? 'recommendations' : 'recommendation'
+                )
+            );
 
             $io->writeln(
                 array_map(
                     function (string $recommendation): string {
-                        return "    - <recommendation>$recommendation</recommendation>";
+                        return "    - $recommendation";
                     },
                     $recommendations
                 )
@@ -42,12 +49,18 @@ final class MessageRenderer
         if ([] === $warnings) {
             $io->writeln('No warning found.');
         } else {
-            $io->writeln('Warnings:');
+            $io->writeln(
+                sprintf(
+                    '⚠️  <warning>%d %s found:</warning>',
+                    count($recommendations),
+                    count($recommendations) > 1 ? 'warnings' : 'warning'
+                )
+            );
 
             $io->writeln(
                 array_map(
                     function (string $warning): string {
-                        return "    - <warning>$warning</warning>";
+                        return "    - $warning";
                     },
                     $warnings
                 )
