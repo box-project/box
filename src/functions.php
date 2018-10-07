@@ -15,11 +15,13 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
+use function bin2hex;
 use Phar;
 use function array_key_exists;
 use function constant;
 use function define;
 use function defined;
+use function random_bytes;
 use function sprintf;
 use function strlen;
 
@@ -156,4 +158,14 @@ function disable_parallel_processing(): void
 function is_parallel_processing_enabled(): bool
 {
     return false === defined(_NO_PARALLEL_PROCESSING) || false === constant(_NO_PARALLEL_PROCESSING);
+}
+
+/**
+ * @private
+ *
+ * @return string Random 12 charactres long (plus the prefix) string composed of a-z characters and digits
+ */
+function unique_id(string $prefix): string
+{
+    return $prefix.bin2hex(random_bytes(6));
 }

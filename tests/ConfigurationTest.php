@@ -68,8 +68,8 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_a_default_alias_is_generated_if_no_alias_is_registered(): void
     {
-        $this->assertRegExp('/^box-auto-generated-alias-[\da-zA-Z]{13}\.phar$/', $this->config->getAlias());
-        $this->assertRegExp('/^box-auto-generated-alias-[\da-zA-Z]{13}\.phar$/', $this->getNoFileConfig()->getAlias());
+        $this->assertRegExp('/^box-auto-generated-alias-[\da-zA-Z]{12}\.phar$/', $this->config->getAlias());
+        $this->assertRegExp('/^box-auto-generated-alias-[\da-zA-Z]{12}\.phar$/', $this->getNoFileConfig()->getAlias());
     }
 
     public function test_the_alias_can_be_configured(): void
@@ -2300,7 +2300,7 @@ COMMENT;
         $this->assertFalse($this->config->checkRequirements());
         $this->assertFalse($this->config->dumpAutoload());
         $this->assertTrue($this->config->excludeComposerFiles());
-        $this->assertRegExp('/^box-auto-generated-alias-[\da-zA-Z]{13}\.phar$/', $this->config->getAlias());
+        $this->assertRegExp('/^box-auto-generated-alias-[\da-zA-Z]{12}\.phar$/', $this->config->getAlias());
         $this->assertSame($this->tmp, $this->config->getBasePath());
         $this->assertSame([], $this->config->getBinaryFiles());
         $this->assertSame([], $this->config->getCompactors());

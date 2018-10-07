@@ -418,7 +418,7 @@ OUTPUT;
 
         // Check PHAR content
         $actualStub = preg_replace(
-            '/box-auto-generated-alias-[\da-zA-Z]{13}\.phar/',
+            '/box-auto-generated-alias-[\da-zA-Z]{12}\.phar/',
             'box-auto-generated-alias-__uniqid__.phar',
             $this->normalizeDisplay($phar->getStub())
         );
@@ -737,7 +737,7 @@ PHP;
 
         // Check PHAR content
         $actualStub = preg_replace(
-            '/box-auto-generated-alias-[\da-zA-Z]{13}\.phar/',
+            '/box-auto-generated-alias-[\da-zA-Z]{12}\.phar/',
             'box-auto-generated-alias-__uniqid__.phar',
             $this->normalizeDisplay($phar->getStub())
         );
