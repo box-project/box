@@ -2408,7 +2408,7 @@ OUTPUT;
 
         $builtPhar = new Phar('test.phar');
 
-        $this->assertFalse($builtPhar->isCompressed()); // TODO: this is a bug, see https://github.com/humbug/box/issues/20
+        $this->assertFalse($builtPhar->isCompressed()); // This is a bug, see https://github.com/humbug/box/issues/20
         $this->assertTrue($builtPhar['test.php']->isCompressed());
 
         $this->assertSame(
@@ -2636,7 +2636,7 @@ OUTPUT;
 
         $builtPhar = new Phar('test.phar');
 
-        $this->assertFalse($builtPhar->isCompressed()); // TODO: this is a bug, see https://github.com/humbug/box/issues/20
+        $this->assertFalse($builtPhar->isCompressed()); // This is a bug, see https://github.com/humbug/box/issues/20
         $this->assertTrue($builtPhar['test.php']->isCompressed());
 
         $this->assertSame(

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Closure;
+use function count;
 use DateTimeImmutable;
 use Generator;
 use Herrera\Annotations\Tokenizer;
@@ -553,8 +554,51 @@ EOF
 
         $this->assertInstanceOf(Php::class, $compactors[0]);
         $this->assertInstanceOf(DummyCompactor::class, $compactors[1]);
+        $this->assertCount(2, $compactors);
 
         $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_recommendation_is_given_if_the_scoper_compactor_is_registered_before_the_php_compactor(): void
+    {
+        $compactorClassesSet = [
+            [Php::class],
+            [PhpScoper::class],
+            [
+                Php::class,
+                PhpScoper::class,
+            ]
+        ];
+
+        foreach ($compactorClassesSet as $compactorClasses) {
+            $this->setConfig([
+                'compactors' => $compactorClasses,
+            ]);
+
+            $this->assertCount(count($compactorClasses), $this->config->getCompactors());
+
+            $this->assertSame([], $this->config->getRecommendations());
+            $this->assertSame([], $this->config->getWarnings());
+        }
+
+        $this->setConfig([
+            'compactors' => [
+                PhpScoper::class,
+                Php::class,
+            ],
+        ]);
+
+        $compactors = $this->config->getCompactors();
+
+        $this->assertInstanceOf(PhpScoper::class, $compactors[0]);
+        $this->assertInstanceOf(Php::class, $compactors[1]);
+        $this->assertCount(2, $compactors);
+
+        $this->assertSame(
+            ['The PHP compactor has been registered after the PhpScoper compactor. It is recommended to register the PHP compactor before for a clearer code and faster processing.'],
+            $this->config->getRecommendations()
+        );
         $this->assertSame([], $this->config->getWarnings());
     }
 

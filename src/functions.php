@@ -81,7 +81,6 @@ function get_phar_signing_algorithms(): array
 /**
  * @private
  */
-// TODO: add more tests for this
 function format_size(int $size): string
 {
     $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
