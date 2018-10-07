@@ -74,7 +74,6 @@ use function sprintf;
 use function strtoupper;
 use function substr;
 use function trigger_error;
-use function uniqid;
 
 /**
  * @private
@@ -661,7 +660,7 @@ BANNER;
     private static function retrieveAlias(stdClass $raw): string
     {
         if (false === isset($raw->{self::ALIAS_KEY})) {
-            return uniqid('box-auto-generated-alias-', false).'.phar';
+            return unique_id('box-auto-generated-alias-').'.phar';
         }
 
         $alias = trim($raw->{self::ALIAS_KEY});
@@ -1543,7 +1542,7 @@ BANNER;
                     $phpScoperConfig = self::retrievePhpScoperConfig($raw, $basePath, $logger);
 
                     $prefix = null === $phpScoperConfig->getPrefix()
-                        ? uniqid('_HumbugBox', false)
+                        ? unique_id('_HumbugBox')
                         : $phpScoperConfig->getPrefix()
                     ;
 
