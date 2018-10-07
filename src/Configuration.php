@@ -24,7 +24,7 @@ use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
 use Humbug\PhpScoper\Console\ApplicationFactory;
 use Humbug\PhpScoper\Scoper;
 use InvalidArgumentException;
-use KevinGH\Box\Compactor\Php;
+use KevinGH\Box\Compactor\Php as PhpCompactor;
 use KevinGH\Box\Compactor\PhpScoper as PhpScoperCompactor;
 use KevinGH\Box\Composer\ComposerConfiguration;
 use KevinGH\Box\Json\Json;
@@ -1544,12 +1544,12 @@ BANNER;
 
         $compactorClasses = array_unique((array) $raw->{self::COMPACTORS_KEY});
 
-        return array_map(
+        $compators = array_map(
             function (string $class) use ($raw, $basePath, $logger): Compactor {
                 Assertion::classExists($class, 'The compactor class "%s" does not exist.');
                 Assertion::implementsInterface($class, Compactor::class, 'The class "%s" is not a compactor class.');
 
-                if (Php::class === $class || LegacyPhp::class === $class) {
+                if (PhpCompactor::class === $class || LegacyPhp::class === $class) {
                     return self::createPhpCompactor($raw);
                 }
 
@@ -1580,6 +1580,29 @@ BANNER;
             },
             $compactorClasses
         );
+
+        $scoperCompactor = false;
+
+        foreach ($compators as $compactor) {
+            if ($compactor instanceof PhpScoperCompactor) {
+                $scoperCompactor = true;
+            }
+
+            if ($compactor instanceof PhpCompactor) {
+                if (true === $scoperCompactor) {
+                    $logger->addRecommendation(
+                        sprintf(
+                            'The PHP compactor has been registered after the PhpScoper compactor. It is '
+                            .'recommended to register the PHP compactor before for a clearer code and faster processing.'
+                        )
+                    );
+                }
+
+                break;
+            }
+        }
+
+        return $compators;
     }
 
     private static function retrieveCompressionAlgorithm(stdClass $raw, ConfigurationLogger $logger): ?int
@@ -2363,7 +2386,6 @@ BANNER;
 
     private static function retrievePhpScoperConfig(stdClass $raw, string $basePath, ConfigurationLogger $logger): PhpScoperConfiguration
     {
-        // TODO: add recommendations regarding the order
         self::checkIfDefaultValue($logger, $raw, self::PHP_SCOPER_KEY, self::PHP_SCOPER_CONFIG);
 
         if (!isset($raw->{self::PHP_SCOPER_KEY})) {
@@ -2415,7 +2437,6 @@ BANNER;
 
     private static function createPhpCompactor(stdClass $raw): Compactor
     {
-        // TODO: false === not set; check & add test/doc
         $tokenizer = new Tokenizer();
 
         if (false === empty($raw->{self::ANNOTATIONS_KEY}) && isset($raw->{self::ANNOTATIONS_KEY}->ignore)) {
@@ -2424,7 +2445,7 @@ BANNER;
             );
         }
 
-        return new Php($tokenizer);
+        return new PhpCompactor($tokenizer);
     }
 
     private static function checkIfDefaultValue(
