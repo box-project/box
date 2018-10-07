@@ -70,6 +70,18 @@ class ConfigurationTest extends ConfigurationTestCase
     {
         $this->assertRegExp('/^box-auto-generated-alias-[\da-zA-Z]{12}\.phar$/', $this->config->getAlias());
         $this->assertRegExp('/^box-auto-generated-alias-[\da-zA-Z]{12}\.phar$/', $this->getNoFileConfig()->getAlias());
+
+        $this->setConfig([
+            'alias' => null,
+        ]);
+
+        $this->assertRegExp('/^box-auto-generated-alias-[\da-zA-Z]{12}\.phar$/', $this->config->getAlias());
+
+        $this->assertSame(
+            ['The "alias" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_alias_can_be_configured(): void
@@ -134,6 +146,24 @@ EOF
                 $exception->getMessage()
             );
         }
+    }
+
+    public function test_a_warning_is_given_if_the_alias_has_been_set_but_a_custom_stub_is_provided(): void
+    {
+        touch('stub-path.php');
+
+        $this->setConfig([
+            'alias' => 'test.phar',
+            'stub' => 'stub-path.php',
+        ]);
+
+        $this->assertSame('test.phar', $this->config->getAlias());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame(
+            ['The "alias" setting has been set but is ignored since a custom stub path is used'],
+            $this->config->getWarnings()
+        );
     }
 
     public function test_the_default_base_path_used_is_the_configuration_file_location(): void
@@ -1444,6 +1474,18 @@ JSON
     public function test_the_config_has_a_default_shebang(): void
     {
         $this->assertSame('#!/usr/bin/env php', $this->config->getShebang());
+
+        $this->setConfig([
+            'shebang' => null,
+        ]);
+
+        $this->assertSame('#!/usr/bin/env php', $this->config->getShebang());
+
+        $this->assertSame(
+            ['The "shebang" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_shebang_can_be_configured(): void
@@ -1458,6 +1500,89 @@ JSON
         $this->assertSame($expected, $actual);
 
         $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_recommendation_is_given_if_the_shebang_configured_to_its_default_value(): void
+    {
+        $this->setConfig([
+            'shebang' => '#!/usr/bin/env php',
+        ]);
+
+        $this->assertSame('#!/usr/bin/env php', $this->config->getShebang());
+
+        $this->assertSame(
+            ['The "shebang" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_warning_is_given_if_the_shebang_configured_but_a_custom_stub_is_used(): void
+    {
+        touch('my-stub.php');
+
+        $this->setConfig([
+            'shebang' => $expected = '#!/bin/php',
+            'stub' => 'my-stub.php',
+        ]);
+
+        $this->assertSame($expected, $this->config->getShebang());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame(
+            ['The "shebang" has been set but ignored since it is used only with the Box built-in stub which is not used'],
+            $this->config->getWarnings()
+        );
+    }
+
+    public function test_a_warning_is_given_if_the_shebang_configured_but_the_PHAR_default_stub_is_used(): void
+    {
+        $this->setConfig([
+            'shebang' => $expected = '#!/bin/php',
+            'stub' => false,
+        ]);
+
+        $this->assertSame($expected, $this->config->getShebang());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame(
+            ['The "shebang" has been set but ignored since it is used only with the Box built-in stub which is not used'],
+            $this->config->getWarnings()
+        );
+    }
+
+    public function test_a_recommendation_is_given_if_the_shebang_disabled_and_a_custom_stub_is_used(): void
+    {
+        touch('my-stub.php');
+
+        $this->setConfig([
+            'shebang' => false,
+            'stub' => 'my-stub.php',
+        ]);
+
+        $this->assertNull($this->config->getShebang());
+
+        $this->assertSame(
+            ['The "shebang" has been set to `false` but is unnecessary since the Box built-in stub is not being used'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_recommendation_is_given_if_the_shebang_disabled_and_the_PHAR_default_stub_is_used(): void
+    {
+        $this->setConfig([
+            'shebang' => false,
+            'stub' => false,
+        ]);
+
+        $this->assertNull($this->config->getShebang());
+
+        $this->assertSame(
+            ['The "shebang" has been set to `false` but is unnecessary since the Box built-in stub is not being used'],
+            $this->config->getRecommendations()
+        );
         $this->assertSame([], $this->config->getWarnings());
     }
 
@@ -1817,6 +1942,48 @@ BANNER
         $this->assertSame([], $this->config->getWarnings());
     }
 
+    public function test_a_warning_is_given_when_the_banner_is_configured_but_the_Box_stub_is_not_used(): void
+    {
+        touch('my-stub.php');
+
+        foreach (['my-stub.php', false] as $stub) {
+            $this->setConfig([
+                'banner' => 'custom banner',
+                'stub' => $stub,
+            ]);
+
+            $this->assertSame('custom banner', $this->config->getStubBannerContents());
+            $this->assertNull($this->config->getStubBannerPath());
+
+            $this->assertSame([], $this->config->getRecommendations());
+            $this->assertSame(
+                ['The "banner" setting has been set but is ignored since the Box built-in stub is not being used'],
+                $this->config->getWarnings()
+            );
+        }
+    }
+
+    public function test_a_recommendation_is_given_when_the_banner_is_disabled_but_the_Box_stub_is_not_used(): void
+    {
+        touch('my-stub.php');
+
+        foreach (['my-stub.php', false] as $stub) {
+            $this->setConfig([
+                'banner' => false,
+                'stub' => $stub,
+            ]);
+
+            $this->assertNull($this->config->getStubBannerContents());
+            $this->assertNull($this->config->getStubBannerPath());
+
+            $this->assertSame(
+                ['The "banner" setting has been set but is unnecessary since the Box built-in stub is not being used'],
+                $this->config->getRecommendations()
+            );
+            $this->assertSame([], $this->config->getWarnings());
+        }
+    }
+
     public function test_the_banner_can_be_disabled(): void
     {
         $this->setConfig([
@@ -1887,6 +2054,26 @@ COMMENT;
         $this->assertSame([], $this->config->getWarnings());
     }
 
+    public function test_not_banner_path_is_registered_by_default(): void
+    {
+        $this->assertNull($this->getNoFileConfig()->getStubBannerPath());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+
+        $this->setConfig([
+            'banner-file' => null,
+        ]);
+
+        $this->assertNull($this->config->getStubBannerPath());
+
+        $this->assertSame(
+            ['The "banner-file" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
     public function test_a_custom_banner_from_a_file_can_be_registered(): void
     {
         $comment = <<<'COMMENT'
@@ -1913,19 +2100,17 @@ COMMENT;
 
     public function test_a_recommendation_is_given_if_the_default_stub_banner_path_is_configured(): void
     {
+        $defaultBanner = <<<'BANNER'
+Generated by Humbug Box.
+
+@link https://github.com/humbug/box
+BANNER;
+
         $this->setConfig([
             'banner-file' => null,
         ]);
 
-        $this->assertSame(
-            <<<'BANNER'
-Generated by Humbug Box.
-
-@link https://github.com/humbug/box
-BANNER
-            ,
-            $this->config->getStubBannerContents()
-        );
+        $this->assertSame($defaultBanner, $this->config->getStubBannerContents());
         $this->assertNull($this->config->getStubBannerPath());
 
         $this->assertSame(
@@ -1933,6 +2118,65 @@ BANNER
             $this->config->getRecommendations()
         );
         $this->assertSame([], $this->config->getWarnings());
+
+        dump_file('custom-banner', $defaultBanner);
+
+        $this->setConfig([
+            'banner-file' => 'custom-banner',
+        ]);
+
+        $this->assertSame($defaultBanner, $this->config->getStubBannerContents());
+        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'custom-banner', $this->config->getStubBannerPath());
+
+        $this->assertSame(
+            ['The "banner-file" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+
+        dump_file(
+            'custom-banner',
+            <<<'BANNER'
+  Generated by Humbug Box.
+
+  @link https://github.com/humbug/box  
+BANNER
+        );
+
+        $this->setConfig([
+            'banner-file' => 'custom-banner',
+        ]);
+
+        $this->assertSame($defaultBanner, $this->config->getStubBannerContents());
+        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'custom-banner', $this->config->getStubBannerPath());
+
+        $this->assertSame(
+            ['The "banner-file" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_warning_is_given_when_the_banner_file_is_configured_but_the_Box_stub_is_not_used(): void
+    {
+        touch('custom-banner');
+        touch('my-stub.php');
+
+        foreach (['my-stub.php', false] as $stub) {
+            $this->setConfig([
+                'banner-file' => 'custom-banner',
+                'stub' => $stub,
+            ]);
+
+            $this->assertSame('', $this->config->getStubBannerContents());
+            $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'custom-banner', $this->config->getStubBannerPath());
+
+            $this->assertSame([], $this->config->getRecommendations());
+            $this->assertSame(
+                ['The "banner-file" setting has been set but is ignored since the Box built-in stub is not being used'],
+                $this->config->getWarnings()
+            );
+        }
     }
 
     public function test_the_banner_value_is_discarded_if_a_banner_file_is_registered(): void
@@ -2138,6 +2382,46 @@ COMMENT;
         $this->assertSame([], $this->config->getWarnings());
     }
 
+    public function test_a_warning_is_given_when_the_intercept_funcs_is_configured_but_the_Box_stub_is_not_used(): void
+    {
+        touch('my-stub.php');
+
+        foreach (['my-stub.php', false] as $stub) {
+            $this->setConfig([
+                'intercept' => true,
+                'stub' => $stub,
+            ]);
+
+            $this->assertTrue($this->config->isInterceptFileFuncs());
+
+            $this->assertSame([], $this->config->getRecommendations());
+            $this->assertSame(
+                ['The "intercept" setting has been set but is ignored since the Box built-in stub is not being used'],
+                $this->config->getWarnings()
+            );
+        }
+    }
+
+    public function test_a_recommendation_is_given_when_the_intercept_funcs_is_disabled_but_the_Box_stub_is_not_used(): void
+    {
+        touch('my-stub.php');
+
+        foreach (['my-stub.php', false] as $stub) {
+            $this->setConfig([
+                'intercept' => false,
+                'stub' => $stub,
+            ]);
+
+            $this->assertFalse($this->config->isInterceptFileFuncs());
+
+            $this->assertSame(
+                ['The "intercept" setting can be omitted since is set to its default value'],
+                $this->config->getRecommendations()
+            );
+            $this->assertSame([], $this->config->getWarnings());
+        }
+    }
+
     public function test_the_requirement_checker_can_be_disabled(): void
     {
         $this->setConfig([
@@ -2286,6 +2570,28 @@ COMMENT;
             $this->config->getRecommendations()
         );
         $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_warning_is_given_if_the_check_requirement_is_configured_but_the_PHAR_stub_used(): void
+    {
+        file_put_contents('composer.json', '{}');
+        file_put_contents('composer.lock', '{}');
+
+        $this->setConfig([
+            'check-requirements' => true,
+            'stub' => false,
+        ]);
+
+        $this->assertTrue($this->config->checkRequirements());
+
+        $this->assertSame(
+            ['The "check-requirements" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame(
+            ['The "check-requirements" setting has been set but has been ignored since the PHAR built-in stub is being used.'],
+            $this->config->getWarnings()
+        );
     }
 
     public function test_it_can_be_created_with_only_default_values(): void

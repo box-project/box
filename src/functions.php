@@ -15,9 +15,9 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
-use function bin2hex;
 use Phar;
 use function array_key_exists;
+use function bin2hex;
 use function constant;
 use function define;
 use function defined;
