@@ -17,6 +17,7 @@ namespace KevinGH\Box\Console\Command;
 use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
+use function realpath;
 use Symfony\Component\Console\Command\Command;
 
 /**
@@ -50,12 +51,12 @@ class GenerateDockerFileTest extends CommandTestCase
     {
         $this->commandTester->execute([
             'command' => 'docker',
-            'phar' => self::FIXTURES_DIR.'/simple-phar.phar',
+            'phar' => $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar.phar'),
         ]);
 
-        $expected = <<<'OUTPUT'
+        $expected = <<<OUTPUT
 
-🐳  Generating a Dockerfile for the PHAR "/Users/tfidry/Project/Humbug/box/fixtures/docker/simple-phar.phar"
+🐳  Generating a Dockerfile for the PHAR "{$pharPath}"
 
  [OK] Done
 
