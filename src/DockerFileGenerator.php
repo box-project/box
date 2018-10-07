@@ -47,9 +47,9 @@ Dockerfile;
     /**
      * Creates a new instance of the generator.
      *
-     * @param array $requirements List of requirements following the format defined by the RequirementChecker component
-     * @param string $sourcePhar source PHAR location; This PHAR is going to be copied over to the image so the path
-     *                            should either be absolute or relative to the location of the Dockerfile
+     * @param array  $requirements List of requirements following the format defined by the RequirementChecker component
+     * @param string $sourcePhar   source PHAR location; This PHAR is going to be copied over to the image so the path
+     *                             should either be absolute or relative to the location of the Dockerfile
      */
     public static function createForRequirements(array $requirements, string $sourcePhar): self
     {
@@ -67,9 +67,12 @@ Dockerfile;
      */
     public function __construct(string $image, array $extensions, string $sourcePhar)
     {
-        $this->baseImage($image);
-        $this->extensions(...$extensions);
-        $this->sourcePhar($sourcePhar);
+        Assertion::inArray($image, self::PHP_DOCKER_IMAGES);
+        Assertion::allString($extensions);
+
+        $this->image = $image;
+        $this->extensions = $extensions;
+        $this->sourcePhar = $sourcePhar;
     }
 
     /**
@@ -112,29 +115,6 @@ Dockerfile;
         );
 
         return $contents;
-    }
-
-    public function baseImage(string $image): self
-    {
-        Assertion::inArray($image, self::PHP_DOCKER_IMAGES);
-
-        $this->image = $image;
-
-        return $this;
-    }
-
-    public function extensions(string ...$extensions): self
-    {
-        $this->extensions = $extensions;
-
-        return $this;
-    }
-
-    public function sourcePhar(string $sourcePhar): self
-    {
-        $this->sourcePhar = $sourcePhar;
-
-        return $this;
     }
 
     private static function retrievePhpImageName(array $requirements): string
