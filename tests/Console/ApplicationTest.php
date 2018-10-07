@@ -111,6 +111,7 @@ Available commands:
   build     Builds a new PHAR (deprecated, use "compile" instead)
   compile   🔨  Compiles an application into a PHAR
   diff      🕵  Displays the differences between all of the files in two PHARs
+  docker    🐳  Generates a Dockerfile for the given PHAR
   help      Displays help for a command
   info      🔍  Displays information about the PHAR extension or file
   list      Lists commands

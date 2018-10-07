@@ -27,7 +27,7 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * @covers \KevinGH\Box\Console\Command\Configurable
+ * @covers \KevinGH\Box\Console\Command\ConfigurableCommand
  */
 class ConfigurableTest extends CommandTestCase
 {
@@ -36,7 +36,7 @@ class ConfigurableTest extends CommandTestCase
      */
     protected function getCommand(): Command
     {
-        return new TestConfigurable('test');
+        return new TestConfigurableCommand('test');
     }
 
     public function test_it_has_a_configure_option(): void
@@ -52,7 +52,7 @@ class ConfigurableTest extends CommandTestCase
 
         file_put_contents('box.json', '{"alias": "foo"}');
 
-        /** @var TestConfigurable $command */
+        /** @var TestConfigurableCommand $command */
         $command = $this->application->get('test');
 
         $input = new ArrayInput([]);
@@ -62,11 +62,11 @@ class ConfigurableTest extends CommandTestCase
 
         /** @var Configuration $config */
         $config = (Closure::bind(
-            function (Configurable $command, InputInterface $input, OutputInterface $output): Configuration {
+            function (ConfigurableCommand $command, InputInterface $input, OutputInterface $output): Configuration {
                 return $command->getConfig($input, $output);
             },
             null,
-            TestConfigurable::class
+            TestConfigurableCommand::class
         )($command, $input, $output));
 
         $this->assertInstanceOf(
@@ -83,7 +83,7 @@ class ConfigurableTest extends CommandTestCase
 
         file_put_contents('mybox.json', '{"alias": "foo"}');
 
-        /** @var TestConfigurable $command */
+        /** @var TestConfigurableCommand $command */
         $command = $this->application->get('test');
 
         $input = new ArrayInput(['--config' => 'mybox.json']);
@@ -93,11 +93,11 @@ class ConfigurableTest extends CommandTestCase
 
         /** @var Configuration $config */
         $config = (Closure::bind(
-            function (Configurable $command, InputInterface $input, OutputInterface $output): Configuration {
+            function (ConfigurableCommand $command, InputInterface $input, OutputInterface $output): Configuration {
                 return $command->getConfig($input, $output);
             },
             null,
-            TestConfigurable::class
+            TestConfigurableCommand::class
         )($command, $input, $output));
 
         $this->assertInstanceOf(
@@ -112,7 +112,7 @@ class ConfigurableTest extends CommandTestCase
     {
         touch('index.php');
 
-        /** @var TestConfigurable $command */
+        /** @var TestConfigurableCommand $command */
         $command = $this->application->get('test');
 
         $input = new ArrayInput([]);
@@ -122,11 +122,11 @@ class ConfigurableTest extends CommandTestCase
 
         try {
             (Closure::bind(
-                function (Configurable $command, InputInterface $input, OutputInterface $output): Configuration {
+                function (ConfigurableCommand $command, InputInterface $input, OutputInterface $output): Configuration {
                     return $command->getConfig($input, $output);
                 },
                 null,
-                TestConfigurable::class
+                TestConfigurableCommand::class
             )($command, $input, $output));
 
             $this->fail('Expected exception to be thrown.');
@@ -142,7 +142,7 @@ class ConfigurableTest extends CommandTestCase
     {
         touch('index.php');
 
-        /** @var TestConfigurable $command */
+        /** @var TestConfigurableCommand $command */
         $command = $this->application->get('test');
 
         $input = new ArrayInput([]);
@@ -152,11 +152,11 @@ class ConfigurableTest extends CommandTestCase
 
         /** @var Configuration $config */
         $config = (Closure::bind(
-            function (Configurable $command, InputInterface $input, OutputInterface $output): Configuration {
+            function (ConfigurableCommand $command, InputInterface $input, OutputInterface $output): Configuration {
                 return $command->getConfig($input, $output, true);
             },
             null,
-            TestConfigurable::class
+            TestConfigurableCommand::class
         )($command, $input, $output));
 
         $this->assertInstanceOf(
@@ -173,7 +173,7 @@ class ConfigurableTest extends CommandTestCase
 
         file_put_contents('box.json', '{"foo": "foo"}');
 
-        /** @var TestConfigurable $command */
+        /** @var TestConfigurableCommand $command */
         $command = $this->application->get('test');
 
         $input = new ArrayInput([]);
@@ -183,11 +183,11 @@ class ConfigurableTest extends CommandTestCase
 
         try {
             (Closure::bind(
-                function (Configurable $command, InputInterface $input, OutputInterface $output): Configuration {
+                function (ConfigurableCommand $command, InputInterface $input, OutputInterface $output): Configuration {
                     return $command->getConfig($input, $output);
                 },
                 null,
-                TestConfigurable::class
+                TestConfigurableCommand::class
             )($command, $input, $output));
 
             $this->fail('Expected exception to be thrown.');
@@ -204,7 +204,7 @@ class ConfigurableTest extends CommandTestCase
     {
         file_put_contents('box.json', '{}');
 
-        /** @var TestConfigurable $command */
+        /** @var TestConfigurableCommand $command */
         $command = $this->application->get('test');
 
         $input = new ArrayInput([]);
@@ -214,11 +214,11 @@ class ConfigurableTest extends CommandTestCase
 
         try {
             (Closure::bind(
-                function (Configurable $command, InputInterface $input, OutputInterface $output): Configuration {
+                function (ConfigurableCommand $command, InputInterface $input, OutputInterface $output): Configuration {
                     return $command->getConfig($input, $output);
                 },
                 null,
-                TestConfigurable::class
+                TestConfigurableCommand::class
             )($command, $input, $output));
 
             $this->fail('Expected exception to be thrown.');

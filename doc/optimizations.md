@@ -70,7 +70,7 @@ possible enabling that optimisation for your PHAR.
 <br />
 <hr />
 
-« [Requirement Checker](requirement-checker.md) • [PHAR code isolation](code-isolation.md) »
+« [Requirement Checker](requirement-checker.md#requirements-checker) • [PHAR code isolation](code-isolation.md#phar-code-isolation) »
 
 
 [include-files]: configuration.md#including-files

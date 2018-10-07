@@ -71,7 +71,7 @@ there is two recommendations:
 <br />
 <hr />
 
-« [Optimize your PHAR](optimizations.md) • [Table of Contents](../README.md#table-of-contents) »
+« [Optimize your PHAR](optimizations.md#optimize-your-phar) • [Docker support](docker.md#docker-support) »
 
 
 [phpstan]: https://github.com/phpstan/phpstan

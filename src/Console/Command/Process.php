@@ -40,7 +40,7 @@ use function sprintf;
 use function strlen;
 use function substr;
 
-final class Process extends Configurable
+final class Process extends ConfigurableCommand
 {
     use ChangeableWorkingDirectory;
 

@@ -28,7 +28,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * @private
  */
-final class Validate extends Configurable
+final class Validate extends ConfigurableCommand
 {
     private const IGNORE_MESSAGES_OPTION = 'ignore-recommendations-and-warnings';
 

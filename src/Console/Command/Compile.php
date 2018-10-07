@@ -34,6 +34,7 @@ use stdClass;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
@@ -72,7 +73,7 @@ use function substr;
  * @final
  * @private
  */
-class Compile extends Configurable
+class Compile extends ConfigurableCommand
 {
     use ChangeableWorkingDirectory;
 
@@ -97,6 +98,7 @@ HELP;
     private const NO_RESTART_OPTION = 'no-restart';
     private const DEV_OPTION = 'dev';
     private const NO_CONFIG_OPTION = 'no-config';
+    private const WITH_DOCKER_OPTION = 'with-docker';
 
     private const DEBUG_DIR = '.box_dump';
 
@@ -140,6 +142,12 @@ HELP;
             null,
             InputOption::VALUE_NONE,
             'Ignore the config file even when one is specified with the --config option'
+        );
+        $this->addOption(
+            self::WITH_DOCKER_OPTION,
+            null,
+            InputOption::VALUE_NONE,
+            'Generates a Dockerfile'
         );
 
         $this->configureWorkingDirOption();
@@ -193,6 +201,10 @@ HELP;
         $this->correctPermissions($path, $config, $logger);
 
         $this->logEndBuilding($config, $logger, $io, $box, $path, $startTime);
+
+        if ($input->getOption(self::WITH_DOCKER_OPTION)) {
+            $this->generateDockerFile($output);
+        }
     }
 
     private function createPhar(
@@ -867,5 +879,15 @@ EOF
                 round(microtime(true) - $startTime, 2)
             )
         );
+    }
+
+    private function generateDockerFile(OutputInterface $output): void
+    {
+        $generateDockerFileCommand = $this->getApplication()->find('docker');
+
+        $input = new StringInput('');
+        $input->setInteractive(false);
+
+        $generateDockerFileCommand->run($input, $output);
     }
 }

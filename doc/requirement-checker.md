@@ -127,7 +127,7 @@ PHP 5.3+ compatible, it will fail before the requirements are being checked.
 <br />
 <hr />
 
-« [Configuration](configuration.md) • [Optimize your PHAR](optimizations.md) »
+« [Configuration](configuration.md#configuration) • [Optimize your PHAR](optimizations.md#optimize-your-phar) »
 
 
 [composer]: https://getcomposer.org/
