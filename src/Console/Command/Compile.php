@@ -71,7 +71,6 @@ use function substr;
 /**
  * @final
  * @private
- * TODO: make final when Build is removed
  */
 class Compile extends Configurable
 {
@@ -488,6 +487,7 @@ EOF
 
             return;
         }
+
         if (null !== ($stub = $config->getStubPath())) {
             $logger->log(
                 CompileLogger::QUESTION_MARK_PREFIX,
@@ -502,7 +502,6 @@ EOF
             return;
         }
 
-        // TODO: add warning that the check requirements could not be added
         $aliasWasAdded = $box->getPhar()->setAlias($config->getAlias());
 
         Assertion::true(

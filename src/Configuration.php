@@ -80,7 +80,7 @@ use function trigger_error;
  */
 final class Configuration
 {
-    private const DEFAULT_ALIAS = 'test.phar';
+    private const DEFAULT_OUTPUT_FALLBACK = 'test.phar';
     private const DEFAULT_MAIN_SCRIPT = 'index.php';
     private const DEFAULT_DATETIME_FORMAT = 'Y-m-d H:i:s';
     private const DEFAULT_REPLACEMENT_SIGIL = '@';
@@ -96,6 +96,7 @@ BANNER;
     ];
     private const PHP_SCOPER_CONFIG = 'scoper.inc.php';
     private const DEFAULT_SIGNING_ALGORITHM = Phar::SHA1;
+    private const DEFAULT_ALIAS_PREFIX = 'box-auto-generated-alias-';
 
     private const ALGORITHM_KEY = 'algorithm';
     private const ALIAS_KEY = 'alias';
@@ -153,7 +154,6 @@ BANNER;
     private $compressionAlgorithm;
     private $mainScriptPath;
     private $mainScriptContents;
-    private $map;
     private $fileMapper;
     private $metadata;
     private $tmpOutputPath;
@@ -177,8 +177,6 @@ BANNER;
     {
         $logger = new ConfigurationLogger();
 
-        $alias = self::retrieveAlias($raw);
-
         $basePath = self::retrieveBasePath($file, $raw, $logger);
 
         $composerFiles = self::retrieveComposerFiles($basePath);
@@ -192,6 +190,36 @@ BANNER;
         $composerJson = $composerFiles[0];
         /** @var (string|null)[] $composerJson */
         $composerLock = $composerFiles[1];
+
+        $stubPath = self::retrieveStubPath($raw, $basePath, $logger);
+        $isStubGenerated = self::retrieveIsStubGenerated($raw, $stubPath, $logger);
+
+        $alias = self::retrieveAlias($raw, null !== $stubPath, $logger);
+
+        $shebang = self::retrieveShebang($raw, $isStubGenerated, $logger);
+
+        $stubBannerContents = self::retrieveStubBannerContents($raw, $isStubGenerated, $logger);
+        $stubBannerPath = self::retrieveStubBannerPath($raw, $basePath, $isStubGenerated, $logger);
+
+        if (null !== $stubBannerPath) {
+            $stubBannerContents = file_contents($stubBannerPath);
+        }
+
+        $stubBannerContents = self::normalizeStubBannerContents($stubBannerContents);
+
+        if (null !== $stubBannerPath && self::DEFAULT_BANNER === $stubBannerContents) {
+            self::addRecommendationForDefaultValue($logger, self::BANNER_FILE_KEY);
+        }
+
+        $isInterceptsFileFuncs = self::retrieveInterceptsFileFuncs($raw, $isStubGenerated, $logger);
+
+        $checkRequirements = self::retrieveCheckRequirements(
+            $raw,
+            null !== $composerJson[0],
+            null !== $composerLock[0],
+            false === $isStubGenerated && null === $stubPath,
+            $logger
+        );
 
         $devPackages = ComposerConfiguration::retrieveDevPackages($basePath, $composerJson[1], $composerLock[1]);
 
@@ -254,30 +282,6 @@ BANNER;
         $privateKeyPassphrase = self::retrievePrivateKeyPassphrase($raw, $signingAlgorithm, $logger);
 
         $replacements = self::retrieveReplacements($raw, $file, $logger);
-
-        $shebang = self::retrieveShebang($raw, $logger);
-
-        $stubBannerContents = self::retrieveStubBannerContents($raw, $logger);
-        $stubBannerPath = self::retrieveStubBannerPath($raw, $basePath, $logger);
-
-        if (null !== $stubBannerPath) {
-            $stubBannerContents = file_contents($stubBannerPath);
-        }
-
-        $stubBannerContents = self::normalizeStubBannerContents($stubBannerContents);
-
-        $stubPath = self::retrieveStubPath($raw, $basePath, $logger);
-
-        // TODO: add warning related to the stub generation
-        $isInterceptsFileFuncs = self::retrieveInterceptsFileFuncs($raw, $logger);
-        $isStubGenerated = self::retrieveIsStubGenerated($raw, $stubPath, $logger);
-
-        $checkRequirements = self::retrieveCheckRequirements(
-            $raw,
-            null !== $composerJson[0],
-            null !== $composerLock[0],
-            $logger
-        );
 
         return new self(
             $file,
@@ -657,15 +661,26 @@ BANNER;
         return $this->recommendations;
     }
 
-    private static function retrieveAlias(stdClass $raw): string
+    private static function retrieveAlias(stdClass $raw, bool $userStubUsed, ConfigurationLogger $logger): string
     {
+        self::checkIfDefaultValue($logger, $raw, self::ALIAS_KEY);
+
         if (false === isset($raw->{self::ALIAS_KEY})) {
-            return unique_id('box-auto-generated-alias-').'.phar';
+            return unique_id(self::DEFAULT_ALIAS_PREFIX).'.phar';
         }
 
         $alias = trim($raw->{self::ALIAS_KEY});
 
         Assertion::notEmpty($alias, 'A PHAR alias cannot be empty when provided.');
+
+        if ($userStubUsed) {
+            $logger->addWarning(
+                sprintf(
+                    'The "%s" setting has been set but is ignored since a custom stub path is used',
+                    self::ALIAS_KEY
+                )
+            );
+        }
 
         return $alias;
     }
@@ -1791,7 +1806,7 @@ BANNER;
             $path = $defaultPath;
         } else {
             // Last resort, should not happen
-            $path = self::normalizePath(self::DEFAULT_ALIAS, $basePath);
+            $path = self::normalizePath(self::DEFAULT_OUTPUT_FALLBACK, $basePath);
         }
 
         $tmp = $real = $path;
@@ -2077,22 +2092,28 @@ BANNER;
         return self::retrievePlaceholder($raw, $logger, self::REPLACEMENT_SIGIL_KEY) ?? self::DEFAULT_REPLACEMENT_SIGIL;
     }
 
-    private static function retrieveShebang(stdClass $raw, ConfigurationLogger $logger): ?string
+    private static function retrieveShebang(stdClass $raw, bool $stubIsGenerated, ConfigurationLogger $logger): ?string
     {
         self::checkIfDefaultValue($logger, $raw, self::SHEBANG_KEY, self::DEFAULT_SHEBANG);
 
-        if (false === array_key_exists(self::SHEBANG_KEY, (array) $raw)) {
+        if (false === isset($raw->{self::SHEBANG_KEY})) {
             return self::DEFAULT_SHEBANG;
         }
 
         $shebang = $raw->{self::SHEBANG_KEY};
 
         if (false === $shebang) {
-            return null;
-        }
+            if (false === $stubIsGenerated) {
+                $logger->addRecommendation(
+                    sprintf(
+                        'The "%s" has been set to `false` but is unnecessary since the Box built-in stub is not'
+                        .' being used',
+                        self::SHEBANG_KEY
+                    )
+                );
+            }
 
-        if (null === $shebang) {
-            $shebang = self::DEFAULT_SHEBANG;
+            return null;
         }
 
         Assertion::string($shebang, 'Expected shebang to be either a string, false or null, found true');
@@ -2107,6 +2128,16 @@ BANNER;
                 $shebang
             )
         );
+
+        if (false === $stubIsGenerated) {
+            $logger->addWarning(
+                sprintf(
+                    'The "%s" has been set but ignored since it is used only with the Box built-in stub which is not'
+                    .' used',
+                    self::SHEBANG_KEY
+                )
+            );
+        }
 
         return $shebang;
     }
@@ -2142,7 +2173,7 @@ BANNER;
         return $algorithm;
     }
 
-    private static function retrieveStubBannerContents(stdClass $raw, ConfigurationLogger $logger): ?string
+    private static function retrieveStubBannerContents(stdClass $raw, bool $stubIsGenerated, ConfigurationLogger $logger): ?string
     {
         self::checkIfDefaultValue($logger, $raw, self::BANNER_KEY, self::DEFAULT_BANNER);
 
@@ -2153,6 +2184,16 @@ BANNER;
         $banner = $raw->{self::BANNER_KEY};
 
         if (false === $banner) {
+            if (false === $stubIsGenerated) {
+                $logger->addRecommendation(
+                    sprintf(
+                        'The "%s" setting has been set but is unnecessary since the Box built-in stub is not '
+                        .'being used',
+                        self::BANNER_KEY
+                    )
+                );
+            }
+
             return null;
         }
 
@@ -2162,11 +2203,24 @@ BANNER;
             $banner = implode("\n", $banner);
         }
 
+        if (false === $stubIsGenerated) {
+            $logger->addWarning(
+                sprintf(
+                    'The "%s" setting has been set but is ignored since the Box built-in stub is not being used',
+                    self::BANNER_KEY
+                )
+            );
+        }
+
         return $banner;
     }
 
-    private static function retrieveStubBannerPath(stdClass $raw, string $basePath, ConfigurationLogger $logger): ?string
-    {
+    private static function retrieveStubBannerPath(
+        stdClass $raw,
+        string $basePath,
+        bool $stubIsGenerated,
+        ConfigurationLogger $logger
+    ): ?string {
         self::checkIfDefaultValue($logger, $raw, self::BANNER_FILE_KEY);
 
         if (false === isset($raw->{self::BANNER_FILE_KEY})) {
@@ -2176,6 +2230,15 @@ BANNER;
         $bannerFile = make_path_absolute($raw->{self::BANNER_FILE_KEY}, $basePath);
 
         Assertion::file($bannerFile);
+
+        if (false === $stubIsGenerated) {
+            $logger->addWarning(
+                sprintf(
+                    'The "%s" setting has been set but is ignored since the Box built-in stub is not being used',
+                    self::BANNER_FILE_KEY
+                )
+            );
+        }
 
         return $bannerFile;
     }
@@ -2207,11 +2270,29 @@ BANNER;
         return null;
     }
 
-    private static function retrieveInterceptsFileFuncs(stdClass $raw, ConfigurationLogger $logger): bool
-    {
+    private static function retrieveInterceptsFileFuncs(
+        stdClass $raw,
+        bool $stubIsGenerated,
+        ConfigurationLogger $logger
+    ): bool {
         self::checkIfDefaultValue($logger, $raw, self::INTERCEPT_KEY, false);
 
-        return $raw->{self::INTERCEPT_KEY} ?? false;
+        if (false === isset($raw->{self::INTERCEPT_KEY})) {
+            return false;
+        }
+
+        $intercept = $raw->{self::INTERCEPT_KEY};
+
+        if ($intercept && false === $stubIsGenerated) {
+            $logger->addWarning(
+                sprintf(
+                    'The "%s" setting has been set but is ignored since the Box built-in stub is not being used',
+                    self::INTERCEPT_KEY
+                )
+            );
+        }
+
+        return $intercept;
     }
 
     private static function retrievePromptForPrivateKey(
@@ -2246,6 +2327,7 @@ BANNER;
         stdClass $raw,
         bool $hasComposerJson,
         bool $hasComposerLock,
+        bool $pharStubUsed,
         ConfigurationLogger $logger
     ): bool {
         self::checkIfDefaultValue($logger, $raw, self::CHECK_REQUIREMENTS_KEY, true);
@@ -2264,6 +2346,16 @@ BANNER;
             );
 
             return false;
+        }
+
+        if ($checkRequirements && $pharStubUsed) {
+            $logger->addWarning(
+                sprintf(
+                    'The "%s" setting has been set but has been ignored since the PHAR built-in stub is being '
+                    .'used.',
+                    self::CHECK_REQUIREMENTS_KEY
+                )
+            );
         }
 
         return $checkRequirements;

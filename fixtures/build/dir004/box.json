@@ -1,5 +1,4 @@
 {
-    "alias": "test.phar",
     "files": ["test.php"],
     "main": "test.php",
     "stub": "stub.php"

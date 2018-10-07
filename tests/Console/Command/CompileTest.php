@@ -1379,7 +1379,6 @@ KevinGH\Box\Configuration {#140
     \\n
     require 'test.php';\\n
     """
-  -map: null
   -fileMapper: KevinGH\Box\MapFile {#140
     -basePath: "/path/to"
     -map: array:1 [
