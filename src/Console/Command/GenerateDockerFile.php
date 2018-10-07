@@ -38,24 +38,6 @@ final class GenerateDockerFile extends ConfigurableCommand
     use CreateTemporaryPharFile;
 
     private const PHAR_ARG = 'phar';
-
-    private const DOCKER_FILE_TEMPLATE = <<<'Dockerfile'
-FROM php:__BASE_PHP_IMAGE_TOKEN__
-
-RUN $(php -r '$extensionInstalled = array_map("strtolower", \get_loaded_extensions(false));$requiredExtensions = __PHP_EXTENSIONS_TOKEN__;$extensionsToInstall = array_diff($requiredExtensions, $extensionInstalled);if ([] !== $extensionsToInstall) {echo \sprintf("docker-php-ext-install %s", implode(" ", $extensionsToInstall));}echo "echo \"No extensions\"";')
-
-COPY __PHAR_FILE_PATH_TOKEN__ /__PHAR_FILE_NAME_TOKEN__
-
-ENTRYPOINT ["/__PHAR_FILE_NAME_TOKEN__"]
-
-Dockerfile;
-
-    private const PHP_DOCKER_IMAGES = [
-        '7.2.0' => '7.2-cli-alpine',
-        '7.1.0' => '7.1-cli-alpine',
-        '7.0.0' => '7-cli-alpine',
-    ];
-
     private const DOCKER_FILE_NAME = 'Dockerfile';
 
     /**
@@ -113,6 +95,8 @@ Dockerfile;
                     'Cannot retrieve the requirements for the PHAR. Make sure the PHAR has been built with Box and the '
                     .'requirement checker enabled.'
                 );
+
+                return 1;
             }
 
             $requirements = include $requirementsPhar;
@@ -123,8 +107,6 @@ Dockerfile;
                 )
                 ->generate()
             ;
-
-            dump_file(self::DOCKER_FILE_NAME, $dockerFileContents);
 
             if (file_exists(self::DOCKER_FILE_NAME)) {
                 $remove = $io->askQuestion(
@@ -140,6 +122,8 @@ Dockerfile;
                     return 0;
                 }
             }
+
+            dump_file(self::DOCKER_FILE_NAME, $dockerFileContents);
 
             $io->success('Done');
 
@@ -200,7 +184,7 @@ Dockerfile;
         $compileInput = new StringInput($compileInput);
         $compileInput->setInteractive(false);
 
-        $compileCommand->run($compileInput, $output);
+        $compileCommand->run($compileInput, clone $output);
 
         return $config->getOutputPath();
     }
