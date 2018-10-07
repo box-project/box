@@ -6,7 +6,7 @@
 1. [Permissions][permissions]
 1. [Check requirements][check-requirements]
 1. [Including files][including-files]
-    1. [Force auto-discovery (`auto-discovery`)][force-autodiscovery]
+    1. [Force auto-discovery (`force-autodiscovery`)][force-autodiscovery]
     1. [Files (`files` and `files-bin`)][files]
     1. [Directories (`directories` and `directories-bin`)][directories]
     1. [Finder (`finder` and `finder-bin`)][finder]
@@ -55,7 +55,6 @@ to `null`, then its default value will be picked and is strictly equivalent to n
     "algorithm": "?",
     "alias": "?",
     "annotations": "?",
-    "auto-discovery": "?",
     "banner": "?",
     "banner-file": "?",
     "base-path": "?",
@@ -74,6 +73,7 @@ to `null`, then its default value will be picked and is strictly equivalent to n
     "files-bin": "?",
     "finder": "?",
     "finder-bin": "?",
+    "force-autodiscovery": "?",
     "git": "?",
     "git-commit": "?",
     "git-commit-short": "?",
@@ -183,7 +183,7 @@ or directory from a dev dependency, you can do so by adding it via one of the fo
 binary files, the regular file will take precedence.
 
 
-### Force auto-discovery (`auto-discovery`)
+### Force auto-discovery (`force-autodiscovery`)
 
 The `auto-discovery` (`bool` default `false`) setting forces Box to attempt to find which files to include even though
 you are using the [`directories`][directories] or [`finder`][finder] setting.
@@ -765,7 +765,7 @@ The datetime format placeholder (`string`|`null`, default `Y-m-d H:i:s`) setting
 
 ### Pretty git tag placeholder (`git`)
 
-The git tag placeholder (`string`|`null` default none) setting is the name of a placeholder value that will be replaced
+The git tag placeholder (`string`|`null` default `null`) setting is the name of a placeholder value that will be replaced
 in all [non-binary files][including-files] by the current git tag of the repository.
 
 Example of value the placeholder will be replaced with:
@@ -776,7 +776,7 @@ Example of value the placeholder will be replaced with:
 
 ### Git commit placeholder (`git-commit`)
 
-The git commit (`string`|`null` default none) setting is the name of a placeholder value that will be replaced in all
+The git commit (`string`|`null` default `null`) setting is the name of a placeholder value that will be replaced in all
 [non-binary files][including-files] by the current git commit hash of the repository.
 
 Example of value the placeholder will be replaced with: `e558e335f1d165bc24d43fdf903cdadd3c3cbd03`
@@ -784,7 +784,7 @@ Example of value the placeholder will be replaced with: `e558e335f1d165bc24d43fd
 
 ### Short git commit placeholder (`git-commit-short`)
 
-The short git commit (`string`|`null` default none) setting is the name of a placeholder value that will be replaced in
+The short git commit (`string`|`null` default `null`) setting is the name of a placeholder value that will be replaced in
 all [non-binary files][including-files] by the current git short commit hash of the repository.
 
 Example of value the placeholder will be replaced with: `e558e33`
@@ -792,7 +792,7 @@ Example of value the placeholder will be replaced with: `e558e33`
 
 ### Git tag placeholder (`git-tag`)
 
-The git tag placeholder (`string`|`null` default none) setting is the name of a placeholder value that will be replaced
+The git tag placeholder (`string`|`null` default `null`) setting is the name of a placeholder value that will be replaced
 in all [non-binary files][including-files] by the current git tag of the repository.
 
 Example of value the placeholder will be replaced with:
@@ -803,7 +803,7 @@ Example of value the placeholder will be replaced with:
 
 ### Git version placeholder (`git-version`)
 
-The git version (`string`|`null` default none) setting is the name of a placeholder value that will be replaced in all
+The git version (`string`|`null` default `null`) setting is the name of a placeholder value that will be replaced in all
 [non-binary files][including-files] by the one of the following (in order):
 
 - The git repository's most recent tag.
@@ -838,7 +838,7 @@ The short commit hash will only be used if no tag is available.
 [directories]: #directories-directories-and-directories-bin
 [dump-autoload]: #dumping-the-composer-autoloader-dump-autoload
 [exclude-composer-files]: #excluding-the-composer-files-exclude-composer-files
-[force-autodiscovery]: #force-auto-discovery-auto-discovery
+[force-autodiscovery]: #force-auto-discovery-force-auto-discovery
 [files]: #files-files-and-files-bin
 [finder]: #finder-finder-and-finder-bin
 [git]: #pretty-git-tag-placeholder-git

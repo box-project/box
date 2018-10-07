@@ -1077,6 +1077,19 @@ JSON
         );
     }
 
+    public function test_a_recommendation_is_given_if_the_blacklist_is_set_with_its_default_value(): void
+    {
+        $this->setConfig([
+            'blacklist' => [],
+        ]);
+
+        $this->assertSame(
+            ['The "blacklist" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
     /**
      * @dataProvider provideJsonValidNonStringArray
      *
@@ -1158,6 +1171,19 @@ JSON
         }
     }
 
+    public function test_a_recommendation_is_given_when_the_files_are_set_to_an_empty_array(): void
+    {
+        $this->setConfig([
+            'files' => [],
+        ]);
+
+        $this->assertSame(
+            ['The "files" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
     /**
      * @dataProvider provideJsonValidNonStringArray
      *
@@ -1224,6 +1250,19 @@ JSON
                 $exception->getMessage()
             );
         }
+    }
+
+    public function test_a_recommendation_is_given_when_an_emtpy_array_is_given_for_directories(): void
+    {
+        $this->setConfig([
+            'directories' => [],
+        ]);
+
+        $this->assertSame(
+            ['The "directories" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     /**
@@ -1293,6 +1332,19 @@ JSON
                 $exception->getMessage()
             );
         }
+    }
+
+    public function test_a_recommendation_is_given_when_an_emtpy_array_is_given_for_finders(): void
+    {
+        $this->setConfig([
+            'finder' => [],
+        ]);
+
+        $this->assertSame(
+            ['The "finder" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_finder_and_bin_finder_input_is_normalized(): void
@@ -1652,7 +1704,7 @@ JSON
             'finder' => [
                 ['in' => ['dir1']],
             ],
-            'auto-discovery' => true,
+            'force-autodiscovery' => true,
             'blacklist' => [
                 'dir0/blacklisted_file',
                 'dir1/blacklisted_file',
@@ -1664,6 +1716,19 @@ JSON
         $this->assertEquals($expected, $actual);
 
         $this->assertCount(0, $this->config->getBinaryFiles());
+    }
+
+    public function test_a_recommendation_is_given_when_the_force_autodiscovery_is_set_to_false(): void
+    {
+        $this->setConfig([
+            'force-autodiscovery' => false,
+        ]);
+
+        $this->assertSame(
+            ['The "force-autodiscovery" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function provideConfigWithMainScript(): Generator
@@ -1859,7 +1924,7 @@ JSON
                 function (): void {
                 },
                 [
-                    'auto-discovery' => $booleanValue,
+                    'force-autodiscovery' => $booleanValue,
                 ],
                 true,
             ];
@@ -1884,7 +1949,7 @@ JSON
                             'in' => ['directory-bin1'],
                         ],
                     ],
-                    'auto-discovery' => $booleanValue,
+                    'force-autodiscovery' => $booleanValue,
                     'blacklist' => ['unknown'],
                 ],
                 true,
@@ -1907,7 +1972,7 @@ JSON
             },
             [
                 'directories' => ['directory0'],
-                'auto-discovery' => true,
+                'force-autodiscovery' => true,
             ],
             true,
         ];
@@ -1936,7 +2001,7 @@ JSON
                         'in' => ['directory1'],
                     ],
                 ],
-                'auto-discovery' => true,
+                'force-autodiscovery' => true,
             ],
             true,
         ];
@@ -1969,7 +2034,7 @@ JSON
                         'in' => ['directory1'],
                     ],
                 ],
-                'auto-discovery' => true,
+                'force-autodiscovery' => true,
             ],
             true,
         ];

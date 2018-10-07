@@ -122,7 +122,6 @@ class CompileTest extends CommandTestCase
                     'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
                     'shebang' => $shebang,
-                    'stub' => true,
                 ]
             )
         );
@@ -322,7 +321,6 @@ PHP;
                     'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
                     'shebang' => $shebang,
-                    'stub' => true,
                 ]
             )
         );
@@ -543,7 +541,7 @@ PHP;
                 [
                     'alias' => 'alias-test.phar',
                     'check-requirements' => false,
-                    'chmod' => '0755',
+                    'chmod' => '0754',
                     'compactors' => [Php::class],
                     'directories' => ['a'],
                     'files' => ['test.php'],
@@ -555,7 +553,6 @@ PHP;
                     ],
                     'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
-                    'stub' => true,
                 ]
             )
         );
@@ -605,7 +602,7 @@ Building the PHAR "/path/to/tmp/test.phar"
 ? Dumping the Composer autoloader
 ? Removing the Composer dump artefacts
 ? No compression
-? Setting file permissions to 0755
+? Setting file permissions to 0754
 * Done.
 
 No recommendation found.
@@ -700,7 +697,7 @@ PHP;
             json_encode(
                 [
                     'check-requirements' => false,
-                    'chmod' => '0755',
+                    'chmod' => '0754',
                     'compactors' => [Php::class],
                     'directories' => ['a'],
                     'files' => ['test.php'],
@@ -712,7 +709,6 @@ PHP;
                     ],
                     'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
-                    'stub' => true,
                 ]
             )
         );
@@ -776,7 +772,7 @@ PHP;
                 [
                     'alias' => 'test.phar',
                     'banner' => 'custom banner',
-                    'chmod' => '0755',
+                    'chmod' => '0754',
                     'compactors' => [Php::class],
                     'directories' => ['a'],
                     'files' => ['test.php'],
@@ -792,7 +788,6 @@ PHP;
                     'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
                     'shebang' => $shebang,
-                    'stub' => true,
                 ]
             )
         );
@@ -846,7 +841,7 @@ Box version 3.x-dev@151e40a
 ? No compression
 ? Signing using a private key
 Private key passphrase:
-? Setting file permissions to 0755
+? Setting file permissions to 0754
 * Done.
 
 No recommendation found.
@@ -880,7 +875,7 @@ OUTPUT;
                         'multiline',
                         'custom banner',
                     ],
-                    'chmod' => '0755',
+                    'chmod' => '0754',
                     'compactors' => [Php::class],
                     'directories' => ['a'],
                     'files' => ['test.php'],
@@ -896,7 +891,6 @@ OUTPUT;
                     'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
                     'shebang' => $shebang,
-                    'stub' => true,
                 ]
             )
         );
@@ -951,7 +945,7 @@ Box version 3.x-dev@151e40a
 ? No compression
 ? Signing using a private key
 Private key passphrase:
-? Setting file permissions to 0755
+? Setting file permissions to 0754
 * Done.
 
 No recommendation found.
@@ -990,7 +984,7 @@ OUTPUT;
                         'multiline',
                         'custom banner',
                     ],
-                    'chmod' => '0755',
+                    'chmod' => '0754',
                     'compactors' => [Php::class],
                     'directories' => ['a'],
                     'files' => ['test.php'],
@@ -1006,7 +1000,6 @@ OUTPUT;
                     'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
                     'shebang' => $shebang,
-                    'stub' => true,
                 ]
             )
         );
@@ -1081,7 +1074,7 @@ Box version 3.x-dev@151e40a
 ? No compression
 ? Signing using a private key
 Private key passphrase:
-? Setting file permissions to 0755
+? Setting file permissions to 0754
 * Done.
 
 No recommendation found.
@@ -1172,7 +1165,7 @@ OUTPUT;
 
 KevinGH\Box\Configuration {#140
   -file: "/path/to/box.json"
-  -fileMode: 493
+  -fileMode: 492
   -alias: "test.phar"
   -basePath: "/path/to"
   -composerJson: array:2 [
@@ -1494,7 +1487,6 @@ EOF;
                     'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
                     'shebang' => $shebang,
-                    'stub' => true,
                 ]
             )
         );
@@ -2910,7 +2902,7 @@ Building the PHAR "/path/to/tmp/index.phar"
 * Done.
 
 Recommendations:
-    - The "check-requirements" setting has been set but is unnecessary since its value is the default value
+    - The "check-requirements" setting can be omitted since is set to its default value
 Warnings:
     - The requirement checker could not be used because the composer.json and composer.lock file could not be found.
 

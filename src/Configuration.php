@@ -68,6 +68,8 @@ use function KevinGH\Box\FileSystem\longest_common_base_path;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use function preg_match;
+use function property_exists;
+use function realpath;
 use function sprintf;
 use function strtoupper;
 use function substr;
@@ -95,6 +97,47 @@ BANNER;
     ];
     private const PHP_SCOPER_CONFIG = 'scoper.inc.php';
     private const DEFAULT_SIGNING_ALGORITHM = Phar::SHA1;
+
+    private const ALGORITHM_KEY = 'algorithm';
+    private const ALIAS_KEY = 'alias';
+    private const ANNOTATIONS_KEY = 'annotations';
+    private const AUTO_DISCOVERY_KEY = 'force-autodiscovery';
+    private const BANNER_KEY = 'banner';
+    private const BANNER_FILE_KEY = 'banner-file';
+    private const BASE_PATH_KEY = 'base-path';
+    private const BLACKLIST_KEY = 'blacklist';
+    private const CHECK_REQUIREMENTS_KEY = 'check-requirements';
+    private const CHMOD_KEY = 'chmod';
+    private const COMPACTORS_KEY = 'compactors';
+    private const COMPRESSION_KEY = 'compression';
+    private const DATETIME_KEY = 'datetime';
+    private const DATETIME_FORMAT_KEY = 'datetime-format';
+    private const DATETIME_FORMAT_DEPRECATED_KEY = 'datetime_format';
+    private const DIRECTORIES_KEY = 'directories';
+    private const DIRECTORIES_BIN_KEY = 'directories-bin';
+    private const DUMP_AUTOLOAD_KEY = 'dump-autoload';
+    private const EXCLUDE_COMPOSER_FILES_KEY = 'exclude-composer-files';
+    private const FILES_KEY = 'files';
+    private const FILES_BIN_KEY = 'files-bin';
+    private const FINDER_KEY = 'finder';
+    private const FINDER_BIN_KEY = 'finder-bin';
+    private const GIT_KEY = 'git';
+    private const GIT_COMMIT_KEY = 'git-commit';
+    private const GIT_COMMIT_SHORT_KEY = 'git-commit-short';
+    private const GIT_TAG_KEY = 'git-tag';
+    private const GIT_VERSION_KEY = 'git-version';
+    private const INTERCEPT_KEY = 'intercept';
+    private const KEY_KEY = 'key';
+    private const KEY_PASS_KEY = 'key-pass';
+    private const MAIN_KEY = 'main';
+    private const MAP_KEY = 'map';
+    private const METADATA_KEY = 'metadata';
+    private const OUTPUT_KEY = 'output';
+    private const PHP_SCOPER_KEY = 'php-scoper';
+    private const REPLACEMENT_SIGIL_KEY = 'replacement-sigil';
+    private const REPLACEMENTS_KEY = 'replacements';
+    private const SHEBANG_KEY = 'shebang';
+    private const STUB_KEY = 'stub';
 
     private $file;
     private $fileMode;
@@ -137,16 +180,18 @@ BANNER;
 
         $alias = self::retrieveAlias($raw);
 
-        $basePath = self::retrieveBasePath($file, $raw);
+        $basePath = self::retrieveBasePath($file, $raw, $logger);
 
         $composerFiles = self::retrieveComposerFiles($basePath);
 
-        $mainScriptPath = self::retrieveMainScriptPath($raw, $basePath, $composerFiles[0][1]);
+        $mainScriptPath = self::retrieveMainScriptPath($raw, $basePath, $composerFiles[0][1], $logger);
         $mainScriptContents = self::retrieveMainScriptContents($mainScriptPath);
 
-        [$tmpOutputPath, $outputPath] = self::retrieveOutputPath($raw, $basePath, $mainScriptPath);
+        [$tmpOutputPath, $outputPath] = self::retrieveOutputPath($raw, $basePath, $mainScriptPath, $logger);
 
+        /** @var (string|null)[] $composerJson */
         $composerJson = $composerFiles[0];
+        /** @var (string|null)[] $composerJson */
         $composerLock = $composerFiles[1];
 
         $devPackages = ComposerConfiguration::retrieveDevPackages($basePath, $composerJson[1], $composerLock[1]);
@@ -155,10 +200,17 @@ BANNER;
          * @var string[]
          * @var Closure  $blacklistFilter
          */
-        [$excludedPaths, $blacklistFilter] = self::retrieveBlacklistFilter($raw, $basePath, $tmpOutputPath, $outputPath, $mainScriptPath);
+        [$excludedPaths, $blacklistFilter] = self::retrieveBlacklistFilter(
+            $raw,
+            $basePath,
+            $logger,
+            $tmpOutputPath,
+            $outputPath,
+            $mainScriptPath
+        );
 
         $autodiscoverFiles = self::autodiscoverFiles($file, $raw);
-        $forceFilesAutodiscovery = self::retrieveForceFilesAutodiscovery($raw);
+        $forceFilesAutodiscovery = self::retrieveForceFilesAutodiscovery($raw, $logger);
 
         $filesAggregate = self::collectFiles(
             $raw,
@@ -170,7 +222,8 @@ BANNER;
             $composerFiles,
             $composerJson,
             $autodiscoverFiles,
-            $forceFilesAutodiscovery
+            $forceFilesAutodiscovery,
+            $logger
         );
         $binaryFilesAggregate = self::collectBinaryFiles(
             $raw,
@@ -178,34 +231,35 @@ BANNER;
             $mainScriptPath,
             $blacklistFilter,
             $excludedPaths,
-            $devPackages
+            $devPackages,
+            $logger
         );
 
         $dumpAutoload = self::retrieveDumpAutoload($raw, null !== $composerJson[0], $logger);
 
-        $excludeComposerFiles = self::retrieveExcludeComposerFiles($raw);
+        $excludeComposerFiles = self::retrieveExcludeComposerFiles($raw, $logger);
 
-        $compactors = self::retrieveCompactors($raw, $basePath);
-        $compressionAlgorithm = self::retrieveCompressionAlgorithm($raw);
+        $compactors = self::retrieveCompactors($raw, $basePath, $logger);
+        $compressionAlgorithm = self::retrieveCompressionAlgorithm($raw, $logger);
 
-        $fileMode = self::retrieveFileMode($raw);
+        $fileMode = self::retrieveFileMode($raw, $logger);
 
-        $map = self::retrieveMap($raw);
+        $map = self::retrieveMap($raw, $logger);
         $fileMapper = new MapFile($basePath, $map);
 
-        $metadata = self::retrieveMetadata($raw);
+        $metadata = self::retrieveMetadata($raw, $logger);
 
-        $signingAlgorithm = self::retrieveSigningAlgorithm($raw);
+        $signingAlgorithm = self::retrieveSigningAlgorithm($raw, $logger);
         $promptForPrivateKey = self::retrievePromptForPrivateKey($raw, $signingAlgorithm, $logger);
         $privateKeyPath = self::retrievePrivateKeyPath($raw, $basePath, $signingAlgorithm, $logger);
         $privateKeyPassphrase = self::retrievePrivateKeyPassphrase($raw, $signingAlgorithm, $logger);
 
         $replacements = self::retrieveReplacements($raw, $file, $logger);
 
-        $shebang = self::retrieveShebang($raw);
+        $shebang = self::retrieveShebang($raw, $logger);
 
-        $stubBannerContents = self::retrieveStubBannerContents($raw);
-        $stubBannerPath = self::retrieveStubBannerPath($raw, $basePath);
+        $stubBannerContents = self::retrieveStubBannerContents($raw, $logger);
+        $stubBannerPath = self::retrieveStubBannerPath($raw, $basePath, $logger);
 
         if (null !== $stubBannerPath) {
             $stubBannerContents = file_contents($stubBannerPath);
@@ -213,10 +267,11 @@ BANNER;
 
         $stubBannerContents = self::normalizeStubBannerContents($stubBannerContents);
 
-        $stubPath = self::retrieveStubPath($raw, $basePath);
+        $stubPath = self::retrieveStubPath($raw, $basePath, $logger);
 
-        $isInterceptFileFuncs = self::retrieveIsInterceptFileFuncs($raw);
-        $isStubGenerated = self::retrieveIsStubGenerated($raw, $stubPath);
+        // TODO: add warning related to the stub generation
+        $isInterceptsFileFuncs = self::retrieveInterceptsFileFuncs($raw, $logger);
+        $isStubGenerated = self::retrieveIsStubGenerated($raw, $stubPath, $logger);
 
         $checkRequirements = self::retrieveCheckRequirements(
             $raw,
@@ -254,7 +309,7 @@ BANNER;
             $stubBannerContents,
             $stubBannerPath,
             $stubPath,
-            $isInterceptFileFuncs,
+            $isInterceptsFileFuncs,
             $isStubGenerated,
             $checkRequirements,
             $logger->getWarnings(),
@@ -605,57 +660,72 @@ BANNER;
 
     private static function retrieveAlias(stdClass $raw): string
     {
-        if (false === isset($raw->alias)) {
+        if (false === isset($raw->{self::ALIAS_KEY})) {
             return uniqid('box-auto-generated-alias-', false).'.phar';
         }
 
-        $alias = trim($raw->alias);
+        $alias = trim($raw->{self::ALIAS_KEY});
 
         Assertion::notEmpty($alias, 'A PHAR alias cannot be empty when provided.');
 
         return $alias;
     }
 
-    private static function retrieveBasePath(?string $file, stdClass $raw): string
+    private static function retrieveBasePath(?string $file, stdClass $raw, ConfigurationLogger $logger): string
     {
         if (null === $file) {
             return getcwd();
         }
 
-        if (false === isset($raw->{'base-path'})) {
+        if (false === isset($raw->{self::BASE_PATH_KEY})) {
             return realpath(dirname($file));
         }
 
-        $basePath = trim($raw->{'base-path'});
+        $basePath = trim($raw->{self::BASE_PATH_KEY});
 
         Assertion::directory(
             $basePath,
             'The base path "%s" is not a directory or does not exist.'
         );
 
-        return realpath($basePath);
+        $basePath = realpath($basePath);
+        $defaultPath = realpath(dirname($file));
+
+        if ($basePath === $defaultPath) {
+            self::addRecommendationForDefaultValue($logger, self::BASE_PATH_KEY);
+        }
+
+        return $basePath;
     }
 
+    /**
+     * Checks if files should be auto-discovered. It does NOT account for the force-autodiscovery setting.
+     */
     private static function autodiscoverFiles(?string $file, stdClass $raw): bool
     {
         if (null === $file) {
             return true;
         }
 
-        // TODO: config should be casted into an array: it is easier to do and we need an array in several places now
-        $rawConfig = (array) $raw;
+        $associativeRaw = (array) $raw;
 
-        return self::FILES_SETTINGS === array_diff(self::FILES_SETTINGS, array_keys($rawConfig));
+        return self::FILES_SETTINGS === array_diff(self::FILES_SETTINGS, array_keys($associativeRaw));
     }
 
-    private static function retrieveForceFilesAutodiscovery(stdClass $raw): bool
+    private static function retrieveForceFilesAutodiscovery(stdClass $raw, ConfigurationLogger $logger): bool
     {
-        return $raw->{'auto-discovery'} ?? false;
+        self::checkIfDefaultValue($logger, $raw, self::AUTO_DISCOVERY_KEY, false);
+
+        return $raw->{self::AUTO_DISCOVERY_KEY} ?? false;
     }
 
-    private static function retrieveBlacklistFilter(stdClass $raw, string $basePath, ?string ...$excludedPaths): array
-    {
-        $blacklist = self::retrieveBlacklist($raw, $basePath, ...$excludedPaths);
+    private static function retrieveBlacklistFilter(
+        stdClass $raw,
+        string $basePath,
+        ConfigurationLogger $logger,
+        ?string ...$excludedPaths
+    ): array {
+        $blacklist = self::retrieveBlacklist($raw, $basePath, $logger, ...$excludedPaths);
 
         $blacklistFilter = function (SplFileInfo $file) use ($blacklist): ?bool {
             if ($file->isLink()) {
@@ -683,12 +753,18 @@ BANNER;
      *
      * @return string[]
      */
-    private static function retrieveBlacklist(stdClass $raw, string $basePath, ?string ...$excludedPaths): array
-    {
+    private static function retrieveBlacklist(
+        stdClass $raw,
+        string $basePath,
+        ConfigurationLogger $logger,
+        ?string ...$excludedPaths
+    ): array {
+        self::checkIfDefaultValue($logger, $raw, self::BLACKLIST_KEY, []);
+
         /** @var string[] $blacklist */
         $blacklist = array_merge(
             array_filter($excludedPaths),
-            $raw->blacklist ?? []
+            $raw->{self::BLACKLIST_KEY} ?? []
         );
 
         $normalizedBlacklist = [];
@@ -717,9 +793,10 @@ BANNER;
         array $composerFiles,
         array $composerJson,
         bool $autodiscoverFiles,
-        bool $forceFilesAutodiscovery
+        bool $forceFilesAutodiscovery,
+        ConfigurationLogger $logger
     ): array {
-        $files = [self::retrieveFiles($raw, 'files', $basePath, $composerFiles, $mainScriptPath)];
+        $files = [self::retrieveFiles($raw, self::FILES_KEY, $basePath, $composerFiles, $mainScriptPath, $logger)];
 
         if ($autodiscoverFiles || $forceFilesAutodiscovery) {
             [$filesToAppend, $directories] = self::retrieveAllDirectoriesToInclude(
@@ -745,9 +822,23 @@ BANNER;
         }
 
         if (false === $autodiscoverFiles) {
-            $files[] = self::retrieveDirectories($raw, 'directories', $basePath, $blacklistFilter, $excludedPaths);
+            $files[] = self::retrieveDirectories(
+                $raw,
+                self::DIRECTORIES_KEY,
+                $basePath,
+                $blacklistFilter,
+                $excludedPaths,
+                $logger
+            );
 
-            $filesFromFinders = self::retrieveFilesFromFinders($raw, 'finder', $basePath, $blacklistFilter, $devPackages);
+            $filesFromFinders = self::retrieveFilesFromFinders(
+                $raw,
+                self::FINDER_KEY,
+                $basePath,
+                $blacklistFilter,
+                $devPackages,
+                $logger
+            );
 
             foreach ($filesFromFinders as $filesFromFinder) {
                 // Avoid an array_merge here as it can be quite expansive at this stage depending of the number of files
@@ -770,11 +861,28 @@ BANNER;
         ?string $mainScriptPath,
         Closure $blacklistFilter,
         array $excludedPaths,
-        array $devPackages
+        array $devPackages,
+        ConfigurationLogger $logger
     ): array {
-        $binaryFiles = self::retrieveFiles($raw, 'files-bin', $basePath, [], $mainScriptPath);
-        $binaryDirectories = self::retrieveDirectories($raw, 'directories-bin', $basePath, $blacklistFilter, $excludedPaths);
-        $binaryFilesFromFinders = self::retrieveFilesFromFinders($raw, 'finder-bin', $basePath, $blacklistFilter, $devPackages);
+        $binaryFiles = self::retrieveFiles($raw, self::FILES_BIN_KEY, $basePath, [], $mainScriptPath, $logger);
+
+        $binaryDirectories = self::retrieveDirectories(
+            $raw,
+            self::DIRECTORIES_BIN_KEY,
+            $basePath,
+            $blacklistFilter,
+            $excludedPaths,
+            $logger
+        );
+
+        $binaryFilesFromFinders = self::retrieveFilesFromFinders(
+            $raw,
+            self::FINDER_BIN_KEY,
+            $basePath,
+            $blacklistFilter,
+            $devPackages,
+            $logger
+        );
 
         return self::retrieveFilesAggregate($binaryFiles, $binaryDirectories, ...$binaryFilesFromFinders);
     }
@@ -787,8 +895,11 @@ BANNER;
         string $key,
         string $basePath,
         array $composerFiles,
-        ?string $mainScriptPath
+        ?string $mainScriptPath,
+        ConfigurationLogger $logger
     ): array {
+        self::checkIfDefaultValue($logger, $raw, $key, []);
+
         $files = [];
 
         if (isset($composerFiles[0][0])) {
@@ -803,6 +914,10 @@ BANNER;
             return $files;
         }
 
+        if ([] === (array) $raw->{$key}) {
+            return $files;
+        }
+
         $files = array_merge((array) $raw->{$key}, $files);
 
         Assertion::allString($files);
@@ -810,15 +925,13 @@ BANNER;
         $normalizePath = function (string $file) use ($basePath, $key, $mainScriptPath): ?SplFileInfo {
             $file = self::normalizePath($file, $basePath);
 
-            if (is_link($file)) {
-                // TODO: add this to baberlei/assert
-                throw new InvalidArgumentException(
-                    sprintf(
-                        'Cannot add the link "%s": links are not supported.',
-                        $file
-                    )
-                );
-            }
+            Assertion::false(
+                is_link($file),
+                sprintf(
+                    'Cannot add the link "%s": links are not supported.',
+                    $file
+                )
+            );
 
             Assertion::file(
                 $file,
@@ -845,9 +958,10 @@ BANNER;
         string $key,
         string $basePath,
         Closure $blacklistFilter,
-        array $excludedPaths
+        array $excludedPaths,
+        ConfigurationLogger $logger
     ): iterable {
-        $directories = self::retrieveDirectoryPaths($raw, $key, $basePath);
+        $directories = self::retrieveDirectoryPaths($raw, $key, $basePath, $logger);
 
         if ([] !== $directories) {
             $finder = Finder::create()
@@ -877,13 +991,18 @@ BANNER;
         string $key,
         string $basePath,
         Closure $blacklistFilter,
-        array $devPackages
+        array $devPackages,
+        ConfigurationLogger $logger
     ): array {
-        if (isset($raw->{$key})) {
-            return self::processFinders($raw->{$key}, $basePath, $blacklistFilter, $devPackages);
+        self::checkIfDefaultValue($logger, $raw, $key, []);
+
+        if (false === isset($raw->{$key})) {
+            return [];
         }
 
-        return [];
+        $finder = $raw->{$key};
+
+        return self::processFinders($finder, $basePath, $blacklistFilter, $devPackages);
     }
 
     /**
@@ -975,15 +1094,13 @@ BANNER;
         $createNormalizedDirectories = function (string $directory) use ($basePath): ?string {
             $directory = self::normalizePath($directory, $basePath);
 
-            if (is_link($directory)) {
-                // TODO: add this to baberlei/assert
-                throw new InvalidArgumentException(
-                    sprintf(
-                        'Cannot append the link "%s" to the Finder: links are not supported.',
-                        $directory
-                    )
-                );
-            }
+            Assertion::false(
+                is_link($directory),
+                sprintf(
+                    'Cannot append the link "%s" to the Finder: links are not supported.',
+                    $directory
+                )
+            );
 
             Assertion::directory($directory);
 
@@ -993,27 +1110,22 @@ BANNER;
         $normalizeFileOrDirectory = function (string &$fileOrDirectory) use ($basePath, $blacklistFilter): void {
             $fileOrDirectory = self::normalizePath($fileOrDirectory, $basePath);
 
-            if (is_link($fileOrDirectory)) {
-                // TODO: add this to baberlei/assert
-                throw new InvalidArgumentException(
-                    sprintf(
-                        'Cannot append the link "%s" to the Finder: links are not supported.',
-                        $fileOrDirectory
-                    )
-                );
-            }
+            Assertion::false(
+                is_link($fileOrDirectory),
+                sprintf(
+                    'Cannot append the link "%s" to the Finder: links are not supported.',
+                    $fileOrDirectory
+                )
+            );
 
-            // TODO: add this to baberlei/assert
-            if (false === file_exists($fileOrDirectory)) {
-                throw new InvalidArgumentException(
-                    sprintf(
-                        'Path "%s" was expected to be a file or directory. It may be a symlink (which are unsupported).',
-                        $fileOrDirectory
-                    )
-                );
-            }
+            Assertion::true(
+                file_exists($fileOrDirectory),
+                sprintf(
+                    'Path "%s" was expected to be a file or directory. It may be a symlink (which are unsupported).',
+                    $fileOrDirectory
+                )
+            );
 
-            // TODO: add fileExists (as file or directory) to Assert
             if (false === is_file($fileOrDirectory)) {
                 Assertion::directory($fileOrDirectory);
             } else {
@@ -1332,8 +1444,14 @@ BANNER;
      *
      * @return string[]
      */
-    private static function retrieveDirectoryPaths(stdClass $raw, string $key, string $basePath): array
-    {
+    private static function retrieveDirectoryPaths(
+        stdClass $raw,
+        string $key,
+        string $basePath,
+        ConfigurationLogger $logger
+    ): array {
+        self::checkIfDefaultValue($logger, $raw, $key, []);
+
         if (false === isset($raw->{$key})) {
             return [];
         }
@@ -1343,15 +1461,13 @@ BANNER;
         $normalizeDirectory = function (string $directory) use ($basePath, $key): string {
             $directory = self::normalizePath($directory, $basePath);
 
-            if (is_link($directory)) {
-                // TODO: add this to baberlei/assert
-                throw new InvalidArgumentException(
-                    sprintf(
-                        'Cannot add the link "%s": links are not supported.',
-                        $directory
-                    )
-                );
-            }
+            Assertion::false(
+                is_link($directory),
+                sprintf(
+                    'Cannot add the link "%s": links are not supported.',
+                    $directory
+                )
+            );
 
             Assertion::directory(
                 $directory,
@@ -1374,19 +1490,13 @@ BANNER;
 
     private static function retrieveDumpAutoload(stdClass $raw, bool $composerJson, ConfigurationLogger $logger): bool
     {
-        $raw = (array) $raw;
+        self::checkIfDefaultValue($logger, $raw, self::DUMP_AUTOLOAD_KEY, true);
 
-        if (false === array_key_exists('dump-autoload', $raw)) {
+        if (false === property_exists($raw, self::DUMP_AUTOLOAD_KEY)) {
             return $composerJson;
         }
 
-        $dumpAutoload = $raw['dump-autoload'];
-
-        if ($dumpAutoload) {
-            $logger->addRecommendation(
-                'The "dump-autoload" setting has been set but is unnecessary since its value is the default value.'
-            );
-        }
+        $dumpAutoload = $raw->{self::DUMP_AUTOLOAD_KEY} ?? true;
 
         if (false === $composerJson && $dumpAutoload) {
             $logger->addWarning(
@@ -1400,24 +1510,28 @@ BANNER;
         return $composerJson && false !== $dumpAutoload;
     }
 
-    private static function retrieveExcludeComposerFiles(stdClass $raw): bool
+    private static function retrieveExcludeComposerFiles(stdClass $raw, ConfigurationLogger $logger): bool
     {
-        return $raw->{'exclude-composer-files'} ?? true;
+        self::checkIfDefaultValue($logger, $raw, self::EXCLUDE_COMPOSER_FILES_KEY, true);
+
+        return $raw->{self::EXCLUDE_COMPOSER_FILES_KEY} ?? true;
     }
 
     /**
      * @return Compactor[]
      */
-    private static function retrieveCompactors(stdClass $raw, string $basePath): array
+    private static function retrieveCompactors(stdClass $raw, string $basePath, ConfigurationLogger $logger): array
     {
-        if (false === isset($raw->compactors)) {
+        self::checkIfDefaultValue($logger, $raw, self::COMPACTORS_KEY, []);
+
+        if (false === isset($raw->{self::COMPACTORS_KEY})) {
             return [];
         }
 
-        $compactorClasses = array_unique((array) $raw->compactors);
+        $compactorClasses = array_unique((array) $raw->{self::COMPACTORS_KEY});
 
         return array_map(
-            function (string $class) use ($raw, $basePath): Compactor {
+            function (string $class) use ($raw, $basePath, $logger): Compactor {
                 Assertion::classExists($class, 'The compactor class "%s" does not exist.');
                 Assertion::implementsInterface($class, Compactor::class, 'The class "%s" is not a compactor class.');
 
@@ -1426,7 +1540,7 @@ BANNER;
                 }
 
                 if (PhpScoperCompactor::class === $class) {
-                    $phpScoperConfig = self::retrievePhpScoperConfig($raw, $basePath);
+                    $phpScoperConfig = self::retrievePhpScoperConfig($raw, $basePath, $logger);
 
                     $prefix = null === $phpScoperConfig->getPrefix()
                         ? uniqid('_HumbugBox', false)
@@ -1454,16 +1568,18 @@ BANNER;
         );
     }
 
-    private static function retrieveCompressionAlgorithm(stdClass $raw): ?int
+    private static function retrieveCompressionAlgorithm(stdClass $raw, ConfigurationLogger $logger): ?int
     {
-        if (false === isset($raw->compression)) {
+        self::checkIfDefaultValue($logger, $raw, self::COMPRESSION_KEY);
+
+        if (false === isset($raw->{self::COMPRESSION_KEY})) {
             return null;
         }
 
         $knownAlgorithmNames = array_keys(get_phar_compression_algorithms());
 
         Assertion::inArray(
-            $raw->compression,
+            $raw->{self::COMPRESSION_KEY},
             $knownAlgorithmNames,
             sprintf(
                 'Invalid compression algorithm "%%s", use one of "%s" instead.',
@@ -1471,7 +1587,7 @@ BANNER;
             )
         );
 
-        $value = get_phar_compression_algorithms()[$raw->compression];
+        $value = get_phar_compression_algorithms()[$raw->{self::COMPRESSION_KEY}];
 
         // Phar::NONE is not valid for compressFiles()
         if (Phar::NONE === $value) {
@@ -1481,26 +1597,56 @@ BANNER;
         return $value;
     }
 
-    private static function retrieveFileMode(stdClass $raw): ?int
+    private static function retrieveFileMode(stdClass $raw, ConfigurationLogger $logger): ?int
     {
-        if (isset($raw->chmod)) {
-            return intval($raw->chmod, 8);
+        if (property_exists($raw, self::CHMOD_KEY) && null === $raw->{self::CHMOD_KEY}) {
+            self::addRecommendationForDefaultValue($logger, self::CHMOD_KEY);
         }
 
-        return intval(0755, 8);
+        $defaultChmod = intval(0755, 8);
+
+        if (isset($raw->{self::CHMOD_KEY})) {
+            $chmod = intval($raw->{self::CHMOD_KEY}, 8);
+
+            if ($defaultChmod === $chmod) {
+                self::addRecommendationForDefaultValue($logger, self::CHMOD_KEY);
+            }
+
+            return $chmod;
+        }
+
+        return $defaultChmod;
     }
 
-    private static function retrieveMainScriptPath(stdClass $raw, string $basePath, ?array $decodedJsonContents): ?string
-    {
-        if (isset($raw->main)) {
-            $main = $raw->main;
-        } else {
-            if (null === $decodedJsonContents
-                || false === array_key_exists('bin', $decodedJsonContents)
-                || false === $main = current((array) $decodedJsonContents['bin'])
-            ) {
-                $main = self::DEFAULT_MAIN_SCRIPT;
+    private static function retrieveMainScriptPath(
+        stdClass $raw,
+        string $basePath,
+        ?array $decodedJsonContents,
+        ConfigurationLogger $logger
+    ): ?string {
+        $firstBin = false;
+
+        if (null !== $decodedJsonContents && array_key_exists('bin', $decodedJsonContents)) {
+            /** @var false|string $firstBin */
+            $firstBin = current((array) $decodedJsonContents['bin']);
+
+            if (false !== $firstBin) {
+                $firstBin = self::normalizePath($firstBin, $basePath);
             }
+        }
+
+        if (isset($raw->{self::MAIN_KEY})) {
+            $main = $raw->{self::MAIN_KEY};
+
+            if (is_string($main)) {
+                $main = self::normalizePath($main, $basePath);
+
+                if ($main === $firstBin) {
+                    $logger->addRecommendation('The "main" setting can be omitted since is set to its default value');
+                }
+            }
+        } else {
+            $main = false !== $firstBin ? $firstBin : self::normalizePath(self::DEFAULT_MAIN_SCRIPT, $basePath);
         }
 
         if (is_bool($main)) {
@@ -1512,7 +1658,9 @@ BANNER;
             return null;
         }
 
-        return self::normalizePath($main, $basePath);
+        Assertion::file($main);
+
+        return $main;
     }
 
     private static function retrieveMainScriptContents(?string $mainScriptPath): ?string
@@ -1525,6 +1673,8 @@ BANNER;
 
         // Remove the shebang line: the shebang line in a PHAR should be located in the stub file which is the real
         // PHAR entry point file.
+        // If one needs the shebang, then the main file should act as the stub and be registered as such and in which
+        // case the main script can be ignored or disabled.
         return preg_replace('/^#!.*\s*/', '', $contents);
     }
 
@@ -1569,15 +1719,18 @@ BANNER;
     /**
      * @return string[][]
      */
-    private static function retrieveMap(stdClass $raw): array
+    private static function retrieveMap(stdClass $raw, ConfigurationLogger $logger): array
     {
-        if (false === isset($raw->map)) {
+        self::checkIfDefaultValue($logger, $raw, self::MAP_KEY, []);
+
+        if (false === isset($raw->{self::MAP_KEY})) {
             return [];
         }
 
         $map = [];
+        $rawMap = (array) $raw->{self::MAP_KEY};
 
-        foreach ((array) $raw->map as $item) {
+        foreach ($rawMap as $item) {
             $processed = [];
 
             foreach ($item as $match => $replace) {
@@ -1599,38 +1752,50 @@ BANNER;
     /**
      * @return mixed
      */
-    private static function retrieveMetadata(stdClass $raw)
+    private static function retrieveMetadata(stdClass $raw, ConfigurationLogger $logger)
     {
-        if (isset($raw->metadata)) {
-            if (is_object($raw->metadata)) {
-                return (array) $raw->metadata;
-            }
+        self::checkIfDefaultValue($logger, $raw, self::METADATA_KEY);
 
-            return $raw->metadata;
+        if (false === isset($raw->{self::METADATA_KEY})) {
+            return null;
         }
 
-        return null;
+        $metadata = $raw->{self::METADATA_KEY};
+
+        return is_object($metadata) ? (array) $metadata : $metadata;
     }
 
     /**
-     * @return string[] The first element is the temporary output path and the second the real one
+     * @return string[] The first element is the temporary output path and the second the final one
      */
-    private static function retrieveOutputPath(stdClass $raw, string $basePath, ?string $mainScriptPath): array
-    {
-        if (isset($raw->output)) {
-            $path = $raw->output;
-        } else {
-            if (null !== $mainScriptPath
-                && 1 === preg_match('/^(?<main>.*?)(?:\.[\p{L}\d]+)?$/', $mainScriptPath, $matches)
-            ) {
-                $path = $matches['main'].'.phar';
-            } else {
-                // Last resort, should not happen
-                $path = self::DEFAULT_ALIAS;
-            }
+    private static function retrieveOutputPath(
+        stdClass $raw,
+        string $basePath,
+        ?string $mainScriptPath,
+        ConfigurationLogger $logger
+    ): array {
+        $defaultPath = null;
+
+        if (null !== $mainScriptPath
+            && 1 === preg_match('/^(?<main>.*?)(?:\.[\p{L}\d]+)?$/', $mainScriptPath, $matches)
+        ) {
+            $defaultPath = $matches['main'].'.phar';
         }
 
-        $tmp = $real = self::normalizePath($path, $basePath);
+        if (isset($raw->{self::OUTPUT_KEY})) {
+            $path = self::normalizePath($raw->{self::OUTPUT_KEY}, $basePath);
+
+            if ($path === $defaultPath) {
+                self::addRecommendationForDefaultValue($logger, self::OUTPUT_KEY);
+            }
+        } elseif (null !== $defaultPath) {
+            $path = $defaultPath;
+        } else {
+            // Last resort, should not happen
+            $path = self::normalizePath(self::DEFAULT_ALIAS, $basePath);
+        }
+
+        $tmp = $real = $path;
 
         if ('.phar' !== substr($real, -5)) {
             $tmp .= '.phar';
@@ -1645,10 +1810,8 @@ BANNER;
         int $signingAlgorithm,
         ConfigurationLogger $logger
     ): ?string {
-        $raw = (array) $raw;
-
-        if (array_key_exists('key', $raw) && Phar::OPENSSL !== $signingAlgorithm) {
-            if (null === $raw['key']) {
+        if (property_exists($raw, self::KEY_KEY) && Phar::OPENSSL !== $signingAlgorithm) {
+            if (null === $raw->{self::KEY_KEY}) {
                 $logger->addRecommendation(
                     'The setting "key" has been set but is unnecessary since the signing algorithm is not "OPENSSL".'
                 );
@@ -1661,7 +1824,7 @@ BANNER;
             return null;
         }
 
-        if (!isset($raw['key'])) {
+        if (!isset($raw->{self::KEY_KEY})) {
             Assertion::true(
                 Phar::OPENSSL !== $signingAlgorithm,
                 'Expected to have a private key for OpenSSL signing but none have been provided.'
@@ -1670,7 +1833,7 @@ BANNER;
             return null;
         }
 
-        $path = self::normalizePath($raw['key'], $basePath);
+        $path = self::normalizePath($raw->{self::KEY_KEY}, $basePath);
 
         Assertion::file($path);
 
@@ -1682,24 +1845,37 @@ BANNER;
         int $algorithm,
         ConfigurationLogger $logger
     ): ?string {
-        $raw = (array) $raw;
+        self::checkIfDefaultValue($logger, $raw, self::KEY_PASS_KEY);
 
-        if (array_key_exists('key-pass', $raw) && Phar::OPENSSL !== $algorithm) {
-            if (false === $raw['key-pass'] || null === $raw['key-pass']) {
+        if (false === property_exists($raw, self::KEY_PASS_KEY)) {
+            return null;
+        }
+
+        /** @var null|false|string $keyPass */
+        $keyPass = $raw->{self::KEY_PASS_KEY};
+
+        if (Phar::OPENSSL !== $algorithm) {
+            if (false === $keyPass || null === $keyPass) {
                 $logger->addRecommendation(
-                    'The setting "key-pass" has been set but is unnecessary since the signing algorithm is not '
-                    .'"OPENSSL".'
+                    sprintf(
+                        'The setting "%s" has been set but is unnecessary since the signing algorithm is '
+                        .'not "OPENSSL".',
+                        self::KEY_PASS_KEY
+                    )
                 );
             } else {
                 $logger->addWarning(
-                    'The setting "key-pass" has been set but ignored the signing algorithm is not "OPENSSL".'
+                    sprintf(
+                    'The setting "%s" has been set but ignored the signing algorithm is not "OPENSSL".',
+                        self::KEY_PASS_KEY
+                    )
                 );
             }
 
             return null;
         }
 
-        return null;
+        return is_string($keyPass) ? $keyPass : null;
     }
 
     /**
@@ -1707,41 +1883,53 @@ BANNER;
      */
     private static function retrieveReplacements(stdClass $raw, ?string $file, ConfigurationLogger $logger): array
     {
+        self::checkIfDefaultValue($logger, $raw, self::REPLACEMENTS_KEY, new stdClass());
+
         if (null === $file) {
             return [];
         }
 
-        $replacements = isset($raw->replacements) ? (array) $raw->replacements : [];
+        $replacements = isset($raw->{self::REPLACEMENTS_KEY}) ? (array) $raw->{self::REPLACEMENTS_KEY} : [];
 
-        if (null !== ($git = self::retrievePrettyGitPlaceholder($raw))) {
+        if (null !== ($git = self::retrievePrettyGitPlaceholder($raw, $logger))) {
             $replacements[$git] = self::retrievePrettyGitTag($file);
         }
 
-        if (null !== ($git = self::retrieveGitHashPlaceholder($raw))) {
+        if (null !== ($git = self::retrieveGitHashPlaceholder($raw, $logger))) {
             $replacements[$git] = self::retrieveGitHash($file);
         }
 
-        if (null !== ($git = self::retrieveGitShortHashPlaceholder($raw))) {
+        if (null !== ($git = self::retrieveGitShortHashPlaceholder($raw, $logger))) {
             $replacements[$git] = self::retrieveGitHash($file, true);
         }
 
-        if (null !== ($git = self::retrieveGitTagPlaceholder($raw))) {
+        if (null !== ($git = self::retrieveGitTagPlaceholder($raw, $logger))) {
             $replacements[$git] = self::retrieveGitTag($file);
         }
 
-        if (null !== ($git = self::retrieveGitVersionPlaceholder($raw))) {
+        if (null !== ($git = self::retrieveGitVersionPlaceholder($raw, $logger))) {
             $replacements[$git] = self::retrieveGitVersion($file);
         }
 
-        $datetimeFormat = self::retrieveDatetimeFormat($raw, $logger);
+        /**
+         * @var string
+         * @var bool   $valueSetByUser
+         */
+        [$datetimeFormat, $valueSetByUser] = self::retrieveDatetimeFormat($raw, $logger);
 
-        if (null !== ($date = self::retrieveDatetimeNowPlaceHolder($raw))) {
-            $replacements[$date] = self::retrieveDatetimeNow(
-                $datetimeFormat
+        if (null !== ($date = self::retrieveDatetimeNowPlaceHolder($raw, $logger))) {
+            $replacements[$date] = self::retrieveDatetimeNow($datetimeFormat);
+        } elseif ($valueSetByUser) {
+            $logger->addRecommendation(
+                sprintf(
+                    'The setting "%s" has been set but is unnecessary because the setting "%s" is not set.',
+                    self::DATETIME_FORMAT_KEY,
+                    self::DATETIME_KEY
+                )
             );
         }
 
-        $sigil = self::retrieveReplacementSigil($raw);
+        $sigil = self::retrieveReplacementSigil($raw, $logger);
 
         foreach ($replacements as $key => $value) {
             unset($replacements[$key]);
@@ -1751,14 +1939,14 @@ BANNER;
         return $replacements;
     }
 
-    private static function retrievePrettyGitPlaceholder(stdClass $raw): ?string
+    private static function retrievePrettyGitPlaceholder(stdClass $raw, ConfigurationLogger $logger): ?string
     {
-        return isset($raw->{'git'}) ? $raw->{'git'} : null;
+        return self::retrievePlaceholder($raw, $logger, self::GIT_KEY);
     }
 
-    private static function retrieveGitHashPlaceholder(stdClass $raw): ?string
+    private static function retrieveGitHashPlaceholder(stdClass $raw, ConfigurationLogger $logger): ?string
     {
-        return isset($raw->{'git-commit'}) ? $raw->{'git-commit'} : null;
+        return self::retrievePlaceholder($raw, $logger, self::GIT_COMMIT_KEY);
     }
 
     /**
@@ -1778,14 +1966,21 @@ BANNER;
         );
     }
 
-    private static function retrieveGitShortHashPlaceholder(stdClass $raw): ?string
+    private static function retrieveGitShortHashPlaceholder(stdClass $raw, ConfigurationLogger $logger): ?string
     {
-        return isset($raw->{'git-commit-short'}) ? $raw->{'git-commit-short'} : null;
+        return self::retrievePlaceholder($raw, $logger, self::GIT_COMMIT_SHORT_KEY);
     }
 
-    private static function retrieveGitTagPlaceholder(stdClass $raw): ?string
+    private static function retrieveGitTagPlaceholder(stdClass $raw, ConfigurationLogger $logger): ?string
     {
-        return isset($raw->{'git-tag'}) ? $raw->{'git-tag'} : null;
+        return self::retrievePlaceholder($raw, $logger, self::GIT_TAG_KEY);
+    }
+
+    private static function retrievePlaceholder(stdClass $raw, ConfigurationLogger $logger, string $key): ?string
+    {
+        self::checkIfDefaultValue($logger, $raw, $key);
+
+        return $raw->{$key} ?? null;
     }
 
     private static function retrieveGitTag(string $file): string
@@ -1804,9 +1999,9 @@ BANNER;
         return $version;
     }
 
-    private static function retrieveGitVersionPlaceholder(stdClass $raw): ?string
+    private static function retrieveGitVersionPlaceholder(stdClass $raw, ConfigurationLogger $logger): ?string
     {
-        return isset($raw->{'git-version'}) ? $raw->{'git-version'} : null;
+        return self::retrievePlaceholder($raw, $logger, self::GIT_VERSION_KEY);
     }
 
     private static function retrieveGitVersion(string $file): ?string
@@ -1830,9 +2025,9 @@ BANNER;
         }
     }
 
-    private static function retrieveDatetimeNowPlaceHolder(stdClass $raw): ?string
+    private static function retrieveDatetimeNowPlaceHolder(stdClass $raw, ConfigurationLogger $logger): ?string
     {
-        return isset($raw->{'datetime'}) ? $raw->{'datetime'} : null;
+        return self::retrievePlaceholder($raw, $logger, self::DATETIME_KEY);
     }
 
     private static function retrieveDatetimeNow(string $format): string
@@ -1842,21 +2037,26 @@ BANNER;
         return $now->format($format);
     }
 
-    private static function retrieveDatetimeFormat(stdClass $raw, ConfigurationLogger $logger): string
+    private static function retrieveDatetimeFormat(stdClass $raw, ConfigurationLogger $logger): array
     {
-        if (isset($raw->{'datetime-format'})) {
-            $format = $raw->{'datetime-format'};
-        } elseif (isset($raw->{'datetime_format'})) {
+        self::checkIfDefaultValue($logger, $raw, self::DATETIME_FORMAT_KEY, self::DEFAULT_DATETIME_FORMAT);
+        self::checkIfDefaultValue($logger, $raw, self::DATETIME_FORMAT_KEY, self::DATETIME_FORMAT_DEPRECATED_KEY);
+
+        if (isset($raw->{self::DATETIME_FORMAT_KEY})) {
+            $format = $raw->{self::DATETIME_FORMAT_KEY};
+        } elseif (isset($raw->{self::DATETIME_FORMAT_DEPRECATED_KEY})) {
             @trigger_error(
-                'The setting "datetime_format" is deprecated, use "datetime-format" instead.',
+                'The "datetime_format" is deprecated, use "datetime-format" setting instead.',
                 E_USER_DEPRECATED
             );
-            $logger->addWarning('The setting "datetime_format" is deprecated, use "datetime-format" instead.');
+            $logger->addWarning('The "datetime_format" is deprecated, use "datetime-format" setting instead.');
 
-            $format = $raw->{'datetime_format'};
+            $format = $raw->{self::DATETIME_FORMAT_DEPRECATED_KEY};
+        } else {
+            $format = null;
         }
 
-        if (isset($format)) {
+        if (null !== $format) {
             $formattedDate = (new DateTimeImmutable())->format($format);
 
             Assertion::false(
@@ -1867,24 +2067,26 @@ BANNER;
                 )
             );
 
-            return $format;
+            return [$format, true];
         }
 
-        return self::DEFAULT_DATETIME_FORMAT;
+        return [self::DEFAULT_DATETIME_FORMAT, false];
     }
 
-    private static function retrieveReplacementSigil(stdClass $raw): string
+    private static function retrieveReplacementSigil(stdClass $raw, ConfigurationLogger $logger): string
     {
-        return isset($raw->{'replacement-sigil'}) ? $raw->{'replacement-sigil'} : self::DEFAULT_REPLACEMENT_SIGIL;
+        return self::retrievePlaceholder($raw, $logger, self::REPLACEMENT_SIGIL_KEY) ?? self::DEFAULT_REPLACEMENT_SIGIL;
     }
 
-    private static function retrieveShebang(stdClass $raw): ?string
+    private static function retrieveShebang(stdClass $raw, ConfigurationLogger $logger): ?string
     {
-        if (false === array_key_exists('shebang', (array) $raw)) {
+        self::checkIfDefaultValue($logger, $raw, self::SHEBANG_KEY, self::DEFAULT_SHEBANG);
+
+        if (false === array_key_exists(self::SHEBANG_KEY, (array) $raw)) {
             return self::DEFAULT_SHEBANG;
         }
 
-        $shebang = $raw->shebang;
+        $shebang = $raw->{self::SHEBANG_KEY};
 
         if (false === $shebang) {
             return null;
@@ -1910,13 +2112,17 @@ BANNER;
         return $shebang;
     }
 
-    private static function retrieveSigningAlgorithm(stdClass $raw): int
+    private static function retrieveSigningAlgorithm(stdClass $raw, ConfigurationLogger $logger): int
     {
-        if (false === isset($raw->algorithm)) {
+        if (property_exists($raw, self::ALGORITHM_KEY) && null === $raw->{self::ALGORITHM_KEY}) {
+            self::addRecommendationForDefaultValue($logger, self::ALGORITHM_KEY);
+        }
+
+        if (false === isset($raw->{self::ALGORITHM_KEY})) {
             return self::DEFAULT_SIGNING_ALGORITHM;
         }
 
-        $algorithm = strtoupper($raw->algorithm);
+        $algorithm = strtoupper($raw->{self::ALGORITHM_KEY});
 
         Assertion::inArray($algorithm, array_keys(get_phar_signing_algorithms()));
 
@@ -1928,16 +2134,24 @@ BANNER;
             )
         );
 
-        return constant('Phar::'.$algorithm);
+        $algorithm = constant('Phar::'.$algorithm);
+
+        if (self::DEFAULT_SIGNING_ALGORITHM === $algorithm) {
+            self::addRecommendationForDefaultValue($logger, self::ALGORITHM_KEY);
+        }
+
+        return $algorithm;
     }
 
-    private static function retrieveStubBannerContents(stdClass $raw): ?string
+    private static function retrieveStubBannerContents(stdClass $raw, ConfigurationLogger $logger): ?string
     {
-        if (false === array_key_exists('banner', (array) $raw) || null === $raw->banner) {
+        self::checkIfDefaultValue($logger, $raw, self::BANNER_KEY, self::DEFAULT_BANNER);
+
+        if (false === isset($raw->{self::BANNER_KEY})) {
             return self::DEFAULT_BANNER;
         }
 
-        $banner = $raw->banner;
+        $banner = $raw->{self::BANNER_KEY};
 
         if (false === $banner) {
             return null;
@@ -1952,13 +2166,15 @@ BANNER;
         return $banner;
     }
 
-    private static function retrieveStubBannerPath(stdClass $raw, string $basePath): ?string
+    private static function retrieveStubBannerPath(stdClass $raw, string $basePath, ConfigurationLogger $logger): ?string
     {
-        if (false === isset($raw->{'banner-file'})) {
+        self::checkIfDefaultValue($logger, $raw, self::BANNER_FILE_KEY);
+
+        if (false === isset($raw->{self::BANNER_FILE_KEY})) {
             return null;
         }
 
-        $bannerFile = make_path_absolute($raw->{'banner-file'}, $basePath);
+        $bannerFile = make_path_absolute($raw->{self::BANNER_FILE_KEY}, $basePath);
 
         Assertion::file($bannerFile);
 
@@ -1977,10 +2193,12 @@ BANNER;
         return implode("\n", $banner);
     }
 
-    private static function retrieveStubPath(stdClass $raw, string $basePath): ?string
+    private static function retrieveStubPath(stdClass $raw, string $basePath, ConfigurationLogger $logger): ?string
     {
-        if (isset($raw->stub) && is_string($raw->stub)) {
-            $stubPath = make_path_absolute($raw->stub, $basePath);
+        self::checkIfDefaultValue($logger, $raw, self::STUB_KEY);
+
+        if (isset($raw->{self::STUB_KEY}) && is_string($raw->{self::STUB_KEY})) {
+            $stubPath = make_path_absolute($raw->{self::STUB_KEY}, $basePath);
 
             Assertion::file($stubPath);
 
@@ -1990,13 +2208,11 @@ BANNER;
         return null;
     }
 
-    private static function retrieveIsInterceptFileFuncs(stdClass $raw): bool
+    private static function retrieveInterceptsFileFuncs(stdClass $raw, ConfigurationLogger $logger): bool
     {
-        if (isset($raw->intercept)) {
-            return $raw->intercept;
-        }
+        self::checkIfDefaultValue($logger, $raw, self::INTERCEPT_KEY, false);
 
-        return false;
+        return $raw->{self::INTERCEPT_KEY} ?? false;
     }
 
     private static function retrievePromptForPrivateKey(
@@ -2004,7 +2220,7 @@ BANNER;
         int $signingAlgorithm,
         ConfigurationLogger $logger
     ): bool {
-        if (isset($raw->{'key-pass'}) && true === $raw->{'key-pass'}) {
+        if (isset($raw->{self::KEY_PASS_KEY}) && true === $raw->{self::KEY_PASS_KEY}) {
             if (Phar::OPENSSL !== $signingAlgorithm) {
                 $logger->addWarning(
                     'A prompt for password for the private key has been requested but ignored since the signing '
@@ -2020,9 +2236,11 @@ BANNER;
         return false;
     }
 
-    private static function retrieveIsStubGenerated(stdClass $raw, ?string $stubPath): bool
+    private static function retrieveIsStubGenerated(stdClass $raw, ?string $stubPath, ConfigurationLogger $logger): bool
     {
-        return null === $stubPath && (false === isset($raw->stub) || false !== $raw->stub);
+        self::checkIfDefaultValue($logger, $raw, self::STUB_KEY, true);
+
+        return null === $stubPath && (false === isset($raw->{self::STUB_KEY}) || false !== $raw->{self::STUB_KEY});
     }
 
     private static function retrieveCheckRequirements(
@@ -2031,24 +2249,14 @@ BANNER;
         bool $hasComposerLock,
         ConfigurationLogger $logger
     ): bool {
-        $raw = (array) $raw;
+        self::checkIfDefaultValue($logger, $raw, self::CHECK_REQUIREMENTS_KEY, true);
 
-        if (false === array_key_exists('check-requirements', $raw)) {
+        if (false === property_exists($raw, self::CHECK_REQUIREMENTS_KEY)) {
             return $hasComposerJson || $hasComposerLock;
         }
 
-        /** @var null|bool $checkRequirements */
-        $checkRequirements = $raw['check-requirements'];
-
-        if ($checkRequirements) {
-            $logger->addRecommendation(
-                'The "check-requirements" setting has been set but is unnecessary since its value is the default value'
-            );
-        }
-
-        if (null === $checkRequirements) {
-            $checkRequirements = true;
-        }
+        /** @var bool $checkRequirements */
+        $checkRequirements = $raw->{self::CHECK_REQUIREMENTS_KEY} ?? true;
 
         if ($checkRequirements && false === $hasComposerJson && false === $hasComposerLock) {
             $logger->addWarning(
@@ -2062,9 +2270,12 @@ BANNER;
         return $checkRequirements;
     }
 
-    private static function retrievePhpScoperConfig(stdClass $raw, string $basePath): PhpScoperConfiguration
+    private static function retrievePhpScoperConfig(stdClass $raw, string $basePath, ConfigurationLogger $logger): PhpScoperConfiguration
     {
-        if (!isset($raw->{'php-scoper'})) {
+        // TODO: add recommendations regarding the order
+        self::checkIfDefaultValue($logger, $raw, self::PHP_SCOPER_KEY, self::PHP_SCOPER_CONFIG);
+
+        if (!isset($raw->{self::PHP_SCOPER_KEY})) {
             $configFilePath = make_path_absolute(self::PHP_SCOPER_CONFIG, $basePath);
 
             return file_exists($configFilePath)
@@ -2073,7 +2284,7 @@ BANNER;
              ;
         }
 
-        $configFile = $raw->{'php-scoper'};
+        $configFile = $raw->{self::PHP_SCOPER_KEY};
 
         Assertion::string($configFile);
 
@@ -2116,12 +2327,47 @@ BANNER;
         // TODO: false === not set; check & add test/doc
         $tokenizer = new Tokenizer();
 
-        if (false === empty($raw->annotations) && isset($raw->annotations->ignore)) {
+        if (false === empty($raw->{self::ANNOTATIONS_KEY}) && isset($raw->{self::ANNOTATIONS_KEY}->ignore)) {
             $tokenizer->ignore(
-                (array) $raw->annotations->ignore
+                (array) $raw->{self::ANNOTATIONS_KEY}->ignore
             );
         }
 
         return new Php($tokenizer);
+    }
+
+    private static function checkIfDefaultValue(
+        ConfigurationLogger $logger,
+        stdClass $raw,
+        string $key,
+        $defaultValue = null
+    ): void {
+        if (false === property_exists($raw, $key)) {
+            return;
+        }
+
+        $value = $raw->{$key};
+
+        if (null === $value
+            || (false === is_object($defaultValue) && $defaultValue === $value)
+            || (is_object($defaultValue) && $defaultValue == $value)
+        ) {
+            $logger->addRecommendation(
+                sprintf(
+                    'The "%s" setting can be omitted since is set to its default value',
+                    $key
+                )
+            );
+        }
+    }
+
+    private static function addRecommendationForDefaultValue(ConfigurationLogger $logger, string $key): void
+    {
+        $logger->addRecommendation(
+            sprintf(
+                'The "%s" setting can be omitted since is set to its default value',
+                $key
+            )
+        );
     }
 }
