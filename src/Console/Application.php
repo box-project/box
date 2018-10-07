@@ -95,6 +95,7 @@ ASCII;
         $commands[] = new Command\Process();
         $commands[] = new Command\Validate();
         $commands[] = new Command\Verify();
+        $commands[] = new Command\GenerateDockerFile();
 
         return $commands;
     }
