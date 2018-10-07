@@ -34,7 +34,6 @@ final class Verify extends Command
     use CreateTemporaryPharFile;
 
     private const PHAR_ARG = 'phar';
-    private const VERBOSITY_LEVEL = OutputInterface::VERBOSITY_VERBOSE;
 
     /**
      * {@inheritdoc}
@@ -42,7 +41,7 @@ final class Verify extends Command
     protected function configure(): void
     {
         $this->setName('verify');
-        $this->setDescription('Verifies the PHAR signature');
+        $this->setDescription('🔐️  Verifies the PHAR signature');
         $this->setHelp(
             <<<'HELP'
 The <info>%command.name%</info> command will verify the signature of the PHAR.
@@ -78,13 +77,14 @@ HELP
 
         $pharPath = false !== realpath($pharPath) ? realpath($pharPath) : $pharPath;
 
+        $io->newLine();
         $io->writeln(
             sprintf(
-                'Verifying the PHAR "<comment>%s</comment>"...',
+                '🔐️  Verifying the PHAR "<comment>%s</comment>"',
                 $pharPath
-            ),
-            self::VERBOSITY_LEVEL
+            )
         );
+        $io->newLine();
 
         $tmpPharPath = $this->createTemporaryPhar($pharPath);
 
@@ -127,17 +127,13 @@ HELP
 
         $io->writeln('<info>The PHAR passed verification.</info>');
 
-        $io->writeln(
-            '',
-            self::VERBOSITY_LEVEL
-        );
+        $io->newLine();
         $io->writeln(
             sprintf(
                 '%s signature: <info>%s</info>',
                 $signature['hash_type'],
                 $signature['hash']
-            ),
-            self::VERBOSITY_LEVEL
+            )
         );
 
         return 0;

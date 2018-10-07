@@ -52,7 +52,7 @@ class ProcessTest extends CommandTestCase
 
  // Loading without a configuration file.
 
-Processing the contents of the file $expectedPath
+⚡  Processing the contents of the file $expectedPath
 
 No replacement values registered
 
@@ -116,7 +116,7 @@ JSON
 
  // Loading the configuration file "box.json".
 
-Processing the contents of the file $expectedFilePath
+⚡  Processing the contents of the file $expectedFilePath
 
 Registered replacement values:
   + @foo@: bar

@@ -49,7 +49,7 @@ final class Diff extends Command
         parent::configure();
 
         $this->setName('diff');
-        $this->setDescription('Display the differences between all of the files in two PHARs');
+        $this->setDescription('🕵  Displays the differences between all of the files in two PHARs');
 
         $this->addArgument(
             self::FIRST_PHAR_ARG,

@@ -53,6 +53,7 @@ install:
     fi
 
 script:
+  - bin/box validate
   - |
     if [ "$COVERAGE" == "true" ]; then
         make tm

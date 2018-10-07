@@ -57,7 +57,7 @@ final class Process extends Configurable
         parent::configure();
 
         $this->setName('process');
-        $this->setDescription('Apply the registered compactors and replacement values on a file');
+        $this->setDescription('⚡  Applies the registered compactors and replacement values on a file');
         $this->setHelp(
             'The <info>%command.name%</info> command will apply the registered compactors and replacement values '
             .'on the the given file. This is useful to debug the scoping of a specific file for example.'
@@ -114,7 +114,7 @@ final class Process extends Configurable
 
         $io->writeln([
             sprintf(
-                'Processing the contents of the file <info>%s</info>',
+                '⚡  Processing the contents of the file <info>%s</info>',
                 $path
             ),
             '',
