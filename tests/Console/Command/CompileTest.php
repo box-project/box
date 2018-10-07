@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use DirectoryIterator;
-use function dump;
 use Generator;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
@@ -54,6 +53,9 @@ use function substr;
 // * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
 // *                              can create undesirable side-effects.
 // */
+/**
+ * @coversNothing
+ */
 class CompileTest extends CommandTestCase
 {
     use RequiresPharReadonlyOff;

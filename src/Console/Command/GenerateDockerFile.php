@@ -15,27 +15,20 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Assert\Assertion;
-use Composer\Semver\Semver;
+use KevinGH\Box\DockerFileGenerator;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use UnexpectedValueException;
-use function array_column;
-use function array_filter;
-use function array_values;
-use function basename;
 use function file_exists;
 use function getcwd;
-use function implode;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use function KevinGH\Box\FileSystem\remove;
 use function realpath;
 use function sprintf;
-use function str_replace;
 
 /**
  * @private
@@ -114,8 +107,6 @@ Dockerfile;
 
         $requirementsPhar = 'phar://'.$tmpPharPath.'/.box/.requirements.php';
 
-        $dockerFileContents = self::DOCKER_FILE_TEMPLATE;
-
         try {
             if (false === file_exists($requirementsPhar)) {
                 $io->error(
@@ -126,29 +117,12 @@ Dockerfile;
 
             $requirements = include $requirementsPhar;
 
-            $dockerFileContents = str_replace(
-                '__BASE_PHP_IMAGE_TOKEN__',
-                $this->retrievePhpImageName($requirements),
-                $dockerFileContents
-            );
-
-            $dockerFileContents = str_replace(
-                '__PHP_EXTENSIONS_TOKEN__',
-                $this->retrievePhpExtensions($requirements),
-                $dockerFileContents
-            );
-
-            $dockerFileContents = str_replace(
-                '__PHAR_FILE_PATH_TOKEN__',
-                make_path_relative($pharPath, getcwd()),
-                $dockerFileContents
-            );
-
-            $dockerFileContents = str_replace(
-                '__PHAR_FILE_NAME_TOKEN__',
-                basename($pharPath),
-                $dockerFileContents
-            );
+            $dockerFileContents = DockerFileGenerator::createForRequirements(
+                    $requirements,
+                    make_path_relative($pharPath, getcwd())
+                )
+                ->generate()
+            ;
 
             dump_file(self::DOCKER_FILE_NAME, $dockerFileContents);
 
@@ -185,62 +159,6 @@ Dockerfile;
         }
 
         return 0;
-    }
-
-    private function retrievePhpImageName(array $requirements): string
-    {
-        $conditions = array_column(
-            array_filter(
-                $requirements,
-                function (array $requirement): bool {
-                    return 'php' === $requirement['type'];
-                }
-            ),
-            'condition'
-        );
-
-        foreach (self::PHP_DOCKER_IMAGES as $php => $image) {
-            foreach ($conditions as $condition) {
-                if (false === Semver::satisfies($php, $condition)) {
-                    continue 2;
-                }
-            }
-
-            return $image;
-        }
-
-        throw new UnexpectedValueException(
-            sprintf(
-                'Could not find a suitable Docker base image for the PHP constraint(s) "%s". Images available: "%s"',
-                implode('", "', $conditions),
-                implode('", "', array_values(self::PHP_DOCKER_IMAGES))
-            )
-        );
-    }
-
-    private function retrievePhpExtensions(array $requirements): string
-    {
-        $extensions = array_column(
-            array_filter(
-                $requirements,
-                function (array $requirement): bool {
-                    return 'extension' === $requirement['type'];
-                }
-            ),
-            'condition'
-        );
-
-        if ([] === $extensions) {
-            return '[]';
-        }
-
-        return sprintf(
-            '["%s"]',
-            implode(
-                '", "',
-                $extensions
-            )
-        );
     }
 
     private function guessPharPath(InputInterface $input, OutputInterface $output, SymfonyStyle $io): ?string
