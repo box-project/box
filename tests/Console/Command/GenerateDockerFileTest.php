@@ -17,8 +17,8 @@ namespace KevinGH\Box\Console\Command;
 use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
-use function realpath;
 use Symfony\Component\Console\Command\Command;
+use function realpath;
 
 /**
  * @covers \KevinGH\Box\Console\Command\GenerateDockerFile

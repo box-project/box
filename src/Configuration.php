@@ -82,7 +82,7 @@ final class Configuration
 {
     private const DEFAULT_OUTPUT_FALLBACK = 'test.phar';
     private const DEFAULT_MAIN_SCRIPT = 'index.php';
-    private const DEFAULT_DATETIME_FORMAT = 'Y-m-d H:i:s';
+    private const DEFAULT_DATETIME_FORMAT = 'Y-m-d H:i:s T';
     private const DEFAULT_REPLACEMENT_SIGIL = '@';
     private const DEFAULT_SHEBANG = '#!/usr/bin/env php';
     private const DEFAULT_BANNER = <<<'BANNER'
