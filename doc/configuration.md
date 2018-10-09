@@ -751,14 +751,14 @@ The datetime (`string`|`null` default `null`) setting is the name of a placehold
 [non-binary files][including-files] by the current datetime. If no value is given (`null`) then this placeholder will
 be ignored.
 
-Example value the placeholder will be replaced with: `2015-01-28 14:55:23`
+Example value the placeholder will be replaced with: `2015-01-28 14:55:23 CEST`
 
 The format of the date used is defined by the [`datetime-format` setting][datetime-placeholder-format].
 
 
 ### Datetime placeholder format (`datetime-format`)
 
-The datetime format placeholder (`string`|`null`, default `Y-m-d H:i:s`) setting accepts a valid
+The datetime format placeholder (`string`|`null`, default `Y-m-d H:i:s T`) setting accepts a valid
 [PHP date format][php-date-format]. It can be used to change the format for the
 [`datetime`][datetime–placeholder] setting.
 

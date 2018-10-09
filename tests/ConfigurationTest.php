@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Closure;
-use function count;
 use DateTimeImmutable;
 use Generator;
 use Herrera\Annotations\Tokenizer;
@@ -33,6 +32,7 @@ use const DIRECTORY_SEPARATOR;
 use const PHP_EOL;
 use function abs;
 use function array_fill_keys;
+use function count;
 use function date_default_timezone_set;
 use function file_put_contents;
 use function getcwd;
@@ -568,7 +568,7 @@ EOF
             [
                 Php::class,
                 PhpScoper::class,
-            ]
+            ],
         ];
 
         foreach ($compactorClassesSet as $compactorClasses) {
@@ -1434,7 +1434,7 @@ JSON
         $this->setConfig(['datetime' => 'date_time']);
 
         $this->assertRegExp(
-            '/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/',
+            '/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} [A-Z]{2,5}$/',
             $this->config->getReplacements()['@date_time@']
         );
         $this->assertCount(1, $this->config->getReplacements());
@@ -1730,7 +1730,7 @@ JSON
     public function test_a_recommendation_is_given_if_the_configured_datetime_format_is_the_default_value(): void
     {
         $this->setConfig([
-            'datetime-format' => 'Y-m-d H:i:s',
+            'datetime-format' => 'Y-m-d H:i:s T',
         ]);
 
         $this->assertSame([], $this->config->getReplacements());
