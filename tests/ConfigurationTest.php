@@ -767,6 +767,18 @@ EOF
             $this->config->getRecommendations()
         );
         $this->assertSame([], $this->config->getWarnings());
+
+        $this->setConfig([
+            'compression' => 'NONE',
+        ]);
+
+        $this->assertNull($this->config->getCompressionAlgorithm());
+
+        $this->assertSame(
+            ['The "compression" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_compression_algorithm_with_a_string(): void

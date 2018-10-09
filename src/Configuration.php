@@ -1607,7 +1607,7 @@ BANNER;
 
     private static function retrieveCompressionAlgorithm(stdClass $raw, ConfigurationLogger $logger): ?int
     {
-        self::checkIfDefaultValue($logger, $raw, self::COMPRESSION_KEY);
+        self::checkIfDefaultValue($logger, $raw, self::COMPRESSION_KEY, 'NONE');
 
         if (false === isset($raw->{self::COMPRESSION_KEY})) {
             return null;
