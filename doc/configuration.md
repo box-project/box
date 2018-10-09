@@ -838,7 +838,7 @@ The short commit hash will only be used if no tag is available.
 [directories]: #directories-directories-and-directories-bin
 [dump-autoload]: #dumping-the-composer-autoloader-dump-autoload
 [exclude-composer-files]: #excluding-the-composer-files-exclude-composer-files
-[force-autodiscovery]: #force-auto-discovery-force-auto-discovery
+[force-autodiscovery]: #force-auto-discovery-force-autodiscovery
 [files]: #files-files-and-files-bin
 [finder]: #finder-finder-and-finder-bin
 [git]: #pretty-git-tag-placeholder-git

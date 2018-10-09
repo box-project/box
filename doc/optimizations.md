@@ -36,7 +36,7 @@ example the following:
 
 namespace Acme;
 
-use class stdClass;
+use stdClass;
 use const BAR;
 use function foo;
 
@@ -51,7 +51,7 @@ Will be more performant than:
 
 namespace Acme;
 
-use class stdClass;
+use stdClass;
 
 new stdClass();
 foo(BAR);
@@ -63,16 +63,17 @@ minor overhead. Besides some functions such as `count` are optimised by opcache 
 `\count` or importing it via a use statement `use function count` will be even more optimised.
 
 However you may not want to care and change your code for such micro optimisations. But if you do, know that
-[isolating your PHAR code](#phar-code-isolation) will transform every call into a fully qualified call whenever
+[isolating your PHAR code][code-isolation] will transform every call into a fully qualified call whenever
 possible enabling that optimisation for your PHAR.
 
 
 <br />
 <hr />
 
-« [Requirement Checker](requirement-checker.md#requirements-checker) • [PHAR code isolation](code-isolation.md#phar-code-isolation) »
+« [Requirement Checker](requirement-checker.md#requirements-checker) • [PHAR code isolation][code-isolation] »
 
 
 [include-files]: configuration.md#including-files
 [compression-algorithm]: configuration.md#compression-algorithm-compression
 [compactors]: configuration.md#compactors-compactors
+[code-isolation]: code-isolation.md#phar-code-isolation
