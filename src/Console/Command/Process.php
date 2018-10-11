@@ -99,7 +99,7 @@ final class Process extends ConfigurableCommand
 
         $this->changeWorkingDirectory($input);
 
-        $io->writeln('');
+        $io->newLine();
 
         $config = $input->getOption(self::NO_CONFIG_OPTION)
             ? Configuration::create(null, new stdClass())
@@ -169,7 +169,7 @@ final class Process extends ConfigurableCommand
             );
         }
 
-        $io->writeln('');
+        $io->newLine();
     }
 
     private function logCompactors(SymfonyStyle $io, Compactors $compactors): void
@@ -210,6 +210,6 @@ final class Process extends ConfigurableCommand
         };
 
         array_map($logCompactors, $compactors);
-        $io->writeln('');
+        $io->newLine();
     }
 }
