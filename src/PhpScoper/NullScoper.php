@@ -27,6 +27,13 @@ final class NullScoper implements Scoper
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function changeWhitelist(Whitelist $whitelist): void
+    {
+    }
+
+    /**
      * @return string[]
      */
     public function getWhitelist(): Whitelist

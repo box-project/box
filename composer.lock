@@ -950,16 +950,16 @@
         },
         {
             "name": "humbug/php-scoper",
-            "version": "0.10.1",
+            "version": "0.10.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/humbug/php-scoper.git",
-                "reference": "490b9cc0f3010aabd9335b485657aaa1b90a858d"
+                "reference": "8d63d9b9bca0071cc6c575c1e08c54c888752100"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/490b9cc0f3010aabd9335b485657aaa1b90a858d",
-                "reference": "490b9cc0f3010aabd9335b485657aaa1b90a858d",
+                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/8d63d9b9bca0071cc6c575c1e08c54c888752100",
+                "reference": "8d63d9b9bca0071cc6c575c1e08c54c888752100",
                 "shasum": ""
             },
             "require": {
@@ -976,7 +976,7 @@
             },
             "require-dev": {
                 "bamarni/composer-bin-plugin": "^1.1",
-                "humbug/box": "^3.0@rc",
+                "humbug/box": "^3.1",
                 "phpunit/phpunit": "^7.0"
             },
             "bin": [
@@ -1018,7 +1018,7 @@
                 }
             ],
             "description": "Prefixes all PHP namespaces in a file or directory.",
-            "time": "2018-10-09T13:56:47+00:00"
+            "time": "2018-10-11T16:40:05+00:00"
         },
         {
             "name": "justinrainbow/json-schema",

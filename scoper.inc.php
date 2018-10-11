@@ -85,20 +85,6 @@ return [
             return 'vendor/composer/composer/src/Composer/Autoload/ClassLoader.php' === $filePath ? $classLoaderContents : $contents;
         },
         function (string $filePath, string $prefix, string $contents): string {
-            if ('src/bootstrap.php' !== $filePath) {
-                return $contents;
-            }
-
-            return preg_replace(
-                sprintf(
-                    '/\\\\%s\\\\PHAR_COPY/',
-                    $prefix
-                ),
-                '\\PHAR_COPY',
-                $contents
-            );
-        },
-        function (string $filePath, string $prefix, string $contents): string {
             if ('vendor/paragonie/sodium_compat/autoload.php' !== $filePath) {
                 return $contents;
             }

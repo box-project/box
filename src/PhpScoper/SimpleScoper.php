@@ -49,6 +49,14 @@ final class SimpleScoper implements Scoper
     /**
      * {@inheritdoc}
      */
+    public function changeWhitelist(Whitelist $whitelist): void
+    {
+        $this->whitelist = $whitelist;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getWhitelist(): Whitelist
     {
         return $this->whitelist;
