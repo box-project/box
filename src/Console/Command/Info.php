@@ -142,7 +142,7 @@ HELP
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $io->writeln('');
+        $io->newLine();
 
         if (null === ($file = $input->getArgument(self::PHAR_ARG))) {
             return $this->showGlobalInfo($output, $io);
@@ -220,7 +220,7 @@ HELP
             ]
         );
 
-        $io->writeln('');
+        $io->newLine();
         $io->comment('Get a PHAR details by giving its path as an argument.');
 
         return 0;
@@ -273,7 +273,7 @@ HELP
                 '' !== $phar->getVersion() ? $phar->getVersion() : 'No information found'
             )
         );
-        $io->writeln('');
+        $io->newLine();
 
         $count = array_filter($this->retrieveCompressionCount($phar));
         $totalCount = array_sum($count);
@@ -311,7 +311,7 @@ HELP
                 );
             }
         }
-        $io->writeln('');
+        $io->newLine();
 
         if (false !== $signature) {
             $io->writeln(
@@ -326,7 +326,7 @@ HELP
                     $signature['hash']
                 )
             );
-            $io->writeln('');
+            $io->newLine();
         }
 
         $metadata = var_export($phar->getMetadata(), true);
@@ -337,7 +337,7 @@ HELP
             $io->writeln('<comment>Metadata:</comment>');
             $io->writeln($metadata);
         }
-        $io->writeln('');
+        $io->newLine();
 
         $io->writeln(
             sprintf(
