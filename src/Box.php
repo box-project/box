@@ -21,12 +21,14 @@ use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 use KevinGH\Box\PhpScoper\NullScoper;
+use KevinGH\Box\PhpScoper\WhitelistManipulator;
 use Phar;
 use RecursiveDirectoryIterator;
 use RuntimeException;
 use SplFileInfo;
 use function Amp\ParallelFunctions\parallelMap;
 use function Amp\Promise\wait;
+use function array_filter;
 use function array_flip;
 use function array_map;
 use function array_unshift;
@@ -403,13 +405,47 @@ final class Box implements Countable
 
             $processedContents = $compactors->compactContents($local, $contents);
 
-            return [$local, $processedContents];
+            return [$local, $processedContents, $compactors->getScoperWhitelist()];
         };
 
-        return is_parallel_processing_enabled() && false === ($this->scoper instanceof NullScoper)
-            ? wait(parallelMap($files, $processFile))
-            : array_map($processFile, $files)
-        ;
+        if (false === is_parallel_processing_enabled() || $this->scoper instanceof NullScoper) {
+            return array_map($processFile, $files);
+        }
+
+        // In the case of parallel processing, an issue is caused due to the statefulness nature of the PhpScoper
+        // whitelist.
+        //
+        // Indeed the PhpScoper Whitelist stores the records of whitelisted classes and functions. If nothing is done,
+        // then the whitelisted retrieve in the end will here will be "blank" since the updated whitelists are the ones
+        // from the workers used for the parallel processing.
+        //
+        // In order to avoid that, the whitelists will be returned as a result as well in order to be able to merge
+        // all the whitelists into one.
+        //
+        // This process is allowed thanks to the nature of the state of the whitelists: having redundant classes or
+        // functions registered can easily be deal with so merging all those different states is actually
+        // straightforward.
+        $tuples = wait(parallelMap($files, $processFile));
+
+        if ([] === $tuples) {
+            return [];
+        }
+
+        $filesWithContents = [];
+        $whitelists = [];
+
+        foreach ($tuples as [$local, $processedContents, $whitelist]) {
+            $filesWithContents[] = [$local, $processedContents];
+            $whitelists[] = $whitelist;
+        }
+
+        $this->compactors->registerWhitelist(
+            WhitelistManipulator::mergeWhitelists(
+                ...array_filter($whitelists)
+            )
+        );
+
+        return $filesWithContents;
     }
 
     /**

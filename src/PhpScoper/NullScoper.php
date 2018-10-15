@@ -16,6 +16,9 @@ namespace KevinGH\Box\PhpScoper;
 
 use Humbug\PhpScoper\Whitelist;
 
+/**
+ * @private
+ */
 final class NullScoper implements Scoper
 {
     /**
@@ -24,6 +27,13 @@ final class NullScoper implements Scoper
     public function scope(string $filePath, string $contents): string
     {
         return $contents;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function changeWhitelist(Whitelist $whitelist): void
+    {
     }
 
     /**

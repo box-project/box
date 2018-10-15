@@ -33,6 +33,14 @@ final class FakeScoper implements Scoper
     /**
      * {@inheritdoc}
      */
+    public function changeWhitelist(Whitelist $whitelist): void
+    {
+        $this->__call(__METHOD__, func_get_args());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getWhitelist(): Whitelist
     {
         $this->__call(__METHOD__, func_get_args());

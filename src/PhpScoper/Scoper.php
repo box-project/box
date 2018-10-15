@@ -28,6 +28,8 @@ interface Scoper
      */
     public function scope(string $filePath, string $contents): string;
 
+    public function changeWhitelist(Whitelist $whitelist): void;
+
     /**
      * @return string[]
      */

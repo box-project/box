@@ -17,6 +17,9 @@ namespace KevinGH\Box\PhpScoper;
 use Humbug\PhpScoper\Scoper as PhpScoper;
 use Humbug\PhpScoper\Whitelist;
 
+/**
+ * @private
+ */
 final class SimpleScoper implements Scoper
 {
     private $scoper;
@@ -44,6 +47,14 @@ final class SimpleScoper implements Scoper
             $this->patchers,
             $this->whitelist
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function changeWhitelist(Whitelist $whitelist): void
+    {
+        $this->whitelist = $whitelist;
     }
 
     /**

@@ -14,13 +14,25 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use Humbug\PhpScoper\Whitelist;
+use KevinGH\Box\Compactor\PhpScoper;
+
 final class Compactors
 {
     private $compactors;
+    private $scoperCompactor;
 
     public function __construct(Compactor ...$compactors)
     {
         $this->compactors = $compactors;
+
+        foreach ($compactors as $compactor) {
+            if ($compactor instanceof PhpScoper) {
+                $this->scoperCompactor = $compactor;
+
+                break;
+            }
+        }
     }
 
     public function compactContents(string $file, string $contents): string
@@ -32,6 +44,18 @@ final class Compactors
             },
             $contents
         );
+    }
+
+    public function getScoperWhitelist(): ?Whitelist
+    {
+        return null !== $this->scoperCompactor ? $this->scoperCompactor->getScoper()->getWhitelist() : null;
+    }
+
+    public function registerWhitelist(Whitelist $whitelist): void
+    {
+        if (null !== $this->scoperCompactor) {
+            $this->scoperCompactor->getScoper()->changeWhitelist($whitelist);
+        }
     }
 
     public function toArray(): array
