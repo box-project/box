@@ -80,7 +80,7 @@ tm:	$(TU_BOX_DEPS)
 
 .PHONY: e2e
 e2e:			 ## Runs all the end-to-end tests
-e2e: e2e_scoper_alias e2e_check_requirements
+e2e: e2e_scoper_alias e2e_scoper_whitelist e2e_check_requirements
 
 .PHONY: e2e_scoper_alias
 e2e_scoper_alias: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the prefix alias is working
