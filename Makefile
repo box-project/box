@@ -83,9 +83,18 @@ e2e:			 ## Runs all the end-to-end tests
 e2e: e2e_scoper_alias e2e_check_requirements
 
 .PHONY: e2e_scoper_alias
-e2e_scoper_alias: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API is working
+e2e_scoper_alias: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the prefix alias is working
 e2e_scoper_alias: box
 	./box compile --working-dir fixtures/build/dir010
+
+.PHONY: e2e_scoper_whitelist
+e2e_scoper_whitelist: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the whitelisting is working
+e2e_scoper_whitelist: box
+	php fixtures/build/dir011/index.php > fixtures/build/dir011/expected-output
+	./box compile --working-dir fixtures/build/dir011
+	php fixtures/build/dir011/index.phar > fixtures/build/dir011/output
+
+	diff fixtures/build/dir011/expected-output fixtures/build/dir011/output
 
 .PHONY: e2e_check_requirements
 DOCKER=docker run -i --rm -w /opt/box

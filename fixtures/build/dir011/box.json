@@ -1,0 +1,5 @@
+{
+    "compactors": [
+        "KevinGH\\Box\\Compactor\\PhpScoper"
+    ]
+}

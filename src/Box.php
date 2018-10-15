@@ -44,6 +44,7 @@ use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
 use function sprintf;
+use function var_dump;
 
 /**
  * Box is a utility class to generate a PHAR.
@@ -427,6 +428,10 @@ final class Box implements Countable
         // straightforward.
         $tuples = wait(parallelMap($files, $processFile));
 
+        if ([] === $tuples) {
+            return [];
+        }
+
         $filesWithContents = [];
         $whitelists = [];
 
@@ -440,6 +445,8 @@ final class Box implements Countable
                 ...array_filter($whitelists)
             )
         );
+
+        dump($whitelist->getRecordedWhitelistedClasses(), $whitelist->getRecordedWhitelistedFunctions());
 
         return $filesWithContents;
     }

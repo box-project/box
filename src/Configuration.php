@@ -74,6 +74,7 @@ use function sprintf;
 use function strtoupper;
 use function substr;
 use function trigger_error;
+use function var_dump;
 
 /**
  * @private

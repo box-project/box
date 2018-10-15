@@ -1,0 +1,11 @@
+{
+    "autoload": {
+        "psr-4": {
+            "": "src/"
+        },
+        "files": [
+            "src/functions.php"
+        ]
+    },
+    "bin": "index.php"
+}
