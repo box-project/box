@@ -1554,26 +1554,7 @@ BANNER;
                 }
 
                 if (PhpScoperCompactor::class === $class) {
-                    $phpScoperConfig = self::retrievePhpScoperConfig($raw, $basePath, $logger);
-
-                    $prefix = null === $phpScoperConfig->getPrefix()
-                        ? unique_id('_HumbugBox')
-                        : $phpScoperConfig->getPrefix()
-                    ;
-
-                    return new PhpScoperCompactor(
-                        new SimpleScoper(
-                            (new class() extends ApplicationFactory {
-                                public static function createScoper(): Scoper
-                                {
-                                    return parent::createScoper();
-                                }
-                            })::createScoper(),
-                            $prefix,
-                            $phpScoperConfig->getWhitelist(),
-                            $phpScoperConfig->getPatchers()
-                        )
-                    );
+                    return self::createPhpScoperCompactor($raw, $basePath, $logger);
                 }
 
                 return new $class();
@@ -1814,7 +1795,7 @@ BANNER;
         $defaultPath = null;
 
         if (null !== $mainScriptPath
-            && 1 === preg_match('/^(?<main>.*?)(?:\.[\p{L}\d]+)?$/', $mainScriptPath, $matches)
+            && 1 === preg_match('/^(?<main>.*?)(?:\.[\p{L}\d]+)?$/u', $mainScriptPath, $matches)
         ) {
             $defaultPath = $matches['main'].'.phar';
         }
@@ -2446,6 +2427,32 @@ BANNER;
         }
 
         return new PhpCompactor($tokenizer);
+    }
+
+    private static function createPhpScoperCompactor(stdClass $raw, string $basePath, ConfigurationLogger $logger): Compactor
+    {
+        $phpScoperConfig = self::retrievePhpScoperConfig($raw, $basePath, $logger);
+
+        $phpScoper = (new class() extends ApplicationFactory {
+            public static function createScoper(): Scoper
+            {
+                return parent::createScoper();
+            }
+        })::createScoper();
+
+        $prefix = null === $phpScoperConfig->getPrefix()
+            ? unique_id('_HumbugBox')
+            : $phpScoperConfig->getPrefix()
+        ;
+
+        return new PhpScoperCompactor(
+            new SimpleScoper(
+                $phpScoper,
+                $prefix,
+                $phpScoperConfig->getWhitelist(),
+                $phpScoperConfig->getPatchers()
+            )
+        );
     }
 
     private static function checkIfDefaultValue(
