@@ -89,7 +89,7 @@ e2e_scoper_alias: box
 
 .PHONY: e2e_scoper_whitelist
 e2e_scoper_whitelist: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the whitelisting is working
-e2e_scoper_whitelist: box
+e2e_scoper_whitelist: box fixtures/build/dir011/vendor
 	php fixtures/build/dir011/index.php > fixtures/build/dir011/expected-output
 	./box compile --working-dir fixtures/build/dir011
 	php fixtures/build/dir011/index.phar > fixtures/build/dir011/output
@@ -228,6 +228,10 @@ fixtures/composer-dump/dir001/composer.lock:	fixtures/composer-dump/dir001/compo
 
 fixtures/composer-dump/dir001/vendor:	fixtures/composer-dump/dir001/composer.lock
 	composer install --working-dir fixtures/composer-dump/dir001
+	touch $@
+
+fixtures/build/dir011/vendor:
+	composer install --working-dir fixtures/build/dir011
 	touch $@
 
 .PHONY: fixtures/default_stub.php
