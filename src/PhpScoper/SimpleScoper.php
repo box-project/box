@@ -17,6 +17,9 @@ namespace KevinGH\Box\PhpScoper;
 use Humbug\PhpScoper\Scoper as PhpScoper;
 use Humbug\PhpScoper\Whitelist;
 
+/**
+ * @private
+ */
 final class SimpleScoper implements Scoper
 {
     private $scoper;

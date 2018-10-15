@@ -1,8 +1,8 @@
 <?php
 
-namespace _HumbugBox5b963fb2bb9ba\Composer\Semver\Constraint;
+namespace _HumbugBoxf93f74f93d56\Composer\Semver\Constraint;
 
-class EmptyConstraint implements \_HumbugBox5b963fb2bb9ba\Composer\Semver\Constraint\ConstraintInterface
+class EmptyConstraint implements \_HumbugBoxf93f74f93d56\Composer\Semver\Constraint\ConstraintInterface
 {
     /**
     @var */
@@ -11,7 +11,7 @@ class EmptyConstraint implements \_HumbugBox5b963fb2bb9ba\Composer\Semver\Constr
     @param
     @return
     */
-    public function matches(\_HumbugBox5b963fb2bb9ba\Composer\Semver\Constraint\ConstraintInterface $provider)
+    public function matches(\_HumbugBoxf93f74f93d56\Composer\Semver\Constraint\ConstraintInterface $provider)
     {
         return \true;
     }

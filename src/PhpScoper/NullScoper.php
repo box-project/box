@@ -16,6 +16,9 @@ namespace KevinGH\Box\PhpScoper;
 
 use Humbug\PhpScoper\Whitelist;
 
+/**
+ * @private
+ */
 final class NullScoper implements Scoper
 {
     /**

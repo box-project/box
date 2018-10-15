@@ -16,7 +16,6 @@ namespace KevinGH\Box;
 
 use Humbug\PhpScoper\Whitelist;
 use KevinGH\Box\Compactor\PhpScoper;
-use KevinGH\Box\PhpScoper\Scoper;
 
 final class Compactors
 {

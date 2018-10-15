@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use function array_filter;
 use Assert\Assertion;
 use BadMethodCallException;
 use Countable;
@@ -29,6 +28,7 @@ use RuntimeException;
 use SplFileInfo;
 use function Amp\ParallelFunctions\parallelMap;
 use function Amp\Promise\wait;
+use function array_filter;
 use function array_flip;
 use function array_map;
 use function array_unshift;
@@ -436,7 +436,7 @@ final class Box implements Countable
         }
 
         $this->compactors->registerWhitelist(
-            WhitelistManipulator::mergeWhitelists(
+            $whitelist = WhitelistManipulator::mergeWhitelists(
                 ...array_filter($whitelists)
             )
         );

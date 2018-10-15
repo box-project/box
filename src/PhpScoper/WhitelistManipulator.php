@@ -2,39 +2,54 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\PhpScoper;
 
-
+use Assert\Assertion;
 use Humbug\PhpScoper\Whitelist;
+use PhpParser\Node\Name\FullyQualified;
 
+/**
+ * @private
+ */
 final class WhitelistManipulator
 {
     public static function mergeWhitelists(Whitelist ...$whitelists): Whitelist
     {
-        $whitelistGlobalConstants = true;
-        $whitelistGlobalClasses = true;
-        $whitelistGlobalFunctions = true;
-        $elements = [];
+        Assertion::greaterThan(count($whitelists), 0, 'Expected to have at least one whitelist, none given');
 
-        foreach ($whitelists as $whitelist) {
-            $whitelistGlobalConstants = $whitelistGlobalConstants && $whitelist->whitelistGlobalConstants();
-            $whitelistGlobalClasses = $whitelistGlobalClasses && $whitelist->whitelistGlobalClasses();
-            $whitelistGlobalFunctions = $whitelistGlobalFunctions && $whitelist->whitelistGlobalFunctions();
+        /** @var Whitelist $whitelist */
+        $whitelist = clone array_shift($whitelists);
 
-            $whitelistElements = $whitelist->toArray();
+        foreach ($whitelists as $whitelistToMerge) {
+            $recordedWhitelistedClasses = $whitelistToMerge->getRecordedWhitelistedClasses();
 
-            foreach ($whitelistElements as $whitelistElement) {
-                // Do not rely on array_merge here since it can be quite slow. Indeed array_merge copies the two arrays
-                // to merge into a new one, done in a loop like here it can be quite taxing.
-                $elements[] = $whitelistElement;
+            foreach ($recordedWhitelistedClasses as [$original, $alias]) {
+                $whitelist->recordWhitelistedClass(
+                    new FullyQualified($original),
+                    new FullyQualified($alias)
+                );
+            }
+
+            $recordedWhitelistedFunctions = $whitelistToMerge->getRecordedWhitelistedFunctions();
+
+            foreach ($recordedWhitelistedFunctions as [$original, $alias]) {
+                $whitelist->recordWhitelistedFunction(
+                    new FullyQualified($original),
+                    new FullyQualified($alias)
+                );
             }
         }
 
-        return Whitelist::create(
-            $whitelistGlobalConstants,
-            $whitelistGlobalClasses,
-            $whitelistGlobalFunctions,
-            ...$elements
-        );
+        return $whitelist;
     }
 }

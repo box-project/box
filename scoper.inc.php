@@ -149,5 +149,8 @@ return [
         \Herrera\Box\Compactor\Php::class,
         \KevinGH\Box\Compactor\Php::class,
         \KevinGH\Box\Compactor\PhpScoper::class,
+
+        \KevinGH\Box\Compactor::class,
+        'KevinGH\Box\get_phar_compression_algorithm_extension',
     ],
 ];

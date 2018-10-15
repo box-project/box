@@ -1,6 +1,6 @@
 <?php
 
-namespace _HumbugBox5b963fb2bb9ba\KevinGH\RequirementChecker;
+namespace _HumbugBoxf93f74f93d56\KevinGH\RequirementChecker;
 
 /**
 @private
@@ -24,6 +24,9 @@ final class Requirement
         $this->testMessage = $testMessage;
         $this->helpText = $helpText;
     }
+    /**
+    @return
+    */
     public function isFulfilled()
     {
         if (null === $this->fulfilled) {

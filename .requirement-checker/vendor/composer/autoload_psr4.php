@@ -6,6 +6,6 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    '_HumbugBox5b963fb2bb9ba\\KevinGH\\RequirementChecker\\' => array($baseDir . '/src'),
-    '_HumbugBox5b963fb2bb9ba\\Composer\\Semver\\' => array($vendorDir . '/composer/semver/src'),
+    '_HumbugBoxf93f74f93d56\\KevinGH\\RequirementChecker\\' => array($baseDir . '/src'),
+    '_HumbugBoxf93f74f93d56\\Composer\\Semver\\' => array($vendorDir . '/composer/semver/src'),
 );
