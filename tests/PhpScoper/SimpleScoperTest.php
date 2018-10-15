@@ -71,4 +71,19 @@ JSON;
         $this->assertSame($prefix, $scoper->getPrefix());
         $this->assertSame($whitelist, $scoper->getWhitelist());
     }
+
+    public function test_it_can_change_of_whitelist(): void
+    {
+        $prefix = 'HumbugBox';
+        $whitelist = Whitelist::create(true, true, true, 'Whitelisted\Foo');
+        $patchers = [];
+
+        $newWhitelist = Whitelist::create(false, false, false);
+
+        $scoper = new SimpleScoper(new FakePhpScoper(), $prefix, $whitelist, $patchers);
+        $scoper->changeWhitelist($newWhitelist);
+
+        $this->assertSame($prefix, $scoper->getPrefix());
+        $this->assertSame($newWhitelist, $scoper->getWhitelist());
+    }
 }

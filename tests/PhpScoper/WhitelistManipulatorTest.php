@@ -41,6 +41,8 @@ class WhitelistManipulatorTest extends TestCase
 
     /**
      * @dataProvider provideWhitelistsToMerge
+     *
+     * @param Whitelist[] $whitelists
      */
     public function test_it_merges_whitelists_into_one(array $whitelists, Whitelist $expected): void
     {

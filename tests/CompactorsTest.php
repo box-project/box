@@ -14,6 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use Generator;
+use Humbug\PhpScoper\Whitelist;
+use KevinGH\Box\Compactor\FakeCompactor;
+use KevinGH\Box\Compactor\PhpScoper;
+use KevinGH\Box\PhpScoper\Scoper;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -95,5 +100,140 @@ class CompactorsTest extends TestCase
             ],
             $this->compactors->toArray()
         );
+    }
+
+    /**
+     * @dataProvider provideCompactorsForFirstWhitelistCheck
+     *
+     * @param Compactor[] $compactors
+     */
+    public function test_it_provides_the_first_scoper_compactor_whitelist_when_there_is_one(array $compactors, ?Whitelist $expected): void
+    {
+        $compactors = new Compactors(...$compactors);
+
+        $actual = $compactors->getScoperWhitelist();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @dataProvider provideCompactorsForFirstWhitelistChange
+     *
+     * @param Compactor[] $compactors
+     */
+    public function test_it_can_change_the_first_scoper_compactor_whitelist(array $compactors, ?Whitelist $newWhitelist): void
+    {
+        $compactors = new Compactors(...$compactors);
+
+        if (null !== $newWhitelist) {
+            $compactors->registerWhitelist($newWhitelist);
+        }
+
+        $actual = $compactors->getScoperWhitelist();
+
+        $this->assertSame($newWhitelist, $actual);
+    }
+
+    public function provideCompactorsForFirstWhitelistCheck(): Generator
+    {
+        yield [
+            [],
+            null,
+        ];
+
+        yield [
+            [new FakeCompactor()],
+            null,
+        ];
+
+        yield (function (): array {
+            $whitelist = Whitelist::create(true, true, true);
+
+            return [
+                [
+                    new FakeCompactor(),
+                    $this->createScoperCompactor($whitelist),
+                ],
+                $whitelist,
+            ];
+        })();
+
+        yield (function (): array {
+            $firstWhitelist = Whitelist::create(true, true, true);
+            $secondWhitelist = Whitelist::create(false, false, false);
+
+            return [
+                [
+                    new FakeCompactor(),
+                    $this->createScoperCompactor($firstWhitelist),
+                    $this->createScoperCompactor($secondWhitelist),
+                ],
+                $firstWhitelist,
+            ];
+        })();
+    }
+
+    public function provideCompactorsForFirstWhitelistChange(): Generator
+    {
+        yield [
+            [],
+            null,
+        ];
+
+        yield [
+            [new FakeCompactor()],
+            null,
+        ];
+
+        yield (function (): array {
+            $whitelist = Whitelist::create(true, true, true);
+
+            return [
+                [
+                    new FakeCompactor(),
+                    $this->createScoperCompactorWithChangeWhitelist($whitelist),
+                ],
+                $whitelist,
+            ];
+        })();
+
+        yield (function (): array {
+            $firstWhitelist = Whitelist::create(true, true, true);
+            $secondWhitelist = Whitelist::create(false, false, false);
+
+            return [
+                [
+                    new FakeCompactor(),
+                    $this->createScoperCompactorWithChangeWhitelist($firstWhitelist),
+                    $this->createScoperCompactorWithChangeWhitelist($secondWhitelist),
+                ],
+                $firstWhitelist,
+            ];
+        })();
+    }
+
+    private function createScoperCompactor(Whitelist $whitelist): PhpScoper
+    {
+        /** @var ObjectProphecy|Scoper $scoperProphecy */
+        $scoperProphecy = $this->prophesize(Scoper::class);
+        $scoperProphecy->getWhitelist()->willReturn($whitelist);
+
+        /** @var Scoper $scoper */
+        $scoper = $scoperProphecy->reveal();
+
+        return new PhpScoper($scoper);
+    }
+
+    private function createScoperCompactorWithChangeWhitelist(Whitelist $whitelist): PhpScoper
+    {
+        /** @var ObjectProphecy|Scoper $scoperProphecy */
+        $scoperProphecy = $this->prophesize(Scoper::class);
+        $scoperProphecy->changeWhitelist($whitelist)->shouldBeCalled();
+        $scoperProphecy->getWhitelist()->willReturn($whitelist);
+
+        /** @var Scoper $scoper */
+        $scoper = $scoperProphecy->reveal();
+
+        return new PhpScoper($scoper);
     }
 }
