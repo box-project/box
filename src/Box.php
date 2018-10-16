@@ -52,8 +52,6 @@ use function sprintf;
  */
 final class Box implements Countable
 {
-    public const DEBUG_DIR = '.box_dump';
-
     /**
      * @var string The path to the PHAR file
      */

@@ -32,6 +32,7 @@ use Traversable;
 use function extension_loaded;
 use function file_get_contents;
 use function file_put_contents;
+use function Humbug\get_contents;
 use function iterator_to_array;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
@@ -47,11 +48,14 @@ use function str_replace;
 use function strlen;
 use function substr;
 
+///**
+// * @covers \KevinGH\Box\Console\Command\Compile
+// * @covers \KevinGH\Box\Console\MessageRenderer
+// * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
+// *                              can create undesirable side-effects.
+// */
 /**
- * @covers \KevinGH\Box\Console\Command\Compile
- * @covers \KevinGH\Box\Console\MessageRenderer
- * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
- *                              can create undesirable side-effects.
+ * @coversNothing
  */
 class CompileTest extends CommandTestCase
 {
@@ -974,6 +978,9 @@ OUTPUT;
         $this->assertSame($expected, $actual);
     }
 
+    /**
+     * @requires extension zlib
+     */
     public function test_it_can_build_a_PHAR_file_in_debug_mode(): void
     {
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
@@ -1005,6 +1012,7 @@ OUTPUT;
                     'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
                     'shebang' => $shebang,
+                    'compression' => 'GZ',
                 ]
             )
         );
@@ -1077,7 +1085,8 @@ Box version 3.x-dev@151e40a
 )
 ? Dumping the Composer autoloader
 ? Removing the Composer dump artefacts
-? No compression
+? Compressing with the algorithm "GZ"
+    > Warning: the extension "zlib" will now be required to execute the PHAR
 ? Signing using a private key
 Private key passphrase:
 ? Setting file permissions to 0754
@@ -1360,7 +1369,7 @@ KevinGH\Box\Configuration {#140
       ]
     }
   ]
-  -compressionAlgorithm: null
+  -compressionAlgorithm: 4096
   -mainScriptPath: "/path/to/run.php"
   -mainScriptContents: """
     <?php\\n
@@ -1462,6 +1471,29 @@ EOF;
         );
 
         $this->assertSame($expectedDumpedConfig, $actualDumpedConfig);
+
+        // Checks one of the dumped file from the PHAR to ensure the encoding of the extracted file is correct
+        $this->assertSame(
+            get_contents('.box_dump/run.php'),
+            <<<'PHP'
+<?php
+
+declare(strict_types=1);
+
+
+
+
+
+
+
+
+
+
+
+require 'test.php';
+
+PHP
+        );
     }
 
     public function test_it_can_build_a_PHAR_file_in_quiet_mode(): void
