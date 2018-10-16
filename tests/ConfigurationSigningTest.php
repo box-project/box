@@ -24,6 +24,8 @@ use function in_array;
 /**
  * @covers \KevinGH\Box\Configuration
  * @covers \KevinGH\Box\MapFile
+ *
+ * @group config
  */
 class ConfigurationSigningTest extends ConfigurationTestCase
 {

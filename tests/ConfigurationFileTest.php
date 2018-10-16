@@ -26,6 +26,8 @@ use function KevinGH\Box\FileSystem\symlink;
 
 /**
  * @covers \KevinGH\Box\Configuration
+ *
+ * @group config
  */
 class ConfigurationFileTest extends ConfigurationTestCase
 {
@@ -1876,6 +1878,30 @@ JSON
             ],
             ['file0'],
             ['file1'],
+        ];
+
+        yield [
+            // https://github.com/humbug/box/issues/303
+            // The main script is blacklisted but ensures this does not affect the other files collected, like here
+            // the files found in a directory which has the same name as the main script
+            function (): void {
+                dump_file('acme');
+                dump_file('src/file00');
+                dump_file('src/file10');
+                dump_file('src/acme/file00');
+                dump_file('src/acme/file10');
+            },
+            [
+                'main' => 'acme',
+                'directories' => ['src'],
+            ],
+            [
+                'src/acme/file00',
+                'src/acme/file10',
+                'src/file00',
+                'src/file10',
+            ],
+            [],
         ];
     }
 

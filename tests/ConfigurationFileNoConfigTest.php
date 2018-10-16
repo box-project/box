@@ -23,6 +23,8 @@ use function symlink;
 
 /**
  * @covers \KevinGH\Box\Configuration
+ *
+ * @group config
  */
 class ConfigurationFileNoConfigTest extends ConfigurationTestCase
 {
