@@ -239,11 +239,11 @@ HELP;
 
         $this->checkComposerFiles($box, $config, $logger);
 
-        $this->configureCompressionAlgorithm($config, $box, $input->getOption(self::DEV_OPTION), $io, $logger);
-
         if ($debug) {
             $box->getPhar()->extractTo(self::DEBUG_DIR, null, true);
         }
+
+        $this->configureCompressionAlgorithm($config, $box, $input->getOption(self::DEV_OPTION), $io, $logger);
 
         $this->signPhar($config, $box, $config->getTmpOutputPath(), $input, $output, $logger);
 
@@ -649,25 +649,27 @@ EOF
         $softLimit = posix_getrlimit()['soft openfiles'];
         $hardLimit = posix_getrlimit()['hard openfiles'];
 
-        if ($softLimit < $filesCount) {
-            $io->writeln(
-                sprintf(
-                    '<info>[debug] Increased the maximum number of open file descriptors from ("%s", "%s") to ("%s", "%s")'
-                    .'</info>',
-                    $softLimit,
-                    $hardLimit,
-                    $filesCount,
-                    'unlimited'
-                ),
-                OutputInterface::VERBOSITY_DEBUG
-            );
-
-            posix_setrlimit(
-                POSIX_RLIMIT_NOFILE,
-                $filesCount,
-                'unlimited' === $hardLimit ? POSIX_RLIMIT_INFINITY : $hardLimit
-            );
+        if ($softLimit >= $filesCount) {
+            return function (): void {};
         }
+
+        $io->writeln(
+            sprintf(
+                '<info>[debug] Increased the maximum number of open file descriptors from ("%s", "%s") to ("%s", "%s")'
+                .'</info>',
+                $softLimit,
+                $hardLimit,
+                $filesCount,
+                'unlimited'
+            ),
+            OutputInterface::VERBOSITY_DEBUG
+        );
+
+        posix_setrlimit(
+            POSIX_RLIMIT_NOFILE,
+            $filesCount,
+            'unlimited' === $hardLimit ? POSIX_RLIMIT_INFINITY : $hardLimit
+        );
 
         return function () use ($io, $softLimit, $hardLimit): void {
             if (function_exists('posix_setrlimit') && isset($softLimit, $hardLimit)) {
