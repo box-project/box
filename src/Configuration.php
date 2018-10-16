@@ -40,6 +40,7 @@ use const E_USER_DEPRECATED;
 use function array_column;
 use function array_diff;
 use function array_filter;
+use function array_flip;
 use function array_key_exists;
 use function array_keys;
 use function array_map;
@@ -49,7 +50,6 @@ use function constant;
 use function defined;
 use function dirname;
 use function file_exists;
-use function in_array;
 use function intval;
 use function is_array;
 use function is_bool;
@@ -478,7 +478,7 @@ BANNER;
     }
 
     /**
-     * @return string[]
+     * @return SplFileInfo[]
      */
     public function getFiles(): array
     {
@@ -486,7 +486,7 @@ BANNER;
     }
 
     /**
-     * @return string[]
+     * @return SplFileInfo[]
      */
     public function getBinaryFiles(): array
     {
@@ -739,7 +739,9 @@ BANNER;
         ConfigurationLogger $logger,
         ?string ...$excludedPaths
     ): array {
-        $blacklist = self::retrieveBlacklist($raw, $basePath, $logger, ...$excludedPaths);
+        $blacklist = array_flip(
+            self::retrieveBlacklist($raw, $basePath, $logger, ...$excludedPaths)
+        );
 
         $blacklistFilter = function (SplFileInfo $file) use ($blacklist): ?bool {
             if ($file->isLink()) {
@@ -750,14 +752,14 @@ BANNER;
                 return false;
             }
 
-            if (in_array($file->getRealPath(), $blacklist, true)) {
+            if (array_key_exists($file->getRealPath(), $blacklist)) {
                 return false;
             }
 
             return null;
         };
 
-        return [$blacklist, $blacklistFilter];
+        return [array_keys($blacklist), $blacklistFilter];
     }
 
     /**
@@ -775,13 +777,15 @@ BANNER;
     ): array {
         self::checkIfDefaultValue($logger, $raw, self::BLACKLIST_KEY, []);
 
-        /** @var string[] $blacklist */
-        $blacklist = array_merge(
-            array_filter($excludedPaths),
-            $raw->{self::BLACKLIST_KEY} ?? []
+        $normalizedBlacklist = array_map(
+            function (string $excludedPath) use ($basePath): string {
+                return self::normalizePath($excludedPath, $basePath);
+            },
+            array_filter($excludedPaths)
         );
 
-        $normalizedBlacklist = [];
+        /** @var string[] $blacklist */
+        $blacklist = $raw->{self::BLACKLIST_KEY} ?? [];
 
         foreach ($blacklist as $file) {
             $normalizedBlacklist[] = self::normalizePath($file, $basePath);

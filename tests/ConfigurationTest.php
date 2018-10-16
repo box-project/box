@@ -44,6 +44,8 @@ use function KevinGH\Box\FileSystem\rename;
 /**
  * @covers \KevinGH\Box\Configuration
  * @covers \KevinGH\Box\MapFile
+ *
+ * @group config
  */
 class ConfigurationTest extends ConfigurationTestCase
 {
