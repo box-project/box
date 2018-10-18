@@ -18,7 +18,6 @@ use Generator;
 use InvalidArgumentException;
 use KevinGH\Box\Json\JsonValidationException;
 use const DIRECTORY_SEPARATOR;
-use function file_put_contents;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\rename;
@@ -1522,8 +1521,8 @@ JSON
         touch('B/fileB0');
         touch('B/fileB1');
 
-        file_put_contents('composer.json', '{}');
-        file_put_contents('composer.lock', '{}');
+        dump_file('composer.json', '{}');
+        dump_file('composer.lock', '{}');
 
         $this->setConfig([
             'files' => [
@@ -1646,7 +1645,7 @@ JSON
         touch('dir1/file1');
         touch('dir1/blacklisted_file');
 
-        file_put_contents(
+        dump_file(
             'composer.json',
             <<<'JSON'
 {

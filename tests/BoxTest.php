@@ -35,7 +35,6 @@ use function array_keys;
 use function current;
 use function dirname;
 use function extension_loaded;
-use function file_put_contents;
 use function in_array;
 use function iterator_to_array;
 use function KevinGH\Box\FileSystem\canonicalize;
@@ -150,7 +149,7 @@ class BoxTest extends FileSystemTestCase
         $file = 'foo';
         $contents = 'test';
 
-        file_put_contents($file, $contents);
+        dump_file($file, $contents);
 
         $this->box->startBuffering();
         $this->box->addFile($file);
@@ -206,7 +205,7 @@ class BoxTest extends FileSystemTestCase
         $file = 'foo';
         $contents = 'test';
 
-        file_put_contents($file, $contents);
+        dump_file($file, $contents);
 
         try {
             $this->box->addFile($file);
@@ -244,7 +243,7 @@ class BoxTest extends FileSystemTestCase
         $file = 'foo';
         $contents = 'test';
 
-        file_put_contents($file, 'tset');
+        dump_file($file, 'tset');
 
         $this->box->startBuffering();
         $this->box->addFile($file, $contents);
@@ -284,7 +283,7 @@ class BoxTest extends FileSystemTestCase
         $file = 'foo';
         $contents = 'test';
 
-        file_put_contents($file, 'tset');
+        dump_file($file, 'tset');
 
         $this->box->startBuffering();
         $this->box->addFile($file, $contents, true);
@@ -328,7 +327,7 @@ class BoxTest extends FileSystemTestCase
         $contents = 'test';
         $localPath = 'local/path/foo';
 
-        file_put_contents($file, $contents);
+        dump_file($file, $contents);
 
         $fileMapper = new MapFile(
             $this->tmp,
@@ -358,7 +357,7 @@ class BoxTest extends FileSystemTestCase
         $file = 'foo';
         $contents = 'test';
 
-        file_put_contents($file, $contents);
+        dump_file($file, $contents);
 
         $this->box->registerCompactors([new FakeCompactor()]);
 
@@ -382,7 +381,7 @@ class BoxTest extends FileSystemTestCase
         $contents = 'test';
         $localPath = 'local/path/foo';
 
-        file_put_contents($file, $contents);
+        dump_file($file, $contents);
 
         $fileMapper = new MapFile(
             $this->tmp,
@@ -415,7 +414,7 @@ class BoxTest extends FileSystemTestCase
             '@foo_placeholder@' => 'foo_value',
         ];
 
-        file_put_contents($file, $contents);
+        dump_file($file, $contents);
 
         $firstCompactorProphecy = $this->prophesize(Compactor::class);
         $firstCompactorProphecy
@@ -518,7 +517,7 @@ class BoxTest extends FileSystemTestCase
         $file = 'foo';
         $contents = 'test';
 
-        file_put_contents($file, $contents);
+        dump_file($file, $contents);
         chmod($file, 0355);
 
         try {
@@ -545,7 +544,7 @@ class BoxTest extends FileSystemTestCase
             '@foo_placeholder@' => 'foo_value',
         ];
 
-        file_put_contents($file, $contents);
+        dump_file($file, $contents);
 
         $firstCompactorProphecy = $this->prophesize(Compactor::class);
         $firstCompactorProphecy
@@ -1071,7 +1070,7 @@ JSON
         $file = 'foo';
         $contents = 'test';
 
-        file_put_contents($file, $contents);
+        dump_file($file, $contents);
         chmod($file, 0355);
 
         try {
@@ -1139,7 +1138,7 @@ JSON
 
     public function test_register_placeholders(): void
     {
-        file_put_contents(
+        dump_file(
             $file = 'foo',
             <<<'PHP'
 #!/usr/bin/env php
@@ -1190,7 +1189,7 @@ EOF;
 
     public function test_register_stub_file(): void
     {
-        file_put_contents(
+        dump_file(
             $file = 'foo',
             <<<'STUB'
 #!/usr/bin/env php
@@ -1225,7 +1224,7 @@ STUB;
 
     public function test_placeholders_are_also_replaced_in_stub_file(): void
     {
-        file_put_contents(
+        dump_file(
             $file = 'foo',
             <<<'STUB'
 #!/usr/bin/env php
@@ -1527,7 +1526,7 @@ PHP
 
         [$key, $password] = $this->getPrivateKey();
 
-        file_put_contents($file = 'foo', $key);
+        dump_file($file = 'foo', $key);
 
         $this->configureHelloWorldPhar();
 
@@ -1554,7 +1553,7 @@ PHP
         $key = $this->getPrivateKey()[0];
         $password = 'wrong password';
 
-        file_put_contents($file = 'foo', $key);
+        dump_file($file = 'foo', $key);
 
         $this->configureHelloWorldPhar();
 

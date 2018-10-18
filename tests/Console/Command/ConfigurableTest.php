@@ -17,6 +17,7 @@ namespace KevinGH\Box\Console\Command;
 use Assert\InvalidArgumentException;
 use Closure;
 use KevinGH\Box\Configuration;
+use function KevinGH\Box\FileSystem\dump_file;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Throwable\Exception\NoConfigurationFound;
@@ -50,7 +51,7 @@ class ConfigurableTest extends CommandTestCase
     {
         touch('index.php');
 
-        file_put_contents('box.json', '{"alias": "foo"}');
+        dump_file('box.json', '{"alias": "foo"}');
 
         /** @var TestConfigurableCommand $command */
         $command = $this->application->get('test');
@@ -81,7 +82,7 @@ class ConfigurableTest extends CommandTestCase
     {
         touch('index.php');
 
-        file_put_contents('mybox.json', '{"alias": "foo"}');
+        dump_file('mybox.json', '{"alias": "foo"}');
 
         /** @var TestConfigurableCommand $command */
         $command = $this->application->get('test');
@@ -171,7 +172,7 @@ class ConfigurableTest extends CommandTestCase
     {
         touch('index.php');
 
-        file_put_contents('box.json', '{"foo": "foo"}');
+        dump_file('box.json', '{"foo": "foo"}');
 
         /** @var TestConfigurableCommand $command */
         $command = $this->application->get('test');
@@ -202,7 +203,7 @@ class ConfigurableTest extends CommandTestCase
 
     public function test_it_throws_an_error_when_the_config_is_invalid(): void
     {
-        file_put_contents('box.json', '{}');
+        dump_file('box.json', '{}');
 
         /** @var TestConfigurableCommand $command */
         $command = $this->application->get('test');

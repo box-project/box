@@ -31,7 +31,7 @@ use Symfony\Component\Process\PhpExecutableFinder;
 use Traversable;
 use function extension_loaded;
 use function file_get_contents;
-use function file_put_contents;
+
 use function Humbug\get_contents;
 use function iterator_to_array;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -96,12 +96,12 @@ class CompileTest extends CommandTestCase
     {
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
-        file_put_contents('composer.json', '{}');
-        file_put_contents('composer.lock', '{}');
+        dump_file('composer.json', '{}');
+        dump_file('composer.lock', '{}');
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
-        file_put_contents(
+        dump_file(
             'box.json',
             json_encode(
                 [
@@ -301,7 +301,7 @@ PHP;
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
-        file_put_contents(
+        dump_file(
             'box.json',
             json_encode(
                 [
@@ -538,7 +538,7 @@ PHP;
     {
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
-        file_put_contents(
+        dump_file(
             'box.json',
             json_encode(
                 [
@@ -696,7 +696,7 @@ PHP;
     {
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
-        file_put_contents(
+        dump_file(
             'box.json',
             json_encode(
                 [
@@ -770,7 +770,7 @@ PHP;
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
-        file_put_contents(
+        dump_file(
             'box.json',
             json_encode(
                 [
@@ -871,7 +871,7 @@ OUTPUT;
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
-        file_put_contents(
+        dump_file(
             'box.json',
             json_encode(
                 [
@@ -984,7 +984,7 @@ OUTPUT;
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
-        file_put_contents(
+        dump_file(
             'box.json',
             json_encode(
                 [
@@ -1499,7 +1499,7 @@ PHP
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
-        file_put_contents(
+        dump_file(
             'box.json',
             json_encode(
                 [
@@ -1576,7 +1576,7 @@ PHP
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
-        file_put_contents(
+        dump_file(
             'box.json',
             json_encode(
                 [
@@ -1621,7 +1621,7 @@ PHP
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
-        file_put_contents(
+        dump_file(
             'custom_stub',
             $stub = <<<'PHP'
 #!/usr/bin/php
@@ -1641,7 +1641,7 @@ __HALT_COMPILER(); ?>
 PHP
         );
 
-        file_put_contents(
+        dump_file(
             'box.json',
             json_encode(
                 [
@@ -1691,7 +1691,7 @@ PHP
     {
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
-        file_put_contents(
+        dump_file(
             'box.json',
             json_encode(
                 [
@@ -1726,7 +1726,7 @@ PHP
         touch('unreadable-file.php');
         chmod('unreadable-file.php', 0000);
 
-        file_put_contents(
+        dump_file(
             'box.json',
             json_encode(
                 [
@@ -1872,7 +1872,7 @@ OUTPUT;
 
         $this->assertFileNotExists($this->tmp.'/vendor/autoload.php');
 
-        file_put_contents(
+        dump_file(
             'box.json',
             json_encode(
                 [
@@ -1965,7 +1965,7 @@ OUTPUT;
 
         rename('run.php', 'index.php');
 
-        file_put_contents(
+        dump_file(
             'box.json',
             json_encode(['exclude-composer-files' => false])
         );
@@ -2524,7 +2524,7 @@ OUTPUT;
     {
         mirror(self::FIXTURES_DIR.'/dir008', $this->tmp);
 
-        file_put_contents(
+        dump_file(
             'box.json',
             json_encode(
                 [
@@ -2601,7 +2601,7 @@ OUTPUT;
 
         $boxRawConfig = json_decode(file_get_contents('box.json'), true, 512, JSON_PRETTY_PRINT);
         $boxRawConfig['shebang'] = false;
-        file_put_contents('box.json', json_encode($boxRawConfig), JSON_PRETTY_PRINT);
+        dump_file('box.json', json_encode($boxRawConfig), JSON_PRETTY_PRINT);
 
         $this->commandTester->execute(
             ['command' => 'compile'],
@@ -2679,7 +2679,7 @@ OUTPUT;
     {
         mirror(self::FIXTURES_DIR.'/dir004', $this->tmp);
 
-        file_put_contents(
+        dump_file(
             'box.json',
             json_encode(
                 array_merge(
@@ -2866,7 +2866,7 @@ OUTPUT;
     {
         mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
 
-        file_put_contents(
+        dump_file(
             'box.json',
             json_encode(
                 [
@@ -2896,7 +2896,7 @@ OUTPUT;
 
         remove('composer.json');
 
-        file_put_contents(
+        dump_file(
             'box.json',
             json_encode(
                 [
@@ -2968,7 +2968,7 @@ OUTPUT;
     {
         mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
 
-        file_put_contents(
+        dump_file(
             'box.json',
             json_encode(
                 [

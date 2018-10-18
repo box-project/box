@@ -34,7 +34,6 @@ use function abs;
 use function array_fill_keys;
 use function count;
 use function date_default_timezone_set;
-use function file_put_contents;
 use function getcwd;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
@@ -329,7 +328,7 @@ EOF
 
     public function test_it_throws_an_error_when_a_composer_file_is_found_but_invalid(): void
     {
-        file_put_contents('composer.json', '');
+        dump_file('composer.json', '');
 
         try {
             $this->reloadConfig();
@@ -353,7 +352,7 @@ EOF
 
     public function test_it_throws_an_error_when_a_composer_lock_is_found_but_invalid(): void
     {
-        file_put_contents('composer.lock', '');
+        dump_file('composer.lock', '');
 
         try {
             $this->reloadConfig();
@@ -395,7 +394,7 @@ EOF
             $this->config->getWarnings()
         );
 
-        file_put_contents('composer.json', '{}');
+        dump_file('composer.json', '{}');
 
         $this->setConfig([]);
 
@@ -415,7 +414,7 @@ EOF
 
     public function test_the_autoloader_dumping_can_be_configured(): void
     {
-        file_put_contents('composer.json', '{}');
+        dump_file('composer.json', '{}');
 
         $this->setConfig([
             'dump-autoload' => false,
@@ -988,7 +987,7 @@ JSON
 
     public function test_main_script_content_ignores_shebang_line(): void
     {
-        file_put_contents('test.php', "#!/usr/bin/env php\ntest");
+        dump_file('test.php', "#!/usr/bin/env php\ntest");
 
         $this->setConfig(['main' => 'test.php']);
 
@@ -2142,7 +2141,7 @@ multiline
 comment.
 COMMENT;
 
-        file_put_contents('banner', $comment);
+        dump_file('banner', $comment);
 
         $this->setConfig([
             'banner-file' => 'banner',
@@ -2247,7 +2246,7 @@ multiline
 comment.
 COMMENT;
 
-        file_put_contents('banner', $comment);
+        dump_file('banner', $comment);
 
         $this->setConfig([
             'banner' => 'discarded banner',
@@ -2280,7 +2279,7 @@ multiline
 comment.
 COMMENT;
 
-        file_put_contents('banner', $comment);
+        dump_file('banner', $comment);
 
         $this->setConfig([
             'banner-file' => 'banner',
@@ -2348,7 +2347,7 @@ COMMENT;
 
     public function test_a_custom_stub_can_be_provided(): void
     {
-        file_put_contents('custom-stub.php', '');
+        dump_file('custom-stub.php', '');
 
         $this->setConfig([
             'stub' => 'custom-stub.php',
@@ -2491,7 +2490,7 @@ COMMENT;
         $this->assertSame([], $this->config->getRecommendations());
         $this->assertSame([], $this->config->getWarnings());
 
-        file_put_contents('composer.lock', '{}');
+        dump_file('composer.lock', '{}');
 
         $this->reloadConfig();
 
@@ -2505,7 +2504,7 @@ COMMENT;
     {
         $this->assertFalse($this->config->checkRequirements());
 
-        file_put_contents('composer.lock', '{}');
+        dump_file('composer.lock', '{}');
 
         $this->reloadConfig();
 
@@ -2514,7 +2513,7 @@ COMMENT;
         $this->assertSame([], $this->config->getRecommendations());
         $this->assertSame([], $this->config->getWarnings());
 
-        file_put_contents('composer.json', '{}');
+        dump_file('composer.json', '{}');
         remove('composer.lock');
 
         $this->reloadConfig();
@@ -2524,7 +2523,7 @@ COMMENT;
         $this->assertSame([], $this->config->getRecommendations());
         $this->assertSame([], $this->config->getWarnings());
 
-        file_put_contents('composer.lock', '{}');
+        dump_file('composer.lock', '{}');
 
         $this->reloadConfig();
 
@@ -2536,8 +2535,8 @@ COMMENT;
 
     public function test_the_requirement_checker_can_be_enabled(): void
     {
-        file_put_contents('composer.json', '{}');
-        file_put_contents('composer.lock', '{}');
+        dump_file('composer.json', '{}');
+        dump_file('composer.lock', '{}');
 
         $this->setConfig([
             'check-requirements' => true,
@@ -2602,8 +2601,8 @@ COMMENT;
             $this->config->getWarnings()
         );
 
-        file_put_contents('composer.json', '{}');
-        file_put_contents('composer.lock', '{}');
+        dump_file('composer.json', '{}');
+        dump_file('composer.lock', '{}');
 
         $this->setConfig([
             'check-requirements' => null,
@@ -2632,8 +2631,8 @@ COMMENT;
 
     public function test_warning_is_given_if_the_check_requirement_is_configured_but_the_PHAR_stub_used(): void
     {
-        file_put_contents('composer.json', '{}');
-        file_put_contents('composer.lock', '{}');
+        dump_file('composer.json', '{}');
+        dump_file('composer.lock', '{}');
 
         $this->setConfig([
             'check-requirements' => true,
@@ -2825,7 +2824,7 @@ COMMENT
 
         yield [
             function (): void {
-                file_put_contents('composer.json', '{}');
+                dump_file('composer.json', '{}');
             },
             'composer.json',
             [],
@@ -2835,7 +2834,7 @@ COMMENT
 
         yield [
             function (): void {
-                file_put_contents('composer.json', '{"name": "acme/foo"}');
+                dump_file('composer.json', '{"name": "acme/foo"}');
             },
             'composer.json',
             ['name' => 'acme/foo'],
@@ -2845,7 +2844,7 @@ COMMENT
 
         yield [
             function (): void {
-                file_put_contents('composer.lock', '{}');
+                dump_file('composer.lock', '{}');
             },
             null,
             null,
@@ -2855,7 +2854,7 @@ COMMENT
 
         yield [
             function (): void {
-                file_put_contents('composer.lock', '{"name": "acme/foo"}');
+                dump_file('composer.lock', '{"name": "acme/foo"}');
             },
             null,
             null,
@@ -2865,8 +2864,8 @@ COMMENT
 
         yield [
             function (): void {
-                file_put_contents('composer.json', '{"name": "acme/foo"}');
-                file_put_contents('composer.lock', '{"name": "acme/bar"}');
+                dump_file('composer.json', '{"name": "acme/foo"}');
+                dump_file('composer.lock', '{"name": "acme/bar"}');
             },
             'composer.json',
             ['name' => 'acme/foo'],

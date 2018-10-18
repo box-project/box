@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console;
 
 use KevinGH\Box\Configuration;
+use function KevinGH\Box\FileSystem\dump_file;
 use KevinGH\Box\Test\FileSystemTestCase;
 use KevinGH\Box\Throwable\Exception\NoConfigurationFound;
 use const DIRECTORY_SEPARATOR;
@@ -78,7 +79,7 @@ class ConfigurationHelperTest extends FileSystemTestCase
     public function test_it_can_load_a_configuration(): void
     {
         touch('index.php');
-        file_put_contents('box.json.dist', '{}');
+        dump_file('box.json.dist', '{}');
 
         $this->assertInstanceOf(
             Configuration::class,

@@ -15,9 +15,10 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use KevinGH\Box\Console\ConfigurationHelper;
+use function KevinGH\Box\FileSystem\dump_file;
 use KevinGH\Box\Test\FileSystemTestCase;
 use stdClass;
-use function file_put_contents;
+
 use function KevinGH\Box\FileSystem\make_path_absolute;
 
 abstract class ConfigurationTestCase extends FileSystemTestCase
@@ -44,14 +45,14 @@ abstract class ConfigurationTestCase extends FileSystemTestCase
         $this->file = make_path_absolute('box.json', $this->tmp);
 
         touch($defaultFile = self::DEFAULT_FILE);
-        file_put_contents($this->file, '{}');
+        dump_file($this->file, '{}');
 
         $this->config = Configuration::create($this->file, new stdClass());
     }
 
     final protected function setConfig(array $config): void
     {
-        file_put_contents($this->file, json_encode($config, JSON_PRETTY_PRINT));
+        dump_file($this->file, json_encode($config, JSON_PRETTY_PRINT));
 
         $this->reloadConfig();
     }

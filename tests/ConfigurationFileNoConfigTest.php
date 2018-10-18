@@ -16,7 +16,6 @@ namespace KevinGH\Box;
 
 use InvalidArgumentException;
 use const PHP_OS_FAMILY;
-use function file_put_contents;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\remove;
 use function symlink;
@@ -78,7 +77,7 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
         touch('CLASSMAP_DEV_DIR/file0');
         touch('CLASSMAP_DEV_DIR/file1');
 
-        file_put_contents(
+        dump_file(
             'composer.json',
             <<<'JSON'
 {
@@ -148,7 +147,7 @@ JSON
     {
         touch('file0');
 
-        file_put_contents(
+        dump_file(
             'composer.json',
             <<<'JSON'
 {
@@ -170,7 +169,7 @@ JSON
             );
         }
 
-        file_put_contents(
+        dump_file(
             'composer.json',
             <<<'JSON'
 {
@@ -198,7 +197,7 @@ JSON
         touch('file0');
         symlink('file0', 'file1');
 
-        file_put_contents(
+        dump_file(
             'composer.json',
             <<<'JSON'
 {
@@ -220,7 +219,7 @@ JSON
             );
         }
 
-        file_put_contents(
+        dump_file(
             'composer.json',
             <<<'JSON'
 {
@@ -299,7 +298,7 @@ JSON
         touch('CLASSMAP_DEV_DIR/file0');
         touch('CLASSMAP_DEV_DIR/file1');
 
-        file_put_contents(
+        dump_file(
             'composer.json',
             <<<'JSON'
 {
@@ -550,7 +549,7 @@ JSON
         touch('.scrutiziner.yml.dist');
         touch('.scrutiziner.yml');
 
-        file_put_contents(
+        dump_file(
             'composer.json',
             <<<'JSON'
 {
@@ -636,7 +635,7 @@ JSON
         touch('A/fileA0');
         touch('A/fileA1');
 
-        file_put_contents(
+        dump_file(
             'composer.json',
             <<<'JSON'
 {
@@ -668,7 +667,7 @@ JSON
     {
         dump_file('vendor/composer/installed.json');
 
-        file_put_contents(
+        dump_file(
             'composer.json',
             <<<'JSON'
 {
