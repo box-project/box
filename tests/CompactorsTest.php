@@ -109,9 +109,7 @@ class CompactorsTest extends TestCase
      */
     public function test_it_provides_the_first_scoper_compactor_whitelist_when_there_is_one(array $compactors, ?Whitelist $expected): void
     {
-        $compactors = new Compactors(...$compactors);
-
-        $actual = $compactors->getScoperWhitelist();
+        $actual = (new Compactors(...$compactors))->getScoperWhitelist();
 
         $this->assertSame($expected, $actual);
     }
@@ -123,13 +121,13 @@ class CompactorsTest extends TestCase
      */
     public function test_it_can_change_the_first_scoper_compactor_whitelist(array $compactors, ?Whitelist $newWhitelist): void
     {
-        $compactors = new Compactors(...$compactors);
+        $compactorsAggregate = new Compactors(...$compactors);
 
         if (null !== $newWhitelist) {
-            $compactors->registerWhitelist($newWhitelist);
+            $compactorsAggregate->registerWhitelist($newWhitelist);
         }
 
-        $actual = $compactors->getScoperWhitelist();
+        $actual = $compactorsAggregate->getScoperWhitelist();
 
         $this->assertSame($newWhitelist, $actual);
     }

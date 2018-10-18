@@ -16,6 +16,7 @@ namespace KevinGH\Box\Composer;
 
 use Composer\Factory;
 use Composer\IO\NullIO;
+use Composer\Repository\InstalledRepositoryInterface;
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use Humbug\PhpScoper\Whitelist;
 use RuntimeException;
@@ -41,6 +42,7 @@ final class ComposerOrchestrator
             $composer = Factory::create(new NullIO(), null, true);
 
             $installationManager = $composer->getInstallationManager();
+            /** @var InstalledRepositoryInterface $localRepository */
             $localRepository = $composer->getRepositoryManager()->getLocalRepository();
             $package = $composer->getPackage();
             $composerConfig = $composer->getConfig();

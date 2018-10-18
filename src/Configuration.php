@@ -1125,7 +1125,7 @@ BANNER;
             return $directory;
         };
 
-        $normalizeFileOrDirectory = function (string &$fileOrDirectory) use ($basePath, $blacklistFilter): void {
+        $normalizeFileOrDirectory = function (?string &$fileOrDirectory) use ($basePath, $blacklistFilter): void {
             $fileOrDirectory = self::normalizePath($fileOrDirectory, $basePath);
 
             Assertion::false(

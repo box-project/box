@@ -31,4 +31,6 @@
 /vendor-bin/*/composer.lock
 /vendor-bin/*/vendor/
 /.php_cs.cache
+/.phpcs-cache
 /phpunit.xml
+/phpcs.xml

@@ -2703,7 +2703,7 @@ BANNER
         $this->assertSame($this->tmp.'/index.phar', $this->config->getTmpOutputPath());
         $this->assertTrue($this->config->hasMainScript());
         $this->assertFalse($this->config->isInterceptFileFuncs());
-        $this->assertFalse($this->config->isPrivateKeyPrompt());
+        $this->assertFalse($this->config->promptForPrivateKey());
         $this->assertTrue($this->config->isStubGenerated());
     }
 

@@ -1171,7 +1171,7 @@ PHP
             '@stringable_placeholder@' => $stringable,
         ]);
 
-        $this->box->registerStub($file, true);
+        $this->box->registerStub($file);
 
         $expected = <<<'EOF'
 Test replacing placeholders.

@@ -106,19 +106,19 @@ function memory_to_bytes(string $value): int
 {
     $unit = strtolower($value[strlen($value) - 1]);
 
-    $value = (int) $value;
+    $bytes = (int) $value;
     switch ($unit) {
         case 'g':
-            $value *= 1024;
+            $bytes *= 1024;
         // no break (cumulative multiplier)
         case 'm':
-            $value *= 1024;
+            $bytes *= 1024;
         // no break (cumulative multiplier)
         case 'k':
-            $value *= 1024;
+            $bytes *= 1024;
     }
 
-    return $value;
+    return $bytes;
 }
 
 /**
@@ -146,7 +146,7 @@ function register_aliases(): void
  */
 function disable_parallel_processing(): void
 {
-    if (false == defined(_NO_PARALLEL_PROCESSING)) {
+    if (false === defined(_NO_PARALLEL_PROCESSING)) {
         define(_NO_PARALLEL_PROCESSING, true);
     }
 }

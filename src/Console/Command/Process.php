@@ -174,15 +174,15 @@ final class Process extends ConfigurableCommand
 
     private function logCompactors(SymfonyStyle $io, Compactors $compactors): void
     {
-        $compactors = $compactors->toArray();
+        $nestedCompactors = $compactors->toArray();
 
-        foreach ($compactors as $index => $compactor) {
+        foreach ($nestedCompactors as $index => $compactor) {
             if ($compactor instanceof Placeholder) {
-                unset($compactors[$index]);
+                unset($nestedCompactors[$index]);
             }
         }
 
-        if ([] === $compactors) {
+        if ([] === $nestedCompactors) {
             $io->writeln([
                 'No compactor registered',
                 '',
@@ -209,7 +209,7 @@ final class Process extends ConfigurableCommand
             );
         };
 
-        array_map($logCompactors, $compactors);
+        array_map($logCompactors, $nestedCompactors);
         $io->newLine();
     }
 }

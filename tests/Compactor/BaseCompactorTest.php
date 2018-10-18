@@ -30,7 +30,7 @@ class BaseCompactorTest extends TestCase
 
         $expected = $contents;
 
-        $compactor = new class($expected) extends BaseCompactor {
+        $compactor = new class() extends BaseCompactor {
             use NotCallable;
 
             /**
