@@ -1942,16 +1942,14 @@ JSON
     public function provideFilesAutodiscoveryConfig(): Generator
     {
         yield [
-            static function (): void {
-            },
+            static function (): void {},
             [],
             true,
         ];
 
         foreach ([true, false] as $booleanValue) {
             yield [
-                static function (): void {
-                },
+                static function (): void {},
                 [
                     'force-autodiscovery' => $booleanValue,
                 ],
