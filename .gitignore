@@ -12,6 +12,7 @@
 /Dockerfile*
 /fixtures/default_stub.php
 /fixtures/**/*/vendor/
+!/fixtures/composer-dump/dir001/vendor/
 /fixtures/build/dir010/*.phar
 /fixtures/build/dir011/*.phar
 /fixtures/build/dir011/*output
