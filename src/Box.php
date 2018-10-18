@@ -338,7 +338,7 @@ final class Box implements Countable
      * Signs the PHAR using a private key file.
      *
      * @param string $file     the private key file name
-     * @param string $password the private key password
+     * @param string|null $password the private key password
      */
     public function signUsingFile(string $file, ?string $password = null): void
     {
@@ -349,7 +349,7 @@ final class Box implements Countable
      * Signs the PHAR using a private key.
      *
      * @param string $key      The private key
-     * @param string $password The private key password
+     * @param string|null $password The private key password
      */
     public function sign(string $key, ?string $password): void
     {
@@ -404,7 +404,7 @@ final class Box implements Countable
             return [$local, $processedContents, $compactors->getScoperWhitelist()];
         };
 
-        if (false === is_parallel_processing_enabled() || $this->scoper instanceof NullScoper) {
+        if ($this->scoper instanceof NullScoper || false === is_parallel_processing_enabled()) {
             return array_map($processFile, $files);
         }
 
