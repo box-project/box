@@ -1,9 +1,9 @@
 <?php
 
-namespace _HumbugBoxc5a6d13bc633\Composer\Semver\Constraint;
+namespace _HumbugBox5b963fb2bb9ba\Composer\Semver\Constraint;
 
 \trigger_error('The ' . __CLASS__ . ' abstract class is deprecated, there is no replacement for it, it will be removed in the next major version.', \E_USER_DEPRECATED);
-abstract class AbstractConstraint implements \_HumbugBoxc5a6d13bc633\Composer\Semver\Constraint\ConstraintInterface
+abstract class AbstractConstraint implements \_HumbugBox5b963fb2bb9ba\Composer\Semver\Constraint\ConstraintInterface
 {
     /**
     @var */
@@ -12,7 +12,7 @@ abstract class AbstractConstraint implements \_HumbugBoxc5a6d13bc633\Composer\Se
     @param
     @return
     */
-    public function matches(\_HumbugBoxc5a6d13bc633\Composer\Semver\Constraint\ConstraintInterface $provider)
+    public function matches(\_HumbugBox5b963fb2bb9ba\Composer\Semver\Constraint\ConstraintInterface $provider)
     {
         if ($provider instanceof $this) {
             return $this->matchSpecific($provider);

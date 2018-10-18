@@ -1,8 +1,8 @@
 <?php
 
-namespace _HumbugBoxc5a6d13bc633\Composer\Semver;
+namespace _HumbugBox5b963fb2bb9ba\Composer\Semver;
 
-use _HumbugBoxc5a6d13bc633\Composer\Semver\Constraint\Constraint;
+use _HumbugBox5b963fb2bb9ba\Composer\Semver\Constraint\Constraint;
 class Semver
 {
     const SORT_ASC = 1;
@@ -18,10 +18,10 @@ class Semver
     public static function satisfies($version, $constraints)
     {
         if (null === self::$versionParser) {
-            self::$versionParser = new \_HumbugBoxc5a6d13bc633\Composer\Semver\VersionParser();
+            self::$versionParser = new \_HumbugBox5b963fb2bb9ba\Composer\Semver\VersionParser();
         }
         $versionParser = self::$versionParser;
-        $provider = new \_HumbugBoxc5a6d13bc633\Composer\Semver\Constraint\Constraint('==', $versionParser->normalize($version));
+        $provider = new \_HumbugBox5b963fb2bb9ba\Composer\Semver\Constraint\Constraint('==', $versionParser->normalize($version));
         $constraints = $versionParser->parseConstraints($constraints);
         return $constraints->matches($provider);
     }
@@ -33,7 +33,7 @@ class Semver
     public static function satisfiedBy(array $versions, $constraints)
     {
         $versions = \array_filter($versions, function ($version) use($constraints) {
-            return \_HumbugBoxc5a6d13bc633\Composer\Semver\Semver::satisfies($version, $constraints);
+            return \_HumbugBox5b963fb2bb9ba\Composer\Semver\Semver::satisfies($version, $constraints);
         });
         return \array_values($versions);
     }
@@ -61,7 +61,7 @@ class Semver
     private static function usort(array $versions, $direction)
     {
         if (null === self::$versionParser) {
-            self::$versionParser = new \_HumbugBoxc5a6d13bc633\Composer\Semver\VersionParser();
+            self::$versionParser = new \_HumbugBox5b963fb2bb9ba\Composer\Semver\VersionParser();
         }
         $versionParser = self::$versionParser;
         $normalized = array();
@@ -72,7 +72,7 @@ class Semver
             if ($left[0] === $right[0]) {
                 return 0;
             }
-            if (\_HumbugBoxc5a6d13bc633\Composer\Semver\Comparator::lessThan($left[0], $right[0])) {
+            if (\_HumbugBox5b963fb2bb9ba\Composer\Semver\Comparator::lessThan($left[0], $right[0])) {
                 return -$direction;
             }
             return $direction;
@@ -84,4 +84,4 @@ class Semver
         return $sorted;
     }
 }
-\class_alias('_HumbugBoxc5a6d13bc633\\Composer\\Semver\\Semver', 'Composer\\Semver\\Semver', \false);
+\class_alias('_HumbugBox5b963fb2bb9ba\\Composer\\Semver\\Semver', 'Composer\\Semver\\Semver', \false);
