@@ -41,6 +41,7 @@ use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\FileSystem\touch;
 use function KevinGH\Box\FileSystem\chmod;
+use function KevinGH\Box\FileSystem\mkdir;
 
 /**
  * @covers \KevinGH\Box\Configuration

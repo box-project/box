@@ -20,6 +20,7 @@ use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\remove;
 use function symlink;
 use function KevinGH\Box\FileSystem\touch;
+use function KevinGH\Box\FileSystem\mkdir;
 
 /**
  * @covers \KevinGH\Box\Configuration

@@ -23,6 +23,7 @@ use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\FileSystem\symlink;
 use function KevinGH\Box\FileSystem\touch;
+use function KevinGH\Box\FileSystem\mkdir;
 
 /**
  * @covers \KevinGH\Box\Configuration
