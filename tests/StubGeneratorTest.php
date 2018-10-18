@@ -22,9 +22,7 @@ use PHPUnit\Framework\TestCase;
  */
 class StubGeneratorTest extends TestCase
 {
-    /**
-     * @var StubGenerator
-     */
+    /** @var StubGenerator */
     private $generator;
 
     /**

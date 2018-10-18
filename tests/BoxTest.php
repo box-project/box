@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Exception;
+use Generator;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\FakeCompactor;
 use KevinGH\Box\Console\DisplayNormalizer;
@@ -30,19 +31,27 @@ use RuntimeException;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
 use const DIRECTORY_SEPARATOR;
+use const PHP_EOL;
+use const STDOUT;
 use function array_filter;
 use function array_keys;
 use function current;
 use function dirname;
+use function exec;
 use function extension_loaded;
+use function file_get_contents;
+use function implode;
 use function in_array;
 use function iterator_to_array;
 use function KevinGH\Box\FileSystem\canonicalize;
+use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\mkdir;
 use function realpath;
-use function KevinGH\Box\FileSystem\chmod;
+use function sprintf;
+use function str_replace;
+use function trim;
 
 /**
  * @covers \KevinGH\Box\Box
@@ -51,24 +60,16 @@ class BoxTest extends FileSystemTestCase
 {
     use RequiresPharReadonlyOff;
 
-    /**
-     * @var Box
-     */
+    /** @var Box */
     private $box;
 
-    /**
-     * @var Phar
-     */
+    /** @var Phar */
     private $phar;
 
-    /**
-     * @var Compactor|ObjectProphecy
-     */
+    /** @var Compactor|ObjectProphecy */
     private $compactorProphecy;
 
-    /**
-     * @var Compactor
-     */
+    /** @var Compactor */
     private $compactor;
 
     /**
@@ -1113,7 +1114,7 @@ JSON
                         return false === in_array(
                             $fileInfo->getRealPath(),
                             [realpath($boxTmp), realpath($this->tmp)],
-                        true
+                            true
                         );
                     }
                 )
@@ -1122,7 +1123,7 @@ JSON
             $this->assertFalse(
                 $boxDir,
                 sprintf(
-                        'Did not expect to find the directory "%s".',
+                    'Did not expect to find the directory "%s".',
                     $boxDir
                 )
             );
@@ -1322,7 +1323,6 @@ STUB;
 
     /**
      * @dataProvider provideCompressionAlgorithms
-     *
      * @requires extension zlib
      * @requires extension bz2
      */
@@ -1603,7 +1603,7 @@ PHP
         }
     }
 
-    public function provideCompressionAlgorithms()
+    public function provideCompressionAlgorithms(): Generator
     {
         foreach (get_phar_compression_algorithms() as $algorithm) {
             yield [$algorithm, true];

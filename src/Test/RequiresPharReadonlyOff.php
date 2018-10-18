@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Test;
 
+use function ini_get;
+
 /**
  * @private
  */

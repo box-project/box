@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use Generator;
 use Herrera\Annotations\Tokenizer;
 use KevinGH\Box\Compactor\Php;
 use PHPUnit\Framework\TestCase;
@@ -58,14 +59,14 @@ PHP;
         $this->assertSame($expected, $actual);
     }
 
-    public function provideFiles()
+    public function provideFiles(): Generator
     {
         yield 'no extension' => ['test', false];
 
         yield 'PHP file' => ['test.php', true];
     }
 
-    public function providePhpContent()
+    public function providePhpContent(): Generator
     {
         yield 'simple PHP file with comments' => [
             new Tokenizer(),
@@ -107,7 +108,7 @@ PHP
         ];
 
         yield 'PHP file with annotations' => [
-            (function (): Tokenizer {
+            (static function (): Tokenizer {
                 $tokenizer = new Tokenizer();
                 $tokenizer->ignore(['ignored']);
 
@@ -201,7 +202,7 @@ PHP
         ];
 
         yield 'legacy issue 14' => [
-            (function (): Tokenizer {
+            (static function (): Tokenizer {
                 $tokenizer = new Tokenizer();
                 $tokenizer->ignore(['author', 'inline']);
 
@@ -345,7 +346,7 @@ PHP
 function foo($x) {
 }
 PHP
-,
+        ,
             <<<'PHP'
 <?php
 

@@ -17,6 +17,7 @@ namespace KevinGH\Box\Console;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use function array_map;
 use function count;
+use function sprintf;
 
 /**
  * @private
@@ -38,7 +39,7 @@ final class MessageRenderer
 
             $io->writeln(
                 array_map(
-                    function (string $recommendation): string {
+                    static function (string $recommendation): string {
                         return "    - $recommendation";
                     },
                     $recommendations
@@ -59,7 +60,7 @@ final class MessageRenderer
 
             $io->writeln(
                 array_map(
-                    function (string $warning): string {
+                    static function (string $warning): string {
                         return "    - $warning";
                     },
                     $warnings

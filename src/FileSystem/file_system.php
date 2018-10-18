@@ -200,7 +200,7 @@ function filename(string $path): string
  *
  * @private
  */
-function filename_without_extension($path, $extension = null)
+function filename_without_extension($path, $extension = null): string
 {
     static $fileSystem;
 
@@ -289,8 +289,6 @@ function change_extension(string $path, string $extension): string
  * Returns whether the file path is an absolute path.
  *
  * @param string $path a path string
- *
- * @return bool
  *
  * @private
  */
@@ -567,9 +565,6 @@ function is_base_path(string $basePath, string $ofPath): bool
     return $fileSystem->isBasePath($basePath, $ofPath);
 }
 
-/**
- * @private
- */
 function escape_path(string $path): string
 {
     static $fileSystem;
@@ -702,7 +697,7 @@ function exists($files): bool
  *
  * @private
  */
-function touch($files, int $time = null, int $atime = null): void
+function touch($files, ?int $time = null, ?int $atime = null): void
 {
     static $fileSystem;
 
@@ -861,8 +856,6 @@ function hardlink(string $originFile, string $targetFiles): void
  * @param string $path         A filesystem path
  * @param bool   $canonicalize Whether or not to return a canonicalized path
  *
- * @return null|string
- *
  * @private
  */
 function readlink(string $path, bool $canonicalize = false): ?string
@@ -892,7 +885,7 @@ function readlink(string $path, bool $canonicalize = false): ?string
  *
  * @private
  */
-function mirror(string $originDir, string $targetDir, Traversable $iterator = null, array $options = []): void
+function mirror(string $originDir, string $targetDir, ?Traversable $iterator = null, array $options = []): void
 {
     static $fileSystem;
 
@@ -935,7 +928,7 @@ function make_tmp_dir(string $namespace, string $className): string
  *
  * @private
  */
-function tempnam($dir, $prefix)
+function tempnam($dir, $prefix): string
 {
     static $fileSystem;
 
@@ -956,7 +949,7 @@ function tempnam($dir, $prefix)
  *
  * @private
  */
-function dump_file(string $filename, string $content = null): void
+function dump_file(string $filename, ?string $content = null): void
 {
     static $fileSystem;
 

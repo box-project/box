@@ -102,9 +102,9 @@ final class GenerateDockerFile extends ConfigurableCommand
             $requirements = include $requirementsPhar;
 
             $dockerFileContents = DockerFileGenerator::createForRequirements(
-                    $requirements,
-                    make_path_relative($pharPath, getcwd())
-                )
+                $requirements,
+                make_path_relative($pharPath, getcwd())
+            )
                 ->generate()
             ;
 

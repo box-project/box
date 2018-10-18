@@ -15,7 +15,10 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use DateTimeImmutable;
+use const PATHINFO_EXTENSION;
 use function KevinGH\Box\FileSystem\copy;
+use function pathinfo;
+use function sys_get_temp_dir;
 
 /**
  * @private

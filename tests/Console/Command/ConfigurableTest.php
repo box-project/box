@@ -17,7 +17,6 @@ namespace KevinGH\Box\Console\Command;
 use Assert\InvalidArgumentException;
 use Closure;
 use KevinGH\Box\Configuration;
-use function KevinGH\Box\FileSystem\dump_file;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Throwable\Exception\NoConfigurationFound;
@@ -26,6 +25,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\touch;
 
 /**
@@ -63,13 +63,13 @@ class ConfigurableTest extends CommandTestCase
         $output = new NullOutput();
 
         /** @var Configuration $config */
-        $config = (Closure::bind(
+        $config = Closure::bind(
             function (ConfigurableCommand $command, InputInterface $input, OutputInterface $output): Configuration {
                 return $command->getConfig($input, $output);
             },
             null,
             TestConfigurableCommand::class
-        )($command, $input, $output));
+        )($command, $input, $output);
 
         $this->assertInstanceOf(
             Configuration::class,
@@ -94,13 +94,13 @@ class ConfigurableTest extends CommandTestCase
         $output = new NullOutput();
 
         /** @var Configuration $config */
-        $config = (Closure::bind(
+        $config = Closure::bind(
             function (ConfigurableCommand $command, InputInterface $input, OutputInterface $output): Configuration {
                 return $command->getConfig($input, $output);
             },
             null,
             TestConfigurableCommand::class
-        )($command, $input, $output));
+        )($command, $input, $output);
 
         $this->assertInstanceOf(
             Configuration::class,
@@ -123,13 +123,13 @@ class ConfigurableTest extends CommandTestCase
         $output = new NullOutput();
 
         try {
-            (Closure::bind(
+            Closure::bind(
                 function (ConfigurableCommand $command, InputInterface $input, OutputInterface $output): Configuration {
                     return $command->getConfig($input, $output);
                 },
                 null,
                 TestConfigurableCommand::class
-            )($command, $input, $output));
+            )($command, $input, $output);
 
             $this->fail('Expected exception to be thrown.');
         } catch (NoConfigurationFound $exception) {
@@ -153,13 +153,13 @@ class ConfigurableTest extends CommandTestCase
         $output = new NullOutput();
 
         /** @var Configuration $config */
-        $config = (Closure::bind(
+        $config = Closure::bind(
             function (ConfigurableCommand $command, InputInterface $input, OutputInterface $output): Configuration {
                 return $command->getConfig($input, $output, true);
             },
             null,
             TestConfigurableCommand::class
-        )($command, $input, $output));
+        )($command, $input, $output);
 
         $this->assertInstanceOf(
             Configuration::class,
@@ -184,13 +184,13 @@ class ConfigurableTest extends CommandTestCase
         $output = new NullOutput();
 
         try {
-            (Closure::bind(
+            Closure::bind(
                 function (ConfigurableCommand $command, InputInterface $input, OutputInterface $output): Configuration {
                     return $command->getConfig($input, $output);
                 },
                 null,
                 TestConfigurableCommand::class
-            )($command, $input, $output));
+            )($command, $input, $output);
 
             $this->fail('Expected exception to be thrown.');
         } catch (JsonValidationException $exception) {
@@ -215,13 +215,13 @@ class ConfigurableTest extends CommandTestCase
         $output = new NullOutput();
 
         try {
-            (Closure::bind(
+            Closure::bind(
                 function (ConfigurableCommand $command, InputInterface $input, OutputInterface $output): Configuration {
                     return $command->getConfig($input, $output);
                 },
                 null,
                 TestConfigurableCommand::class
-            )($command, $input, $output));
+            )($command, $input, $output);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {

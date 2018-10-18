@@ -43,6 +43,9 @@ use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
+use function openssl_pkey_export;
+use function openssl_pkey_get_details;
+use function openssl_pkey_get_private;
 use function sprintf;
 
 /**
@@ -52,14 +55,10 @@ use function sprintf;
  */
 final class Box implements Countable
 {
-    /**
-     * @var string The path to the PHAR file
-     */
+    /** @var string The path to the PHAR file */
     private $file;
 
-    /**
-     * @var Phar The PHAR instance
-     */
+    /** @var Phar The PHAR instance */
     private $phar;
 
     private $compactors;
@@ -91,7 +90,7 @@ final class Box implements Countable
      *
      * @see RecursiveDirectoryIterator
      */
-    public static function create(string $file, int $flags = null, string $alias = null): self
+    public static function create(string $file, ?int $flags = null, ?string $alias = null): self
     {
         // Ensure the parent directory of the PHAR file exists as `new \Phar()` does not create it and would fail
         // otherwise.
@@ -115,7 +114,7 @@ final class Box implements Countable
 
         $cwd = getcwd();
 
-        $tmp = make_tmp_dir('box', __CLASS__);
+        $tmp = make_tmp_dir('box', self::class);
         chdir($tmp);
 
         if ([] === $this->bufferedFiles) {
@@ -282,7 +281,7 @@ final class Box implements Countable
         Assertion::true($this->buffering, 'Cannot add files if the buffering has not started.');
 
         $files = array_map(
-            function ($file): string {
+            static function ($file): string {
                 // Convert files to string as SplFileInfo is not serializable
                 return (string) $file;
             },
@@ -310,13 +309,12 @@ final class Box implements Countable
      * Adds the a file to the PHAR. The contents will first be compacted and have its placeholders
      * replaced.
      *
-     * @param string      $file
      * @param null|string $contents If null the content of the file will be used
      * @param bool        $binary   When true means the file content shouldn't be processed
      *
      * @return string File local path
      */
-    public function addFile(string $file, string $contents = null, bool $binary = false): string
+    public function addFile(string $file, ?string $contents = null, bool $binary = false): string
     {
         Assertion::true($this->buffering, 'Cannot add files if the buffering has not started.');
 
@@ -342,7 +340,7 @@ final class Box implements Countable
      * @param string $file     the private key file name
      * @param string $password the private key password
      */
-    public function signUsingFile(string $file, string $password = null): void
+    public function signUsingFile(string $file, ?string $password = null): void
     {
         $this->sign(file_contents($file), $password);
     }
@@ -390,10 +388,11 @@ final class Box implements Countable
     {
         $mapFile = $this->mapFile;
         $compactors = $this->compactors;
-        $bootstrap = $GLOBALS['_BOX_BOOTSTRAP'] ?? function (): void {};
+        $bootstrap = $GLOBALS['_BOX_BOOTSTRAP'] ?? static function (): void {
+        };
         $cwd = getcwd();
 
-        $processFile = function (string $file) use ($cwd, $mapFile, $compactors, $bootstrap): array {
+        $processFile = static function (string $file) use ($cwd, $mapFile, $compactors, $bootstrap): array {
             chdir($cwd);
             $bootstrap();
 

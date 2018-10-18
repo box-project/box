@@ -18,6 +18,11 @@ use JsonSchema\Validator;
 use Seld\JsonLint\JsonParser;
 use Seld\JsonLint\ParsingException;
 use stdClass;
+use const JSON_ERROR_NONE;
+use const JSON_ERROR_UTF8;
+use function implode;
+use function json_decode;
+use function json_last_error;
 use function KevinGH\Box\FileSystem\file_contents;
 
 /**
@@ -45,9 +50,6 @@ final class Json
     }
 
     /**
-     * @param string $json
-     * @param bool   $assoc
-     *
      * @throws ParsingException
      *
      * @return array|stdClass

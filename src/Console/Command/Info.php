@@ -61,8 +61,6 @@ final class Info extends Command
 
     /**
      * The list of recognized compression algorithms.
-     *
-     * @var array
      */
     private const ALGORITHMS = [
         Phar::BZ2 => 'BZ2',
@@ -72,8 +70,6 @@ final class Info extends Command
 
     /**
      * The list of recognized file compression algorithms.
-     *
-     * @var array
      */
     private const FILE_ALGORITHMS = [
         Phar::BZ2 => 'BZ2',
@@ -376,12 +372,9 @@ HELP
     }
 
     /**
-     * @param OutputInterface         $output
      * @param iterable|PharFileInfo[] $list
      * @param false|int               $indent Nbr of indent or `false`
-     * @param string                  $base
      * @param Phar|PharData           $phar
-     * @param string                  $root
      */
     private function renderContents(
         OutputInterface $output,
@@ -444,7 +437,7 @@ HELP
                     new DirectoryIterator($item->getPathname()),
                     $depth + 1,
                     $maxDepth,
-                    (false === $indent) ? $indent : $indent + 2,
+                    false === $indent ? $indent : $indent + 2,
                     $base,
                     $phar,
                     $root
@@ -459,7 +452,7 @@ HELP
     private function retrieveCompressionCount($phar): array
     {
         $count = array_fill_keys(
-           self::ALGORITHMS,
+            self::ALGORITHMS,
             0
         );
 
@@ -469,7 +462,7 @@ HELP
             return $count;
         }
 
-        $countFile = function (array $count, PharFileInfo $file): array {
+        $countFile = static function (array $count, PharFileInfo $file): array {
             if (false === $file->isCompressed()) {
                 ++$count['None'];
 

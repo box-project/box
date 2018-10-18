@@ -15,17 +15,18 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use KevinGH\Box\Console\DisplayNormalizer;
-use function KevinGH\Box\FileSystem\dump_file;
 use KevinGH\Box\Test\CommandTestCase;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
+use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\touch;
+use function preg_replace;
+use function str_replace;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Validate
  * @covers \KevinGH\Box\Console\MessageRenderer
- *
  * @runTestsInSeparateProcesses
  */
 class ValidateTest extends CommandTestCase

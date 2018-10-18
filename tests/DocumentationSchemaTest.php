@@ -18,8 +18,10 @@ use Assert\Assertion;
 use PHPUnit\Framework\TestCase;
 use function array_diff;
 use function array_filter;
+use function array_keys;
 use function array_merge;
 use function array_unique;
+use function array_values;
 use function json_decode;
 use function KevinGH\Box\FileSystem\file_contents;
 use function preg_match;
@@ -48,7 +50,7 @@ class DocumentationSchemaTest extends TestCase
         $schemaKeys = array_values(
             array_filter(
                 $this->retrieveSchemaKeys(),
-                function (string $key): bool {
+                static function (string $key): bool {
                     return 'datetime_format' !== $key;
                 }
             )
@@ -85,7 +87,7 @@ class DocumentationSchemaTest extends TestCase
         $schemaKeys = array_values(
             array_filter(
                 $this->retrieveSchemaKeys(),
-                function (string $key): bool {
+                static function (string $key): bool {
                     return 'datetime_format' !== $key;
                 }
             )

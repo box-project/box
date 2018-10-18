@@ -14,6 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
+use function array_map;
+use function explode;
+use function implode;
+
 final class DisplayNormalizer
 {
     public static function removeTrailingSpaces(string $display): string

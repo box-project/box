@@ -15,6 +15,9 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
+use function addcslashes;
+use function implode;
+use function str_replace;
 
 /**
  * Generates a new PHP bootstrap loader stub for a PHAR.
@@ -36,29 +39,19 @@ __HALT_COMPILER(); ?>
 
 STUB;
 
-    /**
-     * @var null|string The alias to be used in "phar://" URLs
-     */
+    /** @var null|string The alias to be used in "phar://" URLs */
     private $alias;
 
-    /**
-     * @var null|string The top header comment banner text
-     */
+    /** @var null|string The top header comment banner text */
     private $banner;
 
-    /**
-     * @var null|string The location within the PHAR of index script
-     */
+    /** @var null|string The location within the PHAR of index script */
     private $index;
 
-    /**
-     * @var bool Use the Phar::interceptFileFuncs() method?
-     */
+    /** @var bool Use the Phar::interceptFileFuncs() method? */
     private $intercept = false;
 
-    /**
-     * @var null|string The shebang line
-     */
+    /** @var null|string The shebang line */
     private $shebang;
 
     private $checkRequirements = true;
@@ -68,7 +61,7 @@ STUB;
      *
      * @return StubGenerator the stub generator
      */
-    public static function create()
+    public static function create(): self
     {
         return new static();
     }
@@ -154,9 +147,6 @@ STUB;
 
     /**
      * Escapes an argument so it can be written as a string in a call.
-     *
-     * @param string $arg
-     * @param string $quote
      *
      * @return string The escaped argument
      */

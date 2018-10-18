@@ -28,29 +28,19 @@ use Prophecy\Prophecy\ObjectProphecy;
  */
 class CompactorsTest extends TestCase
 {
-    /**
-     * @var Compactor|ObjectProphecy
-     */
+    /** @var Compactor|ObjectProphecy */
     private $compactor1Prophecy;
 
-    /**
-     * @var Compactor
-     */
+    /** @var Compactor */
     private $compactor1;
 
-    /**
-     * @var Compactor|ObjectProphecy
-     */
+    /** @var Compactor|ObjectProphecy */
     private $compactor2Prophecy;
 
-    /**
-     * @var Compactor
-     */
+    /** @var Compactor */
     private $compactor2;
 
-    /**
-     * @var Compactors
-     */
+    /** @var Compactors */
     private $compactors;
 
     /**

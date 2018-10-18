@@ -18,10 +18,13 @@ use Assert\Assertion;
 use KevinGH\Box\Verifier\Hash;
 use KevinGH\Box\Verifier\PublicKeyDelegate;
 use PharException;
+use const SEEK_END;
+use const SEEK_SET;
 use function fclose;
 use function filesize;
 use function fopen;
 use function fread;
+use function fseek;
 use function ini_get;
 use function is_resource;
 use function realpath;
@@ -42,8 +45,6 @@ final class Signature
 {
     /**
      * The recognized PHAR signatures types.
-     *
-     * @var string
      */
     private const TYPES = [
         [
@@ -78,19 +79,13 @@ final class Signature
         ],
     ];
 
-    /**
-     * @var string The PHAR file path
-     */
+    /** @var string The PHAR file path */
     private $file;
 
-    /**
-     * @var resource The file handle
-     */
+    /** @var resource The file handle */
     private $handle;
 
-    /**
-     * @var int The size of the file
-     */
+    /** @var int The size of the file */
     private $size;
 
     public function __construct(string $path)
@@ -120,7 +115,7 @@ final class Signature
      *
      * @return null|array The signature
      */
-    public function get(bool $required = null): ?array
+    public function get(?bool $required = null): ?array
     {
         if (null === $required) {
             $required = (bool) ini_get('phar.require_hash');
@@ -213,7 +208,7 @@ final class Signature
 
         $this->seek(0);
 
-        /** @var $verify Verifier */
+        /** @var Verifier $verify */
         $verify = new $type['class']($type['name'], $this->file);
 
         $buffer = 64;

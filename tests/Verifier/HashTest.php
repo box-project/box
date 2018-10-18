@@ -14,8 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Verifier;
 
+use Generator;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use function md5;
+use function strtoupper;
 
 /**
  * @covers \KevinGH\Box\Verifier\Hash
@@ -50,7 +53,7 @@ class HashTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function provideData()
+    public function provideData(): Generator
     {
         yield 'md5' => [
             'md5',

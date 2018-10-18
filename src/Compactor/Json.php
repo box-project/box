@@ -14,6 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
+use const JSON_ERROR_NONE;
+use function json_decode;
+use function json_encode;
+use function json_last_error;
+
 /**
  * Compacts JSON files by re-encoding without pretty print.
  *

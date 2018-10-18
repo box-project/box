@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use Generator;
 use KevinGH\Box\Compactor\Json;
 use PHPUnit\Framework\TestCase;
 
@@ -22,9 +23,7 @@ use PHPUnit\Framework\TestCase;
  */
 class JsonTest extends TestCase
 {
-    /**
-     * @var Compactor
-     */
+    /** @var Compactor */
     private $compactor;
 
     protected function setUp(): void
@@ -72,14 +71,14 @@ JSON;
         $this->assertSame($expected, $actual);
     }
 
-    public function provideFiles()
+    public function provideFiles(): Generator
     {
         yield 'no extension' => ['test', false];
 
         yield 'JSON file' => ['test.json', true];
     }
 
-    public function provideJsonContent()
+    public function provideJsonContent(): Generator
     {
         yield [
             '{}',

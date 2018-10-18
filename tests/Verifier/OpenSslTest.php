@@ -16,6 +16,9 @@ namespace KevinGH\Box\Verifier;
 
 use KevinGH\Box\Test\FileSystemTestCase;
 use PHPUnit\Framework\Error\Warning;
+use function copy;
+use function file_get_contents;
+use function filesize;
 use function KevinGH\Box\FileSystem\touch;
 
 /**

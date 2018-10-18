@@ -19,6 +19,8 @@ use KevinGH\Box\Json\Json;
 use KevinGH\Box\Throwable\Exception\NoConfigurationFound;
 use stdClass;
 use Symfony\Component\Console\Helper\Helper;
+use function file_exists;
+use function realpath;
 
 /**
  * @private

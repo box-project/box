@@ -31,15 +31,11 @@ interface Verifier
 
     /**
      * Updates the hash with more data.
-     *
-     * @param string $data
      */
     public function update(string $data): void;
 
     /**
      * Verifies the final hash against the given signed PHAR.
-     *
-     * @param string $signature
      *
      * @return bool true if verified, false if not
      */

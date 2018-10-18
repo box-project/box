@@ -17,6 +17,7 @@ namespace KevinGH\Box\Console\Logger;
 use InvalidArgumentException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use function sprintf;
 
 /**
  * @internal

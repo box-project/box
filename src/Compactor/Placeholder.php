@@ -16,6 +16,9 @@ namespace KevinGH\Box\Compactor;
 
 use Assert\Assertion;
 use KevinGH\Box\Compactor;
+use function array_keys;
+use function array_values;
+use function str_replace;
 
 final class Placeholder implements Compactor
 {

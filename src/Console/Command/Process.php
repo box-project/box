@@ -27,6 +27,7 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
+use function array_map;
 use function array_shift;
 use function array_unshift;
 use function explode;
@@ -193,7 +194,7 @@ final class Process extends ConfigurableCommand
 
         $io->writeln('Registered compactors:');
 
-        $logCompactors = function (Compactor $compactor) use ($io): void {
+        $logCompactors = static function (Compactor $compactor) use ($io): void {
             $compactorClassParts = explode('\\', get_class($compactor));
 
             if ('_HumbugBox' === substr($compactorClassParts[0], 0, strlen('_HumbugBox'))) {

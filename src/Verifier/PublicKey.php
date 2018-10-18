@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Verifier;
 
 use Assert\Assertion;
+use function file_get_contents;
 
 /**
  * Loads the private key from a file to use for verification.
@@ -23,9 +24,7 @@ use Assert\Assertion;
  */
 abstract class PublicKey extends BufferedHash
 {
-    /**
-     * @var string The private key
-     */
+    /** @var string The private key */
     private $key;
 
     /**

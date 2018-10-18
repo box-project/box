@@ -17,6 +17,13 @@ namespace KevinGH\Box;
 use Assert\Assertion;
 use Composer\Semver\Semver;
 use UnexpectedValueException;
+use function array_column;
+use function array_filter;
+use function array_values;
+use function basename;
+use function implode;
+use function sprintf;
+use function str_replace;
 
 /**
  * @private
@@ -122,7 +129,7 @@ Dockerfile;
         $conditions = array_column(
             array_filter(
                 $requirements,
-                function (array $requirement): bool {
+                static function (array $requirement): bool {
                     return 'php' === $requirement['type'];
                 }
             ),
@@ -156,7 +163,7 @@ Dockerfile;
         return array_column(
             array_filter(
                 $requirements,
-                function (array $requirement): bool {
+                static function (array $requirement): bool {
                     return 'extension' === $requirement['type'];
                 }
             ),

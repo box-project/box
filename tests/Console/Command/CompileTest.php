@@ -29,25 +29,36 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Traversable;
+use const JSON_PRETTY_PRINT;
+use function array_merge;
+use function array_unique;
+use function chdir;
+use function exec;
 use function extension_loaded;
 use function file_get_contents;
-use function KevinGH\Box\FileSystem\touch;
 use function Humbug\get_contents;
 use function iterator_to_array;
+use function json_decode;
+use function json_encode;
+use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\mirror;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
+use function KevinGH\Box\FileSystem\touch;
+use function mt_getrandmax;
 use function phpversion;
 use function preg_match;
+use function preg_quote;
 use function preg_replace;
+use function random_int;
+use function realpath;
 use function sort;
 use function sprintf;
 use function str_replace;
 use function strlen;
 use function substr;
-use function KevinGH\Box\FileSystem\chmod;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Compile
@@ -3163,7 +3174,7 @@ OUTPUT;
         return DisplayNormalizer::removeTrailingSpaces($display);
     }
 
-    private function retrievePharFiles(Phar $phar, Traversable $traversable = null): array
+    private function retrievePharFiles(Phar $phar, ?Traversable $traversable = null): array
     {
         $root = 'phar://'.str_replace('\\', '/', realpath($phar->getPath())).'/';
 

@@ -12,4 +12,5 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-echo 'Hello!'; __HALT_COMPILER();
+echo 'Hello!';
+__halt_compiler();

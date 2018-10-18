@@ -15,10 +15,10 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console;
 
 use KevinGH\Box\Configuration;
-use function KevinGH\Box\FileSystem\dump_file;
 use KevinGH\Box\Test\FileSystemTestCase;
 use KevinGH\Box\Throwable\Exception\NoConfigurationFound;
 use const DIRECTORY_SEPARATOR;
+use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\touch;
 
 /**
@@ -26,9 +26,7 @@ use function KevinGH\Box\FileSystem\touch;
  */
 class ConfigurationHelperTest extends FileSystemTestCase
 {
-    /**
-     * @var ConfigurationHelper
-     */
+    /** @var ConfigurationHelper */
     private $helper;
 
     /**

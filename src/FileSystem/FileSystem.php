@@ -21,14 +21,31 @@ use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Traversable;
 use Webmozart\PathUtil\Path;
 use const DIRECTORY_SEPARATOR;
+use function array_reverse;
 use function defined;
+use function error_get_last;
+use function escapeshellarg;
+use function exec;
+use function file_exists;
+use function file_get_contents;
 use function is_array;
+use function is_dir;
+use function is_link;
+use function iterator_to_array;
+use function random_int;
+use function realpath;
+use function rmdir;
+use function sprintf;
+use function str_replace;
+use function strrpos;
+use function substr;
+use function sys_get_temp_dir;
+use function unlink;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Thomas Schulz <mail@king2500.net>
- *
  * @private
  */
 final class FileSystem extends SymfonyFilesystem
@@ -164,7 +181,7 @@ final class FileSystem extends SymfonyFilesystem
      *
      * @return string the file name without extension
      */
-    public function getFilenameWithoutExtension($path, $extension = null)
+    public function getFilenameWithoutExtension($path, $extension = null): string
     {
         return Path::getFilenameWithoutExtension($path, $extension);
     }

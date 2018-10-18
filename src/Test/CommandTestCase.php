@@ -18,25 +18,25 @@ use KevinGH\Box\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\CommandTester;
+use const PHP_EOL;
+use function feof;
+use function fgets;
+use function preg_replace;
+use function rewind;
+use function str_replace;
 
 /**
  * @private
  */
 abstract class CommandTestCase extends FileSystemTestCase
 {
-    /**
-     * @var Application
-     */
+    /** @var Application */
     protected $application;
 
-    /**
-     * @var CommandTester
-     */
+    /** @var CommandTester */
     protected $commandTester;
 
-    /**
-     * @var string the name of the command
-     */
+    /** @var string the name of the command */
     private $name;
 
     /**
@@ -79,9 +79,9 @@ abstract class CommandTestCase extends FileSystemTestCase
      *
      * @return string the output
      */
-    protected function getOutput(CommandTester $tester)
+    protected function getOutput(CommandTester $tester): string
     {
-        /** @var $output StreamOutput */
+        /** @var StreamOutput $output */
         $output = $tester->getOutput();
         $stream = $output->getStream();
         $string = '';

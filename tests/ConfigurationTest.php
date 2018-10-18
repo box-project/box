@@ -32,21 +32,26 @@ use const DIRECTORY_SEPARATOR;
 use const PHP_EOL;
 use function abs;
 use function array_fill_keys;
+use function array_keys;
 use function count;
 use function date_default_timezone_set;
+use function exec;
 use function getcwd;
+use function getrandmax;
+use function json_decode;
+use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
+use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\FileSystem\touch;
-use function KevinGH\Box\FileSystem\chmod;
-use function KevinGH\Box\FileSystem\mkdir;
+use function random_int;
+use function sprintf;
 
 /**
  * @covers \KevinGH\Box\Configuration
  * @covers \KevinGH\Box\MapFile
- *
  * @group config
  */
 class ConfigurationTest extends ConfigurationTestCase
@@ -2754,7 +2759,7 @@ BANNER
         }
     }
 
-    public function provideJsonValidNonObjectArray()
+    public function provideJsonValidNonObjectArray(): Generator
     {
         foreach ($this->provideJsonPrimitives() as $key => $values) {
             if ('object' === $key) {
@@ -2815,10 +2820,10 @@ COMMENT
         ];
     }
 
-    public function provideJsonFiles()
+    public function provideJsonFiles(): Generator
     {
         yield [
-            function (): void {},
+            static function (): void {},
             null,
             null,
             null,
@@ -2826,7 +2831,7 @@ COMMENT
         ];
 
         yield [
-            function (): void {
+            static function (): void {
                 dump_file('composer.json', '{}');
             },
             'composer.json',
@@ -2836,7 +2841,7 @@ COMMENT
         ];
 
         yield [
-            function (): void {
+            static function (): void {
                 dump_file('composer.json', '{"name": "acme/foo"}');
             },
             'composer.json',
@@ -2846,7 +2851,7 @@ COMMENT
         ];
 
         yield [
-            function (): void {
+            static function (): void {
                 dump_file('composer.lock', '{}');
             },
             null,
@@ -2856,7 +2861,7 @@ COMMENT
         ];
 
         yield [
-            function (): void {
+            static function (): void {
                 dump_file('composer.lock', '{"name": "acme/foo"}');
             },
             null,
@@ -2866,7 +2871,7 @@ COMMENT
         ];
 
         yield [
-            function (): void {
+            static function (): void {
                 dump_file('composer.json', '{"name": "acme/foo"}');
                 dump_file('composer.lock', '{"name": "acme/bar"}');
             },
@@ -2877,7 +2882,7 @@ COMMENT
         ];
 
         yield [
-            function (): void {
+            static function (): void {
                 mkdir('composer.json');
             },
             null,
@@ -2887,7 +2892,7 @@ COMMENT
         ];
 
         yield [
-            function (): void {
+            static function (): void {
                 mkdir('composer.lock');
             },
             null,
@@ -2897,7 +2902,7 @@ COMMENT
         ];
 
         yield [
-            function (): void {
+            static function (): void {
                 touch('composer.json');
                 chmod('composer.json', 0000);
             },
@@ -2908,7 +2913,7 @@ COMMENT
         ];
 
         yield [
-            function (): void {
+            static function (): void {
                 touch('composer.lock');
                 chmod('composer.lock', 0000);
             },

@@ -23,9 +23,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ConfigurationLoggerTest extends TestCase
 {
-    /**
-     * @var ConfigurationLogger
-     */
+    /** @var ConfigurationLogger */
     private $logs;
 
     /**

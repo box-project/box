@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
+use Generator;
 use Phar;
 use PHPUnit\Framework\TestCase;
 use function json_decode;
@@ -41,7 +42,7 @@ class AppRequirementsFactoryTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function provideLockContents()
+    public function provideLockContents(): Generator
     {
         yield 'empty json file' => [
             '{}',

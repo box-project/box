@@ -23,7 +23,7 @@ CODE_SNIFFER=vendor-bin/doctrine-cs/vendor/bin/phpcs
 CODE_SNIFFER_FIX=vendor-bin/doctrine-cs/vendor/bin/phpcbf
 cs:	 		 ## Fixes CS
 cs: $(PHP_CS_FIXER) $(CODE_SNIFFER) $(CODE_SNIFFER_FIX)
-	$(PHPNOGC) $(CODE_SNIFFER_FIX)
+	$(PHPNOGC) $(CODE_SNIFFER_FIX) || true
 	$(PHPNOGC) $(CODE_SNIFFER)
 	$(PHPNOGC) $(PHP_CS_FIXER) fix
 

@@ -19,18 +19,26 @@ use Exception;
 use Herrera\Annotations\Convert\ToString;
 use Herrera\Annotations\Tokenizer;
 use Herrera\Annotations\Tokens;
+use const T_COMMENT;
+use const T_DOC_COMMENT;
+use const T_WHITESPACE;
 use function count;
 use function in_array;
 use function is_string;
+use function preg_replace;
+use function str_repeat;
+use function strpos;
+use function substr_count;
+use function token_get_all;
 
 /**
  * A PHP source code compactor copied from Composer.
  *
+ * @see https://github.com/composer/composer/blob/a8df30c09be550bffc37ba540fb7c7f0383c3944/src/Composer/Compiler.php#L214
+ *
  * @author Kevin Herrera <kevin@herrera.io>
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jordi Boggiano <j.boggiano@seld.be>
- *
- * @see https://github.com/composer/composer/blob/a8df30c09be550bffc37ba540fb7c7f0383c3944/src/Composer/Compiler.php#L214
  * @private
  */
 final class Php extends FileExtensionCompactor
@@ -69,7 +77,7 @@ final class Php extends FileExtensionCompactor
             if (is_string($token)) {
                 $output .= $token;
             } elseif (in_array($token[0], [T_COMMENT, T_DOC_COMMENT], true)) {
-                if ($this->tokenizer && (false !== strpos($token[1], '@'))) {
+                if ($this->tokenizer && false !== strpos($token[1], '@')) {
                     try {
                         $output .= $this->compactAnnotations($token[1]);
                     } catch (Exception $exception) {

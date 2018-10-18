@@ -11,40 +11,20 @@
     <arg value="ps"/>
 
     <file>fixtures</file>
+    <exclude-pattern>default_stub\.php</exclude-pattern>
+    <exclude-pattern>/vendor/</exclude-pattern>
+    <exclude-pattern>/build/</exclude-pattern>
     <file>src</file>
     <file>tests</file>
 
-    <rule ref="Doctrine">
-        <exclude name="Generic.CodeAnalysis.UselessOverridingMethod.Found"/>
-        <exclude name="Generic.Files.LineLength.TooLong"/>
-        <exclude name="Generic.Formatting.MultipleStatementAlignment.NotSame"/>
-        <exclude name="Generic.Formatting.SpaceAfterNot.Incorrect"/>
-        <exclude name="PSR1.Methods.CamelCapsMethodName.NotCamelCaps"/>
-        <exclude name="SlevomatCodingStandard.Commenting.DocCommentSpacing.IncorrectOrderOfAnnotationsGroup"/>
-        <exclude name="SlevomatCodingStandard.Commenting.ForbiddenAnnotations.AnnotationForbidden"/>
-        <exclude name="SlevomatCodingStandard.Exceptions.ReferenceThrowableOnly.ReferencedGeneralException"/>
-        <exclude name="SlevomatCodingStandard.Namespaces.NamespaceSpacing.IncorrectLinesCountBeforeNamespace"/>
-        <exclude name="SlevomatCodingStandard.Namespaces.AlphabeticallySortedUses.IncorrectlyOrderedUses"/>
-        <exclude name="SlevomatCodingStandard.Namespaces.UnusedUses.UnusedUse"/>
-        <exclude name="SlevomatCodingStandard.TypeHints.NullTypeHintOnLastPosition.NullTypeHintNotOnLastPosition"/>
-        <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHintSpacing.IncorrectWhitespaceBeforeColon"/>
-        <exclude name="SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint"/>
-        <exclude name="SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingPropertyTypeHint"/>
-        <exclude name="SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingTraversableParameterTypeHintSpecification"/>
-        <exclude name="SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingTraversableReturnTypeHintSpecification"/>
-        <exclude name="SlevomatCodingStandard.ControlStructures.AssignmentInCondition.AssignmentInCondition"/>
-        <exclude name="SlevomatCodingStandard.ControlStructures.DisallowYodaComparison.DisallowedYodaComparison"/>
-        <exclude name="SlevomatCodingStandard.ControlStructures.DisallowEqualOperators.DisallowedEqualOperator"/>
-        <exclude name="SlevomatCodingStandard.ControlStructures.EarlyExit.EarlyExitNotUsed"/>
-        <exclude name="Squiz.Arrays.ArrayDeclaration.MultiLineNotAllowed"/>
-        <exclude name="Squiz.Arrays.ArrayDeclaration.SpaceBeforeComma"/>
-        <exclude name="Squiz.Commenting.FunctionComment.ThrowsNoFullStop"/>
-        <exclude name="Squiz.Functions.GlobalFunction.Found"/>
-        <exclude name="Squiz.Strings.ConcatenationSpacing.PaddingFound"/>
-        <exclude name="Squiz.WhiteSpace.SemicolonSpacing.Incorrect"/>
-    </rule>
-
+    <rule ref="SlevomatCodingStandard.Functions.StaticClosure"/>
+    <rule ref="SlevomatCodingStandard.Functions.StaticClosure.ClosureNotStatic"/>
+    <rule ref="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFallbackGlobalName"/>
     <rule ref="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFullyQualifiedName">
         <exclude-pattern>src/functions\.php</exclude-pattern>
     </rule>
+    <rule ref="SlevomatCodingStandard.Namespaces.UseDoesNotStartWithBackslash"/>
+    <rule ref="SlevomatCodingStandard.PHP.OptimizedFunctionsWithoutUnpacking"/>
+    <rule ref="SlevomatCodingStandard.PHP.TypeCast"/>
+    <rule ref="SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingReturnTypeHint"/>
 </ruleset>

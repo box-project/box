@@ -17,6 +17,8 @@ namespace KevinGH\Box\Console;
 use PackageVersions\Versions;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Helper\HelperSet;
+use function explode;
+use function sprintf;
 use function strpos;
 use function substr;
 use function trim;
@@ -43,7 +45,7 @@ ASCII;
     /**
      * {@inheritdoc}
      */
-    public function __construct(string $name = 'Box', string $version = null, string $releaseDate = '@release-date@')
+    public function __construct(string $name = 'Box', ?string $version = null, string $releaseDate = '@release-date@')
     {
         if (null === $version) {
             $rawVersion = Versions::getVersion('humbug/box');

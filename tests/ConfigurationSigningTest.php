@@ -25,7 +25,6 @@ use function KevinGH\Box\FileSystem\touch;
 /**
  * @covers \KevinGH\Box\Configuration
  * @covers \KevinGH\Box\MapFile
- *
  * @group config
  */
 class ConfigurationSigningTest extends ConfigurationTestCase

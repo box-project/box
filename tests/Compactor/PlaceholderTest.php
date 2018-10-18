@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
+use Generator;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -33,7 +34,7 @@ class PlaceholderTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function provideFilesContents()
+    public function provideFilesContents(): Generator
     {
         yield [[], '', ''];
 

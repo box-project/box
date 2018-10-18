@@ -46,10 +46,13 @@ use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 use const PHP_EOL;
 use const POSIX_RLIMIT_INFINITY;
 use const POSIX_RLIMIT_NOFILE;
+use function array_map;
+use function array_search;
 use function array_shift;
 use function count;
 use function decoct;
 use function explode;
+use function file_exists;
 use function filesize;
 use function function_exists;
 use function get_class;
@@ -63,11 +66,17 @@ use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\get_phar_compression_algorithms;
+use function memory_get_peak_usage;
+use function memory_get_usage;
+use function microtime;
+use function posix_getrlimit;
 use function posix_setrlimit;
 use function putenv;
+use function round;
 use function sprintf;
 use function strlen;
 use function substr;
+use function var_export;
 
 /**
  * @final
@@ -343,7 +352,7 @@ EOF
             'Registering compactors'
         );
 
-        $logCompactors = function (Compactor $compactor) use ($logger): void {
+        $logCompactors = static function (Compactor $compactor) use ($logger): void {
             $compactorClassParts = explode('\\', get_class($compactor));
 
             if ('_HumbugBox' === substr($compactorClassParts[0], 0, strlen('_HumbugBox'))) {
@@ -643,14 +652,16 @@ EOF
                 OutputInterface::VERBOSITY_DEBUG
             );
 
-            return function (): void {};
+            return static function (): void {
+            };
         }
 
         $softLimit = posix_getrlimit()['soft openfiles'];
         $hardLimit = posix_getrlimit()['hard openfiles'];
 
         if ($softLimit >= $filesCount) {
-            return function (): void {};
+            return static function (): void {
+            };
         }
 
         $io->writeln(
@@ -671,7 +682,7 @@ EOF
             'unlimited' === $hardLimit ? POSIX_RLIMIT_INFINITY : $hardLimit
         );
 
-        return function () use ($io, $softLimit, $hardLimit): void {
+        return static function () use ($io, $softLimit, $hardLimit): void {
             if (function_exists('posix_setrlimit') && isset($softLimit, $hardLimit)) {
                 posix_setrlimit(
                     POSIX_RLIMIT_NOFILE,
@@ -726,7 +737,7 @@ EOF
                 );
             }
 
-            /** @var $dialog QuestionHelper */
+            /** @var QuestionHelper $dialog */
             $dialog = $this->getHelper('question');
 
             $question = new Question('Private key passphrase:');

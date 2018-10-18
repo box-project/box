@@ -16,22 +16,26 @@ namespace KevinGH\Box\Test;
 
 use PHPUnit\Framework\TestCase;
 use const DIRECTORY_SEPARATOR;
+use function array_map;
+use function array_values;
+use function chdir;
+use function getcwd;
 use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\remove;
+use function natcasesort;
+use function realpath;
+use function str_replace;
+use function sys_get_temp_dir;
 
 /**
  * @private
  */
 abstract class FileSystemTestCase extends TestCase
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $cwd;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $tmp;
 
     /**
@@ -46,7 +50,7 @@ abstract class FileSystemTestCase extends TestCase
         remove(str_replace('\\', '/', realpath(sys_get_temp_dir())).'/box');
 
         $this->cwd = getcwd();
-        $this->tmp = make_tmp_dir('box', __CLASS__);
+        $this->tmp = make_tmp_dir('box', self::class);
 
         chdir($this->tmp);
     }
@@ -74,7 +78,7 @@ abstract class FileSystemTestCase extends TestCase
 
         $files = array_values(
             array_map(
-                function (string $file) use ($root): string {
+                static function (string $file) use ($root): string {
                     return str_replace($root.DIRECTORY_SEPARATOR, '', $file);
                 },
                 $files

@@ -23,9 +23,7 @@ use KevinGH\Box\Verifier;
  */
 abstract class BufferedHash implements Verifier
 {
-    /**
-     * @var string The buffered data
-     */
+    /** @var string The buffered data */
     private $data;
 
     /**

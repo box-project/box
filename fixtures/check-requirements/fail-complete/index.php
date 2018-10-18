@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the box project.
  *
@@ -10,4 +12,4 @@
  * with this source code in the file LICENSE.
  */
 
-throw new \Error('Should not be executed!');
+throw new Error('Should not be executed!');
