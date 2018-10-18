@@ -652,16 +652,14 @@ EOF
                 OutputInterface::VERBOSITY_DEBUG
             );
 
-            return static function (): void {
-            };
+            return static function (): void {};
         }
 
         $softLimit = posix_getrlimit()['soft openfiles'];
         $hardLimit = posix_getrlimit()['hard openfiles'];
 
         if ($softLimit >= $filesCount) {
-            return static function (): void {
-            };
+            return static function (): void {};
         }
 
         $io->writeln(
