@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Verifier;
 
 use Assert\Assertion;
-use function file_get_contents;
+use function KevinGH\Box\FileSystem\file_contents;
 
 /**
  * Loads the private key from a file to use for verification.
@@ -37,7 +37,7 @@ abstract class PublicKey extends BufferedHash
         Assertion::file($keyPath);
         Assertion::readable($keyPath);
 
-        $this->key = file_get_contents($keyPath);
+        $this->key = file_contents($keyPath);
     }
 
     /**

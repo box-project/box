@@ -19,9 +19,9 @@
 
     <rule ref="SlevomatCodingStandard.Commenting.InlineDocCommentDeclaration.InvalidFormat"/>
     <rule ref="SlevomatCodingStandard.Functions.StaticClosure"/>
-    <rule ref="SlevomatCodingStandard.Functions.StaticClosure.ClosureNotStatic"/>
     <rule ref="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFallbackGlobalName"/>
     <rule ref="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFullyQualifiedName">
+        <exclude-pattern>src/bootstrap\.php</exclude-pattern>
         <exclude-pattern>src/functions\.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.Namespaces.UseDoesNotStartWithBackslash"/>

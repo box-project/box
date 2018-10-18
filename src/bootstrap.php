@@ -19,7 +19,8 @@ use function error_reporting;
 use function set_error_handler;
 
 ($GLOBALS['_BOX_BOOTSTRAP'] = static function (): void {
-    register_aliases();
+    // Keep the fully qualified call here since this function may be executed without the right autoloading mechanism
+    \KevinGH\Box\register_aliases();
 })();
 
 // Convert errors to exceptions
