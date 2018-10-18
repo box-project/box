@@ -31,7 +31,7 @@ use Symfony\Component\Process\PhpExecutableFinder;
 use Traversable;
 use function extension_loaded;
 use function file_get_contents;
-
+use function KevinGH\Box\FileSystem\touch;
 use function Humbug\get_contents;
 use function iterator_to_array;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -47,6 +47,7 @@ use function sprintf;
 use function str_replace;
 use function strlen;
 use function substr;
+use function KevinGH\Box\FileSystem\chmod;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Compile

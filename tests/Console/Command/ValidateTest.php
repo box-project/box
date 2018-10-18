@@ -20,6 +20,7 @@ use KevinGH\Box\Test\CommandTestCase;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
+use function KevinGH\Box\FileSystem\touch;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Validate

@@ -19,6 +19,7 @@ use function KevinGH\Box\FileSystem\dump_file;
 use KevinGH\Box\Test\FileSystemTestCase;
 use KevinGH\Box\Throwable\Exception\NoConfigurationFound;
 use const DIRECTORY_SEPARATOR;
+use function KevinGH\Box\FileSystem\touch;
 
 /**
  * @covers \KevinGH\Box\Console\ConfigurationHelper

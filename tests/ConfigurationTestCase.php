@@ -18,6 +18,7 @@ use KevinGH\Box\Console\ConfigurationHelper;
 use function KevinGH\Box\FileSystem\dump_file;
 use KevinGH\Box\Test\FileSystemTestCase;
 use stdClass;
+use function KevinGH\Box\FileSystem\touch;
 
 use function KevinGH\Box\FileSystem\make_path_absolute;
 

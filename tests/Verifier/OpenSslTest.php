@@ -16,6 +16,7 @@ namespace KevinGH\Box\Verifier;
 
 use KevinGH\Box\Test\FileSystemTestCase;
 use PHPUnit\Framework\Error\Warning;
+use function KevinGH\Box\FileSystem\touch;
 
 /**
  * @covers \KevinGH\Box\Verifier\OpenSsl

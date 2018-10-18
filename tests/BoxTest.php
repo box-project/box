@@ -42,6 +42,7 @@ use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\mkdir;
 use function realpath;
+use function KevinGH\Box\FileSystem\chmod;
 
 /**
  * @covers \KevinGH\Box\Box

@@ -24,6 +24,7 @@ use function get_class;
 use function is_object;
 use function json_decode;
 use function KevinGH\Box\FileSystem\dump_file;
+use function KevinGH\Box\FileSystem\touch;
 
 /**
  * @covers \KevinGH\Box\Json\Json
