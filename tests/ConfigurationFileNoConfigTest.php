@@ -144,6 +144,53 @@ JSON
         $this->assertCount(0, $this->config->getBinaryFiles());
     }
 
+    public function test_psr0_with_empty_directory_in_composer_json(): void
+    {
+        touch('root_file0');
+        touch('root_file1');
+
+        mkdir('Acme');
+        touch('Acme/file0');
+        touch('Acme/file1');
+        touch('Acme/file2');
+
+        file_put_contents(
+            'composer.json',
+            <<<'JSON'
+{
+    "autoload": {
+        "psr-0": {
+            "Acme\\": ""
+        }
+    }
+}
+JSON
+        );
+
+        $expected = [
+            'Acme/file0',
+            'Acme/file1',
+            'Acme/file2',
+            'composer.json',
+            'root_file0',
+            'root_file1',
+        ];
+
+        $noFileConfig = $this->getNoFileConfig();
+
+        $actual = $this->normalizePaths($noFileConfig->getFiles());
+
+        $this->assertEquals($expected, $actual);
+        $this->assertCount(0, $noFileConfig->getBinaryFiles());
+
+        $this->reloadConfig();
+
+        $actual = $this->normalizePaths($this->config->getFiles());
+
+        $this->assertEquals($expected, $actual);
+        $this->assertCount(0, $this->config->getBinaryFiles());
+    }
+
     public function test_throws_an_error_if_a_non_existent_file_is_found_via_the_composer_json(): void
     {
         touch('file0');
