@@ -29,7 +29,7 @@ final class RequirementsDumper
     private const REQUIREMENTS_CONFIG_TEMPLATE = <<<'PHP'
 <?php
 
-return __CONFIG__;
+return '__CONFIG__';
 PHP;
 
     private const REQUIREMENT_CHECKER_PATH = __DIR__.'/../../.requirement-checker';
@@ -71,7 +71,7 @@ PHP;
         return [
             '.requirements.php',
             str_replace(
-                '__CONFIG__',
+                '\'__CONFIG__\'',
                 var_export($config, true),
                 self::REQUIREMENTS_CONFIG_TEMPLATE
             ),
