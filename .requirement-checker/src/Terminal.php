@@ -1,6 +1,6 @@
 <?php
 
-namespace _HumbugBox5b963fb2bb9ba\KevinGH\RequirementChecker;
+namespace _HumbugBoxaadb73f2427d\KevinGH\RequirementChecker;
 
 /**
 @license
