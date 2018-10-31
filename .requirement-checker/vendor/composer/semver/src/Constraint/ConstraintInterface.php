@@ -1,6 +1,6 @@
 <?php
 
-namespace _HumbugBoxd1e70270db87\Composer\Semver\Constraint;
+namespace _HumbugBoxaadb73f2427d\Composer\Semver\Constraint;
 
 interface ConstraintInterface
 {
@@ -8,7 +8,7 @@ interface ConstraintInterface
     @param
     @return
     */
-    public function matches(\_HumbugBoxd1e70270db87\Composer\Semver\Constraint\ConstraintInterface $provider);
+    public function matches(\_HumbugBoxaadb73f2427d\Composer\Semver\Constraint\ConstraintInterface $provider);
     /**
     @return
     */

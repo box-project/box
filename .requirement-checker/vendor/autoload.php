@@ -6,18 +6,10 @@
 
 require_once __DIR__ . '/composer/autoload_real.php';
 
-$loader = ComposerAutoloaderInitb86e8e865c7b52991febec3f1783f755::getLoader();
+$loader = ComposerAutoloaderInit8a3c584ef303b8fee65e2622afd48e49::getLoader();
 
 // Aliases for the whitelisted classes. For more information see:
 // https://github.com/humbug/php-scoper/blob/master/README.md#class-whitelisting
-class_exists('_HumbugBoxd1e70270db87\Composer\Semver\Semver');
-
-// Functions whitelisting. For more information see:
-// https://github.com/humbug/php-scoper/blob/master/README.md#functions-whitelisting
-if (!function_exists('sapi_windows_vt100_support')) {
-    function sapi_windows_vt100_support() {
-        return \_HumbugBoxd1e70270db87\sapi_windows_vt100_support(...func_get_args());
-    }
-}
+class_exists('_HumbugBoxaadb73f2427d\Composer\Semver\Semver');
 
 return $loader;

@@ -1,11 +1,11 @@
 <?php
 
-namespace _HumbugBoxd1e70270db87\KevinGH\RequirementChecker;
+namespace _HumbugBoxaadb73f2427d\KevinGH\RequirementChecker;
 
 /**
 @private
 */
-final class IsExtensionFulfilled implements \_HumbugBoxd1e70270db87\KevinGH\RequirementChecker\IsFulfilled
+final class IsExtensionFulfilled implements \_HumbugBoxaadb73f2427d\KevinGH\RequirementChecker\IsFulfilled
 {
     private $requiredExtension;
     /**

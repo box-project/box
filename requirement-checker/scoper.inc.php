@@ -13,6 +13,8 @@ declare(strict_types=1);
  */
 
 return [
+    'whitelist-global-classes' => false,
+    'whitelist-global-functions' => false,
     'whitelist' => [
         \Composer\Semver\Semver::class,
     ],
