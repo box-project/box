@@ -337,8 +337,8 @@ final class Box implements Countable
     /**
      * Signs the PHAR using a private key file.
      *
-     * @param string $file     the private key file name
-     * @param string|null $password the private key password
+     * @param string      $file     the private key file name
+     * @param null|string $password the private key password
      */
     public function signUsingFile(string $file, ?string $password = null): void
     {
@@ -348,8 +348,8 @@ final class Box implements Countable
     /**
      * Signs the PHAR using a private key.
      *
-     * @param string $key      The private key
-     * @param string|null $password The private key password
+     * @param string      $key      The private key
+     * @param null|string $password The private key password
      */
     public function sign(string $key, ?string $password): void
     {
