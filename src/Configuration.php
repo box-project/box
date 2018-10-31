@@ -1284,9 +1284,7 @@ BANNER;
                 $composerPaths = (array) $path;
 
                 foreach ($composerPaths as $composerPath) {
-                    if ('' !== trim($composerPath)) {
-                        $paths[] = $composerPath;
-                    }
+                    $paths[] = '' !== trim($composerPath) ? $composerPath : $basePath;
                 }
             }
         }
