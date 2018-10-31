@@ -15,7 +15,11 @@ declare(strict_types=1);
 namespace KevinGH\Box\Composer;
 
 use const DIRECTORY_SEPARATOR;
+use function array_filter;
+use function array_key_exists;
+use function array_map;
 use function KevinGH\Box\FileSystem\make_path_absolute;
+use function realpath;
 
 /**
  * @private
@@ -58,7 +62,7 @@ final class ComposerConfiguration
 
         return array_filter(
             array_map(
-                function (string $packageName) use ($vendorDir): ?string {
+                static function (string $packageName) use ($vendorDir): ?string {
                     $realPath = realpath($vendorDir.DIRECTORY_SEPARATOR.$packageName);
 
                     return false !== $realPath ? $realPath : null;
@@ -91,7 +95,7 @@ final class ComposerConfiguration
         }
 
         return array_map(
-            function (array $package): string {
+            static function (array $package): string {
                 return $package['name'];
             },
             $composerLockDecodedContents['packages-dev']

@@ -14,12 +14,15 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Generator;
 use InvalidArgumentException;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
+use function preg_match;
+use function realpath;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Verify
@@ -169,7 +172,7 @@ OUTPUT;
         $this->assertSame(1, $this->commandTester->getStatusCode());
     }
 
-    public function providePassingPharPaths()
+    public function providePassingPharPaths(): Generator
     {
         yield 'simple PHAR' => [
             realpath(self::FIXTURES_DIR.'/simple-phar.phar'),
@@ -180,7 +183,7 @@ OUTPUT;
         ];
     }
 
-    public function provideFailingPharPaths()
+    public function provideFailingPharPaths(): Generator
     {
         yield 'a fake PHAR' => [
             realpath(self::FIXTURES_DIR.'/not-a-phar.phar'),

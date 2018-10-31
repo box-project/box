@@ -18,12 +18,18 @@ use Assert\Assertion;
 use Phar;
 use function array_key_exists;
 use function bin2hex;
+use function class_alias;
+use function class_exists;
 use function constant;
 use function define;
 use function defined;
+use function floor;
+use function log;
+use function number_format;
 use function random_bytes;
 use function sprintf;
 use function strlen;
+use function strtolower;
 
 /**
  * @private
@@ -41,9 +47,6 @@ function get_phar_compression_algorithms(): array
     return $algorithms;
 }
 
-/**
- * @private
- */
 function get_phar_compression_algorithm_extension(int $algorithm): ?string
 {
     static $extensions = [
@@ -78,9 +81,6 @@ function get_phar_signing_algorithms(): array
     return $algorithms;
 }
 
-/**
- * @private
- */
 function format_size(int $size): string
 {
     $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
@@ -99,31 +99,25 @@ function format_size(int $size): string
     );
 }
 
-/**
- * @private Converts a memory string, e.g. '2000M' to bytes
- */
 function memory_to_bytes(string $value): int
 {
     $unit = strtolower($value[strlen($value) - 1]);
 
-    $value = (int) $value;
+    $bytes = (int) $value;
     switch ($unit) {
         case 'g':
-            $value *= 1024;
+            $bytes *= 1024;
         // no break (cumulative multiplier)
         case 'm':
-            $value *= 1024;
+            $bytes *= 1024;
         // no break (cumulative multiplier)
         case 'k':
-            $value *= 1024;
+            $bytes *= 1024;
     }
 
-    return $value;
+    return $bytes;
 }
 
-/**
- * @private
- */
 function register_aliases(): void
 {
     // Exposes the finder used by PHP-Scoper PHAR to allow its usage in the configuration file.
@@ -141,19 +135,13 @@ function register_aliases(): void
     }
 }
 
-/**
- * @private
- */
 function disable_parallel_processing(): void
 {
-    if (false == defined(_NO_PARALLEL_PROCESSING)) {
+    if (false === defined(_NO_PARALLEL_PROCESSING)) {
         define(_NO_PARALLEL_PROCESSING, true);
     }
 }
 
-/**
- * @private
- */
 function is_parallel_processing_enabled(): bool
 {
     return false === defined(_NO_PARALLEL_PROCESSING) || false === constant(_NO_PARALLEL_PROCESSING);

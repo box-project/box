@@ -17,21 +17,22 @@ namespace KevinGH\Box;
 use KevinGH\Box\Console\ConfigurationHelper;
 use KevinGH\Box\Test\FileSystemTestCase;
 use stdClass;
-use function file_put_contents;
+use const JSON_PRETTY_PRINT;
+use const PHP_OS;
+use function json_encode;
+use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_absolute;
+use function KevinGH\Box\FileSystem\touch;
+use function stripos;
 
 abstract class ConfigurationTestCase extends FileSystemTestCase
 {
     protected const DEFAULT_FILE = 'index.php';
 
-    /**
-     * @var Configuration
-     */
+    /** @var Configuration */
     protected $config;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $file;
 
     /**
@@ -44,14 +45,14 @@ abstract class ConfigurationTestCase extends FileSystemTestCase
         $this->file = make_path_absolute('box.json', $this->tmp);
 
         touch($defaultFile = self::DEFAULT_FILE);
-        file_put_contents($this->file, '{}');
+        dump_file($this->file, '{}');
 
         $this->config = Configuration::create($this->file, new stdClass());
     }
 
     final protected function setConfig(array $config): void
     {
-        file_put_contents($this->file, json_encode($config, JSON_PRETTY_PRINT));
+        dump_file($this->file, json_encode($config, JSON_PRETTY_PRINT));
 
         $this->reloadConfig();
     }
@@ -65,7 +66,7 @@ abstract class ConfigurationTestCase extends FileSystemTestCase
 
     final protected function isWindows(): bool
     {
-        return false === strpos(strtolower(PHP_OS), 'darwin') && false !== strpos(strtolower(PHP_OS), 'win');
+        return false === stripos(PHP_OS, 'darwin') && false !== stripos(PHP_OS, 'win');
     }
 
     final protected function getNoFileConfig(): Configuration

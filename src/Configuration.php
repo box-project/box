@@ -46,10 +46,16 @@ use function array_keys;
 use function array_map;
 use function array_merge;
 use function array_unique;
+use function array_values;
+use function array_walk;
 use function constant;
+use function current;
 use function defined;
 use function dirname;
+use function explode;
 use function file_exists;
+use function getcwd;
+use function implode;
 use function intval;
 use function is_array;
 use function is_bool;
@@ -67,13 +73,16 @@ use function KevinGH\Box\FileSystem\is_absolute_path;
 use function KevinGH\Box\FileSystem\longest_common_base_path;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\make_path_relative;
+use function krsort;
 use function preg_match;
+use function preg_replace;
 use function property_exists;
 use function realpath;
 use function sprintf;
 use function strtoupper;
 use function substr;
 use function trigger_error;
+use function trim;
 
 /**
  * @private
@@ -321,8 +330,6 @@ BANNER;
     }
 
     /**
-     * @param null|string   $file
-     * @param null|string   $alias
      * @param string        $basePath             Utility to private the base path used and be able to retrieve a
      *                                            path relative to it (the base path)
      * @param array         $composerJson         The first element is the path to the `composer.json` file as a
@@ -743,7 +750,7 @@ BANNER;
             self::retrieveBlacklist($raw, $basePath, $logger, ...$excludedPaths)
         );
 
-        $blacklistFilter = function (SplFileInfo $file) use ($blacklist): ?bool {
+        $blacklistFilter = static function (SplFileInfo $file) use ($blacklist): ?bool {
             if ($file->isLink()) {
                 return false;
             }
@@ -763,8 +770,6 @@ BANNER;
     }
 
     /**
-     * @param stdClass        $raw
-     * @param string          $basePath
      * @param null[]|string[] $excludedPaths
      *
      * @return string[]
@@ -778,7 +783,7 @@ BANNER;
         self::checkIfDefaultValue($logger, $raw, self::BLACKLIST_KEY, []);
 
         $normalizedBlacklist = array_map(
-            function (string $excludedPath) use ($basePath): string {
+            static function (string $excludedPath) use ($basePath): string {
                 return self::normalizePath($excludedPath, $basePath);
             },
             array_filter($excludedPaths)
@@ -940,7 +945,7 @@ BANNER;
 
         Assertion::allString($files);
 
-        $normalizePath = function (string $file) use ($basePath, $key, $mainScriptPath): ?SplFileInfo {
+        $normalizePath = static function (string $file) use ($basePath, $key, $mainScriptPath): ?SplFileInfo {
             $file = self::normalizePath($file, $basePath);
 
             Assertion::false(
@@ -1052,7 +1057,7 @@ BANNER;
         Closure $blacklistFilter,
         array $devPackages
     ): array {
-        $processFinderConfig = function (stdClass $config) use ($basePath, $blacklistFilter, $devPackages) {
+        $processFinderConfig = static function (stdClass $config) use ($basePath, $blacklistFilter, $devPackages) {
             return self::processFinder($config, $basePath, $blacklistFilter, $devPackages);
         };
 
@@ -1074,7 +1079,7 @@ BANNER;
             ->files()
             ->filter($blacklistFilter)
             ->filter(
-                function (SplFileInfo $fileInfo) use ($devPackages): bool {
+                static function (SplFileInfo $fileInfo) use ($devPackages): bool {
                     foreach ($devPackages as $devPackage) {
                         if ($devPackage === longest_common_base_path([$devPackage, $fileInfo->getRealPath()])) {
                             // File belongs to the dev package
@@ -1088,7 +1093,7 @@ BANNER;
             ->ignoreVCS(true)
         ;
 
-        $normalizedConfig = (function (array $config, Finder $finder): array {
+        $normalizedConfig = (static function (array $config, Finder $finder): array {
             $normalizedConfig = [];
 
             foreach ($config as $method => $arguments) {
@@ -1109,7 +1114,7 @@ BANNER;
             return $normalizedConfig;
         })((array) $config, $finder);
 
-        $createNormalizedDirectories = function (string $directory) use ($basePath): ?string {
+        $createNormalizedDirectories = static function (string $directory) use ($basePath): ?string {
             $directory = self::normalizePath($directory, $basePath);
 
             Assertion::false(
@@ -1125,7 +1130,7 @@ BANNER;
             return $directory;
         };
 
-        $normalizeFileOrDirectory = function (string &$fileOrDirectory) use ($basePath, $blacklistFilter): void {
+        $normalizeFileOrDirectory = static function (?string &$fileOrDirectory) use ($basePath, $blacklistFilter): void {
             $fileOrDirectory = self::normalizePath($fileOrDirectory, $basePath);
 
             Assertion::false(
@@ -1191,7 +1196,7 @@ BANNER;
         array $filesToAppend,
         array $excludedPaths
     ): array {
-        $toString = function ($file): string {
+        $toString = static function ($file): string {
             // @param string|SplFileInfo $file
             return (string) $file;
         };
@@ -1219,7 +1224,7 @@ BANNER;
                     ->depth(1)
                     ->ignoreUnreadableDirs()
                     ->filter(
-                        function (SplFileInfo $fileInfo): ?bool {
+                        static function (SplFileInfo $fileInfo): ?bool {
                             if ($fileInfo->isLink()) {
                                 return false;
                             }
@@ -1293,7 +1298,7 @@ BANNER;
             }
         }
 
-        $normalizePath = function (string $path) use ($basePath): string {
+        $normalizePath = static function (string $path) use ($basePath): string {
             return is_absolute_path($path)
                 ? canonicalize($path)
                 : self::normalizePath(trim($path, '/ '), $basePath)
@@ -1360,7 +1365,7 @@ BANNER;
         }
 
         $relativeDevPackages = array_map(
-            function (string $packagePath) use ($basePath): string {
+            static function (string $packagePath) use ($basePath): string {
                 return make_path_relative($packagePath, $basePath);
             },
             $devPackages
@@ -1437,12 +1442,12 @@ BANNER;
         $excludedPaths = array_unique(
             array_filter(
                 array_map(
-                    function (string $path) use ($basePath): string {
+                    static function (string $path) use ($basePath): string {
                         return make_path_relative($path, $basePath);
                     },
                     $excludedPaths
                 ),
-                function (string $path): bool {
+                static function (string $path): bool {
                     return '..' !== substr($path, 0, 2);
                 }
             )
@@ -1456,9 +1461,7 @@ BANNER;
     }
 
     /**
-     * @param stdClass $raw
-     * @param string   $key      Config property name
-     * @param string   $basePath
+     * @param string $key Config property name
      *
      * @return string[]
      */
@@ -1476,7 +1479,7 @@ BANNER;
 
         $directories = $raw->{$key};
 
-        $normalizeDirectory = function (string $directory) use ($basePath, $key): string {
+        $normalizeDirectory = static function (string $directory) use ($basePath, $key): string {
             $directory = self::normalizePath($directory, $basePath);
 
             Assertion::false(
@@ -1549,7 +1552,7 @@ BANNER;
         $compactorClasses = array_unique((array) $raw->{self::COMPACTORS_KEY});
 
         $compators = array_map(
-            function (string $class) use ($raw, $basePath, $logger): Compactor {
+            static function (string $class) use ($raw, $basePath, $logger): Compactor {
                 Assertion::classExists($class, 'The compactor class "%s" does not exist.');
                 Assertion::implementsInterface($class, Compactor::class, 'The class "%s" is not a compactor class.');
 
@@ -1705,7 +1708,7 @@ BANNER;
      */
     private static function retrieveComposerFiles(string $basePath): array
     {
-        $retrieveFileAndContents = function (string $file): array {
+        $retrieveFileAndContents = static function (string $file): array {
             $json = new Json();
 
             if (false === file_exists($file) || false === is_file($file) || false === is_readable($file)) {
@@ -1888,7 +1891,7 @@ BANNER;
             } else {
                 $logger->addWarning(
                     sprintf(
-                    'The setting "%s" has been set but ignored the signing algorithm is not "OPENSSL".',
+                        'The setting "%s" has been set but ignored the signing algorithm is not "OPENSSL".',
                         self::KEY_PASS_KEY
                     )
                 );
@@ -1972,8 +1975,7 @@ BANNER;
     }
 
     /**
-     * @param string $file
-     * @param bool   $short Use the short version
+     * @param bool $short Use the short version
      *
      * @return string the commit hash
      */

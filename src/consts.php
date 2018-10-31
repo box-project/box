@@ -20,6 +20,7 @@ const BOX_ALLOW_XDEBUG = 'BOX_ALLOW_XDEBUG';
 
 /**
  * @internal
+ *
  * @private
  */
 const _NO_PARALLEL_PROCESSING = '_BOX_NO_PARALLEL_PROCESSING';

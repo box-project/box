@@ -19,11 +19,14 @@ use KevinGH\Box\Test\CommandTestCase;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
+use function KevinGH\Box\FileSystem\dump_file;
+use function KevinGH\Box\FileSystem\touch;
+use function preg_replace;
+use function str_replace;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Validate
  * @covers \KevinGH\Box\Console\MessageRenderer
- *
  * @runTestsInSeparateProcesses
  */
 class ValidateTest extends CommandTestCase
@@ -39,7 +42,7 @@ class ValidateTest extends CommandTestCase
     public function test_it_validates_a_given_file(): void
     {
         touch('index.php');
-        file_put_contents('test.json', '{}');
+        dump_file('test.json', '{}');
 
         $this->commandTester->execute(
             [
@@ -70,7 +73,7 @@ OUTPUT;
     public function test_it_reports_the_recommendations_found(): void
     {
         touch('index.php');
-        file_put_contents(
+        dump_file(
             'test.json',
             <<<'JSON'
 {
@@ -109,7 +112,7 @@ OUTPUT;
     public function test_it_does_not_fail_when_recommendations_are_found_but_ignore_message_is_passed(): void
     {
         touch('index.php');
-        file_put_contents(
+        dump_file(
             'test.json',
             <<<'JSON'
 {
@@ -149,7 +152,7 @@ OUTPUT;
     public function test_it_reports_the_warnings_found(): void
     {
         touch('index.php');
-        file_put_contents(
+        dump_file(
             'test.json',
             <<<'JSON'
 {
@@ -188,7 +191,7 @@ OUTPUT;
     public function test_it_does_not_fail_when_warnings_are_found_but_ignore_message_is_passed(): void
     {
         touch('index.php');
-        file_put_contents(
+        dump_file(
             'test.json',
             <<<'JSON'
 {
@@ -228,7 +231,7 @@ OUTPUT;
     public function test_it_reports_the_recommendations_and_warnings_found(): void
     {
         touch('index.php');
-        file_put_contents(
+        dump_file(
             'test.json',
             <<<'JSON'
 {
@@ -308,7 +311,7 @@ OUTPUT;
 
     public function test_an_invalid_JSON_file_is_invalid(): void
     {
-        file_put_contents('box.json', '{');
+        dump_file('box.json', '{');
 
         $this->commandTester->execute(
             [
@@ -341,7 +344,7 @@ OUTPUT;
 
     public function test_an_invalid_JSON_file_is_invalid_in_verbose_mode(): void
     {
-        file_put_contents('box.json.dist', '{');
+        dump_file('box.json.dist', '{');
 
         try {
             $this->commandTester->execute(
@@ -370,7 +373,7 @@ OUTPUT;
 
     public function test_an_incorrect_config_file_is_invalid(): void
     {
-        file_put_contents('box.json', '{"test": true}');
+        dump_file('box.json', '{"test": true}');
 
         $this->commandTester->execute(
             [
@@ -406,7 +409,7 @@ EOF
 
     public function test_an_incorrect_config_file_is_invalid_in_verbose_mode(): void
     {
-        file_put_contents('box.json', '{"test": true}');
+        dump_file('box.json', '{"test": true}');
 
         try {
             $this->commandTester->execute(

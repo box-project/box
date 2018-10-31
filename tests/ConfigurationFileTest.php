@@ -18,15 +18,17 @@ use Generator;
 use InvalidArgumentException;
 use KevinGH\Box\Json\JsonValidationException;
 use const DIRECTORY_SEPARATOR;
-use function file_put_contents;
+use function chdir;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_absolute;
+use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\FileSystem\symlink;
+use function KevinGH\Box\FileSystem\touch;
+use function sprintf;
 
 /**
  * @covers \KevinGH\Box\Configuration
- *
  * @group config
  */
 class ConfigurationFileTest extends ConfigurationTestCase
@@ -333,7 +335,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
     ]
 }
 JSON
-);
+        );
 
         touch('file0');
         touch('file1');
@@ -1522,8 +1524,8 @@ JSON
         touch('B/fileB0');
         touch('B/fileB1');
 
-        file_put_contents('composer.json', '{}');
-        file_put_contents('composer.lock', '{}');
+        dump_file('composer.json', '{}');
+        dump_file('composer.lock', '{}');
 
         $this->setConfig([
             'files' => [
@@ -1646,7 +1648,7 @@ JSON
         touch('dir1/file1');
         touch('dir1/blacklisted_file');
 
-        file_put_contents(
+        dump_file(
             'composer.json',
             <<<'JSON'
 {
@@ -1736,7 +1738,7 @@ JSON
     public function provideConfigWithMainScript(): Generator
     {
         yield [
-            function (): void {
+            static function (): void {
                 touch('main-script');
                 touch('file0');
                 touch('file1');
@@ -1757,7 +1759,7 @@ JSON
         ];
 
         yield [
-            function (): void {
+            static function (): void {
                 mkdir('sub-dir');
 
                 touch('sub-dir/main-script');
@@ -1781,7 +1783,7 @@ JSON
         ];
 
         yield [
-            function (): void {
+            static function (): void {
                 mkdir('A');
                 touch('A/main-script');
                 touch('A/file0');
@@ -1801,7 +1803,7 @@ JSON
         ];
 
         yield [
-            function (): void {
+            static function (): void {
                 mkdir('sub-dir');
                 mkdir('sub-dir/A');
                 touch('sub-dir/A/main-script');
@@ -1823,7 +1825,7 @@ JSON
         ];
 
         yield [
-            function (): void {
+            static function (): void {
                 mkdir('A');
 
                 touch('A/main-script');
@@ -1852,7 +1854,7 @@ JSON
         ];
 
         yield [
-            function (): void {
+            static function (): void {
                 touch('main-script');
                 touch('file0');
                 touch('file1');
@@ -1884,7 +1886,7 @@ JSON
             // https://github.com/humbug/box/issues/303
             // The main script is blacklisted but ensures this does not affect the other files collected, like here
             // the files found in a directory which has the same name as the main script
-            function (): void {
+            static function (): void {
                 dump_file('acme');
                 dump_file('src/file00');
                 dump_file('src/file10');
@@ -1940,15 +1942,14 @@ JSON
     public function provideFilesAutodiscoveryConfig(): Generator
     {
         yield [
-            function (): void {},
+            static function (): void {},
             [],
             true,
         ];
 
         foreach ([true, false] as $booleanValue) {
             yield [
-                function (): void {
-                },
+                static function (): void {},
                 [
                     'force-autodiscovery' => $booleanValue,
                 ],
@@ -1958,7 +1959,7 @@ JSON
 
         foreach ([true, false] as $booleanValue) {
             yield [
-                function (): void {
+                static function (): void {
                     touch('main-script');
                     touch('file0');
                     touch('file-bin0');
@@ -1983,7 +1984,7 @@ JSON
         }
 
         yield [
-            function (): void {
+            static function (): void {
                 dump_file('directory0/file00');
             },
             [
@@ -1993,7 +1994,7 @@ JSON
         ];
 
         yield [
-            function (): void {
+            static function (): void {
                 dump_file('directory0/file00');
             },
             [
@@ -2004,7 +2005,7 @@ JSON
         ];
 
         yield [
-            function (): void {
+            static function (): void {
                 dump_file('directory1/file10');
             },
             [
@@ -2018,7 +2019,7 @@ JSON
         ];
 
         yield [
-            function (): void {
+            static function (): void {
                 dump_file('directory1/file10');
             },
             [
@@ -2033,7 +2034,7 @@ JSON
         ];
 
         yield [
-            function (): void {
+            static function (): void {
                 dump_file('directory0/file00');
                 dump_file('directory1/file10');
             },
@@ -2049,7 +2050,7 @@ JSON
         ];
 
         yield [
-            function (): void {
+            static function (): void {
                 dump_file('directory0/file00');
                 dump_file('directory1/file10');
             },

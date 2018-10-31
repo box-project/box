@@ -18,15 +18,15 @@ use KevinGH\Box\Configuration;
 use KevinGH\Box\Test\FileSystemTestCase;
 use KevinGH\Box\Throwable\Exception\NoConfigurationFound;
 use const DIRECTORY_SEPARATOR;
+use function KevinGH\Box\FileSystem\dump_file;
+use function KevinGH\Box\FileSystem\touch;
 
 /**
  * @covers \KevinGH\Box\Console\ConfigurationHelper
  */
 class ConfigurationHelperTest extends FileSystemTestCase
 {
-    /**
-     * @var ConfigurationHelper
-     */
+    /** @var ConfigurationHelper */
     private $helper;
 
     /**
@@ -78,7 +78,7 @@ class ConfigurationHelperTest extends FileSystemTestCase
     public function test_it_can_load_a_configuration(): void
     {
         touch('index.php');
-        file_put_contents('box.json.dist', '{}');
+        dump_file('box.json.dist', '{}');
 
         $this->assertInstanceOf(
             Configuration::class,

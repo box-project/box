@@ -14,6 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Verifier;
 
+use function openssl_verify;
+use function pack;
+
 /**
  * Uses OpenSSL to verify the signature.
  *

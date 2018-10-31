@@ -18,6 +18,7 @@ use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\CommandTestCase;
 use Symfony\Component\Console\Command\Command;
 use function KevinGH\Box\FileSystem\dump_file;
+use function KevinGH\Box\FileSystem\touch;
 use function preg_replace;
 
 /**

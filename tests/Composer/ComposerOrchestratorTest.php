@@ -394,7 +394,7 @@ PHP
         ];
 
         yield [
-            (function (): Whitelist {
+            (static function (): Whitelist {
                 $whitelist = Whitelist::create(true, true, true, 'Acme\Foo');
 
                 $whitelist->recordWhitelistedClass(
@@ -426,7 +426,7 @@ PHP
         ];
 
         yield [
-            (function (): Whitelist {
+            (static function (): Whitelist {
                 $whitelist = Whitelist::create(true, true, true, 'Acme\Foo');
 
                 $whitelist->recordWhitelistedFunction(
@@ -462,7 +462,7 @@ PHP
         ];
 
         yield [
-            (function (): Whitelist {
+            (static function (): Whitelist {
                 $whitelist = Whitelist::create(true, true, true, 'Acme\Foo');
 
                 $whitelist->recordWhitelistedFunction(

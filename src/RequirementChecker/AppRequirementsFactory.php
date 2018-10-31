@@ -17,6 +17,7 @@ namespace KevinGH\Box\RequirementChecker;
 use Phar;
 use function array_diff_key;
 use function array_key_exists;
+use function preg_match;
 use function sprintf;
 use function substr;
 
@@ -50,7 +51,7 @@ final class AppRequirementsFactory
         array $composerJsonContents,
         array $composerLockContents
     ): array {
-        if (([] === $composerLockContents && isset($composerJsonContents['require']['php']))
+        if ([] === $composerLockContents && isset($composerJsonContents['require']['php'])
             || isset($composerLockContents['platform']['php'])
         ) {
             // No need to check the packages requirements: the application platform config is the authority here
@@ -220,7 +221,7 @@ final class AppRequirementsFactory
             if (1 === preg_match('/symfony\/polyfill-(?<extension>.+)/', $packageInfo['name'], $matches)) {
                 $extension = $matches['extension'];
 
-                if ('php' !== substr($extension, 0, 3)) {
+                if (0 !== strpos($extension, 'php')) {
                     $polyfills[$extension] = true;
                 }
             }
@@ -269,14 +270,14 @@ final class AppRequirementsFactory
                 ),
             'helpMessage' => null === $packageName
                 ? sprintf(
-                'The application requires the version "%s" or greater.',
-                $requiredPhpVersion
-            )
+                    'The application requires the version "%s" or greater.',
+                    $requiredPhpVersion
+                )
                 : sprintf(
-                'The package "%s" requires the version "%s" or greater.',
-                $packageName,
-                $requiredPhpVersion
-            ),
+                    'The package "%s" requires the version "%s" or greater.',
+                    $packageName,
+                    $requiredPhpVersion
+                ),
         ];
     }
 }

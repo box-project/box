@@ -14,9 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
+use Generator;
 use Phar;
 use PHPUnit\Framework\TestCase;
 use function array_column;
+use function sort;
 
 /**
  * @covers \KevinGH\Box\RequirementChecker\RequirementsDumper
@@ -80,7 +82,7 @@ class RequirementsDumperTest extends TestCase
         $this->assertSame($expectedRequirement, $checkFiles[0][1]);
     }
 
-    public function provideJsonAndLockContents()
+    public function provideJsonAndLockContents(): Generator
     {
         yield [
             [],

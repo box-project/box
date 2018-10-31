@@ -18,15 +18,16 @@ use Assert\Assertion;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use function chdir;
+use function getcwd;
+use function sprintf;
 
 /**
  * @private
  */
 trait ChangeableWorkingDirectory
 {
-    /**
-     * @internal using a static property as traits cannot have constants
-     */
+    /** @internal using a static property as traits cannot have constants */
     private static $WORKING_DIR_OPT = 'working-dir';
 
     final public function changeWorkingDirectory(InputInterface $input): void

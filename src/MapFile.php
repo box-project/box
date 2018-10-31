@@ -15,9 +15,13 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use function KevinGH\Box\FileSystem\make_path_relative;
+use function preg_quote;
+use function preg_replace;
+use function strpos;
 
 /**
  * @internal
+ *
  * @private
  */
 final class MapFile

@@ -17,6 +17,8 @@ namespace KevinGH\Box\PhpScoper;
 use Assert\Assertion;
 use Humbug\PhpScoper\Whitelist;
 use PhpParser\Node\Name\FullyQualified;
+use function array_shift;
+use function count;
 
 /**
  * @private

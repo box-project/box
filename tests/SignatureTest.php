@@ -15,9 +15,11 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Exception;
+use Generator;
 use Phar;
 use PharException;
 use PHPUnit\Framework\TestCase;
+use function realpath;
 
 /**
  * @covers \KevinGH\Box\Signature
@@ -110,7 +112,7 @@ class SignatureTest extends TestCase
         $this->assertTrue($sig->verify());
     }
 
-    public function providePHARs()
+    public function providePHARs(): Generator
     {
         yield [self::FIXTURES_DIR.'/md5.phar'];
         yield [self::FIXTURES_DIR.'/sha1.phar'];

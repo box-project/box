@@ -20,11 +20,11 @@ use Phar;
 use const DIRECTORY_SEPARATOR;
 use function array_unshift;
 use function in_array;
+use function KevinGH\Box\FileSystem\touch;
 
 /**
  * @covers \KevinGH\Box\Configuration
  * @covers \KevinGH\Box\MapFile
- *
  * @group config
  */
 class ConfigurationSigningTest extends ConfigurationTestCase

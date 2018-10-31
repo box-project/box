@@ -71,7 +71,7 @@ class WhitelistManipulatorTest extends TestCase
 
         yield 'it merges the recorded classes and functions' => [
             [
-                (function (): Whitelist {
+                (static function (): Whitelist {
                     $whitelist = Whitelist::create(true, true, true, 'Foo1');
 
                     $whitelist->recordWhitelistedClass(
@@ -94,7 +94,7 @@ class WhitelistManipulatorTest extends TestCase
 
                     return $whitelist;
                 })(),
-                (function (): Whitelist {
+                (static function (): Whitelist {
                     $whitelist = Whitelist::create(true, true, true, 'Foo2');
 
                     $whitelist->recordWhitelistedClass(
@@ -109,7 +109,7 @@ class WhitelistManipulatorTest extends TestCase
 
                     return $whitelist;
                 })(),
-                (function (): Whitelist {
+                (static function (): Whitelist {
                     $whitelist = Whitelist::create(true, true, true, 'Foo3');
 
                     $whitelist->recordWhitelistedClass(
@@ -119,7 +119,7 @@ class WhitelistManipulatorTest extends TestCase
 
                     return $whitelist;
                 })(),
-                (function (): Whitelist {
+                (static function (): Whitelist {
                     $whitelist = Whitelist::create(true, true, true, 'Foo4');
 
                     $whitelist->recordWhitelistedFunction(
@@ -130,7 +130,7 @@ class WhitelistManipulatorTest extends TestCase
                     return $whitelist;
                 })(),
             ],
-            (function (): Whitelist {
+            (static function (): Whitelist {
                 $whitelist = Whitelist::create(true, true, true, 'Foo1');
 
                 $whitelist->recordWhitelistedClass(

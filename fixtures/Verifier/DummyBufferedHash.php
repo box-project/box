@@ -14,8 +14,13 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Verifier;
 
+use KevinGH\Box\NotCallable;
+use function func_get_args;
+
 final class DummyBufferedHash extends BufferedHash
 {
+    use NotCallable;
+
     /**
      * {@inheritdoc}
      */
@@ -28,6 +33,7 @@ final class DummyBufferedHash extends BufferedHash
      */
     public function verify(string $signature): bool
     {
+        $this->__call(__METHOD__, func_get_args());
     }
 
     public function getPublicBufferedData(): string

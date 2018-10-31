@@ -51,13 +51,9 @@ abstract class ConfigurableCommand extends Command
     /**
      * Returns the configuration settings.
      *
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     * @param bool            $allowNoFile Load the config nonetheless if not file is found when true
+     * @param bool $allowNoFile Load the config nonetheless if not file is found when true
      *
      * @throws JsonValidationException
-     *
-     * @return Configuration
      */
     final protected function getConfig(InputInterface $input, OutputInterface $output, bool $allowNoFile = false): Configuration
     {

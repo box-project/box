@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace KevinGH\Box\Verifier;
 
 use PHPUnit\Framework\TestCase;
+use function file_get_contents;
+use function filesize;
 
 /**
  * @covers \KevinGH\Box\Verifier\PublicKeyDelegate

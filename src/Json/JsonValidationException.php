@@ -33,10 +33,10 @@ final class JsonValidationException extends UnexpectedValueException
      */
     public function __construct(
         string $message,
-        string $file = null,
+        ?string $file = null,
         array $errors = [],
         int $code = 0,
-        Throwable $previous = null
+        ?Throwable $previous = null
     ) {
         if (null !== $file) {
             Assertion::file($file);

@@ -24,6 +24,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use function sprintf;
 
 /**
  * @private
@@ -98,7 +99,7 @@ HELP
                 $io->success('The configuration file passed the validation.');
             }
 
-            return ($hasRecommendationsOrWarnings || $input->getOption(self::IGNORE_MESSAGES_OPTION)) ? 0 : 1;
+            return $hasRecommendationsOrWarnings || $input->getOption(self::IGNORE_MESSAGES_OPTION) ? 0 : 1;
         } catch (Exception $exception) {
             // Continue
         }

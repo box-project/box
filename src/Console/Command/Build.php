@@ -20,6 +20,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * @deprecated
+ *
  * @private
  *
  * TODO: make Compile final when Build is removed

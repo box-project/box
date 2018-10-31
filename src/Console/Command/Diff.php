@@ -27,6 +27,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 use function array_map;
+use function realpath;
+use function sprintf;
 
 /**
  * @private
@@ -96,10 +98,10 @@ final class Diff extends Command
         try {
             $diff = new PharDiff(
                 ...array_map(
-                    function (string $path): Pharaoh {
-                        $path = false !== realpath($path) ? realpath($path) : $path;
+                    static function (string $path): Pharaoh {
+                        $realPath = realpath($path);
 
-                        return new Pharaoh($path);
+                        return new Pharaoh(false !== $realPath ? $realPath : $path);
                     },
                     $paths
                 )

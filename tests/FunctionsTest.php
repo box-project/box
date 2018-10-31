@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use Generator;
 use InvalidArgumentException;
 use Phar;
 use PHPUnit\Framework\TestCase;
@@ -79,7 +80,7 @@ class FunctionsTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function providePharCompressionAlgorithm()
+    public function providePharCompressionAlgorithm(): Generator
     {
         yield [Phar::GZ, 'zlib'];
         yield [Phar::BZ2, 'bz2'];
@@ -87,7 +88,7 @@ class FunctionsTest extends TestCase
         yield [10, -1];
     }
 
-    public function provideBytes()
+    public function provideBytes(): Generator
     {
         yield [10, '10.00B'];
         yield [1024, '1.00KB'];
@@ -98,7 +99,7 @@ class FunctionsTest extends TestCase
         yield [1024 ** 6, '1.00EB'];
     }
 
-    public function provideMemory()
+    public function provideMemory(): Generator
     {
         yield ['-1', -1];
         yield ['10', 10];

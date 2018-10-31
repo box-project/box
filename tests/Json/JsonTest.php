@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Json;
 
 use Assert\Assertion;
+use Generator;
 use KevinGH\Box\Test\FileSystemTestCase;
 use PHPUnit\Framework\AssertionFailedError;
 use Seld\JsonLint\ParsingException;
@@ -24,6 +25,8 @@ use function get_class;
 use function is_object;
 use function json_decode;
 use function KevinGH\Box\FileSystem\dump_file;
+use function KevinGH\Box\FileSystem\touch;
+use function mb_convert_encoding;
 
 /**
  * @covers \KevinGH\Box\Json\Json
@@ -31,9 +34,7 @@ use function KevinGH\Box\FileSystem\dump_file;
  */
 class JsonTest extends FileSystemTestCase
 {
-    /**
-     * @var Json
-     */
+    /** @var Json */
     private $json;
 
     /**
@@ -161,7 +162,7 @@ JSON
 
         $this->json->validate(
             'data.json',
-            (function (): stdClass {
+            (static function (): stdClass {
                 $data = new stdClass();
                 $data->foo = 'bar';
 
@@ -173,7 +174,7 @@ JSON
         try {
             $this->json->validate(
                 'data.json',
-                (function (): stdClass {
+                (static function (): stdClass {
                     $data = new stdClass();
                     $data->foo = false;
                     $data->bar = true;
@@ -207,7 +208,7 @@ EOF
         }
     }
 
-    public function provideJsonToLint()
+    public function provideJsonToLint(): Generator
     {
         yield ['{}', null];
 
@@ -224,7 +225,7 @@ EOF
         ];
     }
 
-    public function provideJsonToDecode()
+    public function provideJsonToDecode(): Generator
     {
         yield ['{}', true, [], null];
         yield ['{}', false, new stdClass(), null];
@@ -263,7 +264,7 @@ JSON
 JSON
             ,
             false,
-            (function () {
+            (static function () {
                 $data = new stdClass();
                 $data->foo = new stdClass();
                 $data->foo->bar = [];

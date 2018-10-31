@@ -16,6 +16,7 @@ namespace KevinGH\Box;
 
 use Humbug\PhpScoper\Whitelist;
 use KevinGH\Box\Compactor\PhpScoper;
+use function array_reduce;
 
 final class Compactors
 {
@@ -39,7 +40,7 @@ final class Compactors
     {
         return (string) array_reduce(
             $this->compactors,
-            function (string $contents, Compactor $compactor) use ($file): string {
+            static function (string $contents, Compactor $compactor) use ($file): string {
                 return $compactor->compact($file, $contents);
             },
             $contents

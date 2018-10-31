@@ -27,7 +27,6 @@ use function realpath;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Diff
- *
  * @runTestsInSeparateProcesses
  */
 class DiffTest extends CommandTestCase

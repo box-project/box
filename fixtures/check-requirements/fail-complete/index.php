@@ -10,4 +10,4 @@
  * with this source code in the file LICENSE.
  */
 
-throw new \Error('Should not be executed!');
+throw new Error('Should not be executed!');
