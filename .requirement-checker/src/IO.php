@@ -1,6 +1,6 @@
 <?php
 
-namespace _HumbugBox5b963fb2bb9ba\KevinGH\RequirementChecker;
+namespace _HumbugBoxd1e70270db87\KevinGH\RequirementChecker;
 
 /**
 @private
@@ -132,7 +132,7 @@ final class IO
             return \false;
         }
         if (\DIRECTORY_SEPARATOR === '\\') {
-            return \function_exists('_HumbugBox5b963fb2bb9ba\\sapi_windows_vt100_support') && sapi_windows_vt100_support(\STDOUT) || \false !== \getenv('ANSICON') || 'ON' === \getenv('ConEmuANSI') || 'xterm' === \getenv('TERM');
+            return \function_exists('_HumbugBoxd1e70270db87\\sapi_windows_vt100_support') && sapi_windows_vt100_support(\STDOUT) || \false !== \getenv('ANSICON') || 'ON' === \getenv('ConEmuANSI') || 'xterm' === \getenv('TERM');
         }
         if (\function_exists('stream_isatty')) {
             return \stream_isatty(\STDOUT);
