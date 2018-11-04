@@ -16,9 +16,9 @@ namespace KevinGH\Box\Compactor;
 
 use Doctrine\Common\Annotations\DocLexer;
 use Exception;
-use Herrera\Annotations\Convert\ToString;
-use Herrera\Annotations\Tokenizer;
-use Herrera\Annotations\Tokens;
+use KevinGH\Box\Annotation\Convert\ToString;
+use KevinGH\Box\Annotation\Tokenizer;
+use KevinGH\Box\Annotation\Tokens;
 use const T_COMMENT;
 use const T_DOC_COMMENT;
 use const T_WHITESPACE;

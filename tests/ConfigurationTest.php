@@ -17,7 +17,7 @@ namespace KevinGH\Box;
 use Closure;
 use DateTimeImmutable;
 use Generator;
-use Herrera\Annotations\Tokenizer;
+use KevinGH\Box\Annotation\Tokenizer;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\DummyCompactor;
 use KevinGH\Box\Compactor\InvalidCompactor;

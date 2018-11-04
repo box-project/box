@@ -1336,7 +1336,7 @@ KevinGH\Box\Configuration {#140
   -excludeComposerFiles: true
   -compactors: array:1 [
     0 => KevinGH\Box\Compactor\Php {#140
-      -converter: Herrera\Annotations\Convert\ToString {#140
+      -converter: KevinGH\Box\Annotation\Convert\ToString {#140
         -break: "\\n"
         -char: " "
         -level: null
@@ -1345,7 +1345,7 @@ KevinGH\Box\Configuration {#140
         #result: null
         #tokens: null
       }
-      -tokenizer: Herrera\Annotations\Tokenizer {#140
+      -tokenizer: KevinGH\Box\Annotation\Tokenizer {#140
         -aliases: []
         -ignored: []
         -lexer: Doctrine\Common\Annotations\DocLexer {#140

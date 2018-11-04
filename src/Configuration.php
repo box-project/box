@@ -18,7 +18,7 @@ use Assert\Assertion;
 use Closure;
 use DateTimeImmutable;
 use DateTimeZone;
-use Herrera\Annotations\Tokenizer;
+use KevinGH\Box\Annotation\Tokenizer;
 use Herrera\Box\Compactor\Php as LegacyPhp;
 use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
 use Humbug\PhpScoper\Console\ApplicationFactory;

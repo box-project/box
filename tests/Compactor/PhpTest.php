@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Generator;
-use Herrera\Annotations\Tokenizer;
+use KevinGH\Box\Annotation\Tokenizer;
 use KevinGH\Box\Compactor\Php;
 use PHPUnit\Framework\TestCase;
 
