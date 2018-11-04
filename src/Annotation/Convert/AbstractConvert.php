@@ -1,5 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Annotation\Convert;
 
 use KevinGH\Box\Annotation\Tokens;
@@ -26,7 +38,7 @@ abstract class AbstractConvert implements ConvertInterface
     protected $tokens;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function convert(Tokens $tokens)
     {
@@ -43,12 +55,12 @@ abstract class AbstractConvert implements ConvertInterface
     /**
      * Handles the conversion of the current token.
      */
-    abstract protected function handle();
+    abstract protected function handle(): void;
 
     /**
      * Resets the state of the converter.
      *
-     * @param Tokens $tokens The new list of tokens.
+     * @param Tokens $tokens the new list of tokens
      */
-    abstract protected function reset(Tokens $tokens);
+    abstract protected function reset(Tokens $tokens): void;
 }

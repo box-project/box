@@ -1,5 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Annotation\Convert;
 
 use Doctrine\Common\Annotations\DocLexer;
@@ -29,14 +41,14 @@ class ToString extends AbstractConvert
     /**
      * The current indentation level.
      *
-     * @var integer
+     * @var int
      */
     private $level;
 
     /**
      * The flag used to add a space after a colon (assignment).
      *
-     * @var boolean
+     * @var bool
      */
     private $space = false;
 
@@ -45,7 +57,7 @@ class ToString extends AbstractConvert
      *
      * @var array
      */
-    private static $map = array(
+    private static $map = [
         DocLexer::T_AT => '@',
         DocLexer::T_CLOSE_CURLY_BRACES => '}',
         DocLexer::T_CLOSE_PARENTHESIS => ')',
@@ -55,23 +67,23 @@ class ToString extends AbstractConvert
         DocLexer::T_NAMESPACE_SEPARATOR => '\\',
         DocLexer::T_OPEN_CURLY_BRACES => '{',
         DocLexer::T_OPEN_PARENTHESIS => '(',
-    );
+    ];
 
     /**
      * The indentation size.
      *
-     * @var integer
+     * @var int
      */
     private $size = 0;
 
     /**
      * Sets the line break character(s) used for indentation.
      *
-     * @param string $break The character(s).
+     * @param string $break the character(s)
      *
-     * @return ToString The converter.
+     * @return ToString the converter
      */
-    public function setBreakChar($break)
+    public function setBreakChar($break): self
     {
         $this->break = $break;
 
@@ -81,11 +93,11 @@ class ToString extends AbstractConvert
     /**
      * Sets the repeated indentation character.
      *
-     * @param string $char The character.
+     * @param string $char the character
      *
-     * @return ToString The converter.
+     * @return ToString the converter
      */
-    public function setIndentChar($char)
+    public function setIndentChar($char): self
     {
         $this->char = $char;
 
@@ -95,11 +107,11 @@ class ToString extends AbstractConvert
     /**
      * Sets the size of the indentation.
      *
-     * @param integer $size The size.
+     * @param int $size the size
      *
-     * @return ToString The converter.
+     * @return ToString the converter
      */
-    public function setIndentSize($size)
+    public function setIndentSize($size): self
     {
         $this->size = $size;
 
@@ -109,11 +121,11 @@ class ToString extends AbstractConvert
     /**
      * Sets the flag that determines if a space is added after a colon.
      *
-     * @param boolean $space Add the space?
+     * @param bool $space Add the space?
      *
-     * @return ToString The converter.
+     * @return ToString the converter
      */
-    public function useColonSpace($space)
+    public function useColonSpace($space): self
     {
         $this->space = $space;
 
@@ -123,7 +135,7 @@ class ToString extends AbstractConvert
     /**
      * Processes the current token.
      */
-    protected function handle()
+    protected function handle(): void
     {
         $token = $this->tokens->current();
 
@@ -133,7 +145,7 @@ class ToString extends AbstractConvert
             $this->result .= self::$map[$token[0]];
         } else {
             if (DocLexer::T_STRING === $token[0]) {
-                $this->result .= '"' . $token[1] . '"';
+                $this->result .= '"'.$token[1].'"';
             } else {
                 $this->result .= $token[1];
             }
@@ -143,9 +155,9 @@ class ToString extends AbstractConvert
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    protected function reset(Tokens $tokens)
+    protected function reset(Tokens $tokens): void
     {
         $this->level = 0;
         $this->result = '';
@@ -157,9 +169,9 @@ class ToString extends AbstractConvert
     /**
      * Adds indentation to the result.
      *
-     * @param boolean $force Force add a line break?
+     * @param bool $force Force add a line break?
      */
-    private function indent($force = false)
+    private function indent($force = false): void
     {
         if ($this->size || $force) {
             $this->result .= $this->break;
@@ -176,7 +188,7 @@ class ToString extends AbstractConvert
     /**
      * Handles indentation after the current token.
      */
-    private function postIndent()
+    private function postIndent(): void
     {
         $next = $this->tokens->getId($this->tokens->key() + 1);
 
@@ -216,7 +228,7 @@ class ToString extends AbstractConvert
     /**
      * Handles indentation before the current token.
      */
-    private function preIndent()
+    private function preIndent(): void
     {
         $prev = $this->tokens->getId($this->tokens->key() - 1);
 

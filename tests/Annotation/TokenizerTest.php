@@ -1,12 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Annotation;
 
 use Doctrine\Common\Annotations\DocLexer;
 use KevinGH\Box\Annotation\Exception\SyntaxException;
-use KevinGH\Box\Annotation\TestTokens;
-use KevinGH\Box\Annotation\Tokenizer;
 
+/**
+ * @covers \KevinGH\Box\Annotation\Tokenizer
+ */
 class TokenizerTest extends TestTokens
 {
     /**
@@ -14,120 +27,120 @@ class TokenizerTest extends TestTokens
      */
     private $tokenizer;
 
-    public function getDocblocks()
+    public function getDocblocks(): array
     {
-        $docblocks = array();
+        $docblocks = [];
         $tokens = $this->getTokens();
 
-        $docblocks[] = array(
+        $docblocks[] = [
             '// @comment',
-            array()
-        );
+            [],
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * Empty.
          */
 DOCBLOCK
             ,
-            array()
-        );
+            [],
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation()
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation ()
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @A
          * @B
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @A()
          * @B()
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
+        $docblocks[] = [
             <<<DOCBLOCK
         /**
          * @Namespaced\Annotation
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
+        $docblocks[] = [
             <<<DOCBLOCK
         /**
          * @Namespaced\ Annotation
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
+        $docblocks[] = [
             <<<DOCBLOCK
         /**
          * @Namespaced\Annotation()
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation("string")
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation(
          *     "string"
@@ -135,51 +148,51 @@ DOCBLOCK
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation(123, "string", 1.23, CONSTANT, false, true, null)
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation(constant, FALSE, TRUE, NULL)
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation(key="value")
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation(a="b", c="d")
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation(
          *     a=123,
@@ -193,41 +206,41 @@ DOCBLOCK
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation({})
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation(key={})
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation({"string"})
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation(
          *     {
@@ -237,141 +250,141 @@ DOCBLOCK
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation({123, "string", 1.23, CONSTANT, false, true, null})
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation({key="value"})
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation({"key"="value"})
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation({a="b", c="d"})
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation({a="b", "c"="d", 123="e"})
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation({key={}})
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation(a={b={}})
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation({key: {}})
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation(a={b: {}})
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation({key: "value"})
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation({"key": "value"})
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation({a: "b", c: "d"})
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation({a: "b", "c": "d", 123: "e"})
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation(
          *     {
@@ -387,51 +400,51 @@ DOCBLOCK
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation(@Nested)
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation(@Nested())
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation(@Nested, @Nested)
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation(@Nested(), @Nested())
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation(
          *     @Nested(),
@@ -440,51 +453,51 @@ DOCBLOCK
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation(key=@Nested)
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation(a=@Nested(),b=@Nested)
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation({key=@Nested})
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation({a=@Nested(),b=@Nested})
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Annotation(
          *     @Nested(
@@ -513,90 +526,90 @@ DOCBLOCK
          */
 DOCBLOCK
             ,
-            array_shift($tokens)
-        );
+            array_shift($tokens),
+        ];
 
         // tokenizer specific
 
-        $docblocks[] = array(
+        $docblocks[] = [
             <<<DOCBLOCK
         /**
          * \@Escaped
          */
 DOCBLOCK
             ,
-            array(),
-        );
+            [],
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @!Skipped
          */
 DOCBLOCK
             ,
-            array(),
-        );
+            [],
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
          * @Ignored
          * @Kept
          */
 DOCBLOCK
             ,
-            array(
-                array(DocLexer::T_AT),
-                array(DocLexer::T_IDENTIFIER, 'Kept'),
-            ),
-            array('Ignored')
-        );
+            [
+                [DocLexer::T_AT],
+                [DocLexer::T_IDENTIFIER, 'Kept'],
+            ],
+            ['Ignored'],
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
-         * @Not\\Aliased
+         * @Not\Aliased
          * @Original
          */
 DOCBLOCK
             ,
-            array(
-                array(DocLexer::T_AT),
-                array(DocLexer::T_IDENTIFIER, 'Not\\Aliased'),
-                array(DocLexer::T_AT),
-                array(DocLexer::T_IDENTIFIER, 'Is\\Aliased'),
-            ),
-            array(),
-            array(
-                'Original' => 'Is\\Aliased'
-            )
-        );
+            [
+                [DocLexer::T_AT],
+                [DocLexer::T_IDENTIFIER, 'Not\\Aliased'],
+                [DocLexer::T_AT],
+                [DocLexer::T_IDENTIFIER, 'Is\\Aliased'],
+            ],
+            [],
+            [
+                'Original' => 'Is\\Aliased',
+            ],
+        ];
 
-        $docblocks[] = array(
-            <<<DOCBLOCK
+        $docblocks[] = [
+            <<<'DOCBLOCK'
         /**
-         * @Not\\Aliased
-         * @Original\\Aliased
+         * @Not\Aliased
+         * @Original\Aliased
          */
 DOCBLOCK
             ,
-            array(
-                array(DocLexer::T_AT),
-                array(DocLexer::T_IDENTIFIER, 'Not\\Aliased'),
-                array(DocLexer::T_AT),
-                array(DocLexer::T_IDENTIFIER, 'Is\\Aliased'),
-            ),
-            array(),
-            array(
-                'Original' => 'Is'
-            )
-        );
+            [
+                [DocLexer::T_AT],
+                [DocLexer::T_IDENTIFIER, 'Not\\Aliased'],
+                [DocLexer::T_AT],
+                [DocLexer::T_IDENTIFIER, 'Is\\Aliased'],
+            ],
+            [],
+            [
+                'Original' => 'Is',
+            ],
+        ];
 
         return $docblocks;
     }
 
-    public function testInit()
+    public function testInit(): void
     {
         $this->assertInstanceOf(
             'Doctrine\\Common\\Annotations\\DocLexer',
@@ -606,13 +619,16 @@ DOCBLOCK
 
     /**
      * @dataProvider getDocblocks
+     *
+     * @param mixed $docblock
+     * @param mixed $tokens
      */
     public function testParse(
         $docblock,
         $tokens,
-        array $ignored = array(),
-        array $aliases = array()
-    ) {
+        array $ignored = [],
+        array $aliases = []
+    ): void {
         if ($ignored) {
             $this->setPropertyValue($this->tokenizer, 'ignored', $ignored);
         }
@@ -623,9 +639,9 @@ DOCBLOCK
         );
     }
 
-    public function testParseInvalidArrayCommas()
+    public function testParseInvalidArrayCommas(): void
     {
-        $this->tokenizer->ignore(array('ignored'));
+        $this->tokenizer->ignore(['ignored']);
 
         try {
             $this->tokenizer->parse('/**@a(1,@ignored)*/');
@@ -639,7 +655,7 @@ DOCBLOCK
         }
     }
 
-    public function testParseInvalidIdentifier()
+    public function testParseInvalidIdentifier(): void
     {
         try {
             $this->tokenizer->parse('/**@\\*/');
@@ -653,7 +669,7 @@ DOCBLOCK
         }
     }
 
-    public function testParseInvalidPlainValue()
+    public function testParseInvalidPlainValue(): void
     {
         try {
             $this->tokenizer->parse('/**@a(!)*/');
@@ -667,7 +683,7 @@ DOCBLOCK
         }
     }
 
-    public function testParseInvalidMatch()
+    public function testParseInvalidMatch(): void
     {
         try {
             $this->tokenizer->parse('/**@a({x)');
@@ -681,7 +697,7 @@ DOCBLOCK
         }
     }
 
-    public function testParseInvalidMatchAny()
+    public function testParseInvalidMatchAny(): void
     {
         try {
             $this->tokenizer->parse('/**@a({@:1})');
@@ -695,12 +711,12 @@ DOCBLOCK
         }
     }
 
-    public function testIgnored()
+    public function testIgnored(): void
     {
-        $ignore = array(
+        $ignore = [
             'abc',
             'def',
-        );
+        ];
 
         $this->tokenizer->ignore($ignore);
 
@@ -710,7 +726,7 @@ DOCBLOCK
         );
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenizer = new Tokenizer();
     }

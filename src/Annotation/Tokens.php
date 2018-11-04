@@ -1,15 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Annotation;
 
 use ArrayAccess;
 use Countable;
 use Doctrine\Common\Annotations\DocLexer;
+use Iterator;
 use KevinGH\Box\Annotation\Exception\Exception;
 use KevinGH\Box\Annotation\Exception\InvalidTokenException;
 use KevinGH\Box\Annotation\Exception\LogicException;
 use KevinGH\Box\Annotation\Exception\OutOfRangeException;
-use Iterator;
 
 /**
  * Manages and validates an immutable list of tokens.
@@ -23,7 +35,7 @@ class Tokens implements ArrayAccess, Countable, Iterator
      *
      * @var array
      */
-    private static $hasValue = array(
+    private static $hasValue = [
         DocLexer::T_FALSE => true,
         DocLexer::T_FLOAT => true,
         DocLexer::T_IDENTIFIER => true,
@@ -31,12 +43,12 @@ class Tokens implements ArrayAccess, Countable, Iterator
         DocLexer::T_NULL => true,
         DocLexer::T_STRING => true,
         DocLexer::T_TRUE => true,
-    );
+    ];
 
     /**
      * The current offset.
      *
-     * @var integer
+     * @var int
      */
     private $offset;
 
@@ -52,7 +64,7 @@ class Tokens implements ArrayAccess, Countable, Iterator
      *
      * @var array
      */
-    private static $valid = array(
+    private static $valid = [
         DocLexer::T_AT => true,
         DocLexer::T_CLOSE_CURLY_BRACES => true,
         DocLexer::T_CLOSE_PARENTHESIS => true,
@@ -70,12 +82,12 @@ class Tokens implements ArrayAccess, Countable, Iterator
         DocLexer::T_OPEN_PARENTHESIS => true,
         DocLexer::T_STRING => true,
         DocLexer::T_TRUE => true,
-    );
+    ];
 
     /**
      * Sets the list of tokens to manage.
      *
-     * @param array $tokens The list of tokens.
+     * @param array $tokens the list of tokens
      */
     public function __construct(array $tokens)
     {
@@ -84,7 +96,7 @@ class Tokens implements ArrayAccess, Countable, Iterator
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function count()
     {
@@ -92,7 +104,7 @@ class Tokens implements ArrayAccess, Countable, Iterator
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function current()
     {
@@ -102,9 +114,9 @@ class Tokens implements ArrayAccess, Countable, Iterator
     /**
      * Returns the array copy of the list of tokens.
      *
-     * @return array The list of tokens.
+     * @return array the list of tokens
      */
-    public function getArray()
+    public function getArray(): array
     {
         return $this->tokens;
     }
@@ -112,11 +124,11 @@ class Tokens implements ArrayAccess, Countable, Iterator
     /**
      * Returns the token identifier at the offset.
      *
-     * @param integer $offset The offset to retrieve.
+     * @param int $offset the offset to retrieve
      *
-     * @return integer The token identifier.
+     * @return int the token identifier
      */
-    public function getId($offset = null)
+    public function getId($offset = null): int
     {
         if (null !== ($token = $this->getToken($offset))) {
             return $token[0];
@@ -128,9 +140,9 @@ class Tokens implements ArrayAccess, Countable, Iterator
     /**
      * Returns the key for the value at the offset.
      *
-     * @param integer $offset The value's offset.
+     * @param int $offset the value's offset
      *
-     * @return integer|string The key.
+     * @return int|string the key
      */
     public function getKey($offset = null)
     {
@@ -150,15 +162,15 @@ class Tokens implements ArrayAccess, Countable, Iterator
     /**
      * Returns the token at the offset, or the default given.
      *
-     * @param integer $offset  The offset to retrieve.
-     * @param array   $default The default token to return.
-     *
-     * @return array The token, or the default.
+     * @param int   $offset  the offset to retrieve
+     * @param array $default the default token to return
      *
      * @throws Exception
-     * @throws InvalidTokenException If the token is not valid.
+     * @throws InvalidTokenException if the token is not valid
+     *
+     * @return array the token, or the default
      */
-    public function getToken($offset = null, array $default = null)
+    public function getToken($offset = null, array $default = null): array
     {
         if (null === $offset) {
             $offset = $this->offset;
@@ -197,12 +209,12 @@ class Tokens implements ArrayAccess, Countable, Iterator
     /**
      * Returns the processed value of the specified token.
      *
-     * @param integer $offset The token offset.
-     *
-     * @return mixed The processed value.
+     * @param int $offset the token offset
      *
      * @throws Exception
-     * @throws LogicException If the token is not expected to have a value.
+     * @throws LogicException if the token is not expected to have a value
+     *
+     * @return mixed the processed value
      */
     public function getValue($offset = null)
     {
@@ -238,7 +250,7 @@ class Tokens implements ArrayAccess, Countable, Iterator
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function key()
     {
@@ -246,11 +258,11 @@ class Tokens implements ArrayAccess, Countable, Iterator
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function next()
     {
-        $this->offset++;
+        ++$this->offset;
 
         if (isset($this->tokens[$this->offset])) {
             return $this->tokens[$this->offset];
@@ -260,7 +272,7 @@ class Tokens implements ArrayAccess, Countable, Iterator
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function offsetExists($offset)
     {
@@ -268,9 +280,9 @@ class Tokens implements ArrayAccess, Countable, Iterator
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
-     * @throws OutOfRangeException If the offset is invalid.
+     * @throws OutOfRangeException if the offset is invalid
      */
     public function offsetGet($offset)
     {
@@ -285,11 +297,11 @@ class Tokens implements ArrayAccess, Countable, Iterator
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
-     * @throws LogicException If called.
+     * @throws LogicException if called
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         throw LogicException::create(
             'New values cannot be added to the list of tokens.'
@@ -297,11 +309,11 @@ class Tokens implements ArrayAccess, Countable, Iterator
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
-     * @throws LogicException If called.
+     * @throws LogicException if called
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         throw Logicexception::create(
             'Existing tokens cannot be removed from the list of tokens.'
@@ -309,15 +321,15 @@ class Tokens implements ArrayAccess, Countable, Iterator
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->offset = 0;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function valid()
     {

@@ -1,14 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Annotation;
 
 use KevinGH\Box\Annotation\Convert\AbstractConvert;
-use KevinGH\Box\Annotation\Tokens;
 
 /**
  * A simple test converter that increments a counter.
- *
- * @author Kevin Herrera <kevin@herrera.io>
  */
 class TestConvert extends AbstractConvert
 {
@@ -28,15 +37,15 @@ class TestConvert extends AbstractConvert
     /**
      * @override
      */
-    protected function handle()
+    protected function handle(): void
     {
-        $this->result++;
+        ++$this->result;
     }
 
     /**
      * @override
      */
-    protected function reset(Tokens $tokens)
+    protected function reset(Tokens $tokens): void
     {
         $this->result = 0;
         $this->tokens = $tokens;

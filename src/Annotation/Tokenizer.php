@@ -1,5 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Annotation;
 
 use Doctrine\Common\Annotations\DocLexer;
@@ -23,26 +35,26 @@ class Tokenizer
      *
      * @var array
      */
-    private $aliases = array();
+    private $aliases = [];
 
     /**
      * The list of valid class identifier.
      *
      * @var array
      */
-    private static $classIdentifiers = array(
+    private static $classIdentifiers = [
         DocLexer::T_IDENTIFIER,
         DocLexer::T_TRUE,
         DocLexer::T_FALSE,
-        DocLexer::T_NULL
-    );
+        DocLexer::T_NULL,
+    ];
 
     /**
      * The list of ignored annotation identifiers.
      *
      * @var array
      */
-    private $ignored = array();
+    private $ignored = [];
 
     /**
      * The annotations lexer.
@@ -62,23 +74,23 @@ class Tokenizer
     /**
      * Parses the docblock and returns its annotation tokens.
      *
-     * @param string $input   The docblock.
-     * @param array  $aliases The namespace aliases.
+     * @param string $input   the docblock
+     * @param array  $aliases the namespace aliases
      *
-     * @return array The list of tokens.
+     * @return array the list of tokens
      */
-    public function parse($input, array $aliases = array())
+    public function parse($input, array $aliases = []): array
     {
         if (0 !== strpos(ltrim($input), '/**')) {
-            return array();
+            return [];
         }
 
         if (false == ($position = strpos($input, '@'))) {
-            return array();
+            return [];
         }
 
         if (0 < $position) {
-            $position -= 1;
+            --$position;
         }
 
         $input = substr($input, $position);
@@ -95,9 +107,9 @@ class Tokenizer
     /**
      * Sets the annotation identifiers to ignore.
      *
-     * @param array $ignore The list of ignored identifiers.
+     * @param array $ignore the list of ignored identifiers
      */
-    public function ignore(array $ignore)
+    public function ignore(array $ignore): void
     {
         $this->ignored = $ignore;
     }
@@ -105,9 +117,9 @@ class Tokenizer
     /**
      * Returns the tokens for the next annotation.
      *
-     * @return array The tokens.
+     * @return array the tokens
      */
-    private function getAnnotation()
+    private function getAnnotation(): array
     {
         $this->match(DocLexer::T_AT);
 
@@ -115,7 +127,7 @@ class Tokenizer
         $identifier = $this->getIdentifier();
 
         // skip if necessary
-        if (in_array($identifier, $this->ignored)) {
+        if (in_array($identifier, $this->ignored, true)) {
             return null;
         }
 
@@ -125,8 +137,8 @@ class Tokenizer
 
             if (isset($this->aliases[$alias])) {
                 $identifier = $this->aliases[$alias]
-                            . '\\'
-                            . substr($identifier, $pos + 1);
+                            .'\\'
+                            .substr($identifier, $pos + 1);
             }
         } elseif (isset($this->aliases[$identifier])) {
             $identifier = $this->aliases[$identifier];
@@ -134,10 +146,10 @@ class Tokenizer
 
         // return the @, name, and any values found
         return array_merge(
-            array(
-                array(DocLexer::T_AT),
-                array(DocLexer::T_IDENTIFIER, $identifier)
-            ),
+            [
+                [DocLexer::T_AT],
+                [DocLexer::T_IDENTIFIER, $identifier],
+            ],
             $this->getValues()
         );
     }
@@ -145,14 +157,13 @@ class Tokenizer
     /**
      * Returns the tokens for all available annotations.
      *
-     * @return array The tokens.
+     * @return array the tokens
      */
-    private function getAnnotations()
+    private function getAnnotations(): array
     {
-        $tokens = array();
+        $tokens = [];
 
         while (null !== $this->lexer->lookahead) {
-
             // start at the @ symbol
             if (DocLexer::T_AT !== $this->lexer->lookahead['type']) {
                 $this->lexer->moveNext();
@@ -174,7 +185,7 @@ class Tokenizer
             // make sure we get a valid annotation name
             if ((null === ($glimpse = $this->lexer->glimpse()))
                 || ((DocLexer::T_NAMESPACE_SEPARATOR !== $glimpse['type'])
-                    && !in_array($glimpse['type'], self::$classIdentifiers))) {
+                    && !in_array($glimpse['type'], self::$classIdentifiers, true))) {
                 $this->lexer->moveNext();
 
                 continue;
@@ -192,21 +203,21 @@ class Tokenizer
     /**
      * Returns the tokens for the next array of values.
      *
-     * @return array The tokens.
+     * @return array the tokens
      */
-    private function getArray()
+    private function getArray(): array
     {
         $this->match(DocLexer::T_OPEN_CURLY_BRACES);
 
-        $tokens = array(
-            array(DocLexer::T_OPEN_CURLY_BRACES)
-        );
+        $tokens = [
+            [DocLexer::T_OPEN_CURLY_BRACES],
+        ];
 
         // check if empty array, bail early if it is
         if ($this->lexer->isNextToken(DocLexer::T_CLOSE_CURLY_BRACES)) {
             $this->match(DocLexer::T_CLOSE_CURLY_BRACES);
 
-            $tokens[] = array(DocLexer::T_CLOSE_CURLY_BRACES);
+            $tokens[] = [DocLexer::T_CLOSE_CURLY_BRACES];
 
             return $tokens;
         }
@@ -218,7 +229,7 @@ class Tokenizer
         while ($this->lexer->isNextToken(DocLexer::T_COMMA)) {
             $this->match(DocLexer::T_COMMA);
 
-            $tokens[] = array(DocLexer::T_COMMA);
+            $tokens[] = [DocLexer::T_COMMA];
 
             if ($this->lexer->isNextToken(DocLexer::T_CLOSE_CURLY_BRACES)) {
                 break;
@@ -230,7 +241,7 @@ class Tokenizer
         // end the collection
         $this->match(DocLexer::T_CLOSE_CURLY_BRACES);
 
-        $tokens[] = array(DocLexer::T_CLOSE_CURLY_BRACES);
+        $tokens[] = [DocLexer::T_CLOSE_CURLY_BRACES];
 
         return $tokens;
     }
@@ -238,51 +249,50 @@ class Tokenizer
     /**
      * Returns the tokens for the next array entry.
      *
-     * @return array The tokens.
+     * @return array the tokens
      */
-    private function getArrayEntry()
+    private function getArrayEntry(): array
     {
         $glimpse = $this->lexer->glimpse();
-        $tokens = array();
+        $tokens = [];
 
         // append the correct assignment token: ":" or "="
         if (DocLexer::T_COLON === $glimpse['type']) {
-            $token = array(DocLexer::T_COLON);
+            $token = [DocLexer::T_COLON];
         } elseif (DocLexer::T_EQUALS === $glimpse['type']) {
-            $token = array(DocLexer::T_EQUALS);
+            $token = [DocLexer::T_EQUALS];
         }
 
         // is it an assignment?
         if (isset($token)) {
-
             // if the key is a constant, hand off
             if ($this->lexer->isNextToken(DocLexer::T_IDENTIFIER)) {
                 $tokens = $this->getConstant();
 
-                // match only integer and string keys
+            // match only integer and string keys
             } else {
                 $this->matchAny(
-                    array(
+                    [
                         DocLexer::T_INTEGER,
-                        DocLexer::T_STRING
-                    )
+                        DocLexer::T_STRING,
+                    ]
                 );
 
-                $tokens = array(
-                    array(
+                $tokens = [
+                    [
                         $this->lexer->token['type'],
-                        $this->lexer->token['value']
-                    )
-                );
+                        $this->lexer->token['value'],
+                    ],
+                ];
             }
 
             $tokens[] = $token;
 
             $this->matchAny(
-                array(
+                [
                     DocLexer::T_COLON,
-                    DocLexer::T_EQUALS
-                )
+                    DocLexer::T_EQUALS,
+                ]
             );
         }
 
@@ -293,16 +303,16 @@ class Tokenizer
     /**
      * Returns the tokens for the next assigned (key/value) value.
      *
-     * @return array The tokens.
+     * @return array the tokens
      */
-    private function getAssignedValue()
+    private function getAssignedValue(): array
     {
         $this->match(DocLexer::T_IDENTIFIER);
 
-        $tokens = array(
-            array(DocLexer::T_IDENTIFIER, $this->lexer->token['value']),
-            array(DocLexer::T_EQUALS),
-        );
+        $tokens = [
+            [DocLexer::T_IDENTIFIER, $this->lexer->token['value']],
+            [DocLexer::T_EQUALS],
+        ];
 
         $this->match(DocLexer::T_EQUALS);
 
@@ -312,26 +322,26 @@ class Tokenizer
     /**
      * Returns the current constant value for the current annotation.
      *
-     * @return array The tokens.
+     * @return array the tokens
      */
-    private function getConstant()
+    private function getConstant(): array
     {
         $identifier = $this->getIdentifier();
-        $tokens = array();
+        $tokens = [];
 
         // check for a special constant type
         switch (strtolower($identifier)) {
             case 'true':
-                $tokens[] = array(DocLexer::T_TRUE, $identifier);
+                $tokens[] = [DocLexer::T_TRUE, $identifier];
                 break;
             case 'false':
-                $tokens[] = array(DocLexer::T_FALSE, $identifier);
+                $tokens[] = [DocLexer::T_FALSE, $identifier];
                 break;
             case 'null':
-                $tokens[] = array(DocLexer::T_NULL, $identifier);
+                $tokens[] = [DocLexer::T_NULL, $identifier];
                 break;
             default:
-                $tokens[] = array(DocLexer::T_IDENTIFIER, $identifier);
+                $tokens[] = [DocLexer::T_IDENTIFIER, $identifier];
         }
 
         return $tokens;
@@ -340,12 +350,12 @@ class Tokenizer
     /**
      * Returns the next identifier.
      *
-     * @return string The identifier.
-     *
      * @throws Exception
-     * @throws SyntaxException If a syntax error is found.
+     * @throws SyntaxException if a syntax error is found
+     *
+     * @return string the identifier
      */
-    private function getIdentifier()
+    private function getIdentifier(): string
     {
         // grab the first bit of the identifier
         if ($this->lexer->isNextTokenAny(self::$classIdentifiers)) {
@@ -369,7 +379,7 @@ class Tokenizer
             $this->match(DocLexer::T_NAMESPACE_SEPARATOR);
             $this->matchAny(self::$classIdentifiers);
 
-            $name .= '\\' . $this->lexer->token['value'];
+            $name .= '\\'.$this->lexer->token['value'];
         }
 
         return $name;
@@ -378,12 +388,12 @@ class Tokenizer
     /**
      * Returns the tokens for the next "plain" value.
      *
-     * @return array The tokens.
-     *
      * @throws Exception
-     * @throws SyntaxException If a syntax error is found.
+     * @throws SyntaxException if a syntax error is found
+     *
+     * @return array the tokens
      */
-    private function getPlainValue()
+    private function getPlainValue(): array
     {
         // check if array, then hand off
         if ($this->lexer->isNextToken(DocLexer::T_OPEN_CURLY_BRACES)) {
@@ -400,7 +410,7 @@ class Tokenizer
             return $this->getConstant();
         }
 
-        $tokens = array();
+        $tokens = [];
 
         // determine type, or throw syntax error if unrecognized
         switch ($this->lexer->lookahead['type']) {
@@ -412,10 +422,10 @@ class Tokenizer
             case DocLexer::T_TRUE:
                 $this->match($this->lexer->lookahead['type']);
 
-                $tokens[] = array(
+                $tokens[] = [
                     $this->lexer->token['type'],
-                    $this->lexer->token['value']
-                );
+                    $this->lexer->token['value'],
+                ];
 
                 break;
             default:
@@ -432,9 +442,9 @@ class Tokenizer
     /**
      * Returns the tokens for the next value.
      *
-     * @return array The tokens.
+     * @return array the tokens
      */
-    private function getValue()
+    private function getValue(): array
     {
         $glimpse = $this->lexer->glimpse();
 
@@ -449,26 +459,26 @@ class Tokenizer
     /**
      * Returns the tokens for all of the values for the current annotation.
      *
-     * @return array The tokens.
-     *
      * @throws Exception
-     * @throws SyntaxException If a syntax error is found.
+     * @throws SyntaxException if a syntax error is found
+     *
+     * @return array the tokens
      */
-    private function getValues()
+    private function getValues(): array
     {
-        $tokens = array();
+        $tokens = [];
 
         // check if a value list is given
         if ($this->lexer->isNextToken(DocLexer::T_OPEN_PARENTHESIS)) {
             $this->match(DocLexer::T_OPEN_PARENTHESIS);
 
-            $tokens[] = array(DocLexer::T_OPEN_PARENTHESIS);
+            $tokens[] = [DocLexer::T_OPEN_PARENTHESIS];
 
             // skip if we are given an empty list: @example()
             if ($this->lexer->isNextToken(DocLexer::T_CLOSE_PARENTHESIS)) {
                 $this->match(DocLexer::T_CLOSE_PARENTHESIS);
 
-                $tokens[] = array(DocLexer::T_CLOSE_PARENTHESIS);
+                $tokens[] = [DocLexer::T_CLOSE_PARENTHESIS];
 
                 return $tokens;
             }
@@ -485,7 +495,7 @@ class Tokenizer
         while ($this->lexer->isNextToken(DocLexer::T_COMMA)) {
             $this->match(DocLexer::T_COMMA);
 
-            $tokens[] = array(DocLexer::T_COMMA);
+            $tokens[] = [DocLexer::T_COMMA];
 
             $token = $this->lexer->lookahead;
             $value = $this->getValue();
@@ -501,7 +511,7 @@ class Tokenizer
         // end the list
         $this->match(DocLexer::T_CLOSE_PARENTHESIS);
 
-        $tokens[] = array(DocLexer::T_CLOSE_PARENTHESIS);
+        $tokens[] = [DocLexer::T_CLOSE_PARENTHESIS];
 
         return $tokens;
     }
@@ -509,14 +519,14 @@ class Tokenizer
     /**
      * Matches the next token and advances.
      *
-     * @param integer $token The next token to match.
-     *
-     * @return array|null TRUE if the next token matches, FALSE if not.
+     * @param int $token the next token to match
      *
      * @throws Exception
-     * @throws SyntaxException If a syntax error is found.
+     * @throws SyntaxException if a syntax error is found
+     *
+     * @return null|array TRUE if the next token matches, FALSE if not
      */
-    private function match($token)
+    private function match($token): ?array
     {
         if (!$this->lexer->isNextToken($token)) {
             throw SyntaxException::expectedToken(
@@ -532,20 +542,20 @@ class Tokenizer
     /**
      * Matches any one of the tokens and advances.
      *
-     * @param array $tokens The list of tokens.
-     *
-     * @return boolean TRUE if the next token matches, FALSE if not.
+     * @param array $tokens the list of tokens
      *
      * @throws Exception
-     * @throws SyntaxException If a syntax error is found.
+     * @throws SyntaxException if a syntax error is found
+     *
+     * @return bool TRUE if the next token matches, FALSE if not
      */
-    private function matchAny(array $tokens)
+    private function matchAny(array $tokens): bool
     {
         if (!$this->lexer->isNextTokenAny($tokens)) {
             throw SyntaxException::expectedToken(
                 implode(
                     ' or ',
-                    array_map(array($this->lexer, 'getLiteral'), $tokens)
+                    array_map([$this->lexer, 'getLiteral'], $tokens)
                 ),
                 null,
                 $this->lexer

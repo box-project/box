@@ -1,15 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Annotation;
 
 use Doctrine\Common\Annotations\DocLexer;
-use KevinGH\Box\Annotation\Exception\InvalidArgumentException;
 use KevinGH\Box\Annotation\Exception\InvalidTokenException;
 use KevinGH\Box\Annotation\Exception\LogicException;
-use KevinGH\Box\Annotation\Tokens;
 use PHPUnit\Framework\TestCase;
 use ReflectionObject;
 
+/**
+ * @covers \KevinGH\Box\Annotation\Tokens
+ */
 class TokensTest extends TestCase
 {
     /**
@@ -17,43 +30,43 @@ class TokensTest extends TestCase
      */
     private $tokens;
 
-    public function getTokenAndValue()
+    public function getTokenAndValue(): array
     {
-        return array(
-            array(array(DocLexer::T_FALSE, 'false'), false),
-            array(array(DocLexer::T_FLOAT, '1.23'), 1.23),
-            array(array(DocLexer::T_IDENTIFIER, 'CONSTANT'), 'CONSTANT'),
-            array(array(DocLexer::T_INTEGER, '123'), 123),
-            array(array(DocLexer::T_NULL, 'null'), null),
-            array(array(DocLexer::T_STRING, 'test'), 'test'),
-            array(array(DocLexer::T_TRUE, 'TRUE'), true),
-        );
+        return [
+            [[DocLexer::T_FALSE, 'false'], false],
+            [[DocLexer::T_FLOAT, '1.23'], 1.23],
+            [[DocLexer::T_IDENTIFIER, 'CONSTANT'], 'CONSTANT'],
+            [[DocLexer::T_INTEGER, '123'], 123],
+            [[DocLexer::T_NULL, 'null'], null],
+            [[DocLexer::T_STRING, 'test'], 'test'],
+            [[DocLexer::T_TRUE, 'TRUE'], true],
+        ];
     }
 
-    public function getTokenWithValue()
+    public function getTokenWithValue(): array
     {
-        return array(
-            array(DocLexer::T_FALSE),
-            array(DocLexer::T_FLOAT),
-            array(DocLexer::T_IDENTIFIER),
-            array(DocLexer::T_INTEGER),
-            array(DocLexer::T_NULL),
-            array(DocLexer::T_STRING),
-            array(DocLexer::T_TRUE),
-        );
+        return [
+            [DocLexer::T_FALSE],
+            [DocLexer::T_FLOAT],
+            [DocLexer::T_IDENTIFIER],
+            [DocLexer::T_INTEGER],
+            [DocLexer::T_NULL],
+            [DocLexer::T_STRING],
+            [DocLexer::T_TRUE],
+        ];
     }
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
-        $tokens = array(
-            1 => array(DocLexer::T_AT),
-            4 => array(DocLexer::T_IDENTIFIER, 'test')
-        );
+        $tokens = [
+            1 => [DocLexer::T_AT],
+            4 => [DocLexer::T_IDENTIFIER, 'test'],
+        ];
 
-        $expected = array(
-            0 => array(DocLexer::T_AT),
-            1 => array(DocLexer::T_IDENTIFIER, 'test')
-        );
+        $expected = [
+            0 => [DocLexer::T_AT],
+            1 => [DocLexer::T_IDENTIFIER, 'test'],
+        ];
 
         $this->assertEquals(
             $expected,
@@ -64,50 +77,50 @@ class TokensTest extends TestCase
         );
     }
 
-    public function testCount()
+    public function testCount(): void
     {
         $this->assertEquals(2, count($this->tokens));
     }
 
-    public function testCurrent()
+    public function testCurrent(): void
     {
         $this->assertEquals(
-            array(DocLexer::T_AT),
+            [DocLexer::T_AT],
             $this->tokens->current()
         );
     }
 
-    public function testGetArray()
+    public function testGetArray(): void
     {
         $this->assertEquals(
-            array(
-                array(DocLexer::T_AT),
-                array(DocLexer::T_IDENTIFIER, 'test')
-            ),
+            [
+                [DocLexer::T_AT],
+                [DocLexer::T_IDENTIFIER, 'test'],
+            ],
             $this->tokens->getArray()
         );
     }
 
-    public function testGetKey()
+    public function testGetKey(): void
     {
         $tokens = new Tokens(
-            array(
-                array(DocLexer::T_AT),
-                array(DocLexer::T_IDENTIFIER, 'test'),
-                array(DocLexer::T_OPEN_PARENTHESIS),
-                array(DocLexer::T_OPEN_CURLY_BRACES),
-                array(DocLexer::T_IDENTIFIER, 'a'),
-                array(DocLexer::T_EQUALS),
-                array(DocLexer::T_INTEGER, '123'),
-                array(DocLexer::T_COMMA),
-                array(DocLexer::T_IDENTIFIER, 'b'),
-                array(DocLexer::T_COLON),
-                array(DocLexer::T_INTEGER, '123'),
-                array(DocLexer::T_COMMA),
-                array(DocLexer::T_STRING, 'test'),
-                array(DocLexer::T_CLOSE_CURLY_BRACES),
-                array(DocLexer::T_CLOSE_PARENTHESIS),
-            )
+            [
+                [DocLexer::T_AT],
+                [DocLexer::T_IDENTIFIER, 'test'],
+                [DocLexer::T_OPEN_PARENTHESIS],
+                [DocLexer::T_OPEN_CURLY_BRACES],
+                [DocLexer::T_IDENTIFIER, 'a'],
+                [DocLexer::T_EQUALS],
+                [DocLexer::T_INTEGER, '123'],
+                [DocLexer::T_COMMA],
+                [DocLexer::T_IDENTIFIER, 'b'],
+                [DocLexer::T_COLON],
+                [DocLexer::T_INTEGER, '123'],
+                [DocLexer::T_COMMA],
+                [DocLexer::T_STRING, 'test'],
+                [DocLexer::T_CLOSE_CURLY_BRACES],
+                [DocLexer::T_CLOSE_PARENTHESIS],
+            ]
         );
 
         $this->assertNull($tokens->getKey());
@@ -118,48 +131,50 @@ class TokensTest extends TestCase
 
     /**
      * @dataProvider getTokenAndValue
+     *
+     * @param mixed $token
      */
-    public function testGetId($token)
+    public function testGetId($token): void
     {
-        $tokens = new Tokens(array($token));
+        $tokens = new Tokens([$token]);
 
         $this->assertSame($token[0], $tokens->getId(0));
     }
 
-    public function testGetIdNone()
+    public function testGetIdNone(): void
     {
-        $tokens = new Tokens(array());
+        $tokens = new Tokens([]);
 
         $this->assertNull($tokens->getId());
     }
 
-    public function testGetIdNoOffset()
+    public function testGetIdNoOffset(): void
     {
-        $token = array(DocLexer::T_IDENTIFIER, 'test');
-        $tokens = new Tokens(array($token));
+        $token = [DocLexer::T_IDENTIFIER, 'test'];
+        $tokens = new Tokens([$token]);
 
         $this->assertEquals($token[0], $tokens->getId());
     }
 
-    public function testGetToken()
+    public function testGetToken(): void
     {
         $this->assertEquals(
-            array(DocLexer::T_AT),
+            [DocLexer::T_AT],
             $this->tokens->getToken(0)
         );
     }
 
-    public function testGetTokenDefault()
+    public function testGetTokenDefault(): void
     {
-        $default = array(DocLexer::T_FALSE, '123');
-        $tokens = new Tokens(array());
+        $default = [DocLexer::T_FALSE, '123'];
+        $tokens = new Tokens([]);
 
         $this->assertEquals($default, $tokens->getToken(0, $default));
     }
 
-    public function testGetTokenInvalid()
+    public function testGetTokenInvalid(): void
     {
-        $tokens = new Tokens(array(array('test')));
+        $tokens = new Tokens([['test']]);
 
         try {
             $tokens->getToken(0);
@@ -173,9 +188,9 @@ class TokensTest extends TestCase
         }
     }
 
-    public function testGetTokenMissingId()
+    public function testGetTokenMissingId(): void
     {
-        $tokens = new Tokens(array(array()));
+        $tokens = new Tokens([[]]);
 
         try {
             $tokens->getToken(0);
@@ -191,10 +206,12 @@ class TokensTest extends TestCase
 
     /**
      * @dataProvider getTokenWithValue
+     *
+     * @param mixed $token
      */
-    public function testGetTokenMissingValue($token)
+    public function testGetTokenMissingValue($token): void
     {
-        $tokens = new Tokens(array(array($token)));
+        $tokens = new Tokens([[$token]]);
 
         try {
             $tokens->current(0);
@@ -208,41 +225,44 @@ class TokensTest extends TestCase
         }
     }
 
-    public function testGetTokenNoOffset()
+    public function testGetTokenNoOffset(): void
     {
-        $token = array(DocLexer::T_IDENTIFIER, 'test');
-        $tokens = new Tokens(array($token));
+        $token = [DocLexer::T_IDENTIFIER, 'test'];
+        $tokens = new Tokens([$token]);
 
         $this->assertEquals($token, $tokens->getToken());
     }
 
     /**
      * @dataProvider getTokenAndValue
+     *
+     * @param mixed $token
+     * @param mixed $expected
      */
-    public function testGetValue($token, $expected)
+    public function testGetValue($token, $expected): void
     {
-        $tokens = new Tokens(array($token));
+        $tokens = new Tokens([$token]);
 
         $this->assertSame($expected, $tokens->getValue(0));
     }
 
-    public function testGetValueNoOffset()
+    public function testGetValueNoOffset(): void
     {
         $tokens = new Tokens(
-            array(
-                array(DocLexer::T_IDENTIFIER, 'test')
-            )
+            [
+                [DocLexer::T_IDENTIFIER, 'test'],
+            ]
         );
 
         $this->assertEquals('test', $tokens->getValue());
     }
 
-    public function testGetValueNotExpected()
+    public function testGetValueNotExpected(): void
     {
         $tokens = new Tokens(
-            array(
-                array(DocLexer::T_AT)
-            )
+            [
+                [DocLexer::T_AT],
+            ]
         );
 
         try {
@@ -257,7 +277,7 @@ class TokensTest extends TestCase
         }
     }
 
-    public function testKey()
+    public function testKey(): void
     {
         $this->assertEquals(0, $this->tokens->key());
     }
@@ -265,26 +285,26 @@ class TokensTest extends TestCase
     /**
      * @depends testKey
      */
-    public function testNext()
+    public function testNext(): void
     {
         $this->assertEquals(
-            array(DocLexer::T_IDENTIFIER, 'test'),
+            [DocLexer::T_IDENTIFIER, 'test'],
             $this->tokens->next()
         );
 
         $this->assertEquals(1, $this->tokens->key());
     }
 
-    public function testOffsetExists()
+    public function testOffsetExists(): void
     {
         $this->assertTrue($this->tokens->offsetExists(1));
         $this->assertFalse($this->tokens->offsetExists(2));
     }
 
-    public function testOffsetGet()
+    public function testOffsetGet(): void
     {
         $this->assertEquals(
-            array(DocLexer::T_IDENTIFIER, 'test'),
+            [DocLexer::T_IDENTIFIER, 'test'],
             $this->tokens->offsetGet(1)
         );
     }
@@ -293,7 +313,7 @@ class TokensTest extends TestCase
      * @expectedException \KevinGH\Box\Annotation\Exception\OutOfRangeException
      * @expectedExceptionMessage  No value is set at offset 2.
      */
-    public function testOffsetGetNotSet()
+    public function testOffsetGetNotSet(): void
     {
         $this->tokens->offsetGet(2);
     }
@@ -302,7 +322,7 @@ class TokensTest extends TestCase
      * @expectedException \KevinGH\Box\Annotation\Exception\LogicException
      * @expectedExceptionMessage New values cannot be added to the list of tokens.
      */
-    public function testOffsetSet()
+    public function testOffsetSet(): void
     {
         $this->tokens->offsetSet(1, 123);
     }
@@ -311,7 +331,7 @@ class TokensTest extends TestCase
      * @expectedException \KevinGH\Box\Annotation\Exception\LogicException
      * @expectedExceptionMessage Existing tokens cannot be removed from the list of tokens.
      */
-    public function testOffsetUnset()
+    public function testOffsetUnset(): void
     {
         $this->tokens->offsetUnset(1);
     }
@@ -320,7 +340,7 @@ class TokensTest extends TestCase
      * @depends testKey
      * @depends testNext
      */
-    public function testRewind()
+    public function testRewind(): void
     {
         $this->tokens->next();
         $this->tokens->rewind();
@@ -331,7 +351,7 @@ class TokensTest extends TestCase
     /**
      * @depends testNext
      */
-    public function testValid()
+    public function testValid(): void
     {
         $this->tokens->next();
 
@@ -342,16 +362,21 @@ class TokensTest extends TestCase
         $this->assertFalse($this->tokens->valid());
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokens = new Tokens(
-            array(
-                array(DocLexer::T_AT),
-                array(DocLexer::T_IDENTIFIER, 'test')
-            )
+            [
+                [DocLexer::T_AT],
+                [DocLexer::T_IDENTIFIER, 'test'],
+            ]
         );
     }
 
+    /**
+     * @param mixed $object
+     *
+     * @return mixed The property value
+     */
     final protected function getPropertyValue($object, string $property)
     {
         $reflectionObject = new ReflectionObject($object);
@@ -366,7 +391,7 @@ class TokensTest extends TestCase
         return $propertyReflection->getValue($object);
     }
 
-    final protected function setPropertyValue($object, string $property, $value)
+    final protected function setPropertyValue($object, string $property, $value): void
     {
         $reflectionObject = new ReflectionObject($object);
 

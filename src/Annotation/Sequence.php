@@ -1,5 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Annotation;
 
 use Doctrine\Common\Annotations\DocLexer;
@@ -29,8 +41,8 @@ class Sequence extends Tokens
      *
      * @var array
      */
-    private static $sequences = array(
-        DocLexer::T_AT => array(
+    private static $sequences = [
+        DocLexer::T_AT => [
             DocLexer::T_CLOSE_PARENTHESIS => true,
             DocLexer::T_COLON => true,
             DocLexer::T_COMMA => true,
@@ -38,8 +50,8 @@ class Sequence extends Tokens
             DocLexer::T_IDENTIFIER => DocLexer::T_AT,
             DocLexer::T_OPEN_CURLY_BRACES => true,
             DocLexer::T_OPEN_PARENTHESIS => true,
-        ),
-        DocLexer::T_CLOSE_CURLY_BRACES => array(
+        ],
+        DocLexer::T_CLOSE_CURLY_BRACES => [
             DocLexer::T_CLOSE_CURLY_BRACES => true,
             DocLexer::T_CLOSE_PARENTHESIS => true,
             DocLexer::T_COMMA => true,
@@ -51,8 +63,8 @@ class Sequence extends Tokens
             DocLexer::T_OPEN_CURLY_BRACES => true,
             DocLexer::T_STRING => true,
             DocLexer::T_TRUE => true,
-        ),
-        DocLexer::T_CLOSE_PARENTHESIS => array(
+        ],
+        DocLexer::T_CLOSE_PARENTHESIS => [
             DocLexer::T_CLOSE_CURLY_BRACES => true,
             DocLexer::T_CLOSE_PARENTHESIS => true,
             DocLexer::T_COMMA => true,
@@ -64,13 +76,13 @@ class Sequence extends Tokens
             DocLexer::T_OPEN_PARENTHESIS => true,
             DocLexer::T_STRING => true,
             DocLexer::T_TRUE => true,
-        ),
-        DocLexer::T_COLON => array(
+        ],
+        DocLexer::T_COLON => [
             DocLexer::T_IDENTIFIER => true,
             DocLexer::T_INTEGER => true,
             DocLexer::T_STRING => true,
-        ),
-        DocLexer::T_COMMA => array(
+        ],
+        DocLexer::T_COMMA => [
             DocLexer::T_CLOSE_CURLY_BRACES => true,
             DocLexer::T_CLOSE_PARENTHESIS => true,
             DocLexer::T_FALSE => true,
@@ -80,83 +92,83 @@ class Sequence extends Tokens
             DocLexer::T_NULL => true,
             DocLexer::T_STRING => true,
             DocLexer::T_TRUE => true,
-        ),
-        DocLexer::T_EQUALS => array(
+        ],
+        DocLexer::T_EQUALS => [
             DocLexer::T_IDENTIFIER => true,
             DocLexer::T_INTEGER => true,
             DocLexer::T_STRING => true,
-        ),
-        DocLexer::T_FALSE => array(
+        ],
+        DocLexer::T_FALSE => [
             DocLexer::T_COLON => true,
             DocLexer::T_COMMA => true,
             DocLexer::T_EQUALS => true,
             DocLexer::T_OPEN_CURLY_BRACES => true,
             DocLexer::T_OPEN_PARENTHESIS => true,
-        ),
-        DocLexer::T_FLOAT => array(
+        ],
+        DocLexer::T_FLOAT => [
             DocLexer::T_COLON => true,
             DocLexer::T_COMMA => true,
             DocLexer::T_EQUALS => true,
             DocLexer::T_OPEN_CURLY_BRACES => true,
             DocLexer::T_OPEN_PARENTHESIS => true,
-        ),
-        DocLexer::T_IDENTIFIER => array(
+        ],
+        DocLexer::T_IDENTIFIER => [
             DocLexer::T_AT => true,
             DocLexer::T_COLON => true,
             DocLexer::T_COMMA => true,
             DocLexer::T_EQUALS => true,
             DocLexer::T_OPEN_CURLY_BRACES => true,
             DocLexer::T_OPEN_PARENTHESIS => true,
-        ),
-        DocLexer::T_INTEGER => array(
+        ],
+        DocLexer::T_INTEGER => [
             DocLexer::T_COLON => true,
             DocLexer::T_COMMA => true,
             DocLexer::T_EQUALS => true,
             DocLexer::T_OPEN_CURLY_BRACES => true,
             DocLexer::T_OPEN_PARENTHESIS => true,
-        ),
+        ],
         DocLexer::T_NAMESPACE_SEPARATOR => false,
         DocLexer::T_NONE => false,
-        DocLexer::T_NULL => array(
+        DocLexer::T_NULL => [
             DocLexer::T_COLON => true,
             DocLexer::T_COMMA => true,
             DocLexer::T_EQUALS => true,
             DocLexer::T_OPEN_CURLY_BRACES => true,
             DocLexer::T_OPEN_PARENTHESIS => true,
-        ),
-        DocLexer::T_OPEN_CURLY_BRACES => array(
+        ],
+        DocLexer::T_OPEN_CURLY_BRACES => [
             DocLexer::T_COLON => true,
             DocLexer::T_COMMA => true,
             DocLexer::T_EQUALS => true,
             DocLexer::T_OPEN_CURLY_BRACES => true,
             DocLexer::T_OPEN_PARENTHESIS => true,
-        ),
-        DocLexer::T_OPEN_PARENTHESIS => array(
+        ],
+        DocLexer::T_OPEN_PARENTHESIS => [
             DocLexer::T_IDENTIFIER => DocLexer::T_AT,
-        ),
-        DocLexer::T_STRING => array(
+        ],
+        DocLexer::T_STRING => [
             DocLexer::T_COLON => true,
             DocLexer::T_COMMA => true,
             DocLexer::T_EQUALS => true,
             DocLexer::T_OPEN_CURLY_BRACES => true,
             DocLexer::T_OPEN_PARENTHESIS => true,
-        ),
-        DocLexer::T_TRUE => array(
+        ],
+        DocLexer::T_TRUE => [
             DocLexer::T_COLON => true,
             DocLexer::T_COMMA => true,
             DocLexer::T_EQUALS => true,
             DocLexer::T_OPEN_CURLY_BRACES => true,
             DocLexer::T_OPEN_PARENTHESIS => true,
-        ),
-    );
+        ],
+    ];
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
-     * @param array|Tokens $tokens The list of tokens.
+     * @param array|Tokens $tokens the list of tokens
      *
-     * @throws InvalidArgumentException If the $tokens argument is not either
-     *                                  an array or instance of Tokens.
+     * @throws InvalidArgumentException if the $tokens argument is not either
+     *                                  an array or instance of Tokens
      */
     public function __construct($tokens)
     {
@@ -172,10 +184,10 @@ class Sequence extends Tokens
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @throws Exception
-     * @throws UnexpectedTokenException If the token is not expected.
+     * @throws UnexpectedTokenException if the token is not expected
      */
     public function current()
     {
@@ -194,7 +206,8 @@ class Sequence extends Tokens
             );
 
             // not in the list of expected tokens?
-        } elseif ((empty($before) && (DocLexer::T_AT !== $token[0]))
+        }
+        if ((empty($before) && (DocLexer::T_AT !== $token[0]))
             || ($before && !isset(self::$sequences[$token[0]][$before[0]]))) {
             throw UnexpectedTokenException::create(
                 'Token #%d (%d) is not expected here.',
@@ -203,7 +216,8 @@ class Sequence extends Tokens
             );
 
             // before token has another before requirement?
-        } elseif (isset(self::$sequences[$token[0]][$before[0]])
+        }
+        if (isset(self::$sequences[$token[0]][$before[0]])
             && (true !== self::$sequences[$token[0]][$before[0]])) {
             $ancestor = isset($this[$offset - 2])
                       ? $this[$offset - 2]

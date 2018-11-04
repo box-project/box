@@ -1,32 +1,47 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Annotation;
 
 use Doctrine\Common\Annotations\DocLexer;
 use KevinGH\Box\Annotation\Exception\InvalidArgumentException;
 use KevinGH\Box\Annotation\Exception\UnexpectedTokenException;
-use KevinGH\Box\Annotation\Sequence;
-use KevinGH\Box\Annotation\TestTokens;
-use KevinGH\Box\Annotation\Tokens;
 
+/**
+ * @covers \KevinGH\Box\Annotation\Sequence
+ */
 class SequenceTest extends TestTokens
 {
-    public function getTokens()
+    /**
+     * {@inheritdoc}
+     */
+    public function getTokens(): array
     {
         $tokens = parent::getTokens();
 
         foreach ($tokens as $i => $list) {
-            $tokens[$i] = array($list);
+            $tokens[$i] = [$list];
         }
 
         return $tokens;
     }
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
-        $tokens = array(
-            array(123)
-        );
+        $tokens = [
+            [123],
+        ];
 
         $sequence = new Sequence($tokens);
 
@@ -36,11 +51,11 @@ class SequenceTest extends TestTokens
         );
     }
 
-    public function testConstructWithTokens()
+    public function testConstructWithTokens(): void
     {
-        $tokens = array(
-            array(123)
-        );
+        $tokens = [
+            [123],
+        ];
 
         $sequence = new Sequence(
             new Tokens($tokens)
@@ -52,7 +67,7 @@ class SequenceTest extends TestTokens
         );
     }
 
-    public function testConstructInvalid()
+    public function testConstructInvalid(): void
     {
         try {
             new Sequence(123);
@@ -68,8 +83,10 @@ class SequenceTest extends TestTokens
 
     /**
      * @dataProvider getTokens
+     *
+     * @param mixed $tokens
      */
-    public function testCurrent($tokens)
+    public function testCurrent($tokens): void
     {
         $sequence = new Sequence($tokens);
 
@@ -80,12 +97,12 @@ class SequenceTest extends TestTokens
         }
     }
 
-    public function testCurrentUnexpected()
+    public function testCurrentUnexpected(): void
     {
         $sequence = new Sequence(
-            array(
-                array(DocLexer::T_IDENTIFIER, 'test')
-            )
+            [
+                [DocLexer::T_IDENTIFIER, 'test'],
+            ]
         );
 
         try {
@@ -100,13 +117,13 @@ class SequenceTest extends TestTokens
         }
     }
 
-    public function testCurrentUnexpectedDeeper()
+    public function testCurrentUnexpectedDeeper(): void
     {
         $sequence = new Sequence(
-            array(
-                array(DocLexer::T_IDENTIFIER, 'test'),
-                array(DocLexer::T_OPEN_PARENTHESIS),
-            )
+            [
+                [DocLexer::T_IDENTIFIER, 'test'],
+                [DocLexer::T_OPEN_PARENTHESIS],
+            ]
         );
 
         $sequence->next();
@@ -123,12 +140,12 @@ class SequenceTest extends TestTokens
         }
     }
 
-    public function testCurrentUnused()
+    public function testCurrentUnused(): void
     {
         $sequence = new Sequence(
-            array(
-                array(DocLexer::T_NONE)
-            )
+            [
+                [DocLexer::T_NONE],
+            ]
         );
 
         try {
