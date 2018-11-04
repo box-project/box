@@ -5,7 +5,7 @@ namespace KevinGH\Box\Annotation\Convert;
 use Doctrine\Common\Annotations\DocLexer;
 use KevinGH\Box\Annotation\TestConvert;
 use KevinGH\Box\Annotation\Tokens;
-use Herrera\PHPUnit\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class AbstractConvertTest extends TestCase
 {

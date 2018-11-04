@@ -3,6 +3,7 @@
 namespace KevinGH\Box\Annotation;
 
 use Doctrine\Common\Annotations\DocLexer;
+use KevinGH\Box\Annotation\Exception\SyntaxException;
 use KevinGH\Box\Annotation\TestTokens;
 use KevinGH\Box\Annotation\Tokenizer;
 
@@ -624,54 +625,74 @@ DOCBLOCK
 
     public function testParseInvalidArrayCommas()
     {
-        $this->setExpectedException(
-            'Herrera\\Annotations\\Exception\\SyntaxException',
-            'Expected Value, received \'@\' at position 5.'
-        );
-
         $this->tokenizer->ignore(array('ignored'));
 
-        $this->tokenizer->parse('/**@a(1,@ignored)*/');
+        try {
+            $this->tokenizer->parse('/**@a(1,@ignored)*/');
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (SyntaxException $exception) {
+            $this->assertSame(
+                'Expected Value, received \'@\' at position 5.',
+                $exception->getMessage()
+            );
+        }
     }
 
     public function testParseInvalidIdentifier()
     {
-        $this->setExpectedException(
-            'Herrera\\Annotations\\Exception\\SyntaxException',
-            'Expected namespace separator or identifier, received \'\\\' at position 1.'
-        );
+        try {
+            $this->tokenizer->parse('/**@\\*/');
 
-        $this->tokenizer->parse('/**@\\*/');
+            $this->fail('Expected exception to be thrown.');
+        } catch (SyntaxException $exception) {
+            $this->assertSame(
+                'Expected namespace separator or identifier, received \'\\\' at position 1.',
+                $exception->getMessage()
+            );
+        }
     }
 
     public function testParseInvalidPlainValue()
     {
-        $this->setExpectedException(
-            'Herrera\\Annotations\\Exception\\SyntaxException',
-            'Expected PlainValue, received \'!\' at position 3.'
-        );
+        try {
+            $this->tokenizer->parse('/**@a(!)*/');
 
-        $this->tokenizer->parse('/**@a(!)*/');
+            $this->fail('Expected exception to be thrown.');
+        } catch (SyntaxException $exception) {
+            $this->assertSame(
+                'Expected PlainValue, received \'!\' at position 3.',
+                $exception->getMessage()
+            );
+        }
     }
 
     public function testParseInvalidMatch()
     {
-        $this->setExpectedException(
-            'Herrera\\Annotations\\Exception\\SyntaxException',
-            'Expected Doctrine\\Common\\Annotations\\DocLexer::T_CLOSE_CURLY_BRACES, received \')\' at position 5.'
-        );
+        try {
+            $this->tokenizer->parse('/**@a({x)');
 
-        $this->tokenizer->parse('/**@a({x)');
+            $this->fail('Expected exception to be thrown.');
+        } catch (SyntaxException $exception) {
+            $this->assertSame(
+                'Expected Doctrine\\Common\\Annotations\\DocLexer::T_CLOSE_CURLY_BRACES, received \')\' at position 5.',
+                $exception->getMessage()
+            );
+        }
     }
 
     public function testParseInvalidMatchAny()
     {
-        $this->setExpectedException(
-            'Herrera\\Annotations\\Exception\\SyntaxException',
-            'Expected Doctrine\\Common\\Annotations\\DocLexer::T_INTEGER or Doctrine\\Common\\Annotations\\DocLexer::T_STRING, received \'@\' at position 4.'
-        );
+        try {
+            $this->tokenizer->parse('/**@a({@:1})');
 
-        $this->tokenizer->parse('/**@a({@:1})');
+            $this->fail('Expected exception to be thrown.');
+        } catch (SyntaxException $exception) {
+            $this->assertSame(
+                'Expected Doctrine\\Common\\Annotations\\DocLexer::T_INTEGER or Doctrine\\Common\\Annotations\\DocLexer::T_STRING, received \'@\' at position 4.',
+                $exception->getMessage()
+            );
+        }
     }
 
     public function testIgnored()

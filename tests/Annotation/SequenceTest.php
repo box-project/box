@@ -3,6 +3,8 @@
 namespace KevinGH\Box\Annotation;
 
 use Doctrine\Common\Annotations\DocLexer;
+use KevinGH\Box\Annotation\Exception\InvalidArgumentException;
+use KevinGH\Box\Annotation\Exception\UnexpectedTokenException;
 use KevinGH\Box\Annotation\Sequence;
 use KevinGH\Box\Annotation\TestTokens;
 use KevinGH\Box\Annotation\Tokens;
@@ -52,12 +54,16 @@ class SequenceTest extends TestTokens
 
     public function testConstructInvalid()
     {
-        $this->setExpectedException(
-            'Herrera\\Annotations\\Exception\\InvalidArgumentException',
-            'The $tokens argument must be an array or instance of Tokens.'
-        );
+        try {
+            new Sequence(123);
 
-        new Sequence(123);
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'The $tokens argument must be an array or instance of Tokens.',
+                $exception->getMessage()
+            );
+        }
     }
 
     /**
@@ -82,12 +88,16 @@ class SequenceTest extends TestTokens
             )
         );
 
-        $this->setExpectedException(
-            'Herrera\\Annotations\\Exception\\UnexpectedTokenException',
-            'Token #0 (100) is not expected here.'
-        );
+        try {
+            $sequence->current();
 
-        $sequence->current();
+            $this->fail('Expected exception to be thrown.');
+        } catch (UnexpectedTokenException $exception) {
+            $this->assertSame(
+                'Token #0 (100) is not expected here.',
+                $exception->getMessage()
+            );
+        }
     }
 
     public function testCurrentUnexpectedDeeper()
@@ -99,13 +109,18 @@ class SequenceTest extends TestTokens
             )
         );
 
-        $this->setExpectedException(
-            'Herrera\\Annotations\\Exception\\UnexpectedTokenException',
-            'Token #1 (109) is not expected here.'
-        );
-
         $sequence->next();
-        $sequence->current();
+
+        try {
+            $sequence->current();
+
+            $this->fail('Expected exception to be thrown.');
+        } catch (UnexpectedTokenException $exception) {
+            $this->assertSame(
+                'Token #1 (109) is not expected here.',
+                $exception->getMessage()
+            );
+        }
     }
 
     public function testCurrentUnused()
@@ -116,11 +131,15 @@ class SequenceTest extends TestTokens
             )
         );
 
-        $this->setExpectedException(
-            'Herrera\\Annotations\\Exception\\UnexpectedTokenException',
-            'Token #0 (1) is not used by this library.'
-        );
+        try {
+            $sequence->current();
 
-        $sequence->current();
+            $this->fail('Expected exception to be thrown.');
+        } catch (UnexpectedTokenException $exception) {
+            $this->assertSame(
+                'Token #0 (1) is not used by this library.',
+                $exception->getMessage()
+            );
+        }
     }
 }

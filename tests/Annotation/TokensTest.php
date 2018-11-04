@@ -3,8 +3,12 @@
 namespace KevinGH\Box\Annotation;
 
 use Doctrine\Common\Annotations\DocLexer;
+use KevinGH\Box\Annotation\Exception\InvalidArgumentException;
+use KevinGH\Box\Annotation\Exception\InvalidTokenException;
+use KevinGH\Box\Annotation\Exception\LogicException;
 use KevinGH\Box\Annotation\Tokens;
-use Herrera\PHPUnit\TestCase;
+use PHPUnit\Framework\TestCase;
+use ReflectionObject;
 
 class TokensTest extends TestCase
 {
@@ -157,24 +161,32 @@ class TokensTest extends TestCase
     {
         $tokens = new Tokens(array(array('test')));
 
-        $this->setExpectedException(
-            'Herrera\\Annotations\\Exception\\InvalidTokenException',
-            'Token #0 does not have a valid token identifier.'
-        );
+        try {
+            $tokens->getToken(0);
 
-        $tokens->getToken(0);
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidTokenException $exception) {
+            $this->assertSame(
+                'Token #0 does not have a valid token identifier.',
+                $exception->getMessage()
+            );
+        }
     }
 
     public function testGetTokenMissingId()
     {
         $tokens = new Tokens(array(array()));
 
-        $this->setExpectedException(
-            'Herrera\\Annotations\\Exception\\InvalidTokenException',
-            'Token #0 is missing its token identifier.'
-        );
+        try {
+            $tokens->getToken(0);
 
-        $tokens->getToken(0);
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidTokenException $exception) {
+            $this->assertSame(
+                'Token #0 is missing its token identifier.',
+                $exception->getMessage()
+            );
+        }
     }
 
     /**
@@ -184,12 +196,16 @@ class TokensTest extends TestCase
     {
         $tokens = new Tokens(array(array($token)));
 
-        $this->setExpectedException(
-            'Herrera\\Annotations\\Exception\\InvalidTokenException',
-            "Token #0 ($token) is missing its value."
-        );
+        try {
+            $tokens->current(0);
 
-        $tokens->current(0);
+            $this->fail('Expected exception to be thrown.');
+        } catch (InvalidTokenException $exception) {
+            $this->assertSame(
+                "Token #0 ($token) is missing its value.",
+                $exception->getMessage()
+            );
+        }
     }
 
     public function testGetTokenNoOffset()
@@ -229,12 +245,16 @@ class TokensTest extends TestCase
             )
         );
 
-        $this->setExpectedException(
-            'Herrera\\Annotations\\Exception\\LogicException',
-            'Token #0 (101) is not expected to have a value.'
-        );
+        try {
+            $tokens->getValue(0);
 
-        $tokens->getValue(0);
+            $this->fail('Expected exception to be thrown.');
+        } catch (LogicException $exception) {
+            $this->assertSame(
+                'Token #0 (101) is not expected to have a value.',
+                $exception->getMessage()
+            );
+        }
     }
 
     public function testKey()
@@ -330,5 +350,33 @@ class TokensTest extends TestCase
                 array(DocLexer::T_IDENTIFIER, 'test')
             )
         );
+    }
+
+    final protected function getPropertyValue($object, string $property)
+    {
+        $reflectionObject = new ReflectionObject($object);
+
+        while (false === $reflectionObject->hasProperty($property) && false !== $reflectionObject->getParentClass()) {
+            $reflectionObject = $reflectionObject->getParentClass();
+        }
+
+        $propertyReflection = $reflectionObject->getProperty($property);
+        $propertyReflection->setAccessible(true);
+
+        return $propertyReflection->getValue($object);
+    }
+
+    final protected function setPropertyValue($object, string $property, $value)
+    {
+        $reflectionObject = new ReflectionObject($object);
+
+        while (false === $reflectionObject->hasProperty($property) && false !== $reflectionObject->getParentClass()) {
+            $reflectionObject = $reflectionObject->getParentClass();
+        }
+
+        $propertyReflection = $reflectionObject->getProperty($property);
+        $propertyReflection->setAccessible(true);
+
+        $propertyReflection->setValue($object, $value);
     }
 }

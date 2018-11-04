@@ -3,7 +3,8 @@
 namespace KevinGH\Box\Annotation;
 
 use Doctrine\Common\Annotations\DocLexer;
-use Herrera\PHPUnit\TestCase;
+use PHPUnit\Framework\TestCase;
+use ReflectionObject;
 
 /**
  * Includes a data provider for testing against a battery of tokens.
@@ -786,5 +787,33 @@ class TestTokens extends TestCase
         );
 
         return $tokens;
+    }
+
+    final protected function getPropertyValue($object, string $property)
+    {
+        $reflectionObject = new ReflectionObject($object);
+
+        while (false === $reflectionObject->hasProperty($property) && false !== $reflectionObject->getParentClass()) {
+            $reflectionObject = $reflectionObject->getParentClass();
+        }
+
+        $propertyReflection = $reflectionObject->getProperty($property);
+        $propertyReflection->setAccessible(true);
+
+        return $propertyReflection->getValue($object);
+    }
+
+    final protected function setPropertyValue($object, string $property, $value)
+    {
+        $reflectionObject = new ReflectionObject($object);
+
+        while (false === $reflectionObject->hasProperty($property) && false !== $reflectionObject->getParentClass()) {
+            $reflectionObject = $reflectionObject->getParentClass();
+        }
+
+        $propertyReflection = $reflectionObject->getProperty($property);
+        $propertyReflection->setAccessible(true);
+
+        $propertyReflection->setValue($object, $value);
     }
 }
