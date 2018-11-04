@@ -1,8 +1,8 @@
 <?php
 
-namespace _HumbugBoxaadb73f2427d\Composer\Semver;
+namespace _HumbugBox9d880d18ae09\Composer\Semver;
 
-use _HumbugBoxaadb73f2427d\Composer\Semver\Constraint\Constraint;
+use _HumbugBox9d880d18ae09\Composer\Semver\Constraint\Constraint;
 class Comparator
 {
     /**
@@ -67,7 +67,7 @@ class Comparator
     */
     public static function compare($version1, $operator, $version2)
     {
-        $constraint = new \_HumbugBoxaadb73f2427d\Composer\Semver\Constraint\Constraint($operator, $version2);
-        return $constraint->matches(new \_HumbugBoxaadb73f2427d\Composer\Semver\Constraint\Constraint('==', $version1));
+        $constraint = new \_HumbugBox9d880d18ae09\Composer\Semver\Constraint\Constraint($operator, $version2);
+        return $constraint->matches(new \_HumbugBox9d880d18ae09\Composer\Semver\Constraint\Constraint('==', $version1));
     }
 }

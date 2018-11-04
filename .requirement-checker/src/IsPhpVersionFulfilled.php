@@ -1,12 +1,12 @@
 <?php
 
-namespace _HumbugBoxaadb73f2427d\KevinGH\RequirementChecker;
+namespace _HumbugBox9d880d18ae09\KevinGH\RequirementChecker;
 
-use _HumbugBoxaadb73f2427d\Composer\Semver\Semver;
+use _HumbugBox9d880d18ae09\Composer\Semver\Semver;
 /**
 @private
 */
-final class IsPhpVersionFulfilled implements \_HumbugBoxaadb73f2427d\KevinGH\RequirementChecker\IsFulfilled
+final class IsPhpVersionFulfilled implements \_HumbugBox9d880d18ae09\KevinGH\RequirementChecker\IsFulfilled
 {
     private $requiredPhpVersion;
     /**
@@ -18,6 +18,6 @@ final class IsPhpVersionFulfilled implements \_HumbugBoxaadb73f2427d\KevinGH\Req
     }
     public function __invoke()
     {
-        return \_HumbugBoxaadb73f2427d\Composer\Semver\Semver::satisfies(\sprintf('%d.%d.%d', \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION, \PHP_RELEASE_VERSION), $this->requiredPhpVersion);
+        return \_HumbugBox9d880d18ae09\Composer\Semver\Semver::satisfies(\sprintf('%d.%d.%d', \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION, \PHP_RELEASE_VERSION), $this->requiredPhpVersion);
     }
 }
