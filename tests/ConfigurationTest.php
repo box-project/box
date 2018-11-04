@@ -18,7 +18,7 @@ use Closure;
 use DateTimeImmutable;
 use Generator;
 use InvalidArgumentException;
-use KevinGH\Box\Annotation\Tokenizer;
+use KevinGH\Box\Annotation\DocblockParser;
 use KevinGH\Box\Compactor\DummyCompactor;
 use KevinGH\Box\Compactor\InvalidCompactor;
 use KevinGH\Box\Compactor\Php;
@@ -667,7 +667,7 @@ EOF
 
         $tokenizer = (
             Closure::bind(
-                function (Php $phpCompactor): Tokenizer {
+                function (Php $phpCompactor): DocblockParser {
                     return $phpCompactor->tokenizer;
                 },
                 null,
@@ -679,11 +679,11 @@ EOF
 
         $ignored = (
             Closure::bind(
-                function (Tokenizer $tokenizer): array {
+                function (DocblockParser $tokenizer): array {
                     return $tokenizer->ignored;
                 },
                 null,
-                Tokenizer::class
+                DocblockParser::class
             )
         )($tokenizer);
 

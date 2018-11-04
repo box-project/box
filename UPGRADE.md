@@ -1,3 +1,24 @@
+# From 3.1.3 to 3.2.0
+
+- Changes to the `Php` compactor:
+    - Invalid annotations are no longer recognised as annotations:
+        ```php
+        /**
+          * @Annotation ()
+          * @Namespaced\ Annotation
+          */
+        ```
+        
+        Will be transformed into:
+        
+        ```php
+        /**
+          * @Annotation
+          * @Namespaced
+          */
+        ```
+
+
 # From 2.7 to 3.0
 
 The change from 2.x to 3.x is quite significant but should be really smooth for the user. The main changes are:

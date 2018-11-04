@@ -14,10 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-use Doctrine\Common\Annotations\DocLexer;
 use Exception;
 use KevinGH\Box\Annotation\Convert\ToString;
-use KevinGH\Box\Annotation\Tokenizer;
+use KevinGH\Box\Annotation\AnnotationDumper;
+use KevinGH\Box\Annotation\DocblockParser;
 use KevinGH\Box\Annotation\Tokens;
 use const T_COMMENT;
 use const T_DOC_COMMENT;
@@ -39,6 +39,7 @@ use function token_get_all;
  * @author Kevin Herrera <kevin@herrera.io>
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ * @author Théo Fidry <theo.fidry@gmail.com>
  * @private
  */
 final class Php extends FileExtensionCompactor
@@ -49,7 +50,7 @@ final class Php extends FileExtensionCompactor
     /**
      * {@inheritdoc}
      */
-    public function __construct(Tokenizer $tokenizer, array $extensions = ['php'])
+    public function __construct(DocblockParser $tokenizer, array $extensions = ['php'])
     {
         parent::__construct($extensions);
 
@@ -110,37 +111,37 @@ final class Php extends FileExtensionCompactor
         $annotations = [];
         $index = -1;
         $inside = 0;
-        $tokens = $this->tokenizer->parse($docblock);
+        $nodes = $this->tokenizer->parse($docblock);
 
-        if (empty($tokens)) {
+        if (0 === $nodes->getChildrenNumber()) {
             return str_repeat("\n", substr_count($docblock, "\n"));
         }
 
-        foreach ($tokens as $token) {
-            if ((0 === $inside) && (DocLexer::T_AT === $token[0])) {
-                ++$index;
-            } elseif (DocLexer::T_OPEN_PARENTHESIS === $token[0]) {
-                ++$inside;
-            } elseif (DocLexer::T_CLOSE_PARENTHESIS === $token[0]) {
-                --$inside;
-            }
-
-            if (!isset($annotations[$index])) {
-                $annotations[$index] = [];
-            }
-
-            $annotations[$index][] = $token;
-        }
+//        foreach ($nodes->getChildren() as $child) {
+//            if ((0 === $inside) && (DocLexer::T_AT === $child[0])) {
+//                ++$index;
+//            } elseif (DocLexer::T_OPEN_PARENTHESIS === $child[0]) {
+//                ++$inside;
+//            } elseif (DocLexer::T_CLOSE_PARENTHESIS === $child[0]) {
+//                --$inside;
+//            }
+//
+//            if (!isset($annotations[$index])) {
+//                $annotations[$index] = [];
+//            }
+//
+//            $annotations[$index][] = $child;
+//        }
 
         $breaks = substr_count($docblock, "\n");
         $docblock = '/**';
 
-        foreach ($annotations as $annotation) {
-            $annotation = new Tokens($annotation);
-            $docblock .= "\n".$this->converter->convert($annotation);
+        $compacted = (new AnnotationDumper())->dump($nodes);
+        foreach ($compacted as $annotation) {
+            $docblock .= "\n".$annotation;
         }
 
-        $breaks -= count($annotations);
+        $breaks -= count($compacted);
 
         if ($breaks > 0) {
             $docblock .= str_repeat("\n", $breaks - 1);

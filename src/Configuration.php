@@ -24,7 +24,7 @@ use Humbug\PhpScoper\Console\ApplicationFactory;
 use Humbug\PhpScoper\Scoper;
 use Humbug\PhpScoper\Scoper\FileWhitelistScoper;
 use InvalidArgumentException;
-use KevinGH\Box\Annotation\Tokenizer;
+use KevinGH\Box\Annotation\DocblockParser;
 use KevinGH\Box\Compactor\Php as PhpCompactor;
 use KevinGH\Box\Compactor\PhpScoper as PhpScoperCompactor;
 use KevinGH\Box\Composer\ComposerConfiguration;
@@ -2423,7 +2423,7 @@ BANNER;
 
     private static function createPhpCompactor(stdClass $raw): Compactor
     {
-        $tokenizer = new Tokenizer();
+        $tokenizer = new DocblockParser();
 
         if (false === empty($raw->{self::ANNOTATIONS_KEY}) && isset($raw->{self::ANNOTATIONS_KEY}->ignore)) {
             $tokenizer->ignore(

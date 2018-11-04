@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Generator;
-use KevinGH\Box\Annotation\Tokenizer;
+use KevinGH\Box\Annotation\DocblockParser;
 use KevinGH\Box\Compactor\Php;
 use PHPUnit\Framework\TestCase;
 
@@ -29,7 +29,7 @@ class PhpTest extends TestCase
      */
     public function test_it_supports_PHP_files(string $file, bool $supports): void
     {
-        $compactor = new Php(new Tokenizer());
+        $compactor = new Php(new DocblockParser());
 
         $contents = <<<'PHP'
 <?php
@@ -49,10 +49,10 @@ PHP;
     /**
      * @dataProvider providePhpContent
      */
-    public function test_it_compacts_PHP_files(Tokenizer $tokenizer, string $content, string $expected): void
+    public function test_it_compacts_PHP_files(DocblockParser $docblockParser, string $content, string $expected): void
     {
         $file = 'foo.php';
-        $compactor = new Php($tokenizer);
+        $compactor = new Php($docblockParser);
 
         $actual = $compactor->compact($file, $content);
 
@@ -69,7 +69,7 @@ PHP;
     public function providePhpContent(): Generator
     {
         yield 'simple PHP file with comments' => [
-            new Tokenizer(),
+            new DocblockParser(),
             <<<'PHP'
 <?php
 
@@ -108,8 +108,8 @@ PHP
         ];
 
         yield 'PHP file with annotations' => [
-            (static function (): Tokenizer {
-                $tokenizer = new Tokenizer();
+            (static function (): DocblockParser {
+                $tokenizer = new DocblockParser();
                 $tokenizer->ignore(['ignored']);
 
                 return $tokenizer;
@@ -202,8 +202,8 @@ PHP
         ];
 
         yield 'legacy issue 14' => [
-            (static function (): Tokenizer {
-                $tokenizer = new Tokenizer();
+            (static function (): DocblockParser {
+                $tokenizer = new DocblockParser();
                 $tokenizer->ignore(['author', 'inline']);
 
                 return $tokenizer;
@@ -330,13 +330,13 @@ PHP
         ];
 
         yield 'Invalid PHP file' => [
-            new Tokenizer(),
+            new DocblockParser(),
             '<ph',
             '<ph',
         ];
 
         yield 'Invalid annotation' => [
-            new Tokenizer(),
+            new DocblockParser(),
             <<<'PHP'
 <?php
 
