@@ -48,6 +48,7 @@ use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\FileSystem\touch;
 use function random_int;
 use function sprintf;
+use function strtolower;
 
 /**
  * @covers \KevinGH\Box\Configuration
@@ -1662,13 +1663,16 @@ JSON
         } catch (RuntimeException $exception) {
             $tmp = $this->tmp;
 
+            // Make the comparison case insensitive since depending of the git version the case may be different
             $this->assertSame(
-                sprintf(
-                    'The tag or commit hash could not be retrieved from "%s": fatal: Not a git repository (or '
-                    .'any of the parent directories): .git'.PHP_EOL,
-                    $tmp
+                strtolower(
+                    sprintf(
+                        'The tag or commit hash could not be retrieved from "%s": fatal: Not a git repository '
+                        .'(or any of the parent directories): .git'.PHP_EOL,
+                        $tmp
+                    )
                 ),
-                $exception->getMessage()
+                strtolower($exception->getMessage())
             );
         }
     }
