@@ -214,48 +214,48 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
 //                'compactors' => [Php::class],
 //            ],
 //            <<<'PHP'
-//<?php
+        //<?php
 //
-///**
-// * Function comparing the two given values
-// *
-// * @param int $x
-// * @param int $y
-// *
-// * @return int
-// *
-// * @author Théo Fidry
-// * @LICENSE MIT
-// *
-// * @Acme(type = "function")
-// */
-//function foo($x, $y): int {
+        ///**
+        // * Function comparing the two given values
+        // *
+        // * @param int $x
+        // * @param int $y
+        // *
+        // * @return int
+        // *
+        // * @author Théo Fidry
+        // * @LICENSE MIT
+        // *
+        // * @Acme(type = "function")
+        // */
+        //function foo($x, $y): int {
 //    // Compare the two values
 //    return $x <=> $y;
-//}
-//PHP
+        //}
+        //PHP
 //            ,
 //            <<<'PHP'
-//<?php
+        //<?php
 //
-///**
-//@param
-//@param
-//@return
-//@Acme(type="function")
-//
-//
+        ///**
+        //@param
+        //@param
+        //@return
+        //@Acme(type="function")
 //
 //
 //
 //
 //
-//*/
-//function foo($x, $y): int {
 //
-// return $x <=> $y;
-//}
-//PHP
+//
+        //*/
+        //function foo($x, $y): int {
+//
+        // return $x <=> $y;
+        //}
+        //PHP
 //        ];
 //
 //        $falseAnnotationConfigs = [
@@ -276,48 +276,48 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
 //                    'compactors' => [Php::class],
 //                ],
 //                <<<'PHP'
-//<?php
+        //<?php
 //
-///**
-// * Function comparing the two given values
-// *
-// * @param int $x
-// * @param int $y
-// *
-// * @return int
-// *
-// * @author Théo Fidry
-// * @LICENSE MIT
-// *
-// * @Acme(type = "function")
-// */
-//function foo($x, $y): int {
+        ///**
+        // * Function comparing the two given values
+        // *
+        // * @param int $x
+        // * @param int $y
+        // *
+        // * @return int
+        // *
+        // * @author Théo Fidry
+        // * @LICENSE MIT
+        // *
+        // * @Acme(type = "function")
+        // */
+        //function foo($x, $y): int {
 //    // Compare the two values
 //    return $x <=> $y;
-//}
-//PHP
+        //}
+        //PHP
 //                ,
 //                <<<'PHP'
-//<?php
+        //<?php
 //
-///**
-//@param
-//@param
-//@return
-//@author
-//@LICENSE
-//@Acme(type="function")
-//
-//
+        ///**
+        //@param
+        //@param
+        //@return
+        //@author
+        //@LICENSE
+        //@Acme(type="function")
 //
 //
 //
-//*/
-//function foo($x, $y): int {
 //
-// return $x <=> $y;
-//}
-//PHP
+//
+        //*/
+        //function foo($x, $y): int {
+//
+        // return $x <=> $y;
+        //}
+        //PHP
 //            ];
 //        }
 //
@@ -333,34 +333,32 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
 //                    'compactors' => [Php::class],
 //                ],
 //                <<<'PHP'
-//<?php
+        //<?php
 //
-///**
-// * Function comparing the two given values
-// *
-// * @param int $x
-// * @param int $y
-// *
-// * @return int
-// *
-// * @author Théo Fidry
-// * @LICENSE MIT
-// *
-// * @Acme(type = "function")
-// */
-//function foo($x, $y): int {
+        ///**
+        // * Function comparing the two given values
+        // *
+        // * @param int $x
+        // * @param int $y
+        // *
+        // * @return int
+        // *
+        // * @author Théo Fidry
+        // * @LICENSE MIT
+        // *
+        // * @Acme(type = "function")
+        // */
+        //function foo($x, $y): int {
 //    // Compare the two values
 //    return $x <=> $y;
-//}
-//PHP
+        //}
+        //PHP
 //                ,
 //                <<<'PHP'
-//<?php
+        //<?php
 //
-///**
-//@Acme(type="function")
-//
-//
+        ///**
+        //@Acme(type="function")
 //
 //
 //
@@ -369,12 +367,14 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
 //
 //
 //
-//*/
-//function foo($x, $y): int {
 //
-// return $x <=> $y;
-//}
-//PHP
+//
+        //*/
+        //function foo($x, $y): int {
+//
+        // return $x <=> $y;
+        //}
+        //PHP
 //            ];
 //        }
 
