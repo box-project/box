@@ -588,7 +588,8 @@ By default, it removes all non real-like annotations from the PHP code. See the 
 
 <details>
 <summary>Original code</summary>
-<<<'PHP'
+
+```php
 <?php
 
 /**
@@ -608,10 +609,13 @@ function foo($x, $y): int {
     // Compare the two values
     return $x <=> $y;
 }
-<details>
+```
+</details>
+
 <details>
 <summary>Compacted code</summary>
-<<<'PHP'
+
+```php
 <?php
 
 /**
@@ -631,7 +635,8 @@ function foo($x, $y): int {
 
  return $x <=> $y;
 }
-<details>
+```
+</details>
 
 Note that the empty line returns are on purpose: it is to keep the same line number for the files between your source
 code and the code bundled in the PHAR.
