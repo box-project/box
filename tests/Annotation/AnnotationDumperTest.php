@@ -184,12 +184,11 @@ DOCBLOCK
         yield [
             <<<'DOCBLOCK'
 /**
- * @Annotation(123, "string", 1.23, CONSTANT, false, true, null)
+ * @Annotation(123, "string", 1.23, false, true, null)
  */
- DOCBLOCK
+DOCBLOCK
             ,
-            [],
-
+            ['@Annotation(123,"string",1.23,false,true,null)'],
         ];
 
         yield [
@@ -209,7 +208,6 @@ DOCBLOCK
  *     a=123,
  *     b="string",
  *     c=1.23,
- *     d=CONSTANT,
  *     e=false,
  *     f=true,
  *     g=null
@@ -217,7 +215,7 @@ DOCBLOCK
  */
 DOCBLOCK
             ,
-            [],
+            ['@Annotation(a=123,b="string",c=1.23,e=false,f=true,g=null)'],
         ];
 
         yield [
@@ -257,11 +255,11 @@ DOCBLOCK
         yield [
             <<<'DOCBLOCK'
 /**
- * @Annotation({123, "string", 1.23, CONSTANT, false, true, null})
+ * @Annotation({123, "string", 1.23, false, true, null})
  */
 DOCBLOCK
             ,
-            [],
+            ['@Annotation({123,"string",1.23,false,true,null})'],
         ];
 
         yield [
@@ -331,7 +329,7 @@ DOCBLOCK
  */
 DOCBLOCK
             ,
-            ['@Annotation(a={b: {}})'],
+            ['@Annotation(a={b:{}})'],
         ];
 
         yield [
@@ -341,7 +339,7 @@ DOCBLOCK
  */
 DOCBLOCK
             ,
-            ['@Annotation({key: "value"})'],
+            ['@Annotation({key:"value"})'],
         ];
 
         yield [
@@ -351,7 +349,7 @@ DOCBLOCK
  */
 DOCBLOCK
             ,
-            ['@Annotation({a:"b", c:"d"})'],
+            ['@Annotation({a:"b",c:"d"})'],
         ];
 
         yield [
@@ -511,18 +509,6 @@ DOCBLOCK
             ['@Escaped'],
         ];
 
-        yield [
-            <<<'DOCBLOCK'
-/**
- * @!Skipped
- */
-DOCBLOCK
-            ,
-            <<<'TRACE'
-
-TRACE
-        ];
-
         yield 'multiple without parameters' => [
             <<<'DOCBLOCK'
 /** @Annotation1 @Annotation2 @Annotation3 */
@@ -673,7 +659,7 @@ DOCBLOCK
  */
 DOCBLOCK
             ,
-            ['@Route("/argument_with_route_param_and_default/{value}",defaults={"value": "value"},name="argument_with_route_param_and_default")'],
+            ['@Route("/argument_with_route_param_and_default/{value}",defaults={"value":"value"},name="argument_with_route_param_and_default")'],
         ];
 
         yield 'SymfonyFrameworkExtraBundle annotations' => [

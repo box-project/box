@@ -115,9 +115,8 @@ final class AnnotationDumper
                 }
 
                 throw InvalidToken::createForUnknownType($token);
-
             case 'token':
-                if (in_array($node->getValueToken(), ['identifier', 'simple_identifier', 'integer', 'float', 'boolean', 'identifier_ns'], true)) {
+                if (in_array($node->getValueToken(), ['identifier', 'simple_identifier', 'integer', 'float', 'boolean', 'identifier_ns', 'null'], true)) {
                     return $node->getValueValue();
                 }
 
@@ -130,7 +129,6 @@ final class AnnotationDumper
                 }
 
                 throw InvalidToken::createForUnknownType($node);
-
             case '#parameters':
                 $transformedChildren = $this->transformNodesToString(
                     $node->getChildren(),
@@ -138,17 +136,18 @@ final class AnnotationDumper
                 );
 
                 return implode(',', $transformedChildren);
-
             case '#named_parameter':
-            case '#pair':
+            case '#pair_equal':
+            case '#pair_colon':
                 Assertion::same($node->getChildrenNumber(), 2);
 
                 $name = $node->getChild(0);
                 $parameter = $node->getChild(1);
 
                 return sprintf(
-                    '%s=%s',
+                    '%s%s%s',
                     $this->transformNodeToString($name, $ignored),
+                    '#pair_colon' === $node->getId() ? ':' : '=',
                     $this->transformNodeToString($parameter, $ignored)
                 );
 
@@ -156,12 +155,10 @@ final class AnnotationDumper
                 Assertion::same($node->getChildrenNumber(), 1);
 
                 return $this->transformNodeToString($node->getChild(0), $ignored);
-
             case '#string':
                 Assertion::lessOrEqualThan($node->getChildrenNumber(), 1);
 
                 return 1 === $node->getChildrenNumber() ? $this->transformNodeToString($node->getChild(0), $ignored) : '""';
-
             case '#list':
             case '#map':
                 $transformedChildren = $this->transformNodesToString(
@@ -182,7 +179,6 @@ final class AnnotationDumper
                 Assertion::same($node->getChildrenNumber(), 1);
 
                 return $this->transformNodeToString($node->getChild(0), $ignored);
-
             case '#constant':
                 Assertion::same($node->getChildrenNumber(), 2);
 

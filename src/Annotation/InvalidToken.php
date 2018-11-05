@@ -32,6 +32,7 @@ final class InvalidToken extends UnexpectedValueException
             )
         );
     }
+
     public static function createForUnknownId(TreeNode $node): self
     {
         return new self(

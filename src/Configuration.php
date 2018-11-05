@@ -2537,6 +2537,8 @@ BANNER;
             return [];
         }
 
+        $ignored = [];
+
         if (property_exists($annotations, self::IGNORED_ANNOTATIONS_KEY)
             && in_array($ignored = $annotations->{self::IGNORED_ANNOTATIONS_KEY}, [null, []], true)
         ) {
@@ -2545,7 +2547,7 @@ BANNER;
             return (array) $ignored;
         }
 
-        return [];
+        return $ignored;
     }
 
     private static function createPhpCompactor(array $ignoredAnnotations): Compactor

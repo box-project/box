@@ -24,8 +24,8 @@
 %token  value:colon         :
 %token  value:equals        =
 %token  value:quote_        "                           -> string
-%token  value:null          \bnull\b
-%token  value:boolean       \b(?:true|false)\b
+%token  value:null          \b(?:null|NULL)\b
+%token  value:boolean       \b(?:true|TRUE|false|FALSE)\b
 %token  value:float         -?(0|[1-9]\d*)(?=[eE\.])(\.\d+)?([eE][+-]?\d+)?
 %token  value:integer       -?(0|[1-9]\d*)
 %token  value:identifier_ns \\?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*(\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)+
@@ -53,10 +53,13 @@
     ::brace_:: pairs() ::comma::? ::_brace::
 
 pairs:
-    pair() ( ::comma:: pair() )*
+    (pair_equal() | pair_colon()) ( ::comma:: (pair_equal() | pair_colon()) )*
 
-#pair:
-    (<identifier> | <identifier_ns> | string() | <integer> | <float> | constant()) ( ::equals:: | ::colon:: ) value()
+#pair_equal:
+    (<identifier> | <identifier_ns> | string() | <integer> | <float> | constant()) ::equals:: value()
+
+#pair_colon:
+    (<identifier> | <identifier_ns> | string() | <integer> | <float> | constant()) ::colon:: value()
 
 #value:
     <null> | <boolean> | string() | <integer> | <float> | map() | list() | annotation() | constant()

@@ -9,7 +9,10 @@
         "with this source code in the file LICENSE."
     ],
 
-    "files": ["res/schema.json"],
+    "files": [
+        "annotation-grammar.pp",
+        "res/schema.json"
+    ],
     "directories-bin": [".requirement-checker"],
 
     "compression": "GZ",

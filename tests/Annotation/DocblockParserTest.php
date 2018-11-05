@@ -259,12 +259,34 @@ TRACE
         yield [
             <<<'DOCBLOCK'
 /**
- * @Annotation(123, "string", 1.23, CONSTANT, false, true, null)
+ * @Annotation(123, "string", 1.23, false, true, null)
  */
 DOCBLOCK
             ,
             <<<'TRACE'
-        >  #null
+>  #annotations
+>  >  #annotation
+>  >  >  token(annot:valued_identifier, Annotation)
+>  >  >  #parameters
+>  >  >  >  #unnamed_parameter
+>  >  >  >  >  #value
+>  >  >  >  >  >  token(value:integer, 123)
+>  >  >  >  #unnamed_parameter
+>  >  >  >  >  #value
+>  >  >  >  >  >  #string
+>  >  >  >  >  >  >  token(string:string, string)
+>  >  >  >  #unnamed_parameter
+>  >  >  >  >  #value
+>  >  >  >  >  >  token(value:float, 1.23)
+>  >  >  >  #unnamed_parameter
+>  >  >  >  >  #value
+>  >  >  >  >  >  token(value:boolean, false)
+>  >  >  >  #unnamed_parameter
+>  >  >  >  >  #value
+>  >  >  >  >  >  token(value:boolean, true)
+>  >  >  >  #unnamed_parameter
+>  >  >  >  >  #value
+>  >  >  >  >  >  token(value:null, null)
 
 TRACE
         ];
@@ -272,12 +294,24 @@ TRACE
         yield [
             <<<'DOCBLOCK'
 /**
- * @Annotation(constant, FALSE, TRUE, NULL)
+ * @Annotation(FALSE, TRUE, NULL)
  */
 DOCBLOCK
             ,
             <<<'TRACE'
-        >  #null
+>  #annotations
+>  >  #annotation
+>  >  >  token(annot:valued_identifier, Annotation)
+>  >  >  #parameters
+>  >  >  >  #unnamed_parameter
+>  >  >  >  >  #value
+>  >  >  >  >  >  token(value:boolean, FALSE)
+>  >  >  >  #unnamed_parameter
+>  >  >  >  >  #value
+>  >  >  >  >  >  token(value:boolean, TRUE)
+>  >  >  >  #unnamed_parameter
+>  >  >  >  >  #value
+>  >  >  >  >  >  token(value:null, NULL)
 
 TRACE
         ];
@@ -336,7 +370,6 @@ TRACE
  *     a=123,
  *     b="string",
  *     c=1.23,
- *     d=CONSTANT,
  *     e=false,
  *     f=true,
  *     g=null
@@ -345,7 +378,35 @@ TRACE
 DOCBLOCK
             ,
             <<<'TRACE'
-        >  #null
+>  #annotations
+>  >  #annotation
+>  >  >  token(annot:valued_identifier, Annotation)
+>  >  >  #parameters
+>  >  >  >  #named_parameter
+>  >  >  >  >  token(value:identifier, a)
+>  >  >  >  >  #value
+>  >  >  >  >  >  token(value:integer, 123)
+>  >  >  >  #named_parameter
+>  >  >  >  >  token(value:identifier, b)
+>  >  >  >  >  #value
+>  >  >  >  >  >  #string
+>  >  >  >  >  >  >  token(string:string, string)
+>  >  >  >  #named_parameter
+>  >  >  >  >  token(value:identifier, c)
+>  >  >  >  >  #value
+>  >  >  >  >  >  token(value:float, 1.23)
+>  >  >  >  #named_parameter
+>  >  >  >  >  token(value:identifier, e)
+>  >  >  >  >  #value
+>  >  >  >  >  >  token(value:boolean, false)
+>  >  >  >  #named_parameter
+>  >  >  >  >  token(value:identifier, f)
+>  >  >  >  >  #value
+>  >  >  >  >  >  token(value:boolean, true)
+>  >  >  >  #named_parameter
+>  >  >  >  >  token(value:identifier, g)
+>  >  >  >  >  #value
+>  >  >  >  >  >  token(value:null, null)
 
 TRACE
         ];
@@ -440,12 +501,31 @@ TRACE
         yield [
             <<<'DOCBLOCK'
         /**
-         * @Annotation({123, "string", 1.23, CONSTANT, false, true, null})
+         * @Annotation({123, "string", 1.23, false, true, null})
          */
 DOCBLOCK
             ,
             <<<'TRACE'
-        >  #null
+>  #annotations
+>  >  #annotation
+>  >  >  token(annot:valued_identifier, Annotation)
+>  >  >  #parameters
+>  >  >  >  #unnamed_parameter
+>  >  >  >  >  #value
+>  >  >  >  >  >  #list
+>  >  >  >  >  >  >  #value
+>  >  >  >  >  >  >  >  token(value:integer, 123)
+>  >  >  >  >  >  >  #value
+>  >  >  >  >  >  >  >  #string
+>  >  >  >  >  >  >  >  >  token(string:string, string)
+>  >  >  >  >  >  >  #value
+>  >  >  >  >  >  >  >  token(value:float, 1.23)
+>  >  >  >  >  >  >  #value
+>  >  >  >  >  >  >  >  token(value:boolean, false)
+>  >  >  >  >  >  >  #value
+>  >  >  >  >  >  >  >  token(value:boolean, true)
+>  >  >  >  >  >  >  #value
+>  >  >  >  >  >  >  >  token(value:null, null)
 
 TRACE
         ];
@@ -465,7 +545,7 @@ DOCBLOCK
 >  >  >  >  #unnamed_parameter
 >  >  >  >  >  #value
 >  >  >  >  >  >  #map
->  >  >  >  >  >  >  #pair
+>  >  >  >  >  >  >  #pair_equal
 >  >  >  >  >  >  >  >  token(value:identifier, key)
 >  >  >  >  >  >  >  >  #value
 >  >  >  >  >  >  >  >  >  #string
@@ -489,7 +569,7 @@ DOCBLOCK
 >  >  >  >  #unnamed_parameter
 >  >  >  >  >  #value
 >  >  >  >  >  >  #map
->  >  >  >  >  >  >  #pair
+>  >  >  >  >  >  >  #pair_equal
 >  >  >  >  >  >  >  >  #string
 >  >  >  >  >  >  >  >  >  token(string:string, key)
 >  >  >  >  >  >  >  >  #value
@@ -514,12 +594,12 @@ DOCBLOCK
 >  >  >  >  #unnamed_parameter
 >  >  >  >  >  #value
 >  >  >  >  >  >  #map
->  >  >  >  >  >  >  #pair
+>  >  >  >  >  >  >  #pair_equal
 >  >  >  >  >  >  >  >  token(value:identifier, a)
 >  >  >  >  >  >  >  >  #value
 >  >  >  >  >  >  >  >  >  #string
 >  >  >  >  >  >  >  >  >  >  token(string:string, b)
->  >  >  >  >  >  >  #pair
+>  >  >  >  >  >  >  #pair_equal
 >  >  >  >  >  >  >  >  token(value:identifier, c)
 >  >  >  >  >  >  >  >  #value
 >  >  >  >  >  >  >  >  >  #string
@@ -543,18 +623,18 @@ DOCBLOCK
 >  >  >  >  #unnamed_parameter
 >  >  >  >  >  #value
 >  >  >  >  >  >  #map
->  >  >  >  >  >  >  #pair
+>  >  >  >  >  >  >  #pair_equal
 >  >  >  >  >  >  >  >  token(value:identifier, a)
 >  >  >  >  >  >  >  >  #value
 >  >  >  >  >  >  >  >  >  #string
 >  >  >  >  >  >  >  >  >  >  token(string:string, b)
->  >  >  >  >  >  >  #pair
+>  >  >  >  >  >  >  #pair_equal
 >  >  >  >  >  >  >  >  #string
 >  >  >  >  >  >  >  >  >  token(string:string, c)
 >  >  >  >  >  >  >  >  #value
 >  >  >  >  >  >  >  >  >  #string
 >  >  >  >  >  >  >  >  >  >  token(string:string, d)
->  >  >  >  >  >  >  #pair
+>  >  >  >  >  >  >  #pair_equal
 >  >  >  >  >  >  >  >  token(value:integer, 123)
 >  >  >  >  >  >  >  >  #value
 >  >  >  >  >  >  >  >  >  #string
@@ -578,7 +658,7 @@ DOCBLOCK
 >  >  >  >  #unnamed_parameter
 >  >  >  >  >  #value
 >  >  >  >  >  >  #map
->  >  >  >  >  >  >  #pair
+>  >  >  >  >  >  >  #pair_equal
 >  >  >  >  >  >  >  >  token(value:identifier, key)
 >  >  >  >  >  >  >  >  #value
 >  >  >  >  >  >  >  >  >  #list
@@ -602,7 +682,7 @@ DOCBLOCK
 >  >  >  >  >  token(value:identifier, a)
 >  >  >  >  >  #value
 >  >  >  >  >  >  #map
->  >  >  >  >  >  >  #pair
+>  >  >  >  >  >  >  #pair_equal
 >  >  >  >  >  >  >  >  token(value:identifier, b)
 >  >  >  >  >  >  >  >  #value
 >  >  >  >  >  >  >  >  >  #list
@@ -625,7 +705,7 @@ DOCBLOCK
 >  >  >  >  #unnamed_parameter
 >  >  >  >  >  #value
 >  >  >  >  >  >  #map
->  >  >  >  >  >  >  #pair
+>  >  >  >  >  >  >  #pair_colon
 >  >  >  >  >  >  >  >  token(value:identifier, key)
 >  >  >  >  >  >  >  >  #value
 >  >  >  >  >  >  >  >  >  #list
@@ -649,7 +729,7 @@ DOCBLOCK
 >  >  >  >  >  token(value:identifier, a)
 >  >  >  >  >  #value
 >  >  >  >  >  >  #map
->  >  >  >  >  >  >  #pair
+>  >  >  >  >  >  >  #pair_colon
 >  >  >  >  >  >  >  >  token(value:identifier, b)
 >  >  >  >  >  >  >  >  #value
 >  >  >  >  >  >  >  >  >  #list
@@ -672,7 +752,7 @@ DOCBLOCK
 >  >  >  >  #unnamed_parameter
 >  >  >  >  >  #value
 >  >  >  >  >  >  #map
->  >  >  >  >  >  >  #pair
+>  >  >  >  >  >  >  #pair_colon
 >  >  >  >  >  >  >  >  token(value:identifier, key)
 >  >  >  >  >  >  >  >  #value
 >  >  >  >  >  >  >  >  >  #string
@@ -696,12 +776,12 @@ DOCBLOCK
 >  >  >  >  #unnamed_parameter
 >  >  >  >  >  #value
 >  >  >  >  >  >  #map
->  >  >  >  >  >  >  #pair
+>  >  >  >  >  >  >  #pair_colon
 >  >  >  >  >  >  >  >  token(value:identifier, a)
 >  >  >  >  >  >  >  >  #value
 >  >  >  >  >  >  >  >  >  #string
 >  >  >  >  >  >  >  >  >  >  token(string:string, b)
->  >  >  >  >  >  >  #pair
+>  >  >  >  >  >  >  #pair_colon
 >  >  >  >  >  >  >  >  token(value:identifier, c)
 >  >  >  >  >  >  >  >  #value
 >  >  >  >  >  >  >  >  >  #string
@@ -725,18 +805,18 @@ DOCBLOCK
 >  >  >  >  #unnamed_parameter
 >  >  >  >  >  #value
 >  >  >  >  >  >  #map
->  >  >  >  >  >  >  #pair
+>  >  >  >  >  >  >  #pair_colon
 >  >  >  >  >  >  >  >  token(value:identifier, a)
 >  >  >  >  >  >  >  >  #value
 >  >  >  >  >  >  >  >  >  #string
 >  >  >  >  >  >  >  >  >  >  token(string:string, b)
->  >  >  >  >  >  >  #pair
+>  >  >  >  >  >  >  #pair_colon
 >  >  >  >  >  >  >  >  #string
 >  >  >  >  >  >  >  >  >  token(string:string, c)
 >  >  >  >  >  >  >  >  #value
 >  >  >  >  >  >  >  >  >  #string
 >  >  >  >  >  >  >  >  >  >  token(string:string, d)
->  >  >  >  >  >  >  #pair
+>  >  >  >  >  >  >  #pair_colon
 >  >  >  >  >  >  >  >  token(value:integer, 123)
 >  >  >  >  >  >  >  >  #value
 >  >  >  >  >  >  >  >  >  #string
@@ -940,7 +1020,7 @@ DOCBLOCK
 >  >  >  >  #unnamed_parameter
 >  >  >  >  >  #value
 >  >  >  >  >  >  #map
->  >  >  >  >  >  >  #pair
+>  >  >  >  >  >  >  #pair_equal
 >  >  >  >  >  >  >  >  token(value:identifier, key)
 >  >  >  >  >  >  >  >  #value
 >  >  >  >  >  >  >  >  >  #annotation
@@ -964,12 +1044,12 @@ DOCBLOCK
 >  >  >  >  #unnamed_parameter
 >  >  >  >  >  #value
 >  >  >  >  >  >  #map
->  >  >  >  >  >  >  #pair
+>  >  >  >  >  >  >  #pair_equal
 >  >  >  >  >  >  >  >  token(value:identifier, a)
 >  >  >  >  >  >  >  >  #value
 >  >  >  >  >  >  >  >  >  #annotation
 >  >  >  >  >  >  >  >  >  >  token(annot:valued_identifier, Nested)
->  >  >  >  >  >  >  #pair
+>  >  >  >  >  >  >  #pair_equal
 >  >  >  >  >  >  >  >  token(value:identifier, b)
 >  >  >  >  >  >  >  >  #value
 >  >  >  >  >  >  >  >  >  #annotation
@@ -1074,18 +1154,7 @@ DOCBLOCK
 TRACE
         ];
 
-        yield [
-            <<<'DOCBLOCK'
-/**
- * @!Skipped
- */
-DOCBLOCK
-            ,
-            <<<'TRACE'
-
-TRACE
-        ];
-
+        // TODO: this is wrong
         yield [
             <<<'DOCBLOCK'
 /**
@@ -1094,6 +1163,11 @@ TRACE
 DOCBLOCK
             ,
             <<<'TRACE'
+>  #annotations
+>  >  #annotation
+>  >  >  token(annot:simple_identifier, author)
+>  >  #annotation
+>  >  >  token(annot:simple_identifier, web)
 
 TRACE
         ];
@@ -1142,6 +1216,24 @@ EOF
             <<<'EOF'
 Could not parse the following docblock: "/**@a({@:1})*/". Cause: "Unrecognized token ":" at line 1 and column 9:
 /**@a({@:1})*/
+        ↑"
+EOF
+        ];
+
+        yield [
+            <<<'DOCBLOCK'
+/**
+ * @!Skipped
+ */
+DOCBLOCK
+            ,
+            <<<'EOF'
+Could not parse the following docblock: "/**
+ * @!Skipped
+ */". Cause: "Unrecognized token "!" at line 1 and column 9:
+/**
+ * @!Skipped
+ */
         ↑"
 EOF
         ];
