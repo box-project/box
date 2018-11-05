@@ -20,7 +20,7 @@
                     "items": {
                         "type": "string"
                     },
-                    "type": ["array", "string"]
+                    "type": ["array", "null"]
                 }
             }
         },

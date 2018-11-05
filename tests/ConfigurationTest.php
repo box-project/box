@@ -14,11 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use Closure;
 use DateTimeImmutable;
 use Generator;
 use InvalidArgumentException;
-use KevinGH\Box\Annotation\DocblockParser;
 use KevinGH\Box\Compactor\DummyCompactor;
 use KevinGH\Box\Compactor\InvalidCompactor;
 use KevinGH\Box\Compactor\Php;
@@ -647,47 +645,6 @@ EOF
                 $exception->getMessage()
             );
         }
-    }
-
-    public function test_get_compactors_annotations(): void
-    {
-        $this->setConfig([
-            'files' => [self::DEFAULT_FILE],
-            'annotations' => (object) [
-                'ignore' => [
-                    'author',
-                ],
-            ],
-            'compactors' => [
-                Php::class,
-            ],
-        ]);
-
-        $compactors = $this->config->getCompactors();
-
-        $tokenizer = (
-            Closure::bind(
-                function (Php $phpCompactor): DocblockParser {
-                    return $phpCompactor->annotationParser;
-                },
-                null,
-                Php::class
-            )
-        )($compactors[0]);
-
-        $this->assertNotNull($tokenizer);
-
-        $ignored = (
-            Closure::bind(
-                function (DocblockParser $tokenizer): array {
-                    return $tokenizer->ignored;
-                },
-                null,
-                DocblockParser::class
-            )
-        )($tokenizer);
-
-        $this->assertSame(['author'], $ignored);
     }
 
     public function test_the_php_scoper_configuration_location_can_be_configured(): void

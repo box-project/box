@@ -581,7 +581,7 @@ command ✨.
 
 // TODO: review this setting + doc, default value...]
 
-The annotations (`boolean`|`object`|`null` default `{}`) setting is used to enable compacting annotations in PHP source
+The annotations (`boolean`|`object`|`null` default `true`) setting is used to enable compacting annotations in PHP source
 code. By setting it to `true`, all Doctrine-style annotations are compacted in PHP files. You may also specify a list of
 annotations to ignore, which will be stripped while protecting the remaining annotations:
 

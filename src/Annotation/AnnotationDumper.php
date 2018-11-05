@@ -24,7 +24,6 @@ use function implode;
 use function in_array;
 use function sprintf;
 use function strtolower;
-use function trim;
 
 /**
  * @private
@@ -68,17 +67,6 @@ final class AnnotationDumper
      */
     private function transformNodesToString(array $nodes, array $ignored): array
     {
-        $ignored = array_values(
-            array_filter(
-                array_map(
-                    static function (string $ignored): ?string {
-                        return strtolower(trim($ignored));
-                    },
-                    $ignored
-                )
-            )
-        );
-
         return array_map(
             function (TreeNode $node) use ($ignored): ?string {
                 return $this->transformNodeToString($node, $ignored);
