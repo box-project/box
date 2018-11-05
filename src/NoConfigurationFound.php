@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Throwable\Exception;
+namespace KevinGH\Box;
 
 use RuntimeException;
 use Throwable;

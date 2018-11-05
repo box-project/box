@@ -16,7 +16,7 @@ namespace KevinGH\Box\Console;
 
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Json\Json;
-use KevinGH\Box\Throwable\Exception\NoConfigurationFound;
+use KevinGH\Box\NoConfigurationFound;
 use stdClass;
 use Symfony\Component\Console\Helper\Helper;
 use function file_exists;

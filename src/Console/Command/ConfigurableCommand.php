@@ -18,7 +18,7 @@ use InvalidArgumentException;
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Console\ConfigurationHelper;
 use KevinGH\Box\Json\JsonValidationException;
-use KevinGH\Box\Throwable\Exception\NoConfigurationFound;
+use KevinGH\Box\NoConfigurationFound;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;

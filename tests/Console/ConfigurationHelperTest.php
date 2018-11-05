@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console;
 
 use KevinGH\Box\Configuration;
+use KevinGH\Box\NoConfigurationFound;
 use KevinGH\Box\Test\FileSystemTestCase;
-use KevinGH\Box\Throwable\Exception\NoConfigurationFound;
 use const DIRECTORY_SEPARATOR;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\touch;
