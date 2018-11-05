@@ -638,6 +638,7 @@ function foo($x, $y): int {
 ```
 </details>
 
+
 Note that the empty line returns are on purpose: it is to keep the same line number for the files between your source
 code and the code bundled in the PHAR.
 

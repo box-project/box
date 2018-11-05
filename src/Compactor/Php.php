@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Compactor;
 
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
+use KevinGH\Box\Annotation\InvalidToken;
 use RuntimeException;
 use const T_COMMENT;
 use const T_DOC_COMMENT;
@@ -58,15 +59,6 @@ final class Php extends FileExtensionCompactor
      */
     protected function compactContent(string $contents): string
     {
-        // TODO: refactor this piece of code
-        // - strip down blank spaces
-        // - remove useless spaces
-        // - strip down comments except Doctrine style annotations unless whitelisted -> BC break to document;
-        //   Alternatively provide an easy way to strip down all "regular" annotations such as @package, @param
-        //   & co.
-        // - completely remove comments & docblocks if empty
-        // TODO regarding the doc: it current has its own `annotations` entry. Maybe it would be best to
-        // include it as a sub element of `compactors`
         $output = '';
 
         foreach (token_get_all($contents) as $token) {
@@ -76,6 +68,12 @@ final class Php extends FileExtensionCompactor
                 if (false !== strpos($token[1], '@')) {
                     try {
                         $output .= $this->compactAnnotations($token[1]);
+                    } catch (InvalidToken $exception) {
+                        // This exception is due to the dumper to be out of sync with the current grammar and/or the
+                        // grammar being incomplete. In both cases throwing here is better in order to identify and
+                        // this those cases instead of silently failing.
+
+                        throw $exception;
                     } catch (RuntimeException $exception) {
                         $output .= $token[1];
                     }
@@ -103,25 +101,27 @@ final class Php extends FileExtensionCompactor
 
     private function compactAnnotations(string $docblock): string
     {
-        $breaks = substr_count($docblock, "\n");
-        $compactedDocblock = '/**';
+        $breaksNbr = substr_count($docblock, "\n");
 
         $annotations = $this->annotationParser->parse($docblock);
 
         if ([] === $annotations) {
-            return str_repeat("\n", $breaks);
+            return str_repeat("\n", $breaksNbr);
         }
+
+        $compactedDocblock = '/**';
 
         foreach ($annotations as $annotation) {
             $compactedDocblock .= "\n".$annotation;
         }
 
-        $breaks -= count($annotations);
+        $breaksNbr -= count($annotations);
 
-        if ($breaks > 0) {
-            $compactedDocblock .= str_repeat("\n", $breaks - 1);
+        if ($breaksNbr > 0) {
+            $compactedDocblock .= str_repeat("\n", $breaksNbr - 1);
             $compactedDocblock .= "\n*/";
         } else {
+            // A space is required here to avoid having /***/
             $compactedDocblock .= ' */';
         }
 

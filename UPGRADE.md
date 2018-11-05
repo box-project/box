@@ -17,6 +17,10 @@
           * @Namespaced
           */
         ```
+- The removal of common annotations is enabled by default
+- The setting `annotation#ignore` no longer accepts a `string` value, only `string[]` and `null` are allowed
+- Upon some annotation parsing failures, the error is thrown to the user in order to identify and fix those cases
+  instead of always silently ignore the error.
 
 
 # From 2.7 to 3.0

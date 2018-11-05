@@ -256,32 +256,31 @@ DOCBLOCK
 TRACE
         ];
 
-        // TODO: fix this ASAP
-//        yield [
-//            <<<'DOCBLOCK'
-        ///**
-        // * @Annotation(123, "string", 1.23, CONSTANT, false, true, null)
-        // */
-        //DOCBLOCK
-//            ,
-//            <<<'TRACE'
-        //>  #null
-//
-        //TRACE
-//        ];
+        yield [
+            <<<'DOCBLOCK'
+/**
+ * @Annotation(123, "string", 1.23, CONSTANT, false, true, null)
+ */
+DOCBLOCK
+            ,
+            <<<'TRACE'
+        >  #null
 
-//        yield [
-//            <<<'DOCBLOCK'
-        ///**
-        // * @Annotation(constant, FALSE, TRUE, NULL)
-        // */
-        //DOCBLOCK
-//            ,
-//            <<<'TRACE'
-        //>  #null
-//
-        //TRACE
-//        ];
+TRACE
+        ];
+
+        yield [
+            <<<'DOCBLOCK'
+/**
+ * @Annotation(constant, FALSE, TRUE, NULL)
+ */
+DOCBLOCK
+            ,
+            <<<'TRACE'
+        >  #null
+
+TRACE
+        ];
 
         yield [
             <<<'DOCBLOCK'
@@ -330,26 +329,26 @@ DOCBLOCK
 TRACE
         ];
 
-//        yield [
-//            <<<'DOCBLOCK'
-        ///**
-        // * @Annotation(
-        // *     a=123,
-        // *     b="string",
-        // *     c=1.23,
-        // *     d=CONSTANT,
-        // *     e=false,
-        // *     f=true,
-        // *     g=null
-        // * )
-        // */
-        //DOCBLOCK
-//            ,
-//            <<<'TRACE'
-        //>  #null
-//
-        //TRACE
-//        ];
+        yield [
+            <<<'DOCBLOCK'
+/**
+ * @Annotation(
+ *     a=123,
+ *     b="string",
+ *     c=1.23,
+ *     d=CONSTANT,
+ *     e=false,
+ *     f=true,
+ *     g=null
+ * )
+ */
+DOCBLOCK
+            ,
+            <<<'TRACE'
+        >  #null
+
+TRACE
+        ];
 
         yield [
             <<<'DOCBLOCK'
@@ -438,18 +437,18 @@ DOCBLOCK
 TRACE
         ];
 
-//        yield [
-//            <<<'DOCBLOCK'
-        ///**
-        // * @Annotation({123, "string", 1.23, CONSTANT, false, true, null})
-        // */
-        //DOCBLOCK
-//            ,
-//            <<<'TRACE'
-        //>  #null
-//
-        //TRACE
-//        ];
+        yield [
+            <<<'DOCBLOCK'
+        /**
+         * @Annotation({123, "string", 1.23, CONSTANT, false, true, null})
+         */
+DOCBLOCK
+            ,
+            <<<'TRACE'
+        >  #null
+
+TRACE
+        ];
 
         yield [
             <<<'DOCBLOCK'
@@ -1060,12 +1059,11 @@ DOCBLOCK
 TRACE
         ];
 
-        // TODO: this one looks wrong
         yield [
             <<<DOCBLOCK
-        /**
-         * \@Escaped
-         */
+/**
+ * \@Escaped
+ */
 DOCBLOCK
             ,
             <<<'TRACE'
@@ -1076,30 +1074,29 @@ DOCBLOCK
 TRACE
         ];
 
-//        yield [
-//            <<<'DOCBLOCK'
-//        /**
-//         * @!Skipped
-//         */
-//DOCBLOCK
-//            ,
-//            <<<'TRACE'
-//
-//TRACE
-//        ];
+        yield [
+            <<<'DOCBLOCK'
+/**
+ * @!Skipped
+ */
+DOCBLOCK
+            ,
+            <<<'TRACE'
 
-        // TODO
-//        yield [
-//            <<<'DOCBLOCK'
-//        /**
-//         * @author Made Up <author@web.com>
-//         */
-//DOCBLOCK
-//            ,
-//            <<<'TRACE'
-//
-//TRACE
-//        ];
+TRACE
+        ];
+
+        yield [
+            <<<'DOCBLOCK'
+/**
+ * @author Made Up <author@web.com>
+ */
+DOCBLOCK
+            ,
+            <<<'TRACE'
+
+TRACE
+        ];
     }
 
     public function provideInvalidDocblocks(): Generator

@@ -202,181 +202,181 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
 
     public function providePhpContentsToCompact(): Generator
     {
-//        yield [
-//            [
-//                'annotations' => (object) [
-//                    'ignore' => [
-//                        'author',
-//                        ' license ',
-//                        '',
-//                    ],
-//                ],
-//                'compactors' => [Php::class],
-//            ],
-//            <<<'PHP'
-        //<?php
-//
-        ///**
-        // * Function comparing the two given values
-        // *
-        // * @param int $x
-        // * @param int $y
-        // *
-        // * @return int
-        // *
-        // * @author Théo Fidry
-        // * @LICENSE MIT
-        // *
-        // * @Acme(type = "function")
-        // */
-        //function foo($x, $y): int {
-//    // Compare the two values
-//    return $x <=> $y;
-        //}
-        //PHP
-//            ,
-//            <<<'PHP'
-        //<?php
-//
-        ///**
-        //@param
-        //@param
-        //@return
-        //@Acme(type="function")
-//
-//
-//
-//
-//
-//
-//
-        //*/
-        //function foo($x, $y): int {
-//
-        // return $x <=> $y;
-        //}
-        //PHP
-//        ];
-//
-//        $falseAnnotationConfigs = [
-//            false,
-//            new stdClass(),
-//            (object) [
-//                'ignore' => [],
-//            ],
-//            (object) [
-//                'ignore' => null,
-//            ],
-//        ];
-//
-//        foreach ($falseAnnotationConfigs as $config) {
-//            yield [
-//                [
-//                    'annotations' => $config,
-//                    'compactors' => [Php::class],
-//                ],
-//                <<<'PHP'
-        //<?php
-//
-        ///**
-        // * Function comparing the two given values
-        // *
-        // * @param int $x
-        // * @param int $y
-        // *
-        // * @return int
-        // *
-        // * @author Théo Fidry
-        // * @LICENSE MIT
-        // *
-        // * @Acme(type = "function")
-        // */
-        //function foo($x, $y): int {
-//    // Compare the two values
-//    return $x <=> $y;
-        //}
-        //PHP
-//                ,
-//                <<<'PHP'
-        //<?php
-//
-        ///**
-        //@param
-        //@param
-        //@return
-        //@author
-        //@LICENSE
-        //@Acme(type="function")
-//
-//
-//
-//
-//
-        //*/
-        //function foo($x, $y): int {
-//
-        // return $x <=> $y;
-        //}
-        //PHP
-//            ];
-//        }
-//
-//        $defaultAnnotationConfigs = [
-//            null,
-//            true,
-//        ];
-//
-//        foreach ($defaultAnnotationConfigs as $config) {
-//            yield [
-//                [
-//                    'annotations' => $config,
-//                    'compactors' => [Php::class],
-//                ],
-//                <<<'PHP'
-        //<?php
-//
-        ///**
-        // * Function comparing the two given values
-        // *
-        // * @param int $x
-        // * @param int $y
-        // *
-        // * @return int
-        // *
-        // * @author Théo Fidry
-        // * @LICENSE MIT
-        // *
-        // * @Acme(type = "function")
-        // */
-        //function foo($x, $y): int {
-//    // Compare the two values
-//    return $x <=> $y;
-        //}
-        //PHP
-//                ,
-//                <<<'PHP'
-        //<?php
-//
-        ///**
-        //@Acme(type="function")
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-        //*/
-        //function foo($x, $y): int {
-//
-        // return $x <=> $y;
-        //}
-        //PHP
-//            ];
-//        }
+        yield [
+            [
+                'annotations' => (object) [
+                    'ignore' => [
+                        'author',
+                        ' license ',
+                        '',
+                    ],
+                ],
+                'compactors' => [Php::class],
+            ],
+            <<<'PHP'
+        <?php
+
+        /**
+         * Function comparing the two given values
+         *
+         * @param int $x
+         * @param int $y
+         *
+         * @return int
+         *
+         * @author Théo Fidry
+         * @LICENSE MIT
+         *
+         * @Acme(type = "function")
+         */
+        function foo($x, $y): int {
+    // Compare the two values
+    return $x <=> $y;
+        }
+        PHP
+            ,
+            <<<'PHP'
+        <?php
+
+        /**
+        @param
+        @param
+        @return
+        @Acme(type="function")
+
+
+
+
+
+
+
+        */
+        function foo($x, $y): int {
+
+         return $x <=> $y;
+        }
+        PHP
+        ];
+
+        $falseAnnotationConfigs = [
+            false,
+            new stdClass(),
+            (object) [
+                'ignore' => [],
+            ],
+            (object) [
+                'ignore' => null,
+            ],
+        ];
+
+        foreach ($falseAnnotationConfigs as $config) {
+            yield [
+                [
+                    'annotations' => $config,
+                    'compactors' => [Php::class],
+                ],
+                <<<'PHP'
+        <?php
+
+        /**
+         * Function comparing the two given values
+         *
+         * @param int $x
+         * @param int $y
+         *
+         * @return int
+         *
+         * @author Théo Fidry
+         * @LICENSE MIT
+         *
+         * @Acme(type = "function")
+         */
+        function foo($x, $y): int {
+    // Compare the two values
+    return $x <=> $y;
+        }
+        PHP
+                ,
+                <<<'PHP'
+        <?php
+
+        /**
+        @param
+        @param
+        @return
+        @author
+        @LICENSE
+        @Acme(type="function")
+
+
+
+
+
+        */
+        function foo($x, $y): int {
+
+         return $x <=> $y;
+        }
+        PHP
+            ];
+        }
+
+        $defaultAnnotationConfigs = [
+            null,
+            true,
+        ];
+
+        foreach ($defaultAnnotationConfigs as $config) {
+            yield [
+                [
+                    'annotations' => $config,
+                    'compactors' => [Php::class],
+                ],
+                <<<'PHP'
+        <?php
+
+        /**
+         * Function comparing the two given values
+         *
+         * @param int $x
+         * @param int $y
+         *
+         * @return int
+         *
+         * @author Théo Fidry
+         * @LICENSE MIT
+         *
+         * @Acme(type = "function")
+         */
+        function foo($x, $y): int {
+    // Compare the two values
+    return $x <=> $y;
+        }
+        PHP
+                ,
+                <<<'PHP'
+        <?php
+
+        /**
+        @Acme(type="function")
+
+
+
+
+
+
+
+
+
+
+        */
+        function foo($x, $y): int {
+
+         return $x <=> $y;
+        }
+        PHP
+            ];
+        }
 
         yield [
             [

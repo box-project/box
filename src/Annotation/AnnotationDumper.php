@@ -80,127 +80,119 @@ final class AnnotationDumper
      */
     private function transformNodeToString(TreeNode $node, array $ignored): ?string
     {
-        if ('token' === $node->getId()) {
-            if (in_array($node->getValueToken(), ['identifier', 'simple_identifier', 'integer', 'float', 'boolean', 'identifier_ns'], true)) {
-                return $node->getValueValue();
-            }
+        switch ($node->getId()) {
+            case '#annotation':
+                Assertion::greaterOrEqualThan($node->getChildrenNumber(), 1);
 
-            if ('string' === $node->getValueToken()) {
-                return sprintf('"%s"', $node->getValueValue());
-            }
+                $children = $node->getChildren();
 
-            if ('valued_identifier' === $node->getValueToken()) {
-                return sprintf('%s()', $node->getValueValue());
-            }
+                /** @var TreeNode $token */
+                $token = array_shift($children);
+                $parameters = array_values($children);
 
-            throw InvalidToken::createForUnknownType($node);
-        }
+                if ('simple_identifier' === $token->getValueToken()) {
+                    Assertion::count($parameters, 0);
 
-        if ('#parameters' === $node->getId()) {
-            $transformedChildren = $this->transformNodesToString(
-                $node->getChildren(),
-                $ignored
-            );
+                    $tokenValue = $token->getValueValue();
 
-            return implode(',', $transformedChildren);
-        }
+                    return in_array(strtolower($tokenValue), $ignored, true) ? null : '@'.$tokenValue;
+                }
 
-        if ('#named_parameter' === $node->getId() || '#pair' === $node->getId()) {
-            Assertion::same($node->getChildrenNumber(), 2);
+                if ('valued_identifier' === $token->getValueToken()) {
+                    $transformedChildren = $this->transformNodesToString(
+                        $parameters,
+                        $ignored
+                    );
 
-            $name = $node->getChild(0);
-            $parameter = $node->getChild(1);
+                    return sprintf(
+                        '@%s(%s)',
+                        $token->getValueValue(),
+                        implode(
+                            '',
+                            $transformedChildren
+                        )
+                    );
+                }
 
-            return sprintf(
-                '%s=%s',
-                $this->transformNodeToString($name, $ignored),
-                $this->transformNodeToString($parameter, $ignored)
-            );
-        }
+                throw InvalidToken::createForUnknownType($token);
 
-        if ('#value' === $node->getId()) {
-            Assertion::same($node->getChildrenNumber(), 1);
+            case 'token':
+                if (in_array($node->getValueToken(), ['identifier', 'simple_identifier', 'integer', 'float', 'boolean', 'identifier_ns'], true)) {
+                    return $node->getValueValue();
+                }
 
-            return $this->transformNodeToString($node->getChild(0), $ignored);
-        }
+                if ('string' === $node->getValueToken()) {
+                    return sprintf('"%s"', $node->getValueValue());
+                }
 
-        if ('#string' === $node->getId()) {
-            Assertion::lessOrEqualThan($node->getChildrenNumber(), 1);
+                if ('valued_identifier' === $node->getValueToken()) {
+                    return sprintf('%s()', $node->getValueValue());
+                }
 
-            return 1 === $node->getChildrenNumber() ? $this->transformNodeToString($node->getChild(0), $ignored) : '""';
-        }
+                throw InvalidToken::createForUnknownType($node);
 
-        if ('#list' === $node->getId() || '#map' === $node->getId()) {
-            $transformedChildren = $this->transformNodesToString(
-                $node->getChildren(),
-                $ignored
-            );
-
-            return sprintf(
-                '{%s}',
-                implode(
-                    ',',
-                    $transformedChildren
-                )
-            );
-        }
-
-        if ('#annotation' === $node->getId()) {
-            Assertion::greaterOrEqualThan($node->getChildrenNumber(), 1);
-
-            $children = $node->getChildren();
-
-            /** @var TreeNode $token */
-            $token = array_shift($children);
-            $parameters = array_values($children);
-
-            if ('simple_identifier' === $token->getValueToken()) {
-                Assertion::count($parameters, 0);
-
-                $tokenValue = $token->getValueValue();
-
-                return in_array(strtolower($tokenValue), $ignored, true) ? null : '@'.$tokenValue;
-            }
-
-            if ('valued_identifier' === $token->getValueToken()) {
+            case '#parameters':
                 $transformedChildren = $this->transformNodesToString(
-                    $parameters,
+                    $node->getChildren(),
+                    $ignored
+                );
+
+                return implode(',', $transformedChildren);
+
+            case '#named_parameter':
+            case '#pair':
+                Assertion::same($node->getChildrenNumber(), 2);
+
+                $name = $node->getChild(0);
+                $parameter = $node->getChild(1);
+
+                return sprintf(
+                    '%s=%s',
+                    $this->transformNodeToString($name, $ignored),
+                    $this->transformNodeToString($parameter, $ignored)
+                );
+
+            case '#value':
+                Assertion::same($node->getChildrenNumber(), 1);
+
+                return $this->transformNodeToString($node->getChild(0), $ignored);
+
+            case '#string':
+                Assertion::lessOrEqualThan($node->getChildrenNumber(), 1);
+
+                return 1 === $node->getChildrenNumber() ? $this->transformNodeToString($node->getChild(0), $ignored) : '""';
+
+            case '#list':
+            case '#map':
+                $transformedChildren = $this->transformNodesToString(
+                    $node->getChildren(),
                     $ignored
                 );
 
                 return sprintf(
-                    '@%s(%s)',
-                    $token->getValueValue(),
+                    '{%s}',
                     implode(
-                        '',
+                        ',',
                         $transformedChildren
                     )
                 );
-            }
+
+            case '#unnamed_parameter':
+            case '#reference':
+                Assertion::same($node->getChildrenNumber(), 1);
+
+                return $this->transformNodeToString($node->getChild(0), $ignored);
+
+            case '#constant':
+                Assertion::same($node->getChildrenNumber(), 2);
+
+                return sprintf(
+                    '%s::%s',
+                    $this->transformNodeToString($node->getChild(0), $ignored),
+                    $this->transformNodeToString($node->getChild(1), $ignored)
+                );
         }
 
-        if ('#unnamed_parameter' === $node->getId()) {
-            Assertion::same($node->getChildrenNumber(), 1);
-
-            return $this->transformNodeToString($node->getChild(0), $ignored);
-        }
-
-        if ('#reference' === $node->getId()) {
-            Assertion::same($node->getChildrenNumber(), 1);
-
-            return $this->transformNodeToString($node->getChild(0), $ignored);
-        }
-
-        if ('#constant' === $node->getId()) {
-            Assertion::same($node->getChildrenNumber(), 2);
-
-            return sprintf(
-                '%s::%s',
-                $this->transformNodeToString($node->getChild(0), $ignored),
-                $this->transformNodeToString($node->getChild(1), $ignored)
-            );
-        }
-
-        $x = '';
+        throw InvalidToken::createForUnknownId($node);
     }
 }

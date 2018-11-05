@@ -2537,15 +2537,15 @@ BANNER;
             return [];
         }
 
-        $ignored = [];
-
         if (property_exists($annotations, self::IGNORED_ANNOTATIONS_KEY)
             && in_array($ignored = $annotations->{self::IGNORED_ANNOTATIONS_KEY}, [null, []], true)
         ) {
             self::addRecommendationForDefaultValue($logger, self::ANNOTATIONS_KEY.'#'.self::IGNORED_ANNOTATIONS_KEY);
+
+            return (array) $ignored;
         }
 
-        return (array) $ignored;
+        return [];
     }
 
     private static function createPhpCompactor(array $ignoredAnnotations): Compactor

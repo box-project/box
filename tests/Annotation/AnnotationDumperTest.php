@@ -181,17 +181,16 @@ DOCBLOCK
             ['@Annotation("string")'],
         ];
 
-        // TODO: fix this ASAP
-//        yield [
-//            <<<'DOCBLOCK'
-        ///**
-        // * @Annotation(123, "string", 1.23, CONSTANT, false, true, null)
-        // */
-        //DOCBLOCK
-//            ,
-//            [],
+        yield [
+            <<<'DOCBLOCK'
+/**
+ * @Annotation(123, "string", 1.23, CONSTANT, false, true, null)
+ */
+ DOCBLOCK
+            ,
+            [],
 
-//        ];
+        ];
 
         yield [
             <<<'DOCBLOCK'
@@ -203,24 +202,23 @@ DOCBLOCK
             ['@Annotation(a="b",c="d")'],
         ];
 
-//        yield [
-//            <<<'DOCBLOCK'
-        ///**
-        // * @Annotation(
-        // *     a=123,
-        // *     b="string",
-        // *     c=1.23,
-        // *     d=CONSTANT,
-        // *     e=false,
-        // *     f=true,
-        // *     g=null
-        // * )
-        // */
-        //DOCBLOCK
-//            ,
-//            [],
-
-//        ];
+        yield [
+            <<<'DOCBLOCK'
+/**
+ * @Annotation(
+ *     a=123,
+ *     b="string",
+ *     c=1.23,
+ *     d=CONSTANT,
+ *     e=false,
+ *     f=true,
+ *     g=null
+ * )
+ */
+DOCBLOCK
+            ,
+            [],
+        ];
 
         yield [
             <<<'DOCBLOCK'
@@ -256,16 +254,15 @@ DOCBLOCK
             ['@Annotation({"string"})'],
         ];
 
-//        yield [
-//            <<<'DOCBLOCK'
-        ///**
-        // * @Annotation({123, "string", 1.23, CONSTANT, false, true, null})
-        // */
-        //DOCBLOCK
-//            ,
-//            [],
-
-//        ];
+        yield [
+            <<<'DOCBLOCK'
+/**
+ * @Annotation({123, "string", 1.23, CONSTANT, false, true, null})
+ */
+DOCBLOCK
+            ,
+            [],
+        ];
 
         yield [
             <<<'DOCBLOCK'
@@ -317,62 +314,55 @@ DOCBLOCK
             ['@Annotation(a={b={}})'],
         ];
 
-        // TODO
-//        yield [
-//            <<<'DOCBLOCK'
-        ///**
-        // * @Annotation({key: {}})
-        // */
-        //DOCBLOCK
-//            ,
-//            ['@Annotation({key:{}})'],
-//
-//        ];
+        yield [
+            <<<'DOCBLOCK'
+/**
+ * @Annotation({key: {}})
+ */
+DOCBLOCK
+            ,
+            ['@Annotation({key:{}})'],
+        ];
 
-        // TODO
-//        yield [
-//            <<<'DOCBLOCK'
-        ///**
-        // * @Annotation(a={b: {}})
-        // */
-        //DOCBLOCK
-//            ,
-//            ['@Annotation(a={b: {}})'],
-//
-//        ];
-        // TODO
-//        yield [
-//            <<<'DOCBLOCK'
-        ///**
-        // * @Annotation({key: "value"})
-        // */
-        //DOCBLOCK
-//            ,
-//            ['@Annotation({key: "value"})'],
-//
-//        ];
-        // TODO
-//        yield [
-//            <<<'DOCBLOCK'
-        ///**
-        // * @Annotation({a: "b", c: "d"})
-        // */
-        //DOCBLOCK
-//            ,
-//            ['@Annotation({a:"b", c:"d"})'],
-//
-//        ];
-        // TODO
-//        yield [
-//            <<<'DOCBLOCK'
-        ///**
-        // * @Annotation({a: "b", "c": "d", 123: "e"})
-        // */
-        //DOCBLOCK
-//            ,
-//            ['@Annotation({a:"b","c":"d",123:"e"})'],
-//
-//        ];
+        yield [
+            <<<'DOCBLOCK'
+/**
+ * @Annotation(a={b: {}})
+ */
+DOCBLOCK
+            ,
+            ['@Annotation(a={b: {}})'],
+        ];
+
+        yield [
+            <<<'DOCBLOCK'
+/**
+ * @Annotation({key: "value"})
+ */
+DOCBLOCK
+            ,
+            ['@Annotation({key: "value"})'],
+        ];
+
+        yield [
+            <<<'DOCBLOCK'
+/**
+ * @Annotation({a: "b", c: "d"})
+ */
+DOCBLOCK
+            ,
+            ['@Annotation({a:"b", c:"d"})'],
+        ];
+
+        yield [
+            <<<'DOCBLOCK'
+/**
+ * @Annotation({a: "b", "c": "d", 123: "e"})
+ */
+DOCBLOCK
+            ,
+            ['@Annotation({a:"b","c":"d",123:"e"})'],
+        ];
 
         yield [
             <<<'DOCBLOCK'
@@ -521,17 +511,17 @@ DOCBLOCK
             ['@Escaped'],
         ];
 
-//        yield [
-//            <<<'DOCBLOCK'
-//        /**
-//         * @!Skipped
-//         */
-        //DOCBLOCK
-//            ,
-//            <<<'TRACE'
-//
-        //TRACE
-//        ];
+        yield [
+            <<<'DOCBLOCK'
+/**
+ * @!Skipped
+ */
+DOCBLOCK
+            ,
+            <<<'TRACE'
+
+TRACE
+        ];
 
         yield 'multiple without parameters' => [
             <<<'DOCBLOCK'
@@ -676,16 +666,15 @@ DOCBLOCK
             ],
         ];
 
-        // TODO
-//        yield 'Symfony route' => [
-//            <<<'DOCBLOCK'
-        ///**
-        // * @Route("/argument_with_route_param_and_default/{value}", defaults={"value": "value"}, name="argument_with_route_param_and_default")
-        // */
-        //DOCBLOCK
-//            ,
-//            ['@Route("/argument_with_route_param_and_default/{value}",defaults={"value": "value"},name="argument_with_route_param_and_default")'],
-//        ];
+        yield 'Symfony route' => [
+            <<<'DOCBLOCK'
+/**
+ * @Route("/argument_with_route_param_and_default/{value}", defaults={"value": "value"}, name="argument_with_route_param_and_default")
+ */
+DOCBLOCK
+            ,
+            ['@Route("/argument_with_route_param_and_default/{value}",defaults={"value": "value"},name="argument_with_route_param_and_default")'],
+        ];
 
         yield 'SymfonyFrameworkExtraBundle annotations' => [
             <<<'DOCBLOCK'
