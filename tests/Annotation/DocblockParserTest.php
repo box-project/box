@@ -38,8 +38,8 @@ class DocblockParserTest extends TestTokens
     /**
      * @dataProvider provideDocblocks
      */
-    public function test_it_can_parse_PHP_docblocks(string $docblock, string $expected): void {
-
+    public function test_it_can_parse_PHP_docblocks(string $docblock, string $expected): void
+    {
         $actual = (new Dump())->visit(
             $this->docblockParser->parse($docblock)
         );
@@ -258,28 +258,28 @@ TRACE
         // TODO: fix this ASAP
 //        yield [
 //            <<<'DOCBLOCK'
-///**
-// * @Annotation(123, "string", 1.23, CONSTANT, false, true, null)
-// */
-//DOCBLOCK
+        ///**
+        // * @Annotation(123, "string", 1.23, CONSTANT, false, true, null)
+        // */
+        //DOCBLOCK
 //            ,
 //            <<<'TRACE'
-//>  #null
+        //>  #null
 //
-//TRACE
+        //TRACE
 //        ];
 
 //        yield [
 //            <<<'DOCBLOCK'
-///**
-// * @Annotation(constant, FALSE, TRUE, NULL)
-// */
-//DOCBLOCK
+        ///**
+        // * @Annotation(constant, FALSE, TRUE, NULL)
+        // */
+        //DOCBLOCK
 //            ,
 //            <<<'TRACE'
-//>  #null
+        //>  #null
 //
-//TRACE
+        //TRACE
 //        ];
 
         yield [
@@ -331,23 +331,23 @@ TRACE
 
 //        yield [
 //            <<<'DOCBLOCK'
-///**
-// * @Annotation(
-// *     a=123,
-// *     b="string",
-// *     c=1.23,
-// *     d=CONSTANT,
-// *     e=false,
-// *     f=true,
-// *     g=null
-// * )
-// */
-//DOCBLOCK
+        ///**
+        // * @Annotation(
+        // *     a=123,
+        // *     b="string",
+        // *     c=1.23,
+        // *     d=CONSTANT,
+        // *     e=false,
+        // *     f=true,
+        // *     g=null
+        // * )
+        // */
+        //DOCBLOCK
 //            ,
 //            <<<'TRACE'
-//>  #null
+        //>  #null
 //
-//TRACE
+        //TRACE
 //        ];
 
         yield [
@@ -439,15 +439,15 @@ TRACE
 
 //        yield [
 //            <<<'DOCBLOCK'
-///**
-// * @Annotation({123, "string", 1.23, CONSTANT, false, true, null})
-// */
-//DOCBLOCK
+        ///**
+        // * @Annotation({123, "string", 1.23, CONSTANT, false, true, null})
+        // */
+        //DOCBLOCK
 //            ,
 //            <<<'TRACE'
-//>  #null
+        //>  #null
 //
-//TRACE
+        //TRACE
 //        ];
 
         yield [

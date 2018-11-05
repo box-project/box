@@ -17,6 +17,7 @@ namespace KevinGH\Box\Console\Command;
 use Assert\InvalidArgumentException;
 use Closure;
 use KevinGH\Box\Configuration;
+use KevinGH\Box\Exception\NoConfigurationFound;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\NoConfigurationFound;
 use KevinGH\Box\Test\CommandTestCase;

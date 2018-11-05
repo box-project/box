@@ -15,10 +15,9 @@ declare(strict_types=1);
 namespace KevinGH\Box\Compactor;
 
 use Exception;
-use KevinGH\Box\Annotation\Convert\ToString;
 use KevinGH\Box\Annotation\AnnotationDumper;
+use KevinGH\Box\Annotation\Convert\ToString;
 use KevinGH\Box\Annotation\DocblockParser;
-use KevinGH\Box\Annotation\Tokens;
 use const T_COMMENT;
 use const T_DOC_COMMENT;
 use const T_WHITESPACE;

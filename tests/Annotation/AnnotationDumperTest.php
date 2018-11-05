@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Annotation;
 
 use Generator;
-use Hoa\Compiler\Visitor\Dump;
 
 /**
  * @covers \KevinGH\Box\Annotation\AnnotationDumper
@@ -44,8 +43,8 @@ class AnnotationDumperTest extends TestTokens
     /**
      * @dataProvider provideDocblocks
      */
-    public function test_it_can_parse_PHP_docblocks(string $docblock, array $expected): void {
-
+    public function test_it_can_parse_PHP_docblocks(string $docblock, array $expected): void
+    {
         $actual = $this->annotationDumper->dump(
             $this->docblockParser->parse($docblock)
         );
@@ -78,7 +77,6 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Annotation'],
-
         ];
 
         yield [
@@ -89,7 +87,6 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Annotation()'],
-
         ];
 
         yield [
@@ -100,7 +97,6 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Annotation'],
-
         ];
 
         yield [
@@ -115,7 +111,6 @@ DOCBLOCK
                 '@A',
                 '@B',
             ],
-
         ];
 
         yield [
@@ -130,7 +125,6 @@ DOCBLOCK
                 '@A()',
                 '@B()',
             ],
-
         ];
 
         yield [
@@ -141,7 +135,6 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Namespaced\Annotation'],
-
         ];
 
         yield [
@@ -152,7 +145,6 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Namespaced'],
-
         ];
 
         yield [
@@ -163,7 +155,6 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Namespaced\Annotation()'],
-
         ];
 
         yield [
@@ -174,7 +165,6 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Annotation("string")'],
-
         ];
 
         yield [
@@ -187,16 +177,15 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Annotation("string")'],
-
         ];
 
         // TODO: fix this ASAP
 //        yield [
 //            <<<'DOCBLOCK'
-///**
-// * @Annotation(123, "string", 1.23, CONSTANT, false, true, null)
-// */
-//DOCBLOCK
+        ///**
+        // * @Annotation(123, "string", 1.23, CONSTANT, false, true, null)
+        // */
+        //DOCBLOCK
 //            ,
 //            [],
 
@@ -210,23 +199,22 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Annotation(a="b",c="d")'],
-
         ];
 
 //        yield [
 //            <<<'DOCBLOCK'
-///**
-// * @Annotation(
-// *     a=123,
-// *     b="string",
-// *     c=1.23,
-// *     d=CONSTANT,
-// *     e=false,
-// *     f=true,
-// *     g=null
-// * )
-// */
-//DOCBLOCK
+        ///**
+        // * @Annotation(
+        // *     a=123,
+        // *     b="string",
+        // *     c=1.23,
+        // *     d=CONSTANT,
+        // *     e=false,
+        // *     f=true,
+        // *     g=null
+        // * )
+        // */
+        //DOCBLOCK
 //            ,
 //            [],
 
@@ -240,7 +228,6 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Annotation(key={})'],
-
         ];
 
         yield [
@@ -251,7 +238,6 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Annotation({"string"})'],
-
         ];
 
         yield [
@@ -266,15 +252,14 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Annotation({"string"})'],
-
         ];
 
 //        yield [
 //            <<<'DOCBLOCK'
-///**
-// * @Annotation({123, "string", 1.23, CONSTANT, false, true, null})
-// */
-//DOCBLOCK
+        ///**
+        // * @Annotation({123, "string", 1.23, CONSTANT, false, true, null})
+        // */
+        //DOCBLOCK
 //            ,
 //            [],
 
@@ -288,7 +273,6 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Annotation({"key"="value"})'],
-
         ];
 
         yield [
@@ -299,7 +283,6 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Annotation({a="b",c="d"})'],
-
         ];
 
         yield [
@@ -310,7 +293,6 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Annotation({a="b","c"="d",123="e"})'],
-
         ];
 
         yield [
@@ -321,7 +303,6 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Annotation({key={}})'],
-
         ];
 
         yield [
@@ -332,16 +313,15 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Annotation(a={b={}})'],
-
         ];
 
         // TODO
 //        yield [
 //            <<<'DOCBLOCK'
-///**
-// * @Annotation({key: {}})
-// */
-//DOCBLOCK
+        ///**
+        // * @Annotation({key: {}})
+        // */
+        //DOCBLOCK
 //            ,
 //            ['@Annotation({key:{}})'],
 //
@@ -350,43 +330,43 @@ DOCBLOCK
         // TODO
 //        yield [
 //            <<<'DOCBLOCK'
-///**
-// * @Annotation(a={b: {}})
-// */
-//DOCBLOCK
+        ///**
+        // * @Annotation(a={b: {}})
+        // */
+        //DOCBLOCK
 //            ,
 //            ['@Annotation(a={b: {}})'],
 //
 //        ];
-// TODO
+        // TODO
 //        yield [
 //            <<<'DOCBLOCK'
-///**
-// * @Annotation({key: "value"})
-// */
-//DOCBLOCK
+        ///**
+        // * @Annotation({key: "value"})
+        // */
+        //DOCBLOCK
 //            ,
 //            ['@Annotation({key: "value"})'],
 //
 //        ];
-// TODO
+        // TODO
 //        yield [
 //            <<<'DOCBLOCK'
-///**
-// * @Annotation({a: "b", c: "d"})
-// */
-//DOCBLOCK
+        ///**
+        // * @Annotation({a: "b", c: "d"})
+        // */
+        //DOCBLOCK
 //            ,
 //            ['@Annotation({a:"b", c:"d"})'],
 //
 //        ];
-// TODO
+        // TODO
 //        yield [
 //            <<<'DOCBLOCK'
-///**
-// * @Annotation({a: "b", "c": "d", 123: "e"})
-// */
-//DOCBLOCK
+        ///**
+        // * @Annotation({a: "b", "c": "d", 123: "e"})
+        // */
+        //DOCBLOCK
 //            ,
 //            ['@Annotation({a:"b","c":"d",123:"e"})'],
 //
@@ -410,7 +390,6 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Annotation({"a",{{"c"},"b"}})'],
-
         ];
 
         yield [
@@ -421,7 +400,6 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Annotation(@Nested)'],
-
         ];
 
         yield [
@@ -432,7 +410,6 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Annotation(@Nested())'],
-
         ];
 
         yield [
@@ -443,7 +420,6 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Annotation(@Nested,@Nested)'],
-
         ];
 
         yield [
@@ -457,7 +433,6 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Annotation(@Nested(),@Nested())'],
-
         ];
 
         yield [
@@ -468,7 +443,6 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Annotation(key=@Nested)'],
-
         ];
 
         yield [
@@ -479,7 +453,6 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Annotation(a=@Nested(),b=@Nested)'],
-
         ];
 
         yield [
@@ -490,7 +463,6 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Annotation({key=@Nested})'],
-
         ];
 
         yield [
@@ -501,7 +473,6 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Annotation({a=@Nested(),b=@Nested})'],
-
         ];
 
         yield [
@@ -535,7 +506,6 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Annotation(@Nested({"a",{{"c"},"b"}}),@Nested({"d",{{"f"},"e"}}))'],
-
         ];
 
         // TODO: this one looks wrong
@@ -547,7 +517,6 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Escaped'],
-
         ];
 
 //        yield [
@@ -555,11 +524,11 @@ DOCBLOCK
 //        /**
 //         * @!Skipped
 //         */
-//DOCBLOCK
+        //DOCBLOCK
 //            ,
 //            <<<'TRACE'
 //
-//TRACE
+        //TRACE
 //        ];
 
         yield 'multiple without parameters' => [
@@ -571,7 +540,7 @@ DOCBLOCK
                 '@Annotation1',
                 '@Annotation2',
                 '@Annotation3',
-            ]
+            ],
         ];
 
         yield 'multiple with comments' => [
@@ -587,7 +556,7 @@ DOCBLOCK
             [
                 '@Annotation1',
                 '@Annotation2',
-            ]
+            ],
         ];
 
         yield 'fully qualified with parameter' => [
@@ -609,7 +578,7 @@ DOCBLOCK
             ['@return'],
         ];
 
-        yield 'fully qualified, nested, multiple parameters' =>  [
+        yield 'fully qualified, nested, multiple parameters' => [
             <<<'DOCBLOCK'
 /**
 * @\Ns\Name(int=1, annot=@Annot, float=1.2)
@@ -701,17 +670,17 @@ DOCBLOCK
             ,
             [
                 '@ORM\ManyToMany(targetEntity=CmsGroup::class,inversedBy="users",cascade={"persist"})',
-                '@ORM\JoinTable(name="cms_users_groups",joinColumns={@ORM\JoinColumn(name="user_id",referencedColumnName="id")},inverseJoinColumns={@ORM\JoinColumn(name="group_id",referencedColumnName="id")})'
+                '@ORM\JoinTable(name="cms_users_groups",joinColumns={@ORM\JoinColumn(name="user_id",referencedColumnName="id")},inverseJoinColumns={@ORM\JoinColumn(name="group_id",referencedColumnName="id")})',
             ],
         ];
 
         // TODO
 //        yield 'Symfony route' => [
 //            <<<'DOCBLOCK'
-///**
-// * @Route("/argument_with_route_param_and_default/{value}", defaults={"value": "value"}, name="argument_with_route_param_and_default")
-// */
-//DOCBLOCK
+        ///**
+        // * @Route("/argument_with_route_param_and_default/{value}", defaults={"value": "value"}, name="argument_with_route_param_and_default")
+        // */
+        //DOCBLOCK
 //            ,
 //            ['@Route("/argument_with_route_param_and_default/{value}",defaults={"value": "value"},name="argument_with_route_param_and_default")'],
 //        ];

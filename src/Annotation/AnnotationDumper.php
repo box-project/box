@@ -1,16 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Annotation;
 
+use Assert\Assertion;
+use Hoa\Compiler\Llk\TreeNode;
+use InvalidArgumentException;
 use function array_map;
 use function array_shift;
 use function array_values;
-use Assert\Assertion;
-use Hoa\Compiler\Llk\TreeNode;
-use Hoa\Visitor;
 use function implode;
 use function in_array;
-use InvalidArgumentException;
 use function sprintf;
 
 final class AnnotationDumper
@@ -18,7 +29,7 @@ final class AnnotationDumper
     /**
      * Dumps the list of annotations from the given tree.
      *
-     * @return  string[]
+     * @return string[]
      */
     public function dump(TreeNode $node): array
     {
@@ -90,7 +101,7 @@ final class AnnotationDumper
         if ('#string' === $node->getId()) {
             Assertion::lessOrEqualThan($node->getChildrenNumber(), 1);
 
-            return $node->getChildrenNumber() === 1 ? $this->transformDataToString($node->getChild(0)) : '""';
+            return 1 === $node->getChildrenNumber() ? $this->transformDataToString($node->getChild(0)) : '""';
         }
 
         if ('#list' === $node->getId() || '#map' === $node->getId()) {
@@ -165,7 +176,6 @@ final class AnnotationDumper
                 $this->transformDataToString($node->getChild(1))
             );
         }
-
 
         $x = '';
     }

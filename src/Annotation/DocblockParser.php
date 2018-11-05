@@ -38,7 +38,7 @@ final class DocblockParser
             return new TreeNode('#null');
         }
 
-        $compiler = Llk::load(new Read(__DIR__ . '/../../res/annotation-grammar.pp'));
+        $compiler = Llk::load(new Read(__DIR__.'/../../res/annotation-grammar.pp'));
 
         try {
             return $compiler->parse($docblock);

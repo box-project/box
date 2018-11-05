@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace KevinGH\Box\Annotation;
 
 use Hoa\Compiler\Exception\UnrecognizedToken;
-use function sprintf;
 use UnexpectedValueException;
+use function sprintf;
 
 /**
  * @private
