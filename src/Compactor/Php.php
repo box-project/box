@@ -15,9 +15,8 @@ declare(strict_types=1);
 namespace KevinGH\Box\Compactor;
 
 use Exception;
-use KevinGH\Box\Annotation\AnnotationDumper;
-use KevinGH\Box\Annotation\Convert\ToString;
-use KevinGH\Box\Annotation\DocblockParser;
+use KevinGH\Box\Annotation\DocblockAnnotationParser;
+use RuntimeException;
 use const T_COMMENT;
 use const T_DOC_COMMENT;
 use const T_WHITESPACE;
@@ -43,18 +42,16 @@ use function token_get_all;
  */
 final class Php extends FileExtensionCompactor
 {
-    private $converter;
-    private $tokenizer;
+    private $annotationParser;
 
     /**
      * {@inheritdoc}
      */
-    public function __construct(DocblockParser $tokenizer, array $extensions = ['php'])
+    public function __construct(DocblockAnnotationParser $annotationParser, array $extensions = ['php'])
     {
         parent::__construct($extensions);
 
-        $this->converter = new ToString();
-        $this->tokenizer = $tokenizer;
+        $this->annotationParser = $annotationParser;
     }
 
     /**
@@ -77,10 +74,10 @@ final class Php extends FileExtensionCompactor
             if (is_string($token)) {
                 $output .= $token;
             } elseif (in_array($token[0], [T_COMMENT, T_DOC_COMMENT], true)) {
-                if ($this->tokenizer && false !== strpos($token[1], '@')) {
+                if (false !== strpos($token[1], '@')) {
                     try {
                         $output .= $this->compactAnnotations($token[1]);
-                    } catch (Exception $exception) {
+                    } catch (RuntimeException $exception) {
                         $output .= $token[1];
                     }
                 } else {
@@ -107,48 +104,28 @@ final class Php extends FileExtensionCompactor
 
     private function compactAnnotations(string $docblock): string
     {
-        $annotations = [];
-        $index = -1;
-        $inside = 0;
-        $nodes = $this->tokenizer->parse($docblock);
-
-        if (0 === $nodes->getChildrenNumber()) {
-            return str_repeat("\n", substr_count($docblock, "\n"));
-        }
-
-//        foreach ($nodes->getChildren() as $child) {
-//            if ((0 === $inside) && (DocLexer::T_AT === $child[0])) {
-//                ++$index;
-//            } elseif (DocLexer::T_OPEN_PARENTHESIS === $child[0]) {
-//                ++$inside;
-//            } elseif (DocLexer::T_CLOSE_PARENTHESIS === $child[0]) {
-//                --$inside;
-//            }
-//
-//            if (!isset($annotations[$index])) {
-//                $annotations[$index] = [];
-//            }
-//
-//            $annotations[$index][] = $child;
-//        }
-
         $breaks = substr_count($docblock, "\n");
-        $docblock = '/**';
+        $compactedDocblock = '/**';
 
-        $compacted = (new AnnotationDumper())->dump($nodes);
-        foreach ($compacted as $annotation) {
-            $docblock .= "\n".$annotation;
+        $annotations = $this->annotationParser->parse($docblock);
+
+        if ([] === $annotations) {
+            return str_repeat("\n", $breaks);
         }
 
-        $breaks -= count($compacted);
+        foreach ($annotations as $annotation) {
+            $compactedDocblock .= "\n".$annotation;
+        }
+
+        $breaks -= count($annotations);
 
         if ($breaks > 0) {
-            $docblock .= str_repeat("\n", $breaks - 1);
-            $docblock .= "\n*/";
+            $compactedDocblock .= str_repeat("\n", $breaks - 1);
+            $compactedDocblock .= "\n*/";
         } else {
-            $docblock .= ' */';
+            $compactedDocblock .= ' */';
         }
 
-        return $docblock;
+        return $compactedDocblock;
     }
 }

@@ -29,6 +29,8 @@ final class DocblockParser
 {
     /**
      * Parses the docblock and returns its AST.
+     *
+     * @throws InvalidDocblock
      */
     public function parse(string $docblock): TreeNode
     {

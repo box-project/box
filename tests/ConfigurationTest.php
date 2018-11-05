@@ -668,7 +668,7 @@ EOF
         $tokenizer = (
             Closure::bind(
                 function (Php $phpCompactor): DocblockParser {
-                    return $phpCompactor->tokenizer;
+                    return $phpCompactor->annotationParser;
                 },
                 null,
                 Php::class

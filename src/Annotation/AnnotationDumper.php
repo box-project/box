@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Annotation;
 
+use function array_filter;
 use Assert\Assertion;
 use Hoa\Compiler\Llk\TreeNode;
 use InvalidArgumentException;
@@ -23,29 +24,74 @@ use function array_values;
 use function implode;
 use function in_array;
 use function sprintf;
+use function strtolower;
+use function trim;
 
+/**
+ * @private
+ */
 final class AnnotationDumper
 {
     /**
      * Dumps the list of annotations from the given tree.
      *
+     * @param string[] $ignored List of annotations to ignore
+     *
+     * @throws InvalidToken
+     *
      * @return string[]
      */
-    public function dump(TreeNode $node): array
+    public function dump(TreeNode $node, array $ignored): array
     {
+        Assertion::allString($ignored);
+
+        $ignored = array_map('strtolower', $ignored);
+
         if ('#annotations' !== $node->getId()) {
             return [];
         }
 
-        return array_map(
-            function (TreeNode $node): string {
-                return $this->transformDataToString($node);
-            },
-            $node->getChildren()
+        return array_values(
+            array_filter(
+                $this->transformNodesToString(
+                    $node->getChildren(),
+                    $ignored
+                )
+            )
         );
     }
 
-    private function transformDataToString(TreeNode $node): string
+    /**
+     * @param TreeNode $nodes
+     * @param string[] $ignored
+     *
+     * @return (string|null)[]
+     */
+    private function transformNodesToString(array $nodes, array $ignored): array
+    {
+        $ignored = array_values(
+            array_filter(
+                array_map(
+                    function (string $ignored): ?string {
+                        return strtolower(trim($ignored));
+                    },
+                    $ignored
+                )
+            )
+        );
+
+        return array_map(
+            function (TreeNode $node) use ($ignored): ?string {
+                return $this->transformNodeToString($node, $ignored);
+            },
+            $nodes
+        );
+    }
+
+    /**
+     * @param string[] $ignored
+     */
+    private function transformNodeToString(TreeNode $node, array $ignored): ?string
     {
         if ('token' === $node->getId()) {
             if (in_array($node->getValueToken(), ['identifier', 'simple_identifier', 'integer', 'float', 'boolean', 'identifier_ns'], true)) {
@@ -60,20 +106,13 @@ final class AnnotationDumper
                 return sprintf('%s()', $node->getValueValue());
             }
 
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Unknown token type "%s"',
-                    $node->getValueToken()
-                )
-            );
+            throw InvalidToken::createForUnknownType($node);
         }
 
         if ('#parameters' === $node->getId()) {
-            $transformedChildren = array_map(
-                function (TreeNode $parameter): string {
-                    return $this->transformDataToString($parameter);
-                },
-                $node->getChildren()
+            $transformedChildren = $this->transformNodesToString(
+                $node->getChildren(),
+                $ignored
             );
 
             return implode(',', $transformedChildren);
@@ -87,29 +126,27 @@ final class AnnotationDumper
 
             return sprintf(
                 '%s=%s',
-                $this->transformDataToString($name),
-                $this->transformDataToString($parameter)
+                $this->transformNodeToString($name, $ignored),
+                $this->transformNodeToString($parameter, $ignored)
             );
         }
 
         if ('#value' === $node->getId()) {
             Assertion::same($node->getChildrenNumber(), 1);
 
-            return $this->transformDataToString($node->getChild(0));
+            return $this->transformNodeToString($node->getChild(0), $ignored);
         }
 
         if ('#string' === $node->getId()) {
             Assertion::lessOrEqualThan($node->getChildrenNumber(), 1);
 
-            return 1 === $node->getChildrenNumber() ? $this->transformDataToString($node->getChild(0)) : '""';
+            return 1 === $node->getChildrenNumber() ? $this->transformNodeToString($node->getChild(0), $ignored) : '""';
         }
 
         if ('#list' === $node->getId() || '#map' === $node->getId()) {
-            $transformedChildren = array_map(
-                function (TreeNode $parameter): string {
-                    return $this->transformDataToString($parameter);
-                },
-                $node->getChildren()
+            $transformedChildren = $this->transformNodesToString(
+                $node->getChildren(),
+                $ignored
             );
 
             return sprintf(
@@ -133,15 +170,15 @@ final class AnnotationDumper
             if ('simple_identifier' === $token->getValueToken()) {
                 Assertion::count($parameters, 0);
 
-                return '@'.$token->getValueValue();
+                $tokenValue = $token->getValueValue();
+
+                return in_array(strtolower($tokenValue), $ignored, true) ? null : '@' . $tokenValue;
             }
 
             if ('valued_identifier' === $token->getValueToken()) {
-                $transformedChildren = array_map(
-                    function (TreeNode $parameter): string {
-                        return $this->transformDataToString($parameter);
-                    },
-                    $parameters
+                $transformedChildren = $this->transformNodesToString(
+                    $parameters,
+                    $ignored
                 );
 
                 return sprintf(
@@ -158,13 +195,13 @@ final class AnnotationDumper
         if ('#unnamed_parameter' === $node->getId()) {
             Assertion::same($node->getChildrenNumber(), 1);
 
-            return $this->transformDataToString($node->getChild(0));
+            return $this->transformNodeToString($node->getChild(0), $ignored);
         }
 
         if ('#reference' === $node->getId()) {
             Assertion::same($node->getChildrenNumber(), 1);
 
-            return $this->transformDataToString($node->getChild(0));
+            return $this->transformNodeToString($node->getChild(0), $ignored);
         }
 
         if ('#constant' === $node->getId()) {
@@ -172,8 +209,8 @@ final class AnnotationDumper
 
             return sprintf(
                 '%s::%s',
-                $this->transformDataToString($node->getChild(0)),
-                $this->transformDataToString($node->getChild(1))
+                $this->transformNodeToString($node->getChild(0), $ignored),
+                $this->transformNodeToString($node->getChild(1), $ignored)
             );
         }
 

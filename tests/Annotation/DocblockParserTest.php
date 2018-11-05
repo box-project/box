@@ -16,11 +16,12 @@ namespace KevinGH\Box\Annotation;
 
 use Generator;
 use Hoa\Compiler\Visitor\Dump;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \KevinGH\Box\Annotation\DocblockParser
  */
-class DocblockParserTest extends TestTokens
+class DocblockParserTest extends TestCase
 {
     /**
      * @var DocblockParser
@@ -1079,6 +1080,19 @@ TRACE
 //            <<<'DOCBLOCK'
 //        /**
 //         * @!Skipped
+//         */
+//DOCBLOCK
+//            ,
+//            <<<'TRACE'
+//
+//TRACE
+//        ];
+
+        // TODO
+//        yield [
+//            <<<'DOCBLOCK'
+//        /**
+//         * @author Made Up <author@web.com>
 //         */
 //DOCBLOCK
 //            ,

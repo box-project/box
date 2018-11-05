@@ -15,11 +15,12 @@ declare(strict_types=1);
 namespace KevinGH\Box\Annotation;
 
 use Generator;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \KevinGH\Box\Annotation\AnnotationDumper
  */
-class AnnotationDumperTest extends TestTokens
+class AnnotationDumperTest extends TestCase
 {
     /**
      * @var DocblockParser
@@ -43,10 +44,11 @@ class AnnotationDumperTest extends TestTokens
     /**
      * @dataProvider provideDocblocks
      */
-    public function test_it_can_parse_PHP_docblocks(string $docblock, array $expected): void
+    public function test_it_can_parse_PHP_docblocks(string $docblock, array $expected, array $ignore = []): void
     {
         $actual = $this->annotationDumper->dump(
-            $this->docblockParser->parse($docblock)
+            $this->docblockParser->parse($docblock),
+            $ignore
         );
 
         $this->assertSame($expected, $actual);
@@ -761,12 +763,47 @@ DOCBLOCK
             ['@Annotation'],
         ];
 
-        yield 'oneline annotation' => [
+        yield 'one-line annotation' => [
             <<<'DOCBLOCK'
 /** @var string */
 DOCBLOCK
             ,
             ['@var'],
+        ];
+
+        yield [
+            <<<'DOCBLOCK'
+/**
+ * @Ignored
+ * @Kept
+ */
+DOCBLOCK
+            ,
+            ['@Kept'],
+            ['Ignored']
+        ];
+
+        yield [
+            <<<'DOCBLOCK'
+/**
+ * @ignored
+ * @Kept
+ */
+DOCBLOCK
+            ,
+            ['@Kept'],
+            ['Ignored']
+        ];
+
+        yield [
+            <<<'DOCBLOCK'
+/**
+ * @Kept(@Ignored)
+ */
+DOCBLOCK
+            ,
+            ['@Kept()'],
+            ['Ignored']
         ];
     }
 }
