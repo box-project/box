@@ -14,14 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Annotation;
 
-use Hoa\Compiler\Exception\UnrecognizedToken;
-use Hoa\Compiler\Llk\Llk;
-use Hoa\Compiler\Llk\TreeNode;
-use Hoa\File\Read;
-use function strpos;
-use function substr;
-use function trim;
-
 /**
  * @private
  */

@@ -780,7 +780,7 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Kept'],
-            ['Ignored']
+            ['Ignored'],
         ];
 
         yield [
@@ -792,7 +792,7 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Kept'],
-            ['Ignored']
+            ['Ignored'],
         ];
 
         yield [
@@ -803,7 +803,7 @@ DOCBLOCK
 DOCBLOCK
             ,
             ['@Kept()'],
-            ['Ignored']
+            ['Ignored'],
         ];
     }
 }

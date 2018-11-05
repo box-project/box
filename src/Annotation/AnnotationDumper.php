@@ -14,10 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Annotation;
 
-use function array_filter;
 use Assert\Assertion;
 use Hoa\Compiler\Llk\TreeNode;
-use InvalidArgumentException;
+use function array_filter;
 use function array_map;
 use function array_shift;
 use function array_values;
@@ -72,7 +71,7 @@ final class AnnotationDumper
         $ignored = array_values(
             array_filter(
                 array_map(
-                    function (string $ignored): ?string {
+                    static function (string $ignored): ?string {
                         return strtolower(trim($ignored));
                     },
                     $ignored
@@ -172,7 +171,7 @@ final class AnnotationDumper
 
                 $tokenValue = $token->getValueValue();
 
-                return in_array(strtolower($tokenValue), $ignored, true) ? null : '@' . $tokenValue;
+                return in_array(strtolower($tokenValue), $ignored, true) ? null : '@'.$tokenValue;
             }
 
             if ('valued_identifier' === $token->getValueToken()) {

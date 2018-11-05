@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-use Exception;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
 use RuntimeException;
 use const T_COMMENT;
