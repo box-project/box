@@ -579,11 +579,72 @@ command ✨.
 
 ### Annotations (`annotations`)
 
-// TODO: review this setting + doc, default value...]
-
 The annotations (`boolean`|`object`|`null` default `true`) setting is used to enable compacting annotations in PHP source
-code. By setting it to `true`, all Doctrine-style annotations are compacted in PHP files. You may also specify a list of
-annotations to ignore, which will be stripped while protecting the remaining annotations:
+code. 
+
+This setting is only taken into consideration if the [`KevinGH\Box\Compactor\Php` compactor][compactors] is enabled.
+
+By default, it removes all non real-like annotations from the PHP code. See the following example:
+
+<details>
+<summary>Original code</summary>
+<<<'PHP'
+<?php
+
+/**
+ * Function comparing the two given values
+ *
+ * @param int $x
+ * @param int $y
+ *
+ * @return int
+ *
+ * @author Théo Fidry
+ * @LICENSE MIT
+ *
+ * @Acme(type = "function")
+ */
+function foo($x, $y): int {
+    // Compare the two values
+    return $x <=> $y;
+}
+<details>
+<details>
+<summary>Compacted code</summary>
+<<<'PHP'
+<?php
+
+/**
+@Acme(type="function")
+
+
+
+
+
+
+
+
+
+
+*/
+function foo($x, $y): int {
+
+ return $x <=> $y;
+}
+<details>
+
+Note that the empty line returns are on purpose: it is to keep the same line number for the files between your source
+code and the code bundled in the PHAR.
+
+If you wish to keep all annotations, you can disable the annotations like so:
+
+```json
+{
+    "annotations": false
+}
+```
+
+For a more granular list, you can manually configure the list of annotations you wish to ignore:
 
 ```json
 {
@@ -597,11 +658,6 @@ annotations to ignore, which will be stripped while protecting the remaining ann
     }
 }
 ```
-
-You may want to see this website for a list of annotations which are commonly ignored on
-[herrera-io/php-annotations][herrera-io/php-annotations]:
-
-Note that this setting is used only if the compactor `KevinGH\Box\Compactor\Php` is registered.
 
 
 ### PHP-Scoper (`php-scoper`)
