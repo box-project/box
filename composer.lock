@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "562d878c1afd8679f0615a057d8edaef",
+    "content-hash": "f095c058d463c32b31586e70a6b9a2e8",
     "packages": [
         {
             "name": "amphp/amp",
@@ -1355,16 +1355,16 @@
         },
         {
             "name": "paragonie/pharaoh",
-            "version": "dev-master",
+            "version": "v0.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/pharaoh.git",
-                "reference": "45f139d"
+                "reference": "060418e946de2f39a3618ad70d9b6d0a61437b83"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/pharaoh/zipball/45f139d",
-                "reference": "45f139d",
+                "url": "https://api.github.com/repos/paragonie/pharaoh/zipball/060418e946de2f39a3618ad70d9b6d0a61437b83",
+                "reference": "060418e946de2f39a3618ad70d9b6d0a61437b83",
                 "shasum": ""
             },
             "require": {
@@ -1374,7 +1374,7 @@
                 "ulrichsg/getopt-php": "^3"
             },
             "require-dev": {
-                "vimeo/psalm": "^0|^1"
+                "vimeo/psalm": "^1|^2"
             },
             "bin": [
                 "pharaoh"
@@ -1406,7 +1406,7 @@
                 "tool",
                 "utility"
             ],
-            "time": "2018-08-05T14:34:39+00:00"
+            "time": "2018-11-02T16:45:56+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -4357,9 +4357,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "paragonie/pharaoh": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
