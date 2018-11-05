@@ -1336,42 +1336,65 @@ KevinGH\Box\Configuration {#140
   -excludeComposerFiles: true
   -compactors: array:1 [
     0 => KevinGH\Box\Compactor\Php {#140
-      -converter: KevinGH\Box\Annotation\Convert\ToString {#140
-        -break: "\\n"
-        -char: " "
-        -level: null
-        -space: false
-        -size: 0
-        #result: null
-        #tokens: null
-      }
-      -tokenizer: KevinGH\Box\Annotation\Tokenizer {#140
-        -aliases: []
-        -ignored: []
-        -lexer: Doctrine\Common\Annotations\DocLexer {#140
-          #noCase: array:9 [
-            "@" => 101
-            "," => 104
-            "(" => 109
-            ")" => 103
-            "{" => 108
-            "}" => 102
-            "=" => 105
-            ":" => 112
-            "\" => 107
-          ]
-          #withCase: array:3 [
-            "true" => 110
-            "false" => 106
-            "null" => 111
-          ]
-          -input: null
-          -tokens: []
-          -position: 0
-          -peek: 0
-          +lookahead: null
-          +token: null
-        }
+      -annotationParser: KevinGH\Box\Annotation\DocblockAnnotationParser {#140
+        -docblockParser: KevinGH\Box\Annotation\DocblockParser {#140}
+        -annotationDumper: KevinGH\Box\Annotation\AnnotationDumper {#140}
+        -ignored: array:54 [
+          0 => "abstract"
+          1 => "access"
+          2 => "annotation"
+          3 => "api"
+          4 => "attribute"
+          5 => "attributes"
+          6 => "author"
+          7 => "category"
+          8 => "code"
+          9 => "codecoverageignore"
+          10 => "codecoverageignoreend"
+          11 => "codecoverageignorestart"
+          12 => "copyright"
+          13 => "deprec"
+          14 => "deprecated"
+          15 => "endcode"
+          16 => "example"
+          17 => "exception"
+          18 => "filesource"
+          19 => "final"
+          20 => "fixme"
+          21 => "global"
+          22 => "ignore"
+          23 => "ingroup"
+          24 => "inheritdoc"
+          25 => "internal"
+          26 => "license"
+          27 => "link"
+          28 => "magic"
+          29 => "method"
+          30 => "name"
+          31 => "override"
+          32 => "package"
+          33 => "package_version"
+          34 => "param"
+          35 => "private"
+          36 => "property"
+          37 => "required"
+          38 => "return"
+          39 => "see"
+          40 => "since"
+          41 => "static"
+          42 => "staticvar"
+          43 => "subpackage"
+          44 => "suppresswarnings"
+          45 => "target"
+          46 => "throw"
+          47 => "throws"
+          48 => "todo"
+          49 => "tutorial"
+          50 => "usedby"
+          51 => "uses"
+          52 => "var"
+          53 => "version"
+        ]
       }
       -extensions: array:1 [
         0 => "php"

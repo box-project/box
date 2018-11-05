@@ -2500,7 +2500,7 @@ BANNER;
         self::checkIfDefaultValue($logger, $raw, self::ANNOTATIONS_KEY, null);
 
         if (false === property_exists($raw, self::ANNOTATIONS_KEY)) {
-            return [];
+            return self::DEFAULT_IGNORED_ANNOTATIONS;
         }
 
         if (false === $hasPhpCompactor) {
