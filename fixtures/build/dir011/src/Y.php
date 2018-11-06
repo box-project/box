@@ -12,7 +12,10 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-return [
-    'whitelist' => ['Foo\back'],
-    'files-whitelist' => ['src/Y.php'],
-];
+final class Y
+{
+    public static function salute(): void
+    {
+        echo 'World';
+    }
+}

@@ -23,6 +23,7 @@ use Herrera\Box\Compactor\Php as LegacyPhp;
 use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
 use Humbug\PhpScoper\Console\ApplicationFactory;
 use Humbug\PhpScoper\Scoper;
+use Humbug\PhpScoper\Scoper\FileWhitelistScoper;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php as PhpCompactor;
 use KevinGH\Box\Compactor\PhpScoper as PhpScoperCompactor;
@@ -2443,6 +2444,21 @@ BANNER;
                 return parent::createScoper();
             }
         })::createScoper();
+
+        if ([] !== $phpScoperConfig->getWhitelistedFiles()) {
+            $whitelistedFiles = array_values(
+                array_unique(
+                    array_map(
+                        static function (string $path) use ($basePath): string {
+                            return make_path_relative($path, $basePath);
+                        },
+                        $phpScoperConfig->getWhitelistedFiles()
+                    )
+                )
+            );
+
+            $phpScoper = new FileWhitelistScoper($phpScoper, ...$whitelistedFiles);
+        }
 
         $prefix = null === $phpScoperConfig->getPrefix()
             ? unique_id('_HumbugBox')

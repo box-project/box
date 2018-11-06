@@ -95,9 +95,12 @@ e2e_scoper_whitelist: 	 ## Runs the end-to-end tests to check that the PHP-Scope
 e2e_scoper_whitelist: box fixtures/build/dir011/vendor
 	php fixtures/build/dir011/index.php > fixtures/build/dir011/expected-output
 	./box compile --working-dir fixtures/build/dir011
+
 	php fixtures/build/dir011/index.phar > fixtures/build/dir011/output
+	cd fixtures/build/dir011 && php -r "file_put_contents('phar-Y.php', file_get_contents((new Phar('index.phar'))['src/Y.php']));"
 
 	diff fixtures/build/dir011/expected-output fixtures/build/dir011/output
+	diff fixtures/build/dir011/phar-Y.php fixtures/build/dir011/src/Y.php
 
 .PHONY: e2e_check_requirements
 DOCKER=docker run -i --rm -w /opt/box
