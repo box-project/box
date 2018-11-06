@@ -10,7 +10,7 @@
     ],
 
     "files": [
-        "annotation-grammar.pp",
+        "res/annotation-grammar.pp",
         "res/schema.json"
     ],
     "directories-bin": [".requirement-checker"],
