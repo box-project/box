@@ -214,7 +214,6 @@ private \$none;
 PHP
         ];
 
-        // TODO
         yield 'legacy issue 14' => [
             new DocblockAnnotationParser(
                 new DocblockParser(),

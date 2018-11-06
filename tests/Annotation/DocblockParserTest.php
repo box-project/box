@@ -1154,7 +1154,6 @@ DOCBLOCK
 TRACE
         ];
 
-        // TODO: this is wrong
         yield [
             <<<'DOCBLOCK'
 /**
@@ -1166,8 +1165,6 @@ DOCBLOCK
 >  #annotations
 >  >  #annotation
 >  >  >  token(annot:simple_identifier, author)
->  >  #annotation
->  >  >  token(annot:simple_identifier, web)
 
 TRACE
         ];
