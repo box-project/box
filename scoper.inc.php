@@ -14,8 +14,6 @@ declare(strict_types=1);
 
 use Isolated\Symfony\Component\Finder\Finder;
 
-$classLoaderContents = file_get_contents(__DIR__.'/vendor/composer/composer/src/Composer/Autoload/ClassLoader.php');
-
 return [
     'patchers' => [
         function (string $filePath, string $prefix, string $contents): string {
@@ -65,9 +63,6 @@ return [
                 $contents
             );
         },
-        function (string $filePath, string $prefix, string $contents) use ($classLoaderContents): string {
-            return 'vendor/composer/composer/src/Composer/Autoload/ClassLoader.php' === $filePath ? $classLoaderContents : $contents;
-        },
         function (string $filePath, string $prefix, string $contents): string {
             if ('vendor/paragonie/sodium_compat/autoload.php' !== $filePath) {
                 return $contents;
@@ -104,6 +99,9 @@ return [
                 $contents
             );
         },
+    ],
+    'files-whitelist' => [
+        __DIR__.'/vendor/composer/composer/src/Composer/Autoload/ClassLoader.php',
     ],
     'whitelist' => [
         \Composer\Autoload\ClassLoader::class,
