@@ -15,7 +15,6 @@ declare(strict_types=1);
 use Isolated\Symfony\Component\Finder\Finder;
 
 return [
-    'prefix' => '_HumbugBox3c2c9a8ff89c',
     'patchers' => [
         // TODO: to check if still necessary
         function (string $filePath, string $prefix, string $contents): string {
