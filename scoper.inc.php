@@ -15,12 +15,15 @@ declare(strict_types=1);
 use Isolated\Symfony\Component\Finder\Finder;
 
 return [
+    'prefix' => '_HumbugBox3c2c9a8ff89c',
     'patchers' => [
+        // TODO: to check if still necessary
         function (string $filePath, string $prefix, string $contents): string {
             $finderClass = sprintf('\%s\%s', $prefix, Finder::class);
 
             return str_replace($finderClass, '\\'.Finder::class, $contents);
         },
+        // Box compactors: not required to work but avoid any confusion for the users
         function (string $filePath, string $prefix, string $contents): string {
             $files = [
                 'src/functions.php',
@@ -63,6 +66,7 @@ return [
                 $contents
             );
         },
+        // Paragonie custom autoloader which relies on some regexes
         function (string $filePath, string $prefix, string $contents): string {
             if ('vendor/paragonie/sodium_compat/autoload.php' !== $filePath) {
                 return $contents;
@@ -85,6 +89,7 @@ return [
                 )
             );
         },
+        // Paragonie dynamic constants declarations
         function (string $filePath, string $prefix, string $contents): string {
             if ('vendor/paragonie/sodium_compat/lib/php72compat.php' !== $filePath) {
                 return $contents;
@@ -99,6 +104,61 @@ return [
                 $contents
             );
         },
+        // Hoa patches
+        function (string $filePath, string $prefix, string $contents): string {
+            if ('vendor/hoa/stream/Stream.php' !== $filePath) {
+                return $contents;
+            }
+
+            return preg_replace(
+                '/Hoa\\\\Consistency::registerShutdownFunction\(xcallable\(\'(.*)\'\)\)/',
+                sprintf(
+                    'Hoa\\Consistency::registerShutdownFunction(xcallable(\'%s$1\'))',
+                    $prefix.'\\\\\\\\'
+                ),
+                $contents
+            );
+        },
+        function (string $filePath, string $prefix, string $contents): string {
+            if ('vendor/hoa/consistency/Prelude.php' !== $filePath) {
+                return $contents;
+            }
+
+            return preg_replace(
+                '/\$define\(\'(.*?)\'\,/',
+                sprintf(
+                    '$define(\'%s\\\\$1\',',
+                    $prefix
+                ),
+                $contents
+            );
+        },
+        function (string $filePath, string $prefix, string $contents): string {
+            if ('vendor/hoa/consistency/Autoloader.php' !== $filePath) {
+                return $contents;
+            }
+
+            $contents = preg_replace(
+                '/(\$entityPrefix = \$entity;)/',
+                sprintf(
+                    '$entity = substr($entity, %d);$1',
+                    strlen($prefix) + 1
+                ),
+                $contents
+            );
+
+            $contents = preg_replace(
+                '/return \$this->runAutoloaderStack\((.*)\);/',
+                sprintf(
+                    'return $this->runAutoloaderStack(\'%s\'.\'%s\'.$1);',
+                    $prefix,
+                    '\\\\\\'
+                ),
+                $contents
+            );
+
+            return $contents;
+        },
     ],
     'files-whitelist' => [
         __DIR__.'/vendor/composer/composer/src/Composer/Autoload/ClassLoader.php',
@@ -111,6 +171,16 @@ return [
         \Herrera\Box\Compactor\Php::class,
         \KevinGH\Box\Compactor\Php::class,
         \KevinGH\Box\Compactor\PhpScoper::class,
+
+        // Hoa symbols
+        'xcallable',
+        'ROOT_SEPARATOR',
+        'PHP_WINDOWS_VERSION_PLATFORM',
+        'S_64_BITS',
+        '_static',
+        '_abstract',
+        '_final',
+        'DS',
     ],
     'whitelist-global-constants' => false,
     'whitelist-global-classes' => false,

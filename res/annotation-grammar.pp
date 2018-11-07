@@ -6,7 +6,7 @@
 %skip   docblock:space     [\x20\x09\x0a\x0d]+
 %skip   docblock:star      \*(?!/)
 %token  docblock:_doc      \*/                         -> default
-%token  docblock:at        @(?!\s)                     -> annot
+%token  docblock:at        (?<=[\h\*])@(?=\b)          -> annot
 %token  docblock:text      [^*@]+|@(?=\s)|\*(?!/)
 
 %token  annot:valued_identifier \\?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*(\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)*(?=\()
