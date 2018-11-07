@@ -18,6 +18,7 @@ use KevinGH\Box\Compactor;
 use KevinGH\Box\Compactor\Placeholder;
 use KevinGH\Box\Compactors;
 use KevinGH\Box\Configuration;
+use function KevinGH\Box\FileSystem\make_path_relative;
 use KevinGH\Box\PhpSettingsHandler;
 use stdClass;
 use Symfony\Component\Console\Input\InputArgument;
@@ -107,16 +108,23 @@ final class Process extends ConfigurableCommand
             : $this->getConfig($input, $output, true)
         ;
 
-        $path = make_path_absolute($input->getArgument(self::FILE_ARGUMENT), getcwd());
+        $filePath = $input->getArgument(self::FILE_ARGUMENT);
+
+        $path = make_path_relative($filePath, $config->getBasePath());
 
         $compactors = $this->retrieveCompactors($config);
 
-        $fileContents = file_contents($path);
+        $fileContents = file_contents(
+            $absoluteFilePath = make_path_absolute(
+                $filePath,
+                getcwd()
+            )
+        );
 
         $io->writeln([
             sprintf(
                 '⚡  Processing the contents of the file <info>%s</info>',
-                $path
+                $absoluteFilePath
             ),
             '',
         ]);
@@ -126,13 +134,17 @@ final class Process extends ConfigurableCommand
 
         $fileProcessedContents = $compactors->compactContents($path, $fileContents);
 
-        $io->writeln([
-            'Processed contents:',
-            '',
-            '<comment>"""</comment>',
-            $fileProcessedContents,
-            '<comment>"""</comment>',
-        ]);
+        if ($io->isQuiet()) {
+            $io->writeln($fileProcessedContents, OutputInterface::VERBOSITY_QUIET);
+        } else {
+            $io->writeln([
+                'Processed contents:',
+                '',
+                '<comment>"""</comment>',
+                $fileProcessedContents,
+                '<comment>"""</comment>',
+            ]);
+        }
     }
 
     private function retrieveCompactors(Configuration $config): Compactors
