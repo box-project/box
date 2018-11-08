@@ -1,11 +1,9 @@
 <?php
 
-namespace _HumbugBox9d880d18ae09\KevinGH\RequirementChecker;
+namespace _HumbugBoxacafcfe30294\KevinGH\RequirementChecker;
 
 /**
-@private
-@see
-@license
+@symfony
 */
 final class Requirement
 {
@@ -13,20 +11,12 @@ final class Requirement
     private $fulfilled;
     private $testMessage;
     private $helpText;
-    /**
-    @param
-    @param
-    @param
-    */
     public function __construct($checkIsFulfilled, $testMessage, $helpText)
     {
         $this->checkIsFulfilled = $checkIsFulfilled;
         $this->testMessage = $testMessage;
         $this->helpText = $helpText;
     }
-    /**
-    @return
-    */
     public function isFulfilled()
     {
         if (null === $this->fulfilled) {
@@ -34,23 +24,14 @@ final class Requirement
         }
         return (bool) $this->fulfilled;
     }
-    /**
-    @return
-    */
     public function getIsFullfilledChecker()
     {
         return $this->checkIsFulfilled;
     }
-    /**
-    @return
-    */
     public function getTestMessage()
     {
         return $this->testMessage;
     }
-    /**
-    @return
-    */
     public function getHelpText()
     {
         return $this->helpText;

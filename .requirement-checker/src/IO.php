@@ -1,10 +1,7 @@
 <?php
 
-namespace _HumbugBox9d880d18ae09\KevinGH\RequirementChecker;
+namespace _HumbugBoxacafcfe30294\KevinGH\RequirementChecker;
 
-/**
-@private
-*/
 final class IO
 {
     const VERBOSITY_QUIET = 16;
@@ -23,32 +20,18 @@ final class IO
         $this->interactive = $this->checkInteractivity($shellVerbosity);
         $this->colorSupport = $this->checkColorSupport();
     }
-    /**
-    @return
-    */
     public function isInteractive()
     {
         return $this->interactive;
     }
-    /**
-    @return
-    */
     public function getVerbosity()
     {
         return $this->verbosity;
     }
-    /**
-    @return
-    */
     public function hasColorSupport()
     {
         return $this->colorSupport;
     }
-    /**
-    @param
-    @param
-    @return
-    */
     public function hasParameter($values)
     {
         $values = (array) $values;
@@ -60,10 +43,6 @@ final class IO
         }
         return \false;
     }
-    /**
-    @param
-    @return
-    */
     private function checkInteractivity($shellVerbosity)
     {
         if (-1 === $shellVerbosity) {
@@ -79,9 +58,6 @@ final class IO
         }
         return \true;
     }
-    /**
-    @return
-    */
     private function configureVerbosity()
     {
         switch ($shellVerbosity = (int) \getenv('SHELL_VERBOSITY')) {
@@ -119,9 +95,7 @@ final class IO
         return $shellVerbosity;
     }
     /**
-    @return
-    @see
-    @license
+    @symfony
     */
     private function checkColorSupport()
     {

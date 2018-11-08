@@ -1,16 +1,10 @@
 <?php
 
-namespace _HumbugBox9d880d18ae09\KevinGH\RequirementChecker;
+namespace _HumbugBoxacafcfe30294\KevinGH\RequirementChecker;
 
-/**
-@private
-*/
-final class IsExtensionFulfilled implements \_HumbugBox9d880d18ae09\KevinGH\RequirementChecker\IsFulfilled
+final class IsExtensionFulfilled implements \_HumbugBoxacafcfe30294\KevinGH\RequirementChecker\IsFulfilled
 {
     private $requiredExtension;
-    /**
-    @param
-    */
     public function __construct($requiredExtension)
     {
         $this->requiredExtension = $requiredExtension;

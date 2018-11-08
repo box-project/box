@@ -1,17 +1,14 @@
 <?php
 
-namespace _HumbugBox9d880d18ae09\KevinGH\RequirementChecker;
+namespace _HumbugBoxacafcfe30294\KevinGH\RequirementChecker;
 
 /**
-@license
+@symfony
 */
 class Terminal
 {
     private static $width;
     private static $height;
-    /**
-    @return
-    */
     public function getWidth()
     {
         $width = \getenv('COLUMNS');
@@ -23,9 +20,6 @@ class Terminal
         }
         return self::$width ?: 80;
     }
-    /**
-    @return
-    */
     public function getHeight()
     {
         $height = \getenv('LINES');
@@ -57,9 +51,6 @@ class Terminal
             }
         }
     }
-    /**
-    @return
-    */
     private static function getConsoleMode()
     {
         if (!\function_exists('proc_open')) {
@@ -78,9 +69,6 @@ class Terminal
         }
         return null;
     }
-    /**
-    @return
-    */
     private static function getSttyColumns()
     {
         if (!\function_exists('proc_open')) {
