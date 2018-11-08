@@ -498,7 +498,6 @@ DOCBLOCK
             ['@Annotation(@Nested({"a",{{"c"},"b"}}),@Nested({"d",{{"f"},"e"}}))'],
         ];
 
-        // TODO: this one looks wrong
         yield [
             <<<DOCBLOCK
         /**
