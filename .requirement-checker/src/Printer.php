@@ -1,50 +1,31 @@
 <?php
 
-namespace _HumbugBox9d880d18ae09\KevinGH\RequirementChecker;
+namespace _HumbugBoxacafcfe30294\KevinGH\RequirementChecker;
 
-/**
-@private
-*/
 final class Printer
 {
     private $styles = array('reset' => "\33[0m", 'red' => "\33[31m", 'green' => "\33[32m", 'yellow' => "\33[33m", 'title' => "\33[33m", 'error' => "\33[37;41m", 'success' => "\33[30;42m");
     private $verbosity;
     private $supportColors;
     private $width;
-    /**
-    @param
-    @param
-    @param
-    */
     public function __construct($verbosity, $supportColors, $width = null)
     {
         if (null === $width) {
-            $terminal = new \_HumbugBox9d880d18ae09\KevinGH\RequirementChecker\Terminal();
+            $terminal = new \_HumbugBoxacafcfe30294\KevinGH\RequirementChecker\Terminal();
             $width = \min($terminal->getWidth(), 80);
         }
         $this->verbosity = $verbosity;
         $this->supportColors = $supportColors;
         $this->width = $width;
     }
-    /**
-    @return
-    */
     public function getVerbosity()
     {
         return $this->verbosity;
     }
-    /**
-    @param
-    */
     public function setVerbosity($verbosity)
     {
         $this->verbosity = $verbosity;
     }
-    /**
-    @param
-    @param
-    @param
-    */
     public function title($title, $verbosity, $style = null)
     {
         if (null === $style) {
@@ -55,11 +36,7 @@ final class Printer
         $this->printvln(\str_repeat('=', \min(\strlen($title), $this->width)), $verbosity, $style);
         $this->printvln('', $verbosity, $style);
     }
-    /**
-    @param
-    @return
-    */
-    public function getRequirementErrorMessage(\_HumbugBox9d880d18ae09\KevinGH\RequirementChecker\Requirement $requirement)
+    public function getRequirementErrorMessage(\_HumbugBoxacafcfe30294\KevinGH\RequirementChecker\Requirement $requirement)
     {
         if ($requirement->isFulfilled()) {
             return null;
@@ -67,12 +44,6 @@ final class Printer
         $errorMessage = \wordwrap($requirement->getTestMessage(), $this->width - 3, \PHP_EOL . '   ') . \PHP_EOL;
         return $errorMessage;
     }
-    /**
-    @param
-    @param
-    @param
-    @param
-    */
     public function block($title, $message, $verbosity, $style = null)
     {
         $prefix = ' [' . $title . '] ';
@@ -97,21 +68,11 @@ final class Printer
         $this->printv(\str_repeat(' ', $this->width), $verbosity, $style);
         $this->printvln('', $verbosity);
     }
-    /**
-    @param
-    @param
-    @param
-    */
     public function printvln($message, $verbosity, $style = null)
     {
         $this->printv($message, $verbosity, $style);
         $this->printv(\PHP_EOL, $verbosity, null);
     }
-    /**
-    @param
-    @param
-    @param
-    */
     public function printv($message, $verbosity, $style = null)
     {
         if ($verbosity > $this->verbosity) {

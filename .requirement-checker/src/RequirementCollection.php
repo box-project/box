@@ -1,25 +1,17 @@
 <?php
 
-namespace _HumbugBox9d880d18ae09\KevinGH\RequirementChecker;
+namespace _HumbugBoxacafcfe30294\KevinGH\RequirementChecker;
 
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
 use Traversable;
 /**
-@private
-@see
-@license
+@symfony
 */
 final class RequirementCollection implements \IteratorAggregate, \Countable
 {
-    /**
-    @var
-    */
     private $requirements = array();
-    /**
-    @return
-    */
     public function getIterator()
     {
         return new \ArrayIterator($this->requirements);
@@ -28,52 +20,26 @@ final class RequirementCollection implements \IteratorAggregate, \Countable
     {
         return \count($this->requirements);
     }
-    /**
-    @param
-    */
-    public function add(\_HumbugBox9d880d18ae09\KevinGH\RequirementChecker\Requirement $requirement)
+    public function add(\_HumbugBoxacafcfe30294\KevinGH\RequirementChecker\Requirement $requirement)
     {
         $this->requirements[] = $requirement;
     }
-    /**
-    @param
-    @param
-    @param
-    */
     public function addRequirement($checkIsFulfilled, $testMessage, $helpText)
     {
-        $this->add(new \_HumbugBox9d880d18ae09\KevinGH\RequirementChecker\Requirement($checkIsFulfilled, $testMessage, $helpText));
+        $this->add(new \_HumbugBoxacafcfe30294\KevinGH\RequirementChecker\Requirement($checkIsFulfilled, $testMessage, $helpText));
     }
-    /**
-    @return
-    */
     public function getRequirements()
     {
         return $this->requirements;
     }
-    /**
-    @return
-    */
     public function getPhpIniPath()
     {
         return \get_cfg_var('cfg_file_path');
     }
-    /**
-    @return
-    */
     public function evaluateRequirements()
     {
-        return \array_reduce(
-            $this->requirements,
-            /**
-            @param
-            @param
-            @return
-            */
-            function ($checkPassed, \_HumbugBox9d880d18ae09\KevinGH\RequirementChecker\Requirement $requirement) {
-                return $checkPassed && $requirement->isFulfilled();
-            },
-            \true
-        );
+        return \array_reduce($this->requirements, function ($checkPassed, \_HumbugBoxacafcfe30294\KevinGH\RequirementChecker\Requirement $requirement) {
+            return $checkPassed && $requirement->isFulfilled();
+        }, \true);
     }
 }

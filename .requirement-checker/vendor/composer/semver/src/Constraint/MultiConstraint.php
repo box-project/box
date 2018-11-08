@@ -1,53 +1,30 @@
 <?php
 
-namespace _HumbugBox9d880d18ae09\Composer\Semver\Constraint;
+namespace _HumbugBoxacafcfe30294\Composer\Semver\Constraint;
 
-class MultiConstraint implements \_HumbugBox9d880d18ae09\Composer\Semver\Constraint\ConstraintInterface
+class MultiConstraint implements \_HumbugBoxacafcfe30294\Composer\Semver\Constraint\ConstraintInterface
 {
-    /**
-    @var */
     protected $constraints;
-    /**
-    @var */
     protected $prettyString;
-    /**
-    @var */
     protected $conjunctive;
-    /**
-    @param
-    @param
-    */
     public function __construct(array $constraints, $conjunctive = \true)
     {
         $this->constraints = $constraints;
         $this->conjunctive = $conjunctive;
     }
-    /**
-    @return
-    */
     public function getConstraints()
     {
         return $this->constraints;
     }
-    /**
-    @return
-    */
     public function isConjunctive()
     {
         return $this->conjunctive;
     }
-    /**
-    @return
-    */
     public function isDisjunctive()
     {
         return !$this->conjunctive;
     }
-    /**
-    @param
-    @return
-    */
-    public function matches(\_HumbugBox9d880d18ae09\Composer\Semver\Constraint\ConstraintInterface $provider)
+    public function matches(\_HumbugBoxacafcfe30294\Composer\Semver\Constraint\ConstraintInterface $provider)
     {
         if (\false === $this->conjunctive) {
             foreach ($this->constraints as $constraint) {
@@ -64,16 +41,10 @@ class MultiConstraint implements \_HumbugBox9d880d18ae09\Composer\Semver\Constra
         }
         return \true;
     }
-    /**
-    @param
-    */
     public function setPrettyString($prettyString)
     {
         $this->prettyString = $prettyString;
     }
-    /**
-    @return
-    */
     public function getPrettyString()
     {
         if ($this->prettyString) {
@@ -81,9 +52,6 @@ class MultiConstraint implements \_HumbugBox9d880d18ae09\Composer\Semver\Constra
         }
         return $this->__toString();
     }
-    /**
-    @return
-    */
     public function __toString()
     {
         $constraints = array();

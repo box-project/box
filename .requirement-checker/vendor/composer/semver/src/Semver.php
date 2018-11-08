@@ -1,67 +1,42 @@
 <?php
 
-namespace _HumbugBox9d880d18ae09\Composer\Semver;
+namespace _HumbugBoxacafcfe30294\Composer\Semver;
 
-use _HumbugBox9d880d18ae09\Composer\Semver\Constraint\Constraint;
+use _HumbugBoxacafcfe30294\Composer\Semver\Constraint\Constraint;
 class Semver
 {
     const SORT_ASC = 1;
     const SORT_DESC = -1;
-    /**
-    @var */
     private static $versionParser;
-    /**
-    @param
-    @param
-    @return
-    */
     public static function satisfies($version, $constraints)
     {
         if (null === self::$versionParser) {
-            self::$versionParser = new \_HumbugBox9d880d18ae09\Composer\Semver\VersionParser();
+            self::$versionParser = new \_HumbugBoxacafcfe30294\Composer\Semver\VersionParser();
         }
         $versionParser = self::$versionParser;
-        $provider = new \_HumbugBox9d880d18ae09\Composer\Semver\Constraint\Constraint('==', $versionParser->normalize($version));
+        $provider = new \_HumbugBoxacafcfe30294\Composer\Semver\Constraint\Constraint('==', $versionParser->normalize($version));
         $constraints = $versionParser->parseConstraints($constraints);
         return $constraints->matches($provider);
     }
-    /**
-    @param
-    @param
-    @return
-    */
     public static function satisfiedBy(array $versions, $constraints)
     {
         $versions = \array_filter($versions, function ($version) use($constraints) {
-            return \_HumbugBox9d880d18ae09\Composer\Semver\Semver::satisfies($version, $constraints);
+            return \_HumbugBoxacafcfe30294\Composer\Semver\Semver::satisfies($version, $constraints);
         });
         return \array_values($versions);
     }
-    /**
-    @param
-    @return
-    */
     public static function sort(array $versions)
     {
         return self::usort($versions, self::SORT_ASC);
     }
-    /**
-    @param
-    @return
-    */
     public static function rsort(array $versions)
     {
         return self::usort($versions, self::SORT_DESC);
     }
-    /**
-    @param
-    @param
-    @return
-    */
     private static function usort(array $versions, $direction)
     {
         if (null === self::$versionParser) {
-            self::$versionParser = new \_HumbugBox9d880d18ae09\Composer\Semver\VersionParser();
+            self::$versionParser = new \_HumbugBoxacafcfe30294\Composer\Semver\VersionParser();
         }
         $versionParser = self::$versionParser;
         $normalized = array();
@@ -72,7 +47,7 @@ class Semver
             if ($left[0] === $right[0]) {
                 return 0;
             }
-            if (\_HumbugBox9d880d18ae09\Composer\Semver\Comparator::lessThan($left[0], $right[0])) {
+            if (\_HumbugBoxacafcfe30294\Composer\Semver\Comparator::lessThan($left[0], $right[0])) {
                 return -$direction;
             }
             return $direction;
@@ -84,4 +59,4 @@ class Semver
         return $sorted;
     }
 }
-\class_alias('_HumbugBox9d880d18ae09\\Composer\\Semver\\Semver', 'Composer\\Semver\\Semver', \false);
+\class_alias('_HumbugBoxacafcfe30294\\Composer\\Semver\\Semver', 'Composer\\Semver\\Semver', \false);
