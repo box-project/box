@@ -119,20 +119,6 @@ return [
             );
         },
         function (string $filePath, string $prefix, string $contents): string {
-            if ('vendor/hoa/consistency/Prelude.php' !== $filePath) {
-                return $contents;
-            }
-
-            return preg_replace(
-                '/\$define\(\'(.*?)\'\,/',
-                sprintf(
-                    '$define(\'%s\\\\$1\',',
-                    $prefix
-                ),
-                $contents
-            );
-        },
-        function (string $filePath, string $prefix, string $contents): string {
             if ('vendor/hoa/consistency/Autoloader.php' !== $filePath) {
                 return $contents;
             }
@@ -172,14 +158,35 @@ return [
         \KevinGH\Box\Compactor\PhpScoper::class,
 
         // Hoa symbols
-        'xcallable',
+        'SUCCEED',
+        'FAILED',
+        '…',
+        'DS',
+        'PS',
         'ROOT_SEPARATOR',
-        'PHP_WINDOWS_VERSION_PLATFORM',
+        'RS',
+        'CRLF',
+        'OS_WIN',
         'S_64_BITS',
+        'S_32_BITS',
+        'PHP_INT_MIN',
+        'PHP_FLOAT_MIN',
+        'PHP_FLOAT_MAX',
+        'PHP_WINDOWS_VERSION_PLATFORM',
+        'π',
+        'nil',
+        '_public',
+        '_protected',
+        '_private',
         '_static',
         '_abstract',
+        '_pure',
         '_final',
-        'DS',
+        '_dynamic',
+        '_concrete',
+        '_overridable',
+        'WITH_COMPOSER',
+        'xcallable',
     ],
     'whitelist-global-constants' => false,
     'whitelist-global-classes' => false,
