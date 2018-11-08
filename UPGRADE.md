@@ -1,3 +1,43 @@
+# From 3.1.3 to 3.2.0
+
+- Changes to the `Php` compactor:
+    - Invalid annotations are no longer recognised as annotations:
+        ```php
+        /**
+          * @Annotation ()
+          * @Namespaced\ Annotation
+          */
+        ```
+        
+        Will be transformed into:
+        
+        ```php
+        /**
+          * @Annotation
+          * @Namespaced
+          */
+        ```
+- The removal of common annotations is enabled by default
+- The setting `annotation#ignore` no longer accepts a `string` value, only `string[]` and `null` are allowed
+- Upon some annotation parsing failures, the error is thrown to the user in order to identify and fix those cases
+  instead of always silently ignore the error.
+- Annotations can no longer be escaped like so:
+
+    ```php
+    /**
+      * \@NotEscaped
+      */
+    ```
+    
+    Indeed it will be compacted to:
+    
+    ```php
+    /**
+    @NotEscaped
+    */
+    ```
+
+
 # From 2.7 to 3.0
 
 The change from 2.x to 3.x is quite significant but should be really smooth for the user. The main changes are:

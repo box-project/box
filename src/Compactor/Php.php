@@ -14,11 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-use Doctrine\Common\Annotations\DocLexer;
-use Exception;
-use Herrera\Annotations\Convert\ToString;
-use Herrera\Annotations\Tokenizer;
-use Herrera\Annotations\Tokens;
+use KevinGH\Box\Annotation\DocblockAnnotationParser;
+use KevinGH\Box\Annotation\InvalidToken;
+use RuntimeException;
 use const T_COMMENT;
 use const T_DOC_COMMENT;
 use const T_WHITESPACE;
@@ -39,22 +37,21 @@ use function token_get_all;
  * @author Kevin Herrera <kevin@herrera.io>
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ * @author Théo Fidry <theo.fidry@gmail.com>
  * @private
  */
 final class Php extends FileExtensionCompactor
 {
-    private $converter;
-    private $tokenizer;
+    private $annotationParser;
 
     /**
      * {@inheritdoc}
      */
-    public function __construct(Tokenizer $tokenizer, array $extensions = ['php'])
+    public function __construct(DocblockAnnotationParser $annotationParser, array $extensions = ['php'])
     {
         parent::__construct($extensions);
 
-        $this->converter = new ToString();
-        $this->tokenizer = $tokenizer;
+        $this->annotationParser = $annotationParser;
     }
 
     /**
@@ -62,25 +59,22 @@ final class Php extends FileExtensionCompactor
      */
     protected function compactContent(string $contents): string
     {
-        // TODO: refactor this piece of code
-        // - strip down blank spaces
-        // - remove useless spaces
-        // - strip down comments except Doctrine style annotations unless whitelisted -> BC break to document;
-        //   Alternatively provide an easy way to strip down all "regular" annotations such as @package, @param
-        //   & co.
-        // - completely remove comments & docblocks if empty
-        // TODO regarding the doc: it current has its own `annotations` entry. Maybe it would be best to
-        // include it as a sub element of `compactors`
         $output = '';
 
         foreach (token_get_all($contents) as $token) {
             if (is_string($token)) {
                 $output .= $token;
             } elseif (in_array($token[0], [T_COMMENT, T_DOC_COMMENT], true)) {
-                if ($this->tokenizer && false !== strpos($token[1], '@')) {
+                if (false !== strpos($token[1], '@')) {
                     try {
                         $output .= $this->compactAnnotations($token[1]);
-                    } catch (Exception $exception) {
+                    } catch (InvalidToken $exception) {
+                        // This exception is due to the dumper to be out of sync with the current grammar and/or the
+                        // grammar being incomplete. In both cases throwing here is better in order to identify and
+                        // this those cases instead of silently failing.
+
+                        throw $exception;
+                    } catch (RuntimeException $exception) {
                         $output .= $token[1];
                     }
                 } else {
@@ -107,48 +101,30 @@ final class Php extends FileExtensionCompactor
 
     private function compactAnnotations(string $docblock): string
     {
-        $annotations = [];
-        $index = -1;
-        $inside = 0;
-        $tokens = $this->tokenizer->parse($docblock);
+        $breaksNbr = substr_count($docblock, "\n");
 
-        if (empty($tokens)) {
-            return str_repeat("\n", substr_count($docblock, "\n"));
+        $annotations = $this->annotationParser->parse($docblock);
+
+        if ([] === $annotations) {
+            return str_repeat("\n", $breaksNbr);
         }
 
-        foreach ($tokens as $token) {
-            if ((0 === $inside) && (DocLexer::T_AT === $token[0])) {
-                ++$index;
-            } elseif (DocLexer::T_OPEN_PARENTHESIS === $token[0]) {
-                ++$inside;
-            } elseif (DocLexer::T_CLOSE_PARENTHESIS === $token[0]) {
-                --$inside;
-            }
-
-            if (!isset($annotations[$index])) {
-                $annotations[$index] = [];
-            }
-
-            $annotations[$index][] = $token;
-        }
-
-        $breaks = substr_count($docblock, "\n");
-        $docblock = '/**';
+        $compactedDocblock = '/**';
 
         foreach ($annotations as $annotation) {
-            $annotation = new Tokens($annotation);
-            $docblock .= "\n".$this->converter->convert($annotation);
+            $compactedDocblock .= "\n".$annotation;
         }
 
-        $breaks -= count($annotations);
+        $breaksNbr -= count($annotations);
 
-        if ($breaks > 0) {
-            $docblock .= str_repeat("\n", $breaks - 1);
-            $docblock .= "\n*/";
+        if ($breaksNbr > 0) {
+            $compactedDocblock .= str_repeat("\n", $breaksNbr - 1);
+            $compactedDocblock .= "\n*/";
         } else {
-            $docblock .= ' */';
+            // A space is required here to avoid having /***/
+            $compactedDocblock .= ' */';
         }
 
-        return $docblock;
+        return $compactedDocblock;
     }
 }

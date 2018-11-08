@@ -18,13 +18,15 @@ use Assert\Assertion;
 use Closure;
 use DateTimeImmutable;
 use DateTimeZone;
-use Herrera\Annotations\Tokenizer;
 use Herrera\Box\Compactor\Php as LegacyPhp;
 use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
 use Humbug\PhpScoper\Console\ApplicationFactory;
 use Humbug\PhpScoper\Scoper;
 use Humbug\PhpScoper\Scoper\FileWhitelistScoper;
 use InvalidArgumentException;
+use KevinGH\Box\Annotation\AnnotationDumper;
+use KevinGH\Box\Annotation\DocblockAnnotationParser;
+use KevinGH\Box\Annotation\DocblockParser;
 use KevinGH\Box\Compactor\Php as PhpCompactor;
 use KevinGH\Box\Compactor\PhpScoper as PhpScoperCompactor;
 use KevinGH\Box\Composer\ComposerConfiguration;
@@ -57,6 +59,7 @@ use function explode;
 use function file_exists;
 use function getcwd;
 use function implode;
+use function in_array;
 use function intval;
 use function is_array;
 use function is_bool;
@@ -108,9 +111,67 @@ BANNER;
     private const DEFAULT_SIGNING_ALGORITHM = Phar::SHA1;
     private const DEFAULT_ALIAS_PREFIX = 'box-auto-generated-alias-';
 
+    private const DEFAULT_IGNORED_ANNOTATIONS = [
+        'abstract',
+        'access',
+        'annotation',
+        'api',
+        'attribute',
+        'attributes',
+        'author',
+        'category',
+        'code',
+        'codecoverageignore',
+        'codecoverageignoreend',
+        'codecoverageignorestart',
+        'copyright',
+        'deprec',
+        'deprecated',
+        'endcode',
+        'example',
+        'exception',
+        'filesource',
+        'final',
+        'fixme',
+        'global',
+        'ignore',
+        'ingroup',
+        'inheritdoc',
+        'internal',
+        'license',
+        'link',
+        'magic',
+        'method',
+        'name',
+        'override',
+        'package',
+        'package_version',
+        'param',
+        'private',
+        'property',
+        'required',
+        'return',
+        'see',
+        'since',
+        'static',
+        'staticvar',
+        'subpackage',
+        'suppresswarnings',
+        'target',
+        'throw',
+        'throws',
+        'todo',
+        'tutorial',
+        'usedby',
+        'uses',
+        'var',
+        'version',
+    ];
+
     private const ALGORITHM_KEY = 'algorithm';
     private const ALIAS_KEY = 'alias';
     private const ANNOTATIONS_KEY = 'annotations';
+    private const IGNORED_ANNOTATIONS_KEY = 'ignore';
     private const AUTO_DISCOVERY_KEY = 'force-autodiscovery';
     private const BANNER_KEY = 'banner';
     private const BANNER_FILE_KEY = 'banner-file';
@@ -1544,19 +1605,21 @@ BANNER;
     {
         self::checkIfDefaultValue($logger, $raw, self::COMPACTORS_KEY, []);
 
+        $compactorClasses = array_unique((array) ($raw->{self::COMPACTORS_KEY} ?? []));
+
+        $ignoredAnnotations = self::retrievePhpCompactorIgnoredAnnotations($raw, $compactorClasses, $logger);
+
         if (false === isset($raw->{self::COMPACTORS_KEY})) {
             return [];
         }
 
-        $compactorClasses = array_unique((array) $raw->{self::COMPACTORS_KEY});
-
         $compators = array_map(
-            static function (string $class) use ($raw, $basePath, $logger): Compactor {
+            static function (string $class) use ($raw, $basePath, $logger, $ignoredAnnotations): Compactor {
                 Assertion::classExists($class, 'The compactor class "%s" does not exist.');
                 Assertion::implementsInterface($class, Compactor::class, 'The class "%s" is not a compactor class.');
 
                 if (PhpCompactor::class === $class || LegacyPhp::class === $class) {
-                    return self::createPhpCompactor($raw);
+                    return self::createPhpCompactor($ignoredAnnotations);
                 }
 
                 if (PhpScoperCompactor::class === $class) {
@@ -2421,17 +2484,92 @@ BANNER;
         );
     }
 
-    private static function createPhpCompactor(stdClass $raw): Compactor
-    {
-        $tokenizer = new Tokenizer();
+    /**
+     * @param string[] $compactorClasses
+     *
+     * @return string[]
+     */
+    private static function retrievePhpCompactorIgnoredAnnotations(
+        stdClass $raw,
+        array $compactorClasses,
+        ConfigurationLogger $logger
+    ): array {
+        $hasPhpCompactor = in_array(PhpCompactor::class, $compactorClasses, true) || in_array(LegacyPhp::class, $compactorClasses, true);
 
-        if (false === empty($raw->{self::ANNOTATIONS_KEY}) && isset($raw->{self::ANNOTATIONS_KEY}->ignore)) {
-            $tokenizer->ignore(
-                (array) $raw->{self::ANNOTATIONS_KEY}->ignore
+        self::checkIfDefaultValue($logger, $raw, self::ANNOTATIONS_KEY, true);
+        self::checkIfDefaultValue($logger, $raw, self::ANNOTATIONS_KEY, null);
+
+        if (false === property_exists($raw, self::ANNOTATIONS_KEY)) {
+            return self::DEFAULT_IGNORED_ANNOTATIONS;
+        }
+
+        if (false === $hasPhpCompactor) {
+            $logger->addWarning(
+                sprintf(
+                    'The "%s" setting has been set but is ignored since no PHP compactor has been configured',
+                    self::ANNOTATIONS_KEY
+                )
             );
         }
 
-        return new PhpCompactor($tokenizer);
+        /** @var null|bool|stdClass $annotations */
+        $annotations = $raw->{self::ANNOTATIONS_KEY};
+
+        if (true === $annotations || null === $annotations) {
+            return self::DEFAULT_IGNORED_ANNOTATIONS;
+        }
+
+        if (false === $annotations) {
+            return [];
+        }
+
+        if (false === property_exists($annotations, self::IGNORED_ANNOTATIONS_KEY)) {
+            $logger->addWarning(
+                sprintf(
+                    'The "%s" setting has been set but no "%s" setting has been found, hence "%s" is treated as'
+                    .' if it is set to `false`',
+                    self::ANNOTATIONS_KEY,
+                    self::IGNORED_ANNOTATIONS_KEY,
+                    self::ANNOTATIONS_KEY
+                )
+            );
+
+            return [];
+        }
+
+        $ignored = [];
+
+        if (property_exists($annotations, self::IGNORED_ANNOTATIONS_KEY)
+            && in_array($ignored = $annotations->{self::IGNORED_ANNOTATIONS_KEY}, [null, []], true)
+        ) {
+            self::addRecommendationForDefaultValue($logger, self::ANNOTATIONS_KEY.'#'.self::IGNORED_ANNOTATIONS_KEY);
+
+            return (array) $ignored;
+        }
+
+        return $ignored;
+    }
+
+    private static function createPhpCompactor(array $ignoredAnnotations): Compactor
+    {
+        $ignoredAnnotations = array_values(
+            array_filter(
+                array_map(
+                    static function (string $annotation): ?string {
+                        return strtolower(trim($annotation));
+                    },
+                    $ignoredAnnotations
+                )
+            )
+        );
+
+        return new PhpCompactor(
+            new DocblockAnnotationParser(
+                new DocblockParser(),
+                new AnnotationDumper(),
+                $ignoredAnnotations
+            )
+        );
     }
 
     private static function createPhpScoperCompactor(stdClass $raw, string $basePath, ConfigurationLogger $logger): Compactor

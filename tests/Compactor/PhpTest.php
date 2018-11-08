@@ -15,7 +15,9 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Generator;
-use Herrera\Annotations\Tokenizer;
+use KevinGH\Box\Annotation\AnnotationDumper;
+use KevinGH\Box\Annotation\DocblockAnnotationParser;
+use KevinGH\Box\Annotation\DocblockParser;
 use KevinGH\Box\Compactor\Php;
 use PHPUnit\Framework\TestCase;
 
@@ -29,7 +31,13 @@ class PhpTest extends TestCase
      */
     public function test_it_supports_PHP_files(string $file, bool $supports): void
     {
-        $compactor = new Php(new Tokenizer());
+        $compactor = new Php(
+            new DocblockAnnotationParser(
+                new DocblockParser(),
+                new AnnotationDumper(),
+                []
+            )
+        );
 
         $contents = <<<'PHP'
 <?php
@@ -49,10 +57,10 @@ PHP;
     /**
      * @dataProvider providePhpContent
      */
-    public function test_it_compacts_PHP_files(Tokenizer $tokenizer, string $content, string $expected): void
+    public function test_it_compacts_PHP_files(DocblockAnnotationParser $annotationParser, string $content, string $expected): void
     {
         $file = 'foo.php';
-        $compactor = new Php($tokenizer);
+        $compactor = new Php($annotationParser);
 
         $actual = $compactor->compact($file, $content);
 
@@ -68,8 +76,14 @@ PHP;
 
     public function providePhpContent(): Generator
     {
+        $regularAnnotationParser = new DocblockAnnotationParser(
+            new DocblockParser(),
+            new AnnotationDumper(),
+            []
+        );
+
         yield 'simple PHP file with comments' => [
-            new Tokenizer(),
+            $regularAnnotationParser,
             <<<'PHP'
 <?php
 
@@ -108,12 +122,11 @@ PHP
         ];
 
         yield 'PHP file with annotations' => [
-            (static function (): Tokenizer {
-                $tokenizer = new Tokenizer();
-                $tokenizer->ignore(['ignored']);
-
-                return $tokenizer;
-            })(),
+            new DocblockAnnotationParser(
+                new DocblockParser(),
+                new AnnotationDumper(),
+                ['ignored']
+            ),
             <<<'PHP'
 <?php
 
@@ -202,12 +215,11 @@ PHP
         ];
 
         yield 'legacy issue 14' => [
-            (static function (): Tokenizer {
-                $tokenizer = new Tokenizer();
-                $tokenizer->ignore(['author', 'inline']);
-
-                return $tokenizer;
-            })(),
+            new DocblockAnnotationParser(
+                new DocblockParser(),
+                new AnnotationDumper(),
+                ['author', 'inline']
+            ),
             <<<'PHP'
 <?php
 
@@ -264,7 +276,7 @@ class ComposerAutoloaderInitc22fe6e3e5ad79bad24655b3e52999df
 
         return \$loader;
     }
-}
+        }
 
 PHP
             ,
@@ -330,13 +342,13 @@ PHP
         ];
 
         yield 'Invalid PHP file' => [
-            new Tokenizer(),
+            $regularAnnotationParser,
             '<ph',
             '<ph',
         ];
 
-        yield 'Invalid annotation' => [
-            new Tokenizer(),
+        yield 'Invalid annotation with ignored param' => [
+            $regularAnnotationParser,
             <<<'PHP'
 <?php
 
@@ -351,7 +363,34 @@ PHP
 <?php
 
 /**
- * @param (string|stdClass $x 
+@param
+*/
+function foo($x) {
+}
+PHP
+        ];
+
+        yield 'Invalid annotation' => [
+            $regularAnnotationParser,
+            <<<'PHP'
+<?php
+
+/**
+ * comment
+ *
+ * @a({@:1}) 
+ */
+function foo($x) {
+}
+PHP
+        ,
+            <<<'PHP'
+<?php
+
+/**
+ * comment
+ *
+ * @a({@:1}) 
  */
 function foo($x) {
 }
