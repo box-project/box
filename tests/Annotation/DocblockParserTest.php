@@ -106,34 +106,6 @@ TRACE
         yield [
             <<<'DOCBLOCK'
 /**
- * @ Annotation
- */
-DOCBLOCK
-            ,
-            <<<'TRACE'
->  #annotations
-
-TRACE
-        ];
-
-        yield [
-            <<<'DOCBLOCK'
-/**
- *@Annotation
- */
-DOCBLOCK
-            ,
-            <<<'TRACE'
->  #annotations
->  >  #annotation
->  >  >  token(annot:simple_identifier, Annotation)
-
-TRACE
-        ];
-
-        yield [
-            <<<'DOCBLOCK'
-/**
  * @Annotation()
  */
 DOCBLOCK
@@ -1168,6 +1140,21 @@ TRACE
         ];
 
         yield [
+            <<<DOCBLOCK
+/**
+ * \@Escaped
+ */
+DOCBLOCK
+            ,
+            <<<'TRACE'
+>  #annotations
+>  >  #annotation
+>  >  >  token(annot:simple_identifier, Escaped)
+
+TRACE
+        ];
+
+        yield [
             <<<'DOCBLOCK'
 /**
  * @author Made Up <author@web.com>
@@ -1197,17 +1184,8 @@ EOF
         yield [
             '/**@\\*/',
             <<<'EOF'
-Could not parse the following docblock: "/**@\*/". Cause: "Unrecognized token "@" at line 1 and column 4:
+Could not parse the following docblock: "/**@\*/". Cause: "Unrecognized token "\" at line 1 and column 5:
 /**@\*/
-   ↑"
-EOF
-        ];
-
-        yield [
-            '/** @\\*/',
-            <<<'EOF'
-Could not parse the following docblock: "/** @\*/". Cause: "Unrecognized token "@" at line 1 and column 5:
-/** @\*/
     ↑"
 EOF
         ];
@@ -1249,27 +1227,9 @@ DOCBLOCK
             <<<'EOF'
 Could not parse the following docblock: "/**
  * @!Skipped
- */". Cause: "Unrecognized token "@" at line 1 and column 8:
+ */". Cause: "Unrecognized token "!" at line 1 and column 9:
 /**
  * @!Skipped
- */
-       ↑"
-EOF
-        ];
-
-        yield [
-            <<<DOCBLOCK
-/**
- * \@Escaped
- */
-DOCBLOCK
-            ,
-            <<<'EOF'
-Could not parse the following docblock: "/**
- * \@Escaped
- */". Cause: "Unrecognized token "@" at line 1 and column 9:
-/**
- * \@Escaped
  */
         ↑"
 EOF
