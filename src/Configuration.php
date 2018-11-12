@@ -18,6 +18,7 @@ use Assert\Assertion;
 use Closure;
 use DateTimeImmutable;
 use DateTimeZone;
+use Herrera\Box\Compactor\Json as LegacyJson;
 use Herrera\Box\Compactor\Php as LegacyPhp;
 use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
 use Humbug\PhpScoper\Console\ApplicationFactory;
@@ -27,6 +28,7 @@ use InvalidArgumentException;
 use KevinGH\Box\Annotation\AnnotationDumper;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
 use KevinGH\Box\Annotation\DocblockParser;
+use KevinGH\Box\Compactor\Json as JsonCompactor;
 use KevinGH\Box\Compactor\Php as PhpCompactor;
 use KevinGH\Box\Compactor\PhpScoper as PhpScoperCompactor;
 use KevinGH\Box\Composer\ComposerConfiguration;
@@ -1613,10 +1615,30 @@ BANNER;
             return [];
         }
 
-        $compators = array_map(
+        $compactors = array_map(
             static function (string $class) use ($raw, $basePath, $logger, $ignoredAnnotations): Compactor {
                 Assertion::classExists($class, 'The compactor class "%s" does not exist.');
                 Assertion::implementsInterface($class, Compactor::class, 'The class "%s" is not a compactor class.');
+
+                if (LegacyPhp::class === $class) {
+                    $logger->addRecommendation(
+                        sprintf(
+                            'The compactor "%s" has been deprecated, use "%s" instead.',
+                            LegacyPhp::class,
+                            PhpCompactor::class
+                        )
+                    );
+                }
+
+                if (LegacyJson::class === $class) {
+                    $logger->addRecommendation(
+                        sprintf(
+                            'The compactor "%s" has been deprecated, use "%s" instead.',
+                            LegacyJson::class,
+                            JsonCompactor::class
+                        )
+                    );
+                }
 
                 if (PhpCompactor::class === $class || LegacyPhp::class === $class) {
                     return self::createPhpCompactor($ignoredAnnotations);
@@ -1633,7 +1655,7 @@ BANNER;
 
         $scoperCompactor = false;
 
-        foreach ($compators as $compactor) {
+        foreach ($compactors as $compactor) {
             if ($compactor instanceof PhpScoperCompactor) {
                 $scoperCompactor = true;
             }
@@ -1652,7 +1674,7 @@ BANNER;
             }
         }
 
-        return $compators;
+        return $compactors;
     }
 
     private static function retrieveCompressionAlgorithm(stdClass $raw, ConfigurationLogger $logger): ?int
