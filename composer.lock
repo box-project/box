@@ -304,16 +304,16 @@
         },
         {
             "name": "amphp/process",
-            "version": "v1.0.0",
+            "version": "v1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/process.git",
-                "reference": "9d0d7ab3601272ec66d2b13f6d606257926b2c40"
+                "reference": "90f3f31cbd0eee7fa5ae03ce588b1fc8f122997c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/process/zipball/9d0d7ab3601272ec66d2b13f6d606257926b2c40",
-                "reference": "9d0d7ab3601272ec66d2b13f6d606257926b2c40",
+                "url": "https://api.github.com/repos/amphp/process/zipball/90f3f31cbd0eee7fa5ae03ce588b1fc8f122997c",
+                "reference": "90f3f31cbd0eee7fa5ae03ce588b1fc8f122997c",
                 "shasum": ""
             },
             "require": {
@@ -355,7 +355,7 @@
             ],
             "description": "Asynchronous process manager.",
             "homepage": "https://github.com/amphp/process",
-            "time": "2018-10-20T16:34:05+00:00"
+            "time": "2018-11-09T00:02:00+00:00"
         },
         {
             "name": "amphp/sync",
@@ -1556,16 +1556,16 @@
         },
         {
             "name": "humbug/php-scoper",
-            "version": "0.11.2",
+            "version": "0.11.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/humbug/php-scoper.git",
-                "reference": "40b89422e2977154aa732a2f65c699034ea23f6f"
+                "reference": "c09b336d36d0d9a530eba806d87c901cf0c64355"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/40b89422e2977154aa732a2f65c699034ea23f6f",
-                "reference": "40b89422e2977154aa732a2f65c699034ea23f6f",
+                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/c09b336d36d0d9a530eba806d87c901cf0c64355",
+                "reference": "c09b336d36d0d9a530eba806d87c901cf0c64355",
                 "shasum": ""
             },
             "require": {
@@ -1625,7 +1625,7 @@
                 }
             ],
             "description": "Prefixes all PHP namespaces in a file or directory.",
-            "time": "2018-11-07T10:04:25+00:00"
+            "time": "2018-11-11T18:10:41+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
