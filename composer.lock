@@ -1556,16 +1556,16 @@
         },
         {
             "name": "humbug/php-scoper",
-            "version": "0.11.3",
+            "version": "0.11.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/humbug/php-scoper.git",
-                "reference": "c09b336d36d0d9a530eba806d87c901cf0c64355"
+                "reference": "6fcb3ce7dce5b96e17fac2af17e801741f387df5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/c09b336d36d0d9a530eba806d87c901cf0c64355",
-                "reference": "c09b336d36d0d9a530eba806d87c901cf0c64355",
+                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/6fcb3ce7dce5b96e17fac2af17e801741f387df5",
+                "reference": "6fcb3ce7dce5b96e17fac2af17e801741f387df5",
                 "shasum": ""
             },
             "require": {
@@ -1625,7 +1625,7 @@
                 }
             ],
             "description": "Prefixes all PHP namespaces in a file or directory.",
-            "time": "2018-11-11T18:10:41+00:00"
+            "time": "2018-11-13T08:46:34+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
