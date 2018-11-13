@@ -17,9 +17,9 @@
 
     "compression": "GZ",
     "compactors": [
-        "Herrera\\Box\\Compactor\\Php",
+        "KevinGH\\Box\\Compactor\\Php",
         "KevinGH\\Box\\Compactor\\PhpScoper",
-        "Herrera\\Box\\Compactor\\Json"
+        "KevinGH\\Box\\Compactor\\Json"
     ],
     "datetime": "release-date"
 }
