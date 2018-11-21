@@ -26,8 +26,8 @@ great things:
 - 🔍 Retrieve information about the PHAR extension or a PHAR file and its contents (`box info` or `box diff`)
 - 🔐️ Verify the signature of an existing PHAR (`box verify`)
 - 📝 Use Git tags and short commit hashes for versioning
-- 🕵️️ Get recommendations and warnings about regarding your configuration
-- 🐳 Docker support (`box docker`)
+- 🕵️️ Get recommendations and warnings about regarding your configuration (`box validate`)
+- 🐳 [Docker support (`box docker`)](doc/docker.md#docker-support)
 
 
 ## Table of Contents
