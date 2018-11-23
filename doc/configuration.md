@@ -525,7 +525,7 @@ The `dump-autoload` (`boolean`|`null`, default `true`) setting will result in Bo
 disables the `autoload-dev` rules. This is however done only if a `composer.json` file could be found. If a
 `composer.lock` file is found as well, the file `vendor/composer/installed.json` will be required too.
 
-The dumping of the autoloader will be _ignored_ if the `composer.json` file could be found.
+The dumping of the autoloader will be _ignored_ if the `composer.json` file could not be found.
 
 The autoloader is dumped at the end of the process to ensure it will take into account the eventual modifications done
 by the [compactors][compactors] process.
