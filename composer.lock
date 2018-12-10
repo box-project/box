@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "728edd67c47668e76b7c606fdcb0b40e",
+    "content-hash": "f48e3ffccb06ae0781252db8649d977d",
     "packages": [
         {
             "name": "amphp/amp",
@@ -3403,25 +3403,22 @@
         },
         {
             "name": "infection/infection",
-            "version": "0.11.4",
+            "version": "0.10.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/infection/infection.git",
-                "reference": "f71d7af4332e0c3760aab45c16a6f750db1475a6"
+                "reference": "ccffd492fd235d66bc0407880bc121a28026d3f5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/infection/infection/zipball/f71d7af4332e0c3760aab45c16a6f750db1475a6",
-                "reference": "f71d7af4332e0c3760aab45c16a6f750db1475a6",
+                "url": "https://api.github.com/repos/infection/infection/zipball/ccffd492fd235d66bc0407880bc121a28026d3f5",
+                "reference": "ccffd492fd235d66bc0407880bc121a28026d3f5",
                 "shasum": ""
             },
             "require": {
-                "composer/xdebug-handler": "^1.3",
+                "composer/xdebug-handler": "^1.1",
                 "ext-dom": "*",
-                "ext-json": "*",
-                "ext-libxml": "*",
-                "justinrainbow/json-schema": "^5.2",
-                "nikic/php-parser": "^4.1",
+                "nikic/php-parser": "^4.0",
                 "ocramius/package-versions": "^1.2",
                 "padraic/phar-updater": "^1.0.4",
                 "php": "^7.1",
@@ -3489,7 +3486,7 @@
                 "testing",
                 "unit testing"
             ],
-            "time": "2018-12-09T15:26:00+00:00"
+            "time": "2018-10-30T19:14:11+00:00"
         },
         {
             "name": "mikey179/vfsStream",
