@@ -17,10 +17,10 @@ namespace KevinGH\Box\Console\Command;
 use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\CommandTestCase;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Output\OutputInterface;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\touch;
 use function preg_replace;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Process
@@ -228,8 +228,6 @@ OUTPUT;
         $this->assertSame($expected, $actual);
         $this->assertSame(0, $this->commandTester->getStatusCode());
     }
-
-
 
     public function test_it_processes_a_file_and_displays_only_the_processed_contents_in_quiet_mode(): void
     {

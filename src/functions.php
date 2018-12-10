@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
+use PackageVersions\Versions;
 use Phar;
 use function array_key_exists;
 use function bin2hex;
@@ -30,6 +31,15 @@ use function random_bytes;
 use function sprintf;
 use function strlen;
 use function strtolower;
+
+function get_box_version(): string
+{
+    $rawVersion = Versions::getVersion('humbug/box');
+
+    [$prettyVersion, $commitHash] = explode('@', $rawVersion);
+
+    return $prettyVersion.'@'.substr($commitHash, 0, 7);
+}
 
 /**
  * @private

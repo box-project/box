@@ -14,13 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
-use PackageVersions\Versions;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Helper\HelperSet;
-use function explode;
+use function KevinGH\Box\get_box_version;
 use function sprintf;
 use function strpos;
-use function substr;
 use function trim;
 
 /**
@@ -47,13 +45,7 @@ ASCII;
      */
     public function __construct(string $name = 'Box', ?string $version = null, string $releaseDate = '@release-date@')
     {
-        if (null === $version) {
-            $rawVersion = Versions::getVersion('humbug/box');
-
-            [$prettyVersion, $commitHash] = explode('@', $rawVersion);
-
-            $version = $prettyVersion.'@'.substr($commitHash, 0, 7);
-        }
+        $version = $version ?? get_box_version();
 
         $this->releaseDate = false === strpos($releaseDate, '@') ? $releaseDate : '';
 
