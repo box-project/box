@@ -481,7 +481,7 @@ HELP
         };
 
         return array_reduce(
-            iterator_to_array(new RecursiveIteratorIterator($phar)),
+            iterator_to_array(new RecursiveIteratorIterator($phar), true),
             $countFile,
             $count
         );

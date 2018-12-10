@@ -25,7 +25,7 @@ use function sys_get_temp_dir;
  */
 trait CreateTemporaryPharFile
 {
-    final private function createTemporaryPhar(string $file): string
+    private function createTemporaryPhar(string $file): string
     {
         if ('' === pathinfo($file, PATHINFO_EXTENSION)) {
             copy($file, $tmpFile = sys_get_temp_dir().'/'.(new DateTimeImmutable())->getTimestamp().$file.'.phar');

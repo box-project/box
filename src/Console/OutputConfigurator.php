@@ -21,11 +21,13 @@ final class OutputConfigurator
 {
     public static function configure(OutputInterface $output): void
     {
-        $output->getFormatter()->setStyle(
+        $outputFormatter = $output->getFormatter();
+
+        $outputFormatter->setStyle(
             'recommendation',
             new OutputFormatterStyle('black', 'yellow')
         );
-        $output->getFormatter()->setStyle(
+        $outputFormatter->setStyle(
             'warning',
             new OutputFormatterStyle('white', 'red')
         );

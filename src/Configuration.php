@@ -2671,10 +2671,7 @@ BANNER;
             $phpScoper = new FileWhitelistScoper($phpScoper, ...$whitelistedFiles);
         }
 
-        $prefix = null === $phpScoperConfig->getPrefix()
-            ? unique_id('_HumbugBox')
-            : $phpScoperConfig->getPrefix()
-        ;
+        $prefix = $phpScoperConfig->getPrefix() ?? unique_id('_HumbugBox');
 
         return new PhpScoperCompactor(
             new SimpleScoper(

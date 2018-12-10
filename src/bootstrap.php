@@ -27,7 +27,7 @@ use function set_error_handler;
 set_error_handler(
     static function (int $code, string $message, string $file = '', int $line = -1): void {
         if (error_reporting() & $code) {
-            throw new ErrorException($message, 0, $code, (string) $file, $line);
+            throw new ErrorException($message, 0, $code, $file, $line);
         }
     }
 );

@@ -202,7 +202,7 @@ OUTPUT;
             [
                 'command' => 'diff',
                 'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
-                'pharB' => $pharB = realpath(self::FIXTURES_DIR.'/not-a-phar.phar'),
+                'pharB' => realpath(self::FIXTURES_DIR.'/not-a-phar.phar'),
             ]
         );
 
@@ -242,7 +242,7 @@ OUTPUT;
                 [
                     'command' => 'diff',
                     'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
-                    'pharB' => $pharB = realpath(self::FIXTURES_DIR.'/not-a-phar.phar'),
+                    'pharB' => realpath(self::FIXTURES_DIR.'/not-a-phar.phar'),
                 ],
                 ['verbosity' => OutputInterface::VERBOSITY_DEBUG]
             );

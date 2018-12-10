@@ -296,11 +296,7 @@ final class Box implements Countable
             return;
         }
 
-        $filesWithContents = $this->processContents($files);
-
-        foreach ($filesWithContents as $fileWithContents) {
-            [$file, $contents] = $fileWithContents;
-
+        foreach ($this->processContents($files) as [$file, $contents]) {
             $this->bufferedFiles[$file] = $contents;
         }
     }

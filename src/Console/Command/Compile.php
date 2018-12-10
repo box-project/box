@@ -271,7 +271,7 @@ HELP;
             remove(self::DEBUG_DIR);
 
             $date = (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format(DATE_ATOM);
-            $file = null !== $config->getConfigurationFile() ? $config->getConfigurationFile() : 'No config file';
+            $file = $config->getConfigurationFile() ?? 'No config file';
 
             remove(self::DEBUG_DIR);
 
