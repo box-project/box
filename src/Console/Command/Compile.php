@@ -76,7 +76,6 @@ use function round;
 use function sprintf;
 use function strlen;
 use function substr;
-use Symfony\Component\VarExporter\VarExporter;
 use function var_export;
 
 /**
@@ -286,7 +285,10 @@ HELP;
 
 
 EOF
-                .VarExporter::export($config)
+                .(new CliDumper())->dump(
+                    (new VarCloner())->cloneVar($config),
+                    true
+                )
             );
         }
 

@@ -2542,7 +2542,7 @@ BANNER;
     {
         $path = dirname($file);
 
-        $process = new Process($command, $path);
+        $process = new Process([$command], $path);
 
         if (0 === $process->run()) {
             return trim($process->getOutput());
