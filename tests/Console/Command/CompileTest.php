@@ -3104,7 +3104,6 @@ OUTPUT;
 
         dump_file('box.json', '{}');
         dump_file('composer.json', '{}');
-        dump_file('composer.lock', '{}');
 
         $this->commandTester->execute(
             [
@@ -3139,7 +3138,7 @@ Box version 3.x-dev@151e40a
     > No file found
 ? Auto-discover files? Yes
 ? Adding files
-    > 2 file(s)
+    > 1 file(s)
 ? Generating new stub
   - Using shebang line: #!/usr/bin/env php
   - Using banner:
