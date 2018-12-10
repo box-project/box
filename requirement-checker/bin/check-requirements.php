@@ -14,7 +14,7 @@ namespace KevinGH\RequirementChecker;
 
 require __DIR__.'/../vendor/autoload.php';
 
-if (\PHP_SAPI !== 'cli' && \PHP_SAPI !== 'phpdbg') {
+if (false === in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
     echo \PHP_EOL.'The application may only be invoked from a command line'.\PHP_EOL;
 
     exit(1);
