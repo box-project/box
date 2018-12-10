@@ -111,6 +111,7 @@ class CompileTest extends CommandTestCase
 
         dump_file('composer.json', '{}');
         dump_file('composer.lock', '{}');
+        dump_file('vendor/composer/installed.json', '{}');
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
@@ -123,7 +124,7 @@ class CompileTest extends CommandTestCase
                     'chmod' => '0700',
                     'compactors' => [Php::class],
                     'directories' => ['a'],
-                    'files' => ['test.php'],
+                    'files' => ['test.php', 'vendor/composer/installed.json'],
                     'finder' => [['in' => 'one']],
                     'finder-bin' => [['in' => 'two']],
                     'algorithm' => 'OPENSSL',
@@ -173,7 +174,7 @@ Box version 3.x-dev@151e40a
     > 1 file(s)
 ? Auto-discover files? No
 ? Adding files
-    > 5 file(s)
+    > 6 file(s)
 ? Generating new stub
   - Using shebang line: $shebang
   - Using banner:
@@ -3103,7 +3104,6 @@ OUTPUT;
 
         dump_file('box.json', '{}');
         dump_file('composer.json', '{}');
-        dump_file('composer.lock', '{}');
 
         $this->commandTester->execute(
             [
@@ -3138,7 +3138,7 @@ Box version 3.x-dev@151e40a
     > No file found
 ? Auto-discover files? Yes
 ? Adding files
-    > 2 file(s)
+    > 1 file(s)
 ? Generating new stub
   - Using shebang line: #!/usr/bin/env php
   - Using banner:

@@ -1,0 +1,7 @@
+{
+    "main": "src/Main.php",
+    "directories": [
+        "src/",
+        "vendor/"
+    ]
+}

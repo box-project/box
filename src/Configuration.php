@@ -254,15 +254,29 @@ BANNER;
 
         $composerFiles = self::retrieveComposerFiles($basePath);
 
+        /**
+         * @var (string|null)[]
+         * @var (string|null)[] $composerLock
+         * @var (string|null)[] $installedJson
+         */
+        [$composerJson, $composerLock, $installedJson] = $composerFiles;
+
+        $dumpAutoload = self::retrieveDumpAutoload($raw, null !== $composerJson[0], $logger);
+
+        if ($dumpAutoload && null !== $installedJson[0] && null === $composerLock[0]) {
+            $logger->addWarning(
+                'A vendor/composer/installed.json file has been found but its related file composer.lock could not. '
+                .'This is likely due to the file having been removed despite being necessary. This will not break the '
+                .'build but the dump-autoload had to be disabled.'
+            );
+        }
+
+        $excludeComposerFiles = self::retrieveExcludeComposerFiles($raw, $logger);
+
         $mainScriptPath = self::retrieveMainScriptPath($raw, $basePath, $composerFiles[0][1], $logger);
         $mainScriptContents = self::retrieveMainScriptContents($mainScriptPath);
 
         [$tmpOutputPath, $outputPath] = self::retrieveOutputPath($raw, $basePath, $mainScriptPath, $logger);
-
-        /** @var (string|null)[] $composerJson */
-        $composerJson = $composerFiles[0];
-        /** @var (string|null)[] $composerJson */
-        $composerLock = $composerFiles[1];
 
         $stubPath = self::retrieveStubPath($raw, $basePath, $logger);
         $isStubGenerated = self::retrieveIsStubGenerated($raw, $stubPath, $logger);
@@ -320,9 +334,9 @@ BANNER;
             $excludedPaths,
             $devPackages,
             $composerFiles,
-            $composerJson,
             $autodiscoverFiles,
             $forceFilesAutodiscovery,
+            $dumpAutoload,
             $logger
         );
         $binaryFilesAggregate = self::collectBinaryFiles(
@@ -334,10 +348,6 @@ BANNER;
             $devPackages,
             $logger
         );
-
-        $dumpAutoload = self::retrieveDumpAutoload($raw, null !== $composerJson[0], $logger);
-
-        $excludeComposerFiles = self::retrieveExcludeComposerFiles($raw, $logger);
 
         $compactors = self::retrieveCompactors($raw, $basePath, $logger);
         $compressionAlgorithm = self::retrieveCompressionAlgorithm($raw, $logger);
@@ -878,9 +888,9 @@ BANNER;
         array $excludedPaths,
         array $devPackages,
         array $composerFiles,
-        array $composerJson,
         bool $autodiscoverFiles,
         bool $forceFilesAutodiscovery,
+        bool $dumpAutoload,
         ConfigurationLogger $logger
     ): array {
         $files = [self::retrieveFiles($raw, self::FILES_KEY, $basePath, $composerFiles, $mainScriptPath, $logger)];
@@ -888,7 +898,7 @@ BANNER;
         if ($autodiscoverFiles || $forceFilesAutodiscovery) {
             [$filesToAppend, $directories] = self::retrieveAllDirectoriesToInclude(
                 $basePath,
-                $composerJson[1],
+                $composerFiles[0][1],
                 $devPackages,
                 array_filter(
                     array_column($composerFiles, 0)
@@ -896,7 +906,7 @@ BANNER;
                 $excludedPaths
             );
 
-            $files[] = $filesToAppend;
+            $files[] = self::wrapInSplFileInfo($filesToAppend);
 
             $files[] = self::retrieveAllFiles(
                 $basePath,
@@ -933,7 +943,30 @@ BANNER;
             }
         }
 
-        return self::retrieveFilesAggregate(...$files);
+        $aggregate = self::retrieveFilesAggregate(...$files);
+
+        if (false === $dumpAutoload) {
+            return $aggregate;
+        }
+
+        if (null === $composerFiles[1][0]) {
+            return $aggregate;
+        }
+
+        foreach ($aggregate as $file) {
+            if ($file->getRealPath() === $composerFiles[2][0]) {
+                return $aggregate;
+            }
+        }
+
+        $logger->addWarning(
+            'A composer.lock file has been found but its related file vendor/composer/installed.json could not. This '
+            .'could be due to either dependencies incorrectly installed or an incorrect Box configuration which is not '
+            .'including the installed.json file. This will not break the build but will likely result in a broken '
+            .'Composer classmap.'
+        );
+
+        return $aggregate;
     }
 
     /**
@@ -998,11 +1031,11 @@ BANNER;
         }
 
         if (false === isset($raw->{$key})) {
-            return $files;
+            return self::wrapInSplFileInfo($files);
         }
 
         if ([] === (array) $raw->{$key}) {
-            return $files;
+            return self::wrapInSplFileInfo($files);
         }
 
         $files = array_merge((array) $raw->{$key}, $files);
@@ -1571,6 +1604,21 @@ BANNER;
         return make_path_absolute(trim($file), $basePath);
     }
 
+    /**
+     * @param string[] $files
+     *
+     * @return SplFileInfo[]
+     */
+    private static function wrapInSplFileInfo(array $files): array
+    {
+        return array_map(
+            static function (string $file): SplFileInfo {
+                return new SplFileInfo($file);
+            },
+            $files
+        );
+    }
+
     private static function retrieveDumpAutoload(stdClass $raw, bool $composerJson, ConfigurationLogger $logger): bool
     {
         self::checkIfDefaultValue($logger, $raw, self::DUMP_AUTOLOAD_KEY, true);
@@ -1816,12 +1864,10 @@ BANNER;
             return [$file, $contents];
         };
 
-        [$composerJson, $composerJsonContents] = $retrieveFileAndContents(canonicalize($basePath.'/composer.json'));
-        [$composerLock, $composerLockContents] = $retrieveFileAndContents(canonicalize($basePath.'/composer.lock'));
-
         return [
-            [$composerJson, $composerJsonContents],
-            [$composerLock, $composerLockContents],
+            $retrieveFileAndContents(canonicalize($basePath.'/composer.json')),
+            $retrieveFileAndContents(canonicalize($basePath.'/composer.lock')),
+            $retrieveFileAndContents(canonicalize($basePath.'/vendor/composer/installed.json')),
         ];
     }
 

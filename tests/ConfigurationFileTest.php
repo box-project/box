@@ -19,6 +19,8 @@ use InvalidArgumentException;
 use KevinGH\Box\Json\JsonValidationException;
 use const DIRECTORY_SEPARATOR;
 use function chdir;
+use function Humbug\get_contents;
+use function Humbug\PhpScoper\json_decode;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\mkdir;
@@ -33,6 +35,8 @@ use function sprintf;
  */
 class ConfigurationFileTest extends ConfigurationTestCase
 {
+    private const FIXTURES_DIR = __DIR__.'/../fixtures/configuration';
+
     public function test_the_files_can_be_configured(): void
     {
         touch('file0');
@@ -1733,6 +1737,61 @@ JSON
             $this->config->getRecommendations()
         );
         $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_no_warning_is_given_when_no_installed_json_no_composer_lock_are_found(): void
+    {
+        $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir000/box.json', json_decode(get_contents($configPath)));
+
+        $this->assertSame([], $config->getRecommendations());
+        $this->assertSame([], $config->getWarnings());
+    }
+
+    public function test_no_warning_is_given_when_the_installed_json_and_composer_lock_are_found(): void
+    {
+        $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir001/box.json', json_decode(get_contents($configPath)));
+
+        $this->assertSame([], $config->getRecommendations());
+        $this->assertSame([], $config->getWarnings());
+    }
+
+    public function test_a_warning_is_given_when_no_installed_json_is_found_and_the_composer_lock_is(): void
+    {
+        $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir002/box.json', json_decode(get_contents($configPath)));
+
+        $this->assertSame([], $config->getRecommendations());
+        $this->assertSame(
+            [
+                'A composer.lock file has been found but its related file vendor/composer/installed.json could not. '
+                .'This could be due to either dependencies incorrectly installed or an incorrect Box configuration '
+                .'which is not including the installed.json file. This will not break the build but will likely result '
+                .'in a broken Composer classmap.',
+            ],
+            $config->getWarnings()
+        );
+    }
+
+    public function test_a_warning_is_given_when_the_installed_json_is_found_and_the_composer_lock_is_not(): void
+    {
+        $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir003/box.json', json_decode(get_contents($configPath)));
+
+        $this->assertSame([], $config->getRecommendations());
+        $this->assertSame(
+            [
+                'A vendor/composer/installed.json file has been found but its related file composer.lock could not. '
+                .'This is likely due to the file having been removed despite being necessary. This will not break the '
+                .'build but the dump-autoload had to be disabled.',
+            ],
+            $config->getWarnings()
+        );
+    }
+
+    public function test_not_warning_is_given_when_the_installed_json_is_found_and_the_composer_lock_is_not_and_the_dump_autoload_disabled(): void
+    {
+        $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir004/box.json', json_decode(get_contents($configPath)));
+
+        $this->assertSame([], $config->getRecommendations());
+        $this->assertSame([], $config->getWarnings());
     }
 
     public function provideConfigWithMainScript(): Generator

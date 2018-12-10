@@ -1,0 +1,54 @@
+{
+  "name": "beberlei/assert",
+  "description": "Thin assertion library for input validation in business models.",
+  "authors": [
+    {
+      "name": "Benjamin Eberlei",
+      "email": "kontakt@beberlei.de",
+      "role": "Lead Developer"
+    },
+    {
+      "name": "Richard Quadling",
+      "email": "rquadling@gmail.com",
+      "role": "Collaborator"
+    }
+  ],
+  "license": "BSD-2-Clause",
+  "keywords": [
+    "assert",
+    "assertion",
+    "validation"
+  ],
+  "config": {
+    "sort-packages": true
+  },
+  "require": {
+    "php": ">=5.3",
+    "ext-mbstring": "*"
+  },
+  "require-dev": {
+    "friendsofphp/php-cs-fixer": "^2.1.1",
+    "phpunit/phpunit": "^4.8.35|^5.7"
+  },
+  "autoload": {
+    "psr-4": {
+      "Assert\\": "lib/Assert"
+    },
+    "files": [
+      "lib/Assert/functions.php"
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Assert\\Tests\\": "tests/Assert/Tests"
+    },
+    "files": [
+      "tests/Assert/Tests/Fixtures/functions.php"
+    ]
+  },
+  "scripts": {
+    "assert:generate-docs": "php bin/generate_method_docs.php",
+    "assert:cs-lint": "php-cs-fixer fix --diff -vvv --dry-run",
+    "assert:cs-fix": "php-cs-fixer fix . -vvv || true"
+  }
+}
