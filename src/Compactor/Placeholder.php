@@ -17,7 +17,6 @@ namespace KevinGH\Box\Compactor;
 use Assert\Assertion;
 use KevinGH\Box\Compactor;
 use function array_keys;
-use function array_values;
 use function str_replace;
 
 final class Placeholder implements Compactor
@@ -41,7 +40,7 @@ final class Placeholder implements Compactor
     {
         return str_replace(
             array_keys($this->placeholders),
-            array_values($this->placeholders),
+            $this->placeholders,
             $contents
         );
     }

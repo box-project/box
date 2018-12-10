@@ -54,7 +54,7 @@ trait ChangeableWorkingDirectory
         }
     }
 
-    final private function configureWorkingDirOption(): void
+    private function configureWorkingDirOption(): void
     {
         $this->addOption(
             self::$WORKING_DIR_OPT,

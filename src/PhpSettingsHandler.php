@@ -59,7 +59,7 @@ final class PhpSettingsHandler extends XdebugHandler
     /**
      * {@inheritdoc}
      */
-    protected function requiresRestart($isLoaded)
+    protected function requiresRestart($isLoaded): bool
     {
         return null === self::getRestartSettings();
     }

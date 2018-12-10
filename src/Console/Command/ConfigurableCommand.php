@@ -63,10 +63,7 @@ abstract class ConfigurableCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         try {
-            $configPath = null !== $input->getOption(self::CONFIG_PARAM)
-                ? $input->getOption(self::CONFIG_PARAM)
-                : $helper->findDefaultPath()
-            ;
+            $configPath = $input->getOption(self::CONFIG_PARAM) ?? $helper->findDefaultPath();
 
             $io->comment(
                 sprintf(

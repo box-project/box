@@ -19,7 +19,6 @@ use Composer\Semver\Semver;
 use UnexpectedValueException;
 use function array_column;
 use function array_filter;
-use function array_values;
 use function basename;
 use function implode;
 use function sprintf;
@@ -150,7 +149,7 @@ Dockerfile;
             sprintf(
                 'Could not find a suitable Docker base image for the PHP constraint(s) "%s". Images available: "%s"',
                 implode('", "', $conditions),
-                implode('", "', array_values(self::PHP_DOCKER_IMAGES))
+                implode('", "', self::PHP_DOCKER_IMAGES)
             )
         );
     }

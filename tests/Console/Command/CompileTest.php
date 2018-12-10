@@ -334,7 +334,7 @@ PHP;
                     'map' => [
                         ['a/deep/test/directory' => 'sub'],
                     ],
-                    'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
+                    'metadata' => ['rand' => random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
                     'shebang' => $shebang,
                 ]
@@ -729,7 +729,7 @@ PHP;
                     'map' => [
                         ['a/deep/test/directory' => 'sub'],
                     ],
-                    'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
+                    'metadata' => ['rand' => random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
                 ]
             )
@@ -1181,7 +1181,8 @@ OUTPUT;
 
         $actualFiles = $this->normalizePaths(
             iterator_to_array(
-                Finder::create()->files()->in('.box_dump')->ignoreDotFiles(false)
+                Finder::create()->files()->in('.box_dump')->ignoreDotFiles(false),
+                true
             )
         );
 
@@ -1593,20 +1594,8 @@ PHP
         $pharContents = file_get_contents('test.phar');
         $shebang = preg_quote($shebang, '/');
 
-        $this->assertSame(
-            1,
-            preg_match(
-                "/$shebang/",
-                $pharContents
-            )
-        );
-        $this->assertSame(
-            1,
-            preg_match(
-                '/custom banner/',
-                $pharContents
-            )
-        );
+        $this->assertRegExp("/$shebang/", $pharContents);
+        $this->assertRegExp('/custom banner/', $pharContents);
 
         $phar = new Phar('test.phar');
 
@@ -1637,7 +1626,7 @@ PHP
                     'map' => [
                         ['a/deep/test/directory' => 'sub'],
                     ],
-                    'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
+                    'metadata' => ['rand' => random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
                     'shebang' => $shebang,
                     'stub' => false,
@@ -1703,7 +1692,7 @@ PHP
                     'map' => [
                         ['a/deep/test/directory' => 'sub'],
                     ],
-                    'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
+                    'metadata' => ['rand' => random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
                     'shebang' => $shebang,
                     'stub' => 'custom_stub',
@@ -1886,9 +1875,9 @@ OUTPUT;
 
         $output = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
-        $this->assertSame(
-            1,
-            preg_match('/\? Dumping the Composer autoloader/', $output),
+        $this->assertRegExp(
+            '/\? Dumping the Composer autoloader/',
+            $output,
             'Expected the autoloader to be dumped'
         );
 
@@ -1933,9 +1922,9 @@ OUTPUT;
 
         $output = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
-        $this->assertSame(
-            1,
-            preg_match('/\? Skipping dumping the Composer autoloader/', $output),
+        $this->assertRegExp(
+            '/\? Skipping dumping the Composer autoloader/',
+            $output,
             'Did not expect the autoloader to be dumped'
         );
 
@@ -1971,9 +1960,9 @@ OUTPUT;
 
         $output = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
-        $this->assertSame(
-            1,
-            preg_match('/\? Removing the Composer dump artefacts/', $output),
+        $this->assertRegExp(
+            '/\? Removing the Composer dump artefacts/',
+            $output,
             'Expected the composer files to be removed'
         );
 
@@ -2024,9 +2013,9 @@ OUTPUT;
 
         $output = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
-        $this->assertSame(
-            1,
-            preg_match('/\? Keep the Composer dump artefacts/', $output),
+        $this->assertRegExp(
+            '/\? Keep the Composer dump artefacts/',
+            $output,
             'Expected the composer files to be kept'
         );
 

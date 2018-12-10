@@ -1104,7 +1104,8 @@ JSON
                 Finder::create()
                     ->directories()
                     ->depth(0)
-                    ->in(dirname($boxTmp))
+                    ->in(dirname($boxTmp)),
+                true
             );
 
             $boxDir = current(

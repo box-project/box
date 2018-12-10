@@ -132,7 +132,7 @@ class DocumentationSchemaTest extends TestCase
     private function retrieveDocKeys(): array
     {
         preg_match_all(
-            '/#+ [\p{L}-\s]+\(`(.*?)`(?:[\p{L}-\s]+`(.*?)`)?\)/',
+            '/#+ [\p{L}-\s]+\(`(.*?)`(?:[\p{L}-\s]+`(.*?)`)?\)/u',
             file_contents(__DIR__.'/../doc/configuration.md'),
             $matches
         );

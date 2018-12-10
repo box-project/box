@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Composer;
 
 use const DIRECTORY_SEPARATOR;
+use function array_column;
 use function array_filter;
 use function array_key_exists;
 use function array_map;
@@ -94,11 +95,6 @@ final class ComposerConfiguration
             return [];
         }
 
-        return array_map(
-            static function (array $package): string {
-                return $package['name'];
-            },
-            $composerLockDecodedContents['packages-dev']
-        );
+        return array_column($composerLockDecodedContents['packages-dev'], 'name');
     }
 }

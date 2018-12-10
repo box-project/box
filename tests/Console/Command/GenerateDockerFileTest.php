@@ -73,7 +73,7 @@ OUTPUT;
         );
         $this->assertSame(0, $this->commandTester->getStatusCode());
 
-        $this->assertFileExists($dockerfile = $this->tmp.'/Dockerfile');
+        $this->assertFileExists($this->tmp.'/Dockerfile');
     }
 
     public function test_it_cannot_generate_a_Dockerfile_for_a_PHAR_without_requirements(): void

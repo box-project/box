@@ -524,6 +524,6 @@ PHP
     {
         $finder = Finder::create()->files()->in($this->tmp);
 
-        return $this->normalizePaths(iterator_to_array($finder));
+        return $this->normalizePaths(iterator_to_array($finder), true);
     }
 }

@@ -44,7 +44,7 @@ abstract class ConfigurationTestCase extends FileSystemTestCase
 
         $this->file = make_path_absolute('box.json', $this->tmp);
 
-        touch($defaultFile = self::DEFAULT_FILE);
+        touch(self::DEFAULT_FILE);
         dump_file($this->file, '{}');
 
         $this->config = Configuration::create($this->file, new stdClass());

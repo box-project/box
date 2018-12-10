@@ -87,7 +87,7 @@ STUB;
 
         $stub = str_replace(
             "__BOX_PHAR_CONFIG__\n",
-            (string) $this->generatePharConfigStmt(),
+            $this->generatePharConfigStmt(),
             $stub
         );
 
