@@ -1,0 +1,10 @@
+{
+    "autoload": {
+        "psr-4": {
+            "Acme\\": "src/"
+        }
+    },
+    "require": {
+        "beberlei/assert": "^2.8"
+    }
+}

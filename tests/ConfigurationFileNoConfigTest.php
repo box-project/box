@@ -754,20 +754,15 @@ JSON
 
     public function test_it_includes_the_vendor_files_when_found(): void
     {
-        dump_file('vendor/composer/installed.json');
-
-        dump_file(
-            'composer.json',
-            <<<'JSON'
-{
-}
-JSON
-        );
+        dump_file('vendor/composer/installed.json', '{}');
+        dump_file('composer.json', '{}');
+        dump_file('composer.lock', '{}');
 
         // Relative to the current working directory for readability
         $expected = [
             'box.json',
             'composer.json',
+            'composer.lock',
             'index.php',
             'vendor/composer/installed.json',
         ];
