@@ -19,6 +19,7 @@ use Generator;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Console\DisplayNormalizer;
+use function KevinGH\Box\get_box_version;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
