@@ -21,8 +21,6 @@ matrix:
       env: PHAR_READONLY='true'
     - php: '7.2'
       env: COVERAGE='true'
-    - php: '7.2'
-      env: SYMFONY_VERSION='v3'
   allow_failures:
     - php: nightly
   fast_finish: true
@@ -42,15 +40,7 @@ before_install:
     fi
 
 install:
-  - |
-    if [ -n "$SYMFONY_VERSION" ]; then
-        composer install $COMPOSER_FLAGS
-        composer require --no-update "symfony/lts:${SYMFONY_VERSION}"
-
-        composer update $(composer show | grep symfony | awk '{print $1}' | xargs)
-    else
-        composer install $COMPOSER_FLAGS
-    fi
+  - composer install $COMPOSER_FLAGS
 
 script:
   - bin/box validate
