@@ -2534,15 +2534,13 @@ BANNER;
     /**
      * Runs a Git command on the repository.
      *
-     * @param string $command the command
-     *
-     * @return string the trimmed output from the command
+     * @return string The trimmed output from the command
      */
     private static function runGitCommand(string $command, string $file): string
     {
         $path = dirname($file);
 
-        $process = new Process($command, $path);
+        $process = Process::fromShellCommandline($command, $path);
 
         if (0 === $process->run()) {
             return trim($process->getOutput());
