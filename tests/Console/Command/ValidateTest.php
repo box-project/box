@@ -176,7 +176,7 @@ JSON
  // Loading the configuration file "test.json".
 
 No recommendation found.
-⚠️  0 warning found:
+⚠️  1 warning found:
     - The setting "key" has been set but is ignored since the signing algorithm is not "OPENSSL".
 
  ! [CAUTION] The configuration file passed the validation with warnings.
@@ -216,7 +216,7 @@ JSON
  // Loading the configuration file "test.json".
 
 No recommendation found.
-⚠️  0 warning found:
+⚠️  1 warning found:
     - The setting "key" has been set but is ignored since the signing algorithm is not "OPENSSL".
 
  ! [CAUTION] The configuration file passed the validation with warnings.

@@ -53,8 +53,8 @@ final class MessageRenderer
             $io->writeln(
                 sprintf(
                     '⚠️  <warning>%d %s found:</warning>',
-                    count($recommendations),
-                    count($recommendations) > 1 ? 'warnings' : 'warning'
+                    count($warnings),
+                    count($warnings) > 1 ? 'warnings' : 'warning'
                 )
             );
 
