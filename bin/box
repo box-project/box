@@ -23,7 +23,7 @@ use function file_exists;
 use function in_array;
 
 if (false === in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
-    echo PHP_EOL.'Box may only be invoked from a command line'.PHP_EOL;
+    echo PHP_EOL.'Box may only be invoked from a command line, got "'.PHP_SAPI.'"'.PHP_EOL;
 
     exit(1);
 }
