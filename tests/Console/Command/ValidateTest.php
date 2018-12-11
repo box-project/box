@@ -47,7 +47,7 @@ class ValidateTest extends CommandTestCase
         $this->commandTester->execute(
             [
                 'command' => 'validate',
-                '--config' => 'test.json',
+                'file' => 'test.json',
             ],
             [
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -85,7 +85,7 @@ JSON
         $this->commandTester->execute(
             [
                 'command' => 'validate',
-                '--config' => 'test.json',
+                'file' => 'test.json',
             ],
             [
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -124,7 +124,7 @@ JSON
         $this->commandTester->execute(
             [
                 'command' => 'validate',
-                '--config' => 'test.json',
+                'file' => 'test.json',
                 '--ignore-recommendations-and-warnings' => null,
             ],
             [
@@ -164,7 +164,7 @@ JSON
         $this->commandTester->execute(
             [
                 'command' => 'validate',
-                '--config' => 'test.json',
+                'file' => 'test.json',
             ],
             [
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -203,7 +203,7 @@ JSON
         $this->commandTester->execute(
             [
                 'command' => 'validate',
-                '--config' => 'test.json',
+                'file' => 'test.json',
                 '--ignore-recommendations-and-warnings' => null,
             ],
             [
@@ -243,7 +243,7 @@ JSON
         $this->commandTester->execute(
             [
                 'command' => 'validate',
-                '--config' => 'test.json',
+                'file' => 'test.json',
             ],
             [
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,

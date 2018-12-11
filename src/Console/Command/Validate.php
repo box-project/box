@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Exception;
+use KevinGH\Box\Console\ConfigurationLoader;
 use KevinGH\Box\Console\MessageRenderer;
 use KevinGH\Box\Console\OutputConfigurator;
 use KevinGH\Box\Json\JsonValidationException;
@@ -29,8 +30,9 @@ use function sprintf;
 /**
  * @private
  */
-final class Validate extends ConfigurableCommand
+final class Validate extends Command
 {
+    private const FILE_ARGUMENT = 'file';
     private const IGNORE_MESSAGES_OPTION = 'ignore-recommendations-and-warnings';
 
     /**
@@ -56,7 +58,7 @@ and report any errors found, if any.
 HELP
         );
         $this->addArgument(
-            'file',
+            self::FILE_ARGUMENT,
             InputArgument::OPTIONAL,
             'The configuration file. (default: box.json, box.json.dist)'
         );
@@ -78,7 +80,12 @@ HELP
         OutputConfigurator::configure($output);
 
         try {
-            $config = $this->getConfig($input, $output);
+            $config = ConfigurationLoader::getConfig(
+                $input->getArgument(self::FILE_ARGUMENT) ?? $this->getConfigurationHelper()->findDefaultPath(),
+                $this->getConfigurationHelper(),
+                new SymfonyStyle($input, $output),
+                false
+            );
 
             $recommendations = $config->getRecommendations();
             $warnings = $config->getWarnings();
