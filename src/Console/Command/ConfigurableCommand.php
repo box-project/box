@@ -14,17 +14,13 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use InvalidArgumentException;
 use KevinGH\Box\Configuration;
-use KevinGH\Box\Console\ConfigurationHelper;
+use KevinGH\Box\Console\ConfigurationLoader;
 use KevinGH\Box\Json\JsonValidationException;
-use KevinGH\Box\NoConfigurationFound;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use function sprintf;
 
 /**
  * Allows a configuration file path to be specified for a command.
@@ -57,36 +53,16 @@ abstract class ConfigurableCommand extends Command
      */
     final protected function getConfig(InputInterface $input, OutputInterface $output, bool $allowNoFile = false): Configuration
     {
-        /** @var ConfigurationHelper $helper */
-        $helper = $this->getHelper('config');
+        return ConfigurationLoader::getConfig(
+            $input->getOption(self::CONFIG_PARAM),
+            $this->getConfigurationHelper(),
+            new SymfonyStyle($input, $output),
+            $allowNoFile
+        );
+    }
 
-        $io = new SymfonyStyle($input, $output);
-
-        try {
-            $configPath = $input->getOption(self::CONFIG_PARAM) ?? $helper->findDefaultPath();
-
-            $io->comment(
-                sprintf(
-                    'Loading the configuration file "<comment>%s</comment>".',
-                    $configPath
-                )
-            );
-        } catch (NoConfigurationFound $exception) {
-            if (false === $allowNoFile) {
-                throw $exception;
-            }
-
-            $io->comment('Loading without a configuration file.');
-
-            $configPath = null;
-        }
-
-        try {
-            return $helper->loadFile($configPath);
-        } catch (InvalidArgumentException $exception) {
-            $io->error('The configuration file is invalid.');
-
-            throw $exception;
-        }
+    final protected function getConfigPath(InputInterface $input): string
+    {
+        return $input->getOption(self::CONFIG_PARAM) ?? $this->getConfigurationHelper()->findDefaultPath();
     }
 }

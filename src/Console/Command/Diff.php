@@ -18,7 +18,6 @@ use Assert\Assertion;
 use KevinGH\Box\PhpSettingsHandler;
 use ParagonIE\Pharaoh\Pharaoh;
 use ParagonIE\Pharaoh\PharDiff;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
