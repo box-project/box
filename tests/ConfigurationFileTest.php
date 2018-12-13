@@ -155,6 +155,22 @@ class ConfigurationFileTest extends ConfigurationTestCase
         $this->assertSame($expectedBinFiles, $actualBinFiles);
     }
 
+    /**
+     * @dataProvider provideConfigWithGeneratedArtefact
+     */
+    public function test_the_generated_artefact_is_always_ignored(callable $setUp, array $config, array $expectedFiles, array $expectedBinFiles): void
+    {
+        $setUp();
+
+        $this->setConfig($config);
+
+        $actualFiles = $this->normalizePaths($this->config->getFiles());
+        $actualBinFiles = $this->normalizePaths($this->config->getBinaryFiles());
+
+        $this->assertSame($expectedFiles, $actualFiles);
+        $this->assertSame($expectedBinFiles, $actualBinFiles);
+    }
+
     public function test_configured_files_are_relative_to_base_path(): void
     {
         mkdir('sub-dir');
@@ -1954,6 +1970,185 @@ JSON
             },
             [
                 'main' => 'acme',
+                'directories' => ['src'],
+            ],
+            [
+                'src/acme/file00',
+                'src/acme/file10',
+                'src/file00',
+                'src/file10',
+            ],
+            [],
+        ];
+    }
+
+    public function provideConfigWithGeneratedArtefact(): Generator
+    {
+        yield [
+            static function (): void {
+                touch('acme.phar');
+                touch('index.php');
+                touch('file0');
+                touch('file1');
+            },
+            [
+                'output' => 'acme.phar',
+                'files' => [
+                    'acme.phar',
+                    'file0',
+                ],
+                'files-bin' => [
+                    'acme.phar',
+                    'file1',
+                ],
+            ],
+            ['file0'],
+            ['file1'],
+        ];
+
+        yield [
+            static function (): void {
+                mkdir('sub-dir');
+
+                touch('sub-dir/acme.phar');
+                touch('sub-dir/index.php');
+                touch('sub-dir/file0');
+                touch('sub-dir/file1');
+            },
+            [
+                'base-path' => 'sub-dir',
+                'output' => 'acme.phar',
+                'files' => [
+                    'acme.phar',
+                    'file0',
+                ],
+                'files-bin' => [
+                    'acme.phar',
+                    'file1',
+                ],
+            ],
+            ['sub-dir/file0'],
+            ['sub-dir/file1'],
+        ];
+
+        yield [
+            static function (): void {
+                touch('index.php');
+                mkdir('A');
+                touch('A/acme.phar');
+                touch('A/file0');
+                touch('A/file1');
+            },
+            [
+                'output' => 'A/acme.phar',
+                'directories' => [
+                    'A',
+                ],
+                'directories-bin' => [
+                    'A',
+                ],
+            ],
+            ['A/file0', 'A/file1'],
+            ['A/file0', 'A/file1'],
+        ];
+
+        yield [
+            static function (): void {
+                mkdir('sub-dir');
+                touch('sub-dir/index.php');
+                mkdir('sub-dir/A');
+                touch('sub-dir/A/acme.phar');
+                touch('sub-dir/A/file0');
+                touch('sub-dir/A/file1');
+            },
+            [
+                'base-path' => 'sub-dir',
+                'output' => 'A/acme.phar',
+                'directories' => [
+                    'A',
+                ],
+                'directories-bin' => [
+                    'A',
+                ],
+            ],
+            ['sub-dir/A/file0', 'sub-dir/A/file1'],
+            ['sub-dir/A/file0', 'sub-dir/A/file1'],
+        ];
+
+        yield [
+            static function (): void {
+                mkdir('A');
+
+                touch('index.php');
+                touch('A/acme.phar');
+                touch('A/file0');
+                touch('A/file1');
+            },
+            [
+                'output' => 'A/acme.phar',
+                'finder' => [
+                    [
+                        'in' => [
+                            'A',
+                        ],
+                    ],
+                ],
+                'finder-bin' => [
+                    [
+                        'in' => [
+                            'A',
+                        ],
+                    ],
+                ],
+            ],
+            ['A/file0', 'A/file1'],
+            ['A/file0', 'A/file1'],
+        ];
+
+        yield [
+            static function (): void {
+                touch('acme.phar');
+                touch('index.php');
+                touch('file0');
+                touch('file1');
+            },
+            [
+                'output' => 'acme.phar',
+                'finder' => [
+                    [
+                        'append' => [
+                            'acme.phar',
+                            'file0',
+                        ],
+                    ],
+                ],
+                'finder-bin' => [
+                    [
+                        'append' => [
+                            'acme.phar',
+                            'file1',
+                        ],
+                    ],
+                ],
+            ],
+            ['file0'],
+            ['file1'],
+        ];
+
+        yield [
+            // https://github.com/humbug/box/issues/303
+            // The main script is blacklisted but ensures this does not affect the other files collected, like here
+            // the files found in a directory which has the same name as the main script
+            static function (): void {
+                dump_file('index.php');
+                dump_file('acme');
+                dump_file('src/file00');
+                dump_file('src/file10');
+                dump_file('src/acme/file00');
+                dump_file('src/acme/file10');
+            },
+            [
+                'output' => 'acme',
                 'directories' => ['src'],
             ],
             [

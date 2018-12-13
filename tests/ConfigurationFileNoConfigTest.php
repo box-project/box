@@ -30,6 +30,9 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
 {
     public function test_all_the_files_found_in_the_composer_json_are_taken_by_default_with_no_config_file_is_used(): void
     {
+        touch('index.php');
+        touch('index.phar');
+
         touch('file0');
         touch('file1');
         touch('file2');
@@ -142,6 +145,11 @@ JSON
 
         $this->assertEquals($expected, $actual);
         $this->assertCount(0, $this->config->getBinaryFiles());
+
+        $this->assertSame($this->tmp.'/index.php', $noFileConfig->getMainScriptPath());
+
+        $this->assertSame($this->tmp.'/index.phar', $noFileConfig->getOutputPath());
+        $this->assertSame($this->tmp.'/index.phar', $noFileConfig->getTmpOutputPath());
     }
 
     public function test_find_psr0_files(): void
