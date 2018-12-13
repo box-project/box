@@ -1,8 +1,8 @@
 <?php
 
-namespace _HumbugBoxacafcfe30294\KevinGH\RequirementChecker;
+namespace _HumbugBoxaa731ba336da\KevinGH\RequirementChecker;
 
-final class IsExtensionFulfilled implements \_HumbugBoxacafcfe30294\KevinGH\RequirementChecker\IsFulfilled
+final class IsExtensionFulfilled implements \_HumbugBoxaa731ba336da\KevinGH\RequirementChecker\IsFulfilled
 {
     private $requiredExtension;
     public function __construct($requiredExtension)
