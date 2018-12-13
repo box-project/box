@@ -17,9 +17,10 @@ matrix:
     - php: '7.1'
       env: DEPLOY=true
     - php: '7.2'
-    - php: '7.2'
+    - php: '7.3'
+    - php: '7.3'
       env: PHAR_READONLY='true'
-    - php: '7.2'
+    - php: '7.3'
       env: COVERAGE='true'
   allow_failures:
     - php: nightly
