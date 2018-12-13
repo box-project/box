@@ -123,7 +123,7 @@ e2e_check_requirements:
 		> fixtures/check-requirements/pass-no-config/expected-output-53
 
 	rm fixtures/check-requirements/pass-no-config/actual-output || true
-	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-no-config":/opt/box $(PHP5PHAR) > fixtures/check-requirements/pass-no-config/actual-output
+	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-no-config":/opt/box $(PHP5PHAR) | tee fixtures/check-requirements/pass-no-config/actual-output
 	diff fixtures/check-requirements/pass-no-config/expected-output-53 fixtures/check-requirements/pass-no-config/actual-output
 
 	# 7.2
@@ -132,7 +132,7 @@ e2e_check_requirements:
 		> fixtures/check-requirements/pass-no-config/expected-output-72
 
 	rm fixtures/check-requirements/pass-no-config/actual-output || true
-	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-no-config":/opt/box $(PHP7PHAR) > fixtures/check-requirements/pass-no-config/actual-output
+	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-no-config":/opt/box $(PHP7PHAR) | tee fixtures/check-requirements/pass-no-config/actual-output
 	diff fixtures/check-requirements/pass-no-config/expected-output-72 fixtures/check-requirements/pass-no-config/actual-output
 
 	#
@@ -147,7 +147,7 @@ e2e_check_requirements:
 		> fixtures/check-requirements/pass-complete/expected-output-53
 
 	rm fixtures/check-requirements/pass-complete/actual-output || true
-	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-complete":/opt/box $(PHP5PHAR) > fixtures/check-requirements/pass-complete/actual-output
+	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-complete":/opt/box $(PHP5PHAR) | tee fixtures/check-requirements/pass-complete/actual-output
 	diff fixtures/check-requirements/pass-complete/expected-output-53 fixtures/check-requirements/pass-complete/actual-output
 
 	# 7.2
@@ -156,7 +156,7 @@ e2e_check_requirements:
 		> fixtures/check-requirements/pass-complete/expected-output-72
 
 	rm fixtures/check-requirements/pass-complete/actual-output || true
-	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-complete":/opt/box $(PHP7PHAR) > fixtures/check-requirements/pass-complete/actual-output
+	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-complete":/opt/box $(PHP7PHAR) | tee fixtures/check-requirements/pass-complete/actual-output
 	diff fixtures/check-requirements/pass-complete/expected-output-72 fixtures/check-requirements/pass-complete/actual-output
 
 	#
@@ -171,7 +171,7 @@ e2e_check_requirements:
     		> fixtures/check-requirements/fail-complete/expected-output-53
 
 	rm fixtures/check-requirements/fail-complete/actual-output || true
-	$(DOCKER) -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP5PHAR) > fixtures/check-requirements/fail-complete/actual-output || true
+	$(DOCKER) -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP5PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
 	diff fixtures/check-requirements/fail-complete/expected-output-53 fixtures/check-requirements/fail-complete/actual-output
 
 	# 7.2
@@ -180,7 +180,7 @@ e2e_check_requirements:
 		> fixtures/check-requirements/fail-complete/expected-output-72
 
 	rm fixtures/check-requirements/fail-complete/actual-output || true
-	$(DOCKER) -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP7PHAR) > fixtures/check-requirements/fail-complete/actual-output || true
+	$(DOCKER) -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP7PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
 	diff fixtures/check-requirements/fail-complete/expected-output-72 fixtures/check-requirements/fail-complete/actual-output
 
 .PHONY: blackfire
