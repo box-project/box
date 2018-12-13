@@ -322,6 +322,24 @@ BANNER;
             $outputPath,
             $mainScriptPath
         );
+        // Excluded paths above is a bit misleading since including a file directly has precedence over the blacklist.
+        // If you consider the following:
+        //
+        // {
+        //   "files": ["file1"],
+        //   "blacklist": ["file1"],
+        // }
+        //
+        // In the end the file "file1" _will_ be included: blacklist are here to help out to exclude files for finders
+        // and directories but the user should always have the possibility to force his way to include a file.
+        //
+        // The exception however, is for the following which is essential for the good functioning of Box
+        $alwaysExcludedPaths = array_map(
+            static function (string $excludedPath) use ($basePath): string {
+                return self::normalizePath($excludedPath, $basePath);
+            },
+            array_filter([$tmpOutputPath, $outputPath, $mainScriptPath])
+        );
 
         $autodiscoverFiles = self::autodiscoverFiles($file, $raw);
         $forceFilesAutodiscovery = self::retrieveForceFilesAutodiscovery($raw, $logger);
@@ -332,6 +350,7 @@ BANNER;
             $mainScriptPath,
             $blacklistFilter,
             $excludedPaths,
+            $alwaysExcludedPaths,
             $devPackages,
             $composerFiles,
             $autodiscoverFiles,
@@ -342,9 +361,9 @@ BANNER;
         $binaryFilesAggregate = self::collectBinaryFiles(
             $raw,
             $basePath,
-            $mainScriptPath,
             $blacklistFilter,
             $excludedPaths,
+            $alwaysExcludedPaths,
             $devPackages,
             $logger
         );
@@ -876,6 +895,7 @@ BANNER;
 
     /**
      * @param string[] $excludedPaths
+     * @param string[] $alwaysExcludedPaths
      * @param string[] $devPackages
      *
      * @return SplFileInfo[]
@@ -886,6 +906,7 @@ BANNER;
         ?string $mainScriptPath,
         Closure $blacklistFilter,
         array $excludedPaths,
+        array $alwaysExcludedPaths,
         array $devPackages,
         array $composerFiles,
         bool $autodiscoverFiles,
@@ -893,7 +914,7 @@ BANNER;
         bool $dumpAutoload,
         ConfigurationLogger $logger
     ): array {
-        $files = [self::retrieveFiles($raw, self::FILES_KEY, $basePath, $composerFiles, $mainScriptPath, $logger)];
+        $files = [self::retrieveFiles($raw, self::FILES_KEY, $basePath, $composerFiles, $alwaysExcludedPaths, $logger)];
 
         if ($autodiscoverFiles || $forceFilesAutodiscovery) {
             [$filesToAppend, $directories] = self::retrieveAllDirectoriesToInclude(
@@ -971,6 +992,7 @@ BANNER;
 
     /**
      * @param string[] $excludedPaths
+     * @param string[] $alwaysExcludedPaths
      * @param string[] $devPackages
      *
      * @return SplFileInfo[]
@@ -978,13 +1000,13 @@ BANNER;
     private static function collectBinaryFiles(
         stdClass $raw,
         string $basePath,
-        ?string $mainScriptPath,
         Closure $blacklistFilter,
         array $excludedPaths,
+        array $alwaysExcludedPaths,
         array $devPackages,
         ConfigurationLogger $logger
     ): array {
-        $binaryFiles = self::retrieveFiles($raw, self::FILES_BIN_KEY, $basePath, [], $mainScriptPath, $logger);
+        $binaryFiles = self::retrieveFiles($raw, self::FILES_BIN_KEY, $basePath, [], $alwaysExcludedPaths, $logger);
 
         $binaryDirectories = self::retrieveDirectories(
             $raw,
@@ -1008,6 +1030,8 @@ BANNER;
     }
 
     /**
+     * @param string[] $excludedFiles
+     *
      * @return SplFileInfo[]
      */
     private static function retrieveFiles(
@@ -1015,11 +1039,12 @@ BANNER;
         string $key,
         string $basePath,
         array $composerFiles,
-        ?string $mainScriptPath,
+        array $excludedFiles,
         ConfigurationLogger $logger
     ): array {
         self::checkIfDefaultValue($logger, $raw, $key, []);
 
+        $excludedFiles = array_flip($excludedFiles);
         $files = [];
 
         if (isset($composerFiles[0][0])) {
@@ -1042,7 +1067,7 @@ BANNER;
 
         Assertion::allString($files);
 
-        $normalizePath = static function (string $file) use ($basePath, $key, $mainScriptPath): ?SplFileInfo {
+        $normalizePath = static function (string $file) use ($basePath, $key, $excludedFiles): ?SplFileInfo {
             $file = self::normalizePath($file, $basePath);
 
             Assertion::false(
@@ -1061,7 +1086,7 @@ BANNER;
                 )
             );
 
-            return $mainScriptPath === $file ? null : new SplFileInfo($file);
+            return array_key_exists($file, $excludedFiles) ? null : new SplFileInfo($file);
         };
 
         return array_filter(array_map($normalizePath, $files));
