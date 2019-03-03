@@ -59,9 +59,7 @@ abstract class ConfigurationTestCase extends FileSystemTestCase
 
     final protected function reloadConfig(): void
     {
-        $configHelper = new ConfigurationHelper();
-
-        $this->config = $configHelper->loadFile($this->file);
+        $this->config = (new ConfigurationHelper())->loadFile($this->file);
     }
 
     final protected function isWindows(): bool

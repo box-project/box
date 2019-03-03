@@ -402,6 +402,13 @@ EOF
                 $config->hasAutodiscoveredFiles() ? 'Yes' : 'No'
             )
         );
+        $logger->log(
+            CompileLogger::QUESTION_MARK_PREFIX,
+            sprintf(
+                'Exclude dev files? %s',
+                $config->excludeDevFiles() ? 'Yes' : 'No'
+            )
+        );
         $logger->log(CompileLogger::QUESTION_MARK_PREFIX, 'Adding files');
 
         $count = count($config->getFiles());

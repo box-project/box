@@ -96,6 +96,10 @@
             "description": "Will remove the composer.json, composer.lock and installed.json files from the PHAR",
             "type": ["boolean", "null"]
         },
+        "exclude-dev-files": {
+            "description": "Will remove the files from dev only packages from the PHAR",
+            "type": ["boolean", "null"]
+        },
         "files": {
             "description": "A list of file paths to include.",
             "items": {
