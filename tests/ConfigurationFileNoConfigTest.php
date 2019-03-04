@@ -481,6 +481,7 @@ JSON
         touch('license');
         touch('LICENSE_GECKO');
 
+        touch('License.php');
         touch('LicenseCommand.php');
 
         touch('README');
@@ -489,12 +490,14 @@ JSON
         touch('README.rst');
         touch('readme');
 
+        touch('Readme.php');
         touch('ReadmeCommand.php');
 
         touch('UPGRADE');
         touch('UPGRADE.md');
         touch('upgrade');
 
+        touch('Upgrade.php');
         touch('UpgradeCommand.php');
 
         touch('CHANGELOG');
@@ -502,18 +505,21 @@ JSON
         touch('CHANGELOG.md');
         touch('changelog');
 
+        touch('Changelog.php');
         touch('ChangelogCommand.php');
 
         touch('CONTRIBUTING');
         touch('CONTRIBUTING.md');
         touch('contributing');
 
+        touch('Contributing.php');
         touch('ContributingCommand.php');
 
         touch('TODO');
         touch('TODO.md');
         touch('todo');
 
+        touch('Todo.php');
         touch('TodoCommand.php');
 
         touch('CONDUCT');
@@ -521,12 +527,14 @@ JSON
         touch('conduct');
         touch('CODE_OF_CONDUCT.md');
 
+        touch('Conduct.php');
         touch('ConductCommand.php');
 
         touch('AUTHORS');
         touch('AUTHORS.md');
         touch('authors');
 
+        touch('Author.php');
         touch('AuthorCommand.php');
 
         touch('MainTest.php');
@@ -659,18 +667,26 @@ JSON
 
         // Relative to the current working directory for readability
         $expected = [
+            'Author.php',
             'AuthorCommand.php',
+            'Changelog.php',
             'ChangelogCommand.php',
             'composer.json',
+            'Conduct.php',
             'ConductCommand.php',
+            'Contributing.php',
             'ContributingCommand.php',
             'license',
             'LICENSE',
+            'License.php',
             'LicenseCommand.php',
             'LICENSE_GECKO',
+            'Readme.php',
             'ReadmeCommand.php',
             'src/foo.php',
+            'Todo.php',
             'TodoCommand.php',
+            'Upgrade.php',
             'UpgradeCommand.php',
         ];
 
