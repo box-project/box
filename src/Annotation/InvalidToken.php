@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace KevinGH\Box\Annotation;
 
 use Hoa\Compiler\Llk\TreeNode;
-use UnexpectedValueException;
 use function sprintf;
+use UnexpectedValueException;
 
 /**
  * @private

@@ -15,10 +15,10 @@ declare(strict_types=1);
 namespace KevinGH\Box\Verifier;
 
 use InvalidArgumentException;
-use KevinGH\Box\Test\FileSystemTestCase;
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\touch;
+use KevinGH\Box\Test\FileSystemTestCase;
 
 /**
  * @covers \KevinGH\Box\Verifier\PublicKey

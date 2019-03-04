@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use ErrorException;
 use function error_reporting;
+use ErrorException;
 use function set_error_handler;
 
 ($GLOBALS['_BOX_BOOTSTRAP'] = static function (): void {

@@ -15,11 +15,11 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use InvalidArgumentException;
-use const PHP_OS_FAMILY;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\touch;
+use const PHP_OS_FAMILY;
 use function symlink;
 
 /**

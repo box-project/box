@@ -14,16 +14,16 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Json;
 
+use function implode;
+use function json_decode;
+use const JSON_ERROR_NONE;
+use const JSON_ERROR_UTF8;
+use function json_last_error;
 use JsonSchema\Validator;
+use function KevinGH\Box\FileSystem\file_contents;
 use Seld\JsonLint\JsonParser;
 use Seld\JsonLint\ParsingException;
 use stdClass;
-use const JSON_ERROR_NONE;
-use const JSON_ERROR_UTF8;
-use function implode;
-use function json_decode;
-use function json_last_error;
-use function KevinGH\Box\FileSystem\file_contents;
 
 /**
  * @private

@@ -18,8 +18,8 @@ use InvalidArgumentException;
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\NoConfigurationFound;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use function sprintf;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * @private

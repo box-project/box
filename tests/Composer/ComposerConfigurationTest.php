@@ -15,9 +15,9 @@ declare(strict_types=1);
 namespace KevinGH\Box\Composer;
 
 use Generator;
-use KevinGH\Box\Test\FileSystemTestCase;
 use function json_decode;
 use function KevinGH\Box\FileSystem\mkdir;
+use KevinGH\Box\Test\FileSystemTestCase;
 
 /**
  * @covers \KevinGH\Box\Composer\ComposerConfiguration

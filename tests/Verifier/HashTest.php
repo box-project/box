@@ -16,8 +16,8 @@ namespace KevinGH\Box\Verifier;
 
 use Generator;
 use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
 use function md5;
+use PHPUnit\Framework\TestCase;
 use function strtoupper;
 
 /**

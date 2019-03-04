@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use Assert\Assertion;
 use function addcslashes;
+use Assert\Assertion;
 use function implode;
 use function str_replace;
 

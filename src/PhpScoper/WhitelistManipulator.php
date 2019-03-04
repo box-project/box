@@ -14,11 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PhpScoper;
 
+use function array_shift;
 use Assert\Assertion;
+use function count;
 use Humbug\PhpScoper\Whitelist;
 use PhpParser\Node\Name\FullyQualified;
-use function array_shift;
-use function count;
 
 /**
  * @private

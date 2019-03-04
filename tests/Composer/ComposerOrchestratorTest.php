@@ -15,17 +15,17 @@ declare(strict_types=1);
 namespace KevinGH\Box\Composer;
 
 use Generator;
-use Humbug\PhpScoper\Whitelist;
-use KevinGH\Box\Console\DisplayNormalizer;
-use KevinGH\Box\Test\FileSystemTestCase;
-use PhpParser\Node\Name\FullyQualified;
-use RuntimeException;
-use Symfony\Component\Finder\Finder;
 use function Humbug\get_contents;
+use Humbug\PhpScoper\Whitelist;
 use function iterator_to_array;
+use KevinGH\Box\Console\DisplayNormalizer;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\mirror;
+use KevinGH\Box\Test\FileSystemTestCase;
+use PhpParser\Node\Name\FullyQualified;
 use function preg_replace;
+use RuntimeException;
+use Symfony\Component\Finder\Finder;
 
 /**
  * @covers \KevinGH\Box\Composer\ComposerOrchestrator

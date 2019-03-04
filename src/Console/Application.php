@@ -14,11 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
-use Symfony\Component\Console\Application as SymfonyApplication;
-use Symfony\Component\Console\Helper\HelperSet;
 use function KevinGH\Box\get_box_version;
 use function sprintf;
 use function strpos;
+use Symfony\Component\Console\Application as SymfonyApplication;
+use Symfony\Component\Console\Helper\HelperSet;
 use function trim;
 
 /**

@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Tester\ApplicationTester;
 use function preg_replace;
+use Symfony\Component\Console\Tester\ApplicationTester;
 
 /**
  * @covers \KevinGH\Box\Console\Application

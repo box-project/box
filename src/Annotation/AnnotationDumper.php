@@ -14,12 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Annotation;
 
-use Assert\Assertion;
-use Hoa\Compiler\Llk\TreeNode;
 use function array_filter;
 use function array_map;
 use function array_shift;
 use function array_values;
+use Assert\Assertion;
+use Hoa\Compiler\Llk\TreeNode;
 use function implode;
 use function in_array;
 use function sprintf;

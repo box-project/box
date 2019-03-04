@@ -14,10 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PhpScoper;
 
+use function func_get_args;
 use Humbug\PhpScoper\Scoper;
 use Humbug\PhpScoper\Whitelist;
 use KevinGH\Box\NotCallable;
-use function func_get_args;
 
 final class FakePhpScoper implements Scoper
 {

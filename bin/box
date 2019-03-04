@@ -15,12 +15,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use KevinGH\Box\Console\Application;
-use RuntimeException;
-use const PHP_EOL;
-use const PHP_SAPI;
 use function file_exists;
 use function in_array;
+use KevinGH\Box\Console\Application;
+use const PHP_EOL;
+use const PHP_SAPI;
+use RuntimeException;
 
 if (false === in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
     echo PHP_EOL.'Box may only be invoked from a command line, got "'.PHP_SAPI.'"'.PHP_EOL;

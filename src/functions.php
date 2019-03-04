@@ -14,10 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use Assert\Assertion;
-use PackageVersions\Versions;
-use Phar;
 use function array_key_exists;
+use Assert\Assertion;
 use function bin2hex;
 use function class_alias;
 use function class_exists;
@@ -27,6 +25,8 @@ use function defined;
 use function floor;
 use function log;
 use function number_format;
+use PackageVersions\Versions;
+use Phar;
 use function random_bytes;
 use function sprintf;
 use function strlen;

@@ -14,19 +14,19 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-use KevinGH\Box\Annotation\DocblockAnnotationParser;
-use KevinGH\Box\Annotation\InvalidToken;
-use RuntimeException;
-use const T_COMMENT;
-use const T_DOC_COMMENT;
-use const T_WHITESPACE;
 use function count;
 use function in_array;
 use function is_string;
+use KevinGH\Box\Annotation\DocblockAnnotationParser;
+use KevinGH\Box\Annotation\InvalidToken;
 use function preg_replace;
+use RuntimeException;
 use function str_repeat;
 use function strpos;
 use function substr_count;
+use const T_COMMENT;
+use const T_DOC_COMMENT;
+use const T_WHITESPACE;
 use function token_get_all;
 
 /**

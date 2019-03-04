@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use function func_get_args;
 use KevinGH\Box\Compactor\FileExtensionCompactor;
 use PHPUnit\Framework\TestCase;
-use function func_get_args;
 
 /**
  * @covers \KevinGH\Box\Compactor\FileExtensionCompactor

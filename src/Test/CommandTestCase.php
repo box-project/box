@@ -14,16 +14,16 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Test;
 
-use KevinGH\Box\Console\Application;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Output\StreamOutput;
-use Symfony\Component\Console\Tester\CommandTester;
-use const PHP_EOL;
 use function feof;
 use function fgets;
+use KevinGH\Box\Console\Application;
+use const PHP_EOL;
 use function preg_replace;
 use function rewind;
 use function str_replace;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Tester\CommandTester;
 
 /**
  * @private
