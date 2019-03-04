@@ -173,6 +173,7 @@ Box version 3.x-dev@151e40a
 ? Adding binary files
     > 1 file(s)
 ? Auto-discover files? No
+? Exclude dev files? Yes
 ? Adding files
     > 6 file(s)
 ? Generating new stub
@@ -394,6 +395,7 @@ Box version 3.x-dev@151e40a
 ? Adding binary files
     > No file found
 ? Auto-discover files? Yes
+? Exclude dev files? Yes
 ? Adding files
     > 9 file(s)
 ? Generating new stub
@@ -609,6 +611,7 @@ Box version 3.x-dev@151e40a
 ? Adding binary files
     > 1 file(s)
 ? Auto-discover files? No
+? Exclude dev files? Yes
 ? Adding files
     > 4 file(s)
 ? Generating new stub
@@ -851,6 +854,7 @@ Box version 3.x-dev@151e40a
 ? Adding binary files
     > 1 file(s)
 ? Auto-discover files? No
+? Exclude dev files? Yes
 ? Adding files
     > 4 file(s)
 ? Generating new stub
@@ -955,6 +959,7 @@ Box version 3.x-dev@151e40a
 ? Adding binary files
     > 1 file(s)
 ? Auto-discover files? No
+? Exclude dev files? Yes
 ? Adding files
     > 4 file(s)
 ? Generating new stub
@@ -1089,6 +1094,7 @@ Box version 3.x-dev@151e40a
 ? Adding binary files
     > 1 file(s)
 ? Auto-discover files? No
+? Exclude dev files? Yes
 ? Adding files
     > 4 file(s)
 ? Generating new stub
@@ -1343,6 +1349,7 @@ KevinGH\Box\Configuration {#140
   -autodiscoveredFiles: false
   -dumpAutoload: true
   -excludeComposerFiles: true
+  -excludeDevFiles: true
   -compactors: array:1 [
     0 => KevinGH\Box\Compactor\Php {#140
       -annotationParser: KevinGH\Box\Annotation\DocblockAnnotationParser {#140
@@ -1824,6 +1831,7 @@ Box version 3.x-dev@151e40a
 ? Adding binary files
     > No file found
 ? Auto-discover files? Yes
+? Exclude dev files? No
 ? Adding files
     > No file found
 ? Generating new stub
@@ -2084,6 +2092,7 @@ Box version 3.x-dev@151e40a
 ? Adding binary files
     > No file found
 ? Auto-discover files? Yes
+? Exclude dev files? No
 ? Adding files
     > No file found
 ? Generating new stub
@@ -2151,6 +2160,7 @@ Box version 3.x-dev@151e40a
 ? Adding binary files
     > No file found
 ? Auto-discover files? Yes
+? Exclude dev files? No
 ? Adding files
     > No file found
 ? Using stub file: /path/to/tmp/stub.php
@@ -2218,6 +2228,7 @@ Box version 3.x-dev@151e40a
 ? Adding binary files
     > No file found
 ? Auto-discover files? Yes
+? Exclude dev files? No
 ? Adding files
     > 1 file(s)
 ? Generating new stub
@@ -2293,6 +2304,7 @@ Box version 3.x-dev@151e40a
 ? Adding binary files
     > 1 file(s)
 ? Auto-discover files? Yes
+? Exclude dev files? No
 ? Adding files
     > No file found
 ? Using stub file: /path/to/tmp/stub.php
@@ -2368,6 +2380,7 @@ Box version 3.x-dev@151e40a
 ? Adding binary files
     > No file found
 ? Auto-discover files? Yes
+? Exclude dev files? No
 ? Adding files
     > No file found
 ? Using stub file: /path/to/tmp/stub.php
@@ -2443,6 +2456,7 @@ Box version 3.x-dev@151e40a
 ? Adding binary files
     > No file found
 ? Auto-discover files? Yes
+? Exclude dev files? No
 ? Adding files
     > No file found
 ? Generating new stub
@@ -2521,6 +2535,7 @@ Box version 3.x-dev@151e40a
 ? Adding binary files
     > No file found
 ? Auto-discover files? Yes
+? Exclude dev files? No
 ? Adding files
     > No file found
 ? Generating new stub
@@ -2675,6 +2690,7 @@ Box version 3.x-dev@151e40a
 ? Adding binary files
     > No file found
 ? Auto-discover files? Yes
+? Exclude dev files? No
 ? Adding files
     > No file found
 ? Generating new stub
@@ -2764,6 +2780,7 @@ Box version 3.x-dev@151e40a
 ? Adding binary files
     > No file found
 ? Auto-discover files? Yes
+? Exclude dev files? No
 ? Adding files
     > No file found
 ? Using stub file: /path/to/tmp/stub.php
@@ -2976,6 +2993,7 @@ Box version 3.x-dev@151e40a
 ? Adding binary files
     > No file found
 ? Auto-discover files? Yes
+? Exclude dev files? No
 ? Adding files
     > No file found
 ? Generating new stub
@@ -3053,6 +3071,7 @@ Box version 3.x-dev@151e40a
 ? Adding binary files
     > No file found
 ? Auto-discover files? Yes
+? Exclude dev files? No
 ? Adding files
     > No file found
 ? Generating new stub
@@ -3126,6 +3145,7 @@ Box version 3.x-dev@151e40a
 ? Adding binary files
     > No file found
 ? Auto-discover files? Yes
+? Exclude dev files? Yes
 ? Adding files
     > 1 file(s)
 ? Generating new stub

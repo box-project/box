@@ -190,6 +190,7 @@ BANNER;
     private const DIRECTORIES_BIN_KEY = 'directories-bin';
     private const DUMP_AUTOLOAD_KEY = 'dump-autoload';
     private const EXCLUDE_COMPOSER_FILES_KEY = 'exclude-composer-files';
+    private const EXCLUDE_DEV_FILES_KEY = 'exclude-dev-files';
     private const FILES_KEY = 'files';
     private const FILES_BIN_KEY = 'files-bin';
     private const FINDER_KEY = 'finder';
@@ -223,6 +224,7 @@ BANNER;
     private $autodiscoveredFiles;
     private $dumpAutoload;
     private $excludeComposerFiles;
+    private $excludeDevFiles;
     private $compactors;
     private $compressionAlgorithm;
     private $mainScriptPath;
@@ -298,7 +300,7 @@ BANNER;
             self::addRecommendationForDefaultValue($logger, self::BANNER_FILE_KEY);
         }
 
-        $isInterceptsFileFuncs = self::retrieveInterceptsFileFuncs($raw, $isStubGenerated, $logger);
+        $isInterceptsFileFunctions = self::retrieveInterceptsFileFunctions($raw, $isStubGenerated, $logger);
 
         $checkRequirements = self::retrieveCheckRequirements(
             $raw,
@@ -308,7 +310,14 @@ BANNER;
             $logger
         );
 
-        $devPackages = ComposerConfiguration::retrieveDevPackages($basePath, $composerJson[1], $composerLock[1]);
+        $excludeDevPackages = self::retrieveExcludeDevFiles($raw, $dumpAutoload, $logger);
+
+        $devPackages = ComposerConfiguration::retrieveDevPackages(
+            $basePath,
+            $composerJson[1],
+            $composerLock[1],
+            $excludeDevPackages
+        );
 
         /**
          * @var string[]
@@ -396,6 +405,7 @@ BANNER;
             $autodiscoverFiles || $forceFilesAutodiscovery,
             $dumpAutoload,
             $excludeComposerFiles,
+            $excludeDevPackages,
             $compactors,
             $compressionAlgorithm,
             $fileMode,
@@ -414,7 +424,7 @@ BANNER;
             $stubBannerContents,
             $stubBannerPath,
             $stubPath,
-            $isInterceptsFileFuncs,
+            $isInterceptsFileFunctions,
             $isStubGenerated,
             $checkRequirements,
             $logger->getWarnings(),
@@ -468,6 +478,7 @@ BANNER;
         bool $autodiscoveredFiles,
         bool $dumpAutoload,
         bool $excludeComposerFiles,
+        bool $excludeDevPackages,
         array $compactors,
         ?int $compressionAlgorithm,
         ?int $fileMode,
@@ -517,6 +528,7 @@ BANNER;
         $this->autodiscoveredFiles = $autodiscoveredFiles;
         $this->dumpAutoload = $dumpAutoload;
         $this->excludeComposerFiles = $excludeComposerFiles;
+        $this->excludeDevFiles = $excludeDevPackages;
         $this->compactors = $compactors;
         $this->compressionAlgorithm = $compressionAlgorithm;
         $this->fileMode = $fileMode;
@@ -606,6 +618,11 @@ BANNER;
     public function excludeComposerFiles(): bool
     {
         return $this->excludeComposerFiles;
+    }
+
+    public function excludeDevFiles(): bool
+    {
+        return $this->excludeDevFiles;
     }
 
     /**
@@ -1655,6 +1672,7 @@ BANNER;
         $dumpAutoload = $raw->{self::DUMP_AUTOLOAD_KEY} ?? true;
 
         if (false === $composerJson && $dumpAutoload) {
+            // TODO: use sprintf there; check other occurrences as well
             $logger->addWarning(
                 'The "dump-autoload" setting has been set but has been ignored because the composer.json file necessary'
                 .' for it could not be found'
@@ -1664,6 +1682,28 @@ BANNER;
         }
 
         return $composerJson && false !== $dumpAutoload;
+    }
+
+    private static function retrieveExcludeDevFiles(stdClass $raw, bool $dumpAutoload, ConfigurationLogger $logger): bool
+    {
+        self::checkIfDefaultValue($logger, $raw, self::EXCLUDE_DEV_FILES_KEY, $dumpAutoload);
+
+        if (false === property_exists($raw, self::EXCLUDE_DEV_FILES_KEY)) {
+            return $dumpAutoload;
+        }
+
+        $excludeDevFiles = $raw->{self::EXCLUDE_DEV_FILES_KEY} ?? $dumpAutoload;
+
+        if (true === $excludeDevFiles && false === $dumpAutoload) {
+            $logger->addWarning(sprintf(
+                'The "%s" setting has been set but has been ignored because the Composer autoloader is not dumped',
+                self::EXCLUDE_DEV_FILES_KEY
+            ));
+
+            return false;
+        }
+
+        return $excludeDevFiles;
     }
 
     private static function retrieveExcludeComposerFiles(stdClass $raw, ConfigurationLogger $logger): bool
@@ -2440,7 +2480,7 @@ BANNER;
         return null;
     }
 
-    private static function retrieveInterceptsFileFuncs(
+    private static function retrieveInterceptsFileFunctions(
         stdClass $raw,
         bool $stubIsGenerated,
         ConfigurationLogger $logger

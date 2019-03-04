@@ -2687,6 +2687,171 @@ COMMENT;
         );
     }
 
+    public function test_by_default_dev_files_are_excluded_if_dump_autoload_is_enabled(): void
+    {
+        // Those checks are somewhat redundant. They are however done here to make sure the exclude dev files
+        // checks stay in sync with the dump-autoload
+        $this->assertFalse($this->config->dumpAutoload());
+        $this->assertFalse($this->getNoFileConfig()->dumpAutoload());
+
+        $this->assertFalse($this->config->excludeDevFiles());
+        $this->assertFalse($this->getNoFileConfig()->excludeDevFiles());
+
+        $this->setConfig(['exclude-dev-files' => null]);
+
+        $this->assertFalse($this->config->excludeDevFiles());
+
+        $this->assertSame(
+            ['The "exclude-dev-files" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+
+        dump_file('composer.json', '{}');
+
+        $this->setConfig([]);
+
+        $this->assertTrue($this->config->dumpAutoload());
+        $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
+
+        $this->assertTrue($this->config->excludeDevFiles());
+        $this->assertTrue($this->getNoFileConfig()->excludeDevFiles());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+
+        $this->setConfig(['exclude-dev-files' => null]);
+
+        $this->assertTrue($this->config->dumpAutoload());
+        $this->assertTrue($this->config->excludeDevFiles());
+
+        $this->assertSame(
+            ['The "exclude-dev-files" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+
+        $this->setConfig([
+            'dump-autoload' => false,
+        ]);
+
+        $this->assertFalse($this->config->dumpAutoload());
+        $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
+
+        $this->assertFalse($this->config->excludeDevFiles());
+        $this->assertTrue($this->getNoFileConfig()->excludeDevFiles());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+
+        $this->setConfig([
+            'dump-autoload' => true,
+        ]);
+
+        $this->assertTrue($this->config->dumpAutoload());
+        $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
+
+        $this->assertTrue($this->config->excludeDevFiles());
+        $this->assertTrue($this->getNoFileConfig()->excludeDevFiles());
+
+        $this->assertSame(
+            ['The "dump-autoload" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_recommendation_is_given_if_exclude_dev_files_is_enabled_when_the_autoload_is_dumped(): void
+    {
+        dump_file('composer.json', '{}');
+
+        $this->setConfig([
+            'dump-autoload' => true,
+            'exclude-dev-files' => true,
+        ]);
+
+        $this->assertTrue($this->config->dumpAutoload());
+        $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
+
+        $this->assertTrue($this->config->excludeDevFiles());
+        $this->assertTrue($this->getNoFileConfig()->excludeDevFiles());
+
+        $this->assertSame(
+            [
+                'The "dump-autoload" setting can be omitted since is set to its default value',
+                'The "exclude-dev-files" setting can be omitted since is set to its default value',
+            ],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_recommendation_is_given_if_exclude_dev_files_is_disabled_when_the_autoload_is_not_dumped(): void
+    {
+        dump_file('composer.json', '{}');
+
+        $this->setConfig([
+            'dump-autoload' => false,
+            'exclude-dev-files' => false,
+        ]);
+
+        $this->assertFalse($this->config->dumpAutoload());
+        $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
+
+        $this->assertFalse($this->config->excludeDevFiles());
+        $this->assertTrue($this->getNoFileConfig()->excludeDevFiles());
+
+        $this->assertSame(
+            ['The "exclude-dev-files" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_the_dev_files_can_be_not_excluded_when_the_autoloader_is_dumped(): void
+    {
+        dump_file('composer.json', '{}');
+
+        $this->setConfig([
+            'dump-autoload' => true,
+            'exclude-dev-files' => false,
+        ]);
+
+        $this->assertTrue($this->config->dumpAutoload());
+        $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
+
+        $this->assertFalse($this->config->excludeDevFiles());
+        $this->assertTrue($this->getNoFileConfig()->excludeDevFiles());
+
+        $this->assertSame(
+            ['The "dump-autoload" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_warning_is_given_if_dev_files_are_explicitly_excluded_but_the_autoloader_not_dumped(): void
+    {
+        dump_file('composer.json', '{}');
+
+        $this->setConfig([
+            'dump-autoload' => false,
+            'exclude-dev-files' => true,
+        ]);
+
+        $this->assertFalse($this->config->dumpAutoload());
+        $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
+
+        $this->assertFalse($this->config->excludeDevFiles());
+        $this->assertTrue($this->getNoFileConfig()->excludeDevFiles());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame(
+            ['The "exclude-dev-files" setting has been set but has been ignored because the Composer autoloader is not dumped'],
+            $this->config->getWarnings()
+        );
+    }
+
     public function test_it_can_be_created_with_only_default_values(): void
     {
         $this->setConfig(

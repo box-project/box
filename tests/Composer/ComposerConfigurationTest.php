@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
+use Generator;
 use KevinGH\Box\Test\FileSystemTestCase;
 use function json_decode;
 use function KevinGH\Box\FileSystem\mkdir;
@@ -217,12 +218,35 @@ class ComposerConfigurationTest extends FileSystemTestCase
 }
 JSON;
 
-    public function test_it_returns_an_empty_list_when_trying_to_retrieve_the_list_of_dev_packages_when_no_composer_json_file_is_found(): void
+    /**
+     * @dataProvider provideExcludeDevFilesSetting
+     */
+    public function test_it_returns_an_empty_list_when_trying_to_retrieve_the_list_of_dev_packages_when_no_composer_json_file_is_found(bool $excludeDevPackages): void
     {
-        $this->assertSame([], ComposerConfiguration::retrieveDevPackages($this->tmp, null, null));
-        $this->assertSame([], ComposerConfiguration::retrieveDevPackages($this->tmp, [], null));
+        $this->assertSame(
+            [],
+            ComposerConfiguration::retrieveDevPackages(
+                $this->tmp,
+                null,
+                null,
+                $excludeDevPackages
+            )
+        );
+
+        $this->assertSame(
+            [],
+            ComposerConfiguration::retrieveDevPackages(
+                $this->tmp,
+                [],
+                null,
+                $excludeDevPackages
+            )
+        );
     }
 
+    /**
+     * @dataProvider provideExcludeDevFilesSetting
+     */
     public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file(): void
     {
         $decodedComposerJson = [];
@@ -236,9 +260,19 @@ JSON;
             $this->tmp.'/vendor/doctrine/instantiator',
         ];
 
-        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock);
+        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock, true);
 
         $this->assertSame($expected, $actual);
+
+        $this->assertSame(
+            [],
+            ComposerConfiguration::retrieveDevPackages(
+                $this->tmp,
+                $decodedComposerJson,
+                $decodedComposerLock,
+                false
+            )
+        );
     }
 
     public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file_2(): void
@@ -254,9 +288,19 @@ JSON;
             $this->tmp.'/vendor/doctrine/instantiator',
         ];
 
-        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock);
+        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock, true);
 
         $this->assertSame($expected, $actual);
+
+        $this->assertSame(
+            [],
+            ComposerConfiguration::retrieveDevPackages(
+                $this->tmp,
+                $decodedComposerJson,
+                $decodedComposerLock,
+                false
+            )
+        );
     }
 
     public function test_it_ignores_non_existent_dev_packages_found_in_the_lock_file(): void
@@ -271,9 +315,19 @@ JSON;
             $this->tmp.'/vendor/bamarni/composer-bin-plugin',
         ];
 
-        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock);
+        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock, true);
 
         $this->assertSame($expected, $actual);
+
+        $this->assertSame(
+            [],
+            ComposerConfiguration::retrieveDevPackages(
+                $this->tmp,
+                $decodedComposerJson,
+                $decodedComposerLock,
+                false
+            )
+        );
     }
 
     public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file_in_a_custom_vendor_directory(): void
@@ -292,9 +346,19 @@ JSON;
             $this->tmp.'/custom-vendor/bamarni/composer-bin-plugin',
         ];
 
-        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock);
+        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock, true);
 
         $this->assertSame($expected, $actual);
+
+        $this->assertSame(
+            [],
+            ComposerConfiguration::retrieveDevPackages(
+                $this->tmp,
+                $decodedComposerJson,
+                $decodedComposerLock,
+                false
+            )
+        );
     }
 
     public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file_even_if_no_dev_package_is_registered(): void
@@ -409,8 +473,24 @@ JSON
 
         $expected = [];
 
-        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock);
+        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock, true);
 
         $this->assertSame($expected, $actual);
+
+        $this->assertSame(
+            [],
+            ComposerConfiguration::retrieveDevPackages(
+                $this->tmp,
+                $decodedComposerJson,
+                $decodedComposerLock,
+                false
+            )
+        );
+    }
+
+    public function provideExcludeDevFilesSetting(): Generator
+    {
+        yield [true];
+        yield [false];
     }
 }

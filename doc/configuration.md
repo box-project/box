@@ -11,6 +11,8 @@
     1. [Directories (`directories` and `directories-bin`)][directories]
     1. [Finder (`finder` and `finder-bin`)][finder]
     1. [Blacklist (`blacklist`)][blacklist]
+    1. [Excluding the Composer files (`exclude-composer-files`)][exclude-composer-files]
+    1. [Excluding dev files (`exclude-dev-files`)][exclude-dev-files]
     1. [Map (`map`)][map]
 1. [Stub][stub]
     1. [Stub (`stub`)][stub-stub]
@@ -19,7 +21,6 @@
     1. [Banner (`banner`)][banner]
     1. [Banner file (`banner-file`)][banner-file]
 1. [Dumping the Composer autoloader (`dump-autoload`)][dump-autoload]
-1. [Excluding the Composer files (`exclude-composer-files`)][exclude-composer-files]
 1. [Compactors (`compactors`)][compactors]
     1. [Annotations (`annotations`)][annotations-compactor]
     1. [PHP-Scoper (`php-scoper`)][php-scoper-compactor]
@@ -69,6 +70,7 @@ to `null`, then its default value will be picked and is strictly equivalent to n
     "directories-bin": "?",
     "dump-autoload": "?",
     "exclude-composer-files": "?",
+    "exclude-dev-files": "?",
     "files": "?",
     "files-bin": "?",
     "finder": "?",
@@ -293,7 +295,7 @@ With:
 ```
 
 Box will try to collect all the files found in `project` (cf. [Including files][including-files]) but will exclude `A/`
-and 'B/A' resulting in the following files being collected:
+and `B/A resulting in the following files being collected:
 
 ```
 project/
@@ -304,6 +306,42 @@ project/
 ```
 
 You you want a more granular blacklist leverage the [Finders configuration][finder] instead.
+
+
+### Excluding the Composer files (`exclude-composer-files`)
+
+The `exclude-composer-files` (`boolean`|`null`, default `true`) setting will result in removing the Composer files
+`composer.json`, `composer.lock` and `vendor/composer/installed.json` if they are found regardless of whether or not
+they were found by Box alone or explicitly included.
+
+
+### Excluding dev files (`exclude-dev-files`)
+
+The `exclude-dev-files` (`bool` default `true`) setting will, when enabled, cause Box to attempt to exclude the files
+belonging to dev only packages. For example for the given project:
+
+<details>
+
+<summary>composer.json</summary>
+
+```json
+{
+    "require": {
+        "beberlei/assert": "^3.0"
+    },
+    "require-dev": {
+        "bamarni/composer-bin-plugin": "^1.2"
+    }
+}
+```
+</details>
+
+The `vendor` directory will have `beberlei/assert` and `bamarni/composer-bin-plugin`. If `exclude-dev-files` is not
+disabled, the `bamarni/composer-bin-plugin` package will be removed from the PHAR.
+
+This setting will automatically be disabled when [`dump-autoload`][dump-autoload] is disabled. Indeed, otherwise some
+files will not be shipped in the PHAR but may still appear in the Composer autoload classmap, resulting in an 
+autoloading error. 
 
 
 ### Map (`map`)
@@ -529,13 +567,6 @@ The dumping of the autoloader will be _ignored_ if the `composer.json` file coul
 
 The autoloader is dumped at the end of the process to ensure it will take into account the eventual modifications done
 by the [compactors][compactors] process.
-
-
-## Excluding the Composer files (`exclude-composer-files`)
-
-The `exclude-composer-files` (`boolean`|`null`, default `true`) setting will result in removing the Composer files
-`composer.json`, `composer.lock` and `vendor/composer/installed.json` if they are found regardless of whether or not
-they were found by Box alone or explicitly included.
 
 
 ## Compactors (`compactors`)
@@ -900,6 +931,7 @@ The short commit hash will only be used if no tag is available.
 [directories]: #directories-directories-and-directories-bin
 [dump-autoload]: #dumping-the-composer-autoloader-dump-autoload
 [exclude-composer-files]: #excluding-the-composer-files-exclude-composer-files
+[exclude-dev-files]: #excluding-dev-files-exclude-dev-files
 [force-autodiscovery]: #force-auto-discovery-force-autodiscovery
 [files]: #files-files-and-files-bin
 [finder]: #finder-finder-and-finder-bin

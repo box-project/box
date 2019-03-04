@@ -33,9 +33,17 @@ final class ComposerConfiguration
      *
      * @return string[] Dev package paths
      */
-    public static function retrieveDevPackages(string $basePath, ?array $composerJsonDecodedContents, ?array $composerLockDecodedContents): array
+    public static function retrieveDevPackages(
+        string $basePath,
+        ?array $composerJsonDecodedContents,
+        ?array $composerLockDecodedContents,
+        bool $excludeDevPackages
+    ): array
     {
-        if (null === $composerJsonDecodedContents || null === $composerLockDecodedContents) {
+        if (null === $composerJsonDecodedContents
+            || null === $composerLockDecodedContents
+            || false === $excludeDevPackages
+        ) {
             return [];
         }
 

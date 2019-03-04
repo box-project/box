@@ -1810,6 +1810,76 @@ JSON
         $this->assertSame([], $config->getWarnings());
     }
 
+    public function test_dev_files_are_excluded_or_included_depending_of_the_exclude_dev_files_setting(): void
+    {
+        dump_file('composer.json', '{}');
+        dump_file(
+            'composer.lock',
+            <<<'JSON'
+{
+    "packages": [
+        {"name": "acme/foo"}
+    ],
+    "packages-dev": [
+        {"name": "acme/bar"},
+        {"name": "acme/oof"}
+    ]
+}
+JSON
+        );
+
+        dump_file('vendor/acme/foo/af0');
+        dump_file('vendor/acme/foo/af1');
+
+        dump_file('vendor/acme/bar/ab0');
+        dump_file('vendor/acme/bar/ab1');
+
+        dump_file('vendor/acme/oof/ao0');
+        dump_file('vendor/acme/oof/ao1');
+
+        $this->reloadConfig();
+
+        $this->assertTrue($this->config->excludeDevFiles());
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'box.json',
+            'composer.json',
+            'composer.lock',
+            'index.php',
+            'vendor/acme/foo/af0',
+            'vendor/acme/foo/af1',
+        ];
+
+        $actual = $this->normalizePaths($this->config->getFiles());
+
+        $this->assertSame($expected, $actual);
+        $this->assertCount(0, $this->config->getBinaryFiles());
+
+        $this->setConfig(['exclude-dev-files' => false]);
+
+        $this->assertFalse($this->config->excludeDevFiles());
+
+        // Relative to the current working directory for readability
+        $expected = [
+            'box.json',
+            'composer.json',
+            'composer.lock',
+            'index.php',
+            'vendor/acme/bar/ab0',
+            'vendor/acme/bar/ab1',
+            'vendor/acme/foo/af0',
+            'vendor/acme/foo/af1',
+            'vendor/acme/oof/ao0',
+            'vendor/acme/oof/ao1',
+        ];
+
+        $actual = $this->normalizePaths($this->config->getFiles());
+
+        $this->assertSame($expected, $actual);
+        $this->assertCount(0, $this->config->getBinaryFiles());
+    }
+
     public function provideConfigWithMainScript(): Generator
     {
         yield [
