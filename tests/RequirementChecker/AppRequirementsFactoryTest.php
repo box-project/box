@@ -15,9 +15,9 @@ declare(strict_types=1);
 namespace KevinGH\Box\RequirementChecker;
 
 use Generator;
+use function json_decode;
 use Phar;
 use PHPUnit\Framework\TestCase;
-use function json_decode;
 
 /**
  * @covers \KevinGH\Box\RequirementChecker\AppRequirementsFactory

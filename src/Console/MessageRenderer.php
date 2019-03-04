@@ -14,10 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
-use Symfony\Component\Console\Style\SymfonyStyle;
 use function array_map;
 use function count;
 use function sprintf;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * @private

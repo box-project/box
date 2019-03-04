@@ -14,24 +14,13 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use Assert\Assertion;
-use DirectoryIterator;
-use Phar;
-use PharData;
-use PharFileInfo;
-use RecursiveIteratorIterator;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use Throwable;
-use UnexpectedValueException;
 use function array_fill_keys;
 use function array_filter;
 use function array_reduce;
 use function array_sum;
+use Assert\Assertion;
 use function count;
+use DirectoryIterator;
 use function end;
 use function filesize;
 use function is_array;
@@ -39,10 +28,21 @@ use function iterator_to_array;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\format_size;
 use function key;
+use Phar;
+use PharData;
+use PharFileInfo;
 use function realpath;
+use RecursiveIteratorIterator;
 use function sprintf;
 use function str_repeat;
 use function str_replace;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Throwable;
+use UnexpectedValueException;
 use function var_export;
 
 /**

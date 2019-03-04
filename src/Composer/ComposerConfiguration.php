@@ -14,11 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
-use const DIRECTORY_SEPARATOR;
 use function array_column;
 use function array_filter;
 use function array_key_exists;
 use function array_map;
+use const DIRECTORY_SEPARATOR;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function realpath;
 
@@ -38,8 +38,7 @@ final class ComposerConfiguration
         ?array $composerJsonDecodedContents,
         ?array $composerLockDecodedContents,
         bool $excludeDevPackages
-    ): array
-    {
+    ): array {
         if (null === $composerJsonDecodedContents
             || null === $composerLockDecodedContents
             || false === $excludeDevPackages

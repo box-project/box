@@ -14,15 +14,15 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use Assert\Assertion;
-use Composer\Semver\Semver;
-use UnexpectedValueException;
 use function array_column;
 use function array_filter;
+use Assert\Assertion;
 use function basename;
+use Composer\Semver\Semver;
 use function implode;
 use function sprintf;
 use function str_replace;
+use UnexpectedValueException;
 
 /**
  * @private

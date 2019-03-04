@@ -16,8 +16,8 @@ namespace KevinGH\Box\Json;
 
 use Error;
 use InvalidArgumentException;
-use KevinGH\Box\Test\FileSystemTestCase;
 use function KevinGH\Box\FileSystem\dump_file;
+use KevinGH\Box\Test\FileSystemTestCase;
 
 /**
  * @covers \KevinGH\Box\Json\JsonValidationException

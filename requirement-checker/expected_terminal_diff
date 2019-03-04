@@ -32,6 +32,22 @@
 <             return;
 ---
 >             return null;
+94,98c101,105
+<         $descriptorspec = [
+<             1 => ['pipe', 'w'],
+<             2 => ['pipe', 'w'],
+<         ];
+<         $process = proc_open('mode CON', $descriptorspec, $pipes, null, null, ['suppress_errors' => true]);
+---
+>         $descriptorspec = array(
+>             1 => array('pipe', 'w'),
+>             2 => array('pipe', 'w'),
+>         );
+>         $process = proc_open('mode CON', $descriptorspec, $pipes, null, null, array('suppress_errors' => true));
+106c113
+<                 return [(int) $matches[2], (int) $matches[1]];
+---
+>                 return array((int) $matches[2], (int) $matches[1]);
 108a116,117
 > 
 >         return null;
@@ -39,6 +55,20 @@
 <      * @return string|null
 ---
 >      * @return null|string
+122,125c131,134
+<         $descriptorspec = [
+<             1 => ['pipe', 'w'],
+<             2 => ['pipe', 'w'],
+<         ];
+---
+>         $descriptorspec = array(
+>             1 => array('pipe', 'w'),
+>             2 => array('pipe', 'w'),
+>         );
+127c136
+<         $process = proc_open('stty -a | grep columns', $descriptorspec, $pipes, null, null, ['suppress_errors' => true]);
+---
+>         $process = proc_open('stty -a | grep columns', $descriptorspec, $pipes, null, null, array('suppress_errors' => true));
 135a145,146
 > 
 >         return null;

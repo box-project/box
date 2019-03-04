@@ -15,9 +15,9 @@ declare(strict_types=1);
 namespace KevinGH\Box\Compactor;
 
 use Assert\Assertion;
-use const PATHINFO_EXTENSION;
 use function in_array;
 use function pathinfo;
+use const PATHINFO_EXTENSION;
 
 /**
  * An abstract compactor class that handles matching supported file by their types.

@@ -14,16 +14,16 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use Assert\Assertion;
-use PHPUnit\Framework\TestCase;
 use function array_diff;
 use function array_filter;
 use function array_keys;
 use function array_merge;
 use function array_unique;
 use function array_values;
+use Assert\Assertion;
 use function json_decode;
 use function KevinGH\Box\FileSystem\file_contents;
+use PHPUnit\Framework\TestCase;
 use function preg_match;
 use function preg_match_all;
 use function sort;

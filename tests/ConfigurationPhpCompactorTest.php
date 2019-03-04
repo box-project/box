@@ -14,10 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use function current;
 use Generator;
 use KevinGH\Box\Compactor\Php;
 use stdClass;
-use function current;
 
 /**
  * @covers \KevinGH\Box\Configuration

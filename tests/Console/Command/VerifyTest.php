@@ -19,10 +19,10 @@ use InvalidArgumentException;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Output\OutputInterface;
 use function preg_match;
 use function realpath;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Verify

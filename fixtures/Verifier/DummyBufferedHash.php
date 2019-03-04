@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Verifier;
 
-use KevinGH\Box\NotCallable;
 use function func_get_args;
+use KevinGH\Box\NotCallable;
 
 final class DummyBufferedHash extends BufferedHash
 {

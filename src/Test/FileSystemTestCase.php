@@ -14,15 +14,15 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Test;
 
-use PHPUnit\Framework\TestCase;
-use const DIRECTORY_SEPARATOR;
 use function array_map;
 use function array_values;
 use function chdir;
+use const DIRECTORY_SEPARATOR;
 use function getcwd;
 use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\remove;
 use function natcasesort;
+use PHPUnit\Framework\TestCase;
 use function realpath;
 use function str_replace;
 use function sys_get_temp_dir;

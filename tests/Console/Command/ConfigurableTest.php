@@ -17,6 +17,8 @@ namespace KevinGH\Box\Console\Command;
 use Assert\InvalidArgumentException;
 use Closure;
 use KevinGH\Box\Configuration;
+use function KevinGH\Box\FileSystem\dump_file;
+use function KevinGH\Box\FileSystem\touch;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\NoConfigurationFound;
 use KevinGH\Box\Test\CommandTestCase;
@@ -25,8 +27,6 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\touch;
 
 /**
  * @covers \KevinGH\Box\Console\Command\ConfigurableCommand

@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Verifier;
 
-use PHPUnit\Framework\TestCase;
 use function file_get_contents;
 use function filesize;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \KevinGH\Box\Verifier\PhpSecLib

@@ -19,13 +19,13 @@ use Composer\IO\NullIO;
 use Composer\Repository\InstalledRepositoryInterface;
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use Humbug\PhpScoper\Whitelist;
-use RuntimeException;
-use Throwable;
-use const PHP_EOL;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
+use const PHP_EOL;
 use function preg_replace;
+use RuntimeException;
 use function str_replace;
+use Throwable;
 
 /**
  * @private

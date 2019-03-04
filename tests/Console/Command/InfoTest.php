@@ -14,17 +14,17 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use function getenv;
+use function implode;
 use InvalidArgumentException;
 use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
+use function preg_replace;
+use function realpath;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use UnexpectedValueException;
-use function getenv;
-use function implode;
-use function preg_replace;
-use function realpath;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Info

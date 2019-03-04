@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use function array_reduce;
 use Humbug\PhpScoper\Whitelist;
 use KevinGH\Box\Compactor\PhpScoper;
-use function array_reduce;
 
 final class Compactors
 {

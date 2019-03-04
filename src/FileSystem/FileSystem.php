@@ -14,20 +14,16 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\FileSystem;
 
-use Assert\Assertion;
-use FilesystemIterator;
-use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
-use Traversable;
-use Webmozart\PathUtil\Path;
-use const DIRECTORY_SEPARATOR;
 use function array_reverse;
+use Assert\Assertion;
 use function defined;
+use const DIRECTORY_SEPARATOR;
 use function error_get_last;
 use function escapeshellarg;
 use function exec;
 use function file_exists;
 use function file_get_contents;
+use FilesystemIterator;
 use function is_array;
 use function is_dir;
 use function is_link;
@@ -39,8 +35,12 @@ use function sprintf;
 use function str_replace;
 use function strrpos;
 use function substr;
+use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use function sys_get_temp_dir;
+use Traversable;
 use function unlink;
+use Webmozart\PathUtil\Path;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>

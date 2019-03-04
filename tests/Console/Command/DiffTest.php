@@ -18,12 +18,12 @@ use InvalidArgumentException;
 use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Output\OutputInterface;
-use UnexpectedValueException;
 use function ob_get_clean;
 use function ob_start;
 use function realpath;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Output\OutputInterface;
+use UnexpectedValueException;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Diff

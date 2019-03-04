@@ -14,10 +14,13 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use function array_map;
 use Assert\Assertion;
 use KevinGH\Box\PhpSettingsHandler;
 use ParagonIE\Pharaoh\Pharaoh;
 use ParagonIE\Pharaoh\PharDiff;
+use function realpath;
+use function sprintf;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -25,9 +28,6 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
-use function array_map;
-use function realpath;
-use function sprintf;
 
 /**
  * @private

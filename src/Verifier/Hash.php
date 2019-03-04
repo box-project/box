@@ -15,12 +15,12 @@ declare(strict_types=1);
 namespace KevinGH\Box\Verifier;
 
 use Assert\Assertion;
-use KevinGH\Box\Verifier;
 use function hash_algos;
 use function hash_final;
 use function hash_init;
 use function hash_update;
 use function implode;
+use KevinGH\Box\Verifier;
 use function preg_replace;
 use function strtolower;
 use function strtoupper;
