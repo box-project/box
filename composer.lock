@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b930de8bc889eaaca4f15bdbf18a7db1",
+    "content-hash": "975e1277eaf7e574bf22341de02c0ddf",
     "packages": [
         {
             "name": "amphp/amp",
@@ -3409,35 +3409,32 @@
         },
         {
             "name": "infection/infection",
-            "version": "0.12.2",
+            "version": "0.10.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/infection/infection.git",
-                "reference": "0c028b4b69bbead4b9d6702b36c0d25b9e016785"
+                "reference": "ccffd492fd235d66bc0407880bc121a28026d3f5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/infection/infection/zipball/0c028b4b69bbead4b9d6702b36c0d25b9e016785",
-                "reference": "0c028b4b69bbead4b9d6702b36c0d25b9e016785",
+                "url": "https://api.github.com/repos/infection/infection/zipball/ccffd492fd235d66bc0407880bc121a28026d3f5",
+                "reference": "ccffd492fd235d66bc0407880bc121a28026d3f5",
                 "shasum": ""
             },
             "require": {
-                "composer/xdebug-handler": "^1.3",
+                "composer/xdebug-handler": "^1.1",
                 "ext-dom": "*",
-                "ext-json": "*",
-                "ext-libxml": "*",
-                "justinrainbow/json-schema": "^5.2",
-                "nikic/php-parser": "^4.1",
+                "nikic/php-parser": "^4.0",
                 "ocramius/package-versions": "^1.2",
                 "padraic/phar-updater": "^1.0.4",
-                "php": "^7.1.3",
+                "php": "^7.1",
                 "pimple/pimple": "^3.2",
                 "sebastian/diff": "^1.4 || ^2.0 || ^3.0",
-                "symfony/console": "^3.4 || ^4.0",
-                "symfony/filesystem": "^3.4 || ^4.0",
-                "symfony/finder": "^3.4 || ^4.0",
-                "symfony/process": "^3.4|| ^4.0",
-                "symfony/yaml": "^3.4 || ^4.0",
+                "symfony/console": "^3.2 || ^4.0",
+                "symfony/filesystem": "^3.2 || ^4.0",
+                "symfony/finder": "^3.2 || ^4.0",
+                "symfony/process": "^3.2 || ^4.0",
+                "symfony/yaml": "^3.2 || ^4.0",
                 "webmozart/assert": "^1.3"
             },
             "conflict": {
@@ -3445,7 +3442,8 @@
                 "symfony/process": "3.4.2"
             },
             "require-dev": {
-                "phpunit/phpunit": "^6.2"
+                "mockery/mockery": "^1.1",
+                "phpunit/phpunit": "^6"
             },
             "bin": [
                 "bin/infection"
@@ -3494,7 +3492,7 @@
                 "testing",
                 "unit testing"
             ],
-            "time": "2019-02-10T18:24:30+00:00"
+            "time": "2018-10-30T19:14:11+00:00"
         },
         {
             "name": "mikey179/vfsStream",
