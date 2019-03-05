@@ -3032,42 +3032,6 @@ EOF;
             ' {#100',
             $actualDumpedConfig
         );
-//
-//        $actualDumpedConfig = preg_replace(
-//            '/Time: \d{4,}-\d{2,}-\d{2,}T\d{2,}:\d{2,}:\d{2,}\+\d{2,}:\d{2,}/',
-//            'Time: 2018-05-24T20:59:15+00:00',
-//            $actualDumpedConfig
-//        );
-//
-//        $actualDumpedConfig = preg_replace(
-//            '/([a-z]Time): \d{4,}-\d{2,}-\d{2,} \d{2,}:\d{2,}:\d{2,}/',
-//            '$1: 2018-05-24 20:59:15',
-//            $actualDumpedConfig
-//        );
-//
-//        $actualDumpedConfig = preg_replace(
-//            '/inode: \d+/',
-//            'inode: 33452869',
-//            $actualDumpedConfig
-//        );
-//
-//        $actualDumpedConfig = preg_replace(
-//            '/perms: \d+/',
-//            'perms: 0100644',
-//            $actualDumpedConfig
-//        );
-//
-//        $actualDumpedConfig = preg_replace(
-//            '/owner: \d+/',
-//            'owner: 501',
-//            $actualDumpedConfig
-//        );
-//
-//        $actualDumpedConfig = preg_replace(
-//            '/group: \d+/',
-//            'group: 20',
-//            $actualDumpedConfig
-//        );
 
         $this->assertSame($expectedDumpedConfig, $actualDumpedConfig);
     }
