@@ -144,6 +144,17 @@ return [
 
             return $contents;
         },
+        function (string $filePath, string $prefix, string $contents): string {
+            if ('vendor/symfony/polyfill-php72/bootstrap.php' !== $filePath) {
+                return $contents;
+            }
+
+            return preg_replace(
+                '/namespace .+;/',
+                '',
+                $contents
+            );
+        },
     ],
     'files-whitelist' => [
         __DIR__.'/vendor/composer/composer/src/Composer/Autoload/ClassLoader.php',
@@ -156,6 +167,18 @@ return [
         \Herrera\Box\Compactor\Php::class,
         \KevinGH\Box\Compactor\Php::class,
         \KevinGH\Box\Compactor\PhpScoper::class,
+
+        // Symfony Polyfill for PHP 7.1 support
+        // https://github.com/humbug/php-scoper/issues/304
+        'sapi_windows_vt100_support',
+        'stream_isatty',
+        'utf8_encode',
+        'utf8_decode',
+        'spl_object_id',
+        'PHP_OS_FAMILY',
+        'mb_chr',
+        'mb_ord',
+        'mb_scrub',
 
         // Hoa symbols
         'SUCCEED',
