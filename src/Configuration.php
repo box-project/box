@@ -80,6 +80,8 @@ use function property_exists;
 use function realpath;
 use RuntimeException;
 use Seld\JsonLint\ParsingException;
+use function sort;
+use const SORT_STRING;
 use SplFileInfo;
 use function sprintf;
 use stdClass;
@@ -582,6 +584,14 @@ BANNER;
             $property = $normalizePath($property);
         };
 
+        $normalizeFiles = static function (&$files) use ($normalizePath): void {
+            $files = array_map($normalizePath, $files);
+            sort($files, SORT_STRING);
+        };
+
+        $normalizeFiles($exportedConfig->files);
+        $normalizeFiles($exportedConfig->binaryFiles);
+
         $normalizeProperty($exportedConfig->file);
         $normalizeProperty($exportedConfig->composerJson[0]);
         $normalizeProperty($exportedConfig->composerLock[0]);
@@ -591,6 +601,7 @@ BANNER;
         $normalizeProperty($exportedConfig->privateKeyPath);
         $normalizeProperty($exportedConfig->stubBannerPath);
         $normalizeProperty($exportedConfig->stubPath);
+
         $exportedConfig->compressionAlgorithm = array_flip(get_phar_compression_algorithms())[$exportedConfig->compressionAlgorithm ?? Phar::NONE];
         $exportedConfig->signingAlgorithm = array_flip(get_phar_signing_algorithms())[$exportedConfig->signingAlgorithm];
         $exportedConfig->compactors = array_map('get_class', $exportedConfig->compactors);

@@ -2913,6 +2913,7 @@ BANNER
     public function test_it_can_be_exported(): void
     {
         touch('foo.php');
+        touch('bar.php');
 
         dump_file(
             'composer.json',
@@ -2934,7 +2935,10 @@ JSON
         $this->setConfig([
             'alias' => 'test.phar',
             'banner' => 'My banner',
-            'files-bin' => ['foo.php'],
+            'files-bin' => [
+                'foo.php',
+                'bar.php',  // comes second to see if the sorting from the export kicks in correctly
+            ],
             'compactors' => [Php::class],
             'compression' => 'GZ',
         ]);
@@ -2961,30 +2965,18 @@ KevinGH\Box\Configuration {#100
     0 => "composer.lock"
     1 => []
   ]
-  -files: array:6 [
-    0 => SplFileInfo {#100
-      +0: "composer.json"
-    }
-    1 => SplFileInfo {#100
-      +0: "composer.lock"
-    }
-    2 => SplFileInfo {#100
-      +0: "box.json"
-    }
-    3 => SplFileInfo {#100
-      +0: "foo.php"
-    }
-    4 => SplFileInfo {#100
-      +0: "index.php"
-    }
-    5 => SplFileInfo {#100
-      +0: "vendor/composer/installed.json"
-    }
+  -files: array:7 [
+    0 => "bar.php"
+    1 => "box.json"
+    2 => "composer.json"
+    3 => "composer.lock"
+    4 => "foo.php"
+    5 => "index.php"
+    6 => "vendor/composer/installed.json"
   ]
-  -binaryFiles: array:1 [
-    0 => SplFileInfo {#100
-      +0: "foo.php"
-    }
+  -binaryFiles: array:2 [
+    0 => "bar.php"
+    1 => "foo.php"
   ]
   -autodiscoveredFiles: true
   -dumpAutoload: true
