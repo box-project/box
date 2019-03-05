@@ -2910,6 +2910,168 @@ BANNER
         $this->assertTrue($this->config->isStubGenerated());
     }
 
+    public function test_it_can_be_exported(): void
+    {
+        touch('foo.php');
+
+        dump_file(
+            'composer.json',
+            <<<'JSON'
+{
+    "config": {
+        "bin-dir": "bin",
+        "platform": {
+            "php": "7.1.10"
+        },
+        "sort-packages": true
+    }
+}
+JSON
+        );
+        dump_file('composer.lock', '{}');
+        dump_file('vendor/composer/installed.json', '{}');
+
+        $this->setConfig([
+            'alias' => 'test.phar',
+            'banner' => 'My banner',
+            'files-bin' => ['foo.php'],
+            'compactors' => [Php::class],
+            'compression' => 'GZ',
+        ]);
+
+        $expectedDumpedConfig = <<<EOF
+KevinGH\Box\Configuration {#100
+  -file: "box.json"
+  -fileMode: "0755"
+  -alias: "test.phar"
+  -basePath: "/path/to"
+  -composerJson: array:2 [
+    0 => "composer.json"
+    1 => array:1 [
+      "config" => array:3 [
+        "bin-dir" => "bin"
+        "platform" => array:1 [
+          "php" => "7.1.10"
+        ]
+        "sort-packages" => true
+      ]
+    ]
+  ]
+  -composerLock: array:2 [
+    0 => "composer.lock"
+    1 => []
+  ]
+  -files: array:6 [
+    0 => SplFileInfo {#100
+      +0: "composer.json"
+    }
+    1 => SplFileInfo {#100
+      +0: "composer.lock"
+    }
+    2 => SplFileInfo {#100
+      +0: "box.json"
+    }
+    3 => SplFileInfo {#100
+      +0: "foo.php"
+    }
+    4 => SplFileInfo {#100
+      +0: "index.php"
+    }
+    5 => SplFileInfo {#100
+      +0: "vendor/composer/installed.json"
+    }
+  ]
+  -binaryFiles: array:1 [
+    0 => SplFileInfo {#100
+      +0: "foo.php"
+    }
+  ]
+  -autodiscoveredFiles: true
+  -dumpAutoload: true
+  -excludeComposerFiles: true
+  -excludeDevFiles: true
+  -compactors: array:1 [
+    0 => "KevinGH\Box\Compactor\Php"
+  ]
+  -compressionAlgorithm: "GZ"
+  -mainScriptPath: "index.php"
+  -mainScriptContents: ""
+  -fileMapper: KevinGH\Box\MapFile {#100
+    -basePath: "/path/to"
+    -map: []
+  }
+  -metadata: null
+  -tmpOutputPath: "index.phar"
+  -outputPath: "index.phar"
+  -privateKeyPassphrase: null
+  -privateKeyPath: null
+  -promptForPrivateKey: false
+  -processedReplacements: []
+  -shebang: "#!/usr/bin/env php"
+  -signingAlgorithm: "SHA1"
+  -stubBannerContents: "My banner"
+  -stubBannerPath: null
+  -stubPath: null
+  -isInterceptFileFuncs: false
+  -isStubGenerated: true
+  -checkRequirements: true
+  -warnings: []
+  -recommendations: []
+}
+
+EOF;
+
+        $actualDumpedConfig = str_replace(
+            $this->tmp,
+            '/path/to',
+            $this->config->export()
+        );
+
+        $actualDumpedConfig = preg_replace(
+            '/ \{#\d{2,}/',
+            ' {#100',
+            $actualDumpedConfig
+        );
+//
+//        $actualDumpedConfig = preg_replace(
+//            '/Time: \d{4,}-\d{2,}-\d{2,}T\d{2,}:\d{2,}:\d{2,}\+\d{2,}:\d{2,}/',
+//            'Time: 2018-05-24T20:59:15+00:00',
+//            $actualDumpedConfig
+//        );
+//
+//        $actualDumpedConfig = preg_replace(
+//            '/([a-z]Time): \d{4,}-\d{2,}-\d{2,} \d{2,}:\d{2,}:\d{2,}/',
+//            '$1: 2018-05-24 20:59:15',
+//            $actualDumpedConfig
+//        );
+//
+//        $actualDumpedConfig = preg_replace(
+//            '/inode: \d+/',
+//            'inode: 33452869',
+//            $actualDumpedConfig
+//        );
+//
+//        $actualDumpedConfig = preg_replace(
+//            '/perms: \d+/',
+//            'perms: 0100644',
+//            $actualDumpedConfig
+//        );
+//
+//        $actualDumpedConfig = preg_replace(
+//            '/owner: \d+/',
+//            'owner: 501',
+//            $actualDumpedConfig
+//        );
+//
+//        $actualDumpedConfig = preg_replace(
+//            '/group: \d+/',
+//            'group: 20',
+//            $actualDumpedConfig
+//        );
+
+        $this->assertSame($expectedDumpedConfig, $actualDumpedConfig);
+    }
+
     public function provideInvalidCompressionAlgorithms(): Generator
     {
         yield 'Invalid string key' => [

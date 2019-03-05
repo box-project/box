@@ -74,8 +74,6 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\VarDumper\Cloner\VarCloner;
-use Symfony\Component\VarDumper\Dumper\CliDumper;
 use function var_export;
 
 /**
@@ -285,10 +283,7 @@ HELP;
 
 
 EOF
-                .(new CliDumper())->dump(
-                    (new VarCloner())->cloneVar($config),
-                    true
-                )
+                .$config->export()
             );
         }
 

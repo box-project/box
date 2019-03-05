@@ -1000,48 +1000,31 @@ OUTPUT;
         $this->assertSame($expected, $actual);
     }
 
-    /**
-     * @requires extension zlib
-     */
     public function test_it_can_build_a_PHAR_file_in_debug_mode(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+        dump_file(
+            'index.php',
+            $indexContents = <<<'PHP'
+<?php
 
-        $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
+declare(strict_types=1);
 
+echo 'Yo';
+
+PHP
+        );
         dump_file(
             'box.json',
-            json_encode(
-                [
-                    'alias' => 'test.phar',
-                    'banner' => [
-                        'multiline',
-                        'custom banner',
-                    ],
-                    'chmod' => '0754',
-                    'compactors' => [Php::class],
-                    'directories' => ['a'],
-                    'files' => ['test.php'],
-                    'finder' => [['in' => 'one']],
-                    'finder-bin' => [['in' => 'two']],
-                    'algorithm' => 'OPENSSL',
-                    'key' => 'private.key',
-                    'key-pass' => true,
-                    'main' => 'run.php',
-                    'map' => [
-                        ['a/deep/test/directory' => 'sub'],
-                    ],
-                    'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
-                    'output' => 'test.phar',
-                    'shebang' => $shebang,
-                    'compression' => 'GZ',
-                ]
-            )
+            <<<'JSON'
+{
+    "alias": "index.phar",
+    "banner": ""
+}
+JSON
         );
 
         $this->assertDirectoryNotExists('.box_dump');
 
-        $this->commandTester->setInputs(['test']);    // Set input for the passphrase
         $this->commandTester->execute(
             [
                 'command' => 'compile',
@@ -1082,43 +1065,31 @@ Box version 3.x-dev@151e40a
 
  // Loading the configuration file "/path/to/box.json.dist".
 
-🔨  Building the PHAR "/path/to/tmp/test.phar"
+🔨  Building the PHAR "/path/to/tmp/index.phar"
 
-? Removing the existing PHAR "/path/to/tmp/test.phar"
-? Registering compactors
-  + KevinGH\Box\Compactor\Php
-? Mapping paths
-  - a/deep/test/directory > sub
-? Adding main file: /path/to/tmp/run.php
-? Adding requirements checker
+? No compactor to register
+? Adding main file: /path/to/tmp/index.php
+? Skip requirements checker
 ? Adding binary files
-    > 1 file(s)
-? Auto-discover files? No
-? Exclude dev files? Yes
+    > No file found
+? Auto-discover files? Yes
+? Exclude dev files? No
 ? Adding files
-    > 4 file(s)
+    > No file found
 ? Generating new stub
-  - Using shebang line: #!__PHP_EXECUTABLE__
+  - Using shebang line: #!/usr/bin/env php
   - Using banner:
-    > multiline
-    > custom banner
-? Setting metadata
-  - array (
-  'rand' => $rand,
-)
-? Dumping the Composer autoloader
+    >
+? Skipping dumping the Composer autoloader
 ? Removing the Composer dump artefacts
-? Compressing with the algorithm "GZ"
-    > Warning: the extension "zlib" will now be required to execute the PHAR
-? Signing using a private key
-Private key passphrase:
-? Setting file permissions to 0754
+? No compression
+? Setting file permissions to 0755
 * Done.
 
 No recommendation found.
 No warning found.
 
- // PHAR: 44 files (100B)
+ // PHAR: 1 file (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -1126,11 +1097,6 @@ No warning found.
 
 OUTPUT;
 
-        $expected = str_replace(
-            '__PHP_EXECUTABLE__',
-            (new PhpExecutableFinder())->find(),
-            $expected
-        );
         $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
         $this->assertSame($expected, $actual);
@@ -1138,51 +1104,8 @@ OUTPUT;
         $this->assertDirectoryExists('.box_dump');
 
         $expectedFiles = [
-            '.box_dump/.box/.requirements.php',
-            '.box_dump/.box/bin/check-requirements.php',
-            '.box_dump/.box/composer.json',
-            '.box_dump/.box/composer.lock',
-            '.box_dump/.box/src/Checker.php',
-            '.box_dump/.box/src/IO.php',
-            '.box_dump/.box/src/IsExtensionFulfilled.php',
-            '.box_dump/.box/src/IsFulfilled.php',
-            '.box_dump/.box/src/IsPhpVersionFulfilled.php',
-            '.box_dump/.box/src/Printer.php',
-            '.box_dump/.box/src/Requirement.php',
-            '.box_dump/.box/src/RequirementCollection.php',
-            '.box_dump/.box/src/Terminal.php',
-            '.box_dump/.box/vendor/autoload.php',
-            '.box_dump/.box/vendor/composer/autoload_classmap.php',
-            '.box_dump/.box/vendor/composer/autoload_namespaces.php',
-            '.box_dump/.box/vendor/composer/autoload_psr4.php',
-            '.box_dump/.box/vendor/composer/autoload_real.php',
-            '.box_dump/.box/vendor/composer/autoload_static.php',
-            '.box_dump/.box/vendor/composer/ClassLoader.php',
-            '.box_dump/.box/vendor/composer/installed.json',
-            '.box_dump/.box/vendor/composer/LICENSE',
-            '.box_dump/.box/vendor/composer/semver/LICENSE',
-            '.box_dump/.box/vendor/composer/semver/src/Comparator.php',
-            '.box_dump/.box/vendor/composer/semver/src/Constraint/AbstractConstraint.php',
-            '.box_dump/.box/vendor/composer/semver/src/Constraint/Constraint.php',
-            '.box_dump/.box/vendor/composer/semver/src/Constraint/ConstraintInterface.php',
-            '.box_dump/.box/vendor/composer/semver/src/Constraint/EmptyConstraint.php',
-            '.box_dump/.box/vendor/composer/semver/src/Constraint/MultiConstraint.php',
-            '.box_dump/.box/vendor/composer/semver/src/Semver.php',
-            '.box_dump/.box/vendor/composer/semver/src/VersionParser.php',
             '.box_dump/.box_configuration',
-            '.box_dump/one/test.php',
-            '.box_dump/run.php',
-            '.box_dump/sub/test.php',
-            '.box_dump/test.php',
-            '.box_dump/two/test.png',
-            '.box_dump/vendor/autoload.php',
-            '.box_dump/vendor/composer/autoload_classmap.php',
-            '.box_dump/vendor/composer/autoload_namespaces.php',
-            '.box_dump/vendor/composer/autoload_psr4.php',
-            '.box_dump/vendor/composer/autoload_real.php',
-            '.box_dump/vendor/composer/autoload_static.php',
-            '.box_dump/vendor/composer/ClassLoader.php',
-            '.box_dump/vendor/composer/LICENSE',
+            '.box_dump/index.php',
         ];
 
         $actualFiles = $this->normalizePaths(
@@ -1194,276 +1117,60 @@ OUTPUT;
 
         $this->assertSame($expectedFiles, $actualFiles);
 
-        $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
-
-        $expectedDumpedConfig = <<<EOF
+        $expectedDumpedConfig = <<<'EOF'
 //
 // Processed content of the configuration file "/path/to/box.json" dumped for debugging purposes
 // Time: 2018-05-24T20:59:15+00:00
 //
 
 KevinGH\Box\Configuration {#140
-  -file: "/path/to/box.json"
-  -fileMode: 492
-  -alias: "test.phar"
+  -file: "box.json"
+  -fileMode: "0755"
+  -alias: "index.phar"
   -basePath: "/path/to"
   -composerJson: array:2 [
-    0 => "/path/to/composer.json"
-    1 => array:1 [
-      "autoload" => array:1 [
-        "classmap" => array:1 [
-          0 => "./"
-        ]
-      ]
-    ]
+    0 => null
+    1 => null
   ]
   -composerLock: array:2 [
     0 => null
     1 => null
   ]
-  -files: array:4 [
-    0 => SplFileInfo {#140
-      path: "/path/to"
-      filename: "test.php"
-      basename: "test.php"
-      pathname: "/path/to/test.php"
-      extension: "php"
-      realPath: "/path/to/test.php"
-      aTime: 2018-05-24 20:59:15
-      mTime: 2018-05-24 20:59:15
-      cTime: 2018-05-24 20:59:15
-      inode: 33452869
-      size: 306
-      perms: 0100644
-      owner: 501
-      group: 20
-      type: "file"
-      writable: true
-      readable: true
-      executable: false
-      file: true
-      dir: false
-      link: false
-    }
-    1 => SplFileInfo {#140
-      path: "/path/to"
-      filename: "composer.json"
-      basename: "composer.json"
-      pathname: "/path/to/composer.json"
-      extension: "json"
-      realPath: "/path/to/composer.json"
-      aTime: 2018-05-24 20:59:15
-      mTime: 2018-05-24 20:59:15
-      cTime: 2018-05-24 20:59:15
-      inode: 33452869
-      size: 54
-      perms: 0100644
-      owner: 501
-      group: 20
-      type: "file"
-      writable: true
-      readable: true
-      executable: false
-      file: true
-      dir: false
-      link: false
-    }
-    2 => Symfony\Component\Finder\SplFileInfo {#140
-      -relativePath: "deep/test/directory"
-      -relativePathname: "deep/test/directory/test.php"
-      path: "/path/to/a/deep/test/directory"
-      filename: "test.php"
-      basename: "test.php"
-      pathname: "/path/to/a/deep/test/directory/test.php"
-      extension: "php"
-      realPath: "/path/to/a/deep/test/directory/test.php"
-      aTime: 2018-05-24 20:59:15
-      mTime: 2018-05-24 20:59:15
-      cTime: 2018-05-24 20:59:15
-      inode: 33452869
-      size: 0
-      perms: 0100644
-      owner: 501
-      group: 20
-      type: "file"
-      writable: true
-      readable: true
-      executable: false
-      file: true
-      dir: false
-      link: false
-    }
-    3 => Symfony\Component\Finder\SplFileInfo {#140
-      -relativePath: ""
-      -relativePathname: "test.php"
-      path: "/path/to/one"
-      filename: "test.php"
-      basename: "test.php"
-      pathname: "/path/to/one/test.php"
-      extension: "php"
-      realPath: "/path/to/one/test.php"
-      aTime: 2018-05-24 20:59:15
-      mTime: 2018-05-24 20:59:15
-      cTime: 2018-05-24 20:59:15
-      inode: 33452869
-      size: 0
-      perms: 0100644
-      owner: 501
-      group: 20
-      type: "file"
-      writable: true
-      readable: true
-      executable: false
-      file: true
-      dir: false
-      link: false
-    }
-  ]
-  -binaryFiles: array:1 [
-    0 => Symfony\Component\Finder\SplFileInfo {#140
-      -relativePath: ""
-      -relativePathname: "test.png"
-      path: "/path/to/two"
-      filename: "test.png"
-      basename: "test.png"
-      pathname: "/path/to/two/test.png"
-      extension: "png"
-      realPath: "/path/to/two/test.png"
-      aTime: 2018-05-24 20:59:15
-      mTime: 2018-05-24 20:59:15
-      cTime: 2018-05-24 20:59:15
-      inode: 33452869
-      size: 0
-      perms: 0100644
-      owner: 501
-      group: 20
-      type: "file"
-      writable: true
-      readable: true
-      executable: false
-      file: true
-      dir: false
-      link: false
-    }
-  ]
-  -autodiscoveredFiles: false
-  -dumpAutoload: true
+  -files: []
+  -binaryFiles: []
+  -autodiscoveredFiles: true
+  -dumpAutoload: false
   -excludeComposerFiles: true
-  -excludeDevFiles: true
-  -compactors: array:1 [
-    0 => KevinGH\Box\Compactor\Php {#140
-      -annotationParser: KevinGH\Box\Annotation\DocblockAnnotationParser {#140
-        -docblockParser: KevinGH\Box\Annotation\DocblockParser {#140}
-        -annotationDumper: KevinGH\Box\Annotation\AnnotationDumper {#140}
-        -ignored: array:54 [
-          0 => "abstract"
-          1 => "access"
-          2 => "annotation"
-          3 => "api"
-          4 => "attribute"
-          5 => "attributes"
-          6 => "author"
-          7 => "category"
-          8 => "code"
-          9 => "codecoverageignore"
-          10 => "codecoverageignoreend"
-          11 => "codecoverageignorestart"
-          12 => "copyright"
-          13 => "deprec"
-          14 => "deprecated"
-          15 => "endcode"
-          16 => "example"
-          17 => "exception"
-          18 => "filesource"
-          19 => "final"
-          20 => "fixme"
-          21 => "global"
-          22 => "ignore"
-          23 => "ingroup"
-          24 => "inheritdoc"
-          25 => "internal"
-          26 => "license"
-          27 => "link"
-          28 => "magic"
-          29 => "method"
-          30 => "name"
-          31 => "override"
-          32 => "package"
-          33 => "package_version"
-          34 => "param"
-          35 => "private"
-          36 => "property"
-          37 => "required"
-          38 => "return"
-          39 => "see"
-          40 => "since"
-          41 => "static"
-          42 => "staticvar"
-          43 => "subpackage"
-          44 => "suppresswarnings"
-          45 => "target"
-          46 => "throw"
-          47 => "throws"
-          48 => "todo"
-          49 => "tutorial"
-          50 => "usedby"
-          51 => "uses"
-          52 => "var"
-          53 => "version"
-        ]
-      }
-      -extensions: array:1 [
-        0 => "php"
-      ]
-    }
-  ]
-  -compressionAlgorithm: 4096
-  -mainScriptPath: "/path/to/run.php"
+  -excludeDevFiles: false
+  -compactors: []
+  -compressionAlgorithm: "NONE"
+  -mainScriptPath: "index.php"
   -mainScriptContents: """
-    <?php\\n
-    \\n
-    declare(strict_types=1);\\n
-    \\n
-    /*\\n
-     * This file is part of the box project.\\n
-     *\\n
-     * (c) Kevin Herrera <kevin@herrera.io>\\n
-     *     Théo Fidry <theo.fidry@gmail.com>\\n
-     *\\n
-     * This source file is subject to the MIT license that is bundled\\n
-     * with this source code in the file LICENSE.\\n
-     */\\n
-    \\n
-    require 'test.php';\\n
+    <?php\n
+    \n
+    declare(strict_types=1);\n
+    \n
+    echo 'Yo';\n
     """
   -fileMapper: KevinGH\Box\MapFile {#140
     -basePath: "/path/to"
-    -map: array:1 [
-      0 => array:1 [
-        "a/deep/test/directory" => "sub"
-      ]
-    ]
+    -map: []
   }
-  -metadata: array:1 [
-    "rand" => $rand
-  ]
-  -tmpOutputPath: "/path/to/test.phar"
-  -outputPath: "/path/to/test.phar"
+  -metadata: null
+  -tmpOutputPath: "index.phar"
+  -outputPath: "index.phar"
   -privateKeyPassphrase: null
-  -privateKeyPath: "/path/to/private.key"
-  -promptForPrivateKey: true
+  -privateKeyPath: null
+  -promptForPrivateKey: false
   -processedReplacements: []
-  -shebang: "$shebang"
-  -signingAlgorithm: 16
-  -stubBannerContents: """
-    multiline\\n
-    custom banner
-    """
+  -shebang: "#!/usr/bin/env php"
+  -signingAlgorithm: "SHA1"
+  -stubBannerContents: ""
   -stubBannerPath: null
   -stubPath: null
   -isInterceptFileFuncs: false
   -isStubGenerated: true
-  -checkRequirements: true
+  -checkRequirements: false
   -warnings: []
   -recommendations: []
 }
@@ -1488,59 +1195,12 @@ EOF;
             $actualDumpedConfig
         );
 
-        $actualDumpedConfig = preg_replace(
-            '/([a-z]Time): \d{4,}-\d{2,}-\d{2,} \d{2,}:\d{2,}:\d{2,}/',
-            '$1: 2018-05-24 20:59:15',
-            $actualDumpedConfig
-        );
-
-        $actualDumpedConfig = preg_replace(
-            '/inode: \d+/',
-            'inode: 33452869',
-            $actualDumpedConfig
-        );
-
-        $actualDumpedConfig = preg_replace(
-            '/perms: \d+/',
-            'perms: 0100644',
-            $actualDumpedConfig
-        );
-
-        $actualDumpedConfig = preg_replace(
-            '/owner: \d+/',
-            'owner: 501',
-            $actualDumpedConfig
-        );
-
-        $actualDumpedConfig = preg_replace(
-            '/group: \d+/',
-            'group: 20',
-            $actualDumpedConfig
-        );
-
         $this->assertSame($expectedDumpedConfig, $actualDumpedConfig);
 
         // Checks one of the dumped file from the PHAR to ensure the encoding of the extracted file is correct
         $this->assertSame(
-            get_contents('.box_dump/run.php'),
-            <<<'PHP'
-<?php
-
-declare(strict_types=1);
-
-
-
-
-
-
-
-
-
-
-
-require 'test.php';
-
-PHP
+            get_contents('.box_dump/index.php'),
+            $indexContents
         );
     }
 
