@@ -1,8 +1,8 @@
 <?php
 
-namespace _HumbugBoxaa731ba336da\Composer\Semver;
+namespace _HumbugBoxbb220723f65b\Composer\Semver;
 
-use _HumbugBoxaa731ba336da\Composer\Semver\Constraint\Constraint;
+use _HumbugBoxbb220723f65b\Composer\Semver\Constraint\Constraint;
 class Comparator
 {
     public static function greaterThan($version1, $version2)
@@ -31,7 +31,7 @@ class Comparator
     }
     public static function compare($version1, $operator, $version2)
     {
-        $constraint = new \_HumbugBoxaa731ba336da\Composer\Semver\Constraint\Constraint($operator, $version2);
-        return $constraint->matches(new \_HumbugBoxaa731ba336da\Composer\Semver\Constraint\Constraint('==', $version1));
+        $constraint = new \_HumbugBoxbb220723f65b\Composer\Semver\Constraint\Constraint($operator, $version2);
+        return $constraint->matches(new \_HumbugBoxbb220723f65b\Composer\Semver\Constraint\Constraint('==', $version1));
     }
 }
