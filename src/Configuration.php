@@ -1051,6 +1051,8 @@ BANNER;
                 // Avoid an array_merge here as it can be quite expansive at this stage depending of the number of files
                 $files[] = $filesFromFinder;
             }
+
+            $files[] = self::wrapInSplFileInfo(array_filter(array_column($composerFiles, 0)));
         }
 
         $aggregate = self::retrieveFilesAggregate(...$files);
