@@ -3,5 +3,6 @@
     "directories": [
         "src/",
         "vendor/beberlei/"
-    ]
+    ],
+    "dump-autoload": true
 }

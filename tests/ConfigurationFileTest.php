@@ -356,6 +356,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 }
 JSON
         );
+        dump_file('vendor/composer/installed.json', '{}');
 
         touch('file0');
         touch('file1');
@@ -435,6 +436,7 @@ JSON
             'vendor/acme/bar/ab1',
             'vendor/acme/foo/af0',
             'vendor/acme/foo/af1',
+            'vendor/composer/installed.json',
         ];
 
         $actual = $this->normalizePaths($this->config->getFiles());
@@ -1771,20 +1773,42 @@ JSON
         $this->assertSame([], $config->getWarnings());
     }
 
-    public function test_a_warning_is_given_when_no_installed_json_is_found_and_the_composer_lock_is(): void
+    public function test_no_warning_is_given_when_the_installed_json_is_found_and_the_composer_lock_is_not_when_the_composer_autoloader_is_not_dumped(): void
     {
         $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir002/box.json', json_decode(get_contents($configPath)));
 
         $this->assertSame([], $config->getRecommendations());
+        $this->assertSame([], $config->getWarnings());
+    }
+
+    public function test_a_warning_is_given_when_no_installed_json_is_found_and_the_composer_lock_is_when_the_composer_autoloader_is_dumped(): void
+    {
+        $decodedConfig = json_decode(get_contents($configPath = self::FIXTURES_DIR.'/dir002/box.json'));
+        $decodedConfig->{'dump-autoload'} = true;
+
+        $config = Configuration::create($configPath, $decodedConfig);
+
+        $this->assertSame([], $config->getRecommendations());
         $this->assertSame(
             [
-                'A composer.lock file has been found but its related file vendor/composer/installed.json could not. '
-                .'This could be due to either dependencies incorrectly installed or an incorrect Box configuration '
-                .'which is not including the installed.json file. This will not break the build but will likely result '
-                .'in a broken Composer classmap.',
+                'The "dump-autoload" setting has been set but has been ignored because the composer.json, composer.lock '
+                .'and vendor/composer/installed.json files are necessary but could not be found.',
             ],
             $config->getWarnings()
         );
+    }
+
+    public function test_no_warning_is_given_when_the_installed_json_is_found_and_the_composer_lock_is_not_when_the_autoloader_is_not_dumped(): void
+    {
+        $configPath = self::FIXTURES_DIR.'/dir003/box.json';
+
+        $decodedConfig = json_decode(get_contents($configPath));
+        unset($decodedConfig->{'dump-autoload'});
+
+        $config = Configuration::create($configPath, $decodedConfig);
+
+        $this->assertSame([], $config->getRecommendations());
+        $this->assertSame([], $config->getWarnings());
     }
 
     public function test_a_warning_is_given_when_the_installed_json_is_found_and_the_composer_lock_is_not(): void
@@ -1794,9 +1818,8 @@ JSON
         $this->assertSame([], $config->getRecommendations());
         $this->assertSame(
             [
-                'A vendor/composer/installed.json file has been found but its related file composer.lock could not. '
-                .'This is likely due to the file having been removed despite being necessary. This will not break the '
-                .'build but the dump-autoload had to be disabled.',
+                'The "dump-autoload" setting has been set but has been ignored because the composer.json, composer.lock '
+                .'and vendor/composer/installed.json files are necessary but could not be found.',
             ],
             $config->getWarnings()
         );
@@ -1827,6 +1850,7 @@ JSON
 }
 JSON
         );
+        dump_file('vendor/composer/installed.json', '{}');
 
         dump_file('vendor/acme/foo/af0');
         dump_file('vendor/acme/foo/af1');
@@ -1849,6 +1873,7 @@ JSON
             'index.php',
             'vendor/acme/foo/af0',
             'vendor/acme/foo/af1',
+            'vendor/composer/installed.json',
         ];
 
         $actual = $this->normalizePaths($this->config->getFiles());
@@ -1872,6 +1897,7 @@ JSON
             'vendor/acme/foo/af1',
             'vendor/acme/oof/ao0',
             'vendor/acme/oof/ao1',
+            'vendor/composer/installed.json',
         ];
 
         $actual = $this->normalizePaths($this->config->getFiles());
