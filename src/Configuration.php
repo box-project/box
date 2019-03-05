@@ -265,14 +265,6 @@ BANNER;
 
         $dumpAutoload = self::retrieveDumpAutoload($raw, $composerFiles, $logger);
 
-        if ($dumpAutoload && null !== $composerFiles->getInstalledJson()->getPath() && null === $composerFiles->getComposerLock()->getPath()) {
-            $logger->addWarning(
-                'A vendor/composer/installed.json file has been found but its related file composer.lock could not. '
-                .'This is likely due to the file having been removed despite being necessary. This will not break the '
-                .'build but the dump-autoload had to be disabled.'
-            );
-        }
-
         $excludeComposerFiles = self::retrieveExcludeComposerFiles($raw, $logger);
 
         $mainScriptPath = self::retrieveMainScriptPath($raw, $basePath, $composerFiles->getComposerJson()->getDecodedContents(), $logger);
@@ -1709,28 +1701,6 @@ BANNER;
 
     private static function retrieveDumpAutoload(stdClass $raw, ComposerFiles $composerFiles, ConfigurationLogger $logger): bool
     {
-//        $composerJson = null !== $composerFiles->getComposerJson()->getPath();
-//
-//        self::checkIfDefaultValue($logger, $raw, self::DUMP_AUTOLOAD_KEY, true);
-//
-//        if (false === property_exists($raw, self::DUMP_AUTOLOAD_KEY)) {
-//            return $composerJson;
-//        }
-//
-//        $dumpAutoload = $raw->{self::DUMP_AUTOLOAD_KEY} ?? true;
-//
-//        if (false === $composerJson && $dumpAutoload) {
-//            // TODO: use sprintf there; check other occurrences as well
-//            $logger->addWarning(
-//                'The "dump-autoload" setting has been set but has been ignored because the composer.json file necessary'
-//                .' for it could not be found'
-//            );
-//
-//            return false;
-//        }
-//
-//        return $composerJson && false !== $dumpAutoload;
-
         self::checkIfDefaultValue($logger, $raw, self::DUMP_AUTOLOAD_KEY, null);
 
         $canDumpAutoload = (
@@ -1745,6 +1715,11 @@ BANNER;
                 || (
                     null !== $composerFiles->getComposerLock()->getPath()
                     && null !== $composerFiles->getInstalledJson()->getPath()
+                )
+                || (
+                    null === $composerFiles->getComposerLock()->getPath()
+                    && null !== $composerFiles->getInstalledJson()->getPath()
+                    && [] === $composerFiles->getInstalledJson()->getDecodedContents()
                 )
             )
         );

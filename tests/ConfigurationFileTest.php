@@ -1769,6 +1769,8 @@ JSON
     {
         $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir001/box.json', json_decode(get_contents($configPath)));
 
+        $this->assertTrue($config->dumpAutoload());
+
         $this->assertSame([], $config->getRecommendations());
         $this->assertSame([], $config->getWarnings());
     }
@@ -1776,6 +1778,8 @@ JSON
     public function test_no_warning_is_given_when_the_installed_json_is_found_and_the_composer_lock_is_not_when_the_composer_autoloader_is_not_dumped(): void
     {
         $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir002/box.json', json_decode(get_contents($configPath)));
+
+        $this->assertFalse($config->dumpAutoload());
 
         $this->assertSame([], $config->getRecommendations());
         $this->assertSame([], $config->getWarnings());
@@ -1787,6 +1791,8 @@ JSON
         $decodedConfig->{'dump-autoload'} = true;
 
         $config = Configuration::create($configPath, $decodedConfig);
+
+        $this->assertFalse($config->dumpAutoload());
 
         $this->assertSame([], $config->getRecommendations());
         $this->assertSame(
@@ -1807,6 +1813,8 @@ JSON
 
         $config = Configuration::create($configPath, $decodedConfig);
 
+        $this->assertFalse($config->dumpAutoload());
+
         $this->assertSame([], $config->getRecommendations());
         $this->assertSame([], $config->getWarnings());
     }
@@ -1814,6 +1822,8 @@ JSON
     public function test_a_warning_is_given_when_the_installed_json_is_found_and_the_composer_lock_is_not(): void
     {
         $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir003/box.json', json_decode(get_contents($configPath)));
+
+        $this->assertFalse($config->dumpAutoload());
 
         $this->assertSame([], $config->getRecommendations());
         $this->assertSame(
@@ -1825,9 +1835,11 @@ JSON
         );
     }
 
-    public function test_not_warning_is_given_when_the_installed_json_is_found_and_the_composer_lock_is_not_and_the_dump_autoload_disabled(): void
+    public function test_no_warning_is_given_when_the_installed_json_is_found_and_the_composer_lock_is_not_and_the_dump_autoload_disabled(): void
     {
         $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir004/box.json', json_decode(get_contents($configPath)));
+
+        $this->assertFalse($config->dumpAutoload());
 
         $this->assertSame([], $config->getRecommendations());
         $this->assertSame([], $config->getWarnings());
