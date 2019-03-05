@@ -80,13 +80,18 @@ use function property_exists;
 use function realpath;
 use RuntimeException;
 use Seld\JsonLint\ParsingException;
+use function sort;
+use const SORT_STRING;
 use SplFileInfo;
 use function sprintf;
 use stdClass;
 use function strtoupper;
 use function substr;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo as SymfonySplFileInfo;
 use Symfony\Component\Process\Process;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\VarDumper\Dumper\CliDumper;
 use function trigger_error;
 use function trim;
 
@@ -552,6 +557,73 @@ BANNER;
         $this->checkRequirements = $checkRequirements;
         $this->warnings = $warnings;
         $this->recommendations = $recommendations;
+    }
+
+    public function export(): string
+    {
+        $exportedConfig = clone $this;
+
+        $basePath = $exportedConfig->basePath;
+
+        /**
+         * @param null|SplFileInfo|string $path
+         */
+        $normalizePath = static function ($path) use ($basePath): ?string {
+            if (null === $path) {
+                return null;
+            }
+
+            if ($path instanceof SplFileInfo) {
+                $path = $path->getPathname();
+            }
+
+            return make_path_relative($path, $basePath);
+        };
+
+        $normalizeProperty = static function (&$property) use ($normalizePath): void {
+            $property = $normalizePath($property);
+        };
+
+        $normalizeFiles = static function (&$files) use ($normalizePath): void {
+            $files = array_map($normalizePath, $files);
+            sort($files, SORT_STRING);
+        };
+
+        $normalizeFiles($exportedConfig->files);
+        $normalizeFiles($exportedConfig->binaryFiles);
+
+        $normalizeProperty($exportedConfig->file);
+        $normalizeProperty($exportedConfig->composerJson[0]);
+        $normalizeProperty($exportedConfig->composerLock[0]);
+        $normalizeProperty($exportedConfig->mainScriptPath);
+        $normalizeProperty($exportedConfig->tmpOutputPath);
+        $normalizeProperty($exportedConfig->outputPath);
+        $normalizeProperty($exportedConfig->privateKeyPath);
+        $normalizeProperty($exportedConfig->stubBannerPath);
+        $normalizeProperty($exportedConfig->stubPath);
+
+        $exportedConfig->compressionAlgorithm = array_flip(get_phar_compression_algorithms())[$exportedConfig->compressionAlgorithm ?? Phar::NONE];
+        $exportedConfig->signingAlgorithm = array_flip(get_phar_signing_algorithms())[$exportedConfig->signingAlgorithm];
+        $exportedConfig->compactors = array_map('get_class', $exportedConfig->compactors);
+        $exportedConfig->fileMode = '0'.decoct($exportedConfig->fileMode);
+
+        $cloner = new VarCloner();
+        $cloner->setMaxItems(-1);
+        $cloner->setMaxString(-1);
+
+        $splInfoCaster = static function (SplFileInfo $fileInfo) use ($normalizePath): array {
+            return [$normalizePath($fileInfo)];
+        };
+
+        $cloner->addCasters([
+            SplFileInfo::class => $splInfoCaster,
+            SymfonySplFileInfo::class => $splInfoCaster,
+        ]);
+
+        return (new CliDumper())->dump(
+            $cloner->cloneVar($exportedConfig),
+            true
+        );
     }
 
     public function getConfigurationFile(): ?string
