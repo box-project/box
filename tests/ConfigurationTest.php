@@ -2949,9 +2949,9 @@ KevinGH\Box\Configuration {#100
   -fileMode: "0755"
   -alias: "test.phar"
   -basePath: "/path/to"
-  -composerJson: array:2 [
-    0 => "composer.json"
-    1 => array:1 [
+  -composerJson: KevinGH\Box\Composer\ComposerFile {#100
+    -path: "composer.json"
+    -contents: array:1 [
       "config" => array:3 [
         "bin-dir" => "bin"
         "platform" => array:1 [
@@ -2960,11 +2960,11 @@ KevinGH\Box\Configuration {#100
         "sort-packages" => true
       ]
     ]
-  ]
-  -composerLock: array:2 [
-    0 => "composer.lock"
-    1 => []
-  ]
+  }
+  -composerLock: KevinGH\Box\Composer\ComposerFile {#100
+    -path: "composer.lock"
+    -contents: []
+  }
   -files: array:7 [
     0 => "bar.php"
     1 => "box.json"

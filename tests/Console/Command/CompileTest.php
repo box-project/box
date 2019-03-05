@@ -1128,14 +1128,14 @@ KevinGH\Box\Configuration {#140
   -fileMode: "0755"
   -alias: "index.phar"
   -basePath: "/path/to"
-  -composerJson: array:2 [
-    0 => null
-    1 => null
-  ]
-  -composerLock: array:2 [
-    0 => null
-    1 => null
-  ]
+  -composerJson: KevinGH\Box\Composer\ComposerFile {#140
+    -path: null
+    -contents: []
+  }
+  -composerLock: KevinGH\Box\Composer\ComposerFile {#140
+    -path: null
+    -contents: []
+  }
   -files: []
   -binaryFiles: []
   -autodiscoveredFiles: true
