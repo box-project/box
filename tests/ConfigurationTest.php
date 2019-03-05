@@ -344,19 +344,7 @@ EOF
         $this->assertSame($expectedLockContents, $this->config->getDecodedComposerLockContents());
 
         $this->assertSame([], $this->config->getRecommendations());
-
-        $ignoredWarnings = [
-            'A composer.lock file has been found but its related file vendor/composer/installed.json'
-            .'could not. This could be due to either dependencies incorrectly installed or an incorrect Box '
-            .'configuration which is not including the installed.json file. This will not break the build but will '
-            .'likely result in a broken Composer classmap.',
-            'A composer.lock file has been found but its related file vendor/composer/installed.json could not. This '
-            .'could be due to either dependencies incorrectly installed or an incorrect Box configuration which is not '
-            .'including the installed.json file. This will not break the build but will likely result in a broken '
-            .'Composer classmap.',
-        ];
-
-        $this->assertSame([], array_diff($this->config->getWarnings(), $ignoredWarnings));
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_it_throws_an_error_when_a_composer_file_is_found_but_invalid(): void
@@ -423,7 +411,10 @@ EOF
             $this->config->getRecommendations()
         );
         $this->assertSame(
-            ['The "dump-autoload" setting has been set but has been ignored because the composer.json file necessary for it could not be found'],
+            [
+                'The "dump-autoload" setting has been set but has been ignored because the composer.json, composer.lock'
+                .' and vendor/composer/installed.json files are necessary but could not be found.',
+            ],
             $this->config->getWarnings()
         );
 
@@ -481,12 +472,12 @@ EOF
 
         $this->assertFalse($this->config->dumpAutoload());
 
+        $this->assertSame([], $this->config->getRecommendations());
         $this->assertSame(
-            ['The "dump-autoload" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
-        );
-        $this->assertSame(
-            ['The "dump-autoload" setting has been set but has been ignored because the composer.json file necessary for it could not be found'],
+            [
+                'The "dump-autoload" setting has been set but has been ignored because the composer.json, composer.lock'
+                .' and vendor/composer/installed.json files are necessary but could not be found.',
+            ],
             $this->config->getWarnings()
         );
     }
@@ -2524,17 +2515,6 @@ COMMENT;
 
     public function test_the_requirement_checker_is_enabled_by_default_if_a_composer_lock_or_json_file_is_found(): void
     {
-        $ignoredWarnings = [
-            'A composer.lock file has been found but its related file vendor/composer/installed.json'
-            .'could not. This could be due to either dependencies incorrectly installed or an incorrect Box '
-            .'configuration which is not including the installed.json file. This will not break the build but will '
-            .'likely result in a broken Composer classmap.',
-            'A composer.lock file has been found but its related file vendor/composer/installed.json could not. This '
-            .'could be due to either dependencies incorrectly installed or an incorrect Box configuration which is not '
-            .'including the installed.json file. This will not break the build but will likely result in a broken '
-            .'Composer classmap.',
-        ];
-
         $this->assertFalse($this->config->checkRequirements());
 
         dump_file('composer.lock', '{}');
@@ -2544,7 +2524,7 @@ COMMENT;
         $this->assertTrue($this->config->checkRequirements());
 
         $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], array_diff($this->config->getWarnings(), $ignoredWarnings));
+        $this->assertSame([], $this->config->getWarnings());
 
         dump_file('composer.json', '{}');
         remove('composer.lock');
@@ -2554,7 +2534,7 @@ COMMENT;
         $this->assertTrue($this->config->checkRequirements());
 
         $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], array_diff($this->config->getWarnings(), $ignoredWarnings));
+        $this->assertSame([], $this->config->getWarnings());
 
         dump_file('composer.lock', '{}');
 
@@ -2563,7 +2543,7 @@ COMMENT;
         $this->assertTrue($this->config->checkRequirements());
 
         $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], array_diff($this->config->getWarnings(), $ignoredWarnings));
+        $this->assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_requirement_checker_can_be_enabled(): void

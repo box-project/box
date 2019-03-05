@@ -263,15 +263,7 @@ BANNER;
 
         $composerFiles = self::retrieveComposerFiles($basePath);
 
-        $dumpAutoload = self::retrieveDumpAutoload($raw, null !== $composerFiles->getComposerJson()->getPath(), $logger);
-
-        if ($dumpAutoload && null !== $composerFiles->getInstalledJson()->getPath() && null === $composerFiles->getComposerLock()->getPath()) {
-            $logger->addWarning(
-                'A vendor/composer/installed.json file has been found but its related file composer.lock could not. '
-                .'This is likely due to the file having been removed despite being necessary. This will not break the '
-                .'build but the dump-autoload had to be disabled.'
-            );
-        }
+        $dumpAutoload = self::retrieveDumpAutoload($raw, $composerFiles, $logger);
 
         $excludeComposerFiles = self::retrieveExcludeComposerFiles($raw, $logger);
 
@@ -1051,32 +1043,11 @@ BANNER;
                 // Avoid an array_merge here as it can be quite expansive at this stage depending of the number of files
                 $files[] = $filesFromFinder;
             }
+
+            $files[] = self::wrapInSplFileInfo($composerFiles->getPaths());
         }
 
-        $aggregate = self::retrieveFilesAggregate(...$files);
-
-        if (false === $dumpAutoload) {
-            return $aggregate;
-        }
-
-        if (null === $composerFiles->getComposerLock()->getPath()) {
-            return $aggregate;
-        }
-
-        foreach ($aggregate as $file) {
-            if ($file->getRealPath() === $composerFiles->getInstalledJson()->getPath()) {
-                return $aggregate;
-            }
-        }
-
-        $logger->addWarning(
-            'A composer.lock file has been found but its related file vendor/composer/installed.json could not. This '
-            .'could be due to either dependencies incorrectly installed or an incorrect Box configuration which is not '
-            .'including the installed.json file. This will not break the build but will likely result in a broken '
-            .'Composer classmap.'
-        );
-
-        return $aggregate;
+        return self::retrieveFilesAggregate(...$files);
     }
 
     /**
@@ -1728,27 +1699,52 @@ BANNER;
         );
     }
 
-    private static function retrieveDumpAutoload(stdClass $raw, bool $composerJson, ConfigurationLogger $logger): bool
+    private static function retrieveDumpAutoload(stdClass $raw, ComposerFiles $composerFiles, ConfigurationLogger $logger): bool
     {
-        self::checkIfDefaultValue($logger, $raw, self::DUMP_AUTOLOAD_KEY, true);
+        self::checkIfDefaultValue($logger, $raw, self::DUMP_AUTOLOAD_KEY, null);
+
+        $canDumpAutoload = (
+            null !== $composerFiles->getComposerJson()->getPath()
+            && (
+                // The composer.lock and installed.json are optional (e.g. if there is no dependencies installed)
+                // but when one is present, the other must be as well otherwise the dumped autoloader will be broken
+                (
+                    null === $composerFiles->getComposerLock()->getPath()
+                    && null === $composerFiles->getInstalledJson()->getPath()
+                )
+                || (
+                    null !== $composerFiles->getComposerLock()->getPath()
+                    && null !== $composerFiles->getInstalledJson()->getPath()
+                )
+                || (
+                    null === $composerFiles->getComposerLock()->getPath()
+                    && null !== $composerFiles->getInstalledJson()->getPath()
+                    && [] === $composerFiles->getInstalledJson()->getDecodedContents()
+                )
+            )
+        );
+
+        if ($canDumpAutoload) {
+            self::checkIfDefaultValue($logger, $raw, self::DUMP_AUTOLOAD_KEY, true);
+        }
 
         if (false === property_exists($raw, self::DUMP_AUTOLOAD_KEY)) {
-            return $composerJson;
+            return $canDumpAutoload;
         }
 
         $dumpAutoload = $raw->{self::DUMP_AUTOLOAD_KEY} ?? true;
 
-        if (false === $composerJson && $dumpAutoload) {
+        if (false === $canDumpAutoload && $dumpAutoload) {
             // TODO: use sprintf there; check other occurrences as well
             $logger->addWarning(
-                'The "dump-autoload" setting has been set but has been ignored because the composer.json file necessary'
-                .' for it could not be found'
+                'The "dump-autoload" setting has been set but has been ignored because the composer.json, composer.lock'
+                .' and vendor/composer/installed.json files are necessary but could not be found.'
             );
 
             return false;
         }
 
-        return $composerJson && false !== $dumpAutoload;
+        return $canDumpAutoload && false !== $dumpAutoload;
     }
 
     private static function retrieveExcludeDevFiles(stdClass $raw, bool $dumpAutoload, ConfigurationLogger $logger): bool
