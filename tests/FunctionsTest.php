@@ -73,11 +73,17 @@ class FunctionsTest extends TestCase
     /**
      * @dataProvider provideMemory
      */
-    public function test_it_can_convet_a_memory_limit_amount_to_bytes(string $memory, int $expected): void
+    public function test_it_can_convert_a_memory_limit_amount_to_bytes(string $memory, int $expected): void
     {
         $actual = memory_to_bytes($memory);
 
         $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_can_generate_a_unique_id(): void
+    {
+        $this->assertRegExp('/^(?:[a-z]|\d){12}$/', unique_id(''));
+        $this->assertRegExp('/^Box(?:[a-z]|\d){12}$/', unique_id('Box'));
     }
 
     public function providePharCompressionAlgorithm(): Generator
