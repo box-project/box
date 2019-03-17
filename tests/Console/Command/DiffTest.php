@@ -20,7 +20,6 @@ use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use function ob_get_clean;
 use function ob_start;
-use function preg_replace;
 use function realpath;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -83,8 +82,8 @@ OUTPUT;
             $this->commandTester->execute(
                 [
                     'command' => 'diff',
-                    'pharA' => realpath(self::FIXTURES_DIR . '/simple-phar-foo.phar'),
-                    'pharB' => realpath(self::FIXTURES_DIR . '/simple-phar-bar.phar'),
+                    'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
+                    'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
                 ]
             );
             $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
@@ -106,7 +105,7 @@ OUTPUT;
     public function test_it_can_display_the_GNU_diff_of_two_PHAR_files(): void
     {
         (function (): void {
-            $pharPath = realpath(self::FIXTURES_DIR . '/simple-phar-foo.phar');
+            $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar');
 
             $this->commandTester->execute(
                 [
@@ -133,8 +132,8 @@ OUTPUT;
             $this->commandTester->execute(
                 [
                     'command' => 'diff',
-                    'pharA' => realpath(self::FIXTURES_DIR . '/simple-phar-foo.phar'),
-                    'pharB' => realpath(self::FIXTURES_DIR . '/simple-phar-bar.phar'),
+                    'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
+                    'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
                     '--gnu-diff' => null,
                 ]
             );
@@ -154,8 +153,8 @@ OUTPUT;
             $this->commandTester->execute(
                 [
                     'command' => 'diff',
-                    'pharA' => realpath(self::FIXTURES_DIR . '/simple-phar-bar.phar'),
-                    'pharB' => realpath(self::FIXTURES_DIR . '/simple-phar-baz.phar'),
+                    'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
+                    'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-baz.phar'),
                     '--gnu-diff' => null,
                 ]
             );
@@ -178,7 +177,7 @@ OUTPUT;
     public function test_it_can_check_the_sum_of_two_PHAR_files(): void
     {
         (function (): void {
-            $pharPath = realpath(self::FIXTURES_DIR . '/simple-phar-foo.phar');
+            $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar');
 
             ob_start();
             $this->commandTester->execute(
@@ -205,8 +204,8 @@ OUTPUT;
             $this->commandTester->execute(
                 [
                     'command' => 'diff',
-                    'pharA' => realpath(self::FIXTURES_DIR . '/simple-phar-foo.phar'),
-                    'pharB' => realpath(self::FIXTURES_DIR . '/simple-phar-bar.phar'),
+                    'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
+                    'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
                     '--check' => null,
                 ]
             );
