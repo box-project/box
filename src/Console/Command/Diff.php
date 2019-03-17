@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Assert\Assertion;
-use KevinGH\Box\Pharaoh\PharDiff;
+use KevinGH\Box\PharInfo\PharDiff;
 use KevinGH\Box\PhpSettingsHandler;
 use function sprintf;
 use Symfony\Component\Console\Input\InputArgument;

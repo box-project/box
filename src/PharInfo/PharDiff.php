@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Pharaoh;
+namespace KevinGH\Box\PharInfo;
 
 use function array_map;
 use function escapeshellarg;

@@ -14,9 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use function array_fill_keys;
 use function array_filter;
-use function array_reduce;
+use function array_flip;
 use function array_sum;
 use Assert\Assertion;
 use function count;
@@ -24,15 +23,16 @@ use DirectoryIterator;
 use function end;
 use function filesize;
 use function is_array;
-use function iterator_to_array;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\format_size;
+use function KevinGH\Box\get_phar_compression_algorithms;
+use KevinGH\Box\PharInfo\PharInfo;
 use function key;
 use Phar;
 use PharData;
 use PharFileInfo;
 use function realpath;
-use RecursiveIteratorIterator;
+use function round;
 use function sprintf;
 use function str_repeat;
 use function str_replace;
@@ -42,8 +42,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
-use UnexpectedValueException;
-use function var_export;
 
 /**
  * @private
@@ -58,22 +56,19 @@ final class Info extends Command
     private const MODE_OPT = 'mode';
     private const DEPTH_OPT = 'depth';
 
-    /**
-     * The list of recognized compression algorithms.
-     */
-    private const ALGORITHMS = [
-        Phar::BZ2 => 'BZ2',
-        Phar::GZ => 'GZ',
-        Phar::NONE => 'None',
-    ];
+    private static $FILE_ALGORITHMS;
 
     /**
-     * The list of recognized file compression algorithms.
+     * {@inheritdoc}
      */
-    private const FILE_ALGORITHMS = [
-        Phar::BZ2 => 'BZ2',
-        Phar::GZ => 'GZ',
-    ];
+    public function __construct(?string $name = null)
+    {
+        parent::__construct($name);
+
+        if (null === self::$FILE_ALGORITHMS) {
+            self::$FILE_ALGORITHMS = array_flip(array_filter(get_phar_compression_algorithms()));
+        }
+    }
 
     /**
      * {@inheritdoc}
@@ -174,14 +169,10 @@ HELP
         Assertion::greaterOrEqualThan($depth, -1, 'Expected the depth to be a positive integer or -1, got "%d"');
 
         try {
-            try {
-                $phar = new Phar($file);
-            } catch (UnexpectedValueException $exception) {
-                $phar = new PharData($file);
-            }
+            $pharInfo = new PharInfo($file);
 
             return $this->showPharInfo(
-                $phar,
+                $pharInfo,
                 $input->getOption(self::LIST_OPT),
                 $depth,
                 'indent' === $input->getOption(self::MODE_OPT),
@@ -221,33 +212,28 @@ HELP
         return 0;
     }
 
-    /**
-     * @param Phar|PharData $phar
-     */
     private function showPharInfo(
-        $phar,
+        PharInfo $pharInfo,
         bool $content,
         int $depth,
         bool $indent,
         OutputInterface $output,
         SymfonyStyle $io
     ): int {
-        $signature = $phar->getSignature();
+        $signature = $pharInfo->getPhar()->getSignature();
 
-        $this->showPharGlobalInfo($phar, $io, $signature);
+        $this->showPharGlobalInfo($pharInfo, $io, $signature);
 
         if ($content) {
-            $root = 'phar://'.str_replace('\\', '/', realpath($phar->getPath())).'/';
-
             $this->renderContents(
                 $output,
-                $phar,
+                $pharInfo->getPhar(),
                 0,
                 $depth,
                 $indent ? 0 : false,
-                $root,
-                $phar,
-                $root
+                $pharInfo->getRoot(),
+                $pharInfo->getPhar(),
+                $pharInfo->getRoot()
             );
         } else {
             $io->comment('Use the <info>--list|-l</info> option to list the content of the PHAR.');
@@ -257,20 +243,19 @@ HELP
     }
 
     /**
-     * @param Phar|PharData $phar
-     * @param mixed         $signature
+     * @param mixed $signature
      */
-    private function showPharGlobalInfo($phar, SymfonyStyle $io, $signature): void
+    private function showPharGlobalInfo(PharInfo $pharInfo, SymfonyStyle $io, $signature): void
     {
         $io->writeln(
             sprintf(
                 '<comment>API Version:</comment> %s',
-                '' !== $phar->getVersion() ? $phar->getVersion() : 'No information found'
+                $pharInfo->getVersion()
             )
         );
         $io->newLine();
 
-        $count = array_filter($this->retrieveCompressionCount($phar));
+        $count = array_filter($pharInfo->retrieveCompressionCount());
         $totalCount = array_sum($count);
 
         if (1 === count($count)) {
@@ -292,7 +277,7 @@ HELP
                 if ($lastAlgorithmName === $algorithmName) {
                     $percentage = $totalPercentage;
                 } else {
-                    $percentage = $nbrOfFiles * 100 / $totalCount;
+                    $percentage = round($nbrOfFiles * 100 / $totalCount, 2);
 
                     $totalPercentage -= $percentage;
                 }
@@ -324,9 +309,9 @@ HELP
             $io->newLine();
         }
 
-        $metadata = var_export($phar->getMetadata(), true);
+        $metadata = $pharInfo->getNormalizedMetadata();
 
-        if ('NULL' === $metadata) {
+        if (null === $metadata) {
             $io->writeln('<comment>Metadata:</comment> None');
         } else {
             $io->writeln('<comment>Metadata:</comment>');
@@ -339,7 +324,7 @@ HELP
                 '<comment>Contents:</comment>%s (%s)',
                 1 === $totalCount ? ' 1 file' : " $totalCount files",
                 format_size(
-                    filesize($phar->getPath())
+                    filesize($pharInfo->getPhar()->getPath())
                 )
             )
         );
@@ -411,7 +396,7 @@ HELP
             } else {
                 $compression = '<fg=red>[NONE]</fg=red>';
 
-                foreach (self::FILE_ALGORITHMS as $code => $name) {
+                foreach (self::$FILE_ALGORITHMS as $code => $name) {
                     if ($item->isCompressed($code)) {
                         $compression = "<fg=cyan>[$name]</fg=cyan>";
                         break;
@@ -443,46 +428,5 @@ HELP
                 );
             }
         }
-    }
-
-    /**
-     * @param Phar|PharData $phar
-     */
-    private function retrieveCompressionCount($phar): array
-    {
-        $count = array_fill_keys(
-            self::ALGORITHMS,
-            0
-        );
-
-        if ($phar instanceof PharData) {
-            $count[self::ALGORITHMS[$phar->isCompressed()]] = 1;
-
-            return $count;
-        }
-
-        $countFile = static function (array $count, PharFileInfo $file): array {
-            if (false === $file->isCompressed()) {
-                ++$count['None'];
-
-                return $count;
-            }
-
-            foreach (self::ALGORITHMS as $compressionAlgorithmCode => $compressionAlgorithmName) {
-                if ($file->isCompressed($compressionAlgorithmCode)) {
-                    ++$count[$compressionAlgorithmName];
-
-                    return $count;
-                }
-            }
-
-            return $count;
-        };
-
-        return array_reduce(
-            iterator_to_array(new RecursiveIteratorIterator($phar), true),
-            $countFile,
-            $count
-        );
     }
 }

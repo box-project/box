@@ -386,6 +386,60 @@ OUTPUT;
         $this->assertSame(0, $this->commandTester->getStatusCode());
     }
 
+    public function test_it_provides_a_phar_info_with_the_tree_of_the_content_including_hidden_files(): void
+    {
+        $pharPath = self::FIXTURES.'/hidden-files.phar';
+        $phar = new Phar($pharPath);
+
+        $version = $phar->getVersion();
+        $signature = $phar->getSignature();
+
+        $this->commandTester->execute(
+            [
+                'command' => 'info',
+                'phar' => $pharPath,
+                '--list' => true,
+            ]
+        );
+
+        $expected = <<<OUTPUT
+
+API Version: $version
+
+Archive Compression: None
+
+Signature: {$signature['hash_type']}
+Signature Hash: {$signature['hash']}
+
+Metadata: None
+
+Contents: 16 files (7.50KB)
+.hidden-dir/
+  .hidden-file1 [NONE] - 0.00B
+  .hidden-file1.php [NONE] - 33.00B
+  file1 [NONE] - 0.00B
+  file1.php [NONE] - 33.00B
+.hidden-foo [NONE] - 0.00B
+.hidden-foo.php [NONE] - 33.00B
+a/
+  .hidden-bar [NONE] - 0.00B
+  .hidden-bar.php [NONE] - 33.00B
+  .hidden-dir-2/
+    .hidden-file2 [NONE] - 0.00B
+    .hidden-file2.php [NONE] - 33.00B
+    file2 [NONE] - 0.00B
+    file2.php [NONE] - 33.00B
+  bar [NONE] - 0.00B
+  bar.php [NONE] - 33.00B
+foo [NONE] - 0.00B
+foo.php [NONE] - 33.00B
+
+OUTPUT;
+
+        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
+        $this->assertSame(0, $this->commandTester->getStatusCode());
+    }
+
     public function test_it_can_limit_the_tree_depth(): void
     {
         $pharPath = self::FIXTURES.'/tree-phar.phar';
