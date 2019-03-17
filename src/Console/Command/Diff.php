@@ -15,7 +15,11 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Assert\Assertion;
+use function count;
+use function is_string;
+use KevinGH\Box\Console\PharInfoRenderer;
 use KevinGH\Box\PharInfo\PharDiff;
+use KevinGH\Box\PharInfo\PharInfo;
 use KevinGH\Box\PhpSettingsHandler;
 use function sprintf;
 use Symfony\Component\Console\Input\InputArgument;
@@ -36,6 +40,8 @@ final class Diff extends Command
     private const FIRST_PHAR_ARG = 'pharA';
     private const SECOND_PHAR_ARG = 'pharB';
 
+    private const LIST_FILES_DIFF_OPTION = 'list-diff';
+    private const GIT_DIFF_OPTION = 'git-diff';
     private const GNU_DIFF_OPTION = 'gnu-diff';
     private const CHECK_OPTION = 'check';
 
@@ -62,9 +68,21 @@ final class Diff extends Command
 
         $this->addOption(
             self::GNU_DIFF_OPTION,
-            'd',
+            null,
             InputOption::VALUE_NONE,
-            'Displays a GNU diff instead of the default git diff'
+            'Displays a GNU diff'
+        );
+        $this->addOption(
+            self::GIT_DIFF_OPTION,
+            null,
+            InputOption::VALUE_NONE,
+            'Displays a Git diff'
+        );
+        $this->addOption(
+            self::LIST_FILES_DIFF_OPTION,
+            null,
+            InputOption::VALUE_NONE,
+            'Displays a list of file names diff (default)'
         );
         $this->addOption(
             self::CHECK_OPTION,
@@ -108,14 +126,21 @@ final class Diff extends Command
             return 1;
         }
 
+        $result1 = $this->compareArchives($diff, $io);
+        $result2 = $this->compareContents($input, $diff, $io);
+
+        return $result1 + $result2;
         if ($input->hasParameterOption(['-c', '--check'])) {
             return $diff->listChecksums($input->getOption(self::CHECK_OPTION) ?? 'sha384');
         }
 
-        $diffResult = $input->getOption(self::GNU_DIFF_OPTION)
-            ? $diff->gnuDiff()
-            : $diff->gitDiff()
-        ;
+        if ($input->getOption(self::GNU_DIFF_OPTION)) {
+            $diffResult = $diff->gnuDiff();
+        } elseif ($input->getOption(self::GIT_DIFF_OPTION)) {
+            $diffResult = $diff->gitDiff();
+        } else {
+            return $this->renderListDiff($diff, $io);
+        }
 
         if (null === $diffResult) {
             $io->success('No differences encountered.');
@@ -126,5 +151,113 @@ final class Diff extends Command
         $io->writeln($diffResult);
 
         return 1;
+    }
+
+    private function compareArchives(PharDiff $diff, SymfonyStyle $io): int
+    {
+        $io->comment('<info>Comparing the two archives... (do not check the signatures)</info>');
+
+        $pharInfoA = new PharInfo($diff->getPharA()->phar->getPath());
+        $pharInfoB = new PharInfo($diff->getPharB()->phar->getPath());
+
+        if ($pharInfoA->equals($pharInfoB)) {
+            $io->success('The two archives are identical');
+
+            return 0;
+        }
+
+        $this->renderArchive(
+            $diff->getPharA()->getFileName(),
+            $pharInfoA,
+            $io
+        );
+
+        $io->newLine();
+
+        $this->renderArchive(
+            $diff->getPharB()->getFileName(),
+            $pharInfoA,
+            $io
+        );
+
+        return 1;
+    }
+
+    private function compareContents(InputInterface $input, PharDiff $diff, SymfonyStyle $io): int
+    {
+        $io->comment('<info>Comparing the two archives contents...</info>');
+
+        if ($input->hasParameterOption(['-c', '--check'])) {
+            return $diff->listChecksums($input->getOption(self::CHECK_OPTION) ?? 'sha384');
+        }
+
+        if ($input->getOption(self::GNU_DIFF_OPTION)) {
+            $diffResult = $diff->gnuDiff();
+        } elseif ($input->getOption(self::GIT_DIFF_OPTION)) {
+            $diffResult = $diff->gitDiff();
+        } else {
+            $diffResult = $diff->listDiff($diff, $io);
+        }
+
+        if (null === $diffResult || [[], []] === $diffResult) {
+            $io->success('The contents are identical');
+
+            return 0;
+        }
+
+        if (is_string($diffResult)) {
+            // Git or GNU diff: we don't have much control on the format
+            $io->writeln($diffResult);
+
+            return 1;
+        }
+
+        $io->writeln(sprintf(
+            '--- Files present in "%s" but not in "%s"',
+            $diff->getPharA()->getFileName(),
+            $diff->getPharB()->getFileName()
+        ));
+        $io->writeln(sprintf(
+            '+++ Files present in "%s" but not in "%s"',
+            $diff->getPharB()->getFileName(),
+            $diff->getPharA()->getFileName()
+        ));
+
+        $io->newLine();
+
+        $renderPaths = static function (string $symbol, array $paths, SymfonyStyle $io): void {
+            foreach ($paths as $path) {
+                $io->writeln(sprintf(
+                    '%s %s',
+                    $symbol,
+                    $path
+                ));
+            }
+        };
+
+        $renderPaths('-', $diffResult[0], $io);
+        $renderPaths('+', $diffResult[1], $io);
+
+        $io->error(sprintf(
+            '%d file(s) difference',
+            count($diffResult[0]) + count($diffResult[1])
+        ));
+
+        return 1;
+    }
+
+    private function renderArchive(string $fileName, PharInfo $pharInfo, SymfonyStyle $io): void
+    {
+        $io->writeln(
+            sprintf(
+                '<comment>Archive: </comment><fg=cyan;options=bold>%s</>',
+                $fileName
+            )
+        );
+
+        PharInfoRenderer::renderCompression($pharInfo, $io);
+        // Omit the signature
+        PharInfoRenderer::renderMetadata($pharInfo, $io);
+        PharInfoRenderer::renderContentsSummary($pharInfo, $io);
     }
 }

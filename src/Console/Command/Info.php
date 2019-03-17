@@ -16,23 +16,18 @@ namespace KevinGH\Box\Console\Command;
 
 use function array_filter;
 use function array_flip;
-use function array_sum;
 use Assert\Assertion;
-use function count;
 use DirectoryIterator;
-use function end;
-use function filesize;
 use function is_array;
+use KevinGH\Box\Console\PharInfoRenderer;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\get_phar_compression_algorithms;
 use KevinGH\Box\PharInfo\PharInfo;
-use function key;
 use Phar;
 use PharData;
 use PharFileInfo;
 use function realpath;
-use function round;
 use function sprintf;
 use function str_repeat;
 use function str_replace;
@@ -220,9 +215,7 @@ HELP
         OutputInterface $output,
         SymfonyStyle $io
     ): int {
-        $signature = $pharInfo->getPhar()->getSignature();
-
-        $this->showPharGlobalInfo($pharInfo, $io, $signature);
+        $this->showPharMeta($pharInfo, $io);
 
         if ($content) {
             $this->renderContents(
@@ -242,10 +235,7 @@ HELP
         return 0;
     }
 
-    /**
-     * @param mixed $signature
-     */
-    private function showPharGlobalInfo(PharInfo $pharInfo, SymfonyStyle $io, $signature): void
+    private function showPharMeta(PharInfo $pharInfo, SymfonyStyle $io): void
     {
         $io->writeln(
             sprintf(
@@ -253,81 +243,22 @@ HELP
                 $pharInfo->getVersion()
             )
         );
+
         $io->newLine();
 
-        $count = array_filter($pharInfo->retrieveCompressionCount());
-        $totalCount = array_sum($count);
+        PharInfoRenderer::renderCompression($pharInfo, $io);
 
-        if (1 === count($count)) {
-            $io->writeln(
-                sprintf(
-                    '<comment>Archive Compression:</comment> %s',
-                    key($count)
-                )
-            );
-        } else {
-            $io->writeln('<comment>Archive Compression:</comment>');
-
-            end($count);
-            $lastAlgorithmName = key($count);
-
-            $totalPercentage = 100;
-
-            foreach ($count as $algorithmName => $nbrOfFiles) {
-                if ($lastAlgorithmName === $algorithmName) {
-                    $percentage = $totalPercentage;
-                } else {
-                    $percentage = round($nbrOfFiles * 100 / $totalCount, 2);
-
-                    $totalPercentage -= $percentage;
-                }
-
-                $io->writeln(
-                    sprintf(
-                        '  - %s (%0.2f%%)',
-                        $algorithmName,
-                        $percentage
-                    )
-                );
-            }
-        }
         $io->newLine();
 
-        if (false !== $signature) {
-            $io->writeln(
-                sprintf(
-                    '<comment>Signature:</comment> %s',
-                    $signature['hash_type']
-                )
-            );
-            $io->writeln(
-                sprintf(
-                    '<comment>Signature Hash:</comment> %s',
-                    $signature['hash']
-                )
-            );
-            $io->newLine();
-        }
+        PharInfoRenderer::renderSignature($pharInfo, $io);
 
-        $metadata = $pharInfo->getNormalizedMetadata();
-
-        if (null === $metadata) {
-            $io->writeln('<comment>Metadata:</comment> None');
-        } else {
-            $io->writeln('<comment>Metadata:</comment>');
-            $io->writeln($metadata);
-        }
         $io->newLine();
 
-        $io->writeln(
-            sprintf(
-                '<comment>Contents:</comment>%s (%s)',
-                1 === $totalCount ? ' 1 file' : " $totalCount files",
-                format_size(
-                    filesize($pharInfo->getPhar()->getPath())
-                )
-            )
-        );
+        PharInfoRenderer::renderMetadata($pharInfo, $io);
+
+        $io->newLine();
+
+        PharInfoRenderer::renderContentsSummary($pharInfo, $io);
     }
 
     private function render(OutputInterface $output, array $attributes): void

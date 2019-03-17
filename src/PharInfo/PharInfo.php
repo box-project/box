@@ -28,6 +28,11 @@ final class PharInfo
 
     private $phar;
 
+    /** @var null|array */
+    private $compressionCount;
+    /** @var null|string */
+    private $hash;
+
     public function __construct(string $pharFile)
     {
         if (null === self::$ALGORITHMS) {
@@ -42,7 +47,58 @@ final class PharInfo
         }
     }
 
-    public function retrieveCompressionCount(): array
+    public function equals(self $pharInfo): bool
+    {
+        return
+            $pharInfo->getCompressionCount() === $this->getCompressionCount()
+            && $pharInfo->getNormalizedMetadata() === $this->getNormalizedMetadata()
+        ;
+    }
+
+    public function getCompressionCount(): array
+    {
+        if (null === $this->compressionCount || $this->hash !== $this->getPharHash()) {
+            $this->compressionCount = $this->calculateCompressionCount();
+            $this->hash = $this->getPharHash();
+        }
+
+        return $this->compressionCount;
+    }
+
+    /**
+     * @return Phar|PharData
+     */
+    public function getPhar()
+    {
+        return $this->phar;
+    }
+
+    public function getRoot(): string
+    {
+        // Do not cache the result
+        return 'phar://'.str_replace('\\', '/', realpath($this->phar->getPath())).'/';
+    }
+
+    public function getVersion(): string
+    {
+        // Do not cache the result
+        return '' !== $this->phar->getVersion() ? $this->phar->getVersion() : 'No information found';
+    }
+
+    public function getNormalizedMetadata(): ?string
+    {
+        // Do not cache the result
+        $metadata = var_export($this->phar->getMetadata(), true);
+
+        return 'NULL' === $metadata ? null : $metadata;
+    }
+
+    private function getPharHash(): string
+    {
+        return $this->phar->getSignature()['hash'];
+    }
+
+    private function calculateCompressionCount(): array
     {
         $count = array_fill_keys(
             self::$ALGORITHMS,
@@ -78,30 +134,5 @@ final class PharInfo
             $countFile,
             $count
         );
-    }
-
-    /**
-     * @return Phar|PharData
-     */
-    public function getPhar()
-    {
-        return $this->phar;
-    }
-
-    public function getRoot(): string
-    {
-        return 'phar://'.str_replace('\\', '/', realpath($this->phar->getPath())).'/';
-    }
-
-    public function getVersion(): string
-    {
-        return '' !== $this->phar->getVersion() ? $this->phar->getVersion() : 'No information found';
-    }
-
-    public function getNormalizedMetadata(): ?string
-    {
-        $metadata = var_export($this->phar->getMetadata(), true);
-
-        return 'NULL' === $metadata ? null : $metadata;
     }
 }
