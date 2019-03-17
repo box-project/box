@@ -14,12 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use function array_map;
 use Assert\Assertion;
+use KevinGH\Box\Pharaoh\PharDiff;
 use KevinGH\Box\PhpSettingsHandler;
-use ParagonIE\Pharaoh\Pharaoh;
-use ParagonIE\Pharaoh\PharDiff;
-use function realpath;
 use function sprintf;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -95,17 +92,7 @@ final class Diff extends Command
         Assertion::allFile($paths);
 
         try {
-            $diff = new PharDiff(
-                ...array_map(
-                    static function (string $path): Pharaoh {
-                        $realPath = realpath($path);
-
-                        return new Pharaoh(false !== $realPath ? $realPath : $path);
-                    },
-                    $paths
-                )
-            );
-            $diff->setVerbose(true);
+            $diff = new PharDiff(...$paths);
         } catch (Throwable $throwable) {
             if ($output->isDebug()) {
                 throw $throwable;
@@ -125,10 +112,19 @@ final class Diff extends Command
             return $diff->listChecksums($input->getOption(self::CHECK_OPTION) ?? 'sha384');
         }
 
-        if ($input->getOption(self::GNU_DIFF_OPTION)) {
-            return $diff->printGnuDiff();
+        $diffResult = $input->getOption(self::GNU_DIFF_OPTION)
+            ? $diff->gnuDiff()
+            : $diff->gitDiff()
+        ;
+
+        if (null === $diffResult) {
+            $io->success('No differences encountered.');
+
+            return 0;
         }
 
-        return $diff->printGitDiff();
+        $io->writeln($diffResult);
+
+        return 1;
     }
 }

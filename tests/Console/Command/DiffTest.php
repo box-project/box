@@ -57,7 +57,6 @@ class DiffTest extends CommandTestCase
     {
         $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar');
 
-        ob_start();
         $this->commandTester->execute(
             [
                 'command' => 'diff',
@@ -65,17 +64,18 @@ class DiffTest extends CommandTestCase
                 'pharB' => $pharPath,
             ]
         );
-        $actual = DisplayNormalizer::removeTrailingSpaces(ob_get_clean());
+        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
         $expected = <<<'OUTPUT'
-No differences encountered.
+
+ [OK] No differences encountered.
+
 
 OUTPUT;
 
         $this->assertSame($expected, $actual);
         $this->assertSame(0, $this->commandTester->getStatusCode());
 
-        ob_start();
         $this->commandTester->execute(
             [
                 'command' => 'diff',
@@ -83,12 +83,18 @@ OUTPUT;
                 'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
             ]
         );
-        $output = DisplayNormalizer::removeTrailingSpaces(ob_get_clean());
+        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
-        $this->assertRegExp(
-            '/^diff --git a\/.+\/foo.php b\/.+\/bar.php\nsimilarity index 100%\nrename from \/.+\/foo.php\nrename to \/.+\/bar.php$/m',
-            $output
-        );
+        $expected = <<<'OUTPUT'
+diff --git asimple-phar-foo.phar/foo.php bsimple-phar-bar.phar/bar.php
+similarity index 100%
+rename from simple-phar-foo.phar/foo.php
+rename to simple-phar-bar.phar/bar.php
+
+
+OUTPUT;
+
+        $this->assertSame($expected, $actual);
         $this->assertSame(1, $this->commandTester->getStatusCode());
     }
 
@@ -96,7 +102,6 @@ OUTPUT;
     {
         $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar');
 
-        ob_start();
         $this->commandTester->execute(
             [
                 'command' => 'diff',
@@ -105,17 +110,18 @@ OUTPUT;
                 '--gnu-diff' => null,
             ]
         );
-        $actual = DisplayNormalizer::removeTrailingSpaces(ob_get_clean());
+        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
         $expected = <<<'OUTPUT'
-No differences encountered.
+
+ [OK] No differences encountered.
+
 
 OUTPUT;
 
         $this->assertSame($expected, $actual);
         $this->assertSame(0, $this->commandTester->getStatusCode());
 
-        ob_start();
         $this->commandTester->execute(
             [
                 'command' => 'diff',
@@ -124,12 +130,15 @@ OUTPUT;
                 '--gnu-diff' => null,
             ]
         );
-        $output = DisplayNormalizer::removeTrailingSpaces(ob_get_clean());
+        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
-        $this->assertRegExp(
-            '/^Only in \/.+: bar\.php\nOnly in \/.+: foo\.php$/',
-            $output
-        );
+        $expected = <<<'OUTPUT'
+Only in simple-phar-bar.phar: bar.php
+Only in simple-phar-foo.phar: foo.php
+
+
+OUTPUT;
+        $this->assertSame($expected, $actual);
         $this->assertSame(1, $this->commandTester->getStatusCode());
     }
 
@@ -216,7 +225,6 @@ OUTPUT;
     {
         $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar');
 
-        ob_start();
         $this->commandTester->execute(
             [
                 'command' => 'diff',
@@ -224,10 +232,12 @@ OUTPUT;
                 'pharB' => $pharPath,
             ]
         );
-        $actual = DisplayNormalizer::removeTrailingSpaces(ob_get_clean());
+        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
         $expected = <<<'OUTPUT'
-No differences encountered.
+
+ [OK] No differences encountered.
+
 
 OUTPUT;
 
