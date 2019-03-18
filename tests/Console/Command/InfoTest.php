@@ -26,9 +26,12 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use UnexpectedValueException;
 
+///**
+// * @covers \KevinGH\Box\Console\Command\Info
+// * @runTestsInSeparateProcesses
+// */
 /**
- * @covers \KevinGH\Box\Console\Command\Info
- * @runTestsInSeparateProcesses
+ * @coversNothing
  */
 class InfoTest extends CommandTestCase
 {
@@ -215,6 +218,8 @@ API Version: No information found
 
 Compression: GZ
 
+Signature unreadable
+
 Metadata: None
 
 Contents: 1 file (2.56KB)
@@ -244,6 +249,8 @@ OUTPUT;
 API Version: No information found
 
 Compression: BZ2
+
+Signature unreadable
 
 Metadata: None
 

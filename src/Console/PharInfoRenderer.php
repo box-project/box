@@ -70,6 +70,13 @@ final class PharInfoRenderer
         $signature = $pharInfo->getPhar()->getSignature();
 
         if (false === $signature) {
+            $io->writeln(
+                sprintf(
+                    '<comment>Signature unreadable</comment> %s',
+                    $signature['hash_type']
+                )
+            );
+
             return;
         }
 

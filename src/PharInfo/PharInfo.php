@@ -16,6 +16,7 @@ namespace KevinGH\Box\PharInfo;
 
 use function array_flip;
 use function KevinGH\Box\get_phar_compression_algorithms;
+use function KevinGH\Box\unique_id;
 use Phar;
 use PharData;
 use PharFileInfo;
@@ -95,7 +96,9 @@ final class PharInfo
 
     private function getPharHash(): string
     {
-        return $this->phar->getSignature()['hash'];
+        // If no signature is available (e.g. a tar.gz file), we generate a random hash to ensure
+        // it will always be invalidated
+        return $this->phar->getSignature()['hash'] ?? unique_id('');
     }
 
     private function calculateCompressionCount(): array
