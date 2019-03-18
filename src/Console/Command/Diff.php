@@ -14,13 +14,18 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use function array_filter;
+use function array_flip;
 use Assert\Assertion;
 use function count;
 use function is_string;
 use KevinGH\Box\Console\PharInfoRenderer;
+use function KevinGH\Box\format_size;
+use function KevinGH\Box\get_phar_compression_algorithms;
 use KevinGH\Box\PharInfo\PharDiff;
 use KevinGH\Box\PharInfo\PharInfo;
 use KevinGH\Box\PhpSettingsHandler;
+use PharFileInfo;
 use function sprintf;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -44,6 +49,20 @@ final class Diff extends Command
     private const GIT_DIFF_OPTION = 'git-diff';
     private const GNU_DIFF_OPTION = 'gnu-diff';
     private const CHECK_OPTION = 'check';
+
+    private static $FILE_ALGORITHMS;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct(?string $name = null)
+    {
+        parent::__construct($name);
+
+        if (null === self::$FILE_ALGORITHMS) {
+            self::$FILE_ALGORITHMS = array_flip(array_filter(get_phar_compression_algorithms()));
+        }
+    }
 
     /**
      * {@inheritdoc}
@@ -130,35 +149,14 @@ final class Diff extends Command
         $result2 = $this->compareContents($input, $diff, $io);
 
         return $result1 + $result2;
-        if ($input->hasParameterOption(['-c', '--check'])) {
-            return $diff->listChecksums($input->getOption(self::CHECK_OPTION) ?? 'sha384');
-        }
-
-        if ($input->getOption(self::GNU_DIFF_OPTION)) {
-            $diffResult = $diff->gnuDiff();
-        } elseif ($input->getOption(self::GIT_DIFF_OPTION)) {
-            $diffResult = $diff->gitDiff();
-        } else {
-            return $this->renderListDiff($diff, $io);
-        }
-
-        if (null === $diffResult) {
-            $io->success('No differences encountered.');
-
-            return 0;
-        }
-
-        $io->writeln($diffResult);
-
-        return 1;
     }
 
     private function compareArchives(PharDiff $diff, SymfonyStyle $io): int
     {
         $io->comment('<info>Comparing the two archives... (do not check the signatures)</info>');
 
-        $pharInfoA = new PharInfo($diff->getPharA()->phar->getPath());
-        $pharInfoB = new PharInfo($diff->getPharB()->phar->getPath());
+        $pharInfoA = $diff->getPharA()->getPharInfo();
+        $pharInfoB = $diff->getPharB()->getPharInfo();
 
         if ($pharInfoA->equals($pharInfoB)) {
             $io->success('The two archives are identical');
@@ -225,18 +223,36 @@ final class Diff extends Command
 
         $io->newLine();
 
-        $renderPaths = static function (string $symbol, array $paths, SymfonyStyle $io): void {
+        $renderPaths = static function (string $symbol, PharInfo $pharInfo, array $paths, SymfonyStyle $io): void {
             foreach ($paths as $path) {
-                $io->writeln(sprintf(
-                    '%s %s',
-                    $symbol,
-                    $path
-                ));
+                /** @var PharFileInfo $file */
+                $file = $pharInfo->getPhar()[str_replace($pharInfo->getRoot(), '', $path)];
+
+                $compression = '<fg=red>[NONE]</fg=red>';
+
+                foreach (self::$FILE_ALGORITHMS as $code => $name) {
+                    if ($file->isCompressed($code)) {
+                        $compression = "<fg=cyan>[$name]</fg=cyan>";
+                        break;
+                    }
+                }
+
+                $fileSize = format_size($file->getCompressedSize());
+
+                $io->writeln(
+                    sprintf(
+                        '%s %s %s - %s',
+                        $symbol,
+                        $path,
+                        $compression,
+                        $fileSize
+                    )
+                );
             }
         };
 
-        $renderPaths('-', $diffResult[0], $io);
-        $renderPaths('+', $diffResult[1], $io);
+        $renderPaths('-', $diff->getPharA()->getPharInfo(), $diffResult[0], $io);
+        $renderPaths('+', $diff->getPharB()->getPharInfo(), $diffResult[1], $io);
 
         $io->error(sprintf(
             '%d file(s) difference',

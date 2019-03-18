@@ -16,6 +16,7 @@ namespace KevinGH\Box\PharInfo;
 
 use function array_diff;
 use function array_map;
+use const DIRECTORY_SEPARATOR;
 use function escapeshellarg;
 use function iterator_to_array;
 use ParagonIE\Pharaoh\PharDiff as ParagoniePharDiff;
@@ -138,7 +139,7 @@ final class PharDiff
      */
     private function collectFiles(Pharaoh $phar): array
     {
-        $basePath = $phar->tmp;
+        $basePath = $phar->tmp.DIRECTORY_SEPARATOR;
 
         return array_map(
             static function (SplFileInfo $fileInfo) use ($basePath): string {

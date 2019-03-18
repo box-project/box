@@ -22,6 +22,12 @@ final class Pharaoh extends ParagoniePharaoh
 {
     private $fileName;
 
+    /** @var null|PharInfo */
+    private $pharInfo;
+
+    /** @var null|string */
+    private $path;
+
     /**
      * {@inheritdoc}
      */
@@ -37,6 +43,8 @@ final class Pharaoh extends ParagoniePharaoh
      */
     public function __destruct()
     {
+        unset($this->pharInfo);
+
         parent::__destruct();
 
         remove($this->tmp);
@@ -45,5 +53,15 @@ final class Pharaoh extends ParagoniePharaoh
     public function getFileName(): string
     {
         return $this->fileName;
+    }
+
+    public function getPharInfo(): PharInfo
+    {
+        if (null === $this->pharInfo || $this->path !== $this->phar->getPath()) {
+            $this->path = $this->phar->getPath();
+            $this->pharInfo = new PharInfo($this->path);
+        }
+
+        return $this->pharInfo;
     }
 }
