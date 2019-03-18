@@ -1,0 +1,11 @@
+{
+    "files-bin": [
+        ".env"
+    ],
+    "directories": [
+        "config"
+    ],
+    "force-autodiscovery": true,
+    "check-requirements": false,
+    "exclude-composer-files": false
+}

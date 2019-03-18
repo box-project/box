@@ -1166,6 +1166,7 @@ BANNER;
                 ->files()
                 ->filter($blacklistFilter)
                 ->ignoreVCS(true)
+                ->ignoreDotFiles(false)
                 ->in($directories)
             ;
 
@@ -1266,6 +1267,7 @@ BANNER;
                 }
             )
             ->ignoreVCS(true)
+            ->ignoreDotFiles(false)
         ;
 
         $normalizedConfig = (static function (array $config, Finder $finder): array {
@@ -1549,7 +1551,7 @@ BANNER;
             ->filter($blacklistFilter)
             ->exclude($relativeDevPackages)
             ->ignoreVCS(true)
-            ->ignoreDotFiles(true)
+            ->ignoreDotFiles(false)
             // Remove build files
             ->notName('composer.json')
             ->notName('composer.lock')
