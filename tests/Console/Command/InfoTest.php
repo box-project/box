@@ -26,9 +26,12 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use UnexpectedValueException;
 
+///**
+// * @covers \KevinGH\Box\Console\Command\Info
+// * @runTestsInSeparateProcesses
+// */
 /**
- * @covers \KevinGH\Box\Console\Command\Info
- * @runTestsInSeparateProcesses
+ * @coversNothing
  */
 class InfoTest extends CommandTestCase
 {
@@ -92,7 +95,7 @@ OUTPUT;
 
 API Version: $version
 
-Archive Compression: None
+Compression: None
 
 Signature: {$signature['hash_type']}
 Signature Hash: {$signature['hash']}
@@ -129,7 +132,7 @@ OUTPUT;
 
 API Version: $version
 
-Archive Compression: None
+Compression: None
 
 Signature: {$signature['hash_type']}
 Signature Hash: {$signature['hash']}
@@ -213,7 +216,9 @@ OUTPUT;
 
 API Version: No information found
 
-Archive Compression: GZ
+Compression: GZ
+
+Signature unreadable
 
 Metadata: None
 
@@ -243,7 +248,9 @@ OUTPUT;
 
 API Version: No information found
 
-Archive Compression: BZ2
+Compression: BZ2
+
+Signature unreadable
 
 Metadata: None
 
@@ -316,7 +323,7 @@ OUTPUT;
 
 API Version: $version
 
-Archive Compression:
+Compression:
   - BZ2 (33.33%)
   - None (66.67%)
 
@@ -363,7 +370,7 @@ OUTPUT;
 
 API Version: $version
 
-Archive Compression:
+Compression:
   - BZ2 (33.33%)
   - None (66.67%)
 
@@ -406,7 +413,7 @@ OUTPUT;
 
 API Version: $version
 
-Archive Compression: None
+Compression: None
 
 Signature: {$signature['hash_type']}
 Signature Hash: {$signature['hash']}
@@ -462,7 +469,7 @@ OUTPUT;
 
 API Version: $version
 
-Archive Compression:
+Compression:
   - BZ2 (33.33%)
   - None (66.67%)
 
@@ -498,7 +505,7 @@ OUTPUT;
 
 API Version: $version
 
-Archive Compression:
+Compression:
   - BZ2 (33.33%)
   - None (66.67%)
 
@@ -536,7 +543,7 @@ OUTPUT;
 
 API Version: $version
 
-Archive Compression:
+Compression:
   - BZ2 (33.33%)
   - None (66.67%)
 
@@ -585,7 +592,7 @@ OUTPUT;
 
 API Version: $version
 
-Archive Compression:
+Compression:
   - BZ2 (33.33%)
   - None (66.67%)
 

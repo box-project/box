@@ -14,8 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use DateTimeImmutable;
+use function basename;
 use function KevinGH\Box\FileSystem\copy;
+use function KevinGH\Box\unique_id;
 use function pathinfo;
 use const PATHINFO_EXTENSION;
 use function sys_get_temp_dir;
@@ -28,7 +29,7 @@ trait CreateTemporaryPharFile
     private function createTemporaryPhar(string $file): string
     {
         if ('' === pathinfo($file, PATHINFO_EXTENSION)) {
-            copy($file, $tmpFile = sys_get_temp_dir().'/'.(new DateTimeImmutable())->getTimestamp().$file.'.phar');
+            copy($file, $tmpFile = sys_get_temp_dir().'/'.unique_id('').basename($file).'.phar');
 
             return $tmpFile;
         }

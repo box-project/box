@@ -14,11 +14,15 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PharInfo;
 
+use function array_diff;
 use function array_map;
 use function escapeshellarg;
+use function iterator_to_array;
 use ParagonIE\Pharaoh\PharDiff as ParagoniePharDiff;
 use function realpath;
+use SplFileInfo;
 use function str_replace;
+use Symfony\Component\Finder\Finder;
 
 final class PharDiff
 {
@@ -49,6 +53,16 @@ final class PharDiff
         $diff->setVerbose(true);
 
         $this->diff = $diff;
+    }
+
+    public function getPharA(): Pharaoh
+    {
+        return $this->pharA;
+    }
+
+    public function getPharB(): Pharaoh
+    {
+        return $this->pharB;
     }
 
     public function gitDiff(): ?string
@@ -101,5 +115,42 @@ final class PharDiff
     public function listChecksums(string $algo = 'sha384'): int
     {
         return $this->diff->listChecksums($algo);
+    }
+
+    /**
+     * @return string[][] Returns two arrays of strings. The first one contains all the files present in the first PHAR
+     *                    which are not in the second and the second array all the files present in the second PHAR but
+     *                    not the first one.
+     */
+    public function listDiff(): array
+    {
+        $pharAFiles = $this->collectFiles($this->pharA);
+        $pharBFiles = $this->collectFiles($this->pharB);
+
+        return [
+            array_diff($pharAFiles, $pharBFiles),
+            array_diff($pharBFiles, $pharAFiles),
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    private function collectFiles(Pharaoh $phar): array
+    {
+        $basePath = $phar->tmp;
+
+        return array_map(
+            static function (SplFileInfo $fileInfo) use ($basePath): string {
+                return str_replace($basePath, '', $fileInfo->getRealPath());
+            },
+            iterator_to_array(
+                Finder::create()
+                    ->files()
+                    ->in($basePath)
+                    ->ignoreDotFiles(false),
+                false
+            )
+        );
     }
 }
