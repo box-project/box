@@ -15,9 +15,9 @@ env:
 matrix:
   include:
     - php: '7.1'
-      env: DEPLOY=true
     - php: '7.2'
     - php: '7.3'
+      env: DEPLOY=true
     - php: '7.3'
       env: PHAR_READONLY='true'
     - php: '7.3'
@@ -33,6 +33,8 @@ before_install:
     fi
   - set -eo pipefail
   - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+  - echo "extension = ev.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+  - echo "extension = uv.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
   - composer validate
   - |
     if [ "DEPLOY" != "true" ]; then
