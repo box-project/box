@@ -20,9 +20,11 @@ use function array_unshift;
 use function explode;
 use function get_class;
 use function getcwd;
+use Humbug\PhpScoper\Whitelist;
 use function implode;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 use KevinGH\Box\Compactor;
+use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
 use KevinGH\Box\Compactors;
 use KevinGH\Box\Configuration;
@@ -41,6 +43,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\VarDumper\Dumper\CliDumper;
 
 final class Process extends ConfigurableCommand
 {
@@ -137,6 +141,8 @@ final class Process extends ConfigurableCommand
         if ($io->isQuiet()) {
             $io->writeln($fileProcessedContents, OutputInterface::VERBOSITY_QUIET);
         } else {
+            $whitelist = $this->retrieveWhitelist($compactors);
+
             $io->writeln([
                 'Processed contents:',
                 '',
@@ -144,6 +150,16 @@ final class Process extends ConfigurableCommand
                 $fileProcessedContents,
                 '<comment>"""</comment>',
             ]);
+
+            if (null !== $whitelist) {
+                $io->writeln([
+                    'Whitelist:',
+                    '',
+                    '<comment>"""</comment>',
+                    $this->exportWhitelist($whitelist, $output),
+                    '<comment>"""</comment>',
+                ]);
+            }
         }
     }
 
@@ -223,6 +239,35 @@ final class Process extends ConfigurableCommand
         };
 
         array_map($logCompactors, $nestedCompactors);
+
         $io->newLine();
+    }
+
+    private function retrieveWhitelist(Compactors $compactors): ?Whitelist
+    {
+        foreach ($compactors->toArray() as $compactor) {
+            if ($compactor instanceof PhpScoper) {
+                return $compactor->getScoper()->getWhitelist();
+            }
+        }
+
+        return null;
+    }
+
+    private function exportWhitelist(Whitelist $whitelist, OutputInterface $output): string
+    {
+        $cloner = new VarCloner();
+        $cloner->setMaxItems(-1);
+        $cloner->setMaxString(-1);
+
+        $cliDumper = new CliDumper();
+        if ($output->isDecorated()) {
+            $cliDumper->setColors(true);
+        }
+
+        return $cliDumper->dump(
+            $cloner->cloneVar($whitelist),
+            true
+        );
     }
 }
