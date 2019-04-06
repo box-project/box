@@ -197,6 +197,12 @@ PHP
             $actual
         );
 
+        $actual = preg_replace(
+            '/ \{#\d{3,}/',
+            ' {#140',
+            $actual
+        );
+
         $expectedPath = $this->tmp.'/index.php';
 
         $expected = <<<OUTPUT
@@ -220,6 +226,24 @@ Processed contents:
 namespace _Prefix;
 
 echo '!dlrow olleH';
+
+"""
+
+Whitelist:
+
+"""
+Humbug\PhpScoper\Whitelist {#140
+  -original: []
+  -symbols: []
+  -constants: []
+  -namespaces: []
+  -patterns: []
+  -whitelistGlobalConstants: true
+  -whitelistGlobalClasses: true
+  -whitelistGlobalFunctions: true
+  -whitelistedFunctions: []
+  -whitelistedClasses: []
+}
 
 """
 
