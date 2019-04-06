@@ -15,6 +15,7 @@ env:
 addons:
   apt:
     packages:
+      - libev
       - libuv.dev
 
 matrix:
