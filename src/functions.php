@@ -91,8 +91,12 @@ function get_phar_signing_algorithms(): array
     return $algorithms;
 }
 
-function format_size(int $size): string
+function format_size(int $size, int $decimals = 2): string
 {
+    if (-1 === $size) {
+        return '-1';
+    }
+
     $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
     $power = $size > 0 ? (int) floor(log($size, 1024)) : 0;
@@ -101,7 +105,7 @@ function format_size(int $size): string
         '%s%s',
         number_format(
             $size / (1024 ** $power),
-            2,
+            $decimals,
             '.',
             ','
         ),

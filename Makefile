@@ -1,5 +1,6 @@
 .DEFAULT_GOAL := help
 
+OS := $(shell uname)
 PHPNOGC=php -d zend.enable_gc=0
 
 .PHONY: help
@@ -83,7 +84,7 @@ tm:	$(TU_BOX_DEPS)
 
 .PHONY: e2e
 e2e:			 ## Runs all the end-to-end tests
-e2e: e2e_scoper_alias e2e_scoper_whitelist e2e_check_requirements
+e2e: php_settings_checker e2e_scoper_alias e2e_scoper_whitelist e2e_check_requirements
 
 .PHONY: e2e_scoper_alias
 e2e_scoper_alias: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the prefix alias is working
@@ -107,8 +108,7 @@ DOCKER=docker run -i --rm -w /opt/box
 PHP7PHAR=box_php72 php index.phar -vvv --no-ansi
 PHP5PHAR=box_php53 php index.phar -vvv --no-ansi
 e2e_check_requirements:	 ## Runs the end-to-end tests for the check requirements feature
-#e2e_check_requirements: box
-e2e_check_requirements:
+e2e_check_requirements: box
 	./.docker/build
 
 	#
@@ -182,6 +182,66 @@ e2e_check_requirements:
 	rm fixtures/check-requirements/fail-complete/actual-output || true
 	$(DOCKER) -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP7PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
 	diff fixtures/check-requirements/fail-complete/expected-output-72 fixtures/check-requirements/fail-complete/actual-output
+
+BOX_COMPILE=bin/box compile --working-dir=fixtures/php-settings-checker -vvv --no-ansi
+ifeq ($(OS),Darwin)
+	SED = sed -i ''
+else
+	SED = sed -i
+endif
+.PHONY: php_settings_checker
+php_settings_checker:	 ## Runs the end-to-end tests for the PHP settings handler
+php_settings_checker: vendor
+	./.docker/build
+
+	# No restart needed
+	$(DOCKER) -v "$$PWD":/opt/box box_php72 \
+		php -dphar.readonly=0 -dmemory_limit=-1 \
+		$(BOX_COMPILE) \
+		| grep '\[debug\]' \
+		| tee fixtures/php-settings-checker/actual-output || true
+	diff fixtures/php-settings-checker/output-all-clear fixtures/php-settings-checker/actual-output
+
+	# Xdebug enabled: restart needed
+	$(DOCKER) -v "$$PWD":/opt/box box_php72_xdebug \
+		php -dphar.readonly=0 -dmemory_limit=-1 \
+		$(BOX_COMPILE) \
+		| grep '\[debug\]' \
+		| tee fixtures/php-settings-checker/actual-output || true
+	$(SED) "s/'-c' '.*' 'bin\/box'/'-c' '\/tmp-file' 'bin\/box'/" \
+		fixtures/php-settings-checker/actual-output
+	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
+	diff fixtures/php-settings-checker/output-xdebug-enabled fixtures/php-settings-checker/actual-output
+
+	# phar.readonly enabled: restart needed
+	$(DOCKER) -v "$$PWD":/opt/box box_php72 \
+		php -dphar.readonly=1 -dmemory_limit=-1 \
+		$(BOX_COMPILE) \
+		| grep '\[debug\]' \
+		| tee fixtures/php-settings-checker/actual-output || true
+	$(SED) "s/'-c' '.*' 'bin\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
+	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
+	diff fixtures/php-settings-checker/output-pharreadonly-enabled fixtures/php-settings-checker/actual-output
+
+	# Bump min memory limit if necessary
+	$(DOCKER) -v "$$PWD":/opt/box box_php72 \
+		php -dphar.readonly=0 -dmemory_limit=124M \
+		$(BOX_COMPILE) \
+		| grep '\[debug\]' \
+		| tee fixtures/php-settings-checker/actual-output || true
+	$(SED) "s/'-c' '.*' 'bin\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
+	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
+	diff fixtures/php-settings-checker/output-min-memory-limit fixtures/php-settings-checker/actual-output
+
+	# Bump min memory limit if necessary
+	$(DOCKER) -e BOX_MEMORY_LIMIT=64M -v "$$PWD":/opt/box box_php72 \
+		php -dphar.readonly=0 -dmemory_limit=1024M \
+		$(BOX_COMPILE) \
+		| grep '\[debug\]' \
+		| tee fixtures/php-settings-checker/actual-output || true
+	$(SED) "s/'-c' '.*' 'bin\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
+	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
+	diff fixtures/php-settings-checker/output-set-memory-limit fixtures/php-settings-checker/actual-output
 
 .PHONY: blackfire
 blackfire:		 ## Profiles the compile step

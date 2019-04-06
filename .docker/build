@@ -14,3 +14,7 @@ fi
 if [[ "$(docker images -q box_php72 2> /dev/null)" == "" ]]; then
     $DOCKER build -t box_php72 -f "$PWD/.docker/php72" .
 fi
+
+if [[ "$(docker images -q box_php72_xdebug 2> /dev/null)" == "" ]]; then
+    $DOCKER build -t box_php72_xdebug -f "$PWD/.docker/php72_xdebug" .
+fi

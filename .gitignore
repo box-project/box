@@ -19,6 +19,9 @@
 /fixtures/check-requirements/*/actual-output
 /fixtures/check-requirements/*/expected-output-*
 /fixtures/check-requirements/*/*.phar
+/fixtures/php-settings-checker/*
+!/fixtures/php-settings-checker/index.php
+!/fixtures/php-settings-checker/output-*
 /.phpunit*
 /.requirement-checker/
 /requirement-checker/bin/*
