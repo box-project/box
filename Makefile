@@ -1,5 +1,6 @@
 .DEFAULT_GOAL := help
 
+OS := $(shell uname)
 PHPNOGC=php -d zend.enable_gc=0
 
 .PHONY: help
@@ -183,9 +184,14 @@ e2e_check_requirements: box
 	diff fixtures/check-requirements/fail-complete/expected-output-72 fixtures/check-requirements/fail-complete/actual-output
 
 BOX_COMPILE=bin/box compile --working-dir=fixtures/php-settings-checker -vvv --no-ansi
+ifeq ($(OS),Darwin)
+	SED = sed -i ''
+else
+	SED = sed -i
+endif
 .PHONY: php_settings_checker
 php_settings_checker:	 ## Runs the end-to-end tests for the PHP settings handler
-php_settings_checker:
+php_settings_checker: vendor
 	./.docker/build
 
 	# No restart needed
@@ -202,9 +208,9 @@ php_settings_checker:
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
 		| tee fixtures/php-settings-checker/actual-output || true
-	sed -i '' "s/'-c' '.*' 'bin\/box'/'-c' '\/tmp-file' 'bin\/box'/" \
+	$(SED) "s/'-c' '.*' 'bin\/box'/'-c' '\/tmp-file' 'bin\/box'/" \
 		fixtures/php-settings-checker/actual-output
-	sed -i '' "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
+	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
 	diff fixtures/php-settings-checker/output-xdebug-enabled fixtures/php-settings-checker/actual-output
 
 	# phar.readonly enabled: restart needed
@@ -213,8 +219,8 @@ php_settings_checker:
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
 		| tee fixtures/php-settings-checker/actual-output || true
-	sed -i '' "s/'-c' '.*' 'bin\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
-	sed -i '' "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
+	$(SED) "s/'-c' '.*' 'bin\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
+	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
 	diff fixtures/php-settings-checker/output-pharreadonly-enabled fixtures/php-settings-checker/actual-output
 
 	# Bump min memory limit if necessary
@@ -223,8 +229,8 @@ php_settings_checker:
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
 		| tee fixtures/php-settings-checker/actual-output || true
-	sed -i '' "s/'-c' '.*' 'bin\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
-	sed -i '' "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
+	$(SED) "s/'-c' '.*' 'bin\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
+	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
 	diff fixtures/php-settings-checker/output-min-memory-limit fixtures/php-settings-checker/actual-output
 
 	# Bump min memory limit if necessary
@@ -233,8 +239,8 @@ php_settings_checker:
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
 		| tee fixtures/php-settings-checker/actual-output || true
-	sed -i '' "s/'-c' '.*' 'bin\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
-	sed -i '' "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
+	$(SED) "s/'-c' '.*' 'bin\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
+	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
 	diff fixtures/php-settings-checker/output-set-memory-limit fixtures/php-settings-checker/actual-output
 
 .PHONY: blackfire
