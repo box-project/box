@@ -15,7 +15,7 @@ env:
 addons:
   apt:
     packages:
-      - libev
+      - libev.dev
       - libuv.dev
 
 matrix:
@@ -38,7 +38,6 @@ before_install:
         phpenv config-rm xdebug.ini || true
     fi
   - set -eo pipefail
-  - sudo apt-get install -y libxml2-dev
   - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
   - echo "extension = ev.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
   - echo "extension = uv.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
