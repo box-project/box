@@ -66,14 +66,11 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Traversable;
 
-///**
-// * @covers \KevinGH\Box\Console\Command\Compile
-// * @covers \KevinGH\Box\Console\MessageRenderer
-// * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
-// *                              can create undesirable side-effects.
-// */
 /**
- * @coversNothing
+ * @covers \KevinGH\Box\Console\Command\Compile
+ * @covers \KevinGH\Box\Console\MessageRenderer
+ * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
+ *                              can create undesirable side-effects.
  */
 class CompileTest extends CommandTestCase
 {
