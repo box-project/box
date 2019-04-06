@@ -84,7 +84,7 @@ tm:	$(TU_BOX_DEPS)
 
 .PHONY: e2e
 e2e:			 ## Runs all the end-to-end tests
-e2e: php_settings_checker e2e_scoper_alias e2e_scoper_whitelist e2e_check_requirements
+e2e: e2e_php_settings_checker e2e_scoper_alias e2e_scoper_whitelist e2e_check_requirements e2e_symfony
 
 .PHONY: e2e_scoper_alias
 e2e_scoper_alias: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the prefix alias is working
@@ -189,9 +189,9 @@ ifeq ($(OS),Darwin)
 else
 	SED = sed -i
 endif
-.PHONY: php_settings_checker
-php_settings_checker:	 ## Runs the end-to-end tests for the PHP settings handler
-php_settings_checker: vendor
+.PHONY: e2e_php_settings_checker
+e2e_php_settings_checker: ## Runs the end-to-end tests for the PHP settings handler
+e2e_php_settings_checker: vendor
 	./.docker/build
 
 	# No restart needed
@@ -242,6 +242,18 @@ php_settings_checker: vendor
 	$(SED) "s/'-c' '.*' 'bin\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
 	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
 	diff fixtures/php-settings-checker/output-set-memory-limit fixtures/php-settings-checker/actual-output
+
+.PHONY: e2e_symfony
+e2e_symfony:		 ## Packages a fresh Symfony app
+# TODO: add box as a dep
+e2e_symfony: fixtures/build/dir012/vendor
+	php fixtures/build/dir012/bin/console --version > fixtures/build/dir012/expected-output
+
+	bin/box compile --working-dir fixtures/build/dir012
+
+	php fixtures/build/dir012/bin/console.phar --version > fixtures/build/dir012/actual-output
+
+	diff fixtures/build/dir012/expected-output fixtures/build/dir012/actual-output
 
 .PHONY: blackfire
 blackfire:		 ## Profiles the compile step
@@ -314,6 +326,10 @@ fixtures/composer-dump/dir003/vendor: fixtures/composer-dump/dir003/composer.loc
 
 fixtures/build/dir011/vendor:
 	composer install --working-dir fixtures/build/dir011
+	touch $@
+
+fixtures/build/dir012/vendor:
+	composer install --working-dir fixtures/build/dir012
 	touch $@
 
 .PHONY: fixtures/default_stub.php
