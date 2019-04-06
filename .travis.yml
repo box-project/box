@@ -12,6 +12,12 @@ cache:
 env:
   - COMPOSER_FLAGS='--no-interaction --no-progress --no-suggest --prefer-dist'
 
+addons:
+  apt:
+    packages:
+      - libev
+      - libuv
+
 matrix:
   include:
     - php: '7.1'
@@ -32,6 +38,7 @@ before_install:
         phpenv config-rm xdebug.ini || true
     fi
   - set -eo pipefail
+  - sudo apt-get install -y libxml2-dev
   - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
   - echo "extension = ev.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
   - echo "extension = uv.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
