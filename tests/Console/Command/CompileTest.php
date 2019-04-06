@@ -39,7 +39,9 @@ use function KevinGH\Box\FileSystem\mirror;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\FileSystem\touch;
+use function KevinGH\Box\format_size;
 use function KevinGH\Box\get_box_version;
+use function KevinGH\Box\memory_to_bytes;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use function mt_getrandmax;
@@ -64,11 +66,14 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Traversable;
 
+///**
+// * @covers \KevinGH\Box\Console\Command\Compile
+// * @covers \KevinGH\Box\Console\MessageRenderer
+// * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
+// *                              can create undesirable side-effects.
+// */
 /**
- * @covers \KevinGH\Box\Console\Command\Compile
- * @covers \KevinGH\Box\Console\MessageRenderer
- * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
- *                              can create undesirable side-effects.
+ * @coversNothing
  */
 class CompileTest extends CommandTestCase
 {
@@ -1051,9 +1056,15 @@ JSON
             $xdebugLog = '[debug] The xdebug extension is not loaded';
         }
 
+        $memoryLog = sprintf(
+            '[debug] Current memory limit: "%s"',
+            format_size(memory_to_bytes(trim(ini_get('memory_limit'))), 0)
+        );
+
         $expected = <<<OUTPUT
 [debug] Checking BOX_ALLOW_XDEBUG
 $xdebugLog
+$memoryLog
 [debug] Disabled parallel processing
 
     ____
