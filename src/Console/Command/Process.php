@@ -153,6 +153,7 @@ final class Process extends ConfigurableCommand
 
             if (null !== $whitelist) {
                 $io->writeln([
+                    '',
                     'Whitelist:',
                     '',
                     '<comment>"""</comment>',
