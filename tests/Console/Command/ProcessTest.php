@@ -232,7 +232,7 @@ echo '!dlrow olleH';
 Whitelist:
 
 """
-Humbug\PhpScoper\Whitelist {#100
+Humbug\PhpScoper\Whitelist {#140
   -original: []
   -symbols: []
   -constants: []
