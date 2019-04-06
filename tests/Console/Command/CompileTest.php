@@ -22,7 +22,9 @@ use function exec;
 use function extension_loaded;
 use function file_get_contents;
 use Generator;
+use function get_loaded_extensions;
 use function Humbug\get_contents;
+use function implode;
 use InvalidArgumentException;
 use function iterator_to_array;
 use function json_decode;
@@ -43,6 +45,7 @@ use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use function mt_getrandmax;
 use Phar;
 use PharFileInfo;
+use const PHP_VERSION;
 use function phpversion;
 use function preg_match;
 use function preg_quote;
@@ -1120,6 +1123,11 @@ OUTPUT;
         $expectedDumpedConfig = <<<'EOF'
 //
 // Processed content of the configuration file "/path/to/box.json" dumped for debugging purposes
+//
+// PHP Version: 10.0.0
+// PHP extensions: Core,date
+// Command: bin/phpunit
+// Box: 3.x-dev@27df576
 // Time: 2018-05-24T20:59:15+00:00
 //
 
@@ -1183,12 +1191,54 @@ EOF;
             file_contents('.box_dump/.box_configuration')
         );
 
+        // Replace objects IDs
         $actualDumpedConfig = preg_replace(
             '/ \{#\d{3,}/',
             ' {#140',
             $actualDumpedConfig
         );
 
+        // Replace the expected PHP version
+        $actualDumpedConfig = str_replace(
+            sprintf(
+                'PHP Version: %s',
+                PHP_VERSION
+            ),
+            'PHP Version: 10.0.0',
+            $actualDumpedConfig
+        );
+
+        // Replace the expected PHP extensions
+        $actualDumpedConfig = str_replace(
+            sprintf(
+                'PHP extensions: %s',
+                implode(',', get_loaded_extensions())
+            ),
+            'PHP extensions: Core,date',
+            $actualDumpedConfig
+        );
+
+        // Replace the expected command
+        $actualDumpedConfig = str_replace(
+            sprintf(
+                'Command: %s',
+                implode(' ', $GLOBALS['argv'])
+            ),
+            'Command: bin/phpunit',
+            $actualDumpedConfig
+        );
+
+        // Replace the expected Box version
+        $actualDumpedConfig = str_replace(
+            sprintf(
+                'Box: %s',
+                get_box_version()
+            ),
+            'Box: 3.x-dev@27df576',
+            $actualDumpedConfig
+        );
+
+        // Replace the expected time
         $actualDumpedConfig = preg_replace(
             '/Time: \d{4,}-\d{2,}-\d{2,}T\d{2,}:\d{2,}:\d{2,}\+\d{2,}:\d{2,}/',
             'Time: 2018-05-24T20:59:15+00:00',

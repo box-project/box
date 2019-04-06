@@ -29,6 +29,7 @@ use function file_exists;
 use function filesize;
 use function function_exists;
 use function get_class;
+use function get_loaded_extensions;
 use function implode;
 use function is_string;
 use KevinGH\Box\Box;
@@ -46,6 +47,7 @@ use function KevinGH\Box\FileSystem\make_path_relative;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\format_size;
+use function KevinGH\Box\get_box_version;
 use function KevinGH\Box\get_phar_compression_algorithms;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\PhpSettingsHandler;
@@ -55,6 +57,7 @@ use function memory_get_peak_usage;
 use function memory_get_usage;
 use function microtime;
 use const PHP_EOL;
+use const PHP_VERSION;
 use function posix_getrlimit;
 use const POSIX_RLIMIT_INFINITY;
 use const POSIX_RLIMIT_NOFILE;
@@ -273,11 +276,21 @@ HELP;
 
             remove(self::DEBUG_DIR);
 
+            $phpVersion = PHP_VERSION;
+            $phpExtensions = implode(',', get_loaded_extensions());
+            $command = implode(' ', $GLOBALS['argv']);
+            $boxVersion = get_box_version();
+
             dump_file(
                 self::DEBUG_DIR.'/.box_configuration',
                 <<<EOF
 //
 // Processed content of the configuration file "$file" dumped for debugging purposes
+//
+// PHP Version: $phpVersion
+// PHP extensions: $phpExtensions
+// Command: $command
+// Box: $boxVersion
 // Time: $date
 //
 
