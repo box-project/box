@@ -87,6 +87,7 @@ ASCII;
         $commands[] = new Command\Diff();
         $commands[] = new Command\Info();
         $commands[] = new Command\Process();
+        $commands[] = new Command\Extract();
         $commands[] = new Command\Validate();
         $commands[] = new Command\Verify();
         $commands[] = new Command\GenerateDockerFile();
