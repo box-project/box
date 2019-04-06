@@ -197,6 +197,12 @@ PHP
             $actual
         );
 
+        $actual = preg_replace(
+            '/ \{#\d{3,}/',
+            ' {#140',
+            $actual
+        );
+
         $expectedPath = $this->tmp.'/index.php';
 
         $expected = <<<OUTPUT
@@ -226,7 +232,7 @@ echo '!dlrow olleH';
 Whitelist:
 
 """
-Humbug\PhpScoper\Whitelist {#477
+Humbug\PhpScoper\Whitelist {#100
   -original: []
   -symbols: []
   -constants: []
