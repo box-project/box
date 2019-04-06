@@ -14,8 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
+use Composer\Console\Application;
 use Composer\Factory;
-use Composer\IO\NullIO;
+use Composer\IO\BufferIO;
 use Composer\Repository\InstalledRepositoryInterface;
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use Humbug\PhpScoper\Whitelist;
@@ -25,6 +26,10 @@ use const PHP_EOL;
 use function preg_replace;
 use RuntimeException;
 use function str_replace;
+use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 
 /**
@@ -36,10 +41,21 @@ final class ComposerOrchestrator
     {
     }
 
-    public static function dumpAutoload(Whitelist $whitelist, string $prefix): void
-    {
+    public static function dumpAutoload(
+        Whitelist $whitelist,
+        string $prefix,
+        bool $excludeDevFiles,
+        SymfonyStyle $io = null
+    ): void {
+        if (null === $io) {
+            $io = new SymfonyStyle(
+                new StringInput(''),
+                new NullOutput()
+            );
+        }
+
         try {
-            $composer = Factory::create(new NullIO(), null, true);
+            $composer = Factory::create($composerIO = new BufferIO('', $io->getVerbosity()));
 
             $installationManager = $composer->getInstallationManager();
             /** @var InstalledRepositoryInterface $localRepository */
@@ -48,10 +64,13 @@ final class ComposerOrchestrator
             $composerConfig = $composer->getConfig();
 
             $generator = $composer->getAutoloadGenerator();
-            $generator->setDevMode(false);
+            $generator->setDevMode(false === $excludeDevFiles);
             $generator->setClassMapAuthoritative(true);
-
             $generator->dump($composerConfig, $localRepository, $package, $installationManager, 'composer', true);
+
+            $composer = new Application();
+            $composer->setAutoExit(false);
+            $composer->setCatchExceptions(false);
 
             if ('' !== $prefix) {
                 $autoloadFile = $composerConfig->get('vendor-dir').'/autoload.php';
@@ -64,6 +83,8 @@ final class ComposerOrchestrator
 
                 dump_file($autoloadFile, $autoloadContents);
             }
+
+            $io->writeln($composerIO->getOutput(), OutputInterface::VERBOSITY_DEBUG);
         } catch (Throwable $throwable) {
             throw new RuntimeException(
                 'Could not dump the autoload: '.$throwable->getMessage(),

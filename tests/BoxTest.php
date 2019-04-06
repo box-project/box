@@ -121,7 +121,7 @@ class BoxTest extends FileSystemTestCase
     public function test_it_cannot_end_the_buffering_if_it_is_already_ended(): void
     {
         try {
-            $this->box->endBuffering(false);
+            $this->box->endBuffering(false, true);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -132,10 +132,10 @@ class BoxTest extends FileSystemTestCase
         }
 
         $this->box->startBuffering();
-        $this->box->endBuffering(false);
+        $this->box->endBuffering(false, true);
 
         try {
-            $this->box->endBuffering(false);
+            $this->box->endBuffering(false, true);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -155,7 +155,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file);
-        $this->box->endBuffering(false);
+        $this->box->endBuffering(false, true);
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
@@ -174,7 +174,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file0, $file0Contents);
-        $this->box->endBuffering(false);
+        $this->box->endBuffering(false, true);
 
         $expectedContents = $file0Contents;
         $expectedPharPath = 'phar://test.phar/'.$file0;
@@ -190,7 +190,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file1, $file1Contents);
-        $this->box->endBuffering(false);
+        $this->box->endBuffering(false, true);
 
         $expectedContents = $file1Contents;
         $expectedPharPath = 'phar://test.phar/'.$file1;
@@ -228,7 +228,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file, $contents);
-        $this->box->endBuffering(false);
+        $this->box->endBuffering(false, true);
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
@@ -249,7 +249,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file, $contents);
-        $this->box->endBuffering(false);
+        $this->box->endBuffering(false, true);
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
@@ -268,7 +268,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file, $contents, true);
-        $this->box->endBuffering(false);
+        $this->box->endBuffering(false, true);
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
@@ -289,7 +289,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file, $contents, true);
-        $this->box->endBuffering(false);
+        $this->box->endBuffering(false, true);
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
@@ -311,7 +311,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file);
-        $this->box->endBuffering(false);
+        $this->box->endBuffering(false, true);
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$relativePath;
@@ -342,7 +342,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file);
-        $this->box->endBuffering(false);
+        $this->box->endBuffering(false, true);
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$localPath;
@@ -365,7 +365,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file, null, true);
-        $this->box->endBuffering(false);
+        $this->box->endBuffering(false, true);
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
@@ -396,7 +396,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file, null, true);
-        $this->box->endBuffering(false);
+        $this->box->endBuffering(false, true);
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$localPath;
@@ -439,7 +439,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file);
-        $this->box->endBuffering(false);
+        $this->box->endBuffering(false, true);
 
         $expectedContents = $secondCompactorOutput;
         $expectedPharPath = 'phar://test.phar/'.$file;
@@ -478,7 +478,7 @@ class BoxTest extends FileSystemTestCase
 
             $this->box->startBuffering();
             $local = $this->box->addFile($file);
-            $this->box->endBuffering(false);
+            $this->box->endBuffering(false, true);
 
             $this->assertSame($expectedLocal, $local);
 
@@ -525,7 +525,7 @@ class BoxTest extends FileSystemTestCase
         try {
             $this->box->startBuffering();
             $this->box->addFile($file);
-            $this->box->endBuffering(false);
+            $this->box->endBuffering(false, true);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -569,7 +569,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file, $contents);
-        $this->box->endBuffering(false);
+        $this->box->endBuffering(false, true);
 
         $expectedContents = $secondCompactorOutput;
         $expectedPharPath = 'phar://test.phar/'.$file;
@@ -597,7 +597,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFiles(['foo', 'bar'], false);
-        $this->box->endBuffering(false);
+        $this->box->endBuffering(false, true);
 
         foreach ($files as $file => $contents) {
             $expectedContents = $contents;
@@ -647,7 +647,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFiles([$f1, $f2], false);
-        $this->box->endBuffering(false);
+        $this->box->endBuffering(false, true);
 
         foreach ($files as $file => $contents) {
             $expectedContents = $contents;
@@ -689,7 +689,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFiles(['foo', 'bar'], false);
-        $this->box->endBuffering(false);
+        $this->box->endBuffering(false, true);
 
         foreach ($files as $file => $item) {
             $expectedContents = $item['contents'];
@@ -717,7 +717,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFiles(array_keys($files), false);
-        $this->box->endBuffering(true);
+        $this->box->endBuffering(true, true);
 
         foreach ($files as $file => $contents) {
             $expectedContents = $contents;
@@ -738,7 +738,7 @@ class BoxTest extends FileSystemTestCase
         try {
             $this->box->startBuffering();
             $this->box->addFiles([], false);
-            $this->box->endBuffering(true);
+            $this->box->endBuffering(true, true);
 
             $this->fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
@@ -765,7 +765,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFiles(array_keys($files), true);
-        $this->box->endBuffering(true);
+        $this->box->endBuffering(true, true);
 
         foreach ($files as $file => $contents) {
             $this->assertFileExists('phar://test.phar/'.$file);
@@ -799,7 +799,7 @@ JSON
 
         $this->box->startBuffering();
         $this->box->addFiles(array_keys($files), true);
-        $this->box->endBuffering(true);
+        $this->box->endBuffering(true, true);
 
         foreach ($files as $file => $contents) {
             $this->assertFileExists('phar://test.phar/'.$file);
@@ -835,7 +835,7 @@ JSON
 
         $this->box->startBuffering();
         $this->box->addFiles(array_keys($files), true);
-        $this->box->endBuffering(false);
+        $this->box->endBuffering(false, true);
 
         foreach ($files as $file => $contents) {
             $this->assertFileExists('phar://test.phar/lib/'.$file);
@@ -879,7 +879,7 @@ JSON
         );
 
         try {
-            $this->box->endBuffering(true);
+            $this->box->endBuffering(true, true);
 
             $this->fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
@@ -910,7 +910,7 @@ JSON
 
         $this->box->startBuffering();
         $this->box->addFiles(['foo', 'bar'], true);
-        $this->box->endBuffering(false);
+        $this->box->endBuffering(false, true);
 
         foreach ($files as $file => $contents) {
             $expectedContents = $contents;
@@ -952,7 +952,7 @@ JSON
 
         $this->box->startBuffering();
         $this->box->addFiles(['foo', 'bar'], true);
-        $this->box->endBuffering(false);
+        $this->box->endBuffering(false, true);
 
         foreach ($files as $file => $item) {
             $expectedContents = $item['contents'];
@@ -989,7 +989,7 @@ JSON
 
         $this->box->startBuffering();
         $this->box->addFiles(array_keys($files), false);
-        $this->box->endBuffering(false);
+        $this->box->endBuffering(false, true);
 
         $expected = [
             'foo' => 'foo_value',
@@ -1032,7 +1032,7 @@ JSON
 
         $this->box->startBuffering();
         $this->box->addFiles(array_keys($files), true);
-        $this->box->endBuffering(false);
+        $this->box->endBuffering(false, true);
 
         foreach ($files as $expectedLocal) {
             $this->assertFileExists(
@@ -1391,7 +1391,7 @@ __HALT_COMPILER(); ?>
 PHP
         );
 
-        $this->box->endBuffering(false);
+        $this->box->endBuffering(false, true);
 
         $this->assertCount(2, $this->box);
 

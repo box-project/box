@@ -47,6 +47,9 @@ use RecursiveDirectoryIterator;
 use RuntimeException;
 use SplFileInfo;
 use function sprintf;
+use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Box is a utility class to generate a PHAR.
@@ -108,9 +111,16 @@ final class Box implements Countable
         $this->phar->startBuffering();
     }
 
-    public function endBuffering(bool $dumpAutoload): void
+    public function endBuffering(bool $dumpAutoload, bool $excludeDevFiles, SymfonyStyle $io = null): void
     {
         Assertion::true($this->buffering, 'The buffering must be started before ending it');
+
+        if (null === $io) {
+            $io = new SymfonyStyle(
+                new StringInput(''),
+                new NullOutput()
+            );
+        }
 
         $cwd = getcwd();
 
@@ -130,7 +140,12 @@ final class Box implements Countable
 
             if ($dumpAutoload) {
                 // Dump autoload without dev dependencies
-                ComposerOrchestrator::dumpAutoload($this->scoper->getWhitelist(), $this->scoper->getPrefix());
+                ComposerOrchestrator::dumpAutoload(
+                    $this->scoper->getWhitelist(),
+                    $this->scoper->getPrefix(),
+                    $excludeDevFiles,
+                    $io
+                );
             }
 
             chdir($cwd);

@@ -37,6 +37,11 @@ final class CompileLogger
         $this->io = $io;
     }
 
+    public function getIO(): SymfonyStyle
+    {
+        return $this->io;
+    }
+
     public function log(string $prefix, string $message, int $verbosity = OutputInterface::OUTPUT_NORMAL): void
     {
         switch ($prefix) {
