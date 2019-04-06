@@ -356,7 +356,6 @@ BANNER;
             $composerFiles,
             $autodiscoverFiles,
             $forceFilesAutodiscovery,
-            $dumpAutoload,
             $logger
         );
         $binaryFilesAggregate = self::collectBinaryFiles(
@@ -994,7 +993,6 @@ BANNER;
         ComposerFiles $composerFiles,
         bool $autodiscoverFiles,
         bool $forceFilesAutodiscovery,
-        bool $dumpAutoload,
         ConfigurationLogger $logger
     ): array {
         $files = [self::retrieveFiles($raw, self::FILES_KEY, $basePath, $composerFiles, $alwaysExcludedPaths, $logger)];
