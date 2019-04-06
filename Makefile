@@ -56,7 +56,7 @@ tu: tu_requirement_checker tu_box
 
 .PHONY: tu_box
 tu_box:			 ## Runs the unit tests
-TU_BOX_DEPS = bin/phpunit fixtures/default_stub.php .requirement-checker fixtures/composer-dump/dir001/vendor
+TU_BOX_DEPS = bin/phpunit fixtures/default_stub.php .requirement-checker fixtures/composer-dump/dir001/vendor fixtures/composer-dump/dir003/vendor
 tu_box: $(TU_BOX_DEPS)
 	$(PHPNOGC) bin/phpunit
 
@@ -296,12 +296,20 @@ $(CODE_SNIFFER_FIX): vendor/bamarni
 	composer bin doctrine-cs install
 	touch $@
 
-fixtures/composer-dump/dir001/composer.lock:	fixtures/composer-dump/dir001/composer.json
+fixtures/composer-dump/dir001/composer.lock: fixtures/composer-dump/dir001/composer.json
 	composer install --working-dir fixtures/composer-dump/dir001
 	touch $@
 
-fixtures/composer-dump/dir001/vendor:	fixtures/composer-dump/dir001/composer.lock
+fixtures/composer-dump/dir003/composer.lock: fixtures/composer-dump/dir003/composer.json
+	composer install --working-dir fixtures/composer-dump/dir003
+	touch $@
+
+fixtures/composer-dump/dir001/vendor: fixtures/composer-dump/dir001/composer.lock
 	composer install --working-dir fixtures/composer-dump/dir001
+	touch $@
+
+fixtures/composer-dump/dir003/vendor: fixtures/composer-dump/dir003/composer.lock
+	composer install --working-dir fixtures/composer-dump/dir003
 	touch $@
 
 fixtures/build/dir011/vendor:
