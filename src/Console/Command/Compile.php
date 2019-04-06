@@ -582,7 +582,7 @@ EOF
 
         $logger->log(CompileLogger::QUESTION_MARK_PREFIX, $message);
 
-        $box->endBuffering($config->dumpAutoload());
+        $box->endBuffering($config->dumpAutoload(), $config->excludeDevFiles(), $logger->getIO());
     }
 
     private function checkComposerFiles(Box $box, Configuration $config, CompileLogger $logger): void
