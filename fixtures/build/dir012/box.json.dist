@@ -3,7 +3,8 @@
         ".env"
     ],
     "directories": [
-        "config"
+        "config",
+        "var"
     ],
     "force-autodiscovery": true,
     "check-requirements": false,
