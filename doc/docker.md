@@ -27,7 +27,7 @@ hands and tweak the `Dockerfile` to your needs.
 <br />
 <hr />
 
-« [PHAR code isolation](code-isolation.md#phar-code-isolation) • [Docker supports](symfony.md#symfony-support) »
+« [PHAR code isolation](code-isolation.md#phar-code-isolation) • [Symfony supports](symfony.md#symfony-support) »
 
 
 [docker]: https://www.docker.com/
