@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
-use Composer\Console\Application;
 use Composer\Factory;
 use Composer\IO\BufferIO;
 use Composer\Repository\InstalledRepositoryInterface;
@@ -54,8 +53,14 @@ final class ComposerOrchestrator
             );
         }
 
+        $composerIO = new BufferIO(
+            '',
+            $io->getVerbosity(),
+            $io->getFormatter()
+        );
+
         try {
-            $composer = Factory::create($composerIO = new BufferIO('', $io->getVerbosity()));
+            $composer = Factory::create($composerIO);
 
             $installationManager = $composer->getInstallationManager();
             /** @var InstalledRepositoryInterface $localRepository */
@@ -65,12 +70,9 @@ final class ComposerOrchestrator
 
             $generator = $composer->getAutoloadGenerator();
             $generator->setDevMode(false === $excludeDevFiles);
+            $generator->setRunScripts(true);
             $generator->setClassMapAuthoritative(true);
             $generator->dump($composerConfig, $localRepository, $package, $installationManager, 'composer', true);
-
-            $composer = new Application();
-            $composer->setAutoExit(false);
-            $composer->setCatchExceptions(false);
 
             if ('' !== $prefix) {
                 $autoloadFile = $composerConfig->get('vendor-dir').'/autoload.php';
@@ -86,6 +88,8 @@ final class ComposerOrchestrator
 
             $io->writeln($composerIO->getOutput(), OutputInterface::VERBOSITY_DEBUG);
         } catch (Throwable $throwable) {
+            $io->writeln($composerIO->getOutput());
+
             throw new RuntimeException(
                 'Could not dump the autoload: '.$throwable->getMessage(),
                 $throwable->getCode(),

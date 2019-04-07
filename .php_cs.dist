@@ -76,6 +76,7 @@ $config = PhpCsFixer\Config::create()
             ->append(['bin/box'])
             ->notName('default_stub.php')
             ->exclude('check-requirements')
+            ->exclude('fixtures/build/dir012/var/cache')
     )
 ;
 
