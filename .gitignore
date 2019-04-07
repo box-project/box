@@ -17,7 +17,8 @@
 /fixtures/build/dir011/*output
 /fixtures/build/dir011/phar-Y.php
 /fixtures/build/dir012/bin/console.phar
-/fixtures/build/dir012/bin/*-output
+/fixtures/build/dir012/actual-output
+/fixtures/build/dir012/expected-output
 /fixtures/check-requirements/*/actual-output
 /fixtures/check-requirements/*/expected-output-*
 /fixtures/check-requirements/*/*.phar
