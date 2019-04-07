@@ -15,7 +15,7 @@
         }
     ],
 
-    "bin": "bin/box",
+    "bin": ["bin/box"],
     "autoload": {
         "psr-4": {
             "KevinGH\\Box\\": "src"
