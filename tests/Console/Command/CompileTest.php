@@ -100,6 +100,8 @@ class CompileTest extends CommandTestCase
                 return parent::execute($input, $options);
             }
         };
+
+        remove(self::FIXTURES_DIR.'/dir010/index.phar');
     }
 
     /**

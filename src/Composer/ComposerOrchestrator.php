@@ -14,9 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
-use Composer\Factory;
-use Composer\IO\BufferIO;
-use Composer\Repository\InstalledRepositoryInterface;
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use Humbug\PhpScoper\Whitelist;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -29,7 +26,9 @@ use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Throwable;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\ExecutableFinder;
+use Symfony\Component\Process\Process;
 
 /**
  * @private
@@ -53,48 +52,20 @@ final class ComposerOrchestrator
             );
         }
 
-        $composerIO = new BufferIO(
-            '',
-            $io->getVerbosity(),
-            $io->getFormatter()
-        );
+        $composerExecutable = self::retrieveComposerExecutable();
 
-        try {
-            $composer = Factory::create($composerIO);
+        self::dumpAutoloader($composerExecutable, true === $excludeDevFiles, $io);
 
-            $installationManager = $composer->getInstallationManager();
-            /** @var InstalledRepositoryInterface $localRepository */
-            $localRepository = $composer->getRepositoryManager()->getLocalRepository();
-            $package = $composer->getPackage();
-            $composerConfig = $composer->getConfig();
+        if ('' !== $prefix) {
+            $autoloadFile = self::retrieveAutoloadFile($composerExecutable, $io);
 
-            $generator = $composer->getAutoloadGenerator();
-            $generator->setDevMode(false === $excludeDevFiles);
-            $generator->setRunScripts(true);
-            $generator->setClassMapAuthoritative(true);
-            $generator->dump($composerConfig, $localRepository, $package, $installationManager, 'composer', true);
-
-            if ('' !== $prefix) {
-                $autoloadFile = $composerConfig->get('vendor-dir').'/autoload.php';
-
-                $autoloadContents = self::generateAutoloadStatements(
-                    $whitelist,
-                    $prefix,
-                    file_contents($autoloadFile)
-                );
-
-                dump_file($autoloadFile, $autoloadContents);
-            }
-
-            $io->writeln($composerIO->getOutput(), OutputInterface::VERBOSITY_DEBUG);
-        } catch (Throwable $throwable) {
-            $io->writeln($composerIO->getOutput());
-
-            throw new RuntimeException(
-                'Could not dump the autoload: '.$throwable->getMessage(),
-                $throwable->getCode(),
-                $throwable
+            $autoloadContents = self::generateAutoloadStatements(
+                $whitelist,
+                $prefix,
+                file_contents($autoloadFile)
             );
+
+            dump_file($autoloadFile, $autoloadContents);
         }
     }
 
@@ -131,5 +102,57 @@ final class ComposerOrchestrator
             PHP_EOL.PHP_EOL,
             $whitelistStatements
         );
+    }
+
+    private static function retrieveComposerExecutable(): string
+    {
+        $executableFinder = new ExecutableFinder();
+        $executableFinder->addSuffix('.phar');
+
+        return $executableFinder->find('composer');
+    }
+
+    private static function dumpAutoloader(string $composerExecutable, bool $noDev, SymfonyStyle $io): void
+    {
+        $composerCommand = [$composerExecutable, 'dump-autoload', '--classmap-authoritative'];
+
+        if (true === $noDev) {
+            $composerCommand[] = '--no-dev';
+        }
+
+        $dumpAutoloadProcess = new Process($composerCommand);
+
+        if ($io->isDecorated()) {
+            $dumpAutoloadProcess->setTty($io);
+        }
+
+        $dumpAutoloadProcess->run(static function ($type, $buffer) use ($io): void {
+            $io->writeln($buffer, OutputInterface::VERBOSITY_DEBUG);
+        });
+
+        if (false === $dumpAutoloadProcess->isSuccessful()) {
+            throw new RuntimeException(
+                'Could not dump the autoload',
+                0,
+                new ProcessFailedException($dumpAutoloadProcess)
+            );
+        }
+    }
+
+    private static function retrieveAutoloadFile(string $composerExecutable, SymfonyStyle $io): string
+    {
+        $vendorDirProcess = new Process([$composerExecutable, 'config', 'vendor-dir']);
+
+        if ($io->isDecorated()) {
+            $vendorDirProcess->setTty($io);
+        }
+
+        $vendorDirProcess->run();
+
+        if (false === $vendorDirProcess->isSuccessful()) {
+            new ProcessFailedException($vendorDirProcess);
+        }
+
+        return $vendorDirProcess->getOutput();
     }
 }

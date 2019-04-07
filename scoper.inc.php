@@ -160,6 +160,8 @@ return [
         __DIR__.'/vendor/composer/composer/src/Composer/Autoload/ClassLoader.php',
     ],
     'whitelist' => [
+        'Composer\*',
+
         \Composer\Autoload\ClassLoader::class,
 
         \Herrera\Box\Compactor\Json::class,
