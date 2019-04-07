@@ -41,6 +41,7 @@ use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\FileSystem\touch;
+use function KevinGH\Box\get_box_version;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\MapFile;
 use Phar;
@@ -3233,7 +3234,7 @@ COMMENT
     private function retrieveSchemaKeys(): array
     {
         $schema = json_decode(
-            file_contents(__DIR__.'/../res/schema.json'),
+            file_contents(__DIR__.'/../../res/schema.json'),
             true
         );
 
