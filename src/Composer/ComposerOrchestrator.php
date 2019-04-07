@@ -29,6 +29,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
+use function trim;
 
 /**
  * @private
@@ -132,7 +133,7 @@ final class ComposerOrchestrator
 
         if (false === $dumpAutoloadProcess->isSuccessful()) {
             throw new RuntimeException(
-                'Could not dump the autoload',
+                'Could not dump the autoloader.',
                 0,
                 new ProcessFailedException($dumpAutoloadProcess)
             );
@@ -153,6 +154,6 @@ final class ComposerOrchestrator
             new ProcessFailedException($vendorDirProcess);
         }
 
-        return $vendorDirProcess->getOutput();
+        return trim($vendorDirProcess->getOutput()).'/autoload.php';
     }
 }
