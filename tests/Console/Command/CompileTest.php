@@ -1014,7 +1014,14 @@ OUTPUT;
             (new PhpExecutableFinder())->find(),
             $expected
         );
+
         $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
+
+        $actual = preg_replace(
+            '/(\/.*?composer)/',
+            '/usr/local/bin/composer',
+            $actual
+        );
 
         $this->assertSame($expected, $actual);
     }
