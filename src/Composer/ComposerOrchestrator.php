@@ -53,15 +53,15 @@ final class ComposerOrchestrator
             );
         }
 
-        $composer = Factory::create(
-            $composerIO = new BufferIO(
-                '',
-                $io->getVerbosity(),
-                $io->getFormatter()
-            )
+        $composerIO = new BufferIO(
+            '',
+            $io->getVerbosity(),
+            $io->getFormatter()
         );
 
         try {
+            $composer = Factory::create($composerIO);
+
             $installationManager = $composer->getInstallationManager();
             /** @var InstalledRepositoryInterface $localRepository */
             $localRepository = $composer->getRepositoryManager()->getLocalRepository();
