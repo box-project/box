@@ -54,12 +54,14 @@ final class ComposerOrchestrator
             );
         }
 
+        $logger = new CompileLogger($io);
+
         $composerExecutable = self::retrieveComposerExecutable();
 
-        self::dumpAutoloader($composerExecutable, true === $excludeDevFiles, $io);
+        self::dumpAutoloader($composerExecutable, true === $excludeDevFiles, $logger);
 
         if ('' !== $prefix) {
-            $autoloadFile = self::retrieveAutoloadFile($composerExecutable, $io);
+            $autoloadFile = self::retrieveAutoloadFile($composerExecutable, $logger);
 
             $autoloadContents = self::generateAutoloadStatements(
                 $whitelist,
@@ -114,7 +116,7 @@ final class ComposerOrchestrator
         return $executableFinder->find('composer');
     }
 
-    private static function dumpAutoloader(string $composerExecutable, bool $noDev, SymfonyStyle $io): void
+    private static function dumpAutoloader(string $composerExecutable, bool $noDev, CompileLogger $logger): void
     {
         $composerCommand = [$composerExecutable, 'dump-autoload', '--classmap-authoritative'];
 
@@ -122,17 +124,17 @@ final class ComposerOrchestrator
             $composerCommand[] = '--no-dev';
         }
 
-        if (null !== $verbosity = self::retrieveSubProcessVerbosity($io)) {
+        if (null !== $verbosity = self::retrieveSubProcessVerbosity($logger->getIO())) {
             $composerCommand[] = $verbosity;
         }
 
-        if ($io->isDecorated()) {
+        if ($logger->getIO()->isDecorated()) {
             $composerCommand[] = '--ansi';
         }
 
         $dumpAutoloadProcess = new Process($composerCommand);
 
-        (new CompileLogger($io))->log(
+        $logger->log(
             CompileLogger::CHEVRON_PREFIX,
             $dumpAutoloadProcess->getCommandLine(),
             OutputInterface::VERBOSITY_VERBOSE
@@ -149,21 +151,29 @@ final class ComposerOrchestrator
         }
 
         if ('' !== $output = $dumpAutoloadProcess->getOutput()) {
-            $io->writeln($output, OutputInterface::VERBOSITY_VERBOSE);
+            $logger->getIO()->writeln($output, OutputInterface::VERBOSITY_VERBOSE);
         }
 
         if ('' !== $output = $dumpAutoloadProcess->getErrorOutput()) {
-            $io->writeln($output, OutputInterface::VERBOSITY_VERBOSE);
+            $logger->getIO()->writeln($output, OutputInterface::VERBOSITY_VERBOSE);
         }
     }
 
-    private static function retrieveAutoloadFile(string $composerExecutable, SymfonyStyle $io): string
+    private static function retrieveAutoloadFile(string $composerExecutable, CompileLogger $logger): string
     {
-        $vendorDirProcess = new Process([$composerExecutable, 'config', 'vendor-dir']);
+        $command = [$composerExecutable, 'config', 'vendor-dir'];
 
-        if ($io->isDecorated()) {
-            $vendorDirProcess->setTty($io);
+        if ($logger->getIO()->isDecorated()) {
+            $composerCommand[] = '--ansi';
         }
+
+        $vendorDirProcess = new Process($command);
+
+        $logger->log(
+            CompileLogger::CHEVRON_PREFIX,
+            $vendorDirProcess->getCommandLine(),
+            OutputInterface::VERBOSITY_VERBOSE
+        );
 
         $vendorDirProcess->run();
 
