@@ -41,6 +41,8 @@ dump-requirement-checker: requirement-checker requirement-checker/vendor
 
 	php bin/dump-requirements-checker.php
 
+	touch $@
+
 
 #
 # Tests
@@ -344,6 +346,7 @@ requirement-checker/tests/DisplayNormalizer.php: tests/Console/DisplayNormalizer
 
 .requirement-checker: requirement-checker
 	$(MAKE) dump-requirement-checker
+	touch $@
 
 requirement-checker/actual_terminal_diff: requirement-checker/src/Terminal.php vendor/symfony/console/Terminal.php
 	diff vendor/symfony/console/Terminal.php requirement-checker/src/Terminal.php > requirement-checker/actual_terminal_diff || true
@@ -366,3 +369,5 @@ box: bin src res vendor box.json.dist scoper.inc.php .requirement-checker
 	./box compile
 
 	rm bin/_box.phar
+
+	touch $@
