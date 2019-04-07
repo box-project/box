@@ -260,7 +260,7 @@ e2e_php_settings_checker: vendor
 .PHONY: e2e_symfony
 e2e_symfony:		 ## Packages a fresh Symfony app
 e2e_symfony: fixtures/build/dir012/vendor box
-	composer dump-env prod
+	composer dump-env prod --working-dir fixtures/build/dir012
 
 	APP_ENV=prod APP_DEBUG=0 php fixtures/build/dir012/bin/console --version > fixtures/build/dir012/expected-output
 	rm -rf fixtures/build/dir012/var/cache/prod/*
