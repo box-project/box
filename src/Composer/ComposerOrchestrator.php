@@ -16,6 +16,7 @@ namespace KevinGH\Box\Composer;
 
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use Humbug\PhpScoper\Whitelist;
+use KevinGH\Box\Console\Logger\CompileLogger;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
 use const PHP_EOL;
@@ -121,15 +122,23 @@ final class ComposerOrchestrator
             $composerCommand[] = '--no-dev';
         }
 
-        $dumpAutoloadProcess = new Process($composerCommand);
-
-        if ($io->isDecorated()) {
-            $dumpAutoloadProcess->setTty($io);
+        if (null !== $verbosity = self::retrieveSubProcessVerbosity($io)) {
+            $composerCommand[] = $verbosity;
         }
 
-        $dumpAutoloadProcess->run(static function ($type, $buffer) use ($io): void {
-            $io->writeln($buffer, OutputInterface::VERBOSITY_DEBUG);
-        });
+        if ($io->isDecorated()) {
+            $composerCommand[] = '--ansi';
+        }
+
+        $dumpAutoloadProcess = new Process($composerCommand);
+
+        (new CompileLogger($io))->log(
+            CompileLogger::CHEVRON_PREFIX,
+            $dumpAutoloadProcess->getCommandLine(),
+            OutputInterface::VERBOSITY_VERBOSE
+        );
+
+        $dumpAutoloadProcess->run();
 
         if (false === $dumpAutoloadProcess->isSuccessful()) {
             throw new RuntimeException(
@@ -137,6 +146,14 @@ final class ComposerOrchestrator
                 0,
                 new ProcessFailedException($dumpAutoloadProcess)
             );
+        }
+
+        if ('' !== $output = $dumpAutoloadProcess->getOutput()) {
+            $io->writeln($output, OutputInterface::VERBOSITY_VERBOSE);
+        }
+
+        if ('' !== $output = $dumpAutoloadProcess->getErrorOutput()) {
+            $io->writeln($output, OutputInterface::VERBOSITY_VERBOSE);
         }
     }
 
@@ -155,5 +172,18 @@ final class ComposerOrchestrator
         }
 
         return trim($vendorDirProcess->getOutput()).'/autoload.php';
+    }
+
+    private static function retrieveSubProcessVerbosity(SymfonyStyle $io): ?string
+    {
+        if ($io->isDebug()) {
+            return '-vvv';
+        }
+
+        if ($io->isVeryVerbose()) {
+            return '-v';
+        }
+
+        return null;
     }
 }
