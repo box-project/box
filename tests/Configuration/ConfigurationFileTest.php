@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box;
+namespace KevinGH\Box\Configuration;
 
 use function chdir;
 use const DIRECTORY_SEPARATOR;
@@ -20,6 +20,7 @@ use Generator;
 use function Humbug\get_contents;
 use function Humbug\PhpScoper\json_decode;
 use InvalidArgumentException;
+use KevinGH\Box\Configuration;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\mkdir;
