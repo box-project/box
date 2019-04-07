@@ -124,6 +124,17 @@ The requirement checker works down to PHP 5.3+. If however you are including it 
 PHP 5.3+ compatible, it will fail before the requirements are being checked.
 
 
+## Skipping the requirement checker
+
+When the requirement checker is shipped, you can always skip it by setting the environment variable 
+`BOX_REQUIREMENT_CHECKER` to `0`. For example if you are using the `box.phar` which ships a requirement checker and want 
+to skip it, you can run:
+
+```
+$ BOX_REQUIREMENT_CHECKER=0 php box.phar 
+```
+
+
 <br />
 <hr />
 
