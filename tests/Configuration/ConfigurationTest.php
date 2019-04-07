@@ -2947,14 +2947,13 @@ KevinGH\Box\Configuration {#100
     -path: "composer.lock"
     -contents: []
   }
-  -files: array:7 [
+  -files: array:6 [
     0 => "bar.php"
     1 => "box.json"
     2 => "composer.json"
     3 => "composer.lock"
     4 => "foo.php"
-    5 => "index.php"
-    6 => "vendor/composer/installed.json"
+    5 => "vendor/composer/installed.json"
   ]
   -binaryFiles: array:2 [
     0 => "bar.php"

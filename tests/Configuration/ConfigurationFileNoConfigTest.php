@@ -787,7 +787,6 @@ JSON
             'box.json',
             'composer.json',
             'composer.lock',
-            'index.php',
             'vendor/composer/installed.json',
         ];
 

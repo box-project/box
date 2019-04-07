@@ -1430,8 +1430,14 @@ BANNER;
                 )));
 
                 return [
-                    array_merge($files, $filesToAppend),
-                    array_merge($directories, $vendorPackages),
+                    array_merge(
+                        array_diff($files, $excludedPaths),
+                        $filesToAppend
+                    ),
+                    array_merge(
+                        array_diff($directories, $excludedPaths),
+                        $vendorPackages
+                    ),
                 ];
             }
 
