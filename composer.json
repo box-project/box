@@ -43,7 +43,7 @@
         "ext-phar": "*",
         "amphp/parallel-functions": "^0.1.2",
         "beberlei/assert": "^3.0",
-        "composer/composer": "^1.6",
+        "composer/semver": "^1.5",
         "composer/xdebug-handler": "^1.1.0",
         "hoa/compiler": "^3.17",
         "humbug/php-scoper": "^0.11",
