@@ -12,11 +12,10 @@ prevent the issue, you need to make sure of the following:
 
 To achieve this with the least amount of changes is to:
 
-- Create a `.env.local.php` with the following content:
+- Create the `.env.local.php` file by running the following command:
 
 ```
-APP_ENV='prod'
-APP_DEBUG=0
+$ composer dump-env prod
 ```
 
 This will ensure when loading the variables that your application is in production mode.

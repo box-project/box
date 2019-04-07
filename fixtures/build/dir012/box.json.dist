@@ -1,6 +1,7 @@
 {
     "files-bin": [
-        ".env"
+        ".env.local.php",
+        "src/Controller/.gitignore"
     ],
     "directories": [
         "config",

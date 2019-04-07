@@ -1,0 +1,2615 @@
+//
+// Processed content of the configuration file "/Users/tfidry/Project/Humbug/box/fixtures/build/dir012/box.json.dist" dumped for debugging purposes
+//
+// PHP Version: 7.3.0
+// PHP extensions: Core,date,libxml,openssl,pcre,zlib,bcmath,bz2,calendar,ctype,curl,dom,fileinfo,filter,hash,intl,json,mbstring,SPL,session,pcntl,standard,PDO,mysqlnd,pdo_pgsql,pgsql,Phar,posix,readline,Reflection,pdo_mysql,shmop,SimpleXML,sockets,mysqli,sysvmsg,sysvsem,sysvshm,tokenizer,xml,xmlreader,xmlwriter,xsl,zip,iconv,redis,xdebug
+// Command: /Users/tfidry/Project/Humbug/box/bin/box compile -dfixtures/build/dir012 --debug
+// Box: 3.x-dev@8a56b4d
+// Time: 2019-04-07T07:44:04+00:00
+//
+
+KevinGH\Box\Configuration {#108
+  -file: "box.json.dist"
+  -fileMode: "0755"
+  -alias: "box-auto-generated-alias-908902ff1423.phar"
+  -basePath: "/Users/tfidry/Project/Humbug/box/fixtures/build/dir012"
+  -composerJson: KevinGH\Box\Composer\ComposerFile {#183
+    -path: "composer.json"
+    -contents: array:11 [
+      "type" => "project"
+      "license" => "proprietary"
+      "require" => array:8 [
+        "php" => "^7.1.3"
+        "ext-ctype" => "*"
+        "ext-iconv" => "*"
+        "symfony/console" => "4.2.*"
+        "symfony/dotenv" => "4.2.*"
+        "symfony/flex" => "^1.2"
+        "symfony/framework-bundle" => "4.2.*"
+        "symfony/yaml" => "4.2.*"
+      ]
+      "config" => array:2 [
+        "preferred-install" => array:1 [
+          "*" => "dist"
+        ]
+        "sort-packages" => true
+      ]
+      "bin" => "bin/console"
+      "autoload" => array:1 [
+        "psr-4" => array:1 [
+          "App\" => "src/"
+        ]
+      ]
+      "autoload-dev" => array:1 [
+        "psr-4" => array:1 [
+          "App\Tests\" => "tests/"
+        ]
+      ]
+      "replace" => array:6 [
+        "paragonie/random_compat" => "2.*"
+        "symfony/polyfill-ctype" => "*"
+        "symfony/polyfill-iconv" => "*"
+        "symfony/polyfill-php71" => "*"
+        "symfony/polyfill-php70" => "*"
+        "symfony/polyfill-php56" => "*"
+      ]
+      "scripts" => array:2 [
+        "auto-scripts" => array:1 [
+          "cache:clear" => "symfony-cmd"
+        ]
+        "post-autoload-dump" => array:1 [
+          0 => "@auto-scripts"
+        ]
+      ]
+      "conflict" => array:1 [
+        "symfony/symfony" => "*"
+      ]
+      "extra" => array:1 [
+        "symfony" => array:2 [
+          "allow-contrib" => false
+          "require" => "4.2.*"
+        ]
+      ]
+    ]
+  }
+  -composerLock: KevinGH\Box\Composer\ComposerFile {#165
+    -path: "composer.lock"
+    -contents: array:11 [
+      "_readme" => array:3 [
+        0 => "This file locks the dependencies of your project to a known state"
+        1 => "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies"
+        2 => "This file is @generated automatically"
+      ]
+      "content-hash" => "8f7325e741a3e43019069f0b761c947e"
+      "packages" => array:22 [
+        0 => array:14 [
+          "name" => "psr/cache"
+          "version" => "1.0.1"
+          "source" => array:3 [
+            "type" => "git"
+            "url" => "https://github.com/php-fig/cache.git"
+            "reference" => "d11b50ad223250cf17b86e38383413f5a6764bf8"
+          ]
+          "dist" => array:4 [
+            "type" => "zip"
+            "url" => "https://api.github.com/repos/php-fig/cache/zipball/d11b50ad223250cf17b86e38383413f5a6764bf8"
+            "reference" => "d11b50ad223250cf17b86e38383413f5a6764bf8"
+            "shasum" => ""
+          ]
+          "require" => array:1 [
+            "php" => ">=5.3.0"
+          ]
+          "type" => "library"
+          "extra" => array:1 [
+            "branch-alias" => array:1 [
+              "dev-master" => "1.0.x-dev"
+            ]
+          ]
+          "autoload" => array:1 [
+            "psr-4" => array:1 [
+              "Psr\Cache\" => "src/"
+            ]
+          ]
+          "notification-url" => "https://packagist.org/downloads/"
+          "license" => array:1 [
+            0 => "MIT"
+          ]
+          "authors" => array:1 [
+            0 => array:2 [
+              "name" => "PHP-FIG"
+              "homepage" => "http://www.php-fig.org/"
+            ]
+          ]
+          "description" => "Common interface for caching libraries"
+          "keywords" => array:3 [
+            0 => "cache"
+            1 => "psr"
+            2 => "psr-6"
+          ]
+          "time" => "2016-08-06T20:24:11+00:00"
+        ]
+        1 => array:15 [
+          "name" => "psr/container"
+          "version" => "1.0.0"
+          "source" => array:3 [
+            "type" => "git"
+            "url" => "https://github.com/php-fig/container.git"
+            "reference" => "b7ce3b176482dbbc1245ebf52b181af44c2cf55f"
+          ]
+          "dist" => array:4 [
+            "type" => "zip"
+            "url" => "https://api.github.com/repos/php-fig/container/zipball/b7ce3b176482dbbc1245ebf52b181af44c2cf55f"
+            "reference" => "b7ce3b176482dbbc1245ebf52b181af44c2cf55f"
+            "shasum" => ""
+          ]
+          "require" => array:1 [
+            "php" => ">=5.3.0"
+          ]
+          "type" => "library"
+          "extra" => array:1 [
+            "branch-alias" => array:1 [
+              "dev-master" => "1.0.x-dev"
+            ]
+          ]
+          "autoload" => array:1 [
+            "psr-4" => array:1 [
+              "Psr\Container\" => "src/"
+            ]
+          ]
+          "notification-url" => "https://packagist.org/downloads/"
+          "license" => array:1 [
+            0 => "MIT"
+          ]
+          "authors" => array:1 [
+            0 => array:2 [
+              "name" => "PHP-FIG"
+              "homepage" => "http://www.php-fig.org/"
+            ]
+          ]
+          "description" => "Common Container Interface (PHP FIG PSR-11)"
+          "homepage" => "https://github.com/php-fig/container"
+          "keywords" => array:5 [
+            0 => "PSR-11"
+            1 => "container"
+            2 => "container-interface"
+            3 => "container-interop"
+            4 => "psr"
+          ]
+          "time" => "2017-02-14T16:28:37+00:00"
+        ]
+        2 => array:15 [
+          "name" => "psr/log"
+          "version" => "1.1.0"
+          "source" => array:3 [
+            "type" => "git"
+            "url" => "https://github.com/php-fig/log.git"
+            "reference" => "6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd"
+          ]
+          "dist" => array:4 [
+            "type" => "zip"
+            "url" => "https://api.github.com/repos/php-fig/log/zipball/6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd"
+            "reference" => "6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd"
+            "shasum" => ""
+          ]
+          "require" => array:1 [
+            "php" => ">=5.3.0"
+          ]
+          "type" => "library"
+          "extra" => array:1 [
+            "branch-alias" => array:1 [
+              "dev-master" => "1.0.x-dev"
+            ]
+          ]
+          "autoload" => array:1 [
+            "psr-4" => array:1 [
+              "Psr\Log\" => "Psr/Log/"
+            ]
+          ]
+          "notification-url" => "https://packagist.org/downloads/"
+          "license" => array:1 [
+            0 => "MIT"
+          ]
+          "authors" => array:1 [
+            0 => array:2 [
+              "name" => "PHP-FIG"
+              "homepage" => "http://www.php-fig.org/"
+            ]
+          ]
+          "description" => "Common interface for logging libraries"
+          "homepage" => "https://github.com/php-fig/log"
+          "keywords" => array:3 [
+            0 => "log"
+            1 => "psr"
+            2 => "psr-3"
+          ]
+          "time" => "2018-11-20T15:27:04+00:00"
+        ]
+        3 => array:14 [
+          "name" => "psr/simple-cache"
+          "version" => "1.0.1"
+          "source" => array:3 [
+            "type" => "git"
+            "url" => "https://github.com/php-fig/simple-cache.git"
+            "reference" => "408d5eafb83c57f6365a3ca330ff23aa4a5fa39b"
+          ]
+          "dist" => array:4 [
+            "type" => "zip"
+            "url" => "https://api.github.com/repos/php-fig/simple-cache/zipball/408d5eafb83c57f6365a3ca330ff23aa4a5fa39b"
+            "reference" => "408d5eafb83c57f6365a3ca330ff23aa4a5fa39b"
+            "shasum" => ""
+          ]
+          "require" => array:1 [
+            "php" => ">=5.3.0"
+          ]
+          "type" => "library"
+          "extra" => array:1 [
+            "branch-alias" => array:1 [
+              "dev-master" => "1.0.x-dev"
+            ]
+          ]
+          "autoload" => array:1 [
+            "psr-4" => array:1 [
+              "Psr\SimpleCache\" => "src/"
+            ]
+          ]
+          "notification-url" => "https://packagist.org/downloads/"
+          "license" => array:1 [
+            0 => "MIT"
+          ]
+          "authors" => array:1 [
+            0 => array:2 [
+              "name" => "PHP-FIG"
+              "homepage" => "http://www.php-fig.org/"
+            ]
+          ]
+          "description" => "Common interfaces for simple caching"
+          "keywords" => array:5 [
+            0 => "cache"
+            1 => "caching"
+            2 => "psr"
+            3 => "psr-16"
+            4 => "simple-cache"
+          ]
+          "time" => "2017-10-23T01:57:42+00:00"
+        ]
+        4 => array:18 [
+          "name" => "symfony/cache"
+          "version" => "v4.2.4"
+          "source" => array:3 [
+            "type" => "git"
+            "url" => "https://github.com/symfony/cache.git"
+            "reference" => "b5c650406953f2f44a37c4f3ac66152fafc22c66"
+          ]
+          "dist" => array:4 [
+            "type" => "zip"
+            "url" => "https://api.github.com/repos/symfony/cache/zipball/b5c650406953f2f44a37c4f3ac66152fafc22c66"
+            "reference" => "b5c650406953f2f44a37c4f3ac66152fafc22c66"
+            "shasum" => ""
+          ]
+          "require" => array:6 [
+            "php" => "^7.1.3"
+            "psr/cache" => "~1.0"
+            "psr/log" => "~1.0"
+            "psr/simple-cache" => "^1.0"
+            "symfony/contracts" => "^1.0"
+            "symfony/var-exporter" => "^4.2"
+          ]
+          "conflict" => array:3 [
+            "doctrine/dbal" => "<2.5"
+            "symfony/dependency-injection" => "<3.4"
+            "symfony/var-dumper" => "<3.4"
+          ]
+          "provide" => array:3 [
+            "psr/cache-implementation" => "1.0"
+            "psr/simple-cache-implementation" => "1.0"
+            "symfony/cache-contracts-implementation" => "1.0"
+          ]
+          "require-dev" => array:7 [
+            "cache/integration-tests" => "dev-master"
+            "doctrine/cache" => "~1.6"
+            "doctrine/dbal" => "~2.5"
+            "predis/predis" => "~1.1"
+            "symfony/config" => "~4.2"
+            "symfony/dependency-injection" => "~3.4|~4.1"
+            "symfony/var-dumper" => "^4.1.1"
+          ]
+          "type" => "library"
+          "extra" => array:1 [
+            "branch-alias" => array:1 [
+              "dev-master" => "4.2-dev"
+            ]
+          ]
+          "autoload" => array:2 [
+            "psr-4" => array:1 [
+              "Symfony\Component\Cache\" => ""
+            ]
+            "exclude-from-classmap" => array:1 [
+              0 => "/Tests/"
+            ]
+          ]
+          "notification-url" => "https://packagist.org/downloads/"
+          "license" => array:1 [
+            0 => "MIT"
+          ]
+          "authors" => array:2 [
+            0 => array:2 [
+              "name" => "Nicolas Grekas"
+              "email" => "p@tchwork.com"
+            ]
+            1 => array:2 [
+              "name" => "Symfony Community"
+              "homepage" => "https://symfony.com/contributors"
+            ]
+          ]
+          "description" => "Symfony Cache component with PSR-6, PSR-16, and tags"
+          "homepage" => "https://symfony.com"
+          "keywords" => array:2 [
+            0 => "caching"
+            1 => "psr6"
+          ]
+          "time" => "2019-02-23T15:17:42+00:00"
+        ]
+        5 => array:17 [
+          "name" => "symfony/config"
+          "version" => "v4.2.4"
+          "source" => array:3 [
+            "type" => "git"
+            "url" => "https://github.com/symfony/config.git"
+            "reference" => "7f70d79c7a24a94f8e98abb988049403a53d7b31"
+          ]
+          "dist" => array:4 [
+            "type" => "zip"
+            "url" => "https://api.github.com/repos/symfony/config/zipball/7f70d79c7a24a94f8e98abb988049403a53d7b31"
+            "reference" => "7f70d79c7a24a94f8e98abb988049403a53d7b31"
+            "shasum" => ""
+          ]
+          "require" => array:3 [
+            "php" => "^7.1.3"
+            "symfony/filesystem" => "~3.4|~4.0"
+            "symfony/polyfill-ctype" => "~1.8"
+          ]
+          "conflict" => array:1 [
+            "symfony/finder" => "<3.4"
+          ]
+          "require-dev" => array:4 [
+            "symfony/dependency-injection" => "~3.4|~4.0"
+            "symfony/event-dispatcher" => "~3.4|~4.0"
+            "symfony/finder" => "~3.4|~4.0"
+            "symfony/yaml" => "~3.4|~4.0"
+          ]
+          "suggest" => array:1 [
+            "symfony/yaml" => "To use the yaml reference dumper"
+          ]
+          "type" => "library"
+          "extra" => array:1 [
+            "branch-alias" => array:1 [
+              "dev-master" => "4.2-dev"
+            ]
+          ]
+          "autoload" => array:2 [
+            "psr-4" => array:1 [
+              "Symfony\Component\Config\" => ""
+            ]
+            "exclude-from-classmap" => array:1 [
+              0 => "/Tests/"
+            ]
+          ]
+          "notification-url" => "https://packagist.org/downloads/"
+          "license" => array:1 [
+            0 => "MIT"
+          ]
+          "authors" => array:2 [
+            0 => array:2 [
+              "name" => "Fabien Potencier"
+              "email" => "fabien@symfony.com"
+            ]
+            1 => array:2 [
+              "name" => "Symfony Community"
+              "homepage" => "https://symfony.com/contributors"
+            ]
+          ]
+          "description" => "Symfony Config Component"
+          "homepage" => "https://symfony.com"
+          "time" => "2019-02-23T15:17:42+00:00"
+        ]
+        6 => array:18 [
+          "name" => "symfony/console"
+          "version" => "v4.2.4"
+          "source" => array:3 [
+            "type" => "git"
+            "url" => "https://github.com/symfony/console.git"
+            "reference" => "9dc2299a016497f9ee620be94524e6c0af0280a9"
+          ]
+          "dist" => array:4 [
+            "type" => "zip"
+            "url" => "https://api.github.com/repos/symfony/console/zipball/9dc2299a016497f9ee620be94524e6c0af0280a9"
+            "reference" => "9dc2299a016497f9ee620be94524e6c0af0280a9"
+            "shasum" => ""
+          ]
+          "require" => array:3 [
+            "php" => "^7.1.3"
+            "symfony/contracts" => "^1.0"
+            "symfony/polyfill-mbstring" => "~1.0"
+          ]
+          "conflict" => array:2 [
+            "symfony/dependency-injection" => "<3.4"
+            "symfony/process" => "<3.3"
+          ]
+          "provide" => array:1 [
+            "psr/log-implementation" => "1.0"
+          ]
+          "require-dev" => array:6 [
+            "psr/log" => "~1.0"
+            "symfony/config" => "~3.4|~4.0"
+            "symfony/dependency-injection" => "~3.4|~4.0"
+            "symfony/event-dispatcher" => "~3.4|~4.0"
+            "symfony/lock" => "~3.4|~4.0"
+            "symfony/process" => "~3.4|~4.0"
+          ]
+          "suggest" => array:4 [
+            "psr/log" => "For using the console logger"
+            "symfony/event-dispatcher" => ""
+            "symfony/lock" => ""
+            "symfony/process" => ""
+          ]
+          "type" => "library"
+          "extra" => array:1 [
+            "branch-alias" => array:1 [
+              "dev-master" => "4.2-dev"
+            ]
+          ]
+          "autoload" => array:2 [
+            "psr-4" => array:1 [
+              "Symfony\Component\Console\" => ""
+            ]
+            "exclude-from-classmap" => array:1 [
+              0 => "/Tests/"
+            ]
+          ]
+          "notification-url" => "https://packagist.org/downloads/"
+          "license" => array:1 [
+            0 => "MIT"
+          ]
+          "authors" => array:2 [
+            0 => array:2 [
+              "name" => "Fabien Potencier"
+              "email" => "fabien@symfony.com"
+            ]
+            1 => array:2 [
+              "name" => "Symfony Community"
+              "homepage" => "https://symfony.com/contributors"
+            ]
+          ]
+          "description" => "Symfony Console Component"
+          "homepage" => "https://symfony.com"
+          "time" => "2019-02-23T15:17:42+00:00"
+        ]
+        7 => array:17 [
+          "name" => "symfony/contracts"
+          "version" => "v1.0.2"
+          "source" => array:3 [
+            "type" => "git"
+            "url" => "https://github.com/symfony/contracts.git"
+            "reference" => "1aa7ab2429c3d594dd70689604b5cf7421254cdf"
+          ]
+          "dist" => array:4 [
+            "type" => "zip"
+            "url" => "https://api.github.com/repos/symfony/contracts/zipball/1aa7ab2429c3d594dd70689604b5cf7421254cdf"
+            "reference" => "1aa7ab2429c3d594dd70689604b5cf7421254cdf"
+            "shasum" => ""
+          ]
+          "require" => array:1 [
+            "php" => "^7.1.3"
+          ]
+          "require-dev" => array:2 [
+            "psr/cache" => "^1.0"
+            "psr/container" => "^1.0"
+          ]
+          "suggest" => array:5 [
+            "psr/cache" => "When using the Cache contracts"
+            "psr/container" => "When using the Service contracts"
+            "symfony/cache-contracts-implementation" => ""
+            "symfony/service-contracts-implementation" => ""
+            "symfony/translation-contracts-implementation" => ""
+          ]
+          "type" => "library"
+          "extra" => array:1 [
+            "branch-alias" => array:1 [
+              "dev-master" => "1.0-dev"
+            ]
+          ]
+          "autoload" => array:2 [
+            "psr-4" => array:1 [
+              "Symfony\Contracts\" => ""
+            ]
+            "exclude-from-classmap" => array:1 [
+              0 => "**/Tests/"
+            ]
+          ]
+          "notification-url" => "https://packagist.org/downloads/"
+          "license" => array:1 [
+            0 => "MIT"
+          ]
+          "authors" => array:2 [
+            0 => array:2 [
+              "name" => "Nicolas Grekas"
+              "email" => "p@tchwork.com"
+            ]
+            1 => array:2 [
+              "name" => "Symfony Community"
+              "homepage" => "https://symfony.com/contributors"
+            ]
+          ]
+          "description" => "A set of abstractions extracted out of the Symfony components"
+          "homepage" => "https://symfony.com"
+          "keywords" => array:6 [
+            0 => "abstractions"
+            1 => "contracts"
+            2 => "decoupling"
+            3 => "interfaces"
+            4 => "interoperability"
+            5 => "standards"
+          ]
+          "time" => "2018-12-05T08:06:11+00:00"
+        ]
+        8 => array:16 [
+          "name" => "symfony/debug"
+          "version" => "v4.2.4"
+          "source" => array:3 [
+            "type" => "git"
+            "url" => "https://github.com/symfony/debug.git"
+            "reference" => "de73f48977b8eaf7ce22814d66e43a1662cc864f"
+          ]
+          "dist" => array:4 [
+            "type" => "zip"
+            "url" => "https://api.github.com/repos/symfony/debug/zipball/de73f48977b8eaf7ce22814d66e43a1662cc864f"
+            "reference" => "de73f48977b8eaf7ce22814d66e43a1662cc864f"
+            "shasum" => ""
+          ]
+          "require" => array:2 [
+            "php" => "^7.1.3"
+            "psr/log" => "~1.0"
+          ]
+          "conflict" => array:1 [
+            "symfony/http-kernel" => "<3.4"
+          ]
+          "require-dev" => array:1 [
+            "symfony/http-kernel" => "~3.4|~4.0"
+          ]
+          "type" => "library"
+          "extra" => array:1 [
+            "branch-alias" => array:1 [
+              "dev-master" => "4.2-dev"
+            ]
+          ]
+          "autoload" => array:2 [
+            "psr-4" => array:1 [
+              "Symfony\Component\Debug\" => ""
+            ]
+            "exclude-from-classmap" => array:1 [
+              0 => "/Tests/"
+            ]
+          ]
+          "notification-url" => "https://packagist.org/downloads/"
+          "license" => array:1 [
+            0 => "MIT"
+          ]
+          "authors" => array:2 [
+            0 => array:2 [
+              "name" => "Fabien Potencier"
+              "email" => "fabien@symfony.com"
+            ]
+            1 => array:2 [
+              "name" => "Symfony Community"
+              "homepage" => "https://symfony.com/contributors"
+            ]
+          ]
+          "description" => "Symfony Debug Component"
+          "homepage" => "https://symfony.com"
+          "time" => "2019-03-03T18:11:24+00:00"
+        ]
+        9 => array:18 [
+          "name" => "symfony/dependency-injection"
+          "version" => "v4.2.4"
+          "source" => array:3 [
+            "type" => "git"
+            "url" => "https://github.com/symfony/dependency-injection.git"
+            "reference" => "cdadb3765df7c89ac93628743913b92bb91f1704"
+          ]
+          "dist" => array:4 [
+            "type" => "zip"
+            "url" => "https://api.github.com/repos/symfony/dependency-injection/zipball/cdadb3765df7c89ac93628743913b92bb91f1704"
+            "reference" => "cdadb3765df7c89ac93628743913b92bb91f1704"
+            "shasum" => ""
+          ]
+          "require" => array:3 [
+            "php" => "^7.1.3"
+            "psr/container" => "^1.0"
+            "symfony/contracts" => "^1.0"
+          ]
+          "conflict" => array:4 [
+            "symfony/config" => "<4.2"
+            "symfony/finder" => "<3.4"
+            "symfony/proxy-manager-bridge" => "<3.4"
+            "symfony/yaml" => "<3.4"
+          ]
+          "provide" => array:2 [
+            "psr/container-implementation" => "1.0"
+            "symfony/service-contracts-implementation" => "1.0"
+          ]
+          "require-dev" => array:3 [
+            "symfony/config" => "~4.2"
+            "symfony/expression-language" => "~3.4|~4.0"
+            "symfony/yaml" => "~3.4|~4.0"
+          ]
+          "suggest" => array:5 [
+            "symfony/config" => ""
+            "symfony/expression-language" => "For using expressions in service container configuration"
+            "symfony/finder" => "For using double-star glob patterns or when GLOB_BRACE portability is required"
+            "symfony/proxy-manager-bridge" => "Generate service proxies to lazy load them"
+            "symfony/yaml" => ""
+          ]
+          "type" => "library"
+          "extra" => array:1 [
+            "branch-alias" => array:1 [
+              "dev-master" => "4.2-dev"
+            ]
+          ]
+          "autoload" => array:2 [
+            "psr-4" => array:1 [
+              "Symfony\Component\DependencyInjection\" => ""
+            ]
+            "exclude-from-classmap" => array:1 [
+              0 => "/Tests/"
+            ]
+          ]
+          "notification-url" => "https://packagist.org/downloads/"
+          "license" => array:1 [
+            0 => "MIT"
+          ]
+          "authors" => array:2 [
+            0 => array:2 [
+              "name" => "Fabien Potencier"
+              "email" => "fabien@symfony.com"
+            ]
+            1 => array:2 [
+              "name" => "Symfony Community"
+              "homepage" => "https://symfony.com/contributors"
+            ]
+          ]
+          "description" => "Symfony DependencyInjection Component"
+          "homepage" => "https://symfony.com"
+          "time" => "2019-02-23T15:17:42+00:00"
+        ]
+        10 => array:16 [
+          "name" => "symfony/dotenv"
+          "version" => "v4.2.4"
+          "source" => array:3 [
+            "type" => "git"
+            "url" => "https://github.com/symfony/dotenv.git"
+            "reference" => "9a3bdfcd7a0d9602754894d76c614d15ca366535"
+          ]
+          "dist" => array:4 [
+            "type" => "zip"
+            "url" => "https://api.github.com/repos/symfony/dotenv/zipball/9a3bdfcd7a0d9602754894d76c614d15ca366535"
+            "reference" => "9a3bdfcd7a0d9602754894d76c614d15ca366535"
+            "shasum" => ""
+          ]
+          "require" => array:1 [
+            "php" => "^7.1.3"
+          ]
+          "require-dev" => array:1 [
+            "symfony/process" => "~3.4|~4.0"
+          ]
+          "type" => "library"
+          "extra" => array:1 [
+            "branch-alias" => array:1 [
+              "dev-master" => "4.2-dev"
+            ]
+          ]
+          "autoload" => array:2 [
+            "psr-4" => array:1 [
+              "Symfony\Component\Dotenv\" => ""
+            ]
+            "exclude-from-classmap" => array:1 [
+              0 => "/Tests/"
+            ]
+          ]
+          "notification-url" => "https://packagist.org/downloads/"
+          "license" => array:1 [
+            0 => "MIT"
+          ]
+          "authors" => array:2 [
+            0 => array:2 [
+              "name" => "Fabien Potencier"
+              "email" => "fabien@symfony.com"
+            ]
+            1 => array:2 [
+              "name" => "Symfony Community"
+              "homepage" => "https://symfony.com/contributors"
+            ]
+          ]
+          "description" => "Registers environment variables from a .env file"
+          "homepage" => "https://symfony.com"
+          "keywords" => array:3 [
+            0 => "dotenv"
+            1 => "env"
+            2 => "environment"
+          ]
+          "time" => "2019-01-24T21:39:51+00:00"
+        ]
+        11 => array:17 [
+          "name" => "symfony/event-dispatcher"
+          "version" => "v4.2.4"
+          "source" => array:3 [
+            "type" => "git"
+            "url" => "https://github.com/symfony/event-dispatcher.git"
+            "reference" => "3354d2e6af986dd71f68b4e5cf4a933ab58697fb"
+          ]
+          "dist" => array:4 [
+            "type" => "zip"
+            "url" => "https://api.github.com/repos/symfony/event-dispatcher/zipball/3354d2e6af986dd71f68b4e5cf4a933ab58697fb"
+            "reference" => "3354d2e6af986dd71f68b4e5cf4a933ab58697fb"
+            "shasum" => ""
+          ]
+          "require" => array:2 [
+            "php" => "^7.1.3"
+            "symfony/contracts" => "^1.0"
+          ]
+          "conflict" => array:1 [
+            "symfony/dependency-injection" => "<3.4"
+          ]
+          "require-dev" => array:5 [
+            "psr/log" => "~1.0"
+            "symfony/config" => "~3.4|~4.0"
+            "symfony/dependency-injection" => "~3.4|~4.0"
+            "symfony/expression-language" => "~3.4|~4.0"
+            "symfony/stopwatch" => "~3.4|~4.0"
+          ]
+          "suggest" => array:2 [
+            "symfony/dependency-injection" => ""
+            "symfony/http-kernel" => ""
+          ]
+          "type" => "library"
+          "extra" => array:1 [
+            "branch-alias" => array:1 [
+              "dev-master" => "4.2-dev"
+            ]
+          ]
+          "autoload" => array:2 [
+            "psr-4" => array:1 [
+              "Symfony\Component\EventDispatcher\" => ""
+            ]
+            "exclude-from-classmap" => array:1 [
+              0 => "/Tests/"
+            ]
+          ]
+          "notification-url" => "https://packagist.org/downloads/"
+          "license" => array:1 [
+            0 => "MIT"
+          ]
+          "authors" => array:2 [
+            0 => array:2 [
+              "name" => "Fabien Potencier"
+              "email" => "fabien@symfony.com"
+            ]
+            1 => array:2 [
+              "name" => "Symfony Community"
+              "homepage" => "https://symfony.com/contributors"
+            ]
+          ]
+          "description" => "Symfony EventDispatcher Component"
+          "homepage" => "https://symfony.com"
+          "time" => "2019-02-23T15:17:42+00:00"
+        ]
+        12 => array:14 [
+          "name" => "symfony/filesystem"
+          "version" => "v4.2.4"
+          "source" => array:3 [
+            "type" => "git"
+            "url" => "https://github.com/symfony/filesystem.git"
+            "reference" => "e16b9e471703b2c60b95f14d31c1239f68f11601"
+          ]
+          "dist" => array:4 [
+            "type" => "zip"
+            "url" => "https://api.github.com/repos/symfony/filesystem/zipball/e16b9e471703b2c60b95f14d31c1239f68f11601"
+            "reference" => "e16b9e471703b2c60b95f14d31c1239f68f11601"
+            "shasum" => ""
+          ]
+          "require" => array:2 [
+            "php" => "^7.1.3"
+            "symfony/polyfill-ctype" => "~1.8"
+          ]
+          "type" => "library"
+          "extra" => array:1 [
+            "branch-alias" => array:1 [
+              "dev-master" => "4.2-dev"
+            ]
+          ]
+          "autoload" => array:2 [
+            "psr-4" => array:1 [
+              "Symfony\Component\Filesystem\" => ""
+            ]
+            "exclude-from-classmap" => array:1 [
+              0 => "/Tests/"
+            ]
+          ]
+          "notification-url" => "https://packagist.org/downloads/"
+          "license" => array:1 [
+            0 => "MIT"
+          ]
+          "authors" => array:2 [
+            0 => array:2 [
+              "name" => "Fabien Potencier"
+              "email" => "fabien@symfony.com"
+            ]
+            1 => array:2 [
+              "name" => "Symfony Community"
+              "homepage" => "https://symfony.com/contributors"
+            ]
+          ]
+          "description" => "Symfony Filesystem Component"
+          "homepage" => "https://symfony.com"
+          "time" => "2019-02-07T11:40:08+00:00"
+        ]
+        13 => array:14 [
+          "name" => "symfony/finder"
+          "version" => "v4.2.4"
+          "source" => array:3 [
+            "type" => "git"
+            "url" => "https://github.com/symfony/finder.git"
+            "reference" => "267b7002c1b70ea80db0833c3afe05f0fbde580a"
+          ]
+          "dist" => array:4 [
+            "type" => "zip"
+            "url" => "https://api.github.com/repos/symfony/finder/zipball/267b7002c1b70ea80db0833c3afe05f0fbde580a"
+            "reference" => "267b7002c1b70ea80db0833c3afe05f0fbde580a"
+            "shasum" => ""
+          ]
+          "require" => array:1 [
+            "php" => "^7.1.3"
+          ]
+          "type" => "library"
+          "extra" => array:1 [
+            "branch-alias" => array:1 [
+              "dev-master" => "4.2-dev"
+            ]
+          ]
+          "autoload" => array:2 [
+            "psr-4" => array:1 [
+              "Symfony\Component\Finder\" => ""
+            ]
+            "exclude-from-classmap" => array:1 [
+              0 => "/Tests/"
+            ]
+          ]
+          "notification-url" => "https://packagist.org/downloads/"
+          "license" => array:1 [
+            0 => "MIT"
+          ]
+          "authors" => array:2 [
+            0 => array:2 [
+              "name" => "Fabien Potencier"
+              "email" => "fabien@symfony.com"
+            ]
+            1 => array:2 [
+              "name" => "Symfony Community"
+              "homepage" => "https://symfony.com/contributors"
+            ]
+          ]
+          "description" => "Symfony Finder Component"
+          "homepage" => "https://symfony.com"
+          "time" => "2019-02-23T15:42:05+00:00"
+        ]
+        14 => array:14 [
+          "name" => "symfony/flex"
+          "version" => "v1.2.1"
+          "source" => array:3 [
+            "type" => "git"
+            "url" => "https://github.com/symfony/flex.git"
+            "reference" => "305a6cd75a54992f47f46eb655245b6c9a06997a"
+          ]
+          "dist" => array:4 [
+            "type" => "zip"
+            "url" => "https://api.github.com/repos/symfony/flex/zipball/305a6cd75a54992f47f46eb655245b6c9a06997a"
+            "reference" => "305a6cd75a54992f47f46eb655245b6c9a06997a"
+            "shasum" => ""
+          ]
+          "require" => array:2 [
+            "composer-plugin-api" => "^1.0"
+            "php" => "^7.0"
+          ]
+          "require-dev" => array:4 [
+            "composer/composer" => "^1.0.2"
+            "symfony/dotenv" => "^3.4|^4.0"
+            "symfony/phpunit-bridge" => "^3.4.19|^4.1.8"
+            "symfony/process" => "^2.7|^3.0|^4.0"
+          ]
+          "type" => "composer-plugin"
+          "extra" => array:2 [
+            "branch-alias" => array:1 [
+              "dev-master" => "1.2-dev"
+            ]
+            "class" => "Symfony\Flex\Flex"
+          ]
+          "autoload" => array:1 [
+            "psr-4" => array:1 [
+              "Symfony\Flex\" => "src"
+            ]
+          ]
+          "notification-url" => "https://packagist.org/downloads/"
+          "license" => array:1 [
+            0 => "MIT"
+          ]
+          "authors" => array:1 [
+            0 => array:2 [
+              "name" => "Fabien Potencier"
+              "email" => "fabien.potencier@gmail.com"
+            ]
+          ]
+          "description" => "Composer plugin for Symfony"
+          "time" => "2019-04-03T17:16:03+00:00"
+        ]
+        15 => array:17 [
+          "name" => "symfony/framework-bundle"
+          "version" => "v4.2.4"
+          "source" => array:3 [
+            "type" => "git"
+            "url" => "https://github.com/symfony/framework-bundle.git"
+            "reference" => "50227854eb9863a1cae38952baff4d80953e7336"
+          ]
+          "dist" => array:4 [
+            "type" => "zip"
+            "url" => "https://api.github.com/repos/symfony/framework-bundle/zipball/50227854eb9863a1cae38952baff4d80953e7336"
+            "reference" => "50227854eb9863a1cae38952baff4d80953e7336"
+            "shasum" => ""
+          ]
+          "require" => array:13 [
+            "ext-xml" => "*"
+            "php" => "^7.1.3"
+            "symfony/cache" => "~4.2"
+            "symfony/config" => "~4.2"
+            "symfony/contracts" => "^1.0.2"
+            "symfony/dependency-injection" => "^4.2"
+            "symfony/event-dispatcher" => "^4.1"
+            "symfony/filesystem" => "~3.4|~4.0"
+            "symfony/finder" => "~3.4|~4.0"
+            "symfony/http-foundation" => "^4.1.2"
+            "symfony/http-kernel" => "^4.2"
+            "symfony/polyfill-mbstring" => "~1.0"
+            "symfony/routing" => "^4.1"
+          ]
+          "conflict" => array:15 [
+            "phpdocumentor/reflection-docblock" => "<3.0"
+            "phpdocumentor/type-resolver" => "<0.2.1"
+            "phpunit/phpunit" => "<4.8.35|<5.4.3,>=5.0"
+            "symfony/asset" => "<3.4"
+            "symfony/console" => "<3.4"
+            "symfony/dotenv" => "<4.2"
+            "symfony/form" => "<4.2"
+            "symfony/messenger" => "<4.2"
+            "symfony/property-info" => "<3.4"
+            "symfony/serializer" => "<4.2"
+            "symfony/stopwatch" => "<3.4"
+            "symfony/translation" => "<4.2"
+            "symfony/twig-bridge" => "<4.1.1"
+            "symfony/validator" => "<4.1"
+            "symfony/workflow" => "<4.1"
+          ]
+          "require-dev" => array:29 [
+            "doctrine/annotations" => "~1.0"
+            "doctrine/cache" => "~1.0"
+            "fig/link-util" => "^1.0"
+            "phpdocumentor/reflection-docblock" => "^3.0|^4.0"
+            "symfony/asset" => "~3.4|~4.0"
+            "symfony/browser-kit" => "~3.4|~4.0"
+            "symfony/console" => "~3.4|~4.0"
+            "symfony/css-selector" => "~3.4|~4.0"
+            "symfony/dom-crawler" => "~3.4|~4.0"
+            "symfony/expression-language" => "~3.4|~4.0"
+            "symfony/form" => "^4.2.3"
+            "symfony/lock" => "~3.4|~4.0"
+            "symfony/messenger" => "^4.2"
+            "symfony/polyfill-intl-icu" => "~1.0"
+            "symfony/process" => "~3.4|~4.0"
+            "symfony/property-info" => "~3.4|~4.0"
+            "symfony/security" => "~3.4|~4.0"
+            "symfony/security-core" => "~3.4|~4.0"
+            "symfony/security-csrf" => "~3.4|~4.0"
+            "symfony/serializer" => "^4.2"
+            "symfony/stopwatch" => "~3.4|~4.0"
+            "symfony/templating" => "~3.4|~4.0"
+            "symfony/translation" => "~4.2"
+            "symfony/validator" => "^4.1"
+            "symfony/var-dumper" => "~3.4|~4.0"
+            "symfony/web-link" => "~3.4|~4.0"
+            "symfony/workflow" => "^4.1"
+            "symfony/yaml" => "~3.4|~4.0"
+            "twig/twig" => "~1.34|~2.4"
+          ]
+          "suggest" => array:8 [
+            "ext-apcu" => "For best performance of the system caches"
+            "symfony/console" => "For using the console commands"
+            "symfony/form" => "For using forms"
+            "symfony/property-info" => "For using the property_info service"
+            "symfony/serializer" => "For using the serializer service"
+            "symfony/validator" => "For using validation"
+            "symfony/web-link" => "For using web links, features such as preloading, prefetching or prerendering"
+            "symfony/yaml" => "For using the debug:config and lint:yaml commands"
+          ]
+          "type" => "symfony-bundle"
+          "extra" => array:1 [
+            "branch-alias" => array:1 [
+              "dev-master" => "4.2-dev"
+            ]
+          ]
+          "autoload" => array:2 [
+            "psr-4" => array:1 [
+              "Symfony\Bundle\FrameworkBundle\" => ""
+            ]
+            "exclude-from-classmap" => array:1 [
+              0 => "/Tests/"
+            ]
+          ]
+          "notification-url" => "https://packagist.org/downloads/"
+          "license" => array:1 [
+            0 => "MIT"
+          ]
+          "authors" => array:2 [
+            0 => array:2 [
+              "name" => "Fabien Potencier"
+              "email" => "fabien@symfony.com"
+            ]
+            1 => array:2 [
+              "name" => "Symfony Community"
+              "homepage" => "https://symfony.com/contributors"
+            ]
+          ]
+          "description" => "Symfony FrameworkBundle"
+          "homepage" => "https://symfony.com"
+          "time" => "2019-02-24T02:12:10+00:00"
+        ]
+        16 => array:15 [
+          "name" => "symfony/http-foundation"
+          "version" => "v4.2.4"
+          "source" => array:3 [
+            "type" => "git"
+            "url" => "https://github.com/symfony/http-foundation.git"
+            "reference" => "850a667d6254ccf6c61d853407b16f21c4579c77"
+          ]
+          "dist" => array:4 [
+            "type" => "zip"
+            "url" => "https://api.github.com/repos/symfony/http-foundation/zipball/850a667d6254ccf6c61d853407b16f21c4579c77"
+            "reference" => "850a667d6254ccf6c61d853407b16f21c4579c77"
+            "shasum" => ""
+          ]
+          "require" => array:2 [
+            "php" => "^7.1.3"
+            "symfony/polyfill-mbstring" => "~1.1"
+          ]
+          "require-dev" => array:2 [
+            "predis/predis" => "~1.0"
+            "symfony/expression-language" => "~3.4|~4.0"
+          ]
+          "type" => "library"
+          "extra" => array:1 [
+            "branch-alias" => array:1 [
+              "dev-master" => "4.2-dev"
+            ]
+          ]
+          "autoload" => array:2 [
+            "psr-4" => array:1 [
+              "Symfony\Component\HttpFoundation\" => ""
+            ]
+            "exclude-from-classmap" => array:1 [
+              0 => "/Tests/"
+            ]
+          ]
+          "notification-url" => "https://packagist.org/downloads/"
+          "license" => array:1 [
+            0 => "MIT"
+          ]
+          "authors" => array:2 [
+            0 => array:2 [
+              "name" => "Fabien Potencier"
+              "email" => "fabien@symfony.com"
+            ]
+            1 => array:2 [
+              "name" => "Symfony Community"
+              "homepage" => "https://symfony.com/contributors"
+            ]
+          ]
+          "description" => "Symfony HttpFoundation Component"
+          "homepage" => "https://symfony.com"
+          "time" => "2019-02-26T08:03:39+00:00"
+        ]
+        17 => array:18 [
+          "name" => "symfony/http-kernel"
+          "version" => "v4.2.4"
+          "source" => array:3 [
+            "type" => "git"
+            "url" => "https://github.com/symfony/http-kernel.git"
+            "reference" => "895ceccaa8149f9343e6134e607c21da42d73b7a"
+          ]
+          "dist" => array:4 [
+            "type" => "zip"
+            "url" => "https://api.github.com/repos/symfony/http-kernel/zipball/895ceccaa8149f9343e6134e607c21da42d73b7a"
+            "reference" => "895ceccaa8149f9343e6134e607c21da42d73b7a"
+            "shasum" => ""
+          ]
+          "require" => array:7 [
+            "php" => "^7.1.3"
+            "psr/log" => "~1.0"
+            "symfony/contracts" => "^1.0.2"
+            "symfony/debug" => "~3.4|~4.0"
+            "symfony/event-dispatcher" => "~4.1"
+            "symfony/http-foundation" => "^4.1.1"
+            "symfony/polyfill-ctype" => "~1.8"
+          ]
+          "conflict" => array:5 [
+            "symfony/config" => "<3.4"
+            "symfony/dependency-injection" => "<4.2"
+            "symfony/translation" => "<4.2"
+            "symfony/var-dumper" => "<4.1.1"
+            "twig/twig" => "<1.34|<2.4,>=2"
+          ]
+          "provide" => array:1 [
+            "psr/log-implementation" => "1.0"
+          ]
+          "require-dev" => array:15 [
+            "psr/cache" => "~1.0"
+            "symfony/browser-kit" => "~3.4|~4.0"
+            "symfony/config" => "~3.4|~4.0"
+            "symfony/console" => "~3.4|~4.0"
+            "symfony/css-selector" => "~3.4|~4.0"
+            "symfony/dependency-injection" => "^4.2"
+            "symfony/dom-crawler" => "~3.4|~4.0"
+            "symfony/expression-language" => "~3.4|~4.0"
+            "symfony/finder" => "~3.4|~4.0"
+            "symfony/process" => "~3.4|~4.0"
+            "symfony/routing" => "~3.4|~4.0"
+            "symfony/stopwatch" => "~3.4|~4.0"
+            "symfony/templating" => "~3.4|~4.0"
+            "symfony/translation" => "~4.2"
+            "symfony/var-dumper" => "^4.1.1"
+          ]
+          "suggest" => array:5 [
+            "symfony/browser-kit" => ""
+            "symfony/config" => ""
+            "symfony/console" => ""
+            "symfony/dependency-injection" => ""
+            "symfony/var-dumper" => ""
+          ]
+          "type" => "library"
+          "extra" => array:1 [
+            "branch-alias" => array:1 [
+              "dev-master" => "4.2-dev"
+            ]
+          ]
+          "autoload" => array:2 [
+            "psr-4" => array:1 [
+              "Symfony\Component\HttpKernel\" => ""
+            ]
+            "exclude-from-classmap" => array:1 [
+              0 => "/Tests/"
+            ]
+          ]
+          "notification-url" => "https://packagist.org/downloads/"
+          "license" => array:1 [
+            0 => "MIT"
+          ]
+          "authors" => array:2 [
+            0 => array:2 [
+              "name" => "Fabien Potencier"
+              "email" => "fabien@symfony.com"
+            ]
+            1 => array:2 [
+              "name" => "Symfony Community"
+              "homepage" => "https://symfony.com/contributors"
+            ]
+          ]
+          "description" => "Symfony HttpKernel Component"
+          "homepage" => "https://symfony.com"
+          "time" => "2019-03-03T19:38:09+00:00"
+        ]
+        18 => array:16 [
+          "name" => "symfony/polyfill-mbstring"
+          "version" => "v1.10.0"
+          "source" => array:3 [
+            "type" => "git"
+            "url" => "https://github.com/symfony/polyfill-mbstring.git"
+            "reference" => "c79c051f5b3a46be09205c73b80b346e4153e494"
+          ]
+          "dist" => array:4 [
+            "type" => "zip"
+            "url" => "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/c79c051f5b3a46be09205c73b80b346e4153e494"
+            "reference" => "c79c051f5b3a46be09205c73b80b346e4153e494"
+            "shasum" => ""
+          ]
+          "require" => array:1 [
+            "php" => ">=5.3.3"
+          ]
+          "suggest" => array:1 [
+            "ext-mbstring" => "For best performance"
+          ]
+          "type" => "library"
+          "extra" => array:1 [
+            "branch-alias" => array:1 [
+              "dev-master" => "1.9-dev"
+            ]
+          ]
+          "autoload" => array:2 [
+            "psr-4" => array:1 [
+              "Symfony\Polyfill\Mbstring\" => ""
+            ]
+            "files" => array:1 [
+              0 => "bootstrap.php"
+            ]
+          ]
+          "notification-url" => "https://packagist.org/downloads/"
+          "license" => array:1 [
+            0 => "MIT"
+          ]
+          "authors" => array:2 [
+            0 => array:2 [
+              "name" => "Nicolas Grekas"
+              "email" => "p@tchwork.com"
+            ]
+            1 => array:2 [
+              "name" => "Symfony Community"
+              "homepage" => "https://symfony.com/contributors"
+            ]
+          ]
+          "description" => "Symfony polyfill for the Mbstring extension"
+          "homepage" => "https://symfony.com"
+          "keywords" => array:5 [
+            0 => "compatibility"
+            1 => "mbstring"
+            2 => "polyfill"
+            3 => "portable"
+            4 => "shim"
+          ]
+          "time" => "2018-09-21T13:07:52+00:00"
+        ]
+        19 => array:18 [
+          "name" => "symfony/routing"
+          "version" => "v4.2.4"
+          "source" => array:3 [
+            "type" => "git"
+            "url" => "https://github.com/symfony/routing.git"
+            "reference" => "ff03eae644e6b1e26d4a04b2385fe3a1a7f04e42"
+          ]
+          "dist" => array:4 [
+            "type" => "zip"
+            "url" => "https://api.github.com/repos/symfony/routing/zipball/ff03eae644e6b1e26d4a04b2385fe3a1a7f04e42"
+            "reference" => "ff03eae644e6b1e26d4a04b2385fe3a1a7f04e42"
+            "shasum" => ""
+          ]
+          "require" => array:1 [
+            "php" => "^7.1.3"
+          ]
+          "conflict" => array:3 [
+            "symfony/config" => "<4.2"
+            "symfony/dependency-injection" => "<3.4"
+            "symfony/yaml" => "<3.4"
+          ]
+          "require-dev" => array:7 [
+            "doctrine/annotations" => "~1.0"
+            "psr/log" => "~1.0"
+            "symfony/config" => "~4.2"
+            "symfony/dependency-injection" => "~3.4|~4.0"
+            "symfony/expression-language" => "~3.4|~4.0"
+            "symfony/http-foundation" => "~3.4|~4.0"
+            "symfony/yaml" => "~3.4|~4.0"
+          ]
+          "suggest" => array:6 [
+            "doctrine/annotations" => "For using the annotation loader"
+            "symfony/config" => "For using the all-in-one router or any loader"
+            "symfony/dependency-injection" => "For loading routes from a service"
+            "symfony/expression-language" => "For using expression matching"
+            "symfony/http-foundation" => "For using a Symfony Request object"
+            "symfony/yaml" => "For using the YAML loader"
+          ]
+          "type" => "library"
+          "extra" => array:1 [
+            "branch-alias" => array:1 [
+              "dev-master" => "4.2-dev"
+            ]
+          ]
+          "autoload" => array:2 [
+            "psr-4" => array:1 [
+              "Symfony\Component\Routing\" => ""
+            ]
+            "exclude-from-classmap" => array:1 [
+              0 => "/Tests/"
+            ]
+          ]
+          "notification-url" => "https://packagist.org/downloads/"
+          "license" => array:1 [
+            0 => "MIT"
+          ]
+          "authors" => array:2 [
+            0 => array:2 [
+              "name" => "Fabien Potencier"
+              "email" => "fabien@symfony.com"
+            ]
+            1 => array:2 [
+              "name" => "Symfony Community"
+              "homepage" => "https://symfony.com/contributors"
+            ]
+          ]
+          "description" => "Symfony Routing Component"
+          "homepage" => "https://symfony.com"
+          "keywords" => array:4 [
+            0 => "router"
+            1 => "routing"
+            2 => "uri"
+            3 => "url"
+          ]
+          "time" => "2019-02-23T15:17:42+00:00"
+        ]
+        20 => array:16 [
+          "name" => "symfony/var-exporter"
+          "version" => "v4.2.4"
+          "source" => array:3 [
+            "type" => "git"
+            "url" => "https://github.com/symfony/var-exporter.git"
+            "reference" => "d8bf4424c232b55f4c1816037d3077a89258557e"
+          ]
+          "dist" => array:4 [
+            "type" => "zip"
+            "url" => "https://api.github.com/repos/symfony/var-exporter/zipball/d8bf4424c232b55f4c1816037d3077a89258557e"
+            "reference" => "d8bf4424c232b55f4c1816037d3077a89258557e"
+            "shasum" => ""
+          ]
+          "require" => array:1 [
+            "php" => "^7.1.3"
+          ]
+          "require-dev" => array:1 [
+            "symfony/var-dumper" => "^4.1.1"
+          ]
+          "type" => "library"
+          "extra" => array:1 [
+            "branch-alias" => array:1 [
+              "dev-master" => "4.2-dev"
+            ]
+          ]
+          "autoload" => array:2 [
+            "psr-4" => array:1 [
+              "Symfony\Component\VarExporter\" => ""
+            ]
+            "exclude-from-classmap" => array:1 [
+              0 => "/Tests/"
+            ]
+          ]
+          "notification-url" => "https://packagist.org/downloads/"
+          "license" => array:1 [
+            0 => "MIT"
+          ]
+          "authors" => array:2 [
+            0 => array:2 [
+              "name" => "Nicolas Grekas"
+              "email" => "p@tchwork.com"
+            ]
+            1 => array:2 [
+              "name" => "Symfony Community"
+              "homepage" => "https://symfony.com/contributors"
+            ]
+          ]
+          "description" => "A blend of var_export() + serialize() to turn any serializable data structure to plain PHP code"
+          "homepage" => "https://symfony.com"
+          "keywords" => array:6 [
+            0 => "clone"
+            1 => "construct"
+            2 => "export"
+            3 => "hydrate"
+            4 => "instantiate"
+            5 => "serialize"
+          ]
+          "time" => "2019-01-16T20:35:37+00:00"
+        ]
+        21 => array:17 [
+          "name" => "symfony/yaml"
+          "version" => "v4.2.4"
+          "source" => array:3 [
+            "type" => "git"
+            "url" => "https://github.com/symfony/yaml.git"
+            "reference" => "761fa560a937fd7686e5274ff89dcfa87a5047df"
+          ]
+          "dist" => array:4 [
+            "type" => "zip"
+            "url" => "https://api.github.com/repos/symfony/yaml/zipball/761fa560a937fd7686e5274ff89dcfa87a5047df"
+            "reference" => "761fa560a937fd7686e5274ff89dcfa87a5047df"
+            "shasum" => ""
+          ]
+          "require" => array:2 [
+            "php" => "^7.1.3"
+            "symfony/polyfill-ctype" => "~1.8"
+          ]
+          "conflict" => array:1 [
+            "symfony/console" => "<3.4"
+          ]
+          "require-dev" => array:1 [
+            "symfony/console" => "~3.4|~4.0"
+          ]
+          "suggest" => array:1 [
+            "symfony/console" => "For validating YAML files using the lint command"
+          ]
+          "type" => "library"
+          "extra" => array:1 [
+            "branch-alias" => array:1 [
+              "dev-master" => "4.2-dev"
+            ]
+          ]
+          "autoload" => array:2 [
+            "psr-4" => array:1 [
+              "Symfony\Component\Yaml\" => ""
+            ]
+            "exclude-from-classmap" => array:1 [
+              0 => "/Tests/"
+            ]
+          ]
+          "notification-url" => "https://packagist.org/downloads/"
+          "license" => array:1 [
+            0 => "MIT"
+          ]
+          "authors" => array:2 [
+            0 => array:2 [
+              "name" => "Fabien Potencier"
+              "email" => "fabien@symfony.com"
+            ]
+            1 => array:2 [
+              "name" => "Symfony Community"
+              "homepage" => "https://symfony.com/contributors"
+            ]
+          ]
+          "description" => "Symfony Yaml Component"
+          "homepage" => "https://symfony.com"
+          "time" => "2019-02-23T15:17:42+00:00"
+        ]
+      ]
+      "packages-dev" => []
+      "aliases" => []
+      "minimum-stability" => "stable"
+      "stability-flags" => []
+      "prefer-stable" => false
+      "prefer-lowest" => false
+      "platform" => array:3 [
+        "php" => "^7.1.3"
+        "ext-ctype" => "*"
+        "ext-iconv" => "*"
+      ]
+      "platform-dev" => []
+    ]
+  }
+  -files: array:1053 [
+    0 => "composer.json"
+    1 => "composer.lock"
+    2 => "config/bootstrap.php"
+    3 => "config/bundles.php"
+    4 => "config/packages/cache.yaml"
+    5 => "config/packages/dev/routing.yaml"
+    6 => "config/packages/framework.yaml"
+    7 => "config/packages/routing.yaml"
+    8 => "config/packages/test/framework.yaml"
+    9 => "config/packages/test/routing.yaml"
+    10 => "config/routes.yaml"
+    11 => "config/services.yaml"
+    12 => "src/Kernel.php"
+    13 => "var/cache/dev/ContainerLgqOcaI/getArgumentResolver_ServiceService.php"
+    14 => "var/cache/dev/ContainerLgqOcaI/getCacheClearerService.php"
+    15 => "var/cache/dev/ContainerLgqOcaI/getCacheWarmerService.php"
+    16 => "var/cache/dev/ContainerLgqOcaI/getCache_AppClearerService.php"
+    17 => "var/cache/dev/ContainerLgqOcaI/getCache_AppService.php"
+    18 => "var/cache/dev/ContainerLgqOcaI/getCache_GlobalClearerService.php"
+    19 => "var/cache/dev/ContainerLgqOcaI/getCache_SystemClearerService.php"
+    20 => "var/cache/dev/ContainerLgqOcaI/getCache_SystemService.php"
+    21 => "var/cache/dev/ContainerLgqOcaI/getConsole_CommandLoaderService.php"
+    22 => "var/cache/dev/ContainerLgqOcaI/getConsole_Command_AboutService.php"
+    23 => "var/cache/dev/ContainerLgqOcaI/getConsole_Command_AssetsInstallService.php"
+    24 => "var/cache/dev/ContainerLgqOcaI/getConsole_Command_CacheClearService.php"
+    25 => "var/cache/dev/ContainerLgqOcaI/getConsole_Command_CachePoolClearService.php"
+    26 => "var/cache/dev/ContainerLgqOcaI/getConsole_Command_CachePoolDeleteService.php"
+    27 => "var/cache/dev/ContainerLgqOcaI/getConsole_Command_CachePoolPruneService.php"
+    28 => "var/cache/dev/ContainerLgqOcaI/getConsole_Command_CacheWarmupService.php"
+    29 => "var/cache/dev/ContainerLgqOcaI/getConsole_Command_ConfigDebugService.php"
+    30 => "var/cache/dev/ContainerLgqOcaI/getConsole_Command_ConfigDumpReferenceService.php"
+    31 => "var/cache/dev/ContainerLgqOcaI/getConsole_Command_ContainerDebugService.php"
+    32 => "var/cache/dev/ContainerLgqOcaI/getConsole_Command_DebugAutowiringService.php"
+    33 => "var/cache/dev/ContainerLgqOcaI/getConsole_Command_EventDispatcherDebugService.php"
+    34 => "var/cache/dev/ContainerLgqOcaI/getConsole_Command_RouterDebugService.php"
+    35 => "var/cache/dev/ContainerLgqOcaI/getConsole_Command_RouterMatchService.php"
+    36 => "var/cache/dev/ContainerLgqOcaI/getConsole_Command_YamlLintService.php"
+    37 => "var/cache/dev/ContainerLgqOcaI/getConsole_ErrorListenerService.php"
+    38 => "var/cache/dev/ContainerLgqOcaI/getFilesystemService.php"
+    39 => "var/cache/dev/ContainerLgqOcaI/getHttpExceptionListenerService.php"
+    40 => "var/cache/dev/ContainerLgqOcaI/getRedirectControllerService.php"
+    41 => "var/cache/dev/ContainerLgqOcaI/getRouter_CacheWarmerService.php"
+    42 => "var/cache/dev/ContainerLgqOcaI/getRouting_LoaderService.php"
+    43 => "var/cache/dev/ContainerLgqOcaI/getServicesResetterService.php"
+    44 => "var/cache/dev/ContainerLgqOcaI/getSessionService.php"
+    45 => "var/cache/dev/ContainerLgqOcaI/getSession_Storage_NativeService.php"
+    46 => "var/cache/dev/ContainerLgqOcaI/getTemplateControllerService.php"
+    47 => "var/cache/dev/ContainerLgqOcaI/removed-ids.php"
+    48 => "var/cache/dev/ContainerLgqOcaI/srcApp_KernelDevDebugContainer.php"
+    49 => "var/cache/dev/annotations.map"
+    50 => "var/cache/dev/srcApp_KernelDevDebugContainer.php"
+    51 => "var/cache/dev/srcApp_KernelDevDebugContainer.php.meta"
+    52 => "var/cache/dev/srcApp_KernelDevDebugContainer.xml"
+    53 => "var/cache/dev/srcApp_KernelDevDebugContainer.xml.meta"
+    54 => "var/cache/dev/srcApp_KernelDevDebugContainerCompiler.log"
+    55 => "var/cache/dev/srcApp_KernelDevDebugContainerDeprecations.log"
+    56 => "var/cache/dev/srcApp_KernelDevDebugContainerUrlGenerator.php"
+    57 => "var/cache/dev/srcApp_KernelDevDebugContainerUrlGenerator.php.meta"
+    58 => "var/cache/dev/srcApp_KernelDevDebugContainerUrlMatcher.php"
+    59 => "var/cache/dev/srcApp_KernelDevDebugContainerUrlMatcher.php.meta"
+    60 => "vendor/composer/installed.json"
+    61 => "vendor/psr/cache/LICENSE.txt"
+    62 => "vendor/psr/cache/src/CacheException.php"
+    63 => "vendor/psr/cache/src/CacheItemInterface.php"
+    64 => "vendor/psr/cache/src/CacheItemPoolInterface.php"
+    65 => "vendor/psr/cache/src/InvalidArgumentException.php"
+    66 => "vendor/psr/container/LICENSE"
+    67 => "vendor/psr/container/src/ContainerExceptionInterface.php"
+    68 => "vendor/psr/container/src/ContainerInterface.php"
+    69 => "vendor/psr/container/src/NotFoundExceptionInterface.php"
+    70 => "vendor/psr/log/LICENSE"
+    71 => "vendor/psr/log/Psr/Log/AbstractLogger.php"
+    72 => "vendor/psr/log/Psr/Log/InvalidArgumentException.php"
+    73 => "vendor/psr/log/Psr/Log/LogLevel.php"
+    74 => "vendor/psr/log/Psr/Log/LoggerAwareInterface.php"
+    75 => "vendor/psr/log/Psr/Log/LoggerAwareTrait.php"
+    76 => "vendor/psr/log/Psr/Log/LoggerInterface.php"
+    77 => "vendor/psr/log/Psr/Log/LoggerTrait.php"
+    78 => "vendor/psr/log/Psr/Log/NullLogger.php"
+    79 => "vendor/psr/simple-cache/src/CacheException.php"
+    80 => "vendor/psr/simple-cache/src/CacheInterface.php"
+    81 => "vendor/psr/simple-cache/src/InvalidArgumentException.php"
+    82 => "vendor/symfony/cache/Adapter/AbstractAdapter.php"
+    83 => "vendor/symfony/cache/Adapter/AdapterInterface.php"
+    84 => "vendor/symfony/cache/Adapter/ApcuAdapter.php"
+    85 => "vendor/symfony/cache/Adapter/ArrayAdapter.php"
+    86 => "vendor/symfony/cache/Adapter/ChainAdapter.php"
+    87 => "vendor/symfony/cache/Adapter/DoctrineAdapter.php"
+    88 => "vendor/symfony/cache/Adapter/FilesystemAdapter.php"
+    89 => "vendor/symfony/cache/Adapter/MemcachedAdapter.php"
+    90 => "vendor/symfony/cache/Adapter/NullAdapter.php"
+    91 => "vendor/symfony/cache/Adapter/PdoAdapter.php"
+    92 => "vendor/symfony/cache/Adapter/PhpArrayAdapter.php"
+    93 => "vendor/symfony/cache/Adapter/PhpFilesAdapter.php"
+    94 => "vendor/symfony/cache/Adapter/ProxyAdapter.php"
+    95 => "vendor/symfony/cache/Adapter/RedisAdapter.php"
+    96 => "vendor/symfony/cache/Adapter/SimpleCacheAdapter.php"
+    97 => "vendor/symfony/cache/Adapter/TagAwareAdapter.php"
+    98 => "vendor/symfony/cache/Adapter/TagAwareAdapterInterface.php"
+    99 => "vendor/symfony/cache/Adapter/TraceableAdapter.php"
+    100 => "vendor/symfony/cache/Adapter/TraceableTagAwareAdapter.php"
+    101 => "vendor/symfony/cache/CacheItem.php"
+    102 => "vendor/symfony/cache/DataCollector/CacheDataCollector.php"
+    103 => "vendor/symfony/cache/DependencyInjection/CacheCollectorPass.php"
+    104 => "vendor/symfony/cache/DependencyInjection/CachePoolClearerPass.php"
+    105 => "vendor/symfony/cache/DependencyInjection/CachePoolPass.php"
+    106 => "vendor/symfony/cache/DependencyInjection/CachePoolPrunerPass.php"
+    107 => "vendor/symfony/cache/DoctrineProvider.php"
+    108 => "vendor/symfony/cache/Exception/CacheException.php"
+    109 => "vendor/symfony/cache/Exception/InvalidArgumentException.php"
+    110 => "vendor/symfony/cache/Exception/LogicException.php"
+    111 => "vendor/symfony/cache/LICENSE"
+    112 => "vendor/symfony/cache/LockRegistry.php"
+    113 => "vendor/symfony/cache/Marshaller/DefaultMarshaller.php"
+    114 => "vendor/symfony/cache/Marshaller/MarshallerInterface.php"
+    115 => "vendor/symfony/cache/PruneableInterface.php"
+    116 => "vendor/symfony/cache/ResettableInterface.php"
+    117 => "vendor/symfony/cache/Simple/AbstractCache.php"
+    118 => "vendor/symfony/cache/Simple/ApcuCache.php"
+    119 => "vendor/symfony/cache/Simple/ArrayCache.php"
+    120 => "vendor/symfony/cache/Simple/ChainCache.php"
+    121 => "vendor/symfony/cache/Simple/DoctrineCache.php"
+    122 => "vendor/symfony/cache/Simple/FilesystemCache.php"
+    123 => "vendor/symfony/cache/Simple/MemcachedCache.php"
+    124 => "vendor/symfony/cache/Simple/NullCache.php"
+    125 => "vendor/symfony/cache/Simple/PdoCache.php"
+    126 => "vendor/symfony/cache/Simple/PhpArrayCache.php"
+    127 => "vendor/symfony/cache/Simple/PhpFilesCache.php"
+    128 => "vendor/symfony/cache/Simple/Psr6Cache.php"
+    129 => "vendor/symfony/cache/Simple/RedisCache.php"
+    130 => "vendor/symfony/cache/Simple/TraceableCache.php"
+    131 => "vendor/symfony/cache/Traits/AbstractTrait.php"
+    132 => "vendor/symfony/cache/Traits/ApcuTrait.php"
+    133 => "vendor/symfony/cache/Traits/ArrayTrait.php"
+    134 => "vendor/symfony/cache/Traits/ContractsTrait.php"
+    135 => "vendor/symfony/cache/Traits/DoctrineTrait.php"
+    136 => "vendor/symfony/cache/Traits/FilesystemCommonTrait.php"
+    137 => "vendor/symfony/cache/Traits/FilesystemTrait.php"
+    138 => "vendor/symfony/cache/Traits/MemcachedTrait.php"
+    139 => "vendor/symfony/cache/Traits/PdoTrait.php"
+    140 => "vendor/symfony/cache/Traits/PhpArrayTrait.php"
+    141 => "vendor/symfony/cache/Traits/PhpFilesTrait.php"
+    142 => "vendor/symfony/cache/Traits/ProxyTrait.php"
+    143 => "vendor/symfony/cache/Traits/RedisClusterProxy.php"
+    144 => "vendor/symfony/cache/Traits/RedisProxy.php"
+    145 => "vendor/symfony/cache/Traits/RedisTrait.php"
+    146 => "vendor/symfony/config/ConfigCache.php"
+    147 => "vendor/symfony/config/ConfigCacheFactory.php"
+    148 => "vendor/symfony/config/ConfigCacheFactoryInterface.php"
+    149 => "vendor/symfony/config/ConfigCacheInterface.php"
+    150 => "vendor/symfony/config/Definition/ArrayNode.php"
+    151 => "vendor/symfony/config/Definition/BaseNode.php"
+    152 => "vendor/symfony/config/Definition/BooleanNode.php"
+    153 => "vendor/symfony/config/Definition/Builder/ArrayNodeDefinition.php"
+    154 => "vendor/symfony/config/Definition/Builder/BooleanNodeDefinition.php"
+    155 => "vendor/symfony/config/Definition/Builder/BuilderAwareInterface.php"
+    156 => "vendor/symfony/config/Definition/Builder/EnumNodeDefinition.php"
+    157 => "vendor/symfony/config/Definition/Builder/ExprBuilder.php"
+    158 => "vendor/symfony/config/Definition/Builder/FloatNodeDefinition.php"
+    159 => "vendor/symfony/config/Definition/Builder/IntegerNodeDefinition.php"
+    160 => "vendor/symfony/config/Definition/Builder/MergeBuilder.php"
+    161 => "vendor/symfony/config/Definition/Builder/NodeBuilder.php"
+    162 => "vendor/symfony/config/Definition/Builder/NodeDefinition.php"
+    163 => "vendor/symfony/config/Definition/Builder/NodeParentInterface.php"
+    164 => "vendor/symfony/config/Definition/Builder/NormalizationBuilder.php"
+    165 => "vendor/symfony/config/Definition/Builder/NumericNodeDefinition.php"
+    166 => "vendor/symfony/config/Definition/Builder/ParentNodeDefinitionInterface.php"
+    167 => "vendor/symfony/config/Definition/Builder/ScalarNodeDefinition.php"
+    168 => "vendor/symfony/config/Definition/Builder/TreeBuilder.php"
+    169 => "vendor/symfony/config/Definition/Builder/ValidationBuilder.php"
+    170 => "vendor/symfony/config/Definition/Builder/VariableNodeDefinition.php"
+    171 => "vendor/symfony/config/Definition/ConfigurationInterface.php"
+    172 => "vendor/symfony/config/Definition/Dumper/XmlReferenceDumper.php"
+    173 => "vendor/symfony/config/Definition/Dumper/YamlReferenceDumper.php"
+    174 => "vendor/symfony/config/Definition/EnumNode.php"
+    175 => "vendor/symfony/config/Definition/Exception/DuplicateKeyException.php"
+    176 => "vendor/symfony/config/Definition/Exception/Exception.php"
+    177 => "vendor/symfony/config/Definition/Exception/ForbiddenOverwriteException.php"
+    178 => "vendor/symfony/config/Definition/Exception/InvalidConfigurationException.php"
+    179 => "vendor/symfony/config/Definition/Exception/InvalidDefinitionException.php"
+    180 => "vendor/symfony/config/Definition/Exception/InvalidTypeException.php"
+    181 => "vendor/symfony/config/Definition/Exception/TreeWithoutRootNodeException.php"
+    182 => "vendor/symfony/config/Definition/Exception/UnsetKeyException.php"
+    183 => "vendor/symfony/config/Definition/FloatNode.php"
+    184 => "vendor/symfony/config/Definition/IntegerNode.php"
+    185 => "vendor/symfony/config/Definition/NodeInterface.php"
+    186 => "vendor/symfony/config/Definition/NumericNode.php"
+    187 => "vendor/symfony/config/Definition/Processor.php"
+    188 => "vendor/symfony/config/Definition/PrototypeNodeInterface.php"
+    189 => "vendor/symfony/config/Definition/PrototypedArrayNode.php"
+    190 => "vendor/symfony/config/Definition/ScalarNode.php"
+    191 => "vendor/symfony/config/Definition/VariableNode.php"
+    192 => "vendor/symfony/config/Exception/FileLoaderImportCircularReferenceException.php"
+    193 => "vendor/symfony/config/Exception/FileLoaderLoadException.php"
+    194 => "vendor/symfony/config/Exception/FileLocatorFileNotFoundException.php"
+    195 => "vendor/symfony/config/Exception/LoaderLoadException.php"
+    196 => "vendor/symfony/config/FileLocator.php"
+    197 => "vendor/symfony/config/FileLocatorInterface.php"
+    198 => "vendor/symfony/config/LICENSE"
+    199 => "vendor/symfony/config/Loader/DelegatingLoader.php"
+    200 => "vendor/symfony/config/Loader/FileLoader.php"
+    201 => "vendor/symfony/config/Loader/GlobFileLoader.php"
+    202 => "vendor/symfony/config/Loader/Loader.php"
+    203 => "vendor/symfony/config/Loader/LoaderInterface.php"
+    204 => "vendor/symfony/config/Loader/LoaderResolver.php"
+    205 => "vendor/symfony/config/Loader/LoaderResolverInterface.php"
+    206 => "vendor/symfony/config/Resource/ClassExistenceResource.php"
+    207 => "vendor/symfony/config/Resource/ComposerResource.php"
+    208 => "vendor/symfony/config/Resource/DirectoryResource.php"
+    209 => "vendor/symfony/config/Resource/FileExistenceResource.php"
+    210 => "vendor/symfony/config/Resource/FileResource.php"
+    211 => "vendor/symfony/config/Resource/GlobResource.php"
+    212 => "vendor/symfony/config/Resource/ReflectionClassResource.php"
+    213 => "vendor/symfony/config/Resource/ResourceInterface.php"
+    214 => "vendor/symfony/config/Resource/SelfCheckingResourceChecker.php"
+    215 => "vendor/symfony/config/Resource/SelfCheckingResourceInterface.php"
+    216 => "vendor/symfony/config/ResourceCheckerConfigCache.php"
+    217 => "vendor/symfony/config/ResourceCheckerConfigCacheFactory.php"
+    218 => "vendor/symfony/config/ResourceCheckerInterface.php"
+    219 => "vendor/symfony/config/Util/Exception/InvalidXmlException.php"
+    220 => "vendor/symfony/config/Util/Exception/XmlParsingException.php"
+    221 => "vendor/symfony/config/Util/XmlUtils.php"
+    222 => "vendor/symfony/console/Application.php"
+    223 => "vendor/symfony/console/Command/Command.php"
+    224 => "vendor/symfony/console/Command/HelpCommand.php"
+    225 => "vendor/symfony/console/Command/ListCommand.php"
+    226 => "vendor/symfony/console/Command/LockableTrait.php"
+    227 => "vendor/symfony/console/CommandLoader/CommandLoaderInterface.php"
+    228 => "vendor/symfony/console/CommandLoader/ContainerCommandLoader.php"
+    229 => "vendor/symfony/console/CommandLoader/FactoryCommandLoader.php"
+    230 => "vendor/symfony/console/ConsoleEvents.php"
+    231 => "vendor/symfony/console/DependencyInjection/AddConsoleCommandPass.php"
+    232 => "vendor/symfony/console/Descriptor/ApplicationDescription.php"
+    233 => "vendor/symfony/console/Descriptor/Descriptor.php"
+    234 => "vendor/symfony/console/Descriptor/DescriptorInterface.php"
+    235 => "vendor/symfony/console/Descriptor/JsonDescriptor.php"
+    236 => "vendor/symfony/console/Descriptor/MarkdownDescriptor.php"
+    237 => "vendor/symfony/console/Descriptor/TextDescriptor.php"
+    238 => "vendor/symfony/console/Descriptor/XmlDescriptor.php"
+    239 => "vendor/symfony/console/Event/ConsoleCommandEvent.php"
+    240 => "vendor/symfony/console/Event/ConsoleErrorEvent.php"
+    241 => "vendor/symfony/console/Event/ConsoleEvent.php"
+    242 => "vendor/symfony/console/Event/ConsoleTerminateEvent.php"
+    243 => "vendor/symfony/console/EventListener/ErrorListener.php"
+    244 => "vendor/symfony/console/Exception/CommandNotFoundException.php"
+    245 => "vendor/symfony/console/Exception/ExceptionInterface.php"
+    246 => "vendor/symfony/console/Exception/InvalidArgumentException.php"
+    247 => "vendor/symfony/console/Exception/InvalidOptionException.php"
+    248 => "vendor/symfony/console/Exception/LogicException.php"
+    249 => "vendor/symfony/console/Exception/NamespaceNotFoundException.php"
+    250 => "vendor/symfony/console/Exception/RuntimeException.php"
+    251 => "vendor/symfony/console/Formatter/OutputFormatter.php"
+    252 => "vendor/symfony/console/Formatter/OutputFormatterInterface.php"
+    253 => "vendor/symfony/console/Formatter/OutputFormatterStyle.php"
+    254 => "vendor/symfony/console/Formatter/OutputFormatterStyleInterface.php"
+    255 => "vendor/symfony/console/Formatter/OutputFormatterStyleStack.php"
+    256 => "vendor/symfony/console/Formatter/WrappableOutputFormatterInterface.php"
+    257 => "vendor/symfony/console/Helper/DebugFormatterHelper.php"
+    258 => "vendor/symfony/console/Helper/DescriptorHelper.php"
+    259 => "vendor/symfony/console/Helper/FormatterHelper.php"
+    260 => "vendor/symfony/console/Helper/Helper.php"
+    261 => "vendor/symfony/console/Helper/HelperInterface.php"
+    262 => "vendor/symfony/console/Helper/HelperSet.php"
+    263 => "vendor/symfony/console/Helper/InputAwareHelper.php"
+    264 => "vendor/symfony/console/Helper/ProcessHelper.php"
+    265 => "vendor/symfony/console/Helper/ProgressBar.php"
+    266 => "vendor/symfony/console/Helper/ProgressIndicator.php"
+    267 => "vendor/symfony/console/Helper/QuestionHelper.php"
+    268 => "vendor/symfony/console/Helper/SymfonyQuestionHelper.php"
+    269 => "vendor/symfony/console/Helper/Table.php"
+    270 => "vendor/symfony/console/Helper/TableCell.php"
+    271 => "vendor/symfony/console/Helper/TableRows.php"
+    272 => "vendor/symfony/console/Helper/TableSeparator.php"
+    273 => "vendor/symfony/console/Helper/TableStyle.php"
+    274 => "vendor/symfony/console/Input/ArgvInput.php"
+    275 => "vendor/symfony/console/Input/ArrayInput.php"
+    276 => "vendor/symfony/console/Input/Input.php"
+    277 => "vendor/symfony/console/Input/InputArgument.php"
+    278 => "vendor/symfony/console/Input/InputAwareInterface.php"
+    279 => "vendor/symfony/console/Input/InputDefinition.php"
+    280 => "vendor/symfony/console/Input/InputInterface.php"
+    281 => "vendor/symfony/console/Input/InputOption.php"
+    282 => "vendor/symfony/console/Input/StreamableInputInterface.php"
+    283 => "vendor/symfony/console/Input/StringInput.php"
+    284 => "vendor/symfony/console/LICENSE"
+    285 => "vendor/symfony/console/Logger/ConsoleLogger.php"
+    286 => "vendor/symfony/console/Output/BufferedOutput.php"
+    287 => "vendor/symfony/console/Output/ConsoleOutput.php"
+    288 => "vendor/symfony/console/Output/ConsoleOutputInterface.php"
+    289 => "vendor/symfony/console/Output/ConsoleSectionOutput.php"
+    290 => "vendor/symfony/console/Output/NullOutput.php"
+    291 => "vendor/symfony/console/Output/Output.php"
+    292 => "vendor/symfony/console/Output/OutputInterface.php"
+    293 => "vendor/symfony/console/Output/StreamOutput.php"
+    294 => "vendor/symfony/console/Question/ChoiceQuestion.php"
+    295 => "vendor/symfony/console/Question/ConfirmationQuestion.php"
+    296 => "vendor/symfony/console/Question/Question.php"
+    297 => "vendor/symfony/console/Resources/bin/hiddeninput.exe"
+    298 => "vendor/symfony/console/Style/OutputStyle.php"
+    299 => "vendor/symfony/console/Style/StyleInterface.php"
+    300 => "vendor/symfony/console/Style/SymfonyStyle.php"
+    301 => "vendor/symfony/console/Terminal.php"
+    302 => "vendor/symfony/console/Tester/ApplicationTester.php"
+    303 => "vendor/symfony/console/Tester/CommandTester.php"
+    304 => "vendor/symfony/console/Tester/TesterTrait.php"
+    305 => "vendor/symfony/contracts/Cache/CacheInterface.php"
+    306 => "vendor/symfony/contracts/Cache/CacheTrait.php"
+    307 => "vendor/symfony/contracts/Cache/CallbackInterface.php"
+    308 => "vendor/symfony/contracts/Cache/ItemInterface.php"
+    309 => "vendor/symfony/contracts/Cache/TagAwareCacheInterface.php"
+    310 => "vendor/symfony/contracts/LICENSE"
+    311 => "vendor/symfony/contracts/Service/ResetInterface.php"
+    312 => "vendor/symfony/contracts/Service/ServiceLocatorTrait.php"
+    313 => "vendor/symfony/contracts/Service/ServiceSubscriberInterface.php"
+    314 => "vendor/symfony/contracts/Service/ServiceSubscriberTrait.php"
+    315 => "vendor/symfony/contracts/Translation/LocaleAwareInterface.php"
+    316 => "vendor/symfony/contracts/Translation/TranslatorInterface.php"
+    317 => "vendor/symfony/contracts/Translation/TranslatorTrait.php"
+    318 => "vendor/symfony/debug/BufferingLogger.php"
+    319 => "vendor/symfony/debug/Debug.php"
+    320 => "vendor/symfony/debug/DebugClassLoader.php"
+    321 => "vendor/symfony/debug/ErrorHandler.php"
+    322 => "vendor/symfony/debug/Exception/ClassNotFoundException.php"
+    323 => "vendor/symfony/debug/Exception/FatalErrorException.php"
+    324 => "vendor/symfony/debug/Exception/FatalThrowableError.php"
+    325 => "vendor/symfony/debug/Exception/FlattenException.php"
+    326 => "vendor/symfony/debug/Exception/OutOfMemoryException.php"
+    327 => "vendor/symfony/debug/Exception/SilencedErrorContext.php"
+    328 => "vendor/symfony/debug/Exception/UndefinedFunctionException.php"
+    329 => "vendor/symfony/debug/Exception/UndefinedMethodException.php"
+    330 => "vendor/symfony/debug/ExceptionHandler.php"
+    331 => "vendor/symfony/debug/FatalErrorHandler/ClassNotFoundFatalErrorHandler.php"
+    332 => "vendor/symfony/debug/FatalErrorHandler/FatalErrorHandlerInterface.php"
+    333 => "vendor/symfony/debug/FatalErrorHandler/UndefinedFunctionFatalErrorHandler.php"
+    334 => "vendor/symfony/debug/FatalErrorHandler/UndefinedMethodFatalErrorHandler.php"
+    335 => "vendor/symfony/debug/LICENSE"
+    336 => "vendor/symfony/dependency-injection/Alias.php"
+    337 => "vendor/symfony/dependency-injection/Argument/ArgumentInterface.php"
+    338 => "vendor/symfony/dependency-injection/Argument/BoundArgument.php"
+    339 => "vendor/symfony/dependency-injection/Argument/IteratorArgument.php"
+    340 => "vendor/symfony/dependency-injection/Argument/ReferenceSetArgumentTrait.php"
+    341 => "vendor/symfony/dependency-injection/Argument/RewindableGenerator.php"
+    342 => "vendor/symfony/dependency-injection/Argument/ServiceClosureArgument.php"
+    343 => "vendor/symfony/dependency-injection/Argument/ServiceLocator.php"
+    344 => "vendor/symfony/dependency-injection/Argument/ServiceLocatorArgument.php"
+    345 => "vendor/symfony/dependency-injection/Argument/TaggedIteratorArgument.php"
+    346 => "vendor/symfony/dependency-injection/ChildDefinition.php"
+    347 => "vendor/symfony/dependency-injection/Compiler/AbstractRecursivePass.php"
+    348 => "vendor/symfony/dependency-injection/Compiler/AnalyzeServiceReferencesPass.php"
+    349 => "vendor/symfony/dependency-injection/Compiler/AutoAliasServicePass.php"
+    350 => "vendor/symfony/dependency-injection/Compiler/AutowirePass.php"
+    351 => "vendor/symfony/dependency-injection/Compiler/AutowireRequiredMethodsPass.php"
+    352 => "vendor/symfony/dependency-injection/Compiler/CheckArgumentsValidityPass.php"
+    353 => "vendor/symfony/dependency-injection/Compiler/CheckCircularReferencesPass.php"
+    354 => "vendor/symfony/dependency-injection/Compiler/CheckDefinitionValidityPass.php"
+    355 => "vendor/symfony/dependency-injection/Compiler/CheckExceptionOnInvalidReferenceBehaviorPass.php"
+    356 => "vendor/symfony/dependency-injection/Compiler/CheckReferenceValidityPass.php"
+    357 => "vendor/symfony/dependency-injection/Compiler/Compiler.php"
+    358 => "vendor/symfony/dependency-injection/Compiler/CompilerPassInterface.php"
+    359 => "vendor/symfony/dependency-injection/Compiler/DecoratorServicePass.php"
+    360 => "vendor/symfony/dependency-injection/Compiler/DefinitionErrorExceptionPass.php"
+    361 => "vendor/symfony/dependency-injection/Compiler/ExtensionCompilerPass.php"
+    362 => "vendor/symfony/dependency-injection/Compiler/InlineServiceDefinitionsPass.php"
+    363 => "vendor/symfony/dependency-injection/Compiler/MergeExtensionConfigurationPass.php"
+    364 => "vendor/symfony/dependency-injection/Compiler/PassConfig.php"
+    365 => "vendor/symfony/dependency-injection/Compiler/PriorityTaggedServiceTrait.php"
+    366 => "vendor/symfony/dependency-injection/Compiler/RegisterEnvVarProcessorsPass.php"
+    367 => "vendor/symfony/dependency-injection/Compiler/RegisterServiceSubscribersPass.php"
+    368 => "vendor/symfony/dependency-injection/Compiler/RemoveAbstractDefinitionsPass.php"
+    369 => "vendor/symfony/dependency-injection/Compiler/RemovePrivateAliasesPass.php"
+    370 => "vendor/symfony/dependency-injection/Compiler/RemoveUnusedDefinitionsPass.php"
+    371 => "vendor/symfony/dependency-injection/Compiler/RepeatablePassInterface.php"
+    372 => "vendor/symfony/dependency-injection/Compiler/RepeatedPass.php"
+    373 => "vendor/symfony/dependency-injection/Compiler/ReplaceAliasByActualDefinitionPass.php"
+    374 => "vendor/symfony/dependency-injection/Compiler/ResolveBindingsPass.php"
+    375 => "vendor/symfony/dependency-injection/Compiler/ResolveChildDefinitionsPass.php"
+    376 => "vendor/symfony/dependency-injection/Compiler/ResolveClassPass.php"
+    377 => "vendor/symfony/dependency-injection/Compiler/ResolveEnvPlaceholdersPass.php"
+    378 => "vendor/symfony/dependency-injection/Compiler/ResolveFactoryClassPass.php"
+    379 => "vendor/symfony/dependency-injection/Compiler/ResolveHotPathPass.php"
+    380 => "vendor/symfony/dependency-injection/Compiler/ResolveInstanceofConditionalsPass.php"
+    381 => "vendor/symfony/dependency-injection/Compiler/ResolveInvalidReferencesPass.php"
+    382 => "vendor/symfony/dependency-injection/Compiler/ResolveNamedArgumentsPass.php"
+    383 => "vendor/symfony/dependency-injection/Compiler/ResolveParameterPlaceHoldersPass.php"
+    384 => "vendor/symfony/dependency-injection/Compiler/ResolvePrivatesPass.php"
+    385 => "vendor/symfony/dependency-injection/Compiler/ResolveReferencesToAliasesPass.php"
+    386 => "vendor/symfony/dependency-injection/Compiler/ResolveServiceSubscribersPass.php"
+    387 => "vendor/symfony/dependency-injection/Compiler/ResolveTaggedIteratorArgumentPass.php"
+    388 => "vendor/symfony/dependency-injection/Compiler/ServiceLocatorTagPass.php"
+    389 => "vendor/symfony/dependency-injection/Compiler/ServiceReferenceGraph.php"
+    390 => "vendor/symfony/dependency-injection/Compiler/ServiceReferenceGraphEdge.php"
+    391 => "vendor/symfony/dependency-injection/Compiler/ServiceReferenceGraphNode.php"
+    392 => "vendor/symfony/dependency-injection/Compiler/ValidateEnvPlaceholdersPass.php"
+    393 => "vendor/symfony/dependency-injection/Config/ContainerParametersResource.php"
+    394 => "vendor/symfony/dependency-injection/Config/ContainerParametersResourceChecker.php"
+    395 => "vendor/symfony/dependency-injection/Container.php"
+    396 => "vendor/symfony/dependency-injection/ContainerAwareInterface.php"
+    397 => "vendor/symfony/dependency-injection/ContainerAwareTrait.php"
+    398 => "vendor/symfony/dependency-injection/ContainerBuilder.php"
+    399 => "vendor/symfony/dependency-injection/ContainerInterface.php"
+    400 => "vendor/symfony/dependency-injection/Definition.php"
+    401 => "vendor/symfony/dependency-injection/Dumper/Dumper.php"
+    402 => "vendor/symfony/dependency-injection/Dumper/DumperInterface.php"
+    403 => "vendor/symfony/dependency-injection/Dumper/GraphvizDumper.php"
+    404 => "vendor/symfony/dependency-injection/Dumper/PhpDumper.php"
+    405 => "vendor/symfony/dependency-injection/Dumper/XmlDumper.php"
+    406 => "vendor/symfony/dependency-injection/Dumper/YamlDumper.php"
+    407 => "vendor/symfony/dependency-injection/EnvVarProcessor.php"
+    408 => "vendor/symfony/dependency-injection/EnvVarProcessorInterface.php"
+    409 => "vendor/symfony/dependency-injection/Exception/AutowiringFailedException.php"
+    410 => "vendor/symfony/dependency-injection/Exception/BadMethodCallException.php"
+    411 => "vendor/symfony/dependency-injection/Exception/EnvNotFoundException.php"
+    412 => "vendor/symfony/dependency-injection/Exception/EnvParameterException.php"
+    413 => "vendor/symfony/dependency-injection/Exception/ExceptionInterface.php"
+    414 => "vendor/symfony/dependency-injection/Exception/InvalidArgumentException.php"
+    415 => "vendor/symfony/dependency-injection/Exception/LogicException.php"
+    416 => "vendor/symfony/dependency-injection/Exception/OutOfBoundsException.php"
+    417 => "vendor/symfony/dependency-injection/Exception/ParameterCircularReferenceException.php"
+    418 => "vendor/symfony/dependency-injection/Exception/ParameterNotFoundException.php"
+    419 => "vendor/symfony/dependency-injection/Exception/RuntimeException.php"
+    420 => "vendor/symfony/dependency-injection/Exception/ServiceCircularReferenceException.php"
+    421 => "vendor/symfony/dependency-injection/Exception/ServiceNotFoundException.php"
+    422 => "vendor/symfony/dependency-injection/ExpressionLanguage.php"
+    423 => "vendor/symfony/dependency-injection/ExpressionLanguageProvider.php"
+    424 => "vendor/symfony/dependency-injection/Extension/ConfigurationExtensionInterface.php"
+    425 => "vendor/symfony/dependency-injection/Extension/Extension.php"
+    426 => "vendor/symfony/dependency-injection/Extension/ExtensionInterface.php"
+    427 => "vendor/symfony/dependency-injection/Extension/PrependExtensionInterface.php"
+    428 => "vendor/symfony/dependency-injection/LICENSE"
+    429 => "vendor/symfony/dependency-injection/LazyProxy/Instantiator/InstantiatorInterface.php"
+    430 => "vendor/symfony/dependency-injection/LazyProxy/Instantiator/RealServiceInstantiator.php"
+    431 => "vendor/symfony/dependency-injection/LazyProxy/PhpDumper/DumperInterface.php"
+    432 => "vendor/symfony/dependency-injection/LazyProxy/PhpDumper/NullDumper.php"
+    433 => "vendor/symfony/dependency-injection/LazyProxy/ProxyHelper.php"
+    434 => "vendor/symfony/dependency-injection/Loader/ClosureLoader.php"
+    435 => "vendor/symfony/dependency-injection/Loader/Configurator/AbstractConfigurator.php"
+    436 => "vendor/symfony/dependency-injection/Loader/Configurator/AbstractServiceConfigurator.php"
+    437 => "vendor/symfony/dependency-injection/Loader/Configurator/AliasConfigurator.php"
+    438 => "vendor/symfony/dependency-injection/Loader/Configurator/ContainerConfigurator.php"
+    439 => "vendor/symfony/dependency-injection/Loader/Configurator/DefaultsConfigurator.php"
+    440 => "vendor/symfony/dependency-injection/Loader/Configurator/InlineServiceConfigurator.php"
+    441 => "vendor/symfony/dependency-injection/Loader/Configurator/InstanceofConfigurator.php"
+    442 => "vendor/symfony/dependency-injection/Loader/Configurator/ParametersConfigurator.php"
+    443 => "vendor/symfony/dependency-injection/Loader/Configurator/PrototypeConfigurator.php"
+    444 => "vendor/symfony/dependency-injection/Loader/Configurator/ReferenceConfigurator.php"
+    445 => "vendor/symfony/dependency-injection/Loader/Configurator/ServiceConfigurator.php"
+    446 => "vendor/symfony/dependency-injection/Loader/Configurator/ServicesConfigurator.php"
+    447 => "vendor/symfony/dependency-injection/Loader/Configurator/Traits/AbstractTrait.php"
+    448 => "vendor/symfony/dependency-injection/Loader/Configurator/Traits/ArgumentTrait.php"
+    449 => "vendor/symfony/dependency-injection/Loader/Configurator/Traits/AutoconfigureTrait.php"
+    450 => "vendor/symfony/dependency-injection/Loader/Configurator/Traits/AutowireTrait.php"
+    451 => "vendor/symfony/dependency-injection/Loader/Configurator/Traits/BindTrait.php"
+    452 => "vendor/symfony/dependency-injection/Loader/Configurator/Traits/CallTrait.php"
+    453 => "vendor/symfony/dependency-injection/Loader/Configurator/Traits/ClassTrait.php"
+    454 => "vendor/symfony/dependency-injection/Loader/Configurator/Traits/ConfiguratorTrait.php"
+    455 => "vendor/symfony/dependency-injection/Loader/Configurator/Traits/DecorateTrait.php"
+    456 => "vendor/symfony/dependency-injection/Loader/Configurator/Traits/DeprecateTrait.php"
+    457 => "vendor/symfony/dependency-injection/Loader/Configurator/Traits/FactoryTrait.php"
+    458 => "vendor/symfony/dependency-injection/Loader/Configurator/Traits/FileTrait.php"
+    459 => "vendor/symfony/dependency-injection/Loader/Configurator/Traits/LazyTrait.php"
+    460 => "vendor/symfony/dependency-injection/Loader/Configurator/Traits/ParentTrait.php"
+    461 => "vendor/symfony/dependency-injection/Loader/Configurator/Traits/PropertyTrait.php"
+    462 => "vendor/symfony/dependency-injection/Loader/Configurator/Traits/PublicTrait.php"
+    463 => "vendor/symfony/dependency-injection/Loader/Configurator/Traits/ShareTrait.php"
+    464 => "vendor/symfony/dependency-injection/Loader/Configurator/Traits/SyntheticTrait.php"
+    465 => "vendor/symfony/dependency-injection/Loader/Configurator/Traits/TagTrait.php"
+    466 => "vendor/symfony/dependency-injection/Loader/DirectoryLoader.php"
+    467 => "vendor/symfony/dependency-injection/Loader/FileLoader.php"
+    468 => "vendor/symfony/dependency-injection/Loader/GlobFileLoader.php"
+    469 => "vendor/symfony/dependency-injection/Loader/IniFileLoader.php"
+    470 => "vendor/symfony/dependency-injection/Loader/PhpFileLoader.php"
+    471 => "vendor/symfony/dependency-injection/Loader/XmlFileLoader.php"
+    472 => "vendor/symfony/dependency-injection/Loader/YamlFileLoader.php"
+    473 => "vendor/symfony/dependency-injection/Loader/schema/dic/services/services-1.0.xsd"
+    474 => "vendor/symfony/dependency-injection/Parameter.php"
+    475 => "vendor/symfony/dependency-injection/ParameterBag/ContainerBag.php"
+    476 => "vendor/symfony/dependency-injection/ParameterBag/ContainerBagInterface.php"
+    477 => "vendor/symfony/dependency-injection/ParameterBag/EnvPlaceholderParameterBag.php"
+    478 => "vendor/symfony/dependency-injection/ParameterBag/FrozenParameterBag.php"
+    479 => "vendor/symfony/dependency-injection/ParameterBag/ParameterBag.php"
+    480 => "vendor/symfony/dependency-injection/ParameterBag/ParameterBagInterface.php"
+    481 => "vendor/symfony/dependency-injection/Reference.php"
+    482 => "vendor/symfony/dependency-injection/ResettableContainerInterface.php"
+    483 => "vendor/symfony/dependency-injection/ServiceLocator.php"
+    484 => "vendor/symfony/dependency-injection/ServiceSubscriberInterface.php"
+    485 => "vendor/symfony/dependency-injection/TaggedContainerInterface.php"
+    486 => "vendor/symfony/dependency-injection/TypedReference.php"
+    487 => "vendor/symfony/dependency-injection/Variable.php"
+    488 => "vendor/symfony/dotenv/Dotenv.php"
+    489 => "vendor/symfony/dotenv/Exception/ExceptionInterface.php"
+    490 => "vendor/symfony/dotenv/Exception/FormatException.php"
+    491 => "vendor/symfony/dotenv/Exception/FormatExceptionContext.php"
+    492 => "vendor/symfony/dotenv/Exception/PathException.php"
+    493 => "vendor/symfony/dotenv/LICENSE"
+    494 => "vendor/symfony/event-dispatcher/Debug/TraceableEventDispatcher.php"
+    495 => "vendor/symfony/event-dispatcher/Debug/TraceableEventDispatcherInterface.php"
+    496 => "vendor/symfony/event-dispatcher/Debug/WrappedListener.php"
+    497 => "vendor/symfony/event-dispatcher/DependencyInjection/RegisterListenersPass.php"
+    498 => "vendor/symfony/event-dispatcher/Event.php"
+    499 => "vendor/symfony/event-dispatcher/EventDispatcher.php"
+    500 => "vendor/symfony/event-dispatcher/EventDispatcherInterface.php"
+    501 => "vendor/symfony/event-dispatcher/EventSubscriberInterface.php"
+    502 => "vendor/symfony/event-dispatcher/GenericEvent.php"
+    503 => "vendor/symfony/event-dispatcher/ImmutableEventDispatcher.php"
+    504 => "vendor/symfony/event-dispatcher/LICENSE"
+    505 => "vendor/symfony/filesystem/Exception/ExceptionInterface.php"
+    506 => "vendor/symfony/filesystem/Exception/FileNotFoundException.php"
+    507 => "vendor/symfony/filesystem/Exception/IOException.php"
+    508 => "vendor/symfony/filesystem/Exception/IOExceptionInterface.php"
+    509 => "vendor/symfony/filesystem/Exception/InvalidArgumentException.php"
+    510 => "vendor/symfony/filesystem/Filesystem.php"
+    511 => "vendor/symfony/filesystem/LICENSE"
+    512 => "vendor/symfony/finder/Comparator/Comparator.php"
+    513 => "vendor/symfony/finder/Comparator/DateComparator.php"
+    514 => "vendor/symfony/finder/Comparator/NumberComparator.php"
+    515 => "vendor/symfony/finder/Exception/AccessDeniedException.php"
+    516 => "vendor/symfony/finder/Finder.php"
+    517 => "vendor/symfony/finder/Glob.php"
+    518 => "vendor/symfony/finder/Iterator/CustomFilterIterator.php"
+    519 => "vendor/symfony/finder/Iterator/DateRangeFilterIterator.php"
+    520 => "vendor/symfony/finder/Iterator/DepthRangeFilterIterator.php"
+    521 => "vendor/symfony/finder/Iterator/ExcludeDirectoryFilterIterator.php"
+    522 => "vendor/symfony/finder/Iterator/FileTypeFilterIterator.php"
+    523 => "vendor/symfony/finder/Iterator/FilecontentFilterIterator.php"
+    524 => "vendor/symfony/finder/Iterator/FilenameFilterIterator.php"
+    525 => "vendor/symfony/finder/Iterator/MultiplePcreFilterIterator.php"
+    526 => "vendor/symfony/finder/Iterator/PathFilterIterator.php"
+    527 => "vendor/symfony/finder/Iterator/RecursiveDirectoryIterator.php"
+    528 => "vendor/symfony/finder/Iterator/SizeRangeFilterIterator.php"
+    529 => "vendor/symfony/finder/Iterator/SortableIterator.php"
+    530 => "vendor/symfony/finder/LICENSE"
+    531 => "vendor/symfony/finder/SplFileInfo.php"
+    532 => "vendor/symfony/flex/LICENSE"
+    533 => "vendor/symfony/flex/src/Cache.php"
+    534 => "vendor/symfony/flex/src/Command/DumpEnvCommand.php"
+    535 => "vendor/symfony/flex/src/Command/GenerateIdCommand.php"
+    536 => "vendor/symfony/flex/src/Command/RemoveCommand.php"
+    537 => "vendor/symfony/flex/src/Command/RequireCommand.php"
+    538 => "vendor/symfony/flex/src/Command/SyncRecipesCommand.php"
+    539 => "vendor/symfony/flex/src/Command/UnpackCommand.php"
+    540 => "vendor/symfony/flex/src/Command/UpdateCommand.php"
+    541 => "vendor/symfony/flex/src/ComposerRepository.php"
+    542 => "vendor/symfony/flex/src/Configurator.php"
+    543 => "vendor/symfony/flex/src/Configurator/AbstractConfigurator.php"
+    544 => "vendor/symfony/flex/src/Configurator/BundlesConfigurator.php"
+    545 => "vendor/symfony/flex/src/Configurator/ComposerScriptsConfigurator.php"
+    546 => "vendor/symfony/flex/src/Configurator/ContainerConfigurator.php"
+    547 => "vendor/symfony/flex/src/Configurator/CopyFromPackageConfigurator.php"
+    548 => "vendor/symfony/flex/src/Configurator/CopyFromRecipeConfigurator.php"
+    549 => "vendor/symfony/flex/src/Configurator/EnvConfigurator.php"
+    550 => "vendor/symfony/flex/src/Configurator/GitignoreConfigurator.php"
+    551 => "vendor/symfony/flex/src/Configurator/MakefileConfigurator.php"
+    552 => "vendor/symfony/flex/src/CurlDownloader.php"
+    553 => "vendor/symfony/flex/src/Downloader.php"
+    554 => "vendor/symfony/flex/src/Event/UpdateEvent.php"
+    555 => "vendor/symfony/flex/src/Flex.php"
+    556 => "vendor/symfony/flex/src/Lock.php"
+    557 => "vendor/symfony/flex/src/Options.php"
+    558 => "vendor/symfony/flex/src/PackageResolver.php"
+    559 => "vendor/symfony/flex/src/ParallelDownloader.php"
+    560 => "vendor/symfony/flex/src/Path.php"
+    561 => "vendor/symfony/flex/src/Recipe.php"
+    562 => "vendor/symfony/flex/src/Response.php"
+    563 => "vendor/symfony/flex/src/ScriptExecutor.php"
+    564 => "vendor/symfony/flex/src/SymfonyBundle.php"
+    565 => "vendor/symfony/flex/src/TruncatedComposerRepository.php"
+    566 => "vendor/symfony/flex/src/Unpack/Operation.php"
+    567 => "vendor/symfony/flex/src/Unpack/Result.php"
+    568 => "vendor/symfony/flex/src/Unpacker.php"
+    569 => "vendor/symfony/framework-bundle/CacheWarmer/AbstractPhpFileCacheWarmer.php"
+    570 => "vendor/symfony/framework-bundle/CacheWarmer/AnnotationsCacheWarmer.php"
+    571 => "vendor/symfony/framework-bundle/CacheWarmer/RouterCacheWarmer.php"
+    572 => "vendor/symfony/framework-bundle/CacheWarmer/SerializerCacheWarmer.php"
+    573 => "vendor/symfony/framework-bundle/CacheWarmer/TemplateFinder.php"
+    574 => "vendor/symfony/framework-bundle/CacheWarmer/TemplateFinderInterface.php"
+    575 => "vendor/symfony/framework-bundle/CacheWarmer/TemplatePathsCacheWarmer.php"
+    576 => "vendor/symfony/framework-bundle/CacheWarmer/TranslationsCacheWarmer.php"
+    577 => "vendor/symfony/framework-bundle/CacheWarmer/ValidatorCacheWarmer.php"
+    578 => "vendor/symfony/framework-bundle/Client.php"
+    579 => "vendor/symfony/framework-bundle/Command/AboutCommand.php"
+    580 => "vendor/symfony/framework-bundle/Command/AbstractConfigCommand.php"
+    581 => "vendor/symfony/framework-bundle/Command/AssetsInstallCommand.php"
+    582 => "vendor/symfony/framework-bundle/Command/CacheClearCommand.php"
+    583 => "vendor/symfony/framework-bundle/Command/CachePoolClearCommand.php"
+    584 => "vendor/symfony/framework-bundle/Command/CachePoolDeleteCommand.php"
+    585 => "vendor/symfony/framework-bundle/Command/CachePoolPruneCommand.php"
+    586 => "vendor/symfony/framework-bundle/Command/CacheWarmupCommand.php"
+    587 => "vendor/symfony/framework-bundle/Command/ConfigDebugCommand.php"
+    588 => "vendor/symfony/framework-bundle/Command/ConfigDumpReferenceCommand.php"
+    589 => "vendor/symfony/framework-bundle/Command/ContainerAwareCommand.php"
+    590 => "vendor/symfony/framework-bundle/Command/ContainerDebugCommand.php"
+    591 => "vendor/symfony/framework-bundle/Command/DebugAutowiringCommand.php"
+    592 => "vendor/symfony/framework-bundle/Command/EventDispatcherDebugCommand.php"
+    593 => "vendor/symfony/framework-bundle/Command/RouterDebugCommand.php"
+    594 => "vendor/symfony/framework-bundle/Command/RouterMatchCommand.php"
+    595 => "vendor/symfony/framework-bundle/Command/TranslationDebugCommand.php"
+    596 => "vendor/symfony/framework-bundle/Command/TranslationUpdateCommand.php"
+    597 => "vendor/symfony/framework-bundle/Command/WorkflowDumpCommand.php"
+    598 => "vendor/symfony/framework-bundle/Command/XliffLintCommand.php"
+    599 => "vendor/symfony/framework-bundle/Command/YamlLintCommand.php"
+    600 => "vendor/symfony/framework-bundle/Console/Application.php"
+    601 => "vendor/symfony/framework-bundle/Console/Descriptor/Descriptor.php"
+    602 => "vendor/symfony/framework-bundle/Console/Descriptor/JsonDescriptor.php"
+    603 => "vendor/symfony/framework-bundle/Console/Descriptor/MarkdownDescriptor.php"
+    604 => "vendor/symfony/framework-bundle/Console/Descriptor/TextDescriptor.php"
+    605 => "vendor/symfony/framework-bundle/Console/Descriptor/XmlDescriptor.php"
+    606 => "vendor/symfony/framework-bundle/Console/Helper/DescriptorHelper.php"
+    607 => "vendor/symfony/framework-bundle/Controller/AbstractController.php"
+    608 => "vendor/symfony/framework-bundle/Controller/Controller.php"
+    609 => "vendor/symfony/framework-bundle/Controller/ControllerNameParser.php"
+    610 => "vendor/symfony/framework-bundle/Controller/ControllerResolver.php"
+    611 => "vendor/symfony/framework-bundle/Controller/ControllerTrait.php"
+    612 => "vendor/symfony/framework-bundle/Controller/RedirectController.php"
+    613 => "vendor/symfony/framework-bundle/Controller/TemplateController.php"
+    614 => "vendor/symfony/framework-bundle/DataCollector/RequestDataCollector.php"
+    615 => "vendor/symfony/framework-bundle/DataCollector/RouterDataCollector.php"
+    616 => "vendor/symfony/framework-bundle/DependencyInjection/Compiler/AddAnnotationsCachedReaderPass.php"
+    617 => "vendor/symfony/framework-bundle/DependencyInjection/Compiler/AddDebugLogProcessorPass.php"
+    618 => "vendor/symfony/framework-bundle/DependencyInjection/Compiler/AddExpressionLanguageProvidersPass.php"
+    619 => "vendor/symfony/framework-bundle/DependencyInjection/Compiler/CacheCollectorPass.php"
+    620 => "vendor/symfony/framework-bundle/DependencyInjection/Compiler/CachePoolClearerPass.php"
+    621 => "vendor/symfony/framework-bundle/DependencyInjection/Compiler/CachePoolPass.php"
+    622 => "vendor/symfony/framework-bundle/DependencyInjection/Compiler/CachePoolPrunerPass.php"
+    623 => "vendor/symfony/framework-bundle/DependencyInjection/Compiler/ContainerBuilderDebugDumpPass.php"
+    624 => "vendor/symfony/framework-bundle/DependencyInjection/Compiler/DataCollectorTranslatorPass.php"
+    625 => "vendor/symfony/framework-bundle/DependencyInjection/Compiler/LoggingTranslatorPass.php"
+    626 => "vendor/symfony/framework-bundle/DependencyInjection/Compiler/ProfilerPass.php"
+    627 => "vendor/symfony/framework-bundle/DependencyInjection/Compiler/TemplatingPass.php"
+    628 => "vendor/symfony/framework-bundle/DependencyInjection/Compiler/TestServiceContainerRealRefPass.php"
+    629 => "vendor/symfony/framework-bundle/DependencyInjection/Compiler/TestServiceContainerWeakRefPass.php"
+    630 => "vendor/symfony/framework-bundle/DependencyInjection/Compiler/UnusedTagsPass.php"
+    631 => "vendor/symfony/framework-bundle/DependencyInjection/Compiler/WorkflowGuardListenerPass.php"
+    632 => "vendor/symfony/framework-bundle/DependencyInjection/Configuration.php"
+    633 => "vendor/symfony/framework-bundle/DependencyInjection/FrameworkExtension.php"
+    634 => "vendor/symfony/framework-bundle/EventListener/ResolveControllerNameSubscriber.php"
+    635 => "vendor/symfony/framework-bundle/FrameworkBundle.php"
+    636 => "vendor/symfony/framework-bundle/HttpCache/HttpCache.php"
+    637 => "vendor/symfony/framework-bundle/Kernel/MicroKernelTrait.php"
+    638 => "vendor/symfony/framework-bundle/LICENSE"
+    639 => "vendor/symfony/framework-bundle/Resources/config/annotations.xml"
+    640 => "vendor/symfony/framework-bundle/Resources/config/assets.xml"
+    641 => "vendor/symfony/framework-bundle/Resources/config/cache.xml"
+    642 => "vendor/symfony/framework-bundle/Resources/config/cache_debug.xml"
+    643 => "vendor/symfony/framework-bundle/Resources/config/collectors.xml"
+    644 => "vendor/symfony/framework-bundle/Resources/config/console.xml"
+    645 => "vendor/symfony/framework-bundle/Resources/config/debug.xml"
+    646 => "vendor/symfony/framework-bundle/Resources/config/debug_prod.xml"
+    647 => "vendor/symfony/framework-bundle/Resources/config/esi.xml"
+    648 => "vendor/symfony/framework-bundle/Resources/config/form.xml"
+    649 => "vendor/symfony/framework-bundle/Resources/config/form_csrf.xml"
+    650 => "vendor/symfony/framework-bundle/Resources/config/form_debug.xml"
+    651 => "vendor/symfony/framework-bundle/Resources/config/fragment_listener.xml"
+    652 => "vendor/symfony/framework-bundle/Resources/config/fragment_renderer.xml"
+    653 => "vendor/symfony/framework-bundle/Resources/config/identity_translator.xml"
+    654 => "vendor/symfony/framework-bundle/Resources/config/lock.xml"
+    655 => "vendor/symfony/framework-bundle/Resources/config/messenger.xml"
+    656 => "vendor/symfony/framework-bundle/Resources/config/messenger_debug.xml"
+    657 => "vendor/symfony/framework-bundle/Resources/config/profiling.xml"
+    658 => "vendor/symfony/framework-bundle/Resources/config/property_access.xml"
+    659 => "vendor/symfony/framework-bundle/Resources/config/property_info.xml"
+    660 => "vendor/symfony/framework-bundle/Resources/config/request.xml"
+    661 => "vendor/symfony/framework-bundle/Resources/config/routing.xml"
+    662 => "vendor/symfony/framework-bundle/Resources/config/schema/symfony-1.0.xsd"
+    663 => "vendor/symfony/framework-bundle/Resources/config/security_csrf.xml"
+    664 => "vendor/symfony/framework-bundle/Resources/config/serializer.xml"
+    665 => "vendor/symfony/framework-bundle/Resources/config/services.xml"
+    666 => "vendor/symfony/framework-bundle/Resources/config/session.xml"
+    667 => "vendor/symfony/framework-bundle/Resources/config/ssi.xml"
+    668 => "vendor/symfony/framework-bundle/Resources/config/templating.xml"
+    669 => "vendor/symfony/framework-bundle/Resources/config/templating_debug.xml"
+    670 => "vendor/symfony/framework-bundle/Resources/config/templating_php.xml"
+    671 => "vendor/symfony/framework-bundle/Resources/config/test.xml"
+    672 => "vendor/symfony/framework-bundle/Resources/config/translation.xml"
+    673 => "vendor/symfony/framework-bundle/Resources/config/translation_debug.xml"
+    674 => "vendor/symfony/framework-bundle/Resources/config/validator.xml"
+    675 => "vendor/symfony/framework-bundle/Resources/config/validator_debug.xml"
+    676 => "vendor/symfony/framework-bundle/Resources/config/web.xml"
+    677 => "vendor/symfony/framework-bundle/Resources/config/web_link.xml"
+    678 => "vendor/symfony/framework-bundle/Resources/config/workflow.xml"
+    679 => "vendor/symfony/framework-bundle/Resources/views/Form/attributes.html.php"
+    680 => "vendor/symfony/framework-bundle/Resources/views/Form/button_attributes.html.php"
+    681 => "vendor/symfony/framework-bundle/Resources/views/Form/button_label.html.php"
+    682 => "vendor/symfony/framework-bundle/Resources/views/Form/button_row.html.php"
+    683 => "vendor/symfony/framework-bundle/Resources/views/Form/button_widget.html.php"
+    684 => "vendor/symfony/framework-bundle/Resources/views/Form/checkbox_widget.html.php"
+    685 => "vendor/symfony/framework-bundle/Resources/views/Form/choice_attributes.html.php"
+    686 => "vendor/symfony/framework-bundle/Resources/views/Form/choice_options.html.php"
+    687 => "vendor/symfony/framework-bundle/Resources/views/Form/choice_widget.html.php"
+    688 => "vendor/symfony/framework-bundle/Resources/views/Form/choice_widget_collapsed.html.php"
+    689 => "vendor/symfony/framework-bundle/Resources/views/Form/choice_widget_expanded.html.php"
+    690 => "vendor/symfony/framework-bundle/Resources/views/Form/choice_widget_options.html.php"
+    691 => "vendor/symfony/framework-bundle/Resources/views/Form/collection_widget.html.php"
+    692 => "vendor/symfony/framework-bundle/Resources/views/Form/color_widget.html.php"
+    693 => "vendor/symfony/framework-bundle/Resources/views/Form/container_attributes.html.php"
+    694 => "vendor/symfony/framework-bundle/Resources/views/Form/date_widget.html.php"
+    695 => "vendor/symfony/framework-bundle/Resources/views/Form/datetime_widget.html.php"
+    696 => "vendor/symfony/framework-bundle/Resources/views/Form/email_widget.html.php"
+    697 => "vendor/symfony/framework-bundle/Resources/views/Form/form.html.php"
+    698 => "vendor/symfony/framework-bundle/Resources/views/Form/form_enctype.html.php"
+    699 => "vendor/symfony/framework-bundle/Resources/views/Form/form_end.html.php"
+    700 => "vendor/symfony/framework-bundle/Resources/views/Form/form_errors.html.php"
+    701 => "vendor/symfony/framework-bundle/Resources/views/Form/form_help.html.php"
+    702 => "vendor/symfony/framework-bundle/Resources/views/Form/form_label.html.php"
+    703 => "vendor/symfony/framework-bundle/Resources/views/Form/form_rest.html.php"
+    704 => "vendor/symfony/framework-bundle/Resources/views/Form/form_row.html.php"
+    705 => "vendor/symfony/framework-bundle/Resources/views/Form/form_rows.html.php"
+    706 => "vendor/symfony/framework-bundle/Resources/views/Form/form_start.html.php"
+    707 => "vendor/symfony/framework-bundle/Resources/views/Form/form_widget.html.php"
+    708 => "vendor/symfony/framework-bundle/Resources/views/Form/form_widget_compound.html.php"
+    709 => "vendor/symfony/framework-bundle/Resources/views/Form/form_widget_simple.html.php"
+    710 => "vendor/symfony/framework-bundle/Resources/views/Form/hidden_row.html.php"
+    711 => "vendor/symfony/framework-bundle/Resources/views/Form/hidden_widget.html.php"
+    712 => "vendor/symfony/framework-bundle/Resources/views/Form/integer_widget.html.php"
+    713 => "vendor/symfony/framework-bundle/Resources/views/Form/money_widget.html.php"
+    714 => "vendor/symfony/framework-bundle/Resources/views/Form/number_widget.html.php"
+    715 => "vendor/symfony/framework-bundle/Resources/views/Form/password_widget.html.php"
+    716 => "vendor/symfony/framework-bundle/Resources/views/Form/percent_widget.html.php"
+    717 => "vendor/symfony/framework-bundle/Resources/views/Form/radio_widget.html.php"
+    718 => "vendor/symfony/framework-bundle/Resources/views/Form/range_widget.html.php"
+    719 => "vendor/symfony/framework-bundle/Resources/views/Form/repeated_row.html.php"
+    720 => "vendor/symfony/framework-bundle/Resources/views/Form/reset_widget.html.php"
+    721 => "vendor/symfony/framework-bundle/Resources/views/Form/search_widget.html.php"
+    722 => "vendor/symfony/framework-bundle/Resources/views/Form/submit_widget.html.php"
+    723 => "vendor/symfony/framework-bundle/Resources/views/Form/tel_widget.html.php"
+    724 => "vendor/symfony/framework-bundle/Resources/views/Form/textarea_widget.html.php"
+    725 => "vendor/symfony/framework-bundle/Resources/views/Form/time_widget.html.php"
+    726 => "vendor/symfony/framework-bundle/Resources/views/Form/url_widget.html.php"
+    727 => "vendor/symfony/framework-bundle/Resources/views/Form/widget_attributes.html.php"
+    728 => "vendor/symfony/framework-bundle/Resources/views/Form/widget_container_attributes.html.php"
+    729 => "vendor/symfony/framework-bundle/Resources/views/FormTable/button_row.html.php"
+    730 => "vendor/symfony/framework-bundle/Resources/views/FormTable/form_row.html.php"
+    731 => "vendor/symfony/framework-bundle/Resources/views/FormTable/form_widget_compound.html.php"
+    732 => "vendor/symfony/framework-bundle/Resources/views/FormTable/hidden_row.html.php"
+    733 => "vendor/symfony/framework-bundle/Routing/AnnotatedRouteControllerLoader.php"
+    734 => "vendor/symfony/framework-bundle/Routing/DelegatingLoader.php"
+    735 => "vendor/symfony/framework-bundle/Routing/RedirectableUrlMatcher.php"
+    736 => "vendor/symfony/framework-bundle/Routing/Router.php"
+    737 => "vendor/symfony/framework-bundle/Templating/DelegatingEngine.php"
+    738 => "vendor/symfony/framework-bundle/Templating/EngineInterface.php"
+    739 => "vendor/symfony/framework-bundle/Templating/GlobalVariables.php"
+    740 => "vendor/symfony/framework-bundle/Templating/Helper/ActionsHelper.php"
+    741 => "vendor/symfony/framework-bundle/Templating/Helper/AssetsHelper.php"
+    742 => "vendor/symfony/framework-bundle/Templating/Helper/CodeHelper.php"
+    743 => "vendor/symfony/framework-bundle/Templating/Helper/FormHelper.php"
+    744 => "vendor/symfony/framework-bundle/Templating/Helper/RequestHelper.php"
+    745 => "vendor/symfony/framework-bundle/Templating/Helper/RouterHelper.php"
+    746 => "vendor/symfony/framework-bundle/Templating/Helper/SessionHelper.php"
+    747 => "vendor/symfony/framework-bundle/Templating/Helper/StopwatchHelper.php"
+    748 => "vendor/symfony/framework-bundle/Templating/Helper/TranslatorHelper.php"
+    749 => "vendor/symfony/framework-bundle/Templating/Loader/FilesystemLoader.php"
+    750 => "vendor/symfony/framework-bundle/Templating/Loader/TemplateLocator.php"
+    751 => "vendor/symfony/framework-bundle/Templating/PhpEngine.php"
+    752 => "vendor/symfony/framework-bundle/Templating/TemplateFilenameParser.php"
+    753 => "vendor/symfony/framework-bundle/Templating/TemplateNameParser.php"
+    754 => "vendor/symfony/framework-bundle/Templating/TemplateReference.php"
+    755 => "vendor/symfony/framework-bundle/Templating/TimedPhpEngine.php"
+    756 => "vendor/symfony/framework-bundle/Translation/Translator.php"
+    757 => "vendor/symfony/http-foundation/AcceptHeader.php"
+    758 => "vendor/symfony/http-foundation/AcceptHeaderItem.php"
+    759 => "vendor/symfony/http-foundation/ApacheRequest.php"
+    760 => "vendor/symfony/http-foundation/BinaryFileResponse.php"
+    761 => "vendor/symfony/http-foundation/Cookie.php"
+    762 => "vendor/symfony/http-foundation/Exception/ConflictingHeadersException.php"
+    763 => "vendor/symfony/http-foundation/Exception/RequestExceptionInterface.php"
+    764 => "vendor/symfony/http-foundation/Exception/SuspiciousOperationException.php"
+    765 => "vendor/symfony/http-foundation/ExpressionRequestMatcher.php"
+    766 => "vendor/symfony/http-foundation/File/Exception/AccessDeniedException.php"
+    767 => "vendor/symfony/http-foundation/File/Exception/CannotWriteFileException.php"
+    768 => "vendor/symfony/http-foundation/File/Exception/ExtensionFileException.php"
+    769 => "vendor/symfony/http-foundation/File/Exception/FileException.php"
+    770 => "vendor/symfony/http-foundation/File/Exception/FileNotFoundException.php"
+    771 => "vendor/symfony/http-foundation/File/Exception/FormSizeFileException.php"
+    772 => "vendor/symfony/http-foundation/File/Exception/IniSizeFileException.php"
+    773 => "vendor/symfony/http-foundation/File/Exception/NoFileException.php"
+    774 => "vendor/symfony/http-foundation/File/Exception/NoTmpDirFileException.php"
+    775 => "vendor/symfony/http-foundation/File/Exception/PartialFileException.php"
+    776 => "vendor/symfony/http-foundation/File/Exception/UnexpectedTypeException.php"
+    777 => "vendor/symfony/http-foundation/File/Exception/UploadException.php"
+    778 => "vendor/symfony/http-foundation/File/File.php"
+    779 => "vendor/symfony/http-foundation/File/MimeType/ExtensionGuesser.php"
+    780 => "vendor/symfony/http-foundation/File/MimeType/ExtensionGuesserInterface.php"
+    781 => "vendor/symfony/http-foundation/File/MimeType/FileBinaryMimeTypeGuesser.php"
+    782 => "vendor/symfony/http-foundation/File/MimeType/FileinfoMimeTypeGuesser.php"
+    783 => "vendor/symfony/http-foundation/File/MimeType/MimeTypeExtensionGuesser.php"
+    784 => "vendor/symfony/http-foundation/File/MimeType/MimeTypeGuesser.php"
+    785 => "vendor/symfony/http-foundation/File/MimeType/MimeTypeGuesserInterface.php"
+    786 => "vendor/symfony/http-foundation/File/Stream.php"
+    787 => "vendor/symfony/http-foundation/File/UploadedFile.php"
+    788 => "vendor/symfony/http-foundation/FileBag.php"
+    789 => "vendor/symfony/http-foundation/HeaderBag.php"
+    790 => "vendor/symfony/http-foundation/HeaderUtils.php"
+    791 => "vendor/symfony/http-foundation/IpUtils.php"
+    792 => "vendor/symfony/http-foundation/JsonResponse.php"
+    793 => "vendor/symfony/http-foundation/LICENSE"
+    794 => "vendor/symfony/http-foundation/ParameterBag.php"
+    795 => "vendor/symfony/http-foundation/RedirectResponse.php"
+    796 => "vendor/symfony/http-foundation/Request.php"
+    797 => "vendor/symfony/http-foundation/RequestMatcher.php"
+    798 => "vendor/symfony/http-foundation/RequestMatcherInterface.php"
+    799 => "vendor/symfony/http-foundation/RequestStack.php"
+    800 => "vendor/symfony/http-foundation/Response.php"
+    801 => "vendor/symfony/http-foundation/ResponseHeaderBag.php"
+    802 => "vendor/symfony/http-foundation/ServerBag.php"
+    803 => "vendor/symfony/http-foundation/Session/Attribute/AttributeBag.php"
+    804 => "vendor/symfony/http-foundation/Session/Attribute/AttributeBagInterface.php"
+    805 => "vendor/symfony/http-foundation/Session/Attribute/NamespacedAttributeBag.php"
+    806 => "vendor/symfony/http-foundation/Session/Flash/AutoExpireFlashBag.php"
+    807 => "vendor/symfony/http-foundation/Session/Flash/FlashBag.php"
+    808 => "vendor/symfony/http-foundation/Session/Flash/FlashBagInterface.php"
+    809 => "vendor/symfony/http-foundation/Session/Session.php"
+    810 => "vendor/symfony/http-foundation/Session/SessionBagInterface.php"
+    811 => "vendor/symfony/http-foundation/Session/SessionBagProxy.php"
+    812 => "vendor/symfony/http-foundation/Session/SessionInterface.php"
+    813 => "vendor/symfony/http-foundation/Session/SessionUtils.php"
+    814 => "vendor/symfony/http-foundation/Session/Storage/Handler/AbstractSessionHandler.php"
+    815 => "vendor/symfony/http-foundation/Session/Storage/Handler/MemcachedSessionHandler.php"
+    816 => "vendor/symfony/http-foundation/Session/Storage/Handler/MigratingSessionHandler.php"
+    817 => "vendor/symfony/http-foundation/Session/Storage/Handler/MongoDbSessionHandler.php"
+    818 => "vendor/symfony/http-foundation/Session/Storage/Handler/NativeFileSessionHandler.php"
+    819 => "vendor/symfony/http-foundation/Session/Storage/Handler/NullSessionHandler.php"
+    820 => "vendor/symfony/http-foundation/Session/Storage/Handler/PdoSessionHandler.php"
+    821 => "vendor/symfony/http-foundation/Session/Storage/Handler/RedisSessionHandler.php"
+    822 => "vendor/symfony/http-foundation/Session/Storage/Handler/StrictSessionHandler.php"
+    823 => "vendor/symfony/http-foundation/Session/Storage/MetadataBag.php"
+    824 => "vendor/symfony/http-foundation/Session/Storage/MockArraySessionStorage.php"
+    825 => "vendor/symfony/http-foundation/Session/Storage/MockFileSessionStorage.php"
+    826 => "vendor/symfony/http-foundation/Session/Storage/NativeSessionStorage.php"
+    827 => "vendor/symfony/http-foundation/Session/Storage/PhpBridgeSessionStorage.php"
+    828 => "vendor/symfony/http-foundation/Session/Storage/Proxy/AbstractProxy.php"
+    829 => "vendor/symfony/http-foundation/Session/Storage/Proxy/SessionHandlerProxy.php"
+    830 => "vendor/symfony/http-foundation/Session/Storage/SessionStorageInterface.php"
+    831 => "vendor/symfony/http-foundation/StreamedResponse.php"
+    832 => "vendor/symfony/http-kernel/Bundle/Bundle.php"
+    833 => "vendor/symfony/http-kernel/Bundle/BundleInterface.php"
+    834 => "vendor/symfony/http-kernel/CacheClearer/CacheClearerInterface.php"
+    835 => "vendor/symfony/http-kernel/CacheClearer/ChainCacheClearer.php"
+    836 => "vendor/symfony/http-kernel/CacheClearer/Psr6CacheClearer.php"
+    837 => "vendor/symfony/http-kernel/CacheWarmer/CacheWarmer.php"
+    838 => "vendor/symfony/http-kernel/CacheWarmer/CacheWarmerAggregate.php"
+    839 => "vendor/symfony/http-kernel/CacheWarmer/CacheWarmerInterface.php"
+    840 => "vendor/symfony/http-kernel/CacheWarmer/WarmableInterface.php"
+    841 => "vendor/symfony/http-kernel/Client.php"
+    842 => "vendor/symfony/http-kernel/Config/FileLocator.php"
+    843 => "vendor/symfony/http-kernel/Controller/ArgumentResolver.php"
+    844 => "vendor/symfony/http-kernel/Controller/ArgumentResolver/DefaultValueResolver.php"
+    845 => "vendor/symfony/http-kernel/Controller/ArgumentResolver/RequestAttributeValueResolver.php"
+    846 => "vendor/symfony/http-kernel/Controller/ArgumentResolver/RequestValueResolver.php"
+    847 => "vendor/symfony/http-kernel/Controller/ArgumentResolver/ServiceValueResolver.php"
+    848 => "vendor/symfony/http-kernel/Controller/ArgumentResolver/SessionValueResolver.php"
+    849 => "vendor/symfony/http-kernel/Controller/ArgumentResolver/TraceableValueResolver.php"
+    850 => "vendor/symfony/http-kernel/Controller/ArgumentResolver/VariadicValueResolver.php"
+    851 => "vendor/symfony/http-kernel/Controller/ArgumentResolverInterface.php"
+    852 => "vendor/symfony/http-kernel/Controller/ArgumentValueResolverInterface.php"
+    853 => "vendor/symfony/http-kernel/Controller/ContainerControllerResolver.php"
+    854 => "vendor/symfony/http-kernel/Controller/ControllerReference.php"
+    855 => "vendor/symfony/http-kernel/Controller/ControllerResolver.php"
+    856 => "vendor/symfony/http-kernel/Controller/ControllerResolverInterface.php"
+    857 => "vendor/symfony/http-kernel/Controller/TraceableArgumentResolver.php"
+    858 => "vendor/symfony/http-kernel/Controller/TraceableControllerResolver.php"
+    859 => "vendor/symfony/http-kernel/ControllerMetadata/ArgumentMetadata.php"
+    860 => "vendor/symfony/http-kernel/ControllerMetadata/ArgumentMetadataFactory.php"
+    861 => "vendor/symfony/http-kernel/ControllerMetadata/ArgumentMetadataFactoryInterface.php"
+    862 => "vendor/symfony/http-kernel/DataCollector/AjaxDataCollector.php"
+    863 => "vendor/symfony/http-kernel/DataCollector/ConfigDataCollector.php"
+    864 => "vendor/symfony/http-kernel/DataCollector/DataCollector.php"
+    865 => "vendor/symfony/http-kernel/DataCollector/DataCollectorInterface.php"
+    866 => "vendor/symfony/http-kernel/DataCollector/DumpDataCollector.php"
+    867 => "vendor/symfony/http-kernel/DataCollector/EventDataCollector.php"
+    868 => "vendor/symfony/http-kernel/DataCollector/ExceptionDataCollector.php"
+    869 => "vendor/symfony/http-kernel/DataCollector/LateDataCollectorInterface.php"
+    870 => "vendor/symfony/http-kernel/DataCollector/LoggerDataCollector.php"
+    871 => "vendor/symfony/http-kernel/DataCollector/MemoryDataCollector.php"
+    872 => "vendor/symfony/http-kernel/DataCollector/RequestDataCollector.php"
+    873 => "vendor/symfony/http-kernel/DataCollector/RouterDataCollector.php"
+    874 => "vendor/symfony/http-kernel/DataCollector/TimeDataCollector.php"
+    875 => "vendor/symfony/http-kernel/Debug/FileLinkFormatter.php"
+    876 => "vendor/symfony/http-kernel/Debug/TraceableEventDispatcher.php"
+    877 => "vendor/symfony/http-kernel/DependencyInjection/AddAnnotatedClassesToCachePass.php"
+    878 => "vendor/symfony/http-kernel/DependencyInjection/ConfigurableExtension.php"
+    879 => "vendor/symfony/http-kernel/DependencyInjection/ControllerArgumentValueResolverPass.php"
+    880 => "vendor/symfony/http-kernel/DependencyInjection/Extension.php"
+    881 => "vendor/symfony/http-kernel/DependencyInjection/FragmentRendererPass.php"
+    882 => "vendor/symfony/http-kernel/DependencyInjection/LazyLoadingFragmentHandler.php"
+    883 => "vendor/symfony/http-kernel/DependencyInjection/LoggerPass.php"
+    884 => "vendor/symfony/http-kernel/DependencyInjection/MergeExtensionConfigurationPass.php"
+    885 => "vendor/symfony/http-kernel/DependencyInjection/RegisterControllerArgumentLocatorsPass.php"
+    886 => "vendor/symfony/http-kernel/DependencyInjection/RemoveEmptyControllerArgumentLocatorsPass.php"
+    887 => "vendor/symfony/http-kernel/DependencyInjection/ResettableServicePass.php"
+    888 => "vendor/symfony/http-kernel/DependencyInjection/ServicesResetter.php"
+    889 => "vendor/symfony/http-kernel/Event/FilterControllerArgumentsEvent.php"
+    890 => "vendor/symfony/http-kernel/Event/FilterControllerEvent.php"
+    891 => "vendor/symfony/http-kernel/Event/FilterResponseEvent.php"
+    892 => "vendor/symfony/http-kernel/Event/FinishRequestEvent.php"
+    893 => "vendor/symfony/http-kernel/Event/GetResponseEvent.php"
+    894 => "vendor/symfony/http-kernel/Event/GetResponseForControllerResultEvent.php"
+    895 => "vendor/symfony/http-kernel/Event/GetResponseForExceptionEvent.php"
+    896 => "vendor/symfony/http-kernel/Event/KernelEvent.php"
+    897 => "vendor/symfony/http-kernel/Event/PostResponseEvent.php"
+    898 => "vendor/symfony/http-kernel/EventListener/AbstractSessionListener.php"
+    899 => "vendor/symfony/http-kernel/EventListener/AbstractTestSessionListener.php"
+    900 => "vendor/symfony/http-kernel/EventListener/AddRequestFormatsListener.php"
+    901 => "vendor/symfony/http-kernel/EventListener/DebugHandlersListener.php"
+    902 => "vendor/symfony/http-kernel/EventListener/DumpListener.php"
+    903 => "vendor/symfony/http-kernel/EventListener/ExceptionListener.php"
+    904 => "vendor/symfony/http-kernel/EventListener/FragmentListener.php"
+    905 => "vendor/symfony/http-kernel/EventListener/LocaleListener.php"
+    906 => "vendor/symfony/http-kernel/EventListener/ProfilerListener.php"
+    907 => "vendor/symfony/http-kernel/EventListener/ResponseListener.php"
+    908 => "vendor/symfony/http-kernel/EventListener/RouterListener.php"
+    909 => "vendor/symfony/http-kernel/EventListener/SaveSessionListener.php"
+    910 => "vendor/symfony/http-kernel/EventListener/SessionListener.php"
+    911 => "vendor/symfony/http-kernel/EventListener/StreamedResponseListener.php"
+    912 => "vendor/symfony/http-kernel/EventListener/SurrogateListener.php"
+    913 => "vendor/symfony/http-kernel/EventListener/TestSessionListener.php"
+    914 => "vendor/symfony/http-kernel/EventListener/TranslatorListener.php"
+    915 => "vendor/symfony/http-kernel/EventListener/ValidateRequestListener.php"
+    916 => "vendor/symfony/http-kernel/Exception/AccessDeniedHttpException.php"
+    917 => "vendor/symfony/http-kernel/Exception/BadRequestHttpException.php"
+    918 => "vendor/symfony/http-kernel/Exception/ConflictHttpException.php"
+    919 => "vendor/symfony/http-kernel/Exception/ControllerDoesNotReturnResponseException.php"
+    920 => "vendor/symfony/http-kernel/Exception/GoneHttpException.php"
+    921 => "vendor/symfony/http-kernel/Exception/HttpException.php"
+    922 => "vendor/symfony/http-kernel/Exception/HttpExceptionInterface.php"
+    923 => "vendor/symfony/http-kernel/Exception/LengthRequiredHttpException.php"
+    924 => "vendor/symfony/http-kernel/Exception/MethodNotAllowedHttpException.php"
+    925 => "vendor/symfony/http-kernel/Exception/NotAcceptableHttpException.php"
+    926 => "vendor/symfony/http-kernel/Exception/NotFoundHttpException.php"
+    927 => "vendor/symfony/http-kernel/Exception/PreconditionFailedHttpException.php"
+    928 => "vendor/symfony/http-kernel/Exception/PreconditionRequiredHttpException.php"
+    929 => "vendor/symfony/http-kernel/Exception/ServiceUnavailableHttpException.php"
+    930 => "vendor/symfony/http-kernel/Exception/TooManyRequestsHttpException.php"
+    931 => "vendor/symfony/http-kernel/Exception/UnauthorizedHttpException.php"
+    932 => "vendor/symfony/http-kernel/Exception/UnprocessableEntityHttpException.php"
+    933 => "vendor/symfony/http-kernel/Exception/UnsupportedMediaTypeHttpException.php"
+    934 => "vendor/symfony/http-kernel/Fragment/AbstractSurrogateFragmentRenderer.php"
+    935 => "vendor/symfony/http-kernel/Fragment/EsiFragmentRenderer.php"
+    936 => "vendor/symfony/http-kernel/Fragment/FragmentHandler.php"
+    937 => "vendor/symfony/http-kernel/Fragment/FragmentRendererInterface.php"
+    938 => "vendor/symfony/http-kernel/Fragment/HIncludeFragmentRenderer.php"
+    939 => "vendor/symfony/http-kernel/Fragment/InlineFragmentRenderer.php"
+    940 => "vendor/symfony/http-kernel/Fragment/RoutableFragmentRenderer.php"
+    941 => "vendor/symfony/http-kernel/Fragment/SsiFragmentRenderer.php"
+    942 => "vendor/symfony/http-kernel/HttpCache/AbstractSurrogate.php"
+    943 => "vendor/symfony/http-kernel/HttpCache/Esi.php"
+    944 => "vendor/symfony/http-kernel/HttpCache/HttpCache.php"
+    945 => "vendor/symfony/http-kernel/HttpCache/ResponseCacheStrategy.php"
+    946 => "vendor/symfony/http-kernel/HttpCache/ResponseCacheStrategyInterface.php"
+    947 => "vendor/symfony/http-kernel/HttpCache/Ssi.php"
+    948 => "vendor/symfony/http-kernel/HttpCache/Store.php"
+    949 => "vendor/symfony/http-kernel/HttpCache/StoreInterface.php"
+    950 => "vendor/symfony/http-kernel/HttpCache/SubRequestHandler.php"
+    951 => "vendor/symfony/http-kernel/HttpCache/SurrogateInterface.php"
+    952 => "vendor/symfony/http-kernel/HttpKernel.php"
+    953 => "vendor/symfony/http-kernel/HttpKernelInterface.php"
+    954 => "vendor/symfony/http-kernel/Kernel.php"
+    955 => "vendor/symfony/http-kernel/KernelEvents.php"
+    956 => "vendor/symfony/http-kernel/KernelInterface.php"
+    957 => "vendor/symfony/http-kernel/LICENSE"
+    958 => "vendor/symfony/http-kernel/Log/DebugLoggerInterface.php"
+    959 => "vendor/symfony/http-kernel/Log/Logger.php"
+    960 => "vendor/symfony/http-kernel/Profiler/FileProfilerStorage.php"
+    961 => "vendor/symfony/http-kernel/Profiler/Profile.php"
+    962 => "vendor/symfony/http-kernel/Profiler/Profiler.php"
+    963 => "vendor/symfony/http-kernel/Profiler/ProfilerStorageInterface.php"
+    964 => "vendor/symfony/http-kernel/RebootableInterface.php"
+    965 => "vendor/symfony/http-kernel/Resources/welcome.html.php"
+    966 => "vendor/symfony/http-kernel/TerminableInterface.php"
+    967 => "vendor/symfony/http-kernel/UriSigner.php"
+    968 => "vendor/symfony/polyfill-mbstring/LICENSE"
+    969 => "vendor/symfony/polyfill-mbstring/Mbstring.php"
+    970 => "vendor/symfony/polyfill-mbstring/Resources/unidata/lowerCase.php"
+    971 => "vendor/symfony/polyfill-mbstring/Resources/unidata/titleCaseRegexp.php"
+    972 => "vendor/symfony/polyfill-mbstring/Resources/unidata/upperCase.php"
+    973 => "vendor/symfony/polyfill-mbstring/bootstrap.php"
+    974 => "vendor/symfony/routing/Annotation/Route.php"
+    975 => "vendor/symfony/routing/CompiledRoute.php"
+    976 => "vendor/symfony/routing/DependencyInjection/RoutingResolverPass.php"
+    977 => "vendor/symfony/routing/Exception/ExceptionInterface.php"
+    978 => "vendor/symfony/routing/Exception/InvalidParameterException.php"
+    979 => "vendor/symfony/routing/Exception/MethodNotAllowedException.php"
+    980 => "vendor/symfony/routing/Exception/MissingMandatoryParametersException.php"
+    981 => "vendor/symfony/routing/Exception/NoConfigurationException.php"
+    982 => "vendor/symfony/routing/Exception/ResourceNotFoundException.php"
+    983 => "vendor/symfony/routing/Exception/RouteNotFoundException.php"
+    984 => "vendor/symfony/routing/Generator/ConfigurableRequirementsInterface.php"
+    985 => "vendor/symfony/routing/Generator/Dumper/GeneratorDumper.php"
+    986 => "vendor/symfony/routing/Generator/Dumper/GeneratorDumperInterface.php"
+    987 => "vendor/symfony/routing/Generator/Dumper/PhpGeneratorDumper.php"
+    988 => "vendor/symfony/routing/Generator/UrlGenerator.php"
+    989 => "vendor/symfony/routing/Generator/UrlGeneratorInterface.php"
+    990 => "vendor/symfony/routing/LICENSE"
+    991 => "vendor/symfony/routing/Loader/AnnotationClassLoader.php"
+    992 => "vendor/symfony/routing/Loader/AnnotationDirectoryLoader.php"
+    993 => "vendor/symfony/routing/Loader/AnnotationFileLoader.php"
+    994 => "vendor/symfony/routing/Loader/ClosureLoader.php"
+    995 => "vendor/symfony/routing/Loader/Configurator/CollectionConfigurator.php"
+    996 => "vendor/symfony/routing/Loader/Configurator/ImportConfigurator.php"
+    997 => "vendor/symfony/routing/Loader/Configurator/RouteConfigurator.php"
+    998 => "vendor/symfony/routing/Loader/Configurator/RoutingConfigurator.php"
+    999 => "vendor/symfony/routing/Loader/Configurator/Traits/AddTrait.php"
+    1000 => "vendor/symfony/routing/Loader/Configurator/Traits/RouteTrait.php"
+    1001 => "vendor/symfony/routing/Loader/DependencyInjection/ServiceRouterLoader.php"
+    1002 => "vendor/symfony/routing/Loader/DirectoryLoader.php"
+    1003 => "vendor/symfony/routing/Loader/GlobFileLoader.php"
+    1004 => "vendor/symfony/routing/Loader/ObjectRouteLoader.php"
+    1005 => "vendor/symfony/routing/Loader/PhpFileLoader.php"
+    1006 => "vendor/symfony/routing/Loader/XmlFileLoader.php"
+    1007 => "vendor/symfony/routing/Loader/YamlFileLoader.php"
+    1008 => "vendor/symfony/routing/Loader/schema/routing/routing-1.0.xsd"
+    1009 => "vendor/symfony/routing/Matcher/Dumper/MatcherDumper.php"
+    1010 => "vendor/symfony/routing/Matcher/Dumper/MatcherDumperInterface.php"
+    1011 => "vendor/symfony/routing/Matcher/Dumper/PhpMatcherDumper.php"
+    1012 => "vendor/symfony/routing/Matcher/Dumper/PhpMatcherTrait.php"
+    1013 => "vendor/symfony/routing/Matcher/Dumper/StaticPrefixCollection.php"
+    1014 => "vendor/symfony/routing/Matcher/RedirectableUrlMatcher.php"
+    1015 => "vendor/symfony/routing/Matcher/RedirectableUrlMatcherInterface.php"
+    1016 => "vendor/symfony/routing/Matcher/RequestMatcherInterface.php"
+    1017 => "vendor/symfony/routing/Matcher/TraceableUrlMatcher.php"
+    1018 => "vendor/symfony/routing/Matcher/UrlMatcher.php"
+    1019 => "vendor/symfony/routing/Matcher/UrlMatcherInterface.php"
+    1020 => "vendor/symfony/routing/RequestContext.php"
+    1021 => "vendor/symfony/routing/RequestContextAwareInterface.php"
+    1022 => "vendor/symfony/routing/Route.php"
+    1023 => "vendor/symfony/routing/RouteCollection.php"
+    1024 => "vendor/symfony/routing/RouteCollectionBuilder.php"
+    1025 => "vendor/symfony/routing/RouteCompiler.php"
+    1026 => "vendor/symfony/routing/RouteCompilerInterface.php"
+    1027 => "vendor/symfony/routing/Router.php"
+    1028 => "vendor/symfony/routing/RouterInterface.php"
+    1029 => "vendor/symfony/var-exporter/Exception/ClassNotFoundException.php"
+    1030 => "vendor/symfony/var-exporter/Exception/ExceptionInterface.php"
+    1031 => "vendor/symfony/var-exporter/Exception/NotInstantiableTypeException.php"
+    1032 => "vendor/symfony/var-exporter/Instantiator.php"
+    1033 => "vendor/symfony/var-exporter/Internal/Exporter.php"
+    1034 => "vendor/symfony/var-exporter/Internal/Hydrator.php"
+    1035 => "vendor/symfony/var-exporter/Internal/Reference.php"
+    1036 => "vendor/symfony/var-exporter/Internal/Registry.php"
+    1037 => "vendor/symfony/var-exporter/Internal/Values.php"
+    1038 => "vendor/symfony/var-exporter/LICENSE"
+    1039 => "vendor/symfony/var-exporter/VarExporter.php"
+    1040 => "vendor/symfony/yaml/Command/LintCommand.php"
+    1041 => "vendor/symfony/yaml/Dumper.php"
+    1042 => "vendor/symfony/yaml/Escaper.php"
+    1043 => "vendor/symfony/yaml/Exception/DumpException.php"
+    1044 => "vendor/symfony/yaml/Exception/ExceptionInterface.php"
+    1045 => "vendor/symfony/yaml/Exception/ParseException.php"
+    1046 => "vendor/symfony/yaml/Exception/RuntimeException.php"
+    1047 => "vendor/symfony/yaml/Inline.php"
+    1048 => "vendor/symfony/yaml/LICENSE"
+    1049 => "vendor/symfony/yaml/Parser.php"
+    1050 => "vendor/symfony/yaml/Tag/TaggedValue.php"
+    1051 => "vendor/symfony/yaml/Unescaper.php"
+    1052 => "vendor/symfony/yaml/Yaml.php"
+  ]
+  -binaryFiles: array:1 [
+    0 => ".env.local.php"
+  ]
+  -autodiscoveredFiles: true
+  -dumpAutoload: true
+  -excludeComposerFiles: false
+  -excludeDevFiles: true
+  -compactors: []
+  -compressionAlgorithm: "NONE"
+  -mainScriptPath: "bin/console"
+  -mainScriptContents: """
+    <?php\n
+    \n
+    use App\Kernel;\n
+    use Symfony\Bundle\FrameworkBundle\Console\Application;\n
+    use Symfony\Component\Console\Input\ArgvInput;\n
+    use Symfony\Component\Debug\Debug;\n
+    \n
+    set_time_limit(0);\n
+    \n
+    require dirname(__DIR__).'/vendor/autoload.php';\n
+    \n
+    if (!class_exists(Application::class)) {\n
+        throw new RuntimeException('You need to add "symfony/framework-bundle" as a Composer dependency.');\n
+    }\n
+    \n
+    $input = new ArgvInput();\n
+    if (null !== $env = $input->getParameterOption(['--env', '-e'], null, true)) {\n
+        putenv('APP_ENV='.$_SERVER['APP_ENV'] = $_ENV['APP_ENV'] = $env);\n
+    }\n
+    \n
+    if ($input->hasParameterOption('--no-debug', true)) {\n
+        putenv('APP_DEBUG='.$_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] = '0');\n
+    }\n
+    \n
+    require dirname(__DIR__).'/config/bootstrap.php';\n
+    \n
+    if ($_SERVER['APP_DEBUG']) {\n
+        umask(0000);\n
+    \n
+        if (class_exists(Debug::class)) {\n
+            Debug::enable();\n
+        }\n
+    }\n
+    \n
+    $kernel = new Kernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);\n
+    \n
+    $application = new Application($kernel);\n
+    $application->run($input);\n
+    """
+  -fileMapper: KevinGH\Box\MapFile {#179
+    -basePath: "/Users/tfidry/Project/Humbug/box/fixtures/build/dir012"
+    -map: []
+  }
+  -metadata: null
+  -tmpOutputPath: "bin/console.phar"
+  -outputPath: "bin/console.phar"
+  -privateKeyPassphrase: null
+  -privateKeyPath: null
+  -promptForPrivateKey: false
+  -processedReplacements: []
+  -shebang: "#!/usr/bin/env php"
+  -signingAlgorithm: "SHA1"
+  -stubBannerContents: """
+    Generated by Humbug Box 3.x-dev@8a56b4d.\n
+    \n
+    @link https://github.com/humbug/box
+    """
+  -stubBannerPath: null
+  -stubPath: null
+  -isInterceptFileFuncs: false
+  -isStubGenerated: true
+  -checkRequirements: false
+  -warnings: []
+  -recommendations: []
+}
