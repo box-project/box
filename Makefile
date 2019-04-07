@@ -41,8 +41,6 @@ dump-requirement-checker: requirement-checker requirement-checker/vendor
 
 	php bin/dump-requirements-checker.php
 
-	touch $@
-
 
 #
 # Tests

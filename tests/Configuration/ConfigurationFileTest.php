@@ -36,7 +36,7 @@ use function sprintf;
  */
 class ConfigurationFileTest extends ConfigurationTestCase
 {
-    private const FIXTURES_DIR = __DIR__.'/../fixtures/configuration';
+    private const FIXTURES_DIR = __DIR__.'/../../fixtures/configuration';
 
     public function test_the_files_can_be_configured(): void
     {
