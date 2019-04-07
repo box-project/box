@@ -247,6 +247,8 @@ e2e_php_settings_checker: vendor
 e2e_symfony:		 ## Packages a fresh Symfony app
 # TODO: add box as a dep
 e2e_symfony: fixtures/build/dir012/vendor
+	composer dump-env prod
+
 	APP_ENV=prod APP_DEBUG=0 php fixtures/build/dir012/bin/console --version > fixtures/build/dir012/expected-output
 	rm -rf fixtures/build/dir012/var/cache/prod/*
 
