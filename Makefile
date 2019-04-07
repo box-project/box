@@ -115,7 +115,7 @@ e2e_check_requirements: box
 	# Pass no config
 	#
 
-	bin/box compile --working-dir fixtures/check-requirements/pass-no-config/
+	./box compile --working-dir fixtures/check-requirements/pass-no-config/
 
 	# 5.3
 	sed "s/PHP_VERSION/$$($(DOCKER) box_php53 php -r 'echo PHP_VERSION;')/" \
@@ -139,7 +139,7 @@ e2e_check_requirements: box
 	# Pass complete
 	#
 
-	bin/box compile --working-dir fixtures/check-requirements/pass-complete/
+	./box compile --working-dir fixtures/check-requirements/pass-complete/
 
 	# 5.3
 	sed "s/PHP_VERSION/$$($(DOCKER) box_php53 php -r 'echo PHP_VERSION;')/" \
@@ -163,7 +163,7 @@ e2e_check_requirements: box
 	# Fail complete
 	#
 
-	bin/box compile --working-dir fixtures/check-requirements/fail-complete/
+	./box compile --working-dir fixtures/check-requirements/fail-complete/
 
 	# 5.3
 	sed "s/PHP_VERSION/$$($(DOCKER) box_php53 php -r 'echo PHP_VERSION;')/" \
@@ -187,7 +187,7 @@ e2e_check_requirements: box
 	# Skip the requirement check
 	#
 
-	bin/box compile --working-dir fixtures/check-requirements/fail-complete/
+	./box compile --working-dir fixtures/check-requirements/fail-complete/
 
 	sed "s/PHP_VERSION/$$($(DOCKER) box_php53 php -r 'echo PHP_VERSION;')/" \
 			fixtures/check-requirements/fail-complete/expected-output-53-dist-skipped \
@@ -197,7 +197,7 @@ e2e_check_requirements: box
 	$(DOCKER) -e BOX_REQUIREMENT_CHECKER=0 -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP5PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
 	diff fixtures/check-requirements/fail-complete/expected-output-53 fixtures/check-requirements/fail-complete/actual-output
 
-BOX_COMPILE=bin/box compile --working-dir=fixtures/php-settings-checker -vvv --no-ansi
+BOX_COMPILE=./box compile --working-dir=fixtures/php-settings-checker -vvv --no-ansi
 ifeq ($(OS),Darwin)
 	SED = sed -i ''
 else
@@ -259,14 +259,13 @@ e2e_php_settings_checker: vendor
 
 .PHONY: e2e_symfony
 e2e_symfony:		 ## Packages a fresh Symfony app
-# TODO: add box as a dep
-e2e_symfony: fixtures/build/dir012/vendor
+e2e_symfony: fixtures/build/dir012/vendor box
 	composer dump-env prod
 
 	APP_ENV=prod APP_DEBUG=0 php fixtures/build/dir012/bin/console --version > fixtures/build/dir012/expected-output
 	rm -rf fixtures/build/dir012/var/cache/prod/*
 
-	APP_ENV=prod APP_DEBUG=0 bin/box compile --working-dir fixtures/build/dir012
+	APP_ENV=prod APP_DEBUG=0 $(BOX) compile --working-dir fixtures/build/dir012
 
 	php fixtures/build/dir012/bin/console.phar --version > fixtures/build/dir012/actual-output
 
