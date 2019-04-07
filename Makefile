@@ -185,6 +185,20 @@ e2e_check_requirements: box
 	$(DOCKER) -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP7PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
 	diff fixtures/check-requirements/fail-complete/expected-output-72 fixtures/check-requirements/fail-complete/actual-output
 
+	#
+	# Skip the requirement check
+	#
+
+	bin/box compile --working-dir fixtures/check-requirements/fail-complete/
+
+	sed "s/PHP_VERSION/$$($(DOCKER) box_php53 php -r 'echo PHP_VERSION;')/" \
+			fixtures/check-requirements/fail-complete/expected-output-53-dist-skipped \
+			> fixtures/check-requirements/fail-complete/expected-output-53
+
+	rm fixtures/check-requirements/fail-complete/actual-output || true
+	$(DOCKER) -e BOX_REQUIREMENT_CHECKER=0 -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP5PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
+	diff fixtures/check-requirements/fail-complete/expected-output-53 fixtures/check-requirements/fail-complete/actual-output
+
 BOX_COMPILE=bin/box compile --working-dir=fixtures/php-settings-checker -vvv --no-ansi
 ifeq ($(OS),Darwin)
 	SED = sed -i ''
