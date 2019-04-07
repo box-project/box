@@ -4,53 +4,53 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitb69edb4a9d5942d2a2b9a89a21ebf73f
+class ComposerStaticInit5c70b4df2249d1c85028156a735bffc4
 {
     public static $prefixLengthsPsr4 = array (
         '_' => 
         array (
-            '_HumbugBoxaa731ba336da\\KevinGH\\RequirementChecker\\' => 50,
-            '_HumbugBoxaa731ba336da\\Composer\\Semver\\' => 39,
+            '_HumbugBox87c495005ea2\\KevinGH\\RequirementChecker\\' => 50,
+            '_HumbugBox87c495005ea2\\Composer\\Semver\\' => 39,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        '_HumbugBoxaa731ba336da\\KevinGH\\RequirementChecker\\' => 
+        '_HumbugBox87c495005ea2\\KevinGH\\RequirementChecker\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src',
         ),
-        '_HumbugBoxaa731ba336da\\Composer\\Semver\\' => 
+        '_HumbugBox87c495005ea2\\Composer\\Semver\\' => 
         array (
             0 => __DIR__ . '/..' . '/composer/semver/src',
         ),
     );
 
     public static $classMap = array (
-        '_HumbugBoxaa731ba336da\\Composer\\Semver\\Comparator' => __DIR__ . '/..' . '/composer/semver/src/Comparator.php',
-        '_HumbugBoxaa731ba336da\\Composer\\Semver\\Constraint\\AbstractConstraint' => __DIR__ . '/..' . '/composer/semver/src/Constraint/AbstractConstraint.php',
-        '_HumbugBoxaa731ba336da\\Composer\\Semver\\Constraint\\Constraint' => __DIR__ . '/..' . '/composer/semver/src/Constraint/Constraint.php',
-        '_HumbugBoxaa731ba336da\\Composer\\Semver\\Constraint\\ConstraintInterface' => __DIR__ . '/..' . '/composer/semver/src/Constraint/ConstraintInterface.php',
-        '_HumbugBoxaa731ba336da\\Composer\\Semver\\Constraint\\EmptyConstraint' => __DIR__ . '/..' . '/composer/semver/src/Constraint/EmptyConstraint.php',
-        '_HumbugBoxaa731ba336da\\Composer\\Semver\\Constraint\\MultiConstraint' => __DIR__ . '/..' . '/composer/semver/src/Constraint/MultiConstraint.php',
-        '_HumbugBoxaa731ba336da\\Composer\\Semver\\Semver' => __DIR__ . '/..' . '/composer/semver/src/Semver.php',
-        '_HumbugBoxaa731ba336da\\Composer\\Semver\\VersionParser' => __DIR__ . '/..' . '/composer/semver/src/VersionParser.php',
-        '_HumbugBoxaa731ba336da\\KevinGH\\RequirementChecker\\Checker' => __DIR__ . '/../..' . '/src/Checker.php',
-        '_HumbugBoxaa731ba336da\\KevinGH\\RequirementChecker\\IO' => __DIR__ . '/../..' . '/src/IO.php',
-        '_HumbugBoxaa731ba336da\\KevinGH\\RequirementChecker\\IsExtensionFulfilled' => __DIR__ . '/../..' . '/src/IsExtensionFulfilled.php',
-        '_HumbugBoxaa731ba336da\\KevinGH\\RequirementChecker\\IsFulfilled' => __DIR__ . '/../..' . '/src/IsFulfilled.php',
-        '_HumbugBoxaa731ba336da\\KevinGH\\RequirementChecker\\IsPhpVersionFulfilled' => __DIR__ . '/../..' . '/src/IsPhpVersionFulfilled.php',
-        '_HumbugBoxaa731ba336da\\KevinGH\\RequirementChecker\\Printer' => __DIR__ . '/../..' . '/src/Printer.php',
-        '_HumbugBoxaa731ba336da\\KevinGH\\RequirementChecker\\Requirement' => __DIR__ . '/../..' . '/src/Requirement.php',
-        '_HumbugBoxaa731ba336da\\KevinGH\\RequirementChecker\\RequirementCollection' => __DIR__ . '/../..' . '/src/RequirementCollection.php',
-        '_HumbugBoxaa731ba336da\\KevinGH\\RequirementChecker\\Terminal' => __DIR__ . '/../..' . '/src/Terminal.php',
+        '_HumbugBox87c495005ea2\\Composer\\Semver\\Comparator' => __DIR__ . '/..' . '/composer/semver/src/Comparator.php',
+        '_HumbugBox87c495005ea2\\Composer\\Semver\\Constraint\\AbstractConstraint' => __DIR__ . '/..' . '/composer/semver/src/Constraint/AbstractConstraint.php',
+        '_HumbugBox87c495005ea2\\Composer\\Semver\\Constraint\\Constraint' => __DIR__ . '/..' . '/composer/semver/src/Constraint/Constraint.php',
+        '_HumbugBox87c495005ea2\\Composer\\Semver\\Constraint\\ConstraintInterface' => __DIR__ . '/..' . '/composer/semver/src/Constraint/ConstraintInterface.php',
+        '_HumbugBox87c495005ea2\\Composer\\Semver\\Constraint\\EmptyConstraint' => __DIR__ . '/..' . '/composer/semver/src/Constraint/EmptyConstraint.php',
+        '_HumbugBox87c495005ea2\\Composer\\Semver\\Constraint\\MultiConstraint' => __DIR__ . '/..' . '/composer/semver/src/Constraint/MultiConstraint.php',
+        '_HumbugBox87c495005ea2\\Composer\\Semver\\Semver' => __DIR__ . '/..' . '/composer/semver/src/Semver.php',
+        '_HumbugBox87c495005ea2\\Composer\\Semver\\VersionParser' => __DIR__ . '/..' . '/composer/semver/src/VersionParser.php',
+        '_HumbugBox87c495005ea2\\KevinGH\\RequirementChecker\\Checker' => __DIR__ . '/../..' . '/src/Checker.php',
+        '_HumbugBox87c495005ea2\\KevinGH\\RequirementChecker\\IO' => __DIR__ . '/../..' . '/src/IO.php',
+        '_HumbugBox87c495005ea2\\KevinGH\\RequirementChecker\\IsExtensionFulfilled' => __DIR__ . '/../..' . '/src/IsExtensionFulfilled.php',
+        '_HumbugBox87c495005ea2\\KevinGH\\RequirementChecker\\IsFulfilled' => __DIR__ . '/../..' . '/src/IsFulfilled.php',
+        '_HumbugBox87c495005ea2\\KevinGH\\RequirementChecker\\IsPhpVersionFulfilled' => __DIR__ . '/../..' . '/src/IsPhpVersionFulfilled.php',
+        '_HumbugBox87c495005ea2\\KevinGH\\RequirementChecker\\Printer' => __DIR__ . '/../..' . '/src/Printer.php',
+        '_HumbugBox87c495005ea2\\KevinGH\\RequirementChecker\\Requirement' => __DIR__ . '/../..' . '/src/Requirement.php',
+        '_HumbugBox87c495005ea2\\KevinGH\\RequirementChecker\\RequirementCollection' => __DIR__ . '/../..' . '/src/RequirementCollection.php',
+        '_HumbugBox87c495005ea2\\KevinGH\\RequirementChecker\\Terminal' => __DIR__ . '/../..' . '/src/Terminal.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitb69edb4a9d5942d2a2b9a89a21ebf73f::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitb69edb4a9d5942d2a2b9a89a21ebf73f::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitb69edb4a9d5942d2a2b9a89a21ebf73f::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit5c70b4df2249d1c85028156a735bffc4::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit5c70b4df2249d1c85028156a735bffc4::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit5c70b4df2249d1c85028156a735bffc4::$classMap;
 
         }, null, ClassLoader::class);
     }
