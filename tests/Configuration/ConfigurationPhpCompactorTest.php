@@ -12,10 +12,11 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box;
+namespace KevinGH\Box\Configuration;
 
 use function current;
 use Generator;
+use KevinGH\Box\Compactor;
 use KevinGH\Box\Compactor\Php;
 use stdClass;
 

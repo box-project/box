@@ -12,10 +12,11 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box;
+namespace KevinGH\Box\Configuration;
 
 use function json_encode;
 use const JSON_PRETTY_PRINT;
+use KevinGH\Box\Configuration;
 use KevinGH\Box\Console\ConfigurationHelper;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_absolute;
