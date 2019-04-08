@@ -40,8 +40,6 @@ use Throwable;
  */
 final class Diff extends Command
 {
-    use CreateTemporaryPharFile;
-
     private const FIRST_PHAR_ARG = 'pharA';
     private const SECOND_PHAR_ARG = 'pharB';
 

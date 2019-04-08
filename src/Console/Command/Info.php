@@ -20,6 +20,7 @@ use Assert\Assertion;
 use DirectoryIterator;
 use function is_array;
 use KevinGH\Box\Console\PharInfoRenderer;
+use function KevinGH\Box\create_temporary_phar;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\get_phar_compression_algorithms;
@@ -43,8 +44,6 @@ use Throwable;
  */
 final class Info extends Command
 {
-    use CreateTemporaryPharFile;
-
     private const PHAR_ARG = 'phar';
     private const LIST_OPT = 'list';
     private const METADATA_OPT = 'metadata';
@@ -146,14 +145,12 @@ HELP
             return 1;
         }
 
-        $tmpFile = $this->createTemporaryPhar($file);
+        $tmpFile = create_temporary_phar($file);
 
         try {
             return $this->showInfo($tmpFile, $file, $input, $output, $io);
         } finally {
-            if ($file !== $tmpFile) {
-                remove($tmpFile);
-            }
+            remove($tmpFile);
         }
     }
 

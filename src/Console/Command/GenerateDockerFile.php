@@ -17,6 +17,7 @@ namespace KevinGH\Box\Console\Command;
 use Assert\Assertion;
 use function file_exists;
 use function getcwd;
+use function KevinGH\Box\create_temporary_phar;
 use KevinGH\Box\DockerFileGenerator;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_relative;
@@ -35,8 +36,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 final class GenerateDockerFile extends ConfigurableCommand
 {
-    use CreateTemporaryPharFile;
-
     private const PHAR_ARG = 'phar';
     private const DOCKER_FILE_NAME = 'Dockerfile';
 
@@ -85,7 +84,7 @@ final class GenerateDockerFile extends ConfigurableCommand
             )
         );
 
-        $tmpPharPath = $this->createTemporaryPhar($pharPath);
+        $tmpPharPath = create_temporary_phar($pharPath);
 
         $requirementsPhar = 'phar://'.$tmpPharPath.'/.box/.requirements.php';
 
@@ -137,9 +136,7 @@ final class GenerateDockerFile extends ConfigurableCommand
                 ]
             );
         } finally {
-            if ($tmpPharPath !== $pharPath) {
-                remove($tmpPharPath);
-            }
+            remove($tmpPharPath);
         }
 
         return 0;

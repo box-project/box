@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Assert\Assertion;
+use function KevinGH\Box\create_temporary_phar;
 use function KevinGH\Box\FileSystem\remove;
 use Phar;
 use function realpath;
@@ -30,8 +31,6 @@ use Throwable;
  */
 final class Verify extends Command
 {
-    use CreateTemporaryPharFile;
-
     private const PHAR_ARG = 'phar';
 
     /**
@@ -85,7 +84,7 @@ HELP
         );
         $io->newLine();
 
-        $tmpPharPath = $this->createTemporaryPhar($pharPath);
+        $tmpPharPath = create_temporary_phar($pharPath);
 
         $verified = false;
         $signature = null;
@@ -99,9 +98,7 @@ HELP
         } catch (Throwable $throwable) {
             // Continue
         } finally {
-            if ($tmpPharPath !== $pharPath) {
-                remove($tmpPharPath);
-            }
+            remove($tmpPharPath);
         }
 
         if (false === $verified || null === $signature) {

@@ -31,6 +31,7 @@ use function random_bytes;
 use function sprintf;
 use function strlen;
 use function strtolower;
+use function KevinGH\Box\FileSystem\copy;
 
 function get_box_version(): string
 {
@@ -164,9 +165,22 @@ function is_parallel_processing_enabled(): bool
 /**
  * @private
  *
- * @return string Random 12 charactres long (plus the prefix) string composed of a-z characters and digits
+ * @return string Random 12 characters long (plus the prefix) string composed of a-z characters and digits
  */
 function unique_id(string $prefix): string
 {
     return $prefix.bin2hex(random_bytes(6));
+}
+
+function create_temporary_phar(string $file): string
+{
+    $tmpFile = sys_get_temp_dir().'/'.unique_id('').basename($file);
+
+    if ('' === pathinfo($file, PATHINFO_EXTENSION)) {
+        $tmpFile .= '.phar';
+    }
+
+    copy($file, $tmpFile, true);
+
+    return $tmpFile;
 }
