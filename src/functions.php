@@ -29,9 +29,11 @@ use PackageVersions\Versions;
 use Phar;
 use function random_bytes;
 use function sprintf;
+use function str_replace;
 use function strlen;
 use function strtolower;
 use function KevinGH\Box\FileSystem\copy;
+use Symfony\Component\Console\Helper\Helper;
 
 function get_box_version(): string
 {
@@ -131,6 +133,15 @@ function memory_to_bytes(string $value): int
     }
 
     return $bytes;
+}
+
+function format_time(float $secs): string
+{
+    return str_replace(
+        ' ',
+        '',
+        Helper::formatTime($secs)
+    );
 }
 
 function register_aliases(): void

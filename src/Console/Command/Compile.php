@@ -24,11 +24,13 @@ use KevinGH\Box\Console\Logger\CompileLogger;
 use KevinGH\Box\Console\MessageRenderer;
 use KevinGH\Box\Console\OutputFormatterConfigurator;
 use KevinGH\Box\Console\Php\PhpSettingsHandler;
+use function KevinGH\Box\format_time;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\RequirementChecker\RequirementsDumper;
 use KevinGH\Box\StubGenerator;
 use RuntimeException;
 use stdClass;
+use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -870,10 +872,10 @@ HELP;
 
         $io->comment(
             sprintf(
-                '<info>Memory usage: %.2fMB (peak: %.2fMB), time: %.2fs<info>',
-                round(memory_get_usage() / 1024 / 1024, 2),
-                round(memory_get_peak_usage() / 1024 / 1024, 2),
-                round(microtime(true) - $startTime, 2)
+                '<info>Memory usage: %s (peak: %s), time: %s<info>',
+                format_size(memory_get_usage()),
+                format_size(memory_get_peak_usage()),
+                format_time(microtime(true) - $startTime)
             )
         );
     }
