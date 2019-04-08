@@ -23,6 +23,7 @@ use function array_unshift;
 use Assert\Assertion;
 use BadMethodCallException;
 use function chdir;
+use Closure;
 use Countable;
 use function dirname;
 use function extension_loaded;
@@ -33,8 +34,6 @@ use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
-use KevinGH\Box\Composer\ComposerOrchestrator;
-use KevinGH\Box\Console\IO\IO;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\make_tmp_dir;
@@ -111,7 +110,7 @@ final class Box implements Countable
         $this->phar->startBuffering();
     }
 
-    public function endBuffering(bool $dumpAutoload, bool $excludeDevFiles, IO $io = null): void
+    public function endBuffering(?Closure $dumpAutoload): void
     {
         Assertion::true($this->buffering, 'The buffering must be started before ending it');
 
@@ -131,13 +130,10 @@ final class Box implements Countable
                 dump_file($file, $contents);
             }
 
-            if ($dumpAutoload) {
-                // Dump autoload without dev dependencies
-                ComposerOrchestrator::dumpAutoload(
+            if (null !== $dumpAutoload) {
+                $dumpAutoload(
                     $this->scoper->getWhitelist(),
-                    $this->scoper->getPrefix(),
-                    $excludeDevFiles,
-                    $io
+                    $this->scoper->getPrefix()
                 );
             }
 

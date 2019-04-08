@@ -22,7 +22,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final class CompileLogger
+final class CompilerLogger
 {
     public const QUESTION_MARK_PREFIX = '?';
     public const STAR_PREFIX = '*';

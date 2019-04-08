@@ -17,7 +17,7 @@ namespace KevinGH\Box\Composer;
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use Humbug\PhpScoper\Whitelist;
 use KevinGH\Box\Console\IO\IO;
-use KevinGH\Box\Console\Logger\CompileLogger;
+use KevinGH\Box\Console\Logger\CompilerLogger;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
 use KevinGH\Box\NotInstantiable;
@@ -48,7 +48,7 @@ final class ComposerOrchestrator
             $io = IO::createNull();
         }
 
-        $logger = new CompileLogger($io);
+        $logger = new CompilerLogger($io);
 
         $composerExecutable = self::retrieveComposerExecutable();
 
@@ -110,7 +110,7 @@ final class ComposerOrchestrator
         return $executableFinder->find('composer');
     }
 
-    private static function dumpAutoloader(string $composerExecutable, bool $noDev, CompileLogger $logger): void
+    private static function dumpAutoloader(string $composerExecutable, bool $noDev, CompilerLogger $logger): void
     {
         $composerCommand = [$composerExecutable, 'dump-autoload', '--classmap-authoritative'];
 
@@ -129,7 +129,7 @@ final class ComposerOrchestrator
         $dumpAutoloadProcess = new Process($composerCommand);
 
         $logger->log(
-            CompileLogger::CHEVRON_PREFIX,
+            CompilerLogger::CHEVRON_PREFIX,
             $dumpAutoloadProcess->getCommandLine(),
             OutputInterface::VERBOSITY_VERBOSE
         );
@@ -153,7 +153,7 @@ final class ComposerOrchestrator
         }
     }
 
-    private static function retrieveAutoloadFile(string $composerExecutable, CompileLogger $logger): string
+    private static function retrieveAutoloadFile(string $composerExecutable, CompilerLogger $logger): string
     {
         $command = [$composerExecutable, 'config', 'vendor-dir'];
 
@@ -164,7 +164,7 @@ final class ComposerOrchestrator
         $vendorDirProcess = new Process($command);
 
         $logger->log(
-            CompileLogger::CHEVRON_PREFIX,
+            CompilerLogger::CHEVRON_PREFIX,
             $vendorDirProcess->getCommandLine(),
             OutputInterface::VERBOSITY_VERBOSE
         );

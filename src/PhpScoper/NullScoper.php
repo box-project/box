@@ -37,13 +37,16 @@ final class NullScoper implements Scoper
     }
 
     /**
-     * @return string[]
+     * {@inheritdoc}
      */
     public function getWhitelist(): Whitelist
     {
         return Whitelist::create(true, true, true);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getPrefix(): string
     {
         return '';

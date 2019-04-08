@@ -27,15 +27,17 @@ use function file_exists;
 use function filesize;
 use function function_exists;
 use function get_class;
+use Humbug\PhpScoper\Whitelist;
 use function implode;
 use function is_string;
 use KevinGH\Box\Box;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Composer\ComposerConfiguration;
+use KevinGH\Box\Composer\ComposerOrchestrator;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\IO\IO;
-use KevinGH\Box\Console\Logger\CompileLogger;
+use KevinGH\Box\Console\Logger\CompilerLogger;
 use KevinGH\Box\Console\MessageRenderer;
 use KevinGH\Box\Console\Php\PhpSettingsHandler;
 use function KevinGH\Box\disable_parallel_processing;
@@ -188,7 +190,7 @@ HELP;
         ;
         $path = $config->getOutputPath();
 
-        $logger = new CompileLogger($io);
+        $logger = new CompilerLogger($io);
 
         $startTime = microtime(true);
 
@@ -211,7 +213,7 @@ HELP;
 
     private function createPhar(
         Configuration $config,
-        CompileLogger $logger,
+        CompilerLogger $logger,
         IO $io,
         bool $debug
     ): Box {
@@ -260,7 +262,7 @@ HELP;
         return $box;
     }
 
-    private function removeExistingArtifacts(Configuration $config, CompileLogger $logger, bool $debug): void
+    private function removeExistingArtifacts(Configuration $config, CompilerLogger $logger, bool $debug): void
     {
         $path = $config->getOutputPath();
 
@@ -278,7 +280,7 @@ HELP;
         }
 
         $logger->log(
-            CompileLogger::QUESTION_MARK_PREFIX,
+            CompilerLogger::QUESTION_MARK_PREFIX,
             sprintf(
                 'Removing the existing PHAR "%s"',
                 $path
@@ -288,7 +290,7 @@ HELP;
         remove($path);
     }
 
-    private function registerReplacementValues(Configuration $config, Box $box, CompileLogger $logger): void
+    private function registerReplacementValues(Configuration $config, Box $box, CompilerLogger $logger): void
     {
         $values = $config->getReplacements();
 
@@ -297,13 +299,13 @@ HELP;
         }
 
         $logger->log(
-            CompileLogger::QUESTION_MARK_PREFIX,
+            CompilerLogger::QUESTION_MARK_PREFIX,
             'Setting replacement values'
         );
 
         foreach ($values as $key => $value) {
             $logger->log(
-                CompileLogger::PLUS_PREFIX,
+                CompilerLogger::PLUS_PREFIX,
                 sprintf(
                     '%s: %s',
                     $key,
@@ -315,13 +317,13 @@ HELP;
         $box->registerPlaceholders($values);
     }
 
-    private function registerCompactors(Configuration $config, Box $box, CompileLogger $logger): void
+    private function registerCompactors(Configuration $config, Box $box, CompilerLogger $logger): void
     {
         $compactors = $config->getCompactors();
 
         if ([] === $compactors) {
             $logger->log(
-                CompileLogger::QUESTION_MARK_PREFIX,
+                CompilerLogger::QUESTION_MARK_PREFIX,
                 'No compactor to register'
             );
 
@@ -329,7 +331,7 @@ HELP;
         }
 
         $logger->log(
-            CompileLogger::QUESTION_MARK_PREFIX,
+            CompilerLogger::QUESTION_MARK_PREFIX,
             'Registering compactors'
         );
 
@@ -342,7 +344,7 @@ HELP;
             }
 
             $logger->log(
-                CompileLogger::PLUS_PREFIX,
+                CompilerLogger::PLUS_PREFIX,
                 implode('\\', $compactorClassParts)
             );
         };
@@ -352,7 +354,7 @@ HELP;
         $box->registerCompactors($compactors);
     }
 
-    private function registerFileMapping(Configuration $config, Box $box, CompileLogger $logger): void
+    private function registerFileMapping(Configuration $config, Box $box, CompilerLogger $logger): void
     {
         $fileMapper = $config->getFileMapper();
 
@@ -361,36 +363,36 @@ HELP;
         $box->registerFileMapping($fileMapper);
     }
 
-    private function addFiles(Configuration $config, Box $box, CompileLogger $logger, IO $io): void
+    private function addFiles(Configuration $config, Box $box, CompilerLogger $logger, IO $io): void
     {
-        $logger->log(CompileLogger::QUESTION_MARK_PREFIX, 'Adding binary files');
+        $logger->log(CompilerLogger::QUESTION_MARK_PREFIX, 'Adding binary files');
 
         $count = count($config->getBinaryFiles());
 
         $box->addFiles($config->getBinaryFiles(), true);
 
         $logger->log(
-            CompileLogger::CHEVRON_PREFIX,
+            CompilerLogger::CHEVRON_PREFIX,
             0 === $count
                 ? 'No file found'
                 : sprintf('%d file(s)', $count)
         );
 
         $logger->log(
-            CompileLogger::QUESTION_MARK_PREFIX,
+            CompilerLogger::QUESTION_MARK_PREFIX,
             sprintf(
                 'Auto-discover files? %s',
                 $config->hasAutodiscoveredFiles() ? 'Yes' : 'No'
             )
         );
         $logger->log(
-            CompileLogger::QUESTION_MARK_PREFIX,
+            CompilerLogger::QUESTION_MARK_PREFIX,
             sprintf(
                 'Exclude dev files? %s',
                 $config->excludeDevFiles() ? 'Yes' : 'No'
             )
         );
-        $logger->log(CompileLogger::QUESTION_MARK_PREFIX, 'Adding files');
+        $logger->log(CompilerLogger::QUESTION_MARK_PREFIX, 'Adding files');
 
         $count = count($config->getFiles());
 
@@ -406,18 +408,18 @@ HELP;
         }
 
         $logger->log(
-            CompileLogger::CHEVRON_PREFIX,
+            CompilerLogger::CHEVRON_PREFIX,
             0 === $count
                 ? 'No file found'
                 : sprintf('%d file(s)', $count)
         );
     }
 
-    private function registerMainScript(Configuration $config, Box $box, CompileLogger $logger): ?string
+    private function registerMainScript(Configuration $config, Box $box, CompilerLogger $logger): ?string
     {
         if (false === $config->hasMainScript()) {
             $logger->log(
-                CompileLogger::QUESTION_MARK_PREFIX,
+                CompilerLogger::QUESTION_MARK_PREFIX,
                 'No main script path configured'
             );
 
@@ -427,7 +429,7 @@ HELP;
         $main = $config->getMainScriptPath();
 
         $logger->log(
-            CompileLogger::QUESTION_MARK_PREFIX,
+            CompilerLogger::QUESTION_MARK_PREFIX,
             sprintf(
                 'Adding main file: %s',
                 $main
@@ -443,7 +445,7 @@ HELP;
 
         if ($localMain !== $relativeMain) {
             $logger->log(
-                CompileLogger::CHEVRON_PREFIX,
+                CompilerLogger::CHEVRON_PREFIX,
                 $localMain
             );
         }
@@ -451,11 +453,11 @@ HELP;
         return $localMain;
     }
 
-    private function registerRequirementsChecker(Configuration $config, Box $box, CompileLogger $logger): bool
+    private function registerRequirementsChecker(Configuration $config, Box $box, CompilerLogger $logger): bool
     {
         if (false === $config->checkRequirements()) {
             $logger->log(
-                CompileLogger::QUESTION_MARK_PREFIX,
+                CompilerLogger::QUESTION_MARK_PREFIX,
                 'Skip requirements checker'
             );
 
@@ -463,7 +465,7 @@ HELP;
         }
 
         $logger->log(
-            CompileLogger::QUESTION_MARK_PREFIX,
+            CompilerLogger::QUESTION_MARK_PREFIX,
             'Adding requirements checker'
         );
 
@@ -487,11 +489,11 @@ HELP;
         Box $box,
         ?string $main,
         bool $checkRequirements,
-        CompileLogger $logger
+        CompilerLogger $logger
     ): void {
         if ($config->isStubGenerated()) {
             $logger->log(
-                CompileLogger::QUESTION_MARK_PREFIX,
+                CompilerLogger::QUESTION_MARK_PREFIX,
                 'Generating new stub'
             );
 
@@ -504,7 +506,7 @@ HELP;
 
         if (null !== ($stub = $config->getStubPath())) {
             $logger->log(
-                CompileLogger::QUESTION_MARK_PREFIX,
+                CompilerLogger::QUESTION_MARK_PREFIX,
                 sprintf(
                     'Using stub file: %s',
                     $stub
@@ -529,21 +531,21 @@ HELP;
         $box->getPhar()->setDefaultStub($main);
 
         $logger->log(
-            CompileLogger::QUESTION_MARK_PREFIX,
+            CompilerLogger::QUESTION_MARK_PREFIX,
             'Using default stub'
         );
     }
 
-    private function configureMetadata(Configuration $config, Box $box, CompileLogger $logger): void
+    private function configureMetadata(Configuration $config, Box $box, CompilerLogger $logger): void
     {
         if (null !== ($metadata = $config->getMetadata())) {
             $logger->log(
-                CompileLogger::QUESTION_MARK_PREFIX,
+                CompilerLogger::QUESTION_MARK_PREFIX,
                 'Setting metadata'
             );
 
             $logger->log(
-                CompileLogger::MINUS_PREFIX,
+                CompilerLogger::MINUS_PREFIX,
                 is_string($metadata) ? $metadata : var_export($metadata, true)
             );
 
@@ -551,26 +553,38 @@ HELP;
         }
     }
 
-    private function commit(Box $box, Configuration $config, CompileLogger $logger): void
+    private function commit(Box $box, Configuration $config, CompilerLogger $logger): void
     {
         $message = $config->dumpAutoload()
             ? 'Dumping the Composer autoloader'
             : 'Skipping dumping the Composer autoloader'
         ;
 
-        $logger->log(CompileLogger::QUESTION_MARK_PREFIX, $message);
+        $logger->log(CompilerLogger::QUESTION_MARK_PREFIX, $message);
 
-        $box->endBuffering($config->dumpAutoload(), $config->excludeDevFiles(), $logger->getIO());
+        $excludeDevFiles = $config->excludeDevFiles();
+        $io = $logger->getIO();
+
+        $box->endBuffering(
+            static function (Whitelist $whitelist, string $prefix) use ($excludeDevFiles, $io): void {
+                ComposerOrchestrator::dumpAutoload(
+                    $whitelist,
+                    $prefix,
+                    $excludeDevFiles,
+                    $io
+                );
+            }
+        );
     }
 
-    private function checkComposerFiles(Box $box, Configuration $config, CompileLogger $logger): void
+    private function checkComposerFiles(Box $box, Configuration $config, CompilerLogger $logger): void
     {
         $message = $config->excludeComposerFiles()
             ? 'Removing the Composer dump artefacts'
             : 'Keep the Composer dump artefacts'
         ;
 
-        $logger->log(CompileLogger::QUESTION_MARK_PREFIX, $message);
+        $logger->log(CompilerLogger::QUESTION_MARK_PREFIX, $message);
 
         if ($config->excludeComposerFiles()) {
             $box->removeComposerArtefacts(
@@ -586,11 +600,11 @@ HELP;
         Box $box,
         bool $dev,
         IO $io,
-        CompileLogger $logger
+        CompilerLogger $logger
     ): void {
         if (null === ($algorithm = $config->getCompressionAlgorithm())) {
             $logger->log(
-                CompileLogger::QUESTION_MARK_PREFIX,
+                CompilerLogger::QUESTION_MARK_PREFIX,
                 'No compression'
             );
 
@@ -598,13 +612,13 @@ HELP;
         }
 
         if ($dev) {
-            $logger->log(CompileLogger::QUESTION_MARK_PREFIX, 'Dev mode detected: skipping the compression');
+            $logger->log(CompilerLogger::QUESTION_MARK_PREFIX, 'Dev mode detected: skipping the compression');
 
             return;
         }
 
         $logger->log(
-            CompileLogger::QUESTION_MARK_PREFIX,
+            CompilerLogger::QUESTION_MARK_PREFIX,
             sprintf(
                 'Compressing with the algorithm "<comment>%s</comment>"',
                 array_search($algorithm, get_phar_compression_algorithms(), true)
@@ -618,7 +632,7 @@ HELP;
 
             if (null !== $extension) {
                 $logger->log(
-                    CompileLogger::CHEVRON_PREFIX,
+                    CompilerLogger::CHEVRON_PREFIX,
                     sprintf(
                         '<info>Warning: the extension "%s" will now be required to execute the PHAR</info>',
                         $extension
@@ -700,7 +714,7 @@ HELP;
         string $path,
         InputInterface $input,
         OutputInterface $output,
-        CompileLogger $logger
+        CompilerLogger $logger
     ): void {
         // Sign using private key when applicable
         remove($path.'.pubkey');
@@ -716,7 +730,7 @@ HELP;
         }
 
         $logger->log(
-            CompileLogger::QUESTION_MARK_PREFIX,
+            CompilerLogger::QUESTION_MARK_PREFIX,
             'Signing using a private key'
         );
 
@@ -748,11 +762,11 @@ HELP;
         $box->signUsingFile($key, $passphrase);
     }
 
-    private function correctPermissions(string $path, Configuration $config, CompileLogger $logger): void
+    private function correctPermissions(string $path, Configuration $config, CompilerLogger $logger): void
     {
         if (null !== ($chmod = $config->getFileMode())) {
             $logger->log(
-                CompileLogger::QUESTION_MARK_PREFIX,
+                CompilerLogger::QUESTION_MARK_PREFIX,
                 sprintf(
                     'Setting file permissions to <comment>%s</comment>',
                     '0'.decoct($chmod)
@@ -767,7 +781,7 @@ HELP;
         Configuration $config,
         ?string $main,
         bool $checkRequirements,
-        CompileLogger $logger
+        CompilerLogger $logger
     ): string {
         $stub = StubGenerator::create()
             ->alias($config->getAlias())
@@ -778,7 +792,7 @@ HELP;
 
         if (null !== ($shebang = $config->getShebang())) {
             $logger->log(
-                CompileLogger::MINUS_PREFIX,
+                CompilerLogger::MINUS_PREFIX,
                 sprintf(
                     'Using shebang line: %s',
                     $shebang
@@ -788,14 +802,14 @@ HELP;
             $stub->shebang($shebang);
         } else {
             $logger->log(
-                CompileLogger::MINUS_PREFIX,
+                CompilerLogger::MINUS_PREFIX,
                 'No shebang line'
             );
         }
 
         if (null !== ($bannerPath = $config->getStubBannerPath())) {
             $logger->log(
-                CompileLogger::MINUS_PREFIX,
+                CompilerLogger::MINUS_PREFIX,
                 sprintf(
                     'Using custom banner from file: %s',
                     $bannerPath
@@ -805,7 +819,7 @@ HELP;
             $stub->banner($config->getStubBannerContents());
         } elseif (null !== ($banner = $config->getStubBannerContents())) {
             $logger->log(
-                CompileLogger::MINUS_PREFIX,
+                CompilerLogger::MINUS_PREFIX,
                 'Using banner:'
             );
 
@@ -813,7 +827,7 @@ HELP;
 
             foreach ($bannerLines as $bannerLine) {
                 $logger->log(
-                    CompileLogger::CHEVRON_PREFIX,
+                    CompilerLogger::CHEVRON_PREFIX,
                     $bannerLine
                 );
             }
@@ -824,7 +838,7 @@ HELP;
         return $stub->generate();
     }
 
-    private function logMap(MapFile $fileMapper, CompileLogger $logger): void
+    private function logMap(MapFile $fileMapper, CompilerLogger $logger): void
     {
         $map = $fileMapper->getMap();
 
@@ -833,7 +847,7 @@ HELP;
         }
 
         $logger->log(
-            CompileLogger::QUESTION_MARK_PREFIX,
+            CompilerLogger::QUESTION_MARK_PREFIX,
             'Mapping paths'
         );
 
@@ -845,7 +859,7 @@ HELP;
                 }
 
                 $logger->log(
-                    CompileLogger::MINUS_PREFIX,
+                    CompilerLogger::MINUS_PREFIX,
                     sprintf(
                         '%s <info>></info> %s',
                         $match,
@@ -858,14 +872,14 @@ HELP;
 
     private function logEndBuilding(
         Configuration $config,
-        CompileLogger $logger,
+        CompilerLogger $logger,
         IO $io,
         Box $box,
         string $path,
         float $startTime
     ): void {
         $logger->log(
-            CompileLogger::STAR_PREFIX,
+            CompilerLogger::STAR_PREFIX,
             'Done.'
         );
         $io->newLine();
