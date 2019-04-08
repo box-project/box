@@ -542,7 +542,6 @@ final class FileSystem extends SymfonyFilesystem
         foreach ($files as $file) {
             // MODIFIED CODE
             if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-                //TODO: https://github.com/humbug/php-scoper/pull/19/files#r118838268
                 exec(sprintf('rd /s /q %s', escapeshellarg($file)));
             // - MODIFIED CODE
             } elseif (is_link($file)) {

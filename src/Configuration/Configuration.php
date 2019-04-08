@@ -1745,10 +1745,12 @@ BANNER;
         $dumpAutoload = $raw->{self::DUMP_AUTOLOAD_KEY} ?? true;
 
         if (false === $canDumpAutoload && $dumpAutoload) {
-            // TODO: use sprintf there; check other occurrences as well
             $logger->addWarning(
-                'The "dump-autoload" setting has been set but has been ignored because the composer.json, composer.lock'
-                .' and vendor/composer/installed.json files are necessary but could not be found.'
+                sprintf(
+                    'The "%s" setting has been set but has been ignored because the composer.json, composer.lock'
+                    .' and vendor/composer/installed.json files are necessary but could not be found.',
+                    self::DUMP_AUTOLOAD_KEY
+                )
             );
 
             return false;
@@ -1937,7 +1939,12 @@ BANNER;
                 $main = self::normalizePath($main, $basePath);
 
                 if ($main === $firstBin) {
-                    $logger->addRecommendation('The "main" setting can be omitted since is set to its default value');
+                    $logger->addRecommendation(
+                        sprintf(
+                            'The "%s" setting can be omitted since is set to its default value',
+                            self::MAIN_KEY
+                        )
+                    );
                 }
             }
         } else {
@@ -2335,10 +2342,20 @@ BANNER;
             $format = $raw->{self::DATETIME_FORMAT_KEY};
         } elseif (isset($raw->{self::DATETIME_FORMAT_DEPRECATED_KEY})) {
             @trigger_error(
-                'The "datetime_format" is deprecated, use "datetime-format" setting instead.',
+                sprintf(
+                    'The "%s" is deprecated, use "%s" setting instead.',
+                    self::DATETIME_FORMAT_DEPRECATED_KEY,
+                    self::DATETIME_FORMAT_KEY
+                ),
                 E_USER_DEPRECATED
             );
-            $logger->addWarning('The "datetime_format" is deprecated, use "datetime-format" setting instead.');
+            $logger->addWarning(
+                sprintf(
+                    'The "%s" is deprecated, use "%s" setting instead.',
+                    self::DATETIME_FORMAT_DEPRECATED_KEY,
+                    self::DATETIME_FORMAT_KEY
+                )
+            );
 
             $format = $raw->{self::DATETIME_FORMAT_DEPRECATED_KEY};
         } else {
