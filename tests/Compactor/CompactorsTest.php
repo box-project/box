@@ -12,19 +12,17 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box;
+namespace KevinGH\Box\Compactor;
 
 use Generator;
 use Humbug\PhpScoper\Whitelist;
-use KevinGH\Box\Compactor\FakeCompactor;
-use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\PhpScoper\Scoper;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**
- * @covers \KevinGH\Box\Compactors
+ * @covers \KevinGH\Box\Compactor\Compactors
  */
 class CompactorsTest extends TestCase
 {

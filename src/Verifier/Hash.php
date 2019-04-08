@@ -20,7 +20,6 @@ use function hash_final;
 use function hash_init;
 use function hash_update;
 use function implode;
-use KevinGH\Box\Verifier;
 use function preg_replace;
 use function strtolower;
 use function strtoupper;

@@ -15,12 +15,12 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console;
 
 use InvalidArgumentException;
-use KevinGH\Box\Configuration;
-use KevinGH\Box\NotInstantiable;
+use KevinGH\Box\Configuration\Configuration;
+use KevinGH\Box\Configuration\NoConfigurationFound;
 use KevinGH\Box\Json\JsonValidationException;
-use KevinGH\Box\NoConfigurationFound;
-use function sprintf;
+use KevinGH\Box\NotInstantiable;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use function sprintf;
 
 /**
  * Utility to load the configuration.

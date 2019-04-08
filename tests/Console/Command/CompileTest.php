@@ -172,7 +172,7 @@ Box version 3.x-dev@151e40a
 
 ? Removing the existing PHAR "/path/to/tmp/test.phar"
 ? Registering compactors
-  + KevinGH\Box\Compactor\Php
+  + KevinGH\Box\Compactor\Compactor\Php
 ? Mapping paths
   - a/deep/test/directory > sub
 ? Adding main file: /path/to/tmp/run.php
@@ -610,7 +610,7 @@ Box version 3.x-dev@151e40a
 
 ? Removing the existing PHAR "/path/to/tmp/test.phar"
 ? Registering compactors
-  + KevinGH\Box\Compactor\Php
+  + KevinGH\Box\Compactor\Compactor\Php
 ? Mapping paths
   - a/deep/test/directory > sub
 ? Adding main file: /path/to/tmp/run.php
@@ -853,7 +853,7 @@ Box version 3.x-dev@151e40a
 
 ? Removing the existing PHAR "/path/to/tmp/test.phar"
 ? Registering compactors
-  + KevinGH\Box\Compactor\Php
+  + KevinGH\Box\Compactor\Compactor\Php
 ? Mapping paths
   - a/deep/test/directory > sub
 ? Adding main file: /path/to/tmp/run.php
@@ -967,7 +967,7 @@ Box version 3.x-dev@151e40a
 
 ? Removing the existing PHAR "/path/to/tmp/test.phar"
 ? Registering compactors
-  + KevinGH\Box\Compactor\Php
+  + KevinGH\Box\Compactor\Compactor\Php
 ? Mapping paths
   - a/deep/test/directory > sub
 ? Adding main file: /path/to/tmp/run.php
@@ -1160,7 +1160,7 @@ OUTPUT;
 // Time: 2018-05-24T20:59:15+00:00
 //
 
-KevinGH\Box\Configuration {#140
+KevinGH\Box\Configuration\Configuration {#140
   -file: "box.json"
   -fileMode: "0755"
   -alias: "index.phar"

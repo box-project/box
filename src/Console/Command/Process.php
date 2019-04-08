@@ -14,29 +14,14 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use function array_map;
-use function array_shift;
-use function array_unshift;
-use function explode;
-use function get_class;
-use function getcwd;
 use Humbug\PhpScoper\Whitelist;
-use function implode;
-use const KevinGH\Box\BOX_ALLOW_XDEBUG;
-use KevinGH\Box\Compactor;
+use KevinGH\Box\Compactor\Compactor;
+use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
-use KevinGH\Box\Compactors;
-use KevinGH\Box\Configuration;
+use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\Php\PhpSettingsHandler;
-use function KevinGH\Box\FileSystem\file_contents;
-use function KevinGH\Box\FileSystem\make_path_absolute;
-use function KevinGH\Box\FileSystem\make_path_relative;
-use function putenv;
-use function sprintf;
 use stdClass;
-use function strlen;
-use function substr;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -45,6 +30,21 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
+use function array_map;
+use function array_shift;
+use function array_unshift;
+use function explode;
+use function get_class;
+use function getcwd;
+use function implode;
+use function KevinGH\Box\FileSystem\file_contents;
+use function KevinGH\Box\FileSystem\make_path_absolute;
+use function KevinGH\Box\FileSystem\make_path_relative;
+use function putenv;
+use function sprintf;
+use function strlen;
+use function substr;
+use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 
 final class Process extends ConfigurableCommand
 {

@@ -15,6 +15,10 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Assert\Assertion;
+use KevinGH\Box\Verifier\Hash;
+use KevinGH\Box\Verifier\PublicKeyDelegate;
+use KevinGH\Box\Verifier\Verifier;
+use PharException;
 use function fclose;
 use function filesize;
 use function fopen;
@@ -22,16 +26,13 @@ use function fread;
 use function fseek;
 use function ini_get;
 use function is_resource;
-use KevinGH\Box\Verifier\Hash;
-use KevinGH\Box\Verifier\PublicKeyDelegate;
-use PharException;
 use function realpath;
-use const SEEK_END;
-use const SEEK_SET;
 use function sprintf;
 use function strlen;
 use function strtoupper;
 use function unpack;
+use const SEEK_END;
+use const SEEK_SET;
 
 /**
  * Retrieves and verifies a PHAR's signature without using the extension.

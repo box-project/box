@@ -91,7 +91,7 @@ JSON
         "foo": "bar"
     },
     "compactors": [
-        "KevinGH\\Box\\Compactor\\Json"
+        "KevinGH\\Box\\Compactor\\Compactor\\Json"
     ]
 }
 JSON
@@ -124,7 +124,7 @@ Registered replacement values:
   + @foo@: bar
 
 Registered compactors:
-  + KevinGH\Box\Compactor\Json
+  + KevinGH\Box\Compactor\Compactor\Json
 
 Processed contents:
 
@@ -157,7 +157,7 @@ PHP
         "foo": "bar"
     },
     "compactors": [
-        "KevinGH\\Box\\Compactor\\PhpScoper"
+        "KevinGH\\Box\\Compactor\\Compactor\\PhpScoper"
     ]
 }
 JSON
@@ -216,7 +216,7 @@ Registered replacement values:
   + @foo@: bar
 
 Registered compactors:
-  + KevinGH\Box\Compactor\PhpScoper
+  + KevinGH\Box\Compactor\Compactor\PhpScoper
 
 Processed contents:
 
@@ -272,7 +272,7 @@ JSON
         "foo": "bar"
     },
     "compactors": [
-        "KevinGH\\Box\\Compactor\\Json"
+        "KevinGH\\Box\\Compactor\\Compactor\\Json"
     ]
 }
 JSON

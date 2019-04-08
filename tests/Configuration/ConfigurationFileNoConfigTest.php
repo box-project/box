@@ -19,11 +19,11 @@ use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\touch;
-use const PHP_OS_FAMILY;
 use function symlink;
+use const PHP_OS_FAMILY;
 
 /**
- * @covers \KevinGH\Box\Configuration
+ * @covers \KevinGH\Box\Configuration\Configuration
  * @group config
  */
 class ConfigurationFileNoConfigTest extends ConfigurationTestCase

@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use KevinGH\Box\Configuration;
+use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\ConfigurationLoader;
 use KevinGH\Box\Json\JsonValidationException;
 use Symfony\Component\Console\Input\InputInterface;

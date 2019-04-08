@@ -14,24 +14,23 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Configuration;
 
-use function chdir;
-use const DIRECTORY_SEPARATOR;
 use Generator;
+use InvalidArgumentException;
+use KevinGH\Box\Json\JsonValidationException;
+use function chdir;
 use function Humbug\get_contents;
 use function Humbug\PhpScoper\json_decode;
-use InvalidArgumentException;
-use KevinGH\Box\Configuration;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\FileSystem\symlink;
 use function KevinGH\Box\FileSystem\touch;
-use KevinGH\Box\Json\JsonValidationException;
 use function sprintf;
+use const DIRECTORY_SEPARATOR;
 
 /**
- * @covers \KevinGH\Box\Configuration
+ * @covers \KevinGH\Box\Configuration\Configuration
  * @group config
  */
 class ConfigurationFileTest extends ConfigurationTestCase

@@ -14,26 +14,30 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Configuration;
 
+use DateTimeImmutable;
+use Generator;
+use Herrera\Box\Compactor\Json;
+use Herrera\Box\Compactor\Php as PhpCompactor;
+use InvalidArgumentException;
+use KevinGH\Box\Compactor\DummyCompactor;
+use KevinGH\Box\Compactor\InvalidCompactor;
+use KevinGH\Box\Compactor\Php;
+use KevinGH\Box\Compactor\PhpScoper;
+use KevinGH\Box\Json\JsonValidationException;
+use KevinGH\Box\MapFile;
+use Phar;
+use RuntimeException;
+use Seld\JsonLint\ParsingException;
+use stdClass;
 use function abs;
 use function array_fill_keys;
 use function array_keys;
 use function count;
 use function date_default_timezone_set;
-use DateTimeImmutable;
-use const DIRECTORY_SEPARATOR;
 use function exec;
-use Generator;
 use function getcwd;
 use function getrandmax;
-use Herrera\Box\Compactor\Json;
-use Herrera\Box\Compactor\Php as PhpCompactor;
-use InvalidArgumentException;
 use function json_decode;
-use KevinGH\Box\Compactor\DummyCompactor;
-use KevinGH\Box\Compactor\InvalidCompactor;
-use KevinGH\Box\Compactor\Php;
-use KevinGH\Box\Compactor\PhpScoper;
-use KevinGH\Box\Configuration;
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
@@ -42,19 +46,14 @@ use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\FileSystem\touch;
 use function KevinGH\Box\get_box_version;
-use KevinGH\Box\Json\JsonValidationException;
-use KevinGH\Box\MapFile;
-use Phar;
-use const PHP_EOL;
 use function random_int;
-use RuntimeException;
-use Seld\JsonLint\ParsingException;
 use function sprintf;
-use stdClass;
 use function strtolower;
+use const DIRECTORY_SEPARATOR;
+use const PHP_EOL;
 
 /**
- * @covers \KevinGH\Box\Configuration
+ * @covers \KevinGH\Box\Configuration\Configuration
  * @covers \KevinGH\Box\MapFile
  * @group config
  */
@@ -697,8 +696,8 @@ EOF
 
         $this->assertSame(
             [
-                'The compactor "Herrera\Box\Compactor\Json" has been deprecated, use "KevinGH\Box\Compactor\Json" instead.',
-                'The compactor "Herrera\Box\Compactor\Php" has been deprecated, use "KevinGH\Box\Compactor\Php" instead.',
+                'The compactor "Herrera\Box\Compactor\Json" has been deprecated, use "KevinGH\Box\Compactor\Compactor\Json" instead.',
+                'The compactor "Herrera\Box\Compactor\Php" has been deprecated, use "KevinGH\Box\Compactor\Compactor\Php" instead.',
             ],
             $this->config->getRecommendations()
         );
@@ -2927,7 +2926,7 @@ JSON
         ]);
 
         $expectedDumpedConfig = <<<EOF
-KevinGH\Box\Configuration {#100
+KevinGH\Box\Configuration\Configuration {#100
   -file: "box.json"
   -fileMode: "0755"
   -alias: "test.phar"
@@ -2965,7 +2964,7 @@ KevinGH\Box\Configuration {#100
   -excludeComposerFiles: true
   -excludeDevFiles: true
   -compactors: array:1 [
-    0 => "KevinGH\Box\Compactor\Php"
+    0 => "KevinGH\Box\Compactor\Compactor\Php"
   ]
   -compressionAlgorithm: "GZ"
   -mainScriptPath: "index.php"

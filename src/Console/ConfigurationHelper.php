@@ -14,13 +14,13 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
-use function file_exists;
-use KevinGH\Box\Configuration;
+use KevinGH\Box\Configuration\Configuration;
+use KevinGH\Box\Configuration\NoConfigurationFound;
 use KevinGH\Box\Json\Json;
-use KevinGH\Box\NoConfigurationFound;
-use function realpath;
 use stdClass;
 use Symfony\Component\Console\Helper\Helper;
+use function file_exists;
+use function realpath;
 
 /**
  * @private

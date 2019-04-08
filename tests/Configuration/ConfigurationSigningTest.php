@@ -14,16 +14,16 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Configuration;
 
-use function array_unshift;
-use const DIRECTORY_SEPARATOR;
 use Generator;
-use function in_array;
 use InvalidArgumentException;
-use function KevinGH\Box\FileSystem\touch;
 use Phar;
+use function array_unshift;
+use function in_array;
+use function KevinGH\Box\FileSystem\touch;
+use const DIRECTORY_SEPARATOR;
 
 /**
- * @covers \KevinGH\Box\Configuration
+ * @covers \KevinGH\Box\Configuration\Configuration
  * @covers \KevinGH\Box\MapFile
  * @group config
  */
