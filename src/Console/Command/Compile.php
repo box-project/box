@@ -16,8 +16,6 @@ namespace KevinGH\Box\Console\Command;
 
 use Amp\MultiReasonException;
 use Assert\Assertion;
-use DateTimeImmutable;
-use DateTimeZone;
 use KevinGH\Box\Box;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Composer\ComposerConfiguration;
@@ -49,7 +47,6 @@ use function file_exists;
 use function filesize;
 use function function_exists;
 use function get_class;
-use function get_loaded_extensions;
 use function implode;
 use function is_string;
 use function KevinGH\Box\disable_parallel_processing;
@@ -59,7 +56,6 @@ use function KevinGH\Box\FileSystem\make_path_relative;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\format_size;
-use function KevinGH\Box\get_box_version;
 use function KevinGH\Box\get_phar_compression_algorithms;
 use function memory_get_peak_usage;
 use function memory_get_usage;
@@ -72,10 +68,8 @@ use function sprintf;
 use function strlen;
 use function substr;
 use function var_export;
-use const DATE_ATOM;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 use const PHP_EOL;
-use const PHP_VERSION;
 use const POSIX_RLIMIT_INFINITY;
 use const POSIX_RLIMIT_NOFILE;
 
@@ -271,34 +265,9 @@ HELP;
         if ($debug) {
             remove(self::DEBUG_DIR);
 
-            $date = (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format(DATE_ATOM);
-            $file = $config->getConfigurationFile() ?? 'No config file';
-
-            remove(self::DEBUG_DIR);
-
-            $phpVersion = PHP_VERSION;
-            $phpExtensions = implode(',', get_loaded_extensions());
-            $os = function_exists('php_uname') ? php_uname('s') . ' / ' . php_uname('r') : 'Unknown OS';
-            $command = implode(' ', $GLOBALS['argv']);
-            $boxVersion = get_box_version();
-
             dump_file(
                 self::DEBUG_DIR.'/.box_configuration',
-                <<<EOF
-//
-// Processed content of the configuration file "$file" dumped for debugging purposes
-//
-// PHP Version: $phpVersion
-// PHP extensions: $phpExtensions
-// OS: $os
-// Command: $command
-// Box: $boxVersion
-// Time: $date
-//
-
-
-EOF
-                .$config->export()
+                ConfigurationExporter::export($config)
             );
         }
 
