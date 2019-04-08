@@ -742,12 +742,17 @@ class BoxTest extends FileSystemTestCase
 
             $this->fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
-            $this->assertStringStartsWith(
-                'Could not dump the autoload: Composer could not find a composer.json file in',
+            $this->assertSame(
+                'Could not dump the autoloader.',
                 $exception->getMessage()
             );
             $this->assertSame(0, $exception->getCode());
             $this->assertNotNull($exception->getPrevious());
+
+            $this->assertStringContainsString(
+                'Composer could not find a composer.json file in',
+                $exception->getPrevious()->getMessage()
+            );
         }
     }
 
@@ -884,13 +889,13 @@ JSON
             $this->fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
             $this->assertSame(
-                'Could not dump the autoload: Could not scan for classes inside "unknown" which does not appear to be a file nor a folder',
+                'Could not dump the autoloader.',
                 $exception->getMessage()
             );
             $this->assertSame(0, $exception->getCode());
             $this->assertNotNull($exception->getPrevious());
 
-            $this->assertSame(
+            $this->assertStringContainsString(
                 'Could not scan for classes inside "unknown" which does not appear to be a file nor a folder',
                 $exception->getPrevious()->getMessage()
             );

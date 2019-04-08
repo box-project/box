@@ -205,7 +205,7 @@ else
 endif
 .PHONY: e2e_php_settings_checker
 e2e_php_settings_checker: ## Runs the end-to-end tests for the PHP settings handler
-e2e_php_settings_checker: vendor
+e2e_php_settings_checker: vendor box
 	./.docker/build
 
 	# No restart needed
@@ -222,7 +222,7 @@ e2e_php_settings_checker: vendor
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
 		| tee fixtures/php-settings-checker/actual-output || true
-	$(SED) "s/'-c' '.*' 'bin\/box'/'-c' '\/tmp-file' 'bin\/box'/" \
+	$(SED) "s/'-c' '.*' '\.\/box'/'-c' '\/tmp-file' 'bin\/box'/" \
 		fixtures/php-settings-checker/actual-output
 	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
 	diff fixtures/php-settings-checker/output-xdebug-enabled fixtures/php-settings-checker/actual-output
@@ -233,7 +233,7 @@ e2e_php_settings_checker: vendor
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
 		| tee fixtures/php-settings-checker/actual-output || true
-	$(SED) "s/'-c' '.*' 'bin\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
+	$(SED) "s/'-c' '.*' '\.\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
 	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
 	diff fixtures/php-settings-checker/output-pharreadonly-enabled fixtures/php-settings-checker/actual-output
 
@@ -243,7 +243,7 @@ e2e_php_settings_checker: vendor
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
 		| tee fixtures/php-settings-checker/actual-output || true
-	$(SED) "s/'-c' '.*' 'bin\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
+	$(SED) "s/'-c' '.*' '\.\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
 	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
 	diff fixtures/php-settings-checker/output-min-memory-limit fixtures/php-settings-checker/actual-output
 
@@ -253,19 +253,19 @@ e2e_php_settings_checker: vendor
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
 		| tee fixtures/php-settings-checker/actual-output || true
-	$(SED) "s/'-c' '.*' 'bin\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
+	$(SED) "s/'-c' '.*' '\.\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
 	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
 	diff fixtures/php-settings-checker/output-set-memory-limit fixtures/php-settings-checker/actual-output
 
 .PHONY: e2e_symfony
 e2e_symfony:		 ## Packages a fresh Symfony app
 e2e_symfony: fixtures/build/dir012/vendor box
-	composer dump-env prod
+	composer dump-env prod --working-dir fixtures/build/dir012
 
 	APP_ENV=prod APP_DEBUG=0 php fixtures/build/dir012/bin/console --version > fixtures/build/dir012/expected-output
 	rm -rf fixtures/build/dir012/var/cache/prod/*
 
-	APP_ENV=prod APP_DEBUG=0 $(BOX) compile --working-dir fixtures/build/dir012
+	APP_ENV=prod APP_DEBUG=0 ./box compile --working-dir fixtures/build/dir012
 
 	php fixtures/build/dir012/bin/console.phar --version > fixtures/build/dir012/actual-output
 

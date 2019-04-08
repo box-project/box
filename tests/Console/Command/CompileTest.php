@@ -100,6 +100,8 @@ class CompileTest extends CommandTestCase
                 return parent::execute($input, $options);
             }
         };
+
+        remove(self::FIXTURES_DIR.'/dir010/index.phar');
     }
 
     /**
@@ -871,6 +873,9 @@ Box version 3.x-dev@151e40a
   'rand' => $rand,
 )
 ? Dumping the Composer autoloader
+    > '/usr/local/bin/composer' 'dump-autoload' '--classmap-authoritative' '--no-dev'
+Generating optimized autoload files (authoritative)\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08Generated optimized autoload files (authoritative) containing 0 classes
+
 ? Removing the Composer dump artefacts
 ? No compression
 ? Signing using a private key
@@ -890,6 +895,12 @@ No warning found.
 OUTPUT;
 
         $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
+
+        $actual = preg_replace(
+            '/(\/.*?composer)/',
+            '/usr/local/bin/composer',
+            $actual
+        );
 
         $this->assertSame($expected, $actual);
     }
@@ -977,6 +988,9 @@ Box version 3.x-dev@151e40a
   'rand' => $rand,
 )
 ? Dumping the Composer autoloader
+    > '/usr/local/bin/composer' 'dump-autoload' '--classmap-authoritative' '--no-dev' '-v'
+Generating optimized autoload files (authoritative)\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08Generated optimized autoload files (authoritative) containing 0 classes
+
 ? Removing the Composer dump artefacts
 ? No compression
 ? Signing using a private key
@@ -1000,7 +1014,14 @@ OUTPUT;
             (new PhpExecutableFinder())->find(),
             $expected
         );
+
         $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
+
+        $actual = preg_replace(
+            '/(\/.*?composer)/',
+            '/usr/local/bin/composer',
+            $actual
+        );
 
         $this->assertSame($expected, $actual);
     }
