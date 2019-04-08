@@ -15,17 +15,34 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console;
 
 use function array_map;
+use Assert\Assertion;
 use function count;
+use KevinGH\Box\NotInstantiable;
 use function sprintf;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
+ * Utility to writing on the console output the configuration recommendations and warnings.
+ *
  * @private
  */
 final class MessageRenderer
 {
+    use NotInstantiable;
+
+    /**
+     * @param string[] $recommendations
+     * @param string[] $warnings
+     */
     public static function render(SymfonyStyle $io, array $recommendations, array $warnings): void
     {
+        Assertion::allString($recommendations);
+        Assertion::allString($warnings);
+
+        $renderMessage = static function (string $message): string {
+            return "    - $message";
+        };
+
         if ([] === $recommendations) {
             $io->writeln('No recommendation found.');
         } else {
@@ -38,12 +55,7 @@ final class MessageRenderer
             );
 
             $io->writeln(
-                array_map(
-                    static function (string $recommendation): string {
-                        return "    - $recommendation";
-                    },
-                    $recommendations
-                )
+                array_map($renderMessage, $recommendations)
             );
         }
 
@@ -59,17 +71,8 @@ final class MessageRenderer
             );
 
             $io->writeln(
-                array_map(
-                    static function (string $warning): string {
-                        return "    - $warning";
-                    },
-                    $warnings
-                )
+                array_map($renderMessage, $warnings)
             );
         }
-    }
-
-    private function __construct()
-    {
     }
 }

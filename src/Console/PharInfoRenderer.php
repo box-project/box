@@ -15,14 +15,19 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console;
 
 use function KevinGH\Box\format_size;
+use KevinGH\Box\NotInstantiable;
 use KevinGH\Box\PharInfo\PharInfo;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
+ * Utility to write to the console output various PHAR related pieces of information.
+ *
  * @private
  */
 final class PharInfoRenderer
 {
+    use NotInstantiable;
+
     public static function renderCompression(PharInfo $pharInfo, SymfonyStyle $io): void
     {
         $count = array_filter($pharInfo->getCompressionCount());
@@ -120,9 +125,5 @@ final class PharInfoRenderer
                 )
             )
         );
-    }
-
-    private function __construct()
-    {
     }
 }

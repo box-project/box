@@ -19,6 +19,7 @@ use Humbug\PhpScoper\Whitelist;
 use KevinGH\Box\Console\Logger\CompileLogger;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
+use KevinGH\Box\NotInstantiable;
 use const PHP_EOL;
 use function preg_replace;
 use RuntimeException;
@@ -37,9 +38,7 @@ use function trim;
  */
 final class ComposerOrchestrator
 {
-    private function __construct()
-    {
-    }
+    use NotInstantiable;
 
     public static function dumpAutoload(
         Whitelist $whitelist,

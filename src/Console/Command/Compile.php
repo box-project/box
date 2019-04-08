@@ -39,7 +39,7 @@ use KevinGH\Box\Composer\ComposerConfiguration;
 use KevinGH\Box\Configuration;
 use KevinGH\Box\Console\Logger\CompileLogger;
 use KevinGH\Box\Console\MessageRenderer;
-use KevinGH\Box\Console\OutputConfigurator;
+use KevinGH\Box\Console\OutputFormatterConfigurator;
 use KevinGH\Box\Console\Php\PhpSettingsHandler;
 use function KevinGH\Box\disable_parallel_processing;
 use function KevinGH\Box\FileSystem\chmod;
@@ -170,7 +170,7 @@ HELP;
     {
         $io = new SymfonyStyle($input, $output);
 
-        OutputConfigurator::configure($output);
+        OutputFormatterConfigurator::configure($output);
 
         if ($input->getOption(self::NO_RESTART_OPTION)) {
             putenv(BOX_ALLOW_XDEBUG.'=1');
@@ -278,6 +278,7 @@ HELP;
 
             $phpVersion = PHP_VERSION;
             $phpExtensions = implode(',', get_loaded_extensions());
+            $os = function_exists('php_uname') ? php_uname('s') . ' / ' . php_uname('r') : 'Unknown OS';
             $command = implode(' ', $GLOBALS['argv']);
             $boxVersion = get_box_version();
 
@@ -289,6 +290,7 @@ HELP;
 //
 // PHP Version: $phpVersion
 // PHP extensions: $phpExtensions
+// OS: $os
 // Command: $command
 // Box: $boxVersion
 // Time: $date

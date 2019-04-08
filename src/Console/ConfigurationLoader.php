@@ -16,16 +16,21 @@ namespace KevinGH\Box\Console;
 
 use InvalidArgumentException;
 use KevinGH\Box\Configuration;
+use KevinGH\Box\NotInstantiable;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\NoConfigurationFound;
 use function sprintf;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
+ * Utility to load the configuration.
+ *
  * @private
  */
 final class ConfigurationLoader
 {
+    use NotInstantiable;
+
     /**
      * Returns the configuration settings.
      *

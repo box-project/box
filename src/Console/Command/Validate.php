@@ -17,7 +17,7 @@ namespace KevinGH\Box\Console\Command;
 use Exception;
 use KevinGH\Box\Console\ConfigurationLoader;
 use KevinGH\Box\Console\MessageRenderer;
-use KevinGH\Box\Console\OutputConfigurator;
+use KevinGH\Box\Console\OutputFormatterConfigurator;
 use KevinGH\Box\Json\JsonValidationException;
 use function sprintf;
 use Symfony\Component\Console\Exception\RuntimeException;
@@ -77,7 +77,7 @@ HELP
     {
         $io = new SymfonyStyle($input, $output);
 
-        OutputConfigurator::configure($output);
+        OutputFormatterConfigurator::configure($output);
 
         try {
             $config = ConfigurationLoader::getConfig(
