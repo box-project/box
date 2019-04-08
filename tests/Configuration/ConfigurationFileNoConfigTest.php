@@ -19,8 +19,8 @@ use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\touch;
-use function symlink;
 use const PHP_OS_FAMILY;
+use function symlink;
 
 /**
  * @covers \KevinGH\Box\Configuration\Configuration

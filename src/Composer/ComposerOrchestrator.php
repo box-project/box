@@ -16,6 +16,7 @@ namespace KevinGH\Box\Composer;
 
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use Humbug\PhpScoper\Whitelist;
+use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Console\Logger\CompileLogger;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
@@ -24,10 +25,7 @@ use const PHP_EOL;
 use function preg_replace;
 use RuntimeException;
 use function str_replace;
-use Symfony\Component\Console\Input\StringInput;
-use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
@@ -44,13 +42,10 @@ final class ComposerOrchestrator
         Whitelist $whitelist,
         string $prefix,
         bool $excludeDevFiles,
-        SymfonyStyle $io = null
+        IO $io = null
     ): void {
         if (null === $io) {
-            $io = new SymfonyStyle(
-                new StringInput(''),
-                new NullOutput()
-            );
+            $io = IO::createNull();
         }
 
         $logger = new CompileLogger($io);
@@ -183,7 +178,7 @@ final class ComposerOrchestrator
         return trim($vendorDirProcess->getOutput()).'/autoload.php';
     }
 
-    private static function retrieveSubProcessVerbosity(SymfonyStyle $io): ?string
+    private static function retrieveSubProcessVerbosity(IO $io): ?string
     {
         if ($io->isDebug()) {
             return '-vvv';

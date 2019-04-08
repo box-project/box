@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Verifier;
 
-use RuntimeException;
 use function class_exists;
 use function extension_loaded;
+use RuntimeException;
 
 /**
  * Uses the OpenSSL extension or phpseclib library to verify a signed PHAR.

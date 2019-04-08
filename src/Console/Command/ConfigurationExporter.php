@@ -2,17 +2,26 @@
 
 declare(strict_types=1);
 
-namespace KevinGH\Box\Console\Command;
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
+namespace KevinGH\Box\Console\Command;
 
 use DateTimeImmutable;
 use DateTimeZone;
-use KevinGH\Box\Configuration\Configuration;
-use KevinGH\Box\NotInstantiable;
 use function function_exists;
 use function get_loaded_extensions;
 use function implode;
+use KevinGH\Box\Configuration\Configuration;
 use function KevinGH\Box\get_box_version;
+use KevinGH\Box\NotInstantiable;
 use function php_uname;
 
 final class ConfigurationExporter
@@ -26,7 +35,7 @@ final class ConfigurationExporter
 
         $phpVersion = PHP_VERSION;
         $phpExtensions = implode(',', get_loaded_extensions());
-        $os = function_exists('php_uname') ? PHP_OS . ' / ' . php_uname('r') : 'Unknown OS';
+        $os = function_exists('php_uname') ? PHP_OS.' / '.php_uname('r') : 'Unknown OS';
         $command = implode(' ', $GLOBALS['argv']);
         $boxVersion = get_box_version();
 

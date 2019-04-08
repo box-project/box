@@ -14,6 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-class TestConfigurableCommand extends ConfigurableCommand
+class TestConfigurableCommand extends ConfigurableBaseCommand
 {
 }

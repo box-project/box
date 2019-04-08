@@ -17,9 +17,9 @@ namespace KevinGH\Box\Console;
 use InvalidArgumentException;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Configuration\NoConfigurationFound;
+use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\NotInstantiable;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use function sprintf;
 
 /**
@@ -41,7 +41,7 @@ final class ConfigurationLoader
     public static function getConfig(
         ?string $configPath,
         ConfigurationHelper $helper,
-        SymfonyStyle $io,
+        IO $io,
         bool $allowNoFile
     ): Configuration {
         try {

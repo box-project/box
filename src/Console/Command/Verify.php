@@ -15,21 +15,19 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Assert\Assertion;
+use KevinGH\Box\Console\IO\IO;
 use function KevinGH\Box\create_temporary_phar;
 use function KevinGH\Box\FileSystem\remove;
 use Phar;
 use function realpath;
 use function sprintf;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 
 /**
  * @private
  */
-final class Verify extends Command
+final class Verify extends BaseCommand
 {
     private const PHAR_ARG = 'phar';
 
@@ -65,11 +63,9 @@ HELP
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function executeCommand(IO $io): int
     {
-        $io = new SymfonyStyle($input, $output);
-
-        $pharPath = $input->getArgument(self::PHAR_ARG);
+        $pharPath = $io->getInput()->getArgument(self::PHAR_ARG);
 
         Assertion::file($pharPath);
 
@@ -102,23 +98,7 @@ HELP
         }
 
         if (false === $verified || null === $signature) {
-            $message = null !== $throwable && '' !== $throwable->getMessage()
-                ? $throwable->getMessage()
-                : 'Unknown reason.'
-            ;
-
-            $io->writeln(
-                sprintf(
-                    '<error>The PHAR failed the verification: %s</error>',
-                    $message
-                )
-            );
-
-            if (null !== $throwable && $output->isDebug()) {
-                throw $throwable;
-            }
-
-            return 1;
+            return $this->failVerification($throwable, $io);
         }
 
         $io->writeln('<info>The PHAR passed verification.</info>');
@@ -133,5 +113,26 @@ HELP
         );
 
         return 0;
+    }
+
+    private function failVerification(?Throwable $throwable, IO $io): int
+    {
+        $message = null !== $throwable && '' !== $throwable->getMessage()
+            ? $throwable->getMessage()
+            : 'Unknown reason.'
+        ;
+
+        $io->writeln(
+            sprintf(
+                '<error>The PHAR failed the verification: %s</error>',
+                $message
+            )
+        );
+
+        if (null !== $throwable && $io->isDebug()) {
+            throw $throwable;
+        }
+
+        return 1;
     }
 }

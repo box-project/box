@@ -23,6 +23,7 @@ use function constant;
 use function define;
 use function defined;
 use function floor;
+use function KevinGH\Box\FileSystem\copy;
 use function log;
 use function number_format;
 use PackageVersions\Versions;
@@ -32,7 +33,6 @@ use function sprintf;
 use function str_replace;
 use function strlen;
 use function strtolower;
-use function KevinGH\Box\FileSystem\copy;
 use Symfony\Component\Console\Helper\Helper;
 
 function get_box_version(): string

@@ -14,43 +14,41 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use Assert\Assertion;
-use BadMethodCallException;
-use Countable;
-use KevinGH\Box\Compactor\Compactor;
-use KevinGH\Box\Compactor\Compactors;
-use KevinGH\Box\Compactor\PhpScoper;
-use KevinGH\Box\Compactor\Placeholder;
-use KevinGH\Box\Composer\ComposerOrchestrator;
-use KevinGH\Box\PhpScoper\NullScoper;
-use KevinGH\Box\PhpScoper\WhitelistManipulator;
-use Phar;
-use RecursiveDirectoryIterator;
-use RuntimeException;
-use SplFileInfo;
-use Symfony\Component\Console\Input\StringInput;
-use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use function Amp\ParallelFunctions\parallelMap;
 use function Amp\Promise\wait;
 use function array_filter;
 use function array_flip;
 use function array_map;
 use function array_unshift;
+use Assert\Assertion;
+use BadMethodCallException;
 use function chdir;
+use Countable;
 use function dirname;
 use function extension_loaded;
 use function file_exists;
 use function getcwd;
 use function is_object;
+use KevinGH\Box\Compactor\Compactor;
+use KevinGH\Box\Compactor\Compactors;
+use KevinGH\Box\Compactor\PhpScoper;
+use KevinGH\Box\Compactor\Placeholder;
+use KevinGH\Box\Composer\ComposerOrchestrator;
+use KevinGH\Box\Console\IO\IO;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
+use KevinGH\Box\PhpScoper\NullScoper;
+use KevinGH\Box\PhpScoper\WhitelistManipulator;
 use function openssl_pkey_export;
 use function openssl_pkey_get_details;
 use function openssl_pkey_get_private;
+use Phar;
+use RecursiveDirectoryIterator;
+use RuntimeException;
+use SplFileInfo;
 use function sprintf;
 
 /**
@@ -113,16 +111,9 @@ final class Box implements Countable
         $this->phar->startBuffering();
     }
 
-    public function endBuffering(bool $dumpAutoload, bool $excludeDevFiles, SymfonyStyle $io = null): void
+    public function endBuffering(bool $dumpAutoload, bool $excludeDevFiles, IO $io = null): void
     {
         Assertion::true($this->buffering, 'The buffering must be started before ending it');
-
-        if (null === $io) {
-            $io = new SymfonyStyle(
-                new StringInput(''),
-                new NullOutput()
-            );
-        }
 
         $cwd = getcwd();
 

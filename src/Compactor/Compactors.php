@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-use Humbug\PhpScoper\Whitelist;
 use function array_reduce;
+use Humbug\PhpScoper\Whitelist;
 
 /**
  * @private

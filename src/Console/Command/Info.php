@@ -19,6 +19,7 @@ use function array_flip;
 use Assert\Assertion;
 use DirectoryIterator;
 use function is_array;
+use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Console\PharInfoRenderer;
 use function KevinGH\Box\create_temporary_phar;
 use function KevinGH\Box\FileSystem\remove;
@@ -36,13 +37,12 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 
 /**
  * @private
  */
-final class Info extends Command
+final class Info extends BaseCommand
 {
     private const PHAR_ARG = 'phar';
     private const LIST_OPT = 'list';
@@ -123,13 +123,14 @@ HELP
     /**
      * {@inheritdoc}
      */
-    public function execute(InputInterface $input, OutputInterface $output): int
+    public function executeCommand(IO $io): int
     {
-        $io = new SymfonyStyle($input, $output);
+        $input = $io->getInput();
+
         $io->newLine();
 
         if (null === ($file = $input->getArgument(self::PHAR_ARG))) {
-            return $this->showGlobalInfo($output, $io);
+            return $this->showGlobalInfo($io);
         }
 
         $file = realpath($file);
@@ -148,13 +149,13 @@ HELP
         $tmpFile = create_temporary_phar($file);
 
         try {
-            return $this->showInfo($tmpFile, $file, $input, $output, $io);
+            return $this->showInfo($tmpFile, $file, $io);
         } finally {
             remove($tmpFile);
         }
     }
 
-    public function showInfo(string $file, string $originalFile, InputInterface $input, OutputInterface $output, SymfonyStyle $io): int
+    public function showInfo(string $file, string $originalFile, InputInterface $input, IO $io): int
     {
         $depth = (int) $input->getOption(self::DEPTH_OPT);
 
@@ -168,11 +169,10 @@ HELP
                 $input->getOption(self::LIST_OPT),
                 $depth,
                 'indent' === $input->getOption(self::MODE_OPT),
-                $output,
                 $io
             );
         } catch (Throwable $throwable) {
-            if ($output->isDebug()) {
+            if ($io->isDebug()) {
                 throw $throwable;
             }
 
@@ -187,10 +187,10 @@ HELP
         }
     }
 
-    private function showGlobalInfo(OutputInterface $output, SymfonyStyle $io): int
+    private function showGlobalInfo(IO $io): int
     {
         $this->render(
-            $output,
+            $io,
             [
                 'API Version' => Phar::apiVersion(),
                 'Supported Compression' => Phar::getSupportedCompression(),
@@ -209,14 +209,13 @@ HELP
         bool $content,
         int $depth,
         bool $indent,
-        OutputInterface $output,
-        SymfonyStyle $io
+        IO $io
     ): int {
         $this->showPharMeta($pharInfo, $io);
 
         if ($content) {
             $this->renderContents(
-                $output,
+                $io,
                 $pharInfo->getPhar(),
                 0,
                 $depth,
@@ -232,7 +231,7 @@ HELP
         return 0;
     }
 
-    private function showPharMeta(PharInfo $pharInfo, SymfonyStyle $io): void
+    private function showPharMeta(PharInfo $pharInfo, IO $io): void
     {
         $io->writeln(
             sprintf(
@@ -258,25 +257,25 @@ HELP
         PharInfoRenderer::renderContentsSummary($pharInfo, $io);
     }
 
-    private function render(OutputInterface $output, array $attributes): void
+    private function render(IO $io, array $attributes): void
     {
         $out = false;
 
         foreach ($attributes as $name => $value) {
             if ($out) {
-                $output->writeln('');
+                $io->writeln('');
             }
 
-            $output->write("<comment>$name:</comment>");
+            $io->write("<comment>$name:</comment>");
 
             if (is_array($value)) {
-                $output->writeln('');
+                $io->writeln('');
 
                 foreach ($value as $v) {
-                    $output->writeln("  - $v");
+                    $io->writeln("  - $v");
                 }
             } else {
-                $output->writeln(" $value");
+                $io->writeln(" $value");
             }
 
             $out = true;

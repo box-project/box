@@ -17,9 +17,9 @@ namespace KevinGH\Box\Console;
 use function array_map;
 use Assert\Assertion;
 use function count;
+use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\NotInstantiable;
 use function sprintf;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Utility to writing on the console output the configuration recommendations and warnings.
@@ -34,7 +34,7 @@ final class MessageRenderer
      * @param string[] $recommendations
      * @param string[] $warnings
      */
-    public static function render(SymfonyStyle $io, array $recommendations, array $warnings): void
+    public static function render(IO $io, array $recommendations, array $warnings): void
     {
         Assertion::allString($recommendations);
         Assertion::allString($warnings);

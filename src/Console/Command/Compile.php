@@ -15,33 +15,11 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Amp\MultiReasonException;
-use Assert\Assertion;
-use KevinGH\Box\Box;
-use KevinGH\Box\Compactor\Compactor;
-use KevinGH\Box\Composer\ComposerConfiguration;
-use KevinGH\Box\Configuration\Configuration;
-use KevinGH\Box\Console\Logger\CompileLogger;
-use KevinGH\Box\Console\MessageRenderer;
-use KevinGH\Box\Console\OutputFormatterConfigurator;
-use KevinGH\Box\Console\Php\PhpSettingsHandler;
-use function KevinGH\Box\format_time;
-use KevinGH\Box\MapFile;
-use KevinGH\Box\RequirementChecker\RequirementsDumper;
-use KevinGH\Box\StubGenerator;
-use RuntimeException;
-use stdClass;
-use Symfony\Component\Console\Helper\Helper;
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\StringInput;
-use Symfony\Component\Console\Logger\ConsoleLogger;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use function array_map;
 use function array_search;
 use function array_shift;
+use Assert\Assertion;
+use Closure;
 use function count;
 use function decoct;
 use function explode;
@@ -51,6 +29,15 @@ use function function_exists;
 use function get_class;
 use function implode;
 use function is_string;
+use KevinGH\Box\Box;
+use const KevinGH\Box\BOX_ALLOW_XDEBUG;
+use KevinGH\Box\Compactor\Compactor;
+use KevinGH\Box\Composer\ComposerConfiguration;
+use KevinGH\Box\Configuration\Configuration;
+use KevinGH\Box\Console\IO\IO;
+use KevinGH\Box\Console\Logger\CompileLogger;
+use KevinGH\Box\Console\MessageRenderer;
+use KevinGH\Box\Console\Php\PhpSettingsHandler;
 use function KevinGH\Box\disable_parallel_processing;
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -58,28 +45,37 @@ use function KevinGH\Box\FileSystem\make_path_relative;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\format_size;
+use function KevinGH\Box\format_time;
 use function KevinGH\Box\get_phar_compression_algorithms;
+use KevinGH\Box\MapFile;
+use KevinGH\Box\RequirementChecker\RequirementsDumper;
+use KevinGH\Box\StubGenerator;
 use function memory_get_peak_usage;
 use function memory_get_usage;
 use function microtime;
-use function posix_getrlimit;
-use function posix_setrlimit;
-use function putenv;
-use function round;
-use function sprintf;
-use function strlen;
-use function substr;
-use function var_export;
-use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 use const PHP_EOL;
+use function posix_getrlimit;
 use const POSIX_RLIMIT_INFINITY;
 use const POSIX_RLIMIT_NOFILE;
+use function posix_setrlimit;
+use function putenv;
+use RuntimeException;
+use function sprintf;
+use stdClass;
+use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Logger\ConsoleLogger;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\Question;
+use function var_export;
 
 /**
  * @final
  * @private
  */
-class Compile extends ConfigurableCommand
+class Compile extends ConfigurableBaseCommand
 {
     use ChangeableWorkingDirectory;
 
@@ -162,21 +158,19 @@ HELP;
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    protected function executeCommand(IO $io): int
     {
-        $io = new SymfonyStyle($input, $output);
-
-        OutputFormatterConfigurator::configure($output);
+        $input = $io->getInput();
 
         if ($input->getOption(self::NO_RESTART_OPTION)) {
             putenv(BOX_ALLOW_XDEBUG.'=1');
         }
 
         if ($debug = $input->getOption(self::DEBUG_OPTION)) {
-            $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
+            $io->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
         }
 
-        (new PhpSettingsHandler(new ConsoleLogger($output)))->check();
+        (new PhpSettingsHandler(new ConsoleLogger($io->getOutput())))->check();
 
         if ($input->getOption(self::NO_PARALLEL_PROCESSING_OPTION)) {
             disable_parallel_processing();
@@ -190,7 +184,7 @@ HELP;
 
         $config = $input->getOption(self::NO_CONFIG_OPTION)
             ? Configuration::create(null, new stdClass())
-            : $this->getConfig($input, $output, true)
+            : $this->getConfig($io, true)
         ;
         $path = $config->getOutputPath();
 
@@ -202,23 +196,23 @@ HELP;
 
         $this->removeExistingArtifacts($config, $logger, $debug);
 
-        $box = $this->createPhar($config, $input, $output, $logger, $io, $debug);
+        $box = $this->createPhar($config, $logger, $io, $debug);
 
         $this->correctPermissions($path, $config, $logger);
 
         $this->logEndBuilding($config, $logger, $io, $box, $path, $startTime);
 
         if ($input->getOption(self::WITH_DOCKER_OPTION)) {
-            $this->generateDockerFile($output);
+            $this->generateDockerFile($io);
         }
+
+        return 0;
     }
 
     private function createPhar(
         Configuration $config,
-        InputInterface $input,
-        OutputInterface $output,
         CompileLogger $logger,
-        SymfonyStyle $io,
+        IO $io,
         bool $debug
     ): Box {
         $box = Box::create(
@@ -249,9 +243,15 @@ HELP;
             $box->getPhar()->extractTo(self::DEBUG_DIR, null, true);
         }
 
-        $this->configureCompressionAlgorithm($config, $box, $input->getOption(self::DEV_OPTION), $io, $logger);
+        $this->configureCompressionAlgorithm(
+            $config,
+            $box,
+            $io->getInput()->getOption(self::DEV_OPTION),
+            $io,
+            $logger
+        );
 
-        $this->signPhar($config, $box, $config->getTmpOutputPath(), $input, $output, $logger);
+        $this->signPhar($config, $box, $config->getTmpOutputPath(), $io, $logger);
 
         if ($config->getTmpOutputPath() !== $config->getOutputPath()) {
             rename($config->getTmpOutputPath(), $config->getOutputPath());
@@ -336,7 +336,7 @@ HELP;
         $logCompactors = static function (Compactor $compactor) use ($logger): void {
             $compactorClassParts = explode('\\', get_class($compactor));
 
-            if ('_HumbugBox' === substr($compactorClassParts[0], 0, strlen('_HumbugBox'))) {
+            if (0 === strpos($compactorClassParts[0], '_HumbugBox')) {
                 // Keep the non prefixed class name for the user
                 array_shift($compactorClassParts);
             }
@@ -361,7 +361,7 @@ HELP;
         $box->registerFileMapping($fileMapper);
     }
 
-    private function addFiles(Configuration $config, Box $box, CompileLogger $logger, SymfonyStyle $io): void
+    private function addFiles(Configuration $config, Box $box, CompileLogger $logger, IO $io): void
     {
         $logger->log(CompileLogger::QUESTION_MARK_PREFIX, 'Adding binary files');
 
@@ -482,8 +482,13 @@ HELP;
         return true;
     }
 
-    private function registerStub(Configuration $config, Box $box, ?string $main, bool $checkRequirements, CompileLogger $logger): void
-    {
+    private function registerStub(
+        Configuration $config,
+        Box $box,
+        ?string $main,
+        bool $checkRequirements,
+        CompileLogger $logger
+    ): void {
         if ($config->isStubGenerated()) {
             $logger->log(
                 CompileLogger::QUESTION_MARK_PREFIX,
@@ -576,8 +581,13 @@ HELP;
         }
     }
 
-    private function configureCompressionAlgorithm(Configuration $config, Box $box, bool $dev, SymfonyStyle $io, CompileLogger $logger): void
-    {
+    private function configureCompressionAlgorithm(
+        Configuration $config,
+        Box $box,
+        bool $dev,
+        IO $io,
+        CompileLogger $logger
+    ): void {
         if (null === ($algorithm = $config->getCompressionAlgorithm())) {
             $logger->log(
                 CompileLogger::QUESTION_MARK_PREFIX,
@@ -627,9 +637,9 @@ HELP;
     /**
      * Bumps the maximum number of open file descriptor if necessary.
      *
-     * @return callable callable to call to restore the original maximum number of open files descriptors
+     * @return Closure callable to call to restore the original maximum number of open files descriptors
      */
-    private static function bumpOpenFileDescriptorLimit(Box $box, SymfonyStyle $io): callable
+    private static function bumpOpenFileDescriptorLimit(Box $box, IO $io): Closure
     {
         $filesCount = count($box) + 128;  // Add a little extra for good measure
 
@@ -753,8 +763,12 @@ HELP;
         }
     }
 
-    private function createStub(Configuration $config, ?string $main, bool $checkRequirements, CompileLogger $logger): string
-    {
+    private function createStub(
+        Configuration $config,
+        ?string $main,
+        bool $checkRequirements,
+        CompileLogger $logger
+    ): string {
         $stub = StubGenerator::create()
             ->alias($config->getAlias())
             ->index($main)
@@ -845,7 +859,7 @@ HELP;
     private function logEndBuilding(
         Configuration $config,
         CompileLogger $logger,
-        SymfonyStyle $io,
+        IO $io,
         Box $box,
         string $path,
         float $startTime
@@ -883,6 +897,8 @@ HELP;
     private function generateDockerFile(OutputInterface $output): void
     {
         $generateDockerFileCommand = $this->getApplication()->find('docker');
+
+        Assertion::isInstanceOf($generateDockerFileCommand, GenerateDockerFile::class);
 
         $input = new StringInput('');
         $input->setInteractive(false);

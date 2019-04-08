@@ -16,18 +16,17 @@ namespace KevinGH\Box\Console\Command;
 
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\ConfigurationLoader;
+use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Json\JsonValidationException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Allows a configuration file path to be specified for a command.
  *
  * @private
  */
-abstract class ConfigurableCommand extends Command
+abstract class ConfigurableBaseCommand extends BaseCommand
 {
     private const CONFIG_PARAM = 'config';
 
@@ -51,12 +50,12 @@ abstract class ConfigurableCommand extends Command
      *
      * @throws JsonValidationException
      */
-    final protected function getConfig(InputInterface $input, OutputInterface $output, bool $allowNoFile = false): Configuration
+    final protected function getConfig(IO $io, bool $allowNoFile = false): Configuration
     {
         return ConfigurationLoader::getConfig(
-            $input->getOption(self::CONFIG_PARAM),
+            $io->getInput()->getOption(self::CONFIG_PARAM),
             $this->getConfigurationHelper(),
-            new SymfonyStyle($input, $output),
+            $io,
             $allowNoFile
         );
     }

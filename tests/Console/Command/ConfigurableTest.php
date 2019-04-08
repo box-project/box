@@ -18,6 +18,8 @@ use Assert\InvalidArgumentException;
 use Closure;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Configuration\NoConfigurationFound;
+use function KevinGH\Box\FileSystem\dump_file;
+use function KevinGH\Box\FileSystem\touch;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\Test\CommandTestCase;
 use Symfony\Component\Console\Command\Command;
@@ -25,11 +27,9 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\touch;
 
 /**
- * @covers \KevinGH\Box\Console\Command\ConfigurableCommand
+ * @covers \KevinGH\Box\Console\Command\ConfigurableBaseCommand
  */
 class ConfigurableTest extends CommandTestCase
 {
@@ -64,7 +64,7 @@ class ConfigurableTest extends CommandTestCase
 
         /** @var \KevinGH\Box\Configuration\Configuration $config */
         $config = Closure::bind(
-            function (ConfigurableCommand $command, InputInterface $input, OutputInterface $output): Configuration {
+            function (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration {
                 return $command->getConfig($input, $output);
             },
             null,
@@ -95,7 +95,7 @@ class ConfigurableTest extends CommandTestCase
 
         /** @var Configuration $config */
         $config = Closure::bind(
-            function (ConfigurableCommand $command, InputInterface $input, OutputInterface $output): Configuration {
+            function (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration {
                 return $command->getConfig($input, $output);
             },
             null,
@@ -124,7 +124,7 @@ class ConfigurableTest extends CommandTestCase
 
         try {
             Closure::bind(
-                function (ConfigurableCommand $command, InputInterface $input, OutputInterface $output): Configuration {
+                function (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration {
                     return $command->getConfig($input, $output);
                 },
                 null,
@@ -154,7 +154,7 @@ class ConfigurableTest extends CommandTestCase
 
         /** @var \KevinGH\Box\Configuration\Configuration $config */
         $config = Closure::bind(
-            function (ConfigurableCommand $command, InputInterface $input, OutputInterface $output): Configuration {
+            function (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration {
                 return $command->getConfig($input, $output, true);
             },
             null,
@@ -185,7 +185,7 @@ class ConfigurableTest extends CommandTestCase
 
         try {
             Closure::bind(
-                function (ConfigurableCommand $command, InputInterface $input, OutputInterface $output): Configuration {
+                function (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration {
                     return $command->getConfig($input, $output);
                 },
                 null,
@@ -216,7 +216,7 @@ class ConfigurableTest extends CommandTestCase
 
         try {
             Closure::bind(
-                function (ConfigurableCommand $command, InputInterface $input, OutputInterface $output): Configuration {
+                function (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration {
                     return $command->getConfig($input, $output);
                 },
                 null,
