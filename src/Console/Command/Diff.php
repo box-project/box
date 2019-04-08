@@ -19,6 +19,7 @@ use function array_flip;
 use Assert\Assertion;
 use function count;
 use function is_string;
+use function KevinGH\Box\check_php_settings;
 use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Console\PharInfoRenderer;
 use KevinGH\Box\Console\Php\PhpSettingsHandler;
@@ -114,7 +115,7 @@ final class Diff extends BaseCommand
      */
     protected function executeCommand(IO $io): int
     {
-        (new PhpSettingsHandler(new ConsoleLogger($io->getOutput())))->check();
+        check_php_settings($io);
 
         $input = $io->getInput();
 

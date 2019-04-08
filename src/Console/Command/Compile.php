@@ -32,6 +32,7 @@ use function implode;
 use function is_string;
 use KevinGH\Box\Box;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
+use function KevinGH\Box\check_php_settings;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Composer\ComposerConfiguration;
 use KevinGH\Box\Composer\ComposerOrchestrator;
@@ -172,7 +173,7 @@ HELP;
             $io->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
         }
 
-        (new PhpSettingsHandler(new ConsoleLogger($io->getOutput())))->check();
+        check_php_settings($io);
 
         if ($input->getOption(self::NO_PARALLEL_PROCESSING_OPTION)) {
             disable_parallel_processing();

@@ -23,6 +23,7 @@ use function getcwd;
 use Humbug\PhpScoper\Whitelist;
 use function implode;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
+use function KevinGH\Box\check_php_settings;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
@@ -98,8 +99,7 @@ final class Process extends ConfigurableBaseCommand
             putenv(BOX_ALLOW_XDEBUG.'=1');
         }
 
-        // TODO: check if can be simplified
-        (new PhpSettingsHandler(new ConsoleLogger($io->getOutput())))->check();
+        check_php_settings($io);
 
         $this->changeWorkingDirectory($input);
 

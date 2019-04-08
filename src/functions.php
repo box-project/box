@@ -23,6 +23,7 @@ use function constant;
 use function define;
 use function defined;
 use function floor;
+use KevinGH\Box\Console\Php\PhpSettingsHandler;
 use function KevinGH\Box\FileSystem\copy;
 use function log;
 use function number_format;
@@ -34,7 +35,13 @@ use function str_replace;
 use function strlen;
 use function strtolower;
 use Symfony\Component\Console\Helper\Helper;
+use Symfony\Component\Console\Logger\ConsoleLogger;
+use Symfony\Component\Console\Output\OutputInterface;
+use KevinGH\Box\Console\IO\IO;
 
+/**
+ * @private
+ */
 function get_box_version(): string
 {
     $rawVersion = Versions::getVersion('humbug/box');
@@ -60,6 +67,9 @@ function get_phar_compression_algorithms(): array
     return $algorithms;
 }
 
+/**
+ * @private
+ */
 function get_phar_compression_algorithm_extension(int $algorithm): ?string
 {
     static $extensions = [
@@ -94,6 +104,9 @@ function get_phar_signing_algorithms(): array
     return $algorithms;
 }
 
+/**
+ * @private
+ */
 function format_size(int $size, int $decimals = 2): string
 {
     if (-1 === $size) {
@@ -116,6 +129,9 @@ function format_size(int $size, int $decimals = 2): string
     );
 }
 
+/**
+ * @private
+ */
 function memory_to_bytes(string $value): int
 {
     $unit = strtolower($value[strlen($value) - 1]);
@@ -135,6 +151,9 @@ function memory_to_bytes(string $value): int
     return $bytes;
 }
 
+/**
+ * @private
+ */
 function format_time(float $secs): string
 {
     return str_replace(
@@ -144,6 +163,9 @@ function format_time(float $secs): string
     );
 }
 
+/**
+ * @private
+ */
 function register_aliases(): void
 {
     // Exposes the finder used by PHP-Scoper PHAR to allow its usage in the configuration file.
@@ -161,6 +183,9 @@ function register_aliases(): void
     }
 }
 
+/**
+ * @private
+ */
 function disable_parallel_processing(): void
 {
     if (false === defined(_NO_PARALLEL_PROCESSING)) {
@@ -168,6 +193,9 @@ function disable_parallel_processing(): void
     }
 }
 
+/**
+ * @private
+ */
 function is_parallel_processing_enabled(): bool
 {
     return false === defined(_NO_PARALLEL_PROCESSING) || false === constant(_NO_PARALLEL_PROCESSING);
@@ -183,6 +211,9 @@ function unique_id(string $prefix): string
     return $prefix.bin2hex(random_bytes(6));
 }
 
+/**
+ * @private
+ */
 function create_temporary_phar(string $file): string
 {
     $tmpFile = sys_get_temp_dir().'/'.unique_id('').basename($file);
@@ -194,4 +225,16 @@ function create_temporary_phar(string $file): string
     copy($file, $tmpFile, true);
 
     return $tmpFile;
+}
+
+/**
+ * @private
+ */
+function check_php_settings(IO $io): void
+{
+    (new PhpSettingsHandler(
+        new ConsoleLogger(
+            $io->getOutput()
+        )
+    ))->check();
 }
