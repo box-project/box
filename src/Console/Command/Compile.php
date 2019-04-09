@@ -40,7 +40,6 @@ use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Console\Logger\CompilerLogger;
 use KevinGH\Box\Console\MessageRenderer;
-use KevinGH\Box\Console\Php\PhpSettingsHandler;
 use function KevinGH\Box\disable_parallel_processing;
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -65,11 +64,8 @@ use function putenv;
 use RuntimeException;
 use function sprintf;
 use stdClass;
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
-use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use function var_export;
@@ -567,14 +563,16 @@ HELP;
         $io = $logger->getIO();
 
         $box->endBuffering(
-            static function (Whitelist $whitelist, string $prefix) use ($excludeDevFiles, $io): void {
-                ComposerOrchestrator::dumpAutoload(
-                    $whitelist,
-                    $prefix,
-                    $excludeDevFiles,
-                    $io
-                );
-            }
+            $config->dumpAutoload()
+                ? static function (Whitelist $whitelist, string $prefix) use ($excludeDevFiles, $io): void {
+                    ComposerOrchestrator::dumpAutoload(
+                        $whitelist,
+                        $prefix,
+                        $excludeDevFiles,
+                        $io
+                    );
+                }
+                : null
         );
     }
 
@@ -713,8 +711,7 @@ HELP;
         Configuration $config,
         Box $box,
         string $path,
-        InputInterface $input,
-        OutputInterface $output,
+        IO $io,
         CompilerLogger $logger
     ): void {
         // Sign using private key when applicable
@@ -738,7 +735,7 @@ HELP;
         $passphrase = $config->getPrivateKeyPassphrase();
 
         if ($config->promptForPrivateKey()) {
-            if (false === $input->isInteractive()) {
+            if (false === $io->isInteractive()) {
                 throw new RuntimeException(
                     sprintf(
                         'Accessing to the private key "%s" requires a passphrase but none provided. Either '
@@ -748,16 +745,13 @@ HELP;
                 );
             }
 
-            /** @var QuestionHelper $dialog */
-            $dialog = $this->getHelper('question');
-
-            $question = new Question('Private key passphrase:');
+            $question = new Question('Private key passphrase');
             $question->setHidden(false);
             $question->setHiddenFallback(false);
 
-            $passphrase = $dialog->ask($input, $output, $question);
+            $passphrase = $io->askQuestion($question);
 
-            $output->writeln('');
+            $io->writeln('');
         }
 
         $box->signUsingFile($key, $passphrase);

@@ -34,7 +34,6 @@ use function sprintf;
 use function str_repeat;
 use function str_replace;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
@@ -155,8 +154,10 @@ HELP
         }
     }
 
-    public function showInfo(string $file, string $originalFile, InputInterface $input, IO $io): int
+    public function showInfo(string $file, string $originalFile, IO $io): int
     {
+        $input = $io->getInput();
+
         $depth = (int) $input->getOption(self::DEPTH_OPT);
 
         Assertion::greaterOrEqualThan($depth, -1, 'Expected the depth to be a positive integer or -1, got "%d"');

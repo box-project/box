@@ -46,6 +46,11 @@ final class IO extends SymfonyStyle
         return $this->input;
     }
 
+    public function isInteractive(): bool
+    {
+        return $this->input->isInteractive();
+    }
+
     public function getOutput(): OutputInterface
     {
         return $this->output;

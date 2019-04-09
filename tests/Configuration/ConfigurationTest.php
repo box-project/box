@@ -696,8 +696,8 @@ EOF
 
         $this->assertSame(
             [
-                'The compactor "Herrera\Box\Compactor\Json" has been deprecated, use "KevinGH\Box\Compactor\Compactor\Json" instead.',
-                'The compactor "Herrera\Box\Compactor\Php" has been deprecated, use "KevinGH\Box\Compactor\Compactor\Php" instead.',
+                'The compactor "Herrera\Box\Compactor\Json" has been deprecated, use "KevinGH\Box\Compactor\Json" instead.',
+                'The compactor "Herrera\Box\Compactor\Php" has been deprecated, use "KevinGH\Box\Compactor\Php" instead.',
             ],
             $this->config->getRecommendations()
         );
@@ -2964,7 +2964,7 @@ KevinGH\Box\Configuration\Configuration {#100
   -excludeComposerFiles: true
   -excludeDevFiles: true
   -compactors: array:1 [
-    0 => "KevinGH\Box\Compactor\Compactor\Php"
+    0 => "KevinGH\Box\Compactor\Php"
   ]
   -compressionAlgorithm: "GZ"
   -mainScriptPath: "index.php"

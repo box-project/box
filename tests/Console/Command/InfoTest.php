@@ -26,12 +26,11 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use UnexpectedValueException;
 
-///**
-// * @covers \KevinGH\Box\Console\Command\Info
-// * @runTestsInSeparateProcesses
-// */
 /**
- * @coversNothing
+ * @covers \KevinGH\Box\Console\Command\Info
+ *
+ * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
+ *                              can create undesirable side-effects.
  */
 class InfoTest extends CommandTestCase
 {

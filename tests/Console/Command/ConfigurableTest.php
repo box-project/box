@@ -18,6 +18,7 @@ use Assert\InvalidArgumentException;
 use Closure;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Configuration\NoConfigurationFound;
+use KevinGH\Box\Console\IO\IO;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\touch;
 use KevinGH\Box\Json\JsonValidationException;
@@ -62,10 +63,12 @@ class ConfigurableTest extends CommandTestCase
 
         $output = new NullOutput();
 
-        /** @var \KevinGH\Box\Configuration\Configuration $config */
+        /** @var Configuration $config */
         $config = Closure::bind(
-            function (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration {
-                return $command->getConfig($input, $output);
+            static function (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration {
+                return $command->getConfig(
+                    new IO($input, $output)
+                );
             },
             null,
             TestConfigurableCommand::class
@@ -95,8 +98,10 @@ class ConfigurableTest extends CommandTestCase
 
         /** @var Configuration $config */
         $config = Closure::bind(
-            function (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration {
-                return $command->getConfig($input, $output);
+            static function (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration {
+                return $command->getConfig(
+                    new IO($input, $output)
+                );
             },
             null,
             TestConfigurableCommand::class
@@ -124,8 +129,10 @@ class ConfigurableTest extends CommandTestCase
 
         try {
             Closure::bind(
-                function (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration {
-                    return $command->getConfig($input, $output);
+                static function (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration {
+                    return $command->getConfig(
+                        new IO($input, $output)
+                    );
                 },
                 null,
                 TestConfigurableCommand::class
@@ -152,10 +159,13 @@ class ConfigurableTest extends CommandTestCase
 
         $output = new NullOutput();
 
-        /** @var \KevinGH\Box\Configuration\Configuration $config */
+        /** @var Configuration $config */
         $config = Closure::bind(
-            function (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration {
-                return $command->getConfig($input, $output, true);
+            static function (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration {
+                return $command->getConfig(
+                    new IO($input, $output),
+                    true
+                );
             },
             null,
             TestConfigurableCommand::class
@@ -185,8 +195,10 @@ class ConfigurableTest extends CommandTestCase
 
         try {
             Closure::bind(
-                function (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration {
-                    return $command->getConfig($input, $output);
+                static function (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration {
+                    return $command->getConfig(
+                        new IO($input, $output)
+                    );
                 },
                 null,
                 TestConfigurableCommand::class
@@ -216,8 +228,10 @@ class ConfigurableTest extends CommandTestCase
 
         try {
             Closure::bind(
-                function (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration {
-                    return $command->getConfig($input, $output);
+                static function (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration {
+                    return $command->getConfig(
+                        new IO($input, $output)
+                    );
                 },
                 null,
                 TestConfigurableCommand::class

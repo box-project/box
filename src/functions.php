@@ -19,10 +19,12 @@ use Assert\Assertion;
 use function bin2hex;
 use function class_alias;
 use function class_exists;
+use Closure;
 use function constant;
 use function define;
 use function defined;
 use function floor;
+use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Console\Php\PhpSettingsHandler;
 use function KevinGH\Box\FileSystem\copy;
 use function log;
@@ -36,8 +38,6 @@ use function strlen;
 use function strtolower;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Logger\ConsoleLogger;
-use Symfony\Component\Console\Output\OutputInterface;
-use KevinGH\Box\Console\IO\IO;
 
 /**
  * @private
@@ -237,4 +237,12 @@ function check_php_settings(IO $io): void
             $io->getOutput()
         )
     ))->check();
+}
+
+/**
+ * @private
+ */
+function noop(): Closure
+{
+    return static function (): void {};
 }

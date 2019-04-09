@@ -15,8 +15,10 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Assert\Assertion;
+use function file_exists;
 use KevinGH\Box\Console\IO\IO;
 use function KevinGH\Box\create_temporary_phar;
+use function KevinGH\Box\FileSystem\copy;
 use function KevinGH\Box\FileSystem\remove;
 use Phar;
 use function realpath;
@@ -81,6 +83,10 @@ HELP
         $io->newLine();
 
         $tmpPharPath = create_temporary_phar($pharPath);
+
+        if (file_exists($pharPubKey = $pharPath.'.pubkey')) {
+            copy($pharPubKey, $tmpPharPath.'.pubkey');
+        }
 
         $verified = false;
         $signature = null;

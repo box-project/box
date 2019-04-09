@@ -22,7 +22,6 @@ use function is_string;
 use function KevinGH\Box\check_php_settings;
 use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Console\PharInfoRenderer;
-use KevinGH\Box\Console\Php\PhpSettingsHandler;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\get_phar_compression_algorithms;
 use KevinGH\Box\PharInfo\PharDiff;
@@ -32,7 +31,6 @@ use function sprintf;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Logger\ConsoleLogger;
 use Throwable;
 
 /**

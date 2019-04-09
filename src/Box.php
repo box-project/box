@@ -388,7 +388,7 @@ final class Box implements Countable
     {
         $mapFile = $this->mapFile;
         $compactors = $this->compactors;
-        $bootstrap = $GLOBALS['_BOX_BOOTSTRAP'] ?? static function (): void {};
+        $bootstrap = $GLOBALS['_BOX_BOOTSTRAP'] ?? noop();
         $cwd = getcwd();
 
         $processFile = static function (string $file) use ($cwd, $mapFile, $compactors, $bootstrap): array {
