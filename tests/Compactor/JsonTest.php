@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Generator;
+use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Json;
 use PHPUnit\Framework\TestCase;
 

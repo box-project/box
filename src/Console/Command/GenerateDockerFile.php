@@ -17,6 +17,8 @@ namespace KevinGH\Box\Console\Command;
 use Assert\Assertion;
 use function file_exists;
 use function getcwd;
+use KevinGH\Box\Console\IO\IO;
+use function KevinGH\Box\create_temporary_phar;
 use KevinGH\Box\DockerFileGenerator;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_relative;
@@ -26,17 +28,13 @@ use function sprintf;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StringInput;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * @private
  */
-final class GenerateDockerFile extends ConfigurableCommand
+final class GenerateDockerFile extends ConfigurableBaseCommand
 {
-    use CreateTemporaryPharFile;
-
     private const PHAR_ARG = 'phar';
     private const DOCKER_FILE_NAME = 'Dockerfile';
 
@@ -59,14 +57,12 @@ final class GenerateDockerFile extends ConfigurableCommand
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function executeCommand(IO $io): int
     {
-        $io = new SymfonyStyle($input, $output);
-
-        $pharPath = $input->getArgument(self::PHAR_ARG);
+        $pharPath = $io->getInput()->getArgument(self::PHAR_ARG);
 
         if (null === $pharPath) {
-            $pharPath = $this->guessPharPath($input, $output, $io);
+            $pharPath = $this->guessPharPath($io);
         }
 
         if (null === $pharPath) {
@@ -85,7 +81,7 @@ final class GenerateDockerFile extends ConfigurableCommand
             )
         );
 
-        $tmpPharPath = $this->createTemporaryPhar($pharPath);
+        $tmpPharPath = create_temporary_phar($pharPath);
 
         $requirementsPhar = 'phar://'.$tmpPharPath.'/.box/.requirements.php';
 
@@ -104,7 +100,7 @@ final class GenerateDockerFile extends ConfigurableCommand
             $dockerFileContents = DockerFileGenerator::createForRequirements(
                 $requirements,
                 make_path_relative($pharPath, getcwd())
-            )
+                )
                 ->generate()
             ;
 
@@ -137,17 +133,15 @@ final class GenerateDockerFile extends ConfigurableCommand
                 ]
             );
         } finally {
-            if ($tmpPharPath !== $pharPath) {
-                remove($tmpPharPath);
-            }
+            remove($tmpPharPath);
         }
 
         return 0;
     }
 
-    private function guessPharPath(InputInterface $input, OutputInterface $output, SymfonyStyle $io): ?string
+    private function guessPharPath(IO $io): ?string
     {
-        $config = $this->getConfig($input, $output, true);
+        $config = $this->getConfig($io, true);
 
         if (file_exists($config->getOutputPath())) {
             return $config->getOutputPath();
@@ -167,15 +161,28 @@ final class GenerateDockerFile extends ConfigurableCommand
             return null;
         }
 
-        $compileCommand = $this->getApplication()->find('compile');
+        $this->getCompileCommand()->run(
+            $this->createCompileInput($io),
+            clone $io->getOutput()
+        );
 
-        if ($output->isQuiet()) {
+        return $config->getOutputPath();
+    }
+
+    private function getCompileCommand(): Compile
+    {
+        return $this->getApplication()->find('compile');
+    }
+
+    private function createCompileInput(IO $io): InputInterface
+    {
+        if ($io->isQuiet()) {
             $compileInput = '--quiet';
-        } elseif ($output->isVerbose()) {
+        } elseif ($io->isVerbose()) {
             $compileInput = '--verbose 1';
-        } elseif ($output->isVeryVerbose()) {
+        } elseif ($io->isVeryVerbose()) {
             $compileInput = '--verbose 2';
-        } elseif ($output->isDebug()) {
+        } elseif ($io->isDebug()) {
             $compileInput = '--verbose 3';
         } else {
             $compileInput = '';
@@ -184,8 +191,6 @@ final class GenerateDockerFile extends ConfigurableCommand
         $compileInput = new StringInput($compileInput);
         $compileInput->setInteractive(false);
 
-        $compileCommand->run($compileInput, clone $output);
-
-        return $config->getOutputPath();
+        return $compileInput;
     }
 }

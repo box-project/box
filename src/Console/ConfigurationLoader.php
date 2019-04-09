@@ -15,17 +15,22 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console;
 
 use InvalidArgumentException;
-use KevinGH\Box\Configuration;
+use KevinGH\Box\Configuration\Configuration;
+use KevinGH\Box\Configuration\NoConfigurationFound;
+use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Json\JsonValidationException;
-use KevinGH\Box\NoConfigurationFound;
+use KevinGH\Box\NotInstantiable;
 use function sprintf;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
+ * Utility to load the configuration.
+ *
  * @private
  */
 final class ConfigurationLoader
 {
+    use NotInstantiable;
+
     /**
      * Returns the configuration settings.
      *
@@ -36,7 +41,7 @@ final class ConfigurationLoader
     public static function getConfig(
         ?string $configPath,
         ConfigurationHelper $helper,
-        SymfonyStyle $io,
+        IO $io,
         bool $allowNoFile
     ): Configuration {
         try {

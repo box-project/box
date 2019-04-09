@@ -19,19 +19,29 @@ use Assert\Assertion;
 use function bin2hex;
 use function class_alias;
 use function class_exists;
+use Closure;
 use function constant;
 use function define;
 use function defined;
 use function floor;
+use KevinGH\Box\Console\IO\IO;
+use KevinGH\Box\Console\Php\PhpSettingsHandler;
+use function KevinGH\Box\FileSystem\copy;
 use function log;
 use function number_format;
 use PackageVersions\Versions;
 use Phar;
 use function random_bytes;
 use function sprintf;
+use function str_replace;
 use function strlen;
 use function strtolower;
+use Symfony\Component\Console\Helper\Helper;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 
+/**
+ * @private
+ */
 function get_box_version(): string
 {
     $rawVersion = Versions::getVersion('humbug/box');
@@ -57,6 +67,9 @@ function get_phar_compression_algorithms(): array
     return $algorithms;
 }
 
+/**
+ * @private
+ */
 function get_phar_compression_algorithm_extension(int $algorithm): ?string
 {
     static $extensions = [
@@ -91,6 +104,9 @@ function get_phar_signing_algorithms(): array
     return $algorithms;
 }
 
+/**
+ * @private
+ */
 function format_size(int $size, int $decimals = 2): string
 {
     if (-1 === $size) {
@@ -113,6 +129,9 @@ function format_size(int $size, int $decimals = 2): string
     );
 }
 
+/**
+ * @private
+ */
 function memory_to_bytes(string $value): int
 {
     $unit = strtolower($value[strlen($value) - 1]);
@@ -132,6 +151,21 @@ function memory_to_bytes(string $value): int
     return $bytes;
 }
 
+/**
+ * @private
+ */
+function format_time(float $secs): string
+{
+    return str_replace(
+        ' ',
+        '',
+        Helper::formatTime($secs)
+    );
+}
+
+/**
+ * @private
+ */
 function register_aliases(): void
 {
     // Exposes the finder used by PHP-Scoper PHAR to allow its usage in the configuration file.
@@ -149,6 +183,9 @@ function register_aliases(): void
     }
 }
 
+/**
+ * @private
+ */
 function disable_parallel_processing(): void
 {
     if (false === defined(_NO_PARALLEL_PROCESSING)) {
@@ -156,6 +193,9 @@ function disable_parallel_processing(): void
     }
 }
 
+/**
+ * @private
+ */
 function is_parallel_processing_enabled(): bool
 {
     return false === defined(_NO_PARALLEL_PROCESSING) || false === constant(_NO_PARALLEL_PROCESSING);
@@ -164,9 +204,45 @@ function is_parallel_processing_enabled(): bool
 /**
  * @private
  *
- * @return string Random 12 charactres long (plus the prefix) string composed of a-z characters and digits
+ * @return string Random 12 characters long (plus the prefix) string composed of a-z characters and digits
  */
 function unique_id(string $prefix): string
 {
     return $prefix.bin2hex(random_bytes(6));
+}
+
+/**
+ * @private
+ */
+function create_temporary_phar(string $file): string
+{
+    $tmpFile = sys_get_temp_dir().'/'.unique_id('').basename($file);
+
+    if ('' === pathinfo($file, PATHINFO_EXTENSION)) {
+        $tmpFile .= '.phar';
+    }
+
+    copy($file, $tmpFile, true);
+
+    return $tmpFile;
+}
+
+/**
+ * @private
+ */
+function check_php_settings(IO $io): void
+{
+    (new PhpSettingsHandler(
+        new ConsoleLogger(
+            $io->getOutput()
+        )
+    ))->check();
+}
+
+/**
+ * @private
+ */
+function noop(): Closure
+{
+    return static function (): void {};
 }

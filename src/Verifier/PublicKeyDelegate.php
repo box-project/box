@@ -16,7 +16,6 @@ namespace KevinGH\Box\Verifier;
 
 use function class_exists;
 use function extension_loaded;
-use KevinGH\Box\Verifier;
 use RuntimeException;
 
 /**

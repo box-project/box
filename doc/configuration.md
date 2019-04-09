@@ -580,7 +580,7 @@ example:
 
 namespace Acme;
 
-use KevinGH\Box\Compactor;
+use KevinGH\Box\Compactor\Compactor;
 
 class MyCompactor implements Compactor
 {
@@ -600,9 +600,9 @@ class MyCompactor implements Compactor
 
 The following compactors are included with Box:
 
-- `KevinGH\Box\Compactor\Json`: compress JSON files
-- `KevinGH\Box\Compactor\Php`: strip down classes from phpdocs & comments
-- `KevinGH\Box\Compactor\PhpScoper`: isolate the code using [PHP-Scoper][phpscoper]
+- `KevinGH\Box\Compactor\Compactor\Json`: compress JSON files
+- `KevinGH\Box\Compactor\Compactor\Php`: strip down classes from phpdocs & comments
+- `KevinGH\Box\Compactor\Compactor\PhpScoper`: isolate the code using [PHP-Scoper][phpscoper]
 
 The effects of the [compactors][compactors] and [replacement values][placeholders] can be tested with the `process`
 command ✨.
@@ -613,7 +613,7 @@ command ✨.
 The annotations (`boolean`|`object`|`null` default `true`) setting is used to enable compacting annotations in PHP source
 code. 
 
-This setting is only taken into consideration if the [`KevinGH\Box\Compactor\Php` compactor][compactors] is enabled.
+This setting is only taken into consideration if the [`KevinGH\Box\Compactor\Compactor\Php` compactor][compactors] is enabled.
 
 By default, it removes all non real-like annotations from the PHP code. See the following example:
 
@@ -703,7 +703,7 @@ The PHP-Scoper setting (`string`|`null` default `scoper.inc.php`) points to the 
 [PHP-Scoper configuration][php-scoper-configuration] file. For more documentation regarding PHP-Scoper, you can head to
 [PHAR code isolation][PHAR code isolation] or [PHP-Scoper official documentation][php-scoper-official-doc].
 
-Note that this setting is used only if the compactor `KevinGH\Box\Compactor\PhpScoper` is registered.
+Note that this setting is used only if the compactor `KevinGH\Box\Compactor\Compactor\PhpScoper` is registered.
 
 
 ## Compression algorithm (`compression`)

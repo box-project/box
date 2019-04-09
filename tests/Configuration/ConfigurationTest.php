@@ -33,7 +33,6 @@ use KevinGH\Box\Compactor\DummyCompactor;
 use KevinGH\Box\Compactor\InvalidCompactor;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Compactor\PhpScoper;
-use KevinGH\Box\Configuration;
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
@@ -54,7 +53,7 @@ use stdClass;
 use function strtolower;
 
 /**
- * @covers \KevinGH\Box\Configuration
+ * @covers \KevinGH\Box\Configuration\Configuration
  * @covers \KevinGH\Box\MapFile
  * @group config
  */
@@ -2927,7 +2926,7 @@ JSON
         ]);
 
         $expectedDumpedConfig = <<<EOF
-KevinGH\Box\Configuration {#100
+KevinGH\Box\Configuration\Configuration {#100
   -file: "box.json"
   -fileMode: "0755"
   -alias: "test.phar"

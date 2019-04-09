@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use KevinGH\Box\Console\IO\IO;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * @deprecated
@@ -43,7 +43,7 @@ final class Build extends Compile
      */
     public function run(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
+        $io = new IO($input, $output);
 
         $io->warning('The command "build" is deprecated. Use "compile" instead.');
 

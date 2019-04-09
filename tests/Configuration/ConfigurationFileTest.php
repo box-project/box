@@ -20,7 +20,6 @@ use Generator;
 use function Humbug\get_contents;
 use function Humbug\PhpScoper\json_decode;
 use InvalidArgumentException;
-use KevinGH\Box\Configuration;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\mkdir;
@@ -31,7 +30,7 @@ use KevinGH\Box\Json\JsonValidationException;
 use function sprintf;
 
 /**
- * @covers \KevinGH\Box\Configuration
+ * @covers \KevinGH\Box\Configuration\Configuration
  * @group config
  */
 class ConfigurationFileTest extends ConfigurationTestCase

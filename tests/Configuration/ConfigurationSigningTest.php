@@ -23,7 +23,7 @@ use function KevinGH\Box\FileSystem\touch;
 use Phar;
 
 /**
- * @covers \KevinGH\Box\Configuration
+ * @covers \KevinGH\Box\Configuration\Configuration
  * @covers \KevinGH\Box\MapFile
  * @group config
  */

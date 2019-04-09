@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Compactor;
 
 use function func_get_args;
-use KevinGH\Box\Compactor;
 use KevinGH\Box\NotCallable;
 
 class FakeCompactor implements Compactor

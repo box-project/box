@@ -23,7 +23,7 @@ use const PHP_OS_FAMILY;
 use function symlink;
 
 /**
- * @covers \KevinGH\Box\Configuration
+ * @covers \KevinGH\Box\Configuration\Configuration
  * @group config
  */
 class ConfigurationFileNoConfigTest extends ConfigurationTestCase

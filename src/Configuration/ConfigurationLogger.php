@@ -12,12 +12,15 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box;
+namespace KevinGH\Box\Configuration;
 
 use function array_keys;
 use Assert\Assertion;
 use function trim;
 
+/**
+ * @private
+ */
 final class ConfigurationLogger
 {
     private $recommendations = [];
@@ -32,6 +35,14 @@ final class ConfigurationLogger
         $this->recommendations[$message] = $message;
     }
 
+    /**
+     * @return string[]
+     */
+    public function getRecommendations(): array
+    {
+        return array_keys($this->recommendations);
+    }
+
     public function addWarning(string $message): void
     {
         $message = trim($message);
@@ -39,14 +50,6 @@ final class ConfigurationLogger
         Assertion::false('' === $message, 'Expected to have a message but a blank string was given instead.');
 
         $this->warnings[$message] = $message;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getRecommendations(): array
-    {
-        return array_keys($this->recommendations);
     }
 
     /**

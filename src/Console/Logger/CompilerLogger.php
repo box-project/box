@@ -15,14 +15,14 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Logger;
 
 use InvalidArgumentException;
+use KevinGH\Box\Console\IO\IO;
 use function sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * @internal
  */
-final class CompileLogger
+final class CompilerLogger
 {
     public const QUESTION_MARK_PREFIX = '?';
     public const STAR_PREFIX = '*';
@@ -32,12 +32,12 @@ final class CompileLogger
 
     private $io;
 
-    public function __construct(SymfonyStyle $io)
+    public function __construct(IO $io)
     {
         $this->io = $io;
     }
 
-    public function getIO(): SymfonyStyle
+    public function getIO(): IO
     {
         return $this->io;
     }

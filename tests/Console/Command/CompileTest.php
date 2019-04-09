@@ -69,6 +69,7 @@ use Traversable;
 /**
  * @covers \KevinGH\Box\Console\Command\Compile
  * @covers \KevinGH\Box\Console\MessageRenderer
+ *
  * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
  *                              can create undesirable side-effects.
  */
@@ -165,7 +166,6 @@ class CompileTest extends CommandTestCase
 
 Box version 3.x-dev@151e40a
 
-
  // Loading the configuration file "/path/to/box.json.dist".
 
 🔨  Building the PHAR "/path/to/tmp/test.phar"
@@ -195,7 +195,10 @@ Box version 3.x-dev@151e40a
 ? Removing the Composer dump artefacts
 ? No compression
 ? Signing using a private key
-Private key passphrase:
+
+ Private key passphrase:
+ >
+
 ? Setting file permissions to 0700
 * Done.
 
@@ -390,7 +393,6 @@ PHP;
 
 
 Box version 3.x-dev@151e40a
-
 
  // Loading without a configuration file.
 
@@ -602,7 +604,6 @@ PHP;
 
 
 Box version 3.x-dev@151e40a
-
 
  // Loading the configuration file "/path/to/box.json.dist".
 
@@ -846,7 +847,6 @@ PHP;
 
 Box version 3.x-dev@151e40a
 
-
  // Loading the configuration file "/path/to/box.json.dist".
 
 🔨  Building the PHAR "/path/to/tmp/test.phar"
@@ -879,7 +879,10 @@ Generating optimized autoload files (authoritative)\x08\x08\x08\x08\x08\x08\x08\
 ? Removing the Composer dump artefacts
 ? No compression
 ? Signing using a private key
-Private key passphrase:
+
+ Private key passphrase:
+ >
+
 ? Setting file permissions to 0754
 * Done.
 
@@ -960,7 +963,6 @@ OUTPUT;
 
 Box version 3.x-dev@151e40a
 
-
  // Loading the configuration file "/path/to/box.json.dist".
 
 🔨  Building the PHAR "/path/to/tmp/test.phar"
@@ -994,7 +996,10 @@ Generating optimized autoload files (authoritative)\x08\x08\x08\x08\x08\x08\x08\
 ? Removing the Composer dump artefacts
 ? No compression
 ? Signing using a private key
-Private key passphrase:
+
+ Private key passphrase:
+ >
+
 ? Setting file permissions to 0754
 * Done.
 
@@ -1094,7 +1099,6 @@ $memoryLog
 
 Box version 3.x-dev@151e40a
 
-
  // Loading the configuration file "/path/to/box.json.dist".
 
 🔨  Building the PHAR "/path/to/tmp/index.phar"
@@ -1155,12 +1159,13 @@ OUTPUT;
 //
 // PHP Version: 10.0.0
 // PHP extensions: Core,date
+// OS: Darwin / 17.7.0
 // Command: bin/phpunit
 // Box: 3.x-dev@27df576
 // Time: 2018-05-24T20:59:15+00:00
 //
 
-KevinGH\Box\Configuration {#140
+KevinGH\Box\Configuration\Configuration {#140
   -file: "box.json"
   -fileMode: "0755"
   -alias: "index.phar"
@@ -1244,6 +1249,17 @@ EOF;
                 implode(',', get_loaded_extensions())
             ),
             'PHP extensions: Core,date',
+            $actualDumpedConfig
+        );
+
+        // Replace the expected OS version
+        $actualDumpedConfig = str_replace(
+            sprintf(
+                'OS: %s / %s',
+                PHP_OS,
+                php_uname('r')
+            ),
+            'OS: Darwin / 17.7.0',
             $actualDumpedConfig
         );
 
@@ -1556,7 +1572,6 @@ PHP
 
 Box version 3.x-dev@151e40a
 
-
  // Loading the configuration file "/path/to/box.json.dist".
 
 🔨  Building the PHAR "/path/to/tmp/test.phar"
@@ -1820,7 +1835,6 @@ OUTPUT;
 
 Box version 3.x-dev@151e40a
 
-
  // Loading the configuration file "/path/to/box.json.dist".
 
 🔨  Building the PHAR "/path/to/tmp/test.phar"
@@ -1888,7 +1902,6 @@ OUTPUT;
 
 Box version 3.x-dev@151e40a
 
-
  // Loading the configuration file "/path/to/box.json.dist".
 
 🔨  Building the PHAR "/path/to/tmp/test.phar"
@@ -1955,7 +1968,6 @@ OUTPUT;
 
 
 Box version 3.x-dev@151e40a
-
 
  // Loading the configuration file "/path/to/box.json.dist".
 
@@ -2032,7 +2044,6 @@ JSON
 
 Box version 3.x-dev@151e40a
 
-
  // Loading the configuration file "/path/to/box.json.dist".
 
 🔨  Building the PHAR "/path/to/tmp/test.phar"
@@ -2108,7 +2119,6 @@ JSON
 
 Box version 3.x-dev@151e40a
 
-
  // Loading the configuration file "/path/to/box.json.dist".
 
 🔨  Building the PHAR "/path/to/tmp/test.phar"
@@ -2183,7 +2193,6 @@ OUTPUT;
 
 
 Box version 3.x-dev@151e40a
-
 
  // Loading the configuration file "/path/to/box.json.dist".
 
@@ -2262,7 +2271,6 @@ OUTPUT;
 
 
 Box version 3.x-dev@151e40a
-
 
  // Loading the configuration file "/path/to/box.json.dist".
 
@@ -2418,7 +2426,6 @@ OUTPUT;
 
 Box version 3.x-dev@151e40a
 
-
  // Loading the configuration file "/path/to/box.json.dist".
 
 🔨  Building the PHAR "/path/to/tmp/test.phar"
@@ -2507,7 +2514,6 @@ OUTPUT;
 
 
 Box version 3.x-dev@151e40a
-
 
  // Loading the configuration file "/path/to/box.json.dist".
 
@@ -2721,7 +2727,6 @@ OUTPUT;
 
 Box version 3.x-dev@151e40a
 
-
  // Loading the configuration file "/path/to/box.json.dist".
 
 🔨  Building the PHAR "/path/to/tmp/index.phar"
@@ -2799,7 +2804,6 @@ OUTPUT;
 
 Box version 3.x-dev@151e40a
 
-
  // Loading the configuration file "/path/to/box.json.dist".
 
 🔨  Building the PHAR "/path/to/tmp/index.phar"
@@ -2872,7 +2876,6 @@ OUTPUT;
 
 
 Box version 3.x-dev@151e40a
-
 
  // Loading the configuration file "/path/to/box.json.dist".
 
@@ -2954,7 +2957,7 @@ OUTPUT;
         );
 
         $display = preg_replace(
-            '/\/\/ Memory usage: \d+\.\d{2}MB \(peak: \d+\.\d{2}MB\), time: \d+\.\d{2}s/',
+            '/\/\/ Memory usage: \d+\.\d{2}MB \(peak: \d+\.\d{2}MB\), time: .*?sec/',
             '// Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s',
             $display
         );

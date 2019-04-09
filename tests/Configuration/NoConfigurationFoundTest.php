@@ -12,13 +12,13 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box;
+namespace KevinGH\Box\Configuration;
 
 use Error;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \KevinGH\Box\NoConfigurationFound
+ * @covers \KevinGH\Box\Configuration\NoConfigurationFound
  */
 class NoConfigurationFoundTest extends TestCase
 {

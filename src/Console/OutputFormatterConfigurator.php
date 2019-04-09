@@ -14,11 +14,19 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
+use KevinGH\Box\NotInstantiable;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class OutputConfigurator
+/**
+ * Utility to configure the output formatter styles.
+ *
+ * @private
+ */
+final class OutputFormatterConfigurator
 {
+    use NotInstantiable;
+
     public static function configure(OutputInterface $output): void
     {
         $outputFormatter = $output->getFormatter();
@@ -31,9 +39,5 @@ final class OutputConfigurator
             'warning',
             new OutputFormatterStyle('white', 'red')
         );
-    }
-
-    private function __construct()
-    {
     }
 }

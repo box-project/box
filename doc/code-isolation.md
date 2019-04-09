@@ -40,7 +40,7 @@ Is this really an issue? The answer is it depends. Here as a few real life examp
 
 ## Isolating the PHAR
 
-Box provides an integration with [PHP-Scoper][php-scoper]. To use it, [enable the `KevinGH\Box\Compactor\PhpScoper`
+Box provides an integration with [PHP-Scoper][php-scoper]. To use it, [enable the `KevinGH\Box\Compactor\Compactor\PhpScoper`
 compactor][php-scoper-compactor].
 
 If you need an extra configuration for PHP-Scoper, you can create a `scoper.inc.php` file as

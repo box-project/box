@@ -12,15 +12,14 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Compactor;
+namespace KevinGH\Box;
 
-class DummyCompactor implements Compactor
+/**
+ * @private
+ */
+trait NotInstantiable
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function compact(string $file, string $contents): string
+    private function __construct()
     {
-        return $contents;
     }
 }

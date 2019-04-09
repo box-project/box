@@ -23,15 +23,17 @@ use function array_unshift;
 use Assert\Assertion;
 use BadMethodCallException;
 use function chdir;
+use Closure;
 use Countable;
 use function dirname;
 use function extension_loaded;
 use function file_exists;
 use function getcwd;
 use function is_object;
+use KevinGH\Box\Compactor\Compactor;
+use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
-use KevinGH\Box\Composer\ComposerOrchestrator;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\make_tmp_dir;
@@ -47,9 +49,6 @@ use RecursiveDirectoryIterator;
 use RuntimeException;
 use SplFileInfo;
 use function sprintf;
-use Symfony\Component\Console\Input\StringInput;
-use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Box is a utility class to generate a PHAR.
@@ -111,16 +110,9 @@ final class Box implements Countable
         $this->phar->startBuffering();
     }
 
-    public function endBuffering(bool $dumpAutoload, bool $excludeDevFiles, SymfonyStyle $io = null): void
+    public function endBuffering(?Closure $dumpAutoload): void
     {
         Assertion::true($this->buffering, 'The buffering must be started before ending it');
-
-        if (null === $io) {
-            $io = new SymfonyStyle(
-                new StringInput(''),
-                new NullOutput()
-            );
-        }
 
         $cwd = getcwd();
 
@@ -138,13 +130,10 @@ final class Box implements Countable
                 dump_file($file, $contents);
             }
 
-            if ($dumpAutoload) {
-                // Dump autoload without dev dependencies
-                ComposerOrchestrator::dumpAutoload(
+            if (null !== $dumpAutoload) {
+                $dumpAutoload(
                     $this->scoper->getWhitelist(),
-                    $this->scoper->getPrefix(),
-                    $excludeDevFiles,
-                    $io
+                    $this->scoper->getPrefix()
                 );
             }
 
@@ -399,7 +388,7 @@ final class Box implements Countable
     {
         $mapFile = $this->mapFile;
         $compactors = $this->compactors;
-        $bootstrap = $GLOBALS['_BOX_BOOTSTRAP'] ?? static function (): void {};
+        $bootstrap = $GLOBALS['_BOX_BOOTSTRAP'] ?? noop();
         $cwd = getcwd();
 
         $processFile = static function (string $file) use ($cwd, $mapFile, $compactors, $bootstrap): array {

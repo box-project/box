@@ -22,7 +22,7 @@ interface Scoper
      * Scope AKA. apply the given prefix to the file in the appropriate way.
      *
      * @param string $filePath File to scope
-     * @param string $contents File contents
+     * @param string $contents Contents of the file to scope
      *
      * @return string Contents of the file with the prefix applied
      */
@@ -30,9 +30,6 @@ interface Scoper
 
     public function changeWhitelist(Whitelist $whitelist): void;
 
-    /**
-     * @return string[]
-     */
     public function getWhitelist(): Whitelist;
 
     public function getPrefix(): string;

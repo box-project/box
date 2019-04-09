@@ -14,16 +14,21 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
+use KevinGH\Box\Console\IO\IO;
 use function KevinGH\Box\format_size;
+use KevinGH\Box\NotInstantiable;
 use KevinGH\Box\PharInfo\PharInfo;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
+ * Utility to write to the console output various PHAR related pieces of information.
+ *
  * @private
  */
 final class PharInfoRenderer
 {
-    public static function renderCompression(PharInfo $pharInfo, SymfonyStyle $io): void
+    use NotInstantiable;
+
+    public static function renderCompression(PharInfo $pharInfo, IO $io): void
     {
         $count = array_filter($pharInfo->getCompressionCount());
         $totalCount = array_sum($count);
@@ -65,7 +70,7 @@ final class PharInfoRenderer
         }
     }
 
-    public static function renderSignature(PharInfo $pharInfo, SymfonyStyle $io): void
+    public static function renderSignature(PharInfo $pharInfo, IO $io): void
     {
         $signature = $pharInfo->getPhar()->getSignature();
 
@@ -94,7 +99,7 @@ final class PharInfoRenderer
         );
     }
 
-    public static function renderMetadata(PharInfo $pharInfo, SymfonyStyle $io): void
+    public static function renderMetadata(PharInfo $pharInfo, IO $io): void
     {
         $metadata = $pharInfo->getNormalizedMetadata();
 
@@ -106,7 +111,7 @@ final class PharInfoRenderer
         }
     }
 
-    public static function renderContentsSummary(PharInfo $pharInfo, SymfonyStyle $io): void
+    public static function renderContentsSummary(PharInfo $pharInfo, IO $io): void
     {
         $count = array_filter($pharInfo->getCompressionCount());
         $totalCount = array_sum($count);
@@ -120,9 +125,5 @@ final class PharInfoRenderer
                 )
             )
         );
-    }
-
-    private function __construct()
-    {
     }
 }

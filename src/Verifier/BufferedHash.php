@@ -14,8 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Verifier;
 
-use KevinGH\Box\Verifier;
-
 /**
  * Buffers the hash as opposed to updating incrementally.
  *

@@ -12,12 +12,14 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box;
+namespace KevinGH\Box\Compactor;
 
 use function array_reduce;
 use Humbug\PhpScoper\Whitelist;
-use KevinGH\Box\Compactor\PhpScoper;
 
+/**
+ * @private
+ */
 final class Compactors
 {
     private $compactors;

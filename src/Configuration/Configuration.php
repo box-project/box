@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box;
+namespace KevinGH\Box\Configuration;
 
 use function array_diff;
 use function array_filter;
@@ -34,7 +34,6 @@ use function defined;
 use function dirname;
 use const E_USER_DEPRECATED;
 use function explode;
-use File;
 use function file_exists;
 use function getcwd;
 use Herrera\Box\Compactor\Json as LegacyJson;
@@ -60,6 +59,7 @@ use function iter\values;
 use KevinGH\Box\Annotation\AnnotationDumper;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
 use KevinGH\Box\Annotation\DocblockParser;
+use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Json as JsonCompactor;
 use KevinGH\Box\Compactor\Php as PhpCompactor;
 use KevinGH\Box\Compactor\PhpScoper as PhpScoperCompactor;
@@ -72,8 +72,13 @@ use function KevinGH\Box\FileSystem\is_absolute_path;
 use function KevinGH\Box\FileSystem\longest_common_base_path;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\make_path_relative;
+use function KevinGH\Box\get_box_version;
+use function KevinGH\Box\get_phar_compression_algorithms;
+use function KevinGH\Box\get_phar_signing_algorithms;
 use KevinGH\Box\Json\Json;
+use KevinGH\Box\MapFile;
 use KevinGH\Box\PhpScoper\SimpleScoper;
+use function KevinGH\Box\unique_id;
 use function krsort;
 use Phar;
 use function preg_match;
@@ -445,7 +450,7 @@ BANNER;
      * @param MapFile       $fileMapper           Utility to map the files from outside and inside the PHAR
      * @param mixed         $metadata             The PHAR Metadata
      * @param bool          $promptForPrivateKey  If the user should be prompted for the private key passphrase
-     * @param scalar[]      $replacements         The processed list of replacement placeholders and their values
+     * @param array         $replacements         The processed list of replacement placeholders and their values
      * @param null|string   $shebang              The shebang line
      * @param int           $signingAlgorithm     The PHAR siging algorithm. See \Phar constants
      * @param null|string   $stubBannerContents   The stub banner comment
@@ -1306,6 +1311,10 @@ BANNER;
         };
 
         $normalizeFileOrDirectory = static function (?string &$fileOrDirectory) use ($basePath, $blacklistFilter): void {
+            if (null === $fileOrDirectory) {
+                return;
+            }
+
             $fileOrDirectory = self::normalizePath($fileOrDirectory, $basePath);
 
             Assertion::false(
@@ -1739,10 +1748,12 @@ BANNER;
         $dumpAutoload = $raw->{self::DUMP_AUTOLOAD_KEY} ?? true;
 
         if (false === $canDumpAutoload && $dumpAutoload) {
-            // TODO: use sprintf there; check other occurrences as well
             $logger->addWarning(
-                'The "dump-autoload" setting has been set but has been ignored because the composer.json, composer.lock'
-                .' and vendor/composer/installed.json files are necessary but could not be found.'
+                sprintf(
+                    'The "%s" setting has been set but has been ignored because the composer.json, composer.lock'
+                    .' and vendor/composer/installed.json files are necessary but could not be found.',
+                    self::DUMP_AUTOLOAD_KEY
+                )
             );
 
             return false;
@@ -1931,7 +1942,12 @@ BANNER;
                 $main = self::normalizePath($main, $basePath);
 
                 if ($main === $firstBin) {
-                    $logger->addRecommendation('The "main" setting can be omitted since is set to its default value');
+                    $logger->addRecommendation(
+                        sprintf(
+                            'The "%s" setting can be omitted since is set to its default value',
+                            self::MAIN_KEY
+                        )
+                    );
                 }
             }
         } else {
@@ -2329,10 +2345,20 @@ BANNER;
             $format = $raw->{self::DATETIME_FORMAT_KEY};
         } elseif (isset($raw->{self::DATETIME_FORMAT_DEPRECATED_KEY})) {
             @trigger_error(
-                'The "datetime_format" is deprecated, use "datetime-format" setting instead.',
+                sprintf(
+                    'The "%s" is deprecated, use "%s" setting instead.',
+                    self::DATETIME_FORMAT_DEPRECATED_KEY,
+                    self::DATETIME_FORMAT_KEY
+                ),
                 E_USER_DEPRECATED
             );
-            $logger->addWarning('The "datetime_format" is deprecated, use "datetime-format" setting instead.');
+            $logger->addWarning(
+                sprintf(
+                    'The "%s" is deprecated, use "%s" setting instead.',
+                    self::DATETIME_FORMAT_DEPRECATED_KEY,
+                    self::DATETIME_FORMAT_KEY
+                )
+            );
 
             $format = $raw->{self::DATETIME_FORMAT_DEPRECATED_KEY};
         } else {

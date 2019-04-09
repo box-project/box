@@ -16,10 +16,11 @@ namespace KevinGH\Box;
 
 use Generator;
 use InvalidArgumentException;
+use KevinGH\Box\Configuration\ConfigurationLogger;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \KevinGH\Box\ConfigurationLogger
+ * @covers \KevinGH\Box\Configuration\ConfigurationLogger
  */
 class ConfigurationLoggerTest extends TestCase
 {

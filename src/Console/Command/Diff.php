@@ -19,8 +19,9 @@ use function array_flip;
 use Assert\Assertion;
 use function count;
 use function is_string;
+use function KevinGH\Box\check_php_settings;
+use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Console\PharInfoRenderer;
-use KevinGH\Box\Console\Php\PhpSettingsHandler;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\get_phar_compression_algorithms;
 use KevinGH\Box\PharInfo\PharDiff;
@@ -30,18 +31,13 @@ use function sprintf;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Logger\ConsoleLogger;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 
 /**
  * @private
  */
-final class Diff extends Command
+final class Diff extends BaseCommand
 {
-    use CreateTemporaryPharFile;
-
     private const FIRST_PHAR_ARG = 'pharA';
     private const SECOND_PHAR_ARG = 'pharB';
 
@@ -115,12 +111,13 @@ final class Diff extends Command
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function executeCommand(IO $io): int
     {
-        $io = new SymfonyStyle($input, $output);
+        check_php_settings($io);
 
-        (new PhpSettingsHandler(new ConsoleLogger($output)))->check();
+        $input = $io->getInput();
 
+        /** @var string[] $paths */
         $paths = [
             $input->getArgument(self::FIRST_PHAR_ARG),
             $input->getArgument(self::SECOND_PHAR_ARG),
@@ -131,7 +128,7 @@ final class Diff extends Command
         try {
             $diff = new PharDiff(...$paths);
         } catch (Throwable $throwable) {
-            if ($output->isDebug()) {
+            if ($io->isDebug()) {
                 throw $throwable;
             }
 
@@ -151,7 +148,7 @@ final class Diff extends Command
         return $result1 + $result2;
     }
 
-    private function compareArchives(PharDiff $diff, SymfonyStyle $io): int
+    private function compareArchives(PharDiff $diff, IO $io): int
     {
         $io->comment('<info>Comparing the two archives... (do not check the signatures)</info>');
 
@@ -181,7 +178,7 @@ final class Diff extends Command
         return 1;
     }
 
-    private function compareContents(InputInterface $input, PharDiff $diff, SymfonyStyle $io): int
+    private function compareContents(InputInterface $input, PharDiff $diff, IO $io): int
     {
         $io->comment('<info>Comparing the two archives contents...</info>');
 
@@ -194,7 +191,7 @@ final class Diff extends Command
         } elseif ($input->getOption(self::GIT_DIFF_OPTION)) {
             $diffResult = $diff->gitDiff();
         } else {
-            $diffResult = $diff->listDiff($diff, $io);
+            $diffResult = $diff->listDiff();
         }
 
         if (null === $diffResult || [[], []] === $diffResult) {
@@ -223,7 +220,7 @@ final class Diff extends Command
 
         $io->newLine();
 
-        $renderPaths = static function (string $symbol, PharInfo $pharInfo, array $paths, SymfonyStyle $io): void {
+        $renderPaths = static function (string $symbol, PharInfo $pharInfo, array $paths, IO $io): void {
             foreach ($paths as $path) {
                 /** @var PharFileInfo $file */
                 $file = $pharInfo->getPhar()[str_replace($pharInfo->getRoot(), '', $path)];
@@ -262,7 +259,7 @@ final class Diff extends Command
         return 1;
     }
 
-    private function renderArchive(string $fileName, PharInfo $pharInfo, SymfonyStyle $io): void
+    private function renderArchive(string $fileName, PharInfo $pharInfo, IO $io): void
     {
         $io->writeln(
             sprintf(

@@ -14,6 +14,15 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-class TestConfigurableCommand extends ConfigurableCommand
+use KevinGH\Box\Console\IO\IO;
+
+class TestConfigurableCommand extends ConfigurableBaseCommand
 {
+    /**
+     * {@inheritdoc}
+     */
+    protected function executeCommand(IO $io): int
+    {
+        return 0;
+    }
 }

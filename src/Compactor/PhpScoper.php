@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-use KevinGH\Box\Compactor;
 use KevinGH\Box\PhpScoper\Scoper;
 use Throwable;
 

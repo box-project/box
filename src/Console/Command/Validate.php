@@ -16,21 +16,18 @@ namespace KevinGH\Box\Console\Command;
 
 use Exception;
 use KevinGH\Box\Console\ConfigurationLoader;
+use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Console\MessageRenderer;
-use KevinGH\Box\Console\OutputConfigurator;
 use KevinGH\Box\Json\JsonValidationException;
 use function sprintf;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * @private
  */
-final class Validate extends Command
+final class Validate extends BaseCommand
 {
     private const FILE_ARGUMENT = 'file';
     private const IGNORE_MESSAGES_OPTION = 'ignore-recommendations-and-warnings';
@@ -73,17 +70,15 @@ HELP
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function executeCommand(IO $io): int
     {
-        $io = new SymfonyStyle($input, $output);
-
-        OutputConfigurator::configure($output);
+        $input = $io->getInput();
 
         try {
             $config = ConfigurationLoader::getConfig(
                 $input->getArgument(self::FILE_ARGUMENT) ?? $this->getConfigurationHelper()->findDefaultPath(),
                 $this->getConfigurationHelper(),
-                new SymfonyStyle($input, $output),
+                $io,
                 false
             );
 
@@ -111,7 +106,7 @@ HELP
             // Continue
         }
 
-        if ($output->isVerbose()) {
+        if ($io->isVerbose()) {
             throw new RuntimeException(
                 sprintf(
                     'The configuration file failed validation: %s',
@@ -123,7 +118,7 @@ HELP
         }
 
         if ($exception instanceof JsonValidationException) {
-            $output->writeln(
+            $io->writeln(
                 sprintf(
                     '<error>The configuration file failed validation: "%s" does not match the expected JSON '
                     .'schema:</error>',
@@ -131,10 +126,10 @@ HELP
                 )
             );
 
-            $output->writeln('');
+            $io->writeln('');
 
             foreach ($exception->getErrors() as $error) {
-                $output->writeln("<comment>  - $error</comment>");
+                $io->writeln("<comment>  - $error</comment>");
             }
         } else {
             $errorMessage = isset($exception)
@@ -142,7 +137,7 @@ HELP
                 : 'The configuration file failed validation.'
             ;
 
-            $output->writeln(
+            $io->writeln(
                 sprintf(
                     '<error>%s</error>',
                     $errorMessage
