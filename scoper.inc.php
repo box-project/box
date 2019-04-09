@@ -141,14 +141,12 @@ return [
             );
         },
     ],
-    'files-whitelist' => [
-        __DIR__.'/vendor/composer/composer/src/Composer/Autoload/ClassLoader.php',
-    ],
     'whitelist' => [
         'Composer\*',
 
         \Composer\Autoload\ClassLoader::class,
 
+        \KevinGH\Box\Compactor\Compactor::class,
         \Herrera\Box\Compactor\Json::class,
         \KevinGH\Box\Compactor\Json::class,
         \Herrera\Box\Compactor\Php::class,
