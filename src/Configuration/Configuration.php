@@ -78,7 +78,6 @@ use function KevinGH\Box\get_phar_signing_algorithms;
 use KevinGH\Box\Json\Json;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\PhpScoper\SimpleScoper;
-use KevinGH\Box\scalar;
 use function KevinGH\Box\unique_id;
 use function krsort;
 use Phar;
@@ -451,7 +450,7 @@ BANNER;
      * @param MapFile       $fileMapper           Utility to map the files from outside and inside the PHAR
      * @param mixed         $metadata             The PHAR Metadata
      * @param bool          $promptForPrivateKey  If the user should be prompted for the private key passphrase
-     * @param scalar[]      $replacements         The processed list of replacement placeholders and their values
+     * @param array         $replacements         The processed list of replacement placeholders and their values
      * @param null|string   $shebang              The shebang line
      * @param int           $signingAlgorithm     The PHAR siging algorithm. See \Phar constants
      * @param null|string   $stubBannerContents   The stub banner comment
@@ -1312,6 +1311,10 @@ BANNER;
         };
 
         $normalizeFileOrDirectory = static function (?string &$fileOrDirectory) use ($basePath, $blacklistFilter): void {
+            if (null === $fileOrDirectory) {
+                return;
+            }
+
             $fileOrDirectory = self::normalizePath($fileOrDirectory, $basePath);
 
             Assertion::false(

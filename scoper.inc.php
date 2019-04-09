@@ -16,17 +16,16 @@ use Isolated\Symfony\Component\Finder\Finder;
 
 return [
     'patchers' => [
-        // TODO: to check if still necessary
-        function (string $filePath, string $prefix, string $contents): string {
+        static function (string $filePath, string $prefix, string $contents): string {
             $finderClass = sprintf('\%s\%s', $prefix, Finder::class);
 
             return str_replace($finderClass, '\\'.Finder::class, $contents);
         },
         // Box compactors: not required to work but avoid any confusion for the users
-        function (string $filePath, string $prefix, string $contents): string {
+        static function (string $filePath, string $prefix, string $contents): string {
             $files = [
                 'src/functions.php',
-                'src/Configuration.php',
+                'src/Configuration/Configuration.php',
             ];
 
             if (false === in_array($filePath, $files, true)) {
@@ -51,22 +50,8 @@ return [
                 $contents
             );
         },
-        function (string $filePath, string $prefix, string $contents): string {
-            if ('vendor/composer/composer/src/Composer/Autoload/AutoloadGenerator.php' !== $filePath) {
-                return $contents;
-            }
-
-            return preg_replace(
-                sprintf(
-                    '/\$loader = new \\\\%s\\\\Composer\\\\Autoload\\\\ClassLoader\(\)/',
-                    $prefix
-                ),
-                '$loader = new \Composer\Autoload\ClassLoader();',
-                $contents
-            );
-        },
         // Paragonie custom autoloader which relies on some regexes
-        function (string $filePath, string $prefix, string $contents): string {
+        static function (string $filePath, string $prefix, string $contents): string {
             if ('vendor/paragonie/sodium_compat/autoload.php' !== $filePath) {
                 return $contents;
             }
@@ -89,7 +74,7 @@ return [
             );
         },
         // Paragonie dynamic constants declarations
-        function (string $filePath, string $prefix, string $contents): string {
+        static function (string $filePath, string $prefix, string $contents): string {
             if ('vendor/paragonie/sodium_compat/lib/php72compat.php' !== $filePath) {
                 return $contents;
             }
@@ -104,7 +89,7 @@ return [
             );
         },
         // Hoa patches
-        function (string $filePath, string $prefix, string $contents): string {
+        static function (string $filePath, string $prefix, string $contents): string {
             if ('vendor/hoa/stream/Stream.php' !== $filePath) {
                 return $contents;
             }
@@ -118,7 +103,7 @@ return [
                 $contents
             );
         },
-        function (string $filePath, string $prefix, string $contents): string {
+        static function (string $filePath, string $prefix, string $contents): string {
             if ('vendor/hoa/consistency/Autoloader.php' !== $filePath) {
                 return $contents;
             }
@@ -144,7 +129,7 @@ return [
 
             return $contents;
         },
-        function (string $filePath, string $prefix, string $contents): string {
+        static function (string $filePath, string $prefix, string $contents): string {
             if ('vendor/symfony/polyfill-php72/bootstrap.php' !== $filePath) {
                 return $contents;
             }
