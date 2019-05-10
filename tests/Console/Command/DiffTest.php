@@ -387,9 +387,9 @@ Metadata: None
 Contents: 1 file (6.64KB)
 
 Archive: simple-phar-bar-compressed.phar
-Compression: None
+Compression: GZ
 Metadata: None
-Contents: 1 file (6.64KB)
+Contents: 1 file (6.65KB)
 
  // Comparing the two archives contents...
 
