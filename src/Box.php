@@ -31,6 +31,8 @@ use function extension_loaded;
 use function file_exists;
 use function getcwd;
 use function is_object;
+use KevinGH\Box\Compactor\Compactor;
+use KevinGH\Box\Compactor\CompactorProxy;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
@@ -241,11 +243,11 @@ final class Box implements Countable
     {
         $message = 'Expected value "%s" to be a scalar or stringable object.';
 
-        foreach ($placeholders as $i => $placeholder) {
+        foreach ($placeholders as $index => $placeholder) {
             if (is_object($placeholder)) {
                 Assertion::methodExists('__toString', $placeholder, $message);
 
-                $placeholders[$i] = (string) $placeholder;
+                $placeholders[$index] = (string) $placeholder;
 
                 break;
             }
@@ -253,8 +255,13 @@ final class Box implements Countable
             Assertion::scalar($placeholder, $message);
         }
 
-        $this->placeholderCompactor = new Placeholder($placeholders);
-        $this->registerCompactors($this->compactors->toArray());
+        $this->placeholderCompactor = new CompactorProxy(
+            static function () use ($placeholders): Compactor {
+                return new Placeholder($placeholders);
+            }
+        );
+
+        $this->registerCompactors($this->compactors);
     }
 
     public function registerFileMapping(MapFile $fileMapper): void
