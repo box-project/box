@@ -33,6 +33,10 @@ final class Compactors implements Compactor, Countable
         $this->compactors = $compactors;
 
         foreach ($compactors as $compactor) {
+            if ($compactor instanceof CompactorProxy) {
+                $compactor = $compactor->getCompactor();
+            }
+
             if ($compactor instanceof PhpScoper) {
                 $this->scoperCompactor = $compactor;
 
