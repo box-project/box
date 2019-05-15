@@ -59,7 +59,9 @@ use function trim;
 /**
  * @covers \KevinGH\Box\Box
  *
- * @runTestsInSeparateProcesses
+ * @runTestsInSeparateProcesses Although the tear down should be enough, it appears there is some side-efects remaining
+ *                              screwing up with the openssl API. Indeed without this, running this test and OpenSslTest
+ *                              will result in a failure.
  */
 class BoxTest extends FileSystemTestCase
 {
