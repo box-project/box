@@ -23,6 +23,7 @@ use Closure;
 use function constant;
 use function define;
 use function defined;
+use ErrorException;
 use function floor;
 use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Console\Php\PhpSettingsHandler;
@@ -245,4 +246,20 @@ function check_php_settings(IO $io): void
 function noop(): Closure
 {
     return static function (): void {};
+}
+
+/**
+ * Converts errors to exceptions.
+ *
+ * @private
+ */
+function register_error_handler(): void
+{
+    set_error_handler(
+        static function (int $code, string $message, string $file = '', int $line = -1): void {
+            if (error_reporting() & $code) {
+                throw new ErrorException($message, 0, $code, $file, $line);
+            }
+        }
+    );
 }

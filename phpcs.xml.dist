@@ -12,6 +12,7 @@
 
     <file>fixtures</file>
     <exclude-pattern>default_stub\.php</exclude-pattern>
+    <exclude-pattern>src/Box\.php</exclude-pattern>
     <exclude-pattern>/vendor/</exclude-pattern>
     <exclude-pattern>/build/</exclude-pattern>
     <file>src</file>
