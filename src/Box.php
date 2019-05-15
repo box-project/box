@@ -31,7 +31,6 @@ use function extension_loaded;
 use function file_exists;
 use function getcwd;
 use function is_object;
-use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
@@ -216,14 +215,9 @@ final class Box implements Countable
         return $extensionRequired;
     }
 
-    /**
-     * @param Compactor[] $compactors
-     */
-    public function registerCompactors(array $compactors): void
+    public function registerCompactors(Compactors $compactors): void
     {
-        Assertion::allIsInstanceOf($compactors, Compactor::class);
-
-        foreach ($compactors as $index => $compactor) {
+        foreach ($compactors->toArray() as $index => $compactor) {
             if ($compactor instanceof PhpScoper) {
                 $this->scoper = $compactor->getScoper();
 

@@ -16,6 +16,7 @@ namespace KevinGH\Box\Compactor;
 
 use function array_reduce;
 use Humbug\PhpScoper\Whitelist;
+use KevinGH\Box\PhpScoper\Scoper;
 
 /**
  * @private
@@ -30,6 +31,10 @@ final class Compactors
         $this->compactors = $compactors;
 
         foreach ($compactors as $compactor) {
+            if ($compactor instanceof CompactorProxy) {
+                $compactor = $compactor->getCompactor();
+            }
+
             if ($compactor instanceof PhpScoper) {
                 $this->scoperCompactor = $compactor;
 
@@ -47,6 +52,11 @@ final class Compactors
             },
             $contents
         );
+    }
+
+    public function getScoper(): ?Scoper
+    {
+        return null !== $this->scoperCompactor ? $this->scoperCompactor->getScoper() : null;
     }
 
     public function getScoperWhitelist(): ?Whitelist

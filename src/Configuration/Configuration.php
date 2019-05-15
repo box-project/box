@@ -35,6 +35,7 @@ use function dirname;
 use const E_USER_DEPRECATED;
 use function explode;
 use function file_exists;
+use function get_class;
 use function getcwd;
 use Herrera\Box\Compactor\Json as LegacyJson;
 use Herrera\Box\Compactor\Php as LegacyPhp;
@@ -60,6 +61,8 @@ use KevinGH\Box\Annotation\AnnotationDumper;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
 use KevinGH\Box\Annotation\DocblockParser;
 use KevinGH\Box\Compactor\Compactor;
+use KevinGH\Box\Compactor\CompactorProxy;
+use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\Json as JsonCompactor;
 use KevinGH\Box\Compactor\Php as PhpCompactor;
 use KevinGH\Box\Compactor\PhpScoper as PhpScoperCompactor;
@@ -442,7 +445,6 @@ BANNER;
      * @param bool          $dumpAutoload         Whether or not the Composer autoloader should be dumped
      * @param bool          $excludeComposerFiles Whether or not the Composer files composer.json, composer.lock and
      *                                            installed.json should be removed from the PHAR
-     * @param Compactor[]   $compactors           List of file contents compactors
      * @param null|int      $compressionAlgorithm Compression algorithm constant value. See the \Phar class constants
      * @param null|int      $fileMode             File mode in octal form
      * @param string        $mainScriptPath       The main script file path
@@ -475,7 +477,7 @@ BANNER;
         bool $dumpAutoload,
         bool $excludeComposerFiles,
         bool $excludeDevPackages,
-        array $compactors,
+        Compactors $compactors,
         ?int $compressionAlgorithm,
         ?int $fileMode,
         ?string $mainScriptPath,
@@ -602,7 +604,16 @@ BANNER;
 
         $exportedConfig->compressionAlgorithm = array_flip(get_phar_compression_algorithms())[$exportedConfig->compressionAlgorithm ?? Phar::NONE];
         $exportedConfig->signingAlgorithm = array_flip(get_phar_signing_algorithms())[$exportedConfig->signingAlgorithm];
-        $exportedConfig->compactors = array_map('get_class', $exportedConfig->compactors);
+        $exportedConfig->compactors = array_map(
+            static function (Compactor $compactor): string {
+                return get_class(
+                    $compactor instanceof CompactorProxy
+                    ? $compactor->getCompactor()
+                    : $compactor
+                );
+            },
+            $exportedConfig->compactors
+        );
         $exportedConfig->fileMode = '0'.decoct($exportedConfig->fileMode);
 
         $cloner = new VarCloner();
@@ -695,10 +706,7 @@ BANNER;
         return $this->excludeDevFiles;
     }
 
-    /**
-     * @return Compactor[] the list of compactors
-     */
-    public function getCompactors(): array
+    public function getCompactors(): Compactors
     {
         return $this->compactors;
     }
@@ -1791,23 +1799,51 @@ BANNER;
         return $raw->{self::EXCLUDE_COMPOSER_FILES_KEY} ?? true;
     }
 
-    /**
-     * @return Compactor[]
-     */
-    private static function retrieveCompactors(stdClass $raw, string $basePath, ConfigurationLogger $logger): array
+    private static function retrieveCompactors(stdClass $raw, string $basePath, ConfigurationLogger $logger): Compactors
     {
         self::checkIfDefaultValue($logger, $raw, self::COMPACTORS_KEY, []);
 
         $compactorClasses = array_unique((array) ($raw->{self::COMPACTORS_KEY} ?? []));
 
-        $ignoredAnnotations = self::retrievePhpCompactorIgnoredAnnotations($raw, $compactorClasses, $logger);
-
         if (false === isset($raw->{self::COMPACTORS_KEY})) {
-            return [];
+            return new Compactors();
         }
 
-        $compactors = array_map(
-            static function (string $class) use ($raw, $basePath, $logger, $ignoredAnnotations): Compactor {
+        $createCompactors = self::retrieveCompactorFactories(
+            $raw,
+            $basePath,
+            $compactorClasses,
+            self::retrievePhpCompactorIgnoredAnnotations($raw, $compactorClasses, $logger),
+            $logger
+        );
+
+        $compactors = new Compactors(...array_map(
+            static function (Closure $createCompactor): Compactor {
+                return new CompactorProxy($createCompactor);
+            },
+            $createCompactors
+        ));
+
+        self::checkCompactorsOrder($logger, $compactors);
+
+        return $compactors;
+    }
+
+    /**
+     * @param string[] $compactorClasses
+     * @param string[] $ignoredAnnotations
+     *
+     * @return Closure[]
+     */
+    private static function retrieveCompactorFactories(
+        stdClass $raw,
+        string $basePath,
+        array $compactorClasses,
+        array $ignoredAnnotations,
+        ConfigurationLogger $logger
+    ): array {
+        return array_map(
+            static function (string $class) use ($raw, $basePath, $logger, $ignoredAnnotations): Closure {
                 Assertion::classExists($class, 'The compactor class "%s" does not exist.');
                 Assertion::implementsInterface($class, Compactor::class, 'The class "%s" is not a compactor class.');
 
@@ -1839,14 +1875,23 @@ BANNER;
                     return self::createPhpScoperCompactor($raw, $basePath, $logger);
                 }
 
-                return new $class();
+                return static function () use ($class): Compactor {
+                    return new $class();
+                };
             },
             $compactorClasses
         );
+    }
 
+    private static function checkCompactorsOrder(ConfigurationLogger $logger, Compactors $compactors): void
+    {
         $scoperCompactor = false;
 
-        foreach ($compactors as $compactor) {
+        foreach ($compactors->toArray() as $compactor) {
+            if ($compactor instanceof CompactorProxy) {
+                $compactor = $compactor->getCompactor();
+            }
+
             if ($compactor instanceof PhpScoperCompactor) {
                 $scoperCompactor = true;
             }
@@ -1864,8 +1909,6 @@ BANNER;
                 break;
             }
         }
-
-        return $compactors;
     }
 
     private static function retrieveCompressionAlgorithm(stdClass $raw, ConfigurationLogger $logger): ?int
@@ -2773,7 +2816,7 @@ BANNER;
         return $ignored;
     }
 
-    private static function createPhpCompactor(array $ignoredAnnotations): Compactor
+    private static function createPhpCompactor(array $ignoredAnnotations): Closure
     {
         $ignoredAnnotations = array_values(
             array_filter(
@@ -2786,51 +2829,55 @@ BANNER;
             )
         );
 
-        return new PhpCompactor(
-            new DocblockAnnotationParser(
-                new DocblockParser(),
-                new AnnotationDumper(),
-                $ignoredAnnotations
-            )
-        );
+        return static function () use ($ignoredAnnotations): Compactor {
+            return new PhpCompactor(
+                new DocblockAnnotationParser(
+                    new DocblockParser(),
+                    new AnnotationDumper(),
+                    $ignoredAnnotations
+                )
+            );
+        };
     }
 
-    private static function createPhpScoperCompactor(stdClass $raw, string $basePath, ConfigurationLogger $logger): Compactor
+    private static function createPhpScoperCompactor(stdClass $raw, string $basePath, ConfigurationLogger $logger): Closure
     {
         $phpScoperConfig = self::retrievePhpScoperConfig($raw, $basePath, $logger);
 
-        $phpScoper = (new class() extends ApplicationFactory {
-            public static function createScoper(): Scoper
-            {
-                return parent::createScoper();
-            }
-        })::createScoper();
-
-        if ([] !== $phpScoperConfig->getWhitelistedFiles()) {
-            $whitelistedFiles = array_values(
-                array_unique(
-                    array_map(
-                        static function (string $path) use ($basePath): string {
-                            return make_path_relative($path, $basePath);
-                        },
-                        $phpScoperConfig->getWhitelistedFiles()
-                    )
+        $whitelistedFiles = array_values(
+            array_unique(
+                array_map(
+                    static function (string $path) use ($basePath): string {
+                        return make_path_relative($path, $basePath);
+                    },
+                    $phpScoperConfig->getWhitelistedFiles()
                 )
-            );
-
-            $phpScoper = new FileWhitelistScoper($phpScoper, ...$whitelistedFiles);
-        }
+            )
+        );
 
         $prefix = $phpScoperConfig->getPrefix() ?? unique_id('_HumbugBox');
 
-        return new PhpScoperCompactor(
-            new SimpleScoper(
-                $phpScoper,
-                $prefix,
-                $phpScoperConfig->getWhitelist(),
-                $phpScoperConfig->getPatchers()
-            )
-        );
+        return static function () use ($phpScoperConfig, $prefix, $whitelistedFiles): Compactor {
+            $phpScoper = (new class() extends ApplicationFactory {
+                public static function createScoper(): Scoper
+                {
+                    return parent::createScoper();
+                }
+            })::createScoper();
+
+            if ([] !== $whitelistedFiles) {
+                $phpScoper = new FileWhitelistScoper($phpScoper, ...$whitelistedFiles);
+            }
+
+            return new PhpScoperCompactor(
+                new SimpleScoper(
+                    $phpScoper,
+                    $prefix,
+                    $phpScoperConfig->getWhitelist(),
+                    $phpScoperConfig->getPatchers()
+                )
+            );
+        };
     }
 
     private static function checkIfDefaultValue(
