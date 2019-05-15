@@ -31,6 +31,8 @@ use function extension_loaded;
 use function file_exists;
 use function getcwd;
 use function is_object;
+use KevinGH\Box\Compactor\Compactor;
+use KevinGH\Box\Compactor\CompactorProxy;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
@@ -254,7 +256,11 @@ final class Box implements Countable
             Assertion::scalar($placeholder, $message);
         }
 
-        $this->placeholderCompactor = new Placeholder($placeholders);
+        $this->placeholderCompactor = new CompactorProxy(
+            static function () use ($placeholders): Compactor {
+                return new Placeholder($placeholders);
+            }
+        );
 
         $this->registerCompactors($this->compactors);
     }
