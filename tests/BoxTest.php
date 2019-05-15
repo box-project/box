@@ -58,6 +58,8 @@ use function trim;
 
 /**
  * @covers \KevinGH\Box\Box
+ *
+ * @runTestsInSeparateProcesses
  */
 class BoxTest extends FileSystemTestCase
 {

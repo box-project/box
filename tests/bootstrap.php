@@ -16,6 +16,5 @@ use function KevinGH\Box\register_aliases;
 use org\bovigo\vfs\vfsStreamWrapper;
 
 register_aliases();
-restore_error_handler();
 
 vfsStreamWrapper::register();
