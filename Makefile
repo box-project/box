@@ -36,7 +36,7 @@ compile: box
 .PHONY: dump-requirement-checker
 dump-requirement-checker:## Dumps the requirement checker
 dump-requirement-checker:
-	rm rf .requirement-checker || true
+	rm -rf .requirement-checker || true
 	$(MAKE) .requirement-checker
 
 
@@ -381,5 +381,6 @@ box: bin src res vendor box.json.dist scoper.inc.php .requirement-checker
 
 	touch $@
 
-requirement-checker/bin/check-requirements.phar: requirement-checker/src requirement-checker/bin/check-requirements.php requirement-checker/box.json.dist requirement-checker/vendor
+requirement-checker/bin/check-requirements.phar: requirement-checker/src requirement-checker/bin/check-requirements.php requirement-checker/box.json.dist requirement-checker/scoper.inc.php requirement-checker/vendor
 	bin/box compile --working-dir requirement-checker
+	touch $@

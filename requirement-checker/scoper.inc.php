@@ -12,7 +12,30 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
+function get_prefix(): string
+{
+    $lastReleaseEndpoint = shell_exec(<<<'BASH'
+curl -s https://api.github.com/repos/humbug/box/releases/latest \
+  | grep "browser_download_url.*box.phar" \
+  | cut -d '"' -f 4
+BASH
+    );
+
+    if (1 !== preg_match('/download\/(?<version>.*?)\/box\.phar$/', $lastReleaseEndpoint, $matches)) {
+        throw new \RuntimeException(sprintf(
+            'Could not retrieve the last release endpoint. Last URL download link found: "%s"',
+            $lastReleaseEndpoint
+        ));
+    }
+
+    $lastRelease = $matches['version'];
+
+    return 'HumbugBox'.str_replace('.', '', $lastRelease);
+}
+
 return [
+    'prefix' => get_prefix(),
+
     'whitelist-global-classes' => false,
     'whitelist-global-functions' => false,
     'whitelist' => [
