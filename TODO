@@ -1,3 +1,2 @@
 Check the TODOs in the code
-Fix the error handler change occurring when compiling a PHAR
 Make dumped requirement checker prefix deterministic on a version basis
