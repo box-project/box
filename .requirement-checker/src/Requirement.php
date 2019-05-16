@@ -1,6 +1,6 @@
 <?php
 
-namespace _HumbugBox87c495005ea2\KevinGH\RequirementChecker;
+namespace _HumbugBox90eb36759167\KevinGH\RequirementChecker;
 
 /**
 @symfony

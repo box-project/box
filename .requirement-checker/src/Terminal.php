@@ -1,6 +1,6 @@
 <?php
 
-namespace _HumbugBox87c495005ea2\KevinGH\RequirementChecker;
+namespace _HumbugBox90eb36759167\KevinGH\RequirementChecker;
 
 /**
 @symfony
@@ -72,7 +72,7 @@ class Terminal
     private static function getSttyColumns()
     {
         if (!\function_exists('proc_open')) {
-            return;
+            return null;
         }
         $descriptorspec = array(1 => array('pipe', 'w'), 2 => array('pipe', 'w'));
         $process = \proc_open('stty -a | grep columns', $descriptorspec, $pipes, null, null, array('suppress_errors' => \true));

@@ -55,13 +55,13 @@ class DockerFileGeneratorTest extends TestCase
         try {
             DockerFileGenerator::createForRequirements(
                 [
-                    [
-                        'type' => 'php',
-                        'condition' => '^5.3',
+                        [
+                            'type' => 'php',
+                            'condition' => '^5.3',
+                        ],
                     ],
-                ],
                 'path/to/phar'
-            )
+                )
                 ->generate()
             ;
         } catch (UnexpectedValueException $exception) {

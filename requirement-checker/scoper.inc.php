@@ -36,7 +36,7 @@ return [
         // The following patcher can be safely removed however once https://github.com/humbug/php-scoper/issues/278 is
         // fixed.
         //
-        function (string $filePath, string $prefix, string $contents): string {
+        static function (string $filePath, string $prefix, string $contents): string {
             $files = [
                 'vendor/symfony/console/Output/StreamOutput.php',
                 'vendor/symfony/phpunit-bridge/DeprecationErrorHandler.php',

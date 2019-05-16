@@ -36,9 +36,6 @@ abstract class CommandTestCase extends FileSystemTestCase
     /** @var CommandTester */
     protected $commandTester;
 
-    /** @var string the name of the command */
-    private $name;
-
     /**
      * {@inheritdoc}
      */
@@ -48,11 +45,13 @@ abstract class CommandTestCase extends FileSystemTestCase
 
         $this->application = new Application();
 
-        $this->name = $this->getCommand()->getName();
-
         $this->application->add($this->getCommand());
 
-        $this->commandTester = new CommandTester($this->application->get($this->name));
+        $this->commandTester = new CommandTester(
+            $this->application->get(
+                $this->getCommand()->getName()
+            )
+        );
     }
 
     /**

@@ -156,6 +156,8 @@ class JsonTest extends FileSystemTestCase
 }
 
 JSON
+            ,
+            false
         );
 
         touch('data.json');

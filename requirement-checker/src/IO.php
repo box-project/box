@@ -101,10 +101,11 @@ final class IO
             return false;
         }
 
-        if (\function_exists('posix_isatty')) {
-            if (!@posix_isatty(STDOUT) && false === \getenv('SHELL_INTERACTIVE')) {
-                return false;
-            }
+        if (\function_exists('posix_isatty')
+            && !@posix_isatty(STDOUT)
+            && false === \getenv('SHELL_INTERACTIVE')
+        ) {
+            return false;
         }
 
         return true;
@@ -136,17 +137,15 @@ final class IO
         if ($this->hasParameter(array('--quiet', '-q'))) {
             $this->verbosity = self::VERBOSITY_QUIET;
             $shellVerbosity = -1;
-        } else {
-            if ($this->hasParameter(array('-vvv', '--verbose=3', '--verbose 3'))) {
-                $this->verbosity = self::VERBOSITY_DEBUG;
-                $shellVerbosity = 3;
-            } elseif ($this->hasParameter(array('-vv', '--verbose=2', '--verbose 2'))) {
-                $this->verbosity = self::VERBOSITY_VERY_VERBOSE;
-                $shellVerbosity = 2;
-            } elseif ($this->hasParameter(array('-v', '--verbose=1', '--verbose 1', '--verbose'))) {
-                $this->verbosity = self::VERBOSITY_VERBOSE;
-                $shellVerbosity = 1;
-            }
+        } elseif ($this->hasParameter(array('-vvv', '--verbose=3', '--verbose 3'))) {
+            $this->verbosity = self::VERBOSITY_DEBUG;
+            $shellVerbosity = 3;
+        } elseif ($this->hasParameter(array('-vv', '--verbose=2', '--verbose 2'))) {
+            $this->verbosity = self::VERBOSITY_VERY_VERBOSE;
+            $shellVerbosity = 2;
+        } elseif ($this->hasParameter(array('-v', '--verbose=1', '--verbose 1', '--verbose'))) {
+            $this->verbosity = self::VERBOSITY_VERBOSE;
+            $shellVerbosity = 1;
         }
 
         return $shellVerbosity;

@@ -37,15 +37,13 @@ class PhpScoperTest extends TestCase
 }
 JSON;
 
-        /** @var ObjectProphecy|Scoper $scoper */
+        /** @var ObjectProphecy&Scoper $scoper */
         $scoperProphecy = $this->prophesize(Scoper::class);
         $scoperProphecy->scope($file, $contents)->willReturn($expected = 'Scoped contents');
         /** @var Scoper $scoper */
         $scoper = $scoperProphecy->reveal();
 
-        $compactor = new PhpScoper($scoper);
-
-        $actual = $compactor->compact($file, $contents);
+        $actual = (new PhpScoper($scoper))->compact($file, $contents);
 
         $this->assertSame($expected, $actual);
 
@@ -62,15 +60,13 @@ JSON;
 }
 JSON;
 
-        /** @var ObjectProphecy|Scoper $scoper */
+        /** @var ObjectProphecy&Scoper $scoper */
         $scoperProphecy = $this->prophesize(Scoper::class);
         $scoperProphecy->scope($file, $contents)->willThrow(new Error());
         /** @var Scoper $scoper */
         $scoper = $scoperProphecy->reveal();
 
-        $compactor = new PhpScoper($scoper);
-
-        $actual = $compactor->compact($file, $contents);
+        $actual = (new PhpScoper($scoper))->compact($file, $contents);
 
         $this->assertSame($contents, $actual);
     }

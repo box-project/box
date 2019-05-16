@@ -59,9 +59,8 @@ use function trim;
 /**
  * @covers \KevinGH\Box\Box
  *
- * @runTestsInSeparateProcesses Although the tear down should be enough, it appears there is some side-efects remaining
- *                              screwing up with the openssl API. Indeed without this, running this test and OpenSslTest
- *                              will result in a failure.
+ * @runTestsInSeparateProcesses There is side-effects caused by generating PHARs as a result it is necessary to scope it
+ *                              in separate processes.
  */
 class BoxTest extends FileSystemTestCase
 {
@@ -69,15 +68,6 @@ class BoxTest extends FileSystemTestCase
 
     /** @var Box */
     private $box;
-
-    /** @var Phar */
-    private $phar;
-
-    /** @var Compactor|ObjectProphecy */
-    private $compactorProphecy;
-
-    /** @var Compactor */
-    private $compactor;
 
     /**
      * {@inheritdoc}
@@ -89,10 +79,6 @@ class BoxTest extends FileSystemTestCase
         parent::setUp();
 
         $this->box = Box::create('test.phar');
-        $this->phar = $this->box->getPhar();
-
-        $this->compactorProphecy = $this->prophesize(Compactor::class);
-        $this->compactor = $this->compactorProphecy->reveal();
     }
 
     /**
@@ -425,12 +411,14 @@ class BoxTest extends FileSystemTestCase
 
         dump_file($file, $contents);
 
+        /** @var Compactor&ObjectProphecy $firstCompactorProphecy */
         $firstCompactorProphecy = $this->prophesize(Compactor::class);
         $firstCompactorProphecy
             ->compact($file, 'original contents foo_value')
             ->willReturn($firstCompactorOutput = 'first compactor contents')
         ;
 
+        /** @var Compactor&ObjectProphecy $secondCompactorProphecy */
         $secondCompactorProphecy = $this->prophesize(Compactor::class);
         $secondCompactorProphecy
             ->compact($file, $firstCompactorOutput)
@@ -1487,7 +1475,7 @@ PHP
         $this->box->sign($key, $password);
 
         $this->assertNotSame([], $phar->getSignature(), 'Expected the PHAR to be signed.');
-        $this->assertInternalType('string', $phar->getSignature()['hash'], 'Expected the PHAR signature hash to be a string.');
+        $this->assertIsString($phar->getSignature()['hash'], 'Expected the PHAR signature hash to be a string.');
         $this->assertNotEmpty($phar->getSignature()['hash'], 'Expected the PHAR signature hash to not be empty.');
 
         $this->assertSame('OpenSSL', $phar->getSignature()['hash_type']);
@@ -1556,7 +1544,7 @@ PHP
         $this->box->signUsingFile($file, $password);
 
         $this->assertNotSame([], $phar->getSignature(), 'Expected the PHAR to be signed.');
-        $this->assertInternalType('string', $phar->getSignature()['hash'], 'Expected the PHAR signature hash to be a string.');
+        $this->assertIsString($phar->getSignature()['hash'], 'Expected the PHAR signature hash to be a string.');
         $this->assertNotEmpty($phar->getSignature()['hash'], 'Expected the PHAR signature hash to not be empty.');
 
         $this->assertSame('OpenSSL', $phar->getSignature()['hash_type']);

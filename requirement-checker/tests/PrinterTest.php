@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\RequirementChecker;
 
+use Generator;
 use PHPUnit\Framework\TestCase;
 use function ob_get_clean;
 use function ob_start;
@@ -53,9 +54,7 @@ class PrinterTest extends TestCase
         int $width,
         ?string $expected
     ): void {
-        $printer = new Printer($verbosity, $colors, $width);
-
-        $actual = $printer->getRequirementErrorMessage($requirement);
+        $actual = (new Printer($verbosity, $colors, $width))->getRequirementErrorMessage($requirement);
 
         $this->assertSame($expected, $actual);
     }
@@ -81,7 +80,7 @@ class PrinterTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function provideTitles()
+    public function provideTitles(): Generator
     {
         yield [
             IO::VERBOSITY_NORMAL,
@@ -170,7 +169,7 @@ EOF
         ];
     }
 
-    public function provideErrorRequirements()
+    public function provideErrorRequirements(): Generator
     {
         yield [
             new Requirement(
@@ -215,7 +214,7 @@ EOF
         ];
     }
 
-    public function provideBlocks()
+    public function provideBlocks(): Generator
     {
         yield [
             IO::VERBOSITY_NORMAL,

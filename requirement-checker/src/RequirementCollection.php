@@ -20,7 +20,7 @@ use Traversable;
 /**
  * @private
  *
- * @see \Symfony\Requirements\RequirementCollection
+ * @see https://github.com/symfony/requirements-checker/blob/master/src/RequirementCollection.php
  *
  * @license MIT (c) Fabien Potencier <fabien@symfony.com>
  */
@@ -103,7 +103,7 @@ final class RequirementCollection implements IteratorAggregate, Countable
              *
              * @return bool
              */
-            function ($checkPassed, Requirement $requirement) {
+            static function ($checkPassed, Requirement $requirement) {
                 return $checkPassed && $requirement->isFulfilled();
             },
             true

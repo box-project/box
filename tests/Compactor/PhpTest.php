@@ -60,9 +60,8 @@ PHP;
     public function test_it_compacts_PHP_files(DocblockAnnotationParser $annotationParser, string $content, string $expected): void
     {
         $file = 'foo.php';
-        $compactor = new Php($annotationParser);
 
-        $actual = $compactor->compact($file, $content);
+        $actual = (new Php($annotationParser))->compact($file, $content);
 
         $this->assertSame($expected, $actual);
     }

@@ -1636,7 +1636,7 @@ BANNER;
                     $excludedPaths
                 ),
                 static function (string $path): bool {
-                    return '..' !== substr($path, 0, 2);
+                    return 0 !== strpos($path, '..');
                 }
             )
         );
@@ -2028,9 +2028,8 @@ BANNER;
         }
 
         $map = [];
-        $rawMap = (array) $raw->{self::MAP_KEY};
 
-        foreach ($rawMap as $item) {
+        foreach ((array) $raw->{self::MAP_KEY} as $item) {
             $processed = [];
 
             foreach ($item as $match => $replace) {
@@ -2331,9 +2330,7 @@ BANNER;
 
     private static function retrieveDatetimeNow(string $format): string
     {
-        $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
-
-        return $now->format($format);
+        return (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format($format);
     }
 
     private static function retrieveDatetimeFormat(stdClass $raw, ConfigurationLogger $logger): array
@@ -2417,7 +2414,7 @@ BANNER;
 
         Assertion::notEmpty($shebang, 'The shebang should not be empty.');
         Assertion::true(
-            '#!' === substr($shebang, 0, 2),
+            0 === strpos($shebang, '#!'),
             sprintf(
                 'The shebang line must start with "#!". Got "%s" instead',
                 $shebang

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\RequirementChecker;
 
+use Generator;
 use PHPUnit\Framework\TestCase;
 use function ob_get_contents;
 use function preg_replace;
@@ -45,8 +46,7 @@ class CheckerTest extends TestCase
             $requirements
         );
 
-        $actualOutput = ob_get_contents();
-        ob_end_clean();
+        $actualOutput = ob_get_clean();
 
         $actualOutput = DisplayNormalizer::removeTrailingSpaces($actualOutput);
         $actualOutput = preg_replace(
@@ -59,11 +59,11 @@ class CheckerTest extends TestCase
         $this->assertSame($expectedResult, $actualResult);
     }
 
-    public function provideRequirements()
+    public function provideRequirements(): Generator
     {
         $phpVersion = PHP_VERSION;
 
-        yield (function () use ($phpVersion) {
+        yield (static function () use ($phpVersion) {
             return [
                 new RequirementCollection(),
                 IO::VERBOSITY_DEBUG,
@@ -88,7 +88,7 @@ EOF
             ];
         })();
 
-        yield (function () use ($phpVersion) {
+        yield (static function () use ($phpVersion) {
             return [
                 new RequirementCollection(),
                 IO::VERBOSITY_VERY_VERBOSE,
@@ -114,7 +114,7 @@ EOF
         })();
 
         foreach ([IO::VERBOSITY_VERBOSE, IO::VERBOSITY_NORMAL, IO::VERBOSITY_QUIET] as $verbosity) {
-            yield (function () use ($verbosity) {
+            yield (static function () use ($verbosity) {
                 return [
                     new RequirementCollection(),
                     $verbosity,
@@ -124,7 +124,7 @@ EOF
             })();
         }
 
-        yield (function () use ($phpVersion) {
+        yield (static function () use ($phpVersion) {
             $requirements = new RequirementCollection();
 
             $requirements->addRequirement(
@@ -169,7 +169,7 @@ EOF
             ];
         })();
 
-        yield (function () use ($phpVersion) {
+        yield (static function () use ($phpVersion) {
             $requirements = new RequirementCollection();
 
             $requirements->addRequirement(
@@ -209,7 +209,7 @@ EOF
         })();
 
         foreach ([IO::VERBOSITY_VERBOSE, IO::VERBOSITY_NORMAL, IO::VERBOSITY_QUIET] as $verbosity) {
-            yield (function () use ($verbosity) {
+            yield (static function () use ($verbosity) {
                 $requirements = new RequirementCollection();
 
                 $requirements->addRequirement(
@@ -232,7 +232,7 @@ EOF
             })();
         }
 
-        yield (function () use ($phpVersion) {
+        yield (static function () use ($phpVersion) {
             $requirements = new RequirementCollection();
 
             $requirements->addRequirement(
@@ -280,7 +280,7 @@ EOF
         })();
 
         foreach ([IO::VERBOSITY_VERY_VERBOSE, IO::VERBOSITY_VERBOSE, IO::VERBOSITY_NORMAL] as $verbosity) {
-            yield (function () use ($verbosity, $phpVersion) {
+            yield (static function () use ($verbosity, $phpVersion) {
                 $requirements = new RequirementCollection();
 
                 $requirements->addRequirement(
@@ -326,7 +326,7 @@ EOF
             })();
         }
 
-        yield (function () use ($phpVersion) {
+        yield (static function () use ($phpVersion) {
             $requirements = new RequirementCollection();
 
             $requirements->addRequirement(

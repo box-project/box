@@ -26,13 +26,13 @@ use Prophecy\Prophecy\ObjectProphecy;
  */
 class CompactorsTest extends TestCase
 {
-    /** @var Compactor|ObjectProphecy */
+    /** @var Compactor&ObjectProphecy */
     private $compactor1Prophecy;
 
     /** @var Compactor */
     private $compactor1;
 
-    /** @var Compactor|ObjectProphecy */
+    /** @var Compactor&ObjectProphecy */
     private $compactor2Prophecy;
 
     /** @var Compactor */
@@ -200,7 +200,7 @@ class CompactorsTest extends TestCase
 
     private function createScoperCompactor(Whitelist $whitelist): PhpScoper
     {
-        /** @var ObjectProphecy|Scoper $scoperProphecy */
+        /** @var ObjectProphecy&Scoper $scoperProphecy */
         $scoperProphecy = $this->prophesize(Scoper::class);
         $scoperProphecy->getWhitelist()->willReturn($whitelist);
 
@@ -212,7 +212,7 @@ class CompactorsTest extends TestCase
 
     private function createScoperCompactorWithChangeWhitelist(Whitelist $whitelist): PhpScoper
     {
-        /** @var ObjectProphecy|Scoper $scoperProphecy */
+        /** @var ObjectProphecy&Scoper $scoperProphecy */
         $scoperProphecy = $this->prophesize(Scoper::class);
         $scoperProphecy->changeWhitelist($whitelist)->shouldBeCalled();
         $scoperProphecy->getWhitelist()->willReturn($whitelist);

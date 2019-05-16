@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use Amp\MultiReasonException;
 use function Amp\ParallelFunctions\parallelMap;
 use function Amp\Promise\wait;
 use function array_filter;
@@ -279,18 +280,14 @@ final class Box implements Countable
 
     /**
      * @param SplFileInfo[]|string[] $files
+     *
+     * @throws MultiReasonException
      */
     public function addFiles(array $files, bool $binary): void
     {
         Assertion::true($this->buffering, 'Cannot add files if the buffering has not started.');
 
-        $files = array_map(
-            static function ($file): string {
-                // Convert files to string as SplFileInfo is not serializable
-                return (string) $file;
-            },
-            $files
-        );
+        $files = array_map('strval', $files);
 
         if ($binary) {
             foreach ($files as $file) {

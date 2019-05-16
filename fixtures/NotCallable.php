@@ -17,6 +17,7 @@ namespace KevinGH\Box;
 use DomainException;
 use function sprintf;
 
+// TODO: move this to throw unsupported method exception instead
 trait NotCallable
 {
     public function __call($method, $arguments): void
