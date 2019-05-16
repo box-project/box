@@ -92,7 +92,7 @@ class CompileTest extends CommandTestCase
             /**
              * {@inheritdoc}
              */
-            public function execute(array $input, array $options = [])
+            public function execute(array $input, array $options = []): int
             {
                 if ('compile' === $input['command']) {
                     $input['--no-parallel'] = null;
@@ -2403,7 +2403,7 @@ OUTPUT;
 
         $boxRawConfig = json_decode(file_get_contents('box.json'), true, 512, JSON_PRETTY_PRINT);
         $boxRawConfig['shebang'] = false;
-        dump_file('box.json', json_encode($boxRawConfig), JSON_PRETTY_PRINT);
+        dump_file('box.json', json_encode($boxRawConfig, JSON_PRETTY_PRINT));
 
         $this->commandTester->execute(
             ['command' => 'compile'],

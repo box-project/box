@@ -1430,21 +1430,13 @@ JSON
             'sub-dir/rab',
         ];
 
-        $this->assertEquals(
+        $this->assertEqualsCanonicalizing(
             $expected,
-            $this->normalizePaths($this->config->getFiles()),
-            '',
-            .0,
-            10,
-            true
+            $this->normalizePaths($this->config->getFiles())
         );
-        $this->assertEquals(
+        $this->assertEqualsCanonicalizing(
             $expected,
-            $this->normalizePaths($this->config->getBinaryFiles()),
-            '',
-            .0,
-            10,
-            true
+            $this->normalizePaths($this->config->getBinaryFiles())
         );
     }
 
@@ -1468,21 +1460,13 @@ JSON
         // Relative to the current working directory for readability
         $expected = ['A/foo'];
 
-        $this->assertEquals(
+        $this->assertEqualsCanonicalizing(
             $expected,
-            $this->normalizePaths($this->config->getFiles()),
-            '',
-            .0,
-            10,
-            true
+            $this->normalizePaths($this->config->getFiles())
         );
-        $this->assertEquals(
+        $this->assertEqualsCanonicalizing(
             $expected,
-            $this->normalizePaths($this->config->getBinaryFiles()),
-            '',
-            .0,
-            10,
-            true
+            $this->normalizePaths($this->config->getBinaryFiles())
         );
     }
 
@@ -1759,7 +1743,10 @@ JSON
 
     public function test_no_warning_is_given_when_no_installed_json_no_composer_lock_are_found(): void
     {
-        $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir000/box.json', json_decode(get_contents($configPath)));
+        $config = Configuration::create(
+            $configPath = self::FIXTURES_DIR.'/dir000/box.json',
+            json_decode(get_contents($configPath), false)
+        );
 
         $this->assertSame([], $config->getRecommendations());
         $this->assertSame([], $config->getWarnings());
@@ -1767,7 +1754,10 @@ JSON
 
     public function test_no_warning_is_given_when_the_installed_json_and_composer_lock_are_found(): void
     {
-        $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir001/box.json', json_decode(get_contents($configPath)));
+        $config = Configuration::create(
+            $configPath = self::FIXTURES_DIR.'/dir001/box.json',
+            json_decode(get_contents($configPath), false)
+        );
 
         $this->assertTrue($config->dumpAutoload());
 

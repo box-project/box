@@ -72,6 +72,7 @@ final class PharDiff
         $argB = escapeshellarg($this->pharB->tmp);
 
         /** @var string $diff */
+        // TODO: replace by the process component
         $diff = `git diff --no-index $argA $argB`;
 
         $diff = str_replace(
@@ -94,6 +95,7 @@ final class PharDiff
         $argB = escapeshellarg($this->pharB->tmp);
 
         /** @var string $diff */
+        // TODO: replace by the process component
         $diff = `diff $argA $argB`;
 
         $diff = str_replace(

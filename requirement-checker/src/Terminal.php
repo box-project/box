@@ -125,7 +125,7 @@ class Terminal
     private static function getSttyColumns()
     {
         if (!\function_exists('proc_open')) {
-            return;
+            return null;
         }
 
         $descriptorspec = array(

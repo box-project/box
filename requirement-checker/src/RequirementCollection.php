@@ -20,7 +20,7 @@ use Traversable;
 /**
  * @private
  *
- * @see \Symfony\Requirements\RequirementCollection
+ * @see https://github.com/symfony/requirements-checker/blob/master/src/RequirementCollection.php
  *
  * @license MIT (c) Fabien Potencier <fabien@symfony.com>
  */

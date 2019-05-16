@@ -26,7 +26,7 @@ class RequirementCollectionTest extends TestCase
     {
         $requirements = new RequirementCollection();
 
-        $this->assertSame([], iterator_to_array($requirements));
+        $this->assertSame([], iterator_to_array($requirements, false));
         $this->assertSame([], $requirements->getRequirements());
         $this->assertCount(0, $requirements);
         $this->assertTrue($requirements->evaluateRequirements());
@@ -53,7 +53,7 @@ class RequirementCollectionTest extends TestCase
             $requirements->add($requirement);
         }
 
-        $this->assertSame($reqs, iterator_to_array($requirements));
+        $this->assertSame($reqs, iterator_to_array($requirements, false));
         $this->assertSame($reqs, $requirements->getRequirements());
         $this->assertCount(2, $requirements);
         $this->assertTrue($requirements->evaluateRequirements());
@@ -69,7 +69,7 @@ class RequirementCollectionTest extends TestCase
 
         $retrievedRequirements = $requirements->getRequirements();
 
-        $this->assertSame($retrievedRequirements, iterator_to_array($requirements));
+        $this->assertSame($retrievedRequirements, iterator_to_array($requirements, false));
 
         $this->assertSame($requirementA, $retrievedRequirements[0]);
         $this->assertSame($requirementB, $retrievedRequirements[1]);

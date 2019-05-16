@@ -16,7 +16,6 @@ namespace KevinGH\Box\PhpScoper;
 
 use Humbug\PhpScoper\Scoper;
 use Humbug\PhpScoper\Whitelist;
-use KevinGH\Box\Compactor\PhpScoper;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -40,7 +39,7 @@ JSON;
         $whitelist = Whitelist::create(true, true, true, 'Whitelisted\Foo');
         $patchers = [];
 
-        /** @var ObjectProphecy|PhpScoper $phpScoperProphecy */
+        /** @var ObjectProphecy&Scoper $phpScoperProphecy */
         $phpScoperProphecy = $this->prophesize(Scoper::class);
         $phpScoperProphecy
             ->scope($file, $contents, $prefix, $patchers, $whitelist)
@@ -48,12 +47,10 @@ JSON;
                 $expected = 'Scoped file'
             )
         ;
-        /** @var PhpScoper $phpScoper */
+        /** @var Scoper $phpScoper */
         $phpScoper = $phpScoperProphecy->reveal();
 
-        $scoper = new SimpleScoper($phpScoper, $prefix, $whitelist, $patchers);
-
-        $actual = $scoper->scope($file, $contents);
+        $actual = (new SimpleScoper($phpScoper, $prefix, $whitelist, $patchers))->scope($file, $contents);
 
         $this->assertSame($expected, $actual);
 

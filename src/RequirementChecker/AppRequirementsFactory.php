@@ -19,7 +19,6 @@ use function array_key_exists;
 use Phar;
 use function preg_match;
 use function sprintf;
-use function substr;
 
 /**
  * Collect the list of requirements for running the application.
@@ -184,7 +183,7 @@ final class AppRequirementsFactory
             if (1 === preg_match('/symfony\/polyfill-(?<extension>.+)/', $packageName, $matches)) {
                 $extension = $matches['extension'];
 
-                if ('php' !== substr($extension, 0, 3)) {
+                if (0 !== strpos($extension, 'php')) {
                     $polyfills[$extension] = true;
 
                     continue;

@@ -32,9 +32,7 @@ class NullScoperTest extends TestCase
 }
 JSON;
 
-        $scoper = new NullScoper();
-
-        $actual = $scoper->scope($file, $contents);
+        $actual = (new NullScoper())->scope($file, $contents);
 
         $this->assertSame($contents, $actual);
     }

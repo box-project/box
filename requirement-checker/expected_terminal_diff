@@ -55,6 +55,10 @@
 <      * @return string|null
 ---
 >      * @return null|string
+119c128
+<             return;
+---
+>             return null;
 122,125c131,134
 <         $descriptorspec = [
 <             1 => ['pipe', 'w'],

@@ -118,13 +118,13 @@ final class Printer
 
         $remainingMessage = $message;
 
-        while (\strlen($remainingMessage) > 0) {
+        while ($remainingMessage !== '') {
             $wrapped = wordwrap($remainingMessage, $this->width - 3, '¬');
             $exploded = explode('¬', $wrapped);
             $line = $exploded[0];
             $remainingMessage = ltrim(substr($remainingMessage, \strlen($line)));
 
-            if (\strlen($remainingMessage) > 0) {
+            if ($remainingMessage !== '') {
                 $remainingMessage = str_repeat(' ', \strlen($prefix)).$remainingMessage;
             }
 

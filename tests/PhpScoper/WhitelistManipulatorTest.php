@@ -48,7 +48,7 @@ class WhitelistManipulatorTest extends TestCase
     {
         $actual = WhitelistManipulator::mergeWhitelists(...$whitelists);
 
-        $this->assertEquals($expected, $actual, '', .0, 10, true);
+        $this->assertEqualsCanonicalizing($expected, $actual);
         $this->assertNotSame($expected, $actual);
     }
 
