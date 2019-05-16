@@ -1,6 +1,6 @@
 <?php
 
-namespace _HumbugBox90eb36759167\KevinGH\RequirementChecker;
+namespace _HumbugBox87c495005ea2\KevinGH\RequirementChecker;
 
 final class Printer
 {
@@ -11,7 +11,7 @@ final class Printer
     public function __construct($verbosity, $supportColors, $width = null)
     {
         if (null === $width) {
-            $terminal = new \_HumbugBox90eb36759167\KevinGH\RequirementChecker\Terminal();
+            $terminal = new \_HumbugBox87c495005ea2\KevinGH\RequirementChecker\Terminal();
             $width = \min($terminal->getWidth(), 80);
         }
         $this->verbosity = $verbosity;
@@ -36,7 +36,7 @@ final class Printer
         $this->printvln(\str_repeat('=', \min(\strlen($title), $this->width)), $verbosity, $style);
         $this->printvln('', $verbosity, $style);
     }
-    public function getRequirementErrorMessage(\_HumbugBox90eb36759167\KevinGH\RequirementChecker\Requirement $requirement)
+    public function getRequirementErrorMessage(\_HumbugBox87c495005ea2\KevinGH\RequirementChecker\Requirement $requirement)
     {
         if ($requirement->isFulfilled()) {
             return null;
@@ -50,12 +50,12 @@ final class Printer
         $message = $prefix . \trim($message);
         $lines = array();
         $remainingMessage = $message;
-        while ($remainingMessage !== '') {
+        while (\strlen($remainingMessage) > 0) {
             $wrapped = \wordwrap($remainingMessage, $this->width - 3, '¬');
             $exploded = \explode('¬', $wrapped);
             $line = $exploded[0];
             $remainingMessage = \ltrim(\substr($remainingMessage, \strlen($line)));
-            if ($remainingMessage !== '') {
+            if (\strlen($remainingMessage) > 0) {
                 $remainingMessage = \str_repeat(' ', \strlen($prefix)) . $remainingMessage;
             }
             $lines[] = \str_pad($line, $this->width, ' ', \STR_PAD_RIGHT);
