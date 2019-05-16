@@ -205,7 +205,7 @@ Box version 3.x-dev@151e40a
 No recommendation found.
 No warning found.
 
- // PHAR: 44 files (100B)
+ // PHAR: 41 files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -260,8 +260,6 @@ PHP;
             '/.box/.requirements.php',
             '/.box/bin/',
             '/.box/bin/check-requirements.php',
-            '/.box/composer.json',
-            '/.box/composer.lock',
             '/.box/src/',
             '/.box/src/Checker.php',
             '/.box/src/IO.php',
@@ -282,7 +280,6 @@ PHP;
             '/.box/vendor/composer/autoload_psr4.php',
             '/.box/vendor/composer/autoload_real.php',
             '/.box/vendor/composer/autoload_static.php',
-            '/.box/vendor/composer/installed.json',
             '/.box/vendor/composer/semver/',
             '/.box/vendor/composer/semver/LICENSE',
             '/.box/vendor/composer/semver/src/',
@@ -422,7 +419,7 @@ Box version 3.x-dev@151e40a
 No recommendation found.
 No warning found.
 
- // PHAR: 48 files (100B)
+ // PHAR: 45 files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -483,8 +480,6 @@ PHP;
             '/.box/.requirements.php',
             '/.box/bin/',
             '/.box/bin/check-requirements.php',
-            '/.box/composer.json',
-            '/.box/composer.lock',
             '/.box/src/',
             '/.box/src/Checker.php',
             '/.box/src/IO.php',
@@ -505,7 +500,6 @@ PHP;
             '/.box/vendor/composer/autoload_psr4.php',
             '/.box/vendor/composer/autoload_real.php',
             '/.box/vendor/composer/autoload_static.php',
-            '/.box/vendor/composer/installed.json',
             '/.box/vendor/composer/semver/',
             '/.box/vendor/composer/semver/LICENSE',
             '/.box/vendor/composer/semver/src/',
@@ -889,7 +883,7 @@ Generating optimized autoload files (authoritative)\x08\x08\x08\x08\x08\x08\x08\
 No recommendation found.
 No warning found.
 
- // PHAR: 44 files (100B)
+ // PHAR: 41 files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -1006,7 +1000,7 @@ Generating optimized autoload files (authoritative)\x08\x08\x08\x08\x08\x08\x08\
 No recommendation found.
 No warning found.
 
- // PHAR: 44 files (100B)
+ // PHAR: 41 files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -2905,7 +2899,7 @@ Box version 3.x-dev@151e40a
 No recommendation found.
 No warning found.
 
- // PHAR: 40 files (100B)
+ // PHAR: 37 files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
