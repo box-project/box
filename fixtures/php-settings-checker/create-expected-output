@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -Eeuox pipefail
+
+readonly OS=$(uname);
+readonly XDEBUG_VERSION=$(docker run -i --rm -w /opt/box box_php72_xdebug php -r "echo phpversion('xdebug');");
+readonly CURRENT_DIR=$(dirname $0);
+readonly TEMPLATE_FILE="${CURRENT_DIR}/output-xdebug-enabled.tpl";
+readonly DUMPED_FILE="${CURRENT_DIR}/output-xdebug-enabled";
+
+sed "s/__XDEBUG_VERSION__/${XDEBUG_VERSION}/g" ${TEMPLATE_FILE} > ${DUMPED_FILE};

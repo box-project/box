@@ -393,7 +393,9 @@ final class Box implements Countable
             // Keep the fully qualified call here since this function may be executed without the right autoloading
             // mechanism
             \KevinGH\Box\register_aliases();
-            \KevinGH\Box\register_error_handler();
+            if (true === \KevinGH\Box\is_parallel_processing_enabled()) {
+                \KevinGH\Box\register_error_handler();
+            }
 
             $contents = file_contents($file);
 

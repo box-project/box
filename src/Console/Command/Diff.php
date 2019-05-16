@@ -171,7 +171,7 @@ final class Diff extends BaseCommand
 
         $this->renderArchive(
             $diff->getPharB()->getFileName(),
-            $pharInfoA,
+            $pharInfoB,
             $io
         );
 
