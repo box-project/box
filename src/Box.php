@@ -388,12 +388,15 @@ final class Box implements Countable
     {
         $mapFile = $this->mapFile;
         $compactors = $this->compactors;
-        $bootstrap = $GLOBALS['_BOX_BOOTSTRAP'] ?? noop();
         $cwd = getcwd();
 
-        $processFile = static function (string $file) use ($cwd, $mapFile, $compactors, $bootstrap): array {
+        $processFile = static function (string $file) use ($cwd, $mapFile, $compactors): array {
             chdir($cwd);
-            $bootstrap();
+
+            // Keep the fully qualified call here since this function may be executed without the right autoloading
+            // mechanism
+            \KevinGH\Box\register_aliases();
+            \KevinGH\Box\register_error_handler();
 
             $contents = file_contents($file);
 
