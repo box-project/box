@@ -25,6 +25,7 @@
 /fixtures/php-settings-checker/*
 !/fixtures/php-settings-checker/index.php
 !/fixtures/php-settings-checker/output-*
+fixtures/php-settings-checker/output-xdebug-enabled
 /.phpunit*
 /.requirement-checker/
 /requirement-checker/bin/*

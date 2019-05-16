@@ -203,9 +203,7 @@ else
 endif
 .PHONY: e2e_php_settings_checker
 e2e_php_settings_checker: ## Runs the end-to-end tests for the PHP settings handler
-e2e_php_settings_checker: vendor box
-	./.docker/build
-
+e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xdebug-enabled vendor box
 	# No restart needed
 	$(DOCKER) -v "$$PWD":/opt/box box_php72 \
 		php -dphar.readonly=0 -dmemory_limit=-1 \
@@ -383,3 +381,11 @@ box: bin src res vendor box.json.dist scoper.inc.php .requirement-checker
 
 requirement-checker/bin/check-requirements.phar: requirement-checker/src requirement-checker/bin/check-requirements.php requirement-checker/box.json.dist requirement-checker/vendor
 	bin/box compile --working-dir requirement-checker
+
+.PHONY: docker-images
+docker-images:
+	./.docker/build
+
+fixtures/php-settings-checker/output-xdebug-enabled: fixtures/php-settings-checker/output-xdebug-enabled.tpl docker-images
+	./fixtures/php-settings-checker/create-expected-output
+	touch $@
