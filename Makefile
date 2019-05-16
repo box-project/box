@@ -35,11 +35,9 @@ compile: box
 
 .PHONY: dump-requirement-checker
 dump-requirement-checker:## Dumps the requirement checker
-dump-requirement-checker: requirement-checker requirement-checker/vendor
+dump-requirement-checker:
 	rm rf .requirement-checker || true
-	bin/box compile --working-dir requirement-checker
-
-	php bin/dump-requirements-checker.php
+	$(MAKE) .requirement-checker
 
 
 #
@@ -108,7 +106,7 @@ DOCKER=docker run -i --rm -w /opt/box
 PHP7PHAR=box_php72 php index.phar -vvv --no-ansi
 PHP5PHAR=box_php53 php index.phar -vvv --no-ansi
 e2e_check_requirements:	 ## Runs the end-to-end tests for the check requirements feature
-e2e_check_requirements: box
+e2e_check_requirements: box .requirement-checker
 	./.docker/build
 
 	#
@@ -355,8 +353,8 @@ fixtures/default_stub.php:
 requirement-checker/tests/DisplayNormalizer.php: tests/Console/DisplayNormalizer.php
 	cat tests/Console/DisplayNormalizer.php | sed -E 's/namespace KevinGH\\Box\\Console;/namespace KevinGH\\RequirementChecker;/g' > requirement-checker/tests/DisplayNormalizer.php
 
-.requirement-checker: requirement-checker
-	$(MAKE) dump-requirement-checker
+.requirement-checker: requirement-checker/bin/check-requirements.phar
+	php bin/dump-requirements-checker.php
 	touch $@
 
 requirement-checker/actual_terminal_diff: requirement-checker/src/Terminal.php vendor/symfony/console/Terminal.php
@@ -382,3 +380,6 @@ box: bin src res vendor box.json.dist scoper.inc.php .requirement-checker
 	rm bin/_box.phar
 
 	touch $@
+
+requirement-checker/bin/check-requirements.phar: requirement-checker/src requirement-checker/bin/check-requirements.php requirement-checker/box.json.dist requirement-checker/vendor
+	bin/box compile --working-dir requirement-checker

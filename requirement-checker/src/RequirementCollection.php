@@ -103,7 +103,7 @@ final class RequirementCollection implements IteratorAggregate, Countable
              *
              * @return bool
              */
-            function ($checkPassed, Requirement $requirement) {
+            static function ($checkPassed, Requirement $requirement) {
                 return $checkPassed && $requirement->isFulfilled();
             },
             true
