@@ -12,13 +12,12 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box;
+namespace KevinGH\Box\Compactor;
 
 use Generator;
 use KevinGH\Box\Annotation\AnnotationDumper;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
 use KevinGH\Box\Annotation\DocblockParser;
-use KevinGH\Box\Compactor\Php;
 use PHPUnit\Framework\TestCase;
 
 /**

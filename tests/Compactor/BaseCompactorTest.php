@@ -12,11 +12,12 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box;
+namespace KevinGH\Box\Compactor;
 
-use function func_get_args;
-use KevinGH\Box\Compactor\BaseCompactor;
+use;
+use KevinGH\Box\NotCallable;
 use PHPUnit\Framework\TestCase;
+use function func_get_args;
 
 /**
  * @covers \KevinGH\Box\Compactor\BaseCompactor
