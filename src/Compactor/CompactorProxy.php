@@ -15,9 +15,12 @@ declare(strict_types=1);
 namespace KevinGH\Box\Compactor;
 
 use Closure;
+use Opis\Closure\SerializableClosure;
 use function Opis\Closure\serialize as opis_serialize;
 use function Opis\Closure\unserialize as opis_unserialize;
 use Serializable;
+use function serialize;
+use function unserialize;
 
 final class CompactorProxy implements Compactor, Serializable
 {
@@ -26,7 +29,7 @@ final class CompactorProxy implements Compactor, Serializable
 
     public function __construct(Closure $createCompactor)
     {
-        $this->createCompactor = $createCompactor;
+        $this->createCompactor = new SerializableClosure($createCompactor);
 
         // Instantiate a compactor instead of lazily instantiate it in order to ensure the factory closure is correct
         // and that the created object is of the created type. Since compactors instantiation should be fast, this is
@@ -47,7 +50,7 @@ final class CompactorProxy implements Compactor, Serializable
      */
     public function serialize(): string
     {
-        return opis_serialize($this->createCompactor);
+        return serialize($this->createCompactor);
     }
 
     /**
@@ -55,7 +58,7 @@ final class CompactorProxy implements Compactor, Serializable
      */
     public function unserialize($serialized): void
     {
-        $this->createCompactor = opis_unserialize($serialized);
+        $this->createCompactor = unserialize($serialized);
     }
 
     public function getCompactor(): Compactor
