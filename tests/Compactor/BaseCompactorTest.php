@@ -14,9 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-use function func_get_args;
+use;
 use KevinGH\Box\NotCallable;
 use PHPUnit\Framework\TestCase;
+use function func_get_args;
 
 /**
  * @covers \KevinGH\Box\Compactor\BaseCompactor
