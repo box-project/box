@@ -18,6 +18,8 @@ use Generator;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Json;
 use PHPUnit\Framework\TestCase;
+use function serialize;
+use function unserialize;
 
 /**
  * @covers \KevinGH\Box\Compactor\Json
@@ -70,6 +72,14 @@ JSON;
         $actual = $this->compactor->compact($file, $content);
 
         $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_is_serializable(): void
+    {
+        $this->assertEquals(
+            $this->compactor,
+            unserialize(serialize($this->compactor))
+        );
     }
 
     public function provideFiles(): Generator

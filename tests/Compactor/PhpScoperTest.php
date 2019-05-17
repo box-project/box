@@ -21,6 +21,8 @@ use KevinGH\Box\PhpScoper\Scoper;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
+use function serialize;
+use function unserialize;
 
 /**
  * @covers \KevinGH\Box\Compactor\PhpScoper
@@ -78,5 +80,15 @@ JSON;
         $compactor = new PhpScoper($scoper);
 
         $this->assertSame($scoper, $compactor->getScoper());
+    }
+
+    public function test_it_is_serializable(): void
+    {
+        $compactor = new PhpScoper(new FakeScoper());
+
+        $this->assertEquals(
+            $compactor,
+            unserialize(serialize($compactor))
+        );
     }
 }

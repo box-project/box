@@ -19,6 +19,8 @@ use Humbug\PhpScoper\Whitelist;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
+use function serialize;
+use function unserialize;
 
 /**
  * @covers \KevinGH\Box\PhpScoper\SimpleScoper
@@ -82,5 +84,20 @@ JSON;
 
         $this->assertSame($prefix, $scoper->getPrefix());
         $this->assertSame($newWhitelist, $scoper->getWhitelist());
+    }
+
+    public function test_it_is_serializable(): void
+    {
+        $scoper = new SimpleScoper(
+            new FakePhpScoper(),
+            'HumbugBox',
+            Whitelist::create(true, true, true, 'Whitelisted\Foo'),
+            []
+        );
+
+        $this->assertEquals(
+            $scoper,
+            unserialize(serialize($scoper))
+        );
     }
 }

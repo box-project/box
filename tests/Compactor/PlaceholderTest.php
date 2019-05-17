@@ -32,6 +32,16 @@ class PlaceholderTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
+    public function test_it_is_serializable(): void
+    {
+        $compactor = new Placeholder([]);
+
+        $this->assertEquals(
+            $compactor,
+            unserialize(serialize($compactor))
+        );
+    }
+
     public function provideFilesContents(): Generator
     {
         yield [[], '', ''];

@@ -66,6 +66,22 @@ PHP;
         $this->assertSame($expected, $actual);
     }
 
+    public function test_it_is_serializable(): void
+    {
+        $compactor = new Php(
+            new DocblockAnnotationParser(
+                new DocblockParser(),
+                new AnnotationDumper(),
+                []
+            )
+        );
+
+        $this->assertEquals(
+            $compactor,
+            unserialize(serialize($compactor))
+        );
+    }
+
     public function provideFiles(): Generator
     {
         yield 'no extension' => ['test', false];
