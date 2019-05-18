@@ -164,10 +164,10 @@ final class Process extends ConfigurableBaseCommand
 
     private function retrieveCompactors(Configuration $config): Compactors
     {
-        $compactors = $config->getCompactors();
+        $compactors = $config->getCompactors()->toArray();
 
         array_unshift(
-            $compactors->toArray(),
+            $compactors,
             new Placeholder($config->getReplacements())
         );
 
