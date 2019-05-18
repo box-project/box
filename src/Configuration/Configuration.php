@@ -35,7 +35,6 @@ use function dirname;
 use const E_USER_DEPRECATED;
 use function explode;
 use function file_exists;
-use function get_class;
 use function getcwd;
 use Herrera\Box\Compactor\Json as LegacyJson;
 use Herrera\Box\Compactor\Php as LegacyPhp;
@@ -61,7 +60,6 @@ use KevinGH\Box\Annotation\AnnotationDumper;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
 use KevinGH\Box\Annotation\DocblockParser;
 use KevinGH\Box\Compactor\Compactor;
-use KevinGH\Box\Compactor\CompactorProxy;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\Json as JsonCompactor;
 use KevinGH\Box\Compactor\Php as PhpCompactor;
@@ -604,16 +602,7 @@ BANNER;
 
         $exportedConfig->compressionAlgorithm = array_flip(get_phar_compression_algorithms())[$exportedConfig->compressionAlgorithm ?? Phar::NONE];
         $exportedConfig->signingAlgorithm = array_flip(get_phar_signing_algorithms())[$exportedConfig->signingAlgorithm];
-        $exportedConfig->compactors = array_map(
-            static function (Compactor $compactor): string {
-                return get_class(
-                    $compactor instanceof CompactorProxy
-                    ? $compactor->getCompactor()
-                    : $compactor
-                );
-            },
-            $exportedConfig->compactors
-        );
+        $exportedConfig->compactors = array_map('get_class', $exportedConfig->compactors);
         $exportedConfig->fileMode = '0'.decoct($exportedConfig->fileMode);
 
         $cloner = new VarCloner();
@@ -1809,20 +1798,15 @@ BANNER;
             return new Compactors();
         }
 
-        $createCompactors = self::createCompactors(
-            $raw,
-            $basePath,
-            $compactorClasses,
-            self::retrievePhpCompactorIgnoredAnnotations($raw, $compactorClasses, $logger),
-            $logger
+        $compactors = new Compactors(
+            self::createCompactors(
+                $raw,
+                $basePath,
+                $compactorClasses,
+                self::retrievePhpCompactorIgnoredAnnotations($raw, $compactorClasses, $logger),
+                $logger
+            )
         );
-
-        $compactors = new Compactors(...array_map(
-            static function (Closure $createCompactor): Compactor {
-                return new CompactorProxy($createCompactor);
-            },
-            $createCompactors
-        ));
 
         self::checkCompactorsOrder($logger, $compactors);
 
@@ -1888,10 +1872,6 @@ BANNER;
         $scoperCompactor = false;
 
         foreach ($compactors->toArray() as $compactor) {
-            if ($compactor instanceof CompactorProxy) {
-                $compactor = $compactor->getCompactor();
-            }
-
             if ($compactor instanceof PhpScoperCompactor) {
                 $scoperCompactor = true;
             }

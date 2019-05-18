@@ -34,7 +34,6 @@ use KevinGH\Box\Box;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 use function KevinGH\Box\check_php_settings;
 use KevinGH\Box\Compactor\Compactor;
-use KevinGH\Box\Compactor\CompactorProxy;
 use KevinGH\Box\Composer\ComposerConfiguration;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 use KevinGH\Box\Configuration\Configuration;
@@ -334,10 +333,6 @@ HELP;
         );
 
         $logCompactors = static function (Compactor $compactor) use ($logger): void {
-            if ($compactor instanceof CompactorProxy) {
-                $compactor = $compactor->getCompactor();
-            }
-
             $compactorClassParts = explode('\\', get_class($compactor));
 
             if (0 === strpos($compactorClassParts[0], '_HumbugBox')) {
