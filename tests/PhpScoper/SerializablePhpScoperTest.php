@@ -14,12 +14,15 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PhpScoper;
 
+use Closure;
+use function current;
+use Exception;
+use Generator;
 use Humbug\PhpScoper\Scoper;
 use Humbug\PhpScoper\Scoper\NullScoper;
 use Humbug\PhpScoper\Scoper\PhpScoper;
 use Humbug\PhpScoper\Whitelist;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use function serialize;
 use function unserialize;
@@ -41,10 +44,10 @@ class SerializablePhpScoperTest extends TestCase
     protected function setUp(): void
     {
         $this->decoratedScoperProphecy = $this->prophesize(Scoper::class);
-        $this->decoratedScoper = $this->decoratedScoperProphecy->reveal();
+        $this->decoratedScoper = $decoratedScoper = $this->decoratedScoperProphecy->reveal();
 
-        $this->serializableScoper = new SerializablePhpScoper(function () {
-            return $this->decoratedScoper;
+        $this->serializableScoper = new SerializablePhpScoper(static function () use ($decoratedScoper) {
+            return $decoratedScoper;
         });
     }
 
@@ -55,56 +58,147 @@ class SerializablePhpScoperTest extends TestCase
 
     public function test_it_uses_the_decorated_scoper_to_scope_a_file(): void
     {
-        $file = 'file';
-        $contents = 'something';
-        $prefix = 'HumbugBox';
-        $whitelist = Whitelist::create(true, true, true, 'Whitelisted\Foo');
-        $patchers = [];
+        $arguments = [
+            'file',
+            $contents = 'something',
+            'HumbugBox',
+            [],
+            Whitelist::create(true, true, true, 'Whitelisted\Foo'),
+        ];
 
-        $this->decoratedScoperProphecy
-            ->scope($file, $contents, $prefix, $patchers, $whitelist)
-            ->willReturn($expected = 'foo')
-        ;
+        $decoratedScoper = new CallRecorderScoper();
 
-        $actual = $this->serializableScoper->scope($file, $contents, $prefix, $patchers, $whitelist);
+        $scoper = new SerializablePhpScoper(static function () use ($decoratedScoper): Scoper {
+            return $decoratedScoper;
+        });
 
-        $this->assertSame($expected, $actual);
+        $actual = $scoper->scope(...$arguments);
 
-        $this->decoratedScoperProphecy->scope(Argument::cetera())->shouldHaveBeenCalledTimes(1);
+        $this->assertSame($contents, $actual);
+
+        $this->assertCount(1, $decoratedScoper->getCalls());
+        $this->assertSame($arguments, current($decoratedScoper->getCalls()));
     }
 
     public function test_it_is_serializable(): void
     {
-        // Uses a new compactor instance for which the closure is not linked to this test
-        $compactor = new SerializablePhpScoper(static function () {
+        $scoper = new SerializablePhpScoper(static function () {
             return new NullScoper();
         });
 
-        $decoratedCompactor = $compactor->getScoper();
+        $decoratedScoper = $scoper->getScoper();
 
         /** @var SerializablePhpScoper $deserializedCompactor */
-        $deserializedCompactor = unserialize(serialize($compactor));
+        $deserializedCompactor = unserialize(serialize($scoper));
 
         $this->assertInstanceOf(SerializablePhpScoper::class, $deserializedCompactor);
-        $this->assertNotSame($compactor, $deserializedCompactor);
+        $this->assertNotSame($scoper, $deserializedCompactor);
         $this->assertInstanceOf(NullScoper::class, $deserializedCompactor->getScoper());
-        $this->assertNotSame($decoratedCompactor, $deserializedCompactor->getScoper());
+        $this->assertNotSame($decoratedScoper, $deserializedCompactor->getScoper());
     }
 
     public function test_it_is_serializable_multiple_times(): void
     {
-        $compactor = unserialize(serialize(new SerializablePhpScoper(static function () {
+        $scoper = unserialize(serialize(new SerializablePhpScoper(static function () {
             return new NullScoper();
         })));
 
-        $decoratedCompactor = $compactor->getScoper();
+        $decoratedScoper = $scoper->getScoper();
 
-        /** @var SerializablePhpScoper $deserializedCompactor */
-        $deserializedCompactor = unserialize(serialize($compactor));
+        /** @var SerializablePhpScoper $deserializedScoper */
+        $deserializedScoper = unserialize(serialize($scoper));
 
-        $this->assertInstanceOf(SerializablePhpScoper::class, $deserializedCompactor);
-        $this->assertNotSame($compactor, $deserializedCompactor);
-        $this->assertInstanceOf(NullScoper::class, $deserializedCompactor->getScoper());
-        $this->assertNotSame($decoratedCompactor, $deserializedCompactor->getScoper());
+        $this->assertInstanceOf(SerializablePhpScoper::class, $deserializedScoper);
+        $this->assertNotSame($scoper, $deserializedScoper);
+        $this->assertInstanceOf(NullScoper::class, $deserializedScoper->getScoper());
+        $this->assertNotSame($decoratedScoper, $deserializedScoper->getScoper());
+    }
+
+    /**
+     * @dataProvider provideScoperFactories
+     */
+    public function test_it_check_if_the_closure_given_is_serializable_upfront(
+        Closure $createScoper,
+        ?string $expectedError
+    ): void {
+        try {
+            $scoper = new SerializablePhpScoper($createScoper);
+
+            if (null !== $expectedError) {
+                $this->fail('Expected exception to be thrown.');
+            }
+        } catch (Exception $exception) {
+            if (null === $expectedError) {
+                $this->fail('Did not expect an exception to be thrown.');
+            }
+
+            $this->assertSame(
+                $expectedError,
+                $exception->getMessage()
+            );
+
+            return;
+        }
+
+        // Manually serialize the scoper to ensure the check has been done at the instantiation time and not lazily
+        /** @var SerializablePhpScoper $deserializedScoper */
+        $deserializedScoper = unserialize(serialize($scoper));
+
+        $this->assertInstanceOf(SerializablePhpScoper::class, $deserializedScoper);
+    }
+
+    public function provideScoperFactories(): Generator
+    {
+        yield 'unserializable class' => [
+            static function () {
+                return new UnserializableScoper();
+            },
+            null,
+        ];
+
+        yield 'anonymous class' => [
+            static function () {
+                return new class() implements Scoper {
+                    /**
+                     * {@inheritdoc}
+                     */
+                    public function scope(string $filePath, string $contents, string $prefix, array $patchers, Whitelist $whitelist): string
+                    {
+                        return $contents;
+                    }
+                };
+            },
+            null,
+        ];
+
+        yield 'unserializable class as binding' => (static function (): array {
+            $scoper = new UnserializableScoper();
+
+            return [
+                static function () use ($scoper) {
+                    return $scoper;
+                },
+                'This class is not serializable',
+            ];
+        })();
+
+        yield 'anonymous class as binding' => (static function (): array {
+            $scoper = new class() implements Scoper {
+                /**
+                 * {@inheritdoc}
+                 */
+                public function scope(string $filePath, string $contents, string $prefix, array $patchers, Whitelist $whitelist): string
+                {
+                    return $contents;
+                }
+            };
+
+            return [
+                static function () use ($scoper) {
+                    return $scoper;
+                },
+                "Serialization of 'class@anonymous' is not allowed",
+            ];
+        })();
     }
 }

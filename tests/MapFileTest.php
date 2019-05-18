@@ -2,6 +2,16 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box;
 
 use Generator;
@@ -44,7 +54,7 @@ class MapFileTest extends TestCase
         yield [
             $basePath,
             [
-                ['' => 'local/path']
+                ['' => 'local/path'],
             ],
             'foo',
             'local/path/foo',
@@ -53,7 +63,7 @@ class MapFileTest extends TestCase
         yield [
             $basePath,
             [
-                ['foo' => 'local/path/foo']
+                ['foo' => 'local/path/foo'],
             ],
             'foo',
             'local/path/foo',

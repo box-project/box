@@ -14,11 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-use Generator;
-use KevinGH\Box\Compactor\Compactor;
-use KevinGH\Box\Compactor\CompactorProxy;
-use KevinGH\Box\Compactor\FakeCompactor;
-use KevinGH\Box\Compactor\Json;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;

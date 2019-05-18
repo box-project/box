@@ -1809,7 +1809,7 @@ BANNER;
             return new Compactors();
         }
 
-        $createCompactors = self::retrieveCompactorFactories(
+        $createCompactors = self::createCompactors(
             $raw,
             $basePath,
             $compactorClasses,
@@ -1833,9 +1833,9 @@ BANNER;
      * @param string[] $compactorClasses
      * @param string[] $ignoredAnnotations
      *
-     * @return Closure[]
+     * @return Compactor[]
      */
-    private static function retrieveCompactorFactories(
+    private static function createCompactors(
         stdClass $raw,
         string $basePath,
         array $compactorClasses,
@@ -1843,7 +1843,7 @@ BANNER;
         ConfigurationLogger $logger
     ): array {
         return array_map(
-            static function (string $class) use ($raw, $basePath, $logger, $ignoredAnnotations): Closure {
+            static function (string $class) use ($raw, $basePath, $logger, $ignoredAnnotations): Compactor {
                 Assertion::classExists($class, 'The compactor class "%s" does not exist.');
                 Assertion::implementsInterface($class, Compactor::class, 'The class "%s" is not a compactor class.');
 
@@ -2819,7 +2819,7 @@ BANNER;
         return $ignored;
     }
 
-    private static function createPhpCompactor(array $ignoredAnnotations): Closure
+    private static function createPhpCompactor(array $ignoredAnnotations): Compactor
     {
         $ignoredAnnotations = array_values(
             array_filter(
@@ -2832,19 +2832,20 @@ BANNER;
             )
         );
 
-        return static function () use ($ignoredAnnotations): Compactor {
-            return new PhpCompactor(
-                new DocblockAnnotationParser(
-                    new DocblockParser(),
-                    new AnnotationDumper(),
-                    $ignoredAnnotations
-                )
-            );
-        };
+        return new PhpCompactor(
+            new DocblockAnnotationParser(
+                new DocblockParser(),
+                new AnnotationDumper(),
+                $ignoredAnnotations
+            )
+        );
     }
 
-    private static function createPhpScoperCompactor(stdClass $raw, string $basePath, ConfigurationLogger $logger): Closure
-    {
+    private static function createPhpScoperCompactor(
+        stdClass $raw,
+        string $basePath,
+        ConfigurationLogger $logger
+    ): Compactor {
         $phpScoperConfig = self::retrievePhpScoperConfig($raw, $basePath, $logger);
 
         $whitelistedFiles = array_values(
