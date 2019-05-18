@@ -39,7 +39,7 @@
     },
 
     "require": {
-        "php": "^7.1",
+        "php": "^7.2",
         "ext-phar": "*",
         "amphp/parallel-functions": "^0.1.2",
         "beberlei/assert": "^3.0",
