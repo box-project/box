@@ -55,7 +55,7 @@ function get_box_version(): string
 /**
  * @private
  *
- * @return <string, int>
+ * @return array<string,int>
  */
 function get_phar_compression_algorithms(): array
 {
@@ -90,7 +90,7 @@ function get_phar_compression_algorithm_extension(int $algorithm): ?string
 /**
  * @private
  *
- * @return <string, int>
+ * @return array<string,int>
  */
 function get_phar_signing_algorithms(): array
 {
@@ -138,6 +138,7 @@ function memory_to_bytes(string $value): int
     $unit = strtolower($value[strlen($value) - 1]);
 
     $bytes = (int) $value;
+
     switch ($unit) {
         case 'g':
             $bytes *= 1024;

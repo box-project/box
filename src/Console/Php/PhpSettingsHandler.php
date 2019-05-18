@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Php;
 
+use Assert\Assertion;
 use Composer\XdebugHandler\Process;
 use Composer\XdebugHandler\XdebugHandler;
 use function getenv;
@@ -59,7 +60,11 @@ final class PhpSettingsHandler extends XdebugHandler
         parent::check();
 
         if (self::getRestartSettings()) {
-            Process::setEnv('PHPRC', XdebugHandler::getRestartSettings()['tmpIni']);
+            $restartSettings = XdebugHandler::getRestartSettings();
+
+            Assertion::notNull($restartSettings);
+
+            Process::setEnv('PHPRC', $restartSettings['tmpIni']);
             Process::setEnv('PHP_INI_SCAN_DIR', '');
         }
 
@@ -118,6 +123,8 @@ final class PhpSettingsHandler extends XdebugHandler
     private function disablePharReadonly(): void
     {
         if (ini_get('phar.readonly')) {
+            Assertion::notNull($this->tmpIni);
+
             append_to_file($this->tmpIni, 'phar.readonly=0'.PHP_EOL);
 
             $this->logger->debug('Configured `phar.readonly=0`');
@@ -132,8 +139,15 @@ final class PhpSettingsHandler extends XdebugHandler
         $memoryLimit = trim(ini_get('memory_limit'));
         $memoryLimitInBytes = '-1' === $memoryLimit ? -1 : memory_to_bytes($memoryLimit);
 
-        $bumpMemoryLimit = false === $this->boxMemoryLimitInBytes && -1 !== $memoryLimitInBytes && $memoryLimitInBytes < 1024 * 1024 * 512;
-        $setUserDefinedMemoryLimit = $this->boxMemoryLimitInBytes && $memoryLimitInBytes !== $this->boxMemoryLimitInBytes;
+        $bumpMemoryLimit = (
+            false === $this->boxMemoryLimitInBytes
+            && -1 !== $memoryLimitInBytes
+            && $memoryLimitInBytes < 1024 * 1024 * 512
+        );
+        $setUserDefinedMemoryLimit = (
+            true === $this->boxMemoryLimitInBytes
+            && $memoryLimitInBytes !== $this->boxMemoryLimitInBytes
+        );
 
         if ($bumpMemoryLimit && false === $setUserDefinedMemoryLimit) {
             if ($this->tmpIni) {

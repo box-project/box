@@ -620,7 +620,7 @@ HELP;
             CompilerLogger::QUESTION_MARK_PREFIX,
             sprintf(
                 'Compressing with the algorithm "<comment>%s</comment>"',
-                array_search($algorithm, get_phar_compression_algorithms(), true)
+                (string) array_search($algorithm, get_phar_compression_algorithms(), true)
             )
         );
 
@@ -720,9 +720,9 @@ HELP;
         $key = $config->getPrivateKeyPath();
 
         if (null === $key) {
-            if (null !== ($algorithm = $config->getSigningAlgorithm())) {
-                $box->getPhar()->setSignatureAlgorithm($algorithm);
-            }
+            $box->getPhar()->setSignatureAlgorithm(
+                $config->getSigningAlgorithm()
+            );
 
             return;
         }
