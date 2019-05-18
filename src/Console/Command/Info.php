@@ -131,24 +131,24 @@ HELP
         if (null === ($file = $input->getArgument(self::PHAR_ARG))) {
             return $this->showGlobalInfo($io);
         }
+        /** @var string $file */
+        $fileRealPath = realpath($file);
 
-        $file = realpath($file);
-
-        if (false === $file) {
+        if (false === $fileRealPath) {
             $io->error(
                 sprintf(
                     'The file "%s" could not be found.',
-                    $input->getArgument(self::PHAR_ARG)
+                    $file
                 )
             );
 
             return 1;
         }
 
-        $tmpFile = create_temporary_phar($file);
+        $tmpFile = create_temporary_phar($fileRealPath);
 
         try {
-            return $this->showInfo($tmpFile, $file, $io);
+            return $this->showInfo($tmpFile, $fileRealPath, $io);
         } finally {
             remove($tmpFile);
         }
@@ -284,7 +284,7 @@ HELP
     }
 
     /**
-     * @param iterable|PharFileInfo[] $list
+     * @param iterable&PharFileInfo[] $list
      * @param false|int               $indent Nbr of indent or `false`
      * @param Phar|PharData           $phar
      */
@@ -303,6 +303,7 @@ HELP
         }
 
         foreach ($list as $item) {
+            /** @var PharFileInfo $item */
             $item = $phar[str_replace($root, '', $item->getPathname())];
 
             if (false !== $indent) {

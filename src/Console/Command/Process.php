@@ -108,6 +108,7 @@ final class Process extends ConfigurableBaseCommand
             : $this->getConfig($io, true)
         ;
 
+        /** @var string $filePath */
         $filePath = $input->getArgument(self::FILE_ARGUMENT);
 
         $path = make_path_relative($filePath, $config->getBasePath());
@@ -264,7 +265,7 @@ final class Process extends ConfigurableBaseCommand
             $cliDumper->setColors(true);
         }
 
-        return $cliDumper->dump(
+        return (string) $cliDumper->dump(
             $cloner->cloneVar($whitelist),
             true
         );

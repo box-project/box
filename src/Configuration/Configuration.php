@@ -618,7 +618,7 @@ BANNER;
             SymfonySplFileInfo::class => $splInfoCaster,
         ]);
 
-        return (new CliDumper())->dump(
+        return (string) (new CliDumper())->dump(
             $cloner->cloneVar($exportedConfig),
             true
         );
@@ -1151,7 +1151,7 @@ BANNER;
      * @param string   $key           Config property name
      * @param string[] $excludedPaths
      *
-     * @return iterable|SplFileInfo[]
+     * @return iterable&(SplFileInfo[]&Finder)
      */
     private static function retrieveDirectories(
         stdClass $raw,
@@ -1535,7 +1535,7 @@ BANNER;
      * @param string[] $excludedPaths
      * @param string[] $devPackages
      *
-     * @return SplFileInfo[]
+     * @return Finder|SplFileInfo[]
      */
     private static function retrieveAllFiles(
         string $basePath,

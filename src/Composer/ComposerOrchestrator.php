@@ -107,7 +107,11 @@ final class ComposerOrchestrator
         $executableFinder = new ExecutableFinder();
         $executableFinder->addSuffix('.phar');
 
-        return $executableFinder->find('composer');
+        if (null === $composer = $executableFinder->find('composer')) {
+            throw new RuntimeException('Could not find a Composer executable.');
+        }
+
+        return $composer;
     }
 
     private static function dumpAutoloader(string $composerExecutable, bool $noDev, CompilerLogger $logger): void
@@ -158,7 +162,7 @@ final class ComposerOrchestrator
         $command = [$composerExecutable, 'config', 'vendor-dir'];
 
         if ($logger->getIO()->isDecorated()) {
-            $composerCommand[] = '--ansi';
+            $command[] = '--ansi';
         }
 
         $vendorDirProcess = new Process($command);

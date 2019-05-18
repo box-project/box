@@ -67,6 +67,7 @@ HELP
      */
     protected function executeCommand(IO $io): int
     {
+        /** @var string $pharPath */
         $pharPath = $io->getInput()->getArgument(self::PHAR_ARG);
 
         Assertion::file($pharPath);
