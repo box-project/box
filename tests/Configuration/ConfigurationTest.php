@@ -665,25 +665,25 @@ EOF
             );
         }
     }
-//
-//    public function test_the_php_scoper_configuration_location_can_be_configured(): void
-//    {
-//        dump_file('custom.scoper.ini.php', "<?php return ['prefix' => 'custom'];");
-//
-//        $this->setConfig([
-//            'php-scoper' => 'custom.scoper.ini.php',
-//            'compactors' => [
-//                PhpScoper::class,
-//            ],
-//        ]);
-//
-//        $compactors = $this->config->getCompactors()->toArray();
-//
-//        $this->assertSame('custom', $compactors[0]->getScoper()->getPrefix());
-//
-//        $this->assertSame([], $this->config->getRecommendations());
-//        $this->assertSame([], $this->config->getWarnings());
-//    }
+
+    public function test_the_php_scoper_configuration_location_can_be_configured(): void
+    {
+        dump_file('custom.scoper.ini.php', "<?php return ['prefix' => 'custom'];");
+
+        $this->setConfig([
+            'php-scoper' => 'custom.scoper.ini.php',
+            'compactors' => [
+                PhpScoper::class,
+            ],
+        ]);
+
+        $compactors = $this->config->getCompactors()->toArray();
+
+        $this->assertSame('custom', $compactors[0]->getScoper()->getPrefix());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+    }
 
     public function test_a_recommendation_is_given_when_the_legacy_compactors_are_used(): void
     {
