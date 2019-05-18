@@ -39,7 +39,7 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
         $this->assertCount(1, $compactors);
 
         /** @var Compactor $compactor */
-        $compactor = current($compactors);
+        $compactor = current($compactors->toArray());
 
         $this->assertInstanceOf(Php::class, $compactor);
 
@@ -66,7 +66,7 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
         $this->assertCount(1, $compactors);
 
         /** @var Compactor $compactor */
-        $compactor = current($compactors);
+        $compactor = current($compactors->toArray());
 
         $this->assertInstanceOf(Php::class, $compactor);
 
@@ -155,7 +155,7 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
         $this->assertCount(1, $compactors);
 
         /** @var Compactor $compactor */
-        $compactor = current($compactors);
+        $compactor = current($compactors->toArray());
 
         $this->assertInstanceOf(Php::class, $compactor);
 

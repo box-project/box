@@ -31,7 +31,6 @@ use function extension_loaded;
 use function file_exists;
 use function getcwd;
 use function is_object;
-use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
@@ -216,14 +215,11 @@ final class Box implements Countable
         return $extensionRequired;
     }
 
-    /**
-     * @param Compactor[] $compactors
-     */
-    public function registerCompactors(array $compactors): void
+    public function registerCompactors(Compactors $compactors): void
     {
-        Assertion::allIsInstanceOf($compactors, Compactor::class);
+        $compactorsArray = $compactors->toArray();
 
-        foreach ($compactors as $index => $compactor) {
+        foreach ($compactorsArray as $index => $compactor) {
             if ($compactor instanceof PhpScoper) {
                 $this->scoper = $compactor->getScoper();
 
@@ -231,13 +227,14 @@ final class Box implements Countable
             }
 
             if ($compactor instanceof Placeholder) {
-                unset($compactors[$index]);
+                // Removes the known Placeholder compactors in favour of the Box one
+                unset($compactorsArray[$index]);
             }
         }
 
-        array_unshift($compactors, $this->placeholderCompactor);
+        array_unshift($compactorsArray, $this->placeholderCompactor);
 
-        $this->compactors = new Compactors(...$compactors);
+        $this->compactors = new Compactors(...$compactorsArray);
     }
 
     /**
@@ -247,11 +244,11 @@ final class Box implements Countable
     {
         $message = 'Expected value "%s" to be a scalar or stringable object.';
 
-        foreach ($placeholders as $i => $placeholder) {
+        foreach ($placeholders as $index => $placeholder) {
             if (is_object($placeholder)) {
                 Assertion::methodExists('__toString', $placeholder, $message);
 
-                $placeholders[$i] = (string) $placeholder;
+                $placeholders[$index] = (string) $placeholder;
 
                 break;
             }
@@ -260,7 +257,8 @@ final class Box implements Countable
         }
 
         $this->placeholderCompactor = new Placeholder($placeholders);
-        $this->registerCompactors($this->compactors->toArray());
+
+        $this->registerCompactors($this->compactors);
     }
 
     public function registerFileMapping(MapFile $fileMapper): void
@@ -321,7 +319,7 @@ final class Box implements Countable
 
         $local = ($this->mapFile)($file);
 
-        $this->bufferedFiles[$local] = $binary ? $contents : $this->compactors->compactContents($local, $contents);
+        $this->bufferedFiles[$local] = $binary ? $contents : $this->compactors->compact($local, $contents);
 
         return $local;
     }
@@ -401,7 +399,7 @@ final class Box implements Countable
 
             $local = $mapFile($file);
 
-            $processedContents = $compactors->compactContents($local, $contents);
+            $processedContents = $compactors->compact($local, $contents);
 
             return [$local, $processedContents, $compactors->getScoperWhitelist()];
         };

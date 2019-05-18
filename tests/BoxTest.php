@@ -30,6 +30,7 @@ use function in_array;
 use InvalidArgumentException;
 use function iterator_to_array;
 use KevinGH\Box\Compactor\Compactor;
+use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\FakeCompactor;
 use KevinGH\Box\Console\DisplayNormalizer;
 use function KevinGH\Box\FileSystem\canonicalize;
@@ -354,7 +355,7 @@ class BoxTest extends FileSystemTestCase
 
         dump_file($file, $contents);
 
-        $this->box->registerCompactors([new FakeCompactor()]);
+        $this->box->registerCompactors(new Compactors(new FakeCompactor()));
 
         $this->box->startBuffering();
         $this->box->addFile($file, null, true);
@@ -425,10 +426,12 @@ class BoxTest extends FileSystemTestCase
             ->willReturn($secondCompactorOutput = 'second compactor contents')
         ;
 
-        $this->box->registerCompactors([
-            $firstCompactorProphecy->reveal(),
-            $secondCompactorProphecy->reveal(),
-        ]);
+        $this->box->registerCompactors(
+            new Compactors(
+                $firstCompactorProphecy->reveal(),
+                $secondCompactorProphecy->reveal()
+            )
+        );
 
         $this->box->registerPlaceholders($placeholderMapping);
 
@@ -555,10 +558,12 @@ class BoxTest extends FileSystemTestCase
             ->willReturn($secondCompactorOutput = 'second compactor contents')
         ;
 
-        $this->box->registerCompactors([
-            $firstCompactorProphecy->reveal(),
-            $secondCompactorProphecy->reveal(),
-        ]);
+        $this->box->registerCompactors(
+            new Compactors(
+                $firstCompactorProphecy->reveal(),
+                $secondCompactorProphecy->reveal()
+            )
+        );
 
         $this->box->registerPlaceholders($placeholderMapping);
 

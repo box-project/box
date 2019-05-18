@@ -41,12 +41,21 @@ return [
                 $contents
             );
 
-            return preg_replace(
+            $contents = preg_replace(
                 sprintf(
                     '/\\\\'.$prefix.'\\\\KevinGH\\\\Box\\\\Compactor\\\\/',
                     $prefix
                 ),
                 '\\KevinGH\\\Box\\Compactor\\',
+                $contents
+            );
+
+            return preg_replace(
+                '/\\\\KevinGH\\\\Box\\\\Compactor\\\\Compactors/',
+                sprintf(
+                    '\\%s\\KevinGH\\\Box\\Compactor\\Compactors',
+                    $prefix
+                ),
                 $contents
             );
         },

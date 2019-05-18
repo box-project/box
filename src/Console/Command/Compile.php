@@ -318,7 +318,7 @@ HELP;
     {
         $compactors = $config->getCompactors();
 
-        if ([] === $compactors) {
+        if (0 === count($compactors)) {
             $logger->log(
                 CompilerLogger::QUESTION_MARK_PREFIX,
                 'No compactor to register'
@@ -346,7 +346,7 @@ HELP;
             );
         };
 
-        array_map($logCompactors, $compactors);
+        array_map($logCompactors, $compactors->toArray());
 
         $box->registerCompactors($compactors);
     }

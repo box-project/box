@@ -12,15 +12,16 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box;
+namespace KevinGH\Box\Compactor;
 
 use Error;
-use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\PhpScoper\FakeScoper;
 use KevinGH\Box\PhpScoper\Scoper;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
+use function serialize;
+use function unserialize;
 
 /**
  * @covers \KevinGH\Box\Compactor\PhpScoper
@@ -78,5 +79,15 @@ JSON;
         $compactor = new PhpScoper($scoper);
 
         $this->assertSame($scoper, $compactor->getScoper());
+    }
+
+    public function test_it_is_serializable(): void
+    {
+        $compactor = new PhpScoper(new FakeScoper());
+
+        $this->assertEquals(
+            $compactor,
+            unserialize(serialize($compactor))
+        );
     }
 }

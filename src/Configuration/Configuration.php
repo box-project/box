@@ -60,6 +60,7 @@ use KevinGH\Box\Annotation\AnnotationDumper;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
 use KevinGH\Box\Annotation\DocblockParser;
 use KevinGH\Box\Compactor\Compactor;
+use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\Json as JsonCompactor;
 use KevinGH\Box\Compactor\Php as PhpCompactor;
 use KevinGH\Box\Compactor\PhpScoper as PhpScoperCompactor;
@@ -442,7 +443,6 @@ BANNER;
      * @param bool          $dumpAutoload         Whether or not the Composer autoloader should be dumped
      * @param bool          $excludeComposerFiles Whether or not the Composer files composer.json, composer.lock and
      *                                            installed.json should be removed from the PHAR
-     * @param Compactor[]   $compactors           List of file contents compactors
      * @param null|int      $compressionAlgorithm Compression algorithm constant value. See the \Phar class constants
      * @param null|int      $fileMode             File mode in octal form
      * @param string        $mainScriptPath       The main script file path
@@ -475,7 +475,7 @@ BANNER;
         bool $dumpAutoload,
         bool $excludeComposerFiles,
         bool $excludeDevPackages,
-        array $compactors,
+        Compactors $compactors,
         ?int $compressionAlgorithm,
         ?int $fileMode,
         ?string $mainScriptPath,
@@ -602,7 +602,7 @@ BANNER;
 
         $exportedConfig->compressionAlgorithm = array_flip(get_phar_compression_algorithms())[$exportedConfig->compressionAlgorithm ?? Phar::NONE];
         $exportedConfig->signingAlgorithm = array_flip(get_phar_signing_algorithms())[$exportedConfig->signingAlgorithm];
-        $exportedConfig->compactors = array_map('get_class', $exportedConfig->compactors);
+        $exportedConfig->compactors = array_map('get_class', $exportedConfig->compactors->toArray());
         $exportedConfig->fileMode = '0'.decoct($exportedConfig->fileMode);
 
         $cloner = new VarCloner();
@@ -695,10 +695,7 @@ BANNER;
         return $this->excludeDevFiles;
     }
 
-    /**
-     * @return Compactor[] the list of compactors
-     */
-    public function getCompactors(): array
+    public function getCompactors(): Compactors
     {
         return $this->compactors;
     }
@@ -1791,22 +1788,49 @@ BANNER;
         return $raw->{self::EXCLUDE_COMPOSER_FILES_KEY} ?? true;
     }
 
-    /**
-     * @return Compactor[]
-     */
-    private static function retrieveCompactors(stdClass $raw, string $basePath, ConfigurationLogger $logger): array
+    private static function retrieveCompactors(stdClass $raw, string $basePath, ConfigurationLogger $logger): Compactors
     {
         self::checkIfDefaultValue($logger, $raw, self::COMPACTORS_KEY, []);
 
         $compactorClasses = array_unique((array) ($raw->{self::COMPACTORS_KEY} ?? []));
 
+        // Needs to do this check before returning the compactors in order to properly inform the users about
+        // possible misconfiguration
         $ignoredAnnotations = self::retrievePhpCompactorIgnoredAnnotations($raw, $compactorClasses, $logger);
 
         if (false === isset($raw->{self::COMPACTORS_KEY})) {
-            return [];
+            return new Compactors();
         }
 
-        $compactors = array_map(
+        $compactors = new Compactors(
+            ...self::createCompactors(
+                $raw,
+                $basePath,
+                $compactorClasses,
+                $ignoredAnnotations,
+                $logger
+            )
+        );
+
+        self::checkCompactorsOrder($logger, $compactors);
+
+        return $compactors;
+    }
+
+    /**
+     * @param string[] $compactorClasses
+     * @param string[] $ignoredAnnotations
+     *
+     * @return Compactor[]
+     */
+    private static function createCompactors(
+        stdClass $raw,
+        string $basePath,
+        array $compactorClasses,
+        array $ignoredAnnotations,
+        ConfigurationLogger $logger
+    ): array {
+        return array_map(
             static function (string $class) use ($raw, $basePath, $logger, $ignoredAnnotations): Compactor {
                 Assertion::classExists($class, 'The compactor class "%s" does not exist.');
                 Assertion::implementsInterface($class, Compactor::class, 'The class "%s" is not a compactor class.');
@@ -1843,10 +1867,13 @@ BANNER;
             },
             $compactorClasses
         );
+    }
 
+    private static function checkCompactorsOrder(ConfigurationLogger $logger, Compactors $compactors): void
+    {
         $scoperCompactor = false;
 
-        foreach ($compactors as $compactor) {
+        foreach ($compactors->toArray() as $compactor) {
             if ($compactor instanceof PhpScoperCompactor) {
                 $scoperCompactor = true;
             }
@@ -1864,8 +1891,6 @@ BANNER;
                 break;
             }
         }
-
-        return $compactors;
     }
 
     private static function retrieveCompressionAlgorithm(stdClass $raw, ConfigurationLogger $logger): ?int
@@ -2717,7 +2742,10 @@ BANNER;
         array $compactorClasses,
         ConfigurationLogger $logger
     ): array {
-        $hasPhpCompactor = in_array(PhpCompactor::class, $compactorClasses, true) || in_array(LegacyPhp::class, $compactorClasses, true);
+        $hasPhpCompactor = (
+            in_array(PhpCompactor::class, $compactorClasses, true)
+            || in_array(LegacyPhp::class, $compactorClasses, true)
+        );
 
         self::checkIfDefaultValue($logger, $raw, self::ANNOTATIONS_KEY, true);
         self::checkIfDefaultValue($logger, $raw, self::ANNOTATIONS_KEY, null);
@@ -2795,8 +2823,11 @@ BANNER;
         );
     }
 
-    private static function createPhpScoperCompactor(stdClass $raw, string $basePath, ConfigurationLogger $logger): Compactor
-    {
+    private static function createPhpScoperCompactor(
+        stdClass $raw,
+        string $basePath,
+        ConfigurationLogger $logger
+    ): Compactor {
         $phpScoperConfig = self::retrievePhpScoperConfig($raw, $basePath, $logger);
 
         $phpScoper = (new class() extends ApplicationFactory {

@@ -71,7 +71,7 @@ class CompactorsTest extends TestCase
 
         $expected = $contentsAfterCompactor2;
 
-        $actual = $this->compactors->compactContents($file, $contents);
+        $actual = $this->compactors->compact($file, $contents);
 
         $this->assertSame($expected, $actual);
 
@@ -118,6 +118,13 @@ class CompactorsTest extends TestCase
         $actual = $compactorsAggregate->getScoperWhitelist();
 
         $this->assertSame($newWhitelist, $actual);
+    }
+
+    public function test_it_is_countable(): void
+    {
+        $this->assertCount(0, new Compactors());
+        $this->assertCount(1, new Compactors(new FakeCompactor()));
+        $this->assertCount(2, new Compactors(new FakeCompactor(), new FakeCompactor()));
     }
 
     public function provideCompactorsForFirstWhitelistCheck(): Generator

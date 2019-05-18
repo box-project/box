@@ -539,14 +539,14 @@ EOF
 
     public function test_no_compactors_is_configured_by_default(): void
     {
-        $this->assertSame([], $this->config->getCompactors());
-        $this->assertSame([], $this->getNoFileConfig()->getCompactors());
+        $this->assertSame([], $this->config->getCompactors()->toArray());
+        $this->assertSame([], $this->getNoFileConfig()->getCompactors()->toArray());
 
         $this->setConfig([
             'compactors' => null,
         ]);
 
-        $this->assertSame([], $this->config->getCompactors());
+        $this->assertSame([], $this->config->getCompactors()->toArray());
 
         $this->assertSame(
             ['The "compactors" setting can be omitted since is set to its default value'],
@@ -558,7 +558,7 @@ EOF
             'compactors' => [],
         ]);
 
-        $this->assertSame([], $this->config->getCompactors());
+        $this->assertSame([], $this->config->getCompactors()->toArray());
 
         $this->assertSame(
             ['The "compactors" setting can be omitted since is set to its default value'],
@@ -577,7 +577,7 @@ EOF
             ],
         ]);
 
-        $compactors = $this->config->getCompactors();
+        $compactors = $this->config->getCompactors()->toArray();
 
         $this->assertInstanceOf(Php::class, $compactors[0]);
         $this->assertInstanceOf(DummyCompactor::class, $compactors[1]);
@@ -603,7 +603,7 @@ EOF
                 'compactors' => $compactorClasses,
             ]);
 
-            $this->assertCount(count($compactorClasses), $this->config->getCompactors());
+            $this->assertCount(count($compactorClasses), $this->config->getCompactors()->toArray());
 
             $this->assertSame([], $this->config->getRecommendations());
             $this->assertSame([], $this->config->getWarnings());
@@ -616,7 +616,7 @@ EOF
             ],
         ]);
 
-        $compactors = $this->config->getCompactors();
+        $compactors = $this->config->getCompactors()->toArray();
 
         $this->assertInstanceOf(PhpScoper::class, $compactors[0]);
         $this->assertInstanceOf(Php::class, $compactors[1]);
@@ -677,7 +677,7 @@ EOF
             ],
         ]);
 
-        $compactors = $this->config->getCompactors();
+        $compactors = $this->config->getCompactors()->toArray();
 
         $this->assertSame('custom', $compactors[0]->getScoper()->getPrefix());
 
@@ -714,7 +714,7 @@ EOF
             ],
         ]);
 
-        $compactors = $this->config->getCompactors();
+        $compactors = $this->config->getCompactors()->toArray();
 
         $this->assertSame('custom', $compactors[0]->getScoper()->getPrefix());
 
@@ -728,7 +728,7 @@ EOF
             ],
         ]);
 
-        $compactors = $this->config->getCompactors();
+        $compactors = $this->config->getCompactors()->toArray();
 
         $this->assertSame('custom', $compactors[0]->getScoper()->getPrefix());
 
@@ -745,7 +745,7 @@ EOF
             ],
         ]);
 
-        $compactors = $this->config->getCompactors();
+        $compactors = $this->config->getCompactors()->toArray();
 
         $this->assertSame('custom', $compactors[0]->getScoper()->getPrefix());
 
@@ -2849,7 +2849,7 @@ COMMENT;
         $this->assertRegExp('/^box-auto-generated-alias-[\da-zA-Z]{12}\.phar$/', $this->config->getAlias());
         $this->assertSame($this->tmp, $this->config->getBasePath());
         $this->assertSame([], $this->config->getBinaryFiles());
-        $this->assertSame([], $this->config->getCompactors());
+        $this->assertSame([], $this->config->getCompactors()->toArray());
         $this->assertFalse($this->config->hasAutodiscoveredFiles());
         $this->assertNull($this->config->getComposerJson());
         $this->assertNull($this->config->getComposerLock());
