@@ -2831,39 +2831,33 @@ BANNER;
     ): Compactor {
         $phpScoperConfig = self::retrievePhpScoperConfig($raw, $basePath, $logger);
 
-        $whitelistedFiles = array_values(
-            array_unique(
-                array_map(
-                    static function (string $path) use ($basePath): string {
-                        return make_path_relative($path, $basePath);
-                    },
-                    $phpScoperConfig->getWhitelistedFiles()
+        $phpScoper = (new class() extends ApplicationFactory {
+            public static function createScoper(): Scoper
+            {
+                return parent::createScoper();
+            }
+        })::createScoper();
+
+        if ([] !== $phpScoperConfig->getWhitelistedFiles()) {
+            $whitelistedFiles = array_values(
+                array_unique(
+                    array_map(
+                        static function (string $path) use ($basePath): string {
+                            return make_path_relative($path, $basePath);
+                        },
+                        $phpScoperConfig->getWhitelistedFiles()
+                    )
                 )
-            )
-        );
+            );
+
+            $phpScoper = new FileWhitelistScoper($phpScoper, ...$whitelistedFiles);
+        }
 
         $prefix = $phpScoperConfig->getPrefix() ?? unique_id('_HumbugBox');
 
-        $scoper = new SerializablePhpScoper(
-            static function () use ($whitelistedFiles): Scoper {
-                $scoper = (new class() extends ApplicationFactory {
-                    public static function createScoper(): Scoper
-                    {
-                        return parent::createScoper();
-                    }
-                })::createScoper();
-
-                if ([] !== $whitelistedFiles) {
-                    return new FileWhitelistScoper($scoper, ...$whitelistedFiles);
-                }
-
-                return $scoper;
-            }
-        );
-
         return new PhpScoperCompactor(
             new SimpleScoper(
-                $scoper,
+                $phpScoper,
                 $prefix,
                 $phpScoperConfig->getWhitelist(),
                 $phpScoperConfig->getPatchers()
