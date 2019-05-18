@@ -19,8 +19,8 @@ addons:
 
 matrix:
   include:
-    - php: '7.1'
     - php: '7.2'
+      env: PREFER_LOWEST='true'
     - php: '7.3'
       env: DEPLOY=true
     - php: '7.3'
@@ -46,6 +46,11 @@ before_install:
     if [ "DEPLOY" != "true" ]; then
         composer config --unset platform.php
         composer update --lock
+    fi
+  - |
+    if [ "PREFER_LOWEST" == "true" ]; then
+        COMPOSER_FLAGS="${COMPOSER_FLAGS} --prefer-lowest"
+        rm composer.lock
     fi
 
 install:
