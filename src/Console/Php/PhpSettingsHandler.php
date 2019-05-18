@@ -145,7 +145,7 @@ final class PhpSettingsHandler extends XdebugHandler
             && $memoryLimitInBytes < 1024 * 1024 * 512
         );
         $setUserDefinedMemoryLimit = (
-            true === $this->boxMemoryLimitInBytes
+            false !== $this->boxMemoryLimitInBytes
             && $memoryLimitInBytes !== $this->boxMemoryLimitInBytes
         );
 
