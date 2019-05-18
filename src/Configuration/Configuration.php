@@ -78,6 +78,7 @@ use function KevinGH\Box\get_phar_compression_algorithms;
 use function KevinGH\Box\get_phar_signing_algorithms;
 use KevinGH\Box\Json\Json;
 use KevinGH\Box\MapFile;
+use KevinGH\Box\PhpScoper\SerializablePhpScoper;
 use KevinGH\Box\PhpScoper\SimpleScoper;
 use function KevinGH\Box\unique_id;
 use function krsort;
@@ -602,7 +603,7 @@ BANNER;
 
         $exportedConfig->compressionAlgorithm = array_flip(get_phar_compression_algorithms())[$exportedConfig->compressionAlgorithm ?? Phar::NONE];
         $exportedConfig->signingAlgorithm = array_flip(get_phar_signing_algorithms())[$exportedConfig->signingAlgorithm];
-        $exportedConfig->compactors = array_map('get_class', $exportedConfig->compactors);
+        $exportedConfig->compactors = array_map('get_class', $exportedConfig->compactors->toArray());
         $exportedConfig->fileMode = '0'.decoct($exportedConfig->fileMode);
 
         $cloner = new VarCloner();
@@ -1794,16 +1795,20 @@ BANNER;
 
         $compactorClasses = array_unique((array) ($raw->{self::COMPACTORS_KEY} ?? []));
 
+        // Needs to do this check before returning the compactors in order to properly inform the users about
+        // possible misconfiguration
+        $ignoredAnnotations = self::retrievePhpCompactorIgnoredAnnotations($raw, $compactorClasses, $logger);
+
         if (false === isset($raw->{self::COMPACTORS_KEY})) {
             return new Compactors();
         }
 
         $compactors = new Compactors(
-            self::createCompactors(
+            ...self::createCompactors(
                 $raw,
                 $basePath,
                 $compactorClasses,
-                self::retrievePhpCompactorIgnoredAnnotations($raw, $compactorClasses, $logger),
+                $ignoredAnnotations,
                 $logger
             )
         );
@@ -1859,9 +1864,7 @@ BANNER;
                     return self::createPhpScoperCompactor($raw, $basePath, $logger);
                 }
 
-                return static function () use ($class): Compactor {
-                    return new $class();
-                };
+                return new $class();
             },
             $compactorClasses
         );
@@ -2841,27 +2844,31 @@ BANNER;
 
         $prefix = $phpScoperConfig->getPrefix() ?? unique_id('_HumbugBox');
 
-        return static function () use ($phpScoperConfig, $prefix, $whitelistedFiles): Compactor {
-            $phpScoper = (new class() extends ApplicationFactory {
-                public static function createScoper(): Scoper
-                {
-                    return parent::createScoper();
+        $scoper = new SerializablePhpScoper(
+            static function () use ($whitelistedFiles): Scoper {
+                $scoper = (new class() extends ApplicationFactory {
+                    public static function createScoper(): Scoper
+                    {
+                        return parent::createScoper();
+                    }
+                })::createScoper();
+
+                if ([] !== $whitelistedFiles) {
+                    return new FileWhitelistScoper($scoper, ...$whitelistedFiles);
                 }
-            })::createScoper();
 
-            if ([] !== $whitelistedFiles) {
-                $phpScoper = new FileWhitelistScoper($phpScoper, ...$whitelistedFiles);
+                return $scoper;
             }
+        );
 
-            return new PhpScoperCompactor(
-                new SimpleScoper(
-                    $phpScoper,
-                    $prefix,
-                    $phpScoperConfig->getWhitelist(),
-                    $phpScoperConfig->getPatchers()
-                )
-            );
-        };
+        return new PhpScoperCompactor(
+            new SimpleScoper(
+                $scoper,
+                $prefix,
+                $phpScoperConfig->getWhitelist(),
+                $phpScoperConfig->getPatchers()
+            )
+        );
     }
 
     private static function checkIfDefaultValue(

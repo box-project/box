@@ -217,7 +217,9 @@ final class Box implements Countable
 
     public function registerCompactors(Compactors $compactors): void
     {
-        foreach ($compactors->toArray() as $index => $compactor) {
+        $compactorsArray = $compactors->toArray();
+
+        foreach ($compactorsArray as $index => $compactor) {
             if ($compactor instanceof PhpScoper) {
                 $this->scoper = $compactor->getScoper();
 
