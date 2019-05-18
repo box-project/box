@@ -78,6 +78,7 @@ use function KevinGH\Box\get_phar_compression_algorithms;
 use function KevinGH\Box\get_phar_signing_algorithms;
 use KevinGH\Box\Json\Json;
 use KevinGH\Box\MapFile;
+use KevinGH\Box\PhpScoper\SerializablePhpScoper;
 use KevinGH\Box\PhpScoper\SimpleScoper;
 use function KevinGH\Box\unique_id;
 use function krsort;
@@ -2830,33 +2831,39 @@ BANNER;
     ): Compactor {
         $phpScoperConfig = self::retrievePhpScoperConfig($raw, $basePath, $logger);
 
-        $phpScoper = (new class() extends ApplicationFactory {
-            public static function createScoper(): Scoper
-            {
-                return parent::createScoper();
-            }
-        })::createScoper();
-
-        if ([] !== $phpScoperConfig->getWhitelistedFiles()) {
-            $whitelistedFiles = array_values(
-                array_unique(
-                    array_map(
-                        static function (string $path) use ($basePath): string {
-                            return make_path_relative($path, $basePath);
-                        },
-                        $phpScoperConfig->getWhitelistedFiles()
-                    )
+        $whitelistedFiles = array_values(
+            array_unique(
+                array_map(
+                    static function (string $path) use ($basePath): string {
+                        return make_path_relative($path, $basePath);
+                    },
+                    $phpScoperConfig->getWhitelistedFiles()
                 )
-            );
-
-            $phpScoper = new FileWhitelistScoper($phpScoper, ...$whitelistedFiles);
-        }
+            )
+        );
 
         $prefix = $phpScoperConfig->getPrefix() ?? unique_id('_HumbugBox');
 
+        $scoper = new SerializablePhpScoper(
+            static function () use ($whitelistedFiles): Scoper {
+                $scoper = (new class() extends ApplicationFactory {
+                    public static function createScoper(): Scoper
+                    {
+                        return parent::createScoper();
+                    }
+                })::createScoper();
+
+                if ([] !== $whitelistedFiles) {
+                    return new FileWhitelistScoper($scoper, ...$whitelistedFiles);
+                }
+
+                return $scoper;
+            }
+        );
+
         return new PhpScoperCompactor(
             new SimpleScoper(
-                $phpScoper,
+                $scoper,
                 $prefix,
                 $phpScoperConfig->getWhitelist(),
                 $phpScoperConfig->getPatchers()

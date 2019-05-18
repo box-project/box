@@ -32,7 +32,7 @@ trait ChangeableWorkingDirectory
 
     final public function changeWorkingDirectory(InputInterface $input): void
     {
-        /** @var string|null $workingDir */
+        /** @var null|string $workingDir */
         $workingDir = $input->getOption(self::$WORKING_DIR_OPT);
 
         if (null === $workingDir) {
