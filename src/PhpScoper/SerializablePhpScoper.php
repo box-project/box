@@ -2,12 +2,21 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\PhpScoper;
 
 use Closure;
 use function func_get_args;
 use Humbug\PhpScoper\Scoper as HumbugPhpScoperScoper;
-use Humbug\PhpScoper\Throwable\Exception\ParsingException;
 use Humbug\PhpScoper\Whitelist;
 use Opis\Closure\SerializableClosure;
 use Serializable;
@@ -26,7 +35,12 @@ final class SerializablePhpScoper implements HumbugPhpScoperScoper, Serializable
     {
         $this->createScoper = new SerializableClosure($createScoper);
 
-        // Checks that the scoper is correctly instantiable instead of lazily checking it
+        // Checks that the closure used is serializable upfront instead of lazily: the overhead generated is negligible
+        // hence worth the security this check provides
+        unserialize(serialize($this->createScoper));
+
+        // Checks that the scoper is instantiable upfront instead of lazily: the overhead generated is negligible hence
+        // worth the security this check provides
         $this->getScoper();
     }
 

@@ -16,8 +16,6 @@ namespace KevinGH\Box\Compactor;
 
 use Closure;
 use Opis\Closure\SerializableClosure;
-use function Opis\Closure\serialize as opis_serialize;
-use function Opis\Closure\unserialize as opis_unserialize;
 use Serializable;
 use function serialize;
 use function unserialize;
