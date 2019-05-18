@@ -132,7 +132,7 @@ final class Process extends ConfigurableBaseCommand
         $this->logPlaceholders($config, $io);
         $this->logCompactors($compactors, $io);
 
-        $fileProcessedContents = $compactors->compactContents($path, $fileContents);
+        $fileProcessedContents = $compactors->compact($path, $fileContents);
 
         if ($io->isQuiet()) {
             $io->writeln($fileProcessedContents, OutputInterface::VERBOSITY_QUIET);

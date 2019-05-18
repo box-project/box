@@ -217,7 +217,9 @@ final class Box implements Countable
 
     public function registerCompactors(Compactors $compactors): void
     {
-        foreach ($compactors->toArray() as $index => $compactor) {
+        $compactorsArray = $compactors->toArray();
+
+        foreach ($compactorsArray as $index => $compactor) {
             if ($compactor instanceof PhpScoper) {
                 $this->scoper = $compactor->getScoper();
 
@@ -225,13 +227,14 @@ final class Box implements Countable
             }
 
             if ($compactor instanceof Placeholder) {
-                unset($compactors[$index]);
+                // Removes the known Placeholder compactors in favour of the Box one
+                unset($compactorsArray[$index]);
             }
         }
 
-        array_unshift($compactors, $this->placeholderCompactor);
+        array_unshift($compactorsArray, $this->placeholderCompactor);
 
-        $this->compactors = new Compactors(...$compactors);
+        $this->compactors = new Compactors(...$compactorsArray);
     }
 
     /**
@@ -316,7 +319,7 @@ final class Box implements Countable
 
         $local = ($this->mapFile)($file);
 
-        $this->bufferedFiles[$local] = $binary ? $contents : $this->compactors->compactContents($local, $contents);
+        $this->bufferedFiles[$local] = $binary ? $contents : $this->compactors->compact($local, $contents);
 
         return $local;
     }
@@ -396,7 +399,7 @@ final class Box implements Countable
 
             $local = $mapFile($file);
 
-            $processedContents = $compactors->compactContents($local, $contents);
+            $processedContents = $compactors->compact($local, $contents);
 
             return [$local, $processedContents, $compactors->getScoperWhitelist()];
         };

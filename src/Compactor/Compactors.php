@@ -15,13 +15,15 @@ declare(strict_types=1);
 namespace KevinGH\Box\Compactor;
 
 use function array_reduce;
+use function count;
+use Countable;
 use Humbug\PhpScoper\Whitelist;
 use KevinGH\Box\PhpScoper\Scoper;
 
 /**
  * @private
  */
-final class Compactors
+final class Compactors implements Compactor, Countable
 {
     private $compactors;
     private $scoperCompactor;
@@ -39,7 +41,10 @@ final class Compactors
         }
     }
 
-    public function compactContents(string $file, string $contents): string
+    /**
+     * {@inheritdoc}
+     */
+    public function compact(string $file, string $contents): string
     {
         return (string) array_reduce(
             $this->compactors,
@@ -70,5 +75,13 @@ final class Compactors
     public function toArray(): array
     {
         return $this->compactors;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function count(): int
+    {
+        return count($this->compactors);
     }
 }
