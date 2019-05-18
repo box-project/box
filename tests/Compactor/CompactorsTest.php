@@ -16,12 +16,10 @@ namespace KevinGH\Box\Compactor;
 
 use Generator;
 use Humbug\PhpScoper\Whitelist;
-use function is_countable;
 use KevinGH\Box\PhpScoper\Scoper;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
-use function sprintf;
 
 /**
  * @covers \KevinGH\Box\Compactor\Compactors

@@ -168,7 +168,7 @@ final class Process extends ConfigurableBaseCommand
         $compactors = $config->getCompactors()->toArray();
 
         array_unshift(
-            $compactors->toArray(),
+            $compactors,
             new Placeholder($config->getReplacements())
         );
 
