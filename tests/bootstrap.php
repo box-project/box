@@ -18,3 +18,4 @@ use org\bovigo\vfs\vfsStreamWrapper;
 register_aliases();
 
 vfsStreamWrapper::register();
+\Opis\Closure\ClosureStream::register();

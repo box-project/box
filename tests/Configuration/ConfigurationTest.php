@@ -586,48 +586,48 @@ EOF
         $this->assertSame([], $this->config->getRecommendations());
         $this->assertSame([], $this->config->getWarnings());
     }
-//
-//    public function test_a_recommendation_is_given_if_the_scoper_compactor_is_registered_before_the_php_compactor(): void
-//    {
-//        $compactorClassesSet = [
-//            [Php::class],
-//            [PhpScoper::class],
-//            [
-//                Php::class,
-//                PhpScoper::class,
-//            ],
-//        ];
-//
-//        foreach ($compactorClassesSet as $compactorClasses) {
-//            $this->setConfig([
-//                'compactors' => $compactorClasses,
-//            ]);
-//
-//            $this->assertCount(count($compactorClasses), $this->config->getCompactors()->toArray());
-//
-//            $this->assertSame([], $this->config->getRecommendations());
-//            $this->assertSame([], $this->config->getWarnings());
-//        }
-//
-//        $this->setConfig([
-//            'compactors' => [
-//                PhpScoper::class,
-//                Php::class,
-//            ],
-//        ]);
-//
-//        $compactors = $this->config->getCompactors()->toArray();
-//
-//        $this->assertInstanceOf(PhpScoper::class, $compactors[0]);
-//        $this->assertInstanceOf(Php::class, $compactors[1]);
-//        $this->assertCount(2, $compactors);
-//
-//        $this->assertSame(
-//            ['The PHP compactor has been registered after the PhpScoper compactor. It is recommended to register the PHP compactor before for a clearer code and faster processing.'],
-//            $this->config->getRecommendations()
-//        );
-//        $this->assertSame([], $this->config->getWarnings());
-//    }
+
+    public function test_a_recommendation_is_given_if_the_scoper_compactor_is_registered_before_the_php_compactor(): void
+    {
+        $compactorClassesSet = [
+            [Php::class],
+            [PhpScoper::class],
+            [
+                Php::class,
+                PhpScoper::class,
+            ],
+        ];
+
+        foreach ($compactorClassesSet as $compactorClasses) {
+            $this->setConfig([
+                'compactors' => $compactorClasses,
+            ]);
+
+            $this->assertCount(count($compactorClasses), $this->config->getCompactors()->toArray());
+
+            $this->assertSame([], $this->config->getRecommendations());
+            $this->assertSame([], $this->config->getWarnings());
+        }
+
+        $this->setConfig([
+            'compactors' => [
+                PhpScoper::class,
+                Php::class,
+            ],
+        ]);
+
+        $compactors = $this->config->getCompactors()->toArray();
+
+        $this->assertInstanceOf(PhpScoper::class, $compactors[0]);
+        $this->assertInstanceOf(Php::class, $compactors[1]);
+        $this->assertCount(2, $compactors);
+
+        $this->assertSame(
+            ['The PHP compactor has been registered after the PhpScoper compactor. It is recommended to register the PHP compactor before for a clearer code and faster processing.'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
 
     public function test_it_cannot_get_the_compactors_with_an_invalid_class(): void
     {
@@ -703,59 +703,59 @@ EOF
         );
         $this->assertSame([], $this->config->getWarnings());
     }
-//
-//    public function test_a_default_scoper_path_is_configured_by_default(): void
-//    {
-//        dump_file('scoper.inc.php', "<?php return ['prefix' => 'custom'];");
-//
-//        $this->setConfig([
-//            'compactors' => [
-//                PhpScoper::class,
-//            ],
-//        ]);
-//
-//        $compactors = $this->config->getCompactors()->toArray();
-//
-//        $this->assertSame('custom', $compactors[0]->getScoper()->getPrefix());
-//
-//        $this->assertSame([], $this->config->getRecommendations());
-//        $this->assertSame([], $this->config->getWarnings());
-//
-//        $this->setConfig([
-//            'php-scoper' => 'scoper.inc.php',
-//            'compactors' => [
-//                PhpScoper::class,
-//            ],
-//        ]);
-//
-//        $compactors = $this->config->getCompactors()->toArray();
-//
-//        $this->assertSame('custom', $compactors[0]->getScoper()->getPrefix());
-//
-//        $this->assertSame(
-//            ['The "php-scoper" setting can be omitted since is set to its default value'],
-//            $this->config->getRecommendations()
-//        );
-//        $this->assertSame([], $this->config->getWarnings());
-//
-//        $this->setConfig([
-//            'php-scoper' => null,
-//            'compactors' => [
-//                PhpScoper::class,
-//            ],
-//        ]);
-//
-//        $compactors = $this->config->getCompactors()->toArray();
-//
-//        $this->assertSame('custom', $compactors[0]->getScoper()->getPrefix());
-//
-//        $this->assertSame(
-//            ['The "php-scoper" setting can be omitted since is set to its default value'],
-//            $this->config->getRecommendations()
-//        );
-//        $this->assertSame([], $this->config->getWarnings());
-//    }
-//
+
+    public function test_a_default_scoper_path_is_configured_by_default(): void
+    {
+        dump_file('scoper.inc.php', "<?php return ['prefix' => 'custom'];");
+
+        $this->setConfig([
+            'compactors' => [
+                PhpScoper::class,
+            ],
+        ]);
+
+        $compactors = $this->config->getCompactors()->toArray();
+
+        $this->assertSame('custom', $compactors[0]->getScoper()->getPrefix());
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+
+        $this->setConfig([
+            'php-scoper' => 'scoper.inc.php',
+            'compactors' => [
+                PhpScoper::class,
+            ],
+        ]);
+
+        $compactors = $this->config->getCompactors()->toArray();
+
+        $this->assertSame('custom', $compactors[0]->getScoper()->getPrefix());
+
+        $this->assertSame(
+            ['The "php-scoper" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+
+        $this->setConfig([
+            'php-scoper' => null,
+            'compactors' => [
+                PhpScoper::class,
+            ],
+        ]);
+
+        $compactors = $this->config->getCompactors()->toArray();
+
+        $this->assertSame('custom', $compactors[0]->getScoper()->getPrefix());
+
+        $this->assertSame(
+            ['The "php-scoper" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations()
+        );
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
     public function test_no_compression_algorithm_is_configured_by_default(): void
     {
         $this->assertNull($this->config->getCompressionAlgorithm());
