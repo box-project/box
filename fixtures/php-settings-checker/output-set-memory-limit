@@ -1,4 +1,4 @@
-[debug] Checking BOX_ALLOW_XDEBUG
 [debug] Changed the memory limit from "1GB" to BOX_MEMORY_LIMIT="64MB"
+[debug] Checking BOX_ALLOW_XDEBUG
 [debug] phar.readonly is disabled
 [debug] The xdebug extension is not loaded

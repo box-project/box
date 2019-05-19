@@ -1085,9 +1085,9 @@ JSON
         );
 
         $expected = <<<OUTPUT
+$memoryLog
 [debug] Checking BOX_ALLOW_XDEBUG
 $xdebugLog
-$memoryLog
 [debug] Disabled parallel processing
 
     ____

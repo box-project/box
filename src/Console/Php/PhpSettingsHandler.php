@@ -52,10 +52,18 @@ final class PhpSettingsHandler extends XdebugHandler
     /**
      * {@inheritdoc}
      */
-    protected function requiresRestart($isLoaded): bool
+    public function check()
     {
         $this->bumpMemoryLimit();
 
+        return parent::check();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function requiresRestart($isLoaded): bool
+    {
         if ($this->pharReadonly) {
             $this->logger->debug('phar.readonly is enabled');
 
