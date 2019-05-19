@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Php;
 
 use Assert\Assertion;
-use Composer\XdebugHandler\Process;
 use Composer\XdebugHandler\XdebugHandler;
 use function getenv;
 use function ini_get;
@@ -36,7 +35,6 @@ final class PhpSettingsHandler extends XdebugHandler
 {
     private $logger;
     private $pharReadonly;
-    private $boxMemoryLimitInBytes;
 
     /**
      * {@inheritdoc}
@@ -49,27 +47,6 @@ final class PhpSettingsHandler extends XdebugHandler
         $this->logger = $logger;
 
         $this->pharReadonly = '1' === ini_get('phar.readonly');
-        $this->boxMemoryLimitInBytes = $this->checkMemoryLimit();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function check(): void
-    {
-        parent::check();
-
-        if (self::getRestartSettings()) {
-            $restartSettings = XdebugHandler::getRestartSettings();
-
-            Assertion::notNull($restartSettings);
-
-            Process::setEnv('PHPRC', $restartSettings['tmpIni']);
-            Process::setEnv('PHP_INI_SCAN_DIR', '');
-        }
-
-        // Bump the memory limit in the current process if necessary
-        $this->bumpMemoryLimit();
     }
 
     /**
@@ -77,6 +54,8 @@ final class PhpSettingsHandler extends XdebugHandler
      */
     protected function requiresRestart($isLoaded): bool
     {
+        $this->bumpMemoryLimit();
+
         if ($this->pharReadonly) {
             $this->logger->debug('phar.readonly is enabled');
 
@@ -96,28 +75,7 @@ final class PhpSettingsHandler extends XdebugHandler
         // Disable phar.readonly if set
         $this->disablePharReadonly();
 
-        // Bump the memory limit in the restated process if necessary
-        $this->bumpMemoryLimit();
-
         parent::restart($command);
-    }
-
-    /**
-     * @return false|int the desired memory limit for Box
-     */
-    private function checkMemoryLimit()
-    {
-        $memoryLimit = getenv(BOX_MEMORY_LIMIT);
-
-        if (false === $memoryLimit) {
-            $memoryLimitInBytes = false;
-        } elseif ('-1' === $memoryLimit) {
-            $memoryLimitInBytes = -1;
-        } else {
-            $memoryLimitInBytes = memory_to_bytes($memoryLimit);
-        }
-
-        return $memoryLimitInBytes;
     }
 
     private function disablePharReadonly(): void
@@ -136,27 +94,25 @@ final class PhpSettingsHandler extends XdebugHandler
      */
     private function bumpMemoryLimit(): void
     {
+        $userDefinedMemoryLimit = self::getUserDefinedMemoryLimit();
+
         $memoryLimit = trim(ini_get('memory_limit'));
         $memoryLimitInBytes = '-1' === $memoryLimit ? -1 : memory_to_bytes($memoryLimit);
 
+        // Whether or not the memory limit should be dumped
         $bumpMemoryLimit = (
-            false === $this->boxMemoryLimitInBytes
+            null === $userDefinedMemoryLimit
             && -1 !== $memoryLimitInBytes
             && $memoryLimitInBytes < 1024 * 1024 * 512
         );
+        // Whether or not the memory limit should be set to the user defined memory limit
         $setUserDefinedMemoryLimit = (
-            false !== $this->boxMemoryLimitInBytes
-            && $memoryLimitInBytes !== $this->boxMemoryLimitInBytes
+            null !== $userDefinedMemoryLimit
+            && $memoryLimitInBytes !== $userDefinedMemoryLimit
         );
 
         if ($bumpMemoryLimit && false === $setUserDefinedMemoryLimit) {
-            if ($this->tmpIni) {
-                // Is for the restarted process
-                append_to_file($this->tmpIni, 'memory_limit=512M'.PHP_EOL);
-            } else {
-                // Is for the current process
-                ini_set('memory_limit', '512M');
-            }
+            ini_set('memory_limit', '512M');
 
             $this->logger->debug(
                 sprintf(
@@ -166,20 +122,14 @@ final class PhpSettingsHandler extends XdebugHandler
                 )
             );
         } elseif ($setUserDefinedMemoryLimit) {
-            if ($this->tmpIni) {
-                // Is for the restarted process
-                append_to_file($this->tmpIni, 'memory_limit='.$this->boxMemoryLimitInBytes.PHP_EOL);
-            } else {
-                // Is for the current process
-                ini_set('memory_limit', (string) $this->boxMemoryLimitInBytes);
-            }
+            ini_set('memory_limit', (string) $userDefinedMemoryLimit);
 
             $this->logger->debug(
                 sprintf(
                     'Changed the memory limit from "%s" to %s="%s"',
                     format_size($memoryLimitInBytes, 0),
                     BOX_MEMORY_LIMIT,
-                    format_size($this->boxMemoryLimitInBytes, 0)
+                    format_size($userDefinedMemoryLimit, 0)
                 )
             );
         } else {
@@ -190,5 +140,23 @@ final class PhpSettingsHandler extends XdebugHandler
                 )
             );
         }
+    }
+
+    /**
+     * @return null|int
+     */
+    private static function getUserDefinedMemoryLimit(): ?int
+    {
+        $memoryLimit = getenv(BOX_MEMORY_LIMIT);
+
+        if (false === $memoryLimit) {
+            $memoryLimitInBytes = null;
+        } elseif ('-1' === $memoryLimit) {
+            $memoryLimitInBytes = -1;
+        } else {
+            $memoryLimitInBytes = memory_to_bytes($memoryLimit);
+        }
+
+        return $memoryLimitInBytes;
     }
 }
