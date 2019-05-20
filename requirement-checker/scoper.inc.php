@@ -23,7 +23,7 @@ BASH
         throw new RuntimeException('Could not retrieve the last release endpoint.');
     }
 
-    $contents = json_decode($lastReleaseEndpointContents);
+    $contents = json_decode($lastReleaseEndpointContents, false, 512, JSON_PRETTY_PRINT);
 
     if (JSON_ERROR_NONE !== json_last_error()) {
         // TODO: switch to safe json parsing in the future
@@ -37,7 +37,12 @@ BASH
     }
 
     if (false === isset($contents->tag_name) || false === is_string($contents->tag_name)) {
-        throw new RuntimeException('No tag name could be found.');
+        throw new RuntimeException(
+            sprintf(
+                'No tag name could be found in: %s',
+                $contents
+            )
+        );
     }
 
     $lastRelease = trim($contents->tag_name);
