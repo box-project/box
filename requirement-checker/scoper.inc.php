@@ -14,21 +14,37 @@ declare(strict_types=1);
 
 function get_prefix(): string
 {
-    $lastReleaseEndpoint = shell_exec(<<<'BASH'
-curl -s https://api.github.com/repos/humbug/box/releases/latest \
-  | grep "browser_download_url.*box.phar" \
-  | cut -d '"' -f 4
+    $lastReleaseEndpointContents = shell_exec(<<<'BASH'
+curl -s https://api.github.com/repos/humbug/box/releases/latest
 BASH
     );
 
-    if (1 !== preg_match('/download\/(?<version>.*?)\/box\.phar$/', $lastReleaseEndpoint, $matches)) {
-        throw new \RuntimeException(sprintf(
-            'Could not retrieve the last release endpoint. Last URL download link found: "%s"',
-            $lastReleaseEndpoint
-        ));
+    if (null === $lastReleaseEndpointContents) {
+        throw new RuntimeException('Could not retrieve the last release endpoint.');
     }
 
-    $lastRelease = $matches['version'];
+    $contents = json_decode($lastReleaseEndpointContents);
+
+    if (JSON_ERROR_NONE !== json_last_error()) {
+        // TODO: switch to safe json parsing in the future
+        throw new RuntimeException(
+            sprintf(
+                'Could not parse the request contents: "%d: %s"',
+                json_last_error(),
+                json_last_error_msg()
+            )
+        );
+    }
+
+    if (false === isset($contents->tag_name) || false === is_string($contents->tag_name)) {
+        throw new RuntimeException('No tag name could be found.');
+    }
+
+    $lastRelease = trim($contents->tag_name);
+
+    if ('' === $lastRelease) {
+        throw new RuntimeException('Invalid tag name found.');
+    }
 
     return 'HumbugBox'.str_replace('.', '', $lastRelease);
 }
