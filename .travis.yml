@@ -10,7 +10,10 @@ cache:
     - $HOME/.composer/cache/files
 
 env:
-  - COMPOSER_FLAGS='--no-interaction --no-progress --no-suggest --prefer-dist'
+  global:
+    secure: "TSJx2dIQvDl3I/LtpmVeCU0waltgbOj8XmTRuLOfeig8Ae2kT9XBlv1yL62nNNJU/zjxhUgH06v9eV3TmAgmyXpaui7hqA7K5/4V8a5ujJ3RkZxeNRxtu2Jjg9SEeJmHu6x6GphT+g0JVYei1lwerswjnPze1amjs7nJMq2JkJUEipHiG7FhfYiF6Da65hTLFouWxgyEyu4LkS1Sr7agsmP3lFGH84TGYWRm20pAOFWOPEl7kiLRo7bPkiIvlf/hvV82Lu3XLUscHX53GK6FN5dL9rD7X/vgKZGXHYnndnzTSzdXqx5SsWjzC853cxH03c1abQ8vRkjkWPwTEr35Eqh14w/bRaeV3NQsIUkdJk1cU65fQwLsVCSkVSaq5EwxhKUsZ/moAJYXoQr5h4AZoT5pVEdnmB2Nolf4h+BHiX5vfBdEQuclm9qJgZsmHHAGdhk1guus0500NouDWoZA3xEumf4zZc40UdErOYWM21on8pPhTDu3GUMsphi1yYVnATYLlwI0kcoIwTDaOuW3DwyYa48NUFEclvQ4jHF2p8q7rJGBVIBqxPYEWSxhX16t9ES0XoUZWsNLJUjj/zBETe7iWimL+Fp9uIqRm8ECFFCk0nU9FHd2A6SmBccRjCSq7q1OB5Ji3nWsZNdPkiUGPJXsSxoyEvDqSacAnrT3qzI="
+  matrix:
+    - COMPOSER_FLAGS='--no-interaction --no-progress --no-suggest --prefer-dist'
 
 addons:
   apt:
