@@ -47,7 +47,7 @@ BASH
         throw new RuntimeException(
             sprintf(
                 'No tag name could be found in: %s',
-                $contents
+                $lastReleaseEndpointContents
             )
         );
     }
