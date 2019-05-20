@@ -14,8 +14,15 @@ declare(strict_types=1);
 
 function get_prefix(): string
 {
-    $lastReleaseEndpointContents = shell_exec(<<<'BASH'
-curl -s https://api.github.com/repos/humbug/box/releases/latest
+    $gitHubToken = getenv('GITHUB_TOKEN');
+
+    $headerOption = false === $gitHubToken || '' === $gitHubToken
+        ? ''
+        : '-H "Authorization: token $GITHUB_TOKEN"'
+    ;
+
+    $lastReleaseEndpointContents = shell_exec(<<<BASH
+curl -s $headerOption https://api.github.com/repos/humbug/box/releases/latest
 BASH
     );
 
