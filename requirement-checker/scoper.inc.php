@@ -18,7 +18,7 @@ function get_prefix(): string
 
     $headerOption = false === $gitHubToken || '' === $gitHubToken
         ? ''
-        : '-H "Authorization: token $GITHUB_TOKEN"'
+        : "-H \"Authorization: token $gitHubToken\""
     ;
 
     $lastReleaseEndpointContents = shell_exec(<<<BASH
