@@ -33,16 +33,11 @@ class IOTest extends TestCase
         // colored.
         if (null === self::$defaultExpectedInteractive) {
             if (false !== getenv('CI')) {
-                self::$defaultExpectedInteractive = true !== getenv('TRAVIS_SECURE_ENV_VARS');
+                self::$defaultExpectedInteractive = 'true' !== getenv('TRAVIS_SECURE_ENV_VARS');
             } else {
                 self::$defaultExpectedInteractive = true;
             }
         }
-
-        \file_put_contents('php://stderr', \var_export([
-            'CI' => getenv('CI'),
-            'TRAVIS_SECURE_ENV_VARS' => getenv('TRAVIS_SECURE_ENV_VARS'),
-        ]));
         
         return self::$defaultExpectedInteractive;
     }
