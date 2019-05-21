@@ -24,22 +24,23 @@ use function putenv;
  */
 class IOTest extends TestCase
 {
-    /**
-     * @var bool
-     */
     private static $defaultExpectedInteractive;
     
-    /**
-     * {@inheritdoc}
-     */
-    public static function setUpBeforeClass(): void
+    private static function getDefaultInteractive(): bool
     {
         // @see https://github.com/travis-ci/travis-ci/issues/7967
         // When a secure env var is present, the TTY is not passed correctly. The output is no longer interactive and
         // colored.
-        self::$defaultExpectedInteractive = false !== getenv('TRAVIS_SECURE_ENV_VARS') ? true : false;
+        if (null === self::$defaultExpectedInteractive) {
+            if (false !== getenv('CI')) {
+                self::$defaultExpectedInteractive = false !== getenv('TRAVIS_SECURE_ENV_VARS');
+            } else {
+                self::$defaultExpectedInteractive = true;
+            }
+        }
+        
+        return self::$defaultExpectedInteractive;
     }
-
 
     /**
      * @dataProvider provideOptions
@@ -72,13 +73,13 @@ class IOTest extends TestCase
     {
         yield [
             ['cli.php', '--foo'],
-            self::$defaultExpectedInteractive,
+            self::getDefaultInteractive(),
             IO::VERBOSITY_NORMAL,
         ];
 
         yield [
             ['cli.php', '--foo', '--verbose=0'],
-            self::$defaultExpectedInteractive,
+            self::getDefaultInteractive(),
             IO::VERBOSITY_VERBOSE,
         ];
 
@@ -96,55 +97,55 @@ class IOTest extends TestCase
 
         yield [
             ['cli.php', '--foo', '-vvv'],
-            self::$defaultExpectedInteractive,
+            self::getDefaultInteractive(),
             IO::VERBOSITY_DEBUG,
         ];
 
         yield [
             ['cli.php', '--foo', '--verbose=3'],
-            self::$defaultExpectedInteractive,
+            self::getDefaultInteractive(),
             IO::VERBOSITY_DEBUG,
         ];
 
         yield [
             ['cli.php', '--foo', '--verbose  3'],
-            self::$defaultExpectedInteractive,
+            self::getDefaultInteractive(),
             IO::VERBOSITY_DEBUG,
         ];
 
         yield [
             ['cli.php', '--foo', '-vv'],
-            self::$defaultExpectedInteractive,
+            self::getDefaultInteractive(),
             IO::VERBOSITY_VERY_VERBOSE,
         ];
 
         yield [
             ['cli.php', '--foo', '--verbose=2'],
-            self::$defaultExpectedInteractive,
+            self::getDefaultInteractive(),
             IO::VERBOSITY_VERY_VERBOSE,
         ];
 
         yield [
             ['cli.php', '--foo', '--verbose  2'],
-            self::$defaultExpectedInteractive,
+            self::getDefaultInteractive(),
             IO::VERBOSITY_VERY_VERBOSE,
         ];
 
         yield [
             ['cli.php', '--foo', '-v'],
-            self::$defaultExpectedInteractive,
+            self::getDefaultInteractive(),
             IO::VERBOSITY_VERBOSE,
         ];
 
         yield [
             ['cli.php', '--foo', '--verbose=1'],
-            self::$defaultExpectedInteractive,
+            self::getDefaultInteractive(),
             IO::VERBOSITY_VERBOSE,
         ];
 
         yield [
             ['cli.php', '--foo', '--verbose  '],
-            self::$defaultExpectedInteractive,
+            self::getDefaultInteractive(),
             IO::VERBOSITY_VERBOSE,
         ];
 
@@ -173,28 +174,28 @@ class IOTest extends TestCase
         yield [
             ['cli.php', '--foo'],
             'SHELL_VERBOSITY=0',
-            self::$defaultExpectedInteractive,
+            self::getDefaultInteractive(),
             IO::VERBOSITY_NORMAL,
         ];
 
         yield [
             ['cli.php', '--foo'],
             'SHELL_VERBOSITY=1',
-            self::$defaultExpectedInteractive,
+            self::getDefaultInteractive(),
             IO::VERBOSITY_VERBOSE,
         ];
 
         yield [
             ['cli.php', '--foo'],
             'SHELL_VERBOSITY=2',
-            self::$defaultExpectedInteractive,
+            self::getDefaultInteractive(),
             IO::VERBOSITY_VERY_VERBOSE,
         ];
 
         yield [
             ['cli.php', '--foo'],
             'SHELL_VERBOSITY=3',
-            self::$defaultExpectedInteractive,
+            self::getDefaultInteractive(),
             IO::VERBOSITY_DEBUG,
         ];
     }
