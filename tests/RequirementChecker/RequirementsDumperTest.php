@@ -41,8 +41,6 @@ class RequirementsDumperTest extends TestCase
         $expectedFiles = [
             '.requirements.php',
             'bin/check-requirements.php',
-            'composer.json',
-            'composer.lock',
             'src/Checker.php',
             'src/IO.php',
             'src/IsExtensionFulfilled.php',
@@ -59,7 +57,6 @@ class RequirementsDumperTest extends TestCase
             'vendor/composer/autoload_real.php',
             'vendor/composer/autoload_static.php',
             'vendor/composer/ClassLoader.php',
-            'vendor/composer/installed.json',
             'vendor/composer/LICENSE',
             'vendor/composer/semver/LICENSE',
             'vendor/composer/semver/src/Comparator.php',
