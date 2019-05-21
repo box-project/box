@@ -6,10 +6,10 @@
 
 require_once __DIR__ . '/composer/autoload_real.php';
 
-$loader = ComposerAutoloaderInit5c70b4df2249d1c85028156a735bffc4::getLoader();
+$loader = ComposerAutoloaderInit8b58992d179d0afdbc92988c084b4eef::getLoader();
 
 // Aliases for the whitelisted classes. For more information see:
 // https://github.com/humbug/php-scoper/blob/master/README.md#class-whitelisting
-class_exists('_HumbugBox87c495005ea2\Composer\Semver\Semver');
+class_exists('HumbugBox372\Composer\Semver\Semver');
 
 return $loader;
