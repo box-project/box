@@ -16,6 +16,7 @@ namespace KevinGH\RequirementChecker;
 
 use Generator;
 use function getenv;
+use function in_array;
 use PHPUnit\Framework\TestCase;
 use function putenv;
 
@@ -32,11 +33,10 @@ class IOTest extends TestCase
         // When a secure env var is present, the TTY is not passed correctly. The output is no longer interactive and
         // colored.
         if (null === self::$defaultExpectedInteractive) {
-            if (false !== getenv('CI')) {
-                self::$defaultExpectedInteractive = 'true' !== getenv('TRAVIS_SECURE_ENV_VARS');
-            } else {
-                self::$defaultExpectedInteractive = true;
-            }
+            self::$defaultExpectedInteractive = false === in_array(getenv('CI'), [false, 'false'], true)
+                ? 'true' !== getenv('TRAVIS_SECURE_ENV_VARS')
+                : true
+            ;
         }
         
         return self::$defaultExpectedInteractive;
