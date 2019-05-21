@@ -30,7 +30,7 @@
         "composer/semver": "^1.4"
     },
     "require-dev": {
-        "phpunit/phpunit": "^7.0"
+        "phpunit/phpunit": "^8.0"
     },
 
     "config": {
