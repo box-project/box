@@ -38,6 +38,11 @@ class IOTest extends TestCase
                 self::$defaultExpectedInteractive = true;
             }
         }
+
+        \file_put_contents('php://stderr', \var_export([
+            'CI' => getenv('CI'),
+            'TRAVIS_SECURE_ENV_VARS' => getenv('TRAVIS_SECURE_ENV_VARS'),
+        ]));
         
         return self::$defaultExpectedInteractive;
     }
