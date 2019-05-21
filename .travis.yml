@@ -58,6 +58,7 @@ before_install:
 
 install:
   - composer install $COMPOSER_FLAGS
+  - composer install $COMPOSER_FLAGS --working-dir requirement-checker
 
 script:
   - bin/box validate
