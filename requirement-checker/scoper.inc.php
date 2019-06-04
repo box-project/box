@@ -14,6 +14,12 @@ declare(strict_types=1);
 
 function get_prefix(): string
 {
+    if (false !== getenv('TRAVIS') && 'humbug/box' !== getenv('TRAVIS_REPO_SLUG')) {
+        // Ignore this PR to avoid too many builds to fail untimely or locally due to API rate limits because the last
+        // release version could not be retrieved.
+        return 'HumbugBoxTemporaryPrefix';
+    }
+
     $gitHubToken = getenv('GITHUB_TOKEN');
 
     $headerOption = false === $gitHubToken || '' === $gitHubToken
