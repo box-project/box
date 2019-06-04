@@ -39,7 +39,7 @@ use function getcwd;
 use Herrera\Box\Compactor\Json as LegacyJson;
 use Herrera\Box\Compactor\Php as LegacyPhp;
 use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
-use Humbug\PhpScoper\Console\ApplicationFactory;
+use Humbug\PhpScoper\Container;
 use Humbug\PhpScoper\Scoper;
 use Humbug\PhpScoper\Scoper\FileWhitelistScoper;
 use function implode;
@@ -2846,12 +2846,7 @@ BANNER;
 
         $scoper = new SerializablePhpScoper(
             static function () use ($whitelistedFiles): Scoper {
-                $scoper = (new class() extends ApplicationFactory {
-                    public static function createScoper(): Scoper
-                    {
-                        return parent::createScoper();
-                    }
-                })::createScoper();
+                $scoper = (new Container())->getScoper();
 
                 if ([] !== $whitelistedFiles) {
                     return new FileWhitelistScoper($scoper, ...$whitelistedFiles);
