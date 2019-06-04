@@ -35,6 +35,8 @@ matrix:
   fast_finish: true
 
 before_install:
+  - php -r "echo var_export(getenv('TRAVIS'), true);"
+  - php -r "echo var_export(getenv('TRAVIS_REPO_SLUG'), true);"
   - |
     if [ "$COVERAGE" != "true" ]; then
         phpenv config-rm xdebug.ini || true
