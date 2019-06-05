@@ -15,11 +15,6 @@ env:
   matrix:
     - COMPOSER_FLAGS='--no-interaction --no-progress --no-suggest --prefer-dist'
 
-addons:
-  apt:
-    packages:
-      - libevent-dev
-
 matrix:
   include:
     - php: '7.2'
@@ -41,9 +36,6 @@ before_install:
     fi
   - set -eo pipefail
   - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
-  - .travis/install-uv.sh
-  - .travis/install-ev.sh
-  - .travis/install-event.sh
   - composer validate
   - |
     if [ "DEPLOY" != "true" ]; then
