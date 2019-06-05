@@ -106,7 +106,8 @@ return [
             return preg_replace(
                 '/Hoa\\\\Consistency::registerShutdownFunction\(xcallable\(\'(.*)\'\)\)/',
                 sprintf(
-                    'Hoa\\Consistency::registerShutdownFunction(xcallable(\'%s$1\'))',
+                    'Hoa\\Consistency::registerShutdownFunction(%sxcallable(\'%s$1\'))',
+                    '\\\\'.$prefix.'\\\\',
                     $prefix.'\\\\\\\\'
                 ),
                 $contents
@@ -138,6 +139,7 @@ return [
 
             return $contents;
         },
+        // Symfony polyfills patches
         static function (string $filePath, string $prefix, string $contents): string {
             if ('vendor/symfony/polyfill-php72/bootstrap.php' !== $filePath) {
                 return $contents;
@@ -151,8 +153,6 @@ return [
         },
     ],
     'whitelist' => [
-        'Composer\*',
-
         \Composer\Autoload\ClassLoader::class,
 
         \KevinGH\Box\Compactor\Compactor::class,
@@ -161,18 +161,6 @@ return [
         \Herrera\Box\Compactor\Php::class,
         \KevinGH\Box\Compactor\Php::class,
         \KevinGH\Box\Compactor\PhpScoper::class,
-
-        // Symfony Polyfill for PHP 7.1 support
-        // https://github.com/humbug/php-scoper/issues/304
-        'sapi_windows_vt100_support',
-        'stream_isatty',
-        'utf8_encode',
-        'utf8_decode',
-        'spl_object_id',
-        'PHP_OS_FAMILY',
-        'mb_chr',
-        'mb_ord',
-        'mb_scrub',
 
         // Hoa symbols
         'SUCCEED',
@@ -203,7 +191,6 @@ return [
         '_concrete',
         '_overridable',
         'WITH_COMPOSER',
-        'xcallable',
     ],
     'whitelist-global-constants' => false,
     'whitelist-global-classes' => false,
