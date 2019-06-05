@@ -2,6 +2,8 @@
 
 OS := $(shell uname)
 PHPNOGC=php -d zend.enable_gc=0
+CCYELLOW=\033[0;33m
+CCEND=\033[0m
 
 .PHONY: help
 help:
@@ -204,7 +206,7 @@ endif
 .PHONY: e2e_php_settings_checker
 e2e_php_settings_checker: ## Runs the end-to-end tests for the PHP settings handler
 e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xdebug-enabled vendor box
-	# No restart needed
+	@echo "$(CCYELLOW)No restart needed$(CCEND)"
 	$(DOCKER) -v "$$PWD":/opt/box box_php72 \
 		php -dphar.readonly=0 -dmemory_limit=-1 \
 		$(BOX_COMPILE) \
@@ -212,18 +214,16 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 		| tee fixtures/php-settings-checker/actual-output || true
 	diff fixtures/php-settings-checker/output-all-clear fixtures/php-settings-checker/actual-output
 
-	# Xdebug enabled: restart needed
+	@echo "$(CCYELLOW)Xdebug enabled: restart needed$(CCEND)"
 	$(DOCKER) -v "$$PWD":/opt/box box_php72_xdebug \
 		php -dphar.readonly=0 -dmemory_limit=-1 \
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
 		| tee fixtures/php-settings-checker/actual-output || true
-	$(SED) "s/'-c' '.*' '\.\/box'/'-c' '\/tmp-file' 'bin\/box'/" \
-		fixtures/php-settings-checker/actual-output
 	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
 	diff fixtures/php-settings-checker/output-xdebug-enabled fixtures/php-settings-checker/actual-output
 
-	# phar.readonly enabled: restart needed
+	@echo "$(CCYELLOW)phar.readonly enabled: restart needed$(CCEND)"
 	$(DOCKER) -v "$$PWD":/opt/box box_php72 \
 		php -dphar.readonly=1 -dmemory_limit=-1 \
 		$(BOX_COMPILE) \
@@ -233,7 +233,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
 	diff fixtures/php-settings-checker/output-pharreadonly-enabled fixtures/php-settings-checker/actual-output
 
-	# Bump min memory limit if necessary
+	@echo "$(CCYELLOW)Bump min memory limit if necessary (limit lower than default)$(CCEND)"
 	$(DOCKER) -v "$$PWD":/opt/box box_php72 \
 		php -dphar.readonly=0 -dmemory_limit=124M \
 		$(BOX_COMPILE) \
@@ -243,7 +243,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
 	diff fixtures/php-settings-checker/output-min-memory-limit fixtures/php-settings-checker/actual-output
 
-	# Bump min memory limit if necessary
+	@echo "$(CCYELLOW)Bump min memory limit if necessary (limit higher than default)$(CCEND)"
 	$(DOCKER) -e BOX_MEMORY_LIMIT=64M -v "$$PWD":/opt/box box_php72 \
 		php -dphar.readonly=0 -dmemory_limit=1024M \
 		$(BOX_COMPILE) \

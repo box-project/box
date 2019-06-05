@@ -43,6 +43,8 @@ final class PhpSettingsHandler extends XdebugHandler
     {
         parent::__construct('box', '--ansi');
 
+        $this->setPersistent();
+
         $this->setLogger($logger);
         $this->logger = $logger;
 
