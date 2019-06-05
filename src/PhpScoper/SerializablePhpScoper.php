@@ -24,7 +24,7 @@ use function serialize;
 use function unserialize;
 
 /**
- * Humbug PHP-Scoper scoper which leverages closures to ensure the scoper is serialiable.
+ * Humbug PHP-Scoper scoper which leverages closures to ensure the scoper is serializable.
  */
 final class SerializablePhpScoper implements HumbugPhpScoperScoper, Serializable
 {
