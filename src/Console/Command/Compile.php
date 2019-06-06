@@ -19,19 +19,18 @@ use function array_map;
 use function array_search;
 use function array_shift;
 use Assert\Assertion;
-use Closure;
 use function count;
 use function decoct;
 use function explode;
 use function file_exists;
 use function filesize;
-use function function_exists;
 use function get_class;
 use Humbug\PhpScoper\Whitelist;
 use function implode;
 use function is_string;
 use KevinGH\Box\Box;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
+use function KevinGH\Box\bump_open_file_descriptor_limit;
 use function KevinGH\Box\check_php_settings;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Composer\ComposerConfiguration;
@@ -56,10 +55,6 @@ use function memory_get_peak_usage;
 use function memory_get_usage;
 use function microtime;
 use const PHP_EOL;
-use function posix_getrlimit;
-use const POSIX_RLIMIT_INFINITY;
-use const POSIX_RLIMIT_NOFILE;
-use function posix_setrlimit;
 use function putenv;
 use RuntimeException;
 use function sprintf;
@@ -214,9 +209,8 @@ HELP;
         IO $io,
         bool $debug
     ): Box {
-        $box = Box::create(
-            $config->getTmpOutputPath()
-        );
+        $box = Box::create($config->getTmpOutputPath());
+
         $box->startBuffering();
 
         $this->registerReplacementValues($config, $box, $logger);
@@ -624,7 +618,7 @@ HELP;
             )
         );
 
-        $restoreLimit = self::bumpOpenFileDescriptorLimit($box, $io);
+        $restoreLimit = bump_open_file_descriptor_limit($box, $io);
 
         try {
             $extension = $box->compress($algorithm);
@@ -645,66 +639,6 @@ HELP;
         } finally {
             $restoreLimit();
         }
-    }
-
-    /**
-     * Bumps the maximum number of open file descriptor if necessary.
-     *
-     * @return Closure callable to call to restore the original maximum number of open files descriptors
-     */
-    private static function bumpOpenFileDescriptorLimit(Box $box, IO $io): Closure
-    {
-        $filesCount = count($box) + 128;  // Add a little extra for good measure
-
-        if (false === function_exists('posix_getrlimit') || false === function_exists('posix_setrlimit')) {
-            $io->writeln(
-                '<info>[debug] Could not check the maximum number of open file descriptors: the functions "posix_getrlimit()" and '
-                .'"posix_setrlimit" could not be found.</info>',
-                OutputInterface::VERBOSITY_DEBUG
-            );
-
-            return static function (): void {};
-        }
-
-        $softLimit = posix_getrlimit()['soft openfiles'];
-        $hardLimit = posix_getrlimit()['hard openfiles'];
-
-        if ($softLimit >= $filesCount) {
-            return static function (): void {};
-        }
-
-        $io->writeln(
-            sprintf(
-                '<info>[debug] Increased the maximum number of open file descriptors from ("%s", "%s") to ("%s", "%s")'
-                .'</info>',
-                $softLimit,
-                $hardLimit,
-                $filesCount,
-                'unlimited'
-            ),
-            OutputInterface::VERBOSITY_DEBUG
-        );
-
-        posix_setrlimit(
-            POSIX_RLIMIT_NOFILE,
-            $filesCount,
-            'unlimited' === $hardLimit ? POSIX_RLIMIT_INFINITY : $hardLimit
-        );
-
-        return static function () use ($io, $softLimit, $hardLimit): void {
-            if (function_exists('posix_setrlimit') && isset($softLimit, $hardLimit)) {
-                posix_setrlimit(
-                    POSIX_RLIMIT_NOFILE,
-                    $softLimit,
-                    'unlimited' === $hardLimit ? POSIX_RLIMIT_INFINITY : $hardLimit
-                );
-
-                $io->writeln(
-                    '<info>[debug] Restored the maximum number of open file descriptors</info>',
-                    OutputInterface::VERBOSITY_DEBUG
-                );
-            }
-        };
     }
 
     private function signPhar(

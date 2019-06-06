@@ -113,6 +113,7 @@ Available commands:
   compile   🔨  Compiles an application into a PHAR
   diff      🕵  Displays the differences between all of the files in two PHARs
   docker    🐳  Generates a Dockerfile for the given PHAR
+  extract   🚚  Extracts a given PHAR into a directory
   help      Displays help for a command
   info      🔍  Displays information about the PHAR extension or file
   list      Lists commands
