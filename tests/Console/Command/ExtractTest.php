@@ -63,7 +63,7 @@ class ExtractTest extends CommandTestCase
 
         $actualFiles = $this->collectExtractedFiles();
 
-        $this->assertSame($expectedFiles, $actualFiles);
+        $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
         $expectedOutput = <<<'OUTPUT'
 
@@ -97,7 +97,7 @@ OUTPUT;
 
         $actualFiles = $this->collectExtractedFiles();
 
-        $this->assertSame($expectedFiles, $actualFiles);
+        $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
         $expectedOutput = <<<'OUTPUT'
 
@@ -131,7 +131,7 @@ OUTPUT;
 
         $actualFiles = $this->collectExtractedFiles();
 
-        $this->assertSame($expectedFiles, $actualFiles);
+        $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
         $expectedOutput = <<<'OUTPUT'
 
@@ -162,7 +162,7 @@ OUTPUT;
 
         $actualFiles = $this->collectExtractedFiles();
 
-        $this->assertSame($expectedFiles, $actualFiles);
+        $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
         $expectedOutput = <<<'OUTPUT'
 
