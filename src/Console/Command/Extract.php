@@ -24,7 +24,9 @@ use PharFileInfo;
 use function realpath;
 use RuntimeException;
 use function sprintf;
+use Symfony\Component\Console\Exception\RuntimeException as ConsoleRuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
+use Throwable;
 
 /**
  * @private
@@ -77,7 +79,21 @@ final class Extract extends BaseCommand
 
         $tmpFile = create_temporary_phar($file);
 
-        $box = Box::create($tmpFile);
+        try {
+            $box = Box::create($tmpFile);
+        } catch (Throwable $throwable) {
+            if ($io->isDebug()) {
+                throw new ConsoleRuntimeException(
+                    'The given file is not a valid PHAR',
+                    0,
+                    $throwable
+                );
+            }
+
+            $io->error('The given file is not a valid PHAR');
+
+            return 1;
+        }
 
         $restoreLimit = bump_open_file_descriptor_limit($box, $io);
 
@@ -102,6 +118,8 @@ final class Extract extends BaseCommand
 
             remove($tmpFile);
         }
+
+        $io->success('');
 
         return 0;
     }
