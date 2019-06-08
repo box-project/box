@@ -1,8 +1,8 @@
 <?php
 
-namespace HumbugBox372\Composer\Semver\Constraint;
+namespace HumbugBox373\Composer\Semver\Constraint;
 
-class MultiConstraint implements \HumbugBox372\Composer\Semver\Constraint\ConstraintInterface
+class MultiConstraint implements \HumbugBox373\Composer\Semver\Constraint\ConstraintInterface
 {
     protected $constraints;
     protected $prettyString;
@@ -24,7 +24,7 @@ class MultiConstraint implements \HumbugBox372\Composer\Semver\Constraint\Constr
     {
         return !$this->conjunctive;
     }
-    public function matches(\HumbugBox372\Composer\Semver\Constraint\ConstraintInterface $provider)
+    public function matches(\HumbugBox373\Composer\Semver\Constraint\ConstraintInterface $provider)
     {
         if (\false === $this->conjunctive) {
             foreach ($this->constraints as $constraint) {
