@@ -1,8 +1,8 @@
 <?php
 
-namespace HumbugBox372\Composer\Semver\Constraint;
+namespace HumbugBox373\Composer\Semver\Constraint;
 
-class Constraint implements \HumbugBox372\Composer\Semver\Constraint\ConstraintInterface
+class Constraint implements \HumbugBox373\Composer\Semver\Constraint\ConstraintInterface
 {
     const OP_EQ = 0;
     const OP_LT = 1;
@@ -15,7 +15,7 @@ class Constraint implements \HumbugBox372\Composer\Semver\Constraint\ConstraintI
     protected $operator;
     protected $version;
     protected $prettyString;
-    public function matches(\HumbugBox372\Composer\Semver\Constraint\ConstraintInterface $provider)
+    public function matches(\HumbugBox373\Composer\Semver\Constraint\ConstraintInterface $provider)
     {
         if ($provider instanceof $this) {
             return $this->matchSpecific($provider);
@@ -60,7 +60,7 @@ class Constraint implements \HumbugBox372\Composer\Semver\Constraint\ConstraintI
         }
         return \version_compare($a, $b, $operator);
     }
-    public function matchSpecific(\HumbugBox372\Composer\Semver\Constraint\Constraint $provider, $compareBranches = \false)
+    public function matchSpecific(\HumbugBox373\Composer\Semver\Constraint\Constraint $provider, $compareBranches = \false)
     {
         $noEqualOp = \str_replace('=', '', self::$transOpInt[$this->operator]);
         $providerNoEqualOp = \str_replace('=', '', self::$transOpInt[$provider->operator]);
