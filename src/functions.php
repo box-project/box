@@ -14,7 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use function Amp\ParallelFunctions\parallelMap;
+use Amp\Promise;
+use Amp\Success;
 use function array_key_exists;
+use function array_map;
 use Assert\Assertion;
 use function bin2hex;
 use function class_alias;
@@ -24,6 +28,7 @@ use function constant;
 use function define;
 use function defined;
 use ErrorException;
+use function extension_loaded;
 use function floor;
 use function function_exists;
 use KevinGH\Box\Console\IO\IO;
@@ -31,10 +36,12 @@ use KevinGH\Box\Console\Php\PhpSettingsHandler;
 use function KevinGH\Box\FileSystem\copy;
 use function log;
 use function number_format;
+use Opis\Closure\SerializableClosure;
 use PackageVersions\Versions;
 use Phar;
 use function posix_getrlimit;
 use function posix_setrlimit;
+use Prophecy\Promise\ReturnPromise;
 use function random_bytes;
 use function sprintf;
 use function str_replace;
@@ -43,6 +50,7 @@ use function strtolower;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
+use parallel\Future;
 
 /**
  * @private
@@ -327,4 +335,45 @@ function bump_open_file_descriptor_limit(Box $box, IO $io): Closure
             );
         }
     };
+}
+
+function parallel_map(array $array, Closure $callable): Promise
+{
+    if (false === extension_loaded('parallel')) {
+        return parallelMap($array, $callable);
+    }
+
+//    $events = new \parallel\Events();
+
+//    foreach ($array as $item) {
+//
+//        $events->addFuture(\parallel\run(static function () use ($callable, $item) {
+//            $callable($item);
+//        }));
+//    }
+
+//    $event = $events->poll();
+
+    $item = current($array);
+
+    $future  = \parallel\run(static function() use ($callable, $item) {
+        return $callable($item);
+    });
+
+    \var_dump($future->value());
+die;
+
+    $item = current($array);
+
+    $future = \parallel\run(static function () use ($callable, $item) {
+        $callable($item);
+    });
+
+    \var_dump($future->value());die;
+
+    while (null === $event = $events->poll()) {
+        // Continue
+    }
+
+    return new Success($event->value);
 }

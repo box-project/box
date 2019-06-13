@@ -393,6 +393,7 @@ HELP;
             // This exception is handled a different way to give me meaningful feedback to the user
             foreach ($exception->getReasons() as $reason) {
                 $io->error($reason);
+                $io->error($reason->getWorkerTrace());
             }
 
             throw $exception;

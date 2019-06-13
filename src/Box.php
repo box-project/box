@@ -421,7 +421,7 @@ final class Box implements Countable
         // This process is allowed thanks to the nature of the state of the whitelists: having redundant classes or
         // functions registered can easily be deal with so merging all those different states is actually
         // straightforward.
-        $tuples = wait(parallelMap($files, $processFile));
+        $tuples = wait(parallel_map($files, $processFile));
 
         if ([] === $tuples) {
             return [];
