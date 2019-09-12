@@ -7,7 +7,6 @@
 !/bin/box
 !/bin/box.bat
 !/bin/generate_default_stub
-!/bin/dump-requirements-checker.php
 /dist/
 /Dockerfile*
 /fixtures/default_stub.php
