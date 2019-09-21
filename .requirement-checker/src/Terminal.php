@@ -1,6 +1,6 @@
 <?php
 
-namespace HumbugBox373\KevinGH\RequirementChecker;
+namespace HumbugBox380\KevinGH\RequirementChecker;
 
 /**
 @symfony
@@ -53,36 +53,30 @@ class Terminal
     }
     private static function getConsoleMode()
     {
-        if (!\function_exists('proc_open')) {
+        $info = self::readFromProcess('mode CON');
+        if (null === $info || !\preg_match('/--------+\\r?\\n.+?(\\d+)\\r?\\n.+?(\\d+)\\r?\\n/', $info, $matches)) {
             return null;
         }
-        $descriptorspec = array(1 => array('pipe', 'w'), 2 => array('pipe', 'w'));
-        $process = \proc_open('mode CON', $descriptorspec, $pipes, null, null, array('suppress_errors' => \true));
-        if (\is_resource($process)) {
-            $info = \stream_get_contents($pipes[1]);
-            \fclose($pipes[1]);
-            \fclose($pipes[2]);
-            \proc_close($process);
-            if (\preg_match('/--------+\\r?\\n.+?(\\d+)\\r?\\n.+?(\\d+)\\r?\\n/', $info, $matches)) {
-                return array((int) $matches[2], (int) $matches[1]);
-            }
-        }
-        return null;
+        return array((int) $matches[2], (int) $matches[1]);
     }
     private static function getSttyColumns()
+    {
+        return self::readFromProcess('stty -a | grep columns');
+    }
+    private static function readFromProcess($command)
     {
         if (!\function_exists('proc_open')) {
             return null;
         }
         $descriptorspec = array(1 => array('pipe', 'w'), 2 => array('pipe', 'w'));
-        $process = \proc_open('stty -a | grep columns', $descriptorspec, $pipes, null, null, array('suppress_errors' => \true));
-        if (\is_resource($process)) {
-            $info = \stream_get_contents($pipes[1]);
-            \fclose($pipes[1]);
-            \fclose($pipes[2]);
-            \proc_close($process);
-            return $info;
+        $process = \proc_open($command, $descriptorspec, $pipes, null, null, array('suppress_errors' => \true));
+        if (!\is_resource($process)) {
+            return null;
         }
-        return null;
+        $info = \stream_get_contents($pipes[1]);
+        \fclose($pipes[1]);
+        \fclose($pipes[2]);
+        \proc_close($process);
+        return $info;
     }
 }
