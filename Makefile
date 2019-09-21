@@ -291,6 +291,7 @@ requirement-checker/composer.lock: requirement-checker/composer.json
 
 vendor: composer.lock
 	composer install
+	touch $@
 
 vendor/bamarni: composer.lock
 	composer install
@@ -352,7 +353,7 @@ requirement-checker/tests/DisplayNormalizer.php: tests/Console/DisplayNormalizer
 	cat tests/Console/DisplayNormalizer.php | sed -E 's/namespace KevinGH\\Box\\Console;/namespace KevinGH\\RequirementChecker;/g' > requirement-checker/tests/DisplayNormalizer.php
 
 .requirement-checker: requirement-checker/bin/check-requirements.phar
-	php bin/dump-requirements-checker.php
+	php bin/box extract requirement-checker/bin/check-requirements.phar .requirement-checker
 	touch $@
 
 requirement-checker/actual_terminal_diff: requirement-checker/src/Terminal.php vendor/symfony/console/Terminal.php

@@ -20,10 +20,12 @@ use KevinGH\Box\Console\IO\IO;
 use function KevinGH\Box\create_temporary_phar;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\remove;
-use PharFileInfo;
 use function realpath;
+use RecursiveIteratorIterator;
 use RuntimeException;
 use function sprintf;
+use function strlen;
+use function substr;
 use Symfony\Component\Console\Exception\RuntimeException as ConsoleRuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Throwable;
@@ -102,11 +104,12 @@ final class Extract extends BaseCommand
         try {
             remove($outputDir);
 
-            foreach ($box->getPhar() as $pharFile) {
-                /* @var PharFileInfo $pharFile */
+            $rootLength = strlen('phar://'.$box->getPhar()->getPath()) + 1;
+
+            foreach (new RecursiveIteratorIterator($box->getPhar()) as $file) {
                 dump_file(
-                    $outputDir.'/'.$pharFile->getFilename(),
-                    (string) $pharFile->getContent()
+                    $outputDir.'/'.substr($file->getPathname(), $rootLength),
+                    (string) $file->getContent()
                 );
             }
         } catch (RuntimeException $exception) {
@@ -118,8 +121,6 @@ final class Extract extends BaseCommand
 
             remove($tmpFile);
         }
-
-        $io->success('');
 
         return 0;
     }

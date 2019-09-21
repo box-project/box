@@ -65,16 +65,9 @@ class ExtractTest extends CommandTestCase
 
         $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
-        $expectedOutput = <<<'OUTPUT'
-
- [OK]
-
-
-OUTPUT;
-
         $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
-        $this->assertSame($expectedOutput, $actual);
+        $this->assertSame('', $actual);
         $this->assertSame(0, $this->commandTester->getStatusCode());
     }
 
@@ -99,16 +92,9 @@ OUTPUT;
 
         $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
-        $expectedOutput = <<<'OUTPUT'
-
- [OK]
-
-
-OUTPUT;
-
         $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
-        $this->assertSame($expectedOutput, $actual);
+        $this->assertSame('', $actual);
         $this->assertSame(0, $this->commandTester->getStatusCode());
     }
 
@@ -133,16 +119,9 @@ OUTPUT;
 
         $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
-        $expectedOutput = <<<'OUTPUT'
-
- [OK]
-
-
-OUTPUT;
-
         $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
-        $this->assertSame($expectedOutput, $actual);
+        $this->assertSame('', $actual);
         $this->assertSame(0, $this->commandTester->getStatusCode());
     }
 
