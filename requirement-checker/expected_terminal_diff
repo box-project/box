@@ -24,42 +24,11 @@
 >  *
 >  * @license MIT (c) Fabien Potencier <fabien@symfony.com>
 >  */
-86c93
-<      * @return int[]|null An array composed of the width and the height or null if it could not be parsed
+96c103
+<         return [(int) $matches[2], (int) $matches[1]];
 ---
->      * @return null|int[] An array composed of the width and the height or null if it could not be parsed
-91c98
-<             return;
----
->             return null;
-94,98c101,105
-<         $descriptorspec = [
-<             1 => ['pipe', 'w'],
-<             2 => ['pipe', 'w'],
-<         ];
-<         $process = proc_open('mode CON', $descriptorspec, $pipes, null, null, ['suppress_errors' => true]);
----
->         $descriptorspec = array(
->             1 => array('pipe', 'w'),
->             2 => array('pipe', 'w'),
->         );
->         $process = proc_open('mode CON', $descriptorspec, $pipes, null, null, array('suppress_errors' => true));
-106c113
-<                 return [(int) $matches[2], (int) $matches[1]];
----
->                 return array((int) $matches[2], (int) $matches[1]);
-108a116,117
-> 
->         return null;
-114c123
-<      * @return string|null
----
->      * @return null|string
-119c128
-<             return;
----
->             return null;
-122,125c131,134
+>         return array((int) $matches[2], (int) $matches[1]);
+120,123c127,130
 <         $descriptorspec = [
 <             1 => ['pipe', 'w'],
 <             2 => ['pipe', 'w'],
@@ -69,10 +38,7 @@
 >             1 => array('pipe', 'w'),
 >             2 => array('pipe', 'w'),
 >         );
-127c136
-<         $process = proc_open('stty -a | grep columns', $descriptorspec, $pipes, null, null, ['suppress_errors' => true]);
+125c132
+<         $process = proc_open($command, $descriptorspec, $pipes, null, null, ['suppress_errors' => true]);
 ---
->         $process = proc_open('stty -a | grep columns', $descriptorspec, $pipes, null, null, array('suppress_errors' => true));
-135a145,146
-> 
->         return null;
+>         $process = proc_open($command, $descriptorspec, $pipes, null, null, array('suppress_errors' => true));
