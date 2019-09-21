@@ -1,6 +1,6 @@
 <?php
 
-namespace HumbugBox373\KevinGH\RequirementChecker;
+namespace HumbugBox380\KevinGH\RequirementChecker;
 
 /**
 @symfony
@@ -12,16 +12,16 @@ final class Checker
     {
         $requirements = self::retrieveRequirements();
         $checkPassed = $requirements->evaluateRequirements();
-        $io = new \HumbugBox373\KevinGH\RequirementChecker\IO();
-        self::printCheck($checkPassed, new \HumbugBox373\KevinGH\RequirementChecker\Printer($io->getVerbosity(), $io->hasColorSupport()), $requirements);
+        $io = new \HumbugBox380\KevinGH\RequirementChecker\IO();
+        self::printCheck($checkPassed, new \HumbugBox380\KevinGH\RequirementChecker\Printer($io->getVerbosity(), $io->hasColorSupport()), $requirements);
         return $checkPassed;
     }
-    public static function printCheck($checkPassed, \HumbugBox373\KevinGH\RequirementChecker\Printer $printer, \HumbugBox373\KevinGH\RequirementChecker\RequirementCollection $requirements)
+    public static function printCheck($checkPassed, \HumbugBox380\KevinGH\RequirementChecker\Printer $printer, \HumbugBox380\KevinGH\RequirementChecker\RequirementCollection $requirements)
     {
-        if (\false === $checkPassed && \HumbugBox373\KevinGH\RequirementChecker\IO::VERBOSITY_VERY_VERBOSE > $printer->getVerbosity()) {
-            $printer->setVerbosity(\HumbugBox373\KevinGH\RequirementChecker\IO::VERBOSITY_VERY_VERBOSE);
+        if (\false === $checkPassed && \HumbugBox380\KevinGH\RequirementChecker\IO::VERBOSITY_VERY_VERBOSE > $printer->getVerbosity()) {
+            $printer->setVerbosity(\HumbugBox380\KevinGH\RequirementChecker\IO::VERBOSITY_VERY_VERBOSE);
         }
-        $verbosity = \HumbugBox373\KevinGH\RequirementChecker\IO::VERBOSITY_VERY_VERBOSE;
+        $verbosity = \HumbugBox380\KevinGH\RequirementChecker\IO::VERBOSITY_VERY_VERBOSE;
         $iniPath = $requirements->getPhpIniPath();
         $printer->title('Box Requirements Checker', $verbosity);
         $printer->printv('> Using PHP ', $verbosity);
@@ -42,9 +42,9 @@ final class Checker
         $errorMessages = array();
         foreach ($requirements->getRequirements() as $requirement) {
             if ($errorMessage = $printer->getRequirementErrorMessage($requirement)) {
-                if (\HumbugBox373\KevinGH\RequirementChecker\IO::VERBOSITY_DEBUG === $printer->getVerbosity()) {
-                    $printer->printvln('✘ ' . $requirement->getTestMessage(), \HumbugBox373\KevinGH\RequirementChecker\IO::VERBOSITY_DEBUG, 'red');
-                    $printer->printv('  ', \HumbugBox373\KevinGH\RequirementChecker\IO::VERBOSITY_DEBUG);
+                if (\HumbugBox380\KevinGH\RequirementChecker\IO::VERBOSITY_DEBUG === $printer->getVerbosity()) {
+                    $printer->printvln('✘ ' . $requirement->getTestMessage(), \HumbugBox380\KevinGH\RequirementChecker\IO::VERBOSITY_DEBUG, 'red');
+                    $printer->printv('  ', \HumbugBox380\KevinGH\RequirementChecker\IO::VERBOSITY_DEBUG);
                     $errorMessages[] = $errorMessage;
                 } else {
                     $printer->printv('E', $verbosity, 'red');
@@ -52,14 +52,14 @@ final class Checker
                 }
                 continue;
             }
-            if (\HumbugBox373\KevinGH\RequirementChecker\IO::VERBOSITY_DEBUG === $printer->getVerbosity()) {
-                $printer->printvln('✔ ' . $requirement->getHelpText(), \HumbugBox373\KevinGH\RequirementChecker\IO::VERBOSITY_DEBUG, 'green');
-                $printer->printv('  ', \HumbugBox373\KevinGH\RequirementChecker\IO::VERBOSITY_DEBUG);
+            if (\HumbugBox380\KevinGH\RequirementChecker\IO::VERBOSITY_DEBUG === $printer->getVerbosity()) {
+                $printer->printvln('✔ ' . $requirement->getHelpText(), \HumbugBox380\KevinGH\RequirementChecker\IO::VERBOSITY_DEBUG, 'green');
+                $printer->printv('  ', \HumbugBox380\KevinGH\RequirementChecker\IO::VERBOSITY_DEBUG);
             } else {
                 $printer->printv('.', $verbosity, 'green');
             }
         }
-        if (\HumbugBox373\KevinGH\RequirementChecker\IO::VERBOSITY_DEBUG !== $printer->getVerbosity() && \count($requirements) > 0) {
+        if (\HumbugBox380\KevinGH\RequirementChecker\IO::VERBOSITY_DEBUG !== $printer->getVerbosity() && \count($requirements) > 0) {
             $printer->printvln('', $verbosity);
         }
         if ($requirements->evaluateRequirements()) {
@@ -79,9 +79,9 @@ final class Checker
             self::$requirementsConfig = __DIR__ . '/../.requirements.php';
         }
         $config = (require self::$requirementsConfig);
-        $requirements = new \HumbugBox373\KevinGH\RequirementChecker\RequirementCollection();
+        $requirements = new \HumbugBox380\KevinGH\RequirementChecker\RequirementCollection();
         foreach ($config as $constraint) {
-            $requirements->addRequirement('php' === $constraint['type'] ? new \HumbugBox373\KevinGH\RequirementChecker\IsPhpVersionFulfilled($constraint['condition']) : new \HumbugBox373\KevinGH\RequirementChecker\IsExtensionFulfilled($constraint['condition']), $constraint['message'], $constraint['helpMessage']);
+            $requirements->addRequirement('php' === $constraint['type'] ? new \HumbugBox380\KevinGH\RequirementChecker\IsPhpVersionFulfilled($constraint['condition']) : new \HumbugBox380\KevinGH\RequirementChecker\IsExtensionFulfilled($constraint['condition']), $constraint['message'], $constraint['helpMessage']);
         }
         return $requirements;
     }
