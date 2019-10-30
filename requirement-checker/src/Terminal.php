@@ -22,6 +22,7 @@ class Terminal
 {
     private static $width;
     private static $height;
+    private static $stty;
 
     /**
      * Gets the terminal width.
@@ -59,6 +60,22 @@ class Terminal
         }
 
         return self::$height ?: 50;
+    }
+
+    /**
+     * @internal
+     *
+     * @return bool
+     */
+    public static function hasSttyAvailable()
+    {
+        if (null !== self::$stty) {
+            return self::$stty;
+        }
+
+        exec('stty 2>&1', $output, $exitcode);
+
+        return self::$stty = 0 === $exitcode;
     }
 
     private static function initDimensions()

@@ -24,11 +24,11 @@
 >  *
 >  * @license MIT (c) Fabien Potencier <fabien@symfony.com>
 >  */
-96c103
+113c120
 <         return [(int) $matches[2], (int) $matches[1]];
 ---
 >         return array((int) $matches[2], (int) $matches[1]);
-120,123c127,130
+137,140c144,147
 <         $descriptorspec = [
 <             1 => ['pipe', 'w'],
 <             2 => ['pipe', 'w'],
@@ -38,7 +38,7 @@
 >             1 => array('pipe', 'w'),
 >             2 => array('pipe', 'w'),
 >         );
-125c132
+142c149
 <         $process = proc_open($command, $descriptorspec, $pipes, null, null, ['suppress_errors' => true]);
 ---
 >         $process = proc_open($command, $descriptorspec, $pipes, null, null, array('suppress_errors' => true));
