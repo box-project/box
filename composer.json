@@ -56,7 +56,7 @@
         "phpseclib/phpseclib": "^2.0",
         "psr/log": "^1.0",
         "seld/jsonlint": "^1.7",
-        "symfony/console": "^4.2",
+        "symfony/console": "^4.3.5",
         "symfony/filesystem": "^4.2",
         "symfony/finder": "^4.0",
         "symfony/process": "^4.2",
