@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use function count;
 use KevinGH\Box\Box;
 use function KevinGH\Box\bump_open_file_descriptor_limit;
 use KevinGH\Box\Console\IO\IO;
@@ -97,7 +98,7 @@ final class Extract extends BaseCommand
             return 1;
         }
 
-        $restoreLimit = bump_open_file_descriptor_limit($box, $io);
+        $restoreLimit = bump_open_file_descriptor_limit(count($box), $io);
 
         $outputDir = $input->getArgument(self::OUTPUT_ARG);
 
