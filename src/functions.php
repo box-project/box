@@ -274,9 +274,9 @@ function register_error_handler(): void
  *
  * @return Closure callable to call to restore the original maximum number of open files descriptors
  */
-function bump_open_file_descriptor_limit(Box $box, IO $io): Closure
+function bump_open_file_descriptor_limit(int $count, IO $io): Closure
 {
-    $filesCount = count($box) + 128;  // Add a little extra for good measure
+    $count += 128;  // Add a little extra for good measure
 
     if (false === function_exists('posix_getrlimit') || false === function_exists('posix_setrlimit')) {
         $io->writeln(
@@ -291,7 +291,7 @@ function bump_open_file_descriptor_limit(Box $box, IO $io): Closure
     $softLimit = posix_getrlimit()['soft openfiles'];
     $hardLimit = posix_getrlimit()['hard openfiles'];
 
-    if ($softLimit >= $filesCount) {
+    if ($softLimit >= $count) {
         return static function (): void {};
     }
 
@@ -301,7 +301,7 @@ function bump_open_file_descriptor_limit(Box $box, IO $io): Closure
             .'</info>',
             $softLimit,
             $hardLimit,
-            $filesCount,
+            $count,
             'unlimited'
         ),
         OutputInterface::VERBOSITY_DEBUG
@@ -309,7 +309,7 @@ function bump_open_file_descriptor_limit(Box $box, IO $io): Closure
 
     posix_setrlimit(
         POSIX_RLIMIT_NOFILE,
-        $filesCount,
+        $count,
         'unlimited' === $hardLimit ? POSIX_RLIMIT_INFINITY : $hardLimit
     );
 

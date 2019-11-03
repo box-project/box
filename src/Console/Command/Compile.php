@@ -190,7 +190,16 @@ HELP;
 
         $this->removeExistingArtifacts($config, $logger, $debug);
 
-        $box = $this->createPhar($config, $logger, $io, $debug);
+        // Adding files might result in opening a lot of files. Either because not parallelized or when creating the
+        // workers for parallelization.
+        // As a result, we bump the file descriptor to an arbitrary number to ensure this process can run correctly
+        $restoreLimit = bump_open_file_descriptor_limit(2048, $io);
+
+        try {
+            $box = $this->createPhar($config, $logger, $io, $debug);
+        } finally {
+            $restoreLimit();
+        }
 
         $this->correctPermissions($path, $config, $logger);
 
@@ -618,7 +627,7 @@ HELP;
             )
         );
 
-        $restoreLimit = bump_open_file_descriptor_limit($box, $io);
+        $restoreLimit = bump_open_file_descriptor_limit(count($box), $io);
 
         try {
             $extension = $box->compress($algorithm);
