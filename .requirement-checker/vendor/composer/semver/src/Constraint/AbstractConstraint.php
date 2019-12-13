@@ -1,12 +1,12 @@
 <?php
 
-namespace HumbugBox380\Composer\Semver\Constraint;
+namespace HumbugBox383\Composer\Semver\Constraint;
 
 \trigger_error('The ' . __NAMESPACE__ . '\\AbstractConstraint abstract class is deprecated, there is no replacement for it, it will be removed in the next major version.', \E_USER_DEPRECATED);
-abstract class AbstractConstraint implements \HumbugBox380\Composer\Semver\Constraint\ConstraintInterface
+abstract class AbstractConstraint implements \HumbugBox383\Composer\Semver\Constraint\ConstraintInterface
 {
     protected $prettyString;
-    public function matches(\HumbugBox380\Composer\Semver\Constraint\ConstraintInterface $provider)
+    public function matches(\HumbugBox383\Composer\Semver\Constraint\ConstraintInterface $provider)
     {
         if ($provider instanceof $this) {
             return $this->matchSpecific($provider);
