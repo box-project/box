@@ -2962,6 +2962,12 @@ OUTPUT;
             $display
         );
 
+        $display = str_replace(
+            'Xdebug',
+            'xdebug',
+            $display
+        );
+
         return DisplayNormalizer::removeTrailingSpaces($display);
     }
 

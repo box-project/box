@@ -24,11 +24,43 @@
 >  *
 >  * @license MIT (c) Fabien Potencier <fabien@symfony.com>
 >  */
-122c129
+99c106
+<     private static function hasVt100Support(): bool
+---
+>     private static function hasVt100Support()
+101c108
+<         return \function_exists('sapi_windows_vt100_support') && sapi_windows_vt100_support(fopen('php://stdout', 'w'));
+---
+>         return \function_exists('sapi_windows_vt100_support') && \sapi_windows_vt100_support(\fopen('php://stdout', 'wb'));
+104,106d110
+<     /**
+<      * Initializes dimensions using the output of an stty columns line.
+<      */
+127c131
+<     private static function getConsoleMode(): ?array
+---
+>     private static function getConsoleMode()
+135c139
 <         return [(int) $matches[2], (int) $matches[1]];
 ---
 >         return array((int) $matches[2], (int) $matches[1]);
-146,149c153,156
+139a144,145
+>      *
+>      * @return string|null
+141c147
+<     private static function getSttyColumns(): ?string
+---
+>     private static function getSttyColumns()
+146c152,157
+<     private static function readFromProcess(string $command): ?string
+---
+>     /**
+>      * @param string $command
+>      *
+>      * @return string|null
+>      */
+>     private static function readFromProcess($command)
+152,155c163,166
 <         $descriptorspec = [
 <             1 => ['pipe', 'w'],
 <             2 => ['pipe', 'w'],
@@ -38,7 +70,7 @@
 >             1 => array('pipe', 'w'),
 >             2 => array('pipe', 'w'),
 >         );
-151c158
+157c168
 <         $process = proc_open($command, $descriptorspec, $pipes, null, null, ['suppress_errors' => true]);
 ---
 >         $process = proc_open($command, $descriptorspec, $pipes, null, null, array('suppress_errors' => true));

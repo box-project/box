@@ -70,7 +70,7 @@
         "infection/infection": "^0.10",
         "mikey179/vfsstream": "^1.6",
         "phpunit/phpunit": "^8.1",
-        "symfony/phpunit-bridge": "^4.2"
+        "symfony/phpunit-bridge": "^4.2 || ^5.0"
     },
     "suggest": {
         "ext-openssl": "To accelerate private key generation."
