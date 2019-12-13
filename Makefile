@@ -212,6 +212,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
 		| tee fixtures/php-settings-checker/actual-output || true
+	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
 	diff fixtures/php-settings-checker/output-all-clear fixtures/php-settings-checker/actual-output
 
 	@echo "$(CCYELLOW)Xdebug enabled: restart needed$(CCEND)"
@@ -220,6 +221,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
 		| tee fixtures/php-settings-checker/actual-output || true
+	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
 	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
 	diff fixtures/php-settings-checker/output-xdebug-enabled fixtures/php-settings-checker/actual-output
 
@@ -229,6 +231,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
 		| tee fixtures/php-settings-checker/actual-output || true
+	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
 	$(SED) "s/'-c' '.*' '\.\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
 	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
 	diff fixtures/php-settings-checker/output-pharreadonly-enabled fixtures/php-settings-checker/actual-output
@@ -239,6 +242,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
 		| tee fixtures/php-settings-checker/actual-output || true
+	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
 	$(SED) "s/'-c' '.*' '\.\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
 	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
 	diff fixtures/php-settings-checker/output-min-memory-limit fixtures/php-settings-checker/actual-output
@@ -249,6 +253,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
 		| tee fixtures/php-settings-checker/actual-output || true
+	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
 	$(SED) "s/'-c' '.*' '\.\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
 	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
 	diff fixtures/php-settings-checker/output-set-memory-limit fixtures/php-settings-checker/actual-output
