@@ -1,11 +1,11 @@
 <?php
 
-namespace HumbugBox383\Composer\Semver\Constraint;
+namespace HumbugBox384\Composer\Semver\Constraint;
 
-class EmptyConstraint implements \HumbugBox383\Composer\Semver\Constraint\ConstraintInterface
+class EmptyConstraint implements \HumbugBox384\Composer\Semver\Constraint\ConstraintInterface
 {
     protected $prettyString;
-    public function matches(\HumbugBox383\Composer\Semver\Constraint\ConstraintInterface $provider)
+    public function matches(\HumbugBox384\Composer\Semver\Constraint\ConstraintInterface $provider)
     {
         return \true;
     }
@@ -18,7 +18,7 @@ class EmptyConstraint implements \HumbugBox383\Composer\Semver\Constraint\Constr
         if ($this->prettyString) {
             return $this->prettyString;
         }
-        return $this->__toString();
+        return (string) $this;
     }
     public function __toString()
     {

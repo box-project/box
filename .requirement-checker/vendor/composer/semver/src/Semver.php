@@ -1,8 +1,8 @@
 <?php
 
-namespace HumbugBox383\Composer\Semver;
+namespace HumbugBox384\Composer\Semver;
 
-use HumbugBox383\Composer\Semver\Constraint\Constraint;
+use HumbugBox384\Composer\Semver\Constraint\Constraint;
 class Semver
 {
     const SORT_ASC = 1;
@@ -11,17 +11,17 @@ class Semver
     public static function satisfies($version, $constraints)
     {
         if (null === self::$versionParser) {
-            self::$versionParser = new \HumbugBox383\Composer\Semver\VersionParser();
+            self::$versionParser = new \HumbugBox384\Composer\Semver\VersionParser();
         }
         $versionParser = self::$versionParser;
-        $provider = new \HumbugBox383\Composer\Semver\Constraint\Constraint('==', $versionParser->normalize($version));
-        $constraints = $versionParser->parseConstraints($constraints);
-        return $constraints->matches($provider);
+        $provider = new \HumbugBox384\Composer\Semver\Constraint\Constraint('==', $versionParser->normalize($version));
+        $parsedConstraints = $versionParser->parseConstraints($constraints);
+        return $parsedConstraints->matches($provider);
     }
     public static function satisfiedBy(array $versions, $constraints)
     {
         $versions = \array_filter($versions, function ($version) use($constraints) {
-            return \HumbugBox383\Composer\Semver\Semver::satisfies($version, $constraints);
+            return \HumbugBox384\Composer\Semver\Semver::satisfies($version, $constraints);
         });
         return \array_values($versions);
     }
@@ -36,7 +36,7 @@ class Semver
     private static function usort(array $versions, $direction)
     {
         if (null === self::$versionParser) {
-            self::$versionParser = new \HumbugBox383\Composer\Semver\VersionParser();
+            self::$versionParser = new \HumbugBox384\Composer\Semver\VersionParser();
         }
         $versionParser = self::$versionParser;
         $normalized = array();
@@ -47,7 +47,7 @@ class Semver
             if ($left[0] === $right[0]) {
                 return 0;
             }
-            if (\HumbugBox383\Composer\Semver\Comparator::lessThan($left[0], $right[0])) {
+            if (\HumbugBox384\Composer\Semver\Comparator::lessThan($left[0], $right[0])) {
                 return -$direction;
             }
             return $direction;

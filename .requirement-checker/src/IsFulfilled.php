@@ -1,6 +1,6 @@
 <?php
 
-namespace HumbugBox383\KevinGH\RequirementChecker;
+namespace HumbugBox384\KevinGH\RequirementChecker;
 
 interface IsFulfilled
 {
