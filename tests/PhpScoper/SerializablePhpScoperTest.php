@@ -32,28 +32,15 @@ use function unserialize;
  */
 class SerializablePhpScoperTest extends TestCase
 {
-    /** @var PhpScoper&ObjectProphecy */
-    private $decoratedScoperProphecy;
-
-    /** @var PhpScoper */
-    private $decoratedScoper;
-
-    /** @var SerializablePhpScoper */
-    private $serializableScoper;
-
-    protected function setUp(): void
-    {
-        $this->decoratedScoperProphecy = $this->prophesize(Scoper::class);
-        $this->decoratedScoper = $decoratedScoper = $this->decoratedScoperProphecy->reveal();
-
-        $this->serializableScoper = new SerializablePhpScoper(static function () use ($decoratedScoper) {
-            return $decoratedScoper;
-        });
-    }
-
     public function test_it_exposes_the_decorated_scoper(): void
     {
-        $this->assertSame($this->decoratedScoper, $this->serializableScoper->getScoper());
+        $decoratedScoper = $this->createMock(Scoper::class);
+
+        $serializableScoper = new SerializablePhpScoper(static function () use ($decoratedScoper) {
+            return $decoratedScoper;
+        });
+
+        $this->assertSame($decoratedScoper, $serializableScoper->getScoper());
     }
 
     public function test_it_uses_the_decorated_scoper_to_scope_a_file(): void
