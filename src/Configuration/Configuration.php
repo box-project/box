@@ -390,7 +390,7 @@ BANNER;
         $privateKeyPath = self::retrievePrivateKeyPath($raw, $basePath, $signingAlgorithm, $logger);
         $privateKeyPassphrase = self::retrievePrivateKeyPassphrase($raw, $signingAlgorithm, $logger);
 
-        $replacements = self::retrieveReplacements($raw, $file, $logger);
+        $replacements = self::retrieveReplacements($raw, $file, $basePath, $logger);
 
         return new self(
             $file,
@@ -2206,8 +2206,12 @@ BANNER;
     /**
      * @return scalar[]
      */
-    private static function retrieveReplacements(stdClass $raw, ?string $file, ConfigurationLogger $logger): array
-    {
+    private static function retrieveReplacements(
+        stdClass $raw,
+        ?string $file,
+        string $path,
+        ConfigurationLogger $logger
+    ): array {
         self::checkIfDefaultValue($logger, $raw, self::REPLACEMENTS_KEY, new stdClass());
 
         if (null === $file) {
@@ -2217,23 +2221,23 @@ BANNER;
         $replacements = isset($raw->{self::REPLACEMENTS_KEY}) ? (array) $raw->{self::REPLACEMENTS_KEY} : [];
 
         if (null !== ($git = self::retrievePrettyGitPlaceholder($raw, $logger))) {
-            $replacements[$git] = self::retrievePrettyGitTag($file);
+            $replacements[$git] = self::retrievePrettyGitTag($path);
         }
 
         if (null !== ($git = self::retrieveGitHashPlaceholder($raw, $logger))) {
-            $replacements[$git] = self::retrieveGitHash($file);
+            $replacements[$git] = self::retrieveGitHash($path);
         }
 
         if (null !== ($git = self::retrieveGitShortHashPlaceholder($raw, $logger))) {
-            $replacements[$git] = self::retrieveGitHash($file, true);
+            $replacements[$git] = self::retrieveGitHash($path, true);
         }
 
         if (null !== ($git = self::retrieveGitTagPlaceholder($raw, $logger))) {
-            $replacements[$git] = self::retrieveGitTag($file);
+            $replacements[$git] = self::retrieveGitTag($path);
         }
 
         if (null !== ($git = self::retrieveGitVersionPlaceholder($raw, $logger))) {
-            $replacements[$git] = self::retrieveGitVersion($file);
+            $replacements[$git] = self::retrieveGitVersion($path);
         }
 
         /**
@@ -2279,14 +2283,14 @@ BANNER;
      *
      * @return string the commit hash
      */
-    private static function retrieveGitHash(string $file, bool $short = false): string
+    private static function retrieveGitHash(string $path, bool $short = false): string
     {
         return self::runGitCommand(
             sprintf(
                 'git log --pretty="%s" -n1 HEAD',
                 $short ? '%h' : '%H'
             ),
-            $file
+            $path
         );
     }
 
@@ -2307,14 +2311,14 @@ BANNER;
         return $raw->{$key} ?? null;
     }
 
-    private static function retrieveGitTag(string $file): string
+    private static function retrieveGitTag(string $path): string
     {
-        return self::runGitCommand('git describe --tags HEAD', $file);
+        return self::runGitCommand('git describe --tags HEAD', $path);
     }
 
-    private static function retrievePrettyGitTag(string $file): string
+    private static function retrievePrettyGitTag(string $path): string
     {
-        $version = self::retrieveGitTag($file);
+        $version = self::retrieveGitTag($path);
 
         if (preg_match('/^(?<tag>.+)-\d+-g(?<hash>[a-f0-9]{7})$/', $version, $matches)) {
             return sprintf('%s@%s', $matches['tag'], $matches['hash']);
@@ -2328,18 +2332,18 @@ BANNER;
         return self::retrievePlaceholder($raw, $logger, self::GIT_VERSION_KEY);
     }
 
-    private static function retrieveGitVersion(string $file): ?string
+    private static function retrieveGitVersion(string $path): ?string
     {
         try {
-            return self::retrieveGitTag($file);
+            return self::retrieveGitTag($path);
         } catch (RuntimeException $exception) {
             try {
-                return self::retrieveGitHash($file, true);
+                return self::retrieveGitHash($path, true);
             } catch (RuntimeException $exception) {
                 throw new RuntimeException(
                     sprintf(
                         'The tag or commit hash could not be retrieved from "%s": %s',
-                        dirname($file),
+                        $path,
                         $exception->getMessage()
                     ),
                     0,
@@ -2714,10 +2718,8 @@ BANNER;
      *
      * @return string The trimmed output from the command
      */
-    private static function runGitCommand(string $command, string $file): string
+    private static function runGitCommand(string $command, string $path): string
     {
-        $path = dirname($file);
-
         $process = Process::fromShellCommandline($command, $path);
 
         if (0 === $process->run()) {
