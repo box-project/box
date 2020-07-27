@@ -15,9 +15,11 @@ declare(strict_types=1);
 namespace KevinGH\RequirementChecker;
 
 use Generator;
+use function function_exists;
 use function getenv;
 use function in_array;
 use PHPUnit\Framework\TestCase;
+use function posix_isatty;
 use function putenv;
 
 /**
@@ -25,21 +27,16 @@ use function putenv;
  */
 class IOTest extends TestCase
 {
-    private static $defaultExpectedInteractive;
-    
     private static function getDefaultInteractive(): bool
     {
-        // @see https://github.com/travis-ci/travis-ci/issues/7967
-        // When a secure env var is present, the TTY is not passed correctly. The output is no longer interactive and
-        // colored.
-        if (null === self::$defaultExpectedInteractive) {
-            self::$defaultExpectedInteractive = false === in_array(getenv('CI'), [false, 'false'], true)
-                ? 'true' !== getenv('TRAVIS_SECURE_ENV_VARS')
-                : true
-            ;
+        if (function_exists('posix_isatty')
+            && !@posix_isatty(STDOUT)
+            && false === getenv('SHELL_INTERACTIVE')
+        ) {
+            return false;
         }
         
-        return self::$defaultExpectedInteractive;
+        return true;
     }
 
     /**

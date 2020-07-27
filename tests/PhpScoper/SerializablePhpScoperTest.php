@@ -20,10 +20,8 @@ use Exception;
 use Generator;
 use Humbug\PhpScoper\Scoper;
 use Humbug\PhpScoper\Scoper\NullScoper;
-use Humbug\PhpScoper\Scoper\PhpScoper;
 use Humbug\PhpScoper\Whitelist;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Prophecy\ObjectProphecy;
 use function serialize;
 use function unserialize;
 
@@ -32,28 +30,13 @@ use function unserialize;
  */
 class SerializablePhpScoperTest extends TestCase
 {
-    /** @var PhpScoper&ObjectProphecy */
-    private $decoratedScoperProphecy;
-
-    /** @var PhpScoper */
-    private $decoratedScoper;
-
-    /** @var SerializablePhpScoper */
-    private $serializableScoper;
-
-    protected function setUp(): void
-    {
-        $this->decoratedScoperProphecy = $this->prophesize(Scoper::class);
-        $this->decoratedScoper = $decoratedScoper = $this->decoratedScoperProphecy->reveal();
-
-        $this->serializableScoper = new SerializablePhpScoper(static function () use ($decoratedScoper) {
-            return $decoratedScoper;
-        });
-    }
-
     public function test_it_exposes_the_decorated_scoper(): void
     {
-        $this->assertSame($this->decoratedScoper, $this->serializableScoper->getScoper());
+        $decoratedScoper = new DummyScoper();
+        $scoper = new SerializablePhpScoper(static function () use ($decoratedScoper) {
+            return $decoratedScoper;
+        });
+        $this->assertSame($decoratedScoper, $scoper->getScoper());
     }
 
     public function test_it_uses_the_decorated_scoper_to_scope_a_file(): void
