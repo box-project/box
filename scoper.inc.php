@@ -88,10 +88,42 @@ return [
                 return $contents;
             }
 
+            $contents = preg_replace(
+                '/\\\\defined\\("SODIUM_{\\$constant}"\\) && \\\\defined\\("ParagonIE_Sodium_Compat::{\\$constant}"\\)\\)/',
+                sprintf(
+                    '\defined("SODIUM_{$constant}") && \defined("%s\\ParagonIE_Sodium_Compat::{$constant}"))',
+                    $prefix
+                ),
+                $contents
+            );
+
             return preg_replace(
                 '/\\\\define\\("SODIUM_{\\$constant}", \\\\constant\\("ParagonIE_Sodium_Compat::{\\$constant}"\\)\\);/',
                 sprintf(
                     '\define("SODIUM_{$constant}", \constant("%s\\ParagonIE_Sodium_Compat::{$constant}"));',
+                    $prefix
+                ),
+                $contents
+            );
+        },
+        // Paragonie sodium compat
+        static function (string $filePath, string $prefix, string $contents): string {
+            if ('vendor/paragonie/sodium_compat/lib/sodium_compat.php' !== $filePath) {
+                return $contents;
+            }
+
+            // Fix wrong autoloading in Paragonie
+            $contents = str_replace(
+                'require_once \dirname(__FILE__) . \'/constants.php\';',
+                'require_once \dirname(\dirname(__FILE__)) . \'/src/Compat.php\';'
+                . 'require_once \dirname(__FILE__) . \'/constants.php\';',
+                $contents
+            );
+
+            return preg_replace(
+                '/\\\\\\\\Sodium\\\\\\\\CRYPTO_AUTH_BYTES/',
+                sprintf(
+                    '%s\\\\\\\\Sodium\\\\\\\\CRYPTO_AUTH_BYTES',
                     $prefix
                 ),
                 $contents

@@ -1431,6 +1431,79 @@ JSON
         $this->assertSame([], $this->config->getWarnings());
     }
 
+    public function test_the_replacement_map_can_be_configured_when_base_path_is_different_directory(): void
+    {
+        // Make another directory level to have config not in base-path.
+        $basePath = $this->tmp . DIRECTORY_SEPARATOR . 'subdir';
+        mkdir($basePath);
+        rename(self::DEFAULT_FILE, $basePath . DIRECTORY_SEPARATOR . self::DEFAULT_FILE);
+        chdir($basePath);
+        touch('test');
+        exec('git init');
+        exec('git config user.name "Test User"');
+        exec('git config user.email test@test.test');
+        exec('git config commit.gpgsign false');
+        exec('git add test');
+        exec('git commit -m "Adding test file."');
+        exec('git tag 1.0.0');
+        chdir($this->tmp);
+
+        $this->setConfig([
+            'base-path' => $basePath,
+            'files' => [self::DEFAULT_FILE],
+            'git' => 'git',
+            'git-commit' => 'git_commit',
+            'git-commit-short' => 'git_commit_short',
+            'git-tag' => 'git_tag',
+            'git-version' => 'git_version',
+        ]);
+
+        $values = $this->config->getReplacements();
+
+        $this->assertSame('1.0.0', $values['@git@']);
+        $this->assertRegExp('/^[a-f0-9]{40}$/', $values['@git_commit@']);
+        $this->assertRegExp('/^[a-f0-9]{7}$/', $values['@git_commit_short@']);
+        $this->assertSame('1.0.0', $values['@git_tag@']);
+        $this->assertSame('1.0.0', $values['@git_version@']);
+        $this->assertCount(5, $values);
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+
+        chdir($basePath);
+        touch('foo');
+        exec('git add foo');
+        exec('git commit -m "Adding another test file."');
+        chdir($this->tmp);
+
+        $this->setConfig([
+            'base-path' => $basePath,
+            'files' => [self::DEFAULT_FILE],
+            'git' => 'git',
+            'git-commit' => 'git_commit',
+            'git-commit-short' => 'git_commit_short',
+            'git-tag' => 'git_tag',
+            'git-version' => 'git_version',
+        ]);
+
+        $values = $this->config->getReplacements();
+
+        $this->assertRegExp('/^.+@[a-f0-9]{7}$/', $values['@git@']);
+        $this->assertRegExp('/^[a-f0-9]{40}$/', $values['@git_commit@']);
+        $this->assertRegExp('/^[a-f0-9]{7}$/', $values['@git_commit_short@']);
+        $this->assertRegExp('/^.+-\d+-g[a-f0-9]{7}$/', $values['@git_tag@']);
+        $this->assertRegExp('/^.+-\d+-g[a-f0-9]{7}$/', $values['@git_version@']);
+        $this->assertCount(5, $values);
+
+        // Some process does not release the git files
+        if ($this->isWindows()) {
+            exec('rd /S /Q .git');
+        }
+
+        $this->assertSame([], $this->config->getRecommendations());
+        $this->assertSame([], $this->config->getWarnings());
+    }
+
     public function test_a_recommendation_is_given_if_the_default_replacements_setting_is_provided(): void
     {
         $this->setConfig([
