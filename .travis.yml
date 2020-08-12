@@ -27,7 +27,7 @@ matrix:
     - php: '7.3'
       env: COVERAGE='true'
     - php: '7.4'
-      env: COMPOSER_VERSION='2'
+      env: COMPOSER_VERSION='snapshot'
   allow_failures:
     - php: nightly
   fast_finish: true
