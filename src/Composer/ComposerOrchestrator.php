@@ -48,7 +48,11 @@ final class ComposerOrchestrator
         $getVersionProcess->run();
 
         if (false === $getVersionProcess->isSuccessful()) {
-            new ProcessFailedException($getVersionProcess);
+            throw new RuntimeException(
+                'Could not determine the Composer version.',
+                0,
+                new ProcessFailedException($getVersionProcess)
+            );
         }
 
         $output = $getVersionProcess->getOutput();
@@ -198,7 +202,11 @@ final class ComposerOrchestrator
         $vendorDirProcess->run();
 
         if (false === $vendorDirProcess->isSuccessful()) {
-            new ProcessFailedException($vendorDirProcess);
+            throw new RuntimeException(
+                'Could not retrieve the vendor dir.',
+                0,
+                new ProcessFailedException($vendorDirProcess)
+            );
         }
 
         return trim($vendorDirProcess->getOutput()).'/autoload.php';
