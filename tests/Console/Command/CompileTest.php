@@ -942,9 +942,11 @@ OUTPUT;
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
         $numberOfClasses = 0;
+        $numberOfFiles = 41;
         if (self::$runComposer2) {
             // From Composer 2 there is one more class: Composer\InstalledVersions
             $numberOfClasses++;
+            $numberOfFiles++;
         }
 
         dump_file(
@@ -1040,7 +1042,7 @@ Generated optimized autoload files (authoritative) containing $numberOfClasses c
 No recommendation found.
 No warning found.
 
- // PHAR: 41 files (100B)
+ // PHAR: $numberOfFiles files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
