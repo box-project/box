@@ -121,10 +121,10 @@ class CompileTest extends CommandTestCase
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
-        $numberOfClasses = 41;
+        $numberOfFiles = 41;
         if (self::$runComposer2) {
             // From Composer 2 there is one more class: Composer\InstalledVersions
-            $numberOfClasses++;
+            $numberOfFiles++;
         }
 
         dump_file(
@@ -209,7 +209,7 @@ Box version 3.x-dev@151e40a
 No recommendation found.
 No warning found.
 
- // PHAR: $numberOfClasses files (100B)
+ // PHAR: $numberOfFiles files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -391,10 +391,10 @@ PHP;
 
         $version = get_box_version();
 
-        $numberOfClasses = 45;
+        $numberOfFiles = 45;
         if (self::$runComposer2) {
             // From Composer 2 there is one more class: Composer\InstalledVersions
-            $numberOfClasses++;
+            $numberOfFiles++;
         }
 
         $expected = <<<OUTPUT
@@ -436,7 +436,7 @@ Box version 3.x-dev@151e40a
 No recommendation found.
 No warning found.
 
- // PHAR: $numberOfClasses files (100B)
+ // PHAR: $numberOfFiles files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -820,9 +820,11 @@ PHP;
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
         $numberOfClasses = 0;
+        $numberOfFiles = 41;
         if (self::$runComposer2) {
             // From Composer 2 there is one more class: Composer\InstalledVersions
             $numberOfClasses++;
+            $numberOfFiles++;
         }
 
         dump_file(
@@ -914,7 +916,7 @@ Generated optimized autoload files (authoritative) containing $numberOfClasses c
 No recommendation found.
 No warning found.
 
- // PHAR: 41 files (100B)
+ // PHAR: $numberOfFiles files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -2898,10 +2900,10 @@ OUTPUT;
 
         $version = get_box_version();
 
-        $numberOfClasses = 37;
+        $numberOfFiles = 37;
         if (self::$runComposer2) {
             // From Composer 2 there is one more class: Composer\InstalledVersions
-            $numberOfClasses++;
+            $numberOfFiles++;
         }
 
         $expected = <<<OUTPUT
@@ -2943,7 +2945,7 @@ Box version 3.x-dev@151e40a
 No recommendation found.
 No warning found.
 
- // PHAR: $numberOfClasses files (100B)
+ // PHAR: $numberOfFiles files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
