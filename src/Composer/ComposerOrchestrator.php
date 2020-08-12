@@ -38,6 +38,28 @@ final class ComposerOrchestrator
 {
     use NotInstantiable;
 
+    public static function getVersion(): string
+    {
+        $composerExecutable = self::retrieveComposerExecutable();
+        $command = [$composerExecutable, '--version'];
+
+        $getVersionProcess = new Process($command);
+
+        $getVersionProcess->run();
+
+        if (false === $getVersionProcess->isSuccessful()) {
+            new ProcessFailedException($getVersionProcess);
+        }
+
+        $output = $getVersionProcess->getOutput();
+
+        if (preg_match('/^Composer version ([^\\s]+)/', $output, $match) > 0) {
+            return $match[1];
+        }
+
+        throw new RuntimeException('Could not determine the Composer version.');
+    }
+
     public static function dumpAutoload(
         Whitelist $whitelist,
         string $prefix,

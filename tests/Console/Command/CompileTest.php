@@ -31,6 +31,7 @@ use function json_decode;
 use function json_encode;
 use const JSON_PRETTY_PRINT;
 use KevinGH\Box\Compactor\Php;
+use KevinGH\Box\Composer\ComposerOrchestrator;
 use KevinGH\Box\Console\DisplayNormalizer;
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -782,6 +783,12 @@ PHP;
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
+        $numberOfClasses = 0;
+        if (version_compare(ComposerOrchestrator::getVersion(), '2', '>=')) {
+            // From Composer 2 there is always at least 1 class: Composer\InstalledVersions
+            $numberOfClasses = 1;
+        }
+
         dump_file(
             'box.json',
             json_encode(
@@ -856,7 +863,7 @@ Box version 3.x-dev@151e40a
 ? Dumping the Composer autoloader
     > '/usr/local/bin/composer' 'dump-autoload' '--classmap-authoritative' '--no-dev'
 Generating optimized autoload files (authoritative)
-Generated optimized autoload files (authoritative) containing 0 classes
+Generated optimized autoload files (authoritative) containing $numberOfClasses classes
 
 ? Removing the Composer dump artefacts
 ? No compression
@@ -895,6 +902,12 @@ OUTPUT;
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
+
+        $numberOfClasses = 0;
+        if (version_compare(ComposerOrchestrator::getVersion(), '2', '>=')) {
+            // From Composer 2 there is always at least 1 class: Composer\InstalledVersions
+            $numberOfClasses = 1;
+        }
 
         dump_file(
             'box.json',
@@ -974,7 +987,7 @@ Box version 3.x-dev@151e40a
 ? Dumping the Composer autoloader
     > '/usr/local/bin/composer' 'dump-autoload' '--classmap-authoritative' '--no-dev' '-v'
 Generating optimized autoload files (authoritative)
-Generated optimized autoload files (authoritative) containing 0 classes
+Generated optimized autoload files (authoritative) containing $numberOfClasses classes
 
 ? Removing the Composer dump artefacts
 ? No compression
