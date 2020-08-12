@@ -26,7 +26,7 @@ matrix:
       env: PHAR_READONLY='true'
     - php: '7.3'
       env: COVERAGE='true'
-    - php: '7.4'
+    - php: '7.3'
       env: COMPOSER_VERSION='snapshot'
   allow_failures:
     - php: nightly
