@@ -111,6 +111,12 @@ class CompileTest extends CommandTestCase
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
+        $numberOfClasses = 41;
+        if (version_compare(ComposerOrchestrator::getVersion(), '2', '>=')) {
+            // From Composer 2 there is one more class: Composer\InstalledVersions
+            $numberOfClasses++;
+        }
+
         dump_file(
             'box.json',
             json_encode(
@@ -193,7 +199,7 @@ Box version 3.x-dev@151e40a
 No recommendation found.
 No warning found.
 
- // PHAR: 41 files (100B)
+ // PHAR: $numberOfClasses files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
