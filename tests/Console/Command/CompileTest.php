@@ -79,6 +79,16 @@ class CompileTest extends CommandTestCase
 
     private const FIXTURES_DIR = __DIR__.'/../../../fixtures/build';
 
+    private static $runComposer2 = false;
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function setUpBeforeClass(): void
+    {
+        self::$runComposer2 = version_compare(ComposerOrchestrator::getVersion(), '2', '>=');
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -112,7 +122,7 @@ class CompileTest extends CommandTestCase
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
         $numberOfClasses = 41;
-        if (version_compare(ComposerOrchestrator::getVersion(), '2', '>=')) {
+        if (self::$runComposer2) {
             // From Composer 2 there is one more class: Composer\InstalledVersions
             $numberOfClasses++;
         }
@@ -274,6 +284,7 @@ PHP;
             '/.box/vendor/composer/autoload_psr4.php',
             '/.box/vendor/composer/autoload_real.php',
             '/.box/vendor/composer/autoload_static.php',
+            '/.box/vendor/composer/platform_check.php',
             '/.box/vendor/composer/semver/',
             '/.box/vendor/composer/semver/LICENSE',
             '/.box/vendor/composer/semver/src/',
@@ -305,6 +316,12 @@ PHP;
             '/vendor/composer/autoload_real.php',
             '/vendor/composer/autoload_static.php',
         ];
+
+        if (!self::$runComposer2) {
+            $expectedFiles = array_values(array_filter($expectedFiles, static function ($file): bool {
+                return $file !== '/.box/vendor/composer/platform_check.php';
+            }));
+        }
 
         $actualFiles = $this->retrievePharFiles($phar);
 
@@ -375,7 +392,7 @@ PHP;
         $version = get_box_version();
 
         $numberOfClasses = 45;
-        if (version_compare(ComposerOrchestrator::getVersion(), '2', '>=')) {
+        if (self::$runComposer2) {
             // From Composer 2 there is one more class: Composer\InstalledVersions
             $numberOfClasses++;
         }
@@ -500,6 +517,7 @@ PHP;
             '/.box/vendor/composer/autoload_psr4.php',
             '/.box/vendor/composer/autoload_real.php',
             '/.box/vendor/composer/autoload_static.php',
+            '/.box/vendor/composer/platform_check.php',
             '/.box/vendor/composer/semver/',
             '/.box/vendor/composer/semver/LICENSE',
             '/.box/vendor/composer/semver/src/',
@@ -534,6 +552,12 @@ PHP;
             '/vendor/composer/autoload_real.php',
             '/vendor/composer/autoload_static.php',
         ];
+
+        if (!self::$runComposer2) {
+            $expectedFiles = array_values(array_filter($expectedFiles, static function ($file): bool {
+                return $file !== '/.box/vendor/composer/platform_check.php';
+            }));
+        }
 
         $actualFiles = $this->retrievePharFiles($phar);
 
@@ -796,7 +820,7 @@ PHP;
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
         $numberOfClasses = 0;
-        if (version_compare(ComposerOrchestrator::getVersion(), '2', '>=')) {
+        if (self::$runComposer2) {
             // From Composer 2 there is one more class: Composer\InstalledVersions
             $numberOfClasses++;
         }
@@ -916,7 +940,7 @@ OUTPUT;
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
         $numberOfClasses = 0;
-        if (version_compare(ComposerOrchestrator::getVersion(), '2', '>=')) {
+        if (self::$runComposer2) {
             // From Composer 2 there is one more class: Composer\InstalledVersions
             $numberOfClasses++;
         }
@@ -2875,7 +2899,7 @@ OUTPUT;
         $version = get_box_version();
 
         $numberOfClasses = 37;
-        if (version_compare(ComposerOrchestrator::getVersion(), '2', '>=')) {
+        if (self::$runComposer2) {
             // From Composer 2 there is one more class: Composer\InstalledVersions
             $numberOfClasses++;
         }
