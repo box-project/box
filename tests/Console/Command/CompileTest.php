@@ -3016,6 +3016,18 @@ OUTPUT;
             $display
         );
 
+        $display = preg_replace(
+            '/\[debug\] Increased the maximum number of open file descriptors from \([^\)]+\) to \([^\)]+\)' . PHP_EOL . '/',
+            '',
+            $display
+        );
+
+        $display = str_replace(
+            '[debug] Restored the maximum number of open file descriptors' . PHP_EOL,
+            '',
+            $display
+        );
+
         return DisplayNormalizer::removeTrailingSpaces($display);
     }
 

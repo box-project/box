@@ -24,9 +24,9 @@ matrix:
       env: DEPLOY=true
     - php: '7.3'
       env: PHAR_READONLY='true'
-    - php: '7.3'
+    - php: '7.4'
       env: COVERAGE='true'
-    - php: '7.3'
+    - php: '7.4'
       env: COMPOSER_VERSION='snapshot'
   allow_failures:
     - php: nightly
