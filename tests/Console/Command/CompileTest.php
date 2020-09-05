@@ -31,6 +31,7 @@ use function json_decode;
 use function json_encode;
 use const JSON_PRETTY_PRINT;
 use KevinGH\Box\Compactor\Php;
+use KevinGH\Box\Composer\ComposerOrchestrator;
 use KevinGH\Box\Console\DisplayNormalizer;
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -78,6 +79,16 @@ class CompileTest extends CommandTestCase
 
     private const FIXTURES_DIR = __DIR__.'/../../../fixtures/build';
 
+    private static $runComposer2 = false;
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function setUpBeforeClass(): void
+    {
+        self::$runComposer2 = version_compare(ComposerOrchestrator::getVersion(), '2', '>=');
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -109,6 +120,12 @@ class CompileTest extends CommandTestCase
         dump_file('vendor/composer/installed.json', '{}');
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
+
+        $numberOfFiles = 41;
+        if (self::$runComposer2) {
+            // From Composer 2 there is one more class: Composer\InstalledVersions
+            $numberOfFiles++;
+        }
 
         dump_file(
             'box.json',
@@ -192,7 +209,7 @@ Box version 3.x-dev@151e40a
 No recommendation found.
 No warning found.
 
- // PHAR: 41 files (100B)
+ // PHAR: $numberOfFiles files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -267,6 +284,7 @@ PHP;
             '/.box/vendor/composer/autoload_psr4.php',
             '/.box/vendor/composer/autoload_real.php',
             '/.box/vendor/composer/autoload_static.php',
+            '/.box/vendor/composer/platform_check.php',
             '/.box/vendor/composer/semver/',
             '/.box/vendor/composer/semver/LICENSE',
             '/.box/vendor/composer/semver/src/',
@@ -298,6 +316,12 @@ PHP;
             '/vendor/composer/autoload_real.php',
             '/vendor/composer/autoload_static.php',
         ];
+
+        if (!self::$runComposer2) {
+            $expectedFiles = array_values(array_filter($expectedFiles, static function ($file): bool {
+                return $file !== '/.box/vendor/composer/platform_check.php';
+            }));
+        }
 
         $actualFiles = $this->retrievePharFiles($phar);
 
@@ -367,6 +391,12 @@ PHP;
 
         $version = get_box_version();
 
+        $numberOfFiles = 45;
+        if (self::$runComposer2) {
+            // From Composer 2 there is one more class: Composer\InstalledVersions
+            $numberOfFiles++;
+        }
+
         $expected = <<<OUTPUT
 
     ____
@@ -406,7 +436,7 @@ Box version 3.x-dev@151e40a
 No recommendation found.
 No warning found.
 
- // PHAR: 45 files (100B)
+ // PHAR: $numberOfFiles files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -487,6 +517,7 @@ PHP;
             '/.box/vendor/composer/autoload_psr4.php',
             '/.box/vendor/composer/autoload_real.php',
             '/.box/vendor/composer/autoload_static.php',
+            '/.box/vendor/composer/platform_check.php',
             '/.box/vendor/composer/semver/',
             '/.box/vendor/composer/semver/LICENSE',
             '/.box/vendor/composer/semver/src/',
@@ -521,6 +552,12 @@ PHP;
             '/vendor/composer/autoload_real.php',
             '/vendor/composer/autoload_static.php',
         ];
+
+        if (!self::$runComposer2) {
+            $expectedFiles = array_values(array_filter($expectedFiles, static function ($file): bool {
+                return $file !== '/.box/vendor/composer/platform_check.php';
+            }));
+        }
 
         $actualFiles = $this->retrievePharFiles($phar);
 
@@ -782,6 +819,14 @@ PHP;
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
+        $numberOfClasses = 0;
+        $numberOfFiles = 41;
+        if (self::$runComposer2) {
+            // From Composer 2 there is one more class: Composer\InstalledVersions
+            $numberOfClasses++;
+            $numberOfFiles++;
+        }
+
         dump_file(
             'box.json',
             json_encode(
@@ -856,7 +901,7 @@ Box version 3.x-dev@151e40a
 ? Dumping the Composer autoloader
     > '/usr/local/bin/composer' 'dump-autoload' '--classmap-authoritative' '--no-dev'
 Generating optimized autoload files (authoritative)
-Generated optimized autoload files (authoritative) containing 0 classes
+Generated optimized autoload files (authoritative) containing $numberOfClasses classes
 
 ? Removing the Composer dump artefacts
 ? No compression
@@ -871,7 +916,7 @@ Generated optimized autoload files (authoritative) containing 0 classes
 No recommendation found.
 No warning found.
 
- // PHAR: 41 files (100B)
+ // PHAR: $numberOfFiles files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -895,6 +940,14 @@ OUTPUT;
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
+
+        $numberOfClasses = 0;
+        $numberOfFiles = 41;
+        if (self::$runComposer2) {
+            // From Composer 2 there is one more class: Composer\InstalledVersions
+            $numberOfClasses++;
+            $numberOfFiles++;
+        }
 
         dump_file(
             'box.json',
@@ -974,7 +1027,7 @@ Box version 3.x-dev@151e40a
 ? Dumping the Composer autoloader
     > '/usr/local/bin/composer' 'dump-autoload' '--classmap-authoritative' '--no-dev' '-v'
 Generating optimized autoload files (authoritative)
-Generated optimized autoload files (authoritative) containing 0 classes
+Generated optimized autoload files (authoritative) containing $numberOfClasses classes
 
 ? Removing the Composer dump artefacts
 ? No compression
@@ -989,7 +1042,7 @@ Generated optimized autoload files (authoritative) containing 0 classes
 No recommendation found.
 No warning found.
 
- // PHAR: 41 files (100B)
+ // PHAR: $numberOfFiles files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -2849,6 +2902,12 @@ OUTPUT;
 
         $version = get_box_version();
 
+        $numberOfFiles = 37;
+        if (self::$runComposer2) {
+            // From Composer 2 there is one more class: Composer\InstalledVersions
+            $numberOfFiles++;
+        }
+
         $expected = <<<OUTPUT
 
     ____
@@ -2888,7 +2947,7 @@ Box version 3.x-dev@151e40a
 No recommendation found.
 No warning found.
 
- // PHAR: 37 files (100B)
+ // PHAR: $numberOfFiles files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -2954,6 +3013,18 @@ OUTPUT;
         $display = str_replace(
             'Xdebug',
             'xdebug',
+            $display
+        );
+
+        $display = preg_replace(
+            '/\[debug\] Increased the maximum number of open file descriptors from \([^\)]+\) to \([^\)]+\)' . PHP_EOL . '/',
+            '',
+            $display
+        );
+
+        $display = str_replace(
+            '[debug] Restored the maximum number of open file descriptors' . PHP_EOL,
+            '',
             $display
         );
 

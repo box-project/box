@@ -11,7 +11,8 @@ cache:
 
 env:
   global:
-    secure: "S7EIgyCsWVhv8ppi5t7FhbBQ6eo9Hn+ZpXNIoZ0t1EX0qMKdG1idKGtb6NIO1YDG8cVy1KkPBOUde32Bk62PVK0dDYlD0bH9CczPRt8Fi3BP/t+6uLgXuweOpWNgoy/41nONO4hIOUxL4cWgfeqI6ajuCHa0hF/dD3mbUPH+FU0/mnggWxaUfDWplPqmkiYjyC/CUm4F3ixtXryG+GYQkl8uDNou0bDuLBCuzDYN98AFNEqsj4auWo70nU4mKmEzHjSz7dpLnGmEDA0c/4XuMilsucYyvaZDjQzTro4tMAyg0d/4F0l/njWKIuydRWCMG9NzuyXfVU4hiybLgaQJauM3p/k9jdBKNBk1AMTXmm2uuyFkP+hsH4tIUtuGOym5HM1FMH56Fd95JVN9f1eRGHxKLbOf4dO8COxiyGXRI+FUzpAZrsygA28vQ/JSTIPaBVnsk73MSlUQRGO4SymKABvM3ntzaPEhuaPu/e6q826yJQ9SLlUa4Iw5N8HBlkPPDxuyeDYQkhMNBJrg7rJ0E8g3kGrckW+exIqIjr6FGaL82i7yLmtC+lpZ34rC3UbuYbYtgN/k6A1e3K4OSEybuSkFWVScK+9P5JYVQOP+c14rom3cbBFikG0pwc+TEyjWKkOQKwRHBXyih+60OhbcwShrUxiRGwyuFAZt5jVqyKw="
+    - COMPOSER_VERSION='1'
+    - secure: "S7EIgyCsWVhv8ppi5t7FhbBQ6eo9Hn+ZpXNIoZ0t1EX0qMKdG1idKGtb6NIO1YDG8cVy1KkPBOUde32Bk62PVK0dDYlD0bH9CczPRt8Fi3BP/t+6uLgXuweOpWNgoy/41nONO4hIOUxL4cWgfeqI6ajuCHa0hF/dD3mbUPH+FU0/mnggWxaUfDWplPqmkiYjyC/CUm4F3ixtXryG+GYQkl8uDNou0bDuLBCuzDYN98AFNEqsj4auWo70nU4mKmEzHjSz7dpLnGmEDA0c/4XuMilsucYyvaZDjQzTro4tMAyg0d/4F0l/njWKIuydRWCMG9NzuyXfVU4hiybLgaQJauM3p/k9jdBKNBk1AMTXmm2uuyFkP+hsH4tIUtuGOym5HM1FMH56Fd95JVN9f1eRGHxKLbOf4dO8COxiyGXRI+FUzpAZrsygA28vQ/JSTIPaBVnsk73MSlUQRGO4SymKABvM3ntzaPEhuaPu/e6q826yJQ9SLlUa4Iw5N8HBlkPPDxuyeDYQkhMNBJrg7rJ0E8g3kGrckW+exIqIjr6FGaL82i7yLmtC+lpZ34rC3UbuYbYtgN/k6A1e3K4OSEybuSkFWVScK+9P5JYVQOP+c14rom3cbBFikG0pwc+TEyjWKkOQKwRHBXyih+60OhbcwShrUxiRGwyuFAZt5jVqyKw="
   matrix:
     - COMPOSER_FLAGS='--no-interaction --no-progress --no-suggest --prefer-dist'
 
@@ -23,8 +24,10 @@ matrix:
       env: DEPLOY=true
     - php: '7.3'
       env: PHAR_READONLY='true'
-    - php: '7.3'
+    - php: '7.4'
       env: COVERAGE='true'
+    - php: '7.4'
+      env: COMPOSER_VERSION='snapshot'
   allow_failures:
     - php: nightly
   fast_finish: true
@@ -36,6 +39,7 @@ before_install:
     fi
   - set -eo pipefail
   - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+  - composer self-update --$COMPOSER_VERSION --no-interaction
   - composer validate
   - |
     if [ "DEPLOY" != "true" ]; then

@@ -38,6 +38,32 @@ final class ComposerOrchestrator
 {
     use NotInstantiable;
 
+    public static function getVersion(): string
+    {
+        $composerExecutable = self::retrieveComposerExecutable();
+        $command = [$composerExecutable, '--version'];
+
+        $getVersionProcess = new Process($command);
+
+        $getVersionProcess->run();
+
+        if (false === $getVersionProcess->isSuccessful()) {
+            throw new RuntimeException(
+                'Could not determine the Composer version.',
+                0,
+                new ProcessFailedException($getVersionProcess)
+            );
+        }
+
+        $output = $getVersionProcess->getOutput();
+
+        if (preg_match('/^Composer version ([^\\s]+)/', $output, $match) > 0) {
+            return $match[1];
+        }
+
+        throw new RuntimeException('Could not determine the Composer version.');
+    }
+
     public static function dumpAutoload(
         Whitelist $whitelist,
         string $prefix,
@@ -176,7 +202,11 @@ final class ComposerOrchestrator
         $vendorDirProcess->run();
 
         if (false === $vendorDirProcess->isSuccessful()) {
-            new ProcessFailedException($vendorDirProcess);
+            throw new RuntimeException(
+                'Could not retrieve the vendor dir.',
+                0,
+                new ProcessFailedException($vendorDirProcess)
+            );
         }
 
         return trim($vendorDirProcess->getOutput()).'/autoload.php';
