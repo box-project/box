@@ -6,7 +6,8 @@
          beStrictAboutOutputDuringTests="true"
          beStrictAboutResourceUsageDuringSmallTests="true"
          beStrictAboutCoversAnnotation="true"
-         colors="true">
+         colors="true"
+         failOnWarning="true">
 
     <php>
         <env name="BOX_ALLOW_XDEBUG" value="1"/>
