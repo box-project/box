@@ -261,7 +261,10 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 .PHONY: e2e_symfony
 e2e_symfony:		 ## Packages a fresh Symfony app
 e2e_symfony: fixtures/build/dir012/vendor box
+	# for some reason DotEnv is not autoloaded when 'dump-env' runs
+	composer global require symfony/dotenv
 	composer dump-env prod --working-dir fixtures/build/dir012
+	composer global remove symfony/dotenv
 
 	APP_ENV=prod APP_DEBUG=0 php fixtures/build/dir012/bin/console --version > fixtures/build/dir012/expected-output
 	rm -rf fixtures/build/dir012/var/cache/prod/*
