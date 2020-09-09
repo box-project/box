@@ -7,7 +7,7 @@
         "ext-iconv": "*",
         "symfony/console": "4.2.*",
         "symfony/dotenv": "4.2.*",
-        "symfony/flex": "^1.2",
+        "symfony/flex": "^1.9",
         "symfony/framework-bundle": "4.2.*",
         "symfony/yaml": "4.2.*"
     },
