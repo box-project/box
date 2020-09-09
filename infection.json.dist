@@ -7,5 +7,10 @@
     },
     "logs": {
         "text": "dist/infection-log.txt"
+    },
+    "mutators": {
+        "@default": true,
+        "IdenticalEqual": true,
+        "NotIdenticalNotEqual": true
     }
 }
