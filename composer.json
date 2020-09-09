@@ -70,7 +70,7 @@
         "infection/infection": "^0.15",
         "mikey179/vfsstream": "^1.6",
         "padraic/humbug_get_contents": "^1.1",
-        "phpunit/phpunit": "^8.1 || ^9.3"
+        "phpunit/phpunit": "^8.1"
     },
     "suggest": {
         "ext-openssl": "To accelerate private key generation."
