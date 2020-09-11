@@ -16,6 +16,7 @@ namespace KevinGH\Box\Composer;
 
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use Humbug\PhpScoper\Whitelist;
+use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Console\Logger\CompilerLogger;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -45,7 +46,7 @@ final class ComposerOrchestrator
 
         $getVersionProcess = new Process($command);
 
-        $getVersionProcess->run();
+        $getVersionProcess->run(null, self::getDefaultEnvVars());
 
         if (false === $getVersionProcess->isSuccessful()) {
             throw new RuntimeException(
@@ -164,7 +165,7 @@ final class ComposerOrchestrator
             OutputInterface::VERBOSITY_VERBOSE
         );
 
-        $dumpAutoloadProcess->run();
+        $dumpAutoloadProcess->run(null, self::getDefaultEnvVars());
 
         if (false === $dumpAutoloadProcess->isSuccessful()) {
             throw new RuntimeException(
@@ -199,7 +200,7 @@ final class ComposerOrchestrator
             OutputInterface::VERBOSITY_VERBOSE
         );
 
-        $vendorDirProcess->run();
+        $vendorDirProcess->run(null, self::getDefaultEnvVars());
 
         if (false === $vendorDirProcess->isSuccessful()) {
             throw new RuntimeException(
@@ -223,5 +224,16 @@ final class ComposerOrchestrator
         }
 
         return null;
+    }
+
+    private static function getDefaultEnvVars(): array
+    {
+        $vars = [];
+
+        if ('1' === (string)getenv(BOX_ALLOW_XDEBUG)) {
+            $vars['COMPOSER_ALLOW_XDEBUG'] = '1';
+        }
+
+        return $vars;
     }
 }
