@@ -28,7 +28,7 @@ function get_prefix(): string
     ;
 
     $lastReleaseEndpointContents = shell_exec(<<<BASH
-curl -s $headerOption https://api.github.com/repos/humbug/box/releases/latest
+curl -sL $headerOption https://api.github.com/repos/humbug/box/releases/latest
 BASH
     );
 
