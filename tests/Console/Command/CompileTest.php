@@ -3028,6 +3028,14 @@ OUTPUT;
             $display
         );
 
+        if (extension_loaded('xdebug')) {
+            $display = preg_replace(
+                '/' . PHP_EOL . 'You are running composer with xdebug enabled. This has a major impact on runtime performance. See https:\/[^\s]+' . PHP_EOL . '/',
+                '',
+                $display
+            );
+        }
+
         return DisplayNormalizer::removeTrailingSpaces($display);
     }
 
