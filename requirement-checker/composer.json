@@ -25,9 +25,9 @@
     },
 
     "require": {
-        "php": "^5.3 || ^7.0",
+        "php": ">=5.3",
         "ext-phar": "*",
-        "composer/semver": "^1.4"
+        "composer/semver": "^3.2"
     },
     "require-dev": {
         "phpunit/phpunit": "^8.0"
