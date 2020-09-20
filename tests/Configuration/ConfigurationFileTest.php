@@ -16,8 +16,8 @@ namespace KevinGH\Box\Configuration;
 
 use function chdir;
 use const DIRECTORY_SEPARATOR;
+use function file_get_contents;
 use Generator;
-use function Humbug\get_contents;
 use function Humbug\PhpScoper\json_decode;
 use InvalidArgumentException;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -1745,7 +1745,7 @@ JSON
     {
         $config = Configuration::create(
             $configPath = self::FIXTURES_DIR.'/dir000/box.json',
-            json_decode(get_contents($configPath), false)
+            json_decode(file_get_contents($configPath), false)
         );
 
         $this->assertSame([], $config->getRecommendations());
@@ -1756,7 +1756,7 @@ JSON
     {
         $config = Configuration::create(
             $configPath = self::FIXTURES_DIR.'/dir001/box.json',
-            json_decode(get_contents($configPath), false)
+            json_decode(file_get_contents($configPath), false)
         );
 
         $this->assertTrue($config->dumpAutoload());
@@ -1767,7 +1767,7 @@ JSON
 
     public function test_no_warning_is_given_when_the_installed_json_is_found_and_the_composer_lock_is_not_when_the_composer_autoloader_is_not_dumped(): void
     {
-        $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir002/box.json', json_decode(get_contents($configPath)));
+        $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir002/box.json', json_decode(file_get_contents($configPath)));
 
         $this->assertFalse($config->dumpAutoload());
 
@@ -1777,7 +1777,7 @@ JSON
 
     public function test_a_warning_is_given_when_no_installed_json_is_found_and_the_composer_lock_is_when_the_composer_autoloader_is_dumped(): void
     {
-        $decodedConfig = json_decode(get_contents($configPath = self::FIXTURES_DIR.'/dir002/box.json'));
+        $decodedConfig = json_decode(file_get_contents($configPath = self::FIXTURES_DIR.'/dir002/box.json'));
         $decodedConfig->{'dump-autoload'} = true;
 
         $config = Configuration::create($configPath, $decodedConfig);
@@ -1798,7 +1798,7 @@ JSON
     {
         $configPath = self::FIXTURES_DIR.'/dir003/box.json';
 
-        $decodedConfig = json_decode(get_contents($configPath));
+        $decodedConfig = json_decode(file_get_contents($configPath));
         unset($decodedConfig->{'dump-autoload'});
 
         $config = Configuration::create($configPath, $decodedConfig);
@@ -1811,7 +1811,7 @@ JSON
 
     public function test_a_warning_is_given_when_the_installed_json_is_found_and_the_composer_lock_is_not(): void
     {
-        $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir003/box.json', json_decode(get_contents($configPath)));
+        $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir003/box.json', json_decode(file_get_contents($configPath)));
 
         $this->assertFalse($config->dumpAutoload());
 
@@ -1827,7 +1827,7 @@ JSON
 
     public function test_no_warning_is_given_when_the_installed_json_is_found_and_the_composer_lock_is_not_and_the_dump_autoload_disabled(): void
     {
-        $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir004/box.json', json_decode(get_contents($configPath)));
+        $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir004/box.json', json_decode(file_get_contents($configPath)));
 
         $this->assertFalse($config->dumpAutoload());
 

@@ -23,7 +23,6 @@ use function extension_loaded;
 use function file_get_contents;
 use Generator;
 use function get_loaded_extensions;
-use function Humbug\get_contents;
 use function implode;
 use InvalidArgumentException;
 use function iterator_to_array;
@@ -1330,7 +1329,7 @@ EOF;
 
         // Checks one of the dumped file from the PHAR to ensure the encoding of the extracted file is correct
         $this->assertSame(
-            get_contents('.box_dump/index.php'),
+            file_get_contents('.box_dump/index.php'),
             $indexContents
         );
     }
