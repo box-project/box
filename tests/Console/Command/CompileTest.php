@@ -120,7 +120,7 @@ class CompileTest extends CommandTestCase
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
-        $numberOfFiles = 41;
+        $numberOfFiles = 45;
         if (self::$runComposer2) {
             // From Composer 2 there is one more class: Composer\InstalledVersions
             $numberOfFiles++;
@@ -288,12 +288,16 @@ PHP;
             '/.box/vendor/composer/semver/LICENSE',
             '/.box/vendor/composer/semver/src/',
             '/.box/vendor/composer/semver/src/Comparator.php',
+            '/.box/vendor/composer/semver/src/CompilingMatcher.php',
             '/.box/vendor/composer/semver/src/Constraint/',
-            '/.box/vendor/composer/semver/src/Constraint/AbstractConstraint.php',
+            '/.box/vendor/composer/semver/src/Constraint/Bound.php',
             '/.box/vendor/composer/semver/src/Constraint/Constraint.php',
             '/.box/vendor/composer/semver/src/Constraint/ConstraintInterface.php',
-            '/.box/vendor/composer/semver/src/Constraint/EmptyConstraint.php',
+            '/.box/vendor/composer/semver/src/Constraint/MatchAllConstraint.php',
+            '/.box/vendor/composer/semver/src/Constraint/MatchNoneConstraint.php',
             '/.box/vendor/composer/semver/src/Constraint/MultiConstraint.php',
+            '/.box/vendor/composer/semver/src/Interval.php',
+            '/.box/vendor/composer/semver/src/Intervals.php',
             '/.box/vendor/composer/semver/src/Semver.php',
             '/.box/vendor/composer/semver/src/VersionParser.php',
             '/one/',
@@ -390,7 +394,7 @@ PHP;
 
         $version = get_box_version();
 
-        $numberOfFiles = 45;
+        $numberOfFiles = 49;
         if (self::$runComposer2) {
             // From Composer 2 there is one more class: Composer\InstalledVersions
             $numberOfFiles++;
@@ -521,12 +525,16 @@ PHP;
             '/.box/vendor/composer/semver/LICENSE',
             '/.box/vendor/composer/semver/src/',
             '/.box/vendor/composer/semver/src/Comparator.php',
+            '/.box/vendor/composer/semver/src/CompilingMatcher.php',
             '/.box/vendor/composer/semver/src/Constraint/',
-            '/.box/vendor/composer/semver/src/Constraint/AbstractConstraint.php',
+            '/.box/vendor/composer/semver/src/Constraint/Bound.php',
             '/.box/vendor/composer/semver/src/Constraint/Constraint.php',
             '/.box/vendor/composer/semver/src/Constraint/ConstraintInterface.php',
-            '/.box/vendor/composer/semver/src/Constraint/EmptyConstraint.php',
+            '/.box/vendor/composer/semver/src/Constraint/MatchAllConstraint.php',
+            '/.box/vendor/composer/semver/src/Constraint/MatchNoneConstraint.php',
             '/.box/vendor/composer/semver/src/Constraint/MultiConstraint.php',
+            '/.box/vendor/composer/semver/src/Interval.php',
+            '/.box/vendor/composer/semver/src/Intervals.php',
             '/.box/vendor/composer/semver/src/Semver.php',
             '/.box/vendor/composer/semver/src/VersionParser.php',
             '/binary',
@@ -819,7 +827,7 @@ PHP;
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
         $numberOfClasses = 0;
-        $numberOfFiles = 41;
+        $numberOfFiles = 45;
         if (self::$runComposer2) {
             // From Composer 2 there is one more class: Composer\InstalledVersions
             $numberOfClasses++;
@@ -941,7 +949,7 @@ OUTPUT;
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
         $numberOfClasses = 0;
-        $numberOfFiles = 41;
+        $numberOfFiles = 45;
         if (self::$runComposer2) {
             // From Composer 2 there is one more class: Composer\InstalledVersions
             $numberOfClasses++;
@@ -2901,7 +2909,7 @@ OUTPUT;
 
         $version = get_box_version();
 
-        $numberOfFiles = 37;
+        $numberOfFiles = 41;
         if (self::$runComposer2) {
             // From Composer 2 there is one more class: Composer\InstalledVersions
             $numberOfFiles++;
