@@ -16,7 +16,6 @@ namespace KevinGH\RequirementChecker;
 
 use Generator;
 use PHPUnit\Framework\TestCase;
-use function ob_get_contents;
 use function preg_replace;
 use const PHP_VERSION;
 

@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
+use function file_get_contents;
 use Generator;
-use function Humbug\get_contents;
 use Humbug\PhpScoper\Whitelist;
 use function iterator_to_array;
 use KevinGH\Box\Console\DisplayNormalizer;
@@ -66,7 +66,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
         $actualAutoloadContents = preg_replace(
             '/ComposerAutoloaderInit[a-z\d]{32}/',
             'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
-            get_contents($this->tmp.'/vendor/autoload.php')
+            file_get_contents($this->tmp.'/vendor/autoload.php')
         );
         $actualAutoloadContents = DisplayNormalizer::removeTrailingSpaces($actualAutoloadContents);
 
@@ -89,7 +89,7 @@ PHP
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
                 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
-                get_contents($this->tmp.'/vendor/composer/autoload_psr4.php')
+                file_get_contents($this->tmp.'/vendor/composer/autoload_psr4.php')
             )
         );
     }
@@ -161,7 +161,7 @@ PHP
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
                 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
-                get_contents($this->tmp.'/vendor/autoload.php')
+                file_get_contents($this->tmp.'/vendor/autoload.php')
             )
         );
 
@@ -182,7 +182,7 @@ PHP
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
                 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
-                get_contents($this->tmp.'/vendor/composer/autoload_psr4.php')
+                file_get_contents($this->tmp.'/vendor/composer/autoload_psr4.php')
             )
         );
     }
@@ -268,7 +268,7 @@ PHP
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
                 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
-                get_contents($this->tmp.'/vendor/autoload.php')
+                file_get_contents($this->tmp.'/vendor/autoload.php')
             )
         );
 
@@ -290,7 +290,7 @@ PHP
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
                 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
-                get_contents($this->tmp.'/vendor/composer/autoload_psr4.php')
+                file_get_contents($this->tmp.'/vendor/composer/autoload_psr4.php')
             )
         );
     }
@@ -360,7 +360,7 @@ PHP;
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
                 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
-                get_contents($this->tmp.'/vendor/autoload.php')
+                file_get_contents($this->tmp.'/vendor/autoload.php')
             )
         );
 
@@ -381,7 +381,7 @@ PHP
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
                 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
-                get_contents($this->tmp.'/vendor/composer/autoload_psr4.php')
+                file_get_contents($this->tmp.'/vendor/composer/autoload_psr4.php')
             )
         );
     }
@@ -431,7 +431,7 @@ PHP
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
                 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
-                get_contents($this->tmp.'/vendor/autoload.php')
+                file_get_contents($this->tmp.'/vendor/autoload.php')
             )
         );
 
@@ -452,7 +452,7 @@ PHP
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
                 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
-                get_contents($this->tmp.'/vendor/composer/autoload_psr4.php')
+                file_get_contents($this->tmp.'/vendor/composer/autoload_psr4.php')
             )
         );
     }
