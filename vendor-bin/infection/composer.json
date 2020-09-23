@@ -1,0 +1,5 @@
+{
+    "require-dev": {
+        "infection/infection": "^0.15"
+    }
+}

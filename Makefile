@@ -78,9 +78,10 @@ tc: bin/phpunit
 	phpdbg -qrr -d zend.enable_gc=0 bin/phpunit --coverage-html=dist/coverage --coverage-text
 
 .PHONY: tm
+INFECTION=vendor-bin/infection/vendor/bin/infection
 tm:			 ## Runs Infection
-tm:	$(TU_BOX_DEPS)
-	$(PHPNOGC) bin/infection --only-covered
+tm:	$(TU_BOX_DEPS) $(INFECTION)
+	$(PHPNOGC) $(INFECTION) --only-covered
 
 .PHONY: e2e
 e2e:			 ## Runs all the end-to-end tests
@@ -324,6 +325,10 @@ $(CODE_SNIFFER): vendor/bamarni
 
 $(CODE_SNIFFER_FIX): vendor/bamarni
 	composer bin doctrine-cs install
+	touch $@
+
+$(INFECTION): vendor/bamarni
+	composer bin infection install
 	touch $@
 
 fixtures/composer-dump/dir001/composer.lock: fixtures/composer-dump/dir001/composer.json
