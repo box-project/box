@@ -152,9 +152,6 @@ final class PhpSettingsHandler extends XdebugHandler
         }
     }
 
-    /**
-     * @return null|int
-     */
     private static function getUserDefinedMemoryLimit(): ?int
     {
         $memoryLimit = getenv(BOX_MEMORY_LIMIT);

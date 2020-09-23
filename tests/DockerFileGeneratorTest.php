@@ -61,7 +61,7 @@ class DockerFileGeneratorTest extends TestCase
                         ],
                     ],
                 'path/to/phar'
-                )
+            )
                 ->generate()
             ;
         } catch (UnexpectedValueException $exception) {

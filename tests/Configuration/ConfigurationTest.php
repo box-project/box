@@ -1434,9 +1434,9 @@ JSON
     public function test_the_replacement_map_can_be_configured_when_base_path_is_different_directory(): void
     {
         // Make another directory level to have config not in base-path.
-        $basePath = $this->tmp . DIRECTORY_SEPARATOR . 'subdir';
+        $basePath = $this->tmp.DIRECTORY_SEPARATOR.'subdir';
         mkdir($basePath);
-        rename(self::DEFAULT_FILE, $basePath . DIRECTORY_SEPARATOR . self::DEFAULT_FILE);
+        rename(self::DEFAULT_FILE, $basePath.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
         chdir($basePath);
         touch('test');
         exec('git init');
