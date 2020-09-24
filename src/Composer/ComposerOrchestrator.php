@@ -230,7 +230,7 @@ final class ComposerOrchestrator
     {
         $vars = [];
 
-        if ('1' === (string)getenv(BOX_ALLOW_XDEBUG)) {
+        if ('1' === (string) getenv(BOX_ALLOW_XDEBUG)) {
             $vars['COMPOSER_ALLOW_XDEBUG'] = '1';
         }
 

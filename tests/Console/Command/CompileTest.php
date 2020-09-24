@@ -123,7 +123,7 @@ class CompileTest extends CommandTestCase
         $numberOfFiles = 45;
         if (self::$runComposer2) {
             // From Composer 2 there is one more class: Composer\InstalledVersions
-            $numberOfFiles++;
+            ++$numberOfFiles;
         }
 
         dump_file(
@@ -322,7 +322,7 @@ PHP;
 
         if (!self::$runComposer2) {
             $expectedFiles = array_values(array_filter($expectedFiles, static function ($file): bool {
-                return $file !== '/.box/vendor/composer/platform_check.php';
+                return '/.box/vendor/composer/platform_check.php' !== $file;
             }));
         }
 
@@ -397,7 +397,7 @@ PHP;
         $numberOfFiles = 49;
         if (self::$runComposer2) {
             // From Composer 2 there is one more class: Composer\InstalledVersions
-            $numberOfFiles++;
+            ++$numberOfFiles;
         }
 
         $expected = <<<OUTPUT
@@ -562,7 +562,7 @@ PHP;
 
         if (!self::$runComposer2) {
             $expectedFiles = array_values(array_filter($expectedFiles, static function ($file): bool {
-                return $file !== '/.box/vendor/composer/platform_check.php';
+                return '/.box/vendor/composer/platform_check.php' !== $file;
             }));
         }
 
@@ -830,8 +830,8 @@ PHP;
         $numberOfFiles = 45;
         if (self::$runComposer2) {
             // From Composer 2 there is one more class: Composer\InstalledVersions
-            $numberOfClasses++;
-            $numberOfFiles++;
+            ++$numberOfClasses;
+            ++$numberOfFiles;
         }
 
         dump_file(
@@ -952,8 +952,8 @@ OUTPUT;
         $numberOfFiles = 45;
         if (self::$runComposer2) {
             // From Composer 2 there is one more class: Composer\InstalledVersions
-            $numberOfClasses++;
-            $numberOfFiles++;
+            ++$numberOfClasses;
+            ++$numberOfFiles;
         }
 
         dump_file(
@@ -2912,7 +2912,7 @@ OUTPUT;
         $numberOfFiles = 41;
         if (self::$runComposer2) {
             // From Composer 2 there is one more class: Composer\InstalledVersions
-            $numberOfFiles++;
+            ++$numberOfFiles;
         }
 
         $expected = <<<OUTPUT
@@ -3024,20 +3024,20 @@ OUTPUT;
         );
 
         $display = preg_replace(
-            '/\[debug\] Increased the maximum number of open file descriptors from \([^\)]+\) to \([^\)]+\)' . PHP_EOL . '/',
+            '/\[debug\] Increased the maximum number of open file descriptors from \([^\)]+\) to \([^\)]+\)'.PHP_EOL.'/',
             '',
             $display
         );
 
         $display = str_replace(
-            '[debug] Restored the maximum number of open file descriptors' . PHP_EOL,
+            '[debug] Restored the maximum number of open file descriptors'.PHP_EOL,
             '',
             $display
         );
 
         if (extension_loaded('xdebug')) {
             $display = preg_replace(
-                '/' . PHP_EOL . 'You are running composer with xdebug enabled. This has a major impact on runtime performance. See https:\/[^\s]+' . PHP_EOL . '/',
+                '/'.PHP_EOL.'You are running composer with xdebug enabled. This has a major impact on runtime performance. See https:\/[^\s]+'.PHP_EOL.'/',
                 '',
                 $display
             );
