@@ -74,6 +74,7 @@ class RequirementsDumperTest extends TestCase
         ];
 
         if (file_exists(__DIR__.'/../../.requirement-checker/vendor/composer/platform_check.php')) {
+            $expectedFiles[] = 'vendor/composer/InstalledVersions.php';
             $expectedFiles[] = 'vendor/composer/platform_check.php';
         }
 
