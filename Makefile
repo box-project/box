@@ -85,7 +85,7 @@ tm:	$(TU_BOX_DEPS) $(INFECTION)
 
 .PHONY: e2e
 e2e:			 ## Runs all the end-to-end tests
-e2e: e2e_php_settings_checker e2e_scoper_alias e2e_scoper_whitelist e2e_check_requirements e2e_symfony
+e2e: e2e_php_settings_checker e2e_scoper_alias e2e_scoper_whitelist e2e_check_requirements e2e_symfony e2e_composer_installed_versions
 
 .PHONY: e2e_scoper_alias
 e2e_scoper_alias: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the prefix alias is working
@@ -273,6 +273,15 @@ e2e_symfony: fixtures/build/dir012/vendor box
 
 	diff fixtures/build/dir012/expected-output fixtures/build/dir012/actual-output
 
+.PHONY: e2e_composer_installed_versions
+e2e_composer_installed_versions:		 ## Packages an app using Composer\InstalledVersions
+e2e_composer_installed_versions: fixtures/build/dir013/vendor box
+	./box compile --working-dir fixtures/build/dir013
+	
+	php fixtures/build/dir013/bin/run.phar > fixtures/build/dir013/actual-output
+
+	diff fixtures/build/dir013/expected-output fixtures/build/dir013/actual-output
+
 .PHONY: blackfire
 blackfire:		 ## Profiles the compile step
 blackfire: box
@@ -353,6 +362,10 @@ fixtures/build/dir011/vendor:
 
 fixtures/build/dir012/vendor:
 	composer install --working-dir fixtures/build/dir012
+	touch $@
+
+fixtures/build/dir013/vendor:
+	composer install --working-dir fixtures/build/dir013
 	touch $@
 
 .PHONY: fixtures/default_stub.php

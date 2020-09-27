@@ -122,8 +122,8 @@ class CompileTest extends CommandTestCase
 
         $numberOfFiles = 45;
         if (self::$runComposer2) {
-            // From Composer 2 there is one more class: Composer\InstalledVersions
-            ++$numberOfFiles;
+            // From Composer 2 there are more files
+            $numberOfFiles += 2;
         }
 
         dump_file(
@@ -277,6 +277,7 @@ PHP;
             '/.box/vendor/autoload.php',
             '/.box/vendor/composer/',
             '/.box/vendor/composer/ClassLoader.php',
+            '/.box/vendor/composer/InstalledVersions.php',
             '/.box/vendor/composer/LICENSE',
             '/.box/vendor/composer/autoload_classmap.php',
             '/.box/vendor/composer/autoload_namespaces.php',
@@ -322,7 +323,8 @@ PHP;
 
         if (!self::$runComposer2) {
             $expectedFiles = array_values(array_filter($expectedFiles, static function ($file): bool {
-                return '/.box/vendor/composer/platform_check.php' !== $file;
+                return '/.box/vendor/composer/platform_check.php' !== $file
+                && '/.box/vendor/composer/InstalledVersions.php' !== $file;
             }));
         }
 
@@ -396,8 +398,8 @@ PHP;
 
         $numberOfFiles = 49;
         if (self::$runComposer2) {
-            // From Composer 2 there is one more class: Composer\InstalledVersions
-            ++$numberOfFiles;
+            // From Composer 2 there are more files
+            $numberOfFiles += 2;
         }
 
         $expected = <<<OUTPUT
@@ -514,6 +516,7 @@ PHP;
             '/.box/vendor/autoload.php',
             '/.box/vendor/composer/',
             '/.box/vendor/composer/ClassLoader.php',
+            '/.box/vendor/composer/InstalledVersions.php',
             '/.box/vendor/composer/LICENSE',
             '/.box/vendor/composer/autoload_classmap.php',
             '/.box/vendor/composer/autoload_namespaces.php',
@@ -562,7 +565,8 @@ PHP;
 
         if (!self::$runComposer2) {
             $expectedFiles = array_values(array_filter($expectedFiles, static function ($file): bool {
-                return '/.box/vendor/composer/platform_check.php' !== $file;
+                return '/.box/vendor/composer/platform_check.php' !== $file
+                && '/.box/vendor/composer/InstalledVersions.php' !== $file;
             }));
         }
 
@@ -829,9 +833,9 @@ PHP;
         $numberOfClasses = 0;
         $numberOfFiles = 45;
         if (self::$runComposer2) {
-            // From Composer 2 there is one more class: Composer\InstalledVersions
+            // From Composer 2 there are more files
             ++$numberOfClasses;
-            ++$numberOfFiles;
+            $numberOfFiles += 2;
         }
 
         dump_file(
@@ -951,9 +955,9 @@ OUTPUT;
         $numberOfClasses = 0;
         $numberOfFiles = 45;
         if (self::$runComposer2) {
-            // From Composer 2 there is one more class: Composer\InstalledVersions
+            // From Composer 2 there are more files
             ++$numberOfClasses;
-            ++$numberOfFiles;
+            $numberOfFiles += 2;
         }
 
         dump_file(
@@ -2911,8 +2915,8 @@ OUTPUT;
 
         $numberOfFiles = 41;
         if (self::$runComposer2) {
-            // From Composer 2 there is one more class: Composer\InstalledVersions
-            ++$numberOfFiles;
+            // From Composer 2 there are more files
+            $numberOfFiles += 2;
         }
 
         $expected = <<<OUTPUT

@@ -1,0 +1,4 @@
+{
+	"main": "bin/run",
+	"force-autodiscovery": true
+}
