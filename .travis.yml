@@ -1,7 +1,5 @@
 language: php
 
-sudo: false
-
 services:
   - docker
 
@@ -75,7 +73,7 @@ deploy:
   api_key:
     secure: Cw4LQm+uiQ7BuCVKAzaoxsj2OnpMv3dB0Fu5DBnYNJ4t5D2TFLZqVWnyyv2wx0kSO5uHEy8JwIavEk5kqWBZTuNSYNmE+EsucVOkLfMybsnQ+1e8CXsOPHlGwmVA5HSUIdx/vBEuUkdA6QgOOlFn/qfI4oRHa/CwiFsy9KPCnQ+RfLYYsH0l9SGEtVKqLMEly7qXdr/3OXn5fGKDAzntfuSYdq84jkVcWq8vBM9j5CQ9ZBm0Tfs5zrjedJ16Fdb3YXyb1FZahcdQQN7jLhLT6UYZVdaHHqgLN/vPIfV9PPGSBpIYzVWbGF1NTGPS6A8JjxsG3ylAnGj0VnrPf9WFC+1JuBasmeVhmWt+UDwZVRd83IxAoHKr0qsKDZ6/uCFljLWeOhQhcJ78O8LxqGQVl9JwMgWFmp5WtNFihde3IIFmNr2UL9R3rmchbvLoxupp6xBFklvFa23FRMe1wdxhb1b/Qmyf0ETaKFSwfYEnsgQVxI1sDOXXJRJuFtPIjBX9AFhW6NLBoE8EKYpHPdSQ1P/sH71Wt6lxW5WLWF94cKYQnVWuDIVf+beHLeP4tWy9Sd1Bdg2dYXlaR3wzyUwIb5A82EQ4IwmUeJUWFd1p+Sd5jlSnppB6hFO+FTlhHV77CI0o/lqcgAwKU4o1RZ6MT+38/iK9KMAUlQ69ywPhZ0A=
   file: bin/box.phar
-  skip_cleanup: true
+  cleanup: false
   on:
     tags: true
     repo: humbug/box
