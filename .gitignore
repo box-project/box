@@ -35,7 +35,6 @@
 /requirement-checker/tests/DisplayNormalizer.php
 /requirement-checker/vendor/
 /requirement-checker/.phpunit*
-/composer.lock
 /vendor/
 /vendor-bin/*/composer.lock
 /vendor-bin/*/vendor/

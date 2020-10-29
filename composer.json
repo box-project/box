@@ -53,7 +53,7 @@
         "justinrainbow/json-schema": "^5.2.9",
         "nikic/iter": "^2.0",
         "nikic/php-parser": "^4.2",
-        "opis/closure": "^3.2",
+        "opis/closure": "3.5.*",
         "paragonie/pharaoh": "^0.5",
         "psr/log": "^1.0",
         "seld/jsonlint": "^1.7",
