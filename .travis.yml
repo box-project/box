@@ -51,7 +51,7 @@ before_install:
     fi
 
 install:
-  - composer install $COMPOSER_FLAGS
+  - composer install $COMPOSER_FLAGS || composer update $COMPOSER_FLAGS
   - composer install $COMPOSER_FLAGS --working-dir requirement-checker
 
 script:
