@@ -2855,7 +2855,7 @@ BANNER;
 
         $scoper = new SerializablePhpScoper(
             static function () use ($whitelistedFiles): Scoper {
-                $scoper = (new Container())->getScoper();
+                $scoper = (new \KevinGH\Box\PhpScoper\Container())->getScoper();
 
                 if ([] !== $whitelistedFiles) {
                     return new FileWhitelistScoper($scoper, ...$whitelistedFiles);
