@@ -1691,23 +1691,23 @@
         },
         {
             "name": "humbug/php-scoper",
-            "version": "0.13.9",
+            "version": "dev-emulative",
             "source": {
                 "type": "git",
-                "url": "https://github.com/humbug/php-scoper.git",
-                "reference": "d6d7e83e44ec7a61202289159d4600b476e303e6"
+                "url": "https://github.com/smoench/php-scoper.git",
+                "reference": "6f3db1480e6e1f82e0df44bec64639511dc2c9b5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/d6d7e83e44ec7a61202289159d4600b476e303e6",
-                "reference": "d6d7e83e44ec7a61202289159d4600b476e303e6",
+                "url": "https://api.github.com/repos/smoench/php-scoper/zipball/6f3db1480e6e1f82e0df44bec64639511dc2c9b5",
+                "reference": "6f3db1480e6e1f82e0df44bec64639511dc2c9b5",
                 "shasum": ""
             },
             "require": {
                 "composer/package-versions-deprecated": "^1.8",
                 "jetbrains/phpstorm-stubs": "dev-master",
                 "nikic/php-parser": "^4.0",
-                "php": "^7.2",
+                "php": "^7.3",
                 "symfony/console": "^3.2 || ^4.0",
                 "symfony/filesystem": "^3.2 || ^4.0",
                 "symfony/finder": "^3.2 || ^4.0"
@@ -1741,7 +1741,15 @@
                     "Humbug\\PhpScoper\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "files": [
+                    "tests/functions.php",
+                    "src/json.php"
+                ],
+                "psr-4": {
+                    "Humbug\\PhpScoper\\": "tests/"
+                }
+            },
             "license": [
                 "MIT"
             ],
@@ -1761,16 +1769,15 @@
             ],
             "description": "Prefixes all PHP namespaces in a file or directory.",
             "support": {
-                "issues": "https://github.com/humbug/php-scoper/issues",
-                "source": "https://github.com/humbug/php-scoper/tree/0.13.9"
+                "source": "https://github.com/smoench/php-scoper/tree/emulative"
             },
             "funding": [
                 {
-                    "url": "https://github.com/theofidry",
-                    "type": "github"
+                    "type": "github",
+                    "url": "https://github.com/theofidry"
                 }
             ],
-            "time": "2020-11-06T23:14:56+00:00"
+            "time": "2020-11-17T11:48:12+00:00"
         },
         {
             "name": "jetbrains/phpstorm-stubs",
@@ -1819,7 +1826,7 @@
             "support": {
                 "source": "https://github.com/JetBrains/phpstorm-stubs/tree/master"
             },
-            "time": "2020-11-16T19:39:13+00:00"
+            "time": "2020-11-17T11:49:11+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -5225,16 +5232,18 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "humbug/php-scoper": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^7.2",
+        "php": "^7.3",
         "ext-phar": "*"
     },
     "platform-dev": [],
     "platform-overrides": {
-        "php": "7.2.9"
+        "php": "7.3"
     },
     "plugin-api-version": "2.0.0"
 }
