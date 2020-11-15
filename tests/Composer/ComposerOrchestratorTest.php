@@ -346,7 +346,6 @@ PHP;
             $expectedPaths[] = 'vendor/composer/installed.php';
             $expectedPaths[] = 'vendor/composer/InstalledVersions.php';
             $expectedPaths[] = 'vendor/composer/LICENSE';
-            $expectedPaths[] = 'vendor/composer/platform_check.php';
         } else {
             $expectedPaths[] = 'vendor/composer/LICENSE';
         }
@@ -531,8 +530,8 @@ require_once __DIR__ . '/composer/autoload_real.php';
 
 // Aliases for the whitelisted classes. For more information see:
 // https://github.com/humbug/php-scoper/blob/master/README.md#class-whitelisting
-if (!class_exists('Acme\Foo', false)) {
-    class_exists('_Box\Acme\Foo');
+if (!class_exists('Acme\Foo', false) && !interface_exists('Acme\Foo', false) && !trait_exists('Acme\Foo', false)) {
+    spl_autoload_call('_Box\Acme\Foo');
 }
 
 return \$loader;
