@@ -66,7 +66,7 @@ class DockerFileGeneratorTest extends TestCase
             ;
         } catch (UnexpectedValueException $exception) {
             $this->assertSame(
-                'Could not find a suitable Docker base image for the PHP constraint(s) "^5.3". Images available: "7.3-cli-alpine", "7.2-cli-alpine", "7.1-cli-alpine", "7-cli-alpine"',
+                'Could not find a suitable Docker base image for the PHP constraint(s) "^5.3". Images available: "7.4-cli-alpine", "7.3-cli-alpine", "7.2-cli-alpine", "7.1-cli-alpine", "7-cli-alpine"',
                 $exception->getMessage()
             );
         }
@@ -150,7 +150,7 @@ Dockerfile
             ],
             'box.phar',
             <<<'Dockerfile'
-FROM php:7.3-cli-alpine
+FROM php:7.4-cli-alpine
 
 RUN $(php -r '$extensionInstalled = array_map("strtolower", \get_loaded_extensions(false));$requiredExtensions = ["zlib", "phar", "openssl", "pcre", "tokenizer"];$extensionsToInstall = array_diff($requiredExtensions, $extensionInstalled);if ([] !== $extensionsToInstall) {echo \sprintf("docker-php-ext-install %s", implode(" ", $extensionsToInstall));}echo "echo \"No extensions\"";')
 
