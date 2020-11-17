@@ -1,0 +1,116 @@
+name: Build
+
+on:
+    push:
+        branches: [ master ]
+    pull_request:
+    release:
+        types: [ created ]
+
+jobs:
+    tests:
+        runs-on: ubuntu-latest
+        name: Build and test
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    -   php: 7.2
+                        tools: "composer:v1"
+                        coverage: "none"
+                        git-fetch-depth: 1
+                    -   php: 7.3
+                        tools: "composer:v1"
+                        coverage: "none"
+                        publish-phar: true
+                        git-fetch-depth: 0 # box/composer needs history to determine a recent git version
+                    -   php: 7.3
+                        tools: "composer:v1"
+                        coverage: "none"
+                        phar-readonly: true
+                        git-fetch-depth: 1
+                    -   php: 7.4
+                        tools: "composer:v1"
+                        coverage: "pcov"
+                        git-fetch-depth: 1
+                    -   php: 7.4
+                        tools: "composer:v2"
+                        coverage: "none"
+                        git-fetch-depth: 1
+
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    fetch-depth: ${{ matrix.git-fetch-depth }}
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ matrix.php }}
+                    ini-values: "phar.readonly=0"
+                    tools: ${{ matrix.tools }}
+                    coverage: ${{ matrix.coverage }}
+                    extensions: ctype, iconv, xml
+
+            -   name: Get composer cache directory
+                id: composercache
+                run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+            -   name: Cache composer dependencies
+                uses: actions/cache@v2
+                with:
+                    path: ${{ steps.composercache.outputs.dir }}
+                    key: composer-${{ runner.os }}-${{ matrix.php }}-${{ hashFiles('composer.*') }}
+                    restore-keys: |
+                        composer-${{ runner.os }}-${{ matrix.php }}-
+                        composer-${{ runner.os }}-
+                        composer-
+
+            -   name: Install dependencies
+                run: composer install --no-interaction --no-progress --prefer-dist
+
+            -   name: Install requirement-checker dependencies
+                run: composer install --no-interaction --no-progress --prefer-dist --working-dir requirement-checker
+
+            -   name: validate box config
+                run: bin/box validate
+
+            -   name: Run tests (coverage)
+                if: matrix.coverage == 'pcov'
+                run: make tm
+
+            -   name: Run tests (phar readonly)
+                if: matrix.phar-readonly == true
+                run: make tu_box_phar_readonly
+
+            -   name: Run tests
+                if: matrix.coverage != 'pcov' && matrix.phar-readonly != true
+                run: make test
+
+            -   uses: actions/upload-artifact@v1
+                name: Publish the PHAR
+                if: matrix.publish-phar == true
+                with:
+                    name: box.phar
+                    path: bin/box.phar
+
+    publish-phar:
+        runs-on: ubuntu-latest
+        name: Publish the PHAR
+        needs: tests
+        if: github.event_name == 'release'
+        steps:
+            -   uses: actions/download-artifact@v1
+                with:
+                    name: box.phar
+                    path: .
+
+            -   name: Upload box.phar
+                uses: actions/upload-release-asset@v1
+                env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                with:
+                    upload_url: ${{ github.event.release.upload_url }}
+                    asset_path: box.phar
+                    asset_name: box.phar
+                    asset_content_type: application/zip
