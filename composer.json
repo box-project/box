@@ -50,7 +50,7 @@
         "composer/xdebug-handler": "^1.3.2",
         "composer-plugin-api": "^1.0 || ^2.0",
         "hoa/compiler": "^3.17",
-        "humbug/php-scoper": "dev-emulative@dev",
+        "humbug/php-scoper": "^0.13.10",
         "justinrainbow/json-schema": "^5.2.9",
         "nikic/iter": "^2.0",
         "nikic/php-parser": "^4.2",
@@ -74,12 +74,6 @@
     "suggest": {
         "ext-openssl": "To accelerate private key generation."
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "git@github.com:smoench/php-scoper.git"
-        }
-    ],
 
     "config": {
         "bin-dir": "bin",

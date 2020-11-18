@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b5e21e88b11fda1a3bfead753e644038",
+    "content-hash": "d6d555fb30209e335a7a25fcd62e2988",
     "packages": [
         {
             "name": "amphp/amp",
@@ -1691,16 +1691,16 @@
         },
         {
             "name": "humbug/php-scoper",
-            "version": "dev-emulative",
+            "version": "0.13.10",
             "source": {
                 "type": "git",
-                "url": "https://github.com/smoench/php-scoper.git",
-                "reference": "6f3db1480e6e1f82e0df44bec64639511dc2c9b5"
+                "url": "https://github.com/humbug/php-scoper.git",
+                "reference": "e56b0d91b344181c9a73119454c05a5498bf56e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smoench/php-scoper/zipball/6f3db1480e6e1f82e0df44bec64639511dc2c9b5",
-                "reference": "6f3db1480e6e1f82e0df44bec64639511dc2c9b5",
+                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/e56b0d91b344181c9a73119454c05a5498bf56e4",
+                "reference": "e56b0d91b344181c9a73119454c05a5498bf56e4",
                 "shasum": ""
             },
             "require": {
@@ -1718,7 +1718,8 @@
             "require-dev": {
                 "bamarni/composer-bin-plugin": "^1.1",
                 "humbug/box": "^3.8",
-                "phpunit/phpunit": "^8.0"
+                "phpspec/prophecy-phpunit": "^2.0",
+                "phpunit/phpunit": "^9.0"
             },
             "bin": [
                 "bin/php-scoper"
@@ -1741,15 +1742,7 @@
                     "Humbug\\PhpScoper\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "files": [
-                    "tests/functions.php",
-                    "src/json.php"
-                ],
-                "psr-4": {
-                    "Humbug\\PhpScoper\\": "tests/"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -1769,15 +1762,16 @@
             ],
             "description": "Prefixes all PHP namespaces in a file or directory.",
             "support": {
-                "source": "https://github.com/smoench/php-scoper/tree/emulative"
+                "issues": "https://github.com/humbug/php-scoper/issues",
+                "source": "https://github.com/humbug/php-scoper/tree/0.13.10"
             },
             "funding": [
                 {
-                    "type": "github",
-                    "url": "https://github.com/theofidry"
+                    "url": "https://github.com/theofidry",
+                    "type": "github"
                 }
             ],
-            "time": "2020-11-17T11:48:12+00:00"
+            "time": "2020-11-29T13:29:20+00:00"
         },
         {
             "name": "jetbrains/phpstorm-stubs",
@@ -5232,14 +5226,13 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "humbug/php-scoper": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^7.3",
-        "ext-phar": "*"
+        "ext-phar": "*",
+        "composer-plugin-api": "^1.0 || ^2.0"
     },
     "platform-dev": [],
     "platform-overrides": {
