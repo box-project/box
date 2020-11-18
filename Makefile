@@ -106,7 +106,7 @@ e2e_scoper_whitelist: box fixtures/build/dir011/vendor
 
 .PHONY: e2e_check_requirements
 DOCKER=docker run -i --rm -w /opt/box
-PHP7PHAR=box_php72 php index.phar -vvv --no-ansi
+PHP7PHAR=box_php73 php index.phar -vvv --no-ansi
 PHP5PHAR=box_php53 php index.phar -vvv --no-ansi
 e2e_check_requirements:	 ## Runs the end-to-end tests for the check requirements feature
 e2e_check_requirements: box .requirement-checker
@@ -128,13 +128,13 @@ e2e_check_requirements: box .requirement-checker
 	diff fixtures/check-requirements/pass-no-config/expected-output-53 fixtures/check-requirements/pass-no-config/actual-output
 
 	# 7.2
-	sed "s/PHP_VERSION/$$($(DOCKER) box_php72 php -r 'echo PHP_VERSION;')/" \
-		fixtures/check-requirements/pass-no-config/expected-output-72-dist \
-		> fixtures/check-requirements/pass-no-config/expected-output-72
+	sed "s/PHP_VERSION/$$($(DOCKER) box_php73 php -r 'echo PHP_VERSION;')/" \
+		fixtures/check-requirements/pass-no-config/expected-output-73-dist \
+		> fixtures/check-requirements/pass-no-config/expected-output-73
 
 	rm fixtures/check-requirements/pass-no-config/actual-output || true
 	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-no-config":/opt/box $(PHP7PHAR) | tee fixtures/check-requirements/pass-no-config/actual-output
-	diff fixtures/check-requirements/pass-no-config/expected-output-72 fixtures/check-requirements/pass-no-config/actual-output
+	diff fixtures/check-requirements/pass-no-config/expected-output-73 fixtures/check-requirements/pass-no-config/actual-output
 
 	#
 	# Pass complete
@@ -152,13 +152,13 @@ e2e_check_requirements: box .requirement-checker
 	diff fixtures/check-requirements/pass-complete/expected-output-53 fixtures/check-requirements/pass-complete/actual-output
 
 	# 7.2
-	sed "s/PHP_VERSION/$$($(DOCKER) box_php72 php -r 'echo PHP_VERSION;')/" \
-		fixtures/check-requirements/pass-complete/expected-output-72-dist \
-		> fixtures/check-requirements/pass-complete/expected-output-72
+	sed "s/PHP_VERSION/$$($(DOCKER) box_php73 php -r 'echo PHP_VERSION;')/" \
+		fixtures/check-requirements/pass-complete/expected-output-73-dist \
+		> fixtures/check-requirements/pass-complete/expected-output-73
 
 	rm fixtures/check-requirements/pass-complete/actual-output || true
 	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-complete":/opt/box $(PHP7PHAR) | tee fixtures/check-requirements/pass-complete/actual-output
-	diff fixtures/check-requirements/pass-complete/expected-output-72 fixtures/check-requirements/pass-complete/actual-output
+	diff fixtures/check-requirements/pass-complete/expected-output-73 fixtures/check-requirements/pass-complete/actual-output
 
 	#
 	# Fail complete
@@ -176,13 +176,13 @@ e2e_check_requirements: box .requirement-checker
 	diff fixtures/check-requirements/fail-complete/expected-output-53 fixtures/check-requirements/fail-complete/actual-output
 
 	# 7.2
-	sed "s/PHP_VERSION/$$($(DOCKER) box_php72 php -r 'echo PHP_VERSION;')/" \
-		fixtures/check-requirements/fail-complete/expected-output-72-dist \
-		> fixtures/check-requirements/fail-complete/expected-output-72
+	sed "s/PHP_VERSION/$$($(DOCKER) box_php73 php -r 'echo PHP_VERSION;')/" \
+		fixtures/check-requirements/fail-complete/expected-output-73-dist \
+		> fixtures/check-requirements/fail-complete/expected-output-73
 
 	rm fixtures/check-requirements/fail-complete/actual-output || true
 	$(DOCKER) -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP7PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
-	diff fixtures/check-requirements/fail-complete/expected-output-72 fixtures/check-requirements/fail-complete/actual-output
+	diff fixtures/check-requirements/fail-complete/expected-output-73 fixtures/check-requirements/fail-complete/actual-output
 
 	#
 	# Skip the requirement check
@@ -208,7 +208,7 @@ endif
 e2e_php_settings_checker: ## Runs the end-to-end tests for the PHP settings handler
 e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xdebug-enabled vendor box
 	@echo "$(CCYELLOW)No restart needed$(CCEND)"
-	$(DOCKER) -v "$$PWD":/opt/box box_php72 \
+	$(DOCKER) -v "$$PWD":/opt/box box_php73 \
 		php -dphar.readonly=0 -dmemory_limit=-1 \
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
@@ -217,7 +217,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 	diff fixtures/php-settings-checker/output-all-clear fixtures/php-settings-checker/actual-output
 
 	@echo "$(CCYELLOW)Xdebug enabled: restart needed$(CCEND)"
-	$(DOCKER) -v "$$PWD":/opt/box box_php72_xdebug \
+	$(DOCKER) -v "$$PWD":/opt/box box_php73_xdebug \
 		php -dphar.readonly=0 -dmemory_limit=-1 \
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
@@ -227,7 +227,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 	diff fixtures/php-settings-checker/output-xdebug-enabled fixtures/php-settings-checker/actual-output
 
 	@echo "$(CCYELLOW)phar.readonly enabled: restart needed$(CCEND)"
-	$(DOCKER) -v "$$PWD":/opt/box box_php72 \
+	$(DOCKER) -v "$$PWD":/opt/box box_php73 \
 		php -dphar.readonly=1 -dmemory_limit=-1 \
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
@@ -238,7 +238,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 	diff fixtures/php-settings-checker/output-pharreadonly-enabled fixtures/php-settings-checker/actual-output
 
 	@echo "$(CCYELLOW)Bump min memory limit if necessary (limit lower than default)$(CCEND)"
-	$(DOCKER) -v "$$PWD":/opt/box box_php72 \
+	$(DOCKER) -v "$$PWD":/opt/box box_php73 \
 		php -dphar.readonly=0 -dmemory_limit=124M \
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
@@ -249,7 +249,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 	diff fixtures/php-settings-checker/output-min-memory-limit fixtures/php-settings-checker/actual-output
 
 	@echo "$(CCYELLOW)Bump min memory limit if necessary (limit higher than default)$(CCEND)"
-	$(DOCKER) -e BOX_MEMORY_LIMIT=64M -v "$$PWD":/opt/box box_php72 \
+	$(DOCKER) -e BOX_MEMORY_LIMIT=64M -v "$$PWD":/opt/box box_php73 \
 		php -dphar.readonly=0 -dmemory_limit=1024M \
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
