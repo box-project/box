@@ -544,6 +544,10 @@ HELP;
                 'Setting metadata'
             );
 
+            if (is_callable($metadata)) {
+                $metadata = $metadata();
+            }
+
             $logger->log(
                 CompilerLogger::MINUS_PREFIX,
                 is_string($metadata) ? $metadata : var_export($metadata, true)
