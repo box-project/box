@@ -48,6 +48,7 @@
         "composer/package-versions-deprecated": "^1.8",
         "composer/semver": "^3.2",
         "composer/xdebug-handler": "^1.3.2",
+        "composer-plugin-api": "^1.0 || ^2.0",
         "hoa/compiler": "^3.17",
         "humbug/php-scoper": "^0.13",
         "justinrainbow/json-schema": "^5.2.9",
