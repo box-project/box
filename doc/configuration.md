@@ -762,6 +762,30 @@ This setting will be ignored if no [key][key] has been provided.
 The metadata (`any` default none) setting can be any value. This value will be stored as metadata that can be retrieved
 from the built PHAR ([`Phar::getMetadata()][phar.getmetadata]).
 
+If you specify a closure as string setting, if will be evaluate without any arguments.
+
+For example, if you take the following code:
+
+```php
+<?php
+class MyCallbacks
+{
+    public static function generateMetadata()
+    {
+        return ['application_version' => '1.0.0-dev'];
+    }
+}
+```
+
+With the configuration excerpt:
+
+```json
+{
+    "metadata": "MyCallbacks\\generateMetadata"
+}
+```
+
+Then the `Phar::getMetadata()` will return `['application_version' => '1.0.0-dev']` array.
 
 ## Replaceable placeholders
 
