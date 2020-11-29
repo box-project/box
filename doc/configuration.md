@@ -787,6 +787,7 @@ With the configuration excerpt:
 
 Then the `Phar::getMetadata()` will return `['application_version' => '1.0.0-dev']` array.
 
+
 ## Replaceable placeholders
 
 This feature allows you to set placeholders in your code which will be replaced by different values by Box when building
