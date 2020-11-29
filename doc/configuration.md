@@ -762,7 +762,7 @@ This setting will be ignored if no [key][key] has been provided.
 The metadata (`any` default none) setting can be any value. This value will be stored as metadata that can be retrieved
 from the built PHAR ([`Phar::getMetadata()][phar.getmetadata]).
 
-If you specify a closure as string setting, if will be evaluate without any arguments.
+If you specify a callable (as a string), if will be evaluate without any arguments.
 
 For example, if you take the following code:
 
