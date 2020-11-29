@@ -1,5 +1,20 @@
 # Symfony support
 
+## Project directory
+Symfony 5.1+ defines the "project dir" as the directory where the composer.json file is. Because box deletes it during PHAR compilation, you need to redefine it in your Kernel. It is usually located in `src/Kernel.php` and can be defined as follow: 
+
+```
+class Kernel extends BaseKernel
+{
+...
+    public function getProjectDir()
+    {
+        return __DIR__.'/../';
+    }
+}
+```
+
+## Cache
 What makes Symfony a bit special for shipping it into a PHAR is its compilation step. Indeed the Symfony container can
 be dumped depending on multiple parameters such the application environment, whether it is in debug mode or not and if
 the cache is fresh.
