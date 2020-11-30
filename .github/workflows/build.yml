@@ -15,10 +15,6 @@ jobs:
             fail-fast: false
             matrix:
                 include:
-                    -   php: 7.2
-                        tools: "composer:v1"
-                        coverage: "none"
-                        git-fetch-depth: 1
                     -   php: 7.3
                         tools: "composer:v1"
                         coverage: "none"

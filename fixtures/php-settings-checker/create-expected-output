@@ -3,7 +3,7 @@
 set -Eeuox pipefail
 
 readonly OS=$(uname);
-readonly XDEBUG_VERSION=$(docker run -i --rm -w /opt/box box_php72_xdebug php -r "echo phpversion('xdebug');");
+readonly XDEBUG_VERSION=$(docker run -i --rm -w /opt/box box_php73_xdebug php -r "echo phpversion('xdebug');");
 readonly CURRENT_DIR=$(dirname $0);
 readonly TEMPLATE_FILE="${CURRENT_DIR}/output-xdebug-enabled.tpl";
 readonly DUMPED_FILE="${CURRENT_DIR}/output-xdebug-enabled";
