@@ -33,6 +33,10 @@ jobs:
                         tools: "composer:v2"
                         coverage: "none"
                         git-fetch-depth: 1
+                    -   php: 8.0
+                        tools: "composer:v2"
+                        coverage: "pcov"
+                        git-fetch-depth: 1
 
         steps:
             -   uses: actions/checkout@v2
