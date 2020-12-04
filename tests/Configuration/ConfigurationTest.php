@@ -93,14 +93,14 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_a_default_alias_is_generated_if_no_alias_is_registered(): void
     {
-        $this->assertRegExp('/^box-auto-generated-alias-[\da-zA-Z]{12}\.phar$/', $this->config->getAlias());
-        $this->assertRegExp('/^box-auto-generated-alias-[\da-zA-Z]{12}\.phar$/', $this->getNoFileConfig()->getAlias());
+        $this->assertMatchesRegularExpression('/^box-auto-generated-alias-[\da-zA-Z]{12}\.phar$/', $this->config->getAlias());
+        $this->assertMatchesRegularExpression('/^box-auto-generated-alias-[\da-zA-Z]{12}\.phar$/', $this->getNoFileConfig()->getAlias());
 
         $this->setConfig([
             'alias' => null,
         ]);
 
-        $this->assertRegExp('/^box-auto-generated-alias-[\da-zA-Z]{12}\.phar$/', $this->config->getAlias());
+        $this->assertMatchesRegularExpression('/^box-auto-generated-alias-[\da-zA-Z]{12}\.phar$/', $this->config->getAlias());
 
         $this->assertSame(
             ['The "alias" setting can be omitted since is set to its default value'],
@@ -819,7 +819,7 @@ EOF
                 $exception->getMessage()
             );
         } catch (JsonValidationException $exception) {
-            $this->assertRegExp(
+            $this->assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
                 $exception->getMessage()
             );
@@ -1377,12 +1377,12 @@ JSON
         $values = $this->config->getReplacements();
 
         $this->assertSame('1.0.0', $values['@git@']);
-        $this->assertRegExp('/^[a-f0-9]{40}$/', $values['@git_commit@']);
-        $this->assertRegExp('/^[a-f0-9]{7}$/', $values['@git_commit_short@']);
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{40}$/', $values['@git_commit@']);
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{7}$/', $values['@git_commit_short@']);
         $this->assertSame('1.0.0', $values['@git_tag@']);
         $this->assertSame('1.0.0', $values['@git_version@']);
         $this->assertSame($rand, $values['@rand@']);
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '/^[0-9]{4}:[0-9]{2}:[0-9]{2}$/',
             $values['@date_time@']
         );
@@ -1410,13 +1410,13 @@ JSON
 
         $values = $this->config->getReplacements();
 
-        $this->assertRegExp('/^.+@[a-f0-9]{7}$/', $values['$git$']);
-        $this->assertRegExp('/^[a-f0-9]{40}$/', $values['$git_commit$']);
-        $this->assertRegExp('/^[a-f0-9]{7}$/', $values['$git_commit_short$']);
-        $this->assertRegExp('/^.+-\d+-g[a-f0-9]{7}$/', $values['$git_tag$']);
-        $this->assertRegExp('/^.+-\d+-g[a-f0-9]{7}$/', $values['$git_version$']);
+        $this->assertMatchesRegularExpression('/^.+@[a-f0-9]{7}$/', $values['$git$']);
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{40}$/', $values['$git_commit$']);
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{7}$/', $values['$git_commit_short$']);
+        $this->assertMatchesRegularExpression('/^.+-\d+-g[a-f0-9]{7}$/', $values['$git_tag$']);
+        $this->assertMatchesRegularExpression('/^.+-\d+-g[a-f0-9]{7}$/', $values['$git_version$']);
         $this->assertSame($rand, $values['$rand$']);
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '/^[0-9]{4}:[0-9]{2}:[0-9]{2}$/',
             $values['$date_time$']
         );
@@ -1461,8 +1461,8 @@ JSON
         $values = $this->config->getReplacements();
 
         $this->assertSame('1.0.0', $values['@git@']);
-        $this->assertRegExp('/^[a-f0-9]{40}$/', $values['@git_commit@']);
-        $this->assertRegExp('/^[a-f0-9]{7}$/', $values['@git_commit_short@']);
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{40}$/', $values['@git_commit@']);
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{7}$/', $values['@git_commit_short@']);
         $this->assertSame('1.0.0', $values['@git_tag@']);
         $this->assertSame('1.0.0', $values['@git_version@']);
         $this->assertCount(5, $values);
@@ -1488,11 +1488,11 @@ JSON
 
         $values = $this->config->getReplacements();
 
-        $this->assertRegExp('/^.+@[a-f0-9]{7}$/', $values['@git@']);
-        $this->assertRegExp('/^[a-f0-9]{40}$/', $values['@git_commit@']);
-        $this->assertRegExp('/^[a-f0-9]{7}$/', $values['@git_commit_short@']);
-        $this->assertRegExp('/^.+-\d+-g[a-f0-9]{7}$/', $values['@git_tag@']);
-        $this->assertRegExp('/^.+-\d+-g[a-f0-9]{7}$/', $values['@git_version@']);
+        $this->assertMatchesRegularExpression('/^.+@[a-f0-9]{7}$/', $values['@git@']);
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{40}$/', $values['@git_commit@']);
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{7}$/', $values['@git_commit_short@']);
+        $this->assertMatchesRegularExpression('/^.+-\d+-g[a-f0-9]{7}$/', $values['@git_tag@']);
+        $this->assertMatchesRegularExpression('/^.+-\d+-g[a-f0-9]{7}$/', $values['@git_version@']);
         $this->assertCount(5, $values);
 
         // Some process does not release the git files
@@ -1523,7 +1523,7 @@ JSON
     {
         $this->setConfig(['datetime' => 'date_time']);
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} [A-Z]{2,5}$/',
             $this->config->getReplacements()['@date_time@']
         );
@@ -1580,7 +1580,7 @@ JSON
 
         $values = $this->config->getReplacements();
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/',
             $values['@date_time@']
         );
@@ -2919,7 +2919,7 @@ COMMENT;
         $this->assertFalse($this->config->checkRequirements());
         $this->assertFalse($this->config->dumpAutoload());
         $this->assertTrue($this->config->excludeComposerFiles());
-        $this->assertRegExp('/^box-auto-generated-alias-[\da-zA-Z]{12}\.phar$/', $this->config->getAlias());
+        $this->assertMatchesRegularExpression('/^box-auto-generated-alias-[\da-zA-Z]{12}\.phar$/', $this->config->getAlias());
         $this->assertSame($this->tmp, $this->config->getBasePath());
         $this->assertSame([], $this->config->getBinaryFiles());
         $this->assertSame([], $this->config->getCompactors()->toArray());

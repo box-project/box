@@ -159,7 +159,7 @@ OUTPUT;
             'phar' => $pharPath,
         ]);
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '/The PHAR failed the verification: .+/',
             $this->commandTester->getDisplay(true),
             $this->commandTester->getDisplay(true)

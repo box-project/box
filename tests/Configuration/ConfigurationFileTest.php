@@ -1130,7 +1130,7 @@ JSON
 
             $this->fail('Expected exception to be thrown.');
         } catch (JsonValidationException $exception) {
-            $this->assertRegExp(
+            $this->assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
                 $exception->getMessage()
             );
@@ -1190,7 +1190,7 @@ JSON
 
             $this->fail('Expected exception to be thrown.');
         } catch (JsonValidationException $exception) {
-            $this->assertRegExp(
+            $this->assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
                 $exception->getMessage()
             );
@@ -1224,7 +1224,7 @@ JSON
 
             $this->fail('Expected exception to be thrown.');
         } catch (JsonValidationException $exception) {
-            $this->assertRegExp(
+            $this->assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
                 $exception->getMessage()
             );
@@ -1271,7 +1271,7 @@ JSON
 
             $this->fail('Expected exception to be thrown.');
         } catch (JsonValidationException $exception) {
-            $this->assertRegExp(
+            $this->assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
                 $exception->getMessage()
             );
@@ -1305,7 +1305,7 @@ JSON
 
             $this->fail('Expected exception to be thrown.');
         } catch (JsonValidationException $exception) {
-            $this->assertRegExp(
+            $this->assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
                 $exception->getMessage()
             );
@@ -1353,7 +1353,7 @@ JSON
 
             $this->fail('Expected exception to be thrown.');
         } catch (JsonValidationException $exception) {
-            $this->assertRegExp(
+            $this->assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
                 $exception->getMessage()
             );

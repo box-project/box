@@ -18,6 +18,7 @@ use Humbug\PhpScoper\Scoper;
 use Humbug\PhpScoper\Whitelist;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use function serialize;
 use function unserialize;
@@ -27,6 +28,8 @@ use function unserialize;
  */
 class SimpleScoperTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function test_it_scopes_the_file_content(): void
     {
         $file = 'foo';

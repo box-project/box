@@ -82,8 +82,8 @@ class FunctionsTest extends TestCase
 
     public function test_it_can_generate_a_unique_id(): void
     {
-        $this->assertRegExp('/^(?:[a-z]|\d){12}$/', unique_id(''));
-        $this->assertRegExp('/^Box(?:[a-z]|\d){12}$/', unique_id('Box'));
+        $this->assertMatchesRegularExpression('/^(?:[a-z]|\d){12}$/', unique_id(''));
+        $this->assertMatchesRegularExpression('/^Box(?:[a-z]|\d){12}$/', unique_id('Box'));
     }
 
     public function providePharCompressionAlgorithm(): Generator

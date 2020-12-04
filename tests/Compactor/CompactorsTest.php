@@ -19,6 +19,7 @@ use Humbug\PhpScoper\Whitelist;
 use KevinGH\Box\PhpScoper\Scoper;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**
@@ -26,6 +27,8 @@ use Prophecy\Prophecy\ObjectProphecy;
  */
 class CompactorsTest extends TestCase
 {
+    use ProphecyTrait;
+
     /** @var Compactor&ObjectProphecy */
     private $compactor1Prophecy;
 
