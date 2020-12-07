@@ -5,7 +5,6 @@
          beStrictAboutChangesToGlobalState="true"
          beStrictAboutOutputDuringTests="true"
          beStrictAboutResourceUsageDuringSmallTests="true"
-         beStrictAboutCoversAnnotation="true"
          colors="true">
 
     <php>
