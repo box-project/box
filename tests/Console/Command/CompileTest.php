@@ -1101,7 +1101,7 @@ PHP
 JSON
         );
 
-        $this->assertDirectoryNotExists('.box_dump');
+        $this->assertDirectoryDoesNotExist('.box_dump');
 
         $this->commandTester->execute(
             [
@@ -1403,8 +1403,8 @@ EOF;
         $pharContents = file_get_contents('test.phar');
         $shebang = preg_quote($shebang, '/');
 
-        $this->assertRegExp("/$shebang/", $pharContents);
-        $this->assertRegExp('/custom banner/', $pharContents);
+        $this->assertMatchesRegularExpression("/$shebang/", $pharContents);
+        $this->assertMatchesRegularExpression('/custom banner/', $pharContents);
 
         $phar = new Phar('test.phar');
 
@@ -1587,7 +1587,7 @@ PHP
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertRegExp(
+            $this->assertMatchesRegularExpression(
                 '/^Path ".+?" was expected to be readable\.$/',
                 $exception->getMessage()
             );
@@ -1675,7 +1675,7 @@ OUTPUT;
 
         rename('run.php', 'index.php');
 
-        $this->assertFileNotExists($this->tmp.'/vendor/autoload.php');
+        $this->assertFileDoesNotExist($this->tmp.'/vendor/autoload.php');
 
         $this->commandTester->execute(
             ['command' => 'compile'],
@@ -1684,7 +1684,7 @@ OUTPUT;
 
         $output = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '/\? Dumping the Composer autoloader/',
             $output,
             'Expected the autoloader to be dumped'
@@ -1713,7 +1713,7 @@ OUTPUT;
 
         rename('run.php', 'index.php');
 
-        $this->assertFileNotExists($this->tmp.'/vendor/autoload.php');
+        $this->assertFileDoesNotExist($this->tmp.'/vendor/autoload.php');
 
         dump_file(
             'box.json',
@@ -1731,7 +1731,7 @@ OUTPUT;
 
         $output = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '/\? Skipping dumping the Composer autoloader/',
             $output,
             'Did not expect the autoloader to be dumped'
@@ -1750,7 +1750,7 @@ OUTPUT;
         ];
 
         foreach ($composerFiles as $composerFile) {
-            $this->assertFileNotExists('phar://index.phar/'.$composerFile);
+            $this->assertFileDoesNotExist('phar://index.phar/'.$composerFile);
         }
     }
 
@@ -1760,7 +1760,7 @@ OUTPUT;
 
         rename('run.php', 'index.php');
 
-        $this->assertFileNotExists($this->tmp.'/vendor/autoload.php');
+        $this->assertFileDoesNotExist($this->tmp.'/vendor/autoload.php');
 
         $this->commandTester->execute(
             ['command' => 'compile'],
@@ -1769,7 +1769,7 @@ OUTPUT;
 
         $output = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '/\? Removing the Composer dump artefacts/',
             $output,
             'Expected the composer files to be removed'
@@ -1798,7 +1798,7 @@ OUTPUT;
         ];
 
         foreach ($removedComposerFiles as $composerFile) {
-            $this->assertFileNotExists('phar://index.phar/'.$composerFile);
+            $this->assertFileDoesNotExist('phar://index.phar/'.$composerFile);
         }
     }
 
@@ -1813,7 +1813,7 @@ OUTPUT;
             json_encode(['exclude-composer-files' => false])
         );
 
-        $this->assertFileNotExists($this->tmp.'/vendor/autoload.php');
+        $this->assertFileDoesNotExist($this->tmp.'/vendor/autoload.php');
 
         $this->commandTester->execute(
             ['command' => 'compile'],
@@ -1822,7 +1822,7 @@ OUTPUT;
 
         $output = $this->normalizeDisplay($this->commandTester->getDisplay(true));
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '/\? Keep the Composer dump artefacts/',
             $output,
             'Expected the composer files to be kept'
@@ -2414,11 +2414,11 @@ OUTPUT;
         if ($stub) {
             $this->assertSame($phar->getPath(), $phar->getAlias());
 
-            $this->assertNotRegExp(
+            $this->assertDoesNotMatchRegularExpression(
                 '/Phar::webPhar\(.*\);/',
                 $actualStub
             );
-            $this->assertRegExp(
+            $this->assertMatchesRegularExpression(
                 '/Phar::mapPhar\(\'alias-test\.phar\'\);/',
                 $actualStub
             );
@@ -2429,7 +2429,7 @@ OUTPUT;
 
             // No alias is found: I find it weird but well, that's the default stub so there is not much that can
             // be done here. Maybe there is a valid reason I'm not aware of.
-            $this->assertNotRegExp(
+            $this->assertDoesNotMatchRegularExpression(
                 '/alias-test\.phar/',
                 $actualStub
             );

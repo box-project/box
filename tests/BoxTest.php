@@ -46,6 +46,7 @@ use Phar;
 use PharFileInfo;
 use const PHP_EOL;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use function realpath;
 use RuntimeException;
@@ -65,6 +66,7 @@ use function trim;
  */
 class BoxTest extends FileSystemTestCase
 {
+    use ProphecyTrait;
     use RequiresPharReadonlyOff;
 
     /** @var Box */
@@ -794,7 +796,7 @@ class BoxTest extends FileSystemTestCase
         $this->box->removeComposerArtefacts('vendor');
 
         foreach ($files as $file => $contents) {
-            $this->assertFileNotExists('phar://test.phar/'.$file);
+            $this->assertFileDoesNotExist('phar://test.phar/'.$file);
         }
     }
 
@@ -828,7 +830,7 @@ JSON
         $this->box->removeComposerArtefacts('my-vendor');
 
         foreach ($files as $file => $contents) {
-            $this->assertFileNotExists('phar://test.phar/'.$file);
+            $this->assertFileDoesNotExist('phar://test.phar/'.$file);
         }
     }
 
@@ -864,7 +866,7 @@ JSON
         $this->box->removeComposerArtefacts('vendor');
 
         foreach ($files as $file => $contents) {
-            $this->assertFileNotExists('phar://test.phar/lib/'.$file);
+            $this->assertFileDoesNotExist('phar://test.phar/lib/'.$file);
         }
     }
 

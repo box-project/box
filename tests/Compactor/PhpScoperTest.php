@@ -19,6 +19,7 @@ use KevinGH\Box\PhpScoper\FakeScoper;
 use KevinGH\Box\PhpScoper\Scoper;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use function serialize;
 use function unserialize;
@@ -28,6 +29,8 @@ use function unserialize;
  */
 class PhpScoperTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function test_it_scopes_the_file_content(): void
     {
         $file = 'foo';

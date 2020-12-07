@@ -215,7 +215,7 @@ OUTPUT;
 
         $expected = '/^Could not check the PHARs: internal corruption of phar \".*\.phar\" \(__HALT_COMPILER\(\); not found\)/';
 
-        $this->assertRegExp($expected, $this->commandTester->getDisplay(true));
+        $this->assertMatchesRegularExpression($expected, $this->commandTester->getDisplay(true));
         $this->assertSame(1, $this->commandTester->getStatusCode());
     }
 
@@ -263,7 +263,7 @@ OUTPUT;
 
             $this->fail('Expected exception to be thrown.');
         } catch (UnexpectedValueException $exception) {
-            $this->assertRegExp(
+            $this->assertMatchesRegularExpression(
                 '/openssl signature could not be verified/',
                 $exception->getMessage()
             );
@@ -284,7 +284,7 @@ OUTPUT;
 
             $this->fail('Expected exception to be thrown.');
         } catch (UnexpectedValueException $exception) {
-            $this->assertRegExp(
+            $this->assertMatchesRegularExpression(
                 '/^internal corruption of phar \".*\.phar\" \(__HALT_COMPILER\(\); not found\)/',
                 $exception->getMessage()
             );

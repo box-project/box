@@ -104,7 +104,7 @@ OUTPUT;
         );
         $this->assertSame(1, $this->commandTester->getStatusCode());
 
-        $this->assertFileNotExists($this->tmp.'/Dockerfile');
+        $this->assertFileDoesNotExist($this->tmp.'/Dockerfile');
     }
 
     public function test_it_cannot_generate_a_Dockerfile_for_a_corrupted_PHAR(): void
