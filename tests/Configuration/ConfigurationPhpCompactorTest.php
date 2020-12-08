@@ -243,7 +243,7 @@ PHP
 @param
 @param
 @return
-@Acme(type="function")
+@Acme(type = "function")
 
 
 
@@ -307,7 +307,7 @@ PHP
 @return
 @author
 @LICENSE
-@Acme(type="function")
+@Acme(type = "function")
 
 
 
@@ -359,7 +359,7 @@ PHP
 <?php
 
 /**
-@Acme(type="function")
+@Acme(type = "function")
 
 
 
@@ -409,7 +409,7 @@ PHP
 <?php
 
 /**
-@Acme(type="function")
+@Acme(type = "function")
 
 
 
