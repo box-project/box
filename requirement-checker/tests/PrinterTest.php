@@ -226,7 +226,8 @@ EOF
             <<<'EOF'
 
                          
- [OK] This is a block    
+ [OK] This is a          
+      block              
                          
 
 EOF
@@ -242,7 +243,8 @@ EOF
             <<<'EOF'
 [0m
 [0m[30;42m                         [0m
-[0m[30;42m [OK] This is a block    [0m
+[0m[30;42m [OK] This is a          [0m
+[0m[30;42m      block              [0m
 [0m[30;42m                         [0m[0m
 [0m
 EOF
@@ -258,7 +260,8 @@ EOF
             <<<'EOF'
 
                          
- [OK] This is a block    
+ [OK] This is a          
+      block              
                          
 
 EOF
@@ -284,12 +287,12 @@ EOF
             <<<'EOF'
 
                     
- [OK] This is a     
-      very long     
+ [OK] This is       
+      a very long   
       block that    
       should be     
-      displayed     
-      on 5 lines    
+      displayed on  
+      5 lines       
                     
 
 EOF
@@ -300,18 +303,63 @@ EOF
             true,
             20,
             'OK',
-            'This is a very long block that should be displayed on 5 lines',
+            'This is a very long block that should be displayed on 6 lines',
             IO::VERBOSITY_NORMAL,
             <<<'EOF'
 [0m
 [0m[30;42m                    [0m
-[0m[30;42m [OK] This is a     [0m
-[0m[30;42m      very long     [0m
+[0m[30;42m [OK] This is       [0m
+[0m[30;42m      a very long   [0m
 [0m[30;42m      block that    [0m
 [0m[30;42m      should be     [0m
-[0m[30;42m      displayed     [0m
-[0m[30;42m      on 5 lines    [0m
+[0m[30;42m      displayed on  [0m
+[0m[30;42m      6 lines       [0m
 [0m[30;42m                    [0m[0m
+[0m
+EOF
+      ];
+
+        yield [
+            IO::VERBOSITY_NORMAL,
+            true,
+            20,
+            'OK',
+            'Your system is ready to run the application.',
+            IO::VERBOSITY_NORMAL,
+            <<<'EOF'
+[0m
+[0m[30;42m                    [0m
+[0m[30;42m [OK] Your          [0m
+[0m[30;42m      system is     [0m
+[0m[30;42m      ready to run  [0m
+[0m[30;42m      the           [0m
+[0m[30;42m      application.  [0m
+[0m[30;42m                    [0m[0m
+[0m
+EOF
+        ];
+
+        yield [
+          IO::VERBOSITY_NORMAL,
+          true,
+          0,
+          'OK',
+          'Your system is ready to run the application.',
+          IO::VERBOSITY_NORMAL,
+          <<<'EOF'
+[0m
+[0m[30;42m[0m
+[0m[30;42m[0m
+[0m[30;42m[OK][0m
+[0m[30;42mYour[0m
+[0m[30;42msystem[0m
+[0m[30;42mis[0m
+[0m[30;42mready[0m
+[0m[30;42mto[0m
+[0m[30;42mrun[0m
+[0m[30;42mthe[0m
+[0m[30;42mapplication.[0m
+[0m[30;42m[0m[0m
 [0m
 EOF
         ];
