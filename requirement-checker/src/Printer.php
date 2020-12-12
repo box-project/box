@@ -39,12 +39,12 @@ final class Printer
     {
         if (null === $width) {
             $terminal = new Terminal();
-            $width = min($terminal->getWidth(), 80);
+            $width = $terminal->getWidth();
         }
 
         $this->verbosity = $verbosity;
         $this->supportColors = $supportColors;
-        $this->width = $width;
+        $this->width = $width ?: 80;
     }
 
     /**

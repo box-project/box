@@ -348,18 +348,9 @@ EOF
           IO::VERBOSITY_NORMAL,
           <<<'EOF'
 [0m
-[0m[30;42m[0m
-[0m[30;42m[0m
-[0m[30;42m[OK][0m
-[0m[30;42mYour[0m
-[0m[30;42msystem[0m
-[0m[30;42mis[0m
-[0m[30;42mready[0m
-[0m[30;42mto[0m
-[0m[30;42mrun[0m
-[0m[30;42mthe[0m
-[0m[30;42mapplication.[0m
-[0m[30;42m[0m[0m
+[0m[30;42m                                                                                [0m
+[0m[30;42m [OK] Your system is ready to run the application.                              [0m
+[0m[30;42m                                                                                [0m[0m
 [0m
 EOF
         ];
