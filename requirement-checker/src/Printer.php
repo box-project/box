@@ -114,7 +114,7 @@ final class Printer
         $prefix = ' ['.$title.'] ';
         $lineLength = $this->width - strlen($prefix) - 1;
         if ($lineLength < 0) {
-          $lineLength = 0;
+            $lineLength = 0;
         }
         $message = $prefix.trim($message);
 
@@ -126,11 +126,11 @@ final class Printer
         $wrapped = explode('¬', $wrapped);
 
         do {
-          $line = array_shift($wrapped);
-          if ($lines && $lineLength > 0) {
-            $line = str_repeat(' ', \strlen($prefix)).ltrim($line);
-          }
-          $lines[] = str_pad($line, $this->width, ' ', STR_PAD_RIGHT);
+            $line = array_shift($wrapped);
+            if ($lines && $lineLength > 0) {
+                $line = str_repeat(' ', \strlen($prefix)).ltrim($line);
+            }
+            $lines[] = str_pad($line, $this->width, ' ', STR_PAD_RIGHT);
         }
         while (count($wrapped));
 
