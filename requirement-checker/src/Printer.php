@@ -39,12 +39,12 @@ final class Printer
     {
         if (null === $width) {
             $terminal = new Terminal();
-            $width = min($terminal->getWidth(), 80);
+            $width = $terminal->getWidth();
         }
 
         $this->verbosity = $verbosity;
         $this->supportColors = $supportColors;
-        $this->width = $width;
+        $this->width = $width ?: 80;
     }
 
     /**
@@ -112,24 +112,27 @@ final class Printer
     public function block($title, $message, $verbosity, $style = null)
     {
         $prefix = ' ['.$title.'] ';
+        $lineLength = $this->width - strlen($prefix) - 1;
+        if ($lineLength < 0) {
+            $lineLength = 0;
+        }
         $message = $prefix.trim($message);
 
         $lines = array();
 
         $remainingMessage = $message;
 
-        while ($remainingMessage !== '') {
-            $wrapped = wordwrap($remainingMessage, $this->width - 3, '¬');
-            $exploded = explode('¬', $wrapped);
-            $line = $exploded[0];
-            $remainingMessage = ltrim(substr($remainingMessage, \strlen($line)));
+        $wrapped = wordwrap($remainingMessage, $lineLength, '¬');
+        $wrapped = explode('¬', $wrapped);
 
-            if ($remainingMessage !== '') {
-                $remainingMessage = str_repeat(' ', \strlen($prefix)).$remainingMessage;
+        do {
+            $line = array_shift($wrapped);
+            if ($lines && $lineLength > 0) {
+                $line = str_repeat(' ', \strlen($prefix)).ltrim($line);
             }
-
             $lines[] = str_pad($line, $this->width, ' ', STR_PAD_RIGHT);
         }
+        while (count($wrapped));
 
         $this->printvln('', $verbosity);
         $this->printvln(str_repeat(' ', $this->width), $verbosity, $style);
