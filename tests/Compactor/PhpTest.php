@@ -15,9 +15,9 @@ declare(strict_types=1);
 namespace KevinGH\Box\Compactor;
 
 use Generator;
-use KevinGH\Box\Annotation\AnnotationDumper;
+use KevinGH\Box\Annotation\CompactedFormatter;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
-use KevinGH\Box\Annotation\DocblockParser;
+use phpDocumentor\Reflection\DocBlockFactory;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -32,8 +32,8 @@ class PhpTest extends TestCase
     {
         $compactor = new Php(
             new DocblockAnnotationParser(
-                new DocblockParser(),
-                new AnnotationDumper(),
+                DocBlockFactory::createInstance(),
+                new CompactedFormatter(),
                 []
             )
         );
@@ -69,8 +69,8 @@ PHP;
     {
         $compactor = new Php(
             new DocblockAnnotationParser(
-                new DocblockParser(),
-                new AnnotationDumper(),
+                DocBlockFactory::createInstance(),
+                new CompactedFormatter(),
                 []
             )
         );
@@ -91,8 +91,8 @@ PHP;
     public function providePhpContent(): Generator
     {
         $regularAnnotationParser = new DocblockAnnotationParser(
-            new DocblockParser(),
-            new AnnotationDumper(),
+            DocBlockFactory::createInstance(),
+            new CompactedFormatter(),
             []
         );
 
@@ -137,8 +137,8 @@ PHP
 
         yield 'PHP file with annotations' => [
             new DocblockAnnotationParser(
-                new DocblockParser(),
-                new AnnotationDumper(),
+                DocBlockFactory::createInstance(),
+                new CompactedFormatter(),
                 ['ignored']
             ),
             <<<'PHP'
@@ -230,8 +230,8 @@ PHP
 
         yield 'legacy issue 14' => [
             new DocblockAnnotationParser(
-                new DocblockParser(),
-                new AnnotationDumper(),
+                DocBlockFactory::createInstance(),
+                new CompactedFormatter(),
                 ['author', 'inline']
             ),
             <<<'PHP'
@@ -402,10 +402,10 @@ PHP
 <?php
 
 /**
- * comment
- *
- * @a({@:1}) 
- */
+@a({@:1})
+
+
+*/
 function foo($x) {
 }
 PHP

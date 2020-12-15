@@ -56,9 +56,8 @@ use function is_string;
 use function iter\map;
 use function iter\toArray;
 use function iter\values;
-use KevinGH\Box\Annotation\AnnotationDumper;
+use KevinGH\Box\Annotation\CompactedFormatter;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
-use KevinGH\Box\Annotation\DocblockParser;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\Json as JsonCompactor;
@@ -83,6 +82,7 @@ use KevinGH\Box\PhpScoper\SimpleScoper;
 use function KevinGH\Box\unique_id;
 use function krsort;
 use Phar;
+use phpDocumentor\Reflection\DocBlockFactory;
 use function preg_match;
 use function preg_replace;
 use function property_exists;
@@ -1889,10 +1889,8 @@ BANNER;
             if ($compactor instanceof PhpCompactor) {
                 if (true === $scoperCompactor) {
                     $logger->addRecommendation(
-                        sprintf(
-                            'The PHP compactor has been registered after the PhpScoper compactor. It is '
+                        'The PHP compactor has been registered after the PhpScoper compactor. It is '
                             .'recommended to register the PHP compactor before for a clearer code and faster processing.'
-                        )
                     );
                 }
 
@@ -2826,8 +2824,8 @@ BANNER;
 
         return new PhpCompactor(
             new DocblockAnnotationParser(
-                new DocblockParser(),
-                new AnnotationDumper(),
+                DocBlockFactory::createInstance(),
+                new CompactedFormatter(),
                 $ignoredAnnotations
             )
         );

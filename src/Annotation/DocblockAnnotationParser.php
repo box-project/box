@@ -14,36 +14,55 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Annotation;
 
+use function array_filter;
+use function array_map;
+use function array_values;
+use function in_array;
+use phpDocumentor\Reflection\DocBlock\Tag;
+use phpDocumentor\Reflection\DocBlock\Tags\Formatter;
+use phpDocumentor\Reflection\DocBlockFactoryInterface;
+use function strtolower;
+
 /**
  * @private
  */
 final class DocblockAnnotationParser
 {
-    private $docblockParser;
-    private $annotationDumper;
+    private $factory;
+    private $tagsFormatter;
     private $ignored;
 
     /**
      * @param string[] $ignored
      */
-    public function __construct(DocblockParser $docblockParser, AnnotationDumper $annotationDumper, array $ignored)
+    public function __construct(DocBlockFactoryInterface $factory, Formatter $tagsFormatter, array $ignored)
     {
-        $this->docblockParser = $docblockParser;
-        $this->annotationDumper = $annotationDumper;
+        $this->factory = $factory;
         $this->ignored = $ignored;
+        $this->tagsFormatter = $tagsFormatter;
     }
 
     /**
-     * @throws InvalidDocblock
-     * @throws InvalidToken
-     *
      * @return string[] Parsed compacted annotations parsed from the docblock
      */
     public function parse(string $docblock): array
     {
-        return $this->annotationDumper->dump(
-            $this->docblockParser->parse($docblock),
-            $this->ignored
+        $doc = $this->factory->create($docblock);
+
+        $tags = array_values(
+            array_filter(
+                $doc->getTags(),
+                function (Tag $tag) {
+                    return !in_array(strtolower($tag->getName()), $this->ignored, true);
+                }
+            )
+        );
+
+        return array_map(
+            function (Tag $tag) {
+                return $tag->render($this->tagsFormatter);
+            },
+            $tags
         );
     }
 }

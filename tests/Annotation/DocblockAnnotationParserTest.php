@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Annotation;
 
 use Generator;
+use phpDocumentor\Reflection\DocBlockFactory;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -33,8 +34,8 @@ class DocblockAnnotationParserTest extends TestCase
     protected function setUp(): void
     {
         $this->annotationParser = new DocblockAnnotationParser(
-            new DocblockParser(),
-            new AnnotationDumper(),
+            DocBlockFactory::createInstance(),
+            new CompactedFormatter(),
             ['ignored']
         );
     }
