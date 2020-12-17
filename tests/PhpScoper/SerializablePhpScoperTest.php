@@ -180,7 +180,9 @@ class SerializablePhpScoperTest extends TestCase
                 static function () use ($scoper) {
                     return $scoper;
                 },
-                "Serialization of 'class@anonymous' is not allowed",
+                PHP_VERSION_ID < 80000
+                    ? "Serialization of 'class@anonymous' is not allowed"
+                    : "Serialization of 'Humbug\PhpScoper\Scoper@anonymous' is not allowed",
             ];
         })();
     }

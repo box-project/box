@@ -231,7 +231,6 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
  * @Acme(type = "function")
  */
 function foo($x, $y): int {
-    // Compare the two values
     return $x <=> $y;
 }
 PHP
@@ -253,8 +252,7 @@ PHP
 
 */
 function foo($x, $y): int {
-
- return $x <=> $y;
+return $x <=> $y;
 }
 PHP
         ];
@@ -293,7 +291,6 @@ PHP
  * @Acme(type = "function")
  */
 function foo($x, $y): int {
-    // Compare the two values
     return $x <=> $y;
 }
 PHP
@@ -315,8 +312,7 @@ PHP
 
 */
 function foo($x, $y): int {
-
- return $x <=> $y;
+return $x <=> $y;
 }
 PHP
             ];
@@ -350,7 +346,6 @@ PHP
  * @Acme(type = "function")
  */
 function foo($x, $y): int {
-    // Compare the two values
     return $x <=> $y;
 }
 PHP
@@ -372,8 +367,7 @@ PHP
 
 */
 function foo($x, $y): int {
-
- return $x <=> $y;
+return $x <=> $y;
 }
 PHP
             ];
@@ -400,7 +394,6 @@ PHP
  * @Acme(type = "function")
  */
 function foo($x, $y): int {
-    // Compare the two values
     return $x <=> $y;
 }
 PHP
@@ -422,8 +415,7 @@ PHP
 
 */
 function foo($x, $y): int {
-
- return $x <=> $y;
+return $x <=> $y;
 }
 PHP
         ];
