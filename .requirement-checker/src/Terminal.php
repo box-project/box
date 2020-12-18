@@ -1,10 +1,7 @@
 <?php
 
-namespace HumbugBox383\KevinGH\RequirementChecker;
+namespace HumbugBox3100\KevinGH\RequirementChecker;
 
-/**
-@symfony
-*/
 class Terminal
 {
     private static $width;
@@ -36,6 +33,9 @@ class Terminal
     {
         if (null !== self::$stty) {
             return self::$stty;
+        }
+        if (!\function_exists('exec')) {
+            return \false;
         }
         \exec('stty 2>&1', $output, $exitcode);
         return self::$stty = 0 === $exitcode;

@@ -1,10 +1,7 @@
 <?php
 
-namespace HumbugBox383\KevinGH\RequirementChecker;
+namespace HumbugBox3100\KevinGH\RequirementChecker;
 
-/**
-@symfony
-*/
 final class Requirement
 {
     private $checkIsFulfilled;
