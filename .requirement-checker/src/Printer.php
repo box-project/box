@@ -1,6 +1,6 @@
 <?php
 
-namespace HumbugBox383\KevinGH\RequirementChecker;
+namespace HumbugBox3100\KevinGH\RequirementChecker;
 
 final class Printer
 {
@@ -11,12 +11,12 @@ final class Printer
     public function __construct($verbosity, $supportColors, $width = null)
     {
         if (null === $width) {
-            $terminal = new \HumbugBox383\KevinGH\RequirementChecker\Terminal();
-            $width = \min($terminal->getWidth(), 80);
+            $terminal = new \HumbugBox3100\KevinGH\RequirementChecker\Terminal();
+            $width = $terminal->getWidth();
         }
         $this->verbosity = $verbosity;
         $this->supportColors = $supportColors;
-        $this->width = $width;
+        $this->width = $width ?: 80;
     }
     public function getVerbosity()
     {
@@ -36,7 +36,7 @@ final class Printer
         $this->printvln(\str_repeat('=', \min(\strlen($title), $this->width)), $verbosity, $style);
         $this->printvln('', $verbosity, $style);
     }
-    public function getRequirementErrorMessage(\HumbugBox383\KevinGH\RequirementChecker\Requirement $requirement)
+    public function getRequirementErrorMessage(\HumbugBox3100\KevinGH\RequirementChecker\Requirement $requirement)
     {
         if ($requirement->isFulfilled()) {
             return null;
@@ -47,19 +47,22 @@ final class Printer
     public function block($title, $message, $verbosity, $style = null)
     {
         $prefix = ' [' . $title . '] ';
+        $lineLength = $this->width - \strlen($prefix) - 1;
+        if ($lineLength < 0) {
+            $lineLength = 0;
+        }
         $message = $prefix . \trim($message);
         $lines = array();
         $remainingMessage = $message;
-        while ($remainingMessage !== '') {
-            $wrapped = \wordwrap($remainingMessage, $this->width - 3, '¬');
-            $exploded = \explode('¬', $wrapped);
-            $line = $exploded[0];
-            $remainingMessage = \ltrim(\substr($remainingMessage, \strlen($line)));
-            if ($remainingMessage !== '') {
-                $remainingMessage = \str_repeat(' ', \strlen($prefix)) . $remainingMessage;
+        $wrapped = \wordwrap($remainingMessage, $lineLength, '¬');
+        $wrapped = \explode('¬', $wrapped);
+        do {
+            $line = \array_shift($wrapped);
+            if ($lines && $lineLength > 0) {
+                $line = \str_repeat(' ', \strlen($prefix)) . \ltrim($line);
             }
             $lines[] = \str_pad($line, $this->width, ' ', \STR_PAD_RIGHT);
-        }
+        } while (\count($wrapped));
         $this->printvln('', $verbosity);
         $this->printvln(\str_repeat(' ', $this->width), $verbosity, $style);
         foreach ($lines as $line) {

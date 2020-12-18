@@ -1,6 +1,6 @@
 <?php
 
-namespace HumbugBox383\KevinGH\RequirementChecker;
+namespace HumbugBox3100\KevinGH\RequirementChecker;
 
 final class IO
 {
@@ -90,9 +90,6 @@ final class IO
         }
         return $shellVerbosity;
     }
-    /**
-    @symfony
-    */
     private function checkColorSupport()
     {
         if ($this->hasParameter(array('--ansi'))) {
