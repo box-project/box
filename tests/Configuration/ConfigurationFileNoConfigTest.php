@@ -19,6 +19,7 @@ use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\touch;
+use function natcasesort;
 use const PHP_OS_FAMILY;
 use function symlink;
 
@@ -689,6 +690,8 @@ JSON
             'Upgrade.php',
             'UpgradeCommand.php',
         ];
+        natcasesort($expected);
+        $expected = array_values($expected);
 
         $noFileConfig = $this->getNoFileConfig();
 
