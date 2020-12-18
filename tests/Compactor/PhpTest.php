@@ -111,7 +111,7 @@ class AClass
      */
     public function aMethod()
     {
-        \$test = true;# a comment
+        \$test = true;
     }
 }
 PHP
@@ -130,7 +130,7 @@ class AClass
 public function aMethod()
 {
 \$test = true;
- }
+}
 }
 PHP
         ];

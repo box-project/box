@@ -20,7 +20,7 @@
             "php": "7.2.9"
         }
     },
-    "bin": "bin/console",
+    "bin": ["bin/console"],
     "autoload": {
         "psr-4": {
             "App\\": "src/"

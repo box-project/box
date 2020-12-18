@@ -8,44 +8,26 @@ on:
         types: [ created ]
 
 jobs:
-    tests:
+    unit-tests:
         runs-on: ubuntu-latest
-        name: Build and test
+        name: "Unit-Tests: ${{ matrix.php }} - ${{ matrix.tools }} - PHAR readonly ${{ matrix.phar-readonly }}"
         strategy:
             fail-fast: false
             matrix:
-                include:
-                    -   php: 7.3
-                        tools: "composer:v1"
-                        coverage: "none"
-                        publish-phar: true
-                        git-fetch-depth: 0 # box/composer needs history to determine a recent git version
-                    -   php: 7.3
-                        tools: "composer:v1"
-                        coverage: "none"
-                        phar-readonly: true
-                        git-fetch-depth: 1
-                    -   php: 7.4
-                        tools: "composer:v1"
-                        coverage: "pcov"
-                        git-fetch-depth: 1
-                    -   php: 7.4
-                        tools: "composer:v2"
-                        coverage: "none"
-                        git-fetch-depth: 1
+                php: [ 7.3, 7.4, 8.0 ]
+                tools: [ "composer:v1", "composer:v2" ]
+                phar-readonly: [ true, false ]
 
         steps:
             -   uses: actions/checkout@v2
-                with:
-                    fetch-depth: ${{ matrix.git-fetch-depth }}
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: ${{ matrix.php }}
-                    ini-values: "phar.readonly=0"
+                    ini-values: phar.readonly=0
                     tools: ${{ matrix.tools }}
-                    coverage: ${{ matrix.coverage }}
+                    coverage: none
                     extensions: ctype, iconv, xml
 
             -   name: Get composer cache directory
@@ -71,29 +53,160 @@ jobs:
             -   name: validate box config
                 run: bin/box validate
 
-            -   name: Run tests (coverage)
-                if: matrix.coverage == 'pcov'
-                run: make tm
-
             -   name: Run tests (phar readonly)
                 if: matrix.phar-readonly == true
                 run: make tu_box_phar_readonly
 
             -   name: Run tests
-                if: matrix.coverage != 'pcov' && matrix.phar-readonly != true
-                run: make test
+                if: matrix.phar-readonly == false
+                run: make tu
+
+    coverage:
+        runs-on: ubuntu-latest
+        name: Coverage
+
+        steps:
+            -   uses: actions/checkout@v2
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: 7.4
+                    ini-values: phar.readonly=0
+                    tools: composer:v2
+                    coverage: pcov
+                    extensions: ctype, iconv, xml
+
+            -   name: Get composer cache directory
+                id: composercache
+                run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+            -   name: Cache composer dependencies
+                uses: actions/cache@v2
+                with:
+                    path: ${{ steps.composercache.outputs.dir }}
+                    key: composer-${{ runner.os }}-${{ matrix.php }}-${{ hashFiles('composer.*') }}
+                    restore-keys: |
+                        composer-${{ runner.os }}-${{ matrix.php }}-
+                        composer-${{ runner.os }}-
+                        composer-
+
+            -   name: Install dependencies
+                run: composer install --no-interaction --no-progress --prefer-dist
+
+            -   name: Install requirement-checker dependencies
+                run: composer install --no-interaction --no-progress --prefer-dist --working-dir requirement-checker
+
+            -   name: Run tests (coverage)
+                run: make tm
+
+    e2e-tests:
+        runs-on: ubuntu-latest
+        name: "e2e-Tests: ${{ matrix.e2e }} - ${{ matrix.php }} - ${{ matrix.tools }}"
+        strategy:
+            fail-fast: false
+            matrix:
+                e2e:
+                    - 'e2e_php_settings_checker'
+                    - 'e2e_scoper_alias'
+                    - 'e2e_scoper_whitelist'
+                    - 'e2e_check_requirements'
+                    - 'e2e_symfony'
+                    - 'e2e_composer_installed_versions'
+                php: [ '7.3', '8.0' ]
+                tools: [ 'composer:v1', 'composer:v2' ]
+
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    fetch-depth: 0
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ matrix.php }}
+                    ini-values: "phar.readonly=0"
+                    tools: ${{ matrix.tools }}
+                    coverage: pcov
+
+            -   name: Get composer cache directory
+                id: composercache
+                run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+            -   name: Cache composer dependencies
+                uses: actions/cache@v2
+                with:
+                    path: ${{ steps.composercache.outputs.dir }}
+                    key: composer-${{ runner.os }}-${{ matrix.php }}-${{ hashFiles('composer.*') }}
+                    restore-keys: |
+                        composer-${{ runner.os }}-${{ matrix.php }}-
+                        composer-${{ runner.os }}-
+                        composer-
+
+            -   name: Install dependencies
+                run: composer install --no-interaction --no-progress --no-suggest --prefer-dist
+
+            -   name: Install requirement-checker dependencies
+                run: composer install --no-interaction --no-progress --prefer-dist --working-dir requirement-checker
+
+            -   name: Run e2e ${{ matrix.e2e }}
+                run: make ${{ matrix.e2e }}
+
+    build-phar:
+        runs-on: ubuntu-latest
+        name: Build PHAR
+
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    fetch-depth: 0
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: 7.3
+                    ini-values: phar.readonly=0
+                    tools: composer:v2
+                    coverage: none
+
+            -   name: Get composer cache directory
+                id: composercache
+                run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+            -   name: Cache composer dependencies
+                uses: actions/cache@v2
+                with:
+                    path: ${{ steps.composercache.outputs.dir }}
+                    key: composer-${{ runner.os }}-${{ matrix.php }}-${{ hashFiles('composer.*') }}
+                    restore-keys: |
+                        composer-${{ runner.os }}-${{ matrix.php }}-
+                        composer-${{ runner.os }}-
+                        composer-
+
+            -   name: Install dependencies
+                run: composer install --no-interaction --no-progress --prefer-dist
+
+            -   name: Install requirement-checker dependencies
+                run: composer install --no-interaction --no-progress --prefer-dist --working-dir requirement-checker
+
+            -   name: Build PHAR
+                run: make compile
 
             -   uses: actions/upload-artifact@v1
-                name: Publish the PHAR
-                if: matrix.publish-phar == true
+                name: Upload the PHAR artifact
                 with:
                     name: box.phar
                     path: bin/box.phar
 
+
     publish-phar:
         runs-on: ubuntu-latest
         name: Publish the PHAR
-        needs: tests
+        needs:
+            - unit-tests
+            - coverage
+            - e2e-tests
+            - build-phar
         if: github.event_name == 'release'
         steps:
             -   uses: actions/download-artifact@v1

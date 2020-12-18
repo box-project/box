@@ -7,5 +7,5 @@
             "src/functions.php"
         ]
     },
-    "bin": "index.php"
+    "bin": ["index.php"]
 }

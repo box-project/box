@@ -71,18 +71,22 @@ final class PharDiff
         $argA = escapeshellarg($this->pharA->tmp);
         $argB = escapeshellarg($this->pharB->tmp);
 
-        /** @var string $diff */
         // TODO: replace by the process component
-        $diff = `git diff --no-index $argA $argB`;
+        $diff = shell_exec("git diff --no-index $argA $argB");
+
+        if (null === $diff) {
+            return null;
+        }
 
         $diff = str_replace(
-            $this->pharA->tmp,
-            $this->pharA->getFileName(),
-            $diff
-        );
-        $diff = str_replace(
-            $this->pharB->tmp,
-            $this->pharB->getFileName(),
+            [
+                $this->pharA->tmp,
+                $this->pharB->tmp
+            ],
+            [
+                $this->pharA->getFileName(),
+                $this->pharB->getFileName()
+            ],
             $diff
         );
 
@@ -94,18 +98,22 @@ final class PharDiff
         $argA = escapeshellarg($this->pharA->tmp);
         $argB = escapeshellarg($this->pharB->tmp);
 
-        /** @var string $diff */
         // TODO: replace by the process component
-        $diff = `diff $argA $argB`;
+        $diff = shell_exec("diff $argA $argB");
+
+        if (null === $diff) {
+            return null;
+        }
 
         $diff = str_replace(
-            $this->pharA->tmp,
-            $this->pharA->getFileName(),
-            $diff
-        );
-        $diff = str_replace(
-            $this->pharB->tmp,
-            $this->pharB->getFileName(),
+            [
+                $this->pharA->tmp,
+                $this->pharB->tmp
+            ],
+            [
+                $this->pharA->getFileName(),
+                $this->pharB->getFileName()
+            ],
             $diff
         );
 

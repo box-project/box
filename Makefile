@@ -81,7 +81,7 @@ tc: bin/phpunit
 INFECTION=vendor-bin/infection/vendor/bin/infection
 tm:			 ## Runs Infection
 tm:	$(TU_BOX_DEPS) $(INFECTION)
-	$(PHPNOGC) $(INFECTION) --only-covered
+	$(PHPNOGC) $(INFECTION) --threads=$(shell nproc || sysctl -n hw.ncpu || 1) --only-covered
 
 .PHONY: e2e
 e2e:			 ## Runs all the end-to-end tests
