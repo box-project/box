@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f16b9a3f7ca8490bef00843a80d032ef",
+    "content-hash": "33405dcebb4d700088350f3b0514abc6",
     "packages": [
         {
             "name": "amphp/amp",
@@ -803,23 +803,23 @@
         },
         {
             "name": "humbug/php-scoper",
-            "version": "0.13.10",
+            "version": "0.14.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/humbug/php-scoper.git",
-                "reference": "e56b0d91b344181c9a73119454c05a5498bf56e4"
+                "reference": "6ff13aaae731395d04c06fbdfa9ef08bbb879555"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/e56b0d91b344181c9a73119454c05a5498bf56e4",
-                "reference": "e56b0d91b344181c9a73119454c05a5498bf56e4",
+                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/6ff13aaae731395d04c06fbdfa9ef08bbb879555",
+                "reference": "6ff13aaae731395d04c06fbdfa9ef08bbb879555",
                 "shasum": ""
             },
             "require": {
                 "composer/package-versions-deprecated": "^1.8",
                 "jetbrains/phpstorm-stubs": "dev-master",
                 "nikic/php-parser": "^4.0",
-                "php": "^7.3",
+                "php": "^7.3 || ^8.0",
                 "symfony/console": "^3.2 || ^4.0",
                 "symfony/filesystem": "^3.2 || ^4.0",
                 "symfony/finder": "^3.2 || ^4.0"
@@ -875,7 +875,7 @@
             "description": "Prefixes all PHP namespaces in a file or directory.",
             "support": {
                 "issues": "https://github.com/humbug/php-scoper/issues",
-                "source": "https://github.com/humbug/php-scoper/tree/0.13.10"
+                "source": "https://github.com/humbug/php-scoper/tree/0.14.0"
             },
             "funding": [
                 {
@@ -883,7 +883,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-11-29T13:29:20+00:00"
+            "time": "2020-12-08T09:32:54+00:00"
         },
         {
             "name": "jetbrains/phpstorm-stubs",
