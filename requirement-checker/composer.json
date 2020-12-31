@@ -35,6 +35,7 @@
 
     "config": {
         "bin-dir": "bin",
+        "platform-check": false,
         "sort-packages": true
     }
 }
