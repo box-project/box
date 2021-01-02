@@ -123,7 +123,7 @@ class CompileTest extends CommandTestCase
         $numberOfFiles = 45;
         if (self::$runComposer2) {
             // From Composer 2 there are more files
-            $numberOfFiles += 2;
+            ++$numberOfFiles;
         }
 
         dump_file(
@@ -284,7 +284,6 @@ PHP;
             '/.box/vendor/composer/autoload_psr4.php',
             '/.box/vendor/composer/autoload_real.php',
             '/.box/vendor/composer/autoload_static.php',
-            '/.box/vendor/composer/platform_check.php',
             '/.box/vendor/composer/semver/',
             '/.box/vendor/composer/semver/LICENSE',
             '/.box/vendor/composer/semver/src/',
@@ -323,8 +322,7 @@ PHP;
 
         if (!self::$runComposer2) {
             $expectedFiles = array_values(array_filter($expectedFiles, static function ($file): bool {
-                return '/.box/vendor/composer/platform_check.php' !== $file
-                && '/.box/vendor/composer/InstalledVersions.php' !== $file;
+                return '/.box/vendor/composer/InstalledVersions.php' !== $file;
             }));
         }
 
@@ -399,7 +397,7 @@ PHP;
         $numberOfFiles = 49;
         if (self::$runComposer2) {
             // From Composer 2 there are more files
-            $numberOfFiles += 2;
+            ++$numberOfFiles;
         }
 
         $expected = <<<OUTPUT
@@ -523,7 +521,6 @@ PHP;
             '/.box/vendor/composer/autoload_psr4.php',
             '/.box/vendor/composer/autoload_real.php',
             '/.box/vendor/composer/autoload_static.php',
-            '/.box/vendor/composer/platform_check.php',
             '/.box/vendor/composer/semver/',
             '/.box/vendor/composer/semver/LICENSE',
             '/.box/vendor/composer/semver/src/',
@@ -565,8 +562,7 @@ PHP;
 
         if (!self::$runComposer2) {
             $expectedFiles = array_values(array_filter($expectedFiles, static function ($file): bool {
-                return '/.box/vendor/composer/platform_check.php' !== $file
-                && '/.box/vendor/composer/InstalledVersions.php' !== $file;
+                return '/.box/vendor/composer/InstalledVersions.php' !== $file;
             }));
         }
 
@@ -835,7 +831,7 @@ PHP;
         if (self::$runComposer2) {
             // From Composer 2 there are more files
             ++$numberOfClasses;
-            $numberOfFiles += 2;
+            ++$numberOfFiles;
         }
 
         dump_file(
@@ -957,7 +953,7 @@ OUTPUT;
         if (self::$runComposer2) {
             // From Composer 2 there are more files
             ++$numberOfClasses;
-            $numberOfFiles += 2;
+            ++$numberOfFiles;
         }
 
         dump_file(
@@ -2916,7 +2912,7 @@ OUTPUT;
         $numberOfFiles = 41;
         if (self::$runComposer2) {
             // From Composer 2 there are more files
-            $numberOfFiles += 2;
+            ++$numberOfFiles;
         }
 
         $expected = <<<OUTPUT

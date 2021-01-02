@@ -81,6 +81,7 @@
         "platform": {
             "php": "7.3"
         },
+        "platform-check": false,
         "sort-packages": true
     },
     "extra": {
