@@ -15,9 +15,9 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use function addcslashes;
-use Assert\Assertion;
 use function implode;
 use function str_replace;
+use Webmozart\Assert\Assert;
 
 /**
  * Generates a new PHP bootstrap loader stub for a PHAR.
@@ -125,7 +125,7 @@ STUB;
     public function shebang(?string $shebang): self
     {
         if (null !== $shebang) {
-            Assertion::notEmpty($shebang, 'Cannot use an empty string for the shebang.');
+            Assert::notEmpty($shebang, 'Cannot use an empty string for the shebang.');
         }
 
         $this->shebang = $shebang;

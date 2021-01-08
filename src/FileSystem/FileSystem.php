@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\FileSystem;
 
 use function array_reverse;
-use Assert\Assertion;
 use function defined;
 use const DIRECTORY_SEPARATOR;
 use function error_get_last;
@@ -40,6 +39,7 @@ use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use function sys_get_temp_dir;
 use Traversable;
 use function unlink;
+use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
 
 /**
@@ -464,8 +464,8 @@ final class FileSystem extends SymfonyFilesystem
      */
     public function getFileContents(string $file): string
     {
-        Assertion::file($file);
-        Assertion::readable($file);
+        Assert::file($file);
+        Assert::readable($file);
 
         if (false === ($contents = @file_get_contents($file))) {
             throw new IOException(

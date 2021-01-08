@@ -14,12 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
-use Assert\Assertion;
 use function KevinGH\Box\FileSystem\file_contents;
 use function str_replace;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use function var_export;
+use Webmozart\Assert\Assert;
 
 /**
  * @private
@@ -39,7 +39,7 @@ PHP;
      */
     public static function dump(array $decodedComposerJsonContents, array $decodedComposerLockContents, ?int $compressionAlgorithm): array
     {
-        Assertion::directory(self::REQUIREMENT_CHECKER_PATH, 'Expected the requirement checker to have been dumped');
+        Assert::directory(self::REQUIREMENT_CHECKER_PATH, 'Expected the requirement checker to have been dumped');
 
         $filesWithContents = [
             self::dumpRequirementsConfig($decodedComposerJsonContents, $decodedComposerLockContents, $compressionAlgorithm),

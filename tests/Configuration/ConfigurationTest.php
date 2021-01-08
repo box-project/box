@@ -1009,7 +1009,7 @@ JSON
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                "File \"{$this->tmp}/test.php\" was expected to exist.",
+                "The file \"{$this->tmp}/test.php\" does not exist.",
                 $exception->getMessage()
             );
         }
@@ -2392,7 +2392,7 @@ COMMENT;
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                'File "/does/not/exist" was expected to exist.',
+                'The file "/does/not/exist" does not exist.',
                 $exception->getMessage()
             );
         }

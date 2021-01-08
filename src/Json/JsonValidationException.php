@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Json;
 
-use Assert\Assertion;
 use Throwable;
 use UnexpectedValueException;
+use Webmozart\Assert\Assert;
 
 /**
  * @private
@@ -39,9 +39,9 @@ final class JsonValidationException extends UnexpectedValueException
         ?Throwable $previous = null
     ) {
         if (null !== $file) {
-            Assertion::file($file);
+            Assert::file($file);
         }
-        Assertion::allString($errors);
+        Assert::allString($errors);
 
         $this->validatedFile = $file;
         $this->errors = $errors;

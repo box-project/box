@@ -85,14 +85,14 @@ class ComposerFileTest extends TestCase
             static function (): void {
                 new ComposerFile('', []);
             },
-            'Value "" is empty, but non empty value was expected.',
+            'Expected a non-empty value. Got: ""',
         ];
 
         yield [
             static function (): void {
                 new ComposerFile(null, ['foo' => 'bar']);
             },
-            'Value "<ARRAY>" is not the same as expected value "<ARRAY>".',
+            'Expected a value identical to array. Got: array',
         ];
     }
 }

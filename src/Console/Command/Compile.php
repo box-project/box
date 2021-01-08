@@ -18,7 +18,6 @@ use Amp\MultiReasonException;
 use function array_map;
 use function array_search;
 use function array_shift;
-use Assert\Assertion;
 use function count;
 use function decoct;
 use function explode;
@@ -65,6 +64,7 @@ use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use function var_export;
+use Webmozart\Assert\Assert;
 
 /**
  * @final
@@ -521,7 +521,7 @@ HELP;
 
         $aliasWasAdded = $box->getPhar()->setAlias($config->getAlias());
 
-        Assertion::true(
+        Assert::true(
             $aliasWasAdded,
             sprintf(
                 'The alias "%s" is invalid. See Phar::setAlias() documentation for more information.',
@@ -855,7 +855,7 @@ HELP;
     {
         $generateDockerFileCommand = $this->getApplication()->find('docker');
 
-        Assertion::isInstanceOf($generateDockerFileCommand, GenerateDockerFile::class);
+        Assert::isInstanceOf($generateDockerFileCommand, GenerateDockerFile::class);
 
         $input = new StringInput('');
         $input->setInteractive(false);

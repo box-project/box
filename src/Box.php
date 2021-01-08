@@ -21,7 +21,6 @@ use function array_filter;
 use function array_flip;
 use function array_map;
 use function array_unshift;
-use Assert\Assertion;
 use BadMethodCallException;
 use function chdir;
 use Closure;
@@ -49,6 +48,7 @@ use RecursiveDirectoryIterator;
 use RuntimeException;
 use SplFileInfo;
 use function sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * Box is a utility class to generate a PHAR.
@@ -103,7 +103,7 @@ final class Box implements Countable
 
     public function startBuffering(): void
     {
-        Assertion::false($this->buffering, 'The buffering must be ended before starting it again');
+        Assert::false($this->buffering, 'The buffering must be ended before starting it again');
 
         $this->buffering = true;
 
@@ -112,7 +112,7 @@ final class Box implements Countable
 
     public function endBuffering(?Closure $dumpAutoload): void
     {
-        Assertion::true($this->buffering, 'The buffering must be started before ending it');
+        Assert::true($this->buffering, 'The buffering must be started before ending it');
 
         $cwd = getcwd();
 
@@ -151,7 +151,7 @@ final class Box implements Countable
 
     public function removeComposerArtefacts(string $vendorDir): void
     {
-        Assertion::false($this->buffering, 'The buffering must have ended before removing the Composer artefacts');
+        Assert::false($this->buffering, 'The buffering must have ended before removing the Composer artefacts');
 
         $composerFiles = [
             'composer.json',
@@ -177,8 +177,8 @@ final class Box implements Countable
      */
     public function compress(int $compressionAlgorithm): ?string
     {
-        Assertion::false($this->buffering, 'Cannot compress files while buffering.');
-        Assertion::inArray($compressionAlgorithm, get_phar_compression_algorithms());
+        Assert::false($this->buffering, 'Cannot compress files while buffering.');
+        Assert::inArray($compressionAlgorithm, get_phar_compression_algorithms());
 
         $extensionRequired = get_phar_compression_algorithm_extension($compressionAlgorithm);
 
@@ -246,14 +246,14 @@ final class Box implements Countable
 
         foreach ($placeholders as $index => $placeholder) {
             if (is_object($placeholder)) {
-                Assertion::methodExists('__toString', $placeholder, $message);
+                Assert::methodExists($placeholder, '__toString', $message);
 
                 $placeholders[$index] = (string) $placeholder;
 
                 break;
             }
 
-            Assertion::scalar($placeholder, $message);
+            Assert::scalar($placeholder, $message);
         }
 
         $this->placeholderCompactor = new Placeholder($placeholders);
@@ -283,7 +283,7 @@ final class Box implements Countable
      */
     public function addFiles(array $files, bool $binary): void
     {
-        Assertion::true($this->buffering, 'Cannot add files if the buffering has not started.');
+        Assert::true($this->buffering, 'Cannot add files if the buffering has not started.');
 
         $files = array_map('strval', $files);
 
@@ -311,7 +311,7 @@ final class Box implements Countable
      */
     public function addFile(string $file, ?string $contents = null, bool $binary = false): string
     {
-        Assertion::true($this->buffering, 'Cannot add files if the buffering has not started.');
+        Assert::true($this->buffering, 'Cannot add files if the buffering has not started.');
 
         if (null === $contents) {
             $contents = file_contents($file);
@@ -350,19 +350,19 @@ final class Box implements Countable
     {
         $pubKey = $this->file.'.pubkey';
 
-        Assertion::writeable(dirname($pubKey));
-        Assertion::extensionLoaded('openssl');
+        Assert::writable(dirname($pubKey));
+        Assert::true(extension_loaded('openssl'));
 
         if (file_exists($pubKey)) {
-            Assertion::file(
+            Assert::file(
                 $pubKey,
-                'Cannot create public key: "%s" already exists and is not a file.'
+                'Cannot create public key: %s already exists and is not a file.'
             );
         }
 
         $resource = openssl_pkey_get_private($key, (string) $password);
 
-        Assertion::notSame(false, $resource, 'Could not retrieve the private key, check that the password is correct.');
+        Assert::notSame(false, $resource, 'Could not retrieve the private key, check that the password is correct.');
 
         openssl_pkey_export($resource, $private);
 
@@ -449,7 +449,7 @@ final class Box implements Countable
      */
     public function count(): int
     {
-        Assertion::false($this->buffering, 'Cannot count the number of files in the PHAR when buffering');
+        Assert::false($this->buffering, 'Cannot count the number of files in the PHAR when buffering');
 
         return $this->phar->count();
     }

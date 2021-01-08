@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Php;
 
-use Assert\Assertion;
 use Composer\XdebugHandler\XdebugHandler;
 use function getenv;
 use function ini_get;
@@ -27,6 +26,7 @@ use const PHP_EOL;
 use Psr\Log\LoggerInterface;
 use function sprintf;
 use function trim;
+use Webmozart\Assert\Assert;
 
 /**
  * @private
@@ -91,7 +91,7 @@ final class PhpSettingsHandler extends XdebugHandler
     private function disablePharReadonly(): void
     {
         if (ini_get('phar.readonly')) {
-            Assertion::notNull($this->tmpIni);
+            Assert::notNull($this->tmpIni);
 
             append_to_file($this->tmpIni, 'phar.readonly=0'.PHP_EOL);
 

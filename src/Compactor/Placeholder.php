@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace KevinGH\Box\Compactor;
 
 use function array_keys;
-use Assert\Assertion;
 use function str_replace;
+use Webmozart\Assert\Assert;
 
 final class Placeholder implements Compactor
 {
@@ -27,7 +27,7 @@ final class Placeholder implements Compactor
      */
     public function __construct(array $placeholders)
     {
-        Assertion::allScalar($placeholders);
+        Assert::allScalar($placeholders);
 
         $this->placeholders = $placeholders;
     }

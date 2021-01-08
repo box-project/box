@@ -24,7 +24,6 @@ use function array_merge;
 use function array_unique;
 use function array_values;
 use function array_walk;
-use Assert\Assertion;
 use Closure;
 use function constant;
 use function current;
@@ -103,6 +102,7 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use function trigger_error;
 use function trim;
+use Webmozart\Assert\Assert;
 
 /**
  * @private
@@ -500,19 +500,19 @@ BANNER;
         array $warnings,
         array $recommendations
     ) {
-        Assertion::nullOrInArray(
+        Assert::nullOrInArray(
             $compressionAlgorithm,
             get_phar_compression_algorithms(),
             sprintf(
-                'Invalid compression algorithm "%%s", use one of "%s" instead.',
+                'Invalid compression algorithm %%s, use one of "%s" instead.',
                 implode('", "', array_keys(get_phar_compression_algorithms()))
             )
         );
 
         if (null === $mainScriptPath) {
-            Assertion::null($mainScriptContents);
+            Assert::null($mainScriptContents);
         } else {
-            Assertion::notNull($mainScriptContents);
+            Assert::notNull($mainScriptContents);
         }
 
         $this->file = $file;
@@ -718,7 +718,7 @@ BANNER;
 
     public function getMainScriptPath(): string
     {
-        Assertion::notNull(
+        Assert::notNull(
             $this->mainScriptPath,
             'Cannot retrieve the main script path: no main script configured.'
         );
@@ -728,7 +728,7 @@ BANNER;
 
     public function getMainScriptContents(): string
     {
-        Assertion::notNull(
+        Assert::notNull(
             $this->mainScriptPath,
             'Cannot retrieve the main script contents: no main script configured.'
         );
@@ -856,7 +856,7 @@ BANNER;
 
         $alias = trim($raw->{self::ALIAS_KEY});
 
-        Assertion::notEmpty($alias, 'A PHAR alias cannot be empty when provided.');
+        Assert::notEmpty($alias, 'A PHAR alias cannot be empty when provided.');
 
         if ($userStubUsed) {
             $logger->addWarning(
@@ -882,9 +882,9 @@ BANNER;
 
         $basePath = trim($raw->{self::BASE_PATH_KEY});
 
-        Assertion::directory(
+        Assert::directory(
             $basePath,
-            'The base path "%s" is not a directory or does not exist.'
+            'The base path %s is not a directory or does not exist.'
         );
 
         $basePath = realpath($basePath);
@@ -1121,12 +1121,12 @@ BANNER;
 
         $files = array_merge((array) $raw->{$key}, $files);
 
-        Assertion::allString($files);
+        Assert::allString($files);
 
         $normalizePath = static function (string $file) use ($basePath, $key, $excludedFiles): ?SplFileInfo {
             $file = self::normalizePath($file, $basePath);
 
-            Assertion::false(
+            Assert::false(
                 is_link($file),
                 sprintf(
                     'Cannot add the link "%s": links are not supported.',
@@ -1134,10 +1134,10 @@ BANNER;
                 )
             );
 
-            Assertion::file(
+            Assert::file(
                 $file,
                 sprintf(
-                    '"%s" must contain a list of existing files. Could not find "%%s".',
+                    '"%s" must contain a list of existing files. Could not find %%s.',
                     $key
                 )
             );
@@ -1278,11 +1278,7 @@ BANNER;
                 $method = trim($method);
                 $arguments = (array) $arguments;
 
-                Assertion::methodExists(
-                    $method,
-                    $finder,
-                    'The method "Finder::%s" does not exist.'
-                );
+                Assert::methodExists($finder, $method);
 
                 $normalizedConfig[$method] = $arguments;
             }
@@ -1295,7 +1291,7 @@ BANNER;
         $createNormalizedDirectories = static function (string $directory) use ($basePath): ?string {
             $directory = self::normalizePath($directory, $basePath);
 
-            Assertion::false(
+            Assert::false(
                 is_link($directory),
                 sprintf(
                     'Cannot append the link "%s" to the Finder: links are not supported.',
@@ -1303,7 +1299,7 @@ BANNER;
                 )
             );
 
-            Assertion::directory($directory);
+            Assert::directory($directory);
 
             return $directory;
         };
@@ -1315,7 +1311,7 @@ BANNER;
 
             $fileOrDirectory = self::normalizePath($fileOrDirectory, $basePath);
 
-            Assertion::false(
+            Assert::false(
                 is_link($fileOrDirectory),
                 sprintf(
                     'Cannot append the link "%s" to the Finder: links are not supported.',
@@ -1323,7 +1319,7 @@ BANNER;
                 )
             );
 
-            Assertion::true(
+            Assert::true(
                 file_exists($fileOrDirectory),
                 sprintf(
                     'Path "%s" was expected to be a file or directory. It may be a symlink (which are unsupported).',
@@ -1332,9 +1328,9 @@ BANNER;
             );
 
             if (false === is_file($fileOrDirectory)) {
-                Assertion::directory($fileOrDirectory);
+                Assert::directory($fileOrDirectory);
             } else {
-                Assertion::file($fileOrDirectory);
+                Assert::file($fileOrDirectory);
             }
 
             if (false === $blacklistFilter(new SplFileInfo($fileOrDirectory))) {
@@ -1503,8 +1499,8 @@ BANNER;
                 // @var string $path
                 $path = $normalizePath($path);
 
-                Assertion::file($path);
-                Assertion::false(is_link($path), 'Cannot add the link "'.$path.'": links are not supported.');
+                Assert::file($path);
+                Assert::false(is_link($path), 'Cannot add the link "'.$path.'": links are not supported.');
 
                 $filesToAppend[] = $path;
             }
@@ -1516,8 +1512,8 @@ BANNER;
         foreach ($paths as $path) {
             $path = $normalizePath($path);
 
-            Assertion::true(file_exists($path), 'File or directory "'.$path.'" was expected to exist.');
-            Assertion::false(is_link($path), 'Cannot add the link "'.$path.'": links are not supported.');
+            Assert::true(file_exists($path), 'File or directory "'.$path.'" was expected to exist.');
+            Assert::false(is_link($path), 'Cannot add the link "'.$path.'": links are not supported.');
 
             if (is_file($path)) {
                 $files[] = $path;
@@ -1675,7 +1671,7 @@ BANNER;
         $normalizeDirectory = static function (string $directory) use ($basePath, $key): string {
             $directory = self::normalizePath($directory, $basePath);
 
-            Assertion::false(
+            Assert::false(
                 is_link($directory),
                 sprintf(
                     'Cannot add the link "%s": links are not supported.',
@@ -1683,10 +1679,10 @@ BANNER;
                 )
             );
 
-            Assertion::directory(
+            Assert::directory(
                 $directory,
                 sprintf(
-                    '"%s" must contain a list of existing directories. Could not find "%%s".',
+                    '"%s" must contain a list of existing directories. Could not find %%s.',
                     $key
                 )
             );
@@ -1840,8 +1836,8 @@ BANNER;
     ): array {
         return array_map(
             static function (string $class) use ($raw, $basePath, $logger, $ignoredAnnotations): Compactor {
-                Assertion::classExists($class, 'The compactor class "%s" does not exist.');
-                Assertion::implementsInterface($class, Compactor::class, 'The class "%s" is not a compactor class.');
+                Assert::classExists($class, 'The compactor class %s does not exist.');
+                Assert::isAOf($class, Compactor::class, sprintf('The class "%s" is not a compactor class.', $class));
 
                 if (LegacyPhp::class === $class) {
                     $logger->addRecommendation(
@@ -1909,11 +1905,11 @@ BANNER;
 
         $knownAlgorithmNames = array_keys(get_phar_compression_algorithms());
 
-        Assertion::inArray(
+        Assert::inArray(
             $raw->{self::COMPRESSION_KEY},
             $knownAlgorithmNames,
             sprintf(
-                'Invalid compression algorithm "%%s", use one of "%s" instead.',
+                'Invalid compression algorithm %%s, use one of "%s" instead.',
                 implode('", "', $knownAlgorithmNames)
             )
         );
@@ -1986,7 +1982,7 @@ BANNER;
         }
 
         if (is_bool($main)) {
-            Assertion::false(
+            Assert::false(
                 $main,
                 'Cannot "enable" a main script: either disable it with `false` or give the main script file path.'
             );
@@ -1994,7 +1990,7 @@ BANNER;
             return null;
         }
 
-        Assertion::file($main);
+        Assert::file($main);
 
         return $main;
     }
@@ -2155,7 +2151,7 @@ BANNER;
         }
 
         if (!isset($raw->{self::KEY_KEY})) {
-            Assertion::true(
+            Assert::true(
                 Phar::OPENSSL !== $signingAlgorithm,
                 'Expected to have a private key for OpenSSL signing but none have been provided.'
             );
@@ -2165,7 +2161,7 @@ BANNER;
 
         $path = self::normalizePath($raw->{self::KEY_KEY}, $basePath);
 
-        Assertion::file($path);
+        Assert::file($path);
 
         return $path;
     }
@@ -2400,7 +2396,7 @@ BANNER;
         if (null !== $format) {
             $formattedDate = (new DateTimeImmutable())->format($format);
 
-            Assertion::false(
+            Assert::false(
                 false === $formattedDate || $formattedDate === $format,
                 sprintf(
                     'Expected the datetime format to be a valid format: "%s" is not',
@@ -2443,12 +2439,12 @@ BANNER;
             return null;
         }
 
-        Assertion::string($shebang, 'Expected shebang to be either a string, false or null, found true');
+        Assert::string($shebang, 'Expected shebang to be either a string, false or null, found true');
 
         $shebang = trim($shebang);
 
-        Assertion::notEmpty($shebang, 'The shebang should not be empty.');
-        Assertion::true(
+        Assert::notEmpty($shebang, 'The shebang should not be empty.');
+        Assert::true(
             0 === strpos($shebang, '#!'),
             sprintf(
                 'The shebang line must start with "#!". Got "%s" instead',
@@ -2481,9 +2477,9 @@ BANNER;
 
         $algorithm = strtoupper($raw->{self::ALGORITHM_KEY});
 
-        Assertion::inArray($algorithm, array_keys(get_phar_signing_algorithms()));
+        Assert::inArray($algorithm, array_keys(get_phar_signing_algorithms()));
 
-        Assertion::true(
+        Assert::true(
             defined('Phar::'.$algorithm),
             sprintf(
                 'The signing algorithm "%s" is not supported by your current PHAR version.',
@@ -2524,7 +2520,7 @@ BANNER;
             return null;
         }
 
-        Assertion::true(is_string($banner) || is_array($banner), 'The banner cannot accept true as a value');
+        Assert::true(is_string($banner) || is_array($banner), 'The banner cannot accept true as a value');
 
         if (is_array($banner)) {
             $banner = implode("\n", $banner);
@@ -2561,7 +2557,7 @@ BANNER;
 
         $bannerFile = make_path_absolute($raw->{self::BANNER_FILE_KEY}, $basePath);
 
-        Assertion::file($bannerFile);
+        Assert::file($bannerFile);
 
         if (false === $stubIsGenerated) {
             $logger->addWarning(
@@ -2594,7 +2590,7 @@ BANNER;
         if (isset($raw->{self::STUB_KEY}) && is_string($raw->{self::STUB_KEY})) {
             $stubPath = make_path_absolute($raw->{self::STUB_KEY}, $basePath);
 
-            Assertion::file($stubPath);
+            Assert::file($stubPath);
 
             return $stubPath;
         }
@@ -2708,12 +2704,12 @@ BANNER;
 
         $configFile = $raw->{self::PHP_SCOPER_KEY};
 
-        Assertion::string($configFile);
+        Assert::string($configFile);
 
         $configFilePath = make_path_absolute($configFile, $basePath);
 
-        Assertion::file($configFilePath);
-        Assertion::readable($configFilePath);
+        Assert::file($configFilePath);
+        Assert::readable($configFilePath);
 
         return PhpScoperConfiguration::load($configFilePath);
     }

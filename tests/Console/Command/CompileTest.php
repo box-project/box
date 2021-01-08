@@ -1584,7 +1584,7 @@ PHP
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertMatchesRegularExpression(
-                '/^Path ".+?" was expected to be readable\.$/',
+                '/^The path ".+?" is not readable\.$/',
                 $exception->getMessage()
             );
         }

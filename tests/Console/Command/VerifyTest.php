@@ -143,7 +143,7 @@ OUTPUT;
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                'File "unknown" was expected to exist.',
+                'The file "unknown" does not exist.',
                 $exception->getMessage()
             );
         }
