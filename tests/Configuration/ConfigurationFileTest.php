@@ -1515,7 +1515,7 @@ JSON
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                'The method "Finder::invalidMethod" does not exist.',
+                'Expected the method "invalidMethod" to exist.',
                 $exception->getMessage()
             );
         }

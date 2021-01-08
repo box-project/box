@@ -15,11 +15,11 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console;
 
 use function array_map;
-use Assert\Assertion;
 use function count;
 use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\NotInstantiable;
 use function sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * Utility to writing on the console output the configuration recommendations and warnings.
@@ -36,8 +36,8 @@ final class MessageRenderer
      */
     public static function render(IO $io, array $recommendations, array $warnings): void
     {
-        Assertion::allString($recommendations);
-        Assertion::allString($warnings);
+        Assert::allString($recommendations);
+        Assert::allString($warnings);
 
         $renderMessage = static function (string $message): string {
             return "    - $message";

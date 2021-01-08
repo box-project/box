@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace KevinGH\Box\Configuration;
 
 use function array_keys;
-use Assert\Assertion;
 use function trim;
+use Webmozart\Assert\Assert;
 
 /**
  * @private
@@ -30,7 +30,7 @@ final class ConfigurationLogger
     {
         $message = trim($message);
 
-        Assertion::false('' === $message, 'Expected to have a message but a blank string was given instead.');
+        Assert::false('' === $message, 'Expected to have a message but a blank string was given instead.');
 
         $this->recommendations[$message] = $message;
     }
@@ -47,7 +47,7 @@ final class ConfigurationLogger
     {
         $message = trim($message);
 
-        Assertion::false('' === $message, 'Expected to have a message but a blank string was given instead.');
+        Assert::false('' === $message, 'Expected to have a message but a blank string was given instead.');
 
         $this->warnings[$message] = $message;
     }

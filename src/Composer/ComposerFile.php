@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
-use Assert\Assertion;
+use Webmozart\Assert\Assert;
 
 final class ComposerFile
 {
@@ -28,10 +28,10 @@ final class ComposerFile
 
     public function __construct(?string $path, array $contents)
     {
-        Assertion::nullOrNotEmpty($path);
+        Assert::nullOrNotEmpty($path);
 
         if (null === $path) {
-            Assertion::same([], $contents);
+            Assert::same([], $contents);
         }
 
         $this->path = $path;

@@ -506,10 +506,9 @@ class BoxTest extends FileSystemTestCase
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                'File "/nowhere/foo" was expected to exist.',
+                'The file "/nowhere/foo" does not exist.',
                 $exception->getMessage()
             );
-            $this->assertSame(102, $exception->getCode());
             $this->assertNull($exception->getPrevious());
         }
     }
@@ -530,10 +529,9 @@ class BoxTest extends FileSystemTestCase
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                "Path \"${file}\" was expected to be readable.",
+                'The path "foo" is not readable.',
                 $exception->getMessage()
             );
-            $this->assertSame(103, $exception->getCode());
             $this->assertNull($exception->getPrevious());
         }
     }
@@ -1075,10 +1073,9 @@ JSON
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                'File "/nowhere/foo" was expected to exist.',
+                'The file "/nowhere/foo" does not exist.',
                 $exception->getMessage()
             );
-            $this->assertSame(102, $exception->getCode());
             $this->assertNull($exception->getPrevious());
         }
     }
@@ -1098,10 +1095,9 @@ JSON
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                "Path \"${file}\" was expected to be readable.",
+                'The path "foo" is not readable.',
                 $exception->getMessage()
             );
-            $this->assertSame(103, $exception->getCode());
             $this->assertNull($exception->getPrevious());
         }
     }
@@ -1285,7 +1281,7 @@ STUB;
             $this->fail('Expected exception to be thrown.');
         } catch (Exception $exception) {
             $this->assertSame(
-                'File "/does/not/exist" was expected to exist.',
+                'The file "/does/not/exist" does not exist.',
                 $exception->getMessage()
             );
         }
@@ -1303,7 +1299,7 @@ STUB;
             $this->fail('Expected exception to be thrown.');
         } catch (Exception $exception) {
             $this->assertSame(
-                'Path "vfs://test/test.php" was expected to be readable.',
+                'The path "vfs://test/test.php" is not readable.',
                 $exception->getMessage()
             );
         }
@@ -1317,7 +1313,7 @@ STUB;
             $this->fail('Expected exception to be thrown.');
         } catch (Exception $exception) {
             $this->assertSame(
-                'Expected value "stream" to be a scalar or stringable object.',
+                'Expected value "resource" to be a scalar or stringable object.',
                 $exception->getMessage()
             );
         }
@@ -1358,7 +1354,7 @@ STUB;
 
             $this->assertSame(
                 sprintf(
-                    'Value "%s" is not an element of the valid values: 4096, 8192, 0',
+                    'Expected one of: 4096, 8192, 0. Got: %s',
                     $algorithm
                 ),
                 $exception->getMessage()
@@ -1595,7 +1591,7 @@ PHP
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                'File "/does/not/exist" was expected to exist.',
+                'The file "/does/not/exist" does not exist.',
                 $exception->getMessage()
             );
         }
@@ -1614,7 +1610,7 @@ PHP
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                'Path "vfs://test/private.key" was expected to be readable.',
+                'The path "vfs://test/private.key" is not readable.',
                 $exception->getMessage()
             );
         }

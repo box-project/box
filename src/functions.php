@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use function array_key_exists;
-use Assert\Assertion;
 use function bin2hex;
 use function class_alias;
 use function class_exists;
@@ -43,6 +42,7 @@ use function strtolower;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
+use Webmozart\Assert\Assert;
 
 /**
  * @private
@@ -83,7 +83,7 @@ function get_phar_compression_algorithm_extension(int $algorithm): ?string
         Phar::NONE => null,
     ];
 
-    Assertion::true(
+    Assert::true(
         array_key_exists($algorithm, $extensions),
         sprintf('Unknown compression algorithm code "%d"', $algorithm)
     );

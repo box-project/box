@@ -16,7 +16,6 @@ namespace KevinGH\Box\Console\Command;
 
 use function array_filter;
 use function array_flip;
-use Assert\Assertion;
 use DirectoryIterator;
 use function is_array;
 use KevinGH\Box\Console\IO\IO;
@@ -37,6 +36,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
+use Webmozart\Assert\Assert;
 
 /**
  * @private
@@ -160,7 +160,7 @@ HELP
 
         $depth = (int) $input->getOption(self::DEPTH_OPT);
 
-        Assertion::greaterOrEqualThan($depth, -1, 'Expected the depth to be a positive integer or -1, got "%d"');
+        Assert::greaterThanEq($depth, -1, 'Expected the depth to be a positive integer or -1, got "%d"');
 
         try {
             $pharInfo = new PharInfo($file);

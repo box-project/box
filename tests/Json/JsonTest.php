@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Json;
 
-use Assert\Assertion;
 use Generator;
 use function get_class;
 use function is_object;
@@ -27,6 +26,7 @@ use PHPUnit\Framework\AssertionFailedError;
 use Seld\JsonLint\ParsingException;
 use stdClass;
 use Throwable;
+use Webmozart\Assert\Assert;
 
 /**
  * @covers \KevinGH\Box\Json\Json
@@ -80,9 +80,9 @@ class JsonTest extends FileSystemTestCase
     public function test_it_can_decode_a_json_string(string $json, bool $assoc, $expected, ?Throwable $expectedThrowable): void
     {
         if (null === $expected) {
-            Assertion::notNull($expectedThrowable);
+            Assert::notNull($expectedThrowable);
         } else {
-            Assertion::null($expectedThrowable);
+            Assert::null($expectedThrowable);
         }
 
         try {

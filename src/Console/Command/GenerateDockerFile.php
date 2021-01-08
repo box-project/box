@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use Assert\Assertion;
 use function file_exists;
 use function getcwd;
 use KevinGH\Box\Console\IO\IO;
@@ -29,6 +28,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Webmozart\Assert\Assert;
 
 /**
  * @private
@@ -69,7 +69,7 @@ final class GenerateDockerFile extends ConfigurableBaseCommand
             return 1;
         }
 
-        Assertion::file($pharPath);
+        Assert::file($pharPath);
 
         $pharPath = false !== realpath($pharPath) ? realpath($pharPath) : $pharPath;
 

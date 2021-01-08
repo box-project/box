@@ -16,13 +16,13 @@ namespace KevinGH\Box;
 
 use function array_column;
 use function array_filter;
-use Assert\Assertion;
 use function basename;
 use Composer\Semver\Semver;
 use function implode;
 use function sprintf;
 use function str_replace;
 use UnexpectedValueException;
+use Webmozart\Assert\Assert;
 
 /**
  * @private
@@ -75,8 +75,8 @@ Dockerfile;
      */
     public function __construct(string $image, array $extensions, string $sourcePhar)
     {
-        Assertion::inArray($image, self::PHP_DOCKER_IMAGES);
-        Assertion::allString($extensions);
+        Assert::inArray($image, self::PHP_DOCKER_IMAGES);
+        Assert::allString($extensions);
 
         $this->image = $image;
         $this->extensions = $extensions;

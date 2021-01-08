@@ -20,13 +20,13 @@ use function array_keys;
 use function array_merge;
 use function array_unique;
 use function array_values;
-use Assert\Assertion;
 use function json_decode;
 use function KevinGH\Box\FileSystem\file_contents;
 use PHPUnit\Framework\TestCase;
 use function preg_match;
 use function preg_match_all;
 use function sort;
+use Webmozart\Assert\Assert;
 
 /**
  * @coversNothing
@@ -101,7 +101,7 @@ class DocumentationSchemaTest extends TestCase
      */
     private function retrieveDocSchemaKeys(): array
     {
-        Assertion::same(
+        Assert::same(
             1,
             preg_match(
                 '/```json(?<schema>.*?)```/s',

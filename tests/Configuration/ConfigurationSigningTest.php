@@ -91,7 +91,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                'Value "INVALID" is not an element of the valid values: MD5, SHA1, SHA256, SHA512, OPENSSL',
+                'Expected one of: "MD5", "SHA1", "SHA256", "SHA512", "OPENSSL". Got: "INVALID"',
                 $exception->getMessage()
             );
         }

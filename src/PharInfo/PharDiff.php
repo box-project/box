@@ -81,11 +81,11 @@ final class PharDiff
         $diff = str_replace(
             [
                 $this->pharA->tmp,
-                $this->pharB->tmp
+                $this->pharB->tmp,
             ],
             [
                 $this->pharA->getFileName(),
-                $this->pharB->getFileName()
+                $this->pharB->getFileName(),
             ],
             $diff
         );
@@ -108,11 +108,11 @@ final class PharDiff
         $diff = str_replace(
             [
                 $this->pharA->tmp,
-                $this->pharB->tmp
+                $this->pharB->tmp,
             ],
             [
                 $this->pharA->getFileName(),
-                $this->pharB->getFileName()
+                $this->pharB->getFileName(),
             ],
             $diff
         );

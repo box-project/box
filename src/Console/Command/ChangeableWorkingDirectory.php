@@ -14,13 +14,13 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use Assert\Assertion;
 use function chdir;
 use function getcwd;
 use function sprintf;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Webmozart\Assert\Assert;
 
 /**
  * @private
@@ -39,7 +39,7 @@ trait ChangeableWorkingDirectory
             return;
         }
 
-        Assertion::directory(
+        Assert::directory(
             $workingDir,
             'Could not change the working directory to "%s": directory does not exists or file is not a directory.'
         );

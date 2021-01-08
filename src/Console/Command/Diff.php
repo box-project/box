@@ -16,7 +16,6 @@ namespace KevinGH\Box\Console\Command;
 
 use function array_filter;
 use function array_flip;
-use Assert\Assertion;
 use function count;
 use function is_string;
 use function KevinGH\Box\check_php_settings;
@@ -32,6 +31,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Throwable;
+use Webmozart\Assert\Assert;
 
 /**
  * @private
@@ -123,7 +123,7 @@ final class Diff extends BaseCommand
             $input->getArgument(self::SECOND_PHAR_ARG),
         ];
 
-        Assertion::allFile($paths);
+        Assert::allFile($paths);
 
         try {
             $diff = new PharDiff(...$paths);

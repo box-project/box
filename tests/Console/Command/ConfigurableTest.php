@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use Assert\InvalidArgumentException;
 use Closure;
+use InvalidArgumentException;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Configuration\NoConfigurationFound;
 use KevinGH\Box\Console\IO\IO;
@@ -240,7 +240,7 @@ class ConfigurableTest extends CommandTestCase
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                'File "'.$this->tmp.'/index.php" was expected to exist.',
+                'The file "'.$this->tmp.'/index.php" does not exist.',
                 $exception->getMessage()
             );
         }

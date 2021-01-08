@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use Assert\Assertion;
 use function file_exists;
 use KevinGH\Box\Console\IO\IO;
 use function KevinGH\Box\create_temporary_phar;
@@ -25,6 +24,7 @@ use function realpath;
 use function sprintf;
 use Symfony\Component\Console\Input\InputArgument;
 use Throwable;
+use Webmozart\Assert\Assert;
 
 /**
  * @private
@@ -70,7 +70,7 @@ HELP
         /** @var string $pharPath */
         $pharPath = $io->getInput()->getArgument(self::PHAR_ARG);
 
-        Assertion::file($pharPath);
+        Assert::file($pharPath);
 
         $pharPath = false !== realpath($pharPath) ? realpath($pharPath) : $pharPath;
 

@@ -15,10 +15,10 @@ declare(strict_types=1);
 namespace KevinGH\Box\PhpScoper;
 
 use function array_shift;
-use Assert\Assertion;
 use function count;
 use Humbug\PhpScoper\Whitelist;
 use PhpParser\Node\Name\FullyQualified;
+use Webmozart\Assert\Assert;
 
 /**
  * @private
@@ -27,7 +27,7 @@ final class WhitelistManipulator
 {
     public static function mergeWhitelists(Whitelist ...$whitelists): Whitelist
     {
-        Assertion::greaterThan(count($whitelists), 0, 'Expected to have at least one whitelist, none given');
+        Assert::greaterThan(count($whitelists), 0, 'Expected to have at least one whitelist, none given');
 
         /** @var Whitelist $whitelist */
         $whitelist = clone array_shift($whitelists);
