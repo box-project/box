@@ -53,7 +53,7 @@
         "nikic/iter": "^2.0",
         "nikic/php-parser": "^4.2",
         "opis/closure": "^3.2",
-        "paragonie/pharaoh": "^0.5 || ^0.6",
+        "paragonie/pharaoh": "^0.6",
         "phpdocumentor/reflection-docblock": "^5.2",
         "psr/log": "^1.0",
         "seld/jsonlint": "^1.7",

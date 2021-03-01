@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "79ef2b646a35e3bd176271046b860079",
+    "content-hash": "c566d8c7b0f87d1504f3e6839e8b1f0a",
     "packages": [
         {
             "name": "amphp/amp",
@@ -826,12 +826,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/JetBrains/phpstorm-stubs.git",
-                "reference": "b8cf707c050f775cdb7693afa6099bd227b383f4"
+                "reference": "318fb388b42ae077c2c41e84b6de9d40d72cd6ca"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JetBrains/phpstorm-stubs/zipball/b8cf707c050f775cdb7693afa6099bd227b383f4",
-                "reference": "b8cf707c050f775cdb7693afa6099bd227b383f4",
+                "url": "https://api.github.com/repos/JetBrains/phpstorm-stubs/zipball/318fb388b42ae077c2c41e84b6de9d40d72cd6ca",
+                "reference": "318fb388b42ae077c2c41e84b6de9d40d72cd6ca",
                 "shasum": ""
             },
             "require-dev": {
@@ -866,7 +866,7 @@
             "support": {
                 "source": "https://github.com/JetBrains/phpstorm-stubs/tree/master"
             },
-            "time": "2021-02-15T11:11:55+00:00"
+            "time": "2021-02-26T12:52:34+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -2984,16 +2984,16 @@
         },
         {
             "name": "phar-io/version",
-            "version": "3.0.4",
+            "version": "3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phar-io/version.git",
-                "reference": "e4782611070e50613683d2b9a57730e9a3ba5451"
+                "reference": "bae7c545bef187884426f042434e561ab1ddb182"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phar-io/version/zipball/e4782611070e50613683d2b9a57730e9a3ba5451",
-                "reference": "e4782611070e50613683d2b9a57730e9a3ba5451",
+                "url": "https://api.github.com/repos/phar-io/version/zipball/bae7c545bef187884426f042434e561ab1ddb182",
+                "reference": "bae7c545bef187884426f042434e561ab1ddb182",
                 "shasum": ""
             },
             "require": {
@@ -3029,9 +3029,9 @@
             "description": "Library for handling version information and constraints",
             "support": {
                 "issues": "https://github.com/phar-io/version/issues",
-                "source": "https://github.com/phar-io/version/tree/3.0.4"
+                "source": "https://github.com/phar-io/version/tree/3.1.0"
             },
-            "time": "2020-12-13T23:18:30+00:00"
+            "time": "2021-02-23T14:00:09+00:00"
         },
         {
             "name": "phpspec/prophecy",
