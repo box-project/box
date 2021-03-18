@@ -1,4 +1,5 @@
 {
+    "$schema": "http://json-schema.org/draft-04/schema#",
     "description": "Settings used to build a new PHAR using Box.",
     "type": "object",
     "additionalProperties": false,
@@ -180,7 +181,10 @@
         },
         "output": {
             "description": "The file name or path of the new PHAR.",
-            "type": ["string", "null"]
+            "type": ["string", "null"],
+            "not": {
+                "enum": ["", ".", ".."]
+            }
         },
         "php-scoper": {
             "description": "Path to the PHP-Scoper configuration file.",
