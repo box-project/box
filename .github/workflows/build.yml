@@ -9,7 +9,7 @@ on:
 
 jobs:
     unit-tests:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-18.04
         name: "Unit-Tests: ${{ matrix.php }} - ${{ matrix.tools }} - PHAR readonly ${{ matrix.phar-readonly }}"
         strategy:
             fail-fast: false
@@ -62,7 +62,7 @@ jobs:
                 run: make tu
 
     coverage:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-18.04
         name: Coverage
 
         steps:
@@ -101,7 +101,7 @@ jobs:
                 run: make tm
 
     e2e-tests:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-18.04
         name: "e2e-Tests: ${{ matrix.e2e }} - ${{ matrix.php }} - ${{ matrix.tools }}"
         strategy:
             fail-fast: false
@@ -153,7 +153,7 @@ jobs:
                 run: make ${{ matrix.e2e }}
 
     build-phar:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-18.04
         name: Build PHAR
 
         steps:
@@ -200,7 +200,7 @@ jobs:
 
 
     publish-phar:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-18.04
         name: Publish the PHAR
         needs:
             - unit-tests
