@@ -51,9 +51,6 @@
     "symfony/deprecation-contracts": {
         "version": "v2.2.0"
     },
-    "symfony/deprecation-contracts": {
-        "version": "v2.2.0"
-    },
     "symfony/dotenv": {
         "version": "v5.0.11"
     },
@@ -111,8 +108,20 @@
     "symfony/http-kernel": {
         "version": "v5.1.5"
     },
+    "symfony/mime": {
+        "version": "v5.0.11"
+    },
+    "symfony/polyfill-intl-idn": {
+        "version": "v1.22.1"
+    },
+    "symfony/polyfill-intl-normalizer": {
+        "version": "v1.22.1"
+    },
     "symfony/polyfill-mbstring": {
         "version": "v1.20.0"
+    },
+    "symfony/polyfill-php72": {
+        "version": "v1.22.1"
     },
     "symfony/polyfill-php73": {
         "version": "v1.20.0"
