@@ -85,6 +85,7 @@ abstract class FileSystemTestCase extends TestCase
             )
         );
 
+        natsort($files);
         natcasesort($files);
 
         return array_values($files);
