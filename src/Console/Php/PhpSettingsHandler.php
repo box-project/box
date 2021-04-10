@@ -41,7 +41,7 @@ final class PhpSettingsHandler extends XdebugHandler
      */
     public function __construct(LoggerInterface $logger)
     {
-        parent::__construct('box', '--ansi');
+        parent::__construct('box');
 
         $this->setPersistent();
 
@@ -54,17 +54,17 @@ final class PhpSettingsHandler extends XdebugHandler
     /**
      * {@inheritdoc}
      */
-    public function check()
+    public function check(): void
     {
         $this->bumpMemoryLimit();
 
-        return parent::check();
+        parent::check();
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function requiresRestart($isLoaded): bool
+    protected function requiresRestart($default): bool
     {
         if ($this->pharReadonly) {
             $this->logger->debug('phar.readonly is enabled');
@@ -74,7 +74,7 @@ final class PhpSettingsHandler extends XdebugHandler
 
         $this->logger->debug('phar.readonly is disabled');
 
-        return parent::requiresRestart($isLoaded);
+        return parent::requiresRestart($default);
     }
 
     /**
