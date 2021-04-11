@@ -541,7 +541,7 @@ final class FileSystem extends SymfonyFilesystem
         $files = array_reverse($files);
         foreach ($files as $file) {
             // MODIFIED CODE
-            if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            if (defined('PHP_WINDOWS_VERSION_BUILD') && is_dir($file)) {
                 exec(sprintf('rd /s /q %s', escapeshellarg($file)));
             // - MODIFIED CODE
             } elseif (is_link($file)) {
