@@ -690,6 +690,7 @@ JSON
             'Upgrade.php',
             'UpgradeCommand.php',
         ];
+        natsort($expected);
         natcasesort($expected);
         $expected = array_values($expected);
 

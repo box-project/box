@@ -1354,7 +1354,7 @@ JSON
     public function test_the_replacement_map_can_be_configured(): void
     {
         touch('test');
-        exec('git init');
+        exec('git init -b main');
         exec('git config user.name "Test User"');
         exec('git config user.email test@test.test');
         exec('git config commit.gpgsign false');
@@ -1439,7 +1439,7 @@ JSON
         rename(self::DEFAULT_FILE, $basePath.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
         chdir($basePath);
         touch('test');
-        exec('git init');
+        exec('git init -b main');
         exec('git config user.name "Test User"');
         exec('git config user.email test@test.test');
         exec('git config commit.gpgsign false');

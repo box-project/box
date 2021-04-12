@@ -517,11 +517,8 @@ OUTPUT
 
                     return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
                 },
-                // TODO: figure out a way to compare those strings, but it's hard to do since git will
-                // show +��/�(��JM��WP�H���W(�/�IQT��� for the compressed content of the file and this
-                // string shown is not deterministic
                 null,
-                2,
+                PHP_VERSION_ID >= 70400 ? 1 : 2, // related to https://bugs.php.net/bug.php?id=69279
             ];
         })();
 
@@ -647,11 +644,8 @@ OUTPUT
 
                     return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
                 },
-                // TODO: figure out a way to compare those strings, but it's hard to do since git will
-                // show +��/�(��JM��WP�H���W(�/�IQT��� for the compressed content of the file and this
-                // string shown is not deterministic
                 null,
-                2,
+                PHP_VERSION_ID >= 70400 ? 1 : 2, // related to https://bugs.php.net/bug.php?id=69279
             ];
         })();
 
