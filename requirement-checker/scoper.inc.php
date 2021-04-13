@@ -14,21 +14,16 @@ declare(strict_types=1);
 
 function get_prefix(): string
 {
-    if (false !== getenv('TRAVIS') && false === getenv('GITHUB_TOKEN')) {
+    $gitHubToken = getenv('GITHUB_TOKEN');
+
+    if (false === $gitHubToken || '' === $gitHubToken) {
         // Ignore this PR to avoid too many builds to fail untimely or locally due to API rate limits because the last
         // release version could not be retrieved.
         return 'HumbugBoxTemporaryPrefix';
     }
 
-    $gitHubToken = getenv('GITHUB_TOKEN');
-
-    $headerOption = false === $gitHubToken || '' === $gitHubToken
-        ? ''
-        : "-H \"Authorization: token $gitHubToken\""
-    ;
-
     $lastReleaseEndpointContents = shell_exec(<<<BASH
-curl -sL $headerOption https://api.github.com/repos/humbug/box/releases/latest
+curl -sL -H 'authorization: Bearer $gitHubToken' https://api.github.com/repos/box-project/box/releases/latest
 BASH
     );
 
@@ -36,18 +31,7 @@ BASH
         throw new RuntimeException('Could not retrieve the last release endpoint.');
     }
 
-    $contents = json_decode($lastReleaseEndpointContents, false, 512, JSON_PRETTY_PRINT);
-
-    if (JSON_ERROR_NONE !== json_last_error()) {
-        // TODO: switch to safe json parsing in the future
-        throw new RuntimeException(
-            sprintf(
-                'Could not parse the request contents: "%d: %s"',
-                json_last_error(),
-                json_last_error_msg()
-            )
-        );
-    }
+    $contents = json_decode($lastReleaseEndpointContents, false, 512, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
 
     if (false === isset($contents->tag_name) || false === is_string($contents->tag_name)) {
         throw new RuntimeException(
