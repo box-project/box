@@ -4,7 +4,7 @@
 
 
 [![Package version](https://img.shields.io/packagist/v/humbug/box.svg?style=flat-square)](https://packagist.org/packages/humbug/box)
-[![Travis Build Status](https://img.shields.io/travis/humbug/box.svg?branch=master&style=flat-square)](https://travis-ci.org/humbug/box?branch=master)
+[![Build](https://github.com/box-project/box/actions/workflows/build.yml/badge.svg)](https://github.com/box-project/box/actions/workflows/build.yml)
 [![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/humbug/box.svg?branch=master&style=flat-square)](https://scrutinizer-ci.com/g/humbug/box/?branch=master)
 [![Slack](https://img.shields.io/badge/slack-%23humbug-red.svg?style=flat-square)](https://symfony.com/slack-invite)
 [![License](https://img.shields.io/badge/license-MIT-red.svg?style=flat-square)](LICENSE)
