@@ -14,37 +14,9 @@ declare(strict_types=1);
 
 function get_prefix(): string
 {
-    $gitHubToken = getenv('GITHUB_TOKEN');
+    $lastRelease = shell_exec('git describe --abbrev=0 --tags HEAD');
 
-    if (false === $gitHubToken || '' === $gitHubToken) {
-        // Ignore this PR to avoid too many builds to fail untimely or locally due to API rate limits because the last
-        // release version could not be retrieved.
-        return 'HumbugBoxTemporaryPrefix';
-    }
-
-    $lastReleaseEndpointContents = shell_exec(<<<BASH
-curl -sL -H 'authorization: Bearer $gitHubToken' https://api.github.com/repos/box-project/box/releases/latest
-BASH
-    );
-
-    if (null === $lastReleaseEndpointContents) {
-        throw new RuntimeException('Could not retrieve the last release endpoint.');
-    }
-
-    $contents = json_decode($lastReleaseEndpointContents, false, 512, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
-
-    if (false === isset($contents->tag_name) || false === is_string($contents->tag_name)) {
-        throw new RuntimeException(
-            sprintf(
-                'No tag name could be found in: %s',
-                $lastReleaseEndpointContents
-            )
-        );
-    }
-
-    $lastRelease = trim($contents->tag_name);
-
-    if ('' === $lastRelease) {
+    if (!is_string($lastRelease) || '' === $lastRelease) {
         throw new RuntimeException('Invalid tag name found.');
     }
 
