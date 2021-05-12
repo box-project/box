@@ -18,6 +18,7 @@ use function array_filter;
 use function array_map;
 use function array_values;
 use function in_array;
+use InvalidArgumentException;
 use phpDocumentor\Reflection\DocBlock\Tag;
 use phpDocumentor\Reflection\DocBlock\Tags\Formatter;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
@@ -47,7 +48,11 @@ final class DocblockAnnotationParser
      */
     public function parse(string $docblock): array
     {
-        $doc = $this->factory->create($docblock);
+        try {
+            $doc = $this->factory->create($docblock);
+        } catch (InvalidArgumentException $e) {
+            throw new MalformedTagException('The annotations could not be parsed.', 0, $e);
+        }
 
         $tags = array_values(
             array_filter(
