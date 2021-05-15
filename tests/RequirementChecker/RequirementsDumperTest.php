@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
+use KevinGH\Box\Console\DisplayNormalizer;
 use function array_column;
 use Generator;
 use Phar;
@@ -84,7 +85,10 @@ class RequirementsDumperTest extends TestCase
             array_column($checkFiles, 0)
         );
 
-        $this->assertSame($expectedRequirement, $checkFiles[0][1]);
+        $this->assertSame(
+            DisplayNormalizer::removeTrailingSpaces($expectedRequirement),
+            DisplayNormalizer::removeTrailingSpaces($checkFiles[0][1]),
+        );
     }
 
     public function provideJsonAndLockContents(): Generator
