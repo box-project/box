@@ -30,7 +30,7 @@ class NullScoperTest extends TestCase
         $contents = <<<'JSON'
 {
     "foo": "bar"
-    
+
 }
 JSON;
 

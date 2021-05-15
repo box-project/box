@@ -29,7 +29,7 @@ use Phar;
  */
 class ConfigurationSigningTest extends ConfigurationTestCase
 {
-    public function test_the_default_signing_is_SHA1(): void
+    public function test_the_default_signing_is_sha1(): void
     {
         $this->assertSame(Phar::SHA1, $this->config->getSigningAlgorithm());
 
@@ -97,7 +97,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
         }
     }
 
-    public function test_the_OpenSSL_algorithm_requires_a_private_key(): void
+    public function test_the_openssl_algorithm_requires_a_private_key(): void
     {
         try {
             $this->setConfig([
@@ -116,7 +116,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
     /**
      * @dataProvider providePassFileFreeSigningAlgorithm
      */
-    public function test_it_generates_a_warning_when_a_key_pass_is_provided_but_the_algorithm_is_not_OpenSSL(string $algorithm): void
+    public function test_it_generates_a_warning_when_a_key_pass_is_provided_but_the_algorithm_is_not__open_ssl(string $algorithm): void
     {
         $this->setConfig([
             'algorithm' => $algorithm,
@@ -188,7 +188,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
     /**
      * @dataProvider providePassFileFreeSigningAlgorithm
      */
-    public function test_it_generates_a_warning_when_a_key_path_is_provided_but_the_algorithm_is_not_OpenSSL(string $algorithm): void
+    public function test_it_generates_a_warning_when_a_key_path_is_provided_but_the_algorithm_is_not__open_ssl(string $algorithm): void
     {
         touch('key-file');
 

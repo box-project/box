@@ -30,7 +30,7 @@ class PhpUnitAnnotationsTest extends TestCase
     /**
      * @runInSeparateProcess
      */
-    public function test_there_is_no_commented_PHPUnit_runTestsInSeparateProcesses_annotations_commented(): void
+    public function test_there_is_no_commented_phpunit_run_tests_in_separate_processes_annotations_commented(): void
     {
         chdir(__DIR__.'/..');
 

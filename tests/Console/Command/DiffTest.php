@@ -21,6 +21,7 @@ use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use function ob_get_clean;
 use function ob_start;
+use const PHP_VERSION_ID;
 use function realpath;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -57,7 +58,7 @@ class DiffTest extends CommandTestCase
     /**
      * @dataProvider provideListDiffPhars
      */
-    public function test_it_can_display_the_list_diff_of_two_PHAR_files(
+    public function test_it_can_display_the_list_diff_of_two_phar_files(
         callable $executeCommand,
         string $expectedOutput,
         int $expectedStatusCode
@@ -68,7 +69,7 @@ class DiffTest extends CommandTestCase
         $this->assertSame($expectedStatusCode, $this->commandTester->getStatusCode());
     }
 
-    public function test_it_displays_the_list_diff_of_two_PHAR_files_by_default(): void
+    public function test_it_displays_the_list_diff_of_two_phar_files_by_default(): void
     {
         $this->commandTester->execute(
             [
@@ -107,7 +108,7 @@ OUTPUT;
     /**
      * @dataProvider provideGitDiffPhars
      */
-    public function test_it_can_display_the_git_diff_of_two_PHAR_files(
+    public function test_it_can_display_the_git_diff_of_two_phar_files(
         callable $executeCommand,
         ?string $expectedOutput,
         int $expectedStatusCode
@@ -123,7 +124,7 @@ OUTPUT;
     /**
      * @dataProvider provideGNUDiffPhars
      */
-    public function test_it_can_display_the_GNU_diff_of_two_PHAR_files(
+    public function test_it_can_display_the__gn_u_diff_of_two_phar_files(
         callable $executeCommand,
         ?string $expectedOutput,
         int $expectedStatusCode
@@ -136,7 +137,7 @@ OUTPUT;
         $this->assertSame($expectedStatusCode, $this->commandTester->getStatusCode());
     }
 
-    public function test_it_can_check_the_sum_of_two_PHAR_files(): void
+    public function test_it_can_check_the_sum_of_two_phar_files(): void
     {
         (function (): void {
             $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar');
@@ -203,7 +204,7 @@ OUTPUT;
         }
     }
 
-    public function test_it_cannot_compare_a_non_PHAR_files(): void
+    public function test_it_cannot_compare_a_non_phar_files(): void
     {
         $this->commandTester->execute(
             [
@@ -219,7 +220,7 @@ OUTPUT;
         $this->assertSame(1, $this->commandTester->getStatusCode());
     }
 
-    public function test_it_can_compare_PHAR_files_without_the_PHAR_extension(): void
+    public function test_it_can_compare_phar_files_without_the_phar_extension(): void
     {
         $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar');
 
@@ -249,7 +250,7 @@ OUTPUT;
         $this->assertSame(0, $this->commandTester->getStatusCode());
     }
 
-    public function test_it_cannot_compare_PHARs_which_are_signed_with_a_private_key(): void
+    public function test_it_cannot_compare_phars_which_are_signed_with_a_private_key(): void
     {
         try {
             $this->commandTester->execute(

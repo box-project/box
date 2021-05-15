@@ -50,7 +50,7 @@ class GenerateDockerFileTest extends CommandTestCase
         return new GenerateDockerFile();
     }
 
-    public function test_it_generates_a_Dockerfile_for_a_given_PHAR(): void
+    public function test_it_generates_a__dockerfile_for_a_given_phar(): void
     {
         $this->commandTester->execute([
             'command' => 'docker',
@@ -79,7 +79,7 @@ OUTPUT;
         $this->assertFileExists($this->tmp.'/Dockerfile');
     }
 
-    public function test_it_cannot_generate_a_Dockerfile_for_a_PHAR_without_requirements(): void
+    public function test_it_cannot_generate_a__dockerfile_for_a_phar_without_requirements(): void
     {
         $this->commandTester->execute([
             'command' => 'docker',
@@ -107,7 +107,7 @@ OUTPUT;
         $this->assertFileDoesNotExist($this->tmp.'/Dockerfile');
     }
 
-    public function test_it_cannot_generate_a_Dockerfile_for_a_corrupted_PHAR(): void
+    public function test_it_cannot_generate_a__dockerfile_for_a_corrupted_phar(): void
     {
         $this->commandTester->execute([
             'command' => 'docker',

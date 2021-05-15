@@ -76,7 +76,7 @@ OUTPUT;
         $this->assertSame(0, $this->commandTester->getStatusCode());
     }
 
-    public function test_it_can_verify_a_PHAR_which_does_not_have_the_PHAR_extension(): void
+    public function test_it_can_verify_a_phar_which_does_not_have_the_phar_extension(): void
     {
         $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar');
 
@@ -152,7 +152,7 @@ OUTPUT;
     /**
      * @dataProvider provideFailingPharPaths
      */
-    public function test_a_corrupted_PHAR_fails_the_verification(string $pharPath): void
+    public function test_a_corrupted_phar_fails_the_verification(string $pharPath): void
     {
         $this->commandTester->execute([
             'command' => 'verify',

@@ -10,12 +10,11 @@ This source file is subject to the MIT license that is bundled
 with this source code in the file LICENSE.
 EOF;
 
-$config = PhpCsFixer\Config::create()
+$config = (new PhpCsFixer\Config())
     ->setRiskyAllowed(true)
     ->setRules([
         '@PHP71Migration:risky' => true,
         '@PHP70Migration:risky' => true,
-        '@PHP56Migration' => true,
         '@Symfony' => true,
         '@Symfony:risky' => true,
         'align_multiline_comment' => true,
@@ -32,12 +31,19 @@ $config = PhpCsFixer\Config::create()
         'combine_consecutive_issets' => true,
         'combine_consecutive_unsets' => true,
         'compact_nullable_typehint' => true,
+        'global_namespace_import' => [
+            'import_constants' => true,
+            'import_functions' => true,
+            'import_classes' => true,
+        ],
         'header_comment' => ['header' => $header],
         'heredoc_to_nowdoc' => true,
         'list_syntax' => ['syntax' => 'short'],
-        'method_argument_space' => ['ensure_fully_multiline' => true],
+        'method_argument_space' => [
+            'on_multiline' => 'ensure_fully_multiline',
+        ],
         'native_function_invocation' => false,
-        'no_extra_consecutive_blank_lines' => [
+        'no_extra_blank_lines' => [
             'tokens' => [
                 'break',
                 'continue',
@@ -51,7 +57,7 @@ $config = PhpCsFixer\Config::create()
             ]
         ],
         'no_null_property_initialization' => true,
-        'no_short_echo_tag' => true,
+        'echo_tag_syntax' => true,
         'no_superfluous_elseif' => true,
         'no_unneeded_curly_braces' => true,
         'no_unneeded_final_method' => true,
@@ -64,6 +70,9 @@ $config = PhpCsFixer\Config::create()
         'phpdoc_add_missing_param_annotation' => true,
         'phpdoc_order' => true,
         'phpdoc_types_order' => true,
+        'php_unit_method_casing' => [
+            'case' => 'snake_case',
+        ],
         'semicolon_after_instruction' => true,
         'single_line_throw' => false,
         'strict_param' => true,
@@ -81,10 +90,10 @@ $config = PhpCsFixer\Config::create()
     )
 ;
 
-PhpCsFixer\FixerFactory::create()
+(new PhpCsFixer\FixerFactory())
     ->registerBuiltInFixers()
     ->registerCustomFixers($config->getCustomFixers())
-    ->useRuleSet(new PhpCsFixer\RuleSet($config->getRules()))
+    ->useRuleSet(new PhpCsFixer\RuleSet\RuleSet($config->getRules()))
 ;
 
 return $config;
