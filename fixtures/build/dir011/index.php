@@ -20,4 +20,4 @@ salute();
 echo ' ';
 X::salute();
 back();
-echo PHP_EOL;
+echo \PHP_EOL;

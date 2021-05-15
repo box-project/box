@@ -309,7 +309,7 @@ OUTPUT;
         }
     }
 
-    public function test_an_invalid_JSON_file_is_invalid(): void
+    public function test_an_invalid_json_file_is_invalid(): void
     {
         dump_file('box.json', '{');
 
@@ -342,7 +342,7 @@ OUTPUT;
         $this->assertSame(1, $this->commandTester->getStatusCode());
     }
 
-    public function test_an_invalid_JSON_file_is_invalid_in_verbose_mode(): void
+    public function test_an_invalid_json_file_is_invalid_in_verbose_mode(): void
     {
         dump_file('box.json.dist', '{');
 

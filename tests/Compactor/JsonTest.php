@@ -35,12 +35,12 @@ class JsonTest extends TestCase
     /**
      * @dataProvider provideFiles
      */
-    public function test_it_supports_JSON_files(string $file, bool $supports): void
+    public function test_it_supports_json_files(string $file, bool $supports): void
     {
         $contents = <<<'JSON'
 {
     "foo": "bar"
-    
+
 }
 JSON;
         $actual = $this->compactor->compact($file, $contents);
@@ -51,7 +51,7 @@ JSON;
     /**
      * @dataProvider provideJsonContent
      */
-    public function test_it_compacts_JSON_files(string $content, string $expected): void
+    public function test_it_compacts_json_files(string $content, string $expected): void
     {
         $file = 'file.json';
 
@@ -63,7 +63,7 @@ JSON;
     /**
      * @dataProvider provideJsonContent
      */
-    public function test_it_compacts_Composer_lock_files(string $content, string $expected): void
+    public function test_it_compacts__composer_lock_files(string $content, string $expected): void
     {
         $file = 'composer.lock';
 

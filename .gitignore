@@ -40,5 +40,6 @@
 /vendor-bin/*/vendor/
 /.php_cs.cache
 /.phpcs-cache
+/.php-cs-fixer.cache
 /phpunit.xml
 /phpcs.xml

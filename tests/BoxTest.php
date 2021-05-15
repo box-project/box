@@ -1143,7 +1143,7 @@ JSON
         }
     }
 
-    public function test_it_exposes_the_underlying_PHAR(): void
+    public function test_it_exposes_the_underlying_phar(): void
     {
         $expected = new Phar('test.phar');
         $actual = $this->box->getPhar();
@@ -1319,7 +1319,7 @@ STUB;
         }
     }
 
-    public function test_it_cannot_compress_the_PHAR_while_buffering(): void
+    public function test_it_cannot_compress_the_phar_while_buffering(): void
     {
         try {
             $this->box->startBuffering();
@@ -1339,7 +1339,7 @@ STUB;
      * @requires extension zlib
      * @requires extension bz2
      */
-    public function test_it_cannot_compress_the_PHAR_with_an_unknown_algorithm(int $algorithm, bool $supportedAlgorithm): void
+    public function test_it_cannot_compress_the_phar_with_an_unknown_algorithm(int $algorithm, bool $supportedAlgorithm): void
     {
         try {
             $this->box->compress($algorithm);
@@ -1467,7 +1467,7 @@ PHP
     /**
      * @requires extension openssl
      */
-    public function test_it_can_sign_the_PHAR(): void
+    public function test_it_can_sign_the_phar(): void
     {
         [$key, $password] = $this->getPrivateKey();
 
@@ -1534,7 +1534,7 @@ PHP
     /**
      * @requires extension openssl
      */
-    public function test_it_can_sign_the_PHAR_using_a_private_key_with_password(): void
+    public function test_it_can_sign_the_phar_using_a_private_key_with_password(): void
     {
         $phar = $this->box->getPhar();
 
@@ -1562,7 +1562,7 @@ PHP
     /**
      * @requires extension openssl
      */
-    public function test_it_cannot_sign_the_PHAR_using_a_private_key_with_the_wrong_password(): void
+    public function test_it_cannot_sign_the_phar_using_a_private_key_with_the_wrong_password(): void
     {
         $key = $this->getPrivateKey()[0];
         $password = 'wrong password';
@@ -1583,7 +1583,7 @@ PHP
         }
     }
 
-    public function test_it_cannot_sign_the_PHAR_with_a_non_existent_file_as_private_key(): void
+    public function test_it_cannot_sign_the_phar_with_a_non_existent_file_as_private_key(): void
     {
         try {
             $this->box->signUsingFile('/does/not/exist');
@@ -1597,7 +1597,7 @@ PHP
         }
     }
 
-    public function test_it_cannot_sign_the_PHAR_with_an_unreadable_file_as_a_private_key(): void
+    public function test_it_cannot_sign_the_phar_with_an_unreadable_file_as_a_private_key(): void
     {
         $root = vfsStream::newDirectory('test');
         $root->addChild(vfsStream::newFile('private.key', 0000));

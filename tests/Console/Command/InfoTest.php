@@ -44,7 +44,7 @@ class InfoTest extends CommandTestCase
         return new Info();
     }
 
-    public function test_it_provides_info_about_the_phar_API(): void
+    public function test_it_provides_info_about_the_phar__api(): void
     {
         $this->commandTester->execute(
             [

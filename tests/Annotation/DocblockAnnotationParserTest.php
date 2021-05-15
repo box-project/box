@@ -43,7 +43,7 @@ class DocblockAnnotationParserTest extends TestCase
     /**
      * @dataProvider provideDocblocks
      */
-    public function test_it_can_parse_PHP_docblocks(string $docblock, array $expected): void
+    public function test_it_can_parse_php_docblocks(string $docblock, array $expected): void
     {
         $actual = $this->annotationParser->parse($docblock);
 

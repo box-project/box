@@ -47,6 +47,8 @@ use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use function mt_getrandmax;
 use Phar;
 use PharFileInfo;
+use const PHP_EOL;
+use const PHP_OS;
 use const PHP_VERSION;
 use function phpversion;
 use function preg_match;
@@ -110,7 +112,7 @@ class CompileTest extends CommandTestCase
         return new Compile();
     }
 
-    public function test_it_can_build_a_PHAR_file(): void
+    public function test_it_can_build_a_phar_file(): void
     {
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
@@ -331,7 +333,7 @@ PHP;
         $this->assertSame($expectedFiles, $actualFiles);
     }
 
-    public function test_it_can_build_a_PHAR_from_a_different_directory(): void
+    public function test_it_can_build_a_phar_from_a_different_directory(): void
     {
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
@@ -381,7 +383,7 @@ PHP;
         );
     }
 
-    public function test_it_can_build_a_PHAR_without_any_configuration(): void
+    public function test_it_can_build_a_phar_without_any_configuration(): void
     {
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
@@ -586,7 +588,7 @@ PHP;
         );
     }
 
-    public function test_it_can_build_a_PHAR_with_complete_mapping(): void
+    public function test_it_can_build_a_phar_with_complete_mapping(): void
     {
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
@@ -746,7 +748,7 @@ PHP;
         $this->assertSame($expectedFiles, $actualFiles);
     }
 
-    public function test_it_can_build_a_PHAR_with_complete_mapping_without_an_alias(): void
+    public function test_it_can_build_a_phar_with_complete_mapping_without_an_alias(): void
     {
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
@@ -820,7 +822,7 @@ PHP;
         $this->assertSame($expectedStub, $actualStub);
     }
 
-    public function test_it_can_build_a_PHAR_file_in_verbose_mode(): void
+    public function test_it_can_build_a_phar_file_in_verbose_mode(): void
     {
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
@@ -942,7 +944,7 @@ OUTPUT;
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_can_build_a_PHAR_file_in_very_verbose_mode(): void
+    public function test_it_can_build_a_phar_file_in_very_verbose_mode(): void
     {
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
@@ -1074,7 +1076,7 @@ OUTPUT;
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_can_build_a_PHAR_file_in_debug_mode(): void
+    public function test_it_can_build_a_phar_file_in_debug_mode(): void
     {
         dump_file(
             'index.php',
@@ -1342,7 +1344,7 @@ EOF;
         );
     }
 
-    public function test_it_can_build_a_PHAR_file_in_quiet_mode(): void
+    public function test_it_can_build_a_phar_file_in_quiet_mode(): void
     {
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
@@ -1407,7 +1409,7 @@ EOF;
         $this->assertSame(['rand' => $rand], $phar->getMetadata());
     }
 
-    public function test_it_can_build_a_PHAR_file_using_the_PHAR_default_stub(): void
+    public function test_it_can_build_a_phar_file_using_the_phar_default_stub(): void
     {
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
@@ -1452,7 +1454,7 @@ EOF;
         );
     }
 
-    public function test_it_can_build_a_PHAR_file_using_a_custom_stub(): void
+    public function test_it_can_build_a_phar_file_using_a_custom_stub(): void
     {
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
@@ -1524,7 +1526,7 @@ PHP
         $this->assertSame($stub, $actualStub);
     }
 
-    public function test_it_can_build_a_PHAR_file_using_the_default_stub(): void
+    public function test_it_can_build_a_phar_file_using_the_default_stub(): void
     {
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
@@ -1557,7 +1559,7 @@ PHP
         );
     }
 
-    public function test_it_cannot_build_a_PHAR_using_unreadable_files(): void
+    public function test_it_cannot_build_a_phar_using_unreadable_files(): void
     {
         touch('index.php');
         touch('unreadable-file.php');
@@ -1590,7 +1592,7 @@ PHP
         }
     }
 
-    public function test_it_can_build_a_PHAR_overwriting_an_existing_one_in_verbose_mode(): void
+    public function test_it_can_build_a_phar_overwriting_an_existing_one_in_verbose_mode(): void
     {
         mirror(self::FIXTURES_DIR.'/dir002', $this->tmp);
 
@@ -1703,7 +1705,7 @@ OUTPUT;
         }
     }
 
-    public function test_it_can_build_a_PHAR_without_dumping_the_autoloader(): void
+    public function test_it_can_build_a_phar_without_dumping_the_autoloader(): void
     {
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
@@ -1853,7 +1855,7 @@ OUTPUT;
         }
     }
 
-    public function test_it_can_build_a_PHAR_with_a_custom_banner(): void
+    public function test_it_can_build_a_phar_with_a_custom_banner(): void
     {
         mirror(self::FIXTURES_DIR.'/dir003', $this->tmp);
 
@@ -1922,7 +1924,7 @@ OUTPUT;
         );
     }
 
-    public function test_it_can_build_a_PHAR_with_a_stub_file(): void
+    public function test_it_can_build_a_phar_with_a_stub_file(): void
     {
         mirror(self::FIXTURES_DIR.'/dir004', $this->tmp);
 
@@ -1987,7 +1989,7 @@ OUTPUT;
         );
     }
 
-    public function test_it_can_build_a_PHAR_with_the_default_stub_file(): void
+    public function test_it_can_build_a_phar_with_the_default_stub_file(): void
     {
         mirror(self::FIXTURES_DIR.'/dir005', $this->tmp);
 
@@ -2053,7 +2055,7 @@ OUTPUT;
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_can_build_a_PHAR_without_a_main_script(): void
+    public function test_it_can_build_a_phar_without_a_main_script(): void
     {
         mirror(self::FIXTURES_DIR.'/dir004', $this->tmp);
 
@@ -2129,7 +2131,7 @@ OUTPUT;
         );
     }
 
-    public function test_it_can_build_an_empty_PHAR(): void
+    public function test_it_can_build_an_empty_phar(): void
     {
         mirror(self::FIXTURES_DIR.'/dir004', $this->tmp);
 
@@ -2212,7 +2214,7 @@ OUTPUT;
         $this->assertSame($expectedFiles, $actualFiles);
     }
 
-    public function test_it_can_build_a_PHAR_with_compressed_code(): void
+    public function test_it_can_build_a_phar_with_compressed_code(): void
     {
         mirror(self::FIXTURES_DIR.'/dir006', $this->tmp);
 
@@ -2290,7 +2292,7 @@ OUTPUT;
         );
     }
 
-    public function test_it_can_build_a_PHAR_in_a_non_existent_directory(): void
+    public function test_it_can_build_a_phar_in_a_non_existent_directory(): void
     {
         mirror(self::FIXTURES_DIR.'/dir007', $this->tmp);
 
@@ -2365,7 +2367,7 @@ OUTPUT;
     /**
      * @dataProvider provideAliasConfig
      */
-    public function test_it_configures_the_PHAR_alias(bool $stub): void
+    public function test_it_configures_the_phar_alias(bool $stub): void
     {
         mirror(self::FIXTURES_DIR.'/dir008', $this->tmp);
 
@@ -2440,7 +2442,7 @@ OUTPUT;
         $this->assertSame($expectedFiles, $actualFiles);
     }
 
-    public function test_it_can_build_a_PHAR_file_without_a_shebang_line(): void
+    public function test_it_can_build_a_phar_file_without_a_shebang_line(): void
     {
         mirror(self::FIXTURES_DIR.'/dir006', $this->tmp);
 
@@ -2522,7 +2524,7 @@ OUTPUT;
         );
     }
 
-    public function test_it_can_build_a_PHAR_with_an_output_which_does_not_have_a_PHAR_extension(): void
+    public function test_it_can_build_a_phar_with_an_output_which_does_not_have_a_phar_extension(): void
     {
         mirror(self::FIXTURES_DIR.'/dir004', $this->tmp);
 
@@ -2600,7 +2602,7 @@ OUTPUT;
         );
     }
 
-    public function test_it_can_build_a_PHAR_ignoring_the_configuration(): void
+    public function test_it_can_build_a_phar_ignoring_the_configuration(): void
     {
         mirror(self::FIXTURES_DIR.'/dir009', $this->tmp);
 
@@ -2639,7 +2641,7 @@ OUTPUT;
         );
     }
 
-    public function test_it_can_build_a_PHAR_with_a_PHPScoper_config(): void
+    public function test_it_can_build_a_phar_with_a_php_scoper_config(): void
     {
         mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
 
@@ -2673,7 +2675,7 @@ OUTPUT;
         $this->assertStringStartsWith('_HumbugBox', $phpScoperNamespace);
     }
 
-    public function test_it_can_build_a_PHAR_with_a_PHPScoper_config_with_a_specific_prefix(): void
+    public function test_it_can_build_a_phar_with_a_php_scoper_config_with_a_specific_prefix(): void
     {
         mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
 
@@ -2709,7 +2711,7 @@ OUTPUT;
         $this->assertSame('Acme', $phpScoperNamespace);
     }
 
-    public function test_it_cannot_sign_a_PHAR_with_the_OpenSSL_algorithm_without_a_private_key(): void
+    public function test_it_cannot_sign_a_phar_with_the_openssl_algorithm_without_a_private_key(): void
     {
         mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
 
@@ -2888,7 +2890,7 @@ OUTPUT;
         $this->assertSame($expected, $actual, 'Expected logs to be identical');
     }
 
-    public function test_it_can_generate_a_PHAR_with_docker(): void
+    public function test_it_can_generate_a_phar_with_docker(): void
     {
         if (extension_loaded('xdebug')) {
             $this->markTestSkipped('Skipping this test since xdebug has an include wrapper causing this test to fail');
