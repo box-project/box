@@ -2641,7 +2641,7 @@ OUTPUT;
         );
     }
 
-    public function test_it_can_build_a_phar_with_a__php_scoper_config(): void
+    public function test_it_can_build_a_phar_with_a_php_scoper_config(): void
     {
         mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
 
@@ -2675,7 +2675,7 @@ OUTPUT;
         $this->assertStringStartsWith('_HumbugBox', $phpScoperNamespace);
     }
 
-    public function test_it_can_build_a_phar_with_a__php_scoper_config_with_a_specific_prefix(): void
+    public function test_it_can_build_a_phar_with_a_php_scoper_config_with_a_specific_prefix(): void
     {
         mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
 

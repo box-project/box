@@ -2083,7 +2083,7 @@ BANNER
         $this->assertSame([], $this->config->getWarnings());
     }
 
-    public function test_a_warning_is_given_when_the_banner_is_configured_but_the__box_stub_is_not_used(): void
+    public function test_a_warning_is_given_when_the_banner_is_configured_but_the_box_stub_is_not_used(): void
     {
         touch('my-stub.php');
 
@@ -2104,7 +2104,7 @@ BANNER
         }
     }
 
-    public function test_a_recommendation_is_given_when_the_banner_is_disabled_but_the__box_stub_is_not_used(): void
+    public function test_a_recommendation_is_given_when_the_banner_is_disabled_but_the_box_stub_is_not_used(): void
     {
         touch('my-stub.php');
 
@@ -2302,7 +2302,7 @@ BANNER
         $this->assertSame([], $this->config->getWarnings());
     }
 
-    public function test_a_warning_is_given_when_the_banner_file_is_configured_but_the__box_stub_is_not_used(): void
+    public function test_a_warning_is_given_when_the_banner_file_is_configured_but_the_box_stub_is_not_used(): void
     {
         touch('custom-banner');
         touch('my-stub.php');
@@ -2527,7 +2527,7 @@ COMMENT;
         $this->assertSame([], $this->config->getWarnings());
     }
 
-    public function test_a_warning_is_given_when_the_intercept_funcs_is_configured_but_the__box_stub_is_not_used(): void
+    public function test_a_warning_is_given_when_the_intercept_funcs_is_configured_but_the_box_stub_is_not_used(): void
     {
         touch('my-stub.php');
 
@@ -2547,7 +2547,7 @@ COMMENT;
         }
     }
 
-    public function test_a_recommendation_is_given_when_the_intercept_funcs_is_disabled_but_the__box_stub_is_not_used(): void
+    public function test_a_recommendation_is_given_when_the_intercept_funcs_is_disabled_but_the_box_stub_is_not_used(): void
     {
         touch('my-stub.php');
 
