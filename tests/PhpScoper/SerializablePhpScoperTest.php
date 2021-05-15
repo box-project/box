@@ -21,6 +21,7 @@ use Generator;
 use Humbug\PhpScoper\Scoper;
 use Humbug\PhpScoper\Scoper\NullScoper;
 use Humbug\PhpScoper\Whitelist;
+use const PHP_VERSION_ID;
 use PHPUnit\Framework\TestCase;
 use function serialize;
 use function unserialize;

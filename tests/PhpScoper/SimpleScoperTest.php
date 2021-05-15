@@ -36,7 +36,7 @@ class SimpleScoperTest extends TestCase
         $contents = <<<'JSON'
 {
     "foo": "bar"
-    
+
 }
 JSON;
 

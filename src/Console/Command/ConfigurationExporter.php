@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use const DATE_ATOM;
 use DateTimeImmutable;
 use DateTimeZone;
 use function function_exists;
@@ -22,7 +23,9 @@ use function implode;
 use KevinGH\Box\Configuration\Configuration;
 use function KevinGH\Box\get_box_version;
 use KevinGH\Box\NotInstantiable;
+use const PHP_OS;
 use function php_uname;
+use const PHP_VERSION;
 
 final class ConfigurationExporter
 {

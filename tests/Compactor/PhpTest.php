@@ -28,7 +28,7 @@ class PhpTest extends TestCase
     /**
      * @dataProvider provideFiles
      */
-    public function test_it_supports_PHP_files(string $file, bool $supports): void
+    public function test_it_supports_php_files(string $file, bool $supports): void
     {
         $compactor = new Php(
             new DocblockAnnotationParser(
@@ -56,7 +56,7 @@ PHP;
     /**
      * @dataProvider providePhpContent
      */
-    public function test_it_compacts_PHP_files(DocblockAnnotationParser $annotationParser, string $content, string $expected): void
+    public function test_it_compacts_php_files(DocblockAnnotationParser $annotationParser, string $content, string $expected): void
     {
         $file = 'foo.php';
 
@@ -367,7 +367,7 @@ PHP
 <?php
 
 /**
- * @param (string|stdClass $x 
+ * @param (string|stdClass $x
  */
 function foo($x) {
 }
@@ -392,7 +392,7 @@ PHP
 /**
  * comment
  *
- * @a({@:1}) 
+ * @a({@:1})
  */
 function foo($x) {
 }

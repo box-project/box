@@ -26,7 +26,7 @@ use stdClass;
  */
 class ConfigurationPhpCompactorTest extends ConfigurationTestCase
 {
-    public function test_the_PHP_compactor_can_be_registered(): void
+    public function test_the_php_compactor_can_be_registered(): void
     {
         $this->setConfig([
             'compactors' => [
@@ -47,7 +47,7 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
         $this->assertSame([], $this->config->getWarnings());
     }
 
-    public function test_the_PHP_compactor_ignored_annotations_can_be_configured(): void
+    public function test_the_php_compactor_ignored_annotations_can_be_configured(): void
     {
         $this->setConfig([
             'annotations' => (object) [
@@ -74,7 +74,7 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
         $this->assertSame([], $this->config->getWarnings());
     }
 
-    public function test_a_recommendation_is_given_if_the_PHP_compactor_annotations_are_configured_with_their_default_values(): void
+    public function test_a_recommendation_is_given_if_the_php_compactor_annotations_are_configured_with_their_default_values(): void
     {
         foreach ([true, null] as $annotations) {
             $this->setConfig([
@@ -101,7 +101,7 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
      *
      * @param mixed $annotationValue
      */
-    public function test_a_warning_is_given_if_the_PHP_compactor_annotations_are_configured_but_no_PHP_compactor_is_registered(
+    public function test_a_warning_is_given_if_the_php_compactor_annotations_are_configured_but_no_php_compactor_is_registered(
         $annotationValue,
         array $expectedRecommendations,
         array $expectedWarnings
@@ -118,7 +118,7 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
         $this->assertSame($expectedWarnings, $this->config->getWarnings());
     }
 
-    public function test_a_recommendation_is_given_if_the_PHP_compactor_ignored_annotations_are_configured_with_their_default_values(): void
+    public function test_a_recommendation_is_given_if_the_php_compactor_ignored_annotations_are_configured_with_their_default_values(): void
     {
         $this->setConfig([
             'annotations' => (object) [
@@ -143,7 +143,7 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
     /**
      * @dataProvider providePhpContentsToCompact
      */
-    public function test_ignored_annotations_are_provided_to_the_PHP_compactor(
+    public function test_ignored_annotations_are_provided_to_the_php_compactor(
         array $config,
         string $contents,
         string $expected

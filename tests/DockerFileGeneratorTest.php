@@ -26,7 +26,7 @@ class DockerFileGeneratorTest extends TestCase
     /**
      * @dataProvider provideGeneratorData
      */
-    public function test_it_can_generate_a_Dockerfile_contents(
+    public function test_it_can_generate_a_dockerfile_contents(
         string $image,
         array $extensions,
         string $sourcePhar,
@@ -40,7 +40,7 @@ class DockerFileGeneratorTest extends TestCase
     /**
      * @dataProvider provideGeneratorRequirements
      */
-    public function test_it_can_generate_a_Dockerfile_contents_from_requirements(
+    public function test_it_can_generate_a_dockerfile_contents_from_requirements(
         array $requirements,
         string $sourcePhar,
         string $expected
@@ -50,7 +50,7 @@ class DockerFileGeneratorTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function test_throws_an_error_if_cannot_find_a_suitable_PHP_image(): void
+    public function test_throws_an_error_if_cannot_find_a_suitable_php_image(): void
     {
         try {
             DockerFileGenerator::createForRequirements(

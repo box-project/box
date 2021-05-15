@@ -24,7 +24,7 @@ use PHPUnit\Framework\TestCase;
  */
 class FunctionsTest extends TestCase
 {
-    public function test_it_can_provide_the_PHARs_algorithms(): void
+    public function test_it_can_provide_the_phars_algorithms(): void
     {
         $expected = [
             'GZ' => Phar::GZ,
@@ -42,7 +42,7 @@ class FunctionsTest extends TestCase
      *
      * @param mixed $expected
      */
-    public function test_it_can_provide_the_PHARs_algorithm_extensions(int $algorithm, $expected): void
+    public function test_it_can_provide_the_phars_algorithm_extensions(int $algorithm, $expected): void
     {
         try {
             $actual = get_phar_compression_algorithm_extension($algorithm);

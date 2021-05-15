@@ -606,6 +606,10 @@ JSON
         touch('.php_cs');
         touch('.php_cs.cache');
 
+        touch('.php-cs-fixer.dist.php');
+        touch('.php-cs-fixer.php');
+        touch('.php-cs-fixer.cache');
+
         touch('scoper.inc.php.dist');
         touch('scoper.inc.php');
 
@@ -709,7 +713,7 @@ JSON
         $this->assertCount(0, $this->config->getBinaryFiles());
     }
 
-    public function test_the_existing_PHARs_are_ignored_when_all_the_files_are_collected(): void
+    public function test_the_existing_phars_are_ignored_when_all_the_files_are_collected(): void
     {
         touch('index.phar');
 

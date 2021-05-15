@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
+use KevinGH\Box\Console\DisplayNormalizer;
 use function array_column;
 use Generator;
 use Phar;
@@ -84,7 +85,10 @@ class RequirementsDumperTest extends TestCase
             array_column($checkFiles, 0)
         );
 
-        $this->assertSame($expectedRequirement, $checkFiles[0][1]);
+        $this->assertSame(
+            DisplayNormalizer::removeTrailingSpaces($expectedRequirement),
+            DisplayNormalizer::removeTrailingSpaces($checkFiles[0][1]),
+        );
     }
 
     public function provideJsonAndLockContents(): Generator
@@ -119,21 +123,21 @@ PHP
 <?php
 
 return array (
-  0 => 
+  0 =>
   array (
     'type' => 'php',
     'condition' => '^7.3',
     'message' => 'The package "acme/foo" requires the version "^7.3" or greater.',
     'helpMessage' => 'The package "acme/foo" requires the version "^7.3" or greater.',
   ),
-  1 => 
+  1 =>
   array (
     'type' => 'extension',
     'condition' => 'zlib',
     'message' => 'The application requires the extension "zlib". Enable it or install a polyfill.',
     'helpMessage' => 'The application requires the extension "zlib".',
   ),
-  2 => 
+  2 =>
   array (
     'type' => 'extension',
     'condition' => 'json',

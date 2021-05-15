@@ -37,7 +37,7 @@ class PhpScoperTest extends TestCase
         $contents = <<<'JSON'
 {
     "foo": "bar"
-    
+
 }
 JSON;
 
@@ -60,7 +60,7 @@ JSON;
         $contents = <<<'JSON'
 {
     "foo": "bar"
-    
+
 }
 JSON;
 
