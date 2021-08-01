@@ -43,3 +43,4 @@
 /.php-cs-fixer.cache
 /phpunit.xml
 /phpcs.xml
+/site

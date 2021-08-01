@@ -1,10 +1,3 @@
-# Installation
-
-1. [PHAR](#phar)
-1. [Phive](#phive)
-1. [Composer](#composer)
-1. [Homebrew](#homebrew)
-
 ## PHAR
 
 The preferred method of installation is to use the Box PHAR which can be downloaded from the most recent
@@ -64,12 +57,6 @@ To upgrade `box` use the following command:
 ```bash
 $ brew upgrade box
 ```
-
-<br />
-<hr />
-
-« [Table of Contents](../README.md#table-of-contents) • [Configuration](configuration.md#configuration) »
-
 
 [releases]: https://github.com/humbug/box/releases
 [composer]: https://getcomposer.org
