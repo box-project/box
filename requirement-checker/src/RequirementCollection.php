@@ -15,6 +15,7 @@ namespace KevinGH\RequirementChecker;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
+use ReturnTypeWillChange;
 use Traversable;
 
 /**
@@ -36,6 +37,7 @@ final class RequirementCollection implements IteratorAggregate, Countable
      *
      * @return Requirement[]|Traversable
      */
+    #[ReturnTypeWillChange]
     public function getIterator()
     {
         return new ArrayIterator($this->requirements);
@@ -44,6 +46,7 @@ final class RequirementCollection implements IteratorAggregate, Countable
     /**
      * {@inheritdoc}
      */
+    #[ReturnTypeWillChange]
     public function count()
     {
         return \count($this->requirements);
