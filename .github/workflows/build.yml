@@ -37,7 +37,7 @@ jobs:
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: ${{ matrix.php }}
-                    ini-values: phar.readonly=0
+                    ini-values: phar.readonly=0, display_errors=On, error_reporting=-1
                     tools: ${{ matrix.tools }}
                     coverage: none
                     extensions: ctype, iconv, xml
@@ -96,7 +96,7 @@ jobs:
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: 7.4
-                    ini-values: phar.readonly=0
+                    ini-values: phar.readonly=0, display_errors=On, error_reporting=-1
                     tools: composer:v2
                     coverage: pcov
                     extensions: ctype, iconv, xml
@@ -171,7 +171,7 @@ jobs:
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: ${{ matrix.php }}
-                    ini-values: "phar.readonly=0"
+                    ini-values: "phar.readonly=0, display_errors=On, error_reporting=-1"
                     tools: ${{ matrix.tools }}
                     coverage: pcov
 
@@ -221,7 +221,7 @@ jobs:
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: 7.3
-                    ini-values: phar.readonly=0
+                    ini-values: phar.readonly=0, display_errors=On, error_reporting=-1
                     tools: composer:v2
                     coverage: none
 
