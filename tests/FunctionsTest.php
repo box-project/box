@@ -62,8 +62,10 @@ class FunctionsTest extends TestCase
 
     /**
      * @dataProvider provideBytes
+     *
+     * @param float|int $bytes
      */
-    public function test_it_can_format_bytes(int $bytes, string $expected): void
+    public function test_it_can_format_bytes($bytes, string $expected): void
     {
         $actual = format_size($bytes);
 
@@ -72,8 +74,10 @@ class FunctionsTest extends TestCase
 
     /**
      * @dataProvider provideMemory
+     *
+     * @param float|int $expected
      */
-    public function test_it_can_convert_a_memory_limit_amount_to_bytes(string $memory, int $expected): void
+    public function test_it_can_convert_a_memory_limit_amount_to_bytes(string $memory, $expected): void
     {
         $actual = memory_to_bytes($memory);
 
@@ -103,6 +107,7 @@ class FunctionsTest extends TestCase
         yield [1024 ** 4, '1.00TB'];
         yield [1024 ** 5, '1.00PB'];
         yield [1024 ** 6, '1.00EB'];
+        yield [1.073741824E+21, '931.32EB'];
     }
 
     public function provideMemory(): Generator
@@ -115,5 +120,7 @@ class FunctionsTest extends TestCase
         yield ['10m', (1024 ** 2) * 10];
         yield ['1g', 1024 ** 3];
         yield ['10g', (1024 ** 3) * 10];
+        yield ['10g', (1024 ** 3) * 10];
+        yield ['1000000000000g', 1.073741824E+21];
     }
 }
