@@ -10,6 +10,12 @@
 The preferred method of installation is to use the Box PHAR which can be downloaded from the most recent
 [Github Release][releases]. This method ensures you will not have any dependency conflict issue.
 
+From a script or command line, you can download the latest release using curl:
+
+```bash
+$ curl -f -L https://github.com/humbug/box/releases/latest/download/box.phar -o box.phar
+```
+
 
 ## Phive
 
