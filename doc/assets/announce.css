@@ -1,0 +1,17 @@
+.md-announce a,
+.md-announce a:focus {
+    color: white;
+}
+.md-announce a:hover {
+    color: hotpink;
+}
+.md-announce strong {
+    white-space: nowrap;
+}
+.md-announce .heart {
+    margin-left: 0.2em;
+    color: deeppink;
+}
+.box-image {
+    width: 900px;
+}

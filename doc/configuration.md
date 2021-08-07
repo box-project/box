@@ -1,47 +1,3 @@
-# Configuration
-
-1. [Base path][base-path]
-1. [Main][main]
-1. [Output][output]
-1. [Permissions][permissions]
-1. [Check requirements][check-requirements]
-1. [Including files][including-files]
-    1. [Force auto-discovery (`force-autodiscovery`)][force-autodiscovery]
-    1. [Files (`files` and `files-bin`)][files]
-    1. [Directories (`directories` and `directories-bin`)][directories]
-    1. [Finder (`finder` and `finder-bin`)][finder]
-    1. [Blacklist (`blacklist`)][blacklist]
-    1. [Excluding the Composer files (`exclude-composer-files`)][exclude-composer-files]
-    1. [Excluding dev files (`exclude-dev-files`)][exclude-dev-files]
-    1. [Map (`map`)][map]
-1. [Stub][stub]
-    1. [Stub (`stub`)][stub-stub]
-    1. [Alias (`alias`)][alias]
-    1. [Shebang (`shebang`)][shebang]
-    1. [Banner (`banner`)][banner]
-    1. [Banner file (`banner-file`)][banner-file]
-1. [Dumping the Composer autoloader (`dump-autoload`)][dump-autoload]
-1. [Compactors (`compactors`)][compactors]
-    1. [Annotations (`annotations`)][annotations-compactor]
-    1. [PHP-Scoper (`php-scoper`)][php-scoper-compactor]
-1. [Compression algorithm (`compression`)][compression]
-1. [Security][security]
-    1. [Signing algorithm (`algorithm`)][algorithm]
-    1. [The private key (`key`)][key]
-    1. [The private key password (`key-pass`)][key-pass]
-1. [Metadata (`metadata`)][metadata]
-1. [Replaceable placeholders][placeholders]
-    1. [Replacements (`replacements`)][replacements]
-    1. [Replacement sigil (`replacement-sigil`)][replacement-sigil]
-    1. [Datetime placeholder (`datetime`)][datetime–placeholder]
-    1. [Datetime placeholder format (`datetime-format`)][datetime-placeholder-format]
-    1. [Pretty git commit placeholder (`git`)][git]
-    1. [Git commit placeholder (`git-commit`)][git-commit-placeholder]
-    1. [Short git commit placeholder (`git-commit-short`)][git-commit-short]
-    1. [Git tag placeholder (`git-tag`)][git-tag-placeholder]
-    1. [Git version placeholder (`git-version`)][git-version-placeholder]
-
-
 The build command will build a new PHAR based on a variety of settings.
 
 This command relies on a configuration file for loading PHAR packaging settings. If a configuration file is not
@@ -96,7 +52,6 @@ to `null`, then its default value will be picked and is strictly equivalent to n
 }
 ```
 
-
 ## Base-path (`base-path`)
 
 The `base-path` (`string`|`null`) setting is used to specify where all of the relative file paths should resolve to.
@@ -115,7 +70,7 @@ bootstrapping file).
 When you have a main script file that can be used as a [stub][stub], you can disable the main script by setting it to
 false:
 
-```
+```json
 {
     "stub": "bin/acme.php",
     "main": false
@@ -156,9 +111,10 @@ constraint before running. See more information about it [here][requirement-chec
 the requirement checker will be added. Note that this is true only if either the `composer.json`  or `composer.lock`
 could have been found.
 
-**Warning**: this check is still done within the PHAR. As a result, if 
-[the required extension to open the PHAR][compression] due to the compression algorithm is not loaded, a hard failure
-will still appear: the requirement checker _cannot_ be executed before that.
+!!! warning 
+    this check is still done within the PHAR. As a result, if [the required extension to open the PHAR][compression]
+    due to the compression algorithm is not loaded, a hard failure will still appear: the requirement 
+    checker _cannot_ be executed before that.
 
 
 ## Including files
@@ -176,13 +132,15 @@ If [`directories`][directories] or [`finder`][finder] is set (this includes empt
 guess which files should be included or not (unless you [force the auto-discovery][force-autodiscovery]) and will give
 you full control on it instead.
 
-**Note:** By default, dev dependencies are excluded for both strategies. However if you still which to include a file
-or directory from a dev dependency, you can do so by adding it via one of the following setting: [`files`][files],
-[`files-bin`][files], [`directories`][directories] or [`directories-bin`][directories].
+!!! Note
+    By default, dev dependencies are excluded for both strategies. However if you still which to include a file
+    or directory from a dev dependency, you can do so by adding it via one of the following setting: [`files`][files],
+    [`files-bin`][files], [`directories`][directories] or [`directories-bin`][directories].
 
 
-**Warning:** binary files are added _before_ regular files. As a result if a file is found in both regular files and
-binary files, the regular file will take precedence.
+!!! warning
+    binary files are added _before_ regular files. As a result if a file is found in both regular files and
+    binary files, the regular file will take precedence.
 
 
 ### Force auto-discovery (`force-autodiscovery`)
@@ -305,7 +263,7 @@ project/
     └── B01
 ```
 
-You you want a more granular blacklist leverage the [Finders configuration][finder] instead.
+If you want a more granular blacklist leverage, use the [Finders configuration][finder] instead.
 
 
 ### Excluding the Composer files (`exclude-composer-files`)
@@ -417,7 +375,7 @@ The intercept (`boolean`|`null` default `false`) setting is used when generating
 
 ### Alias (`alias`)
 
-The `alias` (`string`|`null`) setting is used when generating a new stub to call the [`Phar::mapPhar()`](phar.mapphar).
+The `alias` (`string`|`null`) setting is used when generating a new stub to call the [`Phar::mapPhar()`][phar.mapphar].
 This makes it easier to refer to files in the PHAR and ensure the access to internal files will always work regardless
 of the location of the PHAR on the file system.
 
@@ -716,9 +674,10 @@ compression affects the individual files within the PHAR and not the PHAR as a w
 - `BZ2`
 - `NONE` (default)
 
-**Warning**: be aware that if compressed, the PHAR will required the appropriate extension ([`zlib`][zlib-extension] for
-`GZ` and [`bz2`][bz2-extension] for `BZ2`) to execute the PHAR. Without it, PHP will _not_ be able to open the PHAR at
-all.
+!!! warning
+    be aware that if compressed, the PHAR will required the appropriate extension ([`zlib`][zlib-extension] for
+    `GZ` and [`bz2`][bz2-extension] for `BZ2`) to execute the PHAR. Without it, PHP will _not_ be able to open the PHAR
+    at all.
 
 
 ## Security
@@ -928,13 +887,6 @@ The git version (`string`|`null` default `null`) setting is the name of a placeh
 - The git repository's current short commit hash.
 
 The short commit hash will only be used if no tag is available.
-
-
-<br />
-<hr />
-
-« [Installation](installation.md#installation) • [Requirement Checker](requirement-checker.md#requirements-checker) »
-
 
 [PHAR code isolation]: code-isolation.md#phar-code-isolation
 [algorithm]: #signing-algorithm-algorithm

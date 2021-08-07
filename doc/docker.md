@@ -1,5 +1,3 @@
-# Docker support
-
 Besides generating a PHAR, you may want to create a [Docker][docker] image for your application. To do so, you can
 either:
 
@@ -23,11 +21,6 @@ your application requires with the ones already provided by the base PHP image, 
 the extension is not a known one, it cannot be installed the traditional way, it needs to be compiled with PHP... For
 all those cases (unless you have a better way to handle it in which case PRs are welcomed) you will have to dirty your
 hands and tweak the `Dockerfile` to your needs.
-
-<br />
-<hr />
-
-« [PHAR code isolation](code-isolation.md#phar-code-isolation) • [Symfony supports](symfony.md#symfony-support) »
 
 
 [docker]: https://www.docker.com/

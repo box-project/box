@@ -1,12 +1,5 @@
 # Requirements checker
 
-1. [Configuration](#configuration)
-    1. [PHP version requirements](#php-version-requirements)
-    1. [Extension configuration requirements](#extension-configuration-requirements)
-    1. [Polyfills](#polyfills)
-1. [Integration with a custom stub](#integration-with-a-custom-stub)
-
-
 Unlike when installing a library with [Composer][composer], no constraint check is done by default with a PHAR. As a
 result, if you are using a PHAR of an application compatible with PHP 7.2 in PHP 7.0 or a PHP environment which does not
 have a required extension, it will simply break with a non-friendly error.
@@ -18,13 +11,13 @@ compressed) requirements checker which will be executed when starting your PHAR.
 The following are screenshots of the output when an error occurs (left) in a non-quiet verbosity and when all
 requirements are passing on the right in debug verbosity.
 
-<p align="center">
-    <img src="img/requirement-checker.png" width=900 />
-</p>
+![Requirements Checker KO](img/requirement-checker_1.png)
+![Requirements Checker OK](img/requirement-checker_2.png)
 
-**Warning**: this check is still done within the PHAR. As a result, if
-[the required extension to open the PHAR][compression] due to the compression algorithm is not loaded, a hard failure
-will still appear: the requirement checker _cannot_ be executed before that.
+!!! warning
+     this check is still done within the PHAR. As a result, if [the required extension to open the PHAR][compression]
+     due to the compression algorithm is not loaded, a hard failure will still appear: 
+     the requirement checker _cannot_ be executed before that.
 
 
 ## Configuration
@@ -133,13 +126,6 @@ to skip it, you can run:
 ```
 $ BOX_REQUIREMENT_CHECKER=0 php box.phar 
 ```
-
-
-<br />
-<hr />
-
-« [Configuration](configuration.md#configuration) • [Optimize your PHAR](optimizations.md#optimize-your-phar) »
-
 
 [composer]: https://getcomposer.org/
 [compression]: configuration.md#compression-algorithm-compression

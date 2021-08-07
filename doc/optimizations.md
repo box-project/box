@@ -1,9 +1,3 @@
-# Optimize your PHAR
-
-1. [Review your files](#review-your-files)
-1. [Compress your PHAR](#compress-your-phar)
-1. [Optimize your code](#optimize-your-code)
-
 ## Review your files
 
 By default Box try to be smart about which files are required and will attempt to use only the necessary files. You can
@@ -65,12 +59,6 @@ minor overhead. Besides some functions such as `count` are optimised by opcache 
 However you may not want to care and change your code for such micro optimisations. But if you do, know that
 [isolating your PHAR code][code-isolation] will transform every call into a fully qualified call whenever
 possible enabling that optimisation for your PHAR.
-
-
-<br />
-<hr />
-
-« [Requirement Checker](requirement-checker.md#requirements-checker) • [PHAR code isolation][code-isolation] »
 
 
 [include-files]: configuration.md#including-files
