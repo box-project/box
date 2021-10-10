@@ -16,9 +16,11 @@ namespace KevinGH\Box\Compactor;
 
 use function count;
 use function in_array;
+use function is_array;
 use function is_string;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
 use KevinGH\Box\Annotation\InvalidToken;
+use function ltrim;
 use function preg_replace;
 use RuntimeException;
 use function str_repeat;
@@ -60,8 +62,9 @@ final class Php extends FileExtensionCompactor
     protected function compactContent(string $contents): string
     {
         $output = '';
+        $tokens = token_get_all($contents);
 
-        foreach (token_get_all($contents) as $token) {
+        foreach ($tokens as $index => $token) {
             if (is_string($token)) {
                 $output .= $token;
             } elseif (in_array($token[0], [T_COMMENT, T_DOC_COMMENT], true)) {
@@ -86,6 +89,15 @@ final class Php extends FileExtensionCompactor
 
                 // normalize newlines to \n
                 $whitespace = preg_replace('{(?:\r\n|\r|\n)}', "\n", $whitespace);
+
+                // If the new line was split off from the whitespace token due to it being included in
+                // the previous (comment) token (PHP < 8), remove leading spaces.
+                if (is_array($tokens[$index - 1])
+                    && T_COMMENT === $tokens[$index - 1][0]
+                    && strpos($tokens[$index - 1][1], "\n") !== false
+                ) {
+                    $whitespace = ltrim($whitespace, ' ');
+                }
 
                 // trim leading spaces
                 $whitespace = preg_replace('{\n +}', "\n", $whitespace);
