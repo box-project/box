@@ -113,6 +113,26 @@ class AClass
     {
         \$test = true;
     }
+
+    // Inline comment.
+    public function bMethod()
+    {
+        \$test = true; // Inline comment.
+    }
+
+    # Inline comment.
+    public function cMethod()
+    {
+        \$test = true; # Inline comment.
+
+    
+    }
+
+    /* Trailing comment */
+    public function dMethod()
+    {
+        \$test = true; /* Trailing comment */
+    }
 }
 PHP
             ,
@@ -130,6 +150,26 @@ class AClass
 public function aMethod()
 {
 \$test = true;
+}
+
+
+public function bMethod()
+{
+\$test = true; 
+}
+
+
+public function cMethod()
+{
+\$test = true; 
+
+
+}
+
+
+public function dMethod()
+{
+\$test = true; 
 }
 }
 PHP
