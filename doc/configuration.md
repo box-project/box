@@ -45,7 +45,7 @@
 The build command will build a new PHAR based on a variety of settings.
 
 This command relies on a configuration file for loading PHAR packaging settings. If a configuration file is not
-specified through the `--configuration|-c option`, one of the following files will be used (in order): `box.json`,
+specified through the `--config|-c option`, one of the following files will be used (in order): `box.json`,
 `box.json.dist`. If no configuration file is found, Box will proceed with the default settings.
 
 The configuration file is a JSON object saved to a file. Note that **all settings are optional**. If a setting is set
