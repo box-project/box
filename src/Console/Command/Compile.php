@@ -27,6 +27,7 @@ use function get_class;
 use Humbug\PhpScoper\Whitelist;
 use function implode;
 use function is_callable;
+use function is_readable;
 use function is_string;
 use KevinGH\Box\Box;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
@@ -63,6 +64,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
+use Throwable;
 use function var_export;
 use Webmozart\Assert\Assert;
 
@@ -96,6 +98,7 @@ HELP;
     private const DEV_OPTION = 'dev';
     private const NO_CONFIG_OPTION = 'no-config';
     private const WITH_DOCKER_OPTION = 'with-docker';
+    private const BOOTSTRAP_OPTION = 'bootstrap';
 
     private const DEBUG_DIR = '.box_dump';
 
@@ -146,6 +149,12 @@ HELP;
             InputOption::VALUE_NONE,
             'Generates a Dockerfile'
         );
+        $this->addOption(
+            self::BOOTSTRAP_OPTION,
+            null,
+            InputOption::VALUE_REQUIRED,
+            'A PHP script that is included before the compilation'
+        );
 
         $this->configureWorkingDirOption();
     }
@@ -173,6 +182,10 @@ HELP;
         }
 
         $this->changeWorkingDirectory($input);
+
+        if ($bootstrapFile = $input->getOption(self::BOOTSTRAP_OPTION)) {
+            $this->handleBootstrap($bootstrapFile);
+        }
 
         $io->writeln($this->getApplication()->getHelp());
         $io->newLine();
@@ -211,6 +224,29 @@ HELP;
         }
 
         return 0;
+    }
+
+    private function handleBootstrap(string $filename): void
+    {
+        if (!is_readable($filename)) {
+            throw new RuntimeException(
+                sprintf(
+                    'Cannot open bootstrap script "%s"',
+                    $filename
+                )
+            );
+        }
+
+        try {
+            include_once $filename;
+        } catch (Throwable $e) {
+            throw new RuntimeException(
+                sprintf(
+                    'Cannot handle bootstrap script "%s"',
+                    $filename
+                )
+            );
+        }
     }
 
     private function createPhar(
