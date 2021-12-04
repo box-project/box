@@ -9,10 +9,12 @@ use Traversable;
 final class RequirementCollection implements \IteratorAggregate, \Countable
 {
     private $requirements = array();
+    #[ReturnTypeWillChange]
     public function getIterator()
     {
         return new \ArrayIterator($this->requirements);
     }
+    #[ReturnTypeWillChange]
     public function count()
     {
         return \count($this->requirements);
