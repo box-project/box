@@ -5,7 +5,7 @@ namespace HumbugBox3100\KevinGH\RequirementChecker;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
-use Traversable;
+use ReturnTypeWillChange;
 final class RequirementCollection implements \IteratorAggregate, \Countable
 {
     private $requirements = array();
