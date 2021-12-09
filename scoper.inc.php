@@ -14,6 +14,37 @@ declare(strict_types=1);
 
 use Isolated\Symfony\Component\Finder\Finder;
 
+$polyfillsBootstraps = \array_map(
+    function (SplFileInfo $fileInfo) {
+        return $fileInfo->getPathname();
+    },
+    \iterator_to_array(
+        Finder::create()
+            ->files()
+            ->in(__DIR__.'/vendor/symfony/polyfill-*')
+            ->name('bootstrap.php'),
+        false,
+    ),
+);
+
+$polyfillsStubs = [];
+try {
+    $polyfillsStubs = \array_map(
+        function (SplFileInfo $fileInfo) {
+            return $fileInfo->getPathname();
+        },
+        \iterator_to_array(
+            Finder::create()
+                ->files()
+                ->in(__DIR__.'/vendor/symfony/polyfill-*/Resources/stubs')
+                ->name('*.php'),
+            false,
+        ),
+    );
+} catch (Throwable $e) {
+    // There may not be any stubs?
+}
+
 return [
     'patchers' => [
         static function (string $filePath, string $prefix, string $contents): string {
@@ -206,6 +237,9 @@ return [
         \KevinGH\Box\Compactor\Php::class,
         \KevinGH\Box\Compactor\PhpScoper::class,
 
+        // see: https://github.com/humbug/php-scoper/issues/440
+        'Symfony\\Polyfill\\*',
+
         // Hoa symbols
         'SUCCEED',
         'FAILED',
@@ -239,4 +273,5 @@ return [
     'whitelist-global-constants' => false,
     'whitelist-global-classes' => false,
     'whitelist-global-functions' => false,
+    'files-whitelist' => \array_merge($polyfillsBootstraps, $polyfillsStubs),
 ];
