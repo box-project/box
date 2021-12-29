@@ -27,6 +27,8 @@ use function get_class;
 use Humbug\PhpScoper\Whitelist;
 use function implode;
 use function is_callable;
+use function is_file;
+use function is_readable;
 use function is_string;
 use KevinGH\Box\Box;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
@@ -544,6 +546,10 @@ HELP;
                 CompilerLogger::QUESTION_MARK_PREFIX,
                 'Setting metadata'
             );
+
+            if (is_file($metadata) && is_readable($metadata)) {
+                $metadata = require $metadata;
+            }
 
             if (is_callable($metadata)) {
                 $metadata = $metadata();

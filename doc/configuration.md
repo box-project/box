@@ -760,9 +760,9 @@ This setting will be ignored if no [key][key] has been provided.
 ## Metadata (`metadata`)
 
 The metadata (`any` default none) setting can be any value. This value will be stored as metadata that can be retrieved
-from the built PHAR ([`Phar::getMetadata()][phar.getmetadata]).
+from the built PHAR ([Phar::getMetadata()][phar.getmetadata]).
 
-If you specify a callable (as a string), if will be evaluate without any arguments.
+If you specify a callable (as a string), it will be evaluated without any arguments.
 
 For example, if you take the following code:
 
@@ -787,6 +787,32 @@ With the configuration excerpt:
 
 Then the `Phar::getMetadata()` will return `['application_version' => '1.0.0-dev']` array.
 
+If you specify a php file, the return contents (as array) will be included as metadata.
+
+For example, if you take the following code:
+
+```php
+<?php
+# filename:  /project-root/box-metadata.php
+class MyBox
+{
+    public static function generateMetadata()
+    {
+        return ['application_version' => '1.0.0-dev'];
+    }
+}
+return MyBox::generateMetadata();
+```
+
+With the configuration excerpt:
+
+```json
+{
+    "metadata": "/project-root/box-metadata.php"
+}
+```
+
+Then the `Phar::getMetadata()` will return `['application_version' => '1.0.0-dev']` array.
 
 ## Replaceable placeholders
 
