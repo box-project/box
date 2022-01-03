@@ -1,6 +1,6 @@
 <?php
 
-namespace HumbugBox3100\KevinGH\RequirementChecker;
+namespace HumbugBox3140\KevinGH\RequirementChecker;
 
 final class IO
 {
