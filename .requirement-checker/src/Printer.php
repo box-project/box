@@ -1,17 +1,17 @@
 <?php
 
-namespace HumbugBox3100\KevinGH\RequirementChecker;
+namespace HumbugBox3140\KevinGH\RequirementChecker;
 
 final class Printer
 {
-    private $styles = array('reset' => "\33[0m", 'red' => "\33[31m", 'green' => "\33[32m", 'yellow' => "\33[33m", 'title' => "\33[33m", 'error' => "\33[37;41m", 'success' => "\33[30;42m");
+    private $styles = array('reset' => "\x1b[0m", 'red' => "\x1b[31m", 'green' => "\x1b[32m", 'yellow' => "\x1b[33m", 'title' => "\x1b[33m", 'error' => "\x1b[37;41m", 'success' => "\x1b[30;42m");
     private $verbosity;
     private $supportColors;
     private $width;
     public function __construct($verbosity, $supportColors, $width = null)
     {
         if (null === $width) {
-            $terminal = new \HumbugBox3100\KevinGH\RequirementChecker\Terminal();
+            $terminal = new Terminal();
             $width = $terminal->getWidth();
         }
         $this->verbosity = $verbosity;
@@ -36,7 +36,7 @@ final class Printer
         $this->printvln(\str_repeat('=', \min(\strlen($title), $this->width)), $verbosity, $style);
         $this->printvln('', $verbosity, $style);
     }
-    public function getRequirementErrorMessage(\HumbugBox3100\KevinGH\RequirementChecker\Requirement $requirement)
+    public function getRequirementErrorMessage(Requirement $requirement)
     {
         if ($requirement->isFulfilled()) {
             return null;

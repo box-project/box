@@ -1,11 +1,11 @@
 <?php
 
-namespace HumbugBox3100\Composer\Semver;
+namespace HumbugBox3140\Composer\Semver;
 
-use HumbugBox3100\Composer\Semver\Constraint\ConstraintInterface;
-use HumbugBox3100\Composer\Semver\Constraint\MatchAllConstraint;
-use HumbugBox3100\Composer\Semver\Constraint\MultiConstraint;
-use HumbugBox3100\Composer\Semver\Constraint\Constraint;
+use HumbugBox3140\Composer\Semver\Constraint\ConstraintInterface;
+use HumbugBox3140\Composer\Semver\Constraint\MatchAllConstraint;
+use HumbugBox3140\Composer\Semver\Constraint\MultiConstraint;
+use HumbugBox3140\Composer\Semver\Constraint\Constraint;
 class VersionParser
 {
     private static $modifierRegex = '[._-]?(?:(stable|beta|b|RC|alpha|a|patch|pl|p)((?:[.-]?\\d+)*+)?)?([.-]?dev)?';
@@ -142,11 +142,11 @@ class VersionParser
             if (1 === \count($constraintObjects)) {
                 $constraint = $constraintObjects[0];
             } else {
-                $constraint = new \HumbugBox3100\Composer\Semver\Constraint\MultiConstraint($constraintObjects);
+                $constraint = new MultiConstraint($constraintObjects);
             }
             $orGroups[] = $constraint;
         }
-        $constraint = \HumbugBox3100\Composer\Semver\Constraint\MultiConstraint::create($orGroups, \false);
+        $constraint = MultiConstraint::create($orGroups, \false);
         $constraint->setPrettyString($prettyConstraint);
         return $constraint;
     }
@@ -166,9 +166,9 @@ class VersionParser
         }
         if (\preg_match('{^(v)?[xX*](\\.[xX*])*$}i', $constraint, $match)) {
             if (!empty($match[1]) || !empty($match[2])) {
-                return array(new \HumbugBox3100\Composer\Semver\Constraint\Constraint('>=', '0.0.0.0-dev'));
+                return array(new Constraint('>=', '0.0.0.0-dev'));
             }
-            return array(new \HumbugBox3100\Composer\Semver\Constraint\MatchAllConstraint());
+            return array(new MatchAllConstraint());
         }
         $versionRegex = 'v?(\\d++)(?:\\.(\\d++|[xX*]))?(?:\\.(\\d++|[xX*]))?(?:\\.(\\d++|[xX*]))?' . self::$modifierRegex . '(?:\\+[^\\s]+)?';
         if (\preg_match('{^~>?' . $versionRegex . '$}i', $constraint, $matches)) {
@@ -194,10 +194,10 @@ class VersionParser
                 $stabilitySuffix .= '-dev';
             }
             $lowVersion = $this->normalize(\substr($constraint . $stabilitySuffix, 1));
-            $lowerBound = new \HumbugBox3100\Composer\Semver\Constraint\Constraint('>=', $lowVersion);
+            $lowerBound = new Constraint('>=', $lowVersion);
             $highPosition = \max(1, $position - 1);
             $highVersion = $this->manipulateVersionString($matches, $highPosition, 1) . '-dev';
-            $upperBound = new \HumbugBox3100\Composer\Semver\Constraint\Constraint('<', $highVersion);
+            $upperBound = new Constraint('<', $highVersion);
             return array($lowerBound, $upperBound);
         }
         if (\preg_match('{^\\^' . $versionRegex . '($)}i', $constraint, $matches)) {
@@ -216,9 +216,9 @@ class VersionParser
                 $stabilitySuffix .= '-dev';
             }
             $lowVersion = $this->normalize(\substr($constraint . $stabilitySuffix, 1));
-            $lowerBound = new \HumbugBox3100\Composer\Semver\Constraint\Constraint('>=', $lowVersion);
+            $lowerBound = new Constraint('>=', $lowVersion);
             $highVersion = $this->manipulateVersionString($matches, $position, 1) . '-dev';
-            $upperBound = new \HumbugBox3100\Composer\Semver\Constraint\Constraint('<', $highVersion);
+            $upperBound = new Constraint('<', $highVersion);
             return array($lowerBound, $upperBound);
         }
         if (\preg_match('{^v?(\\d++)(?:\\.(\\d++))?(?:\\.(\\d++))?(?:\\.[xX*])++$}', $constraint, $matches)) {
@@ -232,9 +232,9 @@ class VersionParser
             $lowVersion = $this->manipulateVersionString($matches, $position) . '-dev';
             $highVersion = $this->manipulateVersionString($matches, $position, 1) . '-dev';
             if ($lowVersion === '0.0.0.0-dev') {
-                return array(new \HumbugBox3100\Composer\Semver\Constraint\Constraint('<', $highVersion));
+                return array(new Constraint('<', $highVersion));
             }
-            return array(new \HumbugBox3100\Composer\Semver\Constraint\Constraint('>=', $lowVersion), new \HumbugBox3100\Composer\Semver\Constraint\Constraint('<', $highVersion));
+            return array(new Constraint('>=', $lowVersion), new Constraint('<', $highVersion));
         }
         if (\preg_match('{^(?P<from>' . $versionRegex . ') +- +(?P<to>' . $versionRegex . ')($)}i', $constraint, $matches)) {
             $lowStabilitySuffix = '';
@@ -242,18 +242,18 @@ class VersionParser
                 $lowStabilitySuffix = '-dev';
             }
             $lowVersion = $this->normalize($matches['from']);
-            $lowerBound = new \HumbugBox3100\Composer\Semver\Constraint\Constraint('>=', $lowVersion . $lowStabilitySuffix);
+            $lowerBound = new Constraint('>=', $lowVersion . $lowStabilitySuffix);
             $empty = function ($x) {
                 return $x === 0 || $x === '0' ? \false : empty($x);
             };
             if (!$empty($matches[11]) && !$empty($matches[12]) || !empty($matches[14]) || !empty($matches[16])) {
                 $highVersion = $this->normalize($matches['to']);
-                $upperBound = new \HumbugBox3100\Composer\Semver\Constraint\Constraint('<=', $highVersion);
+                $upperBound = new Constraint('<=', $highVersion);
             } else {
                 $highMatch = array('', $matches[10], $matches[11], $matches[12], $matches[13]);
                 $this->normalize($matches['to']);
                 $highVersion = $this->manipulateVersionString($highMatch, $empty($matches[11]) ? 1 : 2, 1) . '-dev';
-                $upperBound = new \HumbugBox3100\Composer\Semver\Constraint\Constraint('<', $highVersion);
+                $upperBound = new Constraint('<', $highVersion);
             }
             return array($lowerBound, $upperBound);
         }
@@ -278,7 +278,7 @@ class VersionParser
                         }
                     }
                 }
-                return array(new \HumbugBox3100\Composer\Semver\Constraint\Constraint($matches[1] ?: '=', $version));
+                return array(new Constraint($matches[1] ?: '=', $version));
             } catch (\Exception $e) {
             }
         }
