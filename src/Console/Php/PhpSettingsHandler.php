@@ -62,6 +62,7 @@ final class PhpSettingsHandler extends XdebugHandler
     }
 
     /**
+     * No type hint to allow XdebugHandler version 2
      * {@inheritdoc}
      */
     protected function requiresRestart($default): bool
@@ -78,6 +79,7 @@ final class PhpSettingsHandler extends XdebugHandler
     }
 
     /**
+     * No type hint to allow XdebugHandler version 2
      * {@inheritdoc}
      */
     protected function restart($command): void
