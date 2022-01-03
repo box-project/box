@@ -1004,7 +1004,7 @@ The short commit hash will only be used if no tag is available.
 [phar class]: https://secure.php.net/manual/en/class.phar.php
 [phar.compress]: https://secure.php.net/manual/en/phar.compress.php
 [phar.fileformat.stub]: https://secure.php.net/manual/en/phar.fileformat.stub.php
-[phar.getmetadata]: htthttps://secure.php.net/manual/en/phar.getmetadata.php
+[phar.getmetadata]: https://secure.php.net/manual/en/phar.getmetadata.php
 [phar.interceptfilefuncs]: https://secure.php.net/manual/en/phar.interceptfilefuncs.php
 [phar.mapphar]: https://secure.php.net/manual/en/phar.mapphar.php
 [phar.setalias]: https://secure.php.net/manual/en/phar.setalias.php
