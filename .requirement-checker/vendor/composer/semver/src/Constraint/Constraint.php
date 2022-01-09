@@ -1,8 +1,8 @@
 <?php
 
-namespace HumbugBox3100\Composer\Semver\Constraint;
+namespace HumbugBox3140\Composer\Semver\Constraint;
 
-class Constraint implements \HumbugBox3100\Composer\Semver\Constraint\ConstraintInterface
+class Constraint implements ConstraintInterface
 {
     const OP_EQ = 0;
     const OP_LT = 1;
@@ -42,7 +42,7 @@ class Constraint implements \HumbugBox3100\Composer\Semver\Constraint\Constraint
     {
         return self::$transOpInt[$this->operator];
     }
-    public function matches(\HumbugBox3100\Composer\Semver\Constraint\ConstraintInterface $provider)
+    public function matches(ConstraintInterface $provider)
     {
         if ($provider instanceof self) {
             return $this->matchSpecific($provider);
@@ -154,7 +154,7 @@ class Constraint implements \HumbugBox3100\Composer\Semver\Constraint\Constraint
         }
         return \sprintf('!$b && %s', $codeComparison);
     }
-    public function matchSpecific(\HumbugBox3100\Composer\Semver\Constraint\Constraint $provider, $compareBranches = \false)
+    public function matchSpecific(Constraint $provider, $compareBranches = \false)
     {
         $noEqualOp = \str_replace('=', '', self::$transOpInt[$this->operator]);
         $providerNoEqualOp = \str_replace('=', '', self::$transOpInt[$provider->operator]);
@@ -208,34 +208,34 @@ class Constraint implements \HumbugBox3100\Composer\Semver\Constraint\Constraint
             return;
         }
         if (\strpos($this->version, 'dev-') === 0) {
-            $this->lowerBound = \HumbugBox3100\Composer\Semver\Constraint\Bound::zero();
-            $this->upperBound = \HumbugBox3100\Composer\Semver\Constraint\Bound::positiveInfinity();
+            $this->lowerBound = Bound::zero();
+            $this->upperBound = Bound::positiveInfinity();
             return;
         }
         switch ($this->operator) {
             case self::OP_EQ:
-                $this->lowerBound = new \HumbugBox3100\Composer\Semver\Constraint\Bound($this->version, \true);
-                $this->upperBound = new \HumbugBox3100\Composer\Semver\Constraint\Bound($this->version, \true);
+                $this->lowerBound = new Bound($this->version, \true);
+                $this->upperBound = new Bound($this->version, \true);
                 break;
             case self::OP_LT:
-                $this->lowerBound = \HumbugBox3100\Composer\Semver\Constraint\Bound::zero();
-                $this->upperBound = new \HumbugBox3100\Composer\Semver\Constraint\Bound($this->version, \false);
+                $this->lowerBound = Bound::zero();
+                $this->upperBound = new Bound($this->version, \false);
                 break;
             case self::OP_LE:
-                $this->lowerBound = \HumbugBox3100\Composer\Semver\Constraint\Bound::zero();
-                $this->upperBound = new \HumbugBox3100\Composer\Semver\Constraint\Bound($this->version, \true);
+                $this->lowerBound = Bound::zero();
+                $this->upperBound = new Bound($this->version, \true);
                 break;
             case self::OP_GT:
-                $this->lowerBound = new \HumbugBox3100\Composer\Semver\Constraint\Bound($this->version, \false);
-                $this->upperBound = \HumbugBox3100\Composer\Semver\Constraint\Bound::positiveInfinity();
+                $this->lowerBound = new Bound($this->version, \false);
+                $this->upperBound = Bound::positiveInfinity();
                 break;
             case self::OP_GE:
-                $this->lowerBound = new \HumbugBox3100\Composer\Semver\Constraint\Bound($this->version, \true);
-                $this->upperBound = \HumbugBox3100\Composer\Semver\Constraint\Bound::positiveInfinity();
+                $this->lowerBound = new Bound($this->version, \true);
+                $this->upperBound = Bound::positiveInfinity();
                 break;
             case self::OP_NE:
-                $this->lowerBound = \HumbugBox3100\Composer\Semver\Constraint\Bound::zero();
-                $this->upperBound = \HumbugBox3100\Composer\Semver\Constraint\Bound::positiveInfinity();
+                $this->lowerBound = Bound::zero();
+                $this->upperBound = Bound::positiveInfinity();
                 break;
         }
     }

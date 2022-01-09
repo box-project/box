@@ -1,8 +1,8 @@
 <?php
 
-namespace HumbugBox3100\Composer\Semver\Constraint;
+namespace HumbugBox3140\Composer\Semver\Constraint;
 
-class MultiConstraint implements \HumbugBox3100\Composer\Semver\Constraint\ConstraintInterface
+class MultiConstraint implements ConstraintInterface
 {
     protected $constraints;
     protected $prettyString;
@@ -52,7 +52,7 @@ class MultiConstraint implements \HumbugBox3100\Composer\Semver\Constraint\Const
         }
         return $this->conjunctive ? \implode('&&', $parts) : \implode('||', $parts);
     }
-    public function matches(\HumbugBox3100\Composer\Semver\Constraint\ConstraintInterface $provider)
+    public function matches(ConstraintInterface $provider)
     {
         if (\false === $this->conjunctive) {
             foreach ($this->constraints as $constraint) {
@@ -104,7 +104,7 @@ class MultiConstraint implements \HumbugBox3100\Composer\Semver\Constraint\Const
     public static function create(array $constraints, $conjunctive = \true)
     {
         if (0 === \count($constraints)) {
-            return new \HumbugBox3100\Composer\Semver\Constraint\MatchAllConstraint();
+            return new MatchAllConstraint();
         }
         if (1 === \count($constraints)) {
             return $constraints[0];
@@ -126,9 +126,9 @@ class MultiConstraint implements \HumbugBox3100\Composer\Semver\Constraint\Const
             $optimized = \false;
             for ($i = 1, $l = \count($constraints); $i < $l; $i++) {
                 $right = $constraints[$i];
-                if ($left instanceof \HumbugBox3100\Composer\Semver\Constraint\MultiConstraint && $left->conjunctive && $right instanceof \HumbugBox3100\Composer\Semver\Constraint\MultiConstraint && $right->conjunctive && ($left0 = (string) $left->constraints[0]) && $left0[0] === '>' && $left0[1] === '=' && ($left1 = (string) $left->constraints[1]) && $left1[0] === '<' && ($right0 = (string) $right->constraints[0]) && $right0[0] === '>' && $right0[1] === '=' && ($right1 = (string) $right->constraints[1]) && $right1[0] === '<' && \substr($left1, 2) === \substr($right0, 3)) {
+                if ($left instanceof MultiConstraint && $left->conjunctive && $right instanceof MultiConstraint && $right->conjunctive && ($left0 = (string) $left->constraints[0]) && $left0[0] === '>' && $left0[1] === '=' && ($left1 = (string) $left->constraints[1]) && $left1[0] === '<' && ($right0 = (string) $right->constraints[0]) && $right0[0] === '>' && $right0[1] === '=' && ($right1 = (string) $right->constraints[1]) && $right1[0] === '<' && \substr($left1, 2) === \substr($right0, 3)) {
                     $optimized = \true;
-                    $left = new \HumbugBox3100\Composer\Semver\Constraint\MultiConstraint(\array_merge(array($left->constraints[0], $right->constraints[1]), \array_slice($left->constraints, 2), \array_slice($right->constraints, 2)), \true);
+                    $left = new MultiConstraint(\array_merge(array($left->constraints[0], $right->constraints[1]), \array_slice($left->constraints, 2), \array_slice($right->constraints, 2)), \true);
                 } else {
                     $mergedConstraints[] = $left;
                     $left = $right;
