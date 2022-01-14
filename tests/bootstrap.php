@@ -13,7 +13,7 @@ declare(strict_types=1);
  */
 
 use function KevinGH\Box\register_aliases;
-use Opis\Closure\ClosureStream;
+use Laravel\SerializableClosure\Support\ClosureStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 
 register_aliases();
