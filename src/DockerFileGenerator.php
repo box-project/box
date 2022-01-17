@@ -42,7 +42,6 @@ Dockerfile;
 
     private const PHP_DOCKER_IMAGES = [
         '7.4.0' => '7.4-cli-alpine',
-        '7.3.0' => '7.3-cli-alpine',
         '7.2.0' => '7.2-cli-alpine',
         '7.1.0' => '7.1-cli-alpine',
         '7.0.0' => '7-cli-alpine',
