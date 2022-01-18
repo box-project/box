@@ -44,7 +44,7 @@
         "php": "^7.4 || ^8.0",
         "ext-phar": "*",
         "composer-plugin-api": "^2.2",
-        "amphp/parallel-functions": "^1.0",
+        "amphp/parallel-functions": "dev-master",
         "composer/package-versions-deprecated": "^1.8",
         "composer/semver": "^3.2",
         "composer/xdebug-handler": "^2.0 || ^3.0",
