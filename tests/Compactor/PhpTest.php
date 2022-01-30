@@ -17,6 +17,7 @@ namespace KevinGH\Box\Compactor;
 use Generator;
 use KevinGH\Box\Annotation\CompactedFormatter;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
+use KevinGH\Box\Console\DisplayNormalizer;
 use phpDocumentor\Reflection\DocBlockFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -61,6 +62,8 @@ PHP;
         $file = 'foo.php';
 
         $actual = (new Php($annotationParser))->compact($file, $content);
+        // We are not interested in different trailing spaces
+        $actual = DisplayNormalizer::removeTrailingSpaces($actual);
 
         $this->assertSame($expected, $actual);
     }

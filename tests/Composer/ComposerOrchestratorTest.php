@@ -248,20 +248,15 @@ PHP
             'vendor/composer/autoload_static.php',
             'vendor/composer/ClassLoader.php',
             'vendor/composer/installed.json',
+            'vendor/composer/installed.php',
+            'vendor/composer/InstalledVersions.php',
+            'vendor/composer/platform_check.php',
+            'vendor/composer/LICENSE',
         ];
-
-        if ($this->isInstalledWithComposer2(self::FIXTURES.'/dir001')) {
-            $expectedPaths[] = 'vendor/composer/installed.php';
-            $expectedPaths[] = 'vendor/composer/InstalledVersions.php';
-            $expectedPaths[] = 'vendor/composer/LICENSE';
-            $expectedPaths[] = 'vendor/composer/platform_check.php';
-        } else {
-            $expectedPaths[] = 'vendor/composer/LICENSE';
-        }
 
         $actualPaths = $this->retrievePaths();
 
-        $this->assertSame($expectedPaths, $actualPaths);
+        $this->assertEqualsCanonicalizing($expectedPaths, $actualPaths);
 
         $this->assertSame(
             $expectedAutoloadContents,
@@ -340,19 +335,14 @@ PHP;
             'vendor/composer/autoload_static.php',
             'vendor/composer/ClassLoader.php',
             'vendor/composer/installed.json',
+            'vendor/composer/installed.php',
+            'vendor/composer/InstalledVersions.php',
+            'vendor/composer/LICENSE',
         ];
-
-        if ($this->isInstalledWithComposer2(self::FIXTURES.'/dir003')) {
-            $expectedPaths[] = 'vendor/composer/installed.php';
-            $expectedPaths[] = 'vendor/composer/InstalledVersions.php';
-            $expectedPaths[] = 'vendor/composer/LICENSE';
-        } else {
-            $expectedPaths[] = 'vendor/composer/LICENSE';
-        }
 
         $actualPaths = $this->retrievePaths();
 
-        $this->assertSame($expectedPaths, $actualPaths);
+        $this->assertEqualsCanonicalizing($expectedPaths, $actualPaths);
 
         $this->assertSame(
             $expectedAutoloadContents,
@@ -412,18 +402,23 @@ PHP
             'vendor/beberlei/assert/lib/Assert/LazyAssertion.php',
             'vendor/beberlei/assert/lib/Assert/LazyAssertionException.php',
             'vendor/beberlei/assert/LICENSE',
-            'vendor/composer/autoload_classmap.php',
+            'vendor/composer/autoload_files.php',
             'vendor/composer/autoload_namespaces.php',
+            'vendor/composer/autoload_classmap.php',
             'vendor/composer/autoload_psr4.php',
             'vendor/composer/autoload_real.php',
             'vendor/composer/autoload_static.php',
             'vendor/composer/ClassLoader.php',
             'vendor/composer/LICENSE',
+            'vendor/composer/installed.json',
+            'vendor/composer/installed.php',
+            'vendor/composer/InstalledVersions.php',
+            'vendor/composer/platform_check.php',
         ];
 
         $actualPaths = $this->retrievePaths();
 
-        $this->assertSame($expectedPaths, $actualPaths);
+        $this->assertEqualsCanonicalizing($expectedPaths, $actualPaths);
 
         $this->assertSame(
             $expectedAutoloadContents,
@@ -444,6 +439,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Assert\\' => array($vendorDir . '/beberlei/assert/lib/Assert'),
 );
 
 PHP
