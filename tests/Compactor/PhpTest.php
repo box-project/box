@@ -125,7 +125,7 @@ class AClass
     {
         \$test = true; # Inline comment.
 
-    
+
     }
 
     /* Trailing comment */
@@ -155,13 +155,13 @@ public function aMethod()
 
 public function bMethod()
 {
-\$test = true; 
+\$test = true;
 }
 
 
 public function cMethod()
 {
-\$test = true; 
+\$test = true;
 
 
 }
@@ -169,7 +169,7 @@ public function cMethod()
 
 public function dMethod()
 {
-\$test = true; 
+\$test = true;
 }
 }
 PHP
@@ -545,7 +545,7 @@ PHP
             <<<'PHP'
 <?php
 
-#[CustomAttribute] 
+#[CustomAttribute]
 function foo() {}
 PHP
         ];
@@ -584,14 +584,13 @@ PHP
 <?php
 
 #[
-CustomAttribute, 
+CustomAttribute,
 AttributeWithParams( 'foo'),
 AttributeWithParams('foo', bar: ['bar' => 'foobar'])
 ]
 function foo() {}
 PHP
         ];
-
 
         yield 'Inline parameter attribute group followed by another attribute' => [
             $regularAnnotationParser,
@@ -630,7 +629,6 @@ AttributeWithParams(
 ] int $param) {}
 PHP
         ];
-
 
         yield 'Single line PHP 8.0 attribute containing text looking like a PHP close tag' => [
             $regularAnnotationParser,

@@ -18,8 +18,6 @@ use function array_pop;
 use function array_slice;
 use function array_splice;
 use function count;
-use function define;
-use function defined;
 use function in_array;
 use function is_array;
 use function is_int;
@@ -74,7 +72,7 @@ final class Php extends FileExtensionCompactor
         $tokens = token_get_all($contents);
         $tokenCount = count($tokens);
 
-        for ($index = 0; $index < $tokenCount; $index++) {
+        for ($index = 0; $index < $tokenCount; ++$index) {
             $token = $tokens[$index];
             if (is_string($token)) {
                 $output .= $token;
@@ -112,7 +110,7 @@ final class Php extends FileExtensionCompactor
                     $output .= str_repeat("\n", substr_count($token[1], "\n"));
                 }
             } elseif (T_WHITESPACE === $token[0]) {
-                $whitespace    = $token[1];
+                $whitespace = $token[1];
                 $previousIndex = ($index - 1);
 
                 // Handle whitespace potentially being split into two tokens after attribute retokenization.
@@ -121,7 +119,7 @@ final class Php extends FileExtensionCompactor
                     && T_WHITESPACE === $tokens[$index + 1][0]
                 ) {
                     $whitespace .= $tokens[$index + 1][1];
-                    $index++;
+                    ++$index;
                 }
 
                 // reduce wide spaces
@@ -134,7 +132,7 @@ final class Php extends FileExtensionCompactor
                 // the previous (comment) token (PHP < 8), remove leading spaces.
                 if (is_array($tokens[$previousIndex])
                     && T_COMMENT === $tokens[$previousIndex][0]
-                    && strpos($tokens[$previousIndex][1], "\n") !== false
+                    && false !== strpos($tokens[$previousIndex][1], "\n")
                 ) {
                     $whitespace = ltrim($whitespace, ' ');
                 }
@@ -183,10 +181,10 @@ final class Php extends FileExtensionCompactor
     private function findAttributeCloser(array $tokens, int $opener): ?int
     {
         $tokenCount = count($tokens);
-        $brackets   = [$opener];
-        $closer     = null;
+        $brackets = [$opener];
+        $closer = null;
 
-        for ($i = ($opener + 1); $i < $tokenCount; $i++) {
+        for ($i = ($opener + 1); $i < $tokenCount; ++$i) {
             if (false === is_string($tokens[$i])) {
                 continue;
             }
@@ -194,6 +192,7 @@ final class Php extends FileExtensionCompactor
             // Allow for short arrays within attributes.
             if ('[' === $tokens[$i]) {
                 $brackets[] = $i;
+
                 continue;
             }
 
@@ -211,9 +210,9 @@ final class Php extends FileExtensionCompactor
 
     private function retokenizeAttribute(array &$tokens, int $opener): ?array
     {
-        $token         = $tokens[$opener];
+        $token = $tokens[$opener];
         $attributeBody = substr($token[1], 2);
-        $subTokens     = @token_get_all('<?php ' . $attributeBody);
+        $subTokens = @token_get_all('<?php '.$attributeBody);
 
         // Replace the PHP open tag with the attribute opener as a simple token.
         array_splice($subTokens, 0, 1, ['#[']);
