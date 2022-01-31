@@ -82,7 +82,11 @@
             "php": "7.3"
         },
         "platform-check": false,
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "bamarni/composer-bin-plugin": true,
+            "composer/package-versions-deprecated": true
+        }
     },
     "extra": {
         "branch-alias": {

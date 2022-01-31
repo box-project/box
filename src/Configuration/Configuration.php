@@ -1396,9 +1396,13 @@ BANNER;
 
             // The InstalledVersions.php file is necessary since Composer v2 adds it to the autoloader class map
             $installedVersionsPhp = self::normalizePath($vendorDir.'/composer/InstalledVersions.php', $basePath);
+            $installedPhp = self::normalizePath($vendorDir.'/composer/installed.php', $basePath);
 
             if (file_exists($installedVersionsPhp)) {
                 $filesToAppend[] = $installedVersionsPhp;
+            }
+            if (file_exists($installedPhp)) {
+                $filesToAppend[] = $installedPhp;
             }
 
             $vendorPackages = toArray(values(map(
