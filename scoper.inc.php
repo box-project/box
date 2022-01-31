@@ -17,7 +17,7 @@ use Isolated\Symfony\Component\Finder\Finder;
 // TODO: check if the phpStorm stubs should not be included?
 
 $polyfillsBootstraps = array_map(
-    static fn (SplFileInfo $fileInfo) => $fileInfo->getPathname(),
+    static function (SplFileInfo $fileInfo): string { return $fileInfo->getPathname(); },
     iterator_to_array(
         Finder::create()
             ->files()
@@ -28,7 +28,7 @@ $polyfillsBootstraps = array_map(
 );
 
 $polyfillsStubs = array_map(
-    static fn (SplFileInfo $fileInfo) => $fileInfo->getPathname(),
+    static function (SplFileInfo $fileInfo): string { return $fileInfo->getPathname(); },
     iterator_to_array(
         Finder::create()
             ->files()
