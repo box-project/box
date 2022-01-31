@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bd425c95111a20feeaa1d6a3af0e9d26",
+    "content-hash": "4236cb219cfee3ebad739ba23aadfec5",
     "packages": [
         {
             "name": "amphp/amp",
@@ -862,9 +862,6 @@
                 "symfony/console": "^3.2 || ^4.0",
                 "symfony/filesystem": "^3.2 || ^4.0",
                 "symfony/finder": "^3.2 || ^4.0"
-            },
-            "replace": {
-                "humbug/php-scoper": "self.version"
             },
             "require-dev": {
                 "bamarni/composer-bin-plugin": "^1.1",
@@ -2982,9 +2979,6 @@
             "require": {
                 "php": "^7.1 || ^8.0"
             },
-            "replace": {
-                "myclabs/deep-copy": "self.version"
-            },
             "require-dev": {
                 "doctrine/collections": "^1.0",
                 "doctrine/common": "^2.6",
@@ -4780,11 +4774,11 @@
     "platform": {
         "php": "^7.3 || ^8.0",
         "ext-phar": "*",
-        "composer-plugin-api": "^1.0 || ^2.0"
+        "composer-plugin-api": "^2.2"
     },
     "platform-dev": [],
     "platform-overrides": {
         "php": "7.3"
     },
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.2.0"
 }
