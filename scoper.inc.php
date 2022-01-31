@@ -39,10 +39,10 @@ $polyfillsStubs = array_map(
 );
 
 return [
-    'files-whitelist' => [
-        ...$polyfillsBootstraps,
-        ...$polyfillsStubs,
-    ],
+    'files-whitelist' => array_merge(
+        $polyfillsBootstraps,
+        $polyfillsStubs,
+    ),
     'patchers' => [
         static function (string $filePath, string $prefix, string $contents): string {
             $finderClass = sprintf('\%s\%s', $prefix, Finder::class);
