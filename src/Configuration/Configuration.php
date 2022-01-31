@@ -1394,6 +1394,7 @@ BANNER;
                 $filesToAppend[] = $installedJsonFiles;
             }
 
+            // TODO: review thisg
             // The InstalledVersions.php file is necessary since Composer v2 adds it to the autoloader class map
             $installedVersionsPhp = self::normalizePath($vendorDir.'/composer/InstalledVersions.php', $basePath);
             $installedPhp = self::normalizePath($vendorDir.'/composer/installed.php', $basePath);
