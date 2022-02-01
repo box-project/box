@@ -7,6 +7,10 @@ on:
     release:
         types: [ created ]
 
+env:
+    # Comma-space separated list, e.g. '8.1, 8.2, 9.0'
+    FUTURE_PHP_VERSION: '8.1'
+
 jobs:
     unit-tests:
         runs-on: ubuntu-latest
@@ -34,12 +38,20 @@ jobs:
                     coverage: none
                     extensions: ctype, iconv, xml
 
+            # https://docs.github.com/en/actions/learn-github-actions/workflow-commands-for-github-actions#setting-an-environment-variable
+            -   name: Configure Composer platform flags
+                if: contains(env.FUTURE_PHP_VERSION, matrix.php)
+                run: echo "COMPOSER_FLAGS=--ignore-platform-req=php+" >> $GITHUB_ENV
+
             -   name: Install Composer dependencies
                 uses: ramsey/composer-install@v1
+                with:
+                    composer-options: '$COMPOSER_FLAGS'
 
             -   name: Install RequirementChecker Composer dependencies
                 uses: ramsey/composer-install@v1
                 with:
+                    composer-options: '$COMPOSER_FLAGS'
                     working-directory: 'vendor-bin/requirement-checker'
 
             -   name: validate box config
