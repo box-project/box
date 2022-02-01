@@ -1,0 +1,49 @@
+name: End-to-End Tests
+
+on:
+    push:
+        branches: [ master ]
+    pull_request:
+    release:
+        types: [ created ]
+
+jobs:
+    e2e-tests:
+        runs-on: ubuntu-latest
+        name: "e2e-Tests: ${{ matrix.e2e }} - ${{ matrix.php }} - ${{ matrix.tools }}"
+        strategy:
+            fail-fast: false
+            matrix:
+                e2e:
+                    - 'e2e_php_settings_checker'
+                    - 'e2e_scoper_alias'
+                    - 'e2e_scoper_whitelist'
+                    - 'e2e_check_requirements'
+                    - 'e2e_symfony'
+                    - 'e2e_composer_installed_versions'
+                php: [ '7.4', '8.0', '8.1' ]
+                tools: [ 'composer:v2' ]
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v2
+                with:
+                    fetch-depth: 0
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ matrix.php }}
+                    ini-values: 'phar.readonly=0, display_errors=On, error_reporting=-1'
+                    tools: ${{ matrix.tools }}
+                    coverage: pcov
+
+            -   name: Install Composer dependencies
+                uses: ramsey/composer-install@v1
+
+            -   name: Install RequirementChecker Composer dependencies
+                uses: ramsey/composer-install@v1
+                with:
+                    working-directory: 'vendor-bin/requirement-checker'
+
+            -   name: Run e2e ${{ matrix.e2e }}
+                run: make ${{ matrix.e2e }}
