@@ -17,6 +17,7 @@ namespace KevinGH\Box\Compactor;
 use Generator;
 use KevinGH\Box\Annotation\CompactedFormatter;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
+use KevinGH\Box\Console\DisplayNormalizer;
 use phpDocumentor\Reflection\DocBlockFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -61,6 +62,8 @@ PHP;
         $file = 'foo.php';
 
         $actual = (new Php($annotationParser))->compact($file, $content);
+        // We are not interested in different trailing spaces
+        $actual = DisplayNormalizer::removeTrailingSpaces($actual);
 
         $this->assertSame($expected, $actual);
     }
@@ -113,6 +116,26 @@ class AClass
     {
         \$test = true;
     }
+
+    // Inline comment.
+    public function bMethod()
+    {
+        \$test = true; // Inline comment.
+    }
+
+    # Inline comment.
+    public function cMethod()
+    {
+        \$test = true; # Inline comment.
+
+
+    }
+
+    /* Trailing comment */
+    public function dMethod()
+    {
+        \$test = true; /* Trailing comment */
+    }
 }
 PHP
             ,
@@ -128,6 +151,26 @@ class AClass
 
 
 public function aMethod()
+{
+\$test = true;
+}
+
+
+public function bMethod()
+{
+\$test = true;
+}
+
+
+public function cMethod()
+{
+\$test = true;
+
+
+}
+
+
+public function dMethod()
 {
 \$test = true;
 }
@@ -408,6 +451,223 @@ PHP
 */
 function foo($x) {
 }
+PHP
+        ];
+
+        yield 'Simple single line PHP 8.0 attribute' => [
+            $regularAnnotationParser,
+            <<<'PHP'
+<?php
+
+class MyJson implements JsonSerializable {
+    // This method has an attribute.
+    #[\ReturnTypeWillChange]
+    public jsonSerialize() {}
+}
+PHP
+        ,
+            <<<'PHP'
+<?php
+
+class MyJson implements JsonSerializable {
+
+#[\ReturnTypeWillChange]
+public jsonSerialize() {}
+}
+PHP
+        ];
+
+        yield 'Simple multi-line PHP 8.0 attribute' => [
+            $regularAnnotationParser,
+            <<<'PHP'
+<?php
+
+class MyJson implements JsonSerializable {
+    #[
+        \ReturnTypeWillChange
+    ]
+    public jsonSerialize() {}
+}
+PHP
+        ,
+            <<<'PHP'
+<?php
+
+class MyJson implements JsonSerializable {
+#[
+\ReturnTypeWillChange
+]
+public jsonSerialize() {}
+}
+PHP
+        ];
+
+        yield 'Single line PHP 8.0 attribute containing short array' => [
+            $regularAnnotationParser,
+            <<<'PHP'
+<?php
+
+#[AttributeWithParams('foo', bar: ['bar' => 'foobar'])]
+function foo() {}
+PHP
+        ,
+            <<<'PHP'
+<?php
+
+#[AttributeWithParams('foo', bar: ['bar' => 'foobar'])]
+function foo() {}
+PHP
+        ];
+
+        yield 'Single line containing two separate PHP 8.0 attributes' => [
+            $regularAnnotationParser,
+            <<<'PHP'
+<?php
+
+#[CustomAttribute] #[AttributeWithParams('foo')]
+function foo() {}
+PHP
+        ,
+            <<<'PHP'
+<?php
+
+#[CustomAttribute] #[AttributeWithParams('foo')]
+function foo() {}
+PHP
+        ];
+
+        yield 'Single line PHP 8.0 attribute followed by a comment' => [
+            $regularAnnotationParser,
+            <<<'PHP'
+<?php
+
+#[CustomAttribute] // This is a comment
+function foo() {}
+PHP
+        ,
+            <<<'PHP'
+<?php
+
+#[CustomAttribute]
+function foo() {}
+PHP
+        ];
+
+        yield 'Single line PHP 8.0 attribute group' => [
+            $regularAnnotationParser,
+            <<<'PHP'
+<?php
+
+#[CustomAttribute, AttributeWithParams('foo'), AttributeWithParams('foo', bar: ['bar' => 'foobar'])]
+function foo() {}
+PHP
+        ,
+            <<<'PHP'
+<?php
+
+#[CustomAttribute, AttributeWithParams('foo'), AttributeWithParams('foo', bar: ['bar' => 'foobar'])]
+function foo() {}
+PHP
+        ];
+
+        yield 'Multi-line PHP 8.0 attribute containing short array and inline comments' => [
+            $regularAnnotationParser,
+            <<<'PHP'
+<?php
+
+#[
+    CustomAttribute,                // comment
+    AttributeWithParams(/* another comment */ 'foo'),
+    AttributeWithParams('foo', bar: ['bar' => 'foobar'])
+]
+function foo() {}
+PHP
+        ,
+            <<<'PHP'
+<?php
+
+#[
+CustomAttribute,
+AttributeWithParams( 'foo'),
+AttributeWithParams('foo', bar: ['bar' => 'foobar'])
+]
+function foo() {}
+PHP
+        ];
+
+        yield 'Inline parameter attribute group followed by another attribute' => [
+            $regularAnnotationParser,
+            <<<'PHP'
+<?php
+
+function foo(#[ParamAttribute, AttributeWithParams(/* comment */ 'foo')] int $param, #[ParamAttr] $more) {}
+PHP
+        ,
+            <<<'PHP'
+<?php
+
+function foo(#[ParamAttribute, AttributeWithParams( 'foo')] int $param, #[ParamAttr] $more) {}
+PHP
+        ];
+
+        yield 'Multi-line PHP 8.0 attribute for parameter' => [
+            $regularAnnotationParser,
+            <<<'PHP'
+<?php
+
+function foo(#[
+    AttributeWithParams(
+        'foo'
+    )
+                                                ] int $param) {}
+PHP
+        ,
+            <<<'PHP'
+<?php
+
+function foo(#[
+AttributeWithParams(
+'foo'
+)
+] int $param) {}
+PHP
+        ];
+
+        yield 'Single line PHP 8.0 attribute containing text looking like a PHP close tag' => [
+            $regularAnnotationParser,
+            <<<'PHP'
+<?php
+
+#[DeprecationReason('reason: <https://some-website/reason?>')]
+function foo() {}
+PHP
+        ,
+            <<<'PHP'
+<?php
+
+#[DeprecationReason('reason: <https://some-website/reason?>')]
+function foo() {}
+PHP
+        ];
+
+        yield 'Multi-line PHP 8.0 attribute containing text looking like a PHP close tag' => [
+            $regularAnnotationParser,
+            <<<'PHP'
+<?php
+
+#[DeprecationReason(
+    'reason: <https://some-website/reason?>'
+)]
+function foo() {}
+PHP
+        ,
+            <<<'PHP'
+<?php
+
+#[DeprecationReason(
+'reason: <https://some-website/reason?>'
+)]
+function foo() {}
 PHP
         ];
     }

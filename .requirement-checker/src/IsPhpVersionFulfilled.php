@@ -1,9 +1,9 @@
 <?php
 
-namespace HumbugBox3100\KevinGH\RequirementChecker;
+namespace HumbugBox3140\KevinGH\RequirementChecker;
 
-use HumbugBox3100\Composer\Semver\Semver;
-final class IsPhpVersionFulfilled implements \HumbugBox3100\KevinGH\RequirementChecker\IsFulfilled
+use HumbugBox3140\Composer\Semver\Semver;
+final class IsPhpVersionFulfilled implements IsFulfilled
 {
     private $requiredPhpVersion;
     public function __construct($requiredPhpVersion)
@@ -12,6 +12,6 @@ final class IsPhpVersionFulfilled implements \HumbugBox3100\KevinGH\RequirementC
     }
     public function __invoke()
     {
-        return \HumbugBox3100\Composer\Semver\Semver::satisfies(\sprintf('%d.%d.%d', \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION, \PHP_RELEASE_VERSION), $this->requiredPhpVersion);
+        return Semver::satisfies(\sprintf('%d.%d.%d', \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION, \PHP_RELEASE_VERSION), $this->requiredPhpVersion);
     }
 }

@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function file_get_contents;
 use Generator;
-use Humbug\PhpScoper\Whitelist;
 use function iterator_to_array;
 use KevinGH\Box\Console\DisplayNormalizer;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -39,13 +39,13 @@ class ComposerOrchestratorTest extends FileSystemTestCase
      * @dataProvider provideComposerAutoload
      */
     public function test_it_can_dump_the_autoloader_with_an_empty_composer_json(
-        Whitelist $whitelist,
-        string $prefix,
-        string $expectedAutoloadContents
+        SymbolsRegistry $symbolsRegistry,
+        string          $prefix,
+        string          $expectedAutoloadContents
     ): void {
         dump_file('composer.json', '{}');
 
-        ComposerOrchestrator::dumpAutoload($whitelist, $prefix, false);
+        ComposerOrchestrator::dumpAutoload($symbolsRegistry, $prefix, false);
 
         $expectedPaths = [
             'composer.json',
@@ -98,15 +98,15 @@ PHP
      * @dataProvider provideComposerAutoload
      */
     public function test_it_cannot_dump_the_autoloader_with_an_invalid_composer_json(
-        Whitelist $whitelist,
-        string $prefix
+        SymbolsRegistry $symbolsRegistry,
+        string          $prefix
     ): void {
         mirror(self::FIXTURES.'/dir000', $this->tmp);
 
         dump_file('composer.json', '');
 
         try {
-            ComposerOrchestrator::dumpAutoload($whitelist, $prefix, false);
+            ComposerOrchestrator::dumpAutoload($symbolsRegistry, $prefix, false);
 
             $this->fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
@@ -128,7 +128,7 @@ PHP
     {
         mirror(self::FIXTURES.'/dir000', $this->tmp);
 
-        ComposerOrchestrator::dumpAutoload(Whitelist::create(true, true, true), '', false);
+        ComposerOrchestrator::dumpAutoload(new SymbolsRegistry(), '', false);
 
         $expectedPaths = [
             'composer.json',
@@ -191,11 +191,11 @@ PHP
      * @dataProvider provideComposerAutoload
      */
     public function test_it_cannot_dump_the_autoloader_if_the_composer_json_file_is_missing(
-        Whitelist $whitelist,
-        string $prefix
+        SymbolsRegistry $symbolsRegistry,
+        string          $prefix
     ): void {
         try {
-            ComposerOrchestrator::dumpAutoload($whitelist, $prefix, false);
+            ComposerOrchestrator::dumpAutoload($symbolsRegistry, $prefix, false);
 
             $this->fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
@@ -217,13 +217,13 @@ PHP
      * @dataProvider provideComposerAutoload
      */
     public function test_it_can_dump_the_autoloader_with_a_composer_json_lock_and_installed_with_a_dependency(
-        Whitelist $whitelist,
-        string $prefix,
-        string $expectedAutoloadContents
+        SymbolsRegistry $SymbolsRegistry,
+        string          $prefix,
+        string          $expectedAutoloadContents
     ): void {
         mirror(self::FIXTURES.'/dir001', $this->tmp);
 
-        ComposerOrchestrator::dumpAutoload($whitelist, $prefix, false);
+        ComposerOrchestrator::dumpAutoload($SymbolsRegistry, $prefix, false);
 
         // The fact that there is a dependency in the `composer.json` does not change anything to Composer
         $expectedPaths = [
@@ -248,16 +248,11 @@ PHP
             'vendor/composer/autoload_static.php',
             'vendor/composer/ClassLoader.php',
             'vendor/composer/installed.json',
+            'vendor/composer/installed.php',
+            'vendor/composer/InstalledVersions.php',
+            'vendor/composer/LICENSE',
+            'vendor/composer/platform_check.php',
         ];
-
-        if ($this->isInstalledWithComposer2(self::FIXTURES.'/dir001')) {
-            $expectedPaths[] = 'vendor/composer/installed.php';
-            $expectedPaths[] = 'vendor/composer/InstalledVersions.php';
-            $expectedPaths[] = 'vendor/composer/LICENSE';
-            $expectedPaths[] = 'vendor/composer/platform_check.php';
-        } else {
-            $expectedPaths[] = 'vendor/composer/LICENSE';
-        }
 
         $actualPaths = $this->retrievePaths();
 
@@ -313,7 +308,7 @@ return $composerAutoloaderName::getLoader();
 PHP;
 
         ComposerOrchestrator::dumpAutoload(
-            Whitelist::create(true, true, true),
+            new SymbolsRegistry(),
             '',
             true
         );
@@ -340,15 +335,10 @@ PHP;
             'vendor/composer/autoload_static.php',
             'vendor/composer/ClassLoader.php',
             'vendor/composer/installed.json',
+            'vendor/composer/installed.php',
+            'vendor/composer/InstalledVersions.php',
+            'vendor/composer/LICENSE',
         ];
-
-        if ($this->isInstalledWithComposer2(self::FIXTURES.'/dir003')) {
-            $expectedPaths[] = 'vendor/composer/installed.php';
-            $expectedPaths[] = 'vendor/composer/InstalledVersions.php';
-            $expectedPaths[] = 'vendor/composer/LICENSE';
-        } else {
-            $expectedPaths[] = 'vendor/composer/LICENSE';
-        }
 
         $actualPaths = $this->retrievePaths();
 
@@ -389,13 +379,13 @@ PHP
      * @dataProvider provideComposerAutoload
      */
     public function test_it_can_dump_the_autoloader_with_a_composer_json_and_lock_with_a_dependency(
-        Whitelist $whitelist,
-        string $prefix,
-        string $expectedAutoloadContents
+        SymbolsRegistry $symbolsRegistry,
+        string          $prefix,
+        string          $expectedAutoloadContents
     ): void {
         mirror(self::FIXTURES.'/dir002', $this->tmp);
 
-        ComposerOrchestrator::dumpAutoload($whitelist, $prefix, false);
+        ComposerOrchestrator::dumpAutoload($symbolsRegistry, $prefix, false);
 
         // The fact that there is a dependency in the `composer.json` does not change anything to Composer
         $expectedPaths = [
@@ -460,8 +450,8 @@ PHP
     {
         $composerAutoloaderName = self::COMPOSER_AUTOLOADER_NAME;
 
-        yield 'Empty whitelist prefix' => [
-            Whitelist::create(true, true, true),
+        yield 'Empty registry' => [
+            new SymbolsRegistry(),
             '',
             <<<PHP
 <?php
@@ -475,47 +465,10 @@ return $composerAutoloaderName::getLoader();
 PHP
         ];
 
-        yield 'Whitelist is ignored when prefix is empty' => [
-            Whitelist::create(true, true, true, 'Acme\Foo'),  // Whitelist is ignored when prefix is empty
-            '',
-            <<<PHP
-<?php
-
-// autoload.php @generated by Composer
-
-require_once __DIR__ . '/composer/autoload_real.php';
-
-return $composerAutoloaderName::getLoader();
-
-PHP
-        ];
-
-        yield '_Box prefix' => [
-            Whitelist::create(true, true, true),
-            '_Box',
-            <<<PHP
-<?php
-
-// autoload.php @generated by Composer
-
-require_once __DIR__ . '/composer/autoload_real.php';
-
-return $composerAutoloaderName::getLoader();
-
-PHP
-        ];
-
-        yield 'Extended whitelist' => [
-            (static function (): Whitelist {
-                $whitelist = Whitelist::create(true, true, true, 'Acme\Foo');
-
-                $whitelist->recordWhitelistedClass(
-                    new FullyQualified('Acme\Foo'),
-                    new FullyQualified('_Box\Acme\Foo')
-                );
-
-                return $whitelist;
-            })(),
+        yield 'Registry with recorded class' => [
+            self::createSymbolsRegistry(
+                [['Acme\Foo', '_Box\Acme\Foo']],
+            ),
             '_Box',
             <<<PHP
 <?php
@@ -528,7 +481,7 @@ require_once __DIR__ . '/composer/autoload_real.php';
 
 \$loader = $composerAutoloaderName::getLoader();
 
-// Aliases for the whitelisted classes. For more information see:
+// Exposed classes. For more information see:
 // https://github.com/humbug/php-scoper/blob/master/README.md#class-whitelisting
 if (!class_exists('Acme\Foo', false) && !interface_exists('Acme\Foo', false) && !trait_exists('Acme\Foo', false)) {
     spl_autoload_call('_Box\Acme\Foo');
@@ -539,17 +492,11 @@ return \$loader;
 PHP
         ];
 
-        yield 'Whitelist with a function' => [
-            (static function (): Whitelist {
-                $whitelist = Whitelist::create(true, true, true, 'Acme\Foo');
-
-                $whitelist->recordWhitelistedFunction(
-                    new FullyQualified('foo'),
-                    new FullyQualified('_Box\foo')
-                );
-
-                return $whitelist;
-            })(),
+        yield 'Registry with a recorded global function' => [
+            self::createSymbolsRegistry(
+                [],
+                [['foo', '_Box\foo']],
+            ),
             '_Box',
             <<<PHP
 <?php
@@ -562,7 +509,7 @@ require_once __DIR__ . '/composer/autoload_real.php';
 
 \$loader = ${composerAutoloaderName}::getLoader();
 
-// Functions whitelisting. For more information see:
+// Exposed functions. For more information see:
 // https://github.com/humbug/php-scoper/blob/master/README.md#functions-whitelisting
 if (!function_exists('foo')) {
     function foo() {
@@ -575,21 +522,14 @@ return \$loader;
 PHP
         ];
 
-        yield 'Whitelist with namespaced function' => [
-            (static function (): Whitelist {
-                $whitelist = Whitelist::create(true, true, true, 'Acme\Foo');
-
-                $whitelist->recordWhitelistedFunction(
-                    new FullyQualified('foo'),
-                    new FullyQualified('_Box\foo')
-                );
-                $whitelist->recordWhitelistedFunction(
-                    new FullyQualified('Acme\foo'),
-                    new FullyQualified('_Box\Acme\foo')
-                );
-
-                return $whitelist;
-            })(),
+        yield 'Registry with recorded namespaced function' => [
+            self::createSymbolsRegistry(
+                [],
+                [
+                    ['foo', '_Box\foo'],
+                    ['Acme\foo', '_Box\Acme\foo'],
+                ],
+            ),
             '_Box',
             <<<PHP
 <?php
@@ -606,7 +546,7 @@ require_once __DIR__ . '/composer/autoload_real.php';
 
 }
 
-// Functions whitelisting. For more information see:
+// Exposed functions. For more information see:
 // https://github.com/humbug/php-scoper/blob/master/README.md#functions-whitelisting
 namespace {
     if (!function_exists('foo')) {
@@ -629,6 +569,114 @@ namespace {
 
 PHP
         ];
+
+        yield 'Registry with recorded classes and functions' => [
+            self::createSymbolsRegistry(
+                [
+                    ['PHPUnit\TestCase', '_Box\PHPUnit\TestCase'],
+                    ['PHPUnit\Framework', '_Box\PHPUnit\Framework'],
+                ],
+                [
+                    ['foo', '_Box\foo'],
+                    ['Acme\foo', '_Box\Acme\foo'],
+                ],
+            ),
+            '_Box',
+            <<<PHP
+<?php
+
+// @generated by Humbug Box
+
+namespace {
+
+// autoload.php @generated by Composer
+
+require_once __DIR__ . '/composer/autoload_real.php';
+
+\$loader = ${composerAutoloaderName}::getLoader();
+
+}
+
+// Exposed classes. For more information see:
+// https://github.com/humbug/php-scoper/blob/master/README.md#class-whitelisting
+namespace {
+    if (!class_exists('PHPUnit\TestCase', false) && !interface_exists('PHPUnit\TestCase', false) && !trait_exists('PHPUnit\TestCase', false)) {
+        spl_autoload_call('_Box\PHPUnit\TestCase');
+    }
+    if (!class_exists('PHPUnit\Framework', false) && !interface_exists('PHPUnit\Framework', false) && !trait_exists('PHPUnit\Framework', false)) {
+        spl_autoload_call('_Box\PHPUnit\Framework');
+    }
+}
+
+// Exposed functions. For more information see:
+// https://github.com/humbug/php-scoper/blob/master/README.md#functions-whitelisting
+namespace {
+    if (!function_exists('foo')) {
+        function foo() {
+            return \_Box\\foo(...func_get_args());
+        }
+    }
+}
+namespace Acme {
+    if (!function_exists('Acme\\foo')) {
+        function foo() {
+            return \_Box\Acme\\foo(...func_get_args());
+        }
+    }
+}
+
+namespace {
+    return \$loader;
+}
+
+PHP
+        ];
+
+        yield 'Registry with recorded symbols and no prefix (it is ignored)' => [
+            self::createSymbolsRegistry(
+                [],
+                [
+                    ['foo', '_Box\foo'],
+                    ['Acme\foo', '_Box\Acme\foo'],
+                ],
+            ),
+            '',
+            <<<PHP
+<?php
+
+// autoload.php @generated by Composer
+
+require_once __DIR__ . '/composer/autoload_real.php';
+
+return ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05::getLoader();
+
+PHP
+        ];
+    }
+
+    /**
+     * @param array<array{string, string}> $recordedClasses
+     * @param array<array{string, string}> $recordedFunctions
+     */
+    private static function createSymbolsRegistry(array $recordedClasses = [], array $recordedFunctions = []): SymbolsRegistry
+    {
+        $registry = new SymbolsRegistry();
+
+        foreach ($recordedClasses as [$original, $alias]) {
+            $registry->recordClass(
+                new FullyQualified($original),
+                new FullyQualified($alias),
+            );
+        }
+
+        foreach ($recordedFunctions as [$original, $alias]) {
+            $registry->recordFunction(
+                new FullyQualified($original),
+                new FullyQualified($alias),
+            );
+        }
+
+        return $registry;
     }
 
     /**
@@ -639,10 +687,5 @@ PHP
         $finder = Finder::create()->files()->in($this->tmp);
 
         return $this->normalizePaths(iterator_to_array($finder, false), true);
-    }
-
-    private function isInstalledWithComposer2(string $baseDir): bool
-    {
-        return file_exists($baseDir.'/vendor/composer/InstalledVersions.php');
     }
 }

@@ -17,7 +17,7 @@ namespace KevinGH\Box\Compactor;
 use function array_reduce;
 use function count;
 use Countable;
-use Humbug\PhpScoper\Whitelist;
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\PhpScoper\Scoper;
 
 /**
@@ -36,6 +36,8 @@ final class Compactors implements Compactor, Countable
             if ($compactor instanceof PhpScoper) {
                 $this->scoperCompactor = $compactor;
 
+                // We do not expect more than one Scoper Compactor. If there is more than
+                // one then the latter is ignored.
                 break;
             }
         }
@@ -60,15 +62,15 @@ final class Compactors implements Compactor, Countable
         return null !== $this->scoperCompactor ? $this->scoperCompactor->getScoper() : null;
     }
 
-    public function getScoperWhitelist(): ?Whitelist
+    public function getScoperSymbolsRegistry(): ?SymbolsRegistry
     {
-        return null !== $this->scoperCompactor ? $this->scoperCompactor->getScoper()->getWhitelist() : null;
+        return null !== $this->scoperCompactor ? $this->scoperCompactor->getScoper()->getSymbolsRegistry() : null;
     }
 
-    public function registerWhitelist(Whitelist $whitelist): void
+    public function registerSymbolsRegistry(SymbolsRegistry $symbolsRegistry): void
     {
         if (null !== $this->scoperCompactor) {
-            $this->scoperCompactor->getScoper()->changeWhitelist($whitelist);
+            $this->scoperCompactor->getScoper()->changeSymbolsRegistry($symbolsRegistry);
         }
     }
 

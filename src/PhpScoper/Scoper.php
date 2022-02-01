@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PhpScoper;
 
-use Humbug\PhpScoper\Whitelist;
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 
 interface Scoper
 {
@@ -28,9 +28,9 @@ interface Scoper
      */
     public function scope(string $filePath, string $contents): string;
 
-    public function changeWhitelist(Whitelist $whitelist): void;
+    public function changeSymbolsRegistry(SymbolsRegistry $symbolsRegistry): void;
 
-    public function getWhitelist(): Whitelist;
+    public function getSymbolsRegistry(): SymbolsRegistry;
 
     public function getPrefix(): string;
 }

@@ -8,8 +8,6 @@ template: >
         sha256 "$STABLE_ASSET_SHA256"
         version "$STABLE_VERSION"
 
-        bottle :unneeded
-
         depends_on "php" if MacOS.version <= :el_capitan
 
         def install

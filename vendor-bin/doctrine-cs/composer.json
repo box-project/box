@@ -1,5 +1,10 @@
 {
     "require-dev": {
-        "doctrine/coding-standard": "^6.0"
+        "doctrine/coding-standard": "^9.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     }
 }

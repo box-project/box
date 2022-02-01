@@ -232,17 +232,9 @@ echo '!dlrow olleH';
 Whitelist:
 
 """
-Humbug\PhpScoper\Whitelist {#140
-  -original: []
-  -symbols: []
-  -constants: []
-  -namespaces: []
-  -patterns: []
-  -whitelistGlobalConstants: true
-  -whitelistGlobalClasses: true
-  -whitelistGlobalFunctions: true
-  -whitelistedFunctions: []
-  -whitelistedClasses: []
+Humbug\PhpScoper\Symbol\SymbolsRegistry {#140
+  -recordedFunctions: []
+  -recordedClasses: []
 }
 
 """

@@ -14,52 +14,51 @@ declare(strict_types=1);
 
 use Isolated\Symfony\Component\Finder\Finder;
 
+// TODO: check if the phpStorm stubs should not be included?
+
+$polyfillsBootstraps = array_map(
+    static fn (SplFileInfo $fileInfo) => $fileInfo->getPathname(),
+    iterator_to_array(
+        Finder::create()
+            ->files()
+            ->in(__DIR__ . '/vendor/symfony/polyfill-*')
+            ->name('bootstrap.php'),
+        false,
+    ),
+);
+
+$polyfillsStubs = array_map(
+    static fn (SplFileInfo $fileInfo) => $fileInfo->getPathname(),
+    iterator_to_array(
+        Finder::create()
+            ->files()
+            ->in(__DIR__ . '/vendor/symfony/polyfill-*/Resources/stubs')
+            ->name('*.php'),
+        false,
+    ),
+);
+
 return [
+    'exclude-files' => [
+        ...$polyfillsBootstraps,
+        ...$polyfillsStubs,
+    ],
     'patchers' => [
         static function (string $filePath, string $prefix, string $contents): string {
             $finderClass = sprintf('\%s\%s', $prefix, Finder::class);
 
             return str_replace($finderClass, '\\'.Finder::class, $contents);
         },
-        // Box compactors: not required to work but avoid any confusion for the users
         static function (string $filePath, string $prefix, string $contents): string {
-            $files = [
-                'src/functions.php',
-                'src/Configuration/Configuration.php',
-            ];
-
-            if (false === in_array($filePath, $files, true)) {
-                return $contents;
-            }
-
-            $contents = preg_replace(
-                sprintf(
-                    '/\\\\'.$prefix.'\\\\Herrera\\\\Box\\\\Compactor/',
-                    $prefix
-                ),
-                '\\Herrera\\\Box\\Compactor',
-                $contents
-            );
-
-            $contents = preg_replace(
-                sprintf(
-                    '/\\\\'.$prefix.'\\\\KevinGH\\\\Box\\\\Compactor\\\\/',
-                    $prefix
-                ),
-                '\\KevinGH\\\Box\\Compactor\\',
-                $contents
-            );
-
             return preg_replace(
-                '/\\\\KevinGH\\\\Box\\\\Compactor\\\\Compactors/',
                 sprintf(
-                    '\\%s\\KevinGH\\\Box\\Compactor\\Compactors',
-                    $prefix
+                    '%s\\\\KevinGH\\\\Box\\\\Compactor\\\\',
+                    $prefix,
                 ),
-                $contents
+                'KevinGH\\Box\\Compactor\\',
+                $contents,
             );
         },
-        // Paragonie custom autoloader which relies on some regexes
         static function (string $filePath, string $prefix, string $contents): string {
             if ('vendor/paragonie/sodium_compat/autoload.php' !== $filePath) {
                 return $contents;
@@ -171,18 +170,6 @@ return [
 
             return $contents;
         },
-        // Symfony polyfills patches
-        static function (string $filePath, string $prefix, string $contents): string {
-            if ('vendor/symfony/polyfill-php72/bootstrap.php' !== $filePath) {
-                return $contents;
-            }
-
-            return preg_replace(
-                '/namespace .+;/',
-                '',
-                $contents
-            );
-        },
         // PHP-Parser
         static function (string $filePath, string $prefix, string $contents): string {
             if ('vendor/nikic/php-parser/lib/PhpParser/Lexer.php' !== $filePath) {
@@ -205,6 +192,9 @@ return [
         \Herrera\Box\Compactor\Php::class,
         \KevinGH\Box\Compactor\Php::class,
         \KevinGH\Box\Compactor\PhpScoper::class,
+
+        // see: https://github.com/humbug/php-scoper/issues/440
+        'Symfony\\Polyfill\\*',
 
         // Hoa symbols
         'SUCCEED',
@@ -236,7 +226,4 @@ return [
         '_overridable',
         'WITH_COMPOSER',
     ],
-    'whitelist-global-constants' => false,
-    'whitelist-global-classes' => false,
-    'whitelist-global-functions' => false,
 ];

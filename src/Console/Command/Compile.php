@@ -24,7 +24,7 @@ use function explode;
 use function file_exists;
 use function filesize;
 use function get_class;
-use Humbug\PhpScoper\Whitelist;
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function implode;
 use function is_callable;
 use function is_string;
@@ -572,9 +572,9 @@ HELP;
 
         $box->endBuffering(
             $config->dumpAutoload()
-                ? static function (Whitelist $whitelist, string $prefix) use ($excludeDevFiles, $io): void {
+                ? static function (SymbolsRegistry $symbolsRegistry, string $prefix) use ($excludeDevFiles, $io): void {
                     ComposerOrchestrator::dumpAutoload(
-                        $whitelist,
+                        $symbolsRegistry,
                         $prefix,
                         $excludeDevFiles,
                         $io

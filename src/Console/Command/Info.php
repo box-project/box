@@ -284,7 +284,7 @@ HELP
     }
 
     /**
-     * @param iterable&PharFileInfo[] $list
+     * @param iterable|PharFileInfo[] $list
      * @param false|int               $indent Nbr of indent or `false`
      * @param Phar|PharData           $phar
      */

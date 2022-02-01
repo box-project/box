@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PhpScoper;
 
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use Humbug\PhpScoper\Whitelist;
 use PHPUnit\Framework\TestCase;
 use function serialize;
@@ -24,6 +25,13 @@ use function unserialize;
  */
 class NullScoperTest extends TestCase
 {
+    private Scoper $scoper;
+
+    protected function setUp(): void
+    {
+        $this->scoper = new NullScoper();
+    }
+
     public function test_it_returns_the_content_of_the_file_unchanged(): void
     {
         $file = 'foo';
@@ -34,17 +42,33 @@ class NullScoperTest extends TestCase
 }
 JSON;
 
-        $actual = (new NullScoper())->scope($file, $contents);
+        $actual = $this->scoper->scope($file, $contents);
 
         $this->assertSame($contents, $actual);
     }
 
-    public function test_it_exposes_some_elements_of_the_scoping_config(): void
+    public function test_it_contains_no_prefixes_and_an_empty_symbols_registry(): void
     {
-        $scoper = new NullScoper();
+        $this->assertSame('', $this->scoper->getPrefix());
+        $this->assertEquals(new SymbolsRegistry(), $this->scoper->getSymbolsRegistry());
+    }
 
-        $this->assertSame('', $scoper->getPrefix());
-        $this->assertEquals(Whitelist::create(true, true, true), $scoper->getWhitelist());
+    public function test_it_exposes_the_given_symbols_registry(): void
+    {
+        $symbolsRegistry = new SymbolsRegistry();
+
+        $scoper = new NullScoper($symbolsRegistry);
+
+        $this->assertSame($symbolsRegistry, $scoper->getSymbolsRegistry());
+    }
+
+    public function test_it_exposes_the_configured_symbols_registry(): void
+    {
+        $symbolsRegistry = new SymbolsRegistry();
+
+        $this->scoper->changeSymbolsRegistry($symbolsRegistry);
+
+        $this->assertSame($symbolsRegistry, $this->scoper->getSymbolsRegistry());
     }
 
     public function test_it_is_serializable(): void
