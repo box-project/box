@@ -26,9 +26,9 @@ function get_prefix(): string
 return [
     'prefix' => get_prefix(),
 
-    'whitelist-global-classes' => false,
-    'whitelist-global-constants' => false,
-    'whitelist-global-functions' => false,
+    'expose-global-classes' => false,
+    'expose-global-constants' => false,
+    'expose-global-functions' => false,
 
     'patchers' => [
         // TODO: report back the missing sapi_windows_vt100_support to JetBrains stubs
