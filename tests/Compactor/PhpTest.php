@@ -17,6 +17,7 @@ namespace KevinGH\Box\Compactor;
 use Generator;
 use KevinGH\Box\Annotation\CompactedFormatter;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
+use KevinGH\Box\Console\DisplayNormalizer;
 use phpDocumentor\Reflection\DocBlockFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -61,6 +62,8 @@ PHP;
         $file = 'foo.php';
 
         $actual = (new Php($annotationParser))->compact($file, $content);
+        // We are not interested in different trailing spaces
+        $actual = DisplayNormalizer::removeTrailingSpaces($actual);
 
         $this->assertSame($expected, $actual);
     }
@@ -125,7 +128,7 @@ class AClass
     {
         \$test = true; # Inline comment.
 
-    
+
     }
 
     /* Trailing comment */
@@ -155,13 +158,13 @@ public function aMethod()
 
 public function bMethod()
 {
-\$test = true; 
+\$test = true;
 }
 
 
 public function cMethod()
 {
-\$test = true; 
+\$test = true;
 
 
 }
@@ -169,7 +172,7 @@ public function cMethod()
 
 public function dMethod()
 {
-\$test = true; 
+\$test = true;
 }
 }
 PHP
@@ -545,7 +548,7 @@ PHP
             <<<'PHP'
 <?php
 
-#[CustomAttribute] 
+#[CustomAttribute]
 function foo() {}
 PHP
         ];
@@ -584,14 +587,13 @@ PHP
 <?php
 
 #[
-CustomAttribute, 
+CustomAttribute,
 AttributeWithParams( 'foo'),
 AttributeWithParams('foo', bar: ['bar' => 'foobar'])
 ]
 function foo() {}
 PHP
         ];
-
 
         yield 'Inline parameter attribute group followed by another attribute' => [
             $regularAnnotationParser,
@@ -630,7 +632,6 @@ AttributeWithParams(
 ] int $param) {}
 PHP
         ];
-
 
         yield 'Single line PHP 8.0 attribute containing text looking like a PHP close tag' => [
             $regularAnnotationParser,

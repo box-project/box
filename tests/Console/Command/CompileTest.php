@@ -30,7 +30,6 @@ use function json_decode;
 use function json_encode;
 use const JSON_PRETTY_PRINT;
 use KevinGH\Box\Compactor\Php;
-use KevinGH\Box\Composer\ComposerOrchestrator;
 use KevinGH\Box\Console\DisplayNormalizer;
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -80,16 +79,6 @@ class CompileTest extends CommandTestCase
 
     private const FIXTURES_DIR = __DIR__.'/../../../fixtures/build';
 
-    private static $runComposer2 = false;
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function setUpBeforeClass(): void
-    {
-        self::$runComposer2 = version_compare(ComposerOrchestrator::getVersion(), '2', '>=');
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -122,11 +111,7 @@ class CompileTest extends CommandTestCase
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
-        $numberOfFiles = 45;
-        if (self::$runComposer2) {
-            // From Composer 2 there are more files
-            ++$numberOfFiles;
-        }
+        $numberOfFiles = 47;
 
         dump_file(
             'box.json',
@@ -280,6 +265,7 @@ PHP;
             '/.box/vendor/composer/',
             '/.box/vendor/composer/ClassLoader.php',
             '/.box/vendor/composer/InstalledVersions.php',
+            '/.box/vendor/composer/installed.php',
             '/.box/vendor/composer/LICENSE',
             '/.box/vendor/composer/autoload_classmap.php',
             '/.box/vendor/composer/autoload_namespaces.php',
@@ -322,15 +308,9 @@ PHP;
             '/vendor/composer/autoload_static.php',
         ];
 
-        if (!self::$runComposer2) {
-            $expectedFiles = array_values(array_filter($expectedFiles, static function ($file): bool {
-                return '/.box/vendor/composer/InstalledVersions.php' !== $file;
-            }));
-        }
-
         $actualFiles = $this->retrievePharFiles($phar);
 
-        $this->assertSame($expectedFiles, $actualFiles);
+        $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
     }
 
     public function test_it_can_build_a_phar_from_a_different_directory(): void
@@ -395,12 +375,7 @@ PHP;
         );
 
         $version = get_box_version();
-
-        $numberOfFiles = 49;
-        if (self::$runComposer2) {
-            // From Composer 2 there are more files
-            ++$numberOfFiles;
-        }
+        $expectedNumberOfFiles = 51;
 
         $expected = <<<OUTPUT
 
@@ -441,7 +416,7 @@ Box version 3.x-dev@151e40a
 No recommendation found.
 No warning found.
 
- // PHAR: $numberOfFiles files (100B)
+ // PHAR: $expectedNumberOfFiles files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -517,6 +492,7 @@ PHP;
             '/.box/vendor/composer/',
             '/.box/vendor/composer/ClassLoader.php',
             '/.box/vendor/composer/InstalledVersions.php',
+            '/.box/vendor/composer/installed.php',
             '/.box/vendor/composer/LICENSE',
             '/.box/vendor/composer/autoload_classmap.php',
             '/.box/vendor/composer/autoload_namespaces.php',
@@ -562,15 +538,9 @@ PHP;
             '/vendor/composer/autoload_static.php',
         ];
 
-        if (!self::$runComposer2) {
-            $expectedFiles = array_values(array_filter($expectedFiles, static function ($file): bool {
-                return '/.box/vendor/composer/InstalledVersions.php' !== $file;
-            }));
-        }
-
         $actualFiles = $this->retrievePharFiles($phar);
 
-        $this->assertSame($expectedFiles, $actualFiles);
+        $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
         unset($phar);
         Phar::unlinkArchive('index.phar');
@@ -745,7 +715,7 @@ PHP;
 
         $actualFiles = $this->retrievePharFiles($phar);
 
-        $this->assertSame($expectedFiles, $actualFiles);
+        $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
     }
 
     public function test_it_can_build_a_phar_with_complete_mapping_without_an_alias(): void
@@ -828,13 +798,8 @@ PHP;
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
-        $numberOfClasses = 0;
-        $numberOfFiles = 45;
-        if (self::$runComposer2) {
-            // From Composer 2 there are more files
-            ++$numberOfClasses;
-            ++$numberOfFiles;
-        }
+        $expectedNumberOfClasses = 1;
+        $expectedNumberOfFiles = 47;
 
         dump_file(
             'box.json',
@@ -910,7 +875,7 @@ Box version 3.x-dev@151e40a
 ? Dumping the Composer autoloader
     > '/usr/local/bin/composer' 'dump-autoload' '--classmap-authoritative' '--no-dev'
 Generating optimized autoload files (authoritative)
-Generated optimized autoload files (authoritative) containing $numberOfClasses classes
+Generated optimized autoload files (authoritative) containing $expectedNumberOfClasses classes
 
 ? Removing the Composer dump artefacts
 ? No compression
@@ -925,7 +890,7 @@ Generated optimized autoload files (authoritative) containing $numberOfClasses c
 No recommendation found.
 No warning found.
 
- // PHAR: $numberOfFiles files (100B)
+ // PHAR: $expectedNumberOfFiles files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -950,13 +915,8 @@ OUTPUT;
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
-        $numberOfClasses = 0;
-        $numberOfFiles = 45;
-        if (self::$runComposer2) {
-            // From Composer 2 there are more files
-            ++$numberOfClasses;
-            ++$numberOfFiles;
-        }
+        $expectedNumberOfClasses = 1;
+        $expectedNumberOfFiles = 47;
 
         dump_file(
             'box.json',
@@ -1036,7 +996,7 @@ Box version 3.x-dev@151e40a
 ? Dumping the Composer autoloader
     > '/usr/local/bin/composer' 'dump-autoload' '--classmap-authoritative' '--no-dev' '-v'
 Generating optimized autoload files (authoritative)
-Generated optimized autoload files (authoritative) containing $numberOfClasses classes
+Generated optimized autoload files (authoritative) containing $expectedNumberOfClasses classes
 
 ? Removing the Composer dump artefacts
 ? No compression
@@ -1051,7 +1011,7 @@ Generated optimized autoload files (authoritative) containing $numberOfClasses c
 No recommendation found.
 No warning found.
 
- // PHAR: $numberOfFiles files (100B)
+ // PHAR: $expectedNumberOfFiles files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -1196,7 +1156,7 @@ OUTPUT;
             )
         );
 
-        $this->assertSame($expectedFiles, $actualFiles);
+        $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
         $expectedDumpedConfig = <<<'EOF'
 //
@@ -2211,7 +2171,7 @@ OUTPUT;
 
         $actualFiles = $this->retrievePharFiles(new Phar('test.phar'));
 
-        $this->assertSame($expectedFiles, $actualFiles);
+        $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
     }
 
     public function test_it_can_build_a_phar_with_compressed_code(): void
@@ -2439,7 +2399,7 @@ OUTPUT;
 
         $actualFiles = $this->retrievePharFiles($phar);
 
-        $this->assertSame($expectedFiles, $actualFiles);
+        $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
     }
 
     public function test_it_can_build_a_phar_file_without_a_shebang_line(): void
@@ -2910,12 +2870,7 @@ OUTPUT;
         );
 
         $version = get_box_version();
-
-        $numberOfFiles = 41;
-        if (self::$runComposer2) {
-            // From Composer 2 there are more files
-            ++$numberOfFiles;
-        }
+        $expectedNumberOfFiles = 43;
 
         $expected = <<<OUTPUT
 
@@ -2956,7 +2911,7 @@ Box version 3.x-dev@151e40a
 No recommendation found.
 No warning found.
 
- // PHAR: $numberOfFiles files (100B)
+ // PHAR: $expectedNumberOfFiles files (100B)
  // You can inspect the generated PHAR with the "info" command.
 
  // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s

@@ -414,14 +414,14 @@ class BoxTest extends FileSystemTestCase
 
         dump_file($file, $contents);
 
-        /** @var Compactor&ObjectProphecy $firstCompactorProphecy */
+        /** @var Compactor|ObjectProphecy $firstCompactorProphecy */
         $firstCompactorProphecy = $this->prophesize(Compactor::class);
         $firstCompactorProphecy
             ->compact($file, 'original contents foo_value')
             ->willReturn($firstCompactorOutput = 'first compactor contents')
         ;
 
-        /** @var Compactor&ObjectProphecy $secondCompactorProphecy */
+        /** @var Compactor|ObjectProphecy $secondCompactorProphecy */
         $secondCompactorProphecy = $this->prophesize(Compactor::class);
         $secondCompactorProphecy
             ->compact($file, $firstCompactorOutput)

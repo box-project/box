@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
-use KevinGH\Box\Console\DisplayNormalizer;
 use function array_column;
 use Generator;
+use KevinGH\Box\Console\DisplayNormalizer;
 use Phar;
 use PHPUnit\Framework\TestCase;
 use function sort;
@@ -59,6 +59,7 @@ class RequirementsDumperTest extends TestCase
             'vendor/composer/autoload_static.php',
             'vendor/composer/ClassLoader.php',
             'vendor/composer/LICENSE',
+            'vendor/composer/installed.php',
             'vendor/composer/semver/LICENSE',
             'vendor/composer/semver/src/Comparator.php',
             'vendor/composer/semver/src/CompilingMatcher.php',
@@ -80,7 +81,7 @@ class RequirementsDumperTest extends TestCase
 
         sort($expectedFiles);
 
-        $this->assertSame(
+        $this->assertEqualsCanonicalizing(
             $expectedFiles,
             array_column($checkFiles, 0)
         );

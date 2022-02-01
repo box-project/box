@@ -44,7 +44,7 @@ JSON;
         $whitelist = Whitelist::create(true, true, true, 'Whitelisted\Foo');
         $patchers = [];
 
-        /** @var ObjectProphecy&Scoper $phpScoperProphecy */
+        /** @var ObjectProphecy|Scoper $phpScoperProphecy */
         $phpScoperProphecy = $this->prophesize(Scoper::class);
         $phpScoperProphecy
             ->scope($file, $contents, $prefix, $patchers, $whitelist)

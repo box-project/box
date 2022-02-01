@@ -248,16 +248,11 @@ PHP
             'vendor/composer/autoload_static.php',
             'vendor/composer/ClassLoader.php',
             'vendor/composer/installed.json',
+            'vendor/composer/installed.php',
+            'vendor/composer/InstalledVersions.php',
+            'vendor/composer/LICENSE',
+            'vendor/composer/platform_check.php',
         ];
-
-        if ($this->isInstalledWithComposer2(self::FIXTURES.'/dir001')) {
-            $expectedPaths[] = 'vendor/composer/installed.php';
-            $expectedPaths[] = 'vendor/composer/InstalledVersions.php';
-            $expectedPaths[] = 'vendor/composer/LICENSE';
-            $expectedPaths[] = 'vendor/composer/platform_check.php';
-        } else {
-            $expectedPaths[] = 'vendor/composer/LICENSE';
-        }
 
         $actualPaths = $this->retrievePaths();
 
@@ -340,15 +335,10 @@ PHP;
             'vendor/composer/autoload_static.php',
             'vendor/composer/ClassLoader.php',
             'vendor/composer/installed.json',
+            'vendor/composer/installed.php',
+            'vendor/composer/InstalledVersions.php',
+            'vendor/composer/LICENSE',
         ];
-
-        if ($this->isInstalledWithComposer2(self::FIXTURES.'/dir003')) {
-            $expectedPaths[] = 'vendor/composer/installed.php';
-            $expectedPaths[] = 'vendor/composer/InstalledVersions.php';
-            $expectedPaths[] = 'vendor/composer/LICENSE';
-        } else {
-            $expectedPaths[] = 'vendor/composer/LICENSE';
-        }
 
         $actualPaths = $this->retrievePaths();
 
@@ -639,10 +629,5 @@ PHP
         $finder = Finder::create()->files()->in($this->tmp);
 
         return $this->normalizePaths(iterator_to_array($finder, false), true);
-    }
-
-    private function isInstalledWithComposer2(string $baseDir): bool
-    {
-        return file_exists($baseDir.'/vendor/composer/InstalledVersions.php');
     }
 }

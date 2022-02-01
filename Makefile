@@ -380,8 +380,9 @@ requirement-checker/tests/DisplayNormalizer.php: tests/Console/DisplayNormalizer
 	touch $@
 
 requirement-checker/actual_terminal_diff: requirement-checker/src/Terminal.php vendor/symfony/console/Terminal.php
-	diff vendor/symfony/console/Terminal.php requirement-checker/src/Terminal.php > requirement-checker/actual_terminal_diff || true
+	(diff vendor/symfony/console/Terminal.php requirement-checker/src/Terminal.php > requirement-checker/actual_terminal_diff) || true
 
+tests/Console/DisplayNormalizer.php: vendor
 vendor/symfony/console/Terminal.php: vendor
 
 box: bin src res vendor box.json.dist scoper.inc.php .requirement-checker
