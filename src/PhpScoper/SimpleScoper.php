@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PhpScoper;
 
+use function array_map;
+use function count;
 use Humbug\PhpScoper\Configuration\Configuration as PhpScoperConfiguration;
 use Humbug\PhpScoper\Container as PhpScoperContainer;
 use Humbug\PhpScoper\Patcher\Patcher;
@@ -22,8 +24,6 @@ use Humbug\PhpScoper\Scoper\FileWhitelistScoper;
 use Humbug\PhpScoper\Scoper\Scoper as PhpScoper;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use Opis\Closure\SerializableClosure;
-use function array_map;
-use function count;
 
 /**
  * @private
@@ -110,7 +110,7 @@ final class SimpleScoper implements Scoper
                 $this->symbolsRegistry,
             );
 
-        if (count($this->whitelistedFilePaths) !== 0) {
+        if (0 !== count($this->whitelistedFilePaths)) {
             $scoper = new FileWhitelistScoper(
                 $scoper,
                 ...$this->whitelistedFilePaths,
@@ -147,14 +147,13 @@ final class SimpleScoper implements Scoper
         return new PatcherChain($serializablePatchers);
     }
 
-    public function __wakeup()
+    public function __wakeup(): void
     {
         // We need to make sure that a fresh Scoper & PHP-Parser Parser/Lexer
         // is used within a sub-process.
         // Otherwise, there is a risk of data corruption or that a compatibility
         // layer of some sorts (such as the tokens for PHP-Paser) is not
         // triggered in the sub-process resulting in obscure errors
-        unset($this->scoper);
-        unset($this->scoperContainer);
+        unset($this->scoper, $this->scoperContainer);
     }
 }

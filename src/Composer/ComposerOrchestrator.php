@@ -16,7 +16,6 @@ namespace KevinGH\Box\Composer;
 
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-use Humbug\PhpScoper\Whitelist;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Console\Logger\CompilerLogger;
@@ -97,9 +96,8 @@ final class ComposerOrchestrator
     private static function generateAutoloadStatements(
         SymbolsRegistry $symbolsRegistry,
         string $autoload
-    ): string
-    {
-        if ($symbolsRegistry->count() === 0) {
+    ): string {
+        if (0 === $symbolsRegistry->count()) {
             return $autoload;
         }
 

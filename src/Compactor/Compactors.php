@@ -14,11 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function array_reduce;
 use function count;
 use Countable;
-use Humbug\PhpScoper\Whitelist;
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\PhpScoper\Scoper;
 
 /**

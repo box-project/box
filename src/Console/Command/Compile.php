@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Amp\MultiReasonException;
-use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function array_map;
 use function array_search;
 use function array_shift;
@@ -25,7 +24,7 @@ use function explode;
 use function file_exists;
 use function filesize;
 use function get_class;
-use Humbug\PhpScoper\Whitelist;
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function implode;
 use function is_callable;
 use function is_string;
@@ -574,13 +573,13 @@ HELP;
         $box->endBuffering(
             $config->dumpAutoload()
                 ? static function (SymbolsRegistry $symbolsRegistry, string $prefix) use ($excludeDevFiles, $io): void {
-                ComposerOrchestrator::dumpAutoload(
-                    $symbolsRegistry,
-                    $prefix,
-                    $excludeDevFiles,
-                    $io
-                );
-            }
+                    ComposerOrchestrator::dumpAutoload(
+                        $symbolsRegistry,
+                        $prefix,
+                        $excludeDevFiles,
+                        $io
+                    );
+                }
                 : null
         );
     }
