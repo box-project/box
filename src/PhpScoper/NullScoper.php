@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PhpScoper;
 
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use Humbug\PhpScoper\Whitelist;
 
 /**
@@ -32,16 +33,16 @@ final class NullScoper implements Scoper
     /**
      * {@inheritdoc}
      */
-    public function changeWhitelist(Whitelist $whitelist): void
+    public function changeSymbolsRegistry(SymbolsRegistry $symbolsRegistry): void
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getWhitelist(): Whitelist
+    public function getSymbolsRegistry(): SymbolsRegistry
     {
-        return Whitelist::create(true, true, true);
+        return new SymbolsRegistry();
     }
 
     /**

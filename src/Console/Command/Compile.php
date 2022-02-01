@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Amp\MultiReasonException;
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function array_map;
 use function array_search;
 use function array_shift;
@@ -572,14 +573,14 @@ HELP;
 
         $box->endBuffering(
             $config->dumpAutoload()
-                ? static function (Whitelist $whitelist, string $prefix) use ($excludeDevFiles, $io): void {
-                    ComposerOrchestrator::dumpAutoload(
-                        $whitelist,
-                        $prefix,
-                        $excludeDevFiles,
-                        $io
-                    );
-                }
+                ? static function (SymbolsRegistry $symbolsRegistry, string $prefix) use ($excludeDevFiles, $io): void {
+                ComposerOrchestrator::dumpAutoload(
+                    $symbolsRegistry,
+                    $prefix,
+                    $excludeDevFiles,
+                    $io
+                );
+            }
                 : null
         );
     }

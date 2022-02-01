@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Amp\MultiReasonException;
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function Amp\ParallelFunctions\parallelMap;
 use function Amp\Promise\wait;
 use function array_filter;
@@ -132,7 +133,7 @@ final class Box implements Countable
 
             if (null !== $dumpAutoload) {
                 $dumpAutoload(
-                    $this->scoper->getWhitelist(),
+                    $this->scoper->getSymbolsRegistry(),
                     $this->scoper->getPrefix()
                 );
             }
@@ -401,7 +402,7 @@ final class Box implements Countable
 
             $processedContents = $compactors->compact($local, $contents);
 
-            return [$local, $processedContents, $compactors->getScoperWhitelist()];
+            return [$local, $processedContents, $compactors->getScoperSymbolsRegistry()];
         };
 
         if ($this->scoper instanceof NullScoper || false === is_parallel_processing_enabled()) {
@@ -428,17 +429,15 @@ final class Box implements Countable
         }
 
         $filesWithContents = [];
-        $whitelists = [];
+        $symbolRegistries = [];
 
-        foreach ($tuples as [$local, $processedContents, $whitelist]) {
+        foreach ($tuples as [$local, $processedContents, $symbolRegistry]) {
             $filesWithContents[] = [$local, $processedContents];
-            $whitelists[] = $whitelist;
+            $symbolRegistries[] = $symbolRegistry;
         }
 
-        $this->compactors->registerWhitelist(
-            WhitelistManipulator::mergeWhitelists(
-                ...array_filter($whitelists)
-            )
+        $this->compactors->registerSymbolsRegistry(
+            SymbolsRegistry::createFromRegistries(array_filter($symbolRegistries)),
         );
 
         return $filesWithContents;

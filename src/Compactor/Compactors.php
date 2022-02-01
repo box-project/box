@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function array_reduce;
 use function count;
 use Countable;
@@ -60,15 +61,15 @@ final class Compactors implements Compactor, Countable
         return null !== $this->scoperCompactor ? $this->scoperCompactor->getScoper() : null;
     }
 
-    public function getScoperWhitelist(): ?Whitelist
+    public function getScoperSymbolsRegistry(): ?SymbolsRegistry
     {
-        return null !== $this->scoperCompactor ? $this->scoperCompactor->getScoper()->getWhitelist() : null;
+        return null !== $this->scoperCompactor ? $this->scoperCompactor->getScoper()->getSymbolsRegistry() : null;
     }
 
-    public function registerWhitelist(Whitelist $whitelist): void
+    public function registerSymbolsRegistry(SymbolsRegistry $symbolsRegistry): void
     {
         if (null !== $this->scoperCompactor) {
-            $this->scoperCompactor->getScoper()->changeWhitelist($whitelist);
+            $this->scoperCompactor->getScoper()->changeSymbolsRegistry($symbolsRegistry);
         }
     }
 

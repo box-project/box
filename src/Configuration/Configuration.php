@@ -14,47 +14,14 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Configuration;
 
-use function array_diff;
-use function array_filter;
-use function array_flip;
-use function array_key_exists;
-use function array_keys;
-use function array_map;
-use function array_merge;
-use function array_unique;
-use function array_values;
-use function array_walk;
 use Closure;
-use function constant;
-use function current;
 use DateTimeImmutable;
 use DateTimeZone;
-use function defined;
-use function dirname;
-use const E_USER_DEPRECATED;
-use function explode;
-use function file_exists;
-use function getcwd;
 use Herrera\Box\Compactor\Json as LegacyJson;
 use Herrera\Box\Compactor\Php as LegacyPhp;
-use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
+use Humbug\PhpScoper\Configuration\Configuration as PhpScoperConfiguration;
 use Humbug\PhpScoper\Container;
-use Humbug\PhpScoper\Scoper;
-use Humbug\PhpScoper\Scoper\FileWhitelistScoper;
-use function implode;
-use function in_array;
-use function intval;
 use InvalidArgumentException;
-use function is_array;
-use function is_bool;
-use function is_file;
-use function is_link;
-use function is_object;
-use function is_readable;
-use function is_string;
-use function iter\map;
-use function iter\toArray;
-use function iter\values;
 use KevinGH\Box\Annotation\CompactedFormatter;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
 use KevinGH\Box\Compactor\Compactor;
@@ -65,6 +32,51 @@ use KevinGH\Box\Compactor\PhpScoper as PhpScoperCompactor;
 use KevinGH\Box\Composer\ComposerConfiguration;
 use KevinGH\Box\Composer\ComposerFile;
 use KevinGH\Box\Composer\ComposerFiles;
+use KevinGH\Box\Json\Json;
+use KevinGH\Box\MapFile;
+use KevinGH\Box\PhpScoper\SimpleScoper;
+use Phar;
+use phpDocumentor\Reflection\DocBlockFactory;
+use RuntimeException;
+use Seld\JsonLint\ParsingException;
+use SplFileInfo;
+use stdClass;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo as SymfonySplFileInfo;
+use Symfony\Component\Process\Process;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\VarDumper\Dumper\CliDumper;
+use Webmozart\Assert\Assert;
+use function array_diff;
+use function array_filter;
+use function array_flip;
+use function array_key_exists;
+use function array_keys;
+use function array_map;
+use function array_merge;
+use function array_unique;
+use function array_values;
+use function array_walk;
+use function constant;
+use function current;
+use function defined;
+use function dirname;
+use function explode;
+use function file_exists;
+use function getcwd;
+use function implode;
+use function in_array;
+use function intval;
+use function is_array;
+use function is_bool;
+use function is_file;
+use function is_link;
+use function is_object;
+use function is_readable;
+use function is_string;
+use function iter\map;
+use function iter\toArray;
+use function iter\values;
 use function KevinGH\Box\FileSystem\canonicalize;
 use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\is_absolute_path;
@@ -74,35 +86,20 @@ use function KevinGH\Box\FileSystem\make_path_relative;
 use function KevinGH\Box\get_box_version;
 use function KevinGH\Box\get_phar_compression_algorithms;
 use function KevinGH\Box\get_phar_signing_algorithms;
-use KevinGH\Box\Json\Json;
-use KevinGH\Box\MapFile;
-use KevinGH\Box\PhpScoper\SerializablePhpScoper;
-use KevinGH\Box\PhpScoper\SimpleScoper;
 use function KevinGH\Box\unique_id;
 use function krsort;
-use Phar;
-use phpDocumentor\Reflection\DocBlockFactory;
 use function preg_match;
 use function preg_replace;
 use function property_exists;
 use function realpath;
-use RuntimeException;
-use Seld\JsonLint\ParsingException;
 use function sort;
-use const SORT_STRING;
-use SplFileInfo;
 use function sprintf;
-use stdClass;
 use function strtoupper;
 use function substr;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo as SymfonySplFileInfo;
-use Symfony\Component\Process\Process;
-use Symfony\Component\VarDumper\Cloner\VarCloner;
-use Symfony\Component\VarDumper\Dumper\CliDumper;
 use function trigger_error;
 use function trim;
-use Webmozart\Assert\Assert;
+use const E_USER_DEPRECATED;
+use const SORT_STRING;
 
 /**
  * @private
@@ -1386,20 +1383,19 @@ BANNER;
         }
 
         if (file_exists($vendorDir)) {
-            // Note that some files may not exist. For example installed.json does not exist at all if no dependencies
-            // are included in composer.json.
-            $requiredComposerFiles = [
-                'installed.json',
-                'InstalledVersions.php',
-                'installed.php',
-            ];
+            // The installed.json file is necessary for dumping the autoload correctly. Note however that it will not exists if no
+            // dependencies are included in the `composer.json`
+            $installedJsonFiles = self::normalizePath($vendorDir.'/composer/installed.json', $basePath);
 
-            foreach ($requiredComposerFiles as $requiredComposerFile) {
-                $normalizePath = self::normalizePath($vendorDir.'/composer/'.$requiredComposerFile, $basePath);
+            if (file_exists($installedJsonFiles)) {
+                $filesToAppend[] = $installedJsonFiles;
+            }
 
-                if (file_exists($normalizePath)) {
-                    $filesToAppend[] = $normalizePath;
-                }
+            // The InstalledVersions.php file is necessary since Composer v2 adds it to the autoloader class map
+            $installedVersionsPhp = self::normalizePath($vendorDir.'/composer/InstalledVersions.php', $basePath);
+
+            if (file_exists($installedVersionsPhp)) {
+                $filesToAppend[] = $installedVersionsPhp;
             }
 
             $vendorPackages = toArray(values(map(
@@ -1492,7 +1488,7 @@ BANNER;
             return is_absolute_path($path)
                 ? canonicalize($path)
                 : self::normalizePath(trim($path, '/ '), $basePath)
-            ;
+                ;
         };
 
         if (array_key_exists('files', $autoload)) {
@@ -1809,12 +1805,12 @@ BANNER;
 
         $compactors = new Compactors(
             ...self::createCompactors(
-                $raw,
-                $basePath,
-                $compactorClasses,
-                $ignoredAnnotations,
-                $logger
-            )
+            $raw,
+            $basePath,
+            $compactorClasses,
+            $ignoredAnnotations,
+            $logger
+        )
         );
 
         self::checkCompactorsOrder($logger, $compactors);
@@ -1887,7 +1883,7 @@ BANNER;
                 if (true === $scoperCompactor) {
                     $logger->addRecommendation(
                         'The PHP compactor has been registered after the PhpScoper compactor. It is '
-                            .'recommended to register the PHP compactor before for a clearer code and faster processing.'
+                        .'recommended to register the PHP compactor before for a clearer code and faster processing.'
                     );
                 }
 
@@ -2694,13 +2690,13 @@ BANNER;
     {
         self::checkIfDefaultValue($logger, $raw, self::PHP_SCOPER_KEY, self::PHP_SCOPER_CONFIG);
 
+        $configFactory = (new Container())->getConfigurationFactory();
+
         if (!isset($raw->{self::PHP_SCOPER_KEY})) {
             $configFilePath = make_path_absolute(self::PHP_SCOPER_CONFIG, $basePath);
+            $configFilePath = file_exists($configFilePath) ? $configFilePath : null;
 
-            return file_exists($configFilePath)
-                ? PhpScoperConfiguration::load($configFilePath)
-                : PhpScoperConfiguration::load()
-             ;
+            return $configFactory->create($configFilePath);
         }
 
         $configFile = $raw->{self::PHP_SCOPER_KEY};
@@ -2712,7 +2708,7 @@ BANNER;
         Assert::file($configFilePath);
         Assert::readable($configFilePath);
 
-        return PhpScoperConfiguration::load($configFilePath);
+        return $configFactory->create($configFilePath);
     }
 
     /**
@@ -2841,32 +2837,15 @@ BANNER;
                     static function (string $path) use ($basePath): string {
                         return make_path_relative($path, $basePath);
                     },
-                    $phpScoperConfig->getWhitelistedFiles()
+                    array_keys(
+                        $phpScoperConfig->getExcludedFilesWithContents(),
+                    ),
                 )
             )
         );
 
-        $prefix = $phpScoperConfig->getPrefix() ?? unique_id('_HumbugBox');
-
-        $scoper = new SerializablePhpScoper(
-            static function () use ($whitelistedFiles): Scoper {
-                $scoper = (new Container())->getScoper();
-
-                if ([] !== $whitelistedFiles) {
-                    return new FileWhitelistScoper($scoper, ...$whitelistedFiles);
-                }
-
-                return $scoper;
-            }
-        );
-
         return new PhpScoperCompactor(
-            new SimpleScoper(
-                $scoper,
-                $prefix,
-                $phpScoperConfig->getWhitelist(),
-                $phpScoperConfig->getPatchers()
-            )
+            new SimpleScoper($phpScoperConfig, ...$whitelistedFiles)
         );
     }
 
@@ -2874,7 +2853,7 @@ BANNER;
         ConfigurationLogger $logger,
         stdClass $raw,
         string $key,
-        $defaultValue = null
+                            $defaultValue = null
     ): void {
         if (false === property_exists($raw, $key)) {
             return;
