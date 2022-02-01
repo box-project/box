@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PhpScoper;
 
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function func_get_args;
-use Humbug\PhpScoper\Whitelist;
 use KevinGH\Box\NotCallable;
 
 final class FakeScoper implements Scoper
@@ -30,25 +30,16 @@ final class FakeScoper implements Scoper
         $this->__call(__METHOD__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function changeWhitelist(Whitelist $whitelist): void
+    public function changeSymbolsRegistry(SymbolsRegistry $symbolsRegistry): void
     {
         $this->__call(__METHOD__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getWhitelist(): Whitelist
+    public function getSymbolsRegistry(): SymbolsRegistry
     {
         $this->__call(__METHOD__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPrefix(): string
     {
         $this->__call(__METHOD__, func_get_args());

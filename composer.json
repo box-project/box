@@ -48,7 +48,7 @@
         "composer/package-versions-deprecated": "^1.8",
         "composer/semver": "^3.2",
         "composer/xdebug-handler": "^2.0 || ^3.0",
-        "humbug/php-scoper": "^0.13.10 || ^0.14 || ^0.15",
+        "humbug/php-scoper": "^0.16",
         "justinrainbow/json-schema": "^5.2.9",
         "nikic/iter": "^2.0",
         "nikic/php-parser": "^4.2",
@@ -74,6 +74,9 @@
     },
     "suggest": {
         "ext-openssl": "To accelerate private key generation."
+    },
+    "scripts": {
+        "post-autoload-dump": "@php fix-composer.php"
     },
 
     "config": {

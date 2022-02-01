@@ -29,6 +29,7 @@ use function dirname;
 use function extension_loaded;
 use function file_exists;
 use function getcwd;
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function is_object;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
@@ -39,7 +40,6 @@ use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
 use KevinGH\Box\PhpScoper\NullScoper;
-use KevinGH\Box\PhpScoper\WhitelistManipulator;
 use function openssl_pkey_export;
 use function openssl_pkey_get_details;
 use function openssl_pkey_get_private;
@@ -132,7 +132,7 @@ final class Box implements Countable
 
             if (null !== $dumpAutoload) {
                 $dumpAutoload(
-                    $this->scoper->getWhitelist(),
+                    $this->scoper->getSymbolsRegistry(),
                     $this->scoper->getPrefix()
                 );
             }
@@ -401,7 +401,7 @@ final class Box implements Countable
 
             $processedContents = $compactors->compact($local, $contents);
 
-            return [$local, $processedContents, $compactors->getScoperWhitelist()];
+            return [$local, $processedContents, $compactors->getScoperSymbolsRegistry()];
         };
 
         if ($this->scoper instanceof NullScoper || false === is_parallel_processing_enabled()) {
@@ -428,17 +428,15 @@ final class Box implements Countable
         }
 
         $filesWithContents = [];
-        $whitelists = [];
+        $symbolRegistries = [];
 
-        foreach ($tuples as [$local, $processedContents, $whitelist]) {
+        foreach ($tuples as [$local, $processedContents, $symbolRegistry]) {
             $filesWithContents[] = [$local, $processedContents];
-            $whitelists[] = $whitelist;
+            $symbolRegistries[] = $symbolRegistry;
         }
 
-        $this->compactors->registerWhitelist(
-            WhitelistManipulator::mergeWhitelists(
-                ...array_filter($whitelists)
-            )
+        $this->compactors->registerSymbolsRegistry(
+            SymbolsRegistry::createFromRegistries(array_filter($symbolRegistries)),
         );
 
         return $filesWithContents;

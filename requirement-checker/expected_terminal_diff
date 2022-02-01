@@ -1,76 +1,36 @@
-4c4
-<  * This file is part of the Symfony package.
----
->  * This file is part of the box project.
-6c6,7
-<  * (c) Fabien Potencier <fabien@symfony.com>
----
->  * (c) Kevin Herrera <kevin@herrera.io>
->  *     Théo Fidry <theo.fidry@gmail.com>
-8,9c9,10
-<  * For the full copyright and license information, please view the LICENSE
-<  * file that was distributed with this source code.
----
->  * This source file is subject to the MIT license that is bundled
->  * with this source code in the file LICENSE.
-12c13
-< namespace Symfony\Component\Console;
----
-> namespace KevinGH\RequirementChecker;
-13a15,20
-> /**
->  * This file is copy/pasted from the Symfony project to avoid a dependency on `symfony/console` which would be too big for just using this
->  * class.
->  *
->  * @license MIT (c) Fabien Potencier <fabien@symfony.com>
->  */
-104c111
-<     private static function hasVt100Support(): bool
----
->     private static function hasVt100Support()
-106c113
-<         return \function_exists('sapi_windows_vt100_support') && sapi_windows_vt100_support(fopen('php://stdout', 'w'));
----
->         return \function_exists('sapi_windows_vt100_support') && \sapi_windows_vt100_support(\fopen('php://stdout', 'wb'));
-109,111d115
-<     /**
-<      * Initializes dimensions using the output of an stty columns line.
-<      */
-132c136
-<     private static function getConsoleMode(): ?array
----
->     private static function getConsoleMode()
-140c144
-<         return [(int) $matches[2], (int) $matches[1]];
----
->         return array((int) $matches[2], (int) $matches[1]);
-144a149,150
->      *
->      * @return string|null
-146c152
-<     private static function getSttyColumns(): ?string
----
->     private static function getSttyColumns()
-151c157,162
-<     private static function readFromProcess(string $command): ?string
----
->     /**
->      * @param string $command
->      *
->      * @return string|null
->      */
->     private static function readFromProcess($command)
-157,160c168,171
-<         $descriptorspec = [
-<             1 => ['pipe', 'w'],
-<             2 => ['pipe', 'w'],
-<         ];
----
->         $descriptorspec = array(
->             1 => array('pipe', 'w'),
->             2 => array('pipe', 'w'),
->         );
-162c173
-<         $process = proc_open($command, $descriptorspec, $pipes, null, null, ['suppress_errors' => true]);
----
->         $process = proc_open($command, $descriptorspec, $pipes, null, null, array('suppress_errors' => true));
+ * This file is part of the Symfony package.		      |	 * This file is part of the box project.
+ * (c) Fabien Potencier <fabien@symfony.com>		      |	 * (c) Kevin Herrera <kevin@herrera.io>
+							      >	 *     Théo Fidry <theo.fidry@gmail.com>
+ * For the full copyright and license information, please vie |	 * This source file is subject to the MIT license that is bun
+ * file that was distributed with this source code.	      |	 * with this source code in the file LICENSE.
+namespace Symfony\Component\Console;			      |	namespace KevinGH\RequirementChecker;
+							      >	/**
+							      >	 * This file is copy/pasted from the Symfony project to avoid
+							      >	 * class.
+							      >	 *
+							      >	 * @license MIT (c) Fabien Potencier <fabien@symfony.com>
+							      >	 */
+							      >	     *
+							      >	     * @return bool
+    public static function hasSttyAvailable(): bool	      |	    public static function hasSttyAvailable()
+    private static function hasVt100Support(): bool	      |	    private static function hasVt100Support()
+        return \function_exists('sapi_windows_vt100_support') |	        return \function_exists('sapi_windows_vt100_support')
+    /**							      <
+     * Initializes dimensions using the output of an stty col <
+     */							      <
+    private static function getConsoleMode(): ?array	      |	    private static function getConsoleMode()
+        return [(int) $matches[2], (int) $matches[1]];	      |	        return array((int) $matches[2], (int) $matches[1]);
+							      >	     *
+							      >	     * @return string|null
+    private static function getSttyColumns(): ?string	      |	    private static function getSttyColumns()
+    private static function readFromProcess(string $command): |	    /**
+							      >	     * @param string $command
+							      >	     *
+							      >	     * @return string|null
+							      >	     */
+							      >	    private static function readFromProcess($command)
+        $descriptorspec = [				      |	        $descriptorspec = array(
+            1 => ['pipe', 'w'],				      |	            1 => array('pipe', 'w'),
+            2 => ['pipe', 'w'],				      |	            2 => array('pipe', 'w'),
+        ];						      |	        );
+        $process = proc_open($command, $descriptorspec, $pipe |	        $process = proc_open($command, $descriptorspec, $pipe

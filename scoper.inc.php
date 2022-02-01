@@ -17,7 +17,7 @@ use Isolated\Symfony\Component\Finder\Finder;
 // TODO: check if the phpStorm stubs should not be included?
 
 $polyfillsBootstraps = array_map(
-    static function (SplFileInfo $fileInfo): string { return $fileInfo->getPathname(); },
+    static fn (SplFileInfo $fileInfo) => $fileInfo->getPathname(),
     iterator_to_array(
         Finder::create()
             ->files()
@@ -28,7 +28,7 @@ $polyfillsBootstraps = array_map(
 );
 
 $polyfillsStubs = array_map(
-    static function (SplFileInfo $fileInfo): string { return $fileInfo->getPathname(); },
+    static fn (SplFileInfo $fileInfo) => $fileInfo->getPathname(),
     iterator_to_array(
         Finder::create()
             ->files()
@@ -39,10 +39,10 @@ $polyfillsStubs = array_map(
 );
 
 return [
-    'files-whitelist' => array_merge(
-        $polyfillsBootstraps,
-        $polyfillsStubs,
-    ),
+    'exclude-files' => [
+        ...$polyfillsBootstraps,
+        ...$polyfillsStubs,
+    ],
     'patchers' => [
         static function (string $filePath, string $prefix, string $contents): string {
             $finderClass = sprintf('\%s\%s', $prefix, Finder::class);
@@ -226,7 +226,4 @@ return [
         '_overridable',
         'WITH_COMPOSER',
     ],
-    'whitelist-global-constants' => false,
-    'whitelist-global-classes' => false,
-    'whitelist-global-functions' => false,
 ];

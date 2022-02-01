@@ -31,16 +31,15 @@ use DateTimeImmutable;
 use DateTimeZone;
 use function defined;
 use function dirname;
+use function str_starts_with;
 use const E_USER_DEPRECATED;
 use function explode;
 use function file_exists;
 use function getcwd;
 use Herrera\Box\Compactor\Json as LegacyJson;
 use Herrera\Box\Compactor\Php as LegacyPhp;
-use Humbug\PhpScoper\Configuration as PhpScoperConfiguration;
+use Humbug\PhpScoper\Configuration\Configuration as PhpScoperConfiguration;
 use Humbug\PhpScoper\Container;
-use Humbug\PhpScoper\Scoper;
-use Humbug\PhpScoper\Scoper\FileWhitelistScoper;
 use function implode;
 use function in_array;
 use function intval;
@@ -76,7 +75,6 @@ use function KevinGH\Box\get_phar_compression_algorithms;
 use function KevinGH\Box\get_phar_signing_algorithms;
 use KevinGH\Box\Json\Json;
 use KevinGH\Box\MapFile;
-use KevinGH\Box\PhpScoper\SerializablePhpScoper;
 use KevinGH\Box\PhpScoper\SimpleScoper;
 use function KevinGH\Box\unique_id;
 use function krsort;
@@ -1390,8 +1388,8 @@ BANNER;
             // are included in composer.json.
             $requiredComposerFiles = [
                 'installed.json',
-                'InstalledVersions.php',
                 'installed.php',
+                'InstalledVersions.php',
             ];
 
             foreach ($requiredComposerFiles as $requiredComposerFile) {
@@ -1492,7 +1490,7 @@ BANNER;
             return is_absolute_path($path)
                 ? canonicalize($path)
                 : self::normalizePath(trim($path, '/ '), $basePath)
-            ;
+                ;
         };
 
         if (array_key_exists('files', $autoload)) {
@@ -1887,7 +1885,7 @@ BANNER;
                 if (true === $scoperCompactor) {
                     $logger->addRecommendation(
                         'The PHP compactor has been registered after the PhpScoper compactor. It is '
-                            .'recommended to register the PHP compactor before for a clearer code and faster processing.'
+                        .'recommended to register the PHP compactor before for a clearer code and faster processing.'
                     );
                 }
 
@@ -2694,13 +2692,13 @@ BANNER;
     {
         self::checkIfDefaultValue($logger, $raw, self::PHP_SCOPER_KEY, self::PHP_SCOPER_CONFIG);
 
+        $configFactory = (new Container())->getConfigurationFactory();
+
         if (!isset($raw->{self::PHP_SCOPER_KEY})) {
             $configFilePath = make_path_absolute(self::PHP_SCOPER_CONFIG, $basePath);
+            $configFilePath = file_exists($configFilePath) ? $configFilePath : null;
 
-            return file_exists($configFilePath)
-                ? PhpScoperConfiguration::load($configFilePath)
-                : PhpScoperConfiguration::load()
-             ;
+            return $configFactory->create($configFilePath);
         }
 
         $configFile = $raw->{self::PHP_SCOPER_KEY};
@@ -2712,7 +2710,7 @@ BANNER;
         Assert::file($configFilePath);
         Assert::readable($configFilePath);
 
-        return PhpScoperConfiguration::load($configFilePath);
+        return $configFactory->create($configFilePath);
     }
 
     /**
@@ -2833,7 +2831,9 @@ BANNER;
         string $basePath,
         ConfigurationLogger $logger
     ): Compactor {
-        $phpScoperConfig = self::retrievePhpScoperConfig($raw, $basePath, $logger);
+        $phpScoperConfig = self::configurePhpScoperPrefix(
+            self::retrievePhpScoperConfig($raw, $basePath, $logger),
+        );
 
         $whitelistedFiles = array_values(
             array_unique(
@@ -2841,32 +2841,35 @@ BANNER;
                     static function (string $path) use ($basePath): string {
                         return make_path_relative($path, $basePath);
                     },
-                    $phpScoperConfig->getWhitelistedFiles()
+                    array_keys(
+                        $phpScoperConfig->getExcludedFilesWithContents(),
+                    ),
                 )
             )
         );
 
-        $prefix = $phpScoperConfig->getPrefix() ?? unique_id('_HumbugBox');
-
-        $scoper = new SerializablePhpScoper(
-            static function () use ($whitelistedFiles): Scoper {
-                $scoper = (new Container())->getScoper();
-
-                if ([] !== $whitelistedFiles) {
-                    return new FileWhitelistScoper($scoper, ...$whitelistedFiles);
-                }
-
-                return $scoper;
-            }
-        );
-
         return new PhpScoperCompactor(
-            new SimpleScoper(
-                $scoper,
-                $prefix,
-                $phpScoperConfig->getWhitelist(),
-                $phpScoperConfig->getPatchers()
-            )
+            new SimpleScoper($phpScoperConfig, ...$whitelistedFiles)
+        );
+    }
+
+    private static function configurePhpScoperPrefix(PhpScoperConfiguration $phpScoperConfig): PhpScoperConfiguration
+    {
+        $prefix = $phpScoperConfig->getPrefix();
+
+        if (!str_starts_with($prefix, '_PhpScoper')) {
+            return $phpScoperConfig;
+        }
+
+        // TODO: provide easier way to change the prefix
+        //  https://github.com/humbug/php-scoper/issues/616
+        return new PhpScoperConfiguration(
+            $phpScoperConfig->getPath(),
+            unique_id('_HumbugBox'),
+            $phpScoperConfig->getFilesWithContents(),
+            $phpScoperConfig->getExcludedFilesWithContents(),
+            $phpScoperConfig->getPatcher(),
+            $phpScoperConfig->getSymbolsConfiguration(),
         );
     }
 

@@ -100,26 +100,26 @@ Usage:
   command [options] [arguments]
 
 Options:
-  -h, --help            Display this help message
+  -h, --help            Display help for the given command. When no command is given display help for the list command
   -q, --quiet           Do not output any message
   -V, --version         Display this application version
-      --ansi            Force ANSI output
-      --no-ansi         Disable ANSI output
+      --ansi|--no-ansi  Force (or disable --no-ansi) ANSI output
   -n, --no-interaction  Do not ask any interactive question
   -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 
 Available commands:
-  build     Builds a new PHAR (deprecated, use "compile" instead)
-  compile   🔨  Compiles an application into a PHAR
-  diff      🕵  Displays the differences between all of the files in two PHARs
-  docker    🐳  Generates a Dockerfile for the given PHAR
-  extract   🚚  Extracts a given PHAR into a directory
-  help      Display help for a command
-  info      🔍  Displays information about the PHAR extension or file
-  list      List commands
-  process   ⚡  Applies the registered compactors and replacement values on a file
-  validate  ⚙  Validates the configuration file
-  verify    🔐️  Verifies the PHAR signature
+  build       Builds a new PHAR (deprecated, use "compile" instead)
+  compile     🔨  Compiles an application into a PHAR
+  completion  Dump the shell completion script
+  diff        🕵  Displays the differences between all of the files in two PHARs
+  docker      🐳  Generates a Dockerfile for the given PHAR
+  extract     🚚  Extracts a given PHAR into a directory
+  help        Display help for a command
+  info        🔍  Displays information about the PHAR extension or file
+  list        List commands
+  process     ⚡  Applies the registered compactors and replacement values on a file
+  validate    ⚙  Validates the configuration file
+  verify      🔐️  Verifies the PHAR signature
 
 EOF;
 

@@ -14,13 +14,13 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function array_map;
 use function array_shift;
 use function array_unshift;
 use function explode;
 use function get_class;
 use function getcwd;
-use Humbug\PhpScoper\Whitelist;
 use function implode;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 use function KevinGH\Box\check_php_settings;
@@ -243,18 +243,18 @@ final class Process extends ConfigurableBaseCommand
         $io->newLine();
     }
 
-    private function retrieveWhitelist(Compactors $compactors): ?Whitelist
+    private function retrieveWhitelist(Compactors $compactors): ?SymbolsRegistry
     {
         foreach ($compactors->toArray() as $compactor) {
             if ($compactor instanceof PhpScoper) {
-                return $compactor->getScoper()->getWhitelist();
+                return $compactor->getScoper()->getSymbolsRegistry();
             }
         }
 
         return null;
     }
 
-    private function exportWhitelist(Whitelist $whitelist, IO $io): string
+    private function exportWhitelist(SymbolsRegistry $whitelist, IO $io): string
     {
         $cloner = new VarCloner();
         $cloner->setMaxItems(-1);
