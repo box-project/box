@@ -70,7 +70,7 @@ tu_requirement_checker:	 ## Runs the unit tests
 tu_requirement_checker: requirement-checker/bin/phpunit requirement-checker/tests/DisplayNormalizer.php requirement-checker/actual_terminal_diff
 	cd requirement-checker && $(PHPNOGC) bin/phpunit
 
-	diff requirement-checker/expected_terminal_diff requirement-checker/actual_terminal_diff
+	diff --side-by-side --suppress-common-lines requirement-checker/expected_terminal_diff requirement-checker/actual_terminal_diff
 
 .PHONY: tc
 tc:			 ## Runs the unit tests with code coverage
@@ -101,8 +101,8 @@ e2e_scoper_whitelist: box fixtures/build/dir011/vendor
 	php fixtures/build/dir011/index.phar > fixtures/build/dir011/output
 	cd fixtures/build/dir011 && php -r "file_put_contents('phar-Y.php', file_get_contents((new Phar('index.phar'))['src/Y.php']));"
 
-	diff fixtures/build/dir011/expected-output fixtures/build/dir011/output
-	diff fixtures/build/dir011/phar-Y.php fixtures/build/dir011/src/Y.php
+	diff --side-by-side --suppress-common-lines fixtures/build/dir011/expected-output fixtures/build/dir011/output
+	diff --side-by-side --suppress-common-lines fixtures/build/dir011/phar-Y.php fixtures/build/dir011/src/Y.php
 
 .PHONY: e2e_check_requirements
 DOCKER=docker run -i --rm -w /opt/box
@@ -125,7 +125,7 @@ e2e_check_requirements: box .requirement-checker
 
 	rm fixtures/check-requirements/pass-no-config/actual-output || true
 	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-no-config":/opt/box $(PHP5PHAR) | tee fixtures/check-requirements/pass-no-config/actual-output
-	diff fixtures/check-requirements/pass-no-config/expected-output-53 fixtures/check-requirements/pass-no-config/actual-output
+	diff --side-by-side --suppress-common-lines fixtures/check-requirements/pass-no-config/expected-output-53 fixtures/check-requirements/pass-no-config/actual-output
 
 	# 7.2
 	sed "s/PHP_VERSION/$$($(DOCKER) box_php73 php -r 'echo PHP_VERSION;')/" \
@@ -134,7 +134,7 @@ e2e_check_requirements: box .requirement-checker
 
 	rm fixtures/check-requirements/pass-no-config/actual-output || true
 	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-no-config":/opt/box $(PHP7PHAR) | tee fixtures/check-requirements/pass-no-config/actual-output
-	diff fixtures/check-requirements/pass-no-config/expected-output-73 fixtures/check-requirements/pass-no-config/actual-output
+	diff --side-by-side --suppress-common-lines fixtures/check-requirements/pass-no-config/expected-output-73 fixtures/check-requirements/pass-no-config/actual-output
 
 	#
 	# Pass complete
@@ -149,7 +149,7 @@ e2e_check_requirements: box .requirement-checker
 
 	rm fixtures/check-requirements/pass-complete/actual-output || true
 	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-complete":/opt/box $(PHP5PHAR) | tee fixtures/check-requirements/pass-complete/actual-output
-	diff fixtures/check-requirements/pass-complete/expected-output-53 fixtures/check-requirements/pass-complete/actual-output
+	diff --side-by-side --suppress-common-lines fixtures/check-requirements/pass-complete/expected-output-53 fixtures/check-requirements/pass-complete/actual-output
 
 	# 7.2
 	sed "s/PHP_VERSION/$$($(DOCKER) box_php73 php -r 'echo PHP_VERSION;')/" \
@@ -158,7 +158,7 @@ e2e_check_requirements: box .requirement-checker
 
 	rm fixtures/check-requirements/pass-complete/actual-output || true
 	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-complete":/opt/box $(PHP7PHAR) | tee fixtures/check-requirements/pass-complete/actual-output
-	diff fixtures/check-requirements/pass-complete/expected-output-73 fixtures/check-requirements/pass-complete/actual-output
+	diff --side-by-side --suppress-common-lines fixtures/check-requirements/pass-complete/expected-output-73 fixtures/check-requirements/pass-complete/actual-output
 
 	#
 	# Fail complete
@@ -173,7 +173,7 @@ e2e_check_requirements: box .requirement-checker
 
 	rm fixtures/check-requirements/fail-complete/actual-output || true
 	$(DOCKER) -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP5PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
-	diff fixtures/check-requirements/fail-complete/expected-output-53 fixtures/check-requirements/fail-complete/actual-output
+	diff --side-by-side --suppress-common-lines fixtures/check-requirements/fail-complete/expected-output-53 fixtures/check-requirements/fail-complete/actual-output
 
 	# 7.2
 	sed "s/PHP_VERSION/$$($(DOCKER) box_php73 php -r 'echo PHP_VERSION;')/" \
@@ -182,7 +182,7 @@ e2e_check_requirements: box .requirement-checker
 
 	rm fixtures/check-requirements/fail-complete/actual-output || true
 	$(DOCKER) -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP7PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
-	diff fixtures/check-requirements/fail-complete/expected-output-73 fixtures/check-requirements/fail-complete/actual-output
+	diff --side-by-side --suppress-common-lines fixtures/check-requirements/fail-complete/expected-output-73 fixtures/check-requirements/fail-complete/actual-output
 
 	#
 	# Skip the requirement check
@@ -196,7 +196,7 @@ e2e_check_requirements: box .requirement-checker
 
 	rm fixtures/check-requirements/fail-complete/actual-output || true
 	$(DOCKER) -e BOX_REQUIREMENT_CHECKER=0 -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP5PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
-	diff fixtures/check-requirements/fail-complete/expected-output-53 fixtures/check-requirements/fail-complete/actual-output
+	diff --side-by-side --suppress-common-lines fixtures/check-requirements/fail-complete/expected-output-53 fixtures/check-requirements/fail-complete/actual-output
 
 BOX_COMPILE=./box compile --working-dir=fixtures/php-settings-checker -vvv --no-ansi
 ifeq ($(OS),Darwin)
@@ -214,7 +214,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 		| grep '\[debug\]' \
 		| tee fixtures/php-settings-checker/actual-output || true
 	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
-	diff fixtures/php-settings-checker/output-all-clear fixtures/php-settings-checker/actual-output
+	diff --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-all-clear fixtures/php-settings-checker/actual-output
 
 	@echo "$(CCYELLOW)Xdebug enabled: restart needed$(CCEND)"
 	$(DOCKER) -v "$$PWD":/opt/box box_php73_xdebug \
@@ -224,7 +224,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 		| tee fixtures/php-settings-checker/actual-output || true
 	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
 	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
-	diff fixtures/php-settings-checker/output-xdebug-enabled fixtures/php-settings-checker/actual-output
+	diff --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-xdebug-enabled fixtures/php-settings-checker/actual-output
 
 	@echo "$(CCYELLOW)phar.readonly enabled: restart needed$(CCEND)"
 	$(DOCKER) -v "$$PWD":/opt/box box_php73 \
@@ -235,7 +235,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
 	$(SED) "s/'-c' '.*' '\.\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
 	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
-	diff fixtures/php-settings-checker/output-pharreadonly-enabled fixtures/php-settings-checker/actual-output
+	diff --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-pharreadonly-enabled fixtures/php-settings-checker/actual-output
 
 	@echo "$(CCYELLOW)Bump min memory limit if necessary (limit lower than default)$(CCEND)"
 	$(DOCKER) -v "$$PWD":/opt/box box_php73 \
@@ -246,7 +246,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
 	$(SED) "s/'-c' '.*' '\.\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
 	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
-	diff fixtures/php-settings-checker/output-min-memory-limit fixtures/php-settings-checker/actual-output
+	diff --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-min-memory-limit fixtures/php-settings-checker/actual-output
 
 	@echo "$(CCYELLOW)Bump min memory limit if necessary (limit higher than default)$(CCEND)"
 	$(DOCKER) -e BOX_MEMORY_LIMIT=64M -v "$$PWD":/opt/box box_php73 \
@@ -257,7 +257,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
 	$(SED) "s/'-c' '.*' '\.\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
 	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
-	diff fixtures/php-settings-checker/output-set-memory-limit fixtures/php-settings-checker/actual-output
+	diff --side-by-side --suppress-common-lines  fixtures/php-settings-checker/output-set-memory-limit fixtures/php-settings-checker/actual-output
 
 .PHONY: e2e_symfony
 e2e_symfony:		 ## Packages a fresh Symfony app
@@ -271,7 +271,7 @@ e2e_symfony: fixtures/build/dir012/vendor box
 
 	php fixtures/build/dir012/bin/console.phar --version > fixtures/build/dir012/actual-output
 
-	diff fixtures/build/dir012/expected-output fixtures/build/dir012/actual-output
+	diff --side-by-side --suppress-common-lines fixtures/build/dir012/expected-output fixtures/build/dir012/actual-output
 
 .PHONY: e2e_composer_installed_versions
 e2e_composer_installed_versions:		 ## Packages an app using Composer\InstalledVersions
@@ -280,7 +280,7 @@ e2e_composer_installed_versions: fixtures/build/dir013/vendor box
 	
 	php fixtures/build/dir013/bin/run.phar > fixtures/build/dir013/actual-output
 
-	diff fixtures/build/dir013/expected-output fixtures/build/dir013/actual-output
+	diff --side-by-side --suppress-common-lines fixtures/build/dir013/expected-output fixtures/build/dir013/actual-output
 
 .PHONY: blackfire
 blackfire:		 ## Profiles the compile step
@@ -380,7 +380,7 @@ requirement-checker/tests/DisplayNormalizer.php: tests/Console/DisplayNormalizer
 	touch $@
 
 requirement-checker/actual_terminal_diff: requirement-checker/src/Terminal.php vendor/symfony/console/Terminal.php
-	(diff vendor/symfony/console/Terminal.php requirement-checker/src/Terminal.php || true) > requirement-checker/actual_terminal_diff
+	(diff --side-by-side --suppress-common-lines vendor/symfony/console/Terminal.php requirement-checker/src/Terminal.php || true) > requirement-checker/actual_terminal_diff
 
 tests/Console/DisplayNormalizer.php: vendor
 vendor/symfony/console/Terminal.php: vendor
