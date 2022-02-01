@@ -75,7 +75,7 @@ jobs:
                     # better portability.
                     ini-values: phar.readonly=0, display_errors=On, error_reporting=-1
                     tools: ${{ matrix.tools }}
-                    coverage: none
+                    coverage: pcov
                     extensions: ctype, iconv, xml
 
             -   name: Install Composer dependencies
@@ -86,5 +86,5 @@ jobs:
                 with:
                     working-directory: 'vendor-bin/requirement-checker'
 
-            -   name: Run infection
+            -   name: Run Infection
                 run: make tm
