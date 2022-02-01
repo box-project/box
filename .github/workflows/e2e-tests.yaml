@@ -10,7 +10,6 @@ on:
 env:
     # Comma-space separated list, e.g. '8.1, 8.2, 9.0'
     FUTURE_PHP_VERSION: '8.1'
-    COMPOSER_FLAGS: ''
 
 jobs:
     e2e-tests:
@@ -42,20 +41,27 @@ jobs:
                     tools: ${{ matrix.tools }}
                     coverage: pcov
 
-            # https://docs.github.com/en/actions/learn-github-actions/workflow-commands-for-github-actions#setting-an-environment-variable
-            -   name: Configure Composer platform flags
-                if: contains(env.FUTURE_PHP_VERSION, matrix.php)
-                run: echo "COMPOSER_FLAGS=--ignore-platform-req=php+" >> $GITHUB_ENV
-
             -   name: Install Composer dependencies
                 uses: ramsey/composer-install@v1
-                with:
-                    composer-options: "$COMPOSER_FLAGS"
+                if: !contains(env.FUTURE_PHP_VERSION, matrix.php)
 
             -   name: Install RequirementChecker Composer dependencies
                 uses: ramsey/composer-install@v1
+                if: !contains(env.FUTURE_PHP_VERSION, matrix.php)
                 with:
-                    composer-options: "$COMPOSER_FLAGS"
+                    working-directory: 'vendor-bin/requirement-checker'
+
+            -   name: Install Composer dependencies (ignore PHP platform req)
+                uses: ramsey/composer-install@v1
+                if: contains(env.FUTURE_PHP_VERSION, matrix.php)
+                with:
+                    composer-options: --ignore-platform-req=php+
+
+            -   name: Install RequirementChecker Composer dependencies (ignore PHP platform req)
+                uses: ramsey/composer-install@v1
+                if: contains(env.FUTURE_PHP_VERSION, matrix.php)
+                with:
+                    composer-options: --ignore-platform-req=php+
                     working-directory: 'vendor-bin/requirement-checker'
 
             -   name: Run e2e ${{ matrix.e2e }}
