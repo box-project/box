@@ -21,6 +21,14 @@ use Humbug\PhpScoper\Symbol\SymbolsRegistry;
  */
 final class NullScoper implements Scoper
 {
+    private SymbolsRegistry $symbolsRegistry;
+
+    public function __construct(?SymbolsRegistry $symbolsRegistry = null)
+    {
+        die('yo');
+        $this->symbolsRegistry = $symbolsRegistry ?? new SymbolsRegistry();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -34,6 +42,7 @@ final class NullScoper implements Scoper
      */
     public function changeSymbolsRegistry(SymbolsRegistry $symbolsRegistry): void
     {
+        $this->symbolsRegistry = $symbolsRegistry;
     }
 
     /**
@@ -41,7 +50,7 @@ final class NullScoper implements Scoper
      */
     public function getSymbolsRegistry(): SymbolsRegistry
     {
-        return new SymbolsRegistry();
+        return $this->symbolsRegistry;
     }
 
     /**

@@ -1383,19 +1383,20 @@ BANNER;
         }
 
         if (file_exists($vendorDir)) {
-            // The installed.json file is necessary for dumping the autoload correctly. Note however that it will not exists if no
-            // dependencies are included in the `composer.json`
-            $installedJsonFiles = self::normalizePath($vendorDir.'/composer/installed.json', $basePath);
+            // Note that some files may not exist. For example installed.json does not exist at all if no dependencies
+            // are included in composer.json.
+            $requiredComposerFiles = [
+                'installed.json',
+                'InstalledVersions.php',
+                'installed.php',
+            ];
 
-            if (file_exists($installedJsonFiles)) {
-                $filesToAppend[] = $installedJsonFiles;
-            }
+            foreach ($requiredComposerFiles as $requiredComposerFile) {
+                $normalizePath = self::normalizePath($vendorDir.'/composer/'.$requiredComposerFile, $basePath);
 
-            // The InstalledVersions.php file is necessary since Composer v2 adds it to the autoloader class map
-            $installedVersionsPhp = self::normalizePath($vendorDir.'/composer/InstalledVersions.php', $basePath);
-
-            if (file_exists($installedVersionsPhp)) {
-                $filesToAppend[] = $installedVersionsPhp;
+                if (file_exists($normalizePath)) {
+                    $filesToAppend[] = $normalizePath;
+                }
             }
 
             $vendorPackages = toArray(values(map(

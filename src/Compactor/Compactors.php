@@ -36,6 +36,8 @@ final class Compactors implements Compactor, Countable
             if ($compactor instanceof PhpScoper) {
                 $this->scoperCompactor = $compactor;
 
+                // We do not expect more than one Scoper Compactor. If there is more than
+                // one then the latter is ignored.
                 break;
             }
         }
