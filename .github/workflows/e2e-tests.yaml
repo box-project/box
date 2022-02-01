@@ -64,5 +64,8 @@ jobs:
                     composer-options: --ignore-platform-req=php+
                     working-directory: 'vendor-bin/requirement-checker'
 
+            -   run: touch -c composer.lock
+            -   run: touch -c requirement-checker/composer.lock
+
             -   name: Run e2e ${{ matrix.e2e }}
                 run: make ${{ matrix.e2e }}

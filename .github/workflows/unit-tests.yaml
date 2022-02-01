@@ -61,6 +61,9 @@ jobs:
                     composer-options: --ignore-platform-req=php+
                     working-directory: 'vendor-bin/requirement-checker'
 
+            -   run: touch -c composer.lock
+            -   run: touch -c requirement-checker/composer.lock
+
             -   name: validate box config
                 run: bin/box validate
 
