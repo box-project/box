@@ -90,13 +90,13 @@ e2e: e2e_php_settings_checker e2e_scoper_alias e2e_scoper_whitelist e2e_check_re
 .PHONY: e2e_scoper_alias
 e2e_scoper_alias: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the prefix alias is working
 e2e_scoper_alias: box
-	./box compile --working-dir fixtures/build/dir010
+	./box compile --working-dir=fixtures/build/dir010
 
 .PHONY: e2e_scoper_whitelist
 e2e_scoper_whitelist: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the whitelisting is working
 e2e_scoper_whitelist: box fixtures/build/dir011/vendor
 	php fixtures/build/dir011/index.php > fixtures/build/dir011/expected-output
-	./box compile --working-dir fixtures/build/dir011
+	./box compile --working-dir=fixtures/build/dir011
 
 	php fixtures/build/dir011/index.phar > fixtures/build/dir011/output
 	cd fixtures/build/dir011 && php -r "file_put_contents('phar-Y.php', file_get_contents((new Phar('index.phar'))['src/Y.php']));"
@@ -116,7 +116,7 @@ e2e_check_requirements: box .requirement-checker
 	# Pass no config
 	#
 
-	./box compile --working-dir fixtures/check-requirements/pass-no-config/
+	./box compile --working-dir=fixtures/check-requirements/pass-no-config/
 
 	# 5.3
 	sed "s/PHP_VERSION/$$($(DOCKER) box_php53 php -r 'echo PHP_VERSION;')/" \
@@ -140,7 +140,7 @@ e2e_check_requirements: box .requirement-checker
 	# Pass complete
 	#
 
-	./box compile --working-dir fixtures/check-requirements/pass-complete/
+	./box compile --working-dir=fixtures/check-requirements/pass-complete/
 
 	# 5.3
 	sed "s/PHP_VERSION/$$($(DOCKER) box_php53 php -r 'echo PHP_VERSION;')/" \
@@ -164,7 +164,7 @@ e2e_check_requirements: box .requirement-checker
 	# Fail complete
 	#
 
-	./box compile --working-dir fixtures/check-requirements/fail-complete/
+	./box compile --working-dir=fixtures/check-requirements/fail-complete/
 
 	# 5.3
 	sed "s/PHP_VERSION/$$($(DOCKER) box_php53 php -r 'echo PHP_VERSION;')/" \
@@ -188,7 +188,7 @@ e2e_check_requirements: box .requirement-checker
 	# Skip the requirement check
 	#
 
-	./box compile --working-dir fixtures/check-requirements/fail-complete/
+	./box compile --working-dir=fixtures/check-requirements/fail-complete/
 
 	sed "s/PHP_VERSION/$$($(DOCKER) box_php53 php -r 'echo PHP_VERSION;')/" \
 			fixtures/check-requirements/fail-complete/expected-output-53-dist-skipped \
@@ -262,12 +262,12 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 .PHONY: e2e_symfony
 e2e_symfony:		 ## Packages a fresh Symfony app
 e2e_symfony: fixtures/build/dir012/vendor box
-	composer dump-env prod --working-dir fixtures/build/dir012
+	composer dump-env prod --working-dir=fixtures/build/dir012
 
 	php fixtures/build/dir012/bin/console --version > fixtures/build/dir012/expected-output
 	rm -rf fixtures/build/dir012/var/cache/prod/*
 
-	./box compile --working-dir fixtures/build/dir012
+	./box compile --working-dir=fixtures/build/dir012
 
 	php fixtures/build/dir012/bin/console.phar --version > fixtures/build/dir012/actual-output
 
@@ -276,7 +276,7 @@ e2e_symfony: fixtures/build/dir012/vendor box
 .PHONY: e2e_composer_installed_versions
 e2e_composer_installed_versions:		 ## Packages an app using Composer\InstalledVersions
 e2e_composer_installed_versions: fixtures/build/dir013/vendor box
-	./box compile --working-dir fixtures/build/dir013
+	./box compile --working-dir=fixtures/build/dir013
 	
 	php fixtures/build/dir013/bin/run.phar > fixtures/build/dir013/actual-output
 
@@ -301,7 +301,7 @@ composer.lock: composer.json
 	touch $@
 
 requirement-checker/composer.lock: requirement-checker/composer.json
-	composer install --working-dir requirement-checker
+	composer install --working-dir=requirement-checker
 	touch $@
 
 vendor: composer.lock
@@ -317,11 +317,11 @@ bin/phpunit: composer.lock
 	touch $@
 
 requirement-checker/bin/phpunit: requirement-checker/composer.lock
-	composer install --working-dir requirement-checker
+	composer install --working-dir=requirement-checker
 	touch $@
 
 requirement-checker/vendor: requirement-checker/composer.json
-	composer install --working-dir requirement-checker
+	composer install --working-dir=requirement-checker
 	touch $@
 
 $(PHP_CS_FIXER): vendor/bamarni
@@ -341,31 +341,31 @@ $(INFECTION): vendor/bamarni
 	touch $@
 
 fixtures/composer-dump/dir001/composer.lock: fixtures/composer-dump/dir001/composer.json
-	composer install --working-dir fixtures/composer-dump/dir001
+	composer install --working-dir=fixtures/composer-dump/dir001
 	touch $@
 
 fixtures/composer-dump/dir003/composer.lock: fixtures/composer-dump/dir003/composer.json
-	composer install --working-dir fixtures/composer-dump/dir003
+	composer install --working-dir=fixtures/composer-dump/dir003
 	touch $@
 
 fixtures/composer-dump/dir001/vendor: fixtures/composer-dump/dir001/composer.lock
-	composer install --working-dir fixtures/composer-dump/dir001
+	composer install --working-dir=fixtures/composer-dump/dir001
 	touch $@
 
 fixtures/composer-dump/dir003/vendor: fixtures/composer-dump/dir003/composer.lock
-	composer install --working-dir fixtures/composer-dump/dir003
+	composer install --working-dir=fixtures/composer-dump/dir003
 	touch $@
 
 fixtures/build/dir011/vendor:
-	composer install --working-dir fixtures/build/dir011
+	composer install --working-dir=fixtures/build/dir011
 	touch $@
 
 fixtures/build/dir012/vendor:
-	composer install --working-dir fixtures/build/dir012
+	composer install --working-dir=fixtures/build/dir012
 	touch $@
 
 fixtures/build/dir013/vendor:
-	composer install --working-dir fixtures/build/dir013
+	composer install --working-dir=fixtures/build/dir013
 	touch $@
 
 .PHONY: fixtures/default_stub.php
@@ -405,7 +405,7 @@ box: bin src res vendor box.json.dist scoper.inc.php .requirement-checker
 	touch $@
 
 requirement-checker/bin/check-requirements.phar: requirement-checker/src requirement-checker/bin/check-requirements.php requirement-checker/box.json.dist requirement-checker/scoper.inc.php requirement-checker/vendor
-	bin/box compile --working-dir requirement-checker
+	bin/box compile --working-dir=requirement-checker
 	touch $@
 
 .PHONY: docker-images
