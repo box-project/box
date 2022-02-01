@@ -41,7 +41,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": "^7.3 || ^8.0",
+        "php": "^7.4 || ^8.0",
         "ext-phar": "*",
         "composer-plugin-api": "^2.2",
         "amphp/parallel-functions": "^1.0",
@@ -79,7 +79,7 @@
     "config": {
         "bin-dir": "bin",
         "platform": {
-            "php": "7.3"
+            "php": "7.4"
         },
         "platform-check": false,
         "sort-packages": true,
