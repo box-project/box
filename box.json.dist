@@ -9,6 +9,9 @@
         "with this source code in the file LICENSE."
     ],
 
+    "files-bin": [
+        "fix-composer.php"
+    ],
     "files": [
         "res/schema.json"
     ],
