@@ -10,6 +10,7 @@ on:
 env:
     # Comma-space separated list, e.g. '8.1, 8.2, 9.0'
     FUTURE_PHP_VERSION: '8.1'
+    COMPOSER_FLAGS: ''
 
 jobs:
     e2e-tests:
