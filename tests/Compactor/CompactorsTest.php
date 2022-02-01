@@ -106,8 +106,6 @@ class CompactorsTest extends TestCase
     {
         $actual = (new Compactors(...$compactors))->getScoperSymbolsRegistry();
 
-        dump($actual, $expected);die;
-
         $this->assertSame($expected, $actual);
     }
 
@@ -144,15 +142,15 @@ class CompactorsTest extends TestCase
         $symbolsRegistry1 = new SymbolsRegistry();
         $symbolsRegistry2 = new SymbolsRegistry();
 
-//        yield [
-//            [],
-//            null,
-//        ];
-//
-//        yield [
-//            [new FakeCompactor()],
-//            null,
-//        ];
+        yield [
+            [],
+            null,
+        ];
+
+        yield [
+            [new FakeCompactor()],
+            null,
+        ];
 
         yield [
             [

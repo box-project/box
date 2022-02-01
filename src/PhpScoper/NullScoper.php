@@ -25,7 +25,6 @@ final class NullScoper implements Scoper
 
     public function __construct(?SymbolsRegistry $symbolsRegistry = null)
     {
-        die('yo');
         $this->symbolsRegistry = $symbolsRegistry ?? new SymbolsRegistry();
     }
 

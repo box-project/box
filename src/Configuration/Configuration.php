@@ -31,6 +31,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use function defined;
 use function dirname;
+use function str_starts_with;
 use const E_USER_DEPRECATED;
 use function explode;
 use function file_exists;
@@ -1387,8 +1388,8 @@ BANNER;
             // are included in composer.json.
             $requiredComposerFiles = [
                 'installed.json',
-                'InstalledVersions.php',
                 'installed.php',
+                'InstalledVersions.php',
             ];
 
             foreach ($requiredComposerFiles as $requiredComposerFile) {
@@ -2830,7 +2831,9 @@ BANNER;
         string $basePath,
         ConfigurationLogger $logger
     ): Compactor {
-        $phpScoperConfig = self::retrievePhpScoperConfig($raw, $basePath, $logger);
+        $phpScoperConfig = self::configurePhpScoperPrefix(
+            self::retrievePhpScoperConfig($raw, $basePath, $logger),
+        );
 
         $whitelistedFiles = array_values(
             array_unique(
@@ -2847,6 +2850,26 @@ BANNER;
 
         return new PhpScoperCompactor(
             new SimpleScoper($phpScoperConfig, ...$whitelistedFiles)
+        );
+    }
+
+    private static function configurePhpScoperPrefix(PhpScoperConfiguration $phpScoperConfig): PhpScoperConfiguration
+    {
+        $prefix = $phpScoperConfig->getPrefix();
+
+        if (!str_starts_with($prefix, '_PhpScoper')) {
+            return $phpScoperConfig;
+        }
+
+        // TODO: provide easier way to change the prefix
+        //  https://github.com/humbug/php-scoper/issues/616
+        return new PhpScoperConfiguration(
+            $phpScoperConfig->getPath(),
+            unique_id('_HumbugBox'),
+            $phpScoperConfig->getFilesWithContents(),
+            $phpScoperConfig->getExcludedFilesWithContents(),
+            $phpScoperConfig->getPatcher(),
+            $phpScoperConfig->getSymbolsConfiguration(),
         );
     }
 

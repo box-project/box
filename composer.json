@@ -75,6 +75,9 @@
     "suggest": {
         "ext-openssl": "To accelerate private key generation."
     },
+    "scripts": {
+        "post-autoload-dump": "@php fix-composer.php"
+    },
 
     "config": {
         "bin-dir": "bin",

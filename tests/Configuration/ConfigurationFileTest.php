@@ -18,7 +18,7 @@ use function chdir;
 use const DIRECTORY_SEPARATOR;
 use function file_get_contents;
 use Generator;
-use function Humbug\PhpScoper\json_decode;
+use function Safe\json_decode;
 use InvalidArgumentException;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_absolute;

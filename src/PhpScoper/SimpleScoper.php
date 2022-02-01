@@ -38,11 +38,11 @@ final class SimpleScoper implements Scoper
     /**
      * @var list<string>
      */
-    private array $whitelistedFilePaths;
+    private array $excludedFilePaths;
 
     public function __construct(
         PhpScoperConfiguration $scoperConfig,
-        string ...$whitelistedFilePaths
+        string ...$excludedFilePaths
     ) {
         $this->scoperConfig = new PhpScoperConfiguration(
             $scoperConfig->getPath(),
@@ -52,7 +52,7 @@ final class SimpleScoper implements Scoper
             self::createSerializablePatchers($scoperConfig->getPatcher()),
             $scoperConfig->getSymbolsConfiguration(),
         );
-        $this->whitelistedFilePaths = $whitelistedFilePaths;
+        $this->excludedFilePaths = $excludedFilePaths;
         $this->symbolsRegistry = new SymbolsRegistry();
     }
 
@@ -110,10 +110,10 @@ final class SimpleScoper implements Scoper
                 $this->symbolsRegistry,
             );
 
-        if (0 !== count($this->whitelistedFilePaths)) {
+        if (0 !== count($this->excludedFilePaths)) {
             $scoper = new FileWhitelistScoper(
                 $scoper,
-                ...$this->whitelistedFilePaths,
+                ...$this->excludedFilePaths,
             );
         }
 
