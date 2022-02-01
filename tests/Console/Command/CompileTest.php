@@ -30,7 +30,6 @@ use function json_decode;
 use function json_encode;
 use const JSON_PRETTY_PRINT;
 use KevinGH\Box\Compactor\Php;
-use KevinGH\Box\Composer\ComposerOrchestrator;
 use KevinGH\Box\Console\DisplayNormalizer;
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -308,7 +307,6 @@ PHP;
             '/vendor/composer/autoload_real.php',
             '/vendor/composer/autoload_static.php',
         ];
-
 
         $actualFiles = $this->retrievePharFiles($phar);
 
