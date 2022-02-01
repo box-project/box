@@ -184,7 +184,6 @@ return [
         },
     ],
     'whitelist' => [
-        '\Symfony\Polyfill\*',
         \Composer\Autoload\ClassLoader::class,
 
         \KevinGH\Box\Compactor\Compactor::class,
@@ -193,6 +192,9 @@ return [
         \Herrera\Box\Compactor\Php::class,
         \KevinGH\Box\Compactor\Php::class,
         \KevinGH\Box\Compactor\PhpScoper::class,
+
+        // see: https://github.com/humbug/php-scoper/issues/440
+        'Symfony\\Polyfill\\*',
 
         // Hoa symbols
         'SUCCEED',
