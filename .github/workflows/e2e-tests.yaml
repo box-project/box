@@ -1,0 +1,71 @@
+name: End-to-End Tests
+
+on:
+    push:
+        branches: [ master ]
+    pull_request:
+    release:
+        types: [ created ]
+
+env:
+    # Comma-space separated list, e.g. '8.1, 8.2, 9.0'
+    FUTURE_PHP_VERSION: '8.1'
+
+jobs:
+    e2e-tests:
+        runs-on: ubuntu-latest
+        name: "e2e-Tests: ${{ matrix.e2e }} - ${{ matrix.php }} - ${{ matrix.tools }}"
+        strategy:
+            fail-fast: false
+            matrix:
+                e2e:
+                    - 'e2e_php_settings_checker'
+                    - 'e2e_scoper_alias'
+                    - 'e2e_scoper_whitelist'
+                    - 'e2e_check_requirements'
+                    - 'e2e_symfony'
+                    - 'e2e_composer_installed_versions'
+                php: [ '7.4', '8.0', '8.1' ]
+                tools: [ 'composer:v2' ]
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v2
+                with:
+                    fetch-depth: 0
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ matrix.php }}
+                    ini-values: 'phar.readonly=0, display_errors=On, error_reporting=-1'
+                    tools: ${{ matrix.tools }}
+                    coverage: pcov
+
+            -   name: Install Composer dependencies
+                uses: ramsey/composer-install@v1
+                if: contains(env.FUTURE_PHP_VERSION, matrix.php) != true
+
+            -   name: Install RequirementChecker Composer dependencies
+                uses: ramsey/composer-install@v1
+                if: contains(env.FUTURE_PHP_VERSION, matrix.php) != true
+                with:
+                    working-directory: 'vendor-bin/requirement-checker'
+
+            -   name: Install Composer dependencies (ignore PHP platform req)
+                uses: ramsey/composer-install@v1
+                if: contains(env.FUTURE_PHP_VERSION, matrix.php)
+                with:
+                    composer-options: --ignore-platform-req=php+
+
+            -   name: Install RequirementChecker Composer dependencies (ignore PHP platform req)
+                uses: ramsey/composer-install@v1
+                if: contains(env.FUTURE_PHP_VERSION, matrix.php)
+                with:
+                    composer-options: --ignore-platform-req=php+
+                    working-directory: 'vendor-bin/requirement-checker'
+
+            -   name: Ensure the Makefile does not run the Composer install command a 2nd time
+                run: touch -c composer.lock vendor requirement-checker/composer.lock requirement-checker/vendor
+
+            -   name: Run e2e ${{ matrix.e2e }}
+                run: make ${{ matrix.e2e }}
