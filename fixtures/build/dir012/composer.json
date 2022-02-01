@@ -8,7 +8,7 @@
         "symfony/console": "5.2.*",
         "symfony/dotenv": "5.2.*",
         "symfony/flex": "^1.9",
-        "symfony/framework-bundle": "5.2.*",
+        "symfony/framework-bundle": "5.3.*",
         "symfony/yaml": "5.2.*"
     },
     "config": {
