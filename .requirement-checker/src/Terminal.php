@@ -1,6 +1,6 @@
 <?php
 
-namespace HumbugBox3140\KevinGH\RequirementChecker;
+namespace HumbugBox3141\KevinGH\RequirementChecker;
 
 class Terminal
 {
