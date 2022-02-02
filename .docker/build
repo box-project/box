@@ -8,13 +8,13 @@ readonly DOCKER=$(which docker)
 # PWD
 
 if [[ "$(docker images -q box_php53 2> /dev/null)" == "" ]]; then
-    $DOCKER build -t box_php53 -f "$PWD/.docker/php53" .
+    $DOCKER build --platform=linux/amd64 --tag=box_php53 --file "$PWD/.docker/php53" .
 fi
 
-if [[ "$(docker images -q box_php73 2> /dev/null)" == "" ]]; then
-    $DOCKER build -t box_php73 -f "$PWD/.docker/php73" .
+if [[ "$(docker images -q box_php74 2> /dev/null)" == "" ]]; then
+    $DOCKER build --platform=linux/amd64 --tag=box_php74 --file "$PWD/.docker/php74" .
 fi
 
-if [[ "$(docker images -q box_php73_xdebug 2> /dev/null)" == "" ]]; then
-    $DOCKER build -t box_php73_xdebug -f "$PWD/.docker/php73_xdebug" .
+if [[ "$(docker images -q box_php74_xdebug 2> /dev/null)" == "" ]]; then
+    $DOCKER build --platform=linux/amd64 --tag=box_php74_xdebug --file "$PWD/.docker/php74_xdebug" .
 fi

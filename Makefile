@@ -85,16 +85,16 @@ tm:	$(TU_BOX_DEPS) $(INFECTION)
 
 .PHONY: e2e
 e2e:			 ## Runs all the end-to-end tests
-e2e: e2e_php_settings_checker e2e_scoper_alias e2e_scoper_whitelist e2e_check_requirements e2e_symfony e2e_composer_installed_versions
+e2e: e2e_php_settings_checker e2e_scoper_alias e2e_scoper_expose_symbols e2e_check_requirements e2e_symfony e2e_composer_installed_versions
 
 .PHONY: e2e_scoper_alias
 e2e_scoper_alias: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the prefix alias is working
 e2e_scoper_alias: box
 	./box compile --working-dir=fixtures/build/dir010
 
-.PHONY: e2e_scoper_whitelist
-e2e_scoper_whitelist: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the whitelisting is working
-e2e_scoper_whitelist: box fixtures/build/dir011/vendor
+.PHONY: e2e_scoper_expose_symbols
+e2e_scoper_expose_symbols: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the symbols exposure is working
+e2e_scoper_expose_symbols: box fixtures/build/dir011/vendor
 	php fixtures/build/dir011/index.php > fixtures/build/dir011/expected-output
 	./box compile --working-dir=fixtures/build/dir011
 
@@ -105,9 +105,12 @@ e2e_scoper_whitelist: box fixtures/build/dir011/vendor
 	diff --side-by-side --suppress-common-lines fixtures/build/dir011/phar-Y.php fixtures/build/dir011/src/Y.php
 
 .PHONY: e2e_check_requirements
-DOCKER=docker run -i --rm -w /opt/box
-PHP7PHAR=box_php73 php index.phar -vvv --no-ansi
-PHP5PHAR=box_php53 php index.phar -vvv --no-ansi
+DOCKER=docker run -i --platform linux/amd64 --rm -w /opt/box
+PHP5_BOX=box_php53
+PHP5_PHAR=$(PHP5_BOX) php index.phar -vvv --no-ansi
+MIN_SUPPORTED_PHP_BOX=box_php74
+MIN_SUPPORTED_PHP_WITH_XDEBUG_BOX=box_php74_xdebug
+MIN_SUPPORTED_PHP_PHAR=$(MIN_SUPPORTED_PHP_BOX) php index.phar -vvv --no-ansi
 e2e_check_requirements:	 ## Runs the end-to-end tests for the check requirements feature
 e2e_check_requirements: box .requirement-checker
 	./.docker/build
@@ -119,22 +122,22 @@ e2e_check_requirements: box .requirement-checker
 	./box compile --working-dir=fixtures/check-requirements/pass-no-config/
 
 	# 5.3
-	sed "s/PHP_VERSION/$$($(DOCKER) box_php53 php -r 'echo PHP_VERSION;')/" \
+	sed "s/PHP_VERSION/$$($(DOCKER) $(PHP5_BOX) php -r 'echo PHP_VERSION;')/" \
 		fixtures/check-requirements/pass-no-config/expected-output-53-dist \
 		> fixtures/check-requirements/pass-no-config/expected-output-53
 
 	rm fixtures/check-requirements/pass-no-config/actual-output || true
-	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-no-config":/opt/box $(PHP5PHAR) | tee fixtures/check-requirements/pass-no-config/actual-output
+	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-no-config":/opt/box $(PHP5_PHAR) | tee fixtures/check-requirements/pass-no-config/actual-output
 	diff --side-by-side --suppress-common-lines fixtures/check-requirements/pass-no-config/expected-output-53 fixtures/check-requirements/pass-no-config/actual-output
 
-	# 7.2
-	sed "s/PHP_VERSION/$$($(DOCKER) box_php73 php -r 'echo PHP_VERSION;')/" \
-		fixtures/check-requirements/pass-no-config/expected-output-73-dist \
-		> fixtures/check-requirements/pass-no-config/expected-output-73
+	# Current min version
+	sed "s/PHP_VERSION/$$($(DOCKER) $(MIN_SUPPORTED_PHP_BOX) php -r 'echo PHP_VERSION;')/" \
+		fixtures/check-requirements/pass-no-config/expected-output-current-min-php-dist \
+		> fixtures/check-requirements/pass-no-config/expected-output-current-min-php
 
 	rm fixtures/check-requirements/pass-no-config/actual-output || true
-	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-no-config":/opt/box $(PHP7PHAR) | tee fixtures/check-requirements/pass-no-config/actual-output
-	diff --side-by-side --suppress-common-lines fixtures/check-requirements/pass-no-config/expected-output-73 fixtures/check-requirements/pass-no-config/actual-output
+	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-no-config":/opt/box $(MIN_SUPPORTED_PHP_PHAR) | tee fixtures/check-requirements/pass-no-config/actual-output
+	diff --side-by-side --suppress-common-lines fixtures/check-requirements/pass-no-config/expected-output-current-min-php fixtures/check-requirements/pass-no-config/actual-output
 
 	#
 	# Pass complete
@@ -143,22 +146,22 @@ e2e_check_requirements: box .requirement-checker
 	./box compile --working-dir=fixtures/check-requirements/pass-complete/
 
 	# 5.3
-	sed "s/PHP_VERSION/$$($(DOCKER) box_php53 php -r 'echo PHP_VERSION;')/" \
+	sed "s/PHP_VERSION/$$($(DOCKER) $(PHP5_BOX) php -r 'echo PHP_VERSION;')/" \
 		fixtures/check-requirements/pass-complete/expected-output-53-dist \
 		> fixtures/check-requirements/pass-complete/expected-output-53
 
 	rm fixtures/check-requirements/pass-complete/actual-output || true
-	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-complete":/opt/box $(PHP5PHAR) | tee fixtures/check-requirements/pass-complete/actual-output
+	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-complete":/opt/box $(PHP5_PHAR) | tee fixtures/check-requirements/pass-complete/actual-output
 	diff --side-by-side --suppress-common-lines fixtures/check-requirements/pass-complete/expected-output-53 fixtures/check-requirements/pass-complete/actual-output
 
-	# 7.2
-	sed "s/PHP_VERSION/$$($(DOCKER) box_php73 php -r 'echo PHP_VERSION;')/" \
-		fixtures/check-requirements/pass-complete/expected-output-73-dist \
-		> fixtures/check-requirements/pass-complete/expected-output-73
+	# Current min version
+	sed "s/PHP_VERSION/$$($(DOCKER) $(MIN_SUPPORTED_PHP_BOX) php -r 'echo PHP_VERSION;')/" \
+		fixtures/check-requirements/pass-complete/expected-output-current-min-php-dist \
+		> fixtures/check-requirements/pass-complete/expected-output-current-min-php
 
 	rm fixtures/check-requirements/pass-complete/actual-output || true
-	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-complete":/opt/box $(PHP7PHAR) | tee fixtures/check-requirements/pass-complete/actual-output
-	diff --side-by-side --suppress-common-lines fixtures/check-requirements/pass-complete/expected-output-73 fixtures/check-requirements/pass-complete/actual-output
+	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-complete":/opt/box $(MIN_SUPPORTED_PHP_PHAR) | tee fixtures/check-requirements/pass-complete/actual-output
+	diff --side-by-side --suppress-common-lines fixtures/check-requirements/pass-complete/expected-output-current-min-php fixtures/check-requirements/pass-complete/actual-output
 
 	#
 	# Fail complete
@@ -167,22 +170,22 @@ e2e_check_requirements: box .requirement-checker
 	./box compile --working-dir=fixtures/check-requirements/fail-complete/
 
 	# 5.3
-	sed "s/PHP_VERSION/$$($(DOCKER) box_php53 php -r 'echo PHP_VERSION;')/" \
+	sed "s/PHP_VERSION/$$($(DOCKER) $(PHP5_BOX) php -r 'echo PHP_VERSION;')/" \
     		fixtures/check-requirements/fail-complete/expected-output-53-dist \
     		> fixtures/check-requirements/fail-complete/expected-output-53
 
 	rm fixtures/check-requirements/fail-complete/actual-output || true
-	$(DOCKER) -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP5PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
+	$(DOCKER) -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP5_PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
 	diff --side-by-side --suppress-common-lines fixtures/check-requirements/fail-complete/expected-output-53 fixtures/check-requirements/fail-complete/actual-output
 
 	# 7.2
-	sed "s/PHP_VERSION/$$($(DOCKER) box_php73 php -r 'echo PHP_VERSION;')/" \
-		fixtures/check-requirements/fail-complete/expected-output-73-dist \
-		> fixtures/check-requirements/fail-complete/expected-output-73
+	sed "s/PHP_VERSION/$$($(DOCKER) $(MIN_SUPPORTED_PHP_BOX) php -r 'echo PHP_VERSION;')/" \
+		fixtures/check-requirements/fail-complete/expected-output-current-min-php-dist \
+		> fixtures/check-requirements/fail-complete/expected-output-current-min-php
 
 	rm fixtures/check-requirements/fail-complete/actual-output || true
-	$(DOCKER) -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP7PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
-	diff --side-by-side --suppress-common-lines fixtures/check-requirements/fail-complete/expected-output-73 fixtures/check-requirements/fail-complete/actual-output
+	$(DOCKER) -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(MIN_SUPPORTED_PHP_PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
+	diff --side-by-side --suppress-common-lines fixtures/check-requirements/fail-complete/expected-output-current-min-php fixtures/check-requirements/fail-complete/actual-output
 
 	#
 	# Skip the requirement check
@@ -190,12 +193,12 @@ e2e_check_requirements: box .requirement-checker
 
 	./box compile --working-dir=fixtures/check-requirements/fail-complete/
 
-	sed "s/PHP_VERSION/$$($(DOCKER) box_php53 php -r 'echo PHP_VERSION;')/" \
+	sed "s/PHP_VERSION/$$($(DOCKER) $(PHP5_BOX) php -r 'echo PHP_VERSION;')/" \
 			fixtures/check-requirements/fail-complete/expected-output-53-dist-skipped \
 			> fixtures/check-requirements/fail-complete/expected-output-53
 
 	rm fixtures/check-requirements/fail-complete/actual-output || true
-	$(DOCKER) -e BOX_REQUIREMENT_CHECKER=0 -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP5PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
+	$(DOCKER) -e BOX_REQUIREMENT_CHECKER=0 -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP5_PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
 	diff --side-by-side --suppress-common-lines fixtures/check-requirements/fail-complete/expected-output-53 fixtures/check-requirements/fail-complete/actual-output
 
 BOX_COMPILE=./box compile --working-dir=fixtures/php-settings-checker -vvv --no-ansi
@@ -208,7 +211,7 @@ endif
 e2e_php_settings_checker: ## Runs the end-to-end tests for the PHP settings handler
 e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xdebug-enabled vendor box
 	@echo "$(CCYELLOW)No restart needed$(CCEND)"
-	$(DOCKER) -v "$$PWD":/opt/box box_php73 \
+	$(DOCKER) -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX) \
 		php -dphar.readonly=0 -dmemory_limit=-1 \
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
@@ -217,7 +220,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 	diff --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-all-clear fixtures/php-settings-checker/actual-output
 
 	@echo "$(CCYELLOW)Xdebug enabled: restart needed$(CCEND)"
-	$(DOCKER) -v "$$PWD":/opt/box box_php73_xdebug \
+	$(DOCKER) -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX)_xdebug \
 		php -dphar.readonly=0 -dmemory_limit=-1 \
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
@@ -227,7 +230,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 	diff --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-xdebug-enabled fixtures/php-settings-checker/actual-output
 
 	@echo "$(CCYELLOW)phar.readonly enabled: restart needed$(CCEND)"
-	$(DOCKER) -v "$$PWD":/opt/box box_php73 \
+	$(DOCKER) -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX) \
 		php -dphar.readonly=1 -dmemory_limit=-1 \
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
@@ -238,7 +241,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 	diff --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-pharreadonly-enabled fixtures/php-settings-checker/actual-output
 
 	@echo "$(CCYELLOW)Bump min memory limit if necessary (limit lower than default)$(CCEND)"
-	$(DOCKER) -v "$$PWD":/opt/box box_php73 \
+	$(DOCKER) -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX) \
 		php -dphar.readonly=0 -dmemory_limit=124M \
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
@@ -249,7 +252,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 	diff --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-min-memory-limit fixtures/php-settings-checker/actual-output
 
 	@echo "$(CCYELLOW)Bump min memory limit if necessary (limit higher than default)$(CCEND)"
-	$(DOCKER) -e BOX_MEMORY_LIMIT=64M -v "$$PWD":/opt/box box_php73 \
+	$(DOCKER) -e BOX_MEMORY_LIMIT=64M -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX) \
 		php -dphar.readonly=0 -dmemory_limit=1024M \
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
@@ -413,5 +416,5 @@ docker-images:
 	./.docker/build
 
 fixtures/php-settings-checker/output-xdebug-enabled: fixtures/php-settings-checker/output-xdebug-enabled.tpl docker-images
-	./fixtures/php-settings-checker/create-expected-output
+	./fixtures/php-settings-checker/create-expected-output $(MIN_SUPPORTED_PHP_WITH_XDEBUG_BOX)
 	touch $@

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Configuration;
 
+use Throwable;
 use function array_diff;
 use function array_filter;
 use function array_flip;
@@ -2692,13 +2693,11 @@ BANNER;
     {
         self::checkIfDefaultValue($logger, $raw, self::PHP_SCOPER_KEY, self::PHP_SCOPER_CONFIG);
 
-        $configFactory = (new Container())->getConfigurationFactory();
-
         if (!isset($raw->{self::PHP_SCOPER_KEY})) {
             $configFilePath = make_path_absolute(self::PHP_SCOPER_CONFIG, $basePath);
             $configFilePath = file_exists($configFilePath) ? $configFilePath : null;
 
-            return $configFactory->create($configFilePath);
+            return self::createPhpScoperConfig($configFilePath);
         }
 
         $configFile = $raw->{self::PHP_SCOPER_KEY};
@@ -2710,7 +2709,26 @@ BANNER;
         Assert::file($configFilePath);
         Assert::readable($configFilePath);
 
-        return $configFactory->create($configFilePath);
+        return self::createPhpScoperConfig($configFilePath);
+    }
+
+    private static function createPhpScoperConfig(?string $filePath): PhpScoperConfiguration
+    {
+        $configFactory = (new Container())->getConfigurationFactory();
+
+        try {
+            return $configFactory->create($filePath);
+        } catch (Throwable $throwable) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Could not create a PHP-Scoper config from the file "%s": %s',
+                    $filePath,
+                    $throwable->getMessage(),
+                ),
+                $throwable->getCode(),
+                $throwable,
+            );
+        }
     }
 
     /**

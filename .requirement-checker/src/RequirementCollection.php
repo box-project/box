@@ -1,11 +1,11 @@
 <?php
 
-namespace HumbugBox3140\KevinGH\RequirementChecker;
+namespace HumbugBox3141\KevinGH\RequirementChecker;
 
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
-use HumbugBox3140\ReturnTypeWillChange;
+use ReturnTypeWillChange;
 use Traversable;
 final class RequirementCollection implements IteratorAggregate, Countable
 {
