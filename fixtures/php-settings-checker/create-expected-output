@@ -2,8 +2,13 @@
 
 set -Eeuox pipefail
 
+# Generates the file with the expected output based on the template,
+# replacing the placeholders of the template by the desired values.
+#
+# Should only be called by the Makefile.
+
 readonly OS=$(uname);
-readonly XDEBUG_VERSION=$(docker run -i --rm -w /opt/box box_php73_xdebug php -r "echo phpversion('xdebug');");
+readonly XDEBUG_VERSION=$(docker run -i --rm -w /opt/box $1 php -r "echo phpversion('xdebug');");
 readonly CURRENT_DIR=$(dirname $0);
 readonly TEMPLATE_FILE="${CURRENT_DIR}/output-xdebug-enabled.tpl";
 readonly DUMPED_FILE="${CURRENT_DIR}/output-xdebug-enabled";

@@ -13,6 +13,6 @@ declare(strict_types=1);
  */
 
 return [
-    'whitelist' => ['Foo\back'],
-    'files-whitelist' => ['src/Y.php'],
+    'exclude-files' => ['src/Y.php'],
+    'expose-functions' => ['Foo\back'],
 ];
