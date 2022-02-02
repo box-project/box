@@ -25,6 +25,8 @@ use function defined;
 use ErrorException;
 use function floor;
 use function function_exists;
+use function is_float;
+use function is_int;
 use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Console\Php\PhpSettingsHandler;
 use function KevinGH\Box\FileSystem\copy;
@@ -114,9 +116,13 @@ function get_phar_signing_algorithms(): array
 
 /**
  * @private
+ *
+ * @param float|int $size
  */
-function format_size(int $size, int $decimals = 2): string
+function format_size($size, int $decimals = 2): string
 {
+    Assert::true(is_int($size) || is_float($size));
+
     if (-1 === $size) {
         return '-1';
     }
@@ -139,8 +145,10 @@ function format_size(int $size, int $decimals = 2): string
 
 /**
  * @private
+ *
+ * @return float|int
  */
-function memory_to_bytes(string $value): int
+function memory_to_bytes(string $value)
 {
     $unit = strtolower($value[strlen($value) - 1]);
 
