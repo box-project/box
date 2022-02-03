@@ -23,7 +23,7 @@ use Humbug\PhpScoper\Patcher\PatcherChain;
 use Humbug\PhpScoper\Scoper\FileWhitelistScoper;
 use Humbug\PhpScoper\Scoper\Scoper as PhpScoper;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-use Opis\Closure\SerializableClosure;
+use Laravel\SerializableClosure\SerializableClosure;
 
 /**
  * @private
@@ -125,7 +125,7 @@ final class SimpleScoper implements Scoper
     /**
      * @param callable[] $patcher
      *
-     * @retunr SerializableClosure[]
+     * @return SerializableClosure[]
      */
     private static function createSerializablePatchers(Patcher $patcher): Patcher
     {
