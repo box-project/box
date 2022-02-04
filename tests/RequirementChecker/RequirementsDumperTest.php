@@ -113,7 +113,7 @@ PHP
                     [
                         'name' => 'acme/foo',
                         'require' => [
-                            'php' => '^7.3',
+                            'php' => '^7.4',
                             'ext-json' => '*',
                         ],
                     ],
@@ -127,9 +127,9 @@ return array (
   0 =>
   array (
     'type' => 'php',
-    'condition' => '^7.3',
-    'message' => 'The package "acme/foo" requires the version "^7.3" or greater.',
-    'helpMessage' => 'The package "acme/foo" requires the version "^7.3" or greater.',
+    'condition' => '^7.4',
+    'message' => 'The package "acme/foo" requires the version "^7.4" or greater.',
+    'helpMessage' => 'The package "acme/foo" requires the version "^7.4" or greater.',
   ),
   1 =>
   array (

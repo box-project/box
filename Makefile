@@ -178,7 +178,7 @@ e2e_check_requirements: box .requirement-checker
 	$(DOCKER) -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP5_PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
 	diff --side-by-side --suppress-common-lines fixtures/check-requirements/fail-complete/expected-output-53 fixtures/check-requirements/fail-complete/actual-output
 
-	# 7.2
+	# Current min version
 	sed "s/PHP_VERSION/$$($(DOCKER) $(MIN_SUPPORTED_PHP_BOX) php -r 'echo PHP_VERSION;')/" \
 		fixtures/check-requirements/fail-complete/expected-output-current-min-php-dist \
 		> fixtures/check-requirements/fail-complete/expected-output-current-min-php
