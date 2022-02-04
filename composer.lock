@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1201edcd98402e5e9af0ab411bf3a5aa",
+    "content-hash": "86e12e0b29d2789f01091d884f7a40bb",
     "packages": [
         {
             "name": "amphp/amp",
@@ -248,21 +248,22 @@
         },
         {
             "name": "amphp/parallel-functions",
-            "version": "dev-master",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/parallel-functions.git",
-                "reference": "221ee7cc8b6f114955bd1a3eab722f3d896a5540"
+                "reference": "04e92fcacfc921a56dfe12c23b3265e62593a7cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/parallel-functions/zipball/221ee7cc8b6f114955bd1a3eab722f3d896a5540",
-                "reference": "221ee7cc8b6f114955bd1a3eab722f3d896a5540",
+                "url": "https://api.github.com/repos/amphp/parallel-functions/zipball/04e92fcacfc921a56dfe12c23b3265e62593a7cb",
+                "reference": "04e92fcacfc921a56dfe12c23b3265e62593a7cb",
                 "shasum": ""
             },
             "require": {
                 "amphp/amp": "^2.0.3",
-                "amphp/parallel": "^1.1",
+                "amphp/parallel": "^1.4",
+                "amphp/serialization": "^1.0",
                 "laravel/serializable-closure": "^1.0",
                 "php": ">=7.4"
             },
@@ -271,7 +272,6 @@
                 "amphp/phpunit-util": "^2.0",
                 "phpunit/phpunit": "^9.5.11"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "files": [
@@ -294,7 +294,7 @@
             "description": "Parallel processing made simple.",
             "support": {
                 "issues": "https://github.com/amphp/parallel-functions/issues",
-                "source": "https://github.com/amphp/parallel-functions/tree/master"
+                "source": "https://github.com/amphp/parallel-functions/tree/v1.1.0"
             },
             "funding": [
                 {
@@ -302,7 +302,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-02-03T12:04:51+00:00"
+            "time": "2022-02-03T19:32:41+00:00"
         },
         {
             "name": "amphp/parser",
@@ -507,13 +507,13 @@
             },
             "type": "library",
             "autoload": {
-                "psr-4": {
-                    "Amp\\Sync\\": "src"
-                },
                 "files": [
                     "src/functions.php",
                     "src/ConcurrentIterator/functions.php"
-                ]
+                ],
+                "psr-4": {
+                    "Amp\\Sync\\": "src"
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -5290,9 +5290,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "amphp/parallel-functions": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
