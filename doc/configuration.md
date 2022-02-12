@@ -762,12 +762,13 @@ This setting will be ignored if no [key][key] has been provided.
 The metadata (`any` default none) setting can be any value. This value will be stored as metadata that can be retrieved
 from the built PHAR ([Phar::getMetadata()][phar.getmetadata]).
 
-If you specify a callable (as a string), if will be evaluate without any arguments.
+If you specify a callable (as a string), it will be evaluated without any arguments.
 
 For example, if you take the following code:
 
 ```php
 <?php
+# callable_script.php
 class MyCallbacks
 {
     public static function generateMetadata()
@@ -781,12 +782,23 @@ With the configuration excerpt:
 
 ```json
 {
-    "metadata": "MyCallbacks\\generateMetadata"
+    "metadata": "MyCallbacks::generateMetadata"
 }
 ```
 
 Then the `Phar::getMetadata()` will return `['application_version' => '1.0.0-dev']` array.
 
+**CAUTION**: Your callable function must be readable by your autoloader.
+
+That means, for Composer, in previous example, we require to have such kind of declaration in your `composer.json` file.
+
+```json
+{
+    "autoload": {
+        "files": ["/path/to/your/callable_script.php"]
+    }
+}
+```
 
 ## Replaceable placeholders
 
