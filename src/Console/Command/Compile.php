@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Amp\MultiReasonException;
+use KevinGH\Box\Composer\ManifestFactory;
 use function array_map;
 use function array_search;
 use function array_shift;
@@ -547,6 +548,22 @@ HELP;
 
             if (is_callable($metadata)) {
                 $metadata = $metadata();
+            } else {
+                $logger->log(
+                    CompilerLogger::MINUS_PREFIX,
+                    sprintf(
+                        'Using composer.json: %s',
+                        $config->getComposerJson() ?? 'None'
+                    )
+                );
+                $logger->log(
+                    CompilerLogger::MINUS_PREFIX,
+                    sprintf(
+                        'Using composer.lock: %s',
+                        $config->getComposerLock() ?? 'None'
+                    )
+                );
+                $metadata = ManifestFactory::create($config);
             }
 
             $logger->log(
