@@ -14,13 +14,13 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function array_map;
 use function array_shift;
 use function array_unshift;
 use function explode;
 use function get_class;
 use function getcwd;
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function implode;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 use function KevinGH\Box\check_php_settings;
