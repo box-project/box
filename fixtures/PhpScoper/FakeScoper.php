@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PhpScoper;
 
-use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function func_get_args;
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\NotCallable;
 
 final class FakeScoper implements Scoper

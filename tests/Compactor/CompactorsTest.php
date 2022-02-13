@@ -102,8 +102,7 @@ class CompactorsTest extends TestCase
     public function test_it_provides_the_first_scoper_compactor_symbols_registry_when_there_is_one(
         array $compactors,
         ?SymbolsRegistry $expected
-    ): void
-    {
+    ): void {
         $actual = (new Compactors(...$compactors))->getScoperSymbolsRegistry();
 
         $this->assertSame($expected, $actual);
@@ -117,8 +116,7 @@ class CompactorsTest extends TestCase
     public function test_it_can_change_the_first_scoper_compactor_whitelist(
         array $compactors,
         ?SymbolsRegistry $newSymbolsRegistry
-    ): void
-    {
+    ): void {
         $compactorsAggregate = new Compactors(...$compactors);
 
         if (null !== $newSymbolsRegistry) {
