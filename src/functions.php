@@ -54,9 +54,8 @@ use Webmozart\Assert\Assert;
  */
 function get_box_version(): string
 {
-    $rawVersion = InstalledVersions::getVersion('humbug/box');
-
-    [$prettyVersion, $commitHash] = explode('@', $rawVersion);
+    $prettyVersion = InstalledVersions::getPrettyVersion('humbug/box');
+    $commitHash = InstalledVersions::getReference('humbug/box');
 
     return $prettyVersion.'@'.substr($commitHash, 0, 7);
 }
