@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use Composer\InstalledVersions;
 use function array_key_exists;
 use function bin2hex;
 use function class_alias;
@@ -32,7 +33,6 @@ use KevinGH\Box\Console\Php\PhpSettingsHandler;
 use function KevinGH\Box\FileSystem\copy;
 use function log;
 use function number_format;
-use PackageVersions\Versions;
 use const PATHINFO_EXTENSION;
 use Phar;
 use function posix_getrlimit;
@@ -54,7 +54,7 @@ use Webmozart\Assert\Assert;
  */
 function get_box_version(): string
 {
-    $rawVersion = Versions::getVersion('humbug/box');
+    $rawVersion = InstalledVersions::getVersion('humbug/box');
 
     [$prettyVersion, $commitHash] = explode('@', $rawVersion);
 
