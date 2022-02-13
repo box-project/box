@@ -482,7 +482,7 @@ require_once __DIR__ . '/composer/autoload_real.php';
 \$loader = $composerAutoloaderName::getLoader();
 
 // Exposed classes. For more information see:
-// https://github.com/humbug/php-scoper/blob/master/README.md#class-whitelisting
+// https://github.com/humbug/php-scoper/blob/master/docs/configuration.md#exposing-classes
 if (!class_exists('Acme\Foo', false) && !interface_exists('Acme\Foo', false) && !trait_exists('Acme\Foo', false)) {
     spl_autoload_call('_Box\Acme\Foo');
 }
@@ -510,7 +510,7 @@ require_once __DIR__ . '/composer/autoload_real.php';
 \$loader = ${composerAutoloaderName}::getLoader();
 
 // Exposed functions. For more information see:
-// https://github.com/humbug/php-scoper/blob/master/README.md#functions-whitelisting
+// https://github.com/humbug/php-scoper/blob/master/docs/configuration.md#exposing-functions
 if (!function_exists('foo')) {
     function foo() {
         return \_Box\\foo(...func_get_args());
@@ -547,7 +547,7 @@ require_once __DIR__ . '/composer/autoload_real.php';
 }
 
 // Exposed functions. For more information see:
-// https://github.com/humbug/php-scoper/blob/master/README.md#functions-whitelisting
+// https://github.com/humbug/php-scoper/blob/master/docs/configuration.md#exposing-functions
 namespace {
     if (!function_exists('foo')) {
         function foo() {
@@ -598,7 +598,7 @@ require_once __DIR__ . '/composer/autoload_real.php';
 }
 
 // Exposed classes. For more information see:
-// https://github.com/humbug/php-scoper/blob/master/README.md#class-whitelisting
+// https://github.com/humbug/php-scoper/blob/master/docs/configuration.md#exposing-classes
 namespace {
     if (!class_exists('PHPUnit\TestCase', false) && !interface_exists('PHPUnit\TestCase', false) && !trait_exists('PHPUnit\TestCase', false)) {
         spl_autoload_call('_Box\PHPUnit\TestCase');
@@ -609,7 +609,7 @@ namespace {
 }
 
 // Exposed functions. For more information see:
-// https://github.com/humbug/php-scoper/blob/master/README.md#functions-whitelisting
+// https://github.com/humbug/php-scoper/blob/master/docs/configuration.md#exposing-functions
 namespace {
     if (!function_exists('foo')) {
         function foo() {
