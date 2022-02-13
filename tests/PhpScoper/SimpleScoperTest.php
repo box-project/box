@@ -14,14 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PhpScoper;
 
-use Humbug\PhpScoper\Scoper;
-use Humbug\PhpScoper\Whitelist;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Prophecy\Prophecy\ObjectProphecy;
-use function serialize;
-use function unserialize;
 
 /**
  * @covers \KevinGH\Box\PhpScoper\SimpleScoper
