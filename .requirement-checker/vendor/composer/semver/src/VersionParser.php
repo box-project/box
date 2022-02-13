@@ -1,11 +1,11 @@
 <?php
 
-namespace HumbugBox3141\Composer\Semver;
+namespace HumbugBox3150\Composer\Semver;
 
-use HumbugBox3141\Composer\Semver\Constraint\ConstraintInterface;
-use HumbugBox3141\Composer\Semver\Constraint\MatchAllConstraint;
-use HumbugBox3141\Composer\Semver\Constraint\MultiConstraint;
-use HumbugBox3141\Composer\Semver\Constraint\Constraint;
+use HumbugBox3150\Composer\Semver\Constraint\ConstraintInterface;
+use HumbugBox3150\Composer\Semver\Constraint\MatchAllConstraint;
+use HumbugBox3150\Composer\Semver\Constraint\MultiConstraint;
+use HumbugBox3150\Composer\Semver\Constraint\Constraint;
 class VersionParser
 {
     private static $modifierRegex = '[._-]?(?:(stable|beta|b|RC|alpha|a|patch|pl|p)((?:[.-]?\\d+)*+)?)?([.-]?dev)?';
