@@ -1,8 +1,8 @@
 <?php
 
-namespace HumbugBox3141\Composer\Semver;
+namespace HumbugBox3150\Composer\Semver;
 
-use HumbugBox3141\Composer\Semver\Constraint\Constraint;
+use HumbugBox3150\Composer\Semver\Constraint\Constraint;
 class Semver
 {
     const SORT_ASC = 1;
