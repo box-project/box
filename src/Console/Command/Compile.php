@@ -547,6 +547,10 @@ HELP;
             );
 
             if (is_callable($metadata)) {
+                $logger->log(
+                    CompilerLogger::MINUS_PREFIX,
+                    sprintf('Using callable function: %s', $metadata)
+                );
                 $metadata = $metadata();
             } else {
                 $logger->log(
@@ -562,6 +566,10 @@ HELP;
                         'Using composer.lock: %s',
                         $config->getComposerLock() ?? 'None'
                     )
+                );
+                $logger->log(
+                    CompilerLogger::MINUS_PREFIX,
+                    sprintf('Using manifest builder: %s', $metadata)
                 );
                 $metadata = ManifestFactory::create($config);
             }
