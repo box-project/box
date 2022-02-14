@@ -800,6 +800,25 @@ That means, for Composer, in previous example, we require to have such kind of d
 }
 ```
 
+Another usefully feature of the metadata setting is ability to add a manifest that can be retrieved later 
+from the built PHAR ([Phar::getMetadata()][phar.getmetadata]).
+
+With the configuration excerpt:
+
+```json
+{
+    "metadata": "KevinGH\\Box\\Composer\\Manifest\\SimpleTextManifestBuilder"
+}
+```
+You will generate a simple text string with key, value pairs that identify all packages and their versions installed. 
+
+**For contributors/developers** that want to make their own manifest builder, all you have to know is :
+
+- The metadata setting must identify a class (free naming) that is readable by your autoloader.
+- The class must implement the `KevinGH\Box\Composer\Manifest\ManifestBuilderInterface` interface.
+- The `$content` array parameter of the `__invoke` method contains two entries (keys: `composer.json`, `installed.php`) 
+with  their corresponding values (json decoded data, php array).
+
 ## Replaceable placeholders
 
 This feature allows you to set placeholders in your code which will be replaced by different values by Box when building
