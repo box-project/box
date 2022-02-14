@@ -1,6 +1,6 @@
 <?php
 
-namespace HumbugBox3141\KevinGH\RequirementChecker;
+namespace HumbugBox3150\KevinGH\RequirementChecker;
 
 final class Checker
 {

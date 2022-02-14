@@ -1,6 +1,6 @@
 <?php
 
-namespace HumbugBox3141\KevinGH\RequirementChecker;
+namespace HumbugBox3150\KevinGH\RequirementChecker;
 
 use ArrayIterator;
 use Countable;
@@ -10,12 +10,12 @@ use Traversable;
 final class RequirementCollection implements IteratorAggregate, Countable
 {
     private $requirements = array();
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return new ArrayIterator($this->requirements);
     }
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return \count($this->requirements);
