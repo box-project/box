@@ -41,7 +41,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": "^7.4 || ^8.0",
+        "php": "^8.1",
         "ext-phar": "*",
         "composer-plugin-api": "^2.2",
         "amphp/parallel-functions": "^1.1",
@@ -56,11 +56,11 @@
         "phpdocumentor/reflection-docblock": "^5.2",
         "psr/log": "^1.0",
         "seld/jsonlint": "^1.7",
-        "symfony/console": "^4.3.5 || ^5.2",
-        "symfony/filesystem": "^4.4 || ^5.2",
-        "symfony/finder": "^4.4 || ^5.2",
-        "symfony/process": "^4.4 || ^5.2",
-        "symfony/var-dumper": "^4.4 || ^5.2",
+        "symfony/console": "^6.1",
+        "symfony/filesystem": "^6.1",
+        "symfony/finder": "^6.1",
+        "symfony/process": "^6.1",
+        "symfony/var-dumper": "^6.1",
         "webmozart/assert": "^1.9",
         "webmozart/path-util": "^2.3"
     },
@@ -78,7 +78,7 @@
     "config": {
         "bin-dir": "bin",
         "platform": {
-            "php": "7.4"
+            "php": "8.1"
         },
         "platform-check": false,
         "sort-packages": true,
