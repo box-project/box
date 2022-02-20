@@ -1171,7 +1171,7 @@ OUTPUT;
 //
 
 KevinGH\Box\Configuration\Configuration {#140
-  -file: "box.json"
+  -file: & "box.json"
   -fileMode: "0755"
   -alias: "index.phar"
   -basePath: "/path/to"
@@ -1183,15 +1183,15 @@ KevinGH\Box\Configuration\Configuration {#140
     -path: null
     -contents: []
   }
-  -files: []
-  -binaryFiles: []
+  -files: & []
+  -binaryFiles: & []
   -autodiscoveredFiles: true
   -dumpAutoload: false
   -excludeComposerFiles: true
   -excludeDevFiles: false
   -compactors: []
   -compressionAlgorithm: "NONE"
-  -mainScriptPath: "index.php"
+  -mainScriptPath: & "index.php"
   -mainScriptContents: """
     <?php\n
     \n
@@ -1204,17 +1204,17 @@ KevinGH\Box\Configuration\Configuration {#140
     -map: []
   }
   -metadata: null
-  -tmpOutputPath: "index.phar"
-  -outputPath: "index.phar"
+  -tmpOutputPath: & "index.phar"
+  -outputPath: & "index.phar"
   -privateKeyPassphrase: null
-  -privateKeyPath: null
+  -privateKeyPath: & null
   -promptForPrivateKey: false
   -processedReplacements: []
   -shebang: "#!/usr/bin/env php"
   -signingAlgorithm: "SHA1"
   -stubBannerContents: ""
-  -stubBannerPath: null
-  -stubPath: null
+  -stubBannerPath: & null
+  -stubPath: & null
   -isInterceptFileFuncs: false
   -isStubGenerated: true
   -checkRequirements: false

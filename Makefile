@@ -108,8 +108,8 @@ e2e_scoper_expose_symbols: box fixtures/build/dir011/vendor
 DOCKER=docker run -i --platform linux/amd64 --rm -w /opt/box
 PHP5_BOX=box_php53
 PHP5_PHAR=$(PHP5_BOX) php index.phar -vvv --no-ansi
-MIN_SUPPORTED_PHP_BOX=box_php74
-MIN_SUPPORTED_PHP_WITH_XDEBUG_BOX=box_php74_xdebug
+MIN_SUPPORTED_PHP_BOX=box_php81
+MIN_SUPPORTED_PHP_WITH_XDEBUG_BOX=box_php81_xdebug
 MIN_SUPPORTED_PHP_PHAR=$(MIN_SUPPORTED_PHP_BOX) php index.phar -vvv --no-ansi
 e2e_check_requirements:	 ## Runs the end-to-end tests for the check requirements feature
 e2e_check_requirements: box .requirement-checker

@@ -10,6 +10,15 @@ namespace Symfony\Component\Console;			      |	namespace KevinGH\RequirementChec
 							      >	 *
 							      >	 * @license MIT (c) Fabien Potencier <fabien@symfony.com>
 							      >	 */
+    private static ?int $width = null;			      |	    private static $width;
+    private static ?int $height = null;			      |	    private static $height;
+    private static ?bool $stty = null;			      |	    private static $stty;
+							      >	     *
+							      >	     * @return int
+    public function getWidth(): int			      |	    public function getWidth()
+							      >	     *
+							      >	     * @return int
+    public function getHeight(): int			      |	    public function getHeight()
 							      >	     *
 							      >	     * @return bool
     public static function hasSttyAvailable(): bool	      |	    public static function hasSttyAvailable()

@@ -59,7 +59,7 @@ use function strtolower;
  */
 class ConfigurationTest extends ConfigurationTestCase
 {
-    private static $version;
+    private static string $version;
 
     /**
      * {@inheritdoc}
@@ -3000,7 +3000,7 @@ JSON
 
         $expectedDumpedConfig = <<<EOF
 KevinGH\Box\Configuration\Configuration {#100
-  -file: "box.json"
+  -file: & "box.json"
   -fileMode: "0755"
   -alias: "test.phar"
   -basePath: "/path/to"
@@ -3020,7 +3020,7 @@ KevinGH\Box\Configuration\Configuration {#100
     -path: "composer.lock"
     -contents: []
   }
-  -files: array:6 [
+  -files: & array:6 [
     0 => "bar.php"
     1 => "box.json"
     2 => "composer.json"
@@ -3028,7 +3028,7 @@ KevinGH\Box\Configuration\Configuration {#100
     4 => "foo.php"
     5 => "vendor/composer/installed.json"
   ]
-  -binaryFiles: array:2 [
+  -binaryFiles: & array:2 [
     0 => "bar.php"
     1 => "foo.php"
   ]
@@ -3040,24 +3040,24 @@ KevinGH\Box\Configuration\Configuration {#100
     0 => "KevinGH\Box\Compactor\Php"
   ]
   -compressionAlgorithm: "GZ"
-  -mainScriptPath: "index.php"
+  -mainScriptPath: & "index.php"
   -mainScriptContents: ""
   -fileMapper: KevinGH\Box\MapFile {#100
     -basePath: "/path/to"
     -map: []
   }
   -metadata: null
-  -tmpOutputPath: "index.phar"
-  -outputPath: "index.phar"
+  -tmpOutputPath: & "index.phar"
+  -outputPath: & "index.phar"
   -privateKeyPassphrase: null
-  -privateKeyPath: null
+  -privateKeyPath: & null
   -promptForPrivateKey: false
   -processedReplacements: []
   -shebang: "#!/usr/bin/env php"
   -signingAlgorithm: "SHA1"
   -stubBannerContents: "My banner"
-  -stubBannerPath: null
-  -stubPath: null
+  -stubBannerPath: & null
+  -stubPath: & null
   -isInterceptFileFuncs: false
   -isStubGenerated: true
   -checkRequirements: true

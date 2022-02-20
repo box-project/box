@@ -57,6 +57,10 @@ function get_box_version(): string
     $prettyVersion = InstalledVersions::getPrettyVersion('humbug/box');
     $commitHash = InstalledVersions::getReference('humbug/box');
 
+    if (null === $commitHash) {
+        return $prettyVersion;
+    }
+
     return $prettyVersion.'@'.substr($commitHash, 0, 7);
 }
 
