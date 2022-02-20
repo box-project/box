@@ -81,7 +81,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                php: [ '7.4' ]
+                php: [ '8.1' ]
                 tools: [ "composer:v2" ]
         steps:
             -   name: Checkout
