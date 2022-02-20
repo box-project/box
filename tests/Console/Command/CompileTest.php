@@ -1170,8 +1170,16 @@ OUTPUT;
 //
 
 KevinGH\Box\Configuration\Configuration {#140
+  -compressionAlgorithm: "NONE"
+  -mainScriptPath: & "index.php"
+  -mainScriptContents: """
+    <?php\n
+    \n
+    declare(strict_types=1);\n
+    \n
+    echo 'Yo';\n
+    """
   -file: & "box.json"
-  -fileMode: "0755"
   -alias: "index.phar"
   -basePath: "/path/to"
   -composerJson: KevinGH\Box\Composer\ComposerFile {#140
@@ -1189,15 +1197,7 @@ KevinGH\Box\Configuration\Configuration {#140
   -excludeComposerFiles: true
   -excludeDevFiles: false
   -compactors: []
-  -compressionAlgorithm: "NONE"
-  -mainScriptPath: & "index.php"
-  -mainScriptContents: """
-    <?php\n
-    \n
-    declare(strict_types=1);\n
-    \n
-    echo 'Yo';\n
-    """
+  -fileMode: "0755"
   -fileMapper: KevinGH\Box\MapFile {#140
     -basePath: "/path/to"
     -map: []
