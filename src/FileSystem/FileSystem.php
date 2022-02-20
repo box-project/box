@@ -401,7 +401,7 @@ final class FileSystem extends SymfonyFilesystem
      */
     public function getLongestCommonBasePath(array $paths): ?string
     {
-        return Path::getLongestCommonBasePath($paths);
+        return Path::getLongestCommonBasePath(...$paths);
     }
 
     /**
