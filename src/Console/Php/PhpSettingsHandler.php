@@ -45,7 +45,7 @@ final class PhpSettingsHandler extends XdebugHandler
         $this->setLogger($logger);
         $this->logger = $logger;
 
-        $this->pharReadonly = '1' === ini_get('phar.readonly');
+        $this->phar= '1' === ini_get('phar.readonly');
     }
 
     public function check(): void
@@ -64,12 +64,12 @@ final class PhpSettingsHandler extends XdebugHandler
     protected function requiresRestart($default): bool
     {
         if ($this->pharReadonly) {
-            $this->logger->debug('phar.readonly is enabled');
+            $this->logger->debug('phar.is enabled');
 
             return true;
         }
 
-        $this->logger->debug('phar.readonly is disabled');
+        $this->logger->debug('phar.is disabled');
 
         return parent::requiresRestart($default);
     }
@@ -80,7 +80,7 @@ final class PhpSettingsHandler extends XdebugHandler
      */
     protected function restart($command): void
     {
-        // Disable phar.readonly if set
+        // Disable phar.if set
         $this->disablePharReadonly();
 
         parent::restart($command);

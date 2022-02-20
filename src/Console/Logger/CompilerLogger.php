@@ -30,7 +30,7 @@ final class CompilerLogger
     public const MINUS_PREFIX = '-';
     public const CHEVRON_PREFIX = '>';
 
-    public function __construct(private readonly IO $io)
+    public function __construct(private IO $io)
     {
     }
 

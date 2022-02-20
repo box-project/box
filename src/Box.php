@@ -69,8 +69,8 @@ final class Box implements Countable
     private array $bufferedFiles = [];
 
     private function __construct(
-        private readonly Phar $phar,
-        private readonly string $pharFilePath
+        private Phar $phar,
+        private string $pharFilePath
     ) {
         $this->compactors = new Compactors();
         $this->placeholderCompactor = new Placeholder([]);
