@@ -51,9 +51,6 @@ final class Info extends BaseCommand
 
     private static $FILE_ALGORITHMS;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(?string $name = null)
     {
         parent::__construct($name);
@@ -63,9 +60,6 @@ final class Info extends BaseCommand
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this->setName('info');
@@ -119,9 +113,6 @@ HELP
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function executeCommand(IO $io): int
     {
         $input = $io->getInput();

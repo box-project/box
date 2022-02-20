@@ -18,9 +18,6 @@ use Symfony\Component\Console\Tester\CommandTester as SymfonyCommandTester;
 
 class CommandTester extends SymfonyCommandTester
 {
-    /**
-     * {@inheritdoc}
-     */
     public function execute(array $input, array $options = []): int
     {
         if ('compile' === $input['command']) {

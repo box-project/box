@@ -79,9 +79,6 @@ class CompileTest extends CommandTestCase
 
     private const FIXTURES_DIR = __DIR__.'/../../../fixtures/build';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->markAsSkippedIfPharReadonlyIsOn();
@@ -93,9 +90,6 @@ class CompileTest extends CommandTestCase
         remove(self::FIXTURES_DIR.'/dir010/index.phar');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getCommand(): Command
     {
         return new Compile();

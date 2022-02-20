@@ -72,9 +72,6 @@ class BoxTest extends FileSystemTestCase
     /** @var Box */
     private $box;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->markAsSkippedIfPharReadonlyIsOn();
@@ -84,9 +81,6 @@ class BoxTest extends FileSystemTestCase
         $this->box = Box::create('test.phar');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown(): void
     {
         parent::tearDown();

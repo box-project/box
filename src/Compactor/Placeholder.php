@@ -32,9 +32,6 @@ final class Placeholder implements Compactor
         $this->placeholders = $placeholders;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function compact(string $file, string $contents): string
     {
         return str_replace(

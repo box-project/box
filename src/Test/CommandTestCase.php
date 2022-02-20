@@ -36,9 +36,6 @@ abstract class CommandTestCase extends FileSystemTestCase
     /** @var CommandTester */
     protected $commandTester;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -54,9 +51,6 @@ abstract class CommandTestCase extends FileSystemTestCase
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown(): void
     {
         parent::tearDown();

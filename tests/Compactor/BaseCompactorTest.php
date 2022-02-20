@@ -33,17 +33,11 @@ class BaseCompactorTest extends TestCase
         $compactor = new class() extends BaseCompactor {
             use NotCallable;
 
-            /**
-             * {@inheritdoc}
-             */
             protected function compactContent(string $contents): string
             {
                 $this->__call(__METHOD__, func_get_args());
             }
 
-            /**
-             * {@inheritdoc}
-             */
             protected function supports(string $file): bool
             {
                 return false;
@@ -70,17 +64,11 @@ class BaseCompactorTest extends TestCase
                 $this->expected = $expected;
             }
 
-            /**
-             * {@inheritdoc}
-             */
             protected function compactContent(string $contents): string
             {
                 return $this->expected;
             }
 
-            /**
-             * {@inheritdoc}
-             */
             protected function supports(string $file): bool
             {
                 return true;

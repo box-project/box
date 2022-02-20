@@ -28,9 +28,6 @@ final class Pharaoh extends ParagoniePharaoh
     /** @var null|string */
     private $path;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(string $file, ?string $alias = null)
     {
         parent::__construct($file, $alias);
@@ -38,9 +35,6 @@ final class Pharaoh extends ParagoniePharaoh
         $this->fileName = basename($file);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __destruct()
     {
         unset($this->pharInfo);

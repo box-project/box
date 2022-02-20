@@ -442,9 +442,6 @@ final class Box implements Countable
         return $filesWithContents;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function count(): int
     {
         Assert::false($this->buffering, 'Cannot count the number of files in the PHAR when buffering');

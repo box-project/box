@@ -61,9 +61,6 @@ class ConfigurationTest extends ConfigurationTestCase
 {
     private static string $version;
 
-    /**
-     * {@inheritdoc}
-     */
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();

@@ -32,9 +32,6 @@ class VerifyTest extends CommandTestCase
 
     private const FIXTURES_DIR = __DIR__.'/../../../fixtures/verify';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->markAsSkippedIfPharReadonlyIsOn();
@@ -42,9 +39,6 @@ class VerifyTest extends CommandTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getCommand(): Command
     {
         return new Verify();

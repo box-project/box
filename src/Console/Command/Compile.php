@@ -99,9 +99,6 @@ HELP;
 
     private const DEBUG_DIR = '.box_dump';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         parent::configure();
@@ -150,9 +147,6 @@ HELP;
         $this->configureWorkingDirOption();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function executeCommand(IO $io): int
     {
         $input = $io->getInput();

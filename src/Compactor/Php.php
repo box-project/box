@@ -53,9 +53,6 @@ final class Php extends FileExtensionCompactor
 {
     private $annotationParser;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(DocblockAnnotationParser $annotationParser, array $extensions = ['php'])
     {
         parent::__construct($extensions);
@@ -63,9 +60,6 @@ final class Php extends FileExtensionCompactor
         $this->annotationParser = $annotationParser;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function compactContent(string $contents): string
     {
         $output = '';
