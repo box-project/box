@@ -24,10 +24,4 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     // Define what rule sets will be applied
     $containerConfigurator->import(LevelSetList::UP_TO_PHP_81);
-
-    // get services (needed for register a single rule)
-    // $services = $containerConfigurator->services();
-
-    // register a single rule
-    // $services->set(TypedPropertyRector::class);
 };
