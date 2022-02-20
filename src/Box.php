@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Amp\MultiReasonException;
+use KevinGH\Box\PhpScoper\Scoper;
 use function Amp\ParallelFunctions\parallelMap;
 use function Amp\Promise\wait;
 use function array_filter;
@@ -59,7 +60,7 @@ final class Box implements Countable
     private Compactors $compactors;
     private Placeholder $placeholderCompactor;
     private MapFile $mapFile;
-    private NullScoper $scoper;
+    private Scoper $scoper;
     private bool $buffering = false;
 
     /**
