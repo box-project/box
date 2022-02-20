@@ -16,8 +16,8 @@ namespace KevinGH\Box\FileSystem;
 
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Path;
 use Traversable;
-use Webmozart\PathUtil\Path;
 
 /**
  * Canonicalizes the given path.

@@ -36,11 +36,11 @@ use function strrpos;
 use function substr;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
+use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
 use Traversable;
 use function unlink;
 use Webmozart\Assert\Assert;
-use Webmozart\PathUtil\Path;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>

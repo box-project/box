@@ -14,12 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use Composer\InstalledVersions;
 use function array_key_exists;
 use function bin2hex;
 use function class_alias;
 use function class_exists;
 use Closure;
+use Composer\InstalledVersions;
 use function constant;
 use function define;
 use function defined;
