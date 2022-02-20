@@ -28,9 +28,6 @@ class ConfigurationHelperTest extends FileSystemTestCase
 {
     private ConfigurationHelper $helper;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();

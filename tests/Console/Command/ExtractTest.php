@@ -36,9 +36,6 @@ class ExtractTest extends CommandTestCase
 {
     private const FIXTURES = __DIR__.'/../../../fixtures/extract';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getCommand(): Command
     {
         return new Extract();

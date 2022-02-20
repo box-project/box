@@ -25,9 +25,6 @@ class ConfigurationLoggerTest extends TestCase
 {
     private ConfigurationLogger $logs;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->logs = new ConfigurationLogger();

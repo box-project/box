@@ -49,13 +49,13 @@ final class Info extends BaseCommand
     private const MODE_OPT = 'mode';
     private const DEPTH_OPT = 'depth';
 
-    private static $FILE_ALGORITHMS;
+    private static array $FILE_ALGORITHMS;
 
     public function __construct(?string $name = null)
     {
         parent::__construct($name);
 
-        if (null === self::$FILE_ALGORITHMS) {
+        if (!isset(self::$FILE_ALGORITHMS)) {
             self::$FILE_ALGORITHMS = array_flip(array_filter(get_phar_compression_algorithms()));
         }
     }
@@ -68,17 +68,17 @@ final class Info extends BaseCommand
         );
         $this->setHelp(
             <<<'HELP'
-The <info>%command.name%</info> command will display information about the Phar extension,
-or the Phar file if specified.
-
-If the <info>phar</info> argument <comment>(the PHAR file path)</comment> is provided, information
-about the PHAR file itself will be displayed.
-
-If the <info>--list|-l</info> option is used, the contents of the PHAR file will
-be listed. By default, the list is shown as an indented tree. You may
-instead choose to view a flat listing, by setting the <info>--mode|-m</info> option
-to <comment>flat</comment>.
-HELP
+            The <info>%command.name%</info> command will display information about the Phar extension,
+            or the Phar file if specified.
+            
+            If the <info>phar</info> argument <comment>(the PHAR file path)</comment> is provided, information
+            about the PHAR file itself will be displayed.
+            
+            If the <info>--list|-l</info> option is used, the contents of the PHAR file will
+            be listed. By default, the list is shown as an indented tree. You may
+            instead choose to view a flat listing, by setting the <info>--mode|-m</info> option
+            to <comment>flat</comment>.
+            HELP,
         );
         $this->addArgument(
             self::PHAR_ARG,

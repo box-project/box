@@ -31,9 +31,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ValidateTest extends CommandTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function getCommand(): Command
     {
         return new Validate();

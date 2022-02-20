@@ -35,9 +35,6 @@ abstract class ConfigurationTestCase extends FileSystemTestCase
     /** @var string */
     protected $file;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();

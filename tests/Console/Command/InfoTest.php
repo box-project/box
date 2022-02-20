@@ -36,9 +36,6 @@ class InfoTest extends CommandTestCase
 {
     private const FIXTURES = __DIR__.'/../../../fixtures/info';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getCommand(): Command
     {
         return new Info();
@@ -57,19 +54,19 @@ class InfoTest extends CommandTestCase
         $signatures = '  - '.implode("\n  - ", Phar::getSupportedSignatures());
 
         $expected = <<<OUTPUT
-
-API Version: $version
-
-Supported Compression:
-$compression
-
-Supported Signatures:
-$signatures
-
- // Get a PHAR details by giving its path as an argument.
-
-
-OUTPUT;
+        
+        API Version: $version
+        
+        Supported Compression:
+        $compression
+        
+        Supported Signatures:
+        $signatures
+        
+         // Get a PHAR details by giving its path as an argument.
+        
+        
+        OUTPUT;
 
         $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(0, $this->commandTester->getStatusCode());

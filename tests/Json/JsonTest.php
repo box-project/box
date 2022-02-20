@@ -35,9 +35,6 @@ class JsonTest extends FileSystemTestCase
 {
     private Json $json;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
