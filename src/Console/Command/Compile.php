@@ -28,6 +28,7 @@ use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function implode;
 use function is_callable;
 use function is_string;
+use KevinGH\Box\Amp\FailureCollector;
 use KevinGH\Box\Box;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 use function KevinGH\Box\bump_open_file_descriptor_limit;
@@ -391,16 +392,7 @@ HELP;
 
         $count = count($config->getFiles());
 
-        try {
-            $box->addFiles($config->getFiles(), false);
-        } catch (MultiReasonException $exception) {
-            // This exception is handled a different way to give me meaningful feedback to the user
-            foreach ($exception->getReasons() as $reason) {
-                $io->error($reason);
-            }
-
-            throw $exception;
-        }
+        self::addFilesWithErrorHandling($config, $box, $io);
 
         $logger->log(
             CompilerLogger::CHEVRON_PREFIX,
@@ -408,6 +400,26 @@ HELP;
                 ? 'No file found'
                 : sprintf('%d file(s)', $count)
         );
+    }
+
+    private static function addFilesWithErrorHandling(Configuration $config, Box $box, IO $io): void
+    {
+        try {
+            $box->addFiles($config->getFiles(), false);
+
+            return;
+        } catch (MultiReasonException $ampFailure) {
+            // Continue
+        }
+
+        // This exception is handled a different way to give me meaningful feedback to the user
+        $io->error([
+            'An Amp\Parallel error occurred. To diagnostic if it is an Amp error related, you may try again with "--no-parallel".',
+            'Reason(s) of the failure:',
+            ...FailureCollector::collectReasons($ampFailure),
+        ]);
+
+        throw $ampFailure;
     }
 
     private function registerMainScript(Configuration $config, Box $box, CompilerLogger $logger): ?string
