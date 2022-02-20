@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use Stringable;
 use function array_filter;
 use function array_keys;
 use function current;
@@ -55,11 +54,10 @@ use SplFileInfo;
 use function sprintf;
 use const STDOUT;
 use function str_replace;
+use Stringable;
 use Symfony\Component\Finder\Finder;
 use Throwable;
 use function trim;
-use KevinGH\Box\Box;
-use Stringablenew;
 
 /**
  * @covers \KevinGH\Box\Box
@@ -1122,7 +1120,7 @@ JSON
             $boxDir = current(
                 array_filter(
                     $tmpDirs,
-                    fn(SplFileInfo $fileInfo): bool => false === in_array(
+                    fn (SplFileInfo $fileInfo): bool => false === in_array(
                         $fileInfo->getRealPath(),
                         [realpath($boxTmp), realpath($this->tmp)],
                         true
@@ -1155,16 +1153,16 @@ JSON
             <<<'PHP'
             #!/usr/bin/env php
             <?php
-            
+
             echo <<<EOF
             Test replacing placeholders.
-            
+
             String value: @string_placeholder@
             Int value: @int_placeholder@
             Stringable value: @stringable_placeholder@
-            
+
             EOF;
-            
+
             __HALT_COMPILER();
             PHP,
         );
@@ -1186,7 +1184,7 @@ JSON
 
         $expected = <<<'EOF'
         Test replacing placeholders.
-        
+
         String value: string value
         Int value: 10
         Stringable value: stringable value
@@ -1206,9 +1204,9 @@ JSON
             <<<'STUB'
             #!/usr/bin/env php
             <?php
-            
+
             echo 'Hello world!';
-            
+
             __HALT_COMPILER();
             STUB,
         );
@@ -1218,9 +1216,9 @@ JSON
         $expected = <<<'STUB'
         #!/usr/bin/env php
         <?php
-        
+
         echo 'Hello world!';
-        
+
         __HALT_COMPILER(); ?>
         STUB;
 
@@ -1241,9 +1239,9 @@ JSON
             <<<'STUB'
             #!/usr/bin/env php
             <?php
-            
+
             echo '@message@';
-            
+
             __HALT_COMPILER();
             STUB,
         );
@@ -1254,9 +1252,9 @@ JSON
         $expected = <<<'STUB'
         #!/usr/bin/env php
         <?php
-        
+
         echo 'Hello world!';
-        
+
         __HALT_COMPILER(); ?>
         STUB;
 
@@ -1662,7 +1660,6 @@ KEY_WRAP
 
 echo 'Hello, world!'.PHP_EOL;
 PHP_WRAP
-
         );
 
         $this->box->getPhar()->setStub(

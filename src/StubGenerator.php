@@ -32,11 +32,11 @@ final class StubGenerator
     __BOX_SHEBANG__
     <?php
     __BOX_BANNER__
-    
+
     __BOX_PHAR_CONFIG__
-    
+
     __HALT_COMPILER(); ?>
-    
+
     STUB;
 
     /** @var null|string The alias to be used in "phar://" URLs */
