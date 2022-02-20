@@ -224,7 +224,7 @@ final class Configuration
     private const REPLACEMENTS_KEY = 'replacements';
     private const SHEBANG_KEY = 'shebang';
     private const STUB_KEY = 'stub';
-    private ?int $compressionAlgorithm;
+    private int|string|null $compressionAlgorithm;
     private ?string $mainScriptPath;
     private ?string $mainScriptContents;
 
@@ -429,40 +429,40 @@ final class Configuration
      * @param string[]      $recommendations
      */
     private function __construct(
-        private readonly ?string $file,
-        private readonly string $alias,
-        private readonly string $basePath,
+        private ?string $file,
+        private string $alias,
+        private string $basePath,
         private ComposerFile $composerJson,
         private ComposerFile $composerLock,
-        private readonly array $files,
-        private readonly array $binaryFiles,
-        private readonly bool $autodiscoveredFiles,
-        private readonly bool $dumpAutoload,
-        private readonly bool $excludeComposerFiles,
-        private readonly bool $excludeDevFiles,
-        private Compactors $compactors,
+        private array $files,
+        private array $binaryFiles,
+        private bool $autodiscoveredFiles,
+        private bool $dumpAutoload,
+        private bool $excludeComposerFiles,
+        private bool $excludeDevFiles,
+        private Compactors|array $compactors,
         ?int $compressionAlgorithm,
-        private ?int $fileMode,
+        private int|string|null $fileMode,
         ?string $mainScriptPath,
         ?string $mainScriptContents,
-        private readonly MapFile $fileMapper,
+        private MapFile $fileMapper,
         private mixed $metadata,
-        private readonly string $tmpOutputPath,
-        private readonly string $outputPath,
-        private readonly ?string $privateKeyPassphrase,
-        private readonly ?string $privateKeyPath,
-        private readonly bool $promptForPrivateKey,
-        private readonly array $processedReplacements,
-        private readonly ?string $shebang,
-        private int $signingAlgorithm,
-        private readonly ?string $stubBannerContents,
-        private readonly ?string $stubBannerPath,
-        private readonly ?string $stubPath,
-        private readonly bool $isInterceptFileFuncs,
-        private readonly bool $isStubGenerated,
-        private readonly bool $checkRequirements,
-        private readonly array $warnings,
-        private readonly array $recommendations
+        private string $tmpOutputPath,
+        private string $outputPath,
+        private ?string $privateKeyPassphrase,
+        private ?string $privateKeyPath,
+        private bool $promptForPrivateKey,
+        private array $processedReplacements,
+        private ?string $shebang,
+        private int|string $signingAlgorithm,
+        private ?string $stubBannerContents,
+        private ?string $stubBannerPath,
+        private ?string $stubPath,
+        private bool $isInterceptFileFuncs,
+        private bool $isStubGenerated,
+        private bool $checkRequirements,
+        private array $warnings,
+        private array $recommendations
     ) {
         Assert::nullOrInArray(
             $compressionAlgorithm,
@@ -478,6 +478,7 @@ final class Configuration
         } else {
             Assert::notNull($mainScriptContents);
         }
+
         $this->compressionAlgorithm = $compressionAlgorithm;
         $this->mainScriptPath = $mainScriptPath;
         $this->mainScriptContents = $mainScriptContents;
@@ -485,14 +486,14 @@ final class Configuration
 
     public function export(): string
     {
+        // TODO: set an array instead of this instance. Indeed, we change the type of
+        //  some properties to better readability which prevents the ability to narrow
+        //  types...
         $exportedConfig = clone $this;
 
         $basePath = $exportedConfig->basePath;
 
-        /**
-         * @param null|SplFileInfo|string $path
-         */
-        $normalizePath = static function ($path) use ($basePath): ?string {
+        $normalizePath = static function (null|SplFileInfo|string $path) use ($basePath): ?string {
             if (null === $path) {
                 return null;
             }

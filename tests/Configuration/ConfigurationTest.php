@@ -2998,8 +2998,10 @@ JSON
 
         $expectedDumpedConfig = <<<EOF
 KevinGH\Box\Configuration\Configuration {#100
+  -compressionAlgorithm: "GZ"
+  -mainScriptPath: & "index.php"
+  -mainScriptContents: ""
   -file: & "box.json"
-  -fileMode: "0755"
   -alias: "test.phar"
   -basePath: "/path/to"
   -composerJson: KevinGH\Box\Composer\ComposerFile {#100
@@ -3037,9 +3039,7 @@ KevinGH\Box\Configuration\Configuration {#100
   -compactors: array:1 [
     0 => "KevinGH\Box\Compactor\Php"
   ]
-  -compressionAlgorithm: "GZ"
-  -mainScriptPath: & "index.php"
-  -mainScriptContents: ""
+  -fileMode: "0755"
   -fileMapper: KevinGH\Box\MapFile {#100
     -basePath: "/path/to"
     -map: []
