@@ -15,13 +15,15 @@ declare(strict_types=1);
 namespace KevinGH\Box\Annotation;
 
 use function array_filter;
+use function array_key_exists;
 use function array_map;
 use function array_values;
-use function in_array;
 use InvalidArgumentException;
+use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlock\Tag;
 use phpDocumentor\Reflection\DocBlock\Tags\Formatter;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
+use function Safe\array_flip;
 use function strtolower;
 
 /**
@@ -30,13 +32,19 @@ use function strtolower;
 final class DocblockAnnotationParser
 {
     /**
-     * @param string[] $ignored
+     * @var array<string, mixed>
+     */
+    private array $ignoredAnnotationsAsKeys;
+
+    /**
+     * @param string[] $ignoredAnnotations
      */
     public function __construct(
-        private readonly DocBlockFactoryInterface $factory,
-        private readonly Formatter $tagsFormatter,
-        private readonly array $ignored
+        private DocBlockFactoryInterface $factory,
+        private Formatter $tagsFormatter,
+        array $ignoredAnnotations
     ) {
+        $this->ignoredAnnotationsAsKeys = array_flip($ignoredAnnotations);
     }
 
     /**
@@ -44,26 +52,44 @@ final class DocblockAnnotationParser
      */
     public function parse(string $docblock): array
     {
-        try {
-            $doc = $this->factory->create($docblock);
-        } catch (InvalidArgumentException $invalidDocBlock) {
-            throw new MalformedTagException('The annotations could not be parsed.', 0, $invalidDocBlock);
-        }
+        $doc = $this->createDocBlock($docblock);
 
-        $tags = array_values(
-            array_filter(
-                $doc->getTags(),
-                static fn (Tag $tag) => !in_array(
-                    strtolower($tag->getName()),
-                    $this->ignored,
-                    true,
-                ),
-            ),
-        );
+        $tags = self::extractTags($doc, $this->ignoredAnnotationsAsKeys);
 
         return array_map(
-            static fn (Tag $tag) => $tag->render($this->tagsFormatter),
-            $tags
+            fn (Tag $tag) => $tag->render($this->tagsFormatter),
+            $tags,
+        );
+    }
+
+    private function createDocBlock(string $docblock): DocBlock
+    {
+        try {
+            return $this->factory->create($docblock);
+        } catch (InvalidArgumentException $invalidDocBlock) {
+            throw new MalformedTagException(
+                'The annotations could not be parsed.',
+                0,
+                $invalidDocBlock,
+            );
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $ignoredAnnotations
+     *
+     * @return list<string>
+     */
+    private static function extractTags(DocBlock $docBlock, array $ignoredAnnotations): array
+    {
+        return array_values(
+            array_filter(
+                $docBlock->getTags(),
+                static fn (Tag $tag) => !array_key_exists(
+                    strtolower($tag->getName()),
+                    $ignoredAnnotations,
+                ),
+            ),
         );
     }
 }

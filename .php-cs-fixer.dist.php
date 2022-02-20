@@ -68,6 +68,7 @@ $config = (new PhpCsFixer\Config())
         'ordered_imports' => true,
         'php_unit_test_class_requires_covers' => true,
         'phpdoc_add_missing_param_annotation' => true,
+        'phpdoc_no_useless_inheritdoc' => true,
         'phpdoc_order' => true,
         'phpdoc_types_order' => true,
         'php_unit_method_casing' => [

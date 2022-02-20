@@ -33,9 +33,6 @@ class FileExtensionCompactorTest extends TestCase
         $compactor = new class([]) extends FileExtensionCompactor {
             use NotCallable;
 
-            /**
-             * {@inheritdoc}
-             */
             protected function compactContent(string $contents): string
             {
                 $this->__call(__METHOD__, func_get_args());
@@ -60,9 +57,6 @@ class FileExtensionCompactorTest extends TestCase
                 parent::__construct(['php']);
             }
 
-            /**
-             * {@inheritdoc}
-             */
             protected function compactContent(string $contents): string
             {
                 return $this->expected;
