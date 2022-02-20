@@ -57,7 +57,7 @@ final class PhpSettingsHandler extends XdebugHandler
 
     /**
      * TODO: bump to XdebugHandler v3
-     * No type hint to allow XdebugHandler version 2
+     * No type hint to allow XdebugHandler version 2.
      *
      * {@inheritdoc}
      */
