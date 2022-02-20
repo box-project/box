@@ -20,7 +20,6 @@ use function preg_replace;
 
 /**
  * @internal
- *
  * @private
  */
 final class MapFile
@@ -28,8 +27,10 @@ final class MapFile
     /**
      * @param string[][] $map
      */
-    public function __construct(private readonly string $basePath, private readonly array $map)
-    {
+    public function __construct(
+        private readonly string $basePath,
+        private readonly array $map
+    ) {
     }
 
     public function __invoke(string $path): ?string
@@ -55,6 +56,9 @@ final class MapFile
         return $relativePath;
     }
 
+    /**
+     * @return string[][] $map
+     */
     public function getMap(): array
     {
         return $this->map;

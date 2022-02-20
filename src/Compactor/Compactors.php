@@ -25,8 +25,12 @@ use KevinGH\Box\PhpScoper\Scoper;
  */
 final class Compactors implements Compactor, Countable
 {
-    private $compactors;
-    private $scoperCompactor;
+    /**
+     * @var Compactor[]
+     */
+    private readonly array $compactors;
+
+    private ?PhpScoper $scoperCompactor = null;
 
     public function __construct(Compactor ...$compactors)
     {
@@ -43,9 +47,6 @@ final class Compactors implements Compactor, Countable
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function compact(string $file, string $contents): string
     {
         return (string) array_reduce(
@@ -57,29 +58,27 @@ final class Compactors implements Compactor, Countable
 
     public function getScoper(): ?Scoper
     {
-        return null !== $this->scoperCompactor ? $this->scoperCompactor->getScoper() : null;
+        return $this->scoperCompactor?->getScoper();
     }
 
     public function getScoperSymbolsRegistry(): ?SymbolsRegistry
     {
-        return null !== $this->scoperCompactor ? $this->scoperCompactor->getScoper()->getSymbolsRegistry() : null;
+        return $this->scoperCompactor?->getScoper()->getSymbolsRegistry();
     }
 
     public function registerSymbolsRegistry(SymbolsRegistry $symbolsRegistry): void
     {
-        if (null !== $this->scoperCompactor) {
-            $this->scoperCompactor->getScoper()->changeSymbolsRegistry($symbolsRegistry);
-        }
+        $this->scoperCompactor?->getScoper()->changeSymbolsRegistry($symbolsRegistry);
     }
 
+    /**
+     * @return Compactor[]
+     */
     public function toArray(): array
     {
         return $this->compactors;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function count(): int
     {
         return count($this->compactors);

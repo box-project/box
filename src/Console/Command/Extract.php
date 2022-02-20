@@ -39,9 +39,6 @@ final class Extract extends BaseCommand
     private const PHAR_ARG = 'phar';
     private const OUTPUT_ARG = 'output';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this->setName('extract');
@@ -60,9 +57,6 @@ final class Extract extends BaseCommand
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function executeCommand(IO $io): int
     {
         $input = $io->getInput();

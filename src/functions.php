@@ -65,6 +65,8 @@ function get_box_version(): string
 }
 
 /**
+ * TODO: switch to an enum for compression algorithms.
+ *
  * @private
  *
  * @return array<string,int>
@@ -137,8 +139,6 @@ function format_size(float|int $size, int $decimals = 2): string
         number_format(
             $size / (1024 ** $power),
             $decimals,
-            '.',
-            ','
         ),
         $units[$power]
     );

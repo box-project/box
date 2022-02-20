@@ -38,9 +38,6 @@ abstract class FileExtensionCompactor extends BaseCompactor
         $this->extensions = $extensions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function supports(string $file): bool
     {
         return in_array(

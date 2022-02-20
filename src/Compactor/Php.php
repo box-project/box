@@ -23,7 +23,6 @@ use function is_array;
 use function is_int;
 use function is_string;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
-use KevinGH\Box\Annotation\InvalidToken;
 use function ltrim;
 use PhpToken;
 use function preg_replace;
@@ -50,17 +49,13 @@ use const T_WHITESPACE;
  */
 final class Php extends FileExtensionCompactor
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct(private readonly DocblockAnnotationParser $annotationParser, array $extensions = ['php'])
-    {
+    public function __construct(
+        private readonly DocblockAnnotationParser $annotationParser,
+        array $extensions = ['php'],
+    ) {
         parent::__construct($extensions);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function compactContent(string $contents): string
     {
         $output = '';
@@ -81,7 +76,7 @@ final class Php extends FileExtensionCompactor
                         $tokenCount = count($tokens);
                     }
 
-                    $attributeCloser = $this->findAttributeCloser($tokens, $index);
+                    $attributeCloser = self::findAttributeCloser($tokens, $index);
 
                     if (is_int($attributeCloser)) {
                         $output .= '#[';
@@ -92,12 +87,6 @@ final class Php extends FileExtensionCompactor
                 } elseif (str_contains((string) $token[1], '@')) {
                     try {
                         $output .= $this->compactAnnotations($token[1]);
-                    } catch (InvalidToken $exception) {
-                        // This exception is due to the dumper to be out of sync with the current grammar and/or the
-                        // grammar being incomplete. In both cases throwing here is better in order to identify and
-                        // this those cases instead of silently failing.
-
-                        throw $exception;
                     } catch (RuntimeException) {
                         $output .= $token[1];
                     }
@@ -173,7 +162,7 @@ final class Php extends FileExtensionCompactor
         return $compactedDocblock;
     }
 
-    private function findAttributeCloser(array $tokens, int $opener): ?int
+    private static function findAttributeCloser(array $tokens, int $opener): ?int
     {
         $tokenCount = count($tokens);
         $brackets = [$opener];
@@ -212,7 +201,7 @@ final class Php extends FileExtensionCompactor
         // Replace the PHP open tag with the attribute opener as a simple token.
         array_splice($subTokens, 0, 1, ['#[']);
 
-        $closer = $this->findAttributeCloser($subTokens, 0);
+        $closer = self::findAttributeCloser($subTokens, 0);
 
         // Multi-line attribute or attribute containing something which looks like a PHP close tag.
         // Retokenize the rest of the file after the attribute opener.
@@ -228,7 +217,7 @@ final class Php extends FileExtensionCompactor
             $subTokens = @PhpToken::tokenize('<?php '.$attributeBody);
             array_splice($subTokens, 0, 1, ['#[']);
 
-            $closer = $this->findAttributeCloser($subTokens, 0);
+            $closer = self::findAttributeCloser($subTokens, 0);
 
             if (null !== $closer) {
                 array_splice($tokens, ($opener + 1), count($tokens), array_slice($subTokens, ($closer + 1)));

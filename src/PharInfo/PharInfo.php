@@ -25,9 +25,9 @@ use UnexpectedValueException;
 
 final class PharInfo
 {
-    private static $ALGORITHMS;
+    private static array $ALGORITHMS;
 
-    private $phar;
+    private PharData|Phar $phar;
 
     private ?array $compressionCount = null;
     private ?string $hash = null;

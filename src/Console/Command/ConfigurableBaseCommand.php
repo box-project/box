@@ -30,9 +30,6 @@ abstract class ConfigurableBaseCommand extends BaseCommand
 {
     private const CONFIG_PARAM = 'config';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this->addOption(

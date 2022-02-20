@@ -26,9 +26,6 @@ final class PhpScoper implements Compactor
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function compact(string $file, string $contents): string
     {
         try {

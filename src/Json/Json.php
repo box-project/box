@@ -30,7 +30,7 @@ use stdClass;
  */
 final class Json
 {
-    private $linter;
+    private JsonParser $linter;
 
     public function __construct()
     {
@@ -96,7 +96,7 @@ final class Json
         if (!$validator->isValid()) {
             $errors = [];
 
-            foreach ((array) $validator->getErrors() as $error) {
+            foreach ($validator->getErrors() as $error) {
                 $errors[] = ($error['property'] ? $error['property'].' : ' : '').$error['message'];
             }
 

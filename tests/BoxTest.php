@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use Stringable;
 use function array_filter;
 use function array_keys;
 use function current;
@@ -1152,23 +1153,23 @@ JSON
         dump_file(
             $file = 'foo',
             <<<'PHP'
-#!/usr/bin/env php
-<?php
-
-echo <<<EOF
-Test replacing placeholders.
-
-String value: @string_placeholder@
-Int value: @int_placeholder@
-Stringable value: @stringable_placeholder@
-
-EOF;
-
-__HALT_COMPILER();
-PHP
+            #!/usr/bin/env php
+            <?php
+            
+            echo <<<EOF
+            Test replacing placeholders.
+            
+            String value: @string_placeholder@
+            Int value: @int_placeholder@
+            Stringable value: @stringable_placeholder@
+            
+            EOF;
+            
+            __HALT_COMPILER();
+            PHP,
         );
 
-        $stringable =  implements Stringablenew class() {
+        $stringable = new class() implements Stringable {
             public function __toString(): string
             {
                 return 'stringable value';
@@ -1184,12 +1185,12 @@ PHP
         $this->box->registerStub($file);
 
         $expected = <<<'EOF'
-Test replacing placeholders.
-
-String value: string value
-Int value: 10
-Stringable value: stringable value
-EOF;
+        Test replacing placeholders.
+        
+        String value: string value
+        Int value: 10
+        Stringable value: stringable value
+        EOF;
 
         exec('php test.phar', $output);
 
@@ -1203,25 +1204,25 @@ EOF;
         dump_file(
             $file = 'foo',
             <<<'STUB'
-#!/usr/bin/env php
-<?php
-
-echo 'Hello world!';
-
-__HALT_COMPILER();
-STUB
+            #!/usr/bin/env php
+            <?php
+            
+            echo 'Hello world!';
+            
+            __HALT_COMPILER();
+            STUB,
         );
 
         $this->box->registerStub($file);
 
         $expected = <<<'STUB'
-#!/usr/bin/env php
-<?php
-
-echo 'Hello world!';
-
-__HALT_COMPILER(); ?>
-STUB;
+        #!/usr/bin/env php
+        <?php
+        
+        echo 'Hello world!';
+        
+        __HALT_COMPILER(); ?>
+        STUB;
 
         $actual = trim($this->box->getPhar()->getStub());
 
@@ -1238,26 +1239,26 @@ STUB;
         dump_file(
             $file = 'foo',
             <<<'STUB'
-#!/usr/bin/env php
-<?php
-
-echo '@message@';
-
-__HALT_COMPILER();
-STUB
+            #!/usr/bin/env php
+            <?php
+            
+            echo '@message@';
+            
+            __HALT_COMPILER();
+            STUB,
         );
 
         $this->box->registerPlaceholders(['@message@' => 'Hello world!']);
         $this->box->registerStub($file);
 
         $expected = <<<'STUB'
-#!/usr/bin/env php
-<?php
-
-echo 'Hello world!';
-
-__HALT_COMPILER(); ?>
-STUB;
+        #!/usr/bin/env php
+        <?php
+        
+        echo 'Hello world!';
+        
+        __HALT_COMPILER(); ?>
+        STUB;
 
         $actual = trim($this->box->getPhar()->getStub());
 
@@ -1668,7 +1669,7 @@ PHP_WRAP
             StubGenerator::create()
                 ->index('main.php')
                 ->checkRequirements(false)
-                ->generate()
+                ->generateStub()
         );
     }
 }

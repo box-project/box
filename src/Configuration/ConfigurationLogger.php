@@ -23,7 +23,14 @@ use Webmozart\Assert\Assert;
  */
 final class ConfigurationLogger
 {
+    /**
+     * @var array<string, true>
+     */
     private array $recommendations = [];
+
+    /**
+     * @var array<string, true>
+     */
     private array $warnings = [];
 
     public function addRecommendation(string $message): void
@@ -32,11 +39,11 @@ final class ConfigurationLogger
 
         Assert::false('' === $message, 'Expected to have a message but a blank string was given instead.');
 
-        $this->recommendations[$message] = $message;
+        $this->recommendations[$message] = true;
     }
 
     /**
-     * @return string[]
+     * @return list<string>
      */
     public function getRecommendations(): array
     {
@@ -49,11 +56,11 @@ final class ConfigurationLogger
 
         Assert::false('' === $message, 'Expected to have a message but a blank string was given instead.');
 
-        $this->warnings[$message] = $message;
+        $this->warnings[$message] = true;
     }
 
     /**
-     * @return string[]
+     * @return list<string>
      */
     public function getWarnings(): array
     {

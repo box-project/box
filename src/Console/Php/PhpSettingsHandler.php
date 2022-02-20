@@ -36,9 +36,6 @@ final class PhpSettingsHandler extends XdebugHandler
     private $logger;
     private $pharReadonly;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(LoggerInterface $logger)
     {
         parent::__construct('box');
@@ -51,9 +48,6 @@ final class PhpSettingsHandler extends XdebugHandler
         $this->pharReadonly = '1' === ini_get('phar.readonly');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function check(): void
     {
         $this->bumpMemoryLimit();

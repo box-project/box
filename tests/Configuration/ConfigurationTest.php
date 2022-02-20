@@ -20,6 +20,7 @@ use function array_keys;
 use function count;
 use function date_default_timezone_set;
 use DateTimeImmutable;
+use function mt_getrandmax;
 use const DIRECTORY_SEPARATOR;
 use function exec;
 use Generator;

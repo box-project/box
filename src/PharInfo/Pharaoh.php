@@ -20,15 +20,10 @@ use ParagonIE\Pharaoh\Pharaoh as ParagoniePharaoh;
 
 final class Pharaoh extends ParagoniePharaoh
 {
-    private $fileName;
-
+    private string $fileName;
     private ?PharInfo $pharInfo = null;
-
     private ?string $path = null;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(string $file, ?string $alias = null)
     {
         parent::__construct($file, $alias);
@@ -36,9 +31,6 @@ final class Pharaoh extends ParagoniePharaoh
         $this->fileName = basename($file);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __destruct()
     {
         unset($this->pharInfo);

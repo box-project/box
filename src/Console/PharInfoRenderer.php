@@ -15,9 +15,17 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console;
 
 use KevinGH\Box\Console\IO\IO;
+use function array_filter;
+use function array_key_last;
+use function array_sum;
+use function count;
+use function Safe\filesize;
 use function KevinGH\Box\format_size;
 use KevinGH\Box\NotInstantiable;
 use KevinGH\Box\PharInfo\PharInfo;
+use function key;
+use function round;
+use function Safe\sprintf;
 
 /**
  * Utility to write to the console output various PHAR related pieces of information.

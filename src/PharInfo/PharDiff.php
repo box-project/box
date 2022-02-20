@@ -28,9 +28,7 @@ use Symfony\Component\Finder\Finder;
 final class PharDiff
 {
     private readonly ParagoniePharDiff $diff;
-
     private readonly Pharaoh $pharA;
-
     private readonly Pharaoh $pharB;
 
     public function __construct(string $pathA, string $pathB)

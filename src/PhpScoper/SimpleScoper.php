@@ -56,9 +56,6 @@ final class SimpleScoper implements Scoper
         $this->symbolsRegistry = new SymbolsRegistry();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function scope(string $filePath, string $contents): string
     {
         return $this->getScoper()->scope(
@@ -67,9 +64,6 @@ final class SimpleScoper implements Scoper
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function changeSymbolsRegistry(SymbolsRegistry $symbolsRegistry): void
     {
         $this->symbolsRegistry = $symbolsRegistry;
@@ -77,17 +71,11 @@ final class SimpleScoper implements Scoper
         unset($this->scoper);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSymbolsRegistry(): SymbolsRegistry
     {
         return $this->symbolsRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPrefix(): string
     {
         return $this->scoperConfig->getPrefix();

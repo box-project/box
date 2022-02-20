@@ -38,9 +38,6 @@ final class GenerateDockerFile extends ConfigurableBaseCommand
     private const PHAR_ARG = 'phar';
     private const DOCKER_FILE_NAME = 'Dockerfile';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         parent::configure();
@@ -54,9 +51,6 @@ final class GenerateDockerFile extends ConfigurableBaseCommand
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function executeCommand(IO $io): int
     {
         $pharPath = $io->getInput()->getArgument(self::PHAR_ARG);
@@ -101,7 +95,7 @@ final class GenerateDockerFile extends ConfigurableBaseCommand
                 $requirements,
                 make_path_relative($pharPath, getcwd())
             )
-                ->generate()
+                ->generateStub()
             ;
 
             if (file_exists(self::DOCKER_FILE_NAME)) {

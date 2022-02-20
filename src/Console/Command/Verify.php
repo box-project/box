@@ -33,9 +33,6 @@ final class Verify extends BaseCommand
 {
     private const PHAR_ARG = 'phar';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this->setName('verify');
@@ -62,9 +59,6 @@ HELP
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function executeCommand(IO $io): int
     {
         /** @var string $pharPath */

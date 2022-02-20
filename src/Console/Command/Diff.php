@@ -48,9 +48,6 @@ final class Diff extends BaseCommand
 
     private static $FILE_ALGORITHMS;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(?string $name = null)
     {
         parent::__construct($name);
@@ -60,9 +57,6 @@ final class Diff extends BaseCommand
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         parent::configure();
@@ -108,9 +102,6 @@ final class Diff extends BaseCommand
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function executeCommand(IO $io): int
     {
         check_php_settings($io);

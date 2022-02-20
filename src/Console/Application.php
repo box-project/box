@@ -26,22 +26,19 @@ use function trim;
 final class Application extends SymfonyApplication
 {
     private const LOGO = <<<'ASCII'
+    
+        ____
+       / __ )____  _  __
+      / __  / __ \| |/_/
+     / /_/ / /_/ />  <
+    /_____/\____/_/|_|
+    
+    
+    
+    ASCII;
 
-    ____
-   / __ )____  _  __
-  / __  / __ \| |/_/
- / /_/ / /_/ />  <
-/_____/\____/_/|_|
+    private string $releaseDate;
 
-
-
-ASCII;
-
-    private $releaseDate;
-
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(string $name = 'Box', ?string $version = null, string $releaseDate = '@release-date@')
     {
         $version ??= get_box_version();
@@ -51,9 +48,6 @@ ASCII;
         parent::__construct($name, $version);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLongVersion(): string
     {
         return trim(
@@ -66,21 +60,16 @@ ASCII;
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getHelp(): string
     {
         return self::LOGO.parent::getHelp();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getDefaultCommands(): array
     {
         $commands = parent::getDefaultCommands();
 
+        // TODO: remove this command
         $commands[] = new Command\Build();
         $commands[] = new Command\Compile();
         $commands[] = new Command\Diff();
@@ -94,9 +83,6 @@ ASCII;
         return $commands;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getDefaultHelperSet(): HelperSet
     {
         $helperSet = parent::getDefaultHelperSet();
