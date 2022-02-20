@@ -34,7 +34,7 @@ final class PharInfo
 
     public function __construct(string $pharFile)
     {
-        if (null === self::$ALGORITHMS) {
+        if (!isset(self::$ALGORITHMS)) {
             self::$ALGORITHMS = array_flip(get_phar_compression_algorithms());
             self::$ALGORITHMS[Phar::NONE] = 'None';
         }

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Symfony\Component\Filesystem\Path;
 use function array_filter;
 use function array_flip;
 use DirectoryIterator;
@@ -37,6 +38,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 use Webmozart\Assert\Assert;
+use function var_dump;
 
 /**
  * @private
@@ -119,9 +121,14 @@ final class Info extends BaseCommand
 
         $io->newLine();
 
-        if (null === ($file = $input->getArgument(self::PHAR_ARG))) {
+        $file = $input->getArgument(self::PHAR_ARG);
+
+        if (null === $file) {
             return $this->showGlobalInfo($io);
         }
+
+        $file = Path::canonicalize($file);
+
         /** @var string $file */
         $fileRealPath = realpath($file);
 
