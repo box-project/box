@@ -21,9 +21,6 @@ namespace KevinGH\Box\Compactor;
  */
 abstract class BaseCompactor implements Compactor
 {
-    /**
-     * {@inheritdoc}
-     */
     public function compact(string $file, string $contents): string
     {
         if ($this->supports($file)) {

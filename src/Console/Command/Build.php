@@ -27,9 +27,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class Build extends Compile
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         parent::configure();
@@ -38,9 +35,6 @@ final class Build extends Compile
         $this->setDescription('Builds a new PHAR (deprecated, use "compile" instead)');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function run(InputInterface $input, OutputInterface $output): int
     {
         $io = new IO($input, $output);

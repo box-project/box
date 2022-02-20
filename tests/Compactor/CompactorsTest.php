@@ -45,9 +45,6 @@ class CompactorsTest extends TestCase
     /** @var Compactors */
     private $compactors;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->compactor1Prophecy = $this->prophesize(Compactor::class);

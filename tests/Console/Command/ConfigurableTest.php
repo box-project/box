@@ -34,9 +34,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ConfigurableTest extends CommandTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function getCommand(): Command
     {
         return new TestConfigurableCommand('test');

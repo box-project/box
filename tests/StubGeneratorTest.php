@@ -25,9 +25,6 @@ class StubGeneratorTest extends TestCase
     /** @var StubGenerator */
     private $generator;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->generator = new StubGenerator();

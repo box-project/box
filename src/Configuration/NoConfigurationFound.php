@@ -22,9 +22,6 @@ use Throwable;
  */
 final class NoConfigurationFound extends RuntimeException
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(string $message = 'The configuration file could not be found.', int $code = 0, ?Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);

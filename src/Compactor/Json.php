@@ -26,17 +26,11 @@ use function json_last_error;
  */
 final class Json extends FileExtensionCompactor
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(array $extensions = ['json', 'lock'])
     {
         parent::__construct($extensions);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function compactContent(string $contents): string
     {
         // TODO: migrate this piece of code once on PHP 7.3

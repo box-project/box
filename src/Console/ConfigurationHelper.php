@@ -37,9 +37,6 @@ final class ConfigurationHelper extends Helper
         $this->json = new Json();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'config';

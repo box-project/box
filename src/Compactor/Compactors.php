@@ -43,9 +43,6 @@ final class Compactors implements Compactor, Countable
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function compact(string $file, string $contents): string
     {
         return (string) array_reduce(
@@ -79,9 +76,6 @@ final class Compactors implements Compactor, Countable
         return $this->compactors;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function count(): int
     {
         return count($this->compactors);

@@ -28,9 +28,6 @@ class DocblockAnnotationParserTest extends TestCase
      */
     private $annotationParser;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->annotationParser = new DocblockAnnotationParser(

@@ -32,9 +32,6 @@ abstract class BaseCommand extends SymfonyCommand
 {
     abstract protected function executeCommand(IO $io): int;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         OutputFormatterConfigurator::configure($output);

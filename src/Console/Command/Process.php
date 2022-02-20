@@ -51,9 +51,6 @@ final class Process extends ConfigurableBaseCommand
     private const NO_RESTART_OPTION = 'no-restart';
     private const NO_CONFIG_OPTION = 'no-config';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         parent::configure();
@@ -86,9 +83,6 @@ final class Process extends ConfigurableBaseCommand
         $this->configureWorkingDirOption();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function executeCommand(IO $io): int
     {
         $input = $io->getInput();

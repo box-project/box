@@ -32,9 +32,6 @@ final class Validate extends BaseCommand
     private const FILE_ARGUMENT = 'file';
     private const IGNORE_MESSAGES_OPTION = 'ignore-recommendations-and-warnings';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         parent::configure();
@@ -67,9 +64,6 @@ HELP
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function executeCommand(IO $io): int
     {
         $input = $io->getInput();

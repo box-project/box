@@ -28,33 +28,21 @@ final class NullScoper implements Scoper
         $this->symbolsRegistry = $symbolsRegistry ?? new SymbolsRegistry();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function scope(string $filePath, string $contents): string
     {
         return $contents;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function changeSymbolsRegistry(SymbolsRegistry $symbolsRegistry): void
     {
         $this->symbolsRegistry = $symbolsRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSymbolsRegistry(): SymbolsRegistry
     {
         return $this->symbolsRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPrefix(): string
     {
         return '';
