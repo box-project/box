@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Json;
 
 use Generator;
-use function get_class;
 use function is_object;
 use function json_decode;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -34,8 +33,7 @@ use Webmozart\Assert\Assert;
  */
 class JsonTest extends FileSystemTestCase
 {
-    /** @var Json */
-    private $json;
+    private Json $json;
 
     /**
      * {@inheritdoc}
@@ -63,7 +61,7 @@ class JsonTest extends FileSystemTestCase
                 $this->fail('Did not except throwable to be thrown.');
             }
 
-            $this->assertSame(get_class($expectedThrowable), get_class($throwable));
+            $this->assertSame($expectedThrowable::class, $throwable::class);
             $this->assertSame($expectedThrowable->getMessage(), $throwable->getMessage());
 
             return;
@@ -98,7 +96,7 @@ class JsonTest extends FileSystemTestCase
                 $this->fail('Did not except throwable to be thrown: '.$throwable->getMessage());
             }
 
-            $this->assertSame(get_class($expectedThrowable), get_class($throwable));
+            $this->assertSame($expectedThrowable::class, $throwable::class);
             $this->assertSame($expectedThrowable->getMessage(), $throwable->getMessage());
 
             return;

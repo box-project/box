@@ -24,8 +24,7 @@ use function unserialize;
  */
 class JsonTest extends TestCase
 {
-    /** @var Compactor */
-    private $compactor;
+    private Compactor $compactor;
 
     protected function setUp(): void
     {

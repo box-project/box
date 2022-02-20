@@ -50,7 +50,6 @@ Dockerfile;
 
     private $image;
     private $extensions;
-    private $sourcePhar;
 
     /**
      * Creates a new instance of the generator.
@@ -73,14 +72,13 @@ Dockerfile;
      * @param string   $sourcePhar source PHAR location; This PHAR is going to be copied over to the image so the path
      *                             should either be absolute or relative to the location of the Dockerfile
      */
-    public function __construct(string $image, array $extensions, string $sourcePhar)
+    public function __construct(string $image, array $extensions, private readonly string $sourcePhar)
     {
         Assert::inArray($image, self::PHP_DOCKER_IMAGES);
         Assert::allString($extensions);
 
         $this->image = $image;
         $this->extensions = $extensions;
-        $this->sourcePhar = $sourcePhar;
     }
 
     /**
@@ -130,9 +128,7 @@ Dockerfile;
         $conditions = array_column(
             array_filter(
                 $requirements,
-                static function (array $requirement): bool {
-                    return 'php' === $requirement['type'];
-                }
+                static fn (array $requirement): bool => 'php' === $requirement['type']
             ),
             'condition'
         );
@@ -164,9 +160,7 @@ Dockerfile;
         return array_column(
             array_filter(
                 $requirements,
-                static function (array $requirement): bool {
-                    return 'extension' === $requirement['type'];
-                }
+                static fn (array $requirement): bool => 'extension' === $requirement['type']
             ),
             'condition'
         );

@@ -24,11 +24,11 @@ use const DIRECTORY_SEPARATOR;
 use function exec;
 use Generator;
 use function getcwd;
-use function getrandmax;
 use Herrera\Box\Compactor\Json;
 use Herrera\Box\Compactor\Php as PhpCompactor;
 use InvalidArgumentException;
 use function json_decode;
+use const JSON_THROW_ON_ERROR;
 use KevinGH\Box\Compactor\DummyCompactor;
 use KevinGH\Box\Compactor\InvalidCompactor;
 use KevinGH\Box\Compactor\Php;
@@ -1369,7 +1369,7 @@ JSON
             'git-commit-short' => 'git_commit_short',
             'git-tag' => 'git_tag',
             'git-version' => 'git_version',
-            'replacements' => ['rand' => $rand = random_int(0, getrandmax())],
+            'replacements' => ['rand' => $rand = random_int(0, mt_getrandmax())],
             'datetime' => 'date_time',
             'datetime-format' => 'Y:m:d',
         ]);
@@ -1402,7 +1402,7 @@ JSON
             'git-commit-short' => 'git_commit_short',
             'git-tag' => 'git_tag',
             'git-version' => 'git_version',
-            'replacements' => ['rand' => $rand = random_int(0, getrandmax())],
+            'replacements' => ['rand' => $rand = random_int(0, mt_getrandmax())],
             'replacement-sigil' => '$',
             'datetime' => 'date_time',
             'datetime-format' => 'Y:m:d',
@@ -3307,7 +3307,9 @@ COMMENT
     {
         $schema = json_decode(
             file_contents(__DIR__.'/../../res/schema.json'),
-            true
+            true,
+            512,
+            JSON_THROW_ON_ERROR
         );
 
         return array_keys($schema['properties']);

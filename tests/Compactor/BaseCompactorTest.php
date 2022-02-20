@@ -63,11 +63,8 @@ class BaseCompactorTest extends TestCase
         $expected = 'compacted contents';
 
         $compactor = new class($expected) extends BaseCompactor {
-            private $expected;
-
-            public function __construct(string $expected)
+            public function __construct(private readonly string $expected)
             {
-                $this->expected = $expected;
             }
 
             /**

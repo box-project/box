@@ -286,16 +286,15 @@ HELP
     /**
      * @param iterable|PharFileInfo[] $list
      * @param false|int               $indent Nbr of indent or `false`
-     * @param Phar|PharData           $phar
      */
     private function renderContents(
         OutputInterface $output,
         iterable $list,
         int $depth,
         int $maxDepth,
-        $indent,
+        int|false $indent,
         string $base,
-        $phar,
+        Phar|PharData $phar,
         string $root
     ): void {
         if (-1 !== $maxDepth && $depth > $maxDepth) {

@@ -23,8 +23,8 @@ use Webmozart\Assert\Assert;
  */
 final class ConfigurationLogger
 {
-    private $recommendations = [];
-    private $warnings = [];
+    private array $recommendations = [];
+    private array $warnings = [];
 
     public function addRecommendation(string $message): void
     {

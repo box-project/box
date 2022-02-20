@@ -413,7 +413,7 @@ final class FileSystem extends SymfonyFilesystem
      *
      * @return string the joint path
      */
-    public function join($paths): string
+    public function join(array|string $paths): string
     {
         return Path::join($paths);
     }
@@ -516,7 +516,7 @@ final class FileSystem extends SymfonyFilesystem
                 $this->mkdir($tmpDir, 0777);
 
                 $result = true;
-            } catch (IOException $exception) {
+            } catch (IOException) {
                 ++$attempts;
             }
         } while (false === $result && $attempts <= 10);

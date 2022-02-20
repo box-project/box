@@ -27,14 +27,11 @@ use Symfony\Component\Finder\Finder;
 
 final class PharDiff
 {
-    /** @var ParagoniePharDiff */
-    private $diff;
+    private readonly ParagoniePharDiff $diff;
 
-    /** @var Pharaoh */
-    private $pharA;
+    private readonly Pharaoh $pharA;
 
-    /** @var Pharaoh */
-    private $pharB;
+    private readonly Pharaoh $pharB;
 
     public function __construct(string $pathA, string $pathB)
     {
@@ -152,9 +149,7 @@ final class PharDiff
         $basePath = $phar->tmp.DIRECTORY_SEPARATOR;
 
         return array_map(
-            static function (SplFileInfo $fileInfo) use ($basePath): string {
-                return str_replace($basePath, '', $fileInfo->getRealPath());
-            },
+            static fn (SplFileInfo $fileInfo): string => str_replace($basePath, '', $fileInfo->getRealPath()),
             iterator_to_array(
                 Finder::create()
                     ->files()

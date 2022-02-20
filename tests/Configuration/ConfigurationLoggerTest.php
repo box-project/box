@@ -23,8 +23,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ConfigurationLoggerTest extends TestCase
 {
-    /** @var ConfigurationLogger */
-    private $logs;
+    private ConfigurationLogger $logs;
 
     /**
      * {@inheritdoc}

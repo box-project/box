@@ -22,11 +22,9 @@ final class Pharaoh extends ParagoniePharaoh
 {
     private $fileName;
 
-    /** @var null|PharInfo */
-    private $pharInfo;
+    private ?PharInfo $pharInfo = null;
 
-    /** @var null|string */
-    private $path;
+    private ?string $path = null;
 
     /**
      * {@inheritdoc}

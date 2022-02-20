@@ -21,11 +21,8 @@ use Humbug\PhpScoper\Symbol\SymbolsRegistry;
  */
 final class NullScoper implements Scoper
 {
-    private SymbolsRegistry $symbolsRegistry;
-
-    public function __construct(?SymbolsRegistry $symbolsRegistry = null)
+    public function __construct(private SymbolsRegistry $symbolsRegistry = new SymbolsRegistry())
     {
-        $this->symbolsRegistry = $symbolsRegistry ?? new SymbolsRegistry();
     }
 
     /**

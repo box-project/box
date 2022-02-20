@@ -25,16 +25,15 @@ use function is_string;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
 use KevinGH\Box\Annotation\InvalidToken;
 use function ltrim;
+use PhpToken;
 use function preg_replace;
 use RuntimeException;
 use function str_repeat;
-use function strpos;
 use function substr;
 use function substr_count;
 use const T_COMMENT;
 use const T_DOC_COMMENT;
 use const T_WHITESPACE;
-use function token_get_all;
 
 /**
  * A PHP source code compactor copied from Composer.
@@ -51,16 +50,12 @@ use function token_get_all;
  */
 final class Php extends FileExtensionCompactor
 {
-    private $annotationParser;
-
     /**
      * {@inheritdoc}
      */
-    public function __construct(DocblockAnnotationParser $annotationParser, array $extensions = ['php'])
+    public function __construct(private readonly DocblockAnnotationParser $annotationParser, array $extensions = ['php'])
     {
         parent::__construct($extensions);
-
-        $this->annotationParser = $annotationParser;
     }
 
     /**
@@ -69,7 +64,7 @@ final class Php extends FileExtensionCompactor
     protected function compactContent(string $contents): string
     {
         $output = '';
-        $tokens = token_get_all($contents);
+        $tokens = PhpToken::tokenize($contents);
         $tokenCount = count($tokens);
 
         for ($index = 0; $index < $tokenCount; ++$index) {
@@ -77,7 +72,7 @@ final class Php extends FileExtensionCompactor
             if (is_string($token)) {
                 $output .= $token;
             } elseif (in_array($token[0], [T_COMMENT, T_DOC_COMMENT], true)) {
-                if (0 === strpos($token[1], '#[')) {
+                if (str_starts_with($token[1], '#[')) {
                     // This is, in all likelyhood, the start of a PHP >= 8.0 attribute.
                     // Note: $tokens may be updated by reference as well!
                     $retokenized = $this->retokenizeAttribute($tokens, $index);
@@ -94,7 +89,7 @@ final class Php extends FileExtensionCompactor
                         // Turns out this was not an attribute. Treat it as a plain comment.
                         $output .= str_repeat("\n", substr_count($token[1], "\n"));
                     }
-                } elseif (false !== strpos($token[1], '@')) {
+                } elseif (str_contains((string) $token[1], '@')) {
                     try {
                         $output .= $this->compactAnnotations($token[1]);
                     } catch (InvalidToken $exception) {
@@ -103,7 +98,7 @@ final class Php extends FileExtensionCompactor
                         // this those cases instead of silently failing.
 
                         throw $exception;
-                    } catch (RuntimeException $exception) {
+                    } catch (RuntimeException) {
                         $output .= $token[1];
                     }
                 } else {
@@ -132,7 +127,7 @@ final class Php extends FileExtensionCompactor
                 // the previous (comment) token (PHP < 8), remove leading spaces.
                 if (is_array($tokens[$previousIndex])
                     && T_COMMENT === $tokens[$previousIndex][0]
-                    && false !== strpos($tokens[$previousIndex][1], "\n")
+                    && str_contains((string) $tokens[$previousIndex][1], "\n")
                 ) {
                     $whitespace = ltrim($whitespace, ' ');
                 }
@@ -212,7 +207,7 @@ final class Php extends FileExtensionCompactor
     {
         $token = $tokens[$opener];
         $attributeBody = substr($token[1], 2);
-        $subTokens = @token_get_all('<?php '.$attributeBody);
+        $subTokens = @PhpToken::tokenize('<?php '.$attributeBody);
 
         // Replace the PHP open tag with the attribute opener as a simple token.
         array_splice($subTokens, 0, 1, ['#[']);
@@ -230,7 +225,7 @@ final class Php extends FileExtensionCompactor
                 }
             }
 
-            $subTokens = @token_get_all('<?php '.$attributeBody);
+            $subTokens = @PhpToken::tokenize('<?php '.$attributeBody);
             array_splice($subTokens, 0, 1, ['#[']);
 
             $closer = $this->findAttributeCloser($subTokens, 0);

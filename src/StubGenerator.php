@@ -40,21 +40,21 @@ __HALT_COMPILER(); ?>
 STUB;
 
     /** @var null|string The alias to be used in "phar://" URLs */
-    private $alias;
+    private ?string $alias = null;
 
     /** @var null|string The top header comment banner text */
-    private $banner;
+    private ?string $banner = null;
 
     /** @var null|string The location within the PHAR of index script */
-    private $index;
+    private ?string $index = null;
 
     /** @var bool Use the Phar::interceptFileFuncs() method? */
-    private $intercept = false;
+    private bool $intercept = false;
 
     /** @var null|string The shebang line */
-    private $shebang;
+    private ?string $shebang = null;
 
-    private $checkRequirements = true;
+    private bool $checkRequirements = true;
 
     /**
      * Creates a new instance of the stub generator.

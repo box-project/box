@@ -29,18 +29,14 @@ use function strtolower;
  */
 final class DocblockAnnotationParser
 {
-    private $factory;
-    private $tagsFormatter;
-    private $ignored;
-
     /**
      * @param string[] $ignored
      */
-    public function __construct(DocBlockFactoryInterface $factory, Formatter $tagsFormatter, array $ignored)
-    {
-        $this->factory = $factory;
-        $this->ignored = $ignored;
-        $this->tagsFormatter = $tagsFormatter;
+    public function __construct(
+        private readonly DocBlockFactoryInterface $factory,
+        private readonly Formatter $tagsFormatter,
+        private readonly array $ignored
+    ) {
     }
 
     /**
@@ -50,23 +46,23 @@ final class DocblockAnnotationParser
     {
         try {
             $doc = $this->factory->create($docblock);
-        } catch (InvalidArgumentException $e) {
-            throw new MalformedTagException('The annotations could not be parsed.', 0, $e);
+        } catch (InvalidArgumentException $invalidDocBlock) {
+            throw new MalformedTagException('The annotations could not be parsed.', 0, $invalidDocBlock);
         }
 
         $tags = array_values(
             array_filter(
                 $doc->getTags(),
-                function (Tag $tag) {
-                    return !in_array(strtolower($tag->getName()), $this->ignored, true);
-                }
-            )
+                static fn (Tag $tag) => !in_array(
+                    strtolower($tag->getName()),
+                    $this->ignored,
+                    true,
+                ),
+            ),
         );
 
         return array_map(
-            function (Tag $tag) {
-                return $tag->render($this->tagsFormatter);
-            },
+            static fn (Tag $tag) => $tag->render($this->tagsFormatter),
             $tags
         );
     }

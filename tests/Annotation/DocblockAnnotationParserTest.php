@@ -23,10 +23,7 @@ use PHPUnit\Framework\TestCase;
  */
 class DocblockAnnotationParserTest extends TestCase
 {
-    /**
-     * @var DocblockAnnotationParser
-     */
-    private $annotationParser;
+    private DocblockAnnotationParser $annotationParser;
 
     /**
      * {@inheritdoc}

@@ -16,7 +16,6 @@ namespace KevinGH\Box\Console;
 
 use function KevinGH\Box\get_box_version;
 use function sprintf;
-use function strpos;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Helper\HelperSet;
 use function trim;
@@ -45,9 +44,9 @@ ASCII;
      */
     public function __construct(string $name = 'Box', ?string $version = null, string $releaseDate = '@release-date@')
     {
-        $version = $version ?? get_box_version();
+        $version ??= get_box_version();
 
-        $this->releaseDate = false === strpos($releaseDate, '@') ? $releaseDate : '';
+        $this->releaseDate = !str_contains($releaseDate, '@') ? $releaseDate : '';
 
         parent::__construct($name, $version);
     }

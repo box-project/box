@@ -516,7 +516,7 @@ function longest_common_base_path(array $paths): ?string
  *
  * @private
  */
-function join($paths): string
+function join(array|string $paths): string
 {
     static $fileSystem;
 
@@ -635,7 +635,7 @@ function copy(string $originFile, string $targetFile, bool $overwriteNewerFiles 
  *
  * @private
  */
-function mkdir($dirs, int $mode = 0777): void
+function mkdir(iterable|string $dirs, int $mode = 0777): void
 {
     static $fileSystem;
 
@@ -655,7 +655,7 @@ function mkdir($dirs, int $mode = 0777): void
  *
  * @private
  */
-function remove($files): void
+function remove(iterable|string $files): void
 {
     static $fileSystem;
 
@@ -675,7 +675,7 @@ function remove($files): void
  *
  * @private
  */
-function exists($files): bool
+function exists(iterable|string $files): bool
 {
     static $fileSystem;
 
@@ -697,7 +697,7 @@ function exists($files): bool
  *
  * @private
  */
-function touch($files, ?int $time = null, ?int $atime = null): void
+function touch(iterable|string $files, ?int $time = null, ?int $atime = null): void
 {
     static $fileSystem;
 
@@ -720,7 +720,7 @@ function touch($files, ?int $time = null, ?int $atime = null): void
  *
  * @private
  */
-function chmod($files, int $mode, int $umask = 0000, bool $recursive = false): void
+function chmod(iterable|string $files, int $mode, int $umask = 0000, bool $recursive = false): void
 {
     static $fileSystem;
 
@@ -742,7 +742,7 @@ function chmod($files, int $mode, int $umask = 0000, bool $recursive = false): v
  *
  * @private
  */
-function chown($files, string $user, bool $recursive = false): void
+function chown(iterable|string $files, string $user, bool $recursive = false): void
 {
     static $fileSystem;
 
@@ -764,7 +764,7 @@ function chown($files, string $user, bool $recursive = false): void
  *
  * @private
  */
-function chgrp($files, string $group, bool $recursive = false): void
+function chgrp(iterable|string $files, string $group, bool $recursive = false): void
 {
     static $fileSystem;
 
@@ -831,7 +831,7 @@ function symlink(string $originDir, string $targetDir, bool $copyOnWindows = fal
  *
  * @private
  */
-function hardlink(string $originFile, string $targetFiles): void
+function hardlink(string $originFile, array|string $targetFiles): void
 {
     static $fileSystem;
 

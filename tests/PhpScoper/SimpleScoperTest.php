@@ -24,7 +24,7 @@ class SimpleScoperTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function test_todo(): void
+    public function test_todo(): never
     {
         $this->markTestSkipped('TODO: need rework');
     }

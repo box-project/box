@@ -23,7 +23,6 @@ use function decoct;
 use function explode;
 use function file_exists;
 use function filesize;
-use function get_class;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function implode;
 use function is_callable;
@@ -337,9 +336,9 @@ HELP;
         );
 
         $logCompactors = static function (Compactor $compactor) use ($logger): void {
-            $compactorClassParts = explode('\\', get_class($compactor));
+            $compactorClassParts = explode('\\', $compactor::class);
 
-            if (0 === strpos($compactorClassParts[0], '_HumbugBox')) {
+            if (str_starts_with($compactorClassParts[0], '_HumbugBox')) {
                 // Keep the non prefixed class name for the user
                 array_shift($compactorClassParts);
             }

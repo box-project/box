@@ -57,6 +57,8 @@ use function str_replace;
 use Symfony\Component\Finder\Finder;
 use Throwable;
 use function trim;
+use KevinGH\Box\Box;
+use Stringablenew;
 
 /**
  * @covers \KevinGH\Box\Box
@@ -69,8 +71,7 @@ class BoxTest extends FileSystemTestCase
     use ProphecyTrait;
     use RequiresPharReadonlyOff;
 
-    /** @var Box */
-    private $box;
+    private Box $box;
 
     /**
      * {@inheritdoc}
@@ -627,10 +628,7 @@ class BoxTest extends FileSystemTestCase
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
-                'Cannot add files if the buffering has not started.',
-                $exception->getMessage()
-            );
+            static::assertSame('Cannot add files if the buffering has not started.', $exception->getMessage());
         }
     }
 
@@ -901,7 +899,7 @@ JSON
         $error = null;
 
         try {
-            $this->box->endBuffering(static function () use (&$error): void {
+            $this->box->endBuffering(static function () use (&$error): never {
                 throw $error = new Error('Autoload dump error');
             });
 
@@ -1111,7 +1109,7 @@ JSON
             $this->box->addFiles(['/nowhere/foo'], false);
 
             $this->fail('Expected exception to be thrown.');
-        } catch (InvalidArgumentException $exception) {
+        } catch (InvalidArgumentException) {
             $tmpDirs = iterator_to_array(
                 Finder::create()
                     ->directories()
@@ -1123,13 +1121,11 @@ JSON
             $boxDir = current(
                 array_filter(
                     $tmpDirs,
-                    function (SplFileInfo $fileInfo) use ($boxTmp): bool {
-                        return false === in_array(
-                            $fileInfo->getRealPath(),
-                            [realpath($boxTmp), realpath($this->tmp)],
-                            true
-                        );
-                    }
+                    fn(SplFileInfo $fileInfo): bool => false === in_array(
+                        $fileInfo->getRealPath(),
+                        [realpath($boxTmp), realpath($this->tmp)],
+                        true
+                    )
                 )
             );
 
@@ -1172,7 +1168,7 @@ __HALT_COMPILER();
 PHP
         );
 
-        $stringable = new class() {
+        $stringable =  implements Stringablenew class() {
             public function __toString(): string
             {
                 return 'stringable value';
@@ -1630,7 +1626,7 @@ PHP
     private function getPrivateKey(): array
     {
         return [
-            <<<'KEY'
+            <<<'KEY_WRAP'
 -----BEGIN RSA PRIVATE KEY-----
 Proc-Type: 4,ENCRYPTED
 DEK-Info: DES-EDE3-CBC,3FF97F75E5A8F534
@@ -1649,7 +1645,8 @@ ypcpLwfS6gyenTqiTiJx/Zca4xmRNA+Fy1EhkymxP3ku0kTU6qutT2tuYOjtz/rW
 k6oIhMcpsXFdB3N9iHT4qqElo3rVW/qLQaNIqxd8+JmE5GkHmF43PhK3HX1PCmRC
 TnvzVS0y1l8zCsRToUtv5rCBC+r8Q3gnvGGnT4jrsp98ithGIQCbbQ==
 -----END RSA PRIVATE KEY-----
-KEY
+KEY_WRAP
+
             ,
             'test',
         ];
@@ -1659,11 +1656,12 @@ KEY
     {
         $this->box->getPhar()->addFromString(
             'main.php',
-            <<<'PHP'
+            <<<'PHP_WRAP'
 <?php
 
 echo 'Hello, world!'.PHP_EOL;
-PHP
+PHP_WRAP
+
         );
 
         $this->box->getPhar()->setStub(

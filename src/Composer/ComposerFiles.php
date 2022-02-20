@@ -19,10 +19,6 @@ use function array_map;
 
 final class ComposerFiles
 {
-    private $composerJson;
-    private $composerLock;
-    private $installedJson;
-
     public static function createEmpty(): self
     {
         return new self(
@@ -32,14 +28,8 @@ final class ComposerFiles
         );
     }
 
-    public function __construct(
-        ComposerFile $composerJson,
-        ComposerFile $composerLock,
-        ComposerFile $installedJson
-    ) {
-        $this->composerJson = $composerJson;
-        $this->composerLock = $composerLock;
-        $this->installedJson = $installedJson;
+    public function __construct(private readonly ComposerFile $composerJson, private readonly ComposerFile $composerLock, private readonly ComposerFile $installedJson)
+    {
     }
 
     public function getComposerJson(): ComposerFile
@@ -63,9 +53,7 @@ final class ComposerFiles
     public function getPaths(): array
     {
         return array_filter(array_map(
-            static function (ComposerFile $file): ?string {
-                return $file->getPath();
-            },
+            static fn (ComposerFile $file): ?string => $file->getPath(),
             [$this->composerJson, $this->composerLock, $this->installedJson]
         ));
     }

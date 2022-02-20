@@ -57,24 +57,18 @@ use Webmozart\Assert\Assert;
  */
 final class Box implements Countable
 {
-    /** @var string The path to the PHAR file */
-    private $file;
-
-    /** @var Phar The PHAR instance */
-    private $phar;
-
     private $compactors;
     private $placeholderCompactor;
     private $mapFile;
     private $scoper;
-    private $buffering = false;
-    private $bufferedFiles = [];
+    private bool $buffering = false;
+    private array $bufferedFiles = [];
 
-    private function __construct(Phar $phar, string $file)
+    private function __construct(/** @var Phar The PHAR instance */
+    private readonly Phar $phar, /** @var string The path to the PHAR file */
+    private readonly string $file
+    )
     {
-        $this->phar = $phar;
-        $this->file = $file;
-
         $this->compactors = new Compactors();
         $this->placeholderCompactor = new Placeholder([]);
         $this->mapFile = new MapFile(getcwd(), []);
@@ -87,8 +81,6 @@ final class Box implements Countable
      * @param string $file  The PHAR file name
      * @param int    $flags Flags to pass to the Phar parent class RecursiveDirectoryIterator
      * @param string $alias Alias with which the Phar archive should be referred to in calls to stream functionality
-     *
-     * @return Box
      *
      * @see RecursiveDirectoryIterator
      */

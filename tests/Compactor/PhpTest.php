@@ -39,7 +39,7 @@ class PhpTest extends TestCase
             )
         );
 
-        $contents = <<<'PHP'
+        $contents = <<<'PHP_WRAP'
 <?php
 
 
@@ -48,7 +48,7 @@ class PhpTest extends TestCase
 $x = '';
 
 
-PHP;
+PHP_WRAP;
         $actual = $compactor->compact($file, $contents);
 
         $this->assertSame($supports, $contents !== $actual);

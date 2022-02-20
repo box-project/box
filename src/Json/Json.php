@@ -51,10 +51,8 @@ final class Json
 
     /**
      * @throws ParsingException
-     *
-     * @return array|stdClass
      */
-    public function decode(string $json, bool $assoc = false)
+    public function decode(string $json, bool $assoc = false): array|stdClass
     {
         $data = json_decode($json, $assoc);
 
@@ -73,10 +71,8 @@ final class Json
 
     /**
      * @throws ParsingException
-     *
-     * @return array|stdClass
      */
-    public function decodeFile(string $file, bool $assoc = false)
+    public function decodeFile(string $file, bool $assoc = false): array|stdClass
     {
         $json = file_contents($file);
 

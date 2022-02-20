@@ -45,7 +45,7 @@ final class ConfigurationLoader
         bool $allowNoFile
     ): Configuration {
         try {
-            $configPath = $configPath ?? $helper->findDefaultPath();
+            $configPath ??= $helper->findDefaultPath();
 
             $io->comment(
                 sprintf(

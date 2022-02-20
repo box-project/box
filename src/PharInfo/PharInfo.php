@@ -29,10 +29,8 @@ final class PharInfo
 
     private $phar;
 
-    /** @var null|array */
-    private $compressionCount;
-    /** @var null|string */
-    private $hash;
+    private ?array $compressionCount = null;
+    private ?string $hash = null;
 
     public function __construct(string $pharFile)
     {
@@ -43,7 +41,7 @@ final class PharInfo
 
         try {
             $this->phar = new Phar($pharFile);
-        } catch (UnexpectedValueException $exception) {
+        } catch (UnexpectedValueException) {
             $this->phar = new PharData($pharFile);
         }
     }
@@ -66,10 +64,7 @@ final class PharInfo
         return $this->compressionCount;
     }
 
-    /**
-     * @return Phar|PharData
-     */
-    public function getPhar()
+    public function getPhar(): Phar|PharData
     {
         return $this->phar;
     }

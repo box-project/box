@@ -30,7 +30,7 @@ use Laravel\SerializableClosure\SerializableClosure;
  */
 final class SimpleScoper implements Scoper
 {
-    private PhpScoperConfiguration $scoperConfig;
+    private readonly PhpScoperConfiguration $scoperConfig;
     private PhpScoperContainer $scoperContainer;
     private PhpScoper $scoper;
     private SymbolsRegistry $symbolsRegistry;
@@ -38,7 +38,7 @@ final class SimpleScoper implements Scoper
     /**
      * @var list<string>
      */
-    private array $excludedFilePaths;
+    private readonly array $excludedFilePaths;
 
     public function __construct(
         PhpScoperConfiguration $scoperConfig,

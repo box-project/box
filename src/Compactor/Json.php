@@ -18,6 +18,7 @@ use function json_decode;
 use function json_encode;
 use const JSON_ERROR_NONE;
 use function json_last_error;
+use const JSON_THROW_ON_ERROR;
 
 /**
  * Compacts JSON files by re-encoding without pretty print.
@@ -46,6 +47,6 @@ final class Json extends FileExtensionCompactor
             return $contents;
         }
 
-        return json_encode($decodedContents);
+        return json_encode($decodedContents, JSON_THROW_ON_ERROR);
     }
 }
