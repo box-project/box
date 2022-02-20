@@ -69,7 +69,7 @@ final class DocblockAnnotationParser
         } catch (InvalidArgumentException $invalidDocBlock) {
             throw new MalformedTagException(
                 'The annotations could not be parsed.',
-                $invalidDocBlock->getCode(),
+                0,
                 $invalidDocBlock,
             );
         }
