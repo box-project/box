@@ -187,9 +187,7 @@ return [
         \Composer\Autoload\ClassLoader::class,
 
         \KevinGH\Box\Compactor\Compactor::class,
-        \Herrera\Box\Compactor\Json::class,
         \KevinGH\Box\Compactor\Json::class,
-        \Herrera\Box\Compactor\Php::class,
         \KevinGH\Box\Compactor\Php::class,
         \KevinGH\Box\Compactor\PhpScoper::class,
 

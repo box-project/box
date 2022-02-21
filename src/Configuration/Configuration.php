@@ -35,8 +35,6 @@ use const E_USER_DEPRECATED;
 use function explode;
 use function file_exists;
 use function getcwd;
-use Herrera\Box\Compactor\Json as LegacyJson;
-use Herrera\Box\Compactor\Php as LegacyPhp;
 use Humbug\PhpScoper\Configuration\Configuration as PhpScoperConfiguration;
 use Humbug\PhpScoper\Container;
 use function implode;
@@ -1750,27 +1748,7 @@ final class Configuration
                 Assert::classExists($class, 'The compactor class %s does not exist.');
                 Assert::isAOf($class, Compactor::class, sprintf('The class "%s" is not a compactor class.', $class));
 
-                if (LegacyPhp::class === $class) {
-                    $logger->addRecommendation(
-                        sprintf(
-                            'The compactor "%s" has been deprecated, use "%s" instead.',
-                            LegacyPhp::class,
-                            PhpCompactor::class
-                        )
-                    );
-                }
-
-                if (LegacyJson::class === $class) {
-                    $logger->addRecommendation(
-                        sprintf(
-                            'The compactor "%s" has been deprecated, use "%s" instead.',
-                            LegacyJson::class,
-                            JsonCompactor::class
-                        )
-                    );
-                }
-
-                if (PhpCompactor::class === $class || LegacyPhp::class === $class) {
+                if (PhpCompactor::class === $class) {
                     return self::createPhpCompactor($ignoredAnnotations);
                 }
 

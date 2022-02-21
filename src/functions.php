@@ -188,15 +188,6 @@ function register_aliases(): void
     if (false === class_exists(\Isolated\Symfony\Component\Finder\Finder::class)) {
         class_alias(\Symfony\Component\Finder\Finder::class, \Isolated\Symfony\Component\Finder\Finder::class);
     }
-
-    // Register compactors aliases
-    if (false === class_exists(\Herrera\Box\Compactor\Json::class, false)) {
-        class_alias(\KevinGH\Box\Compactor\Json::class, \Herrera\Box\Compactor\Json::class);
-    }
-
-    if (false === class_exists(\Herrera\Box\Compactor\Php::class, false)) {
-        class_alias(\KevinGH\Box\Compactor\Php::class, \Herrera\Box\Compactor\Php::class);
-    }
 }
 
 /**
