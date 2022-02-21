@@ -43,6 +43,7 @@
     "require": {
         "php": "^8.1",
         "ext-phar": "*",
+        "ext-sodium": "*",
         "composer-plugin-api": "^2.2",
         "amphp/parallel-functions": "^1.1",
         "composer/semver": "^3.2",
@@ -69,6 +70,9 @@
         "phpspec/prophecy-phpunit": "^2.0",
         "phpunit/phpunit": "^9.0",
         "symfony/phpunit-bridge": "^4.2 || ^5.0"
+    },
+    "replace": {
+        "paragonie/sodium_compat" : "*"
     },
     "suggest": {
         "ext-openssl": "To accelerate private key generation."
