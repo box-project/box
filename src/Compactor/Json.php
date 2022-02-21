@@ -34,7 +34,6 @@ final class Json extends FileExtensionCompactor
 
     protected function compactContent(string $contents): string
     {
-        // TODO: migrate this piece of code once on PHP 7.3
         $decodedContents = json_decode($contents, false);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
