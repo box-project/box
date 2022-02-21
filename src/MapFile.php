@@ -28,8 +28,8 @@ final class MapFile
      * @param string[][] $map
      */
     public function __construct(
-        private string $basePath,
-        private array $map
+        private readonly string $basePath,
+        private readonly array $map
     ) {
     }
 
