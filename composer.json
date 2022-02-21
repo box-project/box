@@ -70,6 +70,9 @@
         "phpunit/phpunit": "^9.0",
         "symfony/phpunit-bridge": "^4.2 || ^5.0"
     },
+    "replace": {
+        "paragonie/sodium_compat" : "*"
+    },
     "suggest": {
         "ext-openssl": "To accelerate private key generation."
     },
