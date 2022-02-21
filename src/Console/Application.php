@@ -69,8 +69,6 @@ final class Application extends SymfonyApplication
     {
         $commands = parent::getDefaultCommands();
 
-        // TODO: remove this command
-        $commands[] = new Command\Build();
         $commands[] = new Command\Compile();
         $commands[] = new Command\Diff();
         $commands[] = new Command\Info();
