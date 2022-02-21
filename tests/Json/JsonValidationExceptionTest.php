@@ -31,10 +31,7 @@ class JsonValidationExceptionTest extends FileSystemTestCase
 
             $this->fail('Expected exception to be thrown');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
-                'The file "unknown file" does not exist.',
-                $exception->getMessage()
-            );
+            static::assertSame('The file "unknown file" does not exist.', $exception->getMessage());
         }
     }
 
@@ -45,10 +42,7 @@ class JsonValidationExceptionTest extends FileSystemTestCase
 
             $this->fail('Expected exception to be thrown');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
-                'Expected a string. Got: boolean',
-                $exception->getMessage()
-            );
+            static::assertSame('Expected a string. Got: boolean', $exception->getMessage());
         }
     }
 

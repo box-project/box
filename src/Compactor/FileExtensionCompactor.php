@@ -26,7 +26,10 @@ use Webmozart\Assert\Assert;
  */
 abstract class FileExtensionCompactor extends BaseCompactor
 {
-    private $extensions;
+    /**
+     * @var string[]
+     */
+    private array $extensions;
 
     /**
      * @param string[] $extensions the list of supported file extensions

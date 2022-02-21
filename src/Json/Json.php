@@ -30,7 +30,7 @@ use stdClass;
  */
 final class Json
 {
-    private $linter;
+    private JsonParser $linter;
 
     public function __construct()
     {
@@ -51,10 +51,8 @@ final class Json
 
     /**
      * @throws ParsingException
-     *
-     * @return array|stdClass
      */
-    public function decode(string $json, bool $assoc = false)
+    public function decode(string $json, bool $assoc = false): array|stdClass
     {
         $data = json_decode($json, $assoc);
 
@@ -73,10 +71,8 @@ final class Json
 
     /**
      * @throws ParsingException
-     *
-     * @return array|stdClass
      */
-    public function decodeFile(string $file, bool $assoc = false)
+    public function decodeFile(string $file, bool $assoc = false): array|stdClass
     {
         $json = file_contents($file);
 
@@ -100,7 +96,7 @@ final class Json
         if (!$validator->isValid()) {
             $errors = [];
 
-            foreach ((array) $validator->getErrors() as $error) {
+            foreach ($validator->getErrors() as $error) {
                 $errors[] = ($error['property'] ? $error['property'].' : ' : '').$error['message'];
             }
 

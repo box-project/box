@@ -686,6 +686,6 @@ PHP
     {
         $finder = Finder::create()->files()->in($this->tmp);
 
-        return $this->normalizePaths(iterator_to_array($finder, false), true);
+        return $this->normalizePaths(iterator_to_array($finder, false));
     }
 }

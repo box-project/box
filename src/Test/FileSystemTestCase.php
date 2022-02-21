@@ -72,9 +72,7 @@ abstract class FileSystemTestCase extends TestCase
 
         $files = array_values(
             array_map(
-                static function (string $file) use ($root): string {
-                    return str_replace($root.DIRECTORY_SEPARATOR, '', $file);
-                },
+                static fn (string $file): string => str_replace($root.DIRECTORY_SEPARATOR, '', $file),
                 $files
             )
         );

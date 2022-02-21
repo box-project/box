@@ -21,6 +21,7 @@ use function array_merge;
 use function array_unique;
 use function array_values;
 use function json_decode;
+use const JSON_THROW_ON_ERROR;
 use function KevinGH\Box\FileSystem\file_contents;
 use PHPUnit\Framework\TestCase;
 use function preg_match;
@@ -50,9 +51,7 @@ class DocumentationSchemaTest extends TestCase
         $schemaKeys = array_values(
             array_filter(
                 $this->retrieveSchemaKeys(),
-                static function (string $key): bool {
-                    return 'datetime_format' !== $key;
-                }
+                static fn (string $key): bool => 'datetime_format' !== $key
             )
         );
 
@@ -87,9 +86,7 @@ class DocumentationSchemaTest extends TestCase
         $schemaKeys = array_values(
             array_filter(
                 $this->retrieveSchemaKeys(),
-                static function (string $key): bool {
-                    return 'datetime_format' !== $key;
-                }
+                static fn (string $key): bool => 'datetime_format' !== $key
             )
         );
 
@@ -110,7 +107,7 @@ class DocumentationSchemaTest extends TestCase
             )
         );
 
-        return array_keys(json_decode($matches['schema'], true));
+        return array_keys(json_decode($matches['schema'], true, 512, JSON_THROW_ON_ERROR));
     }
 
     /**
@@ -120,7 +117,9 @@ class DocumentationSchemaTest extends TestCase
     {
         $schema = json_decode(
             file_contents(__DIR__.'/../res/schema.json'),
-            true
+            true,
+            512,
+            JSON_THROW_ON_ERROR
         );
 
         return array_keys($schema['properties']);
@@ -132,7 +131,7 @@ class DocumentationSchemaTest extends TestCase
     private function retrieveDocKeys(): array
     {
         preg_match_all(
-            '/#+ [\p{L}\-\s]+\(`(.*?)`(?:[\p{L}\-\s]+`(.*?)`)?\)/u',
+            '/#+ [\p{L}\\-\s]+\(`(.*?)`(?:[\p{L}\\-\s]+`(.*?)`)?\)/u',
             file_contents(__DIR__.'/../doc/configuration.md'),
             $matches
         );

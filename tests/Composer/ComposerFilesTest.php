@@ -55,9 +55,7 @@ class ComposerFilesTest extends TestCase
             $installed = new ComposerFile('path/to/installed.json', ['name' => 'installed.json']);
 
             return [
-                static function () use ($json, $lock, $installed): ComposerFiles {
-                    return new ComposerFiles($json, $lock, $installed);
-                },
+                static fn (): ComposerFiles => new ComposerFiles($json, $lock, $installed),
                 $json,
                 $lock,
                 $installed,
@@ -75,9 +73,7 @@ class ComposerFilesTest extends TestCase
             $installed = ComposerFile::createEmpty();
 
             return [
-                static function () use ($json, $lock, $installed): ComposerFiles {
-                    return new ComposerFiles($json, $lock, $installed);
-                },
+                static fn (): ComposerFiles => new ComposerFiles($json, $lock, $installed),
                 $json,
                 $lock,
                 $installed,
@@ -85,16 +81,12 @@ class ComposerFilesTest extends TestCase
             ];
         })();
 
-        yield (static function (): array {
-            return [
-                static function (): ComposerFiles {
-                    return ComposerFiles::createEmpty();
-                },
-                ComposerFile::createEmpty(),
-                ComposerFile::createEmpty(),
-                ComposerFile::createEmpty(),
-                [],
-            ];
-        })();
+        yield (static fn (): array => [
+            static fn (): ComposerFiles => ComposerFiles::createEmpty(),
+            ComposerFile::createEmpty(),
+            ComposerFile::createEmpty(),
+            ComposerFile::createEmpty(),
+            [],
+        ])();
     }
 }

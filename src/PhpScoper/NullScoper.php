@@ -21,11 +21,9 @@ use Humbug\PhpScoper\Symbol\SymbolsRegistry;
  */
 final class NullScoper implements Scoper
 {
-    private SymbolsRegistry $symbolsRegistry;
-
-    public function __construct(?SymbolsRegistry $symbolsRegistry = null)
-    {
-        $this->symbolsRegistry = $symbolsRegistry ?? new SymbolsRegistry();
+    public function __construct(
+        private SymbolsRegistry $symbolsRegistry = new SymbolsRegistry(),
+    ) {
     }
 
     public function scope(string $filePath, string $contents): string

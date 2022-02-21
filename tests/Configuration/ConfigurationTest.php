@@ -24,11 +24,11 @@ use const DIRECTORY_SEPARATOR;
 use function exec;
 use Generator;
 use function getcwd;
-use function getrandmax;
 use Herrera\Box\Compactor\Json;
 use Herrera\Box\Compactor\Php as PhpCompactor;
 use InvalidArgumentException;
 use function json_decode;
+use const JSON_THROW_ON_ERROR;
 use KevinGH\Box\Compactor\DummyCompactor;
 use KevinGH\Box\Compactor\InvalidCompactor;
 use KevinGH\Box\Compactor\Php;
@@ -43,6 +43,7 @@ use function KevinGH\Box\FileSystem\touch;
 use function KevinGH\Box\get_box_version;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\MapFile;
+use function mt_getrandmax;
 use Phar;
 use const PHP_EOL;
 use function random_int;
@@ -1366,7 +1367,7 @@ JSON
             'git-commit-short' => 'git_commit_short',
             'git-tag' => 'git_tag',
             'git-version' => 'git_version',
-            'replacements' => ['rand' => $rand = random_int(0, getrandmax())],
+            'replacements' => ['rand' => $rand = random_int(0, mt_getrandmax())],
             'datetime' => 'date_time',
             'datetime-format' => 'Y:m:d',
         ]);
@@ -1399,7 +1400,7 @@ JSON
             'git-commit-short' => 'git_commit_short',
             'git-tag' => 'git_tag',
             'git-version' => 'git_version',
-            'replacements' => ['rand' => $rand = random_int(0, getrandmax())],
+            'replacements' => ['rand' => $rand = random_int(0, mt_getrandmax())],
             'replacement-sigil' => '$',
             'datetime' => 'date_time',
             'datetime-format' => 'Y:m:d',
@@ -2997,8 +2998,10 @@ JSON
 
         $expectedDumpedConfig = <<<EOF
 KevinGH\Box\Configuration\Configuration {#100
+  -compressionAlgorithm: "GZ"
+  -mainScriptPath: & "index.php"
+  -mainScriptContents: ""
   -file: & "box.json"
-  -fileMode: "0755"
   -alias: "test.phar"
   -basePath: "/path/to"
   -composerJson: KevinGH\Box\Composer\ComposerFile {#100
@@ -3036,9 +3039,7 @@ KevinGH\Box\Configuration\Configuration {#100
   -compactors: array:1 [
     0 => "KevinGH\Box\Compactor\Php"
   ]
-  -compressionAlgorithm: "GZ"
-  -mainScriptPath: & "index.php"
-  -mainScriptContents: ""
+  -fileMode: "0755"
   -fileMapper: KevinGH\Box\MapFile {#100
     -basePath: "/path/to"
     -map: []
@@ -3304,7 +3305,9 @@ COMMENT
     {
         $schema = json_decode(
             file_contents(__DIR__.'/../../res/schema.json'),
-            true
+            true,
+            512,
+            JSON_THROW_ON_ERROR
         );
 
         return array_keys($schema['properties']);

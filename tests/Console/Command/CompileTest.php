@@ -29,6 +29,7 @@ use function iterator_to_array;
 use function json_decode;
 use function json_encode;
 use const JSON_PRETTY_PRINT;
+use const JSON_THROW_ON_ERROR;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Console\DisplayNormalizer;
 use function KevinGH\Box\FileSystem\chmod;
@@ -129,7 +130,8 @@ class CompileTest extends CommandTestCase
                     'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
                     'shebang' => $shebang,
-                ]
+                ],
+                JSON_THROW_ON_ERROR
             )
         );
 
@@ -335,7 +337,8 @@ PHP;
                     'metadata' => ['rand' => random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
                     'shebang' => $shebang,
-                ]
+                ],
+                JSON_THROW_ON_ERROR
             )
         );
 
@@ -817,7 +820,8 @@ PHP;
                     'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
                     'shebang' => $shebang,
-                ]
+                ],
+                JSON_THROW_ON_ERROR
             )
         );
 
@@ -937,7 +941,8 @@ OUTPUT;
                     'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
                     'shebang' => $shebang,
-                ]
+                ],
+                JSON_THROW_ON_ERROR
             )
         );
 
@@ -1165,8 +1170,16 @@ OUTPUT;
 //
 
 KevinGH\Box\Configuration\Configuration {#140
+  -compressionAlgorithm: "NONE"
+  -mainScriptPath: & "index.php"
+  -mainScriptContents: """
+    <?php\n
+    \n
+    declare(strict_types=1);\n
+    \n
+    echo 'Yo';\n
+    """
   -file: & "box.json"
-  -fileMode: "0755"
   -alias: "index.phar"
   -basePath: "/path/to"
   -composerJson: KevinGH\Box\Composer\ComposerFile {#140
@@ -1184,15 +1197,7 @@ KevinGH\Box\Configuration\Configuration {#140
   -excludeComposerFiles: true
   -excludeDevFiles: false
   -compactors: []
-  -compressionAlgorithm: "NONE"
-  -mainScriptPath: & "index.php"
-  -mainScriptContents: """
-    <?php\n
-    \n
-    declare(strict_types=1);\n
-    \n
-    echo 'Yo';\n
-    """
+  -fileMode: "0755"
   -fileMapper: KevinGH\Box\MapFile {#140
     -basePath: "/path/to"
     -map: []
@@ -1326,7 +1331,8 @@ EOF;
                     'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
                     'shebang' => $shebang,
-                ]
+                ],
+                JSON_THROW_ON_ERROR
             )
         );
 
@@ -1391,7 +1397,8 @@ EOF;
                     'output' => 'test.phar',
                     'shebang' => $shebang,
                     'stub' => false,
-                ]
+                ],
+                JSON_THROW_ON_ERROR
             )
         );
 
@@ -1457,7 +1464,8 @@ PHP
                     'output' => 'test.phar',
                     'shebang' => $shebang,
                     'stub' => 'custom_stub',
-                ]
+                ],
+                JSON_THROW_ON_ERROR
             )
         );
 
@@ -2333,7 +2341,8 @@ OUTPUT;
                     'main' => 'index.php',
                     'stub' => $stub,
                     'blacklist' => ['box.json'],
-                ]
+                ],
+                JSON_THROW_ON_ERROR
             )
         );
 
@@ -2488,10 +2497,13 @@ OUTPUT;
                 array_merge(
                     json_decode(
                         file_get_contents('box.json'),
-                        true
+                        true,
+                        512,
+                        JSON_THROW_ON_ERROR
                     ),
                     ['output' => 'test']
-                )
+                ),
+                JSON_THROW_ON_ERROR
             )
         );
 
@@ -2614,7 +2626,7 @@ OUTPUT;
             1,
             preg_match(
                 '/namespace (?<namespace>.*);/',
-                $indexContents = file_get_contents('phar://index.phar/index.php'),
+                (string) ($indexContents = file_get_contents('phar://index.phar/index.php')),
                 $matches
             ),
             sprintf(
@@ -2650,7 +2662,7 @@ OUTPUT;
             1,
             preg_match(
                 '/namespace (?<namespace>.*);/',
-                $indexContents = file_get_contents('phar://index.phar/index.php'),
+                (string) ($indexContents = file_get_contents('phar://index.phar/index.php')),
                 $matches
             ),
             sprintf(

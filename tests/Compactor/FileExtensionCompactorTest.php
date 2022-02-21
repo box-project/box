@@ -52,13 +52,9 @@ class FileExtensionCompactorTest extends TestCase
         $expected = 'compacted contents';
 
         $compactor = new class($expected) extends FileExtensionCompactor {
-            private $expected;
-
-            public function __construct(string $expected)
+            public function __construct(private readonly string $expected)
             {
                 parent::__construct(['php']);
-
-                $this->expected = $expected;
             }
 
             protected function compactContent(string $contents): string

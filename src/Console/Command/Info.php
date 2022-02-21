@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Symfony\Component\Filesystem\Path;
 use function array_filter;
 use function array_flip;
 use DirectoryIterator;
@@ -37,6 +38,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 use Webmozart\Assert\Assert;
+use function var_dump;
 
 /**
  * @private
@@ -49,13 +51,13 @@ final class Info extends BaseCommand
     private const MODE_OPT = 'mode';
     private const DEPTH_OPT = 'depth';
 
-    private static $FILE_ALGORITHMS;
+    private static array $FILE_ALGORITHMS;
 
     public function __construct(?string $name = null)
     {
         parent::__construct($name);
 
-        if (null === self::$FILE_ALGORITHMS) {
+        if (!isset(self::$FILE_ALGORITHMS)) {
             self::$FILE_ALGORITHMS = array_flip(array_filter(get_phar_compression_algorithms()));
         }
     }
@@ -68,17 +70,17 @@ final class Info extends BaseCommand
         );
         $this->setHelp(
             <<<'HELP'
-The <info>%command.name%</info> command will display information about the Phar extension,
-or the Phar file if specified.
-
-If the <info>phar</info> argument <comment>(the PHAR file path)</comment> is provided, information
-about the PHAR file itself will be displayed.
-
-If the <info>--list|-l</info> option is used, the contents of the PHAR file will
-be listed. By default, the list is shown as an indented tree. You may
-instead choose to view a flat listing, by setting the <info>--mode|-m</info> option
-to <comment>flat</comment>.
-HELP
+            The <info>%command.name%</info> command will display information about the Phar extension,
+            or the Phar file if specified.
+            
+            If the <info>phar</info> argument <comment>(the PHAR file path)</comment> is provided, information
+            about the PHAR file itself will be displayed.
+            
+            If the <info>--list|-l</info> option is used, the contents of the PHAR file will
+            be listed. By default, the list is shown as an indented tree. You may
+            instead choose to view a flat listing, by setting the <info>--mode|-m</info> option
+            to <comment>flat</comment>.
+            HELP,
         );
         $this->addArgument(
             self::PHAR_ARG,
@@ -119,9 +121,14 @@ HELP
 
         $io->newLine();
 
-        if (null === ($file = $input->getArgument(self::PHAR_ARG))) {
+        $file = $input->getArgument(self::PHAR_ARG);
+
+        if (null === $file) {
             return $this->showGlobalInfo($io);
         }
+
+        $file = Path::canonicalize($file);
+
         /** @var string $file */
         $fileRealPath = realpath($file);
 
@@ -277,16 +284,15 @@ HELP
     /**
      * @param iterable|PharFileInfo[] $list
      * @param false|int               $indent Nbr of indent or `false`
-     * @param Phar|PharData           $phar
      */
     private function renderContents(
         OutputInterface $output,
         iterable $list,
         int $depth,
         int $maxDepth,
-        $indent,
+        int|false $indent,
         string $base,
-        $phar,
+        Phar|PharData $phar,
         string $root
     ): void {
         if (-1 !== $maxDepth && $depth > $maxDepth) {

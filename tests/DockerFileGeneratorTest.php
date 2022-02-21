@@ -32,7 +32,7 @@ class DockerFileGeneratorTest extends TestCase
         string $sourcePhar,
         string $expected
     ): void {
-        $actual = (new DockerFileGenerator($image, $extensions, $sourcePhar))->generate();
+        $actual = (new DockerFileGenerator($image, $extensions, $sourcePhar))->generateStub();
 
         $this->assertSame($expected, $actual);
     }
@@ -45,7 +45,7 @@ class DockerFileGeneratorTest extends TestCase
         string $sourcePhar,
         string $expected
     ): void {
-        $actual = DockerFileGenerator::createForRequirements($requirements, $sourcePhar)->generate();
+        $actual = DockerFileGenerator::createForRequirements($requirements, $sourcePhar)->generateStub();
 
         $this->assertSame($expected, $actual);
     }
@@ -62,7 +62,7 @@ class DockerFileGeneratorTest extends TestCase
                     ],
                 'path/to/phar'
             )
-                ->generate()
+                ->generateStub()
             ;
         } catch (UnexpectedValueException $exception) {
             $this->assertSame(

@@ -121,6 +121,7 @@ final class SimpleScoper implements Scoper
             return $patcher;
         }
 
+        // TODO: move this to patchers
         $serializablePatchers = array_map(
             static function (callable $patcher): SerializableClosure {
                 if ($patcher instanceof Patcher) {

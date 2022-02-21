@@ -30,20 +30,15 @@ class CompactorsTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var Compactor|ObjectProphecy */
-    private $compactor1Prophecy;
+    private Compactor|ObjectProphecy $compactor1Prophecy;
 
-    /** @var Compactor */
-    private $compactor1;
+    private Compactor $compactor1;
 
-    /** @var Compactor|ObjectProphecy */
-    private $compactor2Prophecy;
+    private Compactor|ObjectProphecy $compactor2Prophecy;
 
-    /** @var Compactor */
-    private $compactor2;
+    private Compactor $compactor2;
 
-    /** @var Compactors */
-    private $compactors;
+    private Compactors $compactors;
 
     protected function setUp(): void
     {

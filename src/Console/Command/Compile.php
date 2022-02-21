@@ -23,7 +23,6 @@ use function decoct;
 use function explode;
 use function file_exists;
 use function filesize;
-use function get_class;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function implode;
 use function is_callable;
@@ -76,20 +75,20 @@ class Compile extends ConfigurableBaseCommand
     use ChangeableWorkingDirectory;
 
     private const HELP = <<<'HELP'
-The <info>%command.name%</info> command will compile code in a new PHAR based on a variety of settings.
-<comment>
-  This command relies on a configuration file for loading
-  PHAR packaging settings. If a configuration file is not
-  specified through the <info>--config|-c</info> option, one of
-  the following files will be used (in order): <info>box.json</info>,
-  <info>box.json.dist</info>
-</comment>
-The configuration file is actually a JSON object saved to a file. For more
-information check the documentation online:
-<comment>
-  https://github.com/humbug/box
-</comment>
-HELP;
+    The <info>%command.name%</info> command will compile code in a new PHAR based on a variety of settings.
+    <comment>
+      This command relies on a configuration file for loading
+      PHAR packaging settings. If a configuration file is not
+      specified through the <info>--config|-c</info> option, one of
+      the following files will be used (in order): <info>box.json</info>,
+      <info>box.json.dist</info>
+    </comment>
+    The configuration file is actually a JSON object saved to a file. For more
+    information check the documentation online:
+    <comment>
+      https://github.com/humbug/box
+    </comment>
+    HELP;
 
     private const DEBUG_OPTION = 'debug';
     private const NO_PARALLEL_PROCESSING_OPTION = 'no-parallel';
@@ -332,9 +331,9 @@ HELP;
         );
 
         $logCompactors = static function (Compactor $compactor) use ($logger): void {
-            $compactorClassParts = explode('\\', get_class($compactor));
+            $compactorClassParts = explode('\\', $compactor::class);
 
-            if (0 === strpos($compactorClassParts[0], '_HumbugBox')) {
+            if (str_starts_with($compactorClassParts[0], '_HumbugBox')) {
                 // Keep the non prefixed class name for the user
                 array_shift($compactorClassParts);
             }
@@ -784,7 +783,7 @@ HELP;
             $stub->banner($banner);
         }
 
-        return $stub->generate();
+        return $stub->generateStub();
     }
 
     private function logMap(MapFile $fileMapper, CompilerLogger $logger): void

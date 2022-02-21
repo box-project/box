@@ -17,25 +17,21 @@ namespace KevinGH\Box;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use function preg_quote;
 use function preg_replace;
-use function strpos;
 
 /**
  * @internal
- *
  * @private
  */
 final class MapFile
 {
-    private $basePath;
-    private $map;
-
     /**
      * @param string[][] $map
      */
-    public function __construct(string $basePath, array $map)
-    {
-        $this->basePath = $basePath;
-        $this->map = $map;
+    public function __construct(
+        // Cannot have readonly properties: requires to be serializable
+        private string $basePath,
+        private array $map
+    ) {
     }
 
     public function __invoke(string $path): ?string
@@ -48,7 +44,7 @@ final class MapFile
                     return $replace.'/'.$relativePath;
                 }
 
-                if (0 === strpos($relativePath, $match)) {
+                if (str_starts_with($relativePath, $match)) {
                     return preg_replace(
                         '/^'.preg_quote($match, '/').'/',
                         $replace,
@@ -61,6 +57,9 @@ final class MapFile
         return $relativePath;
     }
 
+    /**
+     * @return string[][] $map
+     */
     public function getMap(): array
     {
         return $this->map;

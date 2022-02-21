@@ -44,31 +44,42 @@ final class ConfigurationLoader
         IO $io,
         bool $allowNoFile
     ): Configuration {
-        try {
-            $configPath = $configPath ?? $helper->findDefaultPath();
+        $configPath = self::getConfigPath($configPath, $helper, $io, $allowNoFile);
 
-            $io->comment(
-                sprintf(
-                    'Loading the configuration file "<comment>%s</comment>".',
-                    $configPath
-                )
-            );
-        } catch (NoConfigurationFound $exception) {
+        try {
+            return $helper->loadFile($configPath);
+        } catch (InvalidArgumentException $invalidConfig) {
+            $io->error('The configuration file is invalid.');
+
+            throw $invalidConfig;
+        }
+    }
+
+    private static function getConfigPath(
+        ?string $configPath,
+        ConfigurationHelper $helper,
+        IO $io,
+        bool $allowNoFile
+    ): ?string {
+        try {
+            $configPath ??= $helper->findDefaultPath();
+        } catch (NoConfigurationFound $noConfigurationFound) {
             if (false === $allowNoFile) {
-                throw $exception;
+                throw $noConfigurationFound;
             }
 
             $io->comment('Loading without a configuration file.');
 
-            $configPath = null;
+            return null;
         }
 
-        try {
-            return $helper->loadFile($configPath);
-        } catch (InvalidArgumentException $exception) {
-            $io->error('The configuration file is invalid.');
+        $io->comment(
+            sprintf(
+                'Loading the configuration file "<comment>%s</comment>".',
+                $configPath
+            )
+        );
 
-            throw $exception;
-        }
+        return $configPath;
     }
 }

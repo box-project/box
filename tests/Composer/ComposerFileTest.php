@@ -55,25 +55,19 @@ class ComposerFileTest extends TestCase
     public function provideValidInstantiators(): Generator
     {
         yield [
-            static function (): ComposerFile {
-                return new ComposerFile(null, []);
-            },
+            static fn (): ComposerFile => new ComposerFile(null, []),
             null,
             [],
         ];
 
         yield [
-            static function (): ComposerFile {
-                return ComposerFile::createEmpty();
-            },
+            static fn (): ComposerFile => ComposerFile::createEmpty(),
             null,
             [],
         ];
 
         yield [
-            static function (): ComposerFile {
-                return new ComposerFile('path/to/foo', ['foo' => 'bar']);
-            },
+            static fn (): ComposerFile => new ComposerFile('path/to/foo', ['foo' => 'bar']),
             'path/to/foo',
             ['foo' => 'bar'],
         ];

@@ -22,18 +22,15 @@ use Throwable;
  */
 final class PhpScoper implements Compactor
 {
-    private $scoper;
-
-    public function __construct(Scoper $scoper)
+    public function __construct(private Scoper $scoper)
     {
-        $this->scoper = $scoper;
     }
 
     public function compact(string $file, string $contents): string
     {
         try {
             return $this->scoper->scope($file, $contents);
-        } catch (Throwable $throwable) {
+        } catch (Throwable) {
             return $contents;
         }
     }

@@ -65,6 +65,8 @@ function get_box_version(): string
 }
 
 /**
+ * TODO: switch to an enum for compression algorithms.
+ *
  * @private
  *
  * @return array<string,int>
@@ -119,10 +121,8 @@ function get_phar_signing_algorithms(): array
 
 /**
  * @private
- *
- * @param float|int $size
  */
-function format_size($size, int $decimals = 2): string
+function format_size(float|int $size, int $decimals = 2): string
 {
     Assert::true(is_int($size) || is_float($size));
 
@@ -139,8 +139,6 @@ function format_size($size, int $decimals = 2): string
         number_format(
             $size / (1024 ** $power),
             $decimals,
-            '.',
-            ','
         ),
         $units[$power]
     );
@@ -148,10 +146,8 @@ function format_size($size, int $decimals = 2): string
 
 /**
  * @private
- *
- * @return float|int
  */
-function memory_to_bytes(string $value)
+function memory_to_bytes(string $value): float|int
 {
     $unit = strtolower($value[strlen($value) - 1]);
 

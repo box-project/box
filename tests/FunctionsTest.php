@@ -62,10 +62,8 @@ class FunctionsTest extends TestCase
 
     /**
      * @dataProvider provideBytes
-     *
-     * @param float|int $bytes
      */
-    public function test_it_can_format_bytes($bytes, string $expected): void
+    public function test_it_can_format_bytes(float|int $bytes, string $expected): void
     {
         $actual = format_size($bytes);
 
@@ -74,10 +72,8 @@ class FunctionsTest extends TestCase
 
     /**
      * @dataProvider provideMemory
-     *
-     * @param float|int $expected
      */
-    public function test_it_can_convert_a_memory_limit_amount_to_bytes(string $memory, $expected): void
+    public function test_it_can_convert_a_memory_limit_amount_to_bytes(string $memory, float|int $expected): void
     {
         $actual = memory_to_bytes($memory);
 

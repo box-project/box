@@ -95,7 +95,7 @@ final class GenerateDockerFile extends ConfigurableBaseCommand
                 $requirements,
                 make_path_relative($pharPath, getcwd())
             )
-                ->generate()
+                ->generateStub()
             ;
 
             if (file_exists(self::DOCKER_FILE_NAME)) {

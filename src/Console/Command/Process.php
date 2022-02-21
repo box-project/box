@@ -18,7 +18,6 @@ use function array_map;
 use function array_shift;
 use function array_unshift;
 use function explode;
-use function get_class;
 use function getcwd;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function implode;
@@ -217,9 +216,9 @@ final class Process extends ConfigurableBaseCommand
         $io->writeln('Registered compactors:');
 
         $logCompactors = static function (Compactor $compactor) use ($io): void {
-            $compactorClassParts = explode('\\', get_class($compactor));
+            $compactorClassParts = explode('\\', $compactor::class);
 
-            if (0 === strpos($compactorClassParts[0], '_HumbugBox')) {
+            if (str_starts_with($compactorClassParts[0], '_HumbugBox')) {
                 // Keep the non prefixed class name for the user
                 array_shift($compactorClassParts);
             }

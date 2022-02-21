@@ -39,9 +39,7 @@ final class MessageRenderer
         Assert::allString($recommendations);
         Assert::allString($warnings);
 
-        $renderMessage = static function (string $message): string {
-            return "    - $message";
-        };
+        $renderMessage = static fn (string $message): string => "    - $message";
 
         if ([] === $recommendations) {
             $io->writeln('No recommendation found.');

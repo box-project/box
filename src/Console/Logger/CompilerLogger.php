@@ -30,11 +30,8 @@ final class CompilerLogger
     public const MINUS_PREFIX = '-';
     public const CHEVRON_PREFIX = '>';
 
-    private $io;
-
-    public function __construct(IO $io)
+    public function __construct(private readonly IO $io)
     {
-        $this->io = $io;
     }
 
     public function getIO(): IO
@@ -44,26 +41,14 @@ final class CompilerLogger
 
     public function log(string $prefix, string $message, int $verbosity = OutputInterface::OUTPUT_NORMAL): void
     {
-        switch ($prefix) {
-            case '!':
-                $prefix = "<error>$prefix</error>";
-                break;
-            case self::STAR_PREFIX:
-                $prefix = "<info>$prefix</info>";
-                break;
-            case self::QUESTION_MARK_PREFIX:
-                $prefix = "<comment>$prefix</comment>";
-                break;
-            case self::PLUS_PREFIX:
-            case self::MINUS_PREFIX:
-                $prefix = "  <comment>$prefix</comment>";
-                break;
-            case self::CHEVRON_PREFIX:
-                $prefix = "    <comment>$prefix</comment>";
-                break;
-            default:
-                throw new InvalidArgumentException('Expected one of the logger constant as a prefix.');
-        }
+        $prefix = match ($prefix) {
+            '!' => "<error>$prefix</error>",
+            self::STAR_PREFIX => "<info>$prefix</info>",
+            self::QUESTION_MARK_PREFIX => "<comment>$prefix</comment>",
+            self::PLUS_PREFIX, self::MINUS_PREFIX => "  <comment>$prefix</comment>",
+            self::CHEVRON_PREFIX => "    <comment>$prefix</comment>",
+            default => throw new InvalidArgumentException('Expected one of the logger constant as a prefix.'),
+        };
 
         $this->io->writeln(
             "$prefix $message",

@@ -26,12 +26,8 @@ use KevinGH\Box\Test\FileSystemTestCase;
  */
 class ConfigurationHelperTest extends FileSystemTestCase
 {
-    /** @var ConfigurationHelper */
-    private $helper;
+    private ConfigurationHelper $helper;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();

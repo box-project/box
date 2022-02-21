@@ -160,7 +160,7 @@ final class AppRequirementsFactory
         $platform = $composerLockContents['platform'] ?? [];
 
         foreach ($platform as $package => $constraint) {
-            if (preg_match('/^ext-(?<extension>.+)$/', $package, $matches)) {
+            if (preg_match('/^ext-(?<extension>.+)$/', (string) $package, $matches)) {
                 $extension = $matches['extension'];
 
                 $requirements[$extension] = [self::SELF_PACKAGE];
@@ -180,10 +180,10 @@ final class AppRequirementsFactory
         $packages = $composerJsonContents['require'] ?? [];
 
         foreach ($packages as $packageName => $constraint) {
-            if (1 === preg_match('/symfony\/polyfill-(?<extension>.+)/', $packageName, $matches)) {
+            if (1 === preg_match('/symfony\/polyfill-(?<extension>.+)/', (string) $packageName, $matches)) {
                 $extension = $matches['extension'];
 
-                if (0 !== strpos($extension, 'php')) {
+                if (!str_starts_with($extension, 'php')) {
                     $polyfills[$extension] = true;
 
                     continue;
@@ -202,7 +202,7 @@ final class AppRequirementsFactory
                 continue;
             }
 
-            if ('php' !== $packageName && preg_match('/^ext-(?<extension>.+)$/', $packageName, $matches)) {
+            if ('php' !== $packageName && preg_match('/^ext-(?<extension>.+)$/', (string) $packageName, $matches)) {
                 $requirements[$matches['extension']] = [self::SELF_PACKAGE];
             }
         }
@@ -217,10 +217,10 @@ final class AppRequirementsFactory
         foreach ($packages as $packageInfo) {
             $packageRequire = $packageInfo['require'] ?? [];
 
-            if (1 === preg_match('/symfony\/polyfill-(?<extension>.+)/', $packageInfo['name'], $matches)) {
+            if (1 === preg_match('/symfony\/polyfill-(?<extension>.+)/', (string) $packageInfo['name'], $matches)) {
                 $extension = $matches['extension'];
 
-                if (0 !== strpos($extension, 'php')) {
+                if (!str_starts_with($extension, 'php')) {
                     $polyfills[$extension] = true;
                 }
             }
@@ -234,7 +234,7 @@ final class AppRequirementsFactory
             }
 
             foreach ($packageRequire as $package => $constraint) {
-                if (1 === preg_match('/^ext-(?<extension>.+)$/', $package, $matches)) {
+                if (1 === preg_match('/^ext-(?<extension>.+)$/', (string) $package, $matches)) {
                     $extension = $matches['extension'];
 
                     if (false === array_key_exists($extension, $requirements)) {

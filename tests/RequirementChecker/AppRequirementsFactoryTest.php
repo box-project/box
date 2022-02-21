@@ -16,6 +16,7 @@ namespace KevinGH\Box\RequirementChecker;
 
 use Generator;
 use function json_decode;
+use const JSON_THROW_ON_ERROR;
 use Phar;
 use PHPUnit\Framework\TestCase;
 
@@ -34,8 +35,8 @@ class AppRequirementsFactoryTest extends TestCase
         array $expected
     ): void {
         $actual = AppRequirementsFactory::create(
-            null === $composerJsonContents ? [] : json_decode($composerJsonContents, true),
-            null === $composerLockContents ? [] : json_decode($composerLockContents, true),
+            null === $composerJsonContents ? [] : json_decode($composerJsonContents, true, 512, JSON_THROW_ON_ERROR),
+            null === $composerLockContents ? [] : json_decode($composerLockContents, true, 512, JSON_THROW_ON_ERROR),
             $compressionAlgorithm
         );
 

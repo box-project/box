@@ -22,8 +22,7 @@ use PHPUnit\Framework\TestCase;
  */
 class StubGeneratorTest extends TestCase
 {
-    /** @var StubGenerator */
-    private $generator;
+    private StubGenerator $generator;
 
     protected function setUp(): void
     {
@@ -48,7 +47,7 @@ require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 __HALT_COMPILER(); ?>
 
 STUB;
-        $actual = $this->generator->generate();
+        $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
     }
@@ -65,7 +64,7 @@ STUB;
 __HALT_COMPILER(); ?>
 
 STUB;
-        $actual = $this->generator->generate();
+        $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
     }
@@ -94,7 +93,7 @@ require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 __HALT_COMPILER(); ?>
 
 STUB;
-        $actual = $this->generator->generate();
+        $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
 
@@ -114,7 +113,7 @@ STUB;
 __HALT_COMPILER(); ?>
 
 STUB;
-        $actual = $this->generator->generate();
+        $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
     }
@@ -132,7 +131,7 @@ require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 __HALT_COMPILER(); ?>
 
 STUB;
-        $actual = $this->generator->generate();
+        $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
 
@@ -147,7 +146,7 @@ STUB;
 __HALT_COMPILER(); ?>
 
 STUB;
-        $actual = $this->generator->generate();
+        $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
     }
@@ -164,7 +163,7 @@ require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 __HALT_COMPILER(); ?>
 
 STUB;
-        $actual = $this->generator->generate();
+        $actual = $this->generator->generateStub();
 
         $this->generator->checkRequirements(false);
 
@@ -178,7 +177,7 @@ STUB;
 __HALT_COMPILER(); ?>
 
 STUB;
-        $actual = $this->generator->generate();
+        $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
     }
@@ -197,7 +196,7 @@ require 'phar://acme.phar/.box/bin/check-requirements.php';
 __HALT_COMPILER(); ?>
 
 STUB;
-        $actual = $this->generator->generate();
+        $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
 
@@ -211,7 +210,7 @@ Phar::mapPhar('acme.phar');
 __HALT_COMPILER(); ?>
 
 STUB;
-        $actual = $this->generator->generate();
+        $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
     }
@@ -228,7 +227,7 @@ require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 __HALT_COMPILER(); ?>
 
 STUB;
-        $actual = $this->generator->generate();
+        $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
 
@@ -242,7 +241,7 @@ STUB;
 __HALT_COMPILER(); ?>
 
 STUB;
-        $actual = $this->generator->generate();
+        $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
     }
@@ -261,7 +260,7 @@ require 'phar://' . __FILE__ . '/acme.php';
 __HALT_COMPILER(); ?>
 
 STUB;
-        $actual = $this->generator->generate();
+        $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
 
@@ -275,7 +274,7 @@ require 'phar://' . __FILE__ . '/acme.php';
 __HALT_COMPILER(); ?>
 
 STUB;
-        $actual = $this->generator->generate();
+        $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
     }
@@ -294,7 +293,7 @@ require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 __HALT_COMPILER(); ?>
 
 STUB;
-        $actual = $this->generator->generate();
+        $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
 
@@ -308,7 +307,7 @@ Phar::interceptFileFuncs();
 __HALT_COMPILER(); ?>
 
 STUB;
-        $actual = $this->generator->generate();
+        $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
     }
@@ -350,7 +349,7 @@ require 'phar://test.phar/index.php';
 __HALT_COMPILER(); ?>
 
 STUB;
-        $actual = $this->generator->generate();
+        $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
 
@@ -374,7 +373,7 @@ require 'phar://test.phar/index.php';
 __HALT_COMPILER(); ?>
 
 STUB;
-        $actual = $this->generator->generate();
+        $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
     }

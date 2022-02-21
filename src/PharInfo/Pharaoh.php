@@ -20,13 +20,9 @@ use ParagonIE\Pharaoh\Pharaoh as ParagoniePharaoh;
 
 final class Pharaoh extends ParagoniePharaoh
 {
-    private $fileName;
-
-    /** @var null|PharInfo */
-    private $pharInfo;
-
-    /** @var null|string */
-    private $path;
+    private string $fileName;
+    private ?PharInfo $pharInfo = null;
+    private ?string $path = null;
 
     public function __construct(string $file, ?string $alias = null)
     {
