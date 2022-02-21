@@ -70,7 +70,7 @@ use Webmozart\Assert\Assert;
  * @final
  * @private
  */
-class Compile extends ConfigurableBaseCommand
+final class Compile extends ConfigurableBaseCommand
 {
     use ChangeableWorkingDirectory;
 
