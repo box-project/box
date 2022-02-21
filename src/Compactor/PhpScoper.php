@@ -22,7 +22,7 @@ use Throwable;
  */
 final class PhpScoper implements Compactor
 {
-    public function __construct(private readonly Scoper $scoper)
+    public function __construct(private Scoper $scoper)
     {
     }
 

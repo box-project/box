@@ -1,4 +1,5 @@
-/.box_dump
+/.box_dump/
+/requirement-checker/.box_dump/
 /box
 /*.phar
 /*.phar.sig

@@ -20,7 +20,10 @@ use Webmozart\Assert\Assert;
 
 final class Placeholder implements Compactor
 {
-    private $placeholders;
+    /**
+     * @var scalar[]
+     */
+    private array $placeholders;
 
     /**
      * @param scalar[] $placeholders

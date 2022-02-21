@@ -30,7 +30,7 @@ use Laravel\SerializableClosure\SerializableClosure;
  */
 final class SimpleScoper implements Scoper
 {
-    private readonly PhpScoperConfiguration $scoperConfig;
+    private PhpScoperConfiguration $scoperConfig;
     private PhpScoperContainer $scoperContainer;
     private PhpScoper $scoper;
     private SymbolsRegistry $symbolsRegistry;
@@ -38,7 +38,7 @@ final class SimpleScoper implements Scoper
     /**
      * @var list<string>
      */
-    private readonly array $excludedFilePaths;
+    private array $excludedFilePaths;
 
     public function __construct(
         PhpScoperConfiguration $scoperConfig,
@@ -121,6 +121,7 @@ final class SimpleScoper implements Scoper
             return $patcher;
         }
 
+        // TODO: move this to patchers
         $serializablePatchers = array_map(
             static function (callable $patcher): SerializableClosure {
                 if ($patcher instanceof Patcher) {
