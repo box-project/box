@@ -24,8 +24,6 @@ use const DIRECTORY_SEPARATOR;
 use function exec;
 use Generator;
 use function getcwd;
-use Herrera\Box\Compactor\Json;
-use Herrera\Box\Compactor\Php as PhpCompactor;
 use InvalidArgumentException;
 use function json_decode;
 use const JSON_THROW_ON_ERROR;
@@ -680,25 +678,6 @@ EOF
         $this->assertSame('custom', $compactors[0]->getScoper()->getPrefix());
 
         $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
-    }
-
-    public function test_a_recommendation_is_given_when_the_legacy_compactors_are_used(): void
-    {
-        $this->setConfig([
-            'compactors' => [
-                Json::class,
-                PhpCompactor::class,
-            ],
-        ]);
-
-        $this->assertSame(
-            [
-                'The compactor "Herrera\Box\Compactor\Json" has been deprecated, use "KevinGH\Box\Compactor\Json" instead.',
-                'The compactor "Herrera\Box\Compactor\Php" has been deprecated, use "KevinGH\Box\Compactor\Php" instead.',
-            ],
-            $this->config->getRecommendations()
-        );
         $this->assertSame([], $this->config->getWarnings());
     }
 
