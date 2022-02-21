@@ -33,8 +33,8 @@ use Webmozart\Assert\Assert;
  */
 final class PhpSettingsHandler extends XdebugHandler
 {
-    private $logger;
-    private $pharReadonly;
+    private LoggerInterface $logger;
+    private bool $pharReadonly;
 
     public function __construct(LoggerInterface $logger)
     {
@@ -55,13 +55,7 @@ final class PhpSettingsHandler extends XdebugHandler
         parent::check();
     }
 
-    /**
-     * TODO: bump to XdebugHandler v3
-     * No type hint to allow XdebugHandler version 2.
-     *
-     * {@inheritdoc}
-     */
-    protected function requiresRestart($default): bool
+    protected function requiresRestart(bool $default): bool
     {
         if ($this->pharReadonly) {
             $this->logger->debug('phar.readonly is enabled');
@@ -74,11 +68,7 @@ final class PhpSettingsHandler extends XdebugHandler
         return parent::requiresRestart($default);
     }
 
-    /**
-     * No type hint to allow XdebugHandler version 2
-     * {@inheritdoc}
-     */
-    protected function restart($command): void
+    protected function restart(array $command): void
     {
         // Disable phar.readonly if set
         $this->disablePharReadonly();
@@ -107,13 +97,13 @@ final class PhpSettingsHandler extends XdebugHandler
         $memoryLimit = trim(ini_get('memory_limit'));
         $memoryLimitInBytes = '-1' === $memoryLimit ? -1 : memory_to_bytes($memoryLimit);
 
-        // Whether or not the memory limit should be dumped
+        // Whether the memory limit should be dumped
         $bumpMemoryLimit = (
             null === $userDefinedMemoryLimit
             && -1 !== $memoryLimitInBytes
             && $memoryLimitInBytes < 1024 * 1024 * 512
         );
-        // Whether or not the memory limit should be set to the user defined memory limit
+        // Whether the memory limit should be set to the user defined memory limit
         $setUserDefinedMemoryLimit = (
             null !== $userDefinedMemoryLimit
             && $memoryLimitInBytes !== $userDefinedMemoryLimit
