@@ -128,18 +128,6 @@ return [
                 $contents
             );
         },
-        // PHP-Parser
-        static function (string $filePath, string $prefix, string $contents): string {
-            if ('vendor/nikic/php-parser/lib/PhpParser/Lexer.php' !== $filePath) {
-                return $contents;
-            }
-
-            return preg_replace(
-                '/\$tokenMap\[.*T_ENUM\] =/',
-                '$tokenMap[\T_ENUM] =',
-                $contents
-            );
-        },
     ],
     'whitelist' => [
         \Composer\Autoload\ClassLoader::class,
