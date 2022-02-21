@@ -25,30 +25,4 @@ function get_prefix(): string
 
 return [
     'prefix' => get_prefix(),
-
-    'expose-global-classes' => false,
-    'expose-global-constants' => false,
-    'expose-global-functions' => false,
-
-    'patchers' => [
-        // TODO: report back the missing sapi_windows_vt100_support to JetBrains stubs
-        static function (string $filePath, string $prefix, string $contents): string {
-            $files = [
-                'vendor/sebastian/environment/src/Console.php',
-                'src/IO.php',
-            ];
-
-            if (false === in_array($filePath, $files, true)) {
-                return $contents;
-            }
-
-            $contents = preg_replace(
-                '/function_exists\(\''.$prefix.'\\\\(\\\\)?sapi_windows_vt100_support\'\)/',
-                "function_exists('sapi_windows_vt100_support')",
-                $contents
-            );
-
-            return $contents;
-        },
-    ],
 ];
