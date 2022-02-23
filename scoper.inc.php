@@ -52,7 +52,7 @@ return [
         static function (string $filePath, string $prefix, string $contents): string {
             return preg_replace(
                 sprintf(
-                    '%s\\\\KevinGH\\\\Box\\\\Compactor\\\\',
+                    '/%s\\\\KevinGH\\\\Box\\\\Compactor\\\\/',
                     $prefix,
                 ),
                 'KevinGH\\Box\\Compactor\\',
