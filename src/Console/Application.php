@@ -69,6 +69,7 @@ final class Application extends SymfonyApplication
     {
         $commands = parent::getDefaultCommands();
 
+        // TODO: re-order the commands?
         $commands[] = new Command\Compile();
         $commands[] = new Command\Diff();
         $commands[] = new Command\Info();
@@ -77,6 +78,7 @@ final class Application extends SymfonyApplication
         $commands[] = new Command\Validate();
         $commands[] = new Command\Verify();
         $commands[] = new Command\GenerateDockerFile();
+        $commands[] = new Command\Namespace_();
 
         return $commands;
     }

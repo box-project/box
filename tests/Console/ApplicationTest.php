@@ -39,7 +39,7 @@ class ApplicationTest extends TestCase
 
         $expected = <<<'EOF'
         Box version 3.x-dev@151e40a
-        
+
         EOF;
 
         $actual = preg_replace(
@@ -67,7 +67,7 @@ class ApplicationTest extends TestCase
 
         $expected = <<<'EOF'
         Box version 1.2.3 2018-04-29 19:33:12
-        
+
         EOF;
 
         $actual = $appTester->getDisplay(true);
@@ -86,19 +86,19 @@ class ApplicationTest extends TestCase
         $appTester->run([]);
 
         $expected = <<<'EOF'
-        
+
             ____
            / __ )____  _  __
           / __  / __ \| |/_/
          / /_/ / /_/ />  <
         /_____/\____/_/|_|
-        
-        
+
+
         Box version 3.x-dev@151e40a
-        
+
         Usage:
           command [options] [arguments]
-        
+
         Options:
           -h, --help            Display help for the given command. When no command is given display help for the list command
           -q, --quiet           Do not output any message
@@ -106,7 +106,7 @@ class ApplicationTest extends TestCase
               --ansi|--no-ansi  Force (or disable --no-ansi) ANSI output
           -n, --no-interaction  Do not ask any interactive question
           -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
-        
+
         Available commands:
           compile     🔨  Compiles an application into a PHAR
           completion  Dump the shell completion script
@@ -116,10 +116,11 @@ class ApplicationTest extends TestCase
           help        Display help for a command
           info        🔍  Displays information about the PHAR extension or file
           list        List commands
+          namespace   Prints the first part of the command namespace
           process     ⚡  Applies the registered compactors and replacement values on a file
           validate    ⚙  Validates the configuration file
           verify      🔐️  Verifies the PHAR signature
-        
+
         EOF;
 
         $actual = preg_replace(
