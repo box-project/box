@@ -67,7 +67,6 @@ use function var_export;
 use Webmozart\Assert\Assert;
 
 /**
- * @final
  * @private
  */
 final class Compile extends ConfigurableBaseCommand
