@@ -54,6 +54,12 @@ use Webmozart\Assert\Assert;
  */
 function get_box_version(): string
 {
+    // Load manually the InstalledVersions class.
+    // Indeed, this class is registered to the autoloader by Composer itself which
+    // results an incorrect classmap entry in the scoped code.
+    // This strategy avoids having to exclude completely the file from the scoping.
+    require_once __DIR__.'/../vendor/composer/InstalledVersions.php';
+
     $prettyVersion = InstalledVersions::getPrettyVersion('humbug/box');
     $commitHash = InstalledVersions::getReference('humbug/box');
 
