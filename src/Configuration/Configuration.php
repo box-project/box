@@ -2651,10 +2651,7 @@ final class Configuration
         array $compactorClasses,
         ConfigurationLogger $logger
     ): array {
-        $hasPhpCompactor = (
-            in_array(PhpCompactor::class, $compactorClasses, true)
-            || in_array(LegacyPhp::class, $compactorClasses, true)
-        );
+        $hasPhpCompactor = in_array(PhpCompactor::class, $compactorClasses, true);
 
         self::checkIfDefaultValue($logger, $raw, self::ANNOTATIONS_KEY, true);
         self::checkIfDefaultValue($logger, $raw, self::ANNOTATIONS_KEY, null);
