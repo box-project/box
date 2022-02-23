@@ -55,7 +55,6 @@ use KevinGH\Box\Annotation\CompactedFormatter;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Compactors;
-use KevinGH\Box\Compactor\Json as JsonCompactor;
 use KevinGH\Box\Compactor\Php as PhpCompactor;
 use KevinGH\Box\Compactor\PhpScoper as PhpScoperCompactor;
 use KevinGH\Box\Composer\ComposerConfiguration;
@@ -2652,10 +2651,7 @@ final class Configuration
         array $compactorClasses,
         ConfigurationLogger $logger
     ): array {
-        $hasPhpCompactor = (
-            in_array(PhpCompactor::class, $compactorClasses, true)
-            || in_array(LegacyPhp::class, $compactorClasses, true)
-        );
+        $hasPhpCompactor = in_array(PhpCompactor::class, $compactorClasses, true);
 
         self::checkIfDefaultValue($logger, $raw, self::ANNOTATIONS_KEY, true);
         self::checkIfDefaultValue($logger, $raw, self::ANNOTATIONS_KEY, null);

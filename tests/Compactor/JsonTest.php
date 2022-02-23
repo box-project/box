@@ -39,7 +39,7 @@ class JsonTest extends TestCase
         $contents = <<<'JSON'
         {
             "foo": "bar"
-        
+
         }
         JSON;
         $actual = $this->compactor->compact($file, $contents);
