@@ -44,6 +44,9 @@ jobs:
             -   name: Ensure the PHAR works
                 run: bin/box.phar --version
 
+            -   name: Ensure the PHAR is scoped
+                run: bin/box.phar namespace | php -r 'if (!str_starts_with(stream_get_contents(STDIN), "_PhpScoper")) exit (1);'
+
             -   uses: actions/upload-artifact@v2
                 name: Upload the PHAR artifact
                 with:

@@ -116,6 +116,7 @@ class ApplicationTest extends TestCase
           help        Display help for a command
           info        🔍  Displays information about the PHAR extension or file
           list        List commands
+          namespace   Prints the first part of the command namespace
           process     ⚡  Applies the registered compactors and replacement values on a file
           validate    ⚙  Validates the configuration file
           verify      🔐️  Verifies the PHAR signature
