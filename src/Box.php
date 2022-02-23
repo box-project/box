@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Amp\MultiReasonException;
-use KevinGH\Box\PhpScoper\Scoper;
 use function Amp\ParallelFunctions\parallelMap;
 use function Amp\Promise\wait;
 use function array_filter;
@@ -40,6 +39,7 @@ use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
 use KevinGH\Box\PhpScoper\NullScoper;
+use KevinGH\Box\PhpScoper\Scoper;
 use function openssl_pkey_export;
 use function openssl_pkey_get_details;
 use function openssl_pkey_get_private;

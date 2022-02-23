@@ -54,18 +54,18 @@ class InfoTest extends CommandTestCase
         $signatures = '  - '.implode("\n  - ", Phar::getSupportedSignatures());
 
         $expected = <<<OUTPUT
-        
+
         API Version: $version
-        
+
         Supported Compression:
         $compression
-        
+
         Supported Signatures:
         $signatures
-        
+
          // Get a PHAR details by giving its path as an argument.
-        
-        
+
+
         OUTPUT;
 
         $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));

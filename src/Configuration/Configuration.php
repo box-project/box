@@ -55,7 +55,6 @@ use KevinGH\Box\Annotation\CompactedFormatter;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Compactors;
-use KevinGH\Box\Compactor\Json as JsonCompactor;
 use KevinGH\Box\Compactor\Php as PhpCompactor;
 use KevinGH\Box\Compactor\PhpScoper as PhpScoperCompactor;
 use KevinGH\Box\Composer\ComposerConfiguration;
