@@ -41,6 +41,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 
+// TODO: replace the PHP-Scoper compactor in order to warn the user about scoping errors
 final class Process extends ConfigurableBaseCommand
 {
     use ChangeableWorkingDirectory;

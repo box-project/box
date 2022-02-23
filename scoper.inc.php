@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 
 use Isolated\Symfony\Component\Finder\Finder;
+use Isolated\Symfony\Component\Finder\Finder as IsolatedFinder;
 
 // TODO: check if the phpStorm stubs should not be included?
 
@@ -22,7 +23,7 @@ $polyfillsBootstraps = array_map(
         Finder::create()
             ->files()
             ->in(__DIR__ . '/vendor/symfony/polyfill-*')
-            ->name('bootstrap.php'),
+            ->name('bootstrap*.php'),
         false,
     ),
 );
@@ -43,32 +44,25 @@ return [
         ...$polyfillsBootstraps,
         ...$polyfillsStubs,
     ],
-    'patchers' => [
-        static function (string $filePath, string $prefix, string $contents): string {
-            $finderClass = sprintf('\%s\%s', $prefix, Finder::class);
-
-            return str_replace($finderClass, '\\'.Finder::class, $contents);
-        },
-        static function (string $filePath, string $prefix, string $contents): string {
-            return preg_replace(
-                sprintf(
-                    '%s\\\\KevinGH\\\\Box\\\\Compactor\\\\',
-                    $prefix,
-                ),
-                'KevinGH\\Box\\Compactor\\',
-                $contents,
-            );
-        },
+    'exclude-namespaces' => [
+        'Symfony\Polyfill'
     ],
-    'whitelist' => [
+    'exclude-classes' => [
+        IsolatedFinder::class,
+    ],
+    'exclude-constants' => [
+        // Symfony global constants
+        '/^SYMFONY\_[\p{L}_]+$/',
+    ],
+    'expose-functions' => [
+        'trigger_deprecation',
+    ],
+    'expose-classes' => [
         \Composer\Autoload\ClassLoader::class,
 
         \KevinGH\Box\Compactor\Compactor::class,
         \KevinGH\Box\Compactor\Json::class,
         \KevinGH\Box\Compactor\Php::class,
         \KevinGH\Box\Compactor\PhpScoper::class,
-
-        // see: https://github.com/humbug/php-scoper/issues/440
-        'Symfony\\Polyfill\\*',
     ],
 ];
