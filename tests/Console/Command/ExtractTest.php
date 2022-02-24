@@ -50,7 +50,7 @@ class ExtractTest extends CommandTestCase
                 'command' => 'extract',
                 'phar' => $pharPath,
                 'output' => $this->tmp,
-            ]
+            ],
         );
 
         $expectedFiles = [
@@ -77,7 +77,7 @@ class ExtractTest extends CommandTestCase
                 'command' => 'extract',
                 'phar' => $pharPath,
                 'output' => $this->tmp,
-            ]
+            ],
         );
 
         $expectedFiles = [
@@ -104,7 +104,7 @@ class ExtractTest extends CommandTestCase
                 'command' => 'extract',
                 'phar' => $pharPath,
                 'output' => $this->tmp,
-            ]
+            ],
         );
 
         $expectedFiles = [
@@ -131,7 +131,7 @@ class ExtractTest extends CommandTestCase
                 'command' => 'extract',
                 'phar' => $pharPath,
                 'output' => $this->tmp,
-            ]
+            ],
         );
 
         $expectedFiles = [];
@@ -165,14 +165,14 @@ class ExtractTest extends CommandTestCase
                     'phar' => $pharPath,
                     'output' => $this->tmp,
                 ],
-                ['verbosity' => OutputInterface::VERBOSITY_DEBUG]
+                ['verbosity' => OutputInterface::VERBOSITY_DEBUG],
             );
 
             $this->fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
             $this->assertSame(
                 'The given file is not a valid PHAR',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
             $this->assertNotNull($exception->getPrevious());
@@ -193,7 +193,7 @@ class ExtractTest extends CommandTestCase
                 'command' => 'extract',
                 'phar' => $pharPath,
                 'output' => $this->tmp,
-            ]
+            ],
         );
 
         $expectedFiles = [];
@@ -223,7 +223,7 @@ class ExtractTest extends CommandTestCase
                 'command' => 'extract',
                 'phar' => '/unknown',
                 'output' => $this->tmp,
-            ]
+            ],
         );
 
         $expectedFiles = [];

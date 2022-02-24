@@ -43,7 +43,7 @@ class MapFileTest extends TestCase
     {
         $this->assertEquals(
             $mapFile,
-            unserialize(serialize($mapFile))
+            unserialize(serialize($mapFile)),
         );
     }
 

@@ -229,8 +229,8 @@ class ComposerConfigurationTest extends FileSystemTestCase
                 $this->tmp,
                 null,
                 null,
-                $excludeDevPackages
-            )
+                $excludeDevPackages,
+            ),
         );
 
         $this->assertSame(
@@ -239,8 +239,8 @@ class ComposerConfigurationTest extends FileSystemTestCase
                 $this->tmp,
                 [],
                 null,
-                $excludeDevPackages
-            )
+                $excludeDevPackages,
+            ),
         );
     }
 
@@ -270,8 +270,8 @@ class ComposerConfigurationTest extends FileSystemTestCase
                 $this->tmp,
                 $decodedComposerJson,
                 $decodedComposerLock,
-                false
-            )
+                false,
+            ),
         );
     }
 
@@ -298,8 +298,8 @@ class ComposerConfigurationTest extends FileSystemTestCase
                 $this->tmp,
                 $decodedComposerJson,
                 $decodedComposerLock,
-                false
-            )
+                false,
+            ),
         );
     }
 
@@ -325,8 +325,8 @@ class ComposerConfigurationTest extends FileSystemTestCase
                 $this->tmp,
                 $decodedComposerJson,
                 $decodedComposerLock,
-                false
-            )
+                false,
+            ),
         );
     }
 
@@ -356,8 +356,8 @@ class ComposerConfigurationTest extends FileSystemTestCase
                 $this->tmp,
                 $decodedComposerJson,
                 $decodedComposerLock,
-                false
-            )
+                false,
+            ),
         );
     }
 
@@ -465,7 +465,7 @@ class ComposerConfigurationTest extends FileSystemTestCase
                 }
                 JSON
             ,
-            true
+            true,
         );
 
         mkdir('custom-vendor/bamarni/composer-bin-plugin');
@@ -483,8 +483,8 @@ class ComposerConfigurationTest extends FileSystemTestCase
                 $this->tmp,
                 $decodedComposerJson,
                 $decodedComposerLock,
-                false
-            )
+                false,
+            ),
         );
     }
 

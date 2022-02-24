@@ -47,7 +47,7 @@ final class GenerateDockerFile extends ConfigurableBaseCommand
         $this->addArgument(
             self::PHAR_ARG,
             InputArgument::OPTIONAL,
-            'The PHAR file'
+            'The PHAR file',
         );
     }
 
@@ -71,8 +71,8 @@ final class GenerateDockerFile extends ConfigurableBaseCommand
         $io->writeln(
             sprintf(
                 '🐳  Generating a Dockerfile for the PHAR "<comment>%s</comment>"',
-                $pharPath
-            )
+                $pharPath,
+            ),
         );
 
         $tmpPharPath = create_temporary_phar($pharPath);
@@ -83,7 +83,7 @@ final class GenerateDockerFile extends ConfigurableBaseCommand
             if (false === file_exists($requirementsPhar)) {
                 $io->error(
                     'Cannot retrieve the requirements for the PHAR. Make sure the PHAR has been built with Box and the '
-                    .'requirement checker enabled.'
+                    .'requirement checker enabled.',
                 );
 
                 return 1;
@@ -93,7 +93,7 @@ final class GenerateDockerFile extends ConfigurableBaseCommand
 
             $dockerFileContents = DockerFileGenerator::createForRequirements(
                 $requirements,
-                make_path_relative($pharPath, getcwd())
+                make_path_relative($pharPath, getcwd()),
             )
                 ->generateStub()
             ;
@@ -102,8 +102,8 @@ final class GenerateDockerFile extends ConfigurableBaseCommand
                 $remove = $io->askQuestion(
                     new ConfirmationQuestion(
                         'A Docker file has already been found, are you sure you want to override it?',
-                        true
-                    )
+                        true,
+                    ),
                 );
 
                 if (false === $remove) {
@@ -121,10 +121,10 @@ final class GenerateDockerFile extends ConfigurableBaseCommand
                 [
                     sprintf(
                         'You can now inspect your <comment>%s</comment> file or build your container with:',
-                        self::DOCKER_FILE_NAME
+                        self::DOCKER_FILE_NAME,
                     ),
                     '$ <comment>docker build .</comment>',
-                ]
+                ],
             );
         } finally {
             remove($tmpPharPath);
@@ -145,8 +145,8 @@ final class GenerateDockerFile extends ConfigurableBaseCommand
             new ConfirmationQuestion(
                 'The output PHAR could not be found, do you wish to generate it by running "<comment>box '
                 .'compile</comment>"?',
-                true
-            )
+                true,
+            ),
         );
 
         if (false === $compile) {
@@ -157,7 +157,7 @@ final class GenerateDockerFile extends ConfigurableBaseCommand
 
         $this->getCompileCommand()->run(
             $this->createCompileInput($io),
-            clone $io->getOutput()
+            clone $io->getOutput(),
         );
 
         return $config->getOutputPath();

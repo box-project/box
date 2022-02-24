@@ -30,7 +30,7 @@ final class MapFile
     public function __construct(
         // Cannot have readonly properties: requires to be serializable
         private string $basePath,
-        private array $map
+        private array $map,
     ) {
     }
 
@@ -48,7 +48,7 @@ final class MapFile
                     return preg_replace(
                         '/^'.preg_quote($match, '/').'/',
                         $replace,
-                        $relativePath
+                        $relativePath,
                     );
                 }
             }

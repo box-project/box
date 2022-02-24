@@ -59,25 +59,25 @@ final class Process extends ConfigurableBaseCommand
         $this->setDescription('⚡  Applies the registered compactors and replacement values on a file');
         $this->setHelp(
             'The <info>%command.name%</info> command will apply the registered compactors and replacement values '
-            .'on the the given file. This is useful to debug the scoping of a specific file for example.'
+            .'on the the given file. This is useful to debug the scoping of a specific file for example.',
         );
 
         $this->addArgument(
             self::FILE_ARGUMENT,
             InputArgument::REQUIRED,
-            'Path to the file to process'
+            'Path to the file to process',
         );
         $this->addOption(
             self::NO_RESTART_OPTION,
             null,
             InputOption::VALUE_NONE,
-            'Do not restart the PHP process. Box restarts the process by default to disable xdebug'
+            'Do not restart the PHP process. Box restarts the process by default to disable xdebug',
         );
         $this->addOption(
             self::NO_CONFIG_OPTION,
             null,
             InputOption::VALUE_NONE,
-            'Ignore the config file even when one is specified with the --config option'
+            'Ignore the config file even when one is specified with the --config option',
         );
 
         $this->configureWorkingDirOption();
@@ -112,14 +112,14 @@ final class Process extends ConfigurableBaseCommand
         $fileContents = file_contents(
             $absoluteFilePath = make_path_absolute(
                 $filePath,
-                getcwd()
-            )
+                getcwd(),
+            ),
         );
 
         $io->writeln([
             sprintf(
                 '⚡  Processing the contents of the file <info>%s</info>',
-                $absoluteFilePath
+                $absoluteFilePath,
             ),
             '',
         ]);
@@ -163,7 +163,7 @@ final class Process extends ConfigurableBaseCommand
 
         array_unshift(
             $compactors,
-            new Placeholder($config->getReplacements())
+            new Placeholder($config->getReplacements()),
         );
 
         return new Compactors(...$compactors);
@@ -187,8 +187,8 @@ final class Process extends ConfigurableBaseCommand
                 sprintf(
                     '  <comment>+</comment> %s: %s',
                     $key,
-                    $value
-                )
+                    $value,
+                ),
             );
         }
 
@@ -227,8 +227,8 @@ final class Process extends ConfigurableBaseCommand
             $io->writeln(
                 sprintf(
                     '  <comment>+</comment> %s',
-                    implode('\\', $compactorClassParts)
-                )
+                    implode('\\', $compactorClassParts),
+                ),
             );
         };
 
@@ -261,7 +261,7 @@ final class Process extends ConfigurableBaseCommand
 
         return (string) $cliDumper->dump(
             $cloner->cloneVar($whitelist),
-            true
+            true,
         );
     }
 }

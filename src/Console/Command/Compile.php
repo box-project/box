@@ -110,37 +110,37 @@ final class Compile extends ConfigurableBaseCommand
             self::DEBUG_OPTION,
             null,
             InputOption::VALUE_NONE,
-            'Dump the files added to the PHAR in a `'.self::DEBUG_DIR.'` directory'
+            'Dump the files added to the PHAR in a `'.self::DEBUG_DIR.'` directory',
         );
         $this->addOption(
             self::NO_PARALLEL_PROCESSING_OPTION,
             null,
             InputOption::VALUE_NONE,
-            'Disable the parallel processing'
+            'Disable the parallel processing',
         );
         $this->addOption(
             self::NO_RESTART_OPTION,
             null,
             InputOption::VALUE_NONE,
-            'Do not restart the PHP process. Box restarts the process by default to disable xdebug and set `phar.readonly=0`'
+            'Do not restart the PHP process. Box restarts the process by default to disable xdebug and set `phar.readonly=0`',
         );
         $this->addOption(
             self::DEV_OPTION,
             null,
             InputOption::VALUE_NONE,
-            'Skips the compression step'
+            'Skips the compression step',
         );
         $this->addOption(
             self::NO_CONFIG_OPTION,
             null,
             InputOption::VALUE_NONE,
-            'Ignore the config file even when one is specified with the --config option'
+            'Ignore the config file even when one is specified with the --config option',
         );
         $this->addOption(
             self::WITH_DOCKER_OPTION,
             null,
             InputOption::VALUE_NONE,
-            'Generates a Dockerfile'
+            'Generates a Dockerfile',
         );
 
         $this->configureWorkingDirOption();
@@ -210,7 +210,7 @@ final class Compile extends ConfigurableBaseCommand
         Configuration $config,
         CompilerLogger $logger,
         IO $io,
-        bool $debug
+        bool $debug,
     ): Box {
         $box = Box::create($config->getTmpOutputPath());
 
@@ -244,7 +244,7 @@ final class Compile extends ConfigurableBaseCommand
             $box,
             $io->getInput()->getOption(self::DEV_OPTION),
             $io,
-            $logger
+            $logger,
         );
 
         $this->signPhar($config, $box, $config->getTmpOutputPath(), $io, $logger);
@@ -265,7 +265,7 @@ final class Compile extends ConfigurableBaseCommand
 
             dump_file(
                 self::DEBUG_DIR.'/.box_configuration',
-                ConfigurationExporter::export($config)
+                ConfigurationExporter::export($config),
             );
         }
 
@@ -277,8 +277,8 @@ final class Compile extends ConfigurableBaseCommand
             CompilerLogger::QUESTION_MARK_PREFIX,
             sprintf(
                 'Removing the existing PHAR "%s"',
-                $path
-            )
+                $path,
+            ),
         );
 
         remove($path);
@@ -294,7 +294,7 @@ final class Compile extends ConfigurableBaseCommand
 
         $logger->log(
             CompilerLogger::QUESTION_MARK_PREFIX,
-            'Setting replacement values'
+            'Setting replacement values',
         );
 
         foreach ($values as $key => $value) {
@@ -303,8 +303,8 @@ final class Compile extends ConfigurableBaseCommand
                 sprintf(
                     '%s: %s',
                     $key,
-                    $value
-                )
+                    $value,
+                ),
             );
         }
 
@@ -318,7 +318,7 @@ final class Compile extends ConfigurableBaseCommand
         if (0 === count($compactors)) {
             $logger->log(
                 CompilerLogger::QUESTION_MARK_PREFIX,
-                'No compactor to register'
+                'No compactor to register',
             );
 
             return;
@@ -326,7 +326,7 @@ final class Compile extends ConfigurableBaseCommand
 
         $logger->log(
             CompilerLogger::QUESTION_MARK_PREFIX,
-            'Registering compactors'
+            'Registering compactors',
         );
 
         $logCompactors = static function (Compactor $compactor) use ($logger): void {
@@ -339,7 +339,7 @@ final class Compile extends ConfigurableBaseCommand
 
             $logger->log(
                 CompilerLogger::PLUS_PREFIX,
-                implode('\\', $compactorClassParts)
+                implode('\\', $compactorClassParts),
             );
         };
 
@@ -369,22 +369,22 @@ final class Compile extends ConfigurableBaseCommand
             CompilerLogger::CHEVRON_PREFIX,
             0 === $count
                 ? 'No file found'
-                : sprintf('%d file(s)', $count)
+                : sprintf('%d file(s)', $count),
         );
 
         $logger->log(
             CompilerLogger::QUESTION_MARK_PREFIX,
             sprintf(
                 'Auto-discover files? %s',
-                $config->hasAutodiscoveredFiles() ? 'Yes' : 'No'
-            )
+                $config->hasAutodiscoveredFiles() ? 'Yes' : 'No',
+            ),
         );
         $logger->log(
             CompilerLogger::QUESTION_MARK_PREFIX,
             sprintf(
                 'Exclude dev files? %s',
-                $config->excludeDevFiles() ? 'Yes' : 'No'
-            )
+                $config->excludeDevFiles() ? 'Yes' : 'No',
+            ),
         );
         $logger->log(CompilerLogger::QUESTION_MARK_PREFIX, 'Adding files');
 
@@ -396,7 +396,7 @@ final class Compile extends ConfigurableBaseCommand
             CompilerLogger::CHEVRON_PREFIX,
             0 === $count
                 ? 'No file found'
-                : sprintf('%d file(s)', $count)
+                : sprintf('%d file(s)', $count),
         );
     }
 
@@ -425,7 +425,7 @@ final class Compile extends ConfigurableBaseCommand
         if (false === $config->hasMainScript()) {
             $logger->log(
                 CompilerLogger::QUESTION_MARK_PREFIX,
-                'No main script path configured'
+                'No main script path configured',
             );
 
             return null;
@@ -437,13 +437,13 @@ final class Compile extends ConfigurableBaseCommand
             CompilerLogger::QUESTION_MARK_PREFIX,
             sprintf(
                 'Adding main file: %s',
-                $main
-            )
+                $main,
+            ),
         );
 
         $localMain = $box->addFile(
             $main,
-            $config->getMainScriptContents()
+            $config->getMainScriptContents(),
         );
 
         $relativeMain = make_path_relative($main, $config->getBasePath());
@@ -451,7 +451,7 @@ final class Compile extends ConfigurableBaseCommand
         if ($localMain !== $relativeMain) {
             $logger->log(
                 CompilerLogger::CHEVRON_PREFIX,
-                $localMain
+                $localMain,
             );
         }
 
@@ -463,7 +463,7 @@ final class Compile extends ConfigurableBaseCommand
         if (false === $config->checkRequirements()) {
             $logger->log(
                 CompilerLogger::QUESTION_MARK_PREFIX,
-                'Skip requirements checker'
+                'Skip requirements checker',
             );
 
             return false;
@@ -471,13 +471,13 @@ final class Compile extends ConfigurableBaseCommand
 
         $logger->log(
             CompilerLogger::QUESTION_MARK_PREFIX,
-            'Adding requirements checker'
+            'Adding requirements checker',
         );
 
         $checkFiles = RequirementsDumper::dump(
             $config->getDecodedComposerJsonContents() ?? [],
             $config->getDecodedComposerLockContents() ?? [],
-            $config->getCompressionAlgorithm()
+            $config->getCompressionAlgorithm(),
         );
 
         foreach ($checkFiles as $fileWithContents) {
@@ -494,12 +494,12 @@ final class Compile extends ConfigurableBaseCommand
         Box $box,
         ?string $main,
         bool $checkRequirements,
-        CompilerLogger $logger
+        CompilerLogger $logger,
     ): void {
         if ($config->isStubGenerated()) {
             $logger->log(
                 CompilerLogger::QUESTION_MARK_PREFIX,
-                'Generating new stub'
+                'Generating new stub',
             );
 
             $stub = $this->createStub($config, $main, $checkRequirements, $logger);
@@ -514,8 +514,8 @@ final class Compile extends ConfigurableBaseCommand
                 CompilerLogger::QUESTION_MARK_PREFIX,
                 sprintf(
                     'Using stub file: %s',
-                    $stub
-                )
+                    $stub,
+                ),
             );
 
             $box->registerStub($stub);
@@ -529,15 +529,15 @@ final class Compile extends ConfigurableBaseCommand
             $aliasWasAdded,
             sprintf(
                 'The alias "%s" is invalid. See Phar::setAlias() documentation for more information.',
-                $config->getAlias()
-            )
+                $config->getAlias(),
+            ),
         );
 
         $box->getPhar()->setDefaultStub($main);
 
         $logger->log(
             CompilerLogger::QUESTION_MARK_PREFIX,
-            'Using default stub'
+            'Using default stub',
         );
     }
 
@@ -546,7 +546,7 @@ final class Compile extends ConfigurableBaseCommand
         if (null !== ($metadata = $config->getMetadata())) {
             $logger->log(
                 CompilerLogger::QUESTION_MARK_PREFIX,
-                'Setting metadata'
+                'Setting metadata',
             );
 
             if (is_callable($metadata)) {
@@ -555,7 +555,7 @@ final class Compile extends ConfigurableBaseCommand
 
             $logger->log(
                 CompilerLogger::MINUS_PREFIX,
-                is_string($metadata) ? $metadata : var_export($metadata, true)
+                is_string($metadata) ? $metadata : var_export($metadata, true),
             );
 
             $box->getPhar()->setMetadata($metadata);
@@ -581,10 +581,10 @@ final class Compile extends ConfigurableBaseCommand
                         $symbolsRegistry,
                         $prefix,
                         $excludeDevFiles,
-                        $io
+                        $io,
                     );
                 }
-                : null
+                : null,
         );
     }
 
@@ -600,8 +600,8 @@ final class Compile extends ConfigurableBaseCommand
         if ($config->excludeComposerFiles()) {
             $box->removeComposerArtefacts(
                 ComposerConfiguration::retrieveVendorDir(
-                    $config->getDecodedComposerJsonContents() ?? []
-                )
+                    $config->getDecodedComposerJsonContents() ?? [],
+                ),
             );
         }
     }
@@ -611,12 +611,12 @@ final class Compile extends ConfigurableBaseCommand
         Box $box,
         bool $dev,
         IO $io,
-        CompilerLogger $logger
+        CompilerLogger $logger,
     ): void {
         if (null === ($algorithm = $config->getCompressionAlgorithm())) {
             $logger->log(
                 CompilerLogger::QUESTION_MARK_PREFIX,
-                'No compression'
+                'No compression',
             );
 
             return;
@@ -632,8 +632,8 @@ final class Compile extends ConfigurableBaseCommand
             CompilerLogger::QUESTION_MARK_PREFIX,
             sprintf(
                 'Compressing with the algorithm "<comment>%s</comment>"',
-                (string) array_search($algorithm, get_phar_compression_algorithms(), true)
-            )
+                (string) array_search($algorithm, get_phar_compression_algorithms(), true),
+            ),
         );
 
         $restoreLimit = bump_open_file_descriptor_limit(count($box), $io);
@@ -646,8 +646,8 @@ final class Compile extends ConfigurableBaseCommand
                     CompilerLogger::CHEVRON_PREFIX,
                     sprintf(
                         '<info>Warning: the extension "%s" will now be required to execute the PHAR</info>',
-                        $extension
-                    )
+                        $extension,
+                    ),
                 );
             }
         } catch (RuntimeException $exception) {
@@ -664,7 +664,7 @@ final class Compile extends ConfigurableBaseCommand
         Box $box,
         string $path,
         IO $io,
-        CompilerLogger $logger
+        CompilerLogger $logger,
     ): void {
         // Sign using private key when applicable
         remove($path.'.pubkey');
@@ -673,7 +673,7 @@ final class Compile extends ConfigurableBaseCommand
 
         if (null === $key) {
             $box->getPhar()->setSignatureAlgorithm(
-                $config->getSigningAlgorithm()
+                $config->getSigningAlgorithm(),
             );
 
             return;
@@ -681,7 +681,7 @@ final class Compile extends ConfigurableBaseCommand
 
         $logger->log(
             CompilerLogger::QUESTION_MARK_PREFIX,
-            'Signing using a private key'
+            'Signing using a private key',
         );
 
         $passphrase = $config->getPrivateKeyPassphrase();
@@ -692,8 +692,8 @@ final class Compile extends ConfigurableBaseCommand
                     sprintf(
                         'Accessing to the private key "%s" requires a passphrase but none provided. Either '
                         .'provide one or run this command in interactive mode.',
-                        $key
-                    )
+                        $key,
+                    ),
                 );
             }
 
@@ -716,8 +716,8 @@ final class Compile extends ConfigurableBaseCommand
                 CompilerLogger::QUESTION_MARK_PREFIX,
                 sprintf(
                     'Setting file permissions to <comment>%s</comment>',
-                    '0'.decoct($chmod)
-                )
+                    '0'.decoct($chmod),
+                ),
             );
 
             chmod($path, $chmod);
@@ -728,7 +728,7 @@ final class Compile extends ConfigurableBaseCommand
         Configuration $config,
         ?string $main,
         bool $checkRequirements,
-        CompilerLogger $logger
+        CompilerLogger $logger,
     ): string {
         $stub = StubGenerator::create()
             ->alias($config->getAlias())
@@ -742,15 +742,15 @@ final class Compile extends ConfigurableBaseCommand
                 CompilerLogger::MINUS_PREFIX,
                 sprintf(
                     'Using shebang line: %s',
-                    $shebang
-                )
+                    $shebang,
+                ),
             );
 
             $stub->shebang($shebang);
         } else {
             $logger->log(
                 CompilerLogger::MINUS_PREFIX,
-                'No shebang line'
+                'No shebang line',
             );
         }
 
@@ -759,15 +759,15 @@ final class Compile extends ConfigurableBaseCommand
                 CompilerLogger::MINUS_PREFIX,
                 sprintf(
                     'Using custom banner from file: %s',
-                    $bannerPath
-                )
+                    $bannerPath,
+                ),
             );
 
             $stub->banner($config->getStubBannerContents());
         } elseif (null !== ($banner = $config->getStubBannerContents())) {
             $logger->log(
                 CompilerLogger::MINUS_PREFIX,
-                'Using banner:'
+                'Using banner:',
             );
 
             $bannerLines = explode("\n", $banner);
@@ -775,7 +775,7 @@ final class Compile extends ConfigurableBaseCommand
             foreach ($bannerLines as $bannerLine) {
                 $logger->log(
                     CompilerLogger::CHEVRON_PREFIX,
-                    $bannerLine
+                    $bannerLine,
                 );
             }
 
@@ -795,7 +795,7 @@ final class Compile extends ConfigurableBaseCommand
 
         $logger->log(
             CompilerLogger::QUESTION_MARK_PREFIX,
-            'Mapping paths'
+            'Mapping paths',
         );
 
         foreach ($map as $item) {
@@ -810,8 +810,8 @@ final class Compile extends ConfigurableBaseCommand
                     sprintf(
                         '%s <info>></info> %s',
                         $match,
-                        $replace
-                    )
+                        $replace,
+                    ),
                 );
             }
         }
@@ -823,11 +823,11 @@ final class Compile extends ConfigurableBaseCommand
         IO $io,
         Box $box,
         string $path,
-        float $startTime
+        float $startTime,
     ): void {
         $logger->log(
             CompilerLogger::STAR_PREFIX,
-            'Done.'
+            'Done.',
         );
         $io->newLine();
 
@@ -838,11 +838,11 @@ final class Compile extends ConfigurableBaseCommand
                 'PHAR: %s (%s)',
                 $box->count() > 1 ? $box->count().' files' : $box->count().' file',
                 format_size(
-                    filesize($path)
-                )
+                    filesize($path),
+                ),
             )
             .PHP_EOL
-            .'You can inspect the generated PHAR with the "<comment>info</comment>" command.'
+            .'You can inspect the generated PHAR with the "<comment>info</comment>" command.',
         );
 
         $io->comment(
@@ -850,8 +850,8 @@ final class Compile extends ConfigurableBaseCommand
                 '<info>Memory usage: %s (peak: %s), time: %s<info>',
                 format_size(memory_get_usage()),
                 format_size(memory_get_peak_usage()),
-                format_time(microtime(true) - $startTime)
-            )
+                format_time(microtime(true) - $startTime),
+            ),
         );
     }
 

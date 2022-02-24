@@ -66,7 +66,7 @@ final class ConfigurationHelper extends Helper
         $this->json->validate(
             $file,
             $json,
-            $this->json->decodeFile(self::SCHEMA_FILE)
+            $this->json->decodeFile(self::SCHEMA_FILE),
         );
 
         return Configuration::create($file, $json);

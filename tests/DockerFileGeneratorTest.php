@@ -30,7 +30,7 @@ class DockerFileGeneratorTest extends TestCase
         string $image,
         array $extensions,
         string $sourcePhar,
-        string $expected
+        string $expected,
     ): void {
         $actual = (new DockerFileGenerator($image, $extensions, $sourcePhar))->generateStub();
 
@@ -43,7 +43,7 @@ class DockerFileGeneratorTest extends TestCase
     public function test_it_can_generate_a_dockerfile_contents_from_requirements(
         array $requirements,
         string $sourcePhar,
-        string $expected
+        string $expected,
     ): void {
         $actual = DockerFileGenerator::createForRequirements($requirements, $sourcePhar)->generateStub();
 
@@ -60,14 +60,14 @@ class DockerFileGeneratorTest extends TestCase
                             'condition' => '^5.3',
                         ],
                     ],
-                'path/to/phar'
+                'path/to/phar',
             )
                 ->generateStub()
             ;
         } catch (UnexpectedValueException $exception) {
             $this->assertSame(
                 'Could not find a suitable Docker base image for the PHP constraint(s) "^5.3". Images available: "7.4-cli-alpine", "7.3-cli-alpine", "7.2-cli-alpine", "7.1-cli-alpine", "7-cli-alpine"',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -87,7 +87,7 @@ class DockerFileGeneratorTest extends TestCase
 
                 ENTRYPOINT ["/box.phar"]
 
-                Dockerfile
+                Dockerfile,
         ];
 
         yield [
@@ -103,7 +103,7 @@ class DockerFileGeneratorTest extends TestCase
 
                 ENTRYPOINT ["/box"]
 
-                Dockerfile
+                Dockerfile,
         ];
     }
 
@@ -158,7 +158,7 @@ class DockerFileGeneratorTest extends TestCase
 
                 ENTRYPOINT ["/box.phar"]
 
-                Dockerfile
+                Dockerfile,
         ];
 
         yield [
@@ -192,7 +192,7 @@ class DockerFileGeneratorTest extends TestCase
 
                 ENTRYPOINT ["/box.phar"]
 
-                Dockerfile
+                Dockerfile,
         ];
     }
 }

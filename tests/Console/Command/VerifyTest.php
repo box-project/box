@@ -107,7 +107,7 @@ class VerifyTest extends CommandTestCase
             ],
             [
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            ]
+            ],
         );
 
         $expected = <<<OUTPUT
@@ -131,14 +131,14 @@ class VerifyTest extends CommandTestCase
                 [
                     'command' => 'verify',
                     'phar' => 'unknown',
-                ]
+                ],
             );
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The file "unknown" does not exist.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -156,7 +156,7 @@ class VerifyTest extends CommandTestCase
         $this->assertMatchesRegularExpression(
             '/The PHAR failed the verification: .+/',
             $this->commandTester->getDisplay(true),
-            $this->commandTester->getDisplay(true)
+            $this->commandTester->getDisplay(true),
         );
 
         $this->assertSame(1, $this->commandTester->getStatusCode());

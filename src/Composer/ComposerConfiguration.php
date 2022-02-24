@@ -37,7 +37,7 @@ final class ComposerConfiguration
         string $basePath,
         ?array $composerJsonDecodedContents,
         ?array $composerLockDecodedContents,
-        bool $excludeDevPackages
+        bool $excludeDevPackages,
     ): array {
         if (null === $composerJsonDecodedContents
             || null === $composerLockDecodedContents
@@ -49,7 +49,7 @@ final class ComposerConfiguration
         return self::getDevPackagePaths(
             $basePath,
             $composerJsonDecodedContents,
-            $composerLockDecodedContents
+            $composerLockDecodedContents,
         );
     }
 
@@ -59,11 +59,11 @@ final class ComposerConfiguration
     private static function getDevPackagePaths(
         string $basePath,
         array $composerJsonDecodedContents,
-        array $composerLockDecodedContents
+        array $composerLockDecodedContents,
     ): array {
         $vendorDir = make_path_absolute(
             self::retrieveVendorDir($composerJsonDecodedContents),
-            $basePath
+            $basePath,
         );
 
         $packageNames = self::retrieveDevPackageNames($composerLockDecodedContents);
@@ -75,8 +75,8 @@ final class ComposerConfiguration
 
                     return false !== $realPath ? $realPath : null;
                 },
-                $packageNames
-            )
+                $packageNames,
+            ),
         );
     }
 

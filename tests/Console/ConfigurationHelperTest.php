@@ -46,7 +46,7 @@ class ConfigurationHelperTest extends FileSystemTestCase
 
         $this->assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'box.json',
-            $this->helper->findDefaultPath()
+            $this->helper->findDefaultPath(),
         );
     }
 
@@ -56,7 +56,7 @@ class ConfigurationHelperTest extends FileSystemTestCase
 
         $this->assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'box.json.dist',
-            $this->helper->findDefaultPath()
+            $this->helper->findDefaultPath(),
         );
     }
 
@@ -67,7 +67,7 @@ class ConfigurationHelperTest extends FileSystemTestCase
 
         $this->assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'box.json',
-            $this->helper->findDefaultPath()
+            $this->helper->findDefaultPath(),
         );
     }
 
@@ -79,8 +79,8 @@ class ConfigurationHelperTest extends FileSystemTestCase
         $this->assertInstanceOf(
             Configuration::class,
             $this->helper->loadFile(
-                $this->helper->findDefaultPath()
-            )
+                $this->helper->findDefaultPath(),
+            ),
         );
     }
 
@@ -90,7 +90,7 @@ class ConfigurationHelperTest extends FileSystemTestCase
 
         $this->assertInstanceOf(
             Configuration::class,
-            $this->helper->loadFile(null)
+            $this->helper->loadFile(null),
         );
     }
 
@@ -103,7 +103,7 @@ class ConfigurationHelperTest extends FileSystemTestCase
         } catch (NoConfigurationFound $exception) {
             $this->assertSame(
                 'The configuration file could not be found.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
             $this->assertNull($exception->getPrevious());

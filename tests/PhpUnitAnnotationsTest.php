@@ -36,8 +36,8 @@ class PhpUnitAnnotationsTest extends TestCase
 
         $output = shell_exec(
             Process::fromShellCommandline(
-                'grep -rlI "\/\/ \* @runTestsInSeparateProcesses" tests'
-            )->getCommandLine()
+                'grep -rlI "\/\/ \* @runTestsInSeparateProcesses" tests',
+            )->getCommandLine(),
         );
 
         $files = array_filter(explode(PHP_EOL, (string) $output));

@@ -40,7 +40,7 @@ class ProcessTest extends CommandTestCase
             [
                 'command' => 'process',
                 'file' => 'index.php',
-            ]
+            ],
         );
         $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
@@ -78,7 +78,7 @@ class ProcessTest extends CommandTestCase
                 {
                     "foo": "@foo@"
                 }
-                JSON
+                JSON,
         );
         dump_file(
             'box.json',
@@ -91,21 +91,21 @@ class ProcessTest extends CommandTestCase
                         "KevinGH\\Box\\Compactor\\Json"
                     ]
                 }
-                JSON
+                JSON,
         );
 
         $this->commandTester->execute(
             [
                 'command' => 'process',
                 'file' => 'acme.json',
-            ]
+            ],
         );
         $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
         $actual = preg_replace(
             '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
             ' // Loading the configuration file "box.json".',
-            $actual
+            $actual,
         );
 
         $expectedFilePath = $this->tmp.'/acme.json';
@@ -143,7 +143,7 @@ class ProcessTest extends CommandTestCase
                 <?php
 
                 echo 'Hello world!';
-                PHP
+                PHP,
         );
 
         dump_file(
@@ -157,7 +157,7 @@ class ProcessTest extends CommandTestCase
                         "KevinGH\\Box\\Compactor\\PhpScoper"
                     ]
                 }
-                JSON
+                JSON,
         );
         dump_file(
             'scoper.inc.php',
@@ -177,27 +177,27 @@ class ProcessTest extends CommandTestCase
                     ],
                 ];
 
-                PHP
+                PHP,
         );
 
         $this->commandTester->execute(
             [
                 'command' => 'process',
                 'file' => $this->tmp.'/index.php',
-            ]
+            ],
         );
         $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
         $actual = preg_replace(
             '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
             ' // Loading the configuration file "box.json".',
-            $actual
+            $actual,
         );
 
         $actual = preg_replace(
             '/ \{#\d{3,}/',
             ' {#140',
-            $actual
+            $actual,
         );
 
         $expectedPath = $this->tmp.'/index.php';
@@ -251,7 +251,7 @@ class ProcessTest extends CommandTestCase
                 {
                     "foo": "@foo@"
                 }
-                JSON
+                JSON,
         );
         dump_file(
             'box.json',
@@ -264,7 +264,7 @@ class ProcessTest extends CommandTestCase
                         "KevinGH\\Box\\Compactor\\Json"
                     ]
                 }
-                JSON
+                JSON,
         );
 
         $this->commandTester->execute(
@@ -272,14 +272,14 @@ class ProcessTest extends CommandTestCase
                 'command' => 'process',
                 'file' => 'acme.json',
             ],
-            ['verbosity' => OutputInterface::VERBOSITY_QUIET]
+            ['verbosity' => OutputInterface::VERBOSITY_QUIET],
         );
         $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
         $actual = preg_replace(
             '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
             ' // Loading the configuration file "box.json".',
-            $actual
+            $actual,
         );
 
         $expected = <<<'OUTPUT'

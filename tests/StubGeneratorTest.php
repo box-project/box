@@ -33,7 +33,7 @@ class StubGeneratorTest extends TestCase
     {
         $this->assertInstanceOf(
             StubGenerator::class,
-            StubGenerator::create()
+            StubGenerator::create(),
         );
     }
 
@@ -76,7 +76,7 @@ class StubGeneratorTest extends TestCase
                 Custom Banner
 
                 Yolo
-                TEXT
+                TEXT,
         );
 
         $expected = <<<'STUB'
@@ -320,7 +320,7 @@ class StubGeneratorTest extends TestCase
                     Custom Banner
 
                     Yolo
-                    TEXT
+                    TEXT,
             )
             ->shebang('#!/usr/local/bin/env php')
             ->alias('test.phar')
@@ -387,7 +387,7 @@ class StubGeneratorTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Cannot use an empty string for the shebang.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }

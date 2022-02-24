@@ -270,7 +270,7 @@ final class Configuration
             null !== $composerFiles->getComposerJson()->getPath(),
             null !== $composerFiles->getComposerLock()->getPath(),
             false === $isStubGenerated && null === $stubPath,
-            $logger
+            $logger,
         );
 
         $excludeDevPackages = self::retrieveExcludeDevFiles($raw, $dumpAutoload, $logger);
@@ -279,7 +279,7 @@ final class Configuration
             $basePath,
             $composerFiles->getComposerJson()->getDecodedContents(),
             $composerFiles->getComposerLock()->getDecodedContents(),
-            $excludeDevPackages
+            $excludeDevPackages,
         );
 
         /**
@@ -292,7 +292,7 @@ final class Configuration
             $logger,
             $tmpOutputPath,
             $outputPath,
-            $mainScriptPath
+            $mainScriptPath,
         );
         // Excluded paths above is a bit misleading since including a file directly has precedence over the blacklist.
         // If you consider the following:
@@ -308,7 +308,7 @@ final class Configuration
         // The exception however, is for the following which is essential for the good functioning of Box
         $alwaysExcludedPaths = array_map(
             static fn (string $excludedPath): string => self::normalizePath($excludedPath, $basePath),
-            array_filter([$tmpOutputPath, $outputPath, $mainScriptPath])
+            array_filter([$tmpOutputPath, $outputPath, $mainScriptPath]),
         );
 
         $autodiscoverFiles = self::autodiscoverFiles($file, $raw);
@@ -325,7 +325,7 @@ final class Configuration
             $composerFiles,
             $autodiscoverFiles,
             $forceFilesAutodiscovery,
-            $logger
+            $logger,
         );
         $binaryFilesAggregate = self::collectBinaryFiles(
             $raw,
@@ -334,7 +334,7 @@ final class Configuration
             $excludedPaths,
             $alwaysExcludedPaths,
             $devPackages,
-            $logger
+            $logger,
         );
 
         $compactors = self::retrieveCompactors($raw, $basePath, $logger);
@@ -388,7 +388,7 @@ final class Configuration
             $isStubGenerated,
             $checkRequirements,
             $logger->getWarnings(),
-            $logger->getRecommendations()
+            $logger->getRecommendations(),
         );
     }
 
@@ -460,15 +460,15 @@ final class Configuration
         private bool $isStubGenerated,
         private bool $checkRequirements,
         private array $warnings,
-        private array $recommendations
+        private array $recommendations,
     ) {
         Assert::nullOrInArray(
             $compressionAlgorithm,
             get_phar_compression_algorithms(),
             sprintf(
                 'Invalid compression algorithm %%s, use one of "%s" instead.',
-                implode('", "', array_keys(get_phar_compression_algorithms()))
-            )
+                implode('", "', array_keys(get_phar_compression_algorithms())),
+            ),
         );
 
         if (null === $mainScriptPath) {
@@ -517,11 +517,11 @@ final class Configuration
 
         $exportedConfig->composerJson = new ComposerFile(
             $normalizePath($exportedConfig->composerJson->getPath()),
-            $exportedConfig->composerJson->getDecodedContents()
+            $exportedConfig->composerJson->getDecodedContents(),
         );
         $exportedConfig->composerLock = new ComposerFile(
             $normalizePath($exportedConfig->composerLock->getPath()),
-            $exportedConfig->composerLock->getDecodedContents()
+            $exportedConfig->composerLock->getDecodedContents(),
         );
 
         $normalizeProperty($exportedConfig->file);
@@ -550,7 +550,7 @@ final class Configuration
 
         return (string) (new CliDumper())->dump(
             $cloner->cloneVar($exportedConfig),
-            true
+            true,
         );
     }
 
@@ -649,7 +649,7 @@ final class Configuration
     {
         Assert::notNull(
             $this->mainScriptPath,
-            'Cannot retrieve the main script path: no main script configured.'
+            'Cannot retrieve the main script path: no main script configured.',
         );
 
         return $this->mainScriptPath;
@@ -659,7 +659,7 @@ final class Configuration
     {
         Assert::notNull(
             $this->mainScriptPath,
-            'Cannot retrieve the main script contents: no main script configured.'
+            'Cannot retrieve the main script contents: no main script configured.',
         );
 
         return $this->mainScriptContents;
@@ -788,8 +788,8 @@ final class Configuration
             $logger->addWarning(
                 sprintf(
                     'The "%s" setting has been set but is ignored since a custom stub path is used',
-                    self::ALIAS_KEY
-                )
+                    self::ALIAS_KEY,
+                ),
             );
         }
 
@@ -810,7 +810,7 @@ final class Configuration
 
         Assert::directory(
             $basePath,
-            'The base path %s is not a directory or does not exist.'
+            'The base path %s is not a directory or does not exist.',
         );
 
         $basePath = realpath($basePath);
@@ -848,10 +848,10 @@ final class Configuration
         stdClass $raw,
         string $basePath,
         ConfigurationLogger $logger,
-        ?string ...$excludedPaths
+        ?string ...$excludedPaths,
     ): array {
         $blacklist = array_flip(
-            self::retrieveBlacklist($raw, $basePath, $logger, ...$excludedPaths)
+            self::retrieveBlacklist($raw, $basePath, $logger, ...$excludedPaths),
         );
 
         $blacklistFilter = static function (SplFileInfo $file) use ($blacklist): ?bool {
@@ -882,13 +882,13 @@ final class Configuration
         stdClass $raw,
         string $basePath,
         ConfigurationLogger $logger,
-        ?string ...$excludedPaths
+        ?string ...$excludedPaths,
     ): array {
         self::checkIfDefaultValue($logger, $raw, self::BLACKLIST_KEY, []);
 
         $normalizedBlacklist = array_map(
             static fn (string $excludedPath): string => self::normalizePath($excludedPath, $basePath),
-            array_filter($excludedPaths)
+            array_filter($excludedPaths),
         );
 
         /** @var string[] $blacklist */
@@ -920,7 +920,7 @@ final class Configuration
         ComposerFiles $composerFiles,
         bool $autodiscoverFiles,
         bool $forceFilesAutodiscovery,
-        ConfigurationLogger $logger
+        ConfigurationLogger $logger,
     ): array {
         $files = [self::retrieveFiles($raw, self::FILES_KEY, $basePath, $composerFiles, $alwaysExcludedPaths, $logger)];
 
@@ -930,7 +930,7 @@ final class Configuration
                 $composerFiles->getComposerJson()->getDecodedContents(),
                 $devPackages,
                 $composerFiles->getPaths(),
-                $excludedPaths
+                $excludedPaths,
             );
 
             $files[] = self::wrapInSplFileInfo($filesToAppend);
@@ -941,7 +941,7 @@ final class Configuration
                 $mainScriptPath,
                 $blacklistFilter,
                 $excludedPaths,
-                $devPackages
+                $devPackages,
             );
         }
 
@@ -952,7 +952,7 @@ final class Configuration
                 $basePath,
                 $blacklistFilter,
                 $excludedPaths,
-                $logger
+                $logger,
             );
 
             $filesFromFinders = self::retrieveFilesFromFinders(
@@ -961,7 +961,7 @@ final class Configuration
                 $basePath,
                 $blacklistFilter,
                 $devPackages,
-                $logger
+                $logger,
             );
 
             foreach ($filesFromFinders as $filesFromFinder) {
@@ -989,7 +989,7 @@ final class Configuration
         array $excludedPaths,
         array $alwaysExcludedPaths,
         array $devPackages,
-        ConfigurationLogger $logger
+        ConfigurationLogger $logger,
     ): array {
         $binaryFiles = self::retrieveFiles($raw, self::FILES_BIN_KEY, $basePath, ComposerFiles::createEmpty(), $alwaysExcludedPaths, $logger);
 
@@ -999,7 +999,7 @@ final class Configuration
             $basePath,
             $blacklistFilter,
             $excludedPaths,
-            $logger
+            $logger,
         );
 
         $binaryFilesFromFinders = self::retrieveFilesFromFinders(
@@ -1008,7 +1008,7 @@ final class Configuration
             $basePath,
             $blacklistFilter,
             $devPackages,
-            $logger
+            $logger,
         );
 
         return self::retrieveFilesAggregate($binaryFiles, $binaryDirectories, ...$binaryFilesFromFinders);
@@ -1025,7 +1025,7 @@ final class Configuration
         string $basePath,
         ComposerFiles $composerFiles,
         array $excludedFiles,
-        ConfigurationLogger $logger
+        ConfigurationLogger $logger,
     ): array {
         self::checkIfDefaultValue($logger, $raw, $key, []);
 
@@ -1054,16 +1054,16 @@ final class Configuration
                 is_link($file),
                 sprintf(
                     'Cannot add the link "%s": links are not supported.',
-                    $file
-                )
+                    $file,
+                ),
             );
 
             Assert::file(
                 $file,
                 sprintf(
                     '"%s" must contain a list of existing files. Could not find %%s.',
-                    $key
-                )
+                    $key,
+                ),
             );
 
             return array_key_exists($file, $excludedFiles) ? null : new SplFileInfo($file);
@@ -1084,7 +1084,7 @@ final class Configuration
         string $basePath,
         Closure $blacklistFilter,
         array $excludedPaths,
-        ConfigurationLogger $logger
+        ConfigurationLogger $logger,
     ): iterable {
         $directories = self::retrieveDirectoryPaths($raw, $key, $basePath, $logger);
 
@@ -1117,7 +1117,7 @@ final class Configuration
         string $basePath,
         Closure $blacklistFilter,
         array $devPackages,
-        ConfigurationLogger $logger
+        ConfigurationLogger $logger,
     ): array {
         self::checkIfDefaultValue($logger, $raw, $key, []);
 
@@ -1157,7 +1157,7 @@ final class Configuration
         array $findersConfig,
         string $basePath,
         Closure $blacklistFilter,
-        array $devPackages
+        array $devPackages,
     ): array {
         $processFinderConfig = static fn (stdClass $config) => self::processFinder($config, $basePath, $blacklistFilter, $devPackages);
 
@@ -1173,7 +1173,7 @@ final class Configuration
         stdClass $config,
         string $basePath,
         Closure $blacklistFilter,
-        array $devPackages
+        array $devPackages,
     ): Finder {
         $finder = Finder::create()
             ->files()
@@ -1188,7 +1188,7 @@ final class Configuration
                     }
 
                     return true;
-                }
+                },
             )
             ->ignoreVCS(true)
         ;
@@ -1217,8 +1217,8 @@ final class Configuration
                 is_link($directory),
                 sprintf(
                     'Cannot append the link "%s" to the Finder: links are not supported.',
-                    $directory
-                )
+                    $directory,
+                ),
             );
 
             Assert::directory($directory);
@@ -1237,16 +1237,16 @@ final class Configuration
                 is_link($fileOrDirectory),
                 sprintf(
                     'Cannot append the link "%s" to the Finder: links are not supported.',
-                    $fileOrDirectory
-                )
+                    $fileOrDirectory,
+                ),
             );
 
             Assert::true(
                 file_exists($fileOrDirectory),
                 sprintf(
                     'Path "%s" was expected to be a file or directory. It may be a symlink (which are unsupported).',
-                    $fileOrDirectory
-                )
+                    $fileOrDirectory,
+                ),
             );
 
             if (false === is_file($fileOrDirectory)) {
@@ -1294,7 +1294,7 @@ final class Configuration
         ?array $decodedJsonContents,
         array $devPackages,
         array $filesToAppend,
-        array $excludedPaths
+        array $excludedPaths,
     ): array {
         $toString = static fn (string|SplFileInfo $file): string => (string) $file;
 
@@ -1335,8 +1335,8 @@ final class Configuration
                             }
 
                             return null;
-                        }
-                    )
+                        },
+                    ),
             )));
 
             $vendorPackages = array_diff($vendorPackages, $devPackages);
@@ -1347,7 +1347,7 @@ final class Configuration
                     Finder::create()
                         ->in($basePath)
                         ->files()
-                        ->depth(0)
+                        ->depth(0),
                 )));
 
                 $directories = toArray(values(map(
@@ -1356,17 +1356,17 @@ final class Configuration
                         ->in($basePath)
                         ->notPath('vendor')
                         ->directories()
-                        ->depth(0)
+                        ->depth(0),
                 )));
 
                 return [
                     array_merge(
                         array_diff($files, $excludedPaths),
-                        $filesToAppend
+                        $filesToAppend,
                     ),
                     array_merge(
                         array_diff($directories, $excludedPaths),
-                        $vendorPackages
+                        $vendorPackages,
                     ),
                 ];
             }
@@ -1464,7 +1464,7 @@ final class Configuration
         ?string $mainScriptPath,
         Closure $blacklistFilter,
         array $excludedPaths,
-        array $devPackages
+        array $devPackages,
     ): iterable {
         if ([] === $directories) {
             return [];
@@ -1472,7 +1472,7 @@ final class Configuration
 
         $relativeDevPackages = array_map(
             static fn (string $packagePath): string => make_path_relative($packagePath, $basePath),
-            $devPackages
+            $devPackages,
         );
 
         $finder = Finder::create()
@@ -1547,10 +1547,10 @@ final class Configuration
             array_filter(
                 array_map(
                     static fn (string $path): string => make_path_relative($path, $basePath),
-                    $excludedPaths
+                    $excludedPaths,
                 ),
-                static fn (string $path): bool => !str_starts_with($path, '..')
-            )
+                static fn (string $path): bool => !str_starts_with($path, '..'),
+            ),
         );
 
         foreach ($excludedPaths as $excludedPath) {
@@ -1569,7 +1569,7 @@ final class Configuration
         stdClass $raw,
         string $key,
         string $basePath,
-        ConfigurationLogger $logger
+        ConfigurationLogger $logger,
     ): array {
         self::checkIfDefaultValue($logger, $raw, $key, []);
 
@@ -1586,16 +1586,16 @@ final class Configuration
                 is_link($directory),
                 sprintf(
                     'Cannot add the link "%s": links are not supported.',
-                    $directory
-                )
+                    $directory,
+                ),
             );
 
             Assert::directory(
                 $directory,
                 sprintf(
                     '"%s" must contain a list of existing directories. Could not find %%s.',
-                    $key
-                )
+                    $key,
+                ),
             );
 
             return $directory;
@@ -1618,7 +1618,7 @@ final class Configuration
     {
         return array_map(
             static fn (string $file): SplFileInfo => new SplFileInfo($file),
-            $files
+            $files,
         );
     }
 
@@ -1662,8 +1662,8 @@ final class Configuration
                 sprintf(
                     'The "%s" setting has been set but has been ignored because the composer.json, composer.lock'
                     .' and vendor/composer/installed.json files are necessary but could not be found.',
-                    self::DUMP_AUTOLOAD_KEY
-                )
+                    self::DUMP_AUTOLOAD_KEY,
+                ),
             );
 
             return false;
@@ -1685,7 +1685,7 @@ final class Configuration
         if (true === $excludeDevFiles && false === $dumpAutoload) {
             $logger->addWarning(sprintf(
                 'The "%s" setting has been set but has been ignored because the Composer autoloader is not dumped',
-                self::EXCLUDE_DEV_FILES_KEY
+                self::EXCLUDE_DEV_FILES_KEY,
             ));
 
             return false;
@@ -1721,8 +1721,8 @@ final class Configuration
                 $basePath,
                 $compactorClasses,
                 $ignoredAnnotations,
-                $logger
-            )
+                $logger,
+            ),
         );
 
         self::checkCompactorsOrder($logger, $compactors);
@@ -1741,7 +1741,7 @@ final class Configuration
         string $basePath,
         array $compactorClasses,
         array $ignoredAnnotations,
-        ConfigurationLogger $logger
+        ConfigurationLogger $logger,
     ): array {
         return array_map(
             static function (string $class) use ($raw, $basePath, $logger, $ignoredAnnotations): Compactor {
@@ -1760,7 +1760,7 @@ final class Configuration
 
                 return new $class();
             },
-            $compactorClasses
+            $compactorClasses,
         );
     }
 
@@ -1777,7 +1777,7 @@ final class Configuration
                 if (true === $scoperCompactor) {
                     $logger->addRecommendation(
                         'The PHP compactor has been registered after the PhpScoper compactor. It is '
-                        .'recommended to register the PHP compactor before for a clearer code and faster processing.'
+                        .'recommended to register the PHP compactor before for a clearer code and faster processing.',
                     );
                 }
 
@@ -1801,8 +1801,8 @@ final class Configuration
             $knownAlgorithmNames,
             sprintf(
                 'Invalid compression algorithm %%s, use one of "%s" instead.',
-                implode('", "', $knownAlgorithmNames)
-            )
+                implode('", "', $knownAlgorithmNames),
+            ),
         );
 
         $value = get_phar_compression_algorithms()[$raw->{self::COMPRESSION_KEY}];
@@ -1840,7 +1840,7 @@ final class Configuration
         stdClass $raw,
         string $basePath,
         ?array $decodedJsonContents,
-        ConfigurationLogger $logger
+        ConfigurationLogger $logger,
     ): ?string {
         $firstBin = false;
 
@@ -1863,8 +1863,8 @@ final class Configuration
                     $logger->addRecommendation(
                         sprintf(
                             'The "%s" setting can be omitted since is set to its default value',
-                            self::MAIN_KEY
-                        )
+                            self::MAIN_KEY,
+                        ),
                     );
                 }
             }
@@ -1875,7 +1875,7 @@ final class Configuration
         if (is_bool($main)) {
             Assert::false(
                 $main,
-                'Cannot "enable" a main script: either disable it with `false` or give the main script file path.'
+                'Cannot "enable" a main script: either disable it with `false` or give the main script file path.',
             );
 
             return null;
@@ -1917,10 +1917,10 @@ final class Configuration
                     sprintf(
                         'Expected the file "%s" to be a valid composer.json file but an error has been found: %s',
                         $file,
-                        $exception->getMessage()
+                        $exception->getMessage(),
                     ),
                     0,
-                    $exception
+                    $exception,
                 );
             }
 
@@ -1930,7 +1930,7 @@ final class Configuration
         return new ComposerFiles(
             $retrieveFileAndContents(canonicalize($basePath.'/composer.json')),
             $retrieveFileAndContents(canonicalize($basePath.'/composer.lock')),
-            $retrieveFileAndContents(canonicalize($basePath.'/vendor/composer/installed.json'))
+            $retrieveFileAndContents(canonicalize($basePath.'/vendor/composer/installed.json')),
         );
     }
 
@@ -1989,7 +1989,7 @@ final class Configuration
         stdClass $raw,
         string $basePath,
         ?string $mainScriptPath,
-        ConfigurationLogger $logger
+        ConfigurationLogger $logger,
     ): array {
         $defaultPath = null;
 
@@ -2025,16 +2025,16 @@ final class Configuration
         stdClass $raw,
         string $basePath,
         int $signingAlgorithm,
-        ConfigurationLogger $logger
+        ConfigurationLogger $logger,
     ): ?string {
         if (property_exists($raw, self::KEY_KEY) && Phar::OPENSSL !== $signingAlgorithm) {
             if (null === $raw->{self::KEY_KEY}) {
                 $logger->addRecommendation(
-                    'The setting "key" has been set but is unnecessary since the signing algorithm is not "OPENSSL".'
+                    'The setting "key" has been set but is unnecessary since the signing algorithm is not "OPENSSL".',
                 );
             } else {
                 $logger->addWarning(
-                    'The setting "key" has been set but is ignored since the signing algorithm is not "OPENSSL".'
+                    'The setting "key" has been set but is ignored since the signing algorithm is not "OPENSSL".',
                 );
             }
 
@@ -2044,7 +2044,7 @@ final class Configuration
         if (!isset($raw->{self::KEY_KEY})) {
             Assert::true(
                 Phar::OPENSSL !== $signingAlgorithm,
-                'Expected to have a private key for OpenSSL signing but none have been provided.'
+                'Expected to have a private key for OpenSSL signing but none have been provided.',
             );
 
             return null;
@@ -2060,7 +2060,7 @@ final class Configuration
     private static function retrievePrivateKeyPassphrase(
         stdClass $raw,
         int $algorithm,
-        ConfigurationLogger $logger
+        ConfigurationLogger $logger,
     ): ?string {
         self::checkIfDefaultValue($logger, $raw, self::KEY_PASS_KEY);
 
@@ -2077,15 +2077,15 @@ final class Configuration
                     sprintf(
                         'The setting "%s" has been set but is unnecessary since the signing algorithm is '
                         .'not "OPENSSL".',
-                        self::KEY_PASS_KEY
-                    )
+                        self::KEY_PASS_KEY,
+                    ),
                 );
             } else {
                 $logger->addWarning(
                     sprintf(
                         'The setting "%s" has been set but ignored the signing algorithm is not "OPENSSL".',
-                        self::KEY_PASS_KEY
-                    )
+                        self::KEY_PASS_KEY,
+                    ),
                 );
             }
 
@@ -2102,7 +2102,7 @@ final class Configuration
         stdClass $raw,
         ?string $file,
         string $path,
-        ConfigurationLogger $logger
+        ConfigurationLogger $logger,
     ): array {
         self::checkIfDefaultValue($logger, $raw, self::REPLACEMENTS_KEY, new stdClass());
 
@@ -2145,8 +2145,8 @@ final class Configuration
                 sprintf(
                     'The setting "%s" has been set but is unnecessary because the setting "%s" is not set.',
                     self::DATETIME_FORMAT_KEY,
-                    self::DATETIME_KEY
-                )
+                    self::DATETIME_KEY,
+                ),
             );
         }
 
@@ -2180,9 +2180,9 @@ final class Configuration
         return self::runGitCommand(
             sprintf(
                 'git log --pretty="%s" -n1 HEAD',
-                $short ? '%h' : '%H'
+                $short ? '%h' : '%H',
             ),
-            $path
+            $path,
         );
     }
 
@@ -2236,10 +2236,10 @@ final class Configuration
                     sprintf(
                         'The tag or commit hash could not be retrieved from "%s": %s',
                         $path,
-                        $exception->getMessage()
+                        $exception->getMessage(),
                     ),
                     0,
-                    $exception
+                    $exception,
                 );
             }
         }
@@ -2267,16 +2267,16 @@ final class Configuration
                 sprintf(
                     'The "%s" is deprecated, use "%s" setting instead.',
                     self::DATETIME_FORMAT_DEPRECATED_KEY,
-                    self::DATETIME_FORMAT_KEY
+                    self::DATETIME_FORMAT_KEY,
                 ),
-                E_USER_DEPRECATED
+                E_USER_DEPRECATED,
             );
             $logger->addWarning(
                 sprintf(
                     'The "%s" is deprecated, use "%s" setting instead.',
                     self::DATETIME_FORMAT_DEPRECATED_KEY,
-                    self::DATETIME_FORMAT_KEY
-                )
+                    self::DATETIME_FORMAT_KEY,
+                ),
             );
 
             $format = $raw->{self::DATETIME_FORMAT_DEPRECATED_KEY};
@@ -2291,8 +2291,8 @@ final class Configuration
                 false === $formattedDate || $formattedDate === $format,
                 sprintf(
                     'Expected the datetime format to be a valid format: "%s" is not',
-                    $format
-                )
+                    $format,
+                ),
             );
 
             return [$format, true];
@@ -2322,8 +2322,8 @@ final class Configuration
                     sprintf(
                         'The "%s" has been set to `false` but is unnecessary since the Box built-in stub is not'
                         .' being used',
-                        self::SHEBANG_KEY
-                    )
+                        self::SHEBANG_KEY,
+                    ),
                 );
             }
 
@@ -2339,8 +2339,8 @@ final class Configuration
             str_starts_with($shebang, '#!'),
             sprintf(
                 'The shebang line must start with "#!". Got "%s" instead',
-                $shebang
-            )
+                $shebang,
+            ),
         );
 
         if (false === $stubIsGenerated) {
@@ -2348,8 +2348,8 @@ final class Configuration
                 sprintf(
                     'The "%s" has been set but ignored since it is used only with the Box built-in stub which is not'
                     .' used',
-                    self::SHEBANG_KEY
-                )
+                    self::SHEBANG_KEY,
+                ),
             );
         }
 
@@ -2374,8 +2374,8 @@ final class Configuration
             defined('Phar::'.$algorithm),
             sprintf(
                 'The signing algorithm "%s" is not supported by your current PHAR version.',
-                $algorithm
-            )
+                $algorithm,
+            ),
         );
 
         $algorithm = constant('Phar::'.$algorithm);
@@ -2403,8 +2403,8 @@ final class Configuration
                     sprintf(
                         'The "%s" setting has been set but is unnecessary since the Box built-in stub is not '
                         .'being used',
-                        self::BANNER_KEY
-                    )
+                        self::BANNER_KEY,
+                    ),
                 );
             }
 
@@ -2421,8 +2421,8 @@ final class Configuration
             $logger->addWarning(
                 sprintf(
                     'The "%s" setting has been set but is ignored since the Box built-in stub is not being used',
-                    self::BANNER_KEY
-                )
+                    self::BANNER_KEY,
+                ),
             );
         }
 
@@ -2438,7 +2438,7 @@ final class Configuration
         stdClass $raw,
         string $basePath,
         bool $stubIsGenerated,
-        ConfigurationLogger $logger
+        ConfigurationLogger $logger,
     ): ?string {
         self::checkIfDefaultValue($logger, $raw, self::BANNER_FILE_KEY);
 
@@ -2454,8 +2454,8 @@ final class Configuration
             $logger->addWarning(
                 sprintf(
                     'The "%s" setting has been set but is ignored since the Box built-in stub is not being used',
-                    self::BANNER_FILE_KEY
-                )
+                    self::BANNER_FILE_KEY,
+                ),
             );
         }
 
@@ -2492,7 +2492,7 @@ final class Configuration
     private static function retrieveInterceptsFileFunctions(
         stdClass $raw,
         bool $stubIsGenerated,
-        ConfigurationLogger $logger
+        ConfigurationLogger $logger,
     ): bool {
         self::checkIfDefaultValue($logger, $raw, self::INTERCEPT_KEY, false);
 
@@ -2506,8 +2506,8 @@ final class Configuration
             $logger->addWarning(
                 sprintf(
                     'The "%s" setting has been set but is ignored since the Box built-in stub is not being used',
-                    self::INTERCEPT_KEY
-                )
+                    self::INTERCEPT_KEY,
+                ),
             );
         }
 
@@ -2517,13 +2517,13 @@ final class Configuration
     private static function retrievePromptForPrivateKey(
         stdClass $raw,
         int $signingAlgorithm,
-        ConfigurationLogger $logger
+        ConfigurationLogger $logger,
     ): bool {
         if (isset($raw->{self::KEY_PASS_KEY}) && true === $raw->{self::KEY_PASS_KEY}) {
             if (Phar::OPENSSL !== $signingAlgorithm) {
                 $logger->addWarning(
                     'A prompt for password for the private key has been requested but ignored since the signing '
-                    .'algorithm used is not "OPENSSL.'
+                    .'algorithm used is not "OPENSSL.',
                 );
 
                 return false;
@@ -2547,7 +2547,7 @@ final class Configuration
         bool $hasComposerJson,
         bool $hasComposerLock,
         bool $pharStubUsed,
-        ConfigurationLogger $logger
+        ConfigurationLogger $logger,
     ): bool {
         self::checkIfDefaultValue($logger, $raw, self::CHECK_REQUIREMENTS_KEY, true);
 
@@ -2561,7 +2561,7 @@ final class Configuration
         if ($checkRequirements && false === $hasComposerJson && false === $hasComposerLock) {
             $logger->addWarning(
                 'The requirement checker could not be used because the composer.json and composer.lock file could not '
-                .'be found.'
+                .'be found.',
             );
 
             return false;
@@ -2572,8 +2572,8 @@ final class Configuration
                 sprintf(
                     'The "%s" setting has been set but has been ignored since the PHAR built-in stub is being '
                     .'used.',
-                    self::CHECK_REQUIREMENTS_KEY
-                )
+                    self::CHECK_REQUIREMENTS_KEY,
+                ),
             );
         }
 
@@ -2640,7 +2640,7 @@ final class Configuration
             sprintf(
                 'The tag or commit hash could not be retrieved from "%s": %s',
                 $path,
-                $process->getErrorOutput()
+                $process->getErrorOutput(),
             ),
             0,
             new ProcessFailedException($process),
@@ -2655,7 +2655,7 @@ final class Configuration
     private static function retrievePhpCompactorIgnoredAnnotations(
         stdClass $raw,
         array $compactorClasses,
-        ConfigurationLogger $logger
+        ConfigurationLogger $logger,
     ): array {
         $hasPhpCompactor = in_array(PhpCompactor::class, $compactorClasses, true);
 
@@ -2670,8 +2670,8 @@ final class Configuration
             $logger->addWarning(
                 sprintf(
                     'The "%s" setting has been set but is ignored since no PHP compactor has been configured',
-                    self::ANNOTATIONS_KEY
-                )
+                    self::ANNOTATIONS_KEY,
+                ),
             );
         }
 
@@ -2693,8 +2693,8 @@ final class Configuration
                     .' if it is set to `false`',
                     self::ANNOTATIONS_KEY,
                     self::IGNORED_ANNOTATIONS_KEY,
-                    self::ANNOTATIONS_KEY
-                )
+                    self::ANNOTATIONS_KEY,
+                ),
             );
 
             return [];
@@ -2719,24 +2719,24 @@ final class Configuration
             array_filter(
                 array_map(
                     static fn (string $annotation): ?string => strtolower(trim($annotation)),
-                    $ignoredAnnotations
-                )
-            )
+                    $ignoredAnnotations,
+                ),
+            ),
         );
 
         return new PhpCompactor(
             new DocblockAnnotationParser(
                 DocBlockFactory::createInstance(),
                 new CompactedFormatter(),
-                $ignoredAnnotations
-            )
+                $ignoredAnnotations,
+            ),
         );
     }
 
     private static function createPhpScoperCompactor(
         stdClass $raw,
         string $basePath,
-        ConfigurationLogger $logger
+        ConfigurationLogger $logger,
     ): Compactor {
         $phpScoperConfig = self::configurePhpScoperPrefix(
             self::retrievePhpScoperConfig($raw, $basePath, $logger),
@@ -2749,12 +2749,12 @@ final class Configuration
                     array_keys(
                         $phpScoperConfig->getExcludedFilesWithContents(),
                     ),
-                )
-            )
+                ),
+            ),
         );
 
         return new PhpScoperCompactor(
-            new SimpleScoper($phpScoperConfig, ...$whitelistedFiles)
+            new SimpleScoper($phpScoperConfig, ...$whitelistedFiles),
         );
     }
 
@@ -2782,7 +2782,7 @@ final class Configuration
         ConfigurationLogger $logger,
         stdClass $raw,
         string $key,
-        $defaultValue = null
+        $defaultValue = null,
     ): void {
         if (false === property_exists($raw, $key)) {
             return;
@@ -2797,8 +2797,8 @@ final class Configuration
             $logger->addRecommendation(
                 sprintf(
                     'The "%s" setting can be omitted since is set to its default value',
-                    $key
-                )
+                    $key,
+                ),
             );
         }
     }
@@ -2808,8 +2808,8 @@ final class Configuration
         $logger->addRecommendation(
             sprintf(
                 'The "%s" setting can be omitted since is set to its default value',
-                $key
-            )
+                $key,
+            ),
         );
     }
 }

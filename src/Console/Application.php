@@ -55,8 +55,8 @@ final class Application extends SymfonyApplication
                 '<info>%s</info> version <comment>%s</comment> %s',
                 $this->getName(),
                 $this->getVersion(),
-                $this->releaseDate
-            )
+                $this->releaseDate,
+            ),
         );
     }
 

@@ -36,7 +36,7 @@ final class JsonValidationException extends UnexpectedValueException
         ?string $file = null,
         array $errors = [],
         int $code = 0,
-        ?Throwable $previous = null
+        ?Throwable $previous = null,
     ) {
         if (null !== $file) {
             Assert::file($file);

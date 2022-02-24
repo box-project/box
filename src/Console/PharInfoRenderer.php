@@ -45,8 +45,8 @@ final class PharInfoRenderer
             $io->writeln(
                 sprintf(
                     '<comment>Compression:</comment> %s',
-                    key($count)
-                )
+                    key($count),
+                ),
             );
 
             return;
@@ -70,8 +70,8 @@ final class PharInfoRenderer
                 sprintf(
                     '  - %s (%0.2f%%)',
                     $algorithmName,
-                    $percentage
-                )
+                    $percentage,
+                ),
             );
         }
     }
@@ -89,14 +89,14 @@ final class PharInfoRenderer
         $io->writeln(
             sprintf(
                 '<comment>Signature:</comment> %s',
-                $signature['hash_type']
-            )
+                $signature['hash_type'],
+            ),
         );
         $io->writeln(
             sprintf(
                 '<comment>Signature Hash:</comment> %s',
-                $signature['hash']
-            )
+                $signature['hash'],
+            ),
         );
     }
 
@@ -122,9 +122,9 @@ final class PharInfoRenderer
                 '<comment>Contents:</comment>%s (%s)',
                 1 === $totalCount ? ' 1 file' : " $totalCount files",
                 format_size(
-                    filesize($pharInfo->getPhar()->getPath())
-                )
-            )
+                    filesize($pharInfo->getPhar()->getPath()),
+                ),
+            ),
         );
     }
 }

@@ -52,7 +52,7 @@ final class CompilerLogger
 
         $this->io->writeln(
             "$prefix $message",
-            $verbosity
+            $verbosity,
         );
     }
 
@@ -61,8 +61,8 @@ final class CompilerLogger
         $this->io->writeln(
             sprintf(
                 '🔨  Building the PHAR "<comment>%s</comment>"',
-                $path
-            )
+                $path,
+            ),
         );
         $this->io->newLine();
     }

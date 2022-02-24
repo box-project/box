@@ -48,7 +48,7 @@ class ConfigurationLoggerTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected to have a message but a blank string was given instead.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
 
@@ -59,7 +59,7 @@ class ConfigurationLoggerTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected to have a message but a blank string was given instead.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -77,7 +77,7 @@ class ConfigurationLoggerTest extends TestCase
                 'First recommendation',
                 'Second recommendation',
             ],
-            $this->logs->getRecommendations()
+            $this->logs->getRecommendations(),
         );
 
         $this->assertSame(
@@ -85,7 +85,7 @@ class ConfigurationLoggerTest extends TestCase
                 'First warning',
                 'Second warning',
             ],
-            $this->logs->getWarnings()
+            $this->logs->getWarnings(),
         );
     }
 
@@ -104,7 +104,7 @@ class ConfigurationLoggerTest extends TestCase
                 'First recommendation',
                 'Second recommendation',
             ],
-            $this->logs->getRecommendations()
+            $this->logs->getRecommendations(),
         );
 
         $this->assertSame(
@@ -112,7 +112,7 @@ class ConfigurationLoggerTest extends TestCase
                 'First warning',
                 'Second warning',
             ],
-            $this->logs->getWarnings()
+            $this->logs->getWarnings(),
         );
     }
 

@@ -354,7 +354,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
                         {"name": "acme/oof"}
                     ]
                 }
-                JSON
+                JSON,
         );
         dump_file('vendor/composer/installed.json', '{}');
 
@@ -461,9 +461,9 @@ class ConfigurationFileTest extends ConfigurationTestCase
             $this->assertSame(
                 sprintf(
                     '"files" must contain a list of existing files. Could not find "%s".',
-                    $filePath
+                    $filePath,
                 ),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -500,7 +500,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
             $this->assertSame(
                 "Cannot append the link \"$link\" to the Finder: links are not supported.",
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -537,7 +537,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
             $this->assertSame(
                 "Path \"$link\" was expected to be a file or directory. It may be a symlink (which are unsupported).",
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -574,7 +574,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
             $this->assertSame(
                 "Cannot append the link \"$link\" to the Finder: links are not supported.",
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -606,7 +606,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
             $this->assertSame(
                 "Cannot add the link \"$link\": links are not supported.",
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -638,7 +638,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
             $this->assertSame(
                 "Cannot add the link \"$link\": links are not supported.",
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -661,9 +661,9 @@ class ConfigurationFileTest extends ConfigurationTestCase
             $this->assertSame(
                 sprintf(
                     '"files" must contain a list of existing files. Could not find "%s".',
-                    $filePath
+                    $filePath,
                 ),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -684,9 +684,9 @@ class ConfigurationFileTest extends ConfigurationTestCase
             $this->assertSame(
                 sprintf(
                     '"directories" must contain a list of existing directories. Could not find "%s".',
-                    $dirPath
+                    $dirPath,
                 ),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -709,9 +709,9 @@ class ConfigurationFileTest extends ConfigurationTestCase
             $this->assertSame(
                 sprintf(
                     '"directories" must contain a list of existing directories. Could not find "%s".',
-                    $dirPath
+                    $dirPath,
                 ),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -969,9 +969,9 @@ class ConfigurationFileTest extends ConfigurationTestCase
             $this->assertSame(
                 sprintf(
                     '"files-bin" must contain a list of existing files. Could not find "%s".',
-                    $filePath
+                    $filePath,
                 ),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -994,9 +994,9 @@ class ConfigurationFileTest extends ConfigurationTestCase
             $this->assertSame(
                 sprintf(
                     '"files-bin" must contain a list of existing files. Could not find "%s".',
-                    $filePath
+                    $filePath,
                 ),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1017,9 +1017,9 @@ class ConfigurationFileTest extends ConfigurationTestCase
             $this->assertSame(
                 sprintf(
                     '"directories-bin" must contain a list of existing directories. Could not find "%s".',
-                    $dirPath
+                    $dirPath,
                 ),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1042,9 +1042,9 @@ class ConfigurationFileTest extends ConfigurationTestCase
             $this->assertSame(
                 sprintf(
                     '"directories-bin" must contain a list of existing directories. Could not find "%s".',
-                    $dirPath
+                    $dirPath,
                 ),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1095,11 +1095,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $this->assertSame(
             $expected,
-            $this->normalizePaths($this->config->getFiles())
+            $this->normalizePaths($this->config->getFiles()),
         );
         $this->assertSame(
             $expected,
-            $this->normalizePaths($this->config->getBinaryFiles())
+            $this->normalizePaths($this->config->getBinaryFiles()),
         );
     }
 
@@ -1111,7 +1111,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $this->assertSame(
             ['The "blacklist" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -1132,7 +1132,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
         } catch (JsonValidationException $exception) {
             $this->assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1192,7 +1192,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
         } catch (JsonValidationException $exception) {
             $this->assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1205,7 +1205,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $this->assertSame(
             ['The "files" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -1226,7 +1226,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
         } catch (JsonValidationException $exception) {
             $this->assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1249,11 +1249,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $this->assertSame(
             $expected,
-            $this->normalizePaths($this->config->getFiles())
+            $this->normalizePaths($this->config->getFiles()),
         );
         $this->assertSame(
             $expected,
-            $this->normalizePaths($this->config->getBinaryFiles())
+            $this->normalizePaths($this->config->getBinaryFiles()),
         );
     }
 
@@ -1273,7 +1273,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
         } catch (JsonValidationException $exception) {
             $this->assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1286,7 +1286,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $this->assertSame(
             ['The "directories" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -1307,7 +1307,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
         } catch (JsonValidationException $exception) {
             $this->assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1331,11 +1331,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $this->assertSame(
             $expected,
-            $this->normalizePaths($this->config->getFiles())
+            $this->normalizePaths($this->config->getFiles()),
         );
         $this->assertSame(
             $expected,
-            $this->normalizePaths($this->config->getBinaryFiles())
+            $this->normalizePaths($this->config->getBinaryFiles()),
         );
     }
 
@@ -1355,7 +1355,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
         } catch (JsonValidationException $exception) {
             $this->assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1368,7 +1368,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $this->assertSame(
             ['The "finder" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -1432,11 +1432,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $this->assertEqualsCanonicalizing(
             $expected,
-            $this->normalizePaths($this->config->getFiles())
+            $this->normalizePaths($this->config->getFiles()),
         );
         $this->assertEqualsCanonicalizing(
             $expected,
-            $this->normalizePaths($this->config->getBinaryFiles())
+            $this->normalizePaths($this->config->getBinaryFiles()),
         );
     }
 
@@ -1462,11 +1462,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $this->assertEqualsCanonicalizing(
             $expected,
-            $this->normalizePaths($this->config->getFiles())
+            $this->normalizePaths($this->config->getFiles()),
         );
         $this->assertEqualsCanonicalizing(
             $expected,
-            $this->normalizePaths($this->config->getBinaryFiles())
+            $this->normalizePaths($this->config->getBinaryFiles()),
         );
     }
 
@@ -1516,7 +1516,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected the method "invalidMethod" to exist.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1585,7 +1585,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
     public function test_files_are_autodiscovered_unless_directory_or_finder_config_is_provided(
         callable $setUp,
         array $config,
-        bool $expectedFilesAutodiscovery
+        bool $expectedFilesAutodiscovery,
     ): void {
         $setUp();
 
@@ -1681,7 +1681,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
                         "classmap": ["CLASSMAP_DEV_DIR"]
                     }
                 }
-                JSON
+                JSON,
         );
 
         // Relative to the current working directory for readability
@@ -1736,7 +1736,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $this->assertSame(
             ['The "force-autodiscovery" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -1745,7 +1745,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
     {
         $config = Configuration::create(
             $configPath = self::FIXTURES_DIR.'/dir000/box.json',
-            json_decode(file_get_contents($configPath), false)
+            json_decode(file_get_contents($configPath), false),
         );
 
         $this->assertSame([], $config->getRecommendations());
@@ -1756,7 +1756,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
     {
         $config = Configuration::create(
             $configPath = self::FIXTURES_DIR.'/dir001/box.json',
-            json_decode(file_get_contents($configPath), false)
+            json_decode(file_get_contents($configPath), false),
         );
 
         $this->assertTrue($config->dumpAutoload());
@@ -1790,7 +1790,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 'The "dump-autoload" setting has been set but has been ignored because the composer.json, composer.lock '
                 .'and vendor/composer/installed.json files are necessary but could not be found.',
             ],
-            $config->getWarnings()
+            $config->getWarnings(),
         );
     }
 
@@ -1821,7 +1821,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 'The "dump-autoload" setting has been set but has been ignored because the composer.json, composer.lock '
                 .'and vendor/composer/installed.json files are necessary but could not be found.',
             ],
-            $config->getWarnings()
+            $config->getWarnings(),
         );
     }
 
@@ -1850,7 +1850,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
                         {"name": "acme/oof"}
                     ]
                 }
-                JSON
+                JSON,
         );
         dump_file('vendor/composer/installed.json', '{}');
 

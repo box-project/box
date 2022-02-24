@@ -70,38 +70,38 @@ final class Diff extends BaseCommand
         $this->addArgument(
             self::FIRST_PHAR_ARG,
             InputArgument::REQUIRED,
-            'The first PHAR'
+            'The first PHAR',
         );
         $this->addArgument(
             self::SECOND_PHAR_ARG,
             InputArgument::REQUIRED,
-            'The second PHAR'
+            'The second PHAR',
         );
 
         $this->addOption(
             self::GNU_DIFF_OPTION,
             null,
             InputOption::VALUE_NONE,
-            'Displays a GNU diff'
+            'Displays a GNU diff',
         );
         $this->addOption(
             self::GIT_DIFF_OPTION,
             null,
             InputOption::VALUE_NONE,
-            'Displays a Git diff'
+            'Displays a Git diff',
         );
         $this->addOption(
             self::LIST_FILES_DIFF_OPTION,
             null,
             InputOption::VALUE_NONE,
-            'Displays a list of file names diff (default)'
+            'Displays a list of file names diff (default)',
         );
         $this->addOption(
             self::CHECK_OPTION,
             'c',
             InputOption::VALUE_OPTIONAL,
             'Verify the authenticity of the contents between the two PHARs with the given hash function.',
-            'sha384'
+            'sha384',
         );
     }
 
@@ -134,8 +134,8 @@ final class Diff extends BaseCommand
             $io->writeln(
                 sprintf(
                     '<error>Could not check the PHARs: %s</error>',
-                    $throwable->getMessage()
-                )
+                    $throwable->getMessage(),
+                ),
             );
 
             return 1;
@@ -163,7 +163,7 @@ final class Diff extends BaseCommand
         $this->renderArchive(
             $diff->getPharA()->getFileName(),
             $pharInfoA,
-            $io
+            $io,
         );
 
         $io->newLine();
@@ -171,7 +171,7 @@ final class Diff extends BaseCommand
         $this->renderArchive(
             $diff->getPharB()->getFileName(),
             $pharInfoB,
-            $io
+            $io,
         );
 
         return 1;
@@ -209,12 +209,12 @@ final class Diff extends BaseCommand
         $io->writeln(sprintf(
             '--- Files present in "%s" but not in "%s"',
             $diff->getPharA()->getFileName(),
-            $diff->getPharB()->getFileName()
+            $diff->getPharB()->getFileName(),
         ));
         $io->writeln(sprintf(
             '+++ Files present in "%s" but not in "%s"',
             $diff->getPharB()->getFileName(),
-            $diff->getPharA()->getFileName()
+            $diff->getPharA()->getFileName(),
         ));
 
         $io->newLine();
@@ -241,8 +241,8 @@ final class Diff extends BaseCommand
                         $symbol,
                         $path,
                         $compression,
-                        $fileSize
-                    )
+                        $fileSize,
+                    ),
                 );
             }
         };
@@ -252,7 +252,7 @@ final class Diff extends BaseCommand
 
         $io->error(sprintf(
             '%d file(s) difference',
-            count($diffResult[0]) + count($diffResult[1])
+            count($diffResult[0]) + count($diffResult[1]),
         ));
 
         return 1;
@@ -263,8 +263,8 @@ final class Diff extends BaseCommand
         $io->writeln(
             sprintf(
                 '<comment>Archive: </comment><fg=cyan;options=bold>%s</>',
-                $fileName
-            )
+                $fileName,
+            ),
         );
 
         PharInfoRenderer::renderCompression($pharInfo, $io);

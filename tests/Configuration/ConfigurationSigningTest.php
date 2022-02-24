@@ -49,7 +49,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
 
         $this->assertSame(
             ['The "algorithm" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
 
@@ -59,7 +59,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
 
         $this->assertSame(
             ['The "algorithm" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -92,7 +92,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected one of: "MD5", "SHA1", "SHA256", "SHA512", "OPENSSL". Got: "INVALID"',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -108,7 +108,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected to have a private key for OpenSSL signing but none have been provided.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -134,7 +134,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
                 'A prompt for password for the private key has been requested but ignored since the signing algorithm used is not "OPENSSL.',
                 'The setting "key-pass" has been set but ignored the signing algorithm is not "OPENSSL".',
             ],
-            $this->config->getWarnings()
+            $this->config->getWarnings(),
         );
 
         foreach ([false, null] as $keyPass) {
@@ -153,14 +153,14 @@ class ConfigurationSigningTest extends ConfigurationTestCase
             if (null === $keyPass) {
                 array_unshift(
                     $expectedRecommendation,
-                    'The "key-pass" setting can be omitted since is set to its default value'
+                    'The "key-pass" setting can be omitted since is set to its default value',
                 );
             }
 
             if (in_array($algorithm, ['SHA1', false], true)) {
                 array_unshift(
                     $expectedRecommendation,
-                    'The "algorithm" setting can be omitted since is set to its default value'
+                    'The "algorithm" setting can be omitted since is set to its default value',
                 );
             }
 
@@ -181,7 +181,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
         }
         $this->assertSame(
             ['The setting "key-pass" has been set but ignored the signing algorithm is not "OPENSSL".'],
-            $this->config->getWarnings()
+            $this->config->getWarnings(),
         );
     }
 
@@ -204,7 +204,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
         }
         $this->assertSame(
             ['The setting "key" has been set but is ignored since the signing algorithm is not "OPENSSL".'],
-            $this->config->getWarnings()
+            $this->config->getWarnings(),
         );
 
         $this->setConfig([
@@ -221,7 +221,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
         if (in_array($algorithm, ['SHA1', false], true)) {
             array_unshift(
                 $expectedRecommendation,
-                'The "algorithm" setting can be omitted since is set to its default value'
+                'The "algorithm" setting can be omitted since is set to its default value',
             );
         }
 
@@ -277,7 +277,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
             if (null === $keyPass) {
                 $this->assertSame(
                     ['The "key-pass" setting can be omitted since is set to its default value'],
-                    $this->config->getRecommendations()
+                    $this->config->getRecommendations(),
                 );
             }
 

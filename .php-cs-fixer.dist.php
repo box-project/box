@@ -78,6 +78,14 @@ $config = (new PhpCsFixer\Config())
         'semicolon_after_instruction' => true,
         'single_line_throw' => false,
         'strict_param' => true,
+        'trailing_comma_in_multiline' => [
+            'after_heredoc' => true,
+            'elements' => [
+                'arrays',
+                'arguments',
+                'parameters',
+            ],
+        ],
         'yoda_style' => true,
     ])
     ->setFinder(

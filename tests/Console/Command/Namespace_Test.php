@@ -36,7 +36,7 @@ class Namespace_Test extends CommandTestCase
         $this->commandTester->execute(
             [
                 'command' => 'namespace',
-            ]
+            ],
         );
 
         $expected = 'KevinGH'."\n";

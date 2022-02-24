@@ -26,7 +26,7 @@ trait RequiresPharReadonlyOff
         if (true === (bool) ini_get('phar.readonly')) {
             $this->markTestSkipped(
                 'Requires phar.readonly to be set to 0. Either update your php.ini file or run this test with '
-                .'php -d phar.readonly=0.'
+                .'php -d phar.readonly=0.',
             );
         }
     }

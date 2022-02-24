@@ -50,12 +50,12 @@ final class Verify extends BaseCommand
                 Box supports verifying private key signed PHARs without using
                 either extensions. <error>Note however, that the entire PHAR will need
                 to be read into memory before the verification can be performed.</error>
-                HELP
+                HELP,
         );
         $this->addArgument(
             self::PHAR_ARG,
             InputArgument::REQUIRED,
-            'The PHAR file'
+            'The PHAR file',
         );
     }
 
@@ -72,8 +72,8 @@ final class Verify extends BaseCommand
         $io->writeln(
             sprintf(
                 '🔐️  Verifying the PHAR "<comment>%s</comment>"',
-                $pharPath
-            )
+                $pharPath,
+            ),
         );
         $io->newLine();
 
@@ -109,8 +109,8 @@ final class Verify extends BaseCommand
             sprintf(
                 '%s signature: <info>%s</info>',
                 $signature['hash_type'],
-                $signature['hash']
-            )
+                $signature['hash'],
+            ),
         );
 
         return 0;
@@ -126,8 +126,8 @@ final class Verify extends BaseCommand
         $io->writeln(
             sprintf(
                 '<error>The PHAR failed the verification: %s</error>',
-                $message
-            )
+                $message,
+            ),
         );
 
         if (null !== $throwable && $io->isDebug()) {

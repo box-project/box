@@ -101,7 +101,7 @@ function get_phar_compression_algorithm_extension(int $algorithm): ?string
 
     Assert::true(
         array_key_exists($algorithm, $extensions),
-        sprintf('Unknown compression algorithm code "%d"', $algorithm)
+        sprintf('Unknown compression algorithm code "%d"', $algorithm),
     );
 
     return $extensions[$algorithm];
@@ -146,7 +146,7 @@ function format_size(float|int $size, int $decimals = 2): string
             $size / (1024 ** $power),
             $decimals,
         ),
-        $units[$power]
+        $units[$power],
     );
 }
 
@@ -181,7 +181,7 @@ function format_time(float $secs): string
     return str_replace(
         ' ',
         '',
-        Helper::formatTime($secs)
+        Helper::formatTime($secs),
     );
 }
 
@@ -247,8 +247,8 @@ function check_php_settings(IO $io): void
 {
     (new PhpSettingsHandler(
         new ConsoleLogger(
-            $io->getOutput()
-        )
+            $io->getOutput(),
+        ),
     ))->check();
 }
 
@@ -272,7 +272,7 @@ function register_error_handler(): void
             if (error_reporting() & $code) {
                 throw new ErrorException($message, 0, $code, $file, $line);
             }
-        }
+        },
     );
 }
 
@@ -289,7 +289,7 @@ function bump_open_file_descriptor_limit(int $count, IO $io): Closure
         $io->writeln(
             '<info>[debug] Could not check the maximum number of open file descriptors: the functions "posix_getrlimit()" and '
             .'"posix_setrlimit" could not be found.</info>',
-            OutputInterface::VERBOSITY_DEBUG
+            OutputInterface::VERBOSITY_DEBUG,
         );
 
         return static function (): void {};
@@ -309,15 +309,15 @@ function bump_open_file_descriptor_limit(int $count, IO $io): Closure
             $softLimit,
             $hardLimit,
             $count,
-            'unlimited'
+            'unlimited',
         ),
-        OutputInterface::VERBOSITY_DEBUG
+        OutputInterface::VERBOSITY_DEBUG,
     );
 
     posix_setrlimit(
         POSIX_RLIMIT_NOFILE,
         $count,
-        'unlimited' === $hardLimit ? POSIX_RLIMIT_INFINITY : $hardLimit
+        'unlimited' === $hardLimit ? POSIX_RLIMIT_INFINITY : $hardLimit,
     );
 
     return static function () use ($io, $softLimit, $hardLimit): void {
@@ -325,12 +325,12 @@ function bump_open_file_descriptor_limit(int $count, IO $io): Closure
             posix_setrlimit(
                 POSIX_RLIMIT_NOFILE,
                 $softLimit,
-                'unlimited' === $hardLimit ? POSIX_RLIMIT_INFINITY : $hardLimit
+                'unlimited' === $hardLimit ? POSIX_RLIMIT_INFINITY : $hardLimit,
             );
 
             $io->writeln(
                 '<info>[debug] Restored the maximum number of open file descriptors</info>',
-                OutputInterface::VERBOSITY_DEBUG
+                OutputInterface::VERBOSITY_DEBUG,
             );
         }
     };

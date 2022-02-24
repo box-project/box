@@ -67,7 +67,7 @@ final class DockerFileGenerator
         return new self(
             self::retrievePhpImageName($requirements),
             self::retrievePhpExtensions($requirements),
-            $sourcePhar
+            $sourcePhar,
         );
     }
 
@@ -79,7 +79,7 @@ final class DockerFileGenerator
     public function __construct(
         string $image,
         array $extensions,
-        private readonly string $sourcePhar
+        private readonly string $sourcePhar,
     ) {
         Assert::inArray($image, self::PHP_DOCKER_IMAGES);
         Assert::allString($extensions);
@@ -95,7 +95,7 @@ final class DockerFileGenerator
         $contents = str_replace(
             '__BASE_PHP_IMAGE_TOKEN__',
             $this->image,
-            $contents
+            $contents,
         );
 
         $contents = str_replace(
@@ -106,22 +106,22 @@ final class DockerFileGenerator
                     '["%s"]',
                     implode(
                         '", "',
-                        $this->extensions
-                    )
+                        $this->extensions,
+                    ),
                 ),
-            $contents
+            $contents,
         );
 
         $contents = str_replace(
             '__PHAR_FILE_PATH_TOKEN__',
             $this->sourcePhar,
-            $contents
+            $contents,
         );
 
         $contents = str_replace(
             '__PHAR_FILE_NAME_TOKEN__',
             basename($this->sourcePhar),
-            $contents
+            $contents,
         );
 
         return $contents;
@@ -132,9 +132,9 @@ final class DockerFileGenerator
         $conditions = array_column(
             array_filter(
                 $requirements,
-                static fn (array $requirement): bool => 'php' === $requirement['type']
+                static fn (array $requirement): bool => 'php' === $requirement['type'],
             ),
-            'condition'
+            'condition',
         );
 
         foreach (self::PHP_DOCKER_IMAGES as $php => $image) {
@@ -151,8 +151,8 @@ final class DockerFileGenerator
             sprintf(
                 'Could not find a suitable Docker base image for the PHP constraint(s) "%s". Images available: "%s"',
                 implode('", "', $conditions),
-                implode('", "', self::PHP_DOCKER_IMAGES)
-            )
+                implode('", "', self::PHP_DOCKER_IMAGES),
+            ),
         );
     }
 
@@ -164,9 +164,9 @@ final class DockerFileGenerator
         return array_column(
             array_filter(
                 $requirements,
-                static fn (array $requirement): bool => 'extension' === $requirement['type']
+                static fn (array $requirement): bool => 'extension' === $requirement['type'],
             ),
-            'condition'
+            'condition',
         );
     }
 }

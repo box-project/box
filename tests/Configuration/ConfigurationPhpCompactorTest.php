@@ -90,7 +90,7 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
 
             $this->assertSame(
                 ['The "annotations" setting can be omitted since is set to its default value'],
-                $this->config->getRecommendations()
+                $this->config->getRecommendations(),
             );
             $this->assertSame([], $this->config->getWarnings());
         }
@@ -104,7 +104,7 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
     public function test_a_warning_is_given_if_the_php_compactor_annotations_are_configured_but_no_php_compactor_is_registered(
         $annotationValue,
         array $expectedRecommendations,
-        array $expectedWarnings
+        array $expectedWarnings,
     ): void {
         $this->setConfig([
             'annotations' => $annotationValue,
@@ -132,11 +132,11 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
 
         $this->assertSame(
             ['The "annotations#ignore" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame(
             ['The "annotations" setting has been set but is ignored since no PHP compactor has been configured'],
-            $this->config->getWarnings()
+            $this->config->getWarnings(),
         );
     }
 
@@ -146,7 +146,7 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
     public function test_ignored_annotations_are_provided_to_the_php_compactor(
         array $config,
         string $contents,
-        string $expected
+        string $expected,
     ): void {
         $this->setConfig($config);
 
@@ -254,7 +254,7 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
                 function foo($x, $y): int {
                 return $x <=> $y;
                 }
-                PHP
+                PHP,
         ];
 
         $falseAnnotationConfigs = [
@@ -314,7 +314,7 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
                     function foo($x, $y): int {
                     return $x <=> $y;
                     }
-                    PHP
+                    PHP,
             ];
         }
 
@@ -369,7 +369,7 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
                     function foo($x, $y): int {
                     return $x <=> $y;
                     }
-                    PHP
+                    PHP,
             ];
         }
 
@@ -417,7 +417,7 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
                 function foo($x, $y): int {
                 return $x <=> $y;
                 }
-                PHP
+                PHP,
         ];
     }
 }

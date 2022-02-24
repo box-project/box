@@ -35,8 +35,8 @@ class PhpTest extends TestCase
             new DocblockAnnotationParser(
                 DocBlockFactory::createInstance(),
                 new CompactedFormatter(),
-                []
-            )
+                [],
+            ),
         );
 
         $contents = <<<'PHP_WRAP'
@@ -74,13 +74,13 @@ class PhpTest extends TestCase
             new DocblockAnnotationParser(
                 DocBlockFactory::createInstance(),
                 new CompactedFormatter(),
-                []
-            )
+                [],
+            ),
         );
 
         $this->assertEquals(
             $compactor,
-            unserialize(serialize($compactor))
+            unserialize(serialize($compactor)),
         );
     }
 
@@ -96,7 +96,7 @@ class PhpTest extends TestCase
         $regularAnnotationParser = new DocblockAnnotationParser(
             DocBlockFactory::createInstance(),
             new CompactedFormatter(),
-            []
+            [],
         );
 
         yield 'simple PHP file with comments' => [
@@ -175,14 +175,14 @@ class PhpTest extends TestCase
                 \$test = true;
                 }
                 }
-                PHP
+                PHP,
         ];
 
         yield 'PHP file with annotations' => [
             new DocblockAnnotationParser(
                 DocBlockFactory::createInstance(),
                 new CompactedFormatter(),
-                ['ignored']
+                ['ignored'],
             ),
             <<<'PHP'
                 <?php
@@ -268,14 +268,14 @@ class PhpTest extends TestCase
 
                 private \$none;
                 }
-                PHP
+                PHP,
         ];
 
         yield 'legacy issue 14' => [
             new DocblockAnnotationParser(
                 DocBlockFactory::createInstance(),
                 new CompactedFormatter(),
-                ['author', 'inline']
+                ['author', 'inline'],
             ),
             <<<'PHP'
                 <?php
@@ -395,7 +395,7 @@ class PhpTest extends TestCase
                 }
                 }
 
-                PHP
+                PHP,
         ];
 
         yield 'Invalid PHP file' => [
@@ -424,7 +424,7 @@ class PhpTest extends TestCase
                 */
                 function foo($x) {
                 }
-                PHP
+                PHP,
         ];
 
         yield 'Invalid annotation' => [
@@ -451,7 +451,7 @@ class PhpTest extends TestCase
                 */
                 function foo($x) {
                 }
-                PHP
+                PHP,
         ];
 
         yield 'Simple single line PHP 8.0 attribute' => [
@@ -474,7 +474,7 @@ class PhpTest extends TestCase
                 #[\ReturnTypeWillChange]
                 public jsonSerialize() {}
                 }
-                PHP
+                PHP,
         ];
 
         yield 'Simple multi-line PHP 8.0 attribute' => [
@@ -499,7 +499,7 @@ class PhpTest extends TestCase
                 ]
                 public jsonSerialize() {}
                 }
-                PHP
+                PHP,
         ];
 
         yield 'Single line PHP 8.0 attribute containing short array' => [
@@ -516,7 +516,7 @@ class PhpTest extends TestCase
 
                 #[AttributeWithParams('foo', bar: ['bar' => 'foobar'])]
                 function foo() {}
-                PHP
+                PHP,
         ];
 
         yield 'Single line containing two separate PHP 8.0 attributes' => [
@@ -533,7 +533,7 @@ class PhpTest extends TestCase
 
                 #[CustomAttribute] #[AttributeWithParams('foo')]
                 function foo() {}
-                PHP
+                PHP,
         ];
 
         yield 'Single line PHP 8.0 attribute followed by a comment' => [
@@ -550,7 +550,7 @@ class PhpTest extends TestCase
 
                 #[CustomAttribute]
                 function foo() {}
-                PHP
+                PHP,
         ];
 
         yield 'Single line PHP 8.0 attribute group' => [
@@ -567,7 +567,7 @@ class PhpTest extends TestCase
 
                 #[CustomAttribute, AttributeWithParams('foo'), AttributeWithParams('foo', bar: ['bar' => 'foobar'])]
                 function foo() {}
-                PHP
+                PHP,
         ];
 
         yield 'Multi-line PHP 8.0 attribute containing short array and inline comments' => [
@@ -592,7 +592,7 @@ class PhpTest extends TestCase
                 AttributeWithParams('foo', bar: ['bar' => 'foobar'])
                 ]
                 function foo() {}
-                PHP
+                PHP,
         ];
 
         yield 'Inline parameter attribute group followed by another attribute' => [
@@ -607,7 +607,7 @@ class PhpTest extends TestCase
                 <?php
 
                 function foo(#[ParamAttribute, AttributeWithParams( 'foo')] int $param, #[ParamAttr] $more) {}
-                PHP
+                PHP,
         ];
 
         yield 'Multi-line PHP 8.0 attribute for parameter' => [
@@ -630,7 +630,7 @@ class PhpTest extends TestCase
                 'foo'
                 )
                 ] int $param) {}
-                PHP
+                PHP,
         ];
 
         yield 'Single line PHP 8.0 attribute containing text looking like a PHP close tag' => [
@@ -647,7 +647,7 @@ class PhpTest extends TestCase
 
                 #[DeprecationReason('reason: <https://some-website/reason?>')]
                 function foo() {}
-                PHP
+                PHP,
         ];
 
         yield 'Multi-line PHP 8.0 attribute containing text looking like a PHP close tag' => [
@@ -668,7 +668,7 @@ class PhpTest extends TestCase
                 'reason: <https://some-website/reason?>'
                 )]
                 function foo() {}
-                PHP
+                PHP,
         ];
     }
 }

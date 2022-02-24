@@ -64,7 +64,7 @@ final class RequirementsDumper
     private static function dumpRequirementsConfig(
         array $composerJsonDecodedContents,
         array $composerLockDecodedContents,
-        ?int $compressionAlgorithm
+        ?int $compressionAlgorithm,
     ): array {
         $config = AppRequirementsFactory::create($composerJsonDecodedContents, $composerLockDecodedContents, $compressionAlgorithm);
 
@@ -73,7 +73,7 @@ final class RequirementsDumper
             str_replace(
                 '\'__CONFIG__\'',
                 var_export($config, true),
-                self::REQUIREMENTS_CONFIG_TEMPLATE
+                self::REQUIREMENTS_CONFIG_TEMPLATE,
             ),
         ];
     }

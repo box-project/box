@@ -45,7 +45,7 @@ class ApplicationTest extends TestCase
         $actual = preg_replace(
             '/Box version .+@[a-z\d]{7}/',
             'Box version 3.x-dev@151e40a',
-            $appTester->getDisplay(true)
+            $appTester->getDisplay(true),
         );
 
         $this->assertSame($expected, $actual);
@@ -126,7 +126,7 @@ class ApplicationTest extends TestCase
         $actual = preg_replace(
             '/Box version .+@[a-z\d]{7}/',
             'Box version 3.x-dev@151e40a',
-            $appTester->getDisplay(true)
+            $appTester->getDisplay(true),
         );
 
         $this->assertSame($expected, $actual);

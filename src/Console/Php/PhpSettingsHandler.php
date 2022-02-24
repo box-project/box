@@ -116,8 +116,8 @@ final class PhpSettingsHandler extends XdebugHandler
                 sprintf(
                     'Changed the memory limit from "%s" to "%s"',
                     format_size($memoryLimitInBytes, 0),
-                    '512M'
-                )
+                    '512M',
+                ),
             );
         } elseif ($setUserDefinedMemoryLimit) {
             ini_set('memory_limit', (string) $userDefinedMemoryLimit);
@@ -127,15 +127,15 @@ final class PhpSettingsHandler extends XdebugHandler
                     'Changed the memory limit from "%s" to %s="%s"',
                     format_size($memoryLimitInBytes, 0),
                     BOX_MEMORY_LIMIT,
-                    format_size($userDefinedMemoryLimit, 0)
-                )
+                    format_size($userDefinedMemoryLimit, 0),
+                ),
             );
         } else {
             $this->logger->debug(
                 sprintf(
                     'Current memory limit: "%s"',
-                    format_size($memoryLimitInBytes, 0)
-                )
+                    format_size($memoryLimitInBytes, 0),
+                ),
             );
         }
     }
