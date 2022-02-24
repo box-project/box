@@ -17,13 +17,13 @@ namespace KevinGH\Box\PharInfo;
 use function array_diff;
 use function array_map;
 use const DIRECTORY_SEPARATOR;
-use function escapeshellarg;
+use function implode;
 use function iterator_to_array;
 use ParagonIE\Pharaoh\PharDiff as ParagoniePharDiff;
-use function realpath;
 use SplFileInfo;
 use function str_replace;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Process\Process;
 
 final class PharDiff
 {
@@ -34,11 +34,7 @@ final class PharDiff
     public function __construct(string $pathA, string $pathB)
     {
         $phars = array_map(
-            static function (string $path): Pharaoh {
-                $realPath = realpath($path);
-
-                return new Pharaoh(false !== $realPath ? $realPath : $path);
-            },
+            static fn (string $path) => new Pharaoh($path),
             [$pathA, $pathB]
         );
 
@@ -63,56 +59,20 @@ final class PharDiff
 
     public function gitDiff(): ?string
     {
-        $argA = escapeshellarg($this->pharA->tmp);
-        $argB = escapeshellarg($this->pharB->tmp);
-
-        // TODO: replace by the process component
-        $diff = shell_exec("git diff --no-index $argA $argB");
-
-        if (null === $diff) {
-            return null;
-        }
-
-        $diff = str_replace(
-            [
-                $this->pharA->tmp,
-                $this->pharB->tmp,
-            ],
-            [
-                $this->pharA->getFileName(),
-                $this->pharB->getFileName(),
-            ],
-            $diff
+        return self::getDiff(
+            $this->pharA,
+            $this->pharB,
+            'git diff --no-index',
         );
-
-        return '' === $diff ? null : $diff;
     }
 
     public function gnuDiff(): ?string
     {
-        $argA = escapeshellarg($this->pharA->tmp);
-        $argB = escapeshellarg($this->pharB->tmp);
-
-        // TODO: replace by the process component
-        $diff = shell_exec("diff $argA $argB");
-
-        if (null === $diff) {
-            return null;
-        }
-
-        $diff = str_replace(
-            [
-                $this->pharA->tmp,
-                $this->pharB->tmp,
-            ],
-            [
-                $this->pharA->getFileName(),
-                $this->pharB->getFileName(),
-            ],
-            $diff
+        return self::getDiff(
+            $this->pharA,
+            $this->pharB,
+            'diff',
         );
-
-        return '' === $diff ? null : $diff;
     }
 
     /**
@@ -130,8 +90,8 @@ final class PharDiff
      */
     public function listDiff(): array
     {
-        $pharAFiles = $this->collectFiles($this->pharA);
-        $pharBFiles = $this->collectFiles($this->pharB);
+        $pharAFiles = self::collectFiles($this->pharA);
+        $pharBFiles = self::collectFiles($this->pharB);
 
         return [
             array_diff($pharAFiles, $pharBFiles),
@@ -139,10 +99,52 @@ final class PharDiff
         ];
     }
 
+    private static function getDiff(Pharaoh $pharA, Pharaoh $pharB, string $command): ?string
+    {
+        $pharATmp = $pharA->tmp;
+        $pharBTmp = $pharB->tmp;
+
+        $pharAFileName = $pharA->getFileName();
+        $pharBFileName = $pharB->getFileName();
+
+        $diffCommmand = implode(
+            ' ',
+            [
+                $command,
+                $pharATmp,
+                $pharBTmp,
+            ],
+        );
+
+        $diffProcess = Process::fromShellCommandline($diffCommmand);
+        $diffProcess->run();
+
+        // We do not check if the process is successful as if there
+        // is a difference between the two files then the process
+        // _will_ be unsuccessful.
+        $diff = trim($diffProcess->getOutput());
+
+        if ('' === $diff) {
+            return null;
+        }
+
+        return str_replace(
+            [
+                $pharATmp,
+                $pharBTmp,
+            ],
+            [
+                $pharAFileName,
+                $pharBFileName,
+            ],
+            $diff
+        );
+    }
+
     /**
      * @return string[]
      */
-    private function collectFiles(Pharaoh $phar): array
+    private static function collectFiles(Pharaoh $phar): array
     {
         $basePath = $phar->tmp.DIRECTORY_SEPARATOR;
 

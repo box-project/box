@@ -91,6 +91,7 @@ use function str_starts_with;
 use function strtoupper;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo as SymfonySplFileInfo;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
@@ -2630,7 +2631,7 @@ final class Configuration
     {
         $process = Process::fromShellCommandline($command, $path);
 
-        if (0 === $process->run()) {
+        if ($process->isSuccessful()) {
             return trim($process->getOutput());
         }
 
@@ -2639,7 +2640,9 @@ final class Configuration
                 'The tag or commit hash could not be retrieved from "%s": %s',
                 $path,
                 $process->getErrorOutput()
-            )
+            ),
+            0,
+            new ProcessFailedException($process),
         );
     }
 
