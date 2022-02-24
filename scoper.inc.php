@@ -12,37 +12,16 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-use Isolated\Symfony\Component\Finder\Finder;
 use Isolated\Symfony\Component\Finder\Finder as IsolatedFinder;
 
-// TODO: check if the phpStorm stubs should not be included?
-
-$polyfillsBootstraps = array_map(
-    static fn (SplFileInfo $fileInfo) => $fileInfo->getPathname(),
-    iterator_to_array(
-        Finder::create()
-            ->files()
-            ->in(__DIR__ . '/vendor/symfony/polyfill-*')
-            ->name('bootstrap*.php'),
-        false,
-    ),
-);
-
-$polyfillsStubs = array_map(
-    static fn (SplFileInfo $fileInfo) => $fileInfo->getPathname(),
-    iterator_to_array(
-        Finder::create()
-            ->files()
-            ->in(__DIR__ . '/vendor/symfony/polyfill-*/Resources/stubs')
-            ->name('*.php'),
-        false,
-    ),
-);
+$polyfillFiles = require __DIR__.'/res/scoper-polyfills.php';
+$jetBrainStubFiles = require __DIR__.'/res/scoper-phpstorm-stubs.php';
+$jetBrainStubPatcher = require __DIR__.'/res/scoper-phpstorm-stubs-map-patcher.php';
 
 return [
     'exclude-files' => [
-        ...$polyfillsBootstraps,
-        ...$polyfillsStubs,
+        ...$polyfillFiles,
+        ...$jetBrainStubFiles,
     ],
     'exclude-namespaces' => [
         'Symfony\Polyfill'
@@ -65,4 +44,7 @@ return [
         \KevinGH\Box\Compactor\Php::class,
         \KevinGH\Box\Compactor\PhpScoper::class,
     ],
+    'patchers' => [
+        $jetBrainStubPatcher,
+    ]
 ];

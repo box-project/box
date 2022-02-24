@@ -85,7 +85,7 @@ tm:	$(TU_BOX_DEPS) $(INFECTION)
 
 .PHONY: e2e
 e2e:			 ## Runs all the end-to-end tests
-e2e: e2e_php_settings_checker e2e_scoper_alias e2e_scoper_expose_symbols e2e_check_requirements e2e_symfony e2e_composer_installed_versions
+e2e: e2e_php_settings_checker e2e_scoper_alias e2e_scoper_expose_symbols e2e_check_requirements e2e_symfony e2e_composer_installed_versions e2e_phpstorm_stubs
 
 .PHONY: e2e_scoper_alias
 e2e_scoper_alias: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the prefix alias is working
@@ -284,6 +284,15 @@ e2e_composer_installed_versions: fixtures/build/dir013/vendor box
 	php fixtures/build/dir013/bin/run.phar > fixtures/build/dir013/actual-output
 
 	diff --side-by-side --suppress-common-lines fixtures/build/dir013/expected-output fixtures/build/dir013/actual-output
+
+.PHONY: e2e_phpstorm_stubs
+e2e_phpstorm_stubs:		 ## Project using symbols which should be vetted by PhpStormStubs
+e2e_phpstorm_stubs: box
+	./box compile --working-dir=fixtures/build/dir014
+
+	php fixtures/build/dir014/index.phar > fixtures/build/dir014/actual-output
+
+	diff fixtures/build/dir014/expected-output fixtures/build/dir014/actual-output
 
 .PHONY: blackfire
 blackfire:		 ## Profiles the compile step
