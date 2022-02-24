@@ -285,6 +285,15 @@ e2e_composer_installed_versions: fixtures/build/dir013/vendor box
 
 	diff --side-by-side --suppress-common-lines fixtures/build/dir013/expected-output fixtures/build/dir013/actual-output
 
+.PHONY: e2e_phpstorm_stubs
+e2e_phpstorm_stubs:		 ## Project using symbols which should be vetted by PhpStormStubs
+e2e_phpstorm_stubs: box
+	./box compile --working-dir=fixtures/build/dir014
+
+	php fixtures/build/dir014/index.phar > fixtures/build/dir014/actual-output
+
+	diff fixtures/build/dir014/expected-output fixtures/build/dir014/actual-output
+
 .PHONY: blackfire
 blackfire:		 ## Profiles the compile step
 blackfire: box
