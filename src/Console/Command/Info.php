@@ -69,17 +69,17 @@ final class Info extends BaseCommand
         );
         $this->setHelp(
             <<<'HELP'
-            The <info>%command.name%</info> command will display information about the Phar extension,
-            or the Phar file if specified.
+                The <info>%command.name%</info> command will display information about the Phar extension,
+                or the Phar file if specified.
 
-            If the <info>phar</info> argument <comment>(the PHAR file path)</comment> is provided, information
-            about the PHAR file itself will be displayed.
+                If the <info>phar</info> argument <comment>(the PHAR file path)</comment> is provided, information
+                about the PHAR file itself will be displayed.
 
-            If the <info>--list|-l</info> option is used, the contents of the PHAR file will
-            be listed. By default, the list is shown as an indented tree. You may
-            instead choose to view a flat listing, by setting the <info>--mode|-m</info> option
-            to <comment>flat</comment>.
-            HELP,
+                If the <info>--list|-l</info> option is used, the contents of the PHAR file will
+                be listed. By default, the list is shown as an indented tree. You may
+                instead choose to view a flat listing, by setting the <info>--mode|-m</info> option
+                to <comment>flat</comment>.
+                HELP,
         );
         $this->addArgument(
             self::PHAR_ARG,

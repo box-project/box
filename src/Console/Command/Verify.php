@@ -39,18 +39,18 @@ final class Verify extends BaseCommand
         $this->setDescription('🔐️  Verifies the PHAR signature');
         $this->setHelp(
             <<<'HELP'
-The <info>%command.name%</info> command will verify the signature of the PHAR.
+                The <info>%command.name%</info> command will verify the signature of the PHAR.
 
-<question>Why would I require that box handle the verification process?</question>
+                <question>Why would I require that box handle the verification process?</question>
 
-If you meet all of the following conditions:
- - The <comment>openssl</comment> extension is not installed
- - You need to verify a PHAR signed using a private key
+                If you meet all of the following conditions:
+                 - The <comment>openssl</comment> extension is not installed
+                 - You need to verify a PHAR signed using a private key
 
-Box supports verifying private key signed PHARs without using
-either extensions. <error>Note however, that the entire PHAR will need
-to be read into memory before the verification can be performed.</error>
-HELP
+                Box supports verifying private key signed PHARs without using
+                either extensions. <error>Note however, that the entire PHAR will need
+                to be read into memory before the verification can be performed.</error>
+                HELP
         );
         $this->addArgument(
             self::PHAR_ARG,

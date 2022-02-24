@@ -79,15 +79,15 @@ class DockerFileGeneratorTest extends TestCase
             [],
             'box.phar',
             <<<'Dockerfile'
-FROM php:7.2-cli-alpine
+                FROM php:7.2-cli-alpine
 
-RUN $(php -r '$extensionInstalled = array_map("strtolower", \get_loaded_extensions(false));$requiredExtensions = [];$extensionsToInstall = array_diff($requiredExtensions, $extensionInstalled);if ([] !== $extensionsToInstall) {echo \sprintf("docker-php-ext-install %s", implode(" ", $extensionsToInstall));}echo "echo \"No extensions\"";')
+                RUN $(php -r '$extensionInstalled = array_map("strtolower", \get_loaded_extensions(false));$requiredExtensions = [];$extensionsToInstall = array_diff($requiredExtensions, $extensionInstalled);if ([] !== $extensionsToInstall) {echo \sprintf("docker-php-ext-install %s", implode(" ", $extensionsToInstall));}echo "echo \"No extensions\"";')
 
-COPY box.phar /box.phar
+                COPY box.phar /box.phar
 
-ENTRYPOINT ["/box.phar"]
+                ENTRYPOINT ["/box.phar"]
 
-Dockerfile
+                Dockerfile
         ];
 
         yield [
@@ -95,15 +95,15 @@ Dockerfile
             ['phar', 'gzip'],
             '/path/to/box',
             <<<'Dockerfile'
-FROM php:7.2-cli-alpine
+                FROM php:7.2-cli-alpine
 
-RUN $(php -r '$extensionInstalled = array_map("strtolower", \get_loaded_extensions(false));$requiredExtensions = ["phar", "gzip"];$extensionsToInstall = array_diff($requiredExtensions, $extensionInstalled);if ([] !== $extensionsToInstall) {echo \sprintf("docker-php-ext-install %s", implode(" ", $extensionsToInstall));}echo "echo \"No extensions\"";')
+                RUN $(php -r '$extensionInstalled = array_map("strtolower", \get_loaded_extensions(false));$requiredExtensions = ["phar", "gzip"];$extensionsToInstall = array_diff($requiredExtensions, $extensionInstalled);if ([] !== $extensionsToInstall) {echo \sprintf("docker-php-ext-install %s", implode(" ", $extensionsToInstall));}echo "echo \"No extensions\"";')
 
-COPY /path/to/box /box
+                COPY /path/to/box /box
 
-ENTRYPOINT ["/box"]
+                ENTRYPOINT ["/box"]
 
-Dockerfile
+                Dockerfile
         ];
     }
 
@@ -150,15 +150,15 @@ Dockerfile
             ],
             'box.phar',
             <<<'Dockerfile'
-FROM php:7.4-cli-alpine
+                FROM php:7.4-cli-alpine
 
-RUN $(php -r '$extensionInstalled = array_map("strtolower", \get_loaded_extensions(false));$requiredExtensions = ["zlib", "phar", "openssl", "pcre", "tokenizer"];$extensionsToInstall = array_diff($requiredExtensions, $extensionInstalled);if ([] !== $extensionsToInstall) {echo \sprintf("docker-php-ext-install %s", implode(" ", $extensionsToInstall));}echo "echo \"No extensions\"";')
+                RUN $(php -r '$extensionInstalled = array_map("strtolower", \get_loaded_extensions(false));$requiredExtensions = ["zlib", "phar", "openssl", "pcre", "tokenizer"];$extensionsToInstall = array_diff($requiredExtensions, $extensionInstalled);if ([] !== $extensionsToInstall) {echo \sprintf("docker-php-ext-install %s", implode(" ", $extensionsToInstall));}echo "echo \"No extensions\"";')
 
-COPY box.phar /box.phar
+                COPY box.phar /box.phar
 
-ENTRYPOINT ["/box.phar"]
+                ENTRYPOINT ["/box.phar"]
 
-Dockerfile
+                Dockerfile
         ];
 
         yield [
@@ -184,15 +184,15 @@ Dockerfile
             ],
             'box.phar',
             <<<'Dockerfile'
-FROM php:7.1-cli-alpine
+                FROM php:7.1-cli-alpine
 
-RUN $(php -r '$extensionInstalled = array_map("strtolower", \get_loaded_extensions(false));$requiredExtensions = ["zlib"];$extensionsToInstall = array_diff($requiredExtensions, $extensionInstalled);if ([] !== $extensionsToInstall) {echo \sprintf("docker-php-ext-install %s", implode(" ", $extensionsToInstall));}echo "echo \"No extensions\"";')
+                RUN $(php -r '$extensionInstalled = array_map("strtolower", \get_loaded_extensions(false));$requiredExtensions = ["zlib"];$extensionsToInstall = array_diff($requiredExtensions, $extensionInstalled);if ([] !== $extensionsToInstall) {echo \sprintf("docker-php-ext-install %s", implode(" ", $extensionsToInstall));}echo "echo \"No extensions\"";')
 
-COPY box.phar /box.phar
+                COPY box.phar /box.phar
 
-ENTRYPOINT ["/box.phar"]
+                ENTRYPOINT ["/box.phar"]
 
-Dockerfile
+                Dockerfile
         ];
     }
 }

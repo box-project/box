@@ -37,11 +37,11 @@ class JsonTest extends TestCase
     public function test_it_supports_json_files(string $file, bool $supports): void
     {
         $contents = <<<'JSON'
-        {
-            "foo": "bar"
+            {
+                "foo": "bar"
 
-        }
-        JSON;
+            }
+            JSON;
         $actual = $this->compactor->compact($file, $contents);
 
         $this->assertSame($supports, $contents !== $actual);
@@ -95,27 +95,27 @@ class JsonTest extends TestCase
 
         yield [
             <<<'JSON'
-            {
-                "require": {
-                    "humbug/php-scoper": "^1.0",
-                    "infection/infection": "^1.0"
+                {
+                    "require": {
+                        "humbug/php-scoper": "^1.0",
+                        "infection/infection": "^1.0"
+                    }
                 }
-            }
-            JSON
+                JSON
             ,
             <<<'JSON'
-            {"require":{"humbug\/php-scoper":"^1.0","infection\/infection":"^1.0"}}
-            JSON
+                {"require":{"humbug\/php-scoper":"^1.0","infection\/infection":"^1.0"}}
+                JSON
         ];
 
         yield 'invalid JSON' => [
             <<<'JSON'
-            {
-            JSON
+                {
+                JSON
             ,
             <<<'JSON'
-            {
-            JSON
+                {
+                JSON
         ];
     }
 }

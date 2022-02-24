@@ -40,13 +40,13 @@ class StubGeneratorTest extends TestCase
     public function test_it_can_generate_a_stub_with_the_default_config(): void
     {
         $expected = <<<'STUB'
-<?php
+            <?php
 
-require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
+            require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 
-__HALT_COMPILER(); ?>
+            __HALT_COMPILER(); ?>
 
-STUB;
+            STUB;
         $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
@@ -57,13 +57,13 @@ STUB;
         $this->generator->checkRequirements(false);
 
         $expected = <<<'STUB'
-<?php
+            <?php
 
-// No PHAR config
+            // No PHAR config
 
-__HALT_COMPILER(); ?>
+            __HALT_COMPILER(); ?>
 
-STUB;
+            STUB;
         $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
@@ -73,26 +73,26 @@ STUB;
     {
         $this->generator->banner(
             <<<'TEXT'
-Custom Banner
+                Custom Banner
 
-Yolo
-TEXT
+                Yolo
+                TEXT
         );
 
         $expected = <<<'STUB'
-<?php
+            <?php
 
-/*
- * Custom Banner
- *
- * Yolo
- */
+            /*
+             * Custom Banner
+             *
+             * Yolo
+             */
 
-require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
+            require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 
-__HALT_COMPILER(); ?>
+            __HALT_COMPILER(); ?>
 
-STUB;
+            STUB;
         $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
@@ -100,19 +100,19 @@ STUB;
         $this->generator->checkRequirements(false);
 
         $expected = <<<'STUB'
-<?php
+            <?php
 
-/*
- * Custom Banner
- *
- * Yolo
- */
+            /*
+             * Custom Banner
+             *
+             * Yolo
+             */
 
-// No PHAR config
+            // No PHAR config
 
-__HALT_COMPILER(); ?>
+            __HALT_COMPILER(); ?>
 
-STUB;
+            STUB;
         $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
@@ -123,14 +123,14 @@ STUB;
         $this->generator->shebang('#!/usr/local/bin/env php');
 
         $expected = <<<'STUB'
-#!/usr/local/bin/env php
-<?php
+            #!/usr/local/bin/env php
+            <?php
 
-require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
+            require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 
-__HALT_COMPILER(); ?>
+            __HALT_COMPILER(); ?>
 
-STUB;
+            STUB;
         $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
@@ -138,14 +138,14 @@ STUB;
         $this->generator->checkRequirements(false);
 
         $expected = <<<'STUB'
-#!/usr/local/bin/env php
-<?php
+            #!/usr/local/bin/env php
+            <?php
 
-// No PHAR config
+            // No PHAR config
 
-__HALT_COMPILER(); ?>
+            __HALT_COMPILER(); ?>
 
-STUB;
+            STUB;
         $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
@@ -156,13 +156,13 @@ STUB;
         $this->generator->shebang(null);
 
         $expected = <<<'STUB'
-<?php
+            <?php
 
-require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
+            require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 
-__HALT_COMPILER(); ?>
+            __HALT_COMPILER(); ?>
 
-STUB;
+            STUB;
         $actual = $this->generator->generateStub();
 
         $this->generator->checkRequirements(false);
@@ -170,13 +170,13 @@ STUB;
         $this->assertSame($expected, $actual);
 
         $expected = <<<'STUB'
-<?php
+            <?php
 
-// No PHAR config
+            // No PHAR config
 
-__HALT_COMPILER(); ?>
+            __HALT_COMPILER(); ?>
 
-STUB;
+            STUB;
         $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
@@ -187,15 +187,15 @@ STUB;
         $this->generator->alias('acme.phar');
 
         $expected = <<<'STUB'
-<?php
+            <?php
 
-Phar::mapPhar('acme.phar');
+            Phar::mapPhar('acme.phar');
 
-require 'phar://acme.phar/.box/bin/check-requirements.php';
+            require 'phar://acme.phar/.box/bin/check-requirements.php';
 
-__HALT_COMPILER(); ?>
+            __HALT_COMPILER(); ?>
 
-STUB;
+            STUB;
         $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
@@ -203,13 +203,13 @@ STUB;
         $this->generator->checkRequirements(false);
 
         $expected = <<<'STUB'
-<?php
+            <?php
 
-Phar::mapPhar('acme.phar');
+            Phar::mapPhar('acme.phar');
 
-__HALT_COMPILER(); ?>
+            __HALT_COMPILER(); ?>
 
-STUB;
+            STUB;
         $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
@@ -220,13 +220,13 @@ STUB;
         $this->generator->alias(null);
 
         $expected = <<<'STUB'
-<?php
+            <?php
 
-require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
+            require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 
-__HALT_COMPILER(); ?>
+            __HALT_COMPILER(); ?>
 
-STUB;
+            STUB;
         $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
@@ -234,13 +234,13 @@ STUB;
         $this->generator->checkRequirements(false);
 
         $expected = <<<'STUB'
-<?php
+            <?php
 
-// No PHAR config
+            // No PHAR config
 
-__HALT_COMPILER(); ?>
+            __HALT_COMPILER(); ?>
 
-STUB;
+            STUB;
         $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
@@ -251,15 +251,15 @@ STUB;
         $this->generator->index('acme.php');
 
         $expected = <<<'STUB'
-<?php
+            <?php
 
-require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
+            require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 
-require 'phar://' . __FILE__ . '/acme.php';
+            require 'phar://' . __FILE__ . '/acme.php';
 
-__HALT_COMPILER(); ?>
+            __HALT_COMPILER(); ?>
 
-STUB;
+            STUB;
         $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
@@ -267,13 +267,13 @@ STUB;
         $this->generator->checkRequirements(false);
 
         $expected = <<<'STUB'
-<?php
+            <?php
 
-require 'phar://' . __FILE__ . '/acme.php';
+            require 'phar://' . __FILE__ . '/acme.php';
 
-__HALT_COMPILER(); ?>
+            __HALT_COMPILER(); ?>
 
-STUB;
+            STUB;
         $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
@@ -284,15 +284,15 @@ STUB;
         $this->generator->intercept(true);
 
         $expected = <<<'STUB'
-<?php
+            <?php
 
-Phar::interceptFileFuncs();
+            Phar::interceptFileFuncs();
 
-require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
+            require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 
-__HALT_COMPILER(); ?>
+            __HALT_COMPILER(); ?>
 
-STUB;
+            STUB;
         $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
@@ -300,13 +300,13 @@ STUB;
         $this->generator->checkRequirements(false);
 
         $expected = <<<'STUB'
-<?php
+            <?php
 
-Phar::interceptFileFuncs();
+            Phar::interceptFileFuncs();
 
-__HALT_COMPILER(); ?>
+            __HALT_COMPILER(); ?>
 
-STUB;
+            STUB;
         $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
@@ -317,10 +317,10 @@ STUB;
         $this->generator
             ->banner(
                 <<<'TEXT'
-Custom Banner
+                    Custom Banner
 
-Yolo
-TEXT
+                    Yolo
+                    TEXT
             )
             ->shebang('#!/usr/local/bin/env php')
             ->alias('test.phar')
@@ -330,25 +330,25 @@ TEXT
         ;
 
         $expected = <<<'STUB'
-#!/usr/local/bin/env php
-<?php
+            #!/usr/local/bin/env php
+            <?php
 
-/*
- * Custom Banner
- *
- * Yolo
- */
+            /*
+             * Custom Banner
+             *
+             * Yolo
+             */
 
-Phar::mapPhar('test.phar');
-Phar::interceptFileFuncs();
+            Phar::mapPhar('test.phar');
+            Phar::interceptFileFuncs();
 
-require 'phar://test.phar/.box/bin/check-requirements.php';
+            require 'phar://test.phar/.box/bin/check-requirements.php';
 
-require 'phar://test.phar/index.php';
+            require 'phar://test.phar/index.php';
 
-__HALT_COMPILER(); ?>
+            __HALT_COMPILER(); ?>
 
-STUB;
+            STUB;
         $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);
@@ -356,23 +356,23 @@ STUB;
         $this->generator->checkRequirements(false);
 
         $expected = <<<'STUB'
-#!/usr/local/bin/env php
-<?php
+            #!/usr/local/bin/env php
+            <?php
 
-/*
- * Custom Banner
- *
- * Yolo
- */
+            /*
+             * Custom Banner
+             *
+             * Yolo
+             */
 
-Phar::mapPhar('test.phar');
-Phar::interceptFileFuncs();
+            Phar::mapPhar('test.phar');
+            Phar::interceptFileFuncs();
 
-require 'phar://test.phar/index.php';
+            require 'phar://test.phar/index.php';
 
-__HALT_COMPILER(); ?>
+            __HALT_COMPILER(); ?>
 
-STUB;
+            STUB;
         $actual = $this->generator->generateStub();
 
         $this->assertSame($expected, $actual);

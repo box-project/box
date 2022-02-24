@@ -35,11 +35,11 @@ class PhpScoperTest extends TestCase
     {
         $file = 'foo';
         $contents = <<<'JSON'
-{
-    "foo": "bar"
+            {
+                "foo": "bar"
 
-}
-JSON;
+            }
+            JSON;
 
         /** @var ObjectProphecy|Scoper $scoper */
         $scoperProphecy = $this->prophesize(Scoper::class);
@@ -58,11 +58,11 @@ JSON;
     {
         $file = 'foo';
         $contents = <<<'JSON'
-{
-    "foo": "bar"
+            {
+                "foo": "bar"
 
-}
-JSON;
+            }
+            JSON;
 
         /** @var ObjectProphecy|Scoper $scoper */
         $scoperProphecy = $this->prophesize(Scoper::class);

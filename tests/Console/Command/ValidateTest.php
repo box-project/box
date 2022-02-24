@@ -53,15 +53,15 @@ class ValidateTest extends CommandTestCase
 
         $expected = <<<'OUTPUT'
 
- // Loading the configuration file "test.json".
+             // Loading the configuration file "test.json".
 
-No recommendation found.
-No warning found.
+            No recommendation found.
+            No warning found.
 
- [OK] The configuration file passed the validation.
+             [OK] The configuration file passed the validation.
 
 
-OUTPUT;
+            OUTPUT;
 
         $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(0, $this->commandTester->getStatusCode());
@@ -73,10 +73,10 @@ OUTPUT;
         dump_file(
             'test.json',
             <<<'JSON'
-{
-    "key": null
-}
-JSON
+                {
+                    "key": null
+                }
+                JSON
         );
 
         $this->commandTester->execute(
@@ -91,16 +91,16 @@ JSON
 
         $expected = <<<'OUTPUT'
 
- // Loading the configuration file "test.json".
+             // Loading the configuration file "test.json".
 
-💡  1 recommendation found:
-    - The setting "key" has been set but is unnecessary since the signing algorithm is not "OPENSSL".
-No warning found.
+            💡  1 recommendation found:
+                - The setting "key" has been set but is unnecessary since the signing algorithm is not "OPENSSL".
+            No warning found.
 
- ! [CAUTION] The configuration file passed the validation with recommendations.
+             ! [CAUTION] The configuration file passed the validation with recommendations.
 
 
-OUTPUT;
+            OUTPUT;
 
         $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(1, $this->commandTester->getStatusCode());
@@ -112,10 +112,10 @@ OUTPUT;
         dump_file(
             'test.json',
             <<<'JSON'
-{
-    "key": null
-}
-JSON
+                {
+                    "key": null
+                }
+                JSON
         );
 
         $this->commandTester->execute(
@@ -131,16 +131,16 @@ JSON
 
         $expected = <<<'OUTPUT'
 
- // Loading the configuration file "test.json".
+             // Loading the configuration file "test.json".
 
-💡  1 recommendation found:
-    - The setting "key" has been set but is unnecessary since the signing algorithm is not "OPENSSL".
-No warning found.
+            💡  1 recommendation found:
+                - The setting "key" has been set but is unnecessary since the signing algorithm is not "OPENSSL".
+            No warning found.
 
- ! [CAUTION] The configuration file passed the validation with recommendations.
+             ! [CAUTION] The configuration file passed the validation with recommendations.
 
 
-OUTPUT;
+            OUTPUT;
 
         $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(0, $this->commandTester->getStatusCode());
@@ -152,10 +152,10 @@ OUTPUT;
         dump_file(
             'test.json',
             <<<'JSON'
-{
-    "key": "key-file"
-}
-JSON
+                {
+                    "key": "key-file"
+                }
+                JSON
         );
 
         $this->commandTester->execute(
@@ -170,16 +170,16 @@ JSON
 
         $expected = <<<'OUTPUT'
 
- // Loading the configuration file "test.json".
+             // Loading the configuration file "test.json".
 
-No recommendation found.
-⚠️  1 warning found:
-    - The setting "key" has been set but is ignored since the signing algorithm is not "OPENSSL".
+            No recommendation found.
+            ⚠️  1 warning found:
+                - The setting "key" has been set but is ignored since the signing algorithm is not "OPENSSL".
 
- ! [CAUTION] The configuration file passed the validation with warnings.
+             ! [CAUTION] The configuration file passed the validation with warnings.
 
 
-OUTPUT;
+            OUTPUT;
 
         $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(1, $this->commandTester->getStatusCode());
@@ -191,10 +191,10 @@ OUTPUT;
         dump_file(
             'test.json',
             <<<'JSON'
-{
-    "key": "key-file"
-}
-JSON
+                {
+                    "key": "key-file"
+                }
+                JSON
         );
 
         $this->commandTester->execute(
@@ -210,16 +210,16 @@ JSON
 
         $expected = <<<'OUTPUT'
 
- // Loading the configuration file "test.json".
+             // Loading the configuration file "test.json".
 
-No recommendation found.
-⚠️  1 warning found:
-    - The setting "key" has been set but is ignored since the signing algorithm is not "OPENSSL".
+            No recommendation found.
+            ⚠️  1 warning found:
+                - The setting "key" has been set but is ignored since the signing algorithm is not "OPENSSL".
 
- ! [CAUTION] The configuration file passed the validation with warnings.
+             ! [CAUTION] The configuration file passed the validation with warnings.
 
 
-OUTPUT;
+            OUTPUT;
 
         $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(0, $this->commandTester->getStatusCode());
@@ -231,10 +231,10 @@ OUTPUT;
         dump_file(
             'test.json',
             <<<'JSON'
-{
-    "check-requirements": true
-}
-JSON
+                {
+                    "check-requirements": true
+                }
+                JSON
         );
 
         $this->commandTester->execute(
@@ -249,18 +249,18 @@ JSON
 
         $expected = <<<'OUTPUT'
 
- // Loading the configuration file "test.json".
+             // Loading the configuration file "test.json".
 
-💡  1 recommendation found:
-    - The "check-requirements" setting can be omitted since is set to its default value
-⚠️  1 warning found:
-    - The requirement checker could not be used because the composer.json and composer.lock file could not be found.
+            💡  1 recommendation found:
+                - The "check-requirements" setting can be omitted since is set to its default value
+            ⚠️  1 warning found:
+                - The requirement checker could not be used because the composer.json and composer.lock file could not be found.
 
- ! [CAUTION] The configuration file passed the validation with recommendations
- !           and warnings.
+             ! [CAUTION] The configuration file passed the validation with recommendations
+             !           and warnings.
 
 
-OUTPUT;
+            OUTPUT;
 
         $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(1, $this->commandTester->getStatusCode());
@@ -275,9 +275,9 @@ OUTPUT;
         );
 
         $expected = <<<'OUTPUT'
-The configuration file failed validation: The configuration file could not be found.
+            The configuration file failed validation: The configuration file could not be found.
 
-OUTPUT;
+            OUTPUT;
 
         $this->assertSame($expected, $this->commandTester->getDisplay(true));
         $this->assertSame(1, $this->commandTester->getStatusCode());
@@ -318,14 +318,14 @@ OUTPUT;
 
         $expected = <<<'OUTPUT'
 
- // Loading the configuration file "box.json".
+             // Loading the configuration file "box.json".
 
-The configuration file failed validation: Parse error on line 1:
-{
-^
-Expected one of: 'STRING', '}'
+            The configuration file failed validation: Parse error on line 1:
+            {
+            ^
+            Expected one of: 'STRING', '}'
 
-OUTPUT;
+            OUTPUT;
 
         $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
@@ -356,11 +356,11 @@ OUTPUT;
             $this->fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
             $expected = <<<'OUTPUT'
-The configuration file failed validation: Parse error on line 1:
-{
-^
-Expected one of: 'STRING', '}'
-OUTPUT;
+                The configuration file failed validation: Parse error on line 1:
+                {
+                ^
+                Expected one of: 'STRING', '}'
+                OUTPUT;
 
             $this->assertSame($expected, $exception->getMessage());
             $this->assertSame(0, $exception->getCode());
@@ -383,13 +383,13 @@ OUTPUT;
             $this->tmp,
             <<<'EOF'
 
- // Loading the configuration file "box.json".
+                 // Loading the configuration file "box.json".
 
-The configuration file failed validation: "/path/to/box.json" does not match the expected JSON schema:
+                The configuration file failed validation: "/path/to/box.json" does not match the expected JSON schema:
 
-  - The property test is not defined and the definition does not allow additional properties
+                  - The property test is not defined and the definition does not allow additional properties
 
-EOF
+                EOF
         );
 
         $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
@@ -425,9 +425,9 @@ EOF
                     '/path/to',
                     $this->tmp,
                     <<<'EOF'
-The configuration file failed validation: "/path/to/box.json" does not match the expected JSON schema:
-  - The property test is not defined and the definition does not allow additional properties
-EOF
+                        The configuration file failed validation: "/path/to/box.json" does not match the expected JSON schema:
+                          - The property test is not defined and the definition does not allow additional properties
+                        EOF
                 ),
                 $exception->getMessage()
             );

@@ -27,10 +27,10 @@ use Webmozart\Assert\Assert;
 final class RequirementsDumper
 {
     private const REQUIREMENTS_CONFIG_TEMPLATE = <<<'PHP'
-<?php
+        <?php
 
-return '__CONFIG__';
-PHP;
+        return '__CONFIG__';
+        PHP;
 
     private const REQUIREMENT_CHECKER_PATH = __DIR__.'/../../.requirement-checker';
 

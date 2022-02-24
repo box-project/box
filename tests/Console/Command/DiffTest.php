@@ -78,22 +78,22 @@ class DiffTest extends CommandTestCase
 
         $expectedOutput = <<<'OUTPUT'
 
-         // Comparing the two archives... (do not check the signatures)
+             // Comparing the two archives... (do not check the signatures)
 
-         [OK] The two archives are identical
+             [OK] The two archives are identical
 
-         // Comparing the two archives contents...
+             // Comparing the two archives contents...
 
-        --- Files present in "simple-phar-foo.phar" but not in "simple-phar-bar.phar"
-        +++ Files present in "simple-phar-bar.phar" but not in "simple-phar-foo.phar"
+            --- Files present in "simple-phar-foo.phar" but not in "simple-phar-bar.phar"
+            +++ Files present in "simple-phar-bar.phar" but not in "simple-phar-foo.phar"
 
-        - foo.php [NONE] - 29.00B
-        + bar.php [NONE] - 29.00B
+            - foo.php [NONE] - 29.00B
+            + bar.php [NONE] - 29.00B
 
-         [ERROR] 2 file(s) difference
+             [ERROR] 2 file(s) difference
 
 
-        OUTPUT;
+            OUTPUT;
 
         $this->assertSame($expectedOutput, $actualOutput);
         $this->assertSame(1, $this->commandTester->getStatusCode());
@@ -148,9 +148,9 @@ class DiffTest extends CommandTestCase
             $actual = DisplayNormalizer::removeTrailingSpaces(ob_get_clean());
 
             $expected = <<<'OUTPUT'
-            No differences encountered.
+                No differences encountered.
 
-            OUTPUT;
+                OUTPUT;
 
             $this->assertSame($expected, $actual);
             $this->assertSame(0, $this->commandTester->getStatusCode());
@@ -169,9 +169,9 @@ class DiffTest extends CommandTestCase
             $actual = DisplayNormalizer::removeTrailingSpaces(ob_get_clean());
 
             $expected = <<<'OUTPUT'
-            No differences encountered.
+                No differences encountered.
 
-            OUTPUT;
+                OUTPUT;
 
             $this->assertSame($expected, $actual);
             $this->assertSame(0, $this->commandTester->getStatusCode());
@@ -229,16 +229,16 @@ class DiffTest extends CommandTestCase
 
         $expected = <<<'OUTPUT'
 
-         // Comparing the two archives... (do not check the signatures)
+             // Comparing the two archives... (do not check the signatures)
 
-         [OK] The two archives are identical
+             [OK] The two archives are identical
 
-         // Comparing the two archives contents...
+             // Comparing the two archives contents...
 
-         [OK] The contents are identical
+             [OK] The contents are identical
 
 
-        OUTPUT;
+            OUTPUT;
 
         $this->assertSame($expected, $actual);
         $this->assertSame(0, $this->commandTester->getStatusCode());
@@ -305,16 +305,16 @@ class DiffTest extends CommandTestCase
             },
             <<<'OUTPUT'
 
-             // Comparing the two archives... (do not check the signatures)
+                 // Comparing the two archives... (do not check the signatures)
 
-             [OK] The two archives are identical
+                 [OK] The two archives are identical
 
-             // Comparing the two archives contents...
+                 // Comparing the two archives contents...
 
-             [OK] The contents are identical
+                 [OK] The contents are identical
 
 
-            OUTPUT,
+                OUTPUT,
             0,
         ])();
 
@@ -333,22 +333,22 @@ class DiffTest extends CommandTestCase
             },
             <<<'OUTPUT'
 
-             // Comparing the two archives... (do not check the signatures)
+                 // Comparing the two archives... (do not check the signatures)
 
-             [OK] The two archives are identical
+                 [OK] The two archives are identical
 
-             // Comparing the two archives contents...
+                 // Comparing the two archives contents...
 
-            --- Files present in "simple-phar-foo.phar" but not in "simple-phar-bar.phar"
-            +++ Files present in "simple-phar-bar.phar" but not in "simple-phar-foo.phar"
+                --- Files present in "simple-phar-foo.phar" but not in "simple-phar-bar.phar"
+                +++ Files present in "simple-phar-bar.phar" but not in "simple-phar-foo.phar"
 
-            - foo.php [NONE] - 29.00B
-            + bar.php [NONE] - 29.00B
+                - foo.php [NONE] - 29.00B
+                + bar.php [NONE] - 29.00B
 
-             [ERROR] 2 file(s) difference
+                 [ERROR] 2 file(s) difference
 
 
-            OUTPUT,
+                OUTPUT,
             1,
         ])();
 
@@ -367,24 +367,24 @@ class DiffTest extends CommandTestCase
             },
             <<<'OUTPUT'
 
-             // Comparing the two archives... (do not check the signatures)
+                 // Comparing the two archives... (do not check the signatures)
 
-            Archive: simple-phar-bar.phar
-            Compression: None
-            Metadata: None
-            Contents: 1 file (6.64KB)
+                Archive: simple-phar-bar.phar
+                Compression: None
+                Metadata: None
+                Contents: 1 file (6.64KB)
 
-            Archive: simple-phar-bar-compressed.phar
-            Compression: GZ
-            Metadata: None
-            Contents: 1 file (6.65KB)
+                Archive: simple-phar-bar-compressed.phar
+                Compression: GZ
+                Metadata: None
+                Contents: 1 file (6.65KB)
 
-             // Comparing the two archives contents...
+                 // Comparing the two archives contents...
 
-             [OK] The contents are identical
+                 [OK] The contents are identical
 
 
-            OUTPUT,
+                OUTPUT,
             1,
         ])();
 
@@ -403,16 +403,16 @@ class DiffTest extends CommandTestCase
             },
             <<<'OUTPUT'
 
-             // Comparing the two archives... (do not check the signatures)
+                 // Comparing the two archives... (do not check the signatures)
 
-             [OK] The two archives are identical
+                 [OK] The two archives are identical
 
-             // Comparing the two archives contents...
+                 // Comparing the two archives contents...
 
-             [OK] The contents are identical
+                 [OK] The contents are identical
 
 
-            OUTPUT,
+                OUTPUT,
             0,
         ])();
     }
@@ -436,16 +436,16 @@ class DiffTest extends CommandTestCase
             },
             <<<'OUTPUT'
 
-             // Comparing the two archives... (do not check the signatures)
+                 // Comparing the two archives... (do not check the signatures)
 
-             [OK] The two archives are identical
+                 [OK] The two archives are identical
 
-             // Comparing the two archives contents...
+                 // Comparing the two archives contents...
 
-             [OK] The contents are identical
+                 [OK] The contents are identical
 
 
-            OUTPUT,
+                OUTPUT,
             0,
         ])();
 
@@ -464,18 +464,18 @@ class DiffTest extends CommandTestCase
             },
             <<<'OUTPUT'
 
-             // Comparing the two archives... (do not check the signatures)
+                 // Comparing the two archives... (do not check the signatures)
 
-             [OK] The two archives are identical
+                 [OK] The two archives are identical
 
-             // Comparing the two archives contents...
+                 // Comparing the two archives contents...
 
-            diff --git asimple-phar-foo.phar/foo.php bsimple-phar-bar.phar/bar.php
-            similarity index 100%
-            rename from simple-phar-foo.phar/foo.php
-            rename to simple-phar-bar.phar/bar.php
+                diff --git asimple-phar-foo.phar/foo.php bsimple-phar-bar.phar/bar.php
+                similarity index 100%
+                rename from simple-phar-foo.phar/foo.php
+                rename to simple-phar-bar.phar/bar.php
 
-            OUTPUT,
+                OUTPUT,
             1,
         ])();
 
@@ -511,23 +511,23 @@ class DiffTest extends CommandTestCase
             },
             <<<'OUTPUT'
 
-             // Comparing the two archives... (do not check the signatures)
+                 // Comparing the two archives... (do not check the signatures)
 
-             [OK] The two archives are identical
+                 [OK] The two archives are identical
 
-             // Comparing the two archives contents...
+                 // Comparing the two archives contents...
 
-            diff --git asimple-phar-bar.phar/bar.php bsimple-phar-baz.phar/bar.php
-            index 290849f..8aac305 100644
-            --- asimple-phar-bar.phar/bar.php
-            +++ bsimple-phar-baz.phar/bar.php
-            @@ -1,4 +1,4 @@
-             <?php
+                diff --git asimple-phar-bar.phar/bar.php bsimple-phar-baz.phar/bar.php
+                index 290849f..8aac305 100644
+                --- asimple-phar-bar.phar/bar.php
+                +++ bsimple-phar-baz.phar/bar.php
+                @@ -1,4 +1,4 @@
+                 <?php
 
-            -echo "Hello world!";
-            +echo 'Hello world!';
+                -echo "Hello world!";
+                +echo 'Hello world!';
 
-            OUTPUT,
+                OUTPUT,
             1,
         ])();
     }
@@ -551,16 +551,16 @@ class DiffTest extends CommandTestCase
             },
             <<<'OUTPUT'
 
-             // Comparing the two archives... (do not check the signatures)
+                 // Comparing the two archives... (do not check the signatures)
 
-             [OK] The two archives are identical
+                 [OK] The two archives are identical
 
-             // Comparing the two archives contents...
+                 // Comparing the two archives contents...
 
-             [OK] The contents are identical
+                 [OK] The contents are identical
 
 
-            OUTPUT,
+                OUTPUT,
             0,
         ])();
 
@@ -579,16 +579,16 @@ class DiffTest extends CommandTestCase
             },
             <<<'OUTPUT'
 
-             // Comparing the two archives... (do not check the signatures)
+                 // Comparing the two archives... (do not check the signatures)
 
-             [OK] The two archives are identical
+                 [OK] The two archives are identical
 
-             // Comparing the two archives contents...
+                 // Comparing the two archives contents...
 
-            Only in simple-phar-bar.phar: bar.php
-            Only in simple-phar-foo.phar: foo.php
+                Only in simple-phar-bar.phar: bar.php
+                Only in simple-phar-foo.phar: foo.php
 
-            OUTPUT,
+                OUTPUT,
             1,
         ])();
 
@@ -624,19 +624,19 @@ class DiffTest extends CommandTestCase
             },
             <<<'OUTPUT'
 
-             // Comparing the two archives... (do not check the signatures)
+                 // Comparing the two archives... (do not check the signatures)
 
-             [OK] The two archives are identical
+                 [OK] The two archives are identical
 
-             // Comparing the two archives contents...
+                 // Comparing the two archives contents...
 
-            diff simple-phar-bar.phar/bar.php simple-phar-baz.phar/bar.php
-            3c3
-            < echo "Hello world!";
-            ---
-            > echo 'Hello world!';
+                diff simple-phar-bar.phar/bar.php simple-phar-baz.phar/bar.php
+                3c3
+                < echo "Hello world!";
+                ---
+                > echo 'Hello world!';
 
-            OUTPUT,
+                OUTPUT,
             1,
         ])();
     }

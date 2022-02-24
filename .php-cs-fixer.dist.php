@@ -38,6 +38,7 @@ $config = (new PhpCsFixer\Config())
         ],
         'header_comment' => ['header' => $header],
         'heredoc_to_nowdoc' => true,
+        'heredoc_indentation' => true,
         'list_syntax' => ['syntax' => 'short'],
         'method_argument_space' => [
             'on_multiline' => 'ensure_fully_multiline',

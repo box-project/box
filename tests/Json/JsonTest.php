@@ -136,21 +136,21 @@ class JsonTest extends FileSystemTestCase
     {
         $schema = json_decode(
             <<<'JSON'
-{
-    "description": "Schema description",
-    "properties": {
-        "foo": {
-            "description": "The foo property",
-            "type": ["string"]
-        },
-        "bar": {
-            "description": "The foo property",
-            "type": ["string"]
-        }
-    }
-}
+                {
+                    "description": "Schema description",
+                    "properties": {
+                        "foo": {
+                            "description": "The foo property",
+                            "type": ["string"]
+                        },
+                        "bar": {
+                            "description": "The foo property",
+                            "type": ["string"]
+                        }
+                    }
+                }
 
-JSON
+                JSON
             ,
             false
         );
@@ -185,10 +185,10 @@ JSON
         } catch (JsonValidationException $exception) {
             $this->assertSame(
                 <<<'EOF'
-"data.json" does not match the expected JSON schema:
-  - foo : Boolean value found, but a string is required
-  - bar : Boolean value found, but a string is required
-EOF
+                    "data.json" does not match the expected JSON schema:
+                      - foo : Boolean value found, but a string is required
+                      - bar : Boolean value found, but a string is required
+                    EOF
                 ,
                 $exception->getMessage()
             );
@@ -213,11 +213,11 @@ EOF
             '',
             new ParsingException(
                 <<<'EOF'
-Parse error on line 1:
+                    Parse error on line 1:
 
-^
-Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
-EOF
+                    ^
+                    Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
+                    EOF
             ),
         ];
     }
@@ -229,14 +229,14 @@ EOF
 
         yield [
             <<<'JSON'
-{
-    "foo": {
-        "bar": [],
-        "baz": ["a", "b"],
-        "far": {}
-    }
-}
-JSON
+                {
+                    "foo": {
+                        "bar": [],
+                        "baz": ["a", "b"],
+                        "far": {}
+                    }
+                }
+                JSON
             ,
             true,
             [
@@ -251,14 +251,14 @@ JSON
 
         yield [
             <<<'JSON'
-{
-    "foo": {
-        "bar": [],
-        "baz": ["a", "b"],
-        "far": {}
-    }
-}
-JSON
+                {
+                    "foo": {
+                        "bar": [],
+                        "baz": ["a", "b"],
+                        "far": {}
+                    }
+                }
+                JSON
             ,
             false,
             (static function () {
@@ -279,11 +279,11 @@ JSON
             null,
             new ParsingException(
                 <<<'EOF'
-Parse error on line 1:
+                    Parse error on line 1:
 
-^
-Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
-EOF
+                    ^
+                    Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
+                    EOF
             ),
         ];
 

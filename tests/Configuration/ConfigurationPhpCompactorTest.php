@@ -215,46 +215,46 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
                 'compactors' => [Php::class],
             ],
             <<<'PHP'
-<?php
+                <?php
 
-/**
- * Function comparing the two given values
- *
- * @param int $x
- * @param int $y
- *
- * @return int
- *
- * @author Théo Fidry
- * @LICENSE MIT
- *
- * @Acme(type = "function")
- */
-function foo($x, $y): int {
-    return $x <=> $y;
-}
-PHP
+                /**
+                 * Function comparing the two given values
+                 *
+                 * @param int $x
+                 * @param int $y
+                 *
+                 * @return int
+                 *
+                 * @author Théo Fidry
+                 * @LICENSE MIT
+                 *
+                 * @Acme(type = "function")
+                 */
+                function foo($x, $y): int {
+                    return $x <=> $y;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-/**
-@param
-@param
-@return
-@Acme(type = "function")
-
-
+                /**
+                @param
+                @param
+                @return
+                @Acme(type = "function")
 
 
 
 
 
-*/
-function foo($x, $y): int {
-return $x <=> $y;
-}
-PHP
+
+
+                */
+                function foo($x, $y): int {
+                return $x <=> $y;
+                }
+                PHP
         ];
 
         $falseAnnotationConfigs = [
@@ -275,46 +275,46 @@ PHP
                     'compactors' => [Php::class],
                 ],
                 <<<'PHP'
-<?php
+                    <?php
 
-/**
- * Function comparing the two given values
- *
- * @param int $x
- * @param int $y
- *
- * @return int
- *
- * @author Théo Fidry
- * @LICENSE MIT
- *
- * @Acme(type = "function")
- */
-function foo($x, $y): int {
-    return $x <=> $y;
-}
-PHP
+                    /**
+                     * Function comparing the two given values
+                     *
+                     * @param int $x
+                     * @param int $y
+                     *
+                     * @return int
+                     *
+                     * @author Théo Fidry
+                     * @LICENSE MIT
+                     *
+                     * @Acme(type = "function")
+                     */
+                    function foo($x, $y): int {
+                        return $x <=> $y;
+                    }
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-/**
-@param
-@param
-@return
-@author
-@LICENSE
-@Acme(type = "function")
-
-
+                    /**
+                    @param
+                    @param
+                    @return
+                    @author
+                    @LICENSE
+                    @Acme(type = "function")
 
 
 
-*/
-function foo($x, $y): int {
-return $x <=> $y;
-}
-PHP
+
+
+                    */
+                    function foo($x, $y): int {
+                    return $x <=> $y;
+                    }
+                    PHP
             ];
         }
 
@@ -330,33 +330,31 @@ PHP
                     'compactors' => [Php::class],
                 ],
                 <<<'PHP'
-<?php
+                    <?php
 
-/**
- * Function comparing the two given values
- *
- * @param int $x
- * @param int $y
- *
- * @return int
- *
- * @author Théo Fidry
- * @LICENSE MIT
- *
- * @Acme(type = "function")
- */
-function foo($x, $y): int {
-    return $x <=> $y;
-}
-PHP
+                    /**
+                     * Function comparing the two given values
+                     *
+                     * @param int $x
+                     * @param int $y
+                     *
+                     * @return int
+                     *
+                     * @author Théo Fidry
+                     * @LICENSE MIT
+                     *
+                     * @Acme(type = "function")
+                     */
+                    function foo($x, $y): int {
+                        return $x <=> $y;
+                    }
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-/**
-@Acme(type = "function")
-
-
+                    /**
+                    @Acme(type = "function")
 
 
 
@@ -365,11 +363,13 @@ PHP
 
 
 
-*/
-function foo($x, $y): int {
-return $x <=> $y;
-}
-PHP
+
+
+                    */
+                    function foo($x, $y): int {
+                    return $x <=> $y;
+                    }
+                    PHP
             ];
         }
 
@@ -378,33 +378,31 @@ PHP
                 'compactors' => [Php::class],
             ],
             <<<'PHP'
-<?php
+                <?php
 
-/**
- * Function comparing the two given values
- *
- * @param int $x
- * @param int $y
- *
- * @return int
- *p
- * @author Théo Fidry
- * @LICENSE MIT
- *
- * @Acme(type = "function")
- */
-function foo($x, $y): int {
-    return $x <=> $y;
-}
-PHP
+                /**
+                 * Function comparing the two given values
+                 *
+                 * @param int $x
+                 * @param int $y
+                 *
+                 * @return int
+                 *p
+                 * @author Théo Fidry
+                 * @LICENSE MIT
+                 *
+                 * @Acme(type = "function")
+                 */
+                function foo($x, $y): int {
+                    return $x <=> $y;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-/**
-@Acme(type = "function")
-
-
+                /**
+                @Acme(type = "function")
 
 
 
@@ -413,11 +411,13 @@ PHP
 
 
 
-*/
-function foo($x, $y): int {
-return $x <=> $y;
-}
-PHP
+
+
+                */
+                function foo($x, $y): int {
+                return $x <=> $y;
+                }
+                PHP
         ];
     }
 }

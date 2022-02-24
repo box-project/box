@@ -30,15 +30,15 @@ use Webmozart\Assert\Assert;
 final class DockerFileGenerator
 {
     private const FILE_TEMPLATE = <<<'Dockerfile'
-    FROM php:__BASE_PHP_IMAGE_TOKEN__
+        FROM php:__BASE_PHP_IMAGE_TOKEN__
 
-    RUN $(php -r '$extensionInstalled = array_map("strtolower", \get_loaded_extensions(false));$requiredExtensions = __PHP_EXTENSIONS_TOKEN__;$extensionsToInstall = array_diff($requiredExtensions, $extensionInstalled);if ([] !== $extensionsToInstall) {echo \sprintf("docker-php-ext-install %s", implode(" ", $extensionsToInstall));}echo "echo \"No extensions\"";')
+        RUN $(php -r '$extensionInstalled = array_map("strtolower", \get_loaded_extensions(false));$requiredExtensions = __PHP_EXTENSIONS_TOKEN__;$extensionsToInstall = array_diff($requiredExtensions, $extensionInstalled);if ([] !== $extensionsToInstall) {echo \sprintf("docker-php-ext-install %s", implode(" ", $extensionsToInstall));}echo "echo \"No extensions\"";')
 
-    COPY __PHAR_FILE_PATH_TOKEN__ /__PHAR_FILE_NAME_TOKEN__
+        COPY __PHAR_FILE_PATH_TOKEN__ /__PHAR_FILE_NAME_TOKEN__
 
-    ENTRYPOINT ["/__PHAR_FILE_NAME_TOKEN__"]
+        ENTRYPOINT ["/__PHAR_FILE_NAME_TOKEN__"]
 
-    Dockerfile;
+        Dockerfile;
 
     private const PHP_DOCKER_IMAGES = [
         '7.4.0' => '7.4-cli-alpine',

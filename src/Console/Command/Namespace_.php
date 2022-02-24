@@ -28,8 +28,8 @@ final class Namespace_ extends BaseCommand
         $this->setDescription('Prints the first part of the command namespace');
         $this->setHelp(
             <<<'HELP'
-            This command is purely for debugging purposes to ensure it is scoped correctly.
-            HELP,
+                This command is purely for debugging purposes to ensure it is scoped correctly.
+                HELP,
         );
     }
 

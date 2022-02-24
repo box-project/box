@@ -58,13 +58,13 @@ class VerifyTest extends CommandTestCase
 
         $expected = <<<OUTPUT
 
-🔐️  Verifying the PHAR "{$pharPath}"
+            🔐️  Verifying the PHAR "{$pharPath}"
 
-The PHAR passed verification.
+            The PHAR passed verification.
 
-{$signature['hash_type']} signature: {$signature['hash']}
+            {$signature['hash_type']} signature: {$signature['hash']}
 
-OUTPUT;
+            OUTPUT;
 
         $this->assertSame($expected, $this->commandTester->getDisplay(true));
         $this->assertSame(0, $this->commandTester->getStatusCode());
@@ -81,13 +81,13 @@ OUTPUT;
 
         $expected = <<<OUTPUT
 
-🔐️  Verifying the PHAR "{$pharPath}"
+            🔐️  Verifying the PHAR "{$pharPath}"
 
-The PHAR passed verification.
+            The PHAR passed verification.
 
-SHA-1 signature: 191723EE056C62E3179FDE1B792AA03040FCEF92
+            SHA-1 signature: 191723EE056C62E3179FDE1B792AA03040FCEF92
 
-OUTPUT;
+            OUTPUT;
 
         $this->assertSame($expected, $this->commandTester->getDisplay(true));
         $this->assertSame(0, $this->commandTester->getStatusCode());
@@ -112,13 +112,13 @@ OUTPUT;
 
         $expected = <<<OUTPUT
 
-🔐️  Verifying the PHAR "{$pharPath}"
+            🔐️  Verifying the PHAR "{$pharPath}"
 
-The PHAR passed verification.
+            The PHAR passed verification.
 
-{$signature['hash_type']} signature: {$signature['hash']}
+            {$signature['hash_type']} signature: {$signature['hash']}
 
-OUTPUT;
+            OUTPUT;
 
         $this->assertSame($expected, $this->commandTester->getDisplay(true));
         $this->assertSame(0, $this->commandTester->getStatusCode());

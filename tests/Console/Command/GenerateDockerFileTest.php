@@ -53,14 +53,14 @@ class GenerateDockerFileTest extends CommandTestCase
 
         $expected = <<<OUTPUT
 
-🐳  Generating a Dockerfile for the PHAR "{$pharPath}"
+            🐳  Generating a Dockerfile for the PHAR "{$pharPath}"
 
- [OK] Done
+             [OK] Done
 
-You can now inspect your Dockerfile file or build your container with:
-$ docker build .
+            You can now inspect your Dockerfile file or build your container with:
+            $ docker build .
 
-OUTPUT;
+            OUTPUT;
 
         $this->assertSame(
             $expected,
@@ -82,13 +82,13 @@ OUTPUT;
 
         $expected = <<<OUTPUT
 
-🐳  Generating a Dockerfile for the PHAR "{$pharPath}"
+            🐳  Generating a Dockerfile for the PHAR "{$pharPath}"
 
- [ERROR] Cannot retrieve the requirements for the PHAR. Make sure the PHAR has
-         been built with Box and the requirement checker enabled.
+             [ERROR] Cannot retrieve the requirements for the PHAR. Make sure the PHAR has
+                     been built with Box and the requirement checker enabled.
 
 
-OUTPUT;
+            OUTPUT;
 
         $this->assertSame(
             $expected,
@@ -110,13 +110,13 @@ OUTPUT;
 
         $expected = <<<OUTPUT
 
-🐳  Generating a Dockerfile for the PHAR "{$pharPath}"
+            🐳  Generating a Dockerfile for the PHAR "{$pharPath}"
 
- [ERROR] Cannot retrieve the requirements for the PHAR. Make sure the PHAR has
-         been built with Box and the requirement checker enabled.
+             [ERROR] Cannot retrieve the requirements for the PHAR. Make sure the PHAR has
+                     been built with Box and the requirement checker enabled.
 
 
-OUTPUT;
+            OUTPUT;
 
         $this->assertSame(
             $expected,
