@@ -32,12 +32,12 @@ class AppRequirementsFactoryTest extends TestCase
         ?string $composerJsonContents,
         ?string $composerLockContents,
         ?int $compressionAlgorithm,
-        array $expected
+        array $expected,
     ): void {
         $actual = AppRequirementsFactory::create(
             null === $composerJsonContents ? [] : json_decode($composerJsonContents, true, 512, JSON_THROW_ON_ERROR),
             null === $composerLockContents ? [] : json_decode($composerLockContents, true, 512, JSON_THROW_ON_ERROR),
-            $compressionAlgorithm
+            $compressionAlgorithm,
         );
 
         $this->assertSame($expected, $actual);

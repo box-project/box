@@ -49,18 +49,18 @@ final class Validate extends BaseCommand
                   the following files will be used (in order): <info>box.json,
                   box.json.dist</info>
                 </comment>
-                HELP
+                HELP,
         );
         $this->addArgument(
             self::FILE_ARGUMENT,
             InputArgument::OPTIONAL,
-            'The configuration file. (default: box.json, box.json.dist)'
+            'The configuration file. (default: box.json, box.json.dist)',
         );
         $this->addOption(
             self::IGNORE_MESSAGES_OPTION,
             'i',
             InputOption::VALUE_NONE,
-            'Will not return a faulty code when a recommendation or warning is found'
+            'Will not return a faulty code when a recommendation or warning is found',
         );
     }
 
@@ -73,7 +73,7 @@ final class Validate extends BaseCommand
                 $input->getArgument(self::FILE_ARGUMENT) ?? $this->getConfigurationHelper()->findDefaultPath(),
                 $this->getConfigurationHelper(),
                 $io,
-                false
+                false,
             );
 
             $recommendations = $config->getRecommendations();
@@ -104,10 +104,10 @@ final class Validate extends BaseCommand
             throw new RuntimeException(
                 sprintf(
                     'The configuration file failed validation: %s',
-                    $exception->getMessage()
+                    $exception->getMessage(),
                 ),
                 $exception->getCode(),
-                $exception
+                $exception,
             );
         }
 
@@ -116,8 +116,8 @@ final class Validate extends BaseCommand
                 sprintf(
                     '<error>The configuration file failed validation: "%s" does not match the expected JSON '
                     .'schema:</error>',
-                    $exception->getValidatedFile()
-                )
+                    $exception->getValidatedFile(),
+                ),
             );
 
             $io->writeln('');
@@ -134,8 +134,8 @@ final class Validate extends BaseCommand
             $io->writeln(
                 sprintf(
                     '<error>%s</error>',
-                    $errorMessage
-                )
+                    $errorMessage,
+                ),
             );
         }
 

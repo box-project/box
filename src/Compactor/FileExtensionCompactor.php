@@ -46,10 +46,10 @@ abstract class FileExtensionCompactor extends BaseCompactor
         return in_array(
             pathinfo(
                 $file,
-                PATHINFO_EXTENSION
+                PATHINFO_EXTENSION,
             ),
             $this->extensions,
-            true
+            true,
         );
     }
 }

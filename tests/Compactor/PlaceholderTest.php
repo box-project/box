@@ -38,7 +38,7 @@ class PlaceholderTest extends TestCase
 
         $this->assertEquals(
             $compactor,
-            unserialize(serialize($compactor))
+            unserialize(serialize($compactor)),
         );
     }
 

@@ -65,7 +65,7 @@ final class Info extends BaseCommand
     {
         $this->setName('info');
         $this->setDescription(
-            '🔍  Displays information about the PHAR extension or file'
+            '🔍  Displays information about the PHAR extension or file',
         );
         $this->setHelp(
             <<<'HELP'
@@ -84,33 +84,33 @@ final class Info extends BaseCommand
         $this->addArgument(
             self::PHAR_ARG,
             InputArgument::OPTIONAL,
-            'The Phar file.'
+            'The Phar file.',
         );
         $this->addOption(
             self::LIST_OPT,
             'l',
             InputOption::VALUE_NONE,
-            'List the contents of the Phar?'
+            'List the contents of the Phar?',
         );
         $this->addOption(
             self::METADATA_OPT,
             null,
             InputOption::VALUE_NONE,
-            'Display metadata?'
+            'Display metadata?',
         );
         $this->addOption(
             self::MODE_OPT,
             'm',
             InputOption::VALUE_REQUIRED,
             'The listing mode. (default: indent, options: indent, flat)',
-            'indent'
+            'indent',
         );
         $this->addOption(
             self::DEPTH_OPT,
             'd',
             InputOption::VALUE_REQUIRED,
             'The depth of the tree displayed',
-            -1
+            -1,
         );
     }
 
@@ -135,8 +135,8 @@ final class Info extends BaseCommand
             $io->error(
                 sprintf(
                     'The file "%s" could not be found.',
-                    $file
-                )
+                    $file,
+                ),
             );
 
             return 1;
@@ -167,7 +167,7 @@ final class Info extends BaseCommand
                 $input->getOption(self::LIST_OPT),
                 $depth,
                 'indent' === $input->getOption(self::MODE_OPT),
-                $io
+                $io,
             );
         } catch (Throwable $throwable) {
             if ($io->isDebug()) {
@@ -177,8 +177,8 @@ final class Info extends BaseCommand
             $io->error(
                 sprintf(
                     'Could not read the file "%s".',
-                    $originalFile
-                )
+                    $originalFile,
+                ),
             );
 
             return 1;
@@ -193,7 +193,7 @@ final class Info extends BaseCommand
                 'API Version' => Phar::apiVersion(),
                 'Supported Compression' => Phar::getSupportedCompression(),
                 'Supported Signatures' => Phar::getSupportedSignatures(),
-            ]
+            ],
         );
 
         $io->newLine();
@@ -207,7 +207,7 @@ final class Info extends BaseCommand
         bool $content,
         int $depth,
         bool $indent,
-        IO $io
+        IO $io,
     ): int {
         $this->showPharMeta($pharInfo, $io);
 
@@ -220,7 +220,7 @@ final class Info extends BaseCommand
                 $indent ? 0 : false,
                 $pharInfo->getRoot(),
                 $pharInfo->getPhar(),
-                $pharInfo->getRoot()
+                $pharInfo->getRoot(),
             );
         } else {
             $io->comment('Use the <info>--list|-l</info> option to list the content of the PHAR.');
@@ -234,8 +234,8 @@ final class Info extends BaseCommand
         $io->writeln(
             sprintf(
                 '<comment>API Version:</comment> %s',
-                $pharInfo->getVersion()
-            )
+                $pharInfo->getVersion(),
+            ),
         );
 
         $io->newLine();
@@ -292,7 +292,7 @@ final class Info extends BaseCommand
         int|false $indent,
         string $base,
         Phar|PharData $phar,
-        string $root
+        string $root,
     ): void {
         if (-1 !== $maxDepth && $depth > $maxDepth) {
             return;
@@ -335,8 +335,8 @@ final class Info extends BaseCommand
                         '%s %s - %s',
                         $path,
                         $compression,
-                        $fileSize
-                    )
+                        $fileSize,
+                    ),
                 );
             }
 
@@ -349,7 +349,7 @@ final class Info extends BaseCommand
                     false === $indent ? $indent : $indent + 2,
                     $base,
                     $phar,
-                    $root
+                    $root,
                 );
             }
         }

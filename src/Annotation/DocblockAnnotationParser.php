@@ -42,7 +42,7 @@ final class DocblockAnnotationParser
     public function __construct(
         private DocBlockFactoryInterface $factory,
         private Formatter $tagsFormatter,
-        array $ignoredAnnotations
+        array $ignoredAnnotations,
     ) {
         $this->ignoredAnnotationsAsKeys = array_flip($ignoredAnnotations);
     }

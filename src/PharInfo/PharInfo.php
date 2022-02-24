@@ -100,7 +100,7 @@ final class PharInfo
     {
         $count = array_fill_keys(
             self::$ALGORITHMS,
-            0
+            0,
         );
 
         if ($this->phar instanceof PharData) {
@@ -130,7 +130,7 @@ final class PharInfo
         return array_reduce(
             iterator_to_array(new RecursiveIteratorIterator($this->phar), true),
             $countFile,
-            $count
+            $count,
         );
     }
 }

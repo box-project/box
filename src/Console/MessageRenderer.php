@@ -48,12 +48,12 @@ final class MessageRenderer
                 sprintf(
                     '💡  <recommendation>%d %s found:</recommendation>',
                     count($recommendations),
-                    count($recommendations) > 1 ? 'recommendations' : 'recommendation'
-                )
+                    count($recommendations) > 1 ? 'recommendations' : 'recommendation',
+                ),
             );
 
             $io->writeln(
-                array_map($renderMessage, $recommendations)
+                array_map($renderMessage, $recommendations),
             );
         }
 
@@ -64,12 +64,12 @@ final class MessageRenderer
                 sprintf(
                     '⚠️  <warning>%d %s found:</warning>',
                     count($warnings),
-                    count($warnings) > 1 ? 'warnings' : 'warning'
-                )
+                    count($warnings) > 1 ? 'warnings' : 'warning',
+                ),
             );
 
             $io->writeln(
-                array_map($renderMessage, $warnings)
+                array_map($renderMessage, $warnings),
             );
         }
     }

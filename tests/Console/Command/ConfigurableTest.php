@@ -63,15 +63,15 @@ class ConfigurableTest extends CommandTestCase
         /** @var Configuration $config */
         $config = Closure::bind(
             static fn (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration => $command->getConfig(
-                new IO($input, $output)
+                new IO($input, $output),
             ),
             null,
-            TestConfigurableCommand::class
+            TestConfigurableCommand::class,
         )($command, $input, $output);
 
         $this->assertInstanceOf(
             Configuration::class,
-            $config
+            $config,
         );
 
         $this->assertSame('foo', $config->getAlias());
@@ -94,15 +94,15 @@ class ConfigurableTest extends CommandTestCase
         /** @var Configuration $config */
         $config = Closure::bind(
             static fn (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration => $command->getConfig(
-                new IO($input, $output)
+                new IO($input, $output),
             ),
             null,
-            TestConfigurableCommand::class
+            TestConfigurableCommand::class,
         )($command, $input, $output);
 
         $this->assertInstanceOf(
             Configuration::class,
-            $config
+            $config,
         );
 
         $this->assertSame('foo', $config->getAlias());
@@ -123,17 +123,17 @@ class ConfigurableTest extends CommandTestCase
         try {
             Closure::bind(
                 static fn (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration => $command->getConfig(
-                    new IO($input, $output)
+                    new IO($input, $output),
                 ),
                 null,
-                TestConfigurableCommand::class
+                TestConfigurableCommand::class,
             )($command, $input, $output);
 
             $this->fail('Expected exception to be thrown.');
         } catch (NoConfigurationFound $exception) {
             $this->assertSame(
                 'The configuration file could not be found.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -154,15 +154,15 @@ class ConfigurableTest extends CommandTestCase
         $config = Closure::bind(
             static fn (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration => $command->getConfig(
                 new IO($input, $output),
-                true
+                true,
             ),
             null,
-            TestConfigurableCommand::class
+            TestConfigurableCommand::class,
         )($command, $input, $output);
 
         $this->assertInstanceOf(
             Configuration::class,
-            $config
+            $config,
         );
 
         $this->assertSame($this->tmp.'/index.php', $config->getMainScriptPath());
@@ -185,10 +185,10 @@ class ConfigurableTest extends CommandTestCase
         try {
             Closure::bind(
                 static fn (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration => $command->getConfig(
-                    new IO($input, $output)
+                    new IO($input, $output),
                 ),
                 null,
-                TestConfigurableCommand::class
+                TestConfigurableCommand::class,
             )($command, $input, $output);
 
             $this->fail('Expected exception to be thrown.');
@@ -196,7 +196,7 @@ class ConfigurableTest extends CommandTestCase
             $this->assertSame(
                 '"'.$this->tmp.'/box.json" does not match the expected JSON schema:
   - The property foo is not defined and the definition does not allow additional properties',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -216,17 +216,17 @@ class ConfigurableTest extends CommandTestCase
         try {
             Closure::bind(
                 static fn (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration => $command->getConfig(
-                    new IO($input, $output)
+                    new IO($input, $output),
                 ),
                 null,
-                TestConfigurableCommand::class
+                TestConfigurableCommand::class,
             )($command, $input, $output);
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The file "'.$this->tmp.'/index.php" does not exist.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }

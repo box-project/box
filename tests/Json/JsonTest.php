@@ -127,7 +127,7 @@ class JsonTest extends FileSystemTestCase
         } catch (ParsingException $exception) {
             $this->assertStringStartsWith(
                 'Parse error on line 1:',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -152,7 +152,7 @@ class JsonTest extends FileSystemTestCase
 
                 JSON
             ,
-            false
+            false,
         );
 
         touch('data.json');
@@ -165,7 +165,7 @@ class JsonTest extends FileSystemTestCase
 
                 return $data;
             })(),
-            $schema
+            $schema,
         );
 
         try {
@@ -178,7 +178,7 @@ class JsonTest extends FileSystemTestCase
 
                     return $data;
                 })(),
-                $schema
+                $schema,
             );
 
             $this->fail('Expected exception to be thrown.');
@@ -190,14 +190,14 @@ class JsonTest extends FileSystemTestCase
                       - bar : Boolean value found, but a string is required
                     EOF
                 ,
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertSame(
                 [
                     'foo : Boolean value found, but a string is required',
                     'bar : Boolean value found, but a string is required',
                 ],
-                $exception->getErrors()
+                $exception->getErrors(),
             );
             $this->assertSame('data.json', $exception->getValidatedFile());
             $this->assertSame(0, $exception->getCode());
@@ -217,7 +217,7 @@ class JsonTest extends FileSystemTestCase
 
                     ^
                     Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
-                    EOF
+                    EOF,
             ),
         ];
     }
@@ -283,7 +283,7 @@ class JsonTest extends FileSystemTestCase
 
                     ^
                     Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
-                    EOF
+                    EOF,
             ),
         ];
 

@@ -75,7 +75,7 @@ class JsonTest extends TestCase
     {
         $this->assertEquals(
             $this->compactor,
-            unserialize(serialize($this->compactor))
+            unserialize(serialize($this->compactor)),
         );
     }
 
@@ -105,7 +105,7 @@ class JsonTest extends TestCase
             ,
             <<<'JSON'
                 {"require":{"humbug\/php-scoper":"^1.0","infection\/infection":"^1.0"}}
-                JSON
+                JSON,
         ];
 
         yield 'invalid JSON' => [
@@ -115,7 +115,7 @@ class JsonTest extends TestCase
             ,
             <<<'JSON'
                 {
-                JSON
+                JSON,
         ];
     }
 }

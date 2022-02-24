@@ -40,7 +40,7 @@ final class Placeholder implements Compactor
         return str_replace(
             array_keys($this->placeholders),
             $this->placeholders,
-            $contents
+            $contents,
         );
     }
 }

@@ -46,7 +46,7 @@ class InfoTest extends CommandTestCase
         $this->commandTester->execute(
             [
                 'command' => 'info',
-            ]
+            ],
         );
 
         $version = Phar::apiVersion();
@@ -84,7 +84,7 @@ class InfoTest extends CommandTestCase
             [
                 'command' => 'info',
                 'phar' => $pharPath,
-            ]
+            ],
         );
 
         $expected = <<<OUTPUT
@@ -121,7 +121,7 @@ class InfoTest extends CommandTestCase
             [
                 'command' => 'info',
                 'phar' => $pharPath,
-            ]
+            ],
         );
 
         $expected = <<<OUTPUT
@@ -158,7 +158,7 @@ class InfoTest extends CommandTestCase
             [
                 'command' => 'info',
                 'phar' => $file,
-            ]
+            ],
         );
 
         $expectedPath = realpath($file);
@@ -188,7 +188,7 @@ class InfoTest extends CommandTestCase
                     'command' => 'info',
                     'phar' => $file,
                 ],
-                ['verbosity' => OutputInterface::VERBOSITY_DEBUG]
+                ['verbosity' => OutputInterface::VERBOSITY_DEBUG],
             );
 
             $this->fail('Expected exception to be thrown.');
@@ -205,7 +205,7 @@ class InfoTest extends CommandTestCase
             [
                 'command' => 'info',
                 'phar' => $pharPath,
-            ]
+            ],
         );
 
         $expected = <<<'OUTPUT'
@@ -237,7 +237,7 @@ class InfoTest extends CommandTestCase
             [
                 'command' => 'info',
                 'phar' => $pharPath,
-            ]
+            ],
         );
 
         $expected = <<<'OUTPUT'
@@ -273,7 +273,7 @@ class InfoTest extends CommandTestCase
             [
                 'command' => 'info',
                 'phar' => $pharPath,
-            ]
+            ],
         );
 
         $expected = <<<'OUTPUT'
@@ -285,13 +285,13 @@ class InfoTest extends CommandTestCase
             OUTPUT;
 
         $actual = DisplayNormalizer::removeTrailingSpaces(
-            $this->commandTester->getDisplay(true)
+            $this->commandTester->getDisplay(true),
         );
 
         $actual = preg_replace(
             '/\s\[ERROR\] Could not read the file([\s\S]*)new\-simple\-phar\.zip[comment\<\>\n\s\/]*"\./',
             ' [ERROR] Could not read the file "new-simple-phar.zip".',
-            $actual
+            $actual,
         );
 
         $this->assertSame($expected, $actual);
@@ -312,7 +312,7 @@ class InfoTest extends CommandTestCase
                 'phar' => $pharPath,
                 '--list' => true,
                 '--metadata' => true,
-            ]
+            ],
         );
 
         $expected = <<<OUTPUT
@@ -359,7 +359,7 @@ class InfoTest extends CommandTestCase
                 'phar' => $pharPath,
                 '--list' => true,
                 '--mode' => 'flat',
-            ]
+            ],
         );
 
         $expected = <<<OUTPUT
@@ -402,7 +402,7 @@ class InfoTest extends CommandTestCase
                 'command' => 'info',
                 'phar' => $pharPath,
                 '--list' => true,
-            ]
+            ],
         );
 
         $expected = <<<OUTPUT
@@ -458,7 +458,7 @@ class InfoTest extends CommandTestCase
                 '--list' => true,
                 '--metadata' => true,
                 '--depth' => 0,
-            ]
+            ],
         );
 
         $expected = <<<OUTPUT
@@ -494,7 +494,7 @@ class InfoTest extends CommandTestCase
                 '--list' => true,
                 '--metadata' => true,
                 '--depth' => 1,
-            ]
+            ],
         );
 
         $expected = <<<OUTPUT
@@ -532,7 +532,7 @@ class InfoTest extends CommandTestCase
                 '--list' => true,
                 '--metadata' => true,
                 '--depth' => -1,
-            ]
+            ],
         );
 
         $expected = <<<OUTPUT
@@ -581,7 +581,7 @@ class InfoTest extends CommandTestCase
                 '--metadata' => true,
                 '--depth' => 1,
                 '--mode' => 'flat',
-            ]
+            ],
         );
 
         $expected = <<<OUTPUT
@@ -622,14 +622,14 @@ class InfoTest extends CommandTestCase
                     '--list' => true,
                     '--metadata' => true,
                     '--depth' => -10,
-                ]
+                ],
             );
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected the depth to be a positive integer or -1, got "-10"',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }

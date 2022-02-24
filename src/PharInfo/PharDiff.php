@@ -35,7 +35,7 @@ final class PharDiff
     {
         $phars = array_map(
             static fn (string $path) => new Pharaoh($path),
-            [$pathA, $pathB]
+            [$pathA, $pathB],
         );
 
         $this->pharA = $phars[0];
@@ -137,7 +137,7 @@ final class PharDiff
                 $pharAFileName,
                 $pharBFileName,
             ],
-            $diff
+            $diff,
         );
     }
 
@@ -155,8 +155,8 @@ final class PharDiff
                     ->files()
                     ->in($basePath)
                     ->ignoreDotFiles(false),
-                false
-            )
+                false,
+            ),
         );
     }
 }

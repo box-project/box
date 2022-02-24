@@ -46,8 +46,8 @@ abstract class CommandTestCase extends FileSystemTestCase
 
         $this->commandTester = new CommandTester(
             $this->application->get(
-                $this->getCommand()->getName()
-            )
+                $this->getCommand()->getName(),
+            ),
         );
     }
 
@@ -91,7 +91,7 @@ abstract class CommandTestCase extends FileSystemTestCase
                 '/[\x03|\x1a]/',
             ],
             ['', '', ''],
-            $string
+            $string,
         );
 
         return str_replace(PHP_EOL, "\n", $string);

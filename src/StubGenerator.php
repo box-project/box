@@ -73,19 +73,19 @@ final class StubGenerator
         $stub = str_replace(
             "__BOX_SHEBANG__\n",
             null === $this->shebang ? '' : $this->shebang."\n",
-            $stub
+            $stub,
         );
 
         $stub = str_replace(
             "__BOX_BANNER__\n",
             $this->generateBannerStmt(),
-            $stub
+            $stub,
         );
 
         $stub = str_replace(
             "__BOX_PHAR_CONFIG__\n",
             $this->generatePharConfigStmt(),
-            $stub
+            $stub,
         );
 
         return $stub;
@@ -168,7 +168,7 @@ final class StubGenerator
         $banner .= str_replace(
             " \n",
             "\n",
-            str_replace("\n", "\n * ", $this->banner)
+            str_replace("\n", "\n * ", $this->banner),
         );
 
         $banner .= "\n */";

@@ -48,7 +48,7 @@ class ValidateTest extends CommandTestCase
             ],
             [
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            ]
+            ],
         );
 
         $expected = <<<'OUTPUT'
@@ -76,7 +76,7 @@ class ValidateTest extends CommandTestCase
                 {
                     "key": null
                 }
-                JSON
+                JSON,
         );
 
         $this->commandTester->execute(
@@ -86,7 +86,7 @@ class ValidateTest extends CommandTestCase
             ],
             [
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            ]
+            ],
         );
 
         $expected = <<<'OUTPUT'
@@ -115,7 +115,7 @@ class ValidateTest extends CommandTestCase
                 {
                     "key": null
                 }
-                JSON
+                JSON,
         );
 
         $this->commandTester->execute(
@@ -126,7 +126,7 @@ class ValidateTest extends CommandTestCase
             ],
             [
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            ]
+            ],
         );
 
         $expected = <<<'OUTPUT'
@@ -155,7 +155,7 @@ class ValidateTest extends CommandTestCase
                 {
                     "key": "key-file"
                 }
-                JSON
+                JSON,
         );
 
         $this->commandTester->execute(
@@ -165,7 +165,7 @@ class ValidateTest extends CommandTestCase
             ],
             [
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            ]
+            ],
         );
 
         $expected = <<<'OUTPUT'
@@ -194,7 +194,7 @@ class ValidateTest extends CommandTestCase
                 {
                     "key": "key-file"
                 }
-                JSON
+                JSON,
         );
 
         $this->commandTester->execute(
@@ -205,7 +205,7 @@ class ValidateTest extends CommandTestCase
             ],
             [
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            ]
+            ],
         );
 
         $expected = <<<'OUTPUT'
@@ -234,7 +234,7 @@ class ValidateTest extends CommandTestCase
                 {
                     "check-requirements": true
                 }
-                JSON
+                JSON,
         );
 
         $this->commandTester->execute(
@@ -244,7 +244,7 @@ class ValidateTest extends CommandTestCase
             ],
             [
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            ]
+            ],
         );
 
         $expected = <<<'OUTPUT'
@@ -271,7 +271,7 @@ class ValidateTest extends CommandTestCase
         $this->commandTester->execute(
             [
                 'command' => 'validate',
-            ]
+            ],
         );
 
         $expected = <<<'OUTPUT'
@@ -292,14 +292,14 @@ class ValidateTest extends CommandTestCase
                 ],
                 [
                     'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-                ]
+                ],
             );
 
             $this->fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
             $this->assertSame(
                 'The configuration file failed validation: The configuration file could not be found.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
             $this->assertNotNull($exception->getPrevious());
@@ -313,7 +313,7 @@ class ValidateTest extends CommandTestCase
         $this->commandTester->execute(
             [
                 'command' => 'validate',
-            ]
+            ],
         );
 
         $expected = <<<'OUTPUT'
@@ -332,7 +332,7 @@ class ValidateTest extends CommandTestCase
         $actual = preg_replace(
             '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
             ' // Loading the configuration file "box.json".',
-            $actual
+            $actual,
         );
 
         $this->assertSame($expected, $actual);
@@ -350,7 +350,7 @@ class ValidateTest extends CommandTestCase
                 ],
                 [
                     'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-                ]
+                ],
             );
 
             $this->fail('Expected exception to be thrown.');
@@ -375,7 +375,7 @@ class ValidateTest extends CommandTestCase
         $this->commandTester->execute(
             [
                 'command' => 'validate',
-            ]
+            ],
         );
 
         $expected = str_replace(
@@ -389,7 +389,7 @@ class ValidateTest extends CommandTestCase
 
                   - The property test is not defined and the definition does not allow additional properties
 
-                EOF
+                EOF,
         );
 
         $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
@@ -397,7 +397,7 @@ class ValidateTest extends CommandTestCase
         $actual = preg_replace(
             '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
             ' // Loading the configuration file "box.json".',
-            $actual
+            $actual,
         );
 
         $this->assertSame($expected, $actual);
@@ -415,7 +415,7 @@ class ValidateTest extends CommandTestCase
                 ],
                 [
                     'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-                ]
+                ],
             );
 
             $this->fail('Expected exception to be thrown.');
@@ -427,9 +427,9 @@ class ValidateTest extends CommandTestCase
                     <<<'EOF'
                         The configuration file failed validation: "/path/to/box.json" does not match the expected JSON schema:
                           - The property test is not defined and the definition does not allow additional properties
-                        EOF
+                        EOF,
                 ),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
             $this->assertNotNull($exception->getPrevious());

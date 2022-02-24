@@ -70,7 +70,7 @@ final class Box implements Countable
 
     private function __construct(
         private readonly Phar $phar,
-        private readonly string $pharFilePath
+        private readonly string $pharFilePath,
     ) {
         $this->compactors = new Compactors();
         $this->placeholderCompactor = new Placeholder([]);
@@ -135,7 +135,7 @@ final class Box implements Countable
             if (null !== $dumpAutoload) {
                 $dumpAutoload(
                     $this->scoper->getSymbolsRegistry(),
-                    $this->scoper->getPrefix()
+                    $this->scoper->getPrefix(),
                 );
             }
 
@@ -198,8 +198,8 @@ final class Box implements Countable
                 sprintf(
                     'Cannot compress the PHAR with the compression algorithm "%s": the extension "%s" is required but appear to not be loaded',
                     array_flip(get_phar_compression_algorithms())[$compressionAlgorithm],
-                    $extensionRequired
-                )
+                    $extensionRequired,
+                ),
             );
         }
 
@@ -214,7 +214,7 @@ final class Box implements Countable
                 ? 'Could not compress the PHAR: '.$exception->getMessage()
                 : sprintf(
                     'Could not compress the PHAR: the compression requires too many file descriptors to be opened (%s). Check your system limits or install the posix extension to allow Box to automatically configure it during the compression',
-                    $this->phar->count()
+                    $this->phar->count(),
                 )
             ;
 
@@ -279,7 +279,7 @@ final class Box implements Countable
     {
         $contents = $this->placeholderCompactor->compact(
             $file,
-            file_contents($file)
+            file_contents($file),
         );
 
         $this->phar->setStub($contents);
@@ -365,7 +365,7 @@ final class Box implements Countable
         if (file_exists($pubKey)) {
             Assert::file(
                 $pubKey,
-                'Cannot create public key: %s already exists and is not a file.'
+                'Cannot create public key: %s already exists and is not a file.',
             );
         }
 

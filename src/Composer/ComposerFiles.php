@@ -25,14 +25,14 @@ final class ComposerFiles
         return new self(
             ComposerFile::createEmpty(),
             ComposerFile::createEmpty(),
-            ComposerFile::createEmpty()
+            ComposerFile::createEmpty(),
         );
     }
 
     public function __construct(
         private readonly ComposerFile $composerJson,
         private readonly ComposerFile $composerLock,
-        private readonly ComposerFile $installedJson
+        private readonly ComposerFile $installedJson,
     ) {
     }
 
@@ -60,7 +60,7 @@ final class ComposerFiles
             array_filter(
                 array_map(
                     static fn (ComposerFile $file): ?string => $file->getPath(),
-                    [$this->composerJson, $this->composerLock, $this->installedJson]
+                    [$this->composerJson, $this->composerLock, $this->installedJson],
                 ),
             ),
         );

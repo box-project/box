@@ -41,7 +41,7 @@ trait ChangeableWorkingDirectory
 
         Assert::directory(
             $workingDir,
-            'Could not change the working directory to "%s": directory does not exists or file is not a directory.'
+            'Could not change the working directory to "%s": directory does not exists or file is not a directory.',
         );
 
         if (false === chdir($workingDir)) {
@@ -49,8 +49,8 @@ trait ChangeableWorkingDirectory
                 sprintf(
                     'Failed to change the working directory to "%s" from "%s".',
                     $workingDir,
-                    getcwd()
-                )
+                    getcwd(),
+                ),
             );
         }
     }
@@ -62,7 +62,7 @@ trait ChangeableWorkingDirectory
             'd',
             InputOption::VALUE_REQUIRED,
             'If specified, use the given directory as working directory.',
-            null
+            null,
         );
     }
 }

@@ -55,7 +55,7 @@ class DiffTest extends CommandTestCase
     public function test_it_can_display_the_list_diff_of_two_phar_files(
         callable $executeCommand,
         string $expectedOutput,
-        int $expectedStatusCode
+        int $expectedStatusCode,
     ): void {
         $actualOutput = $executeCommand($this->commandTester);
 
@@ -71,7 +71,7 @@ class DiffTest extends CommandTestCase
                 'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
                 'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
                 '--list-diff' => null,
-            ]
+            ],
         );
 
         $actualOutput = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
@@ -105,7 +105,7 @@ class DiffTest extends CommandTestCase
     public function test_it_can_display_the_git_diff_of_two_phar_files(
         callable $executeCommand,
         ?string $expectedOutput,
-        int $expectedStatusCode
+        int $expectedStatusCode,
     ): void {
         $actualOutput = $executeCommand($this->commandTester);
 
@@ -121,7 +121,7 @@ class DiffTest extends CommandTestCase
     public function test_it_can_display_the__gn_u_diff_of_two_phar_files(
         callable $executeCommand,
         ?string $expectedOutput,
-        int $expectedStatusCode
+        int $expectedStatusCode,
     ): void {
         $actualOutput = $executeCommand($this->commandTester);
 
@@ -143,7 +143,7 @@ class DiffTest extends CommandTestCase
                     'pharA' => $pharPath,
                     'pharB' => $pharPath,
                     '--check' => null,
-                ]
+                ],
             );
             $actual = DisplayNormalizer::removeTrailingSpaces(ob_get_clean());
 
@@ -164,7 +164,7 @@ class DiffTest extends CommandTestCase
                     'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
                     'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
                     '--check' => null,
-                ]
+                ],
             );
             $actual = DisplayNormalizer::removeTrailingSpaces(ob_get_clean());
 
@@ -186,14 +186,14 @@ class DiffTest extends CommandTestCase
                     'command' => 'diff',
                     'pharA' => 'unknown',
                     'pharB' => 'unknown',
-                ]
+                ],
             );
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The file "unknown" does not exist.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -205,7 +205,7 @@ class DiffTest extends CommandTestCase
                 'command' => 'diff',
                 'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
                 'pharB' => realpath(self::FIXTURES_DIR.'/not-a-phar.phar'),
-            ]
+            ],
         );
 
         $expected = '/^Could not check the PHARs: internal corruption of phar \".*\.phar\" \(__HALT_COMPILER\(\); not found\)/';
@@ -223,7 +223,7 @@ class DiffTest extends CommandTestCase
                 'command' => 'diff',
                 'pharA' => $pharPath,
                 'pharB' => $pharPath,
-            ]
+            ],
         );
         $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
@@ -253,14 +253,14 @@ class DiffTest extends CommandTestCase
                     'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
                     'pharB' => realpath(self::FIXTURES_DIR.'/openssl.phar'),
                 ],
-                ['verbosity' => OutputInterface::VERBOSITY_DEBUG]
+                ['verbosity' => OutputInterface::VERBOSITY_DEBUG],
             );
 
             $this->fail('Expected exception to be thrown.');
         } catch (UnexpectedValueException $exception) {
             $this->assertMatchesRegularExpression(
                 '/openssl signature could not be verified/',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -274,14 +274,14 @@ class DiffTest extends CommandTestCase
                     'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
                     'pharB' => realpath(self::FIXTURES_DIR.'/not-a-phar.phar'),
                 ],
-                ['verbosity' => OutputInterface::VERBOSITY_DEBUG]
+                ['verbosity' => OutputInterface::VERBOSITY_DEBUG],
             );
 
             $this->fail('Expected exception to be thrown.');
         } catch (UnexpectedValueException $exception) {
             $this->assertMatchesRegularExpression(
                 '/^internal corruption of phar \".*\.phar\" \(__HALT_COMPILER\(\); not found\)/',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -298,7 +298,7 @@ class DiffTest extends CommandTestCase
                         'pharA' => $pharPath,
                         'pharB' => $pharPath,
                         '--list-diff' => null,
-                    ]
+                    ],
                 );
 
                 return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
@@ -326,7 +326,7 @@ class DiffTest extends CommandTestCase
                         'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
                         'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
                         '--list-diff' => null,
-                    ]
+                    ],
                 );
 
                 return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
@@ -360,7 +360,7 @@ class DiffTest extends CommandTestCase
                         'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
                         'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar-compressed.phar'),
                         '--list-diff' => null,
-                    ]
+                    ],
                 );
 
                 return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
@@ -396,7 +396,7 @@ class DiffTest extends CommandTestCase
                         'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
                         'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-baz.phar'),
                         '--list-diff' => null,
-                    ]
+                    ],
                 );
 
                 return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
@@ -429,7 +429,7 @@ class DiffTest extends CommandTestCase
                         'pharA' => $pharPath,
                         'pharB' => $pharPath,
                         '--git-diff' => null,
-                    ]
+                    ],
                 );
 
                 return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
@@ -457,7 +457,7 @@ class DiffTest extends CommandTestCase
                         'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
                         'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
                         '--git-diff' => null,
-                    ]
+                    ],
                 );
 
                 return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
@@ -487,7 +487,7 @@ class DiffTest extends CommandTestCase
                         'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
                         'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar-compressed.phar'),
                         '--git-diff' => null,
-                    ]
+                    ],
                 );
 
                 return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
@@ -504,7 +504,7 @@ class DiffTest extends CommandTestCase
                         'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
                         'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-baz.phar'),
                         '--git-diff' => null,
-                    ]
+                    ],
                 );
 
                 return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
@@ -544,7 +544,7 @@ class DiffTest extends CommandTestCase
                         'pharA' => $pharPath,
                         'pharB' => $pharPath,
                         '--gnu-diff' => null,
-                    ]
+                    ],
                 );
 
                 return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
@@ -572,7 +572,7 @@ class DiffTest extends CommandTestCase
                         'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
                         'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
                         '--gnu-diff' => null,
-                    ]
+                    ],
                 );
 
                 return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
@@ -600,7 +600,7 @@ class DiffTest extends CommandTestCase
                         'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
                         'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar-compressed.phar'),
                         '--gnu-diff' => null,
-                    ]
+                    ],
                 );
 
                 return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
@@ -617,7 +617,7 @@ class DiffTest extends CommandTestCase
                         'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
                         'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-baz.phar'),
                         '--gnu-diff' => null,
-                    ]
+                    ],
                 );
 
                 return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));

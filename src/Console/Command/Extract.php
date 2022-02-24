@@ -43,17 +43,17 @@ final class Extract extends BaseCommand
     {
         $this->setName('extract');
         $this->setDescription(
-            '🚚  Extracts a given PHAR into a directory'
+            '🚚  Extracts a given PHAR into a directory',
         );
         $this->addArgument(
             self::PHAR_ARG,
             InputArgument::REQUIRED,
-            'The PHAR file.'
+            'The PHAR file.',
         );
         $this->addArgument(
             self::OUTPUT_ARG,
             InputArgument::REQUIRED,
-            'The output directory'
+            'The output directory',
         );
     }
 
@@ -67,8 +67,8 @@ final class Extract extends BaseCommand
             $io->error(
                 sprintf(
                     'The file "%s" could not be found.',
-                    $input->getArgument(self::PHAR_ARG)
-                )
+                    $input->getArgument(self::PHAR_ARG),
+                ),
             );
 
             return 1;
@@ -83,7 +83,7 @@ final class Extract extends BaseCommand
                 throw new ConsoleRuntimeException(
                     'The given file is not a valid PHAR',
                     0,
-                    $throwable
+                    $throwable,
                 );
             }
 
@@ -104,7 +104,7 @@ final class Extract extends BaseCommand
             foreach (new RecursiveIteratorIterator($box->getPhar()) as $file) {
                 dump_file(
                     $outputDir.'/'.substr($file->getPathname(), $rootLength),
-                    (string) $file->getContent()
+                    (string) $file->getContent(),
                 );
             }
         } catch (RuntimeException $exception) {

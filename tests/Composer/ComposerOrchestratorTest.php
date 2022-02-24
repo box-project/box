@@ -41,7 +41,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
     public function test_it_can_dump_the_autoloader_with_an_empty_composer_json(
         SymbolsRegistry $symbolsRegistry,
         string $prefix,
-        string $expectedAutoloadContents
+        string $expectedAutoloadContents,
     ): void {
         dump_file('composer.json', '{}');
 
@@ -66,7 +66,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
         $actualAutoloadContents = preg_replace(
             '/ComposerAutoloaderInit[a-z\d]{32}/',
             'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
-            file_get_contents($this->tmp.'/vendor/autoload.php')
+            file_get_contents($this->tmp.'/vendor/autoload.php'),
         );
         $actualAutoloadContents = DisplayNormalizer::removeTrailingSpaces($actualAutoloadContents);
 
@@ -89,8 +89,8 @@ class ComposerOrchestratorTest extends FileSystemTestCase
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
                 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
-                file_get_contents($this->tmp.'/vendor/composer/autoload_psr4.php')
-            )
+                file_get_contents($this->tmp.'/vendor/composer/autoload_psr4.php'),
+            ),
         );
     }
 
@@ -99,7 +99,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
      */
     public function test_it_cannot_dump_the_autoloader_with_an_invalid_composer_json(
         SymbolsRegistry $symbolsRegistry,
-        string $prefix
+        string $prefix,
     ): void {
         mirror(self::FIXTURES.'/dir000', $this->tmp);
 
@@ -112,14 +112,14 @@ class ComposerOrchestratorTest extends FileSystemTestCase
         } catch (RuntimeException $exception) {
             $this->assertSame(
                 'Could not dump the autoloader.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
             $this->assertNotNull($exception->getPrevious());
 
             $this->assertStringContainsString(
                 '"./composer.json" does not contain valid JSON',
-                $exception->getPrevious()->getMessage()
+                $exception->getPrevious()->getMessage(),
             );
         }
     }
@@ -161,8 +161,8 @@ class ComposerOrchestratorTest extends FileSystemTestCase
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
                 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
-                file_get_contents($this->tmp.'/vendor/autoload.php')
-            )
+                file_get_contents($this->tmp.'/vendor/autoload.php'),
+            ),
         );
 
         $this->assertSame(
@@ -182,8 +182,8 @@ class ComposerOrchestratorTest extends FileSystemTestCase
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
                 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
-                file_get_contents($this->tmp.'/vendor/composer/autoload_psr4.php')
-            )
+                file_get_contents($this->tmp.'/vendor/composer/autoload_psr4.php'),
+            ),
         );
     }
 
@@ -192,7 +192,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
      */
     public function test_it_cannot_dump_the_autoloader_if_the_composer_json_file_is_missing(
         SymbolsRegistry $symbolsRegistry,
-        string $prefix
+        string $prefix,
     ): void {
         try {
             ComposerOrchestrator::dumpAutoload($symbolsRegistry, $prefix, false);
@@ -201,14 +201,14 @@ class ComposerOrchestratorTest extends FileSystemTestCase
         } catch (RuntimeException $exception) {
             $this->assertSame(
                 'Could not dump the autoloader.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
             $this->assertNotNull($exception->getPrevious());
 
             $this->assertStringContainsString(
                 'Composer could not find a composer.json file in',
-                $exception->getPrevious()->getMessage()
+                $exception->getPrevious()->getMessage(),
             );
         }
     }
@@ -219,7 +219,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
     public function test_it_can_dump_the_autoloader_with_a_composer_json_lock_and_installed_with_a_dependency(
         SymbolsRegistry $SymbolsRegistry,
         string $prefix,
-        string $expectedAutoloadContents
+        string $expectedAutoloadContents,
     ): void {
         mirror(self::FIXTURES.'/dir001', $this->tmp);
 
@@ -263,8 +263,8 @@ class ComposerOrchestratorTest extends FileSystemTestCase
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
                 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
-                file_get_contents($this->tmp.'/vendor/autoload.php')
-            )
+                file_get_contents($this->tmp.'/vendor/autoload.php'),
+            ),
         );
 
         $this->assertSame(
@@ -285,8 +285,8 @@ class ComposerOrchestratorTest extends FileSystemTestCase
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
                 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
-                file_get_contents($this->tmp.'/vendor/composer/autoload_psr4.php')
-            )
+                file_get_contents($this->tmp.'/vendor/composer/autoload_psr4.php'),
+            ),
         );
     }
 
@@ -310,7 +310,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
         ComposerOrchestrator::dumpAutoload(
             new SymbolsRegistry(),
             '',
-            true
+            true,
         );
 
         // The fact that there is a dependency in the `composer.json` does not change anything to Composer
@@ -349,8 +349,8 @@ class ComposerOrchestratorTest extends FileSystemTestCase
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
                 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
-                file_get_contents($this->tmp.'/vendor/autoload.php')
-            )
+                file_get_contents($this->tmp.'/vendor/autoload.php'),
+            ),
         );
 
         $this->assertSame(
@@ -370,8 +370,8 @@ class ComposerOrchestratorTest extends FileSystemTestCase
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
                 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
-                file_get_contents($this->tmp.'/vendor/composer/autoload_psr4.php')
-            )
+                file_get_contents($this->tmp.'/vendor/composer/autoload_psr4.php'),
+            ),
         );
     }
 
@@ -381,7 +381,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
     public function test_it_can_dump_the_autoloader_with_a_composer_json_and_lock_with_a_dependency(
         SymbolsRegistry $symbolsRegistry,
         string $prefix,
-        string $expectedAutoloadContents
+        string $expectedAutoloadContents,
     ): void {
         mirror(self::FIXTURES.'/dir002', $this->tmp);
 
@@ -420,8 +420,8 @@ class ComposerOrchestratorTest extends FileSystemTestCase
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
                 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
-                file_get_contents($this->tmp.'/vendor/autoload.php')
-            )
+                file_get_contents($this->tmp.'/vendor/autoload.php'),
+            ),
         );
 
         $this->assertSame(
@@ -441,8 +441,8 @@ class ComposerOrchestratorTest extends FileSystemTestCase
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
                 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
-                file_get_contents($this->tmp.'/vendor/composer/autoload_psr4.php')
-            )
+                file_get_contents($this->tmp.'/vendor/composer/autoload_psr4.php'),
+            ),
         );
     }
 
@@ -462,7 +462,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
 
                 return $composerAutoloaderName::getLoader();
 
-                PHP
+                PHP,
         ];
 
         yield 'Registry with recorded class' => [
@@ -489,7 +489,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
 
                 return \$loader;
 
-                PHP
+                PHP,
         ];
 
         yield 'Registry with a recorded global function' => [
@@ -519,7 +519,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
 
                 return \$loader;
 
-                PHP
+                PHP,
         ];
 
         yield 'Registry with recorded namespaced function' => [
@@ -567,7 +567,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
                     return \$loader;
                 }
 
-                PHP
+                PHP,
         ];
 
         yield 'Registry with recorded classes and functions' => [
@@ -629,7 +629,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
                     return \$loader;
                 }
 
-                PHP
+                PHP,
         ];
 
         yield 'Registry with recorded symbols and no prefix (it is ignored)' => [
@@ -650,7 +650,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
 
                 return ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05::getLoader();
 
-                PHP
+                PHP,
         ];
     }
 

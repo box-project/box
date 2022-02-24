@@ -33,7 +33,7 @@ class ComposerFilesTest extends TestCase
         ComposerFile $expectedComposerJson,
         ComposerFile $expectedComposerLock,
         ComposerFile $expectedInstalledJson,
-        array $expectedPaths
+        array $expectedPaths,
     ): void {
         /** @var ComposerFiles $actual */
         $actual = $create();

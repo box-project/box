@@ -73,8 +73,8 @@ abstract class FileSystemTestCase extends TestCase
         $files = array_values(
             array_map(
                 static fn (string $file): string => str_replace($root.DIRECTORY_SEPARATOR, '', $file),
-                $files
-            )
+                $files,
+            ),
         );
 
         natsort($files);

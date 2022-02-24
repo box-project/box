@@ -42,7 +42,7 @@ final class SimpleScoper implements Scoper
 
     public function __construct(
         PhpScoperConfiguration $scoperConfig,
-        string ...$excludedFilePaths
+        string ...$excludedFilePaths,
     ) {
         $this->scoperConfig = new PhpScoperConfiguration(
             $scoperConfig->getPath(),

@@ -109,7 +109,7 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
                         "classmap": ["CLASSMAP_DEV_DIR"]
                     }
                 }
-                JSON
+                JSON,
         );
 
         // Relative to the current working directory for readability
@@ -169,7 +169,7 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
                         }
                     }
                 }
-                JSON
+                JSON,
         );
 
         // Relative to the current working directory for readability
@@ -214,7 +214,7 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
                         }
                     }
                 }
-                JSON
+                JSON,
         );
 
         $expected = [
@@ -253,7 +253,7 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
                         "files": ["file0", "file1"]
                     }
                 }
-                JSON
+                JSON,
         );
 
         try {
@@ -263,7 +263,7 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The file "'.$this->tmp.'/file1" does not exist.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
 
@@ -275,7 +275,7 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
                         "classmap": ["CLASSMAP_DIR"]
                     }
                 }
-                JSON
+                JSON,
         );
 
         try {
@@ -285,7 +285,7 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'File or directory "'.$this->tmp.'/CLASSMAP_DIR" was expected to exist.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -303,7 +303,7 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
                         "files": ["file0", "file1"]
                     }
                 }
-                JSON
+                JSON,
         );
 
         try {
@@ -313,7 +313,7 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Cannot add the link "'.$this->tmp.'/file1": links are not supported.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
 
@@ -325,7 +325,7 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
                         "classmap": ["CLASSMAP_DIR"]
                     }
                 }
-                JSON
+                JSON,
         );
         mkdir('original_dir');
         symlink('original_dir', 'CLASSMAP_DIR');
@@ -337,7 +337,7 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Cannot add the link "'.$this->tmp.'/CLASSMAP_DIR": links are not supported.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -426,7 +426,7 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
                         "classmap": ["CLASSMAP_DEV_DIR"]
                     }
                 }
-                JSON
+                JSON,
         );
 
         $this->setConfig([
@@ -667,7 +667,7 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
                         "classmap": ["./"]
                     }
                 }
-                JSON
+                JSON,
         );
 
         // Relative to the current working directory for readability
@@ -764,7 +764,7 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
                         "classmap": ["./"]
                     }
                 }
-                JSON
+                JSON,
         );
 
         // Relative to the current working directory for readability

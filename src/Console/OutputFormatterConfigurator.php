@@ -33,11 +33,11 @@ final class OutputFormatterConfigurator
 
         $outputFormatter->setStyle(
             'recommendation',
-            new OutputFormatterStyle('black', 'yellow')
+            new OutputFormatterStyle('black', 'yellow'),
         );
         $outputFormatter->setStyle(
             'warning',
-            new OutputFormatterStyle('white', 'red')
+            new OutputFormatterStyle('white', 'red'),
         );
     }
 }

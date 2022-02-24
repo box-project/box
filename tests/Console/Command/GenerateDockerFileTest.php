@@ -65,8 +65,8 @@ class GenerateDockerFileTest extends CommandTestCase
         $this->assertSame(
             $expected,
             DisplayNormalizer::removeTrailingSpaces(
-                $this->commandTester->getDisplay(true)
-            )
+                $this->commandTester->getDisplay(true),
+            ),
         );
         $this->assertSame(0, $this->commandTester->getStatusCode());
 
@@ -93,8 +93,8 @@ class GenerateDockerFileTest extends CommandTestCase
         $this->assertSame(
             $expected,
             DisplayNormalizer::removeTrailingSpaces(
-                $this->commandTester->getDisplay(true)
-            )
+                $this->commandTester->getDisplay(true),
+            ),
         );
         $this->assertSame(1, $this->commandTester->getStatusCode());
 
@@ -121,8 +121,8 @@ class GenerateDockerFileTest extends CommandTestCase
         $this->assertSame(
             $expected,
             DisplayNormalizer::removeTrailingSpaces(
-                $this->commandTester->getDisplay(true)
-            )
+                $this->commandTester->getDisplay(true),
+            ),
         );
         $this->assertSame(1, $this->commandTester->getStatusCode());
     }

@@ -55,7 +55,7 @@ class FunctionsTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Unknown compression algorithm code "'.$algorithm.'"',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }

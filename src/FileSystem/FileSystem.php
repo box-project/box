@@ -472,11 +472,11 @@ final class FileSystem extends SymfonyFilesystem
                 sprintf(
                     'Failed to read file "%s": %s.',
                     $file,
-                    error_get_last()['message']
+                    error_get_last()['message'],
                 ),
                 0,
                 null,
-                $file
+                $file,
             );
         }
 

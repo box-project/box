@@ -42,7 +42,7 @@ final class ConfigurationLoader
         ?string $configPath,
         ConfigurationHelper $helper,
         IO $io,
-        bool $allowNoFile
+        bool $allowNoFile,
     ): Configuration {
         $configPath = self::getConfigPath($configPath, $helper, $io, $allowNoFile);
 
@@ -59,7 +59,7 @@ final class ConfigurationLoader
         ?string $configPath,
         ConfigurationHelper $helper,
         IO $io,
-        bool $allowNoFile
+        bool $allowNoFile,
     ): ?string {
         try {
             $configPath ??= $helper->findDefaultPath();
@@ -76,8 +76,8 @@ final class ConfigurationLoader
         $io->comment(
             sprintf(
                 'Loading the configuration file "<comment>%s</comment>".',
-                $configPath
-            )
+                $configPath,
+            ),
         );
 
         return $configPath;

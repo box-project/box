@@ -76,7 +76,7 @@ class NullScoperTest extends TestCase
 
         $this->assertEquals(
             $scoper,
-            unserialize(serialize($scoper))
+            unserialize(serialize($scoper)),
         );
     }
 }

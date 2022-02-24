@@ -36,7 +36,7 @@ abstract class ConfigurableBaseCommand extends BaseCommand
             self::CONFIG_PARAM,
             'c',
             InputOption::VALUE_REQUIRED,
-            'The alternative configuration file path.'
+            'The alternative configuration file path.',
         );
     }
 
@@ -53,7 +53,7 @@ abstract class ConfigurableBaseCommand extends BaseCommand
             $io->getInput()->getOption(self::CONFIG_PARAM),
             $this->getConfigurationHelper(),
             $io,
-            $allowNoFile
+            $allowNoFile,
         );
     }
 

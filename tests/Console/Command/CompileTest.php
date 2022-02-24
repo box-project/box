@@ -131,14 +131,14 @@ class CompileTest extends CommandTestCase
                     'output' => 'test.phar',
                     'shebang' => $shebang,
                 ],
-                JSON_THROW_ON_ERROR
-            )
+                JSON_THROW_ON_ERROR,
+            ),
         );
 
         $this->commandTester->setInputs(['test']);    // Set input for the passphrase
         $this->commandTester->execute(
             ['command' => 'compile'],
-            ['interactive' => true]
+            ['interactive' => true],
         );
 
         $expected = <<<OUTPUT
@@ -206,7 +206,7 @@ class CompileTest extends CommandTestCase
         $this->assertSame(
             'Hello, world!',
             exec('php test.phar'),
-            'Expected PHAR to be executable'
+            'Expected PHAR to be executable',
         );
 
         $phar = new Phar('test.phar');
@@ -238,7 +238,7 @@ class CompileTest extends CommandTestCase
         $this->assertSame(
             ['rand' => $rand],
             $phar->getMetadata(),
-            'Expected PHAR metadata to be set'
+            'Expected PHAR metadata to be set',
         );
 
         $expectedFiles = [
@@ -338,8 +338,8 @@ class CompileTest extends CommandTestCase
                     'output' => 'test.phar',
                     'shebang' => $shebang,
                 ],
-                JSON_THROW_ON_ERROR
-            )
+                JSON_THROW_ON_ERROR,
+            ),
         );
 
         chdir($this->cwd);
@@ -350,13 +350,13 @@ class CompileTest extends CommandTestCase
                 'command' => 'compile',
                 '--working-dir' => $this->tmp,
             ],
-            ['interactive' => true]
+            ['interactive' => true],
         );
 
         $this->assertSame(
             'Hello, world!',
             exec('php test.phar'),
-            'Expected PHAR to be executable'
+            'Expected PHAR to be executable',
         );
     }
 
@@ -368,7 +368,7 @@ class CompileTest extends CommandTestCase
 
         $this->commandTester->execute(
             ['command' => 'compile'],
-            ['interactive' => true]
+            ['interactive' => true],
         );
 
         $version = get_box_version();
@@ -428,7 +428,7 @@ class CompileTest extends CommandTestCase
         $this->assertSame(
             'Hello, world!',
             exec('php index.phar'),
-            'Expected PHAR to be executable'
+            'Expected PHAR to be executable',
         );
 
         $phar = new Phar('index.phar');
@@ -439,7 +439,7 @@ class CompileTest extends CommandTestCase
         $actualStub = preg_replace(
             '/box-auto-generated-alias-[\da-zA-Z]{12}\.phar/',
             'box-auto-generated-alias-__uniqid__.phar',
-            $this->normalizeDisplay($phar->getStub())
+            $this->normalizeDisplay($phar->getStub()),
         );
 
         $expectedStub = <<<PHP
@@ -466,7 +466,7 @@ class CompileTest extends CommandTestCase
 
         $this->assertNull(
             $phar->getMetadata(),
-            'Expected PHAR metadata to be set'
+            'Expected PHAR metadata to be set',
         );
 
         $expectedFiles = [
@@ -545,13 +545,13 @@ class CompileTest extends CommandTestCase
 
         $this->commandTester->execute(
             ['command' => 'compile'],
-            ['interactive' => true]
+            ['interactive' => true],
         );
 
         $this->assertSame(
             'Hello, world!',
             exec('php index.phar'),
-            'Expected PHAR to be executable'
+            'Expected PHAR to be executable',
         );
     }
 
@@ -577,13 +577,13 @@ class CompileTest extends CommandTestCase
                     ],
                     'metadata' => ['rand' => $rand = random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
-                ]
-            )
+                ],
+            ),
         );
 
         $this->commandTester->execute(
             ['command' => 'compile'],
-            ['interactive' => true]
+            ['interactive' => true],
         );
 
         $version = get_box_version();
@@ -650,13 +650,13 @@ class CompileTest extends CommandTestCase
         $this->assertSame(
             'Hello, world!',
             exec('php test.phar'),
-            'Expected PHAR to be executable'
+            'Expected PHAR to be executable',
         );
 
         $this->assertSame(
             'Hello, world!',
             exec('cp test.phar test; php test'),
-            'Expected PHAR can be renamed'
+            'Expected PHAR can be renamed',
         );
 
         $phar = new Phar('test.phar');
@@ -686,7 +686,7 @@ class CompileTest extends CommandTestCase
         $this->assertSame(
             ['rand' => $rand],
             $phar->getMetadata(),
-            'Expected PHAR metadata to be set'
+            'Expected PHAR metadata to be set',
         );
 
         $expectedFiles = [
@@ -736,25 +736,25 @@ class CompileTest extends CommandTestCase
                     ],
                     'metadata' => ['rand' => random_int(0, mt_getrandmax())],
                     'output' => 'test.phar',
-                ]
-            )
+                ],
+            ),
         );
 
         $this->commandTester->execute(
             ['command' => 'compile'],
-            ['interactive' => true]
+            ['interactive' => true],
         );
 
         $this->assertSame(
             'Hello, world!',
             exec('php test.phar'),
-            'Expected PHAR to be executable'
+            'Expected PHAR to be executable',
         );
 
         $this->assertSame(
             'Hello, world!',
             exec('cp test.phar test; php test'),
-            'Expected PHAR can be renamed'
+            'Expected PHAR can be renamed',
         );
 
         $phar = new Phar('test.phar');
@@ -763,7 +763,7 @@ class CompileTest extends CommandTestCase
         $actualStub = preg_replace(
             '/box-auto-generated-alias-[\da-zA-Z]{12}\.phar/',
             'box-auto-generated-alias-__uniqid__.phar',
-            $this->normalizeDisplay($phar->getStub())
+            $this->normalizeDisplay($phar->getStub()),
         );
 
         $version = get_box_version();
@@ -821,8 +821,8 @@ class CompileTest extends CommandTestCase
                     'output' => 'test.phar',
                     'shebang' => $shebang,
                 ],
-                JSON_THROW_ON_ERROR
-            )
+                JSON_THROW_ON_ERROR,
+            ),
         );
 
         $this->commandTester->setInputs(['test']);    // Set input for the passphrase
@@ -831,7 +831,7 @@ class CompileTest extends CommandTestCase
             [
                 'interactive' => true,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            ]
+            ],
         );
 
         $expected = <<<OUTPUT
@@ -901,7 +901,7 @@ class CompileTest extends CommandTestCase
         $actual = preg_replace(
             '/(\/.*?composer)/',
             '/usr/local/bin/composer',
-            $actual
+            $actual,
         );
 
         $this->assertSame($expected, $actual);
@@ -942,8 +942,8 @@ class CompileTest extends CommandTestCase
                     'output' => 'test.phar',
                     'shebang' => $shebang,
                 ],
-                JSON_THROW_ON_ERROR
-            )
+                JSON_THROW_ON_ERROR,
+            ),
         );
 
         $this->commandTester->setInputs(['test']);    // Set input for the passphrase
@@ -952,7 +952,7 @@ class CompileTest extends CommandTestCase
             [
                 'interactive' => true,
                 'verbosity' => OutputInterface::VERBOSITY_VERY_VERBOSE,
-            ]
+            ],
         );
 
         $expected = <<<OUTPUT
@@ -1021,7 +1021,7 @@ class CompileTest extends CommandTestCase
         $expected = str_replace(
             '__PHP_EXECUTABLE__',
             (new PhpExecutableFinder())->find(),
-            $expected
+            $expected,
         );
 
         $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
@@ -1029,7 +1029,7 @@ class CompileTest extends CommandTestCase
         $actual = preg_replace(
             '/(\/.*?composer)/',
             '/usr/local/bin/composer',
-            $actual
+            $actual,
         );
 
         $this->assertSame($expected, $actual);
@@ -1046,7 +1046,7 @@ class CompileTest extends CommandTestCase
 
                 echo 'Yo';
 
-                PHP
+                PHP,
         );
         dump_file(
             'box.json',
@@ -1055,7 +1055,7 @@ class CompileTest extends CommandTestCase
                     "alias": "index.phar",
                     "banner": ""
                 }
-                JSON
+                JSON,
         );
 
         $this->assertDirectoryDoesNotExist('.box_dump');
@@ -1068,13 +1068,13 @@ class CompileTest extends CommandTestCase
             [
                 'interactive' => true,
                 'verbosity' => OutputInterface::VERBOSITY_DEBUG,
-            ]
+            ],
         );
 
         if (extension_loaded('xdebug')) {
             $xdebugVersion = sprintf(
                 '(%s)',
-                phpversion('xdebug')
+                phpversion('xdebug'),
             );
 
             $xdebugLog = "[debug] The xdebug extension is loaded $xdebugVersion
@@ -1085,7 +1085,7 @@ class CompileTest extends CommandTestCase
 
         $memoryLog = sprintf(
             '[debug] Current memory limit: "%s"',
-            format_size(memory_to_bytes(trim(ini_get('memory_limit'))), 0)
+            format_size(memory_to_bytes(trim(ini_get('memory_limit'))), 0),
         );
 
         $expected = <<<OUTPUT
@@ -1151,8 +1151,8 @@ class CompileTest extends CommandTestCase
         $actualFiles = $this->normalizePaths(
             iterator_to_array(
                 Finder::create()->files()->in('.box_dump')->ignoreDotFiles(false),
-                true
-            )
+                true,
+            ),
         );
 
         $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
@@ -1226,34 +1226,34 @@ class CompileTest extends CommandTestCase
         $actualDumpedConfig = str_replace(
             $this->tmp,
             '/path/to',
-            file_contents('.box_dump/.box_configuration')
+            file_contents('.box_dump/.box_configuration'),
         );
 
         // Replace objects IDs
         $actualDumpedConfig = preg_replace(
             '/ \{#\d{3,}/',
             ' {#140',
-            $actualDumpedConfig
+            $actualDumpedConfig,
         );
 
         // Replace the expected PHP version
         $actualDumpedConfig = str_replace(
             sprintf(
                 'PHP Version: %s',
-                PHP_VERSION
+                PHP_VERSION,
             ),
             'PHP Version: 10.0.0',
-            $actualDumpedConfig
+            $actualDumpedConfig,
         );
 
         // Replace the expected PHP extensions
         $actualDumpedConfig = str_replace(
             sprintf(
                 'PHP extensions: %s',
-                implode(',', get_loaded_extensions())
+                implode(',', get_loaded_extensions()),
             ),
             'PHP extensions: Core,date',
-            $actualDumpedConfig
+            $actualDumpedConfig,
         );
 
         // Replace the expected OS version
@@ -1261,37 +1261,37 @@ class CompileTest extends CommandTestCase
             sprintf(
                 'OS: %s / %s',
                 PHP_OS,
-                php_uname('r')
+                php_uname('r'),
             ),
             'OS: Darwin / 17.7.0',
-            $actualDumpedConfig
+            $actualDumpedConfig,
         );
 
         // Replace the expected command
         $actualDumpedConfig = str_replace(
             sprintf(
                 'Command: %s',
-                implode(' ', $GLOBALS['argv'])
+                implode(' ', $GLOBALS['argv']),
             ),
             'Command: bin/phpunit',
-            $actualDumpedConfig
+            $actualDumpedConfig,
         );
 
         // Replace the expected Box version
         $actualDumpedConfig = str_replace(
             sprintf(
                 'Box: %s',
-                get_box_version()
+                get_box_version(),
             ),
             'Box: 3.x-dev@27df576',
-            $actualDumpedConfig
+            $actualDumpedConfig,
         );
 
         // Replace the expected time
         $actualDumpedConfig = preg_replace(
             '/Time: \d{4,}-\d{2,}-\d{2,}T\d{2,}:\d{2,}:\d{2,}\+\d{2,}:\d{2,}/',
             'Time: 2018-05-24T20:59:15+00:00',
-            $actualDumpedConfig
+            $actualDumpedConfig,
         );
 
         $this->assertSame($expectedDumpedConfig, $actualDumpedConfig);
@@ -1299,7 +1299,7 @@ class CompileTest extends CommandTestCase
         // Checks one of the dumped file from the PHAR to ensure the encoding of the extracted file is correct
         $this->assertSame(
             file_get_contents('.box_dump/index.php'),
-            $indexContents
+            $indexContents,
         );
     }
 
@@ -1332,8 +1332,8 @@ class CompileTest extends CommandTestCase
                     'output' => 'test.phar',
                     'shebang' => $shebang,
                 ],
-                JSON_THROW_ON_ERROR
-            )
+                JSON_THROW_ON_ERROR,
+            ),
         );
 
         $this->commandTester->setInputs(['test']);
@@ -1342,7 +1342,7 @@ class CompileTest extends CommandTestCase
             [
                 'interactive' => true,
                 'verbosity' => OutputInterface::VERBOSITY_QUIET,
-            ]
+            ],
         );
 
         $expected = '';
@@ -1354,7 +1354,7 @@ class CompileTest extends CommandTestCase
         $this->assertSame(
             'Hello, world!',
             exec('php test.phar'),
-            'Expected PHAR to be executable'
+            'Expected PHAR to be executable',
         );
 
         // Check PHAR content
@@ -1398,20 +1398,20 @@ class CompileTest extends CommandTestCase
                     'shebang' => $shebang,
                     'stub' => false,
                 ],
-                JSON_THROW_ON_ERROR
-            )
+                JSON_THROW_ON_ERROR,
+            ),
         );
 
         $this->commandTester->setInputs(['test']);    // Set input for the passphrase
         $this->commandTester->execute(
             ['command' => 'compile'],
-            ['interactive' => true]
+            ['interactive' => true],
         );
 
         $this->assertSame(
             'Hello, world!',
             exec('php test.phar'),
-            'Expected PHAR to be executable'
+            'Expected PHAR to be executable',
         );
     }
 
@@ -1438,7 +1438,7 @@ class CompileTest extends CommandTestCase
 
                 __HALT_COMPILER(); ?>
 
-                PHP
+                PHP,
         );
 
         dump_file(
@@ -1465,20 +1465,20 @@ class CompileTest extends CommandTestCase
                     'shebang' => $shebang,
                     'stub' => 'custom_stub',
                 ],
-                JSON_THROW_ON_ERROR
-            )
+                JSON_THROW_ON_ERROR,
+            ),
         );
 
         $this->commandTester->setInputs(['test']);    // Set input for the passphrase
         $this->commandTester->execute(
             ['command' => 'compile'],
-            ['interactive' => true]
+            ['interactive' => true],
         );
 
         $this->assertSame(
             'Hello, world!',
             exec('php test.phar'),
-            'Expected PHAR to be executable'
+            'Expected PHAR to be executable',
         );
 
         $phar = new Phar('test.phar');
@@ -1505,19 +1505,19 @@ class CompileTest extends CommandTestCase
                         ['a/deep/test/directory' => 'sub'],
                     ],
                     'output' => 'test.phar',
-                ]
-            )
+                ],
+            ),
         );
 
         $this->commandTester->execute(
             ['command' => 'compile'],
-            ['interactive' => true]
+            ['interactive' => true],
         );
 
         $this->assertSame(
             'Hello, world!',
             exec('php test.phar'),
-            'Expected PHAR to be executable'
+            'Expected PHAR to be executable',
         );
     }
 
@@ -1532,8 +1532,8 @@ class CompileTest extends CommandTestCase
             json_encode(
                 [
                     'files' => ['unreadable-file.php'],
-                ]
-            )
+                ],
+            ),
         );
 
         try {
@@ -1542,14 +1542,14 @@ class CompileTest extends CommandTestCase
                 [
                     'interactive' => false,
                     'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-                ]
+                ],
             );
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertMatchesRegularExpression(
                 '/^The path ".+?" is not readable\.$/',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1563,7 +1563,7 @@ class CompileTest extends CommandTestCase
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            ]
+            ],
         );
 
         $version = get_box_version();
@@ -1625,7 +1625,7 @@ class CompileTest extends CommandTestCase
         $this->assertSame(
             'Hello, world!',
             exec('php test.phar'),
-            'Expected PHAR to be executable'
+            'Expected PHAR to be executable',
         );
     }
 
@@ -1639,7 +1639,7 @@ class CompileTest extends CommandTestCase
 
         $this->commandTester->execute(
             ['command' => 'compile'],
-            ['interactive' => true]
+            ['interactive' => true],
         );
 
         $output = $this->normalizeDisplay($this->commandTester->getDisplay(true));
@@ -1647,7 +1647,7 @@ class CompileTest extends CommandTestCase
         $this->assertMatchesRegularExpression(
             '/\? Dumping the Composer autoloader/',
             $output,
-            'Expected the autoloader to be dumped'
+            'Expected the autoloader to be dumped',
         );
 
         $composerFiles = [
@@ -1680,13 +1680,13 @@ class CompileTest extends CommandTestCase
             json_encode(
                 [
                     'dump-autoload' => false,
-                ]
-            )
+                ],
+            ),
         );
 
         $this->commandTester->execute(
             ['command' => 'compile'],
-            ['interactive' => true]
+            ['interactive' => true],
         );
 
         $output = $this->normalizeDisplay($this->commandTester->getDisplay(true));
@@ -1694,7 +1694,7 @@ class CompileTest extends CommandTestCase
         $this->assertMatchesRegularExpression(
             '/\? Skipping dumping the Composer autoloader/',
             $output,
-            'Did not expect the autoloader to be dumped'
+            'Did not expect the autoloader to be dumped',
         );
 
         $composerFiles = [
@@ -1724,7 +1724,7 @@ class CompileTest extends CommandTestCase
 
         $this->commandTester->execute(
             ['command' => 'compile'],
-            ['interactive' => true]
+            ['interactive' => true],
         );
 
         $output = $this->normalizeDisplay($this->commandTester->getDisplay(true));
@@ -1732,7 +1732,7 @@ class CompileTest extends CommandTestCase
         $this->assertMatchesRegularExpression(
             '/\? Removing the Composer dump artefacts/',
             $output,
-            'Expected the composer files to be removed'
+            'Expected the composer files to be removed',
         );
 
         $composerFiles = [
@@ -1770,14 +1770,14 @@ class CompileTest extends CommandTestCase
 
         dump_file(
             'box.json',
-            json_encode(['exclude-composer-files' => false])
+            json_encode(['exclude-composer-files' => false]),
         );
 
         $this->assertFileDoesNotExist($this->tmp.'/vendor/autoload.php');
 
         $this->commandTester->execute(
             ['command' => 'compile'],
-            ['interactive' => true]
+            ['interactive' => true],
         );
 
         $output = $this->normalizeDisplay($this->commandTester->getDisplay(true));
@@ -1785,7 +1785,7 @@ class CompileTest extends CommandTestCase
         $this->assertMatchesRegularExpression(
             '/\? Keep the Composer dump artefacts/',
             $output,
-            'Expected the composer files to be kept'
+            'Expected the composer files to be kept',
         );
 
         $composerFiles = [
@@ -1828,7 +1828,7 @@ class CompileTest extends CommandTestCase
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERY_VERBOSE,
-            ]
+            ],
         );
 
         $expected = <<<OUTPUT
@@ -1882,7 +1882,7 @@ class CompileTest extends CommandTestCase
         $this->assertSame(
             'Hello!',
             exec('php test.phar'),
-            'Expected PHAR to be executable'
+            'Expected PHAR to be executable',
         );
     }
 
@@ -1895,7 +1895,7 @@ class CompileTest extends CommandTestCase
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            ]
+            ],
         );
 
         $expected = <<<OUTPUT
@@ -1947,7 +1947,7 @@ class CompileTest extends CommandTestCase
         $this->assertSame(
             'Hello!',
             exec('php test.phar'),
-            'Expected PHAR to be executable'
+            'Expected PHAR to be executable',
         );
     }
 
@@ -1960,7 +1960,7 @@ class CompileTest extends CommandTestCase
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            ]
+            ],
         );
 
         $version = get_box_version();
@@ -2029,7 +2029,7 @@ class CompileTest extends CommandTestCase
                     "stub": "stub.php",
                     "main": false
                 }
-                JSON
+                JSON,
         );
 
         $this->commandTester->execute(
@@ -2037,7 +2037,7 @@ class CompileTest extends CommandTestCase
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            ]
+            ],
         );
 
         $expected = <<<OUTPUT
@@ -2089,7 +2089,7 @@ class CompileTest extends CommandTestCase
         $this->assertSame(
             'Hello!',
             exec('php test.phar'),
-            'Expected PHAR to be executable'
+            'Expected PHAR to be executable',
         );
     }
 
@@ -2104,7 +2104,7 @@ class CompileTest extends CommandTestCase
                     "stub": "stub.php",
                     "main": false
                 }
-                JSON
+                JSON,
         );
 
         $this->commandTester->execute(
@@ -2112,7 +2112,7 @@ class CompileTest extends CommandTestCase
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            ]
+            ],
         );
 
         $expected = <<<OUTPUT
@@ -2164,7 +2164,7 @@ class CompileTest extends CommandTestCase
         $this->assertSame(
             'Hello!',
             exec('php test.phar'),
-            'Expected PHAR to be executable'
+            'Expected PHAR to be executable',
         );
 
         $expectedFiles = [
@@ -2185,7 +2185,7 @@ class CompileTest extends CommandTestCase
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            ]
+            ],
         );
 
         $version = get_box_version();
@@ -2250,7 +2250,7 @@ class CompileTest extends CommandTestCase
         $this->assertSame(
             'Hello!',
             exec('php test.phar'),
-            'Expected the PHAR to be executable'
+            'Expected the PHAR to be executable',
         );
     }
 
@@ -2263,7 +2263,7 @@ class CompileTest extends CommandTestCase
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            ]
+            ],
         );
 
         $version = get_box_version();
@@ -2322,7 +2322,7 @@ class CompileTest extends CommandTestCase
         $this->assertSame(
             'Hello!',
             exec('php foo/bar/test.phar'),
-            'Expected the PHAR to be executable'
+            'Expected the PHAR to be executable',
         );
     }
 
@@ -2342,13 +2342,13 @@ class CompileTest extends CommandTestCase
                     'stub' => $stub,
                     'blacklist' => ['box.json'],
                 ],
-                JSON_THROW_ON_ERROR
-            )
+                JSON_THROW_ON_ERROR,
+            ),
         );
 
         $this->commandTester->execute(
             ['command' => 'compile'],
-            ['interactive' => true]
+            ['interactive' => true],
         );
 
         $this->assertSame(
@@ -2356,14 +2356,14 @@ class CompileTest extends CommandTestCase
             $this->commandTester->getStatusCode(),
             sprintf(
                 'Expected the command to successfully run. Got: %s',
-                $this->normalizeDisplay($this->commandTester->getDisplay(true))
-            )
+                $this->normalizeDisplay($this->commandTester->getDisplay(true)),
+            ),
         );
 
         $this->assertSame(
             '',
             exec('php index.phar'),
-            'Expected PHAR to be executable'
+            'Expected PHAR to be executable',
         );
 
         $phar = new Phar('index.phar');
@@ -2377,11 +2377,11 @@ class CompileTest extends CommandTestCase
 
             $this->assertDoesNotMatchRegularExpression(
                 '/Phar::webPhar\(.*\);/',
-                $actualStub
+                $actualStub,
             );
             $this->assertMatchesRegularExpression(
                 '/Phar::mapPhar\(\'alias-test\.phar\'\);/',
-                $actualStub
+                $actualStub,
             );
         } else {
             $this->assertSame($alias, $phar->getAlias());
@@ -2392,7 +2392,7 @@ class CompileTest extends CommandTestCase
             // be done here. Maybe there is a valid reason I'm not aware of.
             $this->assertDoesNotMatchRegularExpression(
                 '/alias-test\.phar/',
-                $actualStub
+                $actualStub,
             );
         }
 
@@ -2418,7 +2418,7 @@ class CompileTest extends CommandTestCase
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            ]
+            ],
         );
 
         $version = get_box_version();
@@ -2483,7 +2483,7 @@ class CompileTest extends CommandTestCase
         $this->assertSame(
             'Hello!',
             exec('php test.phar'),
-            'Expected the PHAR to be executable'
+            'Expected the PHAR to be executable',
         );
     }
 
@@ -2499,12 +2499,12 @@ class CompileTest extends CommandTestCase
                         file_get_contents('box.json'),
                         true,
                         512,
-                        JSON_THROW_ON_ERROR
+                        JSON_THROW_ON_ERROR,
                     ),
-                    ['output' => 'test']
+                    ['output' => 'test'],
                 ),
-                JSON_THROW_ON_ERROR
-            )
+                JSON_THROW_ON_ERROR,
+            ),
         );
 
         $this->commandTester->execute(
@@ -2512,7 +2512,7 @@ class CompileTest extends CommandTestCase
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            ]
+            ],
         );
 
         $expected = <<<OUTPUT
@@ -2564,7 +2564,7 @@ class CompileTest extends CommandTestCase
         $this->assertSame(
             'Hello!',
             exec('php test'),
-            'Expected PHAR to be executable'
+            'Expected PHAR to be executable',
         );
     }
 
@@ -2577,13 +2577,13 @@ class CompileTest extends CommandTestCase
                 'command' => 'compile',
                 '--no-config' => null,
             ],
-            ['interactive' => true]
+            ['interactive' => true],
         );
 
         $this->assertSame(
             'Index',
             exec('php index.phar'),
-            'Expected PHAR to be executable'
+            'Expected PHAR to be executable',
         );
     }
 
@@ -2597,13 +2597,13 @@ class CompileTest extends CommandTestCase
                 '--config' => 'box.json',
                 '--no-config' => null,
             ],
-            ['interactive' => true]
+            ['interactive' => true],
         );
 
         $this->assertSame(
             'Index',
             exec('php index.phar'),
-            'Expected PHAR to be executable'
+            'Expected PHAR to be executable',
         );
     }
 
@@ -2613,13 +2613,13 @@ class CompileTest extends CommandTestCase
 
         $this->commandTester->execute(
             ['command' => 'compile'],
-            ['interactive' => true]
+            ['interactive' => true],
         );
 
         $this->assertSame(
             'Index',
             exec('php index.phar'),
-            'Expected PHAR to be executable'
+            'Expected PHAR to be executable',
         );
 
         $this->assertSame(
@@ -2627,13 +2627,13 @@ class CompileTest extends CommandTestCase
             preg_match(
                 '/namespace (?<namespace>.*);/',
                 (string) ($indexContents = file_get_contents('phar://index.phar/index.php')),
-                $matches
+                $matches,
             ),
             sprintf(
                 'Expected the content of the PHAR index.php file to match the given regex. The following '
                 .'contents does not: "%s"',
-                $indexContents
-            )
+                $indexContents,
+            ),
         );
 
         $phpScoperNamespace = $matches['namespace'];
@@ -2649,13 +2649,13 @@ class CompileTest extends CommandTestCase
 
         $this->commandTester->execute(
             ['command' => 'compile'],
-            ['interactive' => true]
+            ['interactive' => true],
         );
 
         $this->assertSame(
             'Index',
             exec('php index.phar'),
-            'Expected PHAR to be executable'
+            'Expected PHAR to be executable',
         );
 
         $this->assertSame(
@@ -2663,13 +2663,13 @@ class CompileTest extends CommandTestCase
             preg_match(
                 '/namespace (?<namespace>.*);/',
                 (string) ($indexContents = file_get_contents('phar://index.phar/index.php')),
-                $matches
+                $matches,
             ),
             sprintf(
                 'Expected the content of the PHAR index.php file to match the given regex. The following '
                 .'contents does not: "%s"',
-                $indexContents
-            )
+                $indexContents,
+            ),
         );
 
         $phpScoperNamespace = $matches['namespace'];
@@ -2686,21 +2686,21 @@ class CompileTest extends CommandTestCase
             json_encode(
                 [
                     'algorithm' => 'OPENSSL',
-                ]
-            )
+                ],
+            ),
         );
 
         try {
             $this->commandTester->execute(
                 ['command' => 'compile'],
-                ['interactive' => true]
+                ['interactive' => true],
             );
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected to have a private key for OpenSSL signing but none have been provided.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -2716,13 +2716,13 @@ class CompileTest extends CommandTestCase
             json_encode(
                 [
                     'check-requirements' => true,
-                ]
-            )
+                ],
+            ),
         );
 
         $this->commandTester->execute(
             ['command' => 'compile'],
-            ['interactive' => true]
+            ['interactive' => true],
         );
 
         $version = get_box_version();
@@ -2790,8 +2790,8 @@ class CompileTest extends CommandTestCase
             json_encode(
                 [
                     'compression' => 'GZ',
-                ]
-            )
+                ],
+            ),
         );
 
         $this->commandTester->execute(
@@ -2799,7 +2799,7 @@ class CompileTest extends CommandTestCase
                 'command' => 'compile',
                 '--dev' => null,
             ],
-            ['interactive' => true]
+            ['interactive' => true],
         );
 
         $version = get_box_version();
@@ -2872,7 +2872,7 @@ class CompileTest extends CommandTestCase
                 'command' => 'compile',
                 '--with-docker' => null,
             ],
-            ['interactive' => true]
+            ['interactive' => true],
         );
 
         $version = get_box_version();
@@ -2953,56 +2953,56 @@ class CompileTest extends CommandTestCase
         $display = preg_replace(
             '/Loading the configuration file[\s\n]+.*[\s\n\/]+.*box\.json[comment\<\>\n\s\/]*"\./',
             'Loading the configuration file "/path/to/box.json.dist".',
-            $display
+            $display,
         );
 
         $display = preg_replace(
             '/You can inspect the generated PHAR( | *\n *\/\/ *)with( | *\n *\/\/ *)the( | *\n *\/\/ *)"info"( | *\n *\/\/ *)command/',
             'You can inspect the generated PHAR with the "info" command',
-            $display
+            $display,
         );
 
         $display = preg_replace(
             '/\/\/ PHAR: (\d+ files?) \(\d+\.\d{2}K?B\)/',
             '// PHAR: $1 (100B)',
-            $display
+            $display,
         );
 
         $display = preg_replace(
             '/\/\/ Memory usage: \d+\.\d{2}MB \(peak: \d+\.\d{2}MB\), time: .*?sec/',
             '// Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s',
-            $display
+            $display,
         );
 
         $display = preg_replace(
             '/Box version .+@[a-z\d]{7}/',
             'Box version 3.x-dev@151e40a',
-            $display
+            $display,
         );
 
         $display = str_replace(
             'Xdebug',
             'xdebug',
-            $display
+            $display,
         );
 
         $display = preg_replace(
             '/\[debug\] Increased the maximum number of open file descriptors from \([^\)]+\) to \([^\)]+\)'.PHP_EOL.'/',
             '',
-            $display
+            $display,
         );
 
         $display = str_replace(
             '[debug] Restored the maximum number of open file descriptors'.PHP_EOL,
             '',
-            $display
+            $display,
         );
 
         if (extension_loaded('xdebug')) {
             $display = preg_replace(
                 '/'.PHP_EOL.'You are running composer with xdebug enabled. This has a major impact on runtime performance. See https:\/[^\s]+'.PHP_EOL.'/',
                 '',
-                $display
+                $display,
             );
         }
 
@@ -3032,8 +3032,8 @@ class CompileTest extends CommandTestCase
                     $paths,
                     $this->retrievePharFiles(
                         $phar,
-                        new DirectoryIterator($fileInfo->getPathname())
-                    )
+                        new DirectoryIterator($fileInfo->getPathname()),
+                    ),
                 );
             }
 

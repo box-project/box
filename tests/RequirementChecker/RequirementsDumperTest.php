@@ -33,7 +33,7 @@ class RequirementsDumperTest extends TestCase
         array $decodedComposerJsonContents,
         array $decodedComposerLockContents,
         ?int $compressionAlgorithm,
-        string $expectedRequirement
+        string $expectedRequirement,
     ): void {
         $checkFiles = RequirementsDumper::dump($decodedComposerJsonContents, $decodedComposerLockContents, $compressionAlgorithm);
 
@@ -83,7 +83,7 @@ class RequirementsDumperTest extends TestCase
 
         $this->assertEqualsCanonicalizing(
             $expectedFiles,
-            array_column($checkFiles, 0)
+            array_column($checkFiles, 0),
         );
 
         $this->assertSame(
@@ -103,7 +103,7 @@ class RequirementsDumperTest extends TestCase
 
                 return array (
                 );
-                PHP
+                PHP,
         ];
 
         yield [
@@ -146,7 +146,7 @@ class RequirementsDumperTest extends TestCase
                     'helpMessage' => 'The package "acme/foo" requires the extension "json".',
                   ),
                 );
-                PHP
+                PHP,
         ];
     }
 }

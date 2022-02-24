@@ -26,7 +26,7 @@ final class DisplayNormalizer
 
         $lines = array_map(
             'rtrim',
-            $lines
+            $lines,
         );
 
         return implode("\n", $lines);

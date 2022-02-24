@@ -41,14 +41,14 @@ final class AppRequirementsFactory
             self::retrievePhpVersionRequirements([], $composerJsonDecodedContents, $composerLockDecodedContents),
             $composerJsonDecodedContents,
             $composerLockDecodedContents,
-            $compressionAlgorithm
+            $compressionAlgorithm,
         );
     }
 
     private static function retrievePhpVersionRequirements(
         array $requirements,
         array $composerJsonContents,
-        array $composerLockContents
+        array $composerLockContents,
     ): array {
         if ([] === $composerLockContents && isset($composerJsonContents['require']['php'])
             || isset($composerLockContents['platform']['php'])
@@ -63,7 +63,7 @@ final class AppRequirementsFactory
     private static function retrievePlatformPhpRequirement(
         array $requirements,
         array $composerJsonContents,
-        array $composerLockContents
+        array $composerLockContents,
     ): array {
         $requiredPhpVersion = [] === $composerLockContents
             ? $composerJsonContents['require']['php']
@@ -95,7 +95,7 @@ final class AppRequirementsFactory
         array $requirements,
         array $composerJsonContents,
         array $composerLockContents,
-        ?int $compressionAlgorithm
+        ?int $compressionAlgorithm,
     ): array {
         $extensionRequirements = self::collectExtensionRequirements($composerJsonContents, $composerLockContents, $compressionAlgorithm);
 
@@ -104,22 +104,22 @@ final class AppRequirementsFactory
                 if (self::SELF_PACKAGE === $package) {
                     $message = sprintf(
                         'The application requires the extension "%s". Enable it or install a polyfill.',
-                        $extension
+                        $extension,
                     );
                     $helpMessage = sprintf(
                         'The application requires the extension "%s".',
-                        $extension
+                        $extension,
                     );
                 } else {
                     $message = sprintf(
                         'The package "%s" requires the extension "%s". Enable it or install a polyfill.',
                         $package,
-                        $extension
+                        $extension,
                     );
                     $helpMessage = sprintf(
                         'The package "%s" requires the extension "%s".',
                         $package,
-                        $extension
+                        $extension,
                     );
                 }
 
@@ -144,7 +144,7 @@ final class AppRequirementsFactory
     private static function collectExtensionRequirements(
         array $composerJsonContents,
         array $composerLockContents,
-        ?int $compressionAlgorithm
+        ?int $compressionAlgorithm,
     ): array {
         $requirements = [];
         $polyfills = [];
@@ -260,22 +260,22 @@ final class AppRequirementsFactory
             'message' => null === $packageName
                 ? sprintf(
                     'The application requires the version "%s" or greater.',
-                    $requiredPhpVersion
+                    $requiredPhpVersion,
                 )
                 : sprintf(
                     'The package "%s" requires the version "%s" or greater.',
                     $packageName,
-                    $requiredPhpVersion
+                    $requiredPhpVersion,
                 ),
             'helpMessage' => null === $packageName
                 ? sprintf(
                     'The application requires the version "%s" or greater.',
-                    $requiredPhpVersion
+                    $requiredPhpVersion,
                 )
                 : sprintf(
                     'The package "%s" requires the version "%s" or greater.',
                     $packageName,
-                    $requiredPhpVersion
+                    $requiredPhpVersion,
                 ),
         ];
     }
