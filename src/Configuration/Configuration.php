@@ -2630,6 +2630,7 @@ final class Configuration
     private static function runGitCommand(string $command, string $path): string
     {
         $process = Process::fromShellCommandline($command, $path);
+        $process->run();
 
         if ($process->isSuccessful()) {
             return trim($process->getOutput());
