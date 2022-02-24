@@ -55,18 +55,18 @@ class InfoTest extends CommandTestCase
 
         $expected = <<<OUTPUT
 
-        API Version: $version
+            API Version: $version
 
-        Supported Compression:
-        $compression
+            Supported Compression:
+            $compression
 
-        Supported Signatures:
-        $signatures
+            Supported Signatures:
+            $signatures
 
-         // Get a PHAR details by giving its path as an argument.
+             // Get a PHAR details by giving its path as an argument.
 
 
-        OUTPUT;
+            OUTPUT;
 
         $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(0, $this->commandTester->getStatusCode());
@@ -89,21 +89,21 @@ class InfoTest extends CommandTestCase
 
         $expected = <<<OUTPUT
 
-API Version: $version
+            API Version: $version
 
-Compression: None
+            Compression: None
 
-Signature: {$signature['hash_type']}
-Signature Hash: {$signature['hash']}
+            Signature: {$signature['hash_type']}
+            Signature Hash: {$signature['hash']}
 
-Metadata: None
+            Metadata: None
 
-Contents: 1 file (6.61KB)
+            Contents: 1 file (6.61KB)
 
- // Use the --list|-l option to list the content of the PHAR.
+             // Use the --list|-l option to list the content of the PHAR.
 
 
-OUTPUT;
+            OUTPUT;
 
         $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(0, $this->commandTester->getStatusCode());
@@ -126,21 +126,21 @@ OUTPUT;
 
         $expected = <<<OUTPUT
 
-API Version: $version
+            API Version: $version
 
-Compression: None
+            Compression: None
 
-Signature: {$signature['hash_type']}
-Signature Hash: {$signature['hash']}
+            Signature: {$signature['hash_type']}
+            Signature Hash: {$signature['hash']}
 
-Metadata: None
+            Metadata: None
 
-Contents: 1 file (6.61KB)
+            Contents: 1 file (6.61KB)
 
- // Use the --list|-l option to list the content of the PHAR.
+             // Use the --list|-l option to list the content of the PHAR.
 
 
-OUTPUT;
+            OUTPUT;
 
         $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(0, $this->commandTester->getStatusCode());
@@ -166,10 +166,10 @@ OUTPUT;
         $expected = <<<OUTPUT
 
 
- [ERROR] Could not read the file "$expectedPath".
+             [ERROR] Could not read the file "$expectedPath".
 
 
-OUTPUT;
+            OUTPUT;
 
         $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
         $actual = preg_replace('/file[\ \n]+"/', 'file "', $actual);
@@ -210,20 +210,20 @@ OUTPUT;
 
         $expected = <<<'OUTPUT'
 
-API Version: No information found
+            API Version: No information found
 
-Compression: GZ
+            Compression: GZ
 
-Signature unreadable
+            Signature unreadable
 
-Metadata: None
+            Metadata: None
 
-Contents: 1 file (2.56KB)
+            Contents: 1 file (2.56KB)
 
- // Use the --list|-l option to list the content of the PHAR.
+             // Use the --list|-l option to list the content of the PHAR.
 
 
-OUTPUT;
+            OUTPUT;
 
         $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(0, $this->commandTester->getStatusCode());
@@ -242,20 +242,20 @@ OUTPUT;
 
         $expected = <<<'OUTPUT'
 
-API Version: No information found
+            API Version: No information found
 
-Compression: BZ2
+            Compression: BZ2
 
-Signature unreadable
+            Signature unreadable
 
-Metadata: None
+            Metadata: None
 
-Contents: 1 file (2.71KB)
+            Contents: 1 file (2.71KB)
 
- // Use the --list|-l option to list the content of the PHAR.
+             // Use the --list|-l option to list the content of the PHAR.
 
 
-OUTPUT;
+            OUTPUT;
 
         $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(0, $this->commandTester->getStatusCode());
@@ -279,10 +279,10 @@ OUTPUT;
         $expected = <<<'OUTPUT'
 
 
- [ERROR] Could not read the file "new-simple-phar.zip".
+             [ERROR] Could not read the file "new-simple-phar.zip".
 
 
-OUTPUT;
+            OUTPUT;
 
         $actual = DisplayNormalizer::removeTrailingSpaces(
             $this->commandTester->getDisplay(true)
@@ -317,29 +317,29 @@ OUTPUT;
 
         $expected = <<<OUTPUT
 
-API Version: $version
+            API Version: $version
 
-Compression:
-  - BZ2 (33.33%)
-  - None (66.67%)
+            Compression:
+              - BZ2 (33.33%)
+              - None (66.67%)
 
-Signature: {$signature['hash_type']}
-Signature Hash: {$signature['hash']}
+            Signature: {$signature['hash_type']}
+            Signature Hash: {$signature['hash']}
 
-Metadata:
-array (
-  'test' => 123,
-)
+            Metadata:
+            array (
+              'test' => 123,
+            )
 
-Contents: 3 files (6.75KB)
-a/
-  bar.php [BZ2] - 60.00B
-b/
-  beta/
-    bar.php [NONE] - 0.00B
-foo.php [NONE] - 19.00B
+            Contents: 3 files (6.75KB)
+            a/
+              bar.php [BZ2] - 60.00B
+            b/
+              beta/
+                bar.php [NONE] - 0.00B
+            foo.php [NONE] - 19.00B
 
-OUTPUT;
+            OUTPUT;
 
         $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(0, $this->commandTester->getStatusCode());
@@ -364,26 +364,26 @@ OUTPUT;
 
         $expected = <<<OUTPUT
 
-API Version: $version
+            API Version: $version
 
-Compression:
-  - BZ2 (33.33%)
-  - None (66.67%)
+            Compression:
+              - BZ2 (33.33%)
+              - None (66.67%)
 
-Signature: {$signature['hash_type']}
-Signature Hash: {$signature['hash']}
+            Signature: {$signature['hash_type']}
+            Signature Hash: {$signature['hash']}
 
-Metadata:
-array (
-  'test' => 123,
-)
+            Metadata:
+            array (
+              'test' => 123,
+            )
 
-Contents: 3 files (6.75KB)
-a/bar.php [BZ2] - 60.00B
-b/beta/bar.php [NONE] - 0.00B
-foo.php [NONE] - 19.00B
+            Contents: 3 files (6.75KB)
+            a/bar.php [BZ2] - 60.00B
+            b/beta/bar.php [NONE] - 0.00B
+            foo.php [NONE] - 19.00B
 
-OUTPUT;
+            OUTPUT;
 
         $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(0, $this->commandTester->getStatusCode());
@@ -407,37 +407,37 @@ OUTPUT;
 
         $expected = <<<OUTPUT
 
-API Version: $version
+            API Version: $version
 
-Compression: None
+            Compression: None
 
-Signature: {$signature['hash_type']}
-Signature Hash: {$signature['hash']}
+            Signature: {$signature['hash_type']}
+            Signature Hash: {$signature['hash']}
 
-Metadata: None
+            Metadata: None
 
-Contents: 16 files (7.50KB)
-.hidden-dir/
-  .hidden-file1 [NONE] - 0.00B
-  .hidden-file1.php [NONE] - 33.00B
-  file1 [NONE] - 0.00B
-  file1.php [NONE] - 33.00B
-.hidden-foo [NONE] - 0.00B
-.hidden-foo.php [NONE] - 33.00B
-a/
-  .hidden-bar [NONE] - 0.00B
-  .hidden-bar.php [NONE] - 33.00B
-  .hidden-dir-2/
-    .hidden-file2 [NONE] - 0.00B
-    .hidden-file2.php [NONE] - 33.00B
-    file2 [NONE] - 0.00B
-    file2.php [NONE] - 33.00B
-  bar [NONE] - 0.00B
-  bar.php [NONE] - 33.00B
-foo [NONE] - 0.00B
-foo.php [NONE] - 33.00B
+            Contents: 16 files (7.50KB)
+            .hidden-dir/
+              .hidden-file1 [NONE] - 0.00B
+              .hidden-file1.php [NONE] - 33.00B
+              file1 [NONE] - 0.00B
+              file1.php [NONE] - 33.00B
+            .hidden-foo [NONE] - 0.00B
+            .hidden-foo.php [NONE] - 33.00B
+            a/
+              .hidden-bar [NONE] - 0.00B
+              .hidden-bar.php [NONE] - 33.00B
+              .hidden-dir-2/
+                .hidden-file2 [NONE] - 0.00B
+                .hidden-file2.php [NONE] - 33.00B
+                file2 [NONE] - 0.00B
+                file2.php [NONE] - 33.00B
+              bar [NONE] - 0.00B
+              bar.php [NONE] - 33.00B
+            foo [NONE] - 0.00B
+            foo.php [NONE] - 33.00B
 
-OUTPUT;
+            OUTPUT;
 
         $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(0, $this->commandTester->getStatusCode());
@@ -463,26 +463,26 @@ OUTPUT;
 
         $expected = <<<OUTPUT
 
-API Version: $version
+            API Version: $version
 
-Compression:
-  - BZ2 (33.33%)
-  - None (66.67%)
+            Compression:
+              - BZ2 (33.33%)
+              - None (66.67%)
 
-Signature: {$signature['hash_type']}
-Signature Hash: {$signature['hash']}
+            Signature: {$signature['hash_type']}
+            Signature Hash: {$signature['hash']}
 
-Metadata:
-array (
-  'test' => 123,
-)
+            Metadata:
+            array (
+              'test' => 123,
+            )
 
-Contents: 3 files (6.75KB)
-a/
-b/
-foo.php [NONE] - 19.00B
+            Contents: 3 files (6.75KB)
+            a/
+            b/
+            foo.php [NONE] - 19.00B
 
-OUTPUT;
+            OUTPUT;
 
         $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(0, $this->commandTester->getStatusCode());
@@ -499,28 +499,28 @@ OUTPUT;
 
         $expected = <<<OUTPUT
 
-API Version: $version
+            API Version: $version
 
-Compression:
-  - BZ2 (33.33%)
-  - None (66.67%)
+            Compression:
+              - BZ2 (33.33%)
+              - None (66.67%)
 
-Signature: {$signature['hash_type']}
-Signature Hash: {$signature['hash']}
+            Signature: {$signature['hash_type']}
+            Signature Hash: {$signature['hash']}
 
-Metadata:
-array (
-  'test' => 123,
-)
+            Metadata:
+            array (
+              'test' => 123,
+            )
 
-Contents: 3 files (6.75KB)
-a/
-  bar.php [BZ2] - 60.00B
-b/
-  beta/
-foo.php [NONE] - 19.00B
+            Contents: 3 files (6.75KB)
+            a/
+              bar.php [BZ2] - 60.00B
+            b/
+              beta/
+            foo.php [NONE] - 19.00B
 
-OUTPUT;
+            OUTPUT;
 
         $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(0, $this->commandTester->getStatusCode());
@@ -537,29 +537,29 @@ OUTPUT;
 
         $expected = <<<OUTPUT
 
-API Version: $version
+            API Version: $version
 
-Compression:
-  - BZ2 (33.33%)
-  - None (66.67%)
+            Compression:
+              - BZ2 (33.33%)
+              - None (66.67%)
 
-Signature: {$signature['hash_type']}
-Signature Hash: {$signature['hash']}
+            Signature: {$signature['hash_type']}
+            Signature Hash: {$signature['hash']}
 
-Metadata:
-array (
-  'test' => 123,
-)
+            Metadata:
+            array (
+              'test' => 123,
+            )
 
-Contents: 3 files (6.75KB)
-a/
-  bar.php [BZ2] - 60.00B
-b/
-  beta/
-    bar.php [NONE] - 0.00B
-foo.php [NONE] - 19.00B
+            Contents: 3 files (6.75KB)
+            a/
+              bar.php [BZ2] - 60.00B
+            b/
+              beta/
+                bar.php [NONE] - 0.00B
+            foo.php [NONE] - 19.00B
 
-OUTPUT;
+            OUTPUT;
 
         $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(0, $this->commandTester->getStatusCode());
@@ -586,25 +586,25 @@ OUTPUT;
 
         $expected = <<<OUTPUT
 
-API Version: $version
+            API Version: $version
 
-Compression:
-  - BZ2 (33.33%)
-  - None (66.67%)
+            Compression:
+              - BZ2 (33.33%)
+              - None (66.67%)
 
-Signature: {$signature['hash_type']}
-Signature Hash: {$signature['hash']}
+            Signature: {$signature['hash_type']}
+            Signature Hash: {$signature['hash']}
 
-Metadata:
-array (
-  'test' => 123,
-)
+            Metadata:
+            array (
+              'test' => 123,
+            )
 
-Contents: 3 files (6.75KB)
-a/bar.php [BZ2] - 60.00B
-foo.php [NONE] - 19.00B
+            Contents: 3 files (6.75KB)
+            a/bar.php [BZ2] - 60.00B
+            foo.php [NONE] - 19.00B
 
-OUTPUT;
+            OUTPUT;
 
         $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
         $this->assertSame(0, $this->commandTester->getStatusCode());

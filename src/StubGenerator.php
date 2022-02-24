@@ -29,15 +29,15 @@ final class StubGenerator
     private const CHECK_FILE_NAME = 'bin/check-requirements.php';
 
     private const STUB_TEMPLATE = <<<'STUB'
-    __BOX_SHEBANG__
-    <?php
-    __BOX_BANNER__
+        __BOX_SHEBANG__
+        <?php
+        __BOX_BANNER__
 
-    __BOX_PHAR_CONFIG__
+        __BOX_PHAR_CONFIG__
 
-    __HALT_COMPILER(); ?>
+        __HALT_COMPILER(); ?>
 
-    STUB;
+        STUB;
 
     /** @var null|string The alias to be used in "phar://" URLs */
     private ?string $alias = null;

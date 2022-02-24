@@ -142,10 +142,10 @@ class ExtractTest extends CommandTestCase
 
         $expectedOutput = <<<'OUTPUT'
 
- [ERROR] The given file is not a valid PHAR
+             [ERROR] The given file is not a valid PHAR
 
 
-OUTPUT;
+            OUTPUT;
 
         $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
         $actual = preg_replace('/file[\ \n]+"/', 'file "', $actual);
@@ -204,10 +204,10 @@ OUTPUT;
 
         $expectedOutput = <<<'OUTPUT'
 
- [ERROR] The given file is not a valid PHAR
+             [ERROR] The given file is not a valid PHAR
 
 
-OUTPUT;
+            OUTPUT;
 
         $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
         $actual = preg_replace('/file[\ \n]+"/', 'file "', $actual);
@@ -234,10 +234,10 @@ OUTPUT;
 
         $expectedOutput = <<<'OUTPUT'
 
- [ERROR] The file "/unknown" could not be found.
+             [ERROR] The file "/unknown" could not be found.
 
 
-OUTPUT;
+            OUTPUT;
 
         $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
         $actual = preg_replace('/file[\ \n]+"/', 'file "', $actual);

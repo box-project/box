@@ -347,14 +347,14 @@ class ConfigurationFileTest extends ConfigurationTestCase
         dump_file(
             'composer.lock',
             <<<'JSON'
-{
-    "packages-dev": [
-        {"name": "acme/foo"},
-        {"name": "acme/bar"},
-        {"name": "acme/oof"}
-    ]
-}
-JSON
+                {
+                    "packages-dev": [
+                        {"name": "acme/foo"},
+                        {"name": "acme/bar"},
+                        {"name": "acme/oof"}
+                    ]
+                }
+                JSON
         );
         dump_file('vendor/composer/installed.json', '{}');
 
@@ -1657,31 +1657,31 @@ JSON
         dump_file(
             'composer.json',
             <<<'JSON'
-{
-    "autoload": {
-        "files": ["file0", "file1"],
-        "psr-4": {
-            "Acme\\": "PSR4_0",
-            "Bar\\": ["PSR4_1", "PSR4_2"]
-        },
-        "psr-0": {
-            "Acme\\": "PSR0_0",
-            "Bar\\": ["PSR0_1", "PSR0_2"]
-        },
-        "classmap": ["CLASSMAP_DIR"]
-    },
-    "autoload-dev": {
-        "files": ["file2"],
-        "psr-4": {
-            "Acme\\": "DEV_PSR4_0"
-        },
-        "psr-0": {
-            "Acme\\": "DEV_PSR0_0"
-        },
-        "classmap": ["CLASSMAP_DEV_DIR"]
-    }
-}
-JSON
+                {
+                    "autoload": {
+                        "files": ["file0", "file1"],
+                        "psr-4": {
+                            "Acme\\": "PSR4_0",
+                            "Bar\\": ["PSR4_1", "PSR4_2"]
+                        },
+                        "psr-0": {
+                            "Acme\\": "PSR0_0",
+                            "Bar\\": ["PSR0_1", "PSR0_2"]
+                        },
+                        "classmap": ["CLASSMAP_DIR"]
+                    },
+                    "autoload-dev": {
+                        "files": ["file2"],
+                        "psr-4": {
+                            "Acme\\": "DEV_PSR4_0"
+                        },
+                        "psr-0": {
+                            "Acme\\": "DEV_PSR0_0"
+                        },
+                        "classmap": ["CLASSMAP_DEV_DIR"]
+                    }
+                }
+                JSON
         );
 
         // Relative to the current working directory for readability
@@ -1841,16 +1841,16 @@ JSON
         dump_file(
             'composer.lock',
             <<<'JSON'
-{
-    "packages": [
-        {"name": "acme/foo"}
-    ],
-    "packages-dev": [
-        {"name": "acme/bar"},
-        {"name": "acme/oof"}
-    ]
-}
-JSON
+                {
+                    "packages": [
+                        {"name": "acme/foo"}
+                    ],
+                    "packages-dev": [
+                        {"name": "acme/bar"},
+                        {"name": "acme/oof"}
+                    ]
+                }
+                JSON
         );
         dump_file('vendor/composer/installed.json', '{}');
 

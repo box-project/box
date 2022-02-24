@@ -53,21 +53,21 @@ class DocblockAnnotationParserTest extends TestCase
 
         yield [
             <<<'DOCBLOCK'
-            /**
-             * @Annotation
-             */
-            DOCBLOCK
+                /**
+                 * @Annotation
+                 */
+                DOCBLOCK
             ,
             ['@Annotation'],
         ];
 
         yield [
             <<<'DOCBLOCK'
-            /**
-             * @ignored
-             * @Kept
-             */
-            DOCBLOCK
+                /**
+                 * @ignored
+                 * @Kept
+                 */
+                DOCBLOCK
             ,
             ['@Kept'],
         ];

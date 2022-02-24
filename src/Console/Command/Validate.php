@@ -40,16 +40,16 @@ final class Validate extends BaseCommand
         $this->setDescription('⚙  Validates the configuration file');
         $this->setHelp(
             <<<'HELP'
-The <info>%command.name%</info> command will validate the configuration file
-and report any errors found, if any.
-<comment>
-  This command relies on a configuration file for loading
-  PHAR packaging settings. If a configuration file is not
-  specified through the <info>--configuration|-c</info> option, one of
-  the following files will be used (in order): <info>box.json,
-  box.json.dist</info>
-</comment>
-HELP
+                The <info>%command.name%</info> command will validate the configuration file
+                and report any errors found, if any.
+                <comment>
+                  This command relies on a configuration file for loading
+                  PHAR packaging settings. If a configuration file is not
+                  specified through the <info>--configuration|-c</info> option, one of
+                  the following files will be used (in order): <info>box.json,
+                  box.json.dist</info>
+                </comment>
+                HELP
         );
         $this->addArgument(
             self::FILE_ARGUMENT,

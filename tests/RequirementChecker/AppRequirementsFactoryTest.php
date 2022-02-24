@@ -152,15 +152,15 @@ class AppRequirementsFactoryTest extends TestCase
 
         yield 'json file platform requirements' => [
             <<<'JSON'
-{
-    "require": {
-        "php": "^7.1",
-        "ext-phar": "*",
-        "acme/foo": "^1.0"
-    },
-    "require-dev": []
-}
-JSON
+                {
+                    "require": {
+                        "php": "^7.1",
+                        "ext-phar": "*",
+                        "acme/foo": "^1.0"
+                    },
+                    "require-dev": []
+                }
+                JSON
             ,
             null,
             null,
@@ -183,14 +183,14 @@ JSON
         yield 'lock file platform requirements' => [
             null,
             <<<'JSON'
-{
-    "platform": {
-        "php": "^7.1",
-        "ext-phar": "*"
-    },
-    "platform-dev": []
-}
-JSON
+                {
+                    "platform": {
+                        "php": "^7.1",
+                        "ext-phar": "*"
+                    },
+                    "platform-dev": []
+                }
+                JSON
             ,
             null,
             [
@@ -211,25 +211,25 @@ JSON
 
         yield 'json & lock file platform requirements' => [
             <<<'JSON'
-{
-    "platform": {
-        "php": "^7.2",
-        "ext-phar": "*",
-        "acme/foo": "^1.0"
-    },
-    "platform-dev": []
-}
-JSON
+                {
+                    "platform": {
+                        "php": "^7.2",
+                        "ext-phar": "*",
+                        "acme/foo": "^1.0"
+                    },
+                    "platform-dev": []
+                }
+                JSON
             ,
             <<<'JSON'
-{
-    "platform": {
-        "php": "^7.1",
-        "ext-phar": "*"
-    },
-    "platform-dev": []
-}
-JSON
+                {
+                    "platform": {
+                        "php": "^7.1",
+                        "ext-phar": "*"
+                    },
+                    "platform-dev": []
+                }
+                JSON
             ,
             null,
             [
@@ -250,14 +250,14 @@ JSON
 
         yield 'json file platform requirements (compressed PHAR)' => [
             <<<'JSON'
-{
-    "require": {
-        "php": "^7.1",
-        "ext-phar": "*"
-    },
-    "require-dev": []
-}
-JSON
+                {
+                    "require": {
+                        "php": "^7.1",
+                        "ext-phar": "*"
+                    },
+                    "require-dev": []
+                }
+                JSON
             ,
             null,
             Phar::GZ,
@@ -286,14 +286,14 @@ JSON
         yield 'lock file platform requirements (compressed PHAR)' => [
             null,
             <<<'JSON'
-{
-    "platform": {
-        "php": "^7.1",
-        "ext-phar": "*"
-    },
-    "platform-dev": []
-}
-JSON
+                {
+                    "platform": {
+                        "php": "^7.1",
+                        "ext-phar": "*"
+                    },
+                    "platform-dev": []
+                }
+                JSON
             ,
             Phar::GZ,
             [
@@ -320,24 +320,24 @@ JSON
 
         yield 'json & lock file platform requirements (compressed PHAR)' => [
             <<<'JSON'
-{
-    "require": {
-        "php": "^7.2",
-        "ext-phar": "*"
-    },
-    "require-dev": []
-}
-JSON
+                {
+                    "require": {
+                        "php": "^7.2",
+                        "ext-phar": "*"
+                    },
+                    "require-dev": []
+                }
+                JSON
             ,
             <<<'JSON'
-{
-    "platform": {
-        "php": "^7.1",
-        "ext-phar": "*"
-    },
-    "platform-dev": []
-}
-JSON
+                {
+                    "platform": {
+                        "php": "^7.1",
+                        "ext-phar": "*"
+                    },
+                    "platform-dev": []
+                }
+                JSON
             ,
             Phar::GZ,
             [
@@ -364,14 +364,14 @@ JSON
 
         yield 'json file platform dev requirements are ignored' => [
             <<<'JSON'
-{
-    "require": [],
-    "require-dev": {
-        "php": "^7.3",
-        "ext-json": "*"
-    }
-}
-JSON
+                {
+                    "require": [],
+                    "require-dev": {
+                        "php": "^7.3",
+                        "ext-json": "*"
+                    }
+                }
+                JSON
             ,
             null,
             null,
@@ -381,14 +381,14 @@ JSON
         yield 'lock file platform dev requirements are ignored' => [
             null,
             <<<'JSON'
-{
-    "platform": [],
-    "platform-dev": {
-        "php": "^7.3",
-        "ext-json": "*"
-    }
-}
-JSON
+                {
+                    "platform": [],
+                    "platform-dev": {
+                        "php": "^7.3",
+                        "ext-json": "*"
+                    }
+                }
+                JSON
             ,
             null,
             [],
@@ -396,24 +396,24 @@ JSON
 
         yield 'json & lock file platform dev requirements are ignored' => [
             <<<'JSON'
-{
-    "require": [],
-    "require-dev": {
-        "php": "^7.3",
-        "ext-json": "*"
-    }
-}
-JSON
+                {
+                    "require": [],
+                    "require-dev": {
+                        "php": "^7.3",
+                        "ext-json": "*"
+                    }
+                }
+                JSON
             ,
             <<<'JSON'
-{
-    "platform": [],
-    "platform-dev": {
-        "php": "^7.3",
-        "ext-json": "*"
-    }
-}
-JSON
+                {
+                    "platform": [],
+                    "platform-dev": {
+                        "php": "^7.3",
+                        "ext-json": "*"
+                    }
+                }
+                JSON
             ,
             null,
             [],
@@ -421,14 +421,14 @@ JSON
 
         yield 'json file platform dev requirements are ignored (compressed PHAR)' => [
             <<<'JSON'
-{
-    "require": [],
-    "require-dev": {
-        "php": "^7.3",
-        "ext-json": "*"
-    }
-}
-JSON
+                {
+                    "require": [],
+                    "require-dev": {
+                        "php": "^7.3",
+                        "ext-json": "*"
+                    }
+                }
+                JSON
             ,
             null,
             Phar::GZ,
@@ -445,14 +445,14 @@ JSON
         yield 'lock file platform dev requirements are ignored (compressed PHAR)' => [
             null,
             <<<'JSON'
-{
-    "platform": [],
-    "platform-dev": {
-        "php": "^7.3",
-        "ext-json": "*"
-    }
-}
-JSON
+                {
+                    "platform": [],
+                    "platform-dev": {
+                        "php": "^7.3",
+                        "ext-json": "*"
+                    }
+                }
+                JSON
             ,
             Phar::GZ,
             [
@@ -467,24 +467,24 @@ JSON
 
         yield 'json & lock file platform dev requirements are ignored (compressed PHAR)' => [
             <<<'JSON'
-{
-    "require": [],
-    "require-dev": {
-        "php": "^7.3",
-        "ext-json": "*"
-    }
-}
-JSON
+                {
+                    "require": [],
+                    "require-dev": {
+                        "php": "^7.3",
+                        "ext-json": "*"
+                    }
+                }
+                JSON
             ,
             <<<'JSON'
-{
-    "platform": [],
-    "platform-dev": {
-        "php": "^7.3",
-        "ext-json": "*"
-    }
-}
-JSON
+                {
+                    "platform": [],
+                    "platform-dev": {
+                        "php": "^7.3",
+                        "ext-json": "*"
+                    }
+                }
+                JSON
             ,
             Phar::GZ,
             [
@@ -499,17 +499,17 @@ JSON
 
         yield 'json file packages requirements' => [
             <<<'JSON'
-{
-    "require": {
-        "php": ">=5.3",
-        "ext-mbstring": "*",
-        "ext-openssl": "*",
-        "ext-pcre": "*",
-        "ext-pdo_sqlite3": "*"
-    },
-    "require-dev": []
-}
-JSON
+                {
+                    "require": {
+                        "php": ">=5.3",
+                        "ext-mbstring": "*",
+                        "ext-openssl": "*",
+                        "ext-pcre": "*",
+                        "ext-pdo_sqlite3": "*"
+                    },
+                    "require-dev": []
+                }
+                JSON
             ,
             null,
             null,
@@ -550,41 +550,41 @@ JSON
         yield 'lock file packages requirements' => [
             null,
             <<<'JSON'
-{
-    "packages": [
-        {
-            "name": "beberlei/assert",
-            "version": "v2.9.2",
-            "require": {
-                "ext-mbstring": "*",
-                "php": ">=5.3"
-            },
-            "require-dev": []
-        },
-        {
-            "name": "composer/ca-bundle",
-            "version": "1.1.0",
-            "require": {
-                "ext-openssl": "*",
-                "ext-pcre": "*",
-                "php": "^5.3.2 || ^7.0"
-            },
-            "require-dev": {
-                "ext-pdo_sqlite3": "*"
-            }
-        },
-        {
-            "name": "acme/foo",
-            "version": "1.1.0",
-            "require": {
-                "ext-openssl": "*"
-            },
-            "require-dev": []
-        }
-    ],
-    "platform-dev": []
-}
-JSON
+                {
+                    "packages": [
+                        {
+                            "name": "beberlei/assert",
+                            "version": "v2.9.2",
+                            "require": {
+                                "ext-mbstring": "*",
+                                "php": ">=5.3"
+                            },
+                            "require-dev": []
+                        },
+                        {
+                            "name": "composer/ca-bundle",
+                            "version": "1.1.0",
+                            "require": {
+                                "ext-openssl": "*",
+                                "ext-pcre": "*",
+                                "php": "^5.3.2 || ^7.0"
+                            },
+                            "require-dev": {
+                                "ext-pdo_sqlite3": "*"
+                            }
+                        },
+                        {
+                            "name": "acme/foo",
+                            "version": "1.1.0",
+                            "require": {
+                                "ext-openssl": "*"
+                            },
+                            "require-dev": []
+                        }
+                    ],
+                    "platform-dev": []
+                }
+                JSON
             ,
             null,
             [
@@ -629,54 +629,54 @@ JSON
 
         yield 'json & lock file packages requirements' => [
             <<<'JSON'
-{
-    "require": {
-        "php": ">=5.3",
-        "ext-mbstring": "*",
-        "ext-openssl": "*",
-        "ext-pcre": "*",
-        "ext-pdo_sqlite3": "*"
-    },
-    "require-dev": []
-}
-JSON
+                {
+                    "require": {
+                        "php": ">=5.3",
+                        "ext-mbstring": "*",
+                        "ext-openssl": "*",
+                        "ext-pcre": "*",
+                        "ext-pdo_sqlite3": "*"
+                    },
+                    "require-dev": []
+                }
+                JSON
             ,
             <<<'JSON'
-{
-    "packages": [
-        {
-            "name": "beberlei/assert",
-            "version": "v2.9.2",
-            "require": {
-                "ext-mbstring": "*",
-                "php": ">=5.3"
-            },
-            "require-dev": []
-        },
-        {
-            "name": "composer/ca-bundle",
-            "version": "1.1.0",
-            "require": {
-                "ext-openssl": "*",
-                "ext-pcre": "*",
-                "php": "^5.3.2 || ^7.0"
-            },
-            "require-dev": {
-                "ext-pdo_sqlite3": "*"
-            }
-        },
-        {
-            "name": "acme/foo",
-            "version": "1.1.0",
-            "require": {
-                "ext-openssl": "*"
-            },
-            "require-dev": []
-        }
-    ],
-    "platform-dev": []
-}
-JSON
+                {
+                    "packages": [
+                        {
+                            "name": "beberlei/assert",
+                            "version": "v2.9.2",
+                            "require": {
+                                "ext-mbstring": "*",
+                                "php": ">=5.3"
+                            },
+                            "require-dev": []
+                        },
+                        {
+                            "name": "composer/ca-bundle",
+                            "version": "1.1.0",
+                            "require": {
+                                "ext-openssl": "*",
+                                "ext-pcre": "*",
+                                "php": "^5.3.2 || ^7.0"
+                            },
+                            "require-dev": {
+                                "ext-pdo_sqlite3": "*"
+                            }
+                        },
+                        {
+                            "name": "acme/foo",
+                            "version": "1.1.0",
+                            "require": {
+                                "ext-openssl": "*"
+                            },
+                            "require-dev": []
+                        }
+                    ],
+                    "platform-dev": []
+                }
+                JSON
             ,
             null,
             [
@@ -721,14 +721,14 @@ JSON
 
         yield 'json file dev packages are ignored' => [
             <<<'JSON'
-{
-    "require": [],
-    "require-dev": {
-        "ext-mbstring": "*",
-        "php": ">=5.3"
-    }
-}
-JSON
+                {
+                    "require": [],
+                    "require-dev": {
+                        "ext-mbstring": "*",
+                        "php": ">=5.3"
+                    }
+                }
+                JSON
             ,
             null,
             null,
@@ -738,33 +738,33 @@ JSON
         yield 'lock file dev packages are ignored' => [
             null,
             <<<'JSON'
-{
-    "packages": [],
-    "packages-dev": [
-        {
-            "name": "beberlei/assert",
-            "version": "v2.9.2",
-            "require": {
-                "ext-mbstring": "*",
-                "php": ">=5.3"
-            },
-            "require-dev": []
-        },
-        {
-            "name": "composer/ca-bundle",
-            "version": "1.1.0",
-            "require": {
-                "ext-openssl": "*",
-                "ext-pcre": "*",
-                "php": "^5.3.2 || ^7.0"
-            },
-            "require-dev": {
-                "ext-pdo_sqlite3": "*"
-            }
-        }
-    ]
-}
-JSON
+                {
+                    "packages": [],
+                    "packages-dev": [
+                        {
+                            "name": "beberlei/assert",
+                            "version": "v2.9.2",
+                            "require": {
+                                "ext-mbstring": "*",
+                                "php": ">=5.3"
+                            },
+                            "require-dev": []
+                        },
+                        {
+                            "name": "composer/ca-bundle",
+                            "version": "1.1.0",
+                            "require": {
+                                "ext-openssl": "*",
+                                "ext-pcre": "*",
+                                "php": "^5.3.2 || ^7.0"
+                            },
+                            "require-dev": {
+                                "ext-pdo_sqlite3": "*"
+                            }
+                        }
+                    ]
+                }
+                JSON
             ,
             null,
             [],
@@ -772,43 +772,43 @@ JSON
 
         yield 'json & lock file dev packages are ignored' => [
             <<<'JSON'
-{
-    "require": [],
-    "require-dev": {
-        "ext-mbstring": "*",
-        "php": ">=5.3"
-    }
-}
-JSON
+                {
+                    "require": [],
+                    "require-dev": {
+                        "ext-mbstring": "*",
+                        "php": ">=5.3"
+                    }
+                }
+                JSON
             ,
             <<<'JSON'
-{
-    "packages": [],
-    "packages-dev": [
-        {
-            "name": "beberlei/assert",
-            "version": "v2.9.2",
-            "require": {
-                "ext-mbstring": "*",
-                "php": ">=5.3"
-            },
-            "require-dev": []
-        },
-        {
-            "name": "composer/ca-bundle",
-            "version": "1.1.0",
-            "require": {
-                "ext-openssl": "*",
-                "ext-pcre": "*",
-                "php": "^5.3.2 || ^7.0"
-            },
-            "require-dev": {
-                "ext-pdo_sqlite3": "*"
-            }
-        }
-    ]
-}
-JSON
+                {
+                    "packages": [],
+                    "packages-dev": [
+                        {
+                            "name": "beberlei/assert",
+                            "version": "v2.9.2",
+                            "require": {
+                                "ext-mbstring": "*",
+                                "php": ">=5.3"
+                            },
+                            "require-dev": []
+                        },
+                        {
+                            "name": "composer/ca-bundle",
+                            "version": "1.1.0",
+                            "require": {
+                                "ext-openssl": "*",
+                                "ext-pcre": "*",
+                                "php": "^5.3.2 || ^7.0"
+                            },
+                            "require-dev": {
+                                "ext-pdo_sqlite3": "*"
+                            }
+                        }
+                    ]
+                }
+                JSON
             ,
             null,
             [],
@@ -817,40 +817,40 @@ JSON
         yield 'duplicate requirements' => [
             null,
             <<<'JSON'
-{
-    "packages": [
-        {
-            "name": "beberlei/assert",
-            "version": "v2.9.2",
-            "require": {
-                "php": "^7.3",
-                "ext-mbstring": "*",
-                "ext-json": "*"
-            },
-            "require-dev": []
-        },
-        {
-            "name": "composer/ca-bundle",
-            "version": "1.1.0",
-            "require": {
-                "php": "^7.3",
-                "ext-mbstring": "*",
-                "ext-json": "*"
-            },
-            "require-dev": {
-                "ext-pdo_sqlite3": "*"
-            }
-        }
-    ],
-    "packages-dev": [],
-    "platform": {
-        "php": "^7.3",
-        "ext-mbstring": "*",
-        "ext-json": "*"
-    },
-    "platform-dev": []
-}
-JSON
+                {
+                    "packages": [
+                        {
+                            "name": "beberlei/assert",
+                            "version": "v2.9.2",
+                            "require": {
+                                "php": "^7.3",
+                                "ext-mbstring": "*",
+                                "ext-json": "*"
+                            },
+                            "require-dev": []
+                        },
+                        {
+                            "name": "composer/ca-bundle",
+                            "version": "1.1.0",
+                            "require": {
+                                "php": "^7.3",
+                                "ext-mbstring": "*",
+                                "ext-json": "*"
+                            },
+                            "require-dev": {
+                                "ext-pdo_sqlite3": "*"
+                            }
+                        }
+                    ],
+                    "packages-dev": [],
+                    "platform": {
+                        "php": "^7.3",
+                        "ext-mbstring": "*",
+                        "ext-json": "*"
+                    },
+                    "platform-dev": []
+                }
+                JSON
             ,
             null,
             [
@@ -901,18 +901,18 @@ JSON
 
         yield 'it supports polyfills (json)' => [
             <<<'JSON'
-{
-    "require": {
-        "php": "^7.3",
-        "ext-mbstring": "*",
-        "ext-json": "*",
-        "symfony/polyfill-mbstring": "^1.0"
-    },
-    "require-dev": {
-        "symfony/polyfill-json": "^4.0"
-    }
-}
-JSON
+                {
+                    "require": {
+                        "php": "^7.3",
+                        "ext-mbstring": "*",
+                        "ext-json": "*",
+                        "symfony/polyfill-mbstring": "^1.0"
+                    },
+                    "require-dev": {
+                        "symfony/polyfill-json": "^4.0"
+                    }
+                }
+                JSON
             ,
             null,
             null,
@@ -935,56 +935,56 @@ JSON
         yield 'it supports polyfills (lock)' => [
             null,
             <<<'JSON'
-{
-    "packages": [
-        {
-            "name": "beberlei/assert",
-            "version": "v2.9.2",
-            "require": {
-                "php": "^7.3",
-                "ext-mbstring": "*",
-                "ext-json": "*"
-            },
-            "require-dev": []
-        },
-        {
-            "name": "composer/ca-bundle",
-            "version": "1.1.0",
-            "require": {
-                "php": "^7.3",
-                "ext-mbstring": "*",
-                "ext-json": "*"
-            },
-            "require-dev": {
-                "ext-pdo_sqlite3": "*"
-            }
-        },
-        {
-            "name": "symfony/polyfill-mbstring",
-            "version": "1.1.0",
-            "require": [],
-            "require-dev": []
-        }
-    ],
-    "packages-dev": [
-        {
-            "name": "acme/bar",
-            "version": "1.1.0",
-            "require": {
-                "php": "^7.3",
-                "symfony/polyfill-json": "^4.0"
-            },
-            "require-dev": []
-        }
-    ],
-    "platform": {
-        "php": "^7.3",
-        "ext-mbstring": "*",
-        "ext-json": "*"
-    },
-    "platform-dev": []
-}
-JSON
+                {
+                    "packages": [
+                        {
+                            "name": "beberlei/assert",
+                            "version": "v2.9.2",
+                            "require": {
+                                "php": "^7.3",
+                                "ext-mbstring": "*",
+                                "ext-json": "*"
+                            },
+                            "require-dev": []
+                        },
+                        {
+                            "name": "composer/ca-bundle",
+                            "version": "1.1.0",
+                            "require": {
+                                "php": "^7.3",
+                                "ext-mbstring": "*",
+                                "ext-json": "*"
+                            },
+                            "require-dev": {
+                                "ext-pdo_sqlite3": "*"
+                            }
+                        },
+                        {
+                            "name": "symfony/polyfill-mbstring",
+                            "version": "1.1.0",
+                            "require": [],
+                            "require-dev": []
+                        }
+                    ],
+                    "packages-dev": [
+                        {
+                            "name": "acme/bar",
+                            "version": "1.1.0",
+                            "require": {
+                                "php": "^7.3",
+                                "symfony/polyfill-json": "^4.0"
+                            },
+                            "require-dev": []
+                        }
+                    ],
+                    "platform": {
+                        "php": "^7.3",
+                        "ext-mbstring": "*",
+                        "ext-json": "*"
+                    },
+                    "platform-dev": []
+                }
+                JSON
             ,
             null,
             [
@@ -1017,13 +1017,13 @@ JSON
 
         yield 'libsodium polyfill (json)' => [
             <<<'JSON'
-{
-    "require": {
-        "ext-libsodium": "*",
-        "paragonie/sodium_compat": "^1.0"
-    }
-}
-JSON
+                {
+                    "require": {
+                        "ext-libsodium": "*",
+                        "paragonie/sodium_compat": "^1.0"
+                    }
+                }
+                JSON
             ,
             null,
             null,
@@ -1033,18 +1033,18 @@ JSON
         yield 'libsodium polyfill (lock)' => [
             null,
             <<<'JSON'
-{
-    "platform": {
-        "ext-libsodium": "*"
-    },
-    "packages": [
-        {
-            "name": "paragonie/sodium_compat",
-            "version": "1.0.0"
-        }
-    ]
-}
-JSON
+                {
+                    "platform": {
+                        "ext-libsodium": "*"
+                    },
+                    "packages": [
+                        {
+                            "name": "paragonie/sodium_compat",
+                            "version": "1.0.0"
+                        }
+                    ]
+                }
+                JSON
             ,
             null,
             [],
@@ -1052,13 +1052,13 @@ JSON
 
         yield 'mcrypt polyfill (json)' => [
             <<<'JSON'
-{
-    "require": {
-        "ext-mcrypt": "*",
-        "phpseclib/mcrypt_compat": "^1.0"
-    }
-}
-JSON
+                {
+                    "require": {
+                        "ext-mcrypt": "*",
+                        "phpseclib/mcrypt_compat": "^1.0"
+                    }
+                }
+                JSON
             ,
             null,
             null,
@@ -1068,18 +1068,18 @@ JSON
         yield 'mcrypt polyfill (lock)' => [
             null,
             <<<'JSON'
-{
-    "platform": {
-        "ext-mcrypt": "*"
-    },
-    "packages": [
-        {
-            "name": "phpseclib/mcrypt_compat",
-            "version": "1.0.0"
-        }
-    ]
-}
-JSON
+                {
+                    "platform": {
+                        "ext-mcrypt": "*"
+                    },
+                    "packages": [
+                        {
+                            "name": "phpseclib/mcrypt_compat",
+                            "version": "1.0.0"
+                        }
+                    ]
+                }
+                JSON
             ,
             null,
             [],

@@ -35,11 +35,11 @@ class NullScoperTest extends TestCase
     {
         $file = 'foo';
         $contents = <<<'JSON'
-{
-    "foo": "bar"
+            {
+                "foo": "bar"
 
-}
-JSON;
+            }
+            JSON;
 
         $actual = $this->scoper->scope($file, $contents);
 

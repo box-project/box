@@ -27,15 +27,15 @@ final class Application extends SymfonyApplication
 {
     private const LOGO = <<<'ASCII'
 
-        ____
-       / __ )____  _  __
-      / __  / __ \| |/_/
-     / /_/ / /_/ />  <
-    /_____/\____/_/|_|
+            ____
+           / __ )____  _  __
+          / __  / __ \| |/_/
+         / /_/ / /_/ />  <
+        /_____/\____/_/|_|
 
 
 
-    ASCII;
+        ASCII;
 
     private string $releaseDate;
 

@@ -99,11 +99,11 @@ class RequirementsDumperTest extends TestCase
             [],
             null,
             <<<'PHP'
-<?php
+                <?php
 
-return array (
-);
-PHP
+                return array (
+                );
+                PHP
         ];
 
         yield [
@@ -121,32 +121,32 @@ PHP
             ],
             Phar::GZ,
             <<<'PHP'
-<?php
+                <?php
 
-return array (
-  0 =>
-  array (
-    'type' => 'php',
-    'condition' => '^7.4',
-    'message' => 'The package "acme/foo" requires the version "^7.4" or greater.',
-    'helpMessage' => 'The package "acme/foo" requires the version "^7.4" or greater.',
-  ),
-  1 =>
-  array (
-    'type' => 'extension',
-    'condition' => 'zlib',
-    'message' => 'The application requires the extension "zlib". Enable it or install a polyfill.',
-    'helpMessage' => 'The application requires the extension "zlib".',
-  ),
-  2 =>
-  array (
-    'type' => 'extension',
-    'condition' => 'json',
-    'message' => 'The package "acme/foo" requires the extension "json". Enable it or install a polyfill.',
-    'helpMessage' => 'The package "acme/foo" requires the extension "json".',
-  ),
-);
-PHP
+                return array (
+                  0 =>
+                  array (
+                    'type' => 'php',
+                    'condition' => '^7.4',
+                    'message' => 'The package "acme/foo" requires the version "^7.4" or greater.',
+                    'helpMessage' => 'The package "acme/foo" requires the version "^7.4" or greater.',
+                  ),
+                  1 =>
+                  array (
+                    'type' => 'extension',
+                    'condition' => 'zlib',
+                    'message' => 'The application requires the extension "zlib". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "zlib".',
+                  ),
+                  2 =>
+                  array (
+                    'type' => 'extension',
+                    'condition' => 'json',
+                    'message' => 'The package "acme/foo" requires the extension "json". Enable it or install a polyfill.',
+                    'helpMessage' => 'The package "acme/foo" requires the extension "json".',
+                  ),
+                );
+                PHP
         ];
     }
 }
