@@ -85,7 +85,7 @@ tm:	$(TU_BOX_DEPS) $(INFECTION)
 
 .PHONY: e2e
 e2e:			 ## Runs all the end-to-end tests
-e2e: e2e_php_settings_checker e2e_scoper_alias e2e_scoper_expose_symbols e2e_check_requirements e2e_symfony e2e_composer_installed_versions
+e2e: e2e_php_settings_checker e2e_scoper_alias e2e_scoper_expose_symbols e2e_check_requirements e2e_symfony e2e_composer_installed_versions e2e_phpstorm_stubs
 
 .PHONY: e2e_scoper_alias
 e2e_scoper_alias: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the prefix alias is working
