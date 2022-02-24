@@ -16,6 +16,7 @@ namespace KevinGH\Box\Console\Command;
 
 use function array_filter;
 use function array_flip;
+use function array_map;
 use function count;
 use function is_string;
 use function KevinGH\Box\check_php_settings;
@@ -27,9 +28,11 @@ use KevinGH\Box\PharInfo\PharDiff;
 use KevinGH\Box\PharInfo\PharInfo;
 use PharFileInfo;
 use function sprintf;
+// TODO: migrate to Safe API
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Filesystem\Path;
 use Throwable;
 use Webmozart\Assert\Assert;
 
@@ -116,8 +119,13 @@ final class Diff extends BaseCommand
 
         Assert::allFile($paths);
 
+        $normalizedPaths = array_map(
+            static fn (string $path) => Path::canonicalize($path),
+            $paths,
+        );
+
         try {
-            $diff = new PharDiff(...$paths);
+            $diff = new PharDiff(...$normalizedPaths);
         } catch (Throwable $throwable) {
             if ($io->isDebug()) {
                 throw $throwable;
