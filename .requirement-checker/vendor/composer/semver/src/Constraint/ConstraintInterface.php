@@ -1,11 +1,14 @@
 <?php
 
-namespace HumbugBox3150\Composer\Semver\Constraint;
+namespace HumbugBox3160\Composer\Semver\Constraint;
 
 interface ConstraintInterface
 {
     public function matches(ConstraintInterface $provider);
-    public function compile($operator);
+    /**
+    @phpstan-param
+    */
+    public function compile($otherOperator);
     public function getUpperBound();
     public function getLowerBound();
     public function getPrettyString();

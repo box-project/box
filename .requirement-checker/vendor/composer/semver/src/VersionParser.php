@@ -1,18 +1,21 @@
 <?php
 
-namespace HumbugBox3150\Composer\Semver;
+namespace HumbugBox3160\Composer\Semver;
 
-use HumbugBox3150\Composer\Semver\Constraint\ConstraintInterface;
-use HumbugBox3150\Composer\Semver\Constraint\MatchAllConstraint;
-use HumbugBox3150\Composer\Semver\Constraint\MultiConstraint;
-use HumbugBox3150\Composer\Semver\Constraint\Constraint;
+use HumbugBox3160\Composer\Semver\Constraint\ConstraintInterface;
+use HumbugBox3160\Composer\Semver\Constraint\MatchAllConstraint;
+use HumbugBox3160\Composer\Semver\Constraint\MultiConstraint;
+use HumbugBox3160\Composer\Semver\Constraint\Constraint;
 class VersionParser
 {
     private static $modifierRegex = '[._-]?(?:(stable|beta|b|RC|alpha|a|patch|pl|p)((?:[.-]?\\d+)*+)?)?([.-]?dev)?';
     private static $stabilitiesRegex = 'stable|RC|beta|alpha|dev';
+    /**
+    @phpstan-return
+    */
     public static function parseStability($version)
     {
-        $version = \preg_replace('{#.+$}i', '', $version);
+        $version = (string) \preg_replace('{#.+$}', '', $version);
         if (\strpos($version, 'dev-') === 0 || '-dev' === \substr($version, -4)) {
             return 'dev';
         }
@@ -72,7 +75,7 @@ class VersionParser
                 if ('stable' === $matches[$index]) {
                     return $version;
                 }
-                $version .= '-' . $this->expandStability($matches[$index]) . (!empty($matches[$index + 1]) ? \ltrim($matches[$index + 1], '.-') : '');
+                $version .= '-' . $this->expandStability($matches[$index]) . (isset($matches[$index + 1]) && '' !== $matches[$index + 1] ? \ltrim($matches[$index + 1], '.-') : '');
             }
             if (!empty($matches[$index + 2])) {
                 $version .= '-dev';
@@ -126,9 +129,15 @@ class VersionParser
     {
         $prettyConstraint = $constraints;
         $orConstraints = \preg_split('{\\s*\\|\\|?\\s*}', \trim($constraints));
+        if (\false === $orConstraints) {
+            throw new \RuntimeException('Failed to preg_split string: ' . $constraints);
+        }
         $orGroups = array();
         foreach ($orConstraints as $constraints) {
             $andConstraints = \preg_split('{(?<!^|as|[=>< ,]) *(?<!-)[, ](?!-) *(?!,|as|$)}', $constraints);
+            if (\false === $andConstraints) {
+                throw new \RuntimeException('Failed to preg_split string: ' . $constraints);
+            }
             if (\count($andConstraints) > 1) {
                 $constraintObjects = array();
                 foreach ($andConstraints as $constraint) {
@@ -150,6 +159,9 @@ class VersionParser
         $constraint->setPrettyString($prettyConstraint);
         return $constraint;
     }
+    /**
+    @phpstan-return
+    */
     private function parseConstraint($constraint)
     {
         if (\preg_match('{^([^,\\s]++) ++as ++([^,\\s]++)$}', $constraint, $match)) {
@@ -170,7 +182,7 @@ class VersionParser
             }
             return array(new MatchAllConstraint());
         }
-        $versionRegex = 'v?(\\d++)(?:\\.(\\d++|[xX*]))?(?:\\.(\\d++|[xX*]))?(?:\\.(\\d++|[xX*]))?' . self::$modifierRegex . '(?:\\+[^\\s]+)?';
+        $versionRegex = 'v?(\\d++)(?:\\.(\\d++))?(?:\\.(\\d++))?(?:\\.(\\d++))?(?:' . self::$modifierRegex . '|\\.([xX*][.-]?dev))(?:\\+[^\\s]+)?';
         if (\preg_match('{^~>?' . $versionRegex . '$}i', $constraint, $matches)) {
             if (\strpos($constraint, '~>') === 0) {
                 throw new \UnexpectedValueException('Could not parse version constraint ' . $constraint . ': ' . 'Invalid operator "~>", you probably meant to use the "~" operator');
@@ -184,13 +196,11 @@ class VersionParser
             } else {
                 $position = 1;
             }
-            for ($i = $position; $i >= 0; $i--) {
-                if ($matches[$i] === 'x' || $matches[$i] === 'X' || $matches[$i] === '*') {
-                    $matches[$i] = '9999999';
-                }
+            if (!empty($matches[8])) {
+                $position++;
             }
             $stabilitySuffix = '';
-            if (empty($matches[5]) && empty($matches[7])) {
+            if (empty($matches[5]) && empty($matches[7]) && empty($matches[8])) {
                 $stabilitySuffix .= '-dev';
             }
             $lowVersion = $this->normalize(\substr($constraint . $stabilitySuffix, 1));
@@ -208,11 +218,8 @@ class VersionParser
             } else {
                 $position = 3;
             }
-            if ($position === 2 && ($matches[2] === 'x' || $matches[2] === 'X' || $matches[2] === '*')) {
-                $position = 1;
-            }
             $stabilitySuffix = '';
-            if (empty($matches[5]) && empty($matches[7])) {
+            if (empty($matches[5]) && empty($matches[7]) && empty($matches[8])) {
                 $stabilitySuffix .= '-dev';
             }
             $lowVersion = $this->normalize(\substr($constraint . $stabilitySuffix, 1));
@@ -238,7 +245,7 @@ class VersionParser
         }
         if (\preg_match('{^(?P<from>' . $versionRegex . ') +- +(?P<to>' . $versionRegex . ')($)}i', $constraint, $matches)) {
             $lowStabilitySuffix = '';
-            if (empty($matches[6]) && empty($matches[8])) {
+            if (empty($matches[6]) && empty($matches[8]) && empty($matches[9])) {
                 $lowStabilitySuffix = '-dev';
             }
             $lowVersion = $this->normalize($matches['from']);
@@ -246,13 +253,13 @@ class VersionParser
             $empty = function ($x) {
                 return $x === 0 || $x === '0' ? \false : empty($x);
             };
-            if (!$empty($matches[11]) && !$empty($matches[12]) || !empty($matches[14]) || !empty($matches[16])) {
+            if (!$empty($matches[12]) && !$empty($matches[13]) || !empty($matches[15]) || !empty($matches[17]) || !empty($matches[18])) {
                 $highVersion = $this->normalize($matches['to']);
                 $upperBound = new Constraint('<=', $highVersion);
             } else {
-                $highMatch = array('', $matches[10], $matches[11], $matches[12], $matches[13]);
+                $highMatch = array('', $matches[11], $matches[12], $matches[13], $matches[14]);
                 $this->normalize($matches['to']);
-                $highVersion = $this->manipulateVersionString($highMatch, $empty($matches[11]) ? 1 : 2, 1) . '-dev';
+                $highVersion = $this->manipulateVersionString($highMatch, $empty($matches[12]) ? 1 : 2, 1) . '-dev';
                 $upperBound = new Constraint('<', $highVersion);
             }
             return array($lowerBound, $upperBound);
@@ -262,7 +269,7 @@ class VersionParser
                 try {
                     $version = $this->normalize($matches[2]);
                 } catch (\UnexpectedValueException $e) {
-                    if (\substr($matches[2], -4) === '-dev') {
+                    if (\substr($matches[2], -4) === '-dev' && \preg_match('{^[0-9a-zA-Z-./]+$}', $matches[2])) {
                         $version = $this->normalize('dev-' . \substr($matches[2], 0, -4));
                     } else {
                         throw $e;
@@ -288,7 +295,10 @@ class VersionParser
         }
         throw new \UnexpectedValueException($message);
     }
-    private function manipulateVersionString($matches, $position, $increment = 0, $pad = '0')
+    /**
+    @phpstan-param
+    */
+    private function manipulateVersionString(array $matches, $position, $increment = 0, $pad = '0')
     {
         for ($i = 4; $i > 0; --$i) {
             if ($i > $position) {
