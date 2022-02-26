@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-use Generator;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -23,7 +22,7 @@ use PHPUnit\Framework\TestCase;
 class PlaceholderTest extends TestCase
 {
     /**
-     * @dataProvider provideFilesContents
+     * @dataProvider filesContentsProvider
      */
     public function test_it_replaces_the_placeholders(array $placeholders, string $contents, string $expected): void
     {
@@ -42,7 +41,7 @@ class PlaceholderTest extends TestCase
         );
     }
 
-    public function provideFilesContents(): Generator
+    public static function filesContentsProvider(): iterable
     {
         yield [[], '', ''];
 

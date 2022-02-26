@@ -17,7 +17,6 @@ namespace KevinGH\Box\Configuration;
 use function chdir;
 use const DIRECTORY_SEPARATOR;
 use function file_get_contents;
-use Generator;
 use InvalidArgumentException;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_absolute;
@@ -140,7 +139,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
     }
 
     /**
-     * @dataProvider provideConfigWithMainScript
+     * @dataProvider configWithMainScriptProvider
      */
     public function test_the_main_script_file_is_always_ignored(callable $setUp, array $config, array $expectedFiles, array $expectedBinFiles): void
     {
@@ -156,7 +155,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
     }
 
     /**
-     * @dataProvider provideConfigWithGeneratedArtefact
+     * @dataProvider configWithGeneratedArtefactProvider
      */
     public function test_the_generated_artefact_is_always_ignored(callable $setUp, array $config, array $expectedFiles, array $expectedBinFiles): void
     {
@@ -1117,7 +1116,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
     }
 
     /**
-     * @dataProvider provideJsonValidNonStringArray
+     * @dataProvider jsonValidNonStringArrayProvider
      *
      * @param mixed $value
      */
@@ -1177,7 +1176,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
     }
 
     /**
-     * @dataProvider provideJsonValidNonStringArray
+     * @dataProvider jsonValidNonStringArrayProvider
      *
      * @param mixed $value
      */
@@ -1211,7 +1210,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
     }
 
     /**
-     * @dataProvider provideJsonValidNonStringArray
+     * @dataProvider jsonValidNonStringArrayProvider
      *
      * @param mixed $value
      */
@@ -1258,7 +1257,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
     }
 
     /**
-     * @dataProvider provideJsonValidNonStringArray
+     * @dataProvider jsonValidNonStringArrayProvider
      *
      * @param mixed $value
      */
@@ -1292,7 +1291,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
     }
 
     /**
-     * @dataProvider provideJsonValidNonStringArray
+     * @dataProvider jsonValidNonStringArrayProvider
      *
      * @param mixed $value
      */
@@ -1340,11 +1339,9 @@ class ConfigurationFileTest extends ConfigurationTestCase
     }
 
     /**
-     * @dataProvider provideJsonValidNonObjectArray
-     *
-     * @param mixed $value
+     * @dataProvider jsonValidNonObjectArrayProvider
      */
-    public function test_finder_value_must_be_an_array_of_objects($value): void
+    public function test_finder_value_must_be_an_array_of_objects(mixed $value): void
     {
         try {
             $this->setConfig([
@@ -1580,7 +1577,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
     }
 
     /**
-     * @dataProvider provideFilesAutodiscoveryConfig
+     * @dataProvider filesAutodiscoveryConfigProvider
      */
     public function test_files_are_autodiscovered_unless_directory_or_finder_config_is_provided(
         callable $setUp,
@@ -1906,7 +1903,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
         $this->assertCount(0, $this->config->getBinaryFiles());
     }
 
-    public function provideConfigWithMainScript(): Generator
+    public static function configWithMainScriptProvider(): iterable
     {
         yield [
             static function (): void {
@@ -2078,7 +2075,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
         ];
     }
 
-    public function provideConfigWithGeneratedArtefact(): Generator
+    public static function configWithGeneratedArtefactProvider(): iterable
     {
         yield [
             static function (): void {
@@ -2257,9 +2254,9 @@ class ConfigurationFileTest extends ConfigurationTestCase
         ];
     }
 
-    public function provideJsonValidNonStringArray(): Generator
+    public static function jsonValidNonStringArrayProvider(): iterable
     {
-        foreach ($this->provideJsonPrimitives() as $key => $values) {
+        foreach (self::jsonPrimitivesProvider() as $key => $values) {
             if ('string' === $key) {
                 continue;
             }
@@ -2268,9 +2265,9 @@ class ConfigurationFileTest extends ConfigurationTestCase
         }
     }
 
-    public function provideJsonValidNonObjectArray(): Generator
+    public static function jsonValidNonObjectArrayProvider(): iterable
     {
-        foreach ($this->provideJsonPrimitives() as $key => $values) {
+        foreach (self::jsonPrimitivesProvider() as $key => $values) {
             if ('object' === $key) {
                 continue;
             }
@@ -2279,7 +2276,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
         }
     }
 
-    public function provideJsonPrimitives(): Generator
+    public static function jsonPrimitivesProvider(): iterable
     {
         yield 'null' => null;
         yield 'bool' => true;
@@ -2289,7 +2286,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
         yield 'array' => ['foo', 'bar'];
     }
 
-    public function provideFilesAutodiscoveryConfig(): Generator
+    public static function filesAutodiscoveryConfigProvider(): iterable
     {
         yield [
             static function (): void {},

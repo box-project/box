@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Configuration;
 
 use function current;
-use Generator;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Php;
 use stdClass;
@@ -97,12 +96,10 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
     }
 
     /**
-     * @dataProvider provideAnnotationConfigurationsWithoutPhpCompactorRegistered
-     *
-     * @param mixed $annotationValue
+     * @dataProvider annotationConfigurationsWithoutPhpCompactorRegisteredProvider
      */
     public function test_a_warning_is_given_if_the_php_compactor_annotations_are_configured_but_no_php_compactor_is_registered(
-        $annotationValue,
+        mixed $annotationValue,
         array $expectedRecommendations,
         array $expectedWarnings,
     ): void {
@@ -141,7 +138,7 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
     }
 
     /**
-     * @dataProvider providePhpContentsToCompact
+     * @dataProvider phpContentsToCompactProvider
      */
     public function test_ignored_annotations_are_provided_to_the_php_compactor(
         array $config,
@@ -164,7 +161,7 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function provideAnnotationConfigurationsWithoutPhpCompactorRegistered(): Generator
+    public static function annotationConfigurationsWithoutPhpCompactorRegisteredProvider(): iterable
     {
         $defaultWarning = 'The "annotations" setting has been set but is ignored since no PHP compactor has been configured';
 
@@ -201,7 +198,7 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
         ];
     }
 
-    public function providePhpContentsToCompact(): Generator
+    public static function phpContentsToCompactProvider(): iterable
     {
         yield [
             [

@@ -16,7 +16,6 @@ namespace KevinGH\Box\Configuration;
 
 use function array_unshift;
 use const DIRECTORY_SEPARATOR;
-use Generator;
 use function in_array;
 use InvalidArgumentException;
 use function KevinGH\Box\FileSystem\touch;
@@ -65,7 +64,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
     }
 
     /**
-     * @dataProvider providePassFileFreeSigningAlgorithm
+     * @dataProvider passFileFreeSigningAlgorithmProvider
      */
     public function test_the_signing_algorithm_can_be_configured(string $algorithm, int $expected): void
     {
@@ -114,7 +113,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
     }
 
     /**
-     * @dataProvider providePassFileFreeSigningAlgorithm
+     * @dataProvider passFileFreeSigningAlgorithmProvider
      */
     public function test_it_generates_a_warning_when_a_key_pass_is_provided_but_the_algorithm_is_not__open_ssl(string $algorithm): void
     {
@@ -186,7 +185,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
     }
 
     /**
-     * @dataProvider providePassFileFreeSigningAlgorithm
+     * @dataProvider passFileFreeSigningAlgorithmProvider
      */
     public function test_it_generates_a_warning_when_a_key_path_is_provided_but_the_algorithm_is_not__open_ssl(string $algorithm): void
     {
@@ -298,7 +297,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
         $this->assertSame([], $this->config->getWarnings());
     }
 
-    public function providePassFileFreeSigningAlgorithm(): Generator
+    public static function passFileFreeSigningAlgorithmProvider(): iterable
     {
         yield ['MD5', Phar::MD5];
         yield ['SHA1', Phar::SHA1];

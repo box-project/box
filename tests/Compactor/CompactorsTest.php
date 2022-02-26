@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-use Generator;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\PhpScoper\NullScoper;
 use KevinGH\Box\PhpScoper\Scoper;
@@ -22,6 +21,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
+use Prophecy\Prophet;
 
 /**
  * @covers \KevinGH\Box\Compactor\Compactors
@@ -87,7 +87,7 @@ class CompactorsTest extends TestCase
     }
 
     /**
-     * @dataProvider provideCompactorsForFirstSymbolsRegistryCheck
+     * @dataProvider compactorsForFirstSymbolsRegistryCheckProvider
      *
      * @param list<Compactor> $compactors
      */
@@ -101,7 +101,7 @@ class CompactorsTest extends TestCase
     }
 
     /**
-     * @dataProvider provideCompactorsForFirstSymbolsRegistryChange
+     * @dataProvider compactorsForFirstSymbolsRegistryChangeProvider
      *
      * @param list<Compactor> $compactors
      */
@@ -109,6 +109,9 @@ class CompactorsTest extends TestCase
         array $compactors,
         ?SymbolsRegistry $newSymbolsRegistry,
     ): void {
+        // We need to do this here since we use a prophet in the data provider
+        $this->recordDoubledType(Scoper::class);
+
         $compactorsAggregate = new Compactors(...$compactors);
 
         if (null !== $newSymbolsRegistry) {
@@ -127,7 +130,7 @@ class CompactorsTest extends TestCase
         $this->assertCount(2, new Compactors(new FakeCompactor(), new FakeCompactor()));
     }
 
-    public function provideCompactorsForFirstSymbolsRegistryCheck(): Generator
+    public static function compactorsForFirstSymbolsRegistryCheckProvider(): iterable
     {
         $symbolsRegistry1 = new SymbolsRegistry();
         $symbolsRegistry2 = new SymbolsRegistry();
@@ -145,7 +148,7 @@ class CompactorsTest extends TestCase
         yield [
             [
                 new FakeCompactor(),
-                $this->createScoperCompactor($symbolsRegistry1),
+                self::createScoperCompactor($symbolsRegistry1),
             ],
             $symbolsRegistry1,
         ];
@@ -153,14 +156,14 @@ class CompactorsTest extends TestCase
         yield [
             [
                 new FakeCompactor(),
-                $this->createScoperCompactor($symbolsRegistry1),
-                $this->createScoperCompactor($symbolsRegistry2),
+                self::createScoperCompactor($symbolsRegistry1),
+                self::createScoperCompactor($symbolsRegistry2),
             ],
             $symbolsRegistry1,
         ];
     }
 
-    public function provideCompactorsForFirstSymbolsRegistryChange(): Generator
+    public static function compactorsForFirstSymbolsRegistryChangeProvider(): iterable
     {
         $symbolsRegistry1 = new SymbolsRegistry();
         $symbolsRegistry2 = new SymbolsRegistry();
@@ -178,7 +181,7 @@ class CompactorsTest extends TestCase
         yield [
             [
                 new FakeCompactor(),
-                $this->createScoperCompactorWithChangeWhitelist($symbolsRegistry1),
+                self::createScoperCompactorWithChangeSymbolsRegistry($symbolsRegistry1),
             ],
             $symbolsRegistry1,
         ];
@@ -186,22 +189,24 @@ class CompactorsTest extends TestCase
         yield [
             [
                 new FakeCompactor(),
-                $this->createScoperCompactorWithChangeWhitelist($symbolsRegistry1),
-                $this->createScoperCompactorWithChangeWhitelist($symbolsRegistry2),
+                self::createScoperCompactorWithChangeSymbolsRegistry($symbolsRegistry1),
+                self::createScoperCompactorWithChangeSymbolsRegistry($symbolsRegistry2),
             ],
             $symbolsRegistry1,
         ];
     }
 
-    private function createScoperCompactor(SymbolsRegistry $symbolsRegistry): PhpScoper
+    private static function createScoperCompactor(SymbolsRegistry $symbolsRegistry): PhpScoper
     {
         return new PhpScoper(new NullScoper($symbolsRegistry));
     }
 
-    private function createScoperCompactorWithChangeWhitelist(SymbolsRegistry $symbolsRegistry): PhpScoper
+    private static function createScoperCompactorWithChangeSymbolsRegistry(SymbolsRegistry $symbolsRegistry): PhpScoper
     {
+        $prophet = new Prophet();
+
         /** @var ObjectProphecy<Scoper> $scoperProphecy */
-        $scoperProphecy = $this->prophesize(Scoper::class);
+        $scoperProphecy = $prophet->prophesize(Scoper::class);
         $scoperProphecy->changeSymbolsRegistry($symbolsRegistry)->shouldBeCalled();
         $scoperProphecy->getSymbolsRegistry()->willReturn($symbolsRegistry);
 

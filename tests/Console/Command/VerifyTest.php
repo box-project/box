@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use Generator;
 use InvalidArgumentException;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
@@ -45,7 +44,7 @@ class VerifyTest extends CommandTestCase
     }
 
     /**
-     * @dataProvider providePassingPharPaths
+     * @dataProvider passingPharPathsProvider
      */
     public function test_it_verifies_the_signature_of_the_given_file_using_the_phar_extension(string $pharPath): void
     {
@@ -94,7 +93,7 @@ class VerifyTest extends CommandTestCase
     }
 
     /**
-     * @dataProvider providePassingPharPaths
+     * @dataProvider passingPharPathsProvider
      */
     public function test_it_verifies_the_signature_of_the_given_file_in_debug_mode(string $pharPath): void
     {
@@ -144,7 +143,7 @@ class VerifyTest extends CommandTestCase
     }
 
     /**
-     * @dataProvider provideFailingPharPaths
+     * @dataProvider failingPharPathsProvider
      */
     public function test_a_corrupted_phar_fails_the_verification(string $pharPath): void
     {
@@ -162,7 +161,7 @@ class VerifyTest extends CommandTestCase
         $this->assertSame(1, $this->commandTester->getStatusCode());
     }
 
-    public function providePassingPharPaths(): Generator
+    public static function passingPharPathsProvider(): iterable
     {
         yield 'simple PHAR' => [
             realpath(self::FIXTURES_DIR.'/simple-phar.phar'),
@@ -173,7 +172,7 @@ class VerifyTest extends CommandTestCase
         ];
     }
 
-    public function provideFailingPharPaths(): Generator
+    public static function failingPharPathsProvider(): iterable
     {
         yield 'a fake PHAR' => [
             realpath(self::FIXTURES_DIR.'/not-a-phar.phar'),

@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use Generator;
 use PHPUnit\Framework\TestCase;
 use UnexpectedValueException;
 
@@ -24,7 +23,7 @@ use UnexpectedValueException;
 class DockerFileGeneratorTest extends TestCase
 {
     /**
-     * @dataProvider provideGeneratorData
+     * @dataProvider generatorDataProvider
      */
     public function test_it_can_generate_a_dockerfile_contents(
         string $image,
@@ -38,7 +37,7 @@ class DockerFileGeneratorTest extends TestCase
     }
 
     /**
-     * @dataProvider provideGeneratorRequirements
+     * @dataProvider generatorRequirementsProvider
      */
     public function test_it_can_generate_a_dockerfile_contents_from_requirements(
         array $requirements,
@@ -72,7 +71,7 @@ class DockerFileGeneratorTest extends TestCase
         }
     }
 
-    public function provideGeneratorData(): Generator
+    public static function generatorDataProvider(): iterable
     {
         yield [
             '7.2-cli-alpine',
@@ -107,7 +106,7 @@ class DockerFileGeneratorTest extends TestCase
         ];
     }
 
-    public function provideGeneratorRequirements(): Generator
+    public static function generatorRequirementsProvider(): iterable
     {
         yield [
             [

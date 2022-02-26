@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Composer;
 
 use Closure;
-use Generator;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -24,7 +23,7 @@ use PHPUnit\Framework\TestCase;
 class ComposerFilesTest extends TestCase
 {
     /**
-     * @dataProvider provideValidInstantiators
+     * @dataProvider validInstantiatorsProvider
      *
      * @param string[] $paths
      */
@@ -47,7 +46,7 @@ class ComposerFilesTest extends TestCase
         $this->assertSame($expectedPaths, $actual->getPaths());
     }
 
-    public function provideValidInstantiators(): Generator
+    public static function validInstantiatorsProvider(): iterable
     {
         yield (static function (): array {
             $json = new ComposerFile('path/to/composer.json', ['name' => 'composer.json']);

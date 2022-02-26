@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-use Generator;
 use KevinGH\Box\Annotation\CompactedFormatter;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
 use KevinGH\Box\Console\DisplayNormalizer;
@@ -27,7 +26,7 @@ use PHPUnit\Framework\TestCase;
 class PhpTest extends TestCase
 {
     /**
-     * @dataProvider provideFiles
+     * @dataProvider filesProvider
      */
     public function test_it_supports_php_files(string $file, bool $supports): void
     {
@@ -55,7 +54,7 @@ class PhpTest extends TestCase
     }
 
     /**
-     * @dataProvider providePhpContent
+     * @dataProvider phpContentProvider
      */
     public function test_it_compacts_php_files(DocblockAnnotationParser $annotationParser, string $content, string $expected): void
     {
@@ -84,14 +83,14 @@ class PhpTest extends TestCase
         );
     }
 
-    public function provideFiles(): Generator
+    public static function filesProvider(): iterable
     {
         yield 'no extension' => ['test', false];
 
         yield 'PHP file' => ['test.php', true];
     }
 
-    public function providePhpContent(): Generator
+    public static function phpContentProvider(): iterable
     {
         $regularAnnotationParser = new DocblockAnnotationParser(
             DocBlockFactory::createInstance(),

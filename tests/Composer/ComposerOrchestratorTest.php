@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Composer;
 
 use function file_get_contents;
-use Generator;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function iterator_to_array;
 use KevinGH\Box\Console\DisplayNormalizer;
@@ -36,7 +35,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
     private const COMPOSER_AUTOLOADER_NAME = 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05';
 
     /**
-     * @dataProvider provideComposerAutoload
+     * @dataProvider composerAutoloadProvider
      */
     public function test_it_can_dump_the_autoloader_with_an_empty_composer_json(
         SymbolsRegistry $symbolsRegistry,
@@ -95,7 +94,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
     }
 
     /**
-     * @dataProvider provideComposerAutoload
+     * @dataProvider composerAutoloadProvider
      */
     public function test_it_cannot_dump_the_autoloader_with_an_invalid_composer_json(
         SymbolsRegistry $symbolsRegistry,
@@ -188,7 +187,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
     }
 
     /**
-     * @dataProvider provideComposerAutoload
+     * @dataProvider composerAutoloadProvider
      */
     public function test_it_cannot_dump_the_autoloader_if_the_composer_json_file_is_missing(
         SymbolsRegistry $symbolsRegistry,
@@ -214,7 +213,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
     }
 
     /**
-     * @dataProvider provideComposerAutoload
+     * @dataProvider composerAutoloadProvider
      */
     public function test_it_can_dump_the_autoloader_with_a_composer_json_lock_and_installed_with_a_dependency(
         SymbolsRegistry $SymbolsRegistry,
@@ -376,7 +375,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
     }
 
     /**
-     * @dataProvider provideComposerAutoload
+     * @dataProvider composerAutoloadProvider
      */
     public function test_it_can_dump_the_autoloader_with_a_composer_json_and_lock_with_a_dependency(
         SymbolsRegistry $symbolsRegistry,
@@ -446,7 +445,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
         );
     }
 
-    public function provideComposerAutoload(): Generator
+    public static function composerAutoloadProvider(): iterable
     {
         $composerAutoloaderName = self::COMPOSER_AUTOLOADER_NAME;
 

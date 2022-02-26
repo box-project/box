@@ -22,7 +22,6 @@ use function date_default_timezone_set;
 use DateTimeImmutable;
 use const DIRECTORY_SEPARATOR;
 use function exec;
-use Generator;
 use function getcwd;
 use InvalidArgumentException;
 use function json_decode;
@@ -314,7 +313,7 @@ class ConfigurationTest extends ConfigurationTestCase
     }
 
     /**
-     * @dataProvider provideJsonFiles
+     * @dataProvider jsonFilesProvider
      */
     public function test_it_attempts_to_get_and_decode_the_json_and_lock_files(
         callable $setup,
@@ -777,7 +776,7 @@ class ConfigurationTest extends ConfigurationTestCase
     }
 
     /**
-     * @dataProvider provideInvalidCompressionAlgorithms
+     * @dataProvider invalidCompressionAlgorithmsProvider
      *
      * @param mixed $compression
      */
@@ -2044,7 +2043,7 @@ class ConfigurationTest extends ConfigurationTestCase
     }
 
     /**
-     * @dataProvider provideCustomBanner
+     * @dataProvider customBannerProvider
      */
     public function test_a_custom_banner_can_be_registered(string $banner): void
     {
@@ -2134,7 +2133,7 @@ class ConfigurationTest extends ConfigurationTestCase
     }
 
     /**
-     * @dataProvider provideUnormalizedCustomBanner
+     * @dataProvider unormalizedCustomBannerProvider
      */
     public function test_the_content_of_the_banner_is_normalized(string $banner, string $expected): void
     {
@@ -3059,7 +3058,7 @@ class ConfigurationTest extends ConfigurationTestCase
         $this->assertSame($expectedDumpedConfig, $actualDumpedConfig);
     }
 
-    public function provideInvalidCompressionAlgorithms(): Generator
+    public static function invalidCompressionAlgorithmsProvider(): iterable
     {
         yield 'Invalid string key' => [
             'INVALID',
@@ -3082,7 +3081,7 @@ class ConfigurationTest extends ConfigurationTestCase
         ];
     }
 
-    public function provideJsonValidNonStringValues(): Generator
+    public static function JsonValidNonStringValuesProvider(): iterable
     {
         foreach ($this->provideJsonPrimitives() as $key => $value) {
             if ('string' === $key) {
@@ -3093,7 +3092,7 @@ class ConfigurationTest extends ConfigurationTestCase
         }
     }
 
-    public function provideJsonValidNonStringArray(): Generator
+    public static function JsonValidNonStringArrayProvider(): iterable
     {
         foreach ($this->provideJsonPrimitives() as $key => $values) {
             if ('string' === $key) {
@@ -3104,7 +3103,7 @@ class ConfigurationTest extends ConfigurationTestCase
         }
     }
 
-    public function provideJsonValidNonObjectArray(): Generator
+    public static function JsonValidNonObjectArrayProvider(): iterable
     {
         foreach ($this->provideJsonPrimitives() as $key => $values) {
             if ('object' === $key) {
@@ -3115,7 +3114,7 @@ class ConfigurationTest extends ConfigurationTestCase
         }
     }
 
-    public function provideJsonPrimitives(): Generator
+    public static function JsonPrimitivesProvider(): iterable
     {
         yield 'null' => null;
         yield 'bool' => true;
@@ -3125,7 +3124,7 @@ class ConfigurationTest extends ConfigurationTestCase
         yield 'array' => ['foo', 'bar'];
     }
 
-    public function provideCustomBanner(): Generator
+    public static function customBannerProvider(): iterable
     {
         yield ['Simple banner'];
 
@@ -3139,7 +3138,7 @@ class ConfigurationTest extends ConfigurationTestCase
         ];
     }
 
-    public function provideUnormalizedCustomBanner(): Generator
+    public static function unormalizedCustomBannerProvider(): iterable
     {
         yield [
             ' Simple banner ',
@@ -3165,7 +3164,7 @@ class ConfigurationTest extends ConfigurationTestCase
         ];
     }
 
-    public function provideJsonFiles(): Generator
+    public static function jsonFilesProvider(): iterable
     {
         yield [
             static function (): void {},
@@ -3269,7 +3268,7 @@ class ConfigurationTest extends ConfigurationTestCase
         ];
     }
 
-    public function providePassFileFreeSigningAlgorithm(): Generator
+    public static function PassFileFreeSigningAlgorithmProvider(): iterable
     {
         yield ['MD5', Phar::MD5];
         yield ['SHA1', Phar::SHA1];

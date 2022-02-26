@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Configuration;
 
-use Generator;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -37,7 +36,7 @@ class ConfigurationLoggerTest extends TestCase
     }
 
     /**
-     * @dataProvider provideEmptyMessage
+     * @dataProvider emptyMessageProvider
      */
     public function test_it_cannot_accept_an_empty_message(string $message): void
     {
@@ -116,7 +115,7 @@ class ConfigurationLoggerTest extends TestCase
         );
     }
 
-    public function provideEmptyMessage(): Generator
+    public static function emptyMessageProvider(): iterable
     {
         yield [''];
         yield [' '];
