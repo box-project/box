@@ -1,8 +1,8 @@
 <?php
 
-namespace HumbugBox3150\KevinGH\RequirementChecker;
+namespace HumbugBox3160\KevinGH\RequirementChecker;
 
-use HumbugBox3150\Composer\Semver\Semver;
+use HumbugBox3160\Composer\Semver\Semver;
 final class IsPhpVersionFulfilled implements IsFulfilled
 {
     private $requiredPhpVersion;

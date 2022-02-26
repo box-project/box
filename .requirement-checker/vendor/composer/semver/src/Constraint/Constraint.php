@@ -1,6 +1,6 @@
 <?php
 
-namespace HumbugBox3150\Composer\Semver\Constraint;
+namespace HumbugBox3160\Composer\Semver\Constraint;
 
 class Constraint implements ConstraintInterface
 {
@@ -10,6 +10,14 @@ class Constraint implements ConstraintInterface
     const OP_GT = 3;
     const OP_GE = 4;
     const OP_NE = 5;
+    const STR_OP_EQ = '==';
+    const STR_OP_EQ_ALT = '=';
+    const STR_OP_LT = '<';
+    const STR_OP_LE = '<=';
+    const STR_OP_GT = '>';
+    const STR_OP_GE = '>=';
+    const STR_OP_NE = '!=';
+    const STR_OP_NE_ALT = '<>';
     /**
     @phpstan-var
     */
@@ -26,6 +34,9 @@ class Constraint implements ConstraintInterface
     protected $prettyString;
     protected $lowerBound;
     protected $upperBound;
+    /**
+    @phpstan-param
+    */
     public function __construct($operator, $version)
     {
         if (!isset(self::$transOpStr[$operator])) {
@@ -38,6 +49,9 @@ class Constraint implements ConstraintInterface
     {
         return $this->version;
     }
+    /**
+    @phpstan-return
+    */
     public function getOperator()
     {
         return self::$transOpInt[$this->operator];
@@ -60,24 +74,31 @@ class Constraint implements ConstraintInterface
         }
         return $this->__toString();
     }
+    /**
+    @phpstan-return
+    */
     public static function getSupportedOperators()
     {
         return \array_keys(self::$transOpStr);
     }
     /**
+    @phpstan-param
     @phpstan-return
     */
     public static function getOperatorConstant($operator)
     {
         return self::$transOpStr[$operator];
     }
+    /**
+    @phpstan-param
+    */
     public function versionCompare($a, $b, $operator, $compareBranches = \false)
     {
         if (!isset(self::$transOpStr[$operator])) {
             throw new \InvalidArgumentException(\sprintf('Invalid operator "%s" given, expected one of: %s', $operator, \implode(', ', self::getSupportedOperators())));
         }
-        $aIsBranch = 'dev-' === \substr($a, 0, 4);
-        $bIsBranch = 'dev-' === \substr($b, 0, 4);
+        $aIsBranch = \strpos($a, 'dev-') === 0;
+        $bIsBranch = \strpos($b, 'dev-') === 0;
         if ($operator === '!=' && ($aIsBranch || $bIsBranch)) {
             return $a !== $b;
         }
@@ -91,7 +112,7 @@ class Constraint implements ConstraintInterface
     }
     public function compile($otherOperator)
     {
-        if ($this->version[0] === 'd' && 'dev-' === \substr($this->version, 0, 4)) {
+        if (\strpos($this->version, 'dev-') === 0) {
             if (self::OP_EQ === $this->operator) {
                 if (self::OP_EQ === $otherOperator) {
                     return \sprintf('$b && $v === %s', \var_export($this->version, \true));
@@ -134,7 +155,7 @@ class Constraint implements ConstraintInterface
             if (self::OP_LT === $otherOperator || self::OP_LE === $otherOperator) {
                 return '!$b';
             }
-        } elseif (self::OP_GT === $this->operator || self::OP_GE === $this->operator) {
+        } else {
             if (self::OP_GT === $otherOperator || self::OP_GE === $otherOperator) {
                 return '!$b';
             }
@@ -163,10 +184,10 @@ class Constraint implements ConstraintInterface
         $isProviderEqualOp = self::OP_EQ === $provider->operator;
         $isProviderNonEqualOp = self::OP_NE === $provider->operator;
         if ($isNonEqualOp || $isProviderNonEqualOp) {
-            if ($isNonEqualOp && !$isProviderNonEqualOp && !$isProviderEqualOp && 'dev-' === \substr($provider->version, 0, 4)) {
+            if ($isNonEqualOp && !$isProviderNonEqualOp && !$isProviderEqualOp && \strpos($provider->version, 'dev-') === 0) {
                 return \false;
             }
-            if ($isProviderNonEqualOp && !$isNonEqualOp && !$isEqualOp && 'dev-' === \substr($this->version, 0, 4)) {
+            if ($isProviderNonEqualOp && !$isNonEqualOp && !$isEqualOp && \strpos($this->version, 'dev-') === 0) {
                 return \false;
             }
             if (!$isEqualOp && !$isProviderEqualOp) {
@@ -175,10 +196,7 @@ class Constraint implements ConstraintInterface
             return $this->versionCompare($provider->version, $this->version, '!=', $compareBranches);
         }
         if ($this->operator !== self::OP_EQ && $noEqualOp === $providerNoEqualOp) {
-            if ('dev-' === \substr($this->version, 0, 4) || 'dev-' === \substr($provider->version, 0, 4)) {
-                return \false;
-            }
-            return \true;
+            return !(\strpos($this->version, 'dev-') === 0 || \strpos($provider->version, 'dev-') === 0);
         }
         $version1 = $isEqualOp ? $this->version : $provider->version;
         $version2 = $isEqualOp ? $provider->version : $this->version;

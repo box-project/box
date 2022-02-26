@@ -1,9 +1,12 @@
 <?php
 
-namespace HumbugBox3150\Composer\Semver\Constraint;
+namespace HumbugBox3160\Composer\Semver\Constraint;
 
 class MultiConstraint implements ConstraintInterface
 {
+    /**
+    @phpstan-var
+    */
     protected $constraints;
     protected $prettyString;
     protected $string;
@@ -62,6 +65,9 @@ class MultiConstraint implements ConstraintInterface
             }
             return \false;
         }
+        if ($provider instanceof MultiConstraint && $provider->isDisjunctive()) {
+            return $provider->matches($this);
+        }
         foreach ($this->constraints as $constraint) {
             if (!$provider->matches($constraint)) {
                 return \false;
@@ -94,11 +100,17 @@ class MultiConstraint implements ConstraintInterface
     public function getLowerBound()
     {
         $this->extractBounds();
+        if (null === $this->lowerBound) {
+            throw new \LogicException('extractBounds should have populated the lowerBound property');
+        }
         return $this->lowerBound;
     }
     public function getUpperBound()
     {
         $this->extractBounds();
+        if (null === $this->upperBound) {
+            throw new \LogicException('extractBounds should have populated the upperBound property');
+        }
         return $this->upperBound;
     }
     public static function create(array $constraints, $conjunctive = \true)
@@ -118,6 +130,9 @@ class MultiConstraint implements ConstraintInterface
         }
         return new self($constraints, $conjunctive);
     }
+    /**
+    @phpstan-return
+    */
     private static function optimizeConstraints(array $constraints, $conjunctive)
     {
         if (!$conjunctive) {
@@ -126,9 +141,9 @@ class MultiConstraint implements ConstraintInterface
             $optimized = \false;
             for ($i = 1, $l = \count($constraints); $i < $l; $i++) {
                 $right = $constraints[$i];
-                if ($left instanceof MultiConstraint && $left->conjunctive && $right instanceof MultiConstraint && $right->conjunctive && ($left0 = (string) $left->constraints[0]) && $left0[0] === '>' && $left0[1] === '=' && ($left1 = (string) $left->constraints[1]) && $left1[0] === '<' && ($right0 = (string) $right->constraints[0]) && $right0[0] === '>' && $right0[1] === '=' && ($right1 = (string) $right->constraints[1]) && $right1[0] === '<' && \substr($left1, 2) === \substr($right0, 3)) {
+                if ($left instanceof self && $left->conjunctive && $right instanceof self && $right->conjunctive && \count($left->constraints) === 2 && \count($right->constraints) === 2 && ($left0 = (string) $left->constraints[0]) && $left0[0] === '>' && $left0[1] === '=' && ($left1 = (string) $left->constraints[1]) && $left1[0] === '<' && ($right0 = (string) $right->constraints[0]) && $right0[0] === '>' && $right0[1] === '=' && ($right1 = (string) $right->constraints[1]) && $right1[0] === '<' && \substr($left1, 2) === \substr($right0, 3)) {
                     $optimized = \true;
-                    $left = new MultiConstraint(\array_merge(array($left->constraints[0], $right->constraints[1]), \array_slice($left->constraints, 2), \array_slice($right->constraints, 2)), \true);
+                    $left = new MultiConstraint(array($left->constraints[0], $right->constraints[1]), \true);
                 } else {
                     $mergedConstraints[] = $left;
                     $left = $right;
@@ -147,7 +162,7 @@ class MultiConstraint implements ConstraintInterface
             return;
         }
         foreach ($this->constraints as $constraint) {
-            if (null === $this->lowerBound && null === $this->upperBound) {
+            if (null === $this->lowerBound || null === $this->upperBound) {
                 $this->lowerBound = $constraint->getLowerBound();
                 $this->upperBound = $constraint->getUpperBound();
                 continue;
