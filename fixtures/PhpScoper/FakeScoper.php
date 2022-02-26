@@ -14,34 +14,31 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PhpScoper;
 
-use function func_get_args;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-use KevinGH\Box\NotCallable;
+use KevinGH\Box\UnsupportedMethodCall;
 
 final class FakeScoper implements Scoper
 {
-    use NotCallable;
-
     /**
      * {@inheritdoc}
      */
     public function scope(string $filePath, string $contents): string
     {
-        $this->__call(__METHOD__, func_get_args());
+        throw UnsupportedMethodCall::forMethod(__CLASS__, __METHOD__);
     }
 
     public function changeSymbolsRegistry(SymbolsRegistry $symbolsRegistry): void
     {
-        $this->__call(__METHOD__, func_get_args());
+        throw UnsupportedMethodCall::forMethod(__CLASS__, __METHOD__);
     }
 
     public function getSymbolsRegistry(): SymbolsRegistry
     {
-        $this->__call(__METHOD__, func_get_args());
+        throw UnsupportedMethodCall::forMethod(__CLASS__, __METHOD__);
     }
 
     public function getPrefix(): string
     {
-        $this->__call(__METHOD__, func_get_args());
+        throw UnsupportedMethodCall::forMethod(__CLASS__, __METHOD__);
     }
 }

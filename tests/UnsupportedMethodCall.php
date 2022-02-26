@@ -15,17 +15,17 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use DomainException;
-use function sprintf;
+use function Safe\sprintf;
 
-// TODO: move this to throw unsupported method exception instead
-trait NotCallable
+final class UnsupportedMethodCall extends DomainException
 {
-    public function __call($method, $arguments): void
+    public static function forMethod(string $className, string $functionName): self
     {
-        throw new DomainException(
+        return new self(
             sprintf(
-                'Did not expect "%s" to be called.',
-                $method,
+                'Did not expect "%s::%s()" to be called.',
+                $className,
+                $functionName,
             ),
         );
     }

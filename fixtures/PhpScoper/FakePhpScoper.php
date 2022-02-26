@@ -14,19 +14,16 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PhpScoper;
 
-use function func_get_args;
 use Humbug\PhpScoper\Scoper\Scoper as PhpScoperScoper;
-use KevinGH\Box\NotCallable;
+use KevinGH\Box\UnsupportedMethodCall;
 
 final class FakePhpScoper implements PhpScoperScoper
 {
-    use NotCallable;
-
     /**
      * {@inheritdoc}
      */
     public function scope(string $filePath, string $contents): string
     {
-        $this->__call(__METHOD__, func_get_args());
+        throw UnsupportedMethodCall::forMethod(__CLASS__, __METHOD__);
     }
 }

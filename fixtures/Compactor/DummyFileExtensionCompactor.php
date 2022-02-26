@@ -14,19 +14,16 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-use function func_get_args;
-use KevinGH\Box\NotCallable;
+use KevinGH\Box\UnsupportedMethodCall;
 
 class DummyFileExtensionCompactor extends FileExtensionCompactor
 {
-    use NotCallable;
-
     /**
      * {@inheritdoc}
      */
     protected function compactContent(string $contents): string
     {
-        $this->__call(__METHOD__, func_get_args());
+        throw UnsupportedMethodCall::forMethod(__CLASS__, __METHOD__);
     }
 
     /**
@@ -34,6 +31,6 @@ class DummyFileExtensionCompactor extends FileExtensionCompactor
      */
     protected function supports(string $file): bool
     {
-        $this->__call(__METHOD__, func_get_args());
+        throw UnsupportedMethodCall::forMethod(__CLASS__, __METHOD__);
     }
 }
