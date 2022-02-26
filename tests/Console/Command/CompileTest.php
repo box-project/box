@@ -791,6 +791,10 @@ class CompileTest extends CommandTestCase
 
     public function test_it_can_build_a_phar_file_in_verbose_mode(): void
     {
+        if (extension_loaded('xdebug')) {
+            $this->markTestSkipped('Skipping this test since xdebug changes the Composer output');
+        }
+
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
@@ -909,6 +913,10 @@ class CompileTest extends CommandTestCase
 
     public function test_it_can_build_a_phar_file_in_very_verbose_mode(): void
     {
+        if (extension_loaded('xdebug')) {
+            $this->markTestSkipped('Skipping this test since xdebug changes the Composer output');
+        }
+
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
@@ -1077,7 +1085,7 @@ class CompileTest extends CommandTestCase
                 phpversion('xdebug'),
             );
 
-            $xdebugLog = "[debug] The xdebug extension is loaded $xdebugVersion
+            $xdebugLog = "[debug] The xdebug extension is loaded $xdebugVersion xdebug.mode=debug
 [debug] No restart (BOX_ALLOW_XDEBUG=1)";
         } else {
             $xdebugLog = '[debug] The xdebug extension is not loaded';
