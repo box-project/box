@@ -41,6 +41,8 @@ final class DockerFileGenerator
         Dockerfile;
 
     private const PHP_DOCKER_IMAGES = [
+        '8.1.0' => '8.1-cli-alpine',
+        '8.0.0' => '8.0-cli-alpine',
         '7.4.0' => '7.4-cli-alpine',
         '7.3.0' => '7.3-cli-alpine',
         '7.2.0' => '7.2-cli-alpine',

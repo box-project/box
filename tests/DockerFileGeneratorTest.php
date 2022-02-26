@@ -66,7 +66,7 @@ class DockerFileGeneratorTest extends TestCase
             ;
         } catch (UnexpectedValueException $exception) {
             $this->assertSame(
-                'Could not find a suitable Docker base image for the PHP constraint(s) "^5.3". Images available: "7.4-cli-alpine", "7.3-cli-alpine", "7.2-cli-alpine", "7.1-cli-alpine", "7-cli-alpine"',
+                'Could not find a suitable Docker base image for the PHP constraint(s) "^5.3". Images available: "8.1-cli-alpine", "8.0-cli-alpine", "7.4-cli-alpine", "7.3-cli-alpine", "7.2-cli-alpine", "7.1-cli-alpine", "7-cli-alpine"',
                 $exception->getMessage(),
             );
         }
