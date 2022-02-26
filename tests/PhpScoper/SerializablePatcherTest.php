@@ -41,11 +41,11 @@ final class SerializablePatcherTest extends TestCase
 
     public static function patchProvider(): iterable
     {
-        $expected = 'scopedContent<content>';
+        $expected = 'scopedContent(content)';
 
         yield 'closure' => [
             static fn (string $filePath, string $prefix, string $contents) => sprintf(
-                'scopedContent<%s>',
+                'scopedContent(%s)',
                 $contents,
             ),
             $expected,

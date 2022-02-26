@@ -22,7 +22,7 @@ final class DummyPatcher implements Patcher
     public function __invoke(string $filePath, string $prefix, string $contents): string
     {
         return sprintf(
-            'scopedContent<%s>',
+            'scopedContent(%s)',
             $contents,
         );
     }
