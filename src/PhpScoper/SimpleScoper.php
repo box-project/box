@@ -14,16 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PhpScoper;
 
-use function array_map;
 use function count;
 use Humbug\PhpScoper\Configuration\Configuration as PhpScoperConfiguration;
 use Humbug\PhpScoper\Container as PhpScoperContainer;
-use Humbug\PhpScoper\Patcher\Patcher;
-use Humbug\PhpScoper\Patcher\PatcherChain;
 use Humbug\PhpScoper\Scoper\FileWhitelistScoper;
 use Humbug\PhpScoper\Scoper\Scoper as PhpScoper;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-use Laravel\SerializableClosure\SerializableClosure;
 
 /**
  * @private
@@ -49,7 +45,7 @@ final class SimpleScoper implements Scoper
             $scoperConfig->getPrefix(),
             $scoperConfig->getFilesWithContents(),
             $scoperConfig->getExcludedFilesWithContents(),
-            self::createSerializablePatchers($scoperConfig->getPatcher()),
+            PatcherFactory::createSerializablePatchers($scoperConfig->getPatcher()),
             $scoperConfig->getSymbolsConfiguration(),
         );
         $this->excludedFilePaths = $excludedFilePaths;
@@ -108,32 +104,6 @@ final class SimpleScoper implements Scoper
         $this->scoper = $scoper;
 
         return $this->scoper;
-    }
-
-    /**
-     * @param callable[] $patcher
-     *
-     * @return SerializableClosure[]
-     */
-    private static function createSerializablePatchers(Patcher $patcher): Patcher
-    {
-        if (!($patcher instanceof PatcherChain)) {
-            return $patcher;
-        }
-
-        // TODO: move this to patchers
-        $serializablePatchers = array_map(
-            static function (callable $patcher): SerializableClosure {
-                if ($patcher instanceof Patcher) {
-                    $patcher = static fn (string $filePath, string $prefix, string $contents) => $patcher($filePath, $prefix, $contents);
-                }
-
-                return new SerializableClosure($patcher);
-            },
-            $patcher->getPatchers(),
-        );
-
-        return new PatcherChain($serializablePatchers);
     }
 
     public function __wakeup(): void

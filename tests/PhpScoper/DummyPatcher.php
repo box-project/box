@@ -14,13 +14,16 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PhpScoper;
 
-use Humbug\PhpScoper\Scoper;
-use Humbug\PhpScoper\Whitelist;
+use Humbug\PhpScoper\Patcher\Patcher;
+use function Safe\sprintf;
 
-class DummyScoper implements Scoper
+final class DummyPatcher implements Patcher
 {
-    public function scope(string $filePath, string $contents, string $prefix, array $patchers, Whitelist $whitelist): string
+    public function __invoke(string $filePath, string $prefix, string $contents): string
     {
-        return 'dummy';
+        return sprintf(
+            'scopedContent(%s)',
+            $contents,
+        );
     }
 }
