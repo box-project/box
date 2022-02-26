@@ -14,16 +14,18 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
+use Fidry\Console\Application\Application as FidryApplication;
 use function KevinGH\Box\get_box_version;
 use function sprintf;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Helper\HelperSet;
 use function trim;
+use KevinGH\Box\Console\Command;
 
 /**
  * @private
  */
-final class Application extends SymfonyApplication
+final class Application implements FidryApplication
 {
     private const LOGO = <<<'ASCII'
 
@@ -37,15 +39,26 @@ final class Application extends SymfonyApplication
 
         ASCII;
 
+    private string $version;
     private string $releaseDate;
 
-    public function __construct(string $name = 'Box', ?string $version = null, string $releaseDate = '@release-date@')
-    {
-        $version ??= get_box_version();
-
+    public function __construct(
+        private string $name = 'Box',
+        ?string $version = null,
+        string $releaseDate = '@release-date@'
+    ) {
+        $this->version = $version ?? get_box_version();
         $this->releaseDate = !str_contains($releaseDate, '@') ? $releaseDate : '';
+    }
 
-        parent::__construct($name, $version);
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function getVersion(): string
+    {
+        return $this->version;
     }
 
     public function getLongVersion(): string
@@ -62,32 +75,36 @@ final class Application extends SymfonyApplication
 
     public function getHelp(): string
     {
-        return self::LOGO.parent::getHelp();
+        return self::LOGO.$this->getLongVersion();
     }
 
-    protected function getDefaultCommands(): array
+    public function getCommands(): array
     {
-        $commands = parent::getDefaultCommands();
-
-        // TODO: re-order the commands?
-        $commands[] = new Command\Compile();
-        $commands[] = new Command\Diff();
-        $commands[] = new Command\Info();
-        $commands[] = new Command\Process();
-        $commands[] = new Command\Extract();
-        $commands[] = new Command\Validate();
-        $commands[] = new Command\Verify();
-        $commands[] = new Command\GenerateDockerFile();
-        $commands[] = new Command\Namespace_();
-
-        return $commands;
+        return [
+//            new Command\Compile(),
+//            new Command\Diff(),
+//            new Command\Info(),
+//            new Command\Process(),
+            new Command\Extract(),
+//            new Command\Validate(),
+            new Command\Verify(),
+//            new Command\GenerateDockerFile(),
+            new Command\Namespace_(),
+        ];
     }
 
-    protected function getDefaultHelperSet(): HelperSet
+    public function getDefaultCommand(): string
     {
-        $helperSet = parent::getDefaultHelperSet();
-        $helperSet->set(new ConfigurationHelper());
+        return 'list';
+    }
 
-        return $helperSet;
+    public function isAutoExitEnabled(): bool
+    {
+        return true;
+    }
+
+    public function areExceptionsCaught(): bool
+    {
+        return true;
     }
 }

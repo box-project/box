@@ -14,8 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Fidry\Console\Command\Command;
+use Fidry\Console\Command\Configuration;
+use Fidry\Console\ExitCode;
+use Fidry\Console\Input\IO;
+use Symfony\Component\Filesystem\Path;
 use function file_exists;
-use KevinGH\Box\Console\IO\IO;
 use function KevinGH\Box\create_temporary_phar;
 use function KevinGH\Box\FileSystem\copy;
 use function KevinGH\Box\FileSystem\remove;
@@ -29,21 +33,21 @@ use Webmozart\Assert\Assert;
 /**
  * @private
  */
-final class Verify extends BaseCommand
+final class Verify implements Command
 {
     private const PHAR_ARG = 'phar';
 
-    protected function configure(): void
+    public function getConfiguration(): Configuration
     {
-        $this->setName('verify');
-        $this->setDescription('🔐️  Verifies the PHAR signature');
-        $this->setHelp(
+        return new Configuration(
+            'verify',
+            '🔐️  Verifies the PHAR signature',
             <<<'HELP'
                 The <info>%command.name%</info> command will verify the signature of the PHAR.
 
                 <question>Why would I require that box handle the verification process?</question>
 
-                If you meet all of the following conditions:
+                If you meet all the following conditions:
                  - The <comment>openssl</comment> extension is not installed
                  - You need to verify a PHAR signed using a private key
 
@@ -51,55 +55,33 @@ final class Verify extends BaseCommand
                 either extensions. <error>Note however, that the entire PHAR will need
                 to be read into memory before the verification can be performed.</error>
                 HELP,
-        );
-        $this->addArgument(
-            self::PHAR_ARG,
-            InputArgument::REQUIRED,
-            'The PHAR file',
+            [
+                new InputArgument(
+                    self::PHAR_ARG,
+                    InputArgument::REQUIRED,
+                    'The PHAR file',
+                ),
+            ],
         );
     }
 
-    protected function executeCommand(IO $io): int
+    public function execute(IO $io): int
     {
-        /** @var string $pharPath */
-        $pharPath = $io->getInput()->getArgument(self::PHAR_ARG);
-
-        Assert::file($pharPath);
-
-        $pharPath = false !== realpath($pharPath) ? realpath($pharPath) : $pharPath;
+        $pharFilePath = self::getPharFilePath($io);
 
         $io->newLine();
         $io->writeln(
             sprintf(
                 '🔐️  Verifying the PHAR "<comment>%s</comment>"',
-                $pharPath,
+                $pharFilePath,
             ),
         );
         $io->newLine();
 
-        $tmpPharPath = create_temporary_phar($pharPath);
+        [$verified, $signature, $throwable] = self::verifyPhar($pharFilePath);
 
-        if (file_exists($pharPubKey = $pharPath.'.pubkey')) {
-            copy($pharPubKey, $tmpPharPath.'.pubkey');
-        }
-
-        $verified = false;
-        $signature = null;
-        $throwable = null;
-
-        try {
-            $phar = new Phar($tmpPharPath);
-
-            $verified = true;
-            $signature = $phar->getSignature();
-        } catch (Throwable $throwable) {
-            // Continue
-        } finally {
-            remove($tmpPharPath);
-        }
-
-        if (false === $verified || null === $signature) {
-            return $this->failVerification($throwable, $io);
+        if (false === $verified || false === $signature) {
+            return self::failVerification($throwable, $io);
         }
 
         $io->writeln('<info>The PHAR passed verification.</info>');
@@ -113,15 +95,64 @@ final class Verify extends BaseCommand
             ),
         );
 
-        return 0;
+        return ExitCode::SUCCESS;
     }
 
-    private function failVerification(?Throwable $throwable, IO $io): int
+    private static function getPharFilePath(IO $io): string
+    {
+        $pharPath = Path::canonicalize(
+            $io->getArgument(self::PHAR_ARG)->asNonEmptyString(),
+        );
+
+        Assert::file($pharPath);
+
+        $pharRealPath = realpath($pharPath);
+
+        return false === $pharRealPath ? $pharPath : $pharRealPath;
+    }
+
+    /**
+     * @return array{bool, array{hash: string, hash_type:string}|false, Throwable|null}
+     */
+    private static function verifyPhar(string $pharFilePath): array
+    {
+        $tmpPharPath = create_temporary_phar($pharFilePath);
+        $pharPubKey = $pharFilePath.'.pubkey';
+        $tmpPharPubKey = $tmpPharPath.'.pubkey';
+
+        if (file_exists($pharPubKey)) {
+            copy($pharPubKey, $tmpPharPath.'.pubkey');
+        }
+
+        $cleanUp = static fn () => remove([$tmpPharPath, $tmpPharPubKey]);
+
+        $verified = false;
+        $signature = false;
+        $throwable = null;
+
+        try {
+            $phar = new Phar($tmpPharPath);
+
+            $verified = true;
+            $signature = $phar->getSignature();
+        } catch (Throwable $throwable) {
+            // Continue
+        } finally {
+            $cleanUp();
+        }
+
+        return [
+            $verified,
+            $signature,
+            $throwable,
+        ];
+    }
+
+    private static function failVerification(?Throwable $throwable, IO $io): int
     {
         $message = null !== $throwable && '' !== $throwable->getMessage()
             ? $throwable->getMessage()
-            : 'Unknown reason.'
-        ;
+            : 'Unknown reason.';
 
         $io->writeln(
             sprintf(
@@ -134,6 +165,6 @@ final class Verify extends BaseCommand
             throw $throwable;
         }
 
-        return 1;
+        return ExitCode::FAILURE;
     }
 }

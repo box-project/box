@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use Fidry\Console\Input\IO;
 use function array_key_exists;
 use function bin2hex;
 use function class_alias;
@@ -28,7 +29,6 @@ use function floor;
 use function function_exists;
 use function is_float;
 use function is_int;
-use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Console\Php\PhpSettingsHandler;
 use function KevinGH\Box\FileSystem\copy;
 use function log;

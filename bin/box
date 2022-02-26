@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use Fidry\Console\Application\ApplicationRunner;
 use function file_exists;
 use function in_array;
 use KevinGH\Box\Console\Application;
@@ -49,5 +50,4 @@ if (false === in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
 register_aliases();
 register_error_handler();
 
-$app = new Application();
-$app->run();
+ApplicationRunner::runApplication(new Application(), null, null);
