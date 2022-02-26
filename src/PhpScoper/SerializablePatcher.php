@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PhpScoper;
 
+use Closure;
 use function func_get_args;
 use Humbug\PhpScoper\Patcher\Patcher;
 use Laravel\SerializableClosure\SerializableClosure;
@@ -35,7 +36,7 @@ final class SerializablePatcher implements Patcher
     /**
      * @param PatcherCallable $patch
      */
-    private function __construct(private SerializableClosure $patch)
+    private function __construct(private Closure $patch)
     {
     }
 
