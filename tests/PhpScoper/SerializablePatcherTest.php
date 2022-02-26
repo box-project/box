@@ -24,11 +24,14 @@ use function unserialize;
  */
 final class SerializablePatcherTest extends TestCase
 {
-    /**
-     * @dataProvider patchProvider
-     */
-    public function test_it_can_be_serialized(callable $patch, string $expected): void
+    public function test_it_can_be_serialized_with_a_closure(): void
     {
+        $patch = static fn (string $filePath, string $prefix, string $contents) => sprintf(
+            'scopedContent(%s)',
+            $contents,
+        );
+        $expected = 'scopedContent(content)';
+
         $serializablePatcher = SerializablePatcher::create($patch);
         $serializedPatcher = unserialize(serialize($serializablePatcher));
 
@@ -39,21 +42,18 @@ final class SerializablePatcherTest extends TestCase
         self::assertSame($expected, $actual2);
     }
 
-    public static function patchProvider(): iterable
+    public function test_it_can_be_serialized_with_a_patcher(): void
     {
+        $patch = new DummyPatcher();
         $expected = 'scopedContent(content)';
 
-        yield 'closure' => [
-            static fn (string $filePath, string $prefix, string $contents) => sprintf(
-                'scopedContent(%s)',
-                $contents,
-            ),
-            $expected,
-        ];
+        $serializablePatcher = SerializablePatcher::create($patch);
+        $serializedPatcher = unserialize(serialize($serializablePatcher));
 
-        yield 'patcher' => [
-            new DummyPatcher(),
-            $expected,
-        ];
+        $actual1 = $serializablePatcher('filePath', '_Humbug', 'content');
+        $actual2 = $serializedPatcher('filePath', '_Humbug', 'content');
+
+        self::assertSame($expected, $actual1);
+        self::assertSame($expected, $actual2);
     }
 }
