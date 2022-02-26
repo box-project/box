@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use Generator;
 use InvalidArgumentException;
 use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\CommandTestCase;
@@ -50,7 +49,7 @@ class DiffTest extends CommandTestCase
     }
 
     /**
-     * @dataProvider provideListDiffPhars
+     * @dataProvider listDiffPharsProvider
      */
     public function test_it_can_display_the_list_diff_of_two_phar_files(
         callable $executeCommand,
@@ -100,7 +99,7 @@ class DiffTest extends CommandTestCase
     }
 
     /**
-     * @dataProvider provideGitDiffPhars
+     * @dataProvider gitDiffPharsProvider
      */
     public function test_it_can_display_the_git_diff_of_two_phar_files(
         callable $executeCommand,
@@ -116,7 +115,7 @@ class DiffTest extends CommandTestCase
     }
 
     /**
-     * @dataProvider provideGNUDiffPhars
+     * @dataProvider GNUDiffPharsProvider
      */
     public function test_it_can_display_the__gn_u_diff_of_two_phar_files(
         callable $executeCommand,
@@ -286,7 +285,7 @@ class DiffTest extends CommandTestCase
         }
     }
 
-    public function provideListDiffPhars(): Generator
+    public static function listDiffPharsProvider(): iterable
     {
         yield (static fn (): array => [
             static function (CommandTester $commandTester): string {
@@ -417,7 +416,7 @@ class DiffTest extends CommandTestCase
         ])();
     }
 
-    public function provideGitDiffPhars(): Generator
+    public static function gitDiffPharsProvider(): iterable
     {
         yield (static fn (): array => [
             static function (CommandTester $commandTester): string {
@@ -532,7 +531,7 @@ class DiffTest extends CommandTestCase
         ])();
     }
 
-    public function provideGNUDiffPhars(): Generator
+    public static function GNUDiffPharsProvider(): iterable
     {
         yield (static fn (): array => [
             static function (CommandTester $commandTester): string {

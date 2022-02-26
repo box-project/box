@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-use Generator;
 use PHPUnit\Framework\TestCase;
 use function serialize;
 use function unserialize;
@@ -32,7 +31,7 @@ class JsonTest extends TestCase
     }
 
     /**
-     * @dataProvider provideFiles
+     * @dataProvider filesProvider
      */
     public function test_it_supports_json_files(string $file, bool $supports): void
     {
@@ -48,7 +47,7 @@ class JsonTest extends TestCase
     }
 
     /**
-     * @dataProvider provideJsonContent
+     * @dataProvider jsonContentProvider
      */
     public function test_it_compacts_json_files(string $content, string $expected): void
     {
@@ -60,7 +59,7 @@ class JsonTest extends TestCase
     }
 
     /**
-     * @dataProvider provideJsonContent
+     * @dataProvider jsonContentProvider
      */
     public function test_it_compacts__composer_lock_files(string $content, string $expected): void
     {
@@ -79,14 +78,14 @@ class JsonTest extends TestCase
         );
     }
 
-    public function provideFiles(): Generator
+    public static function filesProvider(): iterable
     {
         yield 'no extension' => ['test', false];
 
         yield 'JSON file' => ['test.json', true];
     }
 
-    public function provideJsonContent(): Generator
+    public static function jsonContentProvider(): iterable
     {
         yield [
             '{}',

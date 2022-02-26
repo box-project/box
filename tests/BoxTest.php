@@ -24,7 +24,6 @@ use Exception;
 use function exec;
 use function extension_loaded;
 use function file_get_contents;
-use Generator;
 use function implode;
 use function in_array;
 use InvalidArgumentException;
@@ -1324,7 +1323,7 @@ class BoxTest extends FileSystemTestCase
     }
 
     /**
-     * @dataProvider provideCompressionAlgorithms
+     * @dataProvider compressionAlgorithmsProvider
      * @requires extension zlib
      * @requires extension bz2
      */
@@ -1605,7 +1604,7 @@ class BoxTest extends FileSystemTestCase
         }
     }
 
-    public function provideCompressionAlgorithms(): Generator
+    public static function compressionAlgorithmsProvider(): iterable
     {
         foreach (get_phar_compression_algorithms() as $algorithm) {
             yield [$algorithm, true];

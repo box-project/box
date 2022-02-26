@@ -21,7 +21,6 @@ use DirectoryIterator;
 use function exec;
 use function extension_loaded;
 use function file_get_contents;
-use Generator;
 use function get_loaded_extensions;
 use function implode;
 use InvalidArgumentException;
@@ -2335,7 +2334,7 @@ class CompileTest extends CommandTestCase
     }
 
     /**
-     * @dataProvider provideAliasConfig
+     * @dataProvider aliasConfigProvider
      */
     public function test_it_configures_the_phar_alias(bool $stub): void
     {
@@ -2948,7 +2947,7 @@ class CompileTest extends CommandTestCase
         $this->assertSame($expected, $actual, 'Expected logs to be identical');
     }
 
-    public function provideAliasConfig(): Generator
+    public static function aliasConfigProvider(): iterable
     {
         yield [true];
         yield [false];

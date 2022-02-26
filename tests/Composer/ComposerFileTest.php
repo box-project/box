@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Composer;
 
 use Closure;
-use Generator;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 
@@ -25,7 +24,7 @@ use PHPUnit\Framework\TestCase;
 class ComposerFileTest extends TestCase
 {
     /**
-     * @dataProvider provideValidInstantiators
+     * @dataProvider validInstantiatorsProvider
      */
     public function test_it_can_be_created(Closure $create, ?string $expectedPath, array $expectedContents): void
     {
@@ -39,7 +38,7 @@ class ComposerFileTest extends TestCase
     }
 
     /**
-     * @dataProvider provideInvalidInstantiators
+     * @dataProvider invalidInstantiatorsProvider
      */
     public function test_it_cannot_be_created_with_invalid_values(Closure $create, string $errorMessage): void
     {
@@ -52,7 +51,7 @@ class ComposerFileTest extends TestCase
         }
     }
 
-    public function provideValidInstantiators(): Generator
+    public static function validInstantiatorsProvider(): iterable
     {
         yield [
             static fn (): ComposerFile => new ComposerFile(null, []),
@@ -73,7 +72,7 @@ class ComposerFileTest extends TestCase
         ];
     }
 
-    public function provideInvalidInstantiators(): Generator
+    public static function invalidInstantiatorsProvider(): iterable
     {
         yield [
             static function (): void {

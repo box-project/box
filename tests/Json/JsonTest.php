@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Json;
 
-use Generator;
 use function is_object;
 use function json_decode;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -43,7 +42,7 @@ class JsonTest extends FileSystemTestCase
     }
 
     /**
-     * @dataProvider provideJsonToLint
+     * @dataProvider jsonToLintProvider
      */
     public function test_it_can_lint_a_json_string(string $json, ?Throwable $expectedThrowable): void
     {
@@ -68,7 +67,7 @@ class JsonTest extends FileSystemTestCase
     }
 
     /**
-     * @dataProvider provideJsonToDecode
+     * @dataProvider jsonToDecodeProvider
      *
      * @param mixed $expected
      */
@@ -205,7 +204,7 @@ class JsonTest extends FileSystemTestCase
         }
     }
 
-    public function provideJsonToLint(): Generator
+    public static function jsonToLintProvider(): iterable
     {
         yield ['{}', null];
 
@@ -222,7 +221,7 @@ class JsonTest extends FileSystemTestCase
         ];
     }
 
-    public function provideJsonToDecode(): Generator
+    public static function jsonToDecodeProvider(): iterable
     {
         yield ['{}', true, [], null];
         yield ['{}', false, new stdClass(), null];

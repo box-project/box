@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\RequirementChecker;
 
 use function array_column;
-use Generator;
 use KevinGH\Box\Console\DisplayNormalizer;
 use Phar;
 use PHPUnit\Framework\TestCase;
@@ -27,7 +26,7 @@ use function sort;
 class RequirementsDumperTest extends TestCase
 {
     /**
-     * @dataProvider provideJsonAndLockContents
+     * @dataProvider jsonAndLockContentsProvider
      */
     public function test_it_dumps_the_requirement_checker_files(
         array $decodedComposerJsonContents,
@@ -92,7 +91,7 @@ class RequirementsDumperTest extends TestCase
         );
     }
 
-    public function provideJsonAndLockContents(): Generator
+    public static function jsonAndLockContentsProvider(): iterable
     {
         yield [
             [],

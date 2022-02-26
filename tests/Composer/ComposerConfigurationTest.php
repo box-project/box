@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
-use Generator;
 use function json_decode;
 use function KevinGH\Box\FileSystem\mkdir;
 use KevinGH\Box\Test\FileSystemTestCase;
@@ -219,7 +218,7 @@ class ComposerConfigurationTest extends FileSystemTestCase
         JSON;
 
     /**
-     * @dataProvider provideExcludeDevFilesSetting
+     * @dataProvider excludeDevFilesSettingProvider
      */
     public function test_it_returns_an_empty_list_when_trying_to_retrieve_the_list_of_dev_packages_when_no_composer_json_file_is_found(bool $excludeDevPackages): void
     {
@@ -245,7 +244,7 @@ class ComposerConfigurationTest extends FileSystemTestCase
     }
 
     /**
-     * @dataProvider provideExcludeDevFilesSetting
+     * @dataProvider excludeDevFilesSettingProvider
      */
     public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file(): void
     {
@@ -488,7 +487,7 @@ class ComposerConfigurationTest extends FileSystemTestCase
         );
     }
 
-    public function provideExcludeDevFilesSetting(): Generator
+    public static function excludeDevFilesSettingProvider(): iterable
     {
         yield [true];
         yield [false];

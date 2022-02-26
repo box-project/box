@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Annotation;
 
-use Generator;
 use phpDocumentor\Reflection\DocBlockFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -35,7 +34,7 @@ class DocblockAnnotationParserTest extends TestCase
     }
 
     /**
-     * @dataProvider provideDocblocks
+     * @dataProvider docblocksProvider
      */
     public function test_it_can_parse_php_docblocks(string $docblock, array $expected): void
     {
@@ -44,7 +43,7 @@ class DocblockAnnotationParserTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function provideDocblocks(): Generator
+    public static function docblocksProvider(): iterable
     {
         yield [
             '// @comment',

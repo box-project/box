@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use Generator;
 use PHPUnit\Framework\TestCase;
 use function serialize;
 use function unserialize;
@@ -25,7 +24,7 @@ use function unserialize;
 class MapFileTest extends TestCase
 {
     /**
-     * @dataProvider provideMaps
+     * @dataProvider mapsProvider
      */
     public function test_it_can_map_files(string $basePath, array $map, string $file, string $expected): void
     {
@@ -37,7 +36,7 @@ class MapFileTest extends TestCase
     }
 
     /**
-     * @dataProvider provideMapFiles
+     * @dataProvider mapFilesProvider
      */
     public function test_it_serializable(MapFile $mapFile): void
     {
@@ -47,7 +46,7 @@ class MapFileTest extends TestCase
         );
     }
 
-    public function provideMaps(): Generator
+    public static function mapsProvider(): iterable
     {
         $basePath = '/basepath';
 
@@ -103,7 +102,7 @@ class MapFileTest extends TestCase
         ];
     }
 
-    public function provideMapFiles(): Generator
+    public static function mapFilesProvider(): iterable
     {
         yield [new MapFile('', [])];
 

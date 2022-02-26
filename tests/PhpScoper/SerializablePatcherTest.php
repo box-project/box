@@ -29,7 +29,6 @@ final class SerializablePatcherTest extends TestCase
         $this->markTestSkipped('This is causing serialization issues');
     }
 
-
     /**
      * @dataProvider patchProvider
      */

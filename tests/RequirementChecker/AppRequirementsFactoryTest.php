@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
-use Generator;
 use function json_decode;
 use const JSON_THROW_ON_ERROR;
 use Phar;
@@ -26,7 +25,7 @@ use PHPUnit\Framework\TestCase;
 class AppRequirementsFactoryTest extends TestCase
 {
     /**
-     * @dataProvider provideLockContents
+     * @dataProvider lockContentsProvider
      */
     public function test_it_can_generate_and_serialized_requirements_from_a_composer_lock_file(
         ?string $composerJsonContents,
@@ -43,7 +42,7 @@ class AppRequirementsFactoryTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function provideLockContents(): Generator
+    public static function lockContentsProvider(): iterable
     {
         yield 'empty json file' => [
             '{}',
