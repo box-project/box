@@ -14,18 +14,15 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-use function func_get_args;
-use KevinGH\Box\NotCallable;
+use KevinGH\Box\UnsupportedMethodCall;
 
 class FakeCompactor implements Compactor
 {
-    use NotCallable;
-
     /**
      * {@inheritdoc}
      */
     public function compact(string $file, string $contents): string
     {
-        $this->__call(__METHOD__, func_get_args());
+        throw UnsupportedMethodCall::forMethod(__CLASS__, __METHOD__);
     }
 }
