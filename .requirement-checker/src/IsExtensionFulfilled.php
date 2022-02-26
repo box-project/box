@@ -1,6 +1,6 @@
 <?php
 
-namespace HumbugBox3150\KevinGH\RequirementChecker;
+namespace HumbugBox3160\KevinGH\RequirementChecker;
 
 final class IsExtensionFulfilled implements IsFulfilled
 {

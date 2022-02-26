@@ -1,6 +1,6 @@
 <?php
 
-namespace HumbugBox3150\KevinGH\RequirementChecker;
+namespace HumbugBox3160\KevinGH\RequirementChecker;
 
 require __DIR__ . '/../vendor/autoload.php';
 if (\false === \in_array(\PHP_SAPI, array('cli', 'phpdbg', 'embed'), \true)) {
