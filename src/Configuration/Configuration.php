@@ -71,7 +71,7 @@ use function KevinGH\Box\get_phar_compression_algorithms;
 use function KevinGH\Box\get_phar_signing_algorithms;
 use KevinGH\Box\Json\Json;
 use KevinGH\Box\MapFile;
-use KevinGH\Box\PhpScoper\SimpleScoper;
+use KevinGH\Box\PhpScoper\SerializableScoper;
 use function KevinGH\Box\unique_id;
 use function krsort;
 use Phar;
@@ -2754,7 +2754,7 @@ final class Configuration
         );
 
         return new PhpScoperCompactor(
-            new SimpleScoper($phpScoperConfig, ...$whitelistedFiles),
+            new SerializableScoper($phpScoperConfig, ...$whitelistedFiles),
         );
     }
 
