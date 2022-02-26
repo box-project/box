@@ -17,18 +17,17 @@ namespace KevinGH\Box\PhpScoper;
 use function count;
 use Humbug\PhpScoper\Configuration\Configuration as PhpScoperConfiguration;
 use Humbug\PhpScoper\Container as PhpScoperContainer;
-use Humbug\PhpScoper\Scoper\FileWhitelistScoper;
-use Humbug\PhpScoper\Scoper\Scoper as PhpScoper;
+use Humbug\PhpScoper\Scoper\Scoper as PhpScoperScoper;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 
 /**
  * @private
  */
-final class SimpleScoper implements Scoper
+final class SerializableScoper implements Scoper
 {
     private PhpScoperConfiguration $scoperConfig;
     private PhpScoperContainer $scoperContainer;
-    private PhpScoper $scoper;
+    private PhpScoperScoper $scoper;
     private SymbolsRegistry $symbolsRegistry;
 
     /**
@@ -77,7 +76,7 @@ final class SimpleScoper implements Scoper
         return $this->scoperConfig->getPrefix();
     }
 
-    private function getScoper(): PhpScoper
+    private function getScoper(): PhpScoperScoper
     {
         if (isset($this->scoper)) {
             return $this->scoper;
@@ -87,21 +86,7 @@ final class SimpleScoper implements Scoper
             $this->scoperContainer = new PhpScoperContainer();
         }
 
-        $scoper = (new PhpScoperContainer())
-            ->getScoperFactory()
-            ->createScoper(
-                $this->scoperConfig,
-                $this->symbolsRegistry,
-            );
-
-        if (0 !== count($this->excludedFilePaths)) {
-            $scoper = new FileWhitelistScoper(
-                $scoper,
-                ...$this->excludedFilePaths,
-            );
-        }
-
-        $this->scoper = $scoper;
+        $this->scoper = $this->createScoper();
 
         return $this->scoper;
     }
@@ -114,5 +99,24 @@ final class SimpleScoper implements Scoper
         // layer of some sorts (such as the tokens for PHP-Paser) is not
         // triggered in the sub-process resulting in obscure errors
         unset($this->scoper, $this->scoperContainer);
+    }
+
+    private function createScoper(): PhpScoperScoper
+    {
+        $scoper = $this->scoperContainer
+            ->getScoperFactory()
+            ->createScoper(
+                $this->scoperConfig,
+                $this->symbolsRegistry,
+            );
+
+        if (0 === count($this->excludedFilePaths)) {
+            return $scoper;
+        }
+
+        return new ExcludedFilesScoper(
+            $scoper,
+            ...$this->excludedFilePaths,
+        );
     }
 }
