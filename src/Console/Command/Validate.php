@@ -14,31 +14,36 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use Exception;
+use function count;
+use Fidry\Console\Command\Command;
+use Fidry\Console\Command\Configuration as ConsoleConfiguration;
+use Fidry\Console\ExitCode;
+use Fidry\Console\Input\IO;
+use InvalidArgumentException;
+use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\ConfigurationLoader;
-use KevinGH\Box\Console\IO\IO;
+use KevinGH\Box\Console\ConfigurationLocator;
 use KevinGH\Box\Console\MessageRenderer;
 use KevinGH\Box\Json\JsonValidationException;
 use function sprintf;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Webmozart\Assert\Assert;
 
 /**
  * @private
  */
-final class Validate extends BaseCommand
+final class Validate implements Command
 {
     private const FILE_ARGUMENT = 'file';
     private const IGNORE_MESSAGES_OPTION = 'ignore-recommendations-and-warnings';
 
-    protected function configure(): void
+    public function getConfiguration(): ConsoleConfiguration
     {
-        parent::configure();
-
-        $this->setName('validate');
-        $this->setDescription('⚙  Validates the configuration file');
-        $this->setHelp(
+        return new ConsoleConfiguration(
+            'validate',
+            '⚙  Validates the configuration file',
             <<<'HELP'
                 The <info>%command.name%</info> command will validate the configuration file
                 and report any errors found, if any.
@@ -50,56 +55,75 @@ final class Validate extends BaseCommand
                   box.json.dist</info>
                 </comment>
                 HELP,
-        );
-        $this->addArgument(
-            self::FILE_ARGUMENT,
-            InputArgument::OPTIONAL,
-            'The configuration file. (default: box.json, box.json.dist)',
-        );
-        $this->addOption(
-            self::IGNORE_MESSAGES_OPTION,
-            'i',
-            InputOption::VALUE_NONE,
-            'Will not return a faulty code when a recommendation or warning is found',
+            [
+                new InputArgument(
+                    self::FILE_ARGUMENT,
+                    InputArgument::OPTIONAL,
+                    'The configuration file. (default: box.json, box.json.dist)',
+                ),
+            ],
+            [
+                new InputOption(
+                    self::IGNORE_MESSAGES_OPTION,
+                    'i',
+                    InputOption::VALUE_NONE,
+                    'Will not return a faulty code when a recommendation or warning is found',
+                ),
+            ],
         );
     }
 
-    protected function executeCommand(IO $io): int
+    public function execute(IO $io): int
     {
-        $input = $io->getInput();
-
         try {
             $config = ConfigurationLoader::getConfig(
-                $input->getArgument(self::FILE_ARGUMENT) ?? $this->getConfigurationHelper()->findDefaultPath(),
-                $this->getConfigurationHelper(),
+                $io->getArgument(self::FILE_ARGUMENT)->asNullableNonEmptyString() ?? ConfigurationLocator::findDefaultPath(),
                 $io,
                 false,
             );
-
-            $recommendations = $config->getRecommendations();
-            $warnings = $config->getWarnings();
-
-            MessageRenderer::render($io, $recommendations, $warnings);
-
-            $hasRecommendationsOrWarnings = [] === $recommendations && [] === $warnings;
-
-            if (false === $hasRecommendationsOrWarnings) {
-                if ([] === $recommendations) {
-                    $io->caution('The configuration file passed the validation with warnings.');
-                } elseif ([] === $warnings) {
-                    $io->caution('The configuration file passed the validation with recommendations.');
-                } else {
-                    $io->caution('The configuration file passed the validation with recommendations and warnings.');
-                }
-            } else {
-                $io->success('The configuration file passed the validation.');
-            }
-
-            return $hasRecommendationsOrWarnings || $input->getOption(self::IGNORE_MESSAGES_OPTION) ? 0 : 1;
-        } catch (Exception $exception) {
+        } catch (InvalidArgumentException $exception) {
             // Continue
         }
 
+        if (isset($config)) {
+            return self::checkConfig($config, $io);
+        }
+
+        Assert::true(isset($exception));
+
+        return self::handleFailure($exception, $io);
+    }
+
+    private static function checkConfig(Configuration $config, IO $io): int
+    {
+        $ignoreRecommendationsAndWarnings = $io->getOption(self::IGNORE_MESSAGES_OPTION)->asBoolean();
+
+        $recommendations = $config->getRecommendations();
+        $warnings = $config->getWarnings();
+
+        MessageRenderer::render($io, $recommendations, $warnings);
+
+        $hasRecommendationsOrWarnings = 0 === count($recommendations) && 0 === count($warnings);
+
+        if (false === $hasRecommendationsOrWarnings) {
+            if ([] === $recommendations) {
+                $io->caution('The configuration file passed the validation with warnings.');
+            } elseif ([] === $warnings) {
+                $io->caution('The configuration file passed the validation with recommendations.');
+            } else {
+                $io->caution('The configuration file passed the validation with recommendations and warnings.');
+            }
+        } else {
+            $io->success('The configuration file passed the validation.');
+        }
+
+        return $hasRecommendationsOrWarnings || $ignoreRecommendationsAndWarnings
+            ? ExitCode::SUCCESS
+            : ExitCode::FAILURE;
+    }
+
+    private static function handleFailure(InvalidArgumentException $exception, IO $io): int
+    {
         if ($io->isVerbose()) {
             throw new RuntimeException(
                 sprintf(
@@ -111,34 +135,41 @@ final class Validate extends BaseCommand
             );
         }
 
-        if ($exception instanceof JsonValidationException) {
-            $io->writeln(
-                sprintf(
-                    '<error>The configuration file failed validation: "%s" does not match the expected JSON '
-                    .'schema:</error>',
-                    $exception->getValidatedFile(),
-                ),
-            );
+        return $exception instanceof JsonValidationException
+            ? self::handleJsonValidationFailure($exception, $io)
+            : self::handleGenericFailure($exception, $io);
+    }
 
-            $io->writeln('');
+    private static function handleJsonValidationFailure(JsonValidationException $exception, IO $io): int
+    {
+        $io->writeln(
+            sprintf(
+                '<error>The configuration file failed validation: "%s" does not match the expected JSON '
+                .'schema:</error>',
+                $exception->getValidatedFile(),
+            ),
+        );
 
-            foreach ($exception->getErrors() as $error) {
-                $io->writeln("<comment>  - $error</comment>");
-            }
-        } else {
-            $errorMessage = isset($exception)
-                ? sprintf('The configuration file failed validation: %s', $exception->getMessage())
-                : 'The configuration file failed validation.'
-            ;
+        $io->writeln('');
 
-            $io->writeln(
-                sprintf(
-                    '<error>%s</error>',
-                    $errorMessage,
-                ),
-            );
+        foreach ($exception->getErrors() as $error) {
+            $io->writeln("<comment>  - $error</comment>");
         }
 
-        return 1;
+        return ExitCode::FAILURE;
+    }
+
+    private static function handleGenericFailure(InvalidArgumentException $exception, IO $io): int
+    {
+        $errorMessage = sprintf('The configuration file failed validation: %s', $exception->getMessage());
+
+        $io->writeln(
+            sprintf(
+                '<error>%s</error>',
+                $errorMessage,
+            ),
+        );
+
+        return ExitCode::FAILURE;
     }
 }

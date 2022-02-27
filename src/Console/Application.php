@@ -17,35 +17,20 @@ namespace KevinGH\Box\Console;
 use Fidry\Console\Application\Application as FidryApplication;
 use function KevinGH\Box\get_box_version;
 use function sprintf;
-use Symfony\Component\Console\Application as SymfonyApplication;
-use Symfony\Component\Console\Helper\HelperSet;
 use function trim;
-use KevinGH\Box\Console\Command;
 
 /**
  * @private
  */
 final class Application implements FidryApplication
 {
-    private const LOGO = <<<'ASCII'
-
-            ____
-           / __ )____  _  __
-          / __  / __ \| |/_/
-         / /_/ / /_/ />  <
-        /_____/\____/_/|_|
-
-
-
-        ASCII;
-
     private string $version;
     private string $releaseDate;
 
     public function __construct(
         private string $name = 'Box',
         ?string $version = null,
-        string $releaseDate = '@release-date@'
+        string $releaseDate = '@release-date@',
     ) {
         $this->version = $version ?? get_box_version();
         $this->releaseDate = !str_contains($releaseDate, '@') ? $releaseDate : '';
@@ -75,20 +60,20 @@ final class Application implements FidryApplication
 
     public function getHelp(): string
     {
-        return self::LOGO.$this->getLongVersion();
+        return Logo::LOGO_ASCII.$this->getLongVersion();
     }
 
     public function getCommands(): array
     {
         return [
-//            new Command\Compile(),
-//            new Command\Diff(),
-//            new Command\Info(),
-//            new Command\Process(),
+            new Command\Compile(),
+            new Command\Diff(),
+            new Command\Info(),
+            new Command\Process(),
             new Command\Extract(),
-//            new Command\Validate(),
+            new Command\Validate(),
             new Command\Verify(),
-//            new Command\GenerateDockerFile(),
+            new Command\GenerateDockerFile(),
             new Command\Namespace_(),
         ];
     }

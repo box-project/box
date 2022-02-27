@@ -30,7 +30,7 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * @covers \KevinGH\Box\Console\Command\ConfigurableBaseCommand
+ * @covers \KevinGH\Box\Console\Command\ConfigOption
  */
 class ConfigurableTest extends CommandTestCase
 {
@@ -62,7 +62,7 @@ class ConfigurableTest extends CommandTestCase
 
         /** @var Configuration $config */
         $config = Closure::bind(
-            static fn (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration => $command->getConfig(
+            static fn (ConfigOption $command, InputInterface $input, OutputInterface $output): Configuration => $command->getConfig(
                 new IO($input, $output),
             ),
             null,
@@ -93,7 +93,7 @@ class ConfigurableTest extends CommandTestCase
 
         /** @var Configuration $config */
         $config = Closure::bind(
-            static fn (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration => $command->getConfig(
+            static fn (ConfigOption $command, InputInterface $input, OutputInterface $output): Configuration => $command->getConfig(
                 new IO($input, $output),
             ),
             null,
@@ -122,7 +122,7 @@ class ConfigurableTest extends CommandTestCase
 
         try {
             Closure::bind(
-                static fn (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration => $command->getConfig(
+                static fn (ConfigOption $command, InputInterface $input, OutputInterface $output): Configuration => $command->getConfig(
                     new IO($input, $output),
                 ),
                 null,
@@ -152,7 +152,7 @@ class ConfigurableTest extends CommandTestCase
 
         /** @var Configuration $config */
         $config = Closure::bind(
-            static fn (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration => $command->getConfig(
+            static fn (ConfigOption $command, InputInterface $input, OutputInterface $output): Configuration => $command->getConfig(
                 new IO($input, $output),
                 true,
             ),
@@ -184,7 +184,7 @@ class ConfigurableTest extends CommandTestCase
 
         try {
             Closure::bind(
-                static fn (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration => $command->getConfig(
+                static fn (ConfigOption $command, InputInterface $input, OutputInterface $output): Configuration => $command->getConfig(
                     new IO($input, $output),
                 ),
                 null,
@@ -215,7 +215,7 @@ class ConfigurableTest extends CommandTestCase
 
         try {
             Closure::bind(
-                static fn (ConfigurableBaseCommand $command, InputInterface $input, OutputInterface $output): Configuration => $command->getConfig(
+                static fn (ConfigOption $command, InputInterface $input, OutputInterface $output): Configuration => $command->getConfig(
                     new IO($input, $output),
                 ),
                 null,

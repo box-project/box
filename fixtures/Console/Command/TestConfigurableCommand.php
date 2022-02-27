@@ -16,7 +16,7 @@ namespace KevinGH\Box\Console\Command;
 
 use KevinGH\Box\Console\IO\IO;
 
-class TestConfigurableCommand extends ConfigurableBaseCommand
+class TestConfigurableCommand extends ConfigOption
 {
     /**
      * {@inheritdoc}

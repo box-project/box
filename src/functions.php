@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use Fidry\Console\Input\IO;
 use function array_key_exists;
 use function bin2hex;
 use function class_alias;
@@ -25,6 +24,7 @@ use function constant;
 use function define;
 use function defined;
 use ErrorException;
+use Fidry\Console\Input\IO;
 use function floor;
 use function function_exists;
 use function is_float;

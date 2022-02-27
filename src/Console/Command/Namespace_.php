@@ -14,12 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use function current;
+use function explode;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
-use function current;
-use function explode;
 
 final class Namespace_ implements Command
 {

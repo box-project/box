@@ -21,6 +21,11 @@ use function array_shift;
 use function count;
 use function decoct;
 use function explode;
+use Fidry\Console\Command\CommandAware;
+use Fidry\Console\Command\CommandAwareness;
+use Fidry\Console\Command\Configuration as CommandConfiguration;
+use Fidry\Console\ExitCode;
+use Fidry\Console\Input\IO;
 use function file_exists;
 use function filesize;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
@@ -36,8 +41,8 @@ use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Composer\ComposerConfiguration;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 use KevinGH\Box\Configuration\Configuration;
-use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Console\Logger\CompilerLogger;
+use KevinGH\Box\Console\Logo;
 use KevinGH\Box\Console\MessageRenderer;
 use function KevinGH\Box\disable_parallel_processing;
 use function KevinGH\Box\FileSystem\chmod;
@@ -54,7 +59,6 @@ use KevinGH\Box\StubGenerator;
 use function memory_get_peak_usage;
 use function memory_get_usage;
 use function microtime;
-use const PHP_EOL;
 use function putenv;
 use RuntimeException;
 use function sprintf;
@@ -69,9 +73,11 @@ use Webmozart\Assert\Assert;
 /**
  * @private
  */
-final class Compile extends ConfigurableBaseCommand
+final class Compile implements CommandAware
 {
-    use ChangeableWorkingDirectory;
+    use CommandAwareness;
+
+    public const NAME = 'compile';
 
     private const HELP = <<<'HELP'
         The <info>%command.name%</info> command will compile code in a new PHAR based on a variety of settings.
@@ -98,82 +104,86 @@ final class Compile extends ConfigurableBaseCommand
 
     private const DEBUG_DIR = '.box_dump';
 
-    protected function configure(): void
+    public function getConfiguration(): CommandConfiguration
     {
-        parent::configure();
-
-        $this->setName('compile');
-        $this->setDescription('🔨  Compiles an application into a PHAR');
-        $this->setHelp(self::HELP);
-
-        $this->addOption(
-            self::DEBUG_OPTION,
-            null,
-            InputOption::VALUE_NONE,
-            'Dump the files added to the PHAR in a `'.self::DEBUG_DIR.'` directory',
+        return new CommandConfiguration(
+            self::NAME,
+            '🔨  Compiles an application into a PHAR',
+            self::HELP,
+            [],
+            [
+                new InputOption(
+                    self::DEBUG_OPTION,
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Dump the files added to the PHAR in a `'.self::DEBUG_DIR.'` directory',
+                ),
+                new InputOption(
+                    self::NO_PARALLEL_PROCESSING_OPTION,
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Disable the parallel processing',
+                ),
+                new InputOption(
+                    self::NO_RESTART_OPTION,
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Do not restart the PHP process. Box restarts the process by default to disable xdebug and set `phar.readonly=0`',
+                ),
+                new InputOption(
+                    self::DEV_OPTION,
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Skips the compression step',
+                ),
+                new InputOption(
+                    self::NO_CONFIG_OPTION,
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Ignore the config file even when one is specified with the --config option',
+                ),
+                new InputOption(
+                    self::WITH_DOCKER_OPTION,
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Generates a Dockerfile',
+                ),
+                ConfigOption::getOptionInput(),
+                ChangeWorkingOption::getOptionInput(),
+            ],
         );
-        $this->addOption(
-            self::NO_PARALLEL_PROCESSING_OPTION,
-            null,
-            InputOption::VALUE_NONE,
-            'Disable the parallel processing',
-        );
-        $this->addOption(
-            self::NO_RESTART_OPTION,
-            null,
-            InputOption::VALUE_NONE,
-            'Do not restart the PHP process. Box restarts the process by default to disable xdebug and set `phar.readonly=0`',
-        );
-        $this->addOption(
-            self::DEV_OPTION,
-            null,
-            InputOption::VALUE_NONE,
-            'Skips the compression step',
-        );
-        $this->addOption(
-            self::NO_CONFIG_OPTION,
-            null,
-            InputOption::VALUE_NONE,
-            'Ignore the config file even when one is specified with the --config option',
-        );
-        $this->addOption(
-            self::WITH_DOCKER_OPTION,
-            null,
-            InputOption::VALUE_NONE,
-            'Generates a Dockerfile',
-        );
-
-        $this->configureWorkingDirOption();
     }
 
-    protected function executeCommand(IO $io): int
+    public function execute(IO $io): int
     {
-        $input = $io->getInput();
-
-        if ($input->getOption(self::NO_RESTART_OPTION)) {
+        if ($io->getOption(self::NO_RESTART_OPTION)->asBoolean()) {
             putenv(BOX_ALLOW_XDEBUG.'=1');
         }
 
-        if ($debug = $input->getOption(self::DEBUG_OPTION)) {
+        $debug = $io->getOption(self::DEBUG_OPTION)->asBoolean();
+
+        if ($debug) {
             $io->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
         }
 
         check_php_settings($io);
 
-        if ($input->getOption(self::NO_PARALLEL_PROCESSING_OPTION)) {
+        if ($io->getOption(self::NO_PARALLEL_PROCESSING_OPTION)->asBoolean()) {
             disable_parallel_processing();
-            $io->writeln('<info>[debug] Disabled parallel processing</info>', OutputInterface::VERBOSITY_DEBUG);
+            $io->writeln(
+                '<info>[debug] Disabled parallel processing</info>',
+                OutputInterface::VERBOSITY_DEBUG,
+            );
         }
 
-        $this->changeWorkingDirectory($input);
+        ChangeWorkingOption::changeWorkingDirectory($io);
 
-        $io->writeln($this->getApplication()->getHelp());
+        $io->writeln(Logo::LOGO_ASCII);
         $io->newLine();
 
-        $config = $input->getOption(self::NO_CONFIG_OPTION)
+        $config = $io->getOption(self::NO_CONFIG_OPTION)->asBoolean()
             ? Configuration::create(null, new stdClass())
-            : $this->getConfig($io, true)
-        ;
+            : ConfigOption::getConfig($io, true);
         $path = $config->getOutputPath();
 
         $logger = new CompilerLogger($io);
@@ -199,11 +209,11 @@ final class Compile extends ConfigurableBaseCommand
 
         $this->logEndBuilding($config, $logger, $io, $box, $path, $startTime);
 
-        if ($input->getOption(self::WITH_DOCKER_OPTION)) {
-            $this->generateDockerFile($io);
+        if ($io->getOption(self::WITH_DOCKER_OPTION)->asBoolean()) {
+            return $this->generateDockerFile($io);
         }
 
-        return 0;
+        return ExitCode::SUCCESS;
     }
 
     private function createPhar(
@@ -242,7 +252,7 @@ final class Compile extends ConfigurableBaseCommand
         $this->configureCompressionAlgorithm(
             $config,
             $box,
-            $io->getInput()->getOption(self::DEV_OPTION),
+            $io->getOption(self::DEV_OPTION)->asBoolean(),
             $io,
             $logger,
         );
@@ -833,17 +843,17 @@ final class Compile extends ConfigurableBaseCommand
 
         MessageRenderer::render($io, $config->getRecommendations(), $config->getWarnings());
 
-        $io->comment(
+        $io->comment([
             sprintf(
                 'PHAR: %s (%s)',
                 $box->count() > 1 ? $box->count().' files' : $box->count().' file',
                 format_size(
                     filesize($path),
                 ),
-            )
-            .PHP_EOL
-            .'You can inspect the generated PHAR with the "<comment>info</comment>" command.',
-        );
+            ),
+            '',
+            'You can inspect the generated PHAR with the "<comment>info</comment>" command.',
+        ]);
 
         $io->comment(
             sprintf(
@@ -855,15 +865,21 @@ final class Compile extends ConfigurableBaseCommand
         );
     }
 
-    private function generateDockerFile(OutputInterface $output): void
+    private function generateDockerFile(IO $io): int
     {
-        $generateDockerFileCommand = $this->getApplication()->find('docker');
+        $generateDockerFileCommand = $this->getDockerCommand();
 
         Assert::isInstanceOf($generateDockerFileCommand, GenerateDockerFile::class);
 
         $input = new StringInput('');
         $input->setInteractive(false);
 
-        $generateDockerFileCommand->run($input, $output);
+        return $generateDockerFileCommand->execute($io);
+    }
+
+    private function getDockerCommand(): GenerateDockerFile
+    {
+        /* @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getCommandRegistry()->findCommand(GenerateDockerFile::NAME);
     }
 }

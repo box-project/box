@@ -12,15 +12,26 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box;
+namespace KevinGH\Box\Console;
 
-// TODO: check places where it could be used
+use KevinGH\Box\NotInstantiable;
+
 /**
  * @private
  */
-trait NotInstantiable
+final class Logo
 {
-    private function __construct()
-    {
-    }
+    use NotInstantiable;
+
+    public const LOGO_ASCII = <<<'ASCII'
+
+            ____
+           / __ )____  _  __
+          / __  / __ \| |/_/
+         / /_/ / /_/ />  <
+        /_____/\____/_/|_|
+
+
+
+        ASCII;
 }

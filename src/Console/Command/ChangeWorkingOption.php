@@ -15,25 +15,35 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use function chdir;
+use Fidry\Console\Input\IO;
 use function getcwd;
 use function sprintf;
 use Symfony\Component\Console\Exception\RuntimeException;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Webmozart\Assert\Assert;
 
 /**
  * @private
  */
-trait ChangeableWorkingDirectory
+final class ChangeWorkingOption
 {
     /** @internal using a static property as traits cannot have constants */
-    private static $WORKING_DIR_OPT = 'working-dir';
+    private const WORKING_DIR_OPT = 'working-dir';
 
-    final public function changeWorkingDirectory(InputInterface $input): void
+    public static function getOptionInput(): InputOption
     {
-        /** @var null|string $workingDir */
-        $workingDir = $input->getOption(self::$WORKING_DIR_OPT);
+        return new InputOption(
+            self::WORKING_DIR_OPT,
+            'd',
+            InputOption::VALUE_REQUIRED,
+            'If specified, use the given directory as working directory.',
+            null,
+        );
+    }
+
+    public static function changeWorkingDirectory(IO $io): void
+    {
+        $workingDir = $io->getOption(self::WORKING_DIR_OPT)->asNullableNonEmptyString();
 
         if (null === $workingDir) {
             return;
@@ -53,16 +63,5 @@ trait ChangeableWorkingDirectory
                 ),
             );
         }
-    }
-
-    private function configureWorkingDirOption(): void
-    {
-        $this->addOption(
-            self::$WORKING_DIR_OPT,
-            'd',
-            InputOption::VALUE_REQUIRED,
-            'If specified, use the given directory as working directory.',
-            null,
-        );
     }
 }

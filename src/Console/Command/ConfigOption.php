@@ -14,11 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Fidry\Console\Input\IO;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\ConfigurationLoader;
-use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Json\JsonValidationException;
-use Symfony\Component\Console\Input\InputInterface;
+use KevinGH\Box\NotInstantiable;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
@@ -26,13 +26,15 @@ use Symfony\Component\Console\Input\InputOption;
  *
  * @private
  */
-abstract class ConfigurableBaseCommand extends BaseCommand
+final class ConfigOption
 {
+    use NotInstantiable;
+
     private const CONFIG_PARAM = 'config';
 
-    protected function configure(): void
+    public static function getOptionInput(): InputOption
     {
-        $this->addOption(
+        return new InputOption(
             self::CONFIG_PARAM,
             'c',
             InputOption::VALUE_REQUIRED,
@@ -47,18 +49,12 @@ abstract class ConfigurableBaseCommand extends BaseCommand
      *
      * @throws JsonValidationException
      */
-    final protected function getConfig(IO $io, bool $allowNoFile = false): Configuration
+    public static function getConfig(IO $io, bool $allowNoFile = false): Configuration
     {
         return ConfigurationLoader::getConfig(
             $io->getInput()->getOption(self::CONFIG_PARAM),
-            $this->getConfigurationHelper(),
             $io,
             $allowNoFile,
         );
-    }
-
-    final protected function getConfigPath(InputInterface $input): string
-    {
-        return $input->getOption(self::CONFIG_PARAM) ?? $this->getConfigurationHelper()->findDefaultPath();
     }
 }

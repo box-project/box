@@ -14,10 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
+use Fidry\Console\Input\IO;
 use InvalidArgumentException;
 use KevinGH\Box\Configuration\Configuration;
+use KevinGH\Box\Configuration\ConfigurationLoader as ConfigLoader;
 use KevinGH\Box\Configuration\NoConfigurationFound;
-use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\NotInstantiable;
 use function sprintf;
@@ -40,14 +41,14 @@ final class ConfigurationLoader
      */
     public static function getConfig(
         ?string $configPath,
-        ConfigurationHelper $helper,
         IO $io,
         bool $allowNoFile,
     ): Configuration {
-        $configPath = self::getConfigPath($configPath, $helper, $io, $allowNoFile);
+        $configPath = self::getConfigPath($configPath, $io, $allowNoFile);
+        $configLoader = new ConfigLoader();
 
         try {
-            return $helper->loadFile($configPath);
+            return $configLoader->loadFile($configPath);
         } catch (InvalidArgumentException $invalidConfig) {
             $io->error('The configuration file is invalid.');
 
@@ -57,12 +58,11 @@ final class ConfigurationLoader
 
     private static function getConfigPath(
         ?string $configPath,
-        ConfigurationHelper $helper,
         IO $io,
         bool $allowNoFile,
     ): ?string {
         try {
-            $configPath ??= $helper->findDefaultPath();
+            $configPath ??= ConfigurationLocator::findDefaultPath();
         } catch (NoConfigurationFound $noConfigurationFound) {
             if (false === $allowNoFile) {
                 throw $noConfigurationFound;

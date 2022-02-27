@@ -18,9 +18,12 @@ use function array_filter;
 use function array_flip;
 use function array_map;
 use function count;
+use Fidry\Console\Command\Command;
+use Fidry\Console\Command\Configuration;
+use Fidry\Console\ExitCode;
+use Fidry\Console\Input\IO;
 use function is_string;
 use function KevinGH\Box\check_php_settings;
-use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Console\PharInfoRenderer;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\get_phar_compression_algorithms;
@@ -30,7 +33,6 @@ use PharFileInfo;
 use function sprintf;
 // TODO: migrate to Safe API
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Filesystem\Path;
 use Throwable;
@@ -39,7 +41,7 @@ use Webmozart\Assert\Assert;
 /**
  * @private
  */
-final class Diff extends BaseCommand
+final class Diff implements Command
 {
     private const FIRST_PHAR_ARG = 'pharA';
     private const SECOND_PHAR_ARG = 'pharB';
@@ -49,83 +51,66 @@ final class Diff extends BaseCommand
     private const GNU_DIFF_OPTION = 'gnu-diff';
     private const CHECK_OPTION = 'check';
 
-    private static $FILE_ALGORITHMS;
+    private static array $FILE_ALGORITHMS;
 
-    public function __construct(?string $name = null)
+    public function __construct()
     {
-        parent::__construct($name);
-
-        if (null === self::$FILE_ALGORITHMS) {
+        if (!isset(self::$FILE_ALGORITHMS)) {
             self::$FILE_ALGORITHMS = array_flip(array_filter(get_phar_compression_algorithms()));
         }
     }
 
-    protected function configure(): void
+    public function getConfiguration(): Configuration
     {
-        parent::configure();
-
-        $this->setName('diff');
-        $this->setDescription('🕵  Displays the differences between all of the files in two PHARs');
-
-        $this->addArgument(
-            self::FIRST_PHAR_ARG,
-            InputArgument::REQUIRED,
-            'The first PHAR',
-        );
-        $this->addArgument(
-            self::SECOND_PHAR_ARG,
-            InputArgument::REQUIRED,
-            'The second PHAR',
-        );
-
-        $this->addOption(
-            self::GNU_DIFF_OPTION,
-            null,
-            InputOption::VALUE_NONE,
-            'Displays a GNU diff',
-        );
-        $this->addOption(
-            self::GIT_DIFF_OPTION,
-            null,
-            InputOption::VALUE_NONE,
-            'Displays a Git diff',
-        );
-        $this->addOption(
-            self::LIST_FILES_DIFF_OPTION,
-            null,
-            InputOption::VALUE_NONE,
-            'Displays a list of file names diff (default)',
-        );
-        $this->addOption(
-            self::CHECK_OPTION,
-            'c',
-            InputOption::VALUE_OPTIONAL,
-            'Verify the authenticity of the contents between the two PHARs with the given hash function.',
-            'sha384',
+        return new Configuration(
+            'diff',
+            '🕵  Displays the differences between all of the files in two PHARs',
+            '',
+            [
+                new InputArgument(
+                    self::FIRST_PHAR_ARG,
+                    InputArgument::REQUIRED,
+                    'The first PHAR',
+                ),
+            ],
+            [
+                new InputOption(
+                    self::GNU_DIFF_OPTION,
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Displays a GNU diff',
+                ),
+                new InputOption(
+                    self::GIT_DIFF_OPTION,
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Displays a Git diff',
+                ),
+                new InputOption(
+                    self::LIST_FILES_DIFF_OPTION,
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Displays a list of file names diff (default)',
+                ),
+                new InputOption(
+                    self::CHECK_OPTION,
+                    'c',
+                    InputOption::VALUE_OPTIONAL,
+                    'Verify the authenticity of the contents between the two PHARs with the given hash function',
+                    'sha384',
+                ),
+            ],
         );
     }
 
-    protected function executeCommand(IO $io): int
+    public function execute(IO $io): int
     {
         check_php_settings($io);
 
-        $input = $io->getInput();
-
-        /** @var string[] $paths */
-        $paths = [
-            $input->getArgument(self::FIRST_PHAR_ARG),
-            $input->getArgument(self::SECOND_PHAR_ARG),
-        ];
-
-        Assert::allFile($paths);
-
-        $normalizedPaths = array_map(
-            static fn (string $path) => Path::canonicalize($path),
-            $paths,
-        );
+        $paths = self::getPaths($io);
 
         try {
-            $diff = new PharDiff(...$normalizedPaths);
+            $diff = new PharDiff(...$paths);
         } catch (Throwable $throwable) {
             if ($io->isDebug()) {
                 throw $throwable;
@@ -138,13 +123,31 @@ final class Diff extends BaseCommand
                 ),
             );
 
-            return 1;
+            return ExitCode::SUCCESS;
         }
 
         $result1 = $this->compareArchives($diff, $io);
-        $result2 = $this->compareContents($input, $diff, $io);
+        $result2 = $this->compareContents($diff, $io);
 
         return $result1 + $result2;
+    }
+
+    /**
+     * @return list<non-empty-string>
+     */
+    private static function getPaths(IO $io): array
+    {
+        $paths = [
+            $io->getArgument(self::FIRST_PHAR_ARG)->asNonEmptyString(),
+            $io->getArgument(self::SECOND_PHAR_ARG)->asNonEmptyString(),
+        ];
+
+        Assert::allFile($paths);
+
+        return array_map(
+            static fn (string $path) => Path::canonicalize($path),
+            $paths,
+        );
     }
 
     private function compareArchives(PharDiff $diff, IO $io): int
@@ -157,10 +160,10 @@ final class Diff extends BaseCommand
         if ($pharInfoA->equals($pharInfoB)) {
             $io->success('The two archives are identical');
 
-            return 0;
+            return ExitCode::SUCCESS;
         }
 
-        $this->renderArchive(
+        self::renderArchive(
             $diff->getPharA()->getFileName(),
             $pharInfoA,
             $io,
@@ -168,26 +171,26 @@ final class Diff extends BaseCommand
 
         $io->newLine();
 
-        $this->renderArchive(
+        self::renderArchive(
             $diff->getPharB()->getFileName(),
             $pharInfoB,
             $io,
         );
 
-        return 1;
+        return ExitCode::FAILURE;
     }
 
-    private function compareContents(InputInterface $input, PharDiff $diff, IO $io): int
+    private function compareContents(PharDiff $diff, IO $io): int
     {
         $io->comment('<info>Comparing the two archives contents...</info>');
 
-        if ($input->hasParameterOption(['-c', '--check'])) {
-            return $diff->listChecksums($input->getOption(self::CHECK_OPTION) ?? 'sha384');
+        if ($io->getInput()->hasParameterOption(['-c', '--check'])) {
+            return $diff->listChecksums($io->getOption(self::CHECK_OPTION)->asNonEmptyString());
         }
 
-        if ($input->getOption(self::GNU_DIFF_OPTION)) {
+        if ($io->getOption(self::GNU_DIFF_OPTION)->asBoolean()) {
             $diffResult = $diff->gnuDiff();
-        } elseif ($input->getOption(self::GIT_DIFF_OPTION)) {
+        } elseif ($io->getOption(self::GIT_DIFF_OPTION)->asBoolean()) {
             $diffResult = $diff->gitDiff();
         } else {
             $diffResult = $diff->listDiff();
@@ -196,14 +199,14 @@ final class Diff extends BaseCommand
         if (null === $diffResult || [[], []] === $diffResult) {
             $io->success('The contents are identical');
 
-            return 0;
+            return ExitCode::SUCCESS;
         }
 
         if (is_string($diffResult)) {
             // Git or GNU diff: we don't have much control on the format
             $io->writeln($diffResult);
 
-            return 1;
+            return ExitCode::FAILURE;
         }
 
         $io->writeln(sprintf(
@@ -258,7 +261,39 @@ final class Diff extends BaseCommand
         return 1;
     }
 
-    private function renderArchive(string $fileName, PharInfo $pharInfo, IO $io): void
+    /**
+     * @param list<non-empty-string>
+     */
+    private static function renderPaths(string $symbol, PharInfo $pharInfo, array $paths, IO $io): void
+    {
+        foreach ($paths as $path) {
+            /** @var PharFileInfo $file */
+            $file = $pharInfo->getPhar()[str_replace($pharInfo->getRoot(), '', $path)];
+
+            $compression = '<fg=red>[NONE]</fg=red>';
+
+            foreach (self::$FILE_ALGORITHMS as $code => $name) {
+                if ($file->isCompressed($code)) {
+                    $compression = "<fg=cyan>[$name]</fg=cyan>";
+                    break;
+                }
+            }
+
+            $fileSize = format_size($file->getCompressedSize());
+
+            $io->writeln(
+                sprintf(
+                    '%s %s %s - %s',
+                    $symbol,
+                    $path,
+                    $compression,
+                    $fileSize,
+                ),
+            );
+        }
+    }
+
+    private static function renderArchive(string $fileName, PharInfo $pharInfo, IO $io): void
     {
         $io->writeln(
             sprintf(

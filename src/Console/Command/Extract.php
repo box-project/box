@@ -14,11 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use function count;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
-use function count;
 use KevinGH\Box\Box;
 use function KevinGH\Box\bump_open_file_descriptor_limit;
 use function KevinGH\Box\create_temporary_phar;
@@ -59,7 +59,7 @@ final class Extract implements Command
                     InputArgument::REQUIRED,
                     'The output directory',
                 ),
-            ]
+            ],
         );
     }
 
@@ -83,10 +83,10 @@ final class Extract implements Command
         $cleanUp = static function () use ($cleanUp, $restoreLimit): void {
             $cleanUp();
             $restoreLimit();
-        } ;
+        };
 
         try {
-            $this->dumpPhar($outputDir, $box, $cleanUp);
+            self::dumpPhar($outputDir, $box, $cleanUp);
         } catch (RuntimeException $exception) {
             $io->error($exception->getMessage());
 
@@ -151,7 +151,7 @@ final class Extract implements Command
     /**
      * @param callable(): void $cleanUp
      */
-    private function dumpPhar(string $outputDir, Box $box, callable $cleanUp): void
+    private static function dumpPhar(string $outputDir, Box $box, callable $cleanUp): void
     {
         try {
             remove($outputDir);
