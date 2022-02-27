@@ -184,6 +184,7 @@ final class Diff implements Command
     {
         $io->comment('<info>Comparing the two archives contents...</info>');
 
+        // TODO: https://github.com/theofidry/console/issues/54
         if ($io->getInput()->hasParameterOption(['-c', '--check'])) {
             return $diff->listChecksums($io->getOption(self::CHECK_OPTION)->asNonEmptyString());
         }
