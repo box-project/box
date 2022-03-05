@@ -42,23 +42,23 @@ jobs:
                     coverage: pcov
 
             -   name: Install Composer dependencies
-                uses: ramsey/composer-install@v1
+                uses: ramsey/composer-install@v2
                 if: contains(env.FUTURE_PHP_VERSION, matrix.php) != true
 
             -   name: Install RequirementChecker Composer dependencies
-                uses: ramsey/composer-install@v1
+                uses: ramsey/composer-install@v2
                 if: contains(env.FUTURE_PHP_VERSION, matrix.php) != true
                 with:
                     working-directory: 'vendor-bin/requirement-checker'
 
             -   name: Install Composer dependencies (ignore PHP platform req)
-                uses: ramsey/composer-install@v1
+                uses: ramsey/composer-install@v2
                 if: contains(env.FUTURE_PHP_VERSION, matrix.php)
                 with:
                     composer-options: --ignore-platform-req=php+
 
             -   name: Install RequirementChecker Composer dependencies (ignore PHP platform req)
-                uses: ramsey/composer-install@v1
+                uses: ramsey/composer-install@v2
                 if: contains(env.FUTURE_PHP_VERSION, matrix.php)
                 with:
                     composer-options: --ignore-platform-req=php+
