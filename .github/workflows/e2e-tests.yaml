@@ -49,7 +49,7 @@ jobs:
                 uses: ramsey/composer-install@v2
                 if: contains(env.FUTURE_PHP_VERSION, matrix.php) != true
                 with:
-                    working-directory: 'vendor-bin/requirement-checker'
+                    working-directory: 'requirement-checker'
 
             -   name: Install Composer dependencies (ignore PHP platform req)
                 uses: ramsey/composer-install@v2
@@ -62,7 +62,7 @@ jobs:
                 if: contains(env.FUTURE_PHP_VERSION, matrix.php)
                 with:
                     composer-options: --ignore-platform-req=php+
-                    working-directory: 'vendor-bin/requirement-checker'
+                    working-directory: 'requirement-checker'
 
             -   name: Ensure the Makefile does not run the Composer install command a 2nd time
                 run: touch -c composer.lock vendor requirement-checker/composer.lock requirement-checker/vendor
