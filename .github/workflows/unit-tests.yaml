@@ -39,27 +39,27 @@ jobs:
                     extensions: ctype, iconv, xml
 
             -   name: Install Composer dependencies
-                uses: ramsey/composer-install@v1
+                uses: ramsey/composer-install@v2
                 if: contains(env.FUTURE_PHP_VERSION, matrix.php) != true
 
             -   name: Install RequirementChecker Composer dependencies
-                uses: ramsey/composer-install@v1
+                uses: ramsey/composer-install@v2
                 if: contains(env.FUTURE_PHP_VERSION, matrix.php) != true
                 with:
-                    working-directory: 'vendor-bin/requirement-checker'
+                    working-directory: 'requirement-checker'
 
             -   name: Install Composer dependencies (ignore PHP platform req)
-                uses: ramsey/composer-install@v1
+                uses: ramsey/composer-install@v2
                 if: contains(env.FUTURE_PHP_VERSION, matrix.php)
                 with:
                     composer-options: --ignore-platform-req=php+
 
             -   name: Install RequirementChecker Composer dependencies (ignore PHP platform req)
-                uses: ramsey/composer-install@v1
+                uses: ramsey/composer-install@v2
                 if: contains(env.FUTURE_PHP_VERSION, matrix.php)
                 with:
                     composer-options: --ignore-platform-req=php+
-                    working-directory: 'vendor-bin/requirement-checker'
+                    working-directory: 'requirement-checker'
 
             -   name: Ensure the Makefile does not run the Composer install command a 2nd time
                 run: touch -c composer.lock vendor requirement-checker/composer.lock requirement-checker/vendor
@@ -101,12 +101,12 @@ jobs:
                     extensions: ctype, iconv, xml
 
             -   name: Install Composer dependencies
-                uses: ramsey/composer-install@v1
+                uses: ramsey/composer-install@v2
 
             -   name: Install RequirementChecker Composer dependencies
-                uses: ramsey/composer-install@v1
+                uses: ramsey/composer-install@v2
                 with:
-                    working-directory: 'vendor-bin/requirement-checker'
+                    working-directory: 'requirement-checker'
 
             -   name: Run Infection
                 run: make tm
