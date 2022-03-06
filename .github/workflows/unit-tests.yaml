@@ -23,7 +23,7 @@ jobs:
                 phar-readonly: [ true, false ]
         steps:
             -   name: Checkout
-                uses: actions/checkout@v2
+                uses: actions/checkout@v3
                 with:
                     fetch-depth: 0
 
@@ -85,7 +85,7 @@ jobs:
                 tools: [ "composer:v2" ]
         steps:
             -   name: Checkout
-                uses: actions/checkout@v2
+                uses: actions/checkout@v3
                 with:
                     fetch-depth: 0
 
