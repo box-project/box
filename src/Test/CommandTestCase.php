@@ -14,46 +14,49 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Test;
 
+use Fidry\Console\Application\SymfonyApplication;
 use Fidry\Console\Command\Command;
+use Fidry\Console\Command\SymfonyCommand;
+use Fidry\Console\Test\AppTester;
+use Fidry\Console\Test\CommandTester;
+use Fidry\Console\Test\OutputAssertions;
+use KevinGH\Box\Console\OutputFormatterConfigurator;
+use PHPUnit\Framework\Assert;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Tester\CommandTester as SymfonyCommandTester;
 use function feof;
 use function fgets;
-use KevinGH\Box\Console\Application;
+use KevinGH\Box\Console\Application as BoxApplication;
 use const PHP_EOL;
 use function preg_replace;
 use function rewind;
 use function str_replace;
 use Symfony\Component\Console\Output\StreamOutput;
-use Symfony\Component\Console\Tester\CommandTester;
 
 /**
  * @private
  */
 abstract class CommandTestCase extends FileSystemTestCase
 {
-    protected Application $application;
     protected CommandTester $commandTester;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->application = new Application();
+        $command = new SymfonyCommand($this->getCommand());
 
-        $this->application->add($this->getCommand());
+        $application = new Application();
+        $application->add($command);
 
-        $this->commandTester = new CommandTester(
-            $this->application->get(
-                $this->getCommand()->getName(),
-            ),
-        );
+        $this->commandTester = new CommandTester($application->get($command->getName()));
     }
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
-        unset($this->application);
         unset($this->commandTester);
+
+        parent::tearDown();
     }
 
     /**
@@ -64,34 +67,50 @@ abstract class CommandTestCase extends FileSystemTestCase
     abstract protected function getCommand(): Command;
 
     /**
-     * Returns the output for the tester.
-     *
-     * @param CommandTester $tester the tester
-     *
-     * @return string the output
+     * @param null|callable(string):string $extraNormalization
      */
-    protected function getOutput(CommandTester $tester): string
-    {
-        /** @var StreamOutput $output */
-        $output = $tester->getOutput();
-        $stream = $output->getStream();
-        $string = '';
-
-        rewind($stream);
-
-        while (false === feof($stream)) {
-            $string .= fgets($stream);
-        }
-
-        $string = preg_replace(
-            [
-                '/\x1b(\[|\(|\))[;?0-9]*[0-9A-Za-z]/',
-                '/[\x03|\x1a]/',
-            ],
-            ['', '', ''],
-            $string,
+    public function assertSameOutput(
+        string $expectedOutput,
+        int $expectedStatusCode,
+        ?callable $extraNormalization = null
+    ): void {
+        OutputAssertions::assertSameOutput(
+            $expectedOutput,
+            $expectedStatusCode,
+            $this->commandTester,
+            $extraNormalization,
         );
-
-        return str_replace(PHP_EOL, "\n", $string);
     }
+//
+//    /**
+//     * Returns the output for the tester.
+//     *
+//     * @param CommandTester $tester the tester
+//     *
+//     * @return string the output
+//     */
+//    protected function getOutput(CommandTester $tester): string
+//    {
+//        /** @var StreamOutput $output */
+//        $output = $tester->getOutput();
+//        $stream = $output->getStream();
+//        $string = '';
+//
+//        rewind($stream);
+//
+//        while (false === feof($stream)) {
+//            $string .= fgets($stream);
+//        }
+//
+//        $string = preg_replace(
+//            [
+//                '/\x1b(\[|\(|\))[;?0-9]*[0-9A-Za-z]/',
+//                '/[\x03|\x1a]/',
+//            ],
+//            ['', '', ''],
+//            $string,
+//        );
+//
+//        return str_replace(PHP_EOL, "\n", $string);
+//    }
 }

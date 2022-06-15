@@ -37,7 +37,7 @@ final class ConfigurationLoader
      *
      * @param bool $allowNoFile Load the config nonetheless if not file is found when true
      *
-     * @throws JsonValidationException
+     * @throws JsonValidationException|NoConfigurationFound
      */
     public static function getConfig(
         ?string $configPath,

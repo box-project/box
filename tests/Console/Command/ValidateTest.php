@@ -63,8 +63,7 @@ class ValidateTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, 0);
     }
 
     public function test_it_reports_the_recommendations_found(): void
@@ -93,7 +92,7 @@ class ValidateTest extends CommandTestCase
 
              // Loading the configuration file "test.json".
 
-            💡  1 recommendation found:
+            💡  <recommendation>1 recommendation found:</recommendation>
                 - The setting "key" has been set but is unnecessary since the signing algorithm is not "OPENSSL".
             No warning found.
 
@@ -102,8 +101,10 @@ class ValidateTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSameOutput(
+            $expected,
+            1,
+        );
     }
 
     public function test_it_does_not_fail_when_recommendations_are_found_but_ignore_message_is_passed(): void
@@ -133,7 +134,7 @@ class ValidateTest extends CommandTestCase
 
              // Loading the configuration file "test.json".
 
-            💡  1 recommendation found:
+            💡  <recommendation>1 recommendation found:</recommendation>
                 - The setting "key" has been set but is unnecessary since the signing algorithm is not "OPENSSL".
             No warning found.
 
@@ -142,8 +143,7 @@ class ValidateTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, 0);
     }
 
     public function test_it_reports_the_warnings_found(): void
@@ -173,7 +173,7 @@ class ValidateTest extends CommandTestCase
              // Loading the configuration file "test.json".
 
             No recommendation found.
-            ⚠️  1 warning found:
+            ⚠️  <warning>1 warning found:</warning>
                 - The setting "key" has been set but is ignored since the signing algorithm is not "OPENSSL".
 
              ! [CAUTION] The configuration file passed the validation with warnings.
@@ -181,8 +181,7 @@ class ValidateTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, 1);
     }
 
     public function test_it_does_not_fail_when_warnings_are_found_but_ignore_message_is_passed(): void
@@ -213,7 +212,7 @@ class ValidateTest extends CommandTestCase
              // Loading the configuration file "test.json".
 
             No recommendation found.
-            ⚠️  1 warning found:
+            ⚠️  <warning>1 warning found:</warning>
                 - The setting "key" has been set but is ignored since the signing algorithm is not "OPENSSL".
 
              ! [CAUTION] The configuration file passed the validation with warnings.
@@ -221,8 +220,7 @@ class ValidateTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, 0);
     }
 
     public function test_it_reports_the_recommendations_and_warnings_found(): void
@@ -251,9 +249,9 @@ class ValidateTest extends CommandTestCase
 
              // Loading the configuration file "test.json".
 
-            💡  1 recommendation found:
+            💡  <recommendation>1 recommendation found:</recommendation>
                 - The "check-requirements" setting can be omitted since is set to its default value
-            ⚠️  1 warning found:
+            ⚠️  <warning>1 warning found:</warning>
                 - The requirement checker could not be used because the composer.json and composer.lock file could not be found.
 
              ! [CAUTION] The configuration file passed the validation with recommendations
@@ -262,8 +260,7 @@ class ValidateTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, 1);
     }
 
     public function test_an_unknown_file_is_invalid(): void
@@ -279,8 +276,7 @@ class ValidateTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, $this->commandTester->getDisplay(true));
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, 1);
     }
 
     public function test_an_unknown_file_is_invalid_in_verbose_mode(): void
@@ -327,16 +323,7 @@ class ValidateTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-
-        $actual = preg_replace(
-            '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
-            ' // Loading the configuration file "box.json".',
-            $actual,
-        );
-
-        $this->assertSame($expected, $actual);
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, 1, self::createNormalizeLoadingFilePathOutput());
     }
 
     public function test_an_invalid_json_file_is_invalid_in_verbose_mode(): void
@@ -392,16 +379,7 @@ class ValidateTest extends CommandTestCase
                 EOF,
         );
 
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-
-        $actual = preg_replace(
-            '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
-            ' // Loading the configuration file "box.json".',
-            $actual,
-        );
-
-        $this->assertSame($expected, $actual);
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, 1, self::createNormalizeLoadingFilePathOutput());
     }
 
     public function test_an_incorrect_config_file_is_invalid_in_verbose_mode(): void
@@ -434,5 +412,17 @@ class ValidateTest extends CommandTestCase
             $this->assertSame(0, $exception->getCode());
             $this->assertNotNull($exception->getPrevious());
         }
+    }
+
+    /**
+     * @return callable(string):string
+     */
+    private static function createNormalizeLoadingFilePathOutput(): callable
+    {
+        return static fn ($output) => preg_replace(
+            '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
+            ' // Loading the configuration file "box.json".',
+            $output,
+        );
     }
 }

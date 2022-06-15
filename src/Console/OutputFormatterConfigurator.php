@@ -16,6 +16,7 @@ namespace KevinGH\Box\Console;
 
 use Fidry\Console\Input\IO;
 use KevinGH\Box\NotInstantiable;
+use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -30,8 +31,13 @@ final class OutputFormatterConfigurator
 
     public static function configure(IO $io): void
     {
-        $outputFormatter = $io->getOutput()->getFormatter();
+        self::configureFormatter(
+            $io->getOutput()->getFormatter(),
+        );
+    }
 
+    public static function configureFormatter(OutputFormatterInterface $outputFormatter): void
+    {
         $outputFormatter->setStyle(
             'recommendation',
             new OutputFormatterStyle('black', 'yellow'),

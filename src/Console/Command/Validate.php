@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Throwable;
 use function count;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration as ConsoleConfiguration;
@@ -81,7 +82,7 @@ final class Validate implements Command
                 $io,
                 false,
             );
-        } catch (InvalidArgumentException $exception) {
+        } catch (Throwable $throwable) {
             // Continue
         }
 
@@ -89,9 +90,9 @@ final class Validate implements Command
             return self::checkConfig($config, $io);
         }
 
-        Assert::true(isset($exception));
+        Assert::true(isset($throwable));
 
-        return self::handleFailure($exception, $io);
+        return self::handleFailure($throwable, $io);
     }
 
     private static function checkConfig(Configuration $config, IO $io): int
@@ -122,22 +123,22 @@ final class Validate implements Command
             : ExitCode::FAILURE;
     }
 
-    private static function handleFailure(InvalidArgumentException $exception, IO $io): int
+    private static function handleFailure(Throwable $throwable, IO $io): int
     {
         if ($io->isVerbose()) {
             throw new RuntimeException(
                 sprintf(
                     'The configuration file failed validation: %s',
-                    $exception->getMessage(),
+                    $throwable->getMessage(),
                 ),
-                $exception->getCode(),
-                $exception,
+                $throwable->getCode(),
+                $throwable,
             );
         }
 
-        return $exception instanceof JsonValidationException
-            ? self::handleJsonValidationFailure($exception, $io)
-            : self::handleGenericFailure($exception, $io);
+        return $throwable instanceof JsonValidationException
+            ? self::handleJsonValidationFailure($throwable, $io)
+            : self::handleGenericFailure($throwable, $io);
     }
 
     private static function handleJsonValidationFailure(JsonValidationException $exception, IO $io): int
@@ -159,9 +160,9 @@ final class Validate implements Command
         return ExitCode::FAILURE;
     }
 
-    private static function handleGenericFailure(InvalidArgumentException $exception, IO $io): int
+    private static function handleGenericFailure(Throwable $throwable, IO $io): int
     {
-        $errorMessage = sprintf('The configuration file failed validation: %s', $exception->getMessage());
+        $errorMessage = sprintf('The configuration file failed validation: %s', $throwable->getMessage());
 
         $io->writeln(
             sprintf(

@@ -145,7 +145,7 @@ class ProcessTest extends FileSystemTestCase
             $expected,
             0,
             $this->commandTester,
-            self::createNormalizeLoadingFileOutput(),
+            self::createNormalizeLoadingFilePathOutput(),
         );
     }
 
@@ -246,7 +246,7 @@ class ProcessTest extends FileSystemTestCase
             static fn ($output) => preg_replace(
                 '/ \{#\d{3,}/',
                 ' {#140',
-                self::createNormalizeLoadingFileOutput()($output),
+                self::createNormalizeLoadingFilePathOutput()($output),
             ),
         );
     }
@@ -293,14 +293,14 @@ class ProcessTest extends FileSystemTestCase
             $expected,
             0,
             $this->commandTester,
-            self::createNormalizeLoadingFileOutput(),
+            self::createNormalizeLoadingFilePathOutput(),
         );
     }
 
     /**
      * @return callable(string):string
      */
-    private static function createNormalizeLoadingFileOutput(): callable
+    private static function createNormalizeLoadingFilePathOutput(): callable
     {
         return static fn ($output) => preg_replace(
             '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
