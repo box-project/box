@@ -14,6 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Fidry\Console\Command\Command;
+use Fidry\Console\Test\OutputAssertions;
+use KevinGH\Box\Test\FileSystemTestCase;
 use function getenv;
 use function implode;
 use InvalidArgumentException;
@@ -22,9 +25,10 @@ use KevinGH\Box\Test\CommandTestCase;
 use Phar;
 use function preg_replace;
 use function realpath;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use UnexpectedValueException;
+use Fidry\Console\Test\CommandTester;
+use function str_replace;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Info
@@ -32,16 +36,27 @@ use UnexpectedValueException;
  * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
  *                              can create undesirable side-effects.
  */
-class InfoTest extends CommandTestCase
+class InfoTest extends FileSystemTestCase
 {
     private const FIXTURES = __DIR__.'/../../../fixtures/info';
 
-    protected function getCommand(): Command
+    private CommandTester $commandTester;
+
+    protected function setUp(): void
     {
-        return new Info();
+        parent::setUp();
+
+        $this->commandTester = CommandTester::fromConsoleCommand(new Info());
     }
 
-    public function test_it_provides_info_about_the_phar__api(): void
+    protected function tearDown(): void
+    {
+        unset($this->commandTester);
+
+        parent::tearDown();
+    }
+
+    public function test_it_provides_info_about_the_phar_api(): void
     {
         $this->commandTester->execute(
             [
@@ -68,8 +83,11 @@ class InfoTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        OutputAssertions::assertSameOutput(
+            $expected,
+            0,
+            $this->commandTester,
+        );
     }
 
     public function test_it_provides_info_about_a_phar(): void
@@ -105,8 +123,11 @@ class InfoTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        OutputAssertions::assertSameOutput(
+            $expected,
+            0,
+            $this->commandTester,
+        );
     }
 
     public function test_it_provides_info_about_a_phar_without_extension(): void
@@ -142,8 +163,11 @@ class InfoTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        OutputAssertions::assertSameOutput(
+            $expected,
+            0,
+            $this->commandTester,
+        );
     }
 
     public function test_it_cannot_provide_info_about_an_invalid_phar_without_extension(): void
@@ -171,11 +195,12 @@ class InfoTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-        $actual = preg_replace('/file[\ \n]+"/', 'file "', $actual);
-
-        $this->assertSame($expected, $actual);
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        OutputAssertions::assertSameOutput(
+            $expected,
+            1,
+            $this->commandTester,
+            static fn ($output) => preg_replace('/file[\ \n]+"/', 'file "', $output),
+        );
     }
 
     public function test_it_displays_the_error_in_debug_verbosity(): void
@@ -225,8 +250,11 @@ class InfoTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        OutputAssertions::assertSameOutput(
+            $expected,
+            0,
+            $this->commandTester,
+        );
     }
 
     public function test_it_provides_info_about_a_tarbz2_phar(): void
@@ -257,8 +285,11 @@ class InfoTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        OutputAssertions::assertSameOutput(
+            $expected,
+            0,
+            $this->commandTester,
+        );
     }
 
     public function test_it_provides_a_zip_phar_info(): void
@@ -284,18 +315,16 @@ class InfoTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = DisplayNormalizer::removeTrailingSpaces(
-            $this->commandTester->getDisplay(true),
+        OutputAssertions::assertSameOutput(
+            $expected,
+            1,
+            $this->commandTester,
+            static fn ($output) => preg_replace(
+                '/\s\[ERROR\] Could not read the file([\s\S]*)new\-simple\-phar\.zip[comment\<\>\n\s\/]*"\./',
+                ' [ERROR] Could not read the file "new-simple-phar.zip".',
+                $output,
+            ),
         );
-
-        $actual = preg_replace(
-            '/\s\[ERROR\] Could not read the file([\s\S]*)new\-simple\-phar\.zip[comment\<\>\n\s\/]*"\./',
-            ' [ERROR] Could not read the file "new-simple-phar.zip".',
-            $actual,
-        );
-
-        $this->assertSame($expected, $actual);
-        $this->assertSame(1, $this->commandTester->getStatusCode());
     }
 
     public function test_it_provides_a_phar_info_with_the_tree_of_the_content(): void
@@ -341,8 +370,11 @@ class InfoTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        OutputAssertions::assertSameOutput(
+            $expected,
+            0,
+            $this->commandTester,
+        );
     }
 
     public function test_it_provides_a_phar_info_with_the_flat_tree_of_the_content(): void
@@ -385,8 +417,11 @@ class InfoTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        OutputAssertions::assertSameOutput(
+            $expected,
+            0,
+            $this->commandTester,
+        );
     }
 
     public function test_it_provides_a_phar_info_with_the_tree_of_the_content_including_hidden_files(): void
@@ -439,11 +474,21 @@ class InfoTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        OutputAssertions::assertSameOutput(
+            $expected,
+            0,
+            $this->commandTester,
+        );
     }
 
-    public function test_it_can_limit_the_tree_depth(): void
+    /**
+     * @dataProvider treeDepthProvider
+     */
+    public function test_it_can_limit_the_tree_depth(
+        string $pharPath,
+        ?string $depth,
+        $expected,
+    ): void
     {
         $pharPath = self::FIXTURES.'/tree-phar.phar';
         $phar = new Phar($pharPath);
@@ -451,26 +496,58 @@ class InfoTest extends CommandTestCase
         $version = $phar->getVersion();
         $signature = $phar->getSignature();
 
-        $this->commandTester->execute(
+        $expected = str_replace(
             [
-                'command' => 'info',
-                'phar' => $pharPath,
-                '--list' => true,
-                '--metadata' => true,
-                '--depth' => 0,
+                '__VERSION__',
+                '__SIGNATURE__',
+                '__SIGNATURE_HASH__',
             ],
+            [
+                $version,
+                $signature['hash_type'],
+                $signature['hash'],
+            ],
+            $expected
         );
 
-        $expected = <<<OUTPUT
+        $input = [
+            'command' => 'info',
+            'phar' => $pharPath,
+            '--list' => true,
+            '--metadata' => true,
+            '--depth' => $depth,
+        ];
 
-            API Version: $version
+        if (null === $depth) {
+            unset($input['--depth']);
+        }
+
+        $this->commandTester->execute($input);
+
+        OutputAssertions::assertSameOutput(
+            $expected,
+            0,
+            $this->commandTester,
+        );
+    }
+
+    public static function treeDepthProvider(): iterable
+    {
+        $pharPath = self::FIXTURES.'/tree-phar.phar';
+
+        yield 'depth=0' => [
+            $pharPath,
+            '0',
+            <<<OUTPUT
+
+            API Version: __VERSION__
 
             Compression:
               - BZ2 (33.33%)
               - None (66.67%)
 
-            Signature: {$signature['hash_type']}
-            Signature Hash: {$signature['hash']}
+            Signature: __SIGNATURE__
+            Signature Hash: __SIGNATURE_HASH__
 
             Metadata:
             array (
@@ -482,31 +559,22 @@ class InfoTest extends CommandTestCase
             b/
             foo.php [NONE] - 19.00B
 
-            OUTPUT;
+            OUTPUT
+        ];
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        yield 'depth=1' => [
+            $pharPath,
+            '1',
+            <<<OUTPUT
 
-        $this->commandTester->execute(
-            [
-                'command' => 'info',
-                'phar' => $pharPath,
-                '--list' => true,
-                '--metadata' => true,
-                '--depth' => 1,
-            ],
-        );
-
-        $expected = <<<OUTPUT
-
-            API Version: $version
+            API Version: __VERSION__
 
             Compression:
               - BZ2 (33.33%)
               - None (66.67%)
 
-            Signature: {$signature['hash_type']}
-            Signature Hash: {$signature['hash']}
+            Signature: __SIGNATURE__
+            Signature Hash: __SIGNATURE_HASH__
 
             Metadata:
             array (
@@ -520,31 +588,22 @@ class InfoTest extends CommandTestCase
               beta/
             foo.php [NONE] - 19.00B
 
-            OUTPUT;
+            OUTPUT
+        ];
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        yield 'default depth, defined explicitly' => [
+            $pharPath,
+            '-1',
+            <<<OUTPUT
 
-        $this->commandTester->execute(
-            [
-                'command' => 'info',
-                'phar' => $pharPath,
-                '--list' => true,
-                '--metadata' => true,
-                '--depth' => -1,
-            ],
-        );
-
-        $expected = <<<OUTPUT
-
-            API Version: $version
+            API Version: __VERSION__
 
             Compression:
               - BZ2 (33.33%)
               - None (66.67%)
 
-            Signature: {$signature['hash_type']}
-            Signature Hash: {$signature['hash']}
+            Signature: __SIGNATURE__
+            Signature Hash: __SIGNATURE_HASH__
 
             Metadata:
             array (
@@ -559,10 +618,38 @@ class InfoTest extends CommandTestCase
                 bar.php [NONE] - 0.00B
             foo.php [NONE] - 19.00B
 
-            OUTPUT;
+            OUTPUT
+        ];
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        yield 'default depth' => [
+            $pharPath,
+            null,
+            <<<OUTPUT
+
+            API Version: __VERSION__
+
+            Compression:
+              - BZ2 (33.33%)
+              - None (66.67%)
+
+            Signature: __SIGNATURE__
+            Signature Hash: __SIGNATURE_HASH__
+
+            Metadata:
+            array (
+              'test' => 123,
+            )
+
+            Contents: 3 files (6.75KB)
+            a/
+              bar.php [BZ2] - 60.00B
+            b/
+              beta/
+                bar.php [NONE] - 0.00B
+            foo.php [NONE] - 19.00B
+
+            OUTPUT
+        ];
     }
 
     public function test_it_can_limit_the_tree_depth_in_flat_mode(): void
@@ -579,7 +666,7 @@ class InfoTest extends CommandTestCase
                 'phar' => $pharPath,
                 '--list' => true,
                 '--metadata' => true,
-                '--depth' => 1,
+                '--depth' => '1',
                 '--mode' => 'flat',
             ],
         );
@@ -606,31 +693,28 @@ class InfoTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        OutputAssertions::assertSameOutput(
+            $expected,
+            0,
+            $this->commandTester,
+        );
     }
 
     public function test_it_cannot_accept_an_invalid_depth(): void
     {
         $pharPath = self::FIXTURES.'/tree-phar.phar';
 
-        try {
-            $this->commandTester->execute(
-                [
-                    'command' => 'info',
-                    'phar' => $pharPath,
-                    '--list' => true,
-                    '--metadata' => true,
-                    '--depth' => -10,
-                ],
-            );
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected an integer string. Got "\'-10\'"');
 
-            $this->fail('Expected exception to be thrown.');
-        } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
-                'Expected the depth to be a positive integer or -1, got "-10"',
-                $exception->getMessage(),
-            );
-        }
+        $this->commandTester->execute(
+            [
+                'command' => 'info',
+                'phar' => $pharPath,
+                '--list' => true,
+                '--metadata' => true,
+                '--depth' => '-10',
+            ],
+        );
     }
 }

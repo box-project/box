@@ -14,12 +14,13 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Fidry\Console\Command\Command;
+use Fidry\Console\Test\OutputAssertions;
 use KevinGH\Box\Console\DisplayNormalizer;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
 use function preg_replace;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
@@ -62,10 +63,11 @@ class ExtractTest extends CommandTestCase
 
         $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-
-        $this->assertSame('', $actual);
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        OutputAssertions::assertSameOutput(
+            '',
+            0,
+            $this->commandTester,
+        );
     }
 
     public function test_it_can_extract_a_phar_without_the_phar_extension(): void

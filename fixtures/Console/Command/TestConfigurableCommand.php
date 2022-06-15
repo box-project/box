@@ -14,15 +14,33 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use KevinGH\Box\Console\IO\IO;
+use Fidry\Console\Command\Command;
+use Fidry\Console\Command\Configuration;
+use Fidry\Console\ExitCode;
+use Fidry\Console\Input\IO;
 
-class TestConfigurableCommand extends ConfigOption
+class TestConfigurableCommand implements Command
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function executeCommand(IO $io): int
+    protected function executeCommand(): int
     {
         return 0;
+    }
+
+    public function getConfiguration(): Configuration
+    {
+        return new Configuration(
+            'TestCommand',
+            'Command used to test ConfigOption',
+            '',
+            [],
+            [
+                ConfigOption::getOptionInput(),
+            ],
+        );
+    }
+
+    public function execute(IO $io): int
+    {
+        return ExitCode::SUCCESS;
     }
 }

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Fidry\Console\Command\Command;
 use function array_merge;
 use function array_unique;
 use function chdir;
@@ -60,7 +61,6 @@ use function sprintf;
 use function str_replace;
 use function strlen;
 use function substr;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\PhpExecutableFinder;

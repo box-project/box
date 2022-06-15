@@ -14,22 +14,37 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Fidry\Console\Command\Command;
+use Fidry\Console\Command\SymfonyCommand;
+use Fidry\Console\Test\OutputAssertions;
 use KevinGH\Box\Console\DisplayNormalizer;
+use KevinGH\Box\Test\FileSystemTestCase;
+use Symfony\Component\Console\Application;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\touch;
-use KevinGH\Box\Test\CommandTestCase;
 use function preg_replace;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
+use Fidry\Console\Test\CommandTester;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Process
  */
-class ProcessTest extends CommandTestCase
+class ProcessTest extends FileSystemTestCase
 {
-    protected function getCommand(): Command
+    private CommandTester $commandTester;
+
+    protected function setUp(): void
     {
-        return new Process();
+        parent::setUp();
+
+        $this->commandTester = CommandTester::fromConsoleCommand(new Process());
+    }
+
+    protected function tearDown(): void
+    {
+        unset($this->commandTester);
+
+        parent::tearDown();
     }
 
     public function test_it_processes_a_file_and_displays_the_processed_contents_with_no_config(): void
@@ -42,7 +57,6 @@ class ProcessTest extends CommandTestCase
                 'file' => 'index.php',
             ],
         );
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
         $expectedPath = $this->tmp.'/index.php';
 
@@ -65,8 +79,11 @@ class ProcessTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, $actual);
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        OutputAssertions::assertSameOutput(
+            $expected,
+            0,
+            $this->commandTester,
+        );
     }
 
     public function test_it_processes_a_file_and_displays_the_processed_contents_with_a_config(): void
@@ -100,13 +117,6 @@ class ProcessTest extends CommandTestCase
                 'file' => 'acme.json',
             ],
         );
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-
-        $actual = preg_replace(
-            '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
-            ' // Loading the configuration file "box.json".',
-            $actual,
-        );
 
         $expectedFilePath = $this->tmp.'/acme.json';
 
@@ -131,8 +141,12 @@ class ProcessTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, $actual);
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        OutputAssertions::assertSameOutput(
+            $expected,
+            0,
+            $this->commandTester,
+            self::createNormalizeLoadingFileOutput(),
+        );
     }
 
     public function test_it_processes_the_file_relative_to_the_config_base_path(): void
@@ -186,19 +200,6 @@ class ProcessTest extends CommandTestCase
                 'file' => $this->tmp.'/index.php',
             ],
         );
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-
-        $actual = preg_replace(
-            '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
-            ' // Loading the configuration file "box.json".',
-            $actual,
-        );
-
-        $actual = preg_replace(
-            '/ \{#\d{3,}/',
-            ' {#140',
-            $actual,
-        );
 
         $expectedPath = $this->tmp.'/index.php';
 
@@ -238,8 +239,16 @@ class ProcessTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, $actual);
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        OutputAssertions::assertSameOutput(
+            $expected,
+            0,
+            $this->commandTester,
+            static fn ($output) => preg_replace(
+                '/ \{#\d{3,}/',
+                ' {#140',
+                self::createNormalizeLoadingFileOutput()($output),
+            ),
+        );
     }
 
     public function test_it_processes_a_file_and_displays_only_the_processed_contents_in_quiet_mode(): void
@@ -274,20 +283,29 @@ class ProcessTest extends CommandTestCase
             ],
             ['verbosity' => OutputInterface::VERBOSITY_QUIET],
         );
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-
-        $actual = preg_replace(
-            '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
-            ' // Loading the configuration file "box.json".',
-            $actual,
-        );
 
         $expected = <<<'OUTPUT'
             {"foo":"bar"}
 
             OUTPUT;
 
-        $this->assertSame($expected, $actual);
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        OutputAssertions::assertSameOutput(
+            $expected,
+            0,
+            $this->commandTester,
+            self::createNormalizeLoadingFileOutput(),
+        );
+    }
+
+    /**
+     * @return callable(string):string
+     */
+    private static function createNormalizeLoadingFileOutput(): callable
+    {
+        return static fn ($output) => preg_replace(
+            '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
+            ' // Loading the configuration file "box.json".',
+            $output,
+        );
     }
 }

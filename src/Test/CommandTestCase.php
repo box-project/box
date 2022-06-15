@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Test;
 
+use Fidry\Console\Command\Command;
 use function feof;
 use function fgets;
 use KevinGH\Box\Console\Application;
@@ -21,7 +22,6 @@ use const PHP_EOL;
 use function preg_replace;
 use function rewind;
 use function str_replace;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -30,11 +30,8 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 abstract class CommandTestCase extends FileSystemTestCase
 {
-    /** @var Application */
-    protected $application;
-
-    /** @var CommandTester */
-    protected $commandTester;
+    protected Application $application;
+    protected CommandTester $commandTester;
 
     protected function setUp(): void
     {
@@ -55,7 +52,8 @@ abstract class CommandTestCase extends FileSystemTestCase
     {
         parent::tearDown();
 
-        $this->application = null;
+        unset($this->application);
+        unset($this->commandTester);
     }
 
     /**

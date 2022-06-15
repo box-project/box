@@ -119,7 +119,7 @@ final class Info implements Command
                     'd',
                     InputOption::VALUE_REQUIRED,
                     'The depth of the tree displayed',
-                    -1,
+                    '-1',
                 ),
             ],
         );
@@ -160,7 +160,9 @@ final class Info implements Command
 
     public static function showInfo(string $file, string $originalFile, IO $io): int
     {
-        $depth = $io->getOption(self::DEPTH_OPT)->asNatural();
+        $maxDepth = self::getMaxDepth($io);
+        // TODO: see https://github.com/theofidry/console/issues/57; restore custom error message
+        //  Expected the depth to be a positive integer or -1, got "-10"
         $mode = $io->getOption(self::MODE_OPT)->asStringChoice(self::MODES);
 
         try {
@@ -169,7 +171,7 @@ final class Info implements Command
             return self::showPharInfo(
                 $pharInfo,
                 $io->getOption(self::LIST_OPT)->asBoolean(),
-                $depth,
+                $maxDepth,
                 'indent' === $mode,
                 $io,
             );
@@ -187,6 +189,16 @@ final class Info implements Command
 
             return ExitCode::FAILURE;
         }
+    }
+
+    /**
+     * @return -1|natural
+     */
+    private static function getMaxDepth(IO $io): int
+    {
+        $option = $io->getOption(self::DEPTH_OPT);
+
+        return '-1' === $option->asRaw() ? -1 : $option->asNatural();
     }
 
     private static function showGlobalInfo(IO $io): int
@@ -286,6 +298,7 @@ final class Info implements Command
 
     /**
      * @param iterable<PharFileInfo> $list
+     * @param -1|natural              $maxDepth
      * @param false|int              $indent Nbr of indent or `false`
      */
     private static function renderContents(
