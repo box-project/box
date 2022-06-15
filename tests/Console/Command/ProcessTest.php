@@ -18,6 +18,7 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\Command\SymfonyCommand;
 use Fidry\Console\Test\OutputAssertions;
 use KevinGH\Box\Console\DisplayNormalizer;
+use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\FileSystemTestCase;
 use Symfony\Component\Console\Application;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -29,22 +30,11 @@ use Fidry\Console\Test\CommandTester;
 /**
  * @covers \KevinGH\Box\Console\Command\Process
  */
-class ProcessTest extends FileSystemTestCase
+class ProcessTest extends CommandTestCase
 {
-    private CommandTester $commandTester;
-
-    protected function setUp(): void
+    protected function getCommand(): Command
     {
-        parent::setUp();
-
-        $this->commandTester = CommandTester::fromConsoleCommand(new Process());
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->commandTester);
-
-        parent::tearDown();
+        return new Process();
     }
 
     public function test_it_processes_a_file_and_displays_the_processed_contents_with_no_config(): void
@@ -79,11 +69,7 @@ class ProcessTest extends FileSystemTestCase
 
             OUTPUT;
 
-        OutputAssertions::assertSameOutput(
-            $expected,
-            0,
-            $this->commandTester,
-        );
+        $this->assertSameOutput($expected, 0);
     }
 
     public function test_it_processes_a_file_and_displays_the_processed_contents_with_a_config(): void
@@ -141,12 +127,7 @@ class ProcessTest extends FileSystemTestCase
 
             OUTPUT;
 
-        OutputAssertions::assertSameOutput(
-            $expected,
-            0,
-            $this->commandTester,
-            self::createNormalizeLoadingFilePathOutput(),
-        );
+        $this->assertSameOutput($expected, 0, self::createNormalizeLoadingFilePathOutput());
     }
 
     public function test_it_processes_the_file_relative_to_the_config_base_path(): void
@@ -239,10 +220,9 @@ class ProcessTest extends FileSystemTestCase
 
             OUTPUT;
 
-        OutputAssertions::assertSameOutput(
+        $this->assertSameOutput(
             $expected,
             0,
-            $this->commandTester,
             static fn ($output) => preg_replace(
                 '/ \{#\d{3,}/',
                 ' {#140',
@@ -289,12 +269,7 @@ class ProcessTest extends FileSystemTestCase
 
             OUTPUT;
 
-        OutputAssertions::assertSameOutput(
-            $expected,
-            0,
-            $this->commandTester,
-            self::createNormalizeLoadingFilePathOutput(),
-        );
+        $this->assertSameOutput($expected, 0, self::createNormalizeLoadingFilePathOutput());
     }
 
     /**

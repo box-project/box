@@ -36,24 +36,13 @@ use function str_replace;
  * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
  *                              can create undesirable side-effects.
  */
-class InfoTest extends FileSystemTestCase
+class InfoTest extends CommandTestCase
 {
     private const FIXTURES = __DIR__.'/../../../fixtures/info';
 
-    private CommandTester $commandTester;
-
-    protected function setUp(): void
+    protected function getCommand(): Command
     {
-        parent::setUp();
-
-        $this->commandTester = CommandTester::fromConsoleCommand(new Info());
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->commandTester);
-
-        parent::tearDown();
+        return new Info();
     }
 
     public function test_it_provides_info_about_the_phar_api(): void
@@ -83,11 +72,7 @@ class InfoTest extends FileSystemTestCase
 
             OUTPUT;
 
-        OutputAssertions::assertSameOutput(
-            $expected,
-            0,
-            $this->commandTester,
-        );
+        $this->assertSameOutput($expected, 0);
     }
 
     public function test_it_provides_info_about_a_phar(): void
@@ -123,11 +108,7 @@ class InfoTest extends FileSystemTestCase
 
             OUTPUT;
 
-        OutputAssertions::assertSameOutput(
-            $expected,
-            0,
-            $this->commandTester,
-        );
+        $this->assertSameOutput($expected, 0);
     }
 
     public function test_it_provides_info_about_a_phar_without_extension(): void
@@ -163,11 +144,7 @@ class InfoTest extends FileSystemTestCase
 
             OUTPUT;
 
-        OutputAssertions::assertSameOutput(
-            $expected,
-            0,
-            $this->commandTester,
-        );
+        $this->assertSameOutput($expected, 0);
     }
 
     public function test_it_cannot_provide_info_about_an_invalid_phar_without_extension(): void
@@ -195,10 +172,9 @@ class InfoTest extends FileSystemTestCase
 
             OUTPUT;
 
-        OutputAssertions::assertSameOutput(
+        $this->assertSameOutput(
             $expected,
             1,
-            $this->commandTester,
             static fn ($output) => preg_replace('/file[\ \n]+"/', 'file "', $output),
         );
     }
@@ -250,11 +226,7 @@ class InfoTest extends FileSystemTestCase
 
             OUTPUT;
 
-        OutputAssertions::assertSameOutput(
-            $expected,
-            0,
-            $this->commandTester,
-        );
+        $this->assertSameOutput($expected, 0);
     }
 
     public function test_it_provides_info_about_a_tarbz2_phar(): void
@@ -285,11 +257,7 @@ class InfoTest extends FileSystemTestCase
 
             OUTPUT;
 
-        OutputAssertions::assertSameOutput(
-            $expected,
-            0,
-            $this->commandTester,
-        );
+        $this->assertSameOutput($expected, 0);
     }
 
     public function test_it_provides_a_zip_phar_info(): void
@@ -370,11 +338,7 @@ class InfoTest extends FileSystemTestCase
 
             OUTPUT;
 
-        OutputAssertions::assertSameOutput(
-            $expected,
-            0,
-            $this->commandTester,
-        );
+        $this->assertSameOutput($expected, 0);
     }
 
     public function test_it_provides_a_phar_info_with_the_flat_tree_of_the_content(): void
@@ -417,11 +381,7 @@ class InfoTest extends FileSystemTestCase
 
             OUTPUT;
 
-        OutputAssertions::assertSameOutput(
-            $expected,
-            0,
-            $this->commandTester,
-        );
+        $this->assertSameOutput($expected, 0);
     }
 
     public function test_it_provides_a_phar_info_with_the_tree_of_the_content_including_hidden_files(): void
@@ -474,11 +434,7 @@ class InfoTest extends FileSystemTestCase
 
             OUTPUT;
 
-        OutputAssertions::assertSameOutput(
-            $expected,
-            0,
-            $this->commandTester,
-        );
+        $this->assertSameOutput($expected, 0);
     }
 
     /**
@@ -524,11 +480,7 @@ class InfoTest extends FileSystemTestCase
 
         $this->commandTester->execute($input);
 
-        OutputAssertions::assertSameOutput(
-            $expected,
-            0,
-            $this->commandTester,
-        );
+        $this->assertSameOutput($expected, 0);
     }
 
     public static function treeDepthProvider(): iterable
@@ -693,11 +645,7 @@ class InfoTest extends FileSystemTestCase
 
             OUTPUT;
 
-        OutputAssertions::assertSameOutput(
-            $expected,
-            0,
-            $this->commandTester,
-        );
+        $this->assertSameOutput($expected, 0);
     }
 
     public function test_it_cannot_accept_an_invalid_depth(): void

@@ -40,9 +40,7 @@ class Namespace_Test extends CommandTestCase
         );
 
         $expected = 'KevinGH'."\n";
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
-        $this->assertSame($expected, $actual);
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, 0);
     }
 }

@@ -72,6 +72,11 @@ final class Diff implements Command
                     InputArgument::REQUIRED,
                     'The first PHAR',
                 ),
+                new InputArgument(
+                    self::SECOND_PHAR_ARG,
+                    InputArgument::REQUIRED,
+                    'The second PHAR',
+                ),
             ],
             [
                 new InputOption(
@@ -123,7 +128,7 @@ final class Diff implements Command
                 ),
             );
 
-            return ExitCode::SUCCESS;
+            return ExitCode::FAILURE;
         }
 
         $result1 = $this->compareArchives($diff, $io);
@@ -184,10 +189,12 @@ final class Diff implements Command
     {
         $io->comment('<info>Comparing the two archives contents...</info>');
 
-        // TODO: https://github.com/theofidry/console/issues/54
-        if ($io->getInput()->hasParameterOption(['-c', '--check'])) {
-            return $diff->listChecksums($io->getOption(self::CHECK_OPTION)->asNonEmptyString());
-        }
+        $checkSumAlgorithm = $io->getOption(self::CHECK_OPTION)->asNullableNonEmptyString();
+
+//        // TODO: https://github.com/theofidry/console/issues/54
+//        if (null !== $checkSumAlgorithm) {
+//            return $diff->listChecksums($checkSumAlgorithm);
+//        }
 
         if ($io->getOption(self::GNU_DIFF_OPTION)->asBoolean()) {
             $diffResult = $diff->gnuDiff();

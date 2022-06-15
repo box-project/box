@@ -63,11 +63,7 @@ class ExtractTest extends CommandTestCase
 
         $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
-        OutputAssertions::assertSameOutput(
-            '',
-            0,
-            $this->commandTester,
-        );
+        $this->assertSameOutput('', 0);
     }
 
     public function test_it_can_extract_a_phar_without_the_phar_extension(): void
@@ -91,10 +87,7 @@ class ExtractTest extends CommandTestCase
 
         $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-
-        $this->assertSame('', $actual);
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput('', 0);
     }
 
     public function test_it_can_extract_a_compressed_phar(): void
@@ -118,10 +111,7 @@ class ExtractTest extends CommandTestCase
 
         $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-
-        $this->assertSame('', $actual);
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput('', 0);
     }
 
     public function test_it_cannot_extract_an_invalid_phar(): void
@@ -149,11 +139,11 @@ class ExtractTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-        $actual = preg_replace('/file[\ \n]+"/', 'file "', $actual);
-
-        $this->assertSame($expectedOutput, $actual);
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSameOutput(
+            $expectedOutput,
+            1,
+            static fn ($output) => preg_replace('/file[\ \n]+"/', 'file "', $output),
+        );
     }
 
     public function test_it_provides_the_original_exception_in_debug_mode_when_cannot_extract_an_invalid_phar(): void
@@ -211,11 +201,11 @@ class ExtractTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-        $actual = preg_replace('/file[\ \n]+"/', 'file "', $actual);
-
-        $this->assertSame($expectedOutput, $actual);
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSameOutput(
+            $expectedOutput,
+            1,
+            static fn ($output) => preg_replace('/file[\ \n]+"/', 'file "', $output),
+        );
     }
 
     public function test_it_cannot_extract_an_unknown_file(): void
@@ -241,11 +231,11 @@ class ExtractTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-        $actual = preg_replace('/file[\ \n]+"/', 'file "', $actual);
-
-        $this->assertSame($expectedOutput, $actual);
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSameOutput(
+            $expectedOutput,
+            1,
+            static fn ($output) => preg_replace('/file[\ \n]+"/', 'file "', $output),
+        );
     }
 
     /**
