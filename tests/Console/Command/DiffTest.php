@@ -117,7 +117,7 @@ class DiffTest extends CommandTestCase
     /**
      * @dataProvider GNUDiffPharsProvider
      */
-    public function test_it_can_display_the__gn_u_diff_of_two_phar_files(
+    public function test_it_can_display_the_gnu_diff_of_two_phar_files(
         callable $executeCommand,
         ?string $expectedOutput,
         int $expectedStatusCode,

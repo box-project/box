@@ -51,6 +51,8 @@ final class Diff implements Command
     private const GNU_DIFF_OPTION = 'gnu-diff';
     private const CHECK_OPTION = 'check';
 
+    private const DEFAULT_CHECKSUM_ALGO = 'sha384';
+
     private static array $FILE_ALGORITHMS;
 
     public function __construct()
@@ -102,7 +104,7 @@ final class Diff implements Command
                     'c',
                     InputOption::VALUE_OPTIONAL,
                     'Verify the authenticity of the contents between the two PHARs with the given hash function',
-                    'sha384',
+                    self::DEFAULT_CHECKSUM_ALGO,
                 ),
             ],
         );
@@ -189,12 +191,12 @@ final class Diff implements Command
     {
         $io->comment('<info>Comparing the two archives contents...</info>');
 
-        $checkSumAlgorithm = $io->getOption(self::CHECK_OPTION)->asNullableNonEmptyString();
+        $checkSumAlgorithm = $io->getOption(self::CHECK_OPTION)->asNullableNonEmptyString() ?? self::DEFAULT_CHECKSUM_ALGO;
 
-//        // TODO: https://github.com/theofidry/console/issues/54
-//        if (null !== $checkSumAlgorithm) {
-//            return $diff->listChecksums($checkSumAlgorithm);
-//        }
+        // TODO: https://github.com/theofidry/console/issues/54
+        if ($io->getInput()->hasParameterOption(['-c', '--check'])) {
+            return $diff->listChecksums($checkSumAlgorithm);
+        }
 
         if ($io->getOption(self::GNU_DIFF_OPTION)->asBoolean()) {
             $diffResult = $diff->gnuDiff();
