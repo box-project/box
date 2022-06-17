@@ -52,20 +52,4 @@ class ConfigurationLoaderTest extends FileSystemTestCase
             $this->loader->loadFile(null),
         );
     }
-
-    public function test_it_throws_an_error_if_no_config_path_is_found(): void
-    {
-        try {
-            $this->loader->findDefaultPath();
-
-            $this->fail('Expected exception to be thrown.');
-        } catch (NoConfigurationFound $exception) {
-            $this->assertSame(
-                'The configuration file could not be found.',
-                $exception->getMessage(),
-            );
-            $this->assertSame(0, $exception->getCode());
-            $this->assertNull($exception->getPrevious());
-        }
-    }
 }
