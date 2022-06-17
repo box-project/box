@@ -18,9 +18,14 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
+use KevinGH\Box\Configuration\Configuration as BoxConfiguration;
 
 class TestConfigurableCommand implements Command
 {
+    public BoxConfiguration $config;
+
+    public bool $allowNoFile = false;
+
     protected function executeCommand(): int
     {
         return 0;
@@ -41,6 +46,8 @@ class TestConfigurableCommand implements Command
 
     public function execute(IO $io): int
     {
+        $this->config = ConfigOption::getConfig($io, $this->allowNoFile);
+
         return ExitCode::SUCCESS;
     }
 }

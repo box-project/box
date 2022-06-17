@@ -16,10 +16,14 @@ namespace KevinGH\Box\Console\Command;
 
 use Closure;
 use Fidry\Console\Command\Command;
+use Fidry\Console\Command\SymfonyCommand;
 use InvalidArgumentException;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Configuration\NoConfigurationFound;
 use KevinGH\Box\Console\IO\IO;
+use Symfony\Component\Console\Input\InputOption;
+use function array_map;
+use function in_array;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\touch;
 use KevinGH\Box\Json\JsonValidationException;
@@ -39,11 +43,21 @@ class ConfigurableTest extends CommandTestCase
         return new TestConfigurableCommand();
     }
 
+    private function getSymfonyCommand(): SymfonyCommand
+    {
+        return new SymfonyCommand(new TestConfigurableCommand());
+    }
+
     public function test_it_has_a_configure_option(): void
     {
-        $definition = $this->getCommand()->getDefinition();
+        $options = $this->getCommand()->getConfiguration()->getOptions();
 
-        $this->assertTrue($definition->hasOption('config'));
+        $optionNames = array_map(
+            static fn (InputOption $option) => $option->getName(),
+            $options,
+        );
+
+        self::assertContains('config', $optionNames);
     }
 
     public function test_it_can_get_the_configuration(): void
@@ -52,120 +66,39 @@ class ConfigurableTest extends CommandTestCase
 
         dump_file('box.json', '{"alias": "foo"}');
 
-        /** @var TestConfigurableCommand $command */
-        $command = $this->application->get('test');
+        $config = $this->executeAndGetConfig([]);
 
-        $input = new ArrayInput([]);
-        $input->bind($command->getDefinition());
-
-        $output = new NullOutput();
-
-        /** @var Configuration $config */
-        $config = Closure::bind(
-            static fn (ConfigOption $command, InputInterface $input, OutputInterface $output): Configuration => $command->getConfig(
-                new IO($input, $output),
-            ),
-            null,
-            TestConfigurableCommand::class,
-        )($command, $input, $output);
-
-        $this->assertInstanceOf(
-            Configuration::class,
-            $config,
-        );
-
-        $this->assertSame('foo', $config->getAlias());
+        self::assertSame('foo', $config->getAlias());
     }
 
-    public function test_it_can_get_the_configuration__with_a_custom_path(): void
+    public function test_it_can_get_the_configuration_with_a_custom_path(): void
     {
         touch('index.php');
 
         dump_file('mybox.json', '{"alias": "foo"}');
 
-        /** @var TestConfigurableCommand $command */
-        $command = $this->application->get('test');
+        $config = $this->executeAndGetConfig(['--config' => 'mybox.json']);
 
-        $input = new ArrayInput(['--config' => 'mybox.json']);
-        $input->bind($command->getDefinition());
-
-        $output = new NullOutput();
-
-        /** @var Configuration $config */
-        $config = Closure::bind(
-            static fn (ConfigOption $command, InputInterface $input, OutputInterface $output): Configuration => $command->getConfig(
-                new IO($input, $output),
-            ),
-            null,
-            TestConfigurableCommand::class,
-        )($command, $input, $output);
-
-        $this->assertInstanceOf(
-            Configuration::class,
-            $config,
-        );
-
-        $this->assertSame('foo', $config->getAlias());
+        self::assertSame('foo', $config->getAlias());
     }
 
     public function test_it_throws_an_error_when_cannot_load_the_config(): void
     {
         touch('index.php');
 
-        /** @var TestConfigurableCommand $command */
-        $command = $this->application->get('test');
+        $this->expectException(NoConfigurationFound::class);
+        $this->expectExceptionMessage('The configuration file could not be found.');
 
-        $input = new ArrayInput([]);
-        $input->bind($command->getDefinition());
-
-        $output = new NullOutput();
-
-        try {
-            Closure::bind(
-                static fn (ConfigOption $command, InputInterface $input, OutputInterface $output): Configuration => $command->getConfig(
-                    new IO($input, $output),
-                ),
-                null,
-                TestConfigurableCommand::class,
-            )($command, $input, $output);
-
-            $this->fail('Expected exception to be thrown.');
-        } catch (NoConfigurationFound $exception) {
-            $this->assertSame(
-                'The configuration file could not be found.',
-                $exception->getMessage(),
-            );
-        }
+        $this->commandTester->execute([]);
     }
 
     public function test_it_loads_an_empty_configuration_if_no_configuration_is_allowed_and_no_config_file_is_found(): void
     {
         touch('index.php');
 
-        /** @var TestConfigurableCommand $command */
-        $command = $this->application->get('test');
+        $config = $this->executeAndGetConfig([], true);
 
-        $input = new ArrayInput([]);
-        $input->bind($command->getDefinition());
-
-        $output = new NullOutput();
-
-        /** @var Configuration $config */
-        $config = Closure::bind(
-            static fn (ConfigOption $command, InputInterface $input, OutputInterface $output): Configuration => $command->getConfig(
-                new IO($input, $output),
-                true,
-            ),
-            null,
-            TestConfigurableCommand::class,
-        )($command, $input, $output);
-
-        $this->assertInstanceOf(
-            Configuration::class,
-            $config,
-        );
-
-        $this->assertSame($this->tmp.'/index.php', $config->getMainScriptPath());
+        self::assertSame($this->tmp.'/index.php', $config->getMainScriptPath());
     }
 
     public function test_it_throws_an_error_when_the_config_schema_is_invalid(): void
@@ -174,60 +107,37 @@ class ConfigurableTest extends CommandTestCase
 
         dump_file('box.json', '{"foo": "foo"}');
 
-        /** @var TestConfigurableCommand $command */
-        $command = $this->application->get('test');
+        $this->expectException(JsonValidationException::class);
+        $this->expectExceptionMessage('"'.$this->tmp.'/box.json" does not match the expected JSON schema:
+  - The property foo is not defined and the definition does not allow additional properties');
 
-        $input = new ArrayInput([]);
-        $input->bind($command->getDefinition());
-
-        $output = new NullOutput();
-
-        try {
-            Closure::bind(
-                static fn (ConfigOption $command, InputInterface $input, OutputInterface $output): Configuration => $command->getConfig(
-                    new IO($input, $output),
-                ),
-                null,
-                TestConfigurableCommand::class,
-            )($command, $input, $output);
-
-            $this->fail('Expected exception to be thrown.');
-        } catch (JsonValidationException $exception) {
-            $this->assertSame(
-                '"'.$this->tmp.'/box.json" does not match the expected JSON schema:
-  - The property foo is not defined and the definition does not allow additional properties',
-                $exception->getMessage(),
-            );
-        }
+        $this->executeAndGetConfig([]);
     }
 
     public function test_it_throws_an_error_when_the_config_is_invalid(): void
     {
         dump_file('box.json', '{}');
 
-        /** @var TestConfigurableCommand $command */
-        $command = $this->application->get('test');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The file "'.$this->tmp.'/index.php" does not exist.');
 
-        $input = new ArrayInput([]);
-        $input->bind($command->getDefinition());
+        $this->executeAndGetConfig([]);
+    }
 
-        $output = new NullOutput();
+    /**
+     * @param array<string, string> $input
+     */
+    private function executeAndGetConfig(array $input, bool $allowNoFile = false): Configuration
+    {
+        $command = $this->command;
+        self::assertInstanceOf(TestConfigurableCommand::class, $command);
 
-        try {
-            Closure::bind(
-                static fn (ConfigOption $command, InputInterface $input, OutputInterface $output): Configuration => $command->getConfig(
-                    new IO($input, $output),
-                ),
-                null,
-                TestConfigurableCommand::class,
-            )($command, $input, $output);
-
-            $this->fail('Expected exception to be thrown.');
-        } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
-                'The file "'.$this->tmp.'/index.php" does not exist.',
-                $exception->getMessage(),
-            );
+        if ($allowNoFile) {
+            $command->allowNoFile = true;
         }
+
+        $this->commandTester->execute($input);
+
+        return $command->config;
     }
 }

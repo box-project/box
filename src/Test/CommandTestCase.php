@@ -20,9 +20,11 @@ use Fidry\Console\Command\SymfonyCommand;
 use Fidry\Console\Test\AppTester;
 use Fidry\Console\Test\CommandTester;
 use Fidry\Console\Test\OutputAssertions;
+use KevinGH\Box\Console\Command\TestConfigurableCommand;
 use KevinGH\Box\Console\OutputFormatterConfigurator;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command as SymfonyBaseCommand;
 use Symfony\Component\Console\Tester\CommandTester as SymfonyCommandTester;
 use function feof;
 use function fgets;
@@ -39,17 +41,24 @@ use Symfony\Component\Console\Output\StreamOutput;
 abstract class CommandTestCase extends FileSystemTestCase
 {
     protected CommandTester $commandTester;
+    protected Command $command;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $command = new SymfonyCommand($this->getCommand());
+        $this->command = $this->getCommand();
+
+        $command = new SymfonyCommand($this->command);
 
         $application = new Application();
         $application->add($command);
 
-        $this->commandTester = new CommandTester($application->get($command->getName()));
+        $this->commandTester = new CommandTester(
+            $application->get(
+                $command->getName(),
+            ),
+        );
     }
 
     protected function tearDown(): void
