@@ -26,14 +26,20 @@ final class Application implements FidryApplication
 {
     private string $version;
     private string $releaseDate;
+    private bool $autoExit;
+    private bool $catchExceptions;
 
     public function __construct(
         private string $name = 'Box',
         ?string $version = null,
         string $releaseDate = '@release-date@',
+        bool $autoExit = true,
+        bool $catchExceptions = true
     ) {
         $this->version = $version ?? get_box_version();
         $this->releaseDate = !str_contains($releaseDate, '@') ? $releaseDate : '';
+        $this->autoExit = $autoExit;
+        $this->catchExceptions = $catchExceptions;
     }
 
     public function getName(): string
@@ -85,11 +91,11 @@ final class Application implements FidryApplication
 
     public function isAutoExitEnabled(): bool
     {
-        return true;
+        return $this->autoExit;
     }
 
     public function areExceptionsCaught(): bool
     {
-        return true;
+        return $this->catchExceptions;
     }
 }
