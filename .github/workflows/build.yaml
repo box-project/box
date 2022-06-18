@@ -17,7 +17,7 @@ jobs:
                 php: [ '8.1' ]
         steps:
             -   name: Checkout
-                uses: actions/checkout@v2
+                uses: actions/checkout@v3
                 with:
                     fetch-depth: 0
 
@@ -30,12 +30,12 @@ jobs:
                     coverage: none
 
             -   name: Install Composer dependencies
-                uses: ramsey/composer-install@v1
+                uses: ramsey/composer-install@v2
 
             -   name: Install RequirementChecker Composer dependencies
-                uses: ramsey/composer-install@v1
+                uses: ramsey/composer-install@v2
                 with:
-                    working-directory: 'vendor-bin/requirement-checker'
+                    working-directory: 'requirement-checker'
 
             -   name: Build PHAR
                 run: make compile
@@ -47,7 +47,7 @@ jobs:
             -   name: Ensure the PHAR is scoped
                 run: bin/box.phar namespace | php -r 'if (!str_starts_with(stream_get_contents(STDIN), "_HumbugBox")) exit (1);'
 
-            -   uses: actions/upload-artifact@v2
+            -   uses: actions/upload-artifact@v3
                 name: Upload the PHAR artifact
                 with:
                     name: box-phar
@@ -60,7 +60,7 @@ jobs:
             - 'build-phar'
         if: github.event_name == 'release'
         steps:
-            -   uses: actions/download-artifact@v2
+            -   uses: actions/download-artifact@v3
                 with:
                     name: box-phar
                     path: .
