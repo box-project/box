@@ -12,12 +12,11 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Console;
+namespace KevinGH\RequirementChecker;
 
 use function array_map;
 use function explode;
 use function implode;
-use KevinGH\Box\NotInstantiable;
 
 final class DisplayNormalizer
 {
@@ -31,5 +30,9 @@ final class DisplayNormalizer
         );
 
         return implode("\n", $lines);
+    }
+
+    private function __construct()
+    {
     }
 }
