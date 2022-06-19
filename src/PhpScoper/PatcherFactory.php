@@ -16,10 +16,13 @@ namespace KevinGH\Box\PhpScoper;
 
 use Humbug\PhpScoper\Patcher\Patcher;
 use Humbug\PhpScoper\Patcher\PatcherChain;
+use KevinGH\Box\NotInstantiable;
 use Laravel\SerializableClosure\SerializableClosure;
 
 final class PatcherFactory
 {
+    use NotInstantiable;
+
     /**
      * @param callable[] $patcher
      *
@@ -37,9 +40,5 @@ final class PatcherFactory
         );
 
         return new PatcherChain($serializablePatchers);
-    }
-
-    private function __construct()
-    {
     }
 }

@@ -17,9 +17,12 @@ namespace KevinGH\Box\Console;
 use function array_map;
 use function explode;
 use function implode;
+use KevinGH\Box\NotInstantiable;
 
 final class DisplayNormalizer
 {
+    use NotInstantiable;
+
     public static function removeTrailingSpaces(string $display): string
     {
         $lines = explode("\n", $display);
@@ -30,9 +33,5 @@ final class DisplayNormalizer
         );
 
         return implode("\n", $lines);
-    }
-
-    private function __construct()
-    {
     }
 }
