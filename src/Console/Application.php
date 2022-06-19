@@ -25,18 +25,6 @@ use function trim;
  */
 final class Application extends SymfonyApplication
 {
-    private const LOGO = <<<'ASCII'
-
-            ____
-           / __ )____  _  __
-          / __  / __ \| |/_/
-         / /_/ / /_/ />  <
-        /_____/\____/_/|_|
-
-
-
-        ASCII;
-
     private string $releaseDate;
 
     public function __construct(string $name = 'Box', ?string $version = null, string $releaseDate = '@release-date@')
@@ -62,7 +50,7 @@ final class Application extends SymfonyApplication
 
     public function getHelp(): string
     {
-        return self::LOGO.parent::getHelp();
+        return Logo::LOGO_ASCII.parent::getHelp();
     }
 
     protected function getDefaultCommands(): array
