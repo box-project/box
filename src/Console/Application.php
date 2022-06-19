@@ -17,7 +17,6 @@ namespace KevinGH\Box\Console;
 use function KevinGH\Box\get_box_version;
 use function sprintf;
 use Symfony\Component\Console\Application as SymfonyApplication;
-use Symfony\Component\Console\Helper\HelperSet;
 use function trim;
 
 /**
@@ -81,13 +80,5 @@ final class Application extends SymfonyApplication
         $commands[] = new Command\Namespace_();
 
         return $commands;
-    }
-
-    protected function getDefaultHelperSet(): HelperSet
-    {
-        $helperSet = parent::getDefaultHelperSet();
-        $helperSet->set(new ConfigurationHelper());
-
-        return $helperSet;
     }
 }

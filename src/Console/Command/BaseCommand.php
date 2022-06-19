@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use KevinGH\Box\Console\Application;
-use KevinGH\Box\Console\ConfigurationHelper;
 use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Console\OutputFormatterConfigurator;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
@@ -37,10 +36,5 @@ abstract class BaseCommand extends SymfonyCommand
         OutputFormatterConfigurator::configure($output);
 
         return $this->executeCommand(new IO($input, $output));
-    }
-
-    final protected function getConfigurationHelper(): ConfigurationHelper
-    {
-        return $this->getHelper('config');
     }
 }

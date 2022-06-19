@@ -16,6 +16,7 @@ namespace KevinGH\Box\Console\Command;
 
 use Exception;
 use KevinGH\Box\Console\ConfigurationLoader;
+use KevinGH\Box\Console\ConfigurationLocator;
 use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Console\MessageRenderer;
 use KevinGH\Box\Json\JsonValidationException;
@@ -70,8 +71,7 @@ final class Validate extends BaseCommand
 
         try {
             $config = ConfigurationLoader::getConfig(
-                $input->getArgument(self::FILE_ARGUMENT) ?? $this->getConfigurationHelper()->findDefaultPath(),
-                $this->getConfigurationHelper(),
+                $input->getArgument(self::FILE_ARGUMENT) ?? ConfigurationLocator::findDefaultPath(),
                 $io,
                 false,
             );

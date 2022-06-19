@@ -12,49 +12,25 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Console;
+namespace KevinGH\Box\Configuration;
 
-use function file_exists;
-use KevinGH\Box\Configuration\Configuration;
-use KevinGH\Box\Configuration\NoConfigurationFound;
 use KevinGH\Box\Json\Json;
-use function realpath;
 use stdClass;
-use Symfony\Component\Console\Helper\Helper;
 
 /**
  * @private
  */
-final class ConfigurationHelper extends Helper
+final class ConfigurationLoader
 {
-    private const FILE_NAME = 'box.json';
     private const SCHEMA_FILE = __DIR__.'/../../res/schema.json';
 
-    private $json;
-
-    public function __construct()
+    public function __construct(private readonly Json $json = new Json())
     {
-        $this->json = new Json();
     }
 
-    public function getName(): string
-    {
-        return 'config';
-    }
-
-    public function findDefaultPath(): string
-    {
-        if (false === file_exists(self::FILE_NAME)) {
-            if (false === file_exists(self::FILE_NAME.'.dist')) {
-                throw new NoConfigurationFound();
-            }
-
-            return realpath(self::FILE_NAME.'.dist');
-        }
-
-        return realpath(self::FILE_NAME);
-    }
-
+    /**
+     * @param null|non-empty-string $file
+     */
     public function loadFile(?string $file): Configuration
     {
         if (null === $file) {
