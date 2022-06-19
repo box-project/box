@@ -18,9 +18,6 @@ use KevinGH\Box\Console\IO\IO;
 
 class TestConfigurableCommand extends ConfigurableBaseCommand
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function executeCommand(IO $io): int
     {
         return 0;

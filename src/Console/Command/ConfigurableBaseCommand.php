@@ -18,7 +18,6 @@ use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\ConfigurationLoader;
 use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Json\JsonValidationException;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
@@ -51,14 +50,8 @@ abstract class ConfigurableBaseCommand extends BaseCommand
     {
         return ConfigurationLoader::getConfig(
             $io->getInput()->getOption(self::CONFIG_PARAM),
-            $this->getConfigurationHelper(),
             $io,
             $allowNoFile,
         );
-    }
-
-    final protected function getConfigPath(InputInterface $input): string
-    {
-        return $input->getOption(self::CONFIG_PARAM) ?? $this->getConfigurationHelper()->findDefaultPath();
     }
 }
