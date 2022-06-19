@@ -382,7 +382,7 @@ fixtures/build/dir013/vendor:
 
 .PHONY: fixtures/default_stub.php
 fixtures/default_stub.php:
-	bin/generate_default_stub
+	php -d phar.readonly=0 bin/generate_default_stub
 
 requirement-checker/tests/DisplayNormalizer.php: tests/Console/DisplayNormalizer.php
 	cat tests/Console/DisplayNormalizer.php | sed -E 's/namespace KevinGH\\Box\\Console;/namespace KevinGH\\RequirementChecker;/g' > requirement-checker/tests/DisplayNormalizer.php
