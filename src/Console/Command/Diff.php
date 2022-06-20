@@ -30,7 +30,6 @@ use PharFileInfo;
 use function sprintf;
 // TODO: migrate to Safe API
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Filesystem\Path;
 use Throwable;
@@ -49,13 +48,15 @@ final class Diff extends BaseCommand
     private const GNU_DIFF_OPTION = 'gnu-diff';
     private const CHECK_OPTION = 'check';
 
-    private static $FILE_ALGORITHMS;
+    private const DEFAULT_CHECKSUM_ALGO = 'sha384';
+
+    private static array$FILE_ALGORITHMS;
 
     public function __construct(?string $name = null)
     {
         parent::__construct($name);
 
-        if (null === self::$FILE_ALGORITHMS) {
+        if (!isset(self::$FILE_ALGORITHMS)) {
             self::$FILE_ALGORITHMS = array_flip(array_filter(get_phar_compression_algorithms()));
         }
     }
@@ -109,23 +110,10 @@ final class Diff extends BaseCommand
     {
         check_php_settings($io);
 
-        $input = $io->getInput();
-
-        /** @var string[] $paths */
-        $paths = [
-            $input->getArgument(self::FIRST_PHAR_ARG),
-            $input->getArgument(self::SECOND_PHAR_ARG),
-        ];
-
-        Assert::allFile($paths);
-
-        $normalizedPaths = array_map(
-            static fn (string $path) => Path::canonicalize($path),
-            $paths,
-        );
+        $paths = $this->getPaths($io);
 
         try {
-            $diff = new PharDiff(...$normalizedPaths);
+            $diff = new PharDiff(...$paths);
         } catch (Throwable $throwable) {
             if ($io->isDebug()) {
                 throw $throwable;
@@ -142,9 +130,30 @@ final class Diff extends BaseCommand
         }
 
         $result1 = $this->compareArchives($diff, $io);
-        $result2 = $this->compareContents($input, $diff, $io);
+        $result2 = $this->compareContents($diff, $io);
 
         return $result1 + $result2;
+    }
+
+    /**
+     * @return list<non-empty-string>
+     */
+    private function getPaths(IO $io): array
+    {
+        $input = $io->getInput();
+
+        /** @var string[] $paths */
+        $paths = [
+            $input->getArgument(self::FIRST_PHAR_ARG),
+            $input->getArgument(self::SECOND_PHAR_ARG),
+        ];
+
+        Assert::allFile($paths);
+
+        return array_map(
+            static fn (string $path) => Path::canonicalize($path),
+            $paths,
+        );
     }
 
     private function compareArchives(PharDiff $diff, IO $io): int
@@ -160,7 +169,7 @@ final class Diff extends BaseCommand
             return 0;
         }
 
-        $this->renderArchive(
+        self::renderArchive(
             $diff->getPharA()->getFileName(),
             $pharInfoA,
             $io,
@@ -168,7 +177,7 @@ final class Diff extends BaseCommand
 
         $io->newLine();
 
-        $this->renderArchive(
+        self::renderArchive(
             $diff->getPharB()->getFileName(),
             $pharInfoB,
             $io,
@@ -177,17 +186,19 @@ final class Diff extends BaseCommand
         return 1;
     }
 
-    private function compareContents(InputInterface $input, PharDiff $diff, IO $io): int
+    private function compareContents(PharDiff $diff, IO $io): int
     {
         $io->comment('<info>Comparing the two archives contents...</info>');
 
-        if ($input->hasParameterOption(['-c', '--check'])) {
-            return $diff->listChecksums($input->getOption(self::CHECK_OPTION) ?? 'sha384');
+        $checkSumAlgorithm = $io->getInput()->getOption(self::CHECK_OPTION) ?? self::DEFAULT_CHECKSUM_ALGO;
+
+        if ($io->getInput()->hasParameterOption(['-c', '--check'])) {
+            return $diff->listChecksums($io->getInput()->getOption(self::CHECK_OPTION) ?? 'sha384');
         }
 
-        if ($input->getOption(self::GNU_DIFF_OPTION)) {
+        if ($io->getInput()->getOption(self::GNU_DIFF_OPTION)) {
             $diffResult = $diff->gnuDiff();
-        } elseif ($input->getOption(self::GIT_DIFF_OPTION)) {
+        } elseif ($io->getInput()->getOption(self::GIT_DIFF_OPTION)) {
             $diffResult = $diff->gitDiff();
         } else {
             $diffResult = $diff->listDiff();
@@ -258,7 +269,7 @@ final class Diff extends BaseCommand
         return 1;
     }
 
-    private function renderArchive(string $fileName, PharInfo $pharInfo, IO $io): void
+    private static function renderArchive(string $fileName, PharInfo $pharInfo, IO $io): void
     {
         $io->writeln(
             sprintf(
