@@ -139,7 +139,7 @@ final class Info extends BaseCommand
                 ),
             );
 
-            return 1;
+            return self::FAILURE;
         }
 
         $tmpFile = create_temporary_phar($fileRealPath);
@@ -179,7 +179,7 @@ final class Info extends BaseCommand
                 ),
             );
 
-            return 1;
+            return self::FAILURE;
         }
     }
 
@@ -213,7 +213,7 @@ final class Info extends BaseCommand
         $io->newLine();
         $io->comment('Get a PHAR details by giving its path as an argument.');
 
-        return 0;
+        return self::SUCCESS;
     }
 
     private function showPharInfo(
@@ -240,7 +240,7 @@ final class Info extends BaseCommand
             $io->comment('Use the <info>--list|-l</info> option to list the content of the PHAR.');
         }
 
-        return 0;
+        return self::SUCCESS;
     }
 
     private function showPharMeta(PharInfo $pharInfo, IO $io): void

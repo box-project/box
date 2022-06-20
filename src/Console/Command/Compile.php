@@ -209,7 +209,7 @@ final class Compile extends BaseCommand
             return $this->generateDockerFile($io);
         }
 
-        return 0;
+        return self::SUCCESS;
     }
 
     private function createPhar(

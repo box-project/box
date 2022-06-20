@@ -157,7 +157,7 @@ final class Process extends BaseCommand
             }
         }
 
-        return 0;
+        return self::SUCCESS;
     }
 
     private static function retrieveCompactors(Configuration $config): Compactors
