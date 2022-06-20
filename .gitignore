@@ -21,6 +21,7 @@
 /fixtures/build/dir012/expected-output
 /fixtures/check-requirements/*/actual-output
 /fixtures/check-requirements/*/expected-output-*
+!/fixtures/check-requirements/*/expected-output-*-dist
 /fixtures/check-requirements/*/*.phar
 /fixtures/php-settings-checker/*
 !/fixtures/php-settings-checker/index.php

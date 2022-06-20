@@ -17,7 +17,6 @@ namespace KevinGH\RequirementChecker;
 use Generator;
 use function function_exists;
 use function getenv;
-use function in_array;
 use PHPUnit\Framework\TestCase;
 use function posix_isatty;
 use function putenv;

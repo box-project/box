@@ -8,28 +8,28 @@ final class Requirement
     private $fulfilled;
     private $testMessage;
     private $helpText;
-    public function __construct($checkIsFulfilled, $testMessage, $helpText)
+    public function __construct(IsFulfilled $checkIsFulfilled, string $testMessage, string $helpText)
     {
         $this->checkIsFulfilled = $checkIsFulfilled;
         $this->testMessage = $testMessage;
         $this->helpText = $helpText;
     }
-    public function isFulfilled()
+    public function isFulfilled() : bool
     {
-        if (null === $this->fulfilled) {
+        if (!isset($this->fulfilled)) {
             $this->fulfilled = $this->checkIsFulfilled->__invoke();
         }
-        return (bool) $this->fulfilled;
+        return $this->fulfilled;
     }
-    public function getIsFullfilledChecker()
+    public function getIsFullfilledChecker() : IsFulfilled
     {
         return $this->checkIsFulfilled;
     }
-    public function getTestMessage()
+    public function getTestMessage() : string
     {
         return $this->testMessage;
     }
-    public function getHelpText()
+    public function getHelpText() : string
     {
         return $this->helpText;
     }

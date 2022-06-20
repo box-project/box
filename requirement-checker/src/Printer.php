@@ -12,12 +12,25 @@
 
 namespace KevinGH\RequirementChecker;
 
+use function array_shift;
+use function count;
+use function explode;
+use function ltrim;
+use function min;
+use function sprintf;
+use function str_pad;
+use function str_repeat;
+use function strlen;
+use function trim;
+use function wordwrap;
+use const PHP_EOL;
+
 /**
  * @private
  */
 final class Printer
 {
-    private $styles = array(
+    private $styles = [
         'reset' => "\033[0m",
         'red' => "\033[31m",
         'green' => "\033[32m",
@@ -25,17 +38,12 @@ final class Printer
         'title' => "\033[33m",
         'error' => "\033[37;41m",
         'success' => "\033[30;42m",
-    );
+    ];
     private $verbosity;
     private $supportColors;
     private $width;
 
-    /**
-     * @param int      $verbosity
-     * @param bool     $supportColors
-     * @param null|int $width
-     */
-    public function __construct($verbosity, $supportColors, $width = null)
+    public function __construct(int $verbosity, bool $supportColors, ?int $width = null)
     {
         if (null === $width) {
             $terminal = new Terminal();
@@ -47,28 +55,17 @@ final class Printer
         $this->width = $width ?: 80;
     }
 
-    /**
-     * @return int
-     */
-    public function getVerbosity()
+    public function getVerbosity(): int
     {
         return $this->verbosity;
     }
 
-    /**
-     * @param int $verbosity
-     */
-    public function setVerbosity($verbosity)
+    public function setVerbosity($verbosity): void
     {
         $this->verbosity = $verbosity;
     }
 
-    /**
-     * @param string      $title
-     * @param int         $verbosity
-     * @param null|string $style
-     */
-    public function title($title, $verbosity, $style = null)
+    public function title(string $title, int $verbosity, ?string $style = null): void
     {
         if (null === $style) {
             $style = 'title';
@@ -79,7 +76,7 @@ final class Printer
         $this->printvln(
             str_repeat(
                 '=',
-                min(\strlen($title), $this->width)
+                min(strlen($title), $this->width)
             ),
             $verbosity,
             $style
@@ -87,29 +84,16 @@ final class Printer
         $this->printvln('', $verbosity, $style);
     }
 
-    /**
-     * @param Requirement $requirement
-     *
-     * @return null|string
-     */
-    public function getRequirementErrorMessage(Requirement $requirement)
+    public function getRequirementErrorMessage(Requirement $requirement): ?string
     {
         if ($requirement->isFulfilled()) {
             return null;
         }
 
-        $errorMessage = wordwrap($requirement->getTestMessage(), $this->width - 3, PHP_EOL.'   ').PHP_EOL;
-
-        return $errorMessage;
+        return wordwrap($requirement->getTestMessage(), $this->width - 3, PHP_EOL.'   ').PHP_EOL;
     }
 
-    /**
-     * @param string      $title
-     * @param string      $message
-     * @param int         $verbosity
-     * @param null|string $style
-     */
-    public function block($title, $message, $verbosity, $style = null)
+    public function block(string $title, string $message, int $verbosity, ?string $style = null): void
     {
         $prefix = ' ['.$title.'] ';
         $lineLength = $this->width - strlen($prefix) - 1;
@@ -118,7 +102,7 @@ final class Printer
         }
         $message = $prefix.trim($message);
 
-        $lines = array();
+        $lines = [];
 
         $remainingMessage = $message;
 
@@ -128,7 +112,7 @@ final class Printer
         do {
             $line = array_shift($wrapped);
             if ($lines && $lineLength > 0) {
-                $line = str_repeat(' ', \strlen($prefix)).ltrim($line);
+                $line = str_repeat(' ', strlen($prefix)).ltrim($line);
             }
             $lines[] = str_pad($line, $this->width, ' ', STR_PAD_RIGHT);
         }
@@ -143,23 +127,13 @@ final class Printer
         $this->printvln('', $verbosity);
     }
 
-    /**
-     * @param string      $message
-     * @param int         $verbosity
-     * @param null|string $style
-     */
-    public function printvln($message, $verbosity, $style = null)
+    public function printvln(string $message, int $verbosity, ?string $style = null): void
     {
         $this->printv($message, $verbosity, $style);
         $this->printv(PHP_EOL, $verbosity, null);
     }
 
-    /**
-     * @param string      $message
-     * @param int         $verbosity
-     * @param null|string $style
-     */
-    public function printv($message, $verbosity, $style = null)
+    public function printv(string $message, int $verbosity, ?string $style = null): void
     {
         if ($verbosity > $this->verbosity) {
             return;

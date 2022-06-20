@@ -133,7 +133,7 @@ EOF
             );
             $requirements->addRequirement(
                 new class implements IsFulfilled {
-                    public function __invoke()
+                    public function __invoke(): bool
                     {
                         return true;
                     }

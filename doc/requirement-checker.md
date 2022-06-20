@@ -120,8 +120,8 @@ require the requirement checker script `.box/check_requirements.php` like so:
 require 'phar://acme.phar/.box/check_requirements.php';
 ```
 
-The requirement checker works down to PHP 5.3+. If however you are including it after your custom code which is not
-PHP 5.3+ compatible, it will fail before the requirements are being checked.
+The requirement checker works down to PHP 7.2.5+. If however you are including it after your custom code which is not
+PHP 7.2.5+ compatible, it will fail before the requirements are being checked.
 
 
 ## Skipping the requirement checker
