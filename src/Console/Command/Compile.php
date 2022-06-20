@@ -69,7 +69,7 @@ use Webmozart\Assert\Assert;
 /**
  * @private
  */
-final class Compile extends ConfigurableBaseCommand
+final class Compile extends BaseCommand
 {
     use ChangeableWorkingDirectory;
 
@@ -143,6 +143,8 @@ final class Compile extends ConfigurableBaseCommand
             'Generates a Dockerfile',
         );
 
+        $this->getDefinition()->addOption(ConfigOption::getOptionInput());
+
         $this->configureWorkingDirOption();
     }
 
@@ -172,7 +174,7 @@ final class Compile extends ConfigurableBaseCommand
 
         $config = $input->getOption(self::NO_CONFIG_OPTION)
             ? Configuration::create(null, new stdClass())
-            : $this->getConfig($io, true)
+            : ConfigOption::getConfig($io, true)
         ;
         $path = $config->getOutputPath();
 

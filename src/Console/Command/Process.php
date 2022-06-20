@@ -42,7 +42,7 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 
 // TODO: replace the PHP-Scoper compactor in order to warn the user about scoping errors
-final class Process extends ConfigurableBaseCommand
+final class Process extends BaseCommand
 {
     use ChangeableWorkingDirectory;
 
@@ -80,6 +80,8 @@ final class Process extends ConfigurableBaseCommand
             'Ignore the config file even when one is specified with the --config option',
         );
 
+        $this->getDefinition()->addOption(ConfigOption::getOptionInput());
+
         $this->configureWorkingDirOption();
     }
 
@@ -99,7 +101,7 @@ final class Process extends ConfigurableBaseCommand
 
         $config = $input->getOption(self::NO_CONFIG_OPTION)
             ? Configuration::create(null, new stdClass())
-            : $this->getConfig($io, true)
+            : ConfigOption::getConfig($io, true)
         ;
 
         /** @var string $filePath */
