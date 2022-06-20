@@ -28,6 +28,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 
 /**
@@ -35,6 +36,8 @@ use Webmozart\Assert\Assert;
  */
 final class GenerateDockerFile extends BaseCommand
 {
+    public const NAME = 'docker';
+
     private const PHAR_ARG = 'phar';
     private const DOCKER_FILE_NAME = 'Dockerfile';
 
@@ -42,7 +45,7 @@ final class GenerateDockerFile extends BaseCommand
     {
         parent::configure();
 
-        $this->setName('docker');
+        $this->setName(self::NAME);
         $this->setDescription('🐳  Generates a Dockerfile for the given PHAR');
         $this->addArgument(
             self::PHAR_ARG,
@@ -55,84 +58,58 @@ final class GenerateDockerFile extends BaseCommand
 
     protected function executeCommand(IO $io): int
     {
-        $pharPath = $io->getInput()->getArgument(self::PHAR_ARG);
+        $pharFilePath = $this->getPharFilePath($io);
 
-        if (null === $pharPath) {
-            $pharPath = $this->guessPharPath($io);
-        }
-
-        if (null === $pharPath) {
+        if (null === $pharFilePath) {
             return 1;
         }
 
-        Assert::file($pharPath);
+        Assert::file($pharFilePath);
 
-        $pharPath = false !== realpath($pharPath) ? realpath($pharPath) : $pharPath;
+        $pharFilePath = false !== realpath($pharFilePath) ? realpath($pharFilePath) : $pharFilePath;
 
         $io->newLine();
         $io->writeln(
             sprintf(
                 '🐳  Generating a Dockerfile for the PHAR "<comment>%s</comment>"',
-                $pharPath,
+                $pharFilePath,
             ),
         );
 
-        $tmpPharPath = create_temporary_phar($pharPath);
-
-        $requirementsPhar = 'phar://'.$tmpPharPath.'/.box/.requirements.php';
+        $tmpPharPath = create_temporary_phar($pharFilePath);
+        $cleanUp = static fn () => remove($tmpPharPath);
+        $requirementsFilePhar = 'phar://'.$tmpPharPath.'/.box/.requirements.php';
 
         try {
-            if (false === file_exists($requirementsPhar)) {
-                $io->error(
-                    'Cannot retrieve the requirements for the PHAR. Make sure the PHAR has been built with Box and the '
-                    .'requirement checker enabled.',
-                );
-
-                return 1;
-            }
-
-            $requirements = include $requirementsPhar;
-
-            $dockerFileContents = DockerFileGenerator::createForRequirements(
-                $requirements,
-                make_path_relative($pharPath, getcwd()),
-            )
-                ->generateStub()
-            ;
-
-            if (file_exists(self::DOCKER_FILE_NAME)) {
-                $remove = $io->askQuestion(
-                    new ConfirmationQuestion(
-                        'A Docker file has already been found, are you sure you want to override it?',
-                        true,
-                    ),
-                );
-
-                if (false === $remove) {
-                    $io->writeln('Skipped the docker file generation.');
-
-                    return 0;
-                }
-            }
-
-            dump_file(self::DOCKER_FILE_NAME, $dockerFileContents);
-
-            $io->success('Done');
-
-            $io->writeln(
-                [
-                    sprintf(
-                        'You can now inspect your <comment>%s</comment> file or build your container with:',
-                        self::DOCKER_FILE_NAME,
-                    ),
-                    '$ <comment>docker build .</comment>',
-                ],
+            return $this->generateFile(
+                $pharFilePath,
+                $requirementsFilePhar,
+                $io,
             );
         } finally {
-            remove($tmpPharPath);
+            $cleanUp();
+        }
+    }
+
+    /**
+     * @return null|non-empty-string
+     */
+    private function getPharFilePath(IO $io): ?string
+    {
+        $pharFilePath = $io->getInput()->getArgument(self::PHAR_ARG);
+
+        if (null === $pharFilePath) {
+            $pharFilePath = $this->guessPharPath($io);
         }
 
-        return 0;
+        if (null === $pharFilePath) {
+            return null;
+        }
+
+        $pharFilePath = Path::canonicalize($pharFilePath);
+        Assert::file($pharFilePath);
+
+        return false !== realpath($pharFilePath) ? realpath($pharFilePath) : $pharFilePath;
     }
 
     private function guessPharPath(IO $io): ?string
@@ -145,8 +122,7 @@ final class GenerateDockerFile extends BaseCommand
 
         $compile = $io->askQuestion(
             new ConfirmationQuestion(
-                'The output PHAR could not be found, do you wish to generate it by running "<comment>box '
-                .'compile</comment>"?',
+                'The output PHAR could not be found, do you wish to generate it by running "<comment>box compile</comment>"?',
                 true,
             ),
         );
@@ -158,7 +134,7 @@ final class GenerateDockerFile extends BaseCommand
         }
 
         $this->getCompileCommand()->run(
-            $this->createCompileInput($io),
+            self::createCompileInput($io),
             clone $io->getOutput(),
         );
 
@@ -167,10 +143,10 @@ final class GenerateDockerFile extends BaseCommand
 
     private function getCompileCommand(): Compile
     {
-        return $this->getApplication()->find('compile');
+        return $this->getApplication()->find(Compile::NAME);
     }
 
-    private function createCompileInput(IO $io): InputInterface
+    private static function createCompileInput(IO $io): InputInterface
     {
         if ($io->isQuiet()) {
             $compileInput = '--quiet';
@@ -188,5 +164,56 @@ final class GenerateDockerFile extends BaseCommand
         $compileInput->setInteractive(false);
 
         return $compileInput;
+    }
+
+    private function generateFile(string $pharFilePath, string $requirementsPhar, IO $io): int
+    {
+        if (false === file_exists($requirementsPhar)) {
+            $io->error(
+                'Cannot retrieve the requirements for the PHAR. Make sure the PHAR has been built with Box and the '
+                .'requirement checker enabled.',
+            );
+
+            return 1;
+        }
+
+        $requirements = include $requirementsPhar;
+
+        $dockerFileContents = DockerFileGenerator::createForRequirements(
+            $requirements,
+            make_path_relative($pharFilePath, getcwd()),
+        )
+            ->generateStub();
+
+        if (file_exists(self::DOCKER_FILE_NAME)) {
+            $remove = $io->askQuestion(
+                new ConfirmationQuestion(
+                    'A Docker file has already been found, are you sure you want to override it?',
+                    true,
+                ),
+            );
+
+            if (false === $remove) {
+                $io->writeln('Skipped the docker file generation.');
+
+                return 0;
+            }
+        }
+
+        dump_file(self::DOCKER_FILE_NAME, $dockerFileContents);
+
+        $io->success('Done');
+
+        $io->writeln(
+            [
+                sprintf(
+                    'You can now inspect your <comment>%s</comment> file or build your container with:',
+                    self::DOCKER_FILE_NAME,
+                ),
+                '$ <comment>docker build .</comment>',
+            ],
+        );
+
+        return 0;
     }
 }
