@@ -14,20 +14,19 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use Exception;
+use function count;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\ConfigurationLoader;
 use KevinGH\Box\Console\ConfigurationLocator;
 use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Console\MessageRenderer;
 use KevinGH\Box\Json\JsonValidationException;
-use Throwable;
-use Webmozart\Assert\Assert;
-use function count;
 use function sprintf;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Throwable;
+use Webmozart\Assert\Assert;
 
 /**
  * @private
