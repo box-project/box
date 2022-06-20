@@ -12,6 +12,20 @@
 
 namespace KevinGH\RequirementChecker;
 
+use function exec;
+use function fclose;
+use function fopen;
+use function function_exists;
+use function getenv;
+use function is_resource;
+use function preg_match;
+use function proc_close;
+use function proc_open;
+use function sapi_windows_vt100_support;
+use function stream_get_contents;
+use function trim;
+use const DIRECTORY_SEPARATOR;
+
 /**
  * This file is copy/pasted from the Symfony project to avoid a dependency on `symfony/console` which would be too big for just using this
  * class.
@@ -26,17 +40,15 @@ class Terminal
 
     /**
      * Gets the terminal width.
-     *
-     * @return int
      */
-    public function getWidth()
+    public function getWidth(): int
     {
         $width = getenv('COLUMNS');
         if (false !== $width) {
             return (int) trim($width);
         }
 
-        if (null === self::$width) {
+        if (!isset(self::$width)) {
             self::initDimensions();
         }
 
@@ -45,17 +57,15 @@ class Terminal
 
     /**
      * Gets the terminal height.
-     *
-     * @return int
      */
-    public function getHeight()
+    public function getHeight(): int
     {
         $height = getenv('LINES');
         if (false !== $height) {
             return (int) trim($height);
         }
 
-        if (null === self::$height) {
+        if (!isset(self::$height)) {
             self::initDimensions();
         }
 
@@ -64,17 +74,15 @@ class Terminal
 
     /**
      * @internal
-     *
-     * @return bool
      */
-    public static function hasSttyAvailable()
+    public static function hasSttyAvailable(): bool
     {
-        if (null !== self::$stty) {
+        if (isset(self::$stty)) {
             return self::$stty;
         }
 
         // skip check if exec function is disabled
-        if (!\function_exists('exec')) {
+        if (!function_exists('exec')) {
             return false;
         }
 
@@ -83,9 +91,9 @@ class Terminal
         return self::$stty = 0 === $exitcode;
     }
 
-    private static function initDimensions()
+    private static function initDimensions(): void
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             if (preg_match('/^(\d+)x(\d+)(?: \((\d+)x(\d+)\))?$/', trim(getenv('ANSICON')), $matches)) {
                 // extract [w, H] from "wxh (WxH)"
                 // or [w, h] from "wxh"
@@ -108,12 +116,12 @@ class Terminal
     /**
      * Returns whether STDOUT has vt100 support (some Windows 10+ configurations).
      */
-    private static function hasVt100Support()
+    private static function hasVt100Support(): bool
     {
-        return \function_exists('sapi_windows_vt100_support') && \sapi_windows_vt100_support(\fopen('php://stdout', 'wb'));
+        return function_exists('sapi_windows_vt100_support') && sapi_windows_vt100_support(fopen('php://stdout', 'wb'));
     }
 
-    private static function initDimensionsUsingStty()
+    private static function initDimensionsUsingStty(): void
     {
         if ($sttyString = self::getSttyColumns()) {
             if (preg_match('/rows.(\d+);.columns.(\d+);/i', $sttyString, $matches)) {
@@ -133,7 +141,7 @@ class Terminal
      *
      * @return int[]|null An array composed of the width and the height or null if it could not be parsed
      */
-    private static function getConsoleMode()
+    private static function getConsoleMode(): ?array
     {
         $info = self::readFromProcess('mode CON');
 
@@ -146,32 +154,25 @@ class Terminal
 
     /**
      * Runs and parses stty -a if it's available, suppressing any error output.
-     *
-     * @return string|null
      */
-    private static function getSttyColumns()
+    private static function getSttyColumns(): ?string
     {
         return self::readFromProcess('stty -a | grep columns');
     }
 
-    /**
-     * @param string $command
-     *
-     * @return string|null
-     */
-    private static function readFromProcess($command)
+    private static function readFromProcess(string $command): ?string
     {
-        if (!\function_exists('proc_open')) {
+        if (!function_exists('proc_open')) {
             return null;
         }
 
-        $descriptorspec = array(
-            1 => array('pipe', 'w'),
-            2 => array('pipe', 'w'),
-        );
+        $descriptorspec = [
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ];
 
-        $process = proc_open($command, $descriptorspec, $pipes, null, null, array('suppress_errors' => true));
-        if (!\is_resource($process)) {
+        $process = proc_open($command, $descriptorspec, $pipes, null, null, ['suppress_errors' => true]);
+        if (!is_resource($process)) {
             return null;
         }
 

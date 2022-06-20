@@ -41,7 +41,7 @@ class RequirementTest extends TestCase
     {
         $requirement = new Requirement(
             $check = new class implements IsFulfilled {
-                public function __invoke()
+                public function __invoke(): bool
                 {
                     throw new Error();
                 }
@@ -61,66 +61,18 @@ class RequirementTest extends TestCase
         }
     }
 
-    public function test_it_casts_the_fulfilled_result_into_a_boolean(): void
-    {
-        $requirement = new Requirement(
-            new class implements IsFulfilled {
-                public function __invoke()
-                {
-                    return 1;
-                }
-            },
-            '',
-            ''
-        );
-
-        $this->assertTrue($requirement->isFulfilled());
-
-        $requirement = new Requirement(
-            new class implements IsFulfilled {
-                public function __invoke()
-                {
-                    return 0;
-                }
-            },
-            '',
-            ''
-        );
-
-        $this->assertFalse($requirement->isFulfilled());
-
-        $requirement = new Requirement(
-            new class implements IsFulfilled {
-                public function __invoke()
-                {
-                    return new stdClass();
-                }
-            },
-            '',
-            ''
-        );
-
-        $this->assertTrue($requirement->isFulfilled());
-    }
-
     public function test_it_evaluates_the_check_only_once(): void
     {
-        $x = -1;
-
         $requirement = new Requirement(
-            new class($x) implements IsFulfilled {
-                private $x;
+            new class() implements IsFulfilled {
+                private bool $calledOnce = false;
 
-                public function __construct(&$x)
+                public function __invoke(): bool
                 {
-                    $this->x = $x;
-                }
+                    $result = $this->calledOnce;
+                    $this->calledOnce = true;
 
-                public function __invoke()
-                {
-                    $this->x++;
-
-                    return $this->x;
+                    return $result;
                 }
             },
             'Test message',
@@ -128,6 +80,6 @@ class RequirementTest extends TestCase
         );
 
         $this->assertFalse($requirement->isFulfilled());
-        $this->assertFalse($requirement->isFulfilled());    // Would have gave `true` if it was evaluated a second time
+        $this->assertFalse($requirement->isFulfilled());    // Would have given `true` if it was evaluated a second time
     }
 }

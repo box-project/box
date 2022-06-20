@@ -15,7 +15,7 @@ class VersionParser
     */
     public static function parseStability($version)
     {
-        $version = (string) \preg_replace('{#.+$}', '', $version);
+        $version = (string) \preg_replace('{#.+$}', '', (string) $version);
         if (\strpos($version, 'dev-') === 0 || '-dev' === \substr($version, -4)) {
             return 'dev';
         }
@@ -38,12 +38,12 @@ class VersionParser
     }
     public static function normalizeStability($stability)
     {
-        $stability = \strtolower($stability);
+        $stability = \strtolower((string) $stability);
         return $stability === 'rc' ? 'RC' : $stability;
     }
     public function normalize($version, $fullVersion = null)
     {
-        $version = \trim($version);
+        $version = \trim((string) $version);
         $origVersion = $version;
         if (null === $fullVersion) {
             $fullVersion = $version;
@@ -101,14 +101,14 @@ class VersionParser
     }
     public function parseNumericAliasPrefix($branch)
     {
-        if (\preg_match('{^(?P<version>(\\d++\\.)*\\d++)(?:\\.x)?-dev$}i', $branch, $matches)) {
+        if (\preg_match('{^(?P<version>(\\d++\\.)*\\d++)(?:\\.x)?-dev$}i', (string) $branch, $matches)) {
             return $matches['version'] . '.';
         }
         return \false;
     }
     public function normalizeBranch($name)
     {
-        $name = \trim($name);
+        $name = \trim((string) $name);
         if (\preg_match('{^v?(\\d++)(\\.(?:\\d++|[xX*]))?(\\.(?:\\d++|[xX*]))?(\\.(?:\\d++|[xX*]))?$}i', $name, $matches)) {
             $version = '';
             for ($i = 1; $i < 5; ++$i) {
@@ -123,12 +123,12 @@ class VersionParser
         if ($name === 'dev-master' || $name === 'dev-default' || $name === 'dev-trunk') {
             return '9999999-dev';
         }
-        return $name;
+        return (string) $name;
     }
     public function parseConstraints($constraints)
     {
-        $prettyConstraint = $constraints;
-        $orConstraints = \preg_split('{\\s*\\|\\|?\\s*}', \trim($constraints));
+        $prettyConstraint = (string) $constraints;
+        $orConstraints = \preg_split('{\\s*\\|\\|?\\s*}', \trim((string) $constraints));
         if (\false === $orConstraints) {
             throw new \RuntimeException('Failed to preg_split string: ' . $constraints);
         }
