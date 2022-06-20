@@ -67,7 +67,7 @@ tu_box_phar_readonly: $(TU_BOX_DEPS)
 
 .PHONY: tu_requirement_checker
 tu_requirement_checker:	 ## Runs the unit tests
-tu_requirement_checker: requirement-checker/bin/phpunit requirement-checker/tests/DisplayNormalizer.php requirement-checker/actual_terminal_diff
+tu_requirement_checker: requirement-checker/bin/phpunit requirement-checker/actual_terminal_diff
 	cd requirement-checker && $(PHPNOGC) bin/phpunit
 
 	diff --side-by-side --suppress-common-lines requirement-checker/expected_terminal_diff requirement-checker/actual_terminal_diff
@@ -383,9 +383,6 @@ fixtures/build/dir013/vendor:
 .PHONY: fixtures/default_stub.php
 fixtures/default_stub.php:
 	php -d phar.readonly=0 bin/generate_default_stub
-
-requirement-checker/tests/DisplayNormalizer.php: tests/Console/DisplayNormalizer.php
-	cat tests/Console/DisplayNormalizer.php | sed -E 's/namespace KevinGH\\Box\\Console;/namespace KevinGH\\RequirementChecker;/g' > requirement-checker/tests/DisplayNormalizer.php
 
 .requirement-checker: requirement-checker/bin/check-requirements.phar
 	php bin/box extract requirement-checker/bin/check-requirements.phar .requirement-checker

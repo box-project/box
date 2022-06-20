@@ -33,7 +33,6 @@
 !/requirement-checker/bin/check-requirments.php
 /requirement-checker/actual_terminal_diff
 /requirement-checker/.box/
-/requirement-checker/tests/DisplayNormalizer.php
 /requirement-checker/vendor/
 /requirement-checker/.phpunit*
 /vendor/
