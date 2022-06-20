@@ -15,17 +15,11 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
-use Fidry\Console\Command\SymfonyCommand;
-use Fidry\Console\Test\OutputAssertions;
-use KevinGH\Box\Console\DisplayNormalizer;
-use KevinGH\Box\Test\CommandTestCase;
-use KevinGH\Box\Test\FileSystemTestCase;
-use Symfony\Component\Console\Application;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\touch;
+use KevinGH\Box\Test\CommandTestCase;
 use function preg_replace;
 use Symfony\Component\Console\Output\OutputInterface;
-use Fidry\Console\Test\CommandTester;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Process

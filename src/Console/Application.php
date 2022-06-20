@@ -34,7 +34,7 @@ final class Application implements FidryApplication
         ?string $version = null,
         string $releaseDate = '@release-date@',
         bool $autoExit = true,
-        bool $catchExceptions = true
+        bool $catchExceptions = true,
     ) {
         $this->version = $version ?? get_box_version();
         $this->releaseDate = !str_contains($releaseDate, '@') ? $releaseDate : '';

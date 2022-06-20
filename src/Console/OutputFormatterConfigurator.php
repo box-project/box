@@ -18,7 +18,6 @@ use Fidry\Console\Input\IO;
 use KevinGH\Box\NotInstantiable;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Utility to configure the output formatter styles.

@@ -14,24 +14,17 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use Closure;
+use function array_map;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\SymfonyCommand;
 use InvalidArgumentException;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Configuration\NoConfigurationFound;
-use KevinGH\Box\Console\IO\IO;
-use Symfony\Component\Console\Input\InputOption;
-use function array_map;
-use function in_array;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\touch;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\Test\CommandTestCase;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
  * @covers \KevinGH\Box\Console\Command\ConfigOption

@@ -301,8 +301,8 @@ final class Info implements Command
 
     /**
      * @param iterable<PharFileInfo> $list
-     * @param -1|natural              $maxDepth
-     * @param false|int              $indent Nbr of indent or `false`
+     * @param -1|natural             $maxDepth
+     * @param false|int              $indent   Nbr of indent or `false`
      */
     private static function renderContents(
         OutputInterface $output,

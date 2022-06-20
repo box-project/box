@@ -16,19 +16,16 @@ namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\Test\OutputAssertions;
-use KevinGH\Box\Test\FileSystemTestCase;
 use function getenv;
 use function implode;
 use InvalidArgumentException;
-use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
 use function preg_replace;
 use function realpath;
+use function str_replace;
 use Symfony\Component\Console\Output\OutputInterface;
 use UnexpectedValueException;
-use Fidry\Console\Test\CommandTester;
-use function str_replace;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Info
@@ -439,13 +436,14 @@ class InfoTest extends CommandTestCase
 
     /**
      * @dataProvider treeDepthProvider
+     *
+     * @param mixed $expected
      */
     public function test_it_can_limit_the_tree_depth(
         string $pharPath,
         ?string $depth,
         $expected,
-    ): void
-    {
+    ): void {
         $pharPath = self::FIXTURES.'/tree-phar.phar';
         $phar = new Phar($pharPath);
 
@@ -463,7 +461,7 @@ class InfoTest extends CommandTestCase
                 $signature['hash_type'],
                 $signature['hash'],
             ],
-            $expected
+            $expected,
         );
 
         $input = [
@@ -490,117 +488,117 @@ class InfoTest extends CommandTestCase
         yield 'depth=0' => [
             $pharPath,
             '0',
-            <<<OUTPUT
+            <<<'OUTPUT'
 
-            API Version: __VERSION__
+                API Version: __VERSION__
 
-            Compression:
-              - BZ2 (33.33%)
-              - None (66.67%)
+                Compression:
+                  - BZ2 (33.33%)
+                  - None (66.67%)
 
-            Signature: __SIGNATURE__
-            Signature Hash: __SIGNATURE_HASH__
+                Signature: __SIGNATURE__
+                Signature Hash: __SIGNATURE_HASH__
 
-            Metadata:
-            array (
-              'test' => 123,
-            )
+                Metadata:
+                array (
+                  'test' => 123,
+                )
 
-            Contents: 3 files (6.75KB)
-            a/
-            b/
-            foo.php [NONE] - 19.00B
+                Contents: 3 files (6.75KB)
+                a/
+                b/
+                foo.php [NONE] - 19.00B
 
-            OUTPUT
+                OUTPUT,
         ];
 
         yield 'depth=1' => [
             $pharPath,
             '1',
-            <<<OUTPUT
+            <<<'OUTPUT'
 
-            API Version: __VERSION__
+                API Version: __VERSION__
 
-            Compression:
-              - BZ2 (33.33%)
-              - None (66.67%)
+                Compression:
+                  - BZ2 (33.33%)
+                  - None (66.67%)
 
-            Signature: __SIGNATURE__
-            Signature Hash: __SIGNATURE_HASH__
+                Signature: __SIGNATURE__
+                Signature Hash: __SIGNATURE_HASH__
 
-            Metadata:
-            array (
-              'test' => 123,
-            )
+                Metadata:
+                array (
+                  'test' => 123,
+                )
 
-            Contents: 3 files (6.75KB)
-            a/
-              bar.php [BZ2] - 60.00B
-            b/
-              beta/
-            foo.php [NONE] - 19.00B
+                Contents: 3 files (6.75KB)
+                a/
+                  bar.php [BZ2] - 60.00B
+                b/
+                  beta/
+                foo.php [NONE] - 19.00B
 
-            OUTPUT
+                OUTPUT,
         ];
 
         yield 'default depth, defined explicitly' => [
             $pharPath,
             '-1',
-            <<<OUTPUT
+            <<<'OUTPUT'
 
-            API Version: __VERSION__
+                API Version: __VERSION__
 
-            Compression:
-              - BZ2 (33.33%)
-              - None (66.67%)
+                Compression:
+                  - BZ2 (33.33%)
+                  - None (66.67%)
 
-            Signature: __SIGNATURE__
-            Signature Hash: __SIGNATURE_HASH__
+                Signature: __SIGNATURE__
+                Signature Hash: __SIGNATURE_HASH__
 
-            Metadata:
-            array (
-              'test' => 123,
-            )
+                Metadata:
+                array (
+                  'test' => 123,
+                )
 
-            Contents: 3 files (6.75KB)
-            a/
-              bar.php [BZ2] - 60.00B
-            b/
-              beta/
-                bar.php [NONE] - 0.00B
-            foo.php [NONE] - 19.00B
+                Contents: 3 files (6.75KB)
+                a/
+                  bar.php [BZ2] - 60.00B
+                b/
+                  beta/
+                    bar.php [NONE] - 0.00B
+                foo.php [NONE] - 19.00B
 
-            OUTPUT
+                OUTPUT,
         ];
 
         yield 'default depth' => [
             $pharPath,
             null,
-            <<<OUTPUT
+            <<<'OUTPUT'
 
-            API Version: __VERSION__
+                API Version: __VERSION__
 
-            Compression:
-              - BZ2 (33.33%)
-              - None (66.67%)
+                Compression:
+                  - BZ2 (33.33%)
+                  - None (66.67%)
 
-            Signature: __SIGNATURE__
-            Signature Hash: __SIGNATURE_HASH__
+                Signature: __SIGNATURE__
+                Signature Hash: __SIGNATURE_HASH__
 
-            Metadata:
-            array (
-              'test' => 123,
-            )
+                Metadata:
+                array (
+                  'test' => 123,
+                )
 
-            Contents: 3 files (6.75KB)
-            a/
-              bar.php [BZ2] - 60.00B
-            b/
-              beta/
-                bar.php [NONE] - 0.00B
-            foo.php [NONE] - 19.00B
+                Contents: 3 files (6.75KB)
+                a/
+                  bar.php [BZ2] - 60.00B
+                b/
+                  beta/
+                    bar.php [NONE] - 0.00B
+                foo.php [NONE] - 19.00B
 
-            OUTPUT
+                OUTPUT,
         ];
     }
 

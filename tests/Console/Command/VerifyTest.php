@@ -15,15 +15,12 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
-use Fidry\Console\Test\OutputAssertions;
 use InvalidArgumentException;
 use KevinGH\Box\Test\CommandTestCase;
-use KevinGH\Box\Test\FileSystemTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
 use function realpath;
 use Symfony\Component\Console\Output\OutputInterface;
-use Fidry\Console\Test\CommandTester;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Verify

@@ -14,13 +14,13 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use Fidry\Console\Command\Command;
 use function array_merge;
 use function array_unique;
 use function chdir;
 use DirectoryIterator;
 use function exec;
 use function extension_loaded;
+use Fidry\Console\Command\Command;
 use function file_get_contents;
 use function get_loaded_extensions;
 use function implode;

@@ -15,8 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
-use Fidry\Console\Test\OutputAssertions;
-use KevinGH\Box\Console\DisplayNormalizer;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
