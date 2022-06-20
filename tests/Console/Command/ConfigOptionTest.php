@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Fidry\Console\Command\Command;
 use InvalidArgumentException;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Configuration\NoConfigurationFound;
@@ -21,7 +22,6 @@ use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\touch;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\Test\CommandTestCase;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
@@ -31,12 +31,12 @@ class ConfigOptionTest extends CommandTestCase
 {
     protected function getCommand(): Command
     {
-        return new TestConfigurableCommand('test');
+        return new TestConfigurableCommand();
     }
 
     public function test_it_has_a_configure_option(): void
     {
-        $options = $this->getCommand()->getDefinition()->getOptions();
+        $options = $this->getCommand()->getConfiguration()->getOptions();
 
         $optionNames = array_map(
             static fn (InputOption $option) => $option->getName(),
@@ -115,7 +115,7 @@ class ConfigOptionTest extends CommandTestCase
      */
     private function executeAndGetConfig(array $input, bool $allowNoFile = false): Configuration
     {
-        $command = $this->application->get('test');
+        $command = $this->command;
         self::assertInstanceOf(TestConfigurableCommand::class, $command);
 
         if ($allowNoFile) {

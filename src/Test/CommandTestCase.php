@@ -61,18 +61,18 @@ abstract class CommandTestCase extends FileSystemTestCase
     abstract protected function getCommand(): Command;
 
     /**
-     * @param null|callable(string):string $extraNormalization
+     * @param callable(string):string $extraNormalizers
      */
     public function assertSameOutput(
         string $expectedOutput,
         int $expectedStatusCode,
-        ?callable $extraNormalization = null,
+        callable ...$extraNormalizers,
     ): void {
         OutputAssertions::assertSameOutput(
             $expectedOutput,
             $expectedStatusCode,
             $this->commandTester,
-            $extraNormalization,
+            ...$extraNormalizers,
         );
     }
 }

@@ -26,11 +26,6 @@ class TestConfigurableCommand implements Command
 
     public bool $allowNoFile = false;
 
-    protected function executeCommand(): int
-    {
-        return 0;
-    }
-
     public function getConfiguration(): Configuration
     {
         return new Configuration(
