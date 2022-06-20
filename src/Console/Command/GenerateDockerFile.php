@@ -33,7 +33,7 @@ use Webmozart\Assert\Assert;
 /**
  * @private
  */
-final class GenerateDockerFile extends ConfigurableBaseCommand
+final class GenerateDockerFile extends BaseCommand
 {
     private const PHAR_ARG = 'phar';
     private const DOCKER_FILE_NAME = 'Dockerfile';
@@ -49,6 +49,8 @@ final class GenerateDockerFile extends ConfigurableBaseCommand
             InputArgument::OPTIONAL,
             'The PHAR file',
         );
+
+        $this->getDefinition()->addOption(ConfigOption::getOptionInput());
     }
 
     protected function executeCommand(IO $io): int
@@ -135,7 +137,7 @@ final class GenerateDockerFile extends ConfigurableBaseCommand
 
     private function guessPharPath(IO $io): ?string
     {
-        $config = $this->getConfig($io, true);
+        $config = ConfigOption::getConfig($io, true);
 
         if (file_exists($config->getOutputPath())) {
             return $config->getOutputPath();

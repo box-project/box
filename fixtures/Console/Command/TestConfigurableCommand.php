@@ -14,12 +14,24 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use KevinGH\Box\Configuration\Configuration as BoxConfiguration;
 use KevinGH\Box\Console\IO\IO;
 
-class TestConfigurableCommand extends ConfigurableBaseCommand
+class TestConfigurableCommand extends BaseCommand
 {
+    public BoxConfiguration $config;
+
+    public bool $allowNoFile = false;
+
+    protected function configure(): void
+    {
+        $this->getDefinition()->addOption(ConfigOption::getOptionInput());
+    }
+
     protected function executeCommand(IO $io): int
     {
+        $this->config = ConfigOption::getConfig($io, $this->allowNoFile);
+
         return 0;
     }
 }
