@@ -73,6 +73,8 @@ final class Compile extends BaseCommand
 {
     use ChangeableWorkingDirectory;
 
+    public const NAME = 'compile';
+
     private const HELP = <<<'HELP'
         The <info>%command.name%</info> command will compile code in a new PHAR based on a variety of settings.
         <comment>
@@ -102,7 +104,7 @@ final class Compile extends BaseCommand
     {
         parent::configure();
 
-        $this->setName('compile');
+        $this->setName(self::NAME);
         $this->setDescription('🔨  Compiles an application into a PHAR');
         $this->setHelp(self::HELP);
 
@@ -874,6 +876,6 @@ final class Compile extends BaseCommand
     private function getDockerCommand(): GenerateDockerFile
     {
         /* @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getApplication()->find('docker');
+        return $this->getApplication()->find(GenerateDockerFile::NAME);
     }
 }
