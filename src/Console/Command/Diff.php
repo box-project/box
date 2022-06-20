@@ -50,7 +50,7 @@ final class Diff extends BaseCommand
 
     private const DEFAULT_CHECKSUM_ALGO = 'sha384';
 
-    private static array$FILE_ALGORITHMS;
+    private static array $FILE_ALGORITHMS;
 
     public function __construct(?string $name = null)
     {
