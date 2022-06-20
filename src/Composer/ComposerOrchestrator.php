@@ -71,9 +71,7 @@ final class ComposerOrchestrator
         bool $excludeDevFiles,
         IO $io = null,
     ): void {
-        if (null === $io) {
-            $io = IO::createNull();
-        }
+        $io = $io ?? IO::createNull();
 
         $logger = new CompilerLogger($io);
 
