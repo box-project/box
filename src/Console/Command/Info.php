@@ -123,7 +123,7 @@ final class Info extends BaseCommand
         $file = $input->getArgument(self::PHAR_ARG);
 
         if (null === $file) {
-            return $this->showGlobalInfo($io);
+            return self::showGlobalInfo($io);
         }
 
         $file = Path::canonicalize($file);
@@ -155,9 +155,7 @@ final class Info extends BaseCommand
     {
         $input = $io->getInput();
 
-        $depth = (int) $input->getOption(self::DEPTH_OPT);
-
-        Assert::greaterThanEq($depth, -1, 'Expected the depth to be a positive integer or -1, got "%d"');
+        $depth = self::getMaxDepth($io);
 
         try {
             $pharInfo = new PharInfo($file);
@@ -185,9 +183,25 @@ final class Info extends BaseCommand
         }
     }
 
-    private function showGlobalInfo(IO $io): int
+    /**
+     * @return -1|natural
+     */
+    private static function getMaxDepth(IO $io): int
     {
-        $this->render(
+        $depth = (int) $io->getInput()->getOption(self::DEPTH_OPT);
+
+        Assert::greaterThanEq(
+            $depth,
+            -1,
+            'Expected the depth to be a positive integer or -1, got "%d"',
+        );
+
+        return $depth;
+    }
+
+    private static function showGlobalInfo(IO $io): int
+    {
+        self::render(
             $io,
             [
                 'API Version' => Phar::apiVersion(),
@@ -255,7 +269,7 @@ final class Info extends BaseCommand
         PharInfoRenderer::renderContentsSummary($pharInfo, $io);
     }
 
-    private function render(IO $io, array $attributes): void
+    private static function render(IO $io, array $attributes): void
     {
         $out = false;
 
