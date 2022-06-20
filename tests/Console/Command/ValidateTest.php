@@ -93,7 +93,7 @@ class ValidateTest extends CommandTestCase
 
              // Loading the configuration file "test.json".
 
-            💡  1 recommendation found:
+            💡  <recommendation>1 recommendation found:</recommendation>
                 - The setting "key" has been set but is unnecessary since the signing algorithm is not "OPENSSL".
             No warning found.
 
@@ -133,7 +133,7 @@ class ValidateTest extends CommandTestCase
 
              // Loading the configuration file "test.json".
 
-            💡  1 recommendation found:
+            💡  <recommendation>1 recommendation found:</recommendation>
                 - The setting "key" has been set but is unnecessary since the signing algorithm is not "OPENSSL".
             No warning found.
 
@@ -173,7 +173,7 @@ class ValidateTest extends CommandTestCase
              // Loading the configuration file "test.json".
 
             No recommendation found.
-            ⚠️  1 warning found:
+            ⚠️  <warning>1 warning found:</warning>
                 - The setting "key" has been set but is ignored since the signing algorithm is not "OPENSSL".
 
              ! [CAUTION] The configuration file passed the validation with warnings.
@@ -213,7 +213,7 @@ class ValidateTest extends CommandTestCase
              // Loading the configuration file "test.json".
 
             No recommendation found.
-            ⚠️  1 warning found:
+            ⚠️  <warning>1 warning found:</warning>
                 - The setting "key" has been set but is ignored since the signing algorithm is not "OPENSSL".
 
              ! [CAUTION] The configuration file passed the validation with warnings.
@@ -251,9 +251,9 @@ class ValidateTest extends CommandTestCase
 
              // Loading the configuration file "test.json".
 
-            💡  1 recommendation found:
+            💡  <recommendation>1 recommendation found:</recommendation>
                 - The "check-requirements" setting can be omitted since is set to its default value
-            ⚠️  1 warning found:
+            ⚠️  <warning>1 warning found:</warning>
                 - The requirement checker could not be used because the composer.json and composer.lock file could not be found.
 
              ! [CAUTION] The configuration file passed the validation with recommendations

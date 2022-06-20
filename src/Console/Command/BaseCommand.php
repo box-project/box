@@ -16,7 +16,6 @@ namespace KevinGH\Box\Console\Command;
 
 use KevinGH\Box\Console\Application;
 use KevinGH\Box\Console\IO\IO;
-use KevinGH\Box\Console\OutputFormatterConfigurator;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -33,8 +32,6 @@ abstract class BaseCommand extends SymfonyCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        OutputFormatterConfigurator::configure($output);
-
         return $this->executeCommand(new IO($input, $output));
     }
 }

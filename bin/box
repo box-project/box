@@ -18,6 +18,8 @@ namespace KevinGH\Box;
 use function file_exists;
 use function in_array;
 use KevinGH\Box\Console\Application;
+use KevinGH\Box\Console\IO\IO;
+use KevinGH\Box\Console\OutputFormatterConfigurator;
 use const PHP_EOL;
 use const PHP_SAPI;
 use RuntimeException;
@@ -49,5 +51,8 @@ if (false === in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
 register_aliases();
 register_error_handler();
 
+$io = IO::createDefault();
+OutputFormatterConfigurator::configure($io);
+
 $app = new Application();
-$app->run();
+$app->run($io->getInput(), $io->getOutput());
