@@ -38,6 +38,7 @@ use KevinGH\Box\Composer\ComposerOrchestrator;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Console\Logger\CompilerLogger;
+use KevinGH\Box\Console\Logo;
 use KevinGH\Box\Console\MessageRenderer;
 use function KevinGH\Box\disable_parallel_processing;
 use function KevinGH\Box\FileSystem\chmod;
@@ -54,7 +55,6 @@ use KevinGH\Box\StubGenerator;
 use function memory_get_peak_usage;
 use function memory_get_usage;
 use function microtime;
-use const PHP_EOL;
 use function putenv;
 use RuntimeException;
 use function sprintf;
@@ -154,7 +154,9 @@ final class Compile extends ConfigurableBaseCommand
             putenv(BOX_ALLOW_XDEBUG.'=1');
         }
 
-        if ($debug = $input->getOption(self::DEBUG_OPTION)) {
+        $debug = $input->getOption(self::DEBUG_OPTION);
+
+        if ($debug) {
             $io->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
         }
 
@@ -167,7 +169,7 @@ final class Compile extends ConfigurableBaseCommand
 
         $this->changeWorkingDirectory($input);
 
-        $io->writeln($this->getApplication()->getHelp());
+        $io->writeln(Logo::LOGO_ASCII);
         $io->newLine();
 
         $config = $input->getOption(self::NO_CONFIG_OPTION)
@@ -195,12 +197,12 @@ final class Compile extends ConfigurableBaseCommand
             $restoreLimit();
         }
 
-        $this->correctPermissions($path, $config, $logger);
+        self::correctPermissions($path, $config, $logger);
 
-        $this->logEndBuilding($config, $logger, $io, $box, $path, $startTime);
+        self::logEndBuilding($config, $logger, $io, $box, $path, $startTime);
 
         if ($input->getOption(self::WITH_DOCKER_OPTION)) {
-            $this->generateDockerFile($io);
+            return $this->generateDockerFile($io);
         }
 
         return 0;
@@ -216,24 +218,24 @@ final class Compile extends ConfigurableBaseCommand
 
         $box->startBuffering();
 
-        $this->registerReplacementValues($config, $box, $logger);
-        $this->registerCompactors($config, $box, $logger);
+        self::registerReplacementValues($config, $box, $logger);
+        self::registerCompactors($config, $box, $logger);
         $this->registerFileMapping($config, $box, $logger);
 
         // Registering the main script _before_ adding the rest if of the files is _very_ important. The temporary
         // file used for debugging purposes and the Composer dump autoloading will not work correctly otherwise.
-        $main = $this->registerMainScript($config, $box, $logger);
+        $main = self::registerMainScript($config, $box, $logger);
 
-        $check = $this->registerRequirementsChecker($config, $box, $logger);
+        $check = self::registerRequirementsChecker($config, $box, $logger);
 
-        $this->addFiles($config, $box, $logger, $io);
+        self::addFiles($config, $box, $logger, $io);
 
-        $this->registerStub($config, $box, $main, $check, $logger);
-        $this->configureMetadata($config, $box, $logger);
+        self::registerStub($config, $box, $main, $check, $logger);
+        self::configureMetadata($config, $box, $logger);
 
-        $this->commit($box, $config, $logger);
+        self::commit($box, $config, $logger);
 
-        $this->checkComposerFiles($box, $config, $logger);
+        self::checkComposerFiles($box, $config, $logger);
 
         if ($debug) {
             $box->getPhar()->extractTo(self::DEBUG_DIR, null, true);
@@ -247,7 +249,7 @@ final class Compile extends ConfigurableBaseCommand
             $logger,
         );
 
-        $this->signPhar($config, $box, $config->getTmpOutputPath(), $io, $logger);
+        self::signPhar($config, $box, $config->getTmpOutputPath(), $io, $logger);
 
         if ($config->getTmpOutputPath() !== $config->getOutputPath()) {
             rename($config->getTmpOutputPath(), $config->getOutputPath());
@@ -284,11 +286,11 @@ final class Compile extends ConfigurableBaseCommand
         remove($path);
     }
 
-    private function registerReplacementValues(Configuration $config, Box $box, CompilerLogger $logger): void
+    private static function registerReplacementValues(Configuration $config, Box $box, CompilerLogger $logger): void
     {
         $values = $config->getReplacements();
 
-        if ([] === $values) {
+        if (0 === count($values)) {
             return;
         }
 
@@ -311,7 +313,7 @@ final class Compile extends ConfigurableBaseCommand
         $box->registerPlaceholders($values);
     }
 
-    private function registerCompactors(Configuration $config, Box $box, CompilerLogger $logger): void
+    private static function registerCompactors(Configuration $config, Box $box, CompilerLogger $logger): void
     {
         $compactors = $config->getCompactors();
 
@@ -352,12 +354,12 @@ final class Compile extends ConfigurableBaseCommand
     {
         $fileMapper = $config->getFileMapper();
 
-        $this->logMap($fileMapper, $logger);
+        self::logMap($fileMapper, $logger);
 
         $box->registerFileMapping($fileMapper);
     }
 
-    private function addFiles(Configuration $config, Box $box, CompilerLogger $logger, IO $io): void
+    private static function addFiles(Configuration $config, Box $box, CompilerLogger $logger, IO $io): void
     {
         $logger->log(CompilerLogger::QUESTION_MARK_PREFIX, 'Adding binary files');
 
@@ -420,7 +422,7 @@ final class Compile extends ConfigurableBaseCommand
         throw $ampFailure;
     }
 
-    private function registerMainScript(Configuration $config, Box $box, CompilerLogger $logger): ?string
+    private static function registerMainScript(Configuration $config, Box $box, CompilerLogger $logger): ?string
     {
         if (false === $config->hasMainScript()) {
             $logger->log(
@@ -458,7 +460,7 @@ final class Compile extends ConfigurableBaseCommand
         return $localMain;
     }
 
-    private function registerRequirementsChecker(Configuration $config, Box $box, CompilerLogger $logger): bool
+    private static function registerRequirementsChecker(Configuration $config, Box $box, CompilerLogger $logger): bool
     {
         if (false === $config->checkRequirements()) {
             $logger->log(
@@ -489,7 +491,7 @@ final class Compile extends ConfigurableBaseCommand
         return true;
     }
 
-    private function registerStub(
+    private static function registerStub(
         Configuration $config,
         Box $box,
         ?string $main,
@@ -502,7 +504,7 @@ final class Compile extends ConfigurableBaseCommand
                 'Generating new stub',
             );
 
-            $stub = $this->createStub($config, $main, $checkRequirements, $logger);
+            $stub = self::createStub($config, $main, $checkRequirements, $logger);
 
             $box->getPhar()->setStub($stub);
 
@@ -541,7 +543,7 @@ final class Compile extends ConfigurableBaseCommand
         );
     }
 
-    private function configureMetadata(Configuration $config, Box $box, CompilerLogger $logger): void
+    private static function configureMetadata(Configuration $config, Box $box, CompilerLogger $logger): void
     {
         if (null !== ($metadata = $config->getMetadata())) {
             $logger->log(
@@ -562,7 +564,7 @@ final class Compile extends ConfigurableBaseCommand
         }
     }
 
-    private function commit(Box $box, Configuration $config, CompilerLogger $logger): void
+    private static function commit(Box $box, Configuration $config, CompilerLogger $logger): void
     {
         $message = $config->dumpAutoload()
             ? 'Dumping the Composer autoloader'
@@ -588,7 +590,7 @@ final class Compile extends ConfigurableBaseCommand
         );
     }
 
-    private function checkComposerFiles(Box $box, Configuration $config, CompilerLogger $logger): void
+    private static function checkComposerFiles(Box $box, Configuration $config, CompilerLogger $logger): void
     {
         $message = $config->excludeComposerFiles()
             ? 'Removing the Composer dump artefacts'
@@ -659,7 +661,7 @@ final class Compile extends ConfigurableBaseCommand
         }
     }
 
-    private function signPhar(
+    private static function signPhar(
         Configuration $config,
         Box $box,
         string $path,
@@ -709,7 +711,7 @@ final class Compile extends ConfigurableBaseCommand
         $box->signUsingFile($key, $passphrase);
     }
 
-    private function correctPermissions(string $path, Configuration $config, CompilerLogger $logger): void
+    private static function correctPermissions(string $path, Configuration $config, CompilerLogger $logger): void
     {
         if (null !== ($chmod = $config->getFileMode())) {
             $logger->log(
@@ -724,7 +726,7 @@ final class Compile extends ConfigurableBaseCommand
         }
     }
 
-    private function createStub(
+    private static function createStub(
         Configuration $config,
         ?string $main,
         bool $checkRequirements,
@@ -785,11 +787,11 @@ final class Compile extends ConfigurableBaseCommand
         return $stub->generateStub();
     }
 
-    private function logMap(MapFile $fileMapper, CompilerLogger $logger): void
+    private static function logMap(MapFile $fileMapper, CompilerLogger $logger): void
     {
         $map = $fileMapper->getMap();
 
-        if ([] === $map) {
+        if (0 === count($map)) {
             return;
         }
 
@@ -817,7 +819,7 @@ final class Compile extends ConfigurableBaseCommand
         }
     }
 
-    private function logEndBuilding(
+    private static function logEndBuilding(
         Configuration $config,
         CompilerLogger $logger,
         IO $io,
@@ -833,17 +835,17 @@ final class Compile extends ConfigurableBaseCommand
 
         MessageRenderer::render($io, $config->getRecommendations(), $config->getWarnings());
 
-        $io->comment(
+        $io->comment([
             sprintf(
                 'PHAR: %s (%s)',
                 $box->count() > 1 ? $box->count().' files' : $box->count().' file',
                 format_size(
                     filesize($path),
                 ),
-            )
-            .PHP_EOL
-            .'You can inspect the generated PHAR with the "<comment>info</comment>" command.',
-        );
+            ),
+            '',
+            'You can inspect the generated PHAR with the "<comment>info</comment>" command.',
+        ]);
 
         $io->comment(
             sprintf(
@@ -855,15 +857,21 @@ final class Compile extends ConfigurableBaseCommand
         );
     }
 
-    private function generateDockerFile(OutputInterface $output): void
+    private function generateDockerFile(OutputInterface $output): int
     {
-        $generateDockerFileCommand = $this->getApplication()->find('docker');
+        $generateDockerFileCommand = $this->getDockerCommand();
 
         Assert::isInstanceOf($generateDockerFileCommand, GenerateDockerFile::class);
 
         $input = new StringInput('');
         $input->setInteractive(false);
 
-        $generateDockerFileCommand->run($input, $output);
+        return $generateDockerFileCommand->run($input, $output);
+    }
+
+    private function getDockerCommand(): GenerateDockerFile
+    {
+        /* @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getApplication()->find('docker');
     }
 }
