@@ -17,6 +17,7 @@ namespace KevinGH\Box\Console\Command;
 use function array_map;
 use function array_shift;
 use function array_unshift;
+use function count;
 use function explode;
 use function getcwd;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
@@ -109,7 +110,7 @@ final class Process extends BaseCommand
 
         $path = make_path_relative($filePath, $config->getBasePath());
 
-        $compactors = $this->retrieveCompactors($config);
+        $compactors = self::retrieveCompactors($config);
 
         $fileContents = file_contents(
             $absoluteFilePath = make_path_absolute(
@@ -126,15 +127,15 @@ final class Process extends BaseCommand
             '',
         ]);
 
-        $this->logPlaceholders($config, $io);
-        $this->logCompactors($compactors, $io);
+        self::logPlaceholders($config, $io);
+        self::logCompactors($compactors, $io);
 
         $fileProcessedContents = $compactors->compact($path, $fileContents);
 
         if ($io->isQuiet()) {
             $io->writeln($fileProcessedContents, OutputInterface::VERBOSITY_QUIET);
         } else {
-            $whitelist = $this->retrieveWhitelist($compactors);
+            $whitelist = self::retrieveWhitelist($compactors);
 
             $io->writeln([
                 'Processed contents:',
@@ -150,7 +151,7 @@ final class Process extends BaseCommand
                     'Whitelist:',
                     '',
                     '<comment>"""</comment>',
-                    $this->exportWhitelist($whitelist, $io),
+                    self::exportWhitelist($whitelist, $io),
                     '<comment>"""</comment>',
                 ]);
             }
@@ -159,7 +160,7 @@ final class Process extends BaseCommand
         return 0;
     }
 
-    private function retrieveCompactors(Configuration $config): Compactors
+    private static function retrieveCompactors(Configuration $config): Compactors
     {
         $compactors = $config->getCompactors()->toArray();
 
@@ -171,9 +172,9 @@ final class Process extends BaseCommand
         return new Compactors(...$compactors);
     }
 
-    private function logPlaceholders(Configuration $config, IO $io): void
+    private static function logPlaceholders(Configuration $config, IO $io): void
     {
-        if ([] === $config->getReplacements()) {
+        if (0 === count($config->getReplacements())) {
             $io->writeln([
                 'No replacement values registered',
                 '',
@@ -197,7 +198,7 @@ final class Process extends BaseCommand
         $io->newLine();
     }
 
-    private function logCompactors(Compactors $compactors, IO $io): void
+    private static function logCompactors(Compactors $compactors, IO $io): void
     {
         $nestedCompactors = $compactors->toArray();
 
@@ -239,7 +240,7 @@ final class Process extends BaseCommand
         $io->newLine();
     }
 
-    private function retrieveWhitelist(Compactors $compactors): ?SymbolsRegistry
+    private static function retrieveWhitelist(Compactors $compactors): ?SymbolsRegistry
     {
         foreach ($compactors->toArray() as $compactor) {
             if ($compactor instanceof PhpScoper) {
@@ -250,7 +251,7 @@ final class Process extends BaseCommand
         return null;
     }
 
-    private function exportWhitelist(SymbolsRegistry $whitelist, IO $io): string
+    private static function exportWhitelist(SymbolsRegistry $whitelist, IO $io): string
     {
         $cloner = new VarCloner();
         $cloner->setMaxItems(-1);
