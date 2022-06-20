@@ -71,8 +71,6 @@ use Webmozart\Assert\Assert;
  */
 final class Compile extends BaseCommand
 {
-    use ChangeableWorkingDirectory;
-
     public const NAME = 'compile';
 
     private const HELP = <<<'HELP'
@@ -146,8 +144,7 @@ final class Compile extends BaseCommand
         );
 
         $this->getDefinition()->addOption(ConfigOption::getOptionInput());
-
-        $this->configureWorkingDirOption();
+        $this->getDefinition()->addOption(ChangeWorkingDirOption::getOptionInput());
     }
 
     protected function executeCommand(IO $io): int
@@ -171,7 +168,7 @@ final class Compile extends BaseCommand
             $io->writeln('<info>[debug] Disabled parallel processing</info>', OutputInterface::VERBOSITY_DEBUG);
         }
 
-        $this->changeWorkingDirectory($input);
+        ChangeWorkingDirOption::changeWorkingDirectory($io);
 
         $io->writeln(Logo::LOGO_ASCII);
         $io->newLine();

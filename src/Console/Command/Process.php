@@ -45,8 +45,6 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
 // TODO: replace the PHP-Scoper compactor in order to warn the user about scoping errors
 final class Process extends BaseCommand
 {
-    use ChangeableWorkingDirectory;
-
     private const FILE_ARGUMENT = 'file';
 
     private const NO_RESTART_OPTION = 'no-restart';
@@ -82,8 +80,7 @@ final class Process extends BaseCommand
         );
 
         $this->getDefinition()->addOption(ConfigOption::getOptionInput());
-
-        $this->configureWorkingDirOption();
+        $this->getDefinition()->addOption(ChangeWorkingDirOption::getOptionInput());
     }
 
     protected function executeCommand(IO $io): int
@@ -96,7 +93,7 @@ final class Process extends BaseCommand
 
         check_php_settings($io);
 
-        $this->changeWorkingDirectory($input);
+        ChangeWorkingDirOption::changeWorkingDirectory($io);
 
         $io->newLine();
 
