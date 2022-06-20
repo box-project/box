@@ -23,6 +23,7 @@ use Phar;
 use function realpath;
 use function sprintf;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Filesystem\Path;
 use Throwable;
 use Webmozart\Assert\Assert;
 
@@ -61,45 +62,21 @@ final class Verify extends BaseCommand
 
     protected function executeCommand(IO $io): int
     {
-        /** @var string $pharPath */
-        $pharPath = $io->getInput()->getArgument(self::PHAR_ARG);
-
-        Assert::file($pharPath);
-
-        $pharPath = false !== realpath($pharPath) ? realpath($pharPath) : $pharPath;
+        $pharFilePath = self::getPharFilePath($io);
 
         $io->newLine();
         $io->writeln(
             sprintf(
                 '🔐️  Verifying the PHAR "<comment>%s</comment>"',
-                $pharPath,
+                $pharFilePath,
             ),
         );
         $io->newLine();
 
-        $tmpPharPath = create_temporary_phar($pharPath);
+        [$verified, $signature, $throwable] = self::verifyPhar($pharFilePath);
 
-        if (file_exists($pharPubKey = $pharPath.'.pubkey')) {
-            copy($pharPubKey, $tmpPharPath.'.pubkey');
-        }
-
-        $verified = false;
-        $signature = null;
-        $throwable = null;
-
-        try {
-            $phar = new Phar($tmpPharPath);
-
-            $verified = true;
-            $signature = $phar->getSignature();
-        } catch (Throwable $throwable) {
-            // Continue
-        } finally {
-            remove($tmpPharPath);
-        }
-
-        if (false === $verified || null === $signature) {
-            return $this->failVerification($throwable, $io);
+        if (false === $verified || false === $signature) {
+            return self::failVerification($throwable, $io);
         }
 
         $io->writeln('<info>The PHAR passed verification.</info>');
@@ -113,15 +90,64 @@ final class Verify extends BaseCommand
             ),
         );
 
-        return 0;
+        return self::SUCCESS;
     }
 
-    private function failVerification(?Throwable $throwable, IO $io): int
+    private static function getPharFilePath(IO $io): string
+    {
+        $pharPath = Path::canonicalize(
+            $io->getInput()->getArgument(self::PHAR_ARG),
+        );
+
+        Assert::file($pharPath);
+
+        $pharRealPath = realpath($pharPath);
+
+        return false === $pharRealPath ? $pharPath : $pharRealPath;
+    }
+
+    /**
+     * @return array{bool, array{hash: string, hash_type:string}|false, Throwable|null}
+     */
+    private static function verifyPhar(string $pharFilePath): array
+    {
+        $tmpPharPath = create_temporary_phar($pharFilePath);
+        $pharPubKey = $pharFilePath.'.pubkey';
+        $tmpPharPubKey = $tmpPharPath.'.pubkey';
+
+        if (file_exists($pharPubKey)) {
+            copy($pharPubKey, $tmpPharPath.'.pubkey');
+        }
+
+        $cleanUp = static fn () => remove([$tmpPharPath, $tmpPharPubKey]);
+
+        $verified = false;
+        $signature = false;
+        $throwable = null;
+
+        try {
+            $phar = new Phar($tmpPharPath);
+
+            $verified = true;
+            $signature = $phar->getSignature();
+        } catch (Throwable $throwable) {
+            // Continue
+        } finally {
+            $cleanUp();
+        }
+
+        return [
+            $verified,
+            $signature,
+            $throwable,
+        ];
+    }
+
+    private static function failVerification(?Throwable $throwable, IO $io): int
     {
         $message = null !== $throwable && '' !== $throwable->getMessage()
             ? $throwable->getMessage()
-            : 'Unknown reason.'
-        ;
+            : 'Unknown reason.';
 
         $io->writeln(
             sprintf(
@@ -134,6 +160,6 @@ final class Verify extends BaseCommand
             throw $throwable;
         }
 
-        return 1;
+        return self::FAILURE;
     }
 }
