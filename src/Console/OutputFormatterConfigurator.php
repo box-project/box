@@ -14,9 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
+use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\NotInstantiable;
+use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Utility to configure the output formatter styles.
@@ -27,10 +28,15 @@ final class OutputFormatterConfigurator
 {
     use NotInstantiable;
 
-    public static function configure(OutputInterface $output): void
+    public static function configure(IO $io): void
     {
-        $outputFormatter = $output->getFormatter();
+        self::configureFormatter(
+            $io->getOutput()->getFormatter(),
+        );
+    }
 
+    public static function configureFormatter(OutputFormatterInterface $outputFormatter): void
+    {
         $outputFormatter->setStyle(
             'recommendation',
             new OutputFormatterStyle('black', 'yellow'),
