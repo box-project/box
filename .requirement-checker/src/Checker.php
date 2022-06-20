@@ -5,7 +5,7 @@ namespace HumbugBox3160\KevinGH\RequirementChecker;
 final class Checker
 {
     private static $requirementsConfig;
-    public static function checkRequirements()
+    public static function checkRequirements() : bool
     {
         $requirements = self::retrieveRequirements();
         $checkPassed = $requirements->evaluateRequirements();
@@ -13,7 +13,7 @@ final class Checker
         self::printCheck($checkPassed, new Printer($io->getVerbosity(), $io->hasColorSupport()), $requirements);
         return $checkPassed;
     }
-    public static function printCheck($checkPassed, Printer $printer, RequirementCollection $requirements)
+    public static function printCheck($checkPassed, Printer $printer, RequirementCollection $requirements) : void
     {
         if (\false === $checkPassed && IO::VERBOSITY_VERY_VERBOSE > $printer->getVerbosity()) {
             $printer->setVerbosity(IO::VERBOSITY_VERY_VERBOSE);
@@ -36,7 +36,7 @@ final class Checker
         } else {
             $printer->printvln('> No requirements found.', $verbosity);
         }
-        $errorMessages = array();
+        $errorMessages = [];
         foreach ($requirements->getRequirements() as $requirement) {
             if ($errorMessage = $printer->getRequirementErrorMessage($requirement)) {
                 if (IO::VERBOSITY_DEBUG === $printer->getVerbosity()) {
@@ -70,7 +70,7 @@ final class Checker
         }
         $printer->printvln('', $verbosity);
     }
-    private static function retrieveRequirements()
+    private static function retrieveRequirements() : RequirementCollection
     {
         if (null === self::$requirementsConfig) {
             self::$requirementsConfig = __DIR__ . '/../.requirements.php';

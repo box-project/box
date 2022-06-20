@@ -14,7 +14,7 @@ Box Requirements Checker
 it or install a polyfill.
   ✘ The package "package-with-extensions" requires the extension "random".
 Enable it or install a polyfill.
-  
+
                                                                                 
  [ERROR] Your system is not ready to run the application.                       
                                                                                 

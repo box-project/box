@@ -12,6 +12,8 @@
 
 namespace KevinGH\RequirementChecker;
 
+use function extension_loaded;
+
 /**
  * @private
  */
@@ -19,19 +21,13 @@ final class IsExtensionFulfilled implements IsFulfilled
 {
     private $requiredExtension;
 
-    /**
-     * @param string $requiredExtension
-     */
-    public function __construct($requiredExtension)
+    public function __construct(string $requiredExtension)
     {
         $this->requiredExtension = $requiredExtension;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function __invoke()
+    public function __invoke(): bool
     {
-        return \extension_loaded($this->requiredExtension);
+        return extension_loaded($this->requiredExtension);
     }
 }

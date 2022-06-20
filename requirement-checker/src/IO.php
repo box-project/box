@@ -12,16 +12,29 @@
 
 namespace KevinGH\RequirementChecker;
 
+use function fstat;
+use function function_exists;
+use function getenv;
+use function implode;
+use function posix_isatty;
+use function preg_match;
+use function preg_quote;
+use function sapi_windows_vt100_support;
+use function sprintf;
+use function str_replace;
+use function stream_isatty;
+use const STDOUT;
+
 /**
  * @private
  */
 final class IO
 {
-    const VERBOSITY_QUIET = 16;
-    const VERBOSITY_NORMAL = 32;
-    const VERBOSITY_VERBOSE = 64;
-    const VERBOSITY_VERY_VERBOSE = 128;
-    const VERBOSITY_DEBUG = 256;
+    public const VERBOSITY_QUIET = 16;
+    public const VERBOSITY_NORMAL = 32;
+    public const VERBOSITY_VERBOSE = 64;
+    public const VERBOSITY_VERY_VERBOSE = 128;
+    public const VERBOSITY_DEBUG = 256;
 
     private $interactive;
     private $verbosity = self::VERBOSITY_NORMAL;
@@ -30,7 +43,7 @@ final class IO
 
     public function __construct()
     {
-        $this->options = \implode(' ', $_SERVER['argv']);
+        $this->options = implode(' ', $_SERVER['argv']);
 
         $shellVerbosity = $this->configureVerbosity();
 
@@ -38,37 +51,22 @@ final class IO
         $this->colorSupport = $this->checkColorSupport();
     }
 
-    /**
-     * @return bool
-     */
-    public function isInteractive()
+    public function isInteractive(): bool
     {
         return $this->interactive;
     }
 
-    /**
-     * @return int
-     */
-    public function getVerbosity()
+    public function getVerbosity(): int
     {
         return $this->verbosity;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasColorSupport()
+    public function hasColorSupport(): bool
     {
         return $this->colorSupport;
     }
 
-    /**
-     * @param mixed
-     * @param mixed $values
-     *
-     * @return bool
-     */
-    public function hasParameter($values)
+    public function hasParameter($values): bool
     {
         $values = (array) $values;
 
@@ -86,24 +84,19 @@ final class IO
         return false;
     }
 
-    /**
-     * @param int $shellVerbosity
-     *
-     * @return bool
-     */
-    private function checkInteractivity($shellVerbosity)
+    private function checkInteractivity(int $shellVerbosity): bool
     {
         if (-1 === $shellVerbosity) {
             return false;
         }
 
-        if (true === $this->hasParameter(array('--no-interaction', '-n'))) {
+        if (true === $this->hasParameter(['--no-interaction', '-n'])) {
             return false;
         }
 
-        if (\function_exists('posix_isatty')
+        if (function_exists('posix_isatty')
             && !@posix_isatty(STDOUT)
-            && false === \getenv('SHELL_INTERACTIVE')
+            && false === getenv('SHELL_INTERACTIVE')
         ) {
             return false;
         }
@@ -111,10 +104,7 @@ final class IO
         return true;
     }
 
-    /**
-     * @return int
-     */
-    private function configureVerbosity()
+    private function configureVerbosity(): int
     {
         switch ($shellVerbosity = (int) getenv('SHELL_VERBOSITY')) {
             case -1:
@@ -134,16 +124,16 @@ final class IO
                 break;
         }
 
-        if ($this->hasParameter(array('--quiet', '-q'))) {
+        if ($this->hasParameter(['--quiet', '-q'])) {
             $this->verbosity = self::VERBOSITY_QUIET;
             $shellVerbosity = -1;
-        } elseif ($this->hasParameter(array('-vvv', '--verbose=3', '--verbose 3'))) {
+        } elseif ($this->hasParameter(['-vvv', '--verbose=3', '--verbose 3'])) {
             $this->verbosity = self::VERBOSITY_DEBUG;
             $shellVerbosity = 3;
-        } elseif ($this->hasParameter(array('-vv', '--verbose=2', '--verbose 2'))) {
+        } elseif ($this->hasParameter(['-vv', '--verbose=2', '--verbose 2'])) {
             $this->verbosity = self::VERBOSITY_VERY_VERBOSE;
             $shellVerbosity = 2;
-        } elseif ($this->hasParameter(array('-v', '--verbose=1', '--verbose 1', '--verbose'))) {
+        } elseif ($this->hasParameter(['-v', '--verbose=1', '--verbose 1', '--verbose'])) {
             $this->verbosity = self::VERBOSITY_VERBOSE;
             $shellVerbosity = 1;
         }
@@ -165,19 +155,19 @@ final class IO
      *
      * @license MIT (c) Fabien Potencier <fabien@symfony.com>
      */
-    private function checkColorSupport()
+    private function checkColorSupport(): bool
     {
-        if ($this->hasParameter(array('--ansi'))) {
+        if ($this->hasParameter(['--ansi'])) {
             return true;
         }
 
-        if ($this->hasParameter(array('--no-ansi'))) {
+        if ($this->hasParameter(['--no-ansi'])) {
             return false;
         }
 
         if (\DIRECTORY_SEPARATOR === '\\') {
             return (
-                    \function_exists('sapi_windows_vt100_support')
+                    function_exists('sapi_windows_vt100_support')
                     && sapi_windows_vt100_support(STDOUT)
                 )
                 || false !== getenv('ANSICON')
@@ -185,11 +175,11 @@ final class IO
                 || 'xterm' === getenv('TERM');
         }
 
-        if (\function_exists('stream_isatty')) {
+        if (function_exists('stream_isatty')) {
             return stream_isatty(STDOUT);
         }
 
-        if (\function_exists('posix_isatty')) {
+        if (function_exists('posix_isatty')) {
             return posix_isatty(STDOUT);
         }
 

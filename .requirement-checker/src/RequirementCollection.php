@@ -5,40 +5,39 @@ namespace HumbugBox3160\KevinGH\RequirementChecker;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
-use ReturnTypeWillChange;
 use Traversable;
+use function count;
+use function get_cfg_var;
 final class RequirementCollection implements IteratorAggregate, Countable
 {
-    private $requirements = array();
-    #[\ReturnTypeWillChange]
-    public function getIterator()
+    private $requirements = [];
+    public function getIterator() : Traversable
     {
         return new ArrayIterator($this->requirements);
     }
-    #[\ReturnTypeWillChange]
-    public function count()
+    public function count() : int
     {
-        return \count($this->requirements);
+        return count($this->requirements);
     }
-    public function add(Requirement $requirement)
+    public function add(Requirement $requirement) : void
     {
         $this->requirements[] = $requirement;
     }
-    public function addRequirement($checkIsFulfilled, $testMessage, $helpText)
+    public function addRequirement(IsFulfilled $checkIsFulfilled, string $testMessage, string $helpText) : void
     {
         $this->add(new Requirement($checkIsFulfilled, $testMessage, $helpText));
     }
-    public function getRequirements()
+    public function getRequirements() : array
     {
         return $this->requirements;
     }
     public function getPhpIniPath()
     {
-        return \get_cfg_var('cfg_file_path');
+        return get_cfg_var('cfg_file_path');
     }
     public function evaluateRequirements()
     {
-        return \array_reduce($this->requirements, function ($checkPassed, Requirement $requirement) {
+        return \array_reduce($this->requirements, function (bool $checkPassed, Requirement $requirement) : bool {
             return $checkPassed && $requirement->isFulfilled();
         }, \true);
     }

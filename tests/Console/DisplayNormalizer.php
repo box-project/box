@@ -17,7 +17,6 @@ namespace KevinGH\Box\Console;
 use function array_map;
 use function explode;
 use function implode;
-use KevinGH\Box\NotInstantiable;
 
 final class DisplayNormalizer
 {

@@ -13,6 +13,7 @@
 namespace KevinGH\RequirementChecker;
 
 use Composer\Semver\Semver;
+use function sprintf;
 
 /**
  * @private
@@ -21,18 +22,12 @@ final class IsPhpVersionFulfilled implements IsFulfilled
 {
     private $requiredPhpVersion;
 
-    /**
-     * @param string $requiredPhpVersion
-     */
-    public function __construct($requiredPhpVersion)
+    public function __construct(string $requiredPhpVersion)
     {
         $this->requiredPhpVersion = $requiredPhpVersion;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function __invoke()
+    public function __invoke(): bool
     {
         return Semver::satisfies(
             sprintf('%d.%d.%d', \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION, \PHP_RELEASE_VERSION),

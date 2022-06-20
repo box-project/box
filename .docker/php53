@@ -1,4 +1,0 @@
-FROM helder/php-5.3
-
-RUN echo '' | pecl install phar; \
-    echo '' | pecl install json

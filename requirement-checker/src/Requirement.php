@@ -26,53 +26,36 @@ final class Requirement
     private $testMessage;
     private $helpText;
 
-    /**
-     * @param IsFulfilled $checkIsFulfilled
-     * @param string      $testMessage
-     * @param string      $helpText
-     */
     public function __construct(
-        $checkIsFulfilled,
-        $testMessage,
-        $helpText
+        IsFulfilled $checkIsFulfilled,
+        string $testMessage,
+        string $helpText
     ) {
         $this->checkIsFulfilled = $checkIsFulfilled;
         $this->testMessage = $testMessage;
         $this->helpText = $helpText;
     }
 
-    /**
-     * @return bool
-     */
-    public function isFulfilled()
+    public function isFulfilled(): bool
     {
-        if (null === $this->fulfilled) {
+        if (!isset($this->fulfilled)) {
             $this->fulfilled = $this->checkIsFulfilled->__invoke();
         }
 
-        return (bool) $this->fulfilled;  // Cast to boolean, `(bool)` and `boolval()` are not available in PHP 5.3
+        return $this->fulfilled;
     }
 
-    /**
-     * @return IsFulfilled
-     */
-    public function getIsFullfilledChecker()
+    public function getIsFullfilledChecker(): IsFulfilled
     {
         return $this->checkIsFulfilled;
     }
 
-    /**
-     * @return string
-     */
-    public function getTestMessage()
+    public function getTestMessage(): string
     {
         return $this->testMessage;
     }
 
-    /**
-     * @return string
-     */
-    public function getHelpText()
+    public function getHelpText(): string
     {
         return $this->helpText;
     }
