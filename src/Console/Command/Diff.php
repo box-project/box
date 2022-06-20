@@ -126,7 +126,7 @@ final class Diff extends BaseCommand
                 ),
             );
 
-            return 1;
+            return self::FAILURE;
         }
 
         $result1 = $this->compareArchives($diff, $io);
@@ -166,7 +166,7 @@ final class Diff extends BaseCommand
         if ($pharInfoA->equals($pharInfoB)) {
             $io->success('The two archives are identical');
 
-            return 0;
+            return self::SUCCESS;
         }
 
         self::renderArchive(
@@ -183,7 +183,7 @@ final class Diff extends BaseCommand
             $io,
         );
 
-        return 1;
+        return self::FAILURE;
     }
 
     private function compareContents(PharDiff $diff, IO $io): int
@@ -207,14 +207,14 @@ final class Diff extends BaseCommand
         if (null === $diffResult || [[], []] === $diffResult) {
             $io->success('The contents are identical');
 
-            return 0;
+            return self::SUCCESS;
         }
 
         if (is_string($diffResult)) {
             // Git or GNU diff: we don't have much control on the format
             $io->writeln($diffResult);
 
-            return 1;
+            return self::FAILURE;
         }
 
         $io->writeln(sprintf(
@@ -266,7 +266,7 @@ final class Diff extends BaseCommand
             count($diffResult[0]) + count($diffResult[1]),
         ));
 
-        return 1;
+        return self::FAILURE;
     }
 
     private static function renderArchive(string $fileName, PharInfo $pharInfo, IO $io): void

@@ -63,13 +63,13 @@ final class Extract extends BaseCommand
         $outputDir = $io->getInput()->getArgument(self::OUTPUT_ARG);
 
         if (null === $filePath) {
-            return 1;
+            return self::FAILURE;
         }
 
         [$box, $cleanUpTmpPhar] = $this->getBox($filePath, $io);
 
         if (null === $box) {
-            return 1;
+            return self::FAILURE;
         }
 
         $restoreLimit = bump_open_file_descriptor_limit(count($box), $io);
@@ -84,10 +84,10 @@ final class Extract extends BaseCommand
         } catch (RuntimeException $exception) {
             $io->error($exception->getMessage());
 
-            return 1;
+            return self::FAILURE;
         }
 
-        return 0;
+        return self::SUCCESS;
     }
 
     private static function getPharFilePath(IO $io): ?string

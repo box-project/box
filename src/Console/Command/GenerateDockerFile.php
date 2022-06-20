@@ -61,7 +61,7 @@ final class GenerateDockerFile extends BaseCommand
         $pharFilePath = $this->getPharFilePath($io);
 
         if (null === $pharFilePath) {
-            return 1;
+            return self::FAILURE;
         }
 
         Assert::file($pharFilePath);
@@ -174,7 +174,7 @@ final class GenerateDockerFile extends BaseCommand
                 .'requirement checker enabled.',
             );
 
-            return 1;
+            return self::FAILURE;
         }
 
         $requirements = include $requirementsPhar;
@@ -196,7 +196,7 @@ final class GenerateDockerFile extends BaseCommand
             if (false === $remove) {
                 $io->writeln('Skipped the docker file generation.');
 
-                return 0;
+                return self::SUCCESS;
             }
         }
 
@@ -214,6 +214,6 @@ final class GenerateDockerFile extends BaseCommand
             ],
         );
 
-        return 0;
+        return self::SUCCESS;
     }
 }
