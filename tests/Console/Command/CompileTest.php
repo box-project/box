@@ -1815,8 +1815,8 @@ class CompileTest extends CommandTestCase
             'composer.json',
             // The following two files do not exists since there is no dependency, check BoxTest for a more complete
             // test regarding this feature
-            //'composer.lock',
-            //'vendor/composer/installed.json',
+            // 'composer.lock',
+            // 'vendor/composer/installed.json',
         ];
 
         foreach ($removedComposerFiles as $composerFile) {
