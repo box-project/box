@@ -653,7 +653,7 @@ class InfoTest extends CommandTestCase
         $pharPath = self::FIXTURES.'/tree-phar.phar';
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected an integer string. Got "\'-10\'"');
+        $this->expectExceptionMessage('Expected the depth to be a positive integer or -1: "-10".');
 
         $this->commandTester->execute(
             [

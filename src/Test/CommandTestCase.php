@@ -90,36 +90,4 @@ abstract class CommandTestCase extends FileSystemTestCase
             $extraNormalization,
         );
     }
-//
-//    /**
-//     * Returns the output for the tester.
-//     *
-//     * @param CommandTester $tester the tester
-//     *
-//     * @return string the output
-//     */
-//    protected function getOutput(CommandTester $tester): string
-//    {
-//        /** @var StreamOutput $output */
-//        $output = $tester->getOutput();
-//        $stream = $output->getStream();
-//        $string = '';
-//
-//        rewind($stream);
-//
-//        while (false === feof($stream)) {
-//            $string .= fgets($stream);
-//        }
-//
-//        $string = preg_replace(
-//            [
-//                '/\x1b(\[|\(|\))[;?0-9]*[0-9A-Za-z]/',
-//                '/[\x03|\x1a]/',
-//            ],
-//            ['', '', ''],
-//            $string,
-//        );
-//
-//        return str_replace(PHP_EOL, "\n", $string);
-//    }
 }

@@ -17,7 +17,6 @@ namespace KevinGH\Box\Console\Command;
 use function chdir;
 use Fidry\Console\Input\IO;
 use function getcwd;
-use KevinGH\Box\Console\IO\IO;
 use function sprintf;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputOption;
@@ -26,11 +25,7 @@ use Webmozart\Assert\Assert;
 /**
  * @private
  */
-<<<<<<<< HEAD:src/Console/Command/ChangeWorkingOption.php
-final class ChangeWorkingOption
-========
 final class ChangeWorkingDirOption
->>>>>>>> upstream/master:src/Console/Command/ChangeWorkingDirOption.php
 {
     /** @internal using a static property as traits cannot have constants */
     private const WORKING_DIR_OPT = 'working-dir';
@@ -48,11 +43,7 @@ final class ChangeWorkingDirOption
 
     public static function changeWorkingDirectory(IO $io): void
     {
-<<<<<<<< HEAD:src/Console/Command/ChangeWorkingOption.php
         $workingDir = $io->getOption(self::WORKING_DIR_OPT)->asNullableNonEmptyString();
-========
-        $workingDir = $io->getInput()->getOption(self::WORKING_DIR_OPT);
->>>>>>>> upstream/master:src/Console/Command/ChangeWorkingDirOption.php
 
         if (null === $workingDir) {
             return;

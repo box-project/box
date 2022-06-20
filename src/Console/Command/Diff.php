@@ -193,8 +193,7 @@ final class Diff implements Command
 
         $checkSumAlgorithm = $io->getOption(self::CHECK_OPTION)->asNullableNonEmptyString() ?? self::DEFAULT_CHECKSUM_ALGO;
 
-        // TODO: https://github.com/theofidry/console/issues/54
-        if ($io->getInput()->hasParameterOption(['-c', '--check'])) {
+        if ($io->hasOption('-c') || $io->hasOption('--check')) {
             return $diff->listChecksums($checkSumAlgorithm);
         }
 
@@ -268,7 +267,7 @@ final class Diff implements Command
             count($diffResult[0]) + count($diffResult[1]),
         ));
 
-        return 1;
+        return ExitCode::FAILURE;
     }
 
     /**

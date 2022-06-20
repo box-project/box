@@ -79,7 +79,7 @@ final class Process implements Command
                     'Ignore the config file even when one is specified with the --config option',
                 ),
                 ConfigOption::getOptionInput(),
-                ChangeWorkingOption::getOptionInput(),
+                ChangeWorkingDirOption::getOptionInput(),
             ],
         );
     }
@@ -92,7 +92,7 @@ final class Process implements Command
 
         check_php_settings($io);
 
-        ChangeWorkingOption::changeWorkingDirectory($io);
+        ChangeWorkingDirOption::changeWorkingDirectory($io);
 
         $io->newLine();
 

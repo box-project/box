@@ -107,7 +107,7 @@ final class Validate implements Command
         $hasRecommendationsOrWarnings = 0 === count($recommendations) && 0 === count($warnings);
 
         if (false === $hasRecommendationsOrWarnings) {
-            if ([] === $recommendations) {
+            if (0 === count($recommendations)) {
                 $io->caution('The configuration file passed the validation with warnings.');
             } elseif ([] === $warnings) {
                 $io->caution('The configuration file passed the validation with recommendations.');

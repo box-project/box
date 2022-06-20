@@ -149,7 +149,7 @@ final class Compile implements CommandAware
                     'Generates a Dockerfile',
                 ),
                 ConfigOption::getOptionInput(),
-                ChangeWorkingOption::getOptionInput(),
+                ChangeWorkingDirOption::getOptionInput(),
             ],
         );
     }
@@ -176,7 +176,7 @@ final class Compile implements CommandAware
             );
         }
 
-        ChangeWorkingOption::changeWorkingDirectory($io);
+        ChangeWorkingDirOption::changeWorkingDirectory($io);
 
         $io->writeln(Logo::LOGO_ASCII);
         $io->newLine();

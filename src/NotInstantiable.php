@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-// TODO: check places where it could be used
 /**
  * @private
  */

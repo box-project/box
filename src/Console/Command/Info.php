@@ -161,8 +161,6 @@ final class Info implements Command
     public static function showInfo(string $file, string $originalFile, IO $io): int
     {
         $maxDepth = self::getMaxDepth($io);
-        // TODO: see https://github.com/theofidry/console/issues/57; restore custom error message
-        //  Expected the depth to be a positive integer or -1, got "-10"
         $mode = $io->getOption(self::MODE_OPT)->asStringChoice(self::MODES);
 
         try {
@@ -198,7 +196,12 @@ final class Info implements Command
     {
         $option = $io->getOption(self::DEPTH_OPT);
 
-        return '-1' === $option->asRaw() ? -1 : $option->asNatural();
+        return '-1' === $option->asRaw()
+            ? -1
+            : $option->asNatural(sprintf(
+                'Expected the depth to be a positive integer or -1: "%s".',
+                $option->asRaw(),
+            ));
     }
 
     private static function showGlobalInfo(IO $io): int
