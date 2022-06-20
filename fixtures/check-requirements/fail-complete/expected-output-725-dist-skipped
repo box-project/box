@@ -1,0 +1,6 @@
+
+Fatal error: Uncaught Exception: Should not be executed! in phar:///opt/box/index.phar/index.php:13
+Stack trace:
+#0 /opt/box/index.phar(14): require()
+#1 {main}
+  thrown in phar:///opt/box/index.phar/index.php on line 13
