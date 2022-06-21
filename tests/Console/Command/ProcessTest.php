@@ -16,6 +16,7 @@ namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
+use KevinGH\Box\Console\DisplayNormalizer;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\touch;
 use KevinGH\Box\Test\CommandTestCase;
@@ -122,7 +123,7 @@ class ProcessTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expected, 0, self::createNormalizeLoadingFilePathOutput());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_processes_the_file_relative_to_the_config_base_path(): void
@@ -215,15 +216,7 @@ class ProcessTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput(
-            $expected,
-            0,
-            static fn ($output) => preg_replace(
-                '/ \{#\d{3,}/',
-                ' {#140',
-                self::createNormalizeLoadingFilePathOutput()($output),
-            ),
-        );
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_processes_a_file_and_displays_only_the_processed_contents_in_quiet_mode(): void
@@ -264,18 +257,21 @@ class ProcessTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expected, 0, self::createNormalizeLoadingFilePathOutput());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
-    /**
-     * @return callable(string):string
-     */
-    private static function createNormalizeLoadingFilePathOutput(): callable
+    public function assertSameOutput(
+        string $expectedOutput,
+        int $expectedStatusCode,
+        callable ...$extraNormalizers,
+    ): void
     {
-        return static fn ($output) => preg_replace(
-            '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
-            ' // Loading the configuration file "box.json".',
-            $output,
+        parent::assertSameOutput(
+            $expectedOutput,
+            $expectedStatusCode,
+            DisplayNormalizer::createVarDumperObjectReferenceNormalizer(),
+            DisplayNormalizer::createLoadingFilePathOutputNormalizer(),
+            ...$extraNormalizers,
         );
     }
 }

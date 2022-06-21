@@ -16,6 +16,7 @@ namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\DisplayNormalizer;
+use Fidry\Console\ExitCode;
 use InvalidArgumentException;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
@@ -92,7 +93,7 @@ class DiffTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expectedOutput, 1);
+        $this->assertSameOutput($expectedOutput, ExitCode::FAILURE);
     }
 
     /**

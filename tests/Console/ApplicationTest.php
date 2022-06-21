@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
+use Fidry\Console\ExitCode;
 use Fidry\Console\Test\AppTester;
 use Fidry\Console\Test\OutputAssertions;
 use PHPUnit\Framework\TestCase;
@@ -37,7 +38,7 @@ class ApplicationTest extends TestCase
 
         $appTester->run($input);
 
-        $this->assertSame(0, $appTester->getStatusCode());
+        $this->assertSame(ExitCode::SUCCESS, $appTester->getStatusCode());
 
         $expected = <<<'EOF'
             Box version 3.x-dev@151e40a
@@ -46,13 +47,9 @@ class ApplicationTest extends TestCase
 
         OutputAssertions::assertSameOutput(
             $expected,
-            0,
+            ExitCode::SUCCESS,
             $appTester,
-            static fn ($output) => preg_replace(
-                '/Box version .+@[a-z\d]{7}/',
-                'Box version 3.x-dev@151e40a',
-                $output,
-            ),
+            self::createReplaceBoxVersionNormalizer(),
         );
     }
 
@@ -79,7 +76,7 @@ class ApplicationTest extends TestCase
 
         OutputAssertions::assertSameOutput(
             $expected,
-            0,
+            ExitCode::SUCCESS,
             $appTester,
         );
     }
@@ -133,12 +130,20 @@ class ApplicationTest extends TestCase
 
             EOF;
 
-        $actual = preg_replace(
+        OutputAssertions::assertSameOutput(
+            $expected,
+            ExitCode::SUCCESS,
+            $appTester,
+            self::createReplaceBoxVersionNormalizer(),
+        );
+    }
+
+    private static function createReplaceBoxVersionNormalizer(): callable
+    {
+        return static fn (string $output): string => preg_replace(
             '/Box version .+@[a-z\d]{7}/',
             'Box version 3.x-dev@151e40a',
-            $appTester->getNormalizedDisplay(),
+            $output,
         );
-
-        $this->assertSame($expected, $actual);
     }
 }

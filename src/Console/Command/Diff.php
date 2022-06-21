@@ -231,36 +231,8 @@ final class Diff implements Command
 
         $io->newLine();
 
-        $renderPaths = static function (string $symbol, PharInfo $pharInfo, array $paths, IO $io): void {
-            foreach ($paths as $path) {
-                /** @var PharFileInfo $file */
-                $file = $pharInfo->getPhar()[str_replace($pharInfo->getRoot(), '', $path)];
-
-                $compression = '<fg=red>[NONE]</fg=red>';
-
-                foreach (self::$FILE_ALGORITHMS as $code => $name) {
-                    if ($file->isCompressed($code)) {
-                        $compression = "<fg=cyan>[$name]</fg=cyan>";
-                        break;
-                    }
-                }
-
-                $fileSize = format_size($file->getCompressedSize());
-
-                $io->writeln(
-                    sprintf(
-                        '%s %s %s - %s',
-                        $symbol,
-                        $path,
-                        $compression,
-                        $fileSize,
-                    ),
-                );
-            }
-        };
-
-        $renderPaths('-', $diff->getPharA()->getPharInfo(), $diffResult[0], $io);
-        $renderPaths('+', $diff->getPharB()->getPharInfo(), $diffResult[1], $io);
+        self::renderPaths('-', $diff->getPharA()->getPharInfo(), $diffResult[0], $io);
+        self::renderPaths('+', $diff->getPharB()->getPharInfo(), $diffResult[1], $io);
 
         $io->error(sprintf(
             '%d file(s) difference',

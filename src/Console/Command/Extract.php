@@ -72,7 +72,7 @@ final class Extract implements Command
             return ExitCode::FAILURE;
         }
 
-        [$box, $cleanUp] = $this->getBox($filePath, $io);
+        [$box, $cleanUpTmpPhar] = $this->getBox($filePath, $io);
 
         if (null === $box) {
             return ExitCode::FAILURE;
@@ -80,8 +80,8 @@ final class Extract implements Command
 
         $restoreLimit = bump_open_file_descriptor_limit(count($box), $io);
 
-        $cleanUp = static function () use ($cleanUp, $restoreLimit): void {
-            $cleanUp();
+        $cleanUp = static function () use ($cleanUpTmpPhar, $restoreLimit): void {
+            $cleanUpTmpPhar();
             $restoreLimit();
         };
 

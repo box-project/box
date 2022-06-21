@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
+use Fidry\Console\ExitCode;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
@@ -61,7 +62,7 @@ class ExtractTest extends CommandTestCase
 
         $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
-        $this->assertSameOutput('', 0);
+        $this->assertSameOutput('', ExitCode::SUCCESS);
     }
 
     public function test_it_can_extract_a_phar_without_the_phar_extension(): void
@@ -85,7 +86,7 @@ class ExtractTest extends CommandTestCase
 
         $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
-        $this->assertSameOutput('', 0);
+        $this->assertSameOutput('', ExitCode::SUCCESS);
     }
 
     public function test_it_can_extract_a_compressed_phar(): void
@@ -109,7 +110,7 @@ class ExtractTest extends CommandTestCase
 
         $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
-        $this->assertSameOutput('', 0);
+        $this->assertSameOutput('', ExitCode::SUCCESS);
     }
 
     public function test_it_cannot_extract_an_invalid_phar(): void
@@ -137,11 +138,7 @@ class ExtractTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput(
-            $expectedOutput,
-            1,
-            static fn ($output) => preg_replace('/file[\ \n]+"/', 'file "', $output),
-        );
+        $this->assertSameOutput($expectedOutput, ExitCode::FAILURE);
     }
 
     public function test_it_provides_the_original_exception_in_debug_mode_when_cannot_extract_an_invalid_phar(): void
@@ -199,11 +196,7 @@ class ExtractTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput(
-            $expectedOutput,
-            1,
-            static fn ($output) => preg_replace('/file[\ \n]+"/', 'file "', $output),
-        );
+        $this->assertSameOutput($expectedOutput, ExitCode::FAILURE);
     }
 
     public function test_it_cannot_extract_an_unknown_file(): void
@@ -229,11 +222,7 @@ class ExtractTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput(
-            $expectedOutput,
-            1,
-            static fn ($output) => preg_replace('/file[\ \n]+"/', 'file "', $output),
-        );
+        $this->assertSameOutput($expectedOutput, ExitCode::FAILURE);
     }
 
     /**

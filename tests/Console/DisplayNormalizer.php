@@ -31,4 +31,30 @@ final class DisplayNormalizer
 
         return implode("\n", $lines);
     }
+
+
+
+    /**
+     * @return callable(string):string
+     */
+    public static function createLoadingFilePathOutputNormalizer(): callable
+    {
+        return static fn ($output) => preg_replace(
+            '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
+            ' // Loading the configuration file "box.json".',
+            $output,
+        );
+    }
+
+    /**
+     * @return callable(string):string
+     */
+    public static function createVarDumperObjectReferenceNormalizer(): callable
+    {
+        return static fn ($output) => preg_replace(
+            '/ \{#\d{3,}/',
+            ' {#140',
+            $output,
+        );
+    }
 }

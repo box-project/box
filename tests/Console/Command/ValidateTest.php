@@ -16,6 +16,7 @@ namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
+use KevinGH\Box\Console\DisplayNormalizer;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\touch;
 use KevinGH\Box\Test\CommandTestCase;
@@ -101,10 +102,7 @@ class ValidateTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput(
-            $expected,
-            1,
-        );
+        $this->assertSameOutput($expected, ExitCode::FAILURE);
     }
 
     public function test_it_does_not_fail_when_recommendations_are_found_but_ignore_message_is_passed(): void
@@ -326,7 +324,7 @@ class ValidateTest extends CommandTestCase
         $this->assertSameOutput(
             $expected,
             ExitCode::FAILURE, 
-            self::createLoadingFilePathOutputNormalizer(),
+            DisplayNormalizer::createLoadingFilePathOutputNormalizer(),
         );
     }
 
@@ -386,7 +384,7 @@ class ValidateTest extends CommandTestCase
         $this->assertSameOutput(
             $expected,
             ExitCode::FAILURE,
-            self::createLoadingFilePathOutputNormalizer(),
+            DisplayNormalizer::createLoadingFilePathOutputNormalizer(),
         );
     }
 
@@ -420,17 +418,5 @@ class ValidateTest extends CommandTestCase
             $this->assertSame(0, $exception->getCode());
             $this->assertNotNull($exception->getPrevious());
         }
-    }
-
-    /**
-     * @return callable(string):string
-     */
-    private static function createLoadingFilePathOutputNormalizer(): callable
-    {
-        return static fn ($output) => preg_replace(
-            '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
-            ' // Loading the configuration file "box.json".',
-            $output,
-        );
     }
 }

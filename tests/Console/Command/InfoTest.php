@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
+use Fidry\Console\ExitCode;
 use Fidry\Console\Test\OutputAssertions;
 use function getenv;
 use function implode;
@@ -171,7 +172,7 @@ class InfoTest extends CommandTestCase
 
         $this->assertSameOutput(
             $expected,
-            1,
+            ExitCode::FAILURE,
             static fn ($output) => preg_replace('/file[\ \n]+"/', 'file "', $output),
         );
     }
@@ -282,7 +283,7 @@ class InfoTest extends CommandTestCase
 
         OutputAssertions::assertSameOutput(
             $expected,
-            1,
+            ExitCode::FAILURE,
             $this->commandTester,
             static fn ($output) => preg_replace(
                 '/\s\[ERROR\] Could not read the file([\s\S]*)new\-simple\-phar\.zip[comment\<\>\n\s\/]*"\./',

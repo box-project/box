@@ -116,56 +116,6 @@ final class GenerateDockerFile implements CommandAware
         return false !== realpath($pharFilePath) ? realpath($pharFilePath) : $pharFilePath;
     }
 
-    private function generateFile(string $pharPath, string $requirementsPhar, IO $io): int
-    {
-        if (false === file_exists($requirementsPhar)) {
-            $io->error(
-                'Cannot retrieve the requirements for the PHAR. Make sure the PHAR has been built with Box and the requirement checker enabled.',
-            );
-
-            return ExitCode::FAILURE;
-        }
-
-        $requirements = include $requirementsPhar;
-
-        $dockerFileContents = DockerFileGenerator::createForRequirements(
-            $requirements,
-            make_path_relative($pharPath, getcwd()),
-        )
-            ->generateStub();
-
-        if (file_exists(self::DOCKER_FILE_NAME)) {
-            $remove = $io->askQuestion(
-                new ConfirmationQuestion(
-                    'A Docker file has already been found, are you sure you want to override it?',
-                    true,
-                ),
-            );
-
-            if (false === $remove) {
-                $io->writeln('Skipped the docker file generation.');
-
-                return ExitCode::SUCCESS;
-            }
-        }
-
-        dump_file(self::DOCKER_FILE_NAME, $dockerFileContents);
-
-        $io->success('Done');
-
-        $io->writeln(
-            [
-                sprintf(
-                    'You can now inspect your <comment>%s</comment> file or build your container with:',
-                    self::DOCKER_FILE_NAME,
-                ),
-                '$ <comment>docker build .</comment>',
-            ],
-        );
-
-        return ExitCode::SUCCESS;
-    }
-
     private function guessPharPath(IO $io): ?string
     {
         $config = ConfigOption::getConfig($io, true);
@@ -221,5 +171,55 @@ final class GenerateDockerFile implements CommandAware
         $compileInput->setInteractive(false);
 
         return $compileInput;
+    }
+
+    private function generateFile(string $pharPath, string $requirementsPhar, IO $io): int
+    {
+        if (false === file_exists($requirementsPhar)) {
+            $io->error(
+                'Cannot retrieve the requirements for the PHAR. Make sure the PHAR has been built with Box and the requirement checker enabled.',
+            );
+
+            return ExitCode::FAILURE;
+        }
+
+        $requirements = include $requirementsPhar;
+
+        $dockerFileContents = DockerFileGenerator::createForRequirements(
+            $requirements,
+            make_path_relative($pharPath, getcwd()),
+        )
+            ->generateStub();
+
+        if (file_exists(self::DOCKER_FILE_NAME)) {
+            $remove = $io->askQuestion(
+                new ConfirmationQuestion(
+                    'A Docker file has already been found, are you sure you want to override it?',
+                    true,
+                ),
+            );
+
+            if (false === $remove) {
+                $io->writeln('Skipped the docker file generation.');
+
+                return ExitCode::SUCCESS;
+            }
+        }
+
+        dump_file(self::DOCKER_FILE_NAME, $dockerFileContents);
+
+        $io->success('Done');
+
+        $io->writeln(
+            [
+                sprintf(
+                    'You can now inspect your <comment>%s</comment> file or build your container with:',
+                    self::DOCKER_FILE_NAME,
+                ),
+                '$ <comment>docker build .</comment>',
+            ],
+        );
+
+        return ExitCode::SUCCESS;
     }
 }
