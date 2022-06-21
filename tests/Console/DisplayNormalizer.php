@@ -55,4 +55,16 @@ final class DisplayNormalizer
             $output,
         );
     }
+
+    /**
+     * @return callable(string):string
+     */
+    public static function createReplaceBoxVersionNormalizer(): callable
+    {
+        return static fn (string $output): string => preg_replace(
+            '/Box version .+@[a-z\d]{7}/',
+            'Box version 3.x-dev@151e40a',
+            $output,
+        );
+    }
 }

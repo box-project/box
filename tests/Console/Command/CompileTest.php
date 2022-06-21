@@ -14,6 +14,16 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Fidry\Console\Command\SymfonyCommand;
+use Fidry\Console\DisplayNormalizer;
+use Fidry\Console\ExitCode;
+use Fidry\Console\Test\CommandTester;
+use Fidry\Console\Test\OutputAssertions;
+use KevinGH\Box\Console\Application;
+use KevinGH\Box\Console\DisplayNormalizer as BoxDisplayNormalizer;
+use KevinGH\Box\Test\CommandTestCase;
+use KevinGH\Box\Test\FileSystemTestCase;
+use Symfony\Component\Console\Application as SymfonyApplication;
 use function array_merge;
 use function array_unique;
 use function chdir;
@@ -31,7 +41,6 @@ use function json_encode;
 use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
 use KevinGH\Box\Compactor\Php;
-use KevinGH\Box\Console\DisplayNormalizer;
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
@@ -42,7 +51,6 @@ use function KevinGH\Box\FileSystem\touch;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\get_box_version;
 use function KevinGH\Box\memory_to_bytes;
-use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use function mt_getrandmax;
 use Phar;
@@ -73,11 +81,14 @@ use Traversable;
  * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
  *                              can create undesirable side-effects.
  */
-class CompileTest extends CommandTestCase
+class CompileTest extends FileSystemTestCase
 {
     use RequiresPharReadonlyOff;
 
     private const FIXTURES_DIR = __DIR__.'/../../../fixtures/build';
+
+    protected CommandTester $commandTester;
+    protected Command $command;
 
     protected function setUp(): void
     {
@@ -85,14 +96,36 @@ class CompileTest extends CommandTestCase
 
         parent::setUp();
 
-        $this->commandTester = new CommandTester($this->application->get($this->getCommand()->getName()));
+        $this->command = $this->getCommand();
+
+        $command = new SymfonyCommand($this->command);
+
+        $application = new SymfonyApplication();
+        $application->add($command);
+        $application->add(new SymfonyCommand(new GenerateDockerFile()));
+
+        $this->commandTester = new CommandTester(
+            $application->get(
+                $command->getName(),
+            ),
+        );
 
         remove(self::FIXTURES_DIR.'/dir010/index.phar');
     }
 
+    protected function tearDown(): void
+    {
+        unset($this->command);
+        unset($this->commandTester);
+
+        parent::tearDown();
+    }
+
     protected function getCommand(): Command
     {
-        return new Compile();
+        return new Compile(
+            (new Application())->getHeader(),
+        );
     }
 
     public function test_it_can_build_a_phar_file(): void
@@ -136,7 +169,10 @@ class CompileTest extends CommandTestCase
 
         $this->commandTester->setInputs(['test']);    // Set input for the passphrase
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             ['interactive' => true],
         );
 
@@ -198,9 +234,7 @@ class CompileTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
-
-        $this->assertSame($expected, $actual, 'Expected logs to be identical');
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
         $this->assertSame(
             'Hello, world!',
@@ -213,7 +247,7 @@ class CompileTest extends CommandTestCase
         $this->assertSame('OpenSSL', $phar->getSignature()['hash_type']);
 
         // Check PHAR content
-        $actualStub = $this->normalizeDisplay($phar->getStub());
+        $actualStub = self::normalizeStub($phar->getStub());
         $expectedStub = <<<PHP
             $shebang
             <?php
@@ -347,6 +381,7 @@ class CompileTest extends CommandTestCase
         $this->commandTester->execute(
             [
                 'command' => 'compile',
+                '--no-parallel' => null,
                 '--working-dir' => $this->tmp,
             ],
             ['interactive' => true],
@@ -366,7 +401,10 @@ class CompileTest extends CommandTestCase
         rename('run.php', 'index.php');
 
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             ['interactive' => true],
         );
 
@@ -420,9 +458,7 @@ class CompileTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
-
-        $this->assertSame($expected, $actual, 'Expected logs to be identical');
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
         $this->assertSame(
             'Hello, world!',
@@ -435,11 +471,7 @@ class CompileTest extends CommandTestCase
         $this->assertSame('SHA-1', $phar->getSignature()['hash_type']);
 
         // Check PHAR content
-        $actualStub = preg_replace(
-            '/box-auto-generated-alias-[\da-zA-Z]{12}\.phar/',
-            'box-auto-generated-alias-__uniqid__.phar',
-            $this->normalizeDisplay($phar->getStub()),
-        );
+        $actualStub = self::normalizeStub($phar->getStub());
 
         $expectedStub = <<<PHP
             #!/usr/bin/env php
@@ -543,7 +575,10 @@ class CompileTest extends CommandTestCase
         // Executes the compilation again
 
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             ['interactive' => true],
         );
 
@@ -581,7 +616,10 @@ class CompileTest extends CommandTestCase
         );
 
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             ['interactive' => true],
         );
 
@@ -642,9 +680,7 @@ class CompileTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
-
-        $this->assertSame($expected, $actual, 'Expected logs to be identical');
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
         $this->assertSame(
             'Hello, world!',
@@ -661,7 +697,7 @@ class CompileTest extends CommandTestCase
         $phar = new Phar('test.phar');
 
         // Check PHAR content
-        $actualStub = $this->normalizeDisplay($phar->getStub());
+        $actualStub = self::normalizeStub($phar->getStub());
         $expectedStub = <<<PHP
             #!/usr/bin/env php
             <?php
@@ -740,7 +776,10 @@ class CompileTest extends CommandTestCase
         );
 
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             ['interactive' => true],
         );
 
@@ -759,11 +798,7 @@ class CompileTest extends CommandTestCase
         $phar = new Phar('test.phar');
 
         // Check PHAR content
-        $actualStub = preg_replace(
-            '/box-auto-generated-alias-[\da-zA-Z]{12}\.phar/',
-            'box-auto-generated-alias-__uniqid__.phar',
-            $this->normalizeDisplay($phar->getStub()),
-        );
+        $actualStub = self::normalizeStub($phar->getStub());
 
         $version = get_box_version();
 
@@ -830,7 +865,10 @@ class CompileTest extends CommandTestCase
 
         $this->commandTester->setInputs(['test']);    // Set input for the passphrase
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             [
                 'interactive' => true,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -899,15 +937,11 @@ class CompileTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
-
-        $actual = preg_replace(
-            '/(\/.*?composer)/',
-            '/usr/local/bin/composer',
-            $actual,
+        $this->assertSameOutput(
+            $expected,
+            ExitCode::SUCCESS,
+            self::createComposerPathNormalizer(),
         );
-
-        $this->assertSame($expected, $actual);
     }
 
     public function test_it_can_build_a_phar_file_in_very_verbose_mode(): void
@@ -955,7 +989,10 @@ class CompileTest extends CommandTestCase
 
         $this->commandTester->setInputs(['test']);    // Set input for the passphrase
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             [
                 'interactive' => true,
                 'verbosity' => OutputInterface::VERBOSITY_VERY_VERBOSE,
@@ -1031,15 +1068,11 @@ class CompileTest extends CommandTestCase
             $expected,
         );
 
-        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
-
-        $actual = preg_replace(
-            '/(\/.*?composer)/',
-            '/usr/local/bin/composer',
-            $actual,
+        $this->assertSameOutput(
+            $expected,
+            ExitCode::SUCCESS,
+            self::createComposerPathNormalizer(),
         );
-
-        $this->assertSame($expected, $actual);
     }
 
     public function test_it_can_build_a_phar_file_in_debug_mode(): void
@@ -1070,6 +1103,7 @@ class CompileTest extends CommandTestCase
         $this->commandTester->execute(
             [
                 'command' => 'compile',
+                '--no-parallel' => null,
                 '--debug' => null,
             ],
             [
@@ -1144,9 +1178,7 @@ class CompileTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
-
-        $this->assertSame($expected, $actual);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
         $this->assertDirectoryExists('.box_dump');
 
@@ -1345,7 +1377,10 @@ class CompileTest extends CommandTestCase
 
         $this->commandTester->setInputs(['test']);
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             [
                 'interactive' => true,
                 'verbosity' => OutputInterface::VERBOSITY_QUIET,
@@ -1354,9 +1389,7 @@ class CompileTest extends CommandTestCase
 
         $expected = '';
 
-        $actual = $this->commandTester->getDisplay(true);
-
-        $this->assertSame($expected, $actual, 'Expected output logs to be identical');
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
         $this->assertSame(
             'Hello, world!',
@@ -1411,7 +1444,10 @@ class CompileTest extends CommandTestCase
 
         $this->commandTester->setInputs(['test']);    // Set input for the passphrase
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             ['interactive' => true],
         );
 
@@ -1478,7 +1514,10 @@ class CompileTest extends CommandTestCase
 
         $this->commandTester->setInputs(['test']);    // Set input for the passphrase
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             ['interactive' => true],
         );
 
@@ -1490,7 +1529,7 @@ class CompileTest extends CommandTestCase
 
         $phar = new Phar('test.phar');
 
-        $actualStub = $this->normalizeDisplay($phar->getStub());
+        $actualStub = self::normalizeStub($phar->getStub());
 
         $this->assertSame($stub, $actualStub);
     }
@@ -1517,7 +1556,10 @@ class CompileTest extends CommandTestCase
         );
 
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             ['interactive' => true],
         );
 
@@ -1543,22 +1585,19 @@ class CompileTest extends CommandTestCase
             ),
         );
 
-        try {
-            $this->commandTester->execute(
-                ['command' => 'compile'],
-                [
-                    'interactive' => false,
-                    'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-                ],
-            );
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/^The path ".+?" is not readable\.$/');
 
-            $this->fail('Expected exception to be thrown.');
-        } catch (InvalidArgumentException $exception) {
-            $this->assertMatchesRegularExpression(
-                '/^The path ".+?" is not readable\.$/',
-                $exception->getMessage(),
-            );
-        }
+        $this->commandTester->execute(
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
+            [
+                'interactive' => false,
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ],
+        );
     }
 
     public function test_it_can_build_a_phar_overwriting_an_existing_one_in_verbose_mode(): void
@@ -1566,7 +1605,10 @@ class CompileTest extends CommandTestCase
         mirror(self::FIXTURES_DIR.'/dir002', $this->tmp);
 
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -1625,9 +1667,7 @@ class CompileTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
-
-        $this->assertSame($expected, $actual);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
         $this->assertSame(
             'Hello, world!',
@@ -1645,15 +1685,16 @@ class CompileTest extends CommandTestCase
         $this->assertFileDoesNotExist($this->tmp.'/vendor/autoload.php');
 
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             ['interactive' => true],
         );
 
-        $output = $this->normalizeDisplay($this->commandTester->getDisplay(true));
-
         $this->assertMatchesRegularExpression(
             '/\? Dumping the Composer autoloader/',
-            $output,
+            $this->commandTester->getDisplay(),
             'Expected the autoloader to be dumped',
         );
 
@@ -1692,15 +1733,16 @@ class CompileTest extends CommandTestCase
         );
 
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             ['interactive' => true],
         );
 
-        $output = $this->normalizeDisplay($this->commandTester->getDisplay(true));
-
         $this->assertMatchesRegularExpression(
             '/\? Skipping dumping the Composer autoloader/',
-            $output,
+            $this->commandTester->getDisplay(),
             'Did not expect the autoloader to be dumped',
         );
 
@@ -1730,15 +1772,16 @@ class CompileTest extends CommandTestCase
         $this->assertFileDoesNotExist($this->tmp.'/vendor/autoload.php');
 
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             ['interactive' => true],
         );
 
-        $output = $this->normalizeDisplay($this->commandTester->getDisplay(true));
-
         $this->assertMatchesRegularExpression(
             '/\? Removing the Composer dump artefacts/',
-            $output,
+            $this->commandTester->getDisplay(),
             'Expected the composer files to be removed',
         );
 
@@ -1783,15 +1826,16 @@ class CompileTest extends CommandTestCase
         $this->assertFileDoesNotExist($this->tmp.'/vendor/autoload.php');
 
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             ['interactive' => true],
         );
 
-        $output = $this->normalizeDisplay($this->commandTester->getDisplay(true));
-
         $this->assertMatchesRegularExpression(
             '/\? Keep the Composer dump artefacts/',
-            $output,
+            $this->commandTester->getDisplay(),
             'Expected the composer files to be kept',
         );
 
@@ -1831,6 +1875,7 @@ class CompileTest extends CommandTestCase
         $this->commandTester->execute(
             [
                 'command' => 'compile',
+                '--no-parallel' => null,
             ],
             [
                 'interactive' => false,
@@ -1882,9 +1927,7 @@ class CompileTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
-
-        $this->assertSame($expected, $actual);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
         $this->assertSame(
             'Hello!',
@@ -1898,7 +1941,10 @@ class CompileTest extends CommandTestCase
         mirror(self::FIXTURES_DIR.'/dir004', $this->tmp);
 
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -1947,9 +1993,7 @@ class CompileTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
-
-        $this->assertSame($expected, $actual);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
         $this->assertSame(
             'Hello!',
@@ -1963,7 +2007,10 @@ class CompileTest extends CommandTestCase
         mirror(self::FIXTURES_DIR.'/dir005', $this->tmp);
 
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -2019,9 +2066,7 @@ class CompileTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
-
-        $this->assertSame($expected, $actual);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_can_build_a_phar_without_a_main_script(): void
@@ -2040,7 +2085,10 @@ class CompileTest extends CommandTestCase
         );
 
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -2089,9 +2137,7 @@ class CompileTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
-
-        $this->assertSame($expected, $actual);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
         $this->assertSame(
             'Hello!',
@@ -2115,7 +2161,10 @@ class CompileTest extends CommandTestCase
         );
 
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -2164,9 +2213,7 @@ class CompileTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
-
-        $this->assertSame($expected, $actual);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
         $this->assertSame(
             'Hello!',
@@ -2188,7 +2235,10 @@ class CompileTest extends CommandTestCase
         mirror(self::FIXTURES_DIR.'/dir006', $this->tmp);
 
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -2245,9 +2295,7 @@ class CompileTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
-
-        $this->assertSame($expected, $actual);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
         $builtPhar = new Phar('test.phar');
 
@@ -2266,7 +2314,10 @@ class CompileTest extends CommandTestCase
         mirror(self::FIXTURES_DIR.'/dir007', $this->tmp);
 
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -2322,9 +2373,7 @@ class CompileTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
-
-        $this->assertSame($expected, $actual);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
         $this->assertSame(
             'Hello!',
@@ -2354,7 +2403,10 @@ class CompileTest extends CommandTestCase
         );
 
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             ['interactive' => true],
         );
 
@@ -2363,7 +2415,7 @@ class CompileTest extends CommandTestCase
             $this->commandTester->getStatusCode(),
             sprintf(
                 'Expected the command to successfully run. Got: %s',
-                $this->normalizeDisplay($this->commandTester->getDisplay(true)),
+                $this->commandTester->getDisplay(),
             ),
         );
 
@@ -2376,8 +2428,8 @@ class CompileTest extends CommandTestCase
         $phar = new Phar('index.phar');
 
         // Check the stub content
-        $actualStub = DisplayNormalizer::removeTrailingSpaces($phar->getStub());
-        $defaultStub = DisplayNormalizer::removeTrailingSpaces(file_get_contents(self::FIXTURES_DIR.'/../default_stub.php'));
+        $actualStub = self::normalizeStub($phar->getStub());
+        $defaultStub = self::normalizeStub(file_get_contents(self::FIXTURES_DIR.'/../default_stub.php'));
 
         if ($stub) {
             $this->assertSame($phar->getPath(), $phar->getAlias());
@@ -2421,7 +2473,10 @@ class CompileTest extends CommandTestCase
         dump_file('box.json', json_encode($boxRawConfig, JSON_PRETTY_PRINT));
 
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -2478,9 +2533,7 @@ class CompileTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
-
-        $this->assertSame($expected, $actual);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
         $builtPhar = new Phar('test.phar');
 
@@ -2515,7 +2568,10 @@ class CompileTest extends CommandTestCase
         );
 
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             [
                 'interactive' => false,
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -2564,9 +2620,7 @@ class CompileTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
-
-        $this->assertSame($expected, $actual);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
         $this->assertSame(
             'Hello!',
@@ -2582,6 +2636,7 @@ class CompileTest extends CommandTestCase
         $this->commandTester->execute(
             [
                 'command' => 'compile',
+                '--no-parallel' => null,
                 '--no-config' => null,
             ],
             ['interactive' => true],
@@ -2601,6 +2656,7 @@ class CompileTest extends CommandTestCase
         $this->commandTester->execute(
             [
                 'command' => 'compile',
+                '--no-parallel' => null,
                 '--config' => 'box.json',
                 '--no-config' => null,
             ],
@@ -2619,7 +2675,10 @@ class CompileTest extends CommandTestCase
         mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
 
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             ['interactive' => true],
         );
 
@@ -2655,7 +2714,10 @@ class CompileTest extends CommandTestCase
         rename('scoper-fixed-prefix.inc.php', 'scoper.inc.php', true);
 
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             ['interactive' => true],
         );
 
@@ -2697,19 +2759,16 @@ class CompileTest extends CommandTestCase
             ),
         );
 
-        try {
-            $this->commandTester->execute(
-                ['command' => 'compile'],
-                ['interactive' => true],
-            );
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected to have a private key for OpenSSL signing but none have been provided.');
 
-            $this->fail('Expected exception to be thrown.');
-        } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
-                'Expected to have a private key for OpenSSL signing but none have been provided.',
-                $exception->getMessage(),
-            );
-        }
+        $this->commandTester->execute(
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
+            ['interactive' => true],
+        );
     }
 
     public function test_it_displays_recommendations_and_warnings(): void
@@ -2728,7 +2787,10 @@ class CompileTest extends CommandTestCase
         );
 
         $this->commandTester->execute(
-            ['command' => 'compile'],
+            [
+                'command' => 'compile',
+                '--no-parallel' => null,
+            ],
             ['interactive' => true],
         );
 
@@ -2770,9 +2832,9 @@ class CompileTest extends CommandTestCase
             ? Setting file permissions to 0755
             * Done.
 
-            💡  1 recommendation found:
+            💡  <recommendation>1 recommendation found:</recommendation>
                 - The "check-requirements" setting can be omitted since is set to its default value
-            ⚠️  1 warning found:
+            ⚠️  <warning>1 warning found:</warning>
                 - The requirement checker could not be used because the composer.json and composer.lock file could not be found.
 
              // PHAR: 1 file (100B)
@@ -2783,9 +2845,7 @@ class CompileTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
-
-        $this->assertSame($expected, $actual, 'Expected logs to be identical');
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_skips_the_compression_when_in_dev_mode(): void
@@ -2804,6 +2864,7 @@ class CompileTest extends CommandTestCase
         $this->commandTester->execute(
             [
                 'command' => 'compile',
+                '--no-parallel' => null,
                 '--dev' => null,
             ],
             ['interactive' => true],
@@ -2858,9 +2919,7 @@ class CompileTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
-
-        $this->assertSame($expected, $actual, 'Expected logs to be identical');
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_can_generate_a_phar_with_docker(): void
@@ -2877,6 +2936,7 @@ class CompileTest extends CommandTestCase
         $this->commandTester->execute(
             [
                 'command' => 'compile',
+                '--no-parallel' => null,
                 '--with-docker' => null,
             ],
             ['interactive' => true],
@@ -2942,9 +3002,7 @@ class CompileTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = $this->normalizeDisplay($this->commandTester->getDisplay(true));
-
-        $this->assertSame($expected, $actual, 'Expected logs to be identical');
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public static function aliasConfigProvider(): iterable
@@ -2953,67 +3011,80 @@ class CompileTest extends CommandTestCase
         yield [false];
     }
 
-    private function normalizeDisplay(string $display): string
+    /**
+     * @param callable(string):string $extraNormalizers
+     */
+    private function createCompilerDisplayNormalizer(): callable
     {
-        $display = str_replace($this->tmp, '/path/to/tmp', $display);
+        $tmp = $this->tmp;
 
-        $display = preg_replace(
-            '/Loading the configuration file[\s\n]+.*[\s\n\/]+.*box\.json[comment\<\>\n\s\/]*"\./',
-            'Loading the configuration file "/path/to/box.json.dist".',
-            $display,
-        );
+        return static function (string $output) use ($tmp): string {
+            $output = str_replace($tmp, '/path/to/tmp', $output);
 
-        $display = preg_replace(
-            '/You can inspect the generated PHAR( | *\n *\/\/ *)with( | *\n *\/\/ *)the( | *\n *\/\/ *)"info"( | *\n *\/\/ *)command/',
-            'You can inspect the generated PHAR with the "info" command',
-            $display,
-        );
-
-        $display = preg_replace(
-            '/\/\/ PHAR: (\d+ files?) \(\d+\.\d{2}K?B\)/',
-            '// PHAR: $1 (100B)',
-            $display,
-        );
-
-        $display = preg_replace(
-            '/\/\/ Memory usage: \d+\.\d{2}MB \(peak: \d+\.\d{2}MB\), time: .*?sec/',
-            '// Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s',
-            $display,
-        );
-
-        $display = preg_replace(
-            '/Box version .+@[a-z\d]{7}/',
-            'Box version 3.x-dev@151e40a',
-            $display,
-        );
-
-        $display = str_replace(
-            'Xdebug',
-            'xdebug',
-            $display,
-        );
-
-        $display = preg_replace(
-            '/\[debug\] Increased the maximum number of open file descriptors from \([^\)]+\) to \([^\)]+\)'.PHP_EOL.'/',
-            '',
-            $display,
-        );
-
-        $display = str_replace(
-            '[debug] Restored the maximum number of open file descriptors'.PHP_EOL,
-            '',
-            $display,
-        );
-
-        if (extension_loaded('xdebug')) {
-            $display = preg_replace(
-                '/'.PHP_EOL.'You are running composer with xdebug enabled. This has a major impact on runtime performance. See https:\/[^\s]+'.PHP_EOL.'/',
-                '',
-                $display,
+            $output = preg_replace(
+                '/Loading the configuration file[\s\n]+.*[\s\n\/]+.*box\.json[comment\<\>\n\s\/]*"\./',
+                'Loading the configuration file "/path/to/box.json.dist".',
+                $output,
             );
-        }
 
-        return DisplayNormalizer::removeTrailingSpaces($display);
+            $output = preg_replace(
+                '/You can inspect the generated PHAR( | *\n *\/\/ *)with( | *\n *\/\/ *)the( | *\n *\/\/ *)"info"( | *\n *\/\/ *)command/',
+                'You can inspect the generated PHAR with the "info" command',
+                $output,
+            );
+
+            $output = preg_replace(
+                '/\/\/ PHAR: (\d+ files?) \(\d+\.\d{2}K?B\)/',
+                '// PHAR: $1 (100B)',
+                $output,
+            );
+
+            $output = preg_replace(
+                '/\/\/ Memory usage: \d+\.\d{2}MB \(peak: \d+\.\d{2}MB\), time: .*?sec/',
+                '// Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s',
+                $output,
+            );
+
+            $output = str_replace(
+                'Xdebug',
+                'xdebug',
+                $output,
+            );
+
+            $output = preg_replace(
+                '/\[debug\] Increased the maximum number of open file descriptors from \([^\)]+\) to \([^\)]+\)'.PHP_EOL.'/',
+                '',
+                $output,
+            );
+
+            $output = str_replace(
+                '[debug] Restored the maximum number of open file descriptors'.PHP_EOL,
+                '',
+                $output,
+            );
+
+            if (extension_loaded('xdebug')) {
+                $output = preg_replace(
+                    '/'.PHP_EOL.'You are running composer with xdebug enabled. This has a major impact on runtime performance. See https:\/[^\s]+'.PHP_EOL.'/',
+                    '',
+                    $output,
+                );
+            }
+
+            return $output;
+        };
+    }
+
+    /**
+     * @param callable(string):string $extraNormalizers
+     */
+    private static function createComposerPathNormalizer(): callable
+    {
+        return static fn (string $output): string => preg_replace(
+            '/(\/.*?composer)/',
+            '/usr/local/bin/composer',
+            $output,
+        );
     }
 
     private function retrievePharFiles(Phar $phar, ?Traversable $traversable = null): array
@@ -3050,5 +3121,32 @@ class CompileTest extends CommandTestCase
         sort($paths);
 
         return array_unique($paths);
+    }
+
+    private static function normalizeStub(string $pharStub): string
+    {
+        return preg_replace(
+            '/box-auto-generated-alias-[\da-zA-Z]{12}\.phar/',
+            'box-auto-generated-alias-__uniqid__.phar',
+            DisplayNormalizer::removeTrailingSpaces($pharStub),
+        );
+    }
+
+    /**
+     * @param callable(string):string $extraNormalizers
+     */
+    public function assertSameOutput(
+        string $expectedOutput,
+        int $expectedStatusCode,
+        callable ...$extraNormalizers,
+    ): void {
+        OutputAssertions::assertSameOutput(
+            $expectedOutput,
+            $expectedStatusCode,
+            $this->commandTester,
+            BoxDisplayNormalizer::createReplaceBoxVersionNormalizer(),
+            $this->createCompilerDisplayNormalizer(),
+            ...$extraNormalizers,
+        );
     }
 }

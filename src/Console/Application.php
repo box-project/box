@@ -28,6 +28,7 @@ final class Application implements FidryApplication
     private string $releaseDate;
     private bool $autoExit;
     private bool $catchExceptions;
+    private string $header;
 
     public function __construct(
         private string $name = 'Box',
@@ -66,13 +67,22 @@ final class Application implements FidryApplication
 
     public function getHelp(): string
     {
-        return Logo::LOGO_ASCII.$this->getLongVersion();
+        return $this->getHeader();
+    }
+
+    public function getHeader(): string
+    {
+        if (!isset($this->header)) {
+            $this->header = Logo::LOGO_ASCII.$this->getLongVersion();
+        }
+
+        return $this->header;
     }
 
     public function getCommands(): array
     {
         return [
-            new Command\Compile(),
+            new Command\Compile($this->getHeader()),
             new Command\Diff(),
             new Command\Info(),
             new Command\Process(),

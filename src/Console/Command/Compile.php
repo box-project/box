@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Amp\MultiReasonException;
+use Fidry\Console\Command\Command;
 use function array_map;
 use function array_search;
 use function array_shift;
@@ -104,6 +105,13 @@ final class Compile implements CommandAware
 
     private const DEBUG_DIR = '.box_dump';
 
+    private string $header;
+
+    public function __construct(string $header)
+    {
+        $this->header = $header;
+    }
+
     public function getConfiguration(): CommandConfiguration
     {
         return new CommandConfiguration(
@@ -178,8 +186,7 @@ final class Compile implements CommandAware
 
         ChangeWorkingDirOption::changeWorkingDirectory($io);
 
-        $io->writeln(Logo::LOGO_ASCII);
-        $io->newLine();
+        $io->writeln($this->header);
 
         $config = $io->getOption(self::NO_CONFIG_OPTION)->asBoolean()
             ? Configuration::create(null, new stdClass())
@@ -843,17 +850,17 @@ final class Compile implements CommandAware
 
         MessageRenderer::render($io, $config->getRecommendations(), $config->getWarnings());
 
-        $io->comment([
+        $io->comment(
             sprintf(
                 'PHAR: %s (%s)',
                 $box->count() > 1 ? $box->count().' files' : $box->count().' file',
                 format_size(
                     filesize($path),
                 ),
-            ),
-            '',
-            'You can inspect the generated PHAR with the "<comment>info</comment>" command.',
-        ]);
+            )
+            .PHP_EOL
+            .'You can inspect the generated PHAR with the "<comment>info</comment>" command.',
+        );
 
         $io->comment(
             sprintf(
@@ -867,19 +874,16 @@ final class Compile implements CommandAware
 
     private function generateDockerFile(IO $io): int
     {
-        $generateDockerFileCommand = $this->getDockerCommand();
-
-        Assert::isInstanceOf($generateDockerFileCommand, GenerateDockerFile::class);
-
         $input = new StringInput('');
         $input->setInteractive(false);
 
-        return $generateDockerFileCommand->execute($io);
+        return $this->getDockerCommand()->execute(
+            new IO($input, $io->getOutput()),
+        );
     }
 
-    private function getDockerCommand(): GenerateDockerFile
+    private function getDockerCommand(): Command
     {
-        /* @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getCommandRegistry()->findCommand(GenerateDockerFile::NAME);
     }
 }

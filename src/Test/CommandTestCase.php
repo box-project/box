@@ -48,6 +48,7 @@ abstract class CommandTestCase extends FileSystemTestCase
 
     protected function tearDown(): void
     {
+        unset($this->command);
         unset($this->commandTester);
 
         parent::tearDown();

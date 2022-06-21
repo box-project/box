@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
+use Fidry\Console\DisplayNormalizer;
 use KevinGH\Box\Annotation\CompactedFormatter;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
-use KevinGH\Box\Console\DisplayNormalizer;
 use phpDocumentor\Reflection\DocBlockFactory;
 use PHPUnit\Framework\TestCase;
 

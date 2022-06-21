@@ -49,7 +49,7 @@ class ApplicationTest extends TestCase
             $expected,
             ExitCode::SUCCESS,
             $appTester,
-            self::createReplaceBoxVersionNormalizer(),
+            DisplayNormalizer::createReplaceBoxVersionNormalizer(),
         );
     }
 
@@ -134,16 +134,7 @@ class ApplicationTest extends TestCase
             $expected,
             ExitCode::SUCCESS,
             $appTester,
-            self::createReplaceBoxVersionNormalizer(),
-        );
-    }
-
-    private static function createReplaceBoxVersionNormalizer(): callable
-    {
-        return static fn (string $output): string => preg_replace(
-            '/Box version .+@[a-z\d]{7}/',
-            'Box version 3.x-dev@151e40a',
-            $output,
+            DisplayNormalizer::createReplaceBoxVersionNormalizer(),
         );
     }
 }

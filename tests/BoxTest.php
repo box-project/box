@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use Fidry\Console\DisplayNormalizer;
 use function array_filter;
 use function array_keys;
 use function current;
@@ -31,7 +32,6 @@ use function iterator_to_array;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\FakeCompactor;
-use KevinGH\Box\Console\DisplayNormalizer;
 use function KevinGH\Box\FileSystem\canonicalize;
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
