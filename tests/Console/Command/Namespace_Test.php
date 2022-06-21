@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
+use Fidry\Console\ExitCode;
 use function KevinGH\Box\FileSystem\dump_file;
 use KevinGH\Box\Test\CommandTestCase;
 
