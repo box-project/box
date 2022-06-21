@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
+use Fidry\Console\ExitCode;
 use InvalidArgumentException;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
@@ -30,6 +31,13 @@ class VerifyTest extends CommandTestCase
     use RequiresPharReadonlyOff;
 
     private const FIXTURES_DIR = __DIR__.'/../../../fixtures/verify';
+
+    protected function setUp(): void
+    {
+        $this->markAsSkippedIfPharReadonlyIsOn();
+
+        parent::setUp();
+    }
 
     protected function getCommand(): Command
     {
@@ -58,7 +66,7 @@ class VerifyTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expected, 0);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_can_verify_a_phar_which_does_not_have_the_phar_extension(): void
@@ -80,7 +88,7 @@ class VerifyTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expected, 0);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     /**
@@ -110,7 +118,7 @@ class VerifyTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expected, 0);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_cannot_verify_an_unknown_file(): void
@@ -142,7 +150,7 @@ class VerifyTest extends CommandTestCase
             $this->commandTester->getDisplay(true),
         );
 
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSame(ExitCode::FAILURE, $this->commandTester->getStatusCode());
     }
 
     public static function passingPharPathsProvider(): iterable

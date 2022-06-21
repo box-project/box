@@ -40,6 +40,6 @@ class Namespace_Test extends CommandTestCase
 
         $expected = 'KevinGH'."\n";
 
-        $this->assertSameOutput($expected, 0);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 }

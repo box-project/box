@@ -69,7 +69,7 @@ class InfoTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expected, 0);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_provides_info_about_a_phar(): void
@@ -105,7 +105,7 @@ class InfoTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expected, 0);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_provides_info_about_a_phar_without_extension(): void
@@ -141,7 +141,7 @@ class InfoTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expected, 0);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_cannot_provide_info_about_an_invalid_phar_without_extension(): void
@@ -223,7 +223,7 @@ class InfoTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expected, 0);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_provides_info_about_a_tarbz2_phar(): void
@@ -254,7 +254,7 @@ class InfoTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expected, 0);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_provides_a_zip_phar_info(): void
@@ -335,7 +335,7 @@ class InfoTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expected, 0);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_provides_a_phar_info_with_the_flat_tree_of_the_content(): void
@@ -378,7 +378,7 @@ class InfoTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expected, 0);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_provides_a_phar_info_with_the_tree_of_the_content_including_hidden_files(): void
@@ -431,7 +431,7 @@ class InfoTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expected, 0);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     /**
@@ -478,7 +478,7 @@ class InfoTest extends CommandTestCase
 
         $this->commandTester->execute($input);
 
-        $this->assertSameOutput($expected, 0);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public static function treeDepthProvider(): iterable
@@ -643,7 +643,7 @@ class InfoTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expected, 0);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_cannot_accept_an_invalid_depth(): void

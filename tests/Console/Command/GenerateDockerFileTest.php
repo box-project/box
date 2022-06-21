@@ -61,7 +61,7 @@ class GenerateDockerFileTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expected, 0);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
         $this->assertFileExists($this->tmp.'/Dockerfile');
     }
@@ -83,7 +83,7 @@ class GenerateDockerFileTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expected, 1);
+        $this->assertSameOutput($expected, ExitCode::FAILURE);
 
         $this->assertFileDoesNotExist($this->tmp.'/Dockerfile');
     }
@@ -105,6 +105,6 @@ class GenerateDockerFileTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expected, 1);
+        $this->assertSameOutput($expected, ExitCode::FAILURE);
     }
 }

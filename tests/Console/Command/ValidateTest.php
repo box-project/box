@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
+use Fidry\Console\ExitCode;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\touch;
 use KevinGH\Box\Test\CommandTestCase;
@@ -62,7 +63,7 @@ class ValidateTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expected, 0);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_reports_the_recommendations_found(): void
@@ -142,7 +143,7 @@ class ValidateTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expected, 0);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_reports_the_warnings_found(): void
@@ -180,7 +181,7 @@ class ValidateTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expected, 1);
+        $this->assertSameOutput($expected, ExitCode::FAILURE);
     }
 
     public function test_it_does_not_fail_when_warnings_are_found_but_ignore_message_is_passed(): void
@@ -219,7 +220,7 @@ class ValidateTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expected, 0);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_reports_the_recommendations_and_warnings_found(): void
@@ -259,7 +260,7 @@ class ValidateTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expected, 1);
+        $this->assertSameOutput($expected, ExitCode::FAILURE);
     }
 
     public function test_an_unknown_file_is_invalid(): void
@@ -275,7 +276,7 @@ class ValidateTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expected, 1);
+        $this->assertSameOutput($expected, ExitCode::FAILURE);
     }
 
     public function test_an_unknown_file_is_invalid_in_verbose_mode(): void
@@ -322,7 +323,11 @@ class ValidateTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expected, 1, self::createNormalizeLoadingFilePathOutput());
+        $this->assertSameOutput(
+            $expected,
+            ExitCode::FAILURE, 
+            self::createLoadingFilePathOutputNormalizer(),
+        );
     }
 
     public function test_an_invalid_json_file_is_invalid_in_verbose_mode(): void
@@ -378,7 +383,11 @@ class ValidateTest extends CommandTestCase
                 EOF,
         );
 
-        $this->assertSameOutput($expected, 1, self::createNormalizeLoadingFilePathOutput());
+        $this->assertSameOutput(
+            $expected,
+            ExitCode::FAILURE,
+            self::createLoadingFilePathOutputNormalizer(),
+        );
     }
 
     public function test_an_incorrect_config_file_is_invalid_in_verbose_mode(): void
@@ -416,7 +425,7 @@ class ValidateTest extends CommandTestCase
     /**
      * @return callable(string):string
      */
-    private static function createNormalizeLoadingFilePathOutput(): callable
+    private static function createLoadingFilePathOutputNormalizer(): callable
     {
         return static fn ($output) => preg_replace(
             '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',

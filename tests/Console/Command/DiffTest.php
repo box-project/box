@@ -237,7 +237,7 @@ class DiffTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSameOutput($expected, 0);
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_cannot_compare_phars_which_are_signed_with_a_private_key(): void
