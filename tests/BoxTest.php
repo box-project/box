@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use Fidry\Console\DisplayNormalizer;
 use function array_filter;
 use function array_keys;
 use function current;
@@ -24,6 +23,7 @@ use Error;
 use Exception;
 use function exec;
 use function extension_loaded;
+use Fidry\Console\DisplayNormalizer;
 use function file_get_contents;
 use function implode;
 use function in_array;

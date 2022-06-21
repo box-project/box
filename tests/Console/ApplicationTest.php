@@ -18,7 +18,6 @@ use Fidry\Console\ExitCode;
 use Fidry\Console\Test\AppTester;
 use Fidry\Console\Test\OutputAssertions;
 use PHPUnit\Framework\TestCase;
-use function preg_replace;
 
 /**
  * @covers \KevinGH\Box\Console\Application
