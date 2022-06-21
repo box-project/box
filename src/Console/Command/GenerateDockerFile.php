@@ -14,9 +14,13 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Fidry\Console\Command\CommandAware;
+use Fidry\Console\Command\CommandAwareness;
+use Fidry\Console\Command\Configuration;
+use Fidry\Console\ExitCode;
+use Fidry\Console\Input\IO;
 use function file_exists;
 use function getcwd;
-use KevinGH\Box\Console\IO\IO;
 use function KevinGH\Box\create_temporary_phar;
 use KevinGH\Box\DockerFileGenerator;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -34,39 +38,39 @@ use Webmozart\Assert\Assert;
 /**
  * @private
  */
-final class GenerateDockerFile extends BaseCommand
+final class GenerateDockerFile implements CommandAware
 {
+    use CommandAwareness;
+
     public const NAME = 'docker';
 
     private const PHAR_ARG = 'phar';
     private const DOCKER_FILE_NAME = 'Dockerfile';
 
-    protected function configure(): void
+    public function getConfiguration(): Configuration
     {
-        parent::configure();
-
-        $this->setName(self::NAME);
-        $this->setDescription('🐳  Generates a Dockerfile for the given PHAR');
-        $this->addArgument(
-            self::PHAR_ARG,
-            InputArgument::OPTIONAL,
-            'The PHAR file',
+        return new Configuration(
+            'docker',
+            '🐳  Generates a Dockerfile for the given PHAR',
+            '',
+            [
+                new InputArgument(
+                    self::PHAR_ARG,
+                    InputArgument::OPTIONAL,
+                    'The PHAR file',
+                ),
+            ],
+            [ConfigOption::getOptionInput()],
         );
-
-        $this->getDefinition()->addOption(ConfigOption::getOptionInput());
     }
 
-    protected function executeCommand(IO $io): int
+    public function execute(IO $io): int
     {
         $pharFilePath = $this->getPharFilePath($io);
 
         if (null === $pharFilePath) {
-            return self::FAILURE;
+            return ExitCode::FAILURE;
         }
-
-        Assert::file($pharFilePath);
-
-        $pharFilePath = false !== realpath($pharFilePath) ? realpath($pharFilePath) : $pharFilePath;
 
         $io->newLine();
         $io->writeln(
@@ -96,7 +100,7 @@ final class GenerateDockerFile extends BaseCommand
      */
     private function getPharFilePath(IO $io): ?string
     {
-        $pharFilePath = $io->getInput()->getArgument(self::PHAR_ARG);
+        $pharFilePath = $io->getArgument(self::PHAR_ARG)->asNullableNonEmptyString();
 
         if (null === $pharFilePath) {
             $pharFilePath = $this->guessPharPath($io);
@@ -133,9 +137,11 @@ final class GenerateDockerFile extends BaseCommand
             return null;
         }
 
-        $this->getCompileCommand()->run(
-            self::createCompileInput($io),
-            clone $io->getOutput(),
+        $this->getCompileCommand()->execute(
+            new IO(
+                self::createCompileInput($io),
+                clone $io->getOutput(),
+            ),
         );
 
         return $config->getOutputPath();
@@ -143,7 +149,8 @@ final class GenerateDockerFile extends BaseCommand
 
     private function getCompileCommand(): Compile
     {
-        return $this->getApplication()->find(Compile::NAME);
+        /* @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getCommandRegistry()->findCommand(Compile::NAME);
     }
 
     private static function createCompileInput(IO $io): InputInterface
@@ -166,22 +173,21 @@ final class GenerateDockerFile extends BaseCommand
         return $compileInput;
     }
 
-    private function generateFile(string $pharFilePath, string $requirementsPhar, IO $io): int
+    private function generateFile(string $pharPath, string $requirementsPhar, IO $io): int
     {
         if (false === file_exists($requirementsPhar)) {
             $io->error(
-                'Cannot retrieve the requirements for the PHAR. Make sure the PHAR has been built with Box and the '
-                .'requirement checker enabled.',
+                'Cannot retrieve the requirements for the PHAR. Make sure the PHAR has been built with Box and the requirement checker enabled.',
             );
 
-            return self::FAILURE;
+            return ExitCode::FAILURE;
         }
 
         $requirements = include $requirementsPhar;
 
         $dockerFileContents = DockerFileGenerator::createForRequirements(
             $requirements,
-            make_path_relative($pharFilePath, getcwd()),
+            make_path_relative($pharPath, getcwd()),
         )
             ->generateStub();
 
@@ -196,7 +202,7 @@ final class GenerateDockerFile extends BaseCommand
             if (false === $remove) {
                 $io->writeln('Skipped the docker file generation.');
 
-                return self::SUCCESS;
+                return ExitCode::SUCCESS;
             }
         }
 
@@ -214,6 +220,6 @@ final class GenerateDockerFile extends BaseCommand
             ],
         );
 
-        return self::SUCCESS;
+        return ExitCode::SUCCESS;
     }
 }

@@ -15,10 +15,13 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use function count;
+use Fidry\Console\Command\Command;
+use Fidry\Console\Command\Configuration as ConsoleConfiguration;
+use Fidry\Console\ExitCode;
+use Fidry\Console\Input\IO;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\ConfigurationLoader;
 use KevinGH\Box\Console\ConfigurationLocator;
-use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Console\MessageRenderer;
 use KevinGH\Box\Json\JsonValidationException;
 use function sprintf;
@@ -31,18 +34,16 @@ use Webmozart\Assert\Assert;
 /**
  * @private
  */
-final class Validate extends BaseCommand
+final class Validate implements Command
 {
     private const FILE_ARGUMENT = 'file';
     private const IGNORE_MESSAGES_OPTION = 'ignore-recommendations-and-warnings';
 
-    protected function configure(): void
+    public function getConfiguration(): ConsoleConfiguration
     {
-        parent::configure();
-
-        $this->setName('validate');
-        $this->setDescription('⚙  Validates the configuration file');
-        $this->setHelp(
+        return new ConsoleConfiguration(
+            'validate',
+            '⚙  Validates the configuration file',
             <<<'HELP'
                 The <info>%command.name%</info> command will validate the configuration file
                 and report any errors found, if any.
@@ -54,31 +55,33 @@ final class Validate extends BaseCommand
                   box.json.dist</info>
                 </comment>
                 HELP,
-        );
-        $this->addArgument(
-            self::FILE_ARGUMENT,
-            InputArgument::OPTIONAL,
-            'The configuration file. (default: box.json, box.json.dist)',
-        );
-        $this->addOption(
-            self::IGNORE_MESSAGES_OPTION,
-            'i',
-            InputOption::VALUE_NONE,
-            'Will not return a faulty code when a recommendation or warning is found',
+            [
+                new InputArgument(
+                    self::FILE_ARGUMENT,
+                    InputArgument::OPTIONAL,
+                    'The configuration file. (default: box.json, box.json.dist)',
+                ),
+            ],
+            [
+                new InputOption(
+                    self::IGNORE_MESSAGES_OPTION,
+                    'i',
+                    InputOption::VALUE_NONE,
+                    'Will not return a faulty code when a recommendation or warning is found',
+                ),
+            ],
         );
     }
 
-    protected function executeCommand(IO $io): int
+    public function execute(IO $io): int
     {
-        $input = $io->getInput();
-
         try {
             $config = ConfigurationLoader::getConfig(
-                $input->getArgument(self::FILE_ARGUMENT) ?? ConfigurationLocator::findDefaultPath(),
+                $io->getArgument(self::FILE_ARGUMENT)->asNullableNonEmptyString() ?? ConfigurationLocator::findDefaultPath(),
                 $io,
                 false,
             );
-        } catch (Throwable $unexpectedFailure) {
+        } catch (Throwable $throwable) {
             // Continue
         }
 
@@ -86,14 +89,14 @@ final class Validate extends BaseCommand
             return self::checkConfig($config, $io);
         }
 
-        Assert::true(isset($unexpectedFailure));
+        Assert::true(isset($throwable));
 
-        return self::handleFailure($unexpectedFailure, $io);
+        return self::handleFailure($throwable, $io);
     }
 
     private static function checkConfig(Configuration $config, IO $io): int
     {
-        $ignoreRecommendationsAndWarnings = (bool) $io->getInput()->getOption(self::IGNORE_MESSAGES_OPTION);
+        $ignoreRecommendationsAndWarnings = $io->getOption(self::IGNORE_MESSAGES_OPTION)->asBoolean();
 
         $recommendations = $config->getRecommendations();
         $warnings = $config->getWarnings();
@@ -115,8 +118,8 @@ final class Validate extends BaseCommand
         }
 
         return $hasRecommendationsOrWarnings || $ignoreRecommendationsAndWarnings
-            ? self::SUCCESS
-            : self::FAILURE;
+            ? ExitCode::SUCCESS
+            : ExitCode::FAILURE;
     }
 
     private static function handleFailure(Throwable $throwable, IO $io): int
@@ -153,7 +156,7 @@ final class Validate extends BaseCommand
             $io->writeln("<comment>  - $error</comment>");
         }
 
-        return self::FAILURE;
+        return ExitCode::FAILURE;
     }
 
     private static function handleGenericFailure(Throwable $throwable, IO $io): int
@@ -167,6 +170,6 @@ final class Validate extends BaseCommand
             ),
         );
 
-        return self::FAILURE;
+        return ExitCode::FAILURE;
     }
 }

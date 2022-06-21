@@ -14,11 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
+use Fidry\Console\Input\IO;
 use InvalidArgumentException;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Configuration\ConfigurationLoader as ConfigLoader;
 use KevinGH\Box\Configuration\NoConfigurationFound;
-use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\NotInstantiable;
 use function sprintf;

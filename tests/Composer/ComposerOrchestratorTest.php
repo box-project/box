@@ -14,10 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
+use Fidry\Console\DisplayNormalizer;
 use function file_get_contents;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function iterator_to_array;
-use KevinGH\Box\Console\DisplayNormalizer;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\mirror;
 use KevinGH\Box\Test\FileSystemTestCase;

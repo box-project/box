@@ -17,8 +17,11 @@ namespace KevinGH\Box\Console\Command;
 use function array_map;
 use function array_shift;
 use function array_unshift;
-use function count;
 use function explode;
+use Fidry\Console\Command\Command;
+use Fidry\Console\Command\Configuration as ConsoleConfiguration;
+use Fidry\Console\ExitCode;
+use Fidry\Console\Input\IO;
 use function getcwd;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function implode;
@@ -29,7 +32,6 @@ use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
 use KevinGH\Box\Configuration\Configuration;
-use KevinGH\Box\Console\IO\IO;
 use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\make_path_relative;
@@ -43,51 +45,48 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 
 // TODO: replace the PHP-Scoper compactor in order to warn the user about scoping errors
-final class Process extends BaseCommand
+final class Process implements Command
 {
     private const FILE_ARGUMENT = 'file';
 
     private const NO_RESTART_OPTION = 'no-restart';
     private const NO_CONFIG_OPTION = 'no-config';
 
-    protected function configure(): void
+    public function getConfiguration(): ConsoleConfiguration
     {
-        parent::configure();
-
-        $this->setName('process');
-        $this->setDescription('⚡  Applies the registered compactors and replacement values on a file');
-        $this->setHelp(
-            'The <info>%command.name%</info> command will apply the registered compactors and replacement values '
-            .'on the the given file. This is useful to debug the scoping of a specific file for example.',
+        return new ConsoleConfiguration(
+            'process',
+            '⚡  Applies the registered compactors and replacement values on a file',
+            'The <info>%command.name%</info> command will apply the registered compactors and replacement values on the the given file. This is useful to debug the scoping of a specific file for example.',
+            [
+                new InputArgument(
+                    self::FILE_ARGUMENT,
+                    InputArgument::REQUIRED,
+                    'Path to the file to process',
+                ),
+            ],
+            [
+                new InputOption(
+                    self::NO_RESTART_OPTION,
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Do not restart the PHP process. Box restarts the process by default to disable xdebug',
+                ),
+                new InputOption(
+                    self::NO_CONFIG_OPTION,
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Ignore the config file even when one is specified with the --config option',
+                ),
+                ConfigOption::getOptionInput(),
+                ChangeWorkingDirOption::getOptionInput(),
+            ],
         );
-
-        $this->addArgument(
-            self::FILE_ARGUMENT,
-            InputArgument::REQUIRED,
-            'Path to the file to process',
-        );
-        $this->addOption(
-            self::NO_RESTART_OPTION,
-            null,
-            InputOption::VALUE_NONE,
-            'Do not restart the PHP process. Box restarts the process by default to disable xdebug',
-        );
-        $this->addOption(
-            self::NO_CONFIG_OPTION,
-            null,
-            InputOption::VALUE_NONE,
-            'Ignore the config file even when one is specified with the --config option',
-        );
-
-        $this->getDefinition()->addOption(ConfigOption::getOptionInput());
-        $this->getDefinition()->addOption(ChangeWorkingDirOption::getOptionInput());
     }
 
-    protected function executeCommand(IO $io): int
+    public function execute(IO $io): int
     {
-        $input = $io->getInput();
-
-        if ($input->getOption(self::NO_RESTART_OPTION)) {
+        if ($io->getOption(self::NO_RESTART_OPTION)->asBoolean()) {
             putenv(BOX_ALLOW_XDEBUG.'=1');
         }
 
@@ -97,13 +96,12 @@ final class Process extends BaseCommand
 
         $io->newLine();
 
-        $config = $input->getOption(self::NO_CONFIG_OPTION)
+        $config = $io->getOption(self::NO_CONFIG_OPTION)->asBoolean()
             ? Configuration::create(null, new stdClass())
             : ConfigOption::getConfig($io, true)
         ;
 
-        /** @var string $filePath */
-        $filePath = $input->getArgument(self::FILE_ARGUMENT);
+        $filePath = $io->getArgument(self::FILE_ARGUMENT)->asNonEmptyString();
 
         $path = make_path_relative($filePath, $config->getBasePath());
 
@@ -154,7 +152,7 @@ final class Process extends BaseCommand
             }
         }
 
-        return self::SUCCESS;
+        return ExitCode::SUCCESS;
     }
 
     private static function retrieveCompactors(Configuration $config): Compactors

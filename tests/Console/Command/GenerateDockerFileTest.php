@@ -14,11 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use KevinGH\Box\Console\DisplayNormalizer;
+use Fidry\Console\Command\Command;
+use Fidry\Console\ExitCode;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use function realpath;
-use Symfony\Component\Console\Command\Command;
 
 /**
  * @covers \KevinGH\Box\Console\Command\GenerateDockerFile
@@ -62,13 +62,7 @@ class GenerateDockerFileTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame(
-            $expected,
-            DisplayNormalizer::removeTrailingSpaces(
-                $this->commandTester->getDisplay(true),
-            ),
-        );
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
         $this->assertFileExists($this->tmp.'/Dockerfile');
     }
@@ -90,13 +84,7 @@ class GenerateDockerFileTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame(
-            $expected,
-            DisplayNormalizer::removeTrailingSpaces(
-                $this->commandTester->getDisplay(true),
-            ),
-        );
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::FAILURE);
 
         $this->assertFileDoesNotExist($this->tmp.'/Dockerfile');
     }
@@ -118,12 +106,6 @@ class GenerateDockerFileTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame(
-            $expected,
-            DisplayNormalizer::removeTrailingSpaces(
-                $this->commandTester->getDisplay(true),
-            ),
-        );
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::FAILURE);
     }
 }

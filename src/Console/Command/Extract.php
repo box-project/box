@@ -15,9 +15,12 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use function count;
+use Fidry\Console\Command\Command;
+use Fidry\Console\Command\Configuration;
+use Fidry\Console\ExitCode;
+use Fidry\Console\Input\IO;
 use KevinGH\Box\Box;
 use function KevinGH\Box\bump_open_file_descriptor_limit;
-use KevinGH\Box\Console\IO\IO;
 use function KevinGH\Box\create_temporary_phar;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\remove;
@@ -34,42 +37,45 @@ use Throwable;
 /**
  * @private
  */
-final class Extract extends BaseCommand
+final class Extract implements Command
 {
     private const PHAR_ARG = 'phar';
     private const OUTPUT_ARG = 'output';
 
-    protected function configure(): void
+    public function getConfiguration(): Configuration
     {
-        $this->setName('extract');
-        $this->setDescription(
+        return new Configuration(
+            'extract',
             '🚚  Extracts a given PHAR into a directory',
-        );
-        $this->addArgument(
-            self::PHAR_ARG,
-            InputArgument::REQUIRED,
-            'The PHAR file.',
-        );
-        $this->addArgument(
-            self::OUTPUT_ARG,
-            InputArgument::REQUIRED,
-            'The output directory',
+            '',
+            [
+                new InputArgument(
+                    self::PHAR_ARG,
+                    InputArgument::REQUIRED,
+                    'The PHAR file.',
+                ),
+                new InputArgument(
+                    self::OUTPUT_ARG,
+                    InputArgument::REQUIRED,
+                    'The output directory',
+                ),
+            ],
         );
     }
 
-    protected function executeCommand(IO $io): int
+    public function execute(IO $io): int
     {
         $filePath = self::getPharFilePath($io);
-        $outputDir = $io->getInput()->getArgument(self::OUTPUT_ARG);
+        $outputDir = $io->getArgument(self::OUTPUT_ARG)->asNonEmptyString();
 
         if (null === $filePath) {
-            return self::FAILURE;
+            return ExitCode::FAILURE;
         }
 
         [$box, $cleanUpTmpPhar] = $this->getBox($filePath, $io);
 
         if (null === $box) {
-            return self::FAILURE;
+            return ExitCode::FAILURE;
         }
 
         $restoreLimit = bump_open_file_descriptor_limit(count($box), $io);
@@ -84,16 +90,15 @@ final class Extract extends BaseCommand
         } catch (RuntimeException $exception) {
             $io->error($exception->getMessage());
 
-            return self::FAILURE;
+            return ExitCode::FAILURE;
         }
 
-        return self::SUCCESS;
+        return ExitCode::SUCCESS;
     }
 
     private static function getPharFilePath(IO $io): ?string
     {
-        $filePathArg = $io->getInput()->getArgument(self::PHAR_ARG);
-        $filePath = realpath((string) $filePathArg);
+        $filePath = realpath($io->getArgument(self::PHAR_ARG)->asString());
 
         if (false !== $filePath) {
             return $filePath;
@@ -102,7 +107,7 @@ final class Extract extends BaseCommand
         $io->error(
             sprintf(
                 'The file "%s" could not be found.',
-                $filePathArg,
+                $io->getArgument(self::PHAR_ARG)->asRaw(),
             ),
         );
 

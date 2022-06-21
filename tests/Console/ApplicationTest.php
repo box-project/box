@@ -14,9 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
+use Fidry\Console\ExitCode;
+use Fidry\Console\Test\AppTester;
+use Fidry\Console\Test\OutputAssertions;
 use PHPUnit\Framework\TestCase;
-use function preg_replace;
-use Symfony\Component\Console\Tester\ApplicationTester;
 
 /**
  * @covers \KevinGH\Box\Console\Application
@@ -25,63 +26,68 @@ class ApplicationTest extends TestCase
 {
     public function test_it_can_display_the_version_when_no_specific_version_is_given(): void
     {
-        $application = new Application();
-        $application->setAutoExit(false);
-        $application->setCatchExceptions(false);
+        $application = new Application(
+            autoExit: false,
+            catchExceptions: false,
+        );
 
-        $appTester = new ApplicationTester($application);
+        $appTester = AppTester::fromConsoleApp($application);
 
         $input = ['--version'];
 
         $appTester->run($input);
 
-        $this->assertSame(0, $appTester->getStatusCode());
+        $this->assertSame(ExitCode::SUCCESS, $appTester->getStatusCode());
 
         $expected = <<<'EOF'
             Box version 3.x-dev@151e40a
 
             EOF;
 
-        $actual = preg_replace(
-            '/Box version .+@[a-z\d]{7}/',
-            'Box version 3.x-dev@151e40a',
-            $appTester->getDisplay(true),
+        OutputAssertions::assertSameOutput(
+            $expected,
+            ExitCode::SUCCESS,
+            $appTester,
+            DisplayNormalizer::createReplaceBoxVersionNormalizer(),
         );
-
-        $this->assertSame($expected, $actual);
     }
 
     public function test_it_can_display_the_version_when_a_specific_version_is_given(): void
     {
-        $application = new Application('Box', '1.2.3', '2018-04-29 19:33:12');
-        $application->setAutoExit(false);
-        $application->setCatchExceptions(false);
+        $application = new Application(
+            'Box',
+            '1.2.3',
+            '2018-04-29 19:33:12',
+            false,
+            false,
+        );
 
-        $appTester = new ApplicationTester($application);
+        $appTester = AppTester::fromConsoleApp($application);
 
         $input = ['--version'];
 
         $appTester->run($input);
-
-        $this->assertSame(0, $appTester->getStatusCode());
 
         $expected = <<<'EOF'
             Box version 1.2.3 2018-04-29 19:33:12
 
             EOF;
 
-        $actual = $appTester->getDisplay(true);
-
-        $this->assertSame($expected, $actual);
+        OutputAssertions::assertSameOutput(
+            $expected,
+            ExitCode::SUCCESS,
+            $appTester,
+        );
     }
 
     public function test_get_helper_menu(): void
     {
-        $application = new Application();
-        $application->setAutoExit(false);
-        $application->setCatchExceptions(false);
+        $application = new Application(
+            autoExit: false,
+            catchExceptions: false,
+        );
 
-        $appTester = new ApplicationTester($application);
+        $appTester = AppTester::fromConsoleApp($application);
 
         $appTester->run([]);
 
@@ -123,12 +129,11 @@ class ApplicationTest extends TestCase
 
             EOF;
 
-        $actual = preg_replace(
-            '/Box version .+@[a-z\d]{7}/',
-            'Box version 3.x-dev@151e40a',
-            $appTester->getDisplay(true),
+        OutputAssertions::assertSameOutput(
+            $expected,
+            ExitCode::SUCCESS,
+            $appTester,
+            DisplayNormalizer::createReplaceBoxVersionNormalizer(),
         );
-
-        $this->assertSame($expected, $actual);
     }
 }

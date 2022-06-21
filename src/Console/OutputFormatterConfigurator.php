@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
-use KevinGH\Box\Console\IO\IO;
+use Fidry\Console\Input\IO;
 use KevinGH\Box\NotInstantiable;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;

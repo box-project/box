@@ -14,14 +14,14 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Fidry\Console\Command\Command;
+use Fidry\Console\ExitCode;
 use KevinGH\Box\Console\DisplayNormalizer;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\touch;
 use KevinGH\Box\Test\CommandTestCase;
-use function preg_replace;
 use RuntimeException;
 use function str_replace;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -63,8 +63,7 @@ class ValidateTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_reports_the_recommendations_found(): void
@@ -102,8 +101,7 @@ class ValidateTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::FAILURE);
     }
 
     public function test_it_does_not_fail_when_recommendations_are_found_but_ignore_message_is_passed(): void
@@ -142,8 +140,7 @@ class ValidateTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_reports_the_warnings_found(): void
@@ -181,8 +178,7 @@ class ValidateTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::FAILURE);
     }
 
     public function test_it_does_not_fail_when_warnings_are_found_but_ignore_message_is_passed(): void
@@ -221,8 +217,7 @@ class ValidateTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_reports_the_recommendations_and_warnings_found(): void
@@ -262,8 +257,7 @@ class ValidateTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::FAILURE);
     }
 
     public function test_an_unknown_file_is_invalid(): void
@@ -279,8 +273,7 @@ class ValidateTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, $this->commandTester->getDisplay(true));
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::FAILURE);
     }
 
     public function test_an_unknown_file_is_invalid_in_verbose_mode(): void
@@ -327,16 +320,11 @@ class ValidateTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-
-        $actual = preg_replace(
-            '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
-            ' // Loading the configuration file "box.json".',
-            $actual,
+        $this->assertSameOutput(
+            $expected,
+            ExitCode::FAILURE,
+            DisplayNormalizer::createLoadingFilePathOutputNormalizer(),
         );
-
-        $this->assertSame($expected, $actual);
-        $this->assertSame(1, $this->commandTester->getStatusCode());
     }
 
     public function test_an_invalid_json_file_is_invalid_in_verbose_mode(): void
@@ -392,16 +380,11 @@ class ValidateTest extends CommandTestCase
                 EOF,
         );
 
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-
-        $actual = preg_replace(
-            '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
-            ' // Loading the configuration file "box.json".',
-            $actual,
+        $this->assertSameOutput(
+            $expected,
+            ExitCode::FAILURE,
+            DisplayNormalizer::createLoadingFilePathOutputNormalizer(),
         );
-
-        $this->assertSame($expected, $actual);
-        $this->assertSame(1, $this->commandTester->getStatusCode());
     }
 
     public function test_an_incorrect_config_file_is_invalid_in_verbose_mode(): void

@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Fidry\Console\Input\IO;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\ConfigurationLoader;
-use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\NotInstantiable;
 use Symfony\Component\Console\Input\InputOption;

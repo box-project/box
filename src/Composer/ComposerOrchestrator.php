@@ -14,10 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
+use Fidry\Console\Input\IO;
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
-use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Console\Logger\CompilerLogger;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;

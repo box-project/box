@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use function chdir;
+use Fidry\Console\Input\IO;
 use function getcwd;
-use KevinGH\Box\Console\IO\IO;
 use function sprintf;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputOption;
@@ -43,7 +43,7 @@ final class ChangeWorkingDirOption
 
     public static function changeWorkingDirectory(IO $io): void
     {
-        $workingDir = $io->getInput()->getOption(self::WORKING_DIR_OPT);
+        $workingDir = $io->getOption(self::WORKING_DIR_OPT)->asNullableNonEmptyString();
 
         if (null === $workingDir) {
             return;

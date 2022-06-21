@@ -14,24 +14,35 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Fidry\Console\Command\Command;
+use Fidry\Console\Command\Configuration;
+use Fidry\Console\ExitCode;
+use Fidry\Console\Input\IO;
 use KevinGH\Box\Configuration\Configuration as BoxConfiguration;
-use KevinGH\Box\Console\IO\IO;
 
-class TestConfigurableCommand extends BaseCommand
+class TestConfigurableCommand implements Command
 {
     public BoxConfiguration $config;
 
     public bool $allowNoFile = false;
 
-    protected function configure(): void
+    public function getConfiguration(): Configuration
     {
-        $this->getDefinition()->addOption(ConfigOption::getOptionInput());
+        return new Configuration(
+            'TestCommand',
+            'Command used to test ConfigOption',
+            '',
+            [],
+            [
+                ConfigOption::getOptionInput(),
+            ],
+        );
     }
 
-    protected function executeCommand(IO $io): int
+    public function execute(IO $io): int
     {
         $this->config = ConfigOption::getConfig($io, $this->allowNoFile);
 
-        return 0;
+        return ExitCode::SUCCESS;
     }
 }

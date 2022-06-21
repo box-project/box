@@ -14,15 +14,16 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Fidry\Console\Command\Command;
+use Fidry\Console\DisplayNormalizer;
+use Fidry\Console\ExitCode;
 use InvalidArgumentException;
-use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use function ob_get_clean;
 use function ob_start;
 use const PHP_VERSION_ID;
 use function realpath;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use UnexpectedValueException;
@@ -73,8 +74,6 @@ class DiffTest extends CommandTestCase
             ],
         );
 
-        $actualOutput = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-
         $expectedOutput = <<<'OUTPUT'
 
              // Comparing the two archives... (do not check the signatures)
@@ -94,8 +93,7 @@ class DiffTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expectedOutput, $actualOutput);
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expectedOutput, ExitCode::FAILURE);
     }
 
     /**
@@ -111,13 +109,14 @@ class DiffTest extends CommandTestCase
         if (null !== $expectedOutput) {
             $this->assertSame($expectedOutput, $actualOutput);
         }
+
         $this->assertSame($expectedStatusCode, $this->commandTester->getStatusCode());
     }
 
     /**
      * @dataProvider GNUDiffPharsProvider
      */
-    public function test_it_can_display_the__gn_u_diff_of_two_phar_files(
+    public function test_it_can_display_the_gnu_diff_of_two_phar_files(
         callable $executeCommand,
         ?string $expectedOutput,
         int $expectedStatusCode,
@@ -127,6 +126,7 @@ class DiffTest extends CommandTestCase
         if (null !== $expectedOutput) {
             $this->assertSame($expectedOutput, $actualOutput);
         }
+
         $this->assertSame($expectedStatusCode, $this->commandTester->getStatusCode());
     }
 
@@ -224,7 +224,6 @@ class DiffTest extends CommandTestCase
                 'pharB' => $pharPath,
             ],
         );
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
         $expected = <<<'OUTPUT'
 
@@ -239,50 +238,37 @@ class DiffTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, $actual);
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_cannot_compare_phars_which_are_signed_with_a_private_key(): void
     {
-        try {
-            $this->commandTester->execute(
-                [
-                    'command' => 'diff',
-                    'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
-                    'pharB' => realpath(self::FIXTURES_DIR.'/openssl.phar'),
-                ],
-                ['verbosity' => OutputInterface::VERBOSITY_DEBUG],
-            );
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessageMatches('/openssl signature could not be verified/');
 
-            $this->fail('Expected exception to be thrown.');
-        } catch (UnexpectedValueException $exception) {
-            $this->assertMatchesRegularExpression(
-                '/openssl signature could not be verified/',
-                $exception->getMessage(),
-            );
-        }
+        $this->commandTester->execute(
+            [
+                'command' => 'diff',
+                'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
+                'pharB' => realpath(self::FIXTURES_DIR.'/openssl.phar'),
+            ],
+            ['verbosity' => OutputInterface::VERBOSITY_DEBUG],
+        );
     }
 
     public function test_it_does_not_swallow_exceptions_in_debug_mode(): void
     {
-        try {
-            $this->commandTester->execute(
-                [
-                    'command' => 'diff',
-                    'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
-                    'pharB' => realpath(self::FIXTURES_DIR.'/not-a-phar.phar'),
-                ],
-                ['verbosity' => OutputInterface::VERBOSITY_DEBUG],
-            );
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessageMatches('/^internal corruption of phar \".*\.phar\" \(__HALT_COMPILER\(\); not found\)/');
 
-            $this->fail('Expected exception to be thrown.');
-        } catch (UnexpectedValueException $exception) {
-            $this->assertMatchesRegularExpression(
-                '/^internal corruption of phar \".*\.phar\" \(__HALT_COMPILER\(\); not found\)/',
-                $exception->getMessage(),
-            );
-        }
+        $this->commandTester->execute(
+            [
+                'command' => 'diff',
+                'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
+                'pharB' => realpath(self::FIXTURES_DIR.'/not-a-phar.phar'),
+            ],
+            ['verbosity' => OutputInterface::VERBOSITY_DEBUG],
+        );
     }
 
     public static function listDiffPharsProvider(): iterable

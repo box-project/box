@@ -14,12 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use KevinGH\Box\Console\DisplayNormalizer;
+use Fidry\Console\Command\Command;
+use Fidry\Console\ExitCode;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
-use function preg_replace;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
@@ -62,10 +61,7 @@ class ExtractTest extends CommandTestCase
 
         $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-
-        $this->assertSame('', $actual);
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput('', ExitCode::SUCCESS);
     }
 
     public function test_it_can_extract_a_phar_without_the_phar_extension(): void
@@ -89,10 +85,7 @@ class ExtractTest extends CommandTestCase
 
         $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-
-        $this->assertSame('', $actual);
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput('', ExitCode::SUCCESS);
     }
 
     public function test_it_can_extract_a_compressed_phar(): void
@@ -116,10 +109,7 @@ class ExtractTest extends CommandTestCase
 
         $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-
-        $this->assertSame('', $actual);
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput('', ExitCode::SUCCESS);
     }
 
     public function test_it_cannot_extract_an_invalid_phar(): void
@@ -147,11 +137,7 @@ class ExtractTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-        $actual = preg_replace('/file[\ \n]+"/', 'file "', $actual);
-
-        $this->assertSame($expectedOutput, $actual);
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expectedOutput, ExitCode::FAILURE);
     }
 
     public function test_it_provides_the_original_exception_in_debug_mode_when_cannot_extract_an_invalid_phar(): void
@@ -209,11 +195,7 @@ class ExtractTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-        $actual = preg_replace('/file[\ \n]+"/', 'file "', $actual);
-
-        $this->assertSame($expectedOutput, $actual);
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expectedOutput, ExitCode::FAILURE);
     }
 
     public function test_it_cannot_extract_an_unknown_file(): void
@@ -239,11 +221,7 @@ class ExtractTest extends CommandTestCase
 
             OUTPUT;
 
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-        $actual = preg_replace('/file[\ \n]+"/', 'file "', $actual);
-
-        $this->assertSame($expectedOutput, $actual);
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expectedOutput, ExitCode::FAILURE);
     }
 
     /**

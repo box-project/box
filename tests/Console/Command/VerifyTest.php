@@ -14,12 +14,13 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Fidry\Console\Command\Command;
+use Fidry\Console\ExitCode;
 use InvalidArgumentException;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
 use function realpath;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -65,8 +66,7 @@ class VerifyTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, $this->commandTester->getDisplay(true));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_can_verify_a_phar_which_does_not_have_the_phar_extension(): void
@@ -88,8 +88,7 @@ class VerifyTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, $this->commandTester->getDisplay(true));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     /**
@@ -119,27 +118,20 @@ class VerifyTest extends CommandTestCase
 
             OUTPUT;
 
-        $this->assertSame($expected, $this->commandTester->getDisplay(true));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_cannot_verify_an_unknown_file(): void
     {
-        try {
-            $this->commandTester->execute(
-                [
-                    'command' => 'verify',
-                    'phar' => 'unknown',
-                ],
-            );
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The file "unknown" does not exist.');
 
-            $this->fail('Expected exception to be thrown.');
-        } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
-                'The file "unknown" does not exist.',
-                $exception->getMessage(),
-            );
-        }
+        $this->commandTester->execute(
+            [
+                'command' => 'verify',
+                'phar' => 'unknown',
+            ],
+        );
     }
 
     /**
@@ -158,7 +150,7 @@ class VerifyTest extends CommandTestCase
             $this->commandTester->getDisplay(true),
         );
 
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSame(ExitCode::FAILURE, $this->commandTester->getStatusCode());
     }
 
     public static function passingPharPathsProvider(): iterable

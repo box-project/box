@@ -17,8 +17,12 @@ namespace KevinGH\Box\Console\Command;
 use function array_filter;
 use function array_flip;
 use DirectoryIterator;
+use Fidry\Console\Command\Command;
+use Fidry\Console\Command\Configuration;
+use Fidry\Console\ExitCode;
+use Fidry\Console\Input\IO;
+use function implode;
 use function is_array;
-use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Console\PharInfoRenderer;
 use function KevinGH\Box\create_temporary_phar;
 use function KevinGH\Box\FileSystem\remove;
@@ -37,12 +41,11 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Path;
 use Throwable;
-use Webmozart\Assert\Assert;
 
 /**
  * @private
  */
-final class Info extends BaseCommand
+final class Info implements Command
 {
     private const PHAR_ARG = 'phar';
     private const LIST_OPT = 'list';
@@ -50,24 +53,25 @@ final class Info extends BaseCommand
     private const MODE_OPT = 'mode';
     private const DEPTH_OPT = 'depth';
 
+    private const MODES = [
+        'indent',
+        'flat',
+    ];
+
     private static array $FILE_ALGORITHMS;
 
-    public function __construct(?string $name = null)
+    public function __construct()
     {
-        parent::__construct($name);
-
         if (!isset(self::$FILE_ALGORITHMS)) {
             self::$FILE_ALGORITHMS = array_flip(array_filter(get_phar_compression_algorithms()));
         }
     }
 
-    protected function configure(): void
+    public function getConfiguration(): Configuration
     {
-        $this->setName('info');
-        $this->setDescription(
+        return new Configuration(
+            'info',
             '🔍  Displays information about the PHAR extension or file',
-        );
-        $this->setHelp(
             <<<'HELP'
                 The <info>%command.name%</info> command will display information about the Phar extension,
                 or the Phar file if specified.
@@ -80,55 +84,58 @@ final class Info extends BaseCommand
                 instead choose to view a flat listing, by setting the <info>--mode|-m</info> option
                 to <comment>flat</comment>.
                 HELP,
-        );
-        $this->addArgument(
-            self::PHAR_ARG,
-            InputArgument::OPTIONAL,
-            'The Phar file.',
-        );
-        $this->addOption(
-            self::LIST_OPT,
-            'l',
-            InputOption::VALUE_NONE,
-            'List the contents of the Phar?',
-        );
-        $this->addOption(
-            self::METADATA_OPT,
-            null,
-            InputOption::VALUE_NONE,
-            'Display metadata?',
-        );
-        $this->addOption(
-            self::MODE_OPT,
-            'm',
-            InputOption::VALUE_REQUIRED,
-            'The listing mode. (default: indent, options: indent, flat)',
-            'indent',
-        );
-        $this->addOption(
-            self::DEPTH_OPT,
-            'd',
-            InputOption::VALUE_REQUIRED,
-            'The depth of the tree displayed',
-            -1,
+            [
+                new InputArgument(
+                    self::PHAR_ARG,
+                    InputArgument::OPTIONAL,
+                    'The Phar file.',
+                ),
+            ],
+            [
+                new InputOption(
+                    self::LIST_OPT,
+                    'l',
+                    InputOption::VALUE_NONE,
+                    'List the contents of the Phar?',
+                ),
+                new InputOption(
+                    self::METADATA_OPT,
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Display metadata?',
+                ),
+                new InputOption(
+                    self::MODE_OPT,
+                    'm',
+                    InputOption::VALUE_REQUIRED,
+                    sprintf(
+                        'The listing mode. Modes available: "%s"',
+                        implode('", "', self::MODES),
+                    ),
+                    'indent',
+                ),
+                new InputOption(
+                    self::DEPTH_OPT,
+                    'd',
+                    InputOption::VALUE_REQUIRED,
+                    'The depth of the tree displayed',
+                    '-1',
+                ),
+            ],
         );
     }
 
-    public function executeCommand(IO $io): int
+    public function execute(IO $io): int
     {
-        $input = $io->getInput();
-
         $io->newLine();
 
-        $file = $input->getArgument(self::PHAR_ARG);
+        $file = $io->getArgument(self::PHAR_ARG)->asNullableNonEmptyString();
 
         if (null === $file) {
             return self::showGlobalInfo($io);
         }
 
         $file = Path::canonicalize($file);
-
-        /** @var string $file */
         $fileRealPath = realpath($file);
 
         if (false === $fileRealPath) {
@@ -139,32 +146,31 @@ final class Info extends BaseCommand
                 ),
             );
 
-            return self::FAILURE;
+            return ExitCode::FAILURE;
         }
 
         $tmpFile = create_temporary_phar($fileRealPath);
 
         try {
-            return $this->showInfo($tmpFile, $fileRealPath, $io);
+            return self::showInfo($tmpFile, $fileRealPath, $io);
         } finally {
             remove($tmpFile);
         }
     }
 
-    public function showInfo(string $file, string $originalFile, IO $io): int
+    public static function showInfo(string $file, string $originalFile, IO $io): int
     {
-        $input = $io->getInput();
-
-        $depth = self::getMaxDepth($io);
+        $maxDepth = self::getMaxDepth($io);
+        $mode = $io->getOption(self::MODE_OPT)->asStringChoice(self::MODES);
 
         try {
             $pharInfo = new PharInfo($file);
 
-            return $this->showPharInfo(
+            return self::showPharInfo(
                 $pharInfo,
-                $input->getOption(self::LIST_OPT),
-                $depth,
-                'indent' === $input->getOption(self::MODE_OPT),
+                $io->getOption(self::LIST_OPT)->asBoolean(),
+                $maxDepth,
+                'indent' === $mode,
                 $io,
             );
         } catch (Throwable $throwable) {
@@ -179,7 +185,7 @@ final class Info extends BaseCommand
                 ),
             );
 
-            return self::FAILURE;
+            return ExitCode::FAILURE;
         }
     }
 
@@ -188,15 +194,14 @@ final class Info extends BaseCommand
      */
     private static function getMaxDepth(IO $io): int
     {
-        $depth = (int) $io->getInput()->getOption(self::DEPTH_OPT);
+        $option = $io->getOption(self::DEPTH_OPT);
 
-        Assert::greaterThanEq(
-            $depth,
-            -1,
-            'Expected the depth to be a positive integer or -1, got "%d"',
-        );
-
-        return $depth;
+        return '-1' === $option->asRaw()
+            ? -1
+            : $option->asNatural(sprintf(
+                'Expected the depth to be a positive integer or -1: "%s".',
+                $option->asRaw(),
+            ));
     }
 
     private static function showGlobalInfo(IO $io): int
@@ -213,20 +218,20 @@ final class Info extends BaseCommand
         $io->newLine();
         $io->comment('Get a PHAR details by giving its path as an argument.');
 
-        return self::SUCCESS;
+        return ExitCode::SUCCESS;
     }
 
-    private function showPharInfo(
+    private static function showPharInfo(
         PharInfo $pharInfo,
         bool $content,
         int $depth,
         bool $indent,
         IO $io,
     ): int {
-        $this->showPharMeta($pharInfo, $io);
+        self::showPharMeta($pharInfo, $io);
 
         if ($content) {
-            $this->renderContents(
+            self::renderContents(
                 $io,
                 $pharInfo->getPhar(),
                 0,
@@ -240,10 +245,10 @@ final class Info extends BaseCommand
             $io->comment('Use the <info>--list|-l</info> option to list the content of the PHAR.');
         }
 
-        return self::SUCCESS;
+        return ExitCode::SUCCESS;
     }
 
-    private function showPharMeta(PharInfo $pharInfo, IO $io): void
+    private static function showPharMeta(PharInfo $pharInfo, IO $io): void
     {
         $io->writeln(
             sprintf(
@@ -295,10 +300,11 @@ final class Info extends BaseCommand
     }
 
     /**
-     * @param iterable|PharFileInfo[] $list
-     * @param false|int               $indent Nbr of indent or `false`
+     * @param iterable<PharFileInfo> $list
+     * @param -1|natural             $maxDepth
+     * @param false|int              $indent   Nbr of indent or `false`
      */
-    private function renderContents(
+    private static function renderContents(
         OutputInterface $output,
         iterable $list,
         int $depth,
@@ -355,7 +361,7 @@ final class Info extends BaseCommand
             }
 
             if ($item->isDir()) {
-                $this->renderContents(
+                self::renderContents(
                     $output,
                     new DirectoryIterator($item->getPathname()),
                     $depth + 1,

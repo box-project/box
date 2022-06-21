@@ -14,8 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Fidry\Console\Command\Command;
+use Fidry\Console\Command\Configuration;
+use Fidry\Console\ExitCode;
+use Fidry\Console\Input\IO;
 use function file_exists;
-use KevinGH\Box\Console\IO\IO;
 use function KevinGH\Box\create_temporary_phar;
 use function KevinGH\Box\FileSystem\copy;
 use function KevinGH\Box\FileSystem\remove;
@@ -30,21 +33,21 @@ use Webmozart\Assert\Assert;
 /**
  * @private
  */
-final class Verify extends BaseCommand
+final class Verify implements Command
 {
     private const PHAR_ARG = 'phar';
 
-    protected function configure(): void
+    public function getConfiguration(): Configuration
     {
-        $this->setName('verify');
-        $this->setDescription('🔐️  Verifies the PHAR signature');
-        $this->setHelp(
+        return new Configuration(
+            'verify',
+            '🔐️  Verifies the PHAR signature',
             <<<'HELP'
                 The <info>%command.name%</info> command will verify the signature of the PHAR.
 
                 <question>Why would I require that box handle the verification process?</question>
 
-                If you meet all of the following conditions:
+                If you meet all the following conditions:
                  - The <comment>openssl</comment> extension is not installed
                  - You need to verify a PHAR signed using a private key
 
@@ -52,15 +55,17 @@ final class Verify extends BaseCommand
                 either extensions. <error>Note however, that the entire PHAR will need
                 to be read into memory before the verification can be performed.</error>
                 HELP,
-        );
-        $this->addArgument(
-            self::PHAR_ARG,
-            InputArgument::REQUIRED,
-            'The PHAR file',
+            [
+                new InputArgument(
+                    self::PHAR_ARG,
+                    InputArgument::REQUIRED,
+                    'The PHAR file',
+                ),
+            ],
         );
     }
 
-    protected function executeCommand(IO $io): int
+    public function execute(IO $io): int
     {
         $pharFilePath = self::getPharFilePath($io);
 
@@ -90,13 +95,13 @@ final class Verify extends BaseCommand
             ),
         );
 
-        return self::SUCCESS;
+        return ExitCode::SUCCESS;
     }
 
     private static function getPharFilePath(IO $io): string
     {
         $pharPath = Path::canonicalize(
-            $io->getInput()->getArgument(self::PHAR_ARG),
+            $io->getArgument(self::PHAR_ARG)->asNonEmptyString(),
         );
 
         Assert::file($pharPath);
@@ -160,6 +165,6 @@ final class Verify extends BaseCommand
             throw $throwable;
         }
 
-        return self::FAILURE;
+        return ExitCode::FAILURE;
     }
 }

@@ -16,29 +16,30 @@ namespace KevinGH\Box\Console\Command;
 
 use function current;
 use function explode;
-use KevinGH\Box\Console\IO\IO;
+use Fidry\Console\Command\Command;
+use Fidry\Console\Command\Configuration;
+use Fidry\Console\ExitCode;
+use Fidry\Console\Input\IO;
 
-final class Namespace_ extends BaseCommand
+final class Namespace_ implements Command
 {
-    protected function configure(): void
+    public function getConfiguration(): Configuration
     {
-        parent::configure();
-
-        $this->setName('namespace');
-        $this->setDescription('Prints the first part of the command namespace');
-        $this->setHelp(
+        return new Configuration(
+            'namespace',
+            'Prints the first part of the command namespace',
             <<<'HELP'
                 This command is purely for debugging purposes to ensure it is scoped correctly.
                 HELP,
         );
     }
 
-    protected function executeCommand(IO $io): int
+    public function execute(IO $io): int
     {
         $namespace = current(explode('\\', self::class));
 
         $io->writeln($namespace);
 
-        return self::SUCCESS;
+        return ExitCode::SUCCESS;
     }
 }

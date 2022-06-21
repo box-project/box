@@ -15,10 +15,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use Fidry\Console\Application\ApplicationRunner;
+use Fidry\Console\Input\IO;
 use function file_exists;
 use function in_array;
 use KevinGH\Box\Console\Application;
-use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Console\OutputFormatterConfigurator;
 use const PHP_EOL;
 use const PHP_SAPI;
@@ -54,5 +55,5 @@ register_error_handler();
 $io = IO::createDefault();
 OutputFormatterConfigurator::configure($io);
 
-$app = new Application();
-$app->run($io->getInput(), $io->getOutput());
+$runner = new ApplicationRunner(new Application());
+$runner->run($io);
