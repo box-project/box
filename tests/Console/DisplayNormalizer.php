@@ -32,8 +32,6 @@ final class DisplayNormalizer
         return implode("\n", $lines);
     }
 
-
-
     /**
      * @return callable(string):string
      */

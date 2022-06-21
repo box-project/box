@@ -20,7 +20,6 @@ use KevinGH\Box\Console\DisplayNormalizer;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\touch;
 use KevinGH\Box\Test\CommandTestCase;
-use function preg_replace;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -264,8 +263,7 @@ class ProcessTest extends CommandTestCase
         string $expectedOutput,
         int $expectedStatusCode,
         callable ...$extraNormalizers,
-    ): void
-    {
+    ): void {
         parent::assertSameOutput(
             $expectedOutput,
             $expectedStatusCode,

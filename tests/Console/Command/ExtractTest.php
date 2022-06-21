@@ -19,7 +19,6 @@ use Fidry\Console\ExitCode;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
-use function preg_replace;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
