@@ -1451,7 +1451,6 @@ final class Configuration
     }
 
     /**
-     * @param string[] $files
      * @param string[] $directories
      * @param string[] $excludedPaths
      * @param string[] $devPackages

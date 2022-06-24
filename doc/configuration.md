@@ -207,6 +207,8 @@ This setting is not affected by the [`blacklist`][blacklist] setting.
 such as images, those that contain binary data or simply a file you do not want to alter at all despite using
 [compactors][compactors].
 
+**Warning:** Symlinks are not followed/supported.
+
 
 ### Directories (`directories` and `directories-bin`)
 
@@ -225,7 +227,10 @@ to keep it, check the [force the auto-discovery][force-autodiscovery] setting.
 
 **Warning:** By default Box excludes some files (e.g. dot files, readmes & co). This is done in order to attempt to
 reduce the final PHAR size. There is at the moment no way to disable this (maybe this could be done via a new setting)
-but it remains possible to include them via [`files`][files], [`files-bin`][files] or `directories-bin`.
+but it remains possible to include them via [`files`][files], [`files-bin`][files], `directories-bin` or your own
+[`finder`][finder] or [`finder-bin`][finder].
+
+**Warning:** Symlinks are not followed/supported.
 
 
 ### Finder (`finder` and `finder-bin`)
@@ -243,6 +248,8 @@ such as images, those that contain binary data or simply a file you do not want 
 
 **Warning:** Setting the key `finder` (regardless of its value), will disable the file auto-discovery. If you want
 to keep it, check the [force the auto-discovery][force-autodiscovery] setting.
+
+**Warning:** Symlinks are not followed/supported.
 
 Example:
 
