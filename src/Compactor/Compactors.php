@@ -17,7 +17,7 @@ namespace KevinGH\Box\Compactor;
 use function array_reduce;
 use function count;
 use Countable;
-use Humbug\PhpScoper\Whitelist;
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\PhpScoper\Scoper;
 
 /**
@@ -25,8 +25,12 @@ use KevinGH\Box\PhpScoper\Scoper;
  */
 final class Compactors implements Compactor, Countable
 {
-    private $compactors;
-    private $scoperCompactor;
+    /**
+     * @var Compactor[]
+     */
+    private array $compactors;
+
+    private ?PhpScoper $scoperCompactor = null;
 
     public function __construct(Compactor ...$compactors)
     {
@@ -36,50 +40,45 @@ final class Compactors implements Compactor, Countable
             if ($compactor instanceof PhpScoper) {
                 $this->scoperCompactor = $compactor;
 
+                // We do not expect more than one Scoper Compactor. If there is more than
+                // one then the latter is ignored.
                 break;
             }
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function compact(string $file, string $contents): string
     {
         return (string) array_reduce(
             $this->compactors,
-            static function (string $contents, Compactor $compactor) use ($file): string {
-                return $compactor->compact($file, $contents);
-            },
-            $contents
+            static fn (string $contents, Compactor $compactor): string => $compactor->compact($file, $contents),
+            $contents,
         );
     }
 
     public function getScoper(): ?Scoper
     {
-        return null !== $this->scoperCompactor ? $this->scoperCompactor->getScoper() : null;
+        return $this->scoperCompactor?->getScoper();
     }
 
-    public function getScoperWhitelist(): ?Whitelist
+    public function getScoperSymbolsRegistry(): ?SymbolsRegistry
     {
-        return null !== $this->scoperCompactor ? $this->scoperCompactor->getScoper()->getWhitelist() : null;
+        return $this->scoperCompactor?->getScoper()->getSymbolsRegistry();
     }
 
-    public function registerWhitelist(Whitelist $whitelist): void
+    public function registerSymbolsRegistry(SymbolsRegistry $symbolsRegistry): void
     {
-        if (null !== $this->scoperCompactor) {
-            $this->scoperCompactor->getScoper()->changeWhitelist($whitelist);
-        }
+        $this->scoperCompactor?->getScoper()->changeSymbolsRegistry($symbolsRegistry);
     }
 
+    /**
+     * @return Compactor[]
+     */
     public function toArray(): array
     {
         return $this->compactors;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function count(): int
     {
         return count($this->compactors);

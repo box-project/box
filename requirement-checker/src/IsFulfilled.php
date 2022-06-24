@@ -17,8 +17,5 @@ namespace KevinGH\RequirementChecker;
  */
 interface IsFulfilled
 {
-    /**
-     * @return bool
-     */
-    public function __invoke();
+    public function __invoke(): bool;
 }

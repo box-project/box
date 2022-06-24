@@ -14,15 +14,17 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Fidry\Console\Command\Command;
+use Fidry\Console\ExitCode;
+use Fidry\Console\Test\OutputAssertions;
 use function getenv;
 use function implode;
 use InvalidArgumentException;
-use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
 use function preg_replace;
 use function realpath;
-use Symfony\Component\Console\Command\Command;
+use function str_replace;
 use Symfony\Component\Console\Output\OutputInterface;
 use UnexpectedValueException;
 
@@ -36,20 +38,17 @@ class InfoTest extends CommandTestCase
 {
     private const FIXTURES = __DIR__.'/../../../fixtures/info';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getCommand(): Command
     {
         return new Info();
     }
 
-    public function test_it_provides_info_about_the_phar__api(): void
+    public function test_it_provides_info_about_the_phar_api(): void
     {
         $this->commandTester->execute(
             [
                 'command' => 'info',
-            ]
+            ],
         );
 
         $version = Phar::apiVersion();
@@ -58,21 +57,20 @@ class InfoTest extends CommandTestCase
 
         $expected = <<<OUTPUT
 
-API Version: $version
+            API Version: $version
 
-Supported Compression:
-$compression
+            Supported Compression:
+            $compression
 
-Supported Signatures:
-$signatures
+            Supported Signatures:
+            $signatures
 
- // Get a PHAR details by giving its path as an argument.
+             // Get a PHAR details by giving its path as an argument.
 
 
-OUTPUT;
+            OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_provides_info_about_a_phar(): void
@@ -87,29 +85,28 @@ OUTPUT;
             [
                 'command' => 'info',
                 'phar' => $pharPath,
-            ]
+            ],
         );
 
         $expected = <<<OUTPUT
 
-API Version: $version
+            API Version: $version
 
-Compression: None
+            Compression: None
 
-Signature: {$signature['hash_type']}
-Signature Hash: {$signature['hash']}
+            Signature: {$signature['hash_type']}
+            Signature Hash: {$signature['hash']}
 
-Metadata: None
+            Metadata: None
 
-Contents: 1 file (6.61KB)
+            Contents: 1 file (6.61KB)
 
- // Use the --list|-l option to list the content of the PHAR.
+             // Use the --list|-l option to list the content of the PHAR.
 
 
-OUTPUT;
+            OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_provides_info_about_a_phar_without_extension(): void
@@ -124,29 +121,28 @@ OUTPUT;
             [
                 'command' => 'info',
                 'phar' => $pharPath,
-            ]
+            ],
         );
 
         $expected = <<<OUTPUT
 
-API Version: $version
+            API Version: $version
 
-Compression: None
+            Compression: None
 
-Signature: {$signature['hash_type']}
-Signature Hash: {$signature['hash']}
+            Signature: {$signature['hash_type']}
+            Signature Hash: {$signature['hash']}
 
-Metadata: None
+            Metadata: None
 
-Contents: 1 file (6.61KB)
+            Contents: 1 file (6.61KB)
 
- // Use the --list|-l option to list the content of the PHAR.
+             // Use the --list|-l option to list the content of the PHAR.
 
 
-OUTPUT;
+            OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_cannot_provide_info_about_an_invalid_phar_without_extension(): void
@@ -161,7 +157,7 @@ OUTPUT;
             [
                 'command' => 'info',
                 'phar' => $file,
-            ]
+            ],
         );
 
         $expectedPath = realpath($file);
@@ -169,16 +165,16 @@ OUTPUT;
         $expected = <<<OUTPUT
 
 
- [ERROR] Could not read the file "$expectedPath".
+             [ERROR] Could not read the file "$expectedPath".
 
 
-OUTPUT;
+            OUTPUT;
 
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-        $actual = preg_replace('/file[\ \n]+"/', 'file "', $actual);
-
-        $this->assertSame($expected, $actual);
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSameOutput(
+            $expected,
+            ExitCode::FAILURE,
+            static fn ($output) => preg_replace('/file[\ \n]+"/', 'file "', $output),
+        );
     }
 
     public function test_it_displays_the_error_in_debug_verbosity(): void
@@ -191,7 +187,7 @@ OUTPUT;
                     'command' => 'info',
                     'phar' => $file,
                 ],
-                ['verbosity' => OutputInterface::VERBOSITY_DEBUG]
+                ['verbosity' => OutputInterface::VERBOSITY_DEBUG],
             );
 
             $this->fail('Expected exception to be thrown.');
@@ -208,28 +204,27 @@ OUTPUT;
             [
                 'command' => 'info',
                 'phar' => $pharPath,
-            ]
+            ],
         );
 
         $expected = <<<'OUTPUT'
 
-API Version: No information found
+            API Version: No information found
 
-Compression: GZ
+            Compression: GZ
 
-Signature unreadable
+            Signature unreadable
 
-Metadata: None
+            Metadata: None
 
-Contents: 1 file (2.56KB)
+            Contents: 1 file (2.56KB)
 
- // Use the --list|-l option to list the content of the PHAR.
+             // Use the --list|-l option to list the content of the PHAR.
 
 
-OUTPUT;
+            OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_provides_info_about_a_tarbz2_phar(): void
@@ -240,28 +235,27 @@ OUTPUT;
             [
                 'command' => 'info',
                 'phar' => $pharPath,
-            ]
+            ],
         );
 
         $expected = <<<'OUTPUT'
 
-API Version: No information found
+            API Version: No information found
 
-Compression: BZ2
+            Compression: BZ2
 
-Signature unreadable
+            Signature unreadable
 
-Metadata: None
+            Metadata: None
 
-Contents: 1 file (2.71KB)
+            Contents: 1 file (2.71KB)
 
- // Use the --list|-l option to list the content of the PHAR.
+             // Use the --list|-l option to list the content of the PHAR.
 
 
-OUTPUT;
+            OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_provides_a_zip_phar_info(): void
@@ -276,29 +270,27 @@ OUTPUT;
             [
                 'command' => 'info',
                 'phar' => $pharPath,
-            ]
+            ],
         );
 
         $expected = <<<'OUTPUT'
 
 
- [ERROR] Could not read the file "new-simple-phar.zip".
+             [ERROR] Could not read the file "new-simple-phar.zip".
 
 
-OUTPUT;
+            OUTPUT;
 
-        $actual = DisplayNormalizer::removeTrailingSpaces(
-            $this->commandTester->getDisplay(true)
+        OutputAssertions::assertSameOutput(
+            $expected,
+            ExitCode::FAILURE,
+            $this->commandTester,
+            static fn ($output) => preg_replace(
+                '/\s\[ERROR\] Could not read the file([\s\S]*)new\-simple\-phar\.zip[comment\<\>\n\s\/]*"\./',
+                ' [ERROR] Could not read the file "new-simple-phar.zip".',
+                $output,
+            ),
         );
-
-        $actual = preg_replace(
-            '/\s\[ERROR\] Could not read the file([\s\S]*)new\-simple\-phar\.zip[comment\<\>\n\s\/]*"\./',
-            ' [ERROR] Could not read the file "new-simple-phar.zip".',
-            $actual
-        );
-
-        $this->assertSame($expected, $actual);
-        $this->assertSame(1, $this->commandTester->getStatusCode());
     }
 
     public function test_it_provides_a_phar_info_with_the_tree_of_the_content(): void
@@ -315,37 +307,36 @@ OUTPUT;
                 'phar' => $pharPath,
                 '--list' => true,
                 '--metadata' => true,
-            ]
+            ],
         );
 
         $expected = <<<OUTPUT
 
-API Version: $version
+            API Version: $version
 
-Compression:
-  - BZ2 (33.33%)
-  - None (66.67%)
+            Compression:
+              - BZ2 (33.33%)
+              - None (66.67%)
 
-Signature: {$signature['hash_type']}
-Signature Hash: {$signature['hash']}
+            Signature: {$signature['hash_type']}
+            Signature Hash: {$signature['hash']}
 
-Metadata:
-array (
-  'test' => 123,
-)
+            Metadata:
+            array (
+              'test' => 123,
+            )
 
-Contents: 3 files (6.75KB)
-a/
-  bar.php [BZ2] - 60.00B
-b/
-  beta/
-    bar.php [NONE] - 0.00B
-foo.php [NONE] - 19.00B
+            Contents: 3 files (6.75KB)
+            a/
+              bar.php [BZ2] - 60.00B
+            b/
+              beta/
+                bar.php [NONE] - 0.00B
+            foo.php [NONE] - 19.00B
 
-OUTPUT;
+            OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_provides_a_phar_info_with_the_flat_tree_of_the_content(): void
@@ -362,34 +353,33 @@ OUTPUT;
                 'phar' => $pharPath,
                 '--list' => true,
                 '--mode' => 'flat',
-            ]
+            ],
         );
 
         $expected = <<<OUTPUT
 
-API Version: $version
+            API Version: $version
 
-Compression:
-  - BZ2 (33.33%)
-  - None (66.67%)
+            Compression:
+              - BZ2 (33.33%)
+              - None (66.67%)
 
-Signature: {$signature['hash_type']}
-Signature Hash: {$signature['hash']}
+            Signature: {$signature['hash_type']}
+            Signature Hash: {$signature['hash']}
 
-Metadata:
-array (
-  'test' => 123,
-)
+            Metadata:
+            array (
+              'test' => 123,
+            )
 
-Contents: 3 files (6.75KB)
-a/bar.php [BZ2] - 60.00B
-b/beta/bar.php [NONE] - 0.00B
-foo.php [NONE] - 19.00B
+            Contents: 3 files (6.75KB)
+            a/bar.php [BZ2] - 60.00B
+            b/beta/bar.php [NONE] - 0.00B
+            foo.php [NONE] - 19.00B
 
-OUTPUT;
+            OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_provides_a_phar_info_with_the_tree_of_the_content_including_hidden_files(): void
@@ -405,167 +395,212 @@ OUTPUT;
                 'command' => 'info',
                 'phar' => $pharPath,
                 '--list' => true,
-            ]
+            ],
         );
 
         $expected = <<<OUTPUT
 
-API Version: $version
+            API Version: $version
 
-Compression: None
+            Compression: None
 
-Signature: {$signature['hash_type']}
-Signature Hash: {$signature['hash']}
+            Signature: {$signature['hash_type']}
+            Signature Hash: {$signature['hash']}
 
-Metadata: None
+            Metadata: None
 
-Contents: 16 files (7.50KB)
-.hidden-dir/
-  .hidden-file1 [NONE] - 0.00B
-  .hidden-file1.php [NONE] - 33.00B
-  file1 [NONE] - 0.00B
-  file1.php [NONE] - 33.00B
-.hidden-foo [NONE] - 0.00B
-.hidden-foo.php [NONE] - 33.00B
-a/
-  .hidden-bar [NONE] - 0.00B
-  .hidden-bar.php [NONE] - 33.00B
-  .hidden-dir-2/
-    .hidden-file2 [NONE] - 0.00B
-    .hidden-file2.php [NONE] - 33.00B
-    file2 [NONE] - 0.00B
-    file2.php [NONE] - 33.00B
-  bar [NONE] - 0.00B
-  bar.php [NONE] - 33.00B
-foo [NONE] - 0.00B
-foo.php [NONE] - 33.00B
+            Contents: 16 files (7.50KB)
+            .hidden-dir/
+              .hidden-file1 [NONE] - 0.00B
+              .hidden-file1.php [NONE] - 33.00B
+              file1 [NONE] - 0.00B
+              file1.php [NONE] - 33.00B
+            .hidden-foo [NONE] - 0.00B
+            .hidden-foo.php [NONE] - 33.00B
+            a/
+              .hidden-bar [NONE] - 0.00B
+              .hidden-bar.php [NONE] - 33.00B
+              .hidden-dir-2/
+                .hidden-file2 [NONE] - 0.00B
+                .hidden-file2.php [NONE] - 33.00B
+                file2 [NONE] - 0.00B
+                file2.php [NONE] - 33.00B
+              bar [NONE] - 0.00B
+              bar.php [NONE] - 33.00B
+            foo [NONE] - 0.00B
+            foo.php [NONE] - 33.00B
 
-OUTPUT;
+            OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
-    public function test_it_can_limit_the_tree_depth(): void
-    {
+    /**
+     * @dataProvider treeDepthProvider
+     *
+     * @param mixed $expected
+     */
+    public function test_it_can_limit_the_tree_depth(
+        string $pharPath,
+        ?string $depth,
+        $expected,
+    ): void {
         $pharPath = self::FIXTURES.'/tree-phar.phar';
         $phar = new Phar($pharPath);
 
         $version = $phar->getVersion();
         $signature = $phar->getSignature();
 
-        $this->commandTester->execute(
+        $expected = str_replace(
             [
-                'command' => 'info',
-                'phar' => $pharPath,
-                '--list' => true,
-                '--metadata' => true,
-                '--depth' => 0,
-            ]
+                '__VERSION__',
+                '__SIGNATURE__',
+                '__SIGNATURE_HASH__',
+            ],
+            [
+                $version,
+                $signature['hash_type'],
+                $signature['hash'],
+            ],
+            $expected,
         );
 
-        $expected = <<<OUTPUT
+        $input = [
+            'command' => 'info',
+            'phar' => $pharPath,
+            '--list' => true,
+            '--metadata' => true,
+            '--depth' => $depth,
+        ];
 
-API Version: $version
+        if (null === $depth) {
+            unset($input['--depth']);
+        }
 
-Compression:
-  - BZ2 (33.33%)
-  - None (66.67%)
+        $this->commandTester->execute($input);
 
-Signature: {$signature['hash_type']}
-Signature Hash: {$signature['hash']}
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
+    }
 
-Metadata:
-array (
-  'test' => 123,
-)
+    public static function treeDepthProvider(): iterable
+    {
+        $pharPath = self::FIXTURES.'/tree-phar.phar';
 
-Contents: 3 files (6.75KB)
-a/
-b/
-foo.php [NONE] - 19.00B
+        yield 'depth=0' => [
+            $pharPath,
+            '0',
+            <<<'OUTPUT'
 
-OUTPUT;
+                API Version: __VERSION__
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+                Compression:
+                  - BZ2 (33.33%)
+                  - None (66.67%)
 
-        $this->commandTester->execute(
-            [
-                'command' => 'info',
-                'phar' => $pharPath,
-                '--list' => true,
-                '--metadata' => true,
-                '--depth' => 1,
-            ]
-        );
+                Signature: __SIGNATURE__
+                Signature Hash: __SIGNATURE_HASH__
 
-        $expected = <<<OUTPUT
+                Metadata:
+                array (
+                  'test' => 123,
+                )
 
-API Version: $version
+                Contents: 3 files (6.75KB)
+                a/
+                b/
+                foo.php [NONE] - 19.00B
 
-Compression:
-  - BZ2 (33.33%)
-  - None (66.67%)
+                OUTPUT,
+        ];
 
-Signature: {$signature['hash_type']}
-Signature Hash: {$signature['hash']}
+        yield 'depth=1' => [
+            $pharPath,
+            '1',
+            <<<'OUTPUT'
 
-Metadata:
-array (
-  'test' => 123,
-)
+                API Version: __VERSION__
 
-Contents: 3 files (6.75KB)
-a/
-  bar.php [BZ2] - 60.00B
-b/
-  beta/
-foo.php [NONE] - 19.00B
+                Compression:
+                  - BZ2 (33.33%)
+                  - None (66.67%)
 
-OUTPUT;
+                Signature: __SIGNATURE__
+                Signature Hash: __SIGNATURE_HASH__
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+                Metadata:
+                array (
+                  'test' => 123,
+                )
 
-        $this->commandTester->execute(
-            [
-                'command' => 'info',
-                'phar' => $pharPath,
-                '--list' => true,
-                '--metadata' => true,
-                '--depth' => -1,
-            ]
-        );
+                Contents: 3 files (6.75KB)
+                a/
+                  bar.php [BZ2] - 60.00B
+                b/
+                  beta/
+                foo.php [NONE] - 19.00B
 
-        $expected = <<<OUTPUT
+                OUTPUT,
+        ];
 
-API Version: $version
+        yield 'default depth, defined explicitly' => [
+            $pharPath,
+            '-1',
+            <<<'OUTPUT'
 
-Compression:
-  - BZ2 (33.33%)
-  - None (66.67%)
+                API Version: __VERSION__
 
-Signature: {$signature['hash_type']}
-Signature Hash: {$signature['hash']}
+                Compression:
+                  - BZ2 (33.33%)
+                  - None (66.67%)
 
-Metadata:
-array (
-  'test' => 123,
-)
+                Signature: __SIGNATURE__
+                Signature Hash: __SIGNATURE_HASH__
 
-Contents: 3 files (6.75KB)
-a/
-  bar.php [BZ2] - 60.00B
-b/
-  beta/
-    bar.php [NONE] - 0.00B
-foo.php [NONE] - 19.00B
+                Metadata:
+                array (
+                  'test' => 123,
+                )
 
-OUTPUT;
+                Contents: 3 files (6.75KB)
+                a/
+                  bar.php [BZ2] - 60.00B
+                b/
+                  beta/
+                    bar.php [NONE] - 0.00B
+                foo.php [NONE] - 19.00B
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+                OUTPUT,
+        ];
+
+        yield 'default depth' => [
+            $pharPath,
+            null,
+            <<<'OUTPUT'
+
+                API Version: __VERSION__
+
+                Compression:
+                  - BZ2 (33.33%)
+                  - None (66.67%)
+
+                Signature: __SIGNATURE__
+                Signature Hash: __SIGNATURE_HASH__
+
+                Metadata:
+                array (
+                  'test' => 123,
+                )
+
+                Contents: 3 files (6.75KB)
+                a/
+                  bar.php [BZ2] - 60.00B
+                b/
+                  beta/
+                    bar.php [NONE] - 0.00B
+                foo.php [NONE] - 19.00B
+
+                OUTPUT,
+        ];
     }
 
     public function test_it_can_limit_the_tree_depth_in_flat_mode(): void
@@ -582,58 +617,51 @@ OUTPUT;
                 'phar' => $pharPath,
                 '--list' => true,
                 '--metadata' => true,
-                '--depth' => 1,
+                '--depth' => '1',
                 '--mode' => 'flat',
-            ]
+            ],
         );
 
         $expected = <<<OUTPUT
 
-API Version: $version
+            API Version: $version
 
-Compression:
-  - BZ2 (33.33%)
-  - None (66.67%)
+            Compression:
+              - BZ2 (33.33%)
+              - None (66.67%)
 
-Signature: {$signature['hash_type']}
-Signature Hash: {$signature['hash']}
+            Signature: {$signature['hash_type']}
+            Signature Hash: {$signature['hash']}
 
-Metadata:
-array (
-  'test' => 123,
-)
+            Metadata:
+            array (
+              'test' => 123,
+            )
 
-Contents: 3 files (6.75KB)
-a/bar.php [BZ2] - 60.00B
-foo.php [NONE] - 19.00B
+            Contents: 3 files (6.75KB)
+            a/bar.php [BZ2] - 60.00B
+            foo.php [NONE] - 19.00B
 
-OUTPUT;
+            OUTPUT;
 
-        $this->assertSame($expected, DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true)));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_cannot_accept_an_invalid_depth(): void
     {
         $pharPath = self::FIXTURES.'/tree-phar.phar';
 
-        try {
-            $this->commandTester->execute(
-                [
-                    'command' => 'info',
-                    'phar' => $pharPath,
-                    '--list' => true,
-                    '--metadata' => true,
-                    '--depth' => -10,
-                ]
-            );
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected the depth to be a positive integer or -1: "-10".');
 
-            $this->fail('Expected exception to be thrown.');
-        } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
-                'Expected the depth to be a positive integer or -1, got "-10"',
-                $exception->getMessage()
-            );
-        }
+        $this->commandTester->execute(
+            [
+                'command' => 'info',
+                'phar' => $pharPath,
+                '--list' => true,
+                '--metadata' => true,
+                '--depth' => '-10',
+            ],
+        );
     }
 }

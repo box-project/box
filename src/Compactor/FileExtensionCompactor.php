@@ -26,7 +26,10 @@ use Webmozart\Assert\Assert;
  */
 abstract class FileExtensionCompactor extends BaseCompactor
 {
-    private $extensions;
+    /**
+     * @var string[]
+     */
+    private array $extensions;
 
     /**
      * @param string[] $extensions the list of supported file extensions
@@ -38,18 +41,15 @@ abstract class FileExtensionCompactor extends BaseCompactor
         $this->extensions = $extensions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function supports(string $file): bool
     {
         return in_array(
             pathinfo(
                 $file,
-                PATHINFO_EXTENSION
+                PATHINFO_EXTENSION,
             ),
             $this->extensions,
-            true
+            true,
         );
     }
 }

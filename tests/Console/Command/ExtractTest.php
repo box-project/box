@@ -14,12 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use KevinGH\Box\Console\DisplayNormalizer;
+use Fidry\Console\Command\Command;
+use Fidry\Console\ExitCode;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
-use function preg_replace;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
@@ -36,9 +35,6 @@ class ExtractTest extends CommandTestCase
 {
     private const FIXTURES = __DIR__.'/../../../fixtures/extract';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getCommand(): Command
     {
         return new Extract();
@@ -53,7 +49,7 @@ class ExtractTest extends CommandTestCase
                 'command' => 'extract',
                 'phar' => $pharPath,
                 'output' => $this->tmp,
-            ]
+            ],
         );
 
         $expectedFiles = [
@@ -65,10 +61,7 @@ class ExtractTest extends CommandTestCase
 
         $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-
-        $this->assertSame('', $actual);
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput('', ExitCode::SUCCESS);
     }
 
     public function test_it_can_extract_a_phar_without_the_phar_extension(): void
@@ -80,7 +73,7 @@ class ExtractTest extends CommandTestCase
                 'command' => 'extract',
                 'phar' => $pharPath,
                 'output' => $this->tmp,
-            ]
+            ],
         );
 
         $expectedFiles = [
@@ -92,10 +85,7 @@ class ExtractTest extends CommandTestCase
 
         $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-
-        $this->assertSame('', $actual);
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput('', ExitCode::SUCCESS);
     }
 
     public function test_it_can_extract_a_compressed_phar(): void
@@ -107,7 +97,7 @@ class ExtractTest extends CommandTestCase
                 'command' => 'extract',
                 'phar' => $pharPath,
                 'output' => $this->tmp,
-            ]
+            ],
         );
 
         $expectedFiles = [
@@ -119,10 +109,7 @@ class ExtractTest extends CommandTestCase
 
         $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-
-        $this->assertSame('', $actual);
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput('', ExitCode::SUCCESS);
     }
 
     public function test_it_cannot_extract_an_invalid_phar(): void
@@ -134,7 +121,7 @@ class ExtractTest extends CommandTestCase
                 'command' => 'extract',
                 'phar' => $pharPath,
                 'output' => $this->tmp,
-            ]
+            ],
         );
 
         $expectedFiles = [];
@@ -145,16 +132,12 @@ class ExtractTest extends CommandTestCase
 
         $expectedOutput = <<<'OUTPUT'
 
- [ERROR] The given file is not a valid PHAR
+             [ERROR] The given file is not a valid PHAR
 
 
-OUTPUT;
+            OUTPUT;
 
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-        $actual = preg_replace('/file[\ \n]+"/', 'file "', $actual);
-
-        $this->assertSame($expectedOutput, $actual);
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expectedOutput, ExitCode::FAILURE);
     }
 
     public function test_it_provides_the_original_exception_in_debug_mode_when_cannot_extract_an_invalid_phar(): void
@@ -168,14 +151,14 @@ OUTPUT;
                     'phar' => $pharPath,
                     'output' => $this->tmp,
                 ],
-                ['verbosity' => OutputInterface::VERBOSITY_DEBUG]
+                ['verbosity' => OutputInterface::VERBOSITY_DEBUG],
             );
 
             $this->fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
             $this->assertSame(
                 'The given file is not a valid PHAR',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
             $this->assertNotNull($exception->getPrevious());
@@ -196,7 +179,7 @@ OUTPUT;
                 'command' => 'extract',
                 'phar' => $pharPath,
                 'output' => $this->tmp,
-            ]
+            ],
         );
 
         $expectedFiles = [];
@@ -207,16 +190,12 @@ OUTPUT;
 
         $expectedOutput = <<<'OUTPUT'
 
- [ERROR] The given file is not a valid PHAR
+             [ERROR] The given file is not a valid PHAR
 
 
-OUTPUT;
+            OUTPUT;
 
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-        $actual = preg_replace('/file[\ \n]+"/', 'file "', $actual);
-
-        $this->assertSame($expectedOutput, $actual);
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expectedOutput, ExitCode::FAILURE);
     }
 
     public function test_it_cannot_extract_an_unknown_file(): void
@@ -226,7 +205,7 @@ OUTPUT;
                 'command' => 'extract',
                 'phar' => '/unknown',
                 'output' => $this->tmp,
-            ]
+            ],
         );
 
         $expectedFiles = [];
@@ -237,16 +216,12 @@ OUTPUT;
 
         $expectedOutput = <<<'OUTPUT'
 
- [ERROR] The file "/unknown" could not be found.
+             [ERROR] The file "/unknown" could not be found.
 
 
-OUTPUT;
+            OUTPUT;
 
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-        $actual = preg_replace('/file[\ \n]+"/', 'file "', $actual);
-
-        $this->assertSame($expectedOutput, $actual);
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expectedOutput, ExitCode::FAILURE);
     }
 
     /**

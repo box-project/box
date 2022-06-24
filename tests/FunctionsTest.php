@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use Generator;
 use InvalidArgumentException;
 use Phar;
 use PHPUnit\Framework\TestCase;
@@ -38,7 +37,7 @@ class FunctionsTest extends TestCase
     }
 
     /**
-     * @dataProvider providePharCompressionAlgorithm
+     * @dataProvider pharCompressionAlgorithmProvider
      *
      * @param mixed $expected
      */
@@ -55,15 +54,15 @@ class FunctionsTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Unknown compression algorithm code "'.$algorithm.'"',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
 
     /**
-     * @dataProvider provideBytes
+     * @dataProvider bytesProvider
      */
-    public function test_it_can_format_bytes(int $bytes, string $expected): void
+    public function test_it_can_format_bytes(float|int $bytes, string $expected): void
     {
         $actual = format_size($bytes);
 
@@ -71,9 +70,9 @@ class FunctionsTest extends TestCase
     }
 
     /**
-     * @dataProvider provideMemory
+     * @dataProvider memoryProvider
      */
-    public function test_it_can_convert_a_memory_limit_amount_to_bytes(string $memory, int $expected): void
+    public function test_it_can_convert_a_memory_limit_amount_to_bytes(string $memory, float|int $expected): void
     {
         $actual = memory_to_bytes($memory);
 
@@ -86,7 +85,7 @@ class FunctionsTest extends TestCase
         $this->assertMatchesRegularExpression('/^Box(?:[a-z]|\d){12}$/', unique_id('Box'));
     }
 
-    public function providePharCompressionAlgorithm(): Generator
+    public static function pharCompressionAlgorithmProvider(): iterable
     {
         yield [Phar::GZ, 'zlib'];
         yield [Phar::BZ2, 'bz2'];
@@ -94,7 +93,7 @@ class FunctionsTest extends TestCase
         yield [10, -1];
     }
 
-    public function provideBytes(): Generator
+    public static function bytesProvider(): iterable
     {
         yield [10, '10.00B'];
         yield [1024, '1.00KB'];
@@ -103,9 +102,10 @@ class FunctionsTest extends TestCase
         yield [1024 ** 4, '1.00TB'];
         yield [1024 ** 5, '1.00PB'];
         yield [1024 ** 6, '1.00EB'];
+        yield [1.073741824E+21, '931.32EB'];
     }
 
-    public function provideMemory(): Generator
+    public static function memoryProvider(): iterable
     {
         yield ['-1', -1];
         yield ['10', 10];
@@ -115,5 +115,7 @@ class FunctionsTest extends TestCase
         yield ['10m', (1024 ** 2) * 10];
         yield ['1g', 1024 ** 3];
         yield ['10g', (1024 ** 3) * 10];
+        yield ['10g', (1024 ** 3) * 10];
+        yield ['1000000000000g', 1.073741824E+21];
     }
 }

@@ -22,13 +22,10 @@ use function date_default_timezone_set;
 use DateTimeImmutable;
 use const DIRECTORY_SEPARATOR;
 use function exec;
-use Generator;
 use function getcwd;
-use function getrandmax;
-use Herrera\Box\Compactor\Json;
-use Herrera\Box\Compactor\Php as PhpCompactor;
 use InvalidArgumentException;
 use function json_decode;
+use const JSON_THROW_ON_ERROR;
 use KevinGH\Box\Compactor\DummyCompactor;
 use KevinGH\Box\Compactor\InvalidCompactor;
 use KevinGH\Box\Compactor\Php;
@@ -43,6 +40,7 @@ use function KevinGH\Box\FileSystem\touch;
 use function KevinGH\Box\get_box_version;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\MapFile;
+use function mt_getrandmax;
 use Phar;
 use const PHP_EOL;
 use function random_int;
@@ -59,11 +57,8 @@ use function strtolower;
  */
 class ConfigurationTest extends ConfigurationTestCase
 {
-    private static $version;
+    private static string $version;
 
-    /**
-     * {@inheritdoc}
-     */
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
@@ -104,7 +99,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $this->assertSame(
             ['The "alias" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -147,7 +142,7 @@ class ConfigurationTest extends ConfigurationTestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'A PHAR alias cannot be empty when provided.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -164,11 +159,11 @@ class ConfigurationTest extends ConfigurationTestCase
         } catch (JsonValidationException $exception) {
             $this->assertSame(
                 <<<EOF
-"$this->file" does not match the expected JSON schema:
-  - alias : Boolean value found, but a string or a null is required
-EOF
+                    "$this->file" does not match the expected JSON schema:
+                      - alias : Boolean value found, but a string or a null is required
+                    EOF
                 ,
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -187,7 +182,7 @@ EOF
         $this->assertSame([], $this->config->getRecommendations());
         $this->assertSame(
             ['The "alias" setting has been set but is ignored since a custom stub path is used'],
-            $this->config->getWarnings()
+            $this->config->getWarnings(),
         );
     }
 
@@ -222,7 +217,7 @@ EOF
 
         $this->assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'test',
-            $this->config->getBasePath()
+            $this->config->getBasePath(),
         );
 
         $this->assertSame([], $this->config->getRecommendations());
@@ -237,12 +232,12 @@ EOF
 
         $this->assertSame(
             getcwd(),
-            $this->config->getBasePath()
+            $this->config->getBasePath(),
         );
 
         $this->assertSame(
             ['The "base-path" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -259,7 +254,7 @@ EOF
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The base path "'.$this->tmp.DIRECTORY_SEPARATOR.'test" is not a directory or does not exist.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -278,7 +273,7 @@ EOF
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The base path "'.$this->tmp.DIRECTORY_SEPARATOR.'foo" is not a directory or does not exist.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -318,14 +313,14 @@ EOF
     }
 
     /**
-     * @dataProvider provideJsonFiles
+     * @dataProvider jsonFilesProvider
      */
     public function test_it_attempts_to_get_and_decode_the_json_and_lock_files(
         callable $setup,
         ?string $expectedJson,
         ?array $expectedJsonContents,
         ?string $expectedLock,
-        ?array $expectedLockContents
+        ?array $expectedLockContents,
     ): void {
         $setup();
 
@@ -360,13 +355,13 @@ EOF
 
             $this->assertSame(
                 <<<EOF
-Expected the file "$composerJson" to be a valid composer.json file but an error has been found: Parse error on line 1:
+                    Expected the file "$composerJson" to be a valid composer.json file but an error has been found: Parse error on line 1:
 
-^
-Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
-EOF
+                    ^
+                    Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
+                    EOF
                 ,
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
             $this->assertInstanceOf(ParsingException::class, $exception->getPrevious());
@@ -386,13 +381,13 @@ EOF
 
             $this->assertSame(
                 <<<EOF
-Expected the file "$composerLock" to be a valid composer.json file but an error has been found: Parse error on line 1:
+                    Expected the file "$composerLock" to be a valid composer.json file but an error has been found: Parse error on line 1:
 
-^
-Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
-EOF
+                    ^
+                    Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
+                    EOF
                 ,
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
             $this->assertInstanceOf(ParsingException::class, $exception->getPrevious());
@@ -410,14 +405,14 @@ EOF
 
         $this->assertSame(
             ['The "dump-autoload" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame(
             [
                 'The "dump-autoload" setting has been set but has been ignored because the composer.json, composer.lock'
                 .' and vendor/composer/installed.json files are necessary but could not be found.',
             ],
-            $this->config->getWarnings()
+            $this->config->getWarnings(),
         );
 
         dump_file('composer.json', '{}');
@@ -433,7 +428,7 @@ EOF
 
         $this->assertSame(
             ['The "dump-autoload" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -461,7 +456,7 @@ EOF
 
         $this->assertSame(
             ['The "dump-autoload" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -480,7 +475,7 @@ EOF
                 'The "dump-autoload" setting has been set but has been ignored because the composer.json, composer.lock'
                 .' and vendor/composer/installed.json files are necessary but could not be found.',
             ],
-            $this->config->getWarnings()
+            $this->config->getWarnings(),
         );
     }
 
@@ -495,7 +490,7 @@ EOF
 
         $this->assertSame(
             ['The "exclude-composer-files" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
 
@@ -508,7 +503,7 @@ EOF
 
         $this->assertSame(
             ['The "exclude-composer-files" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -523,7 +518,7 @@ EOF
 
         $this->assertSame(
             ['The "exclude-composer-files" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
 
@@ -550,7 +545,7 @@ EOF
 
         $this->assertSame(
             ['The "compactors" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
 
@@ -562,7 +557,7 @@ EOF
 
         $this->assertSame(
             ['The "compactors" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -624,7 +619,7 @@ EOF
 
         $this->assertSame(
             ['The PHP compactor has been registered after the PhpScoper compactor. It is recommended to register the PHP compactor before for a clearer code and faster processing.'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -641,7 +636,7 @@ EOF
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The compactor class "NoSuchClass" does not exist.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -659,9 +654,9 @@ EOF
             $this->assertSame(
                 sprintf(
                     'The class "%s" is not a compactor class.',
-                    InvalidCompactor::class
+                    InvalidCompactor::class,
                 ),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -682,25 +677,6 @@ EOF
         $this->assertSame('custom', $compactors[0]->getScoper()->getPrefix());
 
         $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
-    }
-
-    public function test_a_recommendation_is_given_when_the_legacy_compactors_are_used(): void
-    {
-        $this->setConfig([
-            'compactors' => [
-                Json::class,
-                PhpCompactor::class,
-            ],
-        ]);
-
-        $this->assertSame(
-            [
-                'The compactor "Herrera\Box\Compactor\Json" has been deprecated, use "KevinGH\Box\Compactor\Json" instead.',
-                'The compactor "Herrera\Box\Compactor\Php" has been deprecated, use "KevinGH\Box\Compactor\Php" instead.',
-            ],
-            $this->config->getRecommendations()
-        );
         $this->assertSame([], $this->config->getWarnings());
     }
 
@@ -734,7 +710,7 @@ EOF
 
         $this->assertSame(
             ['The "php-scoper" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
 
@@ -751,7 +727,7 @@ EOF
 
         $this->assertSame(
             ['The "php-scoper" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -769,7 +745,7 @@ EOF
 
         $this->assertSame(
             ['The "compression" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
 
@@ -781,7 +757,7 @@ EOF
 
         $this->assertSame(
             ['The "compression" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -800,7 +776,7 @@ EOF
     }
 
     /**
-     * @dataProvider provideInvalidCompressionAlgorithms
+     * @dataProvider invalidCompressionAlgorithmsProvider
      *
      * @param mixed $compression
      */
@@ -816,12 +792,12 @@ EOF
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 $errorMessage,
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         } catch (JsonValidationException $exception) {
             $this->assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -842,7 +818,7 @@ EOF
 
         $this->assertSame(
             ['The "chmod" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
 
@@ -854,7 +830,7 @@ EOF
 
         $this->assertSame(
             ['The "chmod" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -903,10 +879,10 @@ EOF
         dump_file(
             'composer.json',
             <<<'JSON'
-{
-    "bin": "bin/foo"
-}
-JSON
+                {
+                    "bin": "bin/foo"
+                }
+                JSON,
         );
 
         $this->reloadConfig();
@@ -929,13 +905,13 @@ JSON
         dump_file(
             'composer.json',
             <<<'JSON'
-{
-    "bin": [
-        "bin/foo",
-        "bin/bar"
-    ]
-}
-JSON
+                {
+                    "bin": [
+                        "bin/foo",
+                        "bin/bar"
+                    ]
+                }
+                JSON,
         );
 
         $this->reloadConfig();
@@ -958,13 +934,13 @@ JSON
         dump_file(
             'composer.json',
             <<<'JSON'
-{
-    "bin": [
-        "bin/foo",
-        "bin/bar"
-    ]
-}
-JSON
+                {
+                    "bin": [
+                        "bin/foo",
+                        "bin/bar"
+                    ]
+                }
+                JSON,
         );
 
         $this->setConfig(['main' => 'test.php']);
@@ -1010,7 +986,7 @@ JSON
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 "The file \"{$this->tmp}/test.php\" does not exist.",
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1023,13 +999,13 @@ JSON
         dump_file(
             'composer.json',
             <<<'JSON'
-{
-    "bin": [
-        "bin/foo",
-        "bin/bar"
-    ]
-}
-JSON
+                {
+                    "bin": [
+                        "bin/foo",
+                        "bin/bar"
+                    ]
+                }
+                JSON,
         );
 
         $this->setConfig(['main' => false]);
@@ -1043,7 +1019,7 @@ JSON
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Cannot retrieve the main script path: no main script configured.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
 
@@ -1054,7 +1030,7 @@ JSON
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Cannot retrieve the main script contents: no main script configured.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
 
@@ -1071,7 +1047,7 @@ JSON
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Cannot "enable" a main script: either disable it with `false` or give the main script file path.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1084,7 +1060,7 @@ JSON
 
         $this->assertSame(
             'first/test/path/sub/path/file.php',
-            $mapFile('first/test/path/sub/path/file.php')
+            $mapFile('first/test/path/sub/path/file.php'),
         );
 
         $this->assertSame([], $this->config->getRecommendations());
@@ -1103,12 +1079,12 @@ JSON
 
         $this->assertSame(
             'first/test/path/sub/path/file.php',
-            $mapFile('first/test/path/sub/path/file.php')
+            $mapFile('first/test/path/sub/path/file.php'),
         );
 
         $this->assertSame(
             ['The "map" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -1130,17 +1106,17 @@ JSON
                 ['first/test/path' => 'a'],
                 ['' => 'b'],
             ],
-            $mapFile->getMap()
+            $mapFile->getMap(),
         );
 
         $this->assertSame(
             'a/sub/path/file.php',
-            $mapFile('first/test/path/sub/path/file.php')
+            $mapFile('first/test/path/sub/path/file.php'),
         );
 
         $this->assertSame(
             'b/second/test/path/sub/path/file.php',
-            $mapFile('second/test/path/sub/path/file.php')
+            $mapFile('second/test/path/sub/path/file.php'),
         );
 
         $this->assertSame([], $this->config->getRecommendations());
@@ -1178,7 +1154,7 @@ JSON
 
         $this->assertSame(
             ['The "metadata" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -1187,11 +1163,11 @@ JSON
     {
         $this->assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'index.phar',
-            $this->config->getOutputPath()
+            $this->config->getOutputPath(),
         );
         $this->assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'index.phar',
-            $this->config->getTmpOutputPath()
+            $this->config->getTmpOutputPath(),
         );
 
         $this->assertSame([], $this->config->getRecommendations());
@@ -1207,11 +1183,11 @@ JSON
 
         $this->assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'test.phar',
-            $this->config->getOutputPath()
+            $this->config->getOutputPath(),
         );
         $this->assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'test.phar',
-            $this->config->getTmpOutputPath()
+            $this->config->getTmpOutputPath(),
         );
 
         $this->assertSame([], $this->config->getRecommendations());
@@ -1226,16 +1202,16 @@ JSON
 
         $this->assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'index.phar',
-            $this->config->getOutputPath()
+            $this->config->getOutputPath(),
         );
         $this->assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'index.phar',
-            $this->config->getTmpOutputPath()
+            $this->config->getTmpOutputPath(),
         );
 
         $this->assertSame(
             ['The "output" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -1252,11 +1228,11 @@ JSON
 
         $this->assertSame(
             $this->tmp.'/sub-dir/test.phar',
-            $this->config->getOutputPath()
+            $this->config->getOutputPath(),
         );
         $this->assertSame(
             $this->tmp.'/sub-dir/test.phar',
-            $this->config->getTmpOutputPath()
+            $this->config->getTmpOutputPath(),
         );
 
         $this->assertSame([], $this->config->getRecommendations());
@@ -1275,11 +1251,11 @@ JSON
 
         $this->assertSame(
             $this->tmp.'/test.phar',
-            $this->config->getOutputPath()
+            $this->config->getOutputPath(),
         );
         $this->assertSame(
             $this->tmp.'/test.phar',
-            $this->config->getTmpOutputPath()
+            $this->config->getTmpOutputPath(),
         );
 
         $this->assertSame([], $this->config->getRecommendations());
@@ -1295,11 +1271,11 @@ JSON
 
         $this->assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'test.phar',
-            $this->config->getOutputPath()
+            $this->config->getOutputPath(),
         );
         $this->assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'test.phar',
-            $this->config->getTmpOutputPath()
+            $this->config->getTmpOutputPath(),
         );
 
         $this->assertSame([], $this->config->getRecommendations());
@@ -1315,11 +1291,11 @@ JSON
 
         $this->assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'test',
-            $this->config->getOutputPath()
+            $this->config->getOutputPath(),
         );
         $this->assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'test.phar',
-            $this->config->getTmpOutputPath()
+            $this->config->getTmpOutputPath(),
         );
 
         $this->assertSame([], $this->config->getRecommendations());
@@ -1336,7 +1312,7 @@ JSON
 
         $this->assertSame(
             $this->tmp.'/bin/acme.phar',
-            $this->config->getOutputPath()
+            $this->config->getOutputPath(),
         );
 
         $this->assertSame([], $this->config->getRecommendations());
@@ -1369,7 +1345,7 @@ JSON
             'git-commit-short' => 'git_commit_short',
             'git-tag' => 'git_tag',
             'git-version' => 'git_version',
-            'replacements' => ['rand' => $rand = random_int(0, getrandmax())],
+            'replacements' => ['rand' => $rand = random_int(0, mt_getrandmax())],
             'datetime' => 'date_time',
             'datetime-format' => 'Y:m:d',
         ]);
@@ -1384,7 +1360,7 @@ JSON
         $this->assertSame($rand, $values['@rand@']);
         $this->assertMatchesRegularExpression(
             '/^[0-9]{4}:[0-9]{2}:[0-9]{2}$/',
-            $values['@date_time@']
+            $values['@date_time@'],
         );
         $this->assertCount(7, $values);
 
@@ -1402,7 +1378,7 @@ JSON
             'git-commit-short' => 'git_commit_short',
             'git-tag' => 'git_tag',
             'git-version' => 'git_version',
-            'replacements' => ['rand' => $rand = random_int(0, getrandmax())],
+            'replacements' => ['rand' => $rand = random_int(0, mt_getrandmax())],
             'replacement-sigil' => '$',
             'datetime' => 'date_time',
             'datetime-format' => 'Y:m:d',
@@ -1418,7 +1394,7 @@ JSON
         $this->assertSame($rand, $values['$rand$']);
         $this->assertMatchesRegularExpression(
             '/^[0-9]{4}:[0-9]{2}:[0-9]{2}$/',
-            $values['$date_time$']
+            $values['$date_time$'],
         );
         $this->assertCount(7, $values);
 
@@ -1514,7 +1490,7 @@ JSON
 
         $this->assertSame(
             ['The "replacements" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -1525,7 +1501,7 @@ JSON
 
         $this->assertMatchesRegularExpression(
             '/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} [A-Z]{2,5}$/',
-            $this->config->getReplacements()['@date_time@']
+            $this->config->getReplacements()['@date_time@'],
         );
         $this->assertCount(1, $this->config->getReplacements());
 
@@ -1562,7 +1538,7 @@ JSON
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected the datetime format to be a valid format: "ü" is not',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1582,7 +1558,7 @@ JSON
 
         $this->assertMatchesRegularExpression(
             '/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/',
-            $values['@date_time@']
+            $values['@date_time@'],
         );
 
         $this->assertSame([], $this->config->getRecommendations());
@@ -1598,7 +1574,7 @@ JSON
 
         $this->assertSame(
             ['__foo__' => 'bar'],
-            $this->config->getReplacements()
+            $this->config->getReplacements(),
         );
 
         $this->assertSame([], $this->config->getRecommendations());
@@ -1617,7 +1593,7 @@ JSON
 
         $this->assertSame(
             ['The "shebang" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -1647,7 +1623,7 @@ JSON
 
         $this->assertSame(
             ['The "shebang" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -1666,7 +1642,7 @@ JSON
         $this->assertSame([], $this->config->getRecommendations());
         $this->assertSame(
             ['The "shebang" has been set but ignored since it is used only with the Box built-in stub which is not used'],
-            $this->config->getWarnings()
+            $this->config->getWarnings(),
         );
     }
 
@@ -1682,7 +1658,7 @@ JSON
         $this->assertSame([], $this->config->getRecommendations());
         $this->assertSame(
             ['The "shebang" has been set but ignored since it is used only with the Box built-in stub which is not used'],
-            $this->config->getWarnings()
+            $this->config->getWarnings(),
         );
     }
 
@@ -1699,7 +1675,7 @@ JSON
 
         $this->assertSame(
             ['The "shebang" has been set to `false` but is unnecessary since the Box built-in stub is not being used'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -1715,7 +1691,7 @@ JSON
 
         $this->assertSame(
             ['The "shebang" has been set to `false` but is unnecessary since the Box built-in stub is not being used'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -1737,10 +1713,10 @@ JSON
                     sprintf(
                         'The tag or commit hash could not be retrieved from "%s": fatal: Not a git repository '
                         .'(or any of the parent directories): .git'.PHP_EOL,
-                        $tmp
-                    )
+                        $tmp,
+                    ),
                 ),
-                strtolower($exception->getMessage())
+                strtolower($exception->getMessage()),
             );
         }
     }
@@ -1755,7 +1731,7 @@ JSON
 
         $this->assertSame(
             ['The "git" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -1770,7 +1746,7 @@ JSON
 
         $this->assertSame(
             ['The "git-commit" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -1785,7 +1761,7 @@ JSON
 
         $this->assertSame(
             ['The "git-commit-short" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -1800,7 +1776,7 @@ JSON
 
         $this->assertSame(
             ['The "git-tag" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -1815,7 +1791,7 @@ JSON
 
         $this->assertSame(
             ['The "git-version" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -1833,7 +1809,7 @@ JSON
                 'The "datetime-format" setting can be omitted since is set to its default value',
                 'The setting "datetime-format" has been set but is unnecessary because the setting "datetime" is not set.',
             ],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -1848,7 +1824,7 @@ JSON
 
         $this->assertSame(
             ['The "datetime" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -1863,7 +1839,7 @@ JSON
 
         $this->assertSame(
             ['The setting "datetime-format" has been set but is unnecessary because the setting "datetime" is not set.'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -1878,7 +1854,7 @@ JSON
 
         $this->assertSame(
             ['The "replacement-sigil" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -1906,7 +1882,7 @@ JSON
 
         $this->assertSame(
             ['The "shebang" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
 
@@ -1918,7 +1894,7 @@ JSON
 
         $this->assertSame(
             ['The "shebang" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -1935,7 +1911,7 @@ JSON
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The shebang line must start with "#!". Got "/bin/php" instead',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
 
@@ -1949,7 +1925,7 @@ JSON
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected shebang to be either a string, false or null, found true',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1966,7 +1942,7 @@ JSON
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The shebang should not be empty.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
 
@@ -1980,7 +1956,7 @@ JSON
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The shebang should not be empty.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -2007,10 +1983,10 @@ JSON
         $version = self::$version;
 
         $expected = <<<BANNER
-Generated by Humbug Box $version.
+            Generated by Humbug Box $version.
 
-@link https://github.com/humbug/box
-BANNER;
+            @link https://github.com/humbug/box
+            BANNER;
 
         $this->assertSame($expected, $this->config->getStubBannerContents());
         $this->assertNull($this->config->getStubBannerPath());
@@ -2021,17 +1997,17 @@ BANNER;
         ]);
 
         $expected = <<<BANNER
-Generated by Humbug Box $version.
+            Generated by Humbug Box $version.
 
-@link https://github.com/humbug/box
-BANNER;
+            @link https://github.com/humbug/box
+            BANNER;
 
         $this->assertSame($expected, $this->config->getStubBannerContents());
         $this->assertNull($this->config->getStubBannerPath());
 
         $this->assertSame(
             ['The "banner" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -2044,7 +2020,7 @@ BANNER;
 
         $this->assertSame(
             ['The "banner" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
 
@@ -2052,22 +2028,22 @@ BANNER;
 
         $this->setConfig([
             'banner' => <<<BANNER
-Generated by Humbug Box $version.
+                Generated by Humbug Box $version.
 
-@link https://github.com/humbug/box
-BANNER
+                @link https://github.com/humbug/box
+                BANNER
             ,
         ]);
 
         $this->assertSame(
             ['The "banner" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
 
     /**
-     * @dataProvider provideCustomBanner
+     * @dataProvider customBannerProvider
      */
     public function test_a_custom_banner_can_be_registered(string $banner): void
     {
@@ -2099,7 +2075,7 @@ BANNER
             $this->assertSame([], $this->config->getRecommendations());
             $this->assertSame(
                 ['The "banner" setting has been set but is ignored since the Box built-in stub is not being used'],
-                $this->config->getWarnings()
+                $this->config->getWarnings(),
             );
         }
     }
@@ -2119,7 +2095,7 @@ BANNER
 
             $this->assertSame(
                 ['The "banner" setting has been set but is unnecessary since the Box built-in stub is not being used'],
-                $this->config->getRecommendations()
+                $this->config->getRecommendations(),
             );
             $this->assertSame([], $this->config->getWarnings());
         }
@@ -2151,13 +2127,13 @@ BANNER
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The banner cannot accept true as a value',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
 
     /**
-     * @dataProvider provideUnormalizedCustomBanner
+     * @dataProvider unormalizedCustomBannerProvider
      */
     public function test_the_content_of_the_banner_is_normalized(string $banner, string $expected): void
     {
@@ -2176,12 +2152,12 @@ BANNER
     public function test_a_custom_multiline_banner_can_be_registered(): void
     {
         $comment = <<<'COMMENT'
-This is a
+            This is a
 
-multiline
+            multiline
 
-comment.
-COMMENT;
+            comment.
+            COMMENT;
 
         $this->setConfig([
             'banner' => $comment,
@@ -2210,7 +2186,7 @@ COMMENT;
 
         $this->assertSame(
             ['The "banner-file" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -2218,12 +2194,12 @@ COMMENT;
     public function test_a_custom_banner_from_a_file_can_be_registered(): void
     {
         $comment = <<<'COMMENT'
-This is a
+            This is a
 
-multiline
+            multiline
 
-comment.
-COMMENT;
+            comment.
+            COMMENT;
 
         dump_file('banner', $comment);
 
@@ -2244,10 +2220,10 @@ COMMENT;
         $version = self::$version;
 
         $defaultBanner = <<<BANNER
-Generated by Humbug Box $version.
+            Generated by Humbug Box $version.
 
-@link https://github.com/humbug/box
-BANNER;
+            @link https://github.com/humbug/box
+            BANNER;
 
         $this->setConfig([
             'banner-file' => null,
@@ -2258,7 +2234,7 @@ BANNER;
 
         $this->assertSame(
             ['The "banner-file" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
 
@@ -2273,7 +2249,7 @@ BANNER;
 
         $this->assertSame(
             ['The "banner-file" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
 
@@ -2282,10 +2258,10 @@ BANNER;
         dump_file(
             'custom-banner',
             <<<BANNER
-  Generated by Humbug Box $version.
+                  Generated by Humbug Box $version.
 
-  @link https://github.com/humbug/box
-BANNER
+                  @link https://github.com/humbug/box
+                BANNER,
         );
 
         $this->setConfig([
@@ -2297,7 +2273,7 @@ BANNER
 
         $this->assertSame(
             ['The "banner-file" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -2319,7 +2295,7 @@ BANNER
             $this->assertSame([], $this->config->getRecommendations());
             $this->assertSame(
                 ['The "banner-file" setting has been set but is ignored since the Box built-in stub is not being used'],
-                $this->config->getWarnings()
+                $this->config->getWarnings(),
             );
         }
     }
@@ -2327,12 +2303,12 @@ BANNER
     public function test_the_banner_value_is_discarded_if_a_banner_file_is_registered(): void
     {
         $comment = <<<'COMMENT'
-This is a
+            This is a
 
-multiline
+            multiline
 
-comment.
-COMMENT;
+            comment.
+            COMMENT;
 
         dump_file('banner', $comment);
 
@@ -2352,20 +2328,20 @@ COMMENT;
     public function test_the_content_of_the_custom_banner_file_is_normalized(): void
     {
         $comment = <<<'COMMENT'
- This is a
+             This is a
 
- multiline
+             multiline
 
- comment.
-COMMENT;
+             comment.
+            COMMENT;
 
         $expected = <<<'COMMENT'
-This is a
+            This is a
 
-multiline
+            multiline
 
-comment.
-COMMENT;
+            comment.
+            COMMENT;
 
         dump_file('banner', $comment);
 
@@ -2393,7 +2369,7 @@ COMMENT;
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The file "/does/not/exist" does not exist.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -2415,7 +2391,7 @@ COMMENT;
 
         $this->assertSame(
             ['The "stub" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
 
@@ -2428,7 +2404,7 @@ COMMENT;
 
         $this->assertSame(
             ['The "stub" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -2498,7 +2474,7 @@ COMMENT;
 
         $this->assertSame(
             ['The "intercept" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
 
@@ -2510,7 +2486,7 @@ COMMENT;
 
         $this->assertSame(
             ['The "intercept" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -2542,7 +2518,7 @@ COMMENT;
             $this->assertSame([], $this->config->getRecommendations());
             $this->assertSame(
                 ['The "intercept" setting has been set but is ignored since the Box built-in stub is not being used'],
-                $this->config->getWarnings()
+                $this->config->getWarnings(),
             );
         }
     }
@@ -2561,7 +2537,7 @@ COMMENT;
 
             $this->assertSame(
                 ['The "intercept" setting can be omitted since is set to its default value'],
-                $this->config->getRecommendations()
+                $this->config->getRecommendations(),
             );
             $this->assertSame([], $this->config->getWarnings());
         }
@@ -2635,7 +2611,7 @@ COMMENT;
 
         $this->assertSame(
             ['The "check-requirements" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -2650,11 +2626,11 @@ COMMENT;
 
         $this->assertSame(
             ['The "check-requirements" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame(
             ['The requirement checker could not be used because the composer.json and composer.lock file could not be found.'],
-            $this->config->getWarnings()
+            $this->config->getWarnings(),
         );
     }
 
@@ -2668,11 +2644,11 @@ COMMENT;
 
         $this->assertSame(
             ['The "check-requirements" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame(
             ['The requirement checker could not be used because the composer.json and composer.lock file could not be found.'],
-            $this->config->getWarnings()
+            $this->config->getWarnings(),
         );
 
         $this->setConfig([
@@ -2683,11 +2659,11 @@ COMMENT;
 
         $this->assertSame(
             ['The "check-requirements" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame(
             ['The requirement checker could not be used because the composer.json and composer.lock file could not be found.'],
-            $this->config->getWarnings()
+            $this->config->getWarnings(),
         );
 
         dump_file('composer.json', '{}');
@@ -2702,7 +2678,7 @@ COMMENT;
 
         $this->assertSame(
             ['The "check-requirements" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
 
@@ -2714,7 +2690,7 @@ COMMENT;
 
         $this->assertSame(
             ['The "check-requirements" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -2734,11 +2710,11 @@ COMMENT;
 
         $this->assertSame(
             ['The "check-requirements" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame(
             ['The "check-requirements" setting has been set but has been ignored since the PHAR built-in stub is being used.'],
-            $this->config->getWarnings()
+            $this->config->getWarnings(),
         );
     }
 
@@ -2758,7 +2734,7 @@ COMMENT;
 
         $this->assertSame(
             ['The "exclude-dev-files" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
 
@@ -2782,7 +2758,7 @@ COMMENT;
 
         $this->assertSame(
             ['The "exclude-dev-files" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
 
@@ -2811,7 +2787,7 @@ COMMENT;
 
         $this->assertSame(
             ['The "dump-autoload" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -2836,7 +2812,7 @@ COMMENT;
                 'The "dump-autoload" setting can be omitted since is set to its default value',
                 'The "exclude-dev-files" setting can be omitted since is set to its default value',
             ],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -2858,7 +2834,7 @@ COMMENT;
 
         $this->assertSame(
             ['The "exclude-dev-files" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -2880,7 +2856,7 @@ COMMENT;
 
         $this->assertSame(
             ['The "dump-autoload" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -2903,7 +2879,7 @@ COMMENT;
         $this->assertSame([], $this->config->getRecommendations());
         $this->assertSame(
             ['The "exclude-dev-files" setting has been set but has been ignored because the Composer autoloader is not dumped'],
-            $this->config->getWarnings()
+            $this->config->getWarnings(),
         );
     }
 
@@ -2912,8 +2888,8 @@ COMMENT;
         $this->setConfig(
             array_fill_keys(
                 $this->retrieveSchemaKeys(),
-                null
-            )
+                null,
+            ),
         );
 
         $this->assertFalse($this->config->checkRequirements());
@@ -2932,7 +2908,7 @@ COMMENT;
         $this->assertSame($this->tmp.'/box.json', $this->config->getConfigurationFile());
         $this->assertEquals(
             new MapFile($this->tmp, []),
-            $this->config->getFileMapper()
+            $this->config->getFileMapper(),
         );
         $this->assertSame(493, $this->config->getFileMode());
         $this->assertSame([], $this->config->getFiles());
@@ -2950,12 +2926,12 @@ COMMENT;
 
         $this->assertSame(
             <<<BANNER
-Generated by Humbug Box $version.
+                Generated by Humbug Box $version.
 
-@link https://github.com/humbug/box
-BANNER
+                @link https://github.com/humbug/box
+                BANNER
             ,
-            $this->config->getStubBannerContents()
+            $this->config->getStubBannerContents(),
         );
         $this->assertNull($this->config->getStubPath());
         $this->assertSame($this->tmp.'/index.phar', $this->config->getTmpOutputPath());
@@ -2973,16 +2949,16 @@ BANNER
         dump_file(
             'composer.json',
             <<<'JSON'
-{
-    "config": {
-        "bin-dir": "bin",
-        "platform": {
-            "php": "7.1.10"
-        },
-        "sort-packages": true
-    }
-}
-JSON
+                {
+                    "config": {
+                        "bin-dir": "bin",
+                        "platform": {
+                            "php": "7.1.10"
+                        },
+                        "sort-packages": true
+                    }
+                }
+                JSON,
         );
         dump_file('composer.lock', '{}');
         dump_file('vendor/composer/installed.json', '{}');
@@ -2999,90 +2975,90 @@ JSON
         ]);
 
         $expectedDumpedConfig = <<<EOF
-KevinGH\Box\Configuration\Configuration {#100
-  -file: "box.json"
-  -fileMode: "0755"
-  -alias: "test.phar"
-  -basePath: "/path/to"
-  -composerJson: KevinGH\Box\Composer\ComposerFile {#100
-    -path: "composer.json"
-    -contents: array:1 [
-      "config" => array:3 [
-        "bin-dir" => "bin"
-        "platform" => array:1 [
-          "php" => "7.1.10"
-        ]
-        "sort-packages" => true
-      ]
-    ]
-  }
-  -composerLock: KevinGH\Box\Composer\ComposerFile {#100
-    -path: "composer.lock"
-    -contents: []
-  }
-  -files: array:6 [
-    0 => "bar.php"
-    1 => "box.json"
-    2 => "composer.json"
-    3 => "composer.lock"
-    4 => "foo.php"
-    5 => "vendor/composer/installed.json"
-  ]
-  -binaryFiles: array:2 [
-    0 => "bar.php"
-    1 => "foo.php"
-  ]
-  -autodiscoveredFiles: true
-  -dumpAutoload: true
-  -excludeComposerFiles: true
-  -excludeDevFiles: true
-  -compactors: array:1 [
-    0 => "KevinGH\Box\Compactor\Php"
-  ]
-  -compressionAlgorithm: "GZ"
-  -mainScriptPath: "index.php"
-  -mainScriptContents: ""
-  -fileMapper: KevinGH\Box\MapFile {#100
-    -basePath: "/path/to"
-    -map: []
-  }
-  -metadata: null
-  -tmpOutputPath: "index.phar"
-  -outputPath: "index.phar"
-  -privateKeyPassphrase: null
-  -privateKeyPath: null
-  -promptForPrivateKey: false
-  -processedReplacements: []
-  -shebang: "#!/usr/bin/env php"
-  -signingAlgorithm: "SHA1"
-  -stubBannerContents: "My banner"
-  -stubBannerPath: null
-  -stubPath: null
-  -isInterceptFileFuncs: false
-  -isStubGenerated: true
-  -checkRequirements: true
-  -warnings: []
-  -recommendations: []
-}
+            KevinGH\Box\Configuration\Configuration {#100
+              -compressionAlgorithm: "GZ"
+              -mainScriptPath: & "index.php"
+              -mainScriptContents: ""
+              -file: & "box.json"
+              -alias: "test.phar"
+              -basePath: "/path/to"
+              -composerJson: KevinGH\Box\Composer\ComposerFile {#100
+                -path: "composer.json"
+                -contents: array:1 [
+                  "config" => array:3 [
+                    "bin-dir" => "bin"
+                    "platform" => array:1 [
+                      "php" => "7.1.10"
+                    ]
+                    "sort-packages" => true
+                  ]
+                ]
+              }
+              -composerLock: KevinGH\Box\Composer\ComposerFile {#100
+                -path: "composer.lock"
+                -contents: []
+              }
+              -files: & array:6 [
+                0 => "bar.php"
+                1 => "box.json"
+                2 => "composer.json"
+                3 => "composer.lock"
+                4 => "foo.php"
+                5 => "vendor/composer/installed.json"
+              ]
+              -binaryFiles: & array:2 [
+                0 => "bar.php"
+                1 => "foo.php"
+              ]
+              -autodiscoveredFiles: true
+              -dumpAutoload: true
+              -excludeComposerFiles: true
+              -excludeDevFiles: true
+              -compactors: array:1 [
+                0 => "KevinGH\Box\Compactor\Php"
+              ]
+              -fileMode: "0755"
+              -fileMapper: KevinGH\Box\MapFile {#100
+                -basePath: "/path/to"
+                -map: []
+              }
+              -metadata: null
+              -tmpOutputPath: & "index.phar"
+              -outputPath: & "index.phar"
+              -privateKeyPassphrase: null
+              -privateKeyPath: & null
+              -promptForPrivateKey: false
+              -processedReplacements: []
+              -shebang: "#!/usr/bin/env php"
+              -signingAlgorithm: "SHA1"
+              -stubBannerContents: "My banner"
+              -stubBannerPath: & null
+              -stubPath: & null
+              -isInterceptFileFuncs: false
+              -isStubGenerated: true
+              -checkRequirements: true
+              -warnings: []
+              -recommendations: []
+            }
 
-EOF;
+            EOF;
 
         $actualDumpedConfig = str_replace(
             $this->tmp,
             '/path/to',
-            $this->config->export()
+            $this->config->export(),
         );
 
         $actualDumpedConfig = preg_replace(
             '/ \{#\d{2,}/',
             ' {#100',
-            $actualDumpedConfig
+            $actualDumpedConfig,
         );
 
         $this->assertSame($expectedDumpedConfig, $actualDumpedConfig);
     }
 
-    public function provideInvalidCompressionAlgorithms(): Generator
+    public static function invalidCompressionAlgorithmsProvider(): iterable
     {
         yield 'Invalid string key' => [
             'INVALID',
@@ -3105,7 +3081,7 @@ EOF;
         ];
     }
 
-    public function provideJsonValidNonStringValues(): Generator
+    public static function JsonValidNonStringValuesProvider(): iterable
     {
         foreach ($this->provideJsonPrimitives() as $key => $value) {
             if ('string' === $key) {
@@ -3116,7 +3092,7 @@ EOF;
         }
     }
 
-    public function provideJsonValidNonStringArray(): Generator
+    public static function JsonValidNonStringArrayProvider(): iterable
     {
         foreach ($this->provideJsonPrimitives() as $key => $values) {
             if ('string' === $key) {
@@ -3127,7 +3103,7 @@ EOF;
         }
     }
 
-    public function provideJsonValidNonObjectArray(): Generator
+    public static function JsonValidNonObjectArrayProvider(): iterable
     {
         foreach ($this->provideJsonPrimitives() as $key => $values) {
             if ('object' === $key) {
@@ -3138,7 +3114,7 @@ EOF;
         }
     }
 
-    public function provideJsonPrimitives(): Generator
+    public static function JsonPrimitivesProvider(): iterable
     {
         yield 'null' => null;
         yield 'bool' => true;
@@ -3148,21 +3124,21 @@ EOF;
         yield 'array' => ['foo', 'bar'];
     }
 
-    public function provideCustomBanner(): Generator
+    public static function customBannerProvider(): iterable
     {
         yield ['Simple banner'];
 
         yield [<<<'COMMENT'
-This is a
+            This is a
 
-multiline
+            multiline
 
-banner.
-COMMENT
+            banner.
+            COMMENT
         ];
     }
 
-    public function provideUnormalizedCustomBanner(): Generator
+    public static function unormalizedCustomBannerProvider(): iterable
     {
         yield [
             ' Simple banner ',
@@ -3171,24 +3147,24 @@ COMMENT
 
         yield [
             <<<'COMMENT'
- This is a
+                 This is a
 
- multiline
+                 multiline
 
- banner.
-COMMENT
+                 banner.
+                COMMENT
             ,
             <<<'COMMENT'
-This is a
+                This is a
 
-multiline
+                multiline
 
-banner.
-COMMENT
+                banner.
+                COMMENT,
         ];
     }
 
-    public function provideJsonFiles(): Generator
+    public static function jsonFilesProvider(): iterable
     {
         yield [
             static function (): void {},
@@ -3292,7 +3268,7 @@ COMMENT
         ];
     }
 
-    public function providePassFileFreeSigningAlgorithm(): Generator
+    public static function PassFileFreeSigningAlgorithmProvider(): iterable
     {
         yield ['MD5', Phar::MD5];
         yield ['SHA1', Phar::SHA1];
@@ -3307,7 +3283,9 @@ COMMENT
     {
         $schema = json_decode(
             file_contents(__DIR__.'/../../res/schema.json'),
-            true
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
         );
 
         return array_keys($schema['properties']);

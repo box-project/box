@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Composer;
 
 use Closure;
-use Generator;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -24,7 +23,7 @@ use PHPUnit\Framework\TestCase;
 class ComposerFilesTest extends TestCase
 {
     /**
-     * @dataProvider provideValidInstantiators
+     * @dataProvider validInstantiatorsProvider
      *
      * @param string[] $paths
      */
@@ -33,7 +32,7 @@ class ComposerFilesTest extends TestCase
         ComposerFile $expectedComposerJson,
         ComposerFile $expectedComposerLock,
         ComposerFile $expectedInstalledJson,
-        array $expectedPaths
+        array $expectedPaths,
     ): void {
         /** @var ComposerFiles $actual */
         $actual = $create();
@@ -47,7 +46,7 @@ class ComposerFilesTest extends TestCase
         $this->assertSame($expectedPaths, $actual->getPaths());
     }
 
-    public function provideValidInstantiators(): Generator
+    public static function validInstantiatorsProvider(): iterable
     {
         yield (static function (): array {
             $json = new ComposerFile('path/to/composer.json', ['name' => 'composer.json']);
@@ -55,9 +54,7 @@ class ComposerFilesTest extends TestCase
             $installed = new ComposerFile('path/to/installed.json', ['name' => 'installed.json']);
 
             return [
-                static function () use ($json, $lock, $installed): ComposerFiles {
-                    return new ComposerFiles($json, $lock, $installed);
-                },
+                static fn (): ComposerFiles => new ComposerFiles($json, $lock, $installed),
                 $json,
                 $lock,
                 $installed,
@@ -75,9 +72,7 @@ class ComposerFilesTest extends TestCase
             $installed = ComposerFile::createEmpty();
 
             return [
-                static function () use ($json, $lock, $installed): ComposerFiles {
-                    return new ComposerFiles($json, $lock, $installed);
-                },
+                static fn (): ComposerFiles => new ComposerFiles($json, $lock, $installed),
                 $json,
                 $lock,
                 $installed,
@@ -85,16 +80,12 @@ class ComposerFilesTest extends TestCase
             ];
         })();
 
-        yield (static function (): array {
-            return [
-                static function (): ComposerFiles {
-                    return ComposerFiles::createEmpty();
-                },
-                ComposerFile::createEmpty(),
-                ComposerFile::createEmpty(),
-                ComposerFile::createEmpty(),
-                [],
-            ];
-        })();
+        yield (static fn (): array => [
+            static fn (): ComposerFiles => ComposerFiles::createEmpty(),
+            ComposerFile::createEmpty(),
+            ComposerFile::createEmpty(),
+            ComposerFile::createEmpty(),
+            [],
+        ])();
     }
 }

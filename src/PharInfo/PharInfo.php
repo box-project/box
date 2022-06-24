@@ -25,25 +25,23 @@ use UnexpectedValueException;
 
 final class PharInfo
 {
-    private static $ALGORITHMS;
+    private static array $ALGORITHMS;
 
-    private $phar;
+    private PharData|Phar $phar;
 
-    /** @var null|array */
-    private $compressionCount;
-    /** @var null|string */
-    private $hash;
+    private ?array $compressionCount = null;
+    private ?string $hash = null;
 
     public function __construct(string $pharFile)
     {
-        if (null === self::$ALGORITHMS) {
+        if (!isset(self::$ALGORITHMS)) {
             self::$ALGORITHMS = array_flip(get_phar_compression_algorithms());
             self::$ALGORITHMS[Phar::NONE] = 'None';
         }
 
         try {
             $this->phar = new Phar($pharFile);
-        } catch (UnexpectedValueException $exception) {
+        } catch (UnexpectedValueException) {
             $this->phar = new PharData($pharFile);
         }
     }
@@ -66,10 +64,7 @@ final class PharInfo
         return $this->compressionCount;
     }
 
-    /**
-     * @return Phar|PharData
-     */
-    public function getPhar()
+    public function getPhar(): Phar|PharData
     {
         return $this->phar;
     }
@@ -105,7 +100,7 @@ final class PharInfo
     {
         $count = array_fill_keys(
             self::$ALGORITHMS,
-            0
+            0,
         );
 
         if ($this->phar instanceof PharData) {
@@ -135,7 +130,7 @@ final class PharInfo
         return array_reduce(
             iterator_to_array(new RecursiveIteratorIterator($this->phar), true),
             $countFile,
-            $count
+            $count,
         );
     }
 }

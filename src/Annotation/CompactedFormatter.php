@@ -20,7 +20,6 @@ use function implode;
 use phpDocumentor\Reflection\DocBlock\Tag;
 use phpDocumentor\Reflection\DocBlock\Tags\Formatter;
 use phpDocumentor\Reflection\DocBlock\Tags\Generic;
-use function strpos;
 
 final class CompactedFormatter implements Formatter
 {
@@ -32,7 +31,7 @@ final class CompactedFormatter implements Formatter
 
         $description = (string) $tag;
 
-        if (0 !== strpos($description, '(')) {
+        if (!str_starts_with($description, '(')) {
             return trim('@'.$tag->getName());
         }
 

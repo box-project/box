@@ -67,10 +67,10 @@ tu_box_phar_readonly: $(TU_BOX_DEPS)
 
 .PHONY: tu_requirement_checker
 tu_requirement_checker:	 ## Runs the unit tests
-tu_requirement_checker: requirement-checker/bin/phpunit requirement-checker/tests/DisplayNormalizer.php requirement-checker/actual_terminal_diff
+tu_requirement_checker: requirement-checker/bin/phpunit requirement-checker/actual_terminal_diff
 	cd requirement-checker && $(PHPNOGC) bin/phpunit
 
-	diff requirement-checker/expected_terminal_diff requirement-checker/actual_terminal_diff
+	diff --ignore-all-space --side-by-side --suppress-common-lines requirement-checker/expected_terminal_diff requirement-checker/actual_terminal_diff
 
 .PHONY: tc
 tc:			 ## Runs the unit tests with code coverage
@@ -85,29 +85,32 @@ tm:	$(TU_BOX_DEPS) $(INFECTION)
 
 .PHONY: e2e
 e2e:			 ## Runs all the end-to-end tests
-e2e: e2e_php_settings_checker e2e_scoper_alias e2e_scoper_whitelist e2e_check_requirements e2e_symfony e2e_composer_installed_versions
+e2e: e2e_php_settings_checker e2e_scoper_alias e2e_scoper_expose_symbols e2e_check_requirements e2e_symfony e2e_composer_installed_versions e2e_phpstorm_stubs
 
 .PHONY: e2e_scoper_alias
 e2e_scoper_alias: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the prefix alias is working
 e2e_scoper_alias: box
-	./box compile --working-dir fixtures/build/dir010
+	./box compile --working-dir=fixtures/build/dir010
 
-.PHONY: e2e_scoper_whitelist
-e2e_scoper_whitelist: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the whitelisting is working
-e2e_scoper_whitelist: box fixtures/build/dir011/vendor
+.PHONY: e2e_scoper_expose_symbols
+e2e_scoper_expose_symbols: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the symbols exposure is working
+e2e_scoper_expose_symbols: box fixtures/build/dir011/vendor
 	php fixtures/build/dir011/index.php > fixtures/build/dir011/expected-output
-	./box compile --working-dir fixtures/build/dir011
+	./box compile --working-dir=fixtures/build/dir011
 
 	php fixtures/build/dir011/index.phar > fixtures/build/dir011/output
 	cd fixtures/build/dir011 && php -r "file_put_contents('phar-Y.php', file_get_contents((new Phar('index.phar'))['src/Y.php']));"
 
-	diff fixtures/build/dir011/expected-output fixtures/build/dir011/output
-	diff fixtures/build/dir011/phar-Y.php fixtures/build/dir011/src/Y.php
+	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/build/dir011/expected-output fixtures/build/dir011/output
+	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/build/dir011/phar-Y.php fixtures/build/dir011/src/Y.php
 
 .PHONY: e2e_check_requirements
-DOCKER=docker run -i --rm -w /opt/box
-PHP7PHAR=box_php73 php index.phar -vvv --no-ansi
-PHP5PHAR=box_php53 php index.phar -vvv --no-ansi
+DOCKER=docker run -i --platform linux/amd64 --rm -w /opt/box
+PHP_COMPOSER_MIN_BOX=box_php725
+PHP_COMPOSER_MIN_PHAR=$(PHP_COMPOSER_MIN_BOX) php index.phar -vvv --no-ansi
+MIN_SUPPORTED_PHP_BOX=box_php81
+MIN_SUPPORTED_PHP_WITH_XDEBUG_BOX=box_php81_xdebug
+MIN_SUPPORTED_PHP_PHAR=$(MIN_SUPPORTED_PHP_BOX) php index.phar -vvv --no-ansi
 e2e_check_requirements:	 ## Runs the end-to-end tests for the check requirements feature
 e2e_check_requirements: box .requirement-checker
 	./.docker/build
@@ -116,87 +119,87 @@ e2e_check_requirements: box .requirement-checker
 	# Pass no config
 	#
 
-	./box compile --working-dir fixtures/check-requirements/pass-no-config/
+	./box compile --working-dir=fixtures/check-requirements/pass-no-config/
 
-	# 5.3
-	sed "s/PHP_VERSION/$$($(DOCKER) box_php53 php -r 'echo PHP_VERSION;')/" \
-		fixtures/check-requirements/pass-no-config/expected-output-53-dist \
-		> fixtures/check-requirements/pass-no-config/expected-output-53
-
-	rm fixtures/check-requirements/pass-no-config/actual-output || true
-	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-no-config":/opt/box $(PHP5PHAR) | tee fixtures/check-requirements/pass-no-config/actual-output
-	diff fixtures/check-requirements/pass-no-config/expected-output-53 fixtures/check-requirements/pass-no-config/actual-output
-
-	# 7.2
-	sed "s/PHP_VERSION/$$($(DOCKER) box_php73 php -r 'echo PHP_VERSION;')/" \
-		fixtures/check-requirements/pass-no-config/expected-output-73-dist \
-		> fixtures/check-requirements/pass-no-config/expected-output-73
+	# Composer min version
+	sed "s/PHP_VERSION/$$($(DOCKER) $(PHP_COMPOSER_MIN_BOX) php -r 'echo PHP_VERSION;')/" \
+		fixtures/check-requirements/pass-no-config/expected-output-725-dist \
+		> fixtures/check-requirements/pass-no-config/expected-output-725
 
 	rm fixtures/check-requirements/pass-no-config/actual-output || true
-	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-no-config":/opt/box $(PHP7PHAR) | tee fixtures/check-requirements/pass-no-config/actual-output
-	diff fixtures/check-requirements/pass-no-config/expected-output-73 fixtures/check-requirements/pass-no-config/actual-output
+	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-no-config":/opt/box $(PHP_COMPOSER_MIN_PHAR) | tee fixtures/check-requirements/pass-no-config/actual-output
+	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/check-requirements/pass-no-config/expected-output-725 fixtures/check-requirements/pass-no-config/actual-output
+
+	# Current min version
+	sed "s/PHP_VERSION/$$($(DOCKER) $(MIN_SUPPORTED_PHP_BOX) php -r 'echo PHP_VERSION;')/" \
+		fixtures/check-requirements/pass-no-config/expected-output-current-min-php-dist \
+		> fixtures/check-requirements/pass-no-config/expected-output-current-min-php
+
+	rm fixtures/check-requirements/pass-no-config/actual-output || true
+	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-no-config":/opt/box $(MIN_SUPPORTED_PHP_PHAR) | tee fixtures/check-requirements/pass-no-config/actual-output
+	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/check-requirements/pass-no-config/expected-output-current-min-php fixtures/check-requirements/pass-no-config/actual-output
 
 	#
 	# Pass complete
 	#
 
-	./box compile --working-dir fixtures/check-requirements/pass-complete/
+	./box compile --working-dir=fixtures/check-requirements/pass-complete/
 
-	# 5.3
-	sed "s/PHP_VERSION/$$($(DOCKER) box_php53 php -r 'echo PHP_VERSION;')/" \
-		fixtures/check-requirements/pass-complete/expected-output-53-dist \
-		> fixtures/check-requirements/pass-complete/expected-output-53
-
-	rm fixtures/check-requirements/pass-complete/actual-output || true
-	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-complete":/opt/box $(PHP5PHAR) | tee fixtures/check-requirements/pass-complete/actual-output
-	diff fixtures/check-requirements/pass-complete/expected-output-53 fixtures/check-requirements/pass-complete/actual-output
-
-	# 7.2
-	sed "s/PHP_VERSION/$$($(DOCKER) box_php73 php -r 'echo PHP_VERSION;')/" \
-		fixtures/check-requirements/pass-complete/expected-output-73-dist \
-		> fixtures/check-requirements/pass-complete/expected-output-73
+	# Composer min version
+	sed "s/PHP_VERSION/$$($(DOCKER) $(PHP_COMPOSER_MIN_BOX) php -r 'echo PHP_VERSION;')/" \
+		fixtures/check-requirements/pass-complete/expected-output-725-dist \
+		> fixtures/check-requirements/pass-complete/expected-output-725
 
 	rm fixtures/check-requirements/pass-complete/actual-output || true
-	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-complete":/opt/box $(PHP7PHAR) | tee fixtures/check-requirements/pass-complete/actual-output
-	diff fixtures/check-requirements/pass-complete/expected-output-73 fixtures/check-requirements/pass-complete/actual-output
+	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-complete":/opt/box $(PHP_COMPOSER_MIN_PHAR) | tee fixtures/check-requirements/pass-complete/actual-output
+	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/check-requirements/pass-complete/expected-output-725 fixtures/check-requirements/pass-complete/actual-output
+
+	# Current min version
+	sed "s/PHP_VERSION/$$($(DOCKER) $(MIN_SUPPORTED_PHP_BOX) php -r 'echo PHP_VERSION;')/" \
+		fixtures/check-requirements/pass-complete/expected-output-current-min-php-dist \
+		> fixtures/check-requirements/pass-complete/expected-output-current-min-php
+
+	rm fixtures/check-requirements/pass-complete/actual-output || true
+	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-complete":/opt/box $(MIN_SUPPORTED_PHP_PHAR) | tee fixtures/check-requirements/pass-complete/actual-output
+	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/check-requirements/pass-complete/expected-output-current-min-php fixtures/check-requirements/pass-complete/actual-output
 
 	#
 	# Fail complete
 	#
 
-	./box compile --working-dir fixtures/check-requirements/fail-complete/
+	./box compile --working-dir=fixtures/check-requirements/fail-complete/
 
-	# 5.3
-	sed "s/PHP_VERSION/$$($(DOCKER) box_php53 php -r 'echo PHP_VERSION;')/" \
-    		fixtures/check-requirements/fail-complete/expected-output-53-dist \
-    		> fixtures/check-requirements/fail-complete/expected-output-53
-
-	rm fixtures/check-requirements/fail-complete/actual-output || true
-	$(DOCKER) -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP5PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
-	diff fixtures/check-requirements/fail-complete/expected-output-53 fixtures/check-requirements/fail-complete/actual-output
-
-	# 7.2
-	sed "s/PHP_VERSION/$$($(DOCKER) box_php73 php -r 'echo PHP_VERSION;')/" \
-		fixtures/check-requirements/fail-complete/expected-output-73-dist \
-		> fixtures/check-requirements/fail-complete/expected-output-73
+	# Composer min version
+	sed "s/PHP_VERSION/$$($(DOCKER) $(PHP_COMPOSER_MIN_BOX) php -r 'echo PHP_VERSION;')/" \
+    		fixtures/check-requirements/fail-complete/expected-output-725-dist \
+    		> fixtures/check-requirements/fail-complete/expected-output-725
 
 	rm fixtures/check-requirements/fail-complete/actual-output || true
-	$(DOCKER) -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP7PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
-	diff fixtures/check-requirements/fail-complete/expected-output-73 fixtures/check-requirements/fail-complete/actual-output
+	$(DOCKER) -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP_COMPOSER_MIN_PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
+	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/check-requirements/fail-complete/expected-output-725 fixtures/check-requirements/fail-complete/actual-output
+
+	# Current min version
+	sed "s/PHP_VERSION/$$($(DOCKER) $(MIN_SUPPORTED_PHP_BOX) php -r 'echo PHP_VERSION;')/" \
+		fixtures/check-requirements/fail-complete/expected-output-current-min-php-dist \
+		> fixtures/check-requirements/fail-complete/expected-output-current-min-php
+
+	rm fixtures/check-requirements/fail-complete/actual-output || true
+	$(DOCKER) -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(MIN_SUPPORTED_PHP_PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
+	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/check-requirements/fail-complete/expected-output-current-min-php fixtures/check-requirements/fail-complete/actual-output
 
 	#
 	# Skip the requirement check
 	#
 
-	./box compile --working-dir fixtures/check-requirements/fail-complete/
+	./box compile --working-dir=fixtures/check-requirements/fail-complete/
 
-	sed "s/PHP_VERSION/$$($(DOCKER) box_php53 php -r 'echo PHP_VERSION;')/" \
-			fixtures/check-requirements/fail-complete/expected-output-53-dist-skipped \
-			> fixtures/check-requirements/fail-complete/expected-output-53
+	sed "s/PHP_VERSION/$$($(DOCKER) $(PHP_COMPOSER_MIN_BOX) php -r 'echo PHP_VERSION;')/" \
+			fixtures/check-requirements/fail-complete/expected-output-725-dist-skipped \
+			> fixtures/check-requirements/fail-complete/expected-output-725
 
 	rm fixtures/check-requirements/fail-complete/actual-output || true
-	$(DOCKER) -e BOX_REQUIREMENT_CHECKER=0 -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP5PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
-	diff fixtures/check-requirements/fail-complete/expected-output-53 fixtures/check-requirements/fail-complete/actual-output
+	$(DOCKER) -e BOX_REQUIREMENT_CHECKER=0 -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP_COMPOSER_MIN_PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
+	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/check-requirements/fail-complete/expected-output-725 fixtures/check-requirements/fail-complete/actual-output
 
 BOX_COMPILE=./box compile --working-dir=fixtures/php-settings-checker -vvv --no-ansi
 ifeq ($(OS),Darwin)
@@ -208,26 +211,26 @@ endif
 e2e_php_settings_checker: ## Runs the end-to-end tests for the PHP settings handler
 e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xdebug-enabled vendor box
 	@echo "$(CCYELLOW)No restart needed$(CCEND)"
-	$(DOCKER) -v "$$PWD":/opt/box box_php73 \
+	$(DOCKER) -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX) \
 		php -dphar.readonly=0 -dmemory_limit=-1 \
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
 		| tee fixtures/php-settings-checker/actual-output || true
 	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
-	diff fixtures/php-settings-checker/output-all-clear fixtures/php-settings-checker/actual-output
+	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-all-clear fixtures/php-settings-checker/actual-output
 
 	@echo "$(CCYELLOW)Xdebug enabled: restart needed$(CCEND)"
-	$(DOCKER) -v "$$PWD":/opt/box box_php73_xdebug \
+	$(DOCKER) -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX)_xdebug \
 		php -dphar.readonly=0 -dmemory_limit=-1 \
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
 		| tee fixtures/php-settings-checker/actual-output || true
 	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
 	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
-	diff fixtures/php-settings-checker/output-xdebug-enabled fixtures/php-settings-checker/actual-output
+	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-xdebug-enabled fixtures/php-settings-checker/actual-output
 
 	@echo "$(CCYELLOW)phar.readonly enabled: restart needed$(CCEND)"
-	$(DOCKER) -v "$$PWD":/opt/box box_php73 \
+	$(DOCKER) -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX) \
 		php -dphar.readonly=1 -dmemory_limit=-1 \
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
@@ -235,10 +238,10 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
 	$(SED) "s/'-c' '.*' '\.\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
 	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
-	diff fixtures/php-settings-checker/output-pharreadonly-enabled fixtures/php-settings-checker/actual-output
+	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-pharreadonly-enabled fixtures/php-settings-checker/actual-output
 
 	@echo "$(CCYELLOW)Bump min memory limit if necessary (limit lower than default)$(CCEND)"
-	$(DOCKER) -v "$$PWD":/opt/box box_php73 \
+	$(DOCKER) -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX) \
 		php -dphar.readonly=0 -dmemory_limit=124M \
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
@@ -246,10 +249,10 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
 	$(SED) "s/'-c' '.*' '\.\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
 	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
-	diff fixtures/php-settings-checker/output-min-memory-limit fixtures/php-settings-checker/actual-output
+	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-min-memory-limit fixtures/php-settings-checker/actual-output
 
 	@echo "$(CCYELLOW)Bump min memory limit if necessary (limit higher than default)$(CCEND)"
-	$(DOCKER) -e BOX_MEMORY_LIMIT=64M -v "$$PWD":/opt/box box_php73 \
+	$(DOCKER) -e BOX_MEMORY_LIMIT=64M -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX) \
 		php -dphar.readonly=0 -dmemory_limit=1024M \
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
@@ -257,30 +260,39 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
 	$(SED) "s/'-c' '.*' '\.\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
 	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
-	diff fixtures/php-settings-checker/output-set-memory-limit fixtures/php-settings-checker/actual-output
+	diff --ignore-all-space --side-by-side --suppress-common-lines  fixtures/php-settings-checker/output-set-memory-limit fixtures/php-settings-checker/actual-output
 
 .PHONY: e2e_symfony
 e2e_symfony:		 ## Packages a fresh Symfony app
 e2e_symfony: fixtures/build/dir012/vendor box
-	composer dump-env prod --working-dir fixtures/build/dir012
+	composer dump-env prod --working-dir=fixtures/build/dir012
 
 	php fixtures/build/dir012/bin/console --version > fixtures/build/dir012/expected-output
 	rm -rf fixtures/build/dir012/var/cache/prod/*
 
-	./box compile --working-dir fixtures/build/dir012
+	./box compile --working-dir=fixtures/build/dir012
 
 	php fixtures/build/dir012/bin/console.phar --version > fixtures/build/dir012/actual-output
 
-	diff fixtures/build/dir012/expected-output fixtures/build/dir012/actual-output
+	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/build/dir012/expected-output fixtures/build/dir012/actual-output
 
 .PHONY: e2e_composer_installed_versions
 e2e_composer_installed_versions:		 ## Packages an app using Composer\InstalledVersions
 e2e_composer_installed_versions: fixtures/build/dir013/vendor box
-	./box compile --working-dir fixtures/build/dir013
+	./box compile --working-dir=fixtures/build/dir013
 	
 	php fixtures/build/dir013/bin/run.phar > fixtures/build/dir013/actual-output
 
-	diff fixtures/build/dir013/expected-output fixtures/build/dir013/actual-output
+	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/build/dir013/expected-output fixtures/build/dir013/actual-output
+
+.PHONY: e2e_phpstorm_stubs
+e2e_phpstorm_stubs:		 ## Project using symbols which should be vetted by PhpStormStubs
+e2e_phpstorm_stubs: box
+	./box compile --working-dir=fixtures/build/dir014
+
+	php fixtures/build/dir014/index.phar > fixtures/build/dir014/actual-output
+
+	diff fixtures/build/dir014/expected-output fixtures/build/dir014/actual-output
 
 .PHONY: blackfire
 blackfire:		 ## Profiles the compile step
@@ -301,7 +313,7 @@ composer.lock: composer.json
 	touch $@
 
 requirement-checker/composer.lock: requirement-checker/composer.json
-	composer install --working-dir requirement-checker
+	composer install --working-dir=requirement-checker
 	touch $@
 
 vendor: composer.lock
@@ -317,11 +329,11 @@ bin/phpunit: composer.lock
 	touch $@
 
 requirement-checker/bin/phpunit: requirement-checker/composer.lock
-	composer install --working-dir requirement-checker
+	composer install --working-dir=requirement-checker
 	touch $@
 
 requirement-checker/vendor: requirement-checker/composer.json
-	composer install --working-dir requirement-checker
+	composer install --working-dir=requirement-checker
 	touch $@
 
 $(PHP_CS_FIXER): vendor/bamarni
@@ -341,47 +353,45 @@ $(INFECTION): vendor/bamarni
 	touch $@
 
 fixtures/composer-dump/dir001/composer.lock: fixtures/composer-dump/dir001/composer.json
-	composer install --working-dir fixtures/composer-dump/dir001
+	composer install --working-dir=fixtures/composer-dump/dir001
 	touch $@
 
 fixtures/composer-dump/dir003/composer.lock: fixtures/composer-dump/dir003/composer.json
-	composer install --working-dir fixtures/composer-dump/dir003
+	composer install --working-dir=fixtures/composer-dump/dir003
 	touch $@
 
 fixtures/composer-dump/dir001/vendor: fixtures/composer-dump/dir001/composer.lock
-	composer install --working-dir fixtures/composer-dump/dir001
+	composer install --working-dir=fixtures/composer-dump/dir001
 	touch $@
 
 fixtures/composer-dump/dir003/vendor: fixtures/composer-dump/dir003/composer.lock
-	composer install --working-dir fixtures/composer-dump/dir003
+	composer install --working-dir=fixtures/composer-dump/dir003
 	touch $@
 
 fixtures/build/dir011/vendor:
-	composer install --working-dir fixtures/build/dir011
+	composer install --working-dir=fixtures/build/dir011
 	touch $@
 
 fixtures/build/dir012/vendor:
-	composer install --working-dir fixtures/build/dir012
+	composer install --working-dir=fixtures/build/dir012
 	touch $@
 
 fixtures/build/dir013/vendor:
-	composer install --working-dir fixtures/build/dir013
+	composer install --working-dir=fixtures/build/dir013
 	touch $@
 
 .PHONY: fixtures/default_stub.php
 fixtures/default_stub.php:
-	bin/generate_default_stub
-
-requirement-checker/tests/DisplayNormalizer.php: tests/Console/DisplayNormalizer.php
-	cat tests/Console/DisplayNormalizer.php | sed -E 's/namespace KevinGH\\Box\\Console;/namespace KevinGH\\RequirementChecker;/g' > requirement-checker/tests/DisplayNormalizer.php
+	php -d phar.readonly=0 bin/generate_default_stub
 
 .requirement-checker: requirement-checker/bin/check-requirements.phar
 	php bin/box extract requirement-checker/bin/check-requirements.phar .requirement-checker
 	touch $@
 
 requirement-checker/actual_terminal_diff: requirement-checker/src/Terminal.php vendor/symfony/console/Terminal.php
-	diff vendor/symfony/console/Terminal.php requirement-checker/src/Terminal.php > requirement-checker/actual_terminal_diff || true
+	(diff --ignore-all-space --side-by-side --suppress-common-lines vendor/symfony/console/Terminal.php requirement-checker/src/Terminal.php || true) > requirement-checker/actual_terminal_diff
 
+tests/Console/DisplayNormalizer.php: vendor
 vendor/symfony/console/Terminal.php: vendor
 
 box: bin src res vendor box.json.dist scoper.inc.php .requirement-checker
@@ -404,7 +414,7 @@ box: bin src res vendor box.json.dist scoper.inc.php .requirement-checker
 	touch $@
 
 requirement-checker/bin/check-requirements.phar: requirement-checker/src requirement-checker/bin/check-requirements.php requirement-checker/box.json.dist requirement-checker/scoper.inc.php requirement-checker/vendor
-	bin/box compile --working-dir requirement-checker
+	bin/box compile --working-dir=requirement-checker
 	touch $@
 
 .PHONY: docker-images
@@ -412,5 +422,5 @@ docker-images:
 	./.docker/build
 
 fixtures/php-settings-checker/output-xdebug-enabled: fixtures/php-settings-checker/output-xdebug-enabled.tpl docker-images
-	./fixtures/php-settings-checker/create-expected-output
+	./fixtures/php-settings-checker/create-expected-output $(MIN_SUPPORTED_PHP_WITH_XDEBUG_BOX)
 	touch $@

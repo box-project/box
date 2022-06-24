@@ -1,4 +1,5 @@
-/.box_dump
+/.box_dump/
+/requirement-checker/.box_dump/
 /box
 /*.phar
 /*.phar.sig
@@ -20,6 +21,7 @@
 /fixtures/build/dir012/expected-output
 /fixtures/check-requirements/*/actual-output
 /fixtures/check-requirements/*/expected-output-*
+!/fixtures/check-requirements/*/expected-output-*-dist
 /fixtures/check-requirements/*/*.phar
 /fixtures/php-settings-checker/*
 !/fixtures/php-settings-checker/index.php
@@ -32,7 +34,6 @@
 !/requirement-checker/bin/check-requirments.php
 /requirement-checker/actual_terminal_diff
 /requirement-checker/.box/
-/requirement-checker/tests/DisplayNormalizer.php
 /requirement-checker/vendor/
 /requirement-checker/.phpunit*
 /vendor/

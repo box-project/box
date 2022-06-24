@@ -14,39 +14,33 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PhpScoper;
 
-use Humbug\PhpScoper\Whitelist;
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 
 /**
  * @private
  */
 final class NullScoper implements Scoper
 {
-    /**
-     * {@inheritdoc}
-     */
+    public function __construct(
+        private SymbolsRegistry $symbolsRegistry = new SymbolsRegistry(),
+    ) {
+    }
+
     public function scope(string $filePath, string $contents): string
     {
         return $contents;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function changeWhitelist(Whitelist $whitelist): void
+    public function changeSymbolsRegistry(SymbolsRegistry $symbolsRegistry): void
     {
+        $this->symbolsRegistry = $symbolsRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getWhitelist(): Whitelist
+    public function getSymbolsRegistry(): SymbolsRegistry
     {
-        return Whitelist::create(true, true, true);
+        return $this->symbolsRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPrefix(): string
     {
         return '';

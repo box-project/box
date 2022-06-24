@@ -14,13 +14,14 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-use Generator;
-use Humbug\PhpScoper\Whitelist;
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
+use KevinGH\Box\PhpScoper\NullScoper;
 use KevinGH\Box\PhpScoper\Scoper;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
+use Prophecy\Prophet;
 
 /**
  * @covers \KevinGH\Box\Compactor\Compactors
@@ -29,24 +30,16 @@ class CompactorsTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var Compactor&ObjectProphecy */
-    private $compactor1Prophecy;
+    private Compactor|ObjectProphecy $compactor1Prophecy;
 
-    /** @var Compactor */
-    private $compactor1;
+    private Compactor $compactor1;
 
-    /** @var Compactor&ObjectProphecy */
-    private $compactor2Prophecy;
+    private Compactor|ObjectProphecy $compactor2Prophecy;
 
-    /** @var Compactor */
-    private $compactor2;
+    private Compactor $compactor2;
 
-    /** @var Compactors */
-    private $compactors;
+    private Compactors $compactors;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->compactor1Prophecy = $this->prophesize(Compactor::class);
@@ -89,38 +82,45 @@ class CompactorsTest extends TestCase
                 $this->compactor1,
                 $this->compactor2,
             ],
-            $this->compactors->toArray()
+            $this->compactors->toArray(),
         );
     }
 
     /**
-     * @dataProvider provideCompactorsForFirstWhitelistCheck
+     * @dataProvider compactorsForFirstSymbolsRegistryCheckProvider
      *
-     * @param Compactor[] $compactors
+     * @param list<Compactor> $compactors
      */
-    public function test_it_provides_the_first_scoper_compactor_whitelist_when_there_is_one(array $compactors, ?Whitelist $expected): void
-    {
-        $actual = (new Compactors(...$compactors))->getScoperWhitelist();
+    public function test_it_provides_the_first_scoper_compactor_symbols_registry_when_there_is_one(
+        array $compactors,
+        ?SymbolsRegistry $expected,
+    ): void {
+        $actual = (new Compactors(...$compactors))->getScoperSymbolsRegistry();
 
         $this->assertSame($expected, $actual);
     }
 
     /**
-     * @dataProvider provideCompactorsForFirstWhitelistChange
+     * @dataProvider compactorsForFirstSymbolsRegistryChangeProvider
      *
-     * @param Compactor[] $compactors
+     * @param list<Compactor> $compactors
      */
-    public function test_it_can_change_the_first_scoper_compactor_whitelist(array $compactors, ?Whitelist $newWhitelist): void
-    {
+    public function test_it_can_change_the_first_scoper_compactor_whitelist(
+        array $compactors,
+        ?SymbolsRegistry $newSymbolsRegistry,
+    ): void {
+        // We need to do this here since we use a prophet in the data provider
+        $this->recordDoubledType(Scoper::class);
+
         $compactorsAggregate = new Compactors(...$compactors);
 
-        if (null !== $newWhitelist) {
-            $compactorsAggregate->registerWhitelist($newWhitelist);
+        if (null !== $newSymbolsRegistry) {
+            $compactorsAggregate->registerSymbolsRegistry($newSymbolsRegistry);
         }
 
-        $actual = $compactorsAggregate->getScoperWhitelist();
+        $actual = $compactorsAggregate->getScoperSymbolsRegistry();
 
-        $this->assertSame($newWhitelist, $actual);
+        $this->assertSame($newSymbolsRegistry, $actual);
     }
 
     public function test_it_is_countable(): void
@@ -130,8 +130,11 @@ class CompactorsTest extends TestCase
         $this->assertCount(2, new Compactors(new FakeCompactor(), new FakeCompactor()));
     }
 
-    public function provideCompactorsForFirstWhitelistCheck(): Generator
+    public static function compactorsForFirstSymbolsRegistryCheckProvider(): iterable
     {
+        $symbolsRegistry1 = new SymbolsRegistry();
+        $symbolsRegistry2 = new SymbolsRegistry();
+
         yield [
             [],
             null,
@@ -142,35 +145,29 @@ class CompactorsTest extends TestCase
             null,
         ];
 
-        yield (function (): array {
-            $whitelist = Whitelist::create(true, true, true);
+        yield [
+            [
+                new FakeCompactor(),
+                self::createScoperCompactor($symbolsRegistry1),
+            ],
+            $symbolsRegistry1,
+        ];
 
-            return [
-                [
-                    new FakeCompactor(),
-                    $this->createScoperCompactor($whitelist),
-                ],
-                $whitelist,
-            ];
-        })();
-
-        yield (function (): array {
-            $firstWhitelist = Whitelist::create(true, true, true);
-            $secondWhitelist = Whitelist::create(false, false, false);
-
-            return [
-                [
-                    new FakeCompactor(),
-                    $this->createScoperCompactor($firstWhitelist),
-                    $this->createScoperCompactor($secondWhitelist),
-                ],
-                $firstWhitelist,
-            ];
-        })();
+        yield [
+            [
+                new FakeCompactor(),
+                self::createScoperCompactor($symbolsRegistry1),
+                self::createScoperCompactor($symbolsRegistry2),
+            ],
+            $symbolsRegistry1,
+        ];
     }
 
-    public function provideCompactorsForFirstWhitelistChange(): Generator
+    public static function compactorsForFirstSymbolsRegistryChangeProvider(): iterable
     {
+        $symbolsRegistry1 = new SymbolsRegistry();
+        $symbolsRegistry2 = new SymbolsRegistry();
+
         yield [
             [],
             null,
@@ -181,51 +178,37 @@ class CompactorsTest extends TestCase
             null,
         ];
 
-        yield (function (): array {
-            $whitelist = Whitelist::create(true, true, true);
+        yield [
+            [
+                new FakeCompactor(),
+                self::createScoperCompactorWithChangeSymbolsRegistry($symbolsRegistry1),
+            ],
+            $symbolsRegistry1,
+        ];
 
-            return [
-                [
-                    new FakeCompactor(),
-                    $this->createScoperCompactorWithChangeWhitelist($whitelist),
-                ],
-                $whitelist,
-            ];
-        })();
-
-        yield (function (): array {
-            $firstWhitelist = Whitelist::create(true, true, true);
-            $secondWhitelist = Whitelist::create(false, false, false);
-
-            return [
-                [
-                    new FakeCompactor(),
-                    $this->createScoperCompactorWithChangeWhitelist($firstWhitelist),
-                    $this->createScoperCompactorWithChangeWhitelist($secondWhitelist),
-                ],
-                $firstWhitelist,
-            ];
-        })();
+        yield [
+            [
+                new FakeCompactor(),
+                self::createScoperCompactorWithChangeSymbolsRegistry($symbolsRegistry1),
+                self::createScoperCompactorWithChangeSymbolsRegistry($symbolsRegistry2),
+            ],
+            $symbolsRegistry1,
+        ];
     }
 
-    private function createScoperCompactor(Whitelist $whitelist): PhpScoper
+    private static function createScoperCompactor(SymbolsRegistry $symbolsRegistry): PhpScoper
     {
-        /** @var ObjectProphecy&Scoper $scoperProphecy */
-        $scoperProphecy = $this->prophesize(Scoper::class);
-        $scoperProphecy->getWhitelist()->willReturn($whitelist);
-
-        /** @var Scoper $scoper */
-        $scoper = $scoperProphecy->reveal();
-
-        return new PhpScoper($scoper);
+        return new PhpScoper(new NullScoper($symbolsRegistry));
     }
 
-    private function createScoperCompactorWithChangeWhitelist(Whitelist $whitelist): PhpScoper
+    private static function createScoperCompactorWithChangeSymbolsRegistry(SymbolsRegistry $symbolsRegistry): PhpScoper
     {
-        /** @var ObjectProphecy&Scoper $scoperProphecy */
-        $scoperProphecy = $this->prophesize(Scoper::class);
-        $scoperProphecy->changeWhitelist($whitelist)->shouldBeCalled();
-        $scoperProphecy->getWhitelist()->willReturn($whitelist);
+        $prophet = new Prophet();
+
+        /** @var ObjectProphecy<Scoper> $scoperProphecy */
+        $scoperProphecy = $prophet->prophesize(Scoper::class);
+        $scoperProphecy->changeSymbolsRegistry($symbolsRegistry)->shouldBeCalled();
+        $scoperProphecy->getSymbolsRegistry()->willReturn($symbolsRegistry);
 
         /** @var Scoper $scoper */
         $scoper = $scoperProphecy->reveal();

@@ -28,7 +28,7 @@ class NoConfigurationFoundTest extends TestCase
 
         $this->assertSame(
             'The configuration file could not be found.',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
         $this->assertSame(0, $exception->getCode());
         $this->assertNull($exception->getPrevious());

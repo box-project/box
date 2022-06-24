@@ -21,6 +21,7 @@ use function array_merge;
 use function array_unique;
 use function array_values;
 use function json_decode;
+use const JSON_THROW_ON_ERROR;
 use function KevinGH\Box\FileSystem\file_contents;
 use PHPUnit\Framework\TestCase;
 use function preg_match;
@@ -50,10 +51,8 @@ class DocumentationSchemaTest extends TestCase
         $schemaKeys = array_values(
             array_filter(
                 $this->retrieveSchemaKeys(),
-                static function (string $key): bool {
-                    return 'datetime_format' !== $key;
-                }
-            )
+                static fn (string $key): bool => 'datetime_format' !== $key,
+            ),
         );
 
         $this->assertSame($schemaKeys, $docKeys);
@@ -66,7 +65,7 @@ class DocumentationSchemaTest extends TestCase
         $this->assertSame(
             array_unique($docKeys),
             $docKeys,
-            'Did not expect to find duplicated keys in the documentation'
+            'Did not expect to find duplicated keys in the documentation',
         );
 
         $schemaKeys = $this->retrieveSchemaKeys();
@@ -74,7 +73,7 @@ class DocumentationSchemaTest extends TestCase
         $this->assertSame(
             [],
             array_diff($docKeys, $schemaKeys),
-            'Did not expect to find a key in the documentation which is not found in the schema'
+            'Did not expect to find a key in the documentation which is not found in the schema',
         );
     }
 
@@ -87,10 +86,8 @@ class DocumentationSchemaTest extends TestCase
         $schemaKeys = array_values(
             array_filter(
                 $this->retrieveSchemaKeys(),
-                static function (string $key): bool {
-                    return 'datetime_format' !== $key;
-                }
-            )
+                static fn (string $key): bool => 'datetime_format' !== $key,
+            ),
         );
 
         $this->assertEquals($schemaKeys, $docKeys);
@@ -106,11 +103,11 @@ class DocumentationSchemaTest extends TestCase
             preg_match(
                 '/```json(?<schema>.*?)```/s',
                 file_contents(__DIR__.'/../doc/configuration.md'),
-                $matches
-            )
+                $matches,
+            ),
         );
 
-        return array_keys(json_decode($matches['schema'], true));
+        return array_keys(json_decode($matches['schema'], true, 512, JSON_THROW_ON_ERROR));
     }
 
     /**
@@ -120,7 +117,9 @@ class DocumentationSchemaTest extends TestCase
     {
         $schema = json_decode(
             file_contents(__DIR__.'/../res/schema.json'),
-            true
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
         );
 
         return array_keys($schema['properties']);
@@ -132,16 +131,16 @@ class DocumentationSchemaTest extends TestCase
     private function retrieveDocKeys(): array
     {
         preg_match_all(
-            '/#+ [\p{L}\-\s]+\(`(.*?)`(?:[\p{L}\-\s]+`(.*?)`)?\)/u',
+            '/#+ [\p{L}\\-\s]+\(`(.*?)`(?:[\p{L}\\-\s]+`(.*?)`)?\)/u',
             file_contents(__DIR__.'/../doc/configuration.md'),
-            $matches
+            $matches,
         );
 
         return array_filter(
             array_merge(
                 $matches[1],
-                $matches[2]
-            )
+                $matches[2],
+            ),
         );
     }
 }

@@ -15,9 +15,12 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use function count;
+use Fidry\Console\Command\Command;
+use Fidry\Console\Command\Configuration;
+use Fidry\Console\ExitCode;
+use Fidry\Console\Input\IO;
 use KevinGH\Box\Box;
 use function KevinGH\Box\bump_open_file_descriptor_limit;
-use KevinGH\Box\Console\IO\IO;
 use function KevinGH\Box\create_temporary_phar;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\remove;
@@ -34,95 +37,135 @@ use Throwable;
 /**
  * @private
  */
-final class Extract extends BaseCommand
+final class Extract implements Command
 {
     private const PHAR_ARG = 'phar';
     private const OUTPUT_ARG = 'output';
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure(): void
+    public function getConfiguration(): Configuration
     {
-        $this->setName('extract');
-        $this->setDescription(
-            '🚚  Extracts a given PHAR into a directory'
-        );
-        $this->addArgument(
-            self::PHAR_ARG,
-            InputArgument::REQUIRED,
-            'The PHAR file.'
-        );
-        $this->addArgument(
-            self::OUTPUT_ARG,
-            InputArgument::REQUIRED,
-            'The output directory'
+        return new Configuration(
+            'extract',
+            '🚚  Extracts a given PHAR into a directory',
+            '',
+            [
+                new InputArgument(
+                    self::PHAR_ARG,
+                    InputArgument::REQUIRED,
+                    'The PHAR file.',
+                ),
+                new InputArgument(
+                    self::OUTPUT_ARG,
+                    InputArgument::REQUIRED,
+                    'The output directory',
+                ),
+            ],
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function executeCommand(IO $io): int
+    public function execute(IO $io): int
     {
-        $input = $io->getInput();
+        $filePath = self::getPharFilePath($io);
+        $outputDir = $io->getArgument(self::OUTPUT_ARG)->asNonEmptyString();
 
-        $file = realpath($input->getArgument(self::PHAR_ARG));
-
-        if (false === $file) {
-            $io->error(
-                sprintf(
-                    'The file "%s" could not be found.',
-                    $input->getArgument(self::PHAR_ARG)
-                )
-            );
-
-            return 1;
+        if (null === $filePath) {
+            return ExitCode::FAILURE;
         }
 
-        $tmpFile = create_temporary_phar($file);
+        [$box, $cleanUpTmpPhar] = $this->getBox($filePath, $io);
 
-        try {
-            $box = Box::create($tmpFile);
-        } catch (Throwable $throwable) {
-            if ($io->isDebug()) {
-                throw new ConsoleRuntimeException(
-                    'The given file is not a valid PHAR',
-                    0,
-                    $throwable
-                );
-            }
-
-            $io->error('The given file is not a valid PHAR');
-
-            return 1;
+        if (null === $box) {
+            return ExitCode::FAILURE;
         }
 
         $restoreLimit = bump_open_file_descriptor_limit(count($box), $io);
 
-        $outputDir = $input->getArgument(self::OUTPUT_ARG);
+        $cleanUp = static function () use ($cleanUpTmpPhar, $restoreLimit): void {
+            $cleanUpTmpPhar();
+            $restoreLimit();
+        };
 
+        try {
+            self::dumpPhar($outputDir, $box, $cleanUp);
+        } catch (RuntimeException $exception) {
+            $io->error($exception->getMessage());
+
+            return ExitCode::FAILURE;
+        }
+
+        return ExitCode::SUCCESS;
+    }
+
+    private static function getPharFilePath(IO $io): ?string
+    {
+        $filePath = realpath($io->getArgument(self::PHAR_ARG)->asString());
+
+        if (false !== $filePath) {
+            return $filePath;
+        }
+
+        $io->error(
+            sprintf(
+                'The file "%s" could not be found.',
+                $io->getArgument(self::PHAR_ARG)->asRaw(),
+            ),
+        );
+
+        return null;
+    }
+
+    /**
+     * @return array{Box, callable(): void}|array{null, null}
+     */
+    private function getBox(string $filePath, IO $io): ?array
+    {
+        $tmpFile = create_temporary_phar($filePath);
+        $cleanUp = static fn () => remove($tmpFile);
+
+        try {
+            return [
+                Box::create($tmpFile),
+                $cleanUp,
+            ];
+        } catch (Throwable $throwable) {
+            // Continue
+        }
+
+        if ($io->isDebug()) {
+            $cleanUp();
+
+            throw new ConsoleRuntimeException(
+                'The given file is not a valid PHAR',
+                0,
+                $throwable,
+            );
+        }
+
+        $io->error('The given file is not a valid PHAR');
+
+        $cleanUp();
+
+        return [null, null];
+    }
+
+    /**
+     * @param callable(): void $cleanUp
+     */
+    private static function dumpPhar(string $outputDir, Box $box, callable $cleanUp): void
+    {
         try {
             remove($outputDir);
 
             $rootLength = strlen('phar://'.$box->getPhar()->getPath()) + 1;
 
-            foreach (new RecursiveIteratorIterator($box->getPhar()) as $file) {
+            foreach (new RecursiveIteratorIterator($box->getPhar()) as $filePath) {
                 dump_file(
-                    $outputDir.'/'.substr($file->getPathname(), $rootLength),
-                    (string) $file->getContent()
+                    $outputDir.'/'.substr($filePath->getPathname(), $rootLength),
+                    (string) $filePath->getContent(),
                 );
             }
-        } catch (RuntimeException $exception) {
-            $io->error($exception->getMessage());
-
-            return 1;
         } finally {
-            $restoreLimit();
-
-            remove($tmpFile);
+            $cleanUp();
         }
-
-        return 0;
     }
 }

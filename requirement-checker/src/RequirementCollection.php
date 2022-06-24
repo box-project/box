@@ -16,6 +16,8 @@ use ArrayIterator;
 use Countable;
 use IteratorAggregate;
 use Traversable;
+use function count;
+use function get_cfg_var;
 
 /**
  * @private
@@ -27,32 +29,27 @@ use Traversable;
 final class RequirementCollection implements IteratorAggregate, Countable
 {
     /**
-     * @var Requirement[]
+     * @var list<Requirement>
      */
-    private $requirements = array();
+    private $requirements = [];
 
     /**
-     * {@inheritdoc}
-     *
-     * @return Requirement[]|Traversable
+     * @return Traversable<Requirement>
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return new ArrayIterator($this->requirements);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function count()
+    public function count(): int
     {
-        return \count($this->requirements);
+        return count($this->requirements);
     }
 
     /**
      * @param Requirement $requirement
      */
-    public function add(Requirement $requirement)
+    public function add(Requirement $requirement): void
     {
         $this->requirements[] = $requirement;
     }
@@ -65,7 +62,7 @@ final class RequirementCollection implements IteratorAggregate, Countable
      * @param string      $testMessage      The message for testing the requirement
      * @param string      $helpText         The help text (when null, it will be inferred from $helpHtml, i.e. stripped from HTML tags)
      */
-    public function addRequirement($checkIsFulfilled, $testMessage, $helpText)
+    public function addRequirement(IsFulfilled $checkIsFulfilled, string $testMessage, string $helpText): void
     {
         $this->add(new Requirement($checkIsFulfilled, $testMessage, $helpText));
     }
@@ -73,9 +70,9 @@ final class RequirementCollection implements IteratorAggregate, Countable
     /**
      * Returns all mandatory requirements.
      *
-     * @return Requirement[]
+     * @return list<Requirement>
      */
-    public function getRequirements()
+    public function getRequirements(): array
     {
         return $this->requirements;
     }
@@ -97,13 +94,7 @@ final class RequirementCollection implements IteratorAggregate, Countable
     {
         return array_reduce(
             $this->requirements,
-            /**
-             * @param bool        $checkPassed
-             * @param Requirement $requirement
-             *
-             * @return bool
-             */
-            function ($checkPassed, Requirement $requirement) {
+            function (bool $checkPassed, Requirement $requirement): bool {
                 return $checkPassed && $requirement->isFulfilled();
             },
             true

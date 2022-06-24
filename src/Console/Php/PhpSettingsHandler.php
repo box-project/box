@@ -33,12 +33,9 @@ use Webmozart\Assert\Assert;
  */
 final class PhpSettingsHandler extends XdebugHandler
 {
-    private $logger;
-    private $pharReadonly;
+    private LoggerInterface $logger;
+    private bool $pharReadonly;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(LoggerInterface $logger)
     {
         parent::__construct('box');
@@ -51,9 +48,6 @@ final class PhpSettingsHandler extends XdebugHandler
         $this->pharReadonly = '1' === ini_get('phar.readonly');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function check(): void
     {
         $this->bumpMemoryLimit();
@@ -61,10 +55,7 @@ final class PhpSettingsHandler extends XdebugHandler
         parent::check();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function requiresRestart($default): bool
+    protected function requiresRestart(bool $default): bool
     {
         if ($this->pharReadonly) {
             $this->logger->debug('phar.readonly is enabled');
@@ -77,10 +68,7 @@ final class PhpSettingsHandler extends XdebugHandler
         return parent::requiresRestart($default);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function restart($command): void
+    protected function restart(array $command): void
     {
         // Disable phar.readonly if set
         $this->disablePharReadonly();
@@ -109,13 +97,13 @@ final class PhpSettingsHandler extends XdebugHandler
         $memoryLimit = trim(ini_get('memory_limit'));
         $memoryLimitInBytes = '-1' === $memoryLimit ? -1 : memory_to_bytes($memoryLimit);
 
-        // Whether or not the memory limit should be dumped
+        // Whether the memory limit should be dumped
         $bumpMemoryLimit = (
             null === $userDefinedMemoryLimit
             && -1 !== $memoryLimitInBytes
             && $memoryLimitInBytes < 1024 * 1024 * 512
         );
-        // Whether or not the memory limit should be set to the user defined memory limit
+        // Whether the memory limit should be set to the user defined memory limit
         $setUserDefinedMemoryLimit = (
             null !== $userDefinedMemoryLimit
             && $memoryLimitInBytes !== $userDefinedMemoryLimit
@@ -128,8 +116,8 @@ final class PhpSettingsHandler extends XdebugHandler
                 sprintf(
                     'Changed the memory limit from "%s" to "%s"',
                     format_size($memoryLimitInBytes, 0),
-                    '512M'
-                )
+                    '512M',
+                ),
             );
         } elseif ($setUserDefinedMemoryLimit) {
             ini_set('memory_limit', (string) $userDefinedMemoryLimit);
@@ -139,15 +127,15 @@ final class PhpSettingsHandler extends XdebugHandler
                     'Changed the memory limit from "%s" to %s="%s"',
                     format_size($memoryLimitInBytes, 0),
                     BOX_MEMORY_LIMIT,
-                    format_size($userDefinedMemoryLimit, 0)
-                )
+                    format_size($userDefinedMemoryLimit, 0),
+                ),
             );
         } else {
             $this->logger->debug(
                 sprintf(
                     'Current memory limit: "%s"',
-                    format_size($memoryLimitInBytes, 0)
-                )
+                    format_size($memoryLimitInBytes, 0),
+                ),
             );
         }
     }

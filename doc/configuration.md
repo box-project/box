@@ -1,7 +1,7 @@
 The build command will build a new PHAR based on a variety of settings.
 
 This command relies on a configuration file for loading PHAR packaging settings. If a configuration file is not
-specified through the `--configuration|-c option`, one of the following files will be used (in order): `box.json`,
+specified through the `--config|-c option`, one of the following files will be used (in order): `box.json`,
 `box.json.dist`. If no configuration file is found, Box will proceed with the default settings.
 
 The configuration file is a JSON object saved to a file. Note that **all settings are optional**. If a setting is set
@@ -51,6 +51,7 @@ to `null`, then its default value will be picked and is strictly equivalent to n
     "stub": "?"
 }
 ```
+
 
 ## Base-path (`base-path`)
 
@@ -111,7 +112,7 @@ constraint before running. See more information about it [here][requirement-chec
 the requirement checker will be added. Note that this is true only if either the `composer.json`  or `composer.lock`
 could have been found.
 
-!!! warning 
+!!! Warning 
     this check is still done within the PHAR. As a result, if [the required extension to open the PHAR][compression]
     due to the compression algorithm is not loaded, a hard failure will still appear: the requirement 
     checker _cannot_ be executed before that.
@@ -138,7 +139,7 @@ you full control on it instead.
     [`files-bin`][files], [`directories`][directories] or [`directories-bin`][directories].
 
 
-!!! warning
+!!! Warning
     binary files are added _before_ regular files. As a result if a file is found in both regular files and
     binary files, the regular file will take precedence.
 
@@ -165,6 +166,9 @@ This setting is not affected by the [`blacklist`][blacklist] setting.
 such as images, those that contain binary data or simply a file you do not want to alter at all despite using
 [compactors][compactors].
 
+!!! Warning
+   Symlinks are not followed/supported.
+
 
 ### Directories (`directories` and `directories-bin`)
 
@@ -177,6 +181,19 @@ Files listed in the [`blacklist`][blacklist] will not be added to the PHAR.
 `directories-bin` is analogue to `directories` except the files are added to the PHAR unmodified. This is suitable for
 the files such as images, those that contain binary data or simply a file you do not want to alter at all despite using
 compactors.
+
+!!! Warning 
+    Setting the key `directories` (regardless of its value), will disable the file auto-discovery. If you want
+    to keep it, check the [force the auto-discovery][force-autodiscovery] setting.
+
+!!! Warning
+    By default Box excludes some files (e.g. dot files, readmes & co). This is done in order to attempt to
+    reduce the final PHAR size. There is at the moment no way to disable this (maybe this could be done via a new setting)
+    but it remains possible to include them via [`files`][files], [`files-bin`][files], `directories-bin` or your own
+    [`finder`][finder] or [`finder-bin`][finder].
+
+!!! Warning 
+    Symlinks are not followed/supported.
 
 
 ### Finder (`finder` and `finder-bin`)
@@ -191,6 +208,13 @@ account for the files registered in the [`blacklist`][blacklist].
 `finder-bin` is analogue to `finder` except the files are added to the PHAR unmodified. This is suitable for the files
 such as images, those that contain binary data or simply a file you do not want to alter at all despite using
 [compactors][compactors].
+
+!!! Warning
+    Setting the key `finder` (regardless of its value), will disable the file auto-discovery. If you want
+    to keep it, check the [force the auto-discovery][force-autodiscovery] setting.
+
+!!! Warning
+    Symlinks are not followed/supported.
 
 Example:
 
@@ -674,7 +698,7 @@ compression affects the individual files within the PHAR and not the PHAR as a w
 - `BZ2`
 - `NONE` (default)
 
-!!! warning
+!!! Warning
     be aware that if compressed, the PHAR will required the appropriate extension ([`zlib`][zlib-extension] for
     `GZ` and [`bz2`][bz2-extension] for `BZ2`) to execute the PHAR. Without it, PHP will _not_ be able to open the PHAR
     at all.
@@ -719,14 +743,15 @@ This setting will be ignored if no [key][key] has been provided.
 ## Metadata (`metadata`)
 
 The metadata (`any` default none) setting can be any value. This value will be stored as metadata that can be retrieved
-from the built PHAR ([`Phar::getMetadata()][phar.getmetadata]).
+from the built PHAR ([Phar::getMetadata()][phar.getmetadata]).
 
-If you specify a callable (as a string), if will be evaluate without any arguments.
+If you specify a callable (as a string), it will be evaluated without any arguments.
 
 For example, if you take the following code:
 
 ```php
 <?php
+# callable_script.php
 class MyCallbacks
 {
     public static function generateMetadata()
@@ -740,12 +765,23 @@ With the configuration excerpt:
 
 ```json
 {
-    "metadata": "MyCallbacks\\generateMetadata"
+    "metadata": "MyCallbacks::generateMetadata"
 }
 ```
 
 Then the `Phar::getMetadata()` will return `['application_version' => '1.0.0-dev']` array.
 
+**CAUTION**: Your callable function must be readable by your autoloader.
+
+That means, for Composer, in previous example, we require to have such kind of declaration in your `composer.json` file.
+
+```json
+{
+    "autoload": {
+        "files": ["/path/to/your/callable_script.php"]
+    }
+}
+```
 
 ## Replaceable placeholders
 
@@ -888,6 +924,7 @@ The git version (`string`|`null` default `null`) setting is the name of a placeh
 
 The short commit hash will only be used if no tag is available.
 
+
 [PHAR code isolation]: code-isolation.md#phar-code-isolation
 [algorithm]: #signing-algorithm-algorithm
 [alias]: #alias-alias
@@ -930,7 +967,7 @@ The short commit hash will only be used if no tag is available.
 [phar class]: https://secure.php.net/manual/en/class.phar.php
 [phar.compress]: https://secure.php.net/manual/en/phar.compress.php
 [phar.fileformat.stub]: https://secure.php.net/manual/en/phar.fileformat.stub.php
-[phar.getmetadata]: htthttps://secure.php.net/manual/en/phar.getmetadata.php
+[phar.getmetadata]: https://secure.php.net/manual/en/phar.getmetadata.php
 [phar.interceptfilefuncs]: https://secure.php.net/manual/en/phar.interceptfilefuncs.php
 [phar.mapphar]: https://secure.php.net/manual/en/phar.mapphar.php
 [phar.setalias]: https://secure.php.net/manual/en/phar.setalias.php

@@ -1,41 +1,43 @@
 <?php
 
-namespace HumbugBox3100\KevinGH\RequirementChecker;
+namespace HumbugBox3160\KevinGH\RequirementChecker;
 
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
 use Traversable;
-final class RequirementCollection implements \IteratorAggregate, \Countable
+use function count;
+use function get_cfg_var;
+final class RequirementCollection implements IteratorAggregate, Countable
 {
-    private $requirements = array();
-    public function getIterator()
+    private $requirements = [];
+    public function getIterator() : Traversable
     {
-        return new \ArrayIterator($this->requirements);
+        return new ArrayIterator($this->requirements);
     }
-    public function count()
+    public function count() : int
     {
-        return \count($this->requirements);
+        return count($this->requirements);
     }
-    public function add(\HumbugBox3100\KevinGH\RequirementChecker\Requirement $requirement)
+    public function add(Requirement $requirement) : void
     {
         $this->requirements[] = $requirement;
     }
-    public function addRequirement($checkIsFulfilled, $testMessage, $helpText)
+    public function addRequirement(IsFulfilled $checkIsFulfilled, string $testMessage, string $helpText) : void
     {
-        $this->add(new \HumbugBox3100\KevinGH\RequirementChecker\Requirement($checkIsFulfilled, $testMessage, $helpText));
+        $this->add(new Requirement($checkIsFulfilled, $testMessage, $helpText));
     }
-    public function getRequirements()
+    public function getRequirements() : array
     {
         return $this->requirements;
     }
     public function getPhpIniPath()
     {
-        return \get_cfg_var('cfg_file_path');
+        return get_cfg_var('cfg_file_path');
     }
     public function evaluateRequirements()
     {
-        return \array_reduce($this->requirements, function ($checkPassed, \HumbugBox3100\KevinGH\RequirementChecker\Requirement $requirement) {
+        return \array_reduce($this->requirements, function (bool $checkPassed, Requirement $requirement) : bool {
             return $checkPassed && $requirement->isFulfilled();
         }, \true);
     }

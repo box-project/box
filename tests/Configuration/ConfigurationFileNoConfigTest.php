@@ -85,31 +85,31 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
         dump_file(
             'composer.json',
             <<<'JSON'
-{
-    "autoload": {
-        "files": ["file0", "file1"],
-        "psr-4": {
-            "Acme\\": "PSR4_0",
-            "Bar\\": ["PSR4_1", "PSR4_2"]
-        },
-        "psr-0": {
-            "Acme\\": "PSR0_0",
-            "Bar\\": ["PSR0_1", "PSR0_2"]
-        },
-        "classmap": ["CLASSMAP_DIR"]
-    },
-    "autoload-dev": {
-        "files": ["file2"],
-        "psr-4": {
-            "Acme\\": "DEV_PSR4_0"
-        },
-        "psr-0": {
-            "Acme\\": "DEV_PSR0_0"
-        },
-        "classmap": ["CLASSMAP_DEV_DIR"]
-    }
-}
-JSON
+                {
+                    "autoload": {
+                        "files": ["file0", "file1"],
+                        "psr-4": {
+                            "Acme\\": "PSR4_0",
+                            "Bar\\": ["PSR4_1", "PSR4_2"]
+                        },
+                        "psr-0": {
+                            "Acme\\": "PSR0_0",
+                            "Bar\\": ["PSR0_1", "PSR0_2"]
+                        },
+                        "classmap": ["CLASSMAP_DIR"]
+                    },
+                    "autoload-dev": {
+                        "files": ["file2"],
+                        "psr-4": {
+                            "Acme\\": "DEV_PSR4_0"
+                        },
+                        "psr-0": {
+                            "Acme\\": "DEV_PSR0_0"
+                        },
+                        "classmap": ["CLASSMAP_DEV_DIR"]
+                    }
+                }
+                JSON,
         );
 
         // Relative to the current working directory for readability
@@ -162,14 +162,14 @@ JSON
         dump_file(
             'composer.json',
             <<<'JSON'
-{
-    "autoload": {
-        "psr-0": {
-            "Acme\\": " PSR0_0 "
-        }
-    }
-}
-JSON
+                {
+                    "autoload": {
+                        "psr-0": {
+                            "Acme\\": " PSR0_0 "
+                        }
+                    }
+                }
+                JSON,
         );
 
         // Relative to the current working directory for readability
@@ -207,14 +207,14 @@ JSON
         dump_file(
             'composer.json',
             <<<'JSON'
-{
-    "autoload": {
-        "psr-0": {
-            "Acme\\": ""
-        }
-    }
-}
-JSON
+                {
+                    "autoload": {
+                        "psr-0": {
+                            "Acme\\": ""
+                        }
+                    }
+                }
+                JSON,
         );
 
         $expected = [
@@ -248,12 +248,12 @@ JSON
         dump_file(
             'composer.json',
             <<<'JSON'
-{
-    "autoload": {
-        "files": ["file0", "file1"]
-    }
-}
-JSON
+                {
+                    "autoload": {
+                        "files": ["file0", "file1"]
+                    }
+                }
+                JSON,
         );
 
         try {
@@ -263,19 +263,19 @@ JSON
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The file "'.$this->tmp.'/file1" does not exist.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
 
         dump_file(
             'composer.json',
             <<<'JSON'
-{
-    "autoload": {
-        "classmap": ["CLASSMAP_DIR"]
-    }
-}
-JSON
+                {
+                    "autoload": {
+                        "classmap": ["CLASSMAP_DIR"]
+                    }
+                }
+                JSON,
         );
 
         try {
@@ -285,7 +285,7 @@ JSON
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'File or directory "'.$this->tmp.'/CLASSMAP_DIR" was expected to exist.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -298,12 +298,12 @@ JSON
         dump_file(
             'composer.json',
             <<<'JSON'
-{
-    "autoload": {
-        "files": ["file0", "file1"]
-    }
-}
-JSON
+                {
+                    "autoload": {
+                        "files": ["file0", "file1"]
+                    }
+                }
+                JSON,
         );
 
         try {
@@ -313,19 +313,19 @@ JSON
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Cannot add the link "'.$this->tmp.'/file1": links are not supported.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
 
         dump_file(
             'composer.json',
             <<<'JSON'
-{
-    "autoload": {
-        "classmap": ["CLASSMAP_DIR"]
-    }
-}
-JSON
+                {
+                    "autoload": {
+                        "classmap": ["CLASSMAP_DIR"]
+                    }
+                }
+                JSON,
         );
         mkdir('original_dir');
         symlink('original_dir', 'CLASSMAP_DIR');
@@ -337,7 +337,7 @@ JSON
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Cannot add the link "'.$this->tmp.'/CLASSMAP_DIR": links are not supported.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -399,34 +399,34 @@ JSON
         dump_file(
             'composer.json',
             <<<'JSON'
-{
-    "autoload": {
-        "files": ["file0", "file1"],
-        "psr-4": {
-            "Acme\\": "PSR4_0",
-            "Bar\\": ["PSR4_1", "PSR4_2"]
-        },
-        "psr-0": {
-            "Acme\\": "PSR0_0",
-            "Bar\\": ["PSR0_1", "PSR0_2"]
-        },
-        "classmap": [
-            "BLACKLISTED_CLASSMAP_DIR",
-            "CLASSMAP_DIR"
-        ]
-    },
-    "autoload-dev": {
-        "files": ["file2"],
-        "psr-4": {
-            "Acme\\": "DEV_PSR4_0"
-        },
-        "psr-0": {
-            "Acme\\": "DEV_PSR0_0"
-        },
-        "classmap": ["CLASSMAP_DEV_DIR"]
-    }
-}
-JSON
+                {
+                    "autoload": {
+                        "files": ["file0", "file1"],
+                        "psr-4": {
+                            "Acme\\": "PSR4_0",
+                            "Bar\\": ["PSR4_1", "PSR4_2"]
+                        },
+                        "psr-0": {
+                            "Acme\\": "PSR0_0",
+                            "Bar\\": ["PSR0_1", "PSR0_2"]
+                        },
+                        "classmap": [
+                            "BLACKLISTED_CLASSMAP_DIR",
+                            "CLASSMAP_DIR"
+                        ]
+                    },
+                    "autoload-dev": {
+                        "files": ["file2"],
+                        "psr-4": {
+                            "Acme\\": "DEV_PSR4_0"
+                        },
+                        "psr-0": {
+                            "Acme\\": "DEV_PSR0_0"
+                        },
+                        "classmap": ["CLASSMAP_DEV_DIR"]
+                    }
+                }
+                JSON,
         );
 
         $this->setConfig([
@@ -463,7 +463,7 @@ JSON
     public function test_it_ignores_the_most_common_non_needed_files_when_guess_the_files_from_the_composer_json_file(): void
     {
         // Depending on the test machine: the following command might be needed:
-        // docker run -i --rm -w /opt/box -v "$PWD":/opt/box box_php73 bin/phpunit tests/ConfigurationFileNoConfigTest.php --filter test_it_ignores_the_most_common_non_needed_files_when_guess_the_files_from_the_composer_json_file
+        // docker run -i --rm -w /opt/box -v "$PWD":/opt/box box_php74 bin/phpunit tests/ConfigurationFileNoConfigTest.php --filter test_it_ignores_the_most_common_non_needed_files_when_guess_the_files_from_the_composer_json_file
 
         if ('Darwin' === PHP_OS_FAMILY) {
             $this->markTestSkipped('Cannot run this test on OSX since it is case insensitive.');
@@ -662,12 +662,12 @@ JSON
         dump_file(
             'composer.json',
             <<<'JSON'
-{
-    "autoload": {
-        "classmap": ["./"]
-    }
-}
-JSON
+                {
+                    "autoload": {
+                        "classmap": ["./"]
+                    }
+                }
+                JSON,
         );
 
         // Relative to the current working directory for readability
@@ -759,12 +759,12 @@ JSON
         dump_file(
             'composer.json',
             <<<'JSON'
-{
-    "autoload": {
-        "classmap": ["./"]
-    }
-}
-JSON
+                {
+                    "autoload": {
+                        "classmap": ["./"]
+                    }
+                }
+                JSON,
         );
 
         // Relative to the current working directory for readability

@@ -14,8 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-use function func_get_args;
-use KevinGH\Box\NotCallable;
+use KevinGH\Box\UnsupportedMethodCall;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -31,14 +30,9 @@ class FileExtensionCompactorTest extends TestCase
         $expected = $contents;
 
         $compactor = new class([]) extends FileExtensionCompactor {
-            use NotCallable;
-
-            /**
-             * {@inheritdoc}
-             */
             protected function compactContent(string $contents): string
             {
-                $this->__call(__METHOD__, func_get_args());
+                throw UnsupportedMethodCall::forMethod(__CLASS__, __METHOD__);
             }
         };
 
@@ -55,18 +49,11 @@ class FileExtensionCompactorTest extends TestCase
         $expected = 'compacted contents';
 
         $compactor = new class($expected) extends FileExtensionCompactor {
-            private $expected;
-
-            public function __construct(string $expected)
+            public function __construct(private readonly string $expected)
             {
                 parent::__construct(['php']);
-
-                $this->expected = $expected;
             }
 
-            /**
-             * {@inheritdoc}
-             */
             protected function compactContent(string $contents): string
             {
                 return $this->expected;

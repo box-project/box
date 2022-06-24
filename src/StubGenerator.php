@@ -29,32 +29,32 @@ final class StubGenerator
     private const CHECK_FILE_NAME = 'bin/check-requirements.php';
 
     private const STUB_TEMPLATE = <<<'STUB'
-__BOX_SHEBANG__
-<?php
-__BOX_BANNER__
+        __BOX_SHEBANG__
+        <?php
+        __BOX_BANNER__
 
-__BOX_PHAR_CONFIG__
+        __BOX_PHAR_CONFIG__
 
-__HALT_COMPILER(); ?>
+        __HALT_COMPILER(); ?>
 
-STUB;
+        STUB;
 
     /** @var null|string The alias to be used in "phar://" URLs */
-    private $alias;
+    private ?string $alias = null;
 
     /** @var null|string The top header comment banner text */
-    private $banner;
+    private ?string $banner = null;
 
     /** @var null|string The location within the PHAR of index script */
-    private $index;
+    private ?string $index = null;
 
     /** @var bool Use the Phar::interceptFileFuncs() method? */
-    private $intercept = false;
+    private bool $intercept = false;
 
     /** @var null|string The shebang line */
-    private $shebang;
+    private ?string $shebang = null;
 
-    private $checkRequirements = true;
+    private bool $checkRequirements = true;
 
     /**
      * Creates a new instance of the stub generator.
@@ -63,32 +63,29 @@ STUB;
      */
     public static function create(): self
     {
-        return new static();
+        return new self();
     }
 
-    /**
-     * @return string The stub
-     */
-    public function generate(): string
+    public function generateStub(): string
     {
         $stub = self::STUB_TEMPLATE;
 
         $stub = str_replace(
             "__BOX_SHEBANG__\n",
             null === $this->shebang ? '' : $this->shebang."\n",
-            $stub
+            $stub,
         );
 
         $stub = str_replace(
             "__BOX_BANNER__\n",
             $this->generateBannerStmt(),
-            $stub
+            $stub,
         );
 
         $stub = str_replace(
             "__BOX_PHAR_CONFIG__\n",
             $this->generatePharConfigStmt(),
-            $stub
+            $stub,
         );
 
         return $stub;
@@ -171,7 +168,7 @@ STUB;
         $banner .= str_replace(
             " \n",
             "\n",
-            str_replace("\n", "\n * ", $this->banner)
+            str_replace("\n", "\n * ", $this->banner),
         );
 
         $banner .= "\n */";

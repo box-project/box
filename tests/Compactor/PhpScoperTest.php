@@ -35,13 +35,13 @@ class PhpScoperTest extends TestCase
     {
         $file = 'foo';
         $contents = <<<'JSON'
-{
-    "foo": "bar"
+            {
+                "foo": "bar"
 
-}
-JSON;
+            }
+            JSON;
 
-        /** @var ObjectProphecy&Scoper $scoper */
+        /** @var ObjectProphecy|Scoper $scoper */
         $scoperProphecy = $this->prophesize(Scoper::class);
         $scoperProphecy->scope($file, $contents)->willReturn($expected = 'Scoped contents');
         /** @var Scoper $scoper */
@@ -58,13 +58,13 @@ JSON;
     {
         $file = 'foo';
         $contents = <<<'JSON'
-{
-    "foo": "bar"
+            {
+                "foo": "bar"
 
-}
-JSON;
+            }
+            JSON;
 
-        /** @var ObjectProphecy&Scoper $scoper */
+        /** @var ObjectProphecy|Scoper $scoper */
         $scoperProphecy = $this->prophesize(Scoper::class);
         $scoperProphecy->scope($file, $contents)->willThrow(new Error());
         /** @var Scoper $scoper */
@@ -90,7 +90,7 @@ JSON;
 
         $this->assertEquals(
             $compactor,
-            unserialize(serialize($compactor))
+            unserialize(serialize($compactor)),
         );
     }
 }

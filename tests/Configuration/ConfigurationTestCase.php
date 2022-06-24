@@ -16,7 +16,6 @@ namespace KevinGH\Box\Configuration;
 
 use function json_encode;
 use const JSON_PRETTY_PRINT;
-use KevinGH\Box\Console\ConfigurationHelper;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\touch;
@@ -35,9 +34,6 @@ abstract class ConfigurationTestCase extends FileSystemTestCase
     /** @var string */
     protected $file;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -59,7 +55,7 @@ abstract class ConfigurationTestCase extends FileSystemTestCase
 
     final protected function reloadConfig(): void
     {
-        $this->config = (new ConfigurationHelper())->loadFile($this->file);
+        $this->config = (new ConfigurationLoader())->loadFile($this->file);
     }
 
     final protected function isWindows(): bool

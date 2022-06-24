@@ -21,13 +21,19 @@ use function array_shift;
 use function count;
 use function decoct;
 use function explode;
+use Fidry\Console\Command\Command;
+use Fidry\Console\Command\CommandAware;
+use Fidry\Console\Command\CommandAwareness;
+use Fidry\Console\Command\Configuration as CommandConfiguration;
+use Fidry\Console\ExitCode;
+use Fidry\Console\Input\IO;
 use function file_exists;
 use function filesize;
-use function get_class;
-use Humbug\PhpScoper\Whitelist;
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function implode;
 use function is_callable;
 use function is_string;
+use KevinGH\Box\Amp\FailureCollector;
 use KevinGH\Box\Box;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 use function KevinGH\Box\bump_open_file_descriptor_limit;
@@ -36,7 +42,6 @@ use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Composer\ComposerConfiguration;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 use KevinGH\Box\Configuration\Configuration;
-use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Console\Logger\CompilerLogger;
 use KevinGH\Box\Console\MessageRenderer;
 use function KevinGH\Box\disable_parallel_processing;
@@ -67,28 +72,29 @@ use function var_export;
 use Webmozart\Assert\Assert;
 
 /**
- * @final
  * @private
  */
-class Compile extends ConfigurableBaseCommand
+final class Compile implements CommandAware
 {
-    use ChangeableWorkingDirectory;
+    use CommandAwareness;
+
+    public const NAME = 'compile';
 
     private const HELP = <<<'HELP'
-The <info>%command.name%</info> command will compile code in a new PHAR based on a variety of settings.
-<comment>
-  This command relies on a configuration file for loading
-  PHAR packaging settings. If a configuration file is not
-  specified through the <info>--config|-c</info> option, one of
-  the following files will be used (in order): <info>box.json</info>,
-  <info>box.json.dist</info>
-</comment>
-The configuration file is actually a JSON object saved to a file. For more
-information check the documentation online:
-<comment>
-  https://github.com/humbug/box
-</comment>
-HELP;
+        The <info>%command.name%</info> command will compile code in a new PHAR based on a variety of settings.
+        <comment>
+          This command relies on a configuration file for loading
+          PHAR packaging settings. If a configuration file is not
+          specified through the <info>--config|-c</info> option, one of
+          the following files will be used (in order): <info>box.json</info>,
+          <info>box.json.dist</info>
+        </comment>
+        The configuration file is actually a JSON object saved to a file. For more
+        information check the documentation online:
+        <comment>
+          https://github.com/humbug/box
+        </comment>
+        HELP;
 
     private const DEBUG_OPTION = 'debug';
     private const NO_PARALLEL_PROCESSING_OPTION = 'no-parallel';
@@ -99,88 +105,92 @@ HELP;
 
     private const DEBUG_DIR = '.box_dump';
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure(): void
+    private string $header;
+
+    public function __construct(string $header)
     {
-        parent::configure();
-
-        $this->setName('compile');
-        $this->setDescription('🔨  Compiles an application into a PHAR');
-        $this->setHelp(self::HELP);
-
-        $this->addOption(
-            self::DEBUG_OPTION,
-            null,
-            InputOption::VALUE_NONE,
-            'Dump the files added to the PHAR in a `'.self::DEBUG_DIR.'` directory'
-        );
-        $this->addOption(
-            self::NO_PARALLEL_PROCESSING_OPTION,
-            null,
-            InputOption::VALUE_NONE,
-            'Disable the parallel processing'
-        );
-        $this->addOption(
-            self::NO_RESTART_OPTION,
-            null,
-            InputOption::VALUE_NONE,
-            'Do not restart the PHP process. Box restarts the process by default to disable xdebug and set `phar.readonly=0`'
-        );
-        $this->addOption(
-            self::DEV_OPTION,
-            null,
-            InputOption::VALUE_NONE,
-            'Skips the compression step'
-        );
-        $this->addOption(
-            self::NO_CONFIG_OPTION,
-            null,
-            InputOption::VALUE_NONE,
-            'Ignore the config file even when one is specified with the --config option'
-        );
-        $this->addOption(
-            self::WITH_DOCKER_OPTION,
-            null,
-            InputOption::VALUE_NONE,
-            'Generates a Dockerfile'
-        );
-
-        $this->configureWorkingDirOption();
+        $this->header = $header;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function executeCommand(IO $io): int
+    public function getConfiguration(): CommandConfiguration
     {
-        $input = $io->getInput();
+        return new CommandConfiguration(
+            self::NAME,
+            '🔨  Compiles an application into a PHAR',
+            self::HELP,
+            [],
+            [
+                new InputOption(
+                    self::DEBUG_OPTION,
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Dump the files added to the PHAR in a `'.self::DEBUG_DIR.'` directory',
+                ),
+                new InputOption(
+                    self::NO_PARALLEL_PROCESSING_OPTION,
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Disable the parallel processing',
+                ),
+                new InputOption(
+                    self::NO_RESTART_OPTION,
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Do not restart the PHP process. Box restarts the process by default to disable xdebug and set `phar.readonly=0`',
+                ),
+                new InputOption(
+                    self::DEV_OPTION,
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Skips the compression step',
+                ),
+                new InputOption(
+                    self::NO_CONFIG_OPTION,
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Ignore the config file even when one is specified with the --config option',
+                ),
+                new InputOption(
+                    self::WITH_DOCKER_OPTION,
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Generates a Dockerfile',
+                ),
+                ConfigOption::getOptionInput(),
+                ChangeWorkingDirOption::getOptionInput(),
+            ],
+        );
+    }
 
-        if ($input->getOption(self::NO_RESTART_OPTION)) {
+    public function execute(IO $io): int
+    {
+        if ($io->getOption(self::NO_RESTART_OPTION)->asBoolean()) {
             putenv(BOX_ALLOW_XDEBUG.'=1');
         }
 
-        if ($debug = $input->getOption(self::DEBUG_OPTION)) {
+        $debug = $io->getOption(self::DEBUG_OPTION)->asBoolean();
+
+        if ($debug) {
             $io->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
         }
 
         check_php_settings($io);
 
-        if ($input->getOption(self::NO_PARALLEL_PROCESSING_OPTION)) {
+        if ($io->getOption(self::NO_PARALLEL_PROCESSING_OPTION)->asBoolean()) {
             disable_parallel_processing();
-            $io->writeln('<info>[debug] Disabled parallel processing</info>', OutputInterface::VERBOSITY_DEBUG);
+            $io->writeln(
+                '<info>[debug] Disabled parallel processing</info>',
+                OutputInterface::VERBOSITY_DEBUG,
+            );
         }
 
-        $this->changeWorkingDirectory($input);
+        ChangeWorkingDirOption::changeWorkingDirectory($io);
 
-        $io->writeln($this->getApplication()->getHelp());
-        $io->newLine();
+        $io->writeln($this->header);
 
-        $config = $input->getOption(self::NO_CONFIG_OPTION)
+        $config = $io->getOption(self::NO_CONFIG_OPTION)->asBoolean()
             ? Configuration::create(null, new stdClass())
-            : $this->getConfig($io, true)
-        ;
+            : ConfigOption::getConfig($io, true);
         $path = $config->getOutputPath();
 
         $logger = new CompilerLogger($io);
@@ -202,59 +212,59 @@ HELP;
             $restoreLimit();
         }
 
-        $this->correctPermissions($path, $config, $logger);
+        self::correctPermissions($path, $config, $logger);
 
-        $this->logEndBuilding($config, $logger, $io, $box, $path, $startTime);
+        self::logEndBuilding($config, $logger, $io, $box, $path, $startTime);
 
-        if ($input->getOption(self::WITH_DOCKER_OPTION)) {
-            $this->generateDockerFile($io);
+        if ($io->getOption(self::WITH_DOCKER_OPTION)->asBoolean()) {
+            return $this->generateDockerFile($io);
         }
 
-        return 0;
+        return ExitCode::SUCCESS;
     }
 
     private function createPhar(
         Configuration $config,
         CompilerLogger $logger,
         IO $io,
-        bool $debug
+        bool $debug,
     ): Box {
         $box = Box::create($config->getTmpOutputPath());
 
         $box->startBuffering();
 
-        $this->registerReplacementValues($config, $box, $logger);
-        $this->registerCompactors($config, $box, $logger);
-        $this->registerFileMapping($config, $box, $logger);
+        self::registerReplacementValues($config, $box, $logger);
+        self::registerCompactors($config, $box, $logger);
+        self::registerFileMapping($config, $box, $logger);
 
         // Registering the main script _before_ adding the rest if of the files is _very_ important. The temporary
         // file used for debugging purposes and the Composer dump autoloading will not work correctly otherwise.
-        $main = $this->registerMainScript($config, $box, $logger);
+        $main = self::registerMainScript($config, $box, $logger);
 
-        $check = $this->registerRequirementsChecker($config, $box, $logger);
+        $check = self::registerRequirementsChecker($config, $box, $logger);
 
-        $this->addFiles($config, $box, $logger, $io);
+        self::addFiles($config, $box, $logger, $io);
 
-        $this->registerStub($config, $box, $main, $check, $logger);
-        $this->configureMetadata($config, $box, $logger);
+        self::registerStub($config, $box, $main, $check, $logger);
+        self::configureMetadata($config, $box, $logger);
 
-        $this->commit($box, $config, $logger);
+        self::commit($box, $config, $logger);
 
-        $this->checkComposerFiles($box, $config, $logger);
+        self::checkComposerFiles($box, $config, $logger);
 
         if ($debug) {
             $box->getPhar()->extractTo(self::DEBUG_DIR, null, true);
         }
 
-        $this->configureCompressionAlgorithm(
+        self::configureCompressionAlgorithm(
             $config,
             $box,
-            $io->getInput()->getOption(self::DEV_OPTION),
+            $io->getOption(self::DEV_OPTION)->asBoolean(),
             $io,
-            $logger
+            $logger,
         );
 
-        $this->signPhar($config, $box, $config->getTmpOutputPath(), $io, $logger);
+        self::signPhar($config, $box, $config->getTmpOutputPath(), $io, $logger);
 
         if ($config->getTmpOutputPath() !== $config->getOutputPath()) {
             rename($config->getTmpOutputPath(), $config->getOutputPath());
@@ -272,7 +282,7 @@ HELP;
 
             dump_file(
                 self::DEBUG_DIR.'/.box_configuration',
-                ConfigurationExporter::export($config)
+                ConfigurationExporter::export($config),
             );
         }
 
@@ -284,24 +294,24 @@ HELP;
             CompilerLogger::QUESTION_MARK_PREFIX,
             sprintf(
                 'Removing the existing PHAR "%s"',
-                $path
-            )
+                $path,
+            ),
         );
 
         remove($path);
     }
 
-    private function registerReplacementValues(Configuration $config, Box $box, CompilerLogger $logger): void
+    private static function registerReplacementValues(Configuration $config, Box $box, CompilerLogger $logger): void
     {
         $values = $config->getReplacements();
 
-        if ([] === $values) {
+        if (0 === count($values)) {
             return;
         }
 
         $logger->log(
             CompilerLogger::QUESTION_MARK_PREFIX,
-            'Setting replacement values'
+            'Setting replacement values',
         );
 
         foreach ($values as $key => $value) {
@@ -310,22 +320,22 @@ HELP;
                 sprintf(
                     '%s: %s',
                     $key,
-                    $value
-                )
+                    $value,
+                ),
             );
         }
 
         $box->registerPlaceholders($values);
     }
 
-    private function registerCompactors(Configuration $config, Box $box, CompilerLogger $logger): void
+    private static function registerCompactors(Configuration $config, Box $box, CompilerLogger $logger): void
     {
         $compactors = $config->getCompactors();
 
         if (0 === count($compactors)) {
             $logger->log(
                 CompilerLogger::QUESTION_MARK_PREFIX,
-                'No compactor to register'
+                'No compactor to register',
             );
 
             return;
@@ -333,20 +343,20 @@ HELP;
 
         $logger->log(
             CompilerLogger::QUESTION_MARK_PREFIX,
-            'Registering compactors'
+            'Registering compactors',
         );
 
         $logCompactors = static function (Compactor $compactor) use ($logger): void {
-            $compactorClassParts = explode('\\', get_class($compactor));
+            $compactorClassParts = explode('\\', $compactor::class);
 
-            if (0 === strpos($compactorClassParts[0], '_HumbugBox')) {
+            if (str_starts_with($compactorClassParts[0], '_HumbugBox')) {
                 // Keep the non prefixed class name for the user
                 array_shift($compactorClassParts);
             }
 
             $logger->log(
                 CompilerLogger::PLUS_PREFIX,
-                implode('\\', $compactorClassParts)
+                implode('\\', $compactorClassParts),
             );
         };
 
@@ -355,16 +365,16 @@ HELP;
         $box->registerCompactors($compactors);
     }
 
-    private function registerFileMapping(Configuration $config, Box $box, CompilerLogger $logger): void
+    private static function registerFileMapping(Configuration $config, Box $box, CompilerLogger $logger): void
     {
         $fileMapper = $config->getFileMapper();
 
-        $this->logMap($fileMapper, $logger);
+        self::logMap($fileMapper, $logger);
 
         $box->registerFileMapping($fileMapper);
     }
 
-    private function addFiles(Configuration $config, Box $box, CompilerLogger $logger, IO $io): void
+    private static function addFiles(Configuration $config, Box $box, CompilerLogger $logger, IO $io): void
     {
         $logger->log(CompilerLogger::QUESTION_MARK_PREFIX, 'Adding binary files');
 
@@ -376,52 +386,63 @@ HELP;
             CompilerLogger::CHEVRON_PREFIX,
             0 === $count
                 ? 'No file found'
-                : sprintf('%d file(s)', $count)
+                : sprintf('%d file(s)', $count),
         );
 
         $logger->log(
             CompilerLogger::QUESTION_MARK_PREFIX,
             sprintf(
                 'Auto-discover files? %s',
-                $config->hasAutodiscoveredFiles() ? 'Yes' : 'No'
-            )
+                $config->hasAutodiscoveredFiles() ? 'Yes' : 'No',
+            ),
         );
         $logger->log(
             CompilerLogger::QUESTION_MARK_PREFIX,
             sprintf(
                 'Exclude dev files? %s',
-                $config->excludeDevFiles() ? 'Yes' : 'No'
-            )
+                $config->excludeDevFiles() ? 'Yes' : 'No',
+            ),
         );
         $logger->log(CompilerLogger::QUESTION_MARK_PREFIX, 'Adding files');
 
         $count = count($config->getFiles());
 
-        try {
-            $box->addFiles($config->getFiles(), false);
-        } catch (MultiReasonException $exception) {
-            // This exception is handled a different way to give me meaningful feedback to the user
-            foreach ($exception->getReasons() as $reason) {
-                $io->error($reason);
-            }
-
-            throw $exception;
-        }
+        self::addFilesWithErrorHandling($config, $box, $io);
 
         $logger->log(
             CompilerLogger::CHEVRON_PREFIX,
             0 === $count
                 ? 'No file found'
-                : sprintf('%d file(s)', $count)
+                : sprintf('%d file(s)', $count),
         );
     }
 
-    private function registerMainScript(Configuration $config, Box $box, CompilerLogger $logger): ?string
+    private static function addFilesWithErrorHandling(Configuration $config, Box $box, IO $io): void
+    {
+        try {
+            $box->addFiles($config->getFiles(), false);
+
+            return;
+        } catch (MultiReasonException $ampFailure) {
+            // Continue
+        }
+
+        // This exception is handled a different way to give me meaningful feedback to the user
+        $io->error([
+            'An Amp\Parallel error occurred. To diagnostic if it is an Amp error related, you may try again with "--no-parallel".',
+            'Reason(s) of the failure:',
+            ...FailureCollector::collectReasons($ampFailure),
+        ]);
+
+        throw $ampFailure;
+    }
+
+    private static function registerMainScript(Configuration $config, Box $box, CompilerLogger $logger): ?string
     {
         if (false === $config->hasMainScript()) {
             $logger->log(
                 CompilerLogger::QUESTION_MARK_PREFIX,
-                'No main script path configured'
+                'No main script path configured',
             );
 
             return null;
@@ -433,13 +454,13 @@ HELP;
             CompilerLogger::QUESTION_MARK_PREFIX,
             sprintf(
                 'Adding main file: %s',
-                $main
-            )
+                $main,
+            ),
         );
 
         $localMain = $box->addFile(
             $main,
-            $config->getMainScriptContents()
+            $config->getMainScriptContents(),
         );
 
         $relativeMain = make_path_relative($main, $config->getBasePath());
@@ -447,19 +468,19 @@ HELP;
         if ($localMain !== $relativeMain) {
             $logger->log(
                 CompilerLogger::CHEVRON_PREFIX,
-                $localMain
+                $localMain,
             );
         }
 
         return $localMain;
     }
 
-    private function registerRequirementsChecker(Configuration $config, Box $box, CompilerLogger $logger): bool
+    private static function registerRequirementsChecker(Configuration $config, Box $box, CompilerLogger $logger): bool
     {
         if (false === $config->checkRequirements()) {
             $logger->log(
                 CompilerLogger::QUESTION_MARK_PREFIX,
-                'Skip requirements checker'
+                'Skip requirements checker',
             );
 
             return false;
@@ -467,13 +488,13 @@ HELP;
 
         $logger->log(
             CompilerLogger::QUESTION_MARK_PREFIX,
-            'Adding requirements checker'
+            'Adding requirements checker',
         );
 
         $checkFiles = RequirementsDumper::dump(
             $config->getDecodedComposerJsonContents() ?? [],
             $config->getDecodedComposerLockContents() ?? [],
-            $config->getCompressionAlgorithm()
+            $config->getCompressionAlgorithm(),
         );
 
         foreach ($checkFiles as $fileWithContents) {
@@ -485,20 +506,20 @@ HELP;
         return true;
     }
 
-    private function registerStub(
+    private static function registerStub(
         Configuration $config,
         Box $box,
         ?string $main,
         bool $checkRequirements,
-        CompilerLogger $logger
+        CompilerLogger $logger,
     ): void {
         if ($config->isStubGenerated()) {
             $logger->log(
                 CompilerLogger::QUESTION_MARK_PREFIX,
-                'Generating new stub'
+                'Generating new stub',
             );
 
-            $stub = $this->createStub($config, $main, $checkRequirements, $logger);
+            $stub = self::createStub($config, $main, $checkRequirements, $logger);
 
             $box->getPhar()->setStub($stub);
 
@@ -510,8 +531,8 @@ HELP;
                 CompilerLogger::QUESTION_MARK_PREFIX,
                 sprintf(
                     'Using stub file: %s',
-                    $stub
-                )
+                    $stub,
+                ),
             );
 
             $box->registerStub($stub);
@@ -525,24 +546,24 @@ HELP;
             $aliasWasAdded,
             sprintf(
                 'The alias "%s" is invalid. See Phar::setAlias() documentation for more information.',
-                $config->getAlias()
-            )
+                $config->getAlias(),
+            ),
         );
 
         $box->getPhar()->setDefaultStub($main);
 
         $logger->log(
             CompilerLogger::QUESTION_MARK_PREFIX,
-            'Using default stub'
+            'Using default stub',
         );
     }
 
-    private function configureMetadata(Configuration $config, Box $box, CompilerLogger $logger): void
+    private static function configureMetadata(Configuration $config, Box $box, CompilerLogger $logger): void
     {
         if (null !== ($metadata = $config->getMetadata())) {
             $logger->log(
                 CompilerLogger::QUESTION_MARK_PREFIX,
-                'Setting metadata'
+                'Setting metadata',
             );
 
             if (is_callable($metadata)) {
@@ -551,14 +572,14 @@ HELP;
 
             $logger->log(
                 CompilerLogger::MINUS_PREFIX,
-                is_string($metadata) ? $metadata : var_export($metadata, true)
+                is_string($metadata) ? $metadata : var_export($metadata, true),
             );
 
             $box->getPhar()->setMetadata($metadata);
         }
     }
 
-    private function commit(Box $box, Configuration $config, CompilerLogger $logger): void
+    private static function commit(Box $box, Configuration $config, CompilerLogger $logger): void
     {
         $message = $config->dumpAutoload()
             ? 'Dumping the Composer autoloader'
@@ -572,19 +593,19 @@ HELP;
 
         $box->endBuffering(
             $config->dumpAutoload()
-                ? static function (Whitelist $whitelist, string $prefix) use ($excludeDevFiles, $io): void {
+                ? static function (SymbolsRegistry $symbolsRegistry, string $prefix) use ($excludeDevFiles, $io): void {
                     ComposerOrchestrator::dumpAutoload(
-                        $whitelist,
+                        $symbolsRegistry,
                         $prefix,
                         $excludeDevFiles,
-                        $io
+                        $io,
                     );
                 }
-                : null
+                : null,
         );
     }
 
-    private function checkComposerFiles(Box $box, Configuration $config, CompilerLogger $logger): void
+    private static function checkComposerFiles(Box $box, Configuration $config, CompilerLogger $logger): void
     {
         $message = $config->excludeComposerFiles()
             ? 'Removing the Composer dump artefacts'
@@ -596,23 +617,23 @@ HELP;
         if ($config->excludeComposerFiles()) {
             $box->removeComposerArtefacts(
                 ComposerConfiguration::retrieveVendorDir(
-                    $config->getDecodedComposerJsonContents() ?? []
-                )
+                    $config->getDecodedComposerJsonContents() ?? [],
+                ),
             );
         }
     }
 
-    private function configureCompressionAlgorithm(
+    private static function configureCompressionAlgorithm(
         Configuration $config,
         Box $box,
         bool $dev,
         IO $io,
-        CompilerLogger $logger
+        CompilerLogger $logger,
     ): void {
         if (null === ($algorithm = $config->getCompressionAlgorithm())) {
             $logger->log(
                 CompilerLogger::QUESTION_MARK_PREFIX,
-                'No compression'
+                'No compression',
             );
 
             return;
@@ -628,8 +649,8 @@ HELP;
             CompilerLogger::QUESTION_MARK_PREFIX,
             sprintf(
                 'Compressing with the algorithm "<comment>%s</comment>"',
-                (string) array_search($algorithm, get_phar_compression_algorithms(), true)
-            )
+                (string) array_search($algorithm, get_phar_compression_algorithms(), true),
+            ),
         );
 
         $restoreLimit = bump_open_file_descriptor_limit(count($box), $io);
@@ -642,8 +663,8 @@ HELP;
                     CompilerLogger::CHEVRON_PREFIX,
                     sprintf(
                         '<info>Warning: the extension "%s" will now be required to execute the PHAR</info>',
-                        $extension
-                    )
+                        $extension,
+                    ),
                 );
             }
         } catch (RuntimeException $exception) {
@@ -655,12 +676,12 @@ HELP;
         }
     }
 
-    private function signPhar(
+    private static function signPhar(
         Configuration $config,
         Box $box,
         string $path,
         IO $io,
-        CompilerLogger $logger
+        CompilerLogger $logger,
     ): void {
         // Sign using private key when applicable
         remove($path.'.pubkey');
@@ -669,7 +690,7 @@ HELP;
 
         if (null === $key) {
             $box->getPhar()->setSignatureAlgorithm(
-                $config->getSigningAlgorithm()
+                $config->getSigningAlgorithm(),
             );
 
             return;
@@ -677,7 +698,7 @@ HELP;
 
         $logger->log(
             CompilerLogger::QUESTION_MARK_PREFIX,
-            'Signing using a private key'
+            'Signing using a private key',
         );
 
         $passphrase = $config->getPrivateKeyPassphrase();
@@ -688,8 +709,8 @@ HELP;
                     sprintf(
                         'Accessing to the private key "%s" requires a passphrase but none provided. Either '
                         .'provide one or run this command in interactive mode.',
-                        $key
-                    )
+                        $key,
+                    ),
                 );
             }
 
@@ -705,26 +726,26 @@ HELP;
         $box->signUsingFile($key, $passphrase);
     }
 
-    private function correctPermissions(string $path, Configuration $config, CompilerLogger $logger): void
+    private static function correctPermissions(string $path, Configuration $config, CompilerLogger $logger): void
     {
         if (null !== ($chmod = $config->getFileMode())) {
             $logger->log(
                 CompilerLogger::QUESTION_MARK_PREFIX,
                 sprintf(
                     'Setting file permissions to <comment>%s</comment>',
-                    '0'.decoct($chmod)
-                )
+                    '0'.decoct($chmod),
+                ),
             );
 
             chmod($path, $chmod);
         }
     }
 
-    private function createStub(
+    private static function createStub(
         Configuration $config,
         ?string $main,
         bool $checkRequirements,
-        CompilerLogger $logger
+        CompilerLogger $logger,
     ): string {
         $stub = StubGenerator::create()
             ->alias($config->getAlias())
@@ -738,15 +759,15 @@ HELP;
                 CompilerLogger::MINUS_PREFIX,
                 sprintf(
                     'Using shebang line: %s',
-                    $shebang
-                )
+                    $shebang,
+                ),
             );
 
             $stub->shebang($shebang);
         } else {
             $logger->log(
                 CompilerLogger::MINUS_PREFIX,
-                'No shebang line'
+                'No shebang line',
             );
         }
 
@@ -755,15 +776,15 @@ HELP;
                 CompilerLogger::MINUS_PREFIX,
                 sprintf(
                     'Using custom banner from file: %s',
-                    $bannerPath
-                )
+                    $bannerPath,
+                ),
             );
 
             $stub->banner($config->getStubBannerContents());
         } elseif (null !== ($banner = $config->getStubBannerContents())) {
             $logger->log(
                 CompilerLogger::MINUS_PREFIX,
-                'Using banner:'
+                'Using banner:',
             );
 
             $bannerLines = explode("\n", $banner);
@@ -771,27 +792,27 @@ HELP;
             foreach ($bannerLines as $bannerLine) {
                 $logger->log(
                     CompilerLogger::CHEVRON_PREFIX,
-                    $bannerLine
+                    $bannerLine,
                 );
             }
 
             $stub->banner($banner);
         }
 
-        return $stub->generate();
+        return $stub->generateStub();
     }
 
-    private function logMap(MapFile $fileMapper, CompilerLogger $logger): void
+    private static function logMap(MapFile $fileMapper, CompilerLogger $logger): void
     {
         $map = $fileMapper->getMap();
 
-        if ([] === $map) {
+        if (0 === count($map)) {
             return;
         }
 
         $logger->log(
             CompilerLogger::QUESTION_MARK_PREFIX,
-            'Mapping paths'
+            'Mapping paths',
         );
 
         foreach ($map as $item) {
@@ -806,24 +827,24 @@ HELP;
                     sprintf(
                         '%s <info>></info> %s',
                         $match,
-                        $replace
-                    )
+                        $replace,
+                    ),
                 );
             }
         }
     }
 
-    private function logEndBuilding(
+    private static function logEndBuilding(
         Configuration $config,
         CompilerLogger $logger,
         IO $io,
         Box $box,
         string $path,
-        float $startTime
+        float $startTime,
     ): void {
         $logger->log(
             CompilerLogger::STAR_PREFIX,
-            'Done.'
+            'Done.',
         );
         $io->newLine();
 
@@ -834,11 +855,11 @@ HELP;
                 'PHAR: %s (%s)',
                 $box->count() > 1 ? $box->count().' files' : $box->count().' file',
                 format_size(
-                    filesize($path)
-                )
+                    filesize($path),
+                ),
             )
             .PHP_EOL
-            .'You can inspect the generated PHAR with the "<comment>info</comment>" command.'
+            .'You can inspect the generated PHAR with the "<comment>info</comment>" command.',
         );
 
         $io->comment(
@@ -846,20 +867,23 @@ HELP;
                 '<info>Memory usage: %s (peak: %s), time: %s<info>',
                 format_size(memory_get_usage()),
                 format_size(memory_get_peak_usage()),
-                format_time(microtime(true) - $startTime)
-            )
+                format_time(microtime(true) - $startTime),
+            ),
         );
     }
 
-    private function generateDockerFile(OutputInterface $output): void
+    private function generateDockerFile(IO $io): int
     {
-        $generateDockerFileCommand = $this->getApplication()->find('docker');
-
-        Assert::isInstanceOf($generateDockerFileCommand, GenerateDockerFile::class);
-
         $input = new StringInput('');
         $input->setInteractive(false);
 
-        $generateDockerFileCommand->run($input, $output);
+        return $this->getDockerCommand()->execute(
+            new IO($input, $io->getOutput()),
+        );
+    }
+
+    private function getDockerCommand(): Command
+    {
+        return $this->getCommandRegistry()->findCommand(GenerateDockerFile::NAME);
     }
 }

@@ -27,10 +27,10 @@ use Webmozart\Assert\Assert;
 final class RequirementsDumper
 {
     private const REQUIREMENTS_CONFIG_TEMPLATE = <<<'PHP'
-<?php
+        <?php
 
-return '__CONFIG__';
-PHP;
+        return '__CONFIG__';
+        PHP;
 
     private const REQUIREMENT_CHECKER_PATH = __DIR__.'/../../.requirement-checker';
 
@@ -64,7 +64,7 @@ PHP;
     private static function dumpRequirementsConfig(
         array $composerJsonDecodedContents,
         array $composerLockDecodedContents,
-        ?int $compressionAlgorithm
+        ?int $compressionAlgorithm,
     ): array {
         $config = AppRequirementsFactory::create($composerJsonDecodedContents, $composerLockDecodedContents, $compressionAlgorithm);
 
@@ -73,7 +73,7 @@ PHP;
             str_replace(
                 '\'__CONFIG__\'',
                 var_export($config, true),
-                self::REQUIREMENTS_CONFIG_TEMPLATE
+                self::REQUIREMENTS_CONFIG_TEMPLATE,
             ),
         ];
     }

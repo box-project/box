@@ -24,10 +24,7 @@ final class Checker
     /** @var null|string */
     private static $requirementsConfig;
 
-    /**
-     * @return bool
-     */
-    public static function checkRequirements()
+    public static function checkRequirements(): bool
     {
         $requirements = self::retrieveRequirements();
 
@@ -47,7 +44,7 @@ final class Checker
         return $checkPassed;
     }
 
-    public static function printCheck($checkPassed, Printer $printer, RequirementCollection $requirements)
+    public static function printCheck($checkPassed, Printer $printer, RequirementCollection $requirements): void
     {
         if (false === $checkPassed && IO::VERBOSITY_VERY_VERBOSE > $printer->getVerbosity()) {
             // Override the default verbosity to output errors regardless of the verbosity asked by the user
@@ -80,7 +77,7 @@ final class Checker
             $printer->printvln('> No requirements found.', $verbosity);
         }
 
-        $errorMessages = array();
+        $errorMessages = [];
 
         foreach ($requirements->getRequirements() as $requirement) {
             if ($errorMessage = $printer->getRequirementErrorMessage($requirement)) {
@@ -123,16 +120,13 @@ final class Checker
         $printer->printvln('', $verbosity);
     }
 
-    /**
-     * @return RequirementCollection
-     */
-    private static function retrieveRequirements()
+    private static function retrieveRequirements(): RequirementCollection
     {
         if (null === self::$requirementsConfig) {
             self::$requirementsConfig = __DIR__.'/../.requirements.php';
         }
 
-        /** @var array<string,string> $config */
+        /** @var list<array{type:string, condition:string, message:string, helpMessage:string}> $config */
         $config = require self::$requirementsConfig;
 
         $requirements = new RequirementCollection();

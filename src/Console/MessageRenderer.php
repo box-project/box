@@ -16,7 +16,7 @@ namespace KevinGH\Box\Console;
 
 use function array_map;
 use function count;
-use KevinGH\Box\Console\IO\IO;
+use Fidry\Console\Input\IO;
 use KevinGH\Box\NotInstantiable;
 use function sprintf;
 use Webmozart\Assert\Assert;
@@ -39,9 +39,7 @@ final class MessageRenderer
         Assert::allString($recommendations);
         Assert::allString($warnings);
 
-        $renderMessage = static function (string $message): string {
-            return "    - $message";
-        };
+        $renderMessage = static fn (string $message): string => "    - $message";
 
         if ([] === $recommendations) {
             $io->writeln('No recommendation found.');
@@ -50,12 +48,12 @@ final class MessageRenderer
                 sprintf(
                     '💡  <recommendation>%d %s found:</recommendation>',
                     count($recommendations),
-                    count($recommendations) > 1 ? 'recommendations' : 'recommendation'
-                )
+                    count($recommendations) > 1 ? 'recommendations' : 'recommendation',
+                ),
             );
 
             $io->writeln(
-                array_map($renderMessage, $recommendations)
+                array_map($renderMessage, $recommendations),
             );
         }
 
@@ -66,12 +64,12 @@ final class MessageRenderer
                 sprintf(
                     '⚠️  <warning>%d %s found:</warning>',
                     count($warnings),
-                    count($warnings) > 1 ? 'warnings' : 'warning'
-                )
+                    count($warnings) > 1 ? 'warnings' : 'warning',
+                ),
             );
 
             $io->writeln(
-                array_map($renderMessage, $warnings)
+                array_map($renderMessage, $warnings),
             );
         }
     }

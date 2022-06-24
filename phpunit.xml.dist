@@ -5,7 +5,9 @@
          beStrictAboutChangesToGlobalState="true"
          beStrictAboutOutputDuringTests="true"
          beStrictAboutResourceUsageDuringSmallTests="true"
-         colors="true">
+         convertDeprecationsToExceptions="true"
+         colors="true"
+         executionOrder="random">
 
     <php>
         <env name="BOX_ALLOW_XDEBUG" value="1"/>

@@ -19,18 +19,20 @@ use function bin2hex;
 use function class_alias;
 use function class_exists;
 use Closure;
+use Composer\InstalledVersions;
 use function constant;
 use function define;
 use function defined;
 use ErrorException;
+use Fidry\Console\Input\IO;
 use function floor;
 use function function_exists;
-use KevinGH\Box\Console\IO\IO;
+use function is_float;
+use function is_int;
 use KevinGH\Box\Console\Php\PhpSettingsHandler;
 use function KevinGH\Box\FileSystem\copy;
 use function log;
 use function number_format;
-use PackageVersions\Versions;
 use const PATHINFO_EXTENSION;
 use Phar;
 use function posix_getrlimit;
@@ -52,14 +54,25 @@ use Webmozart\Assert\Assert;
  */
 function get_box_version(): string
 {
-    $rawVersion = Versions::getVersion('humbug/box');
+    // Load manually the InstalledVersions class.
+    // Indeed, this class is registered to the autoloader by Composer itself which
+    // results an incorrect classmap entry in the scoped code.
+    // This strategy avoids having to exclude completely the file from the scoping.
+    require_once __DIR__.'/../vendor/composer/InstalledVersions.php';
 
-    [$prettyVersion, $commitHash] = explode('@', $rawVersion);
+    $prettyVersion = InstalledVersions::getPrettyVersion('humbug/box');
+    $commitHash = InstalledVersions::getReference('humbug/box');
+
+    if (null === $commitHash) {
+        return $prettyVersion;
+    }
 
     return $prettyVersion.'@'.substr($commitHash, 0, 7);
 }
 
 /**
+ * TODO: switch to an enum for compression algorithms.
+ *
  * @private
  *
  * @return array<string,int>
@@ -88,7 +101,7 @@ function get_phar_compression_algorithm_extension(int $algorithm): ?string
 
     Assert::true(
         array_key_exists($algorithm, $extensions),
-        sprintf('Unknown compression algorithm code "%d"', $algorithm)
+        sprintf('Unknown compression algorithm code "%d"', $algorithm),
     );
 
     return $extensions[$algorithm];
@@ -115,8 +128,10 @@ function get_phar_signing_algorithms(): array
 /**
  * @private
  */
-function format_size(int $size, int $decimals = 2): string
+function format_size(float|int $size, int $decimals = 2): string
 {
+    Assert::true(is_int($size) || is_float($size));
+
     if (-1 === $size) {
         return '-1';
     }
@@ -130,17 +145,15 @@ function format_size(int $size, int $decimals = 2): string
         number_format(
             $size / (1024 ** $power),
             $decimals,
-            '.',
-            ','
         ),
-        $units[$power]
+        $units[$power],
     );
 }
 
 /**
  * @private
  */
-function memory_to_bytes(string $value): int
+function memory_to_bytes(string $value): float|int
 {
     $unit = strtolower($value[strlen($value) - 1]);
 
@@ -168,7 +181,7 @@ function format_time(float $secs): string
     return str_replace(
         ' ',
         '',
-        Helper::formatTime($secs)
+        Helper::formatTime($secs),
     );
 }
 
@@ -180,15 +193,6 @@ function register_aliases(): void
     // Exposes the finder used by PHP-Scoper PHAR to allow its usage in the configuration file.
     if (false === class_exists(\Isolated\Symfony\Component\Finder\Finder::class)) {
         class_alias(\Symfony\Component\Finder\Finder::class, \Isolated\Symfony\Component\Finder\Finder::class);
-    }
-
-    // Register compactors aliases
-    if (false === class_exists(\Herrera\Box\Compactor\Json::class, false)) {
-        class_alias(\KevinGH\Box\Compactor\Json::class, \Herrera\Box\Compactor\Json::class);
-    }
-
-    if (false === class_exists(\Herrera\Box\Compactor\Php::class, false)) {
-        class_alias(\KevinGH\Box\Compactor\Php::class, \Herrera\Box\Compactor\Php::class);
     }
 }
 
@@ -243,8 +247,8 @@ function check_php_settings(IO $io): void
 {
     (new PhpSettingsHandler(
         new ConsoleLogger(
-            $io->getOutput()
-        )
+            $io->getOutput(),
+        ),
     ))->check();
 }
 
@@ -268,7 +272,7 @@ function register_error_handler(): void
             if (error_reporting() & $code) {
                 throw new ErrorException($message, 0, $code, $file, $line);
             }
-        }
+        },
     );
 }
 
@@ -285,7 +289,7 @@ function bump_open_file_descriptor_limit(int $count, IO $io): Closure
         $io->writeln(
             '<info>[debug] Could not check the maximum number of open file descriptors: the functions "posix_getrlimit()" and '
             .'"posix_setrlimit" could not be found.</info>',
-            OutputInterface::VERBOSITY_DEBUG
+            OutputInterface::VERBOSITY_DEBUG,
         );
 
         return static function (): void {};
@@ -305,15 +309,15 @@ function bump_open_file_descriptor_limit(int $count, IO $io): Closure
             $softLimit,
             $hardLimit,
             $count,
-            'unlimited'
+            'unlimited',
         ),
-        OutputInterface::VERBOSITY_DEBUG
+        OutputInterface::VERBOSITY_DEBUG,
     );
 
     posix_setrlimit(
         POSIX_RLIMIT_NOFILE,
         $count,
-        'unlimited' === $hardLimit ? POSIX_RLIMIT_INFINITY : $hardLimit
+        'unlimited' === $hardLimit ? POSIX_RLIMIT_INFINITY : $hardLimit,
     );
 
     return static function () use ($io, $softLimit, $hardLimit): void {
@@ -321,12 +325,12 @@ function bump_open_file_descriptor_limit(int $count, IO $io): Closure
             posix_setrlimit(
                 POSIX_RLIMIT_NOFILE,
                 $softLimit,
-                'unlimited' === $hardLimit ? POSIX_RLIMIT_INFINITY : $hardLimit
+                'unlimited' === $hardLimit ? POSIX_RLIMIT_INFINITY : $hardLimit,
             );
 
             $io->writeln(
                 '<info>[debug] Restored the maximum number of open file descriptors</info>',
-                OutputInterface::VERBOSITY_DEBUG
+                OutputInterface::VERBOSITY_DEBUG,
             );
         }
     };

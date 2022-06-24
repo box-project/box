@@ -23,21 +23,19 @@ use function shell_exec;
 use Symfony\Component\Process\Process;
 
 /**
+ * @runInSeparateProcess
  * @coversNothing
  */
 class PhpUnitAnnotationsTest extends TestCase
 {
-    /**
-     * @runInSeparateProcess
-     */
     public function test_there_is_no_commented_phpunit_run_tests_in_separate_processes_annotations_commented(): void
     {
         chdir(__DIR__.'/..');
 
         $output = shell_exec(
             Process::fromShellCommandline(
-                'grep -rlI "\/\/ \* @runTestsInSeparateProcesses" tests'
-            )->getCommandLine()
+                'grep -rlI "\/\/ \* @runTestsInSeparateProcesses" tests',
+            )->getCommandLine(),
         );
 
         $files = array_filter(explode(PHP_EOL, (string) $output));

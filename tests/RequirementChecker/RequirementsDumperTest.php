@@ -14,9 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
-use KevinGH\Box\Console\DisplayNormalizer;
 use function array_column;
-use Generator;
+use KevinGH\Box\Console\DisplayNormalizer;
 use Phar;
 use PHPUnit\Framework\TestCase;
 use function sort;
@@ -27,13 +26,13 @@ use function sort;
 class RequirementsDumperTest extends TestCase
 {
     /**
-     * @dataProvider provideJsonAndLockContents
+     * @dataProvider jsonAndLockContentsProvider
      */
     public function test_it_dumps_the_requirement_checker_files(
         array $decodedComposerJsonContents,
         array $decodedComposerLockContents,
         ?int $compressionAlgorithm,
-        string $expectedRequirement
+        string $expectedRequirement,
     ): void {
         $checkFiles = RequirementsDumper::dump($decodedComposerJsonContents, $decodedComposerLockContents, $compressionAlgorithm);
 
@@ -59,6 +58,7 @@ class RequirementsDumperTest extends TestCase
             'vendor/composer/autoload_static.php',
             'vendor/composer/ClassLoader.php',
             'vendor/composer/LICENSE',
+            'vendor/composer/installed.php',
             'vendor/composer/semver/LICENSE',
             'vendor/composer/semver/src/Comparator.php',
             'vendor/composer/semver/src/CompilingMatcher.php',
@@ -80,9 +80,9 @@ class RequirementsDumperTest extends TestCase
 
         sort($expectedFiles);
 
-        $this->assertSame(
+        $this->assertEqualsCanonicalizing(
             $expectedFiles,
-            array_column($checkFiles, 0)
+            array_column($checkFiles, 0),
         );
 
         $this->assertSame(
@@ -91,18 +91,18 @@ class RequirementsDumperTest extends TestCase
         );
     }
 
-    public function provideJsonAndLockContents(): Generator
+    public static function jsonAndLockContentsProvider(): iterable
     {
         yield [
             [],
             [],
             null,
             <<<'PHP'
-<?php
+                <?php
 
-return array (
-);
-PHP
+                return array (
+                );
+                PHP,
         ];
 
         yield [
@@ -112,7 +112,7 @@ PHP
                     [
                         'name' => 'acme/foo',
                         'require' => [
-                            'php' => '^7.3',
+                            'php' => '^7.4',
                             'ext-json' => '*',
                         ],
                     ],
@@ -120,32 +120,32 @@ PHP
             ],
             Phar::GZ,
             <<<'PHP'
-<?php
+                <?php
 
-return array (
-  0 =>
-  array (
-    'type' => 'php',
-    'condition' => '^7.3',
-    'message' => 'The package "acme/foo" requires the version "^7.3" or greater.',
-    'helpMessage' => 'The package "acme/foo" requires the version "^7.3" or greater.',
-  ),
-  1 =>
-  array (
-    'type' => 'extension',
-    'condition' => 'zlib',
-    'message' => 'The application requires the extension "zlib". Enable it or install a polyfill.',
-    'helpMessage' => 'The application requires the extension "zlib".',
-  ),
-  2 =>
-  array (
-    'type' => 'extension',
-    'condition' => 'json',
-    'message' => 'The package "acme/foo" requires the extension "json". Enable it or install a polyfill.',
-    'helpMessage' => 'The package "acme/foo" requires the extension "json".',
-  ),
-);
-PHP
+                return array (
+                  0 =>
+                  array (
+                    'type' => 'php',
+                    'condition' => '^7.4',
+                    'message' => 'The package "acme/foo" requires the version "^7.4" or greater.',
+                    'helpMessage' => 'The package "acme/foo" requires the version "^7.4" or greater.',
+                  ),
+                  1 =>
+                  array (
+                    'type' => 'extension',
+                    'condition' => 'zlib',
+                    'message' => 'The application requires the extension "zlib". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "zlib".',
+                  ),
+                  2 =>
+                  array (
+                    'type' => 'extension',
+                    'condition' => 'json',
+                    'message' => 'The package "acme/foo" requires the extension "json". Enable it or install a polyfill.',
+                    'helpMessage' => 'The package "acme/foo" requires the extension "json".',
+                  ),
+                );
+                PHP,
         ];
     }
 }

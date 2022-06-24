@@ -14,11 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use KevinGH\Box\Console\DisplayNormalizer;
+use Fidry\Console\Command\Command;
+use Fidry\Console\ExitCode;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use function realpath;
-use Symfony\Component\Console\Command\Command;
 
 /**
  * @covers \KevinGH\Box\Console\Command\GenerateDockerFile
@@ -32,9 +32,6 @@ class GenerateDockerFileTest extends CommandTestCase
 
     private const FIXTURES_DIR = __DIR__.'/../../../fixtures/docker';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->markAsSkippedIfPharReadonlyIsOn();
@@ -42,9 +39,6 @@ class GenerateDockerFileTest extends CommandTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getCommand(): Command
     {
         return new GenerateDockerFile();
@@ -59,22 +53,16 @@ class GenerateDockerFileTest extends CommandTestCase
 
         $expected = <<<OUTPUT
 
-🐳  Generating a Dockerfile for the PHAR "{$pharPath}"
+            🐳  Generating a Dockerfile for the PHAR "{$pharPath}"
 
- [OK] Done
+             [OK] Done
 
-You can now inspect your Dockerfile file or build your container with:
-$ docker build .
+            You can now inspect your Dockerfile file or build your container with:
+            $ docker build .
 
-OUTPUT;
+            OUTPUT;
 
-        $this->assertSame(
-            $expected,
-            DisplayNormalizer::removeTrailingSpaces(
-                $this->commandTester->getDisplay(true)
-            )
-        );
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
         $this->assertFileExists($this->tmp.'/Dockerfile');
     }
@@ -88,21 +76,15 @@ OUTPUT;
 
         $expected = <<<OUTPUT
 
-🐳  Generating a Dockerfile for the PHAR "{$pharPath}"
+            🐳  Generating a Dockerfile for the PHAR "{$pharPath}"
 
- [ERROR] Cannot retrieve the requirements for the PHAR. Make sure the PHAR has
-         been built with Box and the requirement checker enabled.
+             [ERROR] Cannot retrieve the requirements for the PHAR. Make sure the PHAR has
+                     been built with Box and the requirement checker enabled.
 
 
-OUTPUT;
+            OUTPUT;
 
-        $this->assertSame(
-            $expected,
-            DisplayNormalizer::removeTrailingSpaces(
-                $this->commandTester->getDisplay(true)
-            )
-        );
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::FAILURE);
 
         $this->assertFileDoesNotExist($this->tmp.'/Dockerfile');
     }
@@ -116,20 +98,14 @@ OUTPUT;
 
         $expected = <<<OUTPUT
 
-🐳  Generating a Dockerfile for the PHAR "{$pharPath}"
+            🐳  Generating a Dockerfile for the PHAR "{$pharPath}"
 
- [ERROR] Cannot retrieve the requirements for the PHAR. Make sure the PHAR has
-         been built with Box and the requirement checker enabled.
+             [ERROR] Cannot retrieve the requirements for the PHAR. Make sure the PHAR has
+                     been built with Box and the requirement checker enabled.
 
 
-OUTPUT;
+            OUTPUT;
 
-        $this->assertSame(
-            $expected,
-            DisplayNormalizer::removeTrailingSpaces(
-                $this->commandTester->getDisplay(true)
-            )
-        );
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::FAILURE);
     }
 }

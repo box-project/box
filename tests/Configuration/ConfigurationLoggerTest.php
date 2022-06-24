@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Configuration;
 
-use Generator;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -23,12 +22,8 @@ use PHPUnit\Framework\TestCase;
  */
 class ConfigurationLoggerTest extends TestCase
 {
-    /** @var ConfigurationLogger */
-    private $logs;
+    private ConfigurationLogger $logs;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->logs = new ConfigurationLogger();
@@ -41,7 +36,7 @@ class ConfigurationLoggerTest extends TestCase
     }
 
     /**
-     * @dataProvider provideEmptyMessage
+     * @dataProvider emptyMessageProvider
      */
     public function test_it_cannot_accept_an_empty_message(string $message): void
     {
@@ -52,7 +47,7 @@ class ConfigurationLoggerTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected to have a message but a blank string was given instead.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
 
@@ -63,7 +58,7 @@ class ConfigurationLoggerTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected to have a message but a blank string was given instead.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -81,7 +76,7 @@ class ConfigurationLoggerTest extends TestCase
                 'First recommendation',
                 'Second recommendation',
             ],
-            $this->logs->getRecommendations()
+            $this->logs->getRecommendations(),
         );
 
         $this->assertSame(
@@ -89,7 +84,7 @@ class ConfigurationLoggerTest extends TestCase
                 'First warning',
                 'Second warning',
             ],
-            $this->logs->getWarnings()
+            $this->logs->getWarnings(),
         );
     }
 
@@ -108,7 +103,7 @@ class ConfigurationLoggerTest extends TestCase
                 'First recommendation',
                 'Second recommendation',
             ],
-            $this->logs->getRecommendations()
+            $this->logs->getRecommendations(),
         );
 
         $this->assertSame(
@@ -116,11 +111,11 @@ class ConfigurationLoggerTest extends TestCase
                 'First warning',
                 'Second warning',
             ],
-            $this->logs->getWarnings()
+            $this->logs->getWarnings(),
         );
     }
 
-    public function provideEmptyMessage(): Generator
+    public static function emptyMessageProvider(): iterable
     {
         yield [''];
         yield [' '];

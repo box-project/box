@@ -23,12 +23,12 @@ use function array_map;
 use function array_unshift;
 use BadMethodCallException;
 use function chdir;
-use Closure;
 use Countable;
 use function dirname;
 use function extension_loaded;
 use function file_exists;
 use function getcwd;
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function is_object;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
@@ -39,7 +39,7 @@ use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
 use KevinGH\Box\PhpScoper\NullScoper;
-use KevinGH\Box\PhpScoper\WhitelistManipulator;
+use KevinGH\Box\PhpScoper\Scoper;
 use function openssl_pkey_export;
 use function openssl_pkey_get_details;
 use function openssl_pkey_get_private;
@@ -57,24 +57,21 @@ use Webmozart\Assert\Assert;
  */
 final class Box implements Countable
 {
-    /** @var string The path to the PHAR file */
-    private $file;
+    private Compactors $compactors;
+    private Placeholder $placeholderCompactor;
+    private MapFile $mapFile;
+    private Scoper $scoper;
+    private bool $buffering = false;
 
-    /** @var Phar The PHAR instance */
-    private $phar;
+    /**
+     * @var array<string, string> Relative file path as key and file contents as value
+     */
+    private array $bufferedFiles = [];
 
-    private $compactors;
-    private $placeholderCompactor;
-    private $mapFile;
-    private $scoper;
-    private $buffering = false;
-    private $bufferedFiles = [];
-
-    private function __construct(Phar $phar, string $file)
-    {
-        $this->phar = $phar;
-        $this->file = $file;
-
+    private function __construct(
+        private readonly Phar $phar,
+        private readonly string $pharFilePath,
+    ) {
         $this->compactors = new Compactors();
         $this->placeholderCompactor = new Placeholder([]);
         $this->mapFile = new MapFile(getcwd(), []);
@@ -84,21 +81,22 @@ final class Box implements Countable
     /**
      * Creates a new PHAR and Box instance.
      *
-     * @param string $file  The PHAR file name
-     * @param int    $flags Flags to pass to the Phar parent class RecursiveDirectoryIterator
-     * @param string $alias Alias with which the Phar archive should be referred to in calls to stream functionality
-     *
-     * @return Box
+     * @param string $pharFilePath The PHAR file name
+     * @param int    $pharFlags    Flags to pass to the Phar parent class RecursiveDirectoryIterator
+     * @param string $pharAlias    Alias with which the Phar archive should be referred to in calls to stream functionality
      *
      * @see RecursiveDirectoryIterator
      */
-    public static function create(string $file, ?int $flags = null, ?string $alias = null): self
+    public static function create(string $pharFilePath, int $pharFlags = 0, ?string $pharAlias = null): self
     {
         // Ensure the parent directory of the PHAR file exists as `new \Phar()` does not create it and would fail
         // otherwise.
-        mkdir(dirname($file));
+        mkdir(dirname($pharFilePath));
 
-        return new self(new Phar($file, (int) $flags, $alias), $file);
+        return new self(
+            new Phar($pharFilePath, $pharFlags, $pharAlias),
+            $pharFilePath,
+        );
     }
 
     public function startBuffering(): void
@@ -110,10 +108,14 @@ final class Box implements Countable
         $this->phar->startBuffering();
     }
 
-    public function endBuffering(?Closure $dumpAutoload): void
+    /**
+     * @param callable(SymbolsRegistry, string): void $dumpAutoload
+     */
+    public function endBuffering(?callable $dumpAutoload): void
     {
         Assert::true($this->buffering, 'The buffering must be started before ending it');
 
+        $dumpAutoload = $dumpAutoload ?? static fn () => null;
         $cwd = getcwd();
 
         $tmp = make_tmp_dir('box', self::class);
@@ -132,8 +134,8 @@ final class Box implements Countable
 
             if (null !== $dumpAutoload) {
                 $dumpAutoload(
-                    $this->scoper->getWhitelist(),
-                    $this->scoper->getPrefix()
+                    $this->scoper->getSymbolsRegistry(),
+                    $this->scoper->getPrefix(),
                 );
             }
 
@@ -149,14 +151,17 @@ final class Box implements Countable
         $this->phar->stopBuffering();
     }
 
-    public function removeComposerArtefacts(string $vendorDir): void
+    /**
+     * @param non-empty-string $normalizedVendorDir Normalized path ("/" path separator and no trailing "/") to the Composer vendor directory
+     */
+    public function removeComposerArtefacts(string $normalizedVendorDir): void
     {
         Assert::false($this->buffering, 'The buffering must have ended before removing the Composer artefacts');
 
         $composerFiles = [
             'composer.json',
             'composer.lock',
-            $vendorDir.'/composer/installed.json',
+            $normalizedVendorDir.'/composer/installed.json',
         ];
 
         $this->phar->startBuffering();
@@ -164,7 +169,13 @@ final class Box implements Countable
         foreach ($composerFiles as $composerFile) {
             $localComposerFile = ($this->mapFile)($composerFile);
 
-            if (file_exists('phar://'.$this->phar->getPath().'/'.$localComposerFile)) {
+            $pharFilePath = sprintf(
+                'phar://%s/%s',
+                $this->phar->getPath(),
+                $localComposerFile,
+            );
+
+            if (file_exists($pharFilePath)) {
                 $this->phar->delete($localComposerFile);
             }
         }
@@ -185,11 +196,10 @@ final class Box implements Countable
         if (null !== $extensionRequired && false === extension_loaded($extensionRequired)) {
             throw new RuntimeException(
                 sprintf(
-                    'Cannot compress the PHAR with the compression algorithm "%s": the extension "%s" is required but appear to not '
-                    .'be loaded',
+                    'Cannot compress the PHAR with the compression algorithm "%s": the extension "%s" is required but appear to not be loaded',
                     array_flip(get_phar_compression_algorithms())[$compressionAlgorithm],
-                    $extensionRequired
-                )
+                    $extensionRequired,
+                ),
             );
         }
 
@@ -203,9 +213,8 @@ final class Box implements Countable
             $exceptionMessage = 'unable to create temporary file' !== $exception->getMessage()
                 ? 'Could not compress the PHAR: '.$exception->getMessage()
                 : sprintf(
-                    'Could not compress the PHAR: the compression requires too many file descriptors to be opened (%s). Check '
-                    .'your system limits or install the posix extension to allow Box to automatically configure it during the compression',
-                    $this->phar->count()
+                    'Could not compress the PHAR: the compression requires too many file descriptors to be opened (%s). Check your system limits or install the posix extension to allow Box to automatically configure it during the compression',
+                    $this->phar->count(),
                 )
             ;
 
@@ -270,14 +279,14 @@ final class Box implements Countable
     {
         $contents = $this->placeholderCompactor->compact(
             $file,
-            file_contents($file)
+            file_contents($file),
         );
 
         $this->phar->setStub($contents);
     }
 
     /**
-     * @param SplFileInfo[]|string[] $files
+     * @param array<SplFileInfo|string> $files
      *
      * @throws MultiReasonException
      */
@@ -289,7 +298,7 @@ final class Box implements Countable
 
         if ($binary) {
             foreach ($files as $file) {
-                $this->addFile($file, null, $binary);
+                $this->addFile($file, null, true);
             }
 
             return;
@@ -348,7 +357,7 @@ final class Box implements Countable
      */
     public function sign(string $key, ?string $password): void
     {
-        $pubKey = $this->file.'.pubkey';
+        $pubKey = $this->pharFilePath.'.pubkey';
 
         Assert::writable(dirname($pubKey));
         Assert::true(extension_loaded('openssl'));
@@ -356,7 +365,7 @@ final class Box implements Countable
         if (file_exists($pubKey)) {
             Assert::file(
                 $pubKey,
-                'Cannot create public key: %s already exists and is not a file.'
+                'Cannot create public key: %s already exists and is not a file.',
             );
         }
 
@@ -375,6 +384,8 @@ final class Box implements Countable
 
     /**
      * @param string[] $files
+     *
+     * @throws MultiReasonException
      *
      * @return array array of tuples where the first element is the local file path (path inside the PHAR) and the
      *               second element is the processed contents
@@ -401,7 +412,7 @@ final class Box implements Countable
 
             $processedContents = $compactors->compact($local, $contents);
 
-            return [$local, $processedContents, $compactors->getScoperWhitelist()];
+            return [$local, $processedContents, $compactors->getScoperSymbolsRegistry()];
         };
 
         if ($this->scoper instanceof NullScoper || false === is_parallel_processing_enabled()) {
@@ -411,7 +422,7 @@ final class Box implements Countable
         // In the case of parallel processing, an issue is caused due to the statefulness nature of the PhpScoper
         // whitelist.
         //
-        // Indeed the PhpScoper Whitelist stores the records of whitelisted classes and functions. If nothing is done,
+        // Indeed, the PhpScoper Whitelist stores the records of whitelisted classes and functions. If nothing is done,
         // then the whitelisted retrieve in the end will here will be "blank" since the updated whitelists are the ones
         // from the workers used for the parallel processing.
         //
@@ -428,25 +439,20 @@ final class Box implements Countable
         }
 
         $filesWithContents = [];
-        $whitelists = [];
+        $symbolRegistries = [];
 
-        foreach ($tuples as [$local, $processedContents, $whitelist]) {
+        foreach ($tuples as [$local, $processedContents, $symbolRegistry]) {
             $filesWithContents[] = [$local, $processedContents];
-            $whitelists[] = $whitelist;
+            $symbolRegistries[] = $symbolRegistry;
         }
 
-        $this->compactors->registerWhitelist(
-            WhitelistManipulator::mergeWhitelists(
-                ...array_filter($whitelists)
-            )
+        $this->compactors->registerSymbolsRegistry(
+            SymbolsRegistry::createFromRegistries(array_filter($symbolRegistries)),
         );
 
         return $filesWithContents;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function count(): int
     {
         Assert::false($this->buffering, 'Cannot count the number of files in the PHAR when buffering');

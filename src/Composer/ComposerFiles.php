@@ -16,30 +16,24 @@ namespace KevinGH\Box\Composer;
 
 use function array_filter;
 use function array_map;
+use function array_values;
 
 final class ComposerFiles
 {
-    private $composerJson;
-    private $composerLock;
-    private $installedJson;
-
     public static function createEmpty(): self
     {
         return new self(
             ComposerFile::createEmpty(),
             ComposerFile::createEmpty(),
-            ComposerFile::createEmpty()
+            ComposerFile::createEmpty(),
         );
     }
 
     public function __construct(
-        ComposerFile $composerJson,
-        ComposerFile $composerLock,
-        ComposerFile $installedJson
+        private readonly ComposerFile $composerJson,
+        private readonly ComposerFile $composerLock,
+        private readonly ComposerFile $installedJson,
     ) {
-        $this->composerJson = $composerJson;
-        $this->composerLock = $composerLock;
-        $this->installedJson = $installedJson;
     }
 
     public function getComposerJson(): ComposerFile
@@ -62,11 +56,13 @@ final class ComposerFiles
      */
     public function getPaths(): array
     {
-        return array_filter(array_map(
-            static function (ComposerFile $file): ?string {
-                return $file->getPath();
-            },
-            [$this->composerJson, $this->composerLock, $this->installedJson]
-        ));
+        return array_values(
+            array_filter(
+                array_map(
+                    static fn (ComposerFile $file): ?string => $file->getPath(),
+                    [$this->composerJson, $this->composerLock, $this->installedJson],
+                ),
+            ),
+        );
     }
 }

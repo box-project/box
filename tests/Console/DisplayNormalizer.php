@@ -26,13 +26,45 @@ final class DisplayNormalizer
 
         $lines = array_map(
             'rtrim',
-            $lines
+            $lines,
         );
 
         return implode("\n", $lines);
     }
 
-    private function __construct()
+    /**
+     * @return callable(string):string
+     */
+    public static function createLoadingFilePathOutputNormalizer(): callable
     {
+        return static fn ($output) => preg_replace(
+            '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
+            ' // Loading the configuration file "box.json".',
+            $output,
+        );
+    }
+
+    /**
+     * @return callable(string):string
+     */
+    public static function createVarDumperObjectReferenceNormalizer(): callable
+    {
+        return static fn ($output) => preg_replace(
+            '/ \{#\d{3,}/',
+            ' {#140',
+            $output,
+        );
+    }
+
+    /**
+     * @return callable(string):string
+     */
+    public static function createReplaceBoxVersionNormalizer(): callable
+    {
+        return static fn (string $output): string => preg_replace(
+            '/Box version .+@[a-z\d]{7}/',
+            'Box version 3.x-dev@151e40a',
+            $output,
+        );
     }
 }

@@ -43,19 +43,19 @@ final class ConfigurationExporter
         $boxVersion = get_box_version();
 
         $header = <<<EOF
-//
-// Processed content of the configuration file "$file" dumped for debugging purposes
-//
-// PHP Version: $phpVersion
-// PHP extensions: $phpExtensions
-// OS: $os
-// Command: $command
-// Box: $boxVersion
-// Time: $date
-//
+            //
+            // Processed content of the configuration file "$file" dumped for debugging purposes
+            //
+            // PHP Version: $phpVersion
+            // PHP extensions: $phpExtensions
+            // OS: $os
+            // Command: $command
+            // Box: $boxVersion
+            // Time: $date
+            //
 
 
-EOF;
+            EOF;
 
         return $header.$config->export();
     }

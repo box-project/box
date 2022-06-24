@@ -14,47 +14,45 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
+use Fidry\Console\Application\Application as FidryApplication;
 use function KevinGH\Box\get_box_version;
 use function sprintf;
-use function strpos;
-use Symfony\Component\Console\Application as SymfonyApplication;
-use Symfony\Component\Console\Helper\HelperSet;
 use function trim;
 
 /**
  * @private
  */
-final class Application extends SymfonyApplication
+final class Application implements FidryApplication
 {
-    private const LOGO = <<<'ASCII'
+    private string $version;
+    private string $releaseDate;
+    private bool $autoExit;
+    private bool $catchExceptions;
+    private string $header;
 
-    ____
-   / __ )____  _  __
-  / __  / __ \| |/_/
- / /_/ / /_/ />  <
-/_____/\____/_/|_|
-
-
-
-ASCII;
-
-    private $releaseDate;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct(string $name = 'Box', ?string $version = null, string $releaseDate = '@release-date@')
-    {
-        $version = $version ?? get_box_version();
-
-        $this->releaseDate = false === strpos($releaseDate, '@') ? $releaseDate : '';
-
-        parent::__construct($name, $version);
+    public function __construct(
+        private string $name = 'Box',
+        ?string $version = null,
+        string $releaseDate = '@release-date@',
+        bool $autoExit = true,
+        bool $catchExceptions = true,
+    ) {
+        $this->version = $version ?? get_box_version();
+        $this->releaseDate = !str_contains($releaseDate, '@') ? $releaseDate : '';
+        $this->autoExit = $autoExit;
+        $this->catchExceptions = $catchExceptions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function getVersion(): string
+    {
+        return $this->version;
+    }
+
     public function getLongVersion(): string
     {
         return trim(
@@ -62,47 +60,52 @@ ASCII;
                 '<info>%s</info> version <comment>%s</comment> %s',
                 $this->getName(),
                 $this->getVersion(),
-                $this->releaseDate
-            )
+                $this->releaseDate,
+            ),
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getHelp(): string
     {
-        return self::LOGO.parent::getHelp();
+        return $this->getHeader();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getDefaultCommands(): array
+    public function getHeader(): string
     {
-        $commands = parent::getDefaultCommands();
+        if (!isset($this->header)) {
+            $this->header = Logo::LOGO_ASCII.$this->getLongVersion();
+        }
 
-        $commands[] = new Command\Build();
-        $commands[] = new Command\Compile();
-        $commands[] = new Command\Diff();
-        $commands[] = new Command\Info();
-        $commands[] = new Command\Process();
-        $commands[] = new Command\Extract();
-        $commands[] = new Command\Validate();
-        $commands[] = new Command\Verify();
-        $commands[] = new Command\GenerateDockerFile();
-
-        return $commands;
+        return $this->header;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getDefaultHelperSet(): HelperSet
+    public function getCommands(): array
     {
-        $helperSet = parent::getDefaultHelperSet();
-        $helperSet->set(new ConfigurationHelper());
+        return [
+            new Command\Compile($this->getHeader()),
+            new Command\Diff(),
+            new Command\Info(),
+            new Command\Process(),
+            new Command\Extract(),
+            new Command\Validate(),
+            new Command\Verify(),
+            new Command\GenerateDockerFile(),
+            new Command\Namespace_(),
+        ];
+    }
 
-        return $helperSet;
+    public function getDefaultCommand(): string
+    {
+        return 'list';
+    }
+
+    public function isAutoExitEnabled(): bool
+    {
+        return $this->autoExit;
+    }
+
+    public function areExceptionsCaught(): bool
+    {
+        return $this->catchExceptions;
     }
 }

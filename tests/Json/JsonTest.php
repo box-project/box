@@ -14,8 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Json;
 
-use Generator;
-use function get_class;
 use function is_object;
 use function json_decode;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -34,12 +32,8 @@ use Webmozart\Assert\Assert;
  */
 class JsonTest extends FileSystemTestCase
 {
-    /** @var Json */
-    private $json;
+    private Json $json;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -48,7 +42,7 @@ class JsonTest extends FileSystemTestCase
     }
 
     /**
-     * @dataProvider provideJsonToLint
+     * @dataProvider jsonToLintProvider
      */
     public function test_it_can_lint_a_json_string(string $json, ?Throwable $expectedThrowable): void
     {
@@ -63,7 +57,7 @@ class JsonTest extends FileSystemTestCase
                 $this->fail('Did not except throwable to be thrown.');
             }
 
-            $this->assertSame(get_class($expectedThrowable), get_class($throwable));
+            $this->assertSame($expectedThrowable::class, $throwable::class);
             $this->assertSame($expectedThrowable->getMessage(), $throwable->getMessage());
 
             return;
@@ -73,7 +67,7 @@ class JsonTest extends FileSystemTestCase
     }
 
     /**
-     * @dataProvider provideJsonToDecode
+     * @dataProvider jsonToDecodeProvider
      *
      * @param mixed $expected
      */
@@ -98,7 +92,7 @@ class JsonTest extends FileSystemTestCase
                 $this->fail('Did not except throwable to be thrown: '.$throwable->getMessage());
             }
 
-            $this->assertSame(get_class($expectedThrowable), get_class($throwable));
+            $this->assertSame($expectedThrowable::class, $throwable::class);
             $this->assertSame($expectedThrowable->getMessage(), $throwable->getMessage());
 
             return;
@@ -132,7 +126,7 @@ class JsonTest extends FileSystemTestCase
         } catch (ParsingException $exception) {
             $this->assertStringStartsWith(
                 'Parse error on line 1:',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -141,23 +135,23 @@ class JsonTest extends FileSystemTestCase
     {
         $schema = json_decode(
             <<<'JSON'
-{
-    "description": "Schema description",
-    "properties": {
-        "foo": {
-            "description": "The foo property",
-            "type": ["string"]
-        },
-        "bar": {
-            "description": "The foo property",
-            "type": ["string"]
-        }
-    }
-}
+                {
+                    "description": "Schema description",
+                    "properties": {
+                        "foo": {
+                            "description": "The foo property",
+                            "type": ["string"]
+                        },
+                        "bar": {
+                            "description": "The foo property",
+                            "type": ["string"]
+                        }
+                    }
+                }
 
-JSON
+                JSON
             ,
-            false
+            false,
         );
 
         touch('data.json');
@@ -170,7 +164,7 @@ JSON
 
                 return $data;
             })(),
-            $schema
+            $schema,
         );
 
         try {
@@ -183,26 +177,26 @@ JSON
 
                     return $data;
                 })(),
-                $schema
+                $schema,
             );
 
             $this->fail('Expected exception to be thrown.');
         } catch (JsonValidationException $exception) {
             $this->assertSame(
                 <<<'EOF'
-"data.json" does not match the expected JSON schema:
-  - foo : Boolean value found, but a string is required
-  - bar : Boolean value found, but a string is required
-EOF
+                    "data.json" does not match the expected JSON schema:
+                      - foo : Boolean value found, but a string is required
+                      - bar : Boolean value found, but a string is required
+                    EOF
                 ,
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertSame(
                 [
                     'foo : Boolean value found, but a string is required',
                     'bar : Boolean value found, but a string is required',
                 ],
-                $exception->getErrors()
+                $exception->getErrors(),
             );
             $this->assertSame('data.json', $exception->getValidatedFile());
             $this->assertSame(0, $exception->getCode());
@@ -210,7 +204,7 @@ EOF
         }
     }
 
-    public function provideJsonToLint(): Generator
+    public static function jsonToLintProvider(): iterable
     {
         yield ['{}', null];
 
@@ -218,30 +212,30 @@ EOF
             '',
             new ParsingException(
                 <<<'EOF'
-Parse error on line 1:
+                    Parse error on line 1:
 
-^
-Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
-EOF
+                    ^
+                    Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
+                    EOF,
             ),
         ];
     }
 
-    public function provideJsonToDecode(): Generator
+    public static function jsonToDecodeProvider(): iterable
     {
         yield ['{}', true, [], null];
         yield ['{}', false, new stdClass(), null];
 
         yield [
             <<<'JSON'
-{
-    "foo": {
-        "bar": [],
-        "baz": ["a", "b"],
-        "far": {}
-    }
-}
-JSON
+                {
+                    "foo": {
+                        "bar": [],
+                        "baz": ["a", "b"],
+                        "far": {}
+                    }
+                }
+                JSON
             ,
             true,
             [
@@ -256,14 +250,14 @@ JSON
 
         yield [
             <<<'JSON'
-{
-    "foo": {
-        "bar": [],
-        "baz": ["a", "b"],
-        "far": {}
-    }
-}
-JSON
+                {
+                    "foo": {
+                        "bar": [],
+                        "baz": ["a", "b"],
+                        "far": {}
+                    }
+                }
+                JSON
             ,
             false,
             (static function () {
@@ -284,11 +278,11 @@ JSON
             null,
             new ParsingException(
                 <<<'EOF'
-Parse error on line 1:
+                    Parse error on line 1:
 
-^
-Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
-EOF
+                    ^
+                    Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
+                    EOF,
             ),
         ];
 

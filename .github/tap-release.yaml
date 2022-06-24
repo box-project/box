@@ -1,0 +1,20 @@
+asset: box.phar
+tap: humbug/homebrew-box/Formula/box.rb
+template: >
+    class Box < Formula
+        desc "📦🚀 Fast, zero config application bundler with PHARs."
+        homepage "$REPO_WEBITE"
+        url "$STABLE_ASSET_URL"
+        sha256 "$STABLE_ASSET_SHA256"
+        version "$STABLE_VERSION"
+
+        depends_on "php" if MacOS.version <= :el_capitan
+
+        def install
+            bin.install "box.phar" => "box"
+        end
+
+        test do
+            shell_output("#{bin}/box --version").include?(version)
+        end
+    end

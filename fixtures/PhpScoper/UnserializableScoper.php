@@ -14,22 +14,18 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PhpScoper;
 
-use DomainException;
-use Humbug\PhpScoper\Scoper;
-use Humbug\PhpScoper\Whitelist;
-use KevinGH\Box\NotCallable;
+use Humbug\PhpScoper\Scoper\Scoper as PhpScoperScoper;
+use KevinGH\Box\UnsupportedMethodCall;
 use Serializable;
 
-final class UnserializableScoper implements Scoper, Serializable
+final class UnserializableScoper implements PhpScoperScoper, Serializable
 {
-    use NotCallable;
-
     /**
      * {@inheritdoc}
      */
-    public function scope(string $filePath, string $contents, string $prefix, array $patchers, Whitelist $whitelist): string
+    public function scope(string $filePath, string $contents): string
     {
-        $this->__call(__METHOD__, func_get_args());
+        throw UnsupportedMethodCall::forMethod(__CLASS__, __METHOD__);
     }
 
     /**
@@ -37,7 +33,7 @@ final class UnserializableScoper implements Scoper, Serializable
      */
     public function serialize(): string
     {
-        throw new DomainException('This class is not serializable');
+        throw UnsupportedMethodCall::forMethod(__CLASS__, __METHOD__);
     }
 
     /**
@@ -45,6 +41,6 @@ final class UnserializableScoper implements Scoper, Serializable
      */
     public function unserialize($serialized): void
     {
-        throw new DomainException('This class is not serializable');
+        throw UnsupportedMethodCall::forMethod(__CLASS__, __METHOD__);
     }
 }

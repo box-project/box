@@ -23,8 +23,8 @@ use Error;
 use Exception;
 use function exec;
 use function extension_loaded;
+use Fidry\Console\DisplayNormalizer;
 use function file_get_contents;
-use Generator;
 use function implode;
 use function in_array;
 use InvalidArgumentException;
@@ -32,7 +32,6 @@ use function iterator_to_array;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\FakeCompactor;
-use KevinGH\Box\Console\DisplayNormalizer;
 use function KevinGH\Box\FileSystem\canonicalize;
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -54,6 +53,7 @@ use SplFileInfo;
 use function sprintf;
 use const STDOUT;
 use function str_replace;
+use Stringable;
 use Symfony\Component\Finder\Finder;
 use Throwable;
 use function trim;
@@ -69,12 +69,8 @@ class BoxTest extends FileSystemTestCase
     use ProphecyTrait;
     use RequiresPharReadonlyOff;
 
-    /** @var Box */
-    private $box;
+    private Box $box;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->markAsSkippedIfPharReadonlyIsOn();
@@ -84,9 +80,6 @@ class BoxTest extends FileSystemTestCase
         $this->box = Box::create('test.phar');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown(): void
     {
         parent::tearDown();
@@ -109,7 +102,7 @@ class BoxTest extends FileSystemTestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The buffering must be ended before starting it again',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -123,7 +116,7 @@ class BoxTest extends FileSystemTestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The buffering must be started before ending it',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
 
@@ -137,7 +130,7 @@ class BoxTest extends FileSystemTestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The buffering must be started before ending it',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -212,7 +205,7 @@ class BoxTest extends FileSystemTestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Cannot add files if the buffering has not started.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -331,7 +324,7 @@ class BoxTest extends FileSystemTestCase
             $this->tmp,
             [
                 [$file => $localPath],
-            ]
+            ],
         );
 
         $this->box->registerFileMapping($fileMapper);
@@ -385,7 +378,7 @@ class BoxTest extends FileSystemTestCase
             $this->tmp,
             [
                 [$file => $localPath],
-            ]
+            ],
         );
 
         $this->box->registerFileMapping($fileMapper);
@@ -414,14 +407,14 @@ class BoxTest extends FileSystemTestCase
 
         dump_file($file, $contents);
 
-        /** @var Compactor&ObjectProphecy $firstCompactorProphecy */
+        /** @var Compactor|ObjectProphecy $firstCompactorProphecy */
         $firstCompactorProphecy = $this->prophesize(Compactor::class);
         $firstCompactorProphecy
             ->compact($file, 'original contents foo_value')
             ->willReturn($firstCompactorOutput = 'first compactor contents')
         ;
 
-        /** @var Compactor&ObjectProphecy $secondCompactorProphecy */
+        /** @var Compactor|ObjectProphecy $secondCompactorProphecy */
         $secondCompactorProphecy = $this->prophesize(Compactor::class);
         $secondCompactorProphecy
             ->compact($file, $firstCompactorOutput)
@@ -431,8 +424,8 @@ class BoxTest extends FileSystemTestCase
         $this->box->registerCompactors(
             new Compactors(
                 $firstCompactorProphecy->reveal(),
-                $secondCompactorProphecy->reveal()
-            )
+                $secondCompactorProphecy->reveal(),
+            ),
         );
 
         $this->box->registerPlaceholders($placeholderMapping);
@@ -461,7 +454,7 @@ class BoxTest extends FileSystemTestCase
             [
                 ['acme' => 'src/Foo'],
                 ['' => 'lib'],
-            ]
+            ],
         );
 
         $files = [
@@ -484,13 +477,13 @@ class BoxTest extends FileSystemTestCase
 
             $this->assertFileExists(
                 (string) $this->box->getPhar()[$local],
-                'Expected to find the file "%s" in the PHAR.'
+                'Expected to find the file "%s" in the PHAR.',
             );
 
             $pathInPhar = str_replace(
                 'phar://'.$this->box->getPhar()->getPath().'/',
                 '',
-                (string) $this->box->getPhar()[$local]
+                (string) $this->box->getPhar()[$local],
             );
 
             $this->assertSame($expectedLocal, $pathInPhar);
@@ -507,7 +500,7 @@ class BoxTest extends FileSystemTestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The file "/nowhere/foo" does not exist.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertNull($exception->getPrevious());
         }
@@ -530,7 +523,7 @@ class BoxTest extends FileSystemTestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The path "foo" is not readable.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertNull($exception->getPrevious());
         }
@@ -561,8 +554,8 @@ class BoxTest extends FileSystemTestCase
         $this->box->registerCompactors(
             new Compactors(
                 $firstCompactorProphecy->reveal(),
-                $secondCompactorProphecy->reveal()
-            )
+                $secondCompactorProphecy->reveal(),
+            ),
         );
 
         $this->box->registerPlaceholders($placeholderMapping);
@@ -627,10 +620,7 @@ class BoxTest extends FileSystemTestCase
 
             $this->fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
-                'Cannot add files if the buffering has not started.',
-                $exception->getMessage()
-            );
+            static::assertSame('Cannot add files if the buffering has not started.', $exception->getMessage());
         }
     }
 
@@ -667,7 +657,7 @@ class BoxTest extends FileSystemTestCase
             $this->tmp,
             [
                 ['' => 'local'],
-            ]
+            ],
         );
 
         $this->box->registerFileMapping($fileMapper);
@@ -802,12 +792,12 @@ class BoxTest extends FileSystemTestCase
     {
         $files = [
             'composer.json' => <<<'JSON'
-{
-    "config": {
-        "vendor-dir": "my-vendor"
-    }
-}
-JSON
+                {
+                    "config": {
+                        "vendor-dir": "my-vendor"
+                    }
+                }
+                JSON
             ,
             'composer.lock' => '{}',
             'my-vendor/composer/installed.json' => '{}',
@@ -848,7 +838,7 @@ JSON
             $this->tmp,
             [
                 ['' => 'lib'],
-            ]
+            ],
         );
 
         $this->box->registerFileMapping($map);
@@ -879,7 +869,7 @@ JSON
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The buffering must have ended before removing the Composer artefacts',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -890,18 +880,18 @@ JSON
         $this->box->addFile(
             'composer.json',
             <<<'JSON'
-{
-    "autoload": {
-        "classmap": ["unknown"]
-    }
-}
-JSON
+                {
+                    "autoload": {
+                        "classmap": ["unknown"]
+                    }
+                }
+                JSON,
         );
 
         $error = null;
 
         try {
-            $this->box->endBuffering(static function () use (&$error): void {
+            $this->box->endBuffering(static function () use (&$error): never {
                 throw $error = new Error('Autoload dump error');
             });
 
@@ -944,7 +934,7 @@ JSON
             $this->tmp,
             [
                 ['' => 'local'],
-            ]
+            ],
         );
 
         $this->box->registerFileMapping($fileMapper);
@@ -1028,7 +1018,7 @@ JSON
             [
                 ['acme' => 'src/Foo'],
                 ['' => 'lib'],
-            ]
+            ],
         );
 
         $files = [
@@ -1051,13 +1041,13 @@ JSON
         foreach ($files as $expectedLocal) {
             $this->assertFileExists(
                 (string) $this->box->getPhar()[$expectedLocal],
-                'Expected to find the file "%s" in the PHAR.'
+                'Expected to find the file "%s" in the PHAR.',
             );
 
             $pathInPhar = str_replace(
                 'phar://'.$this->box->getPhar()->getPath().'/',
                 '',
-                (string) $this->box->getPhar()[$expectedLocal]
+                (string) $this->box->getPhar()[$expectedLocal],
             );
 
             $this->assertSame($expectedLocal, $pathInPhar);
@@ -1074,7 +1064,7 @@ JSON
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The file "/nowhere/foo" does not exist.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertNull($exception->getPrevious());
         }
@@ -1096,7 +1086,7 @@ JSON
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The path "foo" is not readable.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertNull($exception->getPrevious());
         }
@@ -1111,34 +1101,32 @@ JSON
             $this->box->addFiles(['/nowhere/foo'], false);
 
             $this->fail('Expected exception to be thrown.');
-        } catch (InvalidArgumentException $exception) {
+        } catch (InvalidArgumentException) {
             $tmpDirs = iterator_to_array(
                 Finder::create()
                     ->directories()
                     ->depth(0)
                     ->in(dirname($boxTmp)),
-                true
+                true,
             );
 
             $boxDir = current(
                 array_filter(
                     $tmpDirs,
-                    function (SplFileInfo $fileInfo) use ($boxTmp): bool {
-                        return false === in_array(
-                            $fileInfo->getRealPath(),
-                            [realpath($boxTmp), realpath($this->tmp)],
-                            true
-                        );
-                    }
-                )
+                    fn (SplFileInfo $fileInfo): bool => false === in_array(
+                        $fileInfo->getRealPath(),
+                        [realpath($boxTmp), realpath($this->tmp)],
+                        true,
+                    ),
+                ),
             );
 
             $this->assertFalse(
                 $boxDir,
                 sprintf(
                     'Did not expect to find the directory "%s".',
-                    $boxDir
-                )
+                    $boxDir,
+                ),
             );
         }
     }
@@ -1156,23 +1144,23 @@ JSON
         dump_file(
             $file = 'foo',
             <<<'PHP'
-#!/usr/bin/env php
-<?php
+                #!/usr/bin/env php
+                <?php
 
-echo <<<EOF
-Test replacing placeholders.
+                echo <<<EOF
+                Test replacing placeholders.
 
-String value: @string_placeholder@
-Int value: @int_placeholder@
-Stringable value: @stringable_placeholder@
+                String value: @string_placeholder@
+                Int value: @int_placeholder@
+                Stringable value: @stringable_placeholder@
 
-EOF;
+                EOF;
 
-__HALT_COMPILER();
-PHP
+                __HALT_COMPILER();
+                PHP,
         );
 
-        $stringable = new class() {
+        $stringable = new class() implements Stringable {
             public function __toString(): string
             {
                 return 'stringable value';
@@ -1188,12 +1176,12 @@ PHP
         $this->box->registerStub($file);
 
         $expected = <<<'EOF'
-Test replacing placeholders.
+            Test replacing placeholders.
 
-String value: string value
-Int value: 10
-Stringable value: stringable value
-EOF;
+            String value: string value
+            Int value: 10
+            Stringable value: stringable value
+            EOF;
 
         exec('php test.phar', $output);
 
@@ -1207,25 +1195,25 @@ EOF;
         dump_file(
             $file = 'foo',
             <<<'STUB'
-#!/usr/bin/env php
-<?php
+                #!/usr/bin/env php
+                <?php
 
-echo 'Hello world!';
+                echo 'Hello world!';
 
-__HALT_COMPILER();
-STUB
+                __HALT_COMPILER();
+                STUB,
         );
 
         $this->box->registerStub($file);
 
         $expected = <<<'STUB'
-#!/usr/bin/env php
-<?php
+            #!/usr/bin/env php
+            <?php
 
-echo 'Hello world!';
+            echo 'Hello world!';
 
-__HALT_COMPILER(); ?>
-STUB;
+            __HALT_COMPILER(); ?>
+            STUB;
 
         $actual = trim($this->box->getPhar()->getStub());
 
@@ -1242,26 +1230,26 @@ STUB;
         dump_file(
             $file = 'foo',
             <<<'STUB'
-#!/usr/bin/env php
-<?php
+                #!/usr/bin/env php
+                <?php
 
-echo '@message@';
+                echo '@message@';
 
-__HALT_COMPILER();
-STUB
+                __HALT_COMPILER();
+                STUB,
         );
 
         $this->box->registerPlaceholders(['@message@' => 'Hello world!']);
         $this->box->registerStub($file);
 
         $expected = <<<'STUB'
-#!/usr/bin/env php
-<?php
+            #!/usr/bin/env php
+            <?php
 
-echo 'Hello world!';
+            echo 'Hello world!';
 
-__HALT_COMPILER(); ?>
-STUB;
+            __HALT_COMPILER(); ?>
+            STUB;
 
         $actual = trim($this->box->getPhar()->getStub());
 
@@ -1282,7 +1270,7 @@ STUB;
         } catch (Exception $exception) {
             $this->assertSame(
                 'The file "/does/not/exist" does not exist.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1300,7 +1288,7 @@ STUB;
         } catch (Exception $exception) {
             $this->assertSame(
                 'The path "vfs://test/test.php" is not readable.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1314,7 +1302,7 @@ STUB;
         } catch (Exception $exception) {
             $this->assertSame(
                 'Expected value "resource" to be a scalar or stringable object.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1329,13 +1317,13 @@ STUB;
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Cannot compress files while buffering.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
 
     /**
-     * @dataProvider provideCompressionAlgorithms
+     * @dataProvider compressionAlgorithmsProvider
      * @requires extension zlib
      * @requires extension bz2
      */
@@ -1355,9 +1343,9 @@ STUB;
             $this->assertSame(
                 sprintf(
                     'Expected one of: 4096, 8192, 0. Got: %s',
-                    $algorithm
+                    $algorithm,
                 ),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
 
@@ -1378,7 +1366,7 @@ STUB;
             $this->assertSame(
                 'Cannot compress the PHAR with the compression algorithm "BZ2": the extension "bz2" is required but appear to not '
                 .'be loaded',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1394,13 +1382,13 @@ STUB;
         $this->box->addFile('file1', 'file1 contents');
         $this->box->getPhar()->setStub(
             $stub = <<<'PHP'
-<?php
+                <?php
 
-echo 'Yo';
+                echo 'Yo';
 
-__HALT_COMPILER(); ?>
+                __HALT_COMPILER(); ?>
 
-PHP
+                PHP,
         );
 
         $this->box->endBuffering(noop());
@@ -1420,7 +1408,7 @@ PHP
         $this->assertSame(
             $stub,
             DisplayNormalizer::removeTrailingSpaces($this->box->getPhar()->getStub()),
-            'Did not expect the stub to be affected by the compression.'
+            'Did not expect the stub to be affected by the compression.',
         );
 
         $extensionRequired = $this->box->compress(Phar::GZ);
@@ -1440,7 +1428,7 @@ PHP
         $this->assertSame(
             $stub,
             DisplayNormalizer::removeTrailingSpaces($this->box->getPhar()->getStub()),
-            'Did not expect the stub to be affected by the compression.'
+            'Did not expect the stub to be affected by the compression.',
         );
 
         $extensionRequired = $this->box->compress(Phar::NONE);
@@ -1460,7 +1448,7 @@ PHP
         $this->assertSame(
             $stub,
             DisplayNormalizer::removeTrailingSpaces($this->box->getPhar()->getStub()),
-            'Did not expect the stub to be affected by the compression.'
+            'Did not expect the stub to be affected by the compression.',
         );
     }
 
@@ -1486,7 +1474,7 @@ PHP
         $this->assertSame(
             'Hello, world!',
             exec('php test.phar'),
-            'Expected PHAR to be executable.'
+            'Expected PHAR to be executable.',
         );
     }
 
@@ -1506,7 +1494,7 @@ PHP
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Cannot create public key: "test.phar.pubkey" already exists and is not a file.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1526,7 +1514,7 @@ PHP
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Cannot create public key: "test.phar.pubkey" already exists and is not a file.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1555,7 +1543,7 @@ PHP
         $this->assertSame(
             'Hello, world!',
             exec('php test.phar'),
-            'Expected the PHAR to be executable.'
+            'Expected the PHAR to be executable.',
         );
     }
 
@@ -1578,7 +1566,7 @@ PHP
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Could not retrieve the private key, check that the password is correct.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1592,7 +1580,7 @@ PHP
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The file "/does/not/exist" does not exist.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1611,12 +1599,12 @@ PHP
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The path "vfs://test/private.key" is not readable.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
 
-    public function provideCompressionAlgorithms(): Generator
+    public static function compressionAlgorithmsProvider(): iterable
     {
         foreach (get_phar_compression_algorithms() as $algorithm) {
             yield [$algorithm, true];
@@ -1630,26 +1618,27 @@ PHP
     private function getPrivateKey(): array
     {
         return [
-            <<<'KEY'
------BEGIN RSA PRIVATE KEY-----
-Proc-Type: 4,ENCRYPTED
-DEK-Info: DES-EDE3-CBC,3FF97F75E5A8F534
+            <<<'KEY_WRAP'
+                -----BEGIN RSA PRIVATE KEY-----
+                Proc-Type: 4,ENCRYPTED
+                DEK-Info: DES-EDE3-CBC,3FF97F75E5A8F534
 
-TvEPC5L3OXjy4X5t6SRsW6J4Dfdgw0Mfjqwa4OOI88uk5L8SIezs4sHDYHba9GkG
-RKVnRhA5F+gEHrabsQiVJdWPdS8xKUgpkvHqoAT8Zl5sAy/3e/EKZ+Bd2pS/t5yQ
-aGGqliG4oWecx42QGL8rmyrbs2wnuBZmwQ6iIVIfYabwpiH+lcEmEoxomXjt9A3j
-Sh8IhaDzMLnVS8egk1QvvhFjyXyBIW5mLIue6cdEgINbxzRReNQgjlyHS8BJRLp9
-EvJcZDKJiNJt+VLncbfm4ZhbdKvSsbZbXC/Pqv06YNMY1+m9QwszHJexqjm7AyzB
-MkBFedcxcxqvSb8DaGgQfUkm9rAmbmu+l1Dncd72Cjjf8fIfuodUmKsdfYds3h+n
-Ss7K4YiiNp7u9pqJBMvUdtrVoSsNAo6i7uFa7JQTXec9sbFN1nezgq1FZmcfJYUZ
-rdpc2J1hbHTfUZWtLZebA72GU63Y9zkZzbP3SjFUSWniEEbzWbPy2sAycHrpagND
-itOQNHwZ2Me81MQQB55JOKblKkSha6cNo9nJjd8rpyo/lc/Iay9qlUyba7RO0V/t
-wm9ZeUZL+D2/JQH7zGyLxkKqcMC+CFrNYnVh0U4nk3ftZsM+jcyfl7ScVFTKmcRc
-ypcpLwfS6gyenTqiTiJx/Zca4xmRNA+Fy1EhkymxP3ku0kTU6qutT2tuYOjtz/rW
-k6oIhMcpsXFdB3N9iHT4qqElo3rVW/qLQaNIqxd8+JmE5GkHmF43PhK3HX1PCmRC
-TnvzVS0y1l8zCsRToUtv5rCBC+r8Q3gnvGGnT4jrsp98ithGIQCbbQ==
------END RSA PRIVATE KEY-----
-KEY
+                TvEPC5L3OXjy4X5t6SRsW6J4Dfdgw0Mfjqwa4OOI88uk5L8SIezs4sHDYHba9GkG
+                RKVnRhA5F+gEHrabsQiVJdWPdS8xKUgpkvHqoAT8Zl5sAy/3e/EKZ+Bd2pS/t5yQ
+                aGGqliG4oWecx42QGL8rmyrbs2wnuBZmwQ6iIVIfYabwpiH+lcEmEoxomXjt9A3j
+                Sh8IhaDzMLnVS8egk1QvvhFjyXyBIW5mLIue6cdEgINbxzRReNQgjlyHS8BJRLp9
+                EvJcZDKJiNJt+VLncbfm4ZhbdKvSsbZbXC/Pqv06YNMY1+m9QwszHJexqjm7AyzB
+                MkBFedcxcxqvSb8DaGgQfUkm9rAmbmu+l1Dncd72Cjjf8fIfuodUmKsdfYds3h+n
+                Ss7K4YiiNp7u9pqJBMvUdtrVoSsNAo6i7uFa7JQTXec9sbFN1nezgq1FZmcfJYUZ
+                rdpc2J1hbHTfUZWtLZebA72GU63Y9zkZzbP3SjFUSWniEEbzWbPy2sAycHrpagND
+                itOQNHwZ2Me81MQQB55JOKblKkSha6cNo9nJjd8rpyo/lc/Iay9qlUyba7RO0V/t
+                wm9ZeUZL+D2/JQH7zGyLxkKqcMC+CFrNYnVh0U4nk3ftZsM+jcyfl7ScVFTKmcRc
+                ypcpLwfS6gyenTqiTiJx/Zca4xmRNA+Fy1EhkymxP3ku0kTU6qutT2tuYOjtz/rW
+                k6oIhMcpsXFdB3N9iHT4qqElo3rVW/qLQaNIqxd8+JmE5GkHmF43PhK3HX1PCmRC
+                TnvzVS0y1l8zCsRToUtv5rCBC+r8Q3gnvGGnT4jrsp98ithGIQCbbQ==
+                -----END RSA PRIVATE KEY-----
+                KEY_WRAP
+
             ,
             'test',
         ];
@@ -1659,18 +1648,18 @@ KEY
     {
         $this->box->getPhar()->addFromString(
             'main.php',
-            <<<'PHP'
-<?php
+            <<<'PHP_WRAP'
+                <?php
 
-echo 'Hello, world!'.PHP_EOL;
-PHP
+                echo 'Hello, world!'.PHP_EOL;
+                PHP_WRAP,
         );
 
         $this->box->getPhar()->setStub(
             StubGenerator::create()
                 ->index('main.php')
                 ->checkRequirements(false)
-                ->generate()
+                ->generateStub(),
         );
     }
 }

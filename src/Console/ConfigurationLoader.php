@@ -14,10 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
+use Fidry\Console\Input\IO;
 use InvalidArgumentException;
 use KevinGH\Box\Configuration\Configuration;
+use KevinGH\Box\Configuration\ConfigurationLoader as ConfigLoader;
 use KevinGH\Box\Configuration\NoConfigurationFound;
-use KevinGH\Box\Console\IO\IO;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\NotInstantiable;
 use function sprintf;
@@ -36,39 +37,49 @@ final class ConfigurationLoader
      *
      * @param bool $allowNoFile Load the config nonetheless if not file is found when true
      *
-     * @throws JsonValidationException
+     * @throws JsonValidationException|NoConfigurationFound
      */
     public static function getConfig(
         ?string $configPath,
-        ConfigurationHelper $helper,
         IO $io,
-        bool $allowNoFile
+        bool $allowNoFile,
     ): Configuration {
-        try {
-            $configPath = $configPath ?? $helper->findDefaultPath();
+        $configPath = self::getConfigPath($configPath, $io, $allowNoFile);
+        $configLoader = new ConfigLoader();
 
-            $io->comment(
-                sprintf(
-                    'Loading the configuration file "<comment>%s</comment>".',
-                    $configPath
-                )
-            );
-        } catch (NoConfigurationFound $exception) {
+        try {
+            return $configLoader->loadFile($configPath);
+        } catch (InvalidArgumentException $invalidConfig) {
+            $io->error('The configuration file is invalid.');
+
+            throw $invalidConfig;
+        }
+    }
+
+    private static function getConfigPath(
+        ?string $configPath,
+        IO $io,
+        bool $allowNoFile,
+    ): ?string {
+        try {
+            $configPath ??= ConfigurationLocator::findDefaultPath();
+        } catch (NoConfigurationFound $noConfigurationFound) {
             if (false === $allowNoFile) {
-                throw $exception;
+                throw $noConfigurationFound;
             }
 
             $io->comment('Loading without a configuration file.');
 
-            $configPath = null;
+            return null;
         }
 
-        try {
-            return $helper->loadFile($configPath);
-        } catch (InvalidArgumentException $exception) {
-            $io->error('The configuration file is invalid.');
+        $io->comment(
+            sprintf(
+                'Loading the configuration file "<comment>%s</comment>".',
+                $configPath,
+            ),
+        );
 
-            throw $exception;
-        }
+        return $configPath;
     }
 }

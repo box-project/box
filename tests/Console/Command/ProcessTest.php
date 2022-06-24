@@ -14,12 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Fidry\Console\Command\Command;
+use Fidry\Console\ExitCode;
 use KevinGH\Box\Console\DisplayNormalizer;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\touch;
 use KevinGH\Box\Test\CommandTestCase;
-use function preg_replace;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -27,9 +27,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ProcessTest extends CommandTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function getCommand(): Command
     {
         return new Process();
@@ -43,33 +40,31 @@ class ProcessTest extends CommandTestCase
             [
                 'command' => 'process',
                 'file' => 'index.php',
-            ]
+            ],
         );
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
 
         $expectedPath = $this->tmp.'/index.php';
 
         $expected = <<<OUTPUT
 
 
- // Loading without a configuration file.
+             // Loading without a configuration file.
 
-⚡  Processing the contents of the file $expectedPath
+            ⚡  Processing the contents of the file $expectedPath
 
-No replacement values registered
+            No replacement values registered
 
-No compactor registered
+            No compactor registered
 
-Processed contents:
+            Processed contents:
 
-"""
+            """
 
-"""
+            """
 
-OUTPUT;
+            OUTPUT;
 
-        $this->assertSame($expected, $actual);
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_processes_a_file_and_displays_the_processed_contents_with_a_config(): void
@@ -78,37 +73,30 @@ OUTPUT;
         dump_file(
             'acme.json',
             <<<'JSON'
-{
-    "foo": "@foo@"
-}
-JSON
+                {
+                    "foo": "@foo@"
+                }
+                JSON,
         );
         dump_file(
             'box.json',
             <<<'JSON'
-{
-    "replacements": {
-        "foo": "bar"
-    },
-    "compactors": [
-        "KevinGH\\Box\\Compactor\\Json"
-    ]
-}
-JSON
+                {
+                    "replacements": {
+                        "foo": "bar"
+                    },
+                    "compactors": [
+                        "KevinGH\\Box\\Compactor\\Json"
+                    ]
+                }
+                JSON,
         );
 
         $this->commandTester->execute(
             [
                 'command' => 'process',
                 'file' => 'acme.json',
-            ]
-        );
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-
-        $actual = preg_replace(
-            '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
-            ' // Loading the configuration file "box.json".',
-            $actual
+            ],
         );
 
         $expectedFilePath = $this->tmp.'/acme.json';
@@ -116,26 +104,25 @@ JSON
         $expected = <<<OUTPUT
 
 
- // Loading the configuration file "box.json".
+             // Loading the configuration file "box.json".
 
-⚡  Processing the contents of the file $expectedFilePath
+            ⚡  Processing the contents of the file $expectedFilePath
 
-Registered replacement values:
-  + @foo@: bar
+            Registered replacement values:
+              + @foo@: bar
 
-Registered compactors:
-  + KevinGH\Box\Compactor\Json
+            Registered compactors:
+              + KevinGH\Box\Compactor\Json
 
-Processed contents:
+            Processed contents:
 
-"""
-{"foo":"bar"}
-"""
+            """
+            {"foo":"bar"}
+            """
 
-OUTPUT;
+            OUTPUT;
 
-        $this->assertSame($expected, $actual);
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_processes_the_file_relative_to_the_config_base_path(): void
@@ -143,64 +130,51 @@ OUTPUT;
         dump_file(
             'index.php',
             <<<'PHP'
-<?php
+                <?php
 
-echo 'Hello world!';
-PHP
+                echo 'Hello world!';
+                PHP,
         );
 
         dump_file(
             'box.json',
             <<<'JSON'
-{
-    "replacements": {
-        "foo": "bar"
-    },
-    "compactors": [
-        "KevinGH\\Box\\Compactor\\PhpScoper"
-    ]
-}
-JSON
+                {
+                    "replacements": {
+                        "foo": "bar"
+                    },
+                    "compactors": [
+                        "KevinGH\\Box\\Compactor\\PhpScoper"
+                    ]
+                }
+                JSON,
         );
         dump_file(
             'scoper.inc.php',
             <<<'PHP'
-<?php
+                <?php
 
-return [
-    'prefix' => '_Prefix',
-    'patchers' => [
-        function (string $filePath, string $prefix, string $contents): string {
-            if ('index.php' !== $filePath) {
-                return $contents;
-            }
+                return [
+                    'prefix' => '_Prefix',
+                    'patchers' => [
+                        function (string $filePath, string $prefix, string $contents): string {
+                            if ('index.php' !== $filePath) {
+                                return $contents;
+                            }
 
-            return str_replace('Hello world!', '!dlrow olleH', $contents);
-        },
-    ],
-];
+                            return str_replace('Hello world!', '!dlrow olleH', $contents);
+                        },
+                    ],
+                ];
 
-PHP
+                PHP,
         );
 
         $this->commandTester->execute(
             [
                 'command' => 'process',
                 'file' => $this->tmp.'/index.php',
-            ]
-        );
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-
-        $actual = preg_replace(
-            '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
-            ' // Loading the configuration file "box.json".',
-            $actual
-        );
-
-        $actual = preg_replace(
-            '/ \{#\d{3,}/',
-            ' {#140',
-            $actual
+            ],
         );
 
         $expectedPath = $this->tmp.'/index.php';
@@ -208,49 +182,40 @@ PHP
         $expected = <<<OUTPUT
 
 
- // Loading the configuration file "box.json".
+             // Loading the configuration file "box.json".
 
-⚡  Processing the contents of the file $expectedPath
+            ⚡  Processing the contents of the file $expectedPath
 
-Registered replacement values:
-  + @foo@: bar
+            Registered replacement values:
+              + @foo@: bar
 
-Registered compactors:
-  + KevinGH\Box\Compactor\PhpScoper
+            Registered compactors:
+              + KevinGH\Box\Compactor\PhpScoper
 
-Processed contents:
+            Processed contents:
 
-"""
-<?php
+            """
+            <?php
 
-namespace _Prefix;
+            namespace _Prefix;
 
-echo '!dlrow olleH';
+            echo '!dlrow olleH';
 
-"""
+            """
 
-Whitelist:
+            Whitelist:
 
-"""
-Humbug\PhpScoper\Whitelist {#140
-  -original: []
-  -symbols: []
-  -constants: []
-  -namespaces: []
-  -patterns: []
-  -whitelistGlobalConstants: true
-  -whitelistGlobalClasses: true
-  -whitelistGlobalFunctions: true
-  -whitelistedFunctions: []
-  -whitelistedClasses: []
-}
+            """
+            Humbug\PhpScoper\Symbol\SymbolsRegistry {#140
+              -recordedFunctions: []
+              -recordedClasses: []
+            }
 
-"""
+            """
 
-OUTPUT;
+            OUTPUT;
 
-        $this->assertSame($expected, $actual);
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_processes_a_file_and_displays_only_the_processed_contents_in_quiet_mode(): void
@@ -259,23 +224,23 @@ OUTPUT;
         dump_file(
             'acme.json',
             <<<'JSON'
-{
-    "foo": "@foo@"
-}
-JSON
+                {
+                    "foo": "@foo@"
+                }
+                JSON,
         );
         dump_file(
             'box.json',
             <<<'JSON'
-{
-    "replacements": {
-        "foo": "bar"
-    },
-    "compactors": [
-        "KevinGH\\Box\\Compactor\\Json"
-    ]
-}
-JSON
+                {
+                    "replacements": {
+                        "foo": "bar"
+                    },
+                    "compactors": [
+                        "KevinGH\\Box\\Compactor\\Json"
+                    ]
+                }
+                JSON,
         );
 
         $this->commandTester->execute(
@@ -283,22 +248,28 @@ JSON
                 'command' => 'process',
                 'file' => 'acme.json',
             ],
-            ['verbosity' => OutputInterface::VERBOSITY_QUIET]
-        );
-        $actual = DisplayNormalizer::removeTrailingSpaces($this->commandTester->getDisplay(true));
-
-        $actual = preg_replace(
-            '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
-            ' // Loading the configuration file "box.json".',
-            $actual
+            ['verbosity' => OutputInterface::VERBOSITY_QUIET],
         );
 
         $expected = <<<'OUTPUT'
-{"foo":"bar"}
+            {"foo":"bar"}
 
-OUTPUT;
+            OUTPUT;
 
-        $this->assertSame($expected, $actual);
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
+    }
+
+    public function assertSameOutput(
+        string $expectedOutput,
+        int $expectedStatusCode,
+        callable ...$extraNormalizers,
+    ): void {
+        parent::assertSameOutput(
+            $expectedOutput,
+            $expectedStatusCode,
+            DisplayNormalizer::createVarDumperObjectReferenceNormalizer(),
+            DisplayNormalizer::createLoadingFilePathOutputNormalizer(),
+            ...$extraNormalizers,
+        );
     }
 }

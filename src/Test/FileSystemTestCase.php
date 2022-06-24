@@ -38,9 +38,6 @@ abstract class FileSystemTestCase extends TestCase
     /** @var string */
     protected $tmp;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -55,9 +52,6 @@ abstract class FileSystemTestCase extends TestCase
         chdir($this->tmp);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown(): void
     {
         parent::tearDown();
@@ -78,11 +72,9 @@ abstract class FileSystemTestCase extends TestCase
 
         $files = array_values(
             array_map(
-                static function (string $file) use ($root): string {
-                    return str_replace($root.DIRECTORY_SEPARATOR, '', $file);
-                },
-                $files
-            )
+                static fn (string $file): string => str_replace($root.DIRECTORY_SEPARATOR, '', $file),
+                $files,
+            ),
         );
 
         natsort($files);

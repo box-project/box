@@ -1,8 +1,8 @@
 <?php
 
-namespace HumbugBox3100\KevinGH\RequirementChecker;
+namespace HumbugBox3160\KevinGH\RequirementChecker;
 
 interface IsFulfilled
 {
-    public function __invoke();
+    public function __invoke() : bool;
 }

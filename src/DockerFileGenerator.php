@@ -19,7 +19,7 @@ use function array_filter;
 use function basename;
 use Composer\Semver\Semver;
 use function implode;
-use function sprintf;
+use function Safe\sprintf;
 use function str_replace;
 use UnexpectedValueException;
 use Webmozart\Assert\Assert;
@@ -30,17 +30,19 @@ use Webmozart\Assert\Assert;
 final class DockerFileGenerator
 {
     private const FILE_TEMPLATE = <<<'Dockerfile'
-FROM php:__BASE_PHP_IMAGE_TOKEN__
+        FROM php:__BASE_PHP_IMAGE_TOKEN__
 
-RUN $(php -r '$extensionInstalled = array_map("strtolower", \get_loaded_extensions(false));$requiredExtensions = __PHP_EXTENSIONS_TOKEN__;$extensionsToInstall = array_diff($requiredExtensions, $extensionInstalled);if ([] !== $extensionsToInstall) {echo \sprintf("docker-php-ext-install %s", implode(" ", $extensionsToInstall));}echo "echo \"No extensions\"";')
+        RUN $(php -r '$extensionInstalled = array_map("strtolower", \get_loaded_extensions(false));$requiredExtensions = __PHP_EXTENSIONS_TOKEN__;$extensionsToInstall = array_diff($requiredExtensions, $extensionInstalled);if ([] !== $extensionsToInstall) {echo \sprintf("docker-php-ext-install %s", implode(" ", $extensionsToInstall));}echo "echo \"No extensions\"";')
 
-COPY __PHAR_FILE_PATH_TOKEN__ /__PHAR_FILE_NAME_TOKEN__
+        COPY __PHAR_FILE_PATH_TOKEN__ /__PHAR_FILE_NAME_TOKEN__
 
-ENTRYPOINT ["/__PHAR_FILE_NAME_TOKEN__"]
+        ENTRYPOINT ["/__PHAR_FILE_NAME_TOKEN__"]
 
-Dockerfile;
+        Dockerfile;
 
     private const PHP_DOCKER_IMAGES = [
+        '8.1.0' => '8.1-cli-alpine',
+        '8.0.0' => '8.0-cli-alpine',
         '7.4.0' => '7.4-cli-alpine',
         '7.3.0' => '7.3-cli-alpine',
         '7.2.0' => '7.2-cli-alpine',
@@ -48,9 +50,12 @@ Dockerfile;
         '7.0.0' => '7-cli-alpine',
     ];
 
-    private $image;
-    private $extensions;
-    private $sourcePhar;
+    private string $image;
+
+    /**
+     * @var string[]
+     */
+    private array $extensions;
 
     /**
      * Creates a new instance of the generator.
@@ -61,10 +66,10 @@ Dockerfile;
      */
     public static function createForRequirements(array $requirements, string $sourcePhar): self
     {
-        return new static(
+        return new self(
             self::retrievePhpImageName($requirements),
             self::retrievePhpExtensions($requirements),
-            $sourcePhar
+            $sourcePhar,
         );
     }
 
@@ -73,27 +78,26 @@ Dockerfile;
      * @param string   $sourcePhar source PHAR location; This PHAR is going to be copied over to the image so the path
      *                             should either be absolute or relative to the location of the Dockerfile
      */
-    public function __construct(string $image, array $extensions, string $sourcePhar)
-    {
+    public function __construct(
+        string $image,
+        array $extensions,
+        private readonly string $sourcePhar,
+    ) {
         Assert::inArray($image, self::PHP_DOCKER_IMAGES);
         Assert::allString($extensions);
 
         $this->image = $image;
         $this->extensions = $extensions;
-        $this->sourcePhar = $sourcePhar;
     }
 
-    /**
-     * @return string The stub
-     */
-    public function generate(): string
+    public function generateStub(): string
     {
         $contents = self::FILE_TEMPLATE;
 
         $contents = str_replace(
             '__BASE_PHP_IMAGE_TOKEN__',
             $this->image,
-            $contents
+            $contents,
         );
 
         $contents = str_replace(
@@ -104,22 +108,22 @@ Dockerfile;
                     '["%s"]',
                     implode(
                         '", "',
-                        $this->extensions
-                    )
+                        $this->extensions,
+                    ),
                 ),
-            $contents
+            $contents,
         );
 
         $contents = str_replace(
             '__PHAR_FILE_PATH_TOKEN__',
             $this->sourcePhar,
-            $contents
+            $contents,
         );
 
         $contents = str_replace(
             '__PHAR_FILE_NAME_TOKEN__',
             basename($this->sourcePhar),
-            $contents
+            $contents,
         );
 
         return $contents;
@@ -130,11 +134,9 @@ Dockerfile;
         $conditions = array_column(
             array_filter(
                 $requirements,
-                static function (array $requirement): bool {
-                    return 'php' === $requirement['type'];
-                }
+                static fn (array $requirement): bool => 'php' === $requirement['type'],
             ),
-            'condition'
+            'condition',
         );
 
         foreach (self::PHP_DOCKER_IMAGES as $php => $image) {
@@ -151,8 +153,8 @@ Dockerfile;
             sprintf(
                 'Could not find a suitable Docker base image for the PHP constraint(s) "%s". Images available: "%s"',
                 implode('", "', $conditions),
-                implode('", "', self::PHP_DOCKER_IMAGES)
-            )
+                implode('", "', self::PHP_DOCKER_IMAGES),
+            ),
         );
     }
 
@@ -164,11 +166,9 @@ Dockerfile;
         return array_column(
             array_filter(
                 $requirements,
-                static function (array $requirement): bool {
-                    return 'extension' === $requirement['type'];
-                }
+                static fn (array $requirement): bool => 'extension' === $requirement['type'],
             ),
-            'condition'
+            'condition',
         );
     }
 }

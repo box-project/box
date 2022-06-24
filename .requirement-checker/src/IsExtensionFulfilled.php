@@ -1,16 +1,17 @@
 <?php
 
-namespace HumbugBox3100\KevinGH\RequirementChecker;
+namespace HumbugBox3160\KevinGH\RequirementChecker;
 
-final class IsExtensionFulfilled implements \HumbugBox3100\KevinGH\RequirementChecker\IsFulfilled
+use function extension_loaded;
+final class IsExtensionFulfilled implements IsFulfilled
 {
     private $requiredExtension;
-    public function __construct($requiredExtension)
+    public function __construct(string $requiredExtension)
     {
         $this->requiredExtension = $requiredExtension;
     }
-    public function __invoke()
+    public function __invoke() : bool
     {
-        return \extension_loaded($this->requiredExtension);
+        return extension_loaded($this->requiredExtension);
     }
 }

@@ -38,6 +38,7 @@ $config = (new PhpCsFixer\Config())
         ],
         'header_comment' => ['header' => $header],
         'heredoc_to_nowdoc' => true,
+        'heredoc_indentation' => true,
         'list_syntax' => ['syntax' => 'short'],
         'method_argument_space' => [
             'on_multiline' => 'ensure_fully_multiline',
@@ -68,6 +69,7 @@ $config = (new PhpCsFixer\Config())
         'ordered_imports' => true,
         'php_unit_test_class_requires_covers' => true,
         'phpdoc_add_missing_param_annotation' => true,
+        'phpdoc_no_useless_inheritdoc' => true,
         'phpdoc_order' => true,
         'phpdoc_types_order' => true,
         'php_unit_method_casing' => [
@@ -76,6 +78,14 @@ $config = (new PhpCsFixer\Config())
         'semicolon_after_instruction' => true,
         'single_line_throw' => false,
         'strict_param' => true,
+        'trailing_comma_in_multiline' => [
+            'after_heredoc' => true,
+            'elements' => [
+                'arrays',
+                'arguments',
+                'parameters',
+            ],
+        ],
         'yoda_style' => true,
     ])
     ->setFinder(

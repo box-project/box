@@ -20,7 +20,10 @@ use Webmozart\Assert\Assert;
 
 final class Placeholder implements Compactor
 {
-    private $placeholders;
+    /**
+     * @var scalar[]
+     */
+    private array $placeholders;
 
     /**
      * @param scalar[] $placeholders
@@ -32,15 +35,12 @@ final class Placeholder implements Compactor
         $this->placeholders = $placeholders;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function compact(string $file, string $contents): string
     {
         return str_replace(
             array_keys($this->placeholders),
             $this->placeholders,
-            $contents
+            $contents,
         );
     }
 }

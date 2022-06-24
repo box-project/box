@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use Generator;
 use PHPUnit\Framework\TestCase;
 use UnexpectedValueException;
 
@@ -24,28 +23,28 @@ use UnexpectedValueException;
 class DockerFileGeneratorTest extends TestCase
 {
     /**
-     * @dataProvider provideGeneratorData
+     * @dataProvider generatorDataProvider
      */
     public function test_it_can_generate_a_dockerfile_contents(
         string $image,
         array $extensions,
         string $sourcePhar,
-        string $expected
+        string $expected,
     ): void {
-        $actual = (new DockerFileGenerator($image, $extensions, $sourcePhar))->generate();
+        $actual = (new DockerFileGenerator($image, $extensions, $sourcePhar))->generateStub();
 
         $this->assertSame($expected, $actual);
     }
 
     /**
-     * @dataProvider provideGeneratorRequirements
+     * @dataProvider generatorRequirementsProvider
      */
     public function test_it_can_generate_a_dockerfile_contents_from_requirements(
         array $requirements,
         string $sourcePhar,
-        string $expected
+        string $expected,
     ): void {
-        $actual = DockerFileGenerator::createForRequirements($requirements, $sourcePhar)->generate();
+        $actual = DockerFileGenerator::createForRequirements($requirements, $sourcePhar)->generateStub();
 
         $this->assertSame($expected, $actual);
     }
@@ -60,34 +59,34 @@ class DockerFileGeneratorTest extends TestCase
                             'condition' => '^5.3',
                         ],
                     ],
-                'path/to/phar'
+                'path/to/phar',
             )
-                ->generate()
+                ->generateStub()
             ;
         } catch (UnexpectedValueException $exception) {
             $this->assertSame(
-                'Could not find a suitable Docker base image for the PHP constraint(s) "^5.3". Images available: "7.4-cli-alpine", "7.3-cli-alpine", "7.2-cli-alpine", "7.1-cli-alpine", "7-cli-alpine"',
-                $exception->getMessage()
+                'Could not find a suitable Docker base image for the PHP constraint(s) "^5.3". Images available: "8.1-cli-alpine", "8.0-cli-alpine", "7.4-cli-alpine", "7.3-cli-alpine", "7.2-cli-alpine", "7.1-cli-alpine", "7-cli-alpine"',
+                $exception->getMessage(),
             );
         }
     }
 
-    public function provideGeneratorData(): Generator
+    public static function generatorDataProvider(): iterable
     {
         yield [
             '7.2-cli-alpine',
             [],
             'box.phar',
             <<<'Dockerfile'
-FROM php:7.2-cli-alpine
+                FROM php:7.2-cli-alpine
 
-RUN $(php -r '$extensionInstalled = array_map("strtolower", \get_loaded_extensions(false));$requiredExtensions = [];$extensionsToInstall = array_diff($requiredExtensions, $extensionInstalled);if ([] !== $extensionsToInstall) {echo \sprintf("docker-php-ext-install %s", implode(" ", $extensionsToInstall));}echo "echo \"No extensions\"";')
+                RUN $(php -r '$extensionInstalled = array_map("strtolower", \get_loaded_extensions(false));$requiredExtensions = [];$extensionsToInstall = array_diff($requiredExtensions, $extensionInstalled);if ([] !== $extensionsToInstall) {echo \sprintf("docker-php-ext-install %s", implode(" ", $extensionsToInstall));}echo "echo \"No extensions\"";')
 
-COPY box.phar /box.phar
+                COPY box.phar /box.phar
 
-ENTRYPOINT ["/box.phar"]
+                ENTRYPOINT ["/box.phar"]
 
-Dockerfile
+                Dockerfile,
         ];
 
         yield [
@@ -95,19 +94,19 @@ Dockerfile
             ['phar', 'gzip'],
             '/path/to/box',
             <<<'Dockerfile'
-FROM php:7.2-cli-alpine
+                FROM php:7.2-cli-alpine
 
-RUN $(php -r '$extensionInstalled = array_map("strtolower", \get_loaded_extensions(false));$requiredExtensions = ["phar", "gzip"];$extensionsToInstall = array_diff($requiredExtensions, $extensionInstalled);if ([] !== $extensionsToInstall) {echo \sprintf("docker-php-ext-install %s", implode(" ", $extensionsToInstall));}echo "echo \"No extensions\"";')
+                RUN $(php -r '$extensionInstalled = array_map("strtolower", \get_loaded_extensions(false));$requiredExtensions = ["phar", "gzip"];$extensionsToInstall = array_diff($requiredExtensions, $extensionInstalled);if ([] !== $extensionsToInstall) {echo \sprintf("docker-php-ext-install %s", implode(" ", $extensionsToInstall));}echo "echo \"No extensions\"";')
 
-COPY /path/to/box /box
+                COPY /path/to/box /box
 
-ENTRYPOINT ["/box"]
+                ENTRYPOINT ["/box"]
 
-Dockerfile
+                Dockerfile,
         ];
     }
 
-    public function provideGeneratorRequirements(): Generator
+    public static function generatorRequirementsProvider(): iterable
     {
         yield [
             [
@@ -150,15 +149,15 @@ Dockerfile
             ],
             'box.phar',
             <<<'Dockerfile'
-FROM php:7.4-cli-alpine
+                FROM php:7.4-cli-alpine
 
-RUN $(php -r '$extensionInstalled = array_map("strtolower", \get_loaded_extensions(false));$requiredExtensions = ["zlib", "phar", "openssl", "pcre", "tokenizer"];$extensionsToInstall = array_diff($requiredExtensions, $extensionInstalled);if ([] !== $extensionsToInstall) {echo \sprintf("docker-php-ext-install %s", implode(" ", $extensionsToInstall));}echo "echo \"No extensions\"";')
+                RUN $(php -r '$extensionInstalled = array_map("strtolower", \get_loaded_extensions(false));$requiredExtensions = ["zlib", "phar", "openssl", "pcre", "tokenizer"];$extensionsToInstall = array_diff($requiredExtensions, $extensionInstalled);if ([] !== $extensionsToInstall) {echo \sprintf("docker-php-ext-install %s", implode(" ", $extensionsToInstall));}echo "echo \"No extensions\"";')
 
-COPY box.phar /box.phar
+                COPY box.phar /box.phar
 
-ENTRYPOINT ["/box.phar"]
+                ENTRYPOINT ["/box.phar"]
 
-Dockerfile
+                Dockerfile,
         ];
 
         yield [
@@ -184,15 +183,15 @@ Dockerfile
             ],
             'box.phar',
             <<<'Dockerfile'
-FROM php:7.1-cli-alpine
+                FROM php:7.1-cli-alpine
 
-RUN $(php -r '$extensionInstalled = array_map("strtolower", \get_loaded_extensions(false));$requiredExtensions = ["zlib"];$extensionsToInstall = array_diff($requiredExtensions, $extensionInstalled);if ([] !== $extensionsToInstall) {echo \sprintf("docker-php-ext-install %s", implode(" ", $extensionsToInstall));}echo "echo \"No extensions\"";')
+                RUN $(php -r '$extensionInstalled = array_map("strtolower", \get_loaded_extensions(false));$requiredExtensions = ["zlib"];$extensionsToInstall = array_diff($requiredExtensions, $extensionInstalled);if ([] !== $extensionsToInstall) {echo \sprintf("docker-php-ext-install %s", implode(" ", $extensionsToInstall));}echo "echo \"No extensions\"";')
 
-COPY box.phar /box.phar
+                COPY box.phar /box.phar
 
-ENTRYPOINT ["/box.phar"]
+                ENTRYPOINT ["/box.phar"]
 
-Dockerfile
+                Dockerfile,
         ];
     }
 }

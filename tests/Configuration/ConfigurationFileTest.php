@@ -17,8 +17,6 @@ namespace KevinGH\Box\Configuration;
 use function chdir;
 use const DIRECTORY_SEPARATOR;
 use function file_get_contents;
-use Generator;
-use function Humbug\PhpScoper\json_decode;
 use InvalidArgumentException;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_absolute;
@@ -27,6 +25,7 @@ use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\FileSystem\symlink;
 use function KevinGH\Box\FileSystem\touch;
 use KevinGH\Box\Json\JsonValidationException;
+use function Safe\json_decode;
 use function sprintf;
 
 /**
@@ -140,7 +139,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
     }
 
     /**
-     * @dataProvider provideConfigWithMainScript
+     * @dataProvider configWithMainScriptProvider
      */
     public function test_the_main_script_file_is_always_ignored(callable $setUp, array $config, array $expectedFiles, array $expectedBinFiles): void
     {
@@ -156,7 +155,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
     }
 
     /**
-     * @dataProvider provideConfigWithGeneratedArtefact
+     * @dataProvider configWithGeneratedArtefactProvider
      */
     public function test_the_generated_artefact_is_always_ignored(callable $setUp, array $config, array $expectedFiles, array $expectedBinFiles): void
     {
@@ -347,14 +346,14 @@ class ConfigurationFileTest extends ConfigurationTestCase
         dump_file(
             'composer.lock',
             <<<'JSON'
-{
-    "packages-dev": [
-        {"name": "acme/foo"},
-        {"name": "acme/bar"},
-        {"name": "acme/oof"}
-    ]
-}
-JSON
+                {
+                    "packages-dev": [
+                        {"name": "acme/foo"},
+                        {"name": "acme/bar"},
+                        {"name": "acme/oof"}
+                    ]
+                }
+                JSON,
         );
         dump_file('vendor/composer/installed.json', '{}');
 
@@ -461,9 +460,9 @@ JSON
             $this->assertSame(
                 sprintf(
                     '"files" must contain a list of existing files. Could not find "%s".',
-                    $filePath
+                    $filePath,
                 ),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -500,7 +499,7 @@ JSON
 
             $this->assertSame(
                 "Cannot append the link \"$link\" to the Finder: links are not supported.",
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -537,7 +536,7 @@ JSON
 
             $this->assertSame(
                 "Path \"$link\" was expected to be a file or directory. It may be a symlink (which are unsupported).",
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -574,7 +573,7 @@ JSON
 
             $this->assertSame(
                 "Cannot append the link \"$link\" to the Finder: links are not supported.",
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -606,7 +605,7 @@ JSON
 
             $this->assertSame(
                 "Cannot add the link \"$link\": links are not supported.",
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -638,7 +637,7 @@ JSON
 
             $this->assertSame(
                 "Cannot add the link \"$link\": links are not supported.",
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -661,9 +660,9 @@ JSON
             $this->assertSame(
                 sprintf(
                     '"files" must contain a list of existing files. Could not find "%s".',
-                    $filePath
+                    $filePath,
                 ),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -684,9 +683,9 @@ JSON
             $this->assertSame(
                 sprintf(
                     '"directories" must contain a list of existing directories. Could not find "%s".',
-                    $dirPath
+                    $dirPath,
                 ),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -709,9 +708,9 @@ JSON
             $this->assertSame(
                 sprintf(
                     '"directories" must contain a list of existing directories. Could not find "%s".',
-                    $dirPath
+                    $dirPath,
                 ),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -969,9 +968,9 @@ JSON
             $this->assertSame(
                 sprintf(
                     '"files-bin" must contain a list of existing files. Could not find "%s".',
-                    $filePath
+                    $filePath,
                 ),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -994,9 +993,9 @@ JSON
             $this->assertSame(
                 sprintf(
                     '"files-bin" must contain a list of existing files. Could not find "%s".',
-                    $filePath
+                    $filePath,
                 ),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1017,9 +1016,9 @@ JSON
             $this->assertSame(
                 sprintf(
                     '"directories-bin" must contain a list of existing directories. Could not find "%s".',
-                    $dirPath
+                    $dirPath,
                 ),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1042,9 +1041,9 @@ JSON
             $this->assertSame(
                 sprintf(
                     '"directories-bin" must contain a list of existing directories. Could not find "%s".',
-                    $dirPath
+                    $dirPath,
                 ),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1095,11 +1094,11 @@ JSON
 
         $this->assertSame(
             $expected,
-            $this->normalizePaths($this->config->getFiles())
+            $this->normalizePaths($this->config->getFiles()),
         );
         $this->assertSame(
             $expected,
-            $this->normalizePaths($this->config->getBinaryFiles())
+            $this->normalizePaths($this->config->getBinaryFiles()),
         );
     }
 
@@ -1111,13 +1110,13 @@ JSON
 
         $this->assertSame(
             ['The "blacklist" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
 
     /**
-     * @dataProvider provideJsonValidNonStringArray
+     * @dataProvider jsonValidNonStringArrayProvider
      *
      * @param mixed $value
      */
@@ -1132,7 +1131,7 @@ JSON
         } catch (JsonValidationException $exception) {
             $this->assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1177,7 +1176,7 @@ JSON
     }
 
     /**
-     * @dataProvider provideJsonValidNonStringArray
+     * @dataProvider jsonValidNonStringArrayProvider
      *
      * @param mixed $value
      */
@@ -1192,7 +1191,7 @@ JSON
         } catch (JsonValidationException $exception) {
             $this->assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1205,13 +1204,13 @@ JSON
 
         $this->assertSame(
             ['The "files" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
 
     /**
-     * @dataProvider provideJsonValidNonStringArray
+     * @dataProvider jsonValidNonStringArrayProvider
      *
      * @param mixed $value
      */
@@ -1226,7 +1225,7 @@ JSON
         } catch (JsonValidationException $exception) {
             $this->assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1249,16 +1248,16 @@ JSON
 
         $this->assertSame(
             $expected,
-            $this->normalizePaths($this->config->getFiles())
+            $this->normalizePaths($this->config->getFiles()),
         );
         $this->assertSame(
             $expected,
-            $this->normalizePaths($this->config->getBinaryFiles())
+            $this->normalizePaths($this->config->getBinaryFiles()),
         );
     }
 
     /**
-     * @dataProvider provideJsonValidNonStringArray
+     * @dataProvider jsonValidNonStringArrayProvider
      *
      * @param mixed $value
      */
@@ -1273,7 +1272,7 @@ JSON
         } catch (JsonValidationException $exception) {
             $this->assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1286,13 +1285,13 @@ JSON
 
         $this->assertSame(
             ['The "directories" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
 
     /**
-     * @dataProvider provideJsonValidNonStringArray
+     * @dataProvider jsonValidNonStringArrayProvider
      *
      * @param mixed $value
      */
@@ -1307,7 +1306,7 @@ JSON
         } catch (JsonValidationException $exception) {
             $this->assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1331,20 +1330,18 @@ JSON
 
         $this->assertSame(
             $expected,
-            $this->normalizePaths($this->config->getFiles())
+            $this->normalizePaths($this->config->getFiles()),
         );
         $this->assertSame(
             $expected,
-            $this->normalizePaths($this->config->getBinaryFiles())
+            $this->normalizePaths($this->config->getBinaryFiles()),
         );
     }
 
     /**
-     * @dataProvider provideJsonValidNonObjectArray
-     *
-     * @param mixed $value
+     * @dataProvider jsonValidNonObjectArrayProvider
      */
-    public function test_finder_value_must_be_an_array_of_objects($value): void
+    public function test_finder_value_must_be_an_array_of_objects(mixed $value): void
     {
         try {
             $this->setConfig([
@@ -1355,7 +1352,7 @@ JSON
         } catch (JsonValidationException $exception) {
             $this->assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1368,7 +1365,7 @@ JSON
 
         $this->assertSame(
             ['The "finder" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -1432,11 +1429,11 @@ JSON
 
         $this->assertEqualsCanonicalizing(
             $expected,
-            $this->normalizePaths($this->config->getFiles())
+            $this->normalizePaths($this->config->getFiles()),
         );
         $this->assertEqualsCanonicalizing(
             $expected,
-            $this->normalizePaths($this->config->getBinaryFiles())
+            $this->normalizePaths($this->config->getBinaryFiles()),
         );
     }
 
@@ -1462,11 +1459,11 @@ JSON
 
         $this->assertEqualsCanonicalizing(
             $expected,
-            $this->normalizePaths($this->config->getFiles())
+            $this->normalizePaths($this->config->getFiles()),
         );
         $this->assertEqualsCanonicalizing(
             $expected,
-            $this->normalizePaths($this->config->getBinaryFiles())
+            $this->normalizePaths($this->config->getBinaryFiles()),
         );
     }
 
@@ -1516,7 +1513,7 @@ JSON
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected the method "invalidMethod" to exist.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -1580,12 +1577,12 @@ JSON
     }
 
     /**
-     * @dataProvider provideFilesAutodiscoveryConfig
+     * @dataProvider filesAutodiscoveryConfigProvider
      */
     public function test_files_are_autodiscovered_unless_directory_or_finder_config_is_provided(
         callable $setUp,
         array $config,
-        bool $expectedFilesAutodiscovery
+        bool $expectedFilesAutodiscovery,
     ): void {
         $setUp();
 
@@ -1657,31 +1654,31 @@ JSON
         dump_file(
             'composer.json',
             <<<'JSON'
-{
-    "autoload": {
-        "files": ["file0", "file1"],
-        "psr-4": {
-            "Acme\\": "PSR4_0",
-            "Bar\\": ["PSR4_1", "PSR4_2"]
-        },
-        "psr-0": {
-            "Acme\\": "PSR0_0",
-            "Bar\\": ["PSR0_1", "PSR0_2"]
-        },
-        "classmap": ["CLASSMAP_DIR"]
-    },
-    "autoload-dev": {
-        "files": ["file2"],
-        "psr-4": {
-            "Acme\\": "DEV_PSR4_0"
-        },
-        "psr-0": {
-            "Acme\\": "DEV_PSR0_0"
-        },
-        "classmap": ["CLASSMAP_DEV_DIR"]
-    }
-}
-JSON
+                {
+                    "autoload": {
+                        "files": ["file0", "file1"],
+                        "psr-4": {
+                            "Acme\\": "PSR4_0",
+                            "Bar\\": ["PSR4_1", "PSR4_2"]
+                        },
+                        "psr-0": {
+                            "Acme\\": "PSR0_0",
+                            "Bar\\": ["PSR0_1", "PSR0_2"]
+                        },
+                        "classmap": ["CLASSMAP_DIR"]
+                    },
+                    "autoload-dev": {
+                        "files": ["file2"],
+                        "psr-4": {
+                            "Acme\\": "DEV_PSR4_0"
+                        },
+                        "psr-0": {
+                            "Acme\\": "DEV_PSR0_0"
+                        },
+                        "classmap": ["CLASSMAP_DEV_DIR"]
+                    }
+                }
+                JSON,
         );
 
         // Relative to the current working directory for readability
@@ -1736,7 +1733,7 @@ JSON
 
         $this->assertSame(
             ['The "force-autodiscovery" setting can be omitted since is set to its default value'],
-            $this->config->getRecommendations()
+            $this->config->getRecommendations(),
         );
         $this->assertSame([], $this->config->getWarnings());
     }
@@ -1745,7 +1742,7 @@ JSON
     {
         $config = Configuration::create(
             $configPath = self::FIXTURES_DIR.'/dir000/box.json',
-            json_decode(file_get_contents($configPath), false)
+            json_decode(file_get_contents($configPath), false),
         );
 
         $this->assertSame([], $config->getRecommendations());
@@ -1756,7 +1753,7 @@ JSON
     {
         $config = Configuration::create(
             $configPath = self::FIXTURES_DIR.'/dir001/box.json',
-            json_decode(file_get_contents($configPath), false)
+            json_decode(file_get_contents($configPath), false),
         );
 
         $this->assertTrue($config->dumpAutoload());
@@ -1790,7 +1787,7 @@ JSON
                 'The "dump-autoload" setting has been set but has been ignored because the composer.json, composer.lock '
                 .'and vendor/composer/installed.json files are necessary but could not be found.',
             ],
-            $config->getWarnings()
+            $config->getWarnings(),
         );
     }
 
@@ -1821,7 +1818,7 @@ JSON
                 'The "dump-autoload" setting has been set but has been ignored because the composer.json, composer.lock '
                 .'and vendor/composer/installed.json files are necessary but could not be found.',
             ],
-            $config->getWarnings()
+            $config->getWarnings(),
         );
     }
 
@@ -1841,16 +1838,16 @@ JSON
         dump_file(
             'composer.lock',
             <<<'JSON'
-{
-    "packages": [
-        {"name": "acme/foo"}
-    ],
-    "packages-dev": [
-        {"name": "acme/bar"},
-        {"name": "acme/oof"}
-    ]
-}
-JSON
+                {
+                    "packages": [
+                        {"name": "acme/foo"}
+                    ],
+                    "packages-dev": [
+                        {"name": "acme/bar"},
+                        {"name": "acme/oof"}
+                    ]
+                }
+                JSON,
         );
         dump_file('vendor/composer/installed.json', '{}');
 
@@ -1906,7 +1903,7 @@ JSON
         $this->assertCount(0, $this->config->getBinaryFiles());
     }
 
-    public function provideConfigWithMainScript(): Generator
+    public static function configWithMainScriptProvider(): iterable
     {
         yield [
             static function (): void {
@@ -2078,7 +2075,7 @@ JSON
         ];
     }
 
-    public function provideConfigWithGeneratedArtefact(): Generator
+    public static function configWithGeneratedArtefactProvider(): iterable
     {
         yield [
             static function (): void {
@@ -2257,9 +2254,9 @@ JSON
         ];
     }
 
-    public function provideJsonValidNonStringArray(): Generator
+    public static function jsonValidNonStringArrayProvider(): iterable
     {
-        foreach ($this->provideJsonPrimitives() as $key => $values) {
+        foreach (self::jsonPrimitivesProvider() as $key => $values) {
             if ('string' === $key) {
                 continue;
             }
@@ -2268,9 +2265,9 @@ JSON
         }
     }
 
-    public function provideJsonValidNonObjectArray(): Generator
+    public static function jsonValidNonObjectArrayProvider(): iterable
     {
-        foreach ($this->provideJsonPrimitives() as $key => $values) {
+        foreach (self::jsonPrimitivesProvider() as $key => $values) {
             if ('object' === $key) {
                 continue;
             }
@@ -2279,7 +2276,7 @@ JSON
         }
     }
 
-    public function provideJsonPrimitives(): Generator
+    public static function jsonPrimitivesProvider(): iterable
     {
         yield 'null' => null;
         yield 'bool' => true;
@@ -2289,7 +2286,7 @@ JSON
         yield 'array' => ['foo', 'bar'];
     }
 
-    public function provideFilesAutodiscoveryConfig(): Generator
+    public static function filesAutodiscoveryConfigProvider(): iterable
     {
         yield [
             static function (): void {},

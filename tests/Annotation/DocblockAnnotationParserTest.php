@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Annotation;
 
-use Generator;
 use phpDocumentor\Reflection\DocBlockFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -23,25 +22,19 @@ use PHPUnit\Framework\TestCase;
  */
 class DocblockAnnotationParserTest extends TestCase
 {
-    /**
-     * @var DocblockAnnotationParser
-     */
-    private $annotationParser;
+    private DocblockAnnotationParser $annotationParser;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->annotationParser = new DocblockAnnotationParser(
             DocBlockFactory::createInstance(),
             new CompactedFormatter(),
-            ['ignored']
+            ['ignored'],
         );
     }
 
     /**
-     * @dataProvider provideDocblocks
+     * @dataProvider docblocksProvider
      */
     public function test_it_can_parse_php_docblocks(string $docblock, array $expected): void
     {
@@ -50,7 +43,7 @@ class DocblockAnnotationParserTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function provideDocblocks(): Generator
+    public static function docblocksProvider(): iterable
     {
         yield [
             '// @comment',
@@ -59,21 +52,21 @@ class DocblockAnnotationParserTest extends TestCase
 
         yield [
             <<<'DOCBLOCK'
-/**
- * @Annotation
- */
-DOCBLOCK
+                /**
+                 * @Annotation
+                 */
+                DOCBLOCK
             ,
             ['@Annotation'],
         ];
 
         yield [
             <<<'DOCBLOCK'
-/**
- * @ignored
- * @Kept
- */
-DOCBLOCK
+                /**
+                 * @ignored
+                 * @Kept
+                 */
+                DOCBLOCK
             ,
             ['@Kept'],
         ];

@@ -14,13 +14,13 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use Generator;
+use Fidry\Console\Command\Command;
+use Fidry\Console\ExitCode;
 use InvalidArgumentException;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
 use function realpath;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -32,9 +32,6 @@ class VerifyTest extends CommandTestCase
 
     private const FIXTURES_DIR = __DIR__.'/../../../fixtures/verify';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->markAsSkippedIfPharReadonlyIsOn();
@@ -42,16 +39,13 @@ class VerifyTest extends CommandTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getCommand(): Command
     {
         return new Verify();
     }
 
     /**
-     * @dataProvider providePassingPharPaths
+     * @dataProvider passingPharPathsProvider
      */
     public function test_it_verifies_the_signature_of_the_given_file_using_the_phar_extension(string $pharPath): void
     {
@@ -64,16 +58,15 @@ class VerifyTest extends CommandTestCase
 
         $expected = <<<OUTPUT
 
-🔐️  Verifying the PHAR "{$pharPath}"
+            🔐️  Verifying the PHAR "{$pharPath}"
 
-The PHAR passed verification.
+            The PHAR passed verification.
 
-{$signature['hash_type']} signature: {$signature['hash']}
+            {$signature['hash_type']} signature: {$signature['hash']}
 
-OUTPUT;
+            OUTPUT;
 
-        $this->assertSame($expected, $this->commandTester->getDisplay(true));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_can_verify_a_phar_which_does_not_have_the_phar_extension(): void
@@ -87,20 +80,19 @@ OUTPUT;
 
         $expected = <<<OUTPUT
 
-🔐️  Verifying the PHAR "{$pharPath}"
+            🔐️  Verifying the PHAR "{$pharPath}"
 
-The PHAR passed verification.
+            The PHAR passed verification.
 
-SHA-1 signature: 191723EE056C62E3179FDE1B792AA03040FCEF92
+            SHA-1 signature: 191723EE056C62E3179FDE1B792AA03040FCEF92
 
-OUTPUT;
+            OUTPUT;
 
-        $this->assertSame($expected, $this->commandTester->getDisplay(true));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     /**
-     * @dataProvider providePassingPharPaths
+     * @dataProvider passingPharPathsProvider
      */
     public function test_it_verifies_the_signature_of_the_given_file_in_debug_mode(string $pharPath): void
     {
@@ -113,44 +105,37 @@ OUTPUT;
             ],
             [
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            ]
+            ],
         );
 
         $expected = <<<OUTPUT
 
-🔐️  Verifying the PHAR "{$pharPath}"
+            🔐️  Verifying the PHAR "{$pharPath}"
 
-The PHAR passed verification.
+            The PHAR passed verification.
 
-{$signature['hash_type']} signature: {$signature['hash']}
+            {$signature['hash_type']} signature: {$signature['hash']}
 
-OUTPUT;
+            OUTPUT;
 
-        $this->assertSame($expected, $this->commandTester->getDisplay(true));
-        $this->assertSame(0, $this->commandTester->getStatusCode());
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
     public function test_it_cannot_verify_an_unknown_file(): void
     {
-        try {
-            $this->commandTester->execute(
-                [
-                    'command' => 'verify',
-                    'phar' => 'unknown',
-                ]
-            );
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The file "unknown" does not exist.');
 
-            $this->fail('Expected exception to be thrown.');
-        } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
-                'The file "unknown" does not exist.',
-                $exception->getMessage()
-            );
-        }
+        $this->commandTester->execute(
+            [
+                'command' => 'verify',
+                'phar' => 'unknown',
+            ],
+        );
     }
 
     /**
-     * @dataProvider provideFailingPharPaths
+     * @dataProvider failingPharPathsProvider
      */
     public function test_a_corrupted_phar_fails_the_verification(string $pharPath): void
     {
@@ -162,13 +147,13 @@ OUTPUT;
         $this->assertMatchesRegularExpression(
             '/The PHAR failed the verification: .+/',
             $this->commandTester->getDisplay(true),
-            $this->commandTester->getDisplay(true)
+            $this->commandTester->getDisplay(true),
         );
 
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        $this->assertSame(ExitCode::FAILURE, $this->commandTester->getStatusCode());
     }
 
-    public function providePassingPharPaths(): Generator
+    public static function passingPharPathsProvider(): iterable
     {
         yield 'simple PHAR' => [
             realpath(self::FIXTURES_DIR.'/simple-phar.phar'),
@@ -179,7 +164,7 @@ OUTPUT;
         ];
     }
 
-    public function provideFailingPharPaths(): Generator
+    public static function failingPharPathsProvider(): iterable
     {
         yield 'a fake PHAR' => [
             realpath(self::FIXTURES_DIR.'/not-a-phar.phar'),

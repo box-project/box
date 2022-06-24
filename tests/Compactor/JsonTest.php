@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-use Generator;
 use PHPUnit\Framework\TestCase;
 use function serialize;
 use function unserialize;
@@ -24,8 +23,7 @@ use function unserialize;
  */
 class JsonTest extends TestCase
 {
-    /** @var Compactor */
-    private $compactor;
+    private Compactor $compactor;
 
     protected function setUp(): void
     {
@@ -33,23 +31,23 @@ class JsonTest extends TestCase
     }
 
     /**
-     * @dataProvider provideFiles
+     * @dataProvider filesProvider
      */
     public function test_it_supports_json_files(string $file, bool $supports): void
     {
         $contents = <<<'JSON'
-{
-    "foo": "bar"
+            {
+                "foo": "bar"
 
-}
-JSON;
+            }
+            JSON;
         $actual = $this->compactor->compact($file, $contents);
 
         $this->assertSame($supports, $contents !== $actual);
     }
 
     /**
-     * @dataProvider provideJsonContent
+     * @dataProvider jsonContentProvider
      */
     public function test_it_compacts_json_files(string $content, string $expected): void
     {
@@ -61,7 +59,7 @@ JSON;
     }
 
     /**
-     * @dataProvider provideJsonContent
+     * @dataProvider jsonContentProvider
      */
     public function test_it_compacts__composer_lock_files(string $content, string $expected): void
     {
@@ -76,18 +74,18 @@ JSON;
     {
         $this->assertEquals(
             $this->compactor,
-            unserialize(serialize($this->compactor))
+            unserialize(serialize($this->compactor)),
         );
     }
 
-    public function provideFiles(): Generator
+    public static function filesProvider(): iterable
     {
         yield 'no extension' => ['test', false];
 
         yield 'JSON file' => ['test.json', true];
     }
 
-    public function provideJsonContent(): Generator
+    public static function jsonContentProvider(): iterable
     {
         yield [
             '{}',
@@ -96,27 +94,27 @@ JSON;
 
         yield [
             <<<'JSON'
-{
-    "require": {
-        "humbug/php-scoper": "^1.0",
-        "infection/infection": "^1.0"
-    }
-}
-JSON
+                {
+                    "require": {
+                        "humbug/php-scoper": "^1.0",
+                        "infection/infection": "^1.0"
+                    }
+                }
+                JSON
             ,
             <<<'JSON'
-{"require":{"humbug\/php-scoper":"^1.0","infection\/infection":"^1.0"}}
-JSON
+                {"require":{"humbug\/php-scoper":"^1.0","infection\/infection":"^1.0"}}
+                JSON,
         ];
 
         yield 'invalid JSON' => [
             <<<'JSON'
-{
-JSON
+                {
+                JSON
             ,
             <<<'JSON'
-{
-JSON
+                {
+                JSON,
         ];
     }
 }

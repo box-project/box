@@ -14,8 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Fidry\Console\Command\Command;
+use Fidry\Console\Command\Configuration;
+use Fidry\Console\ExitCode;
+use Fidry\Console\Input\IO;
 use function file_exists;
-use KevinGH\Box\Console\IO\IO;
 use function KevinGH\Box\create_temporary_phar;
 use function KevinGH\Box\FileSystem\copy;
 use function KevinGH\Box\FileSystem\remove;
@@ -23,74 +26,108 @@ use Phar;
 use function realpath;
 use function sprintf;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Filesystem\Path;
 use Throwable;
 use Webmozart\Assert\Assert;
 
 /**
  * @private
  */
-final class Verify extends BaseCommand
+final class Verify implements Command
 {
     private const PHAR_ARG = 'phar';
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure(): void
+    public function getConfiguration(): Configuration
     {
-        $this->setName('verify');
-        $this->setDescription('🔐️  Verifies the PHAR signature');
-        $this->setHelp(
+        return new Configuration(
+            'verify',
+            '🔐️  Verifies the PHAR signature',
             <<<'HELP'
-The <info>%command.name%</info> command will verify the signature of the PHAR.
+                The <info>%command.name%</info> command will verify the signature of the PHAR.
 
-<question>Why would I require that box handle the verification process?</question>
+                <question>Why would I require that box handle the verification process?</question>
 
-If you meet all of the following conditions:
- - The <comment>openssl</comment> extension is not installed
- - You need to verify a PHAR signed using a private key
+                If you meet all the following conditions:
+                 - The <comment>openssl</comment> extension is not installed
+                 - You need to verify a PHAR signed using a private key
 
-Box supports verifying private key signed PHARs without using
-either extensions. <error>Note however, that the entire PHAR will need
-to be read into memory before the verification can be performed.</error>
-HELP
-        );
-        $this->addArgument(
-            self::PHAR_ARG,
-            InputArgument::REQUIRED,
-            'The PHAR file'
+                Box supports verifying private key signed PHARs without using
+                either extensions. <error>Note however, that the entire PHAR will need
+                to be read into memory before the verification can be performed.</error>
+                HELP,
+            [
+                new InputArgument(
+                    self::PHAR_ARG,
+                    InputArgument::REQUIRED,
+                    'The PHAR file',
+                ),
+            ],
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function executeCommand(IO $io): int
+    public function execute(IO $io): int
     {
-        /** @var string $pharPath */
-        $pharPath = $io->getInput()->getArgument(self::PHAR_ARG);
-
-        Assert::file($pharPath);
-
-        $pharPath = false !== realpath($pharPath) ? realpath($pharPath) : $pharPath;
+        $pharFilePath = self::getPharFilePath($io);
 
         $io->newLine();
         $io->writeln(
             sprintf(
                 '🔐️  Verifying the PHAR "<comment>%s</comment>"',
-                $pharPath
-            )
+                $pharFilePath,
+            ),
         );
         $io->newLine();
 
-        $tmpPharPath = create_temporary_phar($pharPath);
+        [$verified, $signature, $throwable] = self::verifyPhar($pharFilePath);
 
-        if (file_exists($pharPubKey = $pharPath.'.pubkey')) {
+        if (false === $verified || false === $signature) {
+            return self::failVerification($throwable, $io);
+        }
+
+        $io->writeln('<info>The PHAR passed verification.</info>');
+
+        $io->newLine();
+        $io->writeln(
+            sprintf(
+                '%s signature: <info>%s</info>',
+                $signature['hash_type'],
+                $signature['hash'],
+            ),
+        );
+
+        return ExitCode::SUCCESS;
+    }
+
+    private static function getPharFilePath(IO $io): string
+    {
+        $pharPath = Path::canonicalize(
+            $io->getArgument(self::PHAR_ARG)->asNonEmptyString(),
+        );
+
+        Assert::file($pharPath);
+
+        $pharRealPath = realpath($pharPath);
+
+        return false === $pharRealPath ? $pharPath : $pharRealPath;
+    }
+
+    /**
+     * @return array{bool, array{hash: string, hash_type:string}|false, Throwable|null}
+     */
+    private static function verifyPhar(string $pharFilePath): array
+    {
+        $tmpPharPath = create_temporary_phar($pharFilePath);
+        $pharPubKey = $pharFilePath.'.pubkey';
+        $tmpPharPubKey = $tmpPharPath.'.pubkey';
+
+        if (file_exists($pharPubKey)) {
             copy($pharPubKey, $tmpPharPath.'.pubkey');
         }
 
+        $cleanUp = static fn () => remove([$tmpPharPath, $tmpPharPubKey]);
+
         $verified = false;
-        $signature = null;
+        $signature = false;
         $throwable = null;
 
         try {
@@ -101,45 +138,33 @@ HELP
         } catch (Throwable $throwable) {
             // Continue
         } finally {
-            remove($tmpPharPath);
+            $cleanUp();
         }
 
-        if (false === $verified || null === $signature) {
-            return $this->failVerification($throwable, $io);
-        }
-
-        $io->writeln('<info>The PHAR passed verification.</info>');
-
-        $io->newLine();
-        $io->writeln(
-            sprintf(
-                '%s signature: <info>%s</info>',
-                $signature['hash_type'],
-                $signature['hash']
-            )
-        );
-
-        return 0;
+        return [
+            $verified,
+            $signature,
+            $throwable,
+        ];
     }
 
-    private function failVerification(?Throwable $throwable, IO $io): int
+    private static function failVerification(?Throwable $throwable, IO $io): int
     {
         $message = null !== $throwable && '' !== $throwable->getMessage()
             ? $throwable->getMessage()
-            : 'Unknown reason.'
-        ;
+            : 'Unknown reason.';
 
         $io->writeln(
             sprintf(
                 '<error>The PHAR failed the verification: %s</error>',
-                $message
-            )
+                $message,
+            ),
         );
 
         if (null !== $throwable && $io->isDebug()) {
             throw $throwable;
         }
 
-        return 1;
+        return ExitCode::FAILURE;
     }
 }

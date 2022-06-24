@@ -36,11 +36,11 @@ use function strrpos;
 use function substr;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
+use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
 use Traversable;
 use function unlink;
 use Webmozart\Assert\Assert;
-use Webmozart\PathUtil\Path;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -401,7 +401,7 @@ final class FileSystem extends SymfonyFilesystem
      */
     public function getLongestCommonBasePath(array $paths): ?string
     {
-        return Path::getLongestCommonBasePath($paths);
+        return Path::getLongestCommonBasePath(...$paths);
     }
 
     /**
@@ -413,7 +413,7 @@ final class FileSystem extends SymfonyFilesystem
      *
      * @return string the joint path
      */
-    public function join($paths): string
+    public function join(array|string $paths): string
     {
         return Path::join($paths);
     }
@@ -472,11 +472,11 @@ final class FileSystem extends SymfonyFilesystem
                 sprintf(
                     'Failed to read file "%s": %s.',
                     $file,
-                    error_get_last()['message']
+                    error_get_last()['message'],
                 ),
                 0,
                 null,
-                $file
+                $file,
             );
         }
 
@@ -516,7 +516,7 @@ final class FileSystem extends SymfonyFilesystem
                 $this->mkdir($tmpDir, 0777);
 
                 $result = true;
-            } catch (IOException $exception) {
+            } catch (IOException) {
                 ++$attempts;
             }
         } while (false === $result && $attempts <= 10);
