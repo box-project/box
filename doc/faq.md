@@ -1,5 +1,12 @@
 # FAQ
 
+1. [What is the canonical way to write a CLI entry file?](#what-is-the-canonical-way-to-write-a-cli-entry-file)
+   1. [The shebang](#the-shebang)
+   1. [The PHP_SAPI check](#the-php_sapi-check)
+   1. [Autoloading Composer](#autoloading-composer)
+2. [Detecting that you are inside a PHAR](#detecting-that-you-are-inside-a-phar)
+
+
 ## What is the canonical way to write a CLI entry file?
 
 A conventional CLI entry file looks like this (see bellow for further explanations):
@@ -117,7 +124,7 @@ See [Phar::running()][phar-running] for more information.
 <br />
 <hr />
 
-« [Symfony supports](symfony.md#symfony-support) • [Table of Contents](../README.md#table-of-contents) »
+« [Symfony supports](symfony.md#symfony-support) • [Table of Contents](/) »
 
 
 [httpoxy]: https://httpoxy.org/

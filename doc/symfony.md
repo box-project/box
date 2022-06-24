@@ -1,3 +1,9 @@
+# Symfony support
+
+1. [Project directory](#project-directory)
+1. [Cache](#cache)
+
+
 ## Project directory
 
 Symfony 5.1+ defines the "project dir" as the directory where the composer.json file is. Because box deletes it during PHAR compilation, you need to redefine it in your Kernel. It is usually located in `src/Kernel.php` and can be defined as follow: 
@@ -73,6 +79,12 @@ I.e.:
 - Trigger the auto-scripts, which includes the cache warming phase, on the Composer dump-autoload event
 
 This last part takes advantage of Box [dumping the autoloader][composer-autoloader-dump] by default.
+
+
+<br />
+<hr />
+
+« [Docker support](docker.md#docker-support) • [FAQ](faq.md#faq) »
 
 
 [composer-autoloader-dump]: configuration.md#dumping-the-composer-autoloader-dump-autoload

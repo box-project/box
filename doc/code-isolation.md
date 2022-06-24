@@ -1,3 +1,10 @@
+# PHAR code isolation
+
+1. [Why/Explanation](#whyexplanation)
+1. [Isolating the PHAR](#isolating-the-phar)
+1. [Debugging the scoping](#debugging-the-scoping)
+
+
 ## Why/Explanation
 
 When bundling the code in a PHAR, it is equivalent to compacting all the code in a single file. However unlike in a 
@@ -60,6 +67,12 @@ there is two recommendations:
   directory. This allows you to more easily inspect, alter and test the code shipped in the PHAR. This way, you can
   make sure the code shipped is working before worrying about whether that code is going to work inside a PHAR.
 - Use the `process` command on a specific file to check the result and the effects of the configuration on it
+
+
+<br />
+<hr />
+
+« [Optimize your PHAR](optimizations.md#optimize-your-phar) • [Docker support](docker.md#docker-support) »
 
 
 [phpstan]: https://github.com/phpstan/phpstan
