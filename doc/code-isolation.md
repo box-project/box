@@ -4,6 +4,7 @@
 1. [Isolating the PHAR](#isolating-the-phar)
 1. [Debugging the scoping](#debugging-the-scoping)
 
+
 ## Why/Explanation
 
 When bundling the code in a PHAR, it is equivalent to compacting all the code in a single file. However unlike in a 

@@ -4,6 +4,7 @@
 1. [Compress your PHAR](#compress-your-phar)
 1. [Optimize your code](#optimize-your-code)
 
+
 ## Review your files
 
 By default Box try to be smart about which files are required and will attempt to use only the necessary files. You can

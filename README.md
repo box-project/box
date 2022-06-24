@@ -9,8 +9,6 @@
 [![Slack](https://img.shields.io/badge/slack-%23humbug-red.svg?style=flat-square)](https://symfony.com/slack-invite)
 [![License](https://img.shields.io/badge/license-MIT-red.svg?style=flat-square)](LICENSE)
 
-Fork of the unmaintained [box2 project][box2]. This project needs your help!
-
 Upgrading from [Box2][box2]? Checkout the [upgrade guide](UPGRADE.md#from-27-to-30)!
 
 ## Goal
@@ -28,6 +26,8 @@ great things:
 - 📝 Use Git tags and short commit hashes for versioning
 - 🕵️️ Get recommendations and warnings about regarding your configuration (`box validate`)
 - 🐳 [Docker support (`box docker`)](doc/docker.md#docker-support)
+
+For the full documentation see https://box-project.github.io/box.
 
 
 ## Table of Contents
@@ -147,7 +147,6 @@ Project originally created by: [Kevin Herrera] ([@kherge]) which has now been mo
 
 
 [box2]: https://github.com/box-project/box2
-[configuration]: doc/configuration.md#configuration
 [Kevin Herrera]: https://github.com/kherge
 [@kherge]: https://github.com/kherge
 [humbug]: https://github.com/humbug

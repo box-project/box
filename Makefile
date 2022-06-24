@@ -304,6 +304,17 @@ blackfire: box
 	blackfire --reference=2 --samples=5 run $(PHPNOGC) -d box compile --quiet
 
 
+.PHONY: serve
+serve:
+	@echo "To install mkdocs ensure you have Python3 & pip3 and run `pip install mkdocs mkdocs-material`"
+	mkdocs serve
+
+
+.PHONY: build-website
+website: doc
+	mkdocs build
+
+
 #
 # Rules from files
 #---------------------------------------------------------------------------
