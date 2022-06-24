@@ -223,6 +223,10 @@ compactors.
 **Warning:** Setting the key `directories` (regardless of its value), will disable the file auto-discovery. If you want
 to keep it, check the [force the auto-discovery][force-autodiscovery] setting.
 
+**Warning:** By default Box excludes some files (e.g. dot files, readmes & co). This is done in order to attempt to
+reduce the final PHAR size. There is at the moment no way to disable this (maybe this could be done via a new setting)
+but it remains possible to include them via [`files`][files], [`files-bin`][files] or `directories-bin`.
+
 
 ### Finder (`finder` and `finder-bin`)
 
