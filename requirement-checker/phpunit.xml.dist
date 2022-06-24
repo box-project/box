@@ -7,6 +7,9 @@
     <php>
         <!-- The width is matching the Travis one to avoid any issues with the CI -->
         <env name="COLUMNS" value="80" />
+
+        <!-- required for output buffering -->
+        <env name="BOX_REQUIREMENTS_CHECKER_LOG_TO_STDOUT" value="1" />
     </php>
 
     <testsuites>
