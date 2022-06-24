@@ -13,5 +13,10 @@ You can then find more advanced configuration settings in [the configuration doc
 For more information on which command or options is available, you can run:
 
 ```
-box help
+$ box help
 ```
+
+<br />
+<hr />
+
+« [Installation](installation.md#installation) • [Configuration](configuration.md#configuration) »

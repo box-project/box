@@ -58,3 +58,4 @@ markdown_extensions:
 
 extra_css:
     - assets/announce.css
+    - assets/docs.css
