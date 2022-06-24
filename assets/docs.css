@@ -1,0 +1,7 @@
+.box-image {
+    width: 900px;
+}
+
+hr + p {
+    text-align: center;
+}
