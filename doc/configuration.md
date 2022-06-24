@@ -220,6 +220,9 @@ Files listed in the [`blacklist`][blacklist] will not be added to the PHAR.
 the files such as images, those that contain binary data or simply a file you do not want to alter at all despite using
 compactors.
 
+**Warning:** Setting the key `directories` (regardless of its value), will disable the file auto-discovery. If you want
+to keep it, check the [force the auto-discovery][force-autodiscovery] setting.
+
 
 ### Finder (`finder` and `finder-bin`)
 
@@ -233,6 +236,9 @@ account for the files registered in the [`blacklist`][blacklist].
 `finder-bin` is analogue to `finder` except the files are added to the PHAR unmodified. This is suitable for the files
 such as images, those that contain binary data or simply a file you do not want to alter at all despite using
 [compactors][compactors].
+
+**Warning:** Setting the key `finder` (regardless of its value), will disable the file auto-discovery. If you want
+to keep it, check the [force the auto-discovery][force-autodiscovery] setting.
 
 Example:
 
@@ -305,7 +311,7 @@ project/
     └── B01
 ```
 
-You you want a more granular blacklist leverage the [Finders configuration][finder] instead.
+If you want a more granular blacklist leverage the [Finders configuration][finder] instead.
 
 
 ### Excluding the Composer files (`exclude-composer-files`)
