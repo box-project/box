@@ -76,7 +76,7 @@ This last part takes advantage of Box [dumping the autoloader][composer-autoload
 <br />
 <hr />
 
-« [Docker support](docker.md#docker-support) • [Table of Contents](../README.md#table-of-contents) »
+« [Docker support](docker.md#docker-support) • [FQA](faq.md#faq) »
 
 
 [composer-autoloader-dump]: configuration.md#dumping-the-composer-autoloader-dump-autoload
