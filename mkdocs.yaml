@@ -48,7 +48,6 @@ nav:
             -   'Docker support': docker.md
             -   'Symfony support': symfony.md
             -   'FAQ': faq.md
-    -   About: about.md
 
 markdown_extensions:
     - admonition
