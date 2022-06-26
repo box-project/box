@@ -110,10 +110,8 @@ jobs:
 
             -   name: Configure Infection for the CI
                 run: |
-                    CHANGED_FILES=$(git diff origin/master --diff-filter=AM --name-only | grep src/ | paste -sd "," -);
-                    INFECTION_CI_FILTER="--filter=${CHANGED_FILES} --ignore-msi-with-no-mutations";
-                    
-                    echo "INFECTION_FLAGS" >> "$GITHUB_ENV"
+                    git fetch origin $GITHUB_BASE_REF
+                    echo "INFECTION_FLAGS=--git-diff-lines --git-diff-base=origin/$GITHUB_BASE_REF --ignore-msi-with-no-mutations" >> "$GITHUB_ENV"
 
             -   name: Run Infection
                 run: make tm
