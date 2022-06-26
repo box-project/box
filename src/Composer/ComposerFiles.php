@@ -52,7 +52,7 @@ final class ComposerFiles
     }
 
     /**
-     * @return string[]
+     * @return list<string>
      */
     public function getPaths(): array
     {

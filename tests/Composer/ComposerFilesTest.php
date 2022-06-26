@@ -69,14 +69,17 @@ class ComposerFilesTest extends TestCase
         yield (static function (): array {
             $json = new ComposerFile('path/to/composer.json', ['name' => 'composer.json']);
             $lock = ComposerFile::createEmpty();
-            $installed = ComposerFile::createEmpty();
+            $installed = new ComposerFile('path/to/installed.json', ['name' => 'installed.json']);
 
             return [
                 static fn (): ComposerFiles => new ComposerFiles($json, $lock, $installed),
                 $json,
                 $lock,
                 $installed,
-                ['path/to/composer.json'],
+                [
+                    'path/to/composer.json',
+                    'path/to/installed.json',
+                ],
             ];
         })();
 

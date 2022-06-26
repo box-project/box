@@ -49,7 +49,7 @@ final class Compactors implements Compactor, Countable
 
     public function compact(string $file, string $contents): string
     {
-        return (string) array_reduce(
+        return array_reduce(
             $this->compactors,
             static fn (string $contents, Compactor $compactor): string => $compactor->compact($file, $contents),
             $contents,
