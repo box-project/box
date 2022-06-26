@@ -111,7 +111,7 @@ jobs:
             -   name: Configure Infection for the CI
                 run: |
                     git fetch origin $GITHUB_BASE_REF
-                    echo "INFECTION_FLAGS=--git-diff-lines --git-diff-base=origin/$GITHUB_BASE_REF --ignore-msi-with-no-mutations" >> "$GITHUB_ENV"
+                    echo "INFECTION_FLAGS=--git-diff-lines --git-diff-base=origin/$GITHUB_BASE_REF --ignore-msi-with-no-mutations --logger-github" >> "$GITHUB_ENV"
 
             -   name: Run Infection
                 run: make tm
