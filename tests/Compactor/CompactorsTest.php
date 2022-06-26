@@ -123,6 +123,15 @@ class CompactorsTest extends TestCase
         $this->assertSame($newSymbolsRegistry, $actual);
     }
 
+    public function test_it_can_change_the_symbols_registry_even_when_the_scoper_is_not_registered(): void
+    {
+        $compactorsAggregate = new Compactors();
+
+        $compactorsAggregate->registerSymbolsRegistry(new SymbolsRegistry());
+
+        $this->assertNull($compactorsAggregate->getScoperSymbolsRegistry());
+    }
+
     public function test_it_is_countable(): void
     {
         $this->assertCount(0, new Compactors());
@@ -184,6 +193,14 @@ class CompactorsTest extends TestCase
                 self::createScoperCompactorWithChangeSymbolsRegistry($symbolsRegistry1),
             ],
             $symbolsRegistry1,
+        ];
+
+        yield [
+            [
+                new FakeCompactor(),
+                self::createScoperCompactorWithChangeSymbolsRegistry($symbolsRegistry1),
+            ],
+            $symbolsRegistry2,
         ];
 
         yield [

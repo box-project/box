@@ -108,5 +108,12 @@ jobs:
                 with:
                     working-directory: 'requirement-checker'
 
+            -   name: Configure Infection for the CI
+                run: |
+                    CHANGED_FILES=$(git diff origin/master --diff-filter=AM --name-only | grep src/ | paste -sd "," -);
+                    INFECTION_CI_FILTER="--filter=${CHANGED_FILES} --ignore-msi-with-no-mutations";
+                    
+                    echo "INFECTION_FLAGS" >> "$GITHUB_ENV"
+
             -   name: Run Infection
                 run: make tm

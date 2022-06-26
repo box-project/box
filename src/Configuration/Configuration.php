@@ -548,7 +548,7 @@ final class Configuration
             SymfonySplFileInfo::class => $splInfoCaster,
         ]);
 
-        return (string) (new CliDumper())->dump(
+        return (new CliDumper())->dump(
             $cloner->cloneVar($exportedConfig),
             true,
         );

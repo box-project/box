@@ -1,8 +1,12 @@
 {
+    "$schema": "vendor-bin/infection/vendor/infection/infection/resources/schema.json",
     "timeout": 10,
     "source": {
         "directories": [
             "src"
+        ],
+        "excludes": [
+            "src/Compactor/Php.php"
         ]
     },
     "logs": {
@@ -10,7 +14,11 @@
     },
     "mutators": {
         "@default": true,
-        "IdenticalEqual": true,
-        "NotIdenticalNotEqual": true
+        "global-ignoreSourceCodeByRegex": [
+            "Assert::.*"
+        ],
+        "IdenticalEqual": false,
+        "NotIdenticalNotEqual": false,
+        "PublicVisibility": false
     }
 }
