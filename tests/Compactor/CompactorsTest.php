@@ -199,14 +199,6 @@ class CompactorsTest extends TestCase
             [
                 new FakeCompactor(),
                 self::createScoperCompactorWithChangeSymbolsRegistry($symbolsRegistry1),
-            ],
-            $symbolsRegistry2,
-        ];
-
-        yield [
-            [
-                new FakeCompactor(),
-                self::createScoperCompactorWithChangeSymbolsRegistry($symbolsRegistry1),
                 self::createScoperCompactorWithChangeSymbolsRegistry($symbolsRegistry2),
             ],
             $symbolsRegistry1,

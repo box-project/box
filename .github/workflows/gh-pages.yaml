@@ -6,7 +6,6 @@ on:
             - master
         paths:
             - doc/**
-    pull_request:
 
 jobs:
     deploy:
