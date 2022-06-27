@@ -28,6 +28,7 @@ theme:
     icon:
         repo: fontawesome/brands/github
     palette:
+        scheme: default
         primary: brown
         accent: amber
     features:

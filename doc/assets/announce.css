@@ -2,20 +2,20 @@
     text-align: center;
 }
 
-.md-announce a,
-.md-announce a:focus {
+.md-banner a,
+.md-banner a:focus {
     color: white;
 }
 
-.md-announce a:hover {
+.md-banner a:hover {
     color: hotpink;
 }
 
-.md-announce strong {
+.md-banner strong {
     white-space: nowrap;
 }
 
-.md-announce .heart {
+.md-banner .heart {
     margin-left: 0.2em;
     color: deeppink;
 }
