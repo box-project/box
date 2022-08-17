@@ -25,6 +25,10 @@ jobs:
           target: 'releases/box.phar'
           token: ${{ secrets.GITHUB_TOKEN }}
       -
+        name: Make release executable
+        run:
+          chmod +x releases/box.phar
+      -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       -
