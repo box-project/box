@@ -38,7 +38,7 @@ For the full documentation see https://box-project.github.io/box.
     1. [Composer](doc/installation.md#composer)
     1. [Homebrew](doc/installation.md#homebrew)
 1. [Usage](#usage)
-1. [Configuration][configuration]
+1. [Configuration](configuration)
     1. [Base path (`base-path`)](doc/configuration.md#base-path-base-path)
     1. [Main (`main`)](doc/configuration.md#main-main)
     1. [Output (`output`)](doc/configuration.md#output-output)
