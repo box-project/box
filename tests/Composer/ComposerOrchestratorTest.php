@@ -531,7 +531,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
 
                 require_once __DIR__ . '/composer/autoload_real.php';
 
-                \$loader = ${composerAutoloaderName}::getLoader();
+                \$loader = {$composerAutoloaderName}::getLoader();
 
                 // Exposed functions. For more information see:
                 // https://github.com/humbug/php-scoper/blob/master/docs/configuration.md#exposing-functions
@@ -571,7 +571,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
 
                 require_once __DIR__ . '/composer/autoload_real.php';
 
-                \$loader = ${composerAutoloaderName}::getLoader();
+                \$loader = {$composerAutoloaderName}::getLoader();
 
                 }
 
@@ -627,7 +627,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
 
                 require_once __DIR__ . '/composer/autoload_real.php';
 
-                \$loader = ${composerAutoloaderName}::getLoader();
+                \$loader = {$composerAutoloaderName}::getLoader();
 
                 }
 

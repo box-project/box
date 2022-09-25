@@ -21,6 +21,7 @@ use stdClass;
 
 /**
  * @covers \KevinGH\Box\Configuration\Configuration
+ *
  * @group config
  */
 class ConfigurationPhpCompactorTest extends ConfigurationTestCase

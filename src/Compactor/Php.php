@@ -43,6 +43,7 @@ use Webmozart\Assert\Assert;
  * @author Théo Fidry <theo.fidry@gmail.com>
  * @author Juliette Reinders Folmer <boxproject_nospam@adviesenzo.nl>
  * @author Alessandro Chitolina <alekitto@gmail.com>
+ *
  * @private
  */
 final class Php extends FileExtensionCompactor
@@ -218,7 +219,7 @@ final class Php extends FileExtensionCompactor
         // Multi-line attribute or attribute containing something which looks like a PHP close tag.
         // Retokenize the rest of the file after the attribute opener.
         if (null === $closer) {
-            foreach (array_slice($tokens, ($opener + 1)) as $token) {
+            foreach (array_slice($tokens, $opener + 1) as $token) {
                 $attributeBody .= $token->text;
             }
 
@@ -230,12 +231,12 @@ final class Php extends FileExtensionCompactor
             if (null !== $closer) {
                 array_splice(
                     $tokens,
-                    ($opener + 1),
+                    $opener + 1,
                     count($tokens),
-                    array_slice($subTokens, ($closer + 1)),
+                    array_slice($subTokens, $closer + 1),
                 );
 
-                $subTokens = array_slice($subTokens, 0, ($closer + 1));
+                $subTokens = array_slice($subTokens, 0, $closer + 1);
             }
         }
 

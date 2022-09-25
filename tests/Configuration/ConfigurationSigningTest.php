@@ -24,6 +24,7 @@ use Phar;
 /**
  * @covers \KevinGH\Box\Configuration\Configuration
  * @covers \KevinGH\Box\MapFile
+ *
  * @group config
  */
 class ConfigurationSigningTest extends ConfigurationTestCase

@@ -167,10 +167,10 @@ function memory_to_bytes(string $value): float|int
     switch ($unit) {
         case 'g':
             $bytes *= 1024;
-        // no break (cumulative multiplier)
+            // no break (cumulative multiplier)
         case 'm':
             $bytes *= 1024;
-        // no break (cumulative multiplier)
+            // no break (cumulative multiplier)
         case 'k':
             $bytes *= 1024;
     }
