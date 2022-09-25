@@ -160,7 +160,7 @@ final class Extract implements Command
 
             foreach (new RecursiveIteratorIterator($box->getPhar()) as $filePath) {
                 dump_file(
-                    $outputDir.'/'.substr($filePath->getPathname(), $rootLength),
+                    $outputDir.'/'.substr((string) $filePath->getPathname(), $rootLength),
                     (string) $filePath->getContent(),
                 );
             }

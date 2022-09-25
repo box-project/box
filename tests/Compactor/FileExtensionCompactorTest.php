@@ -32,7 +32,7 @@ class FileExtensionCompactorTest extends TestCase
         $compactor = new class([]) extends FileExtensionCompactor {
             protected function compactContent(string $contents): string
             {
-                throw UnsupportedMethodCall::forMethod(__CLASS__, __METHOD__);
+                throw UnsupportedMethodCall::forMethod(self::class, __METHOD__);
             }
         };
 

@@ -29,8 +29,8 @@ final class MapFile
      */
     public function __construct(
         // Cannot have readonly properties: requires to be serializable
-        private string $basePath,
-        private array $map,
+        private readonly string $basePath,
+        private readonly array $map,
     ) {
     }
 

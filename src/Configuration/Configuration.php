@@ -223,8 +223,8 @@ final class Configuration
     private const SHEBANG_KEY = 'shebang';
     private const STUB_KEY = 'stub';
     private int|string|null $compressionAlgorithm;
-    private ?string $mainScriptPath;
-    private ?string $mainScriptContents;
+    private readonly ?string $mainScriptPath;
+    private readonly ?string $mainScriptContents;
 
     public static function create(?string $file, stdClass $raw): self
     {
@@ -427,40 +427,40 @@ final class Configuration
      * @param string[]      $recommendations
      */
     private function __construct(
-        private ?string $file,
-        private string $alias,
-        private string $basePath,
+        private readonly ?string $file,
+        private readonly string $alias,
+        private readonly string $basePath,
         private ComposerFile $composerJson,
         private ComposerFile $composerLock,
-        private array $files,
-        private array $binaryFiles,
-        private bool $autodiscoveredFiles,
-        private bool $dumpAutoload,
-        private bool $excludeComposerFiles,
-        private bool $excludeDevFiles,
+        private readonly array $files,
+        private readonly array $binaryFiles,
+        private readonly bool $autodiscoveredFiles,
+        private readonly bool $dumpAutoload,
+        private readonly bool $excludeComposerFiles,
+        private readonly bool $excludeDevFiles,
         private Compactors|array $compactors,
         ?int $compressionAlgorithm,
         private int|string|null $fileMode,
         ?string $mainScriptPath,
         ?string $mainScriptContents,
-        private MapFile $fileMapper,
-        private mixed $metadata,
-        private string $tmpOutputPath,
-        private string $outputPath,
-        private ?string $privateKeyPassphrase,
-        private ?string $privateKeyPath,
-        private bool $promptForPrivateKey,
-        private array $processedReplacements,
-        private ?string $shebang,
+        private readonly MapFile $fileMapper,
+        private readonly mixed $metadata,
+        private readonly string $tmpOutputPath,
+        private readonly string $outputPath,
+        private readonly ?string $privateKeyPassphrase,
+        private readonly ?string $privateKeyPath,
+        private readonly bool $promptForPrivateKey,
+        private readonly array $processedReplacements,
+        private readonly ?string $shebang,
         private int|string $signingAlgorithm,
-        private ?string $stubBannerContents,
-        private ?string $stubBannerPath,
-        private ?string $stubPath,
-        private bool $isInterceptFileFuncs,
-        private bool $isStubGenerated,
-        private bool $checkRequirements,
-        private array $warnings,
-        private array $recommendations,
+        private readonly ?string $stubBannerContents,
+        private readonly ?string $stubBannerPath,
+        private readonly ?string $stubPath,
+        private readonly bool $isInterceptFileFuncs,
+        private readonly bool $isStubGenerated,
+        private readonly bool $checkRequirements,
+        private readonly array $warnings,
+        private readonly array $recommendations,
     ) {
         Assert::nullOrInArray(
             $compressionAlgorithm,
@@ -780,7 +780,7 @@ final class Configuration
             return unique_id(self::DEFAULT_ALIAS_PREFIX).'.phar';
         }
 
-        $alias = trim($raw->{self::ALIAS_KEY});
+        $alias = trim((string) $raw->{self::ALIAS_KEY});
 
         Assert::notEmpty($alias, 'A PHAR alias cannot be empty when provided.');
 
@@ -806,7 +806,7 @@ final class Configuration
             return realpath(dirname($file));
         }
 
-        $basePath = trim($raw->{self::BASE_PATH_KEY});
+        $basePath = trim((string) $raw->{self::BASE_PATH_KEY});
 
         Assert::directory(
             $basePath,
@@ -1950,7 +1950,7 @@ final class Configuration
             $processed = [];
 
             foreach ($item as $match => $replace) {
-                $processed[canonicalize(trim($match))] = canonicalize(trim($replace));
+                $processed[canonicalize(trim((string) $match))] = canonicalize(trim((string) $replace));
             }
 
             if (isset($processed['_empty_'])) {
@@ -2331,7 +2331,7 @@ final class Configuration
 
         Assert::string($shebang, 'Expected shebang to be either a string, false or null, found true');
 
-        $shebang = trim($shebang);
+        $shebang = trim((string) $shebang);
 
         Assert::notEmpty($shebang, 'The shebang should not be empty.');
         Assert::true(
@@ -2365,7 +2365,7 @@ final class Configuration
             return self::DEFAULT_SIGNING_ALGORITHM;
         }
 
-        $algorithm = strtoupper($raw->{self::ALGORITHM_KEY});
+        $algorithm = strtoupper((string) $raw->{self::ALGORITHM_KEY});
 
         Assert::inArray($algorithm, array_keys(get_phar_signing_algorithms()));
 

@@ -308,7 +308,7 @@ final class Info implements Command
         OutputInterface $output,
         iterable $list,
         int $depth,
-        int $maxDepth,
+        int|\natural $maxDepth,
         int|false $indent,
         string $base,
         Phar|PharData $phar,

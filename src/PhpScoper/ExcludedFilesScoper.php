@@ -21,12 +21,10 @@ use function Safe\array_flip;
 
 final class ExcludedFilesScoper implements PhpScoperScoper
 {
-    private PhpScoperScoper $decoratedScoper;
-    private array $excludedFilePathsAsKeys;
+    private readonly array $excludedFilePathsAsKeys;
 
-    public function __construct(PhpScoperScoper $decoratedScoper, string ...$excludedFilePaths)
+    public function __construct(private readonly PhpScoperScoper $decoratedScoper, string ...$excludedFilePaths)
     {
-        $this->decoratedScoper = $decoratedScoper;
         $this->excludedFilePathsAsKeys = array_flip($excludedFilePaths);
     }
 

@@ -115,7 +115,7 @@ final class Box implements Countable
     {
         Assert::true($this->buffering, 'The buffering must be started before ending it');
 
-        $dumpAutoload = $dumpAutoload ?? static fn () => null;
+        $dumpAutoload ??= static fn () => null;
         $cwd = getcwd();
 
         $tmp = make_tmp_dir('box', self::class);
@@ -401,9 +401,9 @@ final class Box implements Countable
 
             // Keep the fully qualified call here since this function may be executed without the right autoloading
             // mechanism
-            \KevinGH\Box\register_aliases();
-            if (true === \KevinGH\Box\is_parallel_processing_enabled()) {
-                \KevinGH\Box\register_error_handler();
+            register_aliases();
+            if (true === is_parallel_processing_enabled()) {
+                register_error_handler();
             }
 
             $contents = file_contents($file);

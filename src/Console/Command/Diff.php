@@ -249,7 +249,7 @@ final class Diff implements Command
     {
         foreach ($paths as $path) {
             /** @var PharFileInfo $file */
-            $file = $pharInfo->getPhar()[str_replace($pharInfo->getRoot(), '', $path)];
+            $file = $pharInfo->getPhar()[str_replace($pharInfo->getRoot(), '', (string) $path)];
 
             $compression = '<fg=red>[NONE]</fg=red>';
 

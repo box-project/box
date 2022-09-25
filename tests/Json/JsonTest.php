@@ -68,10 +68,8 @@ class JsonTest extends FileSystemTestCase
 
     /**
      * @dataProvider jsonToDecodeProvider
-     *
-     * @param mixed $expected
      */
-    public function test_it_can_decode_a_json_string(string $json, bool $assoc, $expected, ?Throwable $expectedThrowable): void
+    public function test_it_can_decode_a_json_string(string $json, bool $assoc, mixed $expected, ?Throwable $expectedThrowable): void
     {
         if (null === $expected) {
             Assert::notNull($expectedThrowable);

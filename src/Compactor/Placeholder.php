@@ -23,7 +23,7 @@ final class Placeholder implements Compactor
     /**
      * @var scalar[]
      */
-    private array $placeholders;
+    private readonly array $placeholders;
 
     /**
      * @param scalar[] $placeholders

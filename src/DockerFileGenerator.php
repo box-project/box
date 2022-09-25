@@ -50,12 +50,12 @@ final class DockerFileGenerator
         '7.0.0' => '7-cli-alpine',
     ];
 
-    private string $image;
+    private readonly string $image;
 
     /**
      * @var string[]
      */
-    private array $extensions;
+    private readonly array $extensions;
 
     /**
      * Creates a new instance of the generator.

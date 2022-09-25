@@ -1117,10 +1117,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     /**
      * @dataProvider jsonValidNonStringArrayProvider
-     *
-     * @param mixed $value
      */
-    public function test_blacklist_value_must_be_an_array_of_strings($value): void
+    public function test_blacklist_value_must_be_an_array_of_strings(mixed $value): void
     {
         try {
             $this->setConfig([
@@ -1177,10 +1175,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     /**
      * @dataProvider jsonValidNonStringArrayProvider
-     *
-     * @param mixed $value
      */
-    public function test_files_value_must_be_an_array_of_strings($value): void
+    public function test_files_value_must_be_an_array_of_strings(mixed $value): void
     {
         try {
             $this->setConfig([
@@ -1211,10 +1207,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     /**
      * @dataProvider jsonValidNonStringArrayProvider
-     *
-     * @param mixed $value
      */
-    public function test_bin_files_value_must_be_an_array_of_strings($value): void
+    public function test_bin_files_value_must_be_an_array_of_strings(mixed $value): void
     {
         try {
             $this->setConfig([
@@ -1258,10 +1252,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     /**
      * @dataProvider jsonValidNonStringArrayProvider
-     *
-     * @param mixed $value
      */
-    public function test_directories_value_must_be_an_array_of_strings($value): void
+    public function test_directories_value_must_be_an_array_of_strings(mixed $value): void
     {
         try {
             $this->setConfig([
@@ -1292,10 +1284,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     /**
      * @dataProvider jsonValidNonStringArrayProvider
-     *
-     * @param mixed $value
      */
-    public function test_bin_directories_value_must_be_an_array_of_strings($value): void
+    public function test_bin_directories_value_must_be_an_array_of_strings(mixed $value): void
     {
         try {
             $this->setConfig([
@@ -1742,7 +1732,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
     {
         $config = Configuration::create(
             $configPath = self::FIXTURES_DIR.'/dir000/box.json',
-            json_decode(file_get_contents($configPath), false),
+            json_decode(file_get_contents($configPath), false, 512, JSON_THROW_ON_ERROR),
         );
 
         $this->assertSame([], $config->getRecommendations());
@@ -1753,7 +1743,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
     {
         $config = Configuration::create(
             $configPath = self::FIXTURES_DIR.'/dir001/box.json',
-            json_decode(file_get_contents($configPath), false),
+            json_decode(file_get_contents($configPath), false, 512, JSON_THROW_ON_ERROR),
         );
 
         $this->assertTrue($config->dumpAutoload());
@@ -1764,7 +1754,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_no_warning_is_given_when_the_installed_json_is_found_and_the_composer_lock_is_not_when_the_composer_autoloader_is_not_dumped(): void
     {
-        $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir002/box.json', json_decode(file_get_contents($configPath)));
+        $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir002/box.json', json_decode(file_get_contents($configPath), null, 512, JSON_THROW_ON_ERROR));
 
         $this->assertFalse($config->dumpAutoload());
 
@@ -1774,7 +1764,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_a_warning_is_given_when_no_installed_json_is_found_and_the_composer_lock_is_when_the_composer_autoloader_is_dumped(): void
     {
-        $decodedConfig = json_decode(file_get_contents($configPath = self::FIXTURES_DIR.'/dir002/box.json'));
+        $decodedConfig = json_decode(file_get_contents($configPath = self::FIXTURES_DIR.'/dir002/box.json'), null, 512, JSON_THROW_ON_ERROR);
         $decodedConfig->{'dump-autoload'} = true;
 
         $config = Configuration::create($configPath, $decodedConfig);
@@ -1795,7 +1785,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
     {
         $configPath = self::FIXTURES_DIR.'/dir003/box.json';
 
-        $decodedConfig = json_decode(file_get_contents($configPath));
+        $decodedConfig = json_decode(file_get_contents($configPath), null, 512, JSON_THROW_ON_ERROR);
         unset($decodedConfig->{'dump-autoload'});
 
         $config = Configuration::create($configPath, $decodedConfig);
@@ -1808,7 +1798,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_a_warning_is_given_when_the_installed_json_is_found_and_the_composer_lock_is_not(): void
     {
-        $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir003/box.json', json_decode(file_get_contents($configPath)));
+        $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir003/box.json', json_decode(file_get_contents($configPath), null, 512, JSON_THROW_ON_ERROR));
 
         $this->assertFalse($config->dumpAutoload());
 
@@ -1824,7 +1814,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_no_warning_is_given_when_the_installed_json_is_found_and_the_composer_lock_is_not_and_the_dump_autoload_disabled(): void
     {
-        $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir004/box.json', json_decode(file_get_contents($configPath)));
+        $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir004/box.json', json_decode(file_get_contents($configPath), null, 512, JSON_THROW_ON_ERROR));
 
         $this->assertFalse($config->dumpAutoload());
 

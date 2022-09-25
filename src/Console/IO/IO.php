@@ -24,8 +24,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class IO extends SymfonyStyle
 {
-    private InputInterface $input;
-    private OutputInterface $output;
+    private readonly InputInterface $input;
+    private readonly OutputInterface $output;
 
     public static function createDefault(): self
     {

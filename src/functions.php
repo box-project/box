@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use Isolated\Symfony\Component\Finder\Finder;
 use function array_key_exists;
 use function bin2hex;
 use function class_alias;
@@ -186,7 +187,7 @@ function format_time(float $secs): string
     return str_replace(
         ' ',
         '',
-        Helper::formatTime($secs),
+        (string) Helper::formatTime($secs),
     );
 }
 
@@ -196,8 +197,8 @@ function format_time(float $secs): string
 function register_aliases(): void
 {
     // Exposes the finder used by PHP-Scoper PHAR to allow its usage in the configuration file.
-    if (false === class_exists(\Isolated\Symfony\Component\Finder\Finder::class)) {
-        class_alias(\Symfony\Component\Finder\Finder::class, \Isolated\Symfony\Component\Finder\Finder::class);
+    if (false === class_exists(Finder::class)) {
+        class_alias(\Symfony\Component\Finder\Finder::class, Finder::class);
     }
 }
 

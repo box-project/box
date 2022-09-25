@@ -20,7 +20,7 @@ use ParagonIE\Pharaoh\Pharaoh as ParagoniePharaoh;
 
 final class Pharaoh extends ParagoniePharaoh
 {
-    private string $fileName;
+    private readonly string $fileName;
     private ?PharInfo $pharInfo = null;
     private ?string $path = null;
 
