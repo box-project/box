@@ -127,7 +127,7 @@ e2e_check_requirements: box .requirement-checker
 		> fixtures/check-requirements/pass-no-config/expected-output-725
 
 	rm fixtures/check-requirements/pass-no-config/actual-output || true
-	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-no-config":/opt/box $(PHP_COMPOSER_MIN_PHAR) | tee fixtures/check-requirements/pass-no-config/actual-output
+	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-no-config":/opt/box $(PHP_COMPOSER_MIN_PHAR) 2>&1 | tee fixtures/check-requirements/pass-no-config/actual-output
 	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/check-requirements/pass-no-config/expected-output-725 fixtures/check-requirements/pass-no-config/actual-output
 
 	# Current min version
@@ -136,7 +136,7 @@ e2e_check_requirements: box .requirement-checker
 		> fixtures/check-requirements/pass-no-config/expected-output-current-min-php
 
 	rm fixtures/check-requirements/pass-no-config/actual-output || true
-	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-no-config":/opt/box $(MIN_SUPPORTED_PHP_PHAR) | tee fixtures/check-requirements/pass-no-config/actual-output
+	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-no-config":/opt/box $(MIN_SUPPORTED_PHP_PHAR) 2>&1 | tee fixtures/check-requirements/pass-no-config/actual-output
 	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/check-requirements/pass-no-config/expected-output-current-min-php fixtures/check-requirements/pass-no-config/actual-output
 
 	#
@@ -151,7 +151,7 @@ e2e_check_requirements: box .requirement-checker
 		> fixtures/check-requirements/pass-complete/expected-output-725
 
 	rm fixtures/check-requirements/pass-complete/actual-output || true
-	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-complete":/opt/box $(PHP_COMPOSER_MIN_PHAR) | tee fixtures/check-requirements/pass-complete/actual-output
+	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-complete":/opt/box $(PHP_COMPOSER_MIN_PHAR) 2>&1 | tee fixtures/check-requirements/pass-complete/actual-output
 	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/check-requirements/pass-complete/expected-output-725 fixtures/check-requirements/pass-complete/actual-output
 
 	# Current min version
@@ -160,7 +160,7 @@ e2e_check_requirements: box .requirement-checker
 		> fixtures/check-requirements/pass-complete/expected-output-current-min-php
 
 	rm fixtures/check-requirements/pass-complete/actual-output || true
-	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-complete":/opt/box $(MIN_SUPPORTED_PHP_PHAR) | tee fixtures/check-requirements/pass-complete/actual-output
+	$(DOCKER) -v "$$PWD/fixtures/check-requirements/pass-complete":/opt/box $(MIN_SUPPORTED_PHP_PHAR) 2>&1 | tee fixtures/check-requirements/pass-complete/actual-output
 	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/check-requirements/pass-complete/expected-output-current-min-php fixtures/check-requirements/pass-complete/actual-output
 
 	#
@@ -175,7 +175,7 @@ e2e_check_requirements: box .requirement-checker
     		> fixtures/check-requirements/fail-complete/expected-output-725
 
 	rm fixtures/check-requirements/fail-complete/actual-output || true
-	$(DOCKER) -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP_COMPOSER_MIN_PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
+	$(DOCKER) -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP_COMPOSER_MIN_PHAR) 2>&1 | tee fixtures/check-requirements/fail-complete/actual-output || true
 	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/check-requirements/fail-complete/expected-output-725 fixtures/check-requirements/fail-complete/actual-output
 
 	# Current min version
@@ -184,7 +184,7 @@ e2e_check_requirements: box .requirement-checker
 		> fixtures/check-requirements/fail-complete/expected-output-current-min-php
 
 	rm fixtures/check-requirements/fail-complete/actual-output || true
-	$(DOCKER) -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(MIN_SUPPORTED_PHP_PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
+	$(DOCKER) -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(MIN_SUPPORTED_PHP_PHAR) 2>&1 | tee fixtures/check-requirements/fail-complete/actual-output || true
 	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/check-requirements/fail-complete/expected-output-current-min-php fixtures/check-requirements/fail-complete/actual-output
 
 	#
@@ -198,7 +198,7 @@ e2e_check_requirements: box .requirement-checker
 			> fixtures/check-requirements/fail-complete/expected-output-725
 
 	rm fixtures/check-requirements/fail-complete/actual-output || true
-	$(DOCKER) -e BOX_REQUIREMENT_CHECKER=0 -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP_COMPOSER_MIN_PHAR) | tee fixtures/check-requirements/fail-complete/actual-output || true
+	$(DOCKER) -e BOX_REQUIREMENT_CHECKER=0 -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP_COMPOSER_MIN_PHAR) 2>&1 | tee fixtures/check-requirements/fail-complete/actual-output || true
 	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/check-requirements/fail-complete/expected-output-725 fixtures/check-requirements/fail-complete/actual-output
 
 BOX_COMPILE=./box compile --working-dir=fixtures/php-settings-checker -vvv --no-ansi
