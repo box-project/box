@@ -148,6 +148,11 @@ final class Printer
             $this->supportColors ? $this->styles['reset'] : ''
         );
 
-        echo $message;
+        if (getenv('BOX_REQUIREMENTS_CHECKER_LOG_TO_STDOUT') === '1') {
+            // use echo/print to support output buffering
+            echo $message;
+        } else {
+            fwrite(STDERR, $message);
+        }
     }
 }

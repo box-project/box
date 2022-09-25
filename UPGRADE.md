@@ -1,3 +1,8 @@
+# From 4.0 to 4.1.0
+
+- The requirements checker now logs its output to `stderr` instead of `stdout` per default. Set `BOX_REQUIREMENTS_CHECKER_LOG_TO_STDOUT=1` to restore the old behaviour.
+
+
 # From 3.x to 4.x
 
 - Bump to PHP 8.1 #613
