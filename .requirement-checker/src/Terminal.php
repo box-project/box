@@ -1,6 +1,6 @@
 <?php
 
-namespace HumbugBox3160\KevinGH\RequirementChecker;
+namespace HumbugBox402\KevinGH\RequirementChecker;
 
 use function exec;
 use function fclose;
