@@ -16,6 +16,7 @@ namespace KevinGH\Box\PhpScoper;
 
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use PHPUnit\Framework\TestCase;
+
 use function serialize;
 use function unserialize;
 

@@ -15,8 +15,11 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console;
 
 use const DIRECTORY_SEPARATOR;
+
 use KevinGH\Box\Configuration\NoConfigurationFound;
+
 use function KevinGH\Box\FileSystem\touch;
+
 use KevinGH\Box\Test\FileSystemTestCase;
 
 /**

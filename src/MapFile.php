@@ -20,6 +20,7 @@ use function preg_replace;
 
 /**
  * @internal
+ *
  * @private
  */
 final class MapFile

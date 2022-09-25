@@ -14,17 +14,20 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PhpScoper;
 
+use function array_flip;
 use function array_key_exists;
 use function func_get_args;
+
 use Humbug\PhpScoper\Scoper\Scoper as PhpScoperScoper;
-use function Safe\array_flip;
 
 final class ExcludedFilesScoper implements PhpScoperScoper
 {
     private readonly array $excludedFilePathsAsKeys;
 
-    public function __construct(private readonly PhpScoperScoper $decoratedScoper, string ...$excludedFilePaths)
-    {
+    public function __construct(
+        private readonly PhpScoperScoper $decoratedScoper,
+        string ...$excludedFilePaths,
+    ) {
         $this->excludedFilePathsAsKeys = array_flip($excludedFilePaths);
     }
 

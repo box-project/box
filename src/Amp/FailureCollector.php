@@ -15,8 +15,10 @@ declare(strict_types=1);
 namespace KevinGH\Box\Amp;
 
 use Amp\MultiReasonException;
+
 use function array_map;
 use function array_unique;
+
 use KevinGH\Box\NotInstantiable;
 use Throwable;
 

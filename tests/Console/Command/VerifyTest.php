@@ -20,7 +20,9 @@ use InvalidArgumentException;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
+
 use function realpath;
+
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**

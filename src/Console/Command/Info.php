@@ -16,26 +16,34 @@ namespace KevinGH\Box\Console\Command;
 
 use function array_filter;
 use function array_flip;
+
 use DirectoryIterator;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
+
 use function implode;
 use function is_array;
+
 use KevinGH\Box\Console\PharInfoRenderer;
+
 use function KevinGH\Box\create_temporary_phar;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\get_phar_compression_algorithms;
+
 use KevinGH\Box\PharInfo\PharInfo;
+use natural;
 use Phar;
 use PharData;
 use PharFileInfo;
+
 use function realpath;
 use function sprintf;
 use function str_repeat;
 use function str_replace;
+
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -308,7 +316,7 @@ final class Info implements Command
         OutputInterface $output,
         iterable $list,
         int $depth,
-        int|\natural $maxDepth,
+        int|natural $maxDepth,
         int|false $indent,
         string $base,
         Phar|PharData $phar,

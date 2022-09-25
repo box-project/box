@@ -19,17 +19,25 @@ use function array_slice;
 use function array_splice;
 use function count;
 use function is_int;
+
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
+
 use function ltrim;
+
 use PhpToken;
+
 use function preg_replace;
+
 use RuntimeException;
+
 use function str_repeat;
 use function substr;
 use function substr_count;
+
 use const T_COMMENT;
 use const T_DOC_COMMENT;
 use const T_WHITESPACE;
+
 use Webmozart\Assert\Assert;
 
 /**
@@ -43,12 +51,15 @@ use Webmozart\Assert\Assert;
  * @author Théo Fidry <theo.fidry@gmail.com>
  * @author Juliette Reinders Folmer <boxproject_nospam@adviesenzo.nl>
  * @author Alessandro Chitolina <alekitto@gmail.com>
+ *
  * @private
  */
 final class Php extends FileExtensionCompactor
 {
-    public function __construct(private readonly DocblockAnnotationParser $annotationParser, array $extensions = ['php'])
-    {
+    public function __construct(
+        private readonly DocblockAnnotationParser $annotationParser,
+        array $extensions = ['php'],
+    ) {
         parent::__construct($extensions);
     }
 
@@ -214,7 +225,7 @@ final class Php extends FileExtensionCompactor
         // Multi-line attribute or attribute containing something which looks like a PHP close tag.
         // Retokenize the rest of the file after the attribute opener.
         if (null === $closer) {
-            foreach (array_slice($tokens, ($opener + 1)) as $token) {
+            foreach (array_slice($tokens, $opener + 1) as $token) {
                 $attributeBody .= $token->text;
             }
 
@@ -226,12 +237,12 @@ final class Php extends FileExtensionCompactor
             if (null !== $closer) {
                 array_splice(
                     $tokens,
-                    ($opener + 1),
+                    $opener + 1,
                     count($tokens),
-                    array_slice($subTokens, ($closer + 1)),
+                    array_slice($subTokens, $closer + 1),
                 );
 
-                $subTokens = array_slice($subTokens, 0, ($closer + 1));
+                $subTokens = array_slice($subTokens, 0, $closer + 1);
             }
         }
 

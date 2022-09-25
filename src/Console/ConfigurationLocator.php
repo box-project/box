@@ -15,8 +15,10 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console;
 
 use function file_exists;
+
 use KevinGH\Box\Configuration\NoConfigurationFound;
 use KevinGH\Box\NotInstantiable;
+
 use function realpath;
 
 /**

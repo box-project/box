@@ -17,27 +17,36 @@ namespace KevinGH\Box\Console\Command;
 use function array_merge;
 use function array_unique;
 use function chdir;
+
 use DirectoryIterator;
+
 use function exec;
 use function extension_loaded;
+
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\SymfonyCommand;
 use Fidry\Console\DisplayNormalizer;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Test\CommandTester;
 use Fidry\Console\Test\OutputAssertions;
+
 use function file_get_contents;
 use function get_loaded_extensions;
 use function implode;
+
 use InvalidArgumentException;
+
 use function iterator_to_array;
 use function json_decode;
 use function json_encode;
+
 use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
+
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Console\Application;
 use KevinGH\Box\Console\DisplayNormalizer as BoxDisplayNormalizer;
+
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
@@ -48,15 +57,20 @@ use function KevinGH\Box\FileSystem\touch;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\get_box_version;
 use function KevinGH\Box\memory_to_bytes;
+
 use KevinGH\Box\Test\FileSystemTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use KevinGH\Box\VarDumperNormalizer;
+
 use function mt_getrandmax;
+
 use Phar;
 use PharFileInfo;
+
 use const PHP_EOL;
 use const PHP_OS;
 use const PHP_VERSION;
+
 use function phpversion;
 use function preg_match;
 use function preg_quote;
@@ -68,6 +82,7 @@ use function sprintf;
 use function str_replace;
 use function strlen;
 use function substr;
+
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;

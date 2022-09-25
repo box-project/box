@@ -15,15 +15,21 @@ declare(strict_types=1);
 namespace KevinGH\Box\Configuration;
 
 use function array_unshift;
+
 use const DIRECTORY_SEPARATOR;
+
 use function in_array;
+
 use InvalidArgumentException;
+
 use function KevinGH\Box\FileSystem\touch;
+
 use Phar;
 
 /**
  * @covers \KevinGH\Box\Configuration\Configuration
  * @covers \KevinGH\Box\MapFile
+ *
  * @group config
  */
 class ConfigurationSigningTest extends ConfigurationTestCase

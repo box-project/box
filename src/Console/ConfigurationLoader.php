@@ -21,6 +21,7 @@ use KevinGH\Box\Configuration\ConfigurationLoader as ConfigLoader;
 use KevinGH\Box\Configuration\NoConfigurationFound;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\NotInstantiable;
+
 use function sprintf;
 
 /**

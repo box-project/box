@@ -18,8 +18,10 @@ use Fidry\Console\Command\Command;
 use InvalidArgumentException;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Configuration\NoConfigurationFound;
+
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\touch;
+
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\Test\CommandTestCase;
 use Symfony\Component\Console\Input\InputOption;

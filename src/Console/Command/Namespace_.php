@@ -16,6 +16,7 @@ namespace KevinGH\Box\Console\Command;
 
 use function current;
 use function explode;
+
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;

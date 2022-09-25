@@ -19,17 +19,25 @@ use function array_fill_keys;
 use function array_keys;
 use function count;
 use function date_default_timezone_set;
+
 use DateTimeImmutable;
+
 use const DIRECTORY_SEPARATOR;
+
 use function exec;
 use function getcwd;
+
 use InvalidArgumentException;
+
 use function json_decode;
+
 use const JSON_THROW_ON_ERROR;
+
 use KevinGH\Box\Compactor\DummyCompactor;
 use KevinGH\Box\Compactor\InvalidCompactor;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Compactor\PhpScoper;
+
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
@@ -38,22 +46,32 @@ use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\FileSystem\touch;
 use function KevinGH\Box\get_box_version;
+
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\VarDumperNormalizer;
+
 use function mt_getrandmax;
+
 use Phar;
+
 use const PHP_EOL;
+
 use function random_int;
+
 use RuntimeException;
 use Seld\JsonLint\ParsingException;
+
 use function sprintf;
+
 use stdClass;
+
 use function strtolower;
 
 /**
  * @covers \KevinGH\Box\Configuration\Configuration
  * @covers \KevinGH\Box\MapFile
+ *
  * @group config
  */
 class ConfigurationTest extends ConfigurationTestCase

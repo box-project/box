@@ -16,6 +16,7 @@ namespace KevinGH\Box\Compactor;
 
 use function array_reduce;
 use function count;
+
 use Countable;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\PhpScoper\Scoper;

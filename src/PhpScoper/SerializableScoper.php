@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\PhpScoper;
 
 use function count;
+
 use Humbug\PhpScoper\Configuration\Configuration as PhpScoperConfiguration;
 use Humbug\PhpScoper\Container as PhpScoperContainer;
 use Humbug\PhpScoper\Scoper\Scoper as PhpScoperScoper;

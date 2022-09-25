@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use DomainException;
+
 use function Safe\sprintf;
 
 final class UnsupportedMethodCall extends DomainException

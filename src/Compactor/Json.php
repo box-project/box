@@ -16,8 +16,11 @@ namespace KevinGH\Box\Compactor;
 
 use function json_decode;
 use function json_encode;
+
 use const JSON_ERROR_NONE;
+
 use function json_last_error;
+
 use const JSON_THROW_ON_ERROR;
 
 /**

@@ -19,15 +19,19 @@ use Fidry\Console\Command\CommandAwareness;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
+
 use function file_exists;
 use function getcwd;
 use function KevinGH\Box\create_temporary_phar;
+
 use KevinGH\Box\DockerFileGenerator;
+
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use function KevinGH\Box\FileSystem\remove;
 use function realpath;
 use function sprintf;
+
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StringInput;

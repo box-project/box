@@ -16,11 +16,16 @@ namespace KevinGH\Box\Json;
 
 use function implode;
 use function json_decode;
+
 use const JSON_ERROR_NONE;
 use const JSON_ERROR_UTF8;
+
 use function json_last_error;
+
 use JsonSchema\Validator;
+
 use function KevinGH\Box\FileSystem\file_contents;
+
 use Seld\JsonLint\JsonParser;
 use Seld\JsonLint\ParsingException;
 use stdClass;
@@ -66,7 +71,7 @@ final class Json
         }
 
         return false === $assoc ? (object) $data : $data;   // If JSON is an empty JSON json_decode returns an empty
-                                                            // array instead of an stdClass instance
+        // array instead of an stdClass instance
     }
 
     /**

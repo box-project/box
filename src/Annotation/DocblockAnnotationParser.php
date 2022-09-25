@@ -18,11 +18,13 @@ use function array_filter;
 use function array_key_exists;
 use function array_map;
 use function array_values;
+
 use InvalidArgumentException;
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlock\Tag;
 use phpDocumentor\Reflection\DocBlock\Tags\Formatter;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
+
 use function Safe\array_flip;
 use function strtolower;
 

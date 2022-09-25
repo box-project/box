@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\PhpScoper;
 
 use PHPUnit\Framework\TestCase;
+
 use function Safe\sprintf;
 use function serialize;
 use function unserialize;

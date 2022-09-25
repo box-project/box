@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\PhpScoper;
 
 use function func_get_args;
+
 use Humbug\PhpScoper\Scoper\Scoper as PhpScoperScoper;
 
 final class CallRecorderScoper implements PhpScoperScoper

@@ -18,19 +18,26 @@ use function array_filter;
 use function array_flip;
 use function array_map;
 use function count;
+
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
+
 use function is_string;
 use function KevinGH\Box\check_php_settings;
+
 use KevinGH\Box\Console\PharInfoRenderer;
+
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\get_phar_compression_algorithms;
+
 use KevinGH\Box\PharInfo\PharDiff;
 use KevinGH\Box\PharInfo\PharInfo;
 use PharFileInfo;
+
 use function sprintf;
+
 // TODO: migrate to Safe API
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;

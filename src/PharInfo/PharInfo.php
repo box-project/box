@@ -17,6 +17,7 @@ namespace KevinGH\Box\PharInfo;
 use function array_flip;
 use function KevinGH\Box\get_phar_compression_algorithms;
 use function KevinGH\Box\unique_id;
+
 use Phar;
 use PharData;
 use PharFileInfo;

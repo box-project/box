@@ -17,6 +17,7 @@ namespace KevinGH\Box\Annotation;
 use function array_map;
 use function explode;
 use function implode;
+
 use phpDocumentor\Reflection\DocBlock\Tag;
 use phpDocumentor\Reflection\DocBlock\Tags\Formatter;
 use phpDocumentor\Reflection\DocBlock\Tags\Generic;

@@ -14,16 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
-use KevinGH\Box\Console\Command\Compile;
-use KevinGH\Box\Console\Command\Diff;
-use KevinGH\Box\Console\Command\Info;
-use KevinGH\Box\Console\Command\Process;
-use KevinGH\Box\Console\Command\Extract;
-use KevinGH\Box\Console\Command\Validate;
-use KevinGH\Box\Console\Command\Verify;
-use KevinGH\Box\Console\Command\GenerateDockerFile;
-use KevinGH\Box\Console\Command\Namespace_;
 use Fidry\Console\Application\Application as FidryApplication;
+
 use function KevinGH\Box\get_box_version;
 use function sprintf;
 use function trim;
@@ -87,15 +79,15 @@ final class Application implements FidryApplication
     public function getCommands(): array
     {
         return [
-            new Compile($this->getHeader()),
-            new Diff(),
-            new Info(),
-            new Process(),
-            new Extract(),
-            new Validate(),
-            new Verify(),
-            new GenerateDockerFile(),
-            new Namespace_(),
+            new Command\Compile($this->getHeader()),
+            new Command\Diff(),
+            new Command\Info(),
+            new Command\Process(),
+            new Command\Extract(),
+            new Command\Validate(),
+            new Command\Verify(),
+            new Command\GenerateDockerFile(),
+            new Command\Namespace_(),
         ];
     }
 

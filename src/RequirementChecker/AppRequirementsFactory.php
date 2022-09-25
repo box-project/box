@@ -16,7 +16,9 @@ namespace KevinGH\Box\RequirementChecker;
 
 use function array_diff_key;
 use function array_key_exists;
+
 use Phar;
+
 use function preg_match;
 use function sprintf;
 

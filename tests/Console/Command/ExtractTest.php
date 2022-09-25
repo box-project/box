@@ -16,7 +16,9 @@ namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
+
 use function KevinGH\Box\FileSystem\make_path_relative;
+
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
 use Symfony\Component\Console\Exception\RuntimeException;

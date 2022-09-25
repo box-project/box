@@ -17,45 +17,65 @@ namespace KevinGH\Box;
 use function array_filter;
 use function array_keys;
 use function current;
+
 use const DIRECTORY_SEPARATOR;
+
 use function dirname;
+
 use Error;
 use Exception;
+
 use function exec;
 use function extension_loaded;
+
 use Fidry\Console\DisplayNormalizer;
+
 use function file_get_contents;
 use function implode;
 use function in_array;
+
 use InvalidArgumentException;
+
 use function iterator_to_array;
+
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\FakeCompactor;
+
 use function KevinGH\Box\FileSystem\canonicalize;
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\mkdir;
+
 use KevinGH\Box\Test\FileSystemTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use Phar;
 use PharFileInfo;
+
 use const PHP_EOL;
+
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
+
 use function realpath;
+
 use RuntimeException;
 use SplFileInfo;
+
 use function sprintf;
+
 use const STDOUT;
+
 use function str_replace;
+
 use Stringable;
 use Symfony\Component\Finder\Finder;
 use Throwable;
+
 use function trim;
 
 /**
@@ -1334,6 +1354,7 @@ class BoxTest extends FileSystemTestCase
 
     /**
      * @dataProvider compressionAlgorithmsProvider
+     *
      * @requires extension zlib
      * @requires extension bz2
      */

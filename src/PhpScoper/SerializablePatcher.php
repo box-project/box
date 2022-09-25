@@ -15,7 +15,9 @@ declare(strict_types=1);
 namespace KevinGH\Box\PhpScoper;
 
 use Closure;
+
 use function func_get_args;
+
 use Humbug\PhpScoper\Patcher\Patcher;
 use Laravel\SerializableClosure\SerializableClosure;
 

@@ -15,9 +15,11 @@ declare(strict_types=1);
 namespace KevinGH\Box\RequirementChecker;
 
 use function array_column;
+
 use KevinGH\Box\Console\DisplayNormalizer;
 use Phar;
 use PHPUnit\Framework\TestCase;
+
 use function sort;
 
 /**

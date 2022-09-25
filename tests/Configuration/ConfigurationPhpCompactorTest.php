@@ -15,12 +15,14 @@ declare(strict_types=1);
 namespace KevinGH\Box\Configuration;
 
 use function current;
+
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Php;
 use stdClass;
 
 /**
  * @covers \KevinGH\Box\Configuration\Configuration
+ *
  * @group config
  */
 class ConfigurationPhpCompactorTest extends ConfigurationTestCase

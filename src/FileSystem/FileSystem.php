@@ -16,13 +16,17 @@ namespace KevinGH\Box\FileSystem;
 
 use function array_reverse;
 use function defined;
+
 use const DIRECTORY_SEPARATOR;
+
 use function error_get_last;
 use function escapeshellarg;
 use function exec;
 use function file_exists;
 use function file_get_contents;
+
 use FilesystemIterator;
+
 use function is_array;
 use function is_dir;
 use function is_link;
@@ -34,18 +38,24 @@ use function sprintf;
 use function str_replace;
 use function strrpos;
 use function substr;
+
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Symfony\Component\Filesystem\Path;
+
 use function sys_get_temp_dir;
+
 use Traversable;
+
 use function unlink;
+
 use Webmozart\Assert\Assert;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Thomas Schulz <mail@king2500.net>
+ *
  * @private
  */
 final class FileSystem extends SymfonyFilesystem
