@@ -58,7 +58,12 @@ function get_box_version(): string
     // Indeed, this class is registered to the autoloader by Composer itself which
     // results an incorrect classmap entry in the scoped code.
     // This strategy avoids having to exclude completely the file from the scoping.
-    require_once __DIR__.'/../vendor/composer/InstalledVersions.php';
+    foreach ([__DIR__.'/../vendor/composer/InstalledVersions.php', __DIR__.'/../../../composer/InstalledVersions.php'] as $file) {
+        if (file_exists($file)) {
+            require_once $file;
+            break;
+        }
+    }
 
     $prettyVersion = InstalledVersions::getPrettyVersion('humbug/box');
     $commitHash = InstalledVersions::getReference('humbug/box');
