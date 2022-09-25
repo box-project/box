@@ -50,6 +50,7 @@ use function KevinGH\Box\get_box_version;
 use function KevinGH\Box\memory_to_bytes;
 use KevinGH\Box\Test\FileSystemTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
+use KevinGH\Box\VarDumperNormalizer;
 use function mt_getrandmax;
 use Phar;
 use PharFileInfo;
@@ -1208,7 +1209,7 @@ class CompileTest extends FileSystemTestCase
 
             KevinGH\Box\Configuration\Configuration {#140
               -compressionAlgorithm: "NONE"
-              -mainScriptPath: & "index.php"
+              -mainScriptPath: "index.php"
               -mainScriptContents: """
                 <?php\n
                 \n
@@ -1216,7 +1217,7 @@ class CompileTest extends FileSystemTestCase
                 \n
                 echo 'Yo';\n
                 """
-              -file: & "box.json"
+              -file: "box.json"
               -alias: "index.phar"
               -basePath: "/path/to"
               -composerJson: KevinGH\Box\Composer\ComposerFile {#140
@@ -1227,8 +1228,8 @@ class CompileTest extends FileSystemTestCase
                 -path: null
                 -contents: []
               }
-              -files: & []
-              -binaryFiles: & []
+              -files: []
+              -binaryFiles: []
               -autodiscoveredFiles: true
               -dumpAutoload: false
               -excludeComposerFiles: true
@@ -1240,17 +1241,17 @@ class CompileTest extends FileSystemTestCase
                 -map: []
               }
               -metadata: null
-              -tmpOutputPath: & "index.phar"
-              -outputPath: & "index.phar"
+              -tmpOutputPath: "index.phar"
+              -outputPath: "index.phar"
               -privateKeyPassphrase: null
-              -privateKeyPath: & null
+              -privateKeyPath: null
               -promptForPrivateKey: false
               -processedReplacements: []
               -shebang: "#!/usr/bin/env php"
               -signingAlgorithm: "SHA1"
               -stubBannerContents: ""
-              -stubBannerPath: & null
-              -stubPath: & null
+              -stubBannerPath: null
+              -stubPath: null
               -isInterceptFileFuncs: false
               -isStubGenerated: true
               -checkRequirements: false
@@ -1260,9 +1261,8 @@ class CompileTest extends FileSystemTestCase
 
             EOF;
 
-        $actualDumpedConfig = str_replace(
+        $actualDumpedConfig = VarDumperNormalizer::normalize(
             $this->tmp,
-            '/path/to',
             file_contents('.box_dump/.box_configuration'),
         );
 

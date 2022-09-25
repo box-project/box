@@ -40,6 +40,7 @@ use function KevinGH\Box\FileSystem\touch;
 use function KevinGH\Box\get_box_version;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\MapFile;
+use KevinGH\Box\VarDumperNormalizer;
 use function mt_getrandmax;
 use Phar;
 use const PHP_EOL;
@@ -2977,9 +2978,9 @@ class ConfigurationTest extends ConfigurationTestCase
         $expectedDumpedConfig = <<<EOF
             KevinGH\Box\Configuration\Configuration {#100
               -compressionAlgorithm: "GZ"
-              -mainScriptPath: & "index.php"
+              -mainScriptPath: "index.php"
               -mainScriptContents: ""
-              -file: & "box.json"
+              -file: "box.json"
               -alias: "test.phar"
               -basePath: "/path/to"
               -composerJson: KevinGH\Box\Composer\ComposerFile {#100
@@ -2998,7 +2999,7 @@ class ConfigurationTest extends ConfigurationTestCase
                 -path: "composer.lock"
                 -contents: []
               }
-              -files: & array:6 [
+              -files: array:6 [
                 0 => "bar.php"
                 1 => "box.json"
                 2 => "composer.json"
@@ -3006,7 +3007,7 @@ class ConfigurationTest extends ConfigurationTestCase
                 4 => "foo.php"
                 5 => "vendor/composer/installed.json"
               ]
-              -binaryFiles: & array:2 [
+              -binaryFiles: array:2 [
                 0 => "bar.php"
                 1 => "foo.php"
               ]
@@ -3023,17 +3024,17 @@ class ConfigurationTest extends ConfigurationTestCase
                 -map: []
               }
               -metadata: null
-              -tmpOutputPath: & "index.phar"
-              -outputPath: & "index.phar"
+              -tmpOutputPath: "index.phar"
+              -outputPath: "index.phar"
               -privateKeyPassphrase: null
-              -privateKeyPath: & null
+              -privateKeyPath: null
               -promptForPrivateKey: false
               -processedReplacements: []
               -shebang: "#!/usr/bin/env php"
               -signingAlgorithm: "SHA1"
               -stubBannerContents: "My banner"
-              -stubBannerPath: & null
-              -stubPath: & null
+              -stubBannerPath: null
+              -stubPath: null
               -isInterceptFileFuncs: false
               -isStubGenerated: true
               -checkRequirements: true
@@ -3043,9 +3044,8 @@ class ConfigurationTest extends ConfigurationTestCase
 
             EOF;
 
-        $actualDumpedConfig = str_replace(
+        $actualDumpedConfig = VarDumperNormalizer::normalize(
             $this->tmp,
-            '/path/to',
             $this->config->export(),
         );
 
@@ -3083,7 +3083,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public static function JsonValidNonStringValuesProvider(): iterable
     {
-        foreach ($this->provideJsonPrimitives() as $key => $value) {
+        foreach (self::provideJsonPrimitives() as $key => $value) {
             if ('string' === $key) {
                 continue;
             }
@@ -3094,7 +3094,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public static function JsonValidNonStringArrayProvider(): iterable
     {
-        foreach ($this->provideJsonPrimitives() as $key => $values) {
+        foreach (self::provideJsonPrimitives() as $key => $values) {
             if ('string' === $key) {
                 continue;
             }
@@ -3105,7 +3105,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public static function JsonValidNonObjectArrayProvider(): iterable
     {
-        foreach ($this->provideJsonPrimitives() as $key => $values) {
+        foreach (self::provideJsonPrimitives() as $key => $values) {
             if ('object' === $key) {
                 continue;
             }
@@ -3114,7 +3114,7 @@ class ConfigurationTest extends ConfigurationTestCase
         }
     }
 
-    public static function JsonPrimitivesProvider(): iterable
+    public static function provideJsonPrimitives(): iterable
     {
         yield 'null' => null;
         yield 'bool' => true;
