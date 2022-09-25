@@ -90,7 +90,7 @@ class DocumentationSchemaTest extends TestCase
             ),
         );
 
-        $this->assertEquals($schemaKeys, '$schema', ...$docKeys]);
+        $this->assertEquals($schemaKeys, ['$schema', ...$docKeys]);
     }
 
     /**
