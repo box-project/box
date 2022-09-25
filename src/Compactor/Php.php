@@ -49,7 +49,7 @@ use Webmozart\Assert\Assert;
 final class Php extends FileExtensionCompactor
 {
     public function __construct(
-        private readonly DocblockAnnotationParser $annotationParser,
+        private DocblockAnnotationParser $annotationParser,
         array $extensions = ['php'],
     ) {
         parent::__construct($extensions);

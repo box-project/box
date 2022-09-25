@@ -24,16 +24,16 @@ use function trim;
  */
 final class Application implements FidryApplication
 {
-    private readonly string $version;
-    private readonly string $releaseDate;
+    private string $version;
+    private string $releaseDate;
     private string $header;
 
     public function __construct(
-        private readonly string $name = 'Box',
+        private string $name = 'Box',
         ?string $version = null,
         string $releaseDate = '@release-date@',
-        private readonly bool $autoExit = true,
-        private readonly bool $catchExceptions = true,
+        private bool $autoExit = true,
+        private bool $catchExceptions = true,
     ) {
         $this->version = $version ?? get_box_version();
         $this->releaseDate = !str_contains($releaseDate, '@') ? $releaseDate : '';

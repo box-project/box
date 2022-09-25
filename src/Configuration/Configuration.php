@@ -224,7 +224,7 @@ final class Configuration
     private const STUB_KEY = 'stub';
     private int|string|null $compressionAlgorithm;
     private ?string $mainScriptPath;
-    private readonly ?string $mainScriptContents;
+    private ?string $mainScriptContents;
 
     public static function create(?string $file, stdClass $raw): self
     {
@@ -428,39 +428,39 @@ final class Configuration
      */
     private function __construct(
         private ?string $file,
-        private readonly string $alias,
-        private readonly string $basePath,
+        private string $alias,
+        private string $basePath,
         private ComposerFile $composerJson,
         private ComposerFile $composerLock,
         private array $files,
         private array $binaryFiles,
-        private readonly bool $autodiscoveredFiles,
-        private readonly bool $dumpAutoload,
-        private readonly bool $excludeComposerFiles,
-        private readonly bool $excludeDevFiles,
+        private bool $autodiscoveredFiles,
+        private bool $dumpAutoload,
+        private bool $excludeComposerFiles,
+        private bool $excludeDevFiles,
         private Compactors|array $compactors,
         ?int $compressionAlgorithm,
         private int|string|null $fileMode,
         ?string $mainScriptPath,
         ?string $mainScriptContents,
-        private readonly MapFile $fileMapper,
-        private readonly mixed $metadata,
+        private MapFile $fileMapper,
+        private mixed $metadata,
         private string $tmpOutputPath,
         private string $outputPath,
-        private readonly ?string $privateKeyPassphrase,
+        private ?string $privateKeyPassphrase,
         private ?string $privateKeyPath,
-        private readonly bool $promptForPrivateKey,
-        private readonly array $processedReplacements,
-        private readonly ?string $shebang,
+        private bool $promptForPrivateKey,
+        private array $processedReplacements,
+        private ?string $shebang,
         private int|string $signingAlgorithm,
-        private readonly ?string $stubBannerContents,
+        private ?string $stubBannerContents,
         private ?string $stubBannerPath,
         private ?string $stubPath,
-        private readonly bool $isInterceptFileFuncs,
-        private readonly bool $isStubGenerated,
-        private readonly bool $checkRequirements,
-        private readonly array $warnings,
-        private readonly array $recommendations,
+        private bool $isInterceptFileFuncs,
+        private bool $isStubGenerated,
+        private bool $checkRequirements,
+        private array $warnings,
+        private array $recommendations,
     ) {
         Assert::nullOrInArray(
             $compressionAlgorithm,

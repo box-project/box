@@ -36,7 +36,7 @@ final class SerializablePatcher implements Patcher
     /**
      * @param PatcherCallable $patch
      */
-    private function __construct(private readonly Closure|SerializableClosure $patch)
+    private function __construct(private Closure|SerializableClosure $patch)
     {
     }
 

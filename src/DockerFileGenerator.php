@@ -50,12 +50,12 @@ final class DockerFileGenerator
         '7.0.0' => '7-cli-alpine',
     ];
 
-    private readonly string $image;
+    private string $image;
 
     /**
      * @var string[]
      */
-    private readonly array $extensions;
+    private array $extensions;
 
     /**
      * Creates a new instance of the generator.
@@ -81,7 +81,7 @@ final class DockerFileGenerator
     public function __construct(
         string $image,
         array $extensions,
-        private readonly string $sourcePhar,
+        private string $sourcePhar,
     ) {
         Assert::inArray($image, self::PHP_DOCKER_IMAGES);
         Assert::allString($extensions);

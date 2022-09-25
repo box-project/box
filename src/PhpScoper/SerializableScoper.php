@@ -25,7 +25,7 @@ use Humbug\PhpScoper\Symbol\SymbolsRegistry;
  */
 final class SerializableScoper implements Scoper
 {
-    private readonly PhpScoperConfiguration $scoperConfig;
+    private PhpScoperConfiguration $scoperConfig;
     private PhpScoperContainer $scoperContainer;
     private PhpScoperScoper $scoper;
     private SymbolsRegistry $symbolsRegistry;
@@ -33,7 +33,7 @@ final class SerializableScoper implements Scoper
     /**
      * @var list<string>
      */
-    private readonly array $excludedFilePaths;
+    private array $excludedFilePaths;
 
     public function __construct(
         PhpScoperConfiguration $scoperConfig,

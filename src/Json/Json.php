@@ -30,7 +30,7 @@ use stdClass;
  */
 final class Json
 {
-    private readonly JsonParser $linter;
+    private JsonParser $linter;
 
     public function __construct()
     {

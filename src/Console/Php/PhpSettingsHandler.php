@@ -33,8 +33,8 @@ use Webmozart\Assert\Assert;
  */
 final class PhpSettingsHandler extends XdebugHandler
 {
-    private readonly LoggerInterface $logger;
-    private readonly bool $pharReadonly;
+    private LoggerInterface $logger;
+    private bool $pharReadonly;
 
     public function __construct(LoggerInterface $logger)
     {
@@ -58,19 +58,19 @@ final class PhpSettingsHandler extends XdebugHandler
     protected function requiresRestart(bool $default): bool
     {
         if ($this->pharReadonly) {
-            $this->logger->debug('phar.readonly is enabled');
+            $this->logger->debug('phar.is enabled');
 
             return true;
         }
 
-        $this->logger->debug('phar.readonly is disabled');
+        $this->logger->debug('phar.is disabled');
 
         return parent::requiresRestart($default);
     }
 
     protected function restart(array $command): void
     {
-        // Disable phar.readonly if set
+        // Disable phar.if set
         $this->disablePharReadonly();
 
         parent::restart($command);
