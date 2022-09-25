@@ -40,6 +40,7 @@ use function KevinGH\Box\FileSystem\touch;
 use function KevinGH\Box\get_box_version;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\MapFile;
+use KevinGH\Box\VarDumperNormalizer;
 use function mt_getrandmax;
 use Phar;
 use const PHP_EOL;
@@ -3043,16 +3044,9 @@ class ConfigurationTest extends ConfigurationTestCase
 
             EOF;
 
-        $actualDumpedConfig = str_replace(
+        $actualDumpedConfig = VarDumperNormalizer::normalize(
             $this->tmp,
-            '/path/to',
             $this->config->export(),
-        );
-
-        $actualDumpedConfig = str_replace(
-            ': & ',
-            ': ',
-            $actualDumpedConfig,
         );
 
         $actualDumpedConfig = preg_replace(
