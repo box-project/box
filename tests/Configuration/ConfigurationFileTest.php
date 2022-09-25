@@ -18,7 +18,6 @@ use function chdir;
 use const DIRECTORY_SEPARATOR;
 use function file_get_contents;
 use InvalidArgumentException;
-use const JSON_THROW_ON_ERROR;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\mkdir;
@@ -1756,7 +1755,12 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_no_warning_is_given_when_the_installed_json_is_found_and_the_composer_lock_is_not_when_the_composer_autoloader_is_not_dumped(): void
     {
-        $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir002/box.json', json_decode(file_get_contents($configPath), null, 512, JSON_THROW_ON_ERROR));
+        $configPath = self::FIXTURES_DIR.'/dir002/box.json';
+
+        $config = Configuration::create(
+            $configPath,
+            json_decode(file_get_contents($configPath)),
+        );
 
         $this->assertFalse($config->dumpAutoload());
 
@@ -1766,7 +1770,9 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_a_warning_is_given_when_no_installed_json_is_found_and_the_composer_lock_is_when_the_composer_autoloader_is_dumped(): void
     {
-        $decodedConfig = json_decode(file_get_contents($configPath = self::FIXTURES_DIR.'/dir002/box.json'), null, 512, JSON_THROW_ON_ERROR);
+        $configPath = self::FIXTURES_DIR.'/dir002/box.json';
+
+        $decodedConfig = json_decode(file_get_contents($configPath));
         $decodedConfig->{'dump-autoload'} = true;
 
         $config = Configuration::create($configPath, $decodedConfig);
@@ -1787,7 +1793,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
     {
         $configPath = self::FIXTURES_DIR.'/dir003/box.json';
 
-        $decodedConfig = json_decode(file_get_contents($configPath), null, 512, JSON_THROW_ON_ERROR);
+        $decodedConfig = json_decode(file_get_contents($configPath));
         unset($decodedConfig->{'dump-autoload'});
 
         $config = Configuration::create($configPath, $decodedConfig);
