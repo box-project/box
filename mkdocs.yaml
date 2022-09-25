@@ -44,7 +44,6 @@ nav:
             -   Configuration: configuration.md
             -   'Requirements checker': requirement-checker.md
             -   'Optimize your PHAR': optimizations.md
-            -   'Optimize your PHAR': optimizations.md
             -   'PHAR code isolation': code-isolation.md
             -   'Docker support': docker.md
             -   'Symfony support': symfony.md
