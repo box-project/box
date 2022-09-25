@@ -115,7 +115,7 @@ final class Box implements Countable
     {
         Assert::true($this->buffering, 'The buffering must be started before ending it');
 
-        $dumpAutoload = $dumpAutoload ?? static fn () => null;
+        $dumpAutoload ??= static fn () => null;
         $cwd = getcwd();
 
         $tmp = make_tmp_dir('box', self::class);

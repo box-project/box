@@ -105,11 +105,8 @@ final class Compile implements CommandAware
 
     private const DEBUG_DIR = '.box_dump';
 
-    private string $header;
-
-    public function __construct(string $header)
+    public function __construct(private string $header)
     {
-        $this->header = $header;
     }
 
     public function getConfiguration(): CommandConfiguration

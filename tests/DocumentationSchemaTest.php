@@ -107,7 +107,7 @@ class DocumentationSchemaTest extends TestCase
             ),
         );
 
-        return array_keys(json_decode($matches['schema'], true, 512, JSON_THROW_ON_ERROR));
+        return array_keys(json_decode((string) $matches['schema'], true, 512, JSON_THROW_ON_ERROR));
     }
 
     /**

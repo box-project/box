@@ -48,13 +48,11 @@ use Webmozart\Assert\Assert;
  */
 final class Php extends FileExtensionCompactor
 {
-    private DocblockAnnotationParser $annotationParser;
-
-    public function __construct(DocblockAnnotationParser $annotationParser, array $extensions = ['php'])
-    {
+    public function __construct(
+        private DocblockAnnotationParser $annotationParser,
+        array $extensions = ['php'],
+    ) {
         parent::__construct($extensions);
-
-        $this->annotationParser = $annotationParser;
     }
 
     protected function compactContent(string $contents): string

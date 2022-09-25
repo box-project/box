@@ -779,10 +779,8 @@ class ConfigurationTest extends ConfigurationTestCase
 
     /**
      * @dataProvider invalidCompressionAlgorithmsProvider
-     *
-     * @param mixed $compression
      */
-    public function test_the_compression_algorithm_cannot_be_an_invalid_algorithm($compression, string $errorMessage): void
+    public function test_the_compression_algorithm_cannot_be_an_invalid_algorithm(mixed $compression, string $errorMessage): void
     {
         try {
             $this->setConfig([

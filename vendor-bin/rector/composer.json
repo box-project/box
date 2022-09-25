@@ -1,5 +1,5 @@
 {
     "require-dev": {
-        "rector/rector": "^0.12.16"
+        "rector/rector": "^0.14"
     }
 }

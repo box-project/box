@@ -3097,7 +3097,7 @@ class CompileTest extends FileSystemTestCase
 
         foreach ($traversable as $fileInfo) {
             /** @var PharFileInfo $fileInfo */
-            $fileInfo = $phar[str_replace($root, '', $fileInfo->getPathname())];
+            $fileInfo = $phar[str_replace($root, '', (string) $fileInfo->getPathname())];
 
             $path = substr($fileInfo->getPathname(), strlen($root) - 1);
 

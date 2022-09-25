@@ -437,13 +437,11 @@ class InfoTest extends CommandTestCase
 
     /**
      * @dataProvider treeDepthProvider
-     *
-     * @param mixed $expected
      */
     public function test_it_can_limit_the_tree_depth(
         string $pharPath,
         ?string $depth,
-        $expected,
+        mixed $expected,
     ): void {
         $pharPath = self::FIXTURES.'/tree-phar.phar';
         $phar = new Phar($pharPath);
@@ -462,7 +460,7 @@ class InfoTest extends CommandTestCase
                 $signature['hash_type'],
                 $signature['hash'],
             ],
-            $expected,
+            (string) $expected,
         );
 
         $input = [

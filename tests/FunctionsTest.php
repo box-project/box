@@ -38,10 +38,8 @@ class FunctionsTest extends TestCase
 
     /**
      * @dataProvider pharCompressionAlgorithmProvider
-     *
-     * @param mixed $expected
      */
-    public function test_it_can_provide_the_phars_algorithm_extensions(int $algorithm, $expected): void
+    public function test_it_can_provide_the_phars_algorithm_extensions(int $algorithm, mixed $expected): void
     {
         try {
             $actual = get_phar_compression_algorithm_extension($algorithm);
