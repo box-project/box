@@ -543,7 +543,7 @@ final class FileSystem extends SymfonyFilesystem
         foreach ($files as $file) {
             // MODIFIED CODE
             if (defined('PHP_WINDOWS_VERSION_BUILD') && is_dir($file)) {
-                exec(sprintf('rd /s /q %s', escapeshellarg((string) $file)));
+                exec(sprintf('rd /s /q %s', escapeshellarg($file)));
             // - MODIFIED CODE
             } elseif (is_link($file)) {
                 // See https://bugs.php.net/52176

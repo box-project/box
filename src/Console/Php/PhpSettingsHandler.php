@@ -58,19 +58,19 @@ final class PhpSettingsHandler extends XdebugHandler
     protected function requiresRestart(bool $default): bool
     {
         if ($this->pharReadonly) {
-            $this->logger->debug('phar.is enabled');
+            $this->logger->debug('phar.readonly is enabled');
 
             return true;
         }
 
-        $this->logger->debug('phar.is disabled');
+        $this->logger->debug('phar.readonly is disabled');
 
         return parent::requiresRestart($default);
     }
 
     protected function restart(array $command): void
     {
-        // Disable phar.if set
+        // Disable phar.readonly if set
         $this->disablePharReadonly();
 
         parent::restart($command);

@@ -66,7 +66,7 @@ final class Php extends FileExtensionCompactor
             $tokenText = $token->text;
 
             if ($token->is([T_COMMENT, T_DOC_COMMENT])) {
-                if (str_starts_with((string) $tokenText, '#[')) {
+                if (str_starts_with($tokenText, '#[')) {
                     // This is, in all likelihood, the start of a PHP >= 8.0 attribute.
                     // Note: $tokens may be updated by reference as well!
                     $retokenized = $this->retokenizeAttribute($tokens, $index);
@@ -82,16 +82,16 @@ final class Php extends FileExtensionCompactor
                         $output .= '#[';
                     } else {
                         // Turns out this was not an attribute. Treat it as a plain comment.
-                        $output .= str_repeat("\n", substr_count((string) $tokenText, "\n"));
+                        $output .= str_repeat("\n", substr_count($tokenText, "\n"));
                     }
-                } elseif (str_contains((string) $tokenText, '@')) {
+                } elseif (str_contains($tokenText, '@')) {
                     try {
                         $output .= $this->compactAnnotations($tokenText);
                     } catch (RuntimeException) {
                         $output .= $tokenText;
                     }
                 } else {
-                    $output .= str_repeat("\n", substr_count((string) $tokenText, "\n"));
+                    $output .= str_repeat("\n", substr_count($tokenText, "\n"));
                 }
             } elseif ($token->is(T_WHITESPACE)) {
                 $whitespace = $tokenText;
@@ -119,7 +119,7 @@ final class Php extends FileExtensionCompactor
                 $previousToken = $tokens[$previousIndex];
 
                 if ($previousToken->is(T_COMMENT)
-                    && str_contains((string) $previousToken->text, "\n")
+                    && str_contains($previousToken->text, "\n")
                 ) {
                     $whitespace = ltrim($whitespace, ' ');
                 }

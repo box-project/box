@@ -183,7 +183,7 @@ final class AppRequirementsFactory
             if (1 === preg_match('/symfony\/polyfill-(?<extension>.+)/', (string) $packageName, $matches)) {
                 $extension = $matches['extension'];
 
-                if (!str_starts_with((string) $extension, 'php')) {
+                if (!str_starts_with($extension, 'php')) {
                     $polyfills[$extension] = true;
 
                     continue;

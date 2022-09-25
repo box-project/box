@@ -27,9 +27,9 @@ use Symfony\Component\Process\Process;
 
 final class PharDiff
 {
-    private ParagoniePharDiff $diff;
-    private Pharaoh $pharA;
-    private Pharaoh $pharB;
+    private readonly ParagoniePharDiff $diff;
+    private readonly Pharaoh $pharA;
+    private readonly Pharaoh $pharB;
 
     public function __construct(string $pathA, string $pathB)
     {

@@ -29,7 +29,7 @@ final class MapFile
      * @param string[][] $map
      */
     public function __construct(
-        // Cannot have properties: requires to be serializable
+        // Cannot have readonly properties: requires to be serializable
         private string $basePath,
         private array $map,
     ) {

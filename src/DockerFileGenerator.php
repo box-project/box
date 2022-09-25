@@ -81,7 +81,7 @@ final class DockerFileGenerator
     public function __construct(
         string $image,
         array $extensions,
-        private string $sourcePhar,
+        private readonly string $sourcePhar,
     ) {
         Assert::inArray($image, self::PHP_DOCKER_IMAGES);
         Assert::allString($extensions);

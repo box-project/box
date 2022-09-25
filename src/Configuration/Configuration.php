@@ -780,7 +780,7 @@ final class Configuration
             return unique_id(self::DEFAULT_ALIAS_PREFIX).'.phar';
         }
 
-        $alias = trim((string) $raw->{self::ALIAS_KEY});
+        $alias = trim($raw->{self::ALIAS_KEY});
 
         Assert::notEmpty($alias, 'A PHAR alias cannot be empty when provided.');
 
@@ -806,7 +806,7 @@ final class Configuration
             return realpath(dirname($file));
         }
 
-        $basePath = trim((string) $raw->{self::BASE_PATH_KEY});
+        $basePath = trim($raw->{self::BASE_PATH_KEY});
 
         Assert::directory(
             $basePath,
@@ -1950,7 +1950,7 @@ final class Configuration
             $processed = [];
 
             foreach ($item as $match => $replace) {
-                $processed[canonicalize(trim((string) $match))] = canonicalize(trim((string) $replace));
+                $processed[canonicalize(trim($match))] = canonicalize(trim($replace));
             }
 
             if (isset($processed['_empty_'])) {
@@ -2331,7 +2331,7 @@ final class Configuration
 
         Assert::string($shebang, 'Expected shebang to be either a string, false or null, found true');
 
-        $shebang = trim((string) $shebang);
+        $shebang = trim($shebang);
 
         Assert::notEmpty($shebang, 'The shebang should not be empty.');
         Assert::true(
@@ -2365,7 +2365,7 @@ final class Configuration
             return self::DEFAULT_SIGNING_ALGORITHM;
         }
 
-        $algorithm = strtoupper((string) $raw->{self::ALGORITHM_KEY});
+        $algorithm = strtoupper($raw->{self::ALGORITHM_KEY});
 
         Assert::inArray($algorithm, array_keys(get_phar_signing_algorithms()));
 
