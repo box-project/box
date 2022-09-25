@@ -1,8 +1,8 @@
 <?php
 
-namespace HumbugBox3160\KevinGH\RequirementChecker;
+namespace HumbugBox402\KevinGH\RequirementChecker;
 
-use HumbugBox3160\Composer\Semver\Semver;
+use HumbugBox402\Composer\Semver\Semver;
 use function sprintf;
 final class IsPhpVersionFulfilled implements IsFulfilled
 {

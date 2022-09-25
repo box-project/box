@@ -1,6 +1,6 @@
 <?php
 
-namespace HumbugBox3160\KevinGH\RequirementChecker;
+namespace HumbugBox402\KevinGH\RequirementChecker;
 
 use function array_shift;
 use function count;
@@ -94,6 +94,10 @@ final class Printer
         }
         $message = wordwrap($message, $this->width);
         $message = sprintf('%s%s%s', $this->supportColors && isset($this->styles[$style]) ? $this->styles[$style] : '', $message, $this->supportColors ? $this->styles['reset'] : '');
-        echo $message;
+        if (\getenv('BOX_REQUIREMENTS_CHECKER_LOG_TO_STDOUT') === '1') {
+            echo $message;
+        } else {
+            \fwrite(\STDERR, $message);
+        }
     }
 }
