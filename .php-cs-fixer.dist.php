@@ -28,6 +28,7 @@ $config = (new PhpCsFixer\Config())
                 'try',
             ],
         ],
+        'blank_line_between_import_groups' => false,
         'combine_consecutive_issets' => true,
         'combine_consecutive_unsets' => true,
         'compact_nullable_typehint' => true,

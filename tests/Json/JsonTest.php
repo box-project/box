@@ -28,6 +28,7 @@ use Webmozart\Assert\Assert;
 
 /**
  * @covers \KevinGH\Box\Json\Json
+ *
  * @requires extension mbstring
  */
 class JsonTest extends FileSystemTestCase

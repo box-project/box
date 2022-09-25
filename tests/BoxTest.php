@@ -1334,6 +1334,7 @@ class BoxTest extends FileSystemTestCase
 
     /**
      * @dataProvider compressionAlgorithmsProvider
+     *
      * @requires extension zlib
      * @requires extension bz2
      */

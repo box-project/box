@@ -30,6 +30,7 @@ use function sprintf;
 
 /**
  * @covers \KevinGH\Box\Configuration\Configuration
+ *
  * @group config
  */
 class ConfigurationFileTest extends ConfigurationTestCase

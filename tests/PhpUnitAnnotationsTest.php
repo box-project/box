@@ -24,6 +24,7 @@ use Symfony\Component\Process\Process;
 
 /**
  * @runInSeparateProcess
+ *
  * @coversNothing
  */
 class PhpUnitAnnotationsTest extends TestCase

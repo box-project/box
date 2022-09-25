@@ -54,6 +54,7 @@ use function strtolower;
 /**
  * @covers \KevinGH\Box\Configuration\Configuration
  * @covers \KevinGH\Box\MapFile
+ *
  * @group config
  */
 class ConfigurationTest extends ConfigurationTestCase

@@ -66,7 +66,7 @@ final class Json
         }
 
         return false === $assoc ? (object) $data : $data;   // If JSON is an empty JSON json_decode returns an empty
-                                                            // array instead of an stdClass instance
+        // array instead of an stdClass instance
     }
 
     /**
