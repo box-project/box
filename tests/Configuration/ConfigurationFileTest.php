@@ -1734,7 +1734,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
     {
         $config = Configuration::create(
             $configPath = self::FIXTURES_DIR.'/dir000/box.json',
-            json_decode(file_get_contents($configPath), false),
+            json_decode(file_get_contents($configPath)),
         );
 
         $this->assertSame([], $config->getRecommendations());
@@ -1745,7 +1745,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
     {
         $config = Configuration::create(
             $configPath = self::FIXTURES_DIR.'/dir001/box.json',
-            json_decode(file_get_contents($configPath), false),
+            json_decode(file_get_contents($configPath)),
         );
 
         $this->assertTrue($config->dumpAutoload());
@@ -1800,7 +1800,12 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_a_warning_is_given_when_the_installed_json_is_found_and_the_composer_lock_is_not(): void
     {
-        $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir003/box.json', json_decode(file_get_contents($configPath), null, 512, JSON_THROW_ON_ERROR));
+        $configPath = self::FIXTURES_DIR.'/dir003/box.json';
+
+        $config = Configuration::create(
+            $configPath,
+            json_decode(file_get_contents($configPath)),
+        );
 
         $this->assertFalse($config->dumpAutoload());
 
@@ -1816,7 +1821,12 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_no_warning_is_given_when_the_installed_json_is_found_and_the_composer_lock_is_not_and_the_dump_autoload_disabled(): void
     {
-        $config = Configuration::create($configPath = self::FIXTURES_DIR.'/dir004/box.json', json_decode(file_get_contents($configPath), null, 512, JSON_THROW_ON_ERROR));
+        $configPath = self::FIXTURES_DIR.'/dir004/box.json';
+
+        $config = Configuration::create(
+            $configPath,
+            json_decode(file_get_contents($configPath)),
+        );
 
         $this->assertFalse($config->dumpAutoload());
 

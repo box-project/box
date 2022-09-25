@@ -29,7 +29,6 @@ use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\get_phar_compression_algorithms;
 use KevinGH\Box\PharInfo\PharInfo;
-use natural;
 use Phar;
 use PharData;
 use PharFileInfo;
@@ -309,7 +308,7 @@ final class Info implements Command
         OutputInterface $output,
         iterable $list,
         int $depth,
-        int|natural $maxDepth,
+        int $maxDepth,
         int|false $indent,
         string $base,
         Phar|PharData $phar,
