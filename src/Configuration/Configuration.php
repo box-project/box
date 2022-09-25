@@ -223,7 +223,7 @@ final class Configuration
     private const SHEBANG_KEY = 'shebang';
     private const STUB_KEY = 'stub';
     private int|string|null $compressionAlgorithm;
-    private readonly ?string $mainScriptPath;
+    private ?string $mainScriptPath;
     private readonly ?string $mainScriptContents;
 
     public static function create(?string $file, stdClass $raw): self
@@ -427,13 +427,13 @@ final class Configuration
      * @param string[]      $recommendations
      */
     private function __construct(
-        private readonly ?string $file,
+        private ?string $file,
         private readonly string $alias,
         private readonly string $basePath,
         private ComposerFile $composerJson,
         private ComposerFile $composerLock,
-        private readonly array $files,
-        private readonly array $binaryFiles,
+        private array $files,
+        private array $binaryFiles,
         private readonly bool $autodiscoveredFiles,
         private readonly bool $dumpAutoload,
         private readonly bool $excludeComposerFiles,
@@ -445,17 +445,17 @@ final class Configuration
         ?string $mainScriptContents,
         private readonly MapFile $fileMapper,
         private readonly mixed $metadata,
-        private readonly string $tmpOutputPath,
-        private readonly string $outputPath,
+        private string $tmpOutputPath,
+        private string $outputPath,
         private readonly ?string $privateKeyPassphrase,
-        private readonly ?string $privateKeyPath,
+        private ?string $privateKeyPath,
         private readonly bool $promptForPrivateKey,
         private readonly array $processedReplacements,
         private readonly ?string $shebang,
         private int|string $signingAlgorithm,
         private readonly ?string $stubBannerContents,
-        private readonly ?string $stubBannerPath,
-        private readonly ?string $stubPath,
+        private ?string $stubBannerPath,
+        private ?string $stubPath,
         private readonly bool $isInterceptFileFuncs,
         private readonly bool $isStubGenerated,
         private readonly bool $checkRequirements,
