@@ -55,7 +55,7 @@ class DocumentationSchemaTest extends TestCase
             ),
         );
 
-        $this->assertSame($schemaKeys, $docKeys);
+        $this->assertSame($schemaKeys, ['$schema', ...$docKeys]);
     }
 
     public function test_all_the_doc_keys_are_valid(): void
@@ -90,7 +90,7 @@ class DocumentationSchemaTest extends TestCase
             ),
         );
 
-        $this->assertEquals($schemaKeys, $docKeys);
+        $this->assertEquals($schemaKeys, '$schema', ...$docKeys]);
     }
 
     /**

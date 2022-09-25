@@ -18,13 +18,13 @@ compressed) requirements checker which will be executed when starting your PHAR.
 The following are screenshots of the output when an error occurs (left) in a non-quiet verbosity and when all
 requirements are passing on the right in debug verbosity.
 
-<p align="center">
-    <img src="img/requirement-checker.png" width=900 />
-</p>
+![Requirements Checker KO](img/requirement-checker_1.png)
+![Requirements Checker OK](img/requirement-checker_2.png)
 
-**Warning**: this check is still done within the PHAR. As a result, if
-[the required extension to open the PHAR][compression] due to the compression algorithm is not loaded, a hard failure
-will still appear: the requirement checker _cannot_ be executed before that.
+!!! Warning
+     this check is still done within the PHAR. As a result, if [the required extension to open the PHAR][compression]
+     due to the compression algorithm is not loaded, a hard failure will still appear: 
+     the requirement checker _cannot_ be executed before that.
 
 
 ## Configuration

@@ -115,7 +115,7 @@ bootstrapping file).
 When you have a main script file that can be used as a [stub][stub], you can disable the main script by setting it to
 false:
 
-```
+```json
 {
     "stub": "bin/acme.php",
     "main": false
@@ -156,9 +156,10 @@ constraint before running. See more information about it [here][requirement-chec
 the requirement checker will be added. Note that this is true only if either the `composer.json`  or `composer.lock`
 could have been found.
 
-**Warning**: this check is still done within the PHAR. As a result, if 
-[the required extension to open the PHAR][compression] due to the compression algorithm is not loaded, a hard failure
-will still appear: the requirement checker _cannot_ be executed before that.
+!!! Warning 
+    this check is still done within the PHAR. As a result, if [the required extension to open the PHAR][compression]
+    due to the compression algorithm is not loaded, a hard failure will still appear: the requirement 
+    checker _cannot_ be executed before that.
 
 
 ## Including files
@@ -176,13 +177,15 @@ If [`directories`][directories] or [`finder`][finder] is set (this includes empt
 guess which files should be included or not (unless you [force the auto-discovery][force-autodiscovery]) and will give
 you full control on it instead.
 
-**Note:** By default, dev dependencies are excluded for both strategies. However if you still which to include a file
-or directory from a dev dependency, you can do so by adding it via one of the following setting: [`files`][files],
-[`files-bin`][files], [`directories`][directories] or [`directories-bin`][directories].
+!!! Note
+    By default, dev dependencies are excluded for both strategies. However if you still which to include a file
+    or directory from a dev dependency, you can do so by adding it via one of the following setting: [`files`][files],
+    [`files-bin`][files], [`directories`][directories] or [`directories-bin`][directories].
 
 
-**Warning:** binary files are added _before_ regular files. As a result if a file is found in both regular files and
-binary files, the regular file will take precedence.
+!!! Warning
+    binary files are added _before_ regular files. As a result if a file is found in both regular files and
+    binary files, the regular file will take precedence.
 
 
 ### Force auto-discovery (`force-autodiscovery`)
@@ -207,6 +210,9 @@ This setting is not affected by the [`blacklist`][blacklist] setting.
 such as images, those that contain binary data or simply a file you do not want to alter at all despite using
 [compactors][compactors].
 
+!!! Warning
+    Symlinks are not followed/supported.
+
 
 ### Directories (`directories` and `directories-bin`)
 
@@ -219,6 +225,19 @@ Files listed in the [`blacklist`][blacklist] will not be added to the PHAR.
 `directories-bin` is analogue to `directories` except the files are added to the PHAR unmodified. This is suitable for
 the files such as images, those that contain binary data or simply a file you do not want to alter at all despite using
 compactors.
+
+!!! Warning 
+    Setting the key `directories` (regardless of its value), will disable the file auto-discovery. If you want
+    to keep it, check the [force the auto-discovery][force-autodiscovery] setting.
+
+!!! Warning
+    By default Box excludes some files (e.g. dot files, readmes & co). This is done in order to attempt to
+    reduce the final PHAR size. There is at the moment no way to disable this (maybe this could be done via a new setting)
+    but it remains possible to include them via [`files`][files], [`files-bin`][files], `directories-bin` or your own
+    [`finder`][finder] or [`finder-bin`][finder].
+
+!!! Warning 
+    Symlinks are not followed/supported.
 
 
 ### Finder (`finder` and `finder-bin`)
@@ -233,6 +252,13 @@ account for the files registered in the [`blacklist`][blacklist].
 `finder-bin` is analogue to `finder` except the files are added to the PHAR unmodified. This is suitable for the files
 such as images, those that contain binary data or simply a file you do not want to alter at all despite using
 [compactors][compactors].
+
+!!! Warning
+    Setting the key `finder` (regardless of its value), will disable the file auto-discovery. If you want
+    to keep it, check the [force the auto-discovery][force-autodiscovery] setting.
+
+!!! Warning
+    Symlinks are not followed/supported.
 
 Example:
 
@@ -305,7 +331,7 @@ project/
     └── B01
 ```
 
-You you want a more granular blacklist leverage the [Finders configuration][finder] instead.
+If you want a more granular blacklist leverage, use the [Finders configuration][finder] instead.
 
 
 ### Excluding the Composer files (`exclude-composer-files`)
@@ -417,7 +443,7 @@ The intercept (`boolean`|`null` default `false`) setting is used when generating
 
 ### Alias (`alias`)
 
-The `alias` (`string`|`null`) setting is used when generating a new stub to call the [`Phar::mapPhar()`](phar.mapphar).
+The `alias` (`string`|`null`) setting is used when generating a new stub to call the [`Phar::mapPhar()`][phar.mapphar].
 This makes it easier to refer to files in the PHAR and ensure the access to internal files will always work regardless
 of the location of the PHAR on the file system.
 
@@ -716,9 +742,10 @@ compression affects the individual files within the PHAR and not the PHAR as a w
 - `BZ2`
 - `NONE` (default)
 
-**Warning**: be aware that if compressed, the PHAR will required the appropriate extension ([`zlib`][zlib-extension] for
-`GZ` and [`bz2`][bz2-extension] for `BZ2`) to execute the PHAR. Without it, PHP will _not_ be able to open the PHAR at
-all.
+!!! Warning
+    Be aware that if compressed, the PHAR will required the appropriate extension ([`zlib`][zlib-extension] for
+    `GZ` and [`bz2`][bz2-extension] for `BZ2`) to execute the PHAR. Without it, PHP will _not_ be able to open the PHAR
+    at all.
 
 
 ## Security

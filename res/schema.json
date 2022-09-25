@@ -4,6 +4,10 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
+        "$schema": {
+            "description": "JSON schema location, e.g. ``vendor\/humbug\/box\/res\/schema.json``",
+            "type": [ "string", "null"]
+        },
         "algorithm": {
             "description": "The algorithm to use for signing the PHAR.",
             "type": ["string", "null"]

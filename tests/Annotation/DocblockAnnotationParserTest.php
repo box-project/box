@@ -70,5 +70,16 @@ class DocblockAnnotationParserTest extends TestCase
             ,
             ['@Kept'],
         ];
+
+        yield [
+            <<<'DOCBLOCK'
+                /**
+                 * @IGNORED
+                 * @Kept
+                 */
+                DOCBLOCK
+            ,
+            ['@Kept'],
+        ];
     }
 }

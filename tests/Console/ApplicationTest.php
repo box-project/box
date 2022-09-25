@@ -136,4 +136,14 @@ class ApplicationTest extends TestCase
             DisplayNormalizer::createReplaceBoxVersionNormalizer(),
         );
     }
+
+    public function test_can_give_its_long_version(): void
+    {
+        $defaultApplication = new Application();
+
+        self::assertMatchesRegularExpression(
+            '/^<info>Box<\/info> version <comment>.+@[a-z\d]{7}<\/comment>$/',
+            $defaultApplication->getLongVersion(),
+        );
+    }
 }

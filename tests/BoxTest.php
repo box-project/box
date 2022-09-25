@@ -156,6 +156,16 @@ class BoxTest extends FileSystemTestCase
         $this->assertSame($expectedContents, $actualContents);
     }
 
+    public function test_it_ensures_a_phar_cannot_be_empty(): void
+    {
+        $this->box->startBuffering();
+        $this->box->endBuffering(noop());
+
+        $expectedPharPath = 'phar://test.phar/.box_empty';
+
+        $this->assertFileExists($expectedPharPath);
+    }
+
     public function test_it_can_add_a_file_to_the_phar_in_a_new_buffering_process_does_not_remove_the_previous_files(): void
     {
         $file0 = 'file0';

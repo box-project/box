@@ -1,7 +1,19 @@
-
 # From 4.0 to 4.1.0
 
 - The requirements checker now logs its output to `stderr` instead of `stdout` per default. Set `BOX_REQUIREMENTS_CHECKER_LOG_TO_STDOUT=1` to restore the old behaviour.
+
+
+# From 3.x to 4.x
+
+- Bump to PHP 8.1 #613
+- Remove the build command (#623): the `build` command has been deprecated since 3.0.0 in favour of `compile`.
+- Remove support for legacy compactors (#626). Here are the replacements:
+  - `Herrera\Box\Compactor\Json` -> `KevinGH\Box\Compactor\Json` 
+  - `Herrera\Box\Compactor\Php` -> `KevinGH\Box\Compactor\Php`
+- Drop PHP5.3 support for the RequirementChecker - new min is 7.2.4+ (#674). This is to align the project with Composer.
+  It is technically possible to restore support for PHP5.3 but requires some work, see
+  https://github.com/box-project/box/issues/656#issuecomment-1164471935.
+- Require sodium & Remove sodium compat layer (#628)
 
 
 # From 3.1.3 to 3.2.0

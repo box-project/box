@@ -75,13 +75,13 @@ tu_requirement_checker: requirement-checker/bin/phpunit requirement-checker/actu
 .PHONY: tc
 tc:			 ## Runs the unit tests with code coverage
 tc: bin/phpunit
-	phpdbg -qrr -d zend.enable_gc=0 bin/phpunit --coverage-html=dist/coverage --coverage-text
+	php -d zend.enable_gc=0 bin/phpunit --coverage-html=dist/coverage --coverage-text
 
 .PHONY: tm
 INFECTION=vendor-bin/infection/vendor/bin/infection
 tm:			 ## Runs Infection
 tm:	$(TU_BOX_DEPS) $(INFECTION)
-	$(PHPNOGC) $(INFECTION) --threads=$(shell nproc || sysctl -n hw.ncpu || 1) --only-covered
+	$(PHPNOGC) $(INFECTION) --threads=$(shell nproc || sysctl -n hw.ncpu || 1) --only-covered --only-covering-test-cases $$INFECTION_FLAGS
 
 .PHONY: e2e
 e2e:			 ## Runs all the end-to-end tests
@@ -302,6 +302,17 @@ blackfire: box
 
 	# Profile compiling the PHAR from the PHAR
 	blackfire --reference=2 --samples=5 run $(PHPNOGC) -d box compile --quiet
+
+
+.PHONY: serve
+serve:
+	@echo "To install mkdocs ensure you have Python3 & pip3 and run `pip install mkdocs mkdocs-material`"
+	mkdocs serve
+
+
+.PHONY: build-website
+website: doc
+	mkdocs build
 
 
 #

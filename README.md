@@ -9,8 +9,6 @@
 [![Slack](https://img.shields.io/badge/slack-%23humbug-red.svg?style=flat-square)](https://symfony.com/slack-invite)
 [![License](https://img.shields.io/badge/license-MIT-red.svg?style=flat-square)](LICENSE)
 
-Fork of the unmaintained [box2 project][box2]. This project needs your help!
-
 Upgrading from [Box2][box2]? Checkout the [upgrade guide](UPGRADE.md#from-27-to-30)!
 
 ## Goal
@@ -29,6 +27,8 @@ great things:
 - 🕵️️ Get recommendations and warnings about regarding your configuration (`box validate`)
 - 🐳 [Docker support (`box docker`)](doc/docker.md#docker-support)
 
+For the full documentation see https://box-project.github.io/box.
+
 
 ## Table of Contents
 
@@ -38,7 +38,7 @@ great things:
     1. [Composer](doc/installation.md#composer)
     1. [Homebrew](doc/installation.md#homebrew)
 1. [Usage](#usage)
-1. [Configuration][configuration]
+1. [Configuration](doc/configuration.md#configuration)
     1. [Base path (`base-path`)](doc/configuration.md#base-path-base-path)
     1. [Main (`main`)](doc/configuration.md#main-main)
     1. [Output (`output`)](doc/configuration.md#output-output)
@@ -95,6 +95,7 @@ great things:
     1. [Debugging the scoping](doc/code-isolation.md#debugging-the-scoping)
 1. [Docker support](doc/docker.md#docker-support)
 1. [Symfony support](doc/symfony.md#symfony-support)
+1. [FAQ](doc/faq.md#faq)
 1. [Contributing](#contributing)
 1. [Upgrade guide](UPGRADE.md#from-27-to-30)
 1. [Backward Compatibility Promise (BCP)](#backward-compatibility-promise-bcp)
@@ -146,7 +147,6 @@ Project originally created by: [Kevin Herrera] ([@kherge]) which has now been mo
 
 
 [box2]: https://github.com/box-project/box2
-[configuration]: doc/configuration.md#configuration
 [Kevin Herrera]: https://github.com/kherge
 [@kherge]: https://github.com/kherge
 [humbug]: https://github.com/humbug

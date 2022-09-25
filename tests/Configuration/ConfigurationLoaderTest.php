@@ -16,6 +16,7 @@ namespace KevinGH\Box\Configuration;
 
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\touch;
+use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\Test\FileSystemTestCase;
 
 /**
@@ -51,5 +52,15 @@ class ConfigurationLoaderTest extends FileSystemTestCase
             Configuration::class,
             $this->loader->loadFile(null),
         );
+    }
+
+    public function test_it_cannot_load_an_invalid_config_file(): void
+    {
+        touch('index.php');
+        dump_file('box.json.dist', '{"foo": "bar"}');
+
+        $this->expectException(JsonValidationException::class);
+
+        $this->loader->loadFile('box.json.dist');
     }
 }

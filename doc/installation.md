@@ -5,6 +5,7 @@
 1. [Composer](#composer)
 1. [Homebrew](#homebrew)
 
+
 ## PHAR
 
 The preferred method of installation is to use the Box PHAR which can be downloaded from the most recent
@@ -16,13 +17,13 @@ The preferred method of installation is to use the Box PHAR which can be downloa
 You can install Box with [Phive][phive]
 
 ```bash
-$ phive install humbug/box --force-accept-unsigned
+$ phive install humbug/box
 ```
 
 To upgrade `box` use the following command:
 
 ```bash
-$ phive update humbug/box --force-accept-unsigned
+$ phive update humbug/box
 ```
 
 
@@ -68,7 +69,7 @@ $ brew upgrade box
 <br />
 <hr />
 
-« [Table of Contents](../README.md#table-of-contents) • [Configuration](configuration.md#configuration) »
+« [Table of Contents](/) • [Usage](usage.md) »
 
 
 [releases]: https://github.com/humbug/box/releases
