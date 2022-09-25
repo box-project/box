@@ -16,7 +16,6 @@ namespace KevinGH\Box\Configuration;
 
 use function array_keys;
 use function trim;
-
 use Webmozart\Assert\Assert;
 
 /**

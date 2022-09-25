@@ -21,17 +21,12 @@ use function array_merge;
 use function array_unique;
 use function array_values;
 use function json_decode;
-
 use const JSON_THROW_ON_ERROR;
-
 use function KevinGH\Box\FileSystem\file_contents;
-
 use PHPUnit\Framework\TestCase;
-
 use function preg_match;
 use function preg_match_all;
 use function sort;
-
 use Webmozart\Assert\Assert;
 
 /**

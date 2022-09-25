@@ -19,25 +19,17 @@ use function array_slice;
 use function array_splice;
 use function count;
 use function is_int;
-
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
-
 use function ltrim;
-
 use PhpToken;
-
 use function preg_replace;
-
 use RuntimeException;
-
 use function str_repeat;
 use function substr;
 use function substr_count;
-
 use const T_COMMENT;
 use const T_DOC_COMMENT;
 use const T_WHITESPACE;
-
 use Webmozart\Assert\Assert;
 
 /**

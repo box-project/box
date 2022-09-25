@@ -17,29 +17,19 @@ namespace KevinGH\Box\Composer;
 use Fidry\Console\Input\IO;
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
-
 use KevinGH\Box\Console\Logger\CompilerLogger;
-
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
-
 use KevinGH\Box\NotInstantiable;
-
 use const PHP_EOL;
-
 use function preg_replace;
-
 use RuntimeException;
-
 use function str_replace;
-
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
-
 use function trim;
 
 /**

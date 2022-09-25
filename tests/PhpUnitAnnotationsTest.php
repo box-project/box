@@ -17,13 +17,9 @@ namespace KevinGH\Box;
 use function array_filter;
 use function chdir;
 use function explode;
-
 use const PHP_EOL;
-
 use PHPUnit\Framework\TestCase;
-
 use function shell_exec;
-
 use Symfony\Component\Process\Process;
 
 /**

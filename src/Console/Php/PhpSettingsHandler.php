@@ -15,24 +15,17 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Php;
 
 use Composer\XdebugHandler\XdebugHandler;
-
 use function getenv;
 use function ini_get;
 use function ini_set;
-
 use const KevinGH\Box\BOX_MEMORY_LIMIT;
-
 use function KevinGH\Box\FileSystem\append_to_file;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\memory_to_bytes;
-
 use const PHP_EOL;
-
 use Psr\Log\LoggerInterface;
-
 use function sprintf;
 use function trim;
-
 use Webmozart\Assert\Assert;
 
 /**

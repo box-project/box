@@ -16,9 +16,7 @@ namespace KevinGH\Box\Compactor;
 
 use function in_array;
 use function pathinfo;
-
 use const PATHINFO_EXTENSION;
-
 use Webmozart\Assert\Assert;
 
 /**

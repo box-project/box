@@ -16,12 +16,9 @@ namespace KevinGH\Box\RequirementChecker;
 
 use function KevinGH\Box\FileSystem\file_contents;
 use function str_replace;
-
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-
 use function var_export;
-
 use Webmozart\Assert\Assert;
 
 /**

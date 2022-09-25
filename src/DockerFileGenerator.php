@@ -17,13 +17,10 @@ namespace KevinGH\Box;
 use function array_column;
 use function array_filter;
 use function basename;
-
 use Composer\Semver\Semver;
-
 use function implode;
 use function Safe\sprintf;
 use function str_replace;
-
 use UnexpectedValueException;
 use Webmozart\Assert\Assert;
 

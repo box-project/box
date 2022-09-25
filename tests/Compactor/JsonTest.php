@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Compactor;
 
 use PHPUnit\Framework\TestCase;
-
 use function serialize;
 use function unserialize;
 

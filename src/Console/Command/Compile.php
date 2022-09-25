@@ -15,45 +15,35 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Amp\MultiReasonException;
-
 use function array_map;
 use function array_search;
 use function array_shift;
 use function count;
 use function decoct;
 use function explode;
-
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\CommandAware;
 use Fidry\Console\Command\CommandAwareness;
 use Fidry\Console\Command\Configuration as CommandConfiguration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
-
 use function file_exists;
 use function filesize;
-
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-
 use function implode;
 use function is_callable;
 use function is_string;
-
 use KevinGH\Box\Amp\FailureCollector;
 use KevinGH\Box\Box;
-
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
-
 use function KevinGH\Box\bump_open_file_descriptor_limit;
 use function KevinGH\Box\check_php_settings;
-
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Composer\ComposerConfiguration;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\Logger\CompilerLogger;
 use KevinGH\Box\Console\MessageRenderer;
-
 use function KevinGH\Box\disable_parallel_processing;
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -63,31 +53,22 @@ use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\format_time;
 use function KevinGH\Box\get_phar_compression_algorithms;
-
 use KevinGH\Box\MapFile;
 use KevinGH\Box\RequirementChecker\RequirementsDumper;
 use KevinGH\Box\StubGenerator;
-
 use function memory_get_peak_usage;
 use function memory_get_usage;
 use function microtime;
-
 use const PHP_EOL;
-
 use function putenv;
-
 use RuntimeException;
-
 use function sprintf;
-
 use stdClass;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
-
 use function var_export;
-
 use Webmozart\Assert\Assert;
 
 /**

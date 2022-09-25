@@ -15,9 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\RequirementChecker;
 
 use function json_decode;
-
 use const JSON_THROW_ON_ERROR;
-
 use Phar;
 use PHPUnit\Framework\TestCase;
 

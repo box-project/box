@@ -17,10 +17,8 @@ namespace KevinGH\Box\Console\Command;
 use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
 use KevinGH\Box\Console\DisplayNormalizer;
-
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\touch;
-
 use KevinGH\Box\Test\CommandTestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 

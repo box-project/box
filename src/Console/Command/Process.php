@@ -18,34 +18,25 @@ use function array_map;
 use function array_shift;
 use function array_unshift;
 use function explode;
-
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration as ConsoleConfiguration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
-
 use function getcwd;
-
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-
 use function implode;
-
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
-
 use function KevinGH\Box\check_php_settings;
-
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
 use KevinGH\Box\Configuration\Configuration;
-
 use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use function putenv;
 use function sprintf;
-
 use stdClass;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;

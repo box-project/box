@@ -17,18 +17,14 @@ namespace KevinGH\Box\Console\Command;
 use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Test\OutputAssertions;
-
 use function getenv;
 use function implode;
-
 use InvalidArgumentException;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
-
 use function preg_replace;
 use function realpath;
 use function str_replace;
-
 use Symfony\Component\Console\Output\OutputInterface;
 use UnexpectedValueException;
 

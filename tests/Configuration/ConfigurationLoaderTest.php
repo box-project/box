@@ -16,7 +16,6 @@ namespace KevinGH\Box\Configuration;
 
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\touch;
-
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\Test\FileSystemTestCase;
 

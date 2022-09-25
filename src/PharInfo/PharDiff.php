@@ -16,17 +16,12 @@ namespace KevinGH\Box\PharInfo;
 
 use function array_diff;
 use function array_map;
-
 use const DIRECTORY_SEPARATOR;
-
 use function implode;
 use function iterator_to_array;
-
 use ParagonIE\Pharaoh\PharDiff as ParagoniePharDiff;
 use SplFileInfo;
-
 use function str_replace;
-
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
 

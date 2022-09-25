@@ -24,33 +24,23 @@ use function array_merge;
 use function array_unique;
 use function array_values;
 use function array_walk;
-
 use Closure;
-
 use function constant;
 use function current;
-
 use DateTimeImmutable;
 use DateTimeZone;
-
 use function defined;
 use function dirname;
-
 use const E_USER_DEPRECATED;
-
 use function explode;
 use function file_exists;
 use function getcwd;
-
 use Humbug\PhpScoper\Configuration\Configuration as PhpScoperConfiguration;
 use Humbug\PhpScoper\Container;
-
 use function implode;
 use function in_array;
 use function intval;
-
 use InvalidArgumentException;
-
 use function is_array;
 use function is_bool;
 use function is_file;
@@ -61,7 +51,6 @@ use function is_string;
 use function iter\map;
 use function iter\toArray;
 use function iter\values;
-
 use KevinGH\Box\Annotation\CompactedFormatter;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
 use KevinGH\Box\Compactor\Compactor;
@@ -71,7 +60,6 @@ use KevinGH\Box\Compactor\PhpScoper as PhpScoperCompactor;
 use KevinGH\Box\Composer\ComposerConfiguration;
 use KevinGH\Box\Composer\ComposerFile;
 use KevinGH\Box\Composer\ComposerFiles;
-
 use function KevinGH\Box\FileSystem\canonicalize;
 use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\is_absolute_path;
@@ -81,38 +69,26 @@ use function KevinGH\Box\FileSystem\make_path_relative;
 use function KevinGH\Box\get_box_version;
 use function KevinGH\Box\get_phar_compression_algorithms;
 use function KevinGH\Box\get_phar_signing_algorithms;
-
 use KevinGH\Box\Json\Json;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\PhpScoper\SerializableScoper;
-
 use function KevinGH\Box\unique_id;
 use function krsort;
-
 use Phar;
 use phpDocumentor\Reflection\DocBlockFactory;
-
 use function preg_match;
 use function preg_replace;
 use function property_exists;
 use function realpath;
-
 use RuntimeException;
 use Seld\JsonLint\ParsingException;
-
 use function sort;
-
 use const SORT_STRING;
-
 use SplFileInfo;
-
 use function sprintf;
-
 use stdClass;
-
 use function str_starts_with;
 use function strtoupper;
-
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo as SymfonySplFileInfo;
 use Symfony\Component\Process\Exception\ProcessFailedException;
@@ -120,10 +96,8 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Throwable;
-
 use function trigger_error;
 use function trim;
-
 use Webmozart\Assert\Assert;
 
 /**

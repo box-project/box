@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use function count;
-
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration as ConsoleConfiguration;
 use Fidry\Console\ExitCode;
@@ -25,9 +24,7 @@ use KevinGH\Box\Console\ConfigurationLoader;
 use KevinGH\Box\Console\ConfigurationLocator;
 use KevinGH\Box\Console\MessageRenderer;
 use KevinGH\Box\Json\JsonValidationException;
-
 use function sprintf;
-
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;

@@ -18,17 +18,13 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
-
 use function file_exists;
 use function KevinGH\Box\create_temporary_phar;
 use function KevinGH\Box\FileSystem\copy;
 use function KevinGH\Box\FileSystem\remove;
-
 use Phar;
-
 use function realpath;
 use function sprintf;
-
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Filesystem\Path;
 use Throwable;

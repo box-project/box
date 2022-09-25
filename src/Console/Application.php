@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console;
 
 use Fidry\Console\Application\Application as FidryApplication;
-
 use function KevinGH\Box\get_box_version;
 use function sprintf;
 use function trim;

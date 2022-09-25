@@ -18,14 +18,10 @@ use function array_filter;
 use function array_key_last;
 use function array_sum;
 use function count;
-
 use Fidry\Console\Input\IO;
-
 use function KevinGH\Box\format_size;
-
 use KevinGH\Box\NotInstantiable;
 use KevinGH\Box\PharInfo\PharInfo;
-
 use function key;
 use function round;
 use function Safe\filesize;

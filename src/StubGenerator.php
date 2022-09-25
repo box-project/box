@@ -17,7 +17,6 @@ namespace KevinGH\Box;
 use function addcslashes;
 use function implode;
 use function str_replace;
-
 use Webmozart\Assert\Assert;
 
 /**

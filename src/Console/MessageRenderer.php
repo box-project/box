@@ -16,12 +16,9 @@ namespace KevinGH\Box\Console;
 
 use function array_map;
 use function count;
-
 use Fidry\Console\Input\IO;
 use KevinGH\Box\NotInstantiable;
-
 use function sprintf;
-
 use Webmozart\Assert\Assert;
 
 /**

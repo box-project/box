@@ -18,44 +18,32 @@ use function array_key_exists;
 use function bin2hex;
 use function class_alias;
 use function class_exists;
-
 use Closure;
 use Composer\InstalledVersions;
-
 use function constant;
 use function define;
 use function defined;
-
 use ErrorException;
 use Fidry\Console\Input\IO;
-
 use function floor;
 use function function_exists;
 use function is_float;
 use function is_int;
-
 use KevinGH\Box\Console\Php\PhpSettingsHandler;
-
 use function KevinGH\Box\FileSystem\copy;
 use function log;
 use function number_format;
-
 use const PATHINFO_EXTENSION;
-
 use Phar;
-
 use function posix_getrlimit;
-
 use const POSIX_RLIMIT_INFINITY;
 use const POSIX_RLIMIT_NOFILE;
-
 use function posix_setrlimit;
 use function random_bytes;
 use function sprintf;
 use function str_replace;
 use function strlen;
 use function strtolower;
-
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;

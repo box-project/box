@@ -15,24 +15,17 @@ declare(strict_types=1);
 namespace KevinGH\Box\Configuration;
 
 use function chdir;
-
 use const DIRECTORY_SEPARATOR;
-
 use function file_get_contents;
-
 use InvalidArgumentException;
-
 use const JSON_THROW_ON_ERROR;
-
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\FileSystem\symlink;
 use function KevinGH\Box\FileSystem\touch;
-
 use KevinGH\Box\Json\JsonValidationException;
-
 use function Safe\json_decode;
 use function sprintf;
 

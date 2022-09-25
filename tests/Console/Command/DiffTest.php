@@ -20,14 +20,10 @@ use Fidry\Console\ExitCode;
 use InvalidArgumentException;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
-
 use function ob_get_clean;
 use function ob_start;
-
 use const PHP_VERSION_ID;
-
 use function realpath;
-
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use UnexpectedValueException;

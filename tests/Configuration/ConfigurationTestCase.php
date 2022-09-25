@@ -15,19 +15,13 @@ declare(strict_types=1);
 namespace KevinGH\Box\Configuration;
 
 use function json_encode;
-
 use const JSON_PRETTY_PRINT;
-
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\touch;
-
 use KevinGH\Box\Test\FileSystemTestCase;
-
 use const PHP_OS;
-
 use stdClass;
-
 use function stripos;
 
 abstract class ConfigurationTestCase extends FileSystemTestCase
