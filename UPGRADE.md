@@ -1,5 +1,5 @@
 
-# From 3.16.0 to 3.17.0
+# From 4.0 to 4.1.0
 
 - The requirements checker now logs its output to `stderr` instead of `stdout` per default. Set `BOX_REQUIREMENTS_CHECKER_LOG_TO_STDOUT=1` to restore the old behaviour.
 
