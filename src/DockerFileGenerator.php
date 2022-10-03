@@ -20,7 +20,6 @@ use function basename;
 use Composer\Semver\Semver;
 use function implode;
 use function Safe\sprintf;
-use function str_replace;
 use UnexpectedValueException;
 use Webmozart\Assert\Assert;
 
@@ -32,7 +31,8 @@ final class DockerFileGenerator
     private const FILE_TEMPLATE = <<<'Dockerfile'
         FROM php:__BASE_PHP_IMAGE_TOKEN__
 
-        RUN $(php -r '$extensionInstalled = array_map("strtolower", \get_loaded_extensions(false));$requiredExtensions = __PHP_EXTENSIONS_TOKEN__;$extensionsToInstall = array_diff($requiredExtensions, $extensionInstalled);if ([] !== $extensionsToInstall) {echo \sprintf("docker-php-ext-install %s", implode(" ", $extensionsToInstall));}echo "echo \"No extensions\"";')
+        COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+        RUN /usr/bin/install-php-extensions __REQUIRED_EXTENSIONS__
 
         COPY __PHAR_FILE_PATH_TOKEN__ /__PHAR_FILE_NAME_TOKEN__
 
@@ -92,41 +92,12 @@ final class DockerFileGenerator
 
     public function generateStub(): string
     {
-        $contents = self::FILE_TEMPLATE;
-
-        $contents = str_replace(
-            '__BASE_PHP_IMAGE_TOKEN__',
-            $this->image,
-            $contents,
-        );
-
-        $contents = str_replace(
-            '__PHP_EXTENSIONS_TOKEN__',
-            [] === $this->extensions
-                ? '[]'
-                : sprintf(
-                    '["%s"]',
-                    implode(
-                        '", "',
-                        $this->extensions,
-                    ),
-                ),
-            $contents,
-        );
-
-        $contents = str_replace(
-            '__PHAR_FILE_PATH_TOKEN__',
-            $this->sourcePhar,
-            $contents,
-        );
-
-        $contents = str_replace(
-            '__PHAR_FILE_NAME_TOKEN__',
-            basename($this->sourcePhar),
-            $contents,
-        );
-
-        return $contents;
+        return strtr(self::FILE_TEMPLATE, [
+            '__BASE_PHP_IMAGE_TOKEN__' => $this->image,
+            '__PHAR_FILE_PATH_TOKEN__' => $this->sourcePhar,
+            '__PHAR_FILE_NAME_TOKEN__' => basename($this->sourcePhar),
+            '__REQUIRED_EXTENSIONS__' => implode(" ", $this->extensions)
+        ]);
     }
 
     private static function retrievePhpImageName(array $requirements): string
