@@ -1698,27 +1698,12 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_it_cannot_retrieve_the_git_hash_if_not_in_a_git_repository(): void
     {
-        try {
-            $this->setConfig([
-                'git' => 'git',
-            ]);
-
-            $this->fail('Expected exception to be thrown.');
-        } catch (RuntimeException $exception) {
-            $tmp = $this->tmp;
-
-            // Make the comparison case insensitive since depending of the git version the case may be different
-            $this->assertSame(
-                strtolower(
-                    sprintf(
-                        'The tag or commit hash could not be retrieved from "%s": fatal: Not a git repository '
-                        .'(or any of the parent directories): .git'.PHP_EOL,
-                        $tmp,
-                    ),
-                ),
-                strtolower($exception->getMessage()),
-            );
-        }
+        $regex = strtr('~^The tag or commit hash could not be retrieved from "{path}": fatal: Not a git repository~i', ['{path}' => $this->tmp]);
+        $this->expectExceptionMessageMatches($regex);
+        $this->expectException(RuntimeException::class);
+        $this->setConfig([
+            'git' => 'git',
+        ]);
     }
 
     public function test_a_recommendation_is_given_if_the_configured_git_placeholder_is_the_default_value(): void
