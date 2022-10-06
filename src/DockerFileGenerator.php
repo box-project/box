@@ -92,7 +92,12 @@ final class DockerFileGenerator
 
     public function generateStub(): string
     {
-        return strtr(self::FILE_TEMPLATE, [
+        return strtr(
+            self::FILE_TEMPLATE,
+            [
+                //....
+            ],
+        );
             '__BASE_PHP_IMAGE_TOKEN__' => $this->image,
             '__PHAR_FILE_PATH_TOKEN__' => $this->sourcePhar,
             '__PHAR_FILE_NAME_TOKEN__' => basename($this->sourcePhar),
