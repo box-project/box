@@ -23,6 +23,8 @@ trait RequiresPharReadonlyOff
 {
     private function markAsSkippedIfPharReadonlyIsOn(): void
     {
+        // Should be supported in PHPUnit9 already
+        // TOOD: @require setting is missing from the doc; can contribute
         if (true === (bool) ini_get('phar.readonly')) {
             $this->markTestSkipped(
                 'Requires phar.readonly to be set to 0. Either update your php.ini file or run this test with '
