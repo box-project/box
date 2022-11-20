@@ -49,7 +49,7 @@
         "composer/semver": "^3.2",
         "composer/xdebug-handler": "^3.0",
         "fidry/console": "^0.5.1",
-        "humbug/php-scoper": "^0.17.3",
+        "humbug/php-scoper": "^0.17.3 || ^0.18",
         "justinrainbow/json-schema": "^5.2.9",
         "laravel/serializable-closure": "^1.0",
         "nikic/iter": "^2.0",
