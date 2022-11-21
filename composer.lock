@@ -922,29 +922,27 @@
         },
         {
             "name": "humbug/php-scoper",
-            "version": "0.17.7",
+            "version": "0.18.0-rc.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/humbug/php-scoper.git",
-                "reference": "0760c02bd666e0dc4918e4e7fb1c4c53c47bcf54"
+                "reference": "f7bd92f2459f1d9a643313f6d324476b0e23e087"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/0760c02bd666e0dc4918e4e7fb1c4c53c47bcf54",
-                "reference": "0760c02bd666e0dc4918e4e7fb1c4c53c47bcf54",
+                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/f7bd92f2459f1d9a643313f6d324476b0e23e087",
+                "reference": "f7bd92f2459f1d9a643313f6d324476b0e23e087",
                 "shasum": ""
             },
             "require": {
                 "composer/package-versions-deprecated": "^1.8",
                 "fidry/console": "^0.5.0",
-                "jetbrains/phpstorm-stubs": "^v2022.1",
+                "jetbrains/phpstorm-stubs": "^v2022.2",
                 "nikic/php-parser": "^4.12",
                 "php": "^8.1",
                 "symfony/console": "^5.2 || ^6.0",
                 "symfony/filesystem": "^5.2 || ^6.0",
                 "symfony/finder": "^5.2 || ^6.0",
-                "symfony/polyfill-php80": "^1.23",
-                "symfony/polyfill-php81": "^1.24",
                 "thecodingmachine/safe": "^1.3 || ^2.0"
             },
             "replace": {
@@ -955,7 +953,8 @@
                 "ergebnis/composer-normalize": "^2.28",
                 "humbug/box": "^4.0",
                 "phpspec/prophecy-phpunit": "^2.0",
-                "phpunit/phpunit": "^9.0"
+                "phpunit/phpunit": "^9.0",
+                "symfony/yaml": "^6.1"
             },
             "bin": [
                 "bin/php-scoper"
@@ -963,7 +962,8 @@
             "type": "library",
             "extra": {
                 "bamarni-bin": {
-                    "bin-links": false
+                    "bin-links": false,
+                    "forward-command": false
                 },
                 "branch-alias": {
                     "dev-master": "1.0-dev"
@@ -975,7 +975,10 @@
                 ],
                 "psr-4": {
                     "Humbug\\PhpScoper\\": "src/"
-                }
+                },
+                "classmap": [
+                    "vendor-hotfix/"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -998,9 +1001,9 @@
             "description": "Prefixes all PHP namespaces in a file or directory.",
             "support": {
                 "issues": "https://github.com/humbug/php-scoper/issues",
-                "source": "https://github.com/humbug/php-scoper/tree/0.17.7"
+                "source": "https://github.com/humbug/php-scoper/tree/0.18.0-rc.0"
             },
-            "time": "2022-11-03T19:10:41+00:00"
+            "time": "2022-11-20T13:00:42+00:00"
         },
         {
             "name": "jetbrains/phpstorm-stubs",
