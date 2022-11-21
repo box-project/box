@@ -98,7 +98,8 @@
             "dev-master": "4.x-dev"
         },
         "bamarni-bin": {
-            "bin-links": false
+            "bin-links": false,
+            "forward-command": false
         }
     }
 }
