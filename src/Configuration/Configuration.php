@@ -74,6 +74,7 @@ use KevinGH\Box\MapFile;
 use KevinGH\Box\PhpScoper\SerializableScoper;
 use function KevinGH\Box\unique_id;
 use function krsort;
+use function method_exists;
 use Phar;
 use phpDocumentor\Reflection\DocBlockFactory;
 use function preg_match;
@@ -2760,13 +2761,15 @@ final class Configuration
     private static function configurePhpScoperPrefix(PhpScoperConfiguration $phpScoperConfig): PhpScoperConfiguration
     {
         $prefix = $phpScoperConfig->getPrefix();
-
         if (!str_starts_with($prefix, '_PhpScoper')) {
             return $phpScoperConfig;
         }
 
-        // TODO: provide easier way to change the prefix
-        //  https://github.com/humbug/php-scoper/issues/616
+        // TODO: remove BC once removing support for PHP-Scoper 0.17
+        if (method_exists($phpScoperConfig, 'withPrefix')) {
+            return $phpScoperConfig->withPrefix(unique_id('_HumbugBox'));
+        }
+
         return new PhpScoperConfiguration(
             $phpScoperConfig->getPath(),
             unique_id('_HumbugBox'),
