@@ -56,7 +56,7 @@
         "nikic/php-parser": "^4.15.2",
         "paragonie/pharaoh": "^0.6",
         "phpdocumentor/reflection-docblock": "^5.3",
-        "psr/log": "^1.1.4",
+        "psr/log": "^3.0",
         "seld/jsonlint": "^1.9",
         "symfony/console": "^6.1.7",
         "symfony/filesystem": "^6.1.5",
@@ -70,7 +70,7 @@
         "mikey179/vfsstream": "^1.6.11",
         "phpspec/prophecy-phpunit": "^2.0.1",
         "phpunit/phpunit": "^9.5.26",
-        "symfony/phpunit-bridge": "^4.2 || ^5.4.14"
+        "symfony/phpunit-bridge": "^4.2 || ^5.4.14 || ^6.1.6"
     },
     "replace": {
         "paragonie/sodium_compat" : "*",
