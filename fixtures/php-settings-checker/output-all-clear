@@ -2,3 +2,4 @@
 [debug] Checking BOX_ALLOW_XDEBUG
 [debug] phar.readonly is disabled
 [debug] The xdebug extension is not loaded
+[debug] Disabled parallel processing
