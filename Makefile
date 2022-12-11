@@ -90,13 +90,13 @@ e2e: e2e_php_settings_checker e2e_scoper_alias e2e_scoper_expose_symbols e2e_che
 .PHONY: e2e_scoper_alias
 e2e_scoper_alias: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the prefix alias is working
 e2e_scoper_alias: box
-	./box compile --working-dir=fixtures/build/dir010
+	./box compile --working-dir=fixtures/build/dir010 --no-parallel
 
 .PHONY: e2e_scoper_expose_symbols
 e2e_scoper_expose_symbols: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the symbols exposure is working
 e2e_scoper_expose_symbols: box fixtures/build/dir011/vendor
 	php fixtures/build/dir011/index.php > fixtures/build/dir011/expected-output
-	./box compile --working-dir=fixtures/build/dir011
+	./box compile --working-dir=fixtures/build/dir011 --no-parallel
 
 	php fixtures/build/dir011/index.phar > fixtures/build/dir011/output
 	cd fixtures/build/dir011 && php -r "file_put_contents('phar-Y.php', file_get_contents((new Phar('index.phar'))['src/Y.php']));"
@@ -119,7 +119,7 @@ e2e_check_requirements: box .requirement-checker
 	# Pass no config
 	#
 
-	./box compile --working-dir=fixtures/check-requirements/pass-no-config/
+	./box compile --working-dir=fixtures/check-requirements/pass-no-config/ --no-parallel
 
 	# Composer min version
 	sed "s/PHP_VERSION/$$($(DOCKER) $(PHP_COMPOSER_MIN_BOX) php -r 'echo PHP_VERSION;')/" \
@@ -143,7 +143,7 @@ e2e_check_requirements: box .requirement-checker
 	# Pass complete
 	#
 
-	./box compile --working-dir=fixtures/check-requirements/pass-complete/
+	./box compile --working-dir=fixtures/check-requirements/pass-complete/ --no-parallel
 
 	# Composer min version
 	sed "s/PHP_VERSION/$$($(DOCKER) $(PHP_COMPOSER_MIN_BOX) php -r 'echo PHP_VERSION;')/" \
@@ -167,7 +167,7 @@ e2e_check_requirements: box .requirement-checker
 	# Fail complete
 	#
 
-	./box compile --working-dir=fixtures/check-requirements/fail-complete/
+	./box compile --working-dir=fixtures/check-requirements/fail-complete/ --no-parallel
 
 	# Composer min version
 	sed "s/PHP_VERSION/$$($(DOCKER) $(PHP_COMPOSER_MIN_BOX) php -r 'echo PHP_VERSION;')/" \
@@ -191,7 +191,7 @@ e2e_check_requirements: box .requirement-checker
 	# Skip the requirement check
 	#
 
-	./box compile --working-dir=fixtures/check-requirements/fail-complete/
+	./box compile --working-dir=fixtures/check-requirements/fail-complete/ --no-parallel
 
 	sed "s/PHP_VERSION/$$($(DOCKER) $(PHP_COMPOSER_MIN_BOX) php -r 'echo PHP_VERSION;')/" \
 			fixtures/check-requirements/fail-complete/expected-output-725-dist-skipped \
@@ -201,7 +201,7 @@ e2e_check_requirements: box .requirement-checker
 	$(DOCKER) -e BOX_REQUIREMENT_CHECKER=0 -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP_COMPOSER_MIN_PHAR) 2>&1 | tee fixtures/check-requirements/fail-complete/actual-output || true
 	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/check-requirements/fail-complete/expected-output-725 fixtures/check-requirements/fail-complete/actual-output
 
-BOX_COMPILE=./box compile --working-dir=fixtures/php-settings-checker -vvv --no-ansi
+BOX_COMPILE=./box compile --working-dir=fixtures/php-settings-checker -vvv --no-ansi --no-parallel
 ifeq ($(OS),Darwin)
 	SED = sed -i ''
 else
@@ -270,7 +270,7 @@ e2e_symfony: fixtures/build/dir012/vendor box
 	php fixtures/build/dir012/bin/console --version > fixtures/build/dir012/expected-output
 	rm -rf fixtures/build/dir012/var/cache/prod/*
 
-	./box compile --working-dir=fixtures/build/dir012
+	./box compile --working-dir=fixtures/build/dir012 --no-parallel
 
 	php fixtures/build/dir012/bin/console.phar --version > fixtures/build/dir012/actual-output
 
@@ -279,7 +279,7 @@ e2e_symfony: fixtures/build/dir012/vendor box
 .PHONY: e2e_composer_installed_versions
 e2e_composer_installed_versions:		 ## Packages an app using Composer\InstalledVersions
 e2e_composer_installed_versions: fixtures/build/dir013/vendor box
-	./box compile --working-dir=fixtures/build/dir013
+	./box compile --working-dir=fixtures/build/dir013 --no-parallel
 	
 	php fixtures/build/dir013/bin/run.phar > fixtures/build/dir013/actual-output
 
@@ -288,7 +288,7 @@ e2e_composer_installed_versions: fixtures/build/dir013/vendor box
 .PHONY: e2e_phpstorm_stubs
 e2e_phpstorm_stubs:		 ## Project using symbols which should be vetted by PhpStormStubs
 e2e_phpstorm_stubs: box
-	./box compile --working-dir=fixtures/build/dir014
+	./box compile --working-dir=fixtures/build/dir014 --no-parallel
 
 	php fixtures/build/dir014/index.phar > fixtures/build/dir014/actual-output
 
@@ -298,10 +298,10 @@ e2e_phpstorm_stubs: box
 blackfire:		 ## Profiles the compile step
 blackfire: box
 	# Profile compiling the PHAR from the source code
-	blackfire --reference=1 --samples=5 run $(PHPNOGC) -d bin/box compile --quiet
+	blackfire --reference=1 --samples=5 run $(PHPNOGC) -d bin/box compile --quiet --no-parallel
 
 	# Profile compiling the PHAR from the PHAR
-	blackfire --reference=2 --samples=5 run $(PHPNOGC) -d box compile --quiet
+	blackfire --reference=2 --samples=5 run $(PHPNOGC) -d box compile --quiet --no-parallel
 
 
 .PHONY: serve
@@ -407,25 +407,25 @@ vendor/symfony/console/Terminal.php: vendor
 
 box: bin src res vendor box.json.dist scoper.inc.php .requirement-checker
 	# Compile Box
-	bin/box compile
+	bin/box compile --no-parallel
 
 	rm bin/_box.phar || true
 	mv -v bin/box.phar bin/_box.phar
 
 	# Compile Box with the isolated Box PHAR
-	php bin/_box.phar compile
+	php bin/_box.phar compile --no-parallel
 
 	mv -fv bin/box.phar box
 
 	# Test the PHAR which has been created by the isolated PHAR
-	./box compile
+	./box compile --no-parallel
 
 	rm bin/_box.phar
 
 	touch $@
 
 requirement-checker/bin/check-requirements.phar: requirement-checker/src requirement-checker/bin/check-requirements.php requirement-checker/box.json.dist requirement-checker/scoper.inc.php requirement-checker/vendor
-	bin/box compile --working-dir=requirement-checker
+	bin/box compile --working-dir=requirement-checker --no-parallel
 	touch $@
 
 .PHONY: docker-images
