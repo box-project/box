@@ -201,7 +201,7 @@ e2e_check_requirements: box .requirement-checker
 	$(DOCKER) -e BOX_REQUIREMENT_CHECKER=0 -v "$$PWD/fixtures/check-requirements/fail-complete":/opt/box $(PHP_COMPOSER_MIN_PHAR) 2>&1 | tee fixtures/check-requirements/fail-complete/actual-output || true
 	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/check-requirements/fail-complete/expected-output-725 fixtures/check-requirements/fail-complete/actual-output
 
-BOX_COMPILE=./box compile --working-dir=fixtures/php-settings-checker -vvv --no-ansi --no-parallel
+BOX_COMPILE=./box compile --working-dir=fixtures/php-settings-checker -vvv --no-ansi
 ifeq ($(OS),Darwin)
 	SED = sed -i ''
 else
