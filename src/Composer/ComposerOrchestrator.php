@@ -130,6 +130,7 @@ final class ComposerOrchestrator
 
     private static function retrieveComposerExecutable(): string
     {
+        // TODO: add env variable; check that env variables are not changed in the scoped version
         $executableFinder = new ExecutableFinder();
         $executableFinder->addSuffix('.phar');
 

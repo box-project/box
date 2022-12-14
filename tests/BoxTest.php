@@ -1366,6 +1366,7 @@ class BoxTest extends FileSystemTestCase
     public function test_it_cannot_compress_if_the_required_extension_is_not_loaded(): void
     {
         if (extension_loaded('bz2')) {
+            // TODO: should be supported<
             $this->markTestSkipped('Requires the extension bz2 to not be loaded.');
         }
 
