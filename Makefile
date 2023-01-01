@@ -2,14 +2,15 @@
 MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 
-SRC_FILES := $(shell find bin/ src/ vendor-hotfix/ -type f)
-
 OS := $(shell uname)
 PHPNOGC = php -d zend.enable_gc=0
 CCYELLOW = \033[0;33m
 CCEND = \033[0m
 
 COMPOSER_BIN_PLUGIN_VENDOR = vendor/bamarni/composer-bin-plugin
+
+PHP_CS_FIXER_BIN = vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
+PHP_CS_FIXER = $(PHP_CS_FIXER_BIN) fix
 
 
 .DEFAULT_GOAL := help
@@ -31,10 +32,20 @@ clean:
 	git clean --exclude=.idea/ -ffdx
 
 .PHONY: cs
-PHP_CS_FIXER=vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
-cs:	 		 ## Fixes CS
-cs: $(PHP_CS_FIXER)
-	$(PHPNOGC) $(PHP_CS_FIXER) fix
+cs:	 ## Fixes CS
+cs: php_cs_fixer
+
+.PHONY: cs_lint
+cs_lint: ## Checks CS
+cs_lint: php_cs_fixer_lint
+
+.PHONY: php_cs_fixer
+php_cs_fixer: $(PHP_CS_FIXER_BIN)
+	$(PHP_CS_FIXER)
+
+.PHONY: php_cs_fixer_lint
+php_cs_fixer_lint: $(PHP_CS_FIXER_BIN)
+	$(PHP_CS_FIXER) --dry-run
 
 .PHONY: compile
 compile: 		 ## Compiles the application into the PHAR
@@ -332,7 +343,7 @@ website: doc
 # vendor dependencies.
 .PHONY: vendor_install
 vendor_install:
-	/bin/bash -c 'source .composer-root-version && composer install'
+	composer install
 	touch -c vendor
 	touch -c $(COMPOSER_BIN_PLUGIN_VENDOR)
 	touch -c bin/phpunit
@@ -363,7 +374,10 @@ requirement-checker/vendor: requirement-checker/composer.json
 	composer install --working-dir=requirement-checker
 	touch -c $@
 
-$(PHP_CS_FIXER): vendor-bin/php-cs-fixer/vendor
+.PHONY: php_cs_fixer_install
+php_cs_fixer_install: $(PHP_CS_FIXER_BIN)
+
+$(PHP_CS_FIXER_BIN): vendor-bin/php-cs-fixer/vendor
 	touch -c $@
 vendor-bin/php-cs-fixer/vendor: vendor-bin/php-cs-fixer/composer.lock $(COMPOSER_BIN_PLUGIN_VENDOR)
 	composer bin php-cs-fixer install
