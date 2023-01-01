@@ -20,6 +20,7 @@
 /box.json
 /dist/
 /fixtures/**/*/vendor/
+/fixtures/build/**/*/vendor/
 /fixtures/build/dir010/*.phar
 /fixtures/build/dir011/*.phar
 /fixtures/build/dir011/*output
