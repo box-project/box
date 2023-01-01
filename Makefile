@@ -30,12 +30,8 @@ clean:
 
 .PHONY: cs
 PHP_CS_FIXER=vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
-CODE_SNIFFER=vendor-bin/doctrine-cs/vendor/bin/phpcs
-CODE_SNIFFER_FIX=vendor-bin/doctrine-cs/vendor/bin/phpcbf
 cs:	 		 ## Fixes CS
-cs: $(PHP_CS_FIXER) $(CODE_SNIFFER) $(CODE_SNIFFER_FIX)
-	$(PHPNOGC) $(CODE_SNIFFER_FIX) || true
-	$(PHPNOGC) $(CODE_SNIFFER)
+cs: $(PHP_CS_FIXER)
 	$(PHPNOGC) $(PHP_CS_FIXER) fix
 
 .PHONY: compile
@@ -357,14 +353,6 @@ requirement-checker/vendor: requirement-checker/composer.json
 
 $(PHP_CS_FIXER): vendor/bamarni
 	composer bin php-cs-fixer install
-	touch $@
-
-$(CODE_SNIFFER): vendor/bamarni
-	composer bin doctrine-cs install
-	touch $@
-
-$(CODE_SNIFFER_FIX): vendor/bamarni
-	composer bin doctrine-cs install
 	touch $@
 
 $(INFECTION): vendor/bamarni
