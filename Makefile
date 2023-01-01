@@ -33,7 +33,7 @@ clean:
 
 .PHONY: cs
 cs:	 ## Fixes CS
-cs: composer_normalize php_cs_fixer
+cs: gitignore_sort composer_normalize php_cs_fixer
 
 .PHONY: cs_lint
 cs_lint: ## Checks CS
@@ -54,6 +54,10 @@ composer_normalize: composer.json vendor
 .PHONY: composer_normalize_lint
 composer_normalize_lint: composer.json vendor
 	composer normalize --dry-run
+
+.PHONY: gitignore_sort
+gitignore_sort:
+	LC_ALL=C sort -u .gitignore -o .gitignore
 
 .PHONY: compile
 compile: 		 ## Compiles the application into the PHAR
