@@ -1,8 +1,10 @@
 {
     "name": "humbug/box",
     "description": "Fast, zero config application bundler with PHARs.",
-    "keywords": ["phar"],
     "license": "MIT",
+    "keywords": [
+        "phar"
+    ],
     "authors": [
         {
             "name": "Kevin Herrera",
@@ -14,32 +16,6 @@
             "email": "theo.fidry@gmail.com"
         }
     ],
-
-    "bin": ["bin/box"],
-    "autoload": {
-        "psr-4": {
-            "KevinGH\\Box\\": "src"
-        },
-        "files": [
-            "src/FileSystem/file_system.php",
-            "src/consts.php",
-            "src/functions.php"
-        ],
-        "exclude-from-classmap": [
-            "/Test/"
-        ]
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "KevinGH\\Box\\": [
-                "fixtures",
-                "tests"
-            ]
-        }
-    },
-
-    "minimum-stability": "dev",
-    "prefer-stable": true,
     "require": {
         "php": "^8.1",
         "ext-phar": "*",
@@ -74,34 +50,59 @@
         "symfony/phpunit-bridge": "^4.2 || ^5.4.14 || ^6.1.6"
     },
     "replace": {
-        "paragonie/sodium_compat" : "*",
-        "symfony/polyfill-php80" : "*",
-        "symfony/polyfill-php81" : "*"
+        "paragonie/sodium_compat": "*",
+        "symfony/polyfill-php80": "*",
+        "symfony/polyfill-php81": "*"
     },
     "suggest": {
         "ext-openssl": "To accelerate private key generation."
     },
-
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "KevinGH\\Box\\": "src"
+        },
+        "files": [
+            "src/FileSystem/file_system.php",
+            "src/consts.php",
+            "src/functions.php"
+        ],
+        "exclude-from-classmap": [
+            "/Test/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "KevinGH\\Box\\": [
+                "fixtures",
+                "tests"
+            ]
+        }
+    },
+    "bin": [
+        "bin/box"
+    ],
     "config": {
+        "allow-plugins": {
+            "bamarni/composer-bin-plugin": true,
+            "composer/package-versions-deprecated": false,
+            "ergebnis/composer-normalize": true
+        },
         "bin-dir": "bin",
         "platform": {
             "php": "8.1"
         },
         "platform-check": false,
-        "sort-packages": true,
-        "allow-plugins": {
-            "bamarni/composer-bin-plugin": true,
-            "composer/package-versions-deprecated": false,
-            "ergebnis/composer-normalize": true
-        }
+        "sort-packages": true
     },
     "extra": {
-        "branch-alias": {
-            "dev-master": "4.x-dev"
-        },
         "bamarni-bin": {
             "bin-links": false,
             "forward-command": false
+        },
+        "branch-alias": {
+            "dev-master": "4.x-dev"
         }
     }
 }
