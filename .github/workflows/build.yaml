@@ -47,11 +47,31 @@ jobs:
             -   name: Ensure the PHAR is scoped
                 run: bin/box.phar namespace | php -r 'if (!str_starts_with(stream_get_contents(STDIN), "_HumbugBox")) exit (1);'
 
+            -   name: Import GPG key
+                if: github.event_name == 'release'
+                uses: crazy-max/ghaction-import-gpg@v5
+                with:
+                    gpg_private_key: ${{ secrets.GPG_KEY_41539BBD4020945DB378F98B2DF45277AEF09A2F }}
+                    passphrase: ${{ secrets.GPG_KEY_41539BBD4020945DB378F98B2DF45277AEF09A2F_PASSPHRASE }}
+
+            -   name: Sign the PHAR
+                if: github.event_name == 'release'
+                run: |
+                    gpg --local-user theo.fidry+box@gmail.com \
+                        --batch \
+                        --yes \
+                        --passphrase="${{ secrets.GPG_KEY_41539BBD4020945DB378F98B2DF45277AEF09A2F_PASSPHRASE }}" \
+                        --detach-sign \
+                        --output bin/box.phar.asc \
+                        bin/box.phar
+
             -   uses: actions/upload-artifact@v3
                 name: Upload the PHAR artifact
                 with:
                     name: box-phar
-                    path: bin/box.phar
+                    path: |
+                        bin/box.phar
+                        bin/box.phar.asc
 
     publish-phar:
         runs-on: ubuntu-latest
@@ -69,4 +89,6 @@ jobs:
                 uses: softprops/action-gh-release@v1
                 with:
                     token: ${{ secrets.GITHUB_TOKEN }}
-                    files: box.phar
+                    files: |
+                        box.phar
+                        box.phar.asc
