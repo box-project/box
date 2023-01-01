@@ -33,11 +33,11 @@ clean:
 
 .PHONY: cs
 cs:	 ## Fixes CS
-cs: php_cs_fixer
+cs: composer_normalize php_cs_fixer
 
 .PHONY: cs_lint
 cs_lint: ## Checks CS
-cs_lint: php_cs_fixer_lint
+cs_lint: composer_normalize_lint php_cs_fixer_lint
 
 .PHONY: php_cs_fixer
 php_cs_fixer: $(PHP_CS_FIXER_BIN)
@@ -46,6 +46,14 @@ php_cs_fixer: $(PHP_CS_FIXER_BIN)
 .PHONY: php_cs_fixer_lint
 php_cs_fixer_lint: $(PHP_CS_FIXER_BIN)
 	$(PHP_CS_FIXER) --dry-run
+
+.PHONY: composer_normalize
+composer_normalize: composer.json vendor
+	composer normalize
+
+.PHONY: composer_normalize_lint
+composer_normalize_lint: composer.json vendor
+	composer normalize --dry-run
 
 .PHONY: compile
 compile: 		 ## Compiles the application into the PHAR
