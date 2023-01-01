@@ -9,6 +9,8 @@ PHPNOGC = php -d zend.enable_gc=0
 CCYELLOW = \033[0;33m
 CCEND = \033[0m
 
+COMPOSER_BIN_PLUGIN_VENDOR = vendor/bamarni/composer-bin-plugin
+
 
 .DEFAULT_GOAL := help
 
@@ -323,24 +325,34 @@ website: doc
 # Rules from files
 #---------------------------------------------------------------------------
 
+# Sometimes we need to re-install the vendor. Since it has a few dependencies
+# we do not want to check over and over, as unlike re-installing dependencies
+# which is fast, those might have a significant overhead (e.g. checking the
+# composer root version), we do not want to repeat the step of checking the
+# vendor dependencies.
+.PHONY: vendor_install
+vendor_install:
+	/bin/bash -c 'source .composer-root-version && composer install'
+	touch -c vendor
+	touch -c $(COMPOSER_BIN_PLUGIN_VENDOR)
+	touch -c bin/phpunit
+
 composer.lock: composer.json
-	composer install
-	touch -c $@
+	@echo "$(@) is not up to date. You may want to run the following command:"
+	@echo "$$ composer update --lock && touch -c $(@)"
 
 requirement-checker/composer.lock: requirement-checker/composer.json
 	composer install --working-dir=requirement-checker
 	touch -c $@
 
 vendor: composer.lock
-	composer install
-	touch -c $@
+	$(MAKE) vendor_install
 
-vendor/bamarni: composer.lock
-	composer install
-	touch -c $@
+$(COMPOSER_BIN_PLUGIN_VENDOR): composer.lock
+	$(MAKE) --always-make vendor_install
 
 bin/phpunit: composer.lock
-	composer install
+	$(MAKE) --always-make vendor_install
 	touch -c $@
 
 requirement-checker/bin/phpunit: requirement-checker/composer.lock
@@ -351,13 +363,23 @@ requirement-checker/vendor: requirement-checker/composer.json
 	composer install --working-dir=requirement-checker
 	touch -c $@
 
-$(PHP_CS_FIXER): vendor/bamarni
+$(PHP_CS_FIXER): vendor-bin/php-cs-fixer/vendor
+	touch -c $@
+vendor-bin/php-cs-fixer/vendor: vendor-bin/php-cs-fixer/composer.lock $(COMPOSER_BIN_PLUGIN_VENDOR)
 	composer bin php-cs-fixer install
 	touch -c $@
+vendor-bin/php-cs-fixer/composer.lock: vendor-bin/php-cs-fixer/composer.json
+	@echo "$(@) is not up to date. You may want to run the following command:"
+	@echo "$$ composer bin php-cs-fixer update --lock && touch -c $(@)"
 
-$(INFECTION): vendor/bamarni
+$(INFECTION): vendor-bin/php-cs-fixer/vendor
+	touch -c $@
+vendor-bin/infection/vendor: vendor-bin/infection/composer.lock $(COMPOSER_BIN_PLUGIN_VENDOR)
 	composer bin infection install
 	touch -c $@
+vendor-bin/infection/composer.lock: vendor-bin/infection/composer.json
+	@echo "$(@) is not up to date. You may want to run the following command:"
+	@echo "$$ composer bin infection update --lock && touch -c $(@)"
 
 fixtures/composer-dump/dir001/composer.lock: fixtures/composer-dump/dir001/composer.json
 	composer install --working-dir=fixtures/composer-dump/dir001
