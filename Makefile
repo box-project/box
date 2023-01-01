@@ -1,9 +1,17 @@
-.DEFAULT_GOAL := help
+# See https://tech.davis-hansson.com/p/make/
+MAKEFLAGS += --warn-undefined-variables
+MAKEFLAGS += --no-builtin-rules
+
+SRC_FILES := $(shell find bin/ src/ vendor-hotfix/ -type f)
 
 OS := $(shell uname)
-PHPNOGC=php -d zend.enable_gc=0
-CCYELLOW=\033[0;33m
-CCEND=\033[0m
+PHPNOGC = php -d zend.enable_gc=0
+CCYELLOW = \033[0;33m
+CCEND = \033[0m
+
+
+.DEFAULT_GOAL := help
+
 
 .PHONY: help
 help:
