@@ -325,67 +325,67 @@ website: doc
 
 composer.lock: composer.json
 	composer install
-	touch $@
+	touch -c $@
 
 requirement-checker/composer.lock: requirement-checker/composer.json
 	composer install --working-dir=requirement-checker
-	touch $@
+	touch -c $@
 
 vendor: composer.lock
 	composer install
-	touch $@
+	touch -c $@
 
 vendor/bamarni: composer.lock
 	composer install
-	touch $@
+	touch -c $@
 
 bin/phpunit: composer.lock
 	composer install
-	touch $@
+	touch -c $@
 
 requirement-checker/bin/phpunit: requirement-checker/composer.lock
 	composer install --working-dir=requirement-checker
-	touch $@
+	touch -c $@
 
 requirement-checker/vendor: requirement-checker/composer.json
 	composer install --working-dir=requirement-checker
-	touch $@
+	touch -c $@
 
 $(PHP_CS_FIXER): vendor/bamarni
 	composer bin php-cs-fixer install
-	touch $@
+	touch -c $@
 
 $(INFECTION): vendor/bamarni
 	composer bin infection install
-	touch $@
+	touch -c $@
 
 fixtures/composer-dump/dir001/composer.lock: fixtures/composer-dump/dir001/composer.json
 	composer install --working-dir=fixtures/composer-dump/dir001
-	touch $@
+	touch -c $@
 
 fixtures/composer-dump/dir003/composer.lock: fixtures/composer-dump/dir003/composer.json
 	composer install --working-dir=fixtures/composer-dump/dir003
-	touch $@
+	touch -c $@
 
 fixtures/composer-dump/dir001/vendor: fixtures/composer-dump/dir001/composer.lock
 	composer install --working-dir=fixtures/composer-dump/dir001
-	touch $@
+	touch -c $@
 
 fixtures/composer-dump/dir003/vendor: fixtures/composer-dump/dir003/composer.lock
 	composer install --working-dir=fixtures/composer-dump/dir003
-	touch $@
+	touch -c $@
 
 fixtures/build/dir011/vendor:
 	composer install --working-dir=fixtures/build/dir011
-	touch $@
+	touch -c $@
 
 fixtures/build/dir012/vendor:
 	composer install --working-dir=fixtures/build/dir012
-	touch $@
+	touch -c $@
 
 fixtures/build/dir013/vendor:
 	composer install --working-dir=fixtures/build/dir013
-	touch $@
+	touch -c $@
 
 .PHONY: fixtures/default_stub.php
 fixtures/default_stub.php:
@@ -393,7 +393,7 @@ fixtures/default_stub.php:
 
 .requirement-checker: requirement-checker/bin/check-requirements.phar
 	php bin/box extract requirement-checker/bin/check-requirements.phar .requirement-checker
-	touch $@
+	touch -c $@
 
 requirement-checker/actual_terminal_diff: requirement-checker/src/Terminal.php vendor/symfony/console/Terminal.php
 	(diff --ignore-all-space --side-by-side --suppress-common-lines vendor/symfony/console/Terminal.php requirement-checker/src/Terminal.php || true) > requirement-checker/actual_terminal_diff
@@ -418,11 +418,11 @@ box: bin src res vendor box.json.dist scoper.inc.php .requirement-checker
 
 	rm bin/_box.phar
 
-	touch $@
+	touch -c $@
 
 requirement-checker/bin/check-requirements.phar: requirement-checker/src requirement-checker/bin/check-requirements.php requirement-checker/box.json.dist requirement-checker/scoper.inc.php requirement-checker/vendor
 	bin/box compile --working-dir=requirement-checker --no-parallel
-	touch $@
+	touch -c $@
 
 .PHONY: docker-images
 docker-images:
@@ -430,4 +430,4 @@ docker-images:
 
 fixtures/php-settings-checker/output-xdebug-enabled: fixtures/php-settings-checker/output-xdebug-enabled.tpl docker-images
 	./fixtures/php-settings-checker/create-expected-output $(MIN_SUPPORTED_PHP_WITH_XDEBUG_BOX)
-	touch $@
+	touch -c $@
