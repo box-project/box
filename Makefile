@@ -345,7 +345,7 @@ website: doc
 # vendor dependencies.
 .PHONY: vendor_install
 vendor_install:
-	/bin/bash -c 'source .composer-root-version && composer install'
+	composer install
 	touch -c vendor
 	touch -c $(COMPOSER_BIN_PLUGIN_VENDOR)
 	touch -c bin/phpunit
@@ -376,8 +376,8 @@ requirement-checker/vendor: requirement-checker/composer.json
 	composer install --working-dir=requirement-checker
 	touch -c $@
 
-.PHONY: install_php_cs_fixer
-install_php_cs_fixer: $(PHP_CS_FIXER_BIN)
+.PHONY: php_cs_fixer_install
+php_cs_fixer_install: $(PHP_CS_FIXER_BIN)
 
 $(PHP_CS_FIXER_BIN): vendor-bin/php-cs-fixer/vendor
 	touch -c $@
