@@ -345,10 +345,10 @@ website: doc
 # vendor dependencies.
 .PHONY: vendor_install
 vendor_install:
-	composer install
+	/bin/bash -c 'source .composer-root-version && composer install'
 	touch -c vendor
 	touch -c $(COMPOSER_BIN_PLUGIN_VENDOR)
-	touch -c $(PHPUNIT_BIN)
+	touch -c bin/phpunit
 
 composer.lock: composer.json
 	@echo "$(@) is not up to date. You may want to run the following command:"
@@ -360,14 +360,12 @@ requirement-checker/composer.lock: requirement-checker/composer.json
 
 vendor: composer.lock
 	$(MAKE) vendor_install
-	touch -c $@
 
 $(COMPOSER_BIN_PLUGIN_VENDOR): composer.lock
 	$(MAKE) --always-make vendor_install
-	touch -c $@
 
 bin/phpunit: composer.lock
-	composer install
+	$(MAKE) --always-make vendor_install
 	touch -c $@
 
 requirement-checker/bin/phpunit: requirement-checker/composer.lock
@@ -390,9 +388,14 @@ vendor-bin/php-cs-fixer/composer.lock: vendor-bin/php-cs-fixer/composer.json
 	@echo "$(@) is not up to date. You may want to run the following command:"
 	@echo "$$ composer bin php-cs-fixer update --lock && touch -c $(@)"
 
-$(INFECTION): vendor/bamarni
+$(INFECTION): vendor-bin/php-cs-fixer/vendor
+	touch -c $@
+vendor-bin/infection/vendor: vendor-bin/infection/composer.lock $(COMPOSER_BIN_PLUGIN_VENDOR)
 	composer bin infection install
 	touch -c $@
+vendor-bin/infection/composer.lock: vendor-bin/infection/composer.json
+	@echo "$(@) is not up to date. You may want to run the following command:"
+	@echo "$$ composer bin infection update --lock && touch -c $(@)"
 
 fixtures/composer-dump/dir001/composer.lock: fixtures/composer-dump/dir001/composer.json
 	composer install --working-dir=fixtures/composer-dump/dir001
