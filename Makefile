@@ -2,8 +2,6 @@
 MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 
-SRC_FILES := $(shell find bin/ src/ vendor-hotfix/ -type f)
-
 OS := $(shell uname)
 PHPNOGC = php -d zend.enable_gc=0
 CCYELLOW = \033[0;33m
