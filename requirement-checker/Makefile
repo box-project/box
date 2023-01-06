@@ -37,12 +37,15 @@ clean:
 
 .PHONY: cs
 cs:	 ## Fixes CS
-cs:
+cs: gitignore_sort
 
 .PHONY: cs_lint
 cs_lint: ## Checks CS
 cs_lint:
 
+.PHONY: gitignore_sort
+gitignore_sort:
+	LC_ALL=C sort -u .gitignore -o .gitignore
 
 
 #
