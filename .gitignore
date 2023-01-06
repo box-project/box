@@ -36,12 +36,6 @@
 /fixtures/php-settings-checker/output-xdebug-enabled
 /phpcs.xml
 /phpunit.xml
-/requirement-checker/.box/
-/requirement-checker/.box_dump/
-/requirement-checker/.phpunit*
-/requirement-checker/actual_terminal_diff
-/requirement-checker/bin/*
-/requirement-checker/vendor/
 /site/
 /vendor-bin/*/composer.lock
 /vendor-bin/*/vendor/

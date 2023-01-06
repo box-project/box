@@ -1,0 +1,7 @@
+/.box/
+/.box_dump/
+/.phpunit*
+/actual_terminal_diff
+/bin/*
+/vendor/
+/.phpunit.result.cache
