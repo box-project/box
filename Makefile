@@ -96,10 +96,8 @@ tu_box_phar_readonly: $(TU_BOX_DEPS)
 
 .PHONY: tu_requirement_checker
 tu_requirement_checker:	 ## Runs the unit tests
-tu_requirement_checker: requirement-checker/bin/phpunit requirement-checker/actual_terminal_diff
-	cd requirement-checker && $(PHPNOGC) bin/phpunit
-
-	diff --ignore-all-space --side-by-side --suppress-common-lines requirement-checker/expected_terminal_diff requirement-checker/actual_terminal_diff
+tu_requirement_checker:
+	cd requirement-checker; $(MAKE) --file=Makefile test
 
 .PHONY: tc
 tc:			 ## Runs the unit tests with code coverage
