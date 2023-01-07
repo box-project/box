@@ -44,15 +44,23 @@ clean:
 
 .PHONY: cs
 cs:	 ## Fixes CS
-cs: gitignore_sort
+cs: gitignore_sort composer_normalize
 
 .PHONY: cs_lint
 cs_lint: ## Checks CS
-cs_lint:
+cs_lint: composer_normalize_lint
 
 .PHONY: gitignore_sort
 gitignore_sort:
 	LC_ALL=C sort -u .gitignore -o .gitignore
+
+.PHONY: composer_normalize
+composer_normalize: composer.json vendor
+	composer normalize
+
+.PHONY: composer_normalize_lint
+composer_normalize_lint: composer.json vendor
+	composer normalize --dry-run
 
 
 #
