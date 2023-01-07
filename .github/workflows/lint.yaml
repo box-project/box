@@ -23,12 +23,15 @@ jobs:
             -   name: Install Composer dependencies
                 uses: ramsey/composer-install@v2
 
+            -   name: Ensure that the make target is up to date
+                run: make vendor_install
+
             -   name: Install PHP-CS-Fixer
                 uses: ramsey/composer-install@v2
                 with:
                     working-directory: 'vendor-bin/php-cs-fixer'
 
-            -   name: Ensure that PHP-CS-Fixer dependencies are updated correctly
+            -   name: Ensure that the PHP-CS-Fixer make target is up to date
                 run: make php_cs_fixer_install
 
-            -   run: make cs_lint
+            -   run: make root_cs_lint

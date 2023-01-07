@@ -89,7 +89,7 @@ composer_normalize: composer.json vendor
 
 .PHONY: composer_normalize_lint
 composer_normalize_lint: composer.json vendor
-	composer normalize --dry-run
+	composer normalize --ansi --dry-run
 
 .PHONY: php_cs_fixer
 php_cs_fixer: $(PHP_CS_FIXER_BIN)
@@ -97,7 +97,7 @@ php_cs_fixer: $(PHP_CS_FIXER_BIN)
 
 .PHONY: php_cs_fixer_lint
 php_cs_fixer_lint: $(PHP_CS_FIXER_BIN)
-	$(PHP_CS_FIXER) fix --verbose --dry-run --diff
+	$(PHP_CS_FIXER) fix --ansi --verbose --dry-run --diff
 
 
 #
@@ -111,7 +111,7 @@ test: phpunit terminal_copy
 .PHONY: phpunit
 phpunit:
 phpunit: $(PHPUNIT_BIN) vendor
-	$(PHPUNIT)
+	$(PHPUNIT) --colors=always
 
 .PHONY: terminal_copy
 terminal_copy: $(ACTUAL_TERMINAL_DIFF)
@@ -129,7 +129,7 @@ terminal_copy: $(ACTUAL_TERMINAL_DIFF)
 # vendor dependencies.
 .PHONY: vendor_install
 vendor_install:
-	composer install
+	composer install --ansi
 	touch -c vendor
 	touch -c $(PHPUNIT_BIN)
 

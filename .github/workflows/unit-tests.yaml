@@ -7,10 +7,6 @@ on:
     release:
         types: [ created ]
 
-env:
-    # Comma-space separated list, e.g. '8.1, 8.2, 9.0'
-    FUTURE_PHP_VERSION: '9.0'
-
 jobs:
     unit-tests:
         runs-on: ubuntu-latest
@@ -18,7 +14,16 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                php: [ '8.1' ]
+                php:
+                    -   version: '8.1'
+                        dependency: locked
+                        composer-options: ''
+                    -   version: '8.2'
+                        dependency: highest
+                        composer-options: ''
+                    -   version: '8.3'
+                        dependency: highest
+                        composer-options: '--ignore-platform-req=php+'
                 tools: [ "composer:v2" ]
                 phar-readonly: [ true, false ]
         steps:
@@ -30,7 +35,7 @@ jobs:
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
                 with:
-                    php-version: ${{ matrix.php }}
+                    php-version: ${{ matrix.php.version }}
                     # The phar.readonly value is adjusted in the Makefile command for
                     # better portability.
                     ini-values: phar.readonly=0, display_errors=On, error_reporting=-1
@@ -40,31 +45,14 @@ jobs:
 
             -   name: Install Composer dependencies
                 uses: ramsey/composer-install@v2
-                if: contains(env.FUTURE_PHP_VERSION, matrix.php) != true
-
-            -   name: Install RequirementChecker Composer dependencies
-                uses: ramsey/composer-install@v2
-                if: contains(env.FUTURE_PHP_VERSION, matrix.php) != true
                 with:
-                    working-directory: 'requirement-checker'
+                    dependency-versions: '${{ matrix.php.dependency }}'
+                    composer-options: '${{ matrix.php.composer-options }}'
 
-            -   name: Install Composer dependencies (ignore PHP platform req)
-                uses: ramsey/composer-install@v2
-                if: contains(env.FUTURE_PHP_VERSION, matrix.php)
-                with:
-                    composer-options: --ignore-platform-req=php+
+            -   name: Ensure that the make target is up to date
+                run: make vendor_install
 
-            -   name: Install RequirementChecker Composer dependencies (ignore PHP platform req)
-                uses: ramsey/composer-install@v2
-                if: contains(env.FUTURE_PHP_VERSION, matrix.php)
-                with:
-                    composer-options: --ignore-platform-req=php+
-                    working-directory: 'requirement-checker'
-
-            -   name: Ensure the Makefile does not run the Composer install command a 2nd time
-                run: touch -c composer.lock vendor requirement-checker/composer.lock requirement-checker/vendor
-
-            -   name: validate box config
+            -   name: Validate box config
                 run: bin/box validate
 
             -   name: Run tests (PHAR readonly)
@@ -73,7 +61,7 @@ jobs:
 
             -   name: Run tests (PHAR writeable)
                 if: matrix.phar-readonly == false
-                run: make tu
+                run: make tu_box
 
     infection:
         runs-on: ubuntu-latest
@@ -103,10 +91,8 @@ jobs:
             -   name: Install Composer dependencies
                 uses: ramsey/composer-install@v2
 
-            -   name: Install RequirementChecker Composer dependencies
-                uses: ramsey/composer-install@v2
-                with:
-                    working-directory: 'requirement-checker'
+            -   name: Ensure that the make target is up to date
+                run: make vendor_install
 
             -   name: Configure Infection for the CI
                 run: |
