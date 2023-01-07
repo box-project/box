@@ -36,9 +36,11 @@ check: cs cs_lint test
 clean: 	 		 ## Cleans all created artifacts
 clean:
 	rm -rf \
+		dist \
 		$(ACTUAL_TERMINAL_DIFF) \
 		.phpunit.result.cache \
 		|| true
+	$(MAKE) dist
 
 .PHONY: cs
 cs:	 ## Fixes CS
@@ -102,4 +104,9 @@ $(ACTUAL_TERMINAL_DIFF): src/Terminal.php vendor $(ORIGINAL_TERMINAL)
 
 $(ORIGINAL_TERMINAL):
 	cd ..; $(MAKE) vendor-bin/requirement-checker/vendor
+	touch -c $@
+
+dist:
+	mkdir -p dist
+	touch dist/.gitkeep
 	touch -c $@
