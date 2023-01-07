@@ -135,7 +135,7 @@ jobs:
 
             # Smoke test
             -   name: Ensure the PHAR works
-                run: box --version
+                run: ./box --version
 
             -   uses: actions/upload-artifact@v3
                 name: Upload the PHAR artifact
@@ -172,7 +172,7 @@ jobs:
                 run: chmod 755 box
 
             -   name: Check that the PHAR works
-                run: box --version
+                run: ./box --version
 
             -   name: Runs the tests
                 run: cd requirement-checker; make test_e2e
