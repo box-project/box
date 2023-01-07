@@ -12,6 +12,8 @@ COMPOSER_BIN_PLUGIN_VENDOR = vendor/bamarni/composer-bin-plugin
 PHP_CS_FIXER_BIN = vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
 PHP_CS_FIXER = $(PHP_CS_FIXER_BIN) fix
 
+REQUIREMENT_CHECKER_EXTRACT = res/requirement-checker
+
 
 .DEFAULT_GOAL := help
 
@@ -84,7 +86,7 @@ tu: tu_requirement_checker tu_box
 
 .PHONY: tu_box
 tu_box:			 ## Runs the unit tests
-TU_BOX_DEPS = bin/phpunit fixtures/default_stub.php .requirement-checker fixtures/composer-dump/dir001/vendor fixtures/composer-dump/dir003/vendor
+TU_BOX_DEPS = bin/phpunit fixtures/default_stub.php $(REQUIREMENT_CHECKER_EXTRACT) fixtures/composer-dump/dir001/vendor fixtures/composer-dump/dir003/vendor
 tu_box: $(TU_BOX_DEPS)
 	$(PHPNOGC) bin/phpunit
 
@@ -138,7 +140,7 @@ MIN_SUPPORTED_PHP_BOX=box_php81
 MIN_SUPPORTED_PHP_WITH_XDEBUG_BOX=box_php81_xdebug
 MIN_SUPPORTED_PHP_PHAR=$(MIN_SUPPORTED_PHP_BOX) php index.phar -vvv --no-ansi
 e2e_check_requirements:	 ## Runs the end-to-end tests for the check requirements feature
-e2e_check_requirements: box .requirement-checker
+e2e_check_requirements: box $(REQUIREMENT_CHECKER_EXTRACT)
 	./.docker/build
 
 	#
@@ -424,10 +426,10 @@ fixtures/build/dir013/vendor:
 fixtures/default_stub.php:
 	php -d phar.readonly=0 bin/generate_default_stub
 
-.requirement-checker:
+$(REQUIREMENT_CHECKER_EXTRACT):
 	cd requirement-checker; $(MAKE) --file=Makefile _dump
 
-box: bin src res vendor box.json.dist scoper.inc.php .requirement-checker
+box: bin src res vendor box.json.dist scoper.inc.php $(REQUIREMENT_CHECKER_EXTRACT)
 	# Compile Box
 	bin/box compile --no-parallel
 

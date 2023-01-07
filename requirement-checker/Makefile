@@ -18,8 +18,8 @@ PHP_CS_FIXER_BIN = ../vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
 PHP_CS_FIXER = $(PHP_CS_FIXER_BIN)
 
 PHAR_SRC_FILES := $(shell find src bin/check-requirements.php box.json.dist scoper.inc.php)
-PHAR = bin/check-requirements.phar
-PHAR_EXTRACT = ../.requirement-checker
+PHAR = dist/check-requirements.phar
+PHAR_EXTRACT = ../res/requirement-checker
 
 BOX_BIN = ../bin/box
 BOX = $(BOX_BIN)
@@ -48,7 +48,10 @@ clean:
 	rm -rf \
 		dist \
 		$(ACTUAL_TERMINAL_DIFF) \
+		bin/check-requirements.phar \
+		$(PHAR) \
 		.phpunit.result.cache \
+		.requirement-checker \
 		|| true
 	$(MAKE) dist
 

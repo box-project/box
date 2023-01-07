@@ -32,7 +32,7 @@ final class RequirementsDumper
         return '__CONFIG__';
         PHP;
 
-    private const REQUIREMENT_CHECKER_PATH = __DIR__.'/../../.requirement-checker';
+    private const REQUIREMENT_CHECKER_PATH = __DIR__.'/../../res/requirement-checker';
 
     /**
      * @return string[][]
