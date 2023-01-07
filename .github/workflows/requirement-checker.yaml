@@ -180,8 +180,8 @@ jobs:
                     platforms: linux/amd64
                     push: true
                     tags: box_php725
-                    cache-from: type=registry,ref=user/app:buildcache
-                    cache-to: type=registry,ref=user/app:buildcache,mode=max
+                    cache-from: type=gha,scope=ci-cache
+                    cache-to: type=gha,scope=ci-cache,mode=max
 
     e2e-tests:
         runs-on: ubuntu-latest
