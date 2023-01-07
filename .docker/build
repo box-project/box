@@ -2,19 +2,16 @@
 
 set -euf -o pipefail
 
-readonly DOCKER=$(which docker)
-
-# Globals
-# PWD
+readonly SCRIPT_DIR=$(dirname $(realpath "${BASH_SOURCE:-$0}"))
 
 if [[ "$(docker images -q box_php725 2> /dev/null)" == "" ]]; then
-    $DOCKER build --platform=linux/amd64 --tag=box_php725 --file "$PWD/.docker/php725" .
+    docker build --platform=linux/amd64 --tag=box_php725 --file "${SCRIPT_DIR}/php725" .
 fi
 
 if [[ "$(docker images -q box_php81 2> /dev/null)" == "" ]]; then
-    $DOCKER build --platform=linux/amd64 --tag=box_php81 --file "$PWD/.docker/php81" .
+    docker build --platform=linux/amd64 --tag=box_php81 --file "${SCRIPT_DIR}/php81" .
 fi
 
 if [[ "$(docker images -q box_php81_xdebug 2> /dev/null)" == "" ]]; then
-    $DOCKER build --platform=linux/amd64 --tag=box_php81_xdebug --file "$PWD/.docker/php81_xdebug" .
+    docker build --platform=linux/amd64 --tag=box_php81_xdebug --file "${SCRIPT_DIR}/php81_xdebug" .
 fi
