@@ -84,7 +84,7 @@ tu: tu_requirement_checker tu_box
 
 .PHONY: tu_box
 tu_box:			 ## Runs the unit tests
-TU_BOX_DEPS = bin/phpunit fixtures/default_stub.php .requirement-checker fixtures/composer-dump/dir001/vendor fixtures/composer-dump/dir003/vendor
+TU_BOX_DEPS = bin/phpunit fixtures/default_stub.php res/requirement-checker fixtures/composer-dump/dir001/vendor fixtures/composer-dump/dir003/vendor
 tu_box: $(TU_BOX_DEPS)
 	$(PHPNOGC) bin/phpunit
 
@@ -138,7 +138,7 @@ MIN_SUPPORTED_PHP_BOX=box_php81
 MIN_SUPPORTED_PHP_WITH_XDEBUG_BOX=box_php81_xdebug
 MIN_SUPPORTED_PHP_PHAR=$(MIN_SUPPORTED_PHP_BOX) php index.phar -vvv --no-ansi
 e2e_check_requirements:	 ## Runs the end-to-end tests for the check requirements feature
-e2e_check_requirements: box .requirement-checker
+e2e_check_requirements: box res/requirement-checker
 	./.docker/build
 
 	#
@@ -424,7 +424,7 @@ fixtures/build/dir013/vendor:
 fixtures/default_stub.php:
 	php -d phar.readonly=0 bin/generate_default_stub
 
-.requirement-checker:
+res/requirement-checker:
 	cd requirement-checker; $(MAKE) --file=Makefile _dump
 
 box: bin src res vendor box.json.dist scoper.inc.php .requirement-checker

@@ -12,7 +12,7 @@
     "files": [
         "res/schema.json"
     ],
-    "directories-bin": [".requirement-checker"],
+    "directories-bin": ["res/requirement-checker"],
 
     "compression": "GZ",
     "compactors": [

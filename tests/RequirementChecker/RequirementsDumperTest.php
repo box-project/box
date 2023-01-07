@@ -74,7 +74,7 @@ class RequirementsDumperTest extends TestCase
             'vendor/composer/semver/src/VersionParser.php',
         ];
 
-        if (file_exists(__DIR__.'/../../.requirement-checker/vendor/composer/InstalledVersions.php')) {
+        if (file_exists(__DIR__.'/../../res/requirement-checker/vendor/composer/InstalledVersions.php')) {
             $expectedFiles[] = 'vendor/composer/InstalledVersions.php';
         }
 

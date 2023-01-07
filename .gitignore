@@ -13,7 +13,6 @@
 /.php_cs.cache
 /.phpcs-cache
 /.phpunit*
-/.requirement-checker/
 /Dockerfile*
 /bin/
 /box
