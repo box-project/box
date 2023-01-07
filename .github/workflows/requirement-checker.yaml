@@ -161,7 +161,6 @@ jobs:
                 uses: actions/download-artifact@v3
                 with:
                     name: box-phar-81
-                    path: bin
 
             -   name: Ensure the make target is up to date
                 run: touch -c box
