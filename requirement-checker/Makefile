@@ -17,6 +17,13 @@ ORIGINAL_TERMINAL = ../vendor-bin/requirement-checker/vendor/symfony/console/Ter
 PHP_CS_FIXER_BIN = ../vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
 PHP_CS_FIXER = $(PHP_CS_FIXER_BIN)
 
+PHAR_SRC_FILES := $(shell find src bin/check-requirements.php box.json.dist scoper.inc.php)
+PHAR = bin/check-requirements.phar
+PHAR_EXTRACT = ../.requirement-checker
+
+BOX_BIN = ../bin/box
+BOX = $(BOX_BIN)
+
 
 .DEFAULT_GOAL := help
 
@@ -44,6 +51,22 @@ clean:
 		.phpunit.result.cache \
 		|| true
 	$(MAKE) dist
+
+
+.PHONY: dump
+dump:	## Dumps the requirement-checker
+dump:
+	rm -rf $(PHAR) $(PHAR_EXTRACT) || true
+	$(MAKE) _dump
+
+.PHONY: _dump
+_dump: $(PHAR_EXTRACT)
+
+
+#
+# CS
+#---------------------------------------------------------------------------
+
 
 .PHONY: cs
 cs:	 ## Fixes CS
@@ -133,3 +156,14 @@ dist:
 	mkdir -p dist
 	touch dist/.gitkeep
 	touch -c $@
+
+$(PHAR): $(PHAR_SRC_FILES) $(BOX_BIN)
+	$(BOX) compile --no-parallel
+	touch -c $@
+
+$(PHAR_EXTRACT): $(PHAR) $(BOX_BIN)
+	$(BOX) extract $(PHAR) $(PHAR_EXTRACT)
+	touch -c $@
+
+$(BOX_BIN):
+	cd ..; $(MAKE) --file=Makefile bin/box

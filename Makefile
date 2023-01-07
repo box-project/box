@@ -67,8 +67,7 @@ compile: box
 .PHONY: dump-requirement-checker
 dump-requirement-checker:## Dumps the requirement checker
 dump-requirement-checker:
-	rm -rf .requirement-checker || true
-	$(MAKE) .requirement-checker
+	cd requirement-checker; $(MAKE) --file=Makefile dump
 
 
 #
@@ -362,10 +361,6 @@ composer.lock: composer.json
 	@echo "$(@) is not up to date. You may want to run the following command:"
 	@echo "$$ composer update --lock && touch -c $(@)"
 
-requirement-checker/composer.lock: requirement-checker/composer.json
-	composer install --working-dir=requirement-checker
-	touch -c $@
-
 vendor: composer.lock
 	$(MAKE) vendor_install
 
@@ -374,14 +369,6 @@ $(COMPOSER_BIN_PLUGIN_VENDOR): composer.lock
 
 bin/phpunit: composer.lock
 	$(MAKE) --always-make vendor_install
-	touch -c $@
-
-requirement-checker/bin/phpunit: requirement-checker/composer.lock
-	composer install --working-dir=requirement-checker
-	touch -c $@
-
-requirement-checker/vendor: requirement-checker/composer.json
-	composer install --working-dir=requirement-checker
 	touch -c $@
 
 .PHONY: php_cs_fixer_install
@@ -437,15 +424,8 @@ fixtures/build/dir013/vendor:
 fixtures/default_stub.php:
 	php -d phar.readonly=0 bin/generate_default_stub
 
-.requirement-checker: requirement-checker/bin/check-requirements.phar
-	php bin/box extract requirement-checker/bin/check-requirements.phar .requirement-checker
-	touch -c $@
-
-requirement-checker/actual_terminal_diff: requirement-checker/src/Terminal.php vendor/symfony/console/Terminal.php
-	(diff --ignore-all-space --side-by-side --suppress-common-lines vendor/symfony/console/Terminal.php requirement-checker/src/Terminal.php || true) > requirement-checker/actual_terminal_diff
-
-tests/Console/DisplayNormalizer.php: vendor
-vendor/symfony/console/Terminal.php: vendor
+.requirement-checker:
+	cd requirement-checker; $(MAKE) --file=Makefile _dump
 
 box: bin src res vendor box.json.dist scoper.inc.php .requirement-checker
 	# Compile Box
@@ -464,10 +444,6 @@ box: bin src res vendor box.json.dist scoper.inc.php .requirement-checker
 
 	rm bin/_box.phar
 
-	touch -c $@
-
-requirement-checker/bin/check-requirements.phar: requirement-checker/src requirement-checker/bin/check-requirements.php requirement-checker/box.json.dist requirement-checker/scoper.inc.php requirement-checker/vendor
-	bin/box compile --working-dir=requirement-checker --no-parallel
 	touch -c $@
 
 .PHONY: docker-images
