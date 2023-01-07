@@ -10,7 +10,7 @@ on:
 jobs:
     unit-tests:
         runs-on: ubuntu-latest
-        name: "Unit-Tests: ${{ matrix.php }} - ${{ matrix.tools }} - PHAR readonly ${{ matrix.phar-readonly }}"
+        name: "Unit-Tests: ${{ matrix.php.version }} (${{ matrix.php.dependency }}) - ${{ matrix.tools }} - PHAR ${{ matrix.phar-readonly ? 'readonly' : 'writeable' }}"
         strategy:
             fail-fast: false
             matrix:
@@ -24,7 +24,9 @@ jobs:
                     -   version: '8.3'
                         dependency: highest
                         composer-options: '--ignore-platform-req=php+'
-                tools: [ "composer:v2" ]
+                tools:
+                    - 'composer:2.2'
+                    - 'composer'
                 phar-readonly: [ true, false ]
         steps:
             -   name: Checkout
