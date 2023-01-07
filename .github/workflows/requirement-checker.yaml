@@ -78,9 +78,9 @@ jobs:
             -   name: Install the Composer dependencies
                 uses: ramsey/composer-install@v2
                 with:
-                    working-directory: 'requirement-checker'
-                    dependency-versions: '${{ matrix.php.dependency }}'
-                    composer-options: '${{ matrix.php.composer-options }}'
+                    working-directory: requirement-checker
+                    dependency-versions: ${{ matrix.php.dependency }}
+                    composer-options: ${{ matrix.php.composer-options }}
 
             -   name: Ensure that the make target is up to date
                 run: cd requirement-checker; make vendor_install
@@ -88,8 +88,8 @@ jobs:
             -   name: Install the Composer (root) dependencies
                 uses: ramsey/composer-install@v2
                 with:
-                    dependency-versions: '${{ matrix.php.dependency }}'
-                    composer-options: '${{ matrix.php.composer-options }}'
+                    dependency-versions: ${{ matrix.php.dependency }}
+                    composer-options: ${{ matrix.php.composer-options }}
 
             -   name: Ensure that the make target is up to date
                 run: make vendor_install
@@ -97,15 +97,51 @@ jobs:
             -   name: Install the Composer (requirement checker bin namespace) dependencies
                 uses: ramsey/composer-install@v2
                 with:
-                    working-directory: 'vendor-bin/requirement-checker'
+                    working-directory: vendor-bin/requirement-checker
                     dependency-versions: highest
-                    composer-options: '${{ matrix.php.composer-options }}'
+                    composer-options: ${{ matrix.php.composer-options }}
 
             -   name: Ensure that the make target is up to date
                 run: make requirement_checker_install
 
             -   name: Runs the tests
                 run: cd requirement-checker; make test_unit
+
+    build-box-phar:
+        runs-on: ubuntu-latest
+        name: Build (test) Box PHAR
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v3
+                with:
+                    fetch-depth: 0
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.1'
+                    ini-values: phar.readonly=0
+                    tools: composer
+                    coverage: none
+
+            -   name: Install the Composer (root) dependencies
+                uses: ramsey/composer-install@v2
+
+            -   name: Ensure that the make target is up to date
+                run: make vendor_install
+
+            -   name: Build PHAR
+                run: make box
+
+            # Smoke test
+            -   name: Ensure the PHAR works
+                run: box --version
+
+            -   uses: actions/upload-artifact@v3
+                name: Upload the PHAR artifact
+                with:
+                    name: box-phar-81
+                    path: box
 
     e2e-tests:
         runs-on: ubuntu-latest
@@ -120,11 +156,22 @@ jobs:
                     php-version: '8.1'
                     tools: composer
 
-            -   name: Install the Composer (root) dependencies
-                uses: ramsey/composer-install@v2
+            -   name: Retrieve built PHAR
+                uses: actions/download-artifact@v3
+                with:
+                    name: box-phar-81
+                    path: bin
 
-            -   name: Ensure that the make target is up to date
-                run: make vendor_install
+            -   name: Ensure the make target is up to date
+                run: touch -c box
+
+            # See https://github.com/actions/download-artifact#limitations
+            # the permissions are not guaranteed to be preserved
+            -   name: Ensure PHAR is executable
+                run: chmod 755 box
+
+            -   name: Check that the PHAR works
+                run: box --version
 
             -   name: Runs the tests
                 run: cd requirement-checker; make test_e2e
