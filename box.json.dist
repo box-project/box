@@ -1,4 +1,6 @@
 {
+    "$schema": "res/schema.json",
+
     "banner": [
         "This file is part of the box project.",
         "",
