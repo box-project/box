@@ -41,12 +41,13 @@ $overriddenRules = [
     ],
     'mb_str_functions' => false,
     'no_trailing_whitespace_in_string' => false,
+    'use_arrow_functions' => false,
     'trailing_comma_in_multiline' => [
         'elements' => ['arrays'],
     ],
 ];
 
-$config = new FidryConfig('', 72_000);
+$config = new FidryConfig('', 74_000);
 $config->addRules($overriddenRules);
 $config->setCacheFile(__DIR__.'/dist/.php-cs-fixer.cache');
 
