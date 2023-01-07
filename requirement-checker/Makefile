@@ -129,7 +129,7 @@ terminal_copy: $(ACTUAL_TERMINAL_DIFF)
 # vendor dependencies.
 .PHONY: vendor_install
 vendor_install:
-	composer install
+	composer install --ansi
 	touch -c vendor
 	touch -c $(PHPUNIT_BIN)
 

@@ -368,7 +368,7 @@ website: doc
 # vendor dependencies.
 .PHONY: vendor_install
 vendor_install:
-	composer install
+	composer install --ansi
 	touch -c vendor
 	touch -c $(COMPOSER_BIN_PLUGIN_VENDOR)
 	touch -c bin/phpunit
@@ -409,31 +409,31 @@ vendor-bin/infection/composer.lock: vendor-bin/infection/composer.json
 	@echo "$$ composer bin infection update --lock && touch -c $(@)"
 
 fixtures/composer-dump/dir001/composer.lock: fixtures/composer-dump/dir001/composer.json
-	composer install --working-dir=fixtures/composer-dump/dir001
+	composer install --ansi --working-dir=fixtures/composer-dump/dir001
 	touch -c $@
 
 fixtures/composer-dump/dir003/composer.lock: fixtures/composer-dump/dir003/composer.json
-	composer install --working-dir=fixtures/composer-dump/dir003
+	composer install --ansi --working-dir=fixtures/composer-dump/dir003
 	touch -c $@
 
 fixtures/composer-dump/dir001/vendor: fixtures/composer-dump/dir001/composer.lock
-	composer install --working-dir=fixtures/composer-dump/dir001
+	composer install --ansi --working-dir=fixtures/composer-dump/dir001
 	touch -c $@
 
 fixtures/composer-dump/dir003/vendor: fixtures/composer-dump/dir003/composer.lock
-	composer install --working-dir=fixtures/composer-dump/dir003
+	composer install --ansi --working-dir=fixtures/composer-dump/dir003
 	touch -c $@
 
 fixtures/build/dir011/vendor:
-	composer install --working-dir=fixtures/build/dir011
+	composer install --ansi --working-dir=fixtures/build/dir011
 	touch -c $@
 
 fixtures/build/dir012/vendor:
-	composer install --working-dir=fixtures/build/dir012
+	composer install --ansi --working-dir=fixtures/build/dir012
 	touch -c $@
 
 fixtures/build/dir013/vendor:
-	composer install --working-dir=fixtures/build/dir013
+	composer install --ansi --working-dir=fixtures/build/dir013
 	touch -c $@
 
 .PHONY: fixtures/default_stub.php
