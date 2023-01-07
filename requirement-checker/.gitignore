@@ -1,4 +1,5 @@
 !/dist/.gitkeep
+!/fixtures/*/expected-output-*-dist
 /.box/
 /.box_dump/
 /.phpunit*
@@ -6,5 +7,9 @@
 /actual_terminal_diff
 /bin/*
 /dist/
+/fixtures/*/*.phar
+/fixtures/*/actual-output
+/fixtures/*/expected-output-*
+/fixtures/*/vendor/
 /tests/TerminalCompatibility/actual_diff
 /vendor/

@@ -1,11 +1,9 @@
 !/bin/box
 !/bin/box.bat
 !/bin/generate_default_stub
-!/fixtures/check-requirements/*/expected-output-*-dist
 !/fixtures/php-settings-checker/create-expected-output
 !/fixtures/php-settings-checker/index.php
 !/fixtures/php-settings-checker/output-*
-!/requirement-checker/bin/check-requirments.php
 /*.phar
 /*.phar.sig
 /.box_dump/
@@ -27,9 +25,6 @@
 /fixtures/build/dir012/actual-output
 /fixtures/build/dir012/bin/console.phar
 /fixtures/build/dir012/expected-output
-/fixtures/check-requirements/*/*.phar
-/fixtures/check-requirements/*/actual-output
-/fixtures/check-requirements/*/expected-output-*
 /fixtures/default_stub.php
 /fixtures/php-settings-checker/*
 /fixtures/php-settings-checker/output-xdebug-enabled
