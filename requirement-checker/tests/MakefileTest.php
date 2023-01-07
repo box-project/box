@@ -12,6 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
+use Fidry\Makefile\Rule;
 use Fidry\Makefile\Test\BaseMakefileTestCase;
 
 /**
@@ -44,5 +45,45 @@ final class MakefileTest extends BaseMakefileTestCase
             [33mtest:[0m	  Runs all the tests
 
             EOF;
+    }
+
+    public function test_the_test_rule_contains_all_test_targets(): void
+    {
+        $testRule = self::getTestRule();
+        $testTargets = self::getTestRules();
+
+        // Sanity check
+        self::assertGreaterThan(0, count($testRule->getPrerequisites()));
+
+        self::assertEqualsCanonicalizing(
+            $testRule->getPrerequisites(),
+            array_map(
+                static fn (Rule $rule) => $rule->getTarget(),
+                $testTargets,
+            ),
+        );
+    }
+
+    private static function getTestRule(): Rule
+    {
+        return current(
+            array_filter(
+                self::getParsedRules(),
+                static fn (Rule $rule) => 'test' === $rule->getTarget() && !$rule->isComment() && !$rule->isPhony(),
+            ),
+        );
+    }
+
+    /**
+     * @return list<Rule>
+     */
+    private static function getTestRules(): array
+    {
+        return array_values(
+            array_filter(
+                self::getParsedRules(),
+                static fn (Rule $rule) => str_starts_with($rule->getTarget(), 'test_') && !$rule->isComment() && !$rule->isPhony(),
+            ),
+        );
     }
 }

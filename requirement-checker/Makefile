@@ -106,7 +106,7 @@ php_cs_fixer_lint: $(PHP_CS_FIXER_BIN)
 
 .PHONY: test
 test:	 ## Runs all the tests
-test: test_unit
+test: test_unit test_e2e
 
 
 #
@@ -133,7 +133,7 @@ terminal_copy: $(ACTUAL_TERMINAL_DIFF)
 include Makefile.e2e
 
 .PHONY: test_e2e
-test_e2e: docker_images _test_e2e_pass_complete_min_composer_php _test_e2e_pass_complete_min_box_php _test_e2e_fail_complete_min_composer_php _test_e2e_fail_complete_min_box_php _test_e2e_skip_min_composer_php
+test_e2e: docker_images _test_e2e_pass_no_config_min_composer_php _test_e2e_pass_no_config_min_box_php _test_e2e_pass_complete_min_composer_php _test_e2e_pass_complete_min_box_php _test_e2e_fail_complete_min_composer_php _test_e2e_fail_complete_min_box_php _test_e2e_skip_min_composer_php
 
 
 #
