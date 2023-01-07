@@ -18,6 +18,7 @@
     },
     "require-dev": {
         "ergebnis/composer-normalize": "^2.29",
+        "fidry/makefile": "^0.2.1",
         "phpunit/phpunit": "^9.0"
     },
     "autoload": {
