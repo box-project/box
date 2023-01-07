@@ -16,10 +16,11 @@ namespace KevinGH\RequirementChecker;
 
 use Error;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 /**
  * @covers \KevinGH\RequirementChecker\Requirement
+ *
+ * @internal
  */
 class RequirementTest extends TestCase
 {
@@ -31,16 +32,16 @@ class RequirementTest extends TestCase
             'Help message'
         );
 
-        $this->assertSame($check, $requirement->getIsFullfilledChecker());
-        $this->assertTrue($requirement->isFulfilled());
-        $this->assertSame('Test message', $requirement->getTestMessage());
-        $this->assertSame('Help message', $requirement->getHelpText());
+        self::assertSame($check, $requirement->getIsFullfilledChecker());
+        self::assertTrue($requirement->isFulfilled());
+        self::assertSame('Test message', $requirement->getTestMessage());
+        self::assertSame('Help message', $requirement->getHelpText());
     }
 
     public function test_it_evaluates_the_check_lazily(): void
     {
         $requirement = new Requirement(
-            $check = new class implements IsFulfilled {
+            $check = new class() implements IsFulfilled {
                 public function __invoke(): bool
                 {
                     throw new Error();
@@ -50,14 +51,14 @@ class RequirementTest extends TestCase
             'Help message'
         );
 
-        $this->assertSame($check, $requirement->getIsFullfilledChecker());
+        self::assertSame($check, $requirement->getIsFullfilledChecker());
 
         try {
             $requirement->isFulfilled();
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (Error $error) {
-            $this->assertTrue(true);
+            self::assertTrue(true);
         }
     }
 
@@ -79,7 +80,7 @@ class RequirementTest extends TestCase
             'Help message'
         );
 
-        $this->assertFalse($requirement->isFulfilled());
-        $this->assertFalse($requirement->isFulfilled());    // Would have given `true` if it was evaluated a second time
+        self::assertFalse($requirement->isFulfilled());
+        self::assertFalse($requirement->isFulfilled());    // Would have given `true` if it was evaluated a second time
     }
 }

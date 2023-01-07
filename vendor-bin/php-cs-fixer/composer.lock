@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "afbb2dec878898133753608e8bcea93e",
+    "content-hash": "1ff3e5b5677b8d3e17f05dbeeaabd284",
     "packages": [],
     "packages-dev": [
         {
@@ -2034,6 +2034,57 @@
                 }
             ],
             "time": "2022-08-12T18:05:43+00:00"
+        },
+        {
+            "name": "theofidry/php-cs-fixer-config",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/theofidry/php-cs-fixer-config.git",
+                "reference": "a7315ef8f130c5846321ebbe2a21f68d724f3b9a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/theofidry/php-cs-fixer-config/zipball/a7315ef8f130c5846321ebbe2a21f68d724f3b9a",
+                "reference": "a7315ef8f130c5846321ebbe2a21f68d724f3b9a",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4 || ^8.0"
+            },
+            "conflict": {
+                "friendsofphp/php-cs-fixer": "<3.11.0,>=4.0",
+                "phpunit/phpunit": "<9.4.3"
+            },
+            "require-dev": {
+                "ergebnis/composer-normalize": "~2.13.0",
+                "fidry/makefile": "^0.2.1",
+                "friendsofphp/php-cs-fixer": "^3.11.0",
+                "phpunit/phpunit": "^9.4.3",
+                "symfony/filesystem": "^5.4 || ^6.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Fidry\\PhpCsFixerConfig\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Théo FIDRY",
+                    "email": "theo.fidry@gmail.com"
+                }
+            ],
+            "description": "The PHP-CS-Fixer default config for my projects",
+            "support": {
+                "issues": "https://github.com/theofidry/php-cs-fixer-config/issues",
+                "source": "https://github.com/theofidry/php-cs-fixer-config/tree/1.1.0"
+            },
+            "time": "2022-12-16T20:01:14+00:00"
         }
     ],
     "aliases": [],

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the box project.
  *
@@ -11,6 +13,8 @@
  */
 
 namespace KevinGH\RequirementChecker;
+
+use function count;
 
 /**
  * @private
@@ -70,7 +74,7 @@ final class Checker
 
         $printer->printvln('', $verbosity);
 
-        if (\count($requirements) > 0) {
+        if (count($requirements) > 0) {
             $printer->printvln('> Checking Box requirements:', $verbosity);
             $printer->printv('  ', $verbosity);
         } else {
@@ -101,7 +105,7 @@ final class Checker
             }
         }
 
-        if (IO::VERBOSITY_DEBUG !== $printer->getVerbosity() && \count($requirements) > 0) {
+        if (IO::VERBOSITY_DEBUG !== $printer->getVerbosity() && count($requirements) > 0) {
             $printer->printvln('', $verbosity);
         }
 
