@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eufx -o pipefail
+set -euf -o pipefail
 
 readonly DOCKER=$(which docker)
 readonly SCRIPT_PATH=$(readlink -f "$0")
