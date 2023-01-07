@@ -197,7 +197,7 @@ _test_e2e_skip_min_composer_php: $(E2E_TEST_SKIP_PHAR)
 .PHONY: docker_images
 docker_images:
 	@# The caching is taken care of within the script
-	@./../.docker/build
+	@bash -x ./../.docker/build
 
 $(E2E_TEST_PASS_NO_CONFIG_PHAR): $(E2E_BOX_BIN)
 	$(E2E_BOX) compile --ansi --working-dir=$(E2E_TEST_PASS_NO_CONFIG_DIR) --no-parallel
