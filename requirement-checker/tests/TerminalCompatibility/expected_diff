@@ -24,10 +24,13 @@ namespace Symfony\Component\Console;			      |	namespace KevinGH\RequirementChec
 							      >	 *
 							      >	 * @license MIT (c) Fabien Potencier <fabien@symfony.com>
 							      >	 */
-    private static ?int $width = null;			      |	    private static $width;
-    private static ?int $height = null;			      |	    private static $height;
-    private static ?bool $stty = null;			      |	    private static $stty;
+     *							      <
+     * @return int					      <
+    public function getWidth()				      |	    public function getWidth(): int
         if (null === self::$width) {			      |	        if (!isset(self::$width)) {
+     *							      <
+     * @return int					      <
+    public function getHeight()				      |	    public function getHeight(): int
         if (null === self::$height) {			      |	        if (!isset(self::$height)) {
         if (null !== self::$stty) {			      |	        if (isset(self::$stty)) {
         if (!\function_exists('exec')) {		      |	        if (!function_exists('exec')) {
