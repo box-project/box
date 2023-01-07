@@ -35,7 +35,10 @@ check: cs cs_lint test
 .PHONY: clean
 clean: 	 		 ## Cleans all created artifacts
 clean:
-	@echo TODO
+	rm -rf \
+		$(ACTUAL_TERMINAL_DIFF) \
+		.phpunit.result.cache \
+		|| true
 
 .PHONY: cs
 cs:	 ## Fixes CS
