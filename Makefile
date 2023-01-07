@@ -477,3 +477,10 @@ docker-images:
 fixtures/php-settings-checker/output-xdebug-enabled: fixtures/php-settings-checker/output-xdebug-enabled.tpl docker-images
 	./fixtures/php-settings-checker/create-expected-output $(MIN_SUPPORTED_PHP_WITH_XDEBUG_BOX)
 	touch -c $@
+
+vendor-bin/requirement-checker/vendor: vendor-bin/requirement-checker/composer.lock $(COMPOSER_BIN_PLUGIN_VENDOR)
+	composer bin requirement-checker install
+	touch -c $@
+vendor-bin/requirement-checker/composer.lock: vendor-bin/requirement-checker/composer.json
+	@echo "$(@) is not up to date. You may want to run the following command:"
+	@echo "$$ composer bin requirement-checker update --lock && touch -c $(@)"

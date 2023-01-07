@@ -10,7 +10,9 @@ NO_COLOR := "\033[0m"
 PHPUNIT_BIN = bin/phpunit
 PHPUNIT = $(PHPUNIT_BIN)
 
-TERMINAL_DIFF = actual_terminal_diff
+ACTUAL_TERMINAL_DIFF = tests/TerminalCompatibility/actual_diff
+EXPECTED_TERMINAL_DIFF = tests/TerminalCompatibility/expected_diff
+ORIGINAL_TERMINAL = ../vendor-bin/requirement-checker/vendor/symfony/console/Terminal.php
 
 
 .DEFAULT_GOAL := help
@@ -62,8 +64,8 @@ phpunit: $(PHPUNIT_BIN) vendor
 	$(PHPUNIT)
 
 .PHONY: terminal_copy
-terminal_copy: $(TERMINAL_DIFF)
-	diff --ignore-all-space --side-by-side --suppress-common-lines requirement-checker/expected_terminal_diff requirement-checker/actual_terminal_diff
+terminal_copy: $(ACTUAL_TERMINAL_DIFF)
+	diff --ignore-all-space --side-by-side --suppress-common-lines $(EXPECTED_TERMINAL_DIFF) $(ACTUAL_TERMINAL_DIFF)
 
 
 #
@@ -79,7 +81,6 @@ terminal_copy: $(TERMINAL_DIFF)
 vendor_install:
 	composer install
 	touch -c vendor
-	touch -c $(COMPOSER_BIN_PLUGIN_VENDOR)
 	touch -c $(PHPUNIT_BIN)
 
 vendor: composer.lock
@@ -92,6 +93,10 @@ $(PHPUNIT_BIN): composer.lock
 	$(MAKE) --always-make vendor_install
 	touch -c $@
 
-$(TERMINAL_DIFF): src/Terminal.php vendor $(wildcard vendor/symfony/console/Terminal.php)
-	(diff --ignore-all-space --side-by-side --suppress-common-lines vendor/symfony/console/Terminal.php src/Terminal.php || true) > $@
+$(ACTUAL_TERMINAL_DIFF): src/Terminal.php vendor $(ORIGINAL_TERMINAL)
+	(diff --ignore-all-space --side-by-side --suppress-common-lines $(ORIGINAL_TERMINAL) src/Terminal.php || true) > $@
+	touch -c $@
+
+$(ORIGINAL_TERMINAL):
+	cd ..; $(MAKE) vendor-bin/requirement-checker/vendor
 	touch -c $@
