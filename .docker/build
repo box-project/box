@@ -9,13 +9,13 @@ readonly SCRIPT_PATH=$(readlink -f "$0")
 # PWD
 
 if [[ "$(docker images -q box_php725 2> /dev/null)" == "" ]]; then
-    $DOCKER build --platform=linux/amd64 --tag=box_php725 --file "${SCRIPT_PATH}/.docker/php725" .
+    $DOCKER build --platform=linux/amd64 --tag=box_php725 --file "${SCRIPT_PATH}/php725" .
 fi
 
 if [[ "$(docker images -q box_php81 2> /dev/null)" == "" ]]; then
-    $DOCKER build --platform=linux/amd64 --tag=box_php81 --file "${SCRIPT_PATH}/.docker/php81" .
+    $DOCKER build --platform=linux/amd64 --tag=box_php81 --file "${SCRIPT_PATH}/php81" .
 fi
 
 if [[ "$(docker images -q box_php81_xdebug 2> /dev/null)" == "" ]]; then
-    $DOCKER build --platform=linux/amd64 --tag=box_php81_xdebug --file "${SCRIPT_PATH}/.docker/php81_xdebug" .
+    $DOCKER build --platform=linux/amd64 --tag=box_php81_xdebug --file "${SCRIPT_PATH}/php81_xdebug" .
 fi
