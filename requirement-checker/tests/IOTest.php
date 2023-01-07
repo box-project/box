@@ -15,14 +15,16 @@ declare(strict_types=1);
 namespace KevinGH\RequirementChecker;
 
 use Generator;
+use PHPUnit\Framework\TestCase;
 use function function_exists;
 use function getenv;
-use PHPUnit\Framework\TestCase;
 use function posix_isatty;
 use function putenv;
 
 /**
  * @covers \KevinGH\RequirementChecker\IO
+ *
+ * @internal
  */
 class IOTest extends TestCase
 {
@@ -34,7 +36,7 @@ class IOTest extends TestCase
         ) {
             return false;
         }
-        
+
         return true;
     }
 
@@ -47,8 +49,8 @@ class IOTest extends TestCase
 
         $io = new IO();
 
-        $this->assertSame($interactive, $io->isInteractive());
-        $this->assertSame($verbosity, $io->getVerbosity());
+        self::assertSame($interactive, $io->isInteractive());
+        self::assertSame($verbosity, $io->getVerbosity());
     }
 
     /**
@@ -61,8 +63,8 @@ class IOTest extends TestCase
 
         $io = new IO();
 
-        $this->assertSame($interactive, $io->isInteractive());
-        $this->assertSame($verbosity, $io->getVerbosity());
+        self::assertSame($interactive, $io->isInteractive());
+        self::assertSame($verbosity, $io->getVerbosity());
     }
 
     public function provideOptions(): Generator

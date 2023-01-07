@@ -7,7 +7,7 @@ ERROR_COLOR := "\033[41m"
 NO_COLOR := "\033[0m"
 
 
-PHPUNIT_BIN = bin/phpunit
+PHPUNIT_BIN = vendor/bin/phpunit
 PHPUNIT = $(PHPUNIT_BIN)
 
 ACTUAL_TERMINAL_DIFF = tests/TerminalCompatibility/actual_diff
@@ -67,11 +67,11 @@ composer_normalize_lint: composer.json vendor
 
 .PHONY: php_cs_fixer
 php_cs_fixer: $(PHP_CS_FIXER_BIN)
-	$(PHP_CS_FIXER) fix
+	$(PHP_CS_FIXER) fix --verbose
 
 .PHONY: php_cs_fixer_lint
 php_cs_fixer_lint: $(PHP_CS_FIXER_BIN)
-	$(PHP_CS_FIXER) fix --dry-run
+	$(PHP_CS_FIXER) fix --verbose --dry-run --diff
 
 
 #

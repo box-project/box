@@ -21,6 +21,8 @@ use function ob_start;
 
 /**
  * @covers \KevinGH\RequirementChecker\Printer
+ *
+ * @internal
  */
 class PrinterTest extends TestCase
 {
@@ -41,7 +43,7 @@ class PrinterTest extends TestCase
         $printer->title($message, $messageVerbosity);
         $actual = ob_get_clean();
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     /**
@@ -56,7 +58,7 @@ class PrinterTest extends TestCase
     ): void {
         $actual = (new Printer($verbosity, $colors, $width))->getRequirementErrorMessage($requirement);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     /**
@@ -77,7 +79,7 @@ class PrinterTest extends TestCase
         $printer->block($title, $message, $messageVerbosity, 'success');
         $actual = ob_get_clean();
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     public function provideTitles(): Generator
@@ -90,11 +92,11 @@ class PrinterTest extends TestCase
             IO::VERBOSITY_NORMAL,
             <<<'EOF'
 
-This is a title
-===============
+                This is a title
+                ===============
 
 
-EOF
+                EOF
         ];
 
         yield [
@@ -104,12 +106,12 @@ EOF
             'This is a title',
             IO::VERBOSITY_NORMAL,
             <<<'EOF'
-[33m[0m
-[0m[33mThis is a title[0m
-[0m[33m===============[0m
-[0m[33m[0m
-[0m
-EOF
+                [33m[0m
+                [0m[33mThis is a title[0m
+                [0m[33m===============[0m
+                [0m[33m[0m
+                [0m
+                EOF
         ];
 
         yield [
@@ -120,11 +122,11 @@ EOF
             IO::VERBOSITY_NORMAL,
             <<<'EOF'
 
-This is a title
-===============
+                This is a title
+                ===============
 
 
-EOF
+                EOF
         ];
 
         yield [
@@ -144,12 +146,12 @@ EOF
             IO::VERBOSITY_NORMAL,
             <<<'EOF'
 
-This is a very
-long title
-===============
+                This is a very
+                long title
+                ===============
 
 
-EOF
+                EOF
         ];
 
         yield [
@@ -159,13 +161,13 @@ EOF
             'This is a very long title',
             IO::VERBOSITY_NORMAL,
             <<<'EOF'
-[33m[0m
-[0m[33mThis is a very
-long title[0m
-[0m[33m===============[0m
-[0m[33m[0m
-[0m
-EOF
+                [33m[0m
+                [0m[33mThis is a very
+                long title[0m
+                [0m[33m===============[0m
+                [0m[33m[0m
+                [0m
+                EOF
         ];
     }
 
@@ -193,9 +195,9 @@ EOF
             false,
             50,
             <<<'EOF'
-Test message
+                Test message
 
-EOF
+                EOF
         ];
 
         yield [
@@ -208,9 +210,9 @@ EOF
             true,
             50,
             <<<'EOF'
-Test message
+                Test message
 
-EOF
+                EOF
         ];
     }
 
@@ -225,12 +227,12 @@ EOF
             IO::VERBOSITY_NORMAL,
             <<<'EOF'
 
-                         
- [OK] This is a          
-      block              
-                         
+                                         
+                 [OK] This is a          
+                      block              
+                                         
 
-EOF
+                EOF
         ];
 
         yield [
@@ -241,13 +243,13 @@ EOF
             'This is a block',
             IO::VERBOSITY_NORMAL,
             <<<'EOF'
-[0m
-[0m[30;42m                         [0m
-[0m[30;42m [OK] This is a          [0m
-[0m[30;42m      block              [0m
-[0m[30;42m                         [0m[0m
-[0m
-EOF
+                [0m
+                [0m[30;42m                         [0m
+                [0m[30;42m [OK] This is a          [0m
+                [0m[30;42m      block              [0m
+                [0m[30;42m                         [0m[0m
+                [0m
+                EOF
         ];
 
         yield [
@@ -259,12 +261,12 @@ EOF
             IO::VERBOSITY_NORMAL,
             <<<'EOF'
 
-                         
- [OK] This is a          
-      block              
-                         
+                                         
+                 [OK] This is a          
+                      block              
+                                         
 
-EOF
+                EOF
         ];
 
         yield [
@@ -286,16 +288,16 @@ EOF
             IO::VERBOSITY_NORMAL,
             <<<'EOF'
 
-                    
- [OK] This is       
-      a very long   
-      block that    
-      should be     
-      displayed on  
-      5 lines       
-                    
+                                    
+                 [OK] This is       
+                      a very long   
+                      block that    
+                      should be     
+                      displayed on  
+                      5 lines       
+                                    
 
-EOF
+                EOF
         ];
 
         yield [
@@ -306,18 +308,18 @@ EOF
             'This is a very long block that should be displayed on 6 lines',
             IO::VERBOSITY_NORMAL,
             <<<'EOF'
-[0m
-[0m[30;42m                    [0m
-[0m[30;42m [OK] This is       [0m
-[0m[30;42m      a very long   [0m
-[0m[30;42m      block that    [0m
-[0m[30;42m      should be     [0m
-[0m[30;42m      displayed on  [0m
-[0m[30;42m      6 lines       [0m
-[0m[30;42m                    [0m[0m
-[0m
-EOF
-      ];
+                [0m
+                [0m[30;42m                    [0m
+                [0m[30;42m [OK] This is       [0m
+                [0m[30;42m      a very long   [0m
+                [0m[30;42m      block that    [0m
+                [0m[30;42m      should be     [0m
+                [0m[30;42m      displayed on  [0m
+                [0m[30;42m      6 lines       [0m
+                [0m[30;42m                    [0m[0m
+                [0m
+                EOF
+        ];
 
         yield [
             IO::VERBOSITY_NORMAL,
@@ -327,32 +329,32 @@ EOF
             'Your system is ready to run the application.',
             IO::VERBOSITY_NORMAL,
             <<<'EOF'
-[0m
-[0m[30;42m                    [0m
-[0m[30;42m [OK] Your          [0m
-[0m[30;42m      system is     [0m
-[0m[30;42m      ready to run  [0m
-[0m[30;42m      the           [0m
-[0m[30;42m      application.  [0m
-[0m[30;42m                    [0m[0m
-[0m
-EOF
+                [0m
+                [0m[30;42m                    [0m
+                [0m[30;42m [OK] Your          [0m
+                [0m[30;42m      system is     [0m
+                [0m[30;42m      ready to run  [0m
+                [0m[30;42m      the           [0m
+                [0m[30;42m      application.  [0m
+                [0m[30;42m                    [0m[0m
+                [0m
+                EOF
         ];
 
         yield [
-          IO::VERBOSITY_NORMAL,
-          true,
-          0,
-          'OK',
-          'Your system is ready to run the application.',
-          IO::VERBOSITY_NORMAL,
-          <<<'EOF'
-[0m
-[0m[30;42m                                                                                [0m
-[0m[30;42m [OK] Your system is ready to run the application.                              [0m
-[0m[30;42m                                                                                [0m[0m
-[0m
-EOF
+            IO::VERBOSITY_NORMAL,
+            true,
+            0,
+            'OK',
+            'Your system is ready to run the application.',
+            IO::VERBOSITY_NORMAL,
+            <<<'EOF'
+                [0m
+                [0m[30;42m                                                                                [0m
+                [0m[30;42m [OK] Your system is ready to run the application.                              [0m
+                [0m[30;42m                                                                                [0m[0m
+                [0m
+                EOF
         ];
     }
 }

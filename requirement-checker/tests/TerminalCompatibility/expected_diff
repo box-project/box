@@ -1,9 +1,12 @@
+							      >	declare(strict_types=1);
+							      >
  * This file is part of the Symfony package.		      |	 * This file is part of the box project.
  * (c) Fabien Potencier <fabien@symfony.com>		      |	 * (c) Kevin Herrera <kevin@herrera.io>
 							      >	 *     Théo Fidry <theo.fidry@gmail.com>
  * For the full copyright and license information, please vie |	 * This source file is subject to the MIT license that is bun
  * file that was distributed with this source code.	      |	 * with this source code in the file LICENSE.
 namespace Symfony\Component\Console;			      |	namespace KevinGH\RequirementChecker;
+							      >
 							      >	use function exec;
 							      >	use function fclose;
 							      >	use function fopen;
@@ -17,7 +20,6 @@ namespace Symfony\Component\Console;			      |	namespace KevinGH\RequirementChec
 							      >	use function stream_get_contents;
 							      >	use function trim;
 							      >	use const DIRECTORY_SEPARATOR;
-							      >
 							      >	/**
 							      >	 * This file is copy/pasted from the Symfony project to avoid
 							      >	 * class.
@@ -36,11 +38,10 @@ namespace Symfony\Component\Console;			      |	namespace KevinGH\RequirementChec
         if (!\function_exists('exec')) {		      |	        if (!function_exists('exec')) {
     private static function initDimensions()		      |	    private static function initDimensions(): void
         if ('\\' === \DIRECTORY_SEPARATOR) {		      |	        if ('\\' === DIRECTORY_SEPARATOR) {
-        return \function_exists('sapi_windows_vt100_support') |	        return function_exists('sapi_windows_vt100_support') 
+        return \function_exists('sapi_windows_vt100_support') |	        return function_exists('sapi_windows_vt100_support')
     /**							      |	    private static function initDimensionsUsingStty(): void
      * Initializes dimensions using the output of an stty col <
      */							      <
     private static function initDimensionsUsingStty()	      <
-        return [(int) $matches[2], (int) $matches[1]];	      |	        return array((int) $matches[2], (int) $matches[1]);
         if (!\function_exists('proc_open')) {		      |	        if (!function_exists('proc_open')) {
         if (!\is_resource($process)) {			      |	        if (!is_resource($process)) {

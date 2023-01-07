@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the box project.
  *
@@ -149,7 +151,7 @@ class Terminal
             return null;
         }
 
-        return array((int) $matches[2], (int) $matches[1]);
+        return [(int) $matches[2], (int) $matches[1]];
     }
 
     /**

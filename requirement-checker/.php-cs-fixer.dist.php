@@ -40,6 +40,10 @@ $overriddenRules = [
         'location' => 'after_declare_strict',
     ],
     'mb_str_functions' => false,
+    'no_trailing_whitespace_in_string' => false,
+    'trailing_comma_in_multiline' => [
+        'elements' => ['arrays'],
+    ],
 ];
 
 $config = new FidryConfig('', 72_000);
