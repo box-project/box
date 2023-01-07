@@ -137,11 +137,51 @@ jobs:
             -   name: Ensure the PHAR works
                 run: ./box --version
 
-            -   uses: actions/upload-artifact@v3
-                name: Upload the PHAR artifact
+            -   name: Upload the PHAR artifact
+                uses: actions/upload-artifact@v3
                 with:
                     name: box-phar-81
                     path: box
+
+    docker-build:
+        runs-on: ubuntu-20.04
+        name: Build the Docker images
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v3
+
+            -   name: Set up Docker Buildx
+                uses: docker/setup-buildx-action@v1
+
+            -   name: Login to GitHub Container Registry
+                uses: docker/login-action@v2
+                with:
+                    registry: ghcr.io
+                    username: ${{ github.repository_owner }}
+                    password: ${{ secrets.GITHUB_TOKEN }}
+
+            -   name: Build and export to Docker
+                uses: docker/build-push-action@v3
+                with:
+                    context: .
+                    dockerfile: .docker/php725
+                    platforms: linux/amd64
+                    load: true
+                    tags: box_php725
+
+            -   name: Test the image
+                run: docker run --rm box_php725 php --version
+
+            -   name: Build and push
+                uses: docker/build-push-action@v3
+                with:
+                    context: .
+                    dockerfile: .docker/php725
+                    platforms: linux/amd64
+                    push: true
+                    tags: box_php725
+                    cache-from: type=registry,ref=user/app:buildcache
+                    cache-to: type=registry,ref=user/app:buildcache,mode=max
 
     e2e-tests:
         runs-on: ubuntu-latest
