@@ -7,4 +7,5 @@
         "KevinGH\\Box\\Compactor\\PhpScoper",
         "KevinGH\\Box\\Compactor\\Json"
     ],
+    "output": "dist/check-requirements.phar"
 }
