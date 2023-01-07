@@ -261,7 +261,7 @@ serve:
 	mkdocs serve
 
 
-.PHONY: build-website
+.PHONY: website
 website: doc
 	mkdocs build
 
