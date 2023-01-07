@@ -20,7 +20,7 @@ REQUIREMENT_CHECKER_EXTRACT = res/requirement-checker
 
 .PHONY: help
 help:
-	@echo "\033[33mUsage:\033[0m\n  make TARGET\n\n\033[32m#\n# Commands\n#---------------------------------------------------------------------------\033[0m\n"
+	@printf "\033[33mUsage:\033[0m\n  make TARGET\n\n\033[32m#\n# Commands\n#---------------------------------------------------------------------------\033[0m\n\n"
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//' | awk 'BEGIN {FS = ":"}; {printf "\033[33m%s:\033[0m%s\n", $$1, $$2}'
 
 
@@ -35,11 +35,25 @@ clean:
 
 .PHONY: cs
 cs:	 ## Fixes CS
-cs: gitignore_sort composer_normalize php_cs_fixer
+cs: root_cs requirement_checker_cs
+
+.PHONY: root_cs
+root_cs: gitignore_sort composer_normalize php_cs_fixer
+
+.PHONY: requirement_checker_cs
+requirement_checker_cs:
+	cd requirement-checker; $(MAKE) --file=Make cs
 
 .PHONY: cs_lint
 cs_lint: ## Checks CS
-cs_lint: composer_normalize_lint php_cs_fixer_lint
+cs_lint: root_cs_lint requirement_checker_cs_lint
+
+.PHONY: root_cs_lint
+root_cs_lint: composer_normalize_lint php_cs_fixer_lint
+
+.PHONY: requirement_checker_cs_lint
+requirement_checker_cs_lint:
+	cd requirement-checker; $(MAKE) --file=Make cs_lint
 
 .PHONY: php_cs_fixer
 php_cs_fixer: $(PHP_CS_FIXER_BIN)
@@ -66,9 +80,9 @@ compile: 		 ## Compiles the application into the PHAR
 compile: box
 	cp -f box bin/box.phar
 
-.PHONY: dump-requirement-checker
-dump-requirement-checker:## Dumps the requirement checker
-dump-requirement-checker:
+.PHONY: dump_requirement_checker
+dump_requirement_checker:## Dumps the requirement checker
+dump_requirement_checker:
 	cd requirement-checker; $(MAKE) --file=Makefile dump
 
 

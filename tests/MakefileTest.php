@@ -40,7 +40,7 @@ final class MakefileTest extends BaseMakefileTestCase
             [33mcs:[0m	  Fixes CS
             [33mcs_lint:[0m  Checks CS
             [33mcompile:[0m 		  Compiles the application into the PHAR
-            [33mdump-requirement-checker:[0m Dumps the requirement checker
+            [33mdump_requirement_checker:[0m Dumps the requirement checker
             [33mtest:[0m		  	  Runs all the tests
             [33mtu:[0m			  Runs the unit tests
             [33mtu_box:[0m			  Runs the unit tests
