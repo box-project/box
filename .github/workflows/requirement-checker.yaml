@@ -82,8 +82,27 @@ jobs:
                     dependency-versions: '${{ matrix.php.dependency }}'
                     composer-options: '${{ matrix.php.composer-options }}'
 
-            -   name: Ensure that the Makefile target is up to date
+            -   name: Ensure that the make target is up to date
                 run: cd requirement-checker; make vendor_install
+
+            -   name: Install the Composer (root) dependencies
+                uses: ramsey/composer-install@v2
+                with:
+                    dependency-versions: '${{ matrix.php.dependency }}'
+                    composer-options: '${{ matrix.php.composer-options }}'
+
+            -   name: Ensure that the make target is up to date
+                run: make vendor_install
+
+            -   name: Install the Composer (requirement checker bin namespace) dependencies
+                uses: ramsey/composer-install@v2
+                with:
+                    working-directory: 'vendor-bin/requirement-checker'
+                    dependency-versions: highest
+                    composer-options: '${{ matrix.php.composer-options }}'
+
+            -   name: Ensure that the make target is up to date
+                run: make requirement_checker_install
 
             -   name: Runs the tests
                 run: cd requirement-checker; make test
