@@ -179,7 +179,7 @@ jobs:
                     file: .docker/php725
                     platforms: linux/amd64
                     push: true
-                    tags: box_php725:latest
+                    tags: user/box_php725:latest
                     cache-from: type=gha
                     cache-to: type=gha,mode=max
 
