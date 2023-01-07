@@ -39,11 +39,11 @@ help:
 #---------------------------------------------------------------------------
 
 .PHONY: check
-check:	## Runs all checks
+check:	 ## Runs all checks
 check: cs cs_lint test
 
 .PHONY: clean
-clean: 	 		 ## Cleans all created artifacts
+clean: 	 ## Cleans all created artifacts
 clean:
 	rm -rf \
 		dist \
@@ -54,7 +54,7 @@ clean:
 
 
 .PHONY: dump
-dump:	## Dumps the requirement-checker
+dump:	 ## Dumps the requirement-checker
 dump:
 	rm -rf $(PHAR) $(PHAR_EXTRACT) || true
 	$(MAKE) _dump
@@ -102,7 +102,7 @@ php_cs_fixer_lint: $(PHP_CS_FIXER_BIN)
 #---------------------------------------------------------------------------
 
 .PHONY: test
-test:		  	 ## Runs all the tests
+test:	 ## Runs all the tests
 test: phpunit terminal_copy
 
 .PHONY: phpunit
