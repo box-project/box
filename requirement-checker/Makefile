@@ -14,6 +14,9 @@ ACTUAL_TERMINAL_DIFF = tests/TerminalCompatibility/actual_diff
 EXPECTED_TERMINAL_DIFF = tests/TerminalCompatibility/expected_diff
 ORIGINAL_TERMINAL = ../vendor-bin/requirement-checker/vendor/symfony/console/Terminal.php
 
+PHP_CS_FIXER_BIN = ../vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
+PHP_CS_FIXER = $(PHP_CS_FIXER_BIN)
+
 
 .DEFAULT_GOAL := help
 
@@ -44,11 +47,11 @@ clean:
 
 .PHONY: cs
 cs:	 ## Fixes CS
-cs: gitignore_sort composer_normalize
+cs: gitignore_sort composer_normalize php_cs_fixer
 
 .PHONY: cs_lint
 cs_lint: ## Checks CS
-cs_lint: composer_normalize_lint
+cs_lint: composer_normalize_lint php_cs_fixer_lint
 
 .PHONY: gitignore_sort
 gitignore_sort:
@@ -61,6 +64,14 @@ composer_normalize: composer.json vendor
 .PHONY: composer_normalize_lint
 composer_normalize_lint: composer.json vendor
 	composer normalize --dry-run
+
+.PHONY: php_cs_fixer
+php_cs_fixer: $(PHP_CS_FIXER_BIN)
+	$(PHP_CS_FIXER) fix
+
+.PHONY: php_cs_fixer_lint
+php_cs_fixer_lint: $(PHP_CS_FIXER_BIN)
+	$(PHP_CS_FIXER) fix --dry-run
 
 
 #
@@ -111,7 +122,11 @@ $(ACTUAL_TERMINAL_DIFF): src/Terminal.php vendor $(ORIGINAL_TERMINAL)
 	touch -c $@
 
 $(ORIGINAL_TERMINAL):
-	cd ..; $(MAKE) vendor-bin/requirement-checker/vendor
+	cd ..; $(MAKE) requirement_checker_install
+	touch -c $@
+
+$(PHP_CS_FIXER_BIN):
+	cd ..; $(MAKE) php_cs_fixer_install
 	touch -c $@
 
 dist:

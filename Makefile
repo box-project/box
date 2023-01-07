@@ -478,6 +478,10 @@ fixtures/php-settings-checker/output-xdebug-enabled: fixtures/php-settings-check
 	./fixtures/php-settings-checker/create-expected-output $(MIN_SUPPORTED_PHP_WITH_XDEBUG_BOX)
 	touch -c $@
 
+
+.PHONY: requirement_checker_install
+requirement_checker_install: vendor-bin/requirement-checker/vendor
+
 vendor-bin/requirement-checker/vendor: vendor-bin/requirement-checker/composer.lock $(COMPOSER_BIN_PLUGIN_VENDOR)
 	composer bin requirement-checker install
 	touch -c $@
