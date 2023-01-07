@@ -164,7 +164,7 @@ jobs:
                 uses: docker/build-push-action@v3
                 with:
                     context: .
-                    dockerfile: .docker/php725
+                    file: .docker/php725
                     platforms: linux/amd64
                     load: true
                     tags: box_php725
@@ -176,7 +176,7 @@ jobs:
                 uses: docker/build-push-action@v3
                 with:
                     context: .
-                    dockerfile: .docker/php725
+                    file: .docker/php725
                     platforms: linux/amd64
                     push: true
                     tags: box_php725
