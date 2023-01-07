@@ -373,7 +373,7 @@ box: bin src res vendor box.json.dist scoper.inc.php $(REQUIREMENT_CHECKER_EXTRA
 
 .PHONY: docker-images
 docker-images:
-	./.docker/build
+	./../.docker/build
 
 fixtures/php-settings-checker/output-xdebug-enabled: fixtures/php-settings-checker/output-xdebug-enabled.tpl docker-images
 	./fixtures/php-settings-checker/create-expected-output $(MIN_SUPPORTED_PHP_WITH_XDEBUG_BOX)
