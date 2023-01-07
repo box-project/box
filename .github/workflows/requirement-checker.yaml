@@ -51,7 +51,14 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                php: [ '8.1', '8.2' ]
+                # The lowest dependency is tested via an e2e test rather than by executing the tests like so.
+                # The reason being using tools such as PHPUnit for a version as low as the lowest supported version
+                # is a serious strain for close to no benefits: the e2e test is simpler.
+                php:
+                    -   version: '8.1'
+                        dependency: locked
+                    -   version: '8.2'
+                        dependency: highest
 
         steps:
             -   name: Checkout
@@ -60,13 +67,14 @@ jobs:
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
                 with:
-                    php-version: "${{ matrix.php }}"
+                    php-version: '${{ matrix.php.version }}'
                     tools: composer
 
             -   name: Install the Composer dependencies
                 uses: ramsey/composer-install@v2
                 with:
                     working-directory: 'requirement-checker'
+                    dependency-versions: '${{ matrix.php.dependency }}'
 
             -   name: Ensure that the Makefile target is up to date
                 run: cd requirement-checker; make vendor_install
