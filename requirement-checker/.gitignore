@@ -8,3 +8,8 @@
 /dist/
 /tests/TerminalCompatibility/actual_diff
 /vendor/
+!/fixtures/*/expected-output-*-dist
+/fixtures/*/*.phar
+/fixtures/*/actual-output
+/fixtures/*/expected-output-*
+/fixtures/*/vendor/

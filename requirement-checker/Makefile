@@ -106,7 +106,15 @@ php_cs_fixer_lint: $(PHP_CS_FIXER_BIN)
 
 .PHONY: test
 test:	 ## Runs all the tests
-test: phpunit terminal_copy
+test: test_unit
+
+
+#
+# Unit Tests
+#---------------------------------------------------------------------------
+
+.PHONY: test_unit
+test_unit: phpunit terminal_copy
 
 .PHONY: phpunit
 phpunit:
@@ -116,6 +124,16 @@ phpunit: $(PHPUNIT_BIN) vendor
 .PHONY: terminal_copy
 terminal_copy: $(ACTUAL_TERMINAL_DIFF)
 	diff --ignore-all-space --side-by-side --suppress-common-lines $(EXPECTED_TERMINAL_DIFF) $(ACTUAL_TERMINAL_DIFF)
+
+
+#
+# E2E Tests
+#---------------------------------------------------------------------------
+
+include Makefile.e2e
+
+.PHONY: test_e2e
+test_e2e: docker_images _test_e2e_pass_complete_min_composer_php _test_e2e_pass_complete_min_box_php _test_e2e_fail_complete_min_composer_php _test_e2e_fail_complete_min_box_php _test_e2e_skip_min_composer_php
 
 
 #
