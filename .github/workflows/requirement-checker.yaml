@@ -167,7 +167,7 @@ jobs:
                     file: .docker/php725
                     platforms: linux/amd64
                     load: true
-                    tags: box_php725
+                    tags: user/box_php725:latest
 
             -   name: Test the image
                 run: docker run --rm box_php725 php --version
