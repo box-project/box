@@ -23,7 +23,7 @@ jobs:
             -   name: Install the Composer (root) dependencies
                 uses: ramsey/composer-install@v2
 
-            -   name: Ensure that the Makefile target is up to date
+            -   name: Ensure that the make target is up to date
                 run: make vendor_install
 
             -   name: Install PHP-CS-Fixer
@@ -31,7 +31,7 @@ jobs:
                 with:
                     working-directory: 'vendor-bin/php-cs-fixer'
 
-            -   name: Ensure that the PHP-CS-Fixer Makefile target is up to date
+            -   name: Ensure that the PHP-CS-Fixer make target is up to date
                 run: make php_cs_fixer_install
 
             -   name: Install the Composer dependencies
@@ -39,7 +39,7 @@ jobs:
                 with:
                     working-directory: 'requirement-checker'
 
-            -   name: Ensure that the Makefile target is up to date
+            -   name: Ensure that the make target is up to date
                 run: cd requirement-checker; make vendor_install
 
             -   name: Lint CS
@@ -57,8 +57,13 @@ jobs:
                 php:
                     -   version: '8.1'
                         dependency: locked
+                        composer-options: ''
                     -   version: '8.2'
                         dependency: highest
+                        composer-options: ''
+                    -   version: '8.3'
+                        dependency: highest
+                        composer-options: '--ignore-platform-req=php+'
 
         steps:
             -   name: Checkout
@@ -75,6 +80,7 @@ jobs:
                 with:
                     working-directory: 'requirement-checker'
                     dependency-versions: '${{ matrix.php.dependency }}'
+                    composer-options: '${{ matrix.php.composer-options }}'
 
             -   name: Ensure that the Makefile target is up to date
                 run: cd requirement-checker; make vendor_install
