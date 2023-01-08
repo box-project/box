@@ -49,8 +49,13 @@ clean:
 	rm -rf \
 		dist \
 		$(ACTUAL_TERMINAL_DIFF) \
-		bin/check-requirements.phar \
 		$(PHAR) \
+		.phpunit.result.cache \
+		.requirement-checker \
+		|| true
+	@# Obsolete entries; Only relevant to someone who still has old artifacts locally
+	@rm -rf \
+		bin/check-requirements.phar \
 		.phpunit.result.cache \
 		.requirement-checker \
 		fixtures/fail-complete/actual-output \
