@@ -67,12 +67,11 @@ jobs:
 
     infection:
         runs-on: ubuntu-latest
-        name: "Infection: ${{ matrix.php }} - ${{ matrix.tools }}"
+        name: "Infection (PHP ${{ matrix.php }})"
         strategy:
             fail-fast: false
             matrix:
                 php: [ '8.1' ]
-                tools: [ "composer:v2" ]
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3
@@ -86,7 +85,7 @@ jobs:
                     # The phar.readonly value is adjusted in the Makefile command for
                     # better portability.
                     ini-values: phar.readonly=0, display_errors=On, error_reporting=-1
-                    tools: ${{ matrix.tools }}
+                    tools: composer
                     coverage: pcov
                     extensions: ctype, iconv, xml
 
@@ -95,6 +94,12 @@ jobs:
 
             -   name: Ensure that the make target is up to date
                 run: make vendor_install
+
+            -   name: Install Infection
+                uses: ramsey/composer-install@v2
+
+            -   name: Ensure that the Infection make target is up to date
+                run: make infection_install
 
             -   name: Configure Infection for the CI
                 run: |
