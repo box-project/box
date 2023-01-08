@@ -2,12 +2,10 @@
 MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 
-OS := $(shell uname)
-ERROR_COLOR := "\033[41m"
-NO_COLOR := "\033[0m"
-
 E2E_BOX_BIN = ../box
 E2E_BOX = $(E2E_BOX_BIN)
+
+DIFF = diff --strip-trailing-cr --ignore-all-space --side-by-side --suppress-common-lines
 
 DOCKER_RUN = docker run --interactive --platform linux/amd64 --rm --workdir=/opt/box
 
@@ -64,14 +62,14 @@ test_e2e_pass_no_config_min_composer_php: docker_images _test_e2e_pass_no_config
 
 .PHONY: _test_e2e_pass_no_config_min_composer_php
 _test_e2e_pass_no_config_min_composer_php: $(E2E_TEST_PASS_NO_CONFIG_PHAR)
-	rm $(E2E_TEST_PASS_NO_CONFIG_ACTUAL_OUTPUT) $(E2E_TEST_PASS_NO_CONFIG_MIN_COMPOSER_EXPECTED_OUTPUT) || true
-	$(MAKE) $(E2E_TEST_PASS_NO_CONFIG_MIN_COMPOSER_EXPECTED_OUTPUT)
+	@echo "$(YELLOW_COLOR)Test RequirementChecker with a project with no configuration (min PHP version supported by Composer).$(NO_COLOR)"
+	@rm $(E2E_TEST_PASS_NO_CONFIG_ACTUAL_OUTPUT) $(E2E_TEST_PASS_NO_CONFIG_MIN_COMPOSER_EXPECTED_OUTPUT) || true
+	@$(MAKE) $(E2E_TEST_PASS_NO_CONFIG_MIN_COMPOSER_EXPECTED_OUTPUT)
 
 	$(DOCKER_RUN) \
 		--volume="$$PWD/$(E2E_TEST_PASS_NO_CONFIG_DIR)":/opt/box \
-		$(DOCKER_MIN_COMPOSER_PHP_VERSION_RUN_COMMAND) \
-		2>&1 | tee $(E2E_TEST_PASS_NO_CONFIG_ACTUAL_OUTPUT)
-	diff --ignore-all-space --side-by-side --suppress-common-lines \
+		$(DOCKER_MIN_COMPOSER_PHP_VERSION_RUN_COMMAND) 2>&1 | tee $(E2E_TEST_PASS_NO_CONFIG_ACTUAL_OUTPUT)
+	$(DIFF) \
 		$(E2E_TEST_PASS_NO_CONFIG_MIN_COMPOSER_EXPECTED_OUTPUT) \
 		$(E2E_TEST_PASS_NO_CONFIG_ACTUAL_OUTPUT)
 
@@ -81,14 +79,14 @@ test_e2e_pass_no_config_min_box_php: docker_images _test_e2e_pass_no_config_min_
 
 .PHONY: _test_e2e_pass_no_config_min_box_php
 _test_e2e_pass_no_config_min_box_php: $(E2E_TEST_PASS_NO_CONFIG_PHAR)
-	rm $(E2E_TEST_PASS_NO_CONFIG_ACTUAL_OUTPUT) $(E2E_TEST_PASS_NO_CONFIG_MIN_BOX_EXPECTED_OUTPUT) || true
-	$(MAKE) $(E2E_TEST_PASS_NO_CONFIG_MIN_BOX_EXPECTED_OUTPUT)
+	@echo "$(YELLOW_COLOR)Test RequirementChecker with a project with no configuration (min PHP version supported by Box).$(NO_COLOR)"
+	@rm $(E2E_TEST_PASS_NO_CONFIG_ACTUAL_OUTPUT) $(E2E_TEST_PASS_NO_CONFIG_MIN_BOX_EXPECTED_OUTPUT) || true
+	@$(MAKE) $(E2E_TEST_PASS_NO_CONFIG_MIN_BOX_EXPECTED_OUTPUT)
 
 	$(DOCKER_RUN) \
 		--volume="$$PWD/$(E2E_TEST_PASS_NO_CONFIG_DIR)":/opt/box \
-		$(DOCKER_MIN_BOX_PHP_VERSION_RUN_COMMAND) \
-		2>&1 | tee $(E2E_TEST_PASS_NO_CONFIG_ACTUAL_OUTPUT)
-	diff --ignore-all-space --side-by-side --suppress-common-lines \
+		$(DOCKER_MIN_BOX_PHP_VERSION_RUN_COMMAND) 2>&1 | tee $(E2E_TEST_PASS_NO_CONFIG_ACTUAL_OUTPUT)
+	$(DIFF) \
 		$(E2E_TEST_PASS_NO_CONFIG_MIN_BOX_EXPECTED_OUTPUT) \
 		$(E2E_TEST_PASS_NO_CONFIG_ACTUAL_OUTPUT)
 
@@ -102,14 +100,14 @@ test_e2e_pass_complete_min_composer_php: docker_images _test_e2e_pass_complete_m
 
 .PHONY: _test_e2e_pass_complete_min_composer_php
 _test_e2e_pass_complete_min_composer_php: $(E2E_TEST_PASS_COMPLETE_PHAR)
-	rm $(E2E_TEST_PASS_COMPLETE_ACTUAL_OUTPUT) $(E2E_TEST_PASS_COMPLETE_MIN_COMPOSER_EXPECTED_OUTPUT) || true
-	$(MAKE) $(E2E_TEST_PASS_COMPLETE_MIN_COMPOSER_EXPECTED_OUTPUT)
+	@echo "$(YELLOW_COLOR)Test RequirementChecker with a project with satisfied requirements (min PHP version supported by Composer).$(NO_COLOR)"
+	@rm $(E2E_TEST_PASS_COMPLETE_ACTUAL_OUTPUT) $(E2E_TEST_PASS_COMPLETE_MIN_COMPOSER_EXPECTED_OUTPUT) || true
+	@$(MAKE) $(E2E_TEST_PASS_COMPLETE_MIN_COMPOSER_EXPECTED_OUTPUT)
 
 	$(DOCKER_RUN) \
 		--volume="$$PWD/$(E2E_TEST_PASS_COMPLETE_DIR)":/opt/box \
-		$(DOCKER_MIN_COMPOSER_PHP_VERSION_RUN_COMMAND) \
-		2>&1 | tee $(E2E_TEST_PASS_COMPLETE_ACTUAL_OUTPUT)
-	diff --ignore-all-space --side-by-side --suppress-common-lines \
+		$(DOCKER_MIN_COMPOSER_PHP_VERSION_RUN_COMMAND) 2>&1 | tee $(E2E_TEST_PASS_COMPLETE_ACTUAL_OUTPUT)
+	$(DIFF) \
 		$(E2E_TEST_PASS_COMPLETE_MIN_COMPOSER_EXPECTED_OUTPUT) \
 		$(E2E_TEST_PASS_COMPLETE_ACTUAL_OUTPUT)
 
@@ -117,16 +115,18 @@ _test_e2e_pass_complete_min_composer_php: $(E2E_TEST_PASS_COMPLETE_PHAR)
 .PHONY: test_e2e_pass_complete_min_box_php
 test_e2e_pass_complete_min_box_php: docker_images _test_e2e_pass_complete_min_box_php
 
+CCYELLOW = \033[0;33m
+CCEND = \033[0m
 .PHONY: _test_e2e_pass_complete_min_box_php
 _test_e2e_pass_complete_min_box_php: $(E2E_TEST_PASS_COMPLETE_PHAR)
-	rm $(E2E_TEST_PASS_COMPLETE_ACTUAL_OUTPUT) || true
-	$(MAKE) $(E2E_TEST_PASS_COMPLETE_MIN_BOX_EXPECTED_OUTPUT)
+	@echo "$(YELLOW_COLOR)Test RequirementChecker with a project with satisfied requirements (min PHP version supported by Box).$(NO_COLOR)"
+	@rm $(E2E_TEST_PASS_COMPLETE_ACTUAL_OUTPUT) $(E2E_TEST_PASS_COMPLETE_MIN_BOX_EXPECTED_OUTPUT) || true
+	@$(MAKE) $(E2E_TEST_PASS_COMPLETE_MIN_BOX_EXPECTED_OUTPUT)
 
 	$(DOCKER_RUN) \
 		--volume="$$PWD/$(E2E_TEST_PASS_COMPLETE_DIR)":/opt/box \
-		$(DOCKER_MIN_BOX_PHP_VERSION_RUN_COMMAND) \
-		2>&1 | tee $(E2E_TEST_PASS_COMPLETE_ACTUAL_OUTPUT)
-	diff --ignore-all-space --side-by-side --suppress-common-lines \
+		$(DOCKER_MIN_BOX_PHP_VERSION_RUN_COMMAND) 2>&1 | tee $(E2E_TEST_PASS_COMPLETE_ACTUAL_OUTPUT)
+	$(DIFF) \
 		$(E2E_TEST_PASS_COMPLETE_MIN_BOX_EXPECTED_OUTPUT) \
 		$(E2E_TEST_PASS_COMPLETE_ACTUAL_OUTPUT)
 
@@ -140,14 +140,14 @@ test_e2e_fail_complete_min_composer_php: docker_images _test_e2e_fail_complete_m
 
 .PHONY: _test_e2e_fail_complete_min_composer_php
 _test_e2e_fail_complete_min_composer_php: $(E2E_TEST_FAIL_COMPLETE_PHAR)
-	rm $(E2E_TEST_FAIL_COMPLETE_ACTUAL_OUTPUT) $(E2E_TEST_FAIL_COMPLETE_MIN_COMPOSER_EXPECTED_OUTPUT) || true
-	$(MAKE) $(E2E_TEST_FAIL_COMPLETE_MIN_COMPOSER_EXPECTED_OUTPUT)
+	@echo "$(YELLOW_COLOR)Test RequirementChecker with a project with non-satisfied requirements (min PHP version supported by Composer).$(NO_COLOR)"
+	@rm $(E2E_TEST_FAIL_COMPLETE_ACTUAL_OUTPUT) $(E2E_TEST_FAIL_COMPLETE_MIN_COMPOSER_EXPECTED_OUTPUT) || true
+	@$(MAKE) $(E2E_TEST_FAIL_COMPLETE_MIN_COMPOSER_EXPECTED_OUTPUT)
 
 	$(DOCKER_RUN) \
 		--volume="$$PWD/$(E2E_TEST_FAIL_COMPLETE_DIR)":/opt/box \
-		$(DOCKER_MIN_COMPOSER_PHP_VERSION_RUN_COMMAND) \
-		2>&1 | tee $(E2E_TEST_FAIL_COMPLETE_ACTUAL_OUTPUT)
-	diff --ignore-all-space --side-by-side --suppress-common-lines \
+		$(DOCKER_MIN_COMPOSER_PHP_VERSION_RUN_COMMAND) 2>&1 | tee $(E2E_TEST_FAIL_COMPLETE_ACTUAL_OUTPUT)
+	$(DIFF) \
 		$(E2E_TEST_FAIL_COMPLETE_MIN_COMPOSER_EXPECTED_OUTPUT) \
 		$(E2E_TEST_FAIL_COMPLETE_ACTUAL_OUTPUT)
 
@@ -157,14 +157,14 @@ test_e2e_fail_complete_min_box_php: docker_images _test_e2e_fail_complete_min_bo
 
 .PHONY: _test_e2e_fail_complete_min_box_php
 _test_e2e_fail_complete_min_box_php: $(E2E_TEST_FAIL_COMPLETE_PHAR)
-	rm $(E2E_TEST_FAIL_COMPLETE_ACTUAL_OUTPUT) $(E2E_TEST_FAIL_COMPLETE_MIN_BOX_EXPECTED_OUTPUT) || true
-	$(MAKE) $(E2E_TEST_FAIL_COMPLETE_MIN_BOX_EXPECTED_OUTPUT)
+	@echo "$(YELLOW_COLOR)Test RequirementChecker with a project with non-satisfied requirements (min PHP version supported by Box).$(NO_COLOR)"
+	@rm $(E2E_TEST_FAIL_COMPLETE_ACTUAL_OUTPUT) $(E2E_TEST_FAIL_COMPLETE_MIN_BOX_EXPECTED_OUTPUT) || true
+	@$(MAKE) $(E2E_TEST_FAIL_COMPLETE_MIN_BOX_EXPECTED_OUTPUT)
 
 	$(DOCKER_RUN) \
 		--volume="$$PWD/$(E2E_TEST_FAIL_COMPLETE_DIR)":/opt/box \
-		$(DOCKER_MIN_BOX_PHP_VERSION_RUN_COMMAND) \
-		2>&1 | tee $(E2E_TEST_FAIL_COMPLETE_ACTUAL_OUTPUT)
-	diff --ignore-all-space --side-by-side --suppress-common-lines \
+		$(DOCKER_MIN_BOX_PHP_VERSION_RUN_COMMAND) 2>&1 | tee $(E2E_TEST_FAIL_COMPLETE_ACTUAL_OUTPUT)
+	$(DIFF) \
 		$(E2E_TEST_FAIL_COMPLETE_MIN_BOX_EXPECTED_OUTPUT) \
 		$(E2E_TEST_FAIL_COMPLETE_ACTUAL_OUTPUT)
 
@@ -178,14 +178,15 @@ test_e2e_skip_min_composer_php: docker_images _test_e2e_skip_min_composer_php
 
 .PHONY: _test_e2e_skip_min_composer_php
 _test_e2e_skip_min_composer_php: $(E2E_TEST_SKIP_PHAR)
-	rm $(E2E_TEST_SKIP_ACTUAL_OUTPUT) $(E2E_TEST_SKIP_MIN_COMPOSER_EXPECTED_OUTPUT) || true
-	$(MAKE) $(E2E_TEST_SKIP_MIN_COMPOSER_EXPECTED_OUTPUT)
+	@echo "$(YELLOW_COLOR)Test skipping the RequirementChecker with a project with non-satisfied requirements.$(NO_COLOR)"
+	@rm $(E2E_TEST_SKIP_ACTUAL_OUTPUT) $(E2E_TEST_SKIP_MIN_COMPOSER_EXPECTED_OUTPUT) || true
+	@$(MAKE) $(E2E_TEST_SKIP_MIN_COMPOSER_EXPECTED_OUTPUT)
 
 	$(DOCKER_RUN) \
+		--env="BOX_REQUIREMENT_CHECKER=0" \
 		--volume="$$PWD/$(E2E_TEST_SKIP_DIR)":/opt/box \
-		$(DOCKER_MIN_COMPOSER_PHP_VERSION_RUN_COMMAND) \
-		2>&1 | tee $(E2E_TEST_SKIP_ACTUAL_OUTPUT)
-	diff --ignore-all-space --side-by-side --suppress-common-lines \
+		$(DOCKER_MIN_COMPOSER_PHP_VERSION_RUN_COMMAND) 2>&1 | tee $(E2E_TEST_SKIP_ACTUAL_OUTPUT)
+	$(DIFF) \
 		$(E2E_TEST_SKIP_MIN_COMPOSER_EXPECTED_OUTPUT) \
 		$(E2E_TEST_SKIP_ACTUAL_OUTPUT)
 

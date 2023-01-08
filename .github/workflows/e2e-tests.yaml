@@ -22,7 +22,6 @@ jobs:
                     - 'e2e_php_settings_checker'
                     - 'e2e_scoper_alias'
                     - 'e2e_scoper_expose_symbols'
-                    - 'e2e_check_requirements'
                     - 'e2e_symfony'
                     - 'e2e_composer_installed_versions'
                 php: [ '8.1' ]
