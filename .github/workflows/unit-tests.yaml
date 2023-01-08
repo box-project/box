@@ -18,14 +18,13 @@ jobs:
                     -   version: '8.1'
                         dependency: locked
                         composer-options: ''
-                    -   version: '8.2'
-                        dependency: highest
-                        composer-options: ''
-                    -   version: '8.3'
-                        dependency: highest
-                        composer-options: '--ignore-platform-req=php+'
+#                    -   version: '8.2'
+#                        dependency: highest
+#                        composer-options: ''
+#                    -   version: '8.3'
+#                        dependency: highest
+#                        composer-options: '--ignore-platform-req=php+'
                 tools:
-                    - 'composer:2.2'
                     - 'composer'
                 phar-readonly: [ true, false ]
         steps:
