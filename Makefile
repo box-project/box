@@ -14,6 +14,10 @@ PHP_CS_FIXER = $(PHP_CS_FIXER_BIN) fix
 
 REQUIREMENT_CHECKER_EXTRACT = res/requirement-checker
 
+DOCKER_RUN = docker run --interactive --platform=linux/amd64 --rm --workdir=/opt/box
+DOCKER_MIN_BOX_PHP_VERSION_IMAGE_TAG = box_php81
+DOCKER_MIN_BOX_XDEBUG_PHP_VERSION_IMAGE_TAG = box_php81_xdebug
+
 
 .DEFAULT_GOAL := help
 
@@ -160,9 +164,9 @@ else
 endif
 .PHONY: e2e_php_settings_checker
 e2e_php_settings_checker: ## Runs the end-to-end tests for the PHP settings handler
-e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xdebug-enabled vendor box
+e2e_php_settings_checker: docker_images fixtures/php-settings-checker/output-xdebug-enabled vendor box
 	@echo "$(CCYELLOW)No restart needed$(CCEND)"
-	$(DOCKER) -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX) \
+	$(DOCKER_RUN) --volume="$$PWD":/opt/box $(DOCKER_MIN_BOX_PHP_VERSION_IMAGE_TAG) \
 		php -dphar.readonly=0 -dmemory_limit=-1 \
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
@@ -171,7 +175,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-all-clear fixtures/php-settings-checker/actual-output
 
 	@echo "$(CCYELLOW)Xdebug enabled: restart needed$(CCEND)"
-	$(DOCKER) -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX)_xdebug \
+	$(DOCKER_RUN) --volume="$$PWD":/opt/box $(DOCKER_MIN_BOX_PHP_VERSION_IMAGE_TAG)_xdebug \
 		php -dphar.readonly=0 -dmemory_limit=-1 \
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
@@ -181,7 +185,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-xdebug-enabled fixtures/php-settings-checker/actual-output
 
 	@echo "$(CCYELLOW)phar.readonly enabled: restart needed$(CCEND)"
-	$(DOCKER) -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX) \
+	$(DOCKER_RUN) --volume="$$PWD":/opt/box $(DOCKER_MIN_BOX_PHP_VERSION_IMAGE_TAG) \
 		php -dphar.readonly=1 -dmemory_limit=-1 \
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
@@ -192,7 +196,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-pharreadonly-enabled fixtures/php-settings-checker/actual-output
 
 	@echo "$(CCYELLOW)Bump min memory limit if necessary (limit lower than default)$(CCEND)"
-	$(DOCKER) -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX) \
+	$(DOCKER_RUN) --volume="$$PWD":/opt/box $(DOCKER_MIN_BOX_PHP_VERSION_IMAGE_TAG) \
 		php -dphar.readonly=0 -dmemory_limit=124M \
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
@@ -203,7 +207,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-min-memory-limit fixtures/php-settings-checker/actual-output
 
 	@echo "$(CCYELLOW)Bump min memory limit if necessary (limit higher than default)$(CCEND)"
-	$(DOCKER) -e BOX_MEMORY_LIMIT=64M -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX) \
+	$(DOCKER_RUN) -e BOX_MEMORY_LIMIT=64M --volume="$$PWD":/opt/box $(DOCKER_MIN_BOX_PHP_VERSION_IMAGE_TAG) \
 		php -dphar.readonly=0 -dmemory_limit=1024M \
 		$(BOX_COMPILE) \
 		| grep '\[debug\]' \
@@ -311,7 +315,7 @@ vendor-bin/php-cs-fixer/composer.lock: vendor-bin/php-cs-fixer/composer.json
 .PHONY: infection_install
 infection_install: $(INFECTION)
 
-$(INFECTION): vendor-bin/php-cs-fixer/vendor
+$(INFECTION): vendor-bin/infection/vendor
 	touch -c $@
 vendor-bin/infection/vendor: vendor-bin/infection/composer.lock $(COMPOSER_BIN_PLUGIN_VENDOR)
 	composer bin infection install
@@ -374,12 +378,12 @@ box: bin src res vendor box.json.dist scoper.inc.php $(REQUIREMENT_CHECKER_EXTRA
 
 	touch -c $@
 
-.PHONY: docker-images
-docker-images:
+.PHONY: docker_images
+docker_images:
 	./.docker/build
 
-fixtures/php-settings-checker/output-xdebug-enabled: fixtures/php-settings-checker/output-xdebug-enabled.tpl docker-images
-	./fixtures/php-settings-checker/create-expected-output $(MIN_SUPPORTED_PHP_WITH_XDEBUG_BOX)
+fixtures/php-settings-checker/output-xdebug-enabled: fixtures/php-settings-checker/output-xdebug-enabled.tpl docker_images
+	./fixtures/php-settings-checker/create-expected-output $(DOCKER_MIN_BOX_XDEBUG_PHP_VERSION_IMAGE_TAG)
 	touch -c $@
 
 
