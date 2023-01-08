@@ -31,7 +31,7 @@ final class E2EMakefileTest extends BaseMakefileTestCase
 
     protected function getExpectedHelpOutput(): string
     {
-        $this->markTestSkipped('There is no help command.');
+        self::markTestSkipped('There is no help command.');
     }
 
     public function test_the_e2e_target_must_contain_all_the_e2e_targets(): void
