@@ -25,7 +25,6 @@ jobs:
                         dependency: highest
                         composer-options: '--ignore-platform-req=php+'
                 tools:
-                    - 'composer:2.2'
                     - 'composer'
                 phar-readonly: [ true, false ]
         steps:
