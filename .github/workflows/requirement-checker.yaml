@@ -190,7 +190,7 @@ jobs:
                 run: cd requirement-checker; make docker_images
 
             -   name: Runs the tests
-                run: cd requirement-checker; make --keep-going test_e2e
+                run: cd requirement-checker; make --keep-going ${{ matrix.e2e }}
 
     # This is a "trick", a meta task which does not change, and we can use in
     # the protected branch rules as opposed to the tests one above which
