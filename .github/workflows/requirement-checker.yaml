@@ -167,7 +167,7 @@ jobs:
                     file: .docker/php725
                     platforms: linux/amd64
                     load: true
-                    tags: user/box_php725:latest
+                    tags: box_php725
 
             -   name: Test the image
                 run: docker run --rm box_php725 php --version
@@ -179,7 +179,7 @@ jobs:
                     file: .docker/php725
                     platforms: linux/amd64
                     push: true
-                    tags: user/box_php725:latest
+                    tags: box_php725
                     cache-from: type=gha
                     cache-to: type=gha,mode=max
 
