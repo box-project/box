@@ -25,7 +25,7 @@ jobs:
                         dependency: highest
                         composer-options: '--ignore-platform-req=php+'
                 tools:
-                    - 'composer:2.2'
+                    - 'composer:2.3'
                     - 'composer'
         steps:
             -   name: Checkout
@@ -87,11 +87,17 @@ jobs:
                     coverage: pcov
                     extensions: ctype, iconv, xml
 
-            -   name: Install Composer dependencies
+            -   name: Install the dependencies
                 uses: ramsey/composer-install@v2
 
             -   name: Ensure that the make target is up to date
                 run: make vendor_install
+
+            -   name: Install Infection dependencies
+                uses: ramsey/composer-install@v2
+
+            -   name: Ensure that the make target is up to date
+                run: make infection_vendor_install
 
             -   name: Configure Infection for the CI
                 run: |

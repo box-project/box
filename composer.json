@@ -20,7 +20,7 @@
         "php": "^8.1",
         "ext-phar": "*",
         "ext-sodium": "*",
-        "composer-plugin-api": "^2.2",
+        "composer-plugin-api": "^2.3",
         "amphp/parallel-functions": "^1.1",
         "composer/semver": "^3.3.2",
         "composer/xdebug-handler": "^3.0.3",

@@ -308,6 +308,9 @@ vendor-bin/php-cs-fixer/composer.lock: vendor-bin/php-cs-fixer/composer.json
 	@echo "$(@) is not up to date. You may want to run the following command:"
 	@echo "$$ composer bin php-cs-fixer update --lock && touch -c $(@)"
 
+.PHONY: infection_vendor_install
+infection_vendor_install: $(INFECTION)
+
 $(INFECTION): vendor-bin/php-cs-fixer/vendor
 	touch -c $@
 vendor-bin/infection/vendor: vendor-bin/infection/composer.lock $(COMPOSER_BIN_PLUGIN_VENDOR)
