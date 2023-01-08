@@ -170,7 +170,7 @@ jobs:
                     tags: ghcr.io/box_php725
 
             -   name: Test the image
-                run: docker run --rm box_php725 php --version
+                run: docker run --rm ghcr.io/box_php725 php --version
 
             -   name: Build and push
                 uses: docker/build-push-action@v3
