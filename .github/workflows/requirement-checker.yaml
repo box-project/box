@@ -186,6 +186,9 @@ jobs:
             -   name: Check that the PHAR works
                 run: ./box --version
 
+            -   name: Build the Docker images
+                run: cd requirement-checker; make docker_images
+
             -   name: Runs the tests
                 run: cd requirement-checker; make --keep-going test_e2e
 

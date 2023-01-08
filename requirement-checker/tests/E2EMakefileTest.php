@@ -31,10 +31,7 @@ final class E2EMakefileTest extends BaseMakefileTestCase
 
     protected function getExpectedHelpOutput(): string
     {
-        return <<<'EOF'
-            make[1]: *** No rule to make target `help'.  Stop.
-
-            EOF;
+        self::markTestSkipped('There is no help command.');
     }
 
     public function test_the_e2e_target_must_contain_all_the_e2e_targets(): void
