@@ -74,6 +74,7 @@ jobs:
                 with:
                     php-version: '${{ matrix.php.version }}'
                     tools: composer
+                    coverage: none
 
             -   name: Install the Composer dependencies
                 uses: ramsey/composer-install@v2
@@ -147,6 +148,17 @@ jobs:
         runs-on: ubuntu-latest
         name: End-to-End Tests
         needs: build-box-phar
+        strategy:
+            fail-fast: false
+            matrix:
+                e2e:
+                    - 'test_e2e_pass_no_config_min_composer_php'
+                    - 'test_e2e_pass_no_config_min_box_php'
+                    - 'test_e2e_pass_complete_min_composer_php'
+                    - 'test_e2e_pass_complete_min_box_php'
+                    - 'test_e2e_fail_complete_min_composer_php'
+                    - 'test_e2e_fail_complete_min_box_php'
+                    - 'test_e2e_skip_min_composer_php'
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3
@@ -156,6 +168,7 @@ jobs:
                 with:
                     php-version: '8.1'
                     tools: composer
+                    coverage: none
 
             -   name: Retrieve built PHAR
                 uses: actions/download-artifact@v3
@@ -173,8 +186,11 @@ jobs:
             -   name: Check that the PHAR works
                 run: ./box --version
 
+            -   name: Build the Docker images
+                run: cd requirement-checker; make docker_images
+
             -   name: Runs the tests
-                run: cd requirement-checker; make --keep-going test_e2e
+                run: cd requirement-checker; make ${{ matrix.e2e }}
 
     # This is a "trick", a meta task which does not change, and we can use in
     # the protected branch rules as opposed to the tests one above which

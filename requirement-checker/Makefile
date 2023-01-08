@@ -3,8 +3,9 @@ MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 
 OS := $(shell uname)
-ERROR_COLOR := "\033[41m"
-NO_COLOR := "\033[0m"
+ERROR_COLOR := \033[41m
+YELLOW_COLOR := \033[0;33m
+NO_COLOR := \033[0m
 
 
 PHPUNIT_BIN = vendor/bin/phpunit
@@ -48,10 +49,29 @@ clean:
 	rm -rf \
 		dist \
 		$(ACTUAL_TERMINAL_DIFF) \
-		bin/check-requirements.phar \
 		$(PHAR) \
 		.phpunit.result.cache \
 		.requirement-checker \
+		|| true
+	@# Obsolete entries; Only relevant to someone who still has old artifacts locally
+	@rm -rf \
+		bin/check-requirements.phar \
+		.phpunit.result.cache \
+		.requirement-checker \
+		fixtures/fail-complete/actual-output \
+		fixtures/fail-complete/expected-output-725 \
+		fixtures/fail-complete/expected-output-725-skipped \
+		fixtures/fail-complete/expected-output-current-min-php \
+		fixtures/fail-complete/index.phar \
+		fixtures/pass-complete/actual-output \
+		fixtures/pass-complete/expected-output-725 \
+		fixtures/pass-complete/expected-output-current-min-php \
+		fixtures/pass-complete/index.phar \
+		fixtures/pass-no-config/actual-output \
+		fixtures/pass-no-config/expected-output-725 \
+		fixtures/pass-no-config/expected-output-725-skipped \
+		fixtures/pass-no-config/expected-output-current-min-php \
+		fixtures/pass-no-config/index.phar \
 		|| true
 	$(MAKE) dist
 
