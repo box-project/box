@@ -52,6 +52,20 @@ clean:
 		$(PHAR) \
 		.phpunit.result.cache \
 		.requirement-checker \
+		fixtures/fail-complete/actual-output \
+		fixtures/fail-complete/expected-output-725 \
+		fixtures/fail-complete/expected-output-725-skipped \
+		fixtures/fail-complete/expected-output-current-min-php \
+		fixtures/fail-complete/index.phar \
+		fixtures/pass-complete/actual-output \
+		fixtures/pass-complete/expected-output-725 \
+		fixtures/pass-complete/expected-output-current-min-php \
+		fixtures/pass-complete/index.phar \
+		fixtures/pass-no-config/actual-output \
+		fixtures/pass-no-config/expected-output-725 \
+		fixtures/pass-no-config/expected-output-725-skipped \
+		fixtures/pass-no-config/expected-output-current-min-php \
+		fixtures/pass-no-config/index.phar \
 		|| true
 	$(MAKE) dist
 
