@@ -74,6 +74,7 @@ jobs:
                 with:
                     php-version: '${{ matrix.php.version }}'
                     tools: composer
+                    coverage: none
 
             -   name: Install the Composer dependencies
                 uses: ramsey/composer-install@v2
@@ -156,6 +157,7 @@ jobs:
                 with:
                     php-version: '8.1'
                     tools: composer
+                    coverage: none
 
             -   name: Retrieve built PHAR
                 uses: actions/download-artifact@v3
