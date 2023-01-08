@@ -87,17 +87,17 @@ jobs:
                     coverage: pcov
                     extensions: ctype, iconv, xml
 
-            -   name: Install the dependencies
+            -   name: Install Composer dependencies
                 uses: ramsey/composer-install@v2
 
             -   name: Ensure that the make target is up to date
                 run: make vendor_install
 
-            -   name: Install Infection dependencies
+            -   name: Install Infection
                 uses: ramsey/composer-install@v2
 
-            -   name: Ensure that the make target is up to date
-                run: make infection_vendor_install
+            -   name: Ensure that the Infection make target is up to date
+                run: make infection_install
 
             -   name: Configure Infection for the CI
                 run: |

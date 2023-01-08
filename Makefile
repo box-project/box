@@ -66,11 +66,11 @@ php_cs_fixer_lint: $(PHP_CS_FIXER_BIN)
 
 .PHONY: composer_normalize
 composer_normalize: composer.json vendor
-	composer normalize
+	composer normalize --ansi
 
 .PHONY: composer_normalize_lint
 composer_normalize_lint: composer.json vendor
-	composer normalize --dry-run
+	composer normalize --ansi --dry-run
 
 .PHONY: gitignore_sort
 gitignore_sort:
@@ -308,8 +308,8 @@ vendor-bin/php-cs-fixer/composer.lock: vendor-bin/php-cs-fixer/composer.json
 	@echo "$(@) is not up to date. You may want to run the following command:"
 	@echo "$$ composer bin php-cs-fixer update --lock && touch -c $(@)"
 
-.PHONY: infection_vendor_install
-infection_vendor_install: $(INFECTION)
+.PHONY: infection_install
+infection_install: $(INFECTION)
 
 $(INFECTION): vendor-bin/php-cs-fixer/vendor
 	touch -c $@
@@ -356,19 +356,19 @@ $(REQUIREMENT_CHECKER_EXTRACT):
 	cd requirement-checker; $(MAKE) --file=Makefile _dump
 
 box: bin src res vendor box.json.dist scoper.inc.php $(REQUIREMENT_CHECKER_EXTRACT)
-	# Compile Box
-	bin/box compile --no-parallel
+	@echo "Compile Box"
+	bin/box compile --ansi --no-parallel
 
 	rm bin/_box.phar || true
 	mv -v bin/box.phar bin/_box.phar
 
-	# Compile Box with the isolated Box PHAR
-	php bin/_box.phar compile --no-parallel
+	@echo "Compile Box with the isolated Box PHAR"
+	php bin/_box.phar compile --ansi --no-parallel
 
 	mv -fv bin/box.phar box
 
-	# Test the PHAR which has been created by the isolated PHAR
-	./box compile --no-parallel
+	@echo "Test the PHAR which has been created by the isolated PHAR"
+	./box compile --ansi --no-parallel
 
 	rm bin/_box.phar
 
