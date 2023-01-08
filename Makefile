@@ -16,6 +16,7 @@ REQUIREMENT_CHECKER_EXTRACT = res/requirement-checker
 
 DOCKER = docker run --interactive --platform=linux/amd64 --rm --workdir=/opt/box
 MIN_SUPPORTED_PHP_BOX = box_php81
+MIN_SUPPORTED_PHP_WITH_XDEBUG_BOX = box_php81_xdebug
 
 
 .DEFAULT_GOAL := help
