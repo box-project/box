@@ -14,7 +14,7 @@ env:
 jobs:
     e2e-tests:
         runs-on: ubuntu-latest
-        name: "e2e-Tests: ${{ matrix.e2e }} - ${{ matrix.php }} - ${{ matrix.tools }}"
+        name: "Test ${{ matrix.e2e }} (PHP ${{ matrix.php }}, ${{ matrix.tools }})"
         strategy:
             fail-fast: false
             matrix:

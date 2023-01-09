@@ -10,7 +10,7 @@ on:
 jobs:
     unit-tests:
         runs-on: ubuntu-latest
-        name: "Unit-Tests: PHP ${{ matrix.php.version }} (${{ matrix.php.dependency }}) - ${{ matrix.tools }}"
+        name: "Unit-Tests (PHP ${{ matrix.php.version }}, ${{ matrix.php.dependency }}, ${{ matrix.tools }})"
         strategy:
             fail-fast: false
             matrix:
