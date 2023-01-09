@@ -40,11 +40,11 @@ help:
 #---------------------------------------------------------------------------
 
 .PHONY: check
-check:	 ## Runs all checks
-check: cs cs_lint test
+check:	 	## Runs all checks
+check: cs autoreview test
 
 .PHONY: clean
-clean: 	 ## Cleans all created artifacts
+clean: 	 	## Cleans all created artifacts
 clean:
 	rm -rf \
 		dist \
@@ -77,13 +77,26 @@ clean:
 
 
 .PHONY: dump
-dump:	 ## Dumps the requirement-checker
+dump:	 	## Dumps the requirement-checker
 dump:
 	rm -rf $(PHAR) $(PHAR_EXTRACT) || true
 	$(MAKE) _dump
 
 .PHONY: _dump
 _dump: $(PHAR_EXTRACT)
+
+#
+# AutoReview
+#---------------------------------------------------------------------------
+
+.PHONY: autoreview
+autoreview:	## AutoReview checks
+autoreview: cs_lint phpunit_autoreview
+
+.PHONY: phpunit_autoreview
+phpunit_autoreview:
+phpunit_autoreview: $(PHPUNIT_BIN) vendor
+	$(PHPUNIT) --testsuite="AutoReview" --colors=always
 
 
 #
@@ -92,11 +105,11 @@ _dump: $(PHAR_EXTRACT)
 
 
 .PHONY: cs
-cs:	 ## Fixes CS
+cs:	 	## Fixes CS
 cs: gitignore_sort composer_normalize php_cs_fixer
 
 .PHONY: cs_lint
-cs_lint: ## Checks CS
+cs_lint: 	## Checks CS
 cs_lint: composer_normalize_lint php_cs_fixer_lint
 
 .PHONY: gitignore_sort
@@ -125,7 +138,7 @@ php_cs_fixer_lint: $(PHP_CS_FIXER_BIN)
 #---------------------------------------------------------------------------
 
 .PHONY: test
-test:	 ## Runs all the tests
+test:		## Runs all the tests
 test: test_unit test_e2e
 
 
@@ -139,7 +152,7 @@ test_unit: phpunit terminal_copy
 .PHONY: phpunit
 phpunit:
 phpunit: $(PHPUNIT_BIN) vendor
-	$(PHPUNIT) --colors=always
+	$(PHPUNIT) --testsuite="UnitTests" --colors=always
 
 .PHONY: terminal_copy
 terminal_copy: $(ACTUAL_TERMINAL_DIFF)

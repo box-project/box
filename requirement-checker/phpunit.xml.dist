@@ -14,15 +14,14 @@
     </php>
 
     <testsuites>
-        <testsuite name="RequirementChecker Test Suite">
+        <testsuite name="AutoReview">
+            <directory>tests/AutoReview</directory>
+        </testsuite>
+
+        <testsuite name="UnitTests">
             <directory>tests/</directory>
+            <exclude>tests/AutoReview</exclude>
         </testsuite>
     </testsuites>
-
-    <coverage>
-        <include>
-            <directory suffix=".php">src/</directory>
-        </include>
-    </coverage>
 
 </phpunit>
