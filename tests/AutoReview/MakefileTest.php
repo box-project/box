@@ -61,7 +61,6 @@ final class MakefileTest extends BaseMakefileTestCase
             [33mwebsite_build:[0m	 Builds the website
             [33mwebsite_serve:[0m	 Serves the website locally
 
-
             EOF;
     }
 }

@@ -35,6 +35,7 @@ use Webmozart\Assert\Assert;
 class DocumentationSchemaTest extends TestCase
 {
     private const CONFIGURATION_DOC_PATH = __DIR__.'/../../doc/configuration.md';
+    private const SCHEMA_PATH = __DIR__.'/../../res/schema.json';
 
     public function test_the_schema_keys_are_ordered_lexicographically(): void
     {
@@ -118,7 +119,7 @@ class DocumentationSchemaTest extends TestCase
     private function retrieveSchemaKeys(): array
     {
         $schema = json_decode(
-            file_contents(__DIR__.'/../res/schema.json'),
+            file_contents(self::SCHEMA_PATH),
             true,
             512,
             JSON_THROW_ON_ERROR,
@@ -134,7 +135,7 @@ class DocumentationSchemaTest extends TestCase
     {
         preg_match_all(
             '/#+ [\p{L}\\-\s]+\(`(.*?)`(?:[\p{L}\\-\s]+`(.*?)`)?\)/u',
-            file_contents(__DIR__.'/../doc/configuration.md'),
+            file_contents(self::CONFIGURATION_DOC_PATH),
             $matches,
         );
 
