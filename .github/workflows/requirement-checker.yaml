@@ -47,7 +47,7 @@ jobs:
 
     unit-tests:
         runs-on: ubuntu-latest
-        name: Unit Tests (PHP ${{ matrix.php.version }}, ${{ matrix.php.dependency }}, ${{ matrix.php.composer-options && 'ø' || matrix.php.composer-options }})
+        name: Unit Tests (PHP ${{ matrix.php.version }}, ${{ matrix.php.dependency }}, ${{ matrix.php.composer-options == null && 'ø' || matrix.php.composer-options }})
         strategy:
             fail-fast: false
             matrix:
