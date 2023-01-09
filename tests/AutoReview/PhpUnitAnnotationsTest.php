@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box;
+namespace KevinGH\Box\AutoReview;
 
 use function array_filter;
 use function chdir;
@@ -31,7 +31,7 @@ class PhpUnitAnnotationsTest extends TestCase
 {
     public function test_there_is_no_commented_phpunit_run_tests_in_separate_processes_annotations_commented(): void
     {
-        chdir(__DIR__.'/..');
+        chdir(__DIR__.'/../..');
 
         $output = shell_exec(
             Process::fromShellCommandline(

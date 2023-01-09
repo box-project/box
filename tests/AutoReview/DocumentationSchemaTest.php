@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box;
+namespace KevinGH\Box\AutoReview;
 
 use function array_diff;
 use function array_filter;
@@ -34,6 +34,8 @@ use Webmozart\Assert\Assert;
  */
 class DocumentationSchemaTest extends TestCase
 {
+    private const CONFIGURATION_DOC_PATH = __DIR__.'/../../doc/configuration.md';
+
     public function test_the_schema_keys_are_ordered_lexicographically(): void
     {
         $schemaKeys = $this->retrieveSchemaKeys();
@@ -102,7 +104,7 @@ class DocumentationSchemaTest extends TestCase
             1,
             preg_match(
                 '/```json(?<schema>.*?)```/s',
-                file_contents(__DIR__.'/../doc/configuration.md'),
+                file_contents(self::CONFIGURATION_DOC_PATH),
                 $matches,
             ),
         );

@@ -18,8 +18,13 @@
     </php>
 
     <testsuites>
-        <testsuite name="Box Test Suite">
+        <testsuite name="AutoReviewTests">
+            <directory>tests/AutoReview</directory>
+        </testsuite>
+
+        <testsuite name="Tests">
             <directory>tests/</directory>
+            <exclude>tests/AutoReview</exclude>
         </testsuite>
     </testsuites>
 
