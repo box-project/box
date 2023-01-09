@@ -105,6 +105,7 @@ $config = (new PhpCsFixer\Config())
     ->registerBuiltInFixers()
     ->registerCustomFixers($config->getCustomFixers())
     ->useRuleSet(new PhpCsFixer\RuleSet\RuleSet($config->getRules()))
+    ->setCacheFile(__DIR__.'/dist/.php-cs-fixer.cache')
 ;
 
 return $config;

@@ -44,6 +44,8 @@ clean:
 	rm -rf fixtures/check-requirements || true
 	@# Obsolete entries; Only relevant to someone who still has old artifacts locally
 	@rm -rf \
+		.php-cs-fixer.cache \
+		.phpunit.result.cache \
 		site \
 		website \
 		|| true
