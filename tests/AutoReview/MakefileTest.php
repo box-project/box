@@ -37,10 +37,11 @@ final class MakefileTest extends BaseMakefileTestCase
             #---------------------------------------------------------------------------[0m
 
             [33mclean:[0m 	 		  Cleans all created artifacts
-            [33mcs:[0m	  Fixes CS
-            [33mcs_lint:[0m  Checks CS
             [33mcompile:[0m 		  Compiles the application into the PHAR
             [33mdump_requirement_checker:[0m Dumps the requirement checker
+            [33mautoreview:[0m 		  AutoReview checks
+            [33mcs:[0m	  Fixes CS
+            [33mcs_lint:[0m  Checks CS
             [33mtest:[0m		  	  Runs all the tests
             [33mtu:[0m			  Runs the unit tests
             [33mtu_box:[0m			  Runs the unit tests
@@ -57,6 +58,9 @@ final class MakefileTest extends BaseMakefileTestCase
             [33me2e_composer_installed_versions:[0m		  Packages an app using Composer\InstalledVersions
             [33me2e_phpstorm_stubs:[0m		  Project using symbols which should be vetted by PhpStormStubs
             [33mblackfire:[0m		  Profiles the compile step
+            [33mwebsite_build:[0m	 Builds the website
+            [33mwebsite_serve:[0m	 Serves the website locally
+
 
             EOF;
     }
