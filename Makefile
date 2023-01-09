@@ -62,18 +62,16 @@ dump_requirement_checker:
 
 
 #
-# CS commands
+# AutoReview commands
 #---------------------------------------------------------------------------
 
-.PHONY: compile
-compile: 		 ## Compiles the application into the PHAR
-compile: box
-	cp -f box bin/box.phar
+.PHONY: autoreview
+autoreview: 		 ## AutoReview checks
+autoreview: cs_lint phpunit_autoreview
 
-.PHONY: dump_requirement_checker
-dump_requirement_checker:## Dumps the requirement checker
-dump_requirement_checker:
-	cd requirement-checker; $(MAKE) --file=Makefile dump
+.PHONY: phpunit_autoreview
+phpunit_autoreview: bin/phpunit
+	bin/phpunit --testsuite="AutoReviewTests" --colors=always
 
 
 #
