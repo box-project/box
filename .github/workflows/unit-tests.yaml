@@ -10,7 +10,7 @@ on:
 jobs:
     unit-tests:
         runs-on: ubuntu-latest
-        name: "Unit-Tests: ${{ matrix.php.version }} (${{ matrix.php.dependency }}) - ${{ matrix.tools }} - PHAR ${{ matrix.phar-readonly && 'readonly' || 'writeable' }}"
+        name: "Unit-Tests: PHP ${{ matrix.php.version }} (${{ matrix.php.dependency }}) - ${{ matrix.tools }}"
         strategy:
             fail-fast: false
             matrix:
@@ -26,7 +26,6 @@ jobs:
 #                        composer-options: '--ignore-platform-req=php+'
                 tools:
                     - 'composer'
-                phar-readonly: [ true, false ]
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3
@@ -37,8 +36,6 @@ jobs:
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: ${{ matrix.php.version }}
-                    # The phar.readonly value is adjusted in the Makefile command for
-                    # better portability.
                     ini-values: phar.readonly=0, display_errors=On, error_reporting=-1
                     tools: ${{ matrix.tools }}
                     coverage: none
@@ -57,11 +54,9 @@ jobs:
                 run: bin/box validate
 
             -   name: Run tests (PHAR readonly)
-                if: matrix.phar-readonly == true
                 run: make tu_box_phar_readonly
 
             -   name: Run tests (PHAR writeable)
-                if: matrix.phar-readonly == false
                 run: make tu_box
 
     infection:

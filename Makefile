@@ -107,7 +107,7 @@ tu: tu_requirement_checker tu_box
 tu_box:			 ## Runs the unit tests
 TU_BOX_DEPS = bin/phpunit fixtures/default_stub.php $(REQUIREMENT_CHECKER_EXTRACT) fixtures/composer-dump/dir001/vendor fixtures/composer-dump/dir003/vendor
 tu_box: $(TU_BOX_DEPS)
-	$(PHPNOGC) bin/phpunit
+	php -d phar.readonly=1 bin/phpunit
 
 .PHONY: tu_box_phar_readonly
 tu_box_phar_readonly: 	 ## Runs the unit tests with the setting `phar.readonly` to `On`
