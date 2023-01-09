@@ -63,6 +63,21 @@ dump_requirement_checker:
 # CS commands
 #---------------------------------------------------------------------------
 
+.PHONY: compile
+compile: 		 ## Compiles the application into the PHAR
+compile: box
+	cp -f box bin/box.phar
+
+.PHONY: dump_requirement_checker
+dump_requirement_checker:## Dumps the requirement checker
+dump_requirement_checker:
+	cd requirement-checker; $(MAKE) --file=Makefile dump
+
+
+#
+# CS commands
+#---------------------------------------------------------------------------
+
 .PHONY: cs
 cs:	 ## Fixes CS
 cs: root_cs requirement_checker_cs
