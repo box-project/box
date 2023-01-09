@@ -4,13 +4,14 @@ MAKEFLAGS += --no-builtin-rules
 
 OS := $(shell uname)
 PHPNOGC = php -d zend.enable_gc=0
-CCYELLOW = \033[0;33m
-CCEND = \033[0m
+ERROR_COLOR := \033[41m
+YELLOW_COLOR = \033[0;33m
+NO_COLOR = \033[0m
 
 COMPOSER_BIN_PLUGIN_VENDOR = vendor/bamarni/composer-bin-plugin
 
 PHP_CS_FIXER_BIN = vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
-PHP_CS_FIXER = $(PHP_CS_FIXER_BIN) fix
+PHP_CS_FIXER = $(PHP_CS_FIXER_BIN)
 
 REQUIREMENT_CHECKER_EXTRACT = res/requirement-checker
 
@@ -62,19 +63,19 @@ requirement_checker_cs_lint:
 
 .PHONY: php_cs_fixer
 php_cs_fixer: $(PHP_CS_FIXER_BIN)
-	$(PHP_CS_FIXER)
+	$(PHP_CS_FIXER) fix
 
 .PHONY: php_cs_fixer_lint
 php_cs_fixer_lint: $(PHP_CS_FIXER_BIN)
-	$(PHP_CS_FIXER) --dry-run
+	$(PHP_CS_FIXER) fix --ansi --verbose --dry-run --diff
 
 .PHONY: composer_normalize
 composer_normalize: composer.json vendor
-	composer normalize
+	composer normalize --ansi
 
 .PHONY: composer_normalize_lint
 composer_normalize_lint: composer.json vendor
-	composer normalize --dry-run
+	composer normalize --ansi --dry-run
 
 .PHONY: gitignore_sort
 gitignore_sort:
@@ -107,12 +108,12 @@ tu: tu_requirement_checker tu_box
 tu_box:			 ## Runs the unit tests
 TU_BOX_DEPS = bin/phpunit fixtures/default_stub.php $(REQUIREMENT_CHECKER_EXTRACT) fixtures/composer-dump/dir001/vendor fixtures/composer-dump/dir003/vendor
 tu_box: $(TU_BOX_DEPS)
-	php -d phar.readonly=1 bin/phpunit
+	php -d phar.readonly=1 bin/phpunit --colors=always
 
 .PHONY: tu_box_phar_readonly
 tu_box_phar_readonly: 	 ## Runs the unit tests with the setting `phar.readonly` to `On`
 tu_box_phar_readonly: $(TU_BOX_DEPS)
-	php -d zend.enable_gc=0 -d phar.readonly=1 bin/phpunit
+	php -d zend.enable_gc=0 -d phar.readonly=1 bin/phpunit --colors=always
 
 .PHONY: tu_requirement_checker
 tu_requirement_checker:	 ## Runs the unit tests
@@ -165,7 +166,7 @@ endif
 .PHONY: e2e_php_settings_checker
 e2e_php_settings_checker: ## Runs the end-to-end tests for the PHP settings handler
 e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xdebug-enabled vendor box
-	@echo "$(CCYELLOW)No restart needed$(CCEND)"
+	@echo "$(YELLOW_COLOR)No restart needed$(NO_COLOR)"
 	$(DOCKER) -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX) \
 		php -dphar.readonly=0 -dmemory_limit=-1 \
 		$(BOX_COMPILE) \
@@ -174,7 +175,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
 	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-all-clear fixtures/php-settings-checker/actual-output
 
-	@echo "$(CCYELLOW)Xdebug enabled: restart needed$(CCEND)"
+	@echo "$(YELLOW_COLOR)Xdebug enabled: restart needed$(NO_COLOR)"
 	$(DOCKER) -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX)_xdebug \
 		php -dphar.readonly=0 -dmemory_limit=-1 \
 		$(BOX_COMPILE) \
@@ -184,7 +185,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
 	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-xdebug-enabled fixtures/php-settings-checker/actual-output
 
-	@echo "$(CCYELLOW)phar.readonly enabled: restart needed$(CCEND)"
+	@echo "$(YELLOW_COLOR)phar.readonly enabled: restart needed$(NO_COLOR)"
 	$(DOCKER) -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX) \
 		php -dphar.readonly=1 -dmemory_limit=-1 \
 		$(BOX_COMPILE) \
@@ -195,7 +196,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
 	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-pharreadonly-enabled fixtures/php-settings-checker/actual-output
 
-	@echo "$(CCYELLOW)Bump min memory limit if necessary (limit lower than default)$(CCEND)"
+	@echo "$(YELLOW_COLOR)Bump min memory limit if necessary (limit lower than default)$(NO_COLOR)"
 	$(DOCKER) -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX) \
 		php -dphar.readonly=0 -dmemory_limit=124M \
 		$(BOX_COMPILE) \
@@ -206,7 +207,7 @@ e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xde
 	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
 	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-min-memory-limit fixtures/php-settings-checker/actual-output
 
-	@echo "$(CCYELLOW)Bump min memory limit if necessary (limit higher than default)$(CCEND)"
+	@echo "$(YELLOW_COLOR)Bump min memory limit if necessary (limit higher than default)$(NO_COLOR)"
 	$(DOCKER) -e BOX_MEMORY_LIMIT=64M -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX) \
 		php -dphar.readonly=0 -dmemory_limit=1024M \
 		$(BOX_COMPILE) \
@@ -360,19 +361,19 @@ $(REQUIREMENT_CHECKER_EXTRACT):
 	cd requirement-checker; $(MAKE) --file=Makefile _dump
 
 box: bin src res vendor box.json.dist scoper.inc.php $(REQUIREMENT_CHECKER_EXTRACT)
-	# Compile Box
-	bin/box compile --no-parallel
+	@echo "$(YELLOW_COLOR)Compile Box.$(NO_COLOR)"
+	bin/box compile --ansi --no-parallel
 
 	rm bin/_box.phar || true
 	mv -v bin/box.phar bin/_box.phar
 
-	# Compile Box with the isolated Box PHAR
-	php bin/_box.phar compile --no-parallel
+	@echo "$(YELLOW_COLOR)Compile Box with the isolated Box PHAR.$(NO_COLOR)"
+	php bin/_box.phar compile --ansi --no-parallel
 
 	mv -fv bin/box.phar box
 
-	# Test the PHAR which has been created by the isolated PHAR
-	./box compile --no-parallel
+	@echo "$(YELLOW_COLOR)Test the PHAR which has been created by the isolated PHAR.$(NO_COLOR)"
+	./box compile --ansi --no-parallel
 
 	rm bin/_box.phar
 
@@ -394,5 +395,5 @@ vendor-bin/requirement-checker/vendor: vendor-bin/requirement-checker/composer.l
 	composer bin requirement-checker install
 	touch -c $@
 vendor-bin/requirement-checker/composer.lock: vendor-bin/requirement-checker/composer.json
-	@echo "$(@) is not up to date. You may want to run the following command:"
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer bin requirement-checker update --lock && touch -c $(@)"

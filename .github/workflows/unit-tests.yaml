@@ -18,6 +18,7 @@ jobs:
                     -   version: '8.1'
                         dependency: locked
                         composer-options: ''
+                        # TODO: enable back
 #                    -   version: '8.2'
 #                        dependency: highest
 #                        composer-options: ''
@@ -25,6 +26,7 @@ jobs:
 #                        dependency: highest
 #                        composer-options: '--ignore-platform-req=php+'
                 tools:
+                    # TODO: add more composer versions
                     - 'composer'
         steps:
             -   name: Checkout
@@ -50,8 +52,9 @@ jobs:
             -   name: Ensure that the make target is up to date
                 run: make vendor_install
 
+            # TODO: move this into a dedicated build
             -   name: Validate box config
-                run: bin/box validate
+                run: bin/box validate --ansi
 
             -   name: Run tests (PHAR readonly)
                 run: make tu_box_phar_readonly
