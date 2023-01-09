@@ -10,10 +10,26 @@ NO_COLOR = \033[0m
 
 COMPOSER_BIN_PLUGIN_VENDOR = vendor/bamarni/composer-bin-plugin
 
+REQUIREMENT_CHECKER_EXTRACT = res/requirement-checker
+
+COVERAGE_DIR = dist/coverage
+COVERAGE_XML_DIR = $(COVERAGE_DIR)/coverage-xml
+COVERAGE_JUNIT = $(COVERAGE_DIR)/phpunit.junit.xml
+COVERAGE_HTML_DIR = $(COVERAGE_DIR)/html
+
+PHPUNIT_BIN = bin/phpunit
+PHPUNIT = $(PHPUNIT)
+PHPUNIT_TEST_SRC = fixtures/default_stub.php $(REQUIREMENT_CHECKER_EXTRACT) fixtures/composer-dump/dir001/vendor fixtures/composer-dump/dir003/vendor
+PHPUNIT_COVERAGE_INFECTION = XDEBUG_MODE=coverage php -dphar.readonly=0 $(PHPUNIT) --coverage-xml=$(COVERAGE_XML) --log-junit=$(COVERAGE_JUNIT)
+PHPUNIT_COVERAGE_HTML = XDEBUG_MODE=coverage php -dphar.readonly=0 $(PHPUNIT) --coverage-html=$(COVERAGE_HTML_DIR)
+
+INFECTION_BIN = vendor-bin/infection/vendor/bin/infection
+INFECTION = SYMFONY_DEPRECATIONS_HELPER="disabled=1" php -dzend.enable_gc=0 $(INFECTION_BIN) --skip-initial-tests --coverage=$(COVERAGE_DIR) --only-covered --show-mutations --min-msi=100 --min-covered-msi=100 --ansi --threads=max --stdout
+INFECTION_WITH_INITIAL_TESTS = SYMFONY_DEPRECATIONS_HELPER="disabled=1" php -dzend.enable_gc=0 $(INFECTION_BIN) --only-covered --show-mutations --min-msi=100 --min-covered-msi=100 --ansi --threads=max --stdout
+INFECTION_SRC := $(shell find src tests) phpunit.xml.dist
+
 PHP_CS_FIXER_BIN = vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
 PHP_CS_FIXER = $(PHP_CS_FIXER_BIN)
-
-REQUIREMENT_CHECKER_EXTRACT = res/requirement-checker
 
 DOCKER = docker run --interactive --platform=linux/amd64 --rm --workdir=/opt/box
 MIN_SUPPORTED_PHP_BOX = box_php81
@@ -37,15 +53,44 @@ help:
 # Commands
 #---------------------------------------------------------------------------
 
+.PHONY: check
+check:			## Runs all the checks
+check: requirement_checker_check box_check
+
+.PHONY: box_check
+box_check: cs autoreview test
+
+.PHONY: requirement_checker_check
+requirement_checker_check:
+	cd requirement-checker; $(MAKE) --file=Makefile check
+
+
 .PHONY: clean
 clean: 	 		 ## Cleans all created artifacts
 clean:
-	git clean --exclude=.idea/ -ffdx
-	rm -rf fixtures/check-requirements || true
+	rm -rf \
+		fixtures/build/dir010/index.phar \
+		fixtures/build/dir011/vendor \
+		fixtures/build/dir011/expected-output \
+		fixtures/build/dir011/index.phar \
+		fixtures/build/dir011/output \
+		fixtures/build/dir011/phar-Y.php \
+		fixtures/build/dir012/bin/console.phar \
+		fixtures/build/dir012/var \
+		fixtures/build/dir012/vendor \
+		fixtures/build/dir012/.env.local.php \
+		fixtures/build/dir012/actual-output \
+		fixtures/build/dir013/vendor \
+		fixtures/build/dir013/actual-output \
+		fixtures/build/dir014/actual-output \
+		fixtures/build/dir014/index.phar \
+		fixtures/default_stub.php \
+		 || true
 	@# Obsolete entries; Only relevant to someone who still has old artifacts locally
 	@rm -rf \
 		.php-cs-fixer.cache \
 		.phpunit.result.cache \
+		fixtures/check-requirements \
 		site \
 		website \
 		|| true
@@ -54,6 +99,7 @@ clean:
 compile: 		 ## Compiles the application into the PHAR
 compile: box
 	cp -f box bin/box.phar
+
 
 .PHONY: dump_requirement_checker
 dump_requirement_checker:## Dumps the requirement checker
@@ -70,8 +116,8 @@ autoreview: 		 ## AutoReview checks
 autoreview: cs_lint phpunit_autoreview
 
 .PHONY: phpunit_autoreview
-phpunit_autoreview: bin/phpunit
-	bin/phpunit --testsuite="AutoReviewTests" --colors=always
+phpunit_autoreview: $(PHPUNIT_BIN) vendor
+	$(PHPUNIT) --testsuite="AutoReviewTests" --colors=always
 
 
 #
@@ -88,6 +134,7 @@ root_cs: gitignore_sort composer_normalize php_cs_fixer
 .PHONY: requirement_checker_cs
 requirement_checker_cs:
 	cd requirement-checker; $(MAKE) --file=Makefile cs
+
 
 .PHONY: cs_lint
 cs_lint: ## Checks CS
@@ -127,42 +174,50 @@ gitignore_sort:
 
 .PHONY: test
 test:		  	 ## Runs all the tests
-test: tu e2e
+test: phpunit_phar_writeable infection test_e2e
 
-.PHONY: tu
-tu:			 ## Runs the unit tests
-tu: tu_requirement_checker tu_box
 
-.PHONY: tu_box
-tu_box:			 ## Runs the unit tests
-TU_BOX_DEPS = bin/phpunit fixtures/default_stub.php $(REQUIREMENT_CHECKER_EXTRACT) fixtures/composer-dump/dir001/vendor fixtures/composer-dump/dir003/vendor
-tu_box: $(TU_BOX_DEPS)
-	php -d phar.readonly=1 bin/phpunit --colors=always
+#
+# Unit Tests commands
+#---------------------------------------------------------------------------
 
-.PHONY: tu_box_phar_readonly
-tu_box_phar_readonly: 	 ## Runs the unit tests with the setting `phar.readonly` to `On`
-tu_box_phar_readonly: $(TU_BOX_DEPS)
-	php -d zend.enable_gc=0 -d phar.readonly=1 bin/phpunit --colors=always
+.PHONY: test_unit
+test_unit: phpunit_phar_readonly phpunit_phar_writeable
 
-.PHONY: tu_requirement_checker
-tu_requirement_checker:	 ## Runs the unit tests
-tu_requirement_checker:
-	cd requirement-checker; $(MAKE) --file=Makefile test
+.PHONY: phpunit_phar_readonly
+phpunit_phar_readonly: $(PHPUNIT_BIN) $(PHPUNIT_TEST_SRC)
+	php -dphar.readonly=0 $(PHPUNIT) --colors=always
 
-.PHONY: tc
-tc:			 ## Runs the unit tests with code coverage
-tc: bin/phpunit
-	php -d zend.enable_gc=0 bin/phpunit --coverage-html=dist/coverage --coverage-text
+.PHONY: phpunit_phar_writeable
+phpunit_phar_writeable: $(PHPUNIT_BIN) $(PHPUNIT_TEST_SRC)
+	php -dphar.readonly=1 $(PHPUNIT) --colors=always
 
-.PHONY: tm
-INFECTION=vendor-bin/infection/vendor/bin/infection
-tm:			 ## Runs Infection
-tm:	$(TU_BOX_DEPS) $(INFECTION)
-	$(PHPNOGC) $(INFECTION) --threads=$(shell nproc || sysctl -n hw.ncpu || 1) --only-covered --only-covering-test-cases $$INFECTION_FLAGS
+.PHONY: phpunit_coverage_html
+phpunit_coverage_html:      ## Runs PHPUnit with code coverage with HTML report
+phpunit_coverage_html: $(PHPUNIT_BIN) vendor
+	$(PHPUNIT_COVERAGE_HTML)
+	@echo "You can check the report by opening the file \"$(COVERAGE_HTML_DIR)/index.html\"."
 
-.PHONY: e2e
-e2e:			 ## Runs all the end-to-end tests
-e2e: e2e_php_settings_checker e2e_scoper_alias e2e_scoper_expose_symbols e2e_check_requirements e2e_symfony e2e_composer_installed_versions e2e_phpstorm_stubs
+.PHONY: phpunit_coverage_infection
+phpunit_coverage_infection: ## Runs PHPUnit tests with test coverage
+phpunit_coverage_infection: $(PHPUNIT_BIN) vendor
+	$(PHPUNIT_COVERAGE_INFECTION)
+
+.PHONY: infection
+infection: $(INFECTION_BIN) vendor
+	$(INFECTION_WITH_INITIAL_TESTS)
+
+.PHONY: _infection
+_infection: $(INFECTION_BIN) $(COVERAGE_XML_DIR) $(COVERAGE_JUNIT) vendor
+	$(INFECTION)
+
+
+#
+# E2E Tests commands
+#---------------------------------------------------------------------------
+
+.PHONY: test_e2e
+test_e2e: e2e_php_settings_checker e2e_scoper_alias e2e_scoper_expose_symbols e2e_check_requirements e2e_symfony e2e_composer_installed_versions e2e_phpstorm_stubs
 
 .PHONY: e2e_scoper_alias
 e2e_scoper_alias: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the prefix alias is working
@@ -194,7 +249,7 @@ else
 endif
 .PHONY: e2e_php_settings_checker
 e2e_php_settings_checker: ## Runs the end-to-end tests for the PHP settings handler
-e2e_php_settings_checker: docker-images fixtures/php-settings-checker/output-xdebug-enabled vendor box
+e2e_php_settings_checker: docker_images fixtures/php-settings-checker/output-xdebug-enabled vendor box
 	@echo "$(YELLOW_COLOR)No restart needed$(NO_COLOR)"
 	$(DOCKER) -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX) \
 		php -dphar.readonly=0 -dmemory_limit=-1 \
@@ -332,19 +387,18 @@ vendor_install:
 	composer install --ansi
 	touch -c vendor
 	touch -c $(COMPOSER_BIN_PLUGIN_VENDOR)
-	touch -c bin/phpunit
+	touch -c $(PHPUNIT_BIN)
 
 composer.lock: composer.json
-	@echo "$(@) is not up to date. You may want to run the following command:"
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer update --lock && touch -c $(@)"
-
 vendor: composer.lock
 	$(MAKE) vendor_install
 
 $(COMPOSER_BIN_PLUGIN_VENDOR): composer.lock
 	$(MAKE) --always-make vendor_install
 
-bin/phpunit: composer.lock
+$(PHPUNIT_BIN): composer.lock
 	$(MAKE) --always-make vendor_install
 	touch -c $@
 
@@ -357,20 +411,30 @@ vendor-bin/php-cs-fixer/vendor: vendor-bin/php-cs-fixer/composer.lock $(COMPOSER
 	composer bin php-cs-fixer install
 	touch -c $@
 vendor-bin/php-cs-fixer/composer.lock: vendor-bin/php-cs-fixer/composer.json
-	@echo "$(@) is not up to date. You may want to run the following command:"
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer bin php-cs-fixer update --lock && touch -c $(@)"
 
 .PHONY: infection_install
-infection_install: $(INFECTION)
+infection_install: $(INFECTION_BIN)
 
-$(INFECTION): vendor-bin/infection/vendor
+$(INFECTION_BIN): vendor-bin/infection/vendor
 	touch -c $@
 vendor-bin/infection/vendor: vendor-bin/infection/composer.lock $(COMPOSER_BIN_PLUGIN_VENDOR)
 	composer bin infection install
 	touch -c $@
 vendor-bin/infection/composer.lock: vendor-bin/infection/composer.json
-	@echo "$(@) is not up to date. You may want to run the following command:"
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer bin infection update --lock && touch -c $(@)"
+
+$(COVERAGE_XML_DIR): $(PHPUNIT_BIN) $(INFECTION_SRC)
+	$(PHPUNIT_COVERAGE_INFECTION)
+	touch -c $@
+	touch -c $(COVERAGE_JUNIT)
+
+$(COVERAGE_JUNIT): $(PHPUNIT_BIN) $(INFECTION_SRC)
+	$(PHPUNIT_COVERAGE_INFECTION)
+	touch -c $@
+	touch -c $(COVERAGE_XML_DIR)
 
 fixtures/composer-dump/dir001/composer.lock: fixtures/composer-dump/dir001/composer.json
 	composer install --ansi --working-dir=fixtures/composer-dump/dir001
@@ -426,11 +490,11 @@ box: bin src res vendor box.json.dist scoper.inc.php $(REQUIREMENT_CHECKER_EXTRA
 
 	touch -c $@
 
-.PHONY: docker-images
-docker-images:
+.PHONY: docker_images
+docker_images:
 	./.docker/build
 
-fixtures/php-settings-checker/output-xdebug-enabled: fixtures/php-settings-checker/output-xdebug-enabled.tpl docker-images
+fixtures/php-settings-checker/output-xdebug-enabled: fixtures/php-settings-checker/output-xdebug-enabled.tpl docker_images
 	./fixtures/php-settings-checker/create-expected-output $(MIN_SUPPORTED_PHP_WITH_XDEBUG_BOX)
 	touch -c $@
 

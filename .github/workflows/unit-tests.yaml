@@ -103,8 +103,7 @@ jobs:
                     git fetch origin $GITHUB_BASE_REF
                     echo "INFECTION_FLAGS=--git-diff-lines --git-diff-base=origin/$GITHUB_BASE_REF --ignore-msi-with-no-mutations --logger-github" >> "$GITHUB_ENV"
 
-            -   name: Run Infection
-                run: make tm
+            -   run: make infection
 
     # This is a "trick", a meta task which does not change, and we can use in
     # the protected branch rules as opposed to the tests one above which
