@@ -3,7 +3,6 @@ MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 
 OS := $(shell uname)
-PHPNOGC = php -d zend.enable_gc=0
 ERROR_COLOR := \033[41m
 YELLOW_COLOR = \033[0;33m
 NO_COLOR = \033[0m
@@ -18,14 +17,14 @@ COVERAGE_JUNIT = $(COVERAGE_DIR)/phpunit.junit.xml
 COVERAGE_HTML_DIR = $(COVERAGE_DIR)/html
 
 PHPUNIT_BIN = bin/phpunit
-PHPUNIT = $(PHPUNIT)
+PHPUNIT = $(PHPUNIT_BIN)
 PHPUNIT_TEST_SRC = fixtures/default_stub.php $(REQUIREMENT_CHECKER_EXTRACT) fixtures/composer-dump/dir001/vendor fixtures/composer-dump/dir003/vendor
 PHPUNIT_COVERAGE_INFECTION = XDEBUG_MODE=coverage php -dphar.readonly=0 $(PHPUNIT) --coverage-xml=$(COVERAGE_XML) --log-junit=$(COVERAGE_JUNIT)
 PHPUNIT_COVERAGE_HTML = XDEBUG_MODE=coverage php -dphar.readonly=0 $(PHPUNIT) --coverage-html=$(COVERAGE_HTML_DIR)
 
 INFECTION_BIN = vendor-bin/infection/vendor/bin/infection
-INFECTION = SYMFONY_DEPRECATIONS_HELPER="disabled=1" php -dzend.enable_gc=0 $(INFECTION_BIN) --skip-initial-tests --coverage=$(COVERAGE_DIR) --only-covered --show-mutations --min-msi=100 --min-covered-msi=100 --ansi --threads=max --stdout
-INFECTION_WITH_INITIAL_TESTS = SYMFONY_DEPRECATIONS_HELPER="disabled=1" php -dzend.enable_gc=0 $(INFECTION_BIN) --only-covered --show-mutations --min-msi=100 --min-covered-msi=100 --ansi --threads=max --stdout
+INFECTION = SYMFONY_DEPRECATIONS_HELPER="disabled=1" php -dzend.enable_gc=0 $(INFECTION_BIN) --skip-initial-tests --coverage=$(COVERAGE_DIR) --only-covered --show-mutations --min-msi=100 --min-covered-msi=100 --ansi --threads=max --show-mutations
+INFECTION_WITH_INITIAL_TESTS = SYMFONY_DEPRECATIONS_HELPER="disabled=1" php -dzend.enable_gc=0 $(INFECTION_BIN) --only-covered --show-mutations --min-msi=100 --min-covered-msi=100 --ansi --threads=max --show-mutations
 INFECTION_SRC := $(shell find src tests) phpunit.xml.dist
 
 PHP_CS_FIXER_BIN = vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
@@ -54,7 +53,7 @@ help:
 #---------------------------------------------------------------------------
 
 .PHONY: check
-check:			## Runs all the checks
+check:			 ## Runs all the checks
 check: requirement_checker_check box_check
 
 .PHONY: box_check
@@ -125,7 +124,7 @@ phpunit_autoreview: $(PHPUNIT_BIN) vendor
 #---------------------------------------------------------------------------
 
 .PHONY: cs
-cs:	 ## Fixes CS
+cs:	 		 ## Fixes CS
 cs: root_cs requirement_checker_cs
 
 .PHONY: root_cs
@@ -137,7 +136,7 @@ requirement_checker_cs:
 
 
 .PHONY: cs_lint
-cs_lint: ## Checks CS
+cs_lint: 	 	 ## Lints CS
 cs_lint: root_cs_lint requirement_checker_cs_lint
 
 .PHONY: root_cs_lint
@@ -225,7 +224,7 @@ e2e_scoper_alias: box
 	./box compile --working-dir=fixtures/build/dir010 --no-parallel
 
 .PHONY: e2e_scoper_expose_symbols
-e2e_scoper_expose_symbols: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the symbols exposure is working
+e2e_scoper_expose_symbols: ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the symbols exposure is working
 e2e_scoper_expose_symbols: box fixtures/build/dir011/vendor
 	php fixtures/build/dir011/index.php > fixtures/build/dir011/expected-output
 	./box compile --working-dir=fixtures/build/dir011 --no-parallel
@@ -317,7 +316,7 @@ e2e_symfony: fixtures/build/dir012/vendor box
 	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/build/dir012/expected-output fixtures/build/dir012/actual-output
 
 .PHONY: e2e_composer_installed_versions
-e2e_composer_installed_versions:		 ## Packages an app using Composer\InstalledVersions
+e2e_composer_installed_versions: ## Packages an app using Composer\InstalledVersions
 e2e_composer_installed_versions: fixtures/build/dir013/vendor box
 	./box compile --working-dir=fixtures/build/dir013 --no-parallel
 	
@@ -326,7 +325,7 @@ e2e_composer_installed_versions: fixtures/build/dir013/vendor box
 	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/build/dir013/expected-output fixtures/build/dir013/actual-output
 
 .PHONY: e2e_phpstorm_stubs
-e2e_phpstorm_stubs:		 ## Project using symbols which should be vetted by PhpStormStubs
+e2e_phpstorm_stubs:	 ## Project using symbols which should be vetted by PhpStormStubs
 e2e_phpstorm_stubs: box
 	./box compile --working-dir=fixtures/build/dir014 --no-parallel
 
@@ -350,7 +349,7 @@ blackfire: box
 
 
 .PHONY: website_build
-website_build:	## Builds the website
+website_build:		 ## Builds the website
 website_build:
 	@echo "$(YELLOW_COLOR)To install mkdocs ensure you have Python3 & pip3 and run the following command:$(NO_COLOR)"
 	@echo "$$ pip install mkdocs mkdocs-material"
@@ -362,7 +361,7 @@ website_build:
 _website_build: $(WEBSITE_OUTPUT)
 
 .PHONY: website_serve
-website_serve:	## Serves the website locally
+website_serve:		 ## Serves the website locally
 website_serve:
 	@echo "$(YELLOW_COLOR)To install mkdocs ensure you have Python3 & pip3 and run the following command:$(NO_COLOR)"
 	@echo "$$ pip install mkdocs mkdocs-material"
@@ -466,7 +465,7 @@ fixtures/build/dir013/vendor:
 
 .PHONY: fixtures/default_stub.php
 fixtures/default_stub.php:
-	php -d phar.readonly=0 bin/generate_default_stub
+	php -dphar.readonly=0 bin/generate_default_stub
 
 $(REQUIREMENT_CHECKER_EXTRACT):
 	cd requirement-checker; $(MAKE) --file=Makefile _dump
