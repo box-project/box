@@ -272,7 +272,7 @@ serve:
 
 
 .PHONY: website
-website: doc
+website: mkdocs.yaml $(shell find doc)
 	mkdocs build
 
 
