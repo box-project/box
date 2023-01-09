@@ -134,7 +134,7 @@ jobs:
                     coverage: none
 
             -   name: Wait for the PHAR to be built
-                uses: lewagon/wait-on-check-action@v1.2
+                uses: lewagon/wait-on-check-action@1.2
                 with:
                     ref: ${{ github.ref }}
                     check-name: Build PHAR
