@@ -30,8 +30,6 @@
 /fixtures/php-settings-checker/output-xdebug-enabled
 /phpcs.xml
 /phpunit.xml
-/site/
 /vendor-bin/*/composer.lock
 /vendor-bin/*/vendor/
 /vendor/
-/website/
