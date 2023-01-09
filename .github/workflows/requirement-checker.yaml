@@ -108,46 +108,9 @@ jobs:
             -   name: Runs the tests
                 run: cd requirement-checker; make test_unit
 
-    build-box-phar:
-        runs-on: ubuntu-latest
-        name: Build (test) Box PHAR
-        steps:
-            -   name: Checkout
-                uses: actions/checkout@v3
-                with:
-                    fetch-depth: 0
-
-            -   name: Setup PHP
-                uses: shivammathur/setup-php@v2
-                with:
-                    php-version: '8.1'
-                    ini-values: phar.readonly=0
-                    tools: composer
-                    coverage: none
-
-            -   name: Install the Composer (root) dependencies
-                uses: ramsey/composer-install@v2
-
-            -   name: Ensure that the make target is up to date
-                run: make vendor_install
-
-            -   name: Build PHAR
-                run: make box
-
-            # Smoke test
-            -   name: Ensure the PHAR works
-                run: ./box --ansi --version
-
-            -   uses: actions/upload-artifact@v3
-                name: Upload the PHAR artifact
-                with:
-                    name: box-phar-81
-                    path: box
-
     e2e-tests:
         runs-on: ubuntu-latest
         name: End-to-End Tests
-        needs: build-box-phar
         strategy:
             fail-fast: false
             matrix:
@@ -170,10 +133,18 @@ jobs:
                     tools: composer
                     coverage: none
 
+            -   name: Wait for the PHAR to be built
+                uses: lewagon/wait-on-check-action@v1.2
+                with:
+                    ref: ${{ github.ref }}
+                    check-name: Build PHAR
+                    repo-token: ${{ secrets.GITHUB_TOKEN }}
+                    wait-interval: 10
+
             -   name: Retrieve built PHAR
                 uses: actions/download-artifact@v3
                 with:
-                    name: box-phar-81
+                    name: box-phar
 
             -   name: Ensure the make target is up to date
                 run: touch -c box
