@@ -31,14 +31,14 @@ jobs:
             -   name: Install RequirementChecker Composer dependencies
                 uses: ramsey/composer-install@v2
                 with:
-                    working-directory: 'requirement-checker'
+                    working-directory: requirement-checker
 
             -   name: Build PHAR
                 run: make compile
 
             # Smoke test
             -   name: Ensure the PHAR works
-                run: bin/box.phar --version
+                run: bin/box.phar --ansi --version
 
             -   name: Ensure the PHAR is scoped
                 run: bin/box.phar namespace | php -r 'if (!str_starts_with(stream_get_contents(STDIN), "_HumbugBox")) exit (1);'
@@ -73,7 +73,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Publish PHAR
         needs:
-            - 'build-phar'
+            - build-phar
         if: github.event_name == 'release'
         steps:
             -   uses: actions/download-artifact@v3

@@ -29,7 +29,7 @@ jobs:
             -   name: Install PHP-CS-Fixer
                 uses: ramsey/composer-install@v2
                 with:
-                    working-directory: 'vendor-bin/php-cs-fixer'
+                    working-directory: vendor-bin/php-cs-fixer
 
             -   name: Ensure that the PHP-CS-Fixer make target is up to date
                 run: make php_cs_fixer_install
@@ -37,7 +37,7 @@ jobs:
             -   name: Install the Composer dependencies
                 uses: ramsey/composer-install@v2
                 with:
-                    working-directory: 'requirement-checker'
+                    working-directory: requirement-checker
 
             -   name: Ensure that the make target is up to date
                 run: cd requirement-checker; make vendor_install
@@ -47,7 +47,7 @@ jobs:
 
     unit-tests:
         runs-on: ubuntu-latest
-        name: "Unit Tests (PHP ${{ matrix.php.version }}, ${{ matrix.php.dependency }}, ${{ matrix.php.composer-options }})"
+        name: Unit Tests (PHP ${{ matrix.php.version }}, ${{ matrix.php.dependency }}, ${{ matrix.php.composer-options && 'ø' || matrix.php.composer-options }})
         strategy:
             fail-fast: false
             matrix:
@@ -57,13 +57,13 @@ jobs:
                 php:
                     -   version: '8.1'
                         dependency: locked
-                        composer-options: ''
+                        composer-options: ~
                     -   version: '8.2'
                         dependency: highest
-                        composer-options: ''
+                        composer-options: ~
                     -   version: '8.3'
                         dependency: highest
-                        composer-options: '--ignore-platform-req=php+'
+                        composer-options: --ignore-platform-req=php+
 
         steps:
             -   name: Checkout
@@ -72,7 +72,7 @@ jobs:
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
                 with:
-                    php-version: '${{ matrix.php.version }}'
+                    php-version: ${{ matrix.php.version }}
                     tools: composer
                     coverage: none
 
@@ -136,7 +136,7 @@ jobs:
 
             # Smoke test
             -   name: Ensure the PHAR works
-                run: ./box --version
+                run: ./box --ansi --version
 
             -   uses: actions/upload-artifact@v3
                 name: Upload the PHAR artifact
@@ -152,13 +152,13 @@ jobs:
             fail-fast: false
             matrix:
                 e2e:
-                    - 'test_e2e_pass_no_config_min_composer_php'
-                    - 'test_e2e_pass_no_config_min_box_php'
-                    - 'test_e2e_pass_complete_min_composer_php'
-                    - 'test_e2e_pass_complete_min_box_php'
-                    - 'test_e2e_fail_complete_min_composer_php'
-                    - 'test_e2e_fail_complete_min_box_php'
-                    - 'test_e2e_skip_min_composer_php'
+                    - test_e2e_pass_no_config_min_composer_php
+                    - test_e2e_pass_no_config_min_box_php
+                    - test_e2e_pass_complete_min_composer_php
+                    - test_e2e_pass_complete_min_box_php
+                    - test_e2e_fail_complete_min_composer_php
+                    - test_e2e_fail_complete_min_box_php
+                    - test_e2e_skip_min_composer_php
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3
@@ -184,7 +184,7 @@ jobs:
                 run: chmod 755 box
 
             -   name: Check that the PHAR works
-                run: ./box --version
+                run: ./box --ansi --version
 
             -   name: Build the Docker images
                 run: cd requirement-checker; make docker_images
