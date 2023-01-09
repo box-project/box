@@ -8,6 +8,7 @@ on:
         types: [ created ]
 
 env:
+    # TODO: adopt the composer-option strategy instead
     # Comma-space separated list, e.g. '8.1, 8.2, 9.0'
     FUTURE_PHP_VERSION: '9.0'
 
@@ -18,6 +19,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
+                # TODO: split into regular e2e tests and docker e2e
                 e2e:
                     - 'e2e_php_settings_checker'
                     - 'e2e_scoper_alias'
