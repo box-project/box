@@ -19,6 +19,10 @@ DOCKER = docker run --interactive --platform=linux/amd64 --rm --workdir=/opt/box
 MIN_SUPPORTED_PHP_BOX = box_php81
 MIN_SUPPORTED_PHP_WITH_XDEBUG_BOX = box_php81_xdebug
 
+WEBSITE_SRC := mkdocs.yaml $(shell find doc)
+# This is defined in mkdocs.yaml#site_dir
+WEBSITE_OUTPUT = dist/website
+
 
 .DEFAULT_GOAL := help
 
@@ -265,15 +269,33 @@ blackfire: box
 	blackfire --reference=2 --samples=5 run $(PHPNOGC) -d box compile --quiet --no-parallel
 
 
-.PHONY: serve
-serve:
-	@echo "To install mkdocs ensure you have Python3 & pip3 and run `pip install mkdocs mkdocs-material`"
+#
+# Website rules
+#---------------------------------------------------------------------------
+
+
+.PHONY: website_build
+website_build:	## Builds the website
+website_build:
+	@echo "$(YELLOW_COLOR)To install mkdocs ensure you have Python3 & pip3 and run the following command:$(NO_COLOR)"
+	@echo "$$ pip install mkdocs mkdocs-material"
+
+	@rm -rf $(WEBSITE_OUTPUT) || true
+	$(MAKE) _website_build
+
+.PHONY: _website_build
+_website_build: $(WEBSITE_OUTPUT)
+
+.PHONY: website_serve
+website_serve:	## Serves the website locally
+website_serve:
+	@echo "$(YELLOW_COLOR)To install mkdocs ensure you have Python3 & pip3 and run the following command:$(NO_COLOR)"
+	@echo "$$ pip install mkdocs mkdocs-material"
 	mkdocs serve
 
-
-.PHONY: website
-website: doc
+$(WEBSITE_OUTPUT): $(WEBSITE_SRC)
 	mkdocs build
+	@touch -c $@
 
 
 #
