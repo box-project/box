@@ -39,6 +39,21 @@ clean:
 	git clean --exclude=.idea/ -ffdx
 	rm -rf fixtures/check-requirements || true
 
+.PHONY: compile
+compile: 		 ## Compiles the application into the PHAR
+compile: box
+	cp -f box bin/box.phar
+
+.PHONY: dump_requirement_checker
+dump_requirement_checker:## Dumps the requirement checker
+dump_requirement_checker:
+	cd requirement-checker; $(MAKE) --file=Makefile dump
+
+
+#
+# CS commands
+#---------------------------------------------------------------------------
+
 .PHONY: cs
 cs:	 ## Fixes CS
 cs: root_cs requirement_checker_cs
@@ -81,19 +96,9 @@ composer_normalize_lint: composer.json vendor
 gitignore_sort:
 	LC_ALL=C sort -u .gitignore -o .gitignore
 
-.PHONY: compile
-compile: 		 ## Compiles the application into the PHAR
-compile: box
-	cp -f box bin/box.phar
-
-.PHONY: dump_requirement_checker
-dump_requirement_checker:## Dumps the requirement checker
-dump_requirement_checker:
-	cd requirement-checker; $(MAKE) --file=Makefile dump
-
 
 #
-# Tests
+# Tests commands
 #---------------------------------------------------------------------------
 
 .PHONY: test
