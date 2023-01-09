@@ -12,6 +12,8 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
+namespace AutoReview;
+
 use Fidry\Makefile\Parser;
 use Fidry\Makefile\Rule;
 use Fidry\Makefile\Test\BaseMakefileTestCase;
@@ -24,9 +26,11 @@ use function Safe\file_get_contents;
  */
 final class E2EMakefileTest extends BaseMakefileTestCase
 {
+    public const MAKEFILE_PATH = __DIR__.'/../../Makefile.e2e';
+
     protected static function getMakefilePath(): string
     {
-        return __DIR__.'/../Makefile.e2e';
+        return self::MAKEFILE_PATH;
     }
 
     protected function getExpectedHelpOutput(): string
@@ -59,7 +63,7 @@ final class E2EMakefileTest extends BaseMakefileTestCase
         return current(
             array_filter(
                 Parser::parse(
-                    file_get_contents(__DIR__.'/../Makefile'),
+                    file_get_contents(MakefileTest::MAKEFILE_PATH),
                 ),
                 static fn (Rule $rule) => 'test_e2e' === $rule->getTarget() && !$rule->isComment() && !$rule->isPhony(),
             ),

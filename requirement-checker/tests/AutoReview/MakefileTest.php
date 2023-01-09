@@ -12,6 +12,8 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
+namespace AutoReview;
+
 use Fidry\Makefile\Rule;
 use Fidry\Makefile\Test\BaseMakefileTestCase;
 
@@ -22,9 +24,11 @@ use Fidry\Makefile\Test\BaseMakefileTestCase;
  */
 final class MakefileTest extends BaseMakefileTestCase
 {
+    public const MAKEFILE_PATH = __DIR__.'/../../Makefile';
+
     protected static function getMakefilePath(): string
     {
-        return __DIR__.'/../Makefile';
+        return self::MAKEFILE_PATH;
     }
 
     protected function getExpectedHelpOutput(): string
@@ -32,17 +36,18 @@ final class MakefileTest extends BaseMakefileTestCase
         return <<<'EOF'
             [33mUsage:[0m
               make TARGET
-
+            
             [32m#
             # Commands
             #---------------------------------------------------------------------------[0m
-
-            [33mcheck:[0m	  Runs all checks
-            [33mclean:[0m 	  Cleans all created artifacts
-            [33mdump:[0m	  Dumps the requirement-checker
-            [33mcs:[0m	  Fixes CS
-            [33mcs_lint:[0m  Checks CS
-            [33mtest:[0m	  Runs all the tests
+            
+            [33mcheck:[0m	 	 Runs all checks
+            [33mclean:[0m 	 	 Cleans all created artifacts
+            [33mdump:[0m	 	 Dumps the requirement-checker
+            [33mautoreview:[0m	 AutoReview checks
+            [33mcs:[0m	 	 Fixes CS
+            [33mcs_lint:[0m 	 Checks CS
+            [33mtest:[0m		 Runs all the tests
 
             EOF;
     }
@@ -75,7 +80,7 @@ final class MakefileTest extends BaseMakefileTestCase
     }
 
     /**
-     * @return list<Rule>
+     * @return Rule
      */
     private static function getTestRules(): array
     {
