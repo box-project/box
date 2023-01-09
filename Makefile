@@ -38,6 +38,11 @@ clean: 	 		 ## Cleans all created artifacts
 clean:
 	git clean --exclude=.idea/ -ffdx
 	rm -rf fixtures/check-requirements || true
+	@# Obsolete entries; Only relevant to someone who still has old artifacts locally
+	@rm -rf \
+		site \
+		website \
+		|| true
 
 .PHONY: compile
 compile: 		 ## Compiles the application into the PHAR
