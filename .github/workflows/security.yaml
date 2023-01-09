@@ -10,7 +10,7 @@ on:
 jobs:
     security:
         runs-on: ubuntu-latest
-        name: Check Dependencies
+        name: Audit Dependencies
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3
