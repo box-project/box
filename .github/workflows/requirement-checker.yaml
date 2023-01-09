@@ -137,7 +137,7 @@ jobs:
                 uses: fountainhead/action-wait-for-check@v1.1.0
                 with:
                     checkName: Build PHAR
-                    ref: ${{ github.event_name != 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+                    ref: ${{ github.event.pull_request.head.sha || github.sha }}
                     token: ${{ secrets.GITHUB_TOKEN }}
                     intervalSeconds: 10
 
