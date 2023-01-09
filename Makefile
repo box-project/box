@@ -299,7 +299,7 @@ website_serve:
 	mkdocs serve
 
 $(WEBSITE_OUTPUT): $(WEBSITE_SRC)
-	mkdocs build
+	mkdocs build --clean --strict
 	@touch -c $@
 
 
