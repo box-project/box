@@ -15,19 +15,19 @@ env:
 jobs:
     e2e-tests:
         runs-on: ubuntu-latest
-        name: "Test ${{ matrix.e2e }} (PHP ${{ matrix.php }}, ${{ matrix.tools }})"
+        name: Test ${{ matrix.e2e }} (PHP ${{ matrix.php }}, ${{ matrix.tools }})
         strategy:
             fail-fast: false
             matrix:
                 # TODO: split into regular e2e tests and docker e2e
                 e2e:
-                    - 'e2e_php_settings_checker'
-                    - 'e2e_scoper_alias'
-                    - 'e2e_scoper_expose_symbols'
-                    - 'e2e_symfony'
-                    - 'e2e_composer_installed_versions'
+                    - e2e_php_settings_checker
+                    - e2e_scoper_alias
+                    - e2e_scoper_expose_symbols
+                    - e2e_symfony
+                    - e2e_composer_installed_versions
                 php: [ '8.1' ]
-                tools: [ 'composer:v2' ]
+                tools: [ composer ]
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3
@@ -38,7 +38,7 @@ jobs:
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: ${{ matrix.php }}
-                    ini-values: 'phar.readonly=0, display_errors=On, error_reporting=-1'
+                    ini-values: phar.readonly=0, display_errors=On, error_reporting=-1
                     tools: ${{ matrix.tools }}
                     coverage: pcov
 
@@ -50,7 +50,7 @@ jobs:
                 uses: ramsey/composer-install@v2
                 if: contains(env.FUTURE_PHP_VERSION, matrix.php) != true
                 with:
-                    working-directory: 'requirement-checker'
+                    working-directory: requirement-checker
 
             -   name: Install Composer dependencies (ignore PHP platform req)
                 uses: ramsey/composer-install@v2
@@ -63,7 +63,7 @@ jobs:
                 if: contains(env.FUTURE_PHP_VERSION, matrix.php)
                 with:
                     composer-options: --ignore-platform-req=php+
-                    working-directory: 'requirement-checker'
+                    working-directory: requirement-checker
 
             -   name: Ensure the Makefile does not run the Composer install command a 2nd time
                 run: touch -c composer.lock vendor requirement-checker/composer.lock requirement-checker/vendor

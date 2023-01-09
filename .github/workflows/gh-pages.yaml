@@ -10,6 +10,7 @@ on:
 jobs:
     deploy:
         runs-on: ubuntu-20.04
+        name: Deploy website
         permissions:
             contents: write
         steps:
@@ -21,10 +22,9 @@ jobs:
                 with:
                     python-version: '3.8'
 
+            # install pip=>20.1 to use "pip cache dir"
             -   name: Upgrade pip
-                run: |
-                    # install pip=>20.1 to use "pip cache dir"
-                    python3 -m pip install --upgrade pip
+                run: python3 -m pip install --upgrade pip
 
             -   name: Get pip cache dir
                 id: pip-cache
