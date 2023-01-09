@@ -134,12 +134,12 @@ jobs:
                     coverage: none
 
             -   name: Wait for the PHAR to be built
-                uses: lewagon/wait-on-check-action@v1.2.0
+                uses: fountainhead/action-wait-for-check@v1.1.0
                 with:
+                    checkName: Build PHAR
                     ref: ${{ github.ref }}
-                    check-name: Build PHAR
-                    repo-token: ${{ secrets.GITHUB_TOKEN }}
-                    wait-interval: 10
+                    token: ${{ secrets.GITHUB_TOKEN }}
+                    intervalSeconds: 10
 
             -   name: Retrieve built PHAR
                 uses: actions/download-artifact@v3
