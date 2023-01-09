@@ -1,4 +1,4 @@
-name: Lint
+name: AutoReview
 
 on:
     push:
@@ -6,9 +6,9 @@ on:
     pull_request:
 
 jobs:
-    tests:
+    lint-cs:
         runs-on: ubuntu-latest
-        name: CS
+        name: Lint CS
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3
