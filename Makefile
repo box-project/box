@@ -203,6 +203,8 @@ phpunit_coverage_html: $(PHPUNIT_BIN) dist $(PHPUNIT_TEST_SRC) vendor
 phpunit_coverage_infection: ## Runs PHPUnit tests with test coverage
 phpunit_coverage_infection: $(PHPUNIT_BIN) dist $(PHPUNIT_TEST_SRC) vendor
 	$(PHPUNIT_COVERAGE_INFECTION)
+	touch -c $(COVERAGE_XML_DIR)
+	touch -c $(COVERAGE_JUNIT)
 
 .PHONY: infection
 infection: $(INFECTION_BIN) dist $(PHPUNIT_TEST_SRC) vendor
