@@ -16,7 +16,7 @@ BOX = $(BOX_BIN)
 
 SCOPED_BOX_BIN = bin/box.phar
 SCOPED_BOX = $(SCOPED_BOX_BIN)
-SCOPED_BOX_DEPS = bin/box bin/box.bat vendor $(shell find src res $(wildcard vendor)) box.json.dist scoper.inc.php
+SCOPED_BOX_DEPS = bin/box bin/box.bat $(shell find src res) box.json.dist scoper.inc.php vendor
 
 COVERAGE_DIR = dist/coverage
 COVERAGE_XML_DIR = $(COVERAGE_DIR)/coverage-xml

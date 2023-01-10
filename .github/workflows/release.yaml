@@ -28,10 +28,8 @@ jobs:
             -   name: Install Composer dependencies
                 uses: ramsey/composer-install@v2
 
-            -   name: Install RequirementChecker Composer dependencies
-                uses: ramsey/composer-install@v2
-                with:
-                    working-directory: requirement-checker
+            -   name: Ensure that the make target is up to date
+                run: make vendor_install
 
             -   name: Build PHAR
                 run: make compile
