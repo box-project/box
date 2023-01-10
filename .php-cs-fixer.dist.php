@@ -101,11 +101,12 @@ $config = (new PhpCsFixer\Config())
     )
 ;
 
+$config->setCacheFile(__DIR__.'/dist/.php-cs-fixer.cache');
+
 (new PhpCsFixer\FixerFactory())
     ->registerBuiltInFixers()
     ->registerCustomFixers($config->getCustomFixers())
     ->useRuleSet(new PhpCsFixer\RuleSet\RuleSet($config->getRules()))
-    ->setCacheFile(__DIR__.'/dist/.php-cs-fixer.cache')
 ;
 
 return $config;

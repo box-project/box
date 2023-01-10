@@ -101,11 +101,11 @@ requirement_checker_cs_lint:
 	cd requirement-checker; $(MAKE) --file=Makefile cs_lint
 
 .PHONY: php_cs_fixer
-php_cs_fixer: $(PHP_CS_FIXER_BIN)
+php_cs_fixer: $(PHP_CS_FIXER_BIN) dist
 	$(PHP_CS_FIXER) fix
 
 .PHONY: php_cs_fixer_lint
-php_cs_fixer_lint: $(PHP_CS_FIXER_BIN)
+php_cs_fixer_lint: $(PHP_CS_FIXER_BIN) dist
 	$(PHP_CS_FIXER) fix --ansi --verbose --dry-run --diff
 
 .PHONY: composer_normalize
@@ -136,12 +136,12 @@ tu: tu_requirement_checker tu_box
 .PHONY: tu_box
 tu_box:			 ## Runs the unit tests
 TU_BOX_DEPS = bin/phpunit fixtures/default_stub.php $(REQUIREMENT_CHECKER_EXTRACT) fixtures/composer-dump/dir001/vendor fixtures/composer-dump/dir003/vendor
-tu_box: $(TU_BOX_DEPS)
+tu_box: $(TU_BOX_DEPS) dist
 	php -d phar.readonly=1 bin/phpunit --colors=always
 
 .PHONY: tu_box_phar_readonly
 tu_box_phar_readonly: 	 ## Runs the unit tests with the setting `phar.readonly` to `On`
-tu_box_phar_readonly: $(TU_BOX_DEPS)
+tu_box_phar_readonly: $(TU_BOX_DEPS) dist
 	php -d zend.enable_gc=0 -d phar.readonly=1 bin/phpunit --colors=always
 
 .PHONY: tu_requirement_checker
@@ -151,13 +151,13 @@ tu_requirement_checker:
 
 .PHONY: tc
 tc:			 ## Runs the unit tests with code coverage
-tc: bin/phpunit
+tc: bin/phpunit dist
 	php -d zend.enable_gc=0 bin/phpunit --coverage-html=dist/coverage --coverage-text
 
 .PHONY: tm
 INFECTION=vendor-bin/infection/vendor/bin/infection
 tm:			 ## Runs Infection
-tm:	$(TU_BOX_DEPS) $(INFECTION)
+tm:	$(TU_BOX_DEPS) dist $(INFECTION)
 	$(PHPNOGC) $(INFECTION) --threads=$(shell nproc || sysctl -n hw.ncpu || 1) --only-covered --only-covering-test-cases $$INFECTION_FLAGS
 
 .PHONY: e2e
@@ -444,3 +444,8 @@ vendor-bin/requirement-checker/vendor: vendor-bin/requirement-checker/composer.l
 vendor-bin/requirement-checker/composer.lock: vendor-bin/requirement-checker/composer.json
 	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer bin requirement-checker update --lock && touch -c $(@)"
+
+dist:
+	mkdir -p dist
+	touch dist/.gitkeep
+	touch -c $@
