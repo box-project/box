@@ -335,7 +335,7 @@ vendor_install:
 	touch -c bin/phpunit
 
 composer.lock: composer.json
-	@echo "$(@) is not up to date. You may want to run the following command:"
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer update --lock && touch -c $(@)"
 
 vendor: composer.lock
@@ -357,7 +357,7 @@ vendor-bin/php-cs-fixer/vendor: vendor-bin/php-cs-fixer/composer.lock $(COMPOSER
 	composer bin php-cs-fixer install
 	touch -c $@
 vendor-bin/php-cs-fixer/composer.lock: vendor-bin/php-cs-fixer/composer.json
-	@echo "$(@) is not up to date. You may want to run the following command:"
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer bin php-cs-fixer update --lock && touch -c $(@)"
 
 .PHONY: infection_install
@@ -369,7 +369,7 @@ vendor-bin/infection/vendor: vendor-bin/infection/composer.lock $(COMPOSER_BIN_P
 	composer bin infection install
 	touch -c $@
 vendor-bin/infection/composer.lock: vendor-bin/infection/composer.json
-	@echo "$(@) is not up to date. You may want to run the following command:"
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer bin infection update --lock && touch -c $(@)"
 
 fixtures/composer-dump/dir001/composer.lock: fixtures/composer-dump/dir001/composer.json
