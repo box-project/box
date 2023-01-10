@@ -83,6 +83,13 @@ jobs:
                     coverage: pcov
                     extensions: ctype, iconv, xml
 
+            # Do this before using the Makefile just to avoid accidentally resolving the deferred variables using
+            # INFECTION_FLAGS.
+            -   name: Configure Infection for the CI
+                run: |
+                    git fetch origin $GITHUB_BASE_REF
+                    echo "INFECTION_FLAGS=--git-diff-lines --git-diff-base=origin/$GITHUB_BASE_REF --ignore-msi-with-no-mutations --logger-github" >> "$GITHUB_ENV"
+
             -   name: Install Composer dependencies
                 uses: ramsey/composer-install@v2
 
@@ -97,11 +104,6 @@ jobs:
 
             -   name: Run tests with coverage
                 run: make phpunit_coverage_infection
-
-            -   name: Configure Infection for the CI
-                run: |
-                    git fetch origin $GITHUB_BASE_REF
-                    echo "INFECTION_FLAGS=--git-diff-lines --git-diff-base=origin/$GITHUB_BASE_REF --ignore-msi-with-no-mutations --logger-github" >> "$GITHUB_ENV"
 
             -   run: make _infection_ci
 
