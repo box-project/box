@@ -98,12 +98,15 @@ jobs:
             -   name: Ensure that the Infection make target is up to date
                 run: make infection_install
 
+            -   name: Run tests with coverage
+                run: make phpunit_coverage_infection
+
             -   name: Configure Infection for the CI
                 run: |
                     git fetch origin $GITHUB_BASE_REF
                     echo "INFECTION_FLAGS=--git-diff-lines --git-diff-base=origin/$GITHUB_BASE_REF --ignore-msi-with-no-mutations --logger-github" >> "$GITHUB_ENV"
 
-            -   run: make infection
+            -   run: make _infection
 
     # This is a "trick", a meta task which does not change, and we can use in
     # the protected branch rules as opposed to the tests one above which
