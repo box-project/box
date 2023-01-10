@@ -68,6 +68,7 @@ requirement_checker_check:
 clean: 	 		 ## Cleans all created artifacts
 clean:
 	rm -rf \
+		dist \
 		fixtures/build/dir010/index.phar \
 		fixtures/build/dir011/vendor \
 		fixtures/build/dir011/expected-output \
@@ -147,11 +148,11 @@ requirement_checker_cs_lint:
 	cd requirement-checker; $(MAKE) --file=Makefile cs_lint
 
 .PHONY: php_cs_fixer
-php_cs_fixer: $(PHP_CS_FIXER_BIN)
+php_cs_fixer: $(PHP_CS_FIXER_BIN) dist
 	$(PHP_CS_FIXER) fix
 
 .PHONY: php_cs_fixer_lint
-php_cs_fixer_lint: $(PHP_CS_FIXER_BIN)
+php_cs_fixer_lint: $(PHP_CS_FIXER_BIN) dist
 	$(PHP_CS_FIXER) fix --ansi --verbose --dry-run --diff
 
 .PHONY: composer_normalize
@@ -193,17 +194,17 @@ phpunit_phar_writeable: $(PHPUNIT_BIN) $(PHPUNIT_TEST_SRC)
 
 .PHONY: phpunit_coverage_html
 phpunit_coverage_html:      ## Runs PHPUnit with code coverage with HTML report
-phpunit_coverage_html: $(PHPUNIT_BIN) vendor
+phpunit_coverage_html: $(PHPUNIT_BIN) dist $(PHPUNIT_TEST_SRC) vendor
 	$(PHPUNIT_COVERAGE_HTML)
 	@echo "You can check the report by opening the file \"$(COVERAGE_HTML_DIR)/index.html\"."
 
 .PHONY: phpunit_coverage_infection
 phpunit_coverage_infection: ## Runs PHPUnit tests with test coverage
-phpunit_coverage_infection: $(PHPUNIT_BIN) vendor
+phpunit_coverage_infection: $(PHPUNIT_BIN) dist $(PHPUNIT_TEST_SRC) vendor
 	$(PHPUNIT_COVERAGE_INFECTION)
 
 .PHONY: infection
-infection: $(INFECTION_BIN) vendor
+infection: $(INFECTION_BIN) dist $(PHPUNIT_TEST_SRC) vendor
 	$(INFECTION_WITH_INITIAL_TESTS)
 
 .PHONY: _infection
@@ -425,12 +426,12 @@ vendor-bin/infection/composer.lock: vendor-bin/infection/composer.json
 	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer bin infection update --lock && touch -c $(@)"
 
-$(COVERAGE_XML_DIR): $(PHPUNIT_BIN) $(INFECTION_SRC)
+$(COVERAGE_XML_DIR): $(PHPUNIT_BIN) dist $(PHPUNIT_TEST_SRC) $(INFECTION_SRC)
 	$(PHPUNIT_COVERAGE_INFECTION)
 	touch -c $@
 	touch -c $(COVERAGE_JUNIT)
 
-$(COVERAGE_JUNIT): $(PHPUNIT_BIN) $(INFECTION_SRC)
+$(COVERAGE_JUNIT): $(PHPUNIT_BIN) dist $(PHPUNIT_TEST_SRC) $(INFECTION_SRC)
 	$(PHPUNIT_COVERAGE_INFECTION)
 	touch -c $@
 	touch -c $(COVERAGE_XML_DIR)
@@ -507,3 +508,8 @@ vendor-bin/requirement-checker/vendor: vendor-bin/requirement-checker/composer.l
 vendor-bin/requirement-checker/composer.lock: vendor-bin/requirement-checker/composer.json
 	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer bin requirement-checker update --lock && touch -c $(@)"
+
+dist:
+	mkdir -p dist
+	touch dist/.gitkeep
+	touch -c $@
