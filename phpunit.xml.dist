@@ -8,7 +8,7 @@
          convertDeprecationsToExceptions="true"
          colors="true"
          executionOrder="random"
-         cacheResultFile="dist/.php-cs-fixer.cache">
+         cacheResultFile="dist/.phpunit.result.cache">
 
     <php>
         <env name="BOX_ALLOW_XDEBUG" value="1"/>
