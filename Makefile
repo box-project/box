@@ -11,6 +11,13 @@ COMPOSER_BIN_PLUGIN_VENDOR = vendor/bamarni/composer-bin-plugin
 
 REQUIREMENT_CHECKER_EXTRACT = res/requirement-checker
 
+BOX_BIN = bin/box
+BOX = $(BOX_BIN)
+
+SCOPED_BOX_BIN = bin/box.phar
+SCOPED_BOX = $(SCOPED_BOX_BIN)
+SCOPED_BOX_DEPS = bin/box bin/box.bat $(shell find src res) box.json.dist scoper.inc.php vendor
+
 COVERAGE_DIR = dist/coverage
 COVERAGE_XML_DIR = $(COVERAGE_DIR)/coverage-xml
 COVERAGE_JUNIT = $(COVERAGE_DIR)/phpunit.junit.xml
@@ -91,6 +98,7 @@ clean:
 	@rm -rf \
 		.php-cs-fixer.cache \
 		.phpunit.result.cache \
+		box \
 		fixtures/check-requirements \
 		site \
 		website \
@@ -98,8 +106,9 @@ clean:
 
 .PHONY: compile
 compile: 		 ## Compiles the application into the PHAR
-compile: box
-	cp -f box bin/box.phar
+compile:
+	@rm $(SCOPED_BOX_BIN) || true
+	$(MAKE) $(SCOPED_BOX_BIN)
 
 
 .PHONY: dump_requirement_checker
@@ -228,14 +237,14 @@ test_e2e: e2e_php_settings_checker e2e_scoper_alias e2e_scoper_expose_symbols e2
 
 .PHONY: e2e_scoper_alias
 e2e_scoper_alias: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the prefix alias is working
-e2e_scoper_alias: box
-	./box compile --working-dir=fixtures/build/dir010 --no-parallel
+e2e_scoper_alias: $(SCOPED_BOX_BIN)
+	$(SCOPED_BOX) compile --working-dir=fixtures/build/dir010 --no-parallel --ansi
 
 .PHONY: e2e_scoper_expose_symbols
 e2e_scoper_expose_symbols: ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the symbols exposure is working
-e2e_scoper_expose_symbols: box fixtures/build/dir011/vendor
+e2e_scoper_expose_symbols: $(SCOPED_BOX_BIN) fixtures/build/dir011/vendor
 	php fixtures/build/dir011/index.php > fixtures/build/dir011/expected-output
-	./box compile --working-dir=fixtures/build/dir011 --no-parallel
+	$(SCOPED_BOX) compile --working-dir=fixtures/build/dir011 --no-parallel --ansi
 
 	php fixtures/build/dir011/index.phar > fixtures/build/dir011/output
 	cd fixtures/build/dir011 && php -r "file_put_contents('phar-Y.php', file_get_contents((new Phar('index.phar'))['src/Y.php']));"
@@ -248,7 +257,7 @@ e2e_check_requirements:	 ## Runs the end-to-end tests for the check requirements
 e2e_check_requirements:
 	cd requirement-checker; $(MAKE) --file=Makefile test_e2e
 
-BOX_COMPILE=./box compile --working-dir=fixtures/php-settings-checker -vvv --no-ansi
+BOX_COMPILE := $(SCOPED_BOX) compile --working-dir=fixtures/php-settings-checker -vvv --no-ansi
 ifeq ($(OS),Darwin)
 	SED = sed -i ''
 else
@@ -256,7 +265,7 @@ else
 endif
 .PHONY: e2e_php_settings_checker
 e2e_php_settings_checker: ## Runs the end-to-end tests for the PHP settings handler
-e2e_php_settings_checker: docker_images fixtures/php-settings-checker/output-xdebug-enabled vendor box
+e2e_php_settings_checker: docker_images fixtures/php-settings-checker/output-xdebug-enabled vendor $(SCOPED_BOX_BIN)
 	@echo "$(YELLOW_COLOR)No restart needed$(NO_COLOR)"
 	$(DOCKER) -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX) \
 		php -dphar.readonly=0 -dmemory_limit=-1 \
@@ -311,13 +320,13 @@ e2e_php_settings_checker: docker_images fixtures/php-settings-checker/output-xde
 
 .PHONY: e2e_symfony
 e2e_symfony:		 ## Packages a fresh Symfony app
-e2e_symfony: fixtures/build/dir012/vendor box
+e2e_symfony: $(SCOPED_BOX_BIN) fixtures/build/dir012/vendor
 	composer dump-env prod --working-dir=fixtures/build/dir012
 
 	php fixtures/build/dir012/bin/console --version > fixtures/build/dir012/expected-output
 	rm -rf fixtures/build/dir012/var/cache/prod/*
 
-	./box compile --working-dir=fixtures/build/dir012 --no-parallel
+	$(SCOPED_BOX) compile --working-dir=fixtures/build/dir012 --no-parallel --ansi
 
 	php fixtures/build/dir012/bin/console.phar --version > fixtures/build/dir012/actual-output
 
@@ -325,8 +334,8 @@ e2e_symfony: fixtures/build/dir012/vendor box
 
 .PHONY: e2e_composer_installed_versions
 e2e_composer_installed_versions: ## Packages an app using Composer\InstalledVersions
-e2e_composer_installed_versions: fixtures/build/dir013/vendor box
-	./box compile --working-dir=fixtures/build/dir013 --no-parallel
+e2e_composer_installed_versions: $(SCOPED_BOX_BIN) fixtures/build/dir013/vendor
+	$(SCOPED_BOX) compile --working-dir=fixtures/build/dir013 --no-parallel
 	
 	php fixtures/build/dir013/bin/run.phar > fixtures/build/dir013/actual-output
 
@@ -334,21 +343,25 @@ e2e_composer_installed_versions: fixtures/build/dir013/vendor box
 
 .PHONY: e2e_phpstorm_stubs
 e2e_phpstorm_stubs:	 ## Project using symbols which should be vetted by PhpStormStubs
-e2e_phpstorm_stubs: box
-	./box compile --working-dir=fixtures/build/dir014 --no-parallel
+e2e_phpstorm_stubs: $(SCOPED_BOX_BIN)
+	$(SCOPED_BOX) compile --working-dir=fixtures/build/dir014 --no-parallel
 
 	php fixtures/build/dir014/index.phar > fixtures/build/dir014/actual-output
 
 	diff fixtures/build/dir014/expected-output fixtures/build/dir014/actual-output
 
+
+#---------------------------------------------------------------------------
+
+
 .PHONY: blackfire
 blackfire:		 ## Profiles the compile step
-blackfire: box
+blackfire: $(SCOPED_BOX_BIN)
 	# Profile compiling the PHAR from the source code
-	blackfire --reference=1 --samples=5 run $(PHPNOGC) -d bin/box compile --quiet --no-parallel
+	blackfire --reference=1 --samples=5 run $(PHPNOGC) -d $(BOX) compile --quiet --no-parallel
 
 	# Profile compiling the PHAR from the PHAR
-	blackfire --reference=2 --samples=5 run $(PHPNOGC) -d box compile --quiet --no-parallel
+	blackfire --reference=2 --samples=5 run $(PHPNOGC) -d $(SCOPED_BOX) compile --quiet --no-parallel
 
 
 #
@@ -478,9 +491,9 @@ fixtures/default_stub.php:
 $(REQUIREMENT_CHECKER_EXTRACT):
 	cd requirement-checker; $(MAKE) --file=Makefile _dump
 
-box: bin src res vendor box.json.dist scoper.inc.php $(REQUIREMENT_CHECKER_EXTRACT)
+$(SCOPED_BOX_BIN): $(SCOPED_BOX_DEPS)
 	@echo "$(YELLOW_COLOR)Compile Box.$(NO_COLOR)"
-	bin/box compile --ansi --no-parallel
+	$(BOX) compile --ansi --no-parallel
 
 	rm bin/_box.phar || true
 	mv -v bin/box.phar bin/_box.phar
@@ -493,6 +506,7 @@ box: bin src res vendor box.json.dist scoper.inc.php $(REQUIREMENT_CHECKER_EXTRA
 	@echo "$(YELLOW_COLOR)Test the PHAR which has been created by the isolated PHAR.$(NO_COLOR)"
 	./box compile --ansi --no-parallel
 
+	mv -fv box bin/box.phar
 	rm bin/_box.phar
 
 	touch -c $@
