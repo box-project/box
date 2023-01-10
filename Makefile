@@ -35,6 +35,13 @@ DOCKER = docker run --interactive --platform=linux/amd64 --rm --workdir=/opt/box
 MIN_SUPPORTED_PHP_BOX = box_php81
 MIN_SUPPORTED_PHP_WITH_XDEBUG_BOX = box_php81_xdebug
 
+E2E_SCOPER_EXPOSE_SYMBOLS_DIR = fixtures/build/dir011
+E2E_SCOPER_EXPOSE_SYMBOLS_EXPECTED_OUTPUT := $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/expected-output
+E2E_SCOPER_EXPOSE_SYMBOLS_ACTUAL_OUTPUT := $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/actual-output
+
+DIFF = diff --strip-trailing-cr --ignore-all-space --side-by-side --suppress-common-lines
+
+
 WEBSITE_SRC := mkdocs.yaml $(shell find doc)
 # This is defined in mkdocs.yaml#site_dir
 WEBSITE_OUTPUT = dist/website
@@ -233,15 +240,15 @@ e2e_scoper_alias: box
 
 .PHONY: e2e_scoper_expose_symbols
 e2e_scoper_expose_symbols: ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the symbols exposure is working
-e2e_scoper_expose_symbols: box fixtures/build/dir011/vendor
-	php fixtures/build/dir011/index.php > fixtures/build/dir011/expected-output
-	./box compile --working-dir=fixtures/build/dir011 --no-parallel
+e2e_scoper_expose_symbols: box $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/vendor
+	php $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/index.php > $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/expected-output
+	./box compile --working-dir=$(E2E_SCOPER_EXPOSE_SYMBOLS_DIR) --no-parallel
 
-	php fixtures/build/dir011/index.phar > fixtures/build/dir011/output
-	cd fixtures/build/dir011 && php -r "file_put_contents('phar-Y.php', file_get_contents((new Phar('index.phar'))['src/Y.php']));"
+	php $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/index.phar > $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/output
+	cd $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR) && php -r "file_put_contents('phar-Y.php', file_get_contents((new Phar('index.phar'))['src/Y.php']));"
 
-	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/build/dir011/expected-output fixtures/build/dir011/output
-	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/build/dir011/phar-Y.php fixtures/build/dir011/src/Y.php
+	diff --ignore-all-space --side-by-side --suppress-common-lines $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/expected-output $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/output
+	diff --ignore-all-space --side-by-side --suppress-common-lines $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/phar-Y.php $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/src/Y.php
 
 .PHONY: e2e_check_requirements
 e2e_check_requirements:	 ## Runs the end-to-end tests for the check requirements feature
@@ -459,9 +466,12 @@ fixtures/composer-dump/dir003/vendor: fixtures/composer-dump/dir003/composer.loc
 	composer install --ansi --working-dir=fixtures/composer-dump/dir003
 	touch -c $@
 
-fixtures/build/dir011/vendor:
-	composer install --ansi --working-dir=fixtures/build/dir011
+$(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/vendor: $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/composer.lock
+	composer install --ansi --working-dir=$(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)
 	touch -c $@
+$(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/composer.lock: $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/composer.json
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
+	@echo "$$ composer update --lock --working-dir=$(E2E_SCOPER_EXPOSE_SYMBOLS_DIR) && touch -c $(@)"
 
 fixtures/build/dir012/vendor:
 	composer install --ansi --working-dir=fixtures/build/dir012
