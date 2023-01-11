@@ -46,13 +46,6 @@ final class MakefileTest extends BaseMakefileTestCase
             [33mtest:[0m		  	  Runs all the tests
             [33mphpunit_coverage_html:[0m       Runs PHPUnit with code coverage with HTML report
             [33mphpunit_coverage_infection:[0m  Runs PHPUnit tests with test coverage
-            [33me2e_scoper_alias:[0m 	  Runs the end-to-end tests to check that the PHP-Scoper config API regarding the prefix alias is working
-            [33me2e_scoper_expose_symbols:[0m  Runs the end-to-end tests to check that the PHP-Scoper config API regarding the symbols exposure is working
-            [33me2e_check_requirements:[0m	  Runs the end-to-end tests for the check requirements feature
-            [33me2e_php_settings_checker:[0m  Runs the end-to-end tests for the PHP settings handler
-            [33me2e_symfony:[0m		  Packages a fresh Symfony app
-            [33me2e_composer_installed_versions:[0m  Packages an app using Composer\InstalledVersions
-            [33me2e_phpstorm_stubs:[0m	  Project using symbols which should be vetted by PhpStormStubs
             [33mblackfire:[0m		  Profiles the compile step
             [33mwebsite_build:[0m		  Builds the website
             [33mwebsite_serve:[0m		  Serves the website locally
