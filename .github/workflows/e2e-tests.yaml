@@ -1,10 +1,11 @@
 name: End-to-End Tests
 
 on:
-    workflow_run:
-        workflows: [Release]
-        types:
-            - completed
+    push:
+        branches: [ main ]
+    pull_request:
+    release:
+        types: [ created ]
 
 env:
     # TODO: adopt the composer-option strategy instead
@@ -12,10 +13,25 @@ env:
     FUTURE_PHP_VERSION: '9.0'
 
 jobs:
+    wait-for-phar:
+        runs-on: ubuntu-latest
+        name: Wait for the PHAR
+        steps:
+            # I could not make this workflow work with a on.workflow_run. Hence instead of adding this
+            # wait step for _every_ e2e job, which will block more runners, we wait in one and only one
+            # runner.
+            -   name: Wait for the PHAR to be built
+                uses: fountainhead/action-wait-for-check@v1.1.0
+                with:
+                    checkName: Build PHAR
+                    ref: ${{ github.event.pull_request.head.sha || github.sha }}
+                    token: ${{ secrets.GITHUB_TOKEN }}
+                    intervalSeconds: 10
+
     e2e-tests:
-        if: ${{ github.event.workflow_run.conclusion == 'success' }}
         runs-on: ubuntu-latest
         name: Test ${{ matrix.e2e }} (PHP ${{ matrix.php }}, ${{ matrix.tools }})
+        needs: wait-for-phar
         strategy:
             fail-fast: false
             matrix:

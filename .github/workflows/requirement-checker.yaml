@@ -133,9 +133,25 @@ jobs:
             -   name: Runs the tests
                 run: cd requirement-checker; make test_unit
 
+    wait-for-phar:
+        runs-on: ubuntu-latest
+        name: Wait for the PHAR
+        steps:
+            # I could not make this workflow work with a on.workflow_run. Hence instead of adding this
+            # wait step for _every_ e2e job, which will block more runners, we wait in one and only one
+            # runner.
+            -   name: Wait for the PHAR to be built
+                uses: fountainhead/action-wait-for-check@v1.1.0
+                with:
+                    checkName: Build PHAR
+                    ref: ${{ github.event.pull_request.head.sha || github.sha }}
+                    token: ${{ secrets.GITHUB_TOKEN }}
+                    intervalSeconds: 10
+
     e2e-tests:
         runs-on: ubuntu-latest
         name: End-to-End Tests
+        needs: wait-for-phar
         strategy:
             fail-fast: false
             matrix:
@@ -157,14 +173,6 @@ jobs:
                     php-version: '8.1'
                     tools: composer
                     coverage: none
-
-            -   name: Wait for the PHAR to be built
-                uses: fountainhead/action-wait-for-check@v1.1.0
-                with:
-                    checkName: Build PHAR
-                    ref: ${{ github.event.pull_request.head.sha || github.sha }}
-                    token: ${{ secrets.GITHUB_TOKEN }}
-                    intervalSeconds: 10
 
             # We cannot use the regular actions/download-artifact here since the artifact is stored
             # in a different workflow.
