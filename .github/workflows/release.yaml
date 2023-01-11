@@ -74,6 +74,9 @@ jobs:
             -   name: Checkout
                 uses: actions/checkout@v3
 
+            -   name: Set up QEMU
+                uses: docker/setup-qemu-action@v2
+
             -   name: Set up Docker Buildx
                 uses: docker/setup-buildx-action@v1
                 with:
@@ -83,7 +86,7 @@ jobs:
                 uses: docker/login-action@v2
                 with:
                     registry: ghcr.io
-                    username: ${{ github.actor }}
+                    username: ${{ github.repository_owner }}
                     password: ${{ secrets.GITHUB_TOKEN }}
 
             -   name: Build and export to Docker
@@ -91,9 +94,9 @@ jobs:
                 with:
                     context: .
                     file: .docker/php725
-                    platforms: linux/amd64
+                    platforms: linux/amd64,linux/arm64
                     load: true
-                    tags: ghcr.io/box/php725
+                    tags: ghcr.io/box/php725:latest
 
             -   name: Test the image
                 run: docker run --rm ghcr.io/box/php725 php --version
@@ -103,11 +106,11 @@ jobs:
                 with:
                     context: .
                     file: .docker/php725
-                    platforms: linux/amd64
+                    platforms: linux/amd64,linux/arm64
                     push: true
-                    tags: ghcr.io/box/php725
-                    cache-from: type=gha
-                    cache-to: type=gha,mode=max
+                    tags: ghcr.io/box/php725:latest
+                    cache-from: type=gha, scope=${{ github.workflow }}
+                    cache-to: type=gha, scope=${{ github.workflow }}
 
     publish-phar:
         runs-on: ubuntu-latest
