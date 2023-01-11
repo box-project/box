@@ -3,8 +3,9 @@ MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 
 OS := $(shell uname)
-ERROR_COLOR := "\033[41m"
-NO_COLOR := "\033[0m"
+ERROR_COLOR := \033[41m
+YELLOW_COLOR := \033[0;33m
+NO_COLOR := \033[0m
 
 
 PHPUNIT_BIN = vendor/bin/phpunit
@@ -39,31 +40,63 @@ help:
 #---------------------------------------------------------------------------
 
 .PHONY: check
-check:	 ## Runs all checks
-check: cs cs_lint test
+check:	 	## Runs all checks
+check: cs autoreview test
 
 .PHONY: clean
-clean: 	 ## Cleans all created artifacts
+clean: 	 	## Cleans all created artifacts
 clean:
 	rm -rf \
 		dist \
 		$(ACTUAL_TERMINAL_DIFF) \
-		bin/check-requirements.phar \
 		$(PHAR) \
 		.phpunit.result.cache \
 		.requirement-checker \
+		|| true
+	@# Obsolete entries; Only relevant to someone who still has old artifacts locally
+	@rm -rf \
+		bin/check-requirements.phar \
+		.phpunit.result.cache \
+		.requirement-checker \
+		fixtures/fail-complete/actual-output \
+		fixtures/fail-complete/expected-output-725 \
+		fixtures/fail-complete/expected-output-725-skipped \
+		fixtures/fail-complete/expected-output-current-min-php \
+		fixtures/fail-complete/index.phar \
+		fixtures/pass-complete/actual-output \
+		fixtures/pass-complete/expected-output-725 \
+		fixtures/pass-complete/expected-output-current-min-php \
+		fixtures/pass-complete/index.phar \
+		fixtures/pass-no-config/actual-output \
+		fixtures/pass-no-config/expected-output-725 \
+		fixtures/pass-no-config/expected-output-725-skipped \
+		fixtures/pass-no-config/expected-output-current-min-php \
+		fixtures/pass-no-config/index.phar \
 		|| true
 	$(MAKE) dist
 
 
 .PHONY: dump
-dump:	 ## Dumps the requirement-checker
+dump:	 	## Dumps the requirement-checker
 dump:
 	rm -rf $(PHAR) $(PHAR_EXTRACT) || true
 	$(MAKE) _dump
 
 .PHONY: _dump
 _dump: $(PHAR_EXTRACT)
+
+#
+# AutoReview
+#---------------------------------------------------------------------------
+
+.PHONY: autoreview
+autoreview:	## AutoReview checks
+autoreview: cs_lint phpunit_autoreview
+
+.PHONY: phpunit_autoreview
+phpunit_autoreview:
+phpunit_autoreview: $(PHPUNIT_BIN) vendor
+	$(PHPUNIT) --testsuite="AutoReview" --colors=always
 
 
 #
@@ -72,11 +105,11 @@ _dump: $(PHAR_EXTRACT)
 
 
 .PHONY: cs
-cs:	 ## Fixes CS
+cs:	 	## Fixes CS
 cs: gitignore_sort composer_normalize php_cs_fixer
 
 .PHONY: cs_lint
-cs_lint: ## Checks CS
+cs_lint: 	## Checks CS
 cs_lint: composer_normalize_lint php_cs_fixer_lint
 
 .PHONY: gitignore_sort
@@ -105,7 +138,7 @@ php_cs_fixer_lint: $(PHP_CS_FIXER_BIN)
 #---------------------------------------------------------------------------
 
 .PHONY: test
-test:	 ## Runs all the tests
+test:		## Runs all the tests
 test: test_unit test_e2e
 
 
@@ -119,7 +152,7 @@ test_unit: phpunit terminal_copy
 .PHONY: phpunit
 phpunit:
 phpunit: $(PHPUNIT_BIN) vendor
-	$(PHPUNIT) --colors=always
+	$(PHPUNIT) --testsuite="UnitTests" --colors=always
 
 .PHONY: terminal_copy
 terminal_copy: $(ACTUAL_TERMINAL_DIFF)

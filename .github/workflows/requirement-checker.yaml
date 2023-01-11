@@ -29,7 +29,7 @@ jobs:
             -   name: Install PHP-CS-Fixer
                 uses: ramsey/composer-install@v2
                 with:
-                    working-directory: 'vendor-bin/php-cs-fixer'
+                    working-directory: vendor-bin/php-cs-fixer
 
             -   name: Ensure that the PHP-CS-Fixer make target is up to date
                 run: make php_cs_fixer_install
@@ -37,7 +37,7 @@ jobs:
             -   name: Install the Composer dependencies
                 uses: ramsey/composer-install@v2
                 with:
-                    working-directory: 'requirement-checker'
+                    working-directory: requirement-checker
 
             -   name: Ensure that the make target is up to date
                 run: cd requirement-checker; make vendor_install
@@ -45,9 +45,34 @@ jobs:
             -   name: Lint CS
                 run: cd requirement-checker; make cs_lint
 
+    autoreview-test:
+        runs-on: ubuntu-latest
+        name: AutoReview Tests
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v3
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.1'
+                    tools: composer
+                    coverage: none
+
+            -   name: Install the Composer dependencies
+                uses: ramsey/composer-install@v2
+                with:
+                    working-directory: requirement-checker
+
+            -   name: Ensure that the make target is up to date
+                run: cd requirement-checker; make vendor_install
+
+            -   name: Run tests
+                run: cd requirement-checker; make phpunit_autoreview
+
     unit-tests:
         runs-on: ubuntu-latest
-        name: Unit Tests
+        name: Unit Tests (PHP ${{ matrix.php.version }}, ${{ matrix.php.dependency }}${{ matrix.php.composer-options == null && ')' || format(', {0})', matrix.php.composer-options) }}
         strategy:
             fail-fast: false
             matrix:
@@ -57,13 +82,13 @@ jobs:
                 php:
                     -   version: '8.1'
                         dependency: locked
-                        composer-options: ''
+                        composer-options: ~
                     -   version: '8.2'
                         dependency: highest
-                        composer-options: ''
+                        composer-options: ~
                     -   version: '8.3'
                         dependency: highest
-                        composer-options: '--ignore-platform-req=php+'
+                        composer-options: --ignore-platform-req=php+
 
         steps:
             -   name: Checkout
@@ -72,8 +97,9 @@ jobs:
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
                 with:
-                    php-version: '${{ matrix.php.version }}'
+                    php-version: ${{ matrix.php.version }}
                     tools: composer
+                    coverage: none
 
             -   name: Install the Composer dependencies
                 uses: ramsey/composer-install@v2
@@ -107,41 +133,20 @@ jobs:
             -   name: Runs the tests
                 run: cd requirement-checker; make test_unit
 
-    build-box-phar:
+    wait-for-phar:
         runs-on: ubuntu-latest
-        name: Build (test) Box PHAR
+        name: Wait for the PHAR
         steps:
-            -   name: Checkout
-                uses: actions/checkout@v3
+            # I could not make this workflow work with a on.workflow_run. Hence instead of adding this
+            # wait step for _every_ e2e job, which will block more runners, we wait in one and only one
+            # runner.
+            -   name: Wait for the PHAR to be built
+                uses: fountainhead/action-wait-for-check@v1.1.0
                 with:
-                    fetch-depth: 0
-
-            -   name: Setup PHP
-                uses: shivammathur/setup-php@v2
-                with:
-                    php-version: '8.1'
-                    ini-values: phar.readonly=0
-                    tools: composer
-                    coverage: none
-
-            -   name: Install the Composer (root) dependencies
-                uses: ramsey/composer-install@v2
-
-            -   name: Ensure that the make target is up to date
-                run: make vendor_install
-
-            -   name: Build PHAR
-                run: make box
-
-            # Smoke test
-            -   name: Ensure the PHAR works
-                run: ./box --version
-
-            -   name: Upload the PHAR artifact
-                uses: actions/upload-artifact@v3
-                with:
-                    name: box-phar-81
-                    path: box
+                    checkName: Build PHAR
+                    ref: ${{ github.event.pull_request.head.sha || github.sha }}
+                    token: ${{ secrets.GITHUB_TOKEN }}
+                    intervalSeconds: 10
 
     docker-build:
         runs-on: ubuntu-20.04
@@ -188,7 +193,18 @@ jobs:
     e2e-tests:
         runs-on: ubuntu-latest
         name: End-to-End Tests
-        needs: build-box-phar
+        needs: wait-for-phar
+        strategy:
+            fail-fast: false
+            matrix:
+                e2e:
+                    - test_e2e_pass_no_config_min_composer_php
+                    - test_e2e_pass_no_config_min_box_php
+                    - test_e2e_pass_complete_min_composer_php
+                    - test_e2e_pass_complete_min_box_php
+                    - test_e2e_fail_complete_min_composer_php
+                    - test_e2e_fail_complete_min_box_php
+                    - test_e2e_skip_min_composer_php
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3
@@ -198,33 +214,46 @@ jobs:
                 with:
                     php-version: '8.1'
                     tools: composer
+                    coverage: none
 
+            # We cannot use the regular actions/download-artifact here since the artifact is stored
+            # in a different workflow.
+            # See https://github.com/actions/download-artifact/issues/172
             -   name: Retrieve built PHAR
-                uses: actions/download-artifact@v3
+                uses: dawidd6/action-download-artifact@v2
                 with:
-                    name: box-phar-81
+                    github_token: ${{secrets.GITHUB_TOKEN}}
+                    workflow: release.yaml
+                    check_artifacts: true
+                    name: box-phar
 
+            # The original target is for the publishing, which is different from the internal name used.
             -   name: Ensure the make target is up to date
-                run: touch -c box
+                run: mv box.phar bin/box.phar && touch -c box
 
             # See https://github.com/actions/download-artifact#limitations
             # the permissions are not guaranteed to be preserved
             -   name: Ensure PHAR is executable
-                run: chmod 755 box
+                run: chmod 755 bin/box.phar
 
             -   name: Check that the PHAR works
-                run: ./box --version
+                run: bin/box.phar --ansi --version
+
+            -   name: Build the Docker images
+                run: cd requirement-checker; make docker_images
 
             -   name: Runs the tests
-                run: cd requirement-checker; make --keep-going test_e2e
+                run: cd requirement-checker; make ${{ matrix.e2e }}
 
     # This is a "trick", a meta task which does not change, and we can use in
     # the protected branch rules as opposed to the tests one above which
     # may change regularly.
     validate-tests:
-        name: Tests status
+        name: RequirementChecker status
         runs-on: ubuntu-latest
         needs:
+            - cs-lint
+            - autoreview-test
             - unit-tests
             - e2e-tests
         if: always()

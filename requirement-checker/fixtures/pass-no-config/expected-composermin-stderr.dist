@@ -6,12 +6,9 @@ Box Requirements Checker
 > PHP is using the following php.ini file:
   WARNING: No configuration file (php.ini) used by PHP!
 
-> Checking Box requirements:
-  ✔ The application requires the version ">=5.3" or greater.
-  ✔ The application requires the extension "phar".
-  
+> No requirements found.
+
                                                                                 
  [OK] Your system is ready to run the application.                              
-                                                                                
 
-Success!
+

@@ -8,25 +8,42 @@ on:
         types: [ created ]
 
 env:
+    # TODO: adopt the composer-option strategy instead
     # Comma-space separated list, e.g. '8.1, 8.2, 9.0'
     FUTURE_PHP_VERSION: '9.0'
 
 jobs:
+    wait-for-phar:
+        runs-on: ubuntu-latest
+        name: Wait for the PHAR
+        steps:
+            # I could not make this workflow work with a on.workflow_run. Hence instead of adding this
+            # wait step for _every_ e2e job, which will block more runners, we wait in one and only one
+            # runner.
+            -   name: Wait for the PHAR to be built
+                uses: fountainhead/action-wait-for-check@v1.1.0
+                with:
+                    checkName: Build PHAR
+                    ref: ${{ github.event.pull_request.head.sha || github.sha }}
+                    token: ${{ secrets.GITHUB_TOKEN }}
+                    intervalSeconds: 10
+
     e2e-tests:
         runs-on: ubuntu-latest
-        name: "e2e-Tests: ${{ matrix.e2e }} - ${{ matrix.php }} - ${{ matrix.tools }}"
+        name: Test ${{ matrix.e2e }} (PHP ${{ matrix.php }}, ${{ matrix.tools }})
+        needs: wait-for-phar
         strategy:
             fail-fast: false
             matrix:
+                # TODO: split into regular e2e tests and docker e2e
                 e2e:
-                    - 'e2e_php_settings_checker'
-                    - 'e2e_scoper_alias'
-                    - 'e2e_scoper_expose_symbols'
-                    - 'e2e_check_requirements'
-                    - 'e2e_symfony'
-                    - 'e2e_composer_installed_versions'
+                    - e2e_php_settings_checker
+                    - e2e_scoper_alias
+                    - e2e_scoper_expose_symbols
+                    - e2e_symfony
+                    - e2e_composer_installed_versions
                 php: [ '8.1' ]
-                tools: [ 'composer:v2' ]
+                tools: [ composer ]
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3
@@ -37,38 +54,38 @@ jobs:
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: ${{ matrix.php }}
-                    ini-values: 'phar.readonly=0, display_errors=On, error_reporting=-1'
+                    ini-values: phar.readonly=0, display_errors=On, error_reporting=-1
                     tools: ${{ matrix.tools }}
                     coverage: pcov
 
-            -   name: Install Composer dependencies
-                uses: ramsey/composer-install@v2
-                if: contains(env.FUTURE_PHP_VERSION, matrix.php) != true
-
-            -   name: Install RequirementChecker Composer dependencies
-                uses: ramsey/composer-install@v2
-                if: contains(env.FUTURE_PHP_VERSION, matrix.php) != true
+            # We cannot use the regular actions/download-artifact here since the artifact is stored
+            # in a different workflow.
+            # See https://github.com/actions/download-artifact/issues/172
+            -   name: Retrieve built PHAR
+                uses: dawidd6/action-download-artifact@v2
                 with:
-                    working-directory: 'requirement-checker'
+                    github_token: ${{secrets.GITHUB_TOKEN}}
+                    workflow: release.yaml
+                    check_artifacts: true
+                    name: box-phar
 
-            -   name: Install Composer dependencies (ignore PHP platform req)
-                uses: ramsey/composer-install@v2
-                if: contains(env.FUTURE_PHP_VERSION, matrix.php)
-                with:
-                    composer-options: --ignore-platform-req=php+
+            # The original target is for the publishing, which is different from the internal name used.
+            -   name: Ensure the make target is up to date
+                run: mv box.phar bin/box.phar && touch -c box
 
-            -   name: Install RequirementChecker Composer dependencies (ignore PHP platform req)
-                uses: ramsey/composer-install@v2
-                if: contains(env.FUTURE_PHP_VERSION, matrix.php)
-                with:
-                    composer-options: --ignore-platform-req=php+
-                    working-directory: 'requirement-checker'
+            # See https://github.com/actions/download-artifact#limitations
+            # the permissions are not guaranteed to be preserved
+            -   name: Ensure PHAR is executable
+                run: chmod 755 bin/box.phar
 
-            -   name: Ensure the Makefile does not run the Composer install command a 2nd time
-                run: touch -c composer.lock vendor requirement-checker/composer.lock requirement-checker/vendor
+            -   name: Check that the PHAR works
+                run: bin/box.phar --ansi --version
 
-            -   name: Run e2e ${{ matrix.e2e }}
-                run: make ${{ matrix.e2e }}
+            -   name: Build the Docker images
+                if: matrix.e2e == e2e_php_settings_checker
+                run: make docker_images
+
+            -   run: make ${{ matrix.e2e }}
 
     # This is a "trick", a meta task which does not change, and we can use in
     # the protected branch rules as opposed to the tests one above which

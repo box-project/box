@@ -1,5 +1,6 @@
 {
     "$schema": "vendor-bin/infection/vendor/infection/infection/resources/schema.json",
+
     "timeout": 10,
     "source": {
         "directories": [
@@ -9,9 +10,7 @@
             "src/Compactor/Php.php"
         ]
     },
-    "logs": {
-        "text": "dist/infection-log.txt"
-    },
+    "testFrameworkOptions": "--testsuite=Tests",
     "mutators": {
         "@default": true,
         "global-ignoreSourceCodeByRegex": [
