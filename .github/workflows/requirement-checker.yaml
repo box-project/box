@@ -178,16 +178,16 @@ jobs:
                     name: box-phar
 
             # The original target is for the publishing, which is different from the internal name used.
-            -   name: Correct the target name
-                run: mv box.phar box && touch -c box
+            -   name: Ensure the make target is up to date
+                run: mv box.phar bin/box.phar && touch -c box
 
             # See https://github.com/actions/download-artifact#limitations
             # the permissions are not guaranteed to be preserved
             -   name: Ensure PHAR is executable
-                run: chmod 755 box
+                run: chmod 755 bin/box.phar
 
             -   name: Check that the PHAR works
-                run: ./box --ansi --version
+                run: bin/box.phar --ansi --version
 
             -   name: Build the Docker images
                 run: cd requirement-checker; make docker_images
