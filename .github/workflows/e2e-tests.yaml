@@ -13,9 +13,9 @@ env:
     FUTURE_PHP_VERSION: '9.0'
 
 jobs:
-    wait-for-phar:
+    wait-for-phar-and-docker-images:
         runs-on: ubuntu-latest
-        name: Wait for the PHAR
+        name: Wait for the PHAR & Docker images
         steps:
             # I could not make this workflow work with a on.workflow_run. Hence instead of adding this
             # wait step for _every_ e2e job, which will block more runners, we wait in one and only one
@@ -28,10 +28,18 @@ jobs:
                     token: ${{ secrets.GITHUB_TOKEN }}
                     intervalSeconds: 10
 
+            -   name: Wait for the Docker images to be pushed
+                uses: fountainhead/action-wait-for-check@v1.1.0
+                with:
+                    checkName: Build the Docker images
+                    ref: ${{ github.event.pull_request.head.sha || github.sha }}
+                    token: ${{ secrets.GITHUB_TOKEN }}
+                    intervalSeconds: 10
+
     e2e-tests:
         runs-on: ubuntu-latest
         name: Test ${{ matrix.e2e }} (PHP ${{ matrix.php }}, ${{ matrix.tools }})
-        needs: wait-for-phar
+        needs: wait-for-phar-and-docker-images
         strategy:
             fail-fast: false
             matrix:
