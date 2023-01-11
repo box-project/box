@@ -70,6 +70,9 @@ jobs:
     docker-build:
         runs-on: ubuntu-20.04
         name: Build the Docker image ${{ matrix.name }}
+        permissions:
+            contents: read
+            packages: write
         strategy:
             fail-fast: false
             matrix:
@@ -99,7 +102,7 @@ jobs:
                 uses: docker/login-action@v2
                 with:
                     registry: ghcr.io
-                    username: ${{ github.repository_owner }}
+                    username: ${{ github.actor }}
                     password: ${{ secrets.GITHUB_TOKEN }}
 
             -   name: Build and export to Docker
