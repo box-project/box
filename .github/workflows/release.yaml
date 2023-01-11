@@ -76,13 +76,13 @@ jobs:
                 include:
                     - name: PHP 7.2.5
                       docker-file: .docker/php725
-                      image-tag: box_php725
+                      image-tag: box/php725
                     - name: PHP 8.1
                       docker-file: .docker/php81
-                      image-tag: box_php81
+                      image-tag: box/php81
                     - name: PHP 8.1 (Xdebug)
                       docker-file: .docker/php81_xdebug
-                      image-tag: box_php81_xdebug
+                      image-tag: box/php81_xdebug
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3
