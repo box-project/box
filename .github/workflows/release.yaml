@@ -69,10 +69,26 @@ jobs:
 
     docker-build:
         runs-on: ubuntu-20.04
-        name: Build the Docker images
+        name: Build the Docker image ${{ matrix.name }}
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - name: PHP 7.2.5
+                      docker-file: ./docker/php725
+                      image-tag: box_php725
+                    - name: PHP 8.1
+                      docker-file: ./docker/box_php81
+                      image-tag: box_php81
+                    - name: PHP 8.1 (Xdebug)
+                      docker-file: ./docker/box_php81_xdebug
+                      image-tag: box_php81_xdebug
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3
+
+            -   name: Set up QEMU
+                uses: docker/setup-qemu-action@v2
 
             -   name: Set up Docker Buildx
                 uses: docker/setup-buildx-action@v1
@@ -90,22 +106,22 @@ jobs:
                 uses: docker/build-push-action@v3
                 with:
                     context: .
-                    file: .docker/php725
+                    file: ${{ matrix.docker-file }}
                     platforms: linux/amd64,linux/arm64
+                    tags: ghcr.io/${{ matrix.image-tag }}
                     load: true
-                    tags: ghcr.io/box/php725:latest
 
             -   name: Test the image
-                run: docker run --rm ghcr.io/box/php725 php --version
+                run: docker run --rm ghcr.io/${{ matrix.image-tag }} php --version
 
             -   name: Build and push
                 uses: docker/build-push-action@v3
                 with:
                     context: .
-                    file: .docker/php725
+                    file: ${{ matrix.docker-file }}
                     platforms: linux/amd64,linux/arm64
+                    tags: ghcr.io/${{ matrix.image-tag }}
                     push: true
-                    tags: ghcr.io/box/php725:latest
                     cache-from: type=gha, scope=${{ github.workflow }}
                     cache-to: type=gha, scope=${{ github.workflow }}
 
