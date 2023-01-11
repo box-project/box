@@ -119,6 +119,7 @@ clean:
 		fixtures/build/*/vendor \
 		fixtures/build/dir010/index.phar \
 		fixtures/build/dir012/bin/console.phar \
+		$(E2E_PHP_SETTINGS_CHECKER_DIR)/index.phar \
 		$(E2E_SYMFONY_DIR)/var \
 		$(E2E_SYMFONY_DIR)/.env.local.php \
 		fixtures/default_stub.php \
@@ -131,6 +132,7 @@ clean:
 		box \
 		fixtures/check-requirements \
 		fixtures/build/*/index.phar \
+		$(E2E_PHP_SETTINGS_CHECKER_DIR)/actual-output \
 		$(E2E_SYMFONY_DIR)/actual-output \
 		$(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/expected-output \
 		$(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/output \
