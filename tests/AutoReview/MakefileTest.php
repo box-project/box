@@ -21,9 +21,11 @@ use Fidry\Makefile\Test\BaseMakefileTestCase;
  */
 final class MakefileTest extends BaseMakefileTestCase
 {
+    public const MAKEFILE_PATH = __DIR__.'/../../Makefile';
+
     protected static function getMakefilePath(): string
     {
-        return __DIR__.'/../../Makefile';
+        return self::MAKEFILE_PATH;
     }
 
     protected function getExpectedHelpOutput(): string
