@@ -75,13 +75,13 @@ jobs:
             matrix:
                 include:
                     - name: PHP 7.2.5
-                      docker-file: ./docker/php725
+                      docker-file: .docker/php725
                       image-tag: box_php725
                     - name: PHP 8.1
-                      docker-file: ./docker/box_php81
+                      docker-file: .docker/php81
                       image-tag: box_php81
                     - name: PHP 8.1 (Xdebug)
-                      docker-file: ./docker/box_php81_xdebug
+                      docker-file: .docker/php81_xdebug
                       image-tag: box_php81_xdebug
         steps:
             -   name: Checkout
