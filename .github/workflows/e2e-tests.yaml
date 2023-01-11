@@ -90,7 +90,7 @@ jobs:
                 run: bin/box.phar --ansi --version
 
             -   name: Build the Docker images
-                if: matrix.e2e == e2e_php_settings_checker
+                if: ${{ matrix.e2e == 'e2e_php_settings_checker' }}
                 run: make docker_images
 
             -   run: make ${{ matrix.e2e }}
