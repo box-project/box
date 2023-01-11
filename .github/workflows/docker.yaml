@@ -74,7 +74,6 @@ jobs:
     # the protected branch rules as opposed to the tests one above which
     # may change regularly.
     validate-images:
-        id: docker-status
         name: Docker status
         runs-on: ubuntu-latest
         needs: docker-build
