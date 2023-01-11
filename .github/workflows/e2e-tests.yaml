@@ -81,6 +81,10 @@ jobs:
             -   name: Check that the PHAR works
                 run: bin/box.phar --ansi --version
 
+            -   name: Build the Docker images
+                if: matrix.e2e == e2e_php_settings_checker
+                run: make docker_images
+
             -   run: make ${{ matrix.e2e }}
 
     # This is a "trick", a meta task which does not change, and we can use in
