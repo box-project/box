@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 
 # Generates the file with the expected output based on the template,
 # replacing the placeholders of the template by the desired values.

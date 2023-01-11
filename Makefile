@@ -38,14 +38,45 @@ INFECTION_SRC := $(shell find src tests) phpunit.xml.dist
 PHP_CS_FIXER_BIN = vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
 PHP_CS_FIXER = $(PHP_CS_FIXER_BIN)
 
-DOCKER = docker run --interactive --platform=linux/amd64 --rm --workdir=/opt/box
-MIN_SUPPORTED_PHP_BOX = box_php81
-MIN_SUPPORTED_PHP_WITH_XDEBUG_BOX = box_php81_xdebug
+DOCKER_RUN = docker run --interactive --platform=linux/amd64 --rm --workdir=/opt/box
+# Matches the minimum PHP version supported by Box.
+DOCKER_MIN_BOX_VERSION_IMAGE_TAG = box_php81
+DOCKER_MIN_BOX_XDEBUG_PHP_VERSION_IMAGE_TAG = box_php81_xdebug
 
 E2E_SCOPER_EXPOSE_SYMBOLS_DIR = fixtures/build/dir011
-E2E_SCOPER_EXPOSE_SYMBOLS_EXPECTED_OUTPUT := $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/expected-output
-E2E_SCOPER_EXPOSE_SYMBOLS_ACTUAL_OUTPUT := $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/actual-output
+E2E_SCOPER_EXPOSE_SYMBOLS_OUTPUT_DIR = dist/dir011
+E2E_SCOPER_EXPOSE_SYMBOLS_EXPECTED_SCOPED_FILE := $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/src/Y.php
+E2E_SCOPER_EXPOSE_SYMBOLS_ACTUAL_SCOPED_FILE := $(E2E_SCOPER_EXPOSE_SYMBOLS_OUTPUT_DIR)/phar-Y.php
+E2E_SCOPER_EXPOSE_SYMBOLS_EXPECTED_OUTPUT := $(E2E_SCOPER_EXPOSE_SYMBOLS_OUTPUT_DIR)/expected-output
+E2E_SCOPER_EXPOSE_SYMBOLS_ACTUAL_OUTPUT := $(E2E_SCOPER_EXPOSE_SYMBOLS_OUTPUT_DIR)/actual-output
 
+E2E_PHP_SETTINGS_CHECKER_DIR = fixtures/php-settings-checker
+E2E_PHP_SETTINGS_CHECKER_OUTPUT_DIR = dist/php-settings-checker
+E2E_PHP_SETTINGS_CHECKER_EXPECTED_XDEBUG_ENABLED_OUTPUT = $(E2E_PHP_SETTINGS_CHECKER_OUTPUT_DIR)/output-xdebug-enabled
+E2E_PHP_SETTINGS_CHECKER_EXPECTED_OUTPUT_XDEBUG_ENABLED_TEMPLATE = $(E2E_PHP_SETTINGS_CHECKER_DIR)/output-xdebug-enabled.tpl
+E2E_PHP_SETTINGS_CHECKER_ACTUAL_OUTPUT = $(E2E_PHP_SETTINGS_CHECKER_OUTPUT_DIR)/actual-output
+E2E_PHP_SETTINGS_CHECKER_BOX_COMPILE := $(SCOPED_BOX) compile --working-dir=$(E2E_PHP_SETTINGS_CHECKER_DIR) -vvv --no-ansi
+
+E2E_SYMFONY_DIR = fixtures/build/dir012
+E2E_SYMFONY_OUTPUT_DIR = dist/dir012
+E2E_SYMFONY_EXPECTED_OUTPUT := $(E2E_SYMFONY_OUTPUT_DIR)/expected-output
+E2E_SYMFONY_ACTUAL_OUTPUT := $(E2E_SYMFONY_OUTPUT_DIR)/actual-output
+
+E2E_COMPOSER_INSTALLED_DIR = fixtures/build/dir013
+E2E_COMPOSER_INSTALLED_OUTPUT_DIR = dist/dir013
+E2E_COMPOSER_INSTALLED_EXPECTED_OUTPUT := $(E2E_COMPOSER_INSTALLED_DIR)/expected-output
+E2E_COMPOSER_INSTALLED_ACTUAL_OUTPUT := $(E2E_COMPOSER_INSTALLED_OUTPUT_DIR)/actual-output
+
+E2E_PHPSTORM_STUBS_DIR = fixtures/build/dir014
+E2E_PHPSTORM_STUBS_OUTPUT_DIR = dist/dir014
+E2E_PHPSTORM_STUBS_EXPECTED_OUTPUT := $(E2E_PHPSTORM_STUBS_DIR)/expected-output
+E2E_PHPSTORM_STUBS_ACTUAL_OUTPUT := $(E2E_PHPSTORM_STUBS_OUTPUT_DIR)/actual-output
+
+ifeq ($(OS),Darwin)
+	SED = sed -i ''
+else
+	SED = sed -i
+endif
 DIFF = diff --strip-trailing-cr --ignore-all-space --side-by-side --suppress-common-lines
 
 
@@ -84,22 +115,14 @@ clean: 	 		 ## Cleans all created artifacts
 clean:
 	rm -rf \
 		dist \
+		fixtures/build/*/.box_dump \
+		fixtures/build/*/vendor \
 		fixtures/build/dir010/index.phar \
-		fixtures/build/dir011/vendor \
-		fixtures/build/dir011/expected-output \
-		fixtures/build/dir011/index.phar \
-		fixtures/build/dir011/output \
-		fixtures/build/dir011/phar-Y.php \
 		fixtures/build/dir012/bin/console.phar \
-		fixtures/build/dir012/var \
-		fixtures/build/dir012/vendor \
-		fixtures/build/dir012/.env.local.php \
-		fixtures/build/dir012/actual-output \
-		fixtures/build/dir013/vendor \
-		fixtures/build/dir013/actual-output \
-		fixtures/build/dir014/actual-output \
-		fixtures/build/dir014/index.phar \
+		$(E2E_SYMFONY_DIR)/var \
+		$(E2E_SYMFONY_DIR)/.env.local.php \
 		fixtures/default_stub.php \
+		fixtures/composer-dump/*/vendor \
 		 || true
 	@# Obsolete entries; Only relevant to someone who still has old artifacts locally
 	@rm -rf \
@@ -107,16 +130,23 @@ clean:
 		.phpunit.result.cache \
 		box \
 		fixtures/check-requirements \
+		fixtures/build/*/index.phar \
+		$(E2E_SYMFONY_DIR)/actual-output \
+		$(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/expected-output \
+		$(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/output \
+		$(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/phar-Y.php \
+		$(E2E_COMPOSER_INSTALLED_DIR)/actual-output \
+		$(E2E_PHPSTORM_STUBS_DIR)/actual-output \
 		site \
 		website \
 		|| true
+
 
 .PHONY: compile
 compile: 		 ## Compiles the application into the PHAR
 compile:
 	@rm $(SCOPED_BOX_BIN) || true
 	$(MAKE) $(SCOPED_BOX_BIN)
-
 
 
 .PHONY: dump_requirement_checker
@@ -249,114 +279,119 @@ e2e_scoper_alias: $(SCOPED_BOX_BIN)
 	$(SCOPED_BOX) compile --working-dir=fixtures/build/dir010 --no-parallel --ansi
 
 .PHONY: e2e_scoper_expose_symbols
-e2e_scoper_expose_symbols: ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the symbols exposure is working
+e2e_scoper_expose_symbols:
 e2e_scoper_expose_symbols: $(SCOPED_BOX_BIN) $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/vendor
-	php $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/index.php > $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/expected-output
-	./box compile --working-dir=$(E2E_SCOPER_EXPOSE_SYMBOLS_DIR) --no-parallel
+	@# Check that the PHP-Scoper config API regarding the symbols exposure is working
+	mkdir -p $(E2E_SCOPER_EXPOSE_SYMBOLS_OUTPUT_DIR)
+	php $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/index.php > $(E2E_SCOPER_EXPOSE_SYMBOLS_EXPECTED_OUTPUT)
 
-	php $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/index.phar > $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/output
-	cd $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR) && php -r "file_put_contents('phar-Y.php', file_get_contents((new Phar('index.phar'))['src/Y.php']));"
+	$(SCOPED_BOX) compile --working-dir=$(E2E_SCOPER_EXPOSE_SYMBOLS_DIR) --no-parallel --ansi
+	php $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/index.phar > $(E2E_SCOPER_EXPOSE_SYMBOLS_ACTUAL_OUTPUT)
+	mv -fv $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/index.phar $(E2E_SCOPER_EXPOSE_SYMBOLS_OUTPUT_DIR)
+	cd $(E2E_SCOPER_EXPOSE_SYMBOLS_OUTPUT_DIR) && php -r "file_put_contents('phar-Y.php', file_get_contents((new Phar('index.phar'))['src/Y.php']));"
 
-	diff --ignore-all-space --side-by-side --suppress-common-lines $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/expected-output $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/output
-	diff --ignore-all-space --side-by-side --suppress-common-lines $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/phar-Y.php $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/src/Y.php
+	$(DIFF) $(E2E_SCOPER_EXPOSE_SYMBOLS_EXPECTED_OUTPUT) $(E2E_SCOPER_EXPOSE_SYMBOLS_ACTUAL_OUTPUT)
+	$(DIFF) $(E2E_SCOPER_EXPOSE_SYMBOLS_EXPECTED_SCOPED_FILE) $(E2E_SCOPER_EXPOSE_SYMBOLS_ACTUAL_SCOPED_FILE)
 
-.PHONY: e2e_check_requirements
-e2e_check_requirements:	 ## Runs the end-to-end tests for the check requirements feature
-e2e_check_requirements:
-	cd requirement-checker; $(MAKE) --file=Makefile test_e2e
-
-BOX_COMPILE := $(SCOPED_BOX) compile --working-dir=fixtures/php-settings-checker -vvv --no-ansi
-ifeq ($(OS),Darwin)
-	SED = sed -i ''
-else
-	SED = sed -i
-endif
 .PHONY: e2e_php_settings_checker
-e2e_php_settings_checker: ## Runs the end-to-end tests for the PHP settings handler
-e2e_php_settings_checker: docker_images fixtures/php-settings-checker/output-xdebug-enabled vendor $(SCOPED_BOX_BIN)
+e2e_php_settings_checker: docker_images _e2e_php_settings_checker
+
+.PHONY: _e2e_php_settings_checker
+_e2e_php_settings_checker: $(SCOPED_BOX_BIN) $(E2E_PHP_SETTINGS_CHECKER_EXPECTED_XDEBUG_ENABLED_OUTPUT)
 	@echo "$(YELLOW_COLOR)No restart needed$(NO_COLOR)"
-	$(DOCKER) -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX) \
+	$(DOCKER_RUN) -v "$$PWD":/opt/box $(DOCKER_MIN_BOX_VERSION_IMAGE_TAG) \
 		php -dphar.readonly=0 -dmemory_limit=-1 \
-		$(BOX_COMPILE) \
+		$(E2E_PHP_SETTINGS_CHECKER_BOX_COMPILE) \
 		| grep '\[debug\]' \
-		| tee fixtures/php-settings-checker/actual-output || true
-	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
-	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-all-clear fixtures/php-settings-checker/actual-output
+		| tee $(E2E_PHP_SETTINGS_CHECKER_ACTUAL_OUTPUT) || true
+	$(SED) "s/Xdebug/xdebug/" $(E2E_PHP_SETTINGS_CHECKER_ACTUAL_OUTPUT)
+	$(DIFF) $(E2E_PHP_SETTINGS_CHECKER_DIR)/output-all-clear $(E2E_PHP_SETTINGS_CHECKER_ACTUAL_OUTPUT)
 
+	@echo ""
 	@echo "$(YELLOW_COLOR)Xdebug enabled: restart needed$(NO_COLOR)"
-	$(DOCKER) -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX)_xdebug \
+	$(DOCKER_RUN) -v "$$PWD":/opt/box $(DOCKER_MIN_BOX_XDEBUG_PHP_VERSION_IMAGE_TAG) \
 		php -dphar.readonly=0 -dmemory_limit=-1 \
-		$(BOX_COMPILE) \
+		$(E2E_PHP_SETTINGS_CHECKER_BOX_COMPILE) \
 		| grep '\[debug\]' \
-		| tee fixtures/php-settings-checker/actual-output || true
-	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
-	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
-	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-xdebug-enabled fixtures/php-settings-checker/actual-output
+		| tee $(E2E_PHP_SETTINGS_CHECKER_ACTUAL_OUTPUT) || true
+	$(SED) "s/Xdebug/xdebug/" $(E2E_PHP_SETTINGS_CHECKER_ACTUAL_OUTPUT)
+	$(SED) "s/[0-9]* ms/100 ms/" $(E2E_PHP_SETTINGS_CHECKER_ACTUAL_OUTPUT)
+	$(DIFF) $(E2E_PHP_SETTINGS_CHECKER_EXPECTED_XDEBUG_ENABLED_OUTPUT) $(E2E_PHP_SETTINGS_CHECKER_ACTUAL_OUTPUT)
 
+	@echo ""
 	@echo "$(YELLOW_COLOR)phar.readonly enabled: restart needed$(NO_COLOR)"
-	$(DOCKER) -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX) \
+	$(DOCKER_RUN) -v "$$PWD":/opt/box $(DOCKER_MIN_BOX_VERSION_IMAGE_TAG) \
 		php -dphar.readonly=1 -dmemory_limit=-1 \
-		$(BOX_COMPILE) \
+		$(E2E_PHP_SETTINGS_CHECKER_BOX_COMPILE) \
 		| grep '\[debug\]' \
-		| tee fixtures/php-settings-checker/actual-output || true
-	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
-	$(SED) "s/'-c' '.*' '\.\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
-	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
-	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-pharreadonly-enabled fixtures/php-settings-checker/actual-output
+		| tee $(E2E_PHP_SETTINGS_CHECKER_ACTUAL_OUTPUT) || true
+	$(SED) "s/Xdebug/xdebug/" $(E2E_PHP_SETTINGS_CHECKER_ACTUAL_OUTPUT)
+	$(SED) "s/'-c' '.*' '\.\/box'/'-c' '\/tmp-file' 'bin\/box'/" $(E2E_PHP_SETTINGS_CHECKER_ACTUAL_OUTPUT)
+	$(SED) "s/[0-9]* ms/100 ms/" $(E2E_PHP_SETTINGS_CHECKER_ACTUAL_OUTPUT)
+	$(DIFF) $(E2E_PHP_SETTINGS_CHECKER_DIR)/output-pharreadonly-enabled $(E2E_PHP_SETTINGS_CHECKER_ACTUAL_OUTPUT)
 
+	@echo ""
 	@echo "$(YELLOW_COLOR)Bump min memory limit if necessary (limit lower than default)$(NO_COLOR)"
-	$(DOCKER) -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX) \
+	$(DOCKER_RUN) -v "$$PWD":/opt/box $(DOCKER_MIN_BOX_VERSION_IMAGE_TAG) \
 		php -dphar.readonly=0 -dmemory_limit=124M \
-		$(BOX_COMPILE) \
+		$(E2E_PHP_SETTINGS_CHECKER_BOX_COMPILE) \
 		| grep '\[debug\]' \
-		| tee fixtures/php-settings-checker/actual-output || true
-	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
-	$(SED) "s/'-c' '.*' '\.\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
-	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
-	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-min-memory-limit fixtures/php-settings-checker/actual-output
+		| tee $(E2E_PHP_SETTINGS_CHECKER_ACTUAL_OUTPUT) || true
+	$(SED) "s/Xdebug/xdebug/" $(E2E_PHP_SETTINGS_CHECKER_ACTUAL_OUTPUT)
+	$(SED) "s/'-c' '.*' '\.\/box'/'-c' '\/tmp-file' 'bin\/box'/" $(E2E_PHP_SETTINGS_CHECKER_ACTUAL_OUTPUT)
+	$(SED) "s/[0-9]* ms/100 ms/" $(E2E_PHP_SETTINGS_CHECKER_ACTUAL_OUTPUT)
+	$(DIFF) $(E2E_PHP_SETTINGS_CHECKER_DIR)/output-min-memory-limit $(E2E_PHP_SETTINGS_CHECKER_ACTUAL_OUTPUT)
 
+	@echo ""
 	@echo "$(YELLOW_COLOR)Bump min memory limit if necessary (limit higher than default)$(NO_COLOR)"
-	$(DOCKER) -e BOX_MEMORY_LIMIT=64M -v "$$PWD":/opt/box $(MIN_SUPPORTED_PHP_BOX) \
+	$(DOCKER_RUN) -e BOX_MEMORY_LIMIT=64M -v "$$PWD":/opt/box $(DOCKER_MIN_BOX_VERSION_IMAGE_TAG) \
 		php -dphar.readonly=0 -dmemory_limit=1024M \
-		$(BOX_COMPILE) \
+		$(E2E_PHP_SETTINGS_CHECKER_BOX_COMPILE) \
 		| grep '\[debug\]' \
-		| tee fixtures/php-settings-checker/actual-output || true
-	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
-	$(SED) "s/'-c' '.*' '\.\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
-	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
-	diff --ignore-all-space --side-by-side --suppress-common-lines  fixtures/php-settings-checker/output-set-memory-limit fixtures/php-settings-checker/actual-output
+		| tee $(E2E_PHP_SETTINGS_CHECKER_ACTUAL_OUTPUT) || true
+	$(SED) "s/Xdebug/xdebug/" $(E2E_PHP_SETTINGS_CHECKER_ACTUAL_OUTPUT)
+	$(SED) "s/'-c' '.*' '\.\/box'/'-c' '\/tmp-file' 'bin\/box'/" $(E2E_PHP_SETTINGS_CHECKER_ACTUAL_OUTPUT)
+	$(SED) "s/[0-9]* ms/100 ms/" $(E2E_PHP_SETTINGS_CHECKER_ACTUAL_OUTPUT)
+	$(DIFF) $(E2E_PHP_SETTINGS_CHECKER_DIR)/output-set-memory-limit $(E2E_PHP_SETTINGS_CHECKER_ACTUAL_OUTPUT)
 
 .PHONY: e2e_symfony
-e2e_symfony:		 ## Packages a fresh Symfony app
-e2e_symfony: $(SCOPED_BOX_BIN) fixtures/build/dir012/vendor
-	composer dump-env prod --working-dir=fixtures/build/dir012
+e2e_symfony: $(SCOPED_BOX_BIN) $(E2E_SYMFONY_DIR)/vendor $(E2E_SYMFONY_DIR)/.env.local.php
+	@# Packages a fresh Symfony app
+	@mkdir -p $(E2E_SYMFONY_OUTPUT_DIR)
+	php $(E2E_SYMFONY_DIR)/bin/console --version --no-ansi > $(E2E_SYMFONY_EXPECTED_OUTPUT)
 
-	php fixtures/build/dir012/bin/console --version > fixtures/build/dir012/expected-output
-	rm -rf fixtures/build/dir012/var/cache/prod/*
+	@# Clear the cache: we want to make sure it works on a clean installation
+	$(E2E_SYMFONY_DIR)/bin/console cache:pool:clear cache.global_clearer --env=prod --ansi
+	$(E2E_SYMFONY_DIR)/bin/console cache:clear --env=prod --ansi
+	rm -rf $(E2E_SYMFONY_DIR)/var/cache/prod/*
 
-	$(SCOPED_BOX) compile --working-dir=fixtures/build/dir012 --no-parallel --ansi
+	$(SCOPED_BOX) compile --working-dir=$(E2E_SYMFONY_DIR) --no-parallel --ansi
 
-	php fixtures/build/dir012/bin/console.phar --version > fixtures/build/dir012/actual-output
+	php $(E2E_SYMFONY_DIR)/bin/console.phar --version --no-ansi > $(E2E_SYMFONY_ACTUAL_OUTPUT)
+	mv -fv $(E2E_SYMFONY_DIR)/bin/console.phar $(E2E_SYMFONY_OUTPUT_DIR)/console.phar
 
-	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/build/dir012/expected-output fixtures/build/dir012/actual-output
+	$(DIFF) $(E2E_SYMFONY_EXPECTED_OUTPUT) $(E2E_SYMFONY_ACTUAL_OUTPUT)
 
 .PHONY: e2e_composer_installed_versions
-e2e_composer_installed_versions: ## Packages an app using Composer\InstalledVersions
-e2e_composer_installed_versions: $(SCOPED_BOX_BIN) fixtures/build/dir013/vendor
-	$(SCOPED_BOX) compile --working-dir=fixtures/build/dir013 --no-parallel
+e2e_composer_installed_versions: $(SCOPED_BOX_BIN) $(E2E_COMPOSER_INSTALLED_DIR)/vendor
+	@# Packages an app using Composer\InstalledVersions
+	$(SCOPED_BOX) compile --working-dir=$(E2E_COMPOSER_INSTALLED_DIR) --no-parallel --ansi
 	
-	php fixtures/build/dir013/bin/run.phar > fixtures/build/dir013/actual-output
+	php $(E2E_COMPOSER_INSTALLED_DIR)/bin/run.phar > $(E2E_COMPOSER_INSTALLED_ACTUAL_OUTPUT)
+	mv -fv $(E2E_COMPOSER_INSTALLED_DIR)/bin/run.phar > $(E2E_COMPOSER_INSTALLED_OUTPUT_DIR)/run.phar
 
-	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/build/dir013/expected-output fixtures/build/dir013/actual-output
+	$(DIFF) $(E2E_COMPOSER_INSTALLED_EXPECTED_OUTPUT) $(E2E_COMPOSER_INSTALLED_ACTUAL_OUTPUT)
 
 .PHONY: e2e_phpstorm_stubs
-e2e_phpstorm_stubs:	 ## Project using symbols which should be vetted by PhpStormStubs
 e2e_phpstorm_stubs: $(SCOPED_BOX_BIN)
-	$(SCOPED_BOX) compile --working-dir=fixtures/build/dir014 --no-parallel
+	@# Project using symbols which should be vetted by PhpStormStubs
+	@mkdir -p $(E2E_PHPSTORM_STUBS_OUTPUT_DIR)
+	$(SCOPED_BOX) compile --working-dir=$(E2E_PHPSTORM_STUBS_DIR) --no-parallel --ansi
 
-	php fixtures/build/dir014/index.phar > fixtures/build/dir014/actual-output
+	php $(E2E_PHPSTORM_STUBS_DIR)/index.phar > $(E2E_PHPSTORM_STUBS_ACTUAL_OUTPUT)
+	mv -fv $(E2E_PHPSTORM_STUBS_DIR)/index.phar $(E2E_PHPSTORM_STUBS_OUTPUT_DIR)/index.phar
 
-	diff fixtures/build/dir014/expected-output fixtures/build/dir014/actual-output
+	$(DIFF) $(E2E_PHPSTORM_STUBS_EXPECTED_OUTPUT) $(E2E_PHPSTORM_STUBS_ACTUAL_OUTPUT)
 
 
 #---------------------------------------------------------------------------
@@ -464,21 +499,19 @@ $(COVERAGE_JUNIT): $(PHPUNIT_BIN) dist $(PHPUNIT_TEST_SRC) $(INFECTION_SRC)
 	touch -c $@
 	touch -c $(COVERAGE_XML_DIR)
 
-fixtures/composer-dump/dir001/composer.lock: fixtures/composer-dump/dir001/composer.json
-	composer install --ansi --working-dir=fixtures/composer-dump/dir001
-	touch -c $@
-
-fixtures/composer-dump/dir003/composer.lock: fixtures/composer-dump/dir003/composer.json
-	composer install --ansi --working-dir=fixtures/composer-dump/dir003
-	touch -c $@
-
 fixtures/composer-dump/dir001/vendor: fixtures/composer-dump/dir001/composer.lock
 	composer install --ansi --working-dir=fixtures/composer-dump/dir001
 	touch -c $@
+fixtures/composer-dump/dir001/composer.lock: fixtures/composer-dump/dir001/composer.json
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
+	@echo "$$ composer update --lock --working-dir=fixtures/composer-dump/dir001 && touch -c $(@)"
 
 fixtures/composer-dump/dir003/vendor: fixtures/composer-dump/dir003/composer.lock
 	composer install --ansi --working-dir=fixtures/composer-dump/dir003
 	touch -c $@
+fixtures/composer-dump/dir003/composer.lock: fixtures/composer-dump/dir003/composer.json
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
+	@echo "$$ composer update --lock --working-dir=fixtures/composer-dump/dir003 && touch -c $(@)"
 
 $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/vendor: $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/composer.lock
 	composer install --ansi --working-dir=$(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)
@@ -487,13 +520,22 @@ $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/composer.lock: $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)
 	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer update --lock --working-dir=$(E2E_SCOPER_EXPOSE_SYMBOLS_DIR) && touch -c $(@)"
 
-fixtures/build/dir012/vendor:
-	composer install --ansi --working-dir=fixtures/build/dir012
+$(E2E_SYMFONY_DIR)/.env.local.php: $(E2E_SYMFONY_DIR)/vendor $(E2E_SYMFONY_DIR)/.env
+	composer dump-env prod --working-dir=$(E2E_SYMFONY_DIR) --ansi
 	touch -c $@
+$(E2E_SYMFONY_DIR)/vendor:
+	composer install --ansi --working-dir=$(E2E_SYMFONY_DIR)
+	touch -c $@
+$(E2E_SYMFONY_DIR)/composer.lock: $(E2E_SYMFONY_DIR)/composer.json
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
+	@echo "$$ composer update --lock --working-dir=$(E2E_SYMFONY_DIR) && touch -c $(@)"
 
-fixtures/build/dir013/vendor:
-	composer install --ansi --working-dir=fixtures/build/dir013
+$(E2E_COMPOSER_INSTALLED_DIR)/vendor: $(E2E_COMPOSER_INSTALLED_DIR)/composer.lock
+	composer install --ansi --working-dir=$(E2E_COMPOSER_INSTALLED_DIR)
 	touch -c $@
+$(E2E_COMPOSER_INSTALLED_DIR)/composer.lock: $(E2E_COMPOSER_INSTALLED_DIR)/composer.json
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
+	@echo "$$ composer update --lock --working-dir=$(E2E_COMPOSER_INSTALLED_DIR) && touch -c $(@)"
 
 .PHONY: fixtures/default_stub.php
 fixtures/default_stub.php:
@@ -526,8 +568,10 @@ $(SCOPED_BOX_BIN): $(SCOPED_BOX_DEPS)
 docker_images:
 	./.docker/build
 
-fixtures/php-settings-checker/output-xdebug-enabled: fixtures/php-settings-checker/output-xdebug-enabled.tpl docker_images
-	./fixtures/php-settings-checker/create-expected-output $(MIN_SUPPORTED_PHP_WITH_XDEBUG_BOX)
+$(E2E_PHP_SETTINGS_CHECKER_EXPECTED_XDEBUG_ENABLED_OUTPUT): $(E2E_PHP_SETTINGS_CHECKER_EXPECTED_OUTPUT_XDEBUG_ENABLED_TEMPLATE)
+	./fixtures/php-settings-checker/create-expected-output $(DOCKER_MIN_BOX_XDEBUG_PHP_VERSION_IMAGE_TAG)
+	mkdir -p $(E2E_PHP_SETTINGS_CHECKER_OUTPUT_DIR)
+	mv -fv $(E2E_PHP_SETTINGS_CHECKER_DIR)/output-xdebug-enabled $(E2E_PHP_SETTINGS_CHECKER_EXPECTED_XDEBUG_ENABLED_OUTPUT)
 	touch -c $@
 
 
