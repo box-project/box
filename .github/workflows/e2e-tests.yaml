@@ -1,11 +1,11 @@
 name: End-to-End Tests
 
 on:
-    push:
-        branches: [ main ]
-    pull_request:
-    release:
-        types: [ created ]
+    workflow_run:
+        workflows:
+            - Release
+        types:
+            - completed
 
 env:
     # TODO: adopt the composer-option strategy instead
@@ -42,34 +42,30 @@ jobs:
                     tools: ${{ matrix.tools }}
                     coverage: pcov
 
-            -   name: Install Composer dependencies
-                uses: ramsey/composer-install@v2
-                if: contains(env.FUTURE_PHP_VERSION, matrix.php) != true
-
-            -   name: Install RequirementChecker Composer dependencies
-                uses: ramsey/composer-install@v2
-                if: contains(env.FUTURE_PHP_VERSION, matrix.php) != true
+            # We cannot use the regular actions/download-artifact here since the artifact is stored
+            # in a different workflow.
+            # See https://github.com/actions/download-artifact/issues/172
+            -   name: Retrieve built PHAR
+                uses: dawidd6/action-download-artifact@v2
                 with:
-                    working-directory: requirement-checker
+                    github_token: ${{secrets.GITHUB_TOKEN}}
+                    workflow: release.yaml
+                    check_artifacts: true
+                    name: box-phar
 
-            -   name: Install Composer dependencies (ignore PHP platform req)
-                uses: ramsey/composer-install@v2
-                if: contains(env.FUTURE_PHP_VERSION, matrix.php)
-                with:
-                    composer-options: --ignore-platform-req=php+
+            # The original target is for the publishing, which is different from the internal name used.
+            -   name: Ensure the make target is up to date
+                run: mv box.phar bin/box.phar && touch -c box
 
-            -   name: Install RequirementChecker Composer dependencies (ignore PHP platform req)
-                uses: ramsey/composer-install@v2
-                if: contains(env.FUTURE_PHP_VERSION, matrix.php)
-                with:
-                    composer-options: --ignore-platform-req=php+
-                    working-directory: requirement-checker
+            # See https://github.com/actions/download-artifact#limitations
+            # the permissions are not guaranteed to be preserved
+            -   name: Ensure PHAR is executable
+                run: chmod 755 bin/box.phar
 
-            -   name: Ensure the Makefile does not run the Composer install command a 2nd time
-                run: touch -c composer.lock vendor requirement-checker/composer.lock requirement-checker/vendor
+            -   name: Check that the PHAR works
+                run: bin/box.phar --ansi --version
 
-            -   name: Run e2e ${{ matrix.e2e }}
-                run: make ${{ matrix.e2e }}
+            -   run: make ${{ matrix.e2e }}
 
     # This is a "trick", a meta task which does not change, and we can use in
     # the protected branch rules as opposed to the tests one above which
