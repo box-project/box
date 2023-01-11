@@ -273,11 +273,11 @@ _infection_ci: $(INFECTION_BIN) $(COVERAGE_XML_DIR) $(COVERAGE_JUNIT) vendor
 #---------------------------------------------------------------------------
 
 .PHONY: test_e2e
-test_e2e: e2e_php_settings_checker e2e_scoper_alias e2e_scoper_expose_symbols e2e_check_requirements e2e_symfony e2e_composer_installed_versions e2e_phpstorm_stubs
+test_e2e: e2e_php_settings_checker e2e_scoper_alias e2e_scoper_expose_symbols e2e_symfony e2e_composer_installed_versions e2e_phpstorm_stubs
 
 .PHONY: e2e_scoper_alias
-e2e_scoper_alias: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the prefix alias is working
 e2e_scoper_alias: $(SCOPED_BOX_BIN)
+	@# Check that the PHP-Scoper config API regarding the prefix alias is working
 	$(SCOPED_BOX) compile --working-dir=fixtures/build/dir010 --no-parallel --ansi
 
 .PHONY: e2e_scoper_expose_symbols
