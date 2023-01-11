@@ -2,8 +2,7 @@ name: End-to-End Tests
 
 on:
     workflow_run:
-        workflows:
-            - Release
+        workflows: [Release]
         types:
             - completed
 
