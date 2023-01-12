@@ -21,13 +21,13 @@ jobs:
                 include:
                     - name: PHP 7.2.5
                       docker-file: .docker/php725
-                      image-tag: box/php725
+                      image-tag: ghcr.io/box-project/box_php725
                     - name: PHP 8.1
                       docker-file: .docker/php81
-                      image-tag: box/php81
+                      image-tag: ghcr.io/box-project/box_php81
                     - name: PHP 8.1 (Xdebug)
                       docker-file: .docker/php81_xdebug
-                      image-tag: box/php81_xdebug
+                      image-tag: ghcr.io/box-project/box_php81_xdebug
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3
@@ -53,7 +53,7 @@ jobs:
                     context: .
                     file: ${{ matrix.docker-file }}
                     platforms: linux/amd64
-                    tags: ghcr.io/${{ matrix.image-tag }}
+                    tags: ${{ matrix.image-tag }}
                     load: true
 
             -   name: Test the image
@@ -65,7 +65,7 @@ jobs:
                     context: .
                     file: ${{ matrix.docker-file }}
                     platforms: linux/amd64
-                    tags: ghcr.io/${{ matrix.image-tag }}
+                    tags: ${{ matrix.image-tag }}
                     push: true
                     cache-from: type=gha, scope=${{ github.workflow }}
                     cache-to: type=gha, scope=${{ github.workflow }}
