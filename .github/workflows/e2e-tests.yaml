@@ -104,7 +104,7 @@ jobs:
                     docker pull ghcr.io/box-project/box_php81
                     docker pull ghcr.io/box-project/box_php81_xdebug
 
-            -   run: make ${{ matrix.e2e }} --debug
+            -   run: make ${{ matrix.e2e }}
 
     # This is a "trick", a meta task which does not change, and we can use in
     # the protected branch rules as opposed to the tests one above which
