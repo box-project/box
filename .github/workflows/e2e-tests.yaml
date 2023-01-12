@@ -43,7 +43,6 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                # TODO: split into regular e2e tests and docker e2e
                 e2e:
                     - _e2e_php_settings_checker
                     - e2e_scoper_alias
