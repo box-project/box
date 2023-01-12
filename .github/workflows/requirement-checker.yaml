@@ -222,9 +222,6 @@ jobs:
             -   name: Pull the docker image
                 run: docker pull ${{ matrix.e2e.docker-image }}
 
-            -   name: Build the Docker images
-                run: cd requirement-checker; make docker_images
-
             -   name: Runs the tests
                 run: cd requirement-checker; make ${{ matrix.e2e.command }}
 
