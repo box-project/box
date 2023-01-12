@@ -29,10 +29,11 @@ jobs:
                     intervalSeconds: 10
 
             -   name: Wait for the Docker images to be pushed
+                if: github.event_name != 'pull_request'
                 uses: fountainhead/action-wait-for-check@v1.1.0
                 with:
                     checkName: Docker status
-                    ref: ${{ github.event.pull_request.head.sha || github.sha }}
+                    ref: ${{ github.sha }}
                     token: ${{ secrets.GITHUB_TOKEN }}
                     intervalSeconds: 10
 
