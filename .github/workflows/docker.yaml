@@ -60,7 +60,7 @@ jobs:
                 run: docker run --rm ${{ matrix.image-tag }} php --version
 
             -   name: Build and push
-                if: ${{ github.ref_name != 'main' }}
+                if: ${{ github.ref_name == 'main' }}
                 uses: docker/build-push-action@v3
                 with:
                     context: .
