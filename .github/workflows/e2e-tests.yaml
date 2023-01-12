@@ -43,9 +43,8 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                # TODO: split into regular e2e tests and docker e2e
                 e2e:
-                    - e2e_php_settings_checker
+                    - _e2e_php_settings_checker
                     - e2e_scoper_alias
                     - e2e_scoper_expose_symbols
                     - e2e_symfony
@@ -89,9 +88,18 @@ jobs:
             -   name: Check that the PHAR works
                 run: bin/box.phar --ansi --version
 
-            -   name: Build the Docker images
-                if: ${{ matrix.e2e == 'e2e_php_settings_checker' }}
-                run: make docker_images
+            -   name: Login to GitHub Container Registry
+                uses: docker/login-action@v2
+                with:
+                    registry: ghcr.io
+                    username: ${{ github.actor }}
+                    password: ${{ secrets.GITHUB_TOKEN }}
+
+            -   name: Pull the docker image
+                if: ${{ matrix.e2e == '_e2e_php_settings_checker' }}
+                run: |
+                    docker pull ghcr.io/box-project/box_php81
+                    docker pull ghcr.io/box-project/box_php81_xdebug
 
             -   run: make ${{ matrix.e2e }}
 

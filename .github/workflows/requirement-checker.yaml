@@ -164,13 +164,20 @@ jobs:
             fail-fast: false
             matrix:
                 e2e:
-                    - test_e2e_pass_no_config_min_composer_php
-                    - test_e2e_pass_no_config_min_box_php
-                    - test_e2e_pass_complete_min_composer_php
-                    - test_e2e_pass_complete_min_box_php
-                    - test_e2e_fail_complete_min_composer_php
-                    - test_e2e_fail_complete_min_box_php
-                    - test_e2e_skip_min_composer_php
+                    - command: _test_e2e_pass_no_config_min_composer_php
+                      docker-image: ghcr.io/box-project/box_php725
+                    - command: _test_e2e_pass_no_config_min_box_php
+                      docker-image: ghcr.io/box-project/box_php81
+                    - command: _test_e2e_pass_complete_min_composer_php
+                      docker-image: ghcr.io/box-project/box_php725
+                    - command: _test_e2e_pass_complete_min_box_php
+                      docker-image: ghcr.io/box-project/box_php81
+                    - command: _test_e2e_fail_complete_min_composer_php
+                      docker-image: ghcr.io/box-project/box_php725
+                    - command: _test_e2e_fail_complete_min_box_php
+                      docker-image: ghcr.io/box-project/box_php81
+                    - command: _test_e2e_skip_min_composer_php
+                      docker-image: ghcr.io/box-project/box_php725
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3
@@ -205,11 +212,21 @@ jobs:
             -   name: Check that the PHAR works
                 run: bin/box.phar --ansi --version
 
+            -   name: Login to GitHub Container Registry
+                uses: docker/login-action@v2
+                with:
+                    registry: ghcr.io
+                    username: ${{ github.actor }}
+                    password: ${{ secrets.GITHUB_TOKEN }}
+
+            -   name: Pull the docker image
+                run: docker pull ${{ matrix.e2e.docker-image }}
+
             -   name: Build the Docker images
                 run: cd requirement-checker; make docker_images
 
             -   name: Runs the tests
-                run: cd requirement-checker; make ${{ matrix.e2e }}
+                run: cd requirement-checker; make ${{ matrix.e2e.command }}
 
     # This is a "trick", a meta task which does not change, and we can use in
     # the protected branch rules as opposed to the tests one above which

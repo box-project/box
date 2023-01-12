@@ -8,10 +8,10 @@ if [[ "$(docker images -q ghcr.io/box-project/box_php725 2> /dev/null)" == "" ]]
     docker build --platform=linux/amd64 --tag=ghcr.io/box-project/box_php725 --file "${SCRIPT_DIR}/php725" .
 fi
 
-if [[ "$(docker images -q box_php81 2> /dev/null)" == "" ]]; then
-    docker build --platform=linux/amd64 --tag=box_php81 --file "${SCRIPT_DIR}/php81" .
+if [[ "$(docker images -q ghcr.io/box-project/box_php81 2> /dev/null)" == "" ]]; then
+    docker build --platform=linux/amd64 --tag=ghcr.io/box-project/box_php81 --file "${SCRIPT_DIR}/php81" .
 fi
 
-if [[ "$(docker images -q box_php81_xdebug 2> /dev/null)" == "" ]]; then
-    docker build --platform=linux/amd64 --tag=box_php81_xdebug --file "${SCRIPT_DIR}/php81_xdebug" .
+if [[ "$(docker images -q ghcr.io/box-project/box_php81_xdebug 2> /dev/null)" == "" ]]; then
+    docker build --platform=linux/amd64 --tag=ghcr.io/box-project/box_php81_xdebug --file "${SCRIPT_DIR}/php81_xdebug" .
 fi
