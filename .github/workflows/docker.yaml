@@ -3,7 +3,6 @@ name: Docker
 on:
     push:
         branches: [ main ]
-    pull_request:
     release:
         types: [ created ]
 
@@ -24,10 +23,10 @@ jobs:
                       image-tag: ghcr.io/box-project/box_php725
                     - name: PHP 8.1
                       docker-file: .docker/php81
-                      image-tag: ghcr.io/box-project/box_php81
+                      image-tag: ghcr.io/box-project/ghcr.io/box-project/box_php81
                     - name: PHP 8.1 (Xdebug)
                       docker-file: .docker/php81_xdebug
-                      image-tag: ghcr.io/box-project/box_php81_xdebug
+                      image-tag: ghcr.io/box-project/ghcr.io/box-project/box_php81_xdebug
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3
