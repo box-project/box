@@ -57,7 +57,7 @@ jobs:
                     load: true
 
             -   name: Test the image
-                run: docker run --rm ghcr.io/${{ matrix.image-tag }} php --version
+                run: docker run --rm ${{ matrix.image-tag }} php --version
 
             -   name: Build and push
                 uses: docker/build-push-action@v3
