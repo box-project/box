@@ -204,7 +204,7 @@ jobs:
             -   name: Ensure the make target is up to date
                 run: |
                     mkdir -p vendor
-                    mv box.phar bin/box.phar
+                    mv -vf box.phar bin/box.phar
                     touch -c bin.box.phar
 
             # See https://github.com/actions/download-artifact#limitations
