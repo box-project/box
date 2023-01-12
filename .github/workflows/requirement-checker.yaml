@@ -202,7 +202,10 @@ jobs:
 
             # The original target is for the publishing, which is different from the internal name used.
             -   name: Ensure the make target is up to date
-                run: mv box.phar bin/box.phar && touch -c box
+                run: |
+                    mkdir -p vendor
+                    mv box.phar bin/box.phar
+                    touch -c bin.box.phar
 
             # See https://github.com/actions/download-artifact#limitations
             # the permissions are not guaranteed to be preserved
