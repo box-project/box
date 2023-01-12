@@ -4,8 +4,8 @@ MAKEFLAGS += --no-builtin-rules
 
 DOCKER_RUN = docker run --interactive --platform=linux/amd64 --rm --workdir=/opt/box
 # Matches the minimum PHP version supported by Box.
-DOCKER_MIN_BOX_VERSION_IMAGE_TAG = ghcr.io/box-project/box_php81
-DOCKER_MIN_BOX_XDEBUG_PHP_VERSION_IMAGE_TAG = ghcr.io/box-project/box_php81_xdebug
+DOCKER_MIN_BOX_VERSION_IMAGE_TAG = box_php81
+DOCKER_MIN_BOX_XDEBUG_PHP_VERSION_IMAGE_TAG = box_php81_xdebug
 
 E2E_SCOPER_EXPOSE_SYMBOLS_DIR = fixtures/build/dir011
 E2E_SCOPER_EXPOSE_SYMBOLS_OUTPUT_DIR = dist/dir011
