@@ -10,7 +10,7 @@ DIFF = diff --strip-trailing-cr --ignore-all-space --side-by-side --suppress-com
 DOCKER_RUN = docker run --interactive --platform linux/amd64 --rm --workdir=/opt/box
 
 # Matches the minimum PHP version supported by Composer.
-DOCKER_MIN_COMPOSER_PHP_VERSION_IMAGE_TAG = box_php725
+DOCKER_MIN_COMPOSER_PHP_VERSION_IMAGE_TAG = ghcr.io/box-project/box_php725
 DOCKER_MIN_COMPOSER_PHP_VERSION_RUN_COMMAND = $(DOCKER_MIN_COMPOSER_PHP_VERSION_IMAGE_TAG) php index.phar -vvv --no-ansi
 
 # Matches the minimum PHP version supported by Box.
