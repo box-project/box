@@ -205,7 +205,7 @@ jobs:
                 run: |
                     mkdir -p vendor
                     mv -vf box.phar bin/box.phar
-                    touch -c bin.box.phar
+                    touch -c bin/box.phar
 
             # See https://github.com/actions/download-artifact#limitations
             # the permissions are not guaranteed to be preserved
