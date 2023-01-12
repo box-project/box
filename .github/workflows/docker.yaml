@@ -1,0 +1,82 @@
+name: Docker
+
+on:
+    push:
+        branches: [ main ]
+    pull_request:
+    release:
+        types: [ created ]
+
+permissions:
+    contents: read
+    packages: write
+
+jobs:
+    docker-build:
+        runs-on: ubuntu-20.04
+        name: Publish the Docker image ${{ matrix.name }}
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - name: PHP 7.2.5
+                      docker-file: .docker/php725
+                      image-tag: box/php725
+                    - name: PHP 8.1
+                      docker-file: .docker/php81
+                      image-tag: box/php81
+                    - name: PHP 8.1 (Xdebug)
+                      docker-file: .docker/php81_xdebug
+                      image-tag: box/php81_xdebug
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v3
+
+            -   name: Set up QEMU
+                uses: docker/setup-qemu-action@v2
+
+            -   name: Set up Docker Buildx
+                uses: docker/setup-buildx-action@v1
+                with:
+                    buildkitd-flags: --debug
+
+            -   name: Login to GitHub Container Registry
+                uses: docker/login-action@v2
+                with:
+                    registry: ghcr.io
+                    username: ${{ github.actor }}
+                    password: ${{ secrets.GITHUB_TOKEN }}
+
+            -   name: Build and export to Docker
+                uses: docker/build-push-action@v3
+                with:
+                    context: .
+                    file: ${{ matrix.docker-file }}
+                    platforms: linux/amd64
+                    tags: ghcr.io/${{ matrix.image-tag }}
+                    load: true
+
+            -   name: Test the image
+                run: docker run --rm ghcr.io/${{ matrix.image-tag }} php --version
+
+            -   name: Build and push
+                uses: docker/build-push-action@v3
+                with:
+                    context: .
+                    file: ${{ matrix.docker-file }}
+                    platforms: linux/amd64
+                    tags: ghcr.io/${{ matrix.image-tag }}
+                    push: true
+                    cache-from: type=gha, scope=${{ github.workflow }}
+                    cache-to: type=gha, scope=${{ github.workflow }}
+
+    # This is a "trick", a meta task which does not change, and we can use in
+    # the protected branch rules as opposed to the tests one above which
+    # may change regularly.
+    validate-images:
+        name: Docker status
+        runs-on: ubuntu-latest
+        needs: docker-build
+        if: always()
+        steps:
+            - run: exit 0
