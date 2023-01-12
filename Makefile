@@ -124,7 +124,15 @@ dump_requirement_checker:
 
 .PHONY: autoreview
 autoreview: 		 ## AutoReview checks
-autoreview: cs_lint phpunit_autoreview
+autoreview: cs_lint composer_validate box_validate phpunit_autoreview
+
+.PHONY: composer_validate
+composer_validate:
+	composer validate --strict --ansi
+
+.PHONY: box_validate
+box_validate: $(BOX_BIN)
+	$(BOX) validate --ansi
 
 .PHONY: phpunit_autoreview
 phpunit_autoreview: $(PHPUNIT_BIN) vendor
