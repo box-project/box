@@ -90,7 +90,6 @@
             "composer/package-versions-deprecated": false,
             "ergebnis/composer-normalize": true
         },
-        "bin-dir": "bin",
         "platform": {
             "php": "8.1"
         },

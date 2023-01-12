@@ -3,20 +3,44 @@ MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 
 OS := $(shell uname)
-PHPNOGC = php -d zend.enable_gc=0
-CCYELLOW = \033[0;33m
-CCEND = \033[0m
+ERROR_COLOR := \033[41m
+YELLOW_COLOR = \033[0;33m
+NO_COLOR = \033[0m
 
 COMPOSER_BIN_PLUGIN_VENDOR = vendor/bamarni/composer-bin-plugin
 
-PHP_CS_FIXER_BIN = vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
-PHP_CS_FIXER = $(PHP_CS_FIXER_BIN) fix
-
 REQUIREMENT_CHECKER_EXTRACT = res/requirement-checker
 
-DOCKER_RUN = docker run --interactive --platform=linux/amd64 --rm --workdir=/opt/box
-DOCKER_MIN_BOX_PHP_VERSION_IMAGE_TAG = box_php81
-DOCKER_MIN_BOX_XDEBUG_PHP_VERSION_IMAGE_TAG = box_php81_xdebug
+BOX_BIN = bin/box
+BOX = $(BOX_BIN)
+
+SCOPED_BOX_BIN = bin/box.phar
+SCOPED_BOX = $(SCOPED_BOX_BIN)
+SCOPED_BOX_DEPS = bin/box bin/box.bat $(shell find src res) box.json.dist scoper.inc.php vendor
+
+COVERAGE_DIR = dist/coverage
+COVERAGE_XML_DIR = $(COVERAGE_DIR)/coverage-xml
+COVERAGE_JUNIT = $(COVERAGE_DIR)/phpunit.junit.xml
+COVERAGE_HTML_DIR = $(COVERAGE_DIR)/html
+
+PHPUNIT_BIN = vendor/bin/phpunit
+PHPUNIT = $(PHPUNIT_BIN)
+PHPUNIT_TEST_SRC = fixtures/default_stub.php $(REQUIREMENT_CHECKER_EXTRACT) fixtures/composer-dump/dir001/vendor fixtures/composer-dump/dir003/vendor
+PHPUNIT_COVERAGE_INFECTION = XDEBUG_MODE=coverage php -dphar.readonly=0 $(PHPUNIT) --colors=always --coverage-xml=$(COVERAGE_XML_DIR) --log-junit=$(COVERAGE_JUNIT) --testsuite=Tests
+PHPUNIT_COVERAGE_HTML = XDEBUG_MODE=coverage php -dphar.readonly=0 $(PHPUNIT) --colors=always --coverage-html=$(COVERAGE_HTML_DIR)
+
+INFECTION_BIN = vendor-bin/infection/vendor/bin/infection
+INFECTION := SYMFONY_DEPRECATIONS_HELPER="disabled=1" php -dzend.enable_gc=0 $(INFECTION_BIN) --skip-initial-tests --coverage=$(COVERAGE_DIR) --only-covered --show-mutations --min-msi=100 --min-covered-msi=100 --ansi --threads=max --show-mutations
+INFECTION_CI = $(eval INFECTION_CI := $(INFECTION) ${INFECTION_FLAGS})$(INFECTION_CI)
+INFECTION_WITH_INITIAL_TESTS := SYMFONY_DEPRECATIONS_HELPER="disabled=1" php -dzend.enable_gc=0 $(INFECTION_BIN) --only-covered --show-mutations --min-msi=100 --min-covered-msi=100 --ansi --threads=max --show-mutations
+INFECTION_SRC := $(shell find src tests) phpunit.xml.dist
+
+PHP_CS_FIXER_BIN = vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
+PHP_CS_FIXER = $(PHP_CS_FIXER_BIN)
+
+WEBSITE_SRC := mkdocs.yaml $(shell find doc)
+# This is defined in mkdocs.yaml#site_dir
+WEBSITE_OUTPUT = dist/website
 
 
 .DEFAULT_GOAL := help
@@ -32,14 +56,87 @@ help:
 # Commands
 #---------------------------------------------------------------------------
 
+# Needs to be included before the clean command.
+include Makefile.e2e
+
+.PHONY: check
+check:			 ## Runs all the checks
+check: requirement_checker_check box_check
+
+.PHONY: box_check
+box_check: cs autoreview test
+
+.PHONY: requirement_checker_check
+requirement_checker_check:
+	cd requirement-checker; $(MAKE) --file=Makefile check
+
+
 .PHONY: clean
 clean: 	 		 ## Cleans all created artifacts
 clean:
-	git clean --exclude=.idea/ -ffdx
-	rm -rf fixtures/check-requirements || true
+	rm -rf \
+		dist \
+		fixtures/build/*/.box_dump \
+		fixtures/build/*/vendor \
+		fixtures/build/dir010/index.phar \
+		fixtures/build/dir012/bin/console.phar \
+		$(E2E_PHP_SETTINGS_CHECKER_DIR)/index.phar \
+		$(E2E_SYMFONY_DIR)/var \
+		$(E2E_SYMFONY_DIR)/.env.local.php \
+		fixtures/default_stub.php \
+		fixtures/composer-dump/*/vendor \
+		 || true
+	@# Obsolete entries; Only relevant to someone who still has old artifacts locally
+	@rm -rf \
+		.php-cs-fixer.cache \
+		.phpunit.result.cache \
+		box \
+		fixtures/check-requirements \
+		fixtures/build/*/index.phar \
+		$(E2E_PHP_SETTINGS_CHECKER_DIR)/actual-output \
+		$(E2E_SYMFONY_DIR)/actual-output \
+		$(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/expected-output \
+		$(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/output \
+		$(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/phar-Y.php \
+		$(E2E_COMPOSER_INSTALLED_DIR)/actual-output \
+		$(E2E_PHPSTORM_STUBS_DIR)/actual-output \
+		site \
+		website \
+		|| true
+
+
+.PHONY: compile
+compile: 		 ## Compiles the application into the PHAR
+compile:
+	@rm $(SCOPED_BOX_BIN) || true
+	$(MAKE) $(SCOPED_BOX_BIN)
+
+
+.PHONY: dump_requirement_checker
+dump_requirement_checker:## Dumps the requirement checker
+dump_requirement_checker:
+	cd requirement-checker; $(MAKE) --file=Makefile dump
+
+
+#
+# AutoReview commands
+#---------------------------------------------------------------------------
+
+.PHONY: autoreview
+autoreview: 		 ## AutoReview checks
+autoreview: cs_lint phpunit_autoreview
+
+.PHONY: phpunit_autoreview
+phpunit_autoreview: $(PHPUNIT_BIN) vendor
+	$(PHPUNIT) --testsuite="AutoReviewTests" --colors=always
+
+
+#
+# CS commands
+#---------------------------------------------------------------------------
 
 .PHONY: cs
-cs:	 ## Fixes CS
+cs:	 		 ## Fixes CS
 cs: root_cs requirement_checker_cs
 
 .PHONY: root_cs
@@ -49,8 +146,9 @@ root_cs: gitignore_sort composer_normalize php_cs_fixer
 requirement_checker_cs:
 	cd requirement-checker; $(MAKE) --file=Makefile cs
 
+
 .PHONY: cs_lint
-cs_lint: ## Checks CS
+cs_lint: 	 	 ## Lints CS
 cs_lint: root_cs_lint requirement_checker_cs_lint
 
 .PHONY: root_cs_lint
@@ -61,12 +159,12 @@ requirement_checker_cs_lint:
 	cd requirement-checker; $(MAKE) --file=Makefile cs_lint
 
 .PHONY: php_cs_fixer
-php_cs_fixer: $(PHP_CS_FIXER_BIN)
-	$(PHP_CS_FIXER)
+php_cs_fixer: $(PHP_CS_FIXER_BIN) dist
+	$(PHP_CS_FIXER) fix
 
 .PHONY: php_cs_fixer_lint
-php_cs_fixer_lint: $(PHP_CS_FIXER_BIN)
-	$(PHP_CS_FIXER) --dry-run
+php_cs_fixer_lint: $(PHP_CS_FIXER_BIN) dist
+	$(PHP_CS_FIXER) fix --ansi --verbose --dry-run --diff
 
 .PHONY: composer_normalize
 composer_normalize: composer.json vendor
@@ -80,194 +178,100 @@ composer_normalize_lint: composer.json vendor
 gitignore_sort:
 	LC_ALL=C sort -u .gitignore -o .gitignore
 
-.PHONY: compile
-compile: 		 ## Compiles the application into the PHAR
-compile: box
-	cp -f box bin/box.phar
-
-.PHONY: dump_requirement_checker
-dump_requirement_checker:## Dumps the requirement checker
-dump_requirement_checker:
-	cd requirement-checker; $(MAKE) --file=Makefile dump
-
 
 #
-# Tests
+# Tests commands
 #---------------------------------------------------------------------------
 
 .PHONY: test
 test:		  	 ## Runs all the tests
-test: tu e2e
+test: phpunit_phar_writeable infection test_e2e
 
-.PHONY: tu
-tu:			 ## Runs the unit tests
-tu: tu_requirement_checker tu_box
 
-.PHONY: tu_box
-tu_box:			 ## Runs the unit tests
-TU_BOX_DEPS = bin/phpunit fixtures/default_stub.php $(REQUIREMENT_CHECKER_EXTRACT) fixtures/composer-dump/dir001/vendor fixtures/composer-dump/dir003/vendor
-tu_box: $(TU_BOX_DEPS)
-	php -d phar.readonly=0 bin/phpunit --colors=always
+#
+# Unit Tests commands
+#---------------------------------------------------------------------------
 
-.PHONY: tu_box_phar_readonly
-tu_box_phar_readonly: 	 ## Runs the unit tests with the setting `phar.readonly` to `On`
-tu_box_phar_readonly: $(TU_BOX_DEPS)
-	php -d phar.readonly=1 bin/phpunit --colors=always
+.PHONY: test_unit
+test_unit: phpunit_phar_readonly phpunit_phar_writeable
 
-.PHONY: tu_requirement_checker
-tu_requirement_checker:	 ## Runs the unit tests
-tu_requirement_checker:
-	cd requirement-checker; $(MAKE) --file=Makefile test
+.PHONY: phpunit_phar_readonly
+phpunit_phar_readonly: $(PHPUNIT_BIN) $(PHPUNIT_TEST_SRC)
+	php -dphar.readonly=0 $(PHPUNIT) --testsuite=Tests --colors=always
 
-.PHONY: tc
-tc:			 ## Runs the unit tests with code coverage
-tc: bin/phpunit
-	php -d zend.enable_gc=0 bin/phpunit --coverage-html=dist/coverage --coverage-text
+.PHONY: phpunit_phar_writeable
+phpunit_phar_writeable: $(PHPUNIT_BIN) $(PHPUNIT_TEST_SRC)
+	php -dphar.readonly=1 $(PHPUNIT) --testsuite=Tests --colors=always
 
-.PHONY: tm
-INFECTION=vendor-bin/infection/vendor/bin/infection
-tm:			 ## Runs Infection
-tm:	$(TU_BOX_DEPS) $(INFECTION)
-	$(PHPNOGC) $(INFECTION) --threads=$(shell nproc || sysctl -n hw.ncpu || 1) --only-covered --only-covering-test-cases $$INFECTION_FLAGS
+.PHONY: phpunit_coverage_html
+phpunit_coverage_html:      ## Runs PHPUnit with code coverage with HTML report
+phpunit_coverage_html: $(PHPUNIT_BIN) dist $(PHPUNIT_TEST_SRC) vendor
+	$(PHPUNIT_COVERAGE_HTML)
+	@echo "You can check the report by opening the file \"$(COVERAGE_HTML_DIR)/index.html\"."
 
-.PHONY: e2e
-e2e:			 ## Runs all the end-to-end tests
-e2e: e2e_php_settings_checker e2e_scoper_alias e2e_scoper_expose_symbols e2e_check_requirements e2e_symfony e2e_composer_installed_versions e2e_phpstorm_stubs
+.PHONY: phpunit_coverage_infection
+phpunit_coverage_infection: ## Runs PHPUnit tests with test coverage
+phpunit_coverage_infection: $(PHPUNIT_BIN) dist $(PHPUNIT_TEST_SRC) vendor
+	$(PHPUNIT_COVERAGE_INFECTION)
+	touch -c $(COVERAGE_XML_DIR)
+	touch -c $(COVERAGE_JUNIT)
 
-.PHONY: e2e_scoper_alias
-e2e_scoper_alias: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the prefix alias is working
-e2e_scoper_alias: box
-	./box compile --working-dir=fixtures/build/dir010 --no-parallel
+.PHONY: infection
+infection: $(INFECTION_BIN) dist $(PHPUNIT_TEST_SRC) vendor
+	$(INFECTION_WITH_INITIAL_TESTS)
 
-.PHONY: e2e_scoper_expose_symbols
-e2e_scoper_expose_symbols: 	 ## Runs the end-to-end tests to check that the PHP-Scoper config API regarding the symbols exposure is working
-e2e_scoper_expose_symbols: box fixtures/build/dir011/vendor
-	php fixtures/build/dir011/index.php > fixtures/build/dir011/expected-output
-	./box compile --working-dir=fixtures/build/dir011 --no-parallel
+.PHONY: _infection
+_infection: $(INFECTION_BIN) $(COVERAGE_XML_DIR) $(COVERAGE_JUNIT) vendor
+	$(INFECTION)
 
-	php fixtures/build/dir011/index.phar > fixtures/build/dir011/output
-	cd fixtures/build/dir011 && php -r "file_put_contents('phar-Y.php', file_get_contents((new Phar('index.phar'))['src/Y.php']));"
+.PHONY: _infection_ci
+_infection_ci: $(INFECTION_BIN) $(COVERAGE_XML_DIR) $(COVERAGE_JUNIT) vendor
+	$(INFECTION_CI)
 
-	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/build/dir011/expected-output fixtures/build/dir011/output
-	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/build/dir011/phar-Y.php fixtures/build/dir011/src/Y.php
 
-.PHONY: e2e_check_requirements
-e2e_check_requirements:	 ## Runs the end-to-end tests for the check requirements feature
-e2e_check_requirements:
-	cd requirement-checker; $(MAKE) --file=Makefile test_e2e
+#---------------------------------------------------------------------------
 
-BOX_COMPILE=./box compile --working-dir=fixtures/php-settings-checker -vvv --no-ansi
-ifeq ($(OS),Darwin)
-	SED = sed -i ''
-else
-	SED = sed -i
-endif
-.PHONY: e2e_php_settings_checker
-e2e_php_settings_checker: ## Runs the end-to-end tests for the PHP settings handler
-e2e_php_settings_checker: docker_images fixtures/php-settings-checker/output-xdebug-enabled vendor box
-	@echo "$(CCYELLOW)No restart needed$(CCEND)"
-	$(DOCKER_RUN) --volume="$$PWD":/opt/box $(DOCKER_MIN_BOX_PHP_VERSION_IMAGE_TAG) \
-		php -dphar.readonly=0 -dmemory_limit=-1 \
-		$(BOX_COMPILE) \
-		| grep '\[debug\]' \
-		| tee fixtures/php-settings-checker/actual-output || true
-	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
-	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-all-clear fixtures/php-settings-checker/actual-output
+.PHONY: test_e2e
+test_e2e: e2e_scoper_alias e2e_scoper_expose_symbols e2e_php_settings_checker e2e_symfony e2e_composer_installed_versions e2e_phpstorm_stubs
 
-	@echo "$(CCYELLOW)Xdebug enabled: restart needed$(CCEND)"
-	$(DOCKER_RUN) --volume="$$PWD":/opt/box $(DOCKER_MIN_BOX_PHP_VERSION_IMAGE_TAG)_xdebug \
-		php -dphar.readonly=0 -dmemory_limit=-1 \
-		$(BOX_COMPILE) \
-		| grep '\[debug\]' \
-		| tee fixtures/php-settings-checker/actual-output || true
-	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
-	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
-	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-xdebug-enabled fixtures/php-settings-checker/actual-output
-
-	@echo "$(CCYELLOW)phar.readonly enabled: restart needed$(CCEND)"
-	$(DOCKER_RUN) --volume="$$PWD":/opt/box $(DOCKER_MIN_BOX_PHP_VERSION_IMAGE_TAG) \
-		php -dphar.readonly=1 -dmemory_limit=-1 \
-		$(BOX_COMPILE) \
-		| grep '\[debug\]' \
-		| tee fixtures/php-settings-checker/actual-output || true
-	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
-	$(SED) "s/'-c' '.*' '\.\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
-	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
-	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-pharreadonly-enabled fixtures/php-settings-checker/actual-output
-
-	@echo "$(CCYELLOW)Bump min memory limit if necessary (limit lower than default)$(CCEND)"
-	$(DOCKER_RUN) --volume="$$PWD":/opt/box $(DOCKER_MIN_BOX_PHP_VERSION_IMAGE_TAG) \
-		php -dphar.readonly=0 -dmemory_limit=124M \
-		$(BOX_COMPILE) \
-		| grep '\[debug\]' \
-		| tee fixtures/php-settings-checker/actual-output || true
-	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
-	$(SED) "s/'-c' '.*' '\.\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
-	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
-	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/php-settings-checker/output-min-memory-limit fixtures/php-settings-checker/actual-output
-
-	@echo "$(CCYELLOW)Bump min memory limit if necessary (limit higher than default)$(CCEND)"
-	$(DOCKER_RUN) -e BOX_MEMORY_LIMIT=64M --volume="$$PWD":/opt/box $(DOCKER_MIN_BOX_PHP_VERSION_IMAGE_TAG) \
-		php -dphar.readonly=0 -dmemory_limit=1024M \
-		$(BOX_COMPILE) \
-		| grep '\[debug\]' \
-		| tee fixtures/php-settings-checker/actual-output || true
-	$(SED) "s/Xdebug/xdebug/" fixtures/php-settings-checker/actual-output
-	$(SED) "s/'-c' '.*' '\.\/box'/'-c' '\/tmp-file' 'bin\/box'/" fixtures/php-settings-checker/actual-output
-	$(SED) "s/[0-9]* ms/100 ms/" fixtures/php-settings-checker/actual-output
-	diff --ignore-all-space --side-by-side --suppress-common-lines  fixtures/php-settings-checker/output-set-memory-limit fixtures/php-settings-checker/actual-output
-
-.PHONY: e2e_symfony
-e2e_symfony:		 ## Packages a fresh Symfony app
-e2e_symfony: fixtures/build/dir012/vendor box
-	composer dump-env prod --working-dir=fixtures/build/dir012
-
-	php fixtures/build/dir012/bin/console --version > fixtures/build/dir012/expected-output
-	rm -rf fixtures/build/dir012/var/cache/prod/*
-
-	./box compile --working-dir=fixtures/build/dir012 --no-parallel
-
-	php fixtures/build/dir012/bin/console.phar --version > fixtures/build/dir012/actual-output
-
-	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/build/dir012/expected-output fixtures/build/dir012/actual-output
-
-.PHONY: e2e_composer_installed_versions
-e2e_composer_installed_versions:		 ## Packages an app using Composer\InstalledVersions
-e2e_composer_installed_versions: fixtures/build/dir013/vendor box
-	./box compile --working-dir=fixtures/build/dir013 --no-parallel
-	
-	php fixtures/build/dir013/bin/run.phar > fixtures/build/dir013/actual-output
-
-	diff --ignore-all-space --side-by-side --suppress-common-lines fixtures/build/dir013/expected-output fixtures/build/dir013/actual-output
-
-.PHONY: e2e_phpstorm_stubs
-e2e_phpstorm_stubs:		 ## Project using symbols which should be vetted by PhpStormStubs
-e2e_phpstorm_stubs: box
-	./box compile --working-dir=fixtures/build/dir014 --no-parallel
-
-	php fixtures/build/dir014/index.phar > fixtures/build/dir014/actual-output
-
-	diff fixtures/build/dir014/expected-output fixtures/build/dir014/actual-output
 
 .PHONY: blackfire
 blackfire:		 ## Profiles the compile step
-blackfire: box
+blackfire: $(SCOPED_BOX_BIN)
 	# Profile compiling the PHAR from the source code
-	blackfire --reference=1 --samples=5 run $(PHPNOGC) -d bin/box compile --quiet --no-parallel
+	blackfire --reference=1 --samples=5 run $(PHPNOGC) -d $(BOX) compile --quiet --no-parallel
 
 	# Profile compiling the PHAR from the PHAR
-	blackfire --reference=2 --samples=5 run $(PHPNOGC) -d box compile --quiet --no-parallel
+	blackfire --reference=2 --samples=5 run $(PHPNOGC) -d $(SCOPED_BOX) compile --quiet --no-parallel
 
 
-.PHONY: serve
-serve:
-	@echo "To install mkdocs ensure you have Python3 & pip3 and run `pip install mkdocs mkdocs-material`"
+#
+# Website rules
+#---------------------------------------------------------------------------
+
+
+.PHONY: website_build
+website_build:		 ## Builds the website
+website_build:
+	@echo "$(YELLOW_COLOR)To install mkdocs ensure you have Python3 & pip3 and run the following command:$(NO_COLOR)"
+	@echo "$$ pip install mkdocs mkdocs-material"
+
+	@rm -rf $(WEBSITE_OUTPUT) || true
+	$(MAKE) _website_build
+
+.PHONY: _website_build
+_website_build: $(WEBSITE_OUTPUT)
+
+.PHONY: website_serve
+website_serve:		 ## Serves the website locally
+website_serve:
+	@echo "$(YELLOW_COLOR)To install mkdocs ensure you have Python3 & pip3 and run the following command:$(NO_COLOR)"
+	@echo "$$ pip install mkdocs mkdocs-material"
 	mkdocs serve
 
-
-.PHONY: website
-website: doc
-	mkdocs build
+$(WEBSITE_OUTPUT): $(WEBSITE_SRC)
+	mkdocs build --clean --strict
+	@touch -c $@
 
 
 #
@@ -284,19 +288,18 @@ vendor_install:
 	composer install --ansi
 	touch -c vendor
 	touch -c $(COMPOSER_BIN_PLUGIN_VENDOR)
-	touch -c bin/phpunit
+	touch -c $(PHPUNIT_BIN)
 
 composer.lock: composer.json
-	@echo "$(@) is not up to date. You may want to run the following command:"
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer update --lock && touch -c $(@)"
-
 vendor: composer.lock
 	$(MAKE) vendor_install
 
 $(COMPOSER_BIN_PLUGIN_VENDOR): composer.lock
 	$(MAKE) --always-make vendor_install
 
-bin/phpunit: composer.lock
+$(PHPUNIT_BIN): composer.lock
 	$(MAKE) --always-make vendor_install
 	touch -c $@
 
@@ -309,81 +312,70 @@ vendor-bin/php-cs-fixer/vendor: vendor-bin/php-cs-fixer/composer.lock $(COMPOSER
 	composer bin php-cs-fixer install
 	touch -c $@
 vendor-bin/php-cs-fixer/composer.lock: vendor-bin/php-cs-fixer/composer.json
-	@echo "$(@) is not up to date. You may want to run the following command:"
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer bin php-cs-fixer update --lock && touch -c $(@)"
 
 .PHONY: infection_install
-infection_install: $(INFECTION)
+infection_install: $(INFECTION_BIN)
 
-$(INFECTION): vendor-bin/infection/vendor
+$(INFECTION_BIN): vendor-bin/infection/vendor
 	touch -c $@
 vendor-bin/infection/vendor: vendor-bin/infection/composer.lock $(COMPOSER_BIN_PLUGIN_VENDOR)
 	composer bin infection install
 	touch -c $@
 vendor-bin/infection/composer.lock: vendor-bin/infection/composer.json
-	@echo "$(@) is not up to date. You may want to run the following command:"
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer bin infection update --lock && touch -c $(@)"
 
-fixtures/composer-dump/dir001/composer.lock: fixtures/composer-dump/dir001/composer.json
-	composer install --ansi --working-dir=fixtures/composer-dump/dir001
+$(COVERAGE_XML_DIR): $(PHPUNIT_BIN) dist $(PHPUNIT_TEST_SRC) $(INFECTION_SRC)
+	$(PHPUNIT_COVERAGE_INFECTION)
 	touch -c $@
+	touch -c $(COVERAGE_JUNIT)
 
-fixtures/composer-dump/dir003/composer.lock: fixtures/composer-dump/dir003/composer.json
-	composer install --ansi --working-dir=fixtures/composer-dump/dir003
+$(COVERAGE_JUNIT): $(PHPUNIT_BIN) dist $(PHPUNIT_TEST_SRC) $(INFECTION_SRC)
+	$(PHPUNIT_COVERAGE_INFECTION)
 	touch -c $@
+	touch -c $(COVERAGE_XML_DIR)
 
 fixtures/composer-dump/dir001/vendor: fixtures/composer-dump/dir001/composer.lock
 	composer install --ansi --working-dir=fixtures/composer-dump/dir001
 	touch -c $@
+fixtures/composer-dump/dir001/composer.lock: fixtures/composer-dump/dir001/composer.json
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
+	@echo "$$ composer update --lock --working-dir=fixtures/composer-dump/dir001 && touch -c $(@)"
 
 fixtures/composer-dump/dir003/vendor: fixtures/composer-dump/dir003/composer.lock
 	composer install --ansi --working-dir=fixtures/composer-dump/dir003
 	touch -c $@
-
-fixtures/build/dir011/vendor:
-	composer install --ansi --working-dir=fixtures/build/dir011
-	touch -c $@
-
-fixtures/build/dir012/vendor:
-	composer install --ansi --working-dir=fixtures/build/dir012
-	touch -c $@
-
-fixtures/build/dir013/vendor:
-	composer install --ansi --working-dir=fixtures/build/dir013
-	touch -c $@
+fixtures/composer-dump/dir003/composer.lock: fixtures/composer-dump/dir003/composer.json
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
+	@echo "$$ composer update --lock --working-dir=fixtures/composer-dump/dir003 && touch -c $(@)"
 
 .PHONY: fixtures/default_stub.php
 fixtures/default_stub.php:
-	php -d phar.readonly=0 bin/generate_default_stub
+	php -dphar.readonly=0 bin/generate_default_stub
 
 $(REQUIREMENT_CHECKER_EXTRACT):
 	cd requirement-checker; $(MAKE) --file=Makefile _dump
 
-box: bin src res vendor box.json.dist scoper.inc.php $(REQUIREMENT_CHECKER_EXTRACT)
-	@echo "Compile Box"
-	bin/box compile --ansi --no-parallel
+$(SCOPED_BOX_BIN): $(SCOPED_BOX_DEPS)
+	@echo "$(YELLOW_COLOR)Compile Box.$(NO_COLOR)"
+	$(BOX) compile --ansi --no-parallel
 
 	rm bin/_box.phar || true
 	mv -v bin/box.phar bin/_box.phar
 
-	@echo "Compile Box with the isolated Box PHAR"
+	@echo "$(YELLOW_COLOR)Compile Box with the isolated Box PHAR.$(NO_COLOR)"
 	php bin/_box.phar compile --ansi --no-parallel
 
 	mv -fv bin/box.phar box
 
-	@echo "Test the PHAR which has been created by the isolated PHAR"
+	@echo "$(YELLOW_COLOR)Test the PHAR which has been created by the isolated PHAR.$(NO_COLOR)"
 	./box compile --ansi --no-parallel
 
+	mv -fv box bin/box.phar
 	rm bin/_box.phar
 
-	touch -c $@
-
-.PHONY: docker_images
-docker_images:
-	./.docker/build
-
-fixtures/php-settings-checker/output-xdebug-enabled: fixtures/php-settings-checker/output-xdebug-enabled.tpl docker_images
-	./fixtures/php-settings-checker/create-expected-output $(DOCKER_MIN_BOX_XDEBUG_PHP_VERSION_IMAGE_TAG)
 	touch -c $@
 
 
@@ -394,5 +386,10 @@ vendor-bin/requirement-checker/vendor: vendor-bin/requirement-checker/composer.l
 	composer bin requirement-checker install
 	touch -c $@
 vendor-bin/requirement-checker/composer.lock: vendor-bin/requirement-checker/composer.json
-	@echo "$(@) is not up to date. You may want to run the following command:"
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer bin requirement-checker update --lock && touch -c $(@)"
+
+dist:
+	mkdir -p dist
+	touch dist/.gitkeep
+	touch -c $@
