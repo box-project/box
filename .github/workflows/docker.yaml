@@ -3,7 +3,7 @@ name: Docker
 on:
     push:
         branches: [ main ]
-    pull_request: ~
+    pull_request:
     release:
         types: [ created ]
 
@@ -60,6 +60,7 @@ jobs:
                 run: docker run --rm ${{ matrix.image-tag }} php --version
 
             -   name: Build and push
+                if: github.event_name != 'pull_request'
                 uses: docker/build-push-action@v3
                 with:
                     context: .
