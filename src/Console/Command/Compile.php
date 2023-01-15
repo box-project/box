@@ -744,14 +744,11 @@ final class Compile implements CommandAware
         bool $checkRequirements,
         CompilerLogger $logger,
     ): string {
-        $stub = StubGenerator::create()
-            ->alias($config->getAlias())
-            ->index($main)
-            ->intercept($config->isInterceptFileFuncs())
-            ->checkRequirements($checkRequirements)
-        ;
+        $shebang = $config->getShebang();
+        $bannerPath = $config->getStubBannerPath();
+        $bannerContents = $config->getStubBannerContents();
 
-        if (null !== ($shebang = $config->getShebang())) {
+        if (null !== $shebang) {
             $logger->log(
                 CompilerLogger::MINUS_PREFIX,
                 sprintf(
@@ -759,8 +756,6 @@ final class Compile implements CommandAware
                     $shebang,
                 ),
             );
-
-            $stub->shebang($shebang);
         } else {
             $logger->log(
                 CompilerLogger::MINUS_PREFIX,
@@ -768,7 +763,7 @@ final class Compile implements CommandAware
             );
         }
 
-        if (null !== ($bannerPath = $config->getStubBannerPath())) {
+        if (null !== $bannerPath) {
             $logger->log(
                 CompilerLogger::MINUS_PREFIX,
                 sprintf(
@@ -776,15 +771,13 @@ final class Compile implements CommandAware
                     $bannerPath,
                 ),
             );
-
-            $stub->banner($config->getStubBannerContents());
-        } elseif (null !== ($banner = $config->getStubBannerContents())) {
+        } elseif (null !== $bannerContents) {
             $logger->log(
                 CompilerLogger::MINUS_PREFIX,
                 'Using banner:',
             );
 
-            $bannerLines = explode("\n", $banner);
+            $bannerLines = explode("\n", $bannerContents);
 
             foreach ($bannerLines as $bannerLine) {
                 $logger->log(
@@ -792,11 +785,16 @@ final class Compile implements CommandAware
                     $bannerLine,
                 );
             }
-
-            $stub->banner($banner);
         }
 
-        return $stub->generateStub();
+        return StubGenerator::generateStub(
+            $config->getAlias(),
+            $bannerContents,
+            $main,
+            $config->isInterceptFileFuncs(),
+            $shebang,
+            $checkRequirements,
+        );
     }
 
     private static function logMap(MapFile $fileMapper, CompilerLogger $logger): void

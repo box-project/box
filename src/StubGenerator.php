@@ -26,6 +26,8 @@ use Webmozart\Assert\Assert;
  */
 final class StubGenerator
 {
+    use NotInstantiable;
+
     private const CHECK_FILE_NAME = 'bin/check-requirements.php';
 
     private const STUB_TEMPLATE = <<<'STUB'
@@ -39,107 +41,72 @@ final class StubGenerator
 
         STUB;
 
-    /** @var null|string The alias to be used in "phar://" URLs */
-    private ?string $alias = null;
-
-    /** @var null|string The top header comment banner text */
-    private ?string $banner = null;
-
-    /** @var null|string The location within the PHAR of index script */
-    private ?string $index = null;
-
-    /** @var bool Use the Phar::interceptFileFuncs() method? */
-    private bool $intercept = false;
-
-    /** @var null|string The shebang line */
-    private ?string $shebang = null;
-
-    private bool $checkRequirements = true;
-
     /**
-     * Creates a new instance of the stub generator.
-     *
-     * @return StubGenerator the stub generator
+     * @param string|null $alias The alias to be used in "phar://" URLs
+     * @param string|null $banner The top header comment banner text
+     * @param string|null $index The location within the PHAR of index script
+     * @param bool $intercept Use the Phar::interceptFileFuncs() method?
+     * @param non-empty-string|null $shebang The shebang line
      */
-    public static function create(): self
-    {
-        return new self();
-    }
-
-    public function generateStub(): string
+    public static function generateStub(
+        ?string $alias = null,
+        ?string $banner = null,
+        ?string $index = null,
+        bool $intercept = false,
+        ?string $shebang = null,
+        bool $checkRequirements = true,
+    ): string
     {
         $stub = self::STUB_TEMPLATE;
 
         $stub = str_replace(
             "__BOX_SHEBANG__\n",
-            null === $this->shebang ? '' : $this->shebang."\n",
+            null === $shebang ? '' : $shebang."\n",
             $stub,
         );
 
         $stub = str_replace(
             "__BOX_BANNER__\n",
-            $this->generateBannerStmt(),
+            self::generateBannerStmt($banner),
             $stub,
         );
 
         $stub = str_replace(
             "__BOX_PHAR_CONFIG__\n",
-            $this->generatePharConfigStmt(),
+            self::generatePharConfigStmt(
+                $alias,
+                $index,
+                $intercept,
+                $checkRequirements,
+            ),
             $stub,
         );
 
         return $stub;
     }
 
-    public function alias(?string $alias): self
+    private static function generateBannerStmt(?string $banner): string
     {
-        $this->alias = $alias;
-
-        return $this;
-    }
-
-    public function banner(?string $banner): self
-    {
-        $this->banner = $banner;
-
-        return $this;
-    }
-
-    public function index(?string $index): self
-    {
-        $this->index = $index;
-
-        return $this;
-    }
-
-    public function intercept(bool $intercept): self
-    {
-        $this->intercept = $intercept;
-
-        return $this;
-    }
-
-    public function shebang(?string $shebang): self
-    {
-        if (null !== $shebang) {
-            Assert::notEmpty($shebang, 'Cannot use an empty string for the shebang.');
+        if (null === $banner) {
+            return '';
         }
 
-        $this->shebang = $shebang;
+        $generatedBanner = "/*\n * ";
 
-        return $this;
+        $generatedBanner .= str_replace(
+            " \n",
+            "\n",
+            str_replace("\n", "\n * ", $banner),
+        );
+
+        $generatedBanner .= "\n */";
+
+        return "\n".$generatedBanner."\n";
     }
 
-    public function getShebang(): ?string
+    private static function getAliasStmt(?string $alias): ?string
     {
-        return $this->shebang;
-    }
-
-    public function checkRequirements(bool $checkRequirements): self
-    {
-        $this->checkRequirements = $checkRequirements;
-
-        return $this;
+        return null !== $alias ? 'Phar::mapPhar('.self::arg($alias).');' : null;
     }
 
     /**
@@ -147,75 +114,57 @@ final class StubGenerator
      *
      * @return string The escaped argument
      */
-    private function arg(string $arg, string $quote = "'"): string
+    private static function arg(string $arg, string $quote = "'"): string
     {
         return $quote.addcslashes($arg, $quote).$quote;
     }
 
-    private function getAliasStmt(): ?string
-    {
-        return null !== $this->alias ? 'Phar::mapPhar('.$this->arg($this->alias).');' : null;
-    }
-
-    private function generateBannerStmt(): string
-    {
-        if (null === $this->banner) {
-            return '';
-        }
-
-        $banner = "/*\n * ";
-
-        $banner .= str_replace(
-            " \n",
-            "\n",
-            str_replace("\n", "\n * ", $this->banner),
-        );
-
-        $banner .= "\n */";
-
-        return "\n".$banner."\n";
-    }
-
-    private function generatePharConfigStmt(): string
+    private static function generatePharConfigStmt(
+        ?string $alias = null,
+        ?string $index = null,
+        bool $intercept = false,
+        bool $checkRequirements = true,
+    ): string
     {
         $previous = false;
         $stub = [];
+        $aliasStmt = self::getAliasStmt($alias);
 
-        if (null !== $aliasStmt = $this->getAliasStmt()) {
+        if (null !== $aliasStmt) {
             $stub[] = $aliasStmt;
 
             $previous = true;
         }
 
-        if ($this->intercept) {
+        if ($intercept) {
             $stub[] = 'Phar::interceptFileFuncs();';
 
             $previous = true;
         }
 
-        if (false !== $this->checkRequirements) {
+        if (false !== $checkRequirements) {
             if ($previous) {
                 $stub[] = '';
             }
 
             $checkRequirementsFile = self::CHECK_FILE_NAME;
 
-            $stub[] = null === $this->alias
+            $stub[] = null === $alias
                 ? "require 'phar://' . __FILE__ . '/.box/{$checkRequirementsFile}';"
-                : "require 'phar://{$this->alias}/.box/{$checkRequirementsFile}';"
+                : "require 'phar://{$alias}/.box/{$checkRequirementsFile}';"
             ;
 
             $previous = true;
         }
 
-        if (null !== $this->index) {
+        if (null !== $index) {
             if ($previous) {
                 $stub[] = '';
             }
 
-            $stub[] = null === $this->alias
-                ? "require 'phar://' . __FILE__ . '/{$this->index}';"
-                : "require 'phar://{$this->alias}/{$this->index}';"
+            $stub[] = null === $alias
+                ? "require 'phar://' . __FILE__ . '/{$index}';"
+                : "require 'phar://{$alias}/{$index}';"
             ;
         }
 

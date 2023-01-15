@@ -16,70 +16,80 @@ namespace KevinGH\Box;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use function array_merge;
+use function array_values;
 
 /**
  * @covers \KevinGH\Box\StubGenerator
  */
 class StubGeneratorTest extends TestCase
 {
-    private StubGenerator $generator;
-
-    protected function setUp(): void
+    /**
+     * @dataProvider valuesProvider
+     */
+    public function test_it_can_generate_a_stub(
+        ?string $alias,
+        ?string $banner,
+        ?string $index,
+        bool $intercept,
+        ?string $shebang,
+        bool $checkRequirements,
+        string $expected,
+    ): void
     {
-        $this->generator = new StubGenerator();
-    }
-
-    public function test_it_can_be_created(): void
-    {
-        $this->assertInstanceOf(
-            StubGenerator::class,
-            StubGenerator::create(),
+        $actual = StubGenerator::generateStub(
+            $alias,
+            $banner,
+            $index,
+            $intercept,
+            $shebang,
+            $checkRequirements,
         );
+
+        self::assertSame($expected, $actual);
     }
 
-    public function test_it_can_generate_a_stub_with_the_default_config(): void
+    public static function valuesProvider(): iterable
     {
-        $expected = <<<'STUB'
+        $defaultValues = self::createDefaultValues();
+        $createValues = static fn (array $values = []) => array_values(
+            array_merge($defaultValues, $values),
+        );
+
+        yield 'default' => [
+            ...$createValues(),
+            <<<'STUB'
             <?php
 
             require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 
             __HALT_COMPILER(); ?>
 
-            STUB;
-        $actual = $this->generator->generateStub();
+            STUB,
+        ];
 
-        $this->assertSame($expected, $actual);
-    }
-
-    public function test_it_can_generate_an_empty_stub(): void
-    {
-        $this->generator->checkRequirements(false);
-
-        $expected = <<<'STUB'
+        yield 'requirement-checker disabled' => [
+            ...$createValues(['checkRequirements' => false]),
+            <<<'STUB'
             <?php
 
             // No PHAR config
 
             __HALT_COMPILER(); ?>
 
-            STUB;
-        $actual = $this->generator->generateStub();
+            STUB,
+        ];
 
-        $this->assertSame($expected, $actual);
-    }
-
-    public function test_it_can_generate_a_stub_with_a_custom_banner(): void
-    {
-        $this->generator->banner(
-            <<<'TEXT'
+        yield 'custom banner' => [
+            ...$createValues([
+                'banner' => <<<'TEXT'
                 Custom Banner
 
                 Yolo
                 TEXT,
-        );
-
-        $expected = <<<'STUB'
+            ]),
+            <<<'STUB'
             <?php
 
             /*
@@ -92,14 +102,19 @@ class StubGeneratorTest extends TestCase
 
             __HALT_COMPILER(); ?>
 
-            STUB;
-        $actual = $this->generator->generateStub();
+            STUB,
+        ];
 
-        $this->assertSame($expected, $actual);
+        yield 'custom banner without requirement checker' => [
+            ...$createValues([
+                'checkRequirements' => false,
+                'banner' => <<<'TEXT'
+                Custom Banner
 
-        $this->generator->checkRequirements(false);
-
-        $expected = <<<'STUB'
+                Yolo
+                TEXT,
+            ]),
+            <<<'STUB'
             <?php
 
             /*
@@ -112,17 +127,12 @@ class StubGeneratorTest extends TestCase
 
             __HALT_COMPILER(); ?>
 
-            STUB;
-        $actual = $this->generator->generateStub();
+            STUB,
+        ];
 
-        $this->assertSame($expected, $actual);
-    }
-
-    public function test_it_can_generate_a_stub_with_a_custom_shebang(): void
-    {
-        $this->generator->shebang('#!/usr/local/bin/env php');
-
-        $expected = <<<'STUB'
+        yield 'custom shebang' => [
+            ...$createValues(['shebang' => '#!/usr/local/bin/env php']),
+            <<<'STUB'
             #!/usr/local/bin/env php
             <?php
 
@@ -130,14 +140,15 @@ class StubGeneratorTest extends TestCase
 
             __HALT_COMPILER(); ?>
 
-            STUB;
-        $actual = $this->generator->generateStub();
+            STUB,
+        ];
 
-        $this->assertSame($expected, $actual);
-
-        $this->generator->checkRequirements(false);
-
-        $expected = <<<'STUB'
+        yield 'custom shebang without requirement checker' => [
+            ...$createValues([
+                'checkRequirements' => false,
+                'shebang' => '#!/usr/local/bin/env php',
+            ]),
+            <<<'STUB'
             #!/usr/local/bin/env php
             <?php
 
@@ -145,48 +156,12 @@ class StubGeneratorTest extends TestCase
 
             __HALT_COMPILER(); ?>
 
-            STUB;
-        $actual = $this->generator->generateStub();
+            STUB,
+        ];
 
-        $this->assertSame($expected, $actual);
-    }
-
-    public function test_it_can_generate_a_stub_without_a_shebang(): void
-    {
-        $this->generator->shebang(null);
-
-        $expected = <<<'STUB'
-            <?php
-
-            require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
-
-            __HALT_COMPILER(); ?>
-
-            STUB;
-        $actual = $this->generator->generateStub();
-
-        $this->generator->checkRequirements(false);
-
-        $this->assertSame($expected, $actual);
-
-        $expected = <<<'STUB'
-            <?php
-
-            // No PHAR config
-
-            __HALT_COMPILER(); ?>
-
-            STUB;
-        $actual = $this->generator->generateStub();
-
-        $this->assertSame($expected, $actual);
-    }
-
-    public function test_it_can_generate_a_stub_with_a_custom_alias(): void
-    {
-        $this->generator->alias('acme.phar');
-
-        $expected = <<<'STUB'
+        yield 'custom alias' => [
+            ...$createValues(['alias' => 'acme.phar']),
+            <<<'STUB'
             <?php
 
             Phar::mapPhar('acme.phar');
@@ -195,62 +170,27 @@ class StubGeneratorTest extends TestCase
 
             __HALT_COMPILER(); ?>
 
-            STUB;
-        $actual = $this->generator->generateStub();
+            STUB,
+        ];
 
-        $this->assertSame($expected, $actual);
-
-        $this->generator->checkRequirements(false);
-
-        $expected = <<<'STUB'
+        yield 'custom alias without requirement checker' => [
+            ...$createValues([
+                'checkRequirements' => false,
+                'alias' => 'acme.phar'
+            ]),
+            <<<'STUB'
             <?php
 
             Phar::mapPhar('acme.phar');
 
             __HALT_COMPILER(); ?>
 
-            STUB;
-        $actual = $this->generator->generateStub();
+            STUB,
+        ];
 
-        $this->assertSame($expected, $actual);
-    }
-
-    public function test_it_can_generate_a_stub_with_no_alias(): void
-    {
-        $this->generator->alias(null);
-
-        $expected = <<<'STUB'
-            <?php
-
-            require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
-
-            __HALT_COMPILER(); ?>
-
-            STUB;
-        $actual = $this->generator->generateStub();
-
-        $this->assertSame($expected, $actual);
-
-        $this->generator->checkRequirements(false);
-
-        $expected = <<<'STUB'
-            <?php
-
-            // No PHAR config
-
-            __HALT_COMPILER(); ?>
-
-            STUB;
-        $actual = $this->generator->generateStub();
-
-        $this->assertSame($expected, $actual);
-    }
-
-    public function test_it_can_generate_a_stub_with_an_index_file(): void
-    {
-        $this->generator->index('acme.php');
-
-        $expected = <<<'STUB'
+        yield 'custom index file' => [
+            ...$createValues(['index' => 'acme.php']),
+            <<<'STUB'
             <?php
 
             require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
@@ -259,31 +199,27 @@ class StubGeneratorTest extends TestCase
 
             __HALT_COMPILER(); ?>
 
-            STUB;
-        $actual = $this->generator->generateStub();
+            STUB,
+        ];
 
-        $this->assertSame($expected, $actual);
-
-        $this->generator->checkRequirements(false);
-
-        $expected = <<<'STUB'
+        yield 'custom index without requirement checker' => [
+            ...$createValues([
+                'checkRequirements' => false,
+                'index' => 'acme.php',
+            ]),
+            <<<'STUB'
             <?php
 
             require 'phar://' . __FILE__ . '/acme.php';
 
             __HALT_COMPILER(); ?>
 
-            STUB;
-        $actual = $this->generator->generateStub();
+            STUB,
+        ];
 
-        $this->assertSame($expected, $actual);
-    }
-
-    public function test_it_can_generate_a_stub_configuring_the_phar_to_intercept_filesystem_stat_functions(): void
-    {
-        $this->generator->intercept(true);
-
-        $expected = <<<'STUB'
+        yield 'intercept file functions' => [
+            ...$createValues(['intercept' => true]),
+            <<<'STUB'
             <?php
 
             Phar::interceptFileFuncs();
@@ -292,44 +228,38 @@ class StubGeneratorTest extends TestCase
 
             __HALT_COMPILER(); ?>
 
-            STUB;
-        $actual = $this->generator->generateStub();
+            STUB,
+        ];
 
-        $this->assertSame($expected, $actual);
-
-        $this->generator->checkRequirements(false);
-
-        $expected = <<<'STUB'
+        yield 'intercept file functions without requirement checker' => [
+            ...$createValues([
+                'checkRequirements' => false,
+                'intercept' => true,
+            ]),
+            <<<'STUB'
             <?php
 
             Phar::interceptFileFuncs();
 
             __HALT_COMPILER(); ?>
 
-            STUB;
-        $actual = $this->generator->generateStub();
+            STUB,
+        ];
 
-        $this->assertSame($expected, $actual);
-    }
-
-    public function test_it_can_generate_a_complete_stub(): void
-    {
-        $this->generator
-            ->banner(
-                <<<'TEXT'
+        yield 'nominal' => [
+            ...$createValues([
+                'banner' => <<<'TEXT'
                     Custom Banner
 
                     Yolo
                     TEXT,
-            )
-            ->shebang('#!/usr/local/bin/env php')
-            ->alias('test.phar')
-            ->index('index.php')
-            ->intercept(true)
-            ->checkRequirements(true)
-        ;
-
-        $expected = <<<'STUB'
+                'shebang' => '#!/usr/local/bin/env php',
+                'alias' => 'test.phar',
+                'index' => 'index.php',
+                'intercept' => true,
+                'checkRequirements' => true,
+            ]),
+            <<<'STUB'
             #!/usr/local/bin/env php
             <?php
 
@@ -348,14 +278,23 @@ class StubGeneratorTest extends TestCase
 
             __HALT_COMPILER(); ?>
 
-            STUB;
-        $actual = $this->generator->generateStub();
+            STUB,
+        ];
 
-        $this->assertSame($expected, $actual);
+        yield 'nominal with requirement checker disabled' => [
+            ...$createValues([
+                'banner' => <<<'TEXT'
+                    Custom Banner
 
-        $this->generator->checkRequirements(false);
-
-        $expected = <<<'STUB'
+                    Yolo
+                    TEXT,
+                'shebang' => '#!/usr/local/bin/env php',
+                'alias' => 'test.phar',
+                'index' => 'index.php',
+                'intercept' => true,
+                'checkRequirements' => false,
+            ]),
+            <<<'STUB'
             #!/usr/local/bin/env php
             <?php
 
@@ -372,23 +311,25 @@ class StubGeneratorTest extends TestCase
 
             __HALT_COMPILER(); ?>
 
-            STUB;
-        $actual = $this->generator->generateStub();
-
-        $this->assertSame($expected, $actual);
+            STUB,
+        ];
     }
 
-    public function test_test_it_cannot_generate_the_stub_without_shebang(): void
+    /**
+     * @return array<string, mixed>
+     */
+    private static function createDefaultValues(): array
     {
-        try {
-            $this->generator->shebang('');
+        $generateStubParameters = (new ReflectionClass(StubGenerator::class))
+            ->getMethod('generateStub')
+            ->getParameters();
 
-            $this->fail('Expected exception to be thrown.');
-        } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
-                'Cannot use an empty string for the shebang.',
-                $exception->getMessage(),
-            );
+        $defaultValues = [];
+
+        foreach ($generateStubParameters as $parameter) {
+            $defaultValues[$parameter->getName()] = $parameter->getDefaultValue();
         }
+
+        return $defaultValues;
     }
 }
