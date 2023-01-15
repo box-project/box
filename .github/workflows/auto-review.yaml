@@ -36,6 +36,44 @@ jobs:
 
             -   run: make root_cs_lint
 
+    composer-validate:
+        runs-on: ubuntu-latest
+        name: Composer Validate
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v3
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.1'
+                    tools: composer
+                    coverage: none
+
+            -   run: make composer_validate
+
+    box-config-validate:
+        runs-on: ubuntu-latest
+        name: Box Validate
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v3
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.1'
+                    tools: composer
+                    coverage: none
+
+            -   name: Install Composer dependencies
+                uses: ramsey/composer-install@v2
+
+            -   name: Ensure that the make target is up to date
+                run: make vendor_install
+
+            -   run: make box_validate
+
     autoreview-test:
         runs-on: ubuntu-latest
         name: AutoReview Tests
@@ -67,6 +105,8 @@ jobs:
         runs-on: ubuntu-latest
         needs:
             - lint-cs
+            - composer-validate
+            - box-config-validate
             - autoreview-test
         if: always()
         steps:

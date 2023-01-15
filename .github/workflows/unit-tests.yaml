@@ -52,10 +52,6 @@ jobs:
             -   name: Ensure that the make target is up to date
                 run: make vendor_install
 
-            # TODO: move this into a dedicated build
-            -   name: Validate box config
-                run: bin/box validate --ansi
-
             -   run: make phpunit_phar_readonly
             -   run: make phpunit_phar_writeable
 
