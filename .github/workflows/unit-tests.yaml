@@ -99,9 +99,9 @@ jobs:
                 run: make infection_install
 
             -   name: Run tests with coverage
-                run: make phpunit_coverage_infection
+                run: make phpunit_coverage_infection --debug
 
-            -   run: make _infection_ci
+            -   run: make _infection_ci --debug
 
     # This is a "trick", a meta task which does not change, and we can use in
     # the protected branch rules as opposed to the tests one above which
