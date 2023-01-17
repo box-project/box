@@ -1,6 +1,3 @@
-!/bin/box
-!/bin/box.bat
-!/bin/generate_default_stub
 !/fixtures/php-settings-checker/create-expected-output
 !/fixtures/php-settings-checker/index.php
 !/fixtures/php-settings-checker/output-*
@@ -12,7 +9,7 @@
 /.phpcs-cache
 /.phpunit*
 /Dockerfile*
-/bin/
+/bin/box.phar
 /box
 /box.json
 /dist/
