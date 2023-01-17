@@ -2427,7 +2427,7 @@ class CompileTest extends FileSystemTestCase
 
         // Check the stub content
         $actualStub = self::normalizeStub($phar->getStub());
-        $defaultStub = self::normalizeStub(file_get_contents(self::FIXTURES_DIR.'/../default_stub.php'));
+        $defaultStub = self::normalizeStub(file_get_contents(self::FIXTURES_DIR.'/../../dist/default_stub.php'));
 
         if ($stub) {
             $this->assertSame($phar->getPath(), $phar->getAlias());
