@@ -18,6 +18,8 @@ SCOPED_BOX_BIN = bin/box.phar
 SCOPED_BOX = $(SCOPED_BOX_BIN)
 SCOPED_BOX_DEPS = bin/box bin/box.bat $(shell find src res) box.json.dist scoper.inc.php vendor
 
+DEFAULT_STUB = dist/default_stub.php
+
 COVERAGE_DIR = dist/coverage
 COVERAGE_XML_DIR = $(COVERAGE_DIR)/coverage-xml
 COVERAGE_JUNIT = $(COVERAGE_DIR)/phpunit.junit.xml
@@ -25,7 +27,7 @@ COVERAGE_HTML_DIR = $(COVERAGE_DIR)/html
 
 PHPUNIT_BIN = vendor/bin/phpunit
 PHPUNIT = $(PHPUNIT_BIN)
-PHPUNIT_TEST_SRC = fixtures/default_stub.php $(REQUIREMENT_CHECKER_EXTRACT) fixtures/composer-dump/dir001/vendor fixtures/composer-dump/dir003/vendor
+PHPUNIT_TEST_SRC = $(DEFAULT_STUB) $(REQUIREMENT_CHECKER_EXTRACT) fixtures/composer-dump/dir001/vendor fixtures/composer-dump/dir003/vendor
 PHPUNIT_COVERAGE_INFECTION = XDEBUG_MODE=coverage php -dphar.readonly=0 $(PHPUNIT) --colors=always --coverage-xml=$(COVERAGE_XML_DIR) --log-junit=$(COVERAGE_JUNIT) --testsuite=Tests
 PHPUNIT_COVERAGE_HTML = XDEBUG_MODE=coverage php -dphar.readonly=0 $(PHPUNIT) --colors=always --coverage-html=$(COVERAGE_HTML_DIR)
 
@@ -83,7 +85,7 @@ clean:
 		$(E2E_PHP_SETTINGS_CHECKER_DIR)/index.phar \
 		$(E2E_SYMFONY_DIR)/var \
 		$(E2E_SYMFONY_DIR)/.env.local.php \
-		fixtures/default_stub.php \
+		$(DEFAULT_STUB) \
 		fixtures/composer-dump/*/vendor \
 		 || true
 	@# Obsolete entries; Only relevant to someone who still has old artifacts locally
@@ -91,6 +93,7 @@ clean:
 		.php-cs-fixer.cache \
 		.phpunit.result.cache \
 		box \
+		fixtures/default_stub.php \
 		fixtures/check-requirements \
 		fixtures/build/*/index.phar \
 		$(E2E_PHP_SETTINGS_CHECKER_DIR)/actual-output \
@@ -359,9 +362,12 @@ fixtures/composer-dump/dir003/composer.lock: fixtures/composer-dump/dir003/compo
 	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer update --lock --working-dir=fixtures/composer-dump/dir003 && touch -c $(@)"
 
-.PHONY: fixtures/default_stub.php
-fixtures/default_stub.php:
+.PHONY: generate_default_stub
+generate_default_stub: $(DEFAULT_STUB)
+
+$(DEFAULT_STUB): bin/generate_default_stub
 	php -dphar.readonly=0 bin/generate_default_stub
+	touch -c $@
 
 $(REQUIREMENT_CHECKER_EXTRACT):
 	cd requirement-checker; $(MAKE) --file=Makefile _dump
