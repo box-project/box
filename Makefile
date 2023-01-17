@@ -106,6 +106,7 @@ clean:
 		site \
 		website \
 		|| true
+	$(MAKE) dist
 
 
 .PHONY: compile
@@ -222,7 +223,7 @@ phpunit_coverage_html: $(PHPUNIT_BIN) dist $(PHPUNIT_TEST_SRC) vendor
 
 .PHONY: phpunit_coverage_infection
 phpunit_coverage_infection: ## Runs PHPUnit tests with test coverage
-phpunit_coverage_infection: $(PHPUNIT_BIN) $(PHPUNIT_TEST_SRC) vendor
+phpunit_coverage_infection: $(PHPUNIT_BIN) dist $(PHPUNIT_TEST_SRC) vendor
 	$(PHPUNIT_COVERAGE_INFECTION)
 	touch -c $(COVERAGE_XML_DIR)
 	touch -c $(COVERAGE_JUNIT)
@@ -338,15 +339,15 @@ vendor-bin/infection/composer.lock: vendor-bin/infection/composer.json
 	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer bin infection update --lock && touch -c $(@)"
 
-$(COVERAGE_XML_DIR): $(PHPUNIT_BIN) $(PHPUNIT_TEST_SRC) $(INFECTION_SRC)
-	@# Do not include dist in the pre-requisite: we do want it to exist but its timestamp should not be tracked
-	$(MAKE) dist
-	$(MAKE) phpunit_coverage_infection
+$(COVERAGE_XML_DIR): $(PHPUNIT_BIN) dist $(PHPUNIT_TEST_SRC) $(INFECTION_SRC)
+	$(PHPUNIT_COVERAGE_INFECTION)
+	touch -c $@
+	touch -c $(COVERAGE_JUNIT)
 
-$(COVERAGE_JUNIT): $(PHPUNIT_BIN) $(PHPUNIT_TEST_SRC) $(INFECTION_SRC)
-	@# Do not include dist in the pre-requisite: we do want it to exist but its timestamp should not be tracked
-	$(MAKE) dist
-	$(MAKE) phpunit_coverage_infection
+$(COVERAGE_JUNIT): $(PHPUNIT_BIN) dist $(PHPUNIT_TEST_SRC) $(INFECTION_SRC)
+	$(PHPUNIT_COVERAGE_INFECTION)
+	touch -c $@
+	touch -c $(COVERAGE_XML_DIR)
 
 fixtures/composer-dump/dir001/vendor: fixtures/composer-dump/dir001/composer.lock
 	composer install --ansi --working-dir=fixtures/composer-dump/dir001
