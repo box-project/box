@@ -239,7 +239,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
         string $prefix,
         string $expectedAutoloadContents,
     ): void {
-        $this->checkFixturesInstalled(self::FIXTURES.'/dir001/vendor');
+        $this->skipIfFixturesNotInstalled(self::FIXTURES.'/dir001/vendor');
         mirror(self::FIXTURES.'/dir001', $this->tmp);
 
         ComposerOrchestrator::dumpAutoload($SymbolsRegistry, $prefix, false);
@@ -311,8 +311,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
 
     public function test_it_can_dump_the_autoloader_with_a_composer_json_lock_and_installed_with_a_dev_dependency(): void
     {
-        $this->checkFixturesInstalled(self::FIXTURES.'/dir003/vendor');
-
+        $this->skipIfFixturesNotInstalled(self::FIXTURES.'/dir003/vendor');
         mirror(self::FIXTURES.'/dir003', $this->tmp);
 
         $composerAutoloaderName = self::COMPOSER_AUTOLOADER_NAME;
@@ -422,7 +421,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
         string $prefix,
         string $expectedAutoloadContents,
     ): void {
-        $this->checkFixturesInstalled(self::FIXTURES.'/dir002/vendor');
+        $this->skipIfFixturesNotInstalled(self::FIXTURES.'/dir002/vendor');
         mirror(self::FIXTURES.'/dir002', $this->tmp);
 
         ComposerOrchestrator::dumpAutoload($symbolsRegistry, $prefix, false);
@@ -885,7 +884,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
         return $this->normalizePaths(iterator_to_array($finder, false));
     }
 
-    private function checkFixturesInstalled(string $path): void
+    private function skipIfFixturesNotInstalled(string $path): void
     {
         if (!file_exists($path)) {
             $this->markTestSkipped('The fixtures were not installed. Run `$ make test_unit` in order to set them all up.');
