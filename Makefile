@@ -27,7 +27,7 @@ COVERAGE_HTML_DIR = $(COVERAGE_DIR)/html
 
 PHPUNIT_BIN = vendor/bin/phpunit
 PHPUNIT = $(PHPUNIT_BIN)
-PHPUNIT_TEST_SRC = $(DEFAULT_STUB) $(REQUIREMENT_CHECKER_EXTRACT) fixtures/composer-dump/dir001/vendor fixtures/composer-dump/dir003/vendor
+PHPUNIT_TEST_SRC = $(DEFAULT_STUB) $(REQUIREMENT_CHECKER_EXTRACT) fixtures/composer-dump/dir001/vendor fixtures/composer-dump/dir002/vendor fixtures/composer-dump/dir003/vendor
 PHPUNIT_COVERAGE_INFECTION = XDEBUG_MODE=coverage php -dphar.readonly=0 $(PHPUNIT) --colors=always --coverage-xml=$(COVERAGE_XML_DIR) --log-junit=$(COVERAGE_JUNIT) --testsuite=Tests
 PHPUNIT_COVERAGE_HTML = XDEBUG_MODE=coverage php -dphar.readonly=0 $(PHPUNIT) --colors=always --coverage-html=$(COVERAGE_HTML_DIR)
 
@@ -355,6 +355,13 @@ fixtures/composer-dump/dir001/vendor: fixtures/composer-dump/dir001/composer.loc
 fixtures/composer-dump/dir001/composer.lock: fixtures/composer-dump/dir001/composer.json
 	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer update --lock --working-dir=fixtures/composer-dump/dir001 && touch -c $(@)"
+
+fixtures/composer-dump/dir002/vendor: fixtures/composer-dump/dir002/composer.lock
+	composer install --ansi --working-dir=fixtures/composer-dump/dir002
+	touch -c $@
+fixtures/composer-dump/dir002/composer.lock: fixtures/composer-dump/dir002/composer.json
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
+	@echo "$$ composer update --lock --working-dir=fixtures/composer-dump/dir002 && touch -c $(@)"
 
 fixtures/composer-dump/dir003/vendor: fixtures/composer-dump/dir003/composer.lock
 	composer install --ansi --working-dir=fixtures/composer-dump/dir003
