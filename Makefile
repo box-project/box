@@ -171,7 +171,7 @@ requirement_checker_cs_lint:
 
 .PHONY: php_cs_fixer
 php_cs_fixer: $(PHP_CS_FIXER_BIN) dist
-	$(PHP_CS_FIXER) fix
+	$(PHP_CS_FIXER) fix --ansi --verbose
 
 .PHONY: php_cs_fixer_lint
 php_cs_fixer_lint: $(PHP_CS_FIXER_BIN) dist
