@@ -374,7 +374,6 @@ fixtures/composer-dump/dir003/composer.lock: fixtures/composer-dump/dir003/compo
 generate_default_stub: $(DEFAULT_STUB)
 
 $(DEFAULT_STUB): bin/generate_default_stub
-	$(MAKE) dist
 	php -dphar.readonly=0 bin/generate_default_stub
 	touch -c $@
 
