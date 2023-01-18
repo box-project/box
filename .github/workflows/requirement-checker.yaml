@@ -105,8 +105,8 @@ jobs:
                 uses: ramsey/composer-install@v2
                 with:
                     working-directory: requirement-checker
-                    dependency-versions: ${{ matrix.php.dependency }}
-                    composer-options: ${{ matrix.php.composer-options }}
+                    dependency-versions: ${{ matrix.dependency }}
+                    composer-options: ${{ matrix.composer-options }}
 
             -   name: Ensure that the make target is up to date
                 run: cd requirement-checker; make vendor_install
