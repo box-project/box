@@ -25,7 +25,7 @@
         "composer/semver": "^3.3.2",
         "composer/xdebug-handler": "^3.0.3",
         "fidry/console": "^0.5.3",
-        "humbug/php-scoper": "^0.17.7 || ^0.18",
+        "humbug/php-scoper": "^0.18.2",
         "justinrainbow/json-schema": "^5.2.12",
         "laravel/serializable-closure": "^1.2.2",
         "nikic/iter": "^2.2",

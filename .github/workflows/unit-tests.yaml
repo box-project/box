@@ -19,6 +19,9 @@ jobs:
                         dependency: locked
                         composer-options: ~
                     -   version: '8.1'
+                        dependency: lowest
+                        composer-options: ~
+                    -   version: '8.1'
                         dependency: highest
                         composer-options: ~
                     -   version: '8.2'
