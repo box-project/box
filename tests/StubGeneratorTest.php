@@ -14,11 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 use function array_merge;
 use function array_values;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 /**
  * @covers \KevinGH\Box\StubGenerator
@@ -36,8 +35,7 @@ class StubGeneratorTest extends TestCase
         ?string $shebang,
         bool $checkRequirements,
         string $expected,
-    ): void
-    {
+    ): void {
         $actual = StubGenerator::generateStub(
             $alias,
             $banner,
@@ -60,87 +58,87 @@ class StubGeneratorTest extends TestCase
         yield 'default' => [
             ...$createValues(),
             <<<'STUB'
-            <?php
+                <?php
 
-            require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
+                require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 
-            __HALT_COMPILER(); ?>
+                __HALT_COMPILER(); ?>
 
-            STUB,
+                STUB,
         ];
 
         yield 'requirement-checker disabled' => [
             ...$createValues(['checkRequirements' => false]),
             <<<'STUB'
-            <?php
+                <?php
 
-            // No PHAR config
+                // No PHAR config
 
-            __HALT_COMPILER(); ?>
+                __HALT_COMPILER(); ?>
 
-            STUB,
+                STUB,
         ];
 
         yield 'custom banner' => [
             ...$createValues([
                 'banner' => <<<'TEXT'
-                Custom Banner
+                    Custom Banner
 
-                Yolo
-                TEXT,
+                    Yolo
+                    TEXT,
             ]),
             <<<'STUB'
-            <?php
+                <?php
 
-            /*
-             * Custom Banner
-             *
-             * Yolo
-             */
+                /*
+                 * Custom Banner
+                 *
+                 * Yolo
+                 */
 
-            require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
+                require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 
-            __HALT_COMPILER(); ?>
+                __HALT_COMPILER(); ?>
 
-            STUB,
+                STUB,
         ];
 
         yield 'custom banner without requirement checker' => [
             ...$createValues([
                 'checkRequirements' => false,
                 'banner' => <<<'TEXT'
-                Custom Banner
+                    Custom Banner
 
-                Yolo
-                TEXT,
+                    Yolo
+                    TEXT,
             ]),
             <<<'STUB'
-            <?php
+                <?php
 
-            /*
-             * Custom Banner
-             *
-             * Yolo
-             */
+                /*
+                 * Custom Banner
+                 *
+                 * Yolo
+                 */
 
-            // No PHAR config
+                // No PHAR config
 
-            __HALT_COMPILER(); ?>
+                __HALT_COMPILER(); ?>
 
-            STUB,
+                STUB,
         ];
 
         yield 'custom shebang' => [
             ...$createValues(['shebang' => '#!/usr/local/bin/env php']),
             <<<'STUB'
-            #!/usr/local/bin/env php
-            <?php
+                #!/usr/local/bin/env php
+                <?php
 
-            require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
+                require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 
-            __HALT_COMPILER(); ?>
+                __HALT_COMPILER(); ?>
 
-            STUB,
+                STUB,
         ];
 
         yield 'custom shebang without requirement checker' => [
@@ -149,57 +147,57 @@ class StubGeneratorTest extends TestCase
                 'shebang' => '#!/usr/local/bin/env php',
             ]),
             <<<'STUB'
-            #!/usr/local/bin/env php
-            <?php
+                #!/usr/local/bin/env php
+                <?php
 
-            // No PHAR config
+                // No PHAR config
 
-            __HALT_COMPILER(); ?>
+                __HALT_COMPILER(); ?>
 
-            STUB,
+                STUB,
         ];
 
         yield 'custom alias' => [
             ...$createValues(['alias' => 'acme.phar']),
             <<<'STUB'
-            <?php
+                <?php
 
-            Phar::mapPhar('acme.phar');
+                Phar::mapPhar('acme.phar');
 
-            require 'phar://acme.phar/.box/bin/check-requirements.php';
+                require 'phar://acme.phar/.box/bin/check-requirements.php';
 
-            __HALT_COMPILER(); ?>
+                __HALT_COMPILER(); ?>
 
-            STUB,
+                STUB,
         ];
 
         yield 'custom alias without requirement checker' => [
             ...$createValues([
                 'checkRequirements' => false,
-                'alias' => 'acme.phar'
+                'alias' => 'acme.phar',
             ]),
             <<<'STUB'
-            <?php
+                <?php
 
-            Phar::mapPhar('acme.phar');
+                Phar::mapPhar('acme.phar');
 
-            __HALT_COMPILER(); ?>
+                __HALT_COMPILER(); ?>
 
-            STUB,
+                STUB,
         ];
 
         yield 'custom index file' => [
             ...$createValues(['index' => 'acme.php']),
             <<<'STUB'
-            <?php
+                <?php
 
-            require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
+                require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 
-            require 'phar://' . __FILE__ . '/acme.php';
+                require 'phar://' . __FILE__ . '/acme.php';
 
-            __HALT_COMPILER(); ?>
+                __HALT_COMPILER(); ?>
 
-            STUB,
+                STUB,
         ];
 
         yield 'custom index without requirement checker' => [
@@ -208,27 +206,27 @@ class StubGeneratorTest extends TestCase
                 'index' => 'acme.php',
             ]),
             <<<'STUB'
-            <?php
+                <?php
 
-            require 'phar://' . __FILE__ . '/acme.php';
+                require 'phar://' . __FILE__ . '/acme.php';
 
-            __HALT_COMPILER(); ?>
+                __HALT_COMPILER(); ?>
 
-            STUB,
+                STUB,
         ];
 
         yield 'intercept file functions' => [
             ...$createValues(['intercept' => true]),
             <<<'STUB'
-            <?php
+                <?php
 
-            Phar::interceptFileFuncs();
+                Phar::interceptFileFuncs();
 
-            require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
+                require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 
-            __HALT_COMPILER(); ?>
+                __HALT_COMPILER(); ?>
 
-            STUB,
+                STUB,
         ];
 
         yield 'intercept file functions without requirement checker' => [
@@ -237,13 +235,13 @@ class StubGeneratorTest extends TestCase
                 'intercept' => true,
             ]),
             <<<'STUB'
-            <?php
+                <?php
 
-            Phar::interceptFileFuncs();
+                Phar::interceptFileFuncs();
 
-            __HALT_COMPILER(); ?>
+                __HALT_COMPILER(); ?>
 
-            STUB,
+                STUB,
         ];
 
         yield 'nominal' => [
@@ -260,25 +258,25 @@ class StubGeneratorTest extends TestCase
                 'checkRequirements' => true,
             ]),
             <<<'STUB'
-            #!/usr/local/bin/env php
-            <?php
+                #!/usr/local/bin/env php
+                <?php
 
-            /*
-             * Custom Banner
-             *
-             * Yolo
-             */
+                /*
+                 * Custom Banner
+                 *
+                 * Yolo
+                 */
 
-            Phar::mapPhar('test.phar');
-            Phar::interceptFileFuncs();
+                Phar::mapPhar('test.phar');
+                Phar::interceptFileFuncs();
 
-            require 'phar://test.phar/.box/bin/check-requirements.php';
+                require 'phar://test.phar/.box/bin/check-requirements.php';
 
-            require 'phar://test.phar/index.php';
+                require 'phar://test.phar/index.php';
 
-            __HALT_COMPILER(); ?>
+                __HALT_COMPILER(); ?>
 
-            STUB,
+                STUB,
         ];
 
         yield 'nominal with requirement checker disabled' => [
@@ -295,23 +293,23 @@ class StubGeneratorTest extends TestCase
                 'checkRequirements' => false,
             ]),
             <<<'STUB'
-            #!/usr/local/bin/env php
-            <?php
+                #!/usr/local/bin/env php
+                <?php
 
-            /*
-             * Custom Banner
-             *
-             * Yolo
-             */
+                /*
+                 * Custom Banner
+                 *
+                 * Yolo
+                 */
 
-            Phar::mapPhar('test.phar');
-            Phar::interceptFileFuncs();
+                Phar::mapPhar('test.phar');
+                Phar::interceptFileFuncs();
 
-            require 'phar://test.phar/index.php';
+                require 'phar://test.phar/index.php';
 
-            __HALT_COMPILER(); ?>
+                __HALT_COMPILER(); ?>
 
-            STUB,
+                STUB,
         ];
     }
 

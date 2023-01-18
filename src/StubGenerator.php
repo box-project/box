@@ -17,7 +17,6 @@ namespace KevinGH\Box;
 use function addcslashes;
 use function implode;
 use function str_replace;
-use Webmozart\Assert\Assert;
 
 /**
  * Generates a new PHP bootstrap loader stub for a PHAR.
@@ -42,11 +41,11 @@ final class StubGenerator
         STUB;
 
     /**
-     * @param string|null $alias The alias to be used in "phar://" URLs
-     * @param string|null $banner The top header comment banner text
-     * @param string|null $index The location within the PHAR of index script
-     * @param bool $intercept Use the Phar::interceptFileFuncs() method?
-     * @param non-empty-string|null $shebang The shebang line
+     * @param null|string           $alias     The alias to be used in "phar://" URLs
+     * @param null|string           $banner    The top header comment banner text
+     * @param null|string           $index     The location within the PHAR of index script
+     * @param bool                  $intercept Use the Phar::interceptFileFuncs() method?
+     * @param null|non-empty-string $shebang   The shebang line
      */
     public static function generateStub(
         ?string $alias = null,
@@ -55,8 +54,7 @@ final class StubGenerator
         bool $intercept = false,
         ?string $shebang = null,
         bool $checkRequirements = true,
-    ): string
-    {
+    ): string {
         $stub = self::STUB_TEMPLATE;
 
         $stub = str_replace(
@@ -124,8 +122,7 @@ final class StubGenerator
         ?string $index = null,
         bool $intercept = false,
         bool $checkRequirements = true,
-    ): string
-    {
+    ): string {
         $previous = false;
         $stub = [];
         $aliasStmt = self::getAliasStmt($alias);
