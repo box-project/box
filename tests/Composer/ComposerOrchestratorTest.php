@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Composer;
 
 use Fidry\Console\DisplayNormalizer;
+use function file_exists;
 use function file_get_contents;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function iterator_to_array;
@@ -238,6 +239,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
         string $prefix,
         string $expectedAutoloadContents,
     ): void {
+        $this->skipIfFixturesNotInstalled(self::FIXTURES.'/dir001/vendor');
         mirror(self::FIXTURES.'/dir001', $this->tmp);
 
         ComposerOrchestrator::dumpAutoload($SymbolsRegistry, $prefix, false);
@@ -309,6 +311,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
 
     public function test_it_can_dump_the_autoloader_with_a_composer_json_lock_and_installed_with_a_dev_dependency(): void
     {
+        $this->skipIfFixturesNotInstalled(self::FIXTURES.'/dir003/vendor');
         mirror(self::FIXTURES.'/dir003', $this->tmp);
 
         $composerAutoloaderName = self::COMPOSER_AUTOLOADER_NAME;
@@ -418,6 +421,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
         string $prefix,
         string $expectedAutoloadContents,
     ): void {
+        $this->skipIfFixturesNotInstalled(self::FIXTURES.'/dir002/vendor');
         mirror(self::FIXTURES.'/dir002', $this->tmp);
 
         ComposerOrchestrator::dumpAutoload($symbolsRegistry, $prefix, false);
@@ -438,17 +442,22 @@ class ComposerOrchestratorTest extends FileSystemTestCase
             'vendor/beberlei/assert/lib/Assert/LazyAssertionException.php',
             'vendor/beberlei/assert/LICENSE',
             'vendor/composer/autoload_classmap.php',
+            'vendor/composer/autoload_files.php',
             'vendor/composer/autoload_namespaces.php',
             'vendor/composer/autoload_psr4.php',
             'vendor/composer/autoload_real.php',
             'vendor/composer/autoload_static.php',
             'vendor/composer/ClassLoader.php',
+            'vendor/composer/installed.json',
+            'vendor/composer/installed.php',
+            'vendor/composer/InstalledVersions.php',
             'vendor/composer/LICENSE',
+            'vendor/composer/platform_check.php',
         ];
 
         $actualPaths = $this->retrievePaths();
 
-        $this->assertSame($expectedPaths, $actualPaths);
+        $this->assertEqualsCanonicalizing($expectedPaths, $actualPaths);
 
         $this->assertSame(
             $expectedAutoloadContents,
@@ -469,6 +478,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
                 $baseDir = dirname($vendorDir);
 
                 return array(
+                    'Assert\\' => array($vendorDir . '/beberlei/assert/lib/Assert'),
                 );
 
                 PHP
@@ -880,5 +890,12 @@ class ComposerOrchestratorTest extends FileSystemTestCase
         $finder = Finder::create()->files()->in($this->tmp);
 
         return $this->normalizePaths(iterator_to_array($finder, false));
+    }
+
+    private function skipIfFixturesNotInstalled(string $path): void
+    {
+        if (!file_exists($path)) {
+            $this->markTestSkipped('The fixtures were not installed. Run `$ make test_unit` in order to set them all up.');
+        }
     }
 }

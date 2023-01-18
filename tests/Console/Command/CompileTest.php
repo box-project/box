@@ -86,6 +86,7 @@ class CompileTest extends FileSystemTestCase
     use RequiresPharReadonlyOff;
 
     private const FIXTURES_DIR = __DIR__.'/../../../fixtures/build';
+    private const DEFAULT_STUB_PATH = __DIR__.'/../../../dist/default_stub.php';
 
     protected CommandTester $commandTester;
     protected Command $command;
@@ -825,7 +826,7 @@ class CompileTest extends FileSystemTestCase
     public function test_it_can_build_a_phar_file_in_verbose_mode(): void
     {
         if (extension_loaded('xdebug')) {
-            $this->markTestSkipped('Skipping this test since xdebug changes the Composer output');
+            $this->markTestSkipped('Skipping this test since xdebug changes the Composer output.');
         }
 
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
@@ -2385,6 +2386,7 @@ class CompileTest extends FileSystemTestCase
      */
     public function test_it_configures_the_phar_alias(bool $stub): void
     {
+        $this->skipIfDefaultStubNotFound();
         mirror(self::FIXTURES_DIR.'/dir008', $this->tmp);
 
         dump_file(
@@ -2427,7 +2429,7 @@ class CompileTest extends FileSystemTestCase
 
         // Check the stub content
         $actualStub = self::normalizeStub($phar->getStub());
-        $defaultStub = self::normalizeStub(file_get_contents(self::FIXTURES_DIR.'/../default_stub.php'));
+        $defaultStub = self::normalizeStub(file_get_contents(self::FIXTURES_DIR.'/../../dist/default_stub.php'));
 
         if ($stub) {
             $this->assertSame($phar->getPath(), $phar->getAlias());
@@ -3038,7 +3040,7 @@ class CompileTest extends FileSystemTestCase
             );
 
             $output = preg_replace(
-                '/\/\/ Memory usage: \d+\.\d{2}MB \(peak: \d+\.\d{2}MB\), time: .*?sec/',
+                '/\/\/ Memory usage: \d+\.\d{2}MB \(peak: \d+\.\d{2}MB\), time: .*?secs?/',
                 '// Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s',
                 $output,
             );
@@ -3133,7 +3135,7 @@ class CompileTest extends FileSystemTestCase
     /**
      * @param callable(string):string $extraNormalizers
      */
-    public function assertSameOutput(
+    private function assertSameOutput(
         string $expectedOutput,
         int $expectedStatusCode,
         callable ...$extraNormalizers,
@@ -3146,5 +3148,12 @@ class CompileTest extends FileSystemTestCase
             $this->createCompilerDisplayNormalizer(),
             ...$extraNormalizers,
         );
+    }
+
+    private function skipIfDefaultStubNotFound(): void
+    {
+        if (!file_exists(self::DEFAULT_STUB_PATH)) {
+            $this->markTestSkipped('The default stub file could not be found. Run the tests via the make commands or manually generate the stub file with `$ make generate_default_stub`.');
+        }
     }
 }

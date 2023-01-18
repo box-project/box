@@ -17,7 +17,7 @@ $phar = new Phar('tmp.phar');
 $phar->setDefaultStub();
 
 file_put_contents(
-    __DIR__.'/../fixtures/default_stub.php',
+    __DIR__.'/../dist/default_stub.php',
     $phar->getStub()
 );
 

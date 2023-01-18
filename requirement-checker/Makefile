@@ -126,7 +126,7 @@ composer_normalize_lint: composer.json vendor
 
 .PHONY: php_cs_fixer
 php_cs_fixer: $(PHP_CS_FIXER_BIN)
-	$(PHP_CS_FIXER) fix --verbose
+	$(PHP_CS_FIXER) fix --ansi --verbose
 
 .PHONY: php_cs_fixer_lint
 php_cs_fixer_lint: $(PHP_CS_FIXER_BIN)
