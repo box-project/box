@@ -106,6 +106,7 @@ clean:
 		site \
 		website \
 		|| true
+	$(MAKE) dist
 
 
 .PHONY: compile
