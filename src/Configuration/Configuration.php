@@ -394,38 +394,38 @@ final class Configuration
     }
 
     /**
-     * @param string        $basePath              Utility to private the base path used and be able to retrieve a
-     *                                             path relative to it (the base path)
-     * @param array         $composerJson          The first element is the path to the `composer.json` file as a
-     *                                             string and the second element its decoded contents as an
-     *                                             associative array.
-     * @param array         $composerLock          The first element is the path to the `composer.lock` file as a
-     *                                             string and the second element its decoded contents as an
-     *                                             associative array.
-     * @param SplFileInfo[] $files                 List of files
-     * @param SplFileInfo[] $binaryFiles           List of binary files
-     * @param bool          $dumpAutoload          Whether the Composer autoloader should be dumped
-     * @param bool          $excludeComposerFiles  Whether the Composer files composer.json, composer.lock and
-     *                                             installed.json should be removed from the PHAR
-     * @param null|int      $compressionAlgorithm  Compression algorithm constant value. See the \Phar class constants
-     * @param null|int      $fileMode              File mode in octal form
-     * @param string        $mainScriptPath        The main script file path
-     * @param string        $mainScriptContents    The processed content of the main script file
-     * @param MapFile       $fileMapper            Utility to map the files from outside and inside the PHAR
-     * @param mixed         $metadata              The PHAR Metadata
-     * @param bool          $promptForPrivateKey   If the user should be prompted for the private key passphrase
-     * @param array         $processedReplacements The processed list of replacement placeholders and their values
-     * @param null|string   $shebang               The shebang line
-     * @param int           $signingAlgorithm      The PHAR siging algorithm. See \Phar constants
-     * @param null|string   $stubBannerContents    The stub banner comment
-     * @param null|string   $stubBannerPath        The path to the stub banner comment file
-     * @param null|string   $stubPath              The PHAR stub file path
-     * @param bool          $isInterceptFileFuncs  Whether Phar::interceptFileFuncs() should be used
-     * @param bool          $isStubGenerated       Whether if the PHAR stub should be generated
-     * @param bool          $checkRequirements     Whether the PHAR will check the application requirements before
-     *                                             running
-     * @param string[]      $warnings
-     * @param string[]      $recommendations
+     * @param string                $basePath              Utility to private the base path used and be able to retrieve a
+     *                                                     path relative to it (the base path)
+     * @param array                 $composerJson          The first element is the path to the `composer.json` file as a
+     *                                                     string and the second element its decoded contents as an
+     *                                                     associative array.
+     * @param array                 $composerLock          The first element is the path to the `composer.lock` file as a
+     *                                                     string and the second element its decoded contents as an
+     *                                                     associative array.
+     * @param SplFileInfo[]         $files                 List of files
+     * @param SplFileInfo[]         $binaryFiles           List of binary files
+     * @param bool                  $dumpAutoload          Whether the Composer autoloader should be dumped
+     * @param bool                  $excludeComposerFiles  Whether the Composer files composer.json, composer.lock and
+     *                                                     installed.json should be removed from the PHAR
+     * @param null|int              $compressionAlgorithm  Compression algorithm constant value. See the \Phar class constants
+     * @param null|int              $fileMode              File mode in octal form
+     * @param string                $mainScriptPath        The main script file path
+     * @param string                $mainScriptContents    The processed content of the main script file
+     * @param MapFile               $fileMapper            Utility to map the files from outside and inside the PHAR
+     * @param mixed                 $metadata              The PHAR Metadata
+     * @param bool                  $promptForPrivateKey   If the user should be prompted for the private key passphrase
+     * @param array                 $processedReplacements The processed list of replacement placeholders and their values
+     * @param null|non-empty-string $shebang               The shebang line
+     * @param int                   $signingAlgorithm      The PHAR siging algorithm. See \Phar constants
+     * @param null|string           $stubBannerContents    The stub banner comment
+     * @param null|string           $stubBannerPath        The path to the stub banner comment file
+     * @param null|string           $stubPath              The PHAR stub file path
+     * @param bool                  $isInterceptFileFuncs  Whether Phar::interceptFileFuncs() should be used
+     * @param bool                  $isStubGenerated       Whether if the PHAR stub should be generated
+     * @param bool                  $checkRequirements     Whether the PHAR will check the application requirements before
+     *                                                     running
+     * @param string[]              $warnings
+     * @param string[]              $recommendations
      */
     private function __construct(
         private ?string $file,
@@ -2306,6 +2306,9 @@ final class Configuration
         return self::retrievePlaceholder($raw, $logger, self::REPLACEMENT_SIGIL_KEY) ?? self::DEFAULT_REPLACEMENT_SIGIL;
     }
 
+    /**
+     * @return null|non-empty-string
+     */
     private static function retrieveShebang(stdClass $raw, bool $stubIsGenerated, ConfigurationLogger $logger): ?string
     {
         self::checkIfDefaultValue($logger, $raw, self::SHEBANG_KEY, self::DEFAULT_SHEBANG);

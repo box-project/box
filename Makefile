@@ -18,6 +18,8 @@ SCOPED_BOX_BIN = bin/box.phar
 SCOPED_BOX = $(SCOPED_BOX_BIN)
 SCOPED_BOX_DEPS = bin/box bin/box.bat $(shell find src res) box.json.dist scoper.inc.php vendor
 
+DEFAULT_STUB = dist/default_stub.php
+
 COVERAGE_DIR = dist/coverage
 COVERAGE_XML_DIR = $(COVERAGE_DIR)/coverage-xml
 COVERAGE_JUNIT = $(COVERAGE_DIR)/phpunit.junit.xml
@@ -25,7 +27,7 @@ COVERAGE_HTML_DIR = $(COVERAGE_DIR)/html
 
 PHPUNIT_BIN = vendor/bin/phpunit
 PHPUNIT = $(PHPUNIT_BIN)
-PHPUNIT_TEST_SRC = fixtures/default_stub.php $(REQUIREMENT_CHECKER_EXTRACT) fixtures/composer-dump/dir001/vendor fixtures/composer-dump/dir003/vendor
+PHPUNIT_TEST_SRC = $(DEFAULT_STUB) $(REQUIREMENT_CHECKER_EXTRACT) fixtures/composer-dump/dir001/vendor fixtures/composer-dump/dir002/vendor fixtures/composer-dump/dir003/vendor
 PHPUNIT_COVERAGE_INFECTION = XDEBUG_MODE=coverage php -dphar.readonly=0 $(PHPUNIT) --colors=always --coverage-xml=$(COVERAGE_XML_DIR) --log-junit=$(COVERAGE_JUNIT) --testsuite=Tests
 PHPUNIT_COVERAGE_HTML = XDEBUG_MODE=coverage php -dphar.readonly=0 $(PHPUNIT) --colors=always --coverage-html=$(COVERAGE_HTML_DIR)
 
@@ -83,7 +85,7 @@ clean:
 		$(E2E_PHP_SETTINGS_CHECKER_DIR)/index.phar \
 		$(E2E_SYMFONY_DIR)/var \
 		$(E2E_SYMFONY_DIR)/.env.local.php \
-		fixtures/default_stub.php \
+		$(DEFAULT_STUB) \
 		fixtures/composer-dump/*/vendor \
 		 || true
 	@# Obsolete entries; Only relevant to someone who still has old artifacts locally
@@ -91,6 +93,7 @@ clean:
 		.php-cs-fixer.cache \
 		.phpunit.result.cache \
 		box \
+		fixtures/default_stub.php \
 		fixtures/check-requirements \
 		fixtures/build/*/index.phar \
 		$(E2E_PHP_SETTINGS_CHECKER_DIR)/actual-output \
@@ -103,6 +106,7 @@ clean:
 		site \
 		website \
 		|| true
+	$(MAKE) dist
 
 
 .PHONY: compile
@@ -124,7 +128,15 @@ dump_requirement_checker:
 
 .PHONY: autoreview
 autoreview: 		 ## AutoReview checks
-autoreview: cs_lint phpunit_autoreview
+autoreview: cs_lint composer_validate box_validate phpunit_autoreview
+
+.PHONY: composer_validate
+composer_validate:
+	composer validate --strict --ansi
+
+.PHONY: box_validate
+box_validate: $(BOX_BIN)
+	$(BOX) validate --ansi
 
 .PHONY: phpunit_autoreview
 phpunit_autoreview: $(PHPUNIT_BIN) vendor
@@ -160,7 +172,7 @@ requirement_checker_cs_lint:
 
 .PHONY: php_cs_fixer
 php_cs_fixer: $(PHP_CS_FIXER_BIN) dist
-	$(PHP_CS_FIXER) fix
+	$(PHP_CS_FIXER) fix --ansi --verbose
 
 .PHONY: php_cs_fixer_lint
 php_cs_fixer_lint: $(PHP_CS_FIXER_BIN) dist
@@ -202,6 +214,10 @@ phpunit_phar_readonly: $(PHPUNIT_BIN) $(PHPUNIT_TEST_SRC)
 .PHONY: phpunit_phar_writeable
 phpunit_phar_writeable: $(PHPUNIT_BIN) $(PHPUNIT_TEST_SRC)
 	php -dphar.readonly=1 $(PHPUNIT) --testsuite=Tests --colors=always
+
+.PHONY: phpunit
+phpunit: $(PHPUNIT_BIN) $(PHPUNIT_TEST_SRC)
+	$(PHPUNIT) --testsuite=Tests --colors=always
 
 .PHONY: phpunit_coverage_html
 phpunit_coverage_html:      ## Runs PHPUnit with code coverage with HTML report
@@ -327,15 +343,15 @@ vendor-bin/infection/composer.lock: vendor-bin/infection/composer.json
 	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer bin infection update --lock && touch -c $(@)"
 
-$(COVERAGE_XML_DIR): $(PHPUNIT_BIN) dist $(PHPUNIT_TEST_SRC) $(INFECTION_SRC)
-	$(PHPUNIT_COVERAGE_INFECTION)
-	touch -c $@
-	touch -c $(COVERAGE_JUNIT)
+$(COVERAGE_XML_DIR): $(PHPUNIT_BIN) $(PHPUNIT_TEST_SRC) $(INFECTION_SRC)
+	@# Do not include dist in the pre-requisite: we do want it to exist but its timestamp should not be tracked
+	$(MAKE) dist
+	$(MAKE) phpunit_coverage_infection
 
-$(COVERAGE_JUNIT): $(PHPUNIT_BIN) dist $(PHPUNIT_TEST_SRC) $(INFECTION_SRC)
-	$(PHPUNIT_COVERAGE_INFECTION)
-	touch -c $@
-	touch -c $(COVERAGE_XML_DIR)
+$(COVERAGE_JUNIT): $(PHPUNIT_BIN) $(PHPUNIT_TEST_SRC) $(INFECTION_SRC)
+	@# Do not include dist in the pre-requisite: we do want it to exist but its timestamp should not be tracked
+	$(MAKE) dist
+	$(MAKE) phpunit_coverage_infection
 
 fixtures/composer-dump/dir001/vendor: fixtures/composer-dump/dir001/composer.lock
 	composer install --ansi --working-dir=fixtures/composer-dump/dir001
@@ -344,6 +360,13 @@ fixtures/composer-dump/dir001/composer.lock: fixtures/composer-dump/dir001/compo
 	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer update --lock --working-dir=fixtures/composer-dump/dir001 && touch -c $(@)"
 
+fixtures/composer-dump/dir002/vendor: fixtures/composer-dump/dir002/composer.lock
+	composer install --ansi --working-dir=fixtures/composer-dump/dir002
+	touch -c $@
+fixtures/composer-dump/dir002/composer.lock: fixtures/composer-dump/dir002/composer.json
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
+	@echo "$$ composer update --lock --working-dir=fixtures/composer-dump/dir002 && touch -c $(@)"
+
 fixtures/composer-dump/dir003/vendor: fixtures/composer-dump/dir003/composer.lock
 	composer install --ansi --working-dir=fixtures/composer-dump/dir003
 	touch -c $@
@@ -351,9 +374,12 @@ fixtures/composer-dump/dir003/composer.lock: fixtures/composer-dump/dir003/compo
 	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer update --lock --working-dir=fixtures/composer-dump/dir003 && touch -c $(@)"
 
-.PHONY: fixtures/default_stub.php
-fixtures/default_stub.php:
+.PHONY: generate_default_stub
+generate_default_stub: $(DEFAULT_STUB)
+
+$(DEFAULT_STUB): bin/generate_default_stub
 	php -dphar.readonly=0 bin/generate_default_stub
+	touch -c $@
 
 $(REQUIREMENT_CHECKER_EXTRACT):
 	cd requirement-checker; $(MAKE) --file=Makefile _dump

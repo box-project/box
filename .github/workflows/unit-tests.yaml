@@ -10,7 +10,7 @@ on:
 jobs:
     unit-tests:
         runs-on: ubuntu-latest
-        name: Unit-Tests (PHP ${{ matrix.php.version }}, ${{ matrix.php.dependency }}, ${{ matrix.tools }})
+        name: Unit-Tests (PHP ${{ matrix.php.version }}, ${{ matrix.php.dependency }}, ${{ matrix.tools }}) - PHAR ${{ matrix.phar-readonly && 'readonly' || 'writeable' }}"
         strategy:
             fail-fast: false
             matrix:
@@ -28,6 +28,7 @@ jobs:
                 tools:
                     # TODO: add more composer versions
                     - composer
+                phar-readonly: [ true, false ]
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3
@@ -38,7 +39,7 @@ jobs:
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: ${{ matrix.php.version }}
-                    ini-values: phar.readonly=0, display_errors=On, error_reporting=-1
+                    ini-values: ${{ matrix.phar-readonly && 'phar.readonly=1' || 'phar.readonly=0' }}, display_errors=On, error_reporting=-1
                     tools: ${{ matrix.tools }}
                     coverage: none
                     extensions: ctype, iconv, xml
@@ -52,12 +53,7 @@ jobs:
             -   name: Ensure that the make target is up to date
                 run: make vendor_install
 
-            # TODO: move this into a dedicated build
-            -   name: Validate box config
-                run: bin/box validate --ansi
-
-            -   run: make phpunit_phar_readonly
-            -   run: make phpunit_phar_writeable
+            -   run: make phpunit
 
     infection:
         runs-on: ubuntu-latest
@@ -103,9 +99,9 @@ jobs:
                 run: make infection_install
 
             -   name: Run tests with coverage
-                run: make phpunit_coverage_infection
+                run: make phpunit_coverage_infection --debug
 
-            -   run: make _infection_ci
+            -   run: make _infection_ci --debug
 
     # This is a "trick", a meta task which does not change, and we can use in
     # the protected branch rules as opposed to the tests one above which
