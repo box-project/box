@@ -25,7 +25,8 @@ use const PHP_EOL;
 use const PHP_SAPI;
 use RuntimeException;
 
-if (false === in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
+// See https://github.com/easysoft/phpmicro for the micro SAPI.
+if (false === in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed', 'micro'], true)) {
     echo PHP_EOL.'Box may only be invoked from a command line, got "'.PHP_SAPI.'"'.PHP_EOL;
 
     exit(1);
