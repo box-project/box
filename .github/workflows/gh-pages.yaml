@@ -45,8 +45,10 @@ jobs:
             -   name: Rebuild website
                 run: make _website_build
 
+            -   name: Correct the source path
+                run: mv dist/website site
+
             -   name: Deploy
                 uses: peaceiris/actions-gh-pages@v3
                 with:
                     github_token: ${{ secrets.GITHUB_TOKEN }}
-                    publish_dir: dist/website
