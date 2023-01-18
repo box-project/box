@@ -1,0 +1,21 @@
+.md-banner {
+    text-align: center;
+}
+
+.md-banner a,
+.md-banner a:focus {
+    color: white;
+}
+
+.md-banner a:hover {
+    color: hotpink;
+}
+
+.md-banner strong {
+    white-space: nowrap;
+}
+
+.md-banner .heart {
+    margin-left: 0.2em;
+    color: deeppink;
+}
