@@ -1667,10 +1667,10 @@ class BoxTest extends FileSystemTestCase
         );
 
         $this->box->getPhar()->setStub(
-            StubGenerator::create()
-                ->index('main.php')
-                ->checkRequirements(false)
-                ->generateStub(),
+            StubGenerator::generateStub(
+                index: 'main.php',
+                checkRequirements: false,
+            ),
         );
     }
 }
