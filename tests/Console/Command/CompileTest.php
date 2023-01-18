@@ -826,7 +826,7 @@ class CompileTest extends FileSystemTestCase
     public function test_it_can_build_a_phar_file_in_verbose_mode(): void
     {
         if (extension_loaded('xdebug')) {
-            $this->markTestSkipped('Skipping this test since xdebug changes the Composer output');
+            $this->markTestSkipped('Skipping this test since xdebug changes the Composer output.');
         }
 
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
