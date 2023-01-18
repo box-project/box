@@ -3040,7 +3040,7 @@ class CompileTest extends FileSystemTestCase
             );
 
             $output = preg_replace(
-                '/\/\/ Memory usage: \d+\.\d{2}MB \(peak: \d+\.\d{2}MB\), time: .*?sec/',
+                '/\/\/ Memory usage: \d+\.\d{2}MB \(peak: \d+\.\d{2}MB\), time: .*?secs?/',
                 '// Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s',
                 $output,
             );
