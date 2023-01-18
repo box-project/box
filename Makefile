@@ -106,6 +106,7 @@ clean:
 		site \
 		website \
 		|| true
+	$(MAKE) dist
 
 
 .PHONY: compile
@@ -213,6 +214,10 @@ phpunit_phar_readonly: $(PHPUNIT_BIN) $(PHPUNIT_TEST_SRC)
 .PHONY: phpunit_phar_writeable
 phpunit_phar_writeable: $(PHPUNIT_BIN) $(PHPUNIT_TEST_SRC)
 	php -dphar.readonly=1 $(PHPUNIT) --testsuite=Tests --colors=always
+
+.PHONY: phpunit
+phpunit: $(PHPUNIT_BIN) $(PHPUNIT_TEST_SRC)
+	$(PHPUNIT) --testsuite=Tests --colors=always
 
 .PHONY: phpunit_coverage_html
 phpunit_coverage_html:      ## Runs PHPUnit with code coverage with HTML report
