@@ -7,6 +7,7 @@ on:
         paths:
             - doc/**
             - mkdocs.yaml
+            - .github/workflows/gh-pages.yaml
 
 jobs:
     deploy:
