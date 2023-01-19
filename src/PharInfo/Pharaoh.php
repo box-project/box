@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PharInfo;
 
+use ParagonIE\Pharaoh\Pharaoh as ParagoniePharaoh;
 use function basename;
 use function KevinGH\Box\FileSystem\remove;
-use ParagonIE\Pharaoh\Pharaoh as ParagoniePharaoh;
 
 final class Pharaoh extends ParagoniePharaoh
 {

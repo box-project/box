@@ -20,6 +20,8 @@ use Fidry\Makefile\Test\BaseMakefileTestCase;
 
 /**
  * @coversNothing
+ *
+ * @internal
  */
 final class E2EMakefileTest extends BaseMakefileTestCase
 {

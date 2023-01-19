@@ -19,6 +19,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \KevinGH\Box\Configuration\ConfigurationLogger
+ *
+ * @internal
  */
 class ConfigurationLoggerTest extends TestCase
 {
@@ -31,8 +33,8 @@ class ConfigurationLoggerTest extends TestCase
 
     public function test_it_has_no_messages_by_default(): void
     {
-        $this->assertSame([], $this->logs->getRecommendations());
-        $this->assertSame([], $this->logs->getWarnings());
+        self::assertSame([], $this->logs->getRecommendations());
+        self::assertSame([], $this->logs->getWarnings());
     }
 
     /**
@@ -43,9 +45,9 @@ class ConfigurationLoggerTest extends TestCase
         try {
             $this->logs->addRecommendation($message);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'Expected to have a message but a blank string was given instead.',
                 $exception->getMessage(),
             );
@@ -54,9 +56,9 @@ class ConfigurationLoggerTest extends TestCase
         try {
             $this->logs->addWarning($message);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'Expected to have a message but a blank string was given instead.',
                 $exception->getMessage(),
             );
@@ -71,7 +73,7 @@ class ConfigurationLoggerTest extends TestCase
         $this->logs->addWarning('First warning');
         $this->logs->addWarning('Second warning');
 
-        $this->assertSame(
+        self::assertSame(
             [
                 'First recommendation',
                 'Second recommendation',
@@ -79,7 +81,7 @@ class ConfigurationLoggerTest extends TestCase
             $this->logs->getRecommendations(),
         );
 
-        $this->assertSame(
+        self::assertSame(
             [
                 'First warning',
                 'Second warning',
@@ -98,7 +100,7 @@ class ConfigurationLoggerTest extends TestCase
         $this->logs->addWarning('First warning');
         $this->logs->addWarning('Second warning');
 
-        $this->assertSame(
+        self::assertSame(
             [
                 'First recommendation',
                 'Second recommendation',
@@ -106,7 +108,7 @@ class ConfigurationLoggerTest extends TestCase
             $this->logs->getRecommendations(),
         );
 
-        $this->assertSame(
+        self::assertSame(
             [
                 'First warning',
                 'Second warning',

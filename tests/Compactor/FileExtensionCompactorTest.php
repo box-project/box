@@ -19,6 +19,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \KevinGH\Box\Compactor\FileExtensionCompactor
+ *
+ * @internal
  */
 class FileExtensionCompactorTest extends TestCase
 {
@@ -38,7 +40,7 @@ class FileExtensionCompactorTest extends TestCase
 
         $actual = $compactor->compact($file, $contents);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     public function test_it_supports_files_with_the_given_extensions(): void
@@ -62,6 +64,6 @@ class FileExtensionCompactorTest extends TestCase
 
         $actual = $compactor->compact($file, $contents);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 }

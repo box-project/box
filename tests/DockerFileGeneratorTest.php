@@ -19,6 +19,8 @@ use UnexpectedValueException;
 
 /**
  * @covers \KevinGH\Box\DockerFileGenerator
+ *
+ * @internal
  */
 class DockerFileGeneratorTest extends TestCase
 {
@@ -33,7 +35,7 @@ class DockerFileGeneratorTest extends TestCase
     ): void {
         $actual = (new DockerFileGenerator($image, $extensions, $sourcePhar))->generateStub();
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     /**
@@ -46,7 +48,7 @@ class DockerFileGeneratorTest extends TestCase
     ): void {
         $actual = DockerFileGenerator::createForRequirements($requirements, $sourcePhar)->generateStub();
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     public function test_throws_an_error_if_cannot_find_a_suitable_php_image(): void
@@ -54,17 +56,16 @@ class DockerFileGeneratorTest extends TestCase
         try {
             DockerFileGenerator::createForRequirements(
                 [
-                        [
-                            'type' => 'php',
-                            'condition' => '^5.3',
-                        ],
+                    [
+                        'type' => 'php',
+                        'condition' => '^5.3',
                     ],
+                ],
                 'path/to/phar',
             )
-                ->generateStub()
-            ;
+                ->generateStub();
         } catch (UnexpectedValueException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'Could not find a suitable Docker base image for the PHP constraint(s) "^5.3". Images available: "8.1-cli-alpine", "8.0-cli-alpine", "7.4-cli-alpine", "7.3-cli-alpine", "7.2-cli-alpine", "7.1-cli-alpine", "7-cli-alpine"',
                 $exception->getMessage(),
             );

@@ -14,13 +14,13 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use function chdir;
 use Fidry\Console\Input\IO;
-use function getcwd;
-use function sprintf;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputOption;
 use Webmozart\Assert\Assert;
+use function chdir;
+use function getcwd;
+use function sprintf;
 
 /**
  * @private

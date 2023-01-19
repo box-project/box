@@ -15,20 +15,22 @@ declare(strict_types=1);
 namespace KevinGH\Box\Composer;
 
 use Fidry\Console\DisplayNormalizer;
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
+use KevinGH\Box\Test\FileSystemTestCase;
+use PhpParser\Node\Name\FullyQualified;
+use RuntimeException;
+use Symfony\Component\Finder\Finder;
 use function file_exists;
 use function file_get_contents;
-use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function iterator_to_array;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\mirror;
-use KevinGH\Box\Test\FileSystemTestCase;
-use PhpParser\Node\Name\FullyQualified;
 use function preg_replace;
-use RuntimeException;
-use Symfony\Component\Finder\Finder;
 
 /**
  * @covers \KevinGH\Box\Composer\ComposerOrchestrator
+ *
+ * @internal
  */
 class ComposerOrchestratorTest extends FileSystemTestCase
 {
@@ -61,7 +63,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
 
         $actualPaths = $this->retrievePaths();
 
-        $this->assertSame($expectedPaths, $actualPaths);
+        self::assertSame($expectedPaths, $actualPaths);
 
         $actualAutoloadContents = preg_replace(
             '/ComposerAutoloaderInit[a-z\d]{32}/',
@@ -70,9 +72,9 @@ class ComposerOrchestratorTest extends FileSystemTestCase
         );
         $actualAutoloadContents = DisplayNormalizer::removeTrailingSpaces($actualAutoloadContents);
 
-        $this->assertSame($expectedAutoloadContents, $actualAutoloadContents);
+        self::assertSame($expectedAutoloadContents, $actualAutoloadContents);
 
-        $this->assertSame(
+        self::assertSame(
             <<<'PHP'
                 <?php
 
@@ -84,8 +86,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
                 return array(
                 );
 
-                PHP
-            ,
+                PHP,
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
                 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
@@ -108,16 +109,16 @@ class ComposerOrchestratorTest extends FileSystemTestCase
         try {
             ComposerOrchestrator::dumpAutoload($symbolsRegistry, $prefix, false);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'Could not dump the autoloader.',
                 $exception->getMessage(),
             );
-            $this->assertSame(0, $exception->getCode());
-            $this->assertNotNull($exception->getPrevious());
+            self::assertSame(0, $exception->getCode());
+            self::assertNotNull($exception->getPrevious());
 
-            $this->assertStringContainsString(
+            self::assertStringContainsString(
                 '"./composer.json" does not contain valid JSON',
                 $exception->getPrevious()->getMessage(),
             );
@@ -144,9 +145,9 @@ class ComposerOrchestratorTest extends FileSystemTestCase
 
         $actualPaths = $this->retrievePaths();
 
-        $this->assertSame($expectedPaths, $actualPaths);
+        self::assertSame($expectedPaths, $actualPaths);
 
-        $this->assertSame(
+        self::assertSame(
             <<<'PHP'
                 <?php
 
@@ -174,8 +175,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
 
                 return ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05::getLoader();
 
-                PHP
-            ,
+                PHP,
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
                 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
@@ -183,7 +183,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
             ),
         );
 
-        $this->assertSame(
+        self::assertSame(
             <<<'PHP'
                 <?php
 
@@ -195,8 +195,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
                 return array(
                 );
 
-                PHP
-            ,
+                PHP,
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
                 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
@@ -215,16 +214,16 @@ class ComposerOrchestratorTest extends FileSystemTestCase
         try {
             ComposerOrchestrator::dumpAutoload($symbolsRegistry, $prefix, false);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'Could not dump the autoloader.',
                 $exception->getMessage(),
             );
-            $this->assertSame(0, $exception->getCode());
-            $this->assertNotNull($exception->getPrevious());
+            self::assertSame(0, $exception->getCode());
+            self::assertNotNull($exception->getPrevious());
 
-            $this->assertStringContainsString(
+            self::assertStringContainsString(
                 'Composer could not find a composer.json file in',
                 $exception->getPrevious()->getMessage(),
             );
@@ -275,9 +274,9 @@ class ComposerOrchestratorTest extends FileSystemTestCase
 
         $actualPaths = $this->retrievePaths();
 
-        $this->assertSame($expectedPaths, $actualPaths);
+        self::assertSame($expectedPaths, $actualPaths);
 
-        $this->assertSame(
+        self::assertSame(
             $expectedAutoloadContents,
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
@@ -286,7 +285,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
             ),
         );
 
-        $this->assertSame(
+        self::assertSame(
             <<<'PHP'
                 <?php
 
@@ -299,8 +298,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
                     'Assert\\' => array($vendorDir . '/beberlei/assert/lib/Assert'),
                 );
 
-                PHP
-            ,
+                PHP,
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
                 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
@@ -341,7 +339,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
 
             require_once __DIR__ . '/composer/autoload_real.php';
 
-            return $composerAutoloaderName::getLoader();
+            return {$composerAutoloaderName}::getLoader();
 
             PHP;
 
@@ -380,9 +378,9 @@ class ComposerOrchestratorTest extends FileSystemTestCase
 
         $actualPaths = $this->retrievePaths();
 
-        $this->assertSame($expectedPaths, $actualPaths);
+        self::assertSame($expectedPaths, $actualPaths);
 
-        $this->assertSame(
+        self::assertSame(
             $expectedAutoloadContents,
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
@@ -391,7 +389,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
             ),
         );
 
-        $this->assertSame(
+        self::assertSame(
             <<<'PHP'
                 <?php
 
@@ -403,8 +401,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
                 return array(
                 );
 
-                PHP
-            ,
+                PHP,
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
                 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
@@ -457,9 +454,9 @@ class ComposerOrchestratorTest extends FileSystemTestCase
 
         $actualPaths = $this->retrievePaths();
 
-        $this->assertEqualsCanonicalizing($expectedPaths, $actualPaths);
+        self::assertEqualsCanonicalizing($expectedPaths, $actualPaths);
 
-        $this->assertSame(
+        self::assertSame(
             $expectedAutoloadContents,
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
@@ -468,7 +465,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
             ),
         );
 
-        $this->assertSame(
+        self::assertSame(
             <<<'PHP'
                 <?php
 
@@ -481,8 +478,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
                     'Assert\\' => array($vendorDir . '/beberlei/assert/lib/Assert'),
                 );
 
-                PHP
-            ,
+                PHP,
             preg_replace(
                 '/ComposerAutoloaderInit[a-z\d]{32}/',
                 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05',
@@ -584,7 +580,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
                         spl_autoload_call(\$prefixed);
                     }
                 }
-                humbug_phpscoper_expose_class('Acme\Foo', '_Box\Acme\Foo');
+                humbug_phpscoper_expose_class('Acme\\Foo', '_Box\\Acme\\Foo');
 
                 return \$loader;
 
@@ -788,14 +784,14 @@ class ComposerOrchestratorTest extends FileSystemTestCase
                             spl_autoload_call(\$prefixed);
                         }
                     }
-                    humbug_phpscoper_expose_class('PHPUnit\TestCase', '_Box\PHPUnit\TestCase');
-                    humbug_phpscoper_expose_class('PHPUnit\Framework', '_Box\PHPUnit\Framework');
+                    humbug_phpscoper_expose_class('PHPUnit\\TestCase', '_Box\\PHPUnit\\TestCase');
+                    humbug_phpscoper_expose_class('PHPUnit\\Framework', '_Box\\PHPUnit\\Framework');
                 }
 
                 // Function aliases. For more information see:
                 // https://github.com/humbug/php-scoper/blob/master/docs/further-reading.md#function-aliases
                 namespace Acme {
-                    if (!function_exists('Acme\bar')) { function bar() { return \\_Box\\Acme\\bar(...func_get_args()); } }
+                    if (!function_exists('Acme\\bar')) { function bar() { return \\_Box\\Acme\\bar(...func_get_args()); } }
                 }
 
                 namespace {
@@ -887,7 +883,7 @@ class ComposerOrchestratorTest extends FileSystemTestCase
     private function skipIfFixturesNotInstalled(string $path): void
     {
         if (!file_exists($path)) {
-            $this->markTestSkipped('The fixtures were not installed. Run `$ make test_unit` in order to set them all up.');
+            self::markTestSkipped('The fixtures were not installed. Run `$ make test_unit` in order to set them all up.');
         }
     }
 }

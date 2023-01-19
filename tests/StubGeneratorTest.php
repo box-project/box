@@ -14,13 +14,15 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use function array_merge;
-use function array_values;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use function array_merge;
+use function array_values;
 
 /**
  * @covers \KevinGH\Box\StubGenerator
+ *
+ * @internal
  */
 class StubGeneratorTest extends TestCase
 {

@@ -25,6 +25,8 @@ use function realpath;
  *
  * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
  *                              can create undesirable side-effects.
+ *
+ * @internal
  */
 class GenerateDockerFileTest extends CommandTestCase
 {
@@ -64,7 +66,7 @@ class GenerateDockerFileTest extends CommandTestCase
 
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
-        $this->assertFileExists($this->tmp.'/Dockerfile');
+        self::assertFileExists($this->tmp.'/Dockerfile');
     }
 
     public function test_it_cannot_generate_a_dockerfile_for_a_phar_without_requirements(): void
@@ -86,7 +88,7 @@ class GenerateDockerFileTest extends CommandTestCase
 
         $this->assertSameOutput($expected, ExitCode::FAILURE);
 
-        $this->assertFileDoesNotExist($this->tmp.'/Dockerfile');
+        self::assertFileDoesNotExist($this->tmp.'/Dockerfile');
     }
 
     public function test_it_cannot_generate_a_dockerfile_for_a_corrupted_phar(): void

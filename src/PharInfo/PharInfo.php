@@ -14,14 +14,14 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PharInfo;
 
-use function array_flip;
-use function KevinGH\Box\get_phar_compression_algorithms;
-use function KevinGH\Box\unique_id;
 use Phar;
 use PharData;
 use PharFileInfo;
 use RecursiveIteratorIterator;
 use UnexpectedValueException;
+use function array_flip;
+use function KevinGH\Box\get_phar_compression_algorithms;
+use function KevinGH\Box\unique_id;
 
 final class PharInfo
 {
@@ -50,8 +50,7 @@ final class PharInfo
     {
         return
             $pharInfo->getCompressionCount() === $this->getCompressionCount()
-            && $pharInfo->getNormalizedMetadata() === $this->getNormalizedMetadata()
-        ;
+            && $pharInfo->getNormalizedMetadata() === $this->getNormalizedMetadata();
     }
 
     public function getCompressionCount(): array

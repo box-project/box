@@ -14,15 +14,19 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\FileSystem;
 
+use FilesystemIterator;
+use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
+use Symfony\Component\Filesystem\Path;
+use Traversable;
+use Webmozart\Assert\Assert;
 use function array_reverse;
 use function defined;
-use const DIRECTORY_SEPARATOR;
 use function error_get_last;
 use function escapeshellarg;
 use function exec;
 use function file_exists;
 use function file_get_contents;
-use FilesystemIterator;
 use function is_array;
 use function is_dir;
 use function is_link;
@@ -32,15 +36,9 @@ use function realpath;
 use function rmdir;
 use function sprintf;
 use function str_replace;
-use function strrpos;
-use function substr;
-use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
-use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
-use Traversable;
 use function unlink;
-use Webmozart\Assert\Assert;
+use const DIRECTORY_SEPARATOR;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -494,8 +492,8 @@ final class FileSystem extends SymfonyFilesystem
      */
     public function makeTmpDir(string $namespace, string $className): string
     {
-        if (false !== ($pos = strrpos($className, '\\'))) {
-            $shortClass = substr($className, $pos + 1);
+        if (false !== ($pos = mb_strrpos($className, '\\'))) {
+            $shortClass = mb_substr($className, $pos + 1);
         } else {
             $shortClass = $className;
         }
@@ -514,7 +512,7 @@ final class FileSystem extends SymfonyFilesystem
             $tmpDir = $this->escapePath($basePath.random_int(10000, 99999));
 
             try {
-                $this->mkdir($tmpDir, 0777);
+                $this->mkdir($tmpDir, 0o777);
 
                 $result = true;
             } catch (IOException) {

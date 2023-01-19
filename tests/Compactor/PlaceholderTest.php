@@ -18,6 +18,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \KevinGH\Box\Compactor\Placeholder
+ *
+ * @internal
  */
 class PlaceholderTest extends TestCase
 {
@@ -28,14 +30,14 @@ class PlaceholderTest extends TestCase
     {
         $actual = (new Placeholder($placeholders))->compact('random file', $contents);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     public function test_it_is_serializable(): void
     {
         $compactor = new Placeholder([]);
 
-        $this->assertEquals(
+        self::assertEquals(
             $compactor,
             unserialize(serialize($compactor)),
         );
@@ -71,8 +73,7 @@ class PlaceholderTest extends TestCase
                 @foo@foo@
                 purus augue a leo. Nulla auctor, augue ac ultricies imperdiet, erat purus interdum libero, eu condimentum tellus nulla
                 vel nisi.
-                EOF
-            ,
+                EOF,
             <<<'EOF'
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam at justo nec sem pretium blandit ut eu nulla. Phasellus
                 oof
@@ -87,8 +88,7 @@ class PlaceholderTest extends TestCase
                 ooffoo@
                 purus augue a leo. Nulla auctor, augue ac ultricies imperdiet, erat purus interdum libero, eu condimentum tellus nulla
                 vel nisi.
-                EOF
-            ,
+                EOF,
         ];
 
         yield [
@@ -111,8 +111,7 @@ class PlaceholderTest extends TestCase
                 _@_foo_@_foo_@_
                 purus augue a leo. Nulla auctor, augue ac ultricies imperdiet, erat purus interdum libero, eu condimentum tellus nulla
                 vel nisi.
-                EOF
-            ,
+                EOF,
             <<<'EOF'
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam at justo nec sem pretium blandit ut eu nulla. Phasellus
                 oof
@@ -127,8 +126,7 @@ class PlaceholderTest extends TestCase
                 ooffoo_@_
                 purus augue a leo. Nulla auctor, augue ac ultricies imperdiet, erat purus interdum libero, eu condimentum tellus nulla
                 vel nisi.
-                EOF
-            ,
+                EOF,
         ];
     }
 }
