@@ -48,7 +48,7 @@ jobs:
                     ini-values: ${{ matrix.phar-readonly && 'phar.readonly=1' || 'phar.readonly=0' }}, display_errors=On, error_reporting=-1
                     tools: ${{ matrix.tools }}
                     coverage: none
-                    extensions: ctype, iconv, xml${{ php-extra-extensions }}
+                    extensions: ctype, iconv, xml${{ matrix.php-extra-extensions }}
 
             -   name: Install Composer dependencies
                 uses: ramsey/composer-install@v2
