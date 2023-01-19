@@ -10,7 +10,7 @@ on:
 jobs:
     unit-tests:
         runs-on: ubuntu-latest
-        name: Unit-Tests (PHP ${{ matrix.php.version }}, ${{ matrix.php.dependency }}, ${{ matrix.tools }}) - PHAR ${{ matrix.phar-readonly && 'readonly' || 'writeable' }}
+        name: Unit-Tests (PHP ${{ matrix.php.version }}, ${{ matrix.php.dependency }}, ${{ matrix.tools }}) - PHAR ${{ matrix.phar-readonly && 'readonly' || 'writeable' }}${{ label }}
         strategy:
             fail-fast: false
             matrix:
@@ -30,8 +30,10 @@ jobs:
                     - composer
                 phar-readonly: [ true, false ]
                 php-extra-extensions: [ '' ]
+                label: [ '' ]
                 include:
-                    -   php:
+                    -   label: '; bz2 disabled'
+                        php:
                             version: '8.1'
                             dependency: locked
                             composer-options: ''
