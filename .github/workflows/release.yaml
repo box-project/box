@@ -86,3 +86,10 @@ jobs:
                     files: |
                         box.phar
                         box.phar.asc
+
+            -   name: Update Homebrew formula
+                uses: dawidd6/action-homebrew-bump-formula@v3
+                with:
+                    token: ${{ secrets.GITHUB_TOKEN }}
+                    tap: box-project/homebrew-box
+                    formula: humbug/box
