@@ -14,12 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Annotation;
 
-use function array_map;
-use function explode;
-use function implode;
 use phpDocumentor\Reflection\DocBlock\Tag;
 use phpDocumentor\Reflection\DocBlock\Tags\Formatter;
 use phpDocumentor\Reflection\DocBlock\Tags\Generic;
+use function array_map;
+use function explode;
+use function implode;
 
 final class CompactedFormatter implements Formatter
 {

@@ -18,6 +18,8 @@ use Fidry\Makefile\Test\BaseMakefileTestCase;
 
 /**
  * @coversNothing
+ *
+ * @internal
  */
 final class MakefileTest extends BaseMakefileTestCase
 {

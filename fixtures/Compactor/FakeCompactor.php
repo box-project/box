@@ -18,9 +18,6 @@ use KevinGH\Box\UnsupportedMethodCall;
 
 class FakeCompactor implements Compactor
 {
-    /**
-     * {@inheritdoc}
-     */
     public function compact(string $file, string $contents): string
     {
         throw UnsupportedMethodCall::forMethod(__CLASS__, __METHOD__);

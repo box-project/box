@@ -14,13 +14,15 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
-use function json_decode;
-use const JSON_THROW_ON_ERROR;
 use Phar;
 use PHPUnit\Framework\TestCase;
+use function json_decode;
+use const JSON_THROW_ON_ERROR;
 
 /**
  * @covers \KevinGH\Box\RequirementChecker\AppRequirementsFactory
+ *
+ * @internal
  */
 class AppRequirementsFactoryTest extends TestCase
 {
@@ -39,7 +41,7 @@ class AppRequirementsFactoryTest extends TestCase
             $compressionAlgorithm,
         );
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     public static function lockContentsProvider(): iterable
@@ -159,8 +161,7 @@ class AppRequirementsFactoryTest extends TestCase
                     },
                     "require-dev": []
                 }
-                JSON
-            ,
+                JSON,
             null,
             null,
             [
@@ -189,8 +190,7 @@ class AppRequirementsFactoryTest extends TestCase
                     },
                     "platform-dev": []
                 }
-                JSON
-            ,
+                JSON,
             null,
             [
                 [
@@ -218,8 +218,7 @@ class AppRequirementsFactoryTest extends TestCase
                     },
                     "platform-dev": []
                 }
-                JSON
-            ,
+                JSON,
             <<<'JSON'
                 {
                     "platform": {
@@ -228,8 +227,7 @@ class AppRequirementsFactoryTest extends TestCase
                     },
                     "platform-dev": []
                 }
-                JSON
-            ,
+                JSON,
             null,
             [
                 [
@@ -256,8 +254,7 @@ class AppRequirementsFactoryTest extends TestCase
                     },
                     "require-dev": []
                 }
-                JSON
-            ,
+                JSON,
             null,
             Phar::GZ,
             [
@@ -292,8 +289,7 @@ class AppRequirementsFactoryTest extends TestCase
                     },
                     "platform-dev": []
                 }
-                JSON
-            ,
+                JSON,
             Phar::GZ,
             [
                 [
@@ -326,8 +322,7 @@ class AppRequirementsFactoryTest extends TestCase
                     },
                     "require-dev": []
                 }
-                JSON
-            ,
+                JSON,
             <<<'JSON'
                 {
                     "platform": {
@@ -336,8 +331,7 @@ class AppRequirementsFactoryTest extends TestCase
                     },
                     "platform-dev": []
                 }
-                JSON
-            ,
+                JSON,
             Phar::GZ,
             [
                 [
@@ -370,8 +364,7 @@ class AppRequirementsFactoryTest extends TestCase
                         "ext-json": "*"
                     }
                 }
-                JSON
-            ,
+                JSON,
             null,
             null,
             [],
@@ -387,8 +380,7 @@ class AppRequirementsFactoryTest extends TestCase
                         "ext-json": "*"
                     }
                 }
-                JSON
-            ,
+                JSON,
             null,
             [],
         ];
@@ -402,8 +394,7 @@ class AppRequirementsFactoryTest extends TestCase
                         "ext-json": "*"
                     }
                 }
-                JSON
-            ,
+                JSON,
             <<<'JSON'
                 {
                     "platform": [],
@@ -412,8 +403,7 @@ class AppRequirementsFactoryTest extends TestCase
                         "ext-json": "*"
                     }
                 }
-                JSON
-            ,
+                JSON,
             null,
             [],
         ];
@@ -427,8 +417,7 @@ class AppRequirementsFactoryTest extends TestCase
                         "ext-json": "*"
                     }
                 }
-                JSON
-            ,
+                JSON,
             null,
             Phar::GZ,
             [
@@ -451,8 +440,7 @@ class AppRequirementsFactoryTest extends TestCase
                         "ext-json": "*"
                     }
                 }
-                JSON
-            ,
+                JSON,
             Phar::GZ,
             [
                 [
@@ -473,8 +461,7 @@ class AppRequirementsFactoryTest extends TestCase
                         "ext-json": "*"
                     }
                 }
-                JSON
-            ,
+                JSON,
             <<<'JSON'
                 {
                     "platform": [],
@@ -483,8 +470,7 @@ class AppRequirementsFactoryTest extends TestCase
                         "ext-json": "*"
                     }
                 }
-                JSON
-            ,
+                JSON,
             Phar::GZ,
             [
                 [
@@ -508,8 +494,7 @@ class AppRequirementsFactoryTest extends TestCase
                     },
                     "require-dev": []
                 }
-                JSON
-            ,
+                JSON,
             null,
             null,
             [
@@ -583,8 +568,7 @@ class AppRequirementsFactoryTest extends TestCase
                     ],
                     "platform-dev": []
                 }
-                JSON
-            ,
+                JSON,
             null,
             [
                 [
@@ -638,8 +622,7 @@ class AppRequirementsFactoryTest extends TestCase
                     },
                     "require-dev": []
                 }
-                JSON
-            ,
+                JSON,
             <<<'JSON'
                 {
                     "packages": [
@@ -675,8 +658,7 @@ class AppRequirementsFactoryTest extends TestCase
                     ],
                     "platform-dev": []
                 }
-                JSON
-            ,
+                JSON,
             null,
             [
                 [
@@ -727,8 +709,7 @@ class AppRequirementsFactoryTest extends TestCase
                         "php": ">=5.3"
                     }
                 }
-                JSON
-            ,
+                JSON,
             null,
             null,
             [],
@@ -763,8 +744,7 @@ class AppRequirementsFactoryTest extends TestCase
                         }
                     ]
                 }
-                JSON
-            ,
+                JSON,
             null,
             [],
         ];
@@ -778,8 +758,7 @@ class AppRequirementsFactoryTest extends TestCase
                         "php": ">=5.3"
                     }
                 }
-                JSON
-            ,
+                JSON,
             <<<'JSON'
                 {
                     "packages": [],
@@ -807,8 +786,7 @@ class AppRequirementsFactoryTest extends TestCase
                         }
                     ]
                 }
-                JSON
-            ,
+                JSON,
             null,
             [],
         ];
@@ -849,8 +827,7 @@ class AppRequirementsFactoryTest extends TestCase
                     },
                     "platform-dev": []
                 }
-                JSON
-            ,
+                JSON,
             null,
             [
                 [
@@ -911,8 +888,7 @@ class AppRequirementsFactoryTest extends TestCase
                         "symfony/polyfill-json": "^4.0"
                     }
                 }
-                JSON
-            ,
+                JSON,
             null,
             null,
             [
@@ -983,8 +959,7 @@ class AppRequirementsFactoryTest extends TestCase
                     },
                     "platform-dev": []
                 }
-                JSON
-            ,
+                JSON,
             null,
             [
                 [
@@ -1022,8 +997,7 @@ class AppRequirementsFactoryTest extends TestCase
                         "paragonie/sodium_compat": "^1.0"
                     }
                 }
-                JSON
-            ,
+                JSON,
             null,
             null,
             [],
@@ -1043,8 +1017,7 @@ class AppRequirementsFactoryTest extends TestCase
                         }
                     ]
                 }
-                JSON
-            ,
+                JSON,
             null,
             [],
         ];
@@ -1057,8 +1030,7 @@ class AppRequirementsFactoryTest extends TestCase
                         "phpseclib/mcrypt_compat": "^1.0"
                     }
                 }
-                JSON
-            ,
+                JSON,
             null,
             null,
             [],
@@ -1078,8 +1050,7 @@ class AppRequirementsFactoryTest extends TestCase
                         }
                     ]
                 }
-                JSON
-            ,
+                JSON,
             null,
             [],
         ];

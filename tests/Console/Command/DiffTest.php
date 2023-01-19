@@ -20,16 +20,18 @@ use Fidry\Console\ExitCode;
 use InvalidArgumentException;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
-use function ob_get_clean;
-use function ob_start;
-use const PHP_VERSION_ID;
-use function realpath;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use UnexpectedValueException;
+use function ob_get_clean;
+use function ob_start;
+use function realpath;
+use const PHP_VERSION_ID;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Diff
+ *
+ * @internal
  */
 class DiffTest extends CommandTestCase
 {
@@ -59,8 +61,8 @@ class DiffTest extends CommandTestCase
     ): void {
         $actualOutput = $executeCommand($this->commandTester);
 
-        $this->assertSame($expectedOutput, $actualOutput);
-        $this->assertSame($expectedStatusCode, $this->commandTester->getStatusCode());
+        self::assertSame($expectedOutput, $actualOutput);
+        self::assertSame($expectedStatusCode, $this->commandTester->getStatusCode());
     }
 
     public function test_it_displays_the_list_diff_of_two_phar_files_by_default(): void
@@ -107,10 +109,10 @@ class DiffTest extends CommandTestCase
         $actualOutput = $executeCommand($this->commandTester);
 
         if (null !== $expectedOutput) {
-            $this->assertSame($expectedOutput, $actualOutput);
+            self::assertSame($expectedOutput, $actualOutput);
         }
 
-        $this->assertSame($expectedStatusCode, $this->commandTester->getStatusCode());
+        self::assertSame($expectedStatusCode, $this->commandTester->getStatusCode());
     }
 
     /**
@@ -124,10 +126,10 @@ class DiffTest extends CommandTestCase
         $actualOutput = $executeCommand($this->commandTester);
 
         if (null !== $expectedOutput) {
-            $this->assertSame($expectedOutput, $actualOutput);
+            self::assertSame($expectedOutput, $actualOutput);
         }
 
-        $this->assertSame($expectedStatusCode, $this->commandTester->getStatusCode());
+        self::assertSame($expectedStatusCode, $this->commandTester->getStatusCode());
     }
 
     public function test_it_can_check_the_sum_of_two_phar_files(): void
@@ -188,9 +190,9 @@ class DiffTest extends CommandTestCase
                 ],
             );
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'The file "unknown" does not exist.',
                 $exception->getMessage(),
             );
@@ -209,8 +211,8 @@ class DiffTest extends CommandTestCase
 
         $expected = '/^Could not check the PHARs: internal corruption of phar \".*\.phar\" \(__HALT_COMPILER\(\); not found\)/';
 
-        $this->assertMatchesRegularExpression($expected, $this->commandTester->getDisplay(true));
-        $this->assertSame(1, $this->commandTester->getStatusCode());
+        self::assertMatchesRegularExpression($expected, $this->commandTester->getDisplay(true));
+        self::assertSame(1, $this->commandTester->getStatusCode());
     }
 
     public function test_it_can_compare_phar_files_without_the_phar_extension(): void

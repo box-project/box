@@ -19,9 +19,6 @@ use KevinGH\Box\UnsupportedMethodCall;
 
 final class FakeScoper implements Scoper
 {
-    /**
-     * {@inheritdoc}
-     */
     public function scope(string $filePath, string $contents): string
     {
         throw UnsupportedMethodCall::forMethod(__CLASS__, __METHOD__);

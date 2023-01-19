@@ -14,13 +14,15 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
-use const DIRECTORY_SEPARATOR;
 use KevinGH\Box\Configuration\NoConfigurationFound;
-use function KevinGH\Box\FileSystem\touch;
 use KevinGH\Box\Test\FileSystemTestCase;
+use function KevinGH\Box\FileSystem\touch;
+use const DIRECTORY_SEPARATOR;
 
 /**
  * @covers \KevinGH\Box\Console\ConfigurationLocator
+ *
+ * @internal
  */
 class ConfigurationLocatorTest extends FileSystemTestCase
 {
@@ -28,7 +30,7 @@ class ConfigurationLocatorTest extends FileSystemTestCase
     {
         touch('box.json');
 
-        $this->assertSame(
+        self::assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'box.json',
             ConfigurationLocator::findDefaultPath(),
         );
@@ -38,7 +40,7 @@ class ConfigurationLocatorTest extends FileSystemTestCase
     {
         touch('box.json.dist');
 
-        $this->assertSame(
+        self::assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'box.json.dist',
             ConfigurationLocator::findDefaultPath(),
         );
@@ -49,7 +51,7 @@ class ConfigurationLocatorTest extends FileSystemTestCase
         touch('box.json');
         touch('box.json.dist');
 
-        $this->assertSame(
+        self::assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'box.json',
             ConfigurationLocator::findDefaultPath(),
         );
@@ -60,14 +62,14 @@ class ConfigurationLocatorTest extends FileSystemTestCase
         try {
             ConfigurationLocator::findDefaultPath();
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (NoConfigurationFound $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'The configuration file could not be found.',
                 $exception->getMessage(),
             );
-            $this->assertSame(0, $exception->getCode());
-            $this->assertNull($exception->getPrevious());
+            self::assertSame(0, $exception->getCode());
+            self::assertNull($exception->getPrevious());
         }
     }
 }

@@ -14,15 +14,15 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use Composer\Semver\Semver;
+use UnexpectedValueException;
+use Webmozart\Assert\Assert;
 use function array_column;
 use function array_filter;
 use function basename;
-use Composer\Semver\Semver;
 use function implode;
 use function Safe\sprintf;
 use function str_replace;
-use UnexpectedValueException;
-use Webmozart\Assert\Assert;
 
 /**
  * @private
@@ -120,13 +120,11 @@ final class DockerFileGenerator
             $contents,
         );
 
-        $contents = str_replace(
+        return str_replace(
             '__PHAR_FILE_NAME_TOKEN__',
             basename($this->sourcePhar),
             $contents,
         );
-
-        return $contents;
     }
 
     private static function retrievePhpImageName(array $requirements): string

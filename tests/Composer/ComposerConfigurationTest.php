@@ -14,12 +14,14 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
+use KevinGH\Box\Test\FileSystemTestCase;
 use function json_decode;
 use function KevinGH\Box\FileSystem\mkdir;
-use KevinGH\Box\Test\FileSystemTestCase;
 
 /**
  * @covers \KevinGH\Box\Composer\ComposerConfiguration
+ *
+ * @internal
  */
 class ComposerConfigurationTest extends FileSystemTestCase
 {
@@ -222,7 +224,7 @@ class ComposerConfigurationTest extends FileSystemTestCase
      */
     public function test_it_returns_an_empty_list_when_trying_to_retrieve_the_list_of_dev_packages_when_no_composer_json_file_is_found(bool $excludeDevPackages): void
     {
-        $this->assertSame(
+        self::assertSame(
             [],
             ComposerConfiguration::retrieveDevPackages(
                 $this->tmp,
@@ -232,7 +234,7 @@ class ComposerConfigurationTest extends FileSystemTestCase
             ),
         );
 
-        $this->assertSame(
+        self::assertSame(
             [],
             ComposerConfiguration::retrieveDevPackages(
                 $this->tmp,
@@ -261,9 +263,9 @@ class ComposerConfigurationTest extends FileSystemTestCase
 
         $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock, true);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
 
-        $this->assertSame(
+        self::assertSame(
             [],
             ComposerConfiguration::retrieveDevPackages(
                 $this->tmp,
@@ -289,9 +291,9 @@ class ComposerConfigurationTest extends FileSystemTestCase
 
         $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock, true);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
 
-        $this->assertSame(
+        self::assertSame(
             [],
             ComposerConfiguration::retrieveDevPackages(
                 $this->tmp,
@@ -316,9 +318,9 @@ class ComposerConfigurationTest extends FileSystemTestCase
 
         $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock, true);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
 
-        $this->assertSame(
+        self::assertSame(
             [],
             ComposerConfiguration::retrieveDevPackages(
                 $this->tmp,
@@ -347,9 +349,9 @@ class ComposerConfigurationTest extends FileSystemTestCase
 
         $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock, true);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
 
-        $this->assertSame(
+        self::assertSame(
             [],
             ComposerConfiguration::retrieveDevPackages(
                 $this->tmp,
@@ -462,8 +464,7 @@ class ComposerConfigurationTest extends FileSystemTestCase
                     },
                     "platform-dev": []
                 }
-                JSON
-            ,
+                JSON,
             true,
         );
 
@@ -474,9 +475,9 @@ class ComposerConfigurationTest extends FileSystemTestCase
 
         $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock, true);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
 
-        $this->assertSame(
+        self::assertSame(
             [],
             ComposerConfiguration::retrieveDevPackages(
                 $this->tmp,

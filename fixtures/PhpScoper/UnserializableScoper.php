@@ -20,25 +20,16 @@ use Serializable;
 
 final class UnserializableScoper implements PhpScoperScoper, Serializable
 {
-    /**
-     * {@inheritdoc}
-     */
     public function scope(string $filePath, string $contents): string
     {
         throw UnsupportedMethodCall::forMethod(__CLASS__, __METHOD__);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function serialize(): string
     {
         throw UnsupportedMethodCall::forMethod(__CLASS__, __METHOD__);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function unserialize($serialized): void
     {
         throw UnsupportedMethodCall::forMethod(__CLASS__, __METHOD__);

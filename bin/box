@@ -17,13 +17,13 @@ namespace KevinGH\Box;
 
 use Fidry\Console\Application\ApplicationRunner;
 use Fidry\Console\Input\IO;
-use function file_exists;
-use function in_array;
 use KevinGH\Box\Console\Application;
 use KevinGH\Box\Console\OutputFormatterConfigurator;
+use RuntimeException;
+use function file_exists;
+use function in_array;
 use const PHP_EOL;
 use const PHP_SAPI;
-use RuntimeException;
 
 // See https://github.com/easysoft/phpmicro for the micro SAPI.
 if (false === in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed', 'micro'], true)) {

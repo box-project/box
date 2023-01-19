@@ -16,9 +16,6 @@ namespace KevinGH\Box\Verifier;
 
 class DummyPublicKey extends PublicKey
 {
-    /**
-     * {@inheritdoc}
-     */
     public function verify(string $signature): bool
     {
         return true;

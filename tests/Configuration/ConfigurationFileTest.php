@@ -14,24 +14,26 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Configuration;
 
-use function chdir;
-use const DIRECTORY_SEPARATOR;
-use function file_get_contents;
 use InvalidArgumentException;
+use KevinGH\Box\Json\JsonValidationException;
+use function chdir;
+use function file_get_contents;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\FileSystem\symlink;
 use function KevinGH\Box\FileSystem\touch;
-use KevinGH\Box\Json\JsonValidationException;
 use function Safe\json_decode;
 use function sprintf;
+use const DIRECTORY_SEPARATOR;
 
 /**
  * @covers \KevinGH\Box\Configuration\Configuration
  *
  * @group config
+ *
+ * @internal
  */
 class ConfigurationFileTest extends ConfigurationTestCase
 {
@@ -135,8 +137,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $actual = $this->normalizePaths($this->config->getFiles());
 
-        $this->assertSame($expected, $actual);
-        $this->assertCount(0, $this->config->getBinaryFiles());
+        self::assertSame($expected, $actual);
+        self::assertCount(0, $this->config->getBinaryFiles());
     }
 
     /**
@@ -151,8 +153,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
         $actualFiles = $this->normalizePaths($this->config->getFiles());
         $actualBinFiles = $this->normalizePaths($this->config->getBinaryFiles());
 
-        $this->assertSame($expectedFiles, $actualFiles);
-        $this->assertSame($expectedBinFiles, $actualBinFiles);
+        self::assertSame($expectedFiles, $actualFiles);
+        self::assertSame($expectedBinFiles, $actualBinFiles);
     }
 
     /**
@@ -167,8 +169,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
         $actualFiles = $this->normalizePaths($this->config->getFiles());
         $actualBinFiles = $this->normalizePaths($this->config->getBinaryFiles());
 
-        $this->assertSame($expectedFiles, $actualFiles);
-        $this->assertSame($expectedBinFiles, $actualBinFiles);
+        self::assertSame($expectedFiles, $actualFiles);
+        self::assertSame($expectedBinFiles, $actualBinFiles);
     }
 
     public function test_configured_files_are_relative_to_base_path(): void
@@ -259,8 +261,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $actual = $this->normalizePaths($this->config->getFiles());
 
-        $this->assertSame($expected, $actual);
-        $this->assertCount(0, $this->config->getBinaryFiles());
+        self::assertSame($expected, $actual);
+        self::assertCount(0, $this->config->getBinaryFiles());
     }
 
     public function test_configured_files_are_relative_to_base_path_unless_they_are_absolute_paths(): void
@@ -337,8 +339,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $actual = $this->normalizePaths($this->config->getFiles());
 
-        $this->assertSame($expected, $actual);
-        $this->assertCount(0, $this->config->getBinaryFiles());
+        self::assertSame($expected, $actual);
+        self::assertCount(0, $this->config->getBinaryFiles());
     }
 
     public function test_the_files_belonging_to_dev_packages_are_ignored_only_in_the_finder_config(): void
@@ -441,8 +443,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $actual = $this->normalizePaths($this->config->getFiles());
 
-        $this->assertSame($expected, $actual);
-        $this->assertCount(0, $this->config->getBinaryFiles());
+        self::assertSame($expected, $actual);
+        self::assertCount(0, $this->config->getBinaryFiles());
     }
 
     public function test_a_non_existent_file_cannot_be_added_to_the_list_of_files(): void
@@ -454,11 +456,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 ],
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $filePath = make_path_absolute('non-existent', $this->tmp);
 
-            $this->assertSame(
+            self::assertSame(
                 sprintf(
                     '"files" must contain a list of existing files. Could not find "%s".',
                     $filePath,
@@ -494,12 +496,12 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 ],
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $link = $this->tmp.'/sub-dir/F';
 
-            $this->assertSame(
-                "Cannot append the link \"$link\" to the Finder: links are not supported.",
+            self::assertSame(
+                "Cannot append the link \"{$link}\" to the Finder: links are not supported.",
                 $exception->getMessage(),
             );
         }
@@ -531,12 +533,12 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 ],
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $link = $this->tmp.'/sub-dir/F/fileF0';
 
-            $this->assertSame(
-                "Path \"$link\" was expected to be a file or directory. It may be a symlink (which are unsupported).",
+            self::assertSame(
+                "Path \"{$link}\" was expected to be a file or directory. It may be a symlink (which are unsupported).",
                 $exception->getMessage(),
             );
         }
@@ -568,12 +570,12 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 ],
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $link = $this->tmp.'/sub-dir/F/fileF0';
 
-            $this->assertSame(
-                "Cannot append the link \"$link\" to the Finder: links are not supported.",
+            self::assertSame(
+                "Cannot append the link \"{$link}\" to the Finder: links are not supported.",
                 $exception->getMessage(),
             );
         }
@@ -600,12 +602,12 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 ],
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $link = $this->tmp.'/sub-dir/F/fileF0';
 
-            $this->assertSame(
-                "Cannot add the link \"$link\": links are not supported.",
+            self::assertSame(
+                "Cannot add the link \"{$link}\": links are not supported.",
                 $exception->getMessage(),
             );
         }
@@ -632,12 +634,12 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 ],
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $link = $this->tmp.'/sub-dir/F';
 
-            $this->assertSame(
-                "Cannot add the link \"$link\": links are not supported.",
+            self::assertSame(
+                "Cannot add the link \"{$link}\": links are not supported.",
                 $exception->getMessage(),
             );
         }
@@ -654,11 +656,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 ],
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $filePath = $this->tmp.DIRECTORY_SEPARATOR.'dirA';
 
-            $this->assertSame(
+            self::assertSame(
                 sprintf(
                     '"files" must contain a list of existing files. Could not find "%s".',
                     $filePath,
@@ -677,11 +679,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 ],
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $dirPath = $this->tmp.DIRECTORY_SEPARATOR.'non-existent';
 
-            $this->assertSame(
+            self::assertSame(
                 sprintf(
                     '"directories" must contain a list of existing directories. Could not find "%s".',
                     $dirPath,
@@ -702,11 +704,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 ],
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $dirPath = $this->tmp.DIRECTORY_SEPARATOR.'foo';
 
-            $this->assertSame(
+            self::assertSame(
                 sprintf(
                     '"directories" must contain a list of existing directories. Could not find "%s".',
                     $dirPath,
@@ -791,8 +793,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $actual = $this->normalizePaths($this->config->getBinaryFiles());
 
-        $this->assertSame($expected, $actual);
-        $this->assertCount(0, $this->config->getFiles());
+        self::assertSame($expected, $actual);
+        self::assertCount(0, $this->config->getFiles());
     }
 
     public function test_configured_bin_files_are_relative_to_base_path(): void
@@ -871,8 +873,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $actual = $this->normalizePaths($this->config->getBinaryFiles());
 
-        $this->assertSame($expected, $actual);
-        $this->assertCount(0, $this->config->getFiles());
+        self::assertSame($expected, $actual);
+        self::assertCount(0, $this->config->getFiles());
     }
 
     public function test_configured_bin_files_are_relative_to_base_path_unless_they_are_absolute_paths(): void
@@ -949,8 +951,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $actual = $this->normalizePaths($this->config->getBinaryFiles());
 
-        $this->assertSame($expected, $actual);
-        $this->assertCount(0, $this->config->getFiles());
+        self::assertSame($expected, $actual);
+        self::assertCount(0, $this->config->getFiles());
     }
 
     public function test_cannot_add_a_non_existent_bin_file_to_the_list_of_files(): void
@@ -962,11 +964,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 ],
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $filePath = $this->tmp.DIRECTORY_SEPARATOR.'non-existent';
 
-            $this->assertSame(
+            self::assertSame(
                 sprintf(
                     '"files-bin" must contain a list of existing files. Could not find "%s".',
                     $filePath,
@@ -987,11 +989,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 ],
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $filePath = $this->tmp.DIRECTORY_SEPARATOR.'dirA';
 
-            $this->assertSame(
+            self::assertSame(
                 sprintf(
                     '"files-bin" must contain a list of existing files. Could not find "%s".',
                     $filePath,
@@ -1010,11 +1012,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 ],
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $dirPath = $this->tmp.DIRECTORY_SEPARATOR.'non-existent';
 
-            $this->assertSame(
+            self::assertSame(
                 sprintf(
                     '"directories-bin" must contain a list of existing directories. Could not find "%s".',
                     $dirPath,
@@ -1035,11 +1037,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 ],
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $dirPath = $this->tmp.DIRECTORY_SEPARATOR.'foo';
 
-            $this->assertSame(
+            self::assertSame(
                 sprintf(
                     '"directories-bin" must contain a list of existing directories. Could not find "%s".',
                     $dirPath,
@@ -1093,11 +1095,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
             'B/bar',
         ];
 
-        $this->assertSame(
+        self::assertSame(
             $expected,
             $this->normalizePaths($this->config->getFiles()),
         );
-        $this->assertSame(
+        self::assertSame(
             $expected,
             $this->normalizePaths($this->config->getBinaryFiles()),
         );
@@ -1109,11 +1111,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
             'blacklist' => [],
         ]);
 
-        $this->assertSame(
+        self::assertSame(
             ['The "blacklist" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     /**
@@ -1126,9 +1128,9 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 'blacklist' => $value,
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (JsonValidationException $exception) {
-            $this->assertMatchesRegularExpression(
+            self::assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
                 $exception->getMessage(),
             );
@@ -1156,7 +1158,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
         ];
         $actual = $this->normalizePaths($this->config->getFiles());
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     public function test_the_blacklist_input_may_refer_to_non_existent_paths(): void
@@ -1171,7 +1173,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
         $expected = [];
         $actual = $this->normalizePaths($this->config->getFiles());
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     /**
@@ -1184,9 +1186,9 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 'files' => $value,
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (JsonValidationException $exception) {
-            $this->assertMatchesRegularExpression(
+            self::assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
                 $exception->getMessage(),
             );
@@ -1199,11 +1201,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
             'files' => [],
         ]);
 
-        $this->assertSame(
+        self::assertSame(
             ['The "files" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     /**
@@ -1216,9 +1218,9 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 'files-bin' => $value,
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (JsonValidationException $exception) {
-            $this->assertMatchesRegularExpression(
+            self::assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
                 $exception->getMessage(),
             );
@@ -1241,11 +1243,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
         // Relative to the current working directory for readability
         $expected = ['foo'];
 
-        $this->assertSame(
+        self::assertSame(
             $expected,
             $this->normalizePaths($this->config->getFiles()),
         );
-        $this->assertSame(
+        self::assertSame(
             $expected,
             $this->normalizePaths($this->config->getBinaryFiles()),
         );
@@ -1261,9 +1263,9 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 'directories' => $value,
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (JsonValidationException $exception) {
-            $this->assertMatchesRegularExpression(
+            self::assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
                 $exception->getMessage(),
             );
@@ -1276,11 +1278,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
             'directories' => [],
         ]);
 
-        $this->assertSame(
+        self::assertSame(
             ['The "directories" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     /**
@@ -1293,9 +1295,9 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 'directories-bin' => $value,
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (JsonValidationException $exception) {
-            $this->assertMatchesRegularExpression(
+            self::assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
                 $exception->getMessage(),
             );
@@ -1319,11 +1321,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
         // Relative to the current working directory for readability
         $expected = ['A/foo'];
 
-        $this->assertSame(
+        self::assertSame(
             $expected,
             $this->normalizePaths($this->config->getFiles()),
         );
-        $this->assertSame(
+        self::assertSame(
             $expected,
             $this->normalizePaths($this->config->getBinaryFiles()),
         );
@@ -1339,9 +1341,9 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 'finder' => $value,
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (JsonValidationException $exception) {
-            $this->assertMatchesRegularExpression(
+            self::assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
                 $exception->getMessage(),
             );
@@ -1354,11 +1356,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
             'finder' => [],
         ]);
 
-        $this->assertSame(
+        self::assertSame(
             ['The "finder" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_finder_and_bin_finder_input_is_normalized(): void
@@ -1418,11 +1420,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
             'sub-dir/rab',
         ];
 
-        $this->assertEqualsCanonicalizing(
+        self::assertEqualsCanonicalizing(
             $expected,
             $this->normalizePaths($this->config->getFiles()),
         );
-        $this->assertEqualsCanonicalizing(
+        self::assertEqualsCanonicalizing(
             $expected,
             $this->normalizePaths($this->config->getBinaryFiles()),
         );
@@ -1448,11 +1450,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
         // Relative to the current working directory for readability
         $expected = ['A/foo'];
 
-        $this->assertEqualsCanonicalizing(
+        self::assertEqualsCanonicalizing(
             $expected,
             $this->normalizePaths($this->config->getFiles()),
         );
-        $this->assertEqualsCanonicalizing(
+        self::assertEqualsCanonicalizing(
             $expected,
             $this->normalizePaths($this->config->getBinaryFiles()),
         );
@@ -1488,7 +1490,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
         ];
         $actual = $this->normalizePaths($this->config->getFiles());
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     public function test_the_finder_config_cannot_include_invalid_methods(): void
@@ -1500,9 +1502,9 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 ],
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'Expected the method "invalidMethod" to exist.',
                 $exception->getMessage(),
             );
@@ -1541,8 +1543,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $actual = $this->normalizePaths($this->config->getFiles());
 
-        $this->assertSame($expected, $actual);
-        $this->assertCount(0, $this->config->getBinaryFiles());
+        self::assertSame($expected, $actual);
+        self::assertCount(0, $this->config->getBinaryFiles());
 
         $this->setConfig([
             'directories' => ['B'],
@@ -1558,13 +1560,13 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $actual = $this->normalizePaths($this->config->getFiles());
 
-        $this->assertSame($expected, $actual);
-        $this->assertCount(0, $this->config->getBinaryFiles());
+        self::assertSame($expected, $actual);
+        self::assertCount(0, $this->config->getBinaryFiles());
     }
 
     public function test_files_are_autodiscovered_by_default(): void
     {
-        $this->assertTrue($this->config->hasAutodiscoveredFiles());
+        self::assertTrue($this->config->hasAutodiscoveredFiles());
     }
 
     /**
@@ -1579,7 +1581,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $this->setConfig($config);
 
-        $this->assertSame($expectedFilesAutodiscovery, $this->config->hasAutodiscoveredFiles());
+        self::assertSame($expectedFilesAutodiscovery, $this->config->hasAutodiscoveredFiles());
     }
 
     public function test_append_autodiscovered_files_to_configured_files_if_the_autodiscovery_is_forced(): void
@@ -1711,9 +1713,9 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $actual = $this->normalizePaths($this->config->getFiles());
 
-        $this->assertEquals($expected, $actual);
+        self::assertEquals($expected, $actual);
 
-        $this->assertCount(0, $this->config->getBinaryFiles());
+        self::assertCount(0, $this->config->getBinaryFiles());
     }
 
     public function test_a_recommendation_is_given_when_the_force_autodiscovery_is_set_to_false(): void
@@ -1722,11 +1724,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
             'force-autodiscovery' => false,
         ]);
 
-        $this->assertSame(
+        self::assertSame(
             ['The "force-autodiscovery" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_no_warning_is_given_when_no_installed_json_no_composer_lock_are_found(): void
@@ -1736,8 +1738,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
             json_decode(file_get_contents($configPath)),
         );
 
-        $this->assertSame([], $config->getRecommendations());
-        $this->assertSame([], $config->getWarnings());
+        self::assertSame([], $config->getRecommendations());
+        self::assertSame([], $config->getWarnings());
     }
 
     public function test_no_warning_is_given_when_the_installed_json_and_composer_lock_are_found(): void
@@ -1747,10 +1749,10 @@ class ConfigurationFileTest extends ConfigurationTestCase
             json_decode(file_get_contents($configPath)),
         );
 
-        $this->assertTrue($config->dumpAutoload());
+        self::assertTrue($config->dumpAutoload());
 
-        $this->assertSame([], $config->getRecommendations());
-        $this->assertSame([], $config->getWarnings());
+        self::assertSame([], $config->getRecommendations());
+        self::assertSame([], $config->getWarnings());
     }
 
     public function test_no_warning_is_given_when_the_installed_json_is_found_and_the_composer_lock_is_not_when_the_composer_autoloader_is_not_dumped(): void
@@ -1762,10 +1764,10 @@ class ConfigurationFileTest extends ConfigurationTestCase
             json_decode(file_get_contents($configPath)),
         );
 
-        $this->assertFalse($config->dumpAutoload());
+        self::assertFalse($config->dumpAutoload());
 
-        $this->assertSame([], $config->getRecommendations());
-        $this->assertSame([], $config->getWarnings());
+        self::assertSame([], $config->getRecommendations());
+        self::assertSame([], $config->getWarnings());
     }
 
     public function test_a_warning_is_given_when_no_installed_json_is_found_and_the_composer_lock_is_when_the_composer_autoloader_is_dumped(): void
@@ -1777,10 +1779,10 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $config = Configuration::create($configPath, $decodedConfig);
 
-        $this->assertFalse($config->dumpAutoload());
+        self::assertFalse($config->dumpAutoload());
 
-        $this->assertSame([], $config->getRecommendations());
-        $this->assertSame(
+        self::assertSame([], $config->getRecommendations());
+        self::assertSame(
             [
                 'The "dump-autoload" setting has been set but has been ignored because the composer.json, composer.lock '
                 .'and vendor/composer/installed.json files are necessary but could not be found.',
@@ -1798,10 +1800,10 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $config = Configuration::create($configPath, $decodedConfig);
 
-        $this->assertFalse($config->dumpAutoload());
+        self::assertFalse($config->dumpAutoload());
 
-        $this->assertSame([], $config->getRecommendations());
-        $this->assertSame([], $config->getWarnings());
+        self::assertSame([], $config->getRecommendations());
+        self::assertSame([], $config->getWarnings());
     }
 
     public function test_a_warning_is_given_when_the_installed_json_is_found_and_the_composer_lock_is_not(): void
@@ -1813,10 +1815,10 @@ class ConfigurationFileTest extends ConfigurationTestCase
             json_decode(file_get_contents($configPath)),
         );
 
-        $this->assertFalse($config->dumpAutoload());
+        self::assertFalse($config->dumpAutoload());
 
-        $this->assertSame([], $config->getRecommendations());
-        $this->assertSame(
+        self::assertSame([], $config->getRecommendations());
+        self::assertSame(
             [
                 'The "dump-autoload" setting has been set but has been ignored because the composer.json, composer.lock '
                 .'and vendor/composer/installed.json files are necessary but could not be found.',
@@ -1834,10 +1836,10 @@ class ConfigurationFileTest extends ConfigurationTestCase
             json_decode(file_get_contents($configPath)),
         );
 
-        $this->assertFalse($config->dumpAutoload());
+        self::assertFalse($config->dumpAutoload());
 
-        $this->assertSame([], $config->getRecommendations());
-        $this->assertSame([], $config->getWarnings());
+        self::assertSame([], $config->getRecommendations());
+        self::assertSame([], $config->getWarnings());
     }
 
     public function test_dev_files_are_excluded_or_included_depending_of_the_exclude_dev_files_setting(): void
@@ -1870,7 +1872,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $this->reloadConfig();
 
-        $this->assertTrue($this->config->excludeDevFiles());
+        self::assertTrue($this->config->excludeDevFiles());
 
         // Relative to the current working directory for readability
         $expected = [
@@ -1884,12 +1886,12 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $actual = $this->normalizePaths($this->config->getFiles());
 
-        $this->assertSame($expected, $actual);
-        $this->assertCount(0, $this->config->getBinaryFiles());
+        self::assertSame($expected, $actual);
+        self::assertCount(0, $this->config->getBinaryFiles());
 
         $this->setConfig(['exclude-dev-files' => false]);
 
-        $this->assertFalse($this->config->excludeDevFiles());
+        self::assertFalse($this->config->excludeDevFiles());
 
         // Relative to the current working directory for readability
         $expected = [
@@ -1907,8 +1909,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         $actual = $this->normalizePaths($this->config->getFiles());
 
-        $this->assertSame($expected, $actual);
-        $this->assertCount(0, $this->config->getBinaryFiles());
+        self::assertSame($expected, $actual);
+        self::assertCount(0, $this->config->getBinaryFiles());
     }
 
     public static function configWithMainScriptProvider(): iterable

@@ -19,6 +19,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \KevinGH\Box\Annotation\DocblockAnnotationParser
+ *
+ * @internal
  */
 class DocblockAnnotationParserTest extends TestCase
 {
@@ -40,7 +42,7 @@ class DocblockAnnotationParserTest extends TestCase
     {
         $actual = $this->annotationParser->parse($docblock);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     public static function docblocksProvider(): iterable
@@ -55,8 +57,7 @@ class DocblockAnnotationParserTest extends TestCase
                 /**
                  * @Annotation
                  */
-                DOCBLOCK
-            ,
+                DOCBLOCK,
             ['@Annotation'],
         ];
 
@@ -66,8 +67,7 @@ class DocblockAnnotationParserTest extends TestCase
                  * @ignored
                  * @Kept
                  */
-                DOCBLOCK
-            ,
+                DOCBLOCK,
             ['@Kept'],
         ];
 
@@ -77,8 +77,7 @@ class DocblockAnnotationParserTest extends TestCase
                  * @IGNORED
                  * @Kept
                  */
-                DOCBLOCK
-            ,
+                DOCBLOCK,
             ['@Kept'],
         ];
     }

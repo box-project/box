@@ -14,17 +14,16 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Annotation;
 
-use function array_filter;
-use function array_key_exists;
-use function array_map;
-use function array_values;
 use InvalidArgumentException;
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlock\Tag;
 use phpDocumentor\Reflection\DocBlock\Tags\Formatter;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
+use function array_filter;
+use function array_key_exists;
+use function array_map;
+use function array_values;
 use function Safe\array_flip;
-use function strtolower;
 
 /**
  * @private
@@ -86,7 +85,7 @@ final class DocblockAnnotationParser
             array_filter(
                 $docBlock->getTags(),
                 static fn (Tag $tag) => !array_key_exists(
-                    strtolower($tag->getName()),
+                    mb_strtolower($tag->getName()),
                     $ignoredAnnotations,
                 ),
             ),
