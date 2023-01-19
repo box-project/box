@@ -31,9 +31,12 @@ jobs:
                 phar-readonly: [ true, false ]
                 php-extra-extensions: [ '' ]
                 include:
-                    -   version: '8.1'
-                        dependency: locked
-                        composer-options: ''
+                    -   php:
+                            version: '8.1'
+                            dependency: locked
+                            composer-options: ''
+                        tools: composer
+                        phar-readonly: false
                         php-extra-extensions: ', :bz2'
         steps:
             -   name: Checkout
