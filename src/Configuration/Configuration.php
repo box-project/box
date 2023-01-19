@@ -1744,8 +1744,6 @@ final class Configuration
                 Assert::classExists($class, 'The compactor class %s does not exist.');
                 Assert::isAOf($class, Compactor::class, sprintf('The class "%s" is not a compactor class.', $class));
 
-                // Use this little string concatenation trick to prevent PHP-Scoper from scoping it.
-                // Indeed, $class comes from the user, so it is unprefixed.
                 if (in_array($class, [PhpCompactor::class, 'KevinGH\Box\Compactor\Php'], true)) {
                     return self::createPhpCompactor($ignoredAnnotations);
                 }
