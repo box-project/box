@@ -229,6 +229,9 @@ class InfoTest extends CommandTestCase
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
+    /**
+     * @requires extension bz2
+     */
     public function test_it_provides_info_about_a_tarbz2_phar(): void
     {
         $pharPath = self::FIXTURES.'/simple-phar.tar.bz2';
@@ -295,6 +298,9 @@ class InfoTest extends CommandTestCase
         );
     }
 
+    /**
+     * @requires extension bz2
+     */
     public function test_it_provides_a_phar_info_with_the_tree_of_the_content(): void
     {
         $pharPath = self::FIXTURES.'/tree-phar.phar';
@@ -341,6 +347,9 @@ class InfoTest extends CommandTestCase
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
+    /**
+     * @requires extension bz2
+     */
     public function test_it_provides_a_phar_info_with_the_flat_tree_of_the_content(): void
     {
         $pharPath = self::FIXTURES.'/tree-phar.phar';
@@ -439,6 +448,8 @@ class InfoTest extends CommandTestCase
 
     /**
      * @dataProvider treeDepthProvider
+     *
+     * @requires extension bz2
      */
     public function test_it_can_limit_the_tree_depth(
         string $pharPath,
@@ -603,6 +614,9 @@ class InfoTest extends CommandTestCase
         ];
     }
 
+    /**
+     * @requires extension bz2
+     */
     public function test_it_can_limit_the_tree_depth_in_flat_mode(): void
     {
         $pharPath = self::FIXTURES.'/tree-phar.phar';
