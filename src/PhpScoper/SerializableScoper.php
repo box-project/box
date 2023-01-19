@@ -19,7 +19,6 @@ use Humbug\PhpScoper\Container as PhpScoperContainer;
 use Humbug\PhpScoper\Scoper\Scoper as PhpScoperScoper;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function count;
-use function method_exists;
 
 /**
  * @private
@@ -40,21 +39,9 @@ final class SerializableScoper implements Scoper
         PhpScoperConfiguration $scoperConfig,
         string ...$excludedFilePaths,
     ) {
-        // TODO: remove BC layer
-        if (method_exists($scoperConfig, 'withPatcher')) {
-            $this->scoperConfig = $scoperConfig->withPatcher(
-                PatcherFactory::createSerializablePatchers($scoperConfig->getPatcher()),
-            );
-        } else {
-            $this->scoperConfig = new PhpScoperConfiguration(
-                $scoperConfig->getPath(),
-                $scoperConfig->getPrefix(),
-                $scoperConfig->getFilesWithContents(),
-                $scoperConfig->getExcludedFilesWithContents(),
-                PatcherFactory::createSerializablePatchers($scoperConfig->getPatcher()),
-                $scoperConfig->getSymbolsConfiguration(),
-            );
-        }
+        $this->scoperConfig = $scoperConfig->withPatcher(
+            PatcherFactory::createSerializablePatchers($scoperConfig->getPatcher())
+        );
         $this->excludedFilePaths = $excludedFilePaths;
         $this->symbolsRegistry = new SymbolsRegistry();
     }

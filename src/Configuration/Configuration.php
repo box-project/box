@@ -87,7 +87,6 @@ use function KevinGH\Box\get_phar_compression_algorithms;
 use function KevinGH\Box\get_phar_signing_algorithms;
 use function KevinGH\Box\unique_id;
 use function krsort;
-use function method_exists;
 use function preg_match;
 use function preg_replace;
 use function property_exists;
@@ -2759,19 +2758,7 @@ final class Configuration
             return $phpScoperConfig;
         }
 
-        // TODO: remove BC once removing support for PHP-Scoper 0.17
-        if (method_exists($phpScoperConfig, 'withPrefix')) {
-            return $phpScoperConfig->withPrefix(unique_id('_HumbugBox'));
-        }
-
-        return new PhpScoperConfiguration(
-            $phpScoperConfig->getPath(),
-            unique_id('_HumbugBox'),
-            $phpScoperConfig->getFilesWithContents(),
-            $phpScoperConfig->getExcludedFilesWithContents(),
-            $phpScoperConfig->getPatcher(),
-            $phpScoperConfig->getSymbolsConfiguration(),
-        );
+        return $phpScoperConfig->withPrefix(unique_id('_HumbugBox'));
     }
 
     private static function checkIfDefaultValue(
