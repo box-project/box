@@ -18,6 +18,7 @@ jobs:
                     -   version: '8.1'
                         dependency: locked
                         composer-options: ''
+                        php-extra-extensions: ''
                         # TODO: enable back
 #                    -   version: '8.2'
 #                        dependency: highest
