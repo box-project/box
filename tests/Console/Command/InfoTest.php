@@ -229,11 +229,11 @@ class InfoTest extends CommandTestCase
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
+    /**
+     * @requires extension bz2
+     */
     public function test_it_provides_info_about_a_tarbz2_phar(): void
     {
-        if (!extension_loaded('bz2')) {
-            self::markTestSkipped('This test requires php-bz2');
-        }
         $pharPath = self::FIXTURES.'/simple-phar.tar.bz2';
 
         $this->commandTester->execute(
@@ -298,12 +298,11 @@ class InfoTest extends CommandTestCase
         );
     }
 
+    /**
+     * @requires extension bz2
+     */
     public function test_it_provides_a_phar_info_with_the_tree_of_the_content(): void
     {
-        if (!extension_loaded('bz2')) {
-            self::markTestSkipped('This test requires php-bz2');
-        }
-
         $pharPath = self::FIXTURES.'/tree-phar.phar';
         $phar = new Phar($pharPath);
 
@@ -348,12 +347,11 @@ class InfoTest extends CommandTestCase
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
+    /**
+     * @requires extension bz2
+     */
     public function test_it_provides_a_phar_info_with_the_flat_tree_of_the_content(): void
     {
-        if (!extension_loaded('bz2')) {
-            self::markTestSkipped('This test requires php-bz2');
-        }
-
         $pharPath = self::FIXTURES.'/tree-phar.phar';
         $phar = new Phar($pharPath);
 
@@ -450,16 +448,14 @@ class InfoTest extends CommandTestCase
 
     /**
      * @dataProvider treeDepthProvider
+     *
+     * @requires extension bz2
      */
     public function test_it_can_limit_the_tree_depth(
         string $pharPath,
         ?string $depth,
         mixed $expected,
     ): void {
-        if (!extension_loaded('bz2')) {
-            self::markTestSkipped('This test requires php-bz2');
-        }
-
         $pharPath = self::FIXTURES.'/tree-phar.phar';
         $phar = new Phar($pharPath);
 
@@ -618,12 +614,11 @@ class InfoTest extends CommandTestCase
         ];
     }
 
+    /**
+     * @requires extension bz2
+     */
     public function test_it_can_limit_the_tree_depth_in_flat_mode(): void
     {
-        if (!extension_loaded('bz2')) {
-            self::markTestSkipped('This test requires php-bz2');
-        }
-
         $pharPath = self::FIXTURES.'/tree-phar.phar';
         $phar = new Phar($pharPath);
 
