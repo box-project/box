@@ -18,7 +18,6 @@ jobs:
                     -   version: '8.1'
                         dependency: locked
                         composer-options: ''
-                        php-extra-extensions: ''
                         # TODO: enable back
 #                    -   version: '8.2'
 #                        dependency: highest
@@ -30,6 +29,7 @@ jobs:
                     # TODO: add more composer versions
                     - composer
                 phar-readonly: [ true, false ]
+                php-extra-extensions: [ '' ]
                 include:
                     -   version: '8.1'
                         dependency: locked
