@@ -4,7 +4,6 @@
 
 
 [![Package version](https://img.shields.io/packagist/v/humbug/box.svg?style=flat-square)](https://packagist.org/packages/humbug/box)
-[![Build](https://github.com/box-project/box/actions/workflows/build.yml/badge.svg)](https://github.com/box-project/box/actions/workflows/build.yml)
 [![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/humbug/box.svg?branch=master&style=flat-square)](https://scrutinizer-ci.com/g/humbug/box/?branch=master)
 [![Slack](https://img.shields.io/badge/slack-%23humbug-red.svg?style=flat-square)](https://symfony.com/slack-invite)
 [![License](https://img.shields.io/badge/license-MIT-red.svg?style=flat-square)](LICENSE)
@@ -38,7 +37,7 @@ For the full documentation see https://box-project.github.io/box.
     1. [Composer](doc/installation.md#composer)
     1. [Homebrew](doc/installation.md#homebrew)
 1. [Usage](#usage)
-1. [Configuration](doc/configuration.md#configuration)
+1. [Configuration][the configuration documentation]
     1. [Base path (`base-path`)](doc/configuration.md#base-path-base-path)
     1. [Main (`main`)](doc/configuration.md#main-main)
     1. [Output (`output`)](doc/configuration.md#output-output)
@@ -151,3 +150,4 @@ Project originally created by: [Kevin Herrera] ([@kherge]) which has now been mo
 [@kherge]: https://github.com/kherge
 [humbug]: https://github.com/humbug
 [symfony-bc-policy]: https://symfony.com/doc/current/contributing/code/bc.html
+[the configuration documentation]: doc/configuration.md#configuration

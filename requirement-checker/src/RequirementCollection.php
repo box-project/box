@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the box project.
  *
@@ -46,9 +48,6 @@ final class RequirementCollection implements IteratorAggregate, Countable
         return count($this->requirements);
     }
 
-    /**
-     * @param Requirement $requirement
-     */
     public function add(Requirement $requirement): void
     {
         $this->requirements[] = $requirement;

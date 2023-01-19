@@ -14,14 +14,16 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
-use function array_column;
 use KevinGH\Box\Console\DisplayNormalizer;
 use Phar;
 use PHPUnit\Framework\TestCase;
+use function array_column;
 use function sort;
 
 /**
  * @covers \KevinGH\Box\RequirementChecker\RequirementsDumper
+ *
+ * @internal
  */
 class RequirementsDumperTest extends TestCase
 {
@@ -74,18 +76,18 @@ class RequirementsDumperTest extends TestCase
             'vendor/composer/semver/src/VersionParser.php',
         ];
 
-        if (file_exists(__DIR__.'/../../.requirement-checker/vendor/composer/InstalledVersions.php')) {
+        if (file_exists(__DIR__.'/../../res/requirement-checker/vendor/composer/InstalledVersions.php')) {
             $expectedFiles[] = 'vendor/composer/InstalledVersions.php';
         }
 
         sort($expectedFiles);
 
-        $this->assertEqualsCanonicalizing(
+        self::assertEqualsCanonicalizing(
             $expectedFiles,
             array_column($checkFiles, 0),
         );
 
-        $this->assertSame(
+        self::assertSame(
             DisplayNormalizer::removeTrailingSpaces($expectedRequirement),
             DisplayNormalizer::removeTrailingSpaces($checkFiles[0][1]),
         );

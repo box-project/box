@@ -14,55 +14,57 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use function array_filter;
-use function array_keys;
-use function current;
-use const DIRECTORY_SEPARATOR;
-use function dirname;
 use Error;
 use Exception;
-use function exec;
-use function extension_loaded;
 use Fidry\Console\DisplayNormalizer;
-use function file_get_contents;
-use function implode;
-use function in_array;
 use InvalidArgumentException;
-use function iterator_to_array;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\FakeCompactor;
-use function KevinGH\Box\FileSystem\canonicalize;
-use function KevinGH\Box\FileSystem\chmod;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\make_tmp_dir;
-use function KevinGH\Box\FileSystem\mkdir;
 use KevinGH\Box\Test\FileSystemTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use Phar;
 use PharFileInfo;
-use const PHP_EOL;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
-use function realpath;
 use RuntimeException;
 use SplFileInfo;
-use function sprintf;
-use const STDOUT;
-use function str_replace;
 use Stringable;
 use Symfony\Component\Finder\Finder;
 use Throwable;
+use function array_filter;
+use function array_keys;
+use function current;
+use function dirname;
+use function exec;
+use function extension_loaded;
+use function file_get_contents;
+use function implode;
+use function in_array;
+use function iterator_to_array;
+use function KevinGH\Box\FileSystem\canonicalize;
+use function KevinGH\Box\FileSystem\chmod;
+use function KevinGH\Box\FileSystem\dump_file;
+use function KevinGH\Box\FileSystem\make_tmp_dir;
+use function KevinGH\Box\FileSystem\mkdir;
+use function realpath;
+use function sprintf;
+use function str_replace;
 use function trim;
+use const DIRECTORY_SEPARATOR;
+use const PHP_EOL;
+use const STDOUT;
 
 /**
  * @covers \KevinGH\Box\Box
  *
  * @runTestsInSeparateProcesses There is side-effects caused by generating PHARs as a result it is necessary to scope it
  *                              in separate processes.
+ *
+ * @internal
  */
 class BoxTest extends FileSystemTestCase
 {
@@ -98,9 +100,9 @@ class BoxTest extends FileSystemTestCase
         try {
             $this->box->startBuffering();
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'The buffering must be ended before starting it again',
                 $exception->getMessage(),
             );
@@ -112,9 +114,9 @@ class BoxTest extends FileSystemTestCase
         try {
             $this->box->endBuffering(noop());
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'The buffering must be started before ending it',
                 $exception->getMessage(),
             );
@@ -126,9 +128,9 @@ class BoxTest extends FileSystemTestCase
         try {
             $this->box->endBuffering(noop());
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'The buffering must be started before ending it',
                 $exception->getMessage(),
             );
@@ -149,11 +151,11 @@ class BoxTest extends FileSystemTestCase
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
 
-        $this->assertFileExists($expectedPharPath);
+        self::assertFileExists($expectedPharPath);
 
         $actualContents = file_get_contents($expectedPharPath);
 
-        $this->assertSame($expectedContents, $actualContents);
+        self::assertSame($expectedContents, $actualContents);
     }
 
     public function test_it_ensures_a_phar_cannot_be_empty(): void
@@ -163,7 +165,7 @@ class BoxTest extends FileSystemTestCase
 
         $expectedPharPath = 'phar://test.phar/.box_empty';
 
-        $this->assertFileExists($expectedPharPath);
+        self::assertFileExists($expectedPharPath);
     }
 
     public function test_it_can_add_a_file_to_the_phar_in_a_new_buffering_process_does_not_remove_the_previous_files(): void
@@ -178,11 +180,11 @@ class BoxTest extends FileSystemTestCase
         $expectedContents = $file0Contents;
         $expectedPharPath = 'phar://test.phar/'.$file0;
 
-        $this->assertFileExists($expectedPharPath);
+        self::assertFileExists($expectedPharPath);
 
         $actualContents = file_get_contents($expectedPharPath);
 
-        $this->assertSame($expectedContents, $actualContents);
+        self::assertSame($expectedContents, $actualContents);
 
         $file1 = 'file1';
         $file1Contents = 'file1 contents';
@@ -194,11 +196,11 @@ class BoxTest extends FileSystemTestCase
         $expectedContents = $file1Contents;
         $expectedPharPath = 'phar://test.phar/'.$file1;
 
-        $this->assertFileExists($expectedPharPath);
+        self::assertFileExists($expectedPharPath);
 
         $actualContents = file_get_contents($expectedPharPath);
 
-        $this->assertSame($expectedContents, $actualContents);
+        self::assertSame($expectedContents, $actualContents);
     }
 
     public function test_it_cannot_add_a_file_to_the_phar_if_the_buffering_did_not_start(): void
@@ -211,9 +213,9 @@ class BoxTest extends FileSystemTestCase
         try {
             $this->box->addFile($file);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'Cannot add files if the buffering has not started.',
                 $exception->getMessage(),
             );
@@ -232,11 +234,11 @@ class BoxTest extends FileSystemTestCase
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
 
-        $this->assertFileExists($expectedPharPath);
+        self::assertFileExists($expectedPharPath);
 
         $actualContents = file_get_contents($expectedPharPath);
 
-        $this->assertSame($expectedContents, $actualContents);
+        self::assertSame($expectedContents, $actualContents);
     }
 
     public function test_it_can_add_an_existent_file_with_contents_to_the_phar(): void
@@ -253,11 +255,11 @@ class BoxTest extends FileSystemTestCase
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
 
-        $this->assertFileExists($expectedPharPath);
+        self::assertFileExists($expectedPharPath);
 
         $actualContents = file_get_contents($expectedPharPath);
 
-        $this->assertSame($expectedContents, $actualContents);
+        self::assertSame($expectedContents, $actualContents);
     }
 
     public function test_it_can_add_a_non_existent_bin_file_with_contents_to_the_phar(): void
@@ -272,11 +274,11 @@ class BoxTest extends FileSystemTestCase
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
 
-        $this->assertFileExists($expectedPharPath);
+        self::assertFileExists($expectedPharPath);
 
         $actualContents = file_get_contents($expectedPharPath);
 
-        $this->assertSame($expectedContents, $actualContents);
+        self::assertSame($expectedContents, $actualContents);
     }
 
     public function test_it_can_add_an_existent_bin_file_with_contents_to_the_phar(): void
@@ -293,11 +295,11 @@ class BoxTest extends FileSystemTestCase
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
 
-        $this->assertFileExists($expectedPharPath);
+        self::assertFileExists($expectedPharPath);
 
         $actualContents = file_get_contents($expectedPharPath);
 
-        $this->assertSame($expectedContents, $actualContents);
+        self::assertSame($expectedContents, $actualContents);
     }
 
     public function test_it_can_add_a_file_with_absolute_path_to_the_phar(): void
@@ -315,11 +317,11 @@ class BoxTest extends FileSystemTestCase
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$relativePath;
 
-        $this->assertFileExists($expectedPharPath);
+        self::assertFileExists($expectedPharPath);
 
         $actualContents = file_get_contents($expectedPharPath);
 
-        $this->assertSame($expectedContents, $actualContents);
+        self::assertSame($expectedContents, $actualContents);
     }
 
     public function test_it_can_add_a_file_with_a_local_path_to_the_phar(): void
@@ -346,11 +348,11 @@ class BoxTest extends FileSystemTestCase
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$localPath;
 
-        $this->assertFileExists($expectedPharPath);
+        self::assertFileExists($expectedPharPath);
 
         $actualContents = file_get_contents($expectedPharPath);
 
-        $this->assertSame($expectedContents, $actualContents);
+        self::assertSame($expectedContents, $actualContents);
     }
 
     public function test_it_can_add_a_binary_file_to_the_phar(): void
@@ -369,11 +371,11 @@ class BoxTest extends FileSystemTestCase
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
 
-        $this->assertFileExists($expectedPharPath);
+        self::assertFileExists($expectedPharPath);
 
         $actualContents = file_get_contents($expectedPharPath);
 
-        $this->assertSame($expectedContents, $actualContents);
+        self::assertSame($expectedContents, $actualContents);
     }
 
     public function test_it_can_add_a_binary_file_with_a_local_path_to_the_phar(): void
@@ -400,11 +402,11 @@ class BoxTest extends FileSystemTestCase
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$localPath;
 
-        $this->assertFileExists($expectedPharPath);
+        self::assertFileExists($expectedPharPath);
 
         $actualContents = file_get_contents($expectedPharPath);
 
-        $this->assertSame($expectedContents, $actualContents);
+        self::assertSame($expectedContents, $actualContents);
     }
 
     public function test_it_compacts_the_file_content_and_replace_placeholders_before_adding_it_to_the_phar(): void
@@ -421,15 +423,13 @@ class BoxTest extends FileSystemTestCase
         $firstCompactorProphecy = $this->prophesize(Compactor::class);
         $firstCompactorProphecy
             ->compact($file, 'original contents foo_value')
-            ->willReturn($firstCompactorOutput = 'first compactor contents')
-        ;
+            ->willReturn($firstCompactorOutput = 'first compactor contents');
 
         /** @var Compactor|ObjectProphecy $secondCompactorProphecy */
         $secondCompactorProphecy = $this->prophesize(Compactor::class);
         $secondCompactorProphecy
             ->compact($file, $firstCompactorOutput)
-            ->willReturn($secondCompactorOutput = 'second compactor contents')
-        ;
+            ->willReturn($secondCompactorOutput = 'second compactor contents');
 
         $this->box->registerCompactors(
             new Compactors(
@@ -447,11 +447,11 @@ class BoxTest extends FileSystemTestCase
         $expectedContents = $secondCompactorOutput;
         $expectedPharPath = 'phar://test.phar/'.$file;
 
-        $this->assertFileExists($expectedPharPath);
+        self::assertFileExists($expectedPharPath);
 
         $actualContents = file_get_contents($expectedPharPath);
 
-        $this->assertSame($expectedContents, $actualContents);
+        self::assertSame($expectedContents, $actualContents);
 
         $firstCompactorProphecy->compact(Argument::cetera())->shouldHaveBeenCalledTimes(1);
         $secondCompactorProphecy->compact(Argument::cetera())->shouldHaveBeenCalledTimes(1);
@@ -483,9 +483,9 @@ class BoxTest extends FileSystemTestCase
             $local = $this->box->addFile($file);
             $this->box->endBuffering(noop());
 
-            $this->assertSame($expectedLocal, $local);
+            self::assertSame($expectedLocal, $local);
 
-            $this->assertFileExists(
+            self::assertFileExists(
                 (string) $this->box->getPhar()[$local],
                 'Expected to find the file "%s" in the PHAR.',
             );
@@ -496,7 +496,7 @@ class BoxTest extends FileSystemTestCase
                 (string) $this->box->getPhar()[$local],
             );
 
-            $this->assertSame($expectedLocal, $pathInPhar);
+            self::assertSame($expectedLocal, $pathInPhar);
         }
     }
 
@@ -506,13 +506,13 @@ class BoxTest extends FileSystemTestCase
             $this->box->startBuffering();
             $this->box->addFile('/nowhere/foo');
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'The file "/nowhere/foo" does not exist.',
                 $exception->getMessage(),
             );
-            $this->assertNull($exception->getPrevious());
+            self::assertNull($exception->getPrevious());
         }
     }
 
@@ -522,20 +522,20 @@ class BoxTest extends FileSystemTestCase
         $contents = 'test';
 
         dump_file($file, $contents);
-        chmod($file, 0355);
+        chmod($file, 0o355);
 
         try {
             $this->box->startBuffering();
             $this->box->addFile($file);
             $this->box->endBuffering(noop());
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'The path "foo" is not readable.',
                 $exception->getMessage(),
             );
-            $this->assertNull($exception->getPrevious());
+            self::assertNull($exception->getPrevious());
         }
     }
 
@@ -552,14 +552,12 @@ class BoxTest extends FileSystemTestCase
         $firstCompactorProphecy = $this->prophesize(Compactor::class);
         $firstCompactorProphecy
             ->compact($file, 'original contents foo_value')
-            ->willReturn($firstCompactorOutput = 'first compactor contents')
-        ;
+            ->willReturn($firstCompactorOutput = 'first compactor contents');
 
         $secondCompactorProphecy = $this->prophesize(Compactor::class);
         $secondCompactorProphecy
             ->compact($file, $firstCompactorOutput)
-            ->willReturn($secondCompactorOutput = 'second compactor contents')
-        ;
+            ->willReturn($secondCompactorOutput = 'second compactor contents');
 
         $this->box->registerCompactors(
             new Compactors(
@@ -577,11 +575,11 @@ class BoxTest extends FileSystemTestCase
         $expectedContents = $secondCompactorOutput;
         $expectedPharPath = 'phar://test.phar/'.$file;
 
-        $this->assertFileExists($expectedPharPath);
+        self::assertFileExists($expectedPharPath);
 
         $actualContents = file_get_contents($expectedPharPath);
 
-        $this->assertSame($expectedContents, $actualContents);
+        self::assertSame($expectedContents, $actualContents);
 
         $firstCompactorProphecy->compact(Argument::cetera())->shouldHaveBeenCalledTimes(1);
         $secondCompactorProphecy->compact(Argument::cetera())->shouldHaveBeenCalledTimes(1);
@@ -606,11 +604,11 @@ class BoxTest extends FileSystemTestCase
             $expectedContents = $contents;
             $expectedPharPath = 'phar://test.phar/'.$file;
 
-            $this->assertFileExists($expectedPharPath);
+            self::assertFileExists($expectedPharPath);
 
             $actualContents = file_get_contents($expectedPharPath);
 
-            $this->assertSame($expectedContents, $actualContents);
+            self::assertSame($expectedContents, $actualContents);
         }
     }
 
@@ -628,9 +626,9 @@ class BoxTest extends FileSystemTestCase
         try {
             $this->box->addFiles(['foo', 'bar'], false);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            static::assertSame('Cannot add files if the buffering has not started.', $exception->getMessage());
+            self::assertSame('Cannot add files if the buffering has not started.', $exception->getMessage());
         }
     }
 
@@ -653,11 +651,11 @@ class BoxTest extends FileSystemTestCase
             $expectedContents = $contents;
             $expectedPharPath = 'phar://test.phar'.str_replace($this->tmp, '', $file);
 
-            $this->assertFileExists($expectedPharPath);
+            self::assertFileExists($expectedPharPath);
 
             $actualContents = file_get_contents($expectedPharPath);
 
-            $this->assertSame($expectedContents, $actualContents);
+            self::assertSame($expectedContents, $actualContents);
         }
     }
 
@@ -695,11 +693,11 @@ class BoxTest extends FileSystemTestCase
             $expectedContents = $item['contents'];
             $expectedPharPath = 'phar://test.phar/'.$item['local'];
 
-            $this->assertFileExists($expectedPharPath);
+            self::assertFileExists($expectedPharPath);
 
             $actualContents = file_get_contents($expectedPharPath);
 
-            $this->assertSame($expectedContents, $actualContents);
+            self::assertSame($expectedContents, $actualContents);
         }
     }
 
@@ -727,14 +725,14 @@ class BoxTest extends FileSystemTestCase
             $expectedContents = $contents;
             $expectedPharPath = 'phar://test.phar/'.$file;
 
-            $this->assertFileExists($expectedPharPath);
+            self::assertFileExists($expectedPharPath);
 
             $actualContents = file_get_contents($expectedPharPath);
 
-            $this->assertSame($expectedContents, $actualContents);
+            self::assertSame($expectedContents, $actualContents);
         }
 
-        $this->assertTrue($autoloadDumped);
+        self::assertTrue($autoloadDumped);
     }
 
     public function test_it_artefacts_created_when_dumping_the_autoloader_are_added_to_the_phar(): void
@@ -763,11 +761,11 @@ class BoxTest extends FileSystemTestCase
             $expectedContents = $contents;
             $expectedPharPath = 'phar://test.phar/'.$file;
 
-            $this->assertFileExists($expectedPharPath);
+            self::assertFileExists($expectedPharPath);
 
             $actualContents = file_get_contents($expectedPharPath);
 
-            $this->assertSame($expectedContents, $actualContents);
+            self::assertSame($expectedContents, $actualContents);
         }
     }
 
@@ -788,13 +786,13 @@ class BoxTest extends FileSystemTestCase
         $this->box->endBuffering(noop());
 
         foreach ($files as $file => $contents) {
-            $this->assertFileExists('phar://test.phar/'.$file);
+            self::assertFileExists('phar://test.phar/'.$file);
         }
 
         $this->box->removeComposerArtefacts('vendor');
 
         foreach ($files as $file => $contents) {
-            $this->assertFileDoesNotExist('phar://test.phar/'.$file);
+            self::assertFileDoesNotExist('phar://test.phar/'.$file);
         }
     }
 
@@ -807,8 +805,7 @@ class BoxTest extends FileSystemTestCase
                         "vendor-dir": "my-vendor"
                     }
                 }
-                JSON
-            ,
+                JSON,
             'composer.lock' => '{}',
             'my-vendor/composer/installed.json' => '{}',
         ];
@@ -822,13 +819,13 @@ class BoxTest extends FileSystemTestCase
         $this->box->endBuffering(noop());
 
         foreach ($files as $file => $contents) {
-            $this->assertFileExists('phar://test.phar/'.$file);
+            self::assertFileExists('phar://test.phar/'.$file);
         }
 
         $this->box->removeComposerArtefacts('my-vendor');
 
         foreach ($files as $file => $contents) {
-            $this->assertFileDoesNotExist('phar://test.phar/'.$file);
+            self::assertFileDoesNotExist('phar://test.phar/'.$file);
         }
     }
 
@@ -858,13 +855,13 @@ class BoxTest extends FileSystemTestCase
         $this->box->endBuffering(noop());
 
         foreach ($files as $file => $contents) {
-            $this->assertFileExists('phar://test.phar/lib/'.$file);
+            self::assertFileExists('phar://test.phar/lib/'.$file);
         }
 
         $this->box->removeComposerArtefacts('vendor');
 
         foreach ($files as $file => $contents) {
-            $this->assertFileDoesNotExist('phar://test.phar/lib/'.$file);
+            self::assertFileDoesNotExist('phar://test.phar/lib/'.$file);
         }
     }
 
@@ -875,9 +872,9 @@ class BoxTest extends FileSystemTestCase
         try {
             $this->box->removeComposerArtefacts('vendor');
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'The buffering must have ended before removing the Composer artefacts',
                 $exception->getMessage(),
             );
@@ -905,9 +902,9 @@ class BoxTest extends FileSystemTestCase
                 throw $error = new Error('Autoload dump error');
             });
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (Throwable $throwable) {
-            $this->assertSame($error, $throwable);
+            self::assertSame($error, $throwable);
         }
     }
 
@@ -930,11 +927,11 @@ class BoxTest extends FileSystemTestCase
             $expectedContents = $contents;
             $expectedPharPath = 'phar://test.phar/'.$file;
 
-            $this->assertFileExists($expectedPharPath);
+            self::assertFileExists($expectedPharPath);
 
             $actualContents = file_get_contents($expectedPharPath);
 
-            $this->assertSame($expectedContents, $actualContents);
+            self::assertSame($expectedContents, $actualContents);
         }
     }
 
@@ -972,11 +969,11 @@ class BoxTest extends FileSystemTestCase
             $expectedContents = $item['contents'];
             $expectedPharPath = 'phar://test.phar/'.$item['local'];
 
-            $this->assertFileExists($expectedPharPath);
+            self::assertFileExists($expectedPharPath);
 
             $actualContents = file_get_contents($expectedPharPath);
 
-            $this->assertSame($expectedContents, $actualContents);
+            self::assertSame($expectedContents, $actualContents);
         }
     }
 
@@ -1013,11 +1010,11 @@ class BoxTest extends FileSystemTestCase
         foreach ($expected as $file => $expectedContents) {
             $expectedPharPath = 'phar://test.phar/'.$file;
 
-            $this->assertFileExists($expectedPharPath);
+            self::assertFileExists($expectedPharPath);
 
             $actualContents = file_get_contents($expectedPharPath);
 
-            $this->assertSame($expectedContents, $actualContents);
+            self::assertSame($expectedContents, $actualContents);
         }
     }
 
@@ -1049,7 +1046,7 @@ class BoxTest extends FileSystemTestCase
         $this->box->endBuffering(noop());
 
         foreach ($files as $expectedLocal) {
-            $this->assertFileExists(
+            self::assertFileExists(
                 (string) $this->box->getPhar()[$expectedLocal],
                 'Expected to find the file "%s" in the PHAR.',
             );
@@ -1060,7 +1057,7 @@ class BoxTest extends FileSystemTestCase
                 (string) $this->box->getPhar()[$expectedLocal],
             );
 
-            $this->assertSame($expectedLocal, $pathInPhar);
+            self::assertSame($expectedLocal, $pathInPhar);
         }
     }
 
@@ -1070,13 +1067,13 @@ class BoxTest extends FileSystemTestCase
             $this->box->startBuffering();
             $this->box->addFiles(['/nowhere/foo'], true);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'The file "/nowhere/foo" does not exist.',
                 $exception->getMessage(),
             );
-            $this->assertNull($exception->getPrevious());
+            self::assertNull($exception->getPrevious());
         }
     }
 
@@ -1086,19 +1083,19 @@ class BoxTest extends FileSystemTestCase
         $contents = 'test';
 
         dump_file($file, $contents);
-        chmod($file, 0355);
+        chmod($file, 0o355);
 
         try {
             $this->box->startBuffering();
             $this->box->addFiles([$file], true);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'The path "foo" is not readable.',
                 $exception->getMessage(),
             );
-            $this->assertNull($exception->getPrevious());
+            self::assertNull($exception->getPrevious());
         }
     }
 
@@ -1110,7 +1107,7 @@ class BoxTest extends FileSystemTestCase
             $this->box->startBuffering();
             $this->box->addFiles(['/nowhere/foo'], false);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException) {
             $tmpDirs = iterator_to_array(
                 Finder::create()
@@ -1131,7 +1128,7 @@ class BoxTest extends FileSystemTestCase
                 ),
             );
 
-            $this->assertFalse(
+            self::assertFalse(
                 $boxDir,
                 sprintf(
                     'Did not expect to find the directory "%s".',
@@ -1146,7 +1143,7 @@ class BoxTest extends FileSystemTestCase
         $expected = new Phar('test.phar');
         $actual = $this->box->getPhar();
 
-        $this->assertEquals($expected, $actual);
+        self::assertEquals($expected, $actual);
     }
 
     public function test_register_placeholders(): void
@@ -1197,7 +1194,7 @@ class BoxTest extends FileSystemTestCase
 
         $actual = implode(PHP_EOL, $output);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     public function test_register_stub_file(): void
@@ -1227,12 +1224,12 @@ class BoxTest extends FileSystemTestCase
 
         $actual = trim($this->box->getPhar()->getStub());
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
 
         $expectedOutput = 'Hello world!';
         $actualOutput = exec('php test.phar');
 
-        $this->assertSame($expectedOutput, $actualOutput, 'Expected the PHAR to be executable.');
+        self::assertSame($expectedOutput, $actualOutput, 'Expected the PHAR to be executable.');
     }
 
     public function test_placeholders_are_also_replaced_in_stub_file(): void
@@ -1263,12 +1260,12 @@ class BoxTest extends FileSystemTestCase
 
         $actual = trim($this->box->getPhar()->getStub());
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
 
         $expectedOutput = 'Hello world!';
         $actualOutput = exec('php test.phar');
 
-        $this->assertSame($expectedOutput, $actualOutput, 'Expected the PHAR to be executable.');
+        self::assertSame($expectedOutput, $actualOutput, 'Expected the PHAR to be executable.');
     }
 
     public function test_cannot_set_non_existent_file_as_stub_file(): void
@@ -1276,9 +1273,9 @@ class BoxTest extends FileSystemTestCase
         try {
             $this->box->registerStub('/does/not/exist');
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (Exception $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'The file "/does/not/exist" does not exist.',
                 $exception->getMessage(),
             );
@@ -1289,14 +1286,14 @@ class BoxTest extends FileSystemTestCase
     {
         vfsStreamWrapper::setRoot($root = vfsStream::newDirectory('test'));
 
-        $root->addChild(vfsStream::newFile('test.php', 0000));
+        $root->addChild(vfsStream::newFile('test.php', 0));
 
         try {
             $this->box->registerStub('vfs://test/test.php');
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (Exception $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'The path "vfs://test/test.php" is not readable.',
                 $exception->getMessage(),
             );
@@ -1308,9 +1305,9 @@ class BoxTest extends FileSystemTestCase
         try {
             $this->box->registerPlaceholders(['stream' => STDOUT]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (Exception $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'Expected value "resource" to be a scalar or stringable object.',
                 $exception->getMessage(),
             );
@@ -1323,9 +1320,9 @@ class BoxTest extends FileSystemTestCase
             $this->box->startBuffering();
             $this->box->compress(Phar::NONE);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'Cannot compress files while buffering.',
                 $exception->getMessage(),
             );
@@ -1344,14 +1341,14 @@ class BoxTest extends FileSystemTestCase
             $this->box->compress($algorithm);
 
             if (false === $supportedAlgorithm) {
-                $this->fail('Expected exception to be thrown.');
+                self::fail('Expected exception to be thrown.');
             }
         } catch (InvalidArgumentException $exception) {
             if ($supportedAlgorithm) {
-                $this->fail('Did not expect exception to be thrown.');
+                self::fail('Did not expect exception to be thrown.');
             }
 
-            $this->assertSame(
+            self::assertSame(
                 sprintf(
                     'Expected one of: 4096, 8192, 0. Got: %s',
                     $algorithm,
@@ -1360,21 +1357,21 @@ class BoxTest extends FileSystemTestCase
             );
         }
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     public function test_it_cannot_compress_if_the_required_extension_is_not_loaded(): void
     {
         if (extension_loaded('bz2')) {
-            $this->markTestSkipped('Requires the extension bz2 to not be loaded.');
+            self::markTestSkipped('Requires the extension bz2 to not be loaded.');
         }
 
         try {
             $this->box->compress(Phar::BZ2);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'Cannot compress the PHAR with the compression algorithm "BZ2": the extension "bz2" is required but appear to not '
                 .'be loaded',
                 $exception->getMessage(),
@@ -1404,7 +1401,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->endBuffering(noop());
 
-        $this->assertCount(2, $this->box);
+        self::assertCount(2, $this->box);
 
         /** @var PharFileInfo[] $files */
         $files = [
@@ -1413,10 +1410,10 @@ class BoxTest extends FileSystemTestCase
         ];
 
         foreach ($files as $file) {
-            $this->assertFalse($file->isCompressed());
+            self::assertFalse($file->isCompressed());
         }
 
-        $this->assertSame(
+        self::assertSame(
             $stub,
             DisplayNormalizer::removeTrailingSpaces($this->box->getPhar()->getStub()),
             'Did not expect the stub to be affected by the compression.',
@@ -1424,7 +1421,7 @@ class BoxTest extends FileSystemTestCase
 
         $extensionRequired = $this->box->compress(Phar::GZ);
 
-        $this->assertSame('zlib', $extensionRequired);
+        self::assertSame('zlib', $extensionRequired);
 
         /** @var PharFileInfo[] $files */
         $files = [
@@ -1433,10 +1430,10 @@ class BoxTest extends FileSystemTestCase
         ];
 
         foreach ($files as $file) {
-            $this->assertTrue($file->isCompressed(Phar::GZ));
+            self::assertTrue($file->isCompressed(Phar::GZ));
         }
 
-        $this->assertSame(
+        self::assertSame(
             $stub,
             DisplayNormalizer::removeTrailingSpaces($this->box->getPhar()->getStub()),
             'Did not expect the stub to be affected by the compression.',
@@ -1444,7 +1441,7 @@ class BoxTest extends FileSystemTestCase
 
         $extensionRequired = $this->box->compress(Phar::NONE);
 
-        $this->assertNull($extensionRequired);
+        self::assertNull($extensionRequired);
 
         /** @var PharFileInfo[] $files */
         $files = [
@@ -1453,10 +1450,10 @@ class BoxTest extends FileSystemTestCase
         ];
 
         foreach ($files as $file) {
-            $this->assertFalse($file->isCompressed());
+            self::assertFalse($file->isCompressed());
         }
 
-        $this->assertSame(
+        self::assertSame(
             $stub,
             DisplayNormalizer::removeTrailingSpaces($this->box->getPhar()->getStub()),
             'Did not expect the stub to be affected by the compression.',
@@ -1476,13 +1473,13 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->sign($key, $password);
 
-        $this->assertNotSame([], $phar->getSignature(), 'Expected the PHAR to be signed.');
-        $this->assertIsString($phar->getSignature()['hash'], 'Expected the PHAR signature hash to be a string.');
-        $this->assertNotEmpty($phar->getSignature()['hash'], 'Expected the PHAR signature hash to not be empty.');
+        self::assertNotSame([], $phar->getSignature(), 'Expected the PHAR to be signed.');
+        self::assertIsString($phar->getSignature()['hash'], 'Expected the PHAR signature hash to be a string.');
+        self::assertNotEmpty($phar->getSignature()['hash'], 'Expected the PHAR signature hash to not be empty.');
 
-        $this->assertSame('OpenSSL', $phar->getSignature()['hash_type']);
+        self::assertSame('OpenSSL', $phar->getSignature()['hash_type']);
 
-        $this->assertSame(
+        self::assertSame(
             'Hello, world!',
             exec('php test.phar'),
             'Expected PHAR to be executable.',
@@ -1501,9 +1498,9 @@ class BoxTest extends FileSystemTestCase
         try {
             $this->box->sign($key, $password);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'Cannot create public key: "test.phar.pubkey" already exists and is not a file.',
                 $exception->getMessage(),
             );
@@ -1521,9 +1518,9 @@ class BoxTest extends FileSystemTestCase
         try {
             $this->box->sign($key, $password);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'Cannot create public key: "test.phar.pubkey" already exists and is not a file.',
                 $exception->getMessage(),
             );
@@ -1545,13 +1542,13 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->signUsingFile($file, $password);
 
-        $this->assertNotSame([], $phar->getSignature(), 'Expected the PHAR to be signed.');
-        $this->assertIsString($phar->getSignature()['hash'], 'Expected the PHAR signature hash to be a string.');
-        $this->assertNotEmpty($phar->getSignature()['hash'], 'Expected the PHAR signature hash to not be empty.');
+        self::assertNotSame([], $phar->getSignature(), 'Expected the PHAR to be signed.');
+        self::assertIsString($phar->getSignature()['hash'], 'Expected the PHAR signature hash to be a string.');
+        self::assertNotEmpty($phar->getSignature()['hash'], 'Expected the PHAR signature hash to not be empty.');
 
-        $this->assertSame('OpenSSL', $phar->getSignature()['hash_type']);
+        self::assertSame('OpenSSL', $phar->getSignature()['hash_type']);
 
-        $this->assertSame(
+        self::assertSame(
             'Hello, world!',
             exec('php test.phar'),
             'Expected the PHAR to be executable.',
@@ -1573,9 +1570,9 @@ class BoxTest extends FileSystemTestCase
         try {
             $this->box->signUsingFile($file, $password);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'Could not retrieve the private key, check that the password is correct.',
                 $exception->getMessage(),
             );
@@ -1587,9 +1584,9 @@ class BoxTest extends FileSystemTestCase
         try {
             $this->box->signUsingFile('/does/not/exist');
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'The file "/does/not/exist" does not exist.',
                 $exception->getMessage(),
             );
@@ -1599,16 +1596,16 @@ class BoxTest extends FileSystemTestCase
     public function test_it_cannot_sign_the_phar_with_an_unreadable_file_as_a_private_key(): void
     {
         $root = vfsStream::newDirectory('test');
-        $root->addChild(vfsStream::newFile('private.key', 0000));
+        $root->addChild(vfsStream::newFile('private.key', 0));
 
         vfsStreamWrapper::setRoot($root);
 
         try {
             $this->box->signUsingFile('vfs://test/private.key');
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'The path "vfs://test/private.key" is not readable.',
                 $exception->getMessage(),
             );
@@ -1648,9 +1645,7 @@ class BoxTest extends FileSystemTestCase
                 k6oIhMcpsXFdB3N9iHT4qqElo3rVW/qLQaNIqxd8+JmE5GkHmF43PhK3HX1PCmRC
                 TnvzVS0y1l8zCsRToUtv5rCBC+r8Q3gnvGGnT4jrsp98ithGIQCbbQ==
                 -----END RSA PRIVATE KEY-----
-                KEY_WRAP
-
-            ,
+                KEY_WRAP,
             'test',
         ];
     }
@@ -1667,10 +1662,10 @@ class BoxTest extends FileSystemTestCase
         );
 
         $this->box->getPhar()->setStub(
-            StubGenerator::create()
-                ->index('main.php')
-                ->checkRequirements(false)
-                ->generateStub(),
+            StubGenerator::generateStub(
+                index: 'main.php',
+                checkRequirements: false,
+            ),
         );
     }
 }

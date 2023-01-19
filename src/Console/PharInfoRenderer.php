@@ -14,14 +14,14 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
+use Fidry\Console\Input\IO;
+use KevinGH\Box\NotInstantiable;
+use KevinGH\Box\PharInfo\PharInfo;
 use function array_filter;
 use function array_key_last;
 use function array_sum;
 use function count;
-use Fidry\Console\Input\IO;
 use function KevinGH\Box\format_size;
-use KevinGH\Box\NotInstantiable;
-use KevinGH\Box\PharInfo\PharInfo;
 use function key;
 use function round;
 use function Safe\filesize;
@@ -120,7 +120,7 @@ final class PharInfoRenderer
         $io->writeln(
             sprintf(
                 '<comment>Contents:</comment>%s (%s)',
-                1 === $totalCount ? ' 1 file' : " $totalCount files",
+                1 === $totalCount ? ' 1 file' : " {$totalCount} files",
                 format_size(
                     filesize($pharInfo->getPhar()->getPath()),
                 ),

@@ -2,7 +2,8 @@
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="vendor/autoload.php"
-         colors="true">
+         colors="true"
+         cacheResultFile="dist/.phpunit.result.cache">
 
     <php>
         <!-- The width is matching the Travis one to avoid any issues with the CI -->
@@ -13,15 +14,14 @@
     </php>
 
     <testsuites>
-        <testsuite name="RequirementChecker Test Suite">
+        <testsuite name="AutoReview">
+            <directory>tests/AutoReview</directory>
+        </testsuite>
+
+        <testsuite name="UnitTests">
             <directory>tests/</directory>
+            <exclude>tests/AutoReview</exclude>
         </testsuite>
     </testsuites>
-
-    <coverage>
-        <include>
-            <directory suffix=".php">src/</directory>
-        </include>
-    </coverage>
 
 </phpunit>

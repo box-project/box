@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
+use Phar;
 use function array_diff_key;
 use function array_key_exists;
-use Phar;
 use function preg_match;
 use function sprintf;
 
@@ -169,8 +169,7 @@ final class AppRequirementsFactory
 
         [$polyfills, $requirements] = [] === $composerLockContents
             ? self::collectComposerJsonExtensionRequirements($composerJsonContents, $polyfills, $requirements)
-            : self::collectComposerLockExtensionRequirements($composerLockContents, $polyfills, $requirements)
-        ;
+            : self::collectComposerLockExtensionRequirements($composerLockContents, $polyfills, $requirements);
 
         return array_diff_key($requirements, $polyfills);
     }

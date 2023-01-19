@@ -3,13 +3,16 @@ name: GitHub-Pages
 on:
     push:
         branches:
-            - master
+            - main
         paths:
             - doc/**
+            - mkdocs.yaml
+            - .github/workflows/gh-pages.yaml
 
 jobs:
     deploy:
         runs-on: ubuntu-20.04
+        name: Deploy website
         permissions:
             contents: write
         steps:
@@ -21,17 +24,16 @@ jobs:
                 with:
                     python-version: '3.8'
 
+            # install pip=>20.1 to use "pip cache dir"
             -   name: Upgrade pip
-                run: |
-                    # install pip=>20.1 to use "pip cache dir"
-                    python3 -m pip install --upgrade pip
+                run: python3 -m pip install --upgrade pip
 
             -   name: Get pip cache dir
                 id: pip-cache
                 run: echo "::set-output name=dir::$(pip cache dir)"
 
             -   name: Cache dependencies
-                uses: actions/cache@v2
+                uses: actions/cache@v3
                 with:
                     path: ${{ steps.pip-cache.outputs.dir }}
                     key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -42,10 +44,10 @@ jobs:
                 run: python3 -m pip install mkdocs mkdocs-material
 
             -   name: Rebuild website
-                run: make website
+                run: make _website_build
 
             -   name: Deploy
                 uses: peaceiris/actions-gh-pages@v3
                 with:
                     github_token: ${{ secrets.GITHUB_TOKEN }}
-                    publish_dir: ./site
+                    publish_dir: ./dist/website

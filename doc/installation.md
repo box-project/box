@@ -50,7 +50,7 @@ $ vendor/bin/box
 To install box using [Homebrew](https://brew.sh), you need to tap the box formula first
 
 ```bash
-$ brew tap humbug/box
+$ brew tap box-project/box
 $ brew install box
 ```
 

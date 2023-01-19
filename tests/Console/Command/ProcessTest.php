@@ -17,13 +17,15 @@ namespace KevinGH\Box\Console\Command;
 use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
 use KevinGH\Box\Console\DisplayNormalizer;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\touch;
 use KevinGH\Box\Test\CommandTestCase;
 use Symfony\Component\Console\Output\OutputInterface;
+use function KevinGH\Box\FileSystem\dump_file;
+use function KevinGH\Box\FileSystem\touch;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Process
+ *
+ * @internal
  */
 class ProcessTest extends CommandTestCase
 {
@@ -50,7 +52,7 @@ class ProcessTest extends CommandTestCase
 
              // Loading without a configuration file.
 
-            ⚡  Processing the contents of the file $expectedPath
+            ⚡  Processing the contents of the file {$expectedPath}
 
             No replacement values registered
 
@@ -106,13 +108,13 @@ class ProcessTest extends CommandTestCase
 
              // Loading the configuration file "box.json".
 
-            ⚡  Processing the contents of the file $expectedFilePath
+            ⚡  Processing the contents of the file {$expectedFilePath}
 
             Registered replacement values:
               + @foo@: bar
 
             Registered compactors:
-              + KevinGH\Box\Compactor\Json
+              + KevinGH\\Box\\Compactor\\Json
 
             Processed contents:
 
@@ -184,13 +186,13 @@ class ProcessTest extends CommandTestCase
 
              // Loading the configuration file "box.json".
 
-            ⚡  Processing the contents of the file $expectedPath
+            ⚡  Processing the contents of the file {$expectedPath}
 
             Registered replacement values:
               + @foo@: bar
 
             Registered compactors:
-              + KevinGH\Box\Compactor\PhpScoper
+              + KevinGH\\Box\\Compactor\\PhpScoper
 
             Processed contents:
 
@@ -206,7 +208,7 @@ class ProcessTest extends CommandTestCase
             Whitelist:
 
             """
-            Humbug\PhpScoper\Symbol\SymbolsRegistry {#140
+            Humbug\\PhpScoper\\Symbol\\SymbolsRegistry {#140
               -recordedFunctions: []
               -recordedClasses: []
             }

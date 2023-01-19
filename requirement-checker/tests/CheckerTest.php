@@ -21,6 +21,8 @@ use const PHP_VERSION;
 
 /**
  * @covers \KevinGH\RequirementChecker\Checker
+ *
+ * @internal
  */
 class CheckerTest extends TestCase
 {
@@ -54,8 +56,8 @@ class CheckerTest extends TestCase
             $actualOutput
         );
 
-        $this->assertSame($expectedOutput, $actualOutput);
-        $this->assertSame($expectedResult, $actualResult);
+        self::assertSame($expectedOutput, $actualOutput);
+        self::assertSame($expectedResult, $actualResult);
     }
 
     public function provideRequirements(): Generator
@@ -69,21 +71,21 @@ class CheckerTest extends TestCase
                 true,
                 <<<EOF
 
-Box Requirements Checker
-========================
+                    Box Requirements Checker
+                    ========================
 
-> Using PHP $phpVersion
-> PHP is using the following php.ini file:
-  /path/to/php.ini
+                    > Using PHP {$phpVersion}
+                    > PHP is using the following php.ini file:
+                      /path/to/php.ini
 
-> No requirements found.
-
-
- [OK] Your system is ready to run the application.
+                    > No requirements found.
 
 
+                     [OK] Your system is ready to run the application.
 
-EOF
+
+
+                    EOF
             ];
         })();
 
@@ -94,21 +96,21 @@ EOF
                 true,
                 <<<EOF
 
-Box Requirements Checker
-========================
+                    Box Requirements Checker
+                    ========================
 
-> Using PHP $phpVersion
-> PHP is using the following php.ini file:
-  /path/to/php.ini
+                    > Using PHP {$phpVersion}
+                    > PHP is using the following php.ini file:
+                      /path/to/php.ini
 
-> No requirements found.
-
-
- [OK] Your system is ready to run the application.
+                    > No requirements found.
 
 
+                     [OK] Your system is ready to run the application.
 
-EOF
+
+
+                    EOF
             ];
         })();
 
@@ -132,7 +134,7 @@ EOF
                 'The application requires the version "7.2.0" or greater.'
             );
             $requirements->addRequirement(
-                new class implements IsFulfilled {
+                new class() implements IsFulfilled {
                     public function __invoke(): bool
                     {
                         return true;
@@ -148,23 +150,23 @@ EOF
                 true,
                 <<<EOF
 
-Box Requirements Checker
-========================
+                    Box Requirements Checker
+                    ========================
 
-> Using PHP $phpVersion
-> PHP is using the following php.ini file:
-  /path/to/php.ini
+                    > Using PHP {$phpVersion}
+                    > PHP is using the following php.ini file:
+                      /path/to/php.ini
 
-> Checking Box requirements:
-  ✔ The application requires the version "7.2.0" or greater.
-  ✔ The package "acme/foo" requires the extension "random".
-
-
- [OK] Your system is ready to run the application.
+                    > Checking Box requirements:
+                      ✔ The application requires the version "7.2.0" or greater.
+                      ✔ The package "acme/foo" requires the extension "random".
 
 
+                     [OK] Your system is ready to run the application.
 
-EOF
+
+
+                    EOF
             ];
         })();
 
@@ -188,22 +190,22 @@ EOF
                 true,
                 <<<EOF
 
-Box Requirements Checker
-========================
+                    Box Requirements Checker
+                    ========================
 
-> Using PHP $phpVersion
-> PHP is using the following php.ini file:
-  /path/to/php.ini
+                    > Using PHP {$phpVersion}
+                    > PHP is using the following php.ini file:
+                      /path/to/php.ini
 
-> Checking Box requirements:
-  ..
-
-
- [OK] Your system is ready to run the application.
+                    > Checking Box requirements:
+                      ..
 
 
+                     [OK] Your system is ready to run the application.
 
-EOF
+
+
+                    EOF
             ];
         })();
 
@@ -251,30 +253,30 @@ EOF
                 false,
                 <<<EOF
 
-Box Requirements Checker
-========================
+                    Box Requirements Checker
+                    ========================
 
-> Using PHP $phpVersion
-> PHP is using the following php.ini file:
-  /path/to/php.ini
+                    > Using PHP {$phpVersion}
+                    > PHP is using the following php.ini file:
+                      /path/to/php.ini
 
-> Checking Box requirements:
-  ✔ The application requires the version "7.2.0" or greater.
-  ✘ The package "acme/foo" requires the extension "random". Enable it or install
-a polyfill.
-
-
- [ERROR] Your system is not ready to run the application.
+                    > Checking Box requirements:
+                      ✔ The application requires the version "7.2.0" or greater.
+                      ✘ The package "acme/foo" requires the extension "random". Enable it or install
+                    a polyfill.
 
 
-Fix the following mandatory requirements:
-=========================================
-
- * The package "acme/foo" requires the extension "random". Enable it or install
-   a polyfill.
+                     [ERROR] Your system is not ready to run the application.
 
 
-EOF
+                    Fix the following mandatory requirements:
+                    =========================================
+
+                     * The package "acme/foo" requires the extension "random". Enable it or install
+                       a polyfill.
+
+
+                    EOF
             ];
         })();
 
@@ -299,28 +301,28 @@ EOF
                     false,
                     <<<EOF
 
-Box Requirements Checker
-========================
+                        Box Requirements Checker
+                        ========================
 
-> Using PHP $phpVersion
-> PHP is using the following php.ini file:
-  /path/to/php.ini
+                        > Using PHP {$phpVersion}
+                        > PHP is using the following php.ini file:
+                          /path/to/php.ini
 
-> Checking Box requirements:
-  .E
-
-
- [ERROR] Your system is not ready to run the application.
+                        > Checking Box requirements:
+                          .E
 
 
-Fix the following mandatory requirements:
-=========================================
-
- * The package "acme/foo" requires the extension "random". Enable it or install
-   a polyfill.
+                         [ERROR] Your system is not ready to run the application.
 
 
-EOF
+                        Fix the following mandatory requirements:
+                        =========================================
+
+                         * The package "acme/foo" requires the extension "random". Enable it or install
+                           a polyfill.
+
+
+                        EOF
                 ];
             })();
         }
@@ -345,28 +347,28 @@ EOF
                 false,
                 <<<EOF
 
-Box Requirements Checker
-========================
+                    Box Requirements Checker
+                    ========================
 
-> Using PHP $phpVersion
-> PHP is using the following php.ini file:
-  /path/to/php.ini
+                    > Using PHP {$phpVersion}
+                    > PHP is using the following php.ini file:
+                      /path/to/php.ini
 
-> Checking Box requirements:
-  .E
-
-
- [ERROR] Your system is not ready to run the application.
+                    > Checking Box requirements:
+                      .E
 
 
-Fix the following mandatory requirements:
-=========================================
-
- * The package "acme/foo" requires the extension "random". Enable it or install
-   a polyfill.
+                     [ERROR] Your system is not ready to run the application.
 
 
-EOF
+                    Fix the following mandatory requirements:
+                    =========================================
+
+                     * The package "acme/foo" requires the extension "random". Enable it or install
+                       a polyfill.
+
+
+                    EOF
             ];
         })();
     }

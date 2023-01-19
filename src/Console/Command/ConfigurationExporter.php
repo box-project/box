@@ -14,17 +14,17 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use const DATE_ATOM;
 use DateTimeImmutable;
 use DateTimeZone;
+use KevinGH\Box\Configuration\Configuration;
+use KevinGH\Box\NotInstantiable;
 use function function_exists;
 use function get_loaded_extensions;
 use function implode;
-use KevinGH\Box\Configuration\Configuration;
 use function KevinGH\Box\get_box_version;
-use KevinGH\Box\NotInstantiable;
-use const PHP_OS;
 use function php_uname;
+use const DATE_ATOM;
+use const PHP_OS;
 use const PHP_VERSION;
 
 final class ConfigurationExporter
@@ -44,14 +44,14 @@ final class ConfigurationExporter
 
         $header = <<<EOF
             //
-            // Processed content of the configuration file "$file" dumped for debugging purposes
+            // Processed content of the configuration file "{$file}" dumped for debugging purposes
             //
-            // PHP Version: $phpVersion
-            // PHP extensions: $phpExtensions
-            // OS: $os
-            // Command: $command
-            // Box: $boxVersion
-            // Time: $date
+            // PHP Version: {$phpVersion}
+            // PHP extensions: {$phpExtensions}
+            // OS: {$os}
+            // Command: {$command}
+            // Box: {$boxVersion}
+            // Time: {$date}
             //
 
 

@@ -14,13 +14,15 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Configuration;
 
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\touch;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\Test\FileSystemTestCase;
+use function KevinGH\Box\FileSystem\dump_file;
+use function KevinGH\Box\FileSystem\touch;
 
 /**
  * @covers \KevinGH\Box\Configuration\ConfigurationLoader
+ *
+ * @internal
  */
 class ConfigurationLoaderTest extends FileSystemTestCase
 {
@@ -38,7 +40,7 @@ class ConfigurationLoaderTest extends FileSystemTestCase
         touch('index.php');
         dump_file('box.json.dist', '{}');
 
-        $this->assertInstanceOf(
+        self::assertInstanceOf(
             Configuration::class,
             $this->loader->loadFile('box.json.dist'),
         );
@@ -48,7 +50,7 @@ class ConfigurationLoaderTest extends FileSystemTestCase
     {
         touch('index.php');
 
-        $this->assertInstanceOf(
+        self::assertInstanceOf(
             Configuration::class,
             $this->loader->loadFile(null),
         );

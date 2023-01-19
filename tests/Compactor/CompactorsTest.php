@@ -25,6 +25,8 @@ use Prophecy\Prophet;
 
 /**
  * @covers \KevinGH\Box\Compactor\Compactors
+ *
+ * @internal
  */
 class CompactorsTest extends TestCase
 {
@@ -58,18 +60,16 @@ class CompactorsTest extends TestCase
 
         $this->compactor1Prophecy
             ->compact($file, $contents)
-            ->willReturn($contentsAfterCompactor1 = 'contents after compactor1')
-        ;
+            ->willReturn($contentsAfterCompactor1 = 'contents after compactor1');
         $this->compactor2Prophecy
             ->compact($file, $contentsAfterCompactor1)
-            ->willReturn($contentsAfterCompactor2 = 'contents after compactor2')
-        ;
+            ->willReturn($contentsAfterCompactor2 = 'contents after compactor2');
 
         $expected = $contentsAfterCompactor2;
 
         $actual = $this->compactors->compact($file, $contents);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
 
         $this->compactor1Prophecy->compact(Argument::cetera())->shouldHaveBeenCalledTimes(1);
         $this->compactor2Prophecy->compact(Argument::cetera())->shouldHaveBeenCalledTimes(1);
@@ -77,7 +77,7 @@ class CompactorsTest extends TestCase
 
     public function test_it_can_be_converted_into_an_array(): void
     {
-        $this->assertSame(
+        self::assertSame(
             [
                 $this->compactor1,
                 $this->compactor2,
@@ -97,7 +97,7 @@ class CompactorsTest extends TestCase
     ): void {
         $actual = (new Compactors(...$compactors))->getScoperSymbolsRegistry();
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     /**
@@ -120,7 +120,7 @@ class CompactorsTest extends TestCase
 
         $actual = $compactorsAggregate->getScoperSymbolsRegistry();
 
-        $this->assertSame($newSymbolsRegistry, $actual);
+        self::assertSame($newSymbolsRegistry, $actual);
     }
 
     public function test_it_can_change_the_symbols_registry_even_when_the_scoper_is_not_registered(): void
@@ -129,14 +129,14 @@ class CompactorsTest extends TestCase
 
         $compactorsAggregate->registerSymbolsRegistry(new SymbolsRegistry());
 
-        $this->assertNull($compactorsAggregate->getScoperSymbolsRegistry());
+        self::assertNull($compactorsAggregate->getScoperSymbolsRegistry());
     }
 
     public function test_it_is_countable(): void
     {
-        $this->assertCount(0, new Compactors());
-        $this->assertCount(1, new Compactors(new FakeCompactor()));
-        $this->assertCount(2, new Compactors(new FakeCompactor(), new FakeCompactor()));
+        self::assertCount(0, new Compactors());
+        self::assertCount(1, new Compactors(new FakeCompactor()));
+        self::assertCount(2, new Compactors(new FakeCompactor(), new FakeCompactor()));
     }
 
     public static function compactorsForFirstSymbolsRegistryCheckProvider(): iterable

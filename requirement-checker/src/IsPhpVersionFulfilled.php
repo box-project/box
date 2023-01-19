@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the box project.
  *
@@ -14,6 +16,9 @@ namespace KevinGH\RequirementChecker;
 
 use Composer\Semver\Semver;
 use function sprintf;
+use const PHP_MAJOR_VERSION;
+use const PHP_MINOR_VERSION;
+use const PHP_RELEASE_VERSION;
 
 /**
  * @private
@@ -30,7 +35,7 @@ final class IsPhpVersionFulfilled implements IsFulfilled
     public function __invoke(): bool
     {
         return Semver::satisfies(
-            sprintf('%d.%d.%d', \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION, \PHP_RELEASE_VERSION),
+            sprintf('%d.%d.%d', PHP_MAJOR_VERSION, PHP_MINOR_VERSION, PHP_RELEASE_VERSION),
             $this->requiredPhpVersion
         );
     }

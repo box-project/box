@@ -18,6 +18,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \KevinGH\Box\PhpScoper\ExcludedFilesScoper
+ *
+ * @internal
  */
 final class ExcludedFilesScoperTest extends TestCase
 {

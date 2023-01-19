@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the box project.
  *
@@ -115,8 +117,7 @@ final class Printer
                 $line = str_repeat(' ', strlen($prefix)).ltrim($line);
             }
             $lines[] = str_pad($line, $this->width, ' ', STR_PAD_RIGHT);
-        }
-        while (count($wrapped));
+        } while (count($wrapped));
 
         $this->printvln('', $verbosity);
         $this->printvln(str_repeat(' ', $this->width), $verbosity, $style);
@@ -148,7 +149,7 @@ final class Printer
             $this->supportColors ? $this->styles['reset'] : ''
         );
 
-        if (getenv('BOX_REQUIREMENTS_CHECKER_LOG_TO_STDOUT') === '1') {
+        if ('1' === getenv('BOX_REQUIREMENTS_CHECKER_LOG_TO_STDOUT')) {
             // use echo/print to support output buffering
             echo $message;
         } else {
