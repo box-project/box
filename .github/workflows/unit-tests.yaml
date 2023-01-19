@@ -29,6 +29,7 @@ jobs:
                     # TODO: add more composer versions
                     - composer
                 phar-readonly: [ true, false ]
+                php-extra-extensions: []
                 include:
                     -   version: '8.1'
                         dependency: locked
