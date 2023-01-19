@@ -29,6 +29,11 @@ jobs:
                     # TODO: add more composer versions
                     - composer
                 phar-readonly: [ true, false ]
+                include:
+                    -   version: '8.1'
+                        dependency: locked
+                        composer-options: ''
+                        php-extra-extensions: ', :bz2'
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3
@@ -42,7 +47,7 @@ jobs:
                     ini-values: ${{ matrix.phar-readonly && 'phar.readonly=1' || 'phar.readonly=0' }}, display_errors=On, error_reporting=-1
                     tools: ${{ matrix.tools }}
                     coverage: none
-                    extensions: ctype, iconv, xml
+                    extensions: ctype, iconv, xml${{ php-extra-extensions }}
 
             -   name: Install Composer dependencies
                 uses: ramsey/composer-install@v2
