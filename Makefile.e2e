@@ -36,6 +36,14 @@ E2E_PHPSTORM_STUBS_OUTPUT_DIR = dist/dir014
 E2E_PHPSTORM_STUBS_EXPECTED_OUTPUT := $(E2E_PHPSTORM_STUBS_DIR)/expected-output
 E2E_PHPSTORM_STUBS_ACTUAL_OUTPUT := $(E2E_PHPSTORM_STUBS_OUTPUT_DIR)/actual-output
 
+E2E_DOCKERFILE_DIR = fixtures/build/dir015
+E2E_DOCKERFILE_OUTPUT_DIR = dist/dir015
+E2E_DOCKERFILE_EXPECTED_OUTPUT := $(E2E_DOCKERFILE_DIR)/expected-output
+E2E_DOCKERFILE_ACTUAL_OUTPUT := $(E2E_DOCKERFILE_OUTPUT_DIR)/actual-output
+E2E_DOCKERFILE_PHAR := $(E2E_DOCKERFILE_DIR)/index.phar
+# TODO: see https://github.com/box-project/box/issues/839
+E2E_DOCKERFILE_DOCKERFILE := Dockerfile
+
 ifeq ($(OS),Darwin)
 	SED = sed -i ''
 else
@@ -73,7 +81,7 @@ e2e_php_settings_checker: docker_images _e2e_php_settings_checker
 .PHONY: _e2e_php_settings_checker
 _e2e_php_settings_checker: $(SCOPED_BOX_BIN) $(E2E_PHP_SETTINGS_CHECKER_EXPECTED_XDEBUG_ENABLED_OUTPUT)
 	@echo "$(YELLOW_COLOR)No restart needed$(NO_COLOR)"
-	$(DOCKER_RUN) -v "$$PWD":/opt/box $(DOCKER_MIN_BOX_VERSION_IMAGE_TAG) \
+	$(DOCKER_RUN) --volume="$$PWD":/opt/box $(DOCKER_MIN_BOX_VERSION_IMAGE_TAG) \
 		php -dphar.readonly=0 -dmemory_limit=-1 \
 		$(E2E_PHP_SETTINGS_CHECKER_BOX_COMPILE) \
 		| grep '\[debug\]' \
@@ -83,7 +91,7 @@ _e2e_php_settings_checker: $(SCOPED_BOX_BIN) $(E2E_PHP_SETTINGS_CHECKER_EXPECTED
 
 	@echo ""
 	@echo "$(YELLOW_COLOR)Xdebug enabled: restart needed$(NO_COLOR)"
-	$(DOCKER_RUN) -v "$$PWD":/opt/box $(DOCKER_MIN_BOX_XDEBUG_PHP_VERSION_IMAGE_TAG) \
+	$(DOCKER_RUN) --volume="$$PWD":/opt/box $(DOCKER_MIN_BOX_XDEBUG_PHP_VERSION_IMAGE_TAG) \
 		php -dphar.readonly=0 -dmemory_limit=-1 \
 		$(E2E_PHP_SETTINGS_CHECKER_BOX_COMPILE) \
 		| grep '\[debug\]' \
@@ -94,7 +102,7 @@ _e2e_php_settings_checker: $(SCOPED_BOX_BIN) $(E2E_PHP_SETTINGS_CHECKER_EXPECTED
 
 	@echo ""
 	@echo "$(YELLOW_COLOR)phar.readonly enabled: restart needed$(NO_COLOR)"
-	$(DOCKER_RUN) -v "$$PWD":/opt/box $(DOCKER_MIN_BOX_VERSION_IMAGE_TAG) \
+	$(DOCKER_RUN) --volume="$$PWD":/opt/box $(DOCKER_MIN_BOX_VERSION_IMAGE_TAG) \
 		php -dphar.readonly=1 -dmemory_limit=-1 \
 		$(E2E_PHP_SETTINGS_CHECKER_BOX_COMPILE) \
 		| grep '\[debug\]' \
@@ -106,7 +114,7 @@ _e2e_php_settings_checker: $(SCOPED_BOX_BIN) $(E2E_PHP_SETTINGS_CHECKER_EXPECTED
 
 	@echo ""
 	@echo "$(YELLOW_COLOR)Bump min memory limit if necessary (limit lower than default)$(NO_COLOR)"
-	$(DOCKER_RUN) -v "$$PWD":/opt/box $(DOCKER_MIN_BOX_VERSION_IMAGE_TAG) \
+	$(DOCKER_RUN) --volume="$$PWD":/opt/box $(DOCKER_MIN_BOX_VERSION_IMAGE_TAG) \
 		php -dphar.readonly=0 -dmemory_limit=124M \
 		$(E2E_PHP_SETTINGS_CHECKER_BOX_COMPILE) \
 		| grep '\[debug\]' \
@@ -118,7 +126,7 @@ _e2e_php_settings_checker: $(SCOPED_BOX_BIN) $(E2E_PHP_SETTINGS_CHECKER_EXPECTED
 
 	@echo ""
 	@echo "$(YELLOW_COLOR)Bump min memory limit if necessary (limit higher than default)$(NO_COLOR)"
-	$(DOCKER_RUN) -e BOX_MEMORY_LIMIT=64M -v "$$PWD":/opt/box $(DOCKER_MIN_BOX_VERSION_IMAGE_TAG) \
+	$(DOCKER_RUN) -e BOX_MEMORY_LIMIT=64M --volume="$$PWD":/opt/box $(DOCKER_MIN_BOX_VERSION_IMAGE_TAG) \
 		php -dphar.readonly=0 -dmemory_limit=1024M \
 		$(E2E_PHP_SETTINGS_CHECKER_BOX_COMPILE) \
 		| grep '\[debug\]' \
@@ -168,6 +176,18 @@ e2e_phpstorm_stubs: $(SCOPED_BOX_BIN)
 
 	$(DIFF) $(E2E_PHPSTORM_STUBS_EXPECTED_OUTPUT) $(E2E_PHPSTORM_STUBS_ACTUAL_OUTPUT)
 
+.PHONY: e2e_dockerfile
+e2e_dockerfile: $(E2E_DOCKERFILE_DOCKERFILE) _e2e_dockerfile
+
+.PHONY: _e2e_dockerfile
+_e2e_dockerfile:
+	@mkdir -p $(E2E_DOCKERFILE_OUTPUT_DIR)
+
+	docker build $(shell dirname $(E2E_DOCKERFILE_DOCKERFILE)) --tag=local/box/e2e_dockerfile
+	docker run --interactive --platform=linux/arm64 --rm local/box/e2e_dockerfile > $(E2E_DOCKERFILE_ACTUAL_OUTPUT)
+
+	$(DIFF) $(E2E_DOCKERFILE_EXPECTED_OUTPUT) $(E2E_DOCKERFILE_ACTUAL_OUTPUT)
+
 
 #
 # Rules from files
@@ -196,6 +216,19 @@ $(E2E_COMPOSER_INSTALLED_DIR)/vendor: $(E2E_COMPOSER_INSTALLED_DIR)/composer.loc
 $(E2E_COMPOSER_INSTALLED_DIR)/composer.lock: $(E2E_COMPOSER_INSTALLED_DIR)/composer.json
 	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer update --lock --working-dir=$(E2E_COMPOSER_INSTALLED_DIR) && touch -c $(@)"
+
+$(E2E_DOCKERFILE_DIR)/vendor: $(E2E_DOCKERFILE_DIR)/composer.lock
+	composer install --ansi --working-dir=$(E2E_DOCKERFILE_DIR)
+	touch -c $@
+$(E2E_DOCKERFILE_DIR)/composer.lock: $(E2E_DOCKERFILE_DIR)/composer.json
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
+	@echo "$$ composer update --lock --working-dir=$(E2E_DOCKERFILE_DIR) && touch -c $(@)"
+$(E2E_DOCKERFILE_PHAR): $(SCOPED_BOX_BIN) $(E2E_DOCKERFILE_DIR)/index.php $(E2E_DOCKERFILE_DIR)/vendor
+	$(SCOPED_BOX) compile --ansi --working-dir=$(E2E_DOCKERFILE_DIR)
+	touch -c $@
+$(E2E_DOCKERFILE_DOCKERFILE): $(E2E_DOCKERFILE_PHAR)
+	$(SCOPED_BOX) docker --no-interaction --config=$(E2E_DOCKERFILE_DIR)/box.json.dist
+	touch -c $@
 
 .PHONY: docker_images
 docker_images:
