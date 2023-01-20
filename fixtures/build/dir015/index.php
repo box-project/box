@@ -12,4 +12,4 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-echo 'Everything is fine!'.(extension_loaded('xml') ? ' The extension XML is loaded.': ' Oups! The extension XML is not loaded!').PHP_EOL;
+echo 'Everything is fine!'.(extension_loaded('xml') ? ' The extension XML is loaded.' : ' Oups! The extension XML is not loaded!').PHP_EOL;
