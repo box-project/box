@@ -129,7 +129,7 @@ final class Process implements Command
         if ($io->isQuiet()) {
             $io->writeln($fileProcessedContents, OutputInterface::VERBOSITY_QUIET);
         } else {
-            $whitelist = self::retrieveWhitelist($compactors);
+            $symbolsRegistry = self::retrieveSymbolsRegistry($compactors);
 
             $io->writeln([
                 'Processed contents:',
@@ -139,13 +139,13 @@ final class Process implements Command
                 '<comment>"""</comment>',
             ]);
 
-            if (null !== $whitelist) {
+            if (null !== $symbolsRegistry) {
                 $io->writeln([
                     '',
                     'Whitelist:',
                     '',
                     '<comment>"""</comment>',
-                    self::exportWhitelist($whitelist, $io),
+                    self::exportSymbolsRegistry($symbolsRegistry, $io),
                     '<comment>"""</comment>',
                 ]);
             }
@@ -234,7 +234,7 @@ final class Process implements Command
         $io->newLine();
     }
 
-    private static function retrieveWhitelist(Compactors $compactors): ?SymbolsRegistry
+    private static function retrieveSymbolsRegistry(Compactors $compactors): ?SymbolsRegistry
     {
         foreach ($compactors->toArray() as $compactor) {
             if ($compactor instanceof PhpScoper) {
@@ -245,7 +245,7 @@ final class Process implements Command
         return null;
     }
 
-    private static function exportWhitelist(SymbolsRegistry $whitelist, IO $io): string
+    private static function exportSymbolsRegistry(SymbolsRegistry $symbolsRegistry, IO $io): string
     {
         $cloner = new VarCloner();
         $cloner->setMaxItems(-1);
@@ -257,7 +257,7 @@ final class Process implements Command
         }
 
         return (string) $cliDumper->dump(
-            $cloner->cloneVar($whitelist),
+            $cloner->cloneVar($symbolsRegistry),
             true,
         );
     }

@@ -105,7 +105,7 @@ class CompactorsTest extends TestCase
      *
      * @param list<Compactor> $compactors
      */
-    public function test_it_can_change_the_first_scoper_compactor_whitelist(
+    public function test_it_can_change_the_first_scoper_compactor_symbols_registry(
         array $compactors,
         ?SymbolsRegistry $newSymbolsRegistry,
     ): void {

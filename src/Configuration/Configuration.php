@@ -2735,7 +2735,7 @@ final class Configuration
             self::retrievePhpScoperConfig($raw, $basePath, $logger),
         );
 
-        $whitelistedFiles = array_values(
+        $excludedFilePaths = array_values(
             array_unique(
                 array_map(
                     static fn (string $path): string => make_path_relative($path, $basePath),
@@ -2747,7 +2747,7 @@ final class Configuration
         );
 
         return new PhpScoperCompactor(
-            new SerializableScoper($phpScoperConfig, ...$whitelistedFiles),
+            new SerializableScoper($phpScoperConfig, ...$excludedFilePaths),
         );
     }
 
