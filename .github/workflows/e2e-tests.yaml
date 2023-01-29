@@ -49,6 +49,7 @@ jobs:
                     - e2e_symfony
                     - e2e_composer_installed_versions
                     - e2e_phpstorm_stubs
+                    - e2e_dockerfile
                 php: [ '8.1' ]
                 tools: [ composer ]
         steps:
