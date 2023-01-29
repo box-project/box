@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Fidry\Console\Command\Command;
 use Fidry\Console\Command\CommandAware;
 use Fidry\Console\Command\CommandAwareness;
 use Fidry\Console\Command\Configuration;
@@ -147,7 +148,7 @@ final class GenerateDockerFile implements CommandAware
         return $config->getOutputPath();
     }
 
-    private function getCompileCommand(): Compile
+    private function getCompileCommand(): Command
     {
         /* @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getCommandRegistry()->findCommand(Compile::NAME);
