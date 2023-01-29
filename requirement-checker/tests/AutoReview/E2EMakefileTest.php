@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace AutoReview;
+namespace KevinGH\RequirementChecker\AutoReview;
 
 use Fidry\Makefile\Parser;
 use Fidry\Makefile\Rule;
