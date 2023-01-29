@@ -164,20 +164,20 @@ jobs:
             fail-fast: false
             matrix:
                 e2e:
-                    - command: _test_e2e_pass_no_config_min_composer_php
-                      docker-image: ghcr.io/box-project/box_php725
-                    - command: _test_e2e_pass_no_config_min_box_php
-                      docker-image: ghcr.io/box-project/box_php81
-                    - command: _test_e2e_pass_complete_min_composer_php
-                      docker-image: ghcr.io/box-project/box_php725
-                    - command: _test_e2e_pass_complete_min_box_php
-                      docker-image: ghcr.io/box-project/box_php81
-                    - command: _test_e2e_fail_complete_min_composer_php
-                      docker-image: ghcr.io/box-project/box_php725
-                    - command: _test_e2e_fail_complete_min_box_php
-                      docker-image: ghcr.io/box-project/box_php81
-                    - command: _test_e2e_skip_min_composer_php
-                      docker-image: ghcr.io/box-project/box_php725
+                    -   command: _test_e2e_pass_no_config_min_composer_php
+                        docker-image: ghcr.io/box-project/box_php725
+                    -   command: _test_e2e_pass_no_config_min_box_php
+                        docker-image: ghcr.io/box-project/box_php81
+                    -   command: _test_e2e_pass_complete_min_composer_php
+                        docker-image: ghcr.io/box-project/box_php725
+                    -   command: _test_e2e_pass_complete_min_box_php
+                        docker-image: ghcr.io/box-project/box_php81
+                    -   command: _test_e2e_fail_complete_min_composer_php
+                        docker-image: ghcr.io/box-project/box_php725
+                    -   command: _test_e2e_fail_complete_min_box_php
+                        docker-image: ghcr.io/box-project/box_php81
+                    -   command: _test_e2e_skip_min_composer_php
+                        docker-image: ghcr.io/box-project/box_php725
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3
@@ -241,13 +241,13 @@ jobs:
             - e2e-tests
         if: always()
         steps:
-            - name: Successful run
-              if: ${{ !(contains(needs.*.result, 'failure')) }}
-              run: exit 0
+            -   name: Successful run
+                if: ${{ !(contains(needs.*.result, 'failure')) }}
+                run: exit 0
 
-            - name: Failing run
-              if: ${{ contains(needs.*.result, 'failure') }}
-              run: exit 1
+            -   name: Failing run
+                if: ${{ contains(needs.*.result, 'failure') }}
+                run: exit 1
 
     update-requirement-checker:
         name: "Update the RequirementChecker"
@@ -255,12 +255,12 @@ jobs:
         runs-on: "ubuntu-latest"
         steps:
             -
-            - name: Checkout
-              uses: actions/checkout@v3
-              with:
-                  ref: ${{ github.head_ref }}
-                  fetch-depth: '0'  # Ensures the tags are fetched
-                  token: ${{ secrets.GITHUB_TOKEN }}
+            -   name: Checkout
+                uses: actions/checkout@v3
+                with:
+                    ref: ${{ github.head_ref }}
+                    fetch-depth: '0'  # Ensures the tags are fetched
+                    token: ${{ secrets.GITHUB_TOKEN }}
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
