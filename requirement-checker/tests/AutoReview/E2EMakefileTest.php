@@ -16,7 +16,6 @@ namespace KevinGH\RequirementChecker\AutoReview;
 
 use Fidry\Makefile\Rule;
 use Fidry\Makefile\Test\BaseMakefileTestCase;
-use KevinGH\RequirementChecker\AutoReview\MakefileE2ECollector;
 
 /**
  * @coversNothing

@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\RequirementChecker\AutoReview;
 
-use AutoReview\MakefileTest;
 use Fidry\Makefile\Parser;
 use Fidry\Makefile\Rule;
 use function current;
