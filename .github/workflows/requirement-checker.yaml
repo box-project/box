@@ -248,3 +248,67 @@ jobs:
             - name: Failing run
               if: ${{ contains(needs.*.result, 'failure') }}
               run: exit 1
+
+    update-requirement-checker:
+        name: "Update the RequirementChecker"
+        if: ${{ github.repository == 'box-project/box' && github.ref_name == 'main' }}
+        runs-on: "ubuntu-latest"
+        steps:
+            -
+            - name: Checkout
+              uses: actions/checkout@v3
+              with:
+                  ref: ${{ github.head_ref }}
+                  fetch-depth: '0'  # Ensures the tags are fetched
+                  token: ${{ secrets.GITHUB_TOKEN }}
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ matrix.php.version }}
+                    tools: composer
+                    coverage: none
+
+            -   name: Install the Composer dependencies
+                uses: ramsey/composer-install@v2
+                with:
+                    working-directory: requirement-checker
+                    dependency-versions: ${{ matrix.php.dependency }}
+                    composer-options: ${{ matrix.php.composer-options }}
+
+            -   name: Ensure that the make target is up to date
+                run: cd requirement-checker; make vendor_install
+
+            -   name: Install the Composer (root) dependencies
+                uses: ramsey/composer-install@v2
+                with:
+                    dependency-versions: ${{ matrix.php.dependency }}
+                    composer-options: ${{ matrix.php.composer-options }}
+
+            -   name: Ensure that the make target is up to date
+                run: make vendor_install
+
+            -   name: Install the Composer (requirement checker bin namespace) dependencies
+                uses: ramsey/composer-install@v2
+                with:
+                    working-directory: vendor-bin/requirement-checker
+                    dependency-versions: highest
+                    composer-options: ${{ matrix.php.composer-options }}
+
+            -   name: Ensure that the make target is up to date
+                run: make requirement_checker_install
+
+            - name: Dump the requirement checker
+              run: make _dump_requirement_checker
+
+            - name: Create Pull Request
+              if: TODO - there is actual changes
+              uses: peter-evans/create-pull-request@v4
+              with:
+                  token: ${{ secrets.GITHUB_SECRETS }}
+                  branch-suffix: random
+                  delete-branch: true
+                  title: "Update the RequirementChecker"
+                  committer: "box-bot <box-project-bot@example.com>"
+                  commit-message: "Update the RequirementChecker"
+
