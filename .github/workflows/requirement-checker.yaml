@@ -298,17 +298,25 @@ jobs:
             -   name: Ensure that the make target is up to date
                 run: make requirement_checker_install
 
-            - name: Dump the requirement checker
-              run: make _dump_requirement_checker
+            -   name: Dump the requirement checker
+                run: make _dump_requirement_checker
 
-            - name: Create Pull Request
-              if: TODO - there is actual changes
-              uses: peter-evans/create-pull-request@v4
-              with:
-                  token: ${{ secrets.GITHUB_SECRETS }}
-                  branch-suffix: random
-                  delete-branch: true
-                  title: "Update the RequirementChecker"
-                  committer: "box-bot <box-project-bot@example.com>"
-                  commit-message: "Update the RequirementChecker"
+            -   name: Check for changes
+                run: |
+                    if [ $(git status --porcelain | wc -l) -eq "0" ]; then
+                        echo "🟢 No change detected."
+                        echo "requirement_checker_changed=false" >> $GITHUB_ENV
+                    else
+                        echo "requirement_checker_changed=true" >> $GITHUB_ENV
+                    fi
 
+            -   name: Create Pull Request
+                if: env.requirement_checker_changed == 'true'
+                uses: peter-evans/create-pull-request@v4
+                with:
+                    token: ${{ secrets.GITHUB_SECRETS }}
+                    branch-suffix: random
+                    delete-branch: true
+                    title: "Update the RequirementChecker"
+                    committer: "box-bot <box-project-bot@example.com>"
+                    commit-message: "Update the RequirementChecker"
