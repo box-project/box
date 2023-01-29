@@ -148,7 +148,7 @@ final class GenerateDockerFile implements CommandAware
         return $config->getOutputPath();
     }
 
-    private function getCompileCommand(): Command
+    private function getCompileCommand(): Compile
     {
         /* @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getCommandRegistry()->findCommand(Compile::NAME);
