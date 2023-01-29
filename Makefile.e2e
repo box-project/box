@@ -184,7 +184,7 @@ _e2e_dockerfile:
 	@mkdir -p $(E2E_DOCKERFILE_OUTPUT_DIR)
 
 	docker build $(shell dirname $(E2E_DOCKERFILE_DOCKERFILE)) --tag=local_box_e2e_dockerfile:latest
-	docker run --interactive --platform=linux/arm64 --rm local_box_e2e_dockerfile:latest > $(E2E_DOCKERFILE_ACTUAL_OUTPUT)
+	docker run --interactive --platform=linux/arm64 --pull=never --rm local_box_e2e_dockerfile:latest > $(E2E_DOCKERFILE_ACTUAL_OUTPUT)
 
 	$(DIFF) $(E2E_DOCKERFILE_EXPECTED_OUTPUT) $(E2E_DOCKERFILE_ACTUAL_OUTPUT)
 
