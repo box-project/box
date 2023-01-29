@@ -78,6 +78,7 @@ clean: 	 		 ## Cleans all created artifacts
 clean:
 	rm -rf \
 		dist \
+		Dockerfile \
 		fixtures/build/*/.box_dump \
 		fixtures/build/*/vendor \
 		fixtures/build/dir010/index.phar \
@@ -93,6 +94,7 @@ clean:
 		.php-cs-fixer.cache \
 		.phpunit.result.cache \
 		box \
+		box.phar \
 		fixtures/default_stub.php \
 		fixtures/check-requirements \
 		fixtures/build/*/index.phar \

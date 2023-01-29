@@ -33,7 +33,7 @@ final class DockerFileGenerator
         FROM php:__BASE_PHP_IMAGE_TOKEN__
 
         COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-        RUN /usr/bin/install-php-extensions __REQUIRED_EXTENSIONS__
+        RUN install-php-extensions __REQUIRED_EXTENSIONS__
 
         COPY __PHAR_FILE_PATH_TOKEN__ /__PHAR_FILE_NAME_TOKEN__
 
