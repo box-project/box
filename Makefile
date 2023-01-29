@@ -381,7 +381,7 @@ $(DEFAULT_STUB): bin/generate_default_stub
 	php -dphar.readonly=0 bin/generate_default_stub
 	touch -c $@
 
-.PHONY: $(REQUIREMENT_CHECKER_EXTRACT)
+.PHONY: _dump_requirement_checker
 _dump_requirement_checker: $(REQUIREMENT_CHECKER_EXTRACT)
 
 $(REQUIREMENT_CHECKER_EXTRACT):
