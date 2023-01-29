@@ -12,16 +12,15 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\AutoReview;
+namespace KevinGH\RequirementChecker\AutoReview;
 
+use AutoReview\MakefileTest;
 use Fidry\Makefile\Parser;
 use Fidry\Makefile\Rule;
-use Humbug\PhpScoper\NotInstantiable;
+use function current;
 
 final class MakefileE2ECollector
 {
-    use NotInstantiable;
-
     public static function getE2ERule(): Rule
     {
         static $e2eRule;

@@ -3,28 +3,24 @@
 declare(strict_types=1);
 
 /*
- * This file is part of the humbug/php-scoper package.
+ * This file is part of the box project.
  *
- * Copyright (c) 2017 Théo FIDRY <theo.fidry@gmail.com>,
- *                    Pádraic Brady <padraic.brady@gmail.com>
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
 
 namespace KevinGH\Box\AutoReview;
 
-use Humbug\PhpScoper\NotInstantiable;
 use Symfony\Component\Yaml\Yaml;
 use function sort;
 use function str_starts_with;
-use function substr;
 use const SORT_STRING;
 
 final class GAE2ECollector
 {
-    use NotInstantiable;
-
     private const GA_FILE = __DIR__.'/../../.github/workflows/e2e-tests.yaml';
 
     private const JOB_NAMES = 'e2e-tests';
@@ -57,7 +53,7 @@ final class GAE2ECollector
 
         foreach (self::findMatrixTests($parsedYaml['jobs'][self::DOCKER_JOB_NAME]) as $name) {
             $names[] = str_starts_with($name, '_')
-                ? substr($name, 1)
+                ? mb_substr($name, 1)
                 : $name;
         }
 

@@ -3,16 +3,16 @@
 declare(strict_types=1);
 
 /*
- * This file is part of the humbug/php-scoper package.
+ * This file is part of the box project.
  *
- * Copyright (c) 2017 Théo FIDRY <theo.fidry@gmail.com>,
- *                    Pádraic Brady <padraic.brady@gmail.com>
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\AutoReview;
+namespace KevinGH\RequirementChecker\AutoReview;
 
 use PHPUnit\Framework\TestCase;
 use function count;
@@ -31,7 +31,7 @@ class GAE2ECollectorTest extends TestCase
         self::assertGreaterThan(0, count($names));
 
         foreach ($names as $name) {
-            self::assertMatchesRegularExpression('/^e2e_[\p{L}_]+$/', $name);
+            self::assertMatchesRegularExpression('/^_?test_e2e_[\p{L}_]+$/', $name);
         }
     }
 }

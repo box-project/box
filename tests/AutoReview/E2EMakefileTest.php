@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\AutoReview;
 
-use Fidry\Makefile\Parser;
 use Fidry\Makefile\Rule;
 use Fidry\Makefile\Test\BaseMakefileTestCase;
 
