@@ -18,14 +18,16 @@ use Fidry\Console\Command\Command;
 use InvalidArgumentException;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Configuration\NoConfigurationFound;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\touch;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\Test\CommandTestCase;
 use Symfony\Component\Console\Input\InputOption;
+use function KevinGH\Box\FileSystem\dump_file;
+use function KevinGH\Box\FileSystem\touch;
 
 /**
  * @covers \KevinGH\Box\Console\Command\ConfigOption
+ *
+ * @internal
  */
 class ConfigOptionTest extends CommandTestCase
 {
@@ -54,7 +56,7 @@ class ConfigOptionTest extends CommandTestCase
 
         $config = $this->executeAndGetConfig([]);
 
-        $this->assertSame('foo', $config->getAlias());
+        self::assertSame('foo', $config->getAlias());
     }
 
     public function test_it_can_get_the_configuration_with_a_custom_path(): void
@@ -65,7 +67,7 @@ class ConfigOptionTest extends CommandTestCase
 
         $config = $this->executeAndGetConfig(['--config' => 'mybox.json']);
 
-        $this->assertSame('foo', $config->getAlias());
+        self::assertSame('foo', $config->getAlias());
     }
 
     public function test_it_throws_an_error_when_cannot_load_the_config(): void
@@ -84,7 +86,7 @@ class ConfigOptionTest extends CommandTestCase
 
         $config = $this->executeAndGetConfig([], true);
 
-        $this->assertSame($this->tmp.'/index.php', $config->getMainScriptPath());
+        self::assertSame($this->tmp.'/index.php', $config->getMainScriptPath());
     }
 
     public function test_it_throws_an_error_when_the_config_schema_is_invalid(): void

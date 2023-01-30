@@ -19,13 +19,13 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \KevinGH\Box\Composer\ComposerFiles
+ *
+ * @internal
  */
 class ComposerFilesTest extends TestCase
 {
     /**
      * @dataProvider validInstantiatorsProvider
-     *
-     * @param string[] $paths
      */
     public function test_it_can_be_created(
         Closure $create,
@@ -37,13 +37,13 @@ class ComposerFilesTest extends TestCase
         /** @var ComposerFiles $actual */
         $actual = $create();
 
-        $this->assertInstanceOf(ComposerFiles::class, $actual);
+        self::assertInstanceOf(ComposerFiles::class, $actual);
 
-        $this->assertEquals($expectedComposerJson, $actual->getComposerJson());
-        $this->assertEquals($expectedComposerLock, $actual->getComposerLock());
-        $this->assertEquals($expectedInstalledJson, $actual->getInstalledJson());
+        self::assertEquals($expectedComposerJson, $actual->getComposerJson());
+        self::assertEquals($expectedComposerLock, $actual->getComposerLock());
+        self::assertEquals($expectedInstalledJson, $actual->getInstalledJson());
 
-        $this->assertSame($expectedPaths, $actual->getPaths());
+        self::assertSame($expectedPaths, $actual->getPaths());
     }
 
     public static function validInstantiatorsProvider(): iterable

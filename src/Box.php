@@ -15,40 +15,40 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Amp\MultiReasonException;
+use BadMethodCallException;
+use Countable;
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
+use KevinGH\Box\Compactor\Compactors;
+use KevinGH\Box\Compactor\PhpScoper;
+use KevinGH\Box\Compactor\Placeholder;
+use KevinGH\Box\PhpScoper\NullScoper;
+use KevinGH\Box\PhpScoper\Scoper;
+use Phar;
+use RecursiveDirectoryIterator;
+use RuntimeException;
+use SplFileInfo;
+use Webmozart\Assert\Assert;
 use function Amp\ParallelFunctions\parallelMap;
 use function Amp\Promise\wait;
 use function array_filter;
 use function array_flip;
 use function array_map;
 use function array_unshift;
-use BadMethodCallException;
 use function chdir;
-use Countable;
 use function dirname;
 use function extension_loaded;
 use function file_exists;
 use function getcwd;
-use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use function is_object;
-use KevinGH\Box\Compactor\Compactors;
-use KevinGH\Box\Compactor\PhpScoper;
-use KevinGH\Box\Compactor\Placeholder;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
-use KevinGH\Box\PhpScoper\NullScoper;
-use KevinGH\Box\PhpScoper\Scoper;
 use function openssl_pkey_export;
 use function openssl_pkey_get_details;
 use function openssl_pkey_get_private;
-use Phar;
-use RecursiveDirectoryIterator;
-use RuntimeException;
-use SplFileInfo;
 use function sprintf;
-use Webmozart\Assert\Assert;
 
 /**
  * Box is a utility class to generate a PHAR.
@@ -115,7 +115,7 @@ final class Box implements Countable
     {
         Assert::true($this->buffering, 'The buffering must be started before ending it');
 
-        $dumpAutoload = $dumpAutoload ?? static fn () => null;
+        $dumpAutoload ??= static fn () => null;
         $cwd = getcwd();
 
         $tmp = make_tmp_dir('box', self::class);
@@ -215,8 +215,7 @@ final class Box implements Countable
                 : sprintf(
                     'Could not compress the PHAR: the compression requires too many file descriptors to be opened (%s). Check your system limits or install the posix extension to allow Box to automatically configure it during the compression',
                     $this->phar->count(),
-                )
-            ;
+                );
 
             throw new RuntimeException($exceptionMessage, $exception->getCode(), $exception);
         }
@@ -420,16 +419,16 @@ final class Box implements Countable
         }
 
         // In the case of parallel processing, an issue is caused due to the statefulness nature of the PhpScoper
-        // whitelist.
+        // symbols registry.
         //
-        // Indeed, the PhpScoper Whitelist stores the records of whitelisted classes and functions. If nothing is done,
-        // then the whitelisted retrieve in the end will here will be "blank" since the updated whitelists are the ones
+        // Indeed, the PhpScoper symbols registry stores the records of exposed/excluded classes and functions. If nothing is done,
+        // then the symbols registry retrieved in the end will here will be "blank" since the updated symbols registries are the ones
         // from the workers used for the parallel processing.
         //
-        // In order to avoid that, the whitelists will be returned as a result as well in order to be able to merge
-        // all the whitelists into one.
+        // In order to avoid that, the symbols registries will be returned as a result as well in order to be able to merge
+        // all the symbols registries into one.
         //
-        // This process is allowed thanks to the nature of the state of the whitelists: having redundant classes or
+        // This process is allowed thanks to the nature of the state of the symbols registries: having redundant classes or
         // functions registered can easily be deal with so merging all those different states is actually
         // straightforward.
         $tuples = wait(parallelMap($files, $processFile));

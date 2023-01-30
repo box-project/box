@@ -14,33 +14,33 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use function array_filter;
-use function array_flip;
 use DirectoryIterator;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
-use function implode;
-use function is_array;
 use KevinGH\Box\Console\PharInfoRenderer;
-use function KevinGH\Box\create_temporary_phar;
-use function KevinGH\Box\FileSystem\remove;
-use function KevinGH\Box\format_size;
-use function KevinGH\Box\get_phar_compression_algorithms;
 use KevinGH\Box\PharInfo\PharInfo;
 use Phar;
 use PharData;
 use PharFileInfo;
-use function realpath;
-use function sprintf;
-use function str_repeat;
-use function str_replace;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Path;
 use Throwable;
+use function array_filter;
+use function array_flip;
+use function implode;
+use function is_array;
+use function KevinGH\Box\create_temporary_phar;
+use function KevinGH\Box\FileSystem\remove;
+use function KevinGH\Box\format_size;
+use function KevinGH\Box\get_phar_compression_algorithms;
+use function realpath;
+use function sprintf;
+use function str_repeat;
+use function str_replace;
 
 /**
  * @private
@@ -283,16 +283,16 @@ final class Info implements Command
                 $io->writeln('');
             }
 
-            $io->write("<comment>$name:</comment>");
+            $io->write("<comment>{$name}:</comment>");
 
             if (is_array($value)) {
                 $io->writeln('');
 
                 foreach ($value as $v) {
-                    $io->writeln("  - $v");
+                    $io->writeln("  - {$v}");
                 }
             } else {
-                $io->writeln(" $value");
+                $io->writeln(" {$value}");
             }
 
             $out = true;
@@ -336,14 +336,14 @@ final class Info implements Command
 
             if ($item->isDir()) {
                 if (false !== $indent) {
-                    $output->writeln("<info>$path</info>");
+                    $output->writeln("<info>{$path}</info>");
                 }
             } else {
                 $compression = '<fg=red>[NONE]</fg=red>';
 
                 foreach (self::$FILE_ALGORITHMS as $code => $name) {
                     if ($item->isCompressed($code)) {
-                        $compression = "<fg=cyan>[$name]</fg=cyan>";
+                        $compression = "<fg=cyan>[{$name}]</fg=cyan>";
                         break;
                     }
                 }

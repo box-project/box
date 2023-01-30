@@ -16,11 +16,13 @@ namespace KevinGH\Box\Json;
 
 use Error;
 use InvalidArgumentException;
-use function KevinGH\Box\FileSystem\dump_file;
 use KevinGH\Box\Test\FileSystemTestCase;
+use function KevinGH\Box\FileSystem\dump_file;
 
 /**
  * @covers \KevinGH\Box\Json\JsonValidationException
+ *
+ * @internal
  */
 class JsonValidationExceptionTest extends FileSystemTestCase
 {
@@ -29,9 +31,9 @@ class JsonValidationExceptionTest extends FileSystemTestCase
         try {
             new JsonValidationException('message', 'unknown file');
 
-            $this->fail('Expected exception to be thrown');
+            self::fail('Expected exception to be thrown');
         } catch (InvalidArgumentException $exception) {
-            static::assertSame('The file "unknown file" does not exist.', $exception->getMessage());
+            self::assertSame('The file "unknown file" does not exist.', $exception->getMessage());
         }
     }
 
@@ -40,9 +42,9 @@ class JsonValidationExceptionTest extends FileSystemTestCase
         try {
             new JsonValidationException('message', null, [false]);
 
-            $this->fail('Expected exception to be thrown');
+            self::fail('Expected exception to be thrown');
         } catch (InvalidArgumentException $exception) {
-            static::assertSame('Expected a string. Got: boolean', $exception->getMessage());
+            self::assertSame('Expected a string. Got: boolean', $exception->getMessage());
         }
     }
 
@@ -52,11 +54,11 @@ class JsonValidationExceptionTest extends FileSystemTestCase
 
         $exception = new JsonValidationException($message);
 
-        $this->assertSame($message, $exception->getMessage());
-        $this->assertSame(0, $exception->getCode());
-        $this->assertNull($exception->getPrevious());
-        $this->assertNull($exception->getValidatedFile());
-        $this->assertSame([], $exception->getErrors());
+        self::assertSame($message, $exception->getMessage());
+        self::assertSame(0, $exception->getCode());
+        self::assertNull($exception->getPrevious());
+        self::assertNull($exception->getValidatedFile());
+        self::assertSame([], $exception->getErrors());
 
         dump_file($file = 'dummy_file', '');
         $errors = ['foo', 'bar'];
@@ -65,10 +67,10 @@ class JsonValidationExceptionTest extends FileSystemTestCase
 
         $exception = new JsonValidationException($message, $file, $errors, $code, $error);
 
-        $this->assertSame($message, $exception->getMessage());
-        $this->assertSame($code, $exception->getCode());
-        $this->assertSame($error, $exception->getPrevious());
-        $this->assertSame($file, $exception->getValidatedFile());
-        $this->assertSame($errors, $exception->getErrors());
+        self::assertSame($message, $exception->getMessage());
+        self::assertSame($code, $exception->getCode());
+        self::assertSame($error, $exception->getPrevious());
+        self::assertSame($file, $exception->getValidatedFile());
+        self::assertSame($errors, $exception->getErrors());
     }
 }

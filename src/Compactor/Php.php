@@ -14,23 +14,21 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
+use KevinGH\Box\Annotation\DocblockAnnotationParser;
+use PhpToken;
+use RuntimeException;
+use Webmozart\Assert\Assert;
 use function array_pop;
 use function array_slice;
 use function array_splice;
 use function count;
 use function is_int;
-use KevinGH\Box\Annotation\DocblockAnnotationParser;
 use function ltrim;
-use PhpToken;
 use function preg_replace;
-use RuntimeException;
 use function str_repeat;
-use function substr;
-use function substr_count;
 use const T_COMMENT;
 use const T_DOC_COMMENT;
 use const T_WHITESPACE;
-use Webmozart\Assert\Assert;
 
 /**
  * A PHP source code compactor copied from Composer.
@@ -43,17 +41,16 @@ use Webmozart\Assert\Assert;
  * @author Théo Fidry <theo.fidry@gmail.com>
  * @author Juliette Reinders Folmer <boxproject_nospam@adviesenzo.nl>
  * @author Alessandro Chitolina <alekitto@gmail.com>
+ *
  * @private
  */
 final class Php extends FileExtensionCompactor
 {
-    private DocblockAnnotationParser $annotationParser;
-
-    public function __construct(DocblockAnnotationParser $annotationParser, array $extensions = ['php'])
-    {
+    public function __construct(
+        private DocblockAnnotationParser $annotationParser,
+        array $extensions = ['php'],
+    ) {
         parent::__construct($extensions);
-
-        $this->annotationParser = $annotationParser;
     }
 
     protected function compactContent(string $contents): string
@@ -83,7 +80,7 @@ final class Php extends FileExtensionCompactor
                         $output .= '#[';
                     } else {
                         // Turns out this was not an attribute. Treat it as a plain comment.
-                        $output .= str_repeat("\n", substr_count($tokenText, "\n"));
+                        $output .= str_repeat("\n", mb_substr_count($tokenText, "\n"));
                     }
                 } elseif (str_contains($tokenText, '@')) {
                     try {
@@ -92,7 +89,7 @@ final class Php extends FileExtensionCompactor
                         $output .= $tokenText;
                     }
                 } else {
-                    $output .= str_repeat("\n", substr_count($tokenText, "\n"));
+                    $output .= str_repeat("\n", mb_substr_count($tokenText, "\n"));
                 }
             } elseif ($token->is(T_WHITESPACE)) {
                 $whitespace = $tokenText;
@@ -139,7 +136,7 @@ final class Php extends FileExtensionCompactor
 
     private function compactAnnotations(string $docblock): string
     {
-        $breaksNbr = substr_count($docblock, "\n");
+        $breaksNbr = mb_substr_count($docblock, "\n");
 
         $annotations = $this->annotationParser->parse($docblock);
 
@@ -207,7 +204,7 @@ final class Php extends FileExtensionCompactor
 
         /** @var PhpToken $token */
         $token = $tokens[$opener];
-        $attributeBody = substr($token->text, 2);
+        $attributeBody = mb_substr($token->text, 2);
         $subTokens = PhpToken::tokenize('<?php '.$attributeBody);
 
         // Replace the PHP open tag with the attribute opener as a simple token.
@@ -218,7 +215,7 @@ final class Php extends FileExtensionCompactor
         // Multi-line attribute or attribute containing something which looks like a PHP close tag.
         // Retokenize the rest of the file after the attribute opener.
         if (null === $closer) {
-            foreach (array_slice($tokens, ($opener + 1)) as $token) {
+            foreach (array_slice($tokens, $opener + 1) as $token) {
                 $attributeBody .= $token->text;
             }
 
@@ -230,12 +227,12 @@ final class Php extends FileExtensionCompactor
             if (null !== $closer) {
                 array_splice(
                     $tokens,
-                    ($opener + 1),
+                    $opener + 1,
                     count($tokens),
-                    array_slice($subTokens, ($closer + 1)),
+                    array_slice($subTokens, $closer + 1),
                 );
 
-                $subTokens = array_slice($subTokens, 0, ($closer + 1));
+                $subTokens = array_slice($subTokens, 0, $closer + 1);
             }
         }
 

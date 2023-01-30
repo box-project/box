@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
+use Phar;
 use function array_diff_key;
 use function array_key_exists;
-use Phar;
 use function preg_match;
 use function sprintf;
 
@@ -169,8 +169,7 @@ final class AppRequirementsFactory
 
         [$polyfills, $requirements] = [] === $composerLockContents
             ? self::collectComposerJsonExtensionRequirements($composerJsonContents, $polyfills, $requirements)
-            : self::collectComposerLockExtensionRequirements($composerLockContents, $polyfills, $requirements)
-        ;
+            : self::collectComposerLockExtensionRequirements($composerLockContents, $polyfills, $requirements);
 
         return array_diff_key($requirements, $polyfills);
     }
@@ -220,7 +219,7 @@ final class AppRequirementsFactory
             if (1 === preg_match('/symfony\/polyfill-(?<extension>.+)/', (string) $packageInfo['name'], $matches)) {
                 $extension = $matches['extension'];
 
-                if (!str_starts_with($extension, 'php')) {
+                if (!str_starts_with((string) $extension, 'php')) {
                     $polyfills[$extension] = true;
                 }
             }

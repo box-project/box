@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Configuration;
 
+use Webmozart\Assert\Assert;
 use function array_keys;
 use function trim;
-use Webmozart\Assert\Assert;
 
 /**
  * @private

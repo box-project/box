@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the box project.
  *
@@ -23,6 +25,7 @@ use function sapi_windows_vt100_support;
 use function sprintf;
 use function str_replace;
 use function stream_isatty;
+use const DIRECTORY_SEPARATOR;
 use const STDOUT;
 
 /**
@@ -165,11 +168,11 @@ final class IO
             return false;
         }
 
-        if (\DIRECTORY_SEPARATOR === '\\') {
+        if (DIRECTORY_SEPARATOR === '\\') {
             return (
-                    function_exists('sapi_windows_vt100_support')
-                    && sapi_windows_vt100_support(STDOUT)
-                )
+                function_exists('sapi_windows_vt100_support')
+                && sapi_windows_vt100_support(STDOUT)
+            )
                 || false !== getenv('ANSICON')
                 || 'ON' === getenv('ConEmuANSI')
                 || 'xterm' === getenv('TERM');

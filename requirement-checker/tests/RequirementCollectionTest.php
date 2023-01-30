@@ -19,6 +19,8 @@ use function iterator_to_array;
 
 /**
  * @covers \KevinGH\RequirementChecker\RequirementCollection
+ *
+ * @internal
  */
 class RequirementCollectionTest extends TestCase
 {
@@ -26,10 +28,10 @@ class RequirementCollectionTest extends TestCase
     {
         $requirements = new RequirementCollection();
 
-        $this->assertSame([], iterator_to_array($requirements, false));
-        $this->assertSame([], $requirements->getRequirements());
-        $this->assertCount(0, $requirements);
-        $this->assertTrue($requirements->evaluateRequirements());
+        self::assertSame([], iterator_to_array($requirements, false));
+        self::assertSame([], $requirements->getRequirements());
+        self::assertCount(0, $requirements);
+        self::assertTrue($requirements->evaluateRequirements());
     }
 
     public function test_it_can_have_and_evaluate_requirements(): void
@@ -53,10 +55,10 @@ class RequirementCollectionTest extends TestCase
             $requirements->add($requirement);
         }
 
-        $this->assertSame($reqs, iterator_to_array($requirements, false));
-        $this->assertSame($reqs, $requirements->getRequirements());
-        $this->assertCount(2, $requirements);
-        $this->assertTrue($requirements->evaluateRequirements());
+        self::assertSame($reqs, iterator_to_array($requirements, false));
+        self::assertSame($reqs, $requirements->getRequirements());
+        self::assertCount(2, $requirements);
+        self::assertTrue($requirements->evaluateRequirements());
 
         $requirements->addRequirement(
             $check = new ConditionIsNotFulfilled(),
@@ -64,21 +66,21 @@ class RequirementCollectionTest extends TestCase
             'req hC'
         );
 
-        $this->assertCount(3, $requirements);
-        $this->assertFalse($requirements->evaluateRequirements());
+        self::assertCount(3, $requirements);
+        self::assertFalse($requirements->evaluateRequirements());
 
         $retrievedRequirements = $requirements->getRequirements();
 
-        $this->assertSame($retrievedRequirements, iterator_to_array($requirements, false));
+        self::assertSame($retrievedRequirements, iterator_to_array($requirements, false));
 
-        $this->assertSame($requirementA, $retrievedRequirements[0]);
-        $this->assertSame($requirementB, $retrievedRequirements[1]);
+        self::assertSame($requirementA, $retrievedRequirements[0]);
+        self::assertSame($requirementB, $retrievedRequirements[1]);
 
         $requirementC = $retrievedRequirements[2];
 
-        $this->assertSame($check, $requirementC->getIsFullfilledChecker());
-        $this->assertFalse($requirementC->isFulfilled());
-        $this->assertSame('req tC', $requirementC->getTestMessage());
-        $this->assertSame('req hC', $requirementC->getHelpText());
+        self::assertSame($check, $requirementC->getIsFullfilledChecker());
+        self::assertFalse($requirementC->isFulfilled());
+        self::assertSame('req tC', $requirementC->getTestMessage());
+        self::assertSame('req hC', $requirementC->getHelpText());
     }
 }

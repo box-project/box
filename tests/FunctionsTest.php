@@ -20,6 +20,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @coversNothing
+ *
+ * @internal
  */
 class FunctionsTest extends TestCase
 {
@@ -33,26 +35,24 @@ class FunctionsTest extends TestCase
 
         $actual = get_phar_compression_algorithms();
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     /**
      * @dataProvider pharCompressionAlgorithmProvider
-     *
-     * @param mixed $expected
      */
-    public function test_it_can_provide_the_phars_algorithm_extensions(int $algorithm, $expected): void
+    public function test_it_can_provide_the_phars_algorithm_extensions(int $algorithm, mixed $expected): void
     {
         try {
             $actual = get_phar_compression_algorithm_extension($algorithm);
 
             if (-1 === $expected) {
-                $this->fail('Expected exception to be thrown.');
+                self::fail('Expected exception to be thrown.');
             }
 
-            $this->assertSame($expected, $actual);
+            self::assertSame($expected, $actual);
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'Unknown compression algorithm code "'.$algorithm.'"',
                 $exception->getMessage(),
             );
@@ -66,7 +66,7 @@ class FunctionsTest extends TestCase
     {
         $actual = format_size($bytes);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     /**
@@ -76,13 +76,13 @@ class FunctionsTest extends TestCase
     {
         $actual = memory_to_bytes($memory);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     public function test_it_can_generate_a_unique_id(): void
     {
-        $this->assertMatchesRegularExpression('/^(?:[a-z]|\d){12}$/', unique_id(''));
-        $this->assertMatchesRegularExpression('/^Box(?:[a-z]|\d){12}$/', unique_id('Box'));
+        self::assertMatchesRegularExpression('/^(?:[a-z]|\d){12}$/', unique_id(''));
+        self::assertMatchesRegularExpression('/^Box(?:[a-z]|\d){12}$/', unique_id('Box'));
     }
 
     public static function pharCompressionAlgorithmProvider(): iterable

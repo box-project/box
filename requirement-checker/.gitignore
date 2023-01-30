@@ -1,0 +1,9 @@
+!/dist/.gitkeep
+/.box/
+/.box_dump/
+/.phpunit*
+/.phpunit.result.cache
+/actual_terminal_diff
+/dist/
+/tests/TerminalCompatibility/actual_diff
+/vendor/

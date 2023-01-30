@@ -1,4 +1,6 @@
 {
+    "$schema": "res/schema.json",
+
     "banner": [
         "This file is part of the box project.",
         "",
@@ -12,7 +14,7 @@
     "files": [
         "res/schema.json"
     ],
-    "directories-bin": [".requirement-checker"],
+    "directories-bin": ["res/requirement-checker"],
 
     "compression": "GZ",
     "compactors": [

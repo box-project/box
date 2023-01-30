@@ -1,8 +1,11 @@
 {
+    "$schema": "../res/schema.json",
+
     "check-requirements": false,
     "compactors": [
         "KevinGH\\Box\\Compactor\\Php",
         "KevinGH\\Box\\Compactor\\PhpScoper",
         "KevinGH\\Box\\Compactor\\Json"
-    ]
+    ],
+    "output": "dist/check-requirements.phar"
 }

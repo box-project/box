@@ -14,6 +14,38 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Configuration;
 
+use Closure;
+use DateTimeImmutable;
+use DateTimeZone;
+use Humbug\PhpScoper\Configuration\Configuration as PhpScoperConfiguration;
+use Humbug\PhpScoper\Container;
+use InvalidArgumentException;
+use KevinGH\Box\Annotation\CompactedFormatter;
+use KevinGH\Box\Annotation\DocblockAnnotationParser;
+use KevinGH\Box\Compactor\Compactor;
+use KevinGH\Box\Compactor\Compactors;
+use KevinGH\Box\Compactor\Php as PhpCompactor;
+use KevinGH\Box\Compactor\PhpScoper as PhpScoperCompactor;
+use KevinGH\Box\Composer\ComposerConfiguration;
+use KevinGH\Box\Composer\ComposerFile;
+use KevinGH\Box\Composer\ComposerFiles;
+use KevinGH\Box\Json\Json;
+use KevinGH\Box\MapFile;
+use KevinGH\Box\PhpScoper\SerializableScoper;
+use Phar;
+use phpDocumentor\Reflection\DocBlockFactory;
+use RuntimeException;
+use Seld\JsonLint\ParsingException;
+use SplFileInfo;
+use stdClass;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo as SymfonySplFileInfo;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\VarDumper\Dumper\CliDumper;
+use Throwable;
+use Webmozart\Assert\Assert;
 use function array_diff;
 use function array_filter;
 use function array_flip;
@@ -24,23 +56,16 @@ use function array_merge;
 use function array_unique;
 use function array_values;
 use function array_walk;
-use Closure;
 use function constant;
 use function current;
-use DateTimeImmutable;
-use DateTimeZone;
 use function defined;
 use function dirname;
-use const E_USER_DEPRECATED;
 use function explode;
 use function file_exists;
 use function getcwd;
-use Humbug\PhpScoper\Configuration\Configuration as PhpScoperConfiguration;
-use Humbug\PhpScoper\Container;
 use function implode;
 use function in_array;
 use function intval;
-use InvalidArgumentException;
 use function is_array;
 use function is_bool;
 use function is_file;
@@ -51,15 +76,6 @@ use function is_string;
 use function iter\map;
 use function iter\toArray;
 use function iter\values;
-use KevinGH\Box\Annotation\CompactedFormatter;
-use KevinGH\Box\Annotation\DocblockAnnotationParser;
-use KevinGH\Box\Compactor\Compactor;
-use KevinGH\Box\Compactor\Compactors;
-use KevinGH\Box\Compactor\Php as PhpCompactor;
-use KevinGH\Box\Compactor\PhpScoper as PhpScoperCompactor;
-use KevinGH\Box\Composer\ComposerConfiguration;
-use KevinGH\Box\Composer\ComposerFile;
-use KevinGH\Box\Composer\ComposerFiles;
 use function KevinGH\Box\FileSystem\canonicalize;
 use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\is_absolute_path;
@@ -69,36 +85,19 @@ use function KevinGH\Box\FileSystem\make_path_relative;
 use function KevinGH\Box\get_box_version;
 use function KevinGH\Box\get_phar_compression_algorithms;
 use function KevinGH\Box\get_phar_signing_algorithms;
-use KevinGH\Box\Json\Json;
-use KevinGH\Box\MapFile;
-use KevinGH\Box\PhpScoper\SerializableScoper;
 use function KevinGH\Box\unique_id;
 use function krsort;
-use Phar;
-use phpDocumentor\Reflection\DocBlockFactory;
 use function preg_match;
 use function preg_replace;
 use function property_exists;
 use function realpath;
-use RuntimeException;
-use Seld\JsonLint\ParsingException;
 use function sort;
-use const SORT_STRING;
-use SplFileInfo;
 use function sprintf;
-use stdClass;
 use function str_starts_with;
-use function strtoupper;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo as SymfonySplFileInfo;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Process;
-use Symfony\Component\VarDumper\Cloner\VarCloner;
-use Symfony\Component\VarDumper\Dumper\CliDumper;
-use Throwable;
 use function trigger_error;
 use function trim;
-use Webmozart\Assert\Assert;
+use const E_USER_DEPRECATED;
+use const SORT_STRING;
 
 /**
  * @private
@@ -393,38 +392,38 @@ final class Configuration
     }
 
     /**
-     * @param string        $basePath              Utility to private the base path used and be able to retrieve a
-     *                                             path relative to it (the base path)
-     * @param array         $composerJson          The first element is the path to the `composer.json` file as a
-     *                                             string and the second element its decoded contents as an
-     *                                             associative array.
-     * @param array         $composerLock          The first element is the path to the `composer.lock` file as a
-     *                                             string and the second element its decoded contents as an
-     *                                             associative array.
-     * @param SplFileInfo[] $files                 List of files
-     * @param SplFileInfo[] $binaryFiles           List of binary files
-     * @param bool          $dumpAutoload          Whether the Composer autoloader should be dumped
-     * @param bool          $excludeComposerFiles  Whether the Composer files composer.json, composer.lock and
-     *                                             installed.json should be removed from the PHAR
-     * @param null|int      $compressionAlgorithm  Compression algorithm constant value. See the \Phar class constants
-     * @param null|int      $fileMode              File mode in octal form
-     * @param string        $mainScriptPath        The main script file path
-     * @param string        $mainScriptContents    The processed content of the main script file
-     * @param MapFile       $fileMapper            Utility to map the files from outside and inside the PHAR
-     * @param mixed         $metadata              The PHAR Metadata
-     * @param bool          $promptForPrivateKey   If the user should be prompted for the private key passphrase
-     * @param array         $processedReplacements The processed list of replacement placeholders and their values
-     * @param null|string   $shebang               The shebang line
-     * @param int           $signingAlgorithm      The PHAR siging algorithm. See \Phar constants
-     * @param null|string   $stubBannerContents    The stub banner comment
-     * @param null|string   $stubBannerPath        The path to the stub banner comment file
-     * @param null|string   $stubPath              The PHAR stub file path
-     * @param bool          $isInterceptFileFuncs  Whether Phar::interceptFileFuncs() should be used
-     * @param bool          $isStubGenerated       Whether if the PHAR stub should be generated
-     * @param bool          $checkRequirements     Whether the PHAR will check the application requirements before
-     *                                             running
-     * @param string[]      $warnings
-     * @param string[]      $recommendations
+     * @param string                $basePath              Utility to private the base path used and be able to retrieve a
+     *                                                     path relative to it (the base path)
+     * @param array                 $composerJson          The first element is the path to the `composer.json` file as a
+     *                                                     string and the second element its decoded contents as an
+     *                                                     associative array.
+     * @param array                 $composerLock          The first element is the path to the `composer.lock` file as a
+     *                                                     string and the second element its decoded contents as an
+     *                                                     associative array.
+     * @param SplFileInfo[]         $files                 List of files
+     * @param SplFileInfo[]         $binaryFiles           List of binary files
+     * @param bool                  $dumpAutoload          Whether the Composer autoloader should be dumped
+     * @param bool                  $excludeComposerFiles  Whether the Composer files composer.json, composer.lock and
+     *                                                     installed.json should be removed from the PHAR
+     * @param null|int              $compressionAlgorithm  Compression algorithm constant value. See the \Phar class constants
+     * @param null|int              $fileMode              File mode in octal form
+     * @param string                $mainScriptPath        The main script file path
+     * @param string                $mainScriptContents    The processed content of the main script file
+     * @param MapFile               $fileMapper            Utility to map the files from outside and inside the PHAR
+     * @param mixed                 $metadata              The PHAR Metadata
+     * @param bool                  $promptForPrivateKey   If the user should be prompted for the private key passphrase
+     * @param array                 $processedReplacements The processed list of replacement placeholders and their values
+     * @param null|non-empty-string $shebang               The shebang line
+     * @param int                   $signingAlgorithm      The PHAR siging algorithm. See \Phar constants
+     * @param null|string           $stubBannerContents    The stub banner comment
+     * @param null|string           $stubBannerPath        The path to the stub banner comment file
+     * @param null|string           $stubPath              The PHAR stub file path
+     * @param bool                  $isInterceptFileFuncs  Whether Phar::interceptFileFuncs() should be used
+     * @param bool                  $isStubGenerated       Whether if the PHAR stub should be generated
+     * @param bool                  $checkRequirements     Whether the PHAR will check the application requirements before
+     *                                                     running
+     * @param string[]              $warnings
+     * @param string[]              $recommendations
      */
     private function __construct(
         private ?string $file,
@@ -1093,8 +1092,7 @@ final class Configuration
                 ->files()
                 ->filter($blacklistFilter)
                 ->ignoreVCS(true)
-                ->in($directories)
-            ;
+                ->in($directories);
 
             foreach ($excludedPaths as $excludedPath) {
                 $finder->notPath($excludedPath);
@@ -1190,8 +1188,7 @@ final class Configuration
                     return true;
                 },
             )
-            ->ignoreVCS(true)
-        ;
+            ->ignoreVCS(true);
 
         $normalizedConfig = (static function (array $config, Finder $finder): array {
             $normalizedConfig = [];
@@ -1276,7 +1273,7 @@ final class Configuration
             }
 
             foreach ($arguments as $argument) {
-                $finder->$method($argument);
+                $finder->{$method}($argument);
             }
         }
 
@@ -1413,7 +1410,7 @@ final class Configuration
 
         if (array_key_exists('files', $autoload)) {
             foreach ($autoload['files'] as $path) {
-                // @var string $path
+                /** @var string $path */
                 $path = $normalizePath($path);
 
                 Assert::file($path);
@@ -1533,8 +1530,7 @@ final class Configuration
             ->exclude('travis')
             ->notName('travis.yml')
             ->notName('appveyor.yml')
-            ->notName('build.xml*')
-        ;
+            ->notName('build.xml*');
 
         if (null !== $mainScriptPath) {
             $finder->notPath(make_path_relative($mainScriptPath, $basePath));
@@ -1747,13 +1743,11 @@ final class Configuration
                 Assert::classExists($class, 'The compactor class %s does not exist.');
                 Assert::isAOf($class, Compactor::class, sprintf('The class "%s" is not a compactor class.', $class));
 
-                // Use this little string concatenation trick to prevent PHP-Scoper from scoping it.
-                // Indeed, $class comes from the user, so it is unprefixed.
-                if (in_array($class, [PhpCompactor::class, 'KevinGH\Box'.'\Compactor\Php'], true)) {
+                if (in_array($class, [PhpCompactor::class, 'KevinGH\Box\Compactor\Php'], true)) {
                     return self::createPhpCompactor($ignoredAnnotations);
                 }
 
-                if (in_array($class, [PhpScoperCompactor::class, 'KevinGH\Box'.'\Compactor\PhpScoper'], true)) {
+                if (in_array($class, [PhpScoperCompactor::class, 'KevinGH\Box\Compactor\PhpScoper'], true)) {
                     return self::createPhpScoperCompactor($raw, $basePath, $logger);
                 }
 
@@ -1820,7 +1814,7 @@ final class Configuration
             self::addRecommendationForDefaultValue($logger, self::CHMOD_KEY);
         }
 
-        $defaultChmod = intval(0755, 8);
+        $defaultChmod = intval(0o755, 8);
 
         if (isset($raw->{self::CHMOD_KEY})) {
             $chmod = intval($raw->{self::CHMOD_KEY}, 8);
@@ -1965,9 +1959,6 @@ final class Configuration
         return $map;
     }
 
-    /**
-     * @return mixed
-     */
     private static function retrieveMetadata(stdClass $raw, ConfigurationLogger $logger)
     {
         self::checkIfDefaultValue($logger, $raw, self::METADATA_KEY);
@@ -2305,6 +2296,9 @@ final class Configuration
         return self::retrievePlaceholder($raw, $logger, self::REPLACEMENT_SIGIL_KEY) ?? self::DEFAULT_REPLACEMENT_SIGIL;
     }
 
+    /**
+     * @return null|non-empty-string
+     */
     private static function retrieveShebang(stdClass $raw, bool $stubIsGenerated, ConfigurationLogger $logger): ?string
     {
         self::checkIfDefaultValue($logger, $raw, self::SHEBANG_KEY, self::DEFAULT_SHEBANG);
@@ -2365,7 +2359,7 @@ final class Configuration
             return self::DEFAULT_SIGNING_ALGORITHM;
         }
 
-        $algorithm = strtoupper($raw->{self::ALGORITHM_KEY});
+        $algorithm = mb_strtoupper($raw->{self::ALGORITHM_KEY});
 
         Assert::inArray($algorithm, array_keys(get_phar_signing_algorithms()));
 
@@ -2717,7 +2711,7 @@ final class Configuration
         $ignoredAnnotations = array_values(
             array_filter(
                 array_map(
-                    static fn (string $annotation): ?string => strtolower(trim($annotation)),
+                    static fn (string $annotation): ?string => mb_strtolower(trim($annotation)),
                     $ignoredAnnotations,
                 ),
             ),
@@ -2741,7 +2735,7 @@ final class Configuration
             self::retrievePhpScoperConfig($raw, $basePath, $logger),
         );
 
-        $whitelistedFiles = array_values(
+        $excludedFilePaths = array_values(
             array_unique(
                 array_map(
                     static fn (string $path): string => make_path_relative($path, $basePath),
@@ -2753,28 +2747,18 @@ final class Configuration
         );
 
         return new PhpScoperCompactor(
-            new SerializableScoper($phpScoperConfig, ...$whitelistedFiles),
+            new SerializableScoper($phpScoperConfig, ...$excludedFilePaths),
         );
     }
 
     private static function configurePhpScoperPrefix(PhpScoperConfiguration $phpScoperConfig): PhpScoperConfiguration
     {
         $prefix = $phpScoperConfig->getPrefix();
-
         if (!str_starts_with($prefix, '_PhpScoper')) {
             return $phpScoperConfig;
         }
 
-        // TODO: provide easier way to change the prefix
-        //  https://github.com/humbug/php-scoper/issues/616
-        return new PhpScoperConfiguration(
-            $phpScoperConfig->getPath(),
-            unique_id('_HumbugBox'),
-            $phpScoperConfig->getFilesWithContents(),
-            $phpScoperConfig->getExcludedFilesWithContents(),
-            $phpScoperConfig->getPatcher(),
-            $phpScoperConfig->getSymbolsConfiguration(),
-        );
+        return $phpScoperConfig->withPrefix(unique_id('_HumbugBox'));
     }
 
     private static function checkIfDefaultValue(

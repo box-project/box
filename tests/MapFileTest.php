@@ -20,6 +20,8 @@ use function unserialize;
 
 /**
  * @covers \KevinGH\Box\MapFile
+ *
+ * @internal
  */
 class MapFileTest extends TestCase
 {
@@ -32,7 +34,7 @@ class MapFileTest extends TestCase
 
         $actual = $mapFile($file);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     /**
@@ -40,7 +42,7 @@ class MapFileTest extends TestCase
      */
     public function test_it_serializable(MapFile $mapFile): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             $mapFile,
             unserialize(serialize($mapFile)),
         );

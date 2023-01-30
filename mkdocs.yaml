@@ -2,6 +2,7 @@
 site_name: Box Project
 site_description: "Box: building and managing PHARs"
 site_url: https://box-project.github.io/box
+site_dir: dist/website
 
 # Repository
 repo_name: 'box-project/box'
@@ -43,7 +44,6 @@ nav:
             -   Usage: usage.md
             -   Configuration: configuration.md
             -   'Requirements checker': requirement-checker.md
-            -   'Optimize your PHAR': optimizations.md
             -   'Optimize your PHAR': optimizations.md
             -   'PHAR code isolation': code-isolation.md
             -   'Docker support': docker.md

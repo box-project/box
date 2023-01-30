@@ -22,6 +22,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \KevinGH\Box\Compactor\Php
+ *
+ * @internal
  */
 class PhpTest extends TestCase
 {
@@ -50,7 +52,7 @@ class PhpTest extends TestCase
             PHP_WRAP;
         $actual = $compactor->compact($file, $contents);
 
-        $this->assertSame($supports, $contents !== $actual);
+        self::assertSame($supports, $contents !== $actual);
     }
 
     /**
@@ -64,7 +66,7 @@ class PhpTest extends TestCase
         // We are not interested in different trailing spaces
         $actual = DisplayNormalizer::removeTrailingSpaces($actual);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     public function test_it_is_serializable(): void
@@ -77,7 +79,7 @@ class PhpTest extends TestCase
             ),
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             $compactor,
             unserialize(serialize($compactor)),
         );
@@ -136,8 +138,7 @@ class PhpTest extends TestCase
                         \$test = true; /* Trailing comment */
                     }
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -224,8 +225,7 @@ class PhpTest extends TestCase
                      */
                     private \$none;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -334,8 +334,7 @@ class PhpTest extends TestCase
                     }
                         }
 
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -413,8 +412,7 @@ class PhpTest extends TestCase
                  */
                 function foo($x) {
                 }
-                PHP
-        ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -438,8 +436,7 @@ class PhpTest extends TestCase
                  */
                 function foo($x) {
                 }
-                PHP
-        ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -463,8 +460,7 @@ class PhpTest extends TestCase
                     #[\ReturnTypeWillChange]
                     public jsonSerialize() {}
                 }
-                PHP
-        ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -487,8 +483,7 @@ class PhpTest extends TestCase
                     ]
                     public jsonSerialize() {}
                 }
-                PHP
-        ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -508,8 +503,7 @@ class PhpTest extends TestCase
 
                 #[AttributeWithParams('foo', bar: ['bar' => 'foobar'])]
                 function foo() {}
-                PHP
-        ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -525,8 +519,7 @@ class PhpTest extends TestCase
 
                 #[CustomAttribute] #[AttributeWithParams('foo')]
                 function foo() {}
-                PHP
-        ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -542,8 +535,7 @@ class PhpTest extends TestCase
 
                 #[CustomAttribute] // This is a comment
                 function foo() {}
-                PHP
-        ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -559,8 +551,7 @@ class PhpTest extends TestCase
 
                 #[CustomAttribute, AttributeWithParams('foo'), AttributeWithParams('foo', bar: ['bar' => 'foobar'])]
                 function foo() {}
-                PHP
-        ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -580,8 +571,7 @@ class PhpTest extends TestCase
                     AttributeWithParams('foo', bar: ['bar' => 'foobar'])
                 ]
                 function foo() {}
-                PHP
-        ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -600,8 +590,7 @@ class PhpTest extends TestCase
                 <?php
 
                 function foo(#[ParamAttribute, AttributeWithParams(/* comment */ 'foo')] int $param, #[ParamAttr] $more) {}
-                PHP
-        ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -619,8 +608,7 @@ class PhpTest extends TestCase
                         'foo'
                     )
                                                                 ] int $param) {}
-                PHP
-        ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -639,8 +627,7 @@ class PhpTest extends TestCase
 
                 #[DeprecationReason('reason: <https://some-website/reason?>')]
                 function foo() {}
-                PHP
-        ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -658,8 +645,7 @@ class PhpTest extends TestCase
                     'reason: <https://some-website/reason?>'
                 )]
                 function foo() {}
-                PHP
-        ,
+                PHP,
             <<<'PHP'
                 <?php
 

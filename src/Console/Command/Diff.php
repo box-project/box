@@ -14,29 +14,29 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use function array_filter;
-use function array_flip;
-use function array_map;
-use function count;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
-use function is_string;
-use function KevinGH\Box\check_php_settings;
 use KevinGH\Box\Console\PharInfoRenderer;
-use function KevinGH\Box\format_size;
-use function KevinGH\Box\get_phar_compression_algorithms;
 use KevinGH\Box\PharInfo\PharDiff;
 use KevinGH\Box\PharInfo\PharInfo;
 use PharFileInfo;
-use function sprintf;
-// TODO: migrate to Safe API
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Filesystem\Path;
 use Throwable;
 use Webmozart\Assert\Assert;
+use function array_filter;
+use function array_flip;
+use function array_map;
+use function count;
+// TODO: migrate to Safe API
+use function is_string;
+use function KevinGH\Box\check_php_settings;
+use function KevinGH\Box\format_size;
+use function KevinGH\Box\get_phar_compression_algorithms;
+use function sprintf;
 
 /**
  * @private
@@ -255,7 +255,7 @@ final class Diff implements Command
 
             foreach (self::$FILE_ALGORITHMS as $code => $name) {
                 if ($file->isCompressed($code)) {
-                    $compression = "<fg=cyan>[$name]</fg=cyan>";
+                    $compression = "<fg=cyan>[{$name}]</fg=cyan>";
                     break;
                 }
             }

@@ -16,7 +16,6 @@ namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
-use function KevinGH\Box\FileSystem\make_path_relative;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
 use Symfony\Component\Console\Exception\RuntimeException;
@@ -24,12 +23,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use UnexpectedValueException;
+use function KevinGH\Box\FileSystem\make_path_relative;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Extract
  *
  * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
  *                              can create undesirable side-effects.
+ *
+ * @internal
  */
 class ExtractTest extends CommandTestCase
 {
@@ -59,7 +61,7 @@ class ExtractTest extends CommandTestCase
 
         $actualFiles = $this->collectExtractedFiles();
 
-        $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
+        self::assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
         $this->assertSameOutput('', ExitCode::SUCCESS);
     }
@@ -83,7 +85,7 @@ class ExtractTest extends CommandTestCase
 
         $actualFiles = $this->collectExtractedFiles();
 
-        $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
+        self::assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
         $this->assertSameOutput('', ExitCode::SUCCESS);
     }
@@ -107,7 +109,7 @@ class ExtractTest extends CommandTestCase
 
         $actualFiles = $this->collectExtractedFiles();
 
-        $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
+        self::assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
         $this->assertSameOutput('', ExitCode::SUCCESS);
     }
@@ -128,7 +130,7 @@ class ExtractTest extends CommandTestCase
 
         $actualFiles = $this->collectExtractedFiles();
 
-        $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
+        self::assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
         $expectedOutput = <<<'OUTPUT'
 
@@ -154,19 +156,19 @@ class ExtractTest extends CommandTestCase
                 ['verbosity' => OutputInterface::VERBOSITY_DEBUG],
             );
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'The given file is not a valid PHAR',
                 $exception->getMessage(),
             );
-            $this->assertSame(0, $exception->getCode());
-            $this->assertNotNull($exception->getPrevious());
+            self::assertSame(0, $exception->getCode());
+            self::assertNotNull($exception->getPrevious());
 
             $previous = $exception->getPrevious();
 
-            $this->assertInstanceOf(UnexpectedValueException::class, $previous);
-            $this->assertStringStartsWith('internal corruption of phar', $previous->getMessage());
+            self::assertInstanceOf(UnexpectedValueException::class, $previous);
+            self::assertStringStartsWith('internal corruption of phar', $previous->getMessage());
         }
     }
 
@@ -186,7 +188,7 @@ class ExtractTest extends CommandTestCase
 
         $actualFiles = $this->collectExtractedFiles();
 
-        $this->assertSame($expectedFiles, $actualFiles);
+        self::assertSame($expectedFiles, $actualFiles);
 
         $expectedOutput = <<<'OUTPUT'
 
@@ -212,7 +214,7 @@ class ExtractTest extends CommandTestCase
 
         $actualFiles = $this->collectExtractedFiles();
 
-        $this->assertSame($expectedFiles, $actualFiles);
+        self::assertSame($expectedFiles, $actualFiles);
 
         $expectedOutput = <<<'OUTPUT'
 
@@ -232,8 +234,7 @@ class ExtractTest extends CommandTestCase
         $finder = Finder::create()
             ->files()
             ->in($this->tmp)
-            ->ignoreDotFiles(false)
-        ;
+            ->ignoreDotFiles(false);
 
         $files = [];
 

@@ -26,6 +26,8 @@ use function unserialize;
 
 /**
  * @covers \KevinGH\Box\Compactor\PhpScoper
+ *
+ * @internal
  */
 class PhpScoperTest extends TestCase
 {
@@ -49,7 +51,7 @@ class PhpScoperTest extends TestCase
 
         $actual = (new PhpScoper($scoper))->compact($file, $contents);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
 
         $scoperProphecy->scope(Argument::cetera())->shouldHaveBeenCalledTimes(1);
     }
@@ -72,7 +74,7 @@ class PhpScoperTest extends TestCase
 
         $actual = (new PhpScoper($scoper))->compact($file, $contents);
 
-        $this->assertSame($contents, $actual);
+        self::assertSame($contents, $actual);
     }
 
     public function test_it_exposes_the_scoper(): void
@@ -81,14 +83,14 @@ class PhpScoperTest extends TestCase
 
         $compactor = new PhpScoper($scoper);
 
-        $this->assertSame($scoper, $compactor->getScoper());
+        self::assertSame($scoper, $compactor->getScoper());
     }
 
     public function test_it_is_serializable(): void
     {
         $compactor = new PhpScoper(new FakeScoper());
 
-        $this->assertEquals(
+        self::assertEquals(
             $compactor,
             unserialize(serialize($compactor)),
         );

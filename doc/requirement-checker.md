@@ -135,6 +135,16 @@ $ BOX_REQUIREMENT_CHECKER=0 php box.phar
 ```
 
 
+## Logging to stdout
+
+Since version 3.17.0, box logs the requirements checker output to `stderr` per default (see: [#678](https://github.com/box-project/box/issues/678)).
+The requirements checker can be configured to output to `stdout` instead by setting `BOX_REQUIREMENTS_CHECKER_LOG_TO_STDOUT=1`:
+
+```
+$ BOX_REQUIREMENTS_CHECKER_LOG_TO_STDOUT=1 php box.phar
+```
+
+
 <br />
 <hr />
 

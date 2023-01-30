@@ -14,35 +14,35 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use function array_map;
-use function array_shift;
-use function array_unshift;
-use function explode;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration as ConsoleConfiguration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
-use function getcwd;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-use function implode;
-use const KevinGH\Box\BOX_ALLOW_XDEBUG;
-use function KevinGH\Box\check_php_settings;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
 use KevinGH\Box\Configuration\Configuration;
-use function KevinGH\Box\FileSystem\file_contents;
-use function KevinGH\Box\FileSystem\make_path_absolute;
-use function KevinGH\Box\FileSystem\make_path_relative;
-use function putenv;
-use function sprintf;
 use stdClass;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
+use function array_map;
+use function array_shift;
+use function array_unshift;
+use function explode;
+use function getcwd;
+use function implode;
+use function KevinGH\Box\check_php_settings;
+use function KevinGH\Box\FileSystem\file_contents;
+use function KevinGH\Box\FileSystem\make_path_absolute;
+use function KevinGH\Box\FileSystem\make_path_relative;
+use function putenv;
+use function sprintf;
+use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 
 // TODO: replace the PHP-Scoper compactor in order to warn the user about scoping errors
 final class Process implements Command
@@ -98,8 +98,7 @@ final class Process implements Command
 
         $config = $io->getOption(self::NO_CONFIG_OPTION)->asBoolean()
             ? Configuration::create(null, new stdClass())
-            : ConfigOption::getConfig($io, true)
-        ;
+            : ConfigOption::getConfig($io, true);
 
         $filePath = $io->getArgument(self::FILE_ARGUMENT)->asNonEmptyString();
 
@@ -130,7 +129,7 @@ final class Process implements Command
         if ($io->isQuiet()) {
             $io->writeln($fileProcessedContents, OutputInterface::VERBOSITY_QUIET);
         } else {
-            $whitelist = self::retrieveWhitelist($compactors);
+            $symbolsRegistry = self::retrieveSymbolsRegistry($compactors);
 
             $io->writeln([
                 'Processed contents:',
@@ -140,13 +139,13 @@ final class Process implements Command
                 '<comment>"""</comment>',
             ]);
 
-            if (null !== $whitelist) {
+            if (null !== $symbolsRegistry) {
                 $io->writeln([
                     '',
                     'Whitelist:',
                     '',
                     '<comment>"""</comment>',
-                    self::exportWhitelist($whitelist, $io),
+                    self::exportSymbolsRegistry($symbolsRegistry, $io),
                     '<comment>"""</comment>',
                 ]);
             }
@@ -235,7 +234,7 @@ final class Process implements Command
         $io->newLine();
     }
 
-    private static function retrieveWhitelist(Compactors $compactors): ?SymbolsRegistry
+    private static function retrieveSymbolsRegistry(Compactors $compactors): ?SymbolsRegistry
     {
         foreach ($compactors->toArray() as $compactor) {
             if ($compactor instanceof PhpScoper) {
@@ -246,7 +245,7 @@ final class Process implements Command
         return null;
     }
 
-    private static function exportWhitelist(SymbolsRegistry $whitelist, IO $io): string
+    private static function exportSymbolsRegistry(SymbolsRegistry $symbolsRegistry, IO $io): string
     {
         $cloner = new VarCloner();
         $cloner->setMaxItems(-1);
@@ -258,7 +257,7 @@ final class Process implements Command
         }
 
         return (string) $cliDumper->dump(
-            $cloner->cloneVar($whitelist),
+            $cloner->cloneVar($symbolsRegistry),
             true,
         );
     }

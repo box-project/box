@@ -20,12 +20,15 @@ use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\touch;
 use function natcasesort;
-use const PHP_OS_FAMILY;
 use function symlink;
+use const PHP_OS_FAMILY;
 
 /**
  * @covers \KevinGH\Box\Configuration\Configuration
+ *
  * @group config
+ *
+ * @internal
  */
 class ConfigurationFileNoConfigTest extends ConfigurationTestCase
 {
@@ -137,20 +140,20 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
 
         $actual = $this->normalizePaths($noFileConfig->getFiles());
 
-        $this->assertEquals($expected, $actual);
-        $this->assertCount(0, $noFileConfig->getBinaryFiles());
+        self::assertEquals($expected, $actual);
+        self::assertCount(0, $noFileConfig->getBinaryFiles());
 
         $this->reloadConfig();
 
         $actual = $this->normalizePaths($this->config->getFiles());
 
-        $this->assertEquals($expected, $actual);
-        $this->assertCount(0, $this->config->getBinaryFiles());
+        self::assertEquals($expected, $actual);
+        self::assertCount(0, $this->config->getBinaryFiles());
 
-        $this->assertSame($this->tmp.'/index.php', $noFileConfig->getMainScriptPath());
+        self::assertSame($this->tmp.'/index.php', $noFileConfig->getMainScriptPath());
 
-        $this->assertSame($this->tmp.'/index.phar', $noFileConfig->getOutputPath());
-        $this->assertSame($this->tmp.'/index.phar', $noFileConfig->getTmpOutputPath());
+        self::assertSame($this->tmp.'/index.phar', $noFileConfig->getOutputPath());
+        self::assertSame($this->tmp.'/index.phar', $noFileConfig->getTmpOutputPath());
     }
 
     public function test_find_psr0_files(): void
@@ -183,15 +186,15 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
 
         $actual = $this->normalizePaths($noFileConfig->getFiles());
 
-        $this->assertEquals($expected, $actual);
-        $this->assertCount(0, $noFileConfig->getBinaryFiles());
+        self::assertEquals($expected, $actual);
+        self::assertCount(0, $noFileConfig->getBinaryFiles());
 
         $this->reloadConfig();
 
         $actual = $this->normalizePaths($this->config->getFiles());
 
-        $this->assertEquals($expected, $actual);
-        $this->assertCount(0, $this->config->getBinaryFiles());
+        self::assertEquals($expected, $actual);
+        self::assertCount(0, $this->config->getBinaryFiles());
     }
 
     public function test_psr0_with_empty_directory_in_composer_json(): void
@@ -230,15 +233,15 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
 
         $actual = $this->normalizePaths($noFileConfig->getFiles());
 
-        $this->assertEquals($expected, $actual);
-        $this->assertCount(0, $noFileConfig->getBinaryFiles());
+        self::assertEquals($expected, $actual);
+        self::assertCount(0, $noFileConfig->getBinaryFiles());
 
         $this->reloadConfig();
 
         $actual = $this->normalizePaths($this->config->getFiles());
 
-        $this->assertEquals($expected, $actual);
-        $this->assertCount(0, $this->config->getBinaryFiles());
+        self::assertEquals($expected, $actual);
+        self::assertCount(0, $this->config->getBinaryFiles());
     }
 
     public function test_throws_an_error_if_a_non_existent_file_is_found_via_the_composer_json(): void
@@ -259,9 +262,9 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
         try {
             $this->getNoFileConfig();
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'The file "'.$this->tmp.'/file1" does not exist.',
                 $exception->getMessage(),
             );
@@ -281,9 +284,9 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
         try {
             $this->getNoFileConfig();
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'File or directory "'.$this->tmp.'/CLASSMAP_DIR" was expected to exist.',
                 $exception->getMessage(),
             );
@@ -309,9 +312,9 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
         try {
             $this->getNoFileConfig();
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'Cannot add the link "'.$this->tmp.'/file1": links are not supported.',
                 $exception->getMessage(),
             );
@@ -333,9 +336,9 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
         try {
             $this->getNoFileConfig();
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'Cannot add the link "'.$this->tmp.'/CLASSMAP_DIR": links are not supported.',
                 $exception->getMessage(),
             );
@@ -451,13 +454,13 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
 
         $actual = $this->normalizePaths($this->config->getFiles());
 
-        $this->assertEquals($expected, $actual);
-        $this->assertCount(0, $this->config->getBinaryFiles());
+        self::assertEquals($expected, $actual);
+        self::assertCount(0, $this->config->getBinaryFiles());
 
         $actual = $this->normalizePaths($this->config->getFiles());
 
-        $this->assertEquals($expected, $actual);
-        $this->assertCount(0, $this->config->getBinaryFiles());
+        self::assertEquals($expected, $actual);
+        self::assertCount(0, $this->config->getBinaryFiles());
     }
 
     public function test_it_ignores_the_most_common_non_needed_files_when_guess_the_files_from_the_composer_json_file(): void
@@ -466,7 +469,7 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
         // docker run -i --rm -w /opt/box -v "$PWD":/opt/box box_php74 bin/phpunit tests/ConfigurationFileNoConfigTest.php --filter test_it_ignores_the_most_common_non_needed_files_when_guess_the_files_from_the_composer_json_file
 
         if ('Darwin' === PHP_OS_FAMILY) {
-            $this->markTestSkipped('Cannot run this test on OSX since it is case insensitive.');
+            self::markTestSkipped('Cannot run this test on OSX since it is case insensitive.');
         }
 
         touch('main.php~');
@@ -702,15 +705,15 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
 
         $actual = $this->normalizePaths($noFileConfig->getFiles());
 
-        $this->assertSame($expected, $actual);
-        $this->assertCount(0, $noFileConfig->getBinaryFiles());
+        self::assertSame($expected, $actual);
+        self::assertCount(0, $noFileConfig->getBinaryFiles());
 
         $this->reloadConfig();
 
         $actual = $this->normalizePaths($this->config->getFiles());
 
-        $this->assertSame($expected, $actual);
-        $this->assertCount(0, $this->config->getBinaryFiles());
+        self::assertSame($expected, $actual);
+        self::assertCount(0, $this->config->getBinaryFiles());
     }
 
     public function test_the_existing_phars_are_ignored_when_all_the_files_are_collected(): void
@@ -724,8 +727,8 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
 
         $actual = $this->normalizePaths($this->config->getFiles());
 
-        $this->assertEquals($expected, $actual);
-        $this->assertCount(0, $this->config->getBinaryFiles());
+        self::assertEquals($expected, $actual);
+        self::assertCount(0, $this->config->getBinaryFiles());
 
         remove('index.phar');
         touch('default');
@@ -739,8 +742,8 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
 
         $actual = $this->normalizePaths($this->config->getFiles());
 
-        $this->assertEquals($expected, $actual);
-        $this->assertCount(0, $this->config->getBinaryFiles());
+        self::assertEquals($expected, $actual);
+        self::assertCount(0, $this->config->getBinaryFiles());
     }
 
     public function test_the_box_debug_directory_is_always_excluded(): void
@@ -780,8 +783,8 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
 
         $actual = $this->normalizePaths($noFileConfig->getFiles());
 
-        $this->assertEquals($expected, $actual);
-        $this->assertCount(0, $noFileConfig->getBinaryFiles());
+        self::assertEquals($expected, $actual);
+        self::assertCount(0, $noFileConfig->getBinaryFiles());
     }
 
     public function test_it_includes_the_vendor_files_when_found(): void
@@ -802,14 +805,14 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
 
         $actual = $this->normalizePaths($noFileConfig->getFiles());
 
-        $this->assertEquals($expected, $actual);
-        $this->assertCount(0, $noFileConfig->getBinaryFiles());
+        self::assertEquals($expected, $actual);
+        self::assertCount(0, $noFileConfig->getBinaryFiles());
 
         $this->reloadConfig();
 
         $actual = $this->normalizePaths($this->config->getFiles());
 
-        $this->assertEquals($expected, $actual);
-        $this->assertCount(0, $this->config->getBinaryFiles());
+        self::assertEquals($expected, $actual);
+        self::assertCount(0, $this->config->getBinaryFiles());
     }
 }

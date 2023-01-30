@@ -17,22 +17,24 @@ namespace KevinGH\Box\Console\Command;
 use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Test\OutputAssertions;
-use function getenv;
-use function implode;
 use InvalidArgumentException;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
+use Symfony\Component\Console\Output\OutputInterface;
+use UnexpectedValueException;
+use function getenv;
+use function implode;
 use function preg_replace;
 use function realpath;
 use function str_replace;
-use Symfony\Component\Console\Output\OutputInterface;
-use UnexpectedValueException;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Info
  *
  * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
  *                              can create undesirable side-effects.
+ *
+ * @internal
  */
 class InfoTest extends CommandTestCase
 {
@@ -57,13 +59,13 @@ class InfoTest extends CommandTestCase
 
         $expected = <<<OUTPUT
 
-            API Version: $version
+            API Version: {$version}
 
             Supported Compression:
-            $compression
+            {$compression}
 
             Supported Signatures:
-            $signatures
+            {$signatures}
 
              // Get a PHAR details by giving its path as an argument.
 
@@ -90,7 +92,7 @@ class InfoTest extends CommandTestCase
 
         $expected = <<<OUTPUT
 
-            API Version: $version
+            API Version: {$version}
 
             Compression: None
 
@@ -126,7 +128,7 @@ class InfoTest extends CommandTestCase
 
         $expected = <<<OUTPUT
 
-            API Version: $version
+            API Version: {$version}
 
             Compression: None
 
@@ -148,7 +150,7 @@ class InfoTest extends CommandTestCase
     public function test_it_cannot_provide_info_about_an_invalid_phar_without_extension(): void
     {
         if ('v3' === getenv('SYMFONY_VERSION')) {
-            $this->markTestSkipped();
+            self::markTestSkipped();
         }
 
         $file = self::FIXTURES.'/foo';
@@ -165,7 +167,7 @@ class InfoTest extends CommandTestCase
         $expected = <<<OUTPUT
 
 
-             [ERROR] Could not read the file "$expectedPath".
+             [ERROR] Could not read the file "{$expectedPath}".
 
 
             OUTPUT;
@@ -190,9 +192,9 @@ class InfoTest extends CommandTestCase
                 ['verbosity' => OutputInterface::VERBOSITY_DEBUG],
             );
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (UnexpectedValueException $exception) {
-            $this->assertStringStartsWith('Cannot create phar', $exception->getMessage());
+            self::assertStringStartsWith('Cannot create phar', $exception->getMessage());
         }
     }
 
@@ -227,6 +229,9 @@ class InfoTest extends CommandTestCase
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
+    /**
+     * @requires extension bz2
+     */
     public function test_it_provides_info_about_a_tarbz2_phar(): void
     {
         $pharPath = self::FIXTURES.'/simple-phar.tar.bz2';
@@ -261,7 +266,7 @@ class InfoTest extends CommandTestCase
     public function test_it_provides_a_zip_phar_info(): void
     {
         if ('v3' === getenv('SYMFONY_VERSION')) {
-            $this->markTestSkipped();
+            self::markTestSkipped();
         }
 
         $pharPath = self::FIXTURES.'/new-simple-phar.zip';
@@ -293,6 +298,9 @@ class InfoTest extends CommandTestCase
         );
     }
 
+    /**
+     * @requires extension bz2
+     */
     public function test_it_provides_a_phar_info_with_the_tree_of_the_content(): void
     {
         $pharPath = self::FIXTURES.'/tree-phar.phar';
@@ -312,7 +320,7 @@ class InfoTest extends CommandTestCase
 
         $expected = <<<OUTPUT
 
-            API Version: $version
+            API Version: {$version}
 
             Compression:
               - BZ2 (33.33%)
@@ -339,6 +347,9 @@ class InfoTest extends CommandTestCase
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
+    /**
+     * @requires extension bz2
+     */
     public function test_it_provides_a_phar_info_with_the_flat_tree_of_the_content(): void
     {
         $pharPath = self::FIXTURES.'/tree-phar.phar';
@@ -358,7 +369,7 @@ class InfoTest extends CommandTestCase
 
         $expected = <<<OUTPUT
 
-            API Version: $version
+            API Version: {$version}
 
             Compression:
               - BZ2 (33.33%)
@@ -400,7 +411,7 @@ class InfoTest extends CommandTestCase
 
         $expected = <<<OUTPUT
 
-            API Version: $version
+            API Version: {$version}
 
             Compression: None
 
@@ -438,12 +449,12 @@ class InfoTest extends CommandTestCase
     /**
      * @dataProvider treeDepthProvider
      *
-     * @param mixed $expected
+     * @requires extension bz2
      */
     public function test_it_can_limit_the_tree_depth(
         string $pharPath,
         ?string $depth,
-        $expected,
+        mixed $expected,
     ): void {
         $pharPath = self::FIXTURES.'/tree-phar.phar';
         $phar = new Phar($pharPath);
@@ -462,7 +473,7 @@ class InfoTest extends CommandTestCase
                 $signature['hash_type'],
                 $signature['hash'],
             ],
-            $expected,
+            (string) $expected,
         );
 
         $input = [
@@ -603,6 +614,9 @@ class InfoTest extends CommandTestCase
         ];
     }
 
+    /**
+     * @requires extension bz2
+     */
     public function test_it_can_limit_the_tree_depth_in_flat_mode(): void
     {
         $pharPath = self::FIXTURES.'/tree-phar.phar';
@@ -624,7 +638,7 @@ class InfoTest extends CommandTestCase
 
         $expected = <<<OUTPUT
 
-            API Version: $version
+            API Version: {$version}
 
             Compression:
               - BZ2 (33.33%)
