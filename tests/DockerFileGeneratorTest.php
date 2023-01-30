@@ -27,11 +27,11 @@ class DockerFileGeneratorTest extends TestCase
     /**
      * @dataProvider generatorDataProvider
      */
-    public function test_it_can_generate_a_stub(
+    public function test_it_can_generate_a_dockerfile_contents(
         string $image,
         array $extensions,
         string $sourcePhar,
-        string $expected
+        string $expected,
     ): void {
         $actual = (new DockerFileGenerator($image, $extensions, $sourcePhar))->generateStub();
 
@@ -44,7 +44,7 @@ class DockerFileGeneratorTest extends TestCase
     public function test_it_can_generate_a_dockerfile_contents_from_requirements(
         array $requirements,
         string $sourcePhar,
-        string $expected
+        string $expected,
     ): void {
         $actual = DockerFileGenerator::createForRequirements($requirements, $sourcePhar)->generateStub();
 

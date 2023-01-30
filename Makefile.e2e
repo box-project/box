@@ -41,8 +41,18 @@ E2E_DOCKERFILE_OUTPUT_DIR = dist/dir015
 E2E_DOCKERFILE_EXPECTED_OUTPUT := $(E2E_DOCKERFILE_DIR)/expected-output
 E2E_DOCKERFILE_ACTUAL_OUTPUT := $(E2E_DOCKERFILE_OUTPUT_DIR)/actual-output
 E2E_DOCKERFILE_PHAR := $(E2E_DOCKERFILE_DIR)/index.phar
+E2E_DOCKERFILE_IMAGE_TAG := local_box_e2e_dockerfile:latest
 # TODO: see https://github.com/box-project/box/issues/839
 E2E_DOCKERFILE_DOCKERFILE := Dockerfile
+
+E2E_DOCKERFILE_NO_EXT_DIR = fixtures/build/dir016
+E2E_DOCKERFILE_NO_EXT_OUTPUT_DIR = dist/dir016
+E2E_DOCKERFILE_NO_EXT_EXPECTED_OUTPUT := $(E2E_DOCKERFILE_NO_EXT_DIR)/expected-output
+E2E_DOCKERFILE_NO_EXT_ACTUAL_OUTPUT := $(E2E_DOCKERFILE_NO_EXT_OUTPUT_DIR)/actual-output
+E2E_DOCKERFILE_NO_EXT_PHAR := $(E2E_DOCKERFILE_NO_EXT_DIR)/index.phar
+E2E_DOCKERFILE_NOT_EXT_IMAGE_TAG := local_box_e2e_dockerfile_no_ext:latest
+# TODO: see https://github.com/box-project/box/issues/839
+E2E_DOCKERFILE_NO_EXT_DOCKERFILE := Dockerfile
 
 ifeq ($(OS),Darwin)
 	SED = sed -i ''
@@ -177,16 +187,31 @@ e2e_phpstorm_stubs: $(SCOPED_BOX_BIN)
 	$(DIFF) $(E2E_PHPSTORM_STUBS_EXPECTED_OUTPUT) $(E2E_PHPSTORM_STUBS_ACTUAL_OUTPUT)
 
 .PHONY: e2e_dockerfile
-e2e_dockerfile: $(E2E_DOCKERFILE_DOCKERFILE) _e2e_dockerfile
+e2e_dockerfile: $(E2E_DOCKERFILE_PHAR) _e2e_dockerfile
 
 .PHONY: _e2e_dockerfile
 _e2e_dockerfile:
+	$(SCOPED_BOX) docker --no-interaction --config=$(E2E_DOCKERFILE_DIR)/box.json.dist
 	@mkdir -p $(E2E_DOCKERFILE_OUTPUT_DIR)
 
-	docker buildx build $(shell dirname $(E2E_DOCKERFILE_DOCKERFILE)) --platform=linux/amd64 --tag=local_box_e2e_dockerfile:latest
-	docker run --interactive --pull=never --rm local_box_e2e_dockerfile:latest > $(E2E_DOCKERFILE_ACTUAL_OUTPUT)
+	docker buildx build $(shell dirname $(E2E_DOCKERFILE_DOCKERFILE)) --platform=linux/amd64 --tag=$(E2E_DOCKERFILE_IMAGE_TAG)
+	docker run --interactive --pull=never --rm $(E2E_DOCKERFILE_IMAGE_TAG) > $(E2E_DOCKERFILE_ACTUAL_OUTPUT)
 
 	$(DIFF) $(E2E_DOCKERFILE_EXPECTED_OUTPUT) $(E2E_DOCKERFILE_ACTUAL_OUTPUT)
+
+
+.PHONY: e2e_dockerfile_no_extension
+e2e_dockerfile_no_extension: $(E2E_DOCKERFILE_NO_EXT_PHAR) _e2e_dockerfile_no_extension
+
+.PHONY: _e2e_dockerfile_no_extension
+_e2e_dockerfile_no_extension:
+	$(SCOPED_BOX) docker --no-interaction --config=$(E2E_DOCKERFILE_NO_EXT_DIR)/box.json.dist
+	@mkdir -p $(E2E_DOCKERFILE_NO_EXT_OUTPUT_DIR)
+
+	docker buildx build $(shell dirname $(E2E_DOCKERFILE_NO_EXT_DOCKERFILE)) --platform=linux/amd64 --tag=$(E2E_DOCKERFILE_NOT_EXT_IMAGE_TAG)
+	docker run --interactive --pull=never --rm $(E2E_DOCKERFILE_NOT_EXT_IMAGE_TAG) > $(E2E_DOCKERFILE_NO_EXT_ACTUAL_OUTPUT)
+
+	$(DIFF) $(E2E_DOCKERFILE_NO_EXT_EXPECTED_OUTPUT) $(E2E_DOCKERFILE_NO_EXT_ACTUAL_OUTPUT)
 
 
 #
@@ -226,8 +251,15 @@ $(E2E_DOCKERFILE_DIR)/composer.lock: $(E2E_DOCKERFILE_DIR)/composer.json
 $(E2E_DOCKERFILE_PHAR): $(SCOPED_BOX_BIN) $(E2E_DOCKERFILE_DIR)/index.php $(E2E_DOCKERFILE_DIR)/vendor
 	$(SCOPED_BOX) compile --ansi --working-dir=$(E2E_DOCKERFILE_DIR)
 	touch -c $@
-$(E2E_DOCKERFILE_DOCKERFILE): $(E2E_DOCKERFILE_PHAR)
-	$(SCOPED_BOX) docker --no-interaction --config=$(E2E_DOCKERFILE_DIR)/box.json.dist
+
+$(E2E_DOCKERFILE_NO_EXT_DIR)/vendor: $(E2E_DOCKERFILE_NO_EXT_DIR)/composer.lock
+	composer install --ansi --working-dir=$(E2E_DOCKERFILE_NO_EXT_DIR)
+	touch -c $@
+$(E2E_DOCKERFILE_NO_EXT_DIR)/composer.lock: $(E2E_DOCKERFILE_NO_EXT_DIR)/composer.json
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
+	@echo "$$ composer update --lock --working-dir=$(E2E_DOCKERFILE_NO_EXT_DIR) && touch -c $(@)"
+$(E2E_DOCKERFILE_NO_EXT_PHAR): $(SCOPED_BOX_BIN) $(E2E_DOCKERFILE_NO_EXT_DIR)/index.php $(E2E_DOCKERFILE_NO_EXT_DIR)/vendor
+	$(SCOPED_BOX) compile --ansi --working-dir=$(E2E_DOCKERFILE_NO_EXT_DIR)
 	touch -c $@
 
 .PHONY: docker_images
