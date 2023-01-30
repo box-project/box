@@ -53,23 +53,18 @@ class DockerFileGeneratorTest extends TestCase
 
     public function test_throws_an_error_if_cannot_find_a_suitable_php_image(): void
     {
-        try {
-            DockerFileGenerator::createForRequirements(
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Could not find a suitable Docker base image for the PHP constraint(s) "^5.3". Images available: "8.2-cli-alpine", "8.1-cli-alpine", "8.0-cli-alpine", "7.4-cli-alpine", "7.3-cli-alpine", "7.2-cli-alpine", "7.1-cli-alpine", "7-cli-alpine".');
+
+        DockerFileGenerator::createForRequirements(
+            [
                 [
-                    [
-                        'type' => 'php',
-                        'condition' => '^5.3',
-                    ],
+                    'type' => 'php',
+                    'condition' => '^5.3',
                 ],
-                'path/to/phar',
-            )
-                ->generateStub();
-        } catch (UnexpectedValueException $exception) {
-            self::assertSame(
-                'Could not find a suitable Docker base image for the PHP constraint(s) "^5.3". Images available: "8.1-cli-alpine", "8.0-cli-alpine", "7.4-cli-alpine", "7.3-cli-alpine", "7.2-cli-alpine", "7.1-cli-alpine", "7-cli-alpine"',
-                $exception->getMessage(),
-            );
-        }
+            ],
+            'path/to/phar',
+        );
     }
 
     public static function generatorDataProvider(): iterable
