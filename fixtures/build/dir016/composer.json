@@ -1,0 +1,6 @@
+{
+    "bin": "index.php",
+    "require": {
+        "php": "^8.1"
+    }
+}
