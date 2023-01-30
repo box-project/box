@@ -159,7 +159,7 @@ class DockerFileGeneratorTest extends TestCase
 
     public static function generatorRequirementsProvider(): iterable
     {
-        yield [
+        yield 'nominal' => [
             [
                 [
                     'type' => 'php',
@@ -212,7 +212,7 @@ class DockerFileGeneratorTest extends TestCase
                 Dockerfile,
         ];
 
-        yield [
+        yield 'multiple PHP constraints' => [
             [
                 [
                     'type' => 'php',
@@ -247,7 +247,7 @@ class DockerFileGeneratorTest extends TestCase
                 Dockerfile,
         ];
 
-        yield [
+        yield 'only PHP constraints' => [
             [
                 [
                     'type' => 'php',
@@ -267,6 +267,53 @@ class DockerFileGeneratorTest extends TestCase
                 FROM php:7.1-cli-alpine
 
                 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+
+                COPY box.phar /box.phar
+
+                ENTRYPOINT ["/box.phar"]
+
+                Dockerfile,
+        ];
+
+        yield 'duplicate extension constraints' => [
+            [
+                [
+                    'type' => 'php',
+                    'condition' => '^7.1',
+                    'message' => 'The application requires the version "^7.1" or greater.',
+                    'helpMessage' => 'The application requires the version "^7.1" or greater.',
+                ],
+                [
+                    'type' => 'php',
+                    'condition' => '~7.1.0',
+                    'message' => 'The application requires the version "^7.1" or greater.',
+                    'helpMessage' => 'The application requires the version "^7.1" or greater.',
+                ],
+                [
+                    'type' => 'extension',
+                    'condition' => 'zlib',
+                    'message' => 'The application requires the extension "zlib". Enable it or install a polyfill.',
+                    'helpMessage' => 'The application requires the extension "zlib".',
+                ],
+                [
+                    'type' => 'extension',
+                    'condition' => 'filter',
+                    'message' => 'The package "nikic/php-parser" requires the extension "filter". Enable it or install a polyfill.',
+                    'helpMessage' => 'The package "nikic/php-parser" requires the extension "filter".',
+                ],
+                [
+                    'type' => 'extension',
+                    'condition' => 'filter',
+                    'message' => 'The package "phpdocumentor/reflection-docblock" requires the extension "filter". Enable it or install a polyfill.',
+                    'helpMessage' => 'The package "phpdocumentor/reflection-docblock" requires the extension "filter".',
+                ],
+            ],
+            'box.phar',
+            <<<'Dockerfile'
+                FROM php:7.1-cli-alpine
+
+                COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+                RUN install-php-extensions zlib filter
 
                 COPY box.phar /box.phar
 
