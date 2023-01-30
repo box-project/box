@@ -92,7 +92,7 @@ class DocblockAnnotationParserTest extends TestCase
                  */
                 DOCBLOCK,
             [
-                '@var string',
+                '@var',
                 '@JMS\Type("string")',
             ],
         ];
