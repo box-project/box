@@ -47,7 +47,7 @@ use const T_WHITESPACE;
 final class Php extends FileExtensionCompactor
 {
     public function __construct(
-        private DocblockAnnotationParser $annotationParser,
+        private ?DocblockAnnotationParser $annotationParser,
         array $extensions = ['php'],
     ) {
         parent::__construct($extensions);
@@ -136,6 +136,10 @@ final class Php extends FileExtensionCompactor
 
     private function compactAnnotations(string $docblock): string
     {
+        if (null === $this->annotationParser) {
+            return $docblock;
+        }
+
         $breaksNbr = mb_substr_count($docblock, "\n");
 
         $annotations = $this->annotationParser->parse($docblock);

@@ -656,4 +656,431 @@ class PhpTest extends TestCase
                 PHP,
         ];
     }
+
+    /**
+     * @dataProvider phpContentWithAnnotationsDisabledProvider
+     */
+    public function test_it_does_not_touch_the_doc_blocks_if_disabled(string $content, string $expected): void
+    {
+        $file = 'foo.php';
+
+        $actual = (new Php(null))->compact($file, $content);
+        // We are not interested in different trailing spaces
+        $actual = DisplayNormalizer::removeTrailingSpaces($actual);
+
+        self::assertSame($expected, $actual);
+    }
+
+    public static function phpContentWithAnnotationsDisabledProvider(): iterable
+    {
+        yield 'simple PHP file with comments' => [
+            <<<'PHP'
+                <?php
+
+                /**
+                 * A comment.
+                 */
+                class AClass
+                {
+                    /**
+                     * A comment.
+                     */
+                    public function aMethod()
+                    {
+                        \$test = true;
+                    }
+
+                    // Inline comment.
+                    public function bMethod()
+                    {
+                        \$test = true; // Inline comment.
+                    }
+
+                    # Inline comment.
+                    public function cMethod()
+                    {
+                        \$test = true; # Inline comment.
+
+
+                    }
+
+                    /* Trailing comment */
+                    public function dMethod()
+                    {
+                        \$test = true; /* Trailing comment */
+                    }
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+
+
+
+                class AClass
+                {
+
+
+
+                public function aMethod()
+                {
+                \$test = true;
+                }
+
+
+                public function bMethod()
+                {
+                \$test = true;
+                }
+
+
+                public function cMethod()
+                {
+                \$test = true;
+
+
+                }
+
+
+                public function dMethod()
+                {
+                \$test = true;
+                }
+                }
+                PHP,
+        ];
+
+        yield 'PHP file with annotations' => [
+            <<<'PHP'
+                <?php
+
+                /**
+                 * This is an example entity class.
+                 *
+                 * @Entity()
+                 * @Table(name="test")
+                 */
+                class Test
+                {
+                    /**
+                     * The unique identifier.
+                     *
+                     * @ORM\Column(type="integer")
+                     * @ORM\GeneratedValue()
+                     * @ORM\Id()
+                     */
+                    private \$id;
+
+                    /**
+                     * A foreign key.
+                     *
+                     * @ORM\ManyToMany(targetEntity="SomethingElse")
+                     * @ORM\JoinTable(
+                     *     name="aJoinTable",
+                     *     joinColumns={
+                     *         @ORM\JoinColumn(name="joined",referencedColumnName="foreign")
+                     *     },
+                     *     inverseJoinColumns={
+                     *         @ORM\JoinColumn(name="foreign",referencedColumnName="joined")
+                     *     }
+                     * )
+                     */
+                    private \$foreign;
+
+                    /**
+                     * @ignored
+                     */
+                    private \$none;
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                /**
+                 * This is an example entity class.
+                 *
+                 * @Entity()
+                 * @Table(name="test")
+                 */
+                class Test
+                {
+                /**
+                     * The unique identifier.
+                     *
+                     * @ORM\Column(type="integer")
+                     * @ORM\GeneratedValue()
+                     * @ORM\Id()
+                     */
+                private \$id;
+
+                /**
+                     * A foreign key.
+                     *
+                     * @ORM\ManyToMany(targetEntity="SomethingElse")
+                     * @ORM\JoinTable(
+                     *     name="aJoinTable",
+                     *     joinColumns={
+                     *         @ORM\JoinColumn(name="joined",referencedColumnName="foreign")
+                     *     },
+                     *     inverseJoinColumns={
+                     *         @ORM\JoinColumn(name="foreign",referencedColumnName="joined")
+                     *     }
+                     * )
+                     */
+                private \$foreign;
+
+                /**
+                     * @ignored
+                     */
+                private \$none;
+                }
+                PHP,
+        ];
+
+        yield 'Invalid PHP file' => [
+            '<ph',
+            '<ph',
+        ];
+
+        yield 'Invalid annotation with ignored param' => [
+            <<<'PHP'
+                <?php
+
+                /**
+                 * @param (string|stdClass $x
+                 */
+                function foo($x) {
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                /**
+                 * @param (string|stdClass $x
+                 */
+                function foo($x) {
+                }
+                PHP,
+        ];
+
+        yield 'Invalid annotation' => [
+            <<<'PHP'
+                <?php
+
+                /**
+                 * comment
+                 *
+                 * @a({@:1})
+                 */
+                function foo($x) {
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                /**
+                 * comment
+                 *
+                 * @a({@:1})
+                 */
+                function foo($x) {
+                }
+                PHP,
+        ];
+
+        yield 'Simple single line PHP 8.0 attribute' => [
+            <<<'PHP'
+                <?php
+
+                class MyJson implements JsonSerializable {
+                    // This method has an attribute.
+                    #[\ReturnTypeWillChange]
+                    public jsonSerialize() {}
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                class MyJson implements JsonSerializable {
+
+                #[\ReturnTypeWillChange]
+                public jsonSerialize() {}
+                }
+                PHP,
+        ];
+
+        yield 'Simple multi-line PHP 8.0 attribute' => [
+            <<<'PHP'
+                <?php
+
+                class MyJson implements JsonSerializable {
+                    #[
+                        \ReturnTypeWillChange
+                    ]
+                    public jsonSerialize() {}
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                class MyJson implements JsonSerializable {
+                #[
+                \ReturnTypeWillChange
+                ]
+                public jsonSerialize() {}
+                }
+                PHP,
+        ];
+
+        yield 'Single line PHP 8.0 attribute containing short array' => [
+            <<<'PHP'
+                <?php
+
+                #[AttributeWithParams('foo', bar: ['bar' => 'foobar'])]
+                function foo() {}
+                PHP,
+            <<<'PHP'
+                <?php
+
+                #[AttributeWithParams('foo', bar: ['bar' => 'foobar'])]
+                function foo() {}
+                PHP,
+        ];
+
+        yield 'Single line containing two separate PHP 8.0 attributes' => [
+            <<<'PHP'
+                <?php
+
+                #[CustomAttribute] #[AttributeWithParams('foo')]
+                function foo() {}
+                PHP,
+            <<<'PHP'
+                <?php
+
+                #[CustomAttribute] #[AttributeWithParams('foo')]
+                function foo() {}
+                PHP,
+        ];
+
+        yield 'Single line PHP 8.0 attribute followed by a comment' => [
+            <<<'PHP'
+                <?php
+
+                #[CustomAttribute] // This is a comment
+                function foo() {}
+                PHP,
+            <<<'PHP'
+                <?php
+
+                #[CustomAttribute]
+                function foo() {}
+                PHP,
+        ];
+
+        yield 'Single line PHP 8.0 attribute group' => [
+            <<<'PHP'
+                <?php
+
+                #[CustomAttribute, AttributeWithParams('foo'), AttributeWithParams('foo', bar: ['bar' => 'foobar'])]
+                function foo() {}
+                PHP,
+            <<<'PHP'
+                <?php
+
+                #[CustomAttribute, AttributeWithParams('foo'), AttributeWithParams('foo', bar: ['bar' => 'foobar'])]
+                function foo() {}
+                PHP,
+        ];
+
+        yield 'Multi-line PHP 8.0 attribute containing short array and inline comments' => [
+            <<<'PHP'
+                <?php
+
+                #[
+                    CustomAttribute,                // comment
+                    AttributeWithParams(/* another comment */ 'foo'),
+                    AttributeWithParams('foo', bar: ['bar' => 'foobar'])
+                ]
+                function foo() {}
+                PHP,
+            <<<'PHP'
+                <?php
+
+                #[
+                CustomAttribute,
+                AttributeWithParams( 'foo'),
+                AttributeWithParams('foo', bar: ['bar' => 'foobar'])
+                ]
+                function foo() {}
+                PHP,
+        ];
+
+        yield 'Inline parameter attribute group followed by another attribute' => [
+            <<<'PHP'
+                <?php
+
+                function foo(#[ParamAttribute, AttributeWithParams(/* comment */ 'foo')] int $param, #[ParamAttr] $more) {}
+                PHP,
+            <<<'PHP'
+                <?php
+
+                function foo(#[ParamAttribute, AttributeWithParams( 'foo')] int $param, #[ParamAttr] $more) {}
+                PHP,
+        ];
+
+        yield 'Multi-line PHP 8.0 attribute for parameter' => [
+            <<<'PHP'
+                <?php
+
+                function foo(#[
+                    AttributeWithParams(
+                        'foo'
+                    )
+                                                                ] int $param) {}
+                PHP,
+            <<<'PHP'
+                <?php
+
+                function foo(#[
+                AttributeWithParams(
+                'foo'
+                )
+                ] int $param) {}
+                PHP,
+        ];
+
+        yield 'Single line PHP 8.0 attribute containing text looking like a PHP close tag' => [
+            <<<'PHP'
+                <?php
+
+                #[DeprecationReason('reason: <https://some-website/reason?>')]
+                function foo() {}
+                PHP,
+            <<<'PHP'
+                <?php
+
+                #[DeprecationReason('reason: <https://some-website/reason?>')]
+                function foo() {}
+                PHP,
+        ];
+
+        yield 'Multi-line PHP 8.0 attribute containing text looking like a PHP close tag' => [
+            <<<'PHP'
+                <?php
+
+                #[DeprecationReason(
+                    'reason: <https://some-website/reason?>'
+                )]
+                function foo() {}
+                PHP,
+            <<<'PHP'
+                <?php
+
+                #[DeprecationReason(
+                'reason: <https://some-website/reason?>'
+                )]
+                function foo() {}
+                PHP,
+        ];
+    }
 }
