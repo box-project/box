@@ -136,7 +136,7 @@ final class DockerFileGenerator
 
         throw new UnexpectedValueException(
             sprintf(
-                'Could not find a suitable Docker base image for the PHP constraint(s) "%s". Images available: "%s"',
+                'Could not find a suitable Docker base image for the PHP constraint(s) "%s". Images available: "%s".',
                 implode('", "', $conditions),
                 implode('", "', self::PHP_DOCKER_IMAGES),
             ),
