@@ -20,9 +20,11 @@ use Webmozart\Assert\Assert;
 use function array_column;
 use function array_filter;
 use function basename;
+use function count;
 use function implode;
-use function Safe\sprintf;
-use function str_replace;
+use function sprintf;
+use function strtr;
+use const PHP_EOL;
 
 /**
  * @private
@@ -32,8 +34,8 @@ final class DockerFileGenerator
     private const FILE_TEMPLATE = <<<'Dockerfile'
         FROM php:__BASE_PHP_IMAGE_TOKEN__
 
-        RUN $(php -r '$extensionInstalled = array_map("strtolower", \get_loaded_extensions(false));$requiredExtensions = __PHP_EXTENSIONS_TOKEN__;$extensionsToInstall = array_diff($requiredExtensions, $extensionInstalled);if ([] !== $extensionsToInstall) {echo \sprintf("docker-php-ext-install %s", implode(" ", $extensionsToInstall));} else {echo "echo \"No extensions\"";}')
-
+        COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+        __REQUIRED_EXTENSIONS__
         COPY __PHAR_FILE_PATH_TOKEN__ /__PHAR_FILE_NAME_TOKEN__
 
         ENTRYPOINT ["/__PHAR_FILE_NAME_TOKEN__"]
@@ -92,38 +94,22 @@ final class DockerFileGenerator
 
     public function generateStub(): string
     {
-        $contents = self::FILE_TEMPLATE;
+        $requiredExtensions = 0 === count($this->extensions)
+            ? ''
+            : sprintf(
+                'RUN install-php-extensions %s%s',
+                implode(' ', $this->extensions),
+                PHP_EOL,
+            );
 
-        $contents = str_replace(
-            '__BASE_PHP_IMAGE_TOKEN__',
-            $this->image,
-            $contents,
-        );
-
-        $contents = str_replace(
-            '__PHP_EXTENSIONS_TOKEN__',
-            [] === $this->extensions
-                ? '[]'
-                : sprintf(
-                    '["%s"]',
-                    implode(
-                        '", "',
-                        $this->extensions,
-                    ),
-                ),
-            $contents,
-        );
-
-        $contents = str_replace(
-            '__PHAR_FILE_PATH_TOKEN__',
-            $this->sourcePhar,
-            $contents,
-        );
-
-        return str_replace(
-            '__PHAR_FILE_NAME_TOKEN__',
-            basename($this->sourcePhar),
-            $contents,
+        return strtr(
+            self::FILE_TEMPLATE,
+            [
+                '__BASE_PHP_IMAGE_TOKEN__' => $this->image,
+                '__PHAR_FILE_PATH_TOKEN__' => $this->sourcePhar,
+                '__PHAR_FILE_NAME_TOKEN__' => basename($this->sourcePhar),
+                '__REQUIRED_EXTENSIONS__' => $requiredExtensions,
+            ],
         );
     }
 
