@@ -12,7 +12,16 @@
 
 namespace KevinGH\RequirementChecker;
 
-require __DIR__.'/../vendor/autoload.php';
+if (
+    isset($_SERVER['BOX_REQUIREMENT_CHECKER'])
+    || false === (bool) $_SERVER['BOX_REQUIREMENT_CHECKER']
+) {
+    // Do nothing.
+    return;
+}
+
+// Important: do this check _after_ the requirement checker flag. Indeed, if the requirement checker is disabled we do
+// not want any of its code to be executed.
 
 // See https://github.com/easysoft/phpmicro for the micro SAPI.
 if (false === in_array(PHP_SAPI, array('cli', 'phpdbg', 'embed', 'micro'), true)) {
@@ -21,11 +30,8 @@ if (false === in_array(PHP_SAPI, array('cli', 'phpdbg', 'embed', 'micro'), true)
     exit(1);
 }
 
-if ((
-        false === isset($_SERVER['BOX_REQUIREMENT_CHECKER'])
-        || true === (bool) $_SERVER['BOX_REQUIREMENT_CHECKER']
-    )
-    && false === Checker::checkRequirements()
-) {
+require __DIR__.'/../vendor/autoload.php';
+
+if (Checker::checkRequirements()) {
     exit(1);
 }
