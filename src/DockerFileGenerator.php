@@ -20,9 +20,11 @@ use Webmozart\Assert\Assert;
 use function array_column;
 use function array_filter;
 use function basename;
+use function count;
 use function implode;
-use function Safe\sprintf;
+use function sprintf;
 use function strtr;
+use const PHP_EOL;
 
 /**
  * @private
@@ -33,8 +35,7 @@ final class DockerFileGenerator
         FROM php:__BASE_PHP_IMAGE_TOKEN__
 
         COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-        RUN install-php-extensions __REQUIRED_EXTENSIONS__
-
+        __REQUIRED_EXTENSIONS__
         COPY __PHAR_FILE_PATH_TOKEN__ /__PHAR_FILE_NAME_TOKEN__
 
         ENTRYPOINT ["/__PHAR_FILE_NAME_TOKEN__"]
@@ -93,14 +94,22 @@ final class DockerFileGenerator
 
     public function generateStub(): string
     {
+        $requiredExtensions = 0 === count($this->extensions)
+            ? ''
+            : sprintf(
+                'RUN install-php-extensions %s%s',
+                implode(' ', $this->extensions),
+                PHP_EOL,
+            );
+
         return strtr(
             self::FILE_TEMPLATE,
             [
                 '__BASE_PHP_IMAGE_TOKEN__' => $this->image,
                 '__PHAR_FILE_PATH_TOKEN__' => $this->sourcePhar,
                 '__PHAR_FILE_NAME_TOKEN__' => basename($this->sourcePhar),
-                '__REQUIRED_EXTENSIONS__' => implode(' ', $this->extensions),
-            ]
+                '__REQUIRED_EXTENSIONS__' => $requiredExtensions,
+            ],
         );
     }
 

@@ -27,15 +27,100 @@ class DockerFileGeneratorTest extends TestCase
     /**
      * @dataProvider generatorDataProvider
      */
-    public function test_all_extension_names_are_in_dockerfile(
+    public function test_it_can_generate_a_stub(
         string $image,
         array $extensions,
         string $sourcePhar,
+        string $expected
     ): void {
-        $stub = (new DockerFileGenerator($image, $extensions, $sourcePhar))->generateStub();
-        foreach ($extensions as $extension) {
-            self::assertStringContainsString($extension, $stub);
-        }
+        $actual = (new DockerFileGenerator($image, $extensions, $sourcePhar))->generateStub();
+
+        self::assertSame($expected, $actual);
+    }
+
+    public static function generatorDataProvider(): iterable
+    {
+        yield 'no extension' => [
+            '7.2-cli-alpine',
+            [],
+            'box.phar',
+            <<<'EOF'
+                FROM php:7.2-cli-alpine
+
+                COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+
+                COPY box.phar /box.phar
+
+                ENTRYPOINT ["/box.phar"]
+
+                EOF,
+        ];
+
+        yield 'no extension with absolute path' => [
+            '7.2-cli-alpine',
+            [],
+            '/path/to/box.phar',
+            <<<'EOF'
+                FROM php:7.2-cli-alpine
+
+                COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+
+                COPY /path/to/box.phar /box.phar
+
+                ENTRYPOINT ["/box.phar"]
+
+                EOF,
+        ];
+
+        yield 'no extension with phar that does not have the PHAR suffix' => [
+            '7.2-cli-alpine',
+            [],
+            'box',
+            <<<'EOF'
+                FROM php:7.2-cli-alpine
+
+                COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+
+                COPY box /box
+
+                ENTRYPOINT ["/box"]
+
+                EOF,
+        ];
+
+        yield 'single extension' => [
+            '7.2-cli-alpine',
+            ['zip'],
+            'box.phar',
+            <<<'EOF'
+                FROM php:7.2-cli-alpine
+
+                COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+                RUN install-php-extensions zip
+
+                COPY box.phar /box.phar
+
+                ENTRYPOINT ["/box.phar"]
+
+                EOF,
+        ];
+
+        yield 'multple extensions' => [
+            '7.2-cli-alpine',
+            ['phar', 'gzip'],
+            'box.phar',
+            <<<'EOF'
+                FROM php:7.2-cli-alpine
+
+                COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+                RUN install-php-extensions phar gzip
+
+                COPY box.phar /box.phar
+
+                ENTRYPOINT ["/box.phar"]
+
+                EOF,
+        ];
     }
 
     /**
@@ -77,21 +162,6 @@ class DockerFileGeneratorTest extends TestCase
                 $exception->getMessage(),
             );
         }
-    }
-
-    public static function generatorDataProvider(): iterable
-    {
-        yield [
-            '7.2-cli-alpine',
-            ['zip'],
-            'box.phar',
-        ];
-
-        yield [
-            '7.2-cli-alpine',
-            ['phar', 'gzip'],
-            '/path/to/box',
-        ];
     }
 
     public static function generatorRequirementsProvider(): iterable
