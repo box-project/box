@@ -44,6 +44,7 @@ final class DockerFileGenerator
         Dockerfile;
 
     private const PHP_DOCKER_IMAGES = [
+        '8.2.0' => '8.2-cli-alpine',
         '8.1.0' => '8.1-cli-alpine',
         '8.0.0' => '8.0-cli-alpine',
         '7.4.0' => '7.4-cli-alpine',
@@ -136,7 +137,7 @@ final class DockerFileGenerator
 
         throw new UnexpectedValueException(
             sprintf(
-                'Could not find a suitable Docker base image for the PHP constraint(s) "%s". Images available: "%s"',
+                'Could not find a suitable Docker base image for the PHP constraint(s) "%s". Images available: "%s".',
                 implode('", "', $conditions),
                 implode('", "', self::PHP_DOCKER_IMAGES),
             ),
