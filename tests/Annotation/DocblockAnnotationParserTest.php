@@ -80,5 +80,21 @@ class DocblockAnnotationParserTest extends TestCase
                 DOCBLOCK,
             ['@Kept'],
         ];
+
+        yield [
+            <<<'DOCBLOCK'
+                /**
+                 * A foo version.
+                 *
+                 * @var string
+                 *
+                 * @JMS\Type("string")
+                 */
+                DOCBLOCK,
+            [
+                '@var string',
+                '@JMS\Type("string")',
+            ],
+        ];
     }
 }

@@ -259,6 +259,58 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
         $falseAnnotationConfigs = [
             false,
             new stdClass(),
+        ];
+
+        foreach ($falseAnnotationConfigs as $config) {
+            yield [
+                [
+                    'annotations' => $config,
+                    'compactors' => [Php::class],
+                ],
+                <<<'PHP'
+                    <?php
+
+                    /**
+                     * Function comparing the two given values
+                     *
+                     * @param int $x
+                     * @param int $y
+                     *
+                     * @return int
+                     *
+                     * @author Théo Fidry
+                     * @LICENSE MIT
+                     *
+                     * @Acme(type = "function")
+                     */
+                    function foo($x, $y): int {
+                        return $x <=> $y;
+                    }
+                    PHP,
+                <<<'PHP'
+                    <?php
+
+                    /**
+                     * Function comparing the two given values
+                     *
+                     * @param int $x
+                     * @param int $y
+                     *
+                     * @return int
+                     *
+                     * @author Théo Fidry
+                     * @LICENSE MIT
+                     *
+                     * @Acme(type = "function")
+                     */
+                    function foo($x, $y): int {
+                    return $x <=> $y;
+                    }
+                    PHP,
+            ];
+        }
+
+        $noIgnoredTagAnnotationConfigs = [
             (object) [
                 'ignore' => [],
             ],
@@ -267,7 +319,7 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
             ],
         ];
 
-        foreach ($falseAnnotationConfigs as $config) {
+        foreach ($noIgnoredTagAnnotationConfigs as $config) {
             yield [
                 [
                     'annotations' => $config,

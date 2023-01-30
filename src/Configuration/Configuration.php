@@ -1726,8 +1726,8 @@ final class Configuration
     }
 
     /**
-     * @param string[] $compactorClasses
-     * @param string[] $ignoredAnnotations
+     * @param string[]      $compactorClasses
+     * @param string[]|null $ignoredAnnotations
      *
      * @return Compactor[]
      */
@@ -1735,7 +1735,7 @@ final class Configuration
         stdClass $raw,
         string $basePath,
         array $compactorClasses,
-        array $ignoredAnnotations,
+        ?array $ignoredAnnotations,
         ConfigurationLogger $logger,
     ): array {
         return array_map(
@@ -2643,13 +2643,13 @@ final class Configuration
     /**
      * @param string[] $compactorClasses
      *
-     * @return string[]
+     * @return string[]|null
      */
     private static function retrievePhpCompactorIgnoredAnnotations(
         stdClass $raw,
         array $compactorClasses,
         ConfigurationLogger $logger,
-    ): array {
+    ): ?array {
         $hasPhpCompactor = in_array(PhpCompactor::class, $compactorClasses, true);
 
         self::checkIfDefaultValue($logger, $raw, self::ANNOTATIONS_KEY, true);
@@ -2676,7 +2676,7 @@ final class Configuration
         }
 
         if (false === $annotations) {
-            return [];
+            return null;
         }
 
         if (false === property_exists($annotations, self::IGNORED_ANNOTATIONS_KEY)) {
@@ -2690,7 +2690,7 @@ final class Configuration
                 ),
             );
 
-            return [];
+            return null;
         }
 
         $ignored = [];
@@ -2706,8 +2706,12 @@ final class Configuration
         return $ignored;
     }
 
-    private static function createPhpCompactor(array $ignoredAnnotations): Compactor
+    private static function createPhpCompactor(?array $ignoredAnnotations): Compactor
     {
+        if (null === $ignoredAnnotations) {
+            return new PhpCompactor(null);
+        }
+
         $ignoredAnnotations = array_values(
             array_filter(
                 array_map(
