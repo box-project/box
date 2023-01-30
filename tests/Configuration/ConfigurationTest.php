@@ -46,9 +46,9 @@ use function KevinGH\Box\get_box_version;
 use function mt_getrandmax;
 use function random_int;
 use function sprintf;
+use function strtr;
 use const DIRECTORY_SEPARATOR;
 use const JSON_THROW_ON_ERROR;
-use const PHP_EOL;
 
 /**
  * @covers \KevinGH\Box\Configuration\Configuration
@@ -1696,27 +1696,15 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_it_cannot_retrieve_the_git_hash_if_not_in_a_git_repository(): void
     {
-        try {
-            $this->setConfig([
-                'git' => 'git',
-            ]);
+        $regex = strtr(
+            '~^The tag or commit hash could not be retrieved from "{path}": fatal: Not a git repository~i',
+            ['{path}' => $this->tmp],
+        );
 
-            self::fail('Expected exception to be thrown.');
-        } catch (RuntimeException $exception) {
-            $tmp = $this->tmp;
+        $this->expectExceptionMessageMatches($regex);
+        $this->expectException(RuntimeException::class);
 
-            // Make the comparison case insensitive since depending of the git version the case may be different
-            self::assertSame(
-                mb_strtolower(
-                    sprintf(
-                        'The tag or commit hash could not be retrieved from "%s": fatal: Not a git repository '
-                        .'(or any of the parent directories): .git'.PHP_EOL,
-                        $tmp,
-                    ),
-                ),
-                mb_strtolower($exception->getMessage()),
-            );
-        }
+        $this->setConfig(['git' => 'git']);
     }
 
     public function test_a_recommendation_is_given_if_the_configured_git_placeholder_is_the_default_value(): void
