@@ -19,6 +19,7 @@ use UnexpectedValueException;
 use Webmozart\Assert\Assert;
 use function array_column;
 use function array_filter;
+use function array_unique;
 use function basename;
 use function count;
 use function implode;
@@ -147,12 +148,14 @@ final class DockerFileGenerator
      */
     private static function retrievePhpExtensions(array $requirements): array
     {
-        return array_column(
-            array_filter(
-                $requirements,
-                static fn (array $requirement): bool => 'extension' === $requirement['type'],
+        return array_unique(
+            array_column(
+                array_filter(
+                    $requirements,
+                    static fn (array $requirement): bool => 'extension' === $requirement['type'],
+                ),
+                'condition',
             ),
-            'condition',
         );
     }
 }
