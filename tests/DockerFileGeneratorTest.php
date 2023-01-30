@@ -44,7 +44,7 @@ class DockerFileGeneratorTest extends TestCase
             '7.2-cli-alpine',
             [],
             'box.phar',
-            <<<'EOF'
+            <<<'Dockerfile'
                 FROM php:7.2-cli-alpine
 
                 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
@@ -53,14 +53,14 @@ class DockerFileGeneratorTest extends TestCase
 
                 ENTRYPOINT ["/box.phar"]
 
-                EOF,
+                Dockerfile,
         ];
 
         yield 'no extension with absolute path' => [
             '7.2-cli-alpine',
             [],
             '/path/to/box.phar',
-            <<<'EOF'
+            <<<'Dockerfile'
                 FROM php:7.2-cli-alpine
 
                 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
@@ -69,14 +69,14 @@ class DockerFileGeneratorTest extends TestCase
 
                 ENTRYPOINT ["/box.phar"]
 
-                EOF,
+                Dockerfile,
         ];
 
         yield 'no extension with phar that does not have the PHAR suffix' => [
             '7.2-cli-alpine',
             [],
             'box',
-            <<<'EOF'
+            <<<'Dockerfile'
                 FROM php:7.2-cli-alpine
 
                 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
@@ -85,14 +85,14 @@ class DockerFileGeneratorTest extends TestCase
 
                 ENTRYPOINT ["/box"]
 
-                EOF,
+                Dockerfile,
         ];
 
         yield 'single extension' => [
             '7.2-cli-alpine',
             ['zip'],
             'box.phar',
-            <<<'EOF'
+            <<<'Dockerfile'
                 FROM php:7.2-cli-alpine
 
                 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
@@ -102,14 +102,14 @@ class DockerFileGeneratorTest extends TestCase
 
                 ENTRYPOINT ["/box.phar"]
 
-                EOF,
+                Dockerfile,
         ];
 
         yield 'multple extensions' => [
             '7.2-cli-alpine',
             ['phar', 'gzip'],
             'box.phar',
-            <<<'EOF'
+            <<<'Dockerfile'
                 FROM php:7.2-cli-alpine
 
                 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
@@ -119,7 +119,7 @@ class DockerFileGeneratorTest extends TestCase
 
                 ENTRYPOINT ["/box.phar"]
 
-                EOF,
+                Dockerfile,
         ];
     }
 
@@ -129,18 +129,11 @@ class DockerFileGeneratorTest extends TestCase
     public function test_it_can_generate_a_dockerfile_contents_from_requirements(
         array $requirements,
         string $sourcePhar,
-        string $expectedBaseImage
+        string $expected
     ): void {
         $actual = DockerFileGenerator::createForRequirements($requirements, $sourcePhar)->generateStub();
 
-        self::assertStringContainsString($sourcePhar, $actual);
-        foreach ($requirements as $requirementDefinition) {
-            if ('extension' === $requirementDefinition['type']) {
-                self::assertStringContainsString($requirementDefinition['condition'], $actual);
-            }
-        }
-
-        self::assertStringContainsString("FROM php:{$expectedBaseImage}", $actual);
+        self::assertSame($expected, $actual);
     }
 
     public function test_throws_an_error_if_cannot_find_a_suitable_php_image(): void
@@ -206,7 +199,17 @@ class DockerFileGeneratorTest extends TestCase
                 ],
             ],
             'box.phar',
-            '7.4-cli-alpine',
+            <<<'Dockerfile'
+                FROM php:7.4-cli-alpine
+
+                COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+                RUN install-php-extensions zlib phar openssl pcre tokenizer
+
+                COPY box.phar /box.phar
+
+                ENTRYPOINT ["/box.phar"]
+
+                Dockerfile,
         ];
 
         yield [
@@ -231,7 +234,45 @@ class DockerFileGeneratorTest extends TestCase
                 ],
             ],
             'box.phar',
-            '7.1-cli-alpine',
+            <<<'Dockerfile'
+                FROM php:7.1-cli-alpine
+
+                COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+                RUN install-php-extensions zlib
+
+                COPY box.phar /box.phar
+
+                ENTRYPOINT ["/box.phar"]
+
+                Dockerfile,
+        ];
+
+        yield [
+            [
+                [
+                    'type' => 'php',
+                    'condition' => '^7.1',
+                    'message' => 'The application requires the version "^7.1" or greater.',
+                    'helpMessage' => 'The application requires the version "^7.1" or greater.',
+                ],
+                [
+                    'type' => 'php',
+                    'condition' => '~7.1.0',
+                    'message' => 'The application requires the version "^7.1" or greater.',
+                    'helpMessage' => 'The application requires the version "^7.1" or greater.',
+                ],
+            ],
+            'box.phar',
+            <<<'Dockerfile'
+                FROM php:7.1-cli-alpine
+
+                COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+
+                COPY box.phar /box.phar
+
+                ENTRYPOINT ["/box.phar"]
+
+                Dockerfile,
         ];
     }
 }
