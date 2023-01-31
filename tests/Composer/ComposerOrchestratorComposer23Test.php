@@ -47,7 +47,7 @@ class ComposerOrchestratorComposer23Test extends FileSystemTestCase
         if (!isset($this->skip)) {
             $this->composerVersion = ComposerOrchestrator::getVersion();
 
-            $this->skip = version_compare($this->composerVersion, '2.3.0', '<') && version_compare($this->composerVersion, '2.4.0', '>=');
+            $this->skip = version_compare($this->composerVersion, '2.3.0', '<') || version_compare($this->composerVersion, '2.4.0', '>=');
         }
 
         if ($this->skip) {
