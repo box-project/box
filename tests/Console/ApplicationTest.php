@@ -21,6 +21,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \KevinGH\Box\Console\Application
+ *
+ * @internal
  */
 class ApplicationTest extends TestCase
 {
@@ -37,7 +39,7 @@ class ApplicationTest extends TestCase
 
         $appTester->run($input);
 
-        $this->assertSame(ExitCode::SUCCESS, $appTester->getStatusCode());
+        self::assertSame(ExitCode::SUCCESS, $appTester->getStatusCode());
 
         $expected = <<<'EOF'
             Box version 3.x-dev@151e40a

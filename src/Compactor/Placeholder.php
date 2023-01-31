@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
+use Webmozart\Assert\Assert;
 use function array_keys;
 use function str_replace;
-use Webmozart\Assert\Assert;
 
 final class Placeholder implements Compactor
 {

@@ -14,13 +14,17 @@ declare(strict_types=1);
 
 function get_prefix(): string
 {
-    $lastRelease = shell_exec('git describe --abbrev=0 --tags HEAD');
+    $prefixPath = __DIR__.'/dist/prefix';
 
-    if (!is_string($lastRelease) || '' === $lastRelease) {
-        throw new RuntimeException('Invalid tag name found.');
-    }
-
-    return 'HumbugBox'.str_replace('.', '', $lastRelease);
+    return file_exists($prefixPath)
+        ? file_get_contents($prefixPath)
+        : throw new RuntimeException(
+            sprintf(
+                'Could not find the dumped prefix. Make sure to run the following command:%s%s',
+                PHP_EOL,
+                '$ make dump_prefix',
+            ),
+        );
 }
 
 return [

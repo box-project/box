@@ -69,7 +69,7 @@ final class StubGenerator
             $stub,
         );
 
-        $stub = str_replace(
+        return str_replace(
             "__BOX_PHAR_CONFIG__\n",
             self::generatePharConfigStmt(
                 $alias,
@@ -79,8 +79,6 @@ final class StubGenerator
             ),
             $stub,
         );
-
-        return $stub;
     }
 
     private static function generateBannerStmt(?string $banner): string
@@ -148,8 +146,7 @@ final class StubGenerator
 
             $stub[] = null === $alias
                 ? "require 'phar://' . __FILE__ . '/.box/{$checkRequirementsFile}';"
-                : "require 'phar://{$alias}/.box/{$checkRequirementsFile}';"
-            ;
+                : "require 'phar://{$alias}/.box/{$checkRequirementsFile}';";
 
             $previous = true;
         }
@@ -161,8 +158,7 @@ final class StubGenerator
 
             $stub[] = null === $alias
                 ? "require 'phar://' . __FILE__ . '/{$index}';"
-                : "require 'phar://{$alias}/{$index}';"
-            ;
+                : "require 'phar://{$alias}/{$index}';";
         }
 
         if ([] === $stub) {

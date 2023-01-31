@@ -20,11 +20,13 @@ use InvalidArgumentException;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
-use function realpath;
 use Symfony\Component\Console\Output\OutputInterface;
+use function realpath;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Verify
+ *
+ * @internal
  */
 class VerifyTest extends CommandTestCase
 {
@@ -144,13 +146,13 @@ class VerifyTest extends CommandTestCase
             'phar' => $pharPath,
         ]);
 
-        $this->assertMatchesRegularExpression(
+        self::assertMatchesRegularExpression(
             '/The PHAR failed the verification: .+/',
             $this->commandTester->getDisplay(true),
             $this->commandTester->getDisplay(true),
         );
 
-        $this->assertSame(ExitCode::FAILURE, $this->commandTester->getStatusCode());
+        self::assertSame(ExitCode::FAILURE, $this->commandTester->getStatusCode());
     }
 
     public static function passingPharPathsProvider(): iterable

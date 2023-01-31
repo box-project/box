@@ -14,15 +14,14 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Configuration;
 
+use KevinGH\Box\Test\FileSystemTestCase;
+use stdClass;
 use function json_encode;
-use const JSON_PRETTY_PRINT;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\touch;
-use KevinGH\Box\Test\FileSystemTestCase;
+use const JSON_PRETTY_PRINT;
 use const PHP_OS;
-use stdClass;
-use function stripos;
 
 abstract class ConfigurationTestCase extends FileSystemTestCase
 {
@@ -60,7 +59,7 @@ abstract class ConfigurationTestCase extends FileSystemTestCase
 
     final protected function isWindows(): bool
     {
-        return false === stripos(PHP_OS, 'darwin') && false !== stripos(PHP_OS, 'win');
+        return false === mb_stripos(PHP_OS, 'darwin') && false !== mb_stripos(PHP_OS, 'win');
     }
 
     final protected function getNoFileConfig(): Configuration

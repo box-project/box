@@ -14,30 +14,38 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use function array_merge;
-use function array_unique;
-use function chdir;
 use DirectoryIterator;
-use function exec;
-use function extension_loaded;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\SymfonyCommand;
 use Fidry\Console\DisplayNormalizer;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Test\CommandTester;
 use Fidry\Console\Test\OutputAssertions;
-use function file_get_contents;
-use function get_loaded_extensions;
-use function implode;
 use InvalidArgumentException;
-use function iterator_to_array;
-use function json_decode;
-use function json_encode;
-use const JSON_PRETTY_PRINT;
-use const JSON_THROW_ON_ERROR;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Console\Application;
 use KevinGH\Box\Console\DisplayNormalizer as BoxDisplayNormalizer;
+use KevinGH\Box\Test\FileSystemTestCase;
+use KevinGH\Box\Test\RequiresPharReadonlyOff;
+use KevinGH\Box\VarDumperNormalizer;
+use Phar;
+use PharFileInfo;
+use Symfony\Component\Console\Application as SymfonyApplication;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Process\PhpExecutableFinder;
+use Traversable;
+use function array_merge;
+use function array_unique;
+use function chdir;
+use function exec;
+use function extension_loaded;
+use function file_get_contents;
+use function get_loaded_extensions;
+use function implode;
+use function iterator_to_array;
+use function json_decode;
+use function json_encode;
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
@@ -48,15 +56,7 @@ use function KevinGH\Box\FileSystem\touch;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\get_box_version;
 use function KevinGH\Box\memory_to_bytes;
-use KevinGH\Box\Test\FileSystemTestCase;
-use KevinGH\Box\Test\RequiresPharReadonlyOff;
-use KevinGH\Box\VarDumperNormalizer;
 use function mt_getrandmax;
-use Phar;
-use PharFileInfo;
-use const PHP_EOL;
-use const PHP_OS;
-use const PHP_VERSION;
 use function phpversion;
 use function preg_match;
 use function preg_quote;
@@ -66,13 +66,11 @@ use function realpath;
 use function sort;
 use function sprintf;
 use function str_replace;
-use function strlen;
-use function substr;
-use Symfony\Component\Console\Application as SymfonyApplication;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Process\PhpExecutableFinder;
-use Traversable;
+use const JSON_PRETTY_PRINT;
+use const JSON_THROW_ON_ERROR;
+use const PHP_EOL;
+use const PHP_OS;
+use const PHP_VERSION;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Compile
@@ -80,6 +78,8 @@ use Traversable;
  *
  * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
  *                              can create undesirable side-effects.
+ *
+ * @internal
  */
 class CompileTest extends FileSystemTestCase
 {
@@ -180,9 +180,9 @@ class CompileTest extends FileSystemTestCase
 
                 ____
                / __ )____  _  __
-              / __  / __ \| |/_/
+              / __  / __ \\| |/_/
              / /_/ / /_/ />  <
-            /_____/\____/_/|_|
+            /_____/\\____/_/|_|
 
 
             Box version 3.x-dev@151e40a
@@ -193,7 +193,7 @@ class CompileTest extends FileSystemTestCase
 
             ? Removing the existing PHAR "/path/to/tmp/test.phar"
             ? Registering compactors
-              + KevinGH\Box\Compactor\Php
+              + KevinGH\\Box\\Compactor\\Php
             ? Mapping paths
               - a/deep/test/directory > sub
             ? Adding main file: /path/to/tmp/run.php
@@ -205,12 +205,12 @@ class CompileTest extends FileSystemTestCase
             ? Adding files
                 > 6 file(s)
             ? Generating new stub
-              - Using shebang line: $shebang
+              - Using shebang line: {$shebang}
               - Using banner:
                 > custom banner
             ? Setting metadata
               - array (
-              'rand' => $rand,
+              'rand' => {$rand},
             )
             ? Dumping the Composer autoloader
             ? Removing the Composer dump artefacts
@@ -226,7 +226,7 @@ class CompileTest extends FileSystemTestCase
             No recommendation found.
             No warning found.
 
-             // PHAR: $numberOfFiles files (100B)
+             // PHAR: {$numberOfFiles} files (100B)
              // You can inspect the generated PHAR with the "info" command.
 
              // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -236,7 +236,7 @@ class CompileTest extends FileSystemTestCase
 
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
-        $this->assertSame(
+        self::assertSame(
             'Hello, world!',
             exec('php test.phar'),
             'Expected PHAR to be executable',
@@ -244,12 +244,12 @@ class CompileTest extends FileSystemTestCase
 
         $phar = new Phar('test.phar');
 
-        $this->assertSame('OpenSSL', $phar->getSignature()['hash_type']);
+        self::assertSame('OpenSSL', $phar->getSignature()['hash_type']);
 
         // Check PHAR content
         $actualStub = self::normalizeStub($phar->getStub());
         $expectedStub = <<<PHP
-            $shebang
+            {$shebang}
             <?php
 
             /*
@@ -266,9 +266,9 @@ class CompileTest extends FileSystemTestCase
 
             PHP;
 
-        $this->assertSame($expectedStub, $actualStub);
+        self::assertSame($expectedStub, $actualStub);
 
-        $this->assertSame(
+        self::assertSame(
             ['rand' => $rand],
             $phar->getMetadata(),
             'Expected PHAR metadata to be set',
@@ -339,7 +339,7 @@ class CompileTest extends FileSystemTestCase
 
         $actualFiles = $this->retrievePharFiles($phar);
 
-        $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
+        self::assertEqualsCanonicalizing($expectedFiles, $actualFiles);
     }
 
     public function test_it_can_build_a_phar_from_a_different_directory(): void
@@ -387,7 +387,7 @@ class CompileTest extends FileSystemTestCase
             ['interactive' => true],
         );
 
-        $this->assertSame(
+        self::assertSame(
             'Hello, world!',
             exec('php test.phar'),
             'Expected PHAR to be executable',
@@ -415,9 +415,9 @@ class CompileTest extends FileSystemTestCase
 
                 ____
                / __ )____  _  __
-              / __  / __ \| |/_/
+              / __  / __ \\| |/_/
              / /_/ / /_/ />  <
-            /_____/\____/_/|_|
+            /_____/\\____/_/|_|
 
 
             Box version 3.x-dev@151e40a
@@ -438,7 +438,7 @@ class CompileTest extends FileSystemTestCase
             ? Generating new stub
               - Using shebang line: #!/usr/bin/env php
               - Using banner:
-                > Generated by Humbug Box $version.
+                > Generated by Humbug Box {$version}.
                 >
                 > @link https://github.com/humbug/box
             ? Dumping the Composer autoloader
@@ -450,7 +450,7 @@ class CompileTest extends FileSystemTestCase
             No recommendation found.
             No warning found.
 
-             // PHAR: $expectedNumberOfFiles files (100B)
+             // PHAR: {$expectedNumberOfFiles} files (100B)
              // You can inspect the generated PHAR with the "info" command.
 
              // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -460,7 +460,7 @@ class CompileTest extends FileSystemTestCase
 
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
-        $this->assertSame(
+        self::assertSame(
             'Hello, world!',
             exec('php index.phar'),
             'Expected PHAR to be executable',
@@ -468,7 +468,7 @@ class CompileTest extends FileSystemTestCase
 
         $phar = new Phar('index.phar');
 
-        $this->assertSame('SHA-1', $phar->getSignature()['hash_type']);
+        self::assertSame('SHA-1', $phar->getSignature()['hash_type']);
 
         // Check PHAR content
         $actualStub = self::normalizeStub($phar->getStub());
@@ -478,7 +478,7 @@ class CompileTest extends FileSystemTestCase
             <?php
 
             /*
-             * Generated by Humbug Box $version.
+             * Generated by Humbug Box {$version}.
              *
              * @link https://github.com/humbug/box
              */
@@ -493,9 +493,9 @@ class CompileTest extends FileSystemTestCase
 
             PHP;
 
-        $this->assertSame($expectedStub, $actualStub);
+        self::assertSame($expectedStub, $actualStub);
 
-        $this->assertNull(
+        self::assertNull(
             $phar->getMetadata(),
             'Expected PHAR metadata to be set',
         );
@@ -568,7 +568,7 @@ class CompileTest extends FileSystemTestCase
 
         $actualFiles = $this->retrievePharFiles($phar);
 
-        $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
+        self::assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
         unset($phar);
         Phar::unlinkArchive('index.phar');
@@ -582,7 +582,7 @@ class CompileTest extends FileSystemTestCase
             ['interactive' => true],
         );
 
-        $this->assertSame(
+        self::assertSame(
             'Hello, world!',
             exec('php index.phar'),
             'Expected PHAR to be executable',
@@ -629,9 +629,9 @@ class CompileTest extends FileSystemTestCase
 
                 ____
                / __ )____  _  __
-              / __  / __ \| |/_/
+              / __  / __ \\| |/_/
              / /_/ / /_/ />  <
-            /_____/\____/_/|_|
+            /_____/\\____/_/|_|
 
 
             Box version 3.x-dev@151e40a
@@ -642,7 +642,7 @@ class CompileTest extends FileSystemTestCase
 
             ? Removing the existing PHAR "/path/to/tmp/test.phar"
             ? Registering compactors
-              + KevinGH\Box\Compactor\Php
+              + KevinGH\\Box\\Compactor\\Php
             ? Mapping paths
               - a/deep/test/directory > sub
             ? Adding main file: /path/to/tmp/run.php
@@ -656,12 +656,12 @@ class CompileTest extends FileSystemTestCase
             ? Generating new stub
               - Using shebang line: #!/usr/bin/env php
               - Using banner:
-                > Generated by Humbug Box $version.
+                > Generated by Humbug Box {$version}.
                 >
                 > @link https://github.com/humbug/box
             ? Setting metadata
               - array (
-              'rand' => $rand,
+              'rand' => {$rand},
             )
             ? Dumping the Composer autoloader
             ? Removing the Composer dump artefacts
@@ -682,13 +682,13 @@ class CompileTest extends FileSystemTestCase
 
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
-        $this->assertSame(
+        self::assertSame(
             'Hello, world!',
             exec('php test.phar'),
             'Expected PHAR to be executable',
         );
 
-        $this->assertSame(
+        self::assertSame(
             'Hello, world!',
             exec('cp test.phar test; php test'),
             'Expected PHAR can be renamed',
@@ -703,7 +703,7 @@ class CompileTest extends FileSystemTestCase
             <?php
 
             /*
-             * Generated by Humbug Box $version.
+             * Generated by Humbug Box {$version}.
              *
              * @link https://github.com/humbug/box
              */
@@ -716,9 +716,9 @@ class CompileTest extends FileSystemTestCase
 
             PHP;
 
-        $this->assertSame($expectedStub, $actualStub);
+        self::assertSame($expectedStub, $actualStub);
 
-        $this->assertSame(
+        self::assertSame(
             ['rand' => $rand],
             $phar->getMetadata(),
             'Expected PHAR metadata to be set',
@@ -747,7 +747,7 @@ class CompileTest extends FileSystemTestCase
 
         $actualFiles = $this->retrievePharFiles($phar);
 
-        $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
+        self::assertEqualsCanonicalizing($expectedFiles, $actualFiles);
     }
 
     public function test_it_can_build_a_phar_with_complete_mapping_without_an_alias(): void
@@ -783,13 +783,13 @@ class CompileTest extends FileSystemTestCase
             ['interactive' => true],
         );
 
-        $this->assertSame(
+        self::assertSame(
             'Hello, world!',
             exec('php test.phar'),
             'Expected PHAR to be executable',
         );
 
-        $this->assertSame(
+        self::assertSame(
             'Hello, world!',
             exec('cp test.phar test; php test'),
             'Expected PHAR can be renamed',
@@ -807,7 +807,7 @@ class CompileTest extends FileSystemTestCase
             <?php
 
             /*
-             * Generated by Humbug Box $version.
+             * Generated by Humbug Box {$version}.
              *
              * @link https://github.com/humbug/box
              */
@@ -820,13 +820,13 @@ class CompileTest extends FileSystemTestCase
 
             PHP;
 
-        $this->assertSame($expectedStub, $actualStub);
+        self::assertSame($expectedStub, $actualStub);
     }
 
     public function test_it_can_build_a_phar_file_in_verbose_mode(): void
     {
         if (extension_loaded('xdebug')) {
-            $this->markTestSkipped('Skipping this test since xdebug changes the Composer output.');
+            self::markTestSkipped('Skipping this test since xdebug changes the Composer output.');
         }
 
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
@@ -879,9 +879,9 @@ class CompileTest extends FileSystemTestCase
 
                 ____
                / __ )____  _  __
-              / __  / __ \| |/_/
+              / __  / __ \\| |/_/
              / /_/ / /_/ />  <
-            /_____/\____/_/|_|
+            /_____/\\____/_/|_|
 
 
             Box version 3.x-dev@151e40a
@@ -892,7 +892,7 @@ class CompileTest extends FileSystemTestCase
 
             ? Removing the existing PHAR "/path/to/tmp/test.phar"
             ? Registering compactors
-              + KevinGH\Box\Compactor\Php
+              + KevinGH\\Box\\Compactor\\Php
             ? Mapping paths
               - a/deep/test/directory > sub
             ? Adding main file: /path/to/tmp/run.php
@@ -904,17 +904,17 @@ class CompileTest extends FileSystemTestCase
             ? Adding files
                 > 4 file(s)
             ? Generating new stub
-              - Using shebang line: $shebang
+              - Using shebang line: {$shebang}
               - Using banner:
                 > custom banner
             ? Setting metadata
               - array (
-              'rand' => $rand,
+              'rand' => {$rand},
             )
             ? Dumping the Composer autoloader
                 > '/usr/local/bin/composer' 'dump-autoload' '--classmap-authoritative' '--no-dev'
             Generating optimized autoload files (authoritative)
-            Generated optimized autoload files (authoritative) containing $expectedNumberOfClasses classes
+            Generated optimized autoload files (authoritative) containing {$expectedNumberOfClasses} classes
 
             ? Removing the Composer dump artefacts
             ? No compression
@@ -929,7 +929,7 @@ class CompileTest extends FileSystemTestCase
             No recommendation found.
             No warning found.
 
-             // PHAR: $expectedNumberOfFiles files (100B)
+             // PHAR: {$expectedNumberOfFiles} files (100B)
              // You can inspect the generated PHAR with the "info" command.
 
              // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -947,7 +947,7 @@ class CompileTest extends FileSystemTestCase
     public function test_it_can_build_a_phar_file_in_very_verbose_mode(): void
     {
         if (extension_loaded('xdebug')) {
-            $this->markTestSkipped('Skipping this test since xdebug changes the Composer output');
+            self::markTestSkipped('Skipping this test since xdebug changes the Composer output');
         }
 
         mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
@@ -1003,9 +1003,9 @@ class CompileTest extends FileSystemTestCase
 
                 ____
                / __ )____  _  __
-              / __  / __ \| |/_/
+              / __  / __ \\| |/_/
              / /_/ / /_/ />  <
-            /_____/\____/_/|_|
+            /_____/\\____/_/|_|
 
 
             Box version 3.x-dev@151e40a
@@ -1016,7 +1016,7 @@ class CompileTest extends FileSystemTestCase
 
             ? Removing the existing PHAR "/path/to/tmp/test.phar"
             ? Registering compactors
-              + KevinGH\Box\Compactor\Php
+              + KevinGH\\Box\\Compactor\\Php
             ? Mapping paths
               - a/deep/test/directory > sub
             ? Adding main file: /path/to/tmp/run.php
@@ -1034,12 +1034,12 @@ class CompileTest extends FileSystemTestCase
                 > custom banner
             ? Setting metadata
               - array (
-              'rand' => $rand,
+              'rand' => {$rand},
             )
             ? Dumping the Composer autoloader
                 > '/usr/local/bin/composer' 'dump-autoload' '--classmap-authoritative' '--no-dev' '-v'
             Generating optimized autoload files (authoritative)
-            Generated optimized autoload files (authoritative) containing $expectedNumberOfClasses classes
+            Generated optimized autoload files (authoritative) containing {$expectedNumberOfClasses} classes
 
             ? Removing the Composer dump artefacts
             ? No compression
@@ -1054,7 +1054,7 @@ class CompileTest extends FileSystemTestCase
             No recommendation found.
             No warning found.
 
-             // PHAR: $expectedNumberOfFiles files (100B)
+             // PHAR: {$expectedNumberOfFiles} files (100B)
              // You can inspect the generated PHAR with the "info" command.
 
              // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -1098,7 +1098,7 @@ class CompileTest extends FileSystemTestCase
                 JSON,
         );
 
-        $this->assertDirectoryDoesNotExist('.box_dump');
+        self::assertDirectoryDoesNotExist('.box_dump');
 
         $this->commandTester->execute(
             [
@@ -1118,7 +1118,7 @@ class CompileTest extends FileSystemTestCase
                 phpversion('xdebug'),
             );
 
-            $xdebugLog = "[debug] The xdebug extension is loaded $xdebugVersion xdebug.mode=debug
+            $xdebugLog = "[debug] The xdebug extension is loaded {$xdebugVersion} xdebug.mode=debug
 [debug] No restart (BOX_ALLOW_XDEBUG=1)";
         } else {
             $xdebugLog = '[debug] The xdebug extension is not loaded';
@@ -1130,16 +1130,16 @@ class CompileTest extends FileSystemTestCase
         );
 
         $expected = <<<OUTPUT
-            $memoryLog
+            {$memoryLog}
             [debug] Checking BOX_ALLOW_XDEBUG
-            $xdebugLog
+            {$xdebugLog}
             [debug] Disabled parallel processing
 
                 ____
                / __ )____  _  __
-              / __  / __ \| |/_/
+              / __  / __ \\| |/_/
              / /_/ / /_/ />  <
-            /_____/\____/_/|_|
+            /_____/\\____/_/|_|
 
 
             Box version 3.x-dev@151e40a
@@ -1180,7 +1180,7 @@ class CompileTest extends FileSystemTestCase
 
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
-        $this->assertDirectoryExists('.box_dump');
+        self::assertDirectoryExists('.box_dump');
 
         $expectedFiles = [
             '.box_dump/.box_configuration',
@@ -1194,7 +1194,7 @@ class CompileTest extends FileSystemTestCase
             ),
         );
 
-        $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
+        self::assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
         $expectedDumpedConfig = <<<'EOF'
             //
@@ -1332,10 +1332,10 @@ class CompileTest extends FileSystemTestCase
             $actualDumpedConfig,
         );
 
-        $this->assertSame($expectedDumpedConfig, $actualDumpedConfig);
+        self::assertSame($expectedDumpedConfig, $actualDumpedConfig);
 
         // Checks one of the dumped file from the PHAR to ensure the encoding of the extracted file is correct
-        $this->assertSame(
+        self::assertSame(
             file_get_contents('.box_dump/index.php'),
             $indexContents,
         );
@@ -1390,7 +1390,7 @@ class CompileTest extends FileSystemTestCase
 
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
-        $this->assertSame(
+        self::assertSame(
             'Hello, world!',
             exec('php test.phar'),
             'Expected PHAR to be executable',
@@ -1400,12 +1400,12 @@ class CompileTest extends FileSystemTestCase
         $pharContents = file_get_contents('test.phar');
         $shebang = preg_quote($shebang, '/');
 
-        $this->assertMatchesRegularExpression("/$shebang/", $pharContents);
-        $this->assertMatchesRegularExpression('/custom banner/', $pharContents);
+        self::assertMatchesRegularExpression("/{$shebang}/", $pharContents);
+        self::assertMatchesRegularExpression('/custom banner/', $pharContents);
 
         $phar = new Phar('test.phar');
 
-        $this->assertSame(['rand' => $rand], $phar->getMetadata());
+        self::assertSame(['rand' => $rand], $phar->getMetadata());
     }
 
     public function test_it_can_build_a_phar_file_using_the_phar_default_stub(): void
@@ -1450,7 +1450,7 @@ class CompileTest extends FileSystemTestCase
             ['interactive' => true],
         );
 
-        $this->assertSame(
+        self::assertSame(
             'Hello, world!',
             exec('php test.phar'),
             'Expected PHAR to be executable',
@@ -1520,7 +1520,7 @@ class CompileTest extends FileSystemTestCase
             ['interactive' => true],
         );
 
-        $this->assertSame(
+        self::assertSame(
             'Hello, world!',
             exec('php test.phar'),
             'Expected PHAR to be executable',
@@ -1530,7 +1530,7 @@ class CompileTest extends FileSystemTestCase
 
         $actualStub = self::normalizeStub($phar->getStub());
 
-        $this->assertSame($stub, $actualStub);
+        self::assertSame($stub, $actualStub);
     }
 
     public function test_it_can_build_a_phar_file_using_the_default_stub(): void
@@ -1562,7 +1562,7 @@ class CompileTest extends FileSystemTestCase
             ['interactive' => true],
         );
 
-        $this->assertSame(
+        self::assertSame(
             'Hello, world!',
             exec('php test.phar'),
             'Expected PHAR to be executable',
@@ -1573,7 +1573,7 @@ class CompileTest extends FileSystemTestCase
     {
         touch('index.php');
         touch('unreadable-file.php');
-        chmod('unreadable-file.php', 0000);
+        chmod('unreadable-file.php', 0);
 
         dump_file(
             'box.json',
@@ -1620,9 +1620,9 @@ class CompileTest extends FileSystemTestCase
 
                 ____
                / __ )____  _  __
-              / __  / __ \| |/_/
+              / __  / __ \\| |/_/
              / /_/ / /_/ />  <
-            /_____/\____/_/|_|
+            /_____/\\____/_/|_|
 
 
             Box version 3.x-dev@151e40a
@@ -1646,7 +1646,7 @@ class CompileTest extends FileSystemTestCase
             ? Generating new stub
               - Using shebang line: #!/usr/bin/env php
               - Using banner:
-                > Generated by Humbug Box $version.
+                > Generated by Humbug Box {$version}.
                 >
                 > @link https://github.com/humbug/box
             ? Skipping dumping the Composer autoloader
@@ -1668,7 +1668,7 @@ class CompileTest extends FileSystemTestCase
 
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
-        $this->assertSame(
+        self::assertSame(
             'Hello, world!',
             exec('php test.phar'),
             'Expected PHAR to be executable',
@@ -1681,7 +1681,7 @@ class CompileTest extends FileSystemTestCase
 
         rename('run.php', 'index.php');
 
-        $this->assertFileDoesNotExist($this->tmp.'/vendor/autoload.php');
+        self::assertFileDoesNotExist($this->tmp.'/vendor/autoload.php');
 
         $this->commandTester->execute(
             [
@@ -1691,7 +1691,7 @@ class CompileTest extends FileSystemTestCase
             ['interactive' => true],
         );
 
-        $this->assertMatchesRegularExpression(
+        self::assertMatchesRegularExpression(
             '/\? Dumping the Composer autoloader/',
             $this->commandTester->getDisplay(),
             'Expected the autoloader to be dumped',
@@ -1710,7 +1710,7 @@ class CompileTest extends FileSystemTestCase
         ];
 
         foreach ($composerFiles as $composerFile) {
-            $this->assertFileExists('phar://index.phar/'.$composerFile);
+            self::assertFileExists('phar://index.phar/'.$composerFile);
         }
     }
 
@@ -1720,7 +1720,7 @@ class CompileTest extends FileSystemTestCase
 
         rename('run.php', 'index.php');
 
-        $this->assertFileDoesNotExist($this->tmp.'/vendor/autoload.php');
+        self::assertFileDoesNotExist($this->tmp.'/vendor/autoload.php');
 
         dump_file(
             'box.json',
@@ -1739,7 +1739,7 @@ class CompileTest extends FileSystemTestCase
             ['interactive' => true],
         );
 
-        $this->assertMatchesRegularExpression(
+        self::assertMatchesRegularExpression(
             '/\? Skipping dumping the Composer autoloader/',
             $this->commandTester->getDisplay(),
             'Did not expect the autoloader to be dumped',
@@ -1758,7 +1758,7 @@ class CompileTest extends FileSystemTestCase
         ];
 
         foreach ($composerFiles as $composerFile) {
-            $this->assertFileDoesNotExist('phar://index.phar/'.$composerFile);
+            self::assertFileDoesNotExist('phar://index.phar/'.$composerFile);
         }
     }
 
@@ -1768,7 +1768,7 @@ class CompileTest extends FileSystemTestCase
 
         rename('run.php', 'index.php');
 
-        $this->assertFileDoesNotExist($this->tmp.'/vendor/autoload.php');
+        self::assertFileDoesNotExist($this->tmp.'/vendor/autoload.php');
 
         $this->commandTester->execute(
             [
@@ -1778,7 +1778,7 @@ class CompileTest extends FileSystemTestCase
             ['interactive' => true],
         );
 
-        $this->assertMatchesRegularExpression(
+        self::assertMatchesRegularExpression(
             '/\? Removing the Composer dump artefacts/',
             $this->commandTester->getDisplay(),
             'Expected the composer files to be removed',
@@ -1797,7 +1797,7 @@ class CompileTest extends FileSystemTestCase
         ];
 
         foreach ($composerFiles as $composerFile) {
-            $this->assertFileExists('phar://index.phar/'.$composerFile);
+            self::assertFileExists('phar://index.phar/'.$composerFile);
         }
 
         $removedComposerFiles = [
@@ -1807,7 +1807,7 @@ class CompileTest extends FileSystemTestCase
         ];
 
         foreach ($removedComposerFiles as $composerFile) {
-            $this->assertFileDoesNotExist('phar://index.phar/'.$composerFile);
+            self::assertFileDoesNotExist('phar://index.phar/'.$composerFile);
         }
     }
 
@@ -1822,7 +1822,7 @@ class CompileTest extends FileSystemTestCase
             json_encode(['exclude-composer-files' => false]),
         );
 
-        $this->assertFileDoesNotExist($this->tmp.'/vendor/autoload.php');
+        self::assertFileDoesNotExist($this->tmp.'/vendor/autoload.php');
 
         $this->commandTester->execute(
             [
@@ -1832,7 +1832,7 @@ class CompileTest extends FileSystemTestCase
             ['interactive' => true],
         );
 
-        $this->assertMatchesRegularExpression(
+        self::assertMatchesRegularExpression(
             '/\? Keep the Composer dump artefacts/',
             $this->commandTester->getDisplay(),
             'Expected the composer files to be kept',
@@ -1851,7 +1851,7 @@ class CompileTest extends FileSystemTestCase
         ];
 
         foreach ($composerFiles as $composerFile) {
-            $this->assertFileExists('phar://index.phar/'.$composerFile);
+            self::assertFileExists('phar://index.phar/'.$composerFile);
         }
 
         $removedComposerFiles = [
@@ -1863,7 +1863,7 @@ class CompileTest extends FileSystemTestCase
         ];
 
         foreach ($removedComposerFiles as $composerFile) {
-            $this->assertFileExists('phar://index.phar/'.$composerFile);
+            self::assertFileExists('phar://index.phar/'.$composerFile);
         }
     }
 
@@ -1882,7 +1882,7 @@ class CompileTest extends FileSystemTestCase
             ],
         );
 
-        $expected = <<<OUTPUT
+        $expected = <<<'OUTPUT'
 
                 ____
                / __ )____  _  __
@@ -1928,7 +1928,7 @@ class CompileTest extends FileSystemTestCase
 
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
-        $this->assertSame(
+        self::assertSame(
             'Hello!',
             exec('php test.phar'),
             'Expected PHAR to be executable',
@@ -1950,7 +1950,7 @@ class CompileTest extends FileSystemTestCase
             ],
         );
 
-        $expected = <<<OUTPUT
+        $expected = <<<'OUTPUT'
 
                 ____
                / __ )____  _  __
@@ -1994,7 +1994,7 @@ class CompileTest extends FileSystemTestCase
 
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
-        $this->assertSame(
+        self::assertSame(
             'Hello!',
             exec('php test.phar'),
             'Expected PHAR to be executable',
@@ -2022,9 +2022,9 @@ class CompileTest extends FileSystemTestCase
 
                 ____
                / __ )____  _  __
-              / __  / __ \| |/_/
+              / __  / __ \\| |/_/
              / /_/ / /_/ />  <
-            /_____/\____/_/|_|
+            /_____/\\____/_/|_|
 
 
             Box version 3.x-dev@151e40a
@@ -2045,7 +2045,7 @@ class CompileTest extends FileSystemTestCase
             ? Generating new stub
               - Using shebang line: #!/usr/bin/env php
               - Using banner:
-                > Generated by Humbug Box $version.
+                > Generated by Humbug Box {$version}.
                 >
                 > @link https://github.com/humbug/box
             ? Skipping dumping the Composer autoloader
@@ -2094,7 +2094,7 @@ class CompileTest extends FileSystemTestCase
             ],
         );
 
-        $expected = <<<OUTPUT
+        $expected = <<<'OUTPUT'
 
                 ____
                / __ )____  _  __
@@ -2138,7 +2138,7 @@ class CompileTest extends FileSystemTestCase
 
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
-        $this->assertSame(
+        self::assertSame(
             'Hello!',
             exec('php test.phar'),
             'Expected PHAR to be executable',
@@ -2170,7 +2170,7 @@ class CompileTest extends FileSystemTestCase
             ],
         );
 
-        $expected = <<<OUTPUT
+        $expected = <<<'OUTPUT'
 
                 ____
                / __ )____  _  __
@@ -2214,7 +2214,7 @@ class CompileTest extends FileSystemTestCase
 
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
-        $this->assertSame(
+        self::assertSame(
             'Hello!',
             exec('php test.phar'),
             'Expected PHAR to be executable',
@@ -2226,7 +2226,7 @@ class CompileTest extends FileSystemTestCase
 
         $actualFiles = $this->retrievePharFiles(new Phar('test.phar'));
 
-        $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
+        self::assertEqualsCanonicalizing($expectedFiles, $actualFiles);
     }
 
     public function test_it_can_build_a_phar_with_compressed_code(): void
@@ -2250,9 +2250,9 @@ class CompileTest extends FileSystemTestCase
 
                 ____
                / __ )____  _  __
-              / __  / __ \| |/_/
+              / __  / __ \\| |/_/
              / /_/ / /_/ />  <
-            /_____/\____/_/|_|
+            /_____/\\____/_/|_|
 
 
             Box version 3.x-dev@151e40a
@@ -2273,7 +2273,7 @@ class CompileTest extends FileSystemTestCase
             ? Generating new stub
               - Using shebang line: #!/usr/bin/env php
               - Using banner:
-                > Generated by Humbug Box $version.
+                > Generated by Humbug Box {$version}.
                 >
                 > @link https://github.com/humbug/box
             ? Skipping dumping the Composer autoloader
@@ -2298,10 +2298,10 @@ class CompileTest extends FileSystemTestCase
 
         $builtPhar = new Phar('test.phar');
 
-        $this->assertFalse($builtPhar->isCompressed()); // This is a bug, see https://github.com/humbug/box/issues/20
-        $this->assertTrue($builtPhar['test.php']->isCompressed());
+        self::assertFalse($builtPhar->isCompressed()); // This is a bug, see https://github.com/humbug/box/issues/20
+        self::assertTrue($builtPhar['test.php']->isCompressed());
 
-        $this->assertSame(
+        self::assertSame(
             'Hello!',
             exec('php test.phar'),
             'Expected the PHAR to be executable',
@@ -2329,9 +2329,9 @@ class CompileTest extends FileSystemTestCase
 
                 ____
                / __ )____  _  __
-              / __  / __ \| |/_/
+              / __  / __ \\| |/_/
              / /_/ / /_/ />  <
-            /_____/\____/_/|_|
+            /_____/\\____/_/|_|
 
 
             Box version 3.x-dev@151e40a
@@ -2352,7 +2352,7 @@ class CompileTest extends FileSystemTestCase
             ? Generating new stub
               - Using shebang line: #!/usr/bin/env php
               - Using banner:
-                > Generated by Humbug Box $version.
+                > Generated by Humbug Box {$version}.
                 >
                 > @link https://github.com/humbug/box
             ? Skipping dumping the Composer autoloader
@@ -2374,7 +2374,7 @@ class CompileTest extends FileSystemTestCase
 
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
-        $this->assertSame(
+        self::assertSame(
             'Hello!',
             exec('php foo/bar/test.phar'),
             'Expected the PHAR to be executable',
@@ -2410,7 +2410,7 @@ class CompileTest extends FileSystemTestCase
             ['interactive' => true],
         );
 
-        $this->assertSame(
+        self::assertSame(
             0,
             $this->commandTester->getStatusCode(),
             sprintf(
@@ -2419,7 +2419,7 @@ class CompileTest extends FileSystemTestCase
             ),
         );
 
-        $this->assertSame(
+        self::assertSame(
             '',
             exec('php index.phar'),
             'Expected PHAR to be executable',
@@ -2432,24 +2432,24 @@ class CompileTest extends FileSystemTestCase
         $defaultStub = self::normalizeStub(file_get_contents(self::FIXTURES_DIR.'/../../dist/default_stub.php'));
 
         if ($stub) {
-            $this->assertSame($phar->getPath(), $phar->getAlias());
+            self::assertSame($phar->getPath(), $phar->getAlias());
 
-            $this->assertDoesNotMatchRegularExpression(
+            self::assertDoesNotMatchRegularExpression(
                 '/Phar::webPhar\(.*\);/',
                 $actualStub,
             );
-            $this->assertMatchesRegularExpression(
+            self::assertMatchesRegularExpression(
                 '/Phar::mapPhar\(\'alias-test\.phar\'\);/',
                 $actualStub,
             );
         } else {
-            $this->assertSame($alias, $phar->getAlias());
+            self::assertSame($alias, $phar->getAlias());
 
-            $this->assertSame($defaultStub, $actualStub);
+            self::assertSame($defaultStub, $actualStub);
 
             // No alias is found: I find it weird but well, that's the default stub so there is not much that can
             // be done here. Maybe there is a valid reason I'm not aware of.
-            $this->assertDoesNotMatchRegularExpression(
+            self::assertDoesNotMatchRegularExpression(
                 '/alias-test\.phar/',
                 $actualStub,
             );
@@ -2461,7 +2461,7 @@ class CompileTest extends FileSystemTestCase
 
         $actualFiles = $this->retrievePharFiles($phar);
 
-        $this->assertEqualsCanonicalizing($expectedFiles, $actualFiles);
+        self::assertEqualsCanonicalizing($expectedFiles, $actualFiles);
     }
 
     public function test_it_can_build_a_phar_file_without_a_shebang_line(): void
@@ -2489,9 +2489,9 @@ class CompileTest extends FileSystemTestCase
 
                 ____
                / __ )____  _  __
-              / __  / __ \| |/_/
+              / __  / __ \\| |/_/
              / /_/ / /_/ />  <
-            /_____/\____/_/|_|
+            /_____/\\____/_/|_|
 
 
             Box version 3.x-dev@151e40a
@@ -2512,7 +2512,7 @@ class CompileTest extends FileSystemTestCase
             ? Generating new stub
               - No shebang line
               - Using banner:
-                > Generated by Humbug Box $version.
+                > Generated by Humbug Box {$version}.
                 >
                 > @link https://github.com/humbug/box
             ? Skipping dumping the Composer autoloader
@@ -2537,10 +2537,10 @@ class CompileTest extends FileSystemTestCase
 
         $builtPhar = new Phar('test.phar');
 
-        $this->assertFalse($builtPhar->isCompressed()); // This is a bug, see https://github.com/humbug/box/issues/20
-        $this->assertTrue($builtPhar['test.php']->isCompressed());
+        self::assertFalse($builtPhar->isCompressed()); // This is a bug, see https://github.com/humbug/box/issues/20
+        self::assertTrue($builtPhar['test.php']->isCompressed());
 
-        $this->assertSame(
+        self::assertSame(
             'Hello!',
             exec('php test.phar'),
             'Expected the PHAR to be executable',
@@ -2578,7 +2578,7 @@ class CompileTest extends FileSystemTestCase
             ],
         );
 
-        $expected = <<<OUTPUT
+        $expected = <<<'OUTPUT'
 
                 ____
                / __ )____  _  __
@@ -2622,7 +2622,7 @@ class CompileTest extends FileSystemTestCase
 
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
-        $this->assertSame(
+        self::assertSame(
             'Hello!',
             exec('php test'),
             'Expected PHAR to be executable',
@@ -2642,7 +2642,7 @@ class CompileTest extends FileSystemTestCase
             ['interactive' => true],
         );
 
-        $this->assertSame(
+        self::assertSame(
             'Index',
             exec('php index.phar'),
             'Expected PHAR to be executable',
@@ -2663,7 +2663,7 @@ class CompileTest extends FileSystemTestCase
             ['interactive' => true],
         );
 
-        $this->assertSame(
+        self::assertSame(
             'Index',
             exec('php index.phar'),
             'Expected PHAR to be executable',
@@ -2682,13 +2682,13 @@ class CompileTest extends FileSystemTestCase
             ['interactive' => true],
         );
 
-        $this->assertSame(
+        self::assertSame(
             'Index',
             exec('php index.phar'),
             'Expected PHAR to be executable',
         );
 
-        $this->assertSame(
+        self::assertSame(
             1,
             preg_match(
                 '/namespace (?<namespace>.*);/',
@@ -2704,7 +2704,7 @@ class CompileTest extends FileSystemTestCase
 
         $phpScoperNamespace = $matches['namespace'];
 
-        $this->assertStringStartsWith('_HumbugBox', $phpScoperNamespace);
+        self::assertStringStartsWith('_HumbugBox', $phpScoperNamespace);
     }
 
     public function test_it_can_build_a_phar_with_a_php_scoper_config_with_a_specific_prefix(): void
@@ -2721,13 +2721,13 @@ class CompileTest extends FileSystemTestCase
             ['interactive' => true],
         );
 
-        $this->assertSame(
+        self::assertSame(
             'Index',
             exec('php index.phar'),
             'Expected PHAR to be executable',
         );
 
-        $this->assertSame(
+        self::assertSame(
             1,
             preg_match(
                 '/namespace (?<namespace>.*);/',
@@ -2743,7 +2743,7 @@ class CompileTest extends FileSystemTestCase
 
         $phpScoperNamespace = $matches['namespace'];
 
-        $this->assertSame('Acme', $phpScoperNamespace);
+        self::assertSame('Acme', $phpScoperNamespace);
     }
 
     public function test_it_cannot_sign_a_phar_with_the_openssl_algorithm_without_a_private_key(): void
@@ -2800,9 +2800,9 @@ class CompileTest extends FileSystemTestCase
 
                 ____
                / __ )____  _  __
-              / __  / __ \| |/_/
+              / __  / __ \\| |/_/
              / /_/ / /_/ />  <
-            /_____/\____/_/|_|
+            /_____/\\____/_/|_|
 
 
             Box version 3.x-dev@151e40a
@@ -2823,7 +2823,7 @@ class CompileTest extends FileSystemTestCase
             ? Generating new stub
               - Using shebang line: #!/usr/bin/env php
               - Using banner:
-                > Generated by Humbug Box $version.
+                > Generated by Humbug Box {$version}.
                 >
                 > @link https://github.com/humbug/box
             ? Skipping dumping the Composer autoloader
@@ -2876,9 +2876,9 @@ class CompileTest extends FileSystemTestCase
 
                 ____
                / __ )____  _  __
-              / __  / __ \| |/_/
+              / __  / __ \\| |/_/
              / /_/ / /_/ />  <
-            /_____/\____/_/|_|
+            /_____/\\____/_/|_|
 
 
             Box version 3.x-dev@151e40a
@@ -2899,7 +2899,7 @@ class CompileTest extends FileSystemTestCase
             ? Generating new stub
               - Using shebang line: #!/usr/bin/env php
               - Using banner:
-                > Generated by Humbug Box $version.
+                > Generated by Humbug Box {$version}.
                 >
                 > @link https://github.com/humbug/box
             ? Skipping dumping the Composer autoloader
@@ -2925,7 +2925,7 @@ class CompileTest extends FileSystemTestCase
     public function test_it_can_generate_a_phar_with_docker(): void
     {
         if (extension_loaded('xdebug')) {
-            $this->markTestSkipped('Skipping this test since xdebug has an include wrapper causing this test to fail');
+            self::markTestSkipped('Skipping this test since xdebug has an include wrapper causing this test to fail');
         }
 
         mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
@@ -2949,9 +2949,9 @@ class CompileTest extends FileSystemTestCase
 
                 ____
                / __ )____  _  __
-              / __  / __ \| |/_/
+              / __  / __ \\| |/_/
              / /_/ / /_/ />  <
-            /_____/\____/_/|_|
+            /_____/\\____/_/|_|
 
 
             Box version 3.x-dev@151e40a
@@ -2972,7 +2972,7 @@ class CompileTest extends FileSystemTestCase
             ? Generating new stub
               - Using shebang line: #!/usr/bin/env php
               - Using banner:
-                > Generated by Humbug Box $version.
+                > Generated by Humbug Box {$version}.
                 >
                 > @link https://github.com/humbug/box
             ? Dumping the Composer autoloader
@@ -2984,7 +2984,7 @@ class CompileTest extends FileSystemTestCase
             No recommendation found.
             No warning found.
 
-             // PHAR: $expectedNumberOfFiles files (100B)
+             // PHAR: {$expectedNumberOfFiles} files (100B)
              // You can inspect the generated PHAR with the "info" command.
 
              // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -3011,9 +3011,6 @@ class CompileTest extends FileSystemTestCase
         yield [false];
     }
 
-    /**
-     * @param callable(string):string $extraNormalizers
-     */
     private function createCompilerDisplayNormalizer(): callable
     {
         $tmp = $this->tmp;
@@ -3075,9 +3072,6 @@ class CompileTest extends FileSystemTestCase
         };
     }
 
-    /**
-     * @param callable(string):string $extraNormalizers
-     */
     private static function createComposerPathNormalizer(): callable
     {
         return static fn (string $output): string => preg_replace(
@@ -3101,7 +3095,7 @@ class CompileTest extends FileSystemTestCase
             /** @var PharFileInfo $fileInfo */
             $fileInfo = $phar[str_replace($root, '', (string) $fileInfo->getPathname())];
 
-            $path = substr($fileInfo->getPathname(), strlen($root) - 1);
+            $path = mb_substr($fileInfo->getPathname(), mb_strlen($root) - 1);
 
             if ($fileInfo->isDir()) {
                 $path .= '/';
@@ -3153,7 +3147,7 @@ class CompileTest extends FileSystemTestCase
     private function skipIfDefaultStubNotFound(): void
     {
         if (!file_exists(self::DEFAULT_STUB_PATH)) {
-            $this->markTestSkipped('The default stub file could not be found. Run the tests via the make commands or manually generate the stub file with `$ make generate_default_stub`.');
+            self::markTestSkipped('The default stub file could not be found. Run the tests via the make commands or manually generate the stub file with `$ make generate_default_stub`.');
         }
     }
 }

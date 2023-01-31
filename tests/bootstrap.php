@@ -12,9 +12,9 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-use function KevinGH\Box\register_aliases;
 use Laravel\SerializableClosure\Support\ClosureStream;
 use org\bovigo\vfs\vfsStreamWrapper;
+use function KevinGH\Box\register_aliases;
 
 register_aliases();
 

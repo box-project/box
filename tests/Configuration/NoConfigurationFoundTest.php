@@ -19,6 +19,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \KevinGH\Box\Configuration\NoConfigurationFound
+ *
+ * @internal
  */
 class NoConfigurationFoundTest extends TestCase
 {
@@ -26,12 +28,12 @@ class NoConfigurationFoundTest extends TestCase
     {
         $exception = new NoConfigurationFound();
 
-        $this->assertSame(
+        self::assertSame(
             'The configuration file could not be found.',
             $exception->getMessage(),
         );
-        $this->assertSame(0, $exception->getCode());
-        $this->assertNull($exception->getPrevious());
+        self::assertSame(0, $exception->getCode());
+        self::assertNull($exception->getPrevious());
     }
 
     public function test_it_can_be_created_with_overridden_values(): void
@@ -42,8 +44,8 @@ class NoConfigurationFoundTest extends TestCase
 
         $exception = new NoConfigurationFound($message, $code, $error);
 
-        $this->assertSame($message, $exception->getMessage());
-        $this->assertSame($code, $exception->getCode());
-        $this->assertSame($error, $exception->getPrevious());
+        self::assertSame($message, $exception->getMessage());
+        self::assertSame($code, $exception->getCode());
+        self::assertSame($error, $exception->getPrevious());
     }
 }

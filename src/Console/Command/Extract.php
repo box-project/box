@@ -14,25 +14,23 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use function count;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
 use KevinGH\Box\Box;
+use RecursiveIteratorIterator;
+use RuntimeException;
+use Symfony\Component\Console\Exception\RuntimeException as ConsoleRuntimeException;
+use Symfony\Component\Console\Input\InputArgument;
+use Throwable;
+use function count;
 use function KevinGH\Box\bump_open_file_descriptor_limit;
 use function KevinGH\Box\create_temporary_phar;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\remove;
 use function realpath;
-use RecursiveIteratorIterator;
-use RuntimeException;
 use function sprintf;
-use function strlen;
-use function substr;
-use Symfony\Component\Console\Exception\RuntimeException as ConsoleRuntimeException;
-use Symfony\Component\Console\Input\InputArgument;
-use Throwable;
 
 /**
  * @private
@@ -156,11 +154,11 @@ final class Extract implements Command
         try {
             remove($outputDir);
 
-            $rootLength = strlen('phar://'.$box->getPhar()->getPath()) + 1;
+            $rootLength = mb_strlen('phar://'.$box->getPhar()->getPath()) + 1;
 
             foreach (new RecursiveIteratorIterator($box->getPhar()) as $filePath) {
                 dump_file(
-                    $outputDir.'/'.substr($filePath->getPathname(), $rootLength),
+                    $outputDir.'/'.mb_substr($filePath->getPathname(), $rootLength),
                     (string) $filePath->getContent(),
                 );
             }

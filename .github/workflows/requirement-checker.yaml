@@ -24,7 +24,7 @@ jobs:
                 uses: ramsey/composer-install@v2
 
             -   name: Ensure that the make target is up to date
-                run: make vendor_install
+                run: make _vendor_install
 
             -   name: Install PHP-CS-Fixer
                 uses: ramsey/composer-install@v2
@@ -72,19 +72,25 @@ jobs:
 
     unit-tests:
         runs-on: ubuntu-latest
-        name: Unit Tests (PHP ${{ matrix.php }}, ${{ matrix.dependency }}${{ matrix.composer-options == null && ')' || format(', {0})', matrix.php.composer-options) }}
+        name: Unit Tests (PHP ${{ matrix.php }}, ${{ matrix.dependency }}${{ matrix.composer-options == null && ')' || format(', {0})', matrix.composer-options) }}
         strategy:
             fail-fast: false
             matrix:
                 # The lowest dependency is tested via an e2e test rather than by executing the tests like so.
                 # The reason being using tools such as PHPUnit for a version as low as the lowest supported version
                 # is a serious strain for close to no benefits: the e2e test is simpler.
-                php: [ '8.1', '8.2' ]
-                dependency: [ highest ]
+                php: [ '8.1' ]
+                dependency: [ locked ]
                 composer-options: [ null ]
                 include:
                     -   php: '8.1'
-                        dependency: locked
+                        dependency: lowest
+                        composer-options: ~
+                    -   php: '8.1'
+                        dependency: highest
+                        composer-options: ~
+                    -   php: '8.2'
+                        dependency: highest
                         composer-options: ~
                     -   php: '8.3'
                         dependency: highest
@@ -118,7 +124,7 @@ jobs:
                     composer-options: ${{ matrix.php.composer-options }}
 
             -   name: Ensure that the make target is up to date
-                run: make vendor_install
+                run: make _vendor_install
 
             -   name: Install the Composer (requirement checker bin namespace) dependencies
                 uses: ramsey/composer-install@v2
@@ -164,20 +170,20 @@ jobs:
             fail-fast: false
             matrix:
                 e2e:
-                    - command: _test_e2e_pass_no_config_min_composer_php
-                      docker-image: ghcr.io/box-project/box_php725
-                    - command: _test_e2e_pass_no_config_min_box_php
-                      docker-image: ghcr.io/box-project/box_php81
-                    - command: _test_e2e_pass_complete_min_composer_php
-                      docker-image: ghcr.io/box-project/box_php725
-                    - command: _test_e2e_pass_complete_min_box_php
-                      docker-image: ghcr.io/box-project/box_php81
-                    - command: _test_e2e_fail_complete_min_composer_php
-                      docker-image: ghcr.io/box-project/box_php725
-                    - command: _test_e2e_fail_complete_min_box_php
-                      docker-image: ghcr.io/box-project/box_php81
-                    - command: _test_e2e_skip_min_composer_php
-                      docker-image: ghcr.io/box-project/box_php725
+                    -   command: _test_e2e_pass_no_config_min_composer_php
+                        docker-image: ghcr.io/box-project/box_php725
+                    -   command: _test_e2e_pass_no_config_min_box_php
+                        docker-image: ghcr.io/box-project/box_php81
+                    -   command: _test_e2e_pass_complete_min_composer_php
+                        docker-image: ghcr.io/box-project/box_php725
+                    -   command: _test_e2e_pass_complete_min_box_php
+                        docker-image: ghcr.io/box-project/box_php81
+                    -   command: _test_e2e_fail_complete_min_composer_php
+                        docker-image: ghcr.io/box-project/box_php725
+                    -   command: _test_e2e_fail_complete_min_box_php
+                        docker-image: ghcr.io/box-project/box_php81
+                    -   command: _test_e2e_skip_min_composer_php
+                        docker-image: ghcr.io/box-project/box_php725
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3
@@ -241,10 +247,81 @@ jobs:
             - e2e-tests
         if: always()
         steps:
-            - name: Successful run
-              if: ${{ !(contains(needs.*.result, 'failure')) }}
-              run: exit 0
+            -   name: Successful run
+                if: ${{ !(contains(needs.*.result, 'failure')) }}
+                run: exit 0
 
-            - name: Failing run
-              if: ${{ contains(needs.*.result, 'failure') }}
-              run: exit 1
+            -   name: Failing run
+                if: ${{ contains(needs.*.result, 'failure') }}
+                run: exit 1
+
+    update-requirement-checker:
+        name: "Update the RequirementChecker"
+        if: ${{ github.repository == 'box-project/box' && github.ref_name == 'main' }}
+        runs-on: "ubuntu-latest"
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v3
+                with:
+                    ref: ${{ github.head_ref }}
+                    fetch-depth: '0'  # Ensures the tags are fetched
+                    token: ${{ secrets.GITHUB_TOKEN }}
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ matrix.php.version }}
+                    tools: composer
+                    coverage: none
+
+            -   name: Install the Composer dependencies
+                uses: ramsey/composer-install@v2
+                with:
+                    working-directory: requirement-checker
+                    dependency-versions: ${{ matrix.php.dependency }}
+                    composer-options: ${{ matrix.php.composer-options }}
+
+            -   name: Ensure that the make target is up to date
+                run: cd requirement-checker; make vendor_install
+
+            -   name: Install the Composer (root) dependencies
+                uses: ramsey/composer-install@v2
+                with:
+                    dependency-versions: ${{ matrix.php.dependency }}
+                    composer-options: ${{ matrix.php.composer-options }}
+
+            -   name: Ensure that the make target is up to date
+                run: make _vendor_install
+
+            -   name: Install the Composer (requirement checker bin namespace) dependencies
+                uses: ramsey/composer-install@v2
+                with:
+                    working-directory: vendor-bin/requirement-checker
+                    dependency-versions: highest
+                    composer-options: ${{ matrix.php.composer-options }}
+
+            -   name: Ensure that the make target is up to date
+                run: make requirement_checker_install
+
+            -   name: Dump the requirement checker
+                run: make _dump_requirement_checker
+
+            -   name: Check for changes
+                run: |
+                    if [ $(git status --porcelain | wc -l) -eq "0" ]; then
+                        echo "🟢 No change detected."
+                        echo "requirement_checker_changed=false" >> $GITHUB_ENV
+                    else
+                        echo "requirement_checker_changed=true" >> $GITHUB_ENV
+                    fi
+
+            -   name: Create Pull Request
+                if: env.requirement_checker_changed == 'true'
+                uses: peter-evans/create-pull-request@v4
+                with:
+                    token: ${{ secrets.GITHUB_SECRETS }}
+                    branch-suffix: random
+                    delete-branch: true
+                    title: "Update the RequirementChecker"
+                    committer: "box-bot <box-project-bot@example.com>"
+                    commit-message: "Update the RequirementChecker"

@@ -14,15 +14,17 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Configuration;
 
-use function current;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Php;
 use stdClass;
+use function current;
 
 /**
  * @covers \KevinGH\Box\Configuration\Configuration
  *
  * @group config
+ *
+ * @internal
  */
 class ConfigurationPhpCompactorTest extends ConfigurationTestCase
 {
@@ -36,15 +38,15 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
 
         $compactors = $this->config->getCompactors();
 
-        $this->assertCount(1, $compactors);
+        self::assertCount(1, $compactors);
 
         /** @var Compactor $compactor */
         $compactor = current($compactors->toArray());
 
-        $this->assertInstanceOf(Php::class, $compactor);
+        self::assertInstanceOf(Php::class, $compactor);
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_php_compactor_ignored_annotations_can_be_configured(): void
@@ -63,15 +65,15 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
 
         $compactors = $this->config->getCompactors();
 
-        $this->assertCount(1, $compactors);
+        self::assertCount(1, $compactors);
 
         /** @var Compactor $compactor */
         $compactor = current($compactors->toArray());
 
-        $this->assertInstanceOf(Php::class, $compactor);
+        self::assertInstanceOf(Php::class, $compactor);
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_recommendation_is_given_if_the_php_compactor_annotations_are_configured_with_their_default_values(): void
@@ -86,13 +88,13 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
 
             $compactors = $this->config->getCompactors();
 
-            $this->assertCount(1, $compactors);
+            self::assertCount(1, $compactors);
 
-            $this->assertSame(
+            self::assertSame(
                 ['The "annotations" setting can be omitted since is set to its default value'],
                 $this->config->getRecommendations(),
             );
-            $this->assertSame([], $this->config->getWarnings());
+            self::assertSame([], $this->config->getWarnings());
         }
     }
 
@@ -110,10 +112,10 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
 
         $compactors = $this->config->getCompactors();
 
-        $this->assertCount(0, $compactors);
+        self::assertCount(0, $compactors);
 
-        $this->assertSame($expectedRecommendations, $this->config->getRecommendations());
-        $this->assertSame($expectedWarnings, $this->config->getWarnings());
+        self::assertSame($expectedRecommendations, $this->config->getRecommendations());
+        self::assertSame($expectedWarnings, $this->config->getWarnings());
     }
 
     public function test_a_recommendation_is_given_if_the_php_compactor_ignored_annotations_are_configured_with_their_default_values(): void
@@ -126,13 +128,13 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
 
         $compactors = $this->config->getCompactors();
 
-        $this->assertCount(0, $compactors);
+        self::assertCount(0, $compactors);
 
-        $this->assertSame(
+        self::assertSame(
             ['The "annotations#ignore" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame(
+        self::assertSame(
             ['The "annotations" setting has been set but is ignored since no PHP compactor has been configured'],
             $this->config->getWarnings(),
         );
@@ -150,16 +152,16 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
 
         $compactors = $this->config->getCompactors();
 
-        $this->assertCount(1, $compactors);
+        self::assertCount(1, $compactors);
 
         /** @var Compactor $compactor */
         $compactor = current($compactors->toArray());
 
-        $this->assertInstanceOf(Php::class, $compactor);
+        self::assertInstanceOf(Php::class, $compactor);
 
         $actual = $compactor->compact('path/to/file.php', $contents);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     public static function annotationConfigurationsWithoutPhpCompactorRegisteredProvider(): iterable
@@ -231,8 +233,7 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
                 function foo($x, $y): int {
                     return $x <=> $y;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -258,12 +259,6 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
         $falseAnnotationConfigs = [
             false,
             new stdClass(),
-            (object) [
-                'ignore' => [],
-            ],
-            (object) [
-                'ignore' => null,
-            ],
         ];
 
         foreach ($falseAnnotationConfigs as $config) {
@@ -291,8 +286,65 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
                     function foo($x, $y): int {
                         return $x <=> $y;
                     }
-                    PHP
-                ,
+                    PHP,
+                <<<'PHP'
+                    <?php
+
+                    /**
+                     * Function comparing the two given values
+                     *
+                     * @param int $x
+                     * @param int $y
+                     *
+                     * @return int
+                     *
+                     * @author Théo Fidry
+                     * @LICENSE MIT
+                     *
+                     * @Acme(type = "function")
+                     */
+                    function foo($x, $y): int {
+                    return $x <=> $y;
+                    }
+                    PHP,
+            ];
+        }
+
+        $noIgnoredTagAnnotationConfigs = [
+            (object) [
+                'ignore' => [],
+            ],
+            (object) [
+                'ignore' => null,
+            ],
+        ];
+
+        foreach ($noIgnoredTagAnnotationConfigs as $config) {
+            yield [
+                [
+                    'annotations' => $config,
+                    'compactors' => [Php::class],
+                ],
+                <<<'PHP'
+                    <?php
+
+                    /**
+                     * Function comparing the two given values
+                     *
+                     * @param int $x
+                     * @param int $y
+                     *
+                     * @return int
+                     *
+                     * @author Théo Fidry
+                     * @LICENSE MIT
+                     *
+                     * @Acme(type = "function")
+                     */
+                    function foo($x, $y): int {
+                        return $x <=> $y;
+                    }
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -346,8 +398,7 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
                     function foo($x, $y): int {
                         return $x <=> $y;
                     }
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -394,8 +445,7 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
                 function foo($x, $y): int {
                     return $x <=> $y;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 

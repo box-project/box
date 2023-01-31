@@ -7,6 +7,10 @@ on:
     release:
         types: [ created ]
 
+env:
+    DOCKERFILE: .docker/Dockerfile
+    DOCKERHUB_USERNAME: boxproject
+
 jobs:
     build-phar:
         runs-on: ubuntu-latest
@@ -29,7 +33,7 @@ jobs:
                 uses: ramsey/composer-install@v2
 
             -   name: Ensure that the make target is up to date
-                run: make vendor_install
+                run: make _vendor_install
 
             -   name: Build PHAR
                 run: make compile
@@ -86,3 +90,67 @@ jobs:
                     files: |
                         box.phar
                         box.phar.asc
+
+            -   name: Update Homebrew formula
+                uses: dawidd6/action-homebrew-bump-formula@v3
+                with:
+                    token: ${{ secrets.GITHUB_TOKEN }}
+                    tap: box-project/homebrew-box
+                    formula: humbug/box
+
+    publish-docker-image:
+        runs-on: ubuntu-latest
+        name: Publish PHAR
+        needs:
+            - build-phar
+        if: github.event_name == 'release'
+        steps:
+            -   uses: actions/download-artifact@v3
+                with:
+                    name: box-phar
+                    path: .
+
+            # See https://github.com/actions/download-artifact#limitations
+            # the permissions are not guaranteed to be preserved
+            -   name: Ensure PHAR is executable
+                run: chmod 755 bin/box.phar
+
+            -   name: Check that the PHAR works
+                run: bin/box.phar --ansi --version
+
+            -   name: Set up QEMU
+                uses: docker/setup-qemu-action@v2
+
+            -   name: Set up Docker Buildx
+                uses: docker/setup-buildx-action@v1
+
+            -   name: Login to Docker Container Registry
+                uses: docker/login-action@v2
+                with:
+                    username: ${{ env.DOCKERHUB_USERNAME }}
+                    password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+            -   name: Build and export to Docker
+                uses: docker/build-push-action@v3
+                with:
+                    context: .
+                    file: ${{ env.DOCKERFILE }}
+                    platforms: linux/amd64
+                    tags: |
+                        ${{ env.DOCKERHUB_USERNAME }}/box:${{ steps.download_release.outputs.version }}
+                        ${{ env.DOCKERHUB_USERNAME }}/box:latest
+                    load: true
+
+            -   name: Test the image
+                run: docker run --rm ${{ env.DOCKERHUB_USERNAME }}/box:latest --version
+
+            -   name: Build and push
+                uses: docker/build-push-action@v3
+                with:
+                    context: .
+                    file: ${{ env.DOCKERFILE }}
+                    platforms: linux/amd64
+                    tags: |
+                        ${{ env.DOCKERHUB_USERNAME }}/box:${{ steps.download_release.outputs.version }}
+                        ${{ env.DOCKERHUB_USERNAME }}/box:latest
+                    push: true

@@ -14,12 +14,13 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\AutoReview;
 
-use Fidry\Makefile\Parser;
 use Fidry\Makefile\Rule;
 use Fidry\Makefile\Test\BaseMakefileTestCase;
 
 /**
  * @coversNothing
+ *
+ * @internal
  */
 final class E2EMakefileTest extends BaseMakefileTestCase
 {
@@ -37,7 +38,7 @@ final class E2EMakefileTest extends BaseMakefileTestCase
 
     public function test_the_e2e_target_must_contain_all_the_e2e_targets(): void
     {
-        $e2eRule = self::getE2ERule();
+        $e2eRule = MakefileE2ECollector::getE2ERule();
         $e2eTestTargets = self::getE2ETestRules();
 
         $e2eRulePrerequisites = $e2eRule->getPrerequisites();
@@ -54,20 +55,8 @@ final class E2EMakefileTest extends BaseMakefileTestCase
         );
     }
 
-    private static function getE2ERule(): Rule
-    {
-        return current(
-            array_filter(
-                Parser::parse(
-                    file_get_contents(MakefileTest::MAKEFILE_PATH),
-                ),
-                static fn (Rule $rule) => 'test_e2e' === $rule->getTarget() && !$rule->isComment() && !$rule->isPhony(),
-            ),
-        );
-    }
-
     /**
-     * @return Rule
+     * @return list<Rule>
      */
     private static function getE2ETestRules(): array
     {

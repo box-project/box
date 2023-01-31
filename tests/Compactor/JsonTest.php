@@ -20,6 +20,8 @@ use function unserialize;
 
 /**
  * @covers \KevinGH\Box\Compactor\Json
+ *
+ * @internal
  */
 class JsonTest extends TestCase
 {
@@ -43,7 +45,7 @@ class JsonTest extends TestCase
             JSON;
         $actual = $this->compactor->compact($file, $contents);
 
-        $this->assertSame($supports, $contents !== $actual);
+        self::assertSame($supports, $contents !== $actual);
     }
 
     /**
@@ -55,7 +57,7 @@ class JsonTest extends TestCase
 
         $actual = $this->compactor->compact($file, $content);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     /**
@@ -67,12 +69,12 @@ class JsonTest extends TestCase
 
         $actual = $this->compactor->compact($file, $content);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     public function test_it_is_serializable(): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             $this->compactor,
             unserialize(serialize($this->compactor)),
         );
@@ -100,8 +102,7 @@ class JsonTest extends TestCase
                         "infection/infection": "^1.0"
                     }
                 }
-                JSON
-            ,
+                JSON,
             <<<'JSON'
                 {"require":{"humbug\/php-scoper":"^1.0","infection\/infection":"^1.0"}}
                 JSON,
@@ -110,8 +111,7 @@ class JsonTest extends TestCase
         yield 'invalid JSON' => [
             <<<'JSON'
                 {
-                JSON
-            ,
+                JSON,
             <<<'JSON'
                 {
                 JSON,

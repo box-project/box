@@ -635,7 +635,7 @@ function copy(string $originFile, string $targetFile, bool $overwriteNewerFiles 
  *
  * @private
  */
-function mkdir(iterable|string $dirs, int $mode = 0777): void
+function mkdir(iterable|string $dirs, int $mode = 0o777): void
 {
     static $fileSystem;
 
@@ -720,7 +720,7 @@ function touch(iterable|string $files, ?int $time = null, ?int $atime = null): v
  *
  * @private
  */
-function chmod(iterable|string $files, int $mode, int $umask = 0000, bool $recursive = false): void
+function chmod(iterable|string $files, int $mode, int $umask = 0, bool $recursive = false): void
 {
     static $fileSystem;
 

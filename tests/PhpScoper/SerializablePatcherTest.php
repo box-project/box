@@ -21,12 +21,14 @@ use function unserialize;
 
 /**
  * @covers \KevinGH\Box\PhpScoper\SerializablePatcher
+ *
+ * @internal
  */
 final class SerializablePatcherTest extends TestCase
 {
     protected function setUp(): void
     {
-        $this->markTestSkipped('This is causing serialization issues');
+        self::markTestSkipped('This is causing serialization issues');
     }
 
     /**

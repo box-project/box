@@ -19,6 +19,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \KevinGH\Box\Compactor\BaseCompactor
+ *
+ * @internal
  */
 class BaseCompactorTest extends TestCase
 {
@@ -43,7 +45,7 @@ class BaseCompactorTest extends TestCase
 
         $actual = $compactor->compact($file, $contents);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     public function test_it_returns_the_compacted_contents_if_it_supports_the_file(): void
@@ -71,6 +73,6 @@ class BaseCompactorTest extends TestCase
 
         $actual = $compactor->compact($file, $contents);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 }
