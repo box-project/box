@@ -59,6 +59,10 @@ jobs:
                     coverage: none
                     extensions: ctype, iconv, xml${{ matrix.php-extra-extensions }}
 
+            -   name: Remove the configured platform on non-locked dependencies
+                if: ${{ matrix.php.dependency != 'locked' }}
+                run: composer config platform.php --unset
+
             -   name: Install Composer dependencies
                 uses: ramsey/composer-install@v2
                 with:
