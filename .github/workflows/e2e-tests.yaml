@@ -7,11 +7,6 @@ on:
     release:
         types: [ created ]
 
-env:
-    # TODO: adopt the composer-option strategy instead
-    # Comma-space separated list, e.g. '8.1, 8.2, 9.0'
-    FUTURE_PHP_VERSION: '9.0'
-
 jobs:
     wait-for-phar-and-docker-images:
         runs-on: ubuntu-latest
@@ -51,8 +46,9 @@ jobs:
                     - e2e_phpstorm_stubs
                     - e2e_dockerfile
                     - e2e_dockerfile_no_extension
-                php: [ '8.1' ]
-                tools: [ composer ]
+                php: [ '8.1', '8.2', '8.3' ]
+                tools:
+                    - 'composer'
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3
@@ -66,6 +62,10 @@ jobs:
                     ini-values: phar.readonly=0, display_errors=On, error_reporting=-1
                     tools: ${{ matrix.tools }}
                     coverage: pcov
+
+            -   name: Allow Composer installation on future PHP versions
+                if: ${{ matrix.php == '8.3' }}
+                run: echo "COMPOSER_IGNORE_PLATFORM_REQ=--ignore-platform-req=php+" >> "$GITHUB_ENV"
 
             # We cannot use the regular actions/download-artifact here since the artifact is stored
             # in a different workflow.

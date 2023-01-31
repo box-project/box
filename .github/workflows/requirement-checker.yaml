@@ -24,7 +24,7 @@ jobs:
                 uses: ramsey/composer-install@v2
 
             -   name: Ensure that the make target is up to date
-                run: make vendor_install
+                run: make _vendor_install
 
             -   name: Install PHP-CS-Fixer
                 uses: ramsey/composer-install@v2
@@ -72,21 +72,27 @@ jobs:
 
     unit-tests:
         runs-on: ubuntu-latest
-        name: Unit Tests (PHP ${{ matrix.php.version }}, ${{ matrix.php.dependency }}${{ matrix.php.composer-options == null && ')' || format(', {0})', matrix.php.composer-options) }}
+        name: Unit Tests (PHP ${{ matrix.php }}, ${{ matrix.dependency }}${{ matrix.composer-options == null && ')' || format(', {0})', matrix.composer-options) }}
         strategy:
             fail-fast: false
             matrix:
                 # The lowest dependency is tested via an e2e test rather than by executing the tests like so.
                 # The reason being using tools such as PHPUnit for a version as low as the lowest supported version
                 # is a serious strain for close to no benefits: the e2e test is simpler.
-                php:
-                    -   version: '8.1'
-                        dependency: locked
+                php: [ '8.1' ]
+                dependency: [ locked ]
+                composer-options: [ null ]
+                include:
+                    -   php: '8.1'
+                        dependency: lowest
                         composer-options: ~
-                    -   version: '8.2'
+                    -   php: '8.1'
                         dependency: highest
                         composer-options: ~
-                    -   version: '8.3'
+                    -   php: '8.2'
+                        dependency: highest
+                        composer-options: ~
+                    -   php: '8.3'
                         dependency: highest
                         composer-options: --ignore-platform-req=php+
 
@@ -97,7 +103,7 @@ jobs:
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
                 with:
-                    php-version: ${{ matrix.php.version }}
+                    php-version: ${{ matrix.php }}
                     tools: composer
                     coverage: none
 
@@ -105,8 +111,8 @@ jobs:
                 uses: ramsey/composer-install@v2
                 with:
                     working-directory: requirement-checker
-                    dependency-versions: ${{ matrix.php.dependency }}
-                    composer-options: ${{ matrix.php.composer-options }}
+                    dependency-versions: ${{ matrix.dependency }}
+                    composer-options: ${{ matrix.composer-options }}
 
             -   name: Ensure that the make target is up to date
                 run: cd requirement-checker; make vendor_install
@@ -118,7 +124,7 @@ jobs:
                     composer-options: ${{ matrix.php.composer-options }}
 
             -   name: Ensure that the make target is up to date
-                run: make vendor_install
+                run: make _vendor_install
 
             -   name: Install the Composer (requirement checker bin namespace) dependencies
                 uses: ramsey/composer-install@v2
@@ -285,7 +291,7 @@ jobs:
                     composer-options: ${{ matrix.php.composer-options }}
 
             -   name: Ensure that the make target is up to date
-                run: make vendor_install
+                run: make _vendor_install
 
             -   name: Install the Composer (requirement checker bin namespace) dependencies
                 uses: ramsey/composer-install@v2

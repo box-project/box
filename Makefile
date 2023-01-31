@@ -304,6 +304,10 @@ $(WEBSITE_OUTPUT): $(WEBSITE_SRC)
 .PHONY: vendor_install
 vendor_install:
 	composer install --ansi
+	$(MAKE) _vendor_install
+
+.PHONY: _vendor_install
+_vendor_install:
 	touch -c vendor
 	touch -c $(COMPOSER_BIN_PLUGIN_VENDOR)
 	touch -c $(PHPUNIT_BIN)
