@@ -72,7 +72,7 @@ jobs:
 
     unit-tests:
         runs-on: ubuntu-latest
-        name: Unit Tests (PHP ${{ matrix.php }}, ${{ matrix.dependency }}${{ matrix.composer-options == null && ')' || format(', {0})', matrix.php.composer-options) }}
+        name: Unit Tests (PHP ${{ matrix.php }}, ${{ matrix.dependency }}${{ matrix.composer-options == null && ')' || format(', {0})', matrix.composer-options) }}
         strategy:
             fail-fast: false
             matrix:
