@@ -64,7 +64,8 @@ jobs:
                     coverage: pcov
 
             -   name: Allow Composer installation on future PHP versions
-                run: echo "$COMPOSER_IGNORE_PLATFORM_REQ=--ignore-platform-req=php+" >> "$GITHUB_ENV"
+                if: ${{ matrix.php == '8.3' }}
+                run: echo "COMPOSER_IGNORE_PLATFORM_REQ=--ignore-platform-req=php+" >> "$GITHUB_ENV"
 
             # We cannot use the regular actions/download-artifact here since the artifact is stored
             # in a different workflow.
