@@ -49,7 +49,6 @@ final class Info implements Command
 {
     private const PHAR_ARG = 'phar';
     private const LIST_OPT = 'list';
-    private const METADATA_OPT = 'metadata';
     private const MODE_OPT = 'mode';
     private const DEPTH_OPT = 'depth';
 
@@ -97,12 +96,6 @@ final class Info implements Command
                     'l',
                     InputOption::VALUE_NONE,
                     'List the contents of the Phar?',
-                ),
-                new InputOption(
-                    self::METADATA_OPT,
-                    null,
-                    InputOption::VALUE_NONE,
-                    'Display metadata?',
                 ),
                 new InputOption(
                     self::MODE_OPT,

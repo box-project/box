@@ -314,7 +314,6 @@ class InfoTest extends CommandTestCase
                 'command' => 'info',
                 'phar' => $pharPath,
                 '--list' => true,
-                '--metadata' => true,
             ],
         );
 
@@ -480,7 +479,6 @@ class InfoTest extends CommandTestCase
             'command' => 'info',
             'phar' => $pharPath,
             '--list' => true,
-            '--metadata' => true,
             '--depth' => $depth,
         ];
 
@@ -630,7 +628,6 @@ class InfoTest extends CommandTestCase
                 'command' => 'info',
                 'phar' => $pharPath,
                 '--list' => true,
-                '--metadata' => true,
                 '--depth' => '1',
                 '--mode' => 'flat',
             ],
@@ -673,7 +670,6 @@ class InfoTest extends CommandTestCase
                 'command' => 'info',
                 'phar' => $pharPath,
                 '--list' => true,
-                '--metadata' => true,
                 '--depth' => '-10',
             ],
         );
