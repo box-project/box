@@ -79,7 +79,7 @@ jobs:
                 # The lowest dependency is tested via an e2e test rather than by executing the tests like so.
                 # The reason being using tools such as PHPUnit for a version as low as the lowest supported version
                 # is a serious strain for close to no benefits: the e2e test is simpler.
-                php: [ '8.1', '8.2' ]
+                php: [ '8.1' ]
                 dependency: [ locked ]
                 composer-options: [ null ]
                 include:
@@ -87,6 +87,9 @@ jobs:
                         dependency: lowest
                         composer-options: ~
                     -   php: '8.1'
+                        dependency: highest
+                        composer-options: ~
+                    -   php: '8.2'
                         dependency: highest
                         composer-options: ~
                     -   php: '8.3'
