@@ -70,7 +70,7 @@ jobs:
                     composer-options: ${{ matrix.php.composer-options }}
 
             -   name: Ensure that the make target is up to date
-                run: make vendor_install
+                run: make _vendor_install
 
             -   run: make phpunit
 
@@ -109,7 +109,7 @@ jobs:
                 uses: ramsey/composer-install@v2
 
             -   name: Ensure that the make target is up to date
-                run: make vendor_install
+                run: make _vendor_install
 
             -   name: Install Infection
                 uses: ramsey/composer-install@v2

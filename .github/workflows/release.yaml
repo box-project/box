@@ -33,7 +33,7 @@ jobs:
                 uses: ramsey/composer-install@v2
 
             -   name: Ensure that the make target is up to date
-                run: make vendor_install
+                run: make _vendor_install
 
             -   name: Build PHAR
                 run: make compile
