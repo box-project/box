@@ -14,22 +14,27 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Configuration;
 
+use DateTimeImmutable;
+use InvalidArgumentException;
+use KevinGH\Box\Compactor\DummyCompactor;
+use KevinGH\Box\Compactor\InvalidCompactor;
+use KevinGH\Box\Compactor\Php;
+use KevinGH\Box\Compactor\PhpScoper;
+use KevinGH\Box\Json\JsonValidationException;
+use KevinGH\Box\MapFile;
+use KevinGH\Box\VarDumperNormalizer;
+use Phar;
+use RuntimeException;
+use Seld\JsonLint\ParsingException;
+use stdClass;
 use function abs;
 use function array_fill_keys;
 use function array_keys;
 use function count;
 use function date_default_timezone_set;
-use DateTimeImmutable;
-use const DIRECTORY_SEPARATOR;
 use function exec;
 use function getcwd;
-use InvalidArgumentException;
 use function json_decode;
-use const JSON_THROW_ON_ERROR;
-use KevinGH\Box\Compactor\DummyCompactor;
-use KevinGH\Box\Compactor\InvalidCompactor;
-use KevinGH\Box\Compactor\Php;
-use KevinGH\Box\Compactor\PhpScoper;
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
@@ -38,24 +43,20 @@ use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\FileSystem\touch;
 use function KevinGH\Box\get_box_version;
-use KevinGH\Box\Json\JsonValidationException;
-use KevinGH\Box\MapFile;
-use KevinGH\Box\VarDumperNormalizer;
 use function mt_getrandmax;
-use Phar;
-use const PHP_EOL;
 use function random_int;
-use RuntimeException;
-use Seld\JsonLint\ParsingException;
 use function sprintf;
-use stdClass;
-use function strtolower;
+use function strtr;
+use const DIRECTORY_SEPARATOR;
+use const JSON_THROW_ON_ERROR;
 
 /**
  * @covers \KevinGH\Box\Configuration\Configuration
  * @covers \KevinGH\Box\MapFile
  *
  * @group config
+ *
+ * @internal
  */
 class ConfigurationTest extends ConfigurationTestCase
 {
@@ -72,38 +73,38 @@ class ConfigurationTest extends ConfigurationTestCase
     {
         $config = Configuration::create('box.json', new stdClass());
 
-        $this->assertSame('box.json', $config->getConfigurationFile());
+        self::assertSame('box.json', $config->getConfigurationFile());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_it_can_be_created_without_a_file(): void
     {
         $config = Configuration::create(null, new stdClass());
 
-        $this->assertNull($config->getConfigurationFile());
+        self::assertNull($config->getConfigurationFile());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_default_alias_is_generated_if_no_alias_is_registered(): void
     {
-        $this->assertMatchesRegularExpression('/^box-auto-generated-alias-[\da-zA-Z]{12}\.phar$/', $this->config->getAlias());
-        $this->assertMatchesRegularExpression('/^box-auto-generated-alias-[\da-zA-Z]{12}\.phar$/', $this->getNoFileConfig()->getAlias());
+        self::assertMatchesRegularExpression('/^box-auto-generated-alias-[\da-zA-Z]{12}\.phar$/', $this->config->getAlias());
+        self::assertMatchesRegularExpression('/^box-auto-generated-alias-[\da-zA-Z]{12}\.phar$/', $this->getNoFileConfig()->getAlias());
 
         $this->setConfig([
             'alias' => null,
         ]);
 
-        $this->assertMatchesRegularExpression('/^box-auto-generated-alias-[\da-zA-Z]{12}\.phar$/', $this->config->getAlias());
+        self::assertMatchesRegularExpression('/^box-auto-generated-alias-[\da-zA-Z]{12}\.phar$/', $this->config->getAlias());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "alias" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_alias_can_be_configured(): void
@@ -113,10 +114,10 @@ class ConfigurationTest extends ConfigurationTestCase
             'files' => [self::DEFAULT_FILE],
         ]);
 
-        $this->assertSame('test.phar', $this->config->getAlias());
+        self::assertSame('test.phar', $this->config->getAlias());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_alias_value_is_normalized(): void
@@ -126,10 +127,10 @@ class ConfigurationTest extends ConfigurationTestCase
             'files' => [self::DEFAULT_FILE],
         ]);
 
-        $this->assertSame('test.phar', $this->config->getAlias());
+        self::assertSame('test.phar', $this->config->getAlias());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_alias_cannot_be_empty(): void
@@ -140,9 +141,9 @@ class ConfigurationTest extends ConfigurationTestCase
                 'files' => [self::DEFAULT_FILE],
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'A PHAR alias cannot be empty when provided.',
                 $exception->getMessage(),
             );
@@ -157,14 +158,13 @@ class ConfigurationTest extends ConfigurationTestCase
                 'files' => [self::DEFAULT_FILE],
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (JsonValidationException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 <<<EOF
-                    "$this->file" does not match the expected JSON schema:
+                    "{$this->file}" does not match the expected JSON schema:
                       - alias : Boolean value found, but a string or a null is required
-                    EOF
-                ,
+                    EOF,
                 $exception->getMessage(),
             );
         }
@@ -179,10 +179,10 @@ class ConfigurationTest extends ConfigurationTestCase
             'stub' => 'stub-path.php',
         ]);
 
-        $this->assertSame('test.phar', $this->config->getAlias());
+        self::assertSame('test.phar', $this->config->getAlias());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame(
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame(
             ['The "alias" setting has been set but is ignored since a custom stub path is used'],
             $this->config->getWarnings(),
         );
@@ -197,15 +197,15 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $this->reloadConfig();
 
-        $this->assertSame($this->tmp.'/sub-dir', $this->config->getBasePath());
+        self::assertSame($this->tmp.'/sub-dir', $this->config->getBasePath());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_if_there_is_no_file_the_default_base_path_used_is_the_current_working_directory(): void
     {
-        $this->assertSame($this->tmp, $this->getNoFileConfig()->getBasePath());
+        self::assertSame($this->tmp, $this->getNoFileConfig()->getBasePath());
     }
 
     public function test_the_base_path_can_be_configured(): void
@@ -217,13 +217,13 @@ class ConfigurationTest extends ConfigurationTestCase
             'base-path' => $basePath,
         ]);
 
-        $this->assertSame(
+        self::assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'test',
             $this->config->getBasePath(),
         );
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_recommendation_is_given_when_the_default_base_path_is_explicitely_used(): void
@@ -232,16 +232,16 @@ class ConfigurationTest extends ConfigurationTestCase
             'base-path' => getcwd(),
         ]);
 
-        $this->assertSame(
+        self::assertSame(
             getcwd(),
             $this->config->getBasePath(),
         );
 
-        $this->assertSame(
+        self::assertSame(
             ['The "base-path" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_non_existent_directory_cannot_be_used_as_a_base_path(): void
@@ -252,9 +252,9 @@ class ConfigurationTest extends ConfigurationTestCase
                 'files' => [self::DEFAULT_FILE],
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'The base path "'.$this->tmp.DIRECTORY_SEPARATOR.'test" is not a directory or does not exist.',
                 $exception->getMessage(),
             );
@@ -271,9 +271,9 @@ class ConfigurationTest extends ConfigurationTestCase
                 'files' => [self::DEFAULT_FILE],
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'The base path "'.$this->tmp.DIRECTORY_SEPARATOR.'foo" is not a directory or does not exist.',
                 $exception->getMessage(),
             );
@@ -291,10 +291,10 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $expected = $this->tmp.DIRECTORY_SEPARATOR.'dir';
 
-        $this->assertSame($expected, $this->config->getBasePath());
+        self::assertSame($expected, $this->config->getBasePath());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_base_path_value_is_normalized(): void
@@ -308,10 +308,10 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $expected = $this->tmp.DIRECTORY_SEPARATOR.'dir';
 
-        $this->assertSame($expected, $this->config->getBasePath());
+        self::assertSame($expected, $this->config->getBasePath());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     /**
@@ -336,14 +336,14 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $this->reloadConfig();
 
-        $this->assertSame($expectedJson, $this->config->getComposerJson());
-        $this->assertSame($expectedJsonContents, $this->config->getDecodedComposerJsonContents());
+        self::assertSame($expectedJson, $this->config->getComposerJson());
+        self::assertSame($expectedJsonContents, $this->config->getDecodedComposerJsonContents());
 
-        $this->assertSame($expectedLock, $this->config->getComposerLock());
-        $this->assertSame($expectedLockContents, $this->config->getDecodedComposerLockContents());
+        self::assertSame($expectedLock, $this->config->getComposerLock());
+        self::assertSame($expectedLockContents, $this->config->getDecodedComposerLockContents());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_it_throws_an_error_when_a_composer_file_is_found_but_invalid(): void
@@ -355,18 +355,17 @@ class ConfigurationTest extends ConfigurationTestCase
         } catch (InvalidArgumentException $exception) {
             $composerJson = $this->tmp.'/composer.json';
 
-            $this->assertSame(
+            self::assertSame(
                 <<<EOF
-                    Expected the file "$composerJson" to be a valid composer.json file but an error has been found: Parse error on line 1:
+                    Expected the file "{$composerJson}" to be a valid composer.json file but an error has been found: Parse error on line 1:
 
                     ^
                     Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
-                    EOF
-                ,
+                    EOF,
                 $exception->getMessage(),
             );
-            $this->assertSame(0, $exception->getCode());
-            $this->assertInstanceOf(ParsingException::class, $exception->getPrevious());
+            self::assertSame(0, $exception->getCode());
+            self::assertInstanceOf(ParsingException::class, $exception->getPrevious());
         }
     }
 
@@ -377,39 +376,38 @@ class ConfigurationTest extends ConfigurationTestCase
         try {
             $this->reloadConfig();
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $composerLock = $this->tmp.'/composer.lock';
 
-            $this->assertSame(
+            self::assertSame(
                 <<<EOF
-                    Expected the file "$composerLock" to be a valid composer.json file but an error has been found: Parse error on line 1:
+                    Expected the file "{$composerLock}" to be a valid composer.json file but an error has been found: Parse error on line 1:
 
                     ^
                     Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
-                    EOF
-                ,
+                    EOF,
                 $exception->getMessage(),
             );
-            $this->assertSame(0, $exception->getCode());
-            $this->assertInstanceOf(ParsingException::class, $exception->getPrevious());
+            self::assertSame(0, $exception->getCode());
+            self::assertInstanceOf(ParsingException::class, $exception->getPrevious());
         }
     }
 
     public function test_the_autoloader_is_dumped_by_default_if_a_composer_json_file_is_found(): void
     {
-        $this->assertFalse($this->config->dumpAutoload());
-        $this->assertFalse($this->getNoFileConfig()->dumpAutoload());
+        self::assertFalse($this->config->dumpAutoload());
+        self::assertFalse($this->getNoFileConfig()->dumpAutoload());
 
         $this->setConfig(['dump-autoload' => null]);
 
-        $this->assertFalse($this->config->dumpAutoload());
+        self::assertFalse($this->config->dumpAutoload());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "dump-autoload" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame(
+        self::assertSame(
             [
                 'The "dump-autoload" setting has been set but has been ignored because the composer.json, composer.lock'
                 .' and vendor/composer/installed.json files are necessary but could not be found.',
@@ -421,18 +419,18 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $this->setConfig([]);
 
-        $this->assertTrue($this->config->dumpAutoload());
-        $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
+        self::assertTrue($this->config->dumpAutoload());
+        self::assertTrue($this->getNoFileConfig()->dumpAutoload());
 
         $this->setConfig(['dump-autoload' => null]);
 
-        $this->assertTrue($this->config->dumpAutoload());
+        self::assertTrue($this->config->dumpAutoload());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "dump-autoload" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_autoloader_dumping_can_be_configured(): void
@@ -443,24 +441,24 @@ class ConfigurationTest extends ConfigurationTestCase
             'dump-autoload' => false,
         ]);
 
-        $this->assertFalse($this->config->dumpAutoload());
-        $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
+        self::assertFalse($this->config->dumpAutoload());
+        self::assertTrue($this->getNoFileConfig()->dumpAutoload());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
 
         $this->setConfig([
             'dump-autoload' => true,
         ]);
 
-        $this->assertTrue($this->config->dumpAutoload());
-        $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
+        self::assertTrue($this->config->dumpAutoload());
+        self::assertTrue($this->getNoFileConfig()->dumpAutoload());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "dump-autoload" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_autoloader_cannot_be_dumped_if_no_composer_json_file_is_found(): void
@@ -469,10 +467,10 @@ class ConfigurationTest extends ConfigurationTestCase
             'dump-autoload' => true,
         ]);
 
-        $this->assertFalse($this->config->dumpAutoload());
+        self::assertFalse($this->config->dumpAutoload());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame(
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame(
             [
                 'The "dump-autoload" setting has been set but has been ignored because the composer.json, composer.lock'
                 .' and vendor/composer/installed.json files are necessary but could not be found.',
@@ -487,27 +485,27 @@ class ConfigurationTest extends ConfigurationTestCase
             'exclude-composer-files' => null,
         ]);
 
-        $this->assertTrue($this->config->excludeComposerFiles());
-        $this->assertTrue($this->getNoFileConfig()->excludeComposerFiles());
+        self::assertTrue($this->config->excludeComposerFiles());
+        self::assertTrue($this->getNoFileConfig()->excludeComposerFiles());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "exclude-composer-files" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
 
         $this->setConfig([
             'exclude-composer-files' => true,
         ]);
 
-        $this->assertTrue($this->config->excludeComposerFiles());
-        $this->assertTrue($this->getNoFileConfig()->excludeComposerFiles());
+        self::assertTrue($this->config->excludeComposerFiles());
+        self::assertTrue($this->getNoFileConfig()->excludeComposerFiles());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "exclude-composer-files" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_excluding_the_composer_files_can_be_configured(): void
@@ -516,52 +514,52 @@ class ConfigurationTest extends ConfigurationTestCase
             'exclude-composer-files' => true,
         ]);
 
-        $this->assertTrue($this->config->excludeComposerFiles());
+        self::assertTrue($this->config->excludeComposerFiles());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "exclude-composer-files" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
 
         $this->setConfig([
             'exclude-composer-files' => false,
         ]);
 
-        $this->assertFalse($this->config->excludeComposerFiles());
+        self::assertFalse($this->config->excludeComposerFiles());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_no_compactors_is_configured_by_default(): void
     {
-        $this->assertSame([], $this->config->getCompactors()->toArray());
-        $this->assertSame([], $this->getNoFileConfig()->getCompactors()->toArray());
+        self::assertSame([], $this->config->getCompactors()->toArray());
+        self::assertSame([], $this->getNoFileConfig()->getCompactors()->toArray());
 
         $this->setConfig([
             'compactors' => null,
         ]);
 
-        $this->assertSame([], $this->config->getCompactors()->toArray());
+        self::assertSame([], $this->config->getCompactors()->toArray());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "compactors" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
 
         $this->setConfig([
             'compactors' => [],
         ]);
 
-        $this->assertSame([], $this->config->getCompactors()->toArray());
+        self::assertSame([], $this->config->getCompactors()->toArray());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "compactors" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_configure_the_compactors(): void
@@ -576,12 +574,12 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $compactors = $this->config->getCompactors()->toArray();
 
-        $this->assertInstanceOf(Php::class, $compactors[0]);
-        $this->assertInstanceOf(DummyCompactor::class, $compactors[1]);
-        $this->assertCount(2, $compactors);
+        self::assertInstanceOf(Php::class, $compactors[0]);
+        self::assertInstanceOf(DummyCompactor::class, $compactors[1]);
+        self::assertCount(2, $compactors);
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_recommendation_is_given_if_the_scoper_compactor_is_registered_before_the_php_compactor(): void
@@ -600,10 +598,10 @@ class ConfigurationTest extends ConfigurationTestCase
                 'compactors' => $compactorClasses,
             ]);
 
-            $this->assertCount(count($compactorClasses), $this->config->getCompactors()->toArray());
+            self::assertCount(count($compactorClasses), $this->config->getCompactors()->toArray());
 
-            $this->assertSame([], $this->config->getRecommendations());
-            $this->assertSame([], $this->config->getWarnings());
+            self::assertSame([], $this->config->getRecommendations());
+            self::assertSame([], $this->config->getWarnings());
         }
 
         $this->setConfig([
@@ -615,15 +613,15 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $compactors = $this->config->getCompactors()->toArray();
 
-        $this->assertInstanceOf(PhpScoper::class, $compactors[0]);
-        $this->assertInstanceOf(Php::class, $compactors[1]);
-        $this->assertCount(2, $compactors);
+        self::assertInstanceOf(PhpScoper::class, $compactors[0]);
+        self::assertInstanceOf(Php::class, $compactors[1]);
+        self::assertCount(2, $compactors);
 
-        $this->assertSame(
+        self::assertSame(
             ['The PHP compactor has been registered after the PhpScoper compactor. It is recommended to register the PHP compactor before for a clearer code and faster processing.'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_it_cannot_get_the_compactors_with_an_invalid_class(): void
@@ -634,9 +632,9 @@ class ConfigurationTest extends ConfigurationTestCase
                 'compactors' => ['NoSuchClass'],
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'The compactor class "NoSuchClass" does not exist.',
                 $exception->getMessage(),
             );
@@ -651,9 +649,9 @@ class ConfigurationTest extends ConfigurationTestCase
                 'files' => [self::DEFAULT_FILE],
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 sprintf(
                     'The class "%s" is not a compactor class.',
                     InvalidCompactor::class,
@@ -676,10 +674,10 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $compactors = $this->config->getCompactors()->toArray();
 
-        $this->assertSame('custom', $compactors[0]->getScoper()->getPrefix());
+        self::assertSame('custom', $compactors[0]->getScoper()->getPrefix());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_default_scoper_path_is_configured_by_default(): void
@@ -694,10 +692,10 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $compactors = $this->config->getCompactors()->toArray();
 
-        $this->assertSame('custom', $compactors[0]->getScoper()->getPrefix());
+        self::assertSame('custom', $compactors[0]->getScoper()->getPrefix());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
 
         $this->setConfig([
             'php-scoper' => 'scoper.inc.php',
@@ -708,13 +706,13 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $compactors = $this->config->getCompactors()->toArray();
 
-        $this->assertSame('custom', $compactors[0]->getScoper()->getPrefix());
+        self::assertSame('custom', $compactors[0]->getScoper()->getPrefix());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "php-scoper" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
 
         $this->setConfig([
             'php-scoper' => null,
@@ -725,43 +723,43 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $compactors = $this->config->getCompactors()->toArray();
 
-        $this->assertSame('custom', $compactors[0]->getScoper()->getPrefix());
+        self::assertSame('custom', $compactors[0]->getScoper()->getPrefix());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "php-scoper" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_no_compression_algorithm_is_configured_by_default(): void
     {
-        $this->assertNull($this->config->getCompressionAlgorithm());
-        $this->assertNull($this->getNoFileConfig()->getCompressionAlgorithm());
+        self::assertNull($this->config->getCompressionAlgorithm());
+        self::assertNull($this->getNoFileConfig()->getCompressionAlgorithm());
 
         $this->setConfig([
             'compression' => null,
         ]);
 
-        $this->assertNull($this->config->getCompressionAlgorithm());
+        self::assertNull($this->config->getCompressionAlgorithm());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "compression" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
 
         $this->setConfig([
             'compression' => 'NONE',
         ]);
 
-        $this->assertNull($this->config->getCompressionAlgorithm());
+        self::assertNull($this->config->getCompressionAlgorithm());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "compression" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_compression_algorithm_with_a_string(): void
@@ -771,10 +769,10 @@ class ConfigurationTest extends ConfigurationTestCase
             'compression' => 'BZ2',
         ]);
 
-        $this->assertSame(Phar::BZ2, $this->config->getCompressionAlgorithm());
+        self::assertSame(Phar::BZ2, $this->config->getCompressionAlgorithm());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     /**
@@ -788,14 +786,14 @@ class ConfigurationTest extends ConfigurationTestCase
                 'compression' => $compression,
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 $errorMessage,
                 $exception->getMessage(),
             );
         } catch (JsonValidationException $exception) {
-            $this->assertMatchesRegularExpression(
+            self::assertMatchesRegularExpression(
                 '/does not match the expected JSON schema:/',
                 $exception->getMessage(),
             );
@@ -804,35 +802,35 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_a_file_mode_is_configured_by_default(): void
     {
-        $this->assertSame(493, $this->config->getFileMode());
-        $this->assertSame(493, $this->getNoFileConfig()->getFileMode());
+        self::assertSame(493, $this->config->getFileMode());
+        self::assertSame(493, $this->getNoFileConfig()->getFileMode());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
 
         $this->setConfig([
             'chmod' => '0755',
         ]);
 
-        $this->assertSame(493, $this->config->getFileMode());
+        self::assertSame(493, $this->config->getFileMode());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "chmod" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
 
         $this->setConfig([
             'chmod' => '755',
         ]);
 
-        $this->assertSame(493, $this->config->getFileMode());
+        self::assertSame(493, $this->config->getFileMode());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "chmod" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_configure_file_mode(): void
@@ -843,10 +841,10 @@ class ConfigurationTest extends ConfigurationTestCase
             'chmod' => '0644',
         ]);
 
-        $this->assertSame(420, $this->config->getFileMode());
+        self::assertSame(420, $this->config->getFileMode());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
 
         // Decimal value provided
         $this->setConfig([
@@ -854,22 +852,22 @@ class ConfigurationTest extends ConfigurationTestCase
             'chmod' => '0644',
         ]);
 
-        $this->assertSame(420, $this->config->getFileMode());
+        self::assertSame(420, $this->config->getFileMode());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_main_script_path_is_configured_by_default(): void
     {
         dump_file('composer.json', '{"bin": []}');
 
-        $this->assertTrue($this->config->hasMainScript());
-        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'index.php', $this->config->getMainScriptPath());
-        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'index.php', $this->getNoFileConfig()->getMainScriptPath());
+        self::assertTrue($this->config->hasMainScript());
+        self::assertSame($this->tmp.DIRECTORY_SEPARATOR.'index.php', $this->config->getMainScriptPath());
+        self::assertSame($this->tmp.DIRECTORY_SEPARATOR.'index.php', $this->getNoFileConfig()->getMainScriptPath());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_main_script_path_is_inferred_by_the_composer_json_by_default(): void
@@ -887,14 +885,14 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $this->reloadConfig();
 
-        $this->assertTrue($this->config->hasMainScript());
-        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'bin/foo', $this->config->getMainScriptPath());
+        self::assertTrue($this->config->hasMainScript());
+        self::assertSame($this->tmp.DIRECTORY_SEPARATOR.'bin/foo', $this->config->getMainScriptPath());
 
-        $this->assertTrue($this->getNoFileConfig()->hasMainScript());
-        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'bin/foo', $this->getNoFileConfig()->getMainScriptPath());
+        self::assertTrue($this->getNoFileConfig()->hasMainScript());
+        self::assertSame($this->tmp.DIRECTORY_SEPARATOR.'bin/foo', $this->getNoFileConfig()->getMainScriptPath());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_first_composer_bin_is_used_as_the_main_script_by_default(): void
@@ -916,12 +914,12 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $this->reloadConfig();
 
-        $this->assertTrue($this->config->hasMainScript());
-        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'bin/foo', $this->config->getMainScriptPath());
-        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'bin/foo', $this->getNoFileConfig()->getMainScriptPath());
+        self::assertTrue($this->config->hasMainScript());
+        self::assertSame($this->tmp.DIRECTORY_SEPARATOR.'bin/foo', $this->config->getMainScriptPath());
+        self::assertSame($this->tmp.DIRECTORY_SEPARATOR.'bin/foo', $this->getNoFileConfig()->getMainScriptPath());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_main_script_can_be_configured(): void
@@ -945,12 +943,12 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $this->setConfig(['main' => 'test.php']);
 
-        $this->assertTrue($this->config->hasMainScript());
-        $this->assertSame($this->tmp.'/test.php', $this->config->getMainScriptPath());
-        $this->assertSame('Main script contents', $this->config->getMainScriptContents());
+        self::assertTrue($this->config->hasMainScript());
+        self::assertSame($this->tmp.'/test.php', $this->config->getMainScriptPath());
+        self::assertSame('Main script contents', $this->config->getMainScriptContents());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_main_script_path_is_normalized(): void
@@ -959,10 +957,10 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $this->setConfig(['main' => ' test.php ']);
 
-        $this->assertSame($this->tmp.'/test.php', $this->config->getMainScriptPath());
+        self::assertSame($this->tmp.'/test.php', $this->config->getMainScriptPath());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_main_script_content_ignores_shebang_line(): void
@@ -971,10 +969,10 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $this->setConfig(['main' => 'test.php']);
 
-        $this->assertSame('test', $this->config->getMainScriptContents());
+        self::assertSame('test', $this->config->getMainScriptContents());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_it_cannot_get_the_main_script_if_file_does_not_exists(): void
@@ -982,9 +980,9 @@ class ConfigurationTest extends ConfigurationTestCase
         try {
             $this->setConfig(['main' => 'test.php']);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 "The file \"{$this->tmp}/test.php\" does not exist.",
                 $exception->getMessage(),
             );
@@ -1010,14 +1008,14 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $this->setConfig(['main' => false]);
 
-        $this->assertFalse($this->config->hasMainScript());
+        self::assertFalse($this->config->hasMainScript());
 
         try {
             $this->config->getMainScriptPath();
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'Cannot retrieve the main script path: no main script configured.',
                 $exception->getMessage(),
             );
@@ -1026,16 +1024,16 @@ class ConfigurationTest extends ConfigurationTestCase
         try {
             $this->config->getMainScriptContents();
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'Cannot retrieve the main script contents: no main script configured.',
                 $exception->getMessage(),
             );
         }
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_main_script_cannot_be_enabled(): void
@@ -1043,9 +1041,9 @@ class ConfigurationTest extends ConfigurationTestCase
         try {
             $this->setConfig(['main' => true]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'Cannot "enable" a main script: either disable it with `false` or give the main script file path.',
                 $exception->getMessage(),
             );
@@ -1056,15 +1054,15 @@ class ConfigurationTest extends ConfigurationTestCase
     {
         $mapFile = $this->config->getFileMapper();
 
-        $this->assertSame([], $mapFile->getMap());
+        self::assertSame([], $mapFile->getMap());
 
-        $this->assertSame(
+        self::assertSame(
             'first/test/path/sub/path/file.php',
             $mapFile('first/test/path/sub/path/file.php'),
         );
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_recommendation_is_given_when_the_default_map_is_given(): void
@@ -1075,18 +1073,18 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $mapFile = $this->config->getFileMapper();
 
-        $this->assertSame([], $mapFile->getMap());
+        self::assertSame([], $mapFile->getMap());
 
-        $this->assertSame(
+        self::assertSame(
             'first/test/path/sub/path/file.php',
             $mapFile('first/test/path/sub/path/file.php'),
         );
 
-        $this->assertSame(
+        self::assertSame(
             ['The "map" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_file_map_can_be_configured(): void
@@ -1101,7 +1099,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $mapFile = $this->config->getFileMapper();
 
-        $this->assertSame(
+        self::assertSame(
             [
                 ['first/test/path' => 'a'],
                 ['' => 'b'],
@@ -1109,26 +1107,26 @@ class ConfigurationTest extends ConfigurationTestCase
             $mapFile->getMap(),
         );
 
-        $this->assertSame(
+        self::assertSame(
             'a/sub/path/file.php',
             $mapFile('first/test/path/sub/path/file.php'),
         );
 
-        $this->assertSame(
+        self::assertSame(
             'b/second/test/path/sub/path/file.php',
             $mapFile('second/test/path/sub/path/file.php'),
         );
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_no_metadata_is_configured_by_default(): void
     {
-        $this->assertNull($this->config->getMetadata());
+        self::assertNull($this->config->getMetadata());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_can_configure_metadata(): void
@@ -1138,10 +1136,10 @@ class ConfigurationTest extends ConfigurationTestCase
             'metadata' => 123,
         ]);
 
-        $this->assertSame(123, $this->config->getMetadata());
+        self::assertSame(123, $this->config->getMetadata());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_recommendation_is_given_if_the_default_metadata_is_provided(): void
@@ -1150,28 +1148,28 @@ class ConfigurationTest extends ConfigurationTestCase
             'metadata' => null,
         ]);
 
-        $this->assertNull($this->config->getMetadata());
+        self::assertNull($this->config->getMetadata());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "metadata" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_get_default_output_path(): void
     {
-        $this->assertSame(
+        self::assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'index.phar',
             $this->config->getOutputPath(),
         );
-        $this->assertSame(
+        self::assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'index.phar',
             $this->config->getTmpOutputPath(),
         );
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_output_path_is_configurable(): void
@@ -1181,17 +1179,17 @@ class ConfigurationTest extends ConfigurationTestCase
             'output' => 'test.phar',
         ]);
 
-        $this->assertSame(
+        self::assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'test.phar',
             $this->config->getOutputPath(),
         );
-        $this->assertSame(
+        self::assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'test.phar',
             $this->config->getTmpOutputPath(),
         );
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_recommendation_is_given_when_the_default_path_is_given(): void
@@ -1200,20 +1198,20 @@ class ConfigurationTest extends ConfigurationTestCase
             'output' => 'index.phar',
         ]);
 
-        $this->assertSame(
+        self::assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'index.phar',
             $this->config->getOutputPath(),
         );
-        $this->assertSame(
+        self::assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'index.phar',
             $this->config->getTmpOutputPath(),
         );
 
-        $this->assertSame(
+        self::assertSame(
             ['The "output" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_output_path_is_relative_to_the_base_path(): void
@@ -1226,17 +1224,17 @@ class ConfigurationTest extends ConfigurationTestCase
             'base-path' => 'sub-dir',
         ]);
 
-        $this->assertSame(
+        self::assertSame(
             $this->tmp.'/sub-dir/test.phar',
             $this->config->getOutputPath(),
         );
-        $this->assertSame(
+        self::assertSame(
             $this->tmp.'/sub-dir/test.phar',
             $this->config->getTmpOutputPath(),
         );
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_output_path_is_not_relative_to_the_base_path_if_is_absolute(): void
@@ -1249,17 +1247,17 @@ class ConfigurationTest extends ConfigurationTestCase
             'base-path' => 'sub-dir',
         ]);
 
-        $this->assertSame(
+        self::assertSame(
             $this->tmp.'/test.phar',
             $this->config->getOutputPath(),
         );
-        $this->assertSame(
+        self::assertSame(
             $this->tmp.'/test.phar',
             $this->config->getTmpOutputPath(),
         );
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_output_path_is_normalized(): void
@@ -1269,17 +1267,17 @@ class ConfigurationTest extends ConfigurationTestCase
             'output' => ' test.phar ',
         ]);
 
-        $this->assertSame(
+        self::assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'test.phar',
             $this->config->getOutputPath(),
         );
-        $this->assertSame(
+        self::assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'test.phar',
             $this->config->getTmpOutputPath(),
         );
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_output_path_can_omit_the_phar_extension(): void
@@ -1289,17 +1287,17 @@ class ConfigurationTest extends ConfigurationTestCase
             'output' => 'test',
         ]);
 
-        $this->assertSame(
+        self::assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'test',
             $this->config->getOutputPath(),
         );
-        $this->assertSame(
+        self::assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'test.phar',
             $this->config->getTmpOutputPath(),
         );
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_get_default_output_path_depends_on_the_input(): void
@@ -1310,21 +1308,21 @@ class ConfigurationTest extends ConfigurationTestCase
             'main' => 'bin/acme',
         ]);
 
-        $this->assertSame(
+        self::assertSame(
             $this->tmp.'/bin/acme.phar',
             $this->config->getOutputPath(),
         );
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_no_replacements_are_configured_by_default(): void
     {
-        $this->assertSame([], $this->config->getReplacements());
+        self::assertSame([], $this->config->getReplacements());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_replacement_map_can_be_configured(): void
@@ -1352,20 +1350,20 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $values = $this->config->getReplacements();
 
-        $this->assertSame('1.0.0', $values['@git@']);
-        $this->assertMatchesRegularExpression('/^[a-f0-9]{40}$/', $values['@git_commit@']);
-        $this->assertMatchesRegularExpression('/^[a-f0-9]{7}$/', $values['@git_commit_short@']);
-        $this->assertSame('1.0.0', $values['@git_tag@']);
-        $this->assertSame('1.0.0', $values['@git_version@']);
-        $this->assertSame($rand, $values['@rand@']);
-        $this->assertMatchesRegularExpression(
+        self::assertSame('1.0.0', $values['@git@']);
+        self::assertMatchesRegularExpression('/^[a-f0-9]{40}$/', $values['@git_commit@']);
+        self::assertMatchesRegularExpression('/^[a-f0-9]{7}$/', $values['@git_commit_short@']);
+        self::assertSame('1.0.0', $values['@git_tag@']);
+        self::assertSame('1.0.0', $values['@git_version@']);
+        self::assertSame($rand, $values['@rand@']);
+        self::assertMatchesRegularExpression(
             '/^[0-9]{4}:[0-9]{2}:[0-9]{2}$/',
             $values['@date_time@'],
         );
-        $this->assertCount(7, $values);
+        self::assertCount(7, $values);
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
 
         touch('foo');
         exec('git add foo');
@@ -1386,25 +1384,25 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $values = $this->config->getReplacements();
 
-        $this->assertMatchesRegularExpression('/^.+@[a-f0-9]{7}$/', $values['$git$']);
-        $this->assertMatchesRegularExpression('/^[a-f0-9]{40}$/', $values['$git_commit$']);
-        $this->assertMatchesRegularExpression('/^[a-f0-9]{7}$/', $values['$git_commit_short$']);
-        $this->assertMatchesRegularExpression('/^.+-\d+-g[a-f0-9]{7}$/', $values['$git_tag$']);
-        $this->assertMatchesRegularExpression('/^.+-\d+-g[a-f0-9]{7}$/', $values['$git_version$']);
-        $this->assertSame($rand, $values['$rand$']);
-        $this->assertMatchesRegularExpression(
+        self::assertMatchesRegularExpression('/^.+@[a-f0-9]{7}$/', $values['$git$']);
+        self::assertMatchesRegularExpression('/^[a-f0-9]{40}$/', $values['$git_commit$']);
+        self::assertMatchesRegularExpression('/^[a-f0-9]{7}$/', $values['$git_commit_short$']);
+        self::assertMatchesRegularExpression('/^.+-\d+-g[a-f0-9]{7}$/', $values['$git_tag$']);
+        self::assertMatchesRegularExpression('/^.+-\d+-g[a-f0-9]{7}$/', $values['$git_version$']);
+        self::assertSame($rand, $values['$rand$']);
+        self::assertMatchesRegularExpression(
             '/^[0-9]{4}:[0-9]{2}:[0-9]{2}$/',
             $values['$date_time$'],
         );
-        $this->assertCount(7, $values);
+        self::assertCount(7, $values);
 
         // Some process does not release the git files
         if ($this->isWindows()) {
             exec('rd /S /Q .git');
         }
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_replacement_map_can_be_configured_when_base_path_is_different_directory(): void
@@ -1436,15 +1434,15 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $values = $this->config->getReplacements();
 
-        $this->assertSame('1.0.0', $values['@git@']);
-        $this->assertMatchesRegularExpression('/^[a-f0-9]{40}$/', $values['@git_commit@']);
-        $this->assertMatchesRegularExpression('/^[a-f0-9]{7}$/', $values['@git_commit_short@']);
-        $this->assertSame('1.0.0', $values['@git_tag@']);
-        $this->assertSame('1.0.0', $values['@git_version@']);
-        $this->assertCount(5, $values);
+        self::assertSame('1.0.0', $values['@git@']);
+        self::assertMatchesRegularExpression('/^[a-f0-9]{40}$/', $values['@git_commit@']);
+        self::assertMatchesRegularExpression('/^[a-f0-9]{7}$/', $values['@git_commit_short@']);
+        self::assertSame('1.0.0', $values['@git_tag@']);
+        self::assertSame('1.0.0', $values['@git_version@']);
+        self::assertCount(5, $values);
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
 
         chdir($basePath);
         touch('foo');
@@ -1464,20 +1462,20 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $values = $this->config->getReplacements();
 
-        $this->assertMatchesRegularExpression('/^.+@[a-f0-9]{7}$/', $values['@git@']);
-        $this->assertMatchesRegularExpression('/^[a-f0-9]{40}$/', $values['@git_commit@']);
-        $this->assertMatchesRegularExpression('/^[a-f0-9]{7}$/', $values['@git_commit_short@']);
-        $this->assertMatchesRegularExpression('/^.+-\d+-g[a-f0-9]{7}$/', $values['@git_tag@']);
-        $this->assertMatchesRegularExpression('/^.+-\d+-g[a-f0-9]{7}$/', $values['@git_version@']);
-        $this->assertCount(5, $values);
+        self::assertMatchesRegularExpression('/^.+@[a-f0-9]{7}$/', $values['@git@']);
+        self::assertMatchesRegularExpression('/^[a-f0-9]{40}$/', $values['@git_commit@']);
+        self::assertMatchesRegularExpression('/^[a-f0-9]{7}$/', $values['@git_commit_short@']);
+        self::assertMatchesRegularExpression('/^.+-\d+-g[a-f0-9]{7}$/', $values['@git_tag@']);
+        self::assertMatchesRegularExpression('/^.+-\d+-g[a-f0-9]{7}$/', $values['@git_version@']);
+        self::assertCount(5, $values);
 
         // Some process does not release the git files
         if ($this->isWindows()) {
             exec('rd /S /Q .git');
         }
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_recommendation_is_given_if_the_default_replacements_setting_is_provided(): void
@@ -1486,27 +1484,27 @@ class ConfigurationTest extends ConfigurationTestCase
             'replacements' => new stdClass(),
         ]);
 
-        $this->assertSame([], $this->config->getReplacements());
+        self::assertSame([], $this->config->getReplacements());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "replacements" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_datetime_replacement_has_a_default_date_format(): void
     {
         $this->setConfig(['datetime' => 'date_time']);
 
-        $this->assertMatchesRegularExpression(
+        self::assertMatchesRegularExpression(
             '/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} [A-Z]{2,5}$/',
             $this->config->getReplacements()['@date_time@'],
         );
-        $this->assertCount(1, $this->config->getReplacements());
+        self::assertCount(1, $this->config->getReplacements());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_datetime_is_converted_to_utc(): void
@@ -1523,10 +1521,10 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $configDateTime = new DateTimeImmutable($this->config->getReplacements()['@date_time@']);
 
-        $this->assertLessThan(10, abs($configDateTime->getTimestamp() - $now->getTimestamp()));
+        self::assertLessThan(10, abs($configDateTime->getTimestamp() - $now->getTimestamp()));
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_datetime_format_must_be_valid(): void
@@ -1534,9 +1532,9 @@ class ConfigurationTest extends ConfigurationTestCase
         try {
             $this->setConfig(['datetime-format' => 'ü']);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'Expected the datetime format to be a valid format: "ü" is not',
                 $exception->getMessage(),
             );
@@ -1556,13 +1554,13 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $values = $this->config->getReplacements();
 
-        $this->assertMatchesRegularExpression(
+        self::assertMatchesRegularExpression(
             '/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/',
             $values['@date_time@'],
         );
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_replacement_sigil_can_be_a_chain_of_characters(): void
@@ -1572,30 +1570,30 @@ class ConfigurationTest extends ConfigurationTestCase
             'replacement-sigil' => '__',
         ]);
 
-        $this->assertSame(
+        self::assertSame(
             ['__foo__' => 'bar'],
             $this->config->getReplacements(),
         );
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_config_has_a_default_shebang(): void
     {
-        $this->assertSame('#!/usr/bin/env php', $this->config->getShebang());
+        self::assertSame('#!/usr/bin/env php', $this->config->getShebang());
 
         $this->setConfig([
             'shebang' => null,
         ]);
 
-        $this->assertSame('#!/usr/bin/env php', $this->config->getShebang());
+        self::assertSame('#!/usr/bin/env php', $this->config->getShebang());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "shebang" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_shebang_can_be_configured(): void
@@ -1607,10 +1605,10 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $actual = $this->config->getShebang();
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_recommendation_is_given_if_the_shebang_configured_to_its_default_value(): void
@@ -1619,13 +1617,13 @@ class ConfigurationTest extends ConfigurationTestCase
             'shebang' => '#!/usr/bin/env php',
         ]);
 
-        $this->assertSame('#!/usr/bin/env php', $this->config->getShebang());
+        self::assertSame('#!/usr/bin/env php', $this->config->getShebang());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "shebang" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_warning_is_given_if_the_shebang_configured_but_a_custom_stub_is_used(): void
@@ -1637,10 +1635,10 @@ class ConfigurationTest extends ConfigurationTestCase
             'stub' => 'my-stub.php',
         ]);
 
-        $this->assertSame($expected, $this->config->getShebang());
+        self::assertSame($expected, $this->config->getShebang());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame(
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame(
             ['The "shebang" has been set but ignored since it is used only with the Box built-in stub which is not used'],
             $this->config->getWarnings(),
         );
@@ -1653,10 +1651,10 @@ class ConfigurationTest extends ConfigurationTestCase
             'stub' => false,
         ]);
 
-        $this->assertSame($expected, $this->config->getShebang());
+        self::assertSame($expected, $this->config->getShebang());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame(
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame(
             ['The "shebang" has been set but ignored since it is used only with the Box built-in stub which is not used'],
             $this->config->getWarnings(),
         );
@@ -1671,13 +1669,13 @@ class ConfigurationTest extends ConfigurationTestCase
             'stub' => 'my-stub.php',
         ]);
 
-        $this->assertNull($this->config->getShebang());
+        self::assertNull($this->config->getShebang());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "shebang" has been set to `false` but is unnecessary since the Box built-in stub is not being used'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_recommendation_is_given_if_the_shebang_disabled_and_the_phar_default_stub_is_used(): void
@@ -1687,38 +1685,26 @@ class ConfigurationTest extends ConfigurationTestCase
             'stub' => false,
         ]);
 
-        $this->assertNull($this->config->getShebang());
+        self::assertNull($this->config->getShebang());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "shebang" has been set to `false` but is unnecessary since the Box built-in stub is not being used'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_it_cannot_retrieve_the_git_hash_if_not_in_a_git_repository(): void
     {
-        try {
-            $this->setConfig([
-                'git' => 'git',
-            ]);
+        $regex = strtr(
+            '~^The tag or commit hash could not be retrieved from "{path}": fatal: Not a git repository~i',
+            ['{path}' => $this->tmp],
+        );
 
-            $this->fail('Expected exception to be thrown.');
-        } catch (RuntimeException $exception) {
-            $tmp = $this->tmp;
+        $this->expectExceptionMessageMatches($regex);
+        $this->expectException(RuntimeException::class);
 
-            // Make the comparison case insensitive since depending of the git version the case may be different
-            $this->assertSame(
-                strtolower(
-                    sprintf(
-                        'The tag or commit hash could not be retrieved from "%s": fatal: Not a git repository '
-                        .'(or any of the parent directories): .git'.PHP_EOL,
-                        $tmp,
-                    ),
-                ),
-                strtolower($exception->getMessage()),
-            );
-        }
+        $this->setConfig(['git' => 'git']);
     }
 
     public function test_a_recommendation_is_given_if_the_configured_git_placeholder_is_the_default_value(): void
@@ -1727,13 +1713,13 @@ class ConfigurationTest extends ConfigurationTestCase
             'git' => null,
         ]);
 
-        $this->assertSame([], $this->config->getReplacements());
+        self::assertSame([], $this->config->getReplacements());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "git" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_recommendation_is_given_if_the_configured_git_commit_placeholder_is_the_default_value(): void
@@ -1742,13 +1728,13 @@ class ConfigurationTest extends ConfigurationTestCase
             'git-commit' => null,
         ]);
 
-        $this->assertSame([], $this->config->getReplacements());
+        self::assertSame([], $this->config->getReplacements());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "git-commit" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_recommendation_is_given_if_the_configured_git_short_hash_placeholder_is_the_default_value(): void
@@ -1757,13 +1743,13 @@ class ConfigurationTest extends ConfigurationTestCase
             'git-commit-short' => null,
         ]);
 
-        $this->assertSame([], $this->config->getReplacements());
+        self::assertSame([], $this->config->getReplacements());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "git-commit-short" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_recommendation_is_given_if_the_configured_git_tag_placeholder_is_the_default_value(): void
@@ -1772,13 +1758,13 @@ class ConfigurationTest extends ConfigurationTestCase
             'git-tag' => null,
         ]);
 
-        $this->assertSame([], $this->config->getReplacements());
+        self::assertSame([], $this->config->getReplacements());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "git-tag" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_recommendation_is_given_if_the_configured_git_version_placeholder_is_the_default_value(): void
@@ -1787,13 +1773,13 @@ class ConfigurationTest extends ConfigurationTestCase
             'git-version' => null,
         ]);
 
-        $this->assertSame([], $this->config->getReplacements());
+        self::assertSame([], $this->config->getReplacements());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "git-version" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_recommendation_is_given_if_the_configured_datetime_format_is_the_default_value(): void
@@ -1802,16 +1788,16 @@ class ConfigurationTest extends ConfigurationTestCase
             'datetime-format' => 'Y-m-d H:i:s T',
         ]);
 
-        $this->assertSame([], $this->config->getReplacements());
+        self::assertSame([], $this->config->getReplacements());
 
-        $this->assertSame(
+        self::assertSame(
             [
                 'The "datetime-format" setting can be omitted since is set to its default value',
                 'The setting "datetime-format" has been set but is unnecessary because the setting "datetime" is not set.',
             ],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_recommendation_is_given_if_the_configured_datetime_is_the_default_value(): void
@@ -1820,13 +1806,13 @@ class ConfigurationTest extends ConfigurationTestCase
             'datetime' => null,
         ]);
 
-        $this->assertSame([], $this->config->getReplacements());
+        self::assertSame([], $this->config->getReplacements());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "datetime" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_recommendation_is_given_if_the_datetime_format_is_configured_but_no_datetime_placeholder_is_not_provided(): void
@@ -1835,13 +1821,13 @@ class ConfigurationTest extends ConfigurationTestCase
             'datetime-format' => 'Y-m-d H:i',
         ]);
 
-        $this->assertSame([], $this->config->getReplacements());
+        self::assertSame([], $this->config->getReplacements());
 
-        $this->assertSame(
+        self::assertSame(
             ['The setting "datetime-format" has been set but is unnecessary because the setting "datetime" is not set.'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_recommendation_is_given_if_the_configured_replacement_sigil_is_the_default_value(): void
@@ -1850,13 +1836,13 @@ class ConfigurationTest extends ConfigurationTestCase
             'replacement-sigil' => null,
         ]);
 
-        $this->assertSame([], $this->config->getReplacements());
+        self::assertSame([], $this->config->getReplacements());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "replacement-sigil" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_shebang_can_be_disabled(): void
@@ -1866,10 +1852,10 @@ class ConfigurationTest extends ConfigurationTestCase
             'files' => [self::DEFAULT_FILE],
         ]);
 
-        $this->assertNull($this->config->getShebang());
+        self::assertNull($this->config->getShebang());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_recommendation_is_given_if_the_shebang_is_the_default_value(): void
@@ -1878,25 +1864,25 @@ class ConfigurationTest extends ConfigurationTestCase
             'shebang' => null,
         ]);
 
-        $this->assertSame('#!/usr/bin/env php', $this->config->getShebang());
+        self::assertSame('#!/usr/bin/env php', $this->config->getShebang());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "shebang" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
 
         $this->setConfig([
             'shebang' => '#!/usr/bin/env php',
         ]);
 
-        $this->assertSame('#!/usr/bin/env php', $this->config->getShebang());
+        self::assertSame('#!/usr/bin/env php', $this->config->getShebang());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "shebang" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_cannot_register_an_invalid_shebang(): void
@@ -1907,9 +1893,9 @@ class ConfigurationTest extends ConfigurationTestCase
                 'files' => [self::DEFAULT_FILE],
             ]);
 
-            $this->fail('Expected exception ot be thrown.');
+            self::fail('Expected exception ot be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'The shebang line must start with "#!". Got "/bin/php" instead',
                 $exception->getMessage(),
             );
@@ -1921,9 +1907,9 @@ class ConfigurationTest extends ConfigurationTestCase
                 'files' => [self::DEFAULT_FILE],
             ]);
 
-            $this->fail('Expected exception ot be thrown.');
+            self::fail('Expected exception ot be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'Expected shebang to be either a string, false or null, found true',
                 $exception->getMessage(),
             );
@@ -1938,9 +1924,9 @@ class ConfigurationTest extends ConfigurationTestCase
                 'files' => [self::DEFAULT_FILE],
             ]);
 
-            $this->fail('Expected exception ot be thrown.');
+            self::fail('Expected exception ot be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'The shebang should not be empty.',
                 $exception->getMessage(),
             );
@@ -1952,9 +1938,9 @@ class ConfigurationTest extends ConfigurationTestCase
                 'files' => [self::DEFAULT_FILE],
             ]);
 
-            $this->fail('Expected exception ot be thrown.');
+            self::fail('Expected exception ot be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'The shebang should not be empty.',
                 $exception->getMessage(),
             );
@@ -1972,10 +1958,10 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $actual = $this->config->getShebang();
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_there_is_a_banner_registered_by_default(): void
@@ -1983,13 +1969,13 @@ class ConfigurationTest extends ConfigurationTestCase
         $version = self::$version;
 
         $expected = <<<BANNER
-            Generated by Humbug Box $version.
+            Generated by Humbug Box {$version}.
 
             @link https://github.com/humbug/box
             BANNER;
 
-        $this->assertSame($expected, $this->config->getStubBannerContents());
-        $this->assertNull($this->config->getStubBannerPath());
+        self::assertSame($expected, $this->config->getStubBannerContents());
+        self::assertNull($this->config->getStubBannerPath());
 
         $this->setConfig([
             'banner' => null,
@@ -1997,19 +1983,19 @@ class ConfigurationTest extends ConfigurationTestCase
         ]);
 
         $expected = <<<BANNER
-            Generated by Humbug Box $version.
+            Generated by Humbug Box {$version}.
 
             @link https://github.com/humbug/box
             BANNER;
 
-        $this->assertSame($expected, $this->config->getStubBannerContents());
-        $this->assertNull($this->config->getStubBannerPath());
+        self::assertSame($expected, $this->config->getStubBannerContents());
+        self::assertNull($this->config->getStubBannerPath());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "banner" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_recommendation_is_given_if_the_banner_is_the_default_value(): void
@@ -2018,28 +2004,27 @@ class ConfigurationTest extends ConfigurationTestCase
             'banner' => null,
         ]);
 
-        $this->assertSame(
+        self::assertSame(
             ['The "banner" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
 
         $version = self::$version;
 
         $this->setConfig([
             'banner' => <<<BANNER
-                Generated by Humbug Box $version.
+                Generated by Humbug Box {$version}.
 
                 @link https://github.com/humbug/box
-                BANNER
-            ,
+                BANNER,
         ]);
 
-        $this->assertSame(
+        self::assertSame(
             ['The "banner" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     /**
@@ -2052,11 +2037,11 @@ class ConfigurationTest extends ConfigurationTestCase
             'files' => [self::DEFAULT_FILE],
         ]);
 
-        $this->assertSame($banner, $this->config->getStubBannerContents());
-        $this->assertNull($this->config->getStubBannerPath());
+        self::assertSame($banner, $this->config->getStubBannerContents());
+        self::assertNull($this->config->getStubBannerPath());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_warning_is_given_when_the_banner_is_configured_but_the_box_stub_is_not_used(): void
@@ -2069,11 +2054,11 @@ class ConfigurationTest extends ConfigurationTestCase
                 'stub' => $stub,
             ]);
 
-            $this->assertSame('custom banner', $this->config->getStubBannerContents());
-            $this->assertNull($this->config->getStubBannerPath());
+            self::assertSame('custom banner', $this->config->getStubBannerContents());
+            self::assertNull($this->config->getStubBannerPath());
 
-            $this->assertSame([], $this->config->getRecommendations());
-            $this->assertSame(
+            self::assertSame([], $this->config->getRecommendations());
+            self::assertSame(
                 ['The "banner" setting has been set but is ignored since the Box built-in stub is not being used'],
                 $this->config->getWarnings(),
             );
@@ -2090,14 +2075,14 @@ class ConfigurationTest extends ConfigurationTestCase
                 'stub' => $stub,
             ]);
 
-            $this->assertNull($this->config->getStubBannerContents());
-            $this->assertNull($this->config->getStubBannerPath());
+            self::assertNull($this->config->getStubBannerContents());
+            self::assertNull($this->config->getStubBannerPath());
 
-            $this->assertSame(
+            self::assertSame(
                 ['The "banner" setting has been set but is unnecessary since the Box built-in stub is not being used'],
                 $this->config->getRecommendations(),
             );
-            $this->assertSame([], $this->config->getWarnings());
+            self::assertSame([], $this->config->getWarnings());
         }
     }
 
@@ -2108,11 +2093,11 @@ class ConfigurationTest extends ConfigurationTestCase
             'files' => [self::DEFAULT_FILE],
         ]);
 
-        $this->assertNull($this->config->getStubBannerContents());
-        $this->assertNull($this->config->getStubBannerPath());
+        self::assertNull($this->config->getStubBannerContents());
+        self::assertNull($this->config->getStubBannerPath());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_banner_must_be_a_valid_value(): void
@@ -2123,9 +2108,9 @@ class ConfigurationTest extends ConfigurationTestCase
                 'files' => [self::DEFAULT_FILE],
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'The banner cannot accept true as a value',
                 $exception->getMessage(),
             );
@@ -2142,11 +2127,11 @@ class ConfigurationTest extends ConfigurationTestCase
             'files' => [self::DEFAULT_FILE],
         ]);
 
-        $this->assertSame($expected, $this->config->getStubBannerContents());
-        $this->assertNull($this->config->getStubBannerPath());
+        self::assertSame($expected, $this->config->getStubBannerContents());
+        self::assertNull($this->config->getStubBannerPath());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_custom_multiline_banner_can_be_registered(): void
@@ -2164,31 +2149,31 @@ class ConfigurationTest extends ConfigurationTestCase
             'files' => [self::DEFAULT_FILE],
         ]);
 
-        $this->assertSame($comment, $this->config->getStubBannerContents());
-        $this->assertNull($this->config->getStubBannerPath());
+        self::assertSame($comment, $this->config->getStubBannerContents());
+        self::assertNull($this->config->getStubBannerPath());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_not_banner_path_is_registered_by_default(): void
     {
-        $this->assertNull($this->getNoFileConfig()->getStubBannerPath());
+        self::assertNull($this->getNoFileConfig()->getStubBannerPath());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
 
         $this->setConfig([
             'banner-file' => null,
         ]);
 
-        $this->assertNull($this->config->getStubBannerPath());
+        self::assertNull($this->config->getStubBannerPath());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "banner-file" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_custom_banner_from_a_file_can_be_registered(): void
@@ -2208,11 +2193,11 @@ class ConfigurationTest extends ConfigurationTestCase
             'files' => [self::DEFAULT_FILE],
         ]);
 
-        $this->assertSame($comment, $this->config->getStubBannerContents());
-        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'banner', $this->config->getStubBannerPath());
+        self::assertSame($comment, $this->config->getStubBannerContents());
+        self::assertSame($this->tmp.DIRECTORY_SEPARATOR.'banner', $this->config->getStubBannerPath());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_recommendation_is_given_if_the_default_stub_banner_path_is_configured(): void
@@ -2220,7 +2205,7 @@ class ConfigurationTest extends ConfigurationTestCase
         $version = self::$version;
 
         $defaultBanner = <<<BANNER
-            Generated by Humbug Box $version.
+            Generated by Humbug Box {$version}.
 
             @link https://github.com/humbug/box
             BANNER;
@@ -2229,14 +2214,14 @@ class ConfigurationTest extends ConfigurationTestCase
             'banner-file' => null,
         ]);
 
-        $this->assertSame($defaultBanner, $this->config->getStubBannerContents());
-        $this->assertNull($this->config->getStubBannerPath());
+        self::assertSame($defaultBanner, $this->config->getStubBannerContents());
+        self::assertNull($this->config->getStubBannerPath());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "banner-file" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
 
         dump_file('custom-banner', $defaultBanner);
 
@@ -2244,21 +2229,21 @@ class ConfigurationTest extends ConfigurationTestCase
             'banner-file' => 'custom-banner',
         ]);
 
-        $this->assertSame($defaultBanner, $this->config->getStubBannerContents());
-        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'custom-banner', $this->config->getStubBannerPath());
+        self::assertSame($defaultBanner, $this->config->getStubBannerContents());
+        self::assertSame($this->tmp.DIRECTORY_SEPARATOR.'custom-banner', $this->config->getStubBannerPath());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "banner-file" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
 
         $version = self::$version;
 
         dump_file(
             'custom-banner',
             <<<BANNER
-                  Generated by Humbug Box $version.
+                  Generated by Humbug Box {$version}.
 
                   @link https://github.com/humbug/box
                 BANNER,
@@ -2268,14 +2253,14 @@ class ConfigurationTest extends ConfigurationTestCase
             'banner-file' => 'custom-banner',
         ]);
 
-        $this->assertSame($defaultBanner, $this->config->getStubBannerContents());
-        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'custom-banner', $this->config->getStubBannerPath());
+        self::assertSame($defaultBanner, $this->config->getStubBannerContents());
+        self::assertSame($this->tmp.DIRECTORY_SEPARATOR.'custom-banner', $this->config->getStubBannerPath());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "banner-file" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_warning_is_given_when_the_banner_file_is_configured_but_the_box_stub_is_not_used(): void
@@ -2289,11 +2274,11 @@ class ConfigurationTest extends ConfigurationTestCase
                 'stub' => $stub,
             ]);
 
-            $this->assertSame('', $this->config->getStubBannerContents());
-            $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'custom-banner', $this->config->getStubBannerPath());
+            self::assertSame('', $this->config->getStubBannerContents());
+            self::assertSame($this->tmp.DIRECTORY_SEPARATOR.'custom-banner', $this->config->getStubBannerPath());
 
-            $this->assertSame([], $this->config->getRecommendations());
-            $this->assertSame(
+            self::assertSame([], $this->config->getRecommendations());
+            self::assertSame(
                 ['The "banner-file" setting has been set but is ignored since the Box built-in stub is not being used'],
                 $this->config->getWarnings(),
             );
@@ -2318,11 +2303,11 @@ class ConfigurationTest extends ConfigurationTestCase
             'files' => [self::DEFAULT_FILE],
         ]);
 
-        $this->assertSame($comment, $this->config->getStubBannerContents());
-        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'banner', $this->config->getStubBannerPath());
+        self::assertSame($comment, $this->config->getStubBannerContents());
+        self::assertSame($this->tmp.DIRECTORY_SEPARATOR.'banner', $this->config->getStubBannerPath());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_content_of_the_custom_banner_file_is_normalized(): void
@@ -2350,11 +2335,11 @@ class ConfigurationTest extends ConfigurationTestCase
             'files' => [self::DEFAULT_FILE],
         ]);
 
-        $this->assertSame($expected, $this->config->getStubBannerContents());
-        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'banner', $this->config->getStubBannerPath());
+        self::assertSame($expected, $this->config->getStubBannerContents());
+        self::assertSame($this->tmp.DIRECTORY_SEPARATOR.'banner', $this->config->getStubBannerPath());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_custom_banner_file_must_exists_when_provided(): void
@@ -2365,9 +2350,9 @@ class ConfigurationTest extends ConfigurationTestCase
                 'files' => [self::DEFAULT_FILE],
             ]);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 'The file "/does/not/exist" does not exist.',
                 $exception->getMessage(),
             );
@@ -2376,37 +2361,37 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_by_default_there_is_no_stub_and_the_stub_is_generated(): void
     {
-        $this->assertNull($this->config->getStubPath());
-        $this->assertTrue($this->config->isStubGenerated());
+        self::assertNull($this->config->getStubPath());
+        self::assertTrue($this->config->isStubGenerated());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
 
         $this->setConfig([
             'stub' => null,
         ]);
 
-        $this->assertNull($this->config->getStubPath());
-        $this->assertTrue($this->config->isStubGenerated());
+        self::assertNull($this->config->getStubPath());
+        self::assertTrue($this->config->isStubGenerated());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "stub" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
 
         $this->setConfig([
             'stub' => true,
         ]);
 
-        $this->assertNull($this->config->getStubPath());
-        $this->assertTrue($this->config->isStubGenerated());
+        self::assertNull($this->config->getStubPath());
+        self::assertTrue($this->config->isStubGenerated());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "stub" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_custom_stub_can_be_provided(): void
@@ -2418,11 +2403,11 @@ class ConfigurationTest extends ConfigurationTestCase
             'files' => [self::DEFAULT_FILE],
         ]);
 
-        $this->assertSame($this->tmp.DIRECTORY_SEPARATOR.'custom-stub.php', $this->config->getStubPath());
-        $this->assertFalse($this->config->isStubGenerated());
+        self::assertSame($this->tmp.DIRECTORY_SEPARATOR.'custom-stub.php', $this->config->getStubPath());
+        self::assertFalse($this->config->isStubGenerated());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_stub_can_be_generated(): void
@@ -2431,11 +2416,11 @@ class ConfigurationTest extends ConfigurationTestCase
             'files' => [self::DEFAULT_FILE],
         ]);
 
-        $this->assertNull($this->config->getStubPath());
-        $this->assertTrue($this->config->isStubGenerated());
+        self::assertNull($this->config->getStubPath());
+        self::assertTrue($this->config->isStubGenerated());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
 
         foreach ([true, null] as $stub) {
             $this->setConfig([
@@ -2443,8 +2428,8 @@ class ConfigurationTest extends ConfigurationTestCase
                 'files' => [self::DEFAULT_FILE],
             ]);
 
-            $this->assertNull($this->config->getStubPath());
-            $this->assertTrue($this->config->isStubGenerated());
+            self::assertNull($this->config->getStubPath());
+            self::assertTrue($this->config->isStubGenerated());
         }
     }
 
@@ -2455,40 +2440,40 @@ class ConfigurationTest extends ConfigurationTestCase
             'files' => [self::DEFAULT_FILE],
         ]);
 
-        $this->assertNull($this->config->getStubPath());
-        $this->assertFalse($this->config->isStubGenerated());
+        self::assertNull($this->config->getStubPath());
+        self::assertFalse($this->config->isStubGenerated());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_funcs_are_not_intercepted_by_default(): void
     {
-        $this->assertFalse($this->config->isInterceptFileFuncs());
+        self::assertFalse($this->config->isInterceptFileFuncs());
 
         $this->setConfig([
             'intercept' => null,
         ]);
 
-        $this->assertFalse($this->config->isInterceptFileFuncs());
+        self::assertFalse($this->config->isInterceptFileFuncs());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "intercept" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
 
         $this->setConfig([
             'intercept' => false,
         ]);
 
-        $this->assertFalse($this->config->isInterceptFileFuncs());
+        self::assertFalse($this->config->isInterceptFileFuncs());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "intercept" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_intercept_funcs_can_be_enabled(): void
@@ -2497,10 +2482,10 @@ class ConfigurationTest extends ConfigurationTestCase
             'intercept' => true,
         ]);
 
-        $this->assertTrue($this->config->isInterceptFileFuncs());
+        self::assertTrue($this->config->isInterceptFileFuncs());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_warning_is_given_when_the_intercept_funcs_is_configured_but_the_box_stub_is_not_used(): void
@@ -2513,10 +2498,10 @@ class ConfigurationTest extends ConfigurationTestCase
                 'stub' => $stub,
             ]);
 
-            $this->assertTrue($this->config->isInterceptFileFuncs());
+            self::assertTrue($this->config->isInterceptFileFuncs());
 
-            $this->assertSame([], $this->config->getRecommendations());
-            $this->assertSame(
+            self::assertSame([], $this->config->getRecommendations());
+            self::assertSame(
                 ['The "intercept" setting has been set but is ignored since the Box built-in stub is not being used'],
                 $this->config->getWarnings(),
             );
@@ -2533,13 +2518,13 @@ class ConfigurationTest extends ConfigurationTestCase
                 'stub' => $stub,
             ]);
 
-            $this->assertFalse($this->config->isInterceptFileFuncs());
+            self::assertFalse($this->config->isInterceptFileFuncs());
 
-            $this->assertSame(
+            self::assertSame(
                 ['The "intercept" setting can be omitted since is set to its default value'],
                 $this->config->getRecommendations(),
             );
-            $this->assertSame([], $this->config->getWarnings());
+            self::assertSame([], $this->config->getWarnings());
         }
     }
 
@@ -2549,52 +2534,52 @@ class ConfigurationTest extends ConfigurationTestCase
             'check-requirements' => false,
         ]);
 
-        $this->assertFalse($this->config->checkRequirements());
+        self::assertFalse($this->config->checkRequirements());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
 
         dump_file('composer.lock', '{}');
 
         $this->reloadConfig();
 
-        $this->assertFalse($this->config->checkRequirements());
+        self::assertFalse($this->config->checkRequirements());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_requirement_checker_is_enabled_by_default_if_a_composer_lock_or_json_file_is_found(): void
     {
-        $this->assertFalse($this->config->checkRequirements());
+        self::assertFalse($this->config->checkRequirements());
 
         dump_file('composer.lock', '{}');
 
         $this->reloadConfig();
 
-        $this->assertTrue($this->config->checkRequirements());
+        self::assertTrue($this->config->checkRequirements());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
 
         dump_file('composer.json', '{}');
         remove('composer.lock');
 
         $this->reloadConfig();
 
-        $this->assertTrue($this->config->checkRequirements());
+        self::assertTrue($this->config->checkRequirements());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
 
         dump_file('composer.lock', '{}');
 
         $this->reloadConfig();
 
-        $this->assertTrue($this->config->checkRequirements());
+        self::assertTrue($this->config->checkRequirements());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_requirement_checker_can_be_enabled(): void
@@ -2607,13 +2592,13 @@ class ConfigurationTest extends ConfigurationTestCase
             'check-requirements' => true,
         ]);
 
-        $this->assertTrue($this->config->checkRequirements());
+        self::assertTrue($this->config->checkRequirements());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "check-requirements" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_requirement_checker_is_forcibly_disabled_if_the_composer_files_could_not_be_found(): void
@@ -2622,13 +2607,13 @@ class ConfigurationTest extends ConfigurationTestCase
             'check-requirements' => true,
         ]);
 
-        $this->assertFalse($this->config->checkRequirements());
+        self::assertFalse($this->config->checkRequirements());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "check-requirements" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame(
+        self::assertSame(
             ['The requirement checker could not be used because the composer.json and composer.lock file could not be found.'],
             $this->config->getWarnings(),
         );
@@ -2640,13 +2625,13 @@ class ConfigurationTest extends ConfigurationTestCase
             'check-requirements' => null,
         ]);
 
-        $this->assertFalse($this->config->checkRequirements());
+        self::assertFalse($this->config->checkRequirements());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "check-requirements" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame(
+        self::assertSame(
             ['The requirement checker could not be used because the composer.json and composer.lock file could not be found.'],
             $this->config->getWarnings(),
         );
@@ -2655,13 +2640,13 @@ class ConfigurationTest extends ConfigurationTestCase
             'check-requirements' => true,
         ]);
 
-        $this->assertFalse($this->config->checkRequirements());
+        self::assertFalse($this->config->checkRequirements());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "check-requirements" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame(
+        self::assertSame(
             ['The requirement checker could not be used because the composer.json and composer.lock file could not be found.'],
             $this->config->getWarnings(),
         );
@@ -2674,25 +2659,25 @@ class ConfigurationTest extends ConfigurationTestCase
             'check-requirements' => null,
         ]);
 
-        $this->assertTrue($this->config->checkRequirements());
+        self::assertTrue($this->config->checkRequirements());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "check-requirements" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
 
         $this->setConfig([
             'check-requirements' => true,
         ]);
 
-        $this->assertTrue($this->config->checkRequirements());
+        self::assertTrue($this->config->checkRequirements());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "check-requirements" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_warning_is_given_if_the_check_requirement_is_configured_but_the_phar_stub_used(): void
@@ -2706,13 +2691,13 @@ class ConfigurationTest extends ConfigurationTestCase
             'stub' => false,
         ]);
 
-        $this->assertTrue($this->config->checkRequirements());
+        self::assertTrue($this->config->checkRequirements());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "check-requirements" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame(
+        self::assertSame(
             ['The "check-requirements" setting has been set but has been ignored since the PHAR built-in stub is being used.'],
             $this->config->getWarnings(),
         );
@@ -2722,74 +2707,74 @@ class ConfigurationTest extends ConfigurationTestCase
     {
         // Those checks are somewhat redundant. They are however done here to make sure the exclude dev files
         // checks stay in sync with the dump-autoload
-        $this->assertFalse($this->config->dumpAutoload());
-        $this->assertFalse($this->getNoFileConfig()->dumpAutoload());
+        self::assertFalse($this->config->dumpAutoload());
+        self::assertFalse($this->getNoFileConfig()->dumpAutoload());
 
-        $this->assertFalse($this->config->excludeDevFiles());
-        $this->assertFalse($this->getNoFileConfig()->excludeDevFiles());
+        self::assertFalse($this->config->excludeDevFiles());
+        self::assertFalse($this->getNoFileConfig()->excludeDevFiles());
 
         $this->setConfig(['exclude-dev-files' => null]);
 
-        $this->assertFalse($this->config->excludeDevFiles());
+        self::assertFalse($this->config->excludeDevFiles());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "exclude-dev-files" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
 
         dump_file('composer.json', '{}');
 
         $this->setConfig([]);
 
-        $this->assertTrue($this->config->dumpAutoload());
-        $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
+        self::assertTrue($this->config->dumpAutoload());
+        self::assertTrue($this->getNoFileConfig()->dumpAutoload());
 
-        $this->assertTrue($this->config->excludeDevFiles());
-        $this->assertTrue($this->getNoFileConfig()->excludeDevFiles());
+        self::assertTrue($this->config->excludeDevFiles());
+        self::assertTrue($this->getNoFileConfig()->excludeDevFiles());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
 
         $this->setConfig(['exclude-dev-files' => null]);
 
-        $this->assertTrue($this->config->dumpAutoload());
-        $this->assertTrue($this->config->excludeDevFiles());
+        self::assertTrue($this->config->dumpAutoload());
+        self::assertTrue($this->config->excludeDevFiles());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "exclude-dev-files" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
 
         $this->setConfig([
             'dump-autoload' => false,
         ]);
 
-        $this->assertFalse($this->config->dumpAutoload());
-        $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
+        self::assertFalse($this->config->dumpAutoload());
+        self::assertTrue($this->getNoFileConfig()->dumpAutoload());
 
-        $this->assertFalse($this->config->excludeDevFiles());
-        $this->assertTrue($this->getNoFileConfig()->excludeDevFiles());
+        self::assertFalse($this->config->excludeDevFiles());
+        self::assertTrue($this->getNoFileConfig()->excludeDevFiles());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
 
         $this->setConfig([
             'dump-autoload' => true,
         ]);
 
-        $this->assertTrue($this->config->dumpAutoload());
-        $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
+        self::assertTrue($this->config->dumpAutoload());
+        self::assertTrue($this->getNoFileConfig()->dumpAutoload());
 
-        $this->assertTrue($this->config->excludeDevFiles());
-        $this->assertTrue($this->getNoFileConfig()->excludeDevFiles());
+        self::assertTrue($this->config->excludeDevFiles());
+        self::assertTrue($this->getNoFileConfig()->excludeDevFiles());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "dump-autoload" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_recommendation_is_given_if_exclude_dev_files_is_enabled_when_the_autoload_is_dumped(): void
@@ -2801,20 +2786,20 @@ class ConfigurationTest extends ConfigurationTestCase
             'exclude-dev-files' => true,
         ]);
 
-        $this->assertTrue($this->config->dumpAutoload());
-        $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
+        self::assertTrue($this->config->dumpAutoload());
+        self::assertTrue($this->getNoFileConfig()->dumpAutoload());
 
-        $this->assertTrue($this->config->excludeDevFiles());
-        $this->assertTrue($this->getNoFileConfig()->excludeDevFiles());
+        self::assertTrue($this->config->excludeDevFiles());
+        self::assertTrue($this->getNoFileConfig()->excludeDevFiles());
 
-        $this->assertSame(
+        self::assertSame(
             [
                 'The "dump-autoload" setting can be omitted since is set to its default value',
                 'The "exclude-dev-files" setting can be omitted since is set to its default value',
             ],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_recommendation_is_given_if_exclude_dev_files_is_disabled_when_the_autoload_is_not_dumped(): void
@@ -2826,17 +2811,17 @@ class ConfigurationTest extends ConfigurationTestCase
             'exclude-dev-files' => false,
         ]);
 
-        $this->assertFalse($this->config->dumpAutoload());
-        $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
+        self::assertFalse($this->config->dumpAutoload());
+        self::assertTrue($this->getNoFileConfig()->dumpAutoload());
 
-        $this->assertFalse($this->config->excludeDevFiles());
-        $this->assertTrue($this->getNoFileConfig()->excludeDevFiles());
+        self::assertFalse($this->config->excludeDevFiles());
+        self::assertTrue($this->getNoFileConfig()->excludeDevFiles());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "exclude-dev-files" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_the_dev_files_can_be_not_excluded_when_the_autoloader_is_dumped(): void
@@ -2848,17 +2833,17 @@ class ConfigurationTest extends ConfigurationTestCase
             'exclude-dev-files' => false,
         ]);
 
-        $this->assertTrue($this->config->dumpAutoload());
-        $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
+        self::assertTrue($this->config->dumpAutoload());
+        self::assertTrue($this->getNoFileConfig()->dumpAutoload());
 
-        $this->assertFalse($this->config->excludeDevFiles());
-        $this->assertTrue($this->getNoFileConfig()->excludeDevFiles());
+        self::assertFalse($this->config->excludeDevFiles());
+        self::assertTrue($this->getNoFileConfig()->excludeDevFiles());
 
-        $this->assertSame(
+        self::assertSame(
             ['The "dump-autoload" setting can be omitted since is set to its default value'],
             $this->config->getRecommendations(),
         );
-        $this->assertSame([], $this->config->getWarnings());
+        self::assertSame([], $this->config->getWarnings());
     }
 
     public function test_a_warning_is_given_if_dev_files_are_explicitly_excluded_but_the_autoloader_not_dumped(): void
@@ -2870,14 +2855,14 @@ class ConfigurationTest extends ConfigurationTestCase
             'exclude-dev-files' => true,
         ]);
 
-        $this->assertFalse($this->config->dumpAutoload());
-        $this->assertTrue($this->getNoFileConfig()->dumpAutoload());
+        self::assertFalse($this->config->dumpAutoload());
+        self::assertTrue($this->getNoFileConfig()->dumpAutoload());
 
-        $this->assertFalse($this->config->excludeDevFiles());
-        $this->assertTrue($this->getNoFileConfig()->excludeDevFiles());
+        self::assertFalse($this->config->excludeDevFiles());
+        self::assertTrue($this->getNoFileConfig()->excludeDevFiles());
 
-        $this->assertSame([], $this->config->getRecommendations());
-        $this->assertSame(
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame(
             ['The "exclude-dev-files" setting has been set but has been ignored because the Composer autoloader is not dumped'],
             $this->config->getWarnings(),
         );
@@ -2892,53 +2877,52 @@ class ConfigurationTest extends ConfigurationTestCase
             ),
         );
 
-        $this->assertFalse($this->config->checkRequirements());
-        $this->assertFalse($this->config->dumpAutoload());
-        $this->assertTrue($this->config->excludeComposerFiles());
-        $this->assertMatchesRegularExpression('/^box-auto-generated-alias-[\da-zA-Z]{12}\.phar$/', $this->config->getAlias());
-        $this->assertSame($this->tmp, $this->config->getBasePath());
-        $this->assertSame([], $this->config->getBinaryFiles());
-        $this->assertSame([], $this->config->getCompactors()->toArray());
-        $this->assertFalse($this->config->hasAutodiscoveredFiles());
-        $this->assertNull($this->config->getComposerJson());
-        $this->assertNull($this->config->getComposerLock());
-        $this->assertNull($this->config->getCompressionAlgorithm());
-        $this->assertNull($this->config->getDecodedComposerJsonContents());
-        $this->assertNull($this->config->getDecodedComposerLockContents());
-        $this->assertSame($this->tmp.'/box.json', $this->config->getConfigurationFile());
-        $this->assertEquals(
+        self::assertFalse($this->config->checkRequirements());
+        self::assertFalse($this->config->dumpAutoload());
+        self::assertTrue($this->config->excludeComposerFiles());
+        self::assertMatchesRegularExpression('/^box-auto-generated-alias-[\da-zA-Z]{12}\.phar$/', $this->config->getAlias());
+        self::assertSame($this->tmp, $this->config->getBasePath());
+        self::assertSame([], $this->config->getBinaryFiles());
+        self::assertSame([], $this->config->getCompactors()->toArray());
+        self::assertFalse($this->config->hasAutodiscoveredFiles());
+        self::assertNull($this->config->getComposerJson());
+        self::assertNull($this->config->getComposerLock());
+        self::assertNull($this->config->getCompressionAlgorithm());
+        self::assertNull($this->config->getDecodedComposerJsonContents());
+        self::assertNull($this->config->getDecodedComposerLockContents());
+        self::assertSame($this->tmp.'/box.json', $this->config->getConfigurationFile());
+        self::assertEquals(
             new MapFile($this->tmp, []),
             $this->config->getFileMapper(),
         );
-        $this->assertSame(493, $this->config->getFileMode());
-        $this->assertSame([], $this->config->getFiles());
-        $this->assertSame('', $this->config->getMainScriptContents());
-        $this->assertSame($this->tmp.'/index.php', $this->config->getMainScriptPath());
-        $this->assertNull($this->config->getMetadata());
-        $this->assertSame($this->tmp.'/index.phar', $this->config->getOutputPath());
-        $this->assertNull($this->config->getPrivateKeyPassphrase());
-        $this->assertNull($this->config->getPrivateKeyPath());
-        $this->assertSame([], $this->config->getReplacements());
-        $this->assertSame('#!/usr/bin/env php', $this->config->getShebang());
-        $this->assertSame(Phar::SHA1, $this->config->getSigningAlgorithm());
+        self::assertSame(493, $this->config->getFileMode());
+        self::assertSame([], $this->config->getFiles());
+        self::assertSame('', $this->config->getMainScriptContents());
+        self::assertSame($this->tmp.'/index.php', $this->config->getMainScriptPath());
+        self::assertNull($this->config->getMetadata());
+        self::assertSame($this->tmp.'/index.phar', $this->config->getOutputPath());
+        self::assertNull($this->config->getPrivateKeyPassphrase());
+        self::assertNull($this->config->getPrivateKeyPath());
+        self::assertSame([], $this->config->getReplacements());
+        self::assertSame('#!/usr/bin/env php', $this->config->getShebang());
+        self::assertSame(Phar::SHA1, $this->config->getSigningAlgorithm());
 
         $version = self::$version;
 
-        $this->assertSame(
+        self::assertSame(
             <<<BANNER
-                Generated by Humbug Box $version.
+                Generated by Humbug Box {$version}.
 
                 @link https://github.com/humbug/box
-                BANNER
-            ,
+                BANNER,
             $this->config->getStubBannerContents(),
         );
-        $this->assertNull($this->config->getStubPath());
-        $this->assertSame($this->tmp.'/index.phar', $this->config->getTmpOutputPath());
-        $this->assertTrue($this->config->hasMainScript());
-        $this->assertFalse($this->config->isInterceptFileFuncs());
-        $this->assertFalse($this->config->promptForPrivateKey());
-        $this->assertTrue($this->config->isStubGenerated());
+        self::assertNull($this->config->getStubPath());
+        self::assertSame($this->tmp.'/index.phar', $this->config->getTmpOutputPath());
+        self::assertTrue($this->config->hasMainScript());
+        self::assertFalse($this->config->isInterceptFileFuncs());
+        self::assertFalse($this->config->promptForPrivateKey());
+        self::assertTrue($this->config->isStubGenerated());
     }
 
     public function test_it_can_be_exported(): void
@@ -2974,7 +2958,7 @@ class ConfigurationTest extends ConfigurationTestCase
             'compression' => 'GZ',
         ]);
 
-        $expectedDumpedConfig = <<<EOF
+        $expectedDumpedConfig = <<<'EOF'
             KevinGH\Box\Configuration\Configuration {#100
               -compressionAlgorithm: "GZ"
               -mainScriptPath: "index.php"
@@ -3054,7 +3038,7 @@ class ConfigurationTest extends ConfigurationTestCase
             $actualDumpedConfig,
         );
 
-        $this->assertSame($expectedDumpedConfig, $actualDumpedConfig);
+        self::assertSame($expectedDumpedConfig, $actualDumpedConfig);
     }
 
     public static function invalidCompressionAlgorithmsProvider(): iterable
@@ -3151,8 +3135,7 @@ class ConfigurationTest extends ConfigurationTestCase
                  multiline
 
                  banner.
-                COMMENT
-            ,
+                COMMENT,
             <<<'COMMENT'
                 This is a
 
@@ -3247,7 +3230,7 @@ class ConfigurationTest extends ConfigurationTestCase
         yield [
             static function (): void {
                 touch('composer.json');
-                chmod('composer.json', 0000);
+                chmod('composer.json', 0);
             },
             null,
             null,
@@ -3258,7 +3241,7 @@ class ConfigurationTest extends ConfigurationTestCase
         yield [
             static function (): void {
                 touch('composer.lock');
-                chmod('composer.lock', 0000);
+                chmod('composer.lock', 0);
             },
             null,
             null,

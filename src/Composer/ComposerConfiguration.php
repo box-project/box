@@ -18,9 +18,9 @@ use function array_column;
 use function array_filter;
 use function array_key_exists;
 use function array_map;
-use const DIRECTORY_SEPARATOR;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function realpath;
+use const DIRECTORY_SEPARATOR;
 
 /**
  * @private

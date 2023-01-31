@@ -18,7 +18,8 @@ ORIGINAL_TERMINAL = ../vendor-bin/requirement-checker/vendor/symfony/console/Ter
 PHP_CS_FIXER_BIN = ../vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
 PHP_CS_FIXER = $(PHP_CS_FIXER_BIN)
 
-PHAR_SRC_FILES := $(shell find src bin/check-requirements.php box.json.dist scoper.inc.php)
+PHAR_PREFIX = dist/prefix
+PHAR_SRC_FILES := $(shell find src bin/check-requirements.php box.json.dist scoper.inc.php) $(wildcard $(PHAR_PREFIX))
 PHAR = dist/check-requirements.phar
 PHAR_EXTRACT = ../res/requirement-checker
 
@@ -211,8 +212,18 @@ dist:
 	touch dist/.gitkeep
 	touch -c $@
 
-$(PHAR): $(PHAR_SRC_FILES) $(BOX_BIN)
+.PHONY: dump_prefix
+dump_prefix:
+	rm $(PHAR_PREFIX) || true
+	$(MAKE) $(PHAR_PREFIX)
+
+$(PHAR_PREFIX): bin/dump-prefix.php
+	php bin/dump-prefix.php
+
+$(PHAR): $(PHAR_SRC_FILES) $(BOX_BIN) $(PHAR_PREFIX)
+	composer config autoloader-suffix $(shell cat $(PHAR_PREFIX))
 	$(BOX) compile --no-parallel
+	composer config autoloader-suffix --unset
 	touch -c $@
 
 $(PHAR_EXTRACT): $(PHAR) $(BOX_BIN)

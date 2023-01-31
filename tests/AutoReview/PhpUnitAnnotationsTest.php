@@ -14,18 +14,20 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\AutoReview;
 
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
 use function array_filter;
 use function chdir;
 use function explode;
-use const PHP_EOL;
-use PHPUnit\Framework\TestCase;
 use function shell_exec;
-use Symfony\Component\Process\Process;
+use const PHP_EOL;
 
 /**
  * @runInSeparateProcess
  *
  * @coversNothing
+ *
+ * @internal
  */
 class PhpUnitAnnotationsTest extends TestCase
 {
@@ -41,6 +43,6 @@ class PhpUnitAnnotationsTest extends TestCase
 
         $files = array_filter(explode(PHP_EOL, (string) $output));
 
-        $this->assertSame([], $files);
+        self::assertSame([], $files);
     }
 }

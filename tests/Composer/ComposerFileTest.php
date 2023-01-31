@@ -20,6 +20,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \KevinGH\Box\Composer\ComposerFile
+ *
+ * @internal
  */
 class ComposerFileTest extends TestCase
 {
@@ -31,10 +33,10 @@ class ComposerFileTest extends TestCase
         /** @var ComposerFile $actual */
         $actual = $create();
 
-        $this->assertInstanceOf(ComposerFile::class, $actual);
+        self::assertInstanceOf(ComposerFile::class, $actual);
 
-        $this->assertSame($expectedPath, $actual->getPath());
-        $this->assertSame($expectedContents, $actual->getDecodedContents());
+        self::assertSame($expectedPath, $actual->getPath());
+        self::assertSame($expectedContents, $actual->getDecodedContents());
     }
 
     /**
@@ -45,9 +47,9 @@ class ComposerFileTest extends TestCase
         try {
             $create();
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (LogicException $exception) {
-            $this->assertSame($errorMessage, $exception->getMessage());
+            self::assertSame($errorMessage, $exception->getMessage());
         }
     }
 

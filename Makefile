@@ -78,6 +78,7 @@ clean: 	 		 ## Cleans all created artifacts
 clean:
 	rm -rf \
 		dist \
+		Dockerfile \
 		fixtures/build/*/.box_dump \
 		fixtures/build/*/vendor \
 		fixtures/build/dir010/index.phar \
@@ -93,6 +94,7 @@ clean:
 		.php-cs-fixer.cache \
 		.phpunit.result.cache \
 		box \
+		box.phar \
 		fixtures/default_stub.php \
 		fixtures/check-requirements \
 		fixtures/build/*/index.phar \
@@ -248,7 +250,7 @@ _infection_ci: $(INFECTION_BIN) $(COVERAGE_XML_DIR) $(COVERAGE_JUNIT) vendor
 #---------------------------------------------------------------------------
 
 .PHONY: test_e2e
-test_e2e: e2e_scoper_alias e2e_scoper_expose_symbols e2e_php_settings_checker e2e_symfony e2e_composer_installed_versions e2e_phpstorm_stubs
+test_e2e: e2e_scoper_alias e2e_scoper_expose_symbols e2e_php_settings_checker e2e_symfony e2e_composer_installed_versions e2e_phpstorm_stubs e2e_dockerfile e2e_dockerfile_no_extension
 
 
 .PHONY: blackfire
@@ -380,6 +382,9 @@ generate_default_stub: $(DEFAULT_STUB)
 $(DEFAULT_STUB): bin/generate_default_stub
 	php -dphar.readonly=0 bin/generate_default_stub
 	touch -c $@
+
+.PHONY: _dump_requirement_checker
+_dump_requirement_checker: $(REQUIREMENT_CHECKER_EXTRACT)
 
 $(REQUIREMENT_CHECKER_EXTRACT):
 	cd requirement-checker; $(MAKE) --file=Makefile _dump

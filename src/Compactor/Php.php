@@ -14,23 +14,21 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
+use KevinGH\Box\Annotation\DocblockAnnotationParser;
+use PhpToken;
+use RuntimeException;
+use Webmozart\Assert\Assert;
 use function array_pop;
 use function array_slice;
 use function array_splice;
 use function count;
 use function is_int;
-use KevinGH\Box\Annotation\DocblockAnnotationParser;
 use function ltrim;
-use PhpToken;
 use function preg_replace;
-use RuntimeException;
 use function str_repeat;
-use function substr;
-use function substr_count;
 use const T_COMMENT;
 use const T_DOC_COMMENT;
 use const T_WHITESPACE;
-use Webmozart\Assert\Assert;
 
 /**
  * A PHP source code compactor copied from Composer.
@@ -49,7 +47,7 @@ use Webmozart\Assert\Assert;
 final class Php extends FileExtensionCompactor
 {
     public function __construct(
-        private DocblockAnnotationParser $annotationParser,
+        private ?DocblockAnnotationParser $annotationParser,
         array $extensions = ['php'],
     ) {
         parent::__construct($extensions);
@@ -82,7 +80,7 @@ final class Php extends FileExtensionCompactor
                         $output .= '#[';
                     } else {
                         // Turns out this was not an attribute. Treat it as a plain comment.
-                        $output .= str_repeat("\n", substr_count($tokenText, "\n"));
+                        $output .= str_repeat("\n", mb_substr_count($tokenText, "\n"));
                     }
                 } elseif (str_contains($tokenText, '@')) {
                     try {
@@ -91,7 +89,7 @@ final class Php extends FileExtensionCompactor
                         $output .= $tokenText;
                     }
                 } else {
-                    $output .= str_repeat("\n", substr_count($tokenText, "\n"));
+                    $output .= str_repeat("\n", mb_substr_count($tokenText, "\n"));
                 }
             } elseif ($token->is(T_WHITESPACE)) {
                 $whitespace = $tokenText;
@@ -138,7 +136,11 @@ final class Php extends FileExtensionCompactor
 
     private function compactAnnotations(string $docblock): string
     {
-        $breaksNbr = substr_count($docblock, "\n");
+        if (null === $this->annotationParser) {
+            return $docblock;
+        }
+
+        $breaksNbr = mb_substr_count($docblock, "\n");
 
         $annotations = $this->annotationParser->parse($docblock);
 
@@ -206,7 +208,7 @@ final class Php extends FileExtensionCompactor
 
         /** @var PhpToken $token */
         $token = $tokens[$opener];
-        $attributeBody = substr($token->text, 2);
+        $attributeBody = mb_substr($token->text, 2);
         $subTokens = PhpToken::tokenize('<?php '.$attributeBody);
 
         // Replace the PHP open tag with the attribute opener as a simple token.

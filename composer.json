@@ -48,7 +48,8 @@
         "mikey179/vfsstream": "^1.6.11",
         "phpspec/prophecy-phpunit": "^2.0.1",
         "phpunit/phpunit": "^9.5.26",
-        "symfony/phpunit-bridge": "^4.2 || ^5.4.14 || ^6.1.6"
+        "symfony/phpunit-bridge": "^4.2 || ^5.4.14 || ^6.1.6",
+        "symfony/yaml": "^6.2"
     },
     "replace": {
         "paragonie/sodium_compat": "*",
@@ -70,7 +71,8 @@
             "src/functions.php"
         ],
         "exclude-from-classmap": [
-            "/Test/"
+            "/Test/",
+            "vendor/humbug/php-scoper/vendor-hotfix"
         ]
     },
     "autoload-dev": {

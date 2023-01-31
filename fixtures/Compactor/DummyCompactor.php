@@ -16,9 +16,6 @@ namespace KevinGH\Box\Compactor;
 
 class DummyCompactor implements Compactor
 {
-    /**
-     * {@inheritdoc}
-     */
     public function compact(string $file, string $contents): string
     {
         return $contents;

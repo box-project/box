@@ -16,8 +16,8 @@ namespace KevinGH\Box\Console\Logger;
 
 use Fidry\Console\Input\IO;
 use InvalidArgumentException;
-use function sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
+use function sprintf;
 
 /**
  * @internal
@@ -42,16 +42,16 @@ final class CompilerLogger
     public function log(string $prefix, string $message, int $verbosity = OutputInterface::OUTPUT_NORMAL): void
     {
         $prefix = match ($prefix) {
-            '!' => "<error>$prefix</error>",
-            self::STAR_PREFIX => "<info>$prefix</info>",
-            self::QUESTION_MARK_PREFIX => "<comment>$prefix</comment>",
-            self::PLUS_PREFIX, self::MINUS_PREFIX => "  <comment>$prefix</comment>",
-            self::CHEVRON_PREFIX => "    <comment>$prefix</comment>",
+            '!' => "<error>{$prefix}</error>",
+            self::STAR_PREFIX => "<info>{$prefix}</info>",
+            self::QUESTION_MARK_PREFIX => "<comment>{$prefix}</comment>",
+            self::PLUS_PREFIX, self::MINUS_PREFIX => "  <comment>{$prefix}</comment>",
+            self::CHEVRON_PREFIX => "    <comment>{$prefix}</comment>",
             default => throw new InvalidArgumentException('Expected one of the logger constant as a prefix.'),
         };
 
         $this->io->writeln(
-            "$prefix $message",
+            "{$prefix} {$message}",
             $verbosity,
         );
     }

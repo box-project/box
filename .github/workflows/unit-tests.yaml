@@ -10,7 +10,7 @@ on:
 jobs:
     unit-tests:
         runs-on: ubuntu-latest
-        name: Unit-Tests (PHP ${{ matrix.php.version }}, ${{ matrix.php.dependency }}, ${{ matrix.tools }}) - PHAR ${{ matrix.phar-readonly && 'readonly' || 'writeable' }}"
+        name: Unit-Tests (PHP ${{ matrix.php.version }}, ${{ matrix.php.dependency }}, ${{ matrix.tools }}) - PHAR ${{ matrix.phar-readonly && 'readonly' || 'writeable' }}${{ matrix.label }}
         strategy:
             fail-fast: false
             matrix:
@@ -43,6 +43,17 @@ jobs:
                         tools: composer
                         phar-readonly: true
                 phar-readonly: [ false ]
+                php-extra-extensions: [ '' ]
+                label: [ '' ]
+                include:
+                    -   label: '; bz2 disabled'
+                        php:
+                            version: '8.1'
+                            dependency: locked
+                            composer-options: ''
+                        tools: composer
+                        phar-readonly: false
+                        php-extra-extensions: ', :bz2'
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3
@@ -56,7 +67,7 @@ jobs:
                     ini-values: ${{ matrix.phar-readonly && 'phar.readonly=1' || 'phar.readonly=0' }}, display_errors=On, error_reporting=-1
                     tools: ${{ matrix.tools }}
                     coverage: none
-                    extensions: ctype, iconv, xml
+                    extensions: ctype, iconv, xml${{ matrix.php-extra-extensions }}
 
             -   name: Install Composer dependencies
                 uses: ramsey/composer-install@v2

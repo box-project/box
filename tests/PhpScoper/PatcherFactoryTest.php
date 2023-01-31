@@ -22,6 +22,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \KevinGH\Box\PhpScoper\PatcherFactory
+ *
+ * @internal
  */
 final class PatcherFactoryTest extends TestCase
 {

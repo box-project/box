@@ -14,12 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
-use function array_map;
-use function count;
 use Fidry\Console\Input\IO;
 use KevinGH\Box\NotInstantiable;
-use function sprintf;
 use Webmozart\Assert\Assert;
+use function array_map;
+use function count;
+use function sprintf;
 
 /**
  * Utility to writing on the console output the configuration recommendations and warnings.
@@ -39,7 +39,7 @@ final class MessageRenderer
         Assert::allString($recommendations);
         Assert::allString($warnings);
 
-        $renderMessage = static fn (string $message): string => "    - $message";
+        $renderMessage = static fn (string $message): string => "    - {$message}";
 
         if ([] === $recommendations) {
             $io->writeln('No recommendation found.');

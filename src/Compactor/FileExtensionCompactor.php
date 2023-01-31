@@ -14,10 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
+use Webmozart\Assert\Assert;
 use function in_array;
 use function pathinfo;
 use const PATHINFO_EXTENSION;
-use Webmozart\Assert\Assert;
 
 /**
  * An abstract compactor class that handles matching supported file by their types.

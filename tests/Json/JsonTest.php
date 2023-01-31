@@ -14,22 +14,24 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Json;
 
-use function is_object;
-use function json_decode;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\touch;
 use KevinGH\Box\Test\FileSystemTestCase;
-use function mb_convert_encoding;
 use PHPUnit\Framework\AssertionFailedError;
 use Seld\JsonLint\ParsingException;
 use stdClass;
 use Throwable;
 use Webmozart\Assert\Assert;
+use function is_object;
+use function json_decode;
+use function KevinGH\Box\FileSystem\dump_file;
+use function KevinGH\Box\FileSystem\touch;
+use function mb_convert_encoding;
 
 /**
  * @covers \KevinGH\Box\Json\Json
  *
  * @requires extension mbstring
+ *
+ * @internal
  */
 class JsonTest extends FileSystemTestCase
 {
@@ -51,20 +53,20 @@ class JsonTest extends FileSystemTestCase
             $this->json->lint($json);
 
             if (null !== $expectedThrowable) {
-                $this->fail('Expected throwable to be thrown.');
+                self::fail('Expected throwable to be thrown.');
             }
         } catch (Throwable $throwable) {
             if (null === $expectedThrowable) {
-                $this->fail('Did not except throwable to be thrown.');
+                self::fail('Did not except throwable to be thrown.');
             }
 
-            $this->assertSame($expectedThrowable::class, $throwable::class);
-            $this->assertSame($expectedThrowable->getMessage(), $throwable->getMessage());
+            self::assertSame($expectedThrowable::class, $throwable::class);
+            self::assertSame($expectedThrowable->getMessage(), $throwable->getMessage());
 
             return;
         }
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     /**
@@ -82,25 +84,25 @@ class JsonTest extends FileSystemTestCase
             $actual = $this->json->decode($json, $assoc);
 
             if (null !== $expectedThrowable) {
-                $this->fail('Expected throwable to be thrown.');
+                self::fail('Expected throwable to be thrown.');
             }
         } catch (AssertionFailedError $error) {
             throw $error;
         } catch (Throwable $throwable) {
             if (null === $expectedThrowable) {
-                $this->fail('Did not except throwable to be thrown: '.$throwable->getMessage());
+                self::fail('Did not except throwable to be thrown: '.$throwable->getMessage());
             }
 
-            $this->assertSame($expectedThrowable::class, $throwable::class);
-            $this->assertSame($expectedThrowable->getMessage(), $throwable->getMessage());
+            self::assertSame($expectedThrowable::class, $throwable::class);
+            self::assertSame($expectedThrowable->getMessage(), $throwable->getMessage());
 
             return;
         }
 
         if (is_object($expected)) {
-            $this->assertEquals($expected, $actual);
+            self::assertEquals($expected, $actual);
         } else {
-            $this->assertSame($expected, $actual);
+            self::assertSame($expected, $actual);
         }
     }
 
@@ -110,20 +112,20 @@ class JsonTest extends FileSystemTestCase
 
         $decoded = $this->json->decodeFile('data.json');
 
-        $this->assertEquals(new stdClass(), $decoded);
+        self::assertEquals(new stdClass(), $decoded);
 
         $decoded = $this->json->decodeFile('data.json', true);
 
-        $this->assertSame([], $decoded);
+        self::assertSame([], $decoded);
 
         dump_file('data.json', '');
 
         try {
             $this->json->decodeFile('data.json', true);
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (ParsingException $exception) {
-            $this->assertStringStartsWith(
+            self::assertStringStartsWith(
                 'Parse error on line 1:',
                 $exception->getMessage(),
             );
@@ -148,8 +150,7 @@ class JsonTest extends FileSystemTestCase
                     }
                 }
 
-                JSON
-            ,
+                JSON,
             false,
         );
 
@@ -179,27 +180,26 @@ class JsonTest extends FileSystemTestCase
                 $schema,
             );
 
-            $this->fail('Expected exception to be thrown.');
+            self::fail('Expected exception to be thrown.');
         } catch (JsonValidationException $exception) {
-            $this->assertSame(
+            self::assertSame(
                 <<<'EOF'
                     "data.json" does not match the expected JSON schema:
                       - foo : Boolean value found, but a string is required
                       - bar : Boolean value found, but a string is required
-                    EOF
-                ,
+                    EOF,
                 $exception->getMessage(),
             );
-            $this->assertSame(
+            self::assertSame(
                 [
                     'foo : Boolean value found, but a string is required',
                     'bar : Boolean value found, but a string is required',
                 ],
                 $exception->getErrors(),
             );
-            $this->assertSame('data.json', $exception->getValidatedFile());
-            $this->assertSame(0, $exception->getCode());
-            $this->assertNull($exception->getPrevious());
+            self::assertSame('data.json', $exception->getValidatedFile());
+            self::assertSame(0, $exception->getCode());
+            self::assertNull($exception->getPrevious());
         }
     }
 
@@ -234,8 +234,7 @@ class JsonTest extends FileSystemTestCase
                         "far": {}
                     }
                 }
-                JSON
-            ,
+                JSON,
             true,
             [
                 'foo' => [
@@ -256,8 +255,7 @@ class JsonTest extends FileSystemTestCase
                         "far": {}
                     }
                 }
-                JSON
-            ,
+                JSON,
             false,
             (static function () {
                 $data = new stdClass();

@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\AutoReview;
 
+use PHPUnit\Framework\TestCase;
+use Webmozart\Assert\Assert;
 use function array_diff;
 use function array_filter;
 use function array_keys;
@@ -21,16 +23,16 @@ use function array_merge;
 use function array_unique;
 use function array_values;
 use function json_decode;
-use const JSON_THROW_ON_ERROR;
 use function KevinGH\Box\FileSystem\file_contents;
-use PHPUnit\Framework\TestCase;
 use function preg_match;
 use function preg_match_all;
 use function sort;
-use Webmozart\Assert\Assert;
+use const JSON_THROW_ON_ERROR;
 
 /**
  * @coversNothing
+ *
+ * @internal
  */
 class DocumentationSchemaTest extends TestCase
 {
@@ -44,7 +46,7 @@ class DocumentationSchemaTest extends TestCase
         $expectedKeys = array_unique($schemaKeys);
         sort($expectedKeys);
 
-        $this->assertSame($expectedKeys, $schemaKeys);
+        self::assertSame($expectedKeys, $schemaKeys);
     }
 
     public function test_the_documentation_schema_is_up_to_date(): void
@@ -58,14 +60,14 @@ class DocumentationSchemaTest extends TestCase
             ),
         );
 
-        $this->assertSame($schemaKeys, ['$schema', ...$docKeys]);
+        self::assertSame($schemaKeys, ['$schema', ...$docKeys]);
     }
 
     public function test_all_the_doc_keys_are_valid(): void
     {
         $docKeys = $this->retrieveDocKeys();
 
-        $this->assertSame(
+        self::assertSame(
             array_unique($docKeys),
             $docKeys,
             'Did not expect to find duplicated keys in the documentation',
@@ -73,7 +75,7 @@ class DocumentationSchemaTest extends TestCase
 
         $schemaKeys = $this->retrieveSchemaKeys();
 
-        $this->assertSame(
+        self::assertSame(
             [],
             array_diff($docKeys, $schemaKeys),
             'Did not expect to find a key in the documentation which is not found in the schema',
@@ -93,7 +95,7 @@ class DocumentationSchemaTest extends TestCase
             ),
         );
 
-        $this->assertEquals($schemaKeys, ['$schema', ...$docKeys]);
+        self::assertEquals($schemaKeys, ['$schema', ...$docKeys]);
     }
 
     /**

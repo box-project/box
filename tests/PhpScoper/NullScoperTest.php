@@ -21,6 +21,8 @@ use function unserialize;
 
 /**
  * @covers \KevinGH\Box\PhpScoper\NullScoper
+ *
+ * @internal
  */
 class NullScoperTest extends TestCase
 {
@@ -43,13 +45,13 @@ class NullScoperTest extends TestCase
 
         $actual = $this->scoper->scope($file, $contents);
 
-        $this->assertSame($contents, $actual);
+        self::assertSame($contents, $actual);
     }
 
     public function test_it_contains_no_prefixes_and_an_empty_symbols_registry(): void
     {
-        $this->assertSame('', $this->scoper->getPrefix());
-        $this->assertEquals(new SymbolsRegistry(), $this->scoper->getSymbolsRegistry());
+        self::assertSame('', $this->scoper->getPrefix());
+        self::assertEquals(new SymbolsRegistry(), $this->scoper->getSymbolsRegistry());
     }
 
     public function test_it_exposes_the_given_symbols_registry(): void
@@ -58,7 +60,7 @@ class NullScoperTest extends TestCase
 
         $scoper = new NullScoper($symbolsRegistry);
 
-        $this->assertSame($symbolsRegistry, $scoper->getSymbolsRegistry());
+        self::assertSame($symbolsRegistry, $scoper->getSymbolsRegistry());
     }
 
     public function test_it_exposes_the_configured_symbols_registry(): void
@@ -67,14 +69,14 @@ class NullScoperTest extends TestCase
 
         $this->scoper->changeSymbolsRegistry($symbolsRegistry);
 
-        $this->assertSame($symbolsRegistry, $this->scoper->getSymbolsRegistry());
+        self::assertSame($symbolsRegistry, $this->scoper->getSymbolsRegistry());
     }
 
     public function test_it_is_serializable(): void
     {
         $scoper = new NullScoper();
 
-        $this->assertEquals(
+        self::assertEquals(
             $scoper,
             unserialize(serialize($scoper)),
         );
