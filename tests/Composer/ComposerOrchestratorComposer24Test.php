@@ -32,10 +32,33 @@ use function preg_replace;
  *
  * @internal
  */
-class ComposerOrchestratorTest extends FileSystemTestCase
+class ComposerOrchestratorComposer24Test extends FileSystemTestCase
 {
     private const FIXTURES = __DIR__.'/../../fixtures/composer-dump';
     private const COMPOSER_AUTOLOADER_NAME = 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05';
+
+    private string $composerVersion;
+    private bool $skip;
+
+    protected function setUp(): void
+    {
+        if (!isset($this->skip)) {
+            $this->composerVersion = ComposerOrchestrator::getVersion();
+
+            $this->skip = version_compare($this->composerVersion, '2.4.0', '<');
+        }
+
+        if ($this->skip) {
+            self::markTestSkipped(
+                sprintf(
+                    'Can only be executed with Composer >=2.4.0. Got "%s".',
+                    $this->composerVersion,
+                ),
+            );
+        }
+
+        parent::setUp();
+    }
 
     /**
      * @dataProvider composerAutoloadProvider
