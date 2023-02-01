@@ -49,7 +49,7 @@ class ComposerOrchestratorComposer24Test extends FileSystemTestCase
         }
 
         if ($this->skip) {
-            $this->markTestSkipped(
+            self::markTestSkipped(
                 sprintf(
                     'Can only be executed with Composer >=2.4.0. Got "%s".',
                     $this->composerVersion,
