@@ -168,8 +168,8 @@ class AppRequirementsFactoryTest extends TestCase
                 [
                     'type' => 'php',
                     'condition' => '^7.1',
-                    'message' => 'The application requires the version "^7.1" or greater.',
-                    'helpMessage' => 'The application requires the version "^7.1" or greater.',
+                    'message' => 'The application requires a version matching "^7.1".',
+                    'helpMessage' => 'The application requires a version matching "^7.1".',
                 ],
                 [
                     'type' => 'extension',
@@ -196,8 +196,8 @@ class AppRequirementsFactoryTest extends TestCase
                 [
                     'type' => 'php',
                     'condition' => '^7.1',
-                    'message' => 'The application requires the version "^7.1" or greater.',
-                    'helpMessage' => 'The application requires the version "^7.1" or greater.',
+                    'message' => 'The application requires a version matching "^7.1".',
+                    'helpMessage' => 'The application requires a version matching "^7.1".',
                 ],
                 [
                     'type' => 'extension',
@@ -233,8 +233,8 @@ class AppRequirementsFactoryTest extends TestCase
                 [
                     'type' => 'php',
                     'condition' => '^7.1',
-                    'message' => 'The application requires the version "^7.1" or greater.',
-                    'helpMessage' => 'The application requires the version "^7.1" or greater.',
+                    'message' => 'The application requires a version matching "^7.1".',
+                    'helpMessage' => 'The application requires a version matching "^7.1".',
                 ],
                 [
                     'type' => 'extension',
@@ -261,8 +261,8 @@ class AppRequirementsFactoryTest extends TestCase
                 [
                     'type' => 'php',
                     'condition' => '^7.1',
-                    'message' => 'The application requires the version "^7.1" or greater.',
-                    'helpMessage' => 'The application requires the version "^7.1" or greater.',
+                    'message' => 'The application requires a version matching "^7.1".',
+                    'helpMessage' => 'The application requires a version matching "^7.1".',
                 ],
                 [
                     'type' => 'extension',
@@ -295,8 +295,8 @@ class AppRequirementsFactoryTest extends TestCase
                 [
                     'type' => 'php',
                     'condition' => '^7.1',
-                    'message' => 'The application requires the version "^7.1" or greater.',
-                    'helpMessage' => 'The application requires the version "^7.1" or greater.',
+                    'message' => 'The application requires a version matching "^7.1".',
+                    'helpMessage' => 'The application requires a version matching "^7.1".',
                 ],
                 [
                     'type' => 'extension',
@@ -337,8 +337,8 @@ class AppRequirementsFactoryTest extends TestCase
                 [
                     'type' => 'php',
                     'condition' => '^7.1',
-                    'message' => 'The application requires the version "^7.1" or greater.',
-                    'helpMessage' => 'The application requires the version "^7.1" or greater.',
+                    'message' => 'The application requires a version matching "^7.1".',
+                    'helpMessage' => 'The application requires a version matching "^7.1".',
                 ],
                 [
                     'type' => 'extension',
@@ -501,8 +501,8 @@ class AppRequirementsFactoryTest extends TestCase
                 [
                     'type' => 'php',
                     'condition' => '>=5.3',
-                    'message' => 'The application requires the version ">=5.3" or greater.',
-                    'helpMessage' => 'The application requires the version ">=5.3" or greater.',
+                    'message' => 'The application requires a version matching ">=5.3".',
+                    'helpMessage' => 'The application requires a version matching ">=5.3".',
                 ],
                 [
                     'type' => 'extension',
@@ -574,14 +574,14 @@ class AppRequirementsFactoryTest extends TestCase
                 [
                     'type' => 'php',
                     'condition' => '>=5.3',
-                    'message' => 'The package "beberlei/assert" requires the version ">=5.3" or greater.',
-                    'helpMessage' => 'The package "beberlei/assert" requires the version ">=5.3" or greater.',
+                    'message' => 'The package "beberlei/assert" requires a version matching ">=5.3".',
+                    'helpMessage' => 'The package "beberlei/assert" requires a version matching ">=5.3".',
                 ],
                 [
                     'type' => 'php',
                     'condition' => '^5.3.2 || ^7.0',
-                    'message' => 'The package "composer/ca-bundle" requires the version "^5.3.2 || ^7.0" or greater.',
-                    'helpMessage' => 'The package "composer/ca-bundle" requires the version "^5.3.2 || ^7.0" or greater.',
+                    'message' => 'The package "composer/ca-bundle" requires a version matching "^5.3.2 || ^7.0".',
+                    'helpMessage' => 'The package "composer/ca-bundle" requires a version matching "^5.3.2 || ^7.0".',
                 ],
                 [
                     'type' => 'extension',
@@ -664,14 +664,14 @@ class AppRequirementsFactoryTest extends TestCase
                 [
                     'type' => 'php',
                     'condition' => '>=5.3',
-                    'message' => 'The package "beberlei/assert" requires the version ">=5.3" or greater.',
-                    'helpMessage' => 'The package "beberlei/assert" requires the version ">=5.3" or greater.',
+                    'message' => 'The package "beberlei/assert" requires a version matching ">=5.3".',
+                    'helpMessage' => 'The package "beberlei/assert" requires a version matching ">=5.3".',
                 ],
                 [
                     'type' => 'php',
                     'condition' => '^5.3.2 || ^7.0',
-                    'message' => 'The package "composer/ca-bundle" requires the version "^5.3.2 || ^7.0" or greater.',
-                    'helpMessage' => 'The package "composer/ca-bundle" requires the version "^5.3.2 || ^7.0" or greater.',
+                    'message' => 'The package "composer/ca-bundle" requires a version matching "^5.3.2 || ^7.0".',
+                    'helpMessage' => 'The package "composer/ca-bundle" requires a version matching "^5.3.2 || ^7.0".',
                 ],
                 [
                     'type' => 'extension',
@@ -833,8 +833,8 @@ class AppRequirementsFactoryTest extends TestCase
                 [
                     'type' => 'php',
                     'condition' => '^7.3',
-                    'message' => 'The application requires the version "^7.3" or greater.',
-                    'helpMessage' => 'The application requires the version "^7.3" or greater.',
+                    'message' => 'The application requires a version matching "^7.3".',
+                    'helpMessage' => 'The application requires a version matching "^7.3".',
                 ],
                 [
                     'type' => 'extension',
@@ -895,8 +895,8 @@ class AppRequirementsFactoryTest extends TestCase
                 [
                     'type' => 'php',
                     'condition' => '^7.3',
-                    'message' => 'The application requires the version "^7.3" or greater.',
-                    'helpMessage' => 'The application requires the version "^7.3" or greater.',
+                    'message' => 'The application requires a version matching "^7.3".',
+                    'helpMessage' => 'The application requires a version matching "^7.3".',
                 ],
                 [
                     'type' => 'extension',
@@ -965,8 +965,8 @@ class AppRequirementsFactoryTest extends TestCase
                 [
                     'type' => 'php',
                     'condition' => '^7.3',
-                    'message' => 'The application requires the version "^7.3" or greater.',
-                    'helpMessage' => 'The application requires the version "^7.3" or greater.',
+                    'message' => 'The application requires a version matching "^7.3".',
+                    'helpMessage' => 'The application requires a version matching "^7.3".',
                 ],
                 [
                     'type' => 'extension',

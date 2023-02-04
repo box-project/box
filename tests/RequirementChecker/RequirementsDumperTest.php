@@ -129,8 +129,8 @@ class RequirementsDumperTest extends TestCase
                   array (
                     'type' => 'php',
                     'condition' => '^7.4',
-                    'message' => 'The package "acme/foo" requires the version "^7.4" or greater.',
-                    'helpMessage' => 'The package "acme/foo" requires the version "^7.4" or greater.',
+                    'message' => 'The package "acme/foo" requires a version matching "^7.4".',
+                    'helpMessage' => 'The package "acme/foo" requires a version matching "^7.4".',
                   ),
                   1 =>
                   array (
