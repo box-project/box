@@ -258,21 +258,21 @@ final class AppRequirementsFactory
             'condition' => $requiredPhpVersion,
             'message' => null === $packageName
                 ? sprintf(
-                    'The application requires the version "%s" or greater.',
+                    'The application requires a version matching "%s".',
                     $requiredPhpVersion,
                 )
                 : sprintf(
-                    'The package "%s" requires the version "%s" or greater.',
+                    'The package "%s" requires a version matching "%s".',
                     $packageName,
                     $requiredPhpVersion,
                 ),
             'helpMessage' => null === $packageName
                 ? sprintf(
-                    'The application requires the version "%s" or greater.',
+                    'The application requires a version matching "%s".',
                     $requiredPhpVersion,
                 )
                 : sprintf(
-                    'The package "%s" requires the version "%s" or greater.',
+                    'The package "%s" requires a version matching "%s".',
                     $packageName,
                     $requiredPhpVersion,
                 ),
