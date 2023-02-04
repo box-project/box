@@ -7,7 +7,7 @@ Box Requirements Checker
   WARNING: No configuration file (php.ini) used by PHP!
 
 > Checking Box requirements:
-  ✔ The application requires the version ">=5.3" or greater.
+  ✔ The application requires a version matching ">=5.3".'
   ✔ The application requires the extension "phar".
   
                                                                                 
