@@ -19,6 +19,7 @@ use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
 use KevinGH\Box\Console\PharInfoRenderer;
+use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\PharInfo\PharDiff;
 use KevinGH\Box\PharInfo\PharInfo;
 use PharFileInfo;
@@ -27,15 +28,12 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Filesystem\Path;
 use Throwable;
 use Webmozart\Assert\Assert;
-use function array_filter;
-use function array_flip;
 use function array_map;
 use function count;
 // TODO: migrate to Safe API
 use function is_string;
 use function KevinGH\Box\check_php_settings;
 use function KevinGH\Box\format_size;
-use function KevinGH\Box\get_phar_compression_algorithms;
 use function sprintf;
 
 /**
@@ -52,15 +50,6 @@ final class Diff implements Command
     private const CHECK_OPTION = 'check';
 
     private const DEFAULT_CHECKSUM_ALGO = 'sha384';
-
-    private static array $FILE_ALGORITHMS;
-
-    public function __construct()
-    {
-        if (!isset(self::$FILE_ALGORITHMS)) {
-            self::$FILE_ALGORITHMS = array_flip(array_filter(get_phar_compression_algorithms()));
-        }
-    }
 
     public function getConfiguration(): Configuration
     {
@@ -253,9 +242,11 @@ final class Diff implements Command
 
             $compression = '<fg=red>[NONE]</fg=red>';
 
-            foreach (self::$FILE_ALGORITHMS as $code => $name) {
-                if ($file->isCompressed($code)) {
-                    $compression = "<fg=cyan>[{$name}]</fg=cyan>";
+            foreach (CompressionAlgorithm::cases() as $compressionAlgorithm) {
+                if (CompressionAlgorithm::NONE !== $compressionAlgorithm
+                    && $file->isCompressed($compressionAlgorithm->value)
+                ) {
+                    $compression = "<fg=cyan>[{$compressionAlgorithm->name}]</fg=cyan>";
                     break;
                 }
             }

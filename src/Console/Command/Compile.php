@@ -31,6 +31,7 @@ use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\Logger\CompilerLogger;
 use KevinGH\Box\Console\MessageRenderer;
 use KevinGH\Box\MapFile;
+use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\RequirementChecker\RequirementsDumper;
 use KevinGH\Box\StubGenerator;
 use RuntimeException;
@@ -41,7 +42,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Webmozart\Assert\Assert;
 use function array_map;
-use function array_search;
 use function array_shift;
 use function count;
 use function decoct;
@@ -61,7 +61,6 @@ use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\format_time;
-use function KevinGH\Box\get_phar_compression_algorithms;
 use function memory_get_peak_usage;
 use function memory_get_usage;
 use function microtime;
@@ -625,7 +624,9 @@ final class Compile implements CommandAware
         IO $io,
         CompilerLogger $logger,
     ): void {
-        if (null === ($algorithm = $config->getCompressionAlgorithm())) {
+        $algorithm = $config->getCompressionAlgorithm();
+
+        if (CompressionAlgorithm::NONE === $algorithm) {
             $logger->log(
                 CompilerLogger::QUESTION_MARK_PREFIX,
                 'No compression',
@@ -644,7 +645,7 @@ final class Compile implements CommandAware
             CompilerLogger::QUESTION_MARK_PREFIX,
             sprintf(
                 'Compressing with the algorithm "<comment>%s</comment>"',
-                (string) array_search($algorithm, get_phar_compression_algorithms(), true),
+                $algorithm->name,
             ),
         );
 

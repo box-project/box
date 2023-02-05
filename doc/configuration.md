@@ -734,7 +734,7 @@ Note that this setting is used only if the compactor `KevinGH\Box\Compactor\PhpS
 
 ## Compression algorithm (`compression`)
 
-The compression (`string`|`null` default `NONE`) setting is the compression algorithm to use when the PHAR is built. The
+The compression (`string`|`null` default `'NONE'`) setting is the compression algorithm to use when the PHAR is built. The
 compression affects the individual files within the PHAR and not the PHAR as a whole
 ([`Phar::compressFiles()`][phar.compress]). The following is a list of the signature algorithms available:
 

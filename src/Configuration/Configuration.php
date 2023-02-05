@@ -31,6 +31,7 @@ use KevinGH\Box\Composer\ComposerFile;
 use KevinGH\Box\Composer\ComposerFiles;
 use KevinGH\Box\Json\Json;
 use KevinGH\Box\MapFile;
+use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\PhpScoper\SerializableScoper;
 use Phar;
 use phpDocumentor\Reflection\DocBlockFactory;
@@ -80,7 +81,6 @@ use function KevinGH\Box\FileSystem\longest_common_base_path;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use function KevinGH\Box\get_box_version;
-use function KevinGH\Box\get_phar_compression_algorithms;
 use function KevinGH\Box\get_phar_signing_algorithms;
 use function KevinGH\Box\unique_id;
 use function krsort;
@@ -216,7 +216,6 @@ final class Configuration
     private const REPLACEMENTS_KEY = 'replacements';
     private const SHEBANG_KEY = 'shebang';
     private const STUB_KEY = 'stub';
-    private int|string|null $compressionAlgorithm;
     private ?string $mainScriptPath;
     private ?string $mainScriptContents;
 
@@ -400,7 +399,7 @@ final class Configuration
      * @param bool                  $dumpAutoload          Whether the Composer autoloader should be dumped
      * @param bool                  $excludeComposerFiles  Whether the Composer files composer.json, composer.lock and
      *                                                     installed.json should be removed from the PHAR
-     * @param null|int              $compressionAlgorithm  Compression algorithm constant value. See the \Phar class constants
+     * @param CompressionAlgorithm  $compressionAlgorithm  Compression algorithm constant value. See the \Phar class constants
      * @param null|int              $fileMode              File mode in octal form
      * @param string                $mainScriptPath        The main script file path
      * @param string                $mainScriptContents    The processed content of the main script file
@@ -433,7 +432,7 @@ final class Configuration
         private bool $excludeComposerFiles,
         private bool $excludeDevFiles,
         private Compactors|array $compactors,
-        ?int $compressionAlgorithm,
+        private CompressionAlgorithm $compressionAlgorithm,
         private int|string|null $fileMode,
         ?string $mainScriptPath,
         ?string $mainScriptContents,
@@ -456,22 +455,12 @@ final class Configuration
         private array $warnings,
         private array $recommendations,
     ) {
-        Assert::nullOrInArray(
-            $compressionAlgorithm,
-            get_phar_compression_algorithms(),
-            sprintf(
-                'Invalid compression algorithm %%s, use one of "%s" instead.',
-                implode('", "', array_keys(get_phar_compression_algorithms())),
-            ),
-        );
-
         if (null === $mainScriptPath) {
             Assert::null($mainScriptContents);
         } else {
             Assert::notNull($mainScriptContents);
         }
 
-        $this->compressionAlgorithm = $compressionAlgorithm;
         $this->mainScriptPath = $mainScriptPath;
         $this->mainScriptContents = $mainScriptContents;
     }
@@ -557,7 +546,7 @@ final class Configuration
         return $this->compactors;
     }
 
-    public function getCompressionAlgorithm(): ?int
+    public function getCompressionAlgorithm(): CompressionAlgorithm
     {
         return $this->compressionAlgorithm;
     }
@@ -1707,33 +1696,26 @@ final class Configuration
         }
     }
 
-    private static function retrieveCompressionAlgorithm(stdClass $raw, ConfigurationLogger $logger): ?int
+    private static function retrieveCompressionAlgorithm(stdClass $raw, ConfigurationLogger $logger): CompressionAlgorithm
     {
         self::checkIfDefaultValue($logger, $raw, self::COMPRESSION_KEY, 'NONE');
 
         if (false === isset($raw->{self::COMPRESSION_KEY})) {
-            return null;
+            return CompressionAlgorithm::NONE;
         }
 
-        $knownAlgorithmNames = array_keys(get_phar_compression_algorithms());
+        $knownAlgorithms = CompressionAlgorithm::getLabels();
 
-        Assert::inArray(
+        Assert::nullOrInArray(
             $raw->{self::COMPRESSION_KEY},
-            $knownAlgorithmNames,
+            $knownAlgorithms,
             sprintf(
-                'Invalid compression algorithm %%s, use one of "%s" instead.',
-                implode('", "', $knownAlgorithmNames),
+                'Unknown compression algorithm %%s. Expected one of "%s".',
+                implode('", "', $knownAlgorithms),
             ),
         );
 
-        $value = get_phar_compression_algorithms()[$raw->{self::COMPRESSION_KEY}];
-
-        // Phar::NONE is not valid for compressFiles()
-        if (Phar::NONE === $value) {
-            return null;
-        }
-
-        return $value;
+        return CompressionAlgorithm::fromLabel($raw->{self::COMPRESSION_KEY});
     }
 
     private static function retrieveFileMode(stdClass $raw, ConfigurationLogger $logger): ?int

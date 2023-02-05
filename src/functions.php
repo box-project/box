@@ -74,7 +74,7 @@ function get_box_version(): string
 }
 
 /**
- * TODO: switch to an enum for compression algorithms.
+ * TODO: to remove once up update PHP-Scoper.
  *
  * @private
  *

@@ -22,6 +22,7 @@ use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\MapFile;
+use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\VarDumperNormalizer;
 use Phar;
 use RuntimeException;
@@ -734,14 +735,14 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_no_compression_algorithm_is_configured_by_default(): void
     {
-        self::assertNull($this->config->getCompressionAlgorithm());
-        self::assertNull($this->getNoFileConfig()->getCompressionAlgorithm());
+        self::assertSame(CompressionAlgorithm::NONE, $this->config->getCompressionAlgorithm());
+        self::assertSame(CompressionAlgorithm::NONE, $this->getNoFileConfig()->getCompressionAlgorithm());
 
         $this->setConfig([
             'compression' => null,
         ]);
 
-        self::assertNull($this->config->getCompressionAlgorithm());
+        self::assertSame(CompressionAlgorithm::NONE, $this->config->getCompressionAlgorithm());
 
         self::assertSame(
             ['The "compression" setting can be omitted since is set to its default value'],
@@ -753,7 +754,7 @@ class ConfigurationTest extends ConfigurationTestCase
             'compression' => 'NONE',
         ]);
 
-        self::assertNull($this->config->getCompressionAlgorithm());
+        self::assertSame(CompressionAlgorithm::NONE, $this->config->getCompressionAlgorithm());
 
         self::assertSame(
             ['The "compression" setting can be omitted since is set to its default value'],
@@ -769,7 +770,7 @@ class ConfigurationTest extends ConfigurationTestCase
             'compression' => 'BZ2',
         ]);
 
-        self::assertSame(Phar::BZ2, $this->config->getCompressionAlgorithm());
+        self::assertSame(CompressionAlgorithm::BZ2, $this->config->getCompressionAlgorithm());
 
         self::assertSame([], $this->config->getRecommendations());
         self::assertSame([], $this->config->getWarnings());
@@ -2887,7 +2888,7 @@ class ConfigurationTest extends ConfigurationTestCase
         self::assertFalse($this->config->hasAutodiscoveredFiles());
         self::assertNull($this->config->getComposerJson());
         self::assertNull($this->config->getComposerLock());
-        self::assertNull($this->config->getCompressionAlgorithm());
+        self::assertSame(CompressionAlgorithm::NONE, $this->config->getCompressionAlgorithm());
         self::assertNull($this->config->getDecodedComposerJsonContents());
         self::assertNull($this->config->getDecodedComposerLockContents());
         self::assertSame($this->tmp.'/box.json', $this->config->getConfigurationFile());
@@ -3045,12 +3046,12 @@ class ConfigurationTest extends ConfigurationTestCase
     {
         yield 'Invalid string key' => [
             'INVALID',
-            'Invalid compression algorithm "INVALID", use one of "GZ", "BZ2", "NONE" instead.',
+            'Unknown compression algorithm "INVALID". Expected one of "GZ", "BZ2", "NONE".',
         ];
 
         yield 'Invalid constant value' => [
             10,
-            'Invalid compression algorithm "10", use one of "GZ", "BZ2", "NONE" instead.',
+            'Unknown compression algorithm "10". Expected one of "GZ", "BZ2", "NONE".',
         ];
 
         yield 'Invalid type 1' => [

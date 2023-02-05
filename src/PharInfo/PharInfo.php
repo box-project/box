@@ -14,13 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PharInfo;
 
+use KevinGH\Box\Phar\CompressionAlgorithm;
 use Phar;
 use PharData;
 use PharFileInfo;
 use RecursiveIteratorIterator;
 use UnexpectedValueException;
-use function array_flip;
-use function KevinGH\Box\get_phar_compression_algorithms;
 use function KevinGH\Box\unique_id;
 
 final class PharInfo
@@ -35,8 +34,11 @@ final class PharInfo
     public function __construct(string $pharFile)
     {
         if (!isset(self::$ALGORITHMS)) {
-            self::$ALGORITHMS = array_flip(get_phar_compression_algorithms());
-            self::$ALGORITHMS[Phar::NONE] = 'None';
+            self::$ALGORITHMS = [];
+
+            foreach (CompressionAlgorithm::cases() as $compressionAlgorithm) {
+                self::$ALGORITHMS[$compressionAlgorithm->value] = $compressionAlgorithm->name;
+            }
         }
 
         try {
@@ -57,6 +59,8 @@ final class PharInfo
     {
         if (null === $this->compressionCount || $this->hash !== $this->getPharHash()) {
             $this->compressionCount = $this->calculateCompressionCount();
+            $this->compressionCount['None'] = $this->compressionCount[CompressionAlgorithm::NONE->name];
+            unset($this->compressionCount[CompressionAlgorithm::NONE->name]);
             $this->hash = $this->getPharHash();
         }
 
@@ -110,7 +114,7 @@ final class PharInfo
 
         $countFile = static function (array $count, PharFileInfo $file): array {
             if (false === $file->isCompressed()) {
-                ++$count['None'];
+                ++$count[CompressionAlgorithm::NONE->name];
 
                 return $count;
             }

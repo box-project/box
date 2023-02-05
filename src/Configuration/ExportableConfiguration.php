@@ -18,7 +18,6 @@ use Closure;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Composer\ComposerFile;
 use KevinGH\Box\MapFile;
-use Phar;
 use SplFileInfo;
 use Symfony\Component\Finder\SplFileInfo as SymfonySplFileInfo;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
@@ -27,7 +26,6 @@ use function array_flip;
 use function array_map;
 use function iter\values;
 use function KevinGH\Box\FileSystem\make_path_relative;
-use function KevinGH\Box\get_phar_compression_algorithms;
 use function KevinGH\Box\get_phar_signing_algorithms;
 use function sort;
 use const SORT_STRING;
@@ -72,7 +70,7 @@ final class ExportableConfiguration
             $configuration->excludeComposerFiles(),
             $configuration->excludeDevFiles(),
             array_map('get_class', $configuration->getCompactors()->toArray()),
-            array_flip(get_phar_compression_algorithms())[$configuration->getCompressionAlgorithm() ?? Phar::NONE],
+            $configuration->getCompressionAlgorithm()->name,
             '0'.decoct($configuration->getFileMode()),
             $normalizePath($configuration->getMainScriptPath()),
             $configuration->getMainScriptContents(),
