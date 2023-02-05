@@ -40,11 +40,8 @@ use Seld\JsonLint\ParsingException;
 use SplFileInfo;
 use stdClass;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo as SymfonySplFileInfo;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
-use Symfony\Component\VarDumper\Cloner\VarCloner;
-use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Throwable;
 use Webmozart\Assert\Assert;
 use function array_diff;
@@ -84,7 +81,6 @@ use function KevinGH\Box\FileSystem\longest_common_base_path;
 use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use function KevinGH\Box\get_box_version;
-use function KevinGH\Box\get_phar_compression_algorithms;
 use function KevinGH\Box\get_phar_signing_algorithms;
 use function KevinGH\Box\unique_id;
 use function krsort;
@@ -92,13 +88,11 @@ use function preg_match;
 use function preg_replace;
 use function property_exists;
 use function realpath;
-use function sort;
 use function sprintf;
 use function str_starts_with;
 use function trigger_error;
 use function trim;
 use const E_USER_DEPRECATED;
-use const SORT_STRING;
 
 /**
  * @private
@@ -405,7 +399,7 @@ final class Configuration
      * @param bool                  $dumpAutoload          Whether the Composer autoloader should be dumped
      * @param bool                  $excludeComposerFiles  Whether the Composer files composer.json, composer.lock and
      *                                                     installed.json should be removed from the PHAR
-     * @param CompressionAlgorithm              $compressionAlgorithm  Compression algorithm constant value. See the \Phar class constants
+     * @param CompressionAlgorithm  $compressionAlgorithm  Compression algorithm constant value. See the \Phar class constants
      * @param null|int              $fileMode              File mode in octal form
      * @param string                $mainScriptPath        The main script file path
      * @param string                $mainScriptContents    The processed content of the main script file
@@ -473,74 +467,7 @@ final class Configuration
 
     public function export(): string
     {
-        // TODO: set an array instead of this instance. Indeed, we change the type of
-        //  some properties to better readability which prevents the ability to narrow
-        //  types...
-        $exportedConfig = clone $this;
-
-        $basePath = $exportedConfig->basePath;
-
-        $normalizePath = static function (null|SplFileInfo|string $path) use ($basePath): ?string {
-            if (null === $path) {
-                return null;
-            }
-
-            if ($path instanceof SplFileInfo) {
-                $path = $path->getPathname();
-            }
-
-            return make_path_relative($path, $basePath);
-        };
-
-        $normalizeProperty = static function (&$property) use ($normalizePath): void {
-            $property = $normalizePath($property);
-        };
-
-        $normalizeFiles = static function (&$files) use ($normalizePath): void {
-            $files = array_map($normalizePath, $files);
-            sort($files, SORT_STRING);
-        };
-
-        $normalizeFiles($exportedConfig->files);
-        $normalizeFiles($exportedConfig->binaryFiles);
-
-        $exportedConfig->composerJson = new ComposerFile(
-            $normalizePath($exportedConfig->composerJson->getPath()),
-            $exportedConfig->composerJson->getDecodedContents(),
-        );
-        $exportedConfig->composerLock = new ComposerFile(
-            $normalizePath($exportedConfig->composerLock->getPath()),
-            $exportedConfig->composerLock->getDecodedContents(),
-        );
-
-        $normalizeProperty($exportedConfig->file);
-        $normalizeProperty($exportedConfig->mainScriptPath);
-        $normalizeProperty($exportedConfig->tmpOutputPath);
-        $normalizeProperty($exportedConfig->outputPath);
-        $normalizeProperty($exportedConfig->privateKeyPath);
-        $normalizeProperty($exportedConfig->stubBannerPath);
-        $normalizeProperty($exportedConfig->stubPath);
-
-        $exportedConfig->compressionAlgorithm = $exportedConfig->compressionAlgorithm->getLabel();
-        $exportedConfig->signingAlgorithm = array_flip(get_phar_signing_algorithms())[$exportedConfig->signingAlgorithm];
-        $exportedConfig->compactors = array_map('get_class', $exportedConfig->compactors->toArray());
-        $exportedConfig->fileMode = '0'.decoct($exportedConfig->fileMode);
-
-        $cloner = new VarCloner();
-        $cloner->setMaxItems(-1);
-        $cloner->setMaxString(-1);
-
-        $splInfoCaster = static fn (SplFileInfo $fileInfo): array => [$normalizePath($fileInfo)];
-
-        $cloner->addCasters([
-            SplFileInfo::class => $splInfoCaster,
-            SymfonySplFileInfo::class => $splInfoCaster,
-        ]);
-
-        return (new CliDumper())->dump(
-            $cloner->cloneVar($exportedConfig),
-            true,
-        );
+        return ExportableConfiguration::create($this)->export();
     }
 
     public function getConfigurationFile(): ?string

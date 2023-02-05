@@ -25,19 +25,6 @@ use PHPUnit\Framework\TestCase;
  */
 class FunctionsTest extends TestCase
 {
-    public function test_it_can_provide_the_phars_algorithms(): void
-    {
-        $expected = [
-            'GZ' => Phar::GZ,
-            'BZ2' => Phar::BZ2,
-            'NONE' => Phar::NONE,
-        ];
-
-        $actual = get_phar_compression_algorithms();
-
-        self::assertSame($expected, $actual);
-    }
-
     /**
      * @dataProvider pharCompressionAlgorithmProvider
      */

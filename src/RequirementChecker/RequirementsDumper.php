@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
+use KevinGH\Box\Phar\CompressionAlgorithm;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
@@ -37,7 +38,7 @@ final class RequirementsDumper
     /**
      * @return string[][]
      */
-    public static function dump(array $decodedComposerJsonContents, array $decodedComposerLockContents, ?int $compressionAlgorithm): array
+    public static function dump(array $decodedComposerJsonContents, array $decodedComposerLockContents, CompressionAlgorithm $compressionAlgorithm): array
     {
         Assert::directory(self::REQUIREMENT_CHECKER_PATH, 'Expected the requirement checker to have been dumped');
 
@@ -63,7 +64,7 @@ final class RequirementsDumper
     private static function dumpRequirementsConfig(
         array $composerJsonDecodedContents,
         array $composerLockDecodedContents,
-        ?int $compressionAlgorithm,
+        CompressionAlgorithm $compressionAlgorithm,
     ): array {
         $config = AppRequirementsFactory::create($composerJsonDecodedContents, $composerLockDecodedContents, $compressionAlgorithm);
 

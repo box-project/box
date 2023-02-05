@@ -2,9 +2,18 @@
 
 declare(strict_types=1);
 
-namespace KevinGH\RequirementChecker\Phar;
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
-use KevinGH\Box\Phar\CompressionAlgorithm;
+namespace KevinGH\Box\Phar;
+
 use PHPUnit\Framework\TestCase;
 use ReflectionEnum;
 use ReflectionEnumBackedCase;
@@ -12,6 +21,8 @@ use function array_map;
 
 /**
  * @covers \KevinGH\Box\Phar\CompressionAlgorithm
+ *
+ * @internal
  */
 final class CompressionAlgorithmTest extends TestCase
 {
@@ -21,14 +32,13 @@ final class CompressionAlgorithmTest extends TestCase
     public function test_it_can_tell_be_created_from_its_label(
         ?string $label,
         CompressionAlgorithm $expected
-    ): void
-    {
+    ): void {
         $actual = CompressionAlgorithm::fromLabel($label);
 
         self::assertSame($expected, $actual);
 
         if (null !== $label) {
-            self::assertSame($label, $actual->getLabel());
+            self::assertSame($label, $actual->name);
         }
     }
 
@@ -68,8 +78,7 @@ final class CompressionAlgorithmTest extends TestCase
      */
     public function test_it_can_tell_what_php_extension_is_required_for_a_given_compression_algorithm(
         CompressionAlgorithm $compressionAlgorithm
-    ): void
-    {
+    ): void {
         $compressionAlgorithm->getRequiredExtension();
 
         // We just want to make sure all the cases are listed here.

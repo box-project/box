@@ -1208,16 +1208,7 @@ class CompileTest extends FileSystemTestCase
             // Time: 2018-05-24T20:59:15+00:00
             //
 
-            KevinGH\Box\Configuration\Configuration {#140
-              -compressionAlgorithm: "NONE"
-              -mainScriptPath: "index.php"
-              -mainScriptContents: """
-                <?php\n
-                \n
-                declare(strict_types=1);\n
-                \n
-                echo 'Yo';\n
-                """
+            KevinGH\Box\Configuration\ExportableConfiguration {#140
               -file: "box.json"
               -alias: "index.phar"
               -basePath: "/path/to"
@@ -1236,7 +1227,16 @@ class CompileTest extends FileSystemTestCase
               -excludeComposerFiles: true
               -excludeDevFiles: false
               -compactors: []
+              -compressionAlgorithm: "NONE"
               -fileMode: "0755"
+              -mainScriptPath: "index.php"
+              -mainScriptContents: """
+                <?php\n
+                \n
+                declare(strict_types=1);\n
+                \n
+                echo 'Yo';\n
+                """
               -fileMapper: KevinGH\Box\MapFile {#140
                 -basePath: "/path/to"
                 -map: []

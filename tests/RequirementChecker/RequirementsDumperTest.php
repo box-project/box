@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\RequirementChecker;
 
 use KevinGH\Box\Console\DisplayNormalizer;
-use Phar;
+use KevinGH\Box\Phar\CompressionAlgorithm;
 use PHPUnit\Framework\TestCase;
 use function array_column;
 use function sort;
@@ -33,7 +33,7 @@ class RequirementsDumperTest extends TestCase
     public function test_it_dumps_the_requirement_checker_files(
         array $decodedComposerJsonContents,
         array $decodedComposerLockContents,
-        ?int $compressionAlgorithm,
+        CompressionAlgorithm $compressionAlgorithm,
         string $expectedRequirement,
     ): void {
         $checkFiles = RequirementsDumper::dump($decodedComposerJsonContents, $decodedComposerLockContents, $compressionAlgorithm);
@@ -98,7 +98,7 @@ class RequirementsDumperTest extends TestCase
         yield [
             [],
             [],
-            null,
+            CompressionAlgorithm::NONE,
             <<<'PHP'
                 <?php
 
@@ -120,7 +120,7 @@ class RequirementsDumperTest extends TestCase
                     ],
                 ],
             ],
-            Phar::GZ,
+            CompressionAlgorithm::GZ,
             <<<'PHP'
                 <?php
 

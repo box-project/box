@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
-use Phar;
+use KevinGH\Box\Phar\CompressionAlgorithm;
 use function array_diff_key;
 use function array_key_exists;
 use function preg_match;
@@ -35,7 +35,7 @@ final class AppRequirementsFactory
      *
      * @return array Serialized configured requirements
      */
-    public static function create(array $composerJsonDecodedContents, array $composerLockDecodedContents, ?int $compressionAlgorithm): array
+    public static function create(array $composerJsonDecodedContents, array $composerLockDecodedContents, CompressionAlgorithm $compressionAlgorithm): array
     {
         return self::configureExtensionRequirements(
             self::retrievePhpVersionRequirements([], $composerJsonDecodedContents, $composerLockDecodedContents),
@@ -95,7 +95,7 @@ final class AppRequirementsFactory
         array $requirements,
         array $composerJsonContents,
         array $composerLockContents,
-        ?int $compressionAlgorithm,
+        CompressionAlgorithm $compressionAlgorithm,
     ): array {
         $extensionRequirements = self::collectExtensionRequirements($composerJsonContents, $composerLockContents, $compressionAlgorithm);
 
@@ -144,17 +144,15 @@ final class AppRequirementsFactory
     private static function collectExtensionRequirements(
         array $composerJsonContents,
         array $composerLockContents,
-        ?int $compressionAlgorithm,
+        CompressionAlgorithm $compressionAlgorithm,
     ): array {
         $requirements = [];
         $polyfills = [];
 
-        if (Phar::BZ2 === $compressionAlgorithm) {
-            $requirements['bz2'] = [self::SELF_PACKAGE];
-        }
+        $compressionAlgorithmRequiredExtension = $compressionAlgorithm->getRequiredExtension();
 
-        if (Phar::GZ === $compressionAlgorithm) {
-            $requirements['zlib'] = [self::SELF_PACKAGE];
+        if (null !== $compressionAlgorithmRequiredExtension) {
+            $requirements[$compressionAlgorithmRequiredExtension] = [self::SELF_PACKAGE];
         }
 
         $platform = $composerLockContents['platform'] ?? [];

@@ -21,6 +21,7 @@ use InvalidArgumentException;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\FakeCompactor;
+use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Test\FileSystemTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use org\bovigo\vfs\vfsStream;
@@ -1318,7 +1319,7 @@ class BoxTest extends FileSystemTestCase
     {
         try {
             $this->box->startBuffering();
-            $this->box->compress(Phar::NONE);
+            $this->box->compress(CompressionAlgorithm::NONE);
 
             self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -1329,37 +1330,6 @@ class BoxTest extends FileSystemTestCase
         }
     }
 
-    /**
-     * @dataProvider compressionAlgorithmsProvider
-     *
-     * @requires extension zlib
-     * @requires extension bz2
-     */
-    public function test_it_cannot_compress_the_phar_with_an_unknown_algorithm(int $algorithm, bool $supportedAlgorithm): void
-    {
-        try {
-            $this->box->compress($algorithm);
-
-            if (false === $supportedAlgorithm) {
-                self::fail('Expected exception to be thrown.');
-            }
-        } catch (InvalidArgumentException $exception) {
-            if ($supportedAlgorithm) {
-                self::fail('Did not expect exception to be thrown.');
-            }
-
-            self::assertSame(
-                sprintf(
-                    'Expected one of: 4096, 8192, 0. Got: %s',
-                    $algorithm,
-                ),
-                $exception->getMessage(),
-            );
-        }
-
-        self::assertTrue(true);
-    }
-
     public function test_it_cannot_compress_if_the_required_extension_is_not_loaded(): void
     {
         if (extension_loaded('bz2')) {
@@ -1367,7 +1337,7 @@ class BoxTest extends FileSystemTestCase
         }
 
         try {
-            $this->box->compress(Phar::BZ2);
+            $this->box->compress(CompressionAlgorithm::BZ2);
 
             self::fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
@@ -1419,7 +1389,7 @@ class BoxTest extends FileSystemTestCase
             'Did not expect the stub to be affected by the compression.',
         );
 
-        $extensionRequired = $this->box->compress(Phar::GZ);
+        $extensionRequired = $this->box->compress(CompressionAlgorithm::GZ);
 
         self::assertSame('zlib', $extensionRequired);
 
@@ -1439,7 +1409,7 @@ class BoxTest extends FileSystemTestCase
             'Did not expect the stub to be affected by the compression.',
         );
 
-        $extensionRequired = $this->box->compress(Phar::NONE);
+        $extensionRequired = $this->box->compress(CompressionAlgorithm::NONE);
 
         self::assertNull($extensionRequired);
 
@@ -1609,17 +1579,6 @@ class BoxTest extends FileSystemTestCase
                 'The path "vfs://test/private.key" is not readable.',
                 $exception->getMessage(),
             );
-        }
-    }
-
-    public static function compressionAlgorithmsProvider(): iterable
-    {
-        foreach (get_phar_compression_algorithms() as $algorithm) {
-            yield [$algorithm, true];
-        }
-
-        foreach ([-1, 1] as $algorithm) {
-            yield [$algorithm, false];
         }
     }
 
