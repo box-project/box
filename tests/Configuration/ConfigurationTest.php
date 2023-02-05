@@ -2959,10 +2959,7 @@ class ConfigurationTest extends ConfigurationTestCase
         ]);
 
         $expectedDumpedConfig = <<<'EOF'
-            KevinGH\Box\Configuration\Configuration {#100
-              -compressionAlgorithm: "GZ"
-              -mainScriptPath: "index.php"
-              -mainScriptContents: ""
+            KevinGH\Box\Configuration\ExportableConfiguration {#100
               -file: "box.json"
               -alias: "test.phar"
               -basePath: "/path/to"
@@ -3001,7 +2998,10 @@ class ConfigurationTest extends ConfigurationTestCase
               -compactors: array:1 [
                 0 => "KevinGH\Box\Compactor\Php"
               ]
+              -compressionAlgorithm: "GZ"
               -fileMode: "0755"
+              -mainScriptPath: "index.php"
+              -mainScriptContents: ""
               -fileMapper: KevinGH\Box\MapFile {#100
                 -basePath: "/path/to"
                 -map: []
