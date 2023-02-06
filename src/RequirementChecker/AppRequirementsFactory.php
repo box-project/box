@@ -17,11 +17,8 @@ namespace KevinGH\Box\RequirementChecker;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use function array_diff_key;
 use function array_filter;
-use function array_key_exists;
 use function array_map;
 use function array_values;
-use function preg_match;
-use function sprintf;
 
 /**
  * Collect the list of requirements for running the application.
@@ -38,9 +35,8 @@ final class AppRequirementsFactory
     public static function create(
         DecodedComposerJson $composerJson,
         DecodedComposerLock $composerLock,
-        CompressionAlgorithm                $compressionAlgorithm,
-    ): array
-    {
+        CompressionAlgorithm $compressionAlgorithm,
+    ): array {
         return self::configureExtensionRequirements(
             self::retrievePhpVersionRequirements($composerJson, $composerLock),
             $composerJson,
@@ -94,10 +90,10 @@ final class AppRequirementsFactory
      * @param list<Requirement> $requirements
      */
     private static function configureExtensionRequirements(
-        array               $requirements,
+        array $requirements,
         DecodedComposerJson $composerJson,
         DecodedComposerLock $composerLock,
-        CompressionAlgorithm                $compressionAlgorithm,
+        CompressionAlgorithm $compressionAlgorithm,
     ): array {
         $extensionRequirements = self::collectExtensionRequirements(
             $composerJson,
@@ -107,34 +103,10 @@ final class AppRequirementsFactory
 
         foreach ($extensionRequirements as $extension => $packages) {
             foreach ($packages as $package) {
-                if (self::SELF_PACKAGE === $package) {
-                    $message = sprintf(
-                        'The application requires the extension "%s". Enable it or install a polyfill.',
-                        $extension,
-                    );
-                    $helpMessage = sprintf(
-                        'The application requires the extension "%s".',
-                        $extension,
-                    );
-                } else {
-                    $message = sprintf(
-                        'The package "%s" requires the extension "%s". Enable it or install a polyfill.',
-                        $package,
-                        $extension,
-                    );
-                    $helpMessage = sprintf(
-                        'The package "%s" requires the extension "%s".',
-                        $package,
-                        $extension,
-                    );
-                }
-
-                $requirements[] = [
-                    'type' => 'extension',
-                    'condition' => $extension,
-                    'message' => $message,
-                    'helpMessage' => $helpMessage,
-                ];
+                $requirements[] = Requirement::forExtension(
+                    $extension,
+                    self::SELF_PACKAGE === $package ? null : $package,
+                );
             }
         }
 
@@ -145,15 +117,14 @@ final class AppRequirementsFactory
      * Collects the extension required. It also accounts for the polyfills, i.e. if the polyfill
      * `symfony/polyfill-mbstring` is provided then the extension `ext-mbstring` will not be required.
      *
-     * @return array Associative array containing the list of extensions required
+     * @return array{array<string, true>, array<string, string>} Associative array containing the list of extensions required
      */
     private static function collectExtensionRequirements(
-        array $composerJsonContents,
-        array $composerLockContents,
+        DecodedComposerJson $composerJson,
+        DecodedComposerLock $composerLock,
         CompressionAlgorithm $compressionAlgorithm,
     ): array {
         $requirements = [];
-        $polyfills = [];
 
         $compressionAlgorithmRequiredExtension = $compressionAlgorithm->getRequiredExtension();
 
@@ -161,91 +132,67 @@ final class AppRequirementsFactory
             $requirements[$compressionAlgorithmRequiredExtension] = [self::SELF_PACKAGE];
         }
 
-        $platform = $composerLockContents['platform'] ?? [];
-
-        foreach ($platform as $package => $constraint) {
-            if (preg_match('/^ext-(?<extension>.+)$/', (string) $package, $matches)) {
-                $extension = $matches['extension'];
-
-                $requirements[$extension] = [self::SELF_PACKAGE];
-            }
+        foreach ($composerLock->getPlatformExtensions() as $extension) {
+            $requirements[$extension] = [self::SELF_PACKAGE];
         }
 
-        [$polyfills, $requirements] = [] === $composerLockContents
-            ? self::collectComposerJsonExtensionRequirements($composerJsonContents, $polyfills, $requirements)
-            : self::collectComposerLockExtensionRequirements($composerLockContents, $polyfills, $requirements);
+        // If the lock is present it is the authority. If not fallback on the .json. It is pointless to check both
+        // since they will contain redundant information.
+        [$polyfills, $requirements] = $composerLock->isEmpty()
+            ? self::collectComposerJsonExtensionRequirements($composerJson, $requirements)
+            : self::collectComposerLockExtensionRequirements($composerLock, $requirements);
 
         return array_diff_key($requirements, $polyfills);
     }
 
-    private static function collectComposerJsonExtensionRequirements(array $composerJsonContents, $polyfills, $requirements): array
-    {
-        $packages = $composerJsonContents['require'] ?? [];
+    /**
+     * @param array<string, list<string>> $requirements The key is the extension name and the value the list of sources (app literal string or the package name).
+     *
+     * @return array{array<string, true>, array<string, string>}
+     */
+    private static function collectComposerJsonExtensionRequirements(
+        DecodedComposerJson $composerJson,
+        array $requirements,
+    ): array {
+        $polyfills = [];
 
-        foreach ($packages as $packageName => $constraint) {
-            if (1 === preg_match('/symfony\/polyfill-(?<extension>.+)/', (string) $packageName, $matches)) {
-                $extension = $matches['extension'];
+        foreach ($composerJson->getPackages() as $packageInfo) {
+            $polyfilledExtension = $packageInfo->getPolyfilledExtension();
 
-                if (!str_starts_with($extension, 'php')) {
-                    $polyfills[$extension] = true;
-
-                    continue;
-                }
-            }
-
-            if ('paragonie/sodium_compat' === $packageName) {
-                $polyfills['libsodium'] = true;
-
-                continue;
-            }
-
-            if ('phpseclib/mcrypt_compat' === $packageName) {
-                $polyfills['mcrypt'] = true;
+            if (null !== $polyfilledExtension) {
+                $polyfills[$polyfilledExtension] = true;
 
                 continue;
             }
 
-            if ('php' !== $packageName && preg_match('/^ext-(?<extension>.+)$/', (string) $packageName, $matches)) {
-                $requirements[$matches['extension']] = [self::SELF_PACKAGE];
+            foreach ($packageInfo->getRequiredExtensions() as $extension) {
+                $requirements[$extension] = [self::SELF_PACKAGE];
             }
         }
 
         return [$polyfills, $requirements];
     }
 
-    private static function collectComposerLockExtensionRequirements(array $composerLockContents, $polyfills, $requirements): array
-    {
-        $packages = $composerLockContents['packages'] ?? [];
+    /**
+     * @param array<string, list<string>> $requirements The key is the extension name and the value the list of sources (app literal string or the package name).
+     *
+     * @return array{array<string, true>, array<string, string>}
+     */
+    private static function collectComposerLockExtensionRequirements(
+        DecodedComposerLock $composerLock,
+        array $requirements,
+    ): array {
+        $polyfills = [];
 
-        foreach ($packages as $packageInfo) {
-            $packageRequire = $packageInfo['require'] ?? [];
+        foreach ($composerLock->getPackages() as $packageInfo) {
+            $polyfilledExtension = $packageInfo->getPolyfilledExtension();
 
-            if (1 === preg_match('/symfony\/polyfill-(?<extension>.+)/', (string) $packageInfo['name'], $matches)) {
-                $extension = $matches['extension'];
-
-                if (!str_starts_with((string) $extension, 'php')) {
-                    $polyfills[$extension] = true;
-                }
+            if (null !== $polyfilledExtension) {
+                $polyfills[$polyfilledExtension] = true;
             }
 
-            if ('paragonie/sodium_compat' === $packageInfo['name']) {
-                $polyfills['libsodium'] = true;
-            }
-
-            if ('phpseclib/mcrypt_compat' === $packageInfo['name']) {
-                $polyfills['mcrypt'] = true;
-            }
-
-            foreach ($packageRequire as $package => $constraint) {
-                if (1 === preg_match('/^ext-(?<extension>.+)$/', (string) $package, $matches)) {
-                    $extension = $matches['extension'];
-
-                    if (false === array_key_exists($extension, $requirements)) {
-                        $requirements[$extension] = [];
-                    }
-
-                    $requirements[$extension][] = $packageInfo['name'];
-                }
+            foreach ($packageInfo->getRequiredExtensions() as $extension) {
+                $requirements[$extension][] = $packageInfo->getName();
             }
         }
 
