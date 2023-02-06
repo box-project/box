@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
-use Phar;
+use KevinGH\Box\Phar\CompressionAlgorithm;
 use PHPUnit\Framework\TestCase;
 use function json_decode;
 use const JSON_THROW_ON_ERROR;
@@ -32,7 +32,7 @@ class AppRequirementsFactoryTest extends TestCase
     public function test_it_can_generate_and_serialized_requirements_from_a_composer_lock_file(
         ?string $composerJsonContents,
         ?string $composerLockContents,
-        ?int $compressionAlgorithm,
+        CompressionAlgorithm $compressionAlgorithm,
         array $expected,
     ): void {
         $actual = AppRequirementsFactory::create(
@@ -49,28 +49,28 @@ class AppRequirementsFactoryTest extends TestCase
         yield 'empty json file' => [
             '{}',
             null,
-            null,
+            CompressionAlgorithm::NONE,
             [],
         ];
 
         yield 'empty lock file' => [
             null,
             '{}',
-            null,
+            CompressionAlgorithm::NONE,
             [],
         ];
 
         yield 'empty json & lock file' => [
             '{}',
             '{}',
-            null,
+            CompressionAlgorithm::NONE,
             [],
         ];
 
         yield 'empty json file (compressed PHAR GZ)' => [
             '{}',
             null,
-            Phar::GZ,
+            CompressionAlgorithm::GZ,
             [
                 [
                     'type' => 'extension',
@@ -84,7 +84,7 @@ class AppRequirementsFactoryTest extends TestCase
         yield 'empty json file (compressed PHAR BZ2)' => [
             '{}',
             null,
-            Phar::BZ2,
+            CompressionAlgorithm::BZ2,
             [
                 [
                     'type' => 'extension',
@@ -98,7 +98,7 @@ class AppRequirementsFactoryTest extends TestCase
         yield 'empty lock file (compressed PHAR GZ)' => [
             null,
             '{}',
-            Phar::GZ,
+            CompressionAlgorithm::GZ,
             [
                 [
                     'type' => 'extension',
@@ -112,7 +112,7 @@ class AppRequirementsFactoryTest extends TestCase
         yield 'empty lock file (compressed PHAR BZ2)' => [
             null,
             '{}',
-            Phar::BZ2,
+            CompressionAlgorithm::BZ2,
             [
                 [
                     'type' => 'extension',
@@ -126,7 +126,7 @@ class AppRequirementsFactoryTest extends TestCase
         yield 'empty json & lock file (compressed PHAR GZ)' => [
             '{}',
             '{}',
-            Phar::GZ,
+            CompressionAlgorithm::GZ,
             [
                 [
                     'type' => 'extension',
@@ -140,7 +140,7 @@ class AppRequirementsFactoryTest extends TestCase
         yield 'empty json & lock file (compressed PHAR BZ2)' => [
             '{}',
             '{}',
-            Phar::BZ2,
+            CompressionAlgorithm::BZ2,
             [
                 [
                     'type' => 'extension',
@@ -163,7 +163,7 @@ class AppRequirementsFactoryTest extends TestCase
                 }
                 JSON,
             null,
-            null,
+            CompressionAlgorithm::NONE,
             [
                 [
                     'type' => 'php',
@@ -191,7 +191,7 @@ class AppRequirementsFactoryTest extends TestCase
                     "platform-dev": []
                 }
                 JSON,
-            null,
+            CompressionAlgorithm::NONE,
             [
                 [
                     'type' => 'php',
@@ -228,7 +228,7 @@ class AppRequirementsFactoryTest extends TestCase
                     "platform-dev": []
                 }
                 JSON,
-            null,
+            CompressionAlgorithm::NONE,
             [
                 [
                     'type' => 'php',
@@ -256,7 +256,7 @@ class AppRequirementsFactoryTest extends TestCase
                 }
                 JSON,
             null,
-            Phar::GZ,
+            CompressionAlgorithm::GZ,
             [
                 [
                     'type' => 'php',
@@ -290,7 +290,7 @@ class AppRequirementsFactoryTest extends TestCase
                     "platform-dev": []
                 }
                 JSON,
-            Phar::GZ,
+            CompressionAlgorithm::GZ,
             [
                 [
                     'type' => 'php',
@@ -332,7 +332,7 @@ class AppRequirementsFactoryTest extends TestCase
                     "platform-dev": []
                 }
                 JSON,
-            Phar::GZ,
+            CompressionAlgorithm::GZ,
             [
                 [
                     'type' => 'php',
@@ -366,7 +366,7 @@ class AppRequirementsFactoryTest extends TestCase
                 }
                 JSON,
             null,
-            null,
+            CompressionAlgorithm::NONE,
             [],
         ];
 
@@ -381,7 +381,7 @@ class AppRequirementsFactoryTest extends TestCase
                     }
                 }
                 JSON,
-            null,
+            CompressionAlgorithm::NONE,
             [],
         ];
 
@@ -404,7 +404,7 @@ class AppRequirementsFactoryTest extends TestCase
                     }
                 }
                 JSON,
-            null,
+            CompressionAlgorithm::NONE,
             [],
         ];
 
@@ -419,7 +419,7 @@ class AppRequirementsFactoryTest extends TestCase
                 }
                 JSON,
             null,
-            Phar::GZ,
+            CompressionAlgorithm::GZ,
             [
                 [
                     'type' => 'extension',
@@ -441,7 +441,7 @@ class AppRequirementsFactoryTest extends TestCase
                     }
                 }
                 JSON,
-            Phar::GZ,
+            CompressionAlgorithm::GZ,
             [
                 [
                     'type' => 'extension',
@@ -471,7 +471,7 @@ class AppRequirementsFactoryTest extends TestCase
                     }
                 }
                 JSON,
-            Phar::GZ,
+            CompressionAlgorithm::GZ,
             [
                 [
                     'type' => 'extension',
@@ -496,7 +496,7 @@ class AppRequirementsFactoryTest extends TestCase
                 }
                 JSON,
             null,
-            null,
+            CompressionAlgorithm::NONE,
             [
                 [
                     'type' => 'php',
@@ -569,7 +569,7 @@ class AppRequirementsFactoryTest extends TestCase
                     "platform-dev": []
                 }
                 JSON,
-            null,
+            CompressionAlgorithm::NONE,
             [
                 [
                     'type' => 'php',
@@ -659,7 +659,7 @@ class AppRequirementsFactoryTest extends TestCase
                     "platform-dev": []
                 }
                 JSON,
-            null,
+            CompressionAlgorithm::NONE,
             [
                 [
                     'type' => 'php',
@@ -711,7 +711,7 @@ class AppRequirementsFactoryTest extends TestCase
                 }
                 JSON,
             null,
-            null,
+            CompressionAlgorithm::NONE,
             [],
         ];
 
@@ -745,7 +745,7 @@ class AppRequirementsFactoryTest extends TestCase
                     ]
                 }
                 JSON,
-            null,
+            CompressionAlgorithm::NONE,
             [],
         ];
 
@@ -787,7 +787,7 @@ class AppRequirementsFactoryTest extends TestCase
                     ]
                 }
                 JSON,
-            null,
+            CompressionAlgorithm::NONE,
             [],
         ];
 
@@ -828,7 +828,7 @@ class AppRequirementsFactoryTest extends TestCase
                     "platform-dev": []
                 }
                 JSON,
-            null,
+            CompressionAlgorithm::NONE,
             [
                 [
                     'type' => 'php',
@@ -890,7 +890,7 @@ class AppRequirementsFactoryTest extends TestCase
                 }
                 JSON,
             null,
-            null,
+            CompressionAlgorithm::NONE,
             [
                 [
                     'type' => 'php',
@@ -960,7 +960,7 @@ class AppRequirementsFactoryTest extends TestCase
                     "platform-dev": []
                 }
                 JSON,
-            null,
+            CompressionAlgorithm::NONE,
             [
                 [
                     'type' => 'php',
@@ -999,7 +999,7 @@ class AppRequirementsFactoryTest extends TestCase
                 }
                 JSON,
             null,
-            null,
+            CompressionAlgorithm::NONE,
             [],
         ];
 
@@ -1018,7 +1018,7 @@ class AppRequirementsFactoryTest extends TestCase
                     ]
                 }
                 JSON,
-            null,
+            CompressionAlgorithm::NONE,
             [],
         ];
 
@@ -1032,7 +1032,7 @@ class AppRequirementsFactoryTest extends TestCase
                 }
                 JSON,
             null,
-            null,
+            CompressionAlgorithm::NONE,
             [],
         ];
 
@@ -1051,7 +1051,7 @@ class AppRequirementsFactoryTest extends TestCase
                     ]
                 }
                 JSON,
-            null,
+            CompressionAlgorithm::NONE,
             [],
         ];
     }

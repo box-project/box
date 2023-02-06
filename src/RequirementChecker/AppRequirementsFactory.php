@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
-use Phar;
+use KevinGH\Box\Phar\CompressionAlgorithm;
 use function array_diff_key;
 use function array_filter;
 use function array_key_exists;
@@ -38,7 +38,7 @@ final class AppRequirementsFactory
     public static function create(
         DecodedComposerJson $composerJson,
         DecodedComposerLock $composerLock,
-        ?int                $compressionAlgorithm,
+        CompressionAlgorithm                $compressionAlgorithm,
     ): array
     {
         return self::configureExtensionRequirements(
@@ -97,7 +97,7 @@ final class AppRequirementsFactory
         array               $requirements,
         DecodedComposerJson $composerJson,
         DecodedComposerLock $composerLock,
-        ?int                $compressionAlgorithm,
+        CompressionAlgorithm                $compressionAlgorithm,
     ): array {
         $extensionRequirements = self::collectExtensionRequirements(
             $composerJson,
@@ -150,17 +150,15 @@ final class AppRequirementsFactory
     private static function collectExtensionRequirements(
         array $composerJsonContents,
         array $composerLockContents,
-        ?int $compressionAlgorithm,
+        CompressionAlgorithm $compressionAlgorithm,
     ): array {
         $requirements = [];
         $polyfills = [];
 
-        if (Phar::BZ2 === $compressionAlgorithm) {
-            $requirements['bz2'] = [self::SELF_PACKAGE];
-        }
+        $compressionAlgorithmRequiredExtension = $compressionAlgorithm->getRequiredExtension();
 
-        if (Phar::GZ === $compressionAlgorithm) {
-            $requirements['zlib'] = [self::SELF_PACKAGE];
+        if (null !== $compressionAlgorithmRequiredExtension) {
+            $requirements[$compressionAlgorithmRequiredExtension] = [self::SELF_PACKAGE];
         }
 
         $platform = $composerLockContents['platform'] ?? [];

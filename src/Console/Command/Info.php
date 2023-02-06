@@ -20,6 +20,7 @@ use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
 use KevinGH\Box\Console\PharInfoRenderer;
+use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\PharInfo\PharInfo;
 use Phar;
 use PharData;
@@ -29,14 +30,11 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Path;
 use Throwable;
-use function array_filter;
-use function array_flip;
 use function implode;
 use function is_array;
 use function KevinGH\Box\create_temporary_phar;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\format_size;
-use function KevinGH\Box\get_phar_compression_algorithms;
 use function realpath;
 use function sprintf;
 use function str_repeat;
@@ -56,15 +54,6 @@ final class Info implements Command
         'indent',
         'flat',
     ];
-
-    private static array $FILE_ALGORITHMS;
-
-    public function __construct()
-    {
-        if (!isset(self::$FILE_ALGORITHMS)) {
-            self::$FILE_ALGORITHMS = array_flip(array_filter(get_phar_compression_algorithms()));
-        }
-    }
 
     public function getConfiguration(): Configuration
     {
@@ -334,9 +323,11 @@ final class Info implements Command
             } else {
                 $compression = '<fg=red>[NONE]</fg=red>';
 
-                foreach (self::$FILE_ALGORITHMS as $code => $name) {
-                    if ($item->isCompressed($code)) {
-                        $compression = "<fg=cyan>[{$name}]</fg=cyan>";
+                foreach (CompressionAlgorithm::cases() as $compressionAlgorithm) {
+                    if (CompressionAlgorithm::NONE !== $compressionAlgorithm
+                        && $item->isCompressed($compressionAlgorithm->value)
+                    ) {
+                        $compression = "<fg=cyan>[{$compressionAlgorithm->name}]</fg=cyan>";
                         break;
                     }
                 }

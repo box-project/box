@@ -21,6 +21,7 @@ use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
+use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\PhpScoper\NullScoper;
 use KevinGH\Box\PhpScoper\Scoper;
 use Phar;
@@ -31,7 +32,6 @@ use Webmozart\Assert\Assert;
 use function Amp\ParallelFunctions\parallelMap;
 use function Amp\Promise\wait;
 use function array_filter;
-use function array_flip;
 use function array_map;
 use function array_unshift;
 use function chdir;
@@ -183,31 +183,27 @@ final class Box implements Countable
         $this->phar->stopBuffering();
     }
 
-    /**
-     * @return null|string The required extension to execute the PHAR now that it is compressed
-     */
-    public function compress(int $compressionAlgorithm): ?string
+    public function compress(CompressionAlgorithm $compressionAlgorithm): ?string
     {
         Assert::false($this->buffering, 'Cannot compress files while buffering.');
-        Assert::inArray($compressionAlgorithm, get_phar_compression_algorithms());
 
-        $extensionRequired = get_phar_compression_algorithm_extension($compressionAlgorithm);
+        $extensionRequired = $compressionAlgorithm->getRequiredExtension();
 
         if (null !== $extensionRequired && false === extension_loaded($extensionRequired)) {
             throw new RuntimeException(
                 sprintf(
                     'Cannot compress the PHAR with the compression algorithm "%s": the extension "%s" is required but appear to not be loaded',
-                    array_flip(get_phar_compression_algorithms())[$compressionAlgorithm],
+                    $compressionAlgorithm->name,
                     $extensionRequired,
                 ),
             );
         }
 
         try {
-            if (Phar::NONE === $compressionAlgorithm) {
+            if (CompressionAlgorithm::NONE === $compressionAlgorithm) {
                 $this->getPhar()->decompressFiles();
             } else {
-                $this->phar->compressFiles($compressionAlgorithm);
+                $this->phar->compressFiles($compressionAlgorithm->value);
             }
         } catch (BadMethodCallException $exception) {
             $exceptionMessage = 'unable to create temporary file' !== $exception->getMessage()
