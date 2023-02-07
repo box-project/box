@@ -20,10 +20,10 @@ namespace KevinGH\Box\RequirementChecker;
 final class Requirement
 {
     public function __construct(
-        public readonly string $type,
-        public readonly string $condition,
-        public readonly string $message,
-        public readonly string $helpMessage,
+        private readonly string $type,
+        private readonly string $condition,
+        private readonly string $message,
+        private readonly string $helpMessage,
     ) {
     }
 
@@ -57,6 +57,7 @@ final class Requirement
 
     public static function forExtension(string $extension, ?string $packageName): self
     {
+        // TODO: review the message & help message
         return new self(
             'extension',
             $extension,
@@ -66,20 +67,20 @@ final class Requirement
                     $extension,
                 )
                 : sprintf(
-                    'The application requires the extension "%s".',
+                    'The package "%s" requires the extension "%s". Enable it or install a polyfill.',
+                    $packageName,
                     $extension,
                 ),
             null === $packageName
                 ? sprintf(
-                    'The package "%s" requires the extension "%s". Enable it or install a polyfill.',
-                    $packageName,
+                    'The application requires the extension "%s".',
                     $extension,
                 )
                 : sprintf(
-                    'The package "%s" requires the extension "%s".',
-                    $packageName,
-                    $extension,
-                ),
+                'The package "%s" requires the extension "%s".',
+                $packageName,
+                $extension,
+            ),
         );
     }
 

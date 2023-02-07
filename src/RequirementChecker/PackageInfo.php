@@ -59,6 +59,7 @@ final class PackageInfo
 
     public function getPolyfilledExtension(): ?string
     {
+        // TODO: should read the "provide" section instead.
         $name = $this->packageInfo['name'];
 
         if (array_key_exists($name, self::POLYFILL_MAP)) {
