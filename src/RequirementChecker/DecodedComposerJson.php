@@ -14,6 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
+use function array_filter;
+use function array_keys;
+use function array_values;
+use function str_starts_with;
+
 /**
  * @private
  */
@@ -22,7 +27,7 @@ final class DecodedComposerJson
     /**
      * @param array $composerJsonDecodedContents Decoded JSON contents of the `composer.json` file
      */
-    public function __construct(private array $composerJsonDecodedContents)
+    public function __construct(private readonly array $composerJsonDecodedContents)
     {
     }
 
@@ -41,9 +46,14 @@ final class DecodedComposerJson
      */
     public function getPackages(): array
     {
-        return array_map(
-            PackageInfo::__construct(...),
-            $this->composerLockDecodedContents['packages'] ?? [],
+        return array_values(
+            array_map(
+                static fn (string $packageName) => new PackageInfo(['name' => $packageName]),
+                array_filter(
+                    array_keys($this->composerJsonDecodedContents['require'] ?? []),
+                    static fn (string $packageName) => 'php' !== $packageName && !str_starts_with($packageName, 'ext-'),
+                ),
+            ),
         );
     }
 }

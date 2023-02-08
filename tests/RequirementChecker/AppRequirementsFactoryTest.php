@@ -36,12 +36,12 @@ class AppRequirementsFactoryTest extends TestCase
         array $expected,
     ): void {
         $actual = AppRequirementsFactory::create(
-            null === $composerJsonContents ? [] : json_decode($composerJsonContents, true, 512, JSON_THROW_ON_ERROR),
-            null === $composerLockContents ? [] : json_decode($composerLockContents, true, 512, JSON_THROW_ON_ERROR),
+            new DecodedComposerJson(null === $composerJsonContents ? [] : json_decode($composerJsonContents, true, flags: JSON_THROW_ON_ERROR)),
+            new DecodedComposerLock(null === $composerLockContents ? [] : json_decode($composerLockContents, true, flags: JSON_THROW_ON_ERROR)),
             $compressionAlgorithm,
         );
 
-        self::assertSame($expected, $actual);
+        self::assertEquals($expected, $actual);
     }
 
     public static function lockContentsProvider(): iterable
@@ -86,12 +86,7 @@ class AppRequirementsFactoryTest extends TestCase
             null,
             CompressionAlgorithm::BZ2,
             [
-                [
-                    'type' => 'extension',
-                    'condition' => 'bz2',
-                    'message' => 'The application requires the extension "bz2". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "bz2".',
-                ],
+                Requirement::forExtension('bz2', null),
             ],
         ];
 
@@ -100,12 +95,7 @@ class AppRequirementsFactoryTest extends TestCase
             '{}',
             CompressionAlgorithm::GZ,
             [
-                [
-                    'type' => 'extension',
-                    'condition' => 'zlib',
-                    'message' => 'The application requires the extension "zlib". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "zlib".',
-                ],
+                Requirement::forExtension('zlib', null),
             ],
         ];
 
@@ -114,12 +104,7 @@ class AppRequirementsFactoryTest extends TestCase
             '{}',
             CompressionAlgorithm::BZ2,
             [
-                [
-                    'type' => 'extension',
-                    'condition' => 'bz2',
-                    'message' => 'The application requires the extension "bz2". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "bz2".',
-                ],
+                Requirement::forExtension('bz2', null),
             ],
         ];
 
@@ -128,12 +113,7 @@ class AppRequirementsFactoryTest extends TestCase
             '{}',
             CompressionAlgorithm::GZ,
             [
-                [
-                    'type' => 'extension',
-                    'condition' => 'zlib',
-                    'message' => 'The application requires the extension "zlib". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "zlib".',
-                ],
+                Requirement::forExtension('zlib', null),
             ],
         ];
 
@@ -142,12 +122,7 @@ class AppRequirementsFactoryTest extends TestCase
             '{}',
             CompressionAlgorithm::BZ2,
             [
-                [
-                    'type' => 'extension',
-                    'condition' => 'bz2',
-                    'message' => 'The application requires the extension "bz2". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "bz2".',
-                ],
+                Requirement::forExtension('bz2', null),
             ],
         ];
 
@@ -165,18 +140,8 @@ class AppRequirementsFactoryTest extends TestCase
             null,
             CompressionAlgorithm::NONE,
             [
-                [
-                    'type' => 'php',
-                    'condition' => '^7.1',
-                    'message' => 'The application requires a version matching "^7.1".',
-                    'helpMessage' => 'The application requires a version matching "^7.1".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'phar',
-                    'message' => 'The application requires the extension "phar". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "phar".',
-                ],
+                Requirement::forPHP('^7.1', null),
+                Requirement::forExtension('phar', null),
             ],
         ];
 
@@ -193,18 +158,8 @@ class AppRequirementsFactoryTest extends TestCase
                 JSON,
             CompressionAlgorithm::NONE,
             [
-                [
-                    'type' => 'php',
-                    'condition' => '^7.1',
-                    'message' => 'The application requires a version matching "^7.1".',
-                    'helpMessage' => 'The application requires a version matching "^7.1".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'phar',
-                    'message' => 'The application requires the extension "phar". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "phar".',
-                ],
+                Requirement::forPHP('^7.1', null),
+                Requirement::forExtension('phar', null),
             ],
         ];
 
@@ -230,18 +185,8 @@ class AppRequirementsFactoryTest extends TestCase
                 JSON,
             CompressionAlgorithm::NONE,
             [
-                [
-                    'type' => 'php',
-                    'condition' => '^7.1',
-                    'message' => 'The application requires a version matching "^7.1".',
-                    'helpMessage' => 'The application requires a version matching "^7.1".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'phar',
-                    'message' => 'The application requires the extension "phar". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "phar".',
-                ],
+                Requirement::forPHP('^7.1', null),
+                Requirement::forExtension('phar', null),
             ],
         ];
 
@@ -258,24 +203,9 @@ class AppRequirementsFactoryTest extends TestCase
             null,
             CompressionAlgorithm::GZ,
             [
-                [
-                    'type' => 'php',
-                    'condition' => '^7.1',
-                    'message' => 'The application requires a version matching "^7.1".',
-                    'helpMessage' => 'The application requires a version matching "^7.1".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'zlib',
-                    'message' => 'The application requires the extension "zlib". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "zlib".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'phar',
-                    'message' => 'The application requires the extension "phar". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "phar".',
-                ],
+                Requirement::forPHP('^7.1', null),
+                Requirement::forExtension('zlib', null),
+                Requirement::forExtension('phar', null),
             ],
         ];
 
@@ -292,24 +222,9 @@ class AppRequirementsFactoryTest extends TestCase
                 JSON,
             CompressionAlgorithm::GZ,
             [
-                [
-                    'type' => 'php',
-                    'condition' => '^7.1',
-                    'message' => 'The application requires a version matching "^7.1".',
-                    'helpMessage' => 'The application requires a version matching "^7.1".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'zlib',
-                    'message' => 'The application requires the extension "zlib". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "zlib".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'phar',
-                    'message' => 'The application requires the extension "phar". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "phar".',
-                ],
+                Requirement::forPHP('^7.1', null),
+                Requirement::forExtension('zlib', null),
+                Requirement::forExtension('phar', null),
             ],
         ];
 
@@ -334,24 +249,9 @@ class AppRequirementsFactoryTest extends TestCase
                 JSON,
             CompressionAlgorithm::GZ,
             [
-                [
-                    'type' => 'php',
-                    'condition' => '^7.1',
-                    'message' => 'The application requires a version matching "^7.1".',
-                    'helpMessage' => 'The application requires a version matching "^7.1".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'zlib',
-                    'message' => 'The application requires the extension "zlib". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "zlib".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'phar',
-                    'message' => 'The application requires the extension "phar". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "phar".',
-                ],
+                Requirement::forPHP('^7.1', null),
+                Requirement::forExtension('zlib', null),
+                Requirement::forExtension('phar', null),
             ],
         ];
 
@@ -421,12 +321,7 @@ class AppRequirementsFactoryTest extends TestCase
             null,
             CompressionAlgorithm::GZ,
             [
-                [
-                    'type' => 'extension',
-                    'condition' => 'zlib',
-                    'message' => 'The application requires the extension "zlib". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "zlib".',
-                ],
+                Requirement::forExtension('zlib', null),
             ],
         ];
 
@@ -443,12 +338,7 @@ class AppRequirementsFactoryTest extends TestCase
                 JSON,
             CompressionAlgorithm::GZ,
             [
-                [
-                    'type' => 'extension',
-                    'condition' => 'zlib',
-                    'message' => 'The application requires the extension "zlib". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "zlib".',
-                ],
+                Requirement::forExtension('zlib', null),
             ],
         ];
 
@@ -473,12 +363,7 @@ class AppRequirementsFactoryTest extends TestCase
                 JSON,
             CompressionAlgorithm::GZ,
             [
-                [
-                    'type' => 'extension',
-                    'condition' => 'zlib',
-                    'message' => 'The application requires the extension "zlib". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "zlib".',
-                ],
+                Requirement::forExtension('zlib', null),
             ],
         ];
 
@@ -498,36 +383,11 @@ class AppRequirementsFactoryTest extends TestCase
             null,
             CompressionAlgorithm::NONE,
             [
-                [
-                    'type' => 'php',
-                    'condition' => '>=5.3',
-                    'message' => 'The application requires a version matching ">=5.3".',
-                    'helpMessage' => 'The application requires a version matching ">=5.3".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'mbstring',
-                    'message' => 'The application requires the extension "mbstring". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "mbstring".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'openssl',
-                    'message' => 'The application requires the extension "openssl". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "openssl".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'pcre',
-                    'message' => 'The application requires the extension "pcre". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "pcre".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'pdo_sqlite3',
-                    'message' => 'The application requires the extension "pdo_sqlite3". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "pdo_sqlite3".',
-                ],
+                Requirement::forPHP('>=5.4', null),
+                Requirement::forExtension('mbstring', null),
+                Requirement::forExtension('openssl', null),
+                Requirement::forExtension('pcre', null),
+                Requirement::forExtension('pdo_sqlite3', null),
             ],
         ];
 
@@ -571,42 +431,12 @@ class AppRequirementsFactoryTest extends TestCase
                 JSON,
             CompressionAlgorithm::NONE,
             [
-                [
-                    'type' => 'php',
-                    'condition' => '>=5.3',
-                    'message' => 'The package "beberlei/assert" requires a version matching ">=5.3".',
-                    'helpMessage' => 'The package "beberlei/assert" requires a version matching ">=5.3".',
-                ],
-                [
-                    'type' => 'php',
-                    'condition' => '^5.3.2 || ^7.0',
-                    'message' => 'The package "composer/ca-bundle" requires a version matching "^5.3.2 || ^7.0".',
-                    'helpMessage' => 'The package "composer/ca-bundle" requires a version matching "^5.3.2 || ^7.0".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'mbstring',
-                    'message' => 'The package "beberlei/assert" requires the extension "mbstring". Enable it or install a polyfill.',
-                    'helpMessage' => 'The package "beberlei/assert" requires the extension "mbstring".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'openssl',
-                    'message' => 'The package "composer/ca-bundle" requires the extension "openssl". Enable it or install a polyfill.',
-                    'helpMessage' => 'The package "composer/ca-bundle" requires the extension "openssl".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'openssl',
-                    'message' => 'The package "acme/foo" requires the extension "openssl". Enable it or install a polyfill.',
-                    'helpMessage' => 'The package "acme/foo" requires the extension "openssl".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'pcre',
-                    'message' => 'The package "composer/ca-bundle" requires the extension "pcre". Enable it or install a polyfill.',
-                    'helpMessage' => 'The package "composer/ca-bundle" requires the extension "pcre".',
-                ],
+                Requirement::forPHP('>=5.3', 'beberlei/assert'),
+                Requirement::forPHP('^5.3.2 || ^7.0', 'composer/ca-bundle'),
+                Requirement::forExtension('mbstring', 'beberlei/assert'),
+                Requirement::forExtension('openssl', 'composer/ca-bundle'),
+                Requirement::forExtension('openssl', 'acme/foo'),
+                Requirement::forExtension('pcre', 'composer/ca-bundle'),
             ],
         ];
 
@@ -661,42 +491,12 @@ class AppRequirementsFactoryTest extends TestCase
                 JSON,
             CompressionAlgorithm::NONE,
             [
-                [
-                    'type' => 'php',
-                    'condition' => '>=5.3',
-                    'message' => 'The package "beberlei/assert" requires a version matching ">=5.3".',
-                    'helpMessage' => 'The package "beberlei/assert" requires a version matching ">=5.3".',
-                ],
-                [
-                    'type' => 'php',
-                    'condition' => '^5.3.2 || ^7.0',
-                    'message' => 'The package "composer/ca-bundle" requires a version matching "^5.3.2 || ^7.0".',
-                    'helpMessage' => 'The package "composer/ca-bundle" requires a version matching "^5.3.2 || ^7.0".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'mbstring',
-                    'message' => 'The package "beberlei/assert" requires the extension "mbstring". Enable it or install a polyfill.',
-                    'helpMessage' => 'The package "beberlei/assert" requires the extension "mbstring".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'openssl',
-                    'message' => 'The package "composer/ca-bundle" requires the extension "openssl". Enable it or install a polyfill.',
-                    'helpMessage' => 'The package "composer/ca-bundle" requires the extension "openssl".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'openssl',
-                    'message' => 'The package "acme/foo" requires the extension "openssl". Enable it or install a polyfill.',
-                    'helpMessage' => 'The package "acme/foo" requires the extension "openssl".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'pcre',
-                    'message' => 'The package "composer/ca-bundle" requires the extension "pcre". Enable it or install a polyfill.',
-                    'helpMessage' => 'The package "composer/ca-bundle" requires the extension "pcre".',
-                ],
+                Requirement::forPHP('>=5.3', 'beberlei/assert'),
+                Requirement::forPHP('^5.3.2 || ^7.0', 'composer/ca-bundle'),
+                Requirement::forExtension('mbstring', 'beberlei/assert'),
+                Requirement::forExtension('openssl', 'composer/ca-bundle'),
+                Requirement::forExtension('openssl', 'acme/foo'),
+                Requirement::forExtension('pcre', 'composer/ca-bundle'),
             ],
         ];
 
@@ -830,48 +630,13 @@ class AppRequirementsFactoryTest extends TestCase
                 JSON,
             CompressionAlgorithm::NONE,
             [
-                [
-                    'type' => 'php',
-                    'condition' => '^7.3',
-                    'message' => 'The application requires a version matching "^7.3".',
-                    'helpMessage' => 'The application requires a version matching "^7.3".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'mbstring',
-                    'message' => 'The application requires the extension "mbstring". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "mbstring".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'mbstring',
-                    'message' => 'The package "beberlei/assert" requires the extension "mbstring". Enable it or install a polyfill.',
-                    'helpMessage' => 'The package "beberlei/assert" requires the extension "mbstring".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'mbstring',
-                    'message' => 'The package "composer/ca-bundle" requires the extension "mbstring". Enable it or install a polyfill.',
-                    'helpMessage' => 'The package "composer/ca-bundle" requires the extension "mbstring".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'json',
-                    'message' => 'The application requires the extension "json". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "json".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'json',
-                    'message' => 'The package "beberlei/assert" requires the extension "json". Enable it or install a polyfill.',
-                    'helpMessage' => 'The package "beberlei/assert" requires the extension "json".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'json',
-                    'message' => 'The package "composer/ca-bundle" requires the extension "json". Enable it or install a polyfill.',
-                    'helpMessage' => 'The package "composer/ca-bundle" requires the extension "json".',
-                ],
+                Requirement::forPHP('^7.3', null),
+                Requirement::forExtension('mbstring', null),
+                Requirement::forExtension('mbstring', 'beberlei/assert'),
+                Requirement::forExtension('mbstring', 'composer/ca-bundle'),
+                Requirement::forExtension('json', null),
+                Requirement::forExtension('pcre', 'beberlei/assert'),
+                Requirement::forExtension('pcre', 'composer/ca-bundle'),
             ],
         ];
 
@@ -892,18 +657,8 @@ class AppRequirementsFactoryTest extends TestCase
             null,
             CompressionAlgorithm::NONE,
             [
-                [
-                    'type' => 'php',
-                    'condition' => '^7.3',
-                    'message' => 'The application requires a version matching "^7.3".',
-                    'helpMessage' => 'The application requires a version matching "^7.3".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'json',
-                    'message' => 'The application requires the extension "json". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "json".',
-                ],
+                Requirement::forPHP('^7.3', null),
+                Requirement::forExtension('json', null),
             ],
         ];
 
@@ -962,30 +717,10 @@ class AppRequirementsFactoryTest extends TestCase
                 JSON,
             CompressionAlgorithm::NONE,
             [
-                [
-                    'type' => 'php',
-                    'condition' => '^7.3',
-                    'message' => 'The application requires a version matching "^7.3".',
-                    'helpMessage' => 'The application requires a version matching "^7.3".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'json',
-                    'message' => 'The application requires the extension "json". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "json".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'json',
-                    'message' => 'The package "beberlei/assert" requires the extension "json". Enable it or install a polyfill.',
-                    'helpMessage' => 'The package "beberlei/assert" requires the extension "json".',
-                ],
-                [
-                    'type' => 'extension',
-                    'condition' => 'json',
-                    'message' => 'The package "composer/ca-bundle" requires the extension "json". Enable it or install a polyfill.',
-                    'helpMessage' => 'The package "composer/ca-bundle" requires the extension "json".',
-                ],
+                Requirement::forPHP('^7.3', null),
+                Requirement::forExtension('json', null),
+                Requirement::forExtension('json', 'beberlei/assert'),
+                Requirement::forExtension('json', 'composer/ca-bundle'),
             ],
         ];
 

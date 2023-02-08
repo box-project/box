@@ -146,6 +146,7 @@ final class AppRequirementsFactory
     }
 
     /**
+     * TODO: review: I am not sure this makes sense since there is no info about the packages used
      * @param array<string, list<string>> $requirements The key is the extension name and the value the list of sources (app literal string or the package name).
      *
      * @return array{array<string, true>, array<string, string>}

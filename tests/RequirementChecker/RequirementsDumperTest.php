@@ -31,12 +31,16 @@ class RequirementsDumperTest extends TestCase
      * @dataProvider jsonAndLockContentsProvider
      */
     public function test_it_dumps_the_requirement_checker_files(
-        array $decodedComposerJsonContents,
-        array $decodedComposerLockContents,
+        DecodedComposerJson $decodedComposerJsonContents,
+        DecodedComposerLock $decodedComposerLockContents,
         CompressionAlgorithm $compressionAlgorithm,
         string $expectedRequirement,
     ): void {
-        $checkFiles = RequirementsDumper::dump($decodedComposerJsonContents, $decodedComposerLockContents, $compressionAlgorithm);
+        $checkFiles = RequirementsDumper::dump(
+            $decodedComposerJsonContents,
+            $decodedComposerLockContents,
+            $compressionAlgorithm,
+        );
 
         sort($checkFiles);
 
@@ -96,8 +100,8 @@ class RequirementsDumperTest extends TestCase
     public static function jsonAndLockContentsProvider(): iterable
     {
         yield [
-            [],
-            [],
+            new DecodedComposerJson([]),
+            new DecodedComposerLock([]),
             CompressionAlgorithm::NONE,
             <<<'PHP'
                 <?php
@@ -108,8 +112,8 @@ class RequirementsDumperTest extends TestCase
         ];
 
         yield [
-            [],
-            [
+            new DecodedComposerJson([]),
+            new DecodedComposerLock([
                 'packages' => [
                     [
                         'name' => 'acme/foo',
@@ -119,7 +123,7 @@ class RequirementsDumperTest extends TestCase
                         ],
                     ],
                 ],
-            ],
+            ]),
             CompressionAlgorithm::GZ,
             <<<'PHP'
                 <?php

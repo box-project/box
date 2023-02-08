@@ -57,7 +57,7 @@ final class DecodedComposerLock
     public function getPackages(): array
     {
         return array_map(
-            PackageInfo::__construct(...),
+            static fn (array $package) => new PackageInfo($package),
             $this->composerLockDecodedContents['packages'] ?? [],
         );
     }
