@@ -18,6 +18,7 @@ use KevinGH\Box\Phar\CompressionAlgorithm;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
+use function array_map;
 use function KevinGH\Box\FileSystem\file_contents;
 use function str_replace;
 use function var_export;
@@ -36,14 +37,21 @@ final class RequirementsDumper
     private const REQUIREMENT_CHECKER_PATH = __DIR__.'/../../res/requirement-checker';
 
     /**
-     * @return string[][]
+     * @return list<array{string, string}>
      */
-    public static function dump(array $decodedComposerJsonContents, array $decodedComposerLockContents, CompressionAlgorithm $compressionAlgorithm): array
-    {
+    public static function dump(
+        DecodedComposerJson $composerJson,
+        DecodedComposerLock $composerLock,
+        CompressionAlgorithm $compressionAlgorithm,
+    ): array {
         Assert::directory(self::REQUIREMENT_CHECKER_PATH, 'Expected the requirement checker to have been dumped');
 
         $filesWithContents = [
-            self::dumpRequirementsConfig($decodedComposerJsonContents, $decodedComposerLockContents, $compressionAlgorithm),
+            self::dumpRequirementsConfig(
+                $composerJson,
+                $composerLock,
+                $compressionAlgorithm,
+            ),
         ];
 
         /** @var SplFileInfo[] $requirementCheckerFiles */
@@ -62,17 +70,24 @@ final class RequirementsDumper
     }
 
     private static function dumpRequirementsConfig(
-        array $composerJsonDecodedContents,
-        array $composerLockDecodedContents,
+        DecodedComposerJson $composerJson,
+        DecodedComposerLock $composerLock,
         CompressionAlgorithm $compressionAlgorithm,
     ): array {
-        $config = AppRequirementsFactory::create($composerJsonDecodedContents, $composerLockDecodedContents, $compressionAlgorithm);
+        $requirements = array_map(
+            static fn (Requirement $requirement) => $requirement->toArray(),
+            AppRequirementsFactory::create(
+                $composerJson,
+                $composerLock,
+                $compressionAlgorithm,
+            ),
+        );
 
         return [
             '.requirements.php',
             str_replace(
                 '\'__CONFIG__\'',
-                var_export($config, true),
+                var_export($requirements, true),
                 self::REQUIREMENTS_CONFIG_TEMPLATE,
             ),
         ];

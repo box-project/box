@@ -32,6 +32,8 @@ use KevinGH\Box\Console\Logger\CompilerLogger;
 use KevinGH\Box\Console\MessageRenderer;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\Phar\CompressionAlgorithm;
+use KevinGH\Box\RequirementChecker\DecodedComposerJson;
+use KevinGH\Box\RequirementChecker\DecodedComposerLock;
 use KevinGH\Box\RequirementChecker\RequirementsDumper;
 use KevinGH\Box\StubGenerator;
 use RuntimeException;
@@ -488,8 +490,8 @@ final class Compile implements CommandAware
         );
 
         $checkFiles = RequirementsDumper::dump(
-            $config->getDecodedComposerJsonContents() ?? [],
-            $config->getDecodedComposerLockContents() ?? [],
+            new DecodedComposerJson($config->getDecodedComposerJsonContents() ?? []),
+            new DecodedComposerLock($config->getDecodedComposerLockContents() ?? []),
             $config->getCompressionAlgorithm(),
         );
 
