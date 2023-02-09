@@ -465,8 +465,7 @@ class AppRequirementsFactoryTest extends TestCase
                             "version": "1.1.0",
                             "require": {
                                 "ext-openssl": "*",
-                                "ext-pcre": "*",
-                                "php": "^5.3.2 || ^7.0"
+                                "ext-pcre": "*"
                             },
                             "require-dev": {
                                 "ext-pdo_sqlite3": "*"
@@ -476,7 +475,8 @@ class AppRequirementsFactoryTest extends TestCase
                             "name": "acme/foo",
                             "version": "1.1.0",
                             "require": {
-                                "ext-openssl": "*"
+                                "ext-openssl": "*",
+                                "php": "^5.3.2 || ^7.0"
                             },
                             "require-dev": []
                         }
@@ -487,7 +487,7 @@ class AppRequirementsFactoryTest extends TestCase
             CompressionAlgorithm::NONE,
             [
                 Requirement::forPHP('>=5.3', 'beberlei/assert'),
-                Requirement::forPHP('^5.3.2 || ^7.0', 'composer/ca-bundle'),
+                Requirement::forPHP('^5.3.2 || ^7.0', 'acme/foo'),
                 Requirement::forExtension('mbstring', 'beberlei/assert'),
                 Requirement::forExtension('openssl', 'composer/ca-bundle'),
                 Requirement::forExtension('openssl', 'acme/foo'),

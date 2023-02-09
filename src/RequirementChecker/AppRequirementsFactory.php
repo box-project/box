@@ -66,7 +66,7 @@ final class AppRequirementsFactory
             ? $composerJson->getRequiredPhpVersion()
             : $composerLock->getRequiredPhpVersion();
 
-        return null === $requiredPhpVersion ? [] : [Requirement::forPHP((string) $requiredPhpVersion, null)];
+        return null === $requiredPhpVersion ? [] : [Requirement::forPHP($requiredPhpVersion, null)];
     }
 
     /**
@@ -77,7 +77,7 @@ final class AppRequirementsFactory
         return array_values(
             array_map(
                 static fn (PackageInfo $packageInfo) => Requirement::forPHP(
-                    (string) $packageInfo->getRequiredPhpVersion(),
+                    $packageInfo->getRequiredPhpVersion(),
                     $packageInfo->getName(),
                 ),
                 array_filter(
