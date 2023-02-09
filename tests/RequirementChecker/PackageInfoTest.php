@@ -2,14 +2,25 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\RequirementChecker;
 
-use KevinGH\Box\RequirementChecker\PackageInfo;
 use PHPUnit\Framework\TestCase;
 use function json_decode;
 
 /**
  * @covers \KevinGH\Box\RequirementChecker\PackageInfo
+ *
+ * @internal
  */
 final class PackageInfoTest extends TestCase
 {
@@ -23,8 +34,7 @@ final class PackageInfoTest extends TestCase
         bool $expectedHasRequiredPhpVersion,
         array $expectedRequiredExtensions,
         ?string $expectedPolyfilledExtension,
-    ): void
-    {
+    ): void {
         $packageInfo = new PackageInfo($rawPackageInfo);
 
         self::assertStateIs(
@@ -152,96 +162,96 @@ final class PackageInfoTest extends TestCase
         yield 'nominal' => [
             json_decode(
                 <<<'JSON'
-                {
-                    "name": "amphp/amp",
-                    "version": "v2.6.2",
-                    "source": {
-                        "type": "git",
-                        "url": "https://github.com/amphp/amp.git",
-                        "reference": "9d5100cebffa729aaffecd3ad25dc5aeea4f13bb"
-                    },
-                    "dist": {
-                        "type": "zip",
-                        "url": "https://api.github.com/repos/amphp/amp/zipball/9d5100cebffa729aaffecd3ad25dc5aeea4f13bb",
-                        "reference": "9d5100cebffa729aaffecd3ad25dc5aeea4f13bb",
-                        "shasum": ""
-                    },
-                    "require": {
-                        "php": ">=7.1"
-                    },
-                    "require-dev": {
-                        "amphp/php-cs-fixer-config": "dev-master",
-                        "amphp/phpunit-util": "^1",
-                        "ext-json": "*",
-                        "jetbrains/phpstorm-stubs": "^2019.3",
-                        "phpunit/phpunit": "^7 | ^8 | ^9",
-                        "psalm/phar": "^3.11@dev",
-                        "react/promise": "^2"
-                    },
-                    "type": "library",
-                    "extra": {
-                        "branch-alias": {
-                            "dev-master": "2.x-dev"
-                        }
-                    },
-                    "autoload": {
-                        "files": [
-                            "lib/functions.php",
-                            "lib/Internal/functions.php"
+                    {
+                        "name": "amphp/amp",
+                        "version": "v2.6.2",
+                        "source": {
+                            "type": "git",
+                            "url": "https://github.com/amphp/amp.git",
+                            "reference": "9d5100cebffa729aaffecd3ad25dc5aeea4f13bb"
+                        },
+                        "dist": {
+                            "type": "zip",
+                            "url": "https://api.github.com/repos/amphp/amp/zipball/9d5100cebffa729aaffecd3ad25dc5aeea4f13bb",
+                            "reference": "9d5100cebffa729aaffecd3ad25dc5aeea4f13bb",
+                            "shasum": ""
+                        },
+                        "require": {
+                            "php": ">=7.1"
+                        },
+                        "require-dev": {
+                            "amphp/php-cs-fixer-config": "dev-master",
+                            "amphp/phpunit-util": "^1",
+                            "ext-json": "*",
+                            "jetbrains/phpstorm-stubs": "^2019.3",
+                            "phpunit/phpunit": "^7 | ^8 | ^9",
+                            "psalm/phar": "^3.11@dev",
+                            "react/promise": "^2"
+                        },
+                        "type": "library",
+                        "extra": {
+                            "branch-alias": {
+                                "dev-master": "2.x-dev"
+                            }
+                        },
+                        "autoload": {
+                            "files": [
+                                "lib/functions.php",
+                                "lib/Internal/functions.php"
+                            ],
+                            "psr-4": {
+                                "Amp\\": "lib"
+                            }
+                        },
+                        "notification-url": "https://packagist.org/downloads/",
+                        "license": [
+                            "MIT"
                         ],
-                        "psr-4": {
-                            "Amp\\": "lib"
-                        }
-                    },
-                    "notification-url": "https://packagist.org/downloads/",
-                    "license": [
-                        "MIT"
-                    ],
-                    "authors": [
-                        {
-                            "name": "Daniel Lowrey",
-                            "email": "rdlowrey@php.net"
+                        "authors": [
+                            {
+                                "name": "Daniel Lowrey",
+                                "email": "rdlowrey@php.net"
+                            },
+                            {
+                                "name": "Aaron Piotrowski",
+                                "email": "aaron@trowski.com"
+                            },
+                            {
+                                "name": "Bob Weinand",
+                                "email": "bobwei9@hotmail.com"
+                            },
+                            {
+                                "name": "Niklas Keller",
+                                "email": "me@kelunik.com"
+                            }
+                        ],
+                        "description": "A non-blocking concurrency framework for PHP applications.",
+                        "homepage": "https://amphp.org/amp",
+                        "keywords": [
+                            "async",
+                            "asynchronous",
+                            "awaitable",
+                            "concurrency",
+                            "event",
+                            "event-loop",
+                            "future",
+                            "non-blocking",
+                            "promise"
+                        ],
+                        "support": {
+                            "irc": "irc://irc.freenode.org/amphp",
+                            "issues": "https://github.com/amphp/amp/issues",
+                            "source": "https://github.com/amphp/amp/tree/v2.6.2"
                         },
-                        {
-                            "name": "Aaron Piotrowski",
-                            "email": "aaron@trowski.com"
-                        },
-                        {
-                            "name": "Bob Weinand",
-                            "email": "bobwei9@hotmail.com"
-                        },
-                        {
-                            "name": "Niklas Keller",
-                            "email": "me@kelunik.com"
-                        }
-                    ],
-                    "description": "A non-blocking concurrency framework for PHP applications.",
-                    "homepage": "https://amphp.org/amp",
-                    "keywords": [
-                        "async",
-                        "asynchronous",
-                        "awaitable",
-                        "concurrency",
-                        "event",
-                        "event-loop",
-                        "future",
-                        "non-blocking",
-                        "promise"
-                    ],
-                    "support": {
-                        "irc": "irc://irc.freenode.org/amphp",
-                        "issues": "https://github.com/amphp/amp/issues",
-                        "source": "https://github.com/amphp/amp/tree/v2.6.2"
-                    },
-                    "funding": [
-                        {
-                            "url": "https://github.com/amphp",
-                            "type": "github"
-                        }
-                    ],
-                    "time": "2022-02-20T17:52:18+00:00"
-                }
-                JSON,
+                        "funding": [
+                            {
+                                "url": "https://github.com/amphp",
+                                "type": "github"
+                            }
+                        ],
+                        "time": "2022-02-20T17:52:18+00:00"
+                    }
+                    JSON,
                 true,
             ),
             'amphp/amp',
@@ -259,8 +269,7 @@ final class PackageInfoTest extends TestCase
         bool $expectedHasRequiredPhpVersion,
         array $expectedRequiredExtensions,
         ?string $expectedPolyfilledExtension,
-    ): void
-    {
+    ): void {
         self::assertSame($expectedName, $actual->getName());
         self::assertSame($expectedRequiredPhpVersion, $actual->getRequiredPhpVersion());
         self::assertSame($expectedHasRequiredPhpVersion, $actual->hasRequiredPhpVersion());

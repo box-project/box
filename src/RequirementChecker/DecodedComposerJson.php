@@ -14,10 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
-use function array_filter;
 use function array_keys;
-use function array_values;
-use function str_starts_with;
 
 /**
  * @private
@@ -42,18 +39,15 @@ final class DecodedComposerJson
     }
 
     /**
-     * @return list<PackageInfo>
+     * @return list<RequiredItem>
      */
-    public function getPackages(): array
+    public function getRequiredItems(): array
     {
-        return array_values(
-            array_map(
-                static fn (string $packageName) => new PackageInfo(['name' => $packageName]),
-                array_filter(
-                    array_keys($this->composerJsonDecodedContents['require'] ?? []),
-                    static fn (string $packageName) => 'php' !== $packageName && !str_starts_with($packageName, 'ext-'),
-                ),
-            ),
+        $require = $this->composerJsonDecodedContents['require'] ?? [];
+
+        return array_map(
+            static fn (string $packageName) => new RequiredItem([$packageName => $require[$packageName]]),
+            array_keys($require),
         );
     }
 }

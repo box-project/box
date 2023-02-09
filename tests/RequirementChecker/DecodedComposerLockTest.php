@@ -14,10 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
-use KevinGH\Box\Phar\CompressionAlgorithm;
 use PHPUnit\Framework\TestCase;
 use function json_decode;
-use const JSON_THROW_ON_ERROR;
 
 /**
  * @covers \KevinGH\Box\RequirementChecker\DecodedComposerLock
@@ -32,10 +30,10 @@ class DecodedComposerLockTest extends TestCase
     public function test_it_can_interpret_a_decoded_composer_json_file(
         string $composerJsonContents,
         bool $expectedIsEmpty,
-        ?string             $expectedRequiredPhpVersion,
-        bool                $expectedHasRequiredPhpVersion,
-        array                $expectedPlatformExtensions,
-        array               $expectedPackages,
+        ?string $expectedRequiredPhpVersion,
+        bool $expectedHasRequiredPhpVersion,
+        array $expectedPlatformExtensions,
+        array $expectedPackages,
     ): void {
         $actual = new DecodedComposerLock(json_decode($composerJsonContents, true));
 
@@ -171,7 +169,7 @@ class DecodedComposerLockTest extends TestCase
                         'php' => '^5.3.2 || ^7.0',
                     ],
                     'require-dev' => [
-                        'ext-pdo_sqlite3' => '*'
+                        'ext-pdo_sqlite3' => '*',
                     ],
                 ]),
             ],
@@ -181,12 +179,11 @@ class DecodedComposerLockTest extends TestCase
     private static function assertStateIs(
         DecodedComposerLock $composerLock,
         bool $expectedIsEmpty,
-        ?string             $expectedRequiredPhpVersion,
-        bool                $expectedHasRequiredPhpVersion,
-        array                $expectedPlatformExtensions,
-        array               $expectedPackages,
-    ): void
-    {
+        ?string $expectedRequiredPhpVersion,
+        bool $expectedHasRequiredPhpVersion,
+        array $expectedPlatformExtensions,
+        array $expectedPackages,
+    ): void {
         self::assertSame($expectedIsEmpty, $composerLock->isEmpty());
         self::assertSame($expectedRequiredPhpVersion, $composerLock->getRequiredPhpVersion());
         self::assertSame($expectedHasRequiredPhpVersion, $composerLock->hasRequiredPhpVersion());

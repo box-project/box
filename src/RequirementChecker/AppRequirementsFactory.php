@@ -50,7 +50,7 @@ final class AppRequirementsFactory
         DecodedComposerLock $composerLock,
     ): array {
         // If the application config is set, it is the authority.
-        return $composerJson->hasRequiredPhpVersion() || $composerLock->hasRequiredPhpVersion()
+        return $composerLock->isEmpty() && $composerJson->hasRequiredPhpVersion() || $composerLock->hasRequiredPhpVersion()
             ? self::retrievePHPRequirementFromPlatform($composerJson, $composerLock)
             : self::retrievePHPRequirementFromPackages($composerLock);
     }
@@ -62,9 +62,11 @@ final class AppRequirementsFactory
         DecodedComposerJson $composerJson,
         DecodedComposerLock $composerLock,
     ): array {
-        $requiredPhpVersion = $composerLock->getRequiredPhpVersion() ?? $composerJson->getRequiredPhpVersion();
+        $requiredPhpVersion = $composerLock->isEmpty()
+            ? $composerJson->getRequiredPhpVersion()
+            : $composerLock->getRequiredPhpVersion();
 
-        return [Requirement::forPHP((string) $requiredPhpVersion, null)];
+        return null === $requiredPhpVersion ? [] : [Requirement::forPHP((string) $requiredPhpVersion, null)];
     }
 
     /**
@@ -146,7 +148,7 @@ final class AppRequirementsFactory
     }
 
     /**
-     * TODO: review: I am not sure this makes sense since there is no info about the packages used
+     * TODO: review: I am not sure this makes sense since there is no info about the packages used.
      * @param array<string, list<string>> $requirements The key is the extension name and the value the list of sources (app literal string or the package name).
      *
      * @return array{array<string, true>, array<string, string>}
@@ -157,7 +159,7 @@ final class AppRequirementsFactory
     ): array {
         $polyfills = [];
 
-        foreach ($composerJson->getPackages() as $packageInfo) {
+        foreach ($composerJson->getRequiredItems() as $packageInfo) {
             $polyfilledExtension = $packageInfo->getPolyfilledExtension();
 
             if (null !== $polyfilledExtension) {

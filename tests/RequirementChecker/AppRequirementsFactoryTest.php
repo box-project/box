@@ -72,12 +72,7 @@ class AppRequirementsFactoryTest extends TestCase
             null,
             CompressionAlgorithm::GZ,
             [
-                [
-                    'type' => 'extension',
-                    'condition' => 'zlib',
-                    'message' => 'The application requires the extension "zlib". Enable it or install a polyfill.',
-                    'helpMessage' => 'The application requires the extension "zlib".',
-                ],
+                Requirement::forExtension('zlib', null),
             ],
         ];
 
@@ -383,7 +378,7 @@ class AppRequirementsFactoryTest extends TestCase
             null,
             CompressionAlgorithm::NONE,
             [
-                Requirement::forPHP('>=5.4', null),
+                Requirement::forPHP('>=5.3', null),
                 Requirement::forExtension('mbstring', null),
                 Requirement::forExtension('openssl', null),
                 Requirement::forExtension('pcre', null),
@@ -635,8 +630,8 @@ class AppRequirementsFactoryTest extends TestCase
                 Requirement::forExtension('mbstring', 'beberlei/assert'),
                 Requirement::forExtension('mbstring', 'composer/ca-bundle'),
                 Requirement::forExtension('json', null),
-                Requirement::forExtension('pcre', 'beberlei/assert'),
-                Requirement::forExtension('pcre', 'composer/ca-bundle'),
+                Requirement::forExtension('json', 'beberlei/assert'),
+                Requirement::forExtension('json', 'composer/ca-bundle'),
             ],
         ];
 

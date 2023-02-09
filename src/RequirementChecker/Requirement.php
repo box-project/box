@@ -77,10 +77,10 @@ final class Requirement
                     $extension,
                 )
                 : sprintf(
-                'The package "%s" requires the extension "%s".',
-                $packageName,
-                $extension,
-            ),
+                    'The package "%s" requires the extension "%s".',
+                    $packageName,
+                    $extension,
+                ),
         );
     }
 

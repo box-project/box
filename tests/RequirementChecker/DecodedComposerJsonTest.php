@@ -14,10 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
-use KevinGH\Box\Phar\CompressionAlgorithm;
 use PHPUnit\Framework\TestCase;
 use function json_decode;
-use const JSON_THROW_ON_ERROR;
 
 /**
  * @covers \KevinGH\Box\RequirementChecker\DecodedComposerJson
@@ -33,7 +31,7 @@ class DecodedComposerJsonTest extends TestCase
         string $composerJsonContents,
         ?string $expectedRequiredPhpVersion,
         bool $expectedHasRequiredPhpVersion,
-        array $expectedPackages,
+        array $expectedRequiredItems,
     ): void {
         $actual = new DecodedComposerJson(json_decode($composerJsonContents, true));
 
@@ -41,7 +39,7 @@ class DecodedComposerJsonTest extends TestCase
             $actual,
             $expectedRequiredPhpVersion,
             $expectedHasRequiredPhpVersion,
-            $expectedPackages,
+            $expectedRequiredItems,
         );
     }
 
@@ -66,7 +64,10 @@ class DecodedComposerJsonTest extends TestCase
                 JSON,
             '^7.1',
             true,
-            [],
+            [
+                new RequiredItem(['php' => '^7.1']),
+                new RequiredItem(['ext-phar' => '*']),
+            ],
         ];
 
         yield 'PHP platform-dev requirements' => [
@@ -99,8 +100,8 @@ class DecodedComposerJsonTest extends TestCase
             null,
             false,
             [
-                new PackageInfo(['name' => 'beberlei/assert']),
-                new PackageInfo(['name' => 'composer/ca-bundle']),
+                new RequiredItem(['beberlei/assert' => '^2.9']),
+                new RequiredItem(['composer/ca-bundle' => '^1.1']),
             ],
         ];
 
@@ -121,8 +122,10 @@ class DecodedComposerJsonTest extends TestCase
             '^7.3',
             true,
             [
-                new PackageInfo(['name' => 'beberlei/assert']),
-                new PackageInfo(['name' => 'composer/ca-bundle']),
+                new RequiredItem(['php' => '^7.3']),
+                new RequiredItem(['beberlei/assert' => '^2.9']),
+                new RequiredItem(['ext-http' => '*']),
+                new RequiredItem(['composer/ca-bundle' => '^1.1']),
             ],
         ];
     }
@@ -131,11 +134,10 @@ class DecodedComposerJsonTest extends TestCase
         DecodedComposerJson $composerJson,
         ?string $expectedRequiredPhpVersion,
         bool $expectedHasRequiredPhpVersion,
-        array $expectedPackages,
-    ): void
-    {
+        array $expectedRequiredItems,
+    ): void {
         self::assertSame($expectedRequiredPhpVersion, $composerJson->getRequiredPhpVersion());
         self::assertSame($expectedHasRequiredPhpVersion, $composerJson->hasRequiredPhpVersion());
-        self::assertEquals($expectedPackages, $composerJson->getPackages());
+        self::assertEquals($expectedRequiredItems, $composerJson->getRequiredItems());
     }
 }
