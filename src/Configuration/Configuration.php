@@ -2461,6 +2461,7 @@ final class Configuration
         /** @var bool $checkRequirements */
         $checkRequirements = $raw->{self::CHECK_REQUIREMENTS_KEY} ?? true;
 
+        // TODO: in 5.0 we no longer care about the composer.json
         if ($checkRequirements && false === $hasComposerJson && false === $hasComposerLock) {
             $logger->addWarning(
                 'The requirement checker could not be used because the composer.json and composer.lock file could not '
@@ -2468,6 +2469,16 @@ final class Configuration
             );
 
             return false;
+        }
+
+        if ($checkRequirements && false === $hasComposerLock) {
+            // TODO: in 5.0:
+            //  - adjust the warning
+            //  - return false here to skip the requirement checker
+            $logger->addWarning(
+                'Enabling the requirement checker when there is no composer.lock is deprecated. In the future the '
+                .'requirement checker will be forcefully skipped in this scenario.',
+            );
         }
 
         if ($checkRequirements && $pharStubUsed) {

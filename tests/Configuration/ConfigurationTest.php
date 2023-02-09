@@ -40,7 +40,6 @@ use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
 use function KevinGH\Box\FileSystem\mkdir;
-use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\FileSystem\touch;
 use function KevinGH\Box\get_box_version;
@@ -2550,8 +2549,24 @@ class ConfigurationTest extends ConfigurationTestCase
         self::assertSame([], $this->config->getWarnings());
     }
 
-    public function test_the_requirement_checker_is_enabled_by_default_if_a_composer_lock_or_json_file_is_found(): void
+    public function test_the_requirement_checker_is_enabled_by_default_if_a_composer_json_is_found(): void
     {
+        // Sanity check
+        self::assertFalse($this->config->checkRequirements());
+
+        dump_file('composer.json', '{}');
+
+        $this->reloadConfig();
+
+        self::assertTrue($this->config->checkRequirements());
+
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_the_requirement_checker_is_enabled_by_default_if_a_composer_lock_is_found(): void
+    {
+        // Sanity check
         self::assertFalse($this->config->checkRequirements());
 
         dump_file('composer.lock', '{}');
@@ -2562,17 +2577,14 @@ class ConfigurationTest extends ConfigurationTestCase
 
         self::assertSame([], $this->config->getRecommendations());
         self::assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_the_requirement_checker_is_enabled_by_default_if_a_composer_json_and_lock_file_is_found(): void
+    {
+        // Sanity check
+        self::assertFalse($this->config->checkRequirements());
 
         dump_file('composer.json', '{}');
-        remove('composer.lock');
-
-        $this->reloadConfig();
-
-        self::assertTrue($this->config->checkRequirements());
-
-        self::assertSame([], $this->config->getRecommendations());
-        self::assertSame([], $this->config->getWarnings());
-
         dump_file('composer.lock', '{}');
 
         $this->reloadConfig();
@@ -2587,7 +2599,6 @@ class ConfigurationTest extends ConfigurationTestCase
     {
         dump_file('composer.json', '{}');
         dump_file('composer.lock', '{}');
-        dump_file('vendor/composer/installed.json', '{}');
 
         $this->setConfig([
             'check-requirements' => true,
@@ -2616,6 +2627,26 @@ class ConfigurationTest extends ConfigurationTestCase
         );
         self::assertSame(
             ['The requirement checker could not be used because the composer.json and composer.lock file could not be found.'],
+            $this->config->getWarnings(),
+        );
+    }
+
+    public function test_the_requirement_checker_is_not_disabled_but_a_warning_is_emitted_if_enabled_without_a_composer_lock_file(): void
+    {
+        dump_file('composer.json', '{}');
+
+        $this->setConfig([
+            'check-requirements' => true,
+        ]);
+
+        self::assertTrue($this->config->checkRequirements());
+
+        self::assertSame(
+            ['The "check-requirements" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations(),
+        );
+        self::assertSame(
+            ['Enabling the requirement checker when there is no composer.lock is deprecated. In the future the requirement checker will be forcefully skipped in this scenario.'],
             $this->config->getWarnings(),
         );
     }
