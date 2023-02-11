@@ -5,6 +5,10 @@ on:
         branches: [ main ]
     pull_request: ~
 
+env:
+    POLLING_INTERVALS_SEC: 30
+    SLEEP_TIME_SEC: 60s
+
 jobs:
     cs-lint:
         runs-on: ubuntu-latest
@@ -143,6 +147,11 @@ jobs:
         runs-on: ubuntu-latest
         name: Wait for the PHAR & Docker images
         steps:
+            # Reduce the amount polling done without increasing the polling internal too much.
+            -   name: Sleep
+                run: sleep ${{ env.SLEEP_TIME_SEC }}
+                shell: bash
+
             # I could not make this workflow work with a on.workflow_run. Hence instead of adding this
             # wait step for _every_ e2e job, which will block more runners, we wait in one and only one
             # runner.
@@ -152,7 +161,7 @@ jobs:
                     checkName: Build PHAR
                     ref: ${{ github.event.pull_request.head.sha || github.sha }}
                     token: ${{ secrets.GITHUB_TOKEN }}
-                    intervalSeconds: 10
+                    intervalSeconds: ${{ env.POLLING_INTERVALS_SEC }}
 
             -   name: Wait for the Docker images to be pushed
                 uses: fountainhead/action-wait-for-check@v1.1.0
@@ -160,7 +169,7 @@ jobs:
                     checkName: Docker status
                     ref: ${{ github.event.pull_request.head.sha || github.sha }}
                     token: ${{ secrets.GITHUB_TOKEN }}
-                    intervalSeconds: 10
+                    intervalSeconds: ${{ env.POLLING_INTERVALS_SEC }}
 
     e2e-tests:
         runs-on: ubuntu-latest
