@@ -72,7 +72,7 @@ class AppRequirementsFactoryTest extends TestCase
             null,
             CompressionAlgorithm::GZ,
             [
-                Requirement::forExtension('zlib', null),
+                Requirement::forRequiredExtension('zlib', null),
             ],
         ];
 
@@ -81,7 +81,7 @@ class AppRequirementsFactoryTest extends TestCase
             null,
             CompressionAlgorithm::BZ2,
             [
-                Requirement::forExtension('bz2', null),
+                Requirement::forRequiredExtension('bz2', null),
             ],
         ];
 
@@ -90,7 +90,7 @@ class AppRequirementsFactoryTest extends TestCase
             '{}',
             CompressionAlgorithm::GZ,
             [
-                Requirement::forExtension('zlib', null),
+                Requirement::forRequiredExtension('zlib', null),
             ],
         ];
 
@@ -99,7 +99,7 @@ class AppRequirementsFactoryTest extends TestCase
             '{}',
             CompressionAlgorithm::BZ2,
             [
-                Requirement::forExtension('bz2', null),
+                Requirement::forRequiredExtension('bz2', null),
             ],
         ];
 
@@ -108,7 +108,7 @@ class AppRequirementsFactoryTest extends TestCase
             '{}',
             CompressionAlgorithm::GZ,
             [
-                Requirement::forExtension('zlib', null),
+                Requirement::forRequiredExtension('zlib', null),
             ],
         ];
 
@@ -117,7 +117,7 @@ class AppRequirementsFactoryTest extends TestCase
             '{}',
             CompressionAlgorithm::BZ2,
             [
-                Requirement::forExtension('bz2', null),
+                Requirement::forRequiredExtension('bz2', null),
             ],
         ];
 
@@ -136,7 +136,7 @@ class AppRequirementsFactoryTest extends TestCase
             CompressionAlgorithm::NONE,
             [
                 Requirement::forPHP('^7.1', null),
-                Requirement::forExtension('phar', null),
+                Requirement::forRequiredExtension('phar', null),
             ],
         ];
 
@@ -154,7 +154,7 @@ class AppRequirementsFactoryTest extends TestCase
             CompressionAlgorithm::NONE,
             [
                 Requirement::forPHP('^7.1', null),
-                Requirement::forExtension('phar', null),
+                Requirement::forRequiredExtension('phar', null),
             ],
         ];
 
@@ -181,7 +181,7 @@ class AppRequirementsFactoryTest extends TestCase
             CompressionAlgorithm::NONE,
             [
                 Requirement::forPHP('^7.1', null),
-                Requirement::forExtension('phar', null),
+                Requirement::forRequiredExtension('phar', null),
             ],
         ];
 
@@ -199,8 +199,8 @@ class AppRequirementsFactoryTest extends TestCase
             CompressionAlgorithm::GZ,
             [
                 Requirement::forPHP('^7.1', null),
-                Requirement::forExtension('zlib', null),
-                Requirement::forExtension('phar', null),
+                Requirement::forRequiredExtension('zlib', null),
+                Requirement::forRequiredExtension('phar', null),
             ],
         ];
 
@@ -218,8 +218,8 @@ class AppRequirementsFactoryTest extends TestCase
             CompressionAlgorithm::GZ,
             [
                 Requirement::forPHP('^7.1', null),
-                Requirement::forExtension('zlib', null),
-                Requirement::forExtension('phar', null),
+                Requirement::forRequiredExtension('zlib', null),
+                Requirement::forRequiredExtension('phar', null),
             ],
         ];
 
@@ -245,8 +245,8 @@ class AppRequirementsFactoryTest extends TestCase
             CompressionAlgorithm::GZ,
             [
                 Requirement::forPHP('^7.1', null),
-                Requirement::forExtension('zlib', null),
-                Requirement::forExtension('phar', null),
+                Requirement::forRequiredExtension('zlib', null),
+                Requirement::forRequiredExtension('phar', null),
             ],
         ];
 
@@ -316,7 +316,7 @@ class AppRequirementsFactoryTest extends TestCase
             null,
             CompressionAlgorithm::GZ,
             [
-                Requirement::forExtension('zlib', null),
+                Requirement::forRequiredExtension('zlib', null),
             ],
         ];
 
@@ -333,7 +333,7 @@ class AppRequirementsFactoryTest extends TestCase
                 JSON,
             CompressionAlgorithm::GZ,
             [
-                Requirement::forExtension('zlib', null),
+                Requirement::forRequiredExtension('zlib', null),
             ],
         ];
 
@@ -358,7 +358,7 @@ class AppRequirementsFactoryTest extends TestCase
                 JSON,
             CompressionAlgorithm::GZ,
             [
-                Requirement::forExtension('zlib', null),
+                Requirement::forRequiredExtension('zlib', null),
             ],
         ];
 
@@ -379,10 +379,10 @@ class AppRequirementsFactoryTest extends TestCase
             CompressionAlgorithm::NONE,
             [
                 Requirement::forPHP('>=5.3', null),
-                Requirement::forExtension('mbstring', null),
-                Requirement::forExtension('openssl', null),
-                Requirement::forExtension('pcre', null),
-                Requirement::forExtension('pdo_sqlite3', null),
+                Requirement::forRequiredExtension('mbstring', null),
+                Requirement::forRequiredExtension('openssl', null),
+                Requirement::forRequiredExtension('pcre', null),
+                Requirement::forRequiredExtension('pdo_sqlite3', null),
             ],
         ];
 
@@ -428,10 +428,10 @@ class AppRequirementsFactoryTest extends TestCase
             [
                 Requirement::forPHP('>=5.3', 'beberlei/assert'),
                 Requirement::forPHP('^5.3.2 || ^7.0', 'composer/ca-bundle'),
-                Requirement::forExtension('mbstring', 'beberlei/assert'),
-                Requirement::forExtension('openssl', 'composer/ca-bundle'),
-                Requirement::forExtension('openssl', 'acme/foo'),
-                Requirement::forExtension('pcre', 'composer/ca-bundle'),
+                Requirement::forRequiredExtension('mbstring', 'beberlei/assert'),
+                Requirement::forRequiredExtension('openssl', 'composer/ca-bundle'),
+                Requirement::forRequiredExtension('openssl', 'acme/foo'),
+                Requirement::forRequiredExtension('pcre', 'composer/ca-bundle'),
             ],
         ];
 
@@ -556,6 +556,63 @@ class AppRequirementsFactoryTest extends TestCase
             ],
         ];
 
+        yield 'The application has extension conflicts' => [
+            <<<'JSON'
+                {
+                    "require": {
+                        "php": ">=5.3"
+                    },
+                    "require-dev": [],
+                    "conflict": {
+                        "ext-psr": "*",
+                        "ext-phar": "*",
+                        "laminas/laminas-code": "<3.3.1"
+                    }
+                }
+                JSON,
+            <<<'JSON'
+                {
+                    "platform": {
+                        "php": ">=5.4"
+                    },
+                    "packages": [
+                        {
+                            "name": "beberlei/assert",
+                            "version": "v2.9.2",
+                            "require": {
+                                "php": ">=5.3"
+                            },
+                            "require-dev": [],
+                            "conflict": {
+                                "ext-http": "*",
+                                "ext-psr": "*"
+                            }
+                        },
+                        {
+                            "name": "composer/ca-bundle",
+                            "version": "1.1.0",
+                            "require": {},
+                            "require-dev": {
+                                "ext-pdo_sqlite3": "*"
+                            },
+                            "conflict": {
+                                "ext-zlib": "*"
+                            }
+                        }
+                    ]
+                }
+                JSON,
+            CompressionAlgorithm::NONE,
+            [
+                Requirement::forPHP('>=5.4', null),
+                Requirement::forConflictingExtension('psr', null),
+                Requirement::forConflictingExtension('phar', null),
+                Requirement::forConflictingExtension('http', 'beberlei/assert'),
+                Requirement::forConflictingExtension('psr', 'beberlei/assert'),
+                Requirement::forConflictingExtension('zlib', 'composer/ca-bundle'),
+            ],
+        ];
+
         yield 'json & lock file packages requirements' => [
             <<<'JSON'
                 {
@@ -608,10 +665,10 @@ class AppRequirementsFactoryTest extends TestCase
             CompressionAlgorithm::NONE,
             [
                 Requirement::forPHP('>=5.3', null),
-                Requirement::forExtension('mbstring', 'beberlei/assert'),
-                Requirement::forExtension('openssl', 'composer/ca-bundle'),
-                Requirement::forExtension('openssl', 'acme/foo'),
-                Requirement::forExtension('pcre', 'composer/ca-bundle'),
+                Requirement::forRequiredExtension('mbstring', 'beberlei/assert'),
+                Requirement::forRequiredExtension('openssl', 'composer/ca-bundle'),
+                Requirement::forRequiredExtension('openssl', 'acme/foo'),
+                Requirement::forRequiredExtension('pcre', 'composer/ca-bundle'),
             ],
         ];
 
@@ -746,12 +803,12 @@ class AppRequirementsFactoryTest extends TestCase
             CompressionAlgorithm::NONE,
             [
                 Requirement::forPHP('^7.3', null),
-                Requirement::forExtension('mbstring', null),
-                Requirement::forExtension('mbstring', 'beberlei/assert'),
-                Requirement::forExtension('mbstring', 'composer/ca-bundle'),
-                Requirement::forExtension('json', null),
-                Requirement::forExtension('json', 'beberlei/assert'),
-                Requirement::forExtension('json', 'composer/ca-bundle'),
+                Requirement::forRequiredExtension('mbstring', null),
+                Requirement::forRequiredExtension('mbstring', 'beberlei/assert'),
+                Requirement::forRequiredExtension('mbstring', 'composer/ca-bundle'),
+                Requirement::forRequiredExtension('json', null),
+                Requirement::forRequiredExtension('json', 'beberlei/assert'),
+                Requirement::forRequiredExtension('json', 'composer/ca-bundle'),
             ],
         ];
 
@@ -773,7 +830,7 @@ class AppRequirementsFactoryTest extends TestCase
             CompressionAlgorithm::NONE,
             [
                 Requirement::forPHP('^7.3', null),
-                Requirement::forExtension('json', null),
+                Requirement::forRequiredExtension('json', null),
             ],
         ];
 
@@ -833,9 +890,9 @@ class AppRequirementsFactoryTest extends TestCase
             CompressionAlgorithm::NONE,
             [
                 Requirement::forPHP('^7.3', null),
-                Requirement::forExtension('json', null),
-                Requirement::forExtension('json', 'beberlei/assert'),
-                Requirement::forExtension('json', 'composer/ca-bundle'),
+                Requirement::forRequiredExtension('json', null),
+                Requirement::forRequiredExtension('json', 'beberlei/assert'),
+                Requirement::forRequiredExtension('json', 'composer/ca-bundle'),
             ],
         ];
 

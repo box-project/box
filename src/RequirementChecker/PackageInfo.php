@@ -90,6 +90,16 @@ final class PackageInfo
     }
 
     /**
+     * @return list<string>
+     */
+    public function getConflictingExtensions(): array
+    {
+        return array_key_exists('conflict', $this->packageInfo)
+            ? self::parseExtensions($this->packageInfo['conflict'])
+            : [];
+    }
+
+    /**
      * @param array<string, string> $constraints
      *
      * @return list<string>
