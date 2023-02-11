@@ -10,6 +10,7 @@
 /.phpunit*
 /Dockerfile*
 /bin/box.phar
+/bin/_box.phar
 /box
 /box.json
 /dist/

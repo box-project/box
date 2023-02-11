@@ -28,13 +28,13 @@ final class PackageInfoTest extends TestCase
      * @dataProvider packageInfoProvider
      */
     public function test_it_can_parse_the_decoded_data(
-        array   $rawPackageInfo,
-        string  $expectedName,
+        array $rawPackageInfo,
+        string $expectedName,
         ?string $expectedRequiredPhpVersion,
-        bool    $expectedHasRequiredPhpVersion,
-        array   $expectedRequiredExtensions,
-        array   $expectedPolyfilledExtensions,
-        array   $expectedConflictingExtensions,
+        bool $expectedHasRequiredPhpVersion,
+        array $expectedRequiredExtensions,
+        array $expectedPolyfilledExtensions,
+        array $expectedConflictingExtensions,
     ): void {
         $packageInfo = new PackageInfo($rawPackageInfo);
 
@@ -179,12 +179,12 @@ final class PackageInfoTest extends TestCase
             [
                 'name' => 'laminas/laminas-servicemanager',
                 'conflict' => [
-                    "ext-psr"=> "*",
-                    "ext-http"=> "*",
-                    "laminas/laminas-code"=> "<3.3.1",
-                    "zendframework/zend-code"=> "<3.3.1",
-                    "zendframework/zend-servicemanager"=> "*",
-                ]
+                    'ext-psr' => '*',
+                    'ext-http' => '*',
+                    'laminas/laminas-code' => '<3.3.1',
+                    'zendframework/zend-code' => '<3.3.1',
+                    'zendframework/zend-servicemanager' => '*',
+                ],
             ],
             'laminas/laminas-servicemanager',
             null,
@@ -300,12 +300,12 @@ final class PackageInfoTest extends TestCase
 
     private static function assertStateIs(
         PackageInfo $actual,
-        string      $expectedName,
-        ?string     $expectedRequiredPhpVersion,
-        bool        $expectedHasRequiredPhpVersion,
-        array       $expectedRequiredExtensions,
-        array       $expectedPolyfilledExtensions,
-        array       $expectedConflictingExtensions,
+        string $expectedName,
+        ?string $expectedRequiredPhpVersion,
+        bool $expectedHasRequiredPhpVersion,
+        array $expectedRequiredExtensions,
+        array $expectedPolyfilledExtensions,
+        array $expectedConflictingExtensions,
     ): void {
         self::assertSame($expectedName, $actual->getName());
         self::assertSame($expectedRequiredPhpVersion, $actual->getRequiredPhpVersion());

@@ -605,11 +605,11 @@ class AppRequirementsFactoryTest extends TestCase
             CompressionAlgorithm::NONE,
             [
                 Requirement::forPHP('>=5.4', null),
-                Requirement::forConflictingExtension('psr', null),
-                Requirement::forConflictingExtension('phar', null),
                 Requirement::forConflictingExtension('http', 'beberlei/assert'),
                 Requirement::forConflictingExtension('psr', 'beberlei/assert'),
+                Requirement::forConflictingExtension('psr', null),
                 Requirement::forConflictingExtension('zlib', 'composer/ca-bundle'),
+                Requirement::forConflictingExtension('phar', null),
             ],
         ];
 

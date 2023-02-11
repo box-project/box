@@ -14,7 +14,7 @@ namespace KevinGH\RequirementChecker;
 
 if (
     isset($_SERVER['BOX_REQUIREMENT_CHECKER'])
-    || false === (bool) $_SERVER['BOX_REQUIREMENT_CHECKER']
+    && false === (bool) $_SERVER['BOX_REQUIREMENT_CHECKER']
 ) {
     // Do nothing.
     return;

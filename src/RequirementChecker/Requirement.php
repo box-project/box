@@ -92,24 +92,24 @@ final class Requirement
             $extension,
             null === $packageName
                 ? sprintf(
-                'The application conflicts with the extension "%s".',
-                $extension,
-            )
+                    'The application conflicts with the extension "%s".',
+                    $extension,
+                )
                 : sprintf(
-                'The package "%s" conflicts with the extension "%s".',
-                $packageName,
-                $extension,
-            ),
+                    'The package "%s" conflicts with the extension "%s".',
+                    $packageName,
+                    $extension,
+                ),
             null === $packageName
                 ? sprintf(
-                'The application conflicts with the extension "%s". Disable it.',
-                $extension,
-            )
+                    'The application conflicts with the extension "%s". Disable it.',
+                    $extension,
+                )
                 : sprintf(
-                'The package "%s" conflicts with the extension "%s". Disable it.',
-                $packageName,
-                $extension,
-            ),
+                    'The package "%s" conflicts with the extension "%s". Disable it.',
+                    $packageName,
+                    $extension,
+                ),
         );
     }
 

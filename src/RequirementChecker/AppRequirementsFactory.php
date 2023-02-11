@@ -18,7 +18,7 @@ use KevinGH\Box\Phar\CompressionAlgorithm;
 use function array_diff_key;
 use function array_filter;
 use function array_map;
-use function array_merge;
+use function array_merge_recursive;
 use function array_values;
 
 /**
@@ -31,7 +31,7 @@ final class AppRequirementsFactory
     private const SELF_PACKAGE = '__APPLICATION__';
 
     /**
-     * @return list<Requirement> Serialized configured requirements
+     * @return list<Requirement> Configured requirements
      */
     public static function create(
         DecodedComposerJson $composerJson,
@@ -46,6 +46,9 @@ final class AppRequirementsFactory
         );
     }
 
+    /**
+     * @return list<Requirement>
+     */
     private static function retrievePhpVersionRequirements(
         DecodedComposerJson $composerJson,
         DecodedComposerLock $composerLock,
@@ -156,7 +159,7 @@ final class AppRequirementsFactory
 
         return [
             array_diff_key($requirements, $polyfills),
-            array_merge($conflicts, $jsonConflicts),
+            array_merge_recursive($conflicts, $jsonConflicts),
         ];
     }
 
@@ -170,6 +173,7 @@ final class AppRequirementsFactory
         array $requirements,
     ): array {
         $polyfills = [];
+        $conflicts = [];
 
         foreach ($composerJson->getRequiredItems() as $packageInfo) {
             $polyfilledExtension = $packageInfo->getPolyfilledExtension();
@@ -185,7 +189,15 @@ final class AppRequirementsFactory
             }
         }
 
-        return [$polyfills, $requirements, []];
+        foreach ($composerJson->getConflictingExtensions() as $extension) {
+            $conflicts[$extension] = [self::SELF_PACKAGE];
+        }
+
+        return [
+            $polyfills,
+            $requirements,
+            $conflicts,
+        ];
     }
 
     /**
@@ -210,7 +222,7 @@ final class AppRequirementsFactory
             }
 
             foreach ($packageInfo->getConflictingExtensions() as $extension) {
-                $requirements[$extension][] = $packageInfo->getName();
+                $conflicts[$extension][] = $packageInfo->getName();
             }
         }
 

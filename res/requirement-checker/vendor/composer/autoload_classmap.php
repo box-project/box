@@ -21,6 +21,7 @@ return array(
     'HumbugBox420\\Composer\\Semver\\VersionParser' => $vendorDir . '/composer/semver/src/VersionParser.php',
     'HumbugBox420\\KevinGH\\RequirementChecker\\Checker' => $baseDir . '/src/Checker.php',
     'HumbugBox420\\KevinGH\\RequirementChecker\\IO' => $baseDir . '/src/IO.php',
+    'HumbugBox420\\KevinGH\\RequirementChecker\\IsExtensionConflictFulfilled' => $baseDir . '/src/IsExtensionConflictFulfilled.php',
     'HumbugBox420\\KevinGH\\RequirementChecker\\IsExtensionFulfilled' => $baseDir . '/src/IsExtensionFulfilled.php',
     'HumbugBox420\\KevinGH\\RequirementChecker\\IsFulfilled' => $baseDir . '/src/IsFulfilled.php',
     'HumbugBox420\\KevinGH\\RequirementChecker\\IsPhpVersionFulfilled' => $baseDir . '/src/IsPhpVersionFulfilled.php',
