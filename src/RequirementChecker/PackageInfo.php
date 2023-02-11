@@ -57,22 +57,29 @@ final class PackageInfo
         return self::parseExtensions($this->packageInfo['require'] ?? []);
     }
 
-    public function getPolyfilledExtension(): ?string
+    /**
+     * @return list<string>
+     */
+    public function getPolyfilledExtensions(): array
     {
-        // TODO: should read the "provide" section instead.
+        if (array_key_exists('provide', $this->packageInfo)) {
+            return self::parseExtensions($this->packageInfo['provide']);
+        }
+
+        // TODO: remove the following code in 5.0.
         $name = $this->packageInfo['name'];
 
         if (array_key_exists($name, self::POLYFILL_MAP)) {
-            return self::POLYFILL_MAP[$name];
+            return [self::POLYFILL_MAP[$name]];
         }
 
         if (1 !== preg_match(self::SYMFONY_POLYFILL_REGEX, $name, $matches)) {
-            return null;
+            return [];
         }
 
         $extension = $matches['extension'];
 
-        return str_starts_with($extension, 'php') ? null : $extension;
+        return str_starts_with($extension, 'php') ? [] : [$extension];
     }
 
     /**

@@ -185,9 +185,7 @@ final class AppRequirementsFactory
         $polyfills = [];
 
         foreach ($composerLock->getPackages() as $packageInfo) {
-            $polyfilledExtension = $packageInfo->getPolyfilledExtension();
-
-            if (null !== $polyfilledExtension) {
+            foreach ($packageInfo->getPolyfilledExtensions() as $polyfilledExtension) {
                 $polyfills[$polyfilledExtension] = true;
             }
 
