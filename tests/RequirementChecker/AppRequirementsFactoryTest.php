@@ -435,6 +435,127 @@ class AppRequirementsFactoryTest extends TestCase
             ],
         ];
 
+        yield 'The application defines a PHP requirement (takes it from the composer.lock)' => [
+            <<<'JSON'
+                {
+                    "require": {
+                        "php": ">=5.3"
+                    },
+                    "require-dev": []
+                }
+                JSON,
+            <<<'JSON'
+                {
+                    "platform": {
+                        "php": ">=5.4"
+                    },
+                    "packages": [
+                        {
+                            "name": "beberlei/assert",
+                            "version": "v2.9.2",
+                            "require": {
+                                "php": ">=5.3"
+                            },
+                            "require-dev": []
+                        },
+                        {
+                            "name": "composer/ca-bundle",
+                            "version": "1.1.0",
+                            "require": {},
+                            "require-dev": {
+                                "ext-pdo_sqlite3": "*"
+                            }
+                        }
+                    ]
+                }
+                JSON,
+            CompressionAlgorithm::NONE,
+            [
+                Requirement::forPHP('>=5.4', null),
+            ],
+        ];
+
+        yield 'The application defines a PHP requirement (takes it from the composer.json if the .lock does not have it)' => [
+            <<<'JSON'
+                {
+                    "require": {
+                        "php": ">=5.3"
+                    },
+                    "require-dev": []
+                }
+                JSON,
+            <<<'JSON'
+                {
+                    "packages": [
+                        {
+                            "name": "beberlei/assert",
+                            "version": "v2.9.2",
+                            "require": {
+                                "php": ">=5.3"
+                            },
+                            "require-dev": []
+                        },
+                        {
+                            "name": "composer/ca-bundle",
+                            "version": "1.1.0",
+                            "require": {},
+                            "require-dev": {
+                                "ext-pdo_sqlite3": "*"
+                            }
+                        }
+                    ]
+                }
+                JSON,
+            CompressionAlgorithm::NONE,
+            [
+                Requirement::forPHP('>=5.3', null),
+            ],
+        ];
+
+        yield 'The application does not define a PHP requirement (takes it from packages)' => [
+            <<<'JSON'
+                {
+                    "require": {},
+                    "require-dev": []
+                }
+                JSON,
+            <<<'JSON'
+                {
+                    "packages": [
+                        {
+                            "name": "beberlei/assert",
+                            "version": "v2.9.2",
+                            "require": {
+                                "php": ">=5.3"
+                            },
+                            "require-dev": []
+                        },
+                        {
+                            "name": "acme/foo",
+                            "version": "2.0.0",
+                            "require": {},
+                            "require-dev": {}
+                        },
+                        {
+                            "name": "composer/ca-bundle",
+                            "version": "1.1.0",
+                            "require": {
+                                "php": "^7.1"
+                            },
+                            "require-dev": {
+                                "ext-pdo_sqlite3": "*"
+                            }
+                        }
+                    ]
+                }
+                JSON,
+            CompressionAlgorithm::NONE,
+            [
+                Requirement::forPHP('>=5.3', 'beberlei/assert'),
+                Requirement::forPHP('^7.1', 'composer/ca-bundle'),
+            ],
+        ];
+
         yield 'json & lock file packages requirements' => [
             <<<'JSON'
                 {
@@ -486,8 +607,7 @@ class AppRequirementsFactoryTest extends TestCase
                 JSON,
             CompressionAlgorithm::NONE,
             [
-                Requirement::forPHP('>=5.3', 'beberlei/assert'),
-                Requirement::forPHP('^5.3.2 || ^7.0', 'acme/foo'),
+                Requirement::forPHP('>=5.3', null),
                 Requirement::forExtension('mbstring', 'beberlei/assert'),
                 Requirement::forExtension('openssl', 'composer/ca-bundle'),
                 Requirement::forExtension('openssl', 'acme/foo'),
