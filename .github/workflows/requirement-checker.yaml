@@ -6,7 +6,7 @@ on:
     pull_request: ~
 
 env:
-    POLLING_INTERVALS_SEC: 10
+    POLLING_INTERVALS_SEC: 30
     SLEEP_TIME_SEC: 60s
 
 jobs:
