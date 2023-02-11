@@ -33,7 +33,7 @@ final class PackageInfoTest extends TestCase
         ?string $expectedRequiredPhpVersion,
         bool $expectedHasRequiredPhpVersion,
         array $expectedRequiredExtensions,
-        ?string $expectedPolyfilledExtension,
+        array $expectedPolyfilledExtension,
     ): void {
         $packageInfo = new PackageInfo($rawPackageInfo);
 
@@ -57,7 +57,7 @@ final class PackageInfoTest extends TestCase
             null,
             false,
             [],
-            null,
+            [],
         ];
 
         yield 'has a PHP version required' => [
@@ -71,7 +71,7 @@ final class PackageInfoTest extends TestCase
             '^8.2',
             true,
             [],
-            null,
+            [],
         ];
 
         yield 'has a PHP version required as a dev dep' => [
@@ -85,7 +85,7 @@ final class PackageInfoTest extends TestCase
             null,
             false,
             [],
-            null,
+            [],
         ];
 
         yield 'has PHP extensions required' => [
@@ -108,22 +108,26 @@ final class PackageInfoTest extends TestCase
                 'phar',
                 'xdebug',
             ],
-            null,
+            [],
         ];
 
-        // TODO: need to add support
-        yield 'polyfills an extension' => [
+        yield 'polyfills extensions' => [
             [
                 'name' => 'box/test',
                 'provide' => [
-                    'mbstring' => '*',
+                    'ext-mbstring' => '*',
+                    'ext-ctype' => '*',
+                    'psr/log-implementation' => '1.0|2.0|3.0',
                 ],
             ],
             'box/test',
             null,
             false,
             [],
-            null,
+            [
+                'mbstring',
+                'ctype',
+            ],
         ];
 
         yield 'Symfony mbstring polyfill' => [
@@ -134,7 +138,7 @@ final class PackageInfoTest extends TestCase
             null,
             false,
             [],
-            'mbstring',
+            ['mbstring'],
         ];
 
         yield 'Symfony PHP polyfill' => [
@@ -145,7 +149,7 @@ final class PackageInfoTest extends TestCase
             null,
             false,
             [],
-            null,
+            [],
         ];
 
         yield 'phpseclib/mcrypt_compat' => [
@@ -156,7 +160,7 @@ final class PackageInfoTest extends TestCase
             null,
             false,
             [],
-            'mcrypt',
+            ['mcrypt'],
         ];
 
         yield 'nominal' => [
@@ -258,7 +262,7 @@ final class PackageInfoTest extends TestCase
             '>=7.1',
             true,
             [],
-            null,
+            [],
         ];
     }
 
@@ -268,12 +272,12 @@ final class PackageInfoTest extends TestCase
         ?string $expectedRequiredPhpVersion,
         bool $expectedHasRequiredPhpVersion,
         array $expectedRequiredExtensions,
-        ?string $expectedPolyfilledExtension,
+        array $expectedPolyfilledExtension,
     ): void {
         self::assertSame($expectedName, $actual->getName());
         self::assertSame($expectedRequiredPhpVersion, $actual->getRequiredPhpVersion());
         self::assertSame($expectedHasRequiredPhpVersion, $actual->hasRequiredPhpVersion());
         self::assertSame($expectedRequiredExtensions, $actual->getRequiredExtensions());
-        self::assertSame($expectedPolyfilledExtension, $actual->getPolyfilledExtension());
+        self::assertSame($expectedPolyfilledExtension, $actual->getPolyfilledExtensions());
     }
 }
