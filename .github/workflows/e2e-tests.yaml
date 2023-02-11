@@ -19,7 +19,7 @@ jobs:
             # Reduce the amount polling done without increasing the polling internal too much.
             -   name: Sleep
                 run: sleep ${{ env.SLEEP_TIME_SEC }}
-                use: bash
+                shell: bash
 
             # I could not make this workflow work with a on.workflow_run. Hence instead of adding this
             # wait step for _every_ e2e job, which will block more runners, we wait in one and only one
