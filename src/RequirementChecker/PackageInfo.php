@@ -21,7 +21,14 @@ use function array_key_exists;
  */
 final class PackageInfo
 {
-    public const EXTENSION_REGEX = '/^ext-(?<extension>.+)$/';
+    private const EXTENSION_REGEX = '/^ext-(?<extension>.+)$/';
+
+    // Some extensions name differs in how they are registered in composer.json
+    // and the name used when doing a `extension_loaded()` check.
+    // See https://github.com/box-project/box/issues/653.
+    private const EXTENSION_NAME_MAP = [
+        'zend-opcache' => 'zend opcache',
+    ];
 
     private const POLYFILL_MAP = [
         'paragonie/sodium_compat' => 'libsodium',
@@ -93,7 +100,9 @@ final class PackageInfo
 
         foreach ($constraints as $package => $constraint) {
             if (preg_match(self::EXTENSION_REGEX, $package, $matches)) {
-                $extensions[] = $matches['extension'];
+                $extension = $matches['extension'];
+
+                $extensions[] = self::EXTENSION_NAME_MAP[$extension] ?? $extension;
             }
         }
 

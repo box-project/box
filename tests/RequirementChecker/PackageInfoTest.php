@@ -95,9 +95,10 @@ final class PackageInfoTest extends TestCase
                     'ext-json' => '*',
                     'ext-phar' => '*',
                     'ext-xdebug' => '3.0',
+                    'ext-zend-opcache' => '*',
                 ],
                 'require-dev' => [
-                    'ext-zend-opcache' => '*',
+                    'ext-http' => '*',
                 ],
             ],
             'box/test',
@@ -107,6 +108,7 @@ final class PackageInfoTest extends TestCase
                 'json',
                 'phar',
                 'xdebug',
+                'zend opcache',
             ],
             [],
         ];
