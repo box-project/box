@@ -49,8 +49,8 @@ final class AppRequirementsFactory
         DecodedComposerJson $composerJson,
         DecodedComposerLock $composerLock,
     ): array {
-        // If the application config is set, it is the authority.
-        return $composerLock->isEmpty() && $composerJson->hasRequiredPhpVersion() || $composerLock->hasRequiredPhpVersion()
+        // If the application has a constraint on the PHP version, it is the authority.
+        return $composerLock->hasRequiredPhpVersion() || $composerJson->hasRequiredPhpVersion()
             ? self::retrievePHPRequirementFromPlatform($composerJson, $composerLock)
             : self::retrievePHPRequirementFromPackages($composerLock);
     }
@@ -62,9 +62,7 @@ final class AppRequirementsFactory
         DecodedComposerJson $composerJson,
         DecodedComposerLock $composerLock,
     ): array {
-        $requiredPhpVersion = $composerLock->isEmpty()
-            ? $composerJson->getRequiredPhpVersion()
-            : $composerLock->getRequiredPhpVersion();
+        $requiredPhpVersion = $composerLock->getRequiredPhpVersion() ?? $composerJson->getRequiredPhpVersion();
 
         return null === $requiredPhpVersion ? [] : [Requirement::forPHP($requiredPhpVersion, null)];
     }
@@ -148,7 +146,6 @@ final class AppRequirementsFactory
     }
 
     /**
-     * TODO: review: I am not sure this makes sense since there is no info about the packages used.
      * @param array<string, list<string>> $requirements The key is the extension name and the value the list of sources (app literal string or the package name).
      *
      * @return array{array<string, true>, array<string, string>}
