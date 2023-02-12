@@ -55,7 +55,7 @@ final class Requirement
         );
     }
 
-    public static function forExtension(string $extension, ?string $packageName): self
+    public static function forRequiredExtension(string $extension, ?string $packageName): self
     {
         // TODO: review the message & help message
         return new self(

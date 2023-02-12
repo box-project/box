@@ -30,7 +30,7 @@ final class AppRequirementsFactory
     private const SELF_PACKAGE = '__APPLICATION__';
 
     /**
-     * @return list<Requirement> Serialized configured requirements
+     * @return list<Requirement> Configured requirements
      */
     public static function create(
         DecodedComposerJson $composerJson,
@@ -103,7 +103,7 @@ final class AppRequirementsFactory
 
         foreach ($extensionRequirements as $extension => $packages) {
             foreach ($packages as $package) {
-                $requirements[] = Requirement::forExtension(
+                $requirements[] = Requirement::forRequiredExtension(
                     $extension,
                     self::SELF_PACKAGE === $package ? null : $package,
                 );
@@ -117,7 +117,7 @@ final class AppRequirementsFactory
      * Collects the extension required. It also accounts for the polyfills, i.e. if the polyfill
      * `symfony/polyfill-mbstring` is provided then the extension `ext-mbstring` will not be required.
      *
-     * @return array{array<string, true>, array<string, string>} Associative array containing the list of extensions required
+     * @return array<string, list<string>> Associative array containing the list of extensions required
      */
     private static function collectExtensionRequirements(
         DecodedComposerJson $composerJson,
@@ -148,7 +148,7 @@ final class AppRequirementsFactory
     /**
      * @param array<string, list<string>> $requirements The key is the extension name and the value the list of sources (app literal string or the package name).
      *
-     * @return array{array<string, true>, array<string, string>}
+     * @return array{array<string, true>, array<string, list<string>>}
      */
     private static function collectComposerJsonExtensionRequirements(
         DecodedComposerJson $composerJson,
@@ -176,7 +176,7 @@ final class AppRequirementsFactory
     /**
      * @param array<string, list<string>> $requirements The key is the extension name and the value the list of sources (app literal string or the package name).
      *
-     * @return array{array<string, true>, array<string, string>}
+     * @return array{array<string, true>, array<string, list<string>>}
      */
     private static function collectComposerLockExtensionRequirements(
         DecodedComposerLock $composerLock,

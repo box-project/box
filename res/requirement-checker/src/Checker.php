@@ -3,6 +3,7 @@
 declare (strict_types=1);
 namespace HumbugBox420\KevinGH\RequirementChecker;
 
+use InvalidArgumentException;
 use function count;
 final class Checker
 {
@@ -80,8 +81,19 @@ final class Checker
         $config = (require self::$requirementsConfig);
         $requirements = new RequirementCollection();
         foreach ($config as $constraint) {
-            $requirements->addRequirement('php' === $constraint['type'] ? new IsPhpVersionFulfilled($constraint['condition']) : new IsExtensionFulfilled($constraint['condition']), $constraint['message'], $constraint['helpMessage']);
+            $requirements->addRequirement(self::createCondition($constraint['type'], $constraint['condition']), $constraint['message'], $constraint['helpMessage']);
         }
         return $requirements;
+    }
+    private static function createCondition($type, $condition) : IsFulfilled
+    {
+        switch ($type) {
+            case 'php':
+                return new IsPhpVersionFulfilled($condition);
+            case 'extension':
+                return new IsExtensionFulfilled($condition);
+            default:
+                throw new InvalidArgumentException(\sprintf('Unknown requirement type "%s".', $type));
+        }
     }
 }

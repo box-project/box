@@ -53,7 +53,7 @@ final class RequirementTest extends TestCase
 
     public function test_it_can_be_created_for_an_extension_constraint(): void
     {
-        $requirement = Requirement::forExtension('mbstring', null);
+        $requirement = Requirement::forRequiredExtension('mbstring', null);
 
         $expected = [
             'type' => 'extension',
@@ -67,7 +67,7 @@ final class RequirementTest extends TestCase
 
     public function test_it_can_be_created_for_an_extension_constraint_for_a_package(): void
     {
-        $requirement = Requirement::forExtension('mbstring', 'box/test');
+        $requirement = Requirement::forRequiredExtension('mbstring', 'box/test');
 
         $expected = [
             'type' => 'extension',

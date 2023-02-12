@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\RequirementChecker;
 
+use InvalidArgumentException;
 use function count;
 
 /**
@@ -137,14 +138,38 @@ final class Checker
 
         foreach ($config as $constraint) {
             $requirements->addRequirement(
-                'php' === $constraint['type']
-                    ? new IsPhpVersionFulfilled($constraint['condition'])
-                    : new IsExtensionFulfilled($constraint['condition']),
+                self::createCondition(
+                    $constraint['type'],
+                    $constraint['condition']
+                ),
                 $constraint['message'],
                 $constraint['helpMessage']
             );
         }
 
         return $requirements;
+    }
+
+    /**
+     * @param string $type
+     * @param string $condition
+     */
+    private static function createCondition($type, $condition): IsFulfilled
+    {
+        switch ($type) {
+            case 'php':
+                return new IsPhpVersionFulfilled($condition);
+
+            case 'extension':
+                return new IsExtensionFulfilled($condition);
+
+            default:
+                throw new InvalidArgumentException(
+                    sprintf(
+                        'Unknown requirement type "%s".',
+                        $type,
+                    ),
+                );
+        }
     }
 }

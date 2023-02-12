@@ -105,7 +105,7 @@ class DecodedComposerJsonTest extends TestCase
             ],
         ];
 
-        yield 'packages and extensions required' => [
+        yield 'nominal' => [
             <<<'JSON'
                 {
                     "require": {
