@@ -193,6 +193,8 @@ jobs:
                         docker-image: ghcr.io/box-project/box_php81
                     -   command: _test_e2e_skip_min_composer_php
                         docker-image: ghcr.io/box-project/box_php725
+                    -   command: _test_e2e_pass_complete_requirement_checker_not_disabled
+                        docker-image: ghcr.io/box-project/box_php725
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3
