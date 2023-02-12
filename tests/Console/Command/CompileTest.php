@@ -85,6 +85,67 @@ class CompileTest extends FileSystemTestCase
 {
     use RequiresPharReadonlyOff;
 
+    private const NUMBER_OF_FILES = 48;
+
+    private const BOX_FILES = [
+        '/.box/',
+        '/.box/.requirements.php',
+        '/.box/bin/',
+        '/.box/bin/check-requirements.php',
+        '/.box/src/',
+        '/.box/src/Checker.php',
+        '/.box/src/IO.php',
+        '/.box/src/IsExtensionConflictFulfilled.php',
+        '/.box/src/IsExtensionFulfilled.php',
+        '/.box/src/IsFulfilled.php',
+        '/.box/src/IsPhpVersionFulfilled.php',
+        '/.box/src/Printer.php',
+        '/.box/src/Requirement.php',
+        '/.box/src/RequirementCollection.php',
+        '/.box/src/Terminal.php',
+        '/.box/vendor/',
+        '/.box/vendor/autoload.php',
+        '/.box/vendor/composer/',
+        '/.box/vendor/composer/ClassLoader.php',
+        '/.box/vendor/composer/InstalledVersions.php',
+        '/.box/vendor/composer/installed.php',
+        '/.box/vendor/composer/LICENSE',
+        '/.box/vendor/composer/autoload_classmap.php',
+        '/.box/vendor/composer/autoload_namespaces.php',
+        '/.box/vendor/composer/autoload_psr4.php',
+        '/.box/vendor/composer/autoload_real.php',
+        '/.box/vendor/composer/autoload_static.php',
+        '/.box/vendor/composer/semver/',
+        '/.box/vendor/composer/semver/LICENSE',
+        '/.box/vendor/composer/semver/src/',
+        '/.box/vendor/composer/semver/src/Comparator.php',
+        '/.box/vendor/composer/semver/src/CompilingMatcher.php',
+        '/.box/vendor/composer/semver/src/Constraint/',
+        '/.box/vendor/composer/semver/src/Constraint/Bound.php',
+        '/.box/vendor/composer/semver/src/Constraint/Constraint.php',
+        '/.box/vendor/composer/semver/src/Constraint/ConstraintInterface.php',
+        '/.box/vendor/composer/semver/src/Constraint/MatchAllConstraint.php',
+        '/.box/vendor/composer/semver/src/Constraint/MatchNoneConstraint.php',
+        '/.box/vendor/composer/semver/src/Constraint/MultiConstraint.php',
+        '/.box/vendor/composer/semver/src/Interval.php',
+        '/.box/vendor/composer/semver/src/Intervals.php',
+        '/.box/vendor/composer/semver/src/Semver.php',
+        '/.box/vendor/composer/semver/src/VersionParser.php',
+    ];
+
+    private const COMPOSER_FILES = [
+        '/vendor/',
+        '/vendor/autoload.php',
+        '/vendor/composer/',
+        '/vendor/composer/ClassLoader.php',
+        '/vendor/composer/LICENSE',
+        '/vendor/composer/autoload_classmap.php',
+        '/vendor/composer/autoload_namespaces.php',
+        '/vendor/composer/autoload_psr4.php',
+        '/vendor/composer/autoload_real.php',
+        '/vendor/composer/autoload_static.php',
+    ];
+
     private const FIXTURES_DIR = __DIR__.'/../../../fixtures/build';
     private const DEFAULT_STUB_PATH = __DIR__.'/../../../dist/default_stub.php';
 
@@ -138,7 +199,7 @@ class CompileTest extends FileSystemTestCase
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
-        $numberOfFiles = 47;
+        $numberOfFiles = self::NUMBER_OF_FILES;
 
         dump_file(
             'box.json',
@@ -275,48 +336,8 @@ class CompileTest extends FileSystemTestCase
         );
 
         $expectedFiles = [
-            '/.box/',
-            '/.box/.requirements.php',
-            '/.box/bin/',
-            '/.box/bin/check-requirements.php',
-            '/.box/src/',
-            '/.box/src/Checker.php',
-            '/.box/src/IO.php',
-            '/.box/src/IsExtensionFulfilled.php',
-            '/.box/src/IsFulfilled.php',
-            '/.box/src/IsPhpVersionFulfilled.php',
-            '/.box/src/Printer.php',
-            '/.box/src/Requirement.php',
-            '/.box/src/RequirementCollection.php',
-            '/.box/src/Terminal.php',
-            '/.box/vendor/',
-            '/.box/vendor/autoload.php',
-            '/.box/vendor/composer/',
-            '/.box/vendor/composer/ClassLoader.php',
-            '/.box/vendor/composer/InstalledVersions.php',
-            '/.box/vendor/composer/installed.php',
-            '/.box/vendor/composer/LICENSE',
-            '/.box/vendor/composer/autoload_classmap.php',
-            '/.box/vendor/composer/autoload_namespaces.php',
-            '/.box/vendor/composer/autoload_psr4.php',
-            '/.box/vendor/composer/autoload_real.php',
-            '/.box/vendor/composer/autoload_static.php',
-            '/.box/vendor/composer/semver/',
-            '/.box/vendor/composer/semver/LICENSE',
-            '/.box/vendor/composer/semver/src/',
-            '/.box/vendor/composer/semver/src/Comparator.php',
-            '/.box/vendor/composer/semver/src/CompilingMatcher.php',
-            '/.box/vendor/composer/semver/src/Constraint/',
-            '/.box/vendor/composer/semver/src/Constraint/Bound.php',
-            '/.box/vendor/composer/semver/src/Constraint/Constraint.php',
-            '/.box/vendor/composer/semver/src/Constraint/ConstraintInterface.php',
-            '/.box/vendor/composer/semver/src/Constraint/MatchAllConstraint.php',
-            '/.box/vendor/composer/semver/src/Constraint/MatchNoneConstraint.php',
-            '/.box/vendor/composer/semver/src/Constraint/MultiConstraint.php',
-            '/.box/vendor/composer/semver/src/Interval.php',
-            '/.box/vendor/composer/semver/src/Intervals.php',
-            '/.box/vendor/composer/semver/src/Semver.php',
-            '/.box/vendor/composer/semver/src/VersionParser.php',
+            ...self::BOX_FILES,
+            ...self::COMPOSER_FILES,
             '/one/',
             '/one/test.php',
             '/run.php',
@@ -325,16 +346,6 @@ class CompileTest extends FileSystemTestCase
             '/test.php',
             '/two/',
             '/two/test.png',
-            '/vendor/',
-            '/vendor/autoload.php',
-            '/vendor/composer/',
-            '/vendor/composer/ClassLoader.php',
-            '/vendor/composer/LICENSE',
-            '/vendor/composer/autoload_classmap.php',
-            '/vendor/composer/autoload_namespaces.php',
-            '/vendor/composer/autoload_psr4.php',
-            '/vendor/composer/autoload_real.php',
-            '/vendor/composer/autoload_static.php',
         ];
 
         $actualFiles = $this->retrievePharFiles($phar);
@@ -409,7 +420,7 @@ class CompileTest extends FileSystemTestCase
         );
 
         $version = get_box_version();
-        $expectedNumberOfFiles = 51;
+        $expectedNumberOfFiles = self::NUMBER_OF_FILES + 4;
 
         $expected = <<<OUTPUT
 
@@ -501,48 +512,8 @@ class CompileTest extends FileSystemTestCase
         );
 
         $expectedFiles = [
-            '/.box/',
-            '/.box/.requirements.php',
-            '/.box/bin/',
-            '/.box/bin/check-requirements.php',
-            '/.box/src/',
-            '/.box/src/Checker.php',
-            '/.box/src/IO.php',
-            '/.box/src/IsExtensionFulfilled.php',
-            '/.box/src/IsFulfilled.php',
-            '/.box/src/IsPhpVersionFulfilled.php',
-            '/.box/src/Printer.php',
-            '/.box/src/Requirement.php',
-            '/.box/src/RequirementCollection.php',
-            '/.box/src/Terminal.php',
-            '/.box/vendor/',
-            '/.box/vendor/autoload.php',
-            '/.box/vendor/composer/',
-            '/.box/vendor/composer/ClassLoader.php',
-            '/.box/vendor/composer/InstalledVersions.php',
-            '/.box/vendor/composer/installed.php',
-            '/.box/vendor/composer/LICENSE',
-            '/.box/vendor/composer/autoload_classmap.php',
-            '/.box/vendor/composer/autoload_namespaces.php',
-            '/.box/vendor/composer/autoload_psr4.php',
-            '/.box/vendor/composer/autoload_real.php',
-            '/.box/vendor/composer/autoload_static.php',
-            '/.box/vendor/composer/semver/',
-            '/.box/vendor/composer/semver/LICENSE',
-            '/.box/vendor/composer/semver/src/',
-            '/.box/vendor/composer/semver/src/Comparator.php',
-            '/.box/vendor/composer/semver/src/CompilingMatcher.php',
-            '/.box/vendor/composer/semver/src/Constraint/',
-            '/.box/vendor/composer/semver/src/Constraint/Bound.php',
-            '/.box/vendor/composer/semver/src/Constraint/Constraint.php',
-            '/.box/vendor/composer/semver/src/Constraint/ConstraintInterface.php',
-            '/.box/vendor/composer/semver/src/Constraint/MatchAllConstraint.php',
-            '/.box/vendor/composer/semver/src/Constraint/MatchNoneConstraint.php',
-            '/.box/vendor/composer/semver/src/Constraint/MultiConstraint.php',
-            '/.box/vendor/composer/semver/src/Interval.php',
-            '/.box/vendor/composer/semver/src/Intervals.php',
-            '/.box/vendor/composer/semver/src/Semver.php',
-            '/.box/vendor/composer/semver/src/VersionParser.php',
+            ...self::BOX_FILES,
+            ...self::COMPOSER_FILES,
             '/binary',
             '/bootstrap.php',
             '/index.php',
@@ -554,16 +525,6 @@ class CompileTest extends FileSystemTestCase
             '/test.php',
             '/two/',
             '/two/test.png',
-            '/vendor/',
-            '/vendor/autoload.php',
-            '/vendor/composer/',
-            '/vendor/composer/ClassLoader.php',
-            '/vendor/composer/LICENSE',
-            '/vendor/composer/autoload_classmap.php',
-            '/vendor/composer/autoload_namespaces.php',
-            '/vendor/composer/autoload_psr4.php',
-            '/vendor/composer/autoload_real.php',
-            '/vendor/composer/autoload_static.php',
         ];
 
         $actualFiles = $this->retrievePharFiles($phar);
@@ -834,7 +795,7 @@ class CompileTest extends FileSystemTestCase
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
         $expectedNumberOfClasses = 1;
-        $expectedNumberOfFiles = 47;
+        $expectedNumberOfFiles = self::NUMBER_OF_FILES;
 
         dump_file(
             'box.json',
@@ -955,7 +916,7 @@ class CompileTest extends FileSystemTestCase
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
         $expectedNumberOfClasses = 1;
-        $expectedNumberOfFiles = 47;
+        $expectedNumberOfFiles = self::NUMBER_OF_FILES;
 
         dump_file(
             'box.json',
@@ -2943,7 +2904,7 @@ class CompileTest extends FileSystemTestCase
         );
 
         $version = get_box_version();
-        $expectedNumberOfFiles = 43;
+        $expectedNumberOfFiles = self::NUMBER_OF_FILES - 4;
 
         $expected = <<<OUTPUT
 
