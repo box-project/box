@@ -78,4 +78,32 @@ final class RequirementTest extends TestCase
 
         self::assertSame($expected, $requirement->toArray());
     }
+
+    public function test_it_can_be_created_for_a_conflicting_extension_constraint(): void
+    {
+        $requirement = Requirement::forConflictingExtension('mbstring', null);
+
+        $expected = [
+            'type' => 'extension-conflict',
+            'condition' => 'mbstring',
+            'message' => 'The application conflicts with the extension "mbstring".',
+            'helpMessage' => 'The application conflicts with the extension "mbstring". Disable it.',
+        ];
+
+        self::assertSame($expected, $requirement->toArray());
+    }
+
+    public function test_it_can_be_created_for_a_conflicting_extension_constraint_for_a_package(): void
+    {
+        $requirement = Requirement::forConflictingExtension('mbstring', 'box/test');
+
+        $expected = [
+            'type' => 'extension-conflict',
+            'condition' => 'mbstring',
+            'message' => 'The package "box/test" conflicts with the extension "mbstring".',
+            'helpMessage' => 'The package "box/test" conflicts with the extension "mbstring". Disable it.',
+        ];
+
+        self::assertSame($expected, $requirement->toArray());
+    }
 }

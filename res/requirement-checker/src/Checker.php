@@ -5,6 +5,7 @@ namespace HumbugBox420\KevinGH\RequirementChecker;
 
 use InvalidArgumentException;
 use function count;
+use function sprintf;
 final class Checker
 {
     private static $requirementsConfig;
@@ -92,8 +93,10 @@ final class Checker
                 return new IsPhpVersionFulfilled($condition);
             case 'extension':
                 return new IsExtensionFulfilled($condition);
+            case 'extension-conflict':
+                return new IsExtensionConflictFulfilled($condition);
             default:
-                throw new InvalidArgumentException(\sprintf('Unknown requirement type "%s".', $type));
+                throw new InvalidArgumentException(sprintf('Unknown requirement type "%s".', $type));
         }
     }
 }

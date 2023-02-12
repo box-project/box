@@ -32,6 +32,7 @@ class DecodedComposerJsonTest extends TestCase
         ?string $expectedRequiredPhpVersion,
         bool $expectedHasRequiredPhpVersion,
         array $expectedRequiredItems,
+        array $expectedConflictingExtensions,
     ): void {
         $actual = new DecodedComposerJson(json_decode($composerJsonContents, true));
 
@@ -40,6 +41,7 @@ class DecodedComposerJsonTest extends TestCase
             $expectedRequiredPhpVersion,
             $expectedHasRequiredPhpVersion,
             $expectedRequiredItems,
+            $expectedConflictingExtensions,
         );
     }
 
@@ -49,6 +51,7 @@ class DecodedComposerJsonTest extends TestCase
             '{}',
             null,
             false,
+            [],
             [],
         ];
 
@@ -68,6 +71,7 @@ class DecodedComposerJsonTest extends TestCase
                 new RequiredItem(['php' => '^7.1']),
                 new RequiredItem(['ext-phar' => '*']),
             ],
+            [],
         ];
 
         yield 'PHP platform-dev requirements' => [
@@ -82,6 +86,7 @@ class DecodedComposerJsonTest extends TestCase
                 JSON,
             null,
             false,
+            [],
             [],
         ];
 
@@ -103,6 +108,22 @@ class DecodedComposerJsonTest extends TestCase
                 new RequiredItem(['beberlei/assert' => '^2.9']),
                 new RequiredItem(['composer/ca-bundle' => '^1.1']),
             ],
+            [],
+        ];
+
+        yield 'conflicts' => [
+            <<<'JSON'
+                {
+                    "conflict": {
+                        "psr/logger": ">=7.1",
+                        "ext-phar": "*"
+                    }
+                }
+                JSON,
+            null,
+            false,
+            [],
+            ['phar'],
         ];
 
         yield 'nominal' => [
@@ -116,6 +137,9 @@ class DecodedComposerJsonTest extends TestCase
                     },
                     "require-dev": {
                         "webmozarts/assert": "^3.2"
+                    },
+                    "conflict": {
+                        "ext-http": "*"
                     }
                 }
                 JSON,
@@ -127,6 +151,7 @@ class DecodedComposerJsonTest extends TestCase
                 new RequiredItem(['ext-http' => '*']),
                 new RequiredItem(['composer/ca-bundle' => '^1.1']),
             ],
+            ['http'],
         ];
     }
 
@@ -135,9 +160,11 @@ class DecodedComposerJsonTest extends TestCase
         ?string $expectedRequiredPhpVersion,
         bool $expectedHasRequiredPhpVersion,
         array $expectedRequiredItems,
+        array $expectedConflictingExtensions,
     ): void {
         self::assertSame($expectedRequiredPhpVersion, $composerJson->getRequiredPhpVersion());
         self::assertSame($expectedHasRequiredPhpVersion, $composerJson->hasRequiredPhpVersion());
         self::assertEquals($expectedRequiredItems, $composerJson->getRequiredItems());
+        self::assertSame($expectedConflictingExtensions, $composerJson->getConflictingExtensions());
     }
 }

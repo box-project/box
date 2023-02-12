@@ -41,6 +41,7 @@ class ComposerStaticInitHumbugBox420
         'HumbugBox420\\Composer\\Semver\\VersionParser' => __DIR__ . '/..' . '/composer/semver/src/VersionParser.php',
         'HumbugBox420\\KevinGH\\RequirementChecker\\Checker' => __DIR__ . '/../..' . '/src/Checker.php',
         'HumbugBox420\\KevinGH\\RequirementChecker\\IO' => __DIR__ . '/../..' . '/src/IO.php',
+        'HumbugBox420\\KevinGH\\RequirementChecker\\IsExtensionConflictFulfilled' => __DIR__ . '/../..' . '/src/IsExtensionConflictFulfilled.php',
         'HumbugBox420\\KevinGH\\RequirementChecker\\IsExtensionFulfilled' => __DIR__ . '/../..' . '/src/IsExtensionFulfilled.php',
         'HumbugBox420\\KevinGH\\RequirementChecker\\IsFulfilled' => __DIR__ . '/../..' . '/src/IsFulfilled.php',
         'HumbugBox420\\KevinGH\\RequirementChecker\\IsPhpVersionFulfilled' => __DIR__ . '/../..' . '/src/IsPhpVersionFulfilled.php',

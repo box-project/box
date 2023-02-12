@@ -556,6 +556,63 @@ class AppRequirementsFactoryTest extends TestCase
             ],
         ];
 
+        yield 'The application has extension conflicts' => [
+            <<<'JSON'
+                {
+                    "require": {
+                        "php": ">=5.3"
+                    },
+                    "require-dev": [],
+                    "conflict": {
+                        "ext-psr": "*",
+                        "ext-phar": "*",
+                        "laminas/laminas-code": "<3.3.1"
+                    }
+                }
+                JSON,
+            <<<'JSON'
+                {
+                    "platform": {
+                        "php": ">=5.4"
+                    },
+                    "packages": [
+                        {
+                            "name": "beberlei/assert",
+                            "version": "v2.9.2",
+                            "require": {
+                                "php": ">=5.3"
+                            },
+                            "require-dev": [],
+                            "conflict": {
+                                "ext-http": "*",
+                                "ext-psr": "*"
+                            }
+                        },
+                        {
+                            "name": "composer/ca-bundle",
+                            "version": "1.1.0",
+                            "require": {},
+                            "require-dev": {
+                                "ext-pdo_sqlite3": "*"
+                            },
+                            "conflict": {
+                                "ext-zlib": "*"
+                            }
+                        }
+                    ]
+                }
+                JSON,
+            CompressionAlgorithm::NONE,
+            [
+                Requirement::forPHP('>=5.4', null),
+                Requirement::forConflictingExtension('http', 'beberlei/assert'),
+                Requirement::forConflictingExtension('psr', 'beberlei/assert'),
+                Requirement::forConflictingExtension('psr', null),
+                Requirement::forConflictingExtension('zlib', 'composer/ca-bundle'),
+                Requirement::forConflictingExtension('phar', null),
+            ],
+        ];
+
         yield 'json & lock file packages requirements' => [
             <<<'JSON'
                 {

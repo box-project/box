@@ -50,4 +50,14 @@ final class DecodedComposerJson
             array_keys($require),
         );
     }
+
+    /**
+     * @return list<string>
+     */
+    public function getConflictingExtensions(): array
+    {
+        return PackageInfo::parseExtensions(
+            $this->composerJsonDecodedContents['conflict'] ?? [],
+        );
+    }
 }

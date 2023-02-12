@@ -84,6 +84,35 @@ final class Requirement
         );
     }
 
+    public static function forConflictingExtension(string $extension, ?string $packageName): self
+    {
+        // TODO: review the message & help message
+        return new self(
+            'extension-conflict',
+            $extension,
+            null === $packageName
+                ? sprintf(
+                    'The application conflicts with the extension "%s".',
+                    $extension,
+                )
+                : sprintf(
+                    'The package "%s" conflicts with the extension "%s".',
+                    $packageName,
+                    $extension,
+                ),
+            null === $packageName
+                ? sprintf(
+                    'The application conflicts with the extension "%s". Disable it.',
+                    $extension,
+                )
+                : sprintf(
+                    'The package "%s" conflicts with the extension "%s". Disable it.',
+                    $packageName,
+                    $extension,
+                ),
+        );
+    }
+
     public function toArray(): array
     {
         return [

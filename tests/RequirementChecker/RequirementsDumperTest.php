@@ -49,6 +49,7 @@ class RequirementsDumperTest extends TestCase
             'bin/check-requirements.php',
             'src/Checker.php',
             'src/IO.php',
+            'src/IsExtensionConflictFulfilled.php',
             'src/IsExtensionFulfilled.php',
             'src/IsFulfilled.php',
             'src/IsPhpVersionFulfilled.php',

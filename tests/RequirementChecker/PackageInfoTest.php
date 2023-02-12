@@ -33,7 +33,8 @@ final class PackageInfoTest extends TestCase
         ?string $expectedRequiredPhpVersion,
         bool $expectedHasRequiredPhpVersion,
         array $expectedRequiredExtensions,
-        array $expectedPolyfilledExtension,
+        array $expectedPolyfilledExtensions,
+        array $expectedConflictingExtensions,
     ): void {
         $packageInfo = new PackageInfo($rawPackageInfo);
 
@@ -43,7 +44,8 @@ final class PackageInfoTest extends TestCase
             $expectedRequiredPhpVersion,
             $expectedHasRequiredPhpVersion,
             $expectedRequiredExtensions,
-            $expectedPolyfilledExtension,
+            $expectedPolyfilledExtensions,
+            $expectedConflictingExtensions,
         );
     }
 
@@ -56,6 +58,7 @@ final class PackageInfoTest extends TestCase
             'box/test',
             null,
             false,
+            [],
             [],
             [],
         ];
@@ -72,6 +75,7 @@ final class PackageInfoTest extends TestCase
             true,
             [],
             [],
+            [],
         ];
 
         yield 'has a PHP version required as a dev dep' => [
@@ -84,6 +88,7 @@ final class PackageInfoTest extends TestCase
             'box/test',
             null,
             false,
+            [],
             [],
             [],
         ];
@@ -111,6 +116,7 @@ final class PackageInfoTest extends TestCase
                 'zend opcache',
             ],
             [],
+            [],
         ];
 
         yield 'polyfills extensions' => [
@@ -130,6 +136,7 @@ final class PackageInfoTest extends TestCase
                 'mbstring',
                 'ctype',
             ],
+            [],
         ];
 
         yield 'Symfony mbstring polyfill' => [
@@ -141,6 +148,7 @@ final class PackageInfoTest extends TestCase
             false,
             [],
             ['mbstring'],
+            [],
         ];
 
         yield 'Symfony PHP polyfill' => [
@@ -150,6 +158,7 @@ final class PackageInfoTest extends TestCase
             'symfony/polyfill-php72',
             null,
             false,
+            [],
             [],
             [],
         ];
@@ -163,6 +172,26 @@ final class PackageInfoTest extends TestCase
             false,
             [],
             ['mcrypt'],
+            [],
+        ];
+
+        yield 'package with conflicts' => [
+            [
+                'name' => 'laminas/laminas-servicemanager',
+                'conflict' => [
+                    'ext-psr' => '*',
+                    'ext-http' => '*',
+                    'laminas/laminas-code' => '<3.3.1',
+                    'zendframework/zend-code' => '<3.3.1',
+                    'zendframework/zend-servicemanager' => '*',
+                ],
+            ],
+            'laminas/laminas-servicemanager',
+            null,
+            false,
+            [],
+            [],
+            ['psr', 'http'],
         ];
 
         yield 'nominal' => [
@@ -265,6 +294,7 @@ final class PackageInfoTest extends TestCase
             true,
             [],
             [],
+            [],
         ];
     }
 
@@ -274,12 +304,14 @@ final class PackageInfoTest extends TestCase
         ?string $expectedRequiredPhpVersion,
         bool $expectedHasRequiredPhpVersion,
         array $expectedRequiredExtensions,
-        array $expectedPolyfilledExtension,
+        array $expectedPolyfilledExtensions,
+        array $expectedConflictingExtensions,
     ): void {
         self::assertSame($expectedName, $actual->getName());
         self::assertSame($expectedRequiredPhpVersion, $actual->getRequiredPhpVersion());
         self::assertSame($expectedHasRequiredPhpVersion, $actual->hasRequiredPhpVersion());
         self::assertSame($expectedRequiredExtensions, $actual->getRequiredExtensions());
-        self::assertSame($expectedPolyfilledExtension, $actual->getPolyfilledExtensions());
+        self::assertSame($expectedPolyfilledExtensions, $actual->getPolyfilledExtensions());
+        self::assertSame($expectedConflictingExtensions, $actual->getConflictingExtensions());
     }
 }

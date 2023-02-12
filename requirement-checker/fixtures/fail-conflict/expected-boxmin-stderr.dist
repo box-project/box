@@ -1,0 +1,21 @@
+
+Box Requirements Checker
+========================
+
+> Using PHP PHP_VERSION
+> PHP is using the following php.ini file:
+  WARNING: No configuration file (php.ini) used by PHP!
+
+> Checking Box requirements:
+  ✔ The application requires the extension "phar".
+  ✘ The application conflicts with the extension "pdo".
+
+                                                                                
+ [ERROR] Your system is not ready to run the application.                       
+                                                                                
+
+Fix the following mandatory requirements:
+=========================================
+
+ * The application conflicts with the extension "pdo".
+

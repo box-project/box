@@ -195,6 +195,8 @@ jobs:
                         docker-image: ghcr.io/box-project/box_php725
                     -   command: _test_e2e_pass_complete_requirement_checker_not_disabled
                         docker-image: ghcr.io/box-project/box_php725
+                    -   command: _test_e2e_fail_conflict
+                        docker-image: ghcr.io/box-project/box_php81
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3

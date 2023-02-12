@@ -16,6 +16,7 @@ namespace KevinGH\RequirementChecker;
 
 use InvalidArgumentException;
 use function count;
+use function sprintf;
 
 /**
  * @private
@@ -162,6 +163,9 @@ final class Checker
 
             case 'extension':
                 return new IsExtensionFulfilled($condition);
+
+            case 'extension-conflict':
+                return new IsExtensionConflictFulfilled($condition);
 
             default:
                 throw new InvalidArgumentException(
