@@ -195,7 +195,7 @@ class PrinterTest extends TestCase
             false,
             50,
             <<<'EOF'
-                Test message
+                Help message
 
                 EOF
         ];
@@ -210,7 +210,7 @@ class PrinterTest extends TestCase
             true,
             50,
             <<<'EOF'
-                Test message
+                Help message
 
                 EOF
         ];
