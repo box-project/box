@@ -54,7 +54,7 @@ final class Checker
                 continue;
             }
             if (IO::VERBOSITY_DEBUG === $printer->getVerbosity()) {
-                $printer->printvln('✔ ' . $requirement->getHelpText(), IO::VERBOSITY_DEBUG, 'green');
+                $printer->printvln('✔ ' . $requirement->getTestMessage(), IO::VERBOSITY_DEBUG, 'green');
                 $printer->printv('  ', IO::VERBOSITY_DEBUG);
             } else {
                 $printer->printv('.', $verbosity, 'green');

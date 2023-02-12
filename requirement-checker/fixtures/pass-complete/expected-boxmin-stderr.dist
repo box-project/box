@@ -8,7 +8,8 @@ Box Requirements Checker
 
 > Checking Box requirements:
   ✔ The application requires a version matching ">=5.3".
-  ✔ The application requires the extension "phar".
+  ✔ The application requires the extension "phar". Enable it or install a
+polyfill.
   
                                                                                 
  [OK] Your system is ready to run the application.                              
