@@ -7,8 +7,7 @@ Box Requirements Checker
   WARNING: No configuration file (php.ini) used by PHP!
 
 > Checking Box requirements:
-  ✔ The application requires the extension "phar". Enable it or install a
-polyfill.
+  ✔ The application requires the extension "phar".
   ✘ The application conflicts with the extension "pdo".
 
                                                                                 
@@ -18,5 +17,6 @@ polyfill.
 Fix the following mandatory requirements:
 =========================================
 
- * The application conflicts with the extension "pdo". Disable it.
+ * The application conflicts with the extension "pdo". You need to disable it in
+   order to run this application.
 
