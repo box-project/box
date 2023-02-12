@@ -63,8 +63,9 @@ class CheckerTest extends TestCase
     public function provideRequirements(): Generator
     {
         $phpVersion = PHP_VERSION;
+        $remainingVerbosities = ['verbosity=verbose' => IO::VERBOSITY_VERBOSE, 'verbosity=normal' => IO::VERBOSITY_NORMAL, 'verbosity=quiet' => IO::VERBOSITY_QUIET];
 
-        yield (static function () use ($phpVersion) {
+        yield 'no requirement; verbosity=debug' => (static function () use ($phpVersion) {
             return [
                 new RequirementCollection(),
                 IO::VERBOSITY_DEBUG,
@@ -89,7 +90,7 @@ class CheckerTest extends TestCase
             ];
         })();
 
-        yield (static function () use ($phpVersion) {
+        yield 'no requirement; verbosity=very verbose' => (static function () use ($phpVersion) {
             return [
                 new RequirementCollection(),
                 IO::VERBOSITY_VERY_VERBOSE,
@@ -114,8 +115,8 @@ class CheckerTest extends TestCase
             ];
         })();
 
-        foreach ([IO::VERBOSITY_VERBOSE, IO::VERBOSITY_NORMAL, IO::VERBOSITY_QUIET] as $verbosity) {
-            yield (static function () use ($verbosity) {
+        foreach ($remainingVerbosities as $label => $verbosity) {
+            yield 'no requirements; '.$label => (static function () use ($verbosity) {
                 return [
                     new RequirementCollection(),
                     $verbosity,
@@ -125,13 +126,13 @@ class CheckerTest extends TestCase
             })();
         }
 
-        yield (static function () use ($phpVersion) {
+        yield 'requirements; check passes; verbosity=debug' => (static function () use ($phpVersion) {
             $requirements = new RequirementCollection();
 
             $requirements->addRequirement(
                 new ConditionIsFulfilled(),
+                'The application requires the version "7.2.0" or greater.',
                 'The application requires the version "7.2.0" or greater. Got "7.2.2"',
-                'The application requires the version "7.2.0" or greater.'
             );
             $requirements->addRequirement(
                 new class() implements IsFulfilled {
@@ -140,8 +141,8 @@ class CheckerTest extends TestCase
                         return true;
                     }
                 },
+                'The package "acme/foo" requires the extension "random".',
                 'The package "acme/foo" requires the extension "random". Enable it or install a polyfill.',
-                'The package "acme/foo" requires the extension "random".'
             );
 
             return [
@@ -170,7 +171,7 @@ class CheckerTest extends TestCase
             ];
         })();
 
-        yield (static function () use ($phpVersion) {
+        yield 'requirements; check passes; verbosity=very verbose' => (static function () use ($phpVersion) {
             $requirements = new RequirementCollection();
 
             $requirements->addRequirement(
@@ -180,8 +181,8 @@ class CheckerTest extends TestCase
             );
             $requirements->addRequirement(
                 new ConditionIsFulfilled(),
+                'The package "acme/foo" requires the extension "random".',
                 'The package "acme/foo" requires the extension "random". Enable it or install a polyfill.',
-                'The package "acme/foo" requires the extension "random".'
             );
 
             return [
@@ -209,8 +210,8 @@ class CheckerTest extends TestCase
             ];
         })();
 
-        foreach ([IO::VERBOSITY_VERBOSE, IO::VERBOSITY_NORMAL, IO::VERBOSITY_QUIET] as $verbosity) {
-            yield (static function () use ($verbosity) {
+        foreach ($remainingVerbosities as $label => $verbosity) {
+            yield 'requirements; check passes; '.$label => (static function () use ($verbosity) {
                 $requirements = new RequirementCollection();
 
                 $requirements->addRequirement(
@@ -220,8 +221,8 @@ class CheckerTest extends TestCase
                 );
                 $requirements->addRequirement(
                     new ConditionIsFulfilled(),
+                    'The package "acme/foo" requires the extension "random".',
                     'The package "acme/foo" requires the extension "random". Enable it or install a polyfill.',
-                    'The package "acme/foo" requires the extension "random".'
                 );
 
                 return [
@@ -233,7 +234,7 @@ class CheckerTest extends TestCase
             })();
         }
 
-        yield (static function () use ($phpVersion) {
+        yield 'requirements; check do not pass; verbosity=debug' => (static function () use ($phpVersion) {
             $requirements = new RequirementCollection();
 
             $requirements->addRequirement(
@@ -243,8 +244,8 @@ class CheckerTest extends TestCase
             );
             $requirements->addRequirement(
                 new ConditionIsNotFulfilled(),
+                'The package "acme/foo" requires the extension "random".',
                 'The package "acme/foo" requires the extension "random". Enable it or install a polyfill.',
-                'The package "acme/foo" requires the extension "random".'
             );
 
             return [
@@ -261,9 +262,8 @@ class CheckerTest extends TestCase
                       /path/to/php.ini
 
                     > Checking Box requirements:
-                      ✔ The application requires the version "7.2.0" or greater.
-                      ✘ The package "acme/foo" requires the extension "random". Enable it or install
-                    a polyfill.
+                      ✔ The application requires the version "7.2.0" or greater. Got "7.2.2"
+                      ✘ The package "acme/foo" requires the extension "random".
 
 
                      [ERROR] Your system is not ready to run the application.
@@ -280,8 +280,8 @@ class CheckerTest extends TestCase
             ];
         })();
 
-        foreach ([IO::VERBOSITY_VERY_VERBOSE, IO::VERBOSITY_VERBOSE, IO::VERBOSITY_NORMAL] as $verbosity) {
-            yield (static function () use ($verbosity, $phpVersion) {
+        foreach (['verbosity=very verbose' => IO::VERBOSITY_VERY_VERBOSE, 'verbosity=verbose' => IO::VERBOSITY_VERBOSE, 'verbosity=normal' => IO::VERBOSITY_NORMAL] as $label => $verbosity) {
+            yield 'requirements; check do not pass; '.$label => (static function () use ($verbosity, $phpVersion) {
                 $requirements = new RequirementCollection();
 
                 $requirements->addRequirement(
@@ -291,8 +291,8 @@ class CheckerTest extends TestCase
                 );
                 $requirements->addRequirement(
                     new ConditionIsNotFulfilled(),
+                    'The package "acme/foo" requires the extension "random".',
                     'The package "acme/foo" requires the extension "random". Enable it or install a polyfill.',
-                    'The package "acme/foo" requires the extension "random".'
                 );
 
                 return [
@@ -327,7 +327,7 @@ class CheckerTest extends TestCase
             })();
         }
 
-        yield (static function () use ($phpVersion) {
+        yield 'requirements; check do not pass; verbosity=quiet' => (static function () use ($phpVersion) {
             $requirements = new RequirementCollection();
 
             $requirements->addRequirement(
@@ -337,8 +337,8 @@ class CheckerTest extends TestCase
             );
             $requirements->addRequirement(
                 new ConditionIsNotFulfilled(),
+                'The package "acme/foo" requires the extension "random".',
                 'The package "acme/foo" requires the extension "random". Enable it or install a polyfill.',
-                'The package "acme/foo" requires the extension "random".'
             );
 
             return [

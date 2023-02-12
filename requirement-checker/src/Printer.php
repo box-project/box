@@ -92,7 +92,7 @@ final class Printer
             return null;
         }
 
-        return wordwrap($requirement->getTestMessage(), $this->width - 3, PHP_EOL.'   ').PHP_EOL;
+        return wordwrap($requirement->getHelpText(), $this->width - 3, PHP_EOL.'   ').PHP_EOL;
     }
 
     public function block(string $title, string $message, int $verbosity, ?string $style = null): void
