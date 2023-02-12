@@ -57,20 +57,9 @@ final class Requirement
 
     public static function forRequiredExtension(string $extension, ?string $packageName): self
     {
-        // TODO: review the message & help message
         return new self(
             'extension',
             $extension,
-            null === $packageName
-                ? sprintf(
-                    'The application requires the extension "%s". Enable it or install a polyfill.',
-                    $extension,
-                )
-                : sprintf(
-                    'The package "%s" requires the extension "%s". Enable it or install a polyfill.',
-                    $packageName,
-                    $extension,
-                ),
             null === $packageName
                 ? sprintf(
                     'The application requires the extension "%s".',
@@ -81,12 +70,21 @@ final class Requirement
                     $packageName,
                     $extension,
                 ),
+            null === $packageName
+                ? sprintf(
+                    'The application requires the extension "%s". You either need to enable it or request the application to be shipped with a polyfill for this extension.',
+                    $extension,
+                )
+                : sprintf(
+                    'The package "%s" requires the extension "%s". You either need to enable it or request the application to be shipped with a polyfill for this extension.',
+                    $packageName,
+                    $extension,
+                ),
         );
     }
 
     public static function forConflictingExtension(string $extension, ?string $packageName): self
     {
-        // TODO: review the message & help message
         return new self(
             'extension-conflict',
             $extension,
@@ -102,11 +100,11 @@ final class Requirement
                 ),
             null === $packageName
                 ? sprintf(
-                    'The application conflicts with the extension "%s". Disable it.',
+                    'The application conflicts with the extension "%s". You need to disable it in order to run this application.',
                     $extension,
                 )
                 : sprintf(
-                    'The package "%s" conflicts with the extension "%s". Disable it.',
+                    'The package "%s" conflicts with the extension "%s". You need to disable it in order to run this application.',
                     $packageName,
                     $extension,
                 ),
