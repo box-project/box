@@ -11,7 +11,6 @@
 /Dockerfile*
 /bin/_box.phar
 /bin/box.phar
-/bin/_box.phar
 /box
 /box.json
 /dist/
