@@ -21,8 +21,10 @@ Fix the following mandatory requirements:
 =========================================
 
  * The application requires a version matching "^10".
- * The package "package-with-extensions" requires the extension "ldap". You either need to enable it
-or request the application to be shipped with a polyfill for this extension.
- * The package "package-with-extensions" requires the extension "random". You either need to enable it
- or request the application to be shipped with a polyfill for this extension.
+ * The package "package-with-extensions" requires the extension "ldap". You
+   either need to enable it or request the application to be shipped with a
+   polyfill for this extension.
+ * The package "package-with-extensions" requires the extension "random". You
+   either need to enable it or request the application to be shipped with a
+   polyfill for this extension.
 

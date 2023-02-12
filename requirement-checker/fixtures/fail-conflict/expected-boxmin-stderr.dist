@@ -17,5 +17,6 @@ Box Requirements Checker
 Fix the following mandatory requirements:
 =========================================
 
- * The application conflicts with the extension "pdo". You need to disable it in order to run this application.
+ * The application conflicts with the extension "pdo". You need to disable it in
+   order to run this application.
 
