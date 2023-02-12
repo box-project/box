@@ -58,8 +58,8 @@ final class RequirementTest extends TestCase
         $expected = [
             'type' => 'extension',
             'condition' => 'mbstring',
-            'message' => 'The application requires the extension "mbstring". Enable it or install a polyfill.',
-            'helpMessage' => 'The application requires the extension "mbstring".',
+            'message' => 'The application requires the extension "mbstring".',
+            'helpMessage' => 'The application requires the extension "mbstring". You either need to enable it or request the application to be shipped with a polyfill for this extension.',
         ];
 
         self::assertSame($expected, $requirement->toArray());
@@ -72,8 +72,8 @@ final class RequirementTest extends TestCase
         $expected = [
             'type' => 'extension',
             'condition' => 'mbstring',
-            'message' => 'The package "box/test" requires the extension "mbstring". Enable it or install a polyfill.',
-            'helpMessage' => 'The package "box/test" requires the extension "mbstring".',
+            'message' => 'The package "box/test" requires the extension "mbstring".',
+            'helpMessage' => 'The package "box/test" requires the extension "mbstring". You either need to enable it or request the application to be shipped with a polyfill for this extension.',
         ];
 
         self::assertSame($expected, $requirement->toArray());
@@ -87,7 +87,7 @@ final class RequirementTest extends TestCase
             'type' => 'extension-conflict',
             'condition' => 'mbstring',
             'message' => 'The application conflicts with the extension "mbstring".',
-            'helpMessage' => 'The application conflicts with the extension "mbstring". Disable it.',
+            'helpMessage' => 'The application conflicts with the extension "mbstring". You need to disable it in order to run this application.',
         ];
 
         self::assertSame($expected, $requirement->toArray());
@@ -101,7 +101,7 @@ final class RequirementTest extends TestCase
             'type' => 'extension-conflict',
             'condition' => 'mbstring',
             'message' => 'The package "box/test" conflicts with the extension "mbstring".',
-            'helpMessage' => 'The package "box/test" conflicts with the extension "mbstring". Disable it.',
+            'helpMessage' => 'The package "box/test" conflicts with the extension "mbstring". You need to disable it in order to run this application.',
         ];
 
         self::assertSame($expected, $requirement->toArray());
