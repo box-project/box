@@ -12,12 +12,22 @@
 
 namespace KevinGH\RequirementChecker;
 
-if (
-    isset($_SERVER['BOX_REQUIREMENT_CHECKER'])
-    || false === (bool) $_SERVER['BOX_REQUIREMENT_CHECKER']
-) {
-    // Do nothing.
-    return;
+if (isset($_SERVER['BOX_REQUIREMENT_CHECKER'])) {
+    $enableRequirementChecker = $_SERVER['BOX_REQUIREMENT_CHECKER'];
+
+    if (is_bool($enableRequirementChecker) && !$enableRequirementChecker) {
+        return;
+    }
+
+    if (is_string($enableRequirementChecker) && in_array(strtolower($enableRequirementChecker), ['false', '0'], true)) {
+        return;
+    }
+
+    if (!is_bool($enableRequirementChecker) && !is_string($enableRequirementChecker)) {
+        echo PHP_EOL.'Unhandled value type for "BOX_REQUIREMENT_CHECKER". Got "'.gettype($enableRequirementChecker).'". Proceeding with the requirement checks.'.PHP_EOL;
+    }
+
+    // Continue
 }
 
 // Important: do this check _after_ the requirement checker flag. Indeed, if the requirement checker is disabled we do
@@ -32,6 +42,6 @@ if (false === in_array(PHP_SAPI, array('cli', 'phpdbg', 'embed', 'micro'), true)
 
 require __DIR__.'/../vendor/autoload.php';
 
-if (Checker::checkRequirements()) {
+if (!Checker::checkRequirements()) {
     exit(1);
 }

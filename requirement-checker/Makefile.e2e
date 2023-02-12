@@ -175,6 +175,33 @@ _test_e2e_pass_complete_min_box_php: $(E2E_TEST_PASS_COMPLETE_PHAR)
 		$(E2E_TEST_PASS_COMPLETE_ACTUAL_STDOUT)
 
 
+
+.PHONY: test_e2e_pass_complete_requirement_checker_not_disabled
+test_e2e_pass_complete_requirement_checker_not_disabled: docker_images _test_e2e_pass_complete_requirement_checker_not_disabled
+
+.PHONY: _test_e2e_pass_complete_requirement_checker_not_disabled
+_test_e2e_pass_complete_requirement_checker_not_disabled: $(E2E_TEST_PASS_COMPLETE_PHAR)
+	@echo "$(YELLOW_COLOR)Test RequirementChecker with a project with satisfied requirements (min PHP version supported by Box).$(NO_COLOR)"
+	@rm \
+		$(E2E_TEST_PASS_COMPLETE_ACTUAL_STDOUT) \
+		$(E2E_TEST_PASS_COMPLETE_ACTUAL_STDERR) \
+		$(E2E_TEST_PASS_COMPLETE_MIN_BOX_EXPECTED_STDERR) || true
+	@$(MAKE) $(E2E_TEST_PASS_COMPLETE_MIN_BOX_EXPECTED_STDERR)
+
+	$(DOCKER_RUN) \
+		--env="BOX_REQUIREMENT_CHECKER=1" \
+		--volume="$$PWD/$(E2E_TEST_PASS_COMPLETE_OUTPUT_DIR)":/opt/box \
+		$(DOCKER_MIN_BOX_PHP_VERSION_RUN_COMMAND) 1>$(E2E_TEST_PASS_COMPLETE_ACTUAL_STDOUT) 2>$(E2E_TEST_PASS_COMPLETE_ACTUAL_STDERR) \
+		|| true
+
+	$(DIFF) \
+		$(E2E_TEST_PASS_COMPLETE_MIN_BOX_EXPECTED_STDERR) \
+		$(E2E_TEST_PASS_COMPLETE_ACTUAL_STDERR)
+	$(DIFF) \
+		$(E2E_TEST_PASS_COMPLETE_MIN_BOX_EXPECTED_STDOUT) \
+		$(E2E_TEST_PASS_COMPLETE_ACTUAL_STDOUT)
+
+
 #
 # Fail Complete
 #---------------------------------------------------------------------------
@@ -324,3 +351,7 @@ $(E2E_TEST_SKIP_OUTPUT_DIR):
 $(E2E_TEST_SKIP_PHAR): $(E2E_TEST_SKIP_OUTPUT_DIR) $(E2E_TEST_FAIL_COMPLETE_PHAR)
 	cp -f $(E2E_TEST_FAIL_COMPLETE_PHAR) $(E2E_TEST_SKIP_PHAR)
 	touch -c $@
+
+
+$(SCOPED_BOX_BIN):
+	cd ..; make --file Makefile compile
