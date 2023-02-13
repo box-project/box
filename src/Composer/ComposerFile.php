@@ -15,18 +15,21 @@ declare(strict_types=1);
 namespace KevinGH\Box\Composer;
 
 use Webmozart\Assert\Assert;
+use function is_array;
+use function is_string;
 
-final class ComposerFile
+class ComposerFile
 {
-    private $path;
-    private $contents;
+    private ?string $path;
+    private string $contents;
+    private array $decodedContents;
 
-    public static function createEmpty(): self
+    final public static function createEmpty(): self
     {
         return new self(null, []);
     }
 
-    public function __construct(?string $path, array $contents)
+    public function __construct(?string $path, array|string $contents)
     {
         Assert::nullOrNotEmpty($path);
 
@@ -35,16 +38,22 @@ final class ComposerFile
         }
 
         $this->path = $path;
-        $this->contents = $contents;
+        $this->contents = is_string($contents) ? $contents : '';
+        $this->decodedContents = is_array($contents) ? $contents : [];
     }
 
-    public function getPath(): ?string
+    final public function getPath(): ?string
     {
         return $this->path;
     }
 
-    public function getDecodedContents(): array
+    final public function getContents(): string
     {
         return $this->contents;
+    }
+
+    final public function getDecodedContents(): array
+    {
+        return $this->decodedContents;
     }
 }

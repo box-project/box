@@ -1,0 +1,221 @@
+//
+// Processed content of the configuration file "/Users/tfidry/Project/Humbug/box/fixtures/build/dir017/box.json.dist" dumped for debugging purposes
+//
+// PHP Version: 8.1.14
+// PHP extensions: Core,date,libxml,openssl,pcre,zlib,bcmath,bz2,calendar,ctype,curl,dom,fileinfo,filter,hash,iconv,intl,json,mbstring,SPL,session,pcntl,standard,mysqlnd,PDO,pdo_mysql,pdo_pgsql,pgsql,Phar,posix,readline,Reflection,mysqli,shmop,SimpleXML,sockets,sodium,sysvmsg,sysvsem,sysvshm,tokenizer,xml,xmlreader,xmlwriter,xsl,zip,gd,pdo_sqlite,redis,soap,xdebug
+// OS: Darwin / 20.6.0
+// Command: /Users/tfidry/Project/Humbug/box/bin/box compile --debug --no-restart
+// Box: dev-main@4a0e146
+// Time: 2023-02-13T09:39:31+00:00
+//
+
+KevinGH\Box\Configuration\ExportableConfiguration {#240
+  -file: "box.json.dist"
+  -alias: "box-auto-generated-alias-6c7d79a985e2.phar"
+  -basePath: "/Users/tfidry/Project/Humbug/box/fixtures/build/dir017"
+  -composerJson: KevinGH\Box\Composer\ComposerFile {#244
+    -path: "composer.json"
+    -contents: array:4 [
+      "bin" => "index.php"
+      "require" => array:1 [
+        "php" => "^8.1"
+      ]
+      "require-dev" => array:2 [
+        "phpstan/phpstan" => "^1.9"
+        "phpstan/extension-installer" => "^1.2"
+      ]
+      "config" => array:1 [
+        "allow-plugins" => array:1 [
+          "phpstan/extension-installer" => true
+        ]
+      ]
+    ]
+  }
+  -composerLock: KevinGH\Box\Composer\ComposerFile {#227
+    -path: "composer.lock"
+    -contents: array:12 [
+      "_readme" => array:3 [
+        0 => "This file locks the dependencies of your project to a known state"
+        1 => "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies"
+        2 => "This file is @generated automatically"
+      ]
+      "content-hash" => "d81279cb2a39d4658ba9a88f221c4c0b"
+      "packages" => []
+      "packages-dev" => array:2 [
+        0 => array:14 [
+          "name" => "phpstan/extension-installer"
+          "version" => "1.2.0"
+          "source" => array:3 [
+            "type" => "git"
+            "url" => "https://github.com/phpstan/extension-installer.git"
+            "reference" => "f06dbb052ddc394e7896fcd1cfcd533f9f6ace40"
+          ]
+          "dist" => array:4 [
+            "type" => "zip"
+            "url" => "https://api.github.com/repos/phpstan/extension-installer/zipball/f06dbb052ddc394e7896fcd1cfcd533f9f6ace40"
+            "reference" => "f06dbb052ddc394e7896fcd1cfcd533f9f6ace40"
+            "shasum" => ""
+          ]
+          "require" => array:3 [
+            "composer-plugin-api" => "^2.0"
+            "php" => "^7.2 || ^8.0"
+            "phpstan/phpstan" => "^1.8.0"
+          ]
+          "require-dev" => array:3 [
+            "composer/composer" => "^2.0"
+            "php-parallel-lint/php-parallel-lint" => "^1.2.0"
+            "phpstan/phpstan-strict-rules" => "^0.11 || ^0.12 || ^1.0"
+          ]
+          "type" => "composer-plugin"
+          "extra" => array:1 [
+            "class" => "PHPStan\ExtensionInstaller\Plugin"
+          ]
+          "autoload" => array:1 [
+            "psr-4" => array:1 [
+              "PHPStan\ExtensionInstaller\" => "src/"
+            ]
+          ]
+          "notification-url" => "https://packagist.org/downloads/"
+          "license" => array:1 [
+            0 => "MIT"
+          ]
+          "description" => "Composer plugin for automatic installation of PHPStan extensions"
+          "support" => array:2 [
+            "issues" => "https://github.com/phpstan/extension-installer/issues"
+            "source" => "https://github.com/phpstan/extension-installer/tree/1.2.0"
+          ]
+          "time" => "2022-10-17T12:59:16+00:00"
+        ]
+        1 => array:16 [
+          "name" => "phpstan/phpstan"
+          "version" => "1.9.17"
+          "source" => array:3 [
+            "type" => "git"
+            "url" => "https://github.com/phpstan/phpstan.git"
+            "reference" => "204e459e7822f2c586463029f5ecec31bb45a1f2"
+          ]
+          "dist" => array:4 [
+            "type" => "zip"
+            "url" => "https://api.github.com/repos/phpstan/phpstan/zipball/204e459e7822f2c586463029f5ecec31bb45a1f2"
+            "reference" => "204e459e7822f2c586463029f5ecec31bb45a1f2"
+            "shasum" => ""
+          ]
+          "require" => array:1 [
+            "php" => "^7.2|^8.0"
+          ]
+          "conflict" => array:1 [
+            "phpstan/phpstan-shim" => "*"
+          ]
+          "bin" => array:2 [
+            0 => "phpstan"
+            1 => "phpstan.phar"
+          ]
+          "type" => "library"
+          "autoload" => array:1 [
+            "files" => array:1 [
+              0 => "bootstrap.php"
+            ]
+          ]
+          "notification-url" => "https://packagist.org/downloads/"
+          "license" => array:1 [
+            0 => "MIT"
+          ]
+          "description" => "PHPStan - PHP Static Analysis Tool"
+          "keywords" => array:2 [
+            0 => "dev"
+            1 => "static analysis"
+          ]
+          "support" => array:2 [
+            "issues" => "https://github.com/phpstan/phpstan/issues"
+            "source" => "https://github.com/phpstan/phpstan/tree/1.9.17"
+          ]
+          "funding" => array:3 [
+            0 => array:2 [
+              "url" => "https://github.com/ondrejmirtes"
+              "type" => "github"
+            ]
+            1 => array:2 [
+              "url" => "https://github.com/phpstan"
+              "type" => "github"
+            ]
+            2 => array:2 [
+              "url" => "https://tidelift.com/funding/github/packagist/phpstan/phpstan"
+              "type" => "tidelift"
+            ]
+          ]
+          "time" => "2023-02-08T12:25:00+00:00"
+        ]
+      ]
+      "aliases" => []
+      "minimum-stability" => "stable"
+      "stability-flags" => []
+      "prefer-stable" => false
+      "prefer-lowest" => false
+      "platform" => array:1 [
+        "php" => "^8.1"
+      ]
+      "platform-dev" => []
+      "plugin-api-version" => "2.3.0"
+    ]
+  }
+  -files: array:7 [
+    0 => "box.json.dist"
+    1 => "composer.json"
+    2 => "composer.lock"
+    3 => "expected-output"
+    4 => "vendor/composer/InstalledVersions.php"
+    5 => "vendor/composer/installed.json"
+    6 => "vendor/composer/installed.php"
+  ]
+  -binaryFiles: []
+  -autodiscoveredFiles: true
+  -dumpAutoload: true
+  -excludeComposerFiles: true
+  -excludeDevFiles: true
+  -compactors: []
+  -compressionAlgorithm: "NONE"
+  -fileMode: "0755"
+  -mainScriptPath: "index.php"
+  -mainScriptContents: """
+    <?php\n
+    \n
+    declare(strict_types=1);\n
+    \n
+    /*\n
+     * This file is part of the box project.\n
+     *\n
+     * (c) Kevin Herrera <kevin@herrera.io>\n
+     *     Théo Fidry <theo.fidry@gmail.com>\n
+     *\n
+     * This source file is subject to the MIT license that is bundled\n
+     * with this source code in the file LICENSE.\n
+     */\n
+    \n
+    echo 'Everything is fine!'.PHP_EOL;\n
+    """
+  -fileMapper: KevinGH\Box\MapFile {#247
+    -basePath: "/Users/tfidry/Project/Humbug/box/fixtures/build/dir017"
+    -map: []
+  }
+  -metadata: null
+  -tmpOutputPath: "index.phar"
+  -outputPath: "index.phar"
+  -privateKeyPassphrase: null
+  -privateKeyPath: null
+  -promptForPrivateKey: false
+  -processedReplacements: []
+  -shebang: "#!/usr/bin/env php"
+  -signingAlgorithm: "SHA1"
+  -stubBannerContents: """
+    Generated by Humbug Box dev-main@4a0e146.\n
+    \n
+    @link https://github.com/humbug/box
+    """
+  -stubBannerPath: null
+  -stubPath: null
+  -isInterceptFileFuncs: false
+  -isStubGenerated: true
+  -checkRequirements: true
+  -warnings: []
+  -recommendations: []
+}

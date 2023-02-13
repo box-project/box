@@ -60,6 +60,7 @@ use function defined;
 use function dirname;
 use function explode;
 use function file_exists;
+use function file_get_contents;
 use function getcwd;
 use function implode;
 use function in_array;
@@ -267,6 +268,10 @@ final class Configuration
         );
 
         $excludeDevPackages = self::retrieveExcludeDevFiles($raw, $dumpAutoload, $logger);
+
+        if ($excludeDevPackages) {
+            $composerFiles = $composerFiles->excludeDevPackagesFromInstalledFiles();
+        }
 
         $devPackages = ComposerConfiguration::retrieveDevPackages(
             $basePath,
@@ -1830,10 +1835,22 @@ final class Configuration
             return new ComposerFile($file, $contents);
         };
 
+        $installedPhpPath = canonicalize($basePath.'/vendor/composer/installed.php');
+
+        $installedPhp = false === file_exists($installedPhpPath)
+            || false === is_file($installedPhpPath)
+            || false === is_readable($installedPhpPath)
+            ? ComposerFile::createEmpty()
+            : new ComposerFile(
+                $installedPhpPath,
+                file_get_contents($installedPhpPath),
+            );
+
         return new ComposerFiles(
             $retrieveFileAndContents(canonicalize($basePath.'/composer.json')),
             $retrieveFileAndContents(canonicalize($basePath.'/composer.lock')),
             $retrieveFileAndContents(canonicalize($basePath.'/vendor/composer/installed.json')),
+            $installedPhp,
         );
     }
 

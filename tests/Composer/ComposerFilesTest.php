@@ -32,6 +32,7 @@ class ComposerFilesTest extends TestCase
         ComposerFile $expectedComposerJson,
         ComposerFile $expectedComposerLock,
         ComposerFile $expectedInstalledJson,
+        ComposerFile $expectedInstalledPhp,
         array $expectedPaths,
     ): void {
         /** @var ComposerFiles $actual */
@@ -42,6 +43,7 @@ class ComposerFilesTest extends TestCase
         self::assertEquals($expectedComposerJson, $actual->getComposerJson());
         self::assertEquals($expectedComposerLock, $actual->getComposerLock());
         self::assertEquals($expectedInstalledJson, $actual->getInstalledJson());
+        self::assertEquals($expectedInstalledPhp, $actual->getInstalledPhp());
 
         self::assertSame($expectedPaths, $actual->getPaths());
     }
@@ -51,17 +53,20 @@ class ComposerFilesTest extends TestCase
         yield (static function (): array {
             $json = new ComposerFile('path/to/composer.json', ['name' => 'composer.json']);
             $lock = new ComposerFile('path/to/composer.lock', ['name' => 'composer.lock']);
-            $installed = new ComposerFile('path/to/installed.json', ['name' => 'installed.json']);
+            $installedJson = new ComposerFile('path/to/installed.json', ['name' => 'installed.json']);
+            $installedPhp = new ComposerFile('path/to/installed.php', ['name' => 'installed.php']);
 
             return [
-                static fn (): ComposerFiles => new ComposerFiles($json, $lock, $installed),
+                static fn (): ComposerFiles => new ComposerFiles($json, $lock, $installedJson, $installedPhp),
                 $json,
                 $lock,
-                $installed,
+                $installedJson,
+                $installedPhp,
                 [
                     'path/to/composer.json',
                     'path/to/composer.lock',
                     'path/to/installed.json',
+                    'path/to/installed.php',
                 ],
             ];
         })();
@@ -69,22 +74,26 @@ class ComposerFilesTest extends TestCase
         yield (static function (): array {
             $json = new ComposerFile('path/to/composer.json', ['name' => 'composer.json']);
             $lock = ComposerFile::createEmpty();
-            $installed = new ComposerFile('path/to/installed.json', ['name' => 'installed.json']);
+            $installedJson = new ComposerFile('path/to/installed.json', ['name' => 'installed.json']);
+            $installedPhp = new ComposerFile('path/to/installed.php', ['name' => 'installed.php']);
 
             return [
-                static fn (): ComposerFiles => new ComposerFiles($json, $lock, $installed),
+                static fn (): ComposerFiles => new ComposerFiles($json, $lock, $installedJson, $installedPhp),
                 $json,
                 $lock,
-                $installed,
+                $installedJson,
+                $installedPhp,
                 [
                     'path/to/composer.json',
                     'path/to/installed.json',
+                    'path/to/installed.php',
                 ],
             ];
         })();
 
         yield (static fn (): array => [
             static fn (): ComposerFiles => ComposerFiles::createEmpty(),
+            ComposerFile::createEmpty(),
             ComposerFile::createEmpty(),
             ComposerFile::createEmpty(),
             ComposerFile::createEmpty(),
