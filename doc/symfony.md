@@ -1,7 +1,8 @@
 # Symfony support
 
 1. [Project directory](#project-directory)
-1. [Cache](#cache)
+2. [Cache](#cache)
+3. [Runtime component](#runtime-component)
 
 
 ## Project directory
@@ -80,6 +81,19 @@ I.e.:
 
 This last part takes advantage of Box [dumping the autoloader][composer-autoloader-dump] by default.
 
+## Runtime component
+
+If using Symfony 5.4 version and higher, running a command from phar might result in an error like 
+```
+PHP Fatal error:  Uncaught TypeError: Invalid return value: callable object expected, "int" returned from "./build/app.phar". in phar:///home/imper/projects/phartest/build/app.phar/vendor/autoload_runtime.php:12
+Stack trace:
+#0 phar:///home/imper/projects/phartest/build/app.phar/bin/console(10): require_once()
+#1 /home/imper/projects/phartest/build/app.phar(14): require('...')
+#2 {main}
+  thrown in phar:///home/imper/projects/phartest/build/app.phar/vendor/autoload_runtime.php on line 12
+```
+The solution is to modify `bin/console`, copy and modify `autoload_runtime.php` form `vendor` to `config` 
+folder, as described in [this issue](https://github.com/box-project/box/issues/655#issuecomment-1118331146).
 
 <br />
 <hr />
