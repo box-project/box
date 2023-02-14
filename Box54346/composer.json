@@ -1,7 +1,8 @@
 {
     "bin": "index.php",
     "require": {
-        "php": "^8.1"
+        "php": "^8.1",
+        "nikic/iter": "^2.2"
     },
     "require-dev": {
         "phpstan/phpstan": "^1.9",

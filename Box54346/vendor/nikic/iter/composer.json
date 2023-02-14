@@ -1,0 +1,29 @@
+{
+    "name": "nikic/iter",
+    "description": "Iteration primitives using generators",
+    "keywords": [
+        "iterator",
+        "generator",
+        "functional"
+    ],
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Nikita Popov",
+            "email": "nikic@php.net"
+        }
+    ],
+    "require": {
+        "php": ">=7.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0"
+    },
+    "autoload": {
+        "files": [
+            "src/iter.func.php",
+            "src/iter.php",
+            "src/iter.rewindable.php"
+        ]
+    }
+}

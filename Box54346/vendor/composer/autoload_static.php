@@ -6,6 +6,12 @@ namespace Composer\Autoload;
 
 class ComposerStaticInitd675878ac2c7da13231e6f107702b12a
 {
+    public static $files = array (
+        '10d1e61aa091e707ef2023f98f57ef11' => __DIR__ . '/..' . '/nikic/iter/src/iter.func.php',
+        '35c02f945f51da2672a14da5064b8327' => __DIR__ . '/..' . '/nikic/iter/src/iter.php',
+        '6f0d4b1a6e0d44877f891efd10b573f1' => __DIR__ . '/..' . '/nikic/iter/src/iter.rewindable.php',
+    );
+
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
     );

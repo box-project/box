@@ -12,4 +12,20 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-echo 'Everything is fine!'.PHP_EOL;
+use Composer\InstalledVersions;
+use function iter\toIter;
+
+require __DIR__.'/vendor/autoload.php';
+
+$packages = toIter([
+    'nikic/iter',
+    'phpstan/extension-installer',
+]);
+
+foreach ($packages as $package) {
+    echo sprintf(
+        'The package "%s" is %sinstalled.'.PHP_EOL,
+        $package,
+        InstalledVersions::isInstalled($package) ? '' : 'NOT ',
+    );
+}

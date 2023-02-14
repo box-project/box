@@ -80,5 +80,6 @@ final class ComposerFiles
 
     public function excludeDevPackagesFromInstalledFiles(): self
     {
+        return $this;
     }
 }

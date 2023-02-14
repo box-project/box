@@ -11,5 +11,10 @@ use PHPUnit\Framework\TestCase;
  */
 final class InstalledJsonFileTest extends TestCase
 {
+    public function test_it_can_exclude_dev_packages(
+        InstalledJsonFile $expected
+    ): void
+    {
 
+    }
 }
