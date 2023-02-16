@@ -26,7 +26,6 @@ final class ComposerFiles
             ComposerFile::createEmpty(),
             ComposerFile::createEmpty(),
             ComposerFile::createEmpty(),
-            ComposerFile::createEmpty(),
         );
     }
 
@@ -34,7 +33,6 @@ final class ComposerFiles
         private readonly ComposerFile $composerJson,
         private readonly ComposerFile $composerLock,
         private readonly ComposerFile $installedJson,
-        private readonly ComposerFile $installedPhp,
     ) {
     }
 
@@ -53,11 +51,6 @@ final class ComposerFiles
         return $this->installedJson;
     }
 
-    public function getInstalledPhp(): ComposerFile
-    {
-        return $this->installedPhp;
-    }
-
     /**
      * @return list<string>
      */
@@ -67,19 +60,9 @@ final class ComposerFiles
             array_filter(
                 array_map(
                     static fn (ComposerFile $file): ?string => $file->getPath(),
-                    [
-                        $this->composerJson,
-                        $this->composerLock,
-                        $this->installedJson,
-                        $this->installedPhp,
-                    ],
+                    [$this->composerJson, $this->composerLock, $this->installedJson],
                 ),
             ),
         );
-    }
-
-    public function excludeDevPackagesFromInstalledFiles(): self
-    {
-        return $this;
     }
 }

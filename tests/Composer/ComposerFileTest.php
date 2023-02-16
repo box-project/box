@@ -28,24 +28,15 @@ class ComposerFileTest extends TestCase
     /**
      * @dataProvider validInstantiatorsProvider
      */
-    public function test_it_can_be_created(
-        Closure $create,
-        ?string $expectedPath,
-        string $expectedContents,
-        array $expectedDecodedContents,
-    ): void
+    public function test_it_can_be_created(Closure $create, ?string $expectedPath, array $expectedContents): void
     {
         /** @var ComposerFile $actual */
         $actual = $create();
 
         self::assertInstanceOf(ComposerFile::class, $actual);
 
-        ComposerFileAssertions::assertStateIs(
-            $actual,
-            $expectedPath,
-            $expectedContents,
-            $expectedDecodedContents,
-        );
+        self::assertSame($expectedPath, $actual->getPath());
+        self::assertSame($expectedContents, $actual->getDecodedContents());
     }
 
     /**
@@ -67,29 +58,19 @@ class ComposerFileTest extends TestCase
         yield [
             static fn (): ComposerFile => new ComposerFile(null, []),
             null,
-            '',
             [],
         ];
 
         yield [
             static fn (): ComposerFile => ComposerFile::createEmpty(),
             null,
-            '',
             [],
         ];
 
         yield [
             static fn (): ComposerFile => new ComposerFile('path/to/foo', ['foo' => 'bar']),
             'path/to/foo',
-            '',
             ['foo' => 'bar'],
-        ];
-
-        yield [
-            static fn (): ComposerFile => new ComposerFile('path/to/foo', 'foo'),
-            'path/to/foo',
-            'foo',
-            [],
         ];
     }
 
