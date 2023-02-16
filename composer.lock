@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4f98ceb3029205feb244041e8943463e",
+    "content-hash": "f79c77b813a392137ca4f67387860c2e",
     "packages": [
         {
             "name": "amphp/amp",
@@ -5438,6 +5438,51 @@
                 }
             ],
             "time": "2021-07-28T10:34:58+00:00"
+        },
+        {
+            "name": "webmozarts/strict-phpunit",
+            "version": "7.6.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webmozarts/strict-phpunit.git",
+                "reference": "6861f7f5baf8e42fe253a6cf16de9ca8ce561ec7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webmozarts/strict-phpunit/zipball/6861f7f5baf8e42fe253a6cf16de9ca8ce561ec7",
+                "reference": "6861f7f5baf8e42fe253a6cf16de9ca8ce561ec7",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4.0",
+                "phpunit/phpunit": "^9.4.3"
+            },
+            "require-dev": {
+                "ergebnis/composer-normalize": "^2.28",
+                "infection/infection": "^0.26.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Webmozarts\\StrictPHPUnit\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bernhard Schussek",
+                    "email": "bernhard.schussek@webmozarts.com"
+                }
+            ],
+            "description": "Enables type-safe comparisons of objects in PHPUnit",
+            "support": {
+                "issues": "https://github.com/webmozarts/strict-phpunit/issues",
+                "source": "https://github.com/webmozarts/strict-phpunit/tree/7.6.5"
+            },
+            "time": "2023-01-13T13:00:42+00:00"
         }
     ],
     "aliases": [],

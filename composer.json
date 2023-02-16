@@ -49,7 +49,8 @@
         "phpspec/prophecy-phpunit": "^2.0.1",
         "phpunit/phpunit": "^9.5.26",
         "symfony/phpunit-bridge": "^6.1.6",
-        "symfony/yaml": "^6.2"
+        "symfony/yaml": "^6.2",
+        "webmozarts/strict-phpunit": "^7.6"
     },
     "replace": {
         "paragonie/sodium_compat": "*",
