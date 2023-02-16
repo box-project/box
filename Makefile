@@ -250,7 +250,7 @@ _infection_ci: $(INFECTION_BIN) $(COVERAGE_XML_DIR) $(COVERAGE_JUNIT) vendor
 #---------------------------------------------------------------------------
 
 .PHONY: test_e2e
-test_e2e: e2e_scoper_alias e2e_scoper_expose_symbols e2e_php_settings_checker e2e_symfony e2e_composer_installed_versions e2e_phpstorm_stubs e2e_dockerfile e2e_dockerfile_no_extension
+test_e2e: e2e_scoper_alias e2e_scoper_expose_symbols e2e_php_settings_checker e2e_symfony e2e_composer_installed_versions e2e_phpstorm_stubs e2e_dockerfile e2e_dockerfile_no_extension e2e_installed_dev
 
 
 .PHONY: blackfire
