@@ -85,7 +85,7 @@ class CompileTest extends FileSystemTestCase
 {
     use RequiresPharReadonlyOff;
 
-    private const NUMBER_OF_FILES = 48;
+    private const NUMBER_OF_FILES = 50;
 
     private const BOX_FILES = [
         '/.box/',
@@ -138,6 +138,8 @@ class CompileTest extends FileSystemTestCase
         '/vendor/autoload.php',
         '/vendor/composer/',
         '/vendor/composer/ClassLoader.php',
+        '/vendor/composer/InstalledVersions.php',
+        '/vendor/composer/installed.php',
         '/vendor/composer/LICENSE',
         '/vendor/composer/autoload_classmap.php',
         '/vendor/composer/autoload_namespaces.php',
@@ -633,7 +635,7 @@ class CompileTest extends FileSystemTestCase
             No recommendation found.
             No warning found.
 
-             // PHAR: 13 files (100B)
+             // PHAR: 15 files (100B)
              // You can inspect the generated PHAR with the "info" command.
 
              // Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s
@@ -698,7 +700,9 @@ class CompileTest extends FileSystemTestCase
             '/vendor/autoload.php',
             '/vendor/composer/',
             '/vendor/composer/ClassLoader.php',
+            '/vendor/composer/InstalledVersions.php',
             '/vendor/composer/LICENSE',
+            '/vendor/composer/installed.php',
             '/vendor/composer/autoload_classmap.php',
             '/vendor/composer/autoload_namespaces.php',
             '/vendor/composer/autoload_psr4.php',
@@ -794,7 +798,7 @@ class CompileTest extends FileSystemTestCase
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
-        $expectedNumberOfClasses = 1;
+        $expectedNumberOfClasses = 4;
         $expectedNumberOfFiles = self::NUMBER_OF_FILES;
 
         dump_file(
@@ -873,6 +877,9 @@ class CompileTest extends FileSystemTestCase
               'rand' => {$rand},
             )
             ? Dumping the Composer autoloader
+                > '/usr/local/bin/composer' 'install' '--no-dev' '--no-scripts' '--no-plugins'
+            Composer install output
+
                 > '/usr/local/bin/composer' 'dump-autoload' '--classmap-authoritative' '--no-dev'
             Generating optimized autoload files (authoritative)
             Generated optimized autoload files (authoritative) containing {$expectedNumberOfClasses} classes
@@ -902,6 +909,7 @@ class CompileTest extends FileSystemTestCase
             $expected,
             ExitCode::SUCCESS,
             self::createComposerPathNormalizer(),
+            self::createComposerInstallNoDevNormalizer(),
         );
     }
 
@@ -915,7 +923,7 @@ class CompileTest extends FileSystemTestCase
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
-        $expectedNumberOfClasses = 1;
+        $expectedNumberOfClasses = 4;
         $expectedNumberOfFiles = self::NUMBER_OF_FILES;
 
         dump_file(
@@ -998,6 +1006,9 @@ class CompileTest extends FileSystemTestCase
               'rand' => {$rand},
             )
             ? Dumping the Composer autoloader
+                > '/usr/local/bin/composer' 'install' '--no-dev' '--no-scripts' '--no-plugins' '-v'
+            Composer install output
+
                 > '/usr/local/bin/composer' 'dump-autoload' '--classmap-authoritative' '--no-dev' '-v'
             Generating optimized autoload files (authoritative)
             Generated optimized autoload files (authoritative) containing {$expectedNumberOfClasses} classes
@@ -1033,6 +1044,7 @@ class CompileTest extends FileSystemTestCase
             $expected,
             ExitCode::SUCCESS,
             self::createComposerPathNormalizer(),
+            self::createComposerInstallNoDevNormalizer(),
         );
     }
 
@@ -3038,6 +3050,15 @@ class CompileTest extends FileSystemTestCase
         return static fn (string $output): string => preg_replace(
             '/(\/.*?composer)/',
             '/usr/local/bin/composer',
+            $output,
+        );
+    }
+
+    private static function createComposerInstallNoDevNormalizer(): callable
+    {
+        return static fn (string $output): string => preg_replace(
+            '/No composer\.lock file present\.[\s\S]*Generating autoload files/',
+            'Composer install output',
             $output,
         );
     }
