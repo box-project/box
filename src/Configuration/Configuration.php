@@ -1433,9 +1433,6 @@ final class Configuration
             ->notName('*.back')
             ->notName('*.swp')
             // Remove tests
-            ->notName('*Test.php')
-            ->exclude('test')
-            ->exclude('Test')
             ->exclude('tests')
             ->exclude('Tests')
             ->notName('/phpunit.*\.xml(.dist)?/')
