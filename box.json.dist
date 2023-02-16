@@ -16,7 +16,6 @@
     ],
     "directories-bin": ["res/requirement-checker"],
 
-    "exclude-composer-files": false,
     "compression": "GZ",
     "compactors": [
         "KevinGH\\Box\\Compactor\\Php",
