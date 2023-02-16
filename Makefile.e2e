@@ -54,10 +54,10 @@ E2E_DOCKERFILE_NOT_EXT_IMAGE_TAG := local_box_e2e_dockerfile_no_ext:latest
 # TODO: see https://github.com/box-project/box/issues/839
 E2E_DOCKERFILE_NO_EXT_DOCKERFILE := Dockerfile
 
-E2E_COMPOSER_INSTALLED_DIR = fixtures/build/dir017
-E2E_COMPOSER_INSTALLED_OUTPUT_DIR = dist/dir017
-E2E_COMPOSER_INSTALLED_EXPECTED_OUTPUT := $(E2E_COMPOSER_INSTALLED_DIR)/expected-output
-E2E_COMPOSER_INSTALLED_ACTUAL_OUTPUT := $(E2E_COMPOSER_INSTALLED_OUTPUT_DIR)/actual-output
+E2E_COMPOSER_INSTALLED_DEV_DIR = fixtures/build/dir017
+E2E_COMPOSER_INSTALLED_DEV_OUTPUT_DIR = dist/dir017
+E2E_COMPOSER_INSTALLED_DEV_EXPECTED_OUTPUT := $(E2E_COMPOSER_INSTALLED_DEV_DIR)/expected-output
+E2E_COMPOSER_INSTALLED_DEV_ACTUAL_OUTPUT := $(E2E_COMPOSER_INSTALLED_DEV_OUTPUT_DIR)/actual-output
 
 ifeq ($(OS),Darwin)
 	SED = sed -i ''
@@ -220,15 +220,15 @@ _e2e_dockerfile_no_extension:
 
 
 .PHONY: e2e_installed_dev
-e2e_installed_dev: $(SCOPED_BOX_BIN) $(E2E_COMPOSER_INSTALLED_DIR)/vendor
+e2e_installed_dev: $(SCOPED_BOX_BIN) $(E2E_COMPOSER_INSTALLED_DEV_DIR)/vendor
 	@# Packages an app with dev composer plugins
-	$(SCOPED_BOX) compile --working-dir=$(E2E_COMPOSER_INSTALLED_DIR) --no-parallel --ansi
+	$(SCOPED_BOX) compile --working-dir=$(E2E_COMPOSER_INSTALLED_DEV_DIR) --no-parallel --ansi
 
-	@mkdir -p $(E2E_COMPOSER_INSTALLED_OUTPUT_DIR)
-	php $(E2E_COMPOSER_INSTALLED_DIR)/index.phar > $(E2E_COMPOSER_INSTALLED_ACTUAL_OUTPUT)
-	mv -vf $(E2E_COMPOSER_INSTALLED_DIR)/index.phar $(E2E_COMPOSER_INSTALLED_OUTPUT_DIR)/index.phar
+	@mkdir -p $(E2E_COMPOSER_INSTALLED_DEV_OUTPUT_DIR)
+	php $(E2E_COMPOSER_INSTALLED_DEV_DIR)/index.phar > $(E2E_COMPOSER_INSTALLED_DEV_ACTUAL_OUTPUT)
+	mv -vf $(E2E_COMPOSER_INSTALLED_DEV_DIR)/index.phar $(E2E_COMPOSER_INSTALLED_DEV_OUTPUT_DIR)/index.phar
 
-	$(DIFF) $(E2E_COMPOSER_INSTALLED_EXPECTED_OUTPUT) $(E2E_COMPOSER_INSTALLED_ACTUAL_OUTPUT)
+	$(DIFF) $(E2E_COMPOSER_INSTALLED_DEV_EXPECTED_OUTPUT) $(E2E_COMPOSER_INSTALLED_DEV_ACTUAL_OUTPUT)
 
 
 #
@@ -278,6 +278,13 @@ $(E2E_DOCKERFILE_NO_EXT_DIR)/composer.lock: $(E2E_DOCKERFILE_NO_EXT_DIR)/compose
 $(E2E_DOCKERFILE_NO_EXT_PHAR): $(SCOPED_BOX_BIN) $(E2E_DOCKERFILE_NO_EXT_DIR)/index.php $(E2E_DOCKERFILE_NO_EXT_DIR)/vendor
 	$(SCOPED_BOX) compile --ansi --working-dir=$(E2E_DOCKERFILE_NO_EXT_DIR)
 	touch -c $@
+
+$(E2E_COMPOSER_INSTALLED_DEV_DIR)/vendor: $(E2E_COMPOSER_INSTALLED_DEV_DIR)/composer.lock
+	composer install --ansi --working-dir=$(E2E_COMPOSER_INSTALLED_DEV_DIR)
+	touch -c $@
+$(E2E_COMPOSER_INSTALLED_DEV_DIR)/composer.lock: $(E2E_COMPOSER_INSTALLED_DEV_DIR)/composer.json
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
+	@echo "$$ composer update --lock --working-dir=$(E2E_COMPOSER_INSTALLED_DEV_DIR) && touch -c $(@)"
 
 .PHONY: docker_images
 docker_images:
