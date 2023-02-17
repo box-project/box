@@ -150,7 +150,7 @@ final class ComposerOrchestrator
             return;
         }
 
-        $composerCommand = [$composerExecutable, 'install', '--no-dev', '--no-scripts', '--no-plugins', '-vvv'];
+        $composerCommand = [$composerExecutable, 'install', '--no-dev', '--no-scripts', '--no-plugins'];
 
         if (null !== $verbosity = self::retrieveSubProcessVerbosity($logger->getIO())) {
             $composerCommand[] = $verbosity;
