@@ -1,0 +1,22 @@
+
+Box Requirements Checker
+========================
+
+> Using PHP 8.1.14
+> PHP is using the following php.ini file:
+  WARNING: No configuration file (php.ini) used by PHP!
+
+> Checking Box requirements:
+  ✔ The application requires a version matching "^8.1".
+  ✔ The application requires the extension "zlib".
+  ✔ The application requires the extension "phar".
+  ✔ The application requires the extension "sodium".
+  ✔ The package "nikic/php-parser" requires the extension "tokenizer".
+  ✔ The package "phpdocumentor/reflection-docblock" requires the extension
+"filter".
+  ✔ The package "symfony/service-contracts" conflicts with the extension "psr".
+  
+                                                                                
+ [OK] Your system is ready to run the application.                              
+                                                                                
+
