@@ -115,7 +115,11 @@ jobs:
             fail-fast: false
             matrix:
                 e2e:
-                    - _e2e_php_settings_checker
+                    - _e2e_php_settings_checker_no_restart
+                    - _e2e_php_settings_checker_xdebug_enabled
+                    - _e2e_php_settings_checker_readonly_enabled
+                    - _e2e_php_settings_checker_memory_limit_lower
+                    - _e2e_php_settings_checker_memory_limit_higher
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3

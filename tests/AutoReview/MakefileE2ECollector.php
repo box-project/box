@@ -40,8 +40,13 @@ final class MakefileE2ECollector
                 Parser::parse(
                     file_get_contents(MakefileTest::MAKEFILE_PATH),
                 ),
-                static fn (Rule $rule) => 'test_e2e' === $rule->getTarget() && !$rule->isComment() && !$rule->isPhony(),
+                self::isE2ERule(...),
             ),
         );
+    }
+
+    private static function isE2ERule(Rule $rule): bool
+    {
+        return 'test_e2e' === $rule->getTarget() && !$rule->isComment() && !$rule->isPhony();
     }
 }
