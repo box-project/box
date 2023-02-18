@@ -1,6 +1,3 @@
-!/fixtures/php-settings-checker/create-expected-output
-!/fixtures/php-settings-checker/index.php
-!/fixtures/php-settings-checker/output-*
 /*.phar
 /*.phar.sig
 /.box_dump/
@@ -24,8 +21,6 @@
 /fixtures/build/dir012/bin/console.phar
 /fixtures/build/dir012/expected-output
 /fixtures/default_stub.php
-/fixtures/php-settings-checker/*
-/fixtures/php-settings-checker/output-xdebug-enabled
 /phpcs.xml
 /phpunit.xml
 /vendor-bin/*/composer.lock
