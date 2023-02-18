@@ -89,7 +89,7 @@ e2e_scoper_expose_symbols: $(SCOPED_BOX_BIN) $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/ve
 e2e_php_settings_checker_no_restart: docker_images _e2e_php_settings_checker_no_restart
 
 .PHONY: _e2e_php_settings_checker_no_restart
-_e2e_php_settings_checker_no_restart: $(SCOPED_BOX_BIN)
+_e2e_php_settings_checker_no_restart: $(SCOPED_BOX_BIN) $(E2E_PHP_SETTINGS_CHECKER_OUTPUT_DIR)
 	@echo "$(YELLOW_COLOR)No restart needed$(NO_COLOR)"
 	$(DOCKER_RUN) --volume="$$PWD":/opt/box $(DOCKER_MIN_BOX_VERSION_IMAGE_TAG) \
 		php -dphar.readonly=0 -dmemory_limit=-1 \
@@ -103,7 +103,7 @@ _e2e_php_settings_checker_no_restart: $(SCOPED_BOX_BIN)
 e2e_php_settings_checker_xdebug_enabled: docker_images _e2e_php_settings_checker_xdebug_enabled
 
 .PHONY: _e2e_php_settings_checker_xdebug_enabled
-_e2e_php_settings_checker_xdebug_enabled: $(SCOPED_BOX_BIN) $(E2E_PHP_SETTINGS_CHECKER_EXPECTED_XDEBUG_ENABLED_OUTPUT)
+_e2e_php_settings_checker_xdebug_enabled: $(SCOPED_BOX_BIN) $(E2E_PHP_SETTINGS_CHECKER_OUTPUT_DIR) $(E2E_PHP_SETTINGS_CHECKER_EXPECTED_XDEBUG_ENABLED_OUTPUT)
 	@echo "$(YELLOW_COLOR)Xdebug enabled: restart needed$(NO_COLOR)"
 	$(DOCKER_RUN) --volume="$$PWD":/opt/box $(DOCKER_MIN_BOX_XDEBUG_PHP_VERSION_IMAGE_TAG) \
 		php -dphar.readonly=0 -dmemory_limit=-1 \
@@ -118,7 +118,7 @@ _e2e_php_settings_checker_xdebug_enabled: $(SCOPED_BOX_BIN) $(E2E_PHP_SETTINGS_C
 e2e_php_settings_checker_readonly_enabled: docker_images _e2e_php_settings_checker_readonly_enabled
 
 .PHONY: _e2e_php_settings_checker_readonly_enabled
-_e2e_php_settings_checker_readonly_enabled: $(SCOPED_BOX_BIN)
+_e2e_php_settings_checker_readonly_enabled: $(SCOPED_BOX_BIN) $(E2E_PHP_SETTINGS_CHECKER_OUTPUT_DIR)
 	@echo "$(YELLOW_COLOR)phar.readonly enabled: restart needed$(NO_COLOR)"
 	$(DOCKER_RUN) --volume="$$PWD":/opt/box $(DOCKER_MIN_BOX_VERSION_IMAGE_TAG) \
 		php -dphar.readonly=1 -dmemory_limit=-1 \
@@ -134,7 +134,7 @@ _e2e_php_settings_checker_readonly_enabled: $(SCOPED_BOX_BIN)
 e2e_php_settings_checker_memory_limit_lower: docker_images _e2e_php_settings_checker_memory_limit_lower
 
 .PHONY: _e2e_php_settings_checker_memory_limit_lower
-_e2e_php_settings_checker_memory_limit_lower: $(SCOPED_BOX_BIN)
+_e2e_php_settings_checker_memory_limit_lower: $(SCOPED_BOX_BIN) $(E2E_PHP_SETTINGS_CHECKER_OUTPUT_DIR)
 	@echo "$(YELLOW_COLOR)Bump min memory limit if necessary (limit lower than default)$(NO_COLOR)"
 	$(DOCKER_RUN) --volume="$$PWD":/opt/box $(DOCKER_MIN_BOX_VERSION_IMAGE_TAG) \
 		php -dphar.readonly=0 -dmemory_limit=124M \
@@ -150,7 +150,7 @@ _e2e_php_settings_checker_memory_limit_lower: $(SCOPED_BOX_BIN)
 e2e_php_settings_checker_memory_limit_higher: docker_images _e2e_php_settings_checker_memory_limit_higher
 
 .PHONY: _e2e_php_settings_checker_memory_limit_higher
-_e2e_php_settings_checker_memory_limit_higher: $(SCOPED_BOX_BIN)
+_e2e_php_settings_checker_memory_limit_higher: $(SCOPED_BOX_BIN) $(E2E_PHP_SETTINGS_CHECKER_OUTPUT_DIR)
 	@echo ""
 	@echo "$(YELLOW_COLOR)Bump min memory limit if necessary (limit higher than default)$(NO_COLOR)"
 	$(DOCKER_RUN) -e BOX_MEMORY_LIMIT=64M --volume="$$PWD":/opt/box $(DOCKER_MIN_BOX_VERSION_IMAGE_TAG) \
@@ -282,6 +282,9 @@ $(E2E_DOCKERFILE_NO_EXT_PHAR): $(SCOPED_BOX_BIN) $(E2E_DOCKERFILE_NO_EXT_DIR)/in
 .PHONY: docker_images
 docker_images:
 	./.docker/build
+
+$(E2E_PHP_SETTINGS_CHECKER_OUTPUT_DIR):
+	mkdir -p $(E2E_PHP_SETTINGS_CHECKER_OUTPUT_DIR)
 
 $(E2E_PHP_SETTINGS_CHECKER_EXPECTED_XDEBUG_ENABLED_OUTPUT): $(E2E_PHP_SETTINGS_CHECKER_EXPECTED_OUTPUT_XDEBUG_ENABLED_TEMPLATE)
 	./fixtures/php-settings-checker/create-expected-output $(DOCKER_MIN_BOX_XDEBUG_PHP_VERSION_IMAGE_TAG)
