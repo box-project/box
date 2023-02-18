@@ -420,7 +420,7 @@ class CompileTest extends FileSystemTestCase
         );
 
         $version = get_box_version();
-        $expectedNumberOfFiles = self::NUMBER_OF_FILES + 4;
+        $expectedNumberOfFiles = self::NUMBER_OF_FILES + 5;
 
         $expected = <<<OUTPUT
 
@@ -445,7 +445,7 @@ class CompileTest extends FileSystemTestCase
             ? Auto-discover files? Yes
             ? Exclude dev files? Yes
             ? Adding files
-                > 9 file(s)
+                > 10 file(s)
             ? Generating new stub
               - Using shebang line: #!/usr/bin/env php
               - Using banner:
@@ -514,6 +514,11 @@ class CompileTest extends FileSystemTestCase
         $expectedFiles = [
             ...self::BOX_FILES,
             ...self::COMPOSER_FILES,
+            '/a/',
+            '/a/deep/',
+            '/a/deep/test/',
+            '/a/deep/test/directory/',
+            '/a/deep/test/directory/test.php',
             '/binary',
             '/bootstrap.php',
             '/index.php',
