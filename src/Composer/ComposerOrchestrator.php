@@ -69,13 +69,14 @@ final class ComposerOrchestrator
         SymbolsRegistry $symbolsRegistry,
         string $prefix,
         bool $excludeDevFiles,
+        ?string $composerBin,
         ?IO $io = null,
     ): void {
         $io ??= IO::createNull();
 
         $logger = new CompilerLogger($io);
 
-        $composerExecutable = self::retrieveComposerExecutable();
+        $composerExecutable = $composerBin ?? self::retrieveComposerExecutable();
 
         self::dumpAutoloader($composerExecutable, true === $excludeDevFiles, $logger);
 
