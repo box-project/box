@@ -21,6 +21,7 @@
 /fixtures/build/dir012/bin/console.phar
 /fixtures/build/dir012/expected-output
 /fixtures/default_stub.php
+/fixtures/php-settings-checker/index.phar
 /phpcs.xml
 /phpunit.xml
 /vendor-bin/*/composer.lock
