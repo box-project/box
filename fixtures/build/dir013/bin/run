@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php declare(strict_types = 1);
 
+use Composer\InstalledVersions;
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 set_error_handler(function($errno, $errstr, $errfile, $errline, $errcontext) {
@@ -12,7 +14,4 @@ set_error_handler(function($errno, $errstr, $errfile, $errline, $errcontext) {
 	throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
 });
 
-// force autoloader
-class_exists(\Composer\InstalledVersions::class);
-
-echo "OK\n";
+echo InstalledVersions::isInstalled('nikic/iter') ? "OK\n" : "NOPE\n";

@@ -1,5 +1,8 @@
 {
     "bin": [
         "bin/run"
-    ]
+    ],
+    "require": {
+        "nikic/iter": "^2.2"
+    }
 }
