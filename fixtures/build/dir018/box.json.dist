@@ -1,10 +1,12 @@
 {
     "files-bin": [
         ".env.local.php",
+        "autoload_runtime.template",
         "src/Controller/.gitignore"
     ],
     "directories": [
         "config",
+        "public",
         "var"
     ],
     "force-autodiscovery": true,

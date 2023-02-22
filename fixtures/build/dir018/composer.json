@@ -22,7 +22,7 @@
             "symfony/runtime": true
         }
     },
-    "bin": ["bin/console"],
+    "bin": ["new-bin/console"],
     "autoload": {
         "psr-4": {
             "App\\": "src/"
@@ -44,6 +44,9 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
+        "post-autoload-dump": [
+            "@auto-scripts"
+        ],
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
@@ -53,9 +56,13 @@
         "symfony/symfony": "*"
     },
     "extra": {
+        "bin-dir": "new-bin",
         "symfony": {
             "allow-contrib": false,
             "require": "6.2.*"
+        },
+        "runtime": {
+            "autoload_template": "autoload_runtime.template"
         }
     }
 }

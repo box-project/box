@@ -57,7 +57,8 @@ E2E_SYMFONY_ACTUAL_STDERR := $(E2E_SYMFONY_OUTPUT_DIR)/actual-stderr
 
 E2E_SYMFONY_RUNTIME_DIR = fixtures/build/dir018
 E2E_SYMFONY_RUNTIME_OUTPUT_DIR = dist/dir018
-E2E_SYMFONY_RUNTIME_TMP_PHAR := $(E2E_SYMFONY_RUNTIME_DIR)/bin/console.phar
+E2E_SYMFONY_RUNTIME_CONSOLE := $(E2E_SYMFONY_RUNTIME_DIR)/new-bin/console
+E2E_SYMFONY_RUNTIME_TMP_PHAR := $(E2E_SYMFONY_RUNTIME_DIR)/new-bin/console.phar
 E2E_SYMFONY_RUNTIME_PHAR := $(E2E_SYMFONY_RUNTIME_OUTPUT_DIR)/console.phar
 E2E_SYMFONY_RUNTIME_EXPECTED_STDOUT := $(E2E_SYMFONY_OUTPUT_DIR)/expected-stdout
 E2E_SYMFONY_RUNTIME_EXPECTED_STDERR := $(E2E_SYMFONY_OUTPUT_DIR)/expected-stderr
@@ -300,13 +301,13 @@ e2e_symfony: $(SCOPED_BOX_BIN) $(E2E_SYMFONY_DIR)/vendor $(E2E_SYMFONY_DIR)/.env
 e2e_symfony_runtime: $(SCOPED_BOX_BIN) $(E2E_SYMFONY_RUNTIME_DIR)/vendor $(E2E_SYMFONY_RUNTIME_DIR)/.env.local.php
 	@# Packages a fresh Symfony app
 	@mkdir -p $(E2E_SYMFONY_RUNTIME_OUTPUT_DIR)
-	php $(E2E_SYMFONY_RUNTIME_DIR)/bin/console --version --no-ansi \
+	php $(E2E_SYMFONY_RUNTIME_CONSOLE) --version --no-ansi \
 		1>$(E2E_SYMFONY_RUNTIME_EXPECTED_STDOUT) \
 		2>$(E2E_SYMFONY_RUNTIME_EXPECTED_STDERR)
 
 	@# Clear the cache: we want to make sure it works on a clean installation
-	$(E2E_SYMFONY_RUNTIME_DIR)/bin/console cache:pool:clear cache.global_clearer --env=prod --ansi
-	$(E2E_SYMFONY_RUNTIME_DIR)/bin/console cache:clear --env=prod --ansi
+	$(E2E_SYMFONY_RUNTIME_CONSOLE) cache:pool:clear cache.global_clearer --env=prod --ansi
+	$(E2E_SYMFONY_RUNTIME_CONSOLE) cache:clear --env=prod --ansi
 	rm -rf $(E2E_SYMFONY_RUNTIME_DIR)/var/cache/prod/*
 
 	$(SCOPED_BOX) compile --working-dir=$(E2E_SYMFONY_RUNTIME_DIR) --no-parallel --ansi
