@@ -101,6 +101,15 @@ E2E_DOCKERFILE_NOT_EXT_IMAGE_TAG := local_box_e2e_dockerfile_no_ext:latest
 # TODO: see https://github.com/box-project/box/issues/839
 E2E_DOCKERFILE_NO_EXT_DOCKERFILE := Dockerfile
 
+E2E_CUSTOM_COMPOSER_BIN_DIR = fixtures/build/dir019
+E2E_CUSTOM_COMPOSER_BIN_OUTPUT_DIR = dist/dir019
+E2E_CUSTOM_COMPOSER_BIN_EXPECTED_STDOUT := $(E2E_CUSTOM_COMPOSER_BIN_DIR)/expected-stdout
+E2E_CUSTOM_COMPOSER_BIN_EXPECTED_STDERR := $(E2E_CUSTOM_COMPOSER_BIN_DIR)/expected-stderr
+E2E_CUSTOM_COMPOSER_BIN_ACTUAL_STDOUT := $(E2E_CUSTOM_COMPOSER_BIN_OUTPUT_DIR)/actual-stdout
+E2E_CUSTOM_COMPOSER_BIN_ACTUAL_STDERR := $(E2E_CUSTOM_COMPOSER_BIN_OUTPUT_DIR)/actual-stderr
+E2E_CUSTOM_COMPOSER_BIN_ACTUAL_COMPILATION := $(E2E_CUSTOM_COMPOSER_BIN_OUTPUT_DIR)/actual-compilation
+E2E_CUSTOM_COMPOSER_BIN_PHAR := $(E2E_CUSTOM_COMPOSER_BIN_OUTPUT_DIR)/index.phar
+
 ifeq ($(OS),Darwin)
 	SED = sed -i ''
 else
@@ -382,6 +391,29 @@ _e2e_dockerfile_no_extension: $(SCOPED_BOX_BIN)
 	$(DIFF) $(E2E_DOCKERFILE_NO_EXT_EXPECTED_STDERR) $(E2E_DOCKERFILE_NO_EXT_ACTUAL_STDERR)
 
 
+.PHONY: e2e_custom_composer_bin
+e2e_custom_composer_bin: $(SCOPED_BOX_BIN) $(E2E_CUSTOM_COMPOSER_BIN_DIR)/vendor
+	@mkdir -p $(E2E_CUSTOM_COMPOSER_BIN_OUTPUT_DIR)
+
+	$(SCOPED_BOX) compile \
+		--working-dir=$(E2E_CUSTOM_COMPOSER_BIN_DIR) \
+		--config=box.json.dist \
+		--composer-bin=composer.phar \
+		--verbose \
+		2>&1 \
+		1>$(E2E_CUSTOM_COMPOSER_BIN_ACTUAL_COMPILATION)
+	mv -fv $(E2E_CUSTOM_COMPOSER_BIN_DIR)/index.phar $(E2E_CUSTOM_COMPOSER_BIN_PHAR)
+	$(E2E_CUSTOM_COMPOSER_BIN_PHAR) \
+		1>$(E2E_CUSTOM_COMPOSER_BIN_ACTUAL_STDOUT) \
+		2>$(E2E_CUSTOM_COMPOSER_BIN_ACTUAL_STDERR)
+
+	$(DIFF) $(E2E_CUSTOM_COMPOSER_BIN_EXPECTED_STDOUT) $(E2E_CUSTOM_COMPOSER_BIN_ACTUAL_STDOUT)
+	$(DIFF) $(E2E_CUSTOM_COMPOSER_BIN_EXPECTED_STDERR) $(E2E_CUSTOM_COMPOSER_BIN_ACTUAL_STDERR)
+	php $(E2E_CUSTOM_COMPOSER_BIN_DIR)/test.php \
+		$(PWD)/$(E2E_CUSTOM_COMPOSER_BIN_DIR)/composer.phar \
+		$(E2E_CUSTOM_COMPOSER_BIN_ACTUAL_COMPILATION)
+
+
 #
 # Rules from files
 #---------------------------------------------------------------------------
@@ -449,3 +481,11 @@ $(E2E_PHP_SETTINGS_CHECKER_EXPECTED_STDOUT_XDEBUG_ENABLED): $(E2E_PHP_SETTINGS_C
 	mkdir -p $(E2E_PHP_SETTINGS_CHECKER_OUTPUT_DIR)
 	mv -fv $(E2E_PHP_SETTINGS_CHECKER_DIR)/expected-stdout-xdebug-enabled $(E2E_PHP_SETTINGS_CHECKER_EXPECTED_STDOUT_XDEBUG_ENABLED)
 	touch -c $@
+
+$(E2E_CUSTOM_COMPOSER_BIN_DIR)/vendor: $(E2E_CUSTOM_COMPOSER_BIN_DIR)/composer.lock
+	composer install --ansi --working-dir=$(E2E_CUSTOM_COMPOSER_BIN_DIR)
+	touch -c $@
+$(E2E_CUSTOM_COMPOSER_BIN_DIR)/composer.lock: $(E2E_CUSTOM_COMPOSER_BIN_DIR)/composer.json
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
+	@echo "$$ composer update --lock --working-dir=$(E2E_CUSTOM_COMPOSER_BIN_DIR) && touch -c $(@)"
+

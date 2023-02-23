@@ -58,6 +58,7 @@ use function KevinGH\Box\check_php_settings;
 use function KevinGH\Box\disable_parallel_processing;
 use function KevinGH\Box\FileSystem\chmod;
 use function KevinGH\Box\FileSystem\dump_file;
+use function KevinGH\Box\FileSystem\make_path_absolute;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\rename;
@@ -67,6 +68,7 @@ use function memory_get_peak_usage;
 use function memory_get_usage;
 use function microtime;
 use function putenv;
+use function Safe\getcwd;
 use function sprintf;
 use function var_export;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
@@ -103,6 +105,7 @@ final class Compile implements CommandAware
     private const DEV_OPTION = 'dev';
     private const NO_CONFIG_OPTION = 'no-config';
     private const WITH_DOCKER_OPTION = 'with-docker';
+    private const COMPOSER_BIN = 'composer-bin';
 
     private const DEBUG_DIR = '.box_dump';
 
@@ -154,6 +157,12 @@ final class Compile implements CommandAware
                     InputOption::VALUE_NONE,
                     'Generates a Dockerfile',
                 ),
+                new InputOption(
+                    self::COMPOSER_BIN,
+                    null,
+                    InputOption::VALUE_REQUIRED,
+                    'Composer binary to use',
+                ),
                 ConfigOption::getOptionInput(),
                 ChangeWorkingDirOption::getOptionInput(),
             ],
@@ -189,6 +198,7 @@ final class Compile implements CommandAware
         $config = $io->getOption(self::NO_CONFIG_OPTION)->asBoolean()
             ? Configuration::create(null, new stdClass())
             : ConfigOption::getConfig($io, true);
+        $config->setComposerBin(self::getComposerBin($io));
         $path = $config->getOutputPath();
 
         $logger = new CompilerLogger($io);
@@ -269,6 +279,13 @@ final class Compile implements CommandAware
         }
 
         return $box;
+    }
+
+    private static function getComposerBin(IO $io): ?string
+    {
+        $composerBin = $io->getOption(self::COMPOSER_BIN)->asNullableNonEmptyString();
+
+        return null === $composerBin ? null : make_path_absolute($composerBin, getcwd());
     }
 
     private function removeExistingArtifacts(Configuration $config, CompilerLogger $logger, bool $debug): void
@@ -585,19 +602,19 @@ final class Compile implements CommandAware
 
         $logger->log(CompilerLogger::QUESTION_MARK_PREFIX, $message);
 
+        $composerBin = $config->getComposerBin();
         $excludeDevFiles = $config->excludeDevFiles();
         $io = $logger->getIO();
 
         $box->endBuffering(
             $config->dumpAutoload()
-                ? static function (SymbolsRegistry $symbolsRegistry, string $prefix) use ($excludeDevFiles, $io): void {
-                    ComposerOrchestrator::dumpAutoload(
-                        $symbolsRegistry,
-                        $prefix,
-                        $excludeDevFiles,
-                        $io,
-                    );
-                }
+                ? static fn (SymbolsRegistry $symbolsRegistry, string $prefix) => ComposerOrchestrator::dumpAutoload(
+                    $symbolsRegistry,
+                    $prefix,
+                    $excludeDevFiles,
+                    $composerBin,
+                    $io,
+                )
                 : null,
         );
     }
