@@ -27,6 +27,7 @@ use KevinGH\Box\Box;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Composer\ComposerConfiguration;
 use KevinGH\Box\Composer\ComposerOrchestrator;
+use KevinGH\Box\Composer\IncompatibleComposerVersion;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\Logger\CompilerLogger;
 use KevinGH\Box\Console\MessageRenderer;
@@ -105,7 +106,8 @@ final class Compile implements CommandAware
     private const DEV_OPTION = 'dev';
     private const NO_CONFIG_OPTION = 'no-config';
     private const WITH_DOCKER_OPTION = 'with-docker';
-    private const COMPOSER_BIN = 'composer-bin';
+    private const COMPOSER_BIN_OPTION = 'composer-bin';
+    private const ALLOW_COMPOSER_COMPOSER_CHECK_FAILURE_OPTION = 'allow-composer-check-failure';
 
     private const DEBUG_DIR = '.box_dump';
 
@@ -158,10 +160,16 @@ final class Compile implements CommandAware
                     'Generates a Dockerfile',
                 ),
                 new InputOption(
-                    self::COMPOSER_BIN,
+                    self::COMPOSER_BIN_OPTION,
                     null,
                     InputOption::VALUE_REQUIRED,
                     'Composer binary to use',
+                ),
+                new InputOption(
+                    self::ALLOW_COMPOSER_COMPOSER_CHECK_FAILURE_OPTION,
+                    null,
+                    InputOption::VALUE_NONE,
+                    'To continue even if an unsupported Composer version is detected',
                 ),
                 ConfigOption::getOptionInput(),
                 ChangeWorkingDirOption::getOptionInput(),
@@ -239,6 +247,8 @@ final class Compile implements CommandAware
     ): Box {
         $box = Box::create($config->getTmpOutputPath());
 
+        self::checkComposerVersion($config, $logger, $io);
+
         $box->startBuffering();
 
         self::registerReplacementValues($config, $box, $logger);
@@ -283,7 +293,7 @@ final class Compile implements CommandAware
 
     private static function getComposerBin(IO $io): ?string
     {
-        $composerBin = $io->getOption(self::COMPOSER_BIN)->asNullableNonEmptyString();
+        $composerBin = $io->getOption(self::COMPOSER_BIN_OPTION)->asNullableNonEmptyString();
 
         return null === $composerBin ? null : make_path_absolute($composerBin, getcwd());
     }
@@ -314,6 +324,49 @@ final class Compile implements CommandAware
         );
 
         remove($path);
+    }
+
+    private static function checkComposerVersion(
+        Configuration $config,
+        CompilerLogger $logger,
+        IO $io,
+    ): void {
+        if (!$config->dumpAutoload()) {
+            $logger->log(
+                CompilerLogger::PLUS_PREFIX,
+                'Skipping the Composer compatibility check: the autoloader is not dumped',
+            );
+
+            return;
+        }
+
+        $logger->log(
+            CompilerLogger::QUESTION_MARK_PREFIX,
+            'Checking Composer compatibility',
+        );
+
+        try {
+            ComposerOrchestrator::checkVersion(
+                $config->getComposerBin(),
+                $io,
+            );
+
+            $logger->log(
+                CompilerLogger::CHEVRON_PREFIX,
+                'Supported version detected',
+            );
+        } catch (IncompatibleComposerVersion $incompatibleComposerVersion) {
+            if ($io->getOption(self::ALLOW_COMPOSER_COMPOSER_CHECK_FAILURE_OPTION)->asBoolean()) {
+                $logger->log(
+                    CompilerLogger::CHEVRON_PREFIX,
+                    'Warning! Incompatible composer version detected: '.$incompatibleComposerVersion->getMessage(),
+                );
+
+                return; // Swallow the exception
+            }
+
+            throw $incompatibleComposerVersion;
+        }
     }
 
     private static function registerReplacementValues(Configuration $config, Box $box, CompilerLogger $logger): void

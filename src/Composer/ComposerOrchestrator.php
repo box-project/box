@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
+use Composer\Semver\Semver;
 use Fidry\Console\Input\IO;
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
@@ -39,12 +40,36 @@ final class ComposerOrchestrator
 {
     use NotInstantiable;
 
-    public static function getVersion(?string $composerBin = null): string
-    {
-        $composerExecutable = $composerBin ?? self::retrieveComposerExecutable();
-        $command = [$composerExecutable, '--version'];
+    private const SUPPORTED_VERSION_CONSTRAINTS = '^2.2.0';
 
-        $getVersionProcess = new Process($command);
+    /**
+     * @throws IncompatibleComposerVersion
+     */
+    public static function checkVersion(
+        ?string $composerBin = null,
+        ?IO $io = null,
+    ): void {
+        $version = self::getVersion($composerBin, $io);
+
+        if (!Semver::satisfies($version, self::SUPPORTED_VERSION_CONSTRAINTS)) {
+            throw IncompatibleComposerVersion::create($version, self::SUPPORTED_VERSION_CONSTRAINTS);
+        }
+    }
+
+    public static function getVersion(
+        ?string $composerBin = null,
+        ?IO $io = null,
+    ): string {
+        $logger = new CompilerLogger($io ?? IO::createNull());
+
+        $composerExecutable = $composerBin ?? self::retrieveComposerExecutable();
+        $getVersionProcess = new Process([$composerExecutable, '--version']);
+
+        $logger->log(
+            CompilerLogger::CHEVRON_PREFIX,
+            $getVersionProcess->getCommandLine(),
+            OutputInterface::VERBOSITY_VERBOSE,
+        );
 
         $getVersionProcess->run(null, self::getDefaultEnvVars());
 
@@ -72,9 +97,7 @@ final class ComposerOrchestrator
         ?string $composerBin = null,
         ?IO $io = null,
     ): void {
-        $io ??= IO::createNull();
-
-        $logger = new CompilerLogger($io);
+        $logger = new CompilerLogger($io ?? IO::createNull());
 
         $composerExecutable = $composerBin ?? self::retrieveComposerExecutable();
 
