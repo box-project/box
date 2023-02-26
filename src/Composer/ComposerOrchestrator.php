@@ -28,6 +28,7 @@ use Symfony\Component\Process\Process;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
 use function preg_replace;
+use function sprintf;
 use function str_replace;
 use function trim;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
@@ -49,7 +50,19 @@ final class ComposerOrchestrator
         ?string $composerBin = null,
         ?IO $io = null,
     ): void {
+        $logger = new CompilerLogger($io ?? IO::createNull());
+
         $version = self::getVersion($composerBin, $io);
+
+        $logger->log(
+            CompilerLogger::CHEVRON_PREFIX,
+            sprintf(
+                '%s (Box requires %s)',
+                $version,
+                self::SUPPORTED_VERSION_CONSTRAINTS,
+            ),
+            OutputInterface::VERBOSITY_VERBOSE,
+        );
 
         if (!Semver::satisfies($version, self::SUPPORTED_VERSION_CONSTRAINTS)) {
             throw IncompatibleComposerVersion::create($version, self::SUPPORTED_VERSION_CONSTRAINTS);

@@ -333,7 +333,7 @@ final class Compile implements CommandAware
     ): void {
         if (!$config->dumpAutoload()) {
             $logger->log(
-                CompilerLogger::PLUS_PREFIX,
+                CompilerLogger::QUESTION_MARK_PREFIX,
                 'Skipping the Composer compatibility check: the autoloader is not dumped',
             );
 
