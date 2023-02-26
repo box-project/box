@@ -2574,6 +2574,7 @@ class CompileTest extends FileSystemTestCase
 
             🔨  Building the PHAR "/path/to/tmp/test"
 
+            ? Skipping the Composer compatibility check: the autoloader is not dumped
             ? No compactor to register
             ? Adding main file: /path/to/tmp/test.php
             ? Skip requirements checker
@@ -3056,8 +3057,8 @@ class CompileTest extends FileSystemTestCase
     private static function createComposerPathNormalizer(): callable
     {
         return static fn (string $output): string => preg_replace(
-            '/> (\d\.\d\.\d) \(Box requires \^2\.2\.0\)/',
-            '> 2.5.0 (Box requires ^2.2.0)',
+            '/(\/.*?composer)/',
+            '/usr/local/bin/composer',
             $output,
         );
     }
@@ -3065,8 +3066,8 @@ class CompileTest extends FileSystemTestCase
     private static function createComposerVersionNormalizer(): callable
     {
         return static fn (string $output): string => preg_replace(
-            '/(\/.*?composer)/',
-            '/usr/local/bin/composer',
+            '/> ([\d.]+) \(Box requires \^2\.2\.0\)/',
+            '> 2.5.0 (Box requires ^2.2.0)',
             $output,
         );
     }
