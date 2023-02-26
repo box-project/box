@@ -1,0 +1,15 @@
+{
+    "files-bin": [
+        ".env.local.php",
+        "autoload_runtime.template",
+        "src/Controller/.gitignore"
+    ],
+    "directories": [
+        "config",
+        "public",
+        "var"
+    ],
+    "force-autodiscovery": true,
+    "check-requirements": false,
+    "exclude-composer-files": false
+}
