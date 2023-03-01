@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use InvalidArgumentException;
 use Phar;
 use PHPUnit\Framework\TestCase;
 
@@ -25,27 +24,6 @@ use PHPUnit\Framework\TestCase;
  */
 class FunctionsTest extends TestCase
 {
-    /**
-     * @dataProvider pharCompressionAlgorithmProvider
-     */
-    public function test_it_can_provide_the_phars_algorithm_extensions(int $algorithm, mixed $expected): void
-    {
-        try {
-            $actual = get_phar_compression_algorithm_extension($algorithm);
-
-            if (-1 === $expected) {
-                self::fail('Expected exception to be thrown.');
-            }
-
-            self::assertSame($expected, $actual);
-        } catch (InvalidArgumentException $exception) {
-            self::assertSame(
-                'Unknown compression algorithm code "'.$algorithm.'"',
-                $exception->getMessage(),
-            );
-        }
-    }
-
     /**
      * @dataProvider bytesProvider
      */
