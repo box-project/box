@@ -317,7 +317,7 @@ jobs:
                 run: make requirement_checker_install
 
             -   name: Dump the requirement checker
-                run: make _dump_requirement_checker
+                run: make dump_requirement_checker
 
             -   name: Check for changes
                 run: |
