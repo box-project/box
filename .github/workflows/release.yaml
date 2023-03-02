@@ -127,7 +127,7 @@ jobs:
                 run: chmod 755 box.phar
 
             -   name: Check that the PHAR works
-                run: box.phar --ansi --version
+                run: ./box.phar --ansi --version
 
             -   name: Set up QEMU
                 uses: docker/setup-qemu-action@v2
