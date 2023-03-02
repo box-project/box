@@ -103,8 +103,8 @@ jobs:
                 uses: dawidd6/action-homebrew-bump-formula@v3
                 with:
                     token: ${{ secrets.BOX_HOMEBREW_TAP_TOKEN }}
-                    tap: box-project/homebrew-box
-                    formula: humbug/box
+                    tap: box-project/box
+                    formula: box
                     tag: ${{ github.event.release.tag_name }}
                     revision: ${{ github.event.release.target_commitish }}
 
