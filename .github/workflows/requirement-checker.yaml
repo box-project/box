@@ -332,7 +332,7 @@ jobs:
                 if: env.requirement_checker_changed == 'true'
                 uses: peter-evans/create-pull-request@v4
                 with:
-                    token: ${{ secrets.GITHUB_SECRETS }}
+                    token: ${{ secrets.GITHUB_TOKEN }}
                     branch-suffix: random
                     delete-branch: true
                     title: "Update the RequirementChecker"
