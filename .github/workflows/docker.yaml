@@ -30,9 +30,6 @@ jobs:
                     - name: PHP 8.1 (Xdebug)
                       docker-file: .docker/php81_xdebug
                       image-tag: ghcr.io/box-project/box_php81_xdebug
-                    - name: Box
-                      docker-file: .docker/Dockerfile
-                      image-tag: ghcr.io/box-project/box
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3
