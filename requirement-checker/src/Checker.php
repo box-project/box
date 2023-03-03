@@ -71,7 +71,7 @@ final class Checker
         if ($iniPath) {
             $printer->printvln('  '.$iniPath, $verbosity, 'green');
         } else {
-            $printer->printvln('  WARNING: No configuration file (php.ini) used by PHP!', $verbosity, 'yellow');
+            $printer->printvln('  No php.ini file used by PHP.', $verbosity, 'yellow');
         }
 
         $printer->printvln('', $verbosity);
