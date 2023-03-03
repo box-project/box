@@ -123,10 +123,10 @@ jobs:
             # See https://github.com/actions/download-artifact#limitations
             # the permissions are not guaranteed to be preserved
             -   name: Ensure PHAR is executable
-                run: chmod 755 box.phar
-
-            -   name: Check that the PHAR works
-                run: ./box.phar --ansi --version
+                run: |
+                    chmod 755 box.phar
+                    mv box.phar bin/box.phar
+                    ./bin/box.phar --ansi --version
 
             -   name: Set up QEMU
                 uses: docker/setup-qemu-action@v2
