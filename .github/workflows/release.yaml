@@ -162,6 +162,6 @@ jobs:
                     file: ${{ env.DOCKERFILE }}
                     platforms: linux/amd64
                     tags: |
-                        ${{ env.DOCKERHUB_USERNAME }}/box:${{ github.ref_name< }}
+                        ${{ env.DOCKERHUB_USERNAME }}/box:${{ github.ref_name }}
                         ${{ env.DOCKERHUB_USERNAME }}/box:latest
                     push: true
