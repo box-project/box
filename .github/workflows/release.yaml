@@ -115,6 +115,9 @@ jobs:
         needs:
             - build-phar
         steps:
+            -   name: Checkout
+                uses: actions/checkout@v3
+
             -   uses: actions/download-artifact@v3
                 with:
                     name: box-phar
@@ -125,7 +128,7 @@ jobs:
             -   name: Ensure PHAR is executable
                 run: |
                     chmod 755 box.phar
-                    mv box.phar bin/box.phar
+                    mv -vf box.phar bin/box.phar
                     ./bin/box.phar --ansi --version
 
             -   name: Set up QEMU
