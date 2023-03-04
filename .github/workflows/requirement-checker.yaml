@@ -269,7 +269,7 @@ jobs:
                 run: exit 1
 
     update-requirement-checker:
-        name: "build: Update the RequirementChecker"
+        name: "Update the RequirementChecker"
         if: ${{ github.repository == 'box-project/box' && github.ref_name == 'main' }}
         runs-on: "ubuntu-latest"
         steps:
@@ -335,6 +335,6 @@ jobs:
                     token: ${{ secrets.GITHUB_TOKEN }}
                     branch-suffix: random
                     delete-branch: true
-                    title: "Update the RequirementChecker"
+                    title: "build: Update the RequirementChecker"
                     committer: "box-bot <box-project-bot@example.com>"
                     commit-message: "Update the RequirementChecker"
