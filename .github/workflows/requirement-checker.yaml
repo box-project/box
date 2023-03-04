@@ -44,7 +44,7 @@ jobs:
                     working-directory: requirement-checker
 
             -   name: Ensure that the make target is up to date
-                run: cd requirement-checker; make vendor_install
+                run: cd requirement-checker; make _vendor_install
 
             -   name: Lint CS
                 run: cd requirement-checker; make cs_lint
@@ -69,7 +69,7 @@ jobs:
                     working-directory: requirement-checker
 
             -   name: Ensure that the make target is up to date
-                run: cd requirement-checker; make vendor_install
+                run: cd requirement-checker; make _vendor_install
 
             -   name: Run tests
                 run: cd requirement-checker; make phpunit_autoreview
@@ -119,7 +119,7 @@ jobs:
                     composer-options: ${{ matrix.composer-options }}
 
             -   name: Ensure that the make target is up to date
-                run: cd requirement-checker; make vendor_install
+                run: cd requirement-checker; make _vendor_install
 
             -   name: Install the Composer (root) dependencies
                 uses: ramsey/composer-install@v2
@@ -295,7 +295,7 @@ jobs:
                     composer-options: ${{ matrix.php.composer-options }}
 
             -   name: Ensure that the make target is up to date
-                run: cd requirement-checker; make vendor_install
+                run: cd requirement-checker; make _vendor_install
 
             -   name: Install the Composer (root) dependencies
                 uses: ramsey/composer-install@v2

@@ -182,6 +182,10 @@ test_e2e: docker_images _test_e2e_pass_no_config_min_composer_php _test_e2e_pass
 .PHONY: vendor_install
 vendor_install:
 	composer install --ansi
+	$(MAKE) _vendor_install
+
+.PHONY: _vendor_install
+_vendor_install:
 	touch -c vendor
 	touch -c $(PHPUNIT_BIN)
 
