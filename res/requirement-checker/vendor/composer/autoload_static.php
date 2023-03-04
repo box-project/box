@@ -4,22 +4,22 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitHumbugBox431
+class ComposerStaticInitHumbugBox435
 {
     public static $prefixLengthsPsr4 = array (
         'H' => 
         array (
-            'HumbugBox431\\KevinGH\\RequirementChecker\\' => 40,
-            'HumbugBox431\\Composer\\Semver\\' => 29,
+            'HumbugBox435\\KevinGH\\RequirementChecker\\' => 40,
+            'HumbugBox435\\Composer\\Semver\\' => 29,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'HumbugBox431\\KevinGH\\RequirementChecker\\' => 
+        'HumbugBox435\\KevinGH\\RequirementChecker\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src',
         ),
-        'HumbugBox431\\Composer\\Semver\\' => 
+        'HumbugBox435\\Composer\\Semver\\' => 
         array (
             0 => __DIR__ . '/..' . '/composer/semver/src',
         ),
@@ -27,36 +27,36 @@ class ComposerStaticInitHumbugBox431
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
-        'HumbugBox431\\Composer\\Semver\\Comparator' => __DIR__ . '/..' . '/composer/semver/src/Comparator.php',
-        'HumbugBox431\\Composer\\Semver\\CompilingMatcher' => __DIR__ . '/..' . '/composer/semver/src/CompilingMatcher.php',
-        'HumbugBox431\\Composer\\Semver\\Constraint\\Bound' => __DIR__ . '/..' . '/composer/semver/src/Constraint/Bound.php',
-        'HumbugBox431\\Composer\\Semver\\Constraint\\Constraint' => __DIR__ . '/..' . '/composer/semver/src/Constraint/Constraint.php',
-        'HumbugBox431\\Composer\\Semver\\Constraint\\ConstraintInterface' => __DIR__ . '/..' . '/composer/semver/src/Constraint/ConstraintInterface.php',
-        'HumbugBox431\\Composer\\Semver\\Constraint\\MatchAllConstraint' => __DIR__ . '/..' . '/composer/semver/src/Constraint/MatchAllConstraint.php',
-        'HumbugBox431\\Composer\\Semver\\Constraint\\MatchNoneConstraint' => __DIR__ . '/..' . '/composer/semver/src/Constraint/MatchNoneConstraint.php',
-        'HumbugBox431\\Composer\\Semver\\Constraint\\MultiConstraint' => __DIR__ . '/..' . '/composer/semver/src/Constraint/MultiConstraint.php',
-        'HumbugBox431\\Composer\\Semver\\Interval' => __DIR__ . '/..' . '/composer/semver/src/Interval.php',
-        'HumbugBox431\\Composer\\Semver\\Intervals' => __DIR__ . '/..' . '/composer/semver/src/Intervals.php',
-        'HumbugBox431\\Composer\\Semver\\Semver' => __DIR__ . '/..' . '/composer/semver/src/Semver.php',
-        'HumbugBox431\\Composer\\Semver\\VersionParser' => __DIR__ . '/..' . '/composer/semver/src/VersionParser.php',
-        'HumbugBox431\\KevinGH\\RequirementChecker\\Checker' => __DIR__ . '/../..' . '/src/Checker.php',
-        'HumbugBox431\\KevinGH\\RequirementChecker\\IO' => __DIR__ . '/../..' . '/src/IO.php',
-        'HumbugBox431\\KevinGH\\RequirementChecker\\IsExtensionConflictFulfilled' => __DIR__ . '/../..' . '/src/IsExtensionConflictFulfilled.php',
-        'HumbugBox431\\KevinGH\\RequirementChecker\\IsExtensionFulfilled' => __DIR__ . '/../..' . '/src/IsExtensionFulfilled.php',
-        'HumbugBox431\\KevinGH\\RequirementChecker\\IsFulfilled' => __DIR__ . '/../..' . '/src/IsFulfilled.php',
-        'HumbugBox431\\KevinGH\\RequirementChecker\\IsPhpVersionFulfilled' => __DIR__ . '/../..' . '/src/IsPhpVersionFulfilled.php',
-        'HumbugBox431\\KevinGH\\RequirementChecker\\Printer' => __DIR__ . '/../..' . '/src/Printer.php',
-        'HumbugBox431\\KevinGH\\RequirementChecker\\Requirement' => __DIR__ . '/../..' . '/src/Requirement.php',
-        'HumbugBox431\\KevinGH\\RequirementChecker\\RequirementCollection' => __DIR__ . '/../..' . '/src/RequirementCollection.php',
-        'HumbugBox431\\KevinGH\\RequirementChecker\\Terminal' => __DIR__ . '/../..' . '/src/Terminal.php',
+        'HumbugBox435\\Composer\\Semver\\Comparator' => __DIR__ . '/..' . '/composer/semver/src/Comparator.php',
+        'HumbugBox435\\Composer\\Semver\\CompilingMatcher' => __DIR__ . '/..' . '/composer/semver/src/CompilingMatcher.php',
+        'HumbugBox435\\Composer\\Semver\\Constraint\\Bound' => __DIR__ . '/..' . '/composer/semver/src/Constraint/Bound.php',
+        'HumbugBox435\\Composer\\Semver\\Constraint\\Constraint' => __DIR__ . '/..' . '/composer/semver/src/Constraint/Constraint.php',
+        'HumbugBox435\\Composer\\Semver\\Constraint\\ConstraintInterface' => __DIR__ . '/..' . '/composer/semver/src/Constraint/ConstraintInterface.php',
+        'HumbugBox435\\Composer\\Semver\\Constraint\\MatchAllConstraint' => __DIR__ . '/..' . '/composer/semver/src/Constraint/MatchAllConstraint.php',
+        'HumbugBox435\\Composer\\Semver\\Constraint\\MatchNoneConstraint' => __DIR__ . '/..' . '/composer/semver/src/Constraint/MatchNoneConstraint.php',
+        'HumbugBox435\\Composer\\Semver\\Constraint\\MultiConstraint' => __DIR__ . '/..' . '/composer/semver/src/Constraint/MultiConstraint.php',
+        'HumbugBox435\\Composer\\Semver\\Interval' => __DIR__ . '/..' . '/composer/semver/src/Interval.php',
+        'HumbugBox435\\Composer\\Semver\\Intervals' => __DIR__ . '/..' . '/composer/semver/src/Intervals.php',
+        'HumbugBox435\\Composer\\Semver\\Semver' => __DIR__ . '/..' . '/composer/semver/src/Semver.php',
+        'HumbugBox435\\Composer\\Semver\\VersionParser' => __DIR__ . '/..' . '/composer/semver/src/VersionParser.php',
+        'HumbugBox435\\KevinGH\\RequirementChecker\\Checker' => __DIR__ . '/../..' . '/src/Checker.php',
+        'HumbugBox435\\KevinGH\\RequirementChecker\\IO' => __DIR__ . '/../..' . '/src/IO.php',
+        'HumbugBox435\\KevinGH\\RequirementChecker\\IsExtensionConflictFulfilled' => __DIR__ . '/../..' . '/src/IsExtensionConflictFulfilled.php',
+        'HumbugBox435\\KevinGH\\RequirementChecker\\IsExtensionFulfilled' => __DIR__ . '/../..' . '/src/IsExtensionFulfilled.php',
+        'HumbugBox435\\KevinGH\\RequirementChecker\\IsFulfilled' => __DIR__ . '/../..' . '/src/IsFulfilled.php',
+        'HumbugBox435\\KevinGH\\RequirementChecker\\IsPhpVersionFulfilled' => __DIR__ . '/../..' . '/src/IsPhpVersionFulfilled.php',
+        'HumbugBox435\\KevinGH\\RequirementChecker\\Printer' => __DIR__ . '/../..' . '/src/Printer.php',
+        'HumbugBox435\\KevinGH\\RequirementChecker\\Requirement' => __DIR__ . '/../..' . '/src/Requirement.php',
+        'HumbugBox435\\KevinGH\\RequirementChecker\\RequirementCollection' => __DIR__ . '/../..' . '/src/RequirementCollection.php',
+        'HumbugBox435\\KevinGH\\RequirementChecker\\Terminal' => __DIR__ . '/../..' . '/src/Terminal.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitHumbugBox431::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitHumbugBox431::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitHumbugBox431::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitHumbugBox435::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitHumbugBox435::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitHumbugBox435::$classMap;
 
         }, null, ClassLoader::class);
     }
