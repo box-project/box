@@ -146,7 +146,11 @@ jobs:
 
             -   name: Setup the Docker (release) tag(s)
                 if: github.event_name == 'release'
+                # Selects a random value for $EOF as a delimiter, and sets the DOCKER_TAGS environment variable
+                # as a multi-line environment variable.
                 run: |
+                    EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+
                     echo "DOCKER_TAGS<<$EOF" >> $GITHUB_ENV
                     ${{ env.DOCKERHUB_USERNAME }}/box:${{ github.ref_name }} >> $GITHUB_ENV
                     ${{ env.DOCKERHUB_USERNAME }}/box:latest >> $GITHUB_ENV
