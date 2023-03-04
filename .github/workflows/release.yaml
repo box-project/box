@@ -152,8 +152,8 @@ jobs:
                     EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
 
                     echo "DOCKER_TAGS<<$EOF" >> $GITHUB_ENV
-                    ${{ env.DOCKERHUB_USERNAME }}/box:${{ github.ref_name }} >> $GITHUB_ENV
-                    ${{ env.DOCKERHUB_USERNAME }}/box:latest >> $GITHUB_ENV
+                    echo "${{ env.DOCKERHUB_USERNAME }}/box:${{ github.ref_name }}" >> $GITHUB_ENV
+                    echo "${{ env.DOCKERHUB_USERNAME }}/box:latest" >> $GITHUB_ENV
                     echo "$EOF" >> $GITHUB_ENV
                     echo "DOCKER_TEST_TAG=${{ env.DOCKERHUB_USERNAME }}/box:latest" >> $GITHUB_ENV
 
