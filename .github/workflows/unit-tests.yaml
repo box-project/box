@@ -106,13 +106,13 @@ jobs:
                 if: github.event_name == 'pull_request'
                 run: echo "INFECTION_BASE_REF=$GITHUB_BASE_REF" >> $GITHUB_ENV
 
-            -   name: Configure Infection for the CI (push/release event)
+            -   name: Configure the base ref (push/release event)
                 if: github.event_name == 'push'
                 run: echo "INFECTION_BASE_REF=${{ github.event.before }}" >> $GITHUB_ENV
 
             # Do this before using the Makefile just to avoid accidentally resolving the deferred variables using
             # INFECTION_FLAGS.
-            -   name: Configure Infection for the CI (push event)
+            -   name: Configure Infection for the CI
                 run: |
                     git fetch origin $INFECTION_BASE_REF
                     echo "INFECTION_FLAGS=--git-diff-lines --git-diff-base=origin/$INFECTION_BASE_REF --ignore-msi-with-no-mutations --logger-github" >> "$GITHUB_ENV"
