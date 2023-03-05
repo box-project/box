@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PharInfo;
 
-use ParagonIE\Pharaoh\PharDiff as ParagoniePharDiff;
+use KevinGH\Box\Pharaoh\PharDiff as ParagoniePharDiff;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
