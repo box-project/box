@@ -45,9 +45,6 @@ namespace KevinGH\Box\Pharaoh;
 
 use Exception;
 
-/**
- * Class PharError.
- */
 class PharError extends Exception
 {
 }
