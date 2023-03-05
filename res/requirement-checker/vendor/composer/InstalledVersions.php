@@ -1,9 +1,9 @@
 <?php
 
-namespace HumbugBox420\Composer;
+namespace HumbugBox436\Composer;
 
-use HumbugBox420\Composer\Autoload\ClassLoader;
-use HumbugBox420\Composer\Semver\VersionParser;
+use HumbugBox436\Composer\Autoload\ClassLoader;
+use HumbugBox436\Composer\Semver\VersionParser;
 class InstalledVersions
 {
     /**
@@ -175,7 +175,7 @@ class InstalledVersions
     private static function getInstalled()
     {
         if (null === self::$canGetVendors) {
-            self::$canGetVendors = \method_exists('HumbugBox420\\Composer\\Autoload\\ClassLoader', 'getRegisteredLoaders');
+            self::$canGetVendors = \method_exists('HumbugBox436\\Composer\\Autoload\\ClassLoader', 'getRegisteredLoaders');
         }
         $installed = array();
         if (self::$canGetVendors) {
