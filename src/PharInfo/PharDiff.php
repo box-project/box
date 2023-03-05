@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PharInfo;
 
+use KevinGH\Box\Pharaoh\Pharaoh;
 use KevinGH\Box\Pharaoh\PharDiff as ParagoniePharDiff;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;

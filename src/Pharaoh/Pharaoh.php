@@ -44,6 +44,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Pharaoh;
 
 use Error;
+use KevinGH\Box\PharInfo\PharInfo;
 use ParagonIE\ConstantTime\Hex;
 use Phar;
 use function copy;
@@ -52,6 +53,7 @@ use function ini_get;
 use function is_dir;
 use function is_readable;
 use function is_string;
+use function KevinGH\Box\FileSystem\remove;
 use function mkdir;
 use function random_bytes;
 use function sys_get_temp_dir;
@@ -59,13 +61,17 @@ use function tempnam;
 use function unlink;
 use const DIRECTORY_SEPARATOR;
 
-class Pharaoh
+final class Pharaoh
 {
     public Phar $phar;
 
     public string $tmp;
 
     public static string $stubfile;
+
+    private string $fileName;
+    private ?PharInfo $pharInfo = null;
+    private ?string $path = null;
 
     public function __construct(string $file, ?string $alias = null)
     {
@@ -116,13 +122,34 @@ class Pharaoh
             $this->tmp.'/'.self::$stubfile,
             $this->phar->getStub()
         );
+
+        $this->fileName = basename($file);
     }
 
     public function __destruct()
     {
+        unset($this->pharInfo);
+
         $path = $this->phar->getPath();
         unset($this->phar);
 
         Phar::unlinkArchive($path);
+
+        remove($this->tmp);
+    }
+
+    public function getFileName(): string
+    {
+        return $this->fileName;
+    }
+
+    public function getPharInfo(): PharInfo
+    {
+        if (null === $this->pharInfo || $this->path !== $this->phar->getPath()) {
+            $this->path = $this->phar->getPath();
+            $this->pharInfo = new PharInfo($this->path);
+        }
+
+        return $this->pharInfo;
     }
 }

@@ -20,7 +20,13 @@ use PharData;
 use PharFileInfo;
 use RecursiveIteratorIterator;
 use UnexpectedValueException;
+use function array_fill_keys;
+use function array_reduce;
+use function iterator_to_array;
 use function KevinGH\Box\unique_id;
+use function realpath;
+use function str_replace;
+use function var_export;
 
 final class PharInfo
 {
