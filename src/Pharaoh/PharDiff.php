@@ -48,7 +48,6 @@ use ParagonIE_Sodium_File;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RegexIterator;
-use SodiumException;
 use function array_keys;
 use function array_merge;
 use function array_values;
@@ -56,20 +55,20 @@ use function count;
 use function escapeshellarg;
 use function hash_file;
 use function max;
+use function mb_strlen;
+use function mb_strtolower;
 use function preg_match;
 use function preg_quote;
 use function preg_replace;
+use function shell_exec;
 use function str_repeat;
 
-/**
- * Class PharDiff.
- */
 class PharDiff
 {
     /**
      * @var array<string, string>
      */
-    protected $c = [
+    protected array $c = [
         '' => "\033[0;39m",
         'red' => "\033[0;31m",
         'green' => "\033[0;32m",
@@ -80,30 +79,21 @@ class PharDiff
     ];
 
     /** @var array<int, Pharaoh> */
-    private $phars = [];
+    private array $phars = [];
 
-    /** @var bool */
-    private $verbose = false;
+    private bool $verbose = false;
 
-    /**
-     * Constructor uses dependency injection.
-     *
-     * @param \ParagonIE\Pharaoh\Pharaoh $pharA
-     * @param \ParagonIE\Pharaoh\Pharaoh $pharB
-     */
     public function __construct(Pharaoh $pharA, Pharaoh $pharB)
     {
         $this->phars = [$pharA, $pharB];
     }
 
     /**
-     * Prints a git-formatted diff of the two phars.
-     *
-     * @psalm-suppress ForbiddenCode
+     * Prints a git-formatted diff of the two PHARs.
      */
     public function printGitDiff(): int
     {
-        // Lazy way; requires git. Will replace with custom implementaiton later.
+        // Lazy way; requires git. Will replace with custom implementation later.
 
         $argA = escapeshellarg($this->phars[0]->tmp);
         $argB = escapeshellarg($this->phars[1]->tmp);
@@ -120,13 +110,11 @@ class PharDiff
     }
 
     /**
-     * Prints a GNU diff of the two phars.
-     *
-     * @psalm-suppress ForbiddenCode
+     * Prints a GNU diff of the two PHARs.
      */
     public function printGnuDiff(): int
     {
-        // Lazy way. Will replace with custom implementaiton later.
+        // Lazy way. Will replace with custom implementation later.
         $argA = escapeshellarg($this->phars[0]->tmp);
         $argB = escapeshellarg($this->phars[1]->tmp);
         /** @var string $diff */
@@ -142,12 +130,11 @@ class PharDiff
     }
 
     /**
-     * Get hashes of all of the files in the two arrays.
+     * Get hashes of all the files in the two arrays.
      *
-     * @throws SodiumException
      * @return array<int, array<mixed, string>>
      */
-    public function hashChildren(string $algo, string $dirA, string $dirB)
+    public function hashChildren(string $algo, string $dirA, string $dirB): array
     {
         /**
          * @var string $a
@@ -206,11 +193,10 @@ class PharDiff
     /**
      * List all the files in a directory (and subdirectories).
      *
-     * @param  string $folder    - start searching here
-     * @param  string $extension - extensions to match
-     * @return array
+     * @param string $folder    - start searching here
+     * @param string $extension - extensions to match
      */
-    private function listAllFiles($folder, $extension = '*')
+    private function listAllFiles(string $folder, string $extension = '*'): array
     {
         /**
          * @var array<mixed, string>       $fileList
@@ -252,10 +238,8 @@ class PharDiff
     }
 
     /**
-     * Prints out all of the differences of checksums of the files contained
+     * Prints out all the differences of checksums of the files contained
      * in both PHP archives.
-     *
-     * @throws SodiumException
      */
     public function listChecksums(string $algo = 'sha384'): int
     {

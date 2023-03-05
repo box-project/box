@@ -44,7 +44,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Pharaoh;
 
 use Error;
-use Exception;
 use ParagonIE\ConstantTime\Hex;
 use Phar;
 use function copy;
@@ -60,39 +59,22 @@ use function tempnam;
 use function unlink;
 use const DIRECTORY_SEPARATOR;
 
-/**
- * Class Pharaoh.
- */
 class Pharaoh
 {
-    /**
-     * @var Phar
-     */
-    public $phar;
+    public Phar $phar;
 
-    /**
-     * @var string
-     */
-    public $tmp;
+    public string $tmp;
 
-    /**
-     * @var string
-     */
-    public static $stubfile;
+    public static string $stubfile;
 
-    /**
-     * Pharaoh constructor.
-     * @param  string    $alias
-     * @throws PharError
-     * @throws Error
-     * @throws Exception
-     */
-    public function __construct(string $file, $alias = null)
+    public function __construct(string $file, ?string $alias = null)
     {
         if (!is_readable($file)) {
             throw new PharError($file.' cannot be read');
         }
+
         if ('1' == ini_get('phar.readonly')) {
+            // TODO: the value may be something else than '1'
             throw new PharError("Pharaoh cannot be used if phar.readonly is enabled in php.ini\n");
         }
 
