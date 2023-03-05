@@ -30,7 +30,7 @@
         "laravel/serializable-closure": "^1.2.2",
         "nikic/iter": "^2.2",
         "nikic/php-parser": "^4.15.2",
-        "paragonie/pharaoh": "^0.6",
+        "paragonie/constant_time_encoding": "^2.6",
         "phpdocumentor/reflection-docblock": "^5.3",
         "psr/log": "^3.0",
         "seld/jsonlint": "^1.9",
