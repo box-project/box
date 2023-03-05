@@ -1,8 +1,8 @@
 <?php
 
-namespace HumbugBox436\Composer\Semver;
+namespace HumbugBox437\Composer\Semver;
 
-use HumbugBox436\Composer\Semver\Constraint\Constraint;
+use HumbugBox437\Composer\Semver\Constraint\Constraint;
 class Comparator
 {
     public static function greaterThan($version1, $version2)
