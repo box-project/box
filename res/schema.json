@@ -173,6 +173,9 @@
             "description": "The file path to the main script.",
             "type": ["boolean", "string", "null"]
         },
+        "manifest": {
+            "description": "Add a manifest on phar contents."
+        },
         "map": {
             "description": "The mapping of file system paths to phar paths.",
             "type": ["array", "null"],

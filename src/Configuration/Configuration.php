@@ -209,6 +209,7 @@ final class Configuration
     private const KEY_PASS_KEY = 'key-pass';
     private const MAIN_KEY = 'main';
     private const MAP_KEY = 'map';
+    private const MANIFEST_KEY = 'manifest';
     private const METADATA_KEY = 'metadata';
     private const OUTPUT_KEY = 'output';
     private const PHP_SCOPER_KEY = 'php-scoper';
@@ -340,6 +341,8 @@ final class Configuration
         $map = self::retrieveMap($raw, $logger);
         $fileMapper = new MapFile($basePath, $map);
 
+        $manifest = self::retrieveManifest($raw, $logger);
+
         $metadata = self::retrieveMetadata($raw, $logger);
 
         $signingAlgorithm = self::retrieveSigningAlgorithm($raw, $logger);
@@ -384,6 +387,7 @@ final class Configuration
             $checkRequirements,
             $logger->getWarnings(),
             $logger->getRecommendations(),
+            $manifest,
         );
     }
 
@@ -456,6 +460,7 @@ final class Configuration
         private bool $checkRequirements,
         private array $warnings,
         private array $recommendations,
+        private mixed $manifest,
     ) {
         if (null === $mainScriptPath) {
             Assert::null($mainScriptContents);
@@ -698,6 +703,11 @@ final class Configuration
     public function getRecommendations(): array
     {
         return $this->recommendations;
+    }
+
+    public function getManifest(): ?string
+    {
+        return $this->manifest;
     }
 
     private static function retrieveAlias(stdClass $raw, bool $userStubUsed, ConfigurationLogger $logger): string
@@ -1876,6 +1886,17 @@ final class Configuration
         }
 
         return $map;
+    }
+
+    private static function retrieveManifest(stdClass $raw, ConfigurationLogger $logger)
+    {
+        self::checkIfDefaultValue($logger, $raw, self::MANIFEST_KEY);
+
+        if (false === isset($raw->{self::MANIFEST_KEY})) {
+            return null;
+        }
+
+        return $raw->{self::MANIFEST_KEY};
     }
 
     private static function retrieveMetadata(stdClass $raw, ConfigurationLogger $logger)

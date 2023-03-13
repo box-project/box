@@ -29,6 +29,7 @@
     1. [Signing algorithm (`algorithm`)][algorithm]
     1. [The private key (`key`)][key]
     1. [The private key password (`key-pass`)][key-pass]
+1. [Manifest (`manifest`)][manifest]
 1. [Metadata (`metadata`)][metadata]
 1. [Replaceable placeholders][placeholders]
     1. [Replacements (`replacements`)][replacements]
@@ -85,6 +86,7 @@ to `null`, then its default value will be picked and is strictly equivalent to n
     "key": "?",
     "key-pass": "?",
     "main": "?",
+    "manifest": "?",
     "map": "?",
     "metadata": "?",
     "output": "?",
@@ -784,6 +786,28 @@ prompted for the passphrase unless you are not in an interactive environment.
 This setting will be ignored if no [key][key] has been provided.
 
 
+## Manifest (`manifest`)
+
+The manifest (`string`|`null` default `null`) setting is used to specify the filename included with the phar file list
+that must contains the software components and dependencies list.
+
+If you specify `auto`, it will search in order for following files until once was found to be used as a manifest: 
+`manifest.txt`, `manifest.xml`, `sbom.xml`, `sbom.json`
+
+In case you are many files in different format, and want to be sure to use a specific version, then you will have to set
+the `manifest` setting.
+
+With the configuration excerpt:
+
+```json
+{
+    "manifest": "sbom.json"
+}
+```
+
+For example, if I've both `sbom.xml` and `sbom.json` files available, and I want to use the json version.
+
+
 ## Metadata (`metadata`)
 
 The metadata (`any` default none) setting can be any value. This value will be stored as metadata that can be retrieved
@@ -1010,6 +1034,7 @@ The short commit hash will only be used if no tag is available.
 [key-pass]: #the-private-key-password-key-pass
 [key]: #the-private-key-key
 [main]: #main-main
+[manifest]: #manifest-manifest
 [map]: #map-map
 [metadata]: #metadata-metadata
 [output]: #output-output

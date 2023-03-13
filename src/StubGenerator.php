@@ -16,6 +16,7 @@ namespace KevinGH\Box;
 
 use function addcslashes;
 use function implode;
+use function realpath;
 use function str_replace;
 
 /**
@@ -36,6 +37,8 @@ final class StubGenerator
 
         __BOX_PHAR_CONFIG__
 
+        __BOX_PHAR_MANIFEST__
+
         __HALT_COMPILER(); ?>
 
         STUB;
@@ -54,6 +57,7 @@ final class StubGenerator
         bool $intercept = false,
         ?string $shebang = null,
         bool $checkRequirements = true,
+        ?string $manifest = null,
     ): string {
         $stub = self::STUB_TEMPLATE;
 
@@ -69,7 +73,7 @@ final class StubGenerator
             $stub,
         );
 
-        return str_replace(
+        $stub = str_replace(
             "__BOX_PHAR_CONFIG__\n",
             self::generatePharConfigStmt(
                 $alias,
@@ -77,6 +81,12 @@ final class StubGenerator
                 $intercept,
                 $checkRequirements,
             ),
+            $stub,
+        );
+
+        return str_replace(
+            "__BOX_PHAR_MANIFEST__\n",
+            self::generateManifestStmt($alias, $manifest),
             $stub,
         );
     }
@@ -163,6 +173,34 @@ final class StubGenerator
 
         if ([] === $stub) {
             return "// No PHAR config\n";
+        }
+
+        return implode("\n", $stub)."\n";
+    }
+
+    private static function generateManifestStmt(
+        ?string $alias,
+        ?string $manifest,
+    ): string {
+        $stub = [];
+
+        $resources = 'auto' === $manifest ? ['manifest.txt', 'manifest.xml', 'sbom.xml', 'sbom.json'] : ($manifest ? [$manifest] : []);
+
+        foreach ($resources as $resource) {
+            $resolved = realpath($resource) ?: (\file_exists($resource) ? $resource : null);
+            if ($resolved) {
+                $stub[] = '$io = \Fidry\Console\Input\IO::createDefault();';
+                $stub[] = 'if (true === $io->getInput()->hasParameterOption(["--manifest"], true)) {';
+                $stub[] = null === $alias
+                    ? '    $phar = new \Phar(" . __FILE__ . ");'
+                    : '    $phar = new \Phar("' . $alias . '");';
+                $stub[] = null === $alias
+                    ? '    $io->writeln(\file_get_contents("phar://" . __FILE__ . "/'. $resource . '"));'
+                    : '    $io->writeln(\file_get_contents("phar://' . $alias . '/'. $resource . '"));';
+                $stub[] = "    exit(\\Fidry\\Console\\ExitCode::SUCCESS);";
+                $stub[] = "}";
+                break;
+            }
         }
 
         return implode("\n", $stub)."\n";

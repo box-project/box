@@ -818,6 +818,7 @@ final class Compile implements CommandAware
         $shebang = $config->getShebang();
         $bannerPath = $config->getStubBannerPath();
         $bannerContents = $config->getStubBannerContents();
+        $manifest = $config->getManifest();
 
         if (null !== $shebang) {
             $logger->log(
@@ -858,6 +859,21 @@ final class Compile implements CommandAware
             }
         }
 
+        if (null !== $manifest) {
+            $logger->log(
+                CompilerLogger::MINUS_PREFIX,
+                sprintf(
+                    'Using manifest: %s',
+                    $manifest,
+                ),
+            );
+        } else {
+            $logger->log(
+                CompilerLogger::MINUS_PREFIX,
+                'No manifest',
+            );
+        }
+
         return StubGenerator::generateStub(
             $config->getAlias(),
             $bannerContents,
@@ -865,6 +881,7 @@ final class Compile implements CommandAware
             $config->isInterceptFileFuncs(),
             $shebang,
             $checkRequirements,
+            $manifest
         );
     }
 
