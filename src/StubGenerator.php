@@ -84,7 +84,7 @@ final class StubGenerator
         );
 
         return str_replace(
-            "__BOX_PHAR_MANIFEST__",
+            '__BOX_PHAR_MANIFEST__',
             self::generateManifestStmt($alias, $manifest),
             $stub,
         );
@@ -203,7 +203,7 @@ final class StubGenerator
         }
 
         if ([] === $stub) {
-            return "";
+            return '';
         }
 
         return implode("\n", $stub)."\n";
