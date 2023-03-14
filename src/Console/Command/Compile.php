@@ -867,11 +867,6 @@ final class Compile implements CommandAware
                     $manifest,
                 ),
             );
-        } else {
-            $logger->log(
-                CompilerLogger::MINUS_PREFIX,
-                'No manifest',
-            );
         }
 
         return StubGenerator::generateStub(
