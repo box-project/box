@@ -37,9 +37,7 @@ final class StubGenerator
         __BOX_BANNER__
 
         __BOX_PHAR_CONFIG__
-
         __BOX_PHAR_MANIFEST__
-
         __HALT_COMPILER(); ?>
 
         STUB;
@@ -86,7 +84,7 @@ final class StubGenerator
         );
 
         return str_replace(
-            "__BOX_PHAR_MANIFEST__\n",
+            "__BOX_PHAR_MANIFEST__",
             self::generateManifestStmt($alias, $manifest),
             $stub,
         );
@@ -202,6 +200,10 @@ final class StubGenerator
                 $stub[] = '}';
                 break;
             }
+        }
+
+        if ([] === $stub) {
+            return "";
         }
 
         return implode("\n", $stub)."\n";

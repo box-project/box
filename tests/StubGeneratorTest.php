@@ -36,6 +36,7 @@ class StubGeneratorTest extends TestCase
         bool $intercept,
         ?string $shebang,
         bool $checkRequirements,
+        ?string $manifest,
         string $expected,
     ): void {
         $actual = StubGenerator::generateStub(
@@ -45,6 +46,7 @@ class StubGeneratorTest extends TestCase
             $intercept,
             $shebang,
             $checkRequirements,
+            $manifest,
         );
 
         self::assertSame($expected, $actual);
