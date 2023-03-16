@@ -44,12 +44,12 @@ declare(strict_types=1);
 namespace KevinGH\Box\Pharaoh;
 
 use Error;
+use KevinGH\Box\Phar\PharPhpSettings;
 use KevinGH\Box\PharInfo\PharInfo;
 use ParagonIE\ConstantTime\Hex;
 use Phar;
 use function copy;
 use function file_put_contents;
-use function ini_get;
 use function is_dir;
 use function is_readable;
 use function is_string;
@@ -79,7 +79,7 @@ final class Pharaoh
             throw new PharError($file.' cannot be read');
         }
 
-        if ('1' == ini_get('phar.readonly')) {
+        if (PharPhpSettings::isReadonly()) {
             // TODO: the value may be something else than '1'
             throw new PharError("Pharaoh cannot be used if phar.readonly is enabled in php.ini\n");
         }
