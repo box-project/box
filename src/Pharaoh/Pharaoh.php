@@ -43,22 +43,19 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Pharaoh;
 
-use Error;
 use KevinGH\Box\Phar\PharPhpSettings;
 use KevinGH\Box\PharInfo\PharInfo;
 use ParagonIE\ConstantTime\Hex;
 use Phar;
-use function copy;
+use Webmozart\Assert\Assert;
+use function file_exists;
 use function file_put_contents;
-use function is_dir;
-use function is_readable;
-use function is_string;
+use function KevinGH\Box\FileSystem\copy;
+use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
-use function mkdir;
+use function KevinGH\Box\FileSystem\tempnam;
 use function random_bytes;
 use function sys_get_temp_dir;
-use function tempnam;
-use function unlink;
 use const DIRECTORY_SEPARATOR;
 
 final class Pharaoh
@@ -75,54 +72,44 @@ final class Pharaoh
 
     public function __construct(string $file, ?string $alias = null)
     {
-        if (!is_readable($file)) {
-            throw new PharError($file.' cannot be read');
-        }
-
-        if (PharPhpSettings::isReadonly()) {
-            // TODO: the value may be something else than '1'
-            throw new PharError("Pharaoh cannot be used if phar.readonly is enabled in php.ini\n");
-        }
+        Assert::readable($file);
+        Assert::true(
+            PharPhpSettings::isReadonly(),
+            'Pharaoh cannot be used if phar.readonly is enabled in php.ini',
+        );
 
         // Set the static variable here
-        if (empty(self::$stubfile)) {
+        if (!isset(self::$stubfile)) {
             self::$stubfile = Hex::encode(random_bytes(12)).'.pharstub';
         }
 
-        if (empty($alias)) {
-            // We have to give every one a different alias, or it pukes.
-            $alias = Hex::encode(random_bytes(16)).'.phar';
-        }
+        // We have to give every one a different alias, or it pukes.
+        $alias ??= (Hex::encode(random_bytes(16)).'.phar');
 
-        if (!copy($file, $tmpFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.$alias)) {
-            throw new Error('Could not create temporary file');
-        }
+        $tmpFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.$alias;
+        copy($file, $tmpFile);
 
-        $this->phar = new Phar($tmpFile);
-        $this->phar->setAlias($alias);
+        $phar = new Phar($tmpFile);
+        $phar->setAlias($alias);
 
         // Make a random folder in /tmp
         /** @var string|bool $tmp */
         $tmp = tempnam(sys_get_temp_dir(), 'phr_');
-        if (!is_string($tmp)) {
-            throw new Error('Could not create temporary file');
-        }
 
-        $this->tmp = $tmp;
-        unlink($this->tmp);
-        if (!mkdir($this->tmp, 0o755, true) && !is_dir($this->tmp)) {
-            throw new Error('Could not create temporary directory');
-        }
+        Assert::false(file_exists($tmp));
+        mkdir($tmp, 0o755);
 
         // Let's extract to our temporary directory
-        $this->phar->extractTo($this->tmp);
+        $phar->extractTo($tmp);
 
         // Also extract the stub
         file_put_contents(
-            $this->tmp.'/'.self::$stubfile,
-            $this->phar->getStub()
+            $tmp.'/'.self::$stubfile,
+            $phar->getStub()
         );
 
+        $this->tmp = $tmp;
+        $this->phar = $phar;
         $this->fileName = basename($file);
     }
 
