@@ -69,7 +69,7 @@ final class Pharaoh
     private ?PharInfo $pharInfo = null;
     private ?string $path = null;
 
-    public function __construct(string $file, ?string $alias = null)
+    public function __construct(string $file)
     {
         Assert::readable($file);
         Assert::false(
@@ -83,7 +83,7 @@ final class Pharaoh
         }
 
         // We have to give every one a different alias, or it pukes.
-        $alias ??= (Hex::encode(random_bytes(16)).'.phar');
+        $alias = (Hex::encode(random_bytes(16)).'.phar');
 
         $tmpFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.$alias;
         copy($file, $tmpFile);
