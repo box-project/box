@@ -48,7 +48,6 @@ use KevinGH\Box\PharInfo\PharInfo;
 use ParagonIE\ConstantTime\Hex;
 use Phar;
 use Webmozart\Assert\Assert;
-use function file_exists;
 use function KevinGH\Box\FileSystem\copy;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\mkdir;
@@ -73,7 +72,7 @@ final class Pharaoh
     public function __construct(string $file, ?string $alias = null)
     {
         Assert::readable($file);
-        Assert::true(
+        Assert::false(
             PharPhpSettings::isReadonly(),
             'Pharaoh cannot be used if phar.readonly is enabled in php.ini',
         );
@@ -93,9 +92,9 @@ final class Pharaoh
         $phar->setAlias($alias);
 
         // Make a random folder in /tmp
-        $tmp = tempnam(sys_get_temp_dir(), 'phr_');
+        $tmp = tempnam(sys_get_temp_dir(), 'box_phar');
 
-        Assert::false(file_exists($tmp));
+        remove($tmp);
         mkdir($tmp, 0o755);
 
         // Let's extract to our temporary directory
