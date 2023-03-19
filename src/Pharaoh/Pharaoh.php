@@ -59,12 +59,10 @@ use const DIRECTORY_SEPARATOR;
 
 final class Pharaoh
 {
-    public Phar $phar;
+    private static string $stubfile;
 
-    public string $tmp;
-
-    public static string $stubfile;
-
+    private Phar $phar;
+    private string $tmp;
     private string $fileName;
     private ?PharInfo $pharInfo = null;
     private ?string $path = null;
@@ -121,6 +119,11 @@ final class Pharaoh
         Phar::unlinkArchive($path);
 
         remove($this->tmp);
+    }
+
+    public function getTmp(): string
+    {
+        return $this->tmp;
     }
 
     public function getFileName(): string
