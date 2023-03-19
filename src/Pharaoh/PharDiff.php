@@ -95,8 +95,8 @@ class PharDiff
     {
         // Lazy way; requires git. Will replace with custom implementation later.
 
-        $argA = escapeshellarg($this->phars[0]->tmp);
-        $argB = escapeshellarg($this->phars[1]->tmp);
+        $argA = escapeshellarg($this->phars[0]->getTmp());
+        $argB = escapeshellarg($this->phars[1]->getTmp());
         /** @var string $diff */
         $diff = shell_exec("git diff --no-index {$argA} {$argB}");
         echo $diff;
@@ -115,8 +115,8 @@ class PharDiff
     public function printGnuDiff(): int
     {
         // Lazy way. Will replace with custom implementation later.
-        $argA = escapeshellarg($this->phars[0]->tmp);
-        $argB = escapeshellarg($this->phars[1]->tmp);
+        $argA = escapeshellarg($this->phars[0]->getTmp());
+        $argB = escapeshellarg($this->phars[1]->getTmp());
         /** @var string $diff */
         $diff = shell_exec("diff {$argA} {$argB}");
         echo $diff;
@@ -245,8 +245,8 @@ class PharDiff
     {
         [$pharA, $pharB] = $this->hashChildren(
             $algo,
-            $this->phars[0]->tmp,
-            $this->phars[1]->tmp
+            $this->phars[0]->getTmp(),
+            $this->phars[1]->getTmp(),
         );
 
         $diffs = 0;
