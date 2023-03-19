@@ -51,7 +51,6 @@ use Webmozart\Assert\Assert;
 use function file_exists;
 use function file_put_contents;
 use function KevinGH\Box\FileSystem\copy;
-use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\tempnam;
@@ -59,33 +58,55 @@ use function random_bytes;
 use function sys_get_temp_dir;
 use const DIRECTORY_SEPARATOR;
 
-/**
- * Pharaoh is a wrapper around Phar
- */
 final class Pharaoh
 {
-    private static string $stubfile;
+    public Phar $phar;
 
-    private Phar $phar;
-    private string $tmp;
+    public string $tmp;
+
+    public static string $stubfile;
+
     private string $fileName;
     private ?PharInfo $pharInfo = null;
     private ?string $path = null;
 
-    public function __construct(string $file)
+    public function __construct(string $file, ?string $alias = null)
     {
         Assert::readable($file);
-        Assert::false(
+        Assert::true(
             PharPhpSettings::isReadonly(),
             'Pharaoh cannot be used if phar.readonly is enabled in php.ini',
         );
 
-        self::initStubFileName();
+        // Set the static variable here
+        if (!isset(self::$stubfile)) {
+            self::$stubfile = Hex::encode(random_bytes(12)).'.pharstub';
+        }
 
-        $tmp = self::createTmpDir();
-        $phar = self::createTmpPhar($file);
+        // We have to give every one a different alias, or it pukes.
+        $alias ??= (Hex::encode(random_bytes(16)).'.phar');
 
-        self::extractPhar($phar, $tmp);
+        $tmpFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.$alias;
+        copy($file, $tmpFile);
+
+        $phar = new Phar($tmpFile);
+        $phar->setAlias($alias);
+
+        // Make a random folder in /tmp
+        /** @var string|bool $tmp */
+        $tmp = tempnam(sys_get_temp_dir(), 'phr_');
+
+        Assert::false(file_exists($tmp));
+        mkdir($tmp, 0o755);
+
+        // Let's extract to our temporary directory
+        $phar->extractTo($tmp);
+
+        // Also extract the stub
+        file_put_contents(
+            $tmp.'/'.self::$stubfile,
+            $phar->getStub()
+        );
 
         $this->tmp = $tmp;
         $this->phar = $phar;
@@ -117,49 +138,5 @@ final class Pharaoh
         }
 
         return $this->pharInfo;
-    }
-
-    private static function initStubFileName(): void
-    {
-        if (!isset(self::$stubfile)) {
-            self::$stubfile = Hex::encode(random_bytes(12)).'.pharstub';
-        }
-    }
-
-    private static function createTmpPhar(string $file): Phar
-    {
-        // We have to give every one a different alias, or it pukes.
-        $alias = Hex::encode(random_bytes(16)).'.phar';
-
-        $tmpFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.$alias;
-        copy($file, $tmpFile);
-
-        $phar = new Phar($tmpFile);
-        $phar->setAlias($alias);
-
-        return $phar;
-    }
-
-    private static function createTmpDir(): string
-    {
-        $tmp = tempnam(sys_get_temp_dir(), 'box_');
-
-        remove($tmp);
-        mkdir($tmp, 0o755);
-
-        return $tmp;
-    }
-
-    private static function extractPhar(Phar $phar, string $tmp): void
-    {
-        // Extract the PHAR content
-        $phar->extractTo($tmp);
-
-        // Extract the stub; Phar::extractTo() does not do it since it
-        // is internal to the PHAR.
-        dump_file(
-            $tmp.DIRECTORY_SEPARATOR.self::$stubfile,
-            $phar->getStub(),
-        );
     }
 }
