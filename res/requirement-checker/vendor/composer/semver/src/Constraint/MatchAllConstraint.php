@@ -1,6 +1,6 @@
 <?php
 
-namespace HumbugBox436\Composer\Semver\Constraint;
+namespace HumbugBox438\Composer\Semver\Constraint;
 
 class MatchAllConstraint implements ConstraintInterface
 {
