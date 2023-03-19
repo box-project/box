@@ -68,6 +68,7 @@ final class Pharaoh
 
     private Phar $phar;
     private string $tmp;
+    private string $file;
     private string $fileName;
     private ?PharInfo $pharInfo = null;
     private ?string $path = null;
@@ -89,6 +90,7 @@ final class Pharaoh
 
         $this->tmp = $tmp;
         $this->phar = $phar;
+        $this->file = $file;
         $this->fileName = basename($file);
     }
 
@@ -102,6 +104,21 @@ final class Pharaoh
         Phar::unlinkArchive($path);
 
         remove($this->tmp);
+    }
+
+    public function getPhar(): Phar
+    {
+        return $this->phar;
+    }
+
+    public function getTmp(): string
+    {
+        return $this->tmp;
+    }
+
+    public function getFile(): string
+    {
+        return $this->file;
     }
 
     public function getFileName(): string

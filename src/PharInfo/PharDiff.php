@@ -102,8 +102,8 @@ final class PharDiff
 
     private static function getDiff(Pharaoh $pharA, Pharaoh $pharB, string $command): ?string
     {
-        $pharATmp = $pharA->tmp;
-        $pharBTmp = $pharB->tmp;
+        $pharATmp = $pharA->getTmp();
+        $pharBTmp = $pharB->getTmp();
 
         $pharAFileName = $pharA->getFileName();
         $pharBFileName = $pharB->getFileName();
@@ -147,7 +147,7 @@ final class PharDiff
      */
     private static function collectFiles(Pharaoh $phar): array
     {
-        $basePath = $phar->tmp.DIRECTORY_SEPARATOR;
+        $basePath = $phar->getTmp().DIRECTORY_SEPARATOR;
 
         return array_map(
             static fn (SplFileInfo $fileInfo): string => str_replace($basePath, '', $fileInfo->getRealPath()),

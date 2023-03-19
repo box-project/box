@@ -27,6 +27,7 @@ use function KevinGH\Box\unique_id;
 use function realpath;
 use function str_replace;
 use function var_export;
+use function Safe\md5_file;
 
 final class PharInfo
 {
@@ -141,5 +142,10 @@ final class PharInfo
             $countFile,
             $count,
         );
+    }
+
+    public function getCheckSum(): string
+    {
+        return md5_file($this->phar->getPath());
     }
 }

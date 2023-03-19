@@ -153,30 +153,28 @@ final class Diff implements Command
 
     private function compareCheckSums(PharDiff $diff, IO $io): int
     {
-        $io->comment('<info>Comparing the two archives... (do not check the signatures)</info>');
+        $io->write('Comparing the two archives checksums...');
 
-        $pharInfoA = $diff->getPharA()->getPharInfo();
-        $pharInfoB = $diff->getPharB()->getPharInfo();
+        $pharACheckSum = $diff->getPharA()->getPharInfo()->getCheckSum();
+        $pharBCheckSum = $diff->getPharB()->getPharInfo()->getCheckSum();
 
-        if ($pharInfoA->equals($pharInfoB)) {
-            $io->success('The two archives are identical');
+        if ($pharACheckSum === $pharBCheckSum) {
+            $io->write(' OK.');
 
             return ExitCode::SUCCESS;
         }
 
-        self::renderArchive(
-            $diff->getPharA()->getFileName(),
-            $pharInfoA,
-            $io,
-        );
-
         $io->newLine();
-
-        self::renderArchive(
-            $diff->getPharB()->getFileName(),
-            $pharInfoB,
-            $io,
-        );
+        $io->writeln([
+            sprintf(
+                '<fg=red>%s</>',
+                $pharACheckSum,
+            ),
+            sprintf(
+                '<fg=green>%s</>',
+                $pharBCheckSum,
+            ),
+        ]);
 
         return ExitCode::FAILURE;
     }
