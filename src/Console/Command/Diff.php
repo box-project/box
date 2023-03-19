@@ -29,6 +29,8 @@ use Symfony\Component\Filesystem\Path;
 use Throwable;
 use Webmozart\Assert\Assert;
 use function array_map;
+use function array_search;
+use function array_sum;
 use function count;
 // TODO: migrate to Safe API
 use function is_string;
@@ -122,10 +124,13 @@ final class Diff implements Command
             return ExitCode::FAILURE;
         }
 
-        $result1 = $this->compareArchives($diff, $io);
-        $result2 = $this->compareContents($diff, $io);
+        $results = [
+            $this->compareCheckSums($diff, $io),
+            $this->compareArchives($diff, $io),
+            $this->compareContents($diff, $io),
+        ];
 
-        return $result1 + $result2;
+        return array_sum($results);
     }
 
     /**
@@ -145,6 +150,37 @@ final class Diff implements Command
             $paths,
         );
     }
+
+    private function compareCheckSums(PharDiff $diff, IO $io): int
+    {
+        $io->comment('<info>Comparing the two archives... (do not check the signatures)</info>');
+
+        $pharInfoA = $diff->getPharA()->getPharInfo();
+        $pharInfoB = $diff->getPharB()->getPharInfo();
+
+        if ($pharInfoA->equals($pharInfoB)) {
+            $io->success('The two archives are identical');
+
+            return ExitCode::SUCCESS;
+        }
+
+        self::renderArchive(
+            $diff->getPharA()->getFileName(),
+            $pharInfoA,
+            $io,
+        );
+
+        $io->newLine();
+
+        self::renderArchive(
+            $diff->getPharB()->getFileName(),
+            $pharInfoB,
+            $io,
+        );
+
+        return ExitCode::FAILURE;
+    }
+
 
     private function compareArchives(PharDiff $diff, IO $io): int
     {
