@@ -49,8 +49,8 @@ use ParagonIE\ConstantTime\Hex;
 use Phar;
 use Webmozart\Assert\Assert;
 use function file_exists;
-use function file_put_contents;
 use function KevinGH\Box\FileSystem\copy;
+use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\tempnam;
@@ -93,7 +93,6 @@ final class Pharaoh
         $phar->setAlias($alias);
 
         // Make a random folder in /tmp
-        /** @var string|bool $tmp */
         $tmp = tempnam(sys_get_temp_dir(), 'phr_');
 
         Assert::false(file_exists($tmp));
@@ -103,7 +102,7 @@ final class Pharaoh
         $phar->extractTo($tmp);
 
         // Also extract the stub
-        file_put_contents(
+        dump_file(
             $tmp.'/'.self::$stubfile,
             $phar->getStub()
         );
