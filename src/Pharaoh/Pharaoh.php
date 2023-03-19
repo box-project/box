@@ -82,13 +82,6 @@ final class Pharaoh
 
         self::initStubFileName();
 
-        $tmp = self::createTmpDir();
-        $phar = self::createTmpPhar($file);
-
-        self::extractPhar($phar, $tmp);
-
-        $this->tmp = $tmp;
-        $this->phar = $phar;
         $this->file = $file;
         $this->fileName = basename($file);
     }
@@ -97,21 +90,22 @@ final class Pharaoh
     {
         unset($this->pharInfo);
 
-        $path = $this->phar->getPath();
-        unset($this->phar);
+        if (isset($this->phar)) {
+            $path = $this->phar->getPath();
+            unset($this->phar);
 
-        Phar::unlinkArchive($path);
+            Phar::unlinkArchive($path);
 
-        remove($this->tmp);
-    }
-
-    public function getPhar(): Phar
-    {
-        return $this->phar;
+            remove($this->tmp);
+        }
     }
 
     public function getTmp(): string
     {
+        if (!isset($this->tmp)) {
+            $this->initPhar();
+        }
+
         return $this->tmp;
     }
 
@@ -125,10 +119,19 @@ final class Pharaoh
         return $this->fileName;
     }
 
+    public function getPhar(): Phar
+    {
+        if (!isset($this->phar)) {
+            $this->initPhar();
+        }
+
+        return $this->phar;
+    }
+
     public function getPharInfo(): PharInfo
     {
-        if (null === $this->pharInfo || $this->path !== $this->phar->getPath()) {
-            $this->path = $this->phar->getPath();
+        if (null === $this->pharInfo || $this->path !== $this->getPhar()->getPath()) {
+            $this->path = $this->getPhar()->getPath();
             $this->pharInfo = new PharInfo($this->path);
         }
 
@@ -177,5 +180,13 @@ final class Pharaoh
             $tmp.DIRECTORY_SEPARATOR.self::$stubfile,
             $phar->getStub(),
         );
+    }
+
+    private function initPhar(): void
+    {
+        $this->tmp = self::createTmpDir();
+        $this->phar = self::createTmpPhar($this->file);
+
+        self::extractPhar($this->phar, $this->tmp);
     }
 }
