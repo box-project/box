@@ -417,8 +417,8 @@ class PhpTest extends TestCase
                 <?php
 
                 /**
-                @param
-                */
+                 * @param (string|stdClass $x
+                 */
                 function foo($x) {
                 }
                 PHP,
