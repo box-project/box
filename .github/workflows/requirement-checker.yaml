@@ -293,6 +293,8 @@ jobs:
                     working-directory: requirement-checker
                     dependency-versions: ${{ matrix.php.dependency }}
                     composer-options: ${{ matrix.php.composer-options }}
+                env:
+                    COMPOSER_ROOT_VERSION: "4.x.x-dev"
 
             -   name: Ensure that the make target is up to date
                 run: cd requirement-checker; make _vendor_install
@@ -302,6 +304,8 @@ jobs:
                 with:
                     dependency-versions: ${{ matrix.php.dependency }}
                     composer-options: ${{ matrix.php.composer-options }}
+                env:
+                    COMPOSER_ROOT_VERSION: "4.x.x-dev"
 
             -   name: Ensure that the make target is up to date
                 run: make _vendor_install
