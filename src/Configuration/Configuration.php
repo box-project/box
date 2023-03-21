@@ -216,8 +216,10 @@ final class Configuration
     private const REPLACEMENTS_KEY = 'replacements';
     private const SHEBANG_KEY = 'shebang';
     private const STUB_KEY = 'stub';
+
     private ?string $mainScriptPath;
     private ?string $mainScriptContents;
+    private ?string $composerBin = null;
 
     public static function create(?string $file, stdClass $raw): self
     {
@@ -463,6 +465,16 @@ final class Configuration
 
         $this->mainScriptPath = $mainScriptPath;
         $this->mainScriptContents = $mainScriptContents;
+    }
+
+    public function setComposerBin(?string $composerBin): void
+    {
+        $this->composerBin = $composerBin;
+    }
+
+    public function getComposerBin(): ?string
+    {
+        return $this->composerBin;
     }
 
     public function export(): string
@@ -1433,9 +1445,6 @@ final class Configuration
             ->notName('*.back')
             ->notName('*.swp')
             // Remove tests
-            ->notName('*Test.php')
-            ->exclude('test')
-            ->exclude('Test')
             ->exclude('tests')
             ->exclude('Tests')
             ->notName('/phpunit.*\.xml(.dist)?/')

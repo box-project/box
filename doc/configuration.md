@@ -1006,7 +1006,7 @@ The short commit hash will only be used if no tag is available.
 [git-version-placeholder]: #git-version-placeholder-git-version
 [herrera-io/php-annotations]: https://github.com/herrera-io/php-annotations
 [including-files]: #including-files
-[intercept-intercept]: #intercept-intercept
+[intercept]: #intercept-intercept
 [key-pass]: #the-private-key-password-key-pass
 [key]: #the-private-key-key
 [main]: #main-main

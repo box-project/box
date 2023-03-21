@@ -24,7 +24,6 @@ use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\Assert\Assert;
-use function array_key_exists;
 use function bin2hex;
 use function class_alias;
 use function class_exists;
@@ -89,25 +88,6 @@ function get_phar_compression_algorithms(): array
     ];
 
     return $algorithms;
-}
-
-/**
- * @private
- */
-function get_phar_compression_algorithm_extension(int $algorithm): ?string
-{
-    static $extensions = [
-        Phar::GZ => 'zlib',
-        Phar::BZ2 => 'bz2',
-        Phar::NONE => null,
-    ];
-
-    Assert::true(
-        array_key_exists($algorithm, $extensions),
-        sprintf('Unknown compression algorithm code "%d"', $algorithm),
-    );
-
-    return $extensions[$algorithm];
 }
 
 /**

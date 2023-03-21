@@ -51,10 +51,12 @@ jobs:
                     - e2e_scoper_alias
                     - e2e_scoper_expose_symbols
                     - e2e_symfony
+                    - e2e_symfony_runtime
                     - e2e_composer_installed_versions
                     - e2e_phpstorm_stubs
                     - e2e_dockerfile
                     - e2e_dockerfile_no_extension
+                    - e2e_custom_composer_bin
                     - e2e_installed_dev
                 php: [ '8.1', '8.2', '8.3' ]
                 tools:
@@ -116,7 +118,11 @@ jobs:
             fail-fast: false
             matrix:
                 e2e:
-                    - _e2e_php_settings_checker
+                    - _e2e_php_settings_checker_no_restart
+                    - _e2e_php_settings_checker_xdebug_enabled
+                    - _e2e_php_settings_checker_readonly_enabled
+                    - _e2e_php_settings_checker_memory_limit_lower
+                    - _e2e_php_settings_checker_memory_limit_higher
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3

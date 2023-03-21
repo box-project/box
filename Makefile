@@ -15,6 +15,7 @@ BOX_BIN = bin/box
 BOX = $(BOX_BIN)
 
 SCOPED_BOX_BIN = bin/box.phar
+TMP_SCOPED_BOX_BIN = bin/_box.phar
 SCOPED_BOX = $(SCOPED_BOX_BIN)
 SCOPED_BOX_DEPS = bin/box bin/box.bat $(shell find src res) box.json.dist scoper.inc.php vendor
 
@@ -79,6 +80,8 @@ clean:
 	rm -rf \
 		dist \
 		Dockerfile \
+		$(SCOPED_BOX_BIN) \
+		$(TMP_SCOPED_BOX_BIN) \
 		fixtures/build/*/.box_dump \
 		fixtures/build/*/vendor \
 		fixtures/build/dir010/index.phar \
@@ -250,7 +253,7 @@ _infection_ci: $(INFECTION_BIN) $(COVERAGE_XML_DIR) $(COVERAGE_JUNIT) vendor
 #---------------------------------------------------------------------------
 
 .PHONY: test_e2e
-test_e2e: e2e_scoper_alias e2e_scoper_expose_symbols e2e_php_settings_checker e2e_symfony e2e_composer_installed_versions e2e_phpstorm_stubs e2e_dockerfile e2e_dockerfile_no_extension e2e_installed_dev
+test_e2e: e2e_scoper_alias e2e_scoper_expose_symbols e2e_php_settings_checker_no_restart e2e_php_settings_checker_xdebug_enabled e2e_php_settings_checker_readonly_enabled e2e_php_settings_checker_memory_limit_lower e2e_php_settings_checker_memory_limit_higher e2e_symfony e2e_composer_installed_versions e2e_phpstorm_stubs e2e_dockerfile e2e_dockerfile_no_extension e2e_custom_composer_bin e2e_symfony_runtime e2e_installed_dev
 
 
 .PHONY: blackfire
@@ -397,11 +400,11 @@ $(SCOPED_BOX_BIN): $(SCOPED_BOX_DEPS)
 	@echo "$(YELLOW_COLOR)Compile Box.$(NO_COLOR)"
 	$(BOX) compile --ansi --no-parallel
 
-	rm bin/_box.phar || true
-	mv -v bin/box.phar bin/_box.phar
+	rm $(TMP_SCOPED_BOX_BIN) || true
+	mv -v bin/box.phar $(TMP_SCOPED_BOX_BIN)
 
 	@echo "$(YELLOW_COLOR)Compile Box with the isolated Box PHAR.$(NO_COLOR)"
-	php bin/_box.phar compile --ansi --no-parallel
+	php $(TMP_SCOPED_BOX_BIN) compile --ansi --no-parallel
 
 	mv -fv bin/box.phar box
 
@@ -409,7 +412,7 @@ $(SCOPED_BOX_BIN): $(SCOPED_BOX_DEPS)
 	./box compile --ansi --no-parallel
 
 	mv -fv box bin/box.phar
-	rm bin/_box.phar
+	rm $(TMP_SCOPED_BOX_BIN)
 
 	touch -c $@
 

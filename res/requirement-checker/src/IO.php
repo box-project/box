@@ -1,7 +1,7 @@
 <?php
 
 declare (strict_types=1);
-namespace HumbugBox420\KevinGH\RequirementChecker;
+namespace HumbugBox438\KevinGH\RequirementChecker;
 
 use function fstat;
 use function function_exists;

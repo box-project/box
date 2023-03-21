@@ -255,6 +255,8 @@ class CompileTest extends FileSystemTestCase
             🔨  Building the PHAR "/path/to/tmp/test.phar"
 
             ? Removing the existing PHAR "/path/to/tmp/test.phar"
+            ? Checking Composer compatibility
+                > Supported version detected
             ? Registering compactors
               + KevinGH\\Box\\Compactor\\Php
             ? Mapping paths
@@ -422,7 +424,7 @@ class CompileTest extends FileSystemTestCase
         );
 
         $version = get_box_version();
-        $expectedNumberOfFiles = self::NUMBER_OF_FILES + 4;
+        $expectedNumberOfFiles = self::NUMBER_OF_FILES + 5;
 
         $expected = <<<OUTPUT
 
@@ -439,6 +441,8 @@ class CompileTest extends FileSystemTestCase
 
             🔨  Building the PHAR "/path/to/tmp/index.phar"
 
+            ? Checking Composer compatibility
+                > Supported version detected
             ? No compactor to register
             ? Adding main file: /path/to/tmp/index.php
             ? Adding requirements checker
@@ -447,7 +451,7 @@ class CompileTest extends FileSystemTestCase
             ? Auto-discover files? Yes
             ? Exclude dev files? Yes
             ? Adding files
-                > 9 file(s)
+                > 10 file(s)
             ? Generating new stub
               - Using shebang line: #!/usr/bin/env php
               - Using banner:
@@ -516,6 +520,11 @@ class CompileTest extends FileSystemTestCase
         $expectedFiles = [
             ...self::BOX_FILES,
             ...self::COMPOSER_FILES,
+            '/a/',
+            '/a/deep/',
+            '/a/deep/test/',
+            '/a/deep/test/directory/',
+            '/a/deep/test/directory/test.php',
             '/binary',
             '/bootstrap.php',
             '/index.php',
@@ -604,6 +613,8 @@ class CompileTest extends FileSystemTestCase
             🔨  Building the PHAR "/path/to/tmp/test.phar"
 
             ? Removing the existing PHAR "/path/to/tmp/test.phar"
+            ? Checking Composer compatibility
+                > Supported version detected
             ? Registering compactors
               + KevinGH\\Box\\Compactor\\Php
             ? Mapping paths
@@ -856,6 +867,10 @@ class CompileTest extends FileSystemTestCase
             🔨  Building the PHAR "/path/to/tmp/test.phar"
 
             ? Removing the existing PHAR "/path/to/tmp/test.phar"
+            ? Checking Composer compatibility
+                > '/usr/local/bin/composer' '--version'
+                > 2.5.0 (Box requires ^2.2.0)
+                > Supported version detected
             ? Registering compactors
               + KevinGH\\Box\\Compactor\\Php
             ? Mapping paths
@@ -984,6 +999,10 @@ class CompileTest extends FileSystemTestCase
             🔨  Building the PHAR "/path/to/tmp/test.phar"
 
             ? Removing the existing PHAR "/path/to/tmp/test.phar"
+            ? Checking Composer compatibility
+                > '/usr/local/bin/composer' '--version'
+                > 2.5.0 (Box requires ^2.2.0)
+                > Supported version detected
             ? Registering compactors
               + KevinGH\\Box\\Compactor\\Php
             ? Mapping paths
@@ -1121,6 +1140,7 @@ class CompileTest extends FileSystemTestCase
 
             🔨  Building the PHAR "/path/to/tmp/index.phar"
 
+            ? Skipping the Composer compatibility check: the autoloader is not dumped
             ? No compactor to register
             ? Adding main file: /path/to/tmp/index.php
             ? Skip requirements checker
@@ -1605,6 +1625,7 @@ class CompileTest extends FileSystemTestCase
             🔨  Building the PHAR "/path/to/tmp/test.phar"
 
             ? Removing the existing PHAR "/path/to/tmp/test.phar"
+            ? Skipping the Composer compatibility check: the autoloader is not dumped
             ? Setting replacement values
               + @name@: world
             ? No compactor to register
@@ -1870,6 +1891,7 @@ class CompileTest extends FileSystemTestCase
 
             🔨  Building the PHAR "/path/to/tmp/test.phar"
 
+            ? Skipping the Composer compatibility check: the autoloader is not dumped
             ? No compactor to register
             ? Adding main file: /path/to/tmp/test.php
             ? Skip requirements checker
@@ -1938,6 +1960,7 @@ class CompileTest extends FileSystemTestCase
 
             🔨  Building the PHAR "/path/to/tmp/test.phar"
 
+            ? Skipping the Composer compatibility check: the autoloader is not dumped
             ? No compactor to register
             ? Adding main file: /path/to/tmp/test.php
             ? Skip requirements checker
@@ -2006,6 +2029,7 @@ class CompileTest extends FileSystemTestCase
 
             🔨  Building the PHAR "/path/to/tmp/test.phar"
 
+            ? Skipping the Composer compatibility check: the autoloader is not dumped
             ? No compactor to register
             ? Adding main file: /path/to/tmp/index.php
             ? Skip requirements checker
@@ -2082,6 +2106,7 @@ class CompileTest extends FileSystemTestCase
 
             🔨  Building the PHAR "/path/to/tmp/test.phar"
 
+            ? Skipping the Composer compatibility check: the autoloader is not dumped
             ? No compactor to register
             ? No main script path configured
             ? Skip requirements checker
@@ -2158,6 +2183,7 @@ class CompileTest extends FileSystemTestCase
 
             🔨  Building the PHAR "/path/to/tmp/test.phar"
 
+            ? Skipping the Composer compatibility check: the autoloader is not dumped
             ? No compactor to register
             ? No main script path configured
             ? Skip requirements checker
@@ -2234,6 +2260,7 @@ class CompileTest extends FileSystemTestCase
 
             🔨  Building the PHAR "/path/to/tmp/test.phar"
 
+            ? Skipping the Composer compatibility check: the autoloader is not dumped
             ? No compactor to register
             ? Adding main file: /path/to/tmp/test.php
             ? Skip requirements checker
@@ -2313,6 +2340,7 @@ class CompileTest extends FileSystemTestCase
 
             🔨  Building the PHAR "/path/to/tmp/foo/bar/test.phar"
 
+            ? Skipping the Composer compatibility check: the autoloader is not dumped
             ? No compactor to register
             ? Adding main file: /path/to/tmp/test.php
             ? Skip requirements checker
@@ -2473,6 +2501,7 @@ class CompileTest extends FileSystemTestCase
 
             🔨  Building the PHAR "/path/to/tmp/test.phar"
 
+            ? Skipping the Composer compatibility check: the autoloader is not dumped
             ? No compactor to register
             ? Adding main file: /path/to/tmp/test.php
             ? Skip requirements checker
@@ -2566,6 +2595,7 @@ class CompileTest extends FileSystemTestCase
 
             🔨  Building the PHAR "/path/to/tmp/test"
 
+            ? Skipping the Composer compatibility check: the autoloader is not dumped
             ? No compactor to register
             ? Adding main file: /path/to/tmp/test.php
             ? Skip requirements checker
@@ -2784,6 +2814,7 @@ class CompileTest extends FileSystemTestCase
 
             🔨  Building the PHAR "/path/to/tmp/index.phar"
 
+            ? Skipping the Composer compatibility check: the autoloader is not dumped
             ? No compactor to register
             ? Adding main file: /path/to/tmp/index.php
             ? Skip requirements checker
@@ -2860,6 +2891,7 @@ class CompileTest extends FileSystemTestCase
 
             🔨  Building the PHAR "/path/to/tmp/index.phar"
 
+            ? Skipping the Composer compatibility check: the autoloader is not dumped
             ? No compactor to register
             ? Adding main file: /path/to/tmp/index.php
             ? Skip requirements checker
@@ -2933,6 +2965,8 @@ class CompileTest extends FileSystemTestCase
 
             🔨  Building the PHAR "/path/to/tmp/index.phar"
 
+            ? Checking Composer compatibility
+                > Supported version detected
             ? No compactor to register
             ? Adding main file: /path/to/tmp/index.php
             ? Adding requirements checker
@@ -3054,6 +3088,15 @@ class CompileTest extends FileSystemTestCase
         );
     }
 
+    private static function createComposerVersionNormalizer(): callable
+    {
+        return static fn (string $output): string => preg_replace(
+            '/> ([\d.]+) \(Box requires \^2\.2\.0\)/',
+            '> 2.5.0 (Box requires ^2.2.0)',
+            $output,
+        );
+    }
+
     private static function createComposerInstallNoDevNormalizer(): callable
     {
         return static fn (string $output): string => preg_replace(
@@ -3122,6 +3165,8 @@ class CompileTest extends FileSystemTestCase
             $this->commandTester,
             BoxDisplayNormalizer::createReplaceBoxVersionNormalizer(),
             $this->createCompilerDisplayNormalizer(),
+            $this->createComposerPathNormalizer(),
+            $this->createComposerVersionNormalizer(),
             ...$extraNormalizers,
         );
     }

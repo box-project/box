@@ -466,7 +466,7 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
     public function test_it_ignores_the_most_common_non_needed_files_when_guess_the_files_from_the_composer_json_file(): void
     {
         // Depending on the test machine: the following command might be needed:
-        // docker run -i --rm -w /opt/box -v "$PWD":/opt/box box_php74 bin/phpunit tests/ConfigurationFileNoConfigTest.php --filter test_it_ignores_the_most_common_non_needed_files_when_guess_the_files_from_the_composer_json_file
+        // docker run -i --rm -w /opt/box -v "$PWD":/opt/box box_php81 vendor/bin/phpunit tests/Configuration/ConfigurationFileNoConfigTest.php --filter test_it_ignores_the_most_common_non_needed_files_when_guess_the_files_from_the_composer_json_file
 
         if ('Darwin' === PHP_OS_FAMILY) {
             self::markTestSkipped('Cannot run this test on OSX since it is case insensitive.');
@@ -541,7 +541,9 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
         touch('Author.php');
         touch('AuthorCommand.php');
 
+        touch('Test.php');
         touch('MainTest.php');
+        touch('SkippedTest.php');
 
         touch('Makefile');
 
@@ -560,15 +562,27 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
 
         mkdir('test');
         touch('test/file0');
+        touch('test/Test.php');
+        touch('test/MainTest.php');
+        touch('test/SkippedTest.php');
 
         mkdir('tests');
         touch('tests/file0');
+        touch('tests/Test.php');
+        touch('tests/MainTest.php');
+        touch('tests/SkippedTest.php');
 
         mkdir('src/Test');
         touch('src/Test/file0');
+        touch('src/Test/Test.php');
+        touch('src/Test/MainTest.php');
+        touch('src/Test/SkippedTest.php');
 
         mkdir('src/Tests');
         touch('src/Tests/file0');
+        touch('src/Tests/Test.php');
+        touch('src/Tests/MainTest.php');
+        touch('src/Tests/SkippedTest.php');
 
         mkdir('travis');
         touch('travis/install-ev.sh');
@@ -692,6 +706,17 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
             'Readme.php',
             'ReadmeCommand.php',
             'src/foo.php',
+            'src/Test/file0',
+            'src/Test/Test.php',
+            'src/Test/MainTest.php',
+            'src/Test/SkippedTest.php',
+            'test/file0',
+            'test/MainTest.php',
+            'test/SkippedTest.php',
+            'test/Test.php',
+            'Test.php',
+            'MainTest.php',
+            'SkippedTest.php',
             'Todo.php',
             'TodoCommand.php',
             'Upgrade.php',
@@ -712,7 +737,7 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
 
         $actual = $this->normalizePaths($this->config->getFiles());
 
-        self::assertSame($expected, $actual);
+        self::assertEqualsCanonicalizing($expected, $actual);
         self::assertCount(0, $this->config->getBinaryFiles());
     }
 
