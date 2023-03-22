@@ -25,7 +25,7 @@ use function KevinGH\Box\format_size;
 use function key;
 use function round;
 use function Safe\filesize;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * Utility to write to the console output various PHAR related pieces of information.
