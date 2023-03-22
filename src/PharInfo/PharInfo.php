@@ -54,6 +54,17 @@ final class PharInfo
         }
     }
 
+    private static function initAlgorithms(): void
+    {
+        if (!isset(self::$ALGORITHMS)) {
+            self::$ALGORITHMS = [];
+
+            foreach (CompressionAlgorithm::cases() as $compressionAlgorithm) {
+                self::$ALGORITHMS[$compressionAlgorithm->value] = $compressionAlgorithm->name;
+            }
+        }
+    }
+
     public function equals(self $pharInfo): bool
     {
         return

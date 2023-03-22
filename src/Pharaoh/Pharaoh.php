@@ -43,16 +43,20 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Pharaoh;
 
+use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\PharPhpSettings;
-use KevinGH\Box\PharInfo\PharInfo;
 use ParagonIE\ConstantTime\Hex;
 use Phar;
+use PharData;
+use PharFileInfo;
+use UnexpectedValueException;
 use Webmozart\Assert\Assert;
 use function KevinGH\Box\FileSystem\copy;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\tempnam;
+use function KevinGH\Box\unique_id;
 use function random_bytes;
 use function sys_get_temp_dir;
 use const DIRECTORY_SEPARATOR;
@@ -63,16 +67,17 @@ use const DIRECTORY_SEPARATOR;
  */
 final class Pharaoh
 {
+    private static array $ALGORITHMS;
     private static string $stubfile;
 
-    private Phar $phar;
-    private string $tmp;
+    private Phar|PharData $phar;
+    private ?string $tmp = null;
     private string $file;
     private string $fileName;
-    private ?PharInfo $pharInfo = null;
-    private ?string $path = null;
+    private ?array $compressionCount = null;
+    private ?string $hash = null;
 
-    public function __construct(string $file)
+    public function __construct(string $file, bool $processSafe = true)
     {
         Assert::readable($file);
         Assert::false(
@@ -80,15 +85,18 @@ final class Pharaoh
             'Pharaoh cannot be used if phar.readonly is enabled in php.ini',
         );
 
+        self::initAlgorithms();
         self::initStubFileName();
 
-        $tmp = self::createTmpDir();
-        $phar = self::createTmpPhar($file);
+        if ($processSafe) {
+            $this->tmp = self::createTmpDir();
+            $this->phar = self::createTmpPhar($file);
 
-        self::extractPhar($phar, $tmp);
+            self::extractPhar($this->phar, $this->tmp);
+        } else {
+            $this->phar = self::createPharOrPharData($file);
+        }
 
-        $this->tmp = $tmp;
-        $this->phar = $phar;
         $this->file = $file;
         $this->fileName = basename($file);
     }
@@ -105,9 +113,13 @@ final class Pharaoh
         remove($this->tmp);
     }
 
-    public function getPhar(): Phar
+    public function getPhar(): Phar|PharData
     {
         return $this->phar;
+    }
+
+    public function getPharInfo(): void
+    {
     }
 
     public function getTmp(): string
@@ -125,14 +137,88 @@ final class Pharaoh
         return $this->fileName;
     }
 
-    public function getPharInfo(): PharInfo
+    public function equals(self $pharInfo): bool
     {
-        if (null === $this->pharInfo || $this->path !== $this->phar->getPath()) {
-            $this->path = $this->phar->getPath();
-            $this->pharInfo = new PharInfo($this->path);
+        return
+            $pharInfo->getCompressionCount() === $this->getCompressionCount()
+            && $pharInfo->getNormalizedMetadata() === $this->getNormalizedMetadata();
+    }
+
+    public function getCompressionCount(): array
+    {
+        if (null === $this->compressionCount || $this->hash !== $this->getPharHash()) {
+            $this->compressionCount = $this->calculateCompressionCount();
+            $this->compressionCount['None'] = $this->compressionCount[CompressionAlgorithm::NONE->name];
+            unset($this->compressionCount[CompressionAlgorithm::NONE->name]);
+            $this->hash = $this->getPharHash();
         }
 
-        return $this->pharInfo;
+        return $this->compressionCount;
+    }
+
+    public function getRoot(): string
+    {
+        // Do not cache the result
+        return 'phar://'.str_replace('\\', '/', realpath($this->phar->getPath())).'/';
+    }
+
+    public function getVersion(): string
+    {
+        // Do not cache the result
+        return '' !== $this->phar->getVersion() ? $this->phar->getVersion() : 'No information found';
+    }
+
+    public function getNormalizedMetadata(): ?string
+    {
+        // Do not cache the result
+        $metadata = var_export($this->phar->getMetadata(), true);
+
+        return 'NULL' === $metadata ? null : $metadata;
+    }
+
+    private function getPharHash(): string
+    {
+        // If no signature is available (e.g. a tar.gz file), we generate a random hash to ensure
+        // it will always be invalidated
+        return $this->phar->getSignature()['hash'] ?? unique_id('');
+    }
+
+    private function calculateCompressionCount(): array
+    {
+        $count = array_fill_keys(
+            self::$ALGORITHMS,
+            0,
+        );
+
+        if ($this->phar instanceof PharData) {
+            $count[self::$ALGORITHMS[$this->phar->isCompressed()]] = 1;
+
+            return $count;
+        }
+
+        $countFile = static function (array $count, PharFileInfo $file): array {
+            if (false === $file->isCompressed()) {
+                ++$count[CompressionAlgorithm::NONE->name];
+
+                return $count;
+            }
+
+            foreach (self::$ALGORITHMS as $compressionAlgorithmCode => $compressionAlgorithmName) {
+                if ($file->isCompressed($compressionAlgorithmCode)) {
+                    ++$count[$compressionAlgorithmName];
+
+                    return $count;
+                }
+            }
+
+            return $count;
+        };
+
+        return array_reduce(
+            iterator_to_array(new RecursiveIteratorIterator($this->phar), true),
+            $countFile,
+            $count,
+        );
     }
 
     private static function initStubFileName(): void
@@ -142,7 +228,18 @@ final class Pharaoh
         }
     }
 
-    private static function createTmpPhar(string $file): Phar
+    private static function initAlgorithms(): void
+    {
+        if (!isset(self::$ALGORITHMS)) {
+            self::$ALGORITHMS = [];
+
+            foreach (CompressionAlgorithm::cases() as $compressionAlgorithm) {
+                self::$ALGORITHMS[$compressionAlgorithm->value] = $compressionAlgorithm->name;
+            }
+        }
+    }
+
+    private static function createTmpPhar(string $file): Phar|PharData
     {
         // We have to give every one a different alias, or it pukes.
         $alias = Hex::encode(random_bytes(16)).'.phar';
@@ -150,10 +247,19 @@ final class Pharaoh
         $tmpFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.$alias;
         copy($file, $tmpFile);
 
-        $phar = new Phar($tmpFile);
+        $phar = self::createPharOrPharData($tmpFile);
         $phar->setAlias($alias);
 
         return $phar;
+    }
+
+    private static function createPharOrPharData(string $path): Phar|PharData
+    {
+        try {
+            return new Phar($path);
+        } catch (UnexpectedValueException) {
+            return new PharData($path);
+        }
     }
 
     private static function createTmpDir(): string
