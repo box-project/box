@@ -43,6 +43,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Pharaoh;
 
+use JetBrains\PhpStorm\ArrayShape;
 use KevinGH\Box\Phar\PharPhpSettings;
 use KevinGH\Box\PharInfo\PharInfo;
 use ParagonIE\ConstantTime\Hex;
@@ -72,6 +73,9 @@ final class Pharaoh
     private ?PharInfo $pharInfo = null;
     private ?string $path = null;
 
+    #[ArrayShape(['hash' => 'string', 'hash_type' => 'string'])]
+    private array|false $signature;
+
     public function __construct(string $file)
     {
         Assert::readable($file);
@@ -83,12 +87,11 @@ final class Pharaoh
         self::initStubFileName();
 
         $tmp = self::createTmpDir();
-        $phar = self::createTmpPhar($file);
+        $this->initPhar($file);
 
-        self::extractPhar($phar, $tmp);
+        self::extractPhar($this->phar, $tmp);
 
         $this->tmp = $tmp;
-        $this->phar = $phar;
         $this->file = $file;
         $this->fileName = basename($file);
     }
@@ -135,14 +138,12 @@ final class Pharaoh
         return $this->pharInfo;
     }
 
-    private static function initStubFileName(): void
+    public function getSignature(): array|false
     {
-        if (!isset(self::$stubfile)) {
-            self::$stubfile = Hex::encode(random_bytes(12)).'.pharstub';
-        }
+        return $this->signature;
     }
 
-    private static function createTmpPhar(string $file): Phar
+    private function initPhar(string $file): void
     {
         $extension = self::getExtension($file);
 
@@ -157,9 +158,17 @@ final class Pharaoh
         copy($file, $tmpFile);
 
         $phar = new Phar($tmpFile);
-        $phar->setAlias($alias);
+        $this->signature = $phar->getSignature();
 
-        return $phar;
+        $phar->setAlias($alias);
+        $this->phar = $phar;
+    }
+
+    private static function initStubFileName(): void
+    {
+        if (!isset(self::$stubfile)) {
+            self::$stubfile = Hex::encode(random_bytes(12)).'.pharstub';
+        }
     }
 
     private static function createTmpDir(): string

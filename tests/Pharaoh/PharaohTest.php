@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Pharaoh;
 
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
+use Phar;
 use PHPUnit\Framework\TestCase;
 use const DIRECTORY_SEPARATOR;
 
@@ -85,5 +86,25 @@ final class PharaohTest extends TestCase
         $pharInfoB = new Pharaoh($file);
 
         self::assertNotSame($pharInfoA->getPhar(), $pharInfoB->getPhar());
+    }
+
+    public function test_it_preserves_the_phar_signature(): void
+    {
+        $file = self::FIXTURES_DIR.'/simple-phar.phar';
+
+        $phar = new Phar($file);
+        $pharaoh = new Pharaoh($file);
+
+        self::assertEquals($phar->getSignature(), $pharaoh->getSignature());
+        self::assertNotFalse($pharaoh->getSignature());
+    }
+
+    public function test_it_preserves_the_absence_of_signature(): void
+    {
+        $file = self::FIXTURES_DIR.'/simple-phar.tar.bz2';
+
+        $pharaoh = new Pharaoh($file);
+
+        self::assertFalse($pharaoh->getSignature());
     }
 }
