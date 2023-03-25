@@ -32,8 +32,6 @@ use Symfony\Component\Filesystem\Path;
 use Throwable;
 use function implode;
 use function is_array;
-use function KevinGH\Box\create_temporary_phar;
-use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\format_size;
 use function realpath;
 use function sprintf;

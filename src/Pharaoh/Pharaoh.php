@@ -51,7 +51,6 @@ use Phar;
 use PharData;
 use PharFileInfo;
 use RecursiveIteratorIterator;
-use UnexpectedValueException;
 use Webmozart\Assert\Assert;
 use function KevinGH\Box\FileSystem\copy;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -62,8 +61,6 @@ use function KevinGH\Box\unique_id;
 use function pathinfo;
 use function random_bytes;
 use function str_ends_with;
-use function strlen;
-use function substr;
 use function sys_get_temp_dir;
 use const DIRECTORY_SEPARATOR;
 use const PATHINFO_EXTENSION;
@@ -85,10 +82,10 @@ final class Pharaoh
     private ?array $compressionCount = null;
     private ?string $hash = null;
 
-    #[ArrayShape(["hash" => "string", "hash_type" => "string"])]
+    #[ArrayShape(['hash' => 'string', 'hash_type' => 'string'])]
     private array|false $signature;
 
-    public function __construct(string $file, bool $processSafe = true)
+    public function __construct(string $file)
     {
         Assert::readable($file);
         Assert::false(
@@ -99,15 +96,12 @@ final class Pharaoh
         self::initAlgorithms();
         self::initStubFileName();
 
-        if ($processSafe) {
-            $this->tmp = self::createTmpDir();
-            $this->initPhar($file);
+        $tmp = self::createTmpDir();
+        $this->initPhar($file);
 
-            self::extractPhar($this->phar, $this->tmp);
-        } else {
-            $this->phar = self::createPharOrPharData($file);
-        }
+        self::extractPhar($this->phar, $tmp);
 
+        $this->tmp = $tmp;
         $this->file = $file;
         $this->fileName = basename($file);
     }
@@ -238,22 +232,9 @@ final class Pharaoh
         );
     }
 
-    private static function initStubFileName(): void
+    public function getSignature(): array|false
     {
-        if (!isset(self::$stubfile)) {
-            self::$stubfile = Hex::encode(random_bytes(12)).'.pharstub';
-        }
-    }
-
-    private static function initAlgorithms(): void
-    {
-        if (!isset(self::$ALGORITHMS)) {
-            self::$ALGORITHMS = [];
-
-            foreach (CompressionAlgorithm::cases() as $compressionAlgorithm) {
-                self::$ALGORITHMS[$compressionAlgorithm->value] = $compressionAlgorithm->name;
-            }
-        }
+        return $this->signature;
     }
 
     private function initPhar(string $file): void
@@ -272,35 +253,17 @@ final class Pharaoh
 
         $phar = self::createPharOrPharData($tmpFile);
 
-        // Pick the signature of the "original" PHAR. Indeed changing
-        // the alias will alter the signature.
+        $phar = new Phar($tmpFile);
         $this->signature = $phar->getSignature();
 
         $phar->setAlias($alias);
-
         $this->phar = $phar;
     }
 
-    private static function getExtension(string $file): string
+    private static function initStubFileName(): void
     {
-        $lastExtension = pathinfo($file, PATHINFO_EXTENSION);
-        $extension = '';
-
-        while ('' !== $lastExtension) {
-            $extension = '.'.$lastExtension.$extension;
-            $file = substr($file, 0, -(strlen($lastExtension) + 1));
-            $lastExtension = pathinfo($file, PATHINFO_EXTENSION);
-        }
-
-        return $extension;
-    }
-
-    private static function createPharOrPharData(string $path): Phar|PharData
-    {
-        try {
-            return new Phar($path);
-        } catch (UnexpectedValueException) {
-            return new PharData($path);
+        if (!isset(self::$stubfile)) {
+            self::$stubfile = Hex::encode(random_bytes(12)).'.pharstub';
         }
     }
 

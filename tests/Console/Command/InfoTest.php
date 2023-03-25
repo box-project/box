@@ -28,7 +28,7 @@ use function preg_replace;
 use function realpath;
 use function str_replace;
 
-///**
+// /**
 // * @covers \KevinGH\Box\Console\Command\Info
 // *
 // * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
@@ -36,6 +36,9 @@ use function str_replace;
 // *
 // * @internal
 // */
+/**
+ * @internal
+ */
 class InfoTest extends CommandTestCase
 {
     private const FIXTURES = __DIR__.'/../../../fixtures/info';
