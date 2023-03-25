@@ -265,10 +265,6 @@ class InfoTest extends CommandTestCase
 
     public function test_it_provides_a_zip_phar_info(): void
     {
-        if ('v3' === getenv('SYMFONY_VERSION')) {
-            self::markTestSkipped();
-        }
-
         $pharPath = self::FIXTURES.'/new-simple-phar.zip';
 
         $this->commandTester->execute(
