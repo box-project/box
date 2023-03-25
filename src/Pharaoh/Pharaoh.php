@@ -144,8 +144,14 @@ final class Pharaoh
 
     private static function createTmpPhar(string $file): Phar
     {
+        $extension = self::getExtension($file);
+
         // We have to give every one a different alias, or it pukes.
-        $alias = Hex::encode(random_bytes(16)).'.phar';
+        $alias = Hex::encode(random_bytes(16)).$extension;
+
+        if (!str_ends_with($alias, '.phar')) {
+            $alias .= '.phar';
+        }
 
         $tmpFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.$alias;
         copy($file, $tmpFile);
@@ -177,5 +183,19 @@ final class Pharaoh
             $tmp.DIRECTORY_SEPARATOR.self::$stubfile,
             $phar->getStub(),
         );
+    }
+
+    private static function getExtension(string $file): string
+    {
+        $lastExtension = pathinfo($file, PATHINFO_EXTENSION);
+        $extension = '';
+
+        while ('' !== $lastExtension) {
+            $extension = '.'.$lastExtension.$extension;
+            $file = mb_substr($file, 0, -(mb_strlen($lastExtension) + 1));
+            $lastExtension = pathinfo($file, PATHINFO_EXTENSION);
+        }
+
+        return $extension;
     }
 }
