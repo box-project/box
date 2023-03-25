@@ -131,22 +131,16 @@ final class Info implements Command
             return ExitCode::FAILURE;
         }
 
-        $tmpFile = create_temporary_phar($fileRealPath);
-
-        try {
-            return self::showInfo($tmpFile, $fileRealPath, $io);
-        } finally {
-            remove($tmpFile);
-        }
+        return self::showInfo($fileRealPath, $io);
     }
 
-    public static function showInfo(string $file, string $originalFile, IO $io): int
+    public static function showInfo(string $file, IO $io): int
     {
         $maxDepth = self::getMaxDepth($io);
         $mode = $io->getOption(self::MODE_OPT)->asStringChoice(self::MODES);
 
         try {
-            $pharInfo = new Pharaoh($file, false);
+            $pharInfo = new Pharaoh($file);
 
             return self::showPharInfo(
                 $pharInfo,
@@ -163,7 +157,7 @@ final class Info implements Command
             $io->error(
                 sprintf(
                     'Could not read the file "%s".',
-                    $originalFile,
+                    $file,
                 ),
             );
 
@@ -301,6 +295,7 @@ final class Info implements Command
         }
 
         foreach ($list as $item) {
+            // TODO: review that
             /** @var PharFileInfo $item */
             $item = $phar[str_replace($root, '', $item->getPathname())];
 

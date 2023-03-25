@@ -214,6 +214,7 @@ function create_temporary_phar(string $file): string
 {
     $tmpFile = sys_get_temp_dir().'/'.unique_id('').basename($file);
 
+    // TODO: port the .phar
     if ('' === pathinfo($file, PATHINFO_EXTENSION)) {
         $tmpFile .= '.phar';
     }

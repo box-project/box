@@ -78,7 +78,7 @@ final class PharInfoRenderer
 
     public static function renderSignature(Pharaoh $pharInfo, IO $io): void
     {
-        $signature = $pharInfo->getPhar()->getSignature();
+        $signature = $pharInfo->getSignature();
 
         if (false === $signature) {
             $io->writeln('<comment>Signature unreadable</comment>');

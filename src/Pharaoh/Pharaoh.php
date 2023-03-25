@@ -43,12 +43,14 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Pharaoh;
 
+use JetBrains\PhpStorm\ArrayShape;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\PharPhpSettings;
 use ParagonIE\ConstantTime\Hex;
 use Phar;
 use PharData;
 use PharFileInfo;
+use RecursiveIteratorIterator;
 use UnexpectedValueException;
 use Webmozart\Assert\Assert;
 use function KevinGH\Box\FileSystem\copy;
@@ -57,10 +59,16 @@ use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\tempnam;
 use function KevinGH\Box\unique_id;
+use function pathinfo;
 use function random_bytes;
+use function str_ends_with;
+use function strlen;
+use function substr;
 use function sys_get_temp_dir;
 use const DIRECTORY_SEPARATOR;
+use const PATHINFO_EXTENSION;
 
+// TODO: rename it to SafePhar
 /**
  * Pharaoh is a wrapper around Phar. This is necessary because the Phar API is quite limited and will crash if say two
  * PHARs with the same alias are loaded.
@@ -77,6 +85,9 @@ final class Pharaoh
     private ?array $compressionCount = null;
     private ?string $hash = null;
 
+    #[ArrayShape(["hash" => "string", "hash_type" => "string"])]
+    private array|false $signature;
+
     public function __construct(string $file, bool $processSafe = true)
     {
         Assert::readable($file);
@@ -90,7 +101,7 @@ final class Pharaoh
 
         if ($processSafe) {
             $this->tmp = self::createTmpDir();
-            $this->phar = self::createTmpPhar($file);
+            $this->initPhar($file);
 
             self::extractPhar($this->phar, $this->tmp);
         } else {
@@ -105,21 +116,22 @@ final class Pharaoh
     {
         unset($this->pharInfo);
 
-        $path = $this->phar->getPath();
-        unset($this->phar);
+        if (isset($this->phar)) {
+            $path = $this->phar->getPath();
+            unset($this->phar);
 
-        Phar::unlinkArchive($path);
+            Phar::unlinkArchive($path);
+        }
 
-        remove($this->tmp);
+        if (null !== $this->tmp) {
+            remove($this->tmp);
+        }
     }
 
+    // TODO: consider making it internal
     public function getPhar(): Phar|PharData
     {
         return $this->phar;
-    }
-
-    public function getPharInfo(): void
-    {
     }
 
     public function getTmp(): string
@@ -176,11 +188,16 @@ final class Pharaoh
         return 'NULL' === $metadata ? null : $metadata;
     }
 
+    public function getSignature(): false|array
+    {
+        return $this->signature;
+    }
+
     private function getPharHash(): string
     {
         // If no signature is available (e.g. a tar.gz file), we generate a random hash to ensure
         // it will always be invalidated
-        return $this->phar->getSignature()['hash'] ?? unique_id('');
+        return $this->signature['hash'] ?? unique_id('');
     }
 
     private function calculateCompressionCount(): array
@@ -215,7 +232,7 @@ final class Pharaoh
         };
 
         return array_reduce(
-            iterator_to_array(new RecursiveIteratorIterator($this->phar), true),
+            iterator_to_array(new RecursiveIteratorIterator($this->phar)),
             $countFile,
             $count,
         );
@@ -239,18 +256,43 @@ final class Pharaoh
         }
     }
 
-    private static function createTmpPhar(string $file): Phar|PharData
+    private function initPhar(string $file): void
     {
+        $extension = self::getExtension($file);
+
         // We have to give every one a different alias, or it pukes.
-        $alias = Hex::encode(random_bytes(16)).'.phar';
+        $alias = Hex::encode(random_bytes(16)).$extension;
+
+        if (!str_ends_with($alias, '.phar')) {
+            $alias .= '.phar';
+        }
 
         $tmpFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.$alias;
-        copy($file, $tmpFile);
+        copy($file, $tmpFile, true);
 
         $phar = self::createPharOrPharData($tmpFile);
+
+        // Pick the signature of the "original" PHAR. Indeed changing
+        // the alias will alter the signature.
+        $this->signature = $phar->getSignature();
+
         $phar->setAlias($alias);
 
-        return $phar;
+        $this->phar = $phar;
+    }
+
+    private static function getExtension(string $file): string
+    {
+        $lastExtension = pathinfo($file, PATHINFO_EXTENSION);
+        $extension = '';
+
+        while ('' !== $lastExtension) {
+            $extension = '.'.$lastExtension.$extension;
+            $file = substr($file, 0, -(strlen($lastExtension) + 1));
+            $lastExtension = pathinfo($file, PATHINFO_EXTENSION);
+        }
+
+        return $extension;
     }
 
     private static function createPharOrPharData(string $path): Phar|PharData

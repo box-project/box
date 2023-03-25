@@ -28,14 +28,14 @@ use function preg_replace;
 use function realpath;
 use function str_replace;
 
-/**
- * @covers \KevinGH\Box\Console\Command\Info
- *
- * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
- *                              can create undesirable side-effects.
- *
- * @internal
- */
+///**
+// * @covers \KevinGH\Box\Console\Command\Info
+// *
+// * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
+// *                              can create undesirable side-effects.
+// *
+// * @internal
+// */
 class InfoTest extends CommandTestCase
 {
     private const FIXTURES = __DIR__.'/../../../fixtures/info';
@@ -265,10 +265,6 @@ class InfoTest extends CommandTestCase
 
     public function test_it_provides_a_zip_phar_info(): void
     {
-        if ('v3' === getenv('SYMFONY_VERSION')) {
-            self::markTestSkipped();
-        }
-
         $pharPath = self::FIXTURES.'/new-simple-phar.zip';
 
         $this->commandTester->execute(
@@ -333,7 +329,7 @@ class InfoTest extends CommandTestCase
               'test' => 123,
             )
 
-            Contents: 3 files (6.75KB)
+            Contents: 3 files (6.79KB)
             a/
               bar.php [BZ2] - 60.00B
             b/
@@ -382,7 +378,7 @@ class InfoTest extends CommandTestCase
               'test' => 123,
             )
 
-            Contents: 3 files (6.75KB)
+            Contents: 3 files (6.79KB)
             a/bar.php [BZ2] - 60.00B
             b/beta/bar.php [NONE] - 0.00B
             foo.php [NONE] - 19.00B
@@ -419,7 +415,7 @@ class InfoTest extends CommandTestCase
 
             Metadata: None
 
-            Contents: 16 files (7.50KB)
+            Contents: 16 files (7.54KB)
             .hidden-dir/
               .hidden-file1 [NONE] - 0.00B
               .hidden-file1.php [NONE] - 33.00B
@@ -514,7 +510,7 @@ class InfoTest extends CommandTestCase
                   'test' => 123,
                 )
 
-                Contents: 3 files (6.75KB)
+                Contents: 3 files (6.79KB)
                 a/
                 b/
                 foo.php [NONE] - 19.00B
@@ -541,7 +537,7 @@ class InfoTest extends CommandTestCase
                   'test' => 123,
                 )
 
-                Contents: 3 files (6.75KB)
+                Contents: 3 files (6.79KB)
                 a/
                   bar.php [BZ2] - 60.00B
                 b/
@@ -570,7 +566,7 @@ class InfoTest extends CommandTestCase
                   'test' => 123,
                 )
 
-                Contents: 3 files (6.75KB)
+                Contents: 3 files (6.79KB)
                 a/
                   bar.php [BZ2] - 60.00B
                 b/
@@ -600,7 +596,7 @@ class InfoTest extends CommandTestCase
                   'test' => 123,
                 )
 
-                Contents: 3 files (6.75KB)
+                Contents: 3 files (6.79KB)
                 a/
                   bar.php [BZ2] - 60.00B
                 b/
@@ -649,7 +645,7 @@ class InfoTest extends CommandTestCase
               'test' => 123,
             )
 
-            Contents: 3 files (6.75KB)
+            Contents: 3 files (6.79KB)
             a/bar.php [BZ2] - 60.00B
             foo.php [NONE] - 19.00B
 
