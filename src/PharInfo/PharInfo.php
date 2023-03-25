@@ -39,18 +39,23 @@ final class PharInfo
 
     public function __construct(string $pharFile)
     {
+        self::initAlgorithms();
+
+        try {
+            $this->phar = new Phar($pharFile);
+        } catch (UnexpectedValueException) {
+            $this->phar = new PharData($pharFile);
+        }
+    }
+
+    private static function initAlgorithms(): void
+    {
         if (!isset(self::$ALGORITHMS)) {
             self::$ALGORITHMS = [];
 
             foreach (CompressionAlgorithm::cases() as $compressionAlgorithm) {
                 self::$ALGORITHMS[$compressionAlgorithm->value] = $compressionAlgorithm->name;
             }
-        }
-
-        try {
-            $this->phar = new Phar($pharFile);
-        } catch (UnexpectedValueException) {
-            $this->phar = new PharData($pharFile);
         }
     }
 
