@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\RequirementChecker\Pharaoh;
 
 use KevinGH\Box\Pharaoh\Pharaoh;
+use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -24,7 +25,14 @@ use PHPUnit\Framework\TestCase;
  */
 final class PharaohTest extends TestCase
 {
+    use RequiresPharReadonlyOff;
+
     private const FIXTURES_DIR = __DIR__.'/../../fixtures/info';
+
+    protected function setUp(): void
+    {
+        $this->markAsSkippedIfPharReadonlyIsOn();
+    }
 
     public function test_it_can_be_instantiated(): void
     {
