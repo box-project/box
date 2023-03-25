@@ -2,9 +2,25 @@
 
 declare(strict_types=1);
 
+<<<<<<< Updated upstream:requirement-checker/tests/Pharaoh/PharaohTest.php
 namespace KevinGH\RequirementChecker\Pharaoh;
 
 use KevinGH\Box\Pharaoh\Pharaoh;
+=======
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+namespace KevinGH\Box\Pharaoh;
+
+use KevinGH\Box\Test\RequiresPharReadonlyOff;
+>>>>>>> Stashed changes:tests/Pharaoh/PharaohTest.php
 use PHPUnit\Framework\TestCase;
 
 /**
