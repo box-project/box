@@ -12,14 +12,15 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\RequirementChecker\Pharaoh;
+namespace KevinGH\Box\Pharaoh;
 
-use KevinGH\Box\Pharaoh\Pharaoh;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use PHPUnit\Framework\TestCase;
+use const DIRECTORY_SEPARATOR;
 
 /**
  * @covers \KevinGH\Box\Pharaoh\Pharaoh
+ * @runTestsInSeparateProcesses
  *
  * @internal
  */
@@ -34,13 +35,33 @@ final class PharaohTest extends TestCase
         $this->markAsSkippedIfPharReadonlyIsOn();
     }
 
-    public function test_it_can_be_instantiated(): void
-    {
-        $file = self::FIXTURES_DIR.'/simple-phar.phar';
+    /**
+     * @dataProvider fileProvider
+     */
+    public function test_it_can_be_instantiated(
+        string $fileName,
+    ): void {
+        $file = self::FIXTURES_DIR.DIRECTORY_SEPARATOR.$fileName;
+
         $pharInfo = new Pharaoh($file);
 
         self::assertSame($file, $pharInfo->getFile());
-        self::assertSame('simple-phar.phar', $pharInfo->getFileName());
+        self::assertSame($fileName, $pharInfo->getFileName());
+    }
+
+    public static function fileProvider(): iterable
+    {
+        yield 'simple PHAR' => [
+            'simple-phar.phar',
+        ];
+
+        yield 'simple PHAR without the extension' => [
+            'simple-phar',
+        ];
+
+        yield 'compressed archive' => [
+            'simple-phar.tar.bz2',
+        ];
     }
 
     public function test_it_cleans_itself_up_upon_destruction(): void

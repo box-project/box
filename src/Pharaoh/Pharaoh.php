@@ -326,4 +326,18 @@ final class Pharaoh
             $phar->getStub(),
         );
     }
+
+    private static function getExtension(string $file): string
+    {
+        $lastExtension = pathinfo($file, PATHINFO_EXTENSION);
+        $extension = '';
+
+        while ('' !== $lastExtension) {
+            $extension = '.'.$lastExtension.$extension;
+            $file = mb_substr($file, 0, -(mb_strlen($lastExtension) + 1));
+            $lastExtension = pathinfo($file, PATHINFO_EXTENSION);
+        }
+
+        return $extension;
+    }
 }
