@@ -48,6 +48,8 @@ use KevinGH\Box\Phar\PharPhpSettings;
 use KevinGH\Box\PharInfo\PharInfo;
 use ParagonIE\ConstantTime\Hex;
 use Phar;
+use PharData;
+use UnexpectedValueException;
 use Webmozart\Assert\Assert;
 use function KevinGH\Box\FileSystem\copy;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -66,7 +68,7 @@ final class Pharaoh
 {
     private static string $stubfile;
 
-    private Phar $phar;
+    private Phar|PharData $phar;
     private string $tmp;
     private string $file;
     private string $fileName;
@@ -108,7 +110,7 @@ final class Pharaoh
         remove($this->tmp);
     }
 
-    public function getPhar(): Phar
+    public function getPhar(): Phar|PharData
     {
         return $this->phar;
     }
@@ -150,17 +152,20 @@ final class Pharaoh
         // We have to give every one a different alias, or it pukes.
         $alias = Hex::encode(random_bytes(16)).$extension;
 
-        if (!str_ends_with($alias, '.phar')) {
-            $alias .= '.phar';
-        }
-
         $tmpFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.$alias;
         copy($file, $tmpFile);
 
-        $phar = new Phar($tmpFile);
-        $this->signature = $phar->getSignature();
+        try {
+            $phar = new Phar($tmpFile);
 
-        $phar->setAlias($alias);
+            $this->signature = $phar->getSignature();
+
+            $phar->setAlias($alias);
+        } catch (UnexpectedValueException $cannotCreatePhar) {
+            $phar = new PharData($tmpFile);
+            $this->signature = $phar->getSignature();
+        }
+
         $this->phar = $phar;
     }
 
@@ -181,7 +186,7 @@ final class Pharaoh
         return $tmp;
     }
 
-    private static function extractPhar(Phar $phar, string $tmp): void
+    private static function extractPhar(Phar|PharData $phar, string $tmp): void
     {
         // Extract the PHAR content
         $phar->extractTo($tmp);
@@ -205,6 +210,6 @@ final class Pharaoh
             $lastExtension = pathinfo($file, PATHINFO_EXTENSION);
         }
 
-        return $extension;
+        return '' === $extension ? '.phar' : $extension;
     }
 }

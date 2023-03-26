@@ -16,7 +16,9 @@ namespace KevinGH\Box\Pharaoh;
 
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
+use PharData;
 use PHPUnit\Framework\TestCase;
+use function get_class;
 use const DIRECTORY_SEPARATOR;
 
 /**
@@ -41,6 +43,7 @@ final class PharaohTest extends TestCase
      */
     public function test_it_can_be_instantiated(
         string $fileName,
+        string $expectedClassName
     ): void {
         $file = self::FIXTURES_DIR.DIRECTORY_SEPARATOR.$fileName;
 
@@ -48,20 +51,24 @@ final class PharaohTest extends TestCase
 
         self::assertSame($file, $pharInfo->getFile());
         self::assertSame($fileName, $pharInfo->getFileName());
+        self::assertSame($expectedClassName, get_class($pharInfo->getPhar()));
     }
 
     public static function fileProvider(): iterable
     {
         yield 'simple PHAR' => [
             'simple-phar.phar',
+            Phar::class,
         ];
 
         yield 'simple PHAR without the extension' => [
             'simple-phar',
+            Phar::class,
         ];
 
         yield 'compressed archive' => [
             'simple-phar.tar.bz2',
+            PharData::class,
         ];
     }
 
