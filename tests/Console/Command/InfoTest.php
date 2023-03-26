@@ -18,24 +18,24 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Test\OutputAssertions;
 use InvalidArgumentException;
+use KevinGH\Box\Pharaoh\InvalidPhar;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
 use Symfony\Component\Console\Output\OutputInterface;
-use UnexpectedValueException;
 use function getenv;
 use function implode;
 use function preg_replace;
 use function realpath;
 use function str_replace;
 
-// /**
-// * @covers \KevinGH\Box\Console\Command\Info
-// *
-// * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
-// *                              can create undesirable side-effects.
-// *
-// * @internal
-// */
+/**
+ * @covers \KevinGH\Box\Console\Command\Info
+ *
+ * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
+ *                              can create undesirable side-effects.
+ *
+ * @internal
+ */
 class InfoTest extends CommandTestCase
 {
     private const FIXTURES = __DIR__.'/../../../fixtures/info';
@@ -101,7 +101,7 @@ class InfoTest extends CommandTestCase
 
             Metadata: None
 
-            Contents: 1 file (6.61KB)
+            Contents: 1 file (6.64KB)
 
              // Use the --list|-l option to list the content of the PHAR.
 
@@ -137,7 +137,7 @@ class InfoTest extends CommandTestCase
 
             Metadata: None
 
-            Contents: 1 file (6.61KB)
+            Contents: 1 file (6.64KB)
 
              // Use the --list|-l option to list the content of the PHAR.
 
@@ -183,19 +183,15 @@ class InfoTest extends CommandTestCase
     {
         $file = self::FIXTURES.'/foo';
 
-        try {
-            $this->commandTester->execute(
-                [
-                    'command' => 'info',
-                    'phar' => $file,
-                ],
-                ['verbosity' => OutputInterface::VERBOSITY_DEBUG],
-            );
+        $this->expectException(InvalidPhar::class);
 
-            self::fail('Expected exception to be thrown.');
-        } catch (UnexpectedValueException $exception) {
-            self::assertStringStartsWith('Cannot create phar', $exception->getMessage());
-        }
+        $this->commandTester->execute(
+            [
+                'command' => 'info',
+                'phar' => $file,
+            ],
+            ['verbosity' => OutputInterface::VERBOSITY_DEBUG],
+        );
     }
 
     public function test_it_provides_info_about_a_targz_phar(): void

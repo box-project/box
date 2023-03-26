@@ -62,7 +62,6 @@ use function KevinGH\Box\FileSystem\tempnam;
 use function KevinGH\Box\unique_id;
 use function pathinfo;
 use function random_bytes;
-use function str_ends_with;
 use function sys_get_temp_dir;
 use const DIRECTORY_SEPARATOR;
 use const PATHINFO_EXTENSION;
@@ -78,11 +77,10 @@ final class Pharaoh
     private static string $stubfile;
 
     private Phar|PharData $phar;
-    private ?string $tmp = null;
+    private string $tmp;
     private string $file;
     private string $fileName;
-    private ?array $compressionCount = null;
-    private ?string $hash = null;
+    private array $compressionCount;
 
     #[ArrayShape(['hash' => 'string', 'hash_type' => 'string'])]
     private array|false $signature;
@@ -156,11 +154,8 @@ final class Pharaoh
 
     public function getCompressionCount(): array
     {
-        if (null === $this->compressionCount || $this->hash !== $this->getPharHash()) {
-            $this->compressionCount = $this->calculateCompressionCount();
-            $this->compressionCount['None'] = $this->compressionCount[CompressionAlgorithm::NONE->name];
-            unset($this->compressionCount[CompressionAlgorithm::NONE->name]);
-            $this->hash = $this->getPharHash();
+        if (!isset($this->compressionCount)) {
+            $this->compressionCount = self::calculateCompressionCount($this->phar);
         }
 
         return $this->compressionCount;
@@ -196,65 +191,6 @@ final class Pharaoh
         // If no signature is available (e.g. a tar.gz file), we generate a random hash to ensure
         // it will always be invalidated
         return $this->signature['hash'] ?? unique_id('');
-    }
-
-    private function calculateCompressionCount(): array
-    {
-        $count = array_fill_keys(
-            self::$ALGORITHMS,
-            0,
-        );
-
-        $count[self::$ALGORITHMS[$this->phar->isCompressed()]] = 1;
-        if ($this->phar instanceof PharData) {
-            $count[self::$ALGORITHMS[$this->phar->isCompressed()]] = 1;
-
-            return $count;
-        }
-
-        $countFile = static function (array $count, PharFileInfo $file): array {
-            if (false === $file->isCompressed()) {
-                ++$count[CompressionAlgorithm::NONE->name];
-
-                return $count;
-            }
-
-            foreach (self::$ALGORITHMS as $compressionAlgorithmCode => $compressionAlgorithmName) {
-                if ($file->isCompressed($compressionAlgorithmCode)) {
-                    ++$count[$compressionAlgorithmName];
-
-                    return $count;
-                }
-            }
-
-            return $count;
-        };
-
-        return array_reduce(
-            iterator_to_array(new RecursiveIteratorIterator($this->phar)),
-            $countFile,
-            $count,
-        );
-    }
-
-    private function initPhar(string $file): void
-    {
-        $extension = self::getExtension($file);
-
-        // We have to give every one a different alias, or it pukes.
-        $alias = Hex::encode(random_bytes(16)).$extension;
-
-        $tmpFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.$alias;
-        copy($file, $tmpFile, true);
-
-        $phar = self::createPhar($file, $tmpFile);
-        $this->signature = $phar->getSignature();
-
-        if (!($phar instanceof PharData)) {
-            $phar->setAlias($alias);
-        }
-
-        $this->phar = $phar;
     }
 
     private static function initAlgorithms(): void
@@ -325,5 +261,71 @@ final class Pharaoh
         }
 
         return '' === $extension ? '.phar' : $extension;
+    }
+
+    private static function calculateCompressionCount(Phar|PharData $phar): array
+    {
+        $count = array_fill_keys(
+            self::$ALGORITHMS,
+            0,
+        );
+
+        if ($phar instanceof PharData) {
+            $count[self::$ALGORITHMS[$phar->isCompressed()]] = 1;
+        } else {
+            $count = self::calculatePharCompressionCount($count, $phar);
+        }
+
+        $count['None'] = $count[CompressionAlgorithm::NONE->name];
+        unset($count[CompressionAlgorithm::NONE->name]);
+
+        return $count;
+    }
+
+    private static function calculatePharCompressionCount(array $count, Phar $phar): array
+    {
+        $countFile = static function (array $count, PharFileInfo $file): array {
+            if (false === $file->isCompressed()) {
+                ++$count[CompressionAlgorithm::NONE->name];
+
+                return $count;
+            }
+
+            foreach (self::$ALGORITHMS as $compressionAlgorithmCode => $compressionAlgorithmName) {
+                if ($file->isCompressed($compressionAlgorithmCode)) {
+                    ++$count[$compressionAlgorithmName];
+
+                    return $count;
+                }
+            }
+
+            return $count;
+        };
+
+        return array_reduce(
+            iterator_to_array(new RecursiveIteratorIterator($phar)),
+            $countFile,
+            $count,
+        );
+    }
+
+    private function initPhar(string $file): void
+    {
+        $extension = self::getExtension($file);
+
+        // We have to give every one a different alias, or it pukes.
+        $alias = Hex::encode(random_bytes(16)).$extension;
+
+        $tmpFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.$alias;
+        copy($file, $tmpFile, true);
+
+        $phar = self::createPhar($file, $tmpFile);
+        $this->signature = $phar->getSignature();
+
+        if (!($phar instanceof PharData)) {
+            $phar->setAlias($alias);
+        }
+
+        $this->phar = $phar;
     }
 }
