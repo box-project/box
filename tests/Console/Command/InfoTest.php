@@ -36,9 +36,6 @@ use function str_replace;
 // *
 // * @internal
 // */
-/**
- * @internal
- */
 class InfoTest extends CommandTestCase
 {
     private const FIXTURES = __DIR__.'/../../../fixtures/info';

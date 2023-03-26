@@ -201,6 +201,7 @@ final class Pharaoh
             0,
         );
 
+        $count[self::$ALGORITHMS[$this->phar->isCompressed()]] = 1;
         if ($this->phar instanceof PharData) {
             $count[self::$ALGORITHMS[$this->phar->isCompressed()]] = 1;
 
