@@ -232,11 +232,6 @@ final class Pharaoh
         );
     }
 
-    public function getSignature(): array|false
-    {
-        return $this->signature;
-    }
-
     private function initPhar(string $file): void
     {
         $extension = self::getExtension($file);
@@ -251,13 +246,22 @@ final class Pharaoh
         $tmpFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.$alias;
         copy($file, $tmpFile, true);
 
-        $phar = self::createPharOrPharData($tmpFile);
-
         $phar = new Phar($tmpFile);
         $this->signature = $phar->getSignature();
 
         $phar->setAlias($alias);
         $this->phar = $phar;
+    }
+
+    private static function initAlgorithms(): void
+    {
+        if (!isset(self::$ALGORITHMS)) {
+            self::$ALGORITHMS = [];
+
+            foreach (CompressionAlgorithm::cases() as $compressionAlgorithm) {
+                self::$ALGORITHMS[$compressionAlgorithm->value] = $compressionAlgorithm->name;
+            }
+        }
     }
 
     private static function initStubFileName(): void
