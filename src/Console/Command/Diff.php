@@ -20,8 +20,8 @@ use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
 use KevinGH\Box\Console\PharInfoRenderer;
 use KevinGH\Box\Phar\CompressionAlgorithm;
+use KevinGH\Box\Pharaoh\Pharaoh;
 use KevinGH\Box\PharInfo\PharDiff;
-use KevinGH\Box\PharInfo\PharInfo;
 use PharFileInfo;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -150,8 +150,8 @@ final class Diff implements Command
     {
         $io->comment('<info>Comparing the two archives... (do not check the signatures)</info>');
 
-        $pharInfoA = $diff->getPharA()->getPharInfo();
-        $pharInfoB = $diff->getPharB()->getPharInfo();
+        $pharInfoA = $diff->getPharA();
+        $pharInfoB = $diff->getPharB();
 
         if ($pharInfoA->equals($pharInfoB)) {
             $io->success('The two archives are identical');
@@ -220,8 +220,8 @@ final class Diff implements Command
 
         $io->newLine();
 
-        self::renderPaths('-', $diff->getPharA()->getPharInfo(), $diffResult[0], $io);
-        self::renderPaths('+', $diff->getPharB()->getPharInfo(), $diffResult[1], $io);
+        self::renderPaths('-', $diff->getPharA(), $diffResult[0], $io);
+        self::renderPaths('+', $diff->getPharB(), $diffResult[1], $io);
 
         $io->error(sprintf(
             '%d file(s) difference',
@@ -232,9 +232,9 @@ final class Diff implements Command
     }
 
     /**
-     * @param list<non-empty-string>
+     * @param list<non-empty-string> $paths
      */
-    private static function renderPaths(string $symbol, PharInfo $pharInfo, array $paths, IO $io): void
+    private static function renderPaths(string $symbol, Pharaoh $pharInfo, array $paths, IO $io): void
     {
         foreach ($paths as $path) {
             /** @var PharFileInfo $file */
@@ -265,7 +265,7 @@ final class Diff implements Command
         }
     }
 
-    private static function renderArchive(string $fileName, PharInfo $pharInfo, IO $io): void
+    private static function renderArchive(string $fileName, Pharaoh $pharInfo, IO $io): void
     {
         $io->writeln(
             sprintf(

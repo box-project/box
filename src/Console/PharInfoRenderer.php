@@ -16,7 +16,7 @@ namespace KevinGH\Box\Console;
 
 use Fidry\Console\Input\IO;
 use KevinGH\Box\NotInstantiable;
-use KevinGH\Box\PharInfo\PharInfo;
+use KevinGH\Box\Pharaoh\Pharaoh;
 use function array_filter;
 use function array_key_last;
 use function array_sum;
@@ -36,7 +36,7 @@ final class PharInfoRenderer
 {
     use NotInstantiable;
 
-    public static function renderCompression(PharInfo $pharInfo, IO $io): void
+    public static function renderCompression(Pharaoh $pharInfo, IO $io): void
     {
         $count = array_filter($pharInfo->getCompressionCount());
         $totalCount = array_sum($count);
@@ -76,9 +76,9 @@ final class PharInfoRenderer
         }
     }
 
-    public static function renderSignature(PharInfo $pharInfo, IO $io): void
+    public static function renderSignature(Pharaoh $pharInfo, IO $io): void
     {
-        $signature = $pharInfo->getPhar()->getSignature();
+        $signature = $pharInfo->getSignature();
 
         if (false === $signature) {
             $io->writeln('<comment>Signature unreadable</comment>');
@@ -100,7 +100,7 @@ final class PharInfoRenderer
         );
     }
 
-    public static function renderMetadata(PharInfo $pharInfo, IO $io): void
+    public static function renderMetadata(Pharaoh $pharInfo, IO $io): void
     {
         $metadata = $pharInfo->getNormalizedMetadata();
 
@@ -112,7 +112,7 @@ final class PharInfoRenderer
         }
     }
 
-    public static function renderContentsSummary(PharInfo $pharInfo, IO $io): void
+    public static function renderContentsSummary(Pharaoh $pharInfo, IO $io): void
     {
         $count = array_filter($pharInfo->getCompressionCount());
         $totalCount = array_sum($count);

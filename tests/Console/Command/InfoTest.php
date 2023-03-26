@@ -18,10 +18,11 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Test\OutputAssertions;
 use InvalidArgumentException;
+use KevinGH\Box\Pharaoh\InvalidPhar;
 use KevinGH\Box\Test\CommandTestCase;
+use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
 use Symfony\Component\Console\Output\OutputInterface;
-use UnexpectedValueException;
 use function getenv;
 use function implode;
 use function preg_replace;
@@ -38,7 +39,16 @@ use function str_replace;
  */
 class InfoTest extends CommandTestCase
 {
+    use RequiresPharReadonlyOff;
+
     private const FIXTURES = __DIR__.'/../../../fixtures/info';
+
+    protected function setUp(): void
+    {
+        $this->markAsSkippedIfPharReadonlyIsOn();
+
+        parent::setUp();
+    }
 
     protected function getCommand(): Command
     {
@@ -101,7 +111,7 @@ class InfoTest extends CommandTestCase
 
             Metadata: None
 
-            Contents: 1 file (6.61KB)
+            Contents: 1 file (6.64KB)
 
              // Use the --list|-l option to list the content of the PHAR.
 
@@ -137,7 +147,7 @@ class InfoTest extends CommandTestCase
 
             Metadata: None
 
-            Contents: 1 file (6.61KB)
+            Contents: 1 file (6.64KB)
 
              // Use the --list|-l option to list the content of the PHAR.
 
@@ -183,19 +193,15 @@ class InfoTest extends CommandTestCase
     {
         $file = self::FIXTURES.'/foo';
 
-        try {
-            $this->commandTester->execute(
-                [
-                    'command' => 'info',
-                    'phar' => $file,
-                ],
-                ['verbosity' => OutputInterface::VERBOSITY_DEBUG],
-            );
+        $this->expectException(InvalidPhar::class);
 
-            self::fail('Expected exception to be thrown.');
-        } catch (UnexpectedValueException $exception) {
-            self::assertStringStartsWith('Cannot create phar', $exception->getMessage());
-        }
+        $this->commandTester->execute(
+            [
+                'command' => 'info',
+                'phar' => $file,
+            ],
+            ['verbosity' => OutputInterface::VERBOSITY_DEBUG],
+        );
     }
 
     public function test_it_provides_info_about_a_targz_phar(): void
@@ -329,7 +335,7 @@ class InfoTest extends CommandTestCase
               'test' => 123,
             )
 
-            Contents: 3 files (6.75KB)
+            Contents: 3 files (6.79KB)
             a/
               bar.php [BZ2] - 60.00B
             b/
@@ -378,7 +384,7 @@ class InfoTest extends CommandTestCase
               'test' => 123,
             )
 
-            Contents: 3 files (6.75KB)
+            Contents: 3 files (6.79KB)
             a/bar.php [BZ2] - 60.00B
             b/beta/bar.php [NONE] - 0.00B
             foo.php [NONE] - 19.00B
@@ -415,7 +421,7 @@ class InfoTest extends CommandTestCase
 
             Metadata: None
 
-            Contents: 16 files (7.50KB)
+            Contents: 16 files (7.54KB)
             .hidden-dir/
               .hidden-file1 [NONE] - 0.00B
               .hidden-file1.php [NONE] - 33.00B
@@ -510,7 +516,7 @@ class InfoTest extends CommandTestCase
                   'test' => 123,
                 )
 
-                Contents: 3 files (6.75KB)
+                Contents: 3 files (6.79KB)
                 a/
                 b/
                 foo.php [NONE] - 19.00B
@@ -537,7 +543,7 @@ class InfoTest extends CommandTestCase
                   'test' => 123,
                 )
 
-                Contents: 3 files (6.75KB)
+                Contents: 3 files (6.79KB)
                 a/
                   bar.php [BZ2] - 60.00B
                 b/
@@ -566,7 +572,7 @@ class InfoTest extends CommandTestCase
                   'test' => 123,
                 )
 
-                Contents: 3 files (6.75KB)
+                Contents: 3 files (6.79KB)
                 a/
                   bar.php [BZ2] - 60.00B
                 b/
@@ -596,7 +602,7 @@ class InfoTest extends CommandTestCase
                   'test' => 123,
                 )
 
-                Contents: 3 files (6.75KB)
+                Contents: 3 files (6.79KB)
                 a/
                   bar.php [BZ2] - 60.00B
                 b/
@@ -645,7 +651,7 @@ class InfoTest extends CommandTestCase
               'test' => 123,
             )
 
-            Contents: 3 files (6.75KB)
+            Contents: 3 files (6.79KB)
             a/bar.php [BZ2] - 60.00B
             foo.php [NONE] - 19.00B
 

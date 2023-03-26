@@ -21,7 +21,7 @@ use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
 use KevinGH\Box\Console\PharInfoRenderer;
 use KevinGH\Box\Phar\CompressionAlgorithm;
-use KevinGH\Box\PharInfo\PharInfo;
+use KevinGH\Box\Pharaoh\Pharaoh;
 use Phar;
 use PharData;
 use PharFileInfo;
@@ -32,8 +32,6 @@ use Symfony\Component\Filesystem\Path;
 use Throwable;
 use function implode;
 use function is_array;
-use function KevinGH\Box\create_temporary_phar;
-use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\format_size;
 use function realpath;
 use function sprintf;
@@ -131,22 +129,16 @@ final class Info implements Command
             return ExitCode::FAILURE;
         }
 
-        $tmpFile = create_temporary_phar($fileRealPath);
-
-        try {
-            return self::showInfo($tmpFile, $fileRealPath, $io);
-        } finally {
-            remove($tmpFile);
-        }
+        return self::showInfo($fileRealPath, $io);
     }
 
-    public static function showInfo(string $file, string $originalFile, IO $io): int
+    public static function showInfo(string $file, IO $io): int
     {
         $maxDepth = self::getMaxDepth($io);
         $mode = $io->getOption(self::MODE_OPT)->asStringChoice(self::MODES);
 
         try {
-            $pharInfo = new PharInfo($file);
+            $pharInfo = new Pharaoh($file);
 
             return self::showPharInfo(
                 $pharInfo,
@@ -163,7 +155,7 @@ final class Info implements Command
             $io->error(
                 sprintf(
                     'Could not read the file "%s".',
-                    $originalFile,
+                    $file,
                 ),
             );
 
@@ -204,7 +196,7 @@ final class Info implements Command
     }
 
     private static function showPharInfo(
-        PharInfo $pharInfo,
+        Pharaoh $pharInfo,
         bool $content,
         int $depth,
         bool $indent,
@@ -230,7 +222,7 @@ final class Info implements Command
         return ExitCode::SUCCESS;
     }
 
-    private static function showPharMeta(PharInfo $pharInfo, IO $io): void
+    private static function showPharMeta(Pharaoh $pharInfo, IO $io): void
     {
         $io->writeln(
             sprintf(
@@ -301,6 +293,7 @@ final class Info implements Command
         }
 
         foreach ($list as $item) {
+            // TODO: review that
             /** @var PharFileInfo $item */
             $item = $phar[str_replace($root, '', $item->getPathname())];
 
