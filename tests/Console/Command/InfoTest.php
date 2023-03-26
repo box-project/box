@@ -20,6 +20,7 @@ use Fidry\Console\Test\OutputAssertions;
 use InvalidArgumentException;
 use KevinGH\Box\Pharaoh\InvalidPhar;
 use KevinGH\Box\Test\CommandTestCase;
+use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
 use Symfony\Component\Console\Output\OutputInterface;
 use function getenv;
@@ -38,7 +39,16 @@ use function str_replace;
  */
 class InfoTest extends CommandTestCase
 {
+    use RequiresPharReadonlyOff;
+
     private const FIXTURES = __DIR__.'/../../../fixtures/info';
+
+    protected function setUp(): void
+    {
+        $this->markAsSkippedIfPharReadonlyIsOn();
+
+        parent::setUp();
+    }
 
     protected function getCommand(): Command
     {
