@@ -16,10 +16,14 @@ namespace KevinGH\Box\Pharaoh;
 
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
+use PharData;
 use PHPUnit\Framework\TestCase;
+use function get_class;
+use function Safe\realpath;
 use const DIRECTORY_SEPARATOR;
 
 /**
+ * @covers \KevinGH\Box\Pharaoh\InvalidPhar
  * @covers \KevinGH\Box\Pharaoh\Pharaoh
  * @runTestsInSeparateProcesses
  *
@@ -41,27 +45,32 @@ final class PharaohTest extends TestCase
      */
     public function test_it_can_be_instantiated(
         string $fileName,
+        string $expectedClassName
     ): void {
         $file = self::FIXTURES_DIR.DIRECTORY_SEPARATOR.$fileName;
 
         $pharInfo = new Pharaoh($file);
 
-        self::assertSame($file, $pharInfo->getFile());
+        self::assertSame(realpath($file), $pharInfo->getFile());
         self::assertSame($fileName, $pharInfo->getFileName());
+        self::assertSame($expectedClassName, get_class($pharInfo->getPhar()));
     }
 
     public static function fileProvider(): iterable
     {
         yield 'simple PHAR' => [
             'simple-phar.phar',
+            Phar::class,
         ];
 
         yield 'simple PHAR without the extension' => [
             'simple-phar',
+            Phar::class,
         ];
 
         yield 'compressed archive' => [
             'simple-phar.tar.bz2',
+            PharData::class,
         ];
     }
 
@@ -106,5 +115,39 @@ final class PharaohTest extends TestCase
         $pharaoh = new Pharaoh($file);
 
         self::assertFalse($pharaoh->getSignature());
+    }
+
+    public function test_it_throws_an_error_when_a_phar_cannot_be_created(): void
+    {
+        $file = self::FIXTURES_DIR.'/foo';
+
+        try {
+            new Pharaoh($file);
+
+            self::fail();
+        } catch (InvalidPhar $exception) {
+            self::assertMatchesRegularExpression(
+                '/^Could not create a Phar or PharData instance for the file ".*"\.$/',
+                $exception->getMessage(),
+            );
+            self::assertNotNull($exception->getPrevious());
+        }
+    }
+
+    public function test_it_throws_an_error_when_a_phar_cannot_be_created_due_to_unverifiable_signature(): void
+    {
+        $file = self::FIXTURES_DIR.'/../diff/openssl.phar';
+
+        try {
+            new Pharaoh($file);
+
+            self::fail();
+        } catch (InvalidPhar $exception) {
+            self::assertMatchesRegularExpression(
+                '/^Could not create a Phar or PharData instance for the file ".*": the OpenSSL signature could not be verified\.$/',
+                $exception->getMessage(),
+            );
+            self::assertNotNull($exception->getPrevious());
+        }
     }
 }

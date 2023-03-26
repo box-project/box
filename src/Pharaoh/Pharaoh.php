@@ -48,6 +48,9 @@ use KevinGH\Box\Phar\PharPhpSettings;
 use KevinGH\Box\PharInfo\PharInfo;
 use ParagonIE\ConstantTime\Hex;
 use Phar;
+use PharData;
+use Symfony\Component\Filesystem\Path;
+use UnexpectedValueException;
 use Webmozart\Assert\Assert;
 use function KevinGH\Box\FileSystem\copy;
 use function KevinGH\Box\FileSystem\dump_file;
@@ -66,7 +69,7 @@ final class Pharaoh
 {
     private static string $stubfile;
 
-    private Phar $phar;
+    private Phar|PharData $phar;
     private string $tmp;
     private string $file;
     private string $fileName;
@@ -78,6 +81,8 @@ final class Pharaoh
 
     public function __construct(string $file)
     {
+        $file = Path::canonicalize($file);
+
         Assert::readable($file);
         Assert::false(
             PharPhpSettings::isReadonly(),
@@ -108,7 +113,7 @@ final class Pharaoh
         remove($this->tmp);
     }
 
-    public function getPhar(): Phar
+    public function getPhar(): Phar|PharData
     {
         return $this->phar;
     }
@@ -150,17 +155,16 @@ final class Pharaoh
         // We have to give every one a different alias, or it pukes.
         $alias = Hex::encode(random_bytes(16)).$extension;
 
-        if (!str_ends_with($alias, '.phar')) {
-            $alias .= '.phar';
-        }
-
         $tmpFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.$alias;
         copy($file, $tmpFile);
 
-        $phar = new Phar($tmpFile);
+        $phar = self::createPhar($file, $tmpFile);
         $this->signature = $phar->getSignature();
 
-        $phar->setAlias($alias);
+        if (!($phar instanceof PharData)) {
+            $phar->setAlias($alias);
+        }
+
         $this->phar = $phar;
     }
 
@@ -181,7 +185,22 @@ final class Pharaoh
         return $tmp;
     }
 
-    private static function extractPhar(Phar $phar, string $tmp): void
+    private static function createPhar(string $file, string $tmpFile): Phar|PharData
+    {
+        try {
+            return new Phar($tmpFile);
+        } catch (UnexpectedValueException $cannotCreatePhar) {
+            // Continue
+        }
+
+        try {
+            return new PharData($tmpFile);
+        } catch (UnexpectedValueException) {
+            throw InvalidPhar::create($file, $cannotCreatePhar);
+        }
+    }
+
+    private static function extractPhar(Phar|PharData $phar, string $tmp): void
     {
         // Extract the PHAR content
         $phar->extractTo($tmp);
@@ -205,6 +224,6 @@ final class Pharaoh
             $lastExtension = pathinfo($file, PATHINFO_EXTENSION);
         }
 
-        return $extension;
+        return '' === $extension ? '.phar' : $extension;
     }
 }
