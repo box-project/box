@@ -18,15 +18,11 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
-use Phar;
+use KevinGH\Box\Pharaoh\Pharaoh;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Filesystem\Path;
 use Throwable;
 use Webmozart\Assert\Assert;
-use function file_exists;
-use function KevinGH\Box\create_temporary_phar;
-use function KevinGH\Box\FileSystem\copy;
-use function KevinGH\Box\FileSystem\remove;
 use function realpath;
 use function sprintf;
 
@@ -116,29 +112,17 @@ final class Verify implements Command
      */
     private static function verifyPhar(string $pharFilePath): array
     {
-        $tmpPharPath = create_temporary_phar($pharFilePath);
-        $pharPubKey = $pharFilePath.'.pubkey';
-        $tmpPharPubKey = $tmpPharPath.'.pubkey';
-
-        if (file_exists($pharPubKey)) {
-            copy($pharPubKey, $tmpPharPath.'.pubkey');
-        }
-
-        $cleanUp = static fn () => remove([$tmpPharPath, $tmpPharPubKey]);
-
         $verified = false;
         $signature = false;
         $throwable = null;
 
         try {
-            $phar = new Phar($tmpPharPath);
+            $phar = new Pharaoh($pharFilePath);
 
             $verified = true;
             $signature = $phar->getSignature();
         } catch (Throwable $throwable) {
             // Continue
-        } finally {
-            $cleanUp();
         }
 
         return [

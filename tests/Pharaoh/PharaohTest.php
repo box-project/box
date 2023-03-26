@@ -53,6 +53,7 @@ final class PharaohTest extends TestCase
 
         self::assertSame(realpath($file), $pharInfo->getFile());
         self::assertSame($fileName, $pharInfo->getFileName());
+        self::assertNull($pharInfo->getPubkey());
         self::assertSame($expectedClassName, get_class($pharInfo->getPhar()));
     }
 
@@ -85,6 +86,18 @@ final class PharaohTest extends TestCase
         unset($pharInfo);
 
         self::assertDirectoryDoesNotExist($tmp);
+    }
+
+    public function test_it_copies_the_pubkey_when_one_is_found(): void
+    {
+        $file = self::FIXTURES_DIR.'/../verify/openssl-signed';
+
+        $pharInfo = new Pharaoh($file);
+
+        self::assertSame(realpath($file), $pharInfo->getFile());
+        self::assertSame(realpath($file).'.pubkey', $pharInfo->getPubkey());
+        self::assertFileExists($pharInfo->getTmpPubkey());
+        self::assertSame($expectedClassName, get_class($pharInfo->getPhar()));
     }
 
     public function test_it_can_create_two_instances_of_the_same_phar(): void

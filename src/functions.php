@@ -210,23 +210,6 @@ function unique_id(string $prefix): string
 /**
  * @private
  */
-function create_temporary_phar(string $file): string
-{
-    $tmpFile = sys_get_temp_dir().'/'.unique_id('').basename($file);
-
-    // TODO: port the .phar
-    if ('' === pathinfo($file, PATHINFO_EXTENSION)) {
-        $tmpFile .= '.phar';
-    }
-
-    copy($file, $tmpFile, true);
-
-    return $tmpFile;
-}
-
-/**
- * @private
- */
 function check_php_settings(IO $io): void
 {
     (new PhpSettingsHandler(

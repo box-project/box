@@ -16,13 +16,13 @@ namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
+use KevinGH\Box\Pharaoh\InvalidPhar;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use UnexpectedValueException;
 use function KevinGH\Box\FileSystem\make_path_relative;
 
 /**
@@ -167,8 +167,7 @@ class ExtractTest extends CommandTestCase
 
             $previous = $exception->getPrevious();
 
-            self::assertInstanceOf(UnexpectedValueException::class, $previous);
-            self::assertStringStartsWith('internal corruption of phar', $previous->getMessage());
+            self::assertInstanceOf(InvalidPhar::class, $previous);
         }
     }
 

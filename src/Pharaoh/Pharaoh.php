@@ -54,6 +54,7 @@ use RecursiveIteratorIterator;
 use Symfony\Component\Filesystem\Path;
 use UnexpectedValueException;
 use Webmozart\Assert\Assert;
+use function file_exists;
 use function KevinGH\Box\FileSystem\copy;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\mkdir;
@@ -80,6 +81,8 @@ final class Pharaoh
     private string $tmp;
     private string $file;
     private string $fileName;
+    private ?string $pubkey = null;
+    private ?string $tmpPubkey = null;
     private array $compressionCount;
 
     #[ArrayShape(['hash' => 'string', 'hash_type' => 'string'])]
@@ -135,9 +138,24 @@ final class Pharaoh
         return $this->tmp;
     }
 
+    public function getTmpPubkey(): ?string
+    {
+        return $this->tmpPubkey;
+    }
+
     public function getFile(): string
     {
         return $this->file;
+    }
+
+    public function getPubkey(): ?string
+    {
+        return $this->pubkey;
+    }
+
+    public function hasPubkey(): bool
+    {
+        return null !== $this->pubkey;
     }
 
     public function getFileName(): string
@@ -319,10 +337,22 @@ final class Pharaoh
         $tmpFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.$alias;
         copy($file, $tmpFile, true);
 
+        $pubkey = $file.'.pubkey';
+        $tmpPubkey = $tmpFile.'.pubkey';
+        $hasPubkey = false;
+
+        if (file_exists($pubkey)) {
+            copy($pubkey, $tmpPubkey, true);
+
+            $hasPubkey = true;
+            $this->pubkey = $tmpPubkey;
+            $this->tmpPubkey = $tmpPubkey;
+        }
+
         $phar = self::createPhar($file, $tmpFile);
         $this->signature = $phar->getSignature();
 
-        if (!($phar instanceof PharData)) {
+        if (!($phar instanceof PharData) && !$hasPubkey) {
             $phar->setAlias($alias);
         }
 

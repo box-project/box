@@ -43,6 +43,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Pharaoh;
 
+use KevinGH\Box\PharInfo\IncompariblePhars;
 use ParagonIE\ConstantTime\Hex;
 use ParagonIE_Sodium_File;
 use RecursiveDirectoryIterator;
@@ -85,6 +86,10 @@ class PharDiff
 
     public function __construct(Pharaoh $pharA, Pharaoh $pharB)
     {
+        if ($pharA->hasPubkey() || $pharB->hasPubkey()) {
+            throw IncompariblePhars::signedPhars();
+        }
+
         $this->phars = [$pharA, $pharB];
     }
 

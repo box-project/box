@@ -19,6 +19,7 @@ use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
 use KevinGH\Box\Box;
+use KevinGH\Box\Pharaoh\Pharaoh;
 use RecursiveIteratorIterator;
 use RuntimeException;
 use Symfony\Component\Console\Exception\RuntimeException as ConsoleRuntimeException;
@@ -26,7 +27,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Throwable;
 use function count;
 use function KevinGH\Box\bump_open_file_descriptor_limit;
-use function KevinGH\Box\create_temporary_phar;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\remove;
 use function realpath;
@@ -117,12 +117,19 @@ final class Extract implements Command
      */
     private function getBox(string $filePath, IO $io): ?array
     {
-        $tmpFile = create_temporary_phar($filePath);
-        $cleanUp = static fn () => remove($tmpFile);
+        $cleanUp = static fn () => null;
 
         try {
+            $pharaoh = new Pharaoh($filePath);
+            // The cleanup is still necessary. Indeed, without it, we would loose
+            // the reference of the pharaoh instance immediately which would result
+            // in the encapsulated PHAR to be unliked too early.
+            $cleanUp = static function () use ($pharaoh): void {
+                unset($pharaoh);
+            };
+
             return [
-                Box::create($tmpFile),
+                Box::createFromPharaoh($pharaoh),
                 $cleanUp,
             ];
         } catch (Throwable $throwable) {
