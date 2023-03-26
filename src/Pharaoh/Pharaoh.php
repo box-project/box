@@ -49,6 +49,7 @@ use KevinGH\Box\PharInfo\PharInfo;
 use ParagonIE\ConstantTime\Hex;
 use Phar;
 use PharData;
+use Symfony\Component\Filesystem\Path;
 use UnexpectedValueException;
 use Webmozart\Assert\Assert;
 use function KevinGH\Box\FileSystem\copy;
@@ -80,6 +81,8 @@ final class Pharaoh
 
     public function __construct(string $file)
     {
+        $file = Path::canonicalize($file);
+
         Assert::readable($file);
         Assert::false(
             PharPhpSettings::isReadonly(),
@@ -155,15 +158,11 @@ final class Pharaoh
         $tmpFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.$alias;
         copy($file, $tmpFile);
 
-        try {
-            $phar = new Phar($tmpFile);
+        $phar = self::createPhar($file, $tmpFile);
+        $this->signature = $phar->getSignature();
 
-            $this->signature = $phar->getSignature();
-
+        if (!($phar instanceof PharData)) {
             $phar->setAlias($alias);
-        } catch (UnexpectedValueException $cannotCreatePhar) {
-            $phar = new PharData($tmpFile);
-            $this->signature = $phar->getSignature();
         }
 
         $this->phar = $phar;
@@ -184,6 +183,21 @@ final class Pharaoh
         mkdir($tmp, 0o755);
 
         return $tmp;
+    }
+
+    private static function createPhar(string $file, string $tmpFile): Phar|PharData
+    {
+        try {
+            return new Phar($tmpFile);
+        } catch (UnexpectedValueException $cannotCreatePhar) {
+            // Continue
+        }
+
+        try {
+            return new PharData($tmpFile);
+        } catch (UnexpectedValueException) {
+            throw InvalidPhar::create($file, $cannotCreatePhar);
+        }
     }
 
     private static function extractPhar(Phar|PharData $phar, string $tmp): void

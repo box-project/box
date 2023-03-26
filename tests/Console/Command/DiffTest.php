@@ -18,11 +18,11 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\DisplayNormalizer;
 use Fidry\Console\ExitCode;
 use InvalidArgumentException;
+use KevinGH\Box\Pharaoh\InvalidPhar;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
-use UnexpectedValueException;
 use function ob_get_clean;
 use function ob_start;
 use function realpath;
@@ -209,7 +209,7 @@ class DiffTest extends CommandTestCase
             ],
         );
 
-        $expected = '/^Could not check the PHARs: internal corruption of phar \".*\.phar\" \(__HALT_COMPILER\(\); not found\)/';
+        $expected = '/^Could not check the PHARs: Could not create a Phar or PharData instance for the file ".*"\.$/';
 
         self::assertMatchesRegularExpression($expected, $this->commandTester->getDisplay(true));
         self::assertSame(1, $this->commandTester->getStatusCode());
@@ -245,8 +245,8 @@ class DiffTest extends CommandTestCase
 
     public function test_it_cannot_compare_phars_which_are_signed_with_a_private_key(): void
     {
-        $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessageMatches('/openssl signature could not be verified/');
+        $this->expectException(InvalidPhar::class);
+        $this->expectExceptionMessageMatches('/the OpenSSL signature could not be verified/');
 
         $this->commandTester->execute(
             [
@@ -260,8 +260,8 @@ class DiffTest extends CommandTestCase
 
     public function test_it_does_not_swallow_exceptions_in_debug_mode(): void
     {
-        $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessageMatches('/^internal corruption of phar \".*\.phar\" \(__HALT_COMPILER\(\); not found\)/');
+        $this->expectException(InvalidPhar::class);
+        $this->expectExceptionMessage('not-a-phar.phar');
 
         $this->commandTester->execute(
             [
