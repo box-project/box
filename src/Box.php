@@ -69,7 +69,7 @@ final class Box implements Countable
      */
     private array $bufferedFiles = [];
 
-    public function __construct(
+    private function __construct(
         private readonly Phar $phar,
         private readonly string $pharFilePath,
     ) {
