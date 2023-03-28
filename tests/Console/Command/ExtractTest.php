@@ -18,6 +18,7 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
 use KevinGH\Box\Pharaoh\InvalidPhar;
 use KevinGH\Box\Test\CommandTestCase;
+use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -35,6 +36,8 @@ use function KevinGH\Box\FileSystem\make_path_relative;
  */
 class ExtractTest extends CommandTestCase
 {
+    use RequiresPharReadonlyOff;
+
     private const FIXTURES = __DIR__.'/../../../fixtures/extract';
 
     protected function getCommand(): Command
@@ -44,6 +47,8 @@ class ExtractTest extends CommandTestCase
 
     public function test_it_can_extract_a_phar(): void
     {
+        $this->markAsSkippedIfPharReadonlyIsOn();
+
         $pharPath = self::FIXTURES.'/simple-phar.phar';
 
         $this->commandTester->execute(
@@ -68,6 +73,8 @@ class ExtractTest extends CommandTestCase
 
     public function test_it_can_extract_a_phar_without_the_phar_extension(): void
     {
+        $this->markAsSkippedIfPharReadonlyIsOn();
+
         $pharPath = self::FIXTURES.'/simple-phar';
 
         $this->commandTester->execute(
@@ -108,9 +115,8 @@ class ExtractTest extends CommandTestCase
 
         $actualFiles = $this->collectExtractedFiles();
 
-        self::assertEqualsCanonicalizing($expectedFiles, $actualFiles);
-
         $this->assertSameOutput('', ExitCode::SUCCESS);
+        self::assertEqualsCanonicalizing($expectedFiles, $actualFiles);
     }
 
     public function test_it_cannot_extract_an_invalid_phar(): void

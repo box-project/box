@@ -90,14 +90,13 @@ final class PharaohTest extends TestCase
 
     public function test_it_copies_the_pubkey_when_one_is_found(): void
     {
-        $file = self::FIXTURES_DIR.'/../verify/openssl-signed';
+        $file = self::FIXTURES_DIR.'/../verify/openssl-signed/php-scoper.phar';
 
         $pharInfo = new Pharaoh($file);
 
         self::assertSame(realpath($file), $pharInfo->getFile());
-        self::assertSame(realpath($file).'.pubkey', $pharInfo->getPubkey());
         self::assertFileExists($pharInfo->getTmpPubkey());
-        self::assertSame($expectedClassName, get_class($pharInfo->getPhar()));
+        self::assertFileEquals($file.'.pubkey', $pharInfo->getPubkey());
     }
 
     public function test_it_can_create_two_instances_of_the_same_phar(): void
