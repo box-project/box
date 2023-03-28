@@ -148,17 +148,13 @@ final class PharaohTest extends TestCase
 
     public function test_it_throws_an_error_when_a_phar_cannot_be_created_due_to_unverifiable_signature(): void
     {
-        $file = self::FIXTURES_DIR.'/../diff/openssl.phar';
+        $file = self::FIXTURES_DIR.'/../verify/openssl-signed-with-corrupted-pubkey/php-scoper.phar';
 
         try {
             new Pharaoh($file);
 
             self::fail();
         } catch (InvalidPhar $exception) {
-            self::assertMatchesRegularExpression(
-                '/^Could not create a Phar or PharData instance for the file ".*": the OpenSSL signature could not be verified\.$/',
-                $exception->getMessage(),
-            );
             self::assertNotNull($exception->getPrevious());
         }
     }

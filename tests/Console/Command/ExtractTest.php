@@ -40,6 +40,13 @@ class ExtractTest extends CommandTestCase
 
     private const FIXTURES = __DIR__.'/../../../fixtures/extract';
 
+    protected function setUp(): void
+    {
+        $this->markAsSkippedIfPharReadonlyIsOn();
+
+        parent::setUp();
+    }
+
     protected function getCommand(): Command
     {
         return new Extract();
@@ -47,8 +54,6 @@ class ExtractTest extends CommandTestCase
 
     public function test_it_can_extract_a_phar(): void
     {
-        $this->markAsSkippedIfPharReadonlyIsOn();
-
         $pharPath = self::FIXTURES.'/simple-phar.phar';
 
         $this->commandTester->execute(
@@ -73,8 +78,6 @@ class ExtractTest extends CommandTestCase
 
     public function test_it_can_extract_a_phar_without_the_phar_extension(): void
     {
-        $this->markAsSkippedIfPharReadonlyIsOn();
-
         $pharPath = self::FIXTURES.'/simple-phar';
 
         $this->commandTester->execute(
