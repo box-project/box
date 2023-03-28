@@ -34,7 +34,6 @@ use function floor;
 use function function_exists;
 use function is_float;
 use function is_int;
-use function KevinGH\Box\FileSystem\copy;
 use function log;
 use function number_format;
 use function posix_getrlimit;
@@ -42,7 +41,6 @@ use function posix_setrlimit;
 use function random_bytes;
 use function sprintf;
 use function str_replace;
-use const PATHINFO_EXTENSION;
 use const POSIX_RLIMIT_INFINITY;
 use const POSIX_RLIMIT_NOFILE;
 

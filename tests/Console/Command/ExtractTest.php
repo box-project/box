@@ -85,9 +85,8 @@ class ExtractTest extends CommandTestCase
 
         $actualFiles = $this->collectExtractedFiles();
 
-        self::assertEqualsCanonicalizing($expectedFiles, $actualFiles);
-
         $this->assertSameOutput('', ExitCode::SUCCESS);
+        self::assertEqualsCanonicalizing($expectedFiles, $actualFiles);
     }
 
     public function test_it_can_extract_a_compressed_phar(): void
@@ -134,7 +133,7 @@ class ExtractTest extends CommandTestCase
 
         $expectedOutput = <<<'OUTPUT'
 
-             [ERROR] The given file is not a valid PHAR
+             [ERROR] The given file is not a valid PHAR.
 
 
             OUTPUT;
@@ -159,7 +158,7 @@ class ExtractTest extends CommandTestCase
             self::fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
             self::assertSame(
-                'The given file is not a valid PHAR',
+                'The given file is not a valid PHAR.',
                 $exception->getMessage(),
             );
             self::assertSame(0, $exception->getCode());
@@ -191,7 +190,7 @@ class ExtractTest extends CommandTestCase
 
         $expectedOutput = <<<'OUTPUT'
 
-             [ERROR] The given file is not a valid PHAR
+             [ERROR] The given file is not a valid PHAR.
 
 
             OUTPUT;

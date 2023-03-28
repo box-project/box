@@ -140,13 +140,13 @@ final class Extract implements Command
             $cleanUp();
 
             throw new ConsoleRuntimeException(
-                'The given file is not a valid PHAR',
+                'The given file is not a valid PHAR.',
                 0,
                 $throwable,
             );
         }
 
-        $io->error('The given file is not a valid PHAR');
+        $io->error('The given file is not a valid PHAR.');
 
         $cleanUp();
 
