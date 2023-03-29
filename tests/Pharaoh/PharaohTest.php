@@ -18,11 +18,14 @@ use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
 use PharData;
 use PHPUnit\Framework\TestCase;
+use function extension_loaded;
 use function get_class;
 use function Safe\realpath;
 use const DIRECTORY_SEPARATOR;
 
 /**
+ * TODO: add more tests with phar.readonly; bz2 missing & co.
+ *
  * @covers \KevinGH\Box\Pharaoh\InvalidPhar
  * @covers \KevinGH\Box\Pharaoh\Pharaoh
  * @runTestsInSeparateProcesses
@@ -69,10 +72,12 @@ final class PharaohTest extends TestCase
             Phar::class,
         ];
 
-        yield 'compressed archive' => [
-            'simple-phar.tar.bz2',
-            PharData::class,
-        ];
+        if (extension_loaded('bz2')) {
+            yield 'compressed archive' => [
+                'simple-phar.tar.bz2',
+                PharData::class,
+            ];
+        }
     }
 
     public function test_it_cleans_itself_up_upon_destruction(): void
@@ -120,6 +125,9 @@ final class PharaohTest extends TestCase
         self::assertNotFalse($pharaoh->getSignature());
     }
 
+    /**
+     * @requires extension bz2
+     */
     public function test_it_preserves_the_absence_of_signature(): void
     {
         $file = self::FIXTURES_DIR.'/simple-phar.tar.bz2';
