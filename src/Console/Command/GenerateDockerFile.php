@@ -28,10 +28,8 @@ use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 use function file_exists;
 use function getcwd;
-use function KevinGH\Box\create_temporary_phar;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_path_relative;
-use function KevinGH\Box\FileSystem\remove;
 use function realpath;
 use function sprintf;
 
@@ -80,19 +78,13 @@ final class GenerateDockerFile implements CommandAware
             ),
         );
 
-        $tmpPharPath = create_temporary_phar($pharFilePath);
-        $cleanUp = static fn () => remove($tmpPharPath);
-        $requirementsFilePhar = 'phar://'.$tmpPharPath.'/.box/.requirements.php';
+        $requirementsFilePhar = 'phar://'.$pharFilePath.'/.box/.requirements.php';
 
-        try {
-            return $this->generateFile(
-                $pharFilePath,
-                $requirementsFilePhar,
-                $io,
-            );
-        } finally {
-            $cleanUp();
-        }
+        return $this->generateFile(
+            $pharFilePath,
+            $requirementsFilePhar,
+            $io,
+        );
     }
 
     /**

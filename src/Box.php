@@ -22,6 +22,7 @@ use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
 use KevinGH\Box\Phar\CompressionAlgorithm;
+use KevinGH\Box\Pharaoh\Pharaoh;
 use KevinGH\Box\PhpScoper\NullScoper;
 use KevinGH\Box\PhpScoper\Scoper;
 use Phar;
@@ -96,6 +97,14 @@ final class Box implements Countable
         return new self(
             new Phar($pharFilePath, $pharFlags, $pharAlias),
             $pharFilePath,
+        );
+    }
+
+    public static function createFromPharaoh(Pharaoh $pharaoh): self
+    {
+        return new self(
+            $pharaoh->getPhar(),
+            $pharaoh->getFile(),
         );
     }
 

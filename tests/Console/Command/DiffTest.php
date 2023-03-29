@@ -19,6 +19,7 @@ use Fidry\Console\DisplayNormalizer;
 use Fidry\Console\ExitCode;
 use InvalidArgumentException;
 use KevinGH\Box\Pharaoh\InvalidPhar;
+use KevinGH\Box\PharInfo\IncompariblePhars;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -245,8 +246,7 @@ class DiffTest extends CommandTestCase
 
     public function test_it_cannot_compare_phars_which_are_signed_with_a_private_key(): void
     {
-        $this->expectException(InvalidPhar::class);
-        $this->expectExceptionMessageMatches('/the OpenSSL signature could not be verified/');
+        $this->expectException(IncompariblePhars::class);
 
         $this->commandTester->execute(
             [

@@ -40,7 +40,7 @@ final class InvalidPhar extends PharError
     {
         return null !== $previous
             && 1 === preg_match(
-                '/^phar ".*" openssl signature could not be verified: openssl public key could not be read$/',
+                '/^phar ".*" openssl signature could not be verified: openssl signature could not be verified/',
                 $previous->getMessage(),
             );
     }

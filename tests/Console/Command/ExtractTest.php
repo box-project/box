@@ -16,13 +16,14 @@ namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
+use KevinGH\Box\Pharaoh\InvalidPhar;
 use KevinGH\Box\Test\CommandTestCase;
+use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use UnexpectedValueException;
 use function KevinGH\Box\FileSystem\make_path_relative;
 
 /**
@@ -35,7 +36,16 @@ use function KevinGH\Box\FileSystem\make_path_relative;
  */
 class ExtractTest extends CommandTestCase
 {
+    use RequiresPharReadonlyOff;
+
     private const FIXTURES = __DIR__.'/../../../fixtures/extract';
+
+    protected function setUp(): void
+    {
+        $this->markAsSkippedIfPharReadonlyIsOn();
+
+        parent::setUp();
+    }
 
     protected function getCommand(): Command
     {
@@ -85,9 +95,8 @@ class ExtractTest extends CommandTestCase
 
         $actualFiles = $this->collectExtractedFiles();
 
-        self::assertEqualsCanonicalizing($expectedFiles, $actualFiles);
-
         $this->assertSameOutput('', ExitCode::SUCCESS);
+        self::assertEqualsCanonicalizing($expectedFiles, $actualFiles);
     }
 
     public function test_it_can_extract_a_compressed_phar(): void
@@ -109,9 +118,8 @@ class ExtractTest extends CommandTestCase
 
         $actualFiles = $this->collectExtractedFiles();
 
-        self::assertEqualsCanonicalizing($expectedFiles, $actualFiles);
-
         $this->assertSameOutput('', ExitCode::SUCCESS);
+        self::assertEqualsCanonicalizing($expectedFiles, $actualFiles);
     }
 
     public function test_it_cannot_extract_an_invalid_phar(): void
@@ -134,7 +142,7 @@ class ExtractTest extends CommandTestCase
 
         $expectedOutput = <<<'OUTPUT'
 
-             [ERROR] The given file is not a valid PHAR
+             [ERROR] The given file is not a valid PHAR.
 
 
             OUTPUT;
@@ -159,7 +167,7 @@ class ExtractTest extends CommandTestCase
             self::fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
             self::assertSame(
-                'The given file is not a valid PHAR',
+                'The given file is not a valid PHAR.',
                 $exception->getMessage(),
             );
             self::assertSame(0, $exception->getCode());
@@ -167,8 +175,7 @@ class ExtractTest extends CommandTestCase
 
             $previous = $exception->getPrevious();
 
-            self::assertInstanceOf(UnexpectedValueException::class, $previous);
-            self::assertStringStartsWith('internal corruption of phar', $previous->getMessage());
+            self::assertInstanceOf(InvalidPhar::class, $previous);
         }
     }
 
@@ -192,7 +199,7 @@ class ExtractTest extends CommandTestCase
 
         $expectedOutput = <<<'OUTPUT'
 
-             [ERROR] The given file is not a valid PHAR
+             [ERROR] The given file is not a valid PHAR.
 
 
             OUTPUT;
