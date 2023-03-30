@@ -52,14 +52,11 @@ use PharData;
 use PharFileInfo;
 use RecursiveIteratorIterator;
 use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Process;
 use UnexpectedValueException;
 use Webmozart\Assert\Assert;
 use function file_exists;
 use function KevinGH\Box\FileSystem\copy;
 use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\tempnam;
@@ -71,7 +68,6 @@ use const DIRECTORY_SEPARATOR;
 use const PATHINFO_EXTENSION;
 
 // TODO: rename it to SafePhar
-
 /**
  * Pharaoh is a wrapper around Phar. This is necessary because the Phar API is quite limited and will crash if say two
  * PHARs with the same alias are loaded.
@@ -105,25 +101,12 @@ final class Pharaoh
         self::initAlgorithms();
         self::initStubFileName();
 
-        $this->tmp = make_tmp_dir('HumbugBox', 'Pharaoh');
+        $tmp = self::createTmpDir();
+        $this->initPhar($file);
 
-        $extractPharProcess = new Process([
-            $_SERVER['SCRIPT_FILENAME'],
-            'extract',
-            $file,
-            $this->tmp,
-            '--quiet',
-        ]);
-        $extractPharProcess->run();
+        self::extractPhar($this->phar, $tmp);
 
-        if (false === $extractPharProcess->isSuccessful()) {
-            throw new InvalidPhar(
-                'TODO.',
-                0,
-                new ProcessFailedException($extractPharProcess),
-            );
-        }
-
+        $this->tmp = $tmp;
         $this->file = $file;
         $this->fileName = basename($file);
     }
@@ -199,7 +182,7 @@ final class Pharaoh
     public function getRoot(): string
     {
         // Do not cache the result
-        return 'phar://' . str_replace('\\', '/', realpath($this->phar->getPath())) . '/';
+        return 'phar://'.str_replace('\\', '/', realpath($this->phar->getPath())).'/';
     }
 
     public function getVersion(): string
@@ -242,7 +225,7 @@ final class Pharaoh
     private static function initStubFileName(): void
     {
         if (!isset(self::$stubfile)) {
-            self::$stubfile = Hex::encode(random_bytes(12)) . '.pharstub';
+            self::$stubfile = Hex::encode(random_bytes(12)).'.pharstub';
         }
     }
 
@@ -279,7 +262,7 @@ final class Pharaoh
         // Extract the stub; Phar::extractTo() does not do it since it
         // is internal to the PHAR.
         dump_file(
-            $tmp . DIRECTORY_SEPARATOR . self::$stubfile,
+            $tmp.DIRECTORY_SEPARATOR.self::$stubfile,
             $phar->getStub(),
         );
     }
@@ -290,7 +273,7 @@ final class Pharaoh
         $extension = '';
 
         while ('' !== $lastExtension) {
-            $extension = '.' . $lastExtension . $extension;
+            $extension = '.'.$lastExtension.$extension;
             $file = mb_substr($file, 0, -(mb_strlen($lastExtension) + 1));
             $lastExtension = pathinfo($file, PATHINFO_EXTENSION);
         }
@@ -349,13 +332,13 @@ final class Pharaoh
         $extension = self::getExtension($file);
 
         // We have to give every one a different alias, or it pukes.
-        $alias = Hex::encode(random_bytes(16)) . $extension;
+        $alias = Hex::encode(random_bytes(16)).$extension;
 
-        $tmpFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $alias;
+        $tmpFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.$alias;
         copy($file, $tmpFile, true);
 
-        $pubkey = $file . '.pubkey';
-        $tmpPubkey = $tmpFile . '.pubkey';
+        $pubkey = $file.'.pubkey';
+        $tmpPubkey = $tmpFile.'.pubkey';
         $hasPubkey = false;
 
         if (file_exists($pubkey)) {
