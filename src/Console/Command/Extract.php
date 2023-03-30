@@ -21,7 +21,6 @@ use Fidry\Console\Input\IO;
 use KevinGH\Box\Box;
 use KevinGH\Box\Pharaoh\Pharaoh;
 use RecursiveIteratorIterator;
-use RuntimeException;
 use Symfony\Component\Console\Exception\RuntimeException as ConsoleRuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Throwable;
@@ -70,7 +69,7 @@ final class Extract implements Command
             return ExitCode::FAILURE;
         }
 
-        [$box, $cleanUpTmpPhar] = $this->getBox($filePath, $io);
+        [$box, $cleanUpTmpPhar] = $this->getBox($filePath);
 
         if (null === $box) {
             return ExitCode::FAILURE;
@@ -83,13 +82,7 @@ final class Extract implements Command
             $restoreLimit();
         };
 
-        try {
-            self::dumpPhar($outputDir, $box, $cleanUp);
-        } catch (RuntimeException $exception) {
-            $io->error($exception->getMessage());
-
-            return ExitCode::FAILURE;
-        }
+        self::dumpPhar($outputDir, $box, $cleanUp);
 
         return ExitCode::SUCCESS;
     }
@@ -115,7 +108,7 @@ final class Extract implements Command
     /**
      * @return array{Box, callable(): void}|array{null, null}
      */
-    private function getBox(string $filePath, IO $io): ?array
+    private function getBox(string $filePath): ?array
     {
         $cleanUp = static fn () => null;
 
@@ -133,10 +126,6 @@ final class Extract implements Command
                 $cleanUp,
             ];
         } catch (Throwable $throwable) {
-            // Continue
-        }
-
-        if ($io->isDebug()) {
             $cleanUp();
 
             throw new ConsoleRuntimeException(
@@ -145,12 +134,6 @@ final class Extract implements Command
                 $throwable,
             );
         }
-
-        $io->error('The given file is not a valid PHAR.');
-
-        $cleanUp();
-
-        return [null, null];
     }
 
     /**
