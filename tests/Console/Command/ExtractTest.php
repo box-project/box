@@ -90,29 +90,23 @@ class ExtractTest extends CommandTestCase
             self::FIXTURES.'/simple-phar',
             $expectedSimplePharFiles,
         ];
-    }
 
-    public function test_it_can_extract_a_compressed_phar(): void
-    {
-        $pharPath = self::FIXTURES.'/simple-phar.phar';
+        if (extension_loaded('zlib')) {
+            yield 'GZ compressed simple PHAR' => [
+                self::FIXTURES.'/gz-compressed-phar.phar',
+                $expectedSimplePharFiles,
+            ];
+        }
 
-        $this->commandTester->execute(
+        yield 'sha512 signed PHAR' => [
+            self::FIXTURES.'/sha512.phar',
             [
-                'command' => 'extract',
-                'phar' => $pharPath,
-                'output' => $this->tmp,
+                'index.php' => <<<'PHP'
+                    <?php echo "Hello, world!\n";
+
+                    PHP,
             ],
-        );
-
-        $expectedFiles = [
-            '.hidden' => 'baz',
-            'foo' => 'bar',
         ];
-
-        $actualFiles = $this->collectExtractedFiles();
-
-        $this->assertSameOutput('', ExitCode::SUCCESS);
-        self::assertEqualsCanonicalizing($expectedFiles, $actualFiles);
     }
 
     /**
@@ -148,6 +142,10 @@ class ExtractTest extends CommandTestCase
 
         yield 'not a valid PHAR without the PHAR extension' => [
             self::FIXTURES.'/invalid.phar',
+        ];
+
+        yield 'corrupted PHAR (was valid; got tempered with' => [
+            self::FIXTURES.'/corrupted.phar',
         ];
     }
 
