@@ -14,38 +14,28 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use Closure;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
-use KevinGH\Box\Box;
 use KevinGH\Box\Pharaoh\InvalidPhar;
 use KevinGH\Box\Pharaoh\Pharaoh;
 use ParagonIE\ConstantTime\Hex;
 use Phar;
 use PharData;
-use RecursiveIteratorIterator;
-use RuntimeException;
-use Symfony\Component\Console\Exception\RuntimeException as ConsoleRuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
-use Symfony\Component\Console\Question\Question;
-use Throwable;
 use UnexpectedValueException;
-use function count;
 use function file_exists;
-use function KevinGH\Box\bump_open_file_descriptor_limit;
 use function KevinGH\Box\check_php_settings;
 use function KevinGH\Box\FileSystem\copy;
 use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\make_tmp_dir;
+use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
 use function realpath;
-use function sprintf;
 use function Safe\json_encode;
+use function sprintf;
 use const DIRECTORY_SEPARATOR;
-use function KevinGH\Box\FileSystem\mkdir;
 
 /**
  * @private
@@ -99,7 +89,7 @@ final class Extract implements Command
 
             if ($canDelete) {
                 remove($outputDir);
-                // Continue
+            // Continue
             } else {
                 // Do nothing
                 return ExitCode::FAILURE;
@@ -135,12 +125,12 @@ final class Extract implements Command
         // We have to give every one a different alias, or it pukes.
         $alias = self::generateAlias($file);
 
-        $tmpFile = $tmpDir . DIRECTORY_SEPARATOR . $alias;
-        $pubkey = $file . '.pubkey';
-        $tmpPubkey = $tmpFile . '.pubkey';
-        $tmpSignature = $tmpDir . DIRECTORY_SEPARATOR . 'signature';
-        $tmpAlias = $tmpDir . DIRECTORY_SEPARATOR . 'alias';
-        $tmpStub = $tmpDir . DIRECTORY_SEPARATOR . 'stub.php';
+        $tmpFile = $tmpDir.DIRECTORY_SEPARATOR.$alias;
+        $pubkey = $file.'.pubkey';
+        $tmpPubkey = $tmpFile.'.pubkey';
+        $tmpSignature = $tmpDir.DIRECTORY_SEPARATOR.'signature';
+        $tmpAlias = $tmpDir.DIRECTORY_SEPARATOR.'alias';
+        $tmpStub = $tmpDir.DIRECTORY_SEPARATOR.'stub.php';
         $tmpPharContent = $tmpDir.DIRECTORY_SEPARATOR.'content';
 
         copy($file, $tmpFile, true);
@@ -167,7 +157,7 @@ final class Extract implements Command
     {
         $extension = self::getExtension($file);
 
-        return Hex::encode(random_bytes(16)) . $extension;
+        return Hex::encode(random_bytes(16)).$extension;
     }
 
     private static function getExtension(string $file): string
@@ -176,7 +166,7 @@ final class Extract implements Command
         $extension = '';
 
         while ('' !== $lastExtension) {
-            $extension = '.' . $lastExtension . $extension;
+            $extension = '.'.$lastExtension.$extension;
             $file = mb_substr($file, 0, -(mb_strlen($lastExtension) + 1));
             $lastExtension = pathinfo($file, PATHINFO_EXTENSION);
         }
