@@ -64,7 +64,6 @@ class ExtractTest extends CommandTestCase
                 'phar' => $pharPath,
                 'output' => $this->tmp,
             ],
-            ['interactive' => false],
         );
 
         $actualFiles = $this->collectExtractedFiles();
@@ -128,7 +127,6 @@ class ExtractTest extends CommandTestCase
                 'phar' => $pharPath,
                 'output' => $this->tmp,
             ],
-            ['interactive' => false],
         );
 
         $expectedOutput = <<<'OUTPUT'
