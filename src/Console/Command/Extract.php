@@ -25,6 +25,7 @@ use Phar;
 use PharData;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Throwable;
 use UnexpectedValueException;
 use function file_exists;
 use function KevinGH\Box\check_php_settings;
@@ -97,7 +98,14 @@ final class Extract implements Command
         }
 
         mkdir($outputDir);
-        self::dumpPhar($pharPath, $outputDir);
+
+        try {
+            self::dumpPhar($pharPath, $outputDir);
+        } catch (Throwable $throwable) {
+            remove($outputDir);
+
+            throw $throwable;
+        }
 
         return ExitCode::SUCCESS;
     }
@@ -127,15 +135,15 @@ final class Extract implements Command
 
         $tmpFile = $tmpDir.DIRECTORY_SEPARATOR.$alias;
         $pubkey = $file.'.pubkey';
-        $tmpPubkey = $tmpFile.'.pubkey';
-        $tmpSignature = $tmpDir.DIRECTORY_SEPARATOR.'signature';
-        $tmpAlias = $tmpDir.DIRECTORY_SEPARATOR.'alias';
-        $tmpStub = $tmpDir.DIRECTORY_SEPARATOR.'stub.php';
-        $tmpPharContent = $tmpDir.DIRECTORY_SEPARATOR.'content';
+        $intermediatePubkey = $tmpFile.'.pubkey';
+        $tmpPubkey = $tmpDir.'/.phar/pubkey';
+        $tmpSignature = $tmpDir.'/.phar/signature.json';
+        $tmpStub = $tmpDir.'/.phar/stub.php';
 
         copy($file, $tmpFile, true);
 
         if (file_exists($pubkey)) {
+            copy($pubkey, $intermediatePubkey, true);
             copy($pubkey, $tmpPubkey, true);
         }
 
@@ -145,10 +153,12 @@ final class Extract implements Command
             $tmpSignature,
             json_encode($phar->getSignature()),
         );
-        dump_file($tmpAlias, $phar->getAlias());
         dump_file($tmpStub, $phar->getStub());
 
-        $phar->extractTo($tmpPharContent);
+        $phar->extractTo($tmpDir);
+
+        remove($intermediatePubkey);
+        remove($tmpFile);
 
         return $tmpDir;
     }
