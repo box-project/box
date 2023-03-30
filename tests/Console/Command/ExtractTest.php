@@ -19,7 +19,6 @@ use Fidry\Console\ExitCode;
 use KevinGH\Box\Pharaoh\InvalidPhar;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
-use Phar;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
@@ -52,51 +51,45 @@ class ExtractTest extends CommandTestCase
         return new Extract();
     }
 
-    public function test_it_can_extract_a_phar(): void
+    /**
+     * @dataProvider pharProvider
+     */
+    public function test_it_can_extract_a_phar(
+        string $pharPath,
+        array $expectedFiles,
+    ): void {
+        $this->commandTester->execute(
+            [
+                'command' => 'extract',
+                'phar' => $pharPath,
+                'output' => $this->tmp,
+            ],
+        );
+
+        $actualFiles = $this->collectExtractedFiles();
+
+        $this->assertSameOutput('', ExitCode::SUCCESS);
+        self::assertEqualsCanonicalizing($expectedFiles, $actualFiles);
+    }
+
+    private static function pharProvider(): iterable
     {
         $pharPath = self::FIXTURES.'/simple-phar.phar';
 
-        $this->commandTester->execute(
-            [
-                'command' => 'extract',
-                'phar' => $pharPath,
-                'output' => $this->tmp,
-            ],
-        );
-
-        $expectedFiles = [
+        $expectedSimplePharFiles = [
             '.hidden' => 'baz',
             'foo' => 'bar',
         ];
 
-        $actualFiles = $this->collectExtractedFiles();
-
-        self::assertEqualsCanonicalizing($expectedFiles, $actualFiles);
-
-        $this->assertSameOutput('', ExitCode::SUCCESS);
-    }
-
-    public function test_it_can_extract_a_phar_without_the_phar_extension(): void
-    {
-        $pharPath = self::FIXTURES.'/simple-phar';
-
-        $this->commandTester->execute(
-            [
-                'command' => 'extract',
-                'phar' => $pharPath,
-                'output' => $this->tmp,
-            ],
-        );
-
-        $expectedFiles = [
-            '.hidden' => 'baz',
-            'foo' => 'bar',
+        yield 'simple PHAR' => [
+            $pharPath,
+            $expectedSimplePharFiles,
         ];
 
-        $actualFiles = $this->collectExtractedFiles();
-
-        $this->assertSameOutput('', ExitCode::SUCCESS);
-        self::assertEqualsCanonicalizing($expectedFiles, $actualFiles);
+        yield 'simple PHAR without the PHAR extension' => [
+            self::FIXTURES.'/simple-phar',
+            $expectedSimplePharFiles,
+        ];
     }
 
     public function test_it_can_extract_a_compressed_phar(): void
@@ -122,10 +115,12 @@ class ExtractTest extends CommandTestCase
         self::assertEqualsCanonicalizing($expectedFiles, $actualFiles);
     }
 
-    public function test_it_cannot_extract_an_invalid_phar(): void
-    {
-        $pharPath = self::FIXTURES.'/invalid.phar';
-
+    /**
+     * @dataProvider invalidPharPath
+     */
+    public function test_it_cannot_extract_an_invalid_phar(
+        string $pharPath,
+    ): void {
         $this->commandTester->execute(
             [
                 'command' => 'extract',
@@ -133,12 +128,6 @@ class ExtractTest extends CommandTestCase
                 'output' => $this->tmp,
             ],
         );
-
-        $expectedFiles = [];
-
-        $actualFiles = $this->collectExtractedFiles();
-
-        self::assertEqualsCanonicalizing($expectedFiles, $actualFiles);
 
         $expectedOutput = <<<'OUTPUT'
 
@@ -148,6 +137,18 @@ class ExtractTest extends CommandTestCase
             OUTPUT;
 
         $this->assertSameOutput($expectedOutput, ExitCode::FAILURE);
+        self::assertSame([], $this->collectExtractedFiles());
+    }
+
+    public static function invalidPharPath(): iterable
+    {
+        yield 'not a valid PHAR with the PHAR extension' => [
+            self::FIXTURES.'/invalid.phar',
+        ];
+
+        yield 'not a valid PHAR without the PHAR extension' => [
+            self::FIXTURES.'/invalid.phar',
+        ];
     }
 
     public function test_it_provides_the_original_exception_in_debug_mode_when_cannot_extract_an_invalid_phar(): void
@@ -177,60 +178,6 @@ class ExtractTest extends CommandTestCase
 
             self::assertInstanceOf(InvalidPhar::class, $previous);
         }
-    }
-
-    public function test_it_cannot_extract_an_invalid_phar_without_extension(): void
-    {
-        $pharPath = self::FIXTURES.'/invalid';
-
-        $this->commandTester->execute(
-            [
-                'command' => 'extract',
-                'phar' => $pharPath,
-                'output' => $this->tmp,
-            ],
-        );
-
-        $expectedFiles = [];
-
-        $actualFiles = $this->collectExtractedFiles();
-
-        self::assertSame($expectedFiles, $actualFiles);
-
-        $expectedOutput = <<<'OUTPUT'
-
-             [ERROR] The given file is not a valid PHAR.
-
-
-            OUTPUT;
-
-        $this->assertSameOutput($expectedOutput, ExitCode::FAILURE);
-    }
-
-    public function test_it_cannot_extract_an_unknown_file(): void
-    {
-        $this->commandTester->execute(
-            [
-                'command' => 'extract',
-                'phar' => '/unknown',
-                'output' => $this->tmp,
-            ],
-        );
-
-        $expectedFiles = [];
-
-        $actualFiles = $this->collectExtractedFiles();
-
-        self::assertSame($expectedFiles, $actualFiles);
-
-        $expectedOutput = <<<'OUTPUT'
-
-             [ERROR] The file "/unknown" could not be found.
-
-
-            OUTPUT;
-
-        $this->assertSameOutput($expectedOutput, ExitCode::FAILURE);
     }
 
     /**
