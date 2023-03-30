@@ -114,23 +114,33 @@ class ExtractTest extends CommandTestCase
      */
     public function test_it_cannot_extract_an_invalid_phar(
         string $pharPath,
+        string $exceptionClassName,
+        string $expectedExceptionMessage,
     ): void {
-        $this->commandTester->execute(
-            [
-                'command' => 'extract',
-                'phar' => $pharPath,
-                'output' => $this->tmp,
-            ],
+        try {
+            $this->commandTester->execute(
+                [
+                    'command' => 'extract',
+                    'phar' => $pharPath,
+                    'output' => $this->tmp,
+                ],
+            );
+
+            self::fail('Expected exception to be thrown.');
+        } catch (RuntimeException $exception) {
+            // Continue
+            $innerException = $exception->getPrevious();
+        }
+
+        self::assertSame(
+            $exceptionClassName,
+            $innerException::class,
+        );
+        self::assertMatchesRegularExpression(
+            $expectedExceptionMessage,
+            $innerException->getMessage(),
         );
 
-        $expectedOutput = <<<'OUTPUT'
-
-             [ERROR] The given file is not a valid PHAR.
-
-
-            OUTPUT;
-
-        $this->assertSameOutput($expectedOutput, ExitCode::FAILURE);
         self::assertSame([], $this->collectExtractedFiles());
     }
 
@@ -138,14 +148,20 @@ class ExtractTest extends CommandTestCase
     {
         yield 'not a valid PHAR with the PHAR extension' => [
             self::FIXTURES.'/invalid.phar',
+            InvalidPhar::class,
+            '/^Could not create a Phar or PharData instance for the file/',
         ];
 
         yield 'not a valid PHAR without the PHAR extension' => [
-            self::FIXTURES.'/invalid.phar',
+            self::FIXTURES.'/invalid',
+            InvalidPhar::class,
+            '/^Could not create a Phar or PharData instance for the file .+$/',
         ];
 
         yield 'corrupted PHAR (was valid; got tempered with' => [
             self::FIXTURES.'/corrupted.phar',
+            InvalidPhar::class,
+            '/^Could not create a Phar or PharData instance for the file .+$/',
         ];
     }
 
