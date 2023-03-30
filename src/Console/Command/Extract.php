@@ -67,35 +67,12 @@ final class Extract implements Command
 
     public function execute(IO $io): int
     {
-        check_php_settings($io);
-
         $pharPath = self::getPharFilePath($io);
         $outputDir = $io->getArgument(self::OUTPUT_ARG)->asNonEmptyString();
 
         if (null === $pharPath) {
             return ExitCode::FAILURE;
         }
-
-        if (file_exists($outputDir)) {
-            $canDelete = $io->askQuestion(
-                new ConfirmationQuestion(
-                    'The output directory already exists. Do you want to delete its current content?',
-                    // If is interactive, we want the prompt to default to false since it can be an error made by the user.
-                    // Otherwise, this is likely launched by a script or Pharaoh in which case we do not care.
-                    !$io->isInteractive(),
-                ),
-            );
-
-            if ($canDelete) {
-                remove($outputDir);
-            // Continue
-            } else {
-                // Do nothing
-                return ExitCode::FAILURE;
-            }
-        }
-
-        mkdir($outputDir);
 
         try {
             self::dumpPhar($pharPath, $outputDir);
@@ -131,6 +108,9 @@ final class Extract implements Command
         // We have to give every one a different alias, or it pukes.
         $alias = self::generateAlias($file);
 
+        // Create a temporary PHAR: this is because the extension might be
+        // missing in which case we would not be able to create a Phar instance
+        // as it requires the .phar extension.
         $tmpFile = $tmpDir.DIRECTORY_SEPARATOR.$alias;
 
         copy($file, $tmpFile, true);
@@ -139,6 +119,7 @@ final class Extract implements Command
 
         $phar->extractTo($tmpDir);
 
+        // Cleanup the temporary PHAR.
         remove($tmpFile);
 
         return $tmpDir;
@@ -170,12 +151,6 @@ final class Extract implements Command
         try {
             return new Phar($tmpFile);
         } catch (UnexpectedValueException $cannotCreatePhar) {
-            // Continue
-        }
-
-        try {
-            return new PharData($tmpFile);
-        } catch (UnexpectedValueException) {
             throw InvalidPhar::create($file, $cannotCreatePhar);
         }
     }
