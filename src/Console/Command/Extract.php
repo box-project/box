@@ -49,7 +49,7 @@ final class Extract implements Command
     {
         return new Configuration(
             'extract',
-            '🚚  Extracts a given PHAR into a directory.',
+            '🚚  Extracts a given PHAR into a directory',
             '',
             [
                 new InputArgument(
@@ -60,7 +60,7 @@ final class Extract implements Command
                 new InputArgument(
                     self::OUTPUT_ARG,
                     InputArgument::REQUIRED,
-                    'The output directory.',
+                    'The output directory',
                 ),
             ],
         );
