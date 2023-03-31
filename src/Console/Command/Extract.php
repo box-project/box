@@ -18,18 +18,18 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
-use KevinGH\Box\Box;
-use KevinGH\Box\Pharaoh\Pharaoh;
-use RecursiveIteratorIterator;
-use Symfony\Component\Console\Exception\RuntimeException as ConsoleRuntimeException;
+use KevinGH\Box\Pharaoh\InvalidPhar;
+use ParagonIE\ConstantTime\Hex;
+use Phar;
+use PharData;
 use Symfony\Component\Console\Input\InputArgument;
 use Throwable;
-use function count;
-use function KevinGH\Box\bump_open_file_descriptor_limit;
-use function KevinGH\Box\FileSystem\dump_file;
+use UnexpectedValueException;
+use function KevinGH\Box\FileSystem\copy;
 use function KevinGH\Box\FileSystem\remove;
 use function realpath;
 use function sprintf;
+use const DIRECTORY_SEPARATOR;
 
 /**
  * @private
@@ -69,20 +69,7 @@ final class Extract implements Command
             return ExitCode::FAILURE;
         }
 
-        [$box, $cleanUpTmpPhar] = $this->getBox($filePath);
-
-        if (null === $box) {
-            return ExitCode::FAILURE;
-        }
-
-        $restoreLimit = bump_open_file_descriptor_limit(count($box), $io);
-
-        $cleanUp = static function () use ($cleanUpTmpPhar, $restoreLimit): void {
-            $cleanUpTmpPhar();
-            $restoreLimit();
-        };
-
-        self::dumpPhar($outputDir, $box, $cleanUp);
+        self::dumpPhar($filePath, $outputDir);
 
         return ExitCode::SUCCESS;
     }
@@ -105,55 +92,61 @@ final class Extract implements Command
         return null;
     }
 
-    /**
-     * @return array{Box, callable(): void}|array{null, null}
-     */
-    private function getBox(string $filePath): ?array
+    private static function dumpPhar(string $file, string $tmpDir): string
     {
-        $cleanUp = static fn () => null;
+        // We have to give every one a different alias, or it pukes.
+        $alias = self::generateAlias($file);
+
+        // Create a temporary PHAR: this is because the extension might be
+        // missing in which case we would not be able to create a Phar instance
+        // as it requires the .phar extension.
+        $tmpFile = $tmpDir.DIRECTORY_SEPARATOR.$alias;
 
         try {
-            $pharaoh = new Pharaoh($filePath);
-            // The cleanup is still necessary. Indeed, without it, we would loose
-            // the reference of the pharaoh instance immediately which would result
-            // in the encapsulated PHAR to be unliked too early.
-            $cleanUp = static function () use ($pharaoh): void {
-                unset($pharaoh);
-            };
+            copy($file, $tmpFile, true);
 
-            return [
-                Box::createFromPharaoh($pharaoh),
-                $cleanUp,
-            ];
+            $phar = self::createPhar($file, $tmpFile);
+
+            $phar->extractTo($tmpDir);
         } catch (Throwable $throwable) {
-            $cleanUp();
+            remove($tmpFile);
 
-            throw new ConsoleRuntimeException(
-                'The given file is not a valid PHAR.',
-                0,
-                $throwable,
-            );
+            throw $throwable;
         }
+
+        // Cleanup the temporary PHAR.
+        remove($tmpFile);
+
+        return $tmpDir;
     }
 
-    /**
-     * @param callable(): void $cleanUp
-     */
-    private static function dumpPhar(string $outputDir, Box $box, callable $cleanUp): void
+    private static function generateAlias(string $file): string
+    {
+        $extension = self::getExtension($file);
+
+        return Hex::encode(random_bytes(16)).$extension;
+    }
+
+    private static function getExtension(string $file): string
+    {
+        $lastExtension = pathinfo($file, PATHINFO_EXTENSION);
+        $extension = '';
+
+        while ('' !== $lastExtension) {
+            $extension = '.'.$lastExtension.$extension;
+            $file = mb_substr($file, 0, -(mb_strlen($lastExtension) + 1));
+            $lastExtension = pathinfo($file, PATHINFO_EXTENSION);
+        }
+
+        return '' === $extension ? '.phar' : $extension;
+    }
+
+    private static function createPhar(string $file, string $tmpFile): Phar|PharData
     {
         try {
-            remove($outputDir);
-
-            $rootLength = mb_strlen('phar://'.$box->getPhar()->getPath()) + 1;
-
-            foreach (new RecursiveIteratorIterator($box->getPhar()) as $filePath) {
-                dump_file(
-                    $outputDir.'/'.mb_substr($filePath->getPathname(), $rootLength),
-                    (string) $filePath->getContent(),
-                );
-            }
-        } finally {
-            $cleanUp();
+            return new Phar($tmpFile);
+        } catch (UnexpectedValueException $cannotCreatePhar) {
+            throw InvalidPhar::create($file, $cannotCreatePhar);
         }
     }
 }
