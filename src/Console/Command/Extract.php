@@ -49,7 +49,7 @@ final class Extract implements Command
                 new InputArgument(
                     self::PHAR_ARG,
                     InputArgument::REQUIRED,
-                    'The PHAR file.',
+                    'The path to the PHAR file',
                 ),
                 new InputArgument(
                     self::OUTPUT_ARG,
@@ -62,14 +62,14 @@ final class Extract implements Command
 
     public function execute(IO $io): int
     {
-        $filePath = self::getPharFilePath($io);
+        $pharPath = self::getPharFilePath($io);
         $outputDir = $io->getArgument(self::OUTPUT_ARG)->asNonEmptyString();
 
-        if (null === $filePath) {
+        if (null === $pharPath) {
             return ExitCode::FAILURE;
         }
 
-        self::dumpPhar($filePath, $outputDir);
+        self::dumpPhar($pharPath, $outputDir);
 
         return ExitCode::SUCCESS;
     }
