@@ -18,7 +18,6 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
 use KevinGH\Box\Pharaoh\InvalidPhar;
 use KevinGH\Box\Test\CommandTestCase;
-use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use function count;
@@ -34,16 +33,7 @@ use function KevinGH\Box\FileSystem\make_path_relative;
  */
 class ExtractTest extends CommandTestCase
 {
-    use RequiresPharReadonlyOff;
-
     private const FIXTURES = __DIR__.'/../../../fixtures/extract';
-
-    protected function setUp(): void
-    {
-        $this->markAsSkippedIfPharReadonlyIsOn();
-
-        parent::setUp();
-    }
 
     protected function getCommand(): Command
     {

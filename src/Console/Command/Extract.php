@@ -28,6 +28,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Throwable;
 use UnexpectedValueException;
 use function file_exists;
+use function KevinGH\Box\check_php_settings;
 use function KevinGH\Box\FileSystem\copy;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\mkdir;
@@ -68,6 +69,8 @@ final class Extract implements Command
 
     public function execute(IO $io): int
     {
+        check_php_settings($io);
+
         $pharPath = self::getPharFilePath($io);
         $outputDir = $io->getArgument(self::OUTPUT_ARG)->asNonEmptyString();
 
