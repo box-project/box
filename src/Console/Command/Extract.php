@@ -19,6 +19,7 @@ use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
 use KevinGH\Box\Pharaoh\InvalidPhar;
+use KevinGH\Box\Pharaoh\Pharaoh;
 use ParagonIE\ConstantTime\Hex;
 use Phar;
 use PharData;
@@ -28,9 +29,11 @@ use Throwable;
 use UnexpectedValueException;
 use function file_exists;
 use function KevinGH\Box\FileSystem\copy;
+use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
 use function realpath;
+use function Safe\json_encode;
 use function sprintf;
 use const DIRECTORY_SEPARATOR;
 
@@ -127,27 +130,35 @@ final class Extract implements Command
         $tmpFile = $tmpDir.DIRECTORY_SEPARATOR.$alias;
         $pubkey = $file.'.pubkey';
         $intermediatePubkey = $tmpFile.'.pubkey';
+        $tmpPubkey = $tmpDir.'/.phar/pubkey';
+        $tmpSignature = $tmpDir.'/.phar/signature.json';
+        $tmpStub = $tmpDir.'/.phar/stub.php';
 
         try {
             copy($file, $tmpFile, true);
 
             if (file_exists($pubkey)) {
                 copy($pubkey, $intermediatePubkey, true);
+                copy($pubkey, $tmpPubkey, true);
             }
 
             $phar = self::createPhar($file, $tmpFile);
 
             $phar->extractTo($tmpDir);
         } catch (Throwable $throwable) {
-            remove($tmpFile);
-            remove($intermediatePubkey);
+            remove([$tmpFile, $intermediatePubkey, $tmpPubkey]);
 
             throw $throwable;
         }
 
+        dump_file(
+            $tmpSignature,
+            json_encode($phar->getSignature()),
+        );
+        dump_file($tmpStub, $phar->getStub());
+
         // Cleanup the temporary PHAR.
-        remove($tmpFile);
-        remove($intermediatePubkey);
+        remove([$tmpFile, $intermediatePubkey]);
 
         return $tmpDir;
     }
