@@ -21,7 +21,6 @@ use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use function extension_loaded;
 use function KevinGH\Box\FileSystem\make_path_relative;
 
 /**
@@ -57,14 +56,12 @@ class ExtractTest extends CommandTestCase
         string $pharPath,
         array $expectedFiles,
     ): void {
-        $this->commandTester->setInputs(['yes']);
         $this->commandTester->execute(
             [
                 'command' => 'extract',
                 'phar' => $pharPath,
                 'output' => $this->tmp,
             ],
-            ['interactive' => false],
         );
 
         $actualFiles = $this->collectExtractedFiles();
@@ -108,6 +105,16 @@ class ExtractTest extends CommandTestCase
                     PHP,
             ],
         ];
+
+        yield 'OpenSSL signed PHAR' => [
+            self::FIXTURES.'/openssl.phar',
+            [
+                'index.php' => <<<'PHP'
+                    <?php echo "Hello, world!\n";
+
+                    PHP,
+            ],
+        ];
     }
 
     /**
@@ -115,6 +122,7 @@ class ExtractTest extends CommandTestCase
      */
     public function test_it_cannot_extract_an_invalid_phar(
         string $pharPath,
+        string $exceptionClassName,
         string $expectedExceptionMessage,
     ): void {
         try {
@@ -124,32 +132,55 @@ class ExtractTest extends CommandTestCase
                     'phar' => $pharPath,
                     'output' => $this->tmp,
                 ],
-                ['interactive' => false],
             );
 
-            self::assertSame(ExitCode::FAILURE, $this->commandTester->getStatusCode());
-
-            return;
-        } catch (InvalidPhar $invalidPhar) {
-            self::assertMatchesRegularExpression(
-                $expectedExceptionMessage,
-                $invalidPhar->getMessage(),
-            );
+            self::fail('Expected exception to be thrown.');
+        } catch (InvalidPhar $exception) {
+            // Continue
         }
 
-        self::assertFileDoesNotExist($this->tmp);
+        self::assertSame(
+            $exceptionClassName,
+            $exception::class,
+        );
+        self::assertMatchesRegularExpression(
+            $expectedExceptionMessage,
+            $exception->getMessage(),
+        );
+
+        self::assertSame([], $this->collectExtractedFiles());
     }
 
     public static function invalidPharPath(): iterable
     {
-        yield 'not a valid PHAR' => [
+        yield 'not a valid PHAR with the PHAR extension' => [
             self::FIXTURES.'/invalid.phar',
-            '/^Could not create a Phar or PharData instance for the file.+$/',
+            InvalidPhar::class,
+            '/^Could not create a Phar or PharData instance for the file/',
         ];
 
-        yield 'non-existent file' => [
-            '/unknown',
-            '',
+        yield 'not a valid PHAR without the PHAR extension' => [
+            self::FIXTURES.'/invalid',
+            InvalidPhar::class,
+            '/^Could not create a Phar or PharData instance for the file .+$/',
+        ];
+
+        yield 'corrupted PHAR (was valid; got tempered with)' => [
+            self::FIXTURES.'/corrupted.phar',
+            InvalidPhar::class,
+            '/^Could not create a Phar or PharData instance for the file .+$/',
+        ];
+
+        yield 'OpenSSL signed PHAR without a pubkey' => [
+            self::FIXTURES.'/openssl-no-pubkey.phar',
+            InvalidPhar::class,
+            '/^Could not create a Phar or PharData instance for the file .+$/',
+        ];
+
+        yield 'OpenSSL signed PHAR with incorrect pubkey' => [
+            self::FIXTURES.'/incorrect-key-openssl.phar',
+            InvalidPhar::class,
+            '/^Could not create a Phar or PharData instance for the file .+$/',
         ];
     }
 

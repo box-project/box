@@ -69,13 +69,7 @@ final class Extract implements Command
             return ExitCode::FAILURE;
         }
 
-        try {
-            self::dumpPhar($pharPath, $outputDir);
-        } catch (Throwable $throwable) {
-            remove($outputDir);
-
-            throw $throwable;
-        }
+        self::dumpPhar($pharPath, $outputDir);
 
         return ExitCode::SUCCESS;
     }
@@ -107,15 +101,29 @@ final class Extract implements Command
         // missing in which case we would not be able to create a Phar instance
         // as it requires the .phar extension.
         $tmpFile = $tmpDir.DIRECTORY_SEPARATOR.$alias;
+        $pubkey = $file.'.pubkey';
+        $intermediatePubkey = $tmpFile.'.pubkey';
 
-        copy($file, $tmpFile, true);
+        try {
+            copy($file, $tmpFile, true);
 
-        $phar = self::createPhar($file, $tmpFile);
+            if (file_exists($pubkey)) {
+                copy($pubkey, $intermediatePubkey, true);
+            }
 
-        $phar->extractTo($tmpDir);
+            $phar = self::createPhar($file, $tmpFile);
+
+            $phar->extractTo($tmpDir);
+        } catch (Throwable $throwable) {
+            remove($tmpFile);
+            remove($intermediatePubkey);
+
+            throw $throwable;
+        }
 
         // Cleanup the temporary PHAR.
         remove($tmpFile);
+        remove($intermediatePubkey);
 
         return $tmpDir;
     }
