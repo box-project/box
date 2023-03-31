@@ -105,6 +105,16 @@ class ExtractTest extends CommandTestCase
                     PHP,
             ],
         ];
+
+        yield 'OpenSSL signed PHAR' => [
+            self::FIXTURES.'/openssl.phar',
+            [
+                'index.php' => <<<'PHP'
+                    <?php echo "Hello, world!\n";
+
+                    PHP,
+            ],
+        ];
     }
 
     /**
@@ -155,8 +165,20 @@ class ExtractTest extends CommandTestCase
             '/^Could not create a Phar or PharData instance for the file .+$/',
         ];
 
-        yield 'corrupted PHAR (was valid; got tempered with' => [
+        yield 'corrupted PHAR (was valid; got tempered with)' => [
             self::FIXTURES.'/corrupted.phar',
+            InvalidPhar::class,
+            '/^Could not create a Phar or PharData instance for the file .+$/',
+        ];
+
+        yield 'OpenSSL signed PHAR without a pubkey' => [
+            self::FIXTURES.'/openssl-no-pubkey.phar',
+            InvalidPhar::class,
+            '/^Could not create a Phar or PharData instance for the file .+$/',
+        ];
+
+        yield 'OpenSSL signed PHAR with incorrect pubkey' => [
+            self::FIXTURES.'/incorrect-key-openssl.phar',
             InvalidPhar::class,
             '/^Could not create a Phar or PharData instance for the file .+$/',
         ];
