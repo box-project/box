@@ -21,6 +21,7 @@ use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use function count;
 use function KevinGH\Box\FileSystem\make_path_relative;
 
 /**
@@ -56,12 +57,14 @@ class ExtractTest extends CommandTestCase
         string $pharPath,
         array $expectedFiles,
     ): void {
+        $this->commandTester->setInputs(['yes']);
         $this->commandTester->execute(
             [
                 'command' => 'extract',
                 'phar' => $pharPath,
                 'output' => $this->tmp,
             ],
+            ['interactive' => false],
         );
 
         $actualFiles = $this->collectExtractedFiles();
@@ -118,6 +121,83 @@ class ExtractTest extends CommandTestCase
     }
 
     /**
+     * @dataProvider confirmationQuestionProvider
+     */
+    public function test_it_asks_confirmation_before_deleting_the_output_dir(
+        bool $outputDirExists,
+        bool $interactive,
+        bool $input,
+        bool $expectedToSucceed,
+    ): void {
+        $outputDir = $outputDirExists ? $this->tmp : $this->tmp.'/subdir';
+
+        $this->commandTester->setInputs([$input ? 'yes' : 'no']);
+        $this->commandTester->execute(
+            [
+                'command' => 'extract',
+                'phar' => self::FIXTURES.'/simple-phar.phar',
+                'output' => $outputDir,
+            ],
+            ['interactive' => $interactive],
+        );
+
+        $actualFiles = $this->collectExtractedFiles();
+
+        if ($expectedToSucceed) {
+            self::assertSame(ExitCode::SUCCESS, $this->commandTester->getStatusCode());
+            self::assertGreaterThan(0, count($actualFiles));
+        } else {
+            self::assertSame(ExitCode::FAILURE, $this->commandTester->getStatusCode());
+            self::assertSame(0, count($actualFiles));
+        }
+    }
+
+    public static function confirmationQuestionProvider(): iterable
+    {
+        yield 'exists; accept' => [
+            true,
+            true,
+            true,
+            true,
+        ];
+
+        yield 'exists; refuse' => [
+            true,
+            true,
+            false,
+            false,
+        ];
+
+        yield 'does not exist: the question is not asked' => [
+            false,
+            true,
+            false,
+            true,
+        ];
+
+        yield 'exists; not interactive; accept' => [
+            true,
+            false,
+            true,
+            true,
+        ];
+
+        yield 'exists; not interactive; refuse' => [
+            true,
+            false,
+            false,
+            true,
+        ];
+
+        yield 'not interactive; does not exist: the question is not asked' => [
+            false,
+            false,
+            false,
+            true,
+        ];
+    }
+
+    /**
      * @dataProvider invalidPharPath
      */
     public function test_it_cannot_extract_an_invalid_phar(
@@ -132,6 +212,7 @@ class ExtractTest extends CommandTestCase
                     'phar' => $pharPath,
                     'output' => $this->tmp,
                 ],
+                ['interactive' => false],
             );
 
             self::fail('Expected exception to be thrown.');

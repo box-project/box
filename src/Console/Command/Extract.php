@@ -23,9 +23,12 @@ use ParagonIE\ConstantTime\Hex;
 use Phar;
 use PharData;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Throwable;
 use UnexpectedValueException;
+use function file_exists;
 use function KevinGH\Box\FileSystem\copy;
+use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
 use function realpath;
 use function sprintf;
@@ -68,6 +71,27 @@ final class Extract implements Command
         if (null === $pharPath) {
             return ExitCode::FAILURE;
         }
+
+        if (file_exists($outputDir)) {
+            $canDelete = $io->askQuestion(
+                new ConfirmationQuestion(
+                    'The output directory already exists. Do you want to delete its current content?',
+                    // If is interactive, we want the prompt to default to false since it can be an error made by the user.
+                    // Otherwise, this is likely launched by a script or Pharaoh in which case we do not care.
+                    !$io->isInteractive(),
+                ),
+            );
+
+            if ($canDelete) {
+                remove($outputDir);
+            // Continue
+            } else {
+                // Do nothing
+                return ExitCode::FAILURE;
+            }
+        }
+
+        mkdir($outputDir);
 
         self::dumpPhar($pharPath, $outputDir);
 
