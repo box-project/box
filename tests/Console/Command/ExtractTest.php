@@ -19,8 +19,6 @@ use Fidry\Console\ExitCode;
 use KevinGH\Box\Pharaoh\InvalidPhar;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
-use Symfony\Component\Console\Exception\RuntimeException;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use function KevinGH\Box\FileSystem\make_path_relative;
@@ -127,18 +125,17 @@ class ExtractTest extends CommandTestCase
             );
 
             self::fail('Expected exception to be thrown.');
-        } catch (RuntimeException $exception) {
+        } catch (InvalidPhar $exception) {
             // Continue
-            $innerException = $exception->getPrevious();
         }
 
         self::assertSame(
             $exceptionClassName,
-            $innerException::class,
+            $exception::class,
         );
         self::assertMatchesRegularExpression(
             $expectedExceptionMessage,
-            $innerException->getMessage(),
+            $exception->getMessage(),
         );
 
         self::assertSame([], $this->collectExtractedFiles());
@@ -163,35 +160,6 @@ class ExtractTest extends CommandTestCase
             InvalidPhar::class,
             '/^Could not create a Phar or PharData instance for the file .+$/',
         ];
-    }
-
-    public function test_it_provides_the_original_exception_in_debug_mode_when_cannot_extract_an_invalid_phar(): void
-    {
-        $pharPath = self::FIXTURES.'/invalid.phar';
-
-        try {
-            $this->commandTester->execute(
-                [
-                    'command' => 'extract',
-                    'phar' => $pharPath,
-                    'output' => $this->tmp,
-                ],
-                ['verbosity' => OutputInterface::VERBOSITY_DEBUG],
-            );
-
-            self::fail('Expected exception to be thrown.');
-        } catch (RuntimeException $exception) {
-            self::assertSame(
-                'The given file is not a valid PHAR.',
-                $exception->getMessage(),
-            );
-            self::assertSame(0, $exception->getCode());
-            self::assertNotNull($exception->getPrevious());
-
-            $previous = $exception->getPrevious();
-
-            self::assertInstanceOf(InvalidPhar::class, $previous);
-        }
     }
 
     /**
