@@ -43,18 +43,18 @@ final class Extract implements Command
     {
         return new Configuration(
             'extract',
-            '🚚  Extracts a given PHAR into a directory.',
+            '🚚  Extracts a given PHAR into a directory',
             '',
             [
                 new InputArgument(
                     self::PHAR_ARG,
                     InputArgument::REQUIRED,
-                    'The path to PHAR file.',
+                    'The path to the PHAR file',
                 ),
                 new InputArgument(
                     self::OUTPUT_ARG,
                     InputArgument::REQUIRED,
-                    'The output directory.',
+                    'The output directory',
                 ),
             ],
         );
