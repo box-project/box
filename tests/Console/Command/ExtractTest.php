@@ -245,31 +245,31 @@ class ExtractTest extends CommandTestCase
         yield 'not a valid PHAR with the PHAR extension' => [
             self::FIXTURES.'/invalid.phar',
             InvalidPhar::class,
-            '/^Could not create a Phar or PharData instance for the file/',
+            '/^Could not create a Phar instance for the file/',
         ];
 
         yield 'not a valid PHAR without the PHAR extension' => [
             self::FIXTURES.'/invalid',
             InvalidPhar::class,
-            '/^Could not create a Phar or PharData instance for the file .+$/',
+            '/^Could not create a Phar instance for the file/',
         ];
 
         yield 'corrupted PHAR (was valid; got tempered with)' => [
             self::FIXTURES.'/corrupted.phar',
             InvalidPhar::class,
-            '/^Could not create a Phar or PharData instance for the file .+$/',
+            '/^Could not create a Phar instance for the file/',
         ];
 
         yield 'OpenSSL signed PHAR without a pubkey' => [
             self::FIXTURES.'/openssl-no-pubkey.phar',
             InvalidPhar::class,
-            '/^Could not create a Phar or PharData instance for the file .+$/',
+            '/^Could not create a Phar instance for the file/',
         ];
 
         yield 'OpenSSL signed PHAR with incorrect pubkey' => [
             self::FIXTURES.'/incorrect-key-openssl.phar',
             InvalidPhar::class,
-            '/^Could not create a Phar or PharData instance for the file .+$/',
+            '/^Could not create a Phar instance for the file/',
         ];
     }
 

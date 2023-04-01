@@ -142,17 +142,17 @@ final class PharFactoryTest extends TestCase
     {
         yield 'URL of a valid PHAR' => [
             'https://github.com/box-project/box/releases/download/4.3.8/box.phar',
-            '/^Cannot create a Phar or PharData instance for the file path ".+"\. PHAR objects can only be created from local files\.$/',
+            '/^Could not create a Phar or PharData instance for the file path ".+"\. PHAR objects can only be created from local files\.$/',
         ];
 
         yield 'FTPS URL of a valid PHAR' => [
             'ftps://github.com/box-project/box/releases/download/4.3.8/box.phar',
-            '/^Cannot create a Phar or PharData instance for the file path ".+"\. PHAR objects can only be created from local files\.$/',
+            '/^Could not create a Phar or PharData instance for the file path ".+"\. PHAR objects can only be created from local files\.$/',
         ];
 
         yield 'local stream' => [
             'php://stdout',
-            '/^Cannot create a Phar or PharData instance for the file path ".+"\. PHAR objects can only be created from local files\.$/',
+            '/^Could not create a Phar or PharData instance for the file path ".+"\. PHAR objects can only be created from local files\.$/',
         ];
 
         yield 'non existent file with a valid PHAR name' => [
@@ -162,12 +162,12 @@ final class PharFactoryTest extends TestCase
 
         yield 'non-compressed binary file (empty PDF)' => [
             self::FIXTURES_DIR.'/empty-pdf.pdf',
-            '/^Cannot create a Phar instance from the file ".+"\. The file must have the extension "\.phar"\.$/',
+            '/^Could not create a Phar instance for the file ".+"\. The file must have the extension "\.phar"\.$/',
         ];
 
         yield 'non-compressed empty file' => [
             self::FIXTURES_DIR.'/empty-file.phar',
-            '/^Cannot create a Phar instance from the file ".+"\. The archive is corrupted: Truncated entry\.$/',
+            '/^Could not create a Phar instance for the file ".+"\. The archive is corrupted: Truncated entry\.$/',
         ];
 
         $validPharDatasWithoutPharExtension = [
@@ -180,13 +180,13 @@ final class PharFactoryTest extends TestCase
         foreach ($validPharDatasWithoutPharExtension as $validPharDataWithoutPharExtension) {
             yield $validPharDataWithoutPharExtension => [
                 self::FIXTURES_DIR.DIRECTORY_SEPARATOR.$validPharDataWithoutPharExtension,
-                '/^Cannot create a Phar instance from the file ".+"\. The file must have the extension "\.phar"\.$/',
+                '/^Could not create a Phar instance for the file ".+"\. The file must have the extension "\.phar"\.$/',
             ];
         }
 
         yield 'PHAR without the __HALT_COMPILER(); ?> token' => [
             self::FIXTURES_DIR.DIRECTORY_SEPARATOR.'corruted-phar-no-halt-compiler.phar',
-            '/^Cannot create a Phar instance from the file ".+"\. The archive is corrupted: __HALT_COMPILER\(\); not found\.$/',
+            '/^Could not create a Phar instance for the file ".+"\. The archive is corrupted: __HALT_COMPILER\(\); not found\.$/',
         ];
 
         yield 'OpenSSL signed PHAR without its pubkey' => [
@@ -226,23 +226,23 @@ final class PharFactoryTest extends TestCase
         foreach (self::validPharProvider() as $label => [$file]) {
             yield 'valid PHAR; '.$label => [
                 $file,
-                '/^Cannot create a PharData instance from the file ".+"\. The file must have the extension "\.zip", "\.tar", "\.tar\.bz2" or "\.tar\.gz"\.$/',
+                '/^Could not create a PharData instance for the file ".+"\. The file must have the extension "\.zip", "\.tar", "\.tar\.bz2" or "\.tar\.gz"\.$/',
             ];
         }
 
         yield 'URL of a valid tar' => [
             'https://github.com/box-project/box/releases/download/4.3.8/box.tar',
-            '/^Cannot create a Phar or PharData instance for the file path ".+"\. PHAR objects can only be created from local files\.$/',
+            '/^Could not create a Phar or PharData instance for the file path ".+"\. PHAR objects can only be created from local files\.$/',
         ];
 
         yield 'FTPS URL of a valid PHAR' => [
             'ftps://github.com/box-project/box/releases/download/4.3.8/box.tar',
-            '/^Cannot create a Phar or PharData instance for the file path ".+"\. PHAR objects can only be created from local files\.$/',
+            '/^Could not create a Phar or PharData instance for the file path ".+"\. PHAR objects can only be created from local files\.$/',
         ];
 
         yield 'local stream' => [
             'php://stdout',
-            '/^Cannot create a Phar or PharData instance for the file path ".+"\. PHAR objects can only be created from local files\.$/',
+            '/^Could not create a Phar or PharData instance for the file path ".+"\. PHAR objects can only be created from local files\.$/',
         ];
 
         yield 'non existent file with a valid PharData name' => [
@@ -252,17 +252,17 @@ final class PharFactoryTest extends TestCase
 
         yield 'corrupted ZIP file' => [
             self::FIXTURES_DIR.DIRECTORY_SEPARATOR.'corrupted-simple.zip',
-            '/^Cannot create a PharData instance from the file ".+"\. The archive is corrupted: __HALT_COMPILER\(\); not found\.$/',
+            '/^Could not create a PharData instance for the file ".+"\. The archive is corrupted: __HALT_COMPILER\(\); not found\.$/',
         ];
 
         yield 'non-compressed binary file (empty PDF)' => [
             self::FIXTURES_DIR.'/empty-pdf.pdf',
-            '/^Cannot create a PharData instance from the file ".+"\. The archive is corrupted: __HALT_COMPILER\(\); not found\.$/',
+            '/^Could not create a PharData instance for the file ".+"\. The archive is corrupted: __HALT_COMPILER\(\); not found\.$/',
         ];
 
         yield 'non-compressed empty file' => [
             self::FIXTURES_DIR.'/empty-file.zip',
-            '/^Cannot create a PharData instance from the file ".+"\. The archive is corrupted: Truncated entry\.$/',
+            '/^Could not create a PharData instance for the file ".+"\. The archive is corrupted: Truncated entry\.$/',
         ];
 
         yield 'OpenSSL signed PHAR renamed to tar without its pubkey' => [

@@ -58,7 +58,7 @@ final class PharFactory
         try {
             return new PharData($file);
         } catch (Throwable) {
-            throw InvalidPhar::forPhar($file, $cannotCreatePhar);
+            throw InvalidPhar::forPharAndPharData($file, $cannotCreatePhar);
         }
     }
 
