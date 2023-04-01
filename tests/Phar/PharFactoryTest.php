@@ -18,7 +18,9 @@ use KevinGH\Box\Pharaoh\InvalidPhar;
 use Phar;
 use PharData;
 use PHPUnit\Framework\TestCase;
+use function extension_loaded;
 use const DIRECTORY_SEPARATOR;
+use const PHP_OS_FAMILY;
 
 /**
  * @covers \KevinGH\Box\Phar\PharFactory
@@ -97,12 +99,18 @@ final class PharFactoryTest extends TestCase
         $tarVariants = [
             'simple.zip.phar',
             'simple.tar.phar',
-            'simple.tar.bz2.phar',
             'simple.tar.gz.phar',
         ];
 
-        foreach ($tarVariants as $tarVariant) {
-            yield $tarVariant => [self::FIXTURES_DIR.DIRECTORY_SEPARATOR.$tarVariant];
+        if (extension_loaded('bz2')) {
+            $tarVariants[] = 'simple.tar.bz2.phar';
+        }
+
+        if ('Darwin' === PHP_OS_FAMILY) {
+            // On Linux the following would fail with "is not a phar archive. Use PharData::__construct() for a standard zip or tar archive"
+            foreach ($tarVariants as $tarVariant) {
+                yield $tarVariant => [self::FIXTURES_DIR.DIRECTORY_SEPARATOR.$tarVariant];
+            }
         }
 
         $signedPhars = [
@@ -123,9 +131,12 @@ final class PharFactoryTest extends TestCase
         $data = [
             'simple tar archive' => 'simple.tar',
             'simple ZIP archive' => 'simple.zip',
-            'simple BZ2 archive' => 'simple.tar.bz2',
             'simple GZ archive' => 'simple.tar.gz',
         ];
+
+        if (extension_loaded('bz2')) {
+            $data['simple BZ2 archive'] = 'simple.tar.bz2';
+        }
 
         foreach ($data as $label => $fileName) {
             yield $label => [self::FIXTURES_DIR.DIRECTORY_SEPARATOR.$fileName];
@@ -173,9 +184,12 @@ final class PharFactoryTest extends TestCase
         $validPharDatasWithoutPharExtension = [
             'simple.zip',
             'simple.tar',
-            'simple.tar.bz2',
             'simple.tar.gz',
         ];
+
+        if (extension_loaded('bz2')) {
+            $validPharDatasWithoutPharExtension[] = 'simple.tar.bz2';
+        }
 
         foreach ($validPharDatasWithoutPharExtension as $validPharDataWithoutPharExtension) {
             yield $validPharDataWithoutPharExtension => [
