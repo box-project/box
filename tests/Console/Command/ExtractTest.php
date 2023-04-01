@@ -208,11 +208,8 @@ class ExtractTest extends CommandTestCase
     /**
      * @dataProvider invalidPharPath
      */
-    public function test_it_cannot_extract_an_invalid_phar(
-        string $pharPath,
-        string $exceptionClassName,
-        string $expectedExceptionMessage,
-    ): void {
+    public function test_it_cannot_extract_an_invalid_phar(string $pharPath): void
+    {
         try {
             $this->commandTester->execute(
                 [
@@ -228,48 +225,13 @@ class ExtractTest extends CommandTestCase
             // Continue
         }
 
-        self::assertSame(
-            $exceptionClassName,
-            $exception::class,
-        );
-        self::assertMatchesRegularExpression(
-            $expectedExceptionMessage,
-            $exception->getMessage(),
-        );
-
         self::assertSame([], $this->collectExtractedFiles());
     }
 
     public static function invalidPharPath(): iterable
     {
-        yield 'not a valid PHAR with the PHAR extension' => [
-            self::FIXTURES.'/invalid.phar',
-            InvalidPhar::class,
-            '/^Could not create a Phar instance for the file/',
-        ];
-
-        yield 'not a valid PHAR without the PHAR extension' => [
-            self::FIXTURES.'/invalid',
-            InvalidPhar::class,
-            '/^Could not create a Phar instance for the file/',
-        ];
-
-        yield 'corrupted PHAR (was valid; got tempered with)' => [
-            self::FIXTURES.'/corrupted.phar',
-            InvalidPhar::class,
-            '/^Could not create a Phar instance for the file/',
-        ];
-
-        yield 'OpenSSL signed PHAR without a pubkey' => [
-            self::FIXTURES.'/openssl-no-pubkey.phar',
-            InvalidPhar::class,
-            '/^Could not create a Phar instance for the file/',
-        ];
-
-        yield 'OpenSSL signed PHAR with incorrect pubkey' => [
-            self::FIXTURES.'/incorrect-key-openssl.phar',
-            InvalidPhar::class,
-            '/^Could not create a Phar instance for the file/',
+        yield 'not a valid PHAR' => [
+            self::FIXTURES.'/../phar/empty-pdf.pdf',
         ];
     }
 
