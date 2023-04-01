@@ -2,33 +2,52 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Phar;
 
 use KevinGH\Box\Pharaoh\InvalidPhar;
 use Phar;
 use PharData;
 use PHPUnit\Framework\TestCase;
+use const DIRECTORY_SEPARATOR;
 
 /**
  * @covers \KevinGH\Box\Phar\PharFactory
  *
  * @preserveGlobalState disabled
  * @runTestsInSeparateProcesses
+ *
+ * @internal
  */
 final class PharFactoryTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__.'/../../fixtures/info';
+    private const FIXTURES_DIR = __DIR__.'/../../fixtures/phar';
 
-    public function test_it_can_create_phars(): void
+    /**
+     * @dataProvider validPharProvider
+     */
+    public function test_it_can_create_phar_instance(string $file): void
     {
-        $phar = PharFactory::createPhar(self::FIXTURES_DIR.'/simple-phar.phar');
+        $phar = PharFactory::createPhar($file);
 
         self::assertSame(Phar::class, $phar::class);
     }
 
-    public function test_it_can_create_phar_datas(): void
+    /**
+     * @dataProvider validPharDataProvider
+     */
+    public function test_it_can_create_phar_data_instance(string $file): void
     {
-        $pharData = PharFactory::createPharData(self::FIXTURES_DIR.'/simple-phar.tar.gz');
+        $pharData = PharFactory::createPharData($file);
 
         self::assertSame(PharData::class, $pharData::class);
     }
@@ -39,62 +58,215 @@ final class PharFactoryTest extends TestCase
     public function test_it_fails_with_a_comprehensive_error_when_cannot_create_a_phar(
         string $file,
         string $expectedExceptionMessageRegex,
-    ): void
-    {
+    ): void {
         $this->expectException(InvalidPhar::class);
         $this->expectExceptionMessageMatches($expectedExceptionMessageRegex);
 
         PharFactory::createPhar($file);
     }
 
+    /**
+     * @dataProvider invalidPharDataProvider
+     */
+    public function test_it_fails_with_a_comprehensive_error_when_cannot_create_a_phar_data(
+        string $file,
+        string $expectedExceptionMessageRegex,
+    ): void {
+        $this->expectException(InvalidPhar::class);
+        $this->expectExceptionMessageMatches($expectedExceptionMessageRegex);
+
+        PharFactory::createPharData($file);
+    }
+
+    public static function validPharProvider(): iterable
+    {
+        yield 'simple PHAR' => [self::FIXTURES_DIR.DIRECTORY_SEPARATOR.'simple-phar.phar'];
+
+        // This works but results in an "empty PHAR": no signature, no stub, will fail to be executed, but can be
+        // instantiated nonetheless.
+        $tarVariants = [
+            'simple.zip.phar',
+            'simple.tar.phar',
+            'simple.tar.bz2.phar',
+            'simple.tar.gz.phar',
+        ];
+
+        foreach ($tarVariants as $tarVariant) {
+            yield $tarVariant => [self::FIXTURES_DIR.DIRECTORY_SEPARATOR.$tarVariant];
+        }
+
+        $signedPhars = [
+            'MD5' => 'simple-phar-md5-sign.phar',
+            'SHA1' => 'simple-phar-sha1-sign.phar',
+            'SHA256' => 'simple-phar-sha256-sign.phar',
+            'SHA512' => 'simple-phar-sha512-sign.phar',
+            'OpenSSL (no passphrase)' => 'simple-phar-openssl-sign.phar',
+        ];
+
+        foreach ($signedPhars as $alogrithm => $signedPhar) {
+            yield $alogrithm => [self::FIXTURES_DIR.DIRECTORY_SEPARATOR.$signedPhar];
+        }
+    }
+
+    public static function validPharDataProvider(): iterable
+    {
+        $data = [
+            'simple tar archive' => 'simple.tar',
+            'simple ZIP archive' => 'simple.zip',
+            'simple BZ2 archive' => 'simple.tar.bz2',
+            'simple GZ archive' => 'simple.tar.gz',
+        ];
+
+        foreach ($data as $label => $fileName) {
+            yield $label => [self::FIXTURES_DIR.DIRECTORY_SEPARATOR.$fileName];
+        }
+    }
+
     public static function invalidPharProvider(): iterable
     {
         yield 'URL of a valid PHAR' => [
             'https://github.com/box-project/box/releases/download/4.3.8/box.phar',
-            '/^Cannot create a PHAR object from a URL like ".+"\. PHAR objects can only be created from local files\.$/',
+            '/^Cannot create a Phar or PharData instance for the file path ".+"\. PHAR objects can only be created from local files\.$/',
         ];
 
-        yield 'x' => [
-            self::FIXTURES_DIR.'/../phar/Empty.pdf',
-            '/^foo\.$/',
+        yield 'FTPS URL of a valid PHAR' => [
+            'ftps://github.com/box-project/box/releases/download/4.3.8/box.phar',
+            '/^Cannot create a Phar or PharData instance for the file path ".+"\. PHAR objects can only be created from local files\.$/',
         ];
 
-        // TODO:
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1330
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1343
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1351
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1430
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#LL1565C45-L1565C45
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1669
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1694
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1705
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1708
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1721
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1730
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1735
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1743
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1750
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1763
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L529
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L853
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L874
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L892
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L903
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L921
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L931
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L948
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L958
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L975
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L985
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1002
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1012
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1024
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1033
-        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1064
+        yield 'local stream' => [
+            'php://stdout',
+            '/^Cannot create a Phar or PharData instance for the file path ".+"\. PHAR objects can only be created from local files\.$/',
+        ];
+
+        yield 'non existent file with a valid PHAR name' => [
+            self::FIXTURES_DIR.DIRECTORY_SEPARATOR.'non-existent-file.phar',
+            '/^Could not find the file ".+"\.$/',
+        ];
+
+        yield 'non-compressed binary file (empty PDF)' => [
+            self::FIXTURES_DIR.'/empty-pdf.pdf',
+            '/^Cannot create a Phar instance from the file ".+"\. The file must have the extension "\.phar"\.$/',
+        ];
+
+        yield 'non-compressed empty file' => [
+            self::FIXTURES_DIR.'/empty-file.phar',
+            '/^Cannot create a Phar instance from the file ".+"\. The archive is corrupted: Truncated entry\.$/',
+        ];
+
+        $validPharDatasWithoutPharExtension = [
+            'simple.zip',
+            'simple.tar',
+            'simple.tar.bz2',
+            'simple.tar.gz',
+        ];
+
+        foreach ($validPharDatasWithoutPharExtension as $validPharDataWithoutPharExtension) {
+            yield $validPharDataWithoutPharExtension => [
+                self::FIXTURES_DIR.DIRECTORY_SEPARATOR.$validPharDataWithoutPharExtension,
+                '/^Cannot create a Phar instance from the file ".+"\. The file must have the extension "\.phar"\.$/',
+            ];
+        }
+
+        yield 'PHAR without the __HALT_COMPILER(); ?> token' => [
+            self::FIXTURES_DIR.DIRECTORY_SEPARATOR.'corruted-phar-no-halt-compiler.phar',
+            '/^Cannot create a Phar instance from the file ".+"\. The archive is corrupted: __HALT_COMPILER\(\); not found\.$/',
+        ];
+
+        yield 'OpenSSL signed PHAR without its pubkey' => [
+            self::FIXTURES_DIR.DIRECTORY_SEPARATOR.'simple-phar-openssl-sign-without-pubkey.phar',
+            '/^Could not create a Phar instance for the file ".+"\. The OpenSSL signature could not be read or verified\.$/',
+        ];
+
+        yield 'OpenSSL signed PHAR without a different pubkey' => [
+            self::FIXTURES_DIR.DIRECTORY_SEPARATOR.'simple-phar-openssl-sign-with-diff-pubkey.phar',
+            '/^Could not create a Phar instance for the file ".+"\. The OpenSSL signature could not be read or verified\.$/',
+        ];
+
+        yield 'OpenSSL signed PHAR without an invalid pubkey' => [
+            self::FIXTURES_DIR.DIRECTORY_SEPARATOR.'simple-phar-openssl-sign-with-invalid-pubkey.phar',
+            '/^Could not create a Phar instance for the file ".+"\. The OpenSSL signature could not be read or verified\.$/',
+        ];
+
+        yield 'PHAR for which the stub content has been altered without updating its signature' => [
+            self::FIXTURES_DIR.DIRECTORY_SEPARATOR.'corrupted-phar-altered-stub.phar',
+            '/^Could not create a Phar instance for the file ".+"\. The archive signature is broken\.$/',
+        ];
+
+        yield 'PHAR for which the content has been altered without updating its signature' => [
+            self::FIXTURES_DIR.DIRECTORY_SEPARATOR.'corrupted-phar-altered-binary.phar',
+            '/^Could not create a Phar instance for the file ".+"\. The archive signature is broken\.$/',
+        ];
+
+        yield 'PHAR for which an included file has been altered without updating its signature' => [
+            self::FIXTURES_DIR.DIRECTORY_SEPARATOR.'corrupted-phar-altered-included-file.phar',
+            '/^Could not create a Phar instance for the file ".+"\. The archive signature is broken\.$/',
+        ];
     }
 
-    public function test_it_fails_with_a_comprehensive_error_when_cannot_create_a_phar_data(): void
+    public static function invalidPharDataProvider(): iterable
     {
-$this->markTestSkipped();
+        // valid PHARs cannot be PharData instances
+        foreach (self::validPharProvider() as $label => [$file]) {
+            yield 'valid PHAR; '.$label => [
+                $file,
+                '/^Cannot create a PharData instance from the file ".+"\. The file must have the extension "\.zip", "\.tar", "\.tar\.bz2" or "\.tar\.gz"\.$/',
+            ];
+        }
+
+        yield 'URL of a valid tar' => [
+            'https://github.com/box-project/box/releases/download/4.3.8/box.tar',
+            '/^Cannot create a Phar or PharData instance for the file path ".+"\. PHAR objects can only be created from local files\.$/',
+        ];
+
+        yield 'FTPS URL of a valid PHAR' => [
+            'ftps://github.com/box-project/box/releases/download/4.3.8/box.tar',
+            '/^Cannot create a Phar or PharData instance for the file path ".+"\. PHAR objects can only be created from local files\.$/',
+        ];
+
+        yield 'local stream' => [
+            'php://stdout',
+            '/^Cannot create a Phar or PharData instance for the file path ".+"\. PHAR objects can only be created from local files\.$/',
+        ];
+
+        yield 'non existent file with a valid PharData name' => [
+            self::FIXTURES_DIR.DIRECTORY_SEPARATOR.'non-existent-file.tar',
+            '/^Could not find the file ".+"\.$/',
+        ];
+
+        yield 'corrupted ZIP file' => [
+            self::FIXTURES_DIR.DIRECTORY_SEPARATOR.'corrupted-simple.zip',
+            '/^Cannot create a PharData instance from the file ".+"\. The archive is corrupted: __HALT_COMPILER\(\); not found\.$/',
+        ];
+
+        yield 'non-compressed binary file (empty PDF)' => [
+            self::FIXTURES_DIR.'/empty-pdf.pdf',
+            '/^Cannot create a PharData instance from the file ".+"\. The archive is corrupted: __HALT_COMPILER\(\); not found\.$/',
+        ];
+
+        yield 'non-compressed empty file' => [
+            self::FIXTURES_DIR.'/empty-file.zip',
+            '/^Cannot create a PharData instance from the file ".+"\. The archive is corrupted: Truncated entry\.$/',
+        ];
+
+        yield 'OpenSSL signed PHAR renamed to tar without its pubkey' => [
+            self::FIXTURES_DIR.'/simple-phar-openssl-sign.tar',
+            '/^Could not create a PharData instance for the file ".+"\. The OpenSSL signature could not be read or verified\.$/',
+        ];
+
+        yield 'signed PHAR renamed to tar for which the stub content has been altered without updating its signature' => [
+            self::FIXTURES_DIR.DIRECTORY_SEPARATOR.'corrupted-phar-altered-stub.tar',
+            '/^Could not create a PharData instance for the file ".+"\. The archive signature is broken\.$/',
+        ];
+
+        yield 'signed PHAR renamed to tar for which the binary content has been altered without updating its signature' => [
+            self::FIXTURES_DIR.DIRECTORY_SEPARATOR.'corrupted-phar-altered-binary.tar',
+            '/^Could not create a PharData instance for the file ".+"\. The archive signature is broken\.$/',
+        ];
+
+        yield 'signed PHAR renamed to tar for which an included file content has been altered without updating its signature' => [
+            self::FIXTURES_DIR.DIRECTORY_SEPARATOR.'corrupted-phar-altered-included-file.tar',
+            '/^Could not create a PharData instance for the file ".+"\. The archive signature is broken\.$/',
+        ];
     }
 }

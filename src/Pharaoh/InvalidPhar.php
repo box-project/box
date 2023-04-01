@@ -16,49 +16,116 @@ namespace KevinGH\Box\Pharaoh;
 
 use Throwable;
 use UnexpectedValueException;
-use function preg_match;
+use function Safe\preg_match;
 use function sprintf;
+use function str_contains;
+use function str_ends_with;
 use function str_starts_with;
+use function ucfirst;
 
 final class InvalidPhar extends PharError
 {
-    public static function create(string $file, ?Throwable $previous): self
+    public static function fileNotLocal(string $file): self
+    {
+        // Covers:
+        // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1328
+        return new self(
+            sprintf(
+                'Cannot create a Phar or PharData instance for the file path "%s". PHAR objects can only be created from local files.',
+                $file,
+            ),
+        );
+    }
+
+    public static function fileNotFound(string $file): self
     {
         return new self(
-            self::mapThrowableToErrorMessage($file, $previous),
+            sprintf(
+                'Could not find the file "%s".',
+                $file,
+            ),
+        );
+    }
+
+    public static function forPhar(string $file, ?Throwable $previous): self
+    {
+        return new self(
+            self::mapThrowableToErrorMessage($file, $previous, false),
             previous: $previous,
         );
     }
 
-    private static function mapThrowableToErrorMessage(string $file, ?Throwable $throwable): string
+    public static function forPharData(string $file, ?Throwable $previous): self
     {
+        return new self(
+            self::mapThrowableToErrorMessage($file, $previous, true),
+            previous: $previous,
+        );
+    }
+
+    private static function mapThrowableToErrorMessage(
+        string $file,
+        ?Throwable $throwable,
+        bool $isPharData,
+    ): string {
+        $message = $throwable->getMessage();
+
         if ($throwable instanceof UnexpectedValueException) {
-            // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1328
-            if (str_starts_with($throwable->getMessage(), 'Cannot create a phar archive from a URL like')) {
+            // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1330
+            if (str_ends_with($message, 'file extension (or combination) not recognised or the directory does not exist')) {
                 return sprintf(
-                    'Cannot create a PHAR object from a URL like "%s". PHAR objects can only be created from local files.',
+                    'Cannot create a %s instance from the file "%s". The file must have the extension "%s".',
+                    $isPharData ? 'PharData' : 'Phar',
+                    $file,
+                    $isPharData ? '.zip", ".tar", ".tar.bz2" or ".tar.gz' : '.phar',
+                );
+            }
+
+            // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1791
+            // and a few other similar errors.
+            if (str_starts_with($message, 'internal corruption of phar ')) {
+                preg_match('/^internal corruption of phar \".+\" \((?<reason>.+)\)$/', $message, $matches);
+
+                return sprintf(
+                    'Cannot create a %s instance from the file "%s". The archive is corrupted: %s.',
+                    $isPharData ? 'PharData' : 'Phar',
+                    $file,
+                    ucfirst($matches['reason']),
+                );
+            }
+
+            // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L874
+            // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L892
+            // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L903
+            if (str_contains($message, ' openssl signature ')) {
+                return sprintf(
+                    'Could not create a %s instance for the file "%s". The OpenSSL signature could not be read or verified.',
+                    $isPharData ? 'PharData' : 'Phar',
+                    $file,
+                );
+            }
+
+            // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1002
+            // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1012
+            // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1024
+            // And analogue ones for the other signatures
+            if (str_contains($message, ' has a broken signature')
+                || str_contains($message, ' signature could not be verified')
+                || str_contains($message, ' has a broken or unsupported signature')
+            ) {
+                return sprintf(
+                    'Could not create a %s instance for the file "%s". The archive signature is broken.',
+                    $isPharData ? 'PharData' : 'Phar',
                     $file,
                 );
             }
         }
 
-        return self::couldNotVerifyOpenSSLSignature($throwable)
-            ? sprintf(
-                'Could not create a Phar or PharData instance for the file "%s": the OpenSSL signature could not be verified.',
-                $file,
-            )
-            : sprintf(
-                'Could not create a Phar or PharData instance for the file "%s".',
-                $file,
-            );
-    }
-
-    private static function couldNotVerifyOpenSSLSignature(?Throwable $previous): bool
-    {
-        return null !== $previous
-            && 1 === preg_match(
-                '/^phar ".*" openssl signature could not be verified: openssl signature could not be verified/',
-                $previous->getMessage(),
-            );
+        return sprintf(
+            'Could not create a %s instance for the file "%s": %s',
+            $isPharData ? 'PharData' : 'Phar',
+            $file,
+            $message,
+        );
     }
 }
