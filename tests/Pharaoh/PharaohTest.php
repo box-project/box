@@ -188,14 +188,11 @@ final class PharaohTest extends TestCase
 
     public function test_it_throws_an_error_when_a_phar_cannot_be_created_due_to_unverifiable_signature(): void
     {
-        $file = self::FIXTURES_DIR.'/phar/simple-phar-openssl-sign-with-invalid-pubkey.pharg';
+        $file = self::FIXTURES_DIR.'/phar/simple-phar-openssl-sign-with-invalid-pubkey.phar';
 
-        try {
-            new Pharaoh($file);
+        $this->expectException(InvalidPhar::class);
+        $this->expectExceptionMessageMatches('/^Could not create a Phar or PharData instance for the file /');
 
-            self::fail();
-        } catch (InvalidPhar $exception) {
-            self::assertNotNull($exception->getPrevious());
-        }
+        new Pharaoh($file);
     }
 }

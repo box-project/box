@@ -261,14 +261,15 @@ final class Pharaoh
             'extract',
             $file,
             $tmp,
-            '--quiet',
+            '--no-interaction',
+            '--internal',
         ]);
         $extractPharProcess->run();
 
         if (false === $extractPharProcess->isSuccessful()) {
             throw new InvalidPhar(
-                'TODO.',
-                0,
+                $extractPharProcess->getErrorOutput(),
+                $extractPharProcess->getExitCode(),
                 new ProcessFailedException($extractPharProcess),
             );
         }
