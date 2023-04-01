@@ -22,6 +22,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use function count;
 use function KevinGH\Box\FileSystem\make_path_relative;
+use function rtrim;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Extract
@@ -71,8 +72,10 @@ class ExtractTest extends CommandTestCase
         $expectedSimplePharFiles = [
             '.hidden' => 'baz',
             'foo' => 'bar',
-            '.phar/stub.php' => file_get_contents(self::FIXTURES.'/simple-phar-stub.php'),
+            '.phar/stub.php' => rtrim(file_get_contents(self::FIXTURES.'/simple-phar-stub.php'), "\n"),
             '.phar/signature.json' => '{"hash":"966C5D96F7A3C67F8FC06D3DF55CE4C9AC820F47","hash_type":"SHA-1"}',
+            '.phar/metadata' => 'NULL',
+            '.phar/phar_version' => '1.1.0',
         ];
 
         yield 'simple PHAR' => [
@@ -106,6 +109,8 @@ class ExtractTest extends CommandTestCase
                     PHP,
                 '.phar/stub.php' => file_get_contents(self::FIXTURES.'/sha512-phar-stub.php'),
                 '.phar/signature.json' => '{"hash":"B4CAE177138A773283A748C8770A7142F0CC36D6EE88E37900BCF09A92D840D237CE3F3B47C2C7B39AC2D2C0F9A16D63FE70E1A455723DD36840B6E2E64E2130","hash_type":"SHA-512"}',
+                '.phar/metadata' => 'NULL',
+                '.phar/phar_version' => '1.1.0',
             ],
         ];
 
@@ -125,6 +130,8 @@ class ExtractTest extends CommandTestCase
                     EOF,
                 '.phar/stub.php' => file_get_contents(self::FIXTURES.'/sha512-phar-stub.php'),
                 '.phar/signature.json' => '{"hash":"54AF1D4E5459D3A77B692E46FDB9C965D1C7579BD1F2AD2BECF4973677575444FE21E104B7655BA3D088090C28DF63D14876B277C423C8BFBCDB9E3E63F9D61A","hash_type":"OpenSSL"}',
+                '.phar/metadata' => 'NULL',
+                '.phar/phar_version' => '1.1.0',
             ],
         ];
     }
