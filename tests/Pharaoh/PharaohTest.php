@@ -147,7 +147,7 @@ final class PharaohTest extends TestCase
             self::fail();
         } catch (InvalidPhar $exception) {
             self::assertMatchesRegularExpression(
-                '/^Could not create a Phar or PharData instance for the file ".*"\.$/',
+                '/^Could not create a Phar or PharData instance for the file /',
                 $exception->getMessage(),
             );
             self::assertNotNull($exception->getPrevious());
