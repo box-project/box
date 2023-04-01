@@ -19,10 +19,12 @@ use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
 use KevinGH\Box\Phar\PharFactory;
+use KevinGH\Box\Pharaoh\InvalidPhar;
 use KevinGH\Box\Pharaoh\Pharaoh;
 use ParagonIE\ConstantTime\Hex;
 use Phar;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Throwable;
 use function file_exists;
@@ -43,6 +45,7 @@ final class Extract implements Command
 {
     private const PHAR_ARG = 'phar';
     private const OUTPUT_ARG = 'output';
+    private const INTERNAL_OPT = 'internal';
 
     public function getConfiguration(): Configuration
     {
@@ -62,6 +65,14 @@ final class Extract implements Command
                     'The output directory',
                 ),
             ],
+            [
+                new InputOption(
+                    self::INTERNAL_OPT,
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Internal option; Should not be used.',
+                ),
+            ],
         );
     }
 
@@ -71,6 +82,7 @@ final class Extract implements Command
 
         $pharPath = self::getPharFilePath($io);
         $outputDir = $io->getArgument(self::OUTPUT_ARG)->asNonEmptyString();
+        $internal = $io->getOption(self::INTERNAL_OPT)->asBoolean();
 
         if (null === $pharPath) {
             return ExitCode::FAILURE;
@@ -82,7 +94,7 @@ final class Extract implements Command
                     'The output directory already exists. Do you want to delete its current content?',
                     // If is interactive, we want the prompt to default to false since it can be an error made by the user.
                     // Otherwise, this is likely launched by a script or Pharaoh in which case we do not care.
-                    !$io->isInteractive(),
+                    $internal,
                 ),
             );
 
@@ -97,7 +109,17 @@ final class Extract implements Command
 
         mkdir($outputDir);
 
-        self::dumpPhar($pharPath, $outputDir);
+        try {
+            self::dumpPhar($pharPath, $outputDir);
+        } catch (InvalidPhar $invalidPhar) {
+            if (!$internal) {
+                throw $invalidPhar;
+            }
+
+            $io->getErrorIO()->write($invalidPhar->getMessage());
+
+            return ExitCode::FAILURE;
+        }
 
         return ExitCode::SUCCESS;
     }

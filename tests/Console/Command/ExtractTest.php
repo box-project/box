@@ -53,6 +53,7 @@ class ExtractTest extends CommandTestCase
                 'command' => 'extract',
                 'phar' => $pharPath,
                 'output' => $this->tmp,
+                '--internal' => null,
             ],
             ['interactive' => false],
         );
@@ -133,21 +134,31 @@ class ExtractTest extends CommandTestCase
      */
     public function test_it_asks_confirmation_before_deleting_the_output_dir(
         bool $outputDirExists,
-        bool $interactive,
-        bool $input,
+        bool $internal,
+        ?bool $input,
         bool $expectedToSucceed,
     ): void {
         $outputDir = $outputDirExists ? $this->tmp : $this->tmp.'/subdir';
 
-        $this->commandTester->setInputs([$input ? 'yes' : 'no']);
-        $this->commandTester->execute(
-            [
-                'command' => 'extract',
-                'phar' => self::FIXTURES.'/simple-phar.phar',
-                'output' => $outputDir,
-            ],
-            ['interactive' => $interactive],
-        );
+        if (null !== $input) {
+            $commandOptions = ['interactive' => true];
+            $this->commandTester->setInputs([$input ? 'yes' : 'no']);
+        } else {
+            $commandOptions = ['interactive' => false];
+        }
+
+        $commandInput = [
+            'command' => 'extract',
+            'phar' => self::FIXTURES.'/simple-phar.phar',
+            'output' => $outputDir,
+            '--internal' => null,
+        ];
+
+        if (!$internal) {
+            unset($commandInput['--internal']);
+        }
+
+        $this->commandTester->execute($commandInput, $commandOptions);
 
         $actualFiles = $this->collectExtractedFiles();
 
@@ -162,45 +173,52 @@ class ExtractTest extends CommandTestCase
 
     public static function confirmationQuestionProvider(): iterable
     {
-        yield 'exists; accept' => [
+        yield 'exists; internal; interactive & accept => delete' => [
             true,
             true,
             true,
             true,
         ];
 
-        yield 'exists; refuse' => [
+        yield 'exists; internal; interactive & refuse => do not delete' => [
             true,
             true,
             false,
+            false,
+        ];
+
+        yield 'exists; internal; not interactive => delete' => [
+            true,
+            true,
+            null,
+            true,
+        ];
+
+        yield 'exists; not internal; interactive & accept => delete' => [
+            true,
+            false,
+            true,
+            true,
+        ];
+
+        yield 'exists; not internal; interactive & refuse => do not delete' => [
+            true,
+            false,
+            false,
+            false,
+        ];
+
+        yield 'exists; not internal; not interactive => do not delete' => [
+            true,
+            false,
+            null,
             false,
         ];
 
         yield 'does not exist: the question is not asked' => [
             false,
             true,
-            false,
-            true,
-        ];
-
-        yield 'exists; not interactive; accept' => [
-            true,
-            false,
-            true,
-            true,
-        ];
-
-        yield 'exists; not interactive; refuse' => [
-            true,
-            false,
-            false,
-            true,
-        ];
-
-        yield 'not interactive; does not exist: the question is not asked' => [
-            false,
-            false,
-            false,
+            null,
             true,
         ];
     }
@@ -216,11 +234,12 @@ class ExtractTest extends CommandTestCase
                     'command' => 'extract',
                     'phar' => $pharPath,
                     'output' => $this->tmp,
+                    '--internal' => false,
                 ],
                 ['interactive' => false],
             );
 
-            self::fail('Expected exception to be thrown.');
+            self::assertSame(ExitCode::FAILURE, $this->commandTester->getStatusCode());
         } catch (InvalidPhar $exception) {
             // Continue
         }
@@ -230,9 +249,36 @@ class ExtractTest extends CommandTestCase
 
     public static function invalidPharPath(): iterable
     {
+        yield 'non-existent file' => [
+            '/unknown',
+        ];
+
         yield 'not a valid PHAR' => [
             self::FIXTURES.'/../phar/empty-pdf.pdf',
         ];
+    }
+
+    public function test_it_writes_the_invalid_phar_error_to_the_stderr_when_cannot_extract_a_phar_in_internal_mode(): void
+    {
+        $this->commandTester->execute(
+            [
+                'command' => 'extract',
+                'phar' => self::FIXTURES.'/../phar/empty-pdf.pdf',
+                'output' => $this->tmp,
+                '--internal' => true,
+            ],
+            [
+                'interactive' => false,
+                'capture_stderr_separately' => true,
+            ],
+        );
+
+        self::assertSame(ExitCode::FAILURE, $this->commandTester->getStatusCode());
+        self::assertSame('', $this->commandTester->getDisplay(true));
+        self::assertMatchesRegularExpression(
+            '/^Could not create a Phar or PharData instance for the file/',
+            $this->commandTester->getErrorOutput(true),
+        );
     }
 
     /**
