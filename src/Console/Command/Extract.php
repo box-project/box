@@ -18,15 +18,13 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
-use KevinGH\Box\Pharaoh\InvalidPhar;
+use KevinGH\Box\Phar\PharFactory;
 use KevinGH\Box\Pharaoh\Pharaoh;
 use ParagonIE\ConstantTime\Hex;
 use Phar;
-use PharData;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Throwable;
-use UnexpectedValueException;
 use function file_exists;
 use function KevinGH\Box\check_php_settings;
 use function KevinGH\Box\FileSystem\copy;
@@ -145,7 +143,7 @@ final class Extract implements Command
                 copy($pubkey, $tmpPubkey, true);
             }
 
-            $phar = self::createPhar($file, $tmpFile);
+            $phar = PharFactory::create($tmpFile);
 
             $phar->extractTo($tmpDir);
         } catch (Throwable $throwable) {
@@ -185,14 +183,5 @@ final class Extract implements Command
         }
 
         return '' === $extension ? '.phar' : $extension;
-    }
-
-    private static function createPhar(string $file, string $tmpFile): Phar|PharData
-    {
-        try {
-            return new Phar($tmpFile);
-        } catch (UnexpectedValueException $cannotCreatePhar) {
-            throw InvalidPhar::forPhar($file, $cannotCreatePhar);
-        }
     }
 }
