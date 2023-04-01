@@ -46,6 +46,8 @@ final class Extract implements Command
     public const PUBKEY_PATH = '.phar/pubkey';
     public const SIGNATURE_PATH = '.phar/signature.json';
     public const STUB_PATH = '.phar/stub.php';
+    public const VERSION_PATH = '.phar/phar_version';
+    public const METADATA_PATH = '.phar/metadata';
 
     private const PHAR_ARG = 'phar';
     private const OUTPUT_ARG = 'output';
@@ -183,6 +185,14 @@ final class Extract implements Command
             json_encode($phar->getSignature()),
         );
         dump_file($tmpStub, $phar->getStub());
+        dump_file(
+            $tmpDir.DIRECTORY_SEPARATOR.self::VERSION_PATH,
+            $phar->getVersion(),
+        );
+        dump_file(
+            $tmpDir.DIRECTORY_SEPARATOR.self::METADATA_PATH,
+            var_export($phar->getMetadata(), true),
+        );
 
         // Cleanup the temporary PHAR.
         remove([$tmpFile, $intermediatePubkey]);
