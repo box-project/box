@@ -14,38 +14,27 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use Closure;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
-use KevinGH\Box\Box;
-use KevinGH\Box\Pharaoh\InvalidPhar;
+use KevinGH\Box\Phar\PharFactory;
 use KevinGH\Box\Pharaoh\Pharaoh;
 use ParagonIE\ConstantTime\Hex;
 use Phar;
-use PharData;
-use RecursiveIteratorIterator;
-use RuntimeException;
-use Symfony\Component\Console\Exception\RuntimeException as ConsoleRuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
-use Symfony\Component\Console\Question\Question;
 use Throwable;
-use UnexpectedValueException;
-use function count;
 use function file_exists;
-use function KevinGH\Box\bump_open_file_descriptor_limit;
 use function KevinGH\Box\check_php_settings;
 use function KevinGH\Box\FileSystem\copy;
 use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\make_tmp_dir;
+use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
 use function realpath;
-use function sprintf;
 use function Safe\json_encode;
+use function sprintf;
 use const DIRECTORY_SEPARATOR;
-use function KevinGH\Box\FileSystem\mkdir;
 
 /**
  * @private
@@ -59,18 +48,18 @@ final class Extract implements Command
     {
         return new Configuration(
             'extract',
-            '🚚  Extracts a given PHAR into a directory.',
+            '🚚  Extracts a given PHAR into a directory',
             '',
             [
                 new InputArgument(
                     self::PHAR_ARG,
                     InputArgument::REQUIRED,
-                    'The path to PHAR file.',
+                    'The path to the PHAR file',
                 ),
                 new InputArgument(
                     self::OUTPUT_ARG,
                     InputArgument::REQUIRED,
-                    'The output directory.',
+                    'The output directory',
                 ),
             ],
         );
@@ -99,7 +88,7 @@ final class Extract implements Command
 
             if ($canDelete) {
                 remove($outputDir);
-                // Continue
+            // Continue
             } else {
                 // Do nothing
                 return ExitCode::FAILURE;
@@ -107,6 +96,7 @@ final class Extract implements Command
         }
 
         mkdir($outputDir);
+
         self::dumpPhar($pharPath, $outputDir);
 
         return ExitCode::SUCCESS;
@@ -135,30 +125,41 @@ final class Extract implements Command
         // We have to give every one a different alias, or it pukes.
         $alias = self::generateAlias($file);
 
-        $tmpFile = $tmpDir . DIRECTORY_SEPARATOR . $alias;
-        $pubkey = $file . '.pubkey';
-        $tmpPubkey = $tmpFile . '.pubkey';
-        $tmpSignature = $tmpDir . DIRECTORY_SEPARATOR . 'signature';
-        $tmpAlias = $tmpDir . DIRECTORY_SEPARATOR . 'alias';
-        $tmpStub = $tmpDir . DIRECTORY_SEPARATOR . 'stub.php';
-        $tmpPharContent = $tmpDir.DIRECTORY_SEPARATOR.'content';
+        // Create a temporary PHAR: this is because the extension might be
+        // missing in which case we would not be able to create a Phar instance
+        // as it requires the .phar extension.
+        $tmpFile = $tmpDir.DIRECTORY_SEPARATOR.$alias;
+        $pubkey = $file.'.pubkey';
+        $intermediatePubkey = $tmpFile.'.pubkey';
+        $tmpPubkey = $tmpDir.'/.phar/pubkey';
+        $tmpSignature = $tmpDir.'/.phar/signature.json';
+        $tmpStub = $tmpDir.'/.phar/stub.php';
 
-        copy($file, $tmpFile, true);
+        try {
+            copy($file, $tmpFile, true);
 
-        if (file_exists($pubkey)) {
-            copy($pubkey, $tmpPubkey, true);
+            if (file_exists($pubkey)) {
+                copy($pubkey, $intermediatePubkey, true);
+                copy($pubkey, $tmpPubkey, true);
+            }
+
+            $phar = PharFactory::create($tmpFile);
+
+            $phar->extractTo($tmpDir);
+        } catch (Throwable $throwable) {
+            remove([$tmpFile, $intermediatePubkey, $tmpPubkey]);
+
+            throw $throwable;
         }
-
-        $phar = self::createPhar($file, $tmpFile);
 
         dump_file(
             $tmpSignature,
             json_encode($phar->getSignature()),
         );
-        dump_file($tmpAlias, $phar->getAlias());
         dump_file($tmpStub, $phar->getStub());
 
-        $phar->extractTo($tmpPharContent);
+        // Cleanup the temporary PHAR.
+        remove([$tmpFile, $intermediatePubkey]);
 
         return $tmpDir;
     }
@@ -167,7 +168,7 @@ final class Extract implements Command
     {
         $extension = self::getExtension($file);
 
-        return Hex::encode(random_bytes(16)) . $extension;
+        return Hex::encode(random_bytes(16)).$extension;
     }
 
     private static function getExtension(string $file): string
@@ -176,26 +177,11 @@ final class Extract implements Command
         $extension = '';
 
         while ('' !== $lastExtension) {
-            $extension = '.' . $lastExtension . $extension;
+            $extension = '.'.$lastExtension.$extension;
             $file = mb_substr($file, 0, -(mb_strlen($lastExtension) + 1));
             $lastExtension = pathinfo($file, PATHINFO_EXTENSION);
         }
 
         return '' === $extension ? '.phar' : $extension;
-    }
-
-    private static function createPhar(string $file, string $tmpFile): Phar|PharData
-    {
-        try {
-            return new Phar($tmpFile);
-        } catch (UnexpectedValueException $cannotCreatePhar) {
-            // Continue
-        }
-
-        try {
-            return new PharData($tmpFile);
-        } catch (UnexpectedValueException) {
-            throw InvalidPhar::create($file, $cannotCreatePhar);
-        }
     }
 }

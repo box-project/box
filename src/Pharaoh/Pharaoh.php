@@ -267,7 +267,7 @@ final class Pharaoh
         try {
             return new PharData($tmpFile);
         } catch (UnexpectedValueException) {
-            throw InvalidPhar::create($file, $cannotCreatePhar);
+            throw InvalidPhar::forPharAndPharData($file, $cannotCreatePhar);
         }
     }
 
