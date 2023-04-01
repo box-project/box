@@ -34,6 +34,37 @@ final class PharFactory
     /**
      * @throws InvalidPhar
      */
+    public static function create(string $file): Phar|PharData
+    {
+        if (!Path::isLocal($file)) {
+            // This is needed as otherwise Phar::__construct() does correctly bail out on a URL
+            // path, but not on other non-local variants, e.g. FTPS, which case it may fail still
+            // but after a timeout, which is too slow.
+            throw InvalidPhar::fileNotLocal($file);
+        }
+
+        if (!file_exists($file)) {
+            // We need to check this case since the goal of this factory is to instantiate an existing
+            // PHAR, not create a new one.
+            throw InvalidPhar::fileNotFound($file);
+        }
+
+        try {
+            return new Phar($file);
+        } catch (Throwable $cannotCreatePhar) {
+            // Continue
+        }
+
+        try {
+            return new PharData($file);
+        } catch (Throwable) {
+            throw InvalidPhar::forPhar($file, $cannotCreatePhar);
+        }
+    }
+
+    /**
+     * @throws InvalidPhar
+     */
     public static function createPhar(string $file): Phar
     {
         if (!Path::isLocal($file)) {

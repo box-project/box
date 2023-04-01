@@ -53,6 +53,16 @@ final class PharFactoryTest extends TestCase
     }
 
     /**
+     * @dataProvider validPharAndPharDataProvider
+     */
+    public function test_it_can_create_phar_or_phar_data_instance(string $file): void
+    {
+        PharFactory::create($file);
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
      * @dataProvider invalidPharProvider
      */
     public function test_it_fails_with_a_comprehensive_error_when_cannot_create_a_phar(
@@ -120,6 +130,12 @@ final class PharFactoryTest extends TestCase
         foreach ($data as $label => $fileName) {
             yield $label => [self::FIXTURES_DIR.DIRECTORY_SEPARATOR.$fileName];
         }
+    }
+
+    public static function validPharAndPharDataProvider(): iterable
+    {
+        yield from self::validPharProvider();
+        yield from self::validPharDataProvider();
     }
 
     public static function invalidPharProvider(): iterable
