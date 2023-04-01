@@ -210,7 +210,7 @@ class DiffTest extends CommandTestCase
             ],
         );
 
-        $expected = '/^Could not check the PHARs: Could not create a Phar instance for the file .+$/';
+        $expected = '/^Could not check the PHARs: Could not create a Phar or PharData instance for the file .+$/';
 
         self::assertMatchesRegularExpression($expected, $this->commandTester->getDisplay(true));
         self::assertSame(1, $this->commandTester->getStatusCode());
