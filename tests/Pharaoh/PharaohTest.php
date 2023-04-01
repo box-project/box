@@ -59,7 +59,7 @@ final class PharaohTest extends TestCase
 
     public static function fileProvider(): iterable
     {
-        $defaultStub = rtrim(file_get_contents(self::FIXTURES_DIR.'/phar/default-stub.php'), "\n");
+        $defaultStub = rtrim(file_get_contents(self::FIXTURES_DIR.'/phar/default-phar-stub.php'), "\n");
 
         yield 'simple PHAR (2017)' => [
             self::FIXTURES_DIR.'/extract/simple-phar-2017.phar',
@@ -70,7 +70,7 @@ final class PharaohTest extends TestCase
             ],
             null,
             null,
-            rtrim(file_get_contents(self::FIXTURES_DIR.'/extract/old-default-stub.php'), "\n"),
+            rtrim(file_get_contents(self::FIXTURES_DIR.'/extract/old-default-phar-stub.php'), "\n"),
             ['foo.php'],
         ];
 

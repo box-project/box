@@ -74,7 +74,7 @@ exit;
 $a = realpath(Extract_Phar::$temp . DIRECTORY_SEPARATOR . $pt);
 if (!$a || strlen(dirname($a)) < strlen(Extract_Phar::$temp)) {
 header('HTTP/1.0 404 Not Found');
-echo "<html>\n <head>\n  <title>File Not Found<title>\n </head>\n <body>\n  <h1>404 - File ", $pt, " Not Found</h1>\n </body>\n</html>";
+echo "<html>\n <head>\n  <title>File Not Found<title>\n </head>\n <body>\n  <h1>404 - File Not Found</h1>\n </body>\n</html>";
 exit;
 }
 $b = pathinfo($a);
@@ -108,7 +108,7 @@ const GZ = 0x1000;
 const BZ2 = 0x2000;
 const MASK = 0x3000;
 const START = 'index.php';
-const LEN = 6653;
+const LEN = 6643;
 
 static function go($return = false)
 {
