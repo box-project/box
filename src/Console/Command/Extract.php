@@ -192,7 +192,7 @@ final class Extract implements Command
         try {
             return new Phar($tmpFile);
         } catch (UnexpectedValueException $cannotCreatePhar) {
-            throw InvalidPhar::create($file, $cannotCreatePhar);
+            throw InvalidPhar::forPhar($file, $cannotCreatePhar);
         }
     }
 }
