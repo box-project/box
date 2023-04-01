@@ -31,7 +31,7 @@ final class InvalidPhar extends PharError
         // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1328
         return new self(
             sprintf(
-                'Cannot create a Phar or PharData instance for the file path "%s". PHAR objects can only be created from local files.',
+                'Could not create a Phar or PharData instance for the file path "%s". PHAR objects can only be created from local files.',
                 $file,
             ),
         );
