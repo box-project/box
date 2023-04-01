@@ -41,6 +41,12 @@ use const DIRECTORY_SEPARATOR;
  */
 final class Extract implements Command
 {
+    public const PUBKEY_PATH = '.phar/pubkey';
+    public const SIGNATURE_PATH = '.phar/signature.json';
+    public const STUB_PATH = '.phar/stub.php';
+    public const VERSION_PATH = '.phar/phar_version';
+    public const METADATA_PATH = '.phar/metadata';
+
     private const PHAR_ARG = 'phar';
     private const OUTPUT_ARG = 'output';
 
@@ -131,9 +137,7 @@ final class Extract implements Command
         $tmpFile = $tmpDir.DIRECTORY_SEPARATOR.$alias;
         $pubkey = $file.'.pubkey';
         $intermediatePubkey = $tmpFile.'.pubkey';
-        $tmpPubkey = $tmpDir.'/.phar/pubkey';
-        $tmpSignature = $tmpDir.'/.phar/signature.json';
-        $tmpStub = $tmpDir.'/.phar/stub.php';
+        $tmpPubkey = $tmpDir.DIRECTORY_SEPARATOR.self::PUBKEY_PATH;
 
         try {
             copy($file, $tmpFile, true);
@@ -153,10 +157,26 @@ final class Extract implements Command
         }
 
         dump_file(
-            $tmpSignature,
+            $tmpDir.DIRECTORY_SEPARATOR.self::SIGNATURE_PATH,
             json_encode($phar->getSignature()),
         );
-        dump_file($tmpStub, $phar->getStub());
+
+        $stub = $phar->getStub();
+        if ('' !== $stub) {
+            dump_file(
+                $tmpDir.DIRECTORY_SEPARATOR.self::STUB_PATH,
+                $stub,
+            );
+        }
+
+        dump_file(
+            $tmpDir.DIRECTORY_SEPARATOR.self::VERSION_PATH,
+            $phar->getVersion(),
+        );
+        dump_file(
+            $tmpDir.DIRECTORY_SEPARATOR.self::METADATA_PATH,
+            var_export($phar->getMetadata(), true),
+        );
 
         // Cleanup the temporary PHAR.
         remove([$tmpFile, $intermediatePubkey]);

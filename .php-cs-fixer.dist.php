@@ -14,7 +14,8 @@ $finder = Finder::create()
         'bin/box',
         'bin/generate_default_stub',
     ])
-    ->notName('*-phar-stub.php');
+    ->notName('*-phar-stub.php')
+    ->notName('*default-stub.php');
 
 $overriddenRules = [
     'header_comment' => [

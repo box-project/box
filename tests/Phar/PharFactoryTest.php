@@ -24,8 +24,8 @@ use const PHP_OS_FAMILY;
 
 /**
  * @covers \KevinGH\Box\Phar\PharFactory
+ * @covers \KevinGH\Box\Pharaoh\InvalidPhar
  *
- * @preserveGlobalState disabled
  * @runTestsInSeparateProcesses
  *
  * @internal
