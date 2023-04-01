@@ -43,6 +43,10 @@ use const DIRECTORY_SEPARATOR;
  */
 final class Extract implements Command
 {
+    public const PUBKEY_PATH = '.phar/pubkey';
+    public const SIGNATURE_PATH = '.phar/signature.json';
+    public const STUB_PATH = '.phar/stub.php';
+
     private const PHAR_ARG = 'phar';
     private const OUTPUT_ARG = 'output';
     private const INTERNAL_OPT = 'internal';
@@ -153,9 +157,9 @@ final class Extract implements Command
         $tmpFile = $tmpDir.DIRECTORY_SEPARATOR.$alias;
         $pubkey = $file.'.pubkey';
         $intermediatePubkey = $tmpFile.'.pubkey';
-        $tmpPubkey = $tmpDir.'/.phar/pubkey';
-        $tmpSignature = $tmpDir.'/.phar/signature.json';
-        $tmpStub = $tmpDir.'/.phar/stub.php';
+        $tmpPubkey = $tmpDir.DIRECTORY_SEPARATOR.self::PUBKEY_PATH;
+        $tmpSignature = $tmpDir.DIRECTORY_SEPARATOR.self::SIGNATURE_PATH;
+        $tmpStub = $tmpDir.DIRECTORY_SEPARATOR.self::STUB_PATH;
 
         try {
             copy($file, $tmpFile, true);
