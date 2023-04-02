@@ -42,10 +42,10 @@ final class PharMetaTest extends TestCase
     {
         yield 'minimal' => [
             new PharMeta(
-                false,
-                '',
-                '',
-                '',
+                null,
+                null,
+                null,
+                null,
                 null,
             ),
         ];
@@ -221,9 +221,9 @@ final class PharMetaTest extends TestCase
             self::FIXTURES_DIR.'/../phar/simple.tar',
             null,
             new PharMeta(
-                false,
-                '',
-                '',
+                null,
+                null,
+                null,
                 'NULL',
                 null,
             ),
