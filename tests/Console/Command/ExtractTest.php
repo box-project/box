@@ -82,7 +82,7 @@ class ExtractTest extends CommandTestCase
             ],
             $oldDefaultPharStub,
             '1.1.0',
-            'NULL',
+            null,
             null,
         );
 
@@ -115,7 +115,7 @@ class ExtractTest extends CommandTestCase
                         ],
                         $oldDefaultPharStub,
                         '1.1.0',
-                        'NULL',
+                        null,
                         null,
                     ))->toJson(),
                 ],
@@ -136,7 +136,7 @@ class ExtractTest extends CommandTestCase
                     ],
                     $sha512Stub,
                     '1.1.0',
-                    'NULL',
+                    null,
                     null,
                 ))->toJson(),
             ],
@@ -156,7 +156,7 @@ class ExtractTest extends CommandTestCase
                     ],
                     $sha512Stub,
                     '1.1.0',
-                    'NULL',
+                    null,
                     <<<'EOF'
                         -----BEGIN PUBLIC KEY-----
                         MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKuZkrHT54KtuBCTrR36+4tibd+2un9b

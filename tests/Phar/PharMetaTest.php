@@ -110,7 +110,7 @@ final class PharMetaTest extends TestCase
                 ],
                 $oldDefaultPharStub,
                 '1.1.0',
-                'NULL',
+                null,
                 null,
             ),
         ];
@@ -126,7 +126,7 @@ final class PharMetaTest extends TestCase
                     ],
                     $oldDefaultPharStub,
                     '1.1.0',
-                    'NULL',
+                    null,
                     null,
                 ),
             ];
@@ -142,7 +142,7 @@ final class PharMetaTest extends TestCase
                 ],
                 $sha512Stub,
                 '1.1.0',
-                'NULL',
+                null,
                 null,
             ),
         ];
@@ -157,7 +157,7 @@ final class PharMetaTest extends TestCase
                 ],
                 $sha512Stub,
                 '1.1.0',
-                'NULL',
+                null,
                 <<<'EOF'
                     -----BEGIN PUBLIC KEY-----
                     MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKuZkrHT54KtuBCTrR36+4tibd+2un9b
@@ -224,7 +224,7 @@ final class PharMetaTest extends TestCase
                 null,
                 null,
                 null,
-                'NULL',
+                null,
                 null,
             ),
         ];
