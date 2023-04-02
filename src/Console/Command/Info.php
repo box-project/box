@@ -25,6 +25,7 @@ use KevinGH\Box\Pharaoh\Pharaoh;
 use Phar;
 use PharData;
 use PharFileInfo;
+use SplFileInfo;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -207,12 +208,12 @@ final class Info implements Command
         if ($content) {
             self::renderContents(
                 $io,
-                $pharInfo->getPhar(),
+                $pharInfo->getFiles(),
                 0,
                 $depth,
                 $indent ? 0 : false,
                 $pharInfo->getRoot(),
-                $pharInfo->getPhar(),
+                $pharInfo,
                 $pharInfo->getRoot(),
             );
         } else {
@@ -274,79 +275,70 @@ final class Info implements Command
     }
 
     /**
-     * @param iterable<PharFileInfo> $list
+     * @param iterable<PharFileInfo> $source
      * @param -1|natural             $maxDepth
      * @param false|int              $indent   Nbr of indent or `false`
      */
     private static function renderContents(
         OutputInterface $output,
-        iterable $list,
-        int $depth,
-        int $maxDepth,
-        int|false $indent,
-        string $base,
-        Phar|PharData $phar,
-        string $root,
+        iterable        $source,
+        int             $depth,
+        int             $maxDepth,
+        int|false       $indent,
+        string          $base,
+        Pharaoh   $pharInfo,
     ): void {
         if (-1 !== $maxDepth && $depth > $maxDepth) {
             return;
         }
 
-        foreach ($list as $item) {
-            // TODO: review that
-            /** @var PharFileInfo $item */
-            $item = $phar[str_replace($root, '', $item->getPathname())];
-
+        foreach ($source as $relativePath => $fileInfo) {
+            /** @var SplFileInfo $fileInfo */
             if (false !== $indent) {
                 $output->write(str_repeat(' ', $indent));
 
-                $path = $item->getFilename();
+                $path = $fileInfo->getFilename();
 
-                if ($item->isDir()) {
+                if ($fileInfo->isDir()) {
                     $path .= '/';
                 }
             } else {
-                $path = str_replace($base, '', $item->getPathname());
+                $path = str_replace($base, '', $fileInfo->getPathname());
             }
 
-            if ($item->isDir()) {
+            if ($fileInfo->isDir()) {
                 if (false !== $indent) {
                     $output->writeln("<info>{$path}</info>");
                 }
             } else {
-                $compression = '<fg=red>[NONE]</fg=red>';
+                [
+                    'compression' => $compression,
+                    'compressedSize' => $compressionSize,
+                ] = $pharInfo->getFileMeta($relativePath);
 
-                foreach (CompressionAlgorithm::cases() as $compressionAlgorithm) {
-                    if (CompressionAlgorithm::NONE !== $compressionAlgorithm
-                        && $item->isCompressed($compressionAlgorithm->value)
-                    ) {
-                        $compression = "<fg=cyan>[{$compressionAlgorithm->name}]</fg=cyan>";
-                        break;
-                    }
-                }
-
-                $fileSize = format_size($item->getCompressedSize());
+                $compressionLine = CompressionAlgorithm::NONE === $compression
+                    ? '<fg=red>[NONE]</fg=red>'
+                    : "<fg=cyan>[{$compression->name}]</fg=cyan>";
 
                 $output->writeln(
                     sprintf(
                         '%s %s - %s',
                         $path,
-                        $compression,
-                        $fileSize,
+                        $compressionLine,
+                        format_size($compressionSize),
                     ),
                 );
             }
 
-            if ($item->isDir()) {
+            if ($fileInfo->isDir()) {
                 self::renderContents(
                     $output,
-                    new DirectoryIterator($item->getPathname()),
+                    new DirectoryIterator($fileInfo->getPathname()),
                     $depth + 1,
                     $maxDepth,
                     false === $indent ? $indent : $indent + 2,
                     $base,
-                    $phar,
-                    $root,
+                    $pharInfo,
                 );
             }
         }

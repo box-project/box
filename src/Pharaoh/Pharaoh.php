@@ -43,10 +43,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Pharaoh;
 
+use JetBrains\PhpStorm\ArrayShape;
 use KevinGH\Box\Console\Command\Extract;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\PharMeta;
 use KevinGH\Box\Phar\PharPhpSettings;
+use OutOfBoundsException;
 use ParagonIE\ConstantTime\Hex;
 use Phar;
 use PharData;
@@ -71,6 +73,7 @@ use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\remove;
 use function random_bytes;
+use function sprintf;
 
 // TODO: rename it to SafePhar
 /**
@@ -214,6 +217,25 @@ final class Pharaoh
     {
         // Do not cache the result
         return 'phar://'.str_replace('\\', '/', realpath($this->phar->getPath())).'/';
+    }
+
+    /**
+     * @return array{'compression': CompressionAlgorithm, compressedSize: int}
+     */
+    public function getFileMeta(string $path): array
+    {
+        $meta = $this->meta->filesMeta[$path] ?? null;
+
+        if (null === $meta) {
+            throw new OutOfBoundsException(
+                sprintf(
+                    'No metadata found for the file "%s".',
+                    $path,
+                ),
+            );
+        }
+
+        return $meta;
     }
 
     public function getVersion(): ?string

@@ -17,8 +17,17 @@ namespace KevinGH\Box\Phar;
 use JetBrains\PhpStorm\ArrayShape;
 use Phar;
 use PharData;
+use PharFileInfo;
+use RecursiveDirectoryIterator;
+use SplFileInfo;
+use Symfony\Component\Filesystem\Path;
+use UnexpectedValueException;
+use function KevinGH\Box\FileSystem\make_path_relative;
+use function Safe\realpath;
 use function Safe\json_decode;
 use function Safe\json_encode;
+use function sprintf;
+use function stat;
 use function var_export;
 
 /**
@@ -34,6 +43,7 @@ final class PharMeta
      * @param non-empty-string|null $version
      * @param non-empty-string|null $normalizedMetadata
      * @param non-empty-string|null $pubKeyContent
+     * @param array<string, array{'compression': CompressionAlgorithm, compressedSize: int}> $filesMeta
      */
     public function __construct(
         #[ArrayShape(['hash' => 'string', 'hash_type' => 'string'])]
@@ -42,6 +52,7 @@ final class PharMeta
         public readonly ?string $version,
         public readonly ?string $normalizedMetadata,
         public readonly ?string $pubKeyContent,
+        public readonly array $filesMeta,
     ) {
     }
 
@@ -59,6 +70,7 @@ final class PharMeta
             // TODO: check $unserializeOptions here
             null === $metadata ? null : var_export($metadata, true),
             $pubKeyContent,
+            self::collectFilesMeta($phar),
         );
     }
 
@@ -66,12 +78,19 @@ final class PharMeta
     {
         $decodedJson = json_decode($json, true);
 
+        $filesMeta = $decodedJson['filesMeta'];
+
+        foreach ($filesMeta as &$fileMeta) {
+            $fileMeta['compression'] = CompressionAlgorithm::from($fileMeta['compression']);
+        }
+
         return new self(
             $decodedJson['signature'],
             $decodedJson['stub'],
             $decodedJson['version'],
             $decodedJson['normalizedMetadata'],
             $decodedJson['pubKeyContent'],
+            $filesMeta,
         );
     }
 
@@ -83,6 +102,87 @@ final class PharMeta
             'version' => $this->version,
             'normalizedMetadata' => $this->normalizedMetadata,
             'pubKeyContent' => $this->pubKeyContent,
+            'filesMeta' => $this->filesMeta,
         ]);
+    }
+
+    /**
+     * @return array<string, array{'compression': CompressionAlgorithm, compressedSize: int}>
+     */
+    private static function collectFilesMeta(Phar|PharData $phar): array
+    {
+        $filesMeta = [];
+
+        $root = self::getPharRoot($phar);
+
+        self::traverseSource(
+            $root,
+            $phar,
+            $filesMeta,
+        );
+
+        return $filesMeta;
+    }
+
+    /**
+     * @param iterable<string, SplFileInfo|PharFileInfo> $source
+     *
+     * @return array<string, array{'compression': CompressionAlgorithm, compressedSize: int}>
+     */
+    private static function traverseSource(
+        string $root,
+        iterable $source,
+        array &$filesMeta,
+    ): void
+    {
+        foreach ($source as $path => $pharFileInfo) {
+            if (!($pharFileInfo instanceof PharFileInfo)) {
+                $pharFileInfo = new PharFileInfo($path);
+            }
+
+            if ($pharFileInfo->isDir()) {
+                self::traverseSource(
+                    $root,
+                    new RecursiveDirectoryIterator($pharFileInfo->getPathname()),
+                    $filesMeta,
+                );
+
+                continue;
+            }
+
+            $relativePath = make_path_relative($path, $root);
+
+            $filesMeta[$relativePath] = [
+                'compression' => self::getCompressionAlgorithm($pharFileInfo),
+                'compressedSize' => $pharFileInfo->getCompressedSize(),
+            ];
+        }
+    }
+
+    private static function getPharRoot(Phar|PharData $phar): string
+    {
+        return 'phar://'.Path::normalize(realpath($phar->getPath()));
+    }
+
+    private static function getCompressionAlgorithm(PharFileInfo $pharFileInfo): CompressionAlgorithm
+    {
+        if (false === $pharFileInfo->isCompressed()) {
+            return CompressionAlgorithm::NONE;
+        }
+
+        foreach (CompressionAlgorithm::cases() as $compressionAlgorithm) {
+            if (CompressionAlgorithm::NONE !== $compressionAlgorithm
+                && $pharFileInfo->isCompressed($compressionAlgorithm->value)
+            ) {
+                return $compressionAlgorithm;
+            }
+        }
+
+        throw new UnexpectedValueException(
+            sprintf(
+                'Unknown compression algorithm for the file "%s',
+                $pharFileInfo->getPath(),
+            ),
+        );
     }
 }
