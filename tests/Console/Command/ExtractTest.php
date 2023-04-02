@@ -16,6 +16,7 @@ namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
+use KevinGH\Box\Phar\PharMeta;
 use KevinGH\Box\Pharaoh\InvalidPhar;
 use KevinGH\Box\Test\CommandTestCase;
 use Symfony\Component\Finder\Finder;
@@ -23,6 +24,7 @@ use Symfony\Component\Finder\SplFileInfo;
 use function count;
 use function KevinGH\Box\FileSystem\make_path_relative;
 use function rtrim;
+use function Safe\file_get_contents;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Extract
@@ -34,7 +36,7 @@ use function rtrim;
  */
 class ExtractTest extends CommandTestCase
 {
-    private const FIXTURES = __DIR__.'/../../../fixtures/extract';
+    private const FIXTURES_DIR = __DIR__.'/../../../fixtures/extract';
 
     protected function getCommand(): Command
     {
@@ -67,15 +69,27 @@ class ExtractTest extends CommandTestCase
 
     private static function pharProvider(): iterable
     {
-        $pharPath = self::FIXTURES.'/simple-phar.phar';
+        $pharPath = self::FIXTURES_DIR.'/simple-phar.phar';
+
+        $oldDefaultPharStub = self::getStub(self::FIXTURES_DIR.'/simple-phar-stub.php');
+        $defaultStub = self::getStub(self::FIXTURES_DIR.'/../phar/default-phar-stub.php');
+        $sha512Stub = self::getStub(self::FIXTURES_DIR.'/sha512-phar-stub.php');
+
+        $pharMeta = new PharMeta(
+            [
+                'hash' => '966C5D96F7A3C67F8FC06D3DF55CE4C9AC820F47',
+                'hash_type' => 'SHA-1',
+            ],
+            $oldDefaultPharStub,
+            '1.1.0',
+            'NULL',
+            null,
+        );
 
         $expectedSimplePharFiles = [
             '.hidden' => 'baz',
             'foo' => 'bar',
-            '.phar/stub.php' => rtrim(file_get_contents(self::FIXTURES.'/simple-phar-stub.php'), "\n"),
-            '.phar/signature.json' => '{"hash":"966C5D96F7A3C67F8FC06D3DF55CE4C9AC820F47","hash_type":"SHA-1"}',
-            '.phar/metadata' => 'NULL',
-            '.phar/phar_version' => '1.1.0',
+            '.phar_meta.json' => $pharMeta->toJson(),
         ];
 
         yield 'simple PHAR' => [
@@ -84,54 +98,73 @@ class ExtractTest extends CommandTestCase
         ];
 
         yield 'simple PHAR without the PHAR extension' => [
-            self::FIXTURES.'/simple-phar',
+            self::FIXTURES_DIR.'/simple-phar',
             $expectedSimplePharFiles,
         ];
 
         if (extension_loaded('zlib')) {
             yield 'GZ compressed simple PHAR' => [
-                self::FIXTURES.'/gz-compressed-phar.phar',
-                array_merge(
-                    $expectedSimplePharFiles,
-                    [
-                        '.phar/signature.json' => '{"hash":"3CCDA01B80C1CAC91494EA59BBAFA479E38CD120","hash_type":"SHA-1"}',
-                    ],
-                ),
+                self::FIXTURES_DIR.'/gz-compressed-phar.phar',
+                [
+                    '.hidden' => 'baz',
+                    'foo' => 'bar',
+                    '.phar_meta.json' => (new PharMeta(
+                        [
+                            'hash' => '3CCDA01B80C1CAC91494EA59BBAFA479E38CD120',
+                            'hash_type' => 'SHA-1',
+                        ],
+                        $oldDefaultPharStub,
+                        '1.1.0',
+                        'NULL',
+                        null,
+                    ))->toJson(),
+                ],
             ];
         }
 
         yield 'sha512 signed PHAR' => [
-            self::FIXTURES.'/sha512.phar',
+            self::FIXTURES_DIR.'/sha512.phar',
             [
                 'index.php' => <<<'PHP'
                     <?php echo "Hello, world!\n";
 
                     PHP,
-                '.phar/stub.php' => file_get_contents(self::FIXTURES.'/sha512-phar-stub.php'),
-                '.phar/signature.json' => '{"hash":"B4CAE177138A773283A748C8770A7142F0CC36D6EE88E37900BCF09A92D840D237CE3F3B47C2C7B39AC2D2C0F9A16D63FE70E1A455723DD36840B6E2E64E2130","hash_type":"SHA-512"}',
-                '.phar/metadata' => 'NULL',
-                '.phar/phar_version' => '1.1.0',
+                '.phar_meta.json' => (new PharMeta(
+                    [
+                        'hash' => 'B4CAE177138A773283A748C8770A7142F0CC36D6EE88E37900BCF09A92D840D237CE3F3B47C2C7B39AC2D2C0F9A16D63FE70E1A455723DD36840B6E2E64E2130',
+                        'hash_type' => 'SHA-512',
+                    ],
+                    $sha512Stub,
+                    '1.1.0',
+                    'NULL',
+                    null,
+                ))->toJson(),
             ],
         ];
 
         yield 'OpenSSL signed PHAR' => [
-            self::FIXTURES.'/openssl.phar',
+            self::FIXTURES_DIR.'/openssl.phar',
             [
                 'index.php' => <<<'PHP'
                     <?php echo "Hello, world!\n";
 
                     PHP,
-                '.phar/pubkey' => <<<'EOF'
-                    -----BEGIN PUBLIC KEY-----
-                    MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKuZkrHT54KtuBCTrR36+4tibd+2un9b
-                    aLFs3X+RHc/jDCXL8pJATz049ckfcfd2ZCMIzH1PHew8H+EMhy4CbSECAwEAAQ==
-                    -----END PUBLIC KEY-----
+                '.phar_meta.json' => (new PharMeta(
+                    [
+                        'hash' => '54AF1D4E5459D3A77B692E46FDB9C965D1C7579BD1F2AD2BECF4973677575444FE21E104B7655BA3D088090C28DF63D14876B277C423C8BFBCDB9E3E63F9D61A',
+                        'hash_type' => 'OpenSSL',
+                    ],
+                    $sha512Stub,
+                    '1.1.0',
+                    'NULL',
+                    <<<'EOF'
+                        -----BEGIN PUBLIC KEY-----
+                        MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKuZkrHT54KtuBCTrR36+4tibd+2un9b
+                        aLFs3X+RHc/jDCXL8pJATz049ckfcfd2ZCMIzH1PHew8H+EMhy4CbSECAwEAAQ==
+                        -----END PUBLIC KEY-----
 
-                    EOF,
-                '.phar/stub.php' => file_get_contents(self::FIXTURES.'/sha512-phar-stub.php'),
-                '.phar/signature.json' => '{"hash":"54AF1D4E5459D3A77B692E46FDB9C965D1C7579BD1F2AD2BECF4973677575444FE21E104B7655BA3D088090C28DF63D14876B277C423C8BFBCDB9E3E63F9D61A","hash_type":"OpenSSL"}',
-                '.phar/metadata' => 'NULL',
-                '.phar/phar_version' => '1.1.0',
+                        EOF,
+                ))->toJson(),
             ],
         ];
     }
@@ -156,7 +189,7 @@ class ExtractTest extends CommandTestCase
 
         $commandInput = [
             'command' => 'extract',
-            'phar' => self::FIXTURES.'/simple-phar.phar',
+            'phar' => self::FIXTURES_DIR.'/simple-phar.phar',
             'output' => $outputDir,
             '--internal' => null,
         ];
@@ -261,7 +294,7 @@ class ExtractTest extends CommandTestCase
         ];
 
         yield 'not a valid PHAR' => [
-            self::FIXTURES.'/../phar/empty-pdf.pdf',
+            self::FIXTURES_DIR.'/../phar/empty-pdf.pdf',
         ];
     }
 
@@ -270,7 +303,7 @@ class ExtractTest extends CommandTestCase
         $this->commandTester->execute(
             [
                 'command' => 'extract',
-                'phar' => self::FIXTURES.'/../phar/empty-pdf.pdf',
+                'phar' => self::FIXTURES_DIR.'/../phar/empty-pdf.pdf',
                 'output' => $this->tmp,
                 '--internal' => true,
             ],
@@ -308,5 +341,14 @@ class ExtractTest extends CommandTestCase
         }
 
         return $files;
+    }
+
+    private static function getStub(string $path): string
+    {
+        // We trim the last line returns since phpStorm may interfere with the copied file appending it on save.
+        return rtrim(
+            file_get_contents($path),
+            "\n",
+        );
     }
 }
