@@ -94,7 +94,7 @@ final class PharMetaTest extends TestCase
 
     public static function pharProvider(): iterable
     {
-        $pharPath = self::FIXTURES_DIR.'/simple-phar.phar';
+        $pharPath = self::FIXTURES_DIR.'/../phar/simple-phar.phar';
 
         $defaultStub = self::getStub(self::FIXTURES_DIR.'/../phar/default-phar-stub.php');
         $oldDefaultPharStub = self::getStub(self::FIXTURES_DIR.'/old-default-phar-stub.php');
@@ -105,12 +105,12 @@ final class PharMetaTest extends TestCase
             null,
             new PharMeta(
                 [
-                    'hash' => '966C5D96F7A3C67F8FC06D3DF55CE4C9AC820F47',
-                    'hash_type' => 'SHA-1',
+                    'hash' => '55AE0CCD6D3A74BE41E19CD070A655A73FEAEF8342084A0801954943FBF219ED',
+                    'hash_type' => 'SHA-256',
                 ],
-                $oldDefaultPharStub,
+                $defaultStub,
                 '1.1.0',
-                'NULL',
+                null,
                 null,
             ),
         ];
@@ -124,9 +124,9 @@ final class PharMetaTest extends TestCase
                         'hash' => '3CCDA01B80C1CAC91494EA59BBAFA479E38CD120',
                         'hash_type' => 'SHA-1',
                     ],
-                    $oldDefaultPharStub,
+                    $defaultStub,
                     '1.1.0',
-                    'NULL',
+                    null,
                     null,
                 ),
             ];
@@ -142,7 +142,7 @@ final class PharMetaTest extends TestCase
                 ],
                 $sha512Stub,
                 '1.1.0',
-                'NULL',
+                null,
                 null,
             ),
         ];
@@ -157,7 +157,7 @@ final class PharMetaTest extends TestCase
                 ],
                 $sha512Stub,
                 '1.1.0',
-                'NULL',
+                null,
                 <<<'EOF'
                     -----BEGIN PUBLIC KEY-----
                     MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKuZkrHT54KtuBCTrR36+4tibd+2un9b
@@ -224,7 +224,7 @@ final class PharMetaTest extends TestCase
                 null,
                 null,
                 null,
-                'NULL',
+                null,
                 null,
             ),
         ];

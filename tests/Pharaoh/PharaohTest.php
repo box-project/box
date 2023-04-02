@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Pharaoh;
 
+use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use PHPUnit\Framework\TestCase;
 use function array_keys;
 use function basename;
@@ -23,12 +24,20 @@ use function Safe\realpath;
 
 /**
  * @covers \KevinGH\Box\Pharaoh\Pharaoh
+ * @runTestsInSeparateProcesses
  *
  * @internal
  */
 final class PharaohTest extends TestCase
 {
+    use RequiresPharReadonlyOff;
+
     private const FIXTURES_DIR = __DIR__.'/../../fixtures';
+
+    protected function setUp(): void
+    {
+        $this->markAsSkippedIfPharReadonlyIsOn();
+    }
 
     /**
      * @dataProvider fileProvider
@@ -48,7 +57,7 @@ final class PharaohTest extends TestCase
         self::assertSame(basename($file), $pharInfo->getFileName());
         self::assertSame($expectedVersion, $pharInfo->getVersion());
         self::assertSame($expectedSignature, $pharInfo->getSignature());
-        self::assertSame($expectedPubkey, $pharInfo->getPubkey());
+        self::assertSame($expectedPubkey, $pharInfo->getPubKeyContent());
         self::assertSame($expectedMetadata, $pharInfo->getNormalizedMetadata());
         self::assertSame($expectedStub, $pharInfo->getStubContent());
         self::assertEqualsCanonicalizing(
@@ -59,7 +68,8 @@ final class PharaohTest extends TestCase
 
     public static function fileProvider(): iterable
     {
-        $defaultStub = rtrim(file_get_contents(self::FIXTURES_DIR.'/phar/default-phar-stub.php'), "\n");
+        $defaultStub = self::getStub(self::FIXTURES_DIR.'/phar/default-phar-stub.php');
+        $oldDefaultStub = self::getStub(self::FIXTURES_DIR.'/extract/old-default-phar-stub.php');
 
         yield 'simple PHAR (2017)' => [
             self::FIXTURES_DIR.'/extract/simple-phar-2017.phar',
@@ -70,7 +80,7 @@ final class PharaohTest extends TestCase
             ],
             null,
             null,
-            rtrim(file_get_contents(self::FIXTURES_DIR.'/extract/old-default-phar-stub.php'), "\n"),
+            $oldDefaultStub,
             ['foo.php'],
         ];
 
@@ -145,7 +155,7 @@ final class PharaohTest extends TestCase
 
         yield 'simple tar' => [
             self::FIXTURES_DIR.'/phar/simple.tar',
-            null,
+            'No information found',
             null,
             null,
             null,
@@ -177,15 +187,6 @@ final class PharaohTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function test_it_throws_an_error_when_a_phar_cannot_be_created(): void
-    {
-        $this->expectException(InvalidPhar::class);
-
-        $file = self::FIXTURES_DIR.'/unknown-file';
-
-        new Pharaoh($file);
-    }
-
     public function test_it_throws_an_error_when_a_phar_cannot_be_created_due_to_unverifiable_signature(): void
     {
         $file = self::FIXTURES_DIR.'/phar/simple-phar-openssl-sign-with-invalid-pubkey.phar';
@@ -194,5 +195,14 @@ final class PharaohTest extends TestCase
         $this->expectExceptionMessageMatches('/^Could not create a Phar or PharData instance for the file /');
 
         new Pharaoh($file);
+    }
+
+    private static function getStub(string $path): string
+    {
+        // We trim the last line returns since phpStorm may interfere with the copied file appending it on save.
+        return rtrim(
+            file_get_contents($path),
+            "\n",
+        );
     }
 }

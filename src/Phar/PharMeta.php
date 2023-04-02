@@ -57,7 +57,7 @@ final class PharMeta
             '' === $stub ? null : $stub,
             '' === $version ? null : $version,
             // TODO: check $unserializeOptions here
-            'NULL' === $metadata ? null : var_export($metadata, true),
+            null === $metadata ? null : var_export($metadata, true),
             $pubKeyContent,
         );
     }
