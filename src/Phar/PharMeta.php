@@ -30,26 +30,34 @@ use function var_export;
 final class PharMeta
 {
     /**
+     * @param non-empty-string|null $stub
+     * @param non-empty-string|null $version
+     * @param non-empty-string|null $normalizedMetadata
      * @param non-empty-string|null $pubKeyContent
      */
     public function __construct(
         #[ArrayShape(['hash' => 'string', 'hash_type' => 'string'])]
-        public readonly false|array $signature,
-        public readonly string $stub,
-        public readonly string $version,
-        public readonly string $normalizedMetadata,
+        public readonly ?array $signature,
+        public readonly ?string $stub,
+        public readonly ?string $version,
+        public readonly ?string $normalizedMetadata,
         public readonly ?string $pubKeyContent,
     ) {
     }
 
     public static function fromPhar(Phar|PharData $phar, ?string $pubKeyContent): self
     {
+        $signature = $phar->getSignature();
+        $stub = $phar->getStub();
+        $version = $phar->getVersion();
+        $metadata = $phar->getMetadata();
+
         return new self(
-            $phar->getSignature(),
-            $phar->getStub(),
-            $phar->getVersion(),
+            false === $signature ? null : $signature,
+            '' === $stub ? null : $stub,
+            '' === $version ? null : $version,
             // TODO: check $unserializeOptions here
-            var_export($phar->getMetadata(), true),
+            'NULL' === $metadata ? null : var_export($metadata, true),
             $pubKeyContent,
         );
     }
