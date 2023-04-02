@@ -16,7 +16,6 @@
 
         <!-- The width is matching the Travis one to avoid any issues with the CI -->
         <env name="COLUMNS" value="80" />
-        <env name="BOX_BIN" value="bin/box" />
     </php>
 
     <testsuites>
