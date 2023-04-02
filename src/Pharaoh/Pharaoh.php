@@ -43,32 +43,39 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Pharaoh;
 
-use JetBrains\PhpStorm\ArrayShape;
+use KevinGH\Box\Console\Command\Extract;
 use KevinGH\Box\Phar\CompressionAlgorithm;
+use KevinGH\Box\Phar\PharMeta;
 use KevinGH\Box\Phar\PharPhpSettings;
 use ParagonIE\ConstantTime\Hex;
 use Phar;
 use PharData;
 use PharFileInfo;
 use RecursiveIteratorIterator;
+use RuntimeException;
 use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 use UnexpectedValueException;
 use Webmozart\Assert\Assert;
 use function file_exists;
+use function getenv;
+use function iter\mapKeys;
+use function iter\toArrayWithKeys;
+use function iterator_to_array;
 use function KevinGH\Box\FileSystem\copy;
 use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\mkdir;
+use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\remove;
-use function KevinGH\Box\FileSystem\tempnam;
-use function KevinGH\Box\unique_id;
-use function pathinfo;
 use function random_bytes;
-use function sys_get_temp_dir;
-use const DIRECTORY_SEPARATOR;
-use const PATHINFO_EXTENSION;
 
 // TODO: rename it to SafePhar
 /**
+ * @private
+ *
  * Pharaoh is a wrapper around Phar. This is necessary because the Phar API is quite limited and will crash if say two
  * PHARs with the same alias are loaded.
  */
@@ -76,17 +83,20 @@ final class Pharaoh
 {
     private static array $ALGORITHMS;
     private static string $stubfile;
+    private static string $phpExecutable;
 
+    private PharMeta $meta;
     private Phar|PharData $phar;
     private string $tmp;
+    private string $temporaryTmp;
     private string $file;
     private string $fileName;
-    private ?string $pubkey = null;
-    private ?string $tmpPubkey = null;
     private array $compressionCount;
 
-    #[ArrayShape(['hash' => 'string', 'hash_type' => 'string'])]
-    private array|false $signature;
+    /**
+     * @var array<string, SplFileInfo>
+     */
+    private array $files;
 
     public function __construct(string $file)
     {
@@ -101,14 +111,21 @@ final class Pharaoh
         self::initAlgorithms();
         self::initStubFileName();
 
-        $tmp = self::createTmpDir();
-        $this->initPhar($file);
-
-        self::extractPhar($this->phar, $tmp);
-
-        $this->tmp = $tmp;
         $this->file = $file;
         $this->fileName = basename($file);
+
+        $this->tmp = make_tmp_dir('HumbugBox', 'Pharaoh');
+        $this->temporaryTmp = make_tmp_dir('HumbugBox', 'PharaohTemporary');
+
+        self::dumpPhar($file, $this->tmp);
+        [
+            $this->meta,
+            $this->files,
+        ] = self::loadDumpedPharFiles($this->tmp);
+
+        $this->initPhar($file);
+
+        self::extractPhar($this->phar, $this->temporaryTmp);
     }
 
     public function __destruct()
@@ -127,7 +144,9 @@ final class Pharaoh
         }
     }
 
-    // TODO: consider making it internal
+    /**
+     * @deprecated
+     */
     public function getPhar(): Phar|PharData
     {
         return $this->phar;
@@ -138,6 +157,9 @@ final class Pharaoh
         return $this->tmp;
     }
 
+    /**
+     * @deprecated
+     */
     public function getTmpPubkey(): ?string
     {
         return $this->tmpPubkey;
@@ -148,14 +170,14 @@ final class Pharaoh
         return $this->file;
     }
 
-    public function getPubkey(): ?string
+    public function getPubKeyContent(): ?string
     {
-        return $this->pubkey;
+        return $this->meta->pubKeyContent;
     }
 
-    public function hasPubkey(): bool
+    public function hasPubKey(): bool
     {
-        return null !== $this->pubkey;
+        return null !== $this->getPubKeyContent();
     }
 
     public function getFileName(): string
@@ -163,6 +185,9 @@ final class Pharaoh
         return $this->fileName;
     }
 
+    /**
+     * @deprecated
+     */
     public function equals(self $pharInfo): bool
     {
         return
@@ -170,6 +195,9 @@ final class Pharaoh
             && $pharInfo->getNormalizedMetadata() === $this->getNormalizedMetadata();
     }
 
+    /**
+     * @deprecated
+     */
     public function getCompressionCount(): array
     {
         if (!isset($this->compressionCount)) {
@@ -179,36 +207,42 @@ final class Pharaoh
         return $this->compressionCount;
     }
 
+    /**
+     * @deprecated
+     */
     public function getRoot(): string
     {
         // Do not cache the result
         return 'phar://'.str_replace('\\', '/', realpath($this->phar->getPath())).'/';
     }
 
-    public function getVersion(): string
+    public function getVersion(): ?string
     {
-        // Do not cache the result
-        return '' !== $this->phar->getVersion() ? $this->phar->getVersion() : 'No information found';
+        // TODO: review this fallback value
+        return $this->meta->version ?? 'No information found';
     }
 
     public function getNormalizedMetadata(): ?string
     {
-        // Do not cache the result
-        $metadata = var_export($this->phar->getMetadata(), true);
-
-        return 'NULL' === $metadata ? null : $metadata;
+        return $this->meta->normalizedMetadata;
     }
 
-    public function getSignature(): false|array
+    public function getSignature(): ?array
     {
-        return $this->signature;
+        return $this->meta->signature;
     }
 
-    private function getPharHash(): string
+    public function getStubContent(): ?string
     {
-        // If no signature is available (e.g. a tar.gz file), we generate a random hash to ensure
-        // it will always be invalidated
-        return $this->signature['hash'] ?? unique_id('');
+        return $this->meta->stub;
+    }
+
+    /**
+     * @return array<string, SplFileInfo>
+     */
+    public function getFiles(): array
+    {
+        return $this->files;
     }
 
     private static function initAlgorithms(): void
@@ -229,14 +263,70 @@ final class Pharaoh
         }
     }
 
-    private static function createTmpDir(): string
+    private static function dumpPhar(string $file, string $tmp): void
     {
-        $tmp = tempnam(sys_get_temp_dir(), 'box_');
+        $extractPharProcess = new Process([
+            self::getPhpExecutable(),
+            self::getBoxBin(),
+            'extract',
+            $file,
+            $tmp,
+            '--no-interaction',
+            '--internal',
+        ]);
+        $extractPharProcess->run();
 
-        remove($tmp);
-        mkdir($tmp, 0o755);
+        if (false === $extractPharProcess->isSuccessful()) {
+            throw new InvalidPhar(
+                $extractPharProcess->getErrorOutput(),
+                $extractPharProcess->getExitCode(),
+                new ProcessFailedException($extractPharProcess),
+            );
+        }
+    }
 
-        return $tmp;
+    /**
+     * @return array{PharMeta, array<string, SplFileInfo>}
+     */
+    private static function loadDumpedPharFiles(string $tmp): array
+    {
+        $dumpedFiles = toArrayWithKeys(
+            mapKeys(
+                static fn (string $filePath) => Path::makeRelative($filePath, $tmp),
+                Finder::create()
+                    ->files()
+                    ->ignoreDotFiles(false)
+                    ->in($tmp),
+            ),
+        );
+
+        $meta = PharMeta::fromJson($dumpedFiles[Extract::PHAR_META_PATH]->getContents());
+        unset($dumpedFiles[Extract::PHAR_META_PATH]);
+
+        return [$meta, $dumpedFiles];
+    }
+
+    private static function getPhpExecutable(): string
+    {
+        if (isset(self::$phpExecutable)) {
+            return self::$phpExecutable;
+        }
+
+        $phpExecutable = (new PhpExecutableFinder())->find();
+
+        if (false === $phpExecutable) {
+            throw new RuntimeException('Could not find a PHP executable.');
+        }
+
+        self::$phpExecutable = $phpExecutable;
+
+        return self::$phpExecutable;
+    }
+
+    private static function getBoxBin(): string
+    {
+        // TODO: move the constraint strings declaration in one place
+        return getenv('BOX_BIN') ?: $_SERVER['SCRIPT_NAME'];
     }
 
     private static function createPhar(string $file, string $tmpFile): Phar|PharData
@@ -345,12 +435,9 @@ final class Pharaoh
             copy($pubkey, $tmpPubkey, true);
 
             $hasPubkey = true;
-            $this->pubkey = $tmpPubkey;
-            $this->tmpPubkey = $tmpPubkey;
         }
 
         $phar = self::createPhar($file, $tmpFile);
-        $this->signature = $phar->getSignature();
 
         if (!($phar instanceof PharData) && !$hasPubkey) {
             $phar->setAlias($alias);

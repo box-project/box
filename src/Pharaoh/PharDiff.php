@@ -86,7 +86,7 @@ class PharDiff
 
     public function __construct(Pharaoh $pharA, Pharaoh $pharB)
     {
-        if ($pharA->hasPubkey() || $pharB->hasPubkey()) {
+        if ($pharA->hasPubKey() || $pharB->hasPubKey()) {
             throw IncompariblePhars::signedPhars();
         }
 

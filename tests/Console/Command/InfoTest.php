@@ -29,12 +29,16 @@ use function preg_replace;
 use function realpath;
 use function str_replace;
 
+//
+// /**
+// * @covers \KevinGH\Box\Console\Command\Info
+// *
+// * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
+// *                              can create undesirable side-effects.
+// *
+// * @internal
+// */
 /**
- * @covers \KevinGH\Box\Console\Command\Info
- *
- * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
- *                              can create undesirable side-effects.
- *
  * @internal
  */
 class InfoTest extends CommandTestCase

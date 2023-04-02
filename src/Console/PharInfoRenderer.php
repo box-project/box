@@ -80,7 +80,7 @@ final class PharInfoRenderer
     {
         $signature = $pharInfo->getSignature();
 
-        if (false === $signature) {
+        if (null === $signature) {
             $io->writeln('<comment>Signature unreadable</comment>');
 
             return;
