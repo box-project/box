@@ -69,7 +69,7 @@ final class PharaohTest extends TestCase
     public static function fileProvider(): iterable
     {
         $defaultStub = self::getStub(self::FIXTURES_DIR.'/phar/default-phar-stub.php');
-        $oldDefaultStub = self::getStub(self::FIXTURES_DIR.'/extract/old-default-phar-stub.php');
+        $oldDefaultStub = self::getStub(self::FIXTURES_DIR.'/phar/old-default-phar-stub.php');
 
         yield 'simple PHAR (2017)' => [
             self::FIXTURES_DIR.'/phar/simple-phar-2017.phar',
