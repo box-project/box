@@ -97,7 +97,7 @@ final class PharMetaTest extends TestCase
         $pharPath = self::FIXTURES_DIR.'/../phar/simple-phar.phar';
 
         $defaultStub = self::getStub(self::FIXTURES_DIR.'/../phar/default-phar-stub.php');
-        $oldDefaultPharStub = self::getStub(self::FIXTURES_DIR.'/old-default-phar-stub.php');
+        $oldDefaultPharStub = self::getStub(self::FIXTURES_DIR.'/../phar/old-default-phar-stub.php');
         $sha512Stub = self::getStub(self::FIXTURES_DIR.'/sha512-phar-stub.php');
 
         yield 'simple PHAR' => [
@@ -109,6 +109,21 @@ final class PharMetaTest extends TestCase
                     'hash_type' => 'SHA-256',
                 ],
                 $defaultStub,
+                '1.1.0',
+                null,
+                null,
+            ),
+        ];
+
+        yield 'simple PHAR (from 2017)' => [
+            self::FIXTURES_DIR.'/../phar/simple-phar-2017.phar',
+            null,
+            new PharMeta(
+                [
+                    'hash' => '191723EE056C62E3179FDE1B792AA03040FCEF92',
+                    'hash_type' => 'SHA-1',
+                ],
+                $oldDefaultPharStub,
                 '1.1.0',
                 null,
                 null,
