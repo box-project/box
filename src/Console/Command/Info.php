@@ -31,6 +31,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Path;
 use Throwable;
 use function array_key_exists;
+use function explode;
 use function implode;
 use function is_array;
 use function KevinGH\Box\format_size;
@@ -44,6 +45,8 @@ use function str_replace;
  */
 final class Info implements Command
 {
+    private const INDENT_SIZE = 2;
+
     private const PHAR_ARG = 'phar';
     private const LIST_OPT = 'list';
     private const MODE_OPT = 'mode';
@@ -286,9 +289,8 @@ final class Info implements Command
             $pharInfo->getFiles(),
             $output,
             $pharInfo,
-            0,
             $maxDepth,
-            true === $indent ? 0 : false,
+            $indent,
         );
     }
 
@@ -301,82 +303,105 @@ final class Info implements Command
         iterable $source,
         OutputInterface $output,
         Pharaoh         $pharInfo,
-        int             $depth,
         int|false       $maxDepth,
-        int|false       $indent,
-        array &$renderedDirectories
+        bool       $indent,
     ): void {
-        if (false !== $maxDepth && $depth > $maxDepth) {
-            return;
-        }
+        $depth = 0;
+        $renderedDirectories = [];
 
         foreach ($source as $splFileInfo) {
-            $x = '';
-        }
-
-        /** @var SplFileInfo $fileInfo */
-        $base = $fileInfo->getRelativePath();
-
-        if ($base !== $previousBase) {
-            $previousBase = $base;
-            $indent -= 2;
-        }
-
-        if (!array_key_exists($base, $renderedBases)) {
-            $renderedBases[$base] = true;
-
-            $depth++;
-
-            if (-1 !== $maxDepth && $depth > $maxDepth) {
-                return;
+            if (false !== $maxDepth && $depth > $maxDepth) {
+                continue;
             }
 
-            $output->writeln("<info>{$base}/</info>");
-            $indent += 2;
-        }
+            self::renderParentDirectoriesIfNecessary(
+                $splFileInfo,
+                $output,
+                $depth,
+                $indent,
+                $renderedDirectories,
+            );
 
-        if (false !== $indent) {
-            $output->write(str_repeat(' ', $indent));
-
-            $path = $fileInfo->getFilename();
-        } else {
-            $path = str_replace($base, '', $fileInfo->getPathname()); // Useless?
-        }
-
-        if ($fileInfo->isDir()) {// ueslesss
-            if (false !== $indent) {
-                $output->writeln("<info>{$path}</info>");
-            }
-        } else {
             [
                 'compression' => $compression,
                 'compressedSize' => $compressionSize,
-            ] = $pharInfo->getFileMeta($relativePath);
+            ] = $pharInfo->getFileMeta($splFileInfo->getRelativePathname());
 
             $compressionLine = CompressionAlgorithm::NONE === $compression
                 ? '<fg=red>[NONE]</fg=red>'
                 : "<fg=cyan>[{$compression->name}]</fg=cyan>";
 
-            $output->writeln(
+            self::print(
+                $output,
                 sprintf(
                     '%s %s - %s',
-                    $path,
+                    $splFileInfo->getFilename(),
                     $compressionLine,
                     format_size($compressionSize),
                 ),
+                $depth,
+                $indent,
             );
+        }
+    }
+
+    private static function renderParentDirectoriesIfNecessary(
+        SplFileInfo $fileInfo,
+        OutputInterface $output,
+        int|false       &$depth,
+        bool       $indent,
+        array &$renderedDirectories
+    ): void
+    {
+        if (false === $indent) {
+            // When there is no indent directories are skipped.
+            return;
         }
 
-        if ($fileInfo->isDir()) {
-            self::renderContentTree(
-                $output,
-                new DirectoryIterator($fileInfo->getPathname()),
-                $depth + 1,
-                $maxDepth,
-                false === $indent ? false : $indent + 2,
-                $base,
-                $pharInfo,
-            );
+        $relativePath = $fileInfo->getRelativePath();
+
+        if ('' === $relativePath) {
+            if ($depth > 0) {
+                $depth--;
+            }
+
+            // No parent directory: there is nothing to do.
+            return;
         }
+
+        $parentDirectories = explode(
+            '/',
+            Path::normalize($relativePath),
+        );
+
+        foreach ($parentDirectories as $parentDirectory) {
+            if (array_key_exists($parentDirectory, $renderedDirectories)) {
+                continue;
+            }
+
+            self::print(
+                $output,
+                "<info>{$parentDirectory}/</info>",
+                $depth,
+                $indent,
+            );
+
+            $renderedDirectories[$parentDirectory] = true;
+            $depth++;
+        }
+    }
+
+    private static function print(
+        OutputInterface $output,
+        string $message,
+        int $depth,
+        bool $indent,
+    ): void
+    {
+        if ($indent) {
+            $output->write(str_repeat(' ', $depth * self::INDENT_SIZE));
+        }
+
+        $output->writeln($message);
     }
 }
