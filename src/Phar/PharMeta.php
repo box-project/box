@@ -46,24 +46,27 @@ final class PharMeta
      * @param array<string, array{'compression': CompressionAlgorithm, compressedSize: int}> $filesMeta
      */
     public function __construct(
+        public readonly CompressionAlgorithm    $compression,
         #[ArrayShape(['hash' => 'string', 'hash_type' => 'string'])]
-        public readonly ?array $signature,
+        public readonly ?array  $signature,
         public readonly ?string $stub,
         public readonly ?string $version,
         public readonly ?string $normalizedMetadata,
         public readonly ?string $pubKeyContent,
-        public readonly array $filesMeta,
+        public readonly array   $filesMeta,
     ) {
     }
 
     public static function fromPhar(Phar|PharData $phar, ?string $pubKeyContent): self
     {
+        $compression = $phar->isCompressed();
         $signature = $phar->getSignature();
         $stub = $phar->getStub();
         $version = $phar->getVersion();
         $metadata = $phar->getMetadata();
 
         return new self(
+            false === $compression ? CompressionAlgorithm::NONE : CompressionAlgorithm::from($compression),
             false === $signature ? null : $signature,
             '' === $stub ? null : $stub,
             '' === $version ? null : $version,
@@ -85,6 +88,7 @@ final class PharMeta
         }
 
         return new self(
+            CompressionAlgorithm::from($decodedJson['compression']),
             $decodedJson['signature'],
             $decodedJson['stub'],
             $decodedJson['version'],
@@ -97,6 +101,7 @@ final class PharMeta
     public function toJson(): string
     {
         return json_encode([
+            'compression' => $this->compression,
             'signature' => $this->signature,
             'stub' => $this->stub,
             'version' => $this->version,

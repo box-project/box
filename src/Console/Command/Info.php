@@ -23,7 +23,6 @@ use KevinGH\Box\Console\PharInfoRenderer;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Pharaoh\Pharaoh;
 use Phar;
-use PharData;
 use PharFileInfo;
 use SplFileInfo;
 use Symfony\Component\Console\Input\InputArgument;
@@ -31,6 +30,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Path;
 use Throwable;
+use function array_key_exists;
 use function implode;
 use function is_array;
 use function KevinGH\Box\format_size;
@@ -144,7 +144,7 @@ final class Info implements Command
             return self::showPharInfo(
                 $pharInfo,
                 $io->getOption(self::LIST_OPT)->asBoolean(),
-                $maxDepth,
+                -1 === $maxDepth ? false : $maxDepth,
                 'indent' === $mode,
                 $io,
             );
@@ -197,24 +197,20 @@ final class Info implements Command
     }
 
     private static function showPharInfo(
-        Pharaoh $pharInfo,
-        bool $content,
-        int $depth,
-        bool $indent,
-        IO $io,
+        Pharaoh   $pharInfo,
+        bool      $content,
+        int|false $maxDepth,
+        bool      $indent,
+        IO        $io,
     ): int {
         self::showPharMeta($pharInfo, $io);
 
         if ($content) {
-            self::renderContents(
+            self::renderContentTree(
                 $io,
-                $pharInfo->getFiles(),
-                0,
-                $depth,
-                $indent ? 0 : false,
-                $pharInfo->getRoot(),
                 $pharInfo,
-                $pharInfo->getRoot(),
+                $maxDepth,
+                $indent,
             );
         } else {
             $io->comment('Use the <info>--list|-l</info> option to list the content of the PHAR.');
@@ -275,72 +271,112 @@ final class Info implements Command
     }
 
     /**
-     * @param iterable<PharFileInfo> $source
+     * @param iterable<SplFileInfo> $source
+     * @param false|natural             $maxDepth
+     * @param false|int              $indent   Nbr of indent or `false`
+     */
+    private static function renderContentTree(
+        OutputInterface $output,
+        Pharaoh         $pharInfo,
+        int|false       $maxDepth,
+        bool       $indent,
+    ): void
+    {
+        self::renderPartialTree(
+            $pharInfo->getFiles(),
+            $output,
+            $pharInfo,
+            0,
+            $maxDepth,
+            true === $indent ? 0 : false,
+        );
+    }
+
+    /**
+     * @param iterable<string, SplFileInfo> $source
      * @param -1|natural             $maxDepth
      * @param false|int              $indent   Nbr of indent or `false`
      */
-    private static function renderContents(
+    private static function renderPartialTree(
+        iterable $source,
         OutputInterface $output,
-        iterable        $source,
+        Pharaoh         $pharInfo,
         int             $depth,
-        int             $maxDepth,
+        int|false       $maxDepth,
         int|false       $indent,
-        string          $base,
-        Pharaoh   $pharInfo,
+        array &$renderedDirectories
     ): void {
-        if (-1 !== $maxDepth && $depth > $maxDepth) {
+        if (false !== $maxDepth && $depth > $maxDepth) {
             return;
         }
 
-        foreach ($source as $relativePath => $fileInfo) {
-            /** @var SplFileInfo $fileInfo */
+        foreach ($source as $splFileInfo) {
+            $x = '';
+        }
+
+        /** @var SplFileInfo $fileInfo */
+        $base = $fileInfo->getRelativePath();
+
+        if ($base !== $previousBase) {
+            $previousBase = $base;
+            $indent -= 2;
+        }
+
+        if (!array_key_exists($base, $renderedBases)) {
+            $renderedBases[$base] = true;
+
+            $depth++;
+
+            if (-1 !== $maxDepth && $depth > $maxDepth) {
+                return;
+            }
+
+            $output->writeln("<info>{$base}/</info>");
+            $indent += 2;
+        }
+
+        if (false !== $indent) {
+            $output->write(str_repeat(' ', $indent));
+
+            $path = $fileInfo->getFilename();
+        } else {
+            $path = str_replace($base, '', $fileInfo->getPathname()); // Useless?
+        }
+
+        if ($fileInfo->isDir()) {// ueslesss
             if (false !== $indent) {
-                $output->write(str_repeat(' ', $indent));
-
-                $path = $fileInfo->getFilename();
-
-                if ($fileInfo->isDir()) {
-                    $path .= '/';
-                }
-            } else {
-                $path = str_replace($base, '', $fileInfo->getPathname());
+                $output->writeln("<info>{$path}</info>");
             }
+        } else {
+            [
+                'compression' => $compression,
+                'compressedSize' => $compressionSize,
+            ] = $pharInfo->getFileMeta($relativePath);
 
-            if ($fileInfo->isDir()) {
-                if (false !== $indent) {
-                    $output->writeln("<info>{$path}</info>");
-                }
-            } else {
-                [
-                    'compression' => $compression,
-                    'compressedSize' => $compressionSize,
-                ] = $pharInfo->getFileMeta($relativePath);
+            $compressionLine = CompressionAlgorithm::NONE === $compression
+                ? '<fg=red>[NONE]</fg=red>'
+                : "<fg=cyan>[{$compression->name}]</fg=cyan>";
 
-                $compressionLine = CompressionAlgorithm::NONE === $compression
-                    ? '<fg=red>[NONE]</fg=red>'
-                    : "<fg=cyan>[{$compression->name}]</fg=cyan>";
+            $output->writeln(
+                sprintf(
+                    '%s %s - %s',
+                    $path,
+                    $compressionLine,
+                    format_size($compressionSize),
+                ),
+            );
+        }
 
-                $output->writeln(
-                    sprintf(
-                        '%s %s - %s',
-                        $path,
-                        $compressionLine,
-                        format_size($compressionSize),
-                    ),
-                );
-            }
-
-            if ($fileInfo->isDir()) {
-                self::renderContents(
-                    $output,
-                    new DirectoryIterator($fileInfo->getPathname()),
-                    $depth + 1,
-                    $maxDepth,
-                    false === $indent ? $indent : $indent + 2,
-                    $base,
-                    $pharInfo,
-                );
-            }
+        if ($fileInfo->isDir()) {
+            self::renderContentTree(
+                $output,
+                new DirectoryIterator($fileInfo->getPathname()),
+                $depth + 1,
+                $maxDepth,
+                false === $indent ? false : $indent + 2,
+                $base,
+                $pharInfo,
+            );
         }
     }
 }

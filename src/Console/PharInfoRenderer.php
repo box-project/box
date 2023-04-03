@@ -16,6 +16,7 @@ namespace KevinGH\Box\Console;
 
 use Fidry\Console\Input\IO;
 use KevinGH\Box\NotInstantiable;
+use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Pharaoh\Pharaoh;
 use function array_filter;
 use function array_key_last;
@@ -38,13 +39,24 @@ final class PharInfoRenderer
 
     public static function renderCompression(Pharaoh $pharInfo, IO $io): void
     {
-        $count = array_filter($pharInfo->getCompressionCount());
+        $io->writeln(
+            sprintf(
+                '<comment>Archive Compression:</comment> %s',
+                self::translateCompressionAlgorithm($pharInfo->getCompression()),
+            ),
+        );
+
+        $count = $pharInfo->getFilesCompressionCount();
+        $count['None'] = $count[CompressionAlgorithm::NONE->name];
+        unset($count[CompressionAlgorithm::NONE->name]);
+        $count = array_filter($count);
+
         $totalCount = array_sum($count);
 
         if (1 === count($count)) {
             $io->writeln(
                 sprintf(
-                    '<comment>Compression:</comment> %s',
+                    '<comment>Files Compression:</comment> %s',
                     key($count),
                 ),
             );
@@ -114,7 +126,7 @@ final class PharInfoRenderer
 
     public static function renderContentsSummary(Pharaoh $pharInfo, IO $io): void
     {
-        $count = array_filter($pharInfo->getCompressionCount());
+        $count = array_filter($pharInfo->getFilesCompressionCount());
         $totalCount = array_sum($count);
 
         $io->writeln(
@@ -126,5 +138,10 @@ final class PharInfoRenderer
                 ),
             ),
         );
+    }
+
+    private static function translateCompressionAlgorithm(CompressionAlgorithm $algorithm): string
+    {
+        return CompressionAlgorithm::NONE === $algorithm ? 'None' : $algorithm->name;
     }
 }
