@@ -23,11 +23,10 @@ use SplFileInfo;
 use Symfony\Component\Filesystem\Path;
 use UnexpectedValueException;
 use function KevinGH\Box\FileSystem\make_path_relative;
-use function Safe\realpath;
 use function Safe\json_decode;
 use function Safe\json_encode;
+use function Safe\realpath;
 use function sprintf;
-use function stat;
 use function var_export;
 
 /**
@@ -39,21 +38,21 @@ use function var_export;
 final class PharMeta
 {
     /**
-     * @param non-empty-string|null $stub
-     * @param non-empty-string|null $version
-     * @param non-empty-string|null $normalizedMetadata
-     * @param non-empty-string|null $pubKeyContent
+     * @param non-empty-string|null                                                          $stub
+     * @param non-empty-string|null                                                          $version
+     * @param non-empty-string|null                                                          $normalizedMetadata
+     * @param non-empty-string|null                                                          $pubKeyContent
      * @param array<string, array{'compression': CompressionAlgorithm, compressedSize: int}> $filesMeta
      */
     public function __construct(
-        public readonly CompressionAlgorithm    $compression,
+        public readonly CompressionAlgorithm $compression,
         #[ArrayShape(['hash' => 'string', 'hash_type' => 'string'])]
-        public readonly ?array  $signature,
+        public readonly ?array $signature,
         public readonly ?string $stub,
         public readonly ?string $version,
         public readonly ?string $normalizedMetadata,
         public readonly ?string $pubKeyContent,
-        public readonly array   $filesMeta,
+        public readonly array $filesMeta,
     ) {
     }
 
@@ -138,8 +137,7 @@ final class PharMeta
         string $root,
         iterable $source,
         array &$filesMeta,
-    ): void
-    {
+    ): void {
         foreach ($source as $path => $pharFileInfo) {
             if (!($pharFileInfo instanceof PharFileInfo)) {
                 $pharFileInfo = new PharFileInfo($path);

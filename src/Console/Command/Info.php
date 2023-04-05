@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use DirectoryIterator;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
@@ -23,7 +22,6 @@ use KevinGH\Box\Console\PharInfoRenderer;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Pharaoh\Pharaoh;
 use Phar;
-use PharFileInfo;
 use SplFileInfo;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -38,7 +36,6 @@ use function KevinGH\Box\format_size;
 use function realpath;
 use function sprintf;
 use function str_repeat;
-use function str_replace;
 
 /**
  * @private
@@ -200,11 +197,11 @@ final class Info implements Command
     }
 
     private static function showPharInfo(
-        Pharaoh   $pharInfo,
-        bool      $content,
+        Pharaoh $pharInfo,
+        bool $content,
         int|false $maxDepth,
-        bool      $indent,
-        IO        $io,
+        bool $indent,
+        IO $io,
     ): int {
         self::showPharMeta($pharInfo, $io);
 
@@ -274,17 +271,15 @@ final class Info implements Command
     }
 
     /**
-     * @param iterable<SplFileInfo> $source
-     * @param false|natural             $maxDepth
-     * @param false|int              $indent   Nbr of indent or `false`
+     * @param false|natural $maxDepth
+     * @param false|int     $indent   Nbr of indent or `false`
      */
     private static function renderContentTree(
         OutputInterface $output,
-        Pharaoh         $pharInfo,
-        int|false       $maxDepth,
-        bool       $indent,
-    ): void
-    {
+        Pharaoh $pharInfo,
+        int|false $maxDepth,
+        bool $indent,
+    ): void {
         self::renderPartialTree(
             $pharInfo->getFiles(),
             $output,
@@ -296,15 +291,15 @@ final class Info implements Command
 
     /**
      * @param iterable<string, SplFileInfo> $source
-     * @param -1|natural             $maxDepth
-     * @param false|int              $indent   Nbr of indent or `false`
+     * @param -1|natural                    $maxDepth
+     * @param false|int                     $indent   Nbr of indent or `false`
      */
     private static function renderPartialTree(
         iterable $source,
         OutputInterface $output,
-        Pharaoh         $pharInfo,
-        int|false       $maxDepth,
-        bool       $indent,
+        Pharaoh $pharInfo,
+        int|false $maxDepth,
+        bool $indent,
     ): void {
         $depth = 0;
         $renderedDirectories = [];
@@ -348,11 +343,10 @@ final class Info implements Command
     private static function renderParentDirectoriesIfNecessary(
         SplFileInfo $fileInfo,
         OutputInterface $output,
-        int|false       &$depth,
-        bool       $indent,
+        int|false &$depth,
+        bool $indent,
         array &$renderedDirectories
-    ): void
-    {
+    ): void {
         if (false === $indent) {
             // When there is no indent directories are skipped.
             return;
@@ -362,7 +356,7 @@ final class Info implements Command
 
         if ('' === $relativePath) {
             if ($depth > 0) {
-                $depth--;
+                --$depth;
             }
 
             // No parent directory: there is nothing to do.
@@ -387,7 +381,7 @@ final class Info implements Command
             );
 
             $renderedDirectories[$parentDirectory] = true;
-            $depth++;
+            ++$depth;
         }
     }
 
@@ -396,8 +390,7 @@ final class Info implements Command
         string $message,
         int $depth,
         bool $indent,
-    ): void
-    {
+    ): void {
         if ($indent) {
             $output->write(str_repeat(' ', $depth * self::INDENT_SIZE));
         }

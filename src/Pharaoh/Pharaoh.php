@@ -43,7 +43,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Pharaoh;
 
-use JetBrains\PhpStorm\ArrayShape;
 use KevinGH\Box\Console\Command\Extract;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\PharMeta;
@@ -52,8 +51,6 @@ use OutOfBoundsException;
 use ParagonIE\ConstantTime\Hex;
 use Phar;
 use PharData;
-use PharFileInfo;
-use RecursiveIteratorIterator;
 use RuntimeException;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
@@ -67,7 +64,6 @@ use function file_exists;
 use function getenv;
 use function iter\mapKeys;
 use function iter\toArrayWithKeys;
-use function iterator_to_array;
 use function KevinGH\Box\FileSystem\copy;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_tmp_dir;
@@ -409,7 +405,7 @@ final class Pharaoh
         );
 
         foreach ($filesMeta as ['compression' => $compression]) {
-            $count[$compression->name]++;
+            ++$count[$compression->name];
         }
 
         return $count;
