@@ -330,7 +330,9 @@ final class Info implements Command
                 $output,
                 sprintf(
                     '%s %s - %s',
-                    $splFileInfo->getFilename(),
+                    $indent
+                        ? $splFileInfo->getFilename()
+                        : $splFileInfo->getRelativePathname(),
                     $compressionLine,
                     format_size($compressionSize),
                 ),
@@ -377,7 +379,7 @@ final class Info implements Command
                 $output,
                 "<info>{$parentDirectory}/</info>",
                 $depth,
-                $indent,
+                true,
             );
 
             $renderedDirectories[$parentDirectory] = true;

@@ -64,7 +64,7 @@ final class PharInfoRenderer
             return;
         }
 
-        $io->writeln('<comment>Compression:</comment>');
+        $io->writeln('<comment>Files Compression:</comment>');
         $lastAlgorithmName = array_key_last($count);
 
         $totalPercentage = 100;

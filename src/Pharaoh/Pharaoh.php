@@ -114,7 +114,7 @@ final class Pharaoh
         $this->fileName = basename($file);
 
         $this->tmp = make_tmp_dir('HumbugBox', 'Pharaoh');
-        $this->temporaryTmp = make_tmp_dir('HumbugBox', 'PharaohTemporary');
+        $temporaryTmp = make_tmp_dir('HumbugBox', 'PharaohTemporary');
 
         self::dumpPhar($file, $this->tmp);
         [
@@ -124,7 +124,7 @@ final class Pharaoh
 
         $this->initPhar($file);
 
-        self::extractPhar($this->phar, $this->temporaryTmp);
+        self::extractPhar($this->phar, $temporaryTmp);
     }
 
     public function __destruct()
