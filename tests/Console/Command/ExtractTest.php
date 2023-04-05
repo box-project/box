@@ -16,6 +16,7 @@ namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
+use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\PharMeta;
 use KevinGH\Box\Pharaoh\InvalidPhar;
 use KevinGH\Box\Test\CommandTestCase;
@@ -72,10 +73,10 @@ class ExtractTest extends CommandTestCase
         $pharPath = self::FIXTURES_DIR.'/simple-phar.phar';
 
         $oldDefaultPharStub = self::getStub(self::FIXTURES_DIR.'/simple-phar-stub.php');
-        $defaultStub = self::getStub(self::FIXTURES_DIR.'/../phar/default-phar-stub.php');
         $sha512Stub = self::getStub(self::FIXTURES_DIR.'/sha512-phar-stub.php');
 
         $pharMeta = new PharMeta(
+            CompressionAlgorithm::NONE,
             [
                 'hash' => '966C5D96F7A3C67F8FC06D3DF55CE4C9AC820F47',
                 'hash_type' => 'SHA-1',
@@ -84,6 +85,16 @@ class ExtractTest extends CommandTestCase
             '1.1.0',
             null,
             null,
+            [
+                '.hidden' => [
+                    'compression' => CompressionAlgorithm::NONE,
+                    'compressedSize' => 3,
+                ],
+                'foo' => [
+                    'compression' => CompressionAlgorithm::NONE,
+                    'compressedSize' => 3,
+                ],
+            ],
         );
 
         $expectedSimplePharFiles = [
@@ -109,6 +120,7 @@ class ExtractTest extends CommandTestCase
                     '.hidden' => 'baz',
                     'foo' => 'bar',
                     '.phar_meta.json' => (new PharMeta(
+                        CompressionAlgorithm::NONE,
                         [
                             'hash' => '3CCDA01B80C1CAC91494EA59BBAFA479E38CD120',
                             'hash_type' => 'SHA-1',
@@ -117,6 +129,16 @@ class ExtractTest extends CommandTestCase
                         '1.1.0',
                         null,
                         null,
+                        [
+                            '.hidden' => [
+                                'compression' => CompressionAlgorithm::GZ,
+                                'compressedSize' => 5,
+                            ],
+                            'foo' => [
+                                'compression' => CompressionAlgorithm::GZ,
+                                'compressedSize' => 5,
+                            ],
+                        ],
                     ))->toJson(),
                 ],
             ];
@@ -130,6 +152,7 @@ class ExtractTest extends CommandTestCase
 
                     PHP,
                 '.phar_meta.json' => (new PharMeta(
+                    CompressionAlgorithm::NONE,
                     [
                         'hash' => 'B4CAE177138A773283A748C8770A7142F0CC36D6EE88E37900BCF09A92D840D237CE3F3B47C2C7B39AC2D2C0F9A16D63FE70E1A455723DD36840B6E2E64E2130',
                         'hash_type' => 'SHA-512',
@@ -138,6 +161,12 @@ class ExtractTest extends CommandTestCase
                     '1.1.0',
                     null,
                     null,
+                    [
+                        'index.php' => [
+                            'compression' => CompressionAlgorithm::NONE,
+                            'compressedSize' => 30,
+                        ],
+                    ],
                 ))->toJson(),
             ],
         ];
@@ -150,6 +179,7 @@ class ExtractTest extends CommandTestCase
 
                     PHP,
                 '.phar_meta.json' => (new PharMeta(
+                    CompressionAlgorithm::NONE,
                     [
                         'hash' => '54AF1D4E5459D3A77B692E46FDB9C965D1C7579BD1F2AD2BECF4973677575444FE21E104B7655BA3D088090C28DF63D14876B277C423C8BFBCDB9E3E63F9D61A',
                         'hash_type' => 'OpenSSL',
@@ -164,6 +194,12 @@ class ExtractTest extends CommandTestCase
                         -----END PUBLIC KEY-----
 
                         EOF,
+                    [
+                        'index.php' => [
+                            'compression' => CompressionAlgorithm::NONE,
+                            'compressedSize' => 30,
+                        ],
+                    ],
                 ))->toJson(),
             ],
         ];

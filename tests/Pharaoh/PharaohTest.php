@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Pharaoh;
 
+use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use PHPUnit\Framework\TestCase;
 use function array_keys;
@@ -64,6 +65,14 @@ final class PharaohTest extends TestCase
             $expectedFileRelativePaths,
             array_keys($pharInfo->getFiles()),
         );
+
+        foreach ($expectedFileRelativePaths as $relativePath) {
+            $fileMeta = $pharInfo->getFileMeta($relativePath);
+
+            self::assertSame(['compression', 'compressedSize'], array_keys($fileMeta));
+            self::assertInstanceOf(CompressionAlgorithm::class, $fileMeta['compression']);
+            self::assertGreaterThanOrEqual(0, $fileMeta['compressedSize']);
+        }
     }
 
     public static function fileProvider(): iterable

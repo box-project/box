@@ -105,7 +105,8 @@ class InfoTest extends CommandTestCase
 
                 API Version: 1.1.0
 
-                Compression: None
+                Archive Compression: None
+                Files Compression: None
 
                 Signature: SHA-256
                 Signature Hash: 55AE0CCD6D3A74BE41E19CD070A655A73FEAEF8342084A0801954943FBF219ED
@@ -129,7 +130,8 @@ class InfoTest extends CommandTestCase
 
                     API Version: 1.1.0
 
-                    Compression: GZ
+                    Archive Compression: None
+                    Files Compression: GZ
 
                     Signature: SHA-1
                     Signature Hash: 3CCDA01B80C1CAC91494EA59BBAFA479E38CD120
@@ -153,7 +155,8 @@ class InfoTest extends CommandTestCase
 
                 API Version: No information found
 
-                Compression: None
+                Archive Compression: None
+                Files Compression: None
 
                 Signature unreadable
 
@@ -176,7 +179,8 @@ class InfoTest extends CommandTestCase
 
                 API Version: No information found
 
-                Compression: None
+                Archive Compression: None
+                Files Compression: None
 
                 Signature unreadable
 
@@ -197,7 +201,8 @@ class InfoTest extends CommandTestCase
 
                     API Version: No information found
 
-                    Compression: GZ
+                    Archive Compression: GZ
+                    Files Compression: None
 
                     Signature unreadable
 
@@ -220,7 +225,8 @@ class InfoTest extends CommandTestCase
 
                 API Version: 1.1.0
 
-                Compression: None
+                Archive Compression: None
+                Files Compression: None
 
                 Signature: SHA-256
                 Signature Hash: 5FE61595A3D773538C3CE6006FBC3679272F6DF118B3229AFD606462B772C414
@@ -244,7 +250,8 @@ class InfoTest extends CommandTestCase
 
                 API Version: 1.1.0
 
-                Compression: None
+                Archive Compression: None
+                Files Compression: None
 
                 Signature: SHA-256
                 Signature Hash: 5FE61595A3D773538C3CE6006FBC3679272F6DF118B3229AFD606462B772C414
@@ -252,26 +259,26 @@ class InfoTest extends CommandTestCase
                 Metadata: None
 
                 Contents: 13 files (7.13KB)
+                fileX [NONE] - 0.00B
+                .hidden-file [NONE] - 0.00B
                 .hidden-dir/
-                  .hidden-file [NONE] - 0.00B
+                  fileY [NONE] - 0.00B
                   dir/
                     fileZ [NONE] - 0.00B
-                  fileY [NONE] - 0.00B
-                .hidden-file [NONE] - 0.00B
+                  .hidden-file [NONE] - 0.00B
+                dir1/
+                  fileG [NONE] - 0.00B
+                  fileH [NONE] - 0.00B
                 dir0/
+                  fileB [NONE] - 0.00B
                   dir01/
-                    fileC [NONE] - 0.00B
                     fileD [NONE] - 0.00B
+                    fileC [NONE] - 0.00B
+                  fileA [NONE] - 0.00B
                   dir02/
                     dir020/
                       fileE [NONE] - 0.00B
                       fileF [NONE] - 0.00B
-                  fileA [NONE] - 0.00B
-                  fileB [NONE] - 0.00B
-                dir1/
-                  fileG [NONE] - 0.00B
-                  fileH [NONE] - 0.00B
-                fileX [NONE] - 0.00B
 
                 OUTPUT,
         ];
@@ -286,7 +293,8 @@ class InfoTest extends CommandTestCase
 
                 API Version: 1.1.0
 
-                Compression: None
+                Archive Compression: None
+                Files Compression: None
 
                 Signature: SHA-256
                 Signature Hash: 5FE61595A3D773538C3CE6006FBC3679272F6DF118B3229AFD606462B772C414
@@ -294,20 +302,12 @@ class InfoTest extends CommandTestCase
                 Metadata: None
 
                 Contents: 13 files (7.13KB)
-                .hidden-dir/
-                  .hidden-file [NONE] - 0.00B
-                  dir/
-                  fileY [NONE] - 0.00B
-                .hidden-file [NONE] - 0.00B
-                dir0/
-                  dir01/
-                  dir02/
-                  fileA [NONE] - 0.00B
-                  fileB [NONE] - 0.00B
-                dir1/
-                  fileG [NONE] - 0.00B
-                  fileH [NONE] - 0.00B
                 fileX [NONE] - 0.00B
+                .hidden-file [NONE] - 0.00B
+                .hidden-dir/
+                  fileY [NONE] - 0.00B
+                  dir/
+                    fileZ [NONE] - 0.00B
 
                 OUTPUT,
         ];
@@ -322,7 +322,8 @@ class InfoTest extends CommandTestCase
 
                 API Version: 1.1.0
 
-                Compression: None
+                Archive Compression: None
+                Files Compression: None
 
                 Signature: SHA-256
                 Signature Hash: 5FE61595A3D773538C3CE6006FBC3679272F6DF118B3229AFD606462B772C414
@@ -330,19 +331,19 @@ class InfoTest extends CommandTestCase
                 Metadata: None
 
                 Contents: 13 files (7.13KB)
-                .hidden-dir/.hidden-file [NONE] - 0.00B
-                .hidden-dir/dir/fileZ [NONE] - 0.00B
-                .hidden-dir/fileY [NONE] - 0.00B
+                fileX [NONE] - 0.00B
                 .hidden-file [NONE] - 0.00B
-                dir0/dir01/fileC [NONE] - 0.00B
-                dir0/dir01/fileD [NONE] - 0.00B
-                dir0/dir02/dir020/fileE [NONE] - 0.00B
-                dir0/dir02/dir020/fileF [NONE] - 0.00B
-                dir0/fileA [NONE] - 0.00B
-                dir0/fileB [NONE] - 0.00B
+                .hidden-dir/fileY [NONE] - 0.00B
+                .hidden-dir/dir/fileZ [NONE] - 0.00B
+                .hidden-dir/.hidden-file [NONE] - 0.00B
                 dir1/fileG [NONE] - 0.00B
                 dir1/fileH [NONE] - 0.00B
-                fileX [NONE] - 0.00B
+                dir0/fileB [NONE] - 0.00B
+                dir0/dir01/fileD [NONE] - 0.00B
+                dir0/dir01/fileC [NONE] - 0.00B
+                dir0/fileA [NONE] - 0.00B
+                dir0/dir02/dir020/fileE [NONE] - 0.00B
+                dir0/dir02/dir020/fileF [NONE] - 0.00B
 
                 OUTPUT,
         ];
@@ -358,7 +359,8 @@ class InfoTest extends CommandTestCase
 
                 API Version: 1.1.0
 
-                Compression: None
+                Archive Compression: None
+                Files Compression: None
 
                 Signature: SHA-256
                 Signature Hash: 5FE61595A3D773538C3CE6006FBC3679272F6DF118B3229AFD606462B772C414
@@ -366,14 +368,19 @@ class InfoTest extends CommandTestCase
                 Metadata: None
 
                 Contents: 13 files (7.13KB)
-                .hidden-dir/.hidden-file [NONE] - 0.00B
-                .hidden-dir/fileY [NONE] - 0.00B
+                fileX [NONE] - 0.00B
                 .hidden-file [NONE] - 0.00B
-                dir0/fileA [NONE] - 0.00B
-                dir0/fileB [NONE] - 0.00B
+                .hidden-dir/fileY [NONE] - 0.00B
+                .hidden-dir/dir/fileZ [NONE] - 0.00B
+                .hidden-dir/.hidden-file [NONE] - 0.00B
                 dir1/fileG [NONE] - 0.00B
                 dir1/fileH [NONE] - 0.00B
-                fileX [NONE] - 0.00B
+                dir0/fileB [NONE] - 0.00B
+                dir0/dir01/fileD [NONE] - 0.00B
+                dir0/dir01/fileC [NONE] - 0.00B
+                dir0/fileA [NONE] - 0.00B
+                dir0/dir02/dir020/fileE [NONE] - 0.00B
+                dir0/dir02/dir020/fileF [NONE] - 0.00B
 
                 OUTPUT,
         ];
@@ -388,7 +395,8 @@ class InfoTest extends CommandTestCase
 
                     API Version: 1.1.0
 
-                    Compression:
+                    Archive Compression: None
+                    Files Compression:
                       - BZ2 (33.33%)
                       - None (66.67%)
 
@@ -403,10 +411,10 @@ class InfoTest extends CommandTestCase
                     Contents: 3 files (6.79KB)
                     a/
                       bar.php [BZ2] - 60.00B
+                    foo.php [NONE] - 19.00B
                     b/
                       beta/
                         bar.php [NONE] - 0.00B
-                    foo.php [NONE] - 19.00B
 
                     OUTPUT,
             ];

@@ -47,11 +47,10 @@ use KevinGH\Box\Console\Command\Extract;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\PharMeta;
 use KevinGH\Box\Phar\PharPhpSettings;
+use OutOfBoundsException;
 use ParagonIE\ConstantTime\Hex;
 use Phar;
 use PharData;
-use PharFileInfo;
-use RecursiveIteratorIterator;
 use RuntimeException;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
@@ -65,12 +64,12 @@ use function file_exists;
 use function getenv;
 use function iter\mapKeys;
 use function iter\toArrayWithKeys;
-use function iterator_to_array;
 use function KevinGH\Box\FileSystem\copy;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\make_tmp_dir;
 use function KevinGH\Box\FileSystem\remove;
 use function random_bytes;
+use function sprintf;
 
 // TODO: rename it to SafePhar
 /**
@@ -115,7 +114,7 @@ final class Pharaoh
         $this->fileName = basename($file);
 
         $this->tmp = make_tmp_dir('HumbugBox', 'Pharaoh');
-        $this->temporaryTmp = make_tmp_dir('HumbugBox', 'PharaohTemporary');
+        $temporaryTmp = make_tmp_dir('HumbugBox', 'PharaohTemporary');
 
         self::dumpPhar($file, $this->tmp);
         [
@@ -125,7 +124,7 @@ final class Pharaoh
 
         $this->initPhar($file);
 
-        self::extractPhar($this->phar, $this->temporaryTmp);
+        self::extractPhar($this->phar, $temporaryTmp);
     }
 
     public function __destruct()
@@ -191,17 +190,22 @@ final class Pharaoh
     public function equals(self $pharInfo): bool
     {
         return
-            $pharInfo->getCompressionCount() === $this->getCompressionCount()
+            $pharInfo->getFilesCompressionCount() === $this->getFilesCompressionCount()
             && $pharInfo->getNormalizedMetadata() === $this->getNormalizedMetadata();
     }
 
+    public function getCompression(): CompressionAlgorithm
+    {
+        return $this->meta->compression;
+    }
+
     /**
-     * @deprecated
+     * @return array<string, positive-int|0> The number of files per compression algorithm label.
      */
-    public function getCompressionCount(): array
+    public function getFilesCompressionCount(): array
     {
         if (!isset($this->compressionCount)) {
-            $this->compressionCount = self::calculateCompressionCount($this->phar);
+            $this->compressionCount = self::calculateCompressionCount($this->meta->filesMeta);
         }
 
         return $this->compressionCount;
@@ -214,6 +218,25 @@ final class Pharaoh
     {
         // Do not cache the result
         return 'phar://'.str_replace('\\', '/', realpath($this->phar->getPath())).'/';
+    }
+
+    /**
+     * @return array{'compression': CompressionAlgorithm, compressedSize: int}
+     */
+    public function getFileMeta(string $path): array
+    {
+        $meta = $this->meta->filesMeta[$path] ?? null;
+
+        if (null === $meta) {
+            throw new OutOfBoundsException(
+                sprintf(
+                    'No metadata found for the file "%s".',
+                    $path,
+                ),
+            );
+        }
+
+        return $meta;
     }
 
     public function getVersion(): ?string
@@ -371,50 +394,21 @@ final class Pharaoh
         return '' === $extension ? '.phar' : $extension;
     }
 
-    private static function calculateCompressionCount(Phar|PharData $phar): array
+    /**
+     * @param array<string, array{'compression': CompressionAlgorithm, compressedSize: int}> $filesMeta
+     */
+    private static function calculateCompressionCount(array $filesMeta): array
     {
         $count = array_fill_keys(
             self::$ALGORITHMS,
             0,
         );
 
-        if ($phar instanceof PharData) {
-            $count[self::$ALGORITHMS[$phar->isCompressed()]] = 1;
-        } else {
-            $count = self::calculatePharCompressionCount($count, $phar);
+        foreach ($filesMeta as ['compression' => $compression]) {
+            ++$count[$compression->name];
         }
 
-        $count['None'] = $count[CompressionAlgorithm::NONE->name];
-        unset($count[CompressionAlgorithm::NONE->name]);
-
         return $count;
-    }
-
-    private static function calculatePharCompressionCount(array $count, Phar $phar): array
-    {
-        $countFile = static function (array $count, PharFileInfo $file): array {
-            if (false === $file->isCompressed()) {
-                ++$count[CompressionAlgorithm::NONE->name];
-
-                return $count;
-            }
-
-            foreach (self::$ALGORITHMS as $compressionAlgorithmCode => $compressionAlgorithmName) {
-                if ($file->isCompressed($compressionAlgorithmCode)) {
-                    ++$count[$compressionAlgorithmName];
-
-                    return $count;
-                }
-            }
-
-            return $count;
-        };
-
-        return array_reduce(
-            iterator_to_array(new RecursiveIteratorIterator($phar)),
-            $countFile,
-            $count,
-        );
     }
 
     private function initPhar(string $file): void
