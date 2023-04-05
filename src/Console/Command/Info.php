@@ -29,6 +29,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Path;
 use Throwable;
 use function array_key_exists;
+use function count;
 use function explode;
 use function implode;
 use function is_array;
@@ -309,13 +310,14 @@ final class Info implements Command
                 continue;
             }
 
-            self::renderParentDirectoriesIfNecessary(
-                $splFileInfo,
-                $output,
-                $depth,
-                $indent,
-                $renderedDirectories,
-            );
+            if ($indent) {
+                self::renderParentDirectoriesIfNecessary(
+                    $splFileInfo,
+                    $output,
+                    $depth,
+                    $renderedDirectories,
+                );
+            }
 
             [
                 'compression' => $compression,
@@ -345,22 +347,13 @@ final class Info implements Command
     private static function renderParentDirectoriesIfNecessary(
         SplFileInfo $fileInfo,
         OutputInterface $output,
-        int|false &$depth,
-        bool $indent,
-        array &$renderedDirectories
+        int &$depth,
+        array &$renderedDirectories,
     ): void {
-        if (false === $indent) {
-            // When there is no indent directories are skipped.
-            return;
-        }
-
+        $depth = 0;
         $relativePath = $fileInfo->getRelativePath();
 
         if ('' === $relativePath) {
-            if ($depth > 0) {
-                --$depth;
-            }
-
             // No parent directory: there is nothing to do.
             return;
         }
@@ -370,21 +363,25 @@ final class Info implements Command
             Path::normalize($relativePath),
         );
 
-        foreach ($parentDirectories as $parentDirectory) {
+        foreach ($parentDirectories as $index => $parentDirectory) {
             if (array_key_exists($parentDirectory, $renderedDirectories)) {
+                ++$depth;
+
                 continue;
             }
 
             self::print(
                 $output,
                 "<info>{$parentDirectory}/</info>",
-                $depth,
+                $index,
                 true,
             );
 
             $renderedDirectories[$parentDirectory] = true;
             ++$depth;
         }
+
+        $depth = count($parentDirectories);
     }
 
     private static function print(

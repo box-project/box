@@ -428,6 +428,76 @@ final class PharMetaTest extends TestCase
                 ),
             ];
         }
+
+        yield 'file keys are sorted' => [
+            self::FIXTURES_DIR.'/../info/complete-tree.phar',
+            null,
+            new PharMeta(
+                CompressionAlgorithm::NONE,
+                [
+                    'hash' => '5FE61595A3D773538C3CE6006FBC3679272F6DF118B3229AFD606462B772C414',
+                    'hash_type' => 'SHA-256',
+                ],
+                $defaultStub,
+                '1.1.0',
+                null,
+                null,
+                [
+                    '.hidden-dir/.hidden-file' => [
+                        'compression' => CompressionAlgorithm::NONE,
+                        'compressedSize' => 0,
+                    ],
+                    '.hidden-dir/dir/fileZ' => [
+                        'compression' => CompressionAlgorithm::NONE,
+                        'compressedSize' => 0,
+                    ],
+                    '.hidden-dir/fileY' => [
+                        'compression' => CompressionAlgorithm::NONE,
+                        'compressedSize' => 0,
+                    ],
+                    '.hidden-file' => [
+                        'compression' => CompressionAlgorithm::NONE,
+                        'compressedSize' => 0,
+                    ],
+                    'dir0/dir01/fileC' => [
+                        'compression' => CompressionAlgorithm::NONE,
+                        'compressedSize' => 0,
+                    ],
+                    'dir0/dir01/fileD' => [
+                        'compression' => CompressionAlgorithm::NONE,
+                        'compressedSize' => 0,
+                    ],
+                    'dir0/dir02/dir020/fileE' => [
+                        'compression' => CompressionAlgorithm::NONE,
+                        'compressedSize' => 0,
+                    ],
+                    'dir0/dir02/dir020/fileF' => [
+                        'compression' => CompressionAlgorithm::NONE,
+                        'compressedSize' => 0,
+                    ],
+                    'dir0/fileA' => [
+                        'compression' => CompressionAlgorithm::NONE,
+                        'compressedSize' => 0,
+                    ],
+                    'dir0/fileB' => [
+                        'compression' => CompressionAlgorithm::NONE,
+                        'compressedSize' => 0,
+                    ],
+                    'dir1/fileG' => [
+                        'compression' => CompressionAlgorithm::NONE,
+                        'compressedSize' => 0,
+                    ],
+                    'dir1/fileH' => [
+                        'compression' => CompressionAlgorithm::NONE,
+                        'compressedSize' => 0,
+                    ],
+                    'fileX' => [
+                        'compression' => CompressionAlgorithm::NONE,
+                        'compressedSize' => 0,
+                    ],
+                ],
+            ),
+        ];
     }
 
     private static function getStub(string $path): string

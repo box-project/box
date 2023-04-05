@@ -23,11 +23,13 @@ use SplFileInfo;
 use Symfony\Component\Filesystem\Path;
 use UnexpectedValueException;
 use function KevinGH\Box\FileSystem\make_path_relative;
+use function ksort;
 use function Safe\json_decode;
 use function Safe\json_encode;
 use function Safe\realpath;
 use function sprintf;
 use function var_export;
+use const SORT_LOCALE_STRING;
 
 /**
  * Represents the PHAR metadata (partially). The goal is to capture enough information to interpret a PHAR
@@ -124,6 +126,8 @@ final class PharMeta
             $phar,
             $filesMeta,
         );
+
+        ksort($filesMeta, SORT_LOCALE_STRING);
 
         return $filesMeta;
     }
