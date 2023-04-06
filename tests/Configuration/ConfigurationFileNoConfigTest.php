@@ -15,13 +15,13 @@ declare(strict_types=1);
 namespace KevinGH\Box\Configuration;
 
 use InvalidArgumentException;
+use KevinGH\Box\Platform;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\touch;
 use function natcasesort;
 use function symlink;
-use const PHP_OS_FAMILY;
 
 /**
  * @covers \KevinGH\Box\Configuration\Configuration
@@ -466,9 +466,9 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
     public function test_it_ignores_the_most_common_non_needed_files_when_guess_the_files_from_the_composer_json_file(): void
     {
         // Depending on the test machine: the following command might be needed:
-        // docker run -i --rm -w /opt/box -v "$PWD":/opt/box box_php81 vendor/bin/phpunit tests/Configuration/ConfigurationFileNoConfigTest.php --filter test_it_ignores_the_most_common_non_needed_files_when_guess_the_files_from_the_composer_json_file
+        // docker run -i --rm -w /opt/box -v "$PWD":/opt/box php:8.1-cli vendor/bin/phpunit tests/Configuration/ConfigurationFileNoConfigTest.php --filter test_it_ignores_the_most_common_non_needed_files_when_guess_the_files_from_the_composer_json_file
 
-        if ('Darwin' === PHP_OS_FAMILY) {
+        if (Platform::isOSX()) {
             self::markTestSkipped('Cannot run this test on OSX since it is case insensitive.');
         }
 
