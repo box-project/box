@@ -14,9 +14,16 @@ declare(strict_types=1);
 
 use Laravel\SerializableClosure\Support\ClosureStream;
 use org\bovigo\vfs\vfsStreamWrapper;
+use Symfony\Component\Filesystem\Path;
 use function KevinGH\Box\register_aliases;
+use function Safe\putenv;
 
 register_aliases();
 
 vfsStreamWrapper::register();
 ClosureStream::register();
+
+$binBoxPath = Path::normalize(__DIR__.'/../bin/box');
+
+$_SERVER['BOX_BIN'] = $_ENV['BOX_BIN'] = $binBoxPath;
+putenv('BOX_BIN='.$binBoxPath);

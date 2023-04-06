@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Pharaoh;
 
+use KevinGH\Box\Phar\CompressionAlgorithm;
 use PHPUnit\Framework\TestCase;
 use function array_keys;
 use function basename;
@@ -23,6 +24,7 @@ use function Safe\realpath;
 
 /**
  * @covers \KevinGH\Box\Pharaoh\Pharaoh
+ * @runTestsInSeparateProcesses
  *
  * @internal
  */
@@ -48,21 +50,30 @@ final class PharaohTest extends TestCase
         self::assertSame(basename($file), $pharInfo->getFileName());
         self::assertSame($expectedVersion, $pharInfo->getVersion());
         self::assertSame($expectedSignature, $pharInfo->getSignature());
-        self::assertSame($expectedPubkey, $pharInfo->getPubkey());
+        self::assertSame($expectedPubkey, $pharInfo->getPubKeyContent());
         self::assertSame($expectedMetadata, $pharInfo->getNormalizedMetadata());
         self::assertSame($expectedStub, $pharInfo->getStubContent());
         self::assertEqualsCanonicalizing(
             $expectedFileRelativePaths,
             array_keys($pharInfo->getFiles()),
         );
+
+        foreach ($expectedFileRelativePaths as $relativePath) {
+            $fileMeta = $pharInfo->getFileMeta($relativePath);
+
+            self::assertSame(['compression', 'compressedSize'], array_keys($fileMeta));
+            self::assertInstanceOf(CompressionAlgorithm::class, $fileMeta['compression']);
+            self::assertGreaterThanOrEqual(0, $fileMeta['compressedSize']);
+        }
     }
 
     public static function fileProvider(): iterable
     {
-        $defaultStub = rtrim(file_get_contents(self::FIXTURES_DIR.'/phar/default-phar-stub.php'), "\n");
+        $defaultStub = self::getStub(self::FIXTURES_DIR.'/phar/default-phar-stub.php');
+        $oldDefaultStub = self::getStub(self::FIXTURES_DIR.'/phar/old-default-phar-stub.php');
 
         yield 'simple PHAR (2017)' => [
-            self::FIXTURES_DIR.'/extract/simple-phar-2017.phar',
+            self::FIXTURES_DIR.'/phar/simple-phar-2017.phar',
             '1.1.0',
             [
                 'hash' => '191723EE056C62E3179FDE1B792AA03040FCEF92',
@@ -70,7 +81,7 @@ final class PharaohTest extends TestCase
             ],
             null,
             null,
-            rtrim(file_get_contents(self::FIXTURES_DIR.'/extract/old-default-phar-stub.php'), "\n"),
+            $oldDefaultStub,
             ['foo.php'],
         ];
 
@@ -101,7 +112,7 @@ final class PharaohTest extends TestCase
         ];
 
         yield 'PHAR with a string value as metadata' => [
-            self::FIXTURES_DIR.'/extract/metadata/string-metadata.phar',
+            self::FIXTURES_DIR.'/phar/metadata/string-metadata.phar',
             '1.1.0',
             [
                 'hash' => 'A9D407999E197A1159F12BE0F4362249625D456E9E7362C8CBA0ECABE8B3C601',
@@ -114,7 +125,7 @@ final class PharaohTest extends TestCase
         ];
 
         yield 'PHAR with a float value as metadata' => [
-            self::FIXTURES_DIR.'/extract/metadata/float-metadata.phar',
+            self::FIXTURES_DIR.'/phar/metadata/float-metadata.phar',
             '1.1.0',
             [
                 'hash' => '7A504BE5DB7793106265A03357C5DB55DFBA51265464F1F56CCD8E2B51CA046A',
@@ -127,7 +138,7 @@ final class PharaohTest extends TestCase
         ];
 
         yield 'PHAR with an stdClass value as metadata' => [
-            self::FIXTURES_DIR.'/extract/metadata/stdClass-metadata.phar',
+            self::FIXTURES_DIR.'/phar/metadata/stdClass-metadata.phar',
             '1.1.0',
             [
                 'hash' => 'EE93788AAE2DE0098532021A425A343595F1066D9638B074E9AEA6BC6CA08D22',
@@ -145,7 +156,7 @@ final class PharaohTest extends TestCase
 
         yield 'simple tar' => [
             self::FIXTURES_DIR.'/phar/simple.tar',
-            null,
+            'No information found',
             null,
             null,
             null,
@@ -177,15 +188,6 @@ final class PharaohTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function test_it_throws_an_error_when_a_phar_cannot_be_created(): void
-    {
-        $this->expectException(InvalidPhar::class);
-
-        $file = self::FIXTURES_DIR.'/unknown-file';
-
-        new Pharaoh($file);
-    }
-
     public function test_it_throws_an_error_when_a_phar_cannot_be_created_due_to_unverifiable_signature(): void
     {
         $file = self::FIXTURES_DIR.'/phar/simple-phar-openssl-sign-with-invalid-pubkey.phar';
@@ -194,5 +196,14 @@ final class PharaohTest extends TestCase
         $this->expectExceptionMessageMatches('/^Could not create a Phar or PharData instance for the file /');
 
         new Pharaoh($file);
+    }
+
+    private static function getStub(string $path): string
+    {
+        // We trim the last line returns since phpStorm may interfere with the copied file appending it on save.
+        return rtrim(
+            file_get_contents($path),
+            "\n",
+        );
     }
 }

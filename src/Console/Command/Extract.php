@@ -19,10 +19,9 @@ use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
 use KevinGH\Box\Phar\PharFactory;
+use KevinGH\Box\Phar\PharMeta;
 use KevinGH\Box\Pharaoh\InvalidPhar;
-use KevinGH\Box\Pharaoh\Pharaoh;
 use ParagonIE\ConstantTime\Hex;
-use Phar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
@@ -34,7 +33,7 @@ use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\mkdir;
 use function KevinGH\Box\FileSystem\remove;
 use function realpath;
-use function Safe\json_encode;
+use function Safe\file_get_contents;
 use function sprintf;
 use const DIRECTORY_SEPARATOR;
 
@@ -43,11 +42,7 @@ use const DIRECTORY_SEPARATOR;
  */
 final class Extract implements Command
 {
-    public const PUBKEY_PATH = '.phar/pubkey';
-    public const SIGNATURE_PATH = '.phar/signature.json';
-    public const STUB_PATH = '.phar/stub.php';
-    public const VERSION_PATH = '.phar/phar_version';
-    public const METADATA_PATH = '.phar/metadata';
+    public const PHAR_META_PATH = '.phar_meta.json';
 
     private const PHAR_ARG = 'phar';
     private const OUTPUT_ARG = 'output';
@@ -157,51 +152,35 @@ final class Extract implements Command
         // missing in which case we would not be able to create a Phar instance
         // as it requires the .phar extension.
         $tmpFile = $tmpDir.DIRECTORY_SEPARATOR.$alias;
-        $pubkey = $file.'.pubkey';
-        $intermediatePubkey = $tmpFile.'.pubkey';
-        $tmpPubkey = $tmpDir.DIRECTORY_SEPARATOR.self::PUBKEY_PATH;
+        $pubKey = $file.'.pubkey';
+        $pubKeyContent = null;
+        $tmpPubKey = $tmpFile.'.pubkey';
 
         try {
             copy($file, $tmpFile, true);
 
-            if (file_exists($pubkey)) {
-                copy($pubkey, $intermediatePubkey, true);
-                copy($pubkey, $tmpPubkey, true);
+            if (file_exists($pubKey)) {
+                copy($pubKey, $tmpPubKey, true);
+                $pubKeyContent = file_get_contents($pubKey);
             }
 
             $phar = PharFactory::create($tmpFile);
+            $pharMeta = PharMeta::fromPhar($phar, $pubKeyContent);
 
             $phar->extractTo($tmpDir);
         } catch (Throwable $throwable) {
-            remove([$tmpFile, $intermediatePubkey, $tmpPubkey]);
+            remove([$tmpFile, $tmpPubKey]);
 
             throw $throwable;
         }
 
         dump_file(
-            $tmpDir.DIRECTORY_SEPARATOR.self::SIGNATURE_PATH,
-            json_encode($phar->getSignature()),
-        );
-
-        $stub = $phar->getStub();
-        if ('' !== $stub) {
-            dump_file(
-                $tmpDir.DIRECTORY_SEPARATOR.self::STUB_PATH,
-                $stub,
-            );
-        }
-
-        dump_file(
-            $tmpDir.DIRECTORY_SEPARATOR.self::VERSION_PATH,
-            $phar->getVersion(),
-        );
-        dump_file(
-            $tmpDir.DIRECTORY_SEPARATOR.self::METADATA_PATH,
-            var_export($phar->getMetadata(), true),
+            $tmpDir.DIRECTORY_SEPARATOR.self::PHAR_META_PATH,
+            $pharMeta->toJson(),
         );
 
         // Cleanup the temporary PHAR.
-        remove([$tmpFile, $intermediatePubkey]);
+        remove([$tmpFile, $tmpPubKey]);
 
         return $tmpDir;
     }

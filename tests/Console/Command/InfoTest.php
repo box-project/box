@@ -16,25 +16,27 @@ namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
-use Fidry\Console\Test\OutputAssertions;
 use InvalidArgumentException;
 use KevinGH\Box\Pharaoh\InvalidPhar;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
 use Symfony\Component\Console\Output\OutputInterface;
-use function getenv;
+use function extension_loaded;
 use function implode;
 use function preg_replace;
 use function realpath;
-use function str_replace;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Info
+ * @covers \KevinGH\Box\Console\Command\PharInfoRenderer
  *
  * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
  *                              can create undesirable side-effects.
  *
+ * @internal
+ */
+/**
  * @internal
  */
 class InfoTest extends CommandTestCase
@@ -55,114 +57,372 @@ class InfoTest extends CommandTestCase
         return new Info();
     }
 
-    public function test_it_provides_info_about_the_phar_api(): void
-    {
-        $this->commandTester->execute(
-            [
-                'command' => 'info',
-            ],
-        );
+    /**
+     * @dataProvider inputProvider
+     */
+    public function test_it_provides_info_about_the_phar_extension_or_the_given_phar_archive(
+        array $input,
+        string $expected,
+    ): void {
+        $input['command'] = 'info';
 
-        $version = Phar::apiVersion();
-        $compression = '  - '.implode("\n  - ", Phar::getSupportedCompression());
-        $signatures = '  - '.implode("\n  - ", Phar::getSupportedSignatures());
-
-        $expected = <<<OUTPUT
-
-            API Version: {$version}
-
-            Supported Compression:
-            {$compression}
-
-            Supported Signatures:
-            {$signatures}
-
-             // Get a PHAR details by giving its path as an argument.
-
-
-            OUTPUT;
+        $this->commandTester->execute($input);
 
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
-    public function test_it_provides_info_about_a_phar(): void
+    public static function inputProvider(): iterable
     {
-        $pharPath = self::FIXTURES.'/simple-phar.phar';
-        $phar = new Phar($pharPath);
+        yield 'PHAR extension data' => (static function (): array {
+            $version = Phar::apiVersion();
+            $compression = '  - '.implode("\n  - ", Phar::getSupportedCompression());
+            $signatures = '  - '.implode("\n  - ", Phar::getSupportedSignatures());
 
-        $version = $phar->getVersion();
-        $signature = $phar->getSignature();
+            return [
+                [],
+                <<<OUTPUT
 
-        $this->commandTester->execute(
+                    API Version: {$version}
+
+                    Supported Compression:
+                    {$compression}
+
+                    Supported Signatures:
+                    {$signatures}
+
+                     // Get a PHAR details by giving its path as an argument.
+
+
+                    OUTPUT,
+            ];
+        })();
+
+        yield 'simple non-compressed PHAR' => [
             [
-                'command' => 'info',
-                'phar' => $pharPath,
+                'phar' => self::FIXTURES.'/../phar/simple-phar.phar',
             ],
-        );
+            <<<'OUTPUT'
 
-        $expected = <<<OUTPUT
+                API Version: 1.1.0
 
-            API Version: {$version}
+                Archive Compression: None
+                Files Compression: None
 
-            Compression: None
+                Signature: SHA-256
+                Signature Hash: 55AE0CCD6D3A74BE41E19CD070A655A73FEAEF8342084A0801954943FBF219ED
 
-            Signature: {$signature['hash_type']}
-            Signature Hash: {$signature['hash']}
+                Metadata: None
 
-            Metadata: None
+                Contents: 1 file (6.65KB)
 
-            Contents: 1 file (6.64KB)
-
-             // Use the --list|-l option to list the content of the PHAR.
+                 // Use the --list|-l option to list the content of the PHAR.
 
 
-            OUTPUT;
+                OUTPUT,
+        ];
 
-        $this->assertSameOutput($expected, ExitCode::SUCCESS);
-    }
+        if (extension_loaded('zlib')) {
+            yield 'simple GZ-compressed PHAR' => [
+                [
+                    'phar' => self::FIXTURES.'/../extract/gz-compressed-phar.phar',
+                ],
+                <<<'OUTPUT'
 
-    public function test_it_provides_info_about_a_phar_without_extension(): void
-    {
-        $pharPath = self::FIXTURES.'/simple-phar';
-        $phar = new Phar($pharPath.'.phar');
+                    API Version: 1.1.0
 
-        $version = $phar->getVersion();
-        $signature = $phar->getSignature();
+                    Archive Compression: None
+                    Files Compression: GZ
 
-        $this->commandTester->execute(
+                    Signature: SHA-1
+                    Signature Hash: 3CCDA01B80C1CAC91494EA59BBAFA479E38CD120
+
+                    Metadata: None
+
+                    Contents: 2 files (6.64KB)
+
+                     // Use the --list|-l option to list the content of the PHAR.
+
+
+                    OUTPUT,
+            ];
+        }
+
+        yield 'non PHAR archive' => [
             [
-                'command' => 'info',
-                'phar' => $pharPath,
+                'phar' => self::FIXTURES.'/../phar/simple.tar',
             ],
-        );
+            <<<'OUTPUT'
 
-        $expected = <<<OUTPUT
+                API Version: No information found
 
-            API Version: {$version}
+                Archive Compression: None
+                Files Compression: None
 
-            Compression: None
+                Signature unreadable
 
-            Signature: {$signature['hash_type']}
-            Signature Hash: {$signature['hash']}
+                Metadata: None
 
-            Metadata: None
+                Contents: 1 file (2.00KB)
 
-            Contents: 1 file (6.64KB)
-
-             // Use the --list|-l option to list the content of the PHAR.
+                 // Use the --list|-l option to list the content of the PHAR.
 
 
-            OUTPUT;
+                OUTPUT,
+        ];
 
-        $this->assertSameOutput($expected, ExitCode::SUCCESS);
+        yield 'non PHAR archive with files listed' => [
+            [
+                'phar' => self::FIXTURES.'/../phar/simple.tar',
+                '--list' => null,
+            ],
+            <<<'OUTPUT'
+
+                API Version: No information found
+
+                Archive Compression: None
+                Files Compression: None
+
+                Signature unreadable
+
+                Metadata: None
+
+                Contents: 1 file (2.00KB)
+                sample.txt [NONE] - 13.00B
+
+                OUTPUT,
+        ];
+
+        if (extension_loaded('zlib')) {
+            yield 'simple TAR-GZ file' => [
+                [
+                    'phar' => self::FIXTURES.'/simple-phar.tar.gz',
+                ],
+                <<<'OUTPUT'
+
+                    API Version: No information found
+
+                    Archive Compression: GZ
+                    Files Compression: None
+
+                    Signature unreadable
+
+                    Metadata: None
+
+                    Contents: 1 file (2.56KB)
+
+                     // Use the --list|-l option to list the content of the PHAR.
+
+
+                    OUTPUT,
+            ];
+        }
+
+        yield 'PHAR with a complete tree files' => [
+            [
+                'phar' => self::FIXTURES.'/complete-tree.phar',
+            ],
+            <<<'OUTPUT'
+
+                API Version: 1.1.0
+
+                Archive Compression: None
+                Files Compression: None
+
+                Signature: SHA-256
+                Signature Hash: 5FE61595A3D773538C3CE6006FBC3679272F6DF118B3229AFD606462B772C414
+
+                Metadata: None
+
+                Contents: 13 files (7.13KB)
+
+                 // Use the --list|-l option to list the content of the PHAR.
+
+
+                OUTPUT,
+        ];
+
+        yield 'list PHAR files' => [
+            [
+                'phar' => self::FIXTURES.'/complete-tree.phar',
+                '--list' => null,
+            ],
+            <<<'OUTPUT'
+
+                API Version: 1.1.0
+
+                Archive Compression: None
+                Files Compression: None
+
+                Signature: SHA-256
+                Signature Hash: 5FE61595A3D773538C3CE6006FBC3679272F6DF118B3229AFD606462B772C414
+
+                Metadata: None
+
+                Contents: 13 files (7.13KB)
+                fileX [NONE] - 0.00B
+                .hidden-file [NONE] - 0.00B
+                .hidden-dir/
+                  fileY [NONE] - 0.00B
+                  dir/
+                    fileZ [NONE] - 0.00B
+                  .hidden-file [NONE] - 0.00B
+                dir1/
+                  fileG [NONE] - 0.00B
+                  fileH [NONE] - 0.00B
+                dir0/
+                  fileB [NONE] - 0.00B
+                  dir01/
+                    fileD [NONE] - 0.00B
+                    fileC [NONE] - 0.00B
+                  fileA [NONE] - 0.00B
+                  dir02/
+                    dir020/
+                      fileE [NONE] - 0.00B
+                      fileF [NONE] - 0.00B
+
+                OUTPUT,
+        ];
+
+        yield 'list PHAR files with limited depth' => [
+            [
+                'phar' => self::FIXTURES.'/complete-tree.phar',
+                '--list' => null,
+                '--depth' => '1',
+            ],
+            <<<'OUTPUT'
+
+                API Version: 1.1.0
+
+                Archive Compression: None
+                Files Compression: None
+
+                Signature: SHA-256
+                Signature Hash: 5FE61595A3D773538C3CE6006FBC3679272F6DF118B3229AFD606462B772C414
+
+                Metadata: None
+
+                Contents: 13 files (7.13KB)
+                fileX [NONE] - 0.00B
+                .hidden-file [NONE] - 0.00B
+                .hidden-dir/
+                  fileY [NONE] - 0.00B
+                  dir/
+                    fileZ [NONE] - 0.00B
+
+                OUTPUT,
+        ];
+
+        yield 'list PHAR files with no indent' => [
+            [
+                'phar' => self::FIXTURES.'/complete-tree.phar',
+                '--list' => null,
+                '--mode' => 'flat',
+            ],
+            <<<'OUTPUT'
+
+                API Version: 1.1.0
+
+                Archive Compression: None
+                Files Compression: None
+
+                Signature: SHA-256
+                Signature Hash: 5FE61595A3D773538C3CE6006FBC3679272F6DF118B3229AFD606462B772C414
+
+                Metadata: None
+
+                Contents: 13 files (7.13KB)
+                fileX [NONE] - 0.00B
+                .hidden-file [NONE] - 0.00B
+                .hidden-dir/fileY [NONE] - 0.00B
+                .hidden-dir/dir/fileZ [NONE] - 0.00B
+                .hidden-dir/.hidden-file [NONE] - 0.00B
+                dir1/fileG [NONE] - 0.00B
+                dir1/fileH [NONE] - 0.00B
+                dir0/fileB [NONE] - 0.00B
+                dir0/dir01/fileD [NONE] - 0.00B
+                dir0/dir01/fileC [NONE] - 0.00B
+                dir0/fileA [NONE] - 0.00B
+                dir0/dir02/dir020/fileE [NONE] - 0.00B
+                dir0/dir02/dir020/fileF [NONE] - 0.00B
+
+                OUTPUT,
+        ];
+
+        yield 'list PHAR files with limited depth and no indent' => [
+            [
+                'phar' => self::FIXTURES.'/complete-tree.phar',
+                '--list' => null,
+                '--depth' => '1',
+                '--mode' => 'flat',
+            ],
+            <<<'OUTPUT'
+
+                API Version: 1.1.0
+
+                Archive Compression: None
+                Files Compression: None
+
+                Signature: SHA-256
+                Signature Hash: 5FE61595A3D773538C3CE6006FBC3679272F6DF118B3229AFD606462B772C414
+
+                Metadata: None
+
+                Contents: 13 files (7.13KB)
+                fileX [NONE] - 0.00B
+                .hidden-file [NONE] - 0.00B
+                .hidden-dir/fileY [NONE] - 0.00B
+                .hidden-dir/dir/fileZ [NONE] - 0.00B
+                .hidden-dir/.hidden-file [NONE] - 0.00B
+                dir1/fileG [NONE] - 0.00B
+                dir1/fileH [NONE] - 0.00B
+                dir0/fileB [NONE] - 0.00B
+                dir0/dir01/fileD [NONE] - 0.00B
+                dir0/dir01/fileC [NONE] - 0.00B
+                dir0/fileA [NONE] - 0.00B
+                dir0/dir02/dir020/fileE [NONE] - 0.00B
+                dir0/dir02/dir020/fileF [NONE] - 0.00B
+
+                OUTPUT,
+        ];
+
+        if (extension_loaded('zlib') && extension_loaded('bz2')) {
+            yield 'list PHAR files with various compressions' => [
+                [
+                    'phar' => self::FIXTURES.'/tree-phar.phar',
+                    '--list' => null,
+                ],
+                <<<'OUTPUT'
+
+                    API Version: 1.1.0
+
+                    Archive Compression: None
+                    Files Compression:
+                      - BZ2 (33.33%)
+                      - None (66.67%)
+
+                    Signature: SHA-1
+                    Signature Hash: 676AF6E890CA1C0EFDD1D856A944DF7FFAFEA06F
+
+                    Metadata:
+                    array (
+                      'test' => 123,
+                    )
+
+                    Contents: 3 files (6.79KB)
+                    a/
+                      bar.php [BZ2] - 60.00B
+                    foo.php [NONE] - 19.00B
+                    b/
+                      beta/
+                        bar.php [NONE] - 0.00B
+
+                    OUTPUT,
+            ];
+        }
     }
 
     public function test_it_cannot_provide_info_about_an_invalid_phar_without_extension(): void
     {
-        if ('v3' === getenv('SYMFONY_VERSION')) {
-            self::markTestSkipped();
-        }
-
         $file = self::FIXTURES.'/foo';
 
         $this->commandTester->execute(
@@ -204,462 +464,6 @@ class InfoTest extends CommandTestCase
         );
     }
 
-    public function test_it_provides_info_about_a_targz_phar(): void
-    {
-        $pharPath = self::FIXTURES.'/simple-phar.tar.gz';
-
-        $this->commandTester->execute(
-            [
-                'command' => 'info',
-                'phar' => $pharPath,
-            ],
-        );
-
-        $expected = <<<'OUTPUT'
-
-            API Version: No information found
-
-            Compression: GZ
-
-            Signature unreadable
-
-            Metadata: None
-
-            Contents: 1 file (2.56KB)
-
-             // Use the --list|-l option to list the content of the PHAR.
-
-
-            OUTPUT;
-
-        $this->assertSameOutput($expected, ExitCode::SUCCESS);
-    }
-
-    /**
-     * @requires extension bz2
-     */
-    public function test_it_provides_info_about_a_tarbz2_phar(): void
-    {
-        $pharPath = self::FIXTURES.'/simple-phar.tar.bz2';
-
-        $this->commandTester->execute(
-            [
-                'command' => 'info',
-                'phar' => $pharPath,
-            ],
-        );
-
-        $expected = <<<'OUTPUT'
-
-            API Version: No information found
-
-            Compression: BZ2
-
-            Signature unreadable
-
-            Metadata: None
-
-            Contents: 1 file (2.71KB)
-
-             // Use the --list|-l option to list the content of the PHAR.
-
-
-            OUTPUT;
-
-        $this->assertSameOutput($expected, ExitCode::SUCCESS);
-    }
-
-    public function test_it_provides_a_zip_phar_info(): void
-    {
-        $pharPath = self::FIXTURES.'/new-simple-phar.zip';
-
-        $this->commandTester->execute(
-            [
-                'command' => 'info',
-                'phar' => $pharPath,
-            ],
-        );
-
-        $expected = <<<'OUTPUT'
-
-
-             [ERROR] Could not read the file "new-simple-phar.zip".
-
-
-            OUTPUT;
-
-        OutputAssertions::assertSameOutput(
-            $expected,
-            ExitCode::FAILURE,
-            $this->commandTester,
-            static fn ($output) => preg_replace(
-                '/\s\[ERROR\] Could not read the file([\s\S]*)new\-simple\-phar\.zip[comment\<\>\n\s\/]*"\./',
-                ' [ERROR] Could not read the file "new-simple-phar.zip".',
-                $output,
-            ),
-        );
-    }
-
-    /**
-     * @requires extension bz2
-     */
-    public function test_it_provides_a_phar_info_with_the_tree_of_the_content(): void
-    {
-        $pharPath = self::FIXTURES.'/tree-phar.phar';
-        $phar = new Phar($pharPath);
-
-        $version = $phar->getVersion();
-        $signature = $phar->getSignature();
-
-        $this->commandTester->execute(
-            [
-                'command' => 'info',
-                'phar' => $pharPath,
-                '--list' => true,
-            ],
-        );
-
-        $expected = <<<OUTPUT
-
-            API Version: {$version}
-
-            Compression:
-              - BZ2 (33.33%)
-              - None (66.67%)
-
-            Signature: {$signature['hash_type']}
-            Signature Hash: {$signature['hash']}
-
-            Metadata:
-            array (
-              'test' => 123,
-            )
-
-            Contents: 3 files (6.79KB)
-            a/
-              bar.php [BZ2] - 60.00B
-            b/
-              beta/
-                bar.php [NONE] - 0.00B
-            foo.php [NONE] - 19.00B
-
-            OUTPUT;
-
-        $this->assertSameOutput($expected, ExitCode::SUCCESS);
-    }
-
-    /**
-     * @requires extension bz2
-     */
-    public function test_it_provides_a_phar_info_with_the_flat_tree_of_the_content(): void
-    {
-        $pharPath = self::FIXTURES.'/tree-phar.phar';
-        $phar = new Phar($pharPath);
-
-        $version = $phar->getVersion();
-        $signature = $phar->getSignature();
-
-        $this->commandTester->execute(
-            [
-                'command' => 'info',
-                'phar' => $pharPath,
-                '--list' => true,
-                '--mode' => 'flat',
-            ],
-        );
-
-        $expected = <<<OUTPUT
-
-            API Version: {$version}
-
-            Compression:
-              - BZ2 (33.33%)
-              - None (66.67%)
-
-            Signature: {$signature['hash_type']}
-            Signature Hash: {$signature['hash']}
-
-            Metadata:
-            array (
-              'test' => 123,
-            )
-
-            Contents: 3 files (6.79KB)
-            a/bar.php [BZ2] - 60.00B
-            b/beta/bar.php [NONE] - 0.00B
-            foo.php [NONE] - 19.00B
-
-            OUTPUT;
-
-        $this->assertSameOutput($expected, ExitCode::SUCCESS);
-    }
-
-    public function test_it_provides_a_phar_info_with_the_tree_of_the_content_including_hidden_files(): void
-    {
-        $pharPath = self::FIXTURES.'/hidden-files.phar';
-        $phar = new Phar($pharPath);
-
-        $version = $phar->getVersion();
-        $signature = $phar->getSignature();
-
-        $this->commandTester->execute(
-            [
-                'command' => 'info',
-                'phar' => $pharPath,
-                '--list' => true,
-            ],
-        );
-
-        $expected = <<<OUTPUT
-
-            API Version: {$version}
-
-            Compression: None
-
-            Signature: {$signature['hash_type']}
-            Signature Hash: {$signature['hash']}
-
-            Metadata: None
-
-            Contents: 16 files (7.54KB)
-            .hidden-dir/
-              .hidden-file1 [NONE] - 0.00B
-              .hidden-file1.php [NONE] - 33.00B
-              file1 [NONE] - 0.00B
-              file1.php [NONE] - 33.00B
-            .hidden-foo [NONE] - 0.00B
-            .hidden-foo.php [NONE] - 33.00B
-            a/
-              .hidden-bar [NONE] - 0.00B
-              .hidden-bar.php [NONE] - 33.00B
-              .hidden-dir-2/
-                .hidden-file2 [NONE] - 0.00B
-                .hidden-file2.php [NONE] - 33.00B
-                file2 [NONE] - 0.00B
-                file2.php [NONE] - 33.00B
-              bar [NONE] - 0.00B
-              bar.php [NONE] - 33.00B
-            foo [NONE] - 0.00B
-            foo.php [NONE] - 33.00B
-
-            OUTPUT;
-
-        $this->assertSameOutput($expected, ExitCode::SUCCESS);
-    }
-
-    /**
-     * @dataProvider treeDepthProvider
-     *
-     * @requires extension bz2
-     */
-    public function test_it_can_limit_the_tree_depth(
-        string $pharPath,
-        ?string $depth,
-        mixed $expected,
-    ): void {
-        $pharPath = self::FIXTURES.'/tree-phar.phar';
-        $phar = new Phar($pharPath);
-
-        $version = $phar->getVersion();
-        $signature = $phar->getSignature();
-
-        $expected = str_replace(
-            [
-                '__VERSION__',
-                '__SIGNATURE__',
-                '__SIGNATURE_HASH__',
-            ],
-            [
-                $version,
-                $signature['hash_type'],
-                $signature['hash'],
-            ],
-            (string) $expected,
-        );
-
-        $input = [
-            'command' => 'info',
-            'phar' => $pharPath,
-            '--list' => true,
-            '--depth' => $depth,
-        ];
-
-        if (null === $depth) {
-            unset($input['--depth']);
-        }
-
-        $this->commandTester->execute($input);
-
-        $this->assertSameOutput($expected, ExitCode::SUCCESS);
-    }
-
-    public static function treeDepthProvider(): iterable
-    {
-        $pharPath = self::FIXTURES.'/tree-phar.phar';
-
-        yield 'depth=0' => [
-            $pharPath,
-            '0',
-            <<<'OUTPUT'
-
-                API Version: __VERSION__
-
-                Compression:
-                  - BZ2 (33.33%)
-                  - None (66.67%)
-
-                Signature: __SIGNATURE__
-                Signature Hash: __SIGNATURE_HASH__
-
-                Metadata:
-                array (
-                  'test' => 123,
-                )
-
-                Contents: 3 files (6.79KB)
-                a/
-                b/
-                foo.php [NONE] - 19.00B
-
-                OUTPUT,
-        ];
-
-        yield 'depth=1' => [
-            $pharPath,
-            '1',
-            <<<'OUTPUT'
-
-                API Version: __VERSION__
-
-                Compression:
-                  - BZ2 (33.33%)
-                  - None (66.67%)
-
-                Signature: __SIGNATURE__
-                Signature Hash: __SIGNATURE_HASH__
-
-                Metadata:
-                array (
-                  'test' => 123,
-                )
-
-                Contents: 3 files (6.79KB)
-                a/
-                  bar.php [BZ2] - 60.00B
-                b/
-                  beta/
-                foo.php [NONE] - 19.00B
-
-                OUTPUT,
-        ];
-
-        yield 'default depth, defined explicitly' => [
-            $pharPath,
-            '-1',
-            <<<'OUTPUT'
-
-                API Version: __VERSION__
-
-                Compression:
-                  - BZ2 (33.33%)
-                  - None (66.67%)
-
-                Signature: __SIGNATURE__
-                Signature Hash: __SIGNATURE_HASH__
-
-                Metadata:
-                array (
-                  'test' => 123,
-                )
-
-                Contents: 3 files (6.79KB)
-                a/
-                  bar.php [BZ2] - 60.00B
-                b/
-                  beta/
-                    bar.php [NONE] - 0.00B
-                foo.php [NONE] - 19.00B
-
-                OUTPUT,
-        ];
-
-        yield 'default depth' => [
-            $pharPath,
-            null,
-            <<<'OUTPUT'
-
-                API Version: __VERSION__
-
-                Compression:
-                  - BZ2 (33.33%)
-                  - None (66.67%)
-
-                Signature: __SIGNATURE__
-                Signature Hash: __SIGNATURE_HASH__
-
-                Metadata:
-                array (
-                  'test' => 123,
-                )
-
-                Contents: 3 files (6.79KB)
-                a/
-                  bar.php [BZ2] - 60.00B
-                b/
-                  beta/
-                    bar.php [NONE] - 0.00B
-                foo.php [NONE] - 19.00B
-
-                OUTPUT,
-        ];
-    }
-
-    /**
-     * @requires extension bz2
-     */
-    public function test_it_can_limit_the_tree_depth_in_flat_mode(): void
-    {
-        $pharPath = self::FIXTURES.'/tree-phar.phar';
-        $phar = new Phar($pharPath);
-
-        $version = $phar->getVersion();
-        $signature = $phar->getSignature();
-
-        $this->commandTester->execute(
-            [
-                'command' => 'info',
-                'phar' => $pharPath,
-                '--list' => true,
-                '--depth' => '1',
-                '--mode' => 'flat',
-            ],
-        );
-
-        $expected = <<<OUTPUT
-
-            API Version: {$version}
-
-            Compression:
-              - BZ2 (33.33%)
-              - None (66.67%)
-
-            Signature: {$signature['hash_type']}
-            Signature Hash: {$signature['hash']}
-
-            Metadata:
-            array (
-              'test' => 123,
-            )
-
-            Contents: 3 files (6.79KB)
-            a/bar.php [BZ2] - 60.00B
-            foo.php [NONE] - 19.00B
-
-            OUTPUT;
-
-        $this->assertSameOutput($expected, ExitCode::SUCCESS);
-    }
-
     public function test_it_cannot_accept_an_invalid_depth(): void
     {
         $pharPath = self::FIXTURES.'/tree-phar.phar';
@@ -673,6 +477,23 @@ class InfoTest extends CommandTestCase
                 'phar' => $pharPath,
                 '--list' => true,
                 '--depth' => '-10',
+            ],
+        );
+    }
+
+    public function test_it_cannot_accept_an_invalid_mode(): void
+    {
+        $pharPath = self::FIXTURES.'/tree-phar.phar';
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected one of: "indent", "flat". Got: "smth" for the option "mode".');
+
+        $this->commandTester->execute(
+            [
+                'command' => 'info',
+                'phar' => $pharPath,
+                '--list' => true,
+                '--mode' => 'smth',
             ],
         );
     }
