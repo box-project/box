@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Phar;
 
 use KevinGH\Box\Pharaoh\InvalidPhar;
+use KevinGH\Box\Platform;
 use Phar;
 use PharData;
 use PHPUnit\Framework\TestCase;
@@ -106,7 +107,7 @@ final class PharFactoryTest extends TestCase
             $tarVariants[] = 'simple.tar.bz2.phar';
         }
 
-        if ('Darwin' === PHP_OS_FAMILY) {
+        if (Platform::isOSX()) {
             // On Linux the following would fail with "is not a phar archive. Use PharData::__construct() for a standard zip or tar archive"
             foreach ($tarVariants as $tarVariant) {
                 yield $tarVariant => [self::FIXTURES_DIR.DIRECTORY_SEPARATOR.$tarVariant];

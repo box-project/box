@@ -18,8 +18,8 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
 use InvalidArgumentException;
 use KevinGH\Box\Pharaoh\InvalidPhar;
+use KevinGH\Box\Platform;
 use KevinGH\Box\Test\CommandTestCase;
-use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
 use Symfony\Component\Console\Output\OutputInterface;
 use function extension_loaded;
@@ -41,16 +41,7 @@ use function realpath;
  */
 class InfoTest extends CommandTestCase
 {
-    use RequiresPharReadonlyOff;
-
     private const FIXTURES = __DIR__.'/../../../fixtures/info';
-
-    protected function setUp(): void
-    {
-        $this->markAsSkippedIfPharReadonlyIsOn();
-
-        parent::setUp();
-    }
 
     protected function getCommand(): Command
     {
@@ -312,13 +303,14 @@ class InfoTest extends CommandTestCase
                 OUTPUT,
         ];
 
-        yield 'list PHAR files with no indent' => [
-            [
-                'phar' => self::FIXTURES.'/complete-tree.phar',
-                '--list' => null,
-                '--mode' => 'flat',
-            ],
-            <<<'OUTPUT'
+        if (Platform::isOSX()) {
+            yield 'list PHAR files with no indent (OSX)' => [
+                [
+                    'phar' => self::FIXTURES.'/complete-tree.phar',
+                    '--list' => null,
+                    '--mode' => 'flat',
+                ],
+                <<<'OUTPUT'
 
                 API Version: 1.1.0
 
@@ -346,16 +338,54 @@ class InfoTest extends CommandTestCase
                 dir0/dir02/dir020/fileF [NONE] - 0.00B
 
                 OUTPUT,
-        ];
+            ];
+        } else {
+            yield 'list PHAR files with no indent' => [
+                [
+                    'phar' => self::FIXTURES.'/complete-tree.phar',
+                    '--list' => null,
+                    '--mode' => 'flat',
+                ],
+                <<<'OUTPUT'
 
-        yield 'list PHAR files with limited depth and no indent' => [
-            [
-                'phar' => self::FIXTURES.'/complete-tree.phar',
-                '--list' => null,
-                '--depth' => '1',
-                '--mode' => 'flat',
-            ],
-            <<<'OUTPUT'
+                API Version: 1.1.0
+
+                Archive Compression: None
+                Files Compression: None
+
+                Signature: SHA-256
+                Signature Hash: 5FE61595A3D773538C3CE6006FBC3679272F6DF118B3229AFD606462B772C414
+
+                Metadata: None
+
+                Contents: 13 files (7.09KB)
+                .hidden-dir/.hidden-file [NONE] - 0.00B
+                .hidden-dir/dir/fileZ [NONE] - 0.00B
+                .hidden-dir/fileY [NONE] - 0.00B
+                dir0/dir02/dir020/fileF [NONE] - 0.00B
+                dir0/dir02/dir020/fileE [NONE] - 0.00B
+                dir0/dir01/fileD [NONE] - 0.00B
+                dir0/dir01/fileC [NONE] - 0.00B
+                dir0/fileA [NONE] - 0.00B
+                dir0/fileB [NONE] - 0.00B
+                fileX [NONE] - 0.00B
+                .hidden-file [NONE] - 0.00B
+                dir1/fileH [NONE] - 0.00B
+                dir1/fileG [NONE] - 0.00B
+
+                OUTPUT,
+            ];
+        }
+
+        if (Platform::isOSX()) {
+            yield 'list PHAR files with limited depth and no indent (OSX)' => [
+                [
+                    'phar' => self::FIXTURES . '/complete-tree.phar',
+                    '--list' => null,
+                    '--depth' => '1',
+                    '--mode' => 'flat',
+                ],
+                <<<'OUTPUT'
 
                 API Version: 1.1.0
 
@@ -383,7 +413,45 @@ class InfoTest extends CommandTestCase
                 dir0/dir02/dir020/fileF [NONE] - 0.00B
 
                 OUTPUT,
-        ];
+            ];
+        } else {
+            yield 'list PHAR files with limited depth and no indent' => [
+                [
+                    'phar' => self::FIXTURES . '/complete-tree.phar',
+                    '--list' => null,
+                    '--depth' => '1',
+                    '--mode' => 'flat',
+                ],
+                <<<'OUTPUT'
+
+                API Version: 1.1.0
+
+                Archive Compression: None
+                Files Compression: None
+
+                Signature: SHA-256
+                Signature Hash: 5FE61595A3D773538C3CE6006FBC3679272F6DF118B3229AFD606462B772C414
+
+                Metadata: None
+
+                Contents: 13 files (7.09KB)
+                fileX [NONE] - 0.00B
+                .hidden-file [NONE] - 0.00B
+                .hidden-dir/fileY [NONE] - 0.00B
+                .hidden-dir/dir/fileZ [NONE] - 0.00B
+                .hidden-dir/.hidden-file [NONE] - 0.00B
+                dir1/fileG [NONE] - 0.00B
+                dir1/fileH [NONE] - 0.00B
+                dir0/fileB [NONE] - 0.00B
+                dir0/dir01/fileD [NONE] - 0.00B
+                dir0/dir01/fileC [NONE] - 0.00B
+                dir0/fileA [NONE] - 0.00B
+                dir0/dir02/dir020/fileE [NONE] - 0.00B
+                dir0/dir02/dir020/fileF [NONE] - 0.00B
+
+                OUTPUT,
+            ];
+        }
 
         if (extension_loaded('zlib') && extension_loaded('bz2')) {
             yield 'list PHAR files with various compressions' => [
