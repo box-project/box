@@ -134,7 +134,7 @@ final class PharInfoRenderer
                 '<comment>Contents:</comment>%s (%s)',
                 1 === $totalCount ? ' 1 file' : " {$totalCount} files",
                 format_size(
-                    filesize($pharInfo->getPhar()->getPath()),
+                    filesize($pharInfo->getFile()),
                 ),
             ),
         );
