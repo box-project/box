@@ -20,7 +20,6 @@ use InvalidArgumentException;
 use KevinGH\Box\Pharaoh\InvalidPhar;
 use KevinGH\Box\Platform;
 use KevinGH\Box\Test\CommandTestCase;
-use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
 use Symfony\Component\Console\Output\OutputInterface;
 use function extension_loaded;
@@ -42,16 +41,7 @@ use function realpath;
  */
 class InfoTest extends CommandTestCase
 {
-    use RequiresPharReadonlyOff;
-
     private const FIXTURES = __DIR__.'/../../../fixtures/info';
-
-    protected function setUp(): void
-    {
-        $this->markAsSkippedIfPharReadonlyIsOn();
-
-        parent::setUp();
-    }
 
     protected function getCommand(): Command
     {
