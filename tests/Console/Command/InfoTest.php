@@ -303,6 +303,26 @@ class InfoTest extends CommandTestCase
                     Metadata: None
 
                     Contents: 13 files (7.13KB)
+                    fileX [NONE] - 0.00B
+                    dir0/
+                      fileA [NONE] - 0.00B
+                      dir02/
+                        dir020/
+                          fileE [NONE] - 0.00B
+                          fileF [NONE] - 0.00B
+                      fileB [NONE] - 0.00B
+                      dir01/
+                        fileD [NONE] - 0.00B
+                        fileC [NONE] - 0.00B
+                    .hidden-dir/
+                      fileY [NONE] - 0.00B
+                      .hidden-file [NONE] - 0.00B
+                      dir/
+                        fileZ [NONE] - 0.00B
+                    .hidden-file [NONE] - 0.00B
+                    dir1/
+                      fileG [NONE] - 0.00B
+                      fileH [NONE] - 0.00B
 
                     OUTPUT,
             ];
@@ -357,6 +377,12 @@ class InfoTest extends CommandTestCase
                     Metadata: None
 
                     Contents: 13 files (7.13KB)
+                    fileX [NONE] - 0.00B
+                    dir0/
+                      fileA [NONE] - 0.00B
+                      dir02/
+                        dir020/
+                          fileE [NONE] - 0.00B
 
                     OUTPUT,
             ];
@@ -418,6 +444,19 @@ class InfoTest extends CommandTestCase
                     Metadata: None
 
                     Contents: 13 files (7.13KB)
+                    fileX [NONE] - 0.00B
+                    dir0/fileA [NONE] - 0.00B
+                    dir0/dir02/dir020/fileE [NONE] - 0.00B
+                    dir0/dir02/dir020/fileF [NONE] - 0.00B
+                    dir0/fileB [NONE] - 0.00B
+                    dir0/dir01/fileD [NONE] - 0.00B
+                    dir0/dir01/fileC [NONE] - 0.00B
+                    .hidden-dir/fileY [NONE] - 0.00B
+                    .hidden-dir/.hidden-file [NONE] - 0.00B
+                    .hidden-dir/dir/fileZ [NONE] - 0.00B
+                    .hidden-file [NONE] - 0.00B
+                    dir1/fileG [NONE] - 0.00B
+                    dir1/fileH [NONE] - 0.00B
 
                     OUTPUT,
             ];
@@ -481,6 +520,19 @@ class InfoTest extends CommandTestCase
                     Metadata: None
 
                     Contents: 13 files (7.13KB)
+                    fileX [NONE] - 0.00B
+                    dir0/fileA [NONE] - 0.00B
+                    dir0/dir02/dir020/fileE [NONE] - 0.00B
+                    dir0/dir02/dir020/fileF [NONE] - 0.00B
+                    dir0/fileB [NONE] - 0.00B
+                    dir0/dir01/fileD [NONE] - 0.00B
+                    dir0/dir01/fileC [NONE] - 0.00B
+                    .hidden-dir/fileY [NONE] - 0.00B
+                    .hidden-dir/.hidden-file [NONE] - 0.00B
+                    .hidden-dir/dir/fileZ [NONE] - 0.00B
+                    .hidden-file [NONE] - 0.00B
+                    dir1/fileG [NONE] - 0.00B
+                    dir1/fileH [NONE] - 0.00B
 
                     OUTPUT,
             ];
@@ -544,6 +596,12 @@ class InfoTest extends CommandTestCase
                         )
 
                         Contents: 3 files (6.79KB)
+                        b/
+                          beta/
+                            bar.php [NONE] - 0.00B
+                        a/
+                          bar.php [BZ2] - 60.00B
+                        foo.php [NONE] - 19.00B
 
                         OUTPUT,
                 ];
