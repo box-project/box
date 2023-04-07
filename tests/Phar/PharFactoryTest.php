@@ -21,7 +21,6 @@ use PharData;
 use PHPUnit\Framework\TestCase;
 use function extension_loaded;
 use const DIRECTORY_SEPARATOR;
-use const PHP_OS_FAMILY;
 
 /**
  * @covers \KevinGH\Box\Phar\PharFactory

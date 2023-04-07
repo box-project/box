@@ -22,7 +22,6 @@ use function KevinGH\Box\FileSystem\remove;
 use function KevinGH\Box\FileSystem\touch;
 use function natcasesort;
 use function symlink;
-use const PHP_OS_FAMILY;
 
 /**
  * @covers \KevinGH\Box\Configuration\Configuration
