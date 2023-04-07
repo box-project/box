@@ -114,7 +114,7 @@ class InfoTest extends CommandTestCase
 
                 Metadata: None
 
-                Contents: 1 file (6.65KB)
+                Contents: 1 file (6.62KB)
 
                  // Use the --list|-l option to list the content of the PHAR.
 
@@ -139,7 +139,7 @@ class InfoTest extends CommandTestCase
 
                     Metadata: None
 
-                    Contents: 2 files (6.64KB)
+                    Contents: 2 files (6.61KB)
 
                      // Use the --list|-l option to list the content of the PHAR.
 
@@ -234,7 +234,7 @@ class InfoTest extends CommandTestCase
 
                 Metadata: None
 
-                Contents: 13 files (7.13KB)
+                Contents: 13 files (7.09KB)
 
                  // Use the --list|-l option to list the content of the PHAR.
 
@@ -260,7 +260,7 @@ class InfoTest extends CommandTestCase
 
                     Metadata: None
 
-                    Contents: 13 files (7.13KB)
+                    Contents: 13 files (7.09KB)
                     fileX [NONE] - 0.00B
                     .hidden-file [NONE] - 0.00B
                     .hidden-dir/
@@ -302,7 +302,7 @@ class InfoTest extends CommandTestCase
 
                     Metadata: None
 
-                    Contents: 13 files (7.13KB)
+                    Contents: 13 files (7.09KB)
                     fileX [NONE] - 0.00B
                     dir0/
                       fileA [NONE] - 0.00B
@@ -347,7 +347,7 @@ class InfoTest extends CommandTestCase
 
                     Metadata: None
 
-                    Contents: 13 files (7.13KB)
+                    Contents: 13 files (7.09KB)
                     fileX [NONE] - 0.00B
                     .hidden-file [NONE] - 0.00B
                     .hidden-dir/
@@ -376,7 +376,7 @@ class InfoTest extends CommandTestCase
 
                     Metadata: None
 
-                    Contents: 13 files (7.13KB)
+                    Contents: 13 files (7.09KB)
                     fileX [NONE] - 0.00B
                     dir0/
                       fileA [NONE] - 0.00B
@@ -407,7 +407,7 @@ class InfoTest extends CommandTestCase
 
                     Metadata: None
 
-                    Contents: 13 files (7.13KB)
+                    Contents: 13 files (7.09KB)
                     fileX [NONE] - 0.00B
                     .hidden-file [NONE] - 0.00B
                     .hidden-dir/fileY [NONE] - 0.00B
@@ -443,7 +443,7 @@ class InfoTest extends CommandTestCase
 
                     Metadata: None
 
-                    Contents: 13 files (7.13KB)
+                    Contents: 13 files (7.09KB)
                     fileX [NONE] - 0.00B
                     dir0/fileA [NONE] - 0.00B
                     dir0/dir02/dir020/fileE [NONE] - 0.00B
@@ -482,7 +482,7 @@ class InfoTest extends CommandTestCase
 
                     Metadata: None
 
-                    Contents: 13 files (7.13KB)
+                    Contents: 13 files (7.09KB)
                     fileX [NONE] - 0.00B
                     .hidden-file [NONE] - 0.00B
                     .hidden-dir/fileY [NONE] - 0.00B
@@ -519,7 +519,7 @@ class InfoTest extends CommandTestCase
 
                     Metadata: None
 
-                    Contents: 13 files (7.13KB)
+                    Contents: 13 files (7.09KB)
                     fileX [NONE] - 0.00B
                     dir0/fileA [NONE] - 0.00B
                     dir0/dir02/dir020/fileE [NONE] - 0.00B
@@ -562,7 +562,7 @@ class InfoTest extends CommandTestCase
                           'test' => 123,
                         )
 
-                        Contents: 3 files (6.79KB)
+                        Contents: 3 files (6.75KB)
                         a/
                           bar.php [BZ2] - 60.00B
                         foo.php [NONE] - 19.00B
@@ -595,7 +595,7 @@ class InfoTest extends CommandTestCase
                           'test' => 123,
                         )
 
-                        Contents: 3 files (6.79KB)
+                        Contents: 3 files (6.75KB)
                         b/
                           beta/
                             bar.php [NONE] - 0.00B
