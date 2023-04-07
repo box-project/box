@@ -35,8 +35,6 @@ use function sprintf;
  */
 final class Info implements Command
 {
-    private const INDENT_SIZE = 2;
-
     private const PHAR_ARG = 'phar';
     private const LIST_OPT = 'list';
     private const MODE_OPT = 'mode';

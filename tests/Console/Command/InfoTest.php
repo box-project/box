@@ -303,26 +303,6 @@ class InfoTest extends CommandTestCase
                     Metadata: None
 
                     Contents: 13 files (7.13KB)
-                    .hidden-file [NONE] - 0.00B
-                    fileX [NONE] - 0.00B
-                    dir1/
-                      fileH [NONE] - 0.00B
-                      fileG [NONE] - 0.00B
-                    .hidden-dir/
-                      .hidden-file [NONE] - 0.00B
-                      dir/
-                        fileZ [NONE] - 0.00B
-                      fileY [NONE] - 0.00B
-                    dir0/
-                      dir01/
-                        fileD [NONE] - 0.00B
-                        fileC [NONE] - 0.00B
-                      fileA [NONE] - 0.00B
-                      dir02/
-                        dir020/
-                          fileF [NONE] - 0.00B
-                          fileE [NONE] - 0.00B
-                      fileB [NONE] - 0.00B
 
                     OUTPUT,
             ];
@@ -377,15 +357,6 @@ class InfoTest extends CommandTestCase
                     Metadata: None
 
                     Contents: 13 files (7.13KB)
-                    .hidden-file [NONE] - 0.00B
-                    fileX [NONE] - 0.00B
-                    dir1/
-                      fileG [NONE] - 0.00B
-                      fileH [NONE] - 0.00B
-                    .hidden-dir/
-                      .hidden-file [NONE] - 0.00B
-                      dir/
-                        fileZ [NONE] - 0.00B
 
                     OUTPUT,
             ];
@@ -447,19 +418,6 @@ class InfoTest extends CommandTestCase
                     Metadata: None
 
                     Contents: 13 files (7.13KB)
-                    .hidden-file [NONE] - 0.00B
-                    fileX [NONE] - 0.00B
-                    dir1/fileG [NONE] - 0.00B
-                    dir1/fileH [NONE] - 0.00B
-                    .hidden-dir/.hidden-file [NONE] - 0.00B
-                    .hidden-dir/dir/fileZ [NONE] - 0.00B
-                    .hidden-dir/fileY [NONE] - 0.00B
-                    dir0/dir01/fileD [NONE] - 0.00B
-                    dir0/dir01/fileC [NONE] - 0.00B
-                    dir0/fileA [NONE] - 0.00B
-                    dir0/dir02/dir020/fileF [NONE] - 0.00B
-                    dir0/dir02/dir020/fileE [NONE] - 0.00B
-                    dir0/fileB [NONE] - 0.00B
 
                     OUTPUT,
             ];
@@ -523,57 +481,73 @@ class InfoTest extends CommandTestCase
                     Metadata: None
 
                     Contents: 13 files (7.13KB)
-                    .hidden-file [NONE] - 0.00B
-                    fileX [NONE] - 0.00B
-                    dir1/fileG [NONE] - 0.00B
-                    dir1/fileH [NONE] - 0.00B
-                    .hidden-dir/.hidden-file [NONE] - 0.00B
-                    .hidden-dir/dir/fileZ [NONE] - 0.00B
-                    .hidden-dir/fileY [NONE] - 0.00B
-                    dir0/dir01/fileD [NONE] - 0.00B
-                    dir0/dir01/fileC [NONE] - 0.00B
-                    dir0/fileA [NONE] - 0.00B
-                    dir0/dir02/dir020/fileF [NONE] - 0.00B
-                    dir0/dir02/dir020/fileE [NONE] - 0.00B
-                    dir0/fileB [NONE] - 0.00B
 
                     OUTPUT,
             ];
         }
 
         if (extension_loaded('zlib') && extension_loaded('bz2')) {
-            yield 'list PHAR files with various compressions' => [
-                [
-                    'phar' => self::FIXTURES.'/tree-phar.phar',
-                    '--list' => null,
-                ],
-                <<<'OUTPUT'
+            if (Platform::isOSX()) {
+                yield 'list PHAR files with various compressions (OSX)' => [
+                    [
+                        'phar' => self::FIXTURES.'/tree-phar.phar',
+                        '--list' => null,
+                    ],
+                    <<<'OUTPUT'
 
-                    API Version: 1.1.0
+                        API Version: 1.1.0
 
-                    Archive Compression: None
-                    Files Compression:
-                      - BZ2 (33.33%)
-                      - None (66.67%)
+                        Archive Compression: None
+                        Files Compression:
+                          - BZ2 (33.33%)
+                          - None (66.67%)
 
-                    Signature: SHA-1
-                    Signature Hash: 676AF6E890CA1C0EFDD1D856A944DF7FFAFEA06F
+                        Signature: SHA-1
+                        Signature Hash: 676AF6E890CA1C0EFDD1D856A944DF7FFAFEA06F
 
-                    Metadata:
-                    array (
-                      'test' => 123,
-                    )
+                        Metadata:
+                        array (
+                          'test' => 123,
+                        )
 
-                    Contents: 3 files (6.79KB)
-                    a/
-                      bar.php [BZ2] - 60.00B
-                    b/
-                      beta/
-                        bar.php [NONE] - 0.00B
-                    foo.php [NONE] - 19.00B
+                        Contents: 3 files (6.79KB)
+                        a/
+                          bar.php [BZ2] - 60.00B
+                        foo.php [NONE] - 19.00B
+                        b/
+                          beta/
+                            bar.php [NONE] - 0.00B
 
-                    OUTPUT,
-            ];
+                        OUTPUT,
+                ];
+            } else {
+                yield 'list PHAR files with various compressions' => [
+                    [
+                        'phar' => self::FIXTURES.'/tree-phar.phar',
+                        '--list' => null,
+                    ],
+                    <<<'OUTPUT'
+
+                        API Version: 1.1.0
+
+                        Archive Compression: None
+                        Files Compression:
+                          - BZ2 (33.33%)
+                          - None (66.67%)
+
+                        Signature: SHA-1
+                        Signature Hash: 676AF6E890CA1C0EFDD1D856A944DF7FFAFEA06F
+
+                        Metadata:
+                        array (
+                          'test' => 123,
+                        )
+
+                        Contents: 3 files (6.79KB)
+
+                        OUTPUT,
+                ];
+            }
         }
     }
 

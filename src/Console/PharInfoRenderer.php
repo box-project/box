@@ -41,6 +41,8 @@ final class PharInfoRenderer
 {
     use NotInstantiable;
 
+    private const INDENT_SIZE = 2;
+
     public static function renderCompression(Pharaoh $pharInfo, IO $io): void
     {
         $io->writeln(
