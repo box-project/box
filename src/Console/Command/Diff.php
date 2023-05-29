@@ -153,12 +153,6 @@ final class Diff implements Command
         $pharInfoA = $diff->getPharA();
         $pharInfoB = $diff->getPharB();
 
-        if ($pharInfoA->equals($pharInfoB)) {
-            $io->success('The two archives are identical');
-
-            return ExitCode::SUCCESS;
-        }
-
         self::renderArchive(
             $diff->getPharA()->getFileName(),
             $pharInfoA,
