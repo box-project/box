@@ -44,6 +44,7 @@ final class Diff implements Command
     private const FIRST_PHAR_ARG = 'pharA';
     private const SECOND_PHAR_ARG = 'pharB';
 
+    // TODO: replace by DiffMode::X->value once bumping to PHP 8.2 as the min version.
     private const LIST_FILES_DIFF_OPTION = 'list-diff';
     private const GIT_DIFF_OPTION = 'git-diff';
     private const GNU_DIFF_OPTION = 'gnu-diff';
@@ -122,10 +123,10 @@ final class Diff implements Command
             return ExitCode::FAILURE;
         }
 
-        $result1 = $this->compareArchives($diff, $io);
+        $this->showArchives($diff, $io);
         $result2 = $this->compareContents($diff, $io);
 
-        return $result1 + $result2;
+        return $result2;
     }
 
     /**
@@ -146,18 +147,10 @@ final class Diff implements Command
         );
     }
 
-    private function compareArchives(PharDiff $diff, IO $io): int
+    private function showArchives(PharDiff $diff, IO $io): void
     {
-        $io->comment('<info>Comparing the two archives... (do not check the signatures)</info>');
-
         $pharInfoA = $diff->getPharA();
         $pharInfoB = $diff->getPharB();
-
-        if ($pharInfoA->equals($pharInfoB)) {
-            $io->success('The two archives are identical');
-
-            return ExitCode::SUCCESS;
-        }
 
         self::renderArchive(
             $diff->getPharA()->getFileName(),
@@ -172,11 +165,63 @@ final class Diff implements Command
             $pharInfoB,
             $io,
         );
+    }
+
+    private function compareContents(PharDiff $diff, IO $io): int
+    {
+        $checkSumAlgorithm = $io->getOption(self::CHECK_OPTION)->asNullableNonEmptyString() ?? self::DEFAULT_CHECKSUM_ALGO;
+
+        if ($io->hasOption('-c') || $io->hasOption('--check')) {
+            return $diff->listChecksums($checkSumAlgorithm);
+        }
+
+        $diffResult = $diff->diff($io->getOption());
+        if ($io->getOption(self::GNU_DIFF_OPTION)->asBoolean()) {
+            $diffResult = $diff->gnuDiff();
+        } elseif ($io->getOption(self::GIT_DIFF_OPTION)->asBoolean()) {
+            $diffResult = $diff->gitDiff();
+        } else {
+            $diffResult = $diff->listDiff();
+        }
+
+        if (null === $diffResult || [[], []] === $diffResult) {
+            $io->success('The contents are identical');
+
+            return ExitCode::SUCCESS;
+        }
+
+        if (is_string($diffResult)) {
+            // Git or GNU diff: we don't have much control on the format
+            $io->writeln($diffResult);
+
+            return ExitCode::FAILURE;
+        }
+
+        $io->writeln(sprintf(
+            '--- Files present in "%s" but not in "%s"',
+            $diff->getPharA()->getFileName(),
+            $diff->getPharB()->getFileName(),
+        ));
+        $io->writeln(sprintf(
+            '+++ Files present in "%s" but not in "%s"',
+            $diff->getPharB()->getFileName(),
+            $diff->getPharA()->getFileName(),
+        ));
+
+        $io->newLine();
+
+        self::renderPaths('-', $diff->getPharA(), $diffResult[0], $io);
+        self::renderPaths('+', $diff->getPharB(), $diffResult[1], $io);
+
+        $io->error(sprintf(
+            '%d file(s) difference',
+            count($diffResult[0]) + count($diffResult[1]),
+        ));
 
         return ExitCode::FAILURE;
     }
 
-    private function compareContents(PharDiff $diff, IO $io): int
+    private function compareContentssS(PharDiff $diff, IO $io): int
     {
         $io->comment('<info>Comparing the two archives contents...</info>');
 
@@ -275,8 +320,9 @@ final class Diff implements Command
         );
 
         PharInfoRenderer::renderCompression($pharInfo, $io);
-        // Omit the signature
+        PharInfoRenderer::renderSignature($pharInfo, $io);
         PharInfoRenderer::renderMetadata($pharInfo, $io);
         PharInfoRenderer::renderContentsSummary($pharInfo, $io);
+        // TODO: checksum
     }
 }
