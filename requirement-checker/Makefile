@@ -3,9 +3,9 @@ MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 
 OS := $(shell uname)
-ERROR_COLOR := \033[41m
-YELLOW_COLOR := \033[0;33m
-NO_COLOR := \033[0m
+ERROR_COLOR := "\033[41m"
+YELLOW_COLOR := "\033[0;33m"
+NO_COLOR := "\033[0m"
 
 
 PHPUNIT_BIN = vendor/bin/phpunit
