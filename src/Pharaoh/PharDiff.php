@@ -53,7 +53,6 @@ use function array_keys;
 use function array_merge;
 use function array_values;
 use function count;
-use function escapeshellarg;
 use function hash_file;
 use function max;
 use function mb_strlen;
@@ -61,7 +60,6 @@ use function mb_strtolower;
 use function preg_match;
 use function preg_quote;
 use function preg_replace;
-use function shell_exec;
 use function str_repeat;
 
 class PharDiff
@@ -91,47 +89,6 @@ class PharDiff
         }
 
         $this->phars = [$pharA, $pharB];
-    }
-
-    /**
-     * Prints a git-formatted diff of the two PHARs.
-     */
-    public function printGitDiff(): int
-    {
-        // Lazy way; requires git. Will replace with custom implementation later.
-
-        $argA = escapeshellarg($this->phars[0]->getTmp());
-        $argB = escapeshellarg($this->phars[1]->getTmp());
-        /** @var string $diff */
-        $diff = shell_exec("git diff --no-index {$argA} {$argB}");
-        echo $diff;
-        if (empty($diff) && $this->verbose) {
-            echo 'No differences encountered.', PHP_EOL;
-
-            return 0;
-        }
-
-        return 1;
-    }
-
-    /**
-     * Prints a GNU diff of the two PHARs.
-     */
-    public function printGnuDiff(): int
-    {
-        // Lazy way. Will replace with custom implementation later.
-        $argA = escapeshellarg($this->phars[0]->getTmp());
-        $argB = escapeshellarg($this->phars[1]->getTmp());
-        /** @var string $diff */
-        $diff = shell_exec("diff {$argA} {$argB}");
-        echo $diff;
-        if (empty($diff) && $this->verbose) {
-            echo 'No differences encountered.', PHP_EOL;
-
-            return 0;
-        }
-
-        return 1;
     }
 
     /**
