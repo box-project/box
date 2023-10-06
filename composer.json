@@ -45,7 +45,7 @@
     "require-dev": {
         "bamarni/composer-bin-plugin": "^1.8.2",
         "ergebnis/composer-normalize": "^2.29",
-        "fidry/makefile": "^0.2.1",
+        "fidry/makefile": "^1.0",
         "mikey179/vfsstream": "^1.6.11",
         "phpspec/prophecy-phpunit": "^2.0.1",
         "phpunit/phpunit": "^9.5.26",
