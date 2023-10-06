@@ -14,12 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Configuration;
 
+use Fidry\FileSystem\FS;
 use KevinGH\Box\Test\FileSystemTestCase;
 use stdClass;
+use Symfony\Component\Filesystem\Path;
 use function json_encode;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\make_path_absolute;
-use function KevinGH\Box\FileSystem\touch;
 use const JSON_PRETTY_PRINT;
 use const PHP_OS;
 
@@ -37,17 +36,17 @@ abstract class ConfigurationTestCase extends FileSystemTestCase
     {
         parent::setUp();
 
-        $this->file = make_path_absolute('box.json', $this->tmp);
+        $this->file = Path::makeAbsolute('box.json', $this->tmp);
 
-        touch(self::DEFAULT_FILE);
-        dump_file($this->file, '{}');
+        FS::touch(self::DEFAULT_FILE);
+        FS::dumpFile($this->file, '{}');
 
         $this->config = Configuration::create($this->file, new stdClass());
     }
 
     final protected function setConfig(array $config): void
     {
-        dump_file($this->file, json_encode($config, JSON_PRETTY_PRINT));
+        FS::dumpFile($this->file, json_encode($config, JSON_PRETTY_PRINT));
 
         $this->reloadConfig();
     }

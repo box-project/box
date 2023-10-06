@@ -14,11 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
+use Symfony\Component\Filesystem\Path;
 use function array_column;
 use function array_filter;
 use function array_key_exists;
 use function array_map;
-use function KevinGH\Box\FileSystem\make_path_absolute;
 use function realpath;
 use const DIRECTORY_SEPARATOR;
 
@@ -61,7 +61,7 @@ final class ComposerConfiguration
         array $composerJsonDecodedContents,
         array $composerLockDecodedContents,
     ): array {
-        $vendorDir = make_path_absolute(
+        $vendorDir = Path::makeAbsolute(
             self::retrieveVendorDir($composerJsonDecodedContents),
             $basePath,
         );

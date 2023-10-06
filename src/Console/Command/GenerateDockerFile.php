@@ -19,6 +19,7 @@ use Fidry\Console\Command\CommandAwareness;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
+use Fidry\FileSystem\FS;
 use KevinGH\Box\DockerFileGenerator;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -28,8 +29,6 @@ use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 use function file_exists;
 use function getcwd;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\make_path_relative;
 use function realpath;
 use function sprintf;
 
@@ -179,7 +178,7 @@ final class GenerateDockerFile implements CommandAware
 
         $dockerFileContents = DockerFileGenerator::createForRequirements(
             $requirements,
-            make_path_relative($pharPath, getcwd()),
+            Path::makeRelative($pharPath, getcwd()),
         )
             ->generateStub();
 
@@ -198,7 +197,7 @@ final class GenerateDockerFile implements CommandAware
             }
         }
 
-        dump_file(self::DOCKER_FILE_NAME, $dockerFileContents);
+        FS::dumpFile(self::DOCKER_FILE_NAME, $dockerFileContents);
 
         $io->success('Done');
 

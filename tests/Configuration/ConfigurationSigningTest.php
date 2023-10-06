@@ -18,7 +18,6 @@ use InvalidArgumentException;
 use Phar;
 use function array_unshift;
 use function in_array;
-use function KevinGH\Box\FileSystem\touch;
 use const DIRECTORY_SEPARATOR;
 
 /**
@@ -192,7 +191,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
      */
     public function test_it_generates_a_warning_when_a_key_path_is_provided_but_the_algorithm_is_not__open_ssl(string $algorithm): void
     {
-        touch('key-file');
+        FS::touch('key-file');
 
         $this->setConfig([
             'algorithm' => $algorithm,
@@ -233,7 +232,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
 
     public function test_the_key_can_be_configured(): void
     {
-        touch('key-file');
+        FS::touch('key-file');
 
         $this->setConfig([
             'algorithm' => 'OPENSSL',
@@ -250,7 +249,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
 
     public function test_the_key_pass_can_be_configured(): void
     {
-        touch('key-file');
+        FS::touch('key-file');
 
         $this->setConfig([
             'algorithm' => 'OPENSSL',

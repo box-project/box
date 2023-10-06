@@ -22,7 +22,6 @@ use RecursiveDirectoryIterator;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Path;
 use UnexpectedValueException;
-use function KevinGH\Box\FileSystem\make_path_relative;
 use function ksort;
 use function Safe\json_decode;
 use function Safe\json_encode;
@@ -157,7 +156,7 @@ final class PharMeta
                 continue;
             }
 
-            $relativePath = make_path_relative($path, $root);
+            $relativePath = Path::makeRelative($path, $root);
 
             $filesMeta[$relativePath] = [
                 'compression' => self::getCompressionAlgorithm($pharFileInfo),

@@ -20,8 +20,6 @@ use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\CommandTestCase;
 use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\touch;
 use function str_replace;
 
 /**
@@ -41,8 +39,8 @@ class ValidateTest extends CommandTestCase
 
     public function test_it_validates_a_given_file(): void
     {
-        touch('index.php');
-        dump_file('test.json', '{}');
+        FS::touch('index.php');
+        FS::dumpFile('test.json', '{}');
 
         $this->commandTester->execute(
             [
@@ -71,8 +69,8 @@ class ValidateTest extends CommandTestCase
 
     public function test_it_reports_the_recommendations_found(): void
     {
-        touch('index.php');
-        dump_file(
+        FS::touch('index.php');
+        FS::dumpFile(
             'test.json',
             <<<'JSON'
                 {
@@ -109,8 +107,8 @@ class ValidateTest extends CommandTestCase
 
     public function test_it_does_not_fail_when_recommendations_are_found_but_ignore_message_is_passed(): void
     {
-        touch('index.php');
-        dump_file(
+        FS::touch('index.php');
+        FS::dumpFile(
             'test.json',
             <<<'JSON'
                 {
@@ -148,8 +146,8 @@ class ValidateTest extends CommandTestCase
 
     public function test_it_reports_the_warnings_found(): void
     {
-        touch('index.php');
-        dump_file(
+        FS::touch('index.php');
+        FS::dumpFile(
             'test.json',
             <<<'JSON'
                 {
@@ -186,8 +184,8 @@ class ValidateTest extends CommandTestCase
 
     public function test_it_does_not_fail_when_warnings_are_found_but_ignore_message_is_passed(): void
     {
-        touch('index.php');
-        dump_file(
+        FS::touch('index.php');
+        FS::dumpFile(
             'test.json',
             <<<'JSON'
                 {
@@ -225,8 +223,8 @@ class ValidateTest extends CommandTestCase
 
     public function test_it_reports_the_recommendations_and_warnings_found(): void
     {
-        touch('index.php');
-        dump_file(
+        FS::touch('index.php');
+        FS::dumpFile(
             'test.json',
             <<<'JSON'
                 {
@@ -304,7 +302,7 @@ class ValidateTest extends CommandTestCase
 
     public function test_an_invalid_json_file_is_invalid(): void
     {
-        dump_file('box.json', '{');
+        FS::dumpFile('box.json', '{');
 
         $this->commandTester->execute(
             [
@@ -332,7 +330,7 @@ class ValidateTest extends CommandTestCase
 
     public function test_an_invalid_json_file_is_invalid_in_verbose_mode(): void
     {
-        dump_file('box.json.dist', '{');
+        FS::dumpFile('box.json.dist', '{');
 
         try {
             $this->commandTester->execute(
@@ -361,7 +359,7 @@ class ValidateTest extends CommandTestCase
 
     public function test_an_incorrect_config_file_is_invalid(): void
     {
-        dump_file('box.json', '{"test": true}');
+        FS::dumpFile('box.json', '{"test": true}');
 
         $this->commandTester->execute(
             [
@@ -392,7 +390,7 @@ class ValidateTest extends CommandTestCase
 
     public function test_an_incorrect_config_file_is_invalid_in_verbose_mode(): void
     {
-        dump_file('box.json', '{"test": true}');
+        FS::dumpFile('box.json', '{"test": true}');
 
         try {
             $this->commandTester->execute(
