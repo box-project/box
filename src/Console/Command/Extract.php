@@ -101,7 +101,7 @@ final class Extract implements Command
 
             if ($canDelete) {
                 remove($outputDir);
-            // Continue
+                // Continue
             } else {
                 // Do nothing
                 return ExitCode::FAILURE;
