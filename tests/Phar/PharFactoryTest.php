@@ -27,6 +27,7 @@ use const DIRECTORY_SEPARATOR;
  * @covers \KevinGH\Box\Pharaoh\InvalidPhar
  *
  * @runTestsInSeparateProcesses
+ * @requires PHP 8.2.0
  *
  * @internal
  */
