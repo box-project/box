@@ -66,27 +66,6 @@ jobs:
             -   name: Checkout
                 uses: actions/checkout@v3
 
-            -   name: Debug
-                run: ls -l /usr/lib/terminfo/x
-
-            -   name: Debug
-                run: echo $TERMINFO
-
-            -   name: Debug
-                run: ls -l /usr/lib/terminfo
-
-            -   name: Install xterm
-                run: sudo apt-get install -y xterm
-
-            -   name: Debug
-                run: ls -l /usr/lib/terminfo/x
-
-            -   name: Debug
-                run: echo $TERMINFO
-
-            -   name: Debug
-                run: ls -l /usr/lib/terminfo
-
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
                 with:
