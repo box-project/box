@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\PhpScoper;
 
 use Humbug\PhpScoper\Patcher\Patcher;
-use function Safe\sprintf;
+use function sprintf;
 
 final class DummyPatcher implements Patcher
 {
