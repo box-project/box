@@ -3,9 +3,9 @@ MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 
 OS := $(shell uname)
-ERROR_COLOR := "\033[41m"
-YELLOW_COLOR = "\033[0;33m"
-NO_COLOR = "\033[0m"
+ERROR_COLOR := $(shell tput setab 1)
+YELLOW_COLOR := $(shell tput setaf 3)
+NO_COLOR := $(shell tput sgr0)
 
 COMPOSER_BIN_PLUGIN_VENDOR = vendor/bamarni/composer-bin-plugin
 
