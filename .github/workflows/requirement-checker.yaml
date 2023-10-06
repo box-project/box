@@ -16,6 +16,8 @@ concurrency:
 env:
     POLLING_INTERVALS_SEC: 30
     SLEEP_TIME_SEC: 60s
+    #TERMINFO: /usr/lib/terminfo
+    TERM: xterm
 
 jobs:
     cs-lint:
