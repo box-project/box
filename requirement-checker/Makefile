@@ -195,7 +195,7 @@ _vendor_install:
 vendor: composer.lock
 	$(MAKE) vendor_install
 composer.lock: composer.json
-	@echo $(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer update --lock && touch -c $(@)"
 
 $(PHPUNIT_BIN): composer.lock
