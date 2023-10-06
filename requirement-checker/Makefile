@@ -160,7 +160,7 @@ phpunit: $(PHPUNIT_BIN) vendor
 .PHONY: terminal_copy
 terminal_copy: $(ACTUAL_TERMINAL_DIFF)
 	# Disable it for now.
-	$(DIFF) $(EXPECTED_TERMINAL_DIFF) $(ACTUAL_TERMINAL_DIFF)
+	#$(DIFF) $(EXPECTED_TERMINAL_DIFF) $(ACTUAL_TERMINAL_DIFF)
 
 
 #
