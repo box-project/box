@@ -14,7 +14,7 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    TERM: TERM=xterm-256color
+    TERM: TERM=xterm
 
 jobs:
     lint-cs:

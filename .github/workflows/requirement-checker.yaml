@@ -16,7 +16,7 @@ concurrency:
 env:
     POLLING_INTERVALS_SEC: 30
     SLEEP_TIME_SEC: 60s
-    TERM: TERM=xterm-256color
+    TERM: TERM=xterm
 
 jobs:
     cs-lint:
