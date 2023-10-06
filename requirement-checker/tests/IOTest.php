@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\RequirementChecker;
 
-use Generator;
 use PHPUnit\Framework\TestCase;
 use function function_exists;
 use function getenv;
@@ -67,7 +66,7 @@ class IOTest extends TestCase
         self::assertSame($verbosity, $io->getVerbosity());
     }
 
-    public function provideOptions(): Generator
+    public function provideOptions(): iterable
     {
         yield [
             ['cli.php', '--foo'],
@@ -160,7 +159,7 @@ class IOTest extends TestCase
         ];
     }
 
-    public function provideOptionsWithShellVerbosity(): Generator
+    public function provideOptionsWithShellVerbosity(): iterable
     {
         yield [
             ['cli.php', '--foo'],

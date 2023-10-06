@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\RequirementChecker;
 
-use Generator;
 use PHPUnit\Framework\TestCase;
 use function preg_replace;
 use const PHP_VERSION;
@@ -60,7 +59,7 @@ class CheckerTest extends TestCase
         self::assertSame($expectedResult, $actualResult);
     }
 
-    public function provideRequirements(): Generator
+    public function provideRequirements(): iterable
     {
         $phpVersion = PHP_VERSION;
         $remainingVerbosities = ['verbosity=verbose' => IO::VERBOSITY_VERBOSE, 'verbosity=normal' => IO::VERBOSITY_NORMAL, 'verbosity=quiet' => IO::VERBOSITY_QUIET];
