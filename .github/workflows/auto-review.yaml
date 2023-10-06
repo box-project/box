@@ -14,7 +14,7 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    TERM: TERM=xterm
+    TERM: xterm
 
 jobs:
     lint-cs:
