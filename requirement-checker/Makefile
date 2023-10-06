@@ -26,6 +26,8 @@ PHAR_EXTRACT = ../res/requirement-checker
 BOX_BIN = ../bin/box
 BOX = $(BOX_BIN)
 
+DIFF = diff --strip-trailing-cr --ignore-all-space --side-by-side --suppress-common-lines
+
 
 .DEFAULT_GOAL := help
 
@@ -157,7 +159,7 @@ phpunit: $(PHPUNIT_BIN) vendor
 
 .PHONY: terminal_copy
 terminal_copy: $(ACTUAL_TERMINAL_DIFF)
-	diff --ignore-all-space --side-by-side --suppress-common-lines $(EXPECTED_TERMINAL_DIFF) $(ACTUAL_TERMINAL_DIFF)
+	$(DIFF) $(EXPECTED_TERMINAL_DIFF) $(ACTUAL_TERMINAL_DIFF)
 
 
 #
