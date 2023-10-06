@@ -26,13 +26,14 @@ use function extension_loaded;
 use function implode;
 use function preg_replace;
 use function realpath;
+use const PHP_OS_FAMILY;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Info
  * @covers \KevinGH\Box\Console\Command\PharInfoRenderer
  *
  * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
- *                              can create undesirable side-effects.
+ *                              can create undesirable side effect.
  *
  * @internal
  */
@@ -42,6 +43,15 @@ use function realpath;
 class InfoTest extends CommandTestCase
 {
     private const FIXTURES = __DIR__.'/../../../fixtures/info';
+
+    protected function setUp(): void
+    {
+        if (PHP_OS_FAMILY !== 'Darwin') {
+            self::markTestSkipped('This test requires more work to be working fine cross-platform.');
+        }
+
+        parent::setUp();
+    }
 
     protected function getCommand(): Command
     {

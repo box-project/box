@@ -3,7 +3,10 @@ name: Release
 on:
     push:
         branches: [ main ]
-    pull_request:
+    pull_request: ~
+    schedule:
+        # Do not make it the first of the month and/or midnight since it is a very busy time
+        - cron: "* 10 5 * *"
     release:
         types: [ created ]
 

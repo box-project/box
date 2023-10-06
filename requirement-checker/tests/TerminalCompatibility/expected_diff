@@ -1,5 +1,5 @@
 								>       declare(strict_types=1);
-								>
+								>       
  * This file is part of the Symfony package.			|        * This file is part of the box project.
  * (c) Fabien Potencier <fabien@symfony.com>			|        * (c) Kevin Herrera <kevin@herrera.io>
 								>        *     Théo Fidry <theo.fidry@gmail.com>
@@ -19,27 +19,29 @@ namespace Symfony\Component\Console;				|       namespace KevinGH\RequirementChe
 								>       use function stream_get_contents;
 								>       use function trim;
 								>       use const DIRECTORY_SEPARATOR;
-								>
+								>       
 								>       /**
 								>        * This file is copy/pasted from the Symfony project to a
 								>        * class.
 								>        *
 								>        * @license MIT (c) Fabien Potencier <fabien@symfony.com>
 								>        */
-     *								<
-     * @return int						<
+     *								<       
+     * @return int						<       
     public function getWidth()					|           public function getWidth(): int
         if (null === self::$width) {				|               if (!isset(self::$width)) {
-     *								<
-     * @return int						<
+     *								<       
+     * @return int						<       
     public function getHeight()					|           public function getHeight(): int
         if (null === self::$height) {				|               if (!isset(self::$height)) {
         if (null !== self::$stty) {				|               if (isset(self::$stty)) {
         if (!\function_exists('exec')) {			|               if (!function_exists('exec')) {
     private static function initDimensions()			|           private static function initDimensions(): void
         if ('\\' === \DIRECTORY_SEPARATOR) {			|               if ('\\' === DIRECTORY_SEPARATOR) {
-            if (preg_match('/^(\d+)x(\d+)(?: \((\d+)x(\d+       |                   if (preg_match('/^(\d+)x(\d+)(?: \((\d+)x(\d+
         return \function_exists('sapi_windows_vt100_suppo       |               return function_exists('sapi_windows_vt100_suppor
-    private static function initDimensionsUsingStty()		|           private static function initDimensionsUsingStty(): vo
+    /**								|           private static function initDimensionsUsingStty(): vo
+     * Initializes dimensions using the output of an stty       <       
+     */								<       
+    private static function initDimensionsUsingStty()		<       
         if (!\function_exists('proc_open')) {			|               if (!function_exists('proc_open')) {
         if (!\is_resource($process)) {				|               if (!is_resource($process)) {
