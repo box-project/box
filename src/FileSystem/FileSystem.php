@@ -542,7 +542,7 @@ final class FileSystem extends SymfonyFilesystem
             // MODIFIED CODE
             if (defined('PHP_WINDOWS_VERSION_BUILD') && is_dir($file)) {
                 exec(sprintf('rd /s /q %s', escapeshellarg($file)));
-            // - MODIFIED CODE
+                // - MODIFIED CODE
             } elseif (is_link($file)) {
                 // See https://bugs.php.net/52176
                 if (!@(unlink($file) || '\\' !== DIRECTORY_SEPARATOR || rmdir($file)) && file_exists($file)) {
@@ -562,7 +562,7 @@ final class FileSystem extends SymfonyFilesystem
                 $error = error_get_last();
 
                 throw new IOException(sprintf('Failed to remove file "%s": %s.', $file, $error['message']));
-            // MODIFIED CODE
+                // MODIFIED CODE
             } elseif (file_exists($file)) {
                 throw new IOException(sprintf('Failed to remove file "%s".', $file));
                 // - MODIFIED CODE
