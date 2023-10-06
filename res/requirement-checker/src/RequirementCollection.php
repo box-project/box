@@ -38,7 +38,7 @@ final class RequirementCollection implements IteratorAggregate, Countable
     }
     public function evaluateRequirements()
     {
-        return \array_reduce($this->requirements, function (bool $checkPassed, Requirement $requirement) : bool {
+        return \array_reduce($this->requirements, static function (bool $checkPassed, Requirement $requirement) : bool {
             return $checkPassed && $requirement->isFulfilled();
         }, \true);
     }
