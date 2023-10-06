@@ -47,7 +47,7 @@ class InfoTest extends CommandTestCase
     protected function setUp(): void
     {
         if (PHP_OS_FAMILY !== 'Darwin') {
-            $this->markTestSkipped('This test requires more work to be working fine cross-platform.');
+            self::markTestSkipped('This test requires more work to be working fine cross-platform.');
         }
 
         parent::setUp();
