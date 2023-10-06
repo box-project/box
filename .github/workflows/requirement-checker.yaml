@@ -27,7 +27,7 @@ jobs:
                 uses: actions/checkout@v3
 
             -   name: Install xterm
-                uses: sudo apt-get install -y xterm
+                run: sudo apt-get install -y xterm
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
