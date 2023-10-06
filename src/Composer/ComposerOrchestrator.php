@@ -25,6 +25,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
+use function file_exists;
+use function file_get_contents;
+use function file_put_contents;
 use function KevinGH\Box\FileSystem\dump_file;
 use function KevinGH\Box\FileSystem\file_contents;
 use function preg_replace;
@@ -114,7 +117,8 @@ final class ComposerOrchestrator
 
         $composerExecutable = $composerBin ?? self::retrieveComposerExecutable();
 
-        self::dumpAutoloader($composerExecutable, true === $excludeDevFiles, $logger);
+        self::removeDevInstallPackages($composerExecutable, $excludeDevFiles, $logger);
+        self::dumpAutoloader($composerExecutable, $excludeDevFiles, $logger);
 
         if ('' !== $prefix) {
             $autoloadFile = self::retrieveAutoloadFile($composerExecutable, $logger);
@@ -175,6 +179,62 @@ final class ComposerOrchestrator
         }
 
         return $composer;
+    }
+
+    private static function removeDevInstallPackages(string $composerExecutable, bool $noDev, CompilerLogger $logger): void
+    {
+        if (false === $noDev) {
+            return;
+        }
+
+        $composerCommand = [$composerExecutable, 'install', '--no-dev', '--no-scripts', '--no-plugins'];
+
+        if (null !== $verbosity = self::retrieveSubProcessVerbosity($logger->getIO())) {
+            $composerCommand[] = $verbosity;
+        }
+
+        if ($logger->getIO()->isDecorated()) {
+            $composerCommand[] = '--ansi';
+        }
+
+        $removeDevInstallPackages = new Process($composerCommand);
+
+        $logger->log(
+            CompilerLogger::CHEVRON_PREFIX,
+            $removeDevInstallPackages->getCommandLine(),
+            OutputInterface::VERBOSITY_VERBOSE,
+        );
+
+        $composerInstalledVersionsPath = 'vendor/composer/InstalledVersions.php';
+
+        if (file_exists($composerInstalledVersionsPath)) {
+            $composerInstalledVersionsContents = file_get_contents($composerInstalledVersionsPath);
+        }
+
+        $removeDevInstallPackages->run(null, self::getDefaultEnvVars());
+
+        if (false === $removeDevInstallPackages->isSuccessful()) {
+            throw new RuntimeException(
+                'Could not remove the dev packages.',
+                0,
+                new ProcessFailedException($removeDevInstallPackages),
+            );
+        }
+
+        if ('' !== $output = $removeDevInstallPackages->getOutput()) {
+            $logger->getIO()->writeln($output, OutputInterface::VERBOSITY_VERBOSE);
+        }
+
+        if ('' !== $output = $removeDevInstallPackages->getErrorOutput()) {
+            $logger->getIO()->writeln($output, OutputInterface::VERBOSITY_VERBOSE);
+        }
+
+        if (isset($composerInstalledVersionsContents)) {
+            file_put_contents(
+                $composerInstalledVersionsPath,
+                $composerInstalledVersionsContents,
+            );
+        }
     }
 
     private static function dumpAutoloader(string $composerExecutable, bool $noDev, CompilerLogger $logger): void

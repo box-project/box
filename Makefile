@@ -253,7 +253,7 @@ _infection_ci: $(INFECTION_BIN) $(COVERAGE_XML_DIR) $(COVERAGE_JUNIT) vendor
 #---------------------------------------------------------------------------
 
 .PHONY: test_e2e
-test_e2e: e2e_scoper_alias e2e_scoper_expose_symbols e2e_php_settings_checker_no_restart e2e_php_settings_checker_xdebug_enabled e2e_php_settings_checker_readonly_enabled e2e_php_settings_checker_memory_limit_lower e2e_php_settings_checker_memory_limit_higher e2e_symfony e2e_composer_installed_versions e2e_phpstorm_stubs e2e_dockerfile e2e_dockerfile_no_extension e2e_custom_composer_bin e2e_symfony_runtime
+test_e2e: e2e_scoper_alias e2e_scoper_expose_symbols e2e_php_settings_checker_no_restart e2e_php_settings_checker_xdebug_enabled e2e_php_settings_checker_readonly_enabled e2e_php_settings_checker_memory_limit_lower e2e_php_settings_checker_memory_limit_higher e2e_symfony e2e_composer_installed_versions e2e_phpstorm_stubs e2e_dockerfile e2e_dockerfile_no_extension e2e_custom_composer_bin e2e_symfony_runtime e2e_installed_dev
 
 
 .PHONY: blackfire
