@@ -117,7 +117,7 @@ class JsonTest extends FileSystemTestCase
 
         self::assertSame([], $decoded);
 
-        FS::dumpFile('data.json', '');
+        FS::dumpFile('data.json');
 
         try {
             $this->json->decodeFile('data.json', true);

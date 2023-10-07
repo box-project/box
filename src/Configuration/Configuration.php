@@ -2038,7 +2038,7 @@ final class Configuration
         }
 
         /**
-         * @var string
+         * @var string $datetimeFormat
          * @var bool   $valueSetByUser
          */
         [$datetimeFormat, $valueSetByUser] = self::retrieveDatetimeFormat($raw, $logger);

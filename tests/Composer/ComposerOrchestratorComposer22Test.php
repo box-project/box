@@ -128,7 +128,7 @@ class ComposerOrchestratorComposer22Test extends FileSystemTestCase
     ): void {
         FS::mirror(self::FIXTURES.'/dir000', $this->tmp);
 
-        FS::dumpFile('composer.json', '');
+        FS::dumpFile('composer.json');
 
         try {
             ComposerOrchestrator::dumpAutoload($symbolsRegistry, $prefix, false);

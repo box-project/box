@@ -29,14 +29,9 @@ class IOTest extends TestCase
 {
     private static function getDefaultInteractive(): bool
     {
-        if (function_exists('posix_isatty')
+        return !(function_exists('posix_isatty')
             && !@posix_isatty(STDOUT)
-            && false === getenv('SHELL_INTERACTIVE')
-        ) {
-            return false;
-        }
-
-        return true;
+            && false === getenv('SHELL_INTERACTIVE'));
     }
 
     /**
