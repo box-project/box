@@ -3,6 +3,7 @@ MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 
 DOCKER_RUN = docker run --interactive --platform=linux/amd64 --rm --workdir=/opt/box
+DOCKER_RUN_NO_PULL = docker run --interactive --platform=linux/amd64 --rm --pull=never
 # Matches the minimum PHP version supported by Box.
 DOCKER_MIN_BOX_VERSION_IMAGE_TAG = ghcr.io/box-project/box_php81
 DOCKER_MIN_BOX_XDEBUG_PHP_VERSION_IMAGE_TAG = ghcr.io/box-project/box_php81_xdebug
@@ -366,7 +367,7 @@ _e2e_dockerfile: $(SCOPED_BOX_BIN)
 	@mkdir -p $(E2E_DOCKERFILE_OUTPUT_DIR)
 
 	docker buildx build $(shell dirname $(E2E_DOCKERFILE_DOCKERFILE)) --platform=linux/amd64 --tag=$(E2E_DOCKERFILE_IMAGE_TAG)
-	docker run --interactive --pull=never --rm $(E2E_DOCKERFILE_IMAGE_TAG) \
+	$(DOCKER_RUN_NO_PULL) $(E2E_DOCKERFILE_IMAGE_TAG) \
 		1>$(E2E_DOCKERFILE_ACTUAL_STDOUT) \
 		2>$(E2E_DOCKERFILE_ACTUAL_STDERR)
 
@@ -383,7 +384,7 @@ _e2e_dockerfile_no_extension: $(SCOPED_BOX_BIN)
 	@mkdir -p $(E2E_DOCKERFILE_NO_EXT_OUTPUT_DIR)
 
 	docker buildx build $(shell dirname $(E2E_DOCKERFILE_NO_EXT_DOCKERFILE)) --platform=linux/amd64 --tag=$(E2E_DOCKERFILE_NOT_EXT_IMAGE_TAG)
-	docker run --interactive --pull=never --rm $(E2E_DOCKERFILE_NOT_EXT_IMAGE_TAG) \
+	$(DOCKER_RUN_NO_PULL) $(E2E_DOCKERFILE_NOT_EXT_IMAGE_TAG) \
 		1>$(E2E_DOCKERFILE_NO_EXT_ACTUAL_STDOUT) \
 		2>$(E2E_DOCKERFILE_NO_EXT_ACTUAL_STDERR)
 
