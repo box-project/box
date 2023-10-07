@@ -18,6 +18,7 @@ concurrency:
 env:
     POLLING_INTERVALS_SEC: 30
     SLEEP_TIME_SEC: 60s
+    TERM: xterm
 
 jobs:
     wait-for-phar-and-docker-images:

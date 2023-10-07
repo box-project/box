@@ -18,6 +18,7 @@ concurrency:
 env:
     DOCKERFILE: .docker/Dockerfile
     DOCKERHUB_USERNAME: boxproject
+    TERM: xterm
 
 jobs:
     build-phar:
