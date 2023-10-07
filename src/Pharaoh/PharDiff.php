@@ -183,6 +183,7 @@ class PharDiff
          * @var string[] $fileSub
          */
         foreach ($files as $fileSub) {
+            // TODO: address this array_merge
             $fileList = array_merge($fileList, $fileSub);
         }
 

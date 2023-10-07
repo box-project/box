@@ -33,7 +33,7 @@ class Namespace_Test extends CommandTestCase
 
     public function test_it_show_the_ng(): void
     {
-        FS::dumpFile('index.php', '');
+        FS::dumpFile('index.php');
 
         $this->commandTester->execute(
             [

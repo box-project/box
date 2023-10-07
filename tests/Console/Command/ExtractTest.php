@@ -243,7 +243,7 @@ class ExtractTest extends CommandTestCase
             self::assertGreaterThan(0, count($actualFiles));
         } else {
             self::assertSame(ExitCode::FAILURE, $this->commandTester->getStatusCode());
-            self::assertSame(0, count($actualFiles));
+            self::assertCount(0, $actualFiles);
         }
     }
 

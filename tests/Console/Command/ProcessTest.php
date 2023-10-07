@@ -35,7 +35,7 @@ class ProcessTest extends CommandTestCase
 
     public function test_it_processes_a_file_and_displays_the_processed_contents_with_no_config(): void
     {
-        FS::dumpFile('index.php', '');
+        FS::dumpFile('index.php');
 
         $this->commandTester->execute(
             [

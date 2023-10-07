@@ -748,10 +748,10 @@ class BoxTest extends FileSystemTestCase
         $this->box->startBuffering();
         $this->box->addFiles(array_keys($files), false);
         $this->box->endBuffering(static function () use (&$files): void {
-            FS::dumpFile('zip', '');
+            FS::dumpFile('zip');
             $files['zip'] = '';
 
-            FS::dumpFile('zap', '');
+            FS::dumpFile('zap');
             $files['zap'] = '';
         });
 

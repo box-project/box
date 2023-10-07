@@ -60,7 +60,7 @@ class JsonValidationExceptionTest extends FileSystemTestCase
         self::assertNull($exception->getValidatedFile());
         self::assertSame([], $exception->getErrors());
 
-        FS::dumpFile($file = 'dummy_file', '');
+        FS::dumpFile($file = 'dummy_file');
         $errors = ['foo', 'bar'];
         $code = 10;
         $error = new Error();

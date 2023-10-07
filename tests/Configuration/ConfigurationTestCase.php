@@ -20,17 +20,14 @@ use stdClass;
 use Symfony\Component\Filesystem\Path;
 use function json_encode;
 use const JSON_PRETTY_PRINT;
-use const PHP_OS;
+use const PHP_OS_FAMILY;
 
 abstract class ConfigurationTestCase extends FileSystemTestCase
 {
     protected const DEFAULT_FILE = 'index.php';
 
-    /** @var Configuration */
-    protected $config;
-
-    /** @var string */
-    protected $file;
+    protected Configuration $config;
+    protected string $file;
 
     protected function setUp(): void
     {
@@ -58,7 +55,7 @@ abstract class ConfigurationTestCase extends FileSystemTestCase
 
     final protected function isWindows(): bool
     {
-        return false === mb_stripos(PHP_OS, 'darwin') && false !== mb_stripos(PHP_OS, 'win');
+        return 'Windows' === PHP_OS_FAMILY;
     }
 
     final protected function getNoFileConfig(): Configuration

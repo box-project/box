@@ -1310,8 +1310,8 @@ class CompileTest extends FileSystemTestCase
         self::assertSame($expectedDumpedConfig, $actualDumpedConfig);
 
         // Checks one of the dumped file from the PHAR to ensure the encoding of the extracted file is correct
-        self::assertSame(
-            file_get_contents('.box_dump/index.php'),
+        self::assertStringEqualsFile(
+            '.box_dump/index.php',
             $indexContents,
         );
     }
@@ -3087,29 +3087,27 @@ class CompileTest extends FileSystemTestCase
             $traversable = $phar;
         }
 
-        $paths = [];
+        $collectedPaths = [];
 
         foreach ($traversable as $fileInfo) {
             /** @var PharFileInfo $fileInfo */
-            $fileInfo = $phar[str_replace($root, '', (string) $fileInfo->getPathname())];
+            $fileInfo = $phar[str_replace($root, '', $fileInfo->getPathname())];
 
             $path = mb_substr($fileInfo->getPathname(), mb_strlen($root) - 1);
 
             if ($fileInfo->isDir()) {
                 $path .= '/';
 
-                $paths = array_merge(
-                    $paths,
-                    $this->retrievePharFiles(
-                        $phar,
-                        new DirectoryIterator($fileInfo->getPathname()),
-                    ),
+                $collectedPaths[] = $this->retrievePharFiles(
+                    $phar,
+                    new DirectoryIterator($fileInfo->getPathname()),
                 );
             }
 
-            $paths[] = $path;
+            $collectedPaths[] = [$path];
         }
 
+        $paths = array_merge(...$collectedPaths);
         sort($paths);
 
         return array_unique($paths);
@@ -3138,8 +3136,8 @@ class CompileTest extends FileSystemTestCase
             $this->commandTester,
             BoxDisplayNormalizer::createReplaceBoxVersionNormalizer(),
             $this->createCompilerDisplayNormalizer(),
-            $this->createComposerPathNormalizer(),
-            $this->createComposerVersionNormalizer(),
+            self::createComposerPathNormalizer(),
+            self::createComposerVersionNormalizer(),
             ...$extraNormalizers,
         );
     }

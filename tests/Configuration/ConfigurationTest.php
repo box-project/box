@@ -343,7 +343,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_it_throws_an_error_when_a_composer_file_is_found_but_invalid(): void
     {
-        FS::dumpFile('composer.json', '');
+        FS::dumpFile('composer.json');
 
         try {
             $this->reloadConfig();
@@ -366,7 +366,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_it_throws_an_error_when_a_composer_lock_is_found_but_invalid(): void
     {
-        FS::dumpFile('composer.lock', '');
+        FS::dumpFile('composer.lock');
 
         try {
             $this->reloadConfig();
@@ -2391,7 +2391,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_a_custom_stub_can_be_provided(): void
     {
-        FS::dumpFile('custom-stub.php', '');
+        FS::dumpFile('custom-stub.php');
 
         $this->setConfig([
             'stub' => 'custom-stub.php',
