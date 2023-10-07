@@ -341,7 +341,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_the_files_belonging_to_dev_packages_are_ignored_only_in_the_finder_config(): void
     {
-        FS::dumpFile('composer.json', '{}');
+        FS::dumpFile('composer.json', '{}', '');
         FS::dumpFile(
             'composer.lock',
             <<<'JSON'
@@ -354,19 +354,19 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 }
                 JSON,
         );
-        FS::dumpFile('vendor/composer/installed.json', '{}');
+        FS::dumpFile('vendor/composer/installed.json', '{}', '');
 
         FS::touch('file0');
         FS::touch('file1');
 
-        FS::dumpFile('vendor/acme/foo/af0');
-        FS::dumpFile('vendor/acme/foo/af1');
+        FS::dumpFile('vendor/acme/foo/af0', '');
+        FS::dumpFile('vendor/acme/foo/af1', '');
 
-        FS::dumpFile('vendor/acme/bar/ab0');
-        FS::dumpFile('vendor/acme/bar/ab1');
+        FS::dumpFile('vendor/acme/bar/ab0', '');
+        FS::dumpFile('vendor/acme/bar/ab1', '');
 
-        FS::dumpFile('vendor/acme/oof/ao0');
-        FS::dumpFile('vendor/acme/oof/ao1');
+        FS::dumpFile('vendor/acme/oof/ao0', '');
+        FS::dumpFile('vendor/acme/oof/ao1', '');
 
         FS::mkdir('C');
         FS::touch('C/fileC0');
@@ -1516,8 +1516,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
         FS::touch('B/fileB0');
         FS::touch('B/fileB1');
 
-        FS::dumpFile('composer.json', '{}');
-        FS::dumpFile('composer.lock', '{}');
+        FS::dumpFile('composer.json', '{}', '');
+        FS::dumpFile('composer.lock', '{}', '');
 
         $this->setConfig([
             'files' => [
@@ -1840,7 +1840,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_dev_files_are_excluded_or_included_depending_of_the_exclude_dev_files_setting(): void
     {
-        FS::dumpFile('composer.json', '{}');
+        FS::dumpFile('composer.json', '{}', '');
         FS::dumpFile(
             'composer.lock',
             <<<'JSON'
@@ -1855,16 +1855,16 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 }
                 JSON,
         );
-        FS::dumpFile('vendor/composer/installed.json', '{}');
+        FS::dumpFile('vendor/composer/installed.json', '{}', '');
 
-        FS::dumpFile('vendor/acme/foo/af0');
-        FS::dumpFile('vendor/acme/foo/af1');
+        FS::dumpFile('vendor/acme/foo/af0', '');
+        FS::dumpFile('vendor/acme/foo/af1', '');
 
-        FS::dumpFile('vendor/acme/bar/ab0');
-        FS::dumpFile('vendor/acme/bar/ab1');
+        FS::dumpFile('vendor/acme/bar/ab0', '');
+        FS::dumpFile('vendor/acme/bar/ab1', '');
 
-        FS::dumpFile('vendor/acme/oof/ao0');
-        FS::dumpFile('vendor/acme/oof/ao1');
+        FS::dumpFile('vendor/acme/oof/ao0', '');
+        FS::dumpFile('vendor/acme/oof/ao1', '');
 
         $this->reloadConfig();
 
@@ -2061,11 +2061,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
             // The main script is blacklisted but ensures this does not affect the other files collected, like here
             // the files found in a directory which has the same name as the main script
             static function (): void {
-                FS::dumpFile('acme');
-                FS::dumpFile('src/file00');
-                FS::dumpFile('src/file10');
-                FS::dumpFile('src/acme/file00');
-                FS::dumpFile('src/acme/file10');
+                FS::dumpFile('acme', '');
+                FS::dumpFile('src/file00', '');
+                FS::dumpFile('src/file10', '');
+                FS::dumpFile('src/acme/file00', '');
+                FS::dumpFile('src/acme/file10', '');
             },
             [
                 'main' => 'acme',
@@ -2239,12 +2239,12 @@ class ConfigurationFileTest extends ConfigurationTestCase
             // The main script is blacklisted but ensures this does not affect the other files collected, like here
             // the files found in a directory which has the same name as the main script
             static function (): void {
-                FS::dumpFile('index.php');
-                FS::dumpFile('acme');
-                FS::dumpFile('src/file00');
-                FS::dumpFile('src/file10');
-                FS::dumpFile('src/acme/file00');
-                FS::dumpFile('src/acme/file10');
+                FS::dumpFile('index.php', '');
+                FS::dumpFile('acme', '');
+                FS::dumpFile('src/file00', '');
+                FS::dumpFile('src/file10', '');
+                FS::dumpFile('src/acme/file00', '');
+                FS::dumpFile('src/acme/file10', '');
             },
             [
                 'output' => 'acme',
@@ -2316,8 +2316,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
                     FS::touch('main-script');
                     FS::touch('file0');
                     FS::touch('file-bin0');
-                    FS::dumpFile('directory-bin0/file00');
-                    FS::dumpFile('directory-bin1/file10');
+                    FS::dumpFile('directory-bin0/file00', '');
+                    FS::dumpFile('directory-bin1/file10', '');
                 },
                 [
                     'main' => 'main-script',
@@ -2338,7 +2338,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                FS::dumpFile('directory0/file00');
+                FS::dumpFile('directory0/file00', '');
             },
             [
                 'directories' => ['directory0'],
@@ -2348,7 +2348,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                FS::dumpFile('directory0/file00');
+                FS::dumpFile('directory0/file00', '');
             },
             [
                 'directories' => ['directory0'],
@@ -2359,7 +2359,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                FS::dumpFile('directory1/file10');
+                FS::dumpFile('directory1/file10', '');
             },
             [
                 'finder' => [
@@ -2373,7 +2373,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                FS::dumpFile('directory1/file10');
+                FS::dumpFile('directory1/file10', '');
             },
             [
                 'finder' => [
@@ -2388,8 +2388,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                FS::dumpFile('directory0/file00');
-                FS::dumpFile('directory1/file10');
+                FS::dumpFile('directory0/file00', '');
+                FS::dumpFile('directory1/file10', '');
             },
             [
                 'directories' => ['directory0'],
@@ -2404,8 +2404,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                FS::dumpFile('directory0/file00');
-                FS::dumpFile('directory1/file10');
+                FS::dumpFile('directory0/file00', '');
+                FS::dumpFile('directory1/file10', '');
             },
             [
                 'directories' => ['directory0'],

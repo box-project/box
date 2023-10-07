@@ -35,6 +35,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 use RuntimeException;
 use SplFileInfo;
 use Stringable;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Throwable;
 use function array_filter;
@@ -47,7 +48,6 @@ use function file_get_contents;
 use function implode;
 use function in_array;
 use function iterator_to_array;
-use function KevinGH\Box\FileSystem\chmod;
 use function realpath;
 use function sprintf;
 use function str_replace;
@@ -520,7 +520,7 @@ class BoxTest extends FileSystemTestCase
         $contents = 'test';
 
         FS::dumpFile($file, $contents);
-        chmod($file, 0o355);
+        FS::chmod($file, 0o355);
 
         try {
             $this->box->startBuffering();
@@ -1081,7 +1081,7 @@ class BoxTest extends FileSystemTestCase
         $contents = 'test';
 
         FS::dumpFile($file, $contents);
-        chmod($file, 0o355);
+        FS::chmod($file, 0o355);
 
         try {
             $this->box->startBuffering();
@@ -1099,7 +1099,7 @@ class BoxTest extends FileSystemTestCase
 
     public function test_the_temporary_directory_created_for_box_is_removed_upon_failure(): void
     {
-        $boxTmp = FS::makeTmpDir('box', Box::class);
+        $boxTmp = $this->tmp.DIRECTORY_SEPARATOR.'test-tmp-dir';
 
         try {
             $this->box->startBuffering();
@@ -1112,7 +1112,6 @@ class BoxTest extends FileSystemTestCase
                     ->directories()
                     ->depth(0)
                     ->in(dirname($boxTmp)),
-                true,
             );
 
             $boxDir = current(

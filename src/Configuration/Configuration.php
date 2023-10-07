@@ -1104,7 +1104,7 @@ final class Configuration
             ->filter(
                 static function (SplFileInfo $fileInfo) use ($devPackages): bool {
                     foreach ($devPackages as $devPackage) {
-                        if ($devPackage === Path::getLongestCommonBasePath([$devPackage, $fileInfo->getRealPath()])) {
+                        if ($devPackage === Path::getLongestCommonBasePath($devPackage, $fileInfo->getRealPath())) {
                             // File belongs to the dev package
                             return false;
                         }

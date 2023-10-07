@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e3ee3e3681715241cad6da4322767a6a",
+    "content-hash": "929461c05717f1f10281876774046cb3",
     "packages": [
         {
             "name": "amphp/amp",
@@ -908,16 +908,16 @@
         },
         {
             "name": "fidry/filesystem",
-            "version": "1.0.0",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/theofidry/filesystem.git",
-                "reference": "b0336b19dc989f5ba4cca8ee43f0cc69a6f6d8bf"
+                "reference": "1dd372ab3eb8b84ffe9578bff576b00c9a44ee46"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/theofidry/filesystem/zipball/b0336b19dc989f5ba4cca8ee43f0cc69a6f6d8bf",
-                "reference": "b0336b19dc989f5ba4cca8ee43f0cc69a6f6d8bf",
+                "url": "https://api.github.com/repos/theofidry/filesystem/zipball/1dd372ab3eb8b84ffe9578bff576b00c9a44ee46",
+                "reference": "1dd372ab3eb8b84ffe9578bff576b00c9a44ee46",
                 "shasum": ""
             },
             "require": {
@@ -965,7 +965,7 @@
             ],
             "support": {
                 "issues": "https://github.com/theofidry/filesystem/issues",
-                "source": "https://github.com/theofidry/filesystem/tree/1.0.0"
+                "source": "https://github.com/theofidry/filesystem/tree/1.1.0"
             },
             "funding": [
                 {
@@ -973,7 +973,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-10-01T21:57:21+00:00"
+            "time": "2023-10-07T07:32:54+00:00"
         },
         {
             "name": "humbug/php-scoper",
