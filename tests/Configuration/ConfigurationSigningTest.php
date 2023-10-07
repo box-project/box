@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Configuration;
 
+use Fidry\FileSystem\FS;
 use InvalidArgumentException;
 use Phar;
 use function array_unshift;

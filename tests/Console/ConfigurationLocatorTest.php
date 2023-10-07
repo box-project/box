@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
+use Fidry\FileSystem\FS;
 use KevinGH\Box\Configuration\NoConfigurationFound;
 use KevinGH\Box\Test\FileSystemTestCase;
 use const DIRECTORY_SEPARATOR;
