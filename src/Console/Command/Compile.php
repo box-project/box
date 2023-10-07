@@ -21,6 +21,7 @@ use Fidry\Console\Command\CommandAwareness;
 use Fidry\Console\Command\Configuration as CommandConfiguration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
+use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Amp\FailureCollector;
 use KevinGH\Box\Box;
@@ -43,6 +44,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 use function array_map;
 use function array_shift;
@@ -57,12 +59,6 @@ use function is_string;
 use function KevinGH\Box\bump_open_file_descriptor_limit;
 use function KevinGH\Box\check_php_settings;
 use function KevinGH\Box\disable_parallel_processing;
-use function KevinGH\Box\FileSystem\chmod;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\make_path_absolute;
-use function KevinGH\Box\FileSystem\make_path_relative;
-use function KevinGH\Box\FileSystem\remove;
-use function KevinGH\Box\FileSystem\rename;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\format_time;
 use function memory_get_peak_usage;
@@ -285,7 +281,7 @@ final class Compile implements CommandAware
         self::signPhar($config, $box, $config->getTmpOutputPath(), $io, $logger);
 
         if ($config->getTmpOutputPath() !== $config->getOutputPath()) {
-            rename($config->getTmpOutputPath(), $config->getOutputPath());
+            FS::rename($config->getTmpOutputPath(), $config->getOutputPath());
         }
 
         return $box;
@@ -295,7 +291,7 @@ final class Compile implements CommandAware
     {
         $composerBin = $io->getOption(self::COMPOSER_BIN_OPTION)->asNullableNonEmptyString();
 
-        return null === $composerBin ? null : make_path_absolute($composerBin, getcwd());
+        return null === $composerBin ? null : Path::makeAbsolute($composerBin, getcwd());
     }
 
     private function removeExistingArtifacts(Configuration $config, CompilerLogger $logger, bool $debug): void
@@ -303,9 +299,9 @@ final class Compile implements CommandAware
         $path = $config->getOutputPath();
 
         if ($debug) {
-            remove(self::DEBUG_DIR);
+            FS::remove(self::DEBUG_DIR);
 
-            dump_file(
+            FS::dumpFile(
                 self::DEBUG_DIR.'/.box_configuration',
                 ConfigurationExporter::export($config),
             );
@@ -323,7 +319,7 @@ final class Compile implements CommandAware
             ),
         );
 
-        remove($path);
+        FS::remove($path);
     }
 
     private static function checkComposerVersion(
@@ -531,7 +527,7 @@ final class Compile implements CommandAware
             $config->getMainScriptContents(),
         );
 
-        $relativeMain = make_path_relative($main, $config->getBasePath());
+        $relativeMain = Path::makeRelative($main, $config->getBasePath());
 
         if ($localMain !== $relativeMain) {
             $logger->log(
@@ -752,7 +748,7 @@ final class Compile implements CommandAware
         CompilerLogger $logger,
     ): void {
         // Sign using private key when applicable
-        remove($path.'.pubkey');
+        FS::remove($path.'.pubkey');
 
         $key = $config->getPrivateKeyPath();
 
@@ -805,7 +801,7 @@ final class Compile implements CommandAware
                 ),
             );
 
-            chmod($path, $chmod);
+            FS::chmod($path, $chmod);
         }
     }
 

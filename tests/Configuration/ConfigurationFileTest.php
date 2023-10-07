@@ -14,16 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Configuration;
 
+use Fidry\FileSystem\FS;
 use InvalidArgumentException;
 use KevinGH\Box\Json\JsonValidationException;
+use Symfony\Component\Filesystem\Path;
 use function chdir;
 use function file_get_contents;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\make_path_absolute;
-use function KevinGH\Box\FileSystem\mkdir;
-use function KevinGH\Box\FileSystem\rename;
-use function KevinGH\Box\FileSystem\symlink;
-use function KevinGH\Box\FileSystem\touch;
 use function Safe\json_decode;
 use function sprintf;
 use const DIRECTORY_SEPARATOR;
@@ -41,42 +37,42 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_the_files_can_be_configured(): void
     {
-        touch('file0');
-        touch('file1');
+        FS::touch('file0');
+        FS::touch('file1');
 
-        mkdir('B');
-        touch('B/file1');
-        touch('B/fileB0');
-        touch('B/fileB1');
-        touch('B/glob_finder_excluded_file');
-        touch('B/glob-finder_excluded_file');
+        FS::mkdir('B');
+        FS::touch('B/file1');
+        FS::touch('B/fileB0');
+        FS::touch('B/fileB1');
+        FS::touch('B/glob_finder_excluded_file');
+        FS::touch('B/glob-finder_excluded_file');
 
-        mkdir('C');
-        touch('C/fileC0');
-        touch('C/fileC1');
+        FS::mkdir('C');
+        FS::touch('C/fileC0');
+        FS::touch('C/fileC1');
 
-        mkdir('D');
-        touch('D/fileD0');
-        touch('D/fileD1');
-        touch('D/finder_excluded_file');
+        FS::mkdir('D');
+        FS::touch('D/fileD0');
+        FS::touch('D/fileD1');
+        FS::touch('D/finder_excluded_file');
 
-        mkdir('E');
-        touch('E/fileE0');
-        touch('E/fileE1');
-        touch('E/finder_excluded_file');
+        FS::mkdir('E');
+        FS::touch('E/fileE0');
+        FS::touch('E/fileE1');
+        FS::touch('E/finder_excluded_file');
 
-        mkdir('F');
-        touch('F/fileF0');
-        touch('F/fileF1');
-        touch('F/fileF2');
-        touch('F/fileF3');
+        FS::mkdir('F');
+        FS::touch('F/fileF0');
+        FS::touch('F/fileF1');
+        FS::touch('F/fileF2');
+        FS::touch('F/fileF3');
 
-        mkdir('vendor');
-        touch('vendor/glob_finder_excluded_file');
-        touch('vendor/glob-finder_excluded_file');
+        FS::mkdir('vendor');
+        FS::touch('vendor/glob_finder_excluded_file');
+        FS::touch('vendor/glob-finder_excluded_file');
 
-        mkdir('vendor-bin');
-        touch('vendor-bin/file1');
+        FS::mkdir('vendor-bin');
+        FS::touch('vendor-bin/file1');
 
         $this->setConfig([
             'files' => [
@@ -175,41 +171,41 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_configured_files_are_relative_to_base_path(): void
     {
-        mkdir('sub-dir');
+        FS::mkdir('sub-dir');
 
-        rename(self::DEFAULT_FILE, 'sub-dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
+        FS::rename(self::DEFAULT_FILE, 'sub-dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
 
         chdir('sub-dir');
 
-        touch('file0');
-        touch('file1');
+        FS::touch('file0');
+        FS::touch('file1');
 
-        mkdir('B');
-        touch('B/fileB0');
-        touch('B/fileB1');
-        touch('B/glob_finder_excluded_file');
-        touch('B/glob-finder_excluded_file');
+        FS::mkdir('B');
+        FS::touch('B/fileB0');
+        FS::touch('B/fileB1');
+        FS::touch('B/glob_finder_excluded_file');
+        FS::touch('B/glob-finder_excluded_file');
 
-        mkdir('C');
-        touch('C/fileC0');
-        touch('C/fileC1');
+        FS::mkdir('C');
+        FS::touch('C/fileC0');
+        FS::touch('C/fileC1');
 
-        mkdir('D');
-        touch('D/fileD0');
-        touch('D/fileD1');
-        touch('D/finder_excluded_file');
+        FS::mkdir('D');
+        FS::touch('D/fileD0');
+        FS::touch('D/fileD1');
+        FS::touch('D/finder_excluded_file');
 
-        mkdir('E');
-        touch('E/fileE0');
-        touch('E/fileE1');
-        touch('E/finder_excluded_file');
+        FS::mkdir('E');
+        FS::touch('E/fileE0');
+        FS::touch('E/fileE1');
+        FS::touch('E/finder_excluded_file');
 
-        mkdir('vendor');
-        touch('vendor/glob_finder_excluded_file');
-        touch('vendor/glob-finder_excluded_file');
+        FS::mkdir('vendor');
+        FS::touch('vendor/glob_finder_excluded_file');
+        FS::touch('vendor/glob-finder_excluded_file');
 
-        mkdir('vendor-bin');
-        touch('vendor-bin/file1');
+        FS::mkdir('vendor-bin');
+        FS::touch('vendor-bin/file1');
 
         chdir($this->tmp);
 
@@ -267,29 +263,29 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_configured_files_are_relative_to_base_path_unless_they_are_absolute_paths(): void
     {
-        mkdir('sub-dir');
+        FS::mkdir('sub-dir');
         chdir('sub-dir');
 
-        touch('file0');
-        touch('file1');
+        FS::touch('file0');
+        FS::touch('file1');
 
-        mkdir('B');
-        touch('B/fileB0');
-        touch('B/fileB1');
+        FS::mkdir('B');
+        FS::touch('B/fileB0');
+        FS::touch('B/fileB1');
 
-        mkdir('C');
-        touch('C/fileC0');
-        touch('C/fileC1');
+        FS::mkdir('C');
+        FS::touch('C/fileC0');
+        FS::touch('C/fileC1');
 
-        mkdir('D');
-        touch('D/fileD0');
-        touch('D/fileD1');
-        touch('D/finder_excluded_file');
+        FS::mkdir('D');
+        FS::touch('D/fileD0');
+        FS::touch('D/fileD1');
+        FS::touch('D/finder_excluded_file');
 
-        mkdir('E');
-        touch('E/fileE0');
-        touch('E/fileE1');
-        touch('E/finder_excluded_file');
+        FS::mkdir('E');
+        FS::touch('E/fileE0');
+        FS::touch('E/fileE1');
+        FS::touch('E/finder_excluded_file');
 
         chdir($this->tmp);
 
@@ -345,8 +341,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_the_files_belonging_to_dev_packages_are_ignored_only_in_the_finder_config(): void
     {
-        dump_file('composer.json', '{}');
-        dump_file(
+        FS::dumpFile('composer.json', '{}', '');
+        FS::dumpFile(
             'composer.lock',
             <<<'JSON'
                 {
@@ -358,33 +354,33 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 }
                 JSON,
         );
-        dump_file('vendor/composer/installed.json', '{}');
+        FS::dumpFile('vendor/composer/installed.json', '{}', '');
 
-        touch('file0');
-        touch('file1');
+        FS::touch('file0');
+        FS::touch('file1');
 
-        dump_file('vendor/acme/foo/af0');
-        dump_file('vendor/acme/foo/af1');
+        FS::dumpFile('vendor/acme/foo/af0', '');
+        FS::dumpFile('vendor/acme/foo/af1', '');
 
-        dump_file('vendor/acme/bar/ab0');
-        dump_file('vendor/acme/bar/ab1');
+        FS::dumpFile('vendor/acme/bar/ab0', '');
+        FS::dumpFile('vendor/acme/bar/ab1', '');
 
-        dump_file('vendor/acme/oof/ao0');
-        dump_file('vendor/acme/oof/ao1');
+        FS::dumpFile('vendor/acme/oof/ao0', '');
+        FS::dumpFile('vendor/acme/oof/ao1', '');
 
-        mkdir('C');
-        touch('C/fileC0');
-        touch('C/fileC1');
+        FS::mkdir('C');
+        FS::touch('C/fileC0');
+        FS::touch('C/fileC1');
 
-        mkdir('D');
-        touch('D/fileD0');
-        touch('D/fileD1');
-        touch('D/finder_excluded_file');
+        FS::mkdir('D');
+        FS::touch('D/fileD0');
+        FS::touch('D/fileD1');
+        FS::touch('D/finder_excluded_file');
 
-        mkdir('E');
-        touch('E/fileE0');
-        touch('E/fileE1');
-        touch('E/finder_excluded_file');
+        FS::mkdir('E');
+        FS::touch('E/fileE0');
+        FS::touch('E/fileE1');
+        FS::touch('E/finder_excluded_file');
 
         $this->setConfig([
             'files' => [
@@ -458,7 +454,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
             self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
-            $filePath = make_path_absolute('non-existent', $this->tmp);
+            $filePath = Path::makeAbsolute('non-existent', $this->tmp);
 
             self::assertSame(
                 sprintf(
@@ -472,16 +468,16 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_symlinks_are_not_supported_in_finder_in_setting(): void
     {
-        mkdir('sub-dir');
+        FS::mkdir('sub-dir');
 
-        rename(self::DEFAULT_FILE, 'sub-dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
+        FS::rename(self::DEFAULT_FILE, 'sub-dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
 
-        mkdir('F');
-        touch('F/fileF0');
-        touch('F/fileF1');
-        touch('F/finder_excluded_file');
+        FS::mkdir('F');
+        FS::touch('F/fileF0');
+        FS::touch('F/fileF1');
+        FS::touch('F/finder_excluded_file');
 
-        symlink('F', 'sub-dir/F');
+        FS::symlink('F', 'sub-dir/F');
 
         try {
             $this->setConfig([
@@ -509,16 +505,16 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_appending_a_file_from_a_symlinked_directory_is_not_supported(): void
     {
-        mkdir('sub-dir');
+        FS::mkdir('sub-dir');
 
-        rename(self::DEFAULT_FILE, 'sub-dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
+        FS::rename(self::DEFAULT_FILE, 'sub-dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
 
-        mkdir('F');
-        touch('F/fileF0');
-        touch('F/fileF1');
-        touch('F/finder_excluded_file');
+        FS::mkdir('F');
+        FS::touch('F/fileF0');
+        FS::touch('F/fileF1');
+        FS::touch('F/finder_excluded_file');
 
-        symlink('F', 'sub-dir/F');
+        FS::symlink('F', 'sub-dir/F');
 
         try {
             $this->setConfig([
@@ -546,16 +542,16 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_appending_a_symlinked_file_is_not_supported(): void
     {
-        mkdir('sub-dir');
+        FS::mkdir('sub-dir');
 
-        rename(self::DEFAULT_FILE, 'sub-dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
+        FS::rename(self::DEFAULT_FILE, 'sub-dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
 
-        mkdir('F');
-        touch('F/fileF0');
-        touch('F/fileF1');
-        touch('F/finder_excluded_file');
+        FS::mkdir('F');
+        FS::touch('F/fileF0');
+        FS::touch('F/fileF1');
+        FS::touch('F/finder_excluded_file');
 
-        symlink('F/fileF0', 'sub-dir/F/fileF0');
+        FS::symlink('F/fileF0', 'sub-dir/F/fileF0');
 
         try {
             $this->setConfig([
@@ -583,16 +579,16 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_configuring_a_symlink_file_is_not_supported(): void
     {
-        mkdir('sub-dir');
+        FS::mkdir('sub-dir');
 
-        rename(self::DEFAULT_FILE, 'sub-dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
+        FS::rename(self::DEFAULT_FILE, 'sub-dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
 
-        mkdir('F');
-        touch('F/fileF0');
-        touch('F/fileF1');
-        touch('F/finder_excluded_file');
+        FS::mkdir('F');
+        FS::touch('F/fileF0');
+        FS::touch('F/fileF1');
+        FS::touch('F/finder_excluded_file');
 
-        symlink('F/fileF0', 'sub-dir/F/fileF0');
+        FS::symlink('F/fileF0', 'sub-dir/F/fileF0');
 
         try {
             $this->setConfig([
@@ -615,16 +611,16 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_configuring_a_symlink_directory_is_not_supported(): void
     {
-        mkdir('sub-dir');
+        FS::mkdir('sub-dir');
 
-        rename(self::DEFAULT_FILE, 'sub-dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
+        FS::rename(self::DEFAULT_FILE, 'sub-dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
 
-        mkdir('F');
-        touch('F/fileF0');
-        touch('F/fileF1');
-        touch('F/finder_excluded_file');
+        FS::mkdir('F');
+        FS::touch('F/fileF0');
+        FS::touch('F/fileF1');
+        FS::touch('F/finder_excluded_file');
 
-        symlink('F', 'sub-dir/F');
+        FS::symlink('F', 'sub-dir/F');
 
         try {
             $this->setConfig([
@@ -647,7 +643,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_cannot_add_a_directory_to_the_list_of_files(): void
     {
-        mkdir('dirA');
+        FS::mkdir('dirA');
 
         try {
             $this->setConfig([
@@ -695,7 +691,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_cannot_add_a_file_to_the_list_of_directories(): void
     {
-        touch('foo');
+        FS::touch('foo');
 
         try {
             $this->setConfig([
@@ -720,30 +716,30 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_the_bin_files_iterator_can_be_configured(): void
     {
-        touch('file0');
-        touch('file1');
+        FS::touch('file0');
+        FS::touch('file1');
 
-        mkdir('B');
-        touch('B/fileB0');
-        touch('B/fileB1');
+        FS::mkdir('B');
+        FS::touch('B/fileB0');
+        FS::touch('B/fileB1');
 
-        mkdir('C');
-        touch('C/fileC0');
-        touch('C/fileC1');
+        FS::mkdir('C');
+        FS::touch('C/fileC0');
+        FS::touch('C/fileC1');
 
-        mkdir('D');
-        touch('D/fileD0');
-        touch('D/fileD1');
-        touch('D/finder_excluded_file');
+        FS::mkdir('D');
+        FS::touch('D/fileD0');
+        FS::touch('D/fileD1');
+        FS::touch('D/finder_excluded_file');
 
-        mkdir('E');
-        touch('E/fileE0');
-        touch('E/fileE1');
-        touch('E/finder_excluded_file');
+        FS::mkdir('E');
+        FS::touch('E/fileE0');
+        FS::touch('E/fileE1');
+        FS::touch('E/finder_excluded_file');
 
-        mkdir('F');
-        touch('F/fileF0');
-        touch('F/fileF1');
+        FS::mkdir('F');
+        FS::touch('F/fileF0');
+        FS::touch('F/fileF1');
 
         $this->setConfig([
             'files-bin' => [
@@ -799,32 +795,32 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_configured_bin_files_are_relative_to_base_path(): void
     {
-        mkdir('sub-dir');
+        FS::mkdir('sub-dir');
 
-        rename(self::DEFAULT_FILE, 'sub-dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
+        FS::rename(self::DEFAULT_FILE, 'sub-dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
 
         chdir('sub-dir');
 
-        touch('file0');
-        touch('file1');
+        FS::touch('file0');
+        FS::touch('file1');
 
-        mkdir('B');
-        touch('B/fileB0');
-        touch('B/fileB1');
+        FS::mkdir('B');
+        FS::touch('B/fileB0');
+        FS::touch('B/fileB1');
 
-        mkdir('C');
-        touch('C/fileC0');
-        touch('C/fileC1');
+        FS::mkdir('C');
+        FS::touch('C/fileC0');
+        FS::touch('C/fileC1');
 
-        mkdir('D');
-        touch('D/fileD0');
-        touch('D/fileD1');
-        touch('D/finder_excluded_file');
+        FS::mkdir('D');
+        FS::touch('D/fileD0');
+        FS::touch('D/fileD1');
+        FS::touch('D/finder_excluded_file');
 
-        mkdir('E');
-        touch('E/fileE0');
-        touch('E/fileE1');
-        touch('E/finder_excluded_file');
+        FS::mkdir('E');
+        FS::touch('E/fileE0');
+        FS::touch('E/fileE1');
+        FS::touch('E/finder_excluded_file');
 
         chdir($this->tmp);
 
@@ -879,29 +875,29 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_configured_bin_files_are_relative_to_base_path_unless_they_are_absolute_paths(): void
     {
-        mkdir('sub-dir');
+        FS::mkdir('sub-dir');
         chdir('sub-dir');
 
-        touch('file0');
-        touch('file1');
+        FS::touch('file0');
+        FS::touch('file1');
 
-        mkdir('B');
-        touch('B/fileB0');
-        touch('B/fileB1');
+        FS::mkdir('B');
+        FS::touch('B/fileB0');
+        FS::touch('B/fileB1');
 
-        mkdir('C');
-        touch('C/fileC0');
-        touch('C/fileC1');
+        FS::mkdir('C');
+        FS::touch('C/fileC0');
+        FS::touch('C/fileC1');
 
-        mkdir('D');
-        touch('D/fileD0');
-        touch('D/fileD1');
-        touch('D/finder_excluded_file');
+        FS::mkdir('D');
+        FS::touch('D/fileD0');
+        FS::touch('D/fileD1');
+        FS::touch('D/finder_excluded_file');
 
-        mkdir('E');
-        touch('E/fileE0');
-        touch('E/fileE1');
-        touch('E/finder_excluded_file');
+        FS::mkdir('E');
+        FS::touch('E/fileE0');
+        FS::touch('E/fileE1');
+        FS::touch('E/finder_excluded_file');
 
         chdir($this->tmp);
 
@@ -980,7 +976,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_cannot_add_a_directory_to_the_list_of_bin_files(): void
     {
-        mkdir('dirA');
+        FS::mkdir('dirA');
 
         try {
             $this->setConfig([
@@ -1028,7 +1024,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_cannot_add_a_file_to_the_list_of_bin_directories(): void
     {
-        touch('foo');
+        FS::touch('foo');
 
         try {
             $this->setConfig([
@@ -1053,11 +1049,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_the_cannot_be_included_twice(): void
     {
-        mkdir('A');
-        touch('A/foo');
+        FS::mkdir('A');
+        FS::touch('A/foo');
 
-        mkdir('B');
-        touch('B/bar');
+        FS::mkdir('B');
+        FS::touch('B/bar');
 
         $this->setConfig([
             'files' => [
@@ -1139,9 +1135,9 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_the_blacklist_input_is_normalized(): void
     {
-        mkdir('B');
-        touch('B/fileB0');
-        touch('B/fileB1');
+        FS::mkdir('B');
+        FS::touch('B/fileB0');
+        FS::touch('B/fileB1');
 
         $this->setConfig([
             'directories' => [
@@ -1229,7 +1225,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_the_files_and_bin_files_input_is_normalized(): void
     {
-        touch('foo');
+        FS::touch('foo');
 
         $this->setConfig([
             'files' => [
@@ -1306,8 +1302,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_the_directories_and_bin_directories_input_is_normalized(): void
     {
-        mkdir('A');
-        touch('A/foo');
+        FS::mkdir('A');
+        FS::touch('A/foo');
 
         $this->setConfig([
             'directories' => [
@@ -1365,35 +1361,35 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_finder_and_bin_finder_input_is_normalized(): void
     {
-        mkdir('sub-dir');
+        FS::mkdir('sub-dir');
 
-        rename(self::DEFAULT_FILE, 'sub-dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
+        FS::rename(self::DEFAULT_FILE, 'sub-dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
 
         chdir('sub-dir');
 
-        mkdir('A');
-        touch('A/foo');
+        FS::mkdir('A');
+        FS::touch('A/foo');
 
-        mkdir('A/D0');
-        touch('A/D0/da0');
+        FS::mkdir('A/D0');
+        FS::touch('A/D0/da0');
 
-        mkdir('A/D1');
-        touch('A/D1/da1');
+        FS::mkdir('A/D1');
+        FS::touch('A/D1/da1');
 
-        mkdir('B');
-        touch('B/bar');
+        FS::mkdir('B');
+        FS::touch('B/bar');
 
-        mkdir('D');
-        touch('D/doo');
+        FS::mkdir('D');
+        FS::touch('D/doo');
 
-        mkdir('D/D0');
-        touch('D/D0/d0o');
+        FS::mkdir('D/D0');
+        FS::touch('D/D0/d0o');
 
-        mkdir('D/D1');
-        touch('D/D1/d1o');
+        FS::mkdir('D/D1');
+        FS::touch('D/D1/d1o');
 
-        touch('oof');
-        touch('rab');
+        FS::touch('oof');
+        FS::touch('rab');
 
         chdir($this->tmp);
 
@@ -1432,8 +1428,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_finder_and_bin_finder_exclude_files_or_directories_may_not_exists(): void
     {
-        mkdir('A');
-        touch('A/foo');
+        FS::mkdir('A');
+        FS::touch('A/foo');
 
         $finderConfig = [
             [
@@ -1462,11 +1458,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_finder_array_arguments_are_called_as_single_arguments(): void
     {
-        mkdir('A');
-        touch('A/foo');
+        FS::mkdir('A');
+        FS::touch('A/foo');
 
-        mkdir('B');
-        touch('B/bar');
+        FS::mkdir('B');
+        FS::touch('B/bar');
 
         $this->setConfig([
             'files' => [],
@@ -1513,15 +1509,15 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_the_composer_json_and_lock_files_are_always_included_even_when_the_user_configure_which_files_to_pick(): void
     {
-        touch('file0');
-        touch('file1');
+        FS::touch('file0');
+        FS::touch('file1');
 
-        mkdir('B');
-        touch('B/fileB0');
-        touch('B/fileB1');
+        FS::mkdir('B');
+        FS::touch('B/fileB0');
+        FS::touch('B/fileB1');
 
-        dump_file('composer.json', '{}');
-        dump_file('composer.lock', '{}');
+        FS::dumpFile('composer.json', '{}', '');
+        FS::dumpFile('composer.lock', '{}', '');
 
         $this->setConfig([
             'files' => [
@@ -1586,65 +1582,65 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_append_autodiscovered_files_to_configured_files_if_the_autodiscovery_is_forced(): void
     {
-        touch('file0');
-        touch('file1');
-        touch('file2');
+        FS::touch('file0');
+        FS::touch('file1');
+        FS::touch('file2');
 
-        mkdir('B');
-        touch('B/fileB0');
-        touch('B/fileB1');
+        FS::mkdir('B');
+        FS::touch('B/fileB0');
+        FS::touch('B/fileB1');
 
-        mkdir('PSR4_0');
-        touch('PSR4_0/file0');
-        touch('PSR4_0/file1');
+        FS::mkdir('PSR4_0');
+        FS::touch('PSR4_0/file0');
+        FS::touch('PSR4_0/file1');
 
-        mkdir('PSR4_1');
-        touch('PSR4_1/file0');
-        touch('PSR4_1/file1');
+        FS::mkdir('PSR4_1');
+        FS::touch('PSR4_1/file0');
+        FS::touch('PSR4_1/file1');
 
-        mkdir('PSR4_2');
-        touch('PSR4_2/file0');
-        touch('PSR4_2/file1');
+        FS::mkdir('PSR4_2');
+        FS::touch('PSR4_2/file0');
+        FS::touch('PSR4_2/file1');
 
-        mkdir('DEV_PSR4_0');
-        touch('DEV_PSR4_0/file0');
-        touch('DEV_PSR4_0/file1');
+        FS::mkdir('DEV_PSR4_0');
+        FS::touch('DEV_PSR4_0/file0');
+        FS::touch('DEV_PSR4_0/file1');
 
-        mkdir('PSR0_0');
-        touch('PSR0_0/file0');
-        touch('PSR0_0/file1');
+        FS::mkdir('PSR0_0');
+        FS::touch('PSR0_0/file0');
+        FS::touch('PSR0_0/file1');
 
-        mkdir('PSR0_1');
-        touch('PSR0_1/file0');
-        touch('PSR0_1/file1');
+        FS::mkdir('PSR0_1');
+        FS::touch('PSR0_1/file0');
+        FS::touch('PSR0_1/file1');
 
-        mkdir('PSR0_2');
-        touch('PSR0_2/file0');
-        touch('PSR0_2/file1');
+        FS::mkdir('PSR0_2');
+        FS::touch('PSR0_2/file0');
+        FS::touch('PSR0_2/file1');
 
-        mkdir('DEV_PSR0_0');
-        touch('DEV_PSR0_0/file0');
-        touch('DEV_PSR0_0/file1');
+        FS::mkdir('DEV_PSR0_0');
+        FS::touch('DEV_PSR0_0/file0');
+        FS::touch('DEV_PSR0_0/file1');
 
-        mkdir('CLASSMAP_DIR');
-        touch('CLASSMAP_DIR/file0');
-        touch('CLASSMAP_DIR/file1');
+        FS::mkdir('CLASSMAP_DIR');
+        FS::touch('CLASSMAP_DIR/file0');
+        FS::touch('CLASSMAP_DIR/file1');
 
-        mkdir('CLASSMAP_DEV_DIR');
-        touch('CLASSMAP_DEV_DIR/file0');
-        touch('CLASSMAP_DEV_DIR/file1');
+        FS::mkdir('CLASSMAP_DEV_DIR');
+        FS::touch('CLASSMAP_DEV_DIR/file0');
+        FS::touch('CLASSMAP_DEV_DIR/file1');
 
-        mkdir('dir0');
-        touch('dir0/file0');
-        touch('dir0/file1');
-        touch('dir0/blacklisted_file');
+        FS::mkdir('dir0');
+        FS::touch('dir0/file0');
+        FS::touch('dir0/file1');
+        FS::touch('dir0/blacklisted_file');
 
-        mkdir('dir1');
-        touch('dir1/file0');
-        touch('dir1/file1');
-        touch('dir1/blacklisted_file');
+        FS::mkdir('dir1');
+        FS::touch('dir1/file0');
+        FS::touch('dir1/file1');
+        FS::touch('dir1/blacklisted_file');
 
-        dump_file(
+        FS::dumpFile(
             'composer.json',
             <<<'JSON'
                 {
@@ -1844,8 +1840,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     public function test_dev_files_are_excluded_or_included_depending_of_the_exclude_dev_files_setting(): void
     {
-        dump_file('composer.json', '{}');
-        dump_file(
+        FS::dumpFile('composer.json', '{}', '');
+        FS::dumpFile(
             'composer.lock',
             <<<'JSON'
                 {
@@ -1859,16 +1855,16 @@ class ConfigurationFileTest extends ConfigurationTestCase
                 }
                 JSON,
         );
-        dump_file('vendor/composer/installed.json', '{}');
+        FS::dumpFile('vendor/composer/installed.json', '{}', '');
 
-        dump_file('vendor/acme/foo/af0');
-        dump_file('vendor/acme/foo/af1');
+        FS::dumpFile('vendor/acme/foo/af0', '');
+        FS::dumpFile('vendor/acme/foo/af1', '');
 
-        dump_file('vendor/acme/bar/ab0');
-        dump_file('vendor/acme/bar/ab1');
+        FS::dumpFile('vendor/acme/bar/ab0', '');
+        FS::dumpFile('vendor/acme/bar/ab1', '');
 
-        dump_file('vendor/acme/oof/ao0');
-        dump_file('vendor/acme/oof/ao1');
+        FS::dumpFile('vendor/acme/oof/ao0', '');
+        FS::dumpFile('vendor/acme/oof/ao1', '');
 
         $this->reloadConfig();
 
@@ -1917,9 +1913,9 @@ class ConfigurationFileTest extends ConfigurationTestCase
     {
         yield [
             static function (): void {
-                touch('main-script');
-                touch('file0');
-                touch('file1');
+                FS::touch('main-script');
+                FS::touch('file0');
+                FS::touch('file1');
             },
             [
                 'main' => 'main-script',
@@ -1938,11 +1934,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                mkdir('sub-dir');
+                FS::mkdir('sub-dir');
 
-                touch('sub-dir/main-script');
-                touch('sub-dir/file0');
-                touch('sub-dir/file1');
+                FS::touch('sub-dir/main-script');
+                FS::touch('sub-dir/file0');
+                FS::touch('sub-dir/file1');
             },
             [
                 'base-path' => 'sub-dir',
@@ -1962,10 +1958,10 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                mkdir('A');
-                touch('A/main-script');
-                touch('A/file0');
-                touch('A/file1');
+                FS::mkdir('A');
+                FS::touch('A/main-script');
+                FS::touch('A/file0');
+                FS::touch('A/file1');
             },
             [
                 'main' => 'A/main-script',
@@ -1982,11 +1978,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                mkdir('sub-dir');
-                mkdir('sub-dir/A');
-                touch('sub-dir/A/main-script');
-                touch('sub-dir/A/file0');
-                touch('sub-dir/A/file1');
+                FS::mkdir('sub-dir');
+                FS::mkdir('sub-dir/A');
+                FS::touch('sub-dir/A/main-script');
+                FS::touch('sub-dir/A/file0');
+                FS::touch('sub-dir/A/file1');
             },
             [
                 'base-path' => 'sub-dir',
@@ -2004,11 +2000,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                mkdir('A');
+                FS::mkdir('A');
 
-                touch('A/main-script');
-                touch('A/file0');
-                touch('A/file1');
+                FS::touch('A/main-script');
+                FS::touch('A/file0');
+                FS::touch('A/file1');
             },
             [
                 'main' => 'A/main-script',
@@ -2033,9 +2029,9 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                touch('main-script');
-                touch('file0');
-                touch('file1');
+                FS::touch('main-script');
+                FS::touch('file0');
+                FS::touch('file1');
             },
             [
                 'main' => 'main-script',
@@ -2065,11 +2061,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
             // The main script is blacklisted but ensures this does not affect the other files collected, like here
             // the files found in a directory which has the same name as the main script
             static function (): void {
-                dump_file('acme');
-                dump_file('src/file00');
-                dump_file('src/file10');
-                dump_file('src/acme/file00');
-                dump_file('src/acme/file10');
+                FS::dumpFile('acme', '');
+                FS::dumpFile('src/file00', '');
+                FS::dumpFile('src/file10', '');
+                FS::dumpFile('src/acme/file00', '');
+                FS::dumpFile('src/acme/file10', '');
             },
             [
                 'main' => 'acme',
@@ -2089,10 +2085,10 @@ class ConfigurationFileTest extends ConfigurationTestCase
     {
         yield [
             static function (): void {
-                touch('acme.phar');
-                touch('index.php');
-                touch('file0');
-                touch('file1');
+                FS::touch('acme.phar');
+                FS::touch('index.php');
+                FS::touch('file0');
+                FS::touch('file1');
             },
             [
                 'output' => 'acme.phar',
@@ -2111,12 +2107,12 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                mkdir('sub-dir');
+                FS::mkdir('sub-dir');
 
-                touch('sub-dir/acme.phar');
-                touch('sub-dir/index.php');
-                touch('sub-dir/file0');
-                touch('sub-dir/file1');
+                FS::touch('sub-dir/acme.phar');
+                FS::touch('sub-dir/index.php');
+                FS::touch('sub-dir/file0');
+                FS::touch('sub-dir/file1');
             },
             [
                 'base-path' => 'sub-dir',
@@ -2136,11 +2132,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                touch('index.php');
-                mkdir('A');
-                touch('A/acme.phar');
-                touch('A/file0');
-                touch('A/file1');
+                FS::touch('index.php');
+                FS::mkdir('A');
+                FS::touch('A/acme.phar');
+                FS::touch('A/file0');
+                FS::touch('A/file1');
             },
             [
                 'output' => 'A/acme.phar',
@@ -2157,12 +2153,12 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                mkdir('sub-dir');
-                touch('sub-dir/index.php');
-                mkdir('sub-dir/A');
-                touch('sub-dir/A/acme.phar');
-                touch('sub-dir/A/file0');
-                touch('sub-dir/A/file1');
+                FS::mkdir('sub-dir');
+                FS::touch('sub-dir/index.php');
+                FS::mkdir('sub-dir/A');
+                FS::touch('sub-dir/A/acme.phar');
+                FS::touch('sub-dir/A/file0');
+                FS::touch('sub-dir/A/file1');
             },
             [
                 'base-path' => 'sub-dir',
@@ -2180,12 +2176,12 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                mkdir('A');
+                FS::mkdir('A');
 
-                touch('index.php');
-                touch('A/acme.phar');
-                touch('A/file0');
-                touch('A/file1');
+                FS::touch('index.php');
+                FS::touch('A/acme.phar');
+                FS::touch('A/file0');
+                FS::touch('A/file1');
             },
             [
                 'output' => 'A/acme.phar',
@@ -2210,10 +2206,10 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                touch('acme.phar');
-                touch('index.php');
-                touch('file0');
-                touch('file1');
+                FS::touch('acme.phar');
+                FS::touch('index.php');
+                FS::touch('file0');
+                FS::touch('file1');
             },
             [
                 'output' => 'acme.phar',
@@ -2243,12 +2239,12 @@ class ConfigurationFileTest extends ConfigurationTestCase
             // The main script is blacklisted but ensures this does not affect the other files collected, like here
             // the files found in a directory which has the same name as the main script
             static function (): void {
-                dump_file('index.php');
-                dump_file('acme');
-                dump_file('src/file00');
-                dump_file('src/file10');
-                dump_file('src/acme/file00');
-                dump_file('src/acme/file10');
+                FS::dumpFile('index.php', '');
+                FS::dumpFile('acme', '');
+                FS::dumpFile('src/file00', '');
+                FS::dumpFile('src/file10', '');
+                FS::dumpFile('src/acme/file00', '');
+                FS::dumpFile('src/acme/file10', '');
             },
             [
                 'output' => 'acme',
@@ -2317,11 +2313,11 @@ class ConfigurationFileTest extends ConfigurationTestCase
         foreach ([true, false] as $booleanValue) {
             yield [
                 static function (): void {
-                    touch('main-script');
-                    touch('file0');
-                    touch('file-bin0');
-                    dump_file('directory-bin0/file00');
-                    dump_file('directory-bin1/file10');
+                    FS::touch('main-script');
+                    FS::touch('file0');
+                    FS::touch('file-bin0');
+                    FS::dumpFile('directory-bin0/file00', '');
+                    FS::dumpFile('directory-bin1/file10', '');
                 },
                 [
                     'main' => 'main-script',
@@ -2342,7 +2338,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                dump_file('directory0/file00');
+                FS::dumpFile('directory0/file00', '');
             },
             [
                 'directories' => ['directory0'],
@@ -2352,7 +2348,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                dump_file('directory0/file00');
+                FS::dumpFile('directory0/file00', '');
             },
             [
                 'directories' => ['directory0'],
@@ -2363,7 +2359,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                dump_file('directory1/file10');
+                FS::dumpFile('directory1/file10', '');
             },
             [
                 'finder' => [
@@ -2377,7 +2373,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                dump_file('directory1/file10');
+                FS::dumpFile('directory1/file10', '');
             },
             [
                 'finder' => [
@@ -2392,8 +2388,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                dump_file('directory0/file00');
-                dump_file('directory1/file10');
+                FS::dumpFile('directory0/file00', '');
+                FS::dumpFile('directory1/file10', '');
             },
             [
                 'directories' => ['directory0'],
@@ -2408,8 +2404,8 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                dump_file('directory0/file00');
-                dump_file('directory1/file10');
+                FS::dumpFile('directory0/file00', '');
+                FS::dumpFile('directory1/file10', '');
             },
             [
                 'directories' => ['directory0'],

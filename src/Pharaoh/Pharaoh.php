@@ -43,6 +43,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Pharaoh;
 
+use Fidry\FileSystem\FS;
 use KevinGH\Box\Console\Command\Extract;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\PharMeta;
@@ -61,8 +62,6 @@ use function getenv;
 use function is_readable;
 use function iter\mapKeys;
 use function iter\toArrayWithKeys;
-use function KevinGH\Box\FileSystem\make_tmp_dir;
-use function KevinGH\Box\FileSystem\remove;
 use function random_bytes;
 use function sprintf;
 
@@ -109,7 +108,7 @@ final class Pharaoh
         $this->file = $file;
         $this->fileName = basename($file);
 
-        $this->tmp = make_tmp_dir('HumbugBox', 'Pharaoh');
+        $this->tmp = FS::makeTmpDir('HumbugBox', 'Pharaoh');
 
         self::dumpPhar($file, $this->tmp);
         [
@@ -129,8 +128,8 @@ final class Pharaoh
             Phar::unlinkArchive($path);
         }
 
-        if (null !== $this->tmp) {
-            remove($this->tmp);
+        if (isset($this->tmp)) {
+            FS::remove($this->tmp);
         }
     }
 

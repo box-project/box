@@ -25,6 +25,7 @@
         "composer/semver": "^3.3.2",
         "composer/xdebug-handler": "^3.0.3",
         "fidry/console": "^0.5.3",
+        "fidry/filesystem": "^1.1",
         "humbug/php-scoper": "^0.18.3",
         "justinrainbow/json-schema": "^5.2.12",
         "laravel/serializable-closure": "^1.2.2",
@@ -68,7 +69,6 @@
             "KevinGH\\Box\\": "src"
         },
         "files": [
-            "src/FileSystem/file_system.php",
             "src/consts.php",
             "src/functions.php"
         ],

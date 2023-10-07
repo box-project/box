@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Configuration;
 
 use DateTimeImmutable;
+use Fidry\FileSystem\FS;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\DummyCompactor;
 use KevinGH\Box\Compactor\InvalidCompactor;
@@ -36,12 +37,6 @@ use function date_default_timezone_set;
 use function exec;
 use function getcwd;
 use function json_decode;
-use function KevinGH\Box\FileSystem\chmod;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\file_contents;
-use function KevinGH\Box\FileSystem\mkdir;
-use function KevinGH\Box\FileSystem\rename;
-use function KevinGH\Box\FileSystem\touch;
 use function KevinGH\Box\get_box_version;
 use function mt_getrandmax;
 use function random_int;
@@ -172,7 +167,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_a_warning_is_given_if_the_alias_has_been_set_but_a_custom_stub_is_provided(): void
     {
-        touch('stub-path.php');
+        FS::touch('stub-path.php');
 
         $this->setConfig([
             'alias' => 'test.phar',
@@ -190,8 +185,8 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_the_default_base_path_used_is_the_configuration_file_location(): void
     {
-        dump_file('sub-dir/box.json', '{}');
-        dump_file('sub-dir/index.php');
+        FS::dumpFile('sub-dir/box.json', '{}');
+        FS::dumpFile('sub-dir/index.php');
 
         $this->file = $this->tmp.'/sub-dir/box.json';
 
@@ -210,8 +205,8 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_the_base_path_can_be_configured(): void
     {
-        mkdir($basePath = $this->tmp.DIRECTORY_SEPARATOR.'test');
-        rename(self::DEFAULT_FILE, $basePath.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
+        FS::mkdir($basePath = $this->tmp.DIRECTORY_SEPARATOR.'test');
+        FS::rename(self::DEFAULT_FILE, $basePath.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
 
         $this->setConfig([
             'base-path' => $basePath,
@@ -263,7 +258,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_a_file_path_cannot_be_used_as_a_base_path(): void
     {
-        touch('foo');
+        FS::touch('foo');
 
         try {
             $this->setConfig([
@@ -282,8 +277,8 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_if_the_base_path_is_relative_then_it_is_relative_to_the_current_working_directory(): void
     {
-        mkdir('dir');
-        rename(self::DEFAULT_FILE, 'dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
+        FS::mkdir('dir');
+        FS::rename(self::DEFAULT_FILE, 'dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
 
         $this->setConfig([
             'base-path' => 'dir',
@@ -299,8 +294,8 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_the_base_path_value_is_normalized(): void
     {
-        mkdir('dir');
-        rename(self::DEFAULT_FILE, 'dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
+        FS::mkdir('dir');
+        FS::rename(self::DEFAULT_FILE, 'dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
 
         $this->setConfig([
             'base-path' => ' dir ',
@@ -348,7 +343,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_it_throws_an_error_when_a_composer_file_is_found_but_invalid(): void
     {
-        dump_file('composer.json', '');
+        FS::dumpFile('composer.json', '');
 
         try {
             $this->reloadConfig();
@@ -371,7 +366,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_it_throws_an_error_when_a_composer_lock_is_found_but_invalid(): void
     {
-        dump_file('composer.lock', '');
+        FS::dumpFile('composer.lock', '');
 
         try {
             $this->reloadConfig();
@@ -415,7 +410,7 @@ class ConfigurationTest extends ConfigurationTestCase
             $this->config->getWarnings(),
         );
 
-        dump_file('composer.json', '{}');
+        FS::dumpFile('composer.json', '{}');
 
         $this->setConfig([]);
 
@@ -435,7 +430,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_the_autoloader_dumping_can_be_configured(): void
     {
-        dump_file('composer.json', '{}');
+        FS::dumpFile('composer.json', '{}');
 
         $this->setConfig([
             'dump-autoload' => false,
@@ -663,7 +658,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_the_php_scoper_configuration_location_can_be_configured(): void
     {
-        dump_file('custom.scoper.ini.php', "<?php return ['prefix' => 'custom'];");
+        FS::dumpFile('custom.scoper.ini.php', "<?php return ['prefix' => 'custom'];");
 
         $this->setConfig([
             'php-scoper' => 'custom.scoper.ini.php',
@@ -682,7 +677,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_a_default_scoper_path_is_configured_by_default(): void
     {
-        dump_file('scoper.inc.php', "<?php return ['prefix' => 'custom'];");
+        FS::dumpFile('scoper.inc.php', "<?php return ['prefix' => 'custom'];");
 
         $this->setConfig([
             'compactors' => [
@@ -860,7 +855,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_a_main_script_path_is_configured_by_default(): void
     {
-        dump_file('composer.json', '{"bin": []}');
+        FS::dumpFile('composer.json', '{"bin": []}');
 
         self::assertTrue($this->config->hasMainScript());
         self::assertSame($this->tmp.DIRECTORY_SEPARATOR.'index.php', $this->config->getMainScriptPath());
@@ -872,9 +867,9 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_a_main_script_path_is_inferred_by_the_composer_json_by_default(): void
     {
-        dump_file('bin/foo');
+        FS::dumpFile('bin/foo');
 
-        dump_file(
+        FS::dumpFile(
             'composer.json',
             <<<'JSON'
                 {
@@ -897,10 +892,10 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_the_first_composer_bin_is_used_as_the_main_script_by_default(): void
     {
-        dump_file('bin/foo');
-        dump_file('bin/bar');
+        FS::dumpFile('bin/foo');
+        FS::dumpFile('bin/bar');
 
-        dump_file(
+        FS::dumpFile(
             'composer.json',
             <<<'JSON'
                 {
@@ -924,12 +919,12 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_the_main_script_can_be_configured(): void
     {
-        dump_file('test.php', 'Main script contents');
+        FS::dumpFile('test.php', 'Main script contents');
 
-        dump_file('bin/foo');
-        dump_file('bin/bar');
+        FS::dumpFile('bin/foo');
+        FS::dumpFile('bin/bar');
 
-        dump_file(
+        FS::dumpFile(
             'composer.json',
             <<<'JSON'
                 {
@@ -953,7 +948,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_the_main_script_path_is_normalized(): void
     {
-        touch('test.php');
+        FS::touch('test.php');
 
         $this->setConfig(['main' => ' test.php ']);
 
@@ -965,7 +960,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_main_script_content_ignores_shebang_line(): void
     {
-        dump_file('test.php', "#!/usr/bin/env php\ntest");
+        FS::dumpFile('test.php', "#!/usr/bin/env php\ntest");
 
         $this->setConfig(['main' => 'test.php']);
 
@@ -991,10 +986,10 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_the_main_script_can_be_disabled(): void
     {
-        dump_file('bin/foo');
-        dump_file('bin/bar');
+        FS::dumpFile('bin/foo');
+        FS::dumpFile('bin/bar');
 
-        dump_file(
+        FS::dumpFile(
             'composer.json',
             <<<'JSON'
                 {
@@ -1216,8 +1211,8 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_the_output_path_is_relative_to_the_base_path(): void
     {
-        mkdir('sub-dir');
-        rename(self::DEFAULT_FILE, 'sub-dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
+        FS::mkdir('sub-dir');
+        FS::rename(self::DEFAULT_FILE, 'sub-dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
 
         $this->setConfig([
             'output' => 'test.phar',
@@ -1239,8 +1234,8 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_the_output_path_is_not_relative_to_the_base_path_if_is_absolute(): void
     {
-        mkdir('sub-dir');
-        rename(self::DEFAULT_FILE, 'sub-dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
+        FS::mkdir('sub-dir');
+        FS::rename(self::DEFAULT_FILE, 'sub-dir'.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
 
         $this->setConfig([
             'output' => $this->tmp.'/test.phar',
@@ -1302,7 +1297,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_get_default_output_path_depends_on_the_input(): void
     {
-        dump_file('bin/acme');
+        FS::dumpFile('bin/acme');
 
         $this->setConfig([
             'main' => 'bin/acme',
@@ -1327,7 +1322,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_the_replacement_map_can_be_configured(): void
     {
-        touch('test');
+        FS::touch('test');
         exec('git init -b main');
         exec('git config user.name "Test User"');
         exec('git config user.email test@test.test');
@@ -1365,7 +1360,7 @@ class ConfigurationTest extends ConfigurationTestCase
         self::assertSame([], $this->config->getRecommendations());
         self::assertSame([], $this->config->getWarnings());
 
-        touch('foo');
+        FS::touch('foo');
         exec('git add foo');
         exec('git commit -m "Adding another test file."');
 
@@ -1409,10 +1404,10 @@ class ConfigurationTest extends ConfigurationTestCase
     {
         // Make another directory level to have config not in base-path.
         $basePath = $this->tmp.DIRECTORY_SEPARATOR.'subdir';
-        mkdir($basePath);
-        rename(self::DEFAULT_FILE, $basePath.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
+        FS::mkdir($basePath);
+        FS::rename(self::DEFAULT_FILE, $basePath.DIRECTORY_SEPARATOR.self::DEFAULT_FILE);
         chdir($basePath);
-        touch('test');
+        FS::touch('test');
         exec('git init -b main');
         exec('git config user.name "Test User"');
         exec('git config user.email test@test.test');
@@ -1445,7 +1440,7 @@ class ConfigurationTest extends ConfigurationTestCase
         self::assertSame([], $this->config->getWarnings());
 
         chdir($basePath);
-        touch('foo');
+        FS::touch('foo');
         exec('git add foo');
         exec('git commit -m "Adding another test file."');
         chdir($this->tmp);
@@ -1628,7 +1623,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_a_warning_is_given_if_the_shebang_configured_but_a_custom_stub_is_used(): void
     {
-        touch('my-stub.php');
+        FS::touch('my-stub.php');
 
         $this->setConfig([
             'shebang' => $expected = '#!/bin/php',
@@ -1662,7 +1657,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_a_recommendation_is_given_if_the_shebang_disabled_and_a_custom_stub_is_used(): void
     {
-        touch('my-stub.php');
+        FS::touch('my-stub.php');
 
         $this->setConfig([
             'shebang' => false,
@@ -2046,7 +2041,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_a_warning_is_given_when_the_banner_is_configured_but_the_box_stub_is_not_used(): void
     {
-        touch('my-stub.php');
+        FS::touch('my-stub.php');
 
         foreach (['my-stub.php', false] as $stub) {
             $this->setConfig([
@@ -2067,7 +2062,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_a_recommendation_is_given_when_the_banner_is_disabled_but_the_box_stub_is_not_used(): void
     {
-        touch('my-stub.php');
+        FS::touch('my-stub.php');
 
         foreach (['my-stub.php', false] as $stub) {
             $this->setConfig([
@@ -2186,7 +2181,7 @@ class ConfigurationTest extends ConfigurationTestCase
             comment.
             COMMENT;
 
-        dump_file('banner', $comment);
+        FS::dumpFile('banner', $comment);
 
         $this->setConfig([
             'banner-file' => 'banner',
@@ -2223,7 +2218,7 @@ class ConfigurationTest extends ConfigurationTestCase
         );
         self::assertSame([], $this->config->getWarnings());
 
-        dump_file('custom-banner', $defaultBanner);
+        FS::dumpFile('custom-banner', $defaultBanner);
 
         $this->setConfig([
             'banner-file' => 'custom-banner',
@@ -2240,7 +2235,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $version = self::$version;
 
-        dump_file(
+        FS::dumpFile(
             'custom-banner',
             <<<BANNER
                   Generated by Humbug Box {$version}.
@@ -2265,8 +2260,8 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_a_warning_is_given_when_the_banner_file_is_configured_but_the_box_stub_is_not_used(): void
     {
-        touch('custom-banner');
-        touch('my-stub.php');
+        FS::touch('custom-banner');
+        FS::touch('my-stub.php');
 
         foreach (['my-stub.php', false] as $stub) {
             $this->setConfig([
@@ -2295,7 +2290,7 @@ class ConfigurationTest extends ConfigurationTestCase
             comment.
             COMMENT;
 
-        dump_file('banner', $comment);
+        FS::dumpFile('banner', $comment);
 
         $this->setConfig([
             'banner' => 'discarded banner',
@@ -2328,7 +2323,7 @@ class ConfigurationTest extends ConfigurationTestCase
             comment.
             COMMENT;
 
-        dump_file('banner', $comment);
+        FS::dumpFile('banner', $comment);
 
         $this->setConfig([
             'banner-file' => 'banner',
@@ -2396,7 +2391,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_a_custom_stub_can_be_provided(): void
     {
-        dump_file('custom-stub.php', '');
+        FS::dumpFile('custom-stub.php', '');
 
         $this->setConfig([
             'stub' => 'custom-stub.php',
@@ -2490,7 +2485,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_a_warning_is_given_when_the_intercept_funcs_is_configured_but_the_box_stub_is_not_used(): void
     {
-        touch('my-stub.php');
+        FS::touch('my-stub.php');
 
         foreach (['my-stub.php', false] as $stub) {
             $this->setConfig([
@@ -2510,7 +2505,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_a_recommendation_is_given_when_the_intercept_funcs_is_disabled_but_the_box_stub_is_not_used(): void
     {
-        touch('my-stub.php');
+        FS::touch('my-stub.php');
 
         foreach (['my-stub.php', false] as $stub) {
             $this->setConfig([
@@ -2539,7 +2534,7 @@ class ConfigurationTest extends ConfigurationTestCase
         self::assertSame([], $this->config->getRecommendations());
         self::assertSame([], $this->config->getWarnings());
 
-        dump_file('composer.lock', '{}');
+        FS::dumpFile('composer.lock', '{}');
 
         $this->reloadConfig();
 
@@ -2554,7 +2549,7 @@ class ConfigurationTest extends ConfigurationTestCase
         // Sanity check
         self::assertFalse($this->config->checkRequirements());
 
-        dump_file('composer.json', '{}');
+        FS::dumpFile('composer.json', '{}');
 
         $this->reloadConfig();
 
@@ -2569,7 +2564,7 @@ class ConfigurationTest extends ConfigurationTestCase
         // Sanity check
         self::assertFalse($this->config->checkRequirements());
 
-        dump_file('composer.lock', '{}');
+        FS::dumpFile('composer.lock', '{}');
 
         $this->reloadConfig();
 
@@ -2584,8 +2579,8 @@ class ConfigurationTest extends ConfigurationTestCase
         // Sanity check
         self::assertFalse($this->config->checkRequirements());
 
-        dump_file('composer.json', '{}');
-        dump_file('composer.lock', '{}');
+        FS::dumpFile('composer.json', '{}');
+        FS::dumpFile('composer.lock', '{}');
 
         $this->reloadConfig();
 
@@ -2597,8 +2592,8 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_the_requirement_checker_can_be_enabled(): void
     {
-        dump_file('composer.json', '{}');
-        dump_file('composer.lock', '{}');
+        FS::dumpFile('composer.json', '{}');
+        FS::dumpFile('composer.lock', '{}');
 
         $this->setConfig([
             'check-requirements' => true,
@@ -2633,7 +2628,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_the_requirement_checker_is_not_disabled_but_a_warning_is_emitted_if_enabled_without_a_composer_lock_file(): void
     {
-        dump_file('composer.json', '{}');
+        FS::dumpFile('composer.json', '{}');
 
         $this->setConfig([
             'check-requirements' => true,
@@ -2683,9 +2678,9 @@ class ConfigurationTest extends ConfigurationTestCase
             $this->config->getWarnings(),
         );
 
-        dump_file('composer.json', '{}');
-        dump_file('composer.lock', '{}');
-        dump_file('vendor/composer/installed.json', '{}');
+        FS::dumpFile('composer.json', '{}');
+        FS::dumpFile('composer.lock', '{}');
+        FS::dumpFile('vendor/composer/installed.json', '{}');
 
         $this->setConfig([
             'check-requirements' => null,
@@ -2714,9 +2709,9 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_warning_is_given_if_the_check_requirement_is_configured_but_the_phar_stub_used(): void
     {
-        dump_file('composer.json', '{}');
-        dump_file('composer.lock', '{}');
-        dump_file('vendor/composer/installed.json', '{}');
+        FS::dumpFile('composer.json', '{}');
+        FS::dumpFile('composer.lock', '{}');
+        FS::dumpFile('vendor/composer/installed.json', '{}');
 
         $this->setConfig([
             'check-requirements' => true,
@@ -2755,7 +2750,7 @@ class ConfigurationTest extends ConfigurationTestCase
         );
         self::assertSame([], $this->config->getWarnings());
 
-        dump_file('composer.json', '{}');
+        FS::dumpFile('composer.json', '{}');
 
         $this->setConfig([]);
 
@@ -2811,7 +2806,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_a_recommendation_is_given_if_exclude_dev_files_is_enabled_when_the_autoload_is_dumped(): void
     {
-        dump_file('composer.json', '{}');
+        FS::dumpFile('composer.json', '{}');
 
         $this->setConfig([
             'dump-autoload' => true,
@@ -2836,7 +2831,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_a_recommendation_is_given_if_exclude_dev_files_is_disabled_when_the_autoload_is_not_dumped(): void
     {
-        dump_file('composer.json', '{}');
+        FS::dumpFile('composer.json', '{}');
 
         $this->setConfig([
             'dump-autoload' => false,
@@ -2858,7 +2853,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_the_dev_files_can_be_not_excluded_when_the_autoloader_is_dumped(): void
     {
-        dump_file('composer.json', '{}');
+        FS::dumpFile('composer.json', '{}');
 
         $this->setConfig([
             'dump-autoload' => true,
@@ -2880,7 +2875,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_a_warning_is_given_if_dev_files_are_explicitly_excluded_but_the_autoloader_not_dumped(): void
     {
-        dump_file('composer.json', '{}');
+        FS::dumpFile('composer.json', '{}');
 
         $this->setConfig([
             'dump-autoload' => false,
@@ -2959,10 +2954,10 @@ class ConfigurationTest extends ConfigurationTestCase
 
     public function test_it_can_be_exported(): void
     {
-        touch('foo.php');
-        touch('bar.php');
+        FS::touch('foo.php');
+        FS::touch('bar.php');
 
-        dump_file(
+        FS::dumpFile(
             'composer.json',
             <<<'JSON'
                 {
@@ -2976,8 +2971,8 @@ class ConfigurationTest extends ConfigurationTestCase
                 }
                 JSON,
         );
-        dump_file('composer.lock', '{}');
-        dump_file('vendor/composer/installed.json', '{}');
+        FS::dumpFile('composer.lock', '{}');
+        FS::dumpFile('vendor/composer/installed.json', '{}');
 
         $this->setConfig([
             'alias' => 'test.phar',
@@ -3190,7 +3185,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                dump_file('composer.json', '{}');
+                FS::dumpFile('composer.json', '{}');
             },
             'composer.json',
             [],
@@ -3200,7 +3195,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                dump_file('composer.json', '{"name": "acme/foo"}');
+                FS::dumpFile('composer.json', '{"name": "acme/foo"}');
             },
             'composer.json',
             ['name' => 'acme/foo'],
@@ -3210,7 +3205,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                dump_file('composer.lock', '{}');
+                FS::dumpFile('composer.lock', '{}');
             },
             null,
             null,
@@ -3220,7 +3215,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                dump_file('composer.lock', '{"name": "acme/foo"}');
+                FS::dumpFile('composer.lock', '{"name": "acme/foo"}');
             },
             null,
             null,
@@ -3230,8 +3225,8 @@ class ConfigurationTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                dump_file('composer.json', '{"name": "acme/foo"}');
-                dump_file('composer.lock', '{"name": "acme/bar"}');
+                FS::dumpFile('composer.json', '{"name": "acme/foo"}');
+                FS::dumpFile('composer.lock', '{"name": "acme/bar"}');
             },
             'composer.json',
             ['name' => 'acme/foo'],
@@ -3241,7 +3236,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                mkdir('composer.json');
+                FS::mkdir('composer.json');
             },
             null,
             null,
@@ -3251,7 +3246,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                mkdir('composer.lock');
+                FS::mkdir('composer.lock');
             },
             null,
             null,
@@ -3261,8 +3256,8 @@ class ConfigurationTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                touch('composer.json');
-                chmod('composer.json', 0);
+                FS::touch('composer.json');
+                FS::chmod('composer.json', 0);
             },
             null,
             null,
@@ -3272,8 +3267,8 @@ class ConfigurationTest extends ConfigurationTestCase
 
         yield [
             static function (): void {
-                touch('composer.lock');
-                chmod('composer.lock', 0);
+                FS::touch('composer.lock');
+                FS::chmod('composer.lock', 0);
             },
             null,
             null,
@@ -3296,7 +3291,7 @@ class ConfigurationTest extends ConfigurationTestCase
     private function retrieveSchemaKeys(): array
     {
         $schema = json_decode(
-            file_contents(__DIR__.'/../../res/schema.json'),
+            FS::getFileContents(__DIR__.'/../../res/schema.json'),
             true,
             512,
             JSON_THROW_ON_ERROR,

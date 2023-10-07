@@ -17,6 +17,7 @@ namespace KevinGH\Box;
 use Error;
 use Exception;
 use Fidry\Console\DisplayNormalizer;
+use Fidry\FileSystem\FS;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Compactors;
@@ -34,6 +35,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 use RuntimeException;
 use SplFileInfo;
 use Stringable;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Throwable;
 use function array_filter;
@@ -46,11 +48,6 @@ use function file_get_contents;
 use function implode;
 use function in_array;
 use function iterator_to_array;
-use function KevinGH\Box\FileSystem\canonicalize;
-use function KevinGH\Box\FileSystem\chmod;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\make_tmp_dir;
-use function KevinGH\Box\FileSystem\mkdir;
 use function realpath;
 use function sprintf;
 use function str_replace;
@@ -143,7 +140,7 @@ class BoxTest extends FileSystemTestCase
         $file = 'foo';
         $contents = 'test';
 
-        dump_file($file, $contents);
+        FS::dumpFile($file, $contents);
 
         $this->box->startBuffering();
         $this->box->addFile($file);
@@ -209,7 +206,7 @@ class BoxTest extends FileSystemTestCase
         $file = 'foo';
         $contents = 'test';
 
-        dump_file($file, $contents);
+        FS::dumpFile($file, $contents);
 
         try {
             $this->box->addFile($file);
@@ -247,7 +244,7 @@ class BoxTest extends FileSystemTestCase
         $file = 'foo';
         $contents = 'test';
 
-        dump_file($file, 'tset');
+        FS::dumpFile($file, 'tset');
 
         $this->box->startBuffering();
         $this->box->addFile($file, $contents);
@@ -287,7 +284,7 @@ class BoxTest extends FileSystemTestCase
         $file = 'foo';
         $contents = 'test';
 
-        dump_file($file, 'tset');
+        FS::dumpFile($file, 'tset');
 
         $this->box->startBuffering();
         $this->box->addFile($file, $contents, true);
@@ -306,10 +303,10 @@ class BoxTest extends FileSystemTestCase
     public function test_it_can_add_a_file_with_absolute_path_to_the_phar(): void
     {
         $relativePath = 'path-to/foo';
-        $file = canonicalize($this->tmp.DIRECTORY_SEPARATOR.$relativePath);
+        $file = Path::canonicalize($this->tmp.DIRECTORY_SEPARATOR.$relativePath);
         $contents = 'test';
 
-        dump_file($file, $contents);
+        FS::dumpFile($file, $contents);
 
         $this->box->startBuffering();
         $this->box->addFile($file);
@@ -331,7 +328,7 @@ class BoxTest extends FileSystemTestCase
         $contents = 'test';
         $localPath = 'local/path/foo';
 
-        dump_file($file, $contents);
+        FS::dumpFile($file, $contents);
 
         $fileMapper = new MapFile(
             $this->tmp,
@@ -361,7 +358,7 @@ class BoxTest extends FileSystemTestCase
         $file = 'foo';
         $contents = 'test';
 
-        dump_file($file, $contents);
+        FS::dumpFile($file, $contents);
 
         $this->box->registerCompactors(new Compactors(new FakeCompactor()));
 
@@ -385,7 +382,7 @@ class BoxTest extends FileSystemTestCase
         $contents = 'test';
         $localPath = 'local/path/foo';
 
-        dump_file($file, $contents);
+        FS::dumpFile($file, $contents);
 
         $fileMapper = new MapFile(
             $this->tmp,
@@ -418,7 +415,7 @@ class BoxTest extends FileSystemTestCase
             '@foo_placeholder@' => 'foo_value',
         ];
 
-        dump_file($file, $contents);
+        FS::dumpFile($file, $contents);
 
         /** @var Compactor|ObjectProphecy $firstCompactorProphecy */
         $firstCompactorProphecy = $this->prophesize(Compactor::class);
@@ -478,7 +475,7 @@ class BoxTest extends FileSystemTestCase
         $this->box->registerFileMapping($map);
 
         foreach ($files as $file => $expectedLocal) {
-            dump_file($file);
+            FS::dumpFile($file);
 
             $this->box->startBuffering();
             $local = $this->box->addFile($file);
@@ -522,8 +519,8 @@ class BoxTest extends FileSystemTestCase
         $file = 'foo';
         $contents = 'test';
 
-        dump_file($file, $contents);
-        chmod($file, 0o355);
+        FS::dumpFile($file, $contents);
+        FS::chmod($file, 0o355);
 
         try {
             $this->box->startBuffering();
@@ -548,7 +545,7 @@ class BoxTest extends FileSystemTestCase
             '@foo_placeholder@' => 'foo_value',
         ];
 
-        dump_file($file, $contents);
+        FS::dumpFile($file, $contents);
 
         $firstCompactorProphecy = $this->prophesize(Compactor::class);
         $firstCompactorProphecy
@@ -594,7 +591,7 @@ class BoxTest extends FileSystemTestCase
         ];
 
         foreach ($files as $file => $contents) {
-            dump_file($file, $contents);
+            FS::dumpFile($file, $contents);
         }
 
         $this->box->startBuffering();
@@ -621,7 +618,7 @@ class BoxTest extends FileSystemTestCase
         ];
 
         foreach ($files as $file => $contents) {
-            dump_file($file, $contents);
+            FS::dumpFile($file, $contents);
         }
 
         try {
@@ -641,7 +638,7 @@ class BoxTest extends FileSystemTestCase
         ];
 
         foreach ($files as $file => $contents) {
-            dump_file($file, $contents);
+            FS::dumpFile($file, $contents);
         }
 
         $this->box->startBuffering();
@@ -683,7 +680,7 @@ class BoxTest extends FileSystemTestCase
         ];
 
         foreach ($files as $file => $item) {
-            dump_file($file, $item['contents']);
+            FS::dumpFile($file, $item['contents']);
         }
 
         $this->box->startBuffering();
@@ -711,7 +708,7 @@ class BoxTest extends FileSystemTestCase
         ];
 
         foreach ($files as $file => $contents) {
-            dump_file($file, $contents);
+            FS::dumpFile($file, $contents);
         }
 
         $autoloadDumped = false;
@@ -745,16 +742,16 @@ class BoxTest extends FileSystemTestCase
         ];
 
         foreach ($files as $file => $contents) {
-            dump_file($file, $contents);
+            FS::dumpFile($file, $contents);
         }
 
         $this->box->startBuffering();
         $this->box->addFiles(array_keys($files), false);
         $this->box->endBuffering(static function () use (&$files): void {
-            dump_file('zip');
+            FS::dumpFile('zip', '');
             $files['zip'] = '';
 
-            dump_file('zap');
+            FS::dumpFile('zap', '');
             $files['zap'] = '';
         });
 
@@ -779,7 +776,7 @@ class BoxTest extends FileSystemTestCase
         ];
 
         foreach ($files as $file => $contents) {
-            dump_file($file, $contents);
+            FS::dumpFile($file, $contents);
         }
 
         $this->box->startBuffering();
@@ -812,7 +809,7 @@ class BoxTest extends FileSystemTestCase
         ];
 
         foreach ($files as $file => $contents) {
-            dump_file($file, $contents);
+            FS::dumpFile($file, $contents);
         }
 
         $this->box->startBuffering();
@@ -839,7 +836,7 @@ class BoxTest extends FileSystemTestCase
         ];
 
         foreach ($files as $file => $contents) {
-            dump_file($file, $contents);
+            FS::dumpFile($file, $contents);
         }
 
         $map = new MapFile(
@@ -917,7 +914,7 @@ class BoxTest extends FileSystemTestCase
         ];
 
         foreach ($files as $file => $contents) {
-            dump_file($file, $contents);
+            FS::dumpFile($file, $contents);
         }
 
         $this->box->startBuffering();
@@ -959,7 +956,7 @@ class BoxTest extends FileSystemTestCase
         ];
 
         foreach ($files as $file => $item) {
-            dump_file($file, $item['contents']);
+            FS::dumpFile($file, $item['contents']);
         }
 
         $this->box->startBuffering();
@@ -993,7 +990,7 @@ class BoxTest extends FileSystemTestCase
         $this->box->registerPlaceholders($placeholderMapping);
 
         foreach ($files as $file => $contents) {
-            dump_file($file, $contents);
+            FS::dumpFile($file, $contents);
         }
 
         // Cannot test the compactors: there is a bug with the serialization of the Prophecy objects which prevents
@@ -1039,7 +1036,7 @@ class BoxTest extends FileSystemTestCase
         $this->box->registerFileMapping($map);
 
         foreach ($files as $file => $expectedLocal) {
-            dump_file($file);
+            FS::dumpFile($file);
         }
 
         $this->box->startBuffering();
@@ -1083,8 +1080,8 @@ class BoxTest extends FileSystemTestCase
         $file = 'foo';
         $contents = 'test';
 
-        dump_file($file, $contents);
-        chmod($file, 0o355);
+        FS::dumpFile($file, $contents);
+        FS::chmod($file, 0o355);
 
         try {
             $this->box->startBuffering();
@@ -1102,7 +1099,7 @@ class BoxTest extends FileSystemTestCase
 
     public function test_the_temporary_directory_created_for_box_is_removed_upon_failure(): void
     {
-        $boxTmp = make_tmp_dir('box', Box::class);
+        $boxTmp = $this->tmp.DIRECTORY_SEPARATOR.'test-tmp-dir';
 
         try {
             $this->box->startBuffering();
@@ -1115,7 +1112,6 @@ class BoxTest extends FileSystemTestCase
                     ->directories()
                     ->depth(0)
                     ->in(dirname($boxTmp)),
-                true,
             );
 
             $boxDir = current(
@@ -1149,7 +1145,7 @@ class BoxTest extends FileSystemTestCase
 
     public function test_register_placeholders(): void
     {
-        dump_file(
+        FS::dumpFile(
             $file = 'foo',
             <<<'PHP'
                 #!/usr/bin/env php
@@ -1200,7 +1196,7 @@ class BoxTest extends FileSystemTestCase
 
     public function test_register_stub_file(): void
     {
-        dump_file(
+        FS::dumpFile(
             $file = 'foo',
             <<<'STUB'
                 #!/usr/bin/env php
@@ -1235,7 +1231,7 @@ class BoxTest extends FileSystemTestCase
 
     public function test_placeholders_are_also_replaced_in_stub_file(): void
     {
-        dump_file(
+        FS::dumpFile(
             $file = 'foo',
             <<<'STUB'
                 #!/usr/bin/env php
@@ -1461,7 +1457,7 @@ class BoxTest extends FileSystemTestCase
         $key = 'Invalid key';
         $password = 'test';
 
-        mkdir('test.phar.pubkey');
+        FS::mkdir('test.phar.pubkey');
 
         $this->configureHelloWorldPhar();
 
@@ -1481,7 +1477,7 @@ class BoxTest extends FileSystemTestCase
     {
         [$key, $password] = $this->getPrivateKey();
 
-        mkdir('test.phar.pubkey');
+        FS::mkdir('test.phar.pubkey');
 
         $this->configureHelloWorldPhar();
 
@@ -1506,7 +1502,7 @@ class BoxTest extends FileSystemTestCase
 
         [$key, $password] = $this->getPrivateKey();
 
-        dump_file($file = 'foo', $key);
+        FS::dumpFile($file = 'foo', $key);
 
         $this->configureHelloWorldPhar();
 
@@ -1533,7 +1529,7 @@ class BoxTest extends FileSystemTestCase
         $key = $this->getPrivateKey()[0];
         $password = 'wrong password';
 
-        dump_file($file = 'foo', $key);
+        FS::dumpFile($file = 'foo', $key);
 
         $this->configureHelloWorldPhar();
 

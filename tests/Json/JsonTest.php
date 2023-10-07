@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Json;
 
+use Fidry\FileSystem\FS;
 use KevinGH\Box\Test\FileSystemTestCase;
 use PHPUnit\Framework\AssertionFailedError;
 use Seld\JsonLint\ParsingException;
@@ -22,8 +23,6 @@ use Throwable;
 use Webmozart\Assert\Assert;
 use function is_object;
 use function json_decode;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\touch;
 use function mb_convert_encoding;
 
 /**
@@ -108,7 +107,7 @@ class JsonTest extends FileSystemTestCase
 
     public function test_it_can_decode_a_file(): void
     {
-        dump_file('data.json', '{}');
+        FS::dumpFile('data.json', '{}');
 
         $decoded = $this->json->decodeFile('data.json');
 
@@ -118,7 +117,7 @@ class JsonTest extends FileSystemTestCase
 
         self::assertSame([], $decoded);
 
-        dump_file('data.json', '');
+        FS::dumpFile('data.json', '');
 
         try {
             $this->json->decodeFile('data.json', true);
@@ -154,7 +153,7 @@ class JsonTest extends FileSystemTestCase
             false,
         );
 
-        touch('data.json');
+        FS::touch('data.json');
 
         $this->json->validate(
             'data.json',

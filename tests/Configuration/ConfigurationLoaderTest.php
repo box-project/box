@@ -14,10 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Configuration;
 
+use Fidry\FileSystem\FS;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\Test\FileSystemTestCase;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\touch;
 
 /**
  * @covers \KevinGH\Box\Configuration\ConfigurationLoader
@@ -37,8 +36,8 @@ class ConfigurationLoaderTest extends FileSystemTestCase
 
     public function test_it_can_load_a_configuration(): void
     {
-        touch('index.php');
-        dump_file('box.json.dist', '{}');
+        FS::touch('index.php');
+        FS::dumpFile('box.json.dist', '{}');
 
         self::assertInstanceOf(
             Configuration::class,
@@ -48,7 +47,7 @@ class ConfigurationLoaderTest extends FileSystemTestCase
 
     public function test_it_can_load_a_configuration_without_a_file(): void
     {
-        touch('index.php');
+        FS::touch('index.php');
 
         self::assertInstanceOf(
             Configuration::class,
@@ -58,8 +57,8 @@ class ConfigurationLoaderTest extends FileSystemTestCase
 
     public function test_it_cannot_load_an_invalid_config_file(): void
     {
-        touch('index.php');
-        dump_file('box.json.dist', '{"foo": "bar"}');
+        FS::touch('index.php');
+        FS::dumpFile('box.json.dist', '{"foo": "bar"}');
 
         $this->expectException(JsonValidationException::class);
 

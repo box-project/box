@@ -15,13 +15,13 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Php;
 
 use Composer\XdebugHandler\XdebugHandler;
+use Fidry\FileSystem\FS;
 use KevinGH\Box\Phar\PharPhpSettings;
 use Psr\Log\LoggerInterface;
 use Webmozart\Assert\Assert;
 use function getenv;
 use function ini_get;
 use function ini_set;
-use function KevinGH\Box\FileSystem\append_to_file;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\memory_to_bytes;
 use function sprintf;
@@ -82,7 +82,7 @@ final class PhpSettingsHandler extends XdebugHandler
         if (PharPhpSettings::isReadonly()) {
             Assert::notNull($this->tmpIni);
 
-            append_to_file($this->tmpIni, 'phar.readonly=0'.PHP_EOL);
+            FS::appendToFile($this->tmpIni, 'phar.readonly=0'.PHP_EOL);
 
             $this->logger->debug('Configured `phar.readonly=0`');
         }
