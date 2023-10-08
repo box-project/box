@@ -136,8 +136,6 @@ final class InvalidPhar extends PharError
             if (str_ends_with($message, 'file extension (or combination) not recognised or the directory does not exist')) {
                 return sprintf(
                     $errorMessageStart.'. The file must have the extension "%s".',
-                    $pharObject,
-                    $file,
                     $isPharData ? '.zip", ".tar", ".tar.bz2" or ".tar.gz' : '.phar',
                 );
             }
@@ -149,8 +147,6 @@ final class InvalidPhar extends PharError
 
                 return sprintf(
                     $errorMessageStart.'. The archive is corrupted: %s.',
-                    $pharObject,
-                    $file,
                     ucfirst($matches['reason']),
                 );
             }
@@ -159,11 +155,7 @@ final class InvalidPhar extends PharError
             // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L892
             // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L903
             if (str_contains($message, ' openssl signature ')) {
-                return sprintf(
-                    $errorMessageStart.'. The OpenSSL signature could not be read or verified.',
-                    $pharObject,
-                    $file,
-                );
+                return $errorMessageStart.'. The OpenSSL signature could not be read or verified.';
             }
 
             // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1002
@@ -174,18 +166,12 @@ final class InvalidPhar extends PharError
                 || str_contains($message, ' signature could not be verified')
                 || str_contains($message, ' has a broken or unsupported signature')
             ) {
-                return sprintf(
-                    $errorMessageStart.'. The archive signature is broken.',
-                    $pharObject,
-                    $file,
-                );
+                return $errorMessageStart.'. The archive signature is broken.';
             }
         }
 
         return sprintf(
             $errorMessageStart.': %s',
-            $pharObject,
-            $file,
             $message,
         );
     }

@@ -90,7 +90,7 @@ final class PharFactoryTest extends TestCase
     {
         $this->expectException(InvalidPhar::class);
         $this->expectExceptionMessageMatches(
-            '/^Could not create a Phar instance for the file ".+"\ \(of the original file "original\.phar"\)\. The file must have the extension "Phar"\.$/',
+            '/^Could not create a Phar instance for the file ".+"\ \(of the original file "original\.phar"\)\. The file must have the extension "\.phar"\.$/',
         );
 
         PharFactory::createPhar(
