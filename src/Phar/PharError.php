@@ -41,7 +41,7 @@ declare(strict_types=1);
  * SOFTWARE.
  */
 
-namespace KevinGH\Box\Pharaoh;
+namespace KevinGH\Box\Phar;
 
 use Exception;
 

@@ -17,7 +17,7 @@ namespace KevinGH\Box\Console;
 use Fidry\Console\Input\IO;
 use KevinGH\Box\NotInstantiable;
 use KevinGH\Box\Phar\CompressionAlgorithm;
-use KevinGH\Box\Pharaoh\Pharaoh;
+use KevinGH\Box\Pharaoh\SafePhar;
 use SplFileInfo;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Path;
@@ -43,7 +43,7 @@ final class PharInfoRenderer
 
     private const INDENT_SIZE = 2;
 
-    public static function renderCompression(Pharaoh $pharInfo, IO $io): void
+    public static function renderCompression(SafePhar $pharInfo, IO $io): void
     {
         $io->writeln(
             sprintf(
@@ -94,7 +94,7 @@ final class PharInfoRenderer
         }
     }
 
-    public static function renderSignature(Pharaoh $pharInfo, IO $io): void
+    public static function renderSignature(SafePhar $pharInfo, IO $io): void
     {
         $signature = $pharInfo->getSignature();
 
@@ -118,7 +118,7 @@ final class PharInfoRenderer
         );
     }
 
-    public static function renderMetadata(Pharaoh $pharInfo, IO $io): void
+    public static function renderMetadata(SafePhar $pharInfo, IO $io): void
     {
         $metadata = $pharInfo->getNormalizedMetadata();
 
@@ -130,7 +130,7 @@ final class PharInfoRenderer
         }
     }
 
-    public static function renderContentsSummary(Pharaoh $pharInfo, IO $io): void
+    public static function renderContentsSummary(SafePhar $pharInfo, IO $io): void
     {
         $count = array_filter($pharInfo->getFilesCompressionCount());
         $totalCount = array_sum($count);
@@ -152,7 +152,7 @@ final class PharInfoRenderer
      */
     public static function renderContent(
         OutputInterface $output,
-        Pharaoh $pharInfo,
+        SafePhar $pharInfo,
         int|false $maxDepth,
         bool $indent,
     ): void {

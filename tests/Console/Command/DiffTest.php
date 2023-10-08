@@ -18,7 +18,7 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\DisplayNormalizer;
 use Fidry\Console\ExitCode;
 use InvalidArgumentException;
-use KevinGH\Box\Pharaoh\InvalidPhar;
+use KevinGH\Box\Phar\InvalidPhar;
 use KevinGH\Box\PharInfo\IncompariblePhars;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;

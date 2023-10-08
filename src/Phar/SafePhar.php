@@ -41,12 +41,10 @@ declare(strict_types=1);
  * SOFTWARE.
  */
 
-namespace KevinGH\Box\Pharaoh;
+namespace KevinGH\Box\Phar;
 
 use Fidry\FileSystem\FS;
 use KevinGH\Box\Console\Command\Extract;
-use KevinGH\Box\Phar\CompressionAlgorithm;
-use KevinGH\Box\Phar\PharMeta;
 use OutOfBoundsException;
 use ParagonIE\ConstantTime\Hex;
 use Phar;
@@ -65,15 +63,17 @@ use function iter\toArrayWithKeys;
 use function random_bytes;
 use function sprintf;
 
-// TODO: rename it to SafePhar
-
 /**
  * @private
  *
- * Pharaoh is a wrapper around Phar. This is necessary because the Phar API is quite limited and will crash if say two
- * PHARs with the same alias are loaded.
+ * SafePhar is a wrapper around the native Phar class. Its goal is to provide an equivalent API whilst being in-memory
+ * safe.
+ *
+ * Indeed, the native Phar API is extremely limited due to the fact that it loads the code in-memory. This pollutes the
+ * current process and will result in a crash if another PHAR with the same alias is loaded. This SafePhar class
+ * circumvents those issues by extracting all the desired information in a separate process.
  */
-final class Pharaoh
+final class SafePhar
 {
     private static array $ALGORITHMS;
     private static string $stubfile;
