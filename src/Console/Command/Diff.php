@@ -20,8 +20,8 @@ use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
 use KevinGH\Box\Console\PharInfoRenderer;
 use KevinGH\Box\Phar\CompressionAlgorithm;
-use KevinGH\Box\Phar\SafePhar;
-use KevinGH\Box\PharInfo\PharDiff;
+use KevinGH\Box\Phar\PharDiff;
+use KevinGH\Box\Phar\PharInfo;
 use PharFileInfo;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -228,7 +228,7 @@ final class Diff implements Command
     /**
      * @param list<non-empty-string> $paths
      */
-    private static function renderPaths(string $symbol, SafePhar $pharInfo, array $paths, IO $io): void
+    private static function renderPaths(string $symbol, PharInfo $pharInfo, array $paths, IO $io): void
     {
         foreach ($paths as $path) {
             /** @var PharFileInfo $file */
@@ -259,7 +259,7 @@ final class Diff implements Command
         }
     }
 
-    private static function renderArchive(string $fileName, SafePhar $pharInfo, IO $io): void
+    private static function renderArchive(string $fileName, PharInfo $pharInfo, IO $io): void
     {
         $io->writeln(
             sprintf(

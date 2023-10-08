@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PharInfo;
 
-use KevinGH\Box\Phar\SafePhar;
+use KevinGH\Box\Phar\PharInfo;
 use KevinGH\Box\Pharaoh\PharDiff as ParagoniePharDiff;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
@@ -29,13 +29,13 @@ use const DIRECTORY_SEPARATOR;
 final class PharDiff
 {
     private readonly ParagoniePharDiff $diff;
-    private readonly SafePhar $pharA;
-    private readonly SafePhar $pharB;
+    private readonly PharInfo $pharA;
+    private readonly PharInfo $pharB;
 
     public function __construct(string $pathA, string $pathB)
     {
         $phars = array_map(
-            static fn (string $path) => new SafePhar($path),
+            static fn (string $path) => new PharInfo($path),
             [$pathA, $pathB],
         );
 
@@ -48,12 +48,12 @@ final class PharDiff
         $this->diff = $diff;
     }
 
-    public function getPharA(): SafePhar
+    public function getPharA(): PharInfo
     {
         return $this->pharA;
     }
 
-    public function getPharB(): SafePhar
+    public function getPharB(): PharInfo
     {
         return $this->pharB;
     }
@@ -100,20 +100,20 @@ final class PharDiff
         ];
     }
 
-    private static function getDiff(SafePhar $pharA, SafePhar $pharB, string $command): ?string
+    private static function getDiff(PharInfo $pharInfoA, PharInfo $pharInfoB, string $command): ?string
     {
-        $pharATmp = $pharA->getTmp();
-        $pharBTmp = $pharB->getTmp();
+        $pharInfoATmp = $pharInfoA->getTmp();
+        $pharInfoBTmp = $pharInfoB->getTmp();
 
-        $pharAFileName = $pharA->getFileName();
-        $pharBFileName = $pharB->getFileName();
+        $pharInfoAFileName = $pharInfoA->getFileName();
+        $pharInfoBFileName = $pharInfoB->getFileName();
 
         $diffCommmand = implode(
             ' ',
             [
                 $command,
-                $pharATmp,
-                $pharBTmp,
+                $pharInfoATmp,
+                $pharInfoBTmp,
             ],
         );
 
@@ -131,12 +131,12 @@ final class PharDiff
 
         return str_replace(
             [
-                $pharATmp,
-                $pharBTmp,
+                $pharInfoATmp,
+                $pharInfoBTmp,
             ],
             [
-                $pharAFileName,
-                $pharBFileName,
+                $pharInfoAFileName,
+                $pharInfoBFileName,
             ],
             $diff,
         );
@@ -145,7 +145,7 @@ final class PharDiff
     /**
      * @return string[]
      */
-    private static function collectFiles(SafePhar $phar): array
+    private static function collectFiles(PharInfo $phar): array
     {
         $basePath = $phar->getTmp().DIRECTORY_SEPARATOR;
 
