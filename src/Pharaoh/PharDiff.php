@@ -43,8 +43,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Pharaoh;
 
+use KevinGH\Box\Phar\IncompariblePhars;
 use KevinGH\Box\Phar\PharInfo;
-use KevinGH\Box\PharInfo\IncompariblePhars;
 use ParagonIE\ConstantTime\Hex;
 use ParagonIE_Sodium_File;
 use RecursiveDirectoryIterator;

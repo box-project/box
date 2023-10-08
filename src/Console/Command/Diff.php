@@ -150,11 +150,11 @@ final class Diff implements Command
     {
         $io->comment('<info>Comparing the two archives... (do not check the signatures)</info>');
 
-        $pharInfoA = $diff->getPharA();
-        $pharInfoB = $diff->getPharB();
+        $pharInfoA = $diff->getPharInfoA();
+        $pharInfoB = $diff->getPharInfoB();
 
         self::renderArchive(
-            $diff->getPharA()->getFileName(),
+            $diff->getPharInfoA()->getFileName(),
             $pharInfoA,
             $io,
         );
@@ -162,7 +162,7 @@ final class Diff implements Command
         $io->newLine();
 
         self::renderArchive(
-            $diff->getPharB()->getFileName(),
+            $diff->getPharInfoB()->getFileName(),
             $pharInfoB,
             $io,
         );
@@ -203,19 +203,19 @@ final class Diff implements Command
 
         $io->writeln(sprintf(
             '--- Files present in "%s" but not in "%s"',
-            $diff->getPharA()->getFileName(),
-            $diff->getPharB()->getFileName(),
+            $diff->getPharInfoA()->getFileName(),
+            $diff->getPharInfoB()->getFileName(),
         ));
         $io->writeln(sprintf(
             '+++ Files present in "%s" but not in "%s"',
-            $diff->getPharB()->getFileName(),
-            $diff->getPharA()->getFileName(),
+            $diff->getPharInfoB()->getFileName(),
+            $diff->getPharInfoA()->getFileName(),
         ));
 
         $io->newLine();
 
-        self::renderPaths('-', $diff->getPharA(), $diffResult[0], $io);
-        self::renderPaths('+', $diff->getPharB(), $diffResult[1], $io);
+        self::renderPaths('-', $diff->getPharInfoA(), $diffResult[0], $io);
+        self::renderPaths('+', $diff->getPharInfoB(), $diffResult[1], $io);
 
         $io->error(sprintf(
             '%d file(s) difference',
