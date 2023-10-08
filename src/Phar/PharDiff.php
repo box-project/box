@@ -12,9 +12,8 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\PharInfo;
+namespace KevinGH\Box\Phar;
 
-use KevinGH\Box\Phar\SafePhar;
 use KevinGH\Box\Pharaoh\PharDiff as ParagoniePharDiff;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;

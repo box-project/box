@@ -19,22 +19,22 @@ use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
 use KevinGH\Box\Console\PharInfoRenderer;
-use KevinGH\Box\Phar\CompressionAlgorithm;
+use KevinGH\Box\Phar\PharDiff;
 use KevinGH\Box\Phar\SafePhar;
-use KevinGH\Box\PharInfo\PharDiff;
-use PharFileInfo;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Filesystem\Path;
 use Throwable;
 use Webmozart\Assert\Assert;
 use function array_map;
 use function count;
 // TODO: migrate to Safe API
+use function explode;
 use function is_string;
 use function KevinGH\Box\check_php_settings;
-use function KevinGH\Box\format_size;
 use function sprintf;
+use const PHP_EOL;
 
 /**
  * @private
@@ -153,6 +153,12 @@ final class Diff implements Command
         $pharInfoA = $diff->getPharA();
         $pharInfoB = $diff->getPharB();
 
+        if ($pharInfoA->equals($pharInfoB)) {
+            $io->success('The two archives are identical');
+
+            return ExitCode::SUCCESS;
+        }
+
         self::renderArchive(
             $diff->getPharA()->getFileName(),
             $pharInfoA,
@@ -228,35 +234,30 @@ final class Diff implements Command
     /**
      * @param list<non-empty-string> $paths
      */
-    private static function renderPaths(string $symbol, SafePhar $pharInfo, array $paths, IO $io): void
+    private static function renderPaths(string $symbol, SafePhar $phar, array $paths, IO $io): void
     {
-        foreach ($paths as $path) {
-            /** @var PharFileInfo $file */
-            $file = $pharInfo->getPhar()[str_replace($pharInfo->getRoot(), '', $path)];
+        $bufferedOutput = new BufferedOutput(
+            $io->getVerbosity(),
+            $io->isDecorated(),
+            $io->getOutput()->getFormatter(),
+        );
 
-            $compression = '<fg=red>[NONE]</fg=red>';
+        PharInfoRenderer::renderContent(
+            $bufferedOutput,
+            $phar,
+            false,
+            false,
+        );
 
-            foreach (CompressionAlgorithm::cases() as $compressionAlgorithm) {
-                if (CompressionAlgorithm::NONE !== $compressionAlgorithm
-                    && $file->isCompressed($compressionAlgorithm->value)
-                ) {
-                    $compression = "<fg=cyan>[{$compressionAlgorithm->name}]</fg=cyan>";
-                    break;
-                }
-            }
+        $lines = array_map(
+            static fn (string $line) => '' === $line ? '' : $symbol.' '.$line,
+            explode(
+                PHP_EOL,
+                $bufferedOutput->fetch(),
+            ),
+        );
 
-            $fileSize = format_size($file->getCompressedSize());
-
-            $io->writeln(
-                sprintf(
-                    '%s %s %s - %s',
-                    $symbol,
-                    $path,
-                    $compression,
-                    $fileSize,
-                ),
-            );
-        }
+        $io->writeln($lines);
     }
 
     private static function renderArchive(string $fileName, SafePhar $pharInfo, IO $io): void

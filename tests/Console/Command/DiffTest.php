@@ -19,7 +19,6 @@ use Fidry\Console\DisplayNormalizer;
 use Fidry\Console\ExitCode;
 use InvalidArgumentException;
 use KevinGH\Box\Phar\InvalidPhar;
-use KevinGH\Box\PharInfo\IncompariblePhars;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -42,7 +41,6 @@ class DiffTest extends CommandTestCase
 
     protected function setUp(): void
     {
-        self::markTestSkipped('TODO');
         $this->markAsSkippedIfPharReadonlyIsOn();
 
         parent::setUp();
@@ -245,20 +243,6 @@ class DiffTest extends CommandTestCase
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
-    public function test_it_cannot_compare_phars_which_are_signed_with_a_private_key(): void
-    {
-        $this->expectException(IncompariblePhars::class);
-
-        $this->commandTester->execute(
-            [
-                'command' => 'diff',
-                'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
-                'pharB' => realpath(self::FIXTURES_DIR.'/openssl.phar'),
-            ],
-            ['verbosity' => OutputInterface::VERBOSITY_DEBUG],
-        );
-    }
-
     public function test_it_does_not_swallow_exceptions_in_debug_mode(): void
     {
         $this->expectException(InvalidPhar::class);
@@ -331,6 +315,7 @@ class DiffTest extends CommandTestCase
                 +++ Files present in "simple-phar-bar.phar" but not in "simple-phar-foo.phar"
 
                 - foo.php [NONE] - 29.00B
+
                 + bar.php [NONE] - 29.00B
 
                  [ERROR] 2 file(s) difference
@@ -358,12 +343,14 @@ class DiffTest extends CommandTestCase
                  // Comparing the two archives... (do not check the signatures)
 
                 Archive: simple-phar-bar.phar
-                Compression: None
+                Archive Compression: None
+                Files Compression: None
                 Metadata: None
                 Contents: 1 file (6.64KB)
 
                 Archive: simple-phar-bar-compressed.phar
-                Compression: GZ
+                Archive Compression: None
+                Files Compression: GZ
                 Metadata: None
                 Contents: 1 file (6.65KB)
 
