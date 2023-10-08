@@ -34,15 +34,15 @@ final class PharDiff
 
     public function __construct(string $pathA, string $pathB)
     {
-        $pharInfos = array_map(
+        [$pharInfoA, $pharInfoB] = array_map(
             static fn (string $path) => new PharInfo($path),
             [$pathA, $pathB],
         );
 
-        $this->pharInfoA = $pharInfos[0];
-        $this->pharInfoB = $pharInfos[1];
+        $this->pharInfoA = $pharInfoA;
+        $this->pharInfoB = $pharInfoB;
 
-        $diff = new ParagoniePharDiff(...$pharInfos);
+        $diff = new ParagoniePharDiff($pharInfoA, $pharInfoB);
         $diff->setVerbose(true);
 
         $this->diff = $diff;
@@ -72,7 +72,7 @@ final class PharDiff
         return self::getDiff(
             $this->pharInfoA,
             $this->pharInfoB,
-            'diff',
+            'diff --exclude='.Extract::PHAR_META_PATH,
         );
     }
 
