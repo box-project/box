@@ -27,7 +27,6 @@ use Symfony\Component\Console\Tester\CommandTester;
 use function ob_get_clean;
 use function ob_start;
 use function realpath;
-use const PHP_VERSION_ID;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Diff

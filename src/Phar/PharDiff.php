@@ -29,40 +29,40 @@ use const DIRECTORY_SEPARATOR;
 final class PharDiff
 {
     private readonly ParagoniePharDiff $diff;
-    private readonly PharInfo $pharA;
-    private readonly PharInfo $pharB;
+    private readonly PharInfo $pharInfoA;
+    private readonly PharInfo $pharInfoB;
 
     public function __construct(string $pathA, string $pathB)
     {
-        $phars = array_map(
+        [$pharInfoA, $pharInfoB] = array_map(
             static fn (string $path) => new PharInfo($path),
             [$pathA, $pathB],
         );
 
-        $this->pharA = $phars[0];
-        $this->pharB = $phars[1];
+        $this->pharInfoA = $pharInfoA;
+        $this->pharInfoB = $pharInfoB;
 
-        $diff = new ParagoniePharDiff(...$phars);
+        $diff = new ParagoniePharDiff($pharInfoA, $pharInfoB);
         $diff->setVerbose(true);
 
         $this->diff = $diff;
     }
 
-    public function getPharA(): PharInfo
+    public function getPharInfoA(): PharInfo
     {
-        return $this->pharA;
+        return $this->pharInfoA;
     }
 
-    public function getPharB(): PharInfo
+    public function getPharInfoB(): PharInfo
     {
-        return $this->pharB;
+        return $this->pharInfoB;
     }
 
     public function gitDiff(): ?string
     {
         return self::getDiff(
-            $this->pharA,
-            $this->pharB,
+            $this->pharInfoA,
+            $this->pharInfoB,
             'git diff --no-index',
         );
     }
@@ -70,8 +70,8 @@ final class PharDiff
     public function gnuDiff(): ?string
     {
         return self::getDiff(
-            $this->pharA,
-            $this->pharB,
+            $this->pharInfoA,
+            $this->pharInfoB,
             'diff',
         );
     }
@@ -91,8 +91,8 @@ final class PharDiff
      */
     public function listDiff(): array
     {
-        $pharAFiles = self::collectFiles($this->pharA);
-        $pharBFiles = self::collectFiles($this->pharB);
+        $pharAFiles = self::collectFiles($this->pharInfoA);
+        $pharBFiles = self::collectFiles($this->pharInfoB);
 
         return [
             array_diff($pharAFiles, $pharBFiles),
