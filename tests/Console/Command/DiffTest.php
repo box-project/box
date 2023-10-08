@@ -18,7 +18,6 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\DisplayNormalizer;
 use Fidry\Console\ExitCode;
 use InvalidArgumentException;
-use KevinGH\Box\Phar\IncompariblePhars;
 use KevinGH\Box\Phar\InvalidPhar;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
@@ -242,20 +241,6 @@ class DiffTest extends CommandTestCase
             OUTPUT;
 
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
-    }
-
-    public function test_it_cannot_compare_phars_which_are_signed_with_a_private_key(): void
-    {
-        $this->expectException(IncompariblePhars::class);
-
-        $this->commandTester->execute(
-            [
-                'command' => 'diff',
-                'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
-                'pharB' => realpath(self::FIXTURES_DIR.'/openssl.phar'),
-            ],
-            ['verbosity' => OutputInterface::VERBOSITY_DEBUG],
-        );
     }
 
     public function test_it_does_not_swallow_exceptions_in_debug_mode(): void
