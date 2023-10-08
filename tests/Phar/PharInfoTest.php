@@ -22,12 +22,12 @@ use function Safe\file_get_contents;
 use function Safe\realpath;
 
 /**
- * @covers \KevinGH\Box\Phar\SafePhar
+ * @covers \KevinGH\Box\Phar\PharInfo
  * @runTestsInSeparateProcesses
  *
  * @internal
  */
-final class SafePharTest extends TestCase
+final class PharInfoTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__.'/../../fixtures';
 
@@ -43,7 +43,7 @@ final class SafePharTest extends TestCase
         ?string $expectedStub,
         array $expectedFileRelativePaths,
     ): void {
-        $pharInfo = new SafePhar($file);
+        $pharInfo = new PharInfo($file);
 
         self::assertSame(realpath($file), $pharInfo->getFile());
         self::assertSame(basename($file), $pharInfo->getFileName());
@@ -166,7 +166,7 @@ final class SafePharTest extends TestCase
 
     public function test_it_cleans_itself_up_upon_destruction(): void
     {
-        $pharInfo = new SafePhar(self::FIXTURES_DIR.'/phar/simple-phar.phar');
+        $pharInfo = new PharInfo(self::FIXTURES_DIR.'/phar/simple-phar.phar');
 
         $tmp = $pharInfo->getTmp();
 
@@ -181,8 +181,8 @@ final class SafePharTest extends TestCase
     {
         $file = self::FIXTURES_DIR.'/phar/simple-phar.phar';
 
-        new SafePhar($file);
-        new SafePhar($file);
+        new PharInfo($file);
+        new PharInfo($file);
 
         $this->addToAssertionCount(1);
     }
@@ -194,7 +194,7 @@ final class SafePharTest extends TestCase
         $this->expectException(InvalidPhar::class);
         $this->expectExceptionMessageMatches('/^Could not create a Phar or PharData instance for the file /');
 
-        new SafePhar($file);
+        new PharInfo($file);
     }
 
     private static function getStub(string $path): string
