@@ -20,7 +20,7 @@ use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
 use KevinGH\Box\Console\PharInfoRenderer;
 use KevinGH\Box\Phar\CompressionAlgorithm;
-use KevinGH\Box\Pharaoh\SafePhar;
+use KevinGH\Box\Phar\SafePhar;
 use KevinGH\Box\PharInfo\PharDiff;
 use PharFileInfo;
 use Symfony\Component\Console\Input\InputArgument;

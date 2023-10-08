@@ -41,7 +41,7 @@ declare(strict_types=1);
  * SOFTWARE.
  */
 
-namespace KevinGH\Box\Phar;
+namespace KevinGH\Box\Pharaoh;
 
 use KevinGH\Box\PharInfo\IncompariblePhars;
 use ParagonIE\ConstantTime\Hex;

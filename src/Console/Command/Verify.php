@@ -18,7 +18,7 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
-use KevinGH\Box\Pharaoh\SafePhar;
+use KevinGH\Box\Phar\SafePhar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Filesystem\Path;
 use Throwable;

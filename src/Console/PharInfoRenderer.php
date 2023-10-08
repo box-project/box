@@ -17,7 +17,7 @@ namespace KevinGH\Box\Console;
 use Fidry\Console\Input\IO;
 use KevinGH\Box\NotInstantiable;
 use KevinGH\Box\Phar\CompressionAlgorithm;
-use KevinGH\Box\Pharaoh\SafePhar;
+use KevinGH\Box\Phar\SafePhar;
 use SplFileInfo;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Path;

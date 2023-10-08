@@ -23,7 +23,7 @@ use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
 use KevinGH\Box\Phar\CompressionAlgorithm;
-use KevinGH\Box\Pharaoh\SafePhar;
+use KevinGH\Box\Phar\SafePhar;
 use KevinGH\Box\PhpScoper\NullScoper;
 use KevinGH\Box\PhpScoper\Scoper;
 use Phar;
