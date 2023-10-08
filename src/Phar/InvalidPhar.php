@@ -25,24 +25,40 @@ use function ucfirst;
 
 final class InvalidPhar extends PharError
 {
-    public static function fileNotLocal(string $file): self
-    {
+    public static function fileNotLocal(
+        string $file,
+        ?string $originalFile = null,
+    ): self {
         // Covers:
         // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1328
         return new self(
             sprintf(
-                'Could not create a Phar or PharData instance for the file path "%s". PHAR objects can only be created from local files.',
+                'Could not create a Phar or PharData instance for the file path "%s"%s. PHAR objects can only be created from local files.',
                 $file,
+                null === $originalFile
+                    ? ''
+                    : sprintf(
+                        ' (of the original file "%s")',
+                        $originalFile,
+                    ),
             ),
         );
     }
 
-    public static function fileNotFound(string $file): self
-    {
+    public static function fileNotFound(
+        string $file,
+        ?string $originalFile = null,
+    ): self {
         return new self(
             sprintf(
-                'Could not find the file "%s".',
+                'Could not find the file "%s"%s.',
                 $file,
+                null === $originalFile
+                    ? ''
+                    : sprintf(
+                        ' (of the original file "%s")',
+                        $originalFile,
+                    ),
             ),
         );
     }
@@ -57,32 +73,42 @@ final class InvalidPhar extends PharError
         );
     }
 
-    public static function forPhar(string $file, ?Throwable $previous): self
-    {
+    public static function forPhar(
+        string $file,
+        ?string $originalFile,
+        ?Throwable $previous,
+    ): self {
         return new self(
-            self::mapThrowableToErrorMessage($file, $previous, false),
+            self::mapThrowableToErrorMessage($file, $originalFile, $previous, false),
             previous: $previous,
         );
     }
 
-    public static function forPharData(string $file, ?Throwable $previous): self
-    {
+    public static function forPharData(
+        string $file,
+        ?string $originalFile,
+        ?Throwable $previous,
+    ): self {
         return new self(
-            self::mapThrowableToErrorMessage($file, $previous, true),
+            self::mapThrowableToErrorMessage($file, $originalFile, $previous, true),
             previous: $previous,
         );
     }
 
-    public static function forPharAndPharData(string $file, ?Throwable $previous): self
-    {
+    public static function forPharAndPharData(
+        string $file,
+        ?string $originalFile,
+        ?Throwable $previous,
+    ): self {
         return new self(
-            self::mapThrowableToErrorMessage($file, $previous, null),
+            self::mapThrowableToErrorMessage($file, $originalFile, $previous, null),
             previous: $previous,
         );
     }
 
     private static function mapThrowableToErrorMessage(
         string $file,
+        ?string $originalFile,
         ?Throwable $throwable,
         ?bool $isPharData,
     ): string {
@@ -92,15 +118,24 @@ final class InvalidPhar extends PharError
             $pharObject = $isPharData ? 'PharData' : 'Phar';
         }
 
-        $message = $throwable->getMessage();
+        $errorMessageStart = sprintf(
+            'Could not create a %s instance for the file "%s"%s',
+            $pharObject,
+            $file,
+            null === $originalFile
+                ? ''
+                : sprintf(
+                    ' (of the original file "%s")',
+                    $originalFile,
+                ),
+        );
+        $message = $throwable?->getMessage() ?? '';
 
         if ($throwable instanceof UnexpectedValueException) {
             // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1330
             if (str_ends_with($message, 'file extension (or combination) not recognised or the directory does not exist')) {
                 return sprintf(
-                    'Could not create a %s instance for the file "%s". The file must have the extension "%s".',
-                    $pharObject,
-                    $file,
+                    $errorMessageStart.'. The file must have the extension "%s".',
                     $isPharData ? '.zip", ".tar", ".tar.bz2" or ".tar.gz' : '.phar',
                 );
             }
@@ -111,9 +146,7 @@ final class InvalidPhar extends PharError
                 preg_match('/^internal corruption of phar \".+\" \((?<reason>.+)\)$/', $message, $matches);
 
                 return sprintf(
-                    'Could not create a %s instance for the file "%s". The archive is corrupted: %s.',
-                    $pharObject,
-                    $file,
+                    $errorMessageStart.'. The archive is corrupted: %s.',
                     ucfirst($matches['reason']),
                 );
             }
@@ -122,11 +155,7 @@ final class InvalidPhar extends PharError
             // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L892
             // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L903
             if (str_contains($message, ' openssl signature ')) {
-                return sprintf(
-                    'Could not create a %s instance for the file "%s". The OpenSSL signature could not be read or verified.',
-                    $pharObject,
-                    $file,
-                );
+                return $errorMessageStart.'. The OpenSSL signature could not be read or verified.';
             }
 
             // https://github.com/php/php-src/blob/930db2b2d315b2acc917706cf76bed8b09f94b79/ext/phar/phar.c#L1002
@@ -137,18 +166,12 @@ final class InvalidPhar extends PharError
                 || str_contains($message, ' signature could not be verified')
                 || str_contains($message, ' has a broken or unsupported signature')
             ) {
-                return sprintf(
-                    'Could not create a %s instance for the file "%s". The archive signature is broken.',
-                    $pharObject,
-                    $file,
-                );
+                return $errorMessageStart.'. The archive signature is broken.';
             }
         }
 
         return sprintf(
-            'Could not create a %s instance for the file "%s": %s',
-            $pharObject,
-            $file,
+            $errorMessageStart.': %s',
             $message,
         );
     }
