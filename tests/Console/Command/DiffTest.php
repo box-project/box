@@ -581,7 +581,7 @@ class DiffTest extends CommandTestCase
                 return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
             },
             null,
-            2,
+            1,
         ])();
 
         yield (static fn (): array => [
@@ -605,7 +605,7 @@ class DiffTest extends CommandTestCase
 
                  // Comparing the two archives contents...
 
-                diff simple-phar-bar.phar/bar.php simple-phar-baz.phar/bar.php
+                diff --ex simple-phar-bar.phar/bar.php simple-phar-baz.phar/bar.php
                 3c3
                 < echo "Hello world!";
                 ---

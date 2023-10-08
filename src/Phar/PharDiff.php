@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Phar;
 
+use KevinGH\Box\Console\Command\Extract;
 use KevinGH\Box\Pharaoh\PharDiff as ParagoniePharDiff;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
@@ -113,6 +114,7 @@ final class PharDiff
                 $command,
                 $pharInfoATmp,
                 $pharInfoBTmp,
+                ' --exclude='.Extract::PHAR_META_PATH,
             ],
         );
 
