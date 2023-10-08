@@ -114,7 +114,6 @@ final class PharDiff
                 $command,
                 $pharInfoATmp,
                 $pharInfoBTmp,
-                ' --exclude='.Extract::PHAR_META_PATH,
             ],
         );
 
