@@ -481,7 +481,7 @@ class DiffTest extends CommandTestCase
                 return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
             },
             null,
-            PHP_VERSION_ID >= 70400 ? 1 : 2, // related to https://bugs.php.net/bug.php?id=69279
+            1,
         ])();
 
         yield (static fn (): array => [
@@ -594,7 +594,7 @@ class DiffTest extends CommandTestCase
                 return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
             },
             null,
-            PHP_VERSION_ID >= 70400 ? 1 : 2, // related to https://bugs.php.net/bug.php?id=69279
+            1,
         ])();
 
         yield (static fn (): array => [
