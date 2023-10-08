@@ -108,7 +108,7 @@ final class PharDiff
         $pharInfoAFileName = $pharInfoA->getFileName();
         $pharInfoBFileName = $pharInfoB->getFileName();
 
-        $diffCommmand = implode(
+        $diffCommand = implode(
             ' ',
             [
                 $command,
@@ -117,7 +117,7 @@ final class PharDiff
             ],
         );
 
-        $diffProcess = Process::fromShellCommandline($diffCommmand);
+        $diffProcess = Process::fromShellCommandline($diffCommand);
         $diffProcess->run();
 
         // We do not check if the process is successful as if there
