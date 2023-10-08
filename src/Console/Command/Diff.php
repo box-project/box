@@ -21,6 +21,7 @@ use Fidry\Console\Input\IO;
 use KevinGH\Box\Console\PharInfoRenderer;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Pharaoh\Pharaoh;
+use KevinGH\Box\PharInfo\DiffMode;
 use KevinGH\Box\PharInfo\PharDiff;
 use PharFileInfo;
 use Symfony\Component\Console\Input\InputArgument;
@@ -31,6 +32,7 @@ use Webmozart\Assert\Assert;
 use function array_map;
 use function count;
 // TODO: migrate to Safe API
+use function implode;
 use function is_string;
 use function KevinGH\Box\check_php_settings;
 use function KevinGH\Box\format_size;
@@ -48,6 +50,7 @@ final class Diff implements Command
     private const LIST_FILES_DIFF_OPTION = 'list-diff';
     private const GIT_DIFF_OPTION = 'git-diff';
     private const GNU_DIFF_OPTION = 'gnu-diff';
+    private const DIFF_OPTION = 'diff';
     private const CHECK_OPTION = 'check';
 
     private const DEFAULT_CHECKSUM_ALGO = 'sha384';
@@ -75,19 +78,32 @@ final class Diff implements Command
                     self::GNU_DIFF_OPTION,
                     null,
                     InputOption::VALUE_NONE,
-                    'Displays a GNU diff',
+                    '(deprecated) Displays a GNU diff',
                 ),
                 new InputOption(
                     self::GIT_DIFF_OPTION,
                     null,
                     InputOption::VALUE_NONE,
-                    'Displays a Git diff',
+                    '(deprecated) Displays a Git diff',
                 ),
                 new InputOption(
                     self::LIST_FILES_DIFF_OPTION,
                     null,
                     InputOption::VALUE_NONE,
-                    'Displays a list of file names diff (default)',
+                    '(deprecated) Displays a list of file names diff (default)',
+                ),
+                new InputOption(
+                    self::DIFF_OPTION,
+                    null,
+                    InputOption::VALUE_REQUIRED,
+                    sprintf(
+                        'Displays a diff of the files. Available options are: "%s"',
+                        implode(
+                            '", "',
+                            DiffMode::values(),
+                        ),
+                    ),
+                    DiffMode::LIST->value,
                 ),
                 new InputOption(
                     self::CHECK_OPTION,
@@ -102,8 +118,6 @@ final class Diff implements Command
 
     public function execute(IO $io): int
     {
-        check_php_settings($io);
-
         $paths = self::getPaths($io);
 
         try {
@@ -167,6 +181,50 @@ final class Diff implements Command
         );
     }
 
+    private static function getDiffMode(IO $io): DiffMode
+    {
+        if ($io->getOption(self::GNU_DIFF_OPTION)->asBoolean()) {
+            $io->writeln(
+                sprintf(
+                    '⚠️  <warning>Using the option "%s" is deprecated. Use "--%s=%s" instead.</warning>',
+                    self::GNU_DIFF_OPTION,
+                    self::DIFF_OPTION,
+                    DiffMode::GNU->value,
+                ),
+            );
+
+            return DiffMode::GNU;
+        }
+
+        if ($io->getOption(self::GIT_DIFF_OPTION)->asBoolean()) {
+            $io->writeln(
+                sprintf(
+                    '⚠️  <warning>Using the option "%s" is deprecated. Use "--%s=%s" instead.</warning>',
+                    self::GIT_DIFF_OPTION,
+                    self::DIFF_OPTION,
+                    DiffMode::GIT->value,
+                ),
+            );
+
+            return DiffMode::GIT;
+        }
+
+        if ($io->getOption(self::LIST_FILES_DIFF_OPTION)->asBoolean()) {
+            $io->writeln(
+                sprintf(
+                    '⚠️  <warning>Using the option "%s" is deprecated. Use "--%s=%s" instead.</warning>',
+                    self::LIST_FILES_DIFF_OPTION,
+                    self::DIFF_OPTION,
+                    DiffMode::LIST->value,
+                ),
+            );
+
+            return DiffMode::LIST;
+        }
+
+        return DiffMode::LIST;
+    }
+
     private function compareContents(PharDiff $diff, IO $io): int
     {
         $checkSumAlgorithm = $io->getOption(self::CHECK_OPTION)->asNullableNonEmptyString() ?? self::DEFAULT_CHECKSUM_ALGO;
@@ -175,14 +233,9 @@ final class Diff implements Command
             return $diff->listChecksums($checkSumAlgorithm);
         }
 
-        $diffResult = $diff->diff($io->getOption());
-        if ($io->getOption(self::GNU_DIFF_OPTION)->asBoolean()) {
-            $diffResult = $diff->gnuDiff();
-        } elseif ($io->getOption(self::GIT_DIFF_OPTION)->asBoolean()) {
-            $diffResult = $diff->gitDiff();
-        } else {
-            $diffResult = $diff->listDiff();
-        }
+        $diffMode = self::getDiffMode($io);
+
+        $diffResult = $diff->diff($diffMode);
 
         if (null === $diffResult || [[], []] === $diffResult) {
             $io->success('The contents are identical');

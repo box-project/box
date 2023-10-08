@@ -59,9 +59,9 @@ final class PharDiff
     }
 
     /**
-     * @return string|string[][]
+     * @return null|string|array{string[], string[]}
      */
-    public function diff(DiffMode $mode): string|array
+    public function diff(DiffMode $mode): null|string|array
     {
         if (DiffMode::LIST === $mode) {
             return $this->listDiff();
