@@ -160,7 +160,7 @@ final class Extract implements Command
                 $pubKeyContent = FS::getFileContents($pubKey);
             }
 
-            $phar = PharFactory::create($tmpFile);
+            $phar = PharFactory::create($tmpFile, $file);
             $pharMeta = PharMeta::fromPhar($phar, $pubKeyContent);
 
             $phar->extractTo($tmpDir);

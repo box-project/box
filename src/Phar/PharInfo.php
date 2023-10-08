@@ -66,6 +66,7 @@ use function sprintf;
 /**
  * @private
  *
+<<<<<<<< HEAD:src/Phar/SafePhar.php
  * SafePhar is a wrapper around the native Phar class. Its goal is to provide an equivalent API whilst being in-memory
  * safe.
  *
@@ -74,6 +75,16 @@ use function sprintf;
  * circumvents those issues by extracting all the desired information in a separate process.
  */
 final class SafePhar
+========
+ * PharInfo is a wrapper around the native Phar class. Its goal is to provide an equivalent API whilst being in-memory
+ * safe.
+ *
+ * Indeed, the native Phar API is extremely limited due to the fact that it loads the code in-memory. This pollutes the
+ * current process and will result in a crash if another PHAR with the same alias is loaded. This PharInfo class
+ * circumvents those issues by extracting all the desired information in a separate process.
+ */
+final class PharInfo
+>>>>>>>> upstream/main:src/Phar/PharInfo.php
 {
     private static array $ALGORITHMS;
     private static string $stubfile;
