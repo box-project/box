@@ -86,6 +86,19 @@ final class PharFactoryTest extends TestCase
         PharFactory::createPhar($file);
     }
 
+    public function test_it_fails_with_a_comprehensive_error_when_cannot_create_a_phar_which_is_a_copy(): void
+    {
+        $this->expectException(InvalidPhar::class);
+        $this->expectExceptionMessageMatches(
+            '/^Could not create a Phar instance for the file ".+"\ \(of the original file "original\.phar"\)\. The file must have the extension "Phar"\.$/',
+        );
+
+        PharFactory::createPhar(
+            self::FIXTURES_DIR.'/empty-pdf.pdf',
+            'original.phar',
+        );
+    }
+
     /**
      * @dataProvider invalidPharDataProvider
      */
