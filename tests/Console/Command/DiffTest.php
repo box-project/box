@@ -19,6 +19,7 @@ use Fidry\Console\DisplayNormalizer;
 use Fidry\Console\ExitCode;
 use InvalidArgumentException;
 use KevinGH\Box\Phar\InvalidPhar;
+use KevinGH\Box\Platform;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -599,7 +600,8 @@ class DiffTest extends CommandTestCase
 
                 return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
             },
-            <<<'OUTPUT'
+            Platform::isOSX()
+            ? <<<'OUTPUT'
 
                  // Comparing the two archives... (do not check the signatures)
 
@@ -608,6 +610,21 @@ class DiffTest extends CommandTestCase
                  // Comparing the two archives contents...
 
                 diff --exclude=.phar_meta.json simple-phar-bar.phar/bar.php simple-phar-baz.phar/bar.php
+                3c3
+                < echo "Hello world!";
+                ---
+                > echo 'Hello world!';
+
+                OUTPUT
+            : <<<'OUTPUT'
+
+                 // Comparing the two archives... (do not check the signatures)
+
+                 [OK] The two archives are identical
+
+                 // Comparing the two archives contents...
+
+                diff '--exclude=.phar_meta.json' simple-phar-bar.phar/bar.php simple-phar-baz.phar/bar.php
                 3c3
                 < echo "Hello world!";
                 ---
