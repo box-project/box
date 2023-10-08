@@ -19,7 +19,7 @@ use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
 use KevinGH\Box\Console\PharInfoRenderer;
-use KevinGH\Box\Pharaoh\Pharaoh;
+use KevinGH\Box\Phar\SafePhar;
 use Phar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -130,7 +130,7 @@ final class Info implements Command
         $mode = $io->getOption(self::MODE_OPT)->asStringChoice(self::MODES);
 
         try {
-            $pharInfo = new Pharaoh($file);
+            $pharInfo = new SafePhar($file);
 
             return self::showPharInfo(
                 $pharInfo,
@@ -188,7 +188,7 @@ final class Info implements Command
     }
 
     private static function showPharInfo(
-        Pharaoh $pharInfo,
+        SafePhar $pharInfo,
         bool $content,
         int|false $maxDepth,
         bool $indent,
@@ -210,7 +210,7 @@ final class Info implements Command
         return ExitCode::SUCCESS;
     }
 
-    private static function showPharMeta(Pharaoh $pharInfo, IO $io): void
+    private static function showPharMeta(SafePhar $pharInfo, IO $io): void
     {
         $io->writeln(
             sprintf(

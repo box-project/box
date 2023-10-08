@@ -77,12 +77,12 @@ class PharDiff
         'yellow' => "\033[0;93m",
     ];
 
-    /** @var array<int, Pharaoh> */
+    /** @var array<int, SafePhar> */
     private array $phars = [];
 
     private bool $verbose = false;
 
-    public function __construct(Pharaoh $pharA, Pharaoh $pharB)
+    public function __construct(SafePhar $pharA, SafePhar $pharB)
     {
         if ($pharA->hasPubKey() || $pharB->hasPubKey()) {
             throw IncompariblePhars::signedPhars();

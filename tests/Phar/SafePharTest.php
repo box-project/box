@@ -12,9 +12,8 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Pharaoh;
+namespace KevinGH\Box\Phar;
 
-use KevinGH\Box\Phar\CompressionAlgorithm;
 use PHPUnit\Framework\TestCase;
 use function array_keys;
 use function basename;
@@ -23,12 +22,12 @@ use function Safe\file_get_contents;
 use function Safe\realpath;
 
 /**
- * @covers \KevinGH\Box\Pharaoh\Pharaoh
+ * @covers \KevinGH\Box\Phar\SafePhar
  * @runTestsInSeparateProcesses
  *
  * @internal
  */
-final class PharaohTest extends TestCase
+final class SafePharTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__.'/../../fixtures';
 
@@ -44,7 +43,7 @@ final class PharaohTest extends TestCase
         ?string $expectedStub,
         array $expectedFileRelativePaths,
     ): void {
-        $pharInfo = new Pharaoh($file);
+        $pharInfo = new SafePhar($file);
 
         self::assertSame(realpath($file), $pharInfo->getFile());
         self::assertSame(basename($file), $pharInfo->getFileName());
@@ -167,7 +166,7 @@ final class PharaohTest extends TestCase
 
     public function test_it_cleans_itself_up_upon_destruction(): void
     {
-        $pharInfo = new Pharaoh(self::FIXTURES_DIR.'/phar/simple-phar.phar');
+        $pharInfo = new SafePhar(self::FIXTURES_DIR.'/phar/simple-phar.phar');
 
         $tmp = $pharInfo->getTmp();
 
@@ -182,8 +181,8 @@ final class PharaohTest extends TestCase
     {
         $file = self::FIXTURES_DIR.'/phar/simple-phar.phar';
 
-        new Pharaoh($file);
-        new Pharaoh($file);
+        new SafePhar($file);
+        new SafePhar($file);
 
         $this->addToAssertionCount(1);
     }
@@ -195,7 +194,7 @@ final class PharaohTest extends TestCase
         $this->expectException(InvalidPhar::class);
         $this->expectExceptionMessageMatches('/^Could not create a Phar or PharData instance for the file /');
 
-        new Pharaoh($file);
+        new SafePhar($file);
     }
 
     private static function getStub(string $path): string

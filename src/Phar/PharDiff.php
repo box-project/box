@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PharInfo;
 
-use KevinGH\Box\Pharaoh\Pharaoh;
+use KevinGH\Box\Phar\SafePhar;
 use KevinGH\Box\Pharaoh\PharDiff as ParagoniePharDiff;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
@@ -29,13 +29,13 @@ use const DIRECTORY_SEPARATOR;
 final class PharDiff
 {
     private readonly ParagoniePharDiff $diff;
-    private readonly Pharaoh $pharA;
-    private readonly Pharaoh $pharB;
+    private readonly SafePhar $pharA;
+    private readonly SafePhar $pharB;
 
     public function __construct(string $pathA, string $pathB)
     {
         $phars = array_map(
-            static fn (string $path) => new Pharaoh($path),
+            static fn (string $path) => new SafePhar($path),
             [$pathA, $pathB],
         );
 
@@ -48,12 +48,12 @@ final class PharDiff
         $this->diff = $diff;
     }
 
-    public function getPharA(): Pharaoh
+    public function getPharA(): SafePhar
     {
         return $this->pharA;
     }
 
-    public function getPharB(): Pharaoh
+    public function getPharB(): SafePhar
     {
         return $this->pharB;
     }
@@ -100,7 +100,7 @@ final class PharDiff
         ];
     }
 
-    private static function getDiff(Pharaoh $pharA, Pharaoh $pharB, string $command): ?string
+    private static function getDiff(SafePhar $pharA, SafePhar $pharB, string $command): ?string
     {
         $pharATmp = $pharA->getTmp();
         $pharBTmp = $pharB->getTmp();
@@ -145,7 +145,7 @@ final class PharDiff
     /**
      * @return string[]
      */
-    private static function collectFiles(Pharaoh $phar): array
+    private static function collectFiles(SafePhar $phar): array
     {
         $basePath = $phar->getTmp().DIRECTORY_SEPARATOR;
 

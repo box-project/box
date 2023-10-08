@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Phar;
 
-use KevinGH\Box\Pharaoh\InvalidPhar;
 use KevinGH\Box\Platform;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
@@ -24,8 +23,8 @@ use function extension_loaded;
 use const DIRECTORY_SEPARATOR;
 
 /**
+ * @covers \KevinGH\Box\Phar\InvalidPhar
  * @covers \KevinGH\Box\Phar\PharFactory
- * @covers \KevinGH\Box\Pharaoh\InvalidPhar
  *
  * @runTestsInSeparateProcesses
  *

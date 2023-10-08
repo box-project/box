@@ -18,7 +18,7 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
-use KevinGH\Box\Pharaoh\Pharaoh;
+use KevinGH\Box\Phar\SafePhar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Filesystem\Path;
 use Throwable;
@@ -117,7 +117,7 @@ final class Verify implements Command
         $throwable = null;
 
         try {
-            $phar = new Pharaoh($pharFilePath);
+            $phar = new SafePhar($pharFilePath);
 
             $verified = true;
             $signature = $phar->getSignature();
