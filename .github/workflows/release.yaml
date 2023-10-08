@@ -3,13 +3,22 @@ name: Release
 on:
     push:
         branches: [ main ]
-    pull_request:
+    pull_request: ~
+    schedule:
+        # Do not make it the first of the month and/or midnight since it is a very busy time
+        - cron: "* 10 5 * *"
     release:
         types: [ created ]
+
+# See https://stackoverflow.com/a/72408109
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
 
 env:
     DOCKERFILE: .docker/Dockerfile
     DOCKERHUB_USERNAME: boxproject
+    TERM: xterm
 
 jobs:
     build-phar:

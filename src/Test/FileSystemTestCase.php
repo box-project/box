@@ -14,72 +14,13 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Test;
 
-use PHPUnit\Framework\TestCase;
-use function array_map;
-use function array_values;
-use function chdir;
-use function getcwd;
-use function KevinGH\Box\FileSystem\make_tmp_dir;
-use function KevinGH\Box\FileSystem\remove;
-use function natcasesort;
-use function realpath;
-use function str_replace;
-use function sys_get_temp_dir;
-use const DIRECTORY_SEPARATOR;
-
 /**
  * @private
  */
-abstract class FileSystemTestCase extends TestCase
+abstract class FileSystemTestCase extends \Fidry\FileSystem\Test\FileSystemTestCase
 {
-    /** @var string */
-    protected $cwd;
-
-    /** @var string */
-    protected $tmp;
-
-    protected function setUp(): void
+    public static function getTmpDirNamespace(): string
     {
-        parent::setUp();
-
-        // Cleans up whatever was there before. Indeed upon failure PHPUnit fails to trigger the `tearDown()` method
-        // and as a result some temporary files may still remain.
-        remove(str_replace('\\', '/', realpath(sys_get_temp_dir())).'/box');
-
-        $this->cwd = getcwd();
-        $this->tmp = make_tmp_dir('box', self::class);
-
-        chdir($this->tmp);
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        chdir($this->cwd);
-
-        remove($this->tmp);
-    }
-
-    /**
-     * @param string[] $files
-     *
-     * @return string[] File real paths relative to the current temporary directory
-     */
-    final protected function normalizePaths(array $files): array
-    {
-        $root = $this->tmp;
-
-        $files = array_values(
-            array_map(
-                static fn (string $file): string => str_replace($root.DIRECTORY_SEPARATOR, '', $file),
-                $files,
-            ),
-        );
-
-        natsort($files);
-        natcasesort($files);
-
-        return array_values($files);
+        return 'Box';
     }
 }

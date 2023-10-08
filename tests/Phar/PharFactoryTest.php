@@ -16,6 +16,7 @@ namespace KevinGH\Box\Phar;
 
 use KevinGH\Box\Pharaoh\InvalidPhar;
 use KevinGH\Box\Platform;
+use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
 use PharData;
 use PHPUnit\Framework\TestCase;
@@ -33,6 +34,15 @@ use const DIRECTORY_SEPARATOR;
 final class PharFactoryTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__.'/../../fixtures/phar';
+
+    use RequiresPharReadonlyOff;
+
+    protected function setUp(): void
+    {
+        $this->markAsSkippedIfPharReadonlyIsOn();
+
+        parent::setUp();
+    }
 
     /**
      * @dataProvider validPharProvider

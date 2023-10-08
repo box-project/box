@@ -17,6 +17,7 @@ namespace KevinGH\Box\Configuration;
 use Closure;
 use DateTimeImmutable;
 use DateTimeZone;
+use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Configuration\Configuration as PhpScoperConfiguration;
 use Humbug\PhpScoper\Container;
 use InvalidArgumentException;
@@ -39,6 +40,7 @@ use RuntimeException;
 use Seld\JsonLint\ParsingException;
 use SplFileInfo;
 use stdClass;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
@@ -74,12 +76,6 @@ use function is_string;
 use function iter\map;
 use function iter\toArray;
 use function iter\values;
-use function KevinGH\Box\FileSystem\canonicalize;
-use function KevinGH\Box\FileSystem\file_contents;
-use function KevinGH\Box\FileSystem\is_absolute_path;
-use function KevinGH\Box\FileSystem\longest_common_base_path;
-use function KevinGH\Box\FileSystem\make_path_absolute;
-use function KevinGH\Box\FileSystem\make_path_relative;
 use function KevinGH\Box\get_box_version;
 use function KevinGH\Box\get_phar_signing_algorithms;
 use function KevinGH\Box\unique_id;
@@ -249,7 +245,7 @@ final class Configuration
         $stubBannerPath = self::retrieveStubBannerPath($raw, $basePath, $isStubGenerated, $logger);
 
         if (null !== $stubBannerPath) {
-            $stubBannerContents = file_contents($stubBannerPath);
+            $stubBannerContents = FS::getFileContents($stubBannerPath);
         }
 
         $stubBannerContents = self::normalizeStubBannerContents($stubBannerContents);
@@ -824,7 +820,7 @@ final class Configuration
 
         foreach ($blacklist as $file) {
             $normalizedBlacklist[] = self::normalizePath($file, $basePath);
-            $normalizedBlacklist[] = canonicalize(make_path_relative(trim($file), $basePath));
+            $normalizedBlacklist[] = Path::canonicalize(Path::makeRelative(trim($file), $basePath));
         }
 
         return array_unique($normalizedBlacklist);
@@ -1108,7 +1104,7 @@ final class Configuration
             ->filter(
                 static function (SplFileInfo $fileInfo) use ($devPackages): bool {
                     foreach ($devPackages as $devPackage) {
-                        if ($devPackage === longest_common_base_path([$devPackage, $fileInfo->getRealPath()])) {
+                        if ($devPackage === Path::getLongestCommonBasePath($devPackage, $fileInfo->getRealPath())) {
                             // File belongs to the dev package
                             return false;
                         }
@@ -1333,8 +1329,8 @@ final class Configuration
             }
         }
 
-        $normalizePath = static fn (string $path): string => is_absolute_path($path)
-            ? canonicalize($path)
+        $normalizePath = static fn (string $path): string => Path::isAbsolute($path)
+            ? Path::canonicalize($path)
             : self::normalizePath(trim($path, '/ '), $basePath);
 
         if (array_key_exists('files', $autoload)) {
@@ -1396,7 +1392,7 @@ final class Configuration
         }
 
         $relativeDevPackages = array_map(
-            static fn (string $packagePath): string => make_path_relative($packagePath, $basePath),
+            static fn (string $packagePath): string => Path::makeRelative($packagePath, $basePath),
             $devPackages,
         );
 
@@ -1459,7 +1455,7 @@ final class Configuration
             ->notName('build.xml*');
 
         if (null !== $mainScriptPath) {
-            $finder->notPath(make_path_relative($mainScriptPath, $basePath));
+            $finder->notPath(Path::makeRelative($mainScriptPath, $basePath));
         }
 
         $finder->in($directories);
@@ -1467,7 +1463,7 @@ final class Configuration
         $excludedPaths = array_unique(
             array_filter(
                 array_map(
-                    static fn (string $path): string => make_path_relative($path, $basePath),
+                    static fn (string $path): string => Path::makeRelative($path, $basePath),
                     $excludedPaths,
                 ),
                 static fn (string $path): bool => !str_starts_with($path, '..'),
@@ -1527,7 +1523,7 @@ final class Configuration
 
     private static function normalizePath(string $file, string $basePath): string
     {
-        return make_path_absolute(trim($file), $basePath);
+        return Path::makeAbsolute(trim($file), $basePath);
     }
 
     /**
@@ -1804,7 +1800,7 @@ final class Configuration
             return null;
         }
 
-        $contents = file_contents($mainScriptPath);
+        $contents = FS::getFileContents($mainScriptPath);
 
         // Remove the shebang line: the shebang line in a PHAR should be located in the stub file which is the real
         // PHAR entry point file.
@@ -1840,9 +1836,9 @@ final class Configuration
         };
 
         return new ComposerFiles(
-            $retrieveFileAndContents(canonicalize($basePath.'/composer.json')),
-            $retrieveFileAndContents(canonicalize($basePath.'/composer.lock')),
-            $retrieveFileAndContents(canonicalize($basePath.'/vendor/composer/installed.json')),
+            $retrieveFileAndContents(Path::canonicalize($basePath.'/composer.json')),
+            $retrieveFileAndContents(Path::canonicalize($basePath.'/composer.lock')),
+            $retrieveFileAndContents(Path::canonicalize($basePath.'/vendor/composer/installed.json')),
         );
     }
 
@@ -1863,7 +1859,7 @@ final class Configuration
             $processed = [];
 
             foreach ($item as $match => $replace) {
-                $processed[canonicalize(trim($match))] = canonicalize(trim($replace));
+                $processed[Path::canonicalize(trim($match))] = Path::canonicalize(trim($replace));
             }
 
             if (isset($processed['_empty_'])) {
@@ -2042,7 +2038,7 @@ final class Configuration
         }
 
         /**
-         * @var string
+         * @var string $datetimeFormat
          * @var bool   $valueSetByUser
          */
         [$datetimeFormat, $valueSetByUser] = self::retrieveDatetimeFormat($raw, $logger);
@@ -2358,7 +2354,7 @@ final class Configuration
             return null;
         }
 
-        $bannerFile = make_path_absolute($raw->{self::BANNER_FILE_KEY}, $basePath);
+        $bannerFile = Path::makeAbsolute($raw->{self::BANNER_FILE_KEY}, $basePath);
 
         Assert::file($bannerFile);
 
@@ -2391,7 +2387,7 @@ final class Configuration
         self::checkIfDefaultValue($logger, $raw, self::STUB_KEY);
 
         if (isset($raw->{self::STUB_KEY}) && is_string($raw->{self::STUB_KEY})) {
-            $stubPath = make_path_absolute($raw->{self::STUB_KEY}, $basePath);
+            $stubPath = Path::makeAbsolute($raw->{self::STUB_KEY}, $basePath);
 
             Assert::file($stubPath);
 
@@ -2508,7 +2504,7 @@ final class Configuration
         self::checkIfDefaultValue($logger, $raw, self::PHP_SCOPER_KEY, self::PHP_SCOPER_CONFIG);
 
         if (!isset($raw->{self::PHP_SCOPER_KEY})) {
-            $configFilePath = make_path_absolute(self::PHP_SCOPER_CONFIG, $basePath);
+            $configFilePath = Path::makeAbsolute(self::PHP_SCOPER_CONFIG, $basePath);
             $configFilePath = file_exists($configFilePath) ? $configFilePath : null;
 
             return self::createPhpScoperConfig($configFilePath);
@@ -2518,7 +2514,7 @@ final class Configuration
 
         Assert::string($configFile);
 
-        $configFilePath = make_path_absolute($configFile, $basePath);
+        $configFilePath = Path::makeAbsolute($configFile, $basePath);
 
         Assert::file($configFilePath);
         Assert::readable($configFilePath);
@@ -2672,7 +2668,7 @@ final class Configuration
         $excludedFilePaths = array_values(
             array_unique(
                 array_map(
-                    static fn (string $path): string => make_path_relative($path, $basePath),
+                    static fn (string $path): string => Path::makeRelative($path, $basePath),
                     array_keys(
                         $phpScoperConfig->getExcludedFilesWithContents(),
                     ),

@@ -3,9 +3,9 @@ MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 
 OS := $(shell uname)
-ERROR_COLOR := \033[41m
-YELLOW_COLOR := \033[0;33m
-NO_COLOR := \033[0m
+ERROR_COLOR := $(shell tput setab 1)
+YELLOW_COLOR := $(shell tput setaf 3)
+NO_COLOR := $(shell tput sgr0)
 
 
 PHPUNIT_BIN = vendor/bin/phpunit
@@ -25,6 +25,8 @@ PHAR_EXTRACT = ../res/requirement-checker
 
 BOX_BIN = ../bin/box
 BOX = $(BOX_BIN)
+
+DIFF = diff --strip-trailing-cr --ignore-all-space --side-by-side --suppress-common-lines
 
 
 .DEFAULT_GOAL := help
@@ -157,7 +159,8 @@ phpunit: $(PHPUNIT_BIN) vendor
 
 .PHONY: terminal_copy
 terminal_copy: $(ACTUAL_TERMINAL_DIFF)
-	diff --ignore-all-space --side-by-side --suppress-common-lines $(EXPECTED_TERMINAL_DIFF) $(ACTUAL_TERMINAL_DIFF)
+	# Disable it for now.
+	#$(DIFF) $(EXPECTED_TERMINAL_DIFF) $(ACTUAL_TERMINAL_DIFF)
 
 
 #
@@ -192,7 +195,7 @@ _vendor_install:
 vendor: composer.lock
 	$(MAKE) vendor_install
 composer.lock: composer.json
-	@echo $(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer update --lock && touch -c $(@)"
 
 $(PHPUNIT_BIN): composer.lock

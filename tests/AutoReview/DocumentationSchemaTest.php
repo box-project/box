@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\AutoReview;
 
+use Fidry\FileSystem\FS;
 use PHPUnit\Framework\TestCase;
 use Webmozart\Assert\Assert;
 use function array_diff;
@@ -23,7 +24,6 @@ use function array_merge;
 use function array_unique;
 use function array_values;
 use function json_decode;
-use function KevinGH\Box\FileSystem\file_contents;
 use function preg_match;
 use function preg_match_all;
 use function sort;
@@ -107,7 +107,7 @@ class DocumentationSchemaTest extends TestCase
             1,
             preg_match(
                 '/```json(?<schema>.*?)```/s',
-                file_contents(self::CONFIGURATION_DOC_PATH),
+                FS::getFileContents(self::CONFIGURATION_DOC_PATH),
                 $matches,
             ),
         );
@@ -121,7 +121,7 @@ class DocumentationSchemaTest extends TestCase
     private function retrieveSchemaKeys(): array
     {
         $schema = json_decode(
-            file_contents(self::SCHEMA_PATH),
+            FS::getFileContents(self::SCHEMA_PATH),
             true,
             512,
             JSON_THROW_ON_ERROR,
@@ -137,7 +137,7 @@ class DocumentationSchemaTest extends TestCase
     {
         preg_match_all(
             '/#+ [\p{L}\\-\s]+\(`(.*?)`(?:[\p{L}\\-\s]+`(.*?)`)?\)/u',
-            file_contents(self::CONFIGURATION_DOC_PATH),
+            FS::getFileContents(self::CONFIGURATION_DOC_PATH),
             $matches,
         );
 

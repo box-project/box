@@ -20,10 +20,10 @@ use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\PharMeta;
 use KevinGH\Box\Pharaoh\InvalidPhar;
 use KevinGH\Box\Test\CommandTestCase;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use function count;
-use function KevinGH\Box\FileSystem\make_path_relative;
 use function rtrim;
 use function Safe\file_get_contents;
 
@@ -243,7 +243,7 @@ class ExtractTest extends CommandTestCase
             self::assertGreaterThan(0, count($actualFiles));
         } else {
             self::assertSame(ExitCode::FAILURE, $this->commandTester->getStatusCode());
-            self::assertSame(0, count($actualFiles));
+            self::assertCount(0, $actualFiles);
         }
     }
 
@@ -371,7 +371,7 @@ class ExtractTest extends CommandTestCase
 
         foreach ($finder as $file) {
             /** @var SplFileInfo $file */
-            $filePath = make_path_relative($file->getPathname(), $this->tmp);
+            $filePath = Path::makeRelative($file->getPathname(), $this->tmp);
 
             $files[$filePath] = $file->getContents();
         }

@@ -53,7 +53,6 @@ use function array_keys;
 use function array_merge;
 use function array_values;
 use function count;
-use function escapeshellarg;
 use function hash_file;
 use function max;
 use function mb_strlen;
@@ -61,7 +60,6 @@ use function mb_strtolower;
 use function preg_match;
 use function preg_quote;
 use function preg_replace;
-use function shell_exec;
 use function str_repeat;
 
 class PharDiff
@@ -185,6 +183,7 @@ class PharDiff
          * @var string[] $fileSub
          */
         foreach ($files as $fileSub) {
+            // TODO: address this array_merge
             $fileList = array_merge($fileList, $fileSub);
         }
 

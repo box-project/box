@@ -47,6 +47,16 @@ final class InvalidPhar extends PharError
         );
     }
 
+    public static function fileNotReadable(string $file): self
+    {
+        return new self(
+            sprintf(
+                'Could not read the file "%s".',
+                $file,
+            ),
+        );
+    }
+
     public static function forPhar(string $file, ?Throwable $previous): self
     {
         return new self(

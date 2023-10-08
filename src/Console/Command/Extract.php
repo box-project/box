@@ -18,6 +18,7 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
+use Fidry\FileSystem\FS;
 use KevinGH\Box\Phar\PharFactory;
 use KevinGH\Box\Phar\PharMeta;
 use KevinGH\Box\Pharaoh\InvalidPhar;
@@ -28,12 +29,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Throwable;
 use function file_exists;
 use function KevinGH\Box\check_php_settings;
-use function KevinGH\Box\FileSystem\copy;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\mkdir;
-use function KevinGH\Box\FileSystem\remove;
 use function realpath;
-use function Safe\file_get_contents;
 use function sprintf;
 use const DIRECTORY_SEPARATOR;
 
@@ -100,15 +96,15 @@ final class Extract implements Command
             );
 
             if ($canDelete) {
-                remove($outputDir);
-            // Continue
+                FS::remove($outputDir);
+                // Continue
             } else {
                 // Do nothing
                 return ExitCode::FAILURE;
             }
         }
 
-        mkdir($outputDir);
+        FS::mkdir($outputDir);
 
         try {
             self::dumpPhar($pharPath, $outputDir);
@@ -157,11 +153,11 @@ final class Extract implements Command
         $tmpPubKey = $tmpFile.'.pubkey';
 
         try {
-            copy($file, $tmpFile, true);
+            FS::copy($file, $tmpFile, true);
 
             if (file_exists($pubKey)) {
-                copy($pubKey, $tmpPubKey, true);
-                $pubKeyContent = file_get_contents($pubKey);
+                FS::copy($pubKey, $tmpPubKey, true);
+                $pubKeyContent = FS::getFileContents($pubKey);
             }
 
             $phar = PharFactory::create($tmpFile);
@@ -169,18 +165,18 @@ final class Extract implements Command
 
             $phar->extractTo($tmpDir);
         } catch (Throwable $throwable) {
-            remove([$tmpFile, $tmpPubKey]);
+            FS::remove([$tmpFile, $tmpPubKey]);
 
             throw $throwable;
         }
 
-        dump_file(
+        FS::dumpFile(
             $tmpDir.DIRECTORY_SEPARATOR.self::PHAR_META_PATH,
             $pharMeta->toJson(),
         );
 
         // Cleanup the temporary PHAR.
-        remove([$tmpFile, $tmpPubKey]);
+        FS::remove([$tmpFile, $tmpPubKey]);
 
         return $tmpDir;
     }

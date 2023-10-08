@@ -3,13 +3,22 @@ name: End-to-End Tests
 on:
     push:
         branches: [ main ]
-    pull_request:
+    pull_request: ~
+    schedule:
+        # Do not make it the first of the month and/or midnight since it is a very busy time
+        - cron: "* 10 5 * *"
     release:
         types: [ created ]
+
+# See https://stackoverflow.com/a/72408109
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
 
 env:
     POLLING_INTERVALS_SEC: 30
     SLEEP_TIME_SEC: 60s
+    TERM: xterm
 
 jobs:
     wait-for-phar-and-docker-images:

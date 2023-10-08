@@ -25,6 +25,7 @@
         "composer/semver": "^3.3.2",
         "composer/xdebug-handler": "^3.0.3",
         "fidry/console": "^0.5.3",
+        "fidry/filesystem": "^1.1",
         "humbug/php-scoper": "^0.18.3",
         "justinrainbow/json-schema": "^5.2.12",
         "laravel/serializable-closure": "^1.2.2",
@@ -45,7 +46,7 @@
     "require-dev": {
         "bamarni/composer-bin-plugin": "^1.8.2",
         "ergebnis/composer-normalize": "^2.29",
-        "fidry/makefile": "^0.2.1",
+        "fidry/makefile": "^1.0",
         "mikey179/vfsstream": "^1.6.11",
         "phpspec/prophecy-phpunit": "^2.0.1",
         "phpunit/phpunit": "^9.5.26",
@@ -68,7 +69,6 @@
             "KevinGH\\Box\\": "src"
         },
         "files": [
-            "src/FileSystem/file_system.php",
             "src/consts.php",
             "src/functions.php"
         ],

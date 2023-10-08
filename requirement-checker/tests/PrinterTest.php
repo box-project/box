@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\RequirementChecker;
 
-use Generator;
 use PHPUnit\Framework\TestCase;
 use function ob_get_clean;
 use function ob_start;
@@ -82,7 +81,7 @@ class PrinterTest extends TestCase
         self::assertSame($expected, $actual);
     }
 
-    public function provideTitles(): Generator
+    public function provideTitles(): iterable
     {
         yield [
             IO::VERBOSITY_NORMAL,
@@ -171,7 +170,7 @@ class PrinterTest extends TestCase
         ];
     }
 
-    public function provideErrorRequirements(): Generator
+    public function provideErrorRequirements(): iterable
     {
         yield [
             new Requirement(
@@ -216,7 +215,7 @@ class PrinterTest extends TestCase
         ];
     }
 
-    public function provideBlocks(): Generator
+    public function provideBlocks(): iterable
     {
         yield [
             IO::VERBOSITY_NORMAL,

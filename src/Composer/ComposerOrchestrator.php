@@ -16,6 +16,7 @@ namespace KevinGH\Box\Composer;
 
 use Composer\Semver\Semver;
 use Fidry\Console\Input\IO;
+use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Console\Logger\CompilerLogger;
@@ -25,8 +26,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\file_contents;
 use function preg_replace;
 use function sprintf;
 use function str_replace;
@@ -121,10 +120,10 @@ final class ComposerOrchestrator
 
             $autoloadContents = self::generateAutoloadStatements(
                 $symbolsRegistry,
-                file_contents($autoloadFile),
+                FS::getFileContents($autoloadFile),
             );
 
-            dump_file($autoloadFile, $autoloadContents);
+            FS::dumpFile($autoloadFile, $autoloadContents);
         }
     }
 

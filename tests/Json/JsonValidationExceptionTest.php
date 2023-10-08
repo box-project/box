@@ -15,9 +15,9 @@ declare(strict_types=1);
 namespace KevinGH\Box\Json;
 
 use Error;
+use Fidry\FileSystem\FS;
 use InvalidArgumentException;
 use KevinGH\Box\Test\FileSystemTestCase;
-use function KevinGH\Box\FileSystem\dump_file;
 
 /**
  * @covers \KevinGH\Box\Json\JsonValidationException
@@ -60,7 +60,7 @@ class JsonValidationExceptionTest extends FileSystemTestCase
         self::assertNull($exception->getValidatedFile());
         self::assertSame([], $exception->getErrors());
 
-        dump_file($file = 'dummy_file', '');
+        FS::dumpFile($file = 'dummy_file');
         $errors = ['foo', 'bar'];
         $code = 10;
         $error = new Error();
