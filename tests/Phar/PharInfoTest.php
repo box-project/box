@@ -22,20 +22,12 @@ use function Safe\file_get_contents;
 use function Safe\realpath;
 
 /**
-<<<<<<<< HEAD:tests/Phar/SafePharTest.php
- * @covers \KevinGH\Box\Phar\SafePhar
-========
  * @covers \KevinGH\Box\Phar\PharInfo
->>>>>>>> upstream/main:tests/Phar/PharInfoTest.php
  * @runTestsInSeparateProcesses
  *
  * @internal
  */
-<<<<<<<< HEAD:tests/Phar/SafePharTest.php
-final class SafePharTest extends TestCase
-========
 final class PharInfoTest extends TestCase
->>>>>>>> upstream/main:tests/Phar/PharInfoTest.php
 {
     private const FIXTURES_DIR = __DIR__.'/../../fixtures';
 
@@ -51,11 +43,7 @@ final class PharInfoTest extends TestCase
         ?string $expectedStub,
         array $expectedFileRelativePaths,
     ): void {
-<<<<<<<< HEAD:tests/Phar/SafePharTest.php
-        $pharInfo = new SafePhar($file);
-========
         $pharInfo = new PharInfo($file);
->>>>>>>> upstream/main:tests/Phar/PharInfoTest.php
 
         self::assertSame(realpath($file), $pharInfo->getFile());
         self::assertSame(basename($file), $pharInfo->getFileName());
@@ -178,11 +166,7 @@ final class PharInfoTest extends TestCase
 
     public function test_it_cleans_itself_up_upon_destruction(): void
     {
-<<<<<<<< HEAD:tests/Phar/SafePharTest.php
-        $pharInfo = new SafePhar(self::FIXTURES_DIR.'/phar/simple-phar.phar');
-========
         $pharInfo = new PharInfo(self::FIXTURES_DIR.'/phar/simple-phar.phar');
->>>>>>>> upstream/main:tests/Phar/PharInfoTest.php
 
         $tmp = $pharInfo->getTmp();
 
@@ -197,13 +181,8 @@ final class PharInfoTest extends TestCase
     {
         $file = self::FIXTURES_DIR.'/phar/simple-phar.phar';
 
-<<<<<<<< HEAD:tests/Phar/SafePharTest.php
-        new SafePhar($file);
-        new SafePhar($file);
-========
         new PharInfo($file);
         new PharInfo($file);
->>>>>>>> upstream/main:tests/Phar/PharInfoTest.php
 
         $this->addToAssertionCount(1);
     }
@@ -215,11 +194,7 @@ final class PharInfoTest extends TestCase
         $this->expectException(InvalidPhar::class);
         $this->expectExceptionMessageMatches('/^Could not create a Phar or PharData instance for the file /');
 
-<<<<<<<< HEAD:tests/Phar/SafePharTest.php
-        new SafePhar($file);
-========
         new PharInfo($file);
->>>>>>>> upstream/main:tests/Phar/PharInfoTest.php
     }
 
     private static function getStub(string $path): string

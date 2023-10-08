@@ -26,7 +26,6 @@ use Symfony\Component\Console\Tester\CommandTester;
 use function ob_get_clean;
 use function ob_start;
 use function realpath;
-use const PHP_VERSION_ID;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Diff
@@ -88,6 +87,7 @@ class DiffTest extends CommandTestCase
             +++ Files present in "simple-phar-bar.phar" but not in "simple-phar-foo.phar"
 
             - foo.php [NONE] - 29.00B
+
             + bar.php [NONE] - 29.00B
 
              [ERROR] 2 file(s) difference
@@ -451,7 +451,7 @@ class DiffTest extends CommandTestCase
                 rename to simple-phar-bar.phar/bar.php
 
                 OUTPUT,
-            1,
+            3,
         ])();
 
         yield (static fn (): array => [
@@ -468,7 +468,7 @@ class DiffTest extends CommandTestCase
                 return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
             },
             null,
-            PHP_VERSION_ID >= 70400 ? 1 : 2, // related to https://bugs.php.net/bug.php?id=69279
+            2,
         ])();
 
         yield (static fn (): array => [
@@ -581,7 +581,7 @@ class DiffTest extends CommandTestCase
                 return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
             },
             null,
-            PHP_VERSION_ID >= 70400 ? 1 : 2, // related to https://bugs.php.net/bug.php?id=69279
+            2,
         ])();
 
         yield (static fn (): array => [

@@ -44,7 +44,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Pharaoh;
 
 use KevinGH\Box\Phar\IncompariblePhars;
-use KevinGH\Box\Phar\SafePhar;
+use KevinGH\Box\Phar\PharInfo;
 use ParagonIE\ConstantTime\Hex;
 use ParagonIE_Sodium_File;
 use RecursiveDirectoryIterator;
@@ -78,18 +78,18 @@ class PharDiff
         'yellow' => "\033[0;93m",
     ];
 
-    /** @var array<int, SafePhar> */
-    private array $phars = [];
+    /** @var array<int, PharInfo> */
+    private array $pharInfos = [];
 
     private bool $verbose = false;
 
-    public function __construct(SafePhar $pharA, SafePhar $pharB)
+    public function __construct(PharInfo $pharInfoA, PharInfo $pharInfoB)
     {
-        if ($pharA->hasPubKey() || $pharB->hasPubKey()) {
+        if ($pharInfoA->hasPubKey() || $pharInfoB->hasPubKey()) {
             throw IncompariblePhars::signedPhars();
         }
 
-        $this->phars = [$pharA, $pharB];
+        $this->pharInfos = [$pharInfoA, $pharInfoB];
     }
 
     /**
@@ -209,8 +209,8 @@ class PharDiff
     {
         [$pharA, $pharB] = $this->hashChildren(
             $algo,
-            $this->phars[0]->getTmp(),
-            $this->phars[1]->getTmp(),
+            $this->pharInfos[0]->getTmp(),
+            $this->pharInfos[1]->getTmp(),
         );
 
         $diffs = 0;
