@@ -20,6 +20,7 @@ use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
 use KevinGH\Box\Console\PharInfoRenderer;
 use KevinGH\Box\Phar\PharDiff;
+use KevinGH\Box\PharInfo\DiffMode;
 use KevinGH\Box\Phar\PharInfo;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -29,6 +30,7 @@ use Webmozart\Assert\Assert;
 use function array_map;
 use function count;
 // TODO: migrate to Safe API
+use function implode;
 use function explode;
 use function is_string;
 use function sprintf;
@@ -42,9 +44,11 @@ final class Diff implements Command
     private const FIRST_PHAR_ARG = 'pharA';
     private const SECOND_PHAR_ARG = 'pharB';
 
+    // TODO: replace by DiffMode::X->value once bumping to PHP 8.2 as the min version.
     private const LIST_FILES_DIFF_OPTION = 'list-diff';
     private const GIT_DIFF_OPTION = 'git-diff';
     private const GNU_DIFF_OPTION = 'gnu-diff';
+    private const DIFF_OPTION = 'diff';
     private const CHECK_OPTION = 'check';
 
     private const DEFAULT_CHECKSUM_ALGO = 'sha384';
@@ -72,19 +76,32 @@ final class Diff implements Command
                     self::GNU_DIFF_OPTION,
                     null,
                     InputOption::VALUE_NONE,
-                    'Displays a GNU diff',
+                    '(deprecated) Displays a GNU diff',
                 ),
                 new InputOption(
                     self::GIT_DIFF_OPTION,
                     null,
                     InputOption::VALUE_NONE,
-                    'Displays a Git diff',
+                    '(deprecated) Displays a Git diff',
                 ),
                 new InputOption(
                     self::LIST_FILES_DIFF_OPTION,
                     null,
                     InputOption::VALUE_NONE,
-                    'Displays a list of file names diff (default)',
+                    '(deprecated) Displays a list of file names diff (default)',
+                ),
+                new InputOption(
+                    self::DIFF_OPTION,
+                    null,
+                    InputOption::VALUE_REQUIRED,
+                    sprintf(
+                        'Displays a diff of the files. Available options are: "%s"',
+                        implode(
+                            '", "',
+                            DiffMode::values(),
+                        ),
+                    ),
+                    DiffMode::LIST->value,
                 ),
                 new InputOption(
                     self::CHECK_OPTION,
@@ -103,10 +120,10 @@ final class Diff implements Command
 
         $diff = new PharDiff(...$paths);
 
-        $result1 = $this->compareArchives($diff, $io);
+        $this->showArchives($diff, $io);
         $result2 = $this->compareContents($diff, $io);
 
-        return $result1 + $result2;
+        return $result2;
     }
 
     /**
@@ -127,10 +144,8 @@ final class Diff implements Command
         );
     }
 
-    private function compareArchives(PharDiff $diff, IO $io): int
+    private function showArchives(PharDiff $diff, IO $io): void
     {
-        $io->comment('<info>Comparing the two archives... (do not check the signatures)</info>');
-
         $pharInfoA = $diff->getPharInfoA();
         $pharInfoB = $diff->getPharInfoB();
 
@@ -153,11 +168,102 @@ final class Diff implements Command
             $pharInfoB,
             $io,
         );
+    }
+
+    private static function getDiffMode(IO $io): DiffMode
+    {
+        if ($io->getOption(self::GNU_DIFF_OPTION)->asBoolean()) {
+            $io->writeln(
+                sprintf(
+                    '⚠️  <warning>Using the option "%s" is deprecated. Use "--%s=%s" instead.</warning>',
+                    self::GNU_DIFF_OPTION,
+                    self::DIFF_OPTION,
+                    DiffMode::GNU->value,
+                ),
+            );
+
+            return DiffMode::GNU;
+        }
+
+        if ($io->getOption(self::GIT_DIFF_OPTION)->asBoolean()) {
+            $io->writeln(
+                sprintf(
+                    '⚠️  <warning>Using the option "%s" is deprecated. Use "--%s=%s" instead.</warning>',
+                    self::GIT_DIFF_OPTION,
+                    self::DIFF_OPTION,
+                    DiffMode::GIT->value,
+                ),
+            );
+
+            return DiffMode::GIT;
+        }
+
+        if ($io->getOption(self::LIST_FILES_DIFF_OPTION)->asBoolean()) {
+            $io->writeln(
+                sprintf(
+                    '⚠️  <warning>Using the option "%s" is deprecated. Use "--%s=%s" instead.</warning>',
+                    self::LIST_FILES_DIFF_OPTION,
+                    self::DIFF_OPTION,
+                    DiffMode::LIST->value,
+                ),
+            );
+
+            return DiffMode::LIST;
+        }
+
+        return DiffMode::LIST;
+    }
+
+    private function compareContents(PharDiff $diff, IO $io): int
+    {
+        $checkSumAlgorithm = $io->getOption(self::CHECK_OPTION)->asNullableNonEmptyString() ?? self::DEFAULT_CHECKSUM_ALGO;
+
+        if ($io->hasOption('-c') || $io->hasOption('--check')) {
+            return $diff->listChecksums($checkSumAlgorithm);
+        }
+
+        $diffMode = self::getDiffMode($io);
+
+        $diffResult = $diff->diff($diffMode);
+
+        if (null === $diffResult || [[], []] === $diffResult) {
+            $io->success('The contents are identical');
+
+            return ExitCode::SUCCESS;
+        }
+
+        if (is_string($diffResult)) {
+            // Git or GNU diff: we don't have much control on the format
+            $io->writeln($diffResult);
+
+            return ExitCode::FAILURE;
+        }
+
+        $io->writeln(sprintf(
+            '--- Files present in "%s" but not in "%s"',
+            $diff->getPharA()->getFileName(),
+            $diff->getPharB()->getFileName(),
+        ));
+        $io->writeln(sprintf(
+            '+++ Files present in "%s" but not in "%s"',
+            $diff->getPharB()->getFileName(),
+            $diff->getPharA()->getFileName(),
+        ));
+
+        $io->newLine();
+
+        self::renderPaths('-', $diff->getPharA(), $diffResult[0], $io);
+        self::renderPaths('+', $diff->getPharB(), $diffResult[1], $io);
+
+        $io->error(sprintf(
+            '%d file(s) difference',
+            count($diffResult[0]) + count($diffResult[1]),
+        ));
 
         return ExitCode::FAILURE;
     }
 
-    private function compareContents(PharDiff $diff, IO $io): int
+    private function compareContentssS(PharDiff $diff, IO $io): int
     {
         $io->comment('<info>Comparing the two archives contents...</info>');
 
@@ -254,5 +360,6 @@ final class Diff implements Command
         PharInfoRenderer::renderSignature($pharInfo, $io);
         PharInfoRenderer::renderMetadata($pharInfo, $io);
         PharInfoRenderer::renderContentsSummary($pharInfo, $io);
+        // TODO: checksum
     }
 }

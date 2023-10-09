@@ -58,6 +58,30 @@ final class PharDiff
         return $this->pharInfoB;
     }
 
+    /**
+     * @return null|string|array{string[], string[]}
+     */
+    public function diff(DiffMode $mode): null|string|array
+    {
+        if (DiffMode::LIST === $mode) {
+            return $this->listDiff();
+        }
+
+        return self::getDiff(
+            $this->pharA,
+            $this->pharB,
+            self::getModeCommand($mode),
+        );
+    }
+
+    private static function getModeCommand(DiffMode $mode): string
+    {
+        return match ($mode) {
+            DiffMode::GIT => 'git diff --no-index',
+            DiffMode::GNU => 'diff',
+        };
+    }
+
     public function gitDiff(): ?string
     {
         return self::getDiff(
