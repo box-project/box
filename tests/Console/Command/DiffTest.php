@@ -204,6 +204,9 @@ class DiffTest extends CommandTestCase
 
     public function test_it_cannot_compare_a_non_phar_files(): void
     {
+        $this->expectException(InvalidPhar::class);
+        $this->expectExceptionMessageMatches('/^Could not create a Phar or PharData instance for the file.+not\-a\-phar\.phar.+$/');
+
         $this->commandTester->execute(
             [
                 'command' => 'diff',
@@ -211,11 +214,6 @@ class DiffTest extends CommandTestCase
                 'pharB' => realpath(self::FIXTURES_DIR.'/not-a-phar.phar'),
             ],
         );
-
-        $expected = '/^Could not check the PHARs: Could not create a Phar or PharData instance for the file .+$/';
-
-        self::assertMatchesRegularExpression($expected, $this->commandTester->getDisplay(true));
-        self::assertSame(1, $this->commandTester->getStatusCode());
     }
 
     public function test_it_can_compare_phar_files_without_the_phar_extension(): void
