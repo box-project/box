@@ -23,7 +23,6 @@ use function Safe\realpath;
 
 /**
  * @covers \KevinGH\Box\Phar\PharInfo
- * @runTestsInSeparateProcesses
  *
  * @internal
  */

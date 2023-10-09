@@ -31,12 +31,6 @@ use function realpath;
  * @covers \KevinGH\Box\Console\Command\Info
  * @covers \KevinGH\Box\Console\Command\PharInfoRenderer
  *
- * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
- *                              can create undesirable side effect.
- *
- * @internal
- */
-/**
  * @internal
  */
 class InfoTest extends CommandTestCase

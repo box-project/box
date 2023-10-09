@@ -26,8 +26,6 @@ use const DIRECTORY_SEPARATOR;
  * @covers \KevinGH\Box\Phar\InvalidPhar
  * @covers \KevinGH\Box\Phar\PharFactory
  *
- * @runTestsInSeparateProcesses
- *
  * @internal
  */
 final class PharFactoryTest extends TestCase
