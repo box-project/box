@@ -25,14 +25,12 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Filesystem\Path;
-use Throwable;
 use Webmozart\Assert\Assert;
 use function array_map;
 use function count;
 // TODO: migrate to Safe API
 use function explode;
 use function is_string;
-use function KevinGH\Box\check_php_settings;
 use function sprintf;
 use const PHP_EOL;
 
@@ -101,26 +99,9 @@ final class Diff implements Command
 
     public function execute(IO $io): int
     {
-        check_php_settings($io);
-
         $paths = self::getPaths($io);
 
-        try {
-            $diff = new PharDiff(...$paths);
-        } catch (Throwable $throwable) {
-            if ($io->isDebug()) {
-                throw $throwable;
-            }
-
-            $io->writeln(
-                sprintf(
-                    '<error>Could not check the PHARs: %s</error>',
-                    $throwable->getMessage(),
-                ),
-            );
-
-            return ExitCode::FAILURE;
-        }
+        $diff = new PharDiff(...$paths);
 
         $result1 = $this->compareArchives($diff, $io);
         $result2 = $this->compareContents($diff, $io);
