@@ -251,7 +251,7 @@ final class Diff implements Command
         );
 
         PharInfoRenderer::renderCompression($pharInfo, $io);
-        // Omit the signature
+        PharInfoRenderer::renderSignature($pharInfo, $io);
         PharInfoRenderer::renderMetadata($pharInfo, $io);
         PharInfoRenderer::renderContentsSummary($pharInfo, $io);
     }

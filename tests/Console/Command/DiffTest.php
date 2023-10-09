@@ -346,12 +346,16 @@ class DiffTest extends CommandTestCase
                 Archive: simple-phar-bar.phar
                 Archive Compression: None
                 Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
                 Metadata: None
                 Contents: 1 file (6.64KB)
 
                 Archive: simple-phar-bar-compressed.phar
                 Archive Compression: None
                 Files Compression: GZ
+                Signature: SHA-1
+                Signature Hash: 3A388D86C91C36659A043D52C2DEB64E8848DD1A
                 Metadata: None
                 Contents: 1 file (6.65KB)
 
