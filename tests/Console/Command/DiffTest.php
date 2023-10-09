@@ -19,6 +19,7 @@ use Fidry\Console\DisplayNormalizer;
 use Fidry\Console\ExitCode;
 use InvalidArgumentException;
 use KevinGH\Box\Phar\InvalidPhar;
+use KevinGH\Box\Platform;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -40,7 +41,6 @@ class DiffTest extends CommandTestCase
 
     protected function setUp(): void
     {
-        self::markTestSkipped('TODO');
         $this->markAsSkippedIfPharReadonlyIsOn();
 
         parent::setUp();
@@ -88,6 +88,7 @@ class DiffTest extends CommandTestCase
             +++ Files present in "simple-phar-bar.phar" but not in "simple-phar-foo.phar"
 
             - foo.php [NONE] - 29.00B
+
             + bar.php [NONE] - 29.00B
 
              [ERROR] 2 file(s) difference
@@ -106,6 +107,7 @@ class DiffTest extends CommandTestCase
         ?string $expectedOutput,
         int $expectedStatusCode,
     ): void {
+        self::markTestSkipped('TODO');
         $actualOutput = $executeCommand($this->commandTester);
 
         if (null !== $expectedOutput) {
@@ -134,6 +136,7 @@ class DiffTest extends CommandTestCase
 
     public function test_it_can_check_the_sum_of_two_phar_files(): void
     {
+        self::markTestSkipped('TODO');
         (function (): void {
             $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar');
 
@@ -315,6 +318,7 @@ class DiffTest extends CommandTestCase
                 +++ Files present in "simple-phar-bar.phar" but not in "simple-phar-foo.phar"
 
                 - foo.php [NONE] - 29.00B
+
                 + bar.php [NONE] - 29.00B
 
                  [ERROR] 2 file(s) difference
@@ -342,12 +346,14 @@ class DiffTest extends CommandTestCase
                  // Comparing the two archives... (do not check the signatures)
 
                 Archive: simple-phar-bar.phar
-                Compression: None
+                Archive Compression: None
+                Files Compression: None
                 Metadata: None
                 Contents: 1 file (6.64KB)
 
                 Archive: simple-phar-bar-compressed.phar
-                Compression: GZ
+                Archive Compression: None
+                Files Compression: GZ
                 Metadata: None
                 Contents: 1 file (6.65KB)
 
@@ -448,7 +454,7 @@ class DiffTest extends CommandTestCase
                 rename to simple-phar-bar.phar/bar.php
 
                 OUTPUT,
-            1,
+            3,
         ])();
 
         yield (static fn (): array => [
@@ -465,7 +471,7 @@ class DiffTest extends CommandTestCase
                 return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
             },
             null,
-            1,
+            2,
         ])();
 
         yield (static fn (): array => [
@@ -594,7 +600,8 @@ class DiffTest extends CommandTestCase
 
                 return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
             },
-            <<<'OUTPUT'
+            Platform::isOSX()
+            ? <<<'OUTPUT'
 
                  // Comparing the two archives... (do not check the signatures)
 
@@ -602,7 +609,22 @@ class DiffTest extends CommandTestCase
 
                  // Comparing the two archives contents...
 
-                diff simple-phar-bar.phar/bar.php simple-phar-baz.phar/bar.php
+                diff --exclude=.phar_meta.json simple-phar-bar.phar/bar.php simple-phar-baz.phar/bar.php
+                3c3
+                < echo "Hello world!";
+                ---
+                > echo 'Hello world!';
+
+                OUTPUT
+            : <<<'OUTPUT'
+
+                 // Comparing the two archives... (do not check the signatures)
+
+                 [OK] The two archives are identical
+
+                 // Comparing the two archives contents...
+
+                diff '--exclude=.phar_meta.json' simple-phar-bar.phar/bar.php simple-phar-baz.phar/bar.php
                 3c3
                 < echo "Hello world!";
                 ---

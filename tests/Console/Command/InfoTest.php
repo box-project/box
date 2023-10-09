@@ -26,7 +26,6 @@ use function extension_loaded;
 use function implode;
 use function preg_replace;
 use function realpath;
-use const PHP_OS_FAMILY;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Info
@@ -46,7 +45,7 @@ class InfoTest extends CommandTestCase
 
     protected function setUp(): void
     {
-        if (PHP_OS_FAMILY !== 'Darwin') {
+        if (!Platform::isOSX()) {
             self::markTestSkipped('This test requires more work to be working fine cross-platform.');
         }
 
