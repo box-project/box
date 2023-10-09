@@ -23,9 +23,6 @@ use function realpath;
 /**
  * @covers \KevinGH\Box\Console\Command\GenerateDockerFile
  *
- * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
- *                              can create undesirable side-effects.
- *
  * @internal
  */
 class GenerateDockerFileTest extends CommandTestCase

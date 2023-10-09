@@ -27,8 +27,6 @@ use function str_replace;
  * @covers \KevinGH\Box\Console\Command\Validate
  * @covers \KevinGH\Box\Console\MessageRenderer
  *
- * @runTestsInSeparateProcesses
- *
  * @internal
  */
 class ValidateTest extends CommandTestCase
