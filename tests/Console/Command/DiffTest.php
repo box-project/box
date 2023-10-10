@@ -23,7 +23,6 @@ use KevinGH\Box\Platform;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Tester\CommandTester;
 use function ob_get_clean;
 use function ob_start;
 use function realpath;
@@ -55,13 +54,27 @@ class DiffTest extends CommandTestCase
      * @dataProvider listDiffPharsProvider
      */
     public function test_it_can_display_the_list_diff_of_two_phar_files(
-        callable $executeCommand,
-        string $expectedOutput,
+        string $pharAPath,
+        string $pharBPath,
+        ?string $expectedOutput,
         int $expectedStatusCode,
     ): void {
-        $actualOutput = $executeCommand($this->commandTester);
+        $this->commandTester->execute(
+            [
+                'command' => 'diff',
+                'pharA' => $pharAPath,
+                'pharB' => $pharBPath,
+                '--list-diff' => null,
+            ],
+        );
 
-        self::assertSame($expectedOutput, $actualOutput);
+        $actualOutput = DisplayNormalizer::removeTrailingSpaces(
+            $this->commandTester->getDisplay(true),
+        );
+
+        if (null !== $expectedOutput) {
+            self::assertSame($expectedOutput, $actualOutput);
+        }
         self::assertSame($expectedStatusCode, $this->commandTester->getStatusCode());
     }
 
@@ -103,17 +116,28 @@ class DiffTest extends CommandTestCase
      * @dataProvider gitDiffPharsProvider
      */
     public function test_it_can_display_the_git_diff_of_two_phar_files(
-        callable $executeCommand,
+        string $pharAPath,
+        string $pharBPath,
         ?string $expectedOutput,
         int $expectedStatusCode,
     ): void {
         self::markTestSkipped('TODO');
-        $actualOutput = $executeCommand($this->commandTester);
+        $this->commandTester->execute(
+            [
+                'command' => 'diff',
+                'pharA' => $pharAPath,
+                'pharB' => $pharBPath,
+                '--git-diff' => null,
+            ],
+        );
+
+        $actualOutput = DisplayNormalizer::removeTrailingSpaces(
+            $this->commandTester->getDisplay(true),
+        );
 
         if (null !== $expectedOutput) {
             self::assertSame($expectedOutput, $actualOutput);
         }
-
         self::assertSame($expectedStatusCode, $this->commandTester->getStatusCode());
     }
 
@@ -121,16 +145,27 @@ class DiffTest extends CommandTestCase
      * @dataProvider GNUDiffPharsProvider
      */
     public function test_it_can_display_the_gnu_diff_of_two_phar_files(
-        callable $executeCommand,
+        string $pharAPath,
+        string $pharBPath,
         ?string $expectedOutput,
         int $expectedStatusCode,
     ): void {
-        $actualOutput = $executeCommand($this->commandTester);
+        $this->commandTester->execute(
+            [
+                'command' => 'diff',
+                'pharA' => $pharAPath,
+                'pharB' => $pharBPath,
+                '--gnu-diff' => null,
+            ],
+        );
+
+        $actualOutput = DisplayNormalizer::removeTrailingSpaces(
+            $this->commandTester->getDisplay(true),
+        );
 
         if (null !== $expectedOutput) {
             self::assertSame($expectedOutput, $actualOutput);
         }
-
         self::assertSame($expectedStatusCode, $this->commandTester->getStatusCode());
     }
 
@@ -259,23 +294,11 @@ class DiffTest extends CommandTestCase
         );
     }
 
-    public static function listDiffPharsProvider(): iterable
+    private static function diffPharsProvider(): iterable
     {
-        yield (static fn (): array => [
-            static function (CommandTester $commandTester): string {
-                $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar');
-
-                $commandTester->execute(
-                    [
-                        'command' => 'diff',
-                        'pharA' => $pharPath,
-                        'pharB' => $pharPath,
-                        '--list-diff' => null,
-                    ],
-                );
-
-                return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
-            },
+        yield 'same PHAR' => [
+            realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
+            realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
             <<<'OUTPUT'
 
                  // Comparing the two archives... (do not check the signatures)
@@ -288,57 +311,12 @@ class DiffTest extends CommandTestCase
 
 
                 OUTPUT,
-            0,
-        ])();
+            ExitCode::SUCCESS,
+        ];
 
-        yield (static fn (): array => [
-            static function (CommandTester $commandTester): string {
-                $commandTester->execute(
-                    [
-                        'command' => 'diff',
-                        'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
-                        'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-                        '--list-diff' => null,
-                    ],
-                );
-
-                return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
-            },
-            <<<'OUTPUT'
-
-                 // Comparing the two archives... (do not check the signatures)
-
-                 [OK] The two archives are identical
-
-                 // Comparing the two archives contents...
-
-                --- Files present in "simple-phar-foo.phar" but not in "simple-phar-bar.phar"
-                +++ Files present in "simple-phar-bar.phar" but not in "simple-phar-foo.phar"
-
-                - foo.php [NONE] - 29.00B
-
-                + bar.php [NONE] - 29.00B
-
-                 [ERROR] 2 file(s) difference
-
-
-                OUTPUT,
-            1,
-        ])();
-
-        yield (static fn (): array => [
-            static function (CommandTester $commandTester): string {
-                $commandTester->execute(
-                    [
-                        'command' => 'diff',
-                        'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-                        'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar-compressed.phar'),
-                        '--list-diff' => null,
-                    ],
-                );
-
-                return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
-            },
+        yield 'different data; same content' => [
+            realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
+            realpath(self::FIXTURES_DIR.'/simple-phar-bar-compressed.phar'),
             <<<'OUTPUT'
 
                  // Comparing the two archives... (do not check the signatures)
@@ -366,21 +344,41 @@ class DiffTest extends CommandTestCase
 
                 OUTPUT,
             1,
-        ])();
+        ];
+    }
 
-        yield (static fn (): array => [
-            static function (CommandTester $commandTester): string {
-                $commandTester->execute(
-                    [
-                        'command' => 'diff',
-                        'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-                        'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-baz.phar'),
-                        '--list-diff' => null,
-                    ],
-                );
+    public static function listDiffPharsProvider(): iterable
+    {
+        yield from self::diffPharsProvider();
 
-                return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
-            },
+        yield 'different files' => [
+            realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
+            realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
+            <<<'OUTPUT'
+
+                 // Comparing the two archives... (do not check the signatures)
+
+                 [OK] The two archives are identical
+
+                 // Comparing the two archives contents...
+
+                --- Files present in "simple-phar-foo.phar" but not in "simple-phar-bar.phar"
+                +++ Files present in "simple-phar-bar.phar" but not in "simple-phar-foo.phar"
+
+                - foo.php [NONE] - 29.00B
+
+                + bar.php [NONE] - 29.00B
+
+                 [ERROR] 2 file(s) difference
+
+
+                OUTPUT,
+            1,
+        ];
+
+        yield 'same files different content' => [
+            realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
+            realpath(self::FIXTURES_DIR.'/simple-phar-baz.phar'),
             <<<'OUTPUT'
 
                  // Comparing the two archives... (do not check the signatures)
@@ -393,55 +391,17 @@ class DiffTest extends CommandTestCase
 
 
                 OUTPUT,
-            0,
-        ])();
+            ExitCode::SUCCESS,
+        ];
     }
 
     public static function gitDiffPharsProvider(): iterable
     {
-        yield (static fn (): array => [
-            static function (CommandTester $commandTester): string {
-                $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar');
+        yield from self::diffPharsProvider();
 
-                $commandTester->execute(
-                    [
-                        'command' => 'diff',
-                        'pharA' => $pharPath,
-                        'pharB' => $pharPath,
-                        '--git-diff' => null,
-                    ],
-                );
-
-                return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
-            },
-            <<<'OUTPUT'
-
-                 // Comparing the two archives... (do not check the signatures)
-
-                 [OK] The two archives are identical
-
-                 // Comparing the two archives contents...
-
-                 [OK] The contents are identical
-
-
-                OUTPUT,
-            0,
-        ])();
-
-        yield (static fn (): array => [
-            static function (CommandTester $commandTester): string {
-                $commandTester->execute(
-                    [
-                        'command' => 'diff',
-                        'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
-                        'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-                        '--git-diff' => null,
-                    ],
-                );
-
-                return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
-            },
+        yield 'different files' => [
+            realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
+            realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
             <<<'OUTPUT'
 
                  // Comparing the two archives... (do not check the signatures)
@@ -457,38 +417,11 @@ class DiffTest extends CommandTestCase
 
                 OUTPUT,
             3,
-        ])();
+        ];
 
-        yield (static fn (): array => [
-            static function (CommandTester $commandTester): string {
-                $commandTester->execute(
-                    [
-                        'command' => 'diff',
-                        'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-                        'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar-compressed.phar'),
-                        '--git-diff' => null,
-                    ],
-                );
-
-                return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
-            },
-            null,
-            2,
-        ])();
-
-        yield (static fn (): array => [
-            static function (CommandTester $commandTester): string {
-                $commandTester->execute(
-                    [
-                        'command' => 'diff',
-                        'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-                        'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-baz.phar'),
-                        '--git-diff' => null,
-                    ],
-                );
-
-                return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
-            },
+        yield 'same files different content' => [
+            realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
+            realpath(self::FIXTURES_DIR.'/simple-phar-baz.phar'),
             <<<'OUTPUT'
 
                  // Comparing the two archives... (do not check the signatures)
@@ -509,54 +442,17 @@ class DiffTest extends CommandTestCase
 
                 OUTPUT,
             1,
-        ])();
+        ];
     }
 
     public static function GNUDiffPharsProvider(): iterable
     {
-        yield (static fn (): array => [
-            static function (CommandTester $commandTester): string {
-                $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar');
+        yield from self::diffPharsProvider();
 
-                $commandTester->execute(
-                    [
-                        'command' => 'diff',
-                        'pharA' => $pharPath,
-                        'pharB' => $pharPath,
-                        '--gnu-diff' => null,
-                    ],
-                );
+        yield 'different files' => [
+            realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
+            realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
 
-                return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
-            },
-            <<<'OUTPUT'
-
-                 // Comparing the two archives... (do not check the signatures)
-
-                 [OK] The two archives are identical
-
-                 // Comparing the two archives contents...
-
-                 [OK] The contents are identical
-
-
-                OUTPUT,
-            0,
-        ])();
-
-        yield (static fn (): array => [
-            static function (CommandTester $commandTester): string {
-                $commandTester->execute(
-                    [
-                        'command' => 'diff',
-                        'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
-                        'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-                        '--gnu-diff' => null,
-                    ],
-                );
-
-                return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
-            },
             <<<'OUTPUT'
 
                  // Comparing the two archives... (do not check the signatures)
@@ -570,70 +466,43 @@ class DiffTest extends CommandTestCase
 
                 OUTPUT,
             1,
-        ])();
+        ];
 
-        yield (static fn (): array => [
-            static function (CommandTester $commandTester): string {
-                $commandTester->execute(
-                    [
-                        'command' => 'diff',
-                        'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-                        'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar-compressed.phar'),
-                        '--gnu-diff' => null,
-                    ],
-                );
-
-                return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
-            },
-            null,
-            1,
-        ])();
-
-        yield (static fn (): array => [
-            static function (CommandTester $commandTester): string {
-                $commandTester->execute(
-                    [
-                        'command' => 'diff',
-                        'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-                        'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-baz.phar'),
-                        '--gnu-diff' => null,
-                    ],
-                );
-
-                return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
-            },
+        yield 'same files different content' => [
+            realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
+            realpath(self::FIXTURES_DIR.'/simple-phar-baz.phar'),
             Platform::isOSX()
-            ? <<<'OUTPUT'
+                ? <<<'OUTPUT'
 
-                 // Comparing the two archives... (do not check the signatures)
+                     // Comparing the two archives... (do not check the signatures)
 
-                 [OK] The two archives are identical
+                     [OK] The two archives are identical
 
-                 // Comparing the two archives contents...
+                     // Comparing the two archives contents...
 
-                diff --exclude=.phar_meta.json simple-phar-bar.phar/bar.php simple-phar-baz.phar/bar.php
-                3c3
-                < echo "Hello world!";
-                ---
-                > echo 'Hello world!';
+                    diff --exclude=.phar_meta.json simple-phar-bar.phar/bar.php simple-phar-baz.phar/bar.php
+                    3c3
+                    < echo "Hello world!";
+                    ---
+                    > echo 'Hello world!';
 
-                OUTPUT
-            : <<<'OUTPUT'
+                    OUTPUT
+                : <<<'OUTPUT'
 
-                 // Comparing the two archives... (do not check the signatures)
+                     // Comparing the two archives... (do not check the signatures)
 
-                 [OK] The two archives are identical
+                     [OK] The two archives are identical
 
-                 // Comparing the two archives contents...
+                     // Comparing the two archives contents...
 
-                diff '--exclude=.phar_meta.json' simple-phar-bar.phar/bar.php simple-phar-baz.phar/bar.php
-                3c3
-                < echo "Hello world!";
-                ---
-                > echo 'Hello world!';
+                    diff '--exclude=.phar_meta.json' simple-phar-bar.phar/bar.php simple-phar-baz.phar/bar.php
+                    3c3
+                    < echo "Hello world!";
+                    ---
+                    > echo 'Hello world!';
 
-                OUTPUT,
+                    OUTPUT,
             1,
-        ])();
+        ];
     }
 }
