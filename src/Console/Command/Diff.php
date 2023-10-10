@@ -20,8 +20,8 @@ use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
 use KevinGH\Box\Console\PharInfoRenderer;
 use KevinGH\Box\Phar\PharDiff;
-use KevinGH\Box\PharInfo\DiffMode;
 use KevinGH\Box\Phar\PharInfo;
+use KevinGH\Box\Phar\DiffMode;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -30,8 +30,8 @@ use Webmozart\Assert\Assert;
 use function array_map;
 use function count;
 // TODO: migrate to Safe API
-use function implode;
 use function explode;
+use function implode;
 use function is_string;
 use function sprintf;
 use const PHP_EOL;
@@ -120,10 +120,10 @@ final class Diff implements Command
 
         $diff = new PharDiff(...$paths);
 
-        $this->showArchives($diff, $io);
+        $result1 = $this->compareArchives($diff, $io);
         $result2 = $this->compareContents($diff, $io);
 
-        return $result2;
+        return $result1 + $result2;
     }
 
     /**
@@ -144,8 +144,10 @@ final class Diff implements Command
         );
     }
 
-    private function showArchives(PharDiff $diff, IO $io): void
+    private function compareArchives(PharDiff $diff, IO $io): int
     {
+        $io->comment('<info>Comparing the two archives... (do not check the signatures)</info>');
+
         $pharInfoA = $diff->getPharInfoA();
         $pharInfoB = $diff->getPharInfoB();
 
@@ -168,6 +170,8 @@ final class Diff implements Command
             $pharInfoB,
             $io,
         );
+
+        return ExitCode::FAILURE;
     }
 
     private static function getDiffMode(IO $io): DiffMode
@@ -216,6 +220,8 @@ final class Diff implements Command
 
     private function compareContents(PharDiff $diff, IO $io): int
     {
+        $io->comment('<info>Comparing the two archives contents...</info>');
+
         $checkSumAlgorithm = $io->getOption(self::CHECK_OPTION)->asNullableNonEmptyString() ?? self::DEFAULT_CHECKSUM_ALGO;
 
         if ($io->hasOption('-c') || $io->hasOption('--check')) {
@@ -225,61 +231,6 @@ final class Diff implements Command
         $diffMode = self::getDiffMode($io);
 
         $diffResult = $diff->diff($diffMode);
-
-        if (null === $diffResult || [[], []] === $diffResult) {
-            $io->success('The contents are identical');
-
-            return ExitCode::SUCCESS;
-        }
-
-        if (is_string($diffResult)) {
-            // Git or GNU diff: we don't have much control on the format
-            $io->writeln($diffResult);
-
-            return ExitCode::FAILURE;
-        }
-
-        $io->writeln(sprintf(
-            '--- Files present in "%s" but not in "%s"',
-            $diff->getPharA()->getFileName(),
-            $diff->getPharB()->getFileName(),
-        ));
-        $io->writeln(sprintf(
-            '+++ Files present in "%s" but not in "%s"',
-            $diff->getPharB()->getFileName(),
-            $diff->getPharA()->getFileName(),
-        ));
-
-        $io->newLine();
-
-        self::renderPaths('-', $diff->getPharA(), $diffResult[0], $io);
-        self::renderPaths('+', $diff->getPharB(), $diffResult[1], $io);
-
-        $io->error(sprintf(
-            '%d file(s) difference',
-            count($diffResult[0]) + count($diffResult[1]),
-        ));
-
-        return ExitCode::FAILURE;
-    }
-
-    private function compareContentssS(PharDiff $diff, IO $io): int
-    {
-        $io->comment('<info>Comparing the two archives contents...</info>');
-
-        $checkSumAlgorithm = $io->getOption(self::CHECK_OPTION)->asNullableNonEmptyString() ?? self::DEFAULT_CHECKSUM_ALGO;
-
-        if ($io->hasOption('-c') || $io->hasOption('--check')) {
-            return $diff->listChecksums($checkSumAlgorithm);
-        }
-
-        if ($io->getOption(self::GNU_DIFF_OPTION)->asBoolean()) {
-            $diffResult = $diff->gnuDiff();
-        } elseif ($io->getOption(self::GIT_DIFF_OPTION)->asBoolean()) {
-            $diffResult = $diff->gitDiff();
-        } else {
-            $diffResult = $diff->listDiff();
-        }
 
         if (null === $diffResult || [[], []] === $diffResult) {
             $io->success('The contents are identical');

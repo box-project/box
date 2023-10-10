@@ -2,10 +2,18 @@
 
 declare(strict_types=1);
 
-namespace KevinGH\Box\PharInfo;
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
-use BackedEnum;
-use UnitEnum;
+namespace KevinGH\Box\Phar;
+
 use function array_map;
 
 enum DiffMode: string

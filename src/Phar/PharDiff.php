@@ -16,6 +16,7 @@ namespace KevinGH\Box\Phar;
 
 use KevinGH\Box\Console\Command\Extract;
 use KevinGH\Box\Pharaoh\PharDiff as ParagoniePharDiff;
+use KevinGH\Box\Phar\DiffMode;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
@@ -26,6 +27,9 @@ use function iterator_to_array;
 use function str_replace;
 use const DIRECTORY_SEPARATOR;
 
+/**
+ * @internal
+ */
 final class PharDiff
 {
     private readonly ParagoniePharDiff $diff;
@@ -68,8 +72,8 @@ final class PharDiff
         }
 
         return self::getDiff(
-            $this->pharA,
-            $this->pharB,
+            $this->pharInfoA,
+            $this->pharInfoB,
             self::getModeCommand($mode),
         );
     }
@@ -80,24 +84,6 @@ final class PharDiff
             DiffMode::GIT => 'git diff --no-index',
             DiffMode::GNU => 'diff',
         };
-    }
-
-    public function gitDiff(): ?string
-    {
-        return self::getDiff(
-            $this->pharInfoA,
-            $this->pharInfoB,
-            'git diff --no-index',
-        );
-    }
-
-    public function gnuDiff(): ?string
-    {
-        return self::getDiff(
-            $this->pharInfoA,
-            $this->pharInfoB,
-            'diff --exclude='.Extract::PHAR_META_PATH,
-        );
     }
 
     /**
@@ -113,7 +99,7 @@ final class PharDiff
      *                    which are not in the second and the second array all the files present in the second PHAR but
      *                    not the first one.
      */
-    public function listDiff(): array
+    private function listDiff(): array
     {
         $pharAFiles = self::collectFiles($this->pharInfoA);
         $pharBFiles = self::collectFiles($this->pharInfoB);
