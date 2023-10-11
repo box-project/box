@@ -18,11 +18,13 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\DisplayNormalizer;
 use Fidry\Console\ExitCode;
 use InvalidArgumentException;
+use KevinGH\Box\Phar\DiffMode;
 use KevinGH\Box\Phar\InvalidPhar;
 use KevinGH\Box\Platform;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Symfony\Component\Console\Output\OutputInterface;
+use function array_splice;
 use function ob_get_clean;
 use function ob_start;
 use function realpath;
@@ -51,20 +53,25 @@ class DiffTest extends CommandTestCase
     }
 
     /**
-     * @dataProvider listDiffPharsProvider
+     * @dataProvider diffPharsProvider
      */
-    public function test_it_can_display_the_list_diff_of_two_phar_files(
+    public function test_it_can_display_the_diff_of_two_phar_files(
         string $pharAPath,
         string $pharBPath,
+        DiffMode $diffMode,
         ?string $expectedOutput,
         int $expectedStatusCode,
     ): void {
+        if (DiffMode::GIT === $diffMode) {
+            $this->markTestSkipped('TODO');
+        }
+
         $this->commandTester->execute(
             [
                 'command' => 'diff',
                 'pharA' => $pharAPath,
                 'pharB' => $pharBPath,
-                '--list-diff' => null,
+                '--diff' => $diffMode->value,
             ],
         );
 
@@ -78,95 +85,112 @@ class DiffTest extends CommandTestCase
         self::assertSame($expectedStatusCode, $this->commandTester->getStatusCode());
     }
 
-    public function test_it_displays_the_list_diff_of_two_phar_files_by_default(): void
+    /**
+     * @deprecated
+     */
+    public function test_it_can_display_the_list_diff_of_two_phar_files(): void
     {
+        $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar');
+
         $this->commandTester->execute(
             [
                 'command' => 'diff',
-                'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
-                'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
+                'pharA' => $pharPath,
+                'pharB' => $pharPath,
                 '--list-diff' => null,
             ],
         );
 
         $expectedOutput = <<<'OUTPUT'
+        
+         // Comparing the two archives... (do not check the signatures)
+        
+         [OK] The two archives are identical
+        
+         // Comparing the two archives contents...
+        
+        ⚠️  <warning>Using the option "list-diff" is deprecated. Use "--diff=list" instead.</warning>
+        
+         [OK] The contents are identical
+        
+        
+        OUTPUT;
 
-             // Comparing the two archives... (do not check the signatures)
-
-             [OK] The two archives are identical
-
-             // Comparing the two archives contents...
-
-            --- Files present in "simple-phar-foo.phar" but not in "simple-phar-bar.phar"
-            +++ Files present in "simple-phar-bar.phar" but not in "simple-phar-foo.phar"
-
-            - foo.php [NONE] - 29.00B
-
-            + bar.php [NONE] - 29.00B
-
-             [ERROR] 2 file(s) difference
-
-
-            OUTPUT;
-
-        $this->assertSameOutput($expectedOutput, ExitCode::FAILURE);
+        $this->assertSameOutput(
+            $expectedOutput,
+            ExitCode::SUCCESS,
+        );
     }
 
     /**
-     * @dataProvider gitDiffPharsProvider
+     * @deprecated
      */
-    public function test_it_can_display_the_git_diff_of_two_phar_files(
-        string $pharAPath,
-        string $pharBPath,
-        ?string $expectedOutput,
-        int $expectedStatusCode,
-    ): void {
-        self::markTestSkipped('TODO');
+    public function test_it_can_display_the_git_diff_of_two_phar_files(): void
+    {
+        $this->markTestSkipped('TODO');
+        $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar');
+
         $this->commandTester->execute(
             [
                 'command' => 'diff',
-                'pharA' => $pharAPath,
-                'pharB' => $pharBPath,
+                'pharA' => $pharPath,
+                'pharB' => $pharPath,
                 '--git-diff' => null,
             ],
         );
 
-        $actualOutput = DisplayNormalizer::removeTrailingSpaces(
-            $this->commandTester->getDisplay(true),
-        );
+        $expectedOutput = <<<'OUTPUT'
+        
+         // Comparing the two archives... (do not check the signatures)
+        
+         [OK] The two archives are identical
+        
+         // Comparing the two archives contents...
+        
+        ⚠️  <warning>Using the option "list-diff" is deprecated. Use "--diff=list" instead.</warning>
+        
+         [OK] The contents are identical
+        
+        
+        OUTPUT;
 
-        if (null !== $expectedOutput) {
-            self::assertSame($expectedOutput, $actualOutput);
-        }
-        self::assertSame($expectedStatusCode, $this->commandTester->getStatusCode());
+        $this->assertSameOutput(
+            $expectedOutput,
+            ExitCode::SUCCESS,
+        );
     }
 
-    /**
-     * @dataProvider GNUDiffPharsProvider
-     */
-    public function test_it_can_display_the_gnu_diff_of_two_phar_files(
-        string $pharAPath,
-        string $pharBPath,
-        ?string $expectedOutput,
-        int $expectedStatusCode,
-    ): void {
+    public function test_it_can_display_the_gnu_diff_of_two_phar_files(): void {
+        $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar');
+
         $this->commandTester->execute(
             [
                 'command' => 'diff',
-                'pharA' => $pharAPath,
-                'pharB' => $pharBPath,
+                'pharA' => $pharPath,
+                'pharB' => $pharPath,
                 '--gnu-diff' => null,
             ],
         );
 
-        $actualOutput = DisplayNormalizer::removeTrailingSpaces(
-            $this->commandTester->getDisplay(true),
-        );
+        $expectedOutput = <<<'OUTPUT'
+        
+         // Comparing the two archives... (do not check the signatures)
+        
+         [OK] The two archives are identical
+        
+         // Comparing the two archives contents...
+        
+        ⚠️  <warning>Using the option "gnu-diff" is deprecated. Use "--diff=gnu" instead.</warning>
+        
+         [OK] The contents are identical
+        
+        
+        OUTPUT;
 
-        if (null !== $expectedOutput) {
-            self::assertSame($expectedOutput, $actualOutput);
-        }
-        self::assertSame($expectedStatusCode, $this->commandTester->getStatusCode());
+        $this->assertSameOutput(
+            $expectedOutput,
+            ExitCode::SUCCESS,
+        );
     }
 
     public function test_it_can_check_the_sum_of_two_phar_files(): void
@@ -294,7 +318,43 @@ class DiffTest extends CommandTestCase
         );
     }
 
-    private static function diffPharsProvider(): iterable
+    public static function diffPharsProvider(): iterable
+    {
+        foreach (self::listDiffPharsProvider() as $label => $set) {
+            array_splice(
+                $set,
+                2,
+                0,
+                [DiffMode::LIST],
+            );
+
+            yield '[list] '.$label => $set;
+        }
+
+        foreach (self::gitDiffPharsProvider() as $label => $set) {
+            array_splice(
+                $set,
+                2,
+                0,
+                [DiffMode::GIT],
+            );
+
+            yield '[git] '.$label => $set;
+        }
+
+        foreach (self::GNUDiffPharsProvider() as $label => $set) {
+            array_splice(
+                $set,
+                2,
+                0,
+                [DiffMode::GNU],
+            );
+
+            yield '[GNU] '.$label => $set;
+        }
+    }
+
+    private static function commonDiffPharsProvider(): iterable
     {
         yield 'same PHAR' => [
             realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
@@ -347,9 +407,9 @@ class DiffTest extends CommandTestCase
         ];
     }
 
-    public static function listDiffPharsProvider(): iterable
+    private static function listDiffPharsProvider(): iterable
     {
-        yield from self::diffPharsProvider();
+        yield from self::commonDiffPharsProvider();
 
         yield 'different files' => [
             realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
@@ -397,7 +457,7 @@ class DiffTest extends CommandTestCase
 
     public static function gitDiffPharsProvider(): iterable
     {
-        yield from self::diffPharsProvider();
+        yield from self::commonDiffPharsProvider();
 
         yield 'different files' => [
             realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
@@ -447,12 +507,11 @@ class DiffTest extends CommandTestCase
 
     public static function GNUDiffPharsProvider(): iterable
     {
-        yield from self::diffPharsProvider();
+        yield from self::commonDiffPharsProvider();
 
         yield 'different files' => [
             realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
             realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-
             <<<'OUTPUT'
 
                  // Comparing the two archives... (do not check the signatures)

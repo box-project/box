@@ -215,7 +215,7 @@ final class Diff implements Command
             return DiffMode::LIST;
         }
 
-        return DiffMode::LIST;
+        return DiffMode::from($io->getOption(self::DIFF_OPTION)->asNonEmptyString());
     }
 
     private function compareContents(PharDiff $diff, IO $io): int
