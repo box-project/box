@@ -75,9 +75,7 @@ class DiffTest extends CommandTestCase
             ],
         );
 
-        $actualOutput = DisplayNormalizer::removeTrailingSpaces(
-            $this->commandTester->getDisplay(true),
-        );
+        $actualOutput = $this->commandTester->getNormalizedDisplay();
 
         if (null !== $expectedOutput) {
             self::assertSame($expectedOutput, $actualOutput);
