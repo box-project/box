@@ -114,18 +114,28 @@ final class Diff implements Command
 
     public function execute(IO $io): int
     {
-        $paths = self::getPaths($io);
+        $diff = new PharDiff(...self::getPaths($io));
+        $diffMode = self::getDiffMode($io);
 
-        $diff = new PharDiff(...$paths);
+        $io->comment('<info>Comparing the two archives...</info>');
 
-        $result1 = $this->compareArchives($diff, $io);
-        $result2 = $this->compareContents($diff, $io);
+        $pharInfoA = $diff->getPharInfoA();
+        $pharInfoB = $diff->getPharInfoB();
 
-        return $result1 + $result2;
+        if ($pharInfoA->equals($pharInfoB)) {
+            $io->success('The two archives are identical.');
+
+            return ExitCode::SUCCESS;
+        }
+
+        $this->compareArchives($diff, $io);
+        $this->compareContents($diff, $diffMode, $io);
+
+        return ExitCode::FAILURE;
     }
 
     /**
-     * @return list<non-empty-string>
+     * @return array{non-empty-string, non-empty-string}
      */
     private static function getPaths(IO $io): array
     {
@@ -142,18 +152,10 @@ final class Diff implements Command
         );
     }
 
-    private function compareArchives(PharDiff $diff, IO $io): int
+    private function compareArchives(PharDiff $diff, IO $io): void
     {
-        $io->comment('<info>Comparing the two archives... (do not check the signatures)</info>');
-
         $pharInfoA = $diff->getPharInfoA();
         $pharInfoB = $diff->getPharInfoB();
-
-        if ($pharInfoA->equals($pharInfoB)) {
-            $io->success('The two archives are identical');
-
-            return ExitCode::SUCCESS;
-        }
 
         self::renderArchive(
             $diff->getPharInfoA()->getFileName(),
@@ -168,8 +170,6 @@ final class Diff implements Command
             $pharInfoB,
             $io,
         );
-
-        return ExitCode::FAILURE;
     }
 
     private static function getDiffMode(IO $io): DiffMode
@@ -216,31 +216,31 @@ final class Diff implements Command
         return DiffMode::from($io->getOption(self::DIFF_OPTION)->asNonEmptyString());
     }
 
-    private function compareContents(PharDiff $diff, IO $io): int
+    private function compareContents(PharDiff $diff, DiffMode $diffMode, IO $io): void
     {
         $io->comment('<info>Comparing the two archives contents...</info>');
 
         $checkSumAlgorithm = $io->getOption(self::CHECK_OPTION)->asNullableNonEmptyString() ?? self::DEFAULT_CHECKSUM_ALGO;
 
         if ($io->hasOption('-c') || $io->hasOption('--check')) {
-            return $diff->listChecksums($checkSumAlgorithm);
-        }
+            $diff->listChecksums($checkSumAlgorithm);
 
-        $diffMode = self::getDiffMode($io);
+            return;
+        }
 
         $diffResult = $diff->diff($diffMode);
 
         if (null === $diffResult || [[], []] === $diffResult) {
             $io->success('The contents are identical');
 
-            return ExitCode::SUCCESS;
+            return;
         }
 
         if (is_string($diffResult)) {
             // Git or GNU diff: we don't have much control on the format
             $io->writeln($diffResult);
 
-            return ExitCode::FAILURE;
+            return;
         }
 
         $io->writeln(sprintf(
@@ -263,8 +263,6 @@ final class Diff implements Command
             '%d file(s) difference',
             count($diffResult[0]) + count($diffResult[1]),
         ));
-
-        return ExitCode::FAILURE;
     }
 
     /**
