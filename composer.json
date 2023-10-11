@@ -24,7 +24,7 @@
         "amphp/parallel-functions": "^1.1",
         "composer/semver": "^3.3.2",
         "composer/xdebug-handler": "^3.0.3",
-        "fidry/console": "^0.5.3",
+        "fidry/console": "^0.5.3 || ^0.6.0",
         "fidry/filesystem": "^1.1",
         "humbug/php-scoper": "^0.18.3",
         "justinrainbow/json-schema": "^5.2.12",
