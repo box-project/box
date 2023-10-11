@@ -63,10 +63,6 @@ class DiffTest extends CommandTestCase
         ?string $expectedOutput,
         int $expectedStatusCode,
     ): void {
-        if (DiffMode::GIT === $diffMode) {
-            self::markTestSkipped('TODO');
-        }
-
         $command = [
             'command' => 'diff',
             'pharA' => realpath($pharAPath),
@@ -538,7 +534,18 @@ class DiffTest extends CommandTestCase
                 Metadata: None
                 Contents: 1 file (6.64KB)
 
-                 // Comparing the two archives contents...
+                <diff-expected>--- PHAR A</diff-expected>
+                <diff-actual>+++ PHAR B</diff-actual>
+                @@ @@
+                 Archive Compression: None
+                 Files Compression: None
+                 Signature: SHA-1
+                <diff-expected>-Signature Hash: 311080EF8E479CE18D866B744B7D467880BFBF57</diff-expected>
+                <diff-actual>+Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51</diff-actual>
+                 Metadata: None
+                 Contents: 1 file (6.64KB)
+
+                 // Comparing the two archives contents (git diff)...
 
                 diff --git asimple-phar-foo.phar/foo.php bsimple-phar-bar.phar/bar.php
                 similarity index 100%
@@ -546,7 +553,7 @@ class DiffTest extends CommandTestCase
                 rename to simple-phar-bar.phar/bar.php
 
                 OUTPUT,
-            3,
+            ExitCode::FAILURE,
         ];
 
         yield 'same files different content' => [
@@ -572,7 +579,19 @@ class DiffTest extends CommandTestCase
                 Metadata: None
                 Contents: 1 file (6.61KB)
 
-                 // Comparing the two archives contents...
+                <diff-expected>--- PHAR A</diff-expected>
+                <diff-actual>+++ PHAR B</diff-actual>
+                @@ @@
+                 Archive Compression: None
+                 Files Compression: None
+                 Signature: SHA-1
+                <diff-expected>-Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51</diff-expected>
+                <diff-actual>+Signature Hash: 122A636B8BB0348C9514833D70281EF6306A5BF5</diff-actual>
+                 Metadata: None
+                <diff-expected>-Contents: 1 file (6.64KB)</diff-expected>
+                <diff-actual>+Contents: 1 file (6.61KB)</diff-actual>
+
+                 // Comparing the two archives contents (git diff)...
 
                 diff --git asimple-phar-bar.phar/bar.php bsimple-phar-baz.phar/bar.php
                 index 290849f..8aac305 100644

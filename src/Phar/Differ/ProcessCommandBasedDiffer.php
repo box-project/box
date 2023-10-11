@@ -35,7 +35,7 @@ final class ProcessCommandBasedDiffer implements Differ
         $io->writeln($result ?? Differ::NO_DIFF_MESSAGE);
     }
 
-    private static function getDiff(PharInfo $pharInfoA, PharInfo $pharInfoB, string $command): ?string
+    public static function getDiff(PharInfo $pharInfoA, PharInfo $pharInfoB, string $command): ?string
     {
         $pharInfoATmp = $pharInfoA->getTmp();
         $pharInfoBTmp = $pharInfoB->getTmp();

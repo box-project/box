@@ -25,7 +25,7 @@ final class DifferFactory
     ): Differ {
         return match ($mode) {
             DiffMode::FILE_NAME => new FilenameDiffer(),
-            DiffMode::GIT => new ProcessCommandBasedDiffer('git diff --no-index'),
+            DiffMode::GIT => new GitDiffer(),
             DiffMode::GNU => new ProcessCommandBasedDiffer('diff --exclude='.Extract::PHAR_META_PATH),
             DiffMode::CHECKSUM => new ChecksumDiffer($checksumAlgorithm),
         };
