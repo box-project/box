@@ -21,6 +21,7 @@ enum DiffMode: string
     case FILE_NAME = 'file-name';
     case GIT = 'git';
     case GNU = 'gnu';
+    case CHECKSUM = 'checksum';
 
     /**
      * @return list<string>

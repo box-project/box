@@ -50,6 +50,7 @@ final class Diff implements Command
     private const GNU_DIFF_OPTION = 'gnu-diff';
     private const DIFF_OPTION = 'diff';
     private const CHECK_OPTION = 'check';
+    private const CHECKSUM_ALGORITHM_OPTION = 'checksum-algorithm';
 
     private const DEFAULT_CHECKSUM_ALGO = 'sha384';
 
@@ -107,7 +108,16 @@ final class Diff implements Command
                     self::CHECK_OPTION,
                     'c',
                     InputOption::VALUE_OPTIONAL,
-                    'Verify the authenticity of the contents between the two PHARs with the given hash function',
+                    '(deprecated) Verify the authenticity of the contents between the two PHARs with the given hash function',
+                ),
+                new InputOption(
+                    self::CHECKSUM_ALGORITHM_OPTION,
+                    null,
+                    InputOption::VALUE_REQUIRED,
+                    sprintf(
+                        'The hash function used to compare files with the diff mode used is "%s".',
+                        DiffMode::CHECKSUM->value,
+                    ),
                     self::DEFAULT_CHECKSUM_ALGO,
                 ),
             ],
@@ -118,6 +128,7 @@ final class Diff implements Command
     {
         $diff = new PharDiff(...self::getPaths($io));
         $diffMode = self::getDiffMode($io);
+        $checksumAlgorithm = self::getChecksumAlgorithm($io);
 
         $io->comment('<info>Comparing the two archives...</info>');
 
@@ -132,7 +143,7 @@ final class Diff implements Command
         self::renderSummary($diff->getPharInfoB(), $io);
 
         $this->renderArchivesDiff($diff, $io);
-        $this->renderContentsDiff($diff, $diffMode, $io);
+        $this->renderContentsDiff($diff, $diffMode, $checksumAlgorithm, $io);
 
         return ExitCode::FAILURE;
     }
@@ -217,10 +228,42 @@ final class Diff implements Command
             return DiffMode::FILE_NAME;
         }
 
+        if ($io->hasOption('-c') || $io->hasOption('--check')) {
+            $io->writeln(
+                sprintf(
+                    '⚠️  <warning>Using the option "%s" is deprecated. Use "--%s=%s" instead.</warning>',
+                    self::CHECK_OPTION,
+                    self::DIFF_OPTION,
+                    DiffMode::CHECKSUM->value,
+                ),
+            );
+
+            return DiffMode::FILE_NAME;
+        }
+
         return DiffMode::from($io->getOption(self::DIFF_OPTION)->asNonEmptyString());
     }
 
-    private function renderContentsDiff(PharDiff $diff, DiffMode $diffMode, IO $io): void
+    private static function getChecksumAlgorithm(IO $io): string
+    {
+        $checksumAlgorithm = $io->getOption(self::CHECK_OPTION)->asNullableNonEmptyString();
+
+        if (null !== $checksumAlgorithm) {
+            $io->writeln(
+                sprintf(
+                    '⚠️  <warning>Using the option "%s" is deprecated. Use "--%s=\<algorithm\>" instead.</warning>',
+                    self::CHECK_OPTION,
+                    self::CHECKSUM_ALGORITHM_OPTION,
+                ),
+            );
+
+            return $checksumAlgorithm;
+        }
+
+        return $io->getOption(self::CHECKSUM_ALGORITHM_OPTION)->asNullableNonEmptyString() ?? self::DEFAULT_CHECKSUM_ALGO;
+    }
+
+    private function renderContentsDiff(PharDiff $diff, DiffMode $diffMode, string $checksumAlgorithm, IO $io): void
     {
         $io->comment(
             sprintf(
@@ -229,15 +272,7 @@ final class Diff implements Command
             ),
         );
 
-        $checkSumAlgorithm = $io->getOption(self::CHECK_OPTION)->asNullableNonEmptyString() ?? self::DEFAULT_CHECKSUM_ALGO;
-
-        if ($io->hasOption('-c') || $io->hasOption('--check')) {
-            $diff->listChecksums($checkSumAlgorithm);
-
-            return;
-        }
-
-        $diffResult = $diff->diff($diffMode);
+        $diffResult = $diff->diff($diffMode, $checksumAlgorithm);
 
         if (null === $diffResult || [[], []] === $diffResult) {
             $io->writeln('No difference could be observed with this mode.');

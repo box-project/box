@@ -69,10 +69,16 @@ final class PharDiff
     /**
      * @return null|string|array{string[], string[]}
      */
-    public function diff(DiffMode $mode): null|string|array
+    public function diff(DiffMode $mode, string $checksumAlgorithm): null|string|array
     {
         if (DiffMode::FILE_NAME === $mode) {
             return $this->listDiff();
+        }
+
+        if (DiffMode::CHECKSUM === $mode) {
+            $this->listChecksums($checksumAlgorithm);
+
+            return null;
         }
 
         return self::getDiff(
