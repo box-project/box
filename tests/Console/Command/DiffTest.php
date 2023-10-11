@@ -26,8 +26,8 @@ use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Symfony\Component\Console\Output\OutputInterface;
 use function array_splice;
 use function ob_get_clean;
-use function ob_start;
-use function realpath;
+use function Safe\ob_start;
+use function Safe\realpath;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Diff
