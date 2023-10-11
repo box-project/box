@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
-use Fidry\Console\DisplayNormalizer;
 use Fidry\Console\ExitCode;
 use InvalidArgumentException;
 use KevinGH\Box\Phar\DiffMode;
@@ -25,8 +24,6 @@ use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Symfony\Component\Console\Output\OutputInterface;
 use function array_splice;
-use function ob_get_clean;
-use function Safe\ob_start;
 use function Safe\realpath;
 
 /**
