@@ -61,6 +61,11 @@ final class PharDiff
         return $this->pharInfoB;
     }
 
+    public function equals(): bool
+    {
+        return $this->pharInfoA->equals($this->pharInfoB);
+    }
+
     /**
      * @return null|string|array{string[], string[]}
      */

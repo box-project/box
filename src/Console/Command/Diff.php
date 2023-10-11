@@ -22,6 +22,8 @@ use KevinGH\Box\Console\PharInfoRenderer;
 use KevinGH\Box\Phar\DiffMode;
 use KevinGH\Box\Phar\PharDiff;
 use KevinGH\Box\Phar\PharInfo;
+use SebastianBergmann\Diff\Differ;
+use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -119,17 +121,18 @@ final class Diff implements Command
 
         $io->comment('<info>Comparing the two archives...</info>');
 
-        $pharInfoA = $diff->getPharInfoA();
-        $pharInfoB = $diff->getPharInfoB();
-
-        if ($pharInfoA->equals($pharInfoB)) {
+        if ($diff->equals()) {
             $io->success('The two archives are identical.');
 
             return ExitCode::SUCCESS;
         }
 
-        $this->compareArchives($diff, $io);
-        $this->compareContents($diff, $diffMode, $io);
+        self::renderSummary($diff->getPharInfoA(), $io);
+        $io->newLine();
+        self::renderSummary($diff->getPharInfoB(), $io);
+
+        $this->renderArchivesDiff($diff, $io);
+        $this->renderContentsDiff($diff, $diffMode, $io);
 
         return ExitCode::FAILURE;
     }
@@ -152,24 +155,25 @@ final class Diff implements Command
         );
     }
 
-    private function compareArchives(PharDiff $diff, IO $io): void
+    private function renderArchivesDiff(PharDiff $diff, IO $io): void
     {
-        $pharInfoA = $diff->getPharInfoA();
-        $pharInfoB = $diff->getPharInfoB();
-
-        self::renderArchive(
-            $diff->getPharInfoA()->getFileName(),
-            $pharInfoA,
-            $io,
+        $differ = new Differ(
+            new UnifiedDiffOutputBuilder("\n--- PHAR A\n+++ PHAR B\n"),
         );
 
-        $io->newLine();
+        $pharA = self::getShortSummary($diff->getPharInfoA(), $io);
+        $pharB = self::getShortSummary($diff->getPharInfoB(), $io);
 
-        self::renderArchive(
-            $diff->getPharInfoB()->getFileName(),
-            $pharInfoB,
-            $io,
+        if ($pharA === $pharB) {
+            return;
+        }
+
+        $result = $differ->diff(
+            $pharA,
+            $pharB,
         );
+
+        $io->writeln($result);
     }
 
     private static function getDiffMode(IO $io): DiffMode
@@ -216,9 +220,14 @@ final class Diff implements Command
         return DiffMode::from($io->getOption(self::DIFF_OPTION)->asNonEmptyString());
     }
 
-    private function compareContents(PharDiff $diff, DiffMode $diffMode, IO $io): void
+    private function renderContentsDiff(PharDiff $diff, DiffMode $diffMode, IO $io): void
     {
-        $io->comment('<info>Comparing the two archives contents...</info>');
+        $io->comment(
+            sprintf(
+                '<info>Comparing the two archives contents (%s diff)...</info>',
+                $diffMode->value,
+            ),
+        );
 
         $checkSumAlgorithm = $io->getOption(self::CHECK_OPTION)->asNullableNonEmptyString() ?? self::DEFAULT_CHECKSUM_ALGO;
 
@@ -231,7 +240,7 @@ final class Diff implements Command
         $diffResult = $diff->diff($diffMode);
 
         if (null === $diffResult || [[], []] === $diffResult) {
-            $io->success('The contents are identical');
+            $io->writeln('No difference could be observed with this mode.');
 
             return;
         }
@@ -259,10 +268,12 @@ final class Diff implements Command
         self::renderPaths('-', $diff->getPharInfoA(), $diffResult[0], $io);
         self::renderPaths('+', $diff->getPharInfoB(), $diffResult[1], $io);
 
-        $io->error(sprintf(
-            '%d file(s) difference',
-            count($diffResult[0]) + count($diffResult[1]),
-        ));
+        $io->error(
+            sprintf(
+                '%d file(s) difference',
+                count($diffResult[0]) + count($diffResult[1]),
+            ),
+        );
     }
 
     /**
@@ -294,19 +305,39 @@ final class Diff implements Command
         $io->writeln($lines);
     }
 
-    private static function renderArchive(string $fileName, PharInfo $pharInfo, IO $io): void
+    private static function renderSummary(PharInfo $pharInfo, IO $io): void
     {
         $io->writeln(
             sprintf(
                 '<comment>Archive: </comment><fg=cyan;options=bold>%s</>',
-                $fileName,
+                $pharInfo->getFileName(),
             ),
         );
 
+        self::renderShortSummary($pharInfo, $io);
+    }
+
+    private static function getShortSummary(PharInfo $pharInfo, IO $io): string
+    {
+        $output = new BufferedOutput(
+            $io->getVerbosity(),
+            $io->isDecorated(),
+            $io->getOutput()->getFormatter(),
+        );
+
+        self::renderShortSummary(
+            $pharInfo,
+            $io->withOutput($output),
+        );
+
+        return $output->fetch();
+    }
+
+    private static function renderShortSummary(PharInfo $pharInfo, IO $io): void
+    {
         PharInfoRenderer::renderCompression($pharInfo, $io);
         PharInfoRenderer::renderSignature($pharInfo, $io);
         PharInfoRenderer::renderMetadata($pharInfo, $io);
         PharInfoRenderer::renderContentsSummary($pharInfo, $io);
-        // TODO: checksum
     }
 }
