@@ -356,8 +356,8 @@ final class Diff implements Command
     {
         $output = new BufferedOutput(
             $io->getVerbosity(),
-            $io->isDecorated(),
-            $io->getOutput()->getFormatter(),
+            false,
+            clone $io->getOutput()->getFormatter(),
         );
 
         self::renderShortSummary(

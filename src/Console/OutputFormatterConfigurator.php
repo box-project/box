@@ -45,5 +45,13 @@ final class OutputFormatterConfigurator
             'warning',
             new OutputFormatterStyle('white', 'red'),
         );
+        $outputFormatter->setStyle(
+            'diff-expected',
+            new OutputFormatterStyle('green'),
+        );
+        $outputFormatter->setStyle(
+            'diff-actual',
+            new OutputFormatterStyle('red'),
+        );
     }
 }
