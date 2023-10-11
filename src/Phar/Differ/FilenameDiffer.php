@@ -17,13 +17,13 @@ namespace KevinGH\Box\Phar\Differ;
 use Fidry\Console\Input\IO;
 use KevinGH\Box\Console\PharInfoRenderer;
 use KevinGH\Box\Phar\PharInfo;
-use KevinGH\Box\Pharaoh\PharDiff as ParagoniePharDiff;
 use SplFileInfo;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Finder\Finder;
 use function array_diff;
 use function array_map;
 use function array_sum;
+use function count;
 use function explode;
 use function iterator_to_array;
 use function sprintf;
@@ -36,9 +36,6 @@ final class FilenameDiffer implements Differ
         PharInfo $pharInfoB,
         IO $io,
     ): void {
-        $paragonieDiff = new ParagoniePharDiff($pharInfoA, $pharInfoB);
-        $paragonieDiff->setVerbose(true);
-
         $pharAFiles = self::collectFiles($pharInfoA);
         $pharBFiles = self::collectFiles($pharInfoB);
 
@@ -46,8 +43,9 @@ final class FilenameDiffer implements Differ
             array_diff($pharAFiles, $pharBFiles),
             array_diff($pharBFiles, $pharAFiles),
         ];
+        $diffCount = array_sum(array_map('count', $diffResult));
 
-        if (0 === array_sum(array_map('count', $diffResult))) {
+        if (0 === $diffCount) {
             $io->writeln(Differ::NO_DIFF_MESSAGE);
 
             return;
@@ -56,15 +54,21 @@ final class FilenameDiffer implements Differ
         self::printDiff(
             $pharInfoA,
             $pharInfoB,
-            $diffResult,
+            $diffResult[0],
+            $diffResult[1],
             $io,
         );
     }
 
+    /**
+     * @param list<non-empty-string> $filesInANotInB
+     * @param list<non-empty-string> $filesInBNotInA
+     */
     private static function printDiff(
         PharInfo $pharInfoA,
         PharInfo $pharInfoB,
-        array $diffResult,
+        array $filesInANotInB,
+        array $filesInBNotInA,
         IO $io,
     ): void {
         $io->writeln(sprintf(
@@ -80,15 +84,14 @@ final class FilenameDiffer implements Differ
 
         $io->newLine();
 
-        self::renderPaths('-', $pharInfoA, $diffResult[0], $io);
-        self::renderPaths('+', $pharInfoB, $diffResult[1], $io);
-
-        $diffCount = array_sum(array_map('count', $diffResult));
+        self::renderPaths('-', $pharInfoA, $filesInANotInB, $io);
+        $io->newLine();
+        self::renderPaths('+', $pharInfoB, $filesInBNotInA, $io);
 
         $io->error(
             sprintf(
                 '%d file(s) difference',
-                $diffCount,
+                count($filesInANotInB) + count($filesInBNotInA),
             ),
         );
     }
@@ -119,7 +122,7 @@ final class FilenameDiffer implements Differ
             ),
         );
 
-        $io->writeln($lines);
+        $io->write($lines);
     }
 
     /**

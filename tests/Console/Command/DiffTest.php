@@ -458,7 +458,6 @@ class DiffTest extends CommandTestCase
                 +++ Files present in "simple-phar-bar.phar" but not in "simple-phar-foo.phar"
 
                 - foo.php [NONE] - 29.00B
-
                 + bar.php [NONE] - 29.00B
 
                  [ERROR] 2 file(s) difference
