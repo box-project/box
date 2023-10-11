@@ -419,7 +419,21 @@ class DiffTest extends CommandTestCase
 
                  // Comparing the two archives... (do not check the signatures)
 
-                 [OK] The two archives are identical
+                Archive: simple-phar-foo.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 311080EF8E479CE18D866B744B7D467880BFBF57
+                Metadata: None
+                Contents: 1 file (6.64KB)
+
+                Archive: simple-phar-bar.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                Metadata: None
+                Contents: 1 file (6.64KB)
 
                  // Comparing the two archives contents...
 
@@ -434,7 +448,7 @@ class DiffTest extends CommandTestCase
 
 
                 OUTPUT,
-            1,
+            2,
         ];
 
         yield 'same files different content' => [
@@ -444,7 +458,21 @@ class DiffTest extends CommandTestCase
 
                  // Comparing the two archives... (do not check the signatures)
 
-                 [OK] The two archives are identical
+                Archive: simple-phar-bar.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                Metadata: None
+                Contents: 1 file (6.64KB)
+
+                Archive: simple-phar-baz.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 122A636B8BB0348C9514833D70281EF6306A5BF5
+                Metadata: None
+                Contents: 1 file (6.61KB)
 
                  // Comparing the two archives contents...
 
@@ -452,7 +480,7 @@ class DiffTest extends CommandTestCase
 
 
                 OUTPUT,
-            ExitCode::SUCCESS,
+            ExitCode::FAILURE,
         ];
     }
 
@@ -467,7 +495,21 @@ class DiffTest extends CommandTestCase
 
                  // Comparing the two archives... (do not check the signatures)
 
-                 [OK] The two archives are identical
+                Archive: simple-phar-foo.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 311080EF8E479CE18D866B744B7D467880BFBF57
+                Metadata: None
+                Contents: 1 file (6.64KB)
+
+                Archive: simple-phar-bar.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                Metadata: None
+                Contents: 1 file (6.64KB)
 
                  // Comparing the two archives contents...
 
@@ -487,7 +529,21 @@ class DiffTest extends CommandTestCase
 
                  // Comparing the two archives... (do not check the signatures)
 
-                 [OK] The two archives are identical
+                Archive: simple-phar-bar.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                Metadata: None
+                Contents: 1 file (6.64KB)
+
+                Archive: simple-phar-baz.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 122A636B8BB0348C9514833D70281EF6306A5BF5
+                Metadata: None
+                Contents: 1 file (6.61KB)
 
                  // Comparing the two archives contents...
 
@@ -502,7 +558,7 @@ class DiffTest extends CommandTestCase
                 +echo 'Hello world!';
 
                 OUTPUT,
-            1,
+            ExitCode::FAILURE,
         ];
     }
 
@@ -517,7 +573,21 @@ class DiffTest extends CommandTestCase
 
                  // Comparing the two archives... (do not check the signatures)
 
-                 [OK] The two archives are identical
+                Archive: simple-phar-foo.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 311080EF8E479CE18D866B744B7D467880BFBF57
+                Metadata: None
+                Contents: 1 file (6.64KB)
+
+                Archive: simple-phar-bar.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                Metadata: None
+                Contents: 1 file (6.64KB)
 
                  // Comparing the two archives contents...
 
@@ -525,7 +595,7 @@ class DiffTest extends CommandTestCase
                 Only in simple-phar-foo.phar: foo.php
 
                 OUTPUT,
-            1,
+            2,
         ];
 
         yield 'same files different content' => [
@@ -536,7 +606,21 @@ class DiffTest extends CommandTestCase
 
                      // Comparing the two archives... (do not check the signatures)
 
-                     [OK] The two archives are identical
+                    Archive: simple-phar-bar.phar
+                    Archive Compression: None
+                    Files Compression: None
+                    Signature: SHA-1
+                    Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                    Metadata: None
+                    Contents: 1 file (6.64KB)
+
+                    Archive: simple-phar-baz.phar
+                    Archive Compression: None
+                    Files Compression: None
+                    Signature: SHA-1
+                    Signature Hash: 122A636B8BB0348C9514833D70281EF6306A5BF5
+                    Metadata: None
+                    Contents: 1 file (6.61KB)
 
                      // Comparing the two archives contents...
 
@@ -562,7 +646,7 @@ class DiffTest extends CommandTestCase
                     > echo 'Hello world!';
 
                     OUTPUT,
-            1,
+            2,
         ];
     }
 }
