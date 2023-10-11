@@ -334,7 +334,7 @@ class DiffTest extends CommandTestCase
         }
     }
 
-    private static function commonDiffPharsProvider(): iterable
+    private static function commonDiffPharsProvider(DiffMode $diffMode): iterable
     {
         yield 'same PHAR' => [
             self::FIXTURES_DIR.'/simple-phar-foo.phar',
@@ -353,39 +353,54 @@ class DiffTest extends CommandTestCase
         yield 'different data; same content' => [
             self::FIXTURES_DIR.'/simple-phar-bar.phar',
             self::FIXTURES_DIR.'/simple-phar-bar-compressed.phar',
-            <<<'OUTPUT'
+            sprintf(
+                <<<'OUTPUT'
 
-                 // Comparing the two archives...
+                     // Comparing the two archives...
 
-                Archive: simple-phar-bar.phar
-                Archive Compression: None
-                Files Compression: None
-                Signature: SHA-1
-                Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
-                Metadata: None
-                Contents: 1 file (6.64KB)
+                    Archive: simple-phar-bar.phar
+                    Archive Compression: None
+                    Files Compression: None
+                    Signature: SHA-1
+                    Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                    Metadata: None
+                    Contents: 1 file (6.64KB)
 
-                Archive: simple-phar-bar-compressed.phar
-                Archive Compression: None
-                Files Compression: GZ
-                Signature: SHA-1
-                Signature Hash: 3A388D86C91C36659A043D52C2DEB64E8848DD1A
-                Metadata: None
-                Contents: 1 file (6.65KB)
+                    Archive: simple-phar-bar-compressed.phar
+                    Archive Compression: None
+                    Files Compression: GZ
+                    Signature: SHA-1
+                    Signature Hash: 3A388D86C91C36659A043D52C2DEB64E8848DD1A
+                    Metadata: None
+                    Contents: 1 file (6.65KB)
 
-                 // Comparing the two archives contents...
+                    --- PHAR A
+                    +++ PHAR B
+                    @@ @@
+                     Archive Compression: None
+                    -Files Compression: None
+                    +Files Compression: GZ
+                     Signature: SHA-1
+                    -Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                    +Signature Hash: 3A388D86C91C36659A043D52C2DEB64E8848DD1A
+                     Metadata: None
+                    -Contents: 1 file (6.64KB)
+                    +Contents: 1 file (6.65KB)
 
-                 [OK] The contents are identical
+                     // Comparing the two archives contents (%s diff)...
 
+                    No difference could be observed with this mode.
 
-                OUTPUT,
+                    OUTPUT,
+                $diffMode->value,
+            ),
             ExitCode::FAILURE,
         ];
     }
 
     private static function listDiffPharsProvider(): iterable
     {
-        yield from self::commonDiffPharsProvider();
+        yield from self::commonDiffPharsProvider(DiffMode::LIST);
 
         yield 'different files' => [
             self::FIXTURES_DIR.'/simple-phar-foo.phar',
@@ -410,7 +425,18 @@ class DiffTest extends CommandTestCase
                 Metadata: None
                 Contents: 1 file (6.64KB)
 
-                 // Comparing the two archives contents...
+                --- PHAR A
+                +++ PHAR B
+                @@ @@
+                 Archive Compression: None
+                 Files Compression: None
+                 Signature: SHA-1
+                -Signature Hash: 311080EF8E479CE18D866B744B7D467880BFBF57
+                +Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                 Metadata: None
+                 Contents: 1 file (6.64KB)
+
+                 // Comparing the two archives contents (list diff)...
 
                 --- Files present in "simple-phar-foo.phar" but not in "simple-phar-bar.phar"
                 +++ Files present in "simple-phar-bar.phar" but not in "simple-phar-foo.phar"
@@ -449,10 +475,21 @@ class DiffTest extends CommandTestCase
                 Metadata: None
                 Contents: 1 file (6.61KB)
 
-                 // Comparing the two archives contents...
+                --- PHAR A
+                +++ PHAR B
+                @@ @@
+                 Archive Compression: None
+                 Files Compression: None
+                 Signature: SHA-1
+                -Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                +Signature Hash: 122A636B8BB0348C9514833D70281EF6306A5BF5
+                 Metadata: None
+                -Contents: 1 file (6.64KB)
+                +Contents: 1 file (6.61KB)
 
-                 [OK] The contents are identical
+                 // Comparing the two archives contents (list diff)...
 
+                No difference could be observed with this mode.
 
                 OUTPUT,
             ExitCode::FAILURE,
@@ -461,7 +498,7 @@ class DiffTest extends CommandTestCase
 
     public static function gitDiffPharsProvider(): iterable
     {
-        yield from self::commonDiffPharsProvider();
+        yield from self::commonDiffPharsProvider(DiffMode::GIT);
 
         yield 'different files' => [
             self::FIXTURES_DIR.'/simple-phar-foo.phar',
@@ -539,7 +576,7 @@ class DiffTest extends CommandTestCase
 
     public static function GNUDiffPharsProvider(): iterable
     {
-        yield from self::commonDiffPharsProvider();
+        yield from self::commonDiffPharsProvider(DiffMode::GNU);
 
         yield 'different files' => [
             self::FIXTURES_DIR.'/simple-phar-foo.phar',
@@ -564,7 +601,18 @@ class DiffTest extends CommandTestCase
                 Metadata: None
                 Contents: 1 file (6.64KB)
 
-                 // Comparing the two archives contents...
+                --- PHAR A
+                +++ PHAR B
+                @@ @@
+                 Archive Compression: None
+                 Files Compression: None
+                 Signature: SHA-1
+                -Signature Hash: 311080EF8E479CE18D866B744B7D467880BFBF57
+                +Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                 Metadata: None
+                 Contents: 1 file (6.64KB)
+
+                 // Comparing the two archives contents (gnu diff)...
 
                 Only in simple-phar-bar.phar: bar.php
                 Only in simple-phar-foo.phar: foo.php
@@ -597,7 +645,19 @@ class DiffTest extends CommandTestCase
                     Metadata: None
                     Contents: 1 file (6.61KB)
 
-                     // Comparing the two archives contents...
+                    --- PHAR A
+                    +++ PHAR B
+                    @@ @@
+                     Archive Compression: None
+                     Files Compression: None
+                     Signature: SHA-1
+                    -Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                    +Signature Hash: 122A636B8BB0348C9514833D70281EF6306A5BF5
+                     Metadata: None
+                    -Contents: 1 file (6.64KB)
+                    +Contents: 1 file (6.61KB)
+
+                     // Comparing the two archives contents (gnu diff)...
 
                     diff --exclude=.phar_meta.json simple-phar-bar.phar/bar.php simple-phar-baz.phar/bar.php
                     3c3
@@ -610,9 +670,35 @@ class DiffTest extends CommandTestCase
 
                      // Comparing the two archives...
 
-                     [OK] The two archives are identical
+                    Archive: simple-phar-bar.phar
+                    Archive Compression: None
+                    Files Compression: None
+                    Signature: SHA-1
+                    Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                    Metadata: None
+                    Contents: 1 file (6.64KB)
 
-                     // Comparing the two archives contents...
+                    Archive: simple-phar-baz.phar
+                    Archive Compression: None
+                    Files Compression: None
+                    Signature: SHA-1
+                    Signature Hash: 122A636B8BB0348C9514833D70281EF6306A5BF5
+                    Metadata: None
+                    Contents: 1 file (6.61KB)
+
+                    --- PHAR A
+                    +++ PHAR B
+                    @@ @@
+                     Archive Compression: None
+                     Files Compression: None
+                     Signature: SHA-1
+                    -Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                    +Signature Hash: 122A636B8BB0348C9514833D70281EF6306A5BF5
+                     Metadata: None
+                    -Contents: 1 file (6.64KB)
+                    +Contents: 1 file (6.61KB)
+
+                     // Comparing the two archives contents (gnu diff)...
 
                     diff '--exclude=.phar_meta.json' simple-phar-bar.phar/bar.php simple-phar-baz.phar/bar.php
                     3c3

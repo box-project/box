@@ -35,6 +35,7 @@
         "phpdocumentor/reflection-docblock": "^5.3",
         "phpdocumentor/type-resolver": "^1.7",
         "psr/log": "^3.0",
+        "sebastian/diff": "^4.0",
         "seld/jsonlint": "^1.9",
         "symfony/console": "^6.1.7",
         "symfony/filesystem": "^6.1.5",
