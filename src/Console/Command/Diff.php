@@ -30,12 +30,8 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 use function array_map;
-use function count;
-use function explode;
 use function implode;
-use function is_string;
 use function sprintf;
-use const PHP_EOL;
 
 /**
  * @private
@@ -272,72 +268,7 @@ final class Diff implements Command
             ),
         );
 
-        $diffResult = $diff->diff($diffMode, $checksumAlgorithm);
-
-        if (null === $diffResult || [[], []] === $diffResult) {
-            $io->writeln('No difference could be observed with this mode.');
-
-            return;
-        }
-
-        if (is_string($diffResult)) {
-            // Git or GNU diff: we don't have much control on the format
-            $io->writeln($diffResult);
-
-            return;
-        }
-
-        $io->writeln(sprintf(
-            '--- Files present in "%s" but not in "%s"',
-            $diff->getPharInfoA()->getFileName(),
-            $diff->getPharInfoB()->getFileName(),
-        ));
-        $io->writeln(sprintf(
-            '+++ Files present in "%s" but not in "%s"',
-            $diff->getPharInfoB()->getFileName(),
-            $diff->getPharInfoA()->getFileName(),
-        ));
-
-        $io->newLine();
-
-        self::renderPaths('-', $diff->getPharInfoA(), $diffResult[0], $io);
-        self::renderPaths('+', $diff->getPharInfoB(), $diffResult[1], $io);
-
-        $io->error(
-            sprintf(
-                '%d file(s) difference',
-                count($diffResult[0]) + count($diffResult[1]),
-            ),
-        );
-    }
-
-    /**
-     * @param list<non-empty-string> $paths
-     */
-    private static function renderPaths(string $symbol, PharInfo $pharInfo, array $paths, IO $io): void
-    {
-        $bufferedOutput = new BufferedOutput(
-            $io->getVerbosity(),
-            $io->isDecorated(),
-            $io->getOutput()->getFormatter(),
-        );
-
-        PharInfoRenderer::renderContent(
-            $bufferedOutput,
-            $pharInfo,
-            false,
-            false,
-        );
-
-        $lines = array_map(
-            static fn (string $line) => '' === $line ? '' : $symbol.' '.$line,
-            explode(
-                PHP_EOL,
-                $bufferedOutput->fetch(),
-            ),
-        );
-
-        $io->writeln($lines);
+        $diff->diff($diffMode, $checksumAlgorithm, $io);
     }
 
     private static function renderSummary(PharInfo $pharInfo, IO $io): void
