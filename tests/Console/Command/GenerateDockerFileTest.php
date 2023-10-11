@@ -18,7 +18,7 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
-use function Safe\realpath
+use function Safe\realpath;
 
 /**
  * @covers \KevinGH\Box\Console\Command\GenerateDockerFile

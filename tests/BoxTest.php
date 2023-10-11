@@ -48,7 +48,7 @@ use function file_get_contents;
 use function implode;
 use function in_array;
 use function iterator_to_array;
-use function Safe\realpath
+use function Safe\realpath;
 use function sprintf;
 use function str_replace;
 use function trim;
