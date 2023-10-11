@@ -26,6 +26,9 @@ use function iterator_to_array;
 use function str_replace;
 use const DIRECTORY_SEPARATOR;
 
+/**
+ * @internal
+ */
 final class PharDiff
 {
     private readonly ParagoniePharDiff $diff;
@@ -58,22 +61,28 @@ final class PharDiff
         return $this->pharInfoB;
     }
 
-    public function gitDiff(): ?string
+    /**
+     * @return null|string|array{string[], string[]}
+     */
+    public function diff(DiffMode $mode): null|string|array
     {
+        if (DiffMode::LIST === $mode) {
+            return $this->listDiff();
+        }
+
         return self::getDiff(
             $this->pharInfoA,
             $this->pharInfoB,
-            'git diff --no-index',
+            self::getModeCommand($mode),
         );
     }
 
-    public function gnuDiff(): ?string
+    private static function getModeCommand(DiffMode $mode): string
     {
-        return self::getDiff(
-            $this->pharInfoA,
-            $this->pharInfoB,
-            'diff --exclude='.Extract::PHAR_META_PATH,
-        );
+        return match ($mode) {
+            DiffMode::GIT => 'git diff --no-index',
+            DiffMode::GNU => 'diff --exclude='.Extract::PHAR_META_PATH,
+        };
     }
 
     /**
@@ -89,7 +98,7 @@ final class PharDiff
      *                    which are not in the second and the second array all the files present in the second PHAR but
      *                    not the first one.
      */
-    public function listDiff(): array
+    private function listDiff(): array
     {
         $pharAFiles = self::collectFiles($this->pharInfoA);
         $pharBFiles = self::collectFiles($this->pharInfoB);
