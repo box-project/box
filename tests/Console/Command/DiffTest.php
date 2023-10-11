@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
-use Fidry\Console\DisplayNormalizer;
 use Fidry\Console\ExitCode;
 use InvalidArgumentException;
 use KevinGH\Box\Phar\DiffMode;
@@ -25,8 +24,6 @@ use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Symfony\Component\Console\Output\OutputInterface;
 use function array_splice;
-use function ob_get_clean;
-use function Safe\ob_start;
 use function Safe\realpath;
 
 /**
@@ -63,10 +60,6 @@ class DiffTest extends CommandTestCase
         ?string $expectedOutput,
         int $expectedStatusCode,
     ): void {
-        if (DiffMode::GIT === $diffMode) {
-            self::markTestSkipped('TODO');
-        }
-
         $command = [
             'command' => 'diff',
             'pharA' => realpath($pharAPath),
@@ -125,7 +118,6 @@ class DiffTest extends CommandTestCase
      */
     public function test_it_can_display_the_git_diff_of_two_phar_files(): void
     {
-        self::markTestSkipped('TODO');
         $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar');
 
         $this->commandTester->execute(
@@ -138,7 +130,7 @@ class DiffTest extends CommandTestCase
         );
 
         $expectedOutput = <<<'OUTPUT'
-            ⚠️  <warning>Using the option "list-diff" is deprecated. Use "--diff=file-name" instead.</warning>
+            ⚠️  <warning>Using the option "git-diff" is deprecated. Use "--diff=git" instead.</warning>
 
              // Comparing the two archives...
 
@@ -180,54 +172,6 @@ class DiffTest extends CommandTestCase
             $expectedOutput,
             ExitCode::SUCCESS,
         );
-    }
-
-    public function test_it_can_check_the_sum_of_two_phar_files(): void
-    {
-        self::markTestSkipped('TODO');
-        (function (): void {
-            $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar');
-
-            ob_start();
-            $this->commandTester->execute(
-                [
-                    'command' => 'diff',
-                    'pharA' => $pharPath,
-                    'pharB' => $pharPath,
-                    '--check' => null,
-                ],
-            );
-            $actual = DisplayNormalizer::removeTrailingSpaces(ob_get_clean());
-
-            $expected = <<<'OUTPUT'
-                No differences encountered.
-
-                OUTPUT;
-
-            $this->assertSame($expected, $actual);
-            $this->assertSame(0, $this->commandTester->getStatusCode());
-        })();
-
-        (function (): void {
-            ob_start();
-            $this->commandTester->execute(
-                [
-                    'command' => 'diff',
-                    'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
-                    'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-                    '--check' => null,
-                ],
-            );
-            $actual = DisplayNormalizer::removeTrailingSpaces(ob_get_clean());
-
-            $expected = <<<'OUTPUT'
-                No differences encountered.
-
-                OUTPUT;
-
-            $this->assertSame($expected, $actual);
-            $this->assertSame(0, $this->commandTester->getStatusCode());
-        })();
     }
 
     public function test_it_cannot_compare_non_existent_files(): void
@@ -538,7 +482,18 @@ class DiffTest extends CommandTestCase
                 Metadata: None
                 Contents: 1 file (6.64KB)
 
-                 // Comparing the two archives contents...
+                <diff-expected>--- PHAR A</diff-expected>
+                <diff-actual>+++ PHAR B</diff-actual>
+                @@ @@
+                 Archive Compression: None
+                 Files Compression: None
+                 Signature: SHA-1
+                <diff-expected>-Signature Hash: 311080EF8E479CE18D866B744B7D467880BFBF57</diff-expected>
+                <diff-actual>+Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51</diff-actual>
+                 Metadata: None
+                 Contents: 1 file (6.64KB)
+
+                 // Comparing the two archives contents (git diff)...
 
                 diff --git asimple-phar-foo.phar/foo.php bsimple-phar-bar.phar/bar.php
                 similarity index 100%
@@ -546,7 +501,7 @@ class DiffTest extends CommandTestCase
                 rename to simple-phar-bar.phar/bar.php
 
                 OUTPUT,
-            3,
+            ExitCode::FAILURE,
         ];
 
         yield 'same files different content' => [
@@ -572,7 +527,19 @@ class DiffTest extends CommandTestCase
                 Metadata: None
                 Contents: 1 file (6.61KB)
 
-                 // Comparing the two archives contents...
+                <diff-expected>--- PHAR A</diff-expected>
+                <diff-actual>+++ PHAR B</diff-actual>
+                @@ @@
+                 Archive Compression: None
+                 Files Compression: None
+                 Signature: SHA-1
+                <diff-expected>-Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51</diff-expected>
+                <diff-actual>+Signature Hash: 122A636B8BB0348C9514833D70281EF6306A5BF5</diff-actual>
+                 Metadata: None
+                <diff-expected>-Contents: 1 file (6.64KB)</diff-expected>
+                <diff-actual>+Contents: 1 file (6.61KB)</diff-actual>
+
+                 // Comparing the two archives contents (git diff)...
 
                 diff --git asimple-phar-bar.phar/bar.php bsimple-phar-baz.phar/bar.php
                 index 290849f..8aac305 100644
