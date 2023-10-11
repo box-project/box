@@ -63,7 +63,7 @@ class DiffTest extends CommandTestCase
         int $expectedStatusCode,
     ): void {
         if (DiffMode::GIT === $diffMode) {
-            $this->markTestSkipped('TODO');
+            self::markTestSkipped('TODO');
         }
 
         $this->commandTester->execute(
@@ -102,19 +102,19 @@ class DiffTest extends CommandTestCase
         );
 
         $expectedOutput = <<<'OUTPUT'
-        
-         // Comparing the two archives... (do not check the signatures)
-        
-         [OK] The two archives are identical
-        
-         // Comparing the two archives contents...
-        
-        ⚠️  <warning>Using the option "list-diff" is deprecated. Use "--diff=list" instead.</warning>
-        
-         [OK] The contents are identical
-        
-        
-        OUTPUT;
+
+             // Comparing the two archives... (do not check the signatures)
+
+             [OK] The two archives are identical
+
+             // Comparing the two archives contents...
+
+            ⚠️  <warning>Using the option "list-diff" is deprecated. Use "--diff=list" instead.</warning>
+
+             [OK] The contents are identical
+
+
+            OUTPUT;
 
         $this->assertSameOutput(
             $expectedOutput,
@@ -127,7 +127,7 @@ class DiffTest extends CommandTestCase
      */
     public function test_it_can_display_the_git_diff_of_two_phar_files(): void
     {
-        $this->markTestSkipped('TODO');
+        self::markTestSkipped('TODO');
         $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar');
 
         $this->commandTester->execute(
@@ -140,19 +140,19 @@ class DiffTest extends CommandTestCase
         );
 
         $expectedOutput = <<<'OUTPUT'
-        
-         // Comparing the two archives... (do not check the signatures)
-        
-         [OK] The two archives are identical
-        
-         // Comparing the two archives contents...
-        
-        ⚠️  <warning>Using the option "list-diff" is deprecated. Use "--diff=list" instead.</warning>
-        
-         [OK] The contents are identical
-        
-        
-        OUTPUT;
+
+             // Comparing the two archives... (do not check the signatures)
+
+             [OK] The two archives are identical
+
+             // Comparing the two archives contents...
+
+            ⚠️  <warning>Using the option "list-diff" is deprecated. Use "--diff=list" instead.</warning>
+
+             [OK] The contents are identical
+
+
+            OUTPUT;
 
         $this->assertSameOutput(
             $expectedOutput,
@@ -160,7 +160,8 @@ class DiffTest extends CommandTestCase
         );
     }
 
-    public function test_it_can_display_the_gnu_diff_of_two_phar_files(): void {
+    public function test_it_can_display_the_gnu_diff_of_two_phar_files(): void
+    {
         $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar');
 
         $this->commandTester->execute(
@@ -173,19 +174,19 @@ class DiffTest extends CommandTestCase
         );
 
         $expectedOutput = <<<'OUTPUT'
-        
-         // Comparing the two archives... (do not check the signatures)
-        
-         [OK] The two archives are identical
-        
-         // Comparing the two archives contents...
-        
-        ⚠️  <warning>Using the option "gnu-diff" is deprecated. Use "--diff=gnu" instead.</warning>
-        
-         [OK] The contents are identical
-        
-        
-        OUTPUT;
+
+             // Comparing the two archives... (do not check the signatures)
+
+             [OK] The two archives are identical
+
+             // Comparing the two archives contents...
+
+            ⚠️  <warning>Using the option "gnu-diff" is deprecated. Use "--diff=gnu" instead.</warning>
+
+             [OK] The contents are identical
+
+
+            OUTPUT;
 
         $this->assertSameOutput(
             $expectedOutput,

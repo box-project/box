@@ -16,7 +16,6 @@ namespace KevinGH\Box\Phar;
 
 use KevinGH\Box\Console\Command\Extract;
 use KevinGH\Box\Pharaoh\PharDiff as ParagoniePharDiff;
-use KevinGH\Box\Phar\DiffMode;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
@@ -82,7 +81,7 @@ final class PharDiff
     {
         return match ($mode) {
             DiffMode::GIT => 'git diff --no-index',
-            DiffMode::GNU => 'diff',
+            DiffMode::GNU => 'diff --exclude='.Extract::PHAR_META_PATH,
         };
     }
 
