@@ -100,16 +100,11 @@ class DiffTest extends CommandTestCase
         );
 
         $expectedOutput = <<<'OUTPUT'
-
-             // Comparing the two archives... (do not check the signatures)
-
-             [OK] The two archives are identical
-
-             // Comparing the two archives contents...
-
             ⚠️  <warning>Using the option "list-diff" is deprecated. Use "--diff=list" instead.</warning>
 
-             [OK] The contents are identical
+             // Comparing the two archives...
+
+             [OK] The two archives are identical.
 
 
             OUTPUT;
@@ -138,16 +133,11 @@ class DiffTest extends CommandTestCase
         );
 
         $expectedOutput = <<<'OUTPUT'
-
-             // Comparing the two archives... (do not check the signatures)
-
-             [OK] The two archives are identical
-
-             // Comparing the two archives contents...
-
             ⚠️  <warning>Using the option "list-diff" is deprecated. Use "--diff=list" instead.</warning>
 
-             [OK] The contents are identical
+             // Comparing the two archives...
+
+             [OK] The two archives are identical.
 
 
             OUTPUT;
@@ -172,16 +162,11 @@ class DiffTest extends CommandTestCase
         );
 
         $expectedOutput = <<<'OUTPUT'
-
-             // Comparing the two archives... (do not check the signatures)
-
-             [OK] The two archives are identical
-
-             // Comparing the two archives contents...
-
             ⚠️  <warning>Using the option "gnu-diff" is deprecated. Use "--diff=gnu" instead.</warning>
 
-             [OK] The contents are identical
+             // Comparing the two archives...
+
+             [OK] The two archives are identical.
 
 
             OUTPUT;
@@ -288,13 +273,9 @@ class DiffTest extends CommandTestCase
 
         $expected = <<<'OUTPUT'
 
-             // Comparing the two archives... (do not check the signatures)
+             // Comparing the two archives...
 
-             [OK] The two archives are identical
-
-             // Comparing the two archives contents...
-
-             [OK] The contents are identical
+             [OK] The two archives are identical.
 
 
             OUTPUT;
@@ -360,13 +341,9 @@ class DiffTest extends CommandTestCase
             self::FIXTURES_DIR.'/simple-phar-foo.phar',
             <<<'OUTPUT'
 
-                 // Comparing the two archives... (do not check the signatures)
+                 // Comparing the two archives...
 
-                 [OK] The two archives are identical
-
-                 // Comparing the two archives contents...
-
-                 [OK] The contents are identical
+                 [OK] The two archives are identical.
 
 
                 OUTPUT,
@@ -378,7 +355,7 @@ class DiffTest extends CommandTestCase
             self::FIXTURES_DIR.'/simple-phar-bar-compressed.phar',
             <<<'OUTPUT'
 
-                 // Comparing the two archives... (do not check the signatures)
+                 // Comparing the two archives...
 
                 Archive: simple-phar-bar.phar
                 Archive Compression: None
@@ -402,7 +379,7 @@ class DiffTest extends CommandTestCase
 
 
                 OUTPUT,
-            1,
+            ExitCode::FAILURE,
         ];
     }
 
@@ -415,7 +392,7 @@ class DiffTest extends CommandTestCase
             self::FIXTURES_DIR.'/simple-phar-bar.phar',
             <<<'OUTPUT'
 
-                 // Comparing the two archives... (do not check the signatures)
+                 // Comparing the two archives...
 
                 Archive: simple-phar-foo.phar
                 Archive Compression: None
@@ -446,7 +423,7 @@ class DiffTest extends CommandTestCase
 
 
                 OUTPUT,
-            2,
+            ExitCode::FAILURE,
         ];
 
         yield 'same files different content' => [
@@ -454,7 +431,7 @@ class DiffTest extends CommandTestCase
             self::FIXTURES_DIR.'/simple-phar-baz.phar',
             <<<'OUTPUT'
 
-                 // Comparing the two archives... (do not check the signatures)
+                 // Comparing the two archives...
 
                 Archive: simple-phar-bar.phar
                 Archive Compression: None
@@ -491,7 +468,7 @@ class DiffTest extends CommandTestCase
             self::FIXTURES_DIR.'/simple-phar-bar.phar',
             <<<'OUTPUT'
 
-                 // Comparing the two archives... (do not check the signatures)
+                 // Comparing the two archives...
 
                 Archive: simple-phar-foo.phar
                 Archive Compression: None
@@ -525,7 +502,7 @@ class DiffTest extends CommandTestCase
             self::FIXTURES_DIR.'/simple-phar-baz.phar',
             <<<'OUTPUT'
 
-                 // Comparing the two archives... (do not check the signatures)
+                 // Comparing the two archives...
 
                 Archive: simple-phar-bar.phar
                 Archive Compression: None
@@ -569,7 +546,7 @@ class DiffTest extends CommandTestCase
             self::FIXTURES_DIR.'/simple-phar-bar.phar',
             <<<'OUTPUT'
 
-                 // Comparing the two archives... (do not check the signatures)
+                 // Comparing the two archives...
 
                 Archive: simple-phar-foo.phar
                 Archive Compression: None
@@ -593,7 +570,7 @@ class DiffTest extends CommandTestCase
                 Only in simple-phar-foo.phar: foo.php
 
                 OUTPUT,
-            2,
+            ExitCode::FAILURE,
         ];
 
         yield 'same files different content' => [
@@ -602,7 +579,7 @@ class DiffTest extends CommandTestCase
             Platform::isOSX()
                 ? <<<'OUTPUT'
 
-                     // Comparing the two archives... (do not check the signatures)
+                     // Comparing the two archives...
 
                     Archive: simple-phar-bar.phar
                     Archive Compression: None
@@ -631,7 +608,7 @@ class DiffTest extends CommandTestCase
                     OUTPUT
                 : <<<'OUTPUT'
 
-                     // Comparing the two archives... (do not check the signatures)
+                     // Comparing the two archives...
 
                      [OK] The two archives are identical
 
@@ -644,7 +621,7 @@ class DiffTest extends CommandTestCase
                     > echo 'Hello world!';
 
                     OUTPUT,
-            2,
+            ExitCode::FAILURE,
         ];
     }
 }
