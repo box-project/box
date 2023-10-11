@@ -75,7 +75,7 @@ final class ComposerOrchestrator
         $logger = new CompilerLogger($io ?? IO::createNull());
 
         $composerExecutable = $composerBin ?? self::retrieveComposerExecutable();
-        $getVersionProcess = new Process([$composerExecutable, '--version']);
+        $getVersionProcess = new Process([$composerExecutable, '--version', '--no-ansi']);
 
         $logger->log(
             CompilerLogger::CHEVRON_PREFIX,
