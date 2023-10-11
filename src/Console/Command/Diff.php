@@ -98,7 +98,7 @@ final class Diff implements Command
                             DiffMode::values(),
                         ),
                     ),
-                    DiffMode::FILE_NAME->value,
+                    DiffMode::CHECKSUM->value,
                 ),
                 new InputOption(
                     self::CHECK_OPTION,
