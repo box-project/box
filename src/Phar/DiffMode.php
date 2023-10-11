@@ -18,7 +18,7 @@ use function array_map;
 
 enum DiffMode: string
 {
-    case LIST = 'list';
+    case FILE_NAME = 'file-name';
     case GIT = 'git';
     case GNU = 'gnu';
 

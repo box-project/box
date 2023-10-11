@@ -100,7 +100,7 @@ class DiffTest extends CommandTestCase
         );
 
         $expectedOutput = <<<'OUTPUT'
-            ⚠️  <warning>Using the option "list-diff" is deprecated. Use "--diff=list" instead.</warning>
+            ⚠️  <warning>Using the option "list-diff" is deprecated. Use "--diff=file-name" instead.</warning>
 
              // Comparing the two archives...
 
@@ -133,7 +133,7 @@ class DiffTest extends CommandTestCase
         );
 
         $expectedOutput = <<<'OUTPUT'
-            ⚠️  <warning>Using the option "list-diff" is deprecated. Use "--diff=list" instead.</warning>
+            ⚠️  <warning>Using the option "list-diff" is deprecated. Use "--diff=file-name" instead.</warning>
 
              // Comparing the two archives...
 
@@ -300,15 +300,15 @@ class DiffTest extends CommandTestCase
 
     public static function diffPharsProvider(): iterable
     {
-        foreach (self::listDiffPharsProvider() as $label => $set) {
+        foreach (self::fileNameDiffPharsProvider() as $label => $set) {
             array_splice(
                 $set,
                 2,
                 0,
-                [DiffMode::LIST],
+                [DiffMode::FILE_NAME],
             );
 
-            yield '[list] '.$label => $set;
+            yield '[file-name] '.$label => $set;
         }
 
         foreach (self::gitDiffPharsProvider() as $label => $set) {
@@ -398,9 +398,9 @@ class DiffTest extends CommandTestCase
         ];
     }
 
-    private static function listDiffPharsProvider(): iterable
+    private static function fileNameDiffPharsProvider(): iterable
     {
-        yield from self::commonDiffPharsProvider(DiffMode::LIST);
+        yield from self::commonDiffPharsProvider(DiffMode::FILE_NAME);
 
         yield 'different files' => [
             self::FIXTURES_DIR.'/simple-phar-foo.phar',
@@ -436,7 +436,7 @@ class DiffTest extends CommandTestCase
                  Metadata: None
                  Contents: 1 file (6.64KB)
 
-                 // Comparing the two archives contents (list diff)...
+                 // Comparing the two archives contents (file-name diff)...
 
                 --- Files present in "simple-phar-foo.phar" but not in "simple-phar-bar.phar"
                 +++ Files present in "simple-phar-bar.phar" but not in "simple-phar-foo.phar"
@@ -487,7 +487,7 @@ class DiffTest extends CommandTestCase
                 -Contents: 1 file (6.64KB)
                 +Contents: 1 file (6.61KB)
 
-                 // Comparing the two archives contents (list diff)...
+                 // Comparing the two archives contents (file-name diff)...
 
                 No difference could be observed with this mode.
 

@@ -71,7 +71,7 @@ final class PharDiff
      */
     public function diff(DiffMode $mode): null|string|array
     {
-        if (DiffMode::LIST === $mode) {
+        if (DiffMode::FILE_NAME === $mode) {
             return $this->listDiff();
         }
 

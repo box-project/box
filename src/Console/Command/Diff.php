@@ -101,7 +101,7 @@ final class Diff implements Command
                             DiffMode::values(),
                         ),
                     ),
-                    DiffMode::LIST->value,
+                    DiffMode::FILE_NAME->value,
                 ),
                 new InputOption(
                     self::CHECK_OPTION,
@@ -210,11 +210,11 @@ final class Diff implements Command
                     '⚠️  <warning>Using the option "%s" is deprecated. Use "--%s=%s" instead.</warning>',
                     self::LIST_FILES_DIFF_OPTION,
                     self::DIFF_OPTION,
-                    DiffMode::LIST->value,
+                    DiffMode::FILE_NAME->value,
                 ),
             );
 
-            return DiffMode::LIST;
+            return DiffMode::FILE_NAME;
         }
 
         return DiffMode::from($io->getOption(self::DIFF_OPTION)->asNonEmptyString());
