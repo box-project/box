@@ -196,6 +196,54 @@ final class PharInfoTest extends TestCase
         new PharInfo($file);
     }
 
+    /**
+     * @dataProvider equalProvider
+     */
+    public function test_it_can_test_if_two_phars_are_equal(
+        string $fileA,
+        string $fileB,
+        bool $expected,
+    ): void {
+        $pharInfoA = new PharInfo(realpath($fileA));
+        $pharInfoB = new PharInfo(realpath($fileB));
+
+        $actual = $pharInfoA->equals($pharInfoB);
+
+        self::assertSame($expected, $actual);
+    }
+
+    public static function equalProvider(): iterable
+    {
+        yield 'identical PHARs' => [
+            self::FIXTURES_DIR.'/phar/simple-phar.phar',
+            self::FIXTURES_DIR.'/phar/simple-phar.phar',
+            true,
+        ];
+
+        yield 'identical PHARs with different compression' => [
+            self::FIXTURES_DIR.'/phar/simple-phar.phar',
+            self::FIXTURES_DIR.'/phar/simple-phar.phar.gz',
+            false,
+        ];
+
+        yield 'different files' => [
+            self::FIXTURES_DIR.'/diff/simple-phar-foo.phar',
+            self::FIXTURES_DIR.'/diff/simple-phar-bar.phar',
+            false,
+        ];
+
+        yield 'same files with different content' => [
+            self::FIXTURES_DIR.'/diff/simple-phar-bar.phar',
+            self::FIXTURES_DIR.'/diff/simple-phar-baz.phar',
+            false,
+        ];
+
+        // TODO: missing cases:
+        //   - same PHARs and diff. metadata
+        //   - same PHARs and same total compression file count but not the same files compression
+        //     (to assert the compression comparison is justified instead of using the existing ::getFilesCompressionCount()).
+    }
+
     private static function getStub(string $path): string
     {
         // We trim the last line returns since phpStorm may interfere with the copied file appending it on save.

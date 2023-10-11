@@ -53,6 +53,7 @@ final class PharInfoRenderer
         );
 
         $count = $pharInfo->getFilesCompressionCount();
+        // Rename "none" to "None"
         $count['None'] = $count[CompressionAlgorithm::NONE->name];
         unset($count[CompressionAlgorithm::NONE->name]);
         $count = array_filter($count);
