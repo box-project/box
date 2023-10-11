@@ -21,7 +21,7 @@ use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
 use Symfony\Component\Console\Output\OutputInterface;
-use function realpath;
+use function Safe\realpath
 
 /**
  * @covers \KevinGH\Box\Console\Command\Verify

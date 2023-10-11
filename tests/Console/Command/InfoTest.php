@@ -25,7 +25,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use function extension_loaded;
 use function implode;
 use function preg_replace;
-use function realpath;
+use function Safe\realpath
 
 /**
  * @covers \KevinGH\Box\Console\Command\Info
