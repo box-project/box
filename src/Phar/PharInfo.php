@@ -158,14 +158,36 @@ final class PharInfo
         return $this->fileName;
     }
 
-    /**
-     * @deprecated
-     */
     public function equals(self $pharInfo): bool
     {
         return
-            $pharInfo->getFilesCompressionCount() === $this->getFilesCompressionCount()
-            && $pharInfo->getNormalizedMetadata() === $this->getNormalizedMetadata();
+            $this->contentEquals($pharInfo)
+            && $this->getCompression() === $pharInfo->getCompression()
+            && $this->getNormalizedMetadata() === $pharInfo->getNormalizedMetadata();
+    }
+
+    /**
+     * Checks if the content of the given PHAR equals the current one. Note that by content is meant
+     * the list of files and their content. The files compression or the PHAR metadata are not considered.
+     */
+    private function contentEquals(self $pharInfo): bool
+    {
+        // The signature only checks if the contents are equal (same files, each files same content), but do
+        // not check the compression of the files.
+        // As a result, we also need to check the compression of each file.
+        if ($this->getSignature() != $pharInfo->getSignature()) {
+            return false;
+        }
+
+        foreach ($this->meta->filesMeta as $file => ['compression' => $compressionAlgorithm]) {
+            ['compression' => $otherCompressionAlgorithm] = $this->getFileMeta($file);
+
+            if ($otherCompressionAlgorithm !== $compressionAlgorithm) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function getCompression(): CompressionAlgorithm
