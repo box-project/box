@@ -29,7 +29,6 @@ use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 use function array_map;
 use function count;
-// TODO: migrate to Safe API
 use function explode;
 use function implode;
 use function is_string;
@@ -44,7 +43,6 @@ final class Diff implements Command
     private const FIRST_PHAR_ARG = 'pharA';
     private const SECOND_PHAR_ARG = 'pharB';
 
-    // TODO: replace by DiffMode::X->value once bumping to PHP 8.2 as the min version.
     private const LIST_FILES_DIFF_OPTION = 'list-diff';
     private const GIT_DIFF_OPTION = 'git-diff';
     private const GNU_DIFF_OPTION = 'gnu-diff';
