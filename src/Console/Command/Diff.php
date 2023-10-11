@@ -30,8 +30,10 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 use function array_map;
+use function explode;
 use function implode;
 use function sprintf;
+use function str_starts_with;
 
 /**
  * @private
@@ -164,23 +166,52 @@ final class Diff implements Command
 
     private function renderArchivesDiff(PharDiff $diff, IO $io): void
     {
-        $differ = new Differ(
-            new UnifiedDiffOutputBuilder("\n--- PHAR A\n+++ PHAR B\n"),
-        );
+        $pharASummary = self::getShortSummary($diff->getPharInfoA(), $io);
+        $pharBSummary = self::getShortSummary($diff->getPharInfoB(), $io);
 
-        $pharA = self::getShortSummary($diff->getPharInfoA(), $io);
-        $pharB = self::getShortSummary($diff->getPharInfoB(), $io);
-
-        if ($pharA === $pharB) {
+        if ($pharASummary === $pharBSummary) {
             return;
         }
 
-        $result = $differ->diff(
-            $pharA,
-            $pharB,
+        $io->writeln(
+            self::createColorizedDiff(
+                $pharASummary,
+                $pharBSummary,
+            ),
+        );
+    }
+
+    private static function createColorizedDiff(string $pharASummary, string $pharBSummary): string
+    {
+        $differ = new Differ(
+            new UnifiedDiffOutputBuilder(
+                "\n<diff-expected>--- PHAR A</diff-expected>\n<diff-actual>+++ PHAR B</diff-actual>\n",
+            ),
         );
 
-        $io->writeln($result);
+        $result = $differ->diff(
+            $pharASummary,
+            $pharBSummary,
+        );
+
+        $lines = explode("\n", $result);
+
+        $colorizedLines = array_map(
+            static fn (string $line) => match (true) {
+                str_starts_with($line, '+') => sprintf(
+                    '<diff-actual>%s</diff-actual>',
+                    $line,
+                ),
+                str_starts_with($line, '-') => sprintf(
+                    '<diff-expected>%s</diff-expected>',
+                    $line,
+                ),
+                default => $line,
+            },
+            $lines,
+        );
+
+        return implode("\n", $colorizedLines);
     }
 
     private static function getDiffMode(IO $io): DiffMode
