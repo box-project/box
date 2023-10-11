@@ -19,10 +19,16 @@ use KevinGH\Box\Pharaoh\PharDiff as ParagoniePharDiff;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
+use UnexpectedValueException;
+use ValueError;
 use function array_diff;
+use function array_key_exists;
 use function array_map;
+use function count;
+use function hash_file;
 use function implode;
 use function iterator_to_array;
+use function sprintf;
 use function str_replace;
 use const DIRECTORY_SEPARATOR;
 
@@ -76,9 +82,11 @@ final class PharDiff
         }
 
         if (DiffMode::CHECKSUM === $mode) {
-            $this->listChecksums($checksumAlgorithm);
-
-            return null;
+            return self::getChecksumDiff(
+                $this->pharInfoA,
+                $this->pharInfoB,
+                $checksumAlgorithm,
+            );
         }
 
         return self::getDiff(
@@ -162,12 +170,71 @@ final class PharDiff
         );
     }
 
+    private static function getChecksumDiff(
+        PharInfo $pharInfoA,
+        PharInfo $pharInfoB,
+        string $checksumAlgorithm,
+    ): ?string {
+        $pharInfoAFileHashes = self::getFileHashesByRelativePathname(
+            $pharInfoA,
+            $checksumAlgorithm,
+        );
+        $pharInfoBFileHashes = self::getFileHashesByRelativePathname(
+            $pharInfoB,
+            $checksumAlgorithm,
+        );
+        $output = [
+            '<diff-expected>--- PHAR A</diff-expected>',
+            '<diff-actual>+++ PHAR B</diff-actual>',
+            '@@ @@',
+        ];
+
+        foreach ($pharInfoAFileHashes as $filePath => $fileAHash) {
+            if (!array_key_exists($filePath, $pharInfoBFileHashes)) {
+                $output[] = $filePath;
+                $output[] = sprintf(
+                    "\t<diff-expected>- %s</diff-expected>",
+                    $fileAHash,
+                );
+
+                continue;
+            }
+
+            $fileBHash = $pharInfoBFileHashes[$filePath];
+            unset($pharInfoBFileHashes[$filePath]);
+
+            if ($fileAHash === $fileBHash) {
+                continue;
+            }
+
+            $output[] = $filePath;
+            $output[] = sprintf(
+                "\t<diff-expected>- %s</diff-expected>",
+                $fileAHash,
+            );
+            $output[] = sprintf(
+                "\t<diff-actual>+ %s</diff-actual>",
+                $fileBHash,
+            );
+        }
+
+        foreach ($pharInfoBFileHashes as $filePath => $fileBHash) {
+            $output[] = $filePath;
+            $output[] = sprintf(
+                "\t<diff-actual>+ %s</diff-actual>",
+                $fileBHash,
+            );
+        }
+
+        return 3 === count($output) ? null : implode("\n", $output);
+    }
+
     /**
      * @return string[]
      */
-    private static function collectFiles(PharInfo $phar): array
+    private static function collectFiles(PharInfo $pharInfo): array
     {
-        $basePath = $phar->getTmp().DIRECTORY_SEPARATOR;
+        $basePath = $pharInfo->getTmp().DIRECTORY_SEPARATOR;
 
         return array_map(
             static fn (SplFileInfo $fileInfo): string => str_replace($basePath, '', $fileInfo->getRealPath()),
@@ -179,5 +246,33 @@ final class PharDiff
                 false,
             ),
         );
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function getFileHashesByRelativePathname(
+        PharInfo $pharInfo,
+        string $algorithm,
+    ): array {
+        $hashFiles = [];
+
+        try {
+            foreach ($pharInfo->getFiles() as $file) {
+                $hashFiles[$file->getRelativePathname()] = hash_file(
+                    $algorithm,
+                    $file->getPathname(),
+                );
+            }
+        } catch (ValueError) {
+            throw new UnexpectedValueException(
+                sprintf(
+                    'Unexpected algorithm "%s". Please pick a registered hashing algorithm (checksum `hash_algos()`).',
+                    $algorithm,
+                ),
+            );
+        }
+
+        return $hashFiles;
     }
 }

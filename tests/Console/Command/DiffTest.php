@@ -59,6 +59,7 @@ class DiffTest extends CommandTestCase
         string $pharAPath,
         string $pharBPath,
         DiffMode $diffMode,
+        ?string $checksumAlgorithm,
         ?string $expectedOutput,
         int $expectedStatusCode,
     ): void {
@@ -66,14 +67,18 @@ class DiffTest extends CommandTestCase
             self::markTestSkipped('TODO');
         }
 
-        $this->commandTester->execute(
-            [
-                'command' => 'diff',
-                'pharA' => realpath($pharAPath),
-                'pharB' => realpath($pharBPath),
-                '--diff' => $diffMode->value,
-            ],
-        );
+        $command = [
+            'command' => 'diff',
+            'pharA' => realpath($pharAPath),
+            'pharB' => realpath($pharBPath),
+            '--diff' => $diffMode->value,
+        ];
+
+        if (null !== $checksumAlgorithm) {
+            $command['--checksum-algorithm'] = $checksumAlgorithm;
+        }
+
+        $this->commandTester->execute($command);
 
         $actualOutput = $this->commandTester->getNormalizedDisplay();
 
@@ -305,7 +310,7 @@ class DiffTest extends CommandTestCase
                 $set,
                 2,
                 0,
-                [DiffMode::FILE_NAME],
+                [DiffMode::FILE_NAME, null],
             );
 
             yield '[file-name] '.$label => $set;
@@ -316,7 +321,7 @@ class DiffTest extends CommandTestCase
                 $set,
                 2,
                 0,
-                [DiffMode::GIT],
+                [DiffMode::GIT, null],
             );
 
             yield '[git] '.$label => $set;
@@ -327,10 +332,21 @@ class DiffTest extends CommandTestCase
                 $set,
                 2,
                 0,
-                [DiffMode::GNU],
+                [DiffMode::GNU, null],
             );
 
             yield '[GNU] '.$label => $set;
+        }
+
+        foreach (self::checksumDiffPharsProvider() as $label => $set) {
+            array_splice(
+                $set,
+                2,
+                0,
+                [DiffMode::CHECKSUM],
+            );
+
+            yield '[CHECKSUM] '.$label => $set;
         }
     }
 
@@ -707,6 +723,167 @@ class DiffTest extends CommandTestCase
                     > echo 'Hello world!';
 
                     OUTPUT,
+            ExitCode::FAILURE,
+        ];
+    }
+
+    public static function checksumDiffPharsProvider(): iterable
+    {
+        foreach (self::commonDiffPharsProvider(DiffMode::CHECKSUM) as $label => $set) {
+            array_splice(
+                $set,
+                2,
+                0,
+                [null],
+            );
+
+            yield $label => $set;
+        }
+
+        yield 'different files with default algorithm' => [
+            self::FIXTURES_DIR.'/simple-phar-foo.phar',
+            self::FIXTURES_DIR.'/simple-phar-bar.phar',
+            null,
+            <<<'OUTPUT'
+
+                 // Comparing the two archives...
+
+                Archive: simple-phar-foo.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 311080EF8E479CE18D866B744B7D467880BFBF57
+                Metadata: None
+                Contents: 1 file (6.64KB)
+
+                Archive: simple-phar-bar.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                Metadata: None
+                Contents: 1 file (6.64KB)
+
+                --- PHAR A
+                +++ PHAR B
+                @@ @@
+                 Archive Compression: None
+                 Files Compression: None
+                 Signature: SHA-1
+                -Signature Hash: 311080EF8E479CE18D866B744B7D467880BFBF57
+                +Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                 Metadata: None
+                 Contents: 1 file (6.64KB)
+
+                 // Comparing the two archives contents (checksum diff)...
+
+                <diff-expected>--- PHAR A</diff-expected>
+                <diff-actual>+++ PHAR B</diff-actual>
+                @@ @@
+                foo.php
+                	<diff-expected>- 4a3ce4dd5197cb5f2dba681e674a254cbe1dd120701aebc4d591dfe96eb15d56f6e6fcaf0ae98c6d4034674df62cc114</diff-expected>
+                bar.php
+                	<diff-actual>+ 4a3ce4dd5197cb5f2dba681e674a254cbe1dd120701aebc4d591dfe96eb15d56f6e6fcaf0ae98c6d4034674df62cc114</diff-actual>
+
+                OUTPUT,
+            ExitCode::FAILURE,
+        ];
+
+        yield 'different files with custom algorithm' => [
+            self::FIXTURES_DIR.'/simple-phar-foo.phar',
+            self::FIXTURES_DIR.'/simple-phar-bar.phar',
+            'md5',
+            <<<'OUTPUT'
+
+                 // Comparing the two archives...
+
+                Archive: simple-phar-foo.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 311080EF8E479CE18D866B744B7D467880BFBF57
+                Metadata: None
+                Contents: 1 file (6.64KB)
+
+                Archive: simple-phar-bar.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                Metadata: None
+                Contents: 1 file (6.64KB)
+
+                --- PHAR A
+                +++ PHAR B
+                @@ @@
+                 Archive Compression: None
+                 Files Compression: None
+                 Signature: SHA-1
+                -Signature Hash: 311080EF8E479CE18D866B744B7D467880BFBF57
+                +Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                 Metadata: None
+                 Contents: 1 file (6.64KB)
+
+                 // Comparing the two archives contents (checksum diff)...
+
+                <diff-expected>--- PHAR A</diff-expected>
+                <diff-actual>+++ PHAR B</diff-actual>
+                @@ @@
+                foo.php
+                	<diff-expected>- bfa05fdefe918f78fa896554f3c625fd</diff-expected>
+                bar.php
+                	<diff-actual>+ bfa05fdefe918f78fa896554f3c625fd</diff-actual>
+
+                OUTPUT,
+            ExitCode::FAILURE,
+        ];
+
+        yield 'same files different content' => [
+            self::FIXTURES_DIR.'/simple-phar-bar.phar',
+            self::FIXTURES_DIR.'/simple-phar-baz.phar',
+            null,
+            <<<'OUTPUT'
+
+                 // Comparing the two archives...
+
+                Archive: simple-phar-bar.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                Metadata: None
+                Contents: 1 file (6.64KB)
+
+                Archive: simple-phar-baz.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 122A636B8BB0348C9514833D70281EF6306A5BF5
+                Metadata: None
+                Contents: 1 file (6.61KB)
+
+                --- PHAR A
+                +++ PHAR B
+                @@ @@
+                 Archive Compression: None
+                 Files Compression: None
+                 Signature: SHA-1
+                -Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                +Signature Hash: 122A636B8BB0348C9514833D70281EF6306A5BF5
+                 Metadata: None
+                -Contents: 1 file (6.64KB)
+                +Contents: 1 file (6.61KB)
+
+                 // Comparing the two archives contents (checksum diff)...
+
+                <diff-expected>--- PHAR A</diff-expected>
+                <diff-actual>+++ PHAR B</diff-actual>
+                @@ @@
+                bar.php
+                	<diff-expected>- 4a3ce4dd5197cb5f2dba681e674a254cbe1dd120701aebc4d591dfe96eb15d56f6e6fcaf0ae98c6d4034674df62cc114</diff-expected>
+                	<diff-actual>+ efb584e2885e5e977702ad04e820ed13b83da70ba49dcebe8896dd36e038224772091150f688c63667cb160dd79aaa48</diff-actual>
+
+                OUTPUT,
             ExitCode::FAILURE,
         ];
     }
