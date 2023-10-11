@@ -121,7 +121,6 @@ class DiffTest extends CommandTestCase
      */
     public function test_it_can_display_the_git_diff_of_two_phar_files(): void
     {
-        self::markTestSkipped('TODO');
         $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar');
 
         $this->commandTester->execute(
@@ -134,7 +133,7 @@ class DiffTest extends CommandTestCase
         );
 
         $expectedOutput = <<<'OUTPUT'
-            ⚠️  <warning>Using the option "list-diff" is deprecated. Use "--diff=file-name" instead.</warning>
+            ⚠️  <warning>Using the option "git-diff" is deprecated. Use "--diff=git" instead.</warning>
 
              // Comparing the two archives...
 
@@ -176,54 +175,6 @@ class DiffTest extends CommandTestCase
             $expectedOutput,
             ExitCode::SUCCESS,
         );
-    }
-
-    public function test_it_can_check_the_sum_of_two_phar_files(): void
-    {
-        self::markTestSkipped('TODO');
-        (function (): void {
-            $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar');
-
-            ob_start();
-            $this->commandTester->execute(
-                [
-                    'command' => 'diff',
-                    'pharA' => $pharPath,
-                    'pharB' => $pharPath,
-                    '--check' => null,
-                ],
-            );
-            $actual = DisplayNormalizer::removeTrailingSpaces(ob_get_clean());
-
-            $expected = <<<'OUTPUT'
-                No differences encountered.
-
-                OUTPUT;
-
-            $this->assertSame($expected, $actual);
-            $this->assertSame(0, $this->commandTester->getStatusCode());
-        })();
-
-        (function (): void {
-            ob_start();
-            $this->commandTester->execute(
-                [
-                    'command' => 'diff',
-                    'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
-                    'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-                    '--check' => null,
-                ],
-            );
-            $actual = DisplayNormalizer::removeTrailingSpaces(ob_get_clean());
-
-            $expected = <<<'OUTPUT'
-                No differences encountered.
-
-                OUTPUT;
-
-            $this->assertSame($expected, $actual);
-            $this->assertSame(0, $this->commandTester->getStatusCode());
-        })();
     }
 
     public function test_it_cannot_compare_non_existent_files(): void
