@@ -56,7 +56,7 @@ use function preg_match;
 use function preg_quote;
 use function preg_replace;
 use function random_int;
-use function realpath;
+use function Safe\realpath;
 use function sort;
 use function sprintf;
 use function str_replace;

@@ -26,8 +26,8 @@ use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Symfony\Component\Console\Output\OutputInterface;
 use function array_splice;
 use function ob_get_clean;
-use function ob_start;
-use function realpath;
+use function Safe\ob_start;
+use function Safe\realpath;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Diff
@@ -69,15 +69,13 @@ class DiffTest extends CommandTestCase
         $this->commandTester->execute(
             [
                 'command' => 'diff',
-                'pharA' => $pharAPath,
-                'pharB' => $pharBPath,
+                'pharA' => realpath($pharAPath),
+                'pharB' => realpath($pharBPath),
                 '--diff' => $diffMode->value,
             ],
         );
 
-        $actualOutput = DisplayNormalizer::removeTrailingSpaces(
-            $this->commandTester->getDisplay(true),
-        );
+        $actualOutput = $this->commandTester->getNormalizedDisplay();
 
         if (null !== $expectedOutput) {
             self::assertSame($expectedOutput, $actualOutput);
@@ -358,8 +356,8 @@ class DiffTest extends CommandTestCase
     private static function commonDiffPharsProvider(): iterable
     {
         yield 'same PHAR' => [
-            realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
-            realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
+            self::FIXTURES_DIR.'/simple-phar-foo.phar',
+            self::FIXTURES_DIR.'/simple-phar-foo.phar',
             <<<'OUTPUT'
 
                  // Comparing the two archives... (do not check the signatures)
@@ -376,8 +374,8 @@ class DiffTest extends CommandTestCase
         ];
 
         yield 'different data; same content' => [
-            realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-            realpath(self::FIXTURES_DIR.'/simple-phar-bar-compressed.phar'),
+            self::FIXTURES_DIR.'/simple-phar-bar.phar',
+            self::FIXTURES_DIR.'/simple-phar-bar-compressed.phar',
             <<<'OUTPUT'
 
                  // Comparing the two archives... (do not check the signatures)
@@ -413,8 +411,8 @@ class DiffTest extends CommandTestCase
         yield from self::commonDiffPharsProvider();
 
         yield 'different files' => [
-            realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
-            realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
+            self::FIXTURES_DIR.'/simple-phar-foo.phar',
+            self::FIXTURES_DIR.'/simple-phar-bar.phar',
             <<<'OUTPUT'
 
                  // Comparing the two archives... (do not check the signatures)
@@ -452,8 +450,8 @@ class DiffTest extends CommandTestCase
         ];
 
         yield 'same files different content' => [
-            realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-            realpath(self::FIXTURES_DIR.'/simple-phar-baz.phar'),
+            self::FIXTURES_DIR.'/simple-phar-bar.phar',
+            self::FIXTURES_DIR.'/simple-phar-baz.phar',
             <<<'OUTPUT'
 
                  // Comparing the two archives... (do not check the signatures)
@@ -489,8 +487,8 @@ class DiffTest extends CommandTestCase
         yield from self::commonDiffPharsProvider();
 
         yield 'different files' => [
-            realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
-            realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
+            self::FIXTURES_DIR.'/simple-phar-foo.phar',
+            self::FIXTURES_DIR.'/simple-phar-bar.phar',
             <<<'OUTPUT'
 
                  // Comparing the two archives... (do not check the signatures)
@@ -523,8 +521,8 @@ class DiffTest extends CommandTestCase
         ];
 
         yield 'same files different content' => [
-            realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-            realpath(self::FIXTURES_DIR.'/simple-phar-baz.phar'),
+            self::FIXTURES_DIR.'/simple-phar-bar.phar',
+            self::FIXTURES_DIR.'/simple-phar-baz.phar',
             <<<'OUTPUT'
 
                  // Comparing the two archives... (do not check the signatures)
@@ -567,8 +565,8 @@ class DiffTest extends CommandTestCase
         yield from self::commonDiffPharsProvider();
 
         yield 'different files' => [
-            realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
-            realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
+            self::FIXTURES_DIR.'/simple-phar-foo.phar',
+            self::FIXTURES_DIR.'/simple-phar-bar.phar',
             <<<'OUTPUT'
 
                  // Comparing the two archives... (do not check the signatures)
@@ -599,8 +597,8 @@ class DiffTest extends CommandTestCase
         ];
 
         yield 'same files different content' => [
-            realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-            realpath(self::FIXTURES_DIR.'/simple-phar-baz.phar'),
+            self::FIXTURES_DIR.'/simple-phar-bar.phar',
+            self::FIXTURES_DIR.'/simple-phar-baz.phar',
             Platform::isOSX()
                 ? <<<'OUTPUT'
 
