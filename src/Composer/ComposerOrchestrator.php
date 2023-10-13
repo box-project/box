@@ -86,11 +86,7 @@ final class ComposerOrchestrator
         $getVersionProcess->run(null, self::getDefaultEnvVars());
 
         if (false === $getVersionProcess->isSuccessful()) {
-            throw new RuntimeException(
-                'Could not determine the Composer version.',
-                0,
-                new ProcessFailedException($getVersionProcess),
-            );
+            throw new ProcessFailedException($getVersionProcess);
         }
 
         $output = $getVersionProcess->getOutput();
@@ -99,7 +95,12 @@ final class ComposerOrchestrator
             return $match[1];
         }
 
-        throw new RuntimeException('Could not determine the Composer version.');
+        throw new RuntimeException(
+            sprintf(
+                'Could not determine the Composer version from "%s".',
+                $output,
+            ),
+        );
     }
 
     public static function dumpAutoload(
