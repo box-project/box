@@ -1,12 +1,12 @@
 <?php
 
-namespace HumbugBox438\Composer\Semver;
+namespace HumbugBox440\Composer\Semver;
 
-use HumbugBox438\Composer\Semver\Constraint\Constraint;
-use HumbugBox438\Composer\Semver\Constraint\ConstraintInterface;
-use HumbugBox438\Composer\Semver\Constraint\MatchAllConstraint;
-use HumbugBox438\Composer\Semver\Constraint\MatchNoneConstraint;
-use HumbugBox438\Composer\Semver\Constraint\MultiConstraint;
+use HumbugBox440\Composer\Semver\Constraint\Constraint;
+use HumbugBox440\Composer\Semver\Constraint\ConstraintInterface;
+use HumbugBox440\Composer\Semver\Constraint\MatchAllConstraint;
+use HumbugBox440\Composer\Semver\Constraint\MatchNoneConstraint;
+use HumbugBox440\Composer\Semver\Constraint\MultiConstraint;
 class Intervals
 {
     /**
