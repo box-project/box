@@ -858,7 +858,7 @@ class CompileTest extends FileSystemTestCase
 
             ? Removing the existing PHAR "/path/to/tmp/test.phar"
             ? Checking Composer compatibility
-                > '/usr/local/bin/composer' '--version'
+                > '/usr/local/bin/composer' '--version' '--no-ansi'
                 > 2.5.0 (Box requires ^2.2.0)
                 > Supported version detected
             ? Registering compactors
@@ -986,7 +986,7 @@ class CompileTest extends FileSystemTestCase
 
             ? Removing the existing PHAR "/path/to/tmp/test.phar"
             ? Checking Composer compatibility
-                > '/usr/local/bin/composer' '--version'
+                > '/usr/local/bin/composer' '--version' '--no-ansi'
                 > 2.5.0 (Box requires ^2.2.0)
                 > Supported version detected
             ? Registering compactors
