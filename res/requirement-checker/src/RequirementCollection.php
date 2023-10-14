@@ -1,7 +1,7 @@
 <?php
 
 declare (strict_types=1);
-namespace HumbugBox431\KevinGH\RequirementChecker;
+namespace HumbugBox440\KevinGH\RequirementChecker;
 
 use ArrayIterator;
 use Countable;
@@ -38,7 +38,7 @@ final class RequirementCollection implements IteratorAggregate, Countable
     }
     public function evaluateRequirements()
     {
-        return \array_reduce($this->requirements, function (bool $checkPassed, Requirement $requirement) : bool {
+        return \array_reduce($this->requirements, static function (bool $checkPassed, Requirement $requirement) : bool {
             return $checkPassed && $requirement->isFulfilled();
         }, \true);
     }

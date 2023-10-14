@@ -1,11 +1,11 @@
 <?php
 
-namespace HumbugBox431\Composer\Semver;
+namespace HumbugBox440\Composer\Semver;
 
-use HumbugBox431\Composer\Semver\Constraint\ConstraintInterface;
-use HumbugBox431\Composer\Semver\Constraint\MatchAllConstraint;
-use HumbugBox431\Composer\Semver\Constraint\MultiConstraint;
-use HumbugBox431\Composer\Semver\Constraint\Constraint;
+use HumbugBox440\Composer\Semver\Constraint\ConstraintInterface;
+use HumbugBox440\Composer\Semver\Constraint\MatchAllConstraint;
+use HumbugBox440\Composer\Semver\Constraint\MultiConstraint;
+use HumbugBox440\Composer\Semver\Constraint\Constraint;
 class VersionParser
 {
     private static $modifierRegex = '[._-]?(?:(stable|beta|b|RC|alpha|a|patch|pl|p)((?:[.-]?\\d+)*+)?)?([.-]?dev)?';
@@ -63,11 +63,11 @@ class VersionParser
         if (\preg_match('{^([^,\\s+]++)\\+[^\\s]++$}', $version, $match)) {
             $version = $match[1];
         }
-        if (\preg_match('{^v?(\\d{1,5})(\\.\\d++)?(\\.\\d++)?(\\.\\d++)?' . self::$modifierRegex . '$}i', $version, $matches)) {
+        if (\preg_match('{^v?(\\d{1,5}+)(\\.\\d++)?(\\.\\d++)?(\\.\\d++)?' . self::$modifierRegex . '$}i', $version, $matches)) {
             $version = $matches[1] . (!empty($matches[2]) ? $matches[2] : '.0') . (!empty($matches[3]) ? $matches[3] : '.0') . (!empty($matches[4]) ? $matches[4] : '.0');
             $index = 5;
-        } elseif (\preg_match('{^v?(\\d{4}(?:[.:-]?\\d{2}){1,6}(?:[.:-]?\\d{1,3})?)' . self::$modifierRegex . '$}i', $version, $matches)) {
-            $version = \preg_replace('{\\D}', '.', $matches[1]);
+        } elseif (\preg_match('{^v?(\\d{4}(?:[.:-]?\\d{2}){1,6}(?:[.:-]?\\d{1,3}){0,2})' . self::$modifierRegex . '$}i', $version, $matches)) {
+            $version = (string) \preg_replace('{\\D}', '.', $matches[1]);
             $index = 2;
         }
         if (isset($index)) {
@@ -133,16 +133,16 @@ class VersionParser
             throw new \RuntimeException('Failed to preg_split string: ' . $constraints);
         }
         $orGroups = array();
-        foreach ($orConstraints as $constraints) {
-            $andConstraints = \preg_split('{(?<!^|as|[=>< ,]) *(?<!-)[, ](?!-) *(?!,|as|$)}', $constraints);
+        foreach ($orConstraints as $orConstraint) {
+            $andConstraints = \preg_split('{(?<!^|as|[=>< ,]) *(?<!-)[, ](?!-) *(?!,|as|$)}', $orConstraint);
             if (\false === $andConstraints) {
-                throw new \RuntimeException('Failed to preg_split string: ' . $constraints);
+                throw new \RuntimeException('Failed to preg_split string: ' . $orConstraint);
             }
             if (\count($andConstraints) > 1) {
                 $constraintObjects = array();
-                foreach ($andConstraints as $constraint) {
-                    foreach ($this->parseConstraint($constraint) as $parsedConstraint) {
-                        $constraintObjects[] = $parsedConstraint;
+                foreach ($andConstraints as $andConstraint) {
+                    foreach ($this->parseConstraint($andConstraint) as $parsedAndConstraint) {
+                        $constraintObjects[] = $parsedAndConstraint;
                     }
                 }
             } else {
@@ -155,9 +155,9 @@ class VersionParser
             }
             $orGroups[] = $constraint;
         }
-        $constraint = MultiConstraint::create($orGroups, \false);
-        $constraint->setPrettyString($prettyConstraint);
-        return $constraint;
+        $parsedConstraint = MultiConstraint::create($orGroups, \false);
+        $parsedConstraint->setPrettyString($prettyConstraint);
+        return $parsedConstraint;
     }
     /**
     @phpstan-return

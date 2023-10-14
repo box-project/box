@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\RequirementChecker;
 
-use Generator;
 use PHPUnit\Framework\TestCase;
 use function function_exists;
 use function getenv;
@@ -30,14 +29,9 @@ class IOTest extends TestCase
 {
     private static function getDefaultInteractive(): bool
     {
-        if (function_exists('posix_isatty')
+        return !(function_exists('posix_isatty')
             && !@posix_isatty(STDOUT)
-            && false === getenv('SHELL_INTERACTIVE')
-        ) {
-            return false;
-        }
-
-        return true;
+            && false === getenv('SHELL_INTERACTIVE'));
     }
 
     /**
@@ -67,7 +61,7 @@ class IOTest extends TestCase
         self::assertSame($verbosity, $io->getVerbosity());
     }
 
-    public function provideOptions(): Generator
+    public function provideOptions(): iterable
     {
         yield [
             ['cli.php', '--foo'],
@@ -160,7 +154,7 @@ class IOTest extends TestCase
         ];
     }
 
-    public function provideOptionsWithShellVerbosity(): Generator
+    public function provideOptionsWithShellVerbosity(): iterable
     {
         yield [
             ['cli.php', '--foo'],

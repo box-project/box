@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Test;
 
-use function ini_get;
+use KevinGH\Box\Phar\PharPhpSettings;
 
 /**
  * @private
@@ -23,7 +23,7 @@ trait RequiresPharReadonlyOff
 {
     private function markAsSkippedIfPharReadonlyIsOn(): void
     {
-        if (true === (bool) ini_get('phar.readonly')) {
+        if (PharPhpSettings::isReadonly()) {
             $this->markTestSkipped(
                 'Requires phar.readonly to be set to 0. Either update your php.ini file or run this test with '
                 .'php -d phar.readonly=0.',

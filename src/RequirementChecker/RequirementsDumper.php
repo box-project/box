@@ -14,12 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
+use Fidry\FileSystem\FS;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 use function array_map;
-use function KevinGH\Box\FileSystem\file_contents;
 use function str_replace;
 use function var_export;
 
@@ -62,7 +62,7 @@ final class RequirementsDumper
         foreach ($requirementCheckerFiles as $file) {
             $filesWithContents[] = [
                 $file->getRelativePathname(),
-                file_contents($file->getPathname()),
+                FS::getFileContents($file->getPathname()),
             ];
         }
 

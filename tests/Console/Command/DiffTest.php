@@ -15,18 +15,16 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
-use Fidry\Console\DisplayNormalizer;
 use Fidry\Console\ExitCode;
 use InvalidArgumentException;
+use KevinGH\Box\Phar\DiffMode;
+use KevinGH\Box\Phar\InvalidPhar;
+use KevinGH\Box\Platform;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Tester\CommandTester;
-use UnexpectedValueException;
-use function ob_get_clean;
-use function ob_start;
-use function realpath;
-use const PHP_VERSION_ID;
+use function array_splice;
+use function Safe\realpath;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Diff
@@ -52,131 +50,128 @@ class DiffTest extends CommandTestCase
     }
 
     /**
-     * @dataProvider listDiffPharsProvider
+     * @dataProvider diffPharsProvider
      */
-    public function test_it_can_display_the_list_diff_of_two_phar_files(
-        callable $executeCommand,
-        string $expectedOutput,
+    public function test_it_can_display_the_diff_of_two_phar_files(
+        string $pharAPath,
+        string $pharBPath,
+        DiffMode $diffMode,
+        ?string $checksumAlgorithm,
+        ?string $expectedOutput,
         int $expectedStatusCode,
     ): void {
-        $actualOutput = $executeCommand($this->commandTester);
+        $command = [
+            'command' => 'diff',
+            'pharA' => realpath($pharAPath),
+            'pharB' => realpath($pharBPath),
+            '--diff' => $diffMode->value,
+        ];
 
-        self::assertSame($expectedOutput, $actualOutput);
+        if (null !== $checksumAlgorithm) {
+            $command['--checksum-algorithm'] = $checksumAlgorithm;
+        }
+
+        $this->commandTester->execute($command);
+
+        $actualOutput = $this->commandTester->getNormalizedDisplay();
+
+        if (null !== $expectedOutput) {
+            self::assertSame($expectedOutput, $actualOutput);
+        }
         self::assertSame($expectedStatusCode, $this->commandTester->getStatusCode());
     }
 
-    public function test_it_displays_the_list_diff_of_two_phar_files_by_default(): void
+    /**
+     * @deprecated
+     */
+    public function test_it_can_display_the_list_diff_of_two_phar_files(): void
     {
+        $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar');
+
         $this->commandTester->execute(
             [
                 'command' => 'diff',
-                'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
-                'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
+                'pharA' => $pharPath,
+                'pharB' => $pharPath,
                 '--list-diff' => null,
             ],
         );
 
         $expectedOutput = <<<'OUTPUT'
+            ⚠️  <warning>Using the option "list-diff" is deprecated. Use "--diff=file-name" instead.</warning>
 
-             // Comparing the two archives... (do not check the signatures)
+             // Comparing the two archives...
 
-             [OK] The two archives are identical
-
-             // Comparing the two archives contents...
-
-            --- Files present in "simple-phar-foo.phar" but not in "simple-phar-bar.phar"
-            +++ Files present in "simple-phar-bar.phar" but not in "simple-phar-foo.phar"
-
-            - foo.php [NONE] - 29.00B
-            + bar.php [NONE] - 29.00B
-
-             [ERROR] 2 file(s) difference
+             [OK] The two archives are identical.
 
 
             OUTPUT;
 
-        $this->assertSameOutput($expectedOutput, ExitCode::FAILURE);
+        $this->assertSameOutput(
+            $expectedOutput,
+            ExitCode::SUCCESS,
+        );
     }
 
     /**
-     * @dataProvider gitDiffPharsProvider
+     * @deprecated
      */
-    public function test_it_can_display_the_git_diff_of_two_phar_files(
-        callable $executeCommand,
-        ?string $expectedOutput,
-        int $expectedStatusCode,
-    ): void {
-        $actualOutput = $executeCommand($this->commandTester);
-
-        if (null !== $expectedOutput) {
-            self::assertSame($expectedOutput, $actualOutput);
-        }
-
-        self::assertSame($expectedStatusCode, $this->commandTester->getStatusCode());
-    }
-
-    /**
-     * @dataProvider GNUDiffPharsProvider
-     */
-    public function test_it_can_display_the_gnu_diff_of_two_phar_files(
-        callable $executeCommand,
-        ?string $expectedOutput,
-        int $expectedStatusCode,
-    ): void {
-        $actualOutput = $executeCommand($this->commandTester);
-
-        if (null !== $expectedOutput) {
-            self::assertSame($expectedOutput, $actualOutput);
-        }
-
-        self::assertSame($expectedStatusCode, $this->commandTester->getStatusCode());
-    }
-
-    public function test_it_can_check_the_sum_of_two_phar_files(): void
+    public function test_it_can_display_the_git_diff_of_two_phar_files(): void
     {
-        (function (): void {
-            $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar');
+        $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar');
 
-            ob_start();
-            $this->commandTester->execute(
-                [
-                    'command' => 'diff',
-                    'pharA' => $pharPath,
-                    'pharB' => $pharPath,
-                    '--check' => null,
-                ],
-            );
-            $actual = DisplayNormalizer::removeTrailingSpaces(ob_get_clean());
+        $this->commandTester->execute(
+            [
+                'command' => 'diff',
+                'pharA' => $pharPath,
+                'pharB' => $pharPath,
+                '--git-diff' => null,
+            ],
+        );
 
-            $expected = <<<'OUTPUT'
-                No differences encountered.
+        $expectedOutput = <<<'OUTPUT'
+            ⚠️  <warning>Using the option "git-diff" is deprecated. Use "--diff=git" instead.</warning>
 
-                OUTPUT;
+             // Comparing the two archives...
 
-            $this->assertSame($expected, $actual);
-            $this->assertSame(0, $this->commandTester->getStatusCode());
-        })();
+             [OK] The two archives are identical.
 
-        (function (): void {
-            ob_start();
-            $this->commandTester->execute(
-                [
-                    'command' => 'diff',
-                    'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
-                    'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-                    '--check' => null,
-                ],
-            );
-            $actual = DisplayNormalizer::removeTrailingSpaces(ob_get_clean());
 
-            $expected = <<<'OUTPUT'
-                No differences encountered.
+            OUTPUT;
 
-                OUTPUT;
+        $this->assertSameOutput(
+            $expectedOutput,
+            ExitCode::SUCCESS,
+        );
+    }
 
-            $this->assertSame($expected, $actual);
-            $this->assertSame(0, $this->commandTester->getStatusCode());
-        })();
+    public function test_it_can_display_the_gnu_diff_of_two_phar_files(): void
+    {
+        $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar');
+
+        $this->commandTester->execute(
+            [
+                'command' => 'diff',
+                'pharA' => $pharPath,
+                'pharB' => $pharPath,
+                '--gnu-diff' => null,
+            ],
+        );
+
+        $expectedOutput = <<<'OUTPUT'
+            ⚠️  <warning>Using the option "gnu-diff" is deprecated. Use "--diff=gnu" instead.</warning>
+
+             // Comparing the two archives...
+
+             [OK] The two archives are identical.
+
+
+            OUTPUT;
+
+        $this->assertSameOutput(
+            $expectedOutput,
+            ExitCode::SUCCESS,
+        );
     }
 
     public function test_it_cannot_compare_non_existent_files(): void
@@ -201,6 +196,9 @@ class DiffTest extends CommandTestCase
 
     public function test_it_cannot_compare_a_non_phar_files(): void
     {
+        $this->expectException(InvalidPhar::class);
+        $this->expectExceptionMessageMatches('/^Could not create a Phar or PharData instance for the file.+not\-a\-phar\.phar.+$/');
+
         $this->commandTester->execute(
             [
                 'command' => 'diff',
@@ -208,11 +206,6 @@ class DiffTest extends CommandTestCase
                 'pharB' => realpath(self::FIXTURES_DIR.'/not-a-phar.phar'),
             ],
         );
-
-        $expected = '/^Could not check the PHARs: internal corruption of phar \".*\.phar\" \(__HALT_COMPILER\(\); not found\)/';
-
-        self::assertMatchesRegularExpression($expected, $this->commandTester->getDisplay(true));
-        self::assertSame(1, $this->commandTester->getStatusCode());
     }
 
     public function test_it_can_compare_phar_files_without_the_phar_extension(): void
@@ -229,13 +222,9 @@ class DiffTest extends CommandTestCase
 
         $expected = <<<'OUTPUT'
 
-             // Comparing the two archives... (do not check the signatures)
+             // Comparing the two archives...
 
-             [OK] The two archives are identical
-
-             // Comparing the two archives contents...
-
-             [OK] The contents are identical
+             [OK] The two archives are identical.
 
 
             OUTPUT;
@@ -243,25 +232,10 @@ class DiffTest extends CommandTestCase
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
-    public function test_it_cannot_compare_phars_which_are_signed_with_a_private_key(): void
-    {
-        $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessageMatches('/openssl signature could not be verified/');
-
-        $this->commandTester->execute(
-            [
-                'command' => 'diff',
-                'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
-                'pharB' => realpath(self::FIXTURES_DIR.'/openssl.phar'),
-            ],
-            ['verbosity' => OutputInterface::VERBOSITY_DEBUG],
-        );
-    }
-
     public function test_it_does_not_swallow_exceptions_in_debug_mode(): void
     {
-        $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessageMatches('/^internal corruption of phar \".*\.phar\" \(__HALT_COMPILER\(\); not found\)/');
+        $this->expectException(InvalidPhar::class);
+        $this->expectExceptionMessage('not-a-phar.phar');
 
         $this->commandTester->execute(
             [
@@ -273,58 +247,156 @@ class DiffTest extends CommandTestCase
         );
     }
 
-    public static function listDiffPharsProvider(): iterable
+    public static function diffPharsProvider(): iterable
     {
-        yield (static fn (): array => [
-            static function (CommandTester $commandTester): string {
-                $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar');
+        foreach (self::fileNameDiffPharsProvider() as $label => $set) {
+            array_splice(
+                $set,
+                2,
+                0,
+                [DiffMode::FILE_NAME, null],
+            );
 
-                $commandTester->execute(
-                    [
-                        'command' => 'diff',
-                        'pharA' => $pharPath,
-                        'pharB' => $pharPath,
-                        '--list-diff' => null,
-                    ],
-                );
+            yield '[file-name] '.$label => $set;
+        }
 
-                return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
-            },
+        foreach (self::gitDiffPharsProvider() as $label => $set) {
+            array_splice(
+                $set,
+                2,
+                0,
+                [DiffMode::GIT, null],
+            );
+
+            yield '[git] '.$label => $set;
+        }
+
+        foreach (self::GNUDiffPharsProvider() as $label => $set) {
+            array_splice(
+                $set,
+                2,
+                0,
+                [DiffMode::GNU, null],
+            );
+
+            yield '[GNU] '.$label => $set;
+        }
+
+        foreach (self::checksumDiffPharsProvider() as $label => $set) {
+            array_splice(
+                $set,
+                2,
+                0,
+                [DiffMode::CHECKSUM],
+            );
+
+            yield '[CHECKSUM] '.$label => $set;
+        }
+    }
+
+    private static function commonDiffPharsProvider(DiffMode $diffMode): iterable
+    {
+        yield 'same PHAR' => [
+            self::FIXTURES_DIR.'/simple-phar-foo.phar',
+            self::FIXTURES_DIR.'/simple-phar-foo.phar',
             <<<'OUTPUT'
 
-                 // Comparing the two archives... (do not check the signatures)
+                 // Comparing the two archives...
 
-                 [OK] The two archives are identical
-
-                 // Comparing the two archives contents...
-
-                 [OK] The contents are identical
+                 [OK] The two archives are identical.
 
 
                 OUTPUT,
-            0,
-        ])();
+            ExitCode::SUCCESS,
+        ];
 
-        yield (static fn (): array => [
-            static function (CommandTester $commandTester): string {
-                $commandTester->execute(
-                    [
-                        'command' => 'diff',
-                        'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
-                        'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-                        '--list-diff' => null,
-                    ],
-                );
+        yield 'different data; same content' => [
+            self::FIXTURES_DIR.'/simple-phar-bar.phar',
+            self::FIXTURES_DIR.'/simple-phar-bar-compressed.phar',
+            sprintf(
+                <<<'OUTPUT'
 
-                return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
-            },
+                     // Comparing the two archives...
+
+                    Archive: simple-phar-bar.phar
+                    Archive Compression: None
+                    Files Compression: None
+                    Signature: SHA-1
+                    Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                    Metadata: None
+                    Contents: 1 file (6.64KB)
+
+                    Archive: simple-phar-bar-compressed.phar
+                    Archive Compression: None
+                    Files Compression: GZ
+                    Signature: SHA-1
+                    Signature Hash: 3A388D86C91C36659A043D52C2DEB64E8848DD1A
+                    Metadata: None
+                    Contents: 1 file (6.65KB)
+
+                    <diff-expected>--- PHAR A</diff-expected>
+                    <diff-actual>+++ PHAR B</diff-actual>
+                    @@ @@
+                     Archive Compression: None
+                    <diff-expected>-Files Compression: None</diff-expected>
+                    <diff-actual>+Files Compression: GZ</diff-actual>
+                     Signature: SHA-1
+                    <diff-expected>-Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51</diff-expected>
+                    <diff-actual>+Signature Hash: 3A388D86C91C36659A043D52C2DEB64E8848DD1A</diff-actual>
+                     Metadata: None
+                    <diff-expected>-Contents: 1 file (6.64KB)</diff-expected>
+                    <diff-actual>+Contents: 1 file (6.65KB)</diff-actual>
+
+                     // Comparing the two archives contents (%s diff)...
+
+                    No difference could be observed with this mode.
+
+                    OUTPUT,
+                $diffMode->value,
+            ),
+            ExitCode::FAILURE,
+        ];
+    }
+
+    private static function fileNameDiffPharsProvider(): iterable
+    {
+        yield from self::commonDiffPharsProvider(DiffMode::FILE_NAME);
+
+        yield 'different files' => [
+            self::FIXTURES_DIR.'/simple-phar-foo.phar',
+            self::FIXTURES_DIR.'/simple-phar-bar.phar',
             <<<'OUTPUT'
 
-                 // Comparing the two archives... (do not check the signatures)
+                 // Comparing the two archives...
 
-                 [OK] The two archives are identical
+                Archive: simple-phar-foo.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 311080EF8E479CE18D866B744B7D467880BFBF57
+                Metadata: None
+                Contents: 1 file (6.64KB)
 
-                 // Comparing the two archives contents...
+                Archive: simple-phar-bar.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                Metadata: None
+                Contents: 1 file (6.64KB)
+
+                <diff-expected>--- PHAR A</diff-expected>
+                <diff-actual>+++ PHAR B</diff-actual>
+                @@ @@
+                 Archive Compression: None
+                 Files Compression: None
+                 Signature: SHA-1
+                <diff-expected>-Signature Hash: 311080EF8E479CE18D866B744B7D467880BFBF57</diff-expected>
+                <diff-actual>+Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51</diff-actual>
+                 Metadata: None
+                 Contents: 1 file (6.64KB)
+
+                 // Comparing the two archives contents (file-name diff)...
 
                 --- Files present in "simple-phar-foo.phar" but not in "simple-phar-bar.phar"
                 +++ Files present in "simple-phar-bar.phar" but not in "simple-phar-foo.phar"
@@ -336,126 +408,92 @@ class DiffTest extends CommandTestCase
 
 
                 OUTPUT,
-            1,
-        ])();
+            ExitCode::FAILURE,
+        ];
 
-        yield (static fn (): array => [
-            static function (CommandTester $commandTester): string {
-                $commandTester->execute(
-                    [
-                        'command' => 'diff',
-                        'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-                        'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar-compressed.phar'),
-                        '--list-diff' => null,
-                    ],
-                );
-
-                return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
-            },
+        yield 'same files different content' => [
+            self::FIXTURES_DIR.'/simple-phar-bar.phar',
+            self::FIXTURES_DIR.'/simple-phar-baz.phar',
             <<<'OUTPUT'
 
-                 // Comparing the two archives... (do not check the signatures)
+                 // Comparing the two archives...
 
                 Archive: simple-phar-bar.phar
-                Compression: None
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
                 Metadata: None
                 Contents: 1 file (6.64KB)
 
-                Archive: simple-phar-bar-compressed.phar
-                Compression: GZ
+                Archive: simple-phar-baz.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 122A636B8BB0348C9514833D70281EF6306A5BF5
                 Metadata: None
-                Contents: 1 file (6.65KB)
+                Contents: 1 file (6.61KB)
 
-                 // Comparing the two archives contents...
+                <diff-expected>--- PHAR A</diff-expected>
+                <diff-actual>+++ PHAR B</diff-actual>
+                @@ @@
+                 Archive Compression: None
+                 Files Compression: None
+                 Signature: SHA-1
+                <diff-expected>-Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51</diff-expected>
+                <diff-actual>+Signature Hash: 122A636B8BB0348C9514833D70281EF6306A5BF5</diff-actual>
+                 Metadata: None
+                <diff-expected>-Contents: 1 file (6.64KB)</diff-expected>
+                <diff-actual>+Contents: 1 file (6.61KB)</diff-actual>
 
-                 [OK] The contents are identical
+                 // Comparing the two archives contents (file-name diff)...
 
-
-                OUTPUT,
-            1,
-        ])();
-
-        yield (static fn (): array => [
-            static function (CommandTester $commandTester): string {
-                $commandTester->execute(
-                    [
-                        'command' => 'diff',
-                        'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-                        'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-baz.phar'),
-                        '--list-diff' => null,
-                    ],
-                );
-
-                return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
-            },
-            <<<'OUTPUT'
-
-                 // Comparing the two archives... (do not check the signatures)
-
-                 [OK] The two archives are identical
-
-                 // Comparing the two archives contents...
-
-                 [OK] The contents are identical
-
+                No difference could be observed with this mode.
 
                 OUTPUT,
-            0,
-        ])();
+            ExitCode::FAILURE,
+        ];
     }
 
     public static function gitDiffPharsProvider(): iterable
     {
-        yield (static fn (): array => [
-            static function (CommandTester $commandTester): string {
-                $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar');
+        yield from self::commonDiffPharsProvider(DiffMode::GIT);
 
-                $commandTester->execute(
-                    [
-                        'command' => 'diff',
-                        'pharA' => $pharPath,
-                        'pharB' => $pharPath,
-                        '--git-diff' => null,
-                    ],
-                );
-
-                return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
-            },
+        yield 'different files' => [
+            self::FIXTURES_DIR.'/simple-phar-foo.phar',
+            self::FIXTURES_DIR.'/simple-phar-bar.phar',
             <<<'OUTPUT'
 
-                 // Comparing the two archives... (do not check the signatures)
+                 // Comparing the two archives...
 
-                 [OK] The two archives are identical
+                Archive: simple-phar-foo.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 311080EF8E479CE18D866B744B7D467880BFBF57
+                Metadata: None
+                Contents: 1 file (6.64KB)
 
-                 // Comparing the two archives contents...
+                Archive: simple-phar-bar.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                Metadata: None
+                Contents: 1 file (6.64KB)
 
-                 [OK] The contents are identical
+                <diff-expected>--- PHAR A</diff-expected>
+                <diff-actual>+++ PHAR B</diff-actual>
+                @@ @@
+                 Archive Compression: None
+                 Files Compression: None
+                 Signature: SHA-1
+                <diff-expected>-Signature Hash: 311080EF8E479CE18D866B744B7D467880BFBF57</diff-expected>
+                <diff-actual>+Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51</diff-actual>
+                 Metadata: None
+                 Contents: 1 file (6.64KB)
 
-
-                OUTPUT,
-            0,
-        ])();
-
-        yield (static fn (): array => [
-            static function (CommandTester $commandTester): string {
-                $commandTester->execute(
-                    [
-                        'command' => 'diff',
-                        'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
-                        'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-                        '--git-diff' => null,
-                    ],
-                );
-
-                return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
-            },
-            <<<'OUTPUT'
-
-                 // Comparing the two archives... (do not check the signatures)
-
-                 [OK] The two archives are identical
-
-                 // Comparing the two archives contents...
+                 // Comparing the two archives contents (git diff)...
 
                 diff --git asimple-phar-foo.phar/foo.php bsimple-phar-bar.phar/bar.php
                 similarity index 100%
@@ -463,46 +501,45 @@ class DiffTest extends CommandTestCase
                 rename to simple-phar-bar.phar/bar.php
 
                 OUTPUT,
-            1,
-        ])();
+            ExitCode::FAILURE,
+        ];
 
-        yield (static fn (): array => [
-            static function (CommandTester $commandTester): string {
-                $commandTester->execute(
-                    [
-                        'command' => 'diff',
-                        'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-                        'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar-compressed.phar'),
-                        '--git-diff' => null,
-                    ],
-                );
-
-                return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
-            },
-            null,
-            PHP_VERSION_ID >= 70400 ? 1 : 2, // related to https://bugs.php.net/bug.php?id=69279
-        ])();
-
-        yield (static fn (): array => [
-            static function (CommandTester $commandTester): string {
-                $commandTester->execute(
-                    [
-                        'command' => 'diff',
-                        'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-                        'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-baz.phar'),
-                        '--git-diff' => null,
-                    ],
-                );
-
-                return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
-            },
+        yield 'same files different content' => [
+            self::FIXTURES_DIR.'/simple-phar-bar.phar',
+            self::FIXTURES_DIR.'/simple-phar-baz.phar',
             <<<'OUTPUT'
 
-                 // Comparing the two archives... (do not check the signatures)
+                 // Comparing the two archives...
 
-                 [OK] The two archives are identical
+                Archive: simple-phar-bar.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                Metadata: None
+                Contents: 1 file (6.64KB)
 
-                 // Comparing the two archives contents...
+                Archive: simple-phar-baz.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 122A636B8BB0348C9514833D70281EF6306A5BF5
+                Metadata: None
+                Contents: 1 file (6.61KB)
+
+                <diff-expected>--- PHAR A</diff-expected>
+                <diff-actual>+++ PHAR B</diff-actual>
+                @@ @@
+                 Archive Compression: None
+                 Files Compression: None
+                 Signature: SHA-1
+                <diff-expected>-Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51</diff-expected>
+                <diff-actual>+Signature Hash: 122A636B8BB0348C9514833D70281EF6306A5BF5</diff-actual>
+                 Metadata: None
+                <diff-expected>-Contents: 1 file (6.64KB)</diff-expected>
+                <diff-actual>+Contents: 1 file (6.61KB)</diff-actual>
+
+                 // Comparing the two archives contents (git diff)...
 
                 diff --git asimple-phar-bar.phar/bar.php bsimple-phar-baz.phar/bar.php
                 index 290849f..8aac305 100644
@@ -515,116 +552,305 @@ class DiffTest extends CommandTestCase
                 +echo 'Hello world!';
 
                 OUTPUT,
-            1,
-        ])();
+            ExitCode::FAILURE,
+        ];
     }
 
     public static function GNUDiffPharsProvider(): iterable
     {
-        yield (static fn (): array => [
-            static function (CommandTester $commandTester): string {
-                $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar');
+        yield from self::commonDiffPharsProvider(DiffMode::GNU);
 
-                $commandTester->execute(
-                    [
-                        'command' => 'diff',
-                        'pharA' => $pharPath,
-                        'pharB' => $pharPath,
-                        '--gnu-diff' => null,
-                    ],
-                );
-
-                return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
-            },
+        yield 'different files' => [
+            self::FIXTURES_DIR.'/simple-phar-foo.phar',
+            self::FIXTURES_DIR.'/simple-phar-bar.phar',
             <<<'OUTPUT'
 
-                 // Comparing the two archives... (do not check the signatures)
+                 // Comparing the two archives...
 
-                 [OK] The two archives are identical
+                Archive: simple-phar-foo.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 311080EF8E479CE18D866B744B7D467880BFBF57
+                Metadata: None
+                Contents: 1 file (6.64KB)
 
-                 // Comparing the two archives contents...
+                Archive: simple-phar-bar.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                Metadata: None
+                Contents: 1 file (6.64KB)
 
-                 [OK] The contents are identical
+                <diff-expected>--- PHAR A</diff-expected>
+                <diff-actual>+++ PHAR B</diff-actual>
+                @@ @@
+                 Archive Compression: None
+                 Files Compression: None
+                 Signature: SHA-1
+                <diff-expected>-Signature Hash: 311080EF8E479CE18D866B744B7D467880BFBF57</diff-expected>
+                <diff-actual>+Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51</diff-actual>
+                 Metadata: None
+                 Contents: 1 file (6.64KB)
 
-
-                OUTPUT,
-            0,
-        ])();
-
-        yield (static fn (): array => [
-            static function (CommandTester $commandTester): string {
-                $commandTester->execute(
-                    [
-                        'command' => 'diff',
-                        'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-foo.phar'),
-                        'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-                        '--gnu-diff' => null,
-                    ],
-                );
-
-                return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
-            },
-            <<<'OUTPUT'
-
-                 // Comparing the two archives... (do not check the signatures)
-
-                 [OK] The two archives are identical
-
-                 // Comparing the two archives contents...
+                 // Comparing the two archives contents (gnu diff)...
 
                 Only in simple-phar-bar.phar: bar.php
                 Only in simple-phar-foo.phar: foo.php
 
                 OUTPUT,
-            1,
-        ])();
+            ExitCode::FAILURE,
+        ];
 
-        yield (static fn (): array => [
-            static function (CommandTester $commandTester): string {
-                $commandTester->execute(
-                    [
-                        'command' => 'diff',
-                        'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-                        'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-bar-compressed.phar'),
-                        '--gnu-diff' => null,
-                    ],
-                );
+        yield 'same files different content' => [
+            self::FIXTURES_DIR.'/simple-phar-bar.phar',
+            self::FIXTURES_DIR.'/simple-phar-baz.phar',
+            Platform::isOSX()
+                ? <<<'OUTPUT'
 
-                return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
-            },
+                     // Comparing the two archives...
+
+                    Archive: simple-phar-bar.phar
+                    Archive Compression: None
+                    Files Compression: None
+                    Signature: SHA-1
+                    Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                    Metadata: None
+                    Contents: 1 file (6.64KB)
+
+                    Archive: simple-phar-baz.phar
+                    Archive Compression: None
+                    Files Compression: None
+                    Signature: SHA-1
+                    Signature Hash: 122A636B8BB0348C9514833D70281EF6306A5BF5
+                    Metadata: None
+                    Contents: 1 file (6.61KB)
+
+                    <diff-expected>--- PHAR A</diff-expected>
+                    <diff-actual>+++ PHAR B</diff-actual>
+                    @@ @@
+                     Archive Compression: None
+                     Files Compression: None
+                     Signature: SHA-1
+                    <diff-expected>-Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51</diff-expected>
+                    <diff-actual>+Signature Hash: 122A636B8BB0348C9514833D70281EF6306A5BF5</diff-actual>
+                     Metadata: None
+                    <diff-expected>-Contents: 1 file (6.64KB)</diff-expected>
+                    <diff-actual>+Contents: 1 file (6.61KB)</diff-actual>
+
+                     // Comparing the two archives contents (gnu diff)...
+
+                    diff --exclude=.phar_meta.json simple-phar-bar.phar/bar.php simple-phar-baz.phar/bar.php
+                    3c3
+                    < echo "Hello world!";
+                    ---
+                    > echo 'Hello world!';
+
+                    OUTPUT
+                : <<<'OUTPUT'
+
+                     // Comparing the two archives...
+
+                    Archive: simple-phar-bar.phar
+                    Archive Compression: None
+                    Files Compression: None
+                    Signature: SHA-1
+                    Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                    Metadata: None
+                    Contents: 1 file (6.64KB)
+
+                    Archive: simple-phar-baz.phar
+                    Archive Compression: None
+                    Files Compression: None
+                    Signature: SHA-1
+                    Signature Hash: 122A636B8BB0348C9514833D70281EF6306A5BF5
+                    Metadata: None
+                    Contents: 1 file (6.61KB)
+
+                    <diff-expected>--- PHAR A</diff-expected>
+                    <diff-actual>+++ PHAR B</diff-actual>
+                    @@ @@
+                     Archive Compression: None
+                     Files Compression: None
+                     Signature: SHA-1
+                    <diff-expected>-Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51</diff-expected>
+                    <diff-actual>+Signature Hash: 122A636B8BB0348C9514833D70281EF6306A5BF5</diff-actual>
+                     Metadata: None
+                    <diff-expected>-Contents: 1 file (6.64KB)</diff-expected>
+                    <diff-actual>+Contents: 1 file (6.61KB)</diff-actual>
+
+                     // Comparing the two archives contents (gnu diff)...
+
+                    diff '--exclude=.phar_meta.json' simple-phar-bar.phar/bar.php simple-phar-baz.phar/bar.php
+                    3c3
+                    < echo "Hello world!";
+                    ---
+                    > echo 'Hello world!';
+
+                    OUTPUT,
+            ExitCode::FAILURE,
+        ];
+    }
+
+    public static function checksumDiffPharsProvider(): iterable
+    {
+        foreach (self::commonDiffPharsProvider(DiffMode::CHECKSUM) as $label => $set) {
+            array_splice(
+                $set,
+                2,
+                0,
+                [null],
+            );
+
+            yield $label => $set;
+        }
+
+        yield 'different files with default algorithm' => [
+            self::FIXTURES_DIR.'/simple-phar-foo.phar',
+            self::FIXTURES_DIR.'/simple-phar-bar.phar',
             null,
-            PHP_VERSION_ID >= 70400 ? 1 : 2, // related to https://bugs.php.net/bug.php?id=69279
-        ])();
-
-        yield (static fn (): array => [
-            static function (CommandTester $commandTester): string {
-                $commandTester->execute(
-                    [
-                        'command' => 'diff',
-                        'pharA' => realpath(self::FIXTURES_DIR.'/simple-phar-bar.phar'),
-                        'pharB' => realpath(self::FIXTURES_DIR.'/simple-phar-baz.phar'),
-                        '--gnu-diff' => null,
-                    ],
-                );
-
-                return DisplayNormalizer::removeTrailingSpaces($commandTester->getDisplay(true));
-            },
             <<<'OUTPUT'
 
-                 // Comparing the two archives... (do not check the signatures)
+                 // Comparing the two archives...
 
-                 [OK] The two archives are identical
+                Archive: simple-phar-foo.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 311080EF8E479CE18D866B744B7D467880BFBF57
+                Metadata: None
+                Contents: 1 file (6.64KB)
 
-                 // Comparing the two archives contents...
+                Archive: simple-phar-bar.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                Metadata: None
+                Contents: 1 file (6.64KB)
 
-                diff simple-phar-bar.phar/bar.php simple-phar-baz.phar/bar.php
-                3c3
-                < echo "Hello world!";
-                ---
-                > echo 'Hello world!';
+                <diff-expected>--- PHAR A</diff-expected>
+                <diff-actual>+++ PHAR B</diff-actual>
+                @@ @@
+                 Archive Compression: None
+                 Files Compression: None
+                 Signature: SHA-1
+                <diff-expected>-Signature Hash: 311080EF8E479CE18D866B744B7D467880BFBF57</diff-expected>
+                <diff-actual>+Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51</diff-actual>
+                 Metadata: None
+                 Contents: 1 file (6.64KB)
+
+                 // Comparing the two archives contents (checksum diff)...
+
+                <diff-expected>--- PHAR A</diff-expected>
+                <diff-actual>+++ PHAR B</diff-actual>
+                @@ @@
+                foo.php
+                	<diff-expected>- 4a3ce4dd5197cb5f2dba681e674a254cbe1dd120701aebc4d591dfe96eb15d56f6e6fcaf0ae98c6d4034674df62cc114</diff-expected>
+                bar.php
+                	<diff-actual>+ 4a3ce4dd5197cb5f2dba681e674a254cbe1dd120701aebc4d591dfe96eb15d56f6e6fcaf0ae98c6d4034674df62cc114</diff-actual>
 
                 OUTPUT,
-            1,
-        ])();
+            ExitCode::FAILURE,
+        ];
+
+        yield 'different files with custom algorithm' => [
+            self::FIXTURES_DIR.'/simple-phar-foo.phar',
+            self::FIXTURES_DIR.'/simple-phar-bar.phar',
+            'md5',
+            <<<'OUTPUT'
+
+                 // Comparing the two archives...
+
+                Archive: simple-phar-foo.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 311080EF8E479CE18D866B744B7D467880BFBF57
+                Metadata: None
+                Contents: 1 file (6.64KB)
+
+                Archive: simple-phar-bar.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                Metadata: None
+                Contents: 1 file (6.64KB)
+
+                <diff-expected>--- PHAR A</diff-expected>
+                <diff-actual>+++ PHAR B</diff-actual>
+                @@ @@
+                 Archive Compression: None
+                 Files Compression: None
+                 Signature: SHA-1
+                <diff-expected>-Signature Hash: 311080EF8E479CE18D866B744B7D467880BFBF57</diff-expected>
+                <diff-actual>+Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51</diff-actual>
+                 Metadata: None
+                 Contents: 1 file (6.64KB)
+
+                 // Comparing the two archives contents (checksum diff)...
+
+                <diff-expected>--- PHAR A</diff-expected>
+                <diff-actual>+++ PHAR B</diff-actual>
+                @@ @@
+                foo.php
+                	<diff-expected>- bfa05fdefe918f78fa896554f3c625fd</diff-expected>
+                bar.php
+                	<diff-actual>+ bfa05fdefe918f78fa896554f3c625fd</diff-actual>
+
+                OUTPUT,
+            ExitCode::FAILURE,
+        ];
+
+        yield 'same files different content' => [
+            self::FIXTURES_DIR.'/simple-phar-bar.phar',
+            self::FIXTURES_DIR.'/simple-phar-baz.phar',
+            null,
+            <<<'OUTPUT'
+
+                 // Comparing the two archives...
+
+                Archive: simple-phar-bar.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                Metadata: None
+                Contents: 1 file (6.64KB)
+
+                Archive: simple-phar-baz.phar
+                Archive Compression: None
+                Files Compression: None
+                Signature: SHA-1
+                Signature Hash: 122A636B8BB0348C9514833D70281EF6306A5BF5
+                Metadata: None
+                Contents: 1 file (6.61KB)
+
+                <diff-expected>--- PHAR A</diff-expected>
+                <diff-actual>+++ PHAR B</diff-actual>
+                @@ @@
+                 Archive Compression: None
+                 Files Compression: None
+                 Signature: SHA-1
+                <diff-expected>-Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51</diff-expected>
+                <diff-actual>+Signature Hash: 122A636B8BB0348C9514833D70281EF6306A5BF5</diff-actual>
+                 Metadata: None
+                <diff-expected>-Contents: 1 file (6.64KB)</diff-expected>
+                <diff-actual>+Contents: 1 file (6.61KB)</diff-actual>
+
+                 // Comparing the two archives contents (checksum diff)...
+
+                <diff-expected>--- PHAR A</diff-expected>
+                <diff-actual>+++ PHAR B</diff-actual>
+                @@ @@
+                bar.php
+                	<diff-expected>- 4a3ce4dd5197cb5f2dba681e674a254cbe1dd120701aebc4d591dfe96eb15d56f6e6fcaf0ae98c6d4034674df62cc114</diff-expected>
+                	<diff-actual>+ efb584e2885e5e977702ad04e820ed13b83da70ba49dcebe8896dd36e038224772091150f688c63667cb160dd79aaa48</diff-actual>
+
+                OUTPUT,
+            ExitCode::FAILURE,
+        ];
     }
 }

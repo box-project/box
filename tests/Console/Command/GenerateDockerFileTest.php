@@ -18,13 +18,10 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
-use function realpath;
+use function Safe\realpath;
 
 /**
  * @covers \KevinGH\Box\Console\Command\GenerateDockerFile
- *
- * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
- *                              can create undesirable side-effects.
  *
  * @internal
  */

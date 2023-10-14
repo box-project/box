@@ -16,11 +16,10 @@ namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
+use Fidry\FileSystem\FS;
 use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\CommandTestCase;
 use Symfony\Component\Console\Output\OutputInterface;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\touch;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Process
@@ -36,7 +35,7 @@ class ProcessTest extends CommandTestCase
 
     public function test_it_processes_a_file_and_displays_the_processed_contents_with_no_config(): void
     {
-        dump_file('index.php', '');
+        FS::dumpFile('index.php');
 
         $this->commandTester->execute(
             [
@@ -71,8 +70,8 @@ class ProcessTest extends CommandTestCase
 
     public function test_it_processes_a_file_and_displays_the_processed_contents_with_a_config(): void
     {
-        touch('index.php');
-        dump_file(
+        FS::touch('index.php');
+        FS::dumpFile(
             'acme.json',
             <<<'JSON'
                 {
@@ -80,7 +79,7 @@ class ProcessTest extends CommandTestCase
                 }
                 JSON,
         );
-        dump_file(
+        FS::dumpFile(
             'box.json',
             <<<'JSON'
                 {
@@ -129,7 +128,7 @@ class ProcessTest extends CommandTestCase
 
     public function test_it_processes_the_file_relative_to_the_config_base_path(): void
     {
-        dump_file(
+        FS::dumpFile(
             'index.php',
             <<<'PHP'
                 <?php
@@ -138,7 +137,7 @@ class ProcessTest extends CommandTestCase
                 PHP,
         );
 
-        dump_file(
+        FS::dumpFile(
             'box.json',
             <<<'JSON'
                 {
@@ -151,7 +150,7 @@ class ProcessTest extends CommandTestCase
                 }
                 JSON,
         );
-        dump_file(
+        FS::dumpFile(
             'scoper.inc.php',
             <<<'PHP'
                 <?php
@@ -222,8 +221,8 @@ class ProcessTest extends CommandTestCase
 
     public function test_it_processes_a_file_and_displays_only_the_processed_contents_in_quiet_mode(): void
     {
-        touch('index.php');
-        dump_file(
+        FS::touch('index.php');
+        FS::dumpFile(
             'acme.json',
             <<<'JSON'
                 {
@@ -231,7 +230,7 @@ class ProcessTest extends CommandTestCase
                 }
                 JSON,
         );
-        dump_file(
+        FS::dumpFile(
             'box.json',
             <<<'JSON'
                 {

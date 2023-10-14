@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Json;
 
+use Fidry\FileSystem\FS;
 use JsonSchema\Validator;
 use Seld\JsonLint\JsonParser;
 use Seld\JsonLint\ParsingException;
@@ -21,7 +22,6 @@ use stdClass;
 use function implode;
 use function json_decode;
 use function json_last_error;
-use function KevinGH\Box\FileSystem\file_contents;
 use const JSON_ERROR_NONE;
 use const JSON_ERROR_UTF8;
 
@@ -74,7 +74,7 @@ final class Json
      */
     public function decodeFile(string $file, bool $assoc = false): array|stdClass
     {
-        $json = file_contents($file);
+        $json = FS::getFileContents($file);
 
         return $this->decode($json, $assoc);
     }

@@ -1,7 +1,7 @@
 <?php
 
 declare (strict_types=1);
-namespace HumbugBox431\KevinGH\RequirementChecker;
+namespace HumbugBox440\KevinGH\RequirementChecker;
 
 interface IsFulfilled
 {

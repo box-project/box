@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
+use Fidry\FileSystem\FS;
 use KevinGH\Box\Configuration\NoConfigurationFound;
 use KevinGH\Box\Test\FileSystemTestCase;
-use function KevinGH\Box\FileSystem\touch;
 use const DIRECTORY_SEPARATOR;
 
 /**
@@ -28,7 +28,7 @@ class ConfigurationLocatorTest extends FileSystemTestCase
 {
     public function test_it_finds_the_default_path(): void
     {
-        touch('box.json');
+        FS::touch('box.json');
 
         self::assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'box.json',
@@ -38,7 +38,7 @@ class ConfigurationLocatorTest extends FileSystemTestCase
 
     public function test_it_finds_the_default_dist_path(): void
     {
-        touch('box.json.dist');
+        FS::touch('box.json.dist');
 
         self::assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'box.json.dist',
@@ -48,8 +48,8 @@ class ConfigurationLocatorTest extends FileSystemTestCase
 
     public function test_it_non_dist_file_takes_priority_over_dist_file(): void
     {
-        touch('box.json');
-        touch('box.json.dist');
+        FS::touch('box.json');
+        FS::touch('box.json.dist');
 
         self::assertSame(
             $this->tmp.DIRECTORY_SEPARATOR.'box.json',

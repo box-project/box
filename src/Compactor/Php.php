@@ -206,7 +206,6 @@ final class Php extends FileExtensionCompactor
     {
         Assert::keyExists($tokens, $opener);
 
-        /** @var PhpToken $token */
         $token = $tokens[$opener];
         $attributeBody = mb_substr($token->text, 2);
         $subTokens = PhpToken::tokenize('<?php '.$attributeBody);

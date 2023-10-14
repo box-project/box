@@ -14,40 +14,36 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Configuration;
 
+use Fidry\FileSystem\FS;
 use KevinGH\Box\Test\FileSystemTestCase;
 use stdClass;
+use Symfony\Component\Filesystem\Path;
 use function json_encode;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\make_path_absolute;
-use function KevinGH\Box\FileSystem\touch;
 use const JSON_PRETTY_PRINT;
-use const PHP_OS;
+use const PHP_OS_FAMILY;
 
 abstract class ConfigurationTestCase extends FileSystemTestCase
 {
     protected const DEFAULT_FILE = 'index.php';
 
-    /** @var Configuration */
-    protected $config;
-
-    /** @var string */
-    protected $file;
+    protected Configuration $config;
+    protected string $file;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->file = make_path_absolute('box.json', $this->tmp);
+        $this->file = Path::makeAbsolute('box.json', $this->tmp);
 
-        touch(self::DEFAULT_FILE);
-        dump_file($this->file, '{}');
+        FS::touch(self::DEFAULT_FILE);
+        FS::dumpFile($this->file, '{}');
 
         $this->config = Configuration::create($this->file, new stdClass());
     }
 
     final protected function setConfig(array $config): void
     {
-        dump_file($this->file, json_encode($config, JSON_PRETTY_PRINT));
+        FS::dumpFile($this->file, json_encode($config, JSON_PRETTY_PRINT));
 
         $this->reloadConfig();
     }
@@ -59,7 +55,7 @@ abstract class ConfigurationTestCase extends FileSystemTestCase
 
     final protected function isWindows(): bool
     {
-        return false === mb_stripos(PHP_OS, 'darwin') && false !== mb_stripos(PHP_OS, 'win');
+        return 'Windows' === PHP_OS_FAMILY;
     }
 
     final protected function getNoFileConfig(): Configuration

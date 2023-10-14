@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Composer;
 
 use Fidry\Console\DisplayNormalizer;
+use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Test\FileSystemTestCase;
 use PhpParser\Node\Name\FullyQualified;
@@ -23,8 +24,6 @@ use Symfony\Component\Finder\Finder;
 use function file_exists;
 use function file_get_contents;
 use function iterator_to_array;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\mirror;
 use function preg_replace;
 
 /**
@@ -68,7 +67,7 @@ class ComposerOrchestratorComposer24Test extends FileSystemTestCase
         string $prefix,
         string $expectedAutoloadContents,
     ): void {
-        dump_file('composer.json', '{}');
+        FS::dumpFile('composer.json', '{}');
 
         ComposerOrchestrator::dumpAutoload($symbolsRegistry, $prefix, false);
 
@@ -125,9 +124,9 @@ class ComposerOrchestratorComposer24Test extends FileSystemTestCase
         SymbolsRegistry $symbolsRegistry,
         string $prefix,
     ): void {
-        mirror(self::FIXTURES.'/dir000', $this->tmp);
+        FS::mirror(self::FIXTURES.'/dir000', $this->tmp);
 
-        dump_file('composer.json', '');
+        FS::dumpFile('composer.json');
 
         try {
             ComposerOrchestrator::dumpAutoload($symbolsRegistry, $prefix, false);
@@ -150,7 +149,7 @@ class ComposerOrchestratorComposer24Test extends FileSystemTestCase
 
     public function test_it_can_dump_the_autoloader_with_a_composer_json_with_a_dependency(): void
     {
-        mirror(self::FIXTURES.'/dir000', $this->tmp);
+        FS::mirror(self::FIXTURES.'/dir000', $this->tmp);
 
         ComposerOrchestrator::dumpAutoload(new SymbolsRegistry(), '', false);
 
@@ -262,7 +261,7 @@ class ComposerOrchestratorComposer24Test extends FileSystemTestCase
         string $expectedAutoloadContents,
     ): void {
         $this->skipIfFixturesNotInstalled(self::FIXTURES.'/dir001/vendor');
-        mirror(self::FIXTURES.'/dir001', $this->tmp);
+        FS::mirror(self::FIXTURES.'/dir001', $this->tmp);
 
         ComposerOrchestrator::dumpAutoload($SymbolsRegistry, $prefix, false);
 
@@ -333,7 +332,7 @@ class ComposerOrchestratorComposer24Test extends FileSystemTestCase
     public function test_it_can_dump_the_autoloader_with_a_composer_json_lock_and_installed_with_a_dev_dependency(): void
     {
         $this->skipIfFixturesNotInstalled(self::FIXTURES.'/dir003/vendor');
-        mirror(self::FIXTURES.'/dir003', $this->tmp);
+        FS::mirror(self::FIXTURES.'/dir003', $this->tmp);
 
         $composerAutoloaderName = self::COMPOSER_AUTOLOADER_NAME;
 
@@ -442,7 +441,7 @@ class ComposerOrchestratorComposer24Test extends FileSystemTestCase
         string $expectedAutoloadContents,
     ): void {
         $this->skipIfFixturesNotInstalled(self::FIXTURES.'/dir002/vendor');
-        mirror(self::FIXTURES.'/dir002', $this->tmp);
+        FS::mirror(self::FIXTURES.'/dir002', $this->tmp);
 
         ComposerOrchestrator::dumpAutoload($symbolsRegistry, $prefix, false);
 

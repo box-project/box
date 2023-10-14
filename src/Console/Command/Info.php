@@ -14,31 +14,21 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use DirectoryIterator;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
 use KevinGH\Box\Console\PharInfoRenderer;
-use KevinGH\Box\Phar\CompressionAlgorithm;
-use KevinGH\Box\PharInfo\PharInfo;
+use KevinGH\Box\Phar\PharInfo;
 use Phar;
-use PharData;
-use PharFileInfo;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Path;
 use Throwable;
 use function implode;
 use function is_array;
-use function KevinGH\Box\create_temporary_phar;
-use function KevinGH\Box\FileSystem\remove;
-use function KevinGH\Box\format_size;
 use function realpath;
 use function sprintf;
-use function str_repeat;
-use function str_replace;
 
 /**
  * @private
@@ -131,16 +121,10 @@ final class Info implements Command
             return ExitCode::FAILURE;
         }
 
-        $tmpFile = create_temporary_phar($fileRealPath);
-
-        try {
-            return self::showInfo($tmpFile, $fileRealPath, $io);
-        } finally {
-            remove($tmpFile);
-        }
+        return self::showInfo($fileRealPath, $io);
     }
 
-    public static function showInfo(string $file, string $originalFile, IO $io): int
+    public static function showInfo(string $file, IO $io): int
     {
         $maxDepth = self::getMaxDepth($io);
         $mode = $io->getOption(self::MODE_OPT)->asStringChoice(self::MODES);
@@ -151,7 +135,7 @@ final class Info implements Command
             return self::showPharInfo(
                 $pharInfo,
                 $io->getOption(self::LIST_OPT)->asBoolean(),
-                $maxDepth,
+                -1 === $maxDepth ? false : $maxDepth,
                 'indent' === $mode,
                 $io,
             );
@@ -163,7 +147,7 @@ final class Info implements Command
             $io->error(
                 sprintf(
                     'Could not read the file "%s".',
-                    $originalFile,
+                    $file,
                 ),
             );
 
@@ -206,22 +190,18 @@ final class Info implements Command
     private static function showPharInfo(
         PharInfo $pharInfo,
         bool $content,
-        int $depth,
+        int|false $maxDepth,
         bool $indent,
         IO $io,
     ): int {
         self::showPharMeta($pharInfo, $io);
 
         if ($content) {
-            self::renderContents(
+            PharInfoRenderer::renderContent(
                 $io,
-                $pharInfo->getPhar(),
-                0,
-                $depth,
-                $indent ? 0 : false,
-                $pharInfo->getRoot(),
-                $pharInfo->getPhar(),
-                $pharInfo->getRoot(),
+                $pharInfo,
+                $maxDepth,
+                $indent,
             );
         } else {
             $io->comment('Use the <info>--list|-l</info> option to list the content of the PHAR.');
@@ -278,84 +258,6 @@ final class Info implements Command
             }
 
             $out = true;
-        }
-    }
-
-    /**
-     * @param iterable<PharFileInfo> $list
-     * @param -1|natural             $maxDepth
-     * @param false|int              $indent   Nbr of indent or `false`
-     */
-    private static function renderContents(
-        OutputInterface $output,
-        iterable $list,
-        int $depth,
-        int $maxDepth,
-        int|false $indent,
-        string $base,
-        Phar|PharData $phar,
-        string $root,
-    ): void {
-        if (-1 !== $maxDepth && $depth > $maxDepth) {
-            return;
-        }
-
-        foreach ($list as $item) {
-            /** @var PharFileInfo $item */
-            $item = $phar[str_replace($root, '', $item->getPathname())];
-
-            if (false !== $indent) {
-                $output->write(str_repeat(' ', $indent));
-
-                $path = $item->getFilename();
-
-                if ($item->isDir()) {
-                    $path .= '/';
-                }
-            } else {
-                $path = str_replace($base, '', $item->getPathname());
-            }
-
-            if ($item->isDir()) {
-                if (false !== $indent) {
-                    $output->writeln("<info>{$path}</info>");
-                }
-            } else {
-                $compression = '<fg=red>[NONE]</fg=red>';
-
-                foreach (CompressionAlgorithm::cases() as $compressionAlgorithm) {
-                    if (CompressionAlgorithm::NONE !== $compressionAlgorithm
-                        && $item->isCompressed($compressionAlgorithm->value)
-                    ) {
-                        $compression = "<fg=cyan>[{$compressionAlgorithm->name}]</fg=cyan>";
-                        break;
-                    }
-                }
-
-                $fileSize = format_size($item->getCompressedSize());
-
-                $output->writeln(
-                    sprintf(
-                        '%s %s - %s',
-                        $path,
-                        $compression,
-                        $fileSize,
-                    ),
-                );
-            }
-
-            if ($item->isDir()) {
-                self::renderContents(
-                    $output,
-                    new DirectoryIterator($item->getPathname()),
-                    $depth + 1,
-                    $maxDepth,
-                    false === $indent ? $indent : $indent + 2,
-                    $base,
-                    $phar,
-                    $root,
-                );
-            }
         }
     }
 }

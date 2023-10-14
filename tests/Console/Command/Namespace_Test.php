@@ -16,8 +16,8 @@ namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
+use Fidry\FileSystem\FS;
 use KevinGH\Box\Test\CommandTestCase;
-use function KevinGH\Box\FileSystem\dump_file;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Namespace_
@@ -33,7 +33,7 @@ class Namespace_Test extends CommandTestCase
 
     public function test_it_show_the_ng(): void
     {
-        dump_file('index.php', '');
+        FS::dumpFile('index.php');
 
         $this->commandTester->execute(
             [

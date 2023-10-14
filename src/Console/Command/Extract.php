@@ -18,27 +18,31 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
-use KevinGH\Box\Box;
-use RecursiveIteratorIterator;
-use RuntimeException;
-use Symfony\Component\Console\Exception\RuntimeException as ConsoleRuntimeException;
+use Fidry\FileSystem\FS;
+use KevinGH\Box\Phar\InvalidPhar;
+use KevinGH\Box\Phar\PharFactory;
+use KevinGH\Box\Phar\PharMeta;
+use ParagonIE\ConstantTime\Hex;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Throwable;
-use function count;
-use function KevinGH\Box\bump_open_file_descriptor_limit;
-use function KevinGH\Box\create_temporary_phar;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\remove;
+use function file_exists;
+use function KevinGH\Box\check_php_settings;
 use function realpath;
 use function sprintf;
+use const DIRECTORY_SEPARATOR;
 
 /**
  * @private
  */
 final class Extract implements Command
 {
+    public const PHAR_META_PATH = '.phar_meta.json';
+
     private const PHAR_ARG = 'phar';
     private const OUTPUT_ARG = 'output';
+    private const INTERNAL_OPT = 'internal';
 
     public function getConfiguration(): Configuration
     {
@@ -50,7 +54,7 @@ final class Extract implements Command
                 new InputArgument(
                     self::PHAR_ARG,
                     InputArgument::REQUIRED,
-                    'The PHAR file.',
+                    'The path to the PHAR file',
                 ),
                 new InputArgument(
                     self::OUTPUT_ARG,
@@ -58,35 +62,58 @@ final class Extract implements Command
                     'The output directory',
                 ),
             ],
+            [
+                new InputOption(
+                    self::INTERNAL_OPT,
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Internal option; Should not be used.',
+                ),
+            ],
         );
     }
 
     public function execute(IO $io): int
     {
-        $filePath = self::getPharFilePath($io);
+        check_php_settings($io);
+
+        $pharPath = self::getPharFilePath($io);
         $outputDir = $io->getArgument(self::OUTPUT_ARG)->asNonEmptyString();
+        $internal = $io->getOption(self::INTERNAL_OPT)->asBoolean();
 
-        if (null === $filePath) {
+        if (null === $pharPath) {
             return ExitCode::FAILURE;
         }
 
-        [$box, $cleanUpTmpPhar] = $this->getBox($filePath, $io);
+        if (file_exists($outputDir)) {
+            $canDelete = $io->askQuestion(
+                new ConfirmationQuestion(
+                    'The output directory already exists. Do you want to delete its current content?',
+                    // If is interactive, we want the prompt to default to false since it can be an error made by the user.
+                    // Otherwise, this is likely launched by a script or Pharaoh in which case we do not care.
+                    $internal,
+                ),
+            );
 
-        if (null === $box) {
-            return ExitCode::FAILURE;
+            if ($canDelete) {
+                FS::remove($outputDir);
+                // Continue
+            } else {
+                // Do nothing
+                return ExitCode::FAILURE;
+            }
         }
 
-        $restoreLimit = bump_open_file_descriptor_limit(count($box), $io);
-
-        $cleanUp = static function () use ($cleanUpTmpPhar, $restoreLimit): void {
-            $cleanUpTmpPhar();
-            $restoreLimit();
-        };
+        FS::mkdir($outputDir);
 
         try {
-            self::dumpPhar($outputDir, $box, $cleanUp);
-        } catch (RuntimeException $exception) {
-            $io->error($exception->getMessage());
+            self::dumpPhar($pharPath, $outputDir);
+        } catch (InvalidPhar $invalidPhar) {
+            if (!$internal) {
+                throw $invalidPhar;
+            }
+
+            $io->getErrorIO()->write($invalidPhar->getMessage());
 
             return ExitCode::FAILURE;
         }
@@ -112,58 +139,66 @@ final class Extract implements Command
         return null;
     }
 
-    /**
-     * @return array{Box, callable(): void}|array{null, null}
-     */
-    private function getBox(string $filePath, IO $io): ?array
+    private static function dumpPhar(string $file, string $tmpDir): string
     {
-        $tmpFile = create_temporary_phar($filePath);
-        $cleanUp = static fn () => remove($tmpFile);
+        // We have to give every one a different alias, or it pukes.
+        $alias = self::generateAlias($file);
+
+        // Create a temporary PHAR: this is because the extension might be
+        // missing in which case we would not be able to create a Phar instance
+        // as it requires the .phar extension.
+        $tmpFile = $tmpDir.DIRECTORY_SEPARATOR.$alias;
+        $pubKey = $file.'.pubkey';
+        $pubKeyContent = null;
+        $tmpPubKey = $tmpFile.'.pubkey';
 
         try {
-            return [
-                Box::create($tmpFile),
-                $cleanUp,
-            ];
+            FS::copy($file, $tmpFile, true);
+
+            if (file_exists($pubKey)) {
+                FS::copy($pubKey, $tmpPubKey, true);
+                $pubKeyContent = FS::getFileContents($pubKey);
+            }
+
+            $phar = PharFactory::create($tmpFile, $file);
+            $pharMeta = PharMeta::fromPhar($phar, $pubKeyContent);
+
+            $phar->extractTo($tmpDir);
         } catch (Throwable $throwable) {
-            // Continue
+            FS::remove([$tmpFile, $tmpPubKey]);
+
+            throw $throwable;
         }
 
-        if ($io->isDebug()) {
-            $cleanUp();
+        FS::dumpFile(
+            $tmpDir.DIRECTORY_SEPARATOR.self::PHAR_META_PATH,
+            $pharMeta->toJson(),
+        );
 
-            throw new ConsoleRuntimeException(
-                'The given file is not a valid PHAR',
-                0,
-                $throwable,
-            );
-        }
+        // Cleanup the temporary PHAR.
+        FS::remove([$tmpFile, $tmpPubKey]);
 
-        $io->error('The given file is not a valid PHAR');
-
-        $cleanUp();
-
-        return [null, null];
+        return $tmpDir;
     }
 
-    /**
-     * @param callable(): void $cleanUp
-     */
-    private static function dumpPhar(string $outputDir, Box $box, callable $cleanUp): void
+    private static function generateAlias(string $file): string
     {
-        try {
-            remove($outputDir);
+        $extension = self::getExtension($file);
 
-            $rootLength = mb_strlen('phar://'.$box->getPhar()->getPath()) + 1;
+        return Hex::encode(random_bytes(16)).$extension;
+    }
 
-            foreach (new RecursiveIteratorIterator($box->getPhar()) as $filePath) {
-                dump_file(
-                    $outputDir.'/'.mb_substr($filePath->getPathname(), $rootLength),
-                    (string) $filePath->getContent(),
-                );
-            }
-        } finally {
-            $cleanUp();
+    private static function getExtension(string $file): string
+    {
+        $lastExtension = pathinfo($file, PATHINFO_EXTENSION);
+        $extension = '';
+
+        while ('' !== $lastExtension) {
+            $extension = '.'.$lastExtension.$extension;
+            $file = mb_substr($file, 0, -(mb_strlen($lastExtension) + 1));
+            $lastExtension = pathinfo($file, PATHINFO_EXTENSION);
         }
+
+        return '' === $extension ? '.phar' : $extension;
     }
 }

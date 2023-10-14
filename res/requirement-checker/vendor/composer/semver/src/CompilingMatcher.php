@@ -1,9 +1,9 @@
 <?php
 
-namespace HumbugBox431\Composer\Semver;
+namespace HumbugBox440\Composer\Semver;
 
-use HumbugBox431\Composer\Semver\Constraint\Constraint;
-use HumbugBox431\Composer\Semver\Constraint\ConstraintInterface;
+use HumbugBox440\Composer\Semver\Constraint\Constraint;
+use HumbugBox440\Composer\Semver\Constraint\ConstraintInterface;
 class CompilingMatcher
 {
     /**

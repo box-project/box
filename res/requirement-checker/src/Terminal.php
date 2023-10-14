@@ -1,7 +1,7 @@
 <?php
 
 declare (strict_types=1);
-namespace HumbugBox431\KevinGH\RequirementChecker;
+namespace HumbugBox440\KevinGH\RequirementChecker;
 
 use function exec;
 use function fclose;
@@ -57,7 +57,7 @@ class Terminal
     private static function initDimensions() : void
     {
         if ('\\' === DIRECTORY_SEPARATOR) {
-            if (preg_match('/^(\\d+)x(\\d+)(?: \\((\\d+)x(\\d+)\\))?$/', trim(getenv('ANSICON')), $matches)) {
+            if (preg_match('/^(\\d+)x(\\d+)(?: \\((\\d+)x(\\d+)\\))?$/', trim(getenv('ANSICON') ?: ''), $matches)) {
                 self::$width = (int) $matches[1];
                 self::$height = isset($matches[4]) ? (int) $matches[4] : (int) $matches[2];
             } elseif (!self::hasVt100Support() && self::hasSttyAvailable()) {

@@ -18,6 +18,7 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration as ConsoleConfiguration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
+use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Compactors;
@@ -28,6 +29,7 @@ use stdClass;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use function array_map;
@@ -37,9 +39,6 @@ use function explode;
 use function getcwd;
 use function implode;
 use function KevinGH\Box\check_php_settings;
-use function KevinGH\Box\FileSystem\file_contents;
-use function KevinGH\Box\FileSystem\make_path_absolute;
-use function KevinGH\Box\FileSystem\make_path_relative;
 use function putenv;
 use function sprintf;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
@@ -102,12 +101,12 @@ final class Process implements Command
 
         $filePath = $io->getArgument(self::FILE_ARGUMENT)->asNonEmptyString();
 
-        $path = make_path_relative($filePath, $config->getBasePath());
+        $path = Path::makeRelative($filePath, $config->getBasePath());
 
         $compactors = self::retrieveCompactors($config);
 
-        $fileContents = file_contents(
-            $absoluteFilePath = make_path_absolute(
+        $fileContents = FS::getFileContents(
+            $absoluteFilePath = Path::makeAbsolute(
                 $filePath,
                 getcwd(),
             ),

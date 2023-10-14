@@ -16,6 +16,7 @@ namespace KevinGH\Box\Composer;
 
 use Composer\Semver\Semver;
 use Fidry\Console\Input\IO;
+use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Console\Logger\CompilerLogger;
@@ -25,8 +26,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\file_contents;
 use function preg_replace;
 use function sprintf;
 use function str_replace;
@@ -76,7 +75,7 @@ final class ComposerOrchestrator
         $logger = new CompilerLogger($io ?? IO::createNull());
 
         $composerExecutable = $composerBin ?? self::retrieveComposerExecutable();
-        $getVersionProcess = new Process([$composerExecutable, '--version']);
+        $getVersionProcess = new Process([$composerExecutable, '--version', '--no-ansi']);
 
         $logger->log(
             CompilerLogger::CHEVRON_PREFIX,
@@ -87,11 +86,7 @@ final class ComposerOrchestrator
         $getVersionProcess->run(null, self::getDefaultEnvVars());
 
         if (false === $getVersionProcess->isSuccessful()) {
-            throw new RuntimeException(
-                'Could not determine the Composer version.',
-                0,
-                new ProcessFailedException($getVersionProcess),
-            );
+            throw new ProcessFailedException($getVersionProcess);
         }
 
         $output = $getVersionProcess->getOutput();
@@ -100,7 +95,12 @@ final class ComposerOrchestrator
             return $match[1];
         }
 
-        throw new RuntimeException('Could not determine the Composer version.');
+        throw new RuntimeException(
+            sprintf(
+                'Could not determine the Composer version from "%s".',
+                $output,
+            ),
+        );
     }
 
     public static function dumpAutoload(
@@ -121,10 +121,10 @@ final class ComposerOrchestrator
 
             $autoloadContents = self::generateAutoloadStatements(
                 $symbolsRegistry,
-                file_contents($autoloadFile),
+                FS::getFileContents($autoloadFile),
             );
 
-            dump_file($autoloadFile, $autoloadContents);
+            FS::dumpFile($autoloadFile, $autoloadContents);
         }
     }
 

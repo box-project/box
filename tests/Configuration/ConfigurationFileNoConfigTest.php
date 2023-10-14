@@ -14,14 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Configuration;
 
+use Fidry\FileSystem\FS;
 use InvalidArgumentException;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\mkdir;
-use function KevinGH\Box\FileSystem\remove;
-use function KevinGH\Box\FileSystem\touch;
+use KevinGH\Box\Platform;
 use function natcasesort;
 use function symlink;
-use const PHP_OS_FAMILY;
 
 /**
  * @covers \KevinGH\Box\Configuration\Configuration
@@ -34,58 +31,58 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
 {
     public function test_all_the_files_found_in_the_composer_json_are_taken_by_default_with_no_config_file_is_used(): void
     {
-        touch('index.php');
-        touch('index.phar');
+        FS::touch('index.php');
+        FS::touch('index.phar');
 
-        touch('file0');
-        touch('file1');
-        touch('file2');
+        FS::touch('file0');
+        FS::touch('file1');
+        FS::touch('file2');
 
-        mkdir('B');
-        touch('B/fileB0');
-        touch('B/fileB1');
+        FS::mkdir('B');
+        FS::touch('B/fileB0');
+        FS::touch('B/fileB1');
 
-        mkdir('PSR4_0');
-        touch('PSR4_0/file0');
-        touch('PSR4_0/file1');
+        FS::mkdir('PSR4_0');
+        FS::touch('PSR4_0/file0');
+        FS::touch('PSR4_0/file1');
 
-        mkdir('PSR4_1');
-        touch('PSR4_1/file0');
-        touch('PSR4_1/file1');
+        FS::mkdir('PSR4_1');
+        FS::touch('PSR4_1/file0');
+        FS::touch('PSR4_1/file1');
 
-        mkdir('PSR4_2');
-        touch('PSR4_2/file0');
-        touch('PSR4_2/file1');
+        FS::mkdir('PSR4_2');
+        FS::touch('PSR4_2/file0');
+        FS::touch('PSR4_2/file1');
 
-        mkdir('DEV_PSR4_0');
-        touch('DEV_PSR4_0/file0');
-        touch('DEV_PSR4_0/file1');
+        FS::mkdir('DEV_PSR4_0');
+        FS::touch('DEV_PSR4_0/file0');
+        FS::touch('DEV_PSR4_0/file1');
 
-        mkdir('PSR0_0');
-        touch('PSR0_0/file0');
-        touch('PSR0_0/file1');
+        FS::mkdir('PSR0_0');
+        FS::touch('PSR0_0/file0');
+        FS::touch('PSR0_0/file1');
 
-        mkdir('PSR0_1');
-        touch('PSR0_1/file0');
-        touch('PSR0_1/file1');
+        FS::mkdir('PSR0_1');
+        FS::touch('PSR0_1/file0');
+        FS::touch('PSR0_1/file1');
 
-        mkdir('PSR0_2');
-        touch('PSR0_2/file0');
-        touch('PSR0_2/file1');
+        FS::mkdir('PSR0_2');
+        FS::touch('PSR0_2/file0');
+        FS::touch('PSR0_2/file1');
 
-        mkdir('DEV_PSR0_0');
-        touch('DEV_PSR0_0/file0');
-        touch('DEV_PSR0_0/file1');
+        FS::mkdir('DEV_PSR0_0');
+        FS::touch('DEV_PSR0_0/file0');
+        FS::touch('DEV_PSR0_0/file1');
 
-        mkdir('CLASSMAP_DIR');
-        touch('CLASSMAP_DIR/file0');
-        touch('CLASSMAP_DIR/file1');
+        FS::mkdir('CLASSMAP_DIR');
+        FS::touch('CLASSMAP_DIR/file0');
+        FS::touch('CLASSMAP_DIR/file1');
 
-        mkdir('CLASSMAP_DEV_DIR');
-        touch('CLASSMAP_DEV_DIR/file0');
-        touch('CLASSMAP_DEV_DIR/file1');
+        FS::mkdir('CLASSMAP_DEV_DIR');
+        FS::touch('CLASSMAP_DEV_DIR/file0');
+        FS::touch('CLASSMAP_DEV_DIR/file1');
 
-        dump_file(
+        FS::dumpFile(
             'composer.json',
             <<<'JSON'
                 {
@@ -158,11 +155,11 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
 
     public function test_find_psr0_files(): void
     {
-        mkdir('PSR0_0');
-        touch('PSR0_0/file0');
-        touch('PSR0_0/file1');
+        FS::mkdir('PSR0_0');
+        FS::touch('PSR0_0/file0');
+        FS::touch('PSR0_0/file1');
 
-        dump_file(
+        FS::dumpFile(
             'composer.json',
             <<<'JSON'
                 {
@@ -199,15 +196,15 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
 
     public function test_psr0_with_empty_directory_in_composer_json(): void
     {
-        touch('root_file0');
-        touch('root_file1');
+        FS::touch('root_file0');
+        FS::touch('root_file1');
 
-        mkdir('Acme');
-        touch('Acme/file0');
-        touch('Acme/file1');
-        touch('Acme/file2');
+        FS::mkdir('Acme');
+        FS::touch('Acme/file0');
+        FS::touch('Acme/file1');
+        FS::touch('Acme/file2');
 
-        dump_file(
+        FS::dumpFile(
             'composer.json',
             <<<'JSON'
                 {
@@ -246,9 +243,9 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
 
     public function test_throws_an_error_if_a_non_existent_file_is_found_via_the_composer_json(): void
     {
-        touch('file0');
+        FS::touch('file0');
 
-        dump_file(
+        FS::dumpFile(
             'composer.json',
             <<<'JSON'
                 {
@@ -270,7 +267,7 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
             );
         }
 
-        dump_file(
+        FS::dumpFile(
             'composer.json',
             <<<'JSON'
                 {
@@ -295,10 +292,10 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
 
     public function test_throws_an_error_if_a_symlink_is_used(): void
     {
-        touch('file0');
+        FS::touch('file0');
         symlink('file0', 'file1');
 
-        dump_file(
+        FS::dumpFile(
             'composer.json',
             <<<'JSON'
                 {
@@ -320,7 +317,7 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
             );
         }
 
-        dump_file(
+        FS::dumpFile(
             'composer.json',
             <<<'JSON'
                 {
@@ -330,7 +327,7 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
                 }
                 JSON,
         );
-        mkdir('original_dir');
+        FS::mkdir('original_dir');
         symlink('original_dir', 'CLASSMAP_DIR');
 
         try {
@@ -347,59 +344,59 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
 
     public function test_the_blacklist_setting_is_applied_to_all_the_files_found_in_the_current_directory_are_taken_by_default_if_no_file_setting_is_used(): void
     {
-        touch('file0');
-        touch('file1');
-        touch('file2');
+        FS::touch('file0');
+        FS::touch('file1');
+        FS::touch('file2');
 
-        mkdir('B');
-        touch('B/fileB0');
-        touch('B/fileB1');
+        FS::mkdir('B');
+        FS::touch('B/fileB0');
+        FS::touch('B/fileB1');
 
-        mkdir('PSR4_0');
-        touch('PSR4_0/file0');
-        touch('PSR4_0/file1');
+        FS::mkdir('PSR4_0');
+        FS::touch('PSR4_0/file0');
+        FS::touch('PSR4_0/file1');
 
-        mkdir('PSR4_1');
-        touch('PSR4_1/file0');
-        touch('PSR4_1/file1');
+        FS::mkdir('PSR4_1');
+        FS::touch('PSR4_1/file0');
+        FS::touch('PSR4_1/file1');
 
-        mkdir('PSR4_2');
-        touch('PSR4_2/file0');
-        touch('PSR4_2/file1');
+        FS::mkdir('PSR4_2');
+        FS::touch('PSR4_2/file0');
+        FS::touch('PSR4_2/file1');
 
-        mkdir('DEV_PSR4_0');
-        touch('DEV_PSR4_0/file0');
-        touch('DEV_PSR4_0/file1');
+        FS::mkdir('DEV_PSR4_0');
+        FS::touch('DEV_PSR4_0/file0');
+        FS::touch('DEV_PSR4_0/file1');
 
-        mkdir('PSR0_0');
-        touch('PSR0_0/file0');
-        touch('PSR0_0/file1');
+        FS::mkdir('PSR0_0');
+        FS::touch('PSR0_0/file0');
+        FS::touch('PSR0_0/file1');
 
-        mkdir('PSR0_1');
-        touch('PSR0_1/file0');
-        touch('PSR0_1/file1');
+        FS::mkdir('PSR0_1');
+        FS::touch('PSR0_1/file0');
+        FS::touch('PSR0_1/file1');
 
-        mkdir('PSR0_2');
-        touch('PSR0_2/file0');
-        touch('PSR0_2/file1');
+        FS::mkdir('PSR0_2');
+        FS::touch('PSR0_2/file0');
+        FS::touch('PSR0_2/file1');
 
-        mkdir('DEV_PSR0_0');
-        touch('DEV_PSR0_0/file0');
-        touch('DEV_PSR0_0/file1');
+        FS::mkdir('DEV_PSR0_0');
+        FS::touch('DEV_PSR0_0/file0');
+        FS::touch('DEV_PSR0_0/file1');
 
-        mkdir('BLACKLISTED_CLASSMAP_DIR');
-        touch('BLACKLISTED_CLASSMAP_DIR/file0');
-        touch('BLACKLISTED_CLASSMAP_DIR/file1');
+        FS::mkdir('BLACKLISTED_CLASSMAP_DIR');
+        FS::touch('BLACKLISTED_CLASSMAP_DIR/file0');
+        FS::touch('BLACKLISTED_CLASSMAP_DIR/file1');
 
-        mkdir('CLASSMAP_DIR');
-        touch('CLASSMAP_DIR/file0');
-        touch('CLASSMAP_DIR/file1');
+        FS::mkdir('CLASSMAP_DIR');
+        FS::touch('CLASSMAP_DIR/file0');
+        FS::touch('CLASSMAP_DIR/file1');
 
-        mkdir('CLASSMAP_DEV_DIR');
-        touch('CLASSMAP_DEV_DIR/file0');
-        touch('CLASSMAP_DEV_DIR/file1');
+        FS::mkdir('CLASSMAP_DEV_DIR');
+        FS::touch('CLASSMAP_DEV_DIR/file0');
+        FS::touch('CLASSMAP_DEV_DIR/file1');
 
-        dump_file(
+        FS::dumpFile(
             'composer.json',
             <<<'JSON'
                 {
@@ -466,217 +463,217 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
     public function test_it_ignores_the_most_common_non_needed_files_when_guess_the_files_from_the_composer_json_file(): void
     {
         // Depending on the test machine: the following command might be needed:
-        // docker run -i --rm -w /opt/box -v "$PWD":/opt/box box_php81 vendor/bin/phpunit tests/Configuration/ConfigurationFileNoConfigTest.php --filter test_it_ignores_the_most_common_non_needed_files_when_guess_the_files_from_the_composer_json_file
+        // docker run -i --rm -w /opt/box -v "$PWD":/opt/box php:8.1-cli vendor/bin/phpunit tests/Configuration/ConfigurationFileNoConfigTest.php --filter test_it_ignores_the_most_common_non_needed_files_when_guess_the_files_from_the_composer_json_file
 
-        if ('Darwin' === PHP_OS_FAMILY) {
+        if (Platform::isOSX()) {
             self::markTestSkipped('Cannot run this test on OSX since it is case insensitive.');
         }
 
-        touch('main.php~');
-        touch('main.php.back');
-        touch('main.php.swp');
+        FS::touch('main.php~');
+        FS::touch('main.php.back');
+        FS::touch('main.php.swp');
 
-        touch('phpunit.xml.dist');
-        touch('phpunit.xml');
-        touch('phpunit_infection.xml.dist');
+        FS::touch('phpunit.xml.dist');
+        FS::touch('phpunit.xml');
+        FS::touch('phpunit_infection.xml.dist');
 
-        touch('LICENSE');
-        touch('LICENSE.md');
-        touch('license');
-        touch('LICENSE_GECKO');
+        FS::touch('LICENSE');
+        FS::touch('LICENSE.md');
+        FS::touch('license');
+        FS::touch('LICENSE_GECKO');
 
-        touch('License.php');
-        touch('LicenseCommand.php');
+        FS::touch('License.php');
+        FS::touch('LicenseCommand.php');
 
-        touch('README');
-        touch('README.md');
-        touch('README_ru.md');
-        touch('README.rst');
-        touch('readme');
+        FS::touch('README');
+        FS::touch('README.md');
+        FS::touch('README_ru.md');
+        FS::touch('README.rst');
+        FS::touch('readme');
 
-        touch('Readme.php');
-        touch('ReadmeCommand.php');
+        FS::touch('Readme.php');
+        FS::touch('ReadmeCommand.php');
 
-        touch('UPGRADE');
-        touch('UPGRADE.md');
-        touch('upgrade');
+        FS::touch('UPGRADE');
+        FS::touch('UPGRADE.md');
+        FS::touch('upgrade');
 
-        touch('Upgrade.php');
-        touch('UpgradeCommand.php');
+        FS::touch('Upgrade.php');
+        FS::touch('UpgradeCommand.php');
 
-        touch('CHANGELOG');
-        touch('ChangeLog-7.1.md');
-        touch('CHANGELOG.md');
-        touch('changelog');
+        FS::touch('CHANGELOG');
+        FS::touch('ChangeLog-7.1.md');
+        FS::touch('CHANGELOG.md');
+        FS::touch('changelog');
 
-        touch('Changelog.php');
-        touch('ChangelogCommand.php');
+        FS::touch('Changelog.php');
+        FS::touch('ChangelogCommand.php');
 
-        touch('CONTRIBUTING');
-        touch('CONTRIBUTING.md');
-        touch('contributing');
+        FS::touch('CONTRIBUTING');
+        FS::touch('CONTRIBUTING.md');
+        FS::touch('contributing');
 
-        touch('Contributing.php');
-        touch('ContributingCommand.php');
+        FS::touch('Contributing.php');
+        FS::touch('ContributingCommand.php');
 
-        touch('TODO');
-        touch('TODO.md');
-        touch('todo');
+        FS::touch('TODO');
+        FS::touch('TODO.md');
+        FS::touch('todo');
 
-        touch('Todo.php');
-        touch('TodoCommand.php');
+        FS::touch('Todo.php');
+        FS::touch('TodoCommand.php');
 
-        touch('CONDUCT');
-        touch('CONDUCT.md');
-        touch('conduct');
-        touch('CODE_OF_CONDUCT.md');
+        FS::touch('CONDUCT');
+        FS::touch('CONDUCT.md');
+        FS::touch('conduct');
+        FS::touch('CODE_OF_CONDUCT.md');
 
-        touch('Conduct.php');
-        touch('ConductCommand.php');
+        FS::touch('Conduct.php');
+        FS::touch('ConductCommand.php');
 
-        touch('AUTHORS');
-        touch('AUTHORS.md');
-        touch('authors');
+        FS::touch('AUTHORS');
+        FS::touch('AUTHORS.md');
+        FS::touch('authors');
 
-        touch('Author.php');
-        touch('AuthorCommand.php');
+        FS::touch('Author.php');
+        FS::touch('AuthorCommand.php');
 
-        touch('Test.php');
-        touch('MainTest.php');
-        touch('SkippedTest.php');
+        FS::touch('Test.php');
+        FS::touch('MainTest.php');
+        FS::touch('SkippedTest.php');
 
-        touch('Makefile');
+        FS::touch('Makefile');
 
-        mkdir('doc');
-        touch('doc/file0');
+        FS::mkdir('doc');
+        FS::touch('doc/file0');
 
-        mkdir('docs');
-        touch('docs/file0');
+        FS::mkdir('docs');
+        FS::touch('docs/file0');
 
-        mkdir('src');
-        touch('src/.fileB0');
-        touch('src/foo.php');
-        touch('src/doc.md');
-        touch('src/doc.rst');
-        touch('src/composer.json');
+        FS::mkdir('src');
+        FS::touch('src/.fileB0');
+        FS::touch('src/foo.php');
+        FS::touch('src/doc.md');
+        FS::touch('src/doc.rst');
+        FS::touch('src/composer.json');
 
-        mkdir('test');
-        touch('test/file0');
-        touch('test/Test.php');
-        touch('test/MainTest.php');
-        touch('test/SkippedTest.php');
+        FS::mkdir('test');
+        FS::touch('test/file0');
+        FS::touch('test/Test.php');
+        FS::touch('test/MainTest.php');
+        FS::touch('test/SkippedTest.php');
 
-        mkdir('tests');
-        touch('tests/file0');
-        touch('tests/Test.php');
-        touch('tests/MainTest.php');
-        touch('tests/SkippedTest.php');
+        FS::mkdir('tests');
+        FS::touch('tests/file0');
+        FS::touch('tests/Test.php');
+        FS::touch('tests/MainTest.php');
+        FS::touch('tests/SkippedTest.php');
 
-        mkdir('src/Test');
-        touch('src/Test/file0');
-        touch('src/Test/Test.php');
-        touch('src/Test/MainTest.php');
-        touch('src/Test/SkippedTest.php');
+        FS::mkdir('src/Test');
+        FS::touch('src/Test/file0');
+        FS::touch('src/Test/Test.php');
+        FS::touch('src/Test/MainTest.php');
+        FS::touch('src/Test/SkippedTest.php');
 
-        mkdir('src/Tests');
-        touch('src/Tests/file0');
-        touch('src/Tests/Test.php');
-        touch('src/Tests/MainTest.php');
-        touch('src/Tests/SkippedTest.php');
+        FS::mkdir('src/Tests');
+        FS::touch('src/Tests/file0');
+        FS::touch('src/Tests/Test.php');
+        FS::touch('src/Tests/MainTest.php');
+        FS::touch('src/Tests/SkippedTest.php');
 
-        mkdir('travis');
-        touch('travis/install-ev.sh');
+        FS::mkdir('travis');
+        FS::touch('travis/install-ev.sh');
 
-        mkdir('.travis');
-        touch('.travis/install-ev.sh');
+        FS::mkdir('.travis');
+        FS::touch('.travis/install-ev.sh');
 
-        touch('.travis.yml');
-        touch('appveyor.yml');
+        FS::touch('.travis.yml');
+        FS::touch('appveyor.yml');
 
-        touch('phpdoc.dist.xml');
-        touch('phpdoc.xml');
+        FS::touch('phpdoc.dist.xml');
+        FS::touch('phpdoc.xml');
 
-        touch('psalm.xml');
+        FS::touch('psalm.xml');
 
-        touch('Vagrantfile');
+        FS::touch('Vagrantfile');
 
-        touch('phpstan.neon.dist');
-        touch('phpstan.neon');
-        touch('phpstan-test.neon');
+        FS::touch('phpstan.neon.dist');
+        FS::touch('phpstan.neon');
+        FS::touch('phpstan-test.neon');
 
-        touch('infection.json.dist');
-        touch('infection.json');
+        FS::touch('infection.json.dist');
+        FS::touch('infection.json');
 
-        touch('humbug.json.dist');
-        touch('humbug.json');
+        FS::touch('humbug.json.dist');
+        FS::touch('humbug.json');
 
-        touch('easy-coding-standard.neon');
-        touch('easy-coding-standard.neon.dist');
+        FS::touch('easy-coding-standard.neon');
+        FS::touch('easy-coding-standard.neon.dist');
 
-        touch('phpbench.json.dist');
-        touch('phpbench.json');
+        FS::touch('phpbench.json.dist');
+        FS::touch('phpbench.json');
 
-        touch('phpcs.xml.dist');
-        touch('phpcs.xml');
+        FS::touch('phpcs.xml.dist');
+        FS::touch('phpcs.xml');
 
-        touch('.php_cs.dist');
-        touch('.php_cs');
-        touch('.php_cs.cache');
+        FS::touch('.php_cs.dist');
+        FS::touch('.php_cs');
+        FS::touch('.php_cs.cache');
 
-        touch('.php-cs-fixer.dist.php');
-        touch('.php-cs-fixer.php');
-        touch('.php-cs-fixer.cache');
+        FS::touch('.php-cs-fixer.dist.php');
+        FS::touch('.php-cs-fixer.php');
+        FS::touch('.php-cs-fixer.cache');
 
-        touch('scoper.inc.php.dist');
-        touch('scoper.inc.php');
+        FS::touch('scoper.inc.php.dist');
+        FS::touch('scoper.inc.php');
 
-        mkdir('example');
-        touch('example/file0');
+        FS::mkdir('example');
+        FS::touch('example/file0');
 
-        mkdir('examples');
-        touch('examples/file0');
+        FS::mkdir('examples');
+        FS::touch('examples/file0');
 
-        mkdir('build');
-        touch('build/file0');
+        FS::mkdir('build');
+        FS::touch('build/file0');
 
-        mkdir('dist');
-        touch('dist/file0');
+        FS::mkdir('dist');
+        FS::touch('dist/file0');
 
-        mkdir('specs');
-        touch('specs/file0');
+        FS::mkdir('specs');
+        FS::touch('specs/file0');
 
-        mkdir('spec');
-        touch('spec/MainSpec.php');
+        FS::mkdir('spec');
+        FS::touch('spec/MainSpec.php');
 
-        mkdir('features');
-        touch('features/acme.feature');
+        FS::mkdir('features');
+        FS::touch('features/acme.feature');
 
-        touch('build.xml.dist');
-        touch('build.xml');
+        FS::touch('build.xml.dist');
+        FS::touch('build.xml');
 
-        touch('.editorconfig');
-        touch('.gitattributes');
-        touch('.gitignore');
+        FS::touch('.editorconfig');
+        FS::touch('.gitattributes');
+        FS::touch('.gitignore');
 
-        touch('behat.yml.dist');
-        touch('behat.yml');
+        FS::touch('behat.yml.dist');
+        FS::touch('behat.yml');
 
-        touch('box.json.dist');
-        touch('box.json');
-        touch('box_dev.json');
+        FS::touch('box.json.dist');
+        FS::touch('box.json');
+        FS::touch('box_dev.json');
 
-        touch('Dockerfile');
+        FS::touch('Dockerfile');
 
-        touch('codecov.yml.dist');
-        touch('codecov.yml');
+        FS::touch('codecov.yml.dist');
+        FS::touch('codecov.yml');
 
-        touch('.styleci.yml.dist');
-        touch('.styleci.yml');
+        FS::touch('.styleci.yml.dist');
+        FS::touch('.styleci.yml');
 
-        touch('.scrutiziner.yml.dist');
-        touch('.scrutiziner.yml');
+        FS::touch('.scrutiziner.yml.dist');
+        FS::touch('.scrutiziner.yml');
 
-        dump_file(
+        FS::dumpFile(
             'composer.json',
             <<<'JSON'
                 {
@@ -743,7 +740,7 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
 
     public function test_the_existing_phars_are_ignored_when_all_the_files_are_collected(): void
     {
-        touch('index.phar');
+        FS::touch('index.phar');
 
         // Relative to the current working directory for readability
         $expected = [];
@@ -755,8 +752,8 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
         self::assertEquals($expected, $actual);
         self::assertCount(0, $this->config->getBinaryFiles());
 
-        remove('index.phar');
-        touch('default');
+        FS::remove('index.phar');
+        FS::touch('default');
 
         // Relative to the current working directory for readability
         $expected = [];
@@ -773,18 +770,18 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
 
     public function test_the_box_debug_directory_is_always_excluded(): void
     {
-        touch('file0');
-        touch('file1');
+        FS::touch('file0');
+        FS::touch('file1');
 
-        mkdir('.box_dump');
-        touch('.box_dump/file0');
-        touch('.box_dump/file1');
+        FS::mkdir('.box_dump');
+        FS::touch('.box_dump/file0');
+        FS::touch('.box_dump/file1');
 
-        mkdir('A');
-        touch('A/fileA0');
-        touch('A/fileA1');
+        FS::mkdir('A');
+        FS::touch('A/fileA0');
+        FS::touch('A/fileA1');
 
-        dump_file(
+        FS::dumpFile(
             'composer.json',
             <<<'JSON'
                 {
@@ -814,9 +811,9 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
 
     public function test_it_includes_the_vendor_files_when_found(): void
     {
-        dump_file('vendor/composer/installed.json', '{}');
-        dump_file('composer.json', '{}');
-        dump_file('composer.lock', '{}');
+        FS::dumpFile('vendor/composer/installed.json', '{}');
+        FS::dumpFile('composer.json', '{}');
+        FS::dumpFile('composer.lock', '{}');
 
         // Relative to the current working directory for readability
         $expected = [

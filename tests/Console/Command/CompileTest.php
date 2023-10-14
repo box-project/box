@@ -21,6 +21,7 @@ use Fidry\Console\DisplayNormalizer;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Test\CommandTester;
 use Fidry\Console\Test\OutputAssertions;
+use Fidry\FileSystem\FS;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Console\Application;
@@ -46,13 +47,6 @@ use function implode;
 use function iterator_to_array;
 use function json_decode;
 use function json_encode;
-use function KevinGH\Box\FileSystem\chmod;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\file_contents;
-use function KevinGH\Box\FileSystem\mirror;
-use function KevinGH\Box\FileSystem\remove;
-use function KevinGH\Box\FileSystem\rename;
-use function KevinGH\Box\FileSystem\touch;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\get_box_version;
 use function KevinGH\Box\memory_to_bytes;
@@ -62,7 +56,7 @@ use function preg_match;
 use function preg_quote;
 use function preg_replace;
 use function random_int;
-use function realpath;
+use function Safe\realpath;
 use function sort;
 use function sprintf;
 use function str_replace;
@@ -172,7 +166,7 @@ class CompileTest extends FileSystemTestCase
             ),
         );
 
-        remove(self::FIXTURES_DIR.'/dir010/index.phar');
+        FS::remove(self::FIXTURES_DIR.'/dir010/index.phar');
     }
 
     protected function tearDown(): void
@@ -191,17 +185,17 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_build_a_phar_file(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
-        dump_file('composer.json', '{}');
-        dump_file('composer.lock', '{}');
-        dump_file('vendor/composer/installed.json', '{}');
+        FS::dumpFile('composer.json', '{}');
+        FS::dumpFile('composer.lock', '{}');
+        FS::dumpFile('vendor/composer/installed.json', '{}');
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
         $numberOfFiles = self::NUMBER_OF_FILES;
 
-        dump_file(
+        FS::dumpFile(
             'box.json',
             json_encode(
                 [
@@ -357,11 +351,11 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_build_a_phar_from_a_different_directory(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
-        dump_file(
+        FS::dumpFile(
             'box.json',
             json_encode(
                 [
@@ -409,9 +403,9 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_build_a_phar_without_any_configuration(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
-        rename('run.php', 'index.php');
+        FS::rename('run.php', 'index.php');
 
         $this->commandTester->execute(
             [
@@ -561,9 +555,9 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_build_a_phar_with_complete_mapping(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
-        dump_file(
+        FS::dumpFile(
             'box.json',
             json_encode(
                 [
@@ -724,9 +718,9 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_build_a_phar_with_complete_mapping_without_an_alias(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
-        dump_file(
+        FS::dumpFile(
             'box.json',
             json_encode(
                 [
@@ -801,14 +795,14 @@ class CompileTest extends FileSystemTestCase
             self::markTestSkipped('Skipping this test since xdebug changes the Composer output.');
         }
 
-        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
         $expectedNumberOfClasses = 1;
         $expectedNumberOfFiles = self::NUMBER_OF_FILES;
 
-        dump_file(
+        FS::dumpFile(
             'box.json',
             json_encode(
                 [
@@ -864,7 +858,7 @@ class CompileTest extends FileSystemTestCase
 
             ? Removing the existing PHAR "/path/to/tmp/test.phar"
             ? Checking Composer compatibility
-                > '/usr/local/bin/composer' '--version'
+                > '/usr/local/bin/composer' '--version' '--no-ansi'
                 > 2.5.0 (Box requires ^2.2.0)
                 > Supported version detected
             ? Registering compactors
@@ -926,14 +920,14 @@ class CompileTest extends FileSystemTestCase
             self::markTestSkipped('Skipping this test since xdebug changes the Composer output');
         }
 
-        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
         $expectedNumberOfClasses = 1;
         $expectedNumberOfFiles = self::NUMBER_OF_FILES;
 
-        dump_file(
+        FS::dumpFile(
             'box.json',
             json_encode(
                 [
@@ -992,7 +986,7 @@ class CompileTest extends FileSystemTestCase
 
             ? Removing the existing PHAR "/path/to/tmp/test.phar"
             ? Checking Composer compatibility
-                > '/usr/local/bin/composer' '--version'
+                > '/usr/local/bin/composer' '--version' '--no-ansi'
                 > 2.5.0 (Box requires ^2.2.0)
                 > Supported version detected
             ? Registering compactors
@@ -1057,7 +1051,7 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_build_a_phar_file_in_debug_mode(): void
     {
-        dump_file(
+        FS::dumpFile(
             'index.php',
             $indexContents = <<<'PHP'
                 <?php
@@ -1068,7 +1062,7 @@ class CompileTest extends FileSystemTestCase
 
                 PHP,
         );
-        dump_file(
+        FS::dumpFile(
             'box.json',
             <<<'JSON'
                 {
@@ -1245,7 +1239,7 @@ class CompileTest extends FileSystemTestCase
 
         $actualDumpedConfig = VarDumperNormalizer::normalize(
             $this->tmp,
-            file_contents('.box_dump/.box_configuration'),
+            FS::getFileContents('.box_dump/.box_configuration'),
         );
 
         // Replace objects IDs
@@ -1316,19 +1310,19 @@ class CompileTest extends FileSystemTestCase
         self::assertSame($expectedDumpedConfig, $actualDumpedConfig);
 
         // Checks one of the dumped file from the PHAR to ensure the encoding of the extracted file is correct
-        self::assertSame(
-            file_get_contents('.box_dump/index.php'),
+        self::assertStringEqualsFile(
+            '.box_dump/index.php',
             $indexContents,
         );
     }
 
     public function test_it_can_build_a_phar_file_in_quiet_mode(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
-        dump_file(
+        FS::dumpFile(
             'box.json',
             json_encode(
                 [
@@ -1391,11 +1385,11 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_build_a_phar_file_using_the_phar_default_stub(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
-        dump_file(
+        FS::dumpFile(
             'box.json',
             json_encode(
                 [
@@ -1440,11 +1434,11 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_build_a_phar_file_using_a_custom_stub(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
         $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
 
-        dump_file(
+        FS::dumpFile(
             'custom_stub',
             $stub = <<<'PHP'
                 #!/usr/bin/php
@@ -1464,7 +1458,7 @@ class CompileTest extends FileSystemTestCase
                 PHP,
         );
 
-        dump_file(
+        FS::dumpFile(
             'box.json',
             json_encode(
                 [
@@ -1516,9 +1510,9 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_build_a_phar_file_using_the_default_stub(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
-        dump_file(
+        FS::dumpFile(
             'box.json',
             json_encode(
                 [
@@ -1552,11 +1546,11 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_cannot_build_a_phar_using_unreadable_files(): void
     {
-        touch('index.php');
-        touch('unreadable-file.php');
-        chmod('unreadable-file.php', 0);
+        FS::touch('index.php');
+        FS::touch('unreadable-file.php');
+        FS::chmod('unreadable-file.php', 0);
 
-        dump_file(
+        FS::dumpFile(
             'box.json',
             json_encode(
                 [
@@ -1582,7 +1576,7 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_build_a_phar_overwriting_an_existing_one_in_verbose_mode(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir002', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir002', $this->tmp);
 
         $this->commandTester->execute(
             [
@@ -1659,9 +1653,9 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_dump_the_autoloader(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
-        rename('run.php', 'index.php');
+        FS::rename('run.php', 'index.php');
 
         self::assertFileDoesNotExist($this->tmp.'/vendor/autoload.php');
 
@@ -1698,13 +1692,13 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_build_a_phar_without_dumping_the_autoloader(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
-        rename('run.php', 'index.php');
+        FS::rename('run.php', 'index.php');
 
         self::assertFileDoesNotExist($this->tmp.'/vendor/autoload.php');
 
-        dump_file(
+        FS::dumpFile(
             'box.json',
             json_encode(
                 [
@@ -1746,9 +1740,9 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_dump_the_autoloader_and_exclude_the_composer_files(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
-        rename('run.php', 'index.php');
+        FS::rename('run.php', 'index.php');
 
         self::assertFileDoesNotExist($this->tmp.'/vendor/autoload.php');
 
@@ -1795,11 +1789,11 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_dump_the_autoloader_and_keep_the_composer_files(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
-        rename('run.php', 'index.php');
+        FS::rename('run.php', 'index.php');
 
-        dump_file(
+        FS::dumpFile(
             'box.json',
             json_encode(['exclude-composer-files' => false]),
         );
@@ -1851,7 +1845,7 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_build_a_phar_with_a_custom_banner(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir003', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir003', $this->tmp);
 
         $this->commandTester->execute(
             [
@@ -1920,7 +1914,7 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_build_a_phar_with_a_stub_file(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir004', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir004', $this->tmp);
 
         $this->commandTester->execute(
             [
@@ -1987,7 +1981,7 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_build_a_phar_with_the_default_stub_file(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir005', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir005', $this->tmp);
 
         $this->commandTester->execute(
             [
@@ -2055,9 +2049,9 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_build_a_phar_without_a_main_script(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir004', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir004', $this->tmp);
 
-        dump_file(
+        FS::dumpFile(
             'box.json',
             <<<'JSON'
                 {
@@ -2133,9 +2127,9 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_build_an_empty_phar(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir004', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir004', $this->tmp);
 
-        dump_file(
+        FS::dumpFile(
             'box.json',
             <<<'JSON'
                 {
@@ -2218,7 +2212,7 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_build_a_phar_with_compressed_code(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir006', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir006', $this->tmp);
 
         $this->commandTester->execute(
             [
@@ -2298,7 +2292,7 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_build_a_phar_in_a_non_existent_directory(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir007', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir007', $this->tmp);
 
         $this->commandTester->execute(
             [
@@ -2376,9 +2370,9 @@ class CompileTest extends FileSystemTestCase
     public function test_it_configures_the_phar_alias(bool $stub): void
     {
         $this->skipIfDefaultStubNotFound();
-        mirror(self::FIXTURES_DIR.'/dir008', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir008', $this->tmp);
 
-        dump_file(
+        FS::dumpFile(
             'box.json',
             json_encode(
                 [
@@ -2455,11 +2449,11 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_build_a_phar_file_without_a_shebang_line(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir006', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir006', $this->tmp);
 
         $boxRawConfig = json_decode(file_get_contents('box.json'), true, 512, JSON_PRETTY_PRINT);
         $boxRawConfig['shebang'] = false;
-        dump_file('box.json', json_encode($boxRawConfig, JSON_PRETTY_PRINT));
+        FS::dumpFile('box.json', json_encode($boxRawConfig, JSON_PRETTY_PRINT));
 
         $this->commandTester->execute(
             [
@@ -2539,9 +2533,9 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_build_a_phar_with_an_output_which_does_not_have_a_phar_extension(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir004', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir004', $this->tmp);
 
-        dump_file(
+        FS::dumpFile(
             'box.json',
             json_encode(
                 array_merge(
@@ -2622,7 +2616,7 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_build_a_phar_ignoring_the_configuration(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir009', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir009', $this->tmp);
 
         $this->commandTester->execute(
             [
@@ -2642,7 +2636,7 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_ignores_the_config_given_when_the_no_config_setting_is_set(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir009', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir009', $this->tmp);
 
         $this->commandTester->execute(
             [
@@ -2663,7 +2657,7 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_build_a_phar_with_a_php_scoper_config(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
 
         $this->commandTester->execute(
             [
@@ -2700,9 +2694,9 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_can_build_a_phar_with_a_php_scoper_config_with_a_specific_prefix(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
 
-        rename('scoper-fixed-prefix.inc.php', 'scoper.inc.php', true);
+        FS::rename('scoper-fixed-prefix.inc.php', 'scoper.inc.php', true);
 
         $this->commandTester->execute(
             [
@@ -2739,9 +2733,9 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_cannot_sign_a_phar_with_the_openssl_algorithm_without_a_private_key(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
 
-        dump_file(
+        FS::dumpFile(
             'box.json',
             json_encode(
                 [
@@ -2764,11 +2758,11 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_displays_recommendations_and_warnings(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
 
-        remove('composer.json');
+        FS::remove('composer.json');
 
-        dump_file(
+        FS::dumpFile(
             'box.json',
             json_encode(
                 [
@@ -2842,9 +2836,9 @@ class CompileTest extends FileSystemTestCase
 
     public function test_it_skips_the_compression_when_in_dev_mode(): void
     {
-        mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
 
-        dump_file(
+        FS::dumpFile(
             'box.json',
             json_encode(
                 [
@@ -2921,10 +2915,10 @@ class CompileTest extends FileSystemTestCase
             self::markTestSkipped('Skipping this test since xdebug has an include wrapper causing this test to fail');
         }
 
-        mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
+        FS::mirror(self::FIXTURES_DIR.'/dir010', $this->tmp);
 
-        dump_file('box.json', '{}');
-        dump_file('composer.json', '{}');
+        FS::dumpFile('box.json', '{}');
+        FS::dumpFile('composer.json', '{}');
 
         $this->commandTester->execute(
             [
@@ -3093,29 +3087,27 @@ class CompileTest extends FileSystemTestCase
             $traversable = $phar;
         }
 
-        $paths = [];
+        $collectedPaths = [];
 
         foreach ($traversable as $fileInfo) {
             /** @var PharFileInfo $fileInfo */
-            $fileInfo = $phar[str_replace($root, '', (string) $fileInfo->getPathname())];
+            $fileInfo = $phar[str_replace($root, '', $fileInfo->getPathname())];
 
             $path = mb_substr($fileInfo->getPathname(), mb_strlen($root) - 1);
 
             if ($fileInfo->isDir()) {
                 $path .= '/';
 
-                $paths = array_merge(
-                    $paths,
-                    $this->retrievePharFiles(
-                        $phar,
-                        new DirectoryIterator($fileInfo->getPathname()),
-                    ),
+                $collectedPaths[] = $this->retrievePharFiles(
+                    $phar,
+                    new DirectoryIterator($fileInfo->getPathname()),
                 );
             }
 
-            $paths[] = $path;
+            $collectedPaths[] = [$path];
         }
 
+        $paths = array_merge(...$collectedPaths);
         sort($paths);
 
         return array_unique($paths);
@@ -3144,8 +3136,8 @@ class CompileTest extends FileSystemTestCase
             $this->commandTester,
             BoxDisplayNormalizer::createReplaceBoxVersionNormalizer(),
             $this->createCompilerDisplayNormalizer(),
-            $this->createComposerPathNormalizer(),
-            $this->createComposerVersionNormalizer(),
+            self::createComposerPathNormalizer(),
+            self::createComposerVersionNormalizer(),
             ...$extraNormalizers,
         );
     }

@@ -24,7 +24,6 @@ use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\Assert\Assert;
-use function array_key_exists;
 use function bin2hex;
 use function class_alias;
 use function class_exists;
@@ -35,7 +34,6 @@ use function floor;
 use function function_exists;
 use function is_float;
 use function is_int;
-use function KevinGH\Box\FileSystem\copy;
 use function log;
 use function number_format;
 use function posix_getrlimit;
@@ -43,7 +41,6 @@ use function posix_setrlimit;
 use function random_bytes;
 use function sprintf;
 use function str_replace;
-use const PATHINFO_EXTENSION;
 use const POSIX_RLIMIT_INFINITY;
 use const POSIX_RLIMIT_NOFILE;
 
@@ -89,25 +86,6 @@ function get_phar_compression_algorithms(): array
     ];
 
     return $algorithms;
-}
-
-/**
- * @private
- */
-function get_phar_compression_algorithm_extension(int $algorithm): ?string
-{
-    static $extensions = [
-        Phar::GZ => 'zlib',
-        Phar::BZ2 => 'bz2',
-        Phar::NONE => null,
-    ];
-
-    Assert::true(
-        array_key_exists($algorithm, $extensions),
-        sprintf('Unknown compression algorithm code "%d"', $algorithm),
-    );
-
-    return $extensions[$algorithm];
 }
 
 /**
@@ -225,22 +203,6 @@ function is_parallel_processing_enabled(): bool
 function unique_id(string $prefix): string
 {
     return $prefix.bin2hex(random_bytes(6));
-}
-
-/**
- * @private
- */
-function create_temporary_phar(string $file): string
-{
-    $tmpFile = sys_get_temp_dir().'/'.unique_id('').basename($file);
-
-    if ('' === pathinfo($file, PATHINFO_EXTENSION)) {
-        $tmpFile .= '.phar';
-    }
-
-    copy($file, $tmpFile, true);
-
-    return $tmpFile;
 }
 
 /**

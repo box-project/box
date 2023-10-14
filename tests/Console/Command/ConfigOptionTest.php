@@ -15,14 +15,13 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
+use Fidry\FileSystem\FS;
 use InvalidArgumentException;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Configuration\NoConfigurationFound;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\Test\CommandTestCase;
 use Symfony\Component\Console\Input\InputOption;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\touch;
 
 /**
  * @covers \KevinGH\Box\Console\Command\ConfigOption
@@ -50,9 +49,9 @@ class ConfigOptionTest extends CommandTestCase
 
     public function test_it_can_get_the_configuration(): void
     {
-        touch('index.php');
+        FS::touch('index.php');
 
-        dump_file('box.json', '{"alias": "foo"}');
+        FS::dumpFile('box.json', '{"alias": "foo"}');
 
         $config = $this->executeAndGetConfig([]);
 
@@ -61,9 +60,9 @@ class ConfigOptionTest extends CommandTestCase
 
     public function test_it_can_get_the_configuration_with_a_custom_path(): void
     {
-        touch('index.php');
+        FS::touch('index.php');
 
-        dump_file('mybox.json', '{"alias": "foo"}');
+        FS::dumpFile('mybox.json', '{"alias": "foo"}');
 
         $config = $this->executeAndGetConfig(['--config' => 'mybox.json']);
 
@@ -72,7 +71,7 @@ class ConfigOptionTest extends CommandTestCase
 
     public function test_it_throws_an_error_when_cannot_load_the_config(): void
     {
-        touch('index.php');
+        FS::touch('index.php');
 
         $this->expectException(NoConfigurationFound::class);
         $this->expectExceptionMessage('The configuration file could not be found.');
@@ -82,7 +81,7 @@ class ConfigOptionTest extends CommandTestCase
 
     public function test_it_loads_an_empty_configuration_if_no_configuration_is_allowed_and_no_config_file_is_found(): void
     {
-        touch('index.php');
+        FS::touch('index.php');
 
         $config = $this->executeAndGetConfig([], true);
 
@@ -91,9 +90,9 @@ class ConfigOptionTest extends CommandTestCase
 
     public function test_it_throws_an_error_when_the_config_schema_is_invalid(): void
     {
-        touch('index.php');
+        FS::touch('index.php');
 
-        dump_file('box.json', '{"foo": "foo"}');
+        FS::dumpFile('box.json', '{"foo": "foo"}');
 
         $this->expectException(JsonValidationException::class);
         $this->expectExceptionMessage('"'.$this->tmp.'/box.json" does not match the expected JSON schema:
@@ -104,7 +103,7 @@ class ConfigOptionTest extends CommandTestCase
 
     public function test_it_throws_an_error_when_the_config_is_invalid(): void
     {
-        dump_file('box.json', '{}');
+        FS::dumpFile('box.json', '{}');
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The file "'.$this->tmp.'/index.php" does not exist.');

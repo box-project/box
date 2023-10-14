@@ -17,6 +17,7 @@ namespace KevinGH\Box;
 use Amp\MultiReasonException;
 use BadMethodCallException;
 use Countable;
+use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
@@ -40,11 +41,6 @@ use function extension_loaded;
 use function file_exists;
 use function getcwd;
 use function is_object;
-use function KevinGH\Box\FileSystem\dump_file;
-use function KevinGH\Box\FileSystem\file_contents;
-use function KevinGH\Box\FileSystem\make_tmp_dir;
-use function KevinGH\Box\FileSystem\mkdir;
-use function KevinGH\Box\FileSystem\remove;
 use function openssl_pkey_export;
 use function openssl_pkey_get_details;
 use function openssl_pkey_get_private;
@@ -91,7 +87,7 @@ final class Box implements Countable
     {
         // Ensure the parent directory of the PHAR file exists as `new \Phar()` does not create it and would fail
         // otherwise.
-        mkdir(dirname($pharFilePath));
+        FS::mkdir(dirname($pharFilePath));
 
         return new self(
             new Phar($pharFilePath, $pharFlags, $pharAlias),
@@ -118,7 +114,7 @@ final class Box implements Countable
         $dumpAutoload ??= static fn () => null;
         $cwd = getcwd();
 
-        $tmp = make_tmp_dir('box', self::class);
+        $tmp = FS::makeTmpDir('box', self::class);
         chdir($tmp);
 
         if ([] === $this->bufferedFiles) {
@@ -129,7 +125,7 @@ final class Box implements Countable
 
         try {
             foreach ($this->bufferedFiles as $file => $contents) {
-                dump_file($file, $contents);
+                FS::dumpFile($file, $contents);
             }
 
             if (null !== $dumpAutoload) {
@@ -143,7 +139,7 @@ final class Box implements Countable
 
             $this->phar->buildFromDirectory($tmp);
         } finally {
-            remove($tmp);
+            FS::remove($tmp);
         }
 
         $this->buffering = false;
@@ -274,7 +270,7 @@ final class Box implements Countable
     {
         $contents = $this->placeholderCompactor->compact(
             $file,
-            file_contents($file),
+            FS::getFileContents($file),
         );
 
         $this->phar->setStub($contents);
@@ -318,7 +314,7 @@ final class Box implements Countable
         Assert::true($this->buffering, 'Cannot add files if the buffering has not started.');
 
         if (null === $contents) {
-            $contents = file_contents($file);
+            $contents = FS::getFileContents($file);
         }
 
         $local = ($this->mapFile)($file);
@@ -341,7 +337,7 @@ final class Box implements Countable
      */
     public function signUsingFile(string $file, ?string $password = null): void
     {
-        $this->sign(file_contents($file), $password);
+        $this->sign(FS::getFileContents($file), $password);
     }
 
     /**
@@ -374,7 +370,7 @@ final class Box implements Countable
 
         $this->phar->setSignatureAlgorithm(Phar::OPENSSL, $private);
 
-        dump_file($pubKey, $details['key']);
+        FS::dumpFile($pubKey, $details['key']);
     }
 
     /**
@@ -401,7 +397,7 @@ final class Box implements Countable
                 \KevinGH\Box\register_error_handler();
             }
 
-            $contents = file_contents($file);
+            $contents = \Fidry\FileSystem\FS::getFileContents($file);
 
             $local = $mapFile($file);
 

@@ -4,10 +4,20 @@ on:
     push:
         branches: [ main ]
     pull_request: ~
+    schedule:
+        # Do not make it the first of the month and/or midnight since it is a very busy time
+        - cron: "* 10 5 * *"
+
+# See https://stackoverflow.com/a/72408109
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
 
 env:
     POLLING_INTERVALS_SEC: 30
     SLEEP_TIME_SEC: 60s
+    #TERMINFO: /usr/lib/terminfo
+    TERM: xterm
 
 jobs:
     cs-lint:
@@ -44,7 +54,7 @@ jobs:
                     working-directory: requirement-checker
 
             -   name: Ensure that the make target is up to date
-                run: cd requirement-checker; make vendor_install
+                run: cd requirement-checker; make _vendor_install
 
             -   name: Lint CS
                 run: cd requirement-checker; make cs_lint
@@ -69,7 +79,7 @@ jobs:
                     working-directory: requirement-checker
 
             -   name: Ensure that the make target is up to date
-                run: cd requirement-checker; make vendor_install
+                run: cd requirement-checker; make _vendor_install
 
             -   name: Run tests
                 run: cd requirement-checker; make phpunit_autoreview
@@ -119,7 +129,7 @@ jobs:
                     composer-options: ${{ matrix.composer-options }}
 
             -   name: Ensure that the make target is up to date
-                run: cd requirement-checker; make vendor_install
+                run: cd requirement-checker; make _vendor_install
 
             -   name: Install the Composer (root) dependencies
                 uses: ramsey/composer-install@v2
@@ -293,15 +303,19 @@ jobs:
                     working-directory: requirement-checker
                     dependency-versions: ${{ matrix.php.dependency }}
                     composer-options: ${{ matrix.php.composer-options }}
+                env:
+                    COMPOSER_ROOT_VERSION: "4.x.x-dev"
 
             -   name: Ensure that the make target is up to date
-                run: cd requirement-checker; make vendor_install
+                run: cd requirement-checker; make _vendor_install
 
             -   name: Install the Composer (root) dependencies
                 uses: ramsey/composer-install@v2
                 with:
                     dependency-versions: ${{ matrix.php.dependency }}
                     composer-options: ${{ matrix.php.composer-options }}
+                env:
+                    COMPOSER_ROOT_VERSION: "4.x.x-dev"
 
             -   name: Ensure that the make target is up to date
                 run: make _vendor_install
@@ -335,6 +349,6 @@ jobs:
                     token: ${{ secrets.GITHUB_TOKEN }}
                     branch-suffix: random
                     delete-branch: true
-                    title: "Update the RequirementChecker"
+                    title: "build: Update the RequirementChecker"
                     committer: "box-bot <box-project-bot@example.com>"
                     commit-message: "Update the RequirementChecker"

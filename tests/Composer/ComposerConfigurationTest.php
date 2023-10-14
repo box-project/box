@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
+use Fidry\FileSystem\FS;
 use KevinGH\Box\Test\FileSystemTestCase;
 use function json_decode;
-use function KevinGH\Box\FileSystem\mkdir;
 
 /**
  * @covers \KevinGH\Box\Composer\ComposerConfiguration
@@ -253,8 +253,8 @@ class ComposerConfigurationTest extends FileSystemTestCase
         $decodedComposerJson = [];
         $decodedComposerLock = json_decode(self::COMPOSER_LOCK_SAMPLE, true);
 
-        mkdir('vendor/bamarni/composer-bin-plugin');
-        mkdir('vendor/doctrine/instantiator');
+        FS::mkdir('vendor/bamarni/composer-bin-plugin');
+        FS::mkdir('vendor/doctrine/instantiator');
 
         $expected = [
             $this->tmp.'/vendor/bamarni/composer-bin-plugin',
@@ -281,8 +281,8 @@ class ComposerConfigurationTest extends FileSystemTestCase
         $decodedComposerJson = ['config' => []];
         $decodedComposerLock = json_decode(self::COMPOSER_LOCK_SAMPLE, true);
 
-        mkdir('vendor/bamarni/composer-bin-plugin');
-        mkdir('vendor/doctrine/instantiator');
+        FS::mkdir('vendor/bamarni/composer-bin-plugin');
+        FS::mkdir('vendor/doctrine/instantiator');
 
         $expected = [
             $this->tmp.'/vendor/bamarni/composer-bin-plugin',
@@ -309,7 +309,7 @@ class ComposerConfigurationTest extends FileSystemTestCase
         $decodedComposerJson = [];
         $decodedComposerLock = json_decode(self::COMPOSER_LOCK_SAMPLE, true);
 
-        mkdir('vendor/bamarni/composer-bin-plugin');
+        FS::mkdir('vendor/bamarni/composer-bin-plugin');
         // Doctrine Instantiator vendor does not exists
 
         $expected = [
@@ -340,8 +340,8 @@ class ComposerConfigurationTest extends FileSystemTestCase
         ];
         $decodedComposerLock = json_decode(self::COMPOSER_LOCK_SAMPLE, true);
 
-        mkdir('custom-vendor/bamarni/composer-bin-plugin');
-        mkdir('vendor/doctrine/instantiator');  // Wrong directory
+        FS::mkdir('custom-vendor/bamarni/composer-bin-plugin');
+        FS::mkdir('vendor/doctrine/instantiator');  // Wrong directory
 
         $expected = [
             $this->tmp.'/custom-vendor/bamarni/composer-bin-plugin',
@@ -468,8 +468,8 @@ class ComposerConfigurationTest extends FileSystemTestCase
             true,
         );
 
-        mkdir('custom-vendor/bamarni/composer-bin-plugin');
-        mkdir('vendor/doctrine/instantiator');  // Wrong directory
+        FS::mkdir('custom-vendor/bamarni/composer-bin-plugin');
+        FS::mkdir('vendor/doctrine/instantiator');  // Wrong directory
 
         $expected = [];
 
