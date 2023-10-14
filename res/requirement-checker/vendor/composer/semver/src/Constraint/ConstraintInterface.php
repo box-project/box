@@ -1,6 +1,6 @@
 <?php
 
-namespace HumbugBox438\Composer\Semver\Constraint;
+namespace HumbugBox440\Composer\Semver\Constraint;
 
 interface ConstraintInterface
 {

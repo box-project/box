@@ -1,7 +1,7 @@
 <?php
 
 declare (strict_types=1);
-namespace HumbugBox438\KevinGH\RequirementChecker;
+namespace HumbugBox440\KevinGH\RequirementChecker;
 
 use ArrayIterator;
 use Countable;
