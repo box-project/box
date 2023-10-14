@@ -926,7 +926,7 @@ final class Compile implements CommandAware
 
         $io->comment(
             sprintf(
-                '<info>Memory usage: %s (peak: %s), time: %s<info>',
+                '<info>Memory usage: %s (peak: %s), time: %s</info>',
                 format_size(memory_get_usage()),
                 format_size(memory_get_peak_usage()),
                 format_time(microtime(true) - $startTime),
