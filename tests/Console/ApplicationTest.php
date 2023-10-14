@@ -42,7 +42,7 @@ class ApplicationTest extends TestCase
         self::assertSame(ExitCode::SUCCESS, $appTester->getStatusCode());
 
         $expected = <<<'EOF'
-            Box version 3.x-dev@151e40a
+            Box version x.x-dev@151e40a
 
             EOF;
 
@@ -102,7 +102,7 @@ class ApplicationTest extends TestCase
             /_____/\____/_/|_|
 
 
-            Box version 3.x-dev@151e40a
+            Box version x.x-dev@151e40a
 
             Usage:
               command [options] [arguments]

@@ -240,7 +240,7 @@ class CompileTest extends FileSystemTestCase
             /_____/\\____/_/|_|
 
 
-            Box version 3.x-dev@151e40a
+            Box version x.x-dev@151e40a
 
              // Loading the configuration file "/path/to/box.json.dist".
 
@@ -427,7 +427,7 @@ class CompileTest extends FileSystemTestCase
             /_____/\\____/_/|_|
 
 
-            Box version 3.x-dev@151e40a
+            Box version x.x-dev@151e40a
 
              // Loading without a configuration file.
 
@@ -598,7 +598,7 @@ class CompileTest extends FileSystemTestCase
             /_____/\\____/_/|_|
 
 
-            Box version 3.x-dev@151e40a
+            Box version x.x-dev@151e40a
 
              // Loading the configuration file "/path/to/box.json.dist".
 
@@ -850,7 +850,7 @@ class CompileTest extends FileSystemTestCase
             /_____/\\____/_/|_|
 
 
-            Box version 3.x-dev@151e40a
+            Box version x.x-dev@151e40a
 
              // Loading the configuration file "/path/to/box.json.dist".
 
@@ -978,7 +978,7 @@ class CompileTest extends FileSystemTestCase
             /_____/\\____/_/|_|
 
 
-            Box version 3.x-dev@151e40a
+            Box version x.x-dev@151e40a
 
              // Loading the configuration file "/path/to/box.json.dist".
 
@@ -1116,7 +1116,7 @@ class CompileTest extends FileSystemTestCase
             /_____/\\____/_/|_|
 
 
-            Box version 3.x-dev@151e40a
+            Box version x.x-dev@151e40a
 
              // Loading the configuration file "/path/to/box.json.dist".
 
@@ -1179,7 +1179,7 @@ class CompileTest extends FileSystemTestCase
             // PHP extensions: Core,date
             // OS: Darwin / 17.7.0
             // Command: bin/phpunit
-            // Box: 3.x-dev@27df576
+            // Box: x.x-dev@27df576
             // Time: 2018-05-24T20:59:15+00:00
             //
 
@@ -1296,7 +1296,7 @@ class CompileTest extends FileSystemTestCase
                 'Box: %s',
                 get_box_version(),
             ),
-            'Box: 3.x-dev@27df576',
+            'Box: x.x-dev@27df576',
             $actualDumpedConfig,
         );
 
@@ -1600,7 +1600,7 @@ class CompileTest extends FileSystemTestCase
             /_____/\\____/_/|_|
 
 
-            Box version 3.x-dev@151e40a
+            Box version x.x-dev@151e40a
 
              // Loading the configuration file "/path/to/box.json.dist".
 
@@ -1867,7 +1867,7 @@ class CompileTest extends FileSystemTestCase
             /_____/\____/_/|_|
 
 
-            Box version 3.x-dev@151e40a
+            Box version x.x-dev@151e40a
 
              // Loading the configuration file "/path/to/box.json.dist".
 
@@ -1936,7 +1936,7 @@ class CompileTest extends FileSystemTestCase
             /_____/\____/_/|_|
 
 
-            Box version 3.x-dev@151e40a
+            Box version x.x-dev@151e40a
 
              // Loading the configuration file "/path/to/box.json.dist".
 
@@ -2005,7 +2005,7 @@ class CompileTest extends FileSystemTestCase
             /_____/\\____/_/|_|
 
 
-            Box version 3.x-dev@151e40a
+            Box version x.x-dev@151e40a
 
              // Loading the configuration file "/path/to/box.json.dist".
 
@@ -2082,7 +2082,7 @@ class CompileTest extends FileSystemTestCase
             /_____/\____/_/|_|
 
 
-            Box version 3.x-dev@151e40a
+            Box version x.x-dev@151e40a
 
              // Loading the configuration file "/path/to/box.json.dist".
 
@@ -2159,7 +2159,7 @@ class CompileTest extends FileSystemTestCase
             /_____/\____/_/|_|
 
 
-            Box version 3.x-dev@151e40a
+            Box version x.x-dev@151e40a
 
              // Loading the configuration file "/path/to/box.json.dist".
 
@@ -2236,7 +2236,7 @@ class CompileTest extends FileSystemTestCase
             /_____/\\____/_/|_|
 
 
-            Box version 3.x-dev@151e40a
+            Box version x.x-dev@151e40a
 
              // Loading the configuration file "/path/to/box.json.dist".
 
@@ -2316,7 +2316,7 @@ class CompileTest extends FileSystemTestCase
             /_____/\\____/_/|_|
 
 
-            Box version 3.x-dev@151e40a
+            Box version x.x-dev@151e40a
 
              // Loading the configuration file "/path/to/box.json.dist".
 
@@ -2477,7 +2477,7 @@ class CompileTest extends FileSystemTestCase
             /_____/\\____/_/|_|
 
 
-            Box version 3.x-dev@151e40a
+            Box version x.x-dev@151e40a
 
              // Loading the configuration file "/path/to/box.json.dist".
 
@@ -2571,7 +2571,7 @@ class CompileTest extends FileSystemTestCase
             /_____/\____/_/|_|
 
 
-            Box version 3.x-dev@151e40a
+            Box version x.x-dev@151e40a
 
              // Loading the configuration file "/path/to/box.json.dist".
 
@@ -2790,7 +2790,7 @@ class CompileTest extends FileSystemTestCase
             /_____/\\____/_/|_|
 
 
-            Box version 3.x-dev@151e40a
+            Box version x.x-dev@151e40a
 
              // Loading the configuration file "/path/to/box.json.dist".
 
@@ -2867,7 +2867,7 @@ class CompileTest extends FileSystemTestCase
             /_____/\\____/_/|_|
 
 
-            Box version 3.x-dev@151e40a
+            Box version x.x-dev@151e40a
 
              // Loading the configuration file "/path/to/box.json.dist".
 
@@ -2941,7 +2941,7 @@ class CompileTest extends FileSystemTestCase
             /_____/\\____/_/|_|
 
 
-            Box version 3.x-dev@151e40a
+            Box version x.x-dev@151e40a
 
              // Loading the configuration file "/path/to/box.json.dist".
 
