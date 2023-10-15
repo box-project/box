@@ -594,6 +594,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#building-a-phar-with-box-as-a-dependency" class="md-nav__link">
+    Building a PHAR with Box as a dependency
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -677,6 +684,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#building-a-phar-with-box-as-a-dependency" class="md-nav__link">
+    Building a PHAR with Box as a dependency
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -699,6 +713,7 @@
 <li><a href="#the-php_sapi-check">The PHP_SAPI check</a></li>
 <li><a href="#autoloading-composer">Autoloading Composer</a></li>
 <li><a href="#detecting-that-you-are-inside-a-phar">Detecting that you are inside a PHAR</a></li>
+<li><a href="#building-a-phar-with-box-as-a-dependency">Building a PHAR with Box as a dependency</a></li>
 </ol>
 <h2 id="what-is-the-canonical-way-to-write-a-cli-entry-file">What is the canonical way to write a CLI entry file?</h2>
 <p>A conventional CLI entry file looks like this (see bellow for further explanations):</p>
@@ -782,6 +797,20 @@ found.</p>
 <div class="highlight"><pre><span></span><code><span class="x">$isInPhar = &#39;&#39; !== Phar::running(false);</span>
 </code></pre></div>
 <p>See <a href="https://www.php.net/manual/en/phar.running.php">Phar::running()</a> for more information.</p>
+<h2 id="building-a-phar-with-box-as-a-dependency">Building a PHAR with Box as a dependency</h2>
+<p>If you need to include Box as part of your dependencies and include it within your PHAR, you will probably encounter
+the following issue when building your PHAR:</p>
+<div class="highlight"><pre><span></span><code>Could not dump the autoloader.
+[...]
+Could not scan for classes inside &quot;/path/to/vendor/humbug/php-scoper/vendor-hotfix/&quot; which does not appear to be a file nor a folder
+</code></pre></div>
+<p>This is because by default, Box does not include VCS or dot files which results in the directory <code>vendor/humbug/php-scoper/vendor-hotfix/</code>
+to be excluded (as it becomes an empty directory). To circumvent that, you will likely need:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">   </span><span class="nt">&quot;directories&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;vendor/humbug/php-scoper/vendor-hotfix&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Note that as a result you may want to use the <a href="../configuration/#force-auto-discovery-force-autodiscovery"><code>force-autodiscovery</code></a> setting.</p>
 <p><br /></p>
 <hr />
 
