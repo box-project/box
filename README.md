@@ -94,6 +94,7 @@ For the full documentation see https://box-project.github.io/box.
     1. [Debugging the scoping](doc/code-isolation.md#debugging-the-scoping)
 1. [Docker support](doc/docker.md#docker-support)
 1. [Symfony support](doc/symfony.md#symfony-support)
+1. [Reproducible builds](doc/reproducible-builds.md#reproducible-builds)
 1. [FAQ](doc/faq.md#faq)
 1. [Contributing](#contributing)
 1. [Upgrade guide](UPGRADE.md#from-27-to-30)

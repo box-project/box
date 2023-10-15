@@ -152,7 +152,7 @@ this in order to fix the problem.
 <br />
 <hr />
 
-« [Docker support](docker.md#docker-support) • [FAQ](faq.md#faq) »
+« [Docker support](docker.md#docker-support) • [Reproducible build](reproducible-builds.md#reproducible-builds) »
 
 
 [composer-autoloader-dump]: configuration.md#dumping-the-composer-autoloader-dump-autoload
