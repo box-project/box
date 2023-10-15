@@ -1,4 +1,5 @@
 {
+    "content-hash": "93756b503a85907c1d008537b4f0373b",
     "packages": [
         {
             "name": "package-with-polyfill",
