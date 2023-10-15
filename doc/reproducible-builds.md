@@ -136,7 +136,7 @@ This is obviously not ideal and should be fixed by Box at some point (see https:
 <br />
 <hr />
 
-« [Installation](installation.md#installation) • [Requirement Checker](requirement-checker.md#requirements-checker) »
+« [Symfony support](symfony.md#symfony-support) • [FAQ](faq.md#faq) »
 
 
 [banner]: ./configuration.md#banner-banner
