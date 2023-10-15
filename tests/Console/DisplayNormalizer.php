@@ -63,7 +63,7 @@ final class DisplayNormalizer
     {
         return static fn (string $output): string => preg_replace(
             '/Box version .+@[a-z\d]{7}/',
-            'Box version 3.x-dev@151e40a',
+            'Box version x.x-dev@151e40a',
             $output,
         );
     }
