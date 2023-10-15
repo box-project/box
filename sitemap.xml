@@ -36,6 +36,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://box-project.github.io/box/reproducible-builds/</loc>
+         <lastmod>2023-10-15</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://box-project.github.io/box/requirement-checker/</loc>
          <lastmod>2023-10-15</lastmod>
          <changefreq>daily</changefreq>

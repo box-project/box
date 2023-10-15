@@ -10,13 +10,9 @@
       
       
       
-        <link rel="canonical" href="https://box-project.github.io/box/symfony/">
+        <link rel="canonical" href="https://box-project.github.io/box/reproducible-builds/">
       
       
-        <link rel="prev" href="../docker/">
-      
-      
-        <link rel="next" href="../faq/">
       
       
       <link rel="icon" href="../img/favicon.png">
@@ -24,7 +20,7 @@
     
     
       
-        <title>Symfony support - Box Project</title>
+        <title>Reproducible builds - Box Project</title>
       
     
     
@@ -79,7 +75,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#symfony-support" class="md-skip">
+        <a href="#reproducible-builds" class="md-skip">
           Skip to content
         </a>
       
@@ -128,7 +124,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Symfony support
+              Reproducible builds
             
           </span>
         </div>
@@ -223,12 +219,10 @@
         
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
+      <li class="md-tabs__item">
         <a href="../installation/" class="md-tabs__link">
           
   
@@ -307,8 +301,6 @@
       
   
   
-    
-  
   
     
     
@@ -318,12 +310,12 @@
       
       
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
         
           
           <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
@@ -337,7 +329,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             Documentation
@@ -488,29 +480,9 @@
                 
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Symfony support
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../symfony/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -519,54 +491,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#project-files" class="md-nav__link">
-    Project files
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#project-directory" class="md-nav__link">
-    Project directory
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cache" class="md-nav__link">
-    Cache
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#runtime-component" class="md-nav__link">
-    Runtime component
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -626,29 +550,76 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#project-files" class="md-nav__link">
-    Project files
+  <a href="#php-scoper" class="md-nav__link">
+    PHP-Scoper
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#project-directory" class="md-nav__link">
-    Project directory
+  <a href="#composer" class="md-nav__link">
+    Composer
   </a>
+  
+    <nav class="md-nav" aria-label="Composer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#composer-root-version" class="md-nav__link">
+    Composer root version
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#composer-autoload-suffix" class="md-nav__link">
+    Composer autoload suffix
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#cache" class="md-nav__link">
-    Cache
+  <a href="#box" class="md-nav__link">
+    Box
   </a>
+  
+    <nav class="md-nav" aria-label="Box">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phar-alias" class="md-nav__link">
+    PHAR Alias
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#requirement-checker" class="md-nav__link">
+    Requirement Checker
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#box-banner" class="md-nav__link">
+    Box banner
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#runtime-component" class="md-nav__link">
-    Runtime component
+  <a href="#phar" class="md-nav__link">
+    PHAR
   </a>
   
 </li>
@@ -668,131 +639,98 @@
                   
 
 
-<h1 id="symfony-support">Symfony support</h1>
+<h1 id="reproducible-builds">Reproducible builds</h1>
 <ol>
-<li><a href="#project-files">Project files</a></li>
-<li><a href="#project-directory">Project directory</a></li>
-<li><a href="#cache">Cache</a></li>
-<li><a href="#runtime-component">Runtime component</a></li>
+<li><a href="#php-scoper">PHP-Scoper</a></li>
+<li><a href="#composer">Composer</a></li>
+<li><a href="#composer-root-version">Composer root version</a></li>
+<li><a href="#composer-autoload-suffix">Composer autoload suffix</a></li>
+<li><a href="#box">Box</a></li>
+<li><a href="#phar-alias">PHAR alias</a></li>
+<li><a href="#requirement-checker">Requirement Checker</a></li>
+<li><a href="#box-banner">Box banner</a></li>
+<li><a href="#phar">PHAR</a></li>
 </ol>
-<p>Examples of Symfony applications can be found in the project under <code>fixtures/build/dir012</code> (Symfony5) and
-<code>fixtures/build/dir018</code> (Symfony6 with the Runtime component).</p>
-<p>They may slightly vary to what you want to do since they are here for testing purposes, but they should be good enough
-to show-case a working scenario if this doc does not prove to be enough.</p>
-<h2 id="project-files">Project files</h2>
-<p>When working with a Symfony project, you usually have a few files that are necessary for the application to work but
-cannot be inferred from Composer. A non-exhaustive list: <code>.env</code>, <code>public</code>, <code>config</code>, <code>var</code>.</p>
-<p>As a result, you will likely need to add them via <code>directories</code>, <code>files</code> or their <code>*-bin</code> variant which may force you
-to use the <code>force-autodiscovery</code> setting. For more information you can find check the <a href="../configuration/#including-files">Including files</a>
-doc.</p>
-<h2 id="project-directory">Project directory</h2>
-<p>Symfony 5.1+ defines the "project dir" as the directory where the composer.json file is. Because box deletes it during PHAR compilation, you need to redefine it in your Kernel. It is usually located in <code>src/Kernel.php</code> and can be defined as follow: </p>
-<div class="highlight"><pre><span></span><code><span class="cp">&lt;?php</span>
-
-<span class="k">class</span> <span class="nc">Kernel</span> <span class="k">extends</span> <span class="nx">BaseKernel</span>
-<span class="p">{</span>
-<span class="o">...</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">getProjectDir</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="no">__DIR__</span><span class="o">.</span><span class="s1">&#39;/../&#39;</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
+<p>When building a PHAR, you sometimes want to have reproducible builds, i.e. no matter how many times you build the PHAR,
+as long as the source content is identical, then the resulting PHAR should not change.</p>
+<p>Whilst this sounds like a good idea and easy at first, it is not the default behaviour. Indeed there is a number of things
+that are generated and will make the resulting PHAR different, for example the Composer autoloader classname, or the scoping
+prefix if you are using PHP-Scoper.</p>
+<p>This documentation aims at walking you through the common elements to adjust in order to achieve reproducible builds. This
+is not an exhaustive piece of documentation as it will also depends on your own application too.</p>
+<h2 id="php-scoper">PHP-Scoper</h2>
+<p>If you are using the <a href="../configuration/#compactors-compactors">PHP-Scoper compactor</a>, you will need to define a fixed prefix as otherwise a random
+one is generated.</p>
+<p>See the <a href="https://github.com/humbug/php-scoper/blob/main/docs/configuration.md#prefix">PHP-Scoper prefix configuration doc</a>.</p>
+<h2 id="composer">Composer</h2>
+<h3 id="composer-root-version">Composer root version</h3>
+<p>By default, the git commit of the current version is included in some places in the Composer generated files. At the time
+of writing, the current git reference can be found in <code>vendor/composer/installed.{json|php}</code> with the path <code>root.reference</code>.</p>
+<p>This is not ideal as the content of the PHAR could be identical for two different git commits. In order to get rid of
+this problem, you can leverage the <a href="https://getcomposer.org/doc/03-cli.md#composer-root-version"><code>COMPOSER_ROOT_VERSION</code></a>. Either by exporting it or passing
+it to Box when compiling it:</p>
+<div class="highlight"><pre><span></span><code>$ COMPOSER_ROOT_VERSION=1.0.0-dev box compile
 </code></pre></div>
-<h2 id="cache">Cache</h2>
-<p>What makes Symfony a bit special for shipping it into a PHAR is its compilation step. Indeed, the Symfony container can
-be dumped depending on multiple parameters such the application environment, whether it is in debug mode or not and if
-the cache is fresh.</p>
-<p>A PHAR however is a readonly only environment, which means the container <em>cannot</em> be dumped once inside the PHAR. To
-prevent the issue, you need to make sure of the following:</p>
-<ul>
-<li>The cache is warmed up before being shipped within the PHAR</li>
-<li>The application within the PHAR is running in production mode</li>
-</ul>
-<p>To achieve this with the least amount of changes is to:</p>
-<ul>
-<li>Create the <code>.env.local.php</code> file by running the following command:</li>
-</ul>
-<div class="highlight"><pre><span></span><code>$ composer dump-env prod
+<h3 id="composer-autoload-suffix">Composer autoload suffix</h3>
+<p>By default, Box will dump the Composer autoloader which usually results in a different autoloader classname. There is
+exceptions to this, for example Composer tend to try to keep the known suffix if one already exist, but it is an exotic
+case that is not recommended to rely on. For this reason you need to configure the <a href="https://getcomposer.org/doc/06-config.md#autoloader-suffix">Composer autoload prefix</a>:</p>
+<div class="highlight"><pre><span></span><code>$ composer config autoloader-suffix AppChecksum
 </code></pre></div>
-<p>This will ensure when loading the variables that your application is in production mode.</p>
-<ul>
-<li>Change the following part of the <code>composer.json</code> file:</li>
-</ul>
-<div class="highlight"><pre><span></span><code><span class="nt">&quot;scripts&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;auto-scripts&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;cache:clear&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;symfony-cmd&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;assets:install %PUBLIC_DIR%&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;symfony-cmd&quot;</span>
-<span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="nt">&quot;post-install-cmd&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">        </span><span class="s2">&quot;@auto-scripts&quot;</span>
-<span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;post-update-cmd&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">        </span><span class="s2">&quot;@auto-scripts&quot;</span>
-<span class="w">    </span><span class="p">]</span>
-<span class="p">},</span>
+<p>Or configure it directly in your <code>composer.json</code>:</p>
+<div class="highlight"><pre><span></span><code>{
+    &quot;config&quot;: {
+        &quot;autoloader-suffix&quot;: &quot;AppChecksum&quot;
+    }
+}
 </code></pre></div>
-<p>For:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">&quot;scripts&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;auto-scripts&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;cache:clear&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;symfony-cmd&quot;</span>
-<span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="nt">&quot;post-autoload-dump&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">        </span><span class="s2">&quot;@auto-scripts&quot;</span>
-<span class="w">    </span><span class="p">]</span>
-<span class="p">},</span>
+<h2 id="box">Box</h2>
+<h3 id="phar-alias">PHAR Alias</h3>
+<p>By default, Box generates a random PHAR alias so you need to set a fixed value, e.g. <code>my-app-name</code>.</p>
+<p>See the <a href="../configuration/#alias-alias">Box alias setting</a>.</p>
+<p>The output (<code>string</code>|<code>null</code>) setting specifies the file name and path of the newly built PHAR. If the value of the
+setting is not an absolute path, the path will be relative to the base path.</p>
+<p>If not provided or set to <code>null</code>, the default value used will based on the [<code>main</code>][main]. For example if the main file
+is <code>bin/acme.php</code> or <code>bin/acme</code> then the output will be <code>bin/acme.phar</code>.</p>
+<h3 id="requirement-checker">Requirement Checker</h3>
+<p>By default, Box includes its <a href="../requirement-checker/">Requirement Checker</a>. It will not change from a PHAR to another, so
+this step should be skippable. However, the RequirementChecker shipped <em>does</em> change based on the Box version. I.e.
+building your PHAR with Box 4.3.8 will result in a different† requirement checker shipped than the one in 4.4.0.</p>
+<p>†: By different is meant the checksum is different. The behaviour and code may be the exact same. The most likely
+difference will be the namespace.</p>
+<p>Note that this may change in the future: https://github.com/box-project/box/issues/1075.</p>
+<h3 id="box-banner">Box banner</h3>
+<p>By default, Box generates a <a href="../configuration/#banner-banner">banner</a>. This banners includes the Box version so building the same PHAR with two
+different Box versions will result in a different PHAR signature.</p>
+<h2 id="phar">PHAR</h2>
+<p>The files unix timestamp are part of the PHAR signature, hence if they have a different timestamp (which they do as when
+you add a PHAR to a file, it is changed to the time at when you added it).</p>
+<p>To fix this, you can leverage <a href="https://github.com/Seldaek/phar-utils">Seldaek PHAR-Utils</a> with the following script:</p>
+<div class="highlight"><pre><span></span><code>// resign.php
+&lt;?php declare(strict_types=1);
+
+require_once __DIR__ . &#39;/vendor/autoload.php&#39;;
+
+use Seld\PharUtils\Timestamps;
+
+$file = getcwd() . &#39;/&#39; . ($argv[1] ?? &#39;&#39;);
+if (!is_file($file)) {
+    echo &quot;File does not exist.\n&quot;;
+    exit(1);
+}
+
+$util = new Timestamps($file);
+$util-&gt;updateTimestamps(new DateTimeImmutable(&#39;2017-10-11 08:58:00&#39;));
+$util-&gt;save($file, Phar::SHA512);
 </code></pre></div>
-<p>I.e.:</p>
-<ul>
-<li>You skip the installation of assets (which you shouldn't need in the context of a CLI application)</li>
-<li>Trigger the auto-scripts, which includes the cache warming phase, on the Composer dump-autoload event</li>
-</ul>
-<p>This last part takes advantage of Box <a href="../configuration/#dumping-the-composer-autoloader-dump-autoload">dumping the autoloader</a> by default.</p>
-<h2 id="runtime-component">Runtime component</h2>
-<p>If you are using <a href="https://symfony.com/doc/current/components/runtime.html"><code>symfony/runtime</code></a>, you may end up into some errors (see https://github.com/symfony/symfony/issues/49443).</p>
-<p>To fix the issue, you need to create your own <code>autoload_runtime.template</code> file, for example:</p>
-<div class="highlight"><pre><span></span><code><span class="cp">&lt;?php</span>
-
-<span class="c1">// autoload_runtime.php @generated by Symfony Runtime</span>
-
-<span class="k">if</span> <span class="p">(</span><span class="k">true</span> <span class="o">===</span> <span class="p">(</span><span class="k">require_once</span> <span class="no">__DIR__</span><span class="o">.</span><span class="s1">&#39;/autoload.php&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="k">empty</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;SCRIPT_FILENAME&#39;</span><span class="p">]))</span> <span class="p">{</span>
-    <span class="k">return</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="nv">$pharPath</span> <span class="o">=</span> <span class="nx">Phar</span><span class="o">::</span><span class="na">running</span><span class="p">();</span>
-<span class="k">if</span> <span class="p">(</span><span class="nb">strlen</span><span class="p">(</span><span class="nv">$pharPath</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nb">str_starts_with</span><span class="p">(</span><span class="nv">$scriptFileName</span><span class="p">,</span> <span class="s1">&#39;phar://&#39;</span><span class="p">))</span> <span class="p">{</span>
-    <span class="nv">$scriptFileName</span> <span class="o">=</span> <span class="nv">$pharPath</span><span class="o">.</span><span class="nx">DIRECTORY_SEPARATOR</span><span class="o">.</span><span class="nv">$scriptFileName</span><span class="p">;</span>
-<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="nv">$scriptFileName</span> <span class="o">=</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;SCRIPT_FILENAME&#39;</span><span class="p">];</span>
-<span class="p">}</span>
-
-<span class="nv">$app</span> <span class="o">=</span> <span class="k">require</span> <span class="nv">$scriptFileName</span><span class="p">;</span>
-
-<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">is_object</span><span class="p">(</span><span class="nv">$app</span><span class="p">))</span> <span class="p">{</span>
-    <span class="k">throw</span> <span class="k">new</span> <span class="nx">TypeError</span><span class="p">(</span><span class="nb">sprintf</span><span class="p">(</span><span class="s1">&#39;Invalid return value: callable object expected, &quot;%s&quot; returned from &quot;%s&quot;.&#39;</span><span class="p">,</span> <span class="nb">get_debug_type</span><span class="p">(</span><span class="nv">$app</span><span class="p">),</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;SCRIPT_FILENAME&#39;</span><span class="p">]));</span>
-<span class="p">}</span>
-
-<span class="nv">$runtime</span> <span class="o">=</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;APP_RUNTIME&#39;</span><span class="p">]</span> <span class="o">??</span> <span class="nv">$_ENV</span><span class="p">[</span><span class="s1">&#39;APP_RUNTIME&#39;</span><span class="p">]</span> <span class="o">??</span> <span class="o">%</span><span class="nx">runtime_class</span><span class="o">%</span><span class="p">;</span>
-<span class="nv">$runtime</span> <span class="o">=</span> <span class="k">new</span> <span class="nv">$runtime</span><span class="p">((</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;APP_RUNTIME_OPTIONS&#39;</span><span class="p">]</span> <span class="o">??</span> <span class="nv">$_ENV</span><span class="p">[</span><span class="s1">&#39;APP_RUNTIME_OPTIONS&#39;</span><span class="p">]</span> <span class="o">??</span> <span class="p">[])</span> <span class="o">+</span> <span class="o">%</span><span class="nx">runtime_options</span><span class="o">%</span><span class="p">);</span>
-
-<span class="p">[</span><span class="nv">$app</span><span class="p">,</span> <span class="nv">$args</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$runtime</span>
-    <span class="o">-&gt;</span><span class="na">getResolver</span><span class="p">(</span><span class="nv">$app</span><span class="p">)</span>
-    <span class="o">-&gt;</span><span class="na">resolve</span><span class="p">();</span>
-
-<span class="nv">$app</span> <span class="o">=</span> <span class="nv">$app</span><span class="p">(</span><span class="o">...</span><span class="nv">$args</span><span class="p">);</span>
-
-<span class="k">exit</span><span class="p">(</span>
-    <span class="nv">$runtime</span>
-        <span class="o">-&gt;</span><span class="na">getRunner</span><span class="p">(</span><span class="nv">$app</span><span class="p">)</span>
-        <span class="o">-&gt;</span><span class="na">run</span><span class="p">()</span>
-<span class="p">);</span>
+<p>Then once your PHAR is built:</p>
+<div class="highlight"><pre><span></span><code>$ php resign.php app.phar
 </code></pre></div>
-<p>Notice the <code>Phar::running()</code> section: this is the key of the fix.</p>
-<p>If you ended up changing the location of the <code>console</code> file (which is <code>bin/console</code>), you will need to further customize
-this in order to fix the problem.</p>
+<p>This is obviously not ideal and should be fixed by Box at some point (see https://github.com/box-project/box/issues/1074).</p>
 <p><br /></p>
 <hr />
 
-<p>« <a href="../docker/#docker-support">Docker support</a> • <a href="../reproducible-builds/#reproducible-builds">Reproducible build</a> »</p>
+<p>« <a href="../symfony/#symfony-support">Symfony support</a> • <a href="../faq/#faq">FAQ</a> »</p>
 
 
 
