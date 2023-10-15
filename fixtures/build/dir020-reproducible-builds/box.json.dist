@@ -1,0 +1,8 @@
+{
+  "$schema": "../../../res/schema.json",
+
+  "alias": "e20-app",
+  "compactors": [
+    "KevinGH\\Box\\Compactor\\PhpScoper"
+  ]
+}

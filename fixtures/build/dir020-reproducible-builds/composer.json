@@ -1,0 +1,14 @@
+{
+    "bin": "index.php",
+    "autoload": {
+        "psr-4": {
+            "App\\": ["src/"]
+        }
+    },
+    "config": {
+        "autoloader-suffix": "AppChecksum"
+    },
+    "require": {
+        "seld/phar-utils": "^1.2"
+    }
+}
