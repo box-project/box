@@ -5,6 +5,7 @@
    1. [The PHP_SAPI check](#the-php_sapi-check)
    1. [Autoloading Composer](#autoloading-composer)
 2. [Detecting that you are inside a PHAR](#detecting-that-you-are-inside-a-phar)
+3. [Building a PHAR with Box as a dependency](#building-a-phar-with-box-as-a-dependency)
 
 
 ## What is the canonical way to write a CLI entry file?
@@ -121,6 +122,29 @@ $isInPhar = '' !== Phar::running(false);
 See [Phar::running()][phar-running] for more information.
 
 
+## Building a PHAR with Box as a dependency
+
+If you need to include Box as part of your dependencies and include it within your PHAR, you will probably encounter
+the following issue when building your PHAR:
+
+```
+Could not dump the autoloader.
+[...]
+Could not scan for classes inside "/path/to/vendor/humbug/php-scoper/vendor-hotfix/" which does not appear to be a file nor a folder
+```
+
+This is because by default, Box does not include VCS or dot files which results in the directory `vendor/humbug/php-scoper/vendor-hotfix/`
+to be excluded (as it becomes an empty directory). To circumvent that, you will likely need:
+
+```json
+{
+   "directories": ["vendor/humbug/php-scoper/vendor-hotfix"]
+}
+```
+
+Note that as a result you may want to use the [`force-autodiscovery`][force-autodiscovery] setting.
+
+
 <br />
 <hr />
 
@@ -128,6 +152,7 @@ See [Phar::running()][phar-running] for more information.
 
 
 [httpoxy]: https://httpoxy.org/
+[force-autodiscovery]: ./configuration.md#force-auto-discovery-force-autodiscovery
 [phar-running]: https://www.php.net/manual/en/phar.running.php
 [phpdbg]: https://www.php.net/manual/en/intro.phpdbg.php
 [php-sapi-name]: https://www.php.net/manual/en/function.php-sapi-name.php
