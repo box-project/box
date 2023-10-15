@@ -37,7 +37,6 @@
         "psr/log": "^3.0",
         "sebastian/diff": "^4.0",
         "seld/jsonlint": "^1.9",
-        "seld/phar-utils": "^1.2",
         "symfony/console": "^6.1.7",
         "symfony/filesystem": "^6.1.5",
         "symfony/finder": "^6.1.3",

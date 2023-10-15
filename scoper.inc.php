@@ -19,7 +19,6 @@ $jetBrainStubFiles = require __DIR__.'/res/scoper-phpstorm-stubs.php';
 $jetBrainStubPatcher = require __DIR__.'/res/scoper-phpstorm-stubs-map-patcher.php';
 
 return [
-    'prefix' => 'HumbugBoxTest',
     'exclude-files' => [
         ...$polyfillFiles,
         ...$jetBrainStubFiles,
