@@ -236,6 +236,11 @@ compactors.
     but it remains possible to include them via [`files`][files], [`files-bin`][files], `directories-bin` or your own
     [`finder`][finder] or [`finder-bin`][finder].
 
+!!! Warning
+    If some files are expected to be excluded from the [`finder`][finder] (respectively [`finder-bin`][finder]) but
+    included in `directories` (respectively `directories-bin`), the those files **will be included**. The files included
+    are a union of the directives.
+
 !!! Warning 
     Symlinks are not followed/supported.
 
@@ -256,6 +261,11 @@ such as images, those that contain binary data or simply a file you do not want 
 !!! Warning
     Setting the key `finder` (regardless of its value), will disable the file auto-discovery. If you want
     to keep it, check the [force the auto-discovery][force-autodiscovery] setting.
+
+!!! Warning
+    If some files are expected to be excluded from the [`finder`][finder] (respectively [`finder-bin`][finder]) but
+    included in `directories` (respectively `directories-bin`), the those files **will be included**. The files included
+    are a union of the directives.
 
 !!! Warning
     Symlinks are not followed/supported.
