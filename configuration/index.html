@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../img/favicon.png">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.4">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.6">
     
     
       
@@ -28,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.bd3936ea.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.35e1ed30.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.356b1318.min.css">
@@ -1452,6 +1452,12 @@ but it remains possible to include them via <a href="#files-files-and-files-bin"
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
+<p>If some files are expected to be excluded from the <a href="#finder-finder-and-finder-bin"><code>finder</code></a> (respectively <a href="#finder-finder-and-finder-bin"><code>finder-bin</code></a>) but
+included in <code>directories</code> (respectively <code>directories-bin</code>), the those files <strong>will be included</strong>. The files included
+are a union of the directives.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
 <p>Symlinks are not followed/supported.</p>
 </div>
 <h3 id="finder-finder-and-finder-bin">Finder (<code>finder</code> and <code>finder-bin</code>)</h3>
@@ -1467,6 +1473,12 @@ such as images, those that contain binary data or simply a file you do not want 
 <p class="admonition-title">Warning</p>
 <p>Setting the key <code>finder</code> (regardless of its value), will disable the file auto-discovery. If you want
 to keep it, check the <a href="#force-auto-discovery-force-autodiscovery">force the auto-discovery</a> setting.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If some files are expected to be excluded from the <a href="#finder-finder-and-finder-bin"><code>finder</code></a> (respectively <a href="#finder-finder-and-finder-bin"><code>finder-bin</code></a>) but
+included in <code>directories</code> (respectively <code>directories-bin</code>), the those files <strong>will be included</strong>. The files included
+are a union of the directives.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -2070,7 +2082,7 @@ in all <a href="#including-files">non-binary files</a> by the current git tag of
     <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.94c44541.min.js"></script>
+      <script src="../assets/javascripts/bundle.aecac24b.min.js"></script>
       
     
   </body>
