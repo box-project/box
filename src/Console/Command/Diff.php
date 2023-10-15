@@ -24,10 +24,12 @@ use KevinGH\Box\Phar\PharDiff;
 use KevinGH\Box\Phar\PharInfo;
 use SebastianBergmann\Diff\Differ;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Filesystem\Path;
+use ValueError;
 use Webmozart\Assert\Assert;
 use function array_map;
 use function explode;
@@ -268,7 +270,23 @@ final class Diff implements Command
             return DiffMode::FILE_NAME;
         }
 
-        return DiffMode::from($io->getOption(self::DIFF_OPTION)->asNonEmptyString());
+        $rawDiffOption = $io->getOption(self::DIFF_OPTION)->asNonEmptyString();
+
+        try {
+            return DiffMode::from($rawDiffOption);
+        } catch (ValueError) {
+            // Rethrow a more user-friendly error message
+            throw new RuntimeException(
+                sprintf(
+                    'Invalid diff mode "%s". Expected one of: "%s".',
+                    $rawDiffOption,
+                    implode(
+                        '", "',
+                        DiffMode::values(),
+                    ),
+                ),
+            );
+        }
     }
 
     private static function getChecksumAlgorithm(IO $io): string
