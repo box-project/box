@@ -12,6 +12,11 @@ use function get_cfg_var;
 final class RequirementCollection implements IteratorAggregate, Countable
 {
     private $requirements = [];
+    private $phpIniPath;
+    public function __construct($phpIniPath = null)
+    {
+        $this->phpIniPath = null === $phpIniPath ? get_cfg_var('cfg_file_path') : $phpIniPath;
+    }
     public function getIterator() : Traversable
     {
         return new ArrayIterator($this->requirements);
@@ -34,7 +39,7 @@ final class RequirementCollection implements IteratorAggregate, Countable
     }
     public function getPhpIniPath()
     {
-        return get_cfg_var('cfg_file_path');
+        return $this->phpIniPath;
     }
     public function evaluateRequirements()
     {
