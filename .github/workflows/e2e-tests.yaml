@@ -66,6 +66,7 @@ jobs:
                     - e2e_dockerfile
                     - e2e_dockerfile_no_extension
                     - e2e_custom_composer_bin
+                    - e2e_reproducible_build
                 php: [ '8.1', '8.2', '8.3' ]
                 tools:
                     - 'composer:2.2'
