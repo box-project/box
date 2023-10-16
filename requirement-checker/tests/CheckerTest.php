@@ -89,6 +89,30 @@ class CheckerTest extends TestCase
             ];
         })();
 
+        yield 'no requirement + no ini path; verbosity=debug' => (static function () use ($phpVersion) {
+            return [
+                new RequirementCollection(false),
+                IO::VERBOSITY_DEBUG,
+                true,
+                <<<EOF
+
+                    Box Requirements Checker
+                    ========================
+
+                    > Using PHP {$phpVersion}
+                    > PHP is not using any php.ini file.
+
+                    > No requirements found.
+
+
+                     [OK] Your system is ready to run the application.
+
+
+
+                    EOF
+            ];
+        })();
+
         yield 'no requirement; verbosity=very verbose' => (static function () use ($phpVersion) {
             return [
                 new RequirementCollection(),

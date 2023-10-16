@@ -36,6 +36,21 @@ final class RequirementCollection implements IteratorAggregate, Countable
     private $requirements = [];
 
     /**
+     * @var string|false
+     */
+    private $phpIniPath;
+
+    /**
+     * @param string|false|null $phpIniPath
+     */
+    public function __construct($phpIniPath = null)
+    {
+        $this->phpIniPath = null === $phpIniPath
+            ? get_cfg_var('cfg_file_path')
+            : $phpIniPath;
+    }
+
+    /**
      * @return Traversable<Requirement>
      */
     public function getIterator(): Traversable
@@ -83,7 +98,7 @@ final class RequirementCollection implements IteratorAggregate, Countable
      */
     public function getPhpIniPath()
     {
-        return get_cfg_var('cfg_file_path');
+        return $this->phpIniPath;
     }
 
     /**

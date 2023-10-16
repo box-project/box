@@ -66,12 +66,11 @@ final class Checker
         $printer->printv('> Using PHP ', $verbosity);
         $printer->printvln(PHP_VERSION, $verbosity, 'green');
 
-        $printer->printvln('> PHP is using the following php.ini file:', $verbosity);
-
         if ($iniPath) {
+            $printer->printvln('> PHP is using the following php.ini file:', $verbosity);
             $printer->printvln('  '.$iniPath, $verbosity, 'green');
         } else {
-            $printer->printvln('  WARNING: No configuration file (php.ini) used by PHP!', $verbosity, 'yellow');
+            $printer->printvln('> PHP is not using any php.ini file.', $verbosity, 'yellow');
         }
 
         $printer->printvln('', $verbosity);
