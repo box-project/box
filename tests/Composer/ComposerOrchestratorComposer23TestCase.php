@@ -17,50 +17,19 @@ namespace KevinGH\Box\Composer;
 use Fidry\Console\DisplayNormalizer;
 use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-use KevinGH\Box\Test\FileSystemTestCase;
-use PhpParser\Node\Name\FullyQualified;
 use RuntimeException;
-use Symfony\Component\Finder\Finder;
-use function file_exists;
 use function file_get_contents;
-use function iterator_to_array;
 use function preg_replace;
-use function sprintf;
-use function version_compare;
 
 /**
+ * @covers \KevinGH\Box\Composer\AutoloadDumper
  * @covers \KevinGH\Box\Composer\ComposerOrchestrator
+ * @covers \KevinGH\Box\Composer\ComposerProcessFactory
  *
  * @internal
  */
-class ComposerOrchestratorComposer23Test extends FileSystemTestCase
+class ComposerOrchestratorComposer23TestCase extends BaseComposerOrchestratorComposerTestCase
 {
-    private const FIXTURES = __DIR__.'/../../fixtures/composer-dump';
-    private const COMPOSER_AUTOLOADER_NAME = 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05';
-
-    private string $composerVersion;
-    private bool $skip;
-
-    protected function setUp(): void
-    {
-        if (!isset($this->skip)) {
-            $this->composerVersion = ComposerOrchestrator::getVersion();
-
-            $this->skip = version_compare($this->composerVersion, '2.3.0', '<') || version_compare($this->composerVersion, '2.4.0', '>=');
-        }
-
-        if ($this->skip) {
-            self::markTestSkipped(
-                sprintf(
-                    'Can only be executed with Composer ~2.3.0. Got "%s".',
-                    $this->composerVersion,
-                ),
-            );
-        }
-
-        parent::setUp();
-    }
-
     /**
      * @dataProvider composerAutoloadProvider
      */
@@ -71,7 +40,7 @@ class ComposerOrchestratorComposer23Test extends FileSystemTestCase
     ): void {
         FS::dumpFile('composer.json', '{}');
 
-        ComposerOrchestrator::dumpAutoload($symbolsRegistry, $prefix, false);
+        $this->composerOrchestrator->dumpAutoload($symbolsRegistry, $prefix, false);
 
         $expectedPaths = [
             'composer.json',
@@ -131,7 +100,7 @@ class ComposerOrchestratorComposer23Test extends FileSystemTestCase
         FS::dumpFile('composer.json');
 
         try {
-            ComposerOrchestrator::dumpAutoload($symbolsRegistry, $prefix, false);
+            $this->composerOrchestrator->dumpAutoload($symbolsRegistry, $prefix, false);
 
             self::fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
@@ -153,7 +122,7 @@ class ComposerOrchestratorComposer23Test extends FileSystemTestCase
     {
         FS::mirror(self::FIXTURES.'/dir000', $this->tmp);
 
-        ComposerOrchestrator::dumpAutoload(new SymbolsRegistry(), '', false);
+        $this->composerOrchestrator->dumpAutoload(new SymbolsRegistry(), '', false);
 
         $expectedPaths = [
             'composer.json',
@@ -223,7 +192,7 @@ class ComposerOrchestratorComposer23Test extends FileSystemTestCase
         string $prefix,
     ): void {
         try {
-            ComposerOrchestrator::dumpAutoload($symbolsRegistry, $prefix, false);
+            $this->composerOrchestrator->dumpAutoload($symbolsRegistry, $prefix, false);
 
             self::fail('Expected exception to be thrown.');
         } catch (RuntimeException $exception) {
@@ -252,7 +221,7 @@ class ComposerOrchestratorComposer23Test extends FileSystemTestCase
         $this->skipIfFixturesNotInstalled(self::FIXTURES.'/dir001/vendor');
         FS::mirror(self::FIXTURES.'/dir001', $this->tmp);
 
-        ComposerOrchestrator::dumpAutoload($SymbolsRegistry, $prefix, false);
+        $this->composerOrchestrator->dumpAutoload($SymbolsRegistry, $prefix, false);
 
         // The fact that there is a dependency in the `composer.json` does not change anything to Composer
         $expectedPaths = [
@@ -341,7 +310,7 @@ class ComposerOrchestratorComposer23Test extends FileSystemTestCase
 
             PHP;
 
-        ComposerOrchestrator::dumpAutoload(
+        $this->composerOrchestrator->dumpAutoload(
             new SymbolsRegistry(),
             '',
             true,
@@ -419,7 +388,7 @@ class ComposerOrchestratorComposer23Test extends FileSystemTestCase
         $this->skipIfFixturesNotInstalled(self::FIXTURES.'/dir002/vendor');
         FS::mirror(self::FIXTURES.'/dir002', $this->tmp);
 
-        ComposerOrchestrator::dumpAutoload($symbolsRegistry, $prefix, false);
+        $this->composerOrchestrator->dumpAutoload($symbolsRegistry, $prefix, false);
 
         // The fact that there is a dependency in the `composer.json` does not change anything to Composer
         $expectedPaths = [
@@ -771,47 +740,5 @@ class ComposerOrchestratorComposer23Test extends FileSystemTestCase
 
                 PHP,
         ];
-    }
-
-    /**
-     * @param array<array{string, string}> $recordedClasses
-     * @param array<array{string, string}> $recordedFunctions
-     */
-    private static function createSymbolsRegistry(array $recordedClasses = [], array $recordedFunctions = []): SymbolsRegistry
-    {
-        $registry = new SymbolsRegistry();
-
-        foreach ($recordedClasses as [$original, $alias]) {
-            $registry->recordClass(
-                new FullyQualified($original),
-                new FullyQualified($alias),
-            );
-        }
-
-        foreach ($recordedFunctions as [$original, $alias]) {
-            $registry->recordFunction(
-                new FullyQualified($original),
-                new FullyQualified($alias),
-            );
-        }
-
-        return $registry;
-    }
-
-    /**
-     * @return string[]
-     */
-    private function retrievePaths(): array
-    {
-        $finder = Finder::create()->files()->in($this->tmp);
-
-        return $this->normalizePaths(iterator_to_array($finder, false));
-    }
-
-    private function skipIfFixturesNotInstalled(string $path): void
-    {
-        if (!file_exists($path)) {
-            self::markTestSkipped('The fixtures were not installed. Run `$ make test_unit` in order to set them all up.');
-        }
     }
 }

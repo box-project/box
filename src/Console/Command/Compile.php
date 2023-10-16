@@ -21,13 +21,16 @@ use Fidry\Console\Command\CommandAwareness;
 use Fidry\Console\Command\Configuration as CommandConfiguration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
+use Fidry\FileSystem\FileSystem;
 use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Amp\FailureCollector;
 use KevinGH\Box\Box;
 use KevinGH\Box\Compactor\Compactor;
+use KevinGH\Box\Composer\CompilerPsrLogger;
 use KevinGH\Box\Composer\ComposerConfiguration;
 use KevinGH\Box\Composer\ComposerOrchestrator;
+use KevinGH\Box\Composer\ComposerProcessFactory;
 use KevinGH\Box\Composer\IncompatibleComposerVersion;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\Logger\CompilerLogger;
@@ -242,8 +245,16 @@ final class Compile implements CommandAware
         bool $debug,
     ): Box {
         $box = Box::create($config->getTmpOutputPath());
+        $composerOrchestrator = new ComposerOrchestrator(
+            ComposerProcessFactory::create(
+                $config->getComposerBin(),
+                $io,
+            ),
+            new CompilerPsrLogger($logger),
+            new FileSystem(),
+        );
 
-        self::checkComposerVersion($config, $logger, $io);
+        self::checkComposerVersion($composerOrchestrator, $config, $logger, $io);
 
         $box->startBuffering();
 
@@ -262,7 +273,7 @@ final class Compile implements CommandAware
         self::registerStub($config, $box, $main, $check, $logger);
         self::configureMetadata($config, $box, $logger);
 
-        self::commit($box, $config, $logger);
+        self::commit($box, $composerOrchestrator, $config, $logger);
 
         self::checkComposerFiles($box, $config, $logger);
 
@@ -323,6 +334,7 @@ final class Compile implements CommandAware
     }
 
     private static function checkComposerVersion(
+        ComposerOrchestrator $composerOrchestrator,
         Configuration $config,
         CompilerLogger $logger,
         IO $io,
@@ -342,10 +354,7 @@ final class Compile implements CommandAware
         );
 
         try {
-            ComposerOrchestrator::checkVersion(
-                $config->getComposerBin(),
-                $io,
-            );
+            $composerOrchestrator->checkVersion();
 
             $logger->log(
                 CompilerLogger::CHEVRON_PREFIX,
@@ -643,26 +652,26 @@ final class Compile implements CommandAware
         }
     }
 
-    private static function commit(Box $box, Configuration $config, CompilerLogger $logger): void
-    {
+    private static function commit(
+        Box $box,
+        ComposerOrchestrator $composerOrchestrator,
+        Configuration $config,
+        CompilerLogger $logger,
+    ): void {
         $message = $config->dumpAutoload()
             ? 'Dumping the Composer autoloader'
             : 'Skipping dumping the Composer autoloader';
 
         $logger->log(CompilerLogger::QUESTION_MARK_PREFIX, $message);
 
-        $composerBin = $config->getComposerBin();
         $excludeDevFiles = $config->excludeDevFiles();
-        $io = $logger->getIO();
 
         $box->endBuffering(
             $config->dumpAutoload()
-                ? static fn (SymbolsRegistry $symbolsRegistry, string $prefix) => ComposerOrchestrator::dumpAutoload(
+                ? static fn (SymbolsRegistry $symbolsRegistry, string $prefix) => $composerOrchestrator->dumpAutoload(
                     $symbolsRegistry,
                     $prefix,
                     $excludeDevFiles,
-                    $composerBin,
-                    $io,
                 )
                 : null,
         );

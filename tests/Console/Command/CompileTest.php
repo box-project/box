@@ -859,7 +859,7 @@ class CompileTest extends FileSystemTestCase
             ? Removing the existing PHAR "/path/to/tmp/test.phar"
             ? Checking Composer compatibility
                 > '/usr/local/bin/composer' '--version' '--no-ansi'
-                > 2.5.0 (Box requires ^2.2.0)
+                > Version detected: 2.2.22 (Box requires ^2.2.0)
                 > Supported version detected
             ? Registering compactors
               + KevinGH\\Box\\Compactor\\Php
@@ -987,7 +987,7 @@ class CompileTest extends FileSystemTestCase
             ? Removing the existing PHAR "/path/to/tmp/test.phar"
             ? Checking Composer compatibility
                 > '/usr/local/bin/composer' '--version' '--no-ansi'
-                > 2.5.0 (Box requires ^2.2.0)
+                > Version detected: 2.2.22 (Box requires ^2.2.0)
                 > Supported version detected
             ? Registering compactors
               + KevinGH\\Box\\Compactor\\Php
@@ -3073,8 +3073,8 @@ class CompileTest extends FileSystemTestCase
     private static function createComposerVersionNormalizer(): callable
     {
         return static fn (string $output): string => preg_replace(
-            '/> ([\d.]+) \(Box requires \^2\.2\.0\)/',
-            '> 2.5.0 (Box requires ^2.2.0)',
+            '/> Version detected: ([\d.]+) \(Box requires \^2\.2\.0\)/',
+            '> Version detected: 2.2.22 (Box requires ^2.2.0)',
             $output,
         );
     }
