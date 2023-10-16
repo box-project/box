@@ -135,7 +135,7 @@ final class ComposerOrchestrator
 
         $this->logger->info($dumpAutoloadProcess->getCommandLine());
 
-        $dumpAutoloadProcess->run($this->processFactory->getDefaultEnvVars());
+        $dumpAutoloadProcess->run(env: $this->processFactory->getDefaultEnvVars());
 
         if (false === $dumpAutoloadProcess->isSuccessful()) {
             throw new RuntimeException(
@@ -148,14 +148,19 @@ final class ComposerOrchestrator
         $output = $dumpAutoloadProcess->getOutput();
         $errorOutput = $dumpAutoloadProcess->getErrorOutput();
 
-        $this->logger->info(
-            'STDOUT output:'.PHP_EOL.$output,
-            ['stdout' => $output],
-        );
-        $this->logger->info(
-            'STDERR output:'.PHP_EOL.$errorOutput,
-            ['stderr' => $errorOutput],
-        );
+        if ('' !== $output) {
+            $this->logger->info(
+                'STDOUT output:'.PHP_EOL.$output,
+                ['stdout' => $output],
+            );
+        }
+
+        if ('' !== $errorOutput) {
+            $this->logger->info(
+                'STDERR output:'.PHP_EOL.$errorOutput,
+                ['stderr' => $errorOutput],
+            );
+        }
     }
 
     private function retrieveAutoloadFile(): string
