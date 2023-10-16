@@ -24,8 +24,6 @@ use Phar;
 use Symfony\Component\Console\Output\OutputInterface;
 use function extension_loaded;
 use function implode;
-use function preg_replace;
-use function Safe\realpath;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Info
@@ -602,31 +600,17 @@ class InfoTest extends CommandTestCase
         }
     }
 
-    public function test_it_cannot_provide_info_about_an_invalid_phar_without_extension(): void
+    public function test_it_cannot_provide_info_about_an_invalid_phar(): void
     {
         $file = self::FIXTURES.'/foo';
+
+        $this->expectException(InvalidPhar::class);
 
         $this->commandTester->execute(
             [
                 'command' => 'info',
                 'phar' => $file,
             ],
-        );
-
-        $expectedPath = realpath($file);
-
-        $expected = <<<OUTPUT
-
-
-             [ERROR] Could not read the file "{$expectedPath}".
-
-
-            OUTPUT;
-
-        $this->assertSameOutput(
-            $expected,
-            ExitCode::FAILURE,
-            static fn ($output) => preg_replace('/file[\ \n]+"/', 'file "', $output),
         );
     }
 
