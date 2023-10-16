@@ -16,21 +16,15 @@ namespace KevinGH\Box\Composer;
 
 use Composer\Semver\Semver;
 use Fidry\Console\Input\IO;
-use Fidry\FileSystem\FS;
-use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
+use Fidry\FileSystem\FileSystem;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-use KevinGH\Box\Console\Logger\CompilerLogger;
 use KevinGH\Box\NotInstantiable;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use RuntimeException;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\ExecutableFinder;
-use Symfony\Component\Process\Process;
-use function preg_replace;
 use function sprintf;
-use function str_replace;
 use function trim;
-use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 use const PHP_EOL;
 
 /**
@@ -40,27 +34,73 @@ final class ComposerOrchestrator
 {
     use NotInstantiable;
 
-    private const SUPPORTED_VERSION_CONSTRAINTS = '^2.2.0';
+    public const SUPPORTED_VERSION_CONSTRAINTS = '^2.2.0';
+
+    private string $detectedVersion;
+
+    public static function create(): self
+    {
+        return new self(
+            ComposerProcessFactory::create(io: IO::createNull()),
+            new NullLogger(),
+            new FileSystem(),
+        );
+    }
+
+    public function __construct(
+        private ComposerProcessFactory $processFactory,
+        private LoggerInterface $logger,
+        private FileSystem $fileSystem,
+    ) {
+    }
 
     /**
+     * @throws UndetectableComposerVersion
+     */
+    public function getVersion(): string
+    {
+        if (isset($this->detectedVersion)) {
+            return $this->detectedVersion;
+        }
+
+        $getVersionProcess = $this->processFactory->getVersionProcess();
+
+        $this->logger->info($getVersionProcess->getCommandLine());
+
+        $getVersionProcess->run(env: $this->processFactory->getDefaultEnvVars());
+
+        if (false === $getVersionProcess->isSuccessful()) {
+            throw UndetectableComposerVersion::forFailedProcess($getVersionProcess);
+        }
+
+        $output = $getVersionProcess->getOutput();
+
+        if (1 !== preg_match('/^Composer version ([^\\s]+)/', $output, $match)) {
+            throw UndetectableComposerVersion::forOutput(
+                $getVersionProcess,
+                $output,
+            );
+        }
+
+        $this->detectedVersion = $match[1];
+
+        return $this->detectedVersion;
+    }
+
+    /**
+     * @throws UndetectableComposerVersion
      * @throws IncompatibleComposerVersion
      */
-    public static function checkVersion(
-        ?string $composerBin = null,
-        ?IO $io = null,
-    ): void {
-        $logger = new CompilerLogger($io ?? IO::createNull());
+    public function checkVersion(): void
+    {
+        $version = $this->getVersion();
 
-        $version = self::getVersion($composerBin, $io);
-
-        $logger->log(
-            CompilerLogger::CHEVRON_PREFIX,
+        $this->logger->info(
             sprintf(
-                '%s (Box requires %s)',
+                'Version detected: %s (Box requires %s)',
                 $version,
                 self::SUPPORTED_VERSION_CONSTRAINTS,
             ),
-            OutputInterface::VERBOSITY_VERBOSE,
         );
 
         if (!Semver::satisfies($version, self::SUPPORTED_VERSION_CONSTRAINTS)) {
@@ -68,140 +108,34 @@ final class ComposerOrchestrator
         }
     }
 
-    public static function getVersion(
-        ?string $composerBin = null,
-        ?IO $io = null,
-    ): string {
-        $logger = new CompilerLogger($io ?? IO::createNull());
-
-        $composerExecutable = $composerBin ?? self::retrieveComposerExecutable();
-        $getVersionProcess = new Process([$composerExecutable, '--version', '--no-ansi']);
-
-        $logger->log(
-            CompilerLogger::CHEVRON_PREFIX,
-            $getVersionProcess->getCommandLine(),
-            OutputInterface::VERBOSITY_VERBOSE,
-        );
-
-        $getVersionProcess->run(null, self::getDefaultEnvVars());
-
-        if (false === $getVersionProcess->isSuccessful()) {
-            throw new ProcessFailedException($getVersionProcess);
-        }
-
-        $output = $getVersionProcess->getOutput();
-
-        if (preg_match('/^Composer version ([^\\s]+)/', $output, $match) > 0) {
-            return $match[1];
-        }
-
-        throw new RuntimeException(
-            sprintf(
-                'Could not determine the Composer version from "%s".',
-                $output,
-            ),
-        );
-    }
-
-    public static function dumpAutoload(
+    public function dumpAutoload(
         SymbolsRegistry $symbolsRegistry,
         string $prefix,
         bool $excludeDevFiles,
-        ?string $composerBin = null,
-        ?IO $io = null,
     ): void {
-        $logger = new CompilerLogger($io ?? IO::createNull());
+        $this->dumpAutoloader(true === $excludeDevFiles);
 
-        $composerExecutable = $composerBin ?? self::retrieveComposerExecutable();
-
-        self::dumpAutoloader($composerExecutable, true === $excludeDevFiles, $logger);
-
-        if ('' !== $prefix) {
-            $autoloadFile = self::retrieveAutoloadFile($composerExecutable, $logger);
-
-            $autoloadContents = self::generateAutoloadStatements(
-                $symbolsRegistry,
-                FS::getFileContents($autoloadFile),
-            );
-
-            FS::dumpFile($autoloadFile, $autoloadContents);
-        }
-    }
-
-    private static function generateAutoloadStatements(
-        SymbolsRegistry $symbolsRegistry,
-        string $autoload,
-    ): string {
-        if (0 === $symbolsRegistry->count()) {
-            return $autoload;
+        if ('' === $prefix) {
+            return;
         }
 
-        $autoload = str_replace('<?php', '', $autoload);
+        $autoloadFile = $this->retrieveAutoloadFile();
 
-        $autoload = preg_replace(
-            '/return (ComposerAutoloaderInit.+::getLoader\(\));/',
-            '\$loader = $1;',
-            $autoload,
+        $autoloadContents = AutoloadDumper::generateAutoloadStatements(
+            $symbolsRegistry,
+            $this->fileSystem->getFileContents($autoloadFile),
         );
 
-        $scoperStatements = (new ScoperAutoloadGenerator($symbolsRegistry))->dump();
-
-        $scoperStatements = preg_replace(
-            '/scoper\-autoload\.php \@generated by PhpScoper/',
-            '@generated by Humbug Box',
-            $scoperStatements,
-        );
-
-        $scoperStatements = preg_replace(
-            '/(\s*\\$loader \= .*)/',
-            $autoload,
-            $scoperStatements,
-        );
-
-        return preg_replace(
-            '/\n{2,}/m',
-            PHP_EOL.PHP_EOL,
-            $scoperStatements,
-        );
+        $this->fileSystem->dumpFile($autoloadFile, $autoloadContents);
     }
 
-    private static function retrieveComposerExecutable(): string
+    private function dumpAutoloader(bool $noDev): void
     {
-        $executableFinder = new ExecutableFinder();
-        $executableFinder->addSuffix('.phar');
+        $dumpAutoloadProcess = $this->processFactory->getDumpAutoloaderProcess($noDev);
 
-        if (null === $composer = $executableFinder->find('composer')) {
-            throw new RuntimeException('Could not find a Composer executable.');
-        }
+        $this->logger->info($dumpAutoloadProcess->getCommandLine());
 
-        return $composer;
-    }
-
-    private static function dumpAutoloader(string $composerExecutable, bool $noDev, CompilerLogger $logger): void
-    {
-        $composerCommand = [$composerExecutable, 'dump-autoload', '--classmap-authoritative'];
-
-        if (true === $noDev) {
-            $composerCommand[] = '--no-dev';
-        }
-
-        if (null !== $verbosity = self::retrieveSubProcessVerbosity($logger->getIO())) {
-            $composerCommand[] = $verbosity;
-        }
-
-        if ($logger->getIO()->isDecorated()) {
-            $composerCommand[] = '--ansi';
-        }
-
-        $dumpAutoloadProcess = new Process($composerCommand);
-
-        $logger->log(
-            CompilerLogger::CHEVRON_PREFIX,
-            $dumpAutoloadProcess->getCommandLine(),
-            OutputInterface::VERBOSITY_VERBOSE,
-        );
-
-        $dumpAutoloadProcess->run(null, self::getDefaultEnvVars());
+        $dumpAutoloadProcess->run($this->processFactory->getDefaultEnvVars());
 
         if (false === $dumpAutoloadProcess->isSuccessful()) {
             throw new RuntimeException(
@@ -211,32 +145,26 @@ final class ComposerOrchestrator
             );
         }
 
-        if ('' !== $output = $dumpAutoloadProcess->getOutput()) {
-            $logger->getIO()->writeln($output, OutputInterface::VERBOSITY_VERBOSE);
-        }
+        $output = $dumpAutoloadProcess->getOutput();
+        $errorOutput = $dumpAutoloadProcess->getErrorOutput();
 
-        if ('' !== $output = $dumpAutoloadProcess->getErrorOutput()) {
-            $logger->getIO()->writeln($output, OutputInterface::VERBOSITY_VERBOSE);
-        }
+        $this->logger->info(
+            'STDOUT output:'.PHP_EOL.$output,
+            ['stdout' => $output],
+        );
+        $this->logger->info(
+            'STDERR output:'.PHP_EOL.$errorOutput,
+            ['stderr' => $errorOutput],
+        );
     }
 
-    private static function retrieveAutoloadFile(string $composerExecutable, CompilerLogger $logger): string
+    private function retrieveAutoloadFile(): string
     {
-        $command = [$composerExecutable, 'config', 'vendor-dir'];
+        $vendorDirProcess = $this->processFactory->getAutoloadFileProcess();
 
-        if ($logger->getIO()->isDecorated()) {
-            $command[] = '--ansi';
-        }
+        $this->logger->info($vendorDirProcess->getCommandLine());
 
-        $vendorDirProcess = new Process($command);
-
-        $logger->log(
-            CompilerLogger::CHEVRON_PREFIX,
-            $vendorDirProcess->getCommandLine(),
-            OutputInterface::VERBOSITY_VERBOSE,
-        );
-
-        $vendorDirProcess->run(null, self::getDefaultEnvVars());
+        $vendorDirProcess->run(env: $this->processFactory->getDefaultEnvVars());
 
         if (false === $vendorDirProcess->isSuccessful()) {
             throw new RuntimeException(
@@ -247,29 +175,5 @@ final class ComposerOrchestrator
         }
 
         return trim($vendorDirProcess->getOutput()).'/autoload.php';
-    }
-
-    private static function retrieveSubProcessVerbosity(IO $io): ?string
-    {
-        if ($io->isDebug()) {
-            return '-vvv';
-        }
-
-        if ($io->isVeryVerbose()) {
-            return '-v';
-        }
-
-        return null;
-    }
-
-    private static function getDefaultEnvVars(): array
-    {
-        $vars = [];
-
-        if ('1' === (string) getenv(BOX_ALLOW_XDEBUG)) {
-            $vars['COMPOSER_ALLOW_XDEBUG'] = '1';
-        }
-
-        return $vars;
     }
 }
