@@ -24,7 +24,6 @@ use Phar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Filesystem\Path;
-use Throwable;
 use function implode;
 use function is_array;
 use function realpath;
@@ -129,30 +128,15 @@ final class Info implements Command
         $maxDepth = self::getMaxDepth($io);
         $mode = $io->getOption(self::MODE_OPT)->asStringChoice(self::MODES);
 
-        try {
-            $pharInfo = new PharInfo($file);
+        $pharInfo = new PharInfo($file);
 
-            return self::showPharInfo(
-                $pharInfo,
-                $io->getOption(self::LIST_OPT)->asBoolean(),
-                -1 === $maxDepth ? false : $maxDepth,
-                'indent' === $mode,
-                $io,
-            );
-        } catch (Throwable $throwable) {
-            if ($io->isDebug()) {
-                throw $throwable;
-            }
-
-            $io->error(
-                sprintf(
-                    'Could not read the file "%s".',
-                    $file,
-                ),
-            );
-
-            return ExitCode::FAILURE;
-        }
+        return self::showPharInfo(
+            $pharInfo,
+            $io->getOption(self::LIST_OPT)->asBoolean(),
+            -1 === $maxDepth ? false : $maxDepth,
+            'indent' === $mode,
+            $io,
+        );
     }
 
     /**
