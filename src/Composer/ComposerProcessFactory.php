@@ -49,11 +49,11 @@ final class ComposerProcessFactory
 
     public function getVersionProcess(): Process
     {
-        // Never use ANSI support here as we want to parse the raw output.
         return $this->createProcess(
             [
                 $this->composerExecutable,
                 '--version',
+                // Never use ANSI support here as we want to parse the raw output.
                 '--no-ansi',
             ],
             // Ensure that even if this command gets executed within the app with --quiet it still
@@ -83,12 +83,18 @@ final class ComposerProcessFactory
 
     public function getVendorDirProcess(): Process
     {
-        return $this->createProcess([
-            $this->composerExecutable,
-            'config',
-            'vendor-dir',
-            '--no-ansi',
-        ]);
+        return $this->createProcess(
+            [
+                $this->composerExecutable,
+                'config',
+                'vendor-dir',
+                // Never use ANSI support here as we want to parse the raw output.
+                '--no-ansi',
+            ],
+            // Ensure that even if this command gets executed within the app with --quiet it still
+            // works.
+            ['SHELL_VERBOSITY' => 0],
+        );
     }
 
     private function createProcess(array $command, array $environmentVariables = []): Process
