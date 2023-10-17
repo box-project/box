@@ -135,7 +135,7 @@ final class ComposerOrchestrator
 
         $this->logger->info($vendorDirProcess->getCommandLine());
 
-        $vendorDirProcess->run(env: $this->processFactory->getDefaultEnvVars());
+        $vendorDirProcess->run();
 
         if (false === $vendorDirProcess->isSuccessful()) {
             throw new RuntimeException(
