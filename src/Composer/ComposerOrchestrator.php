@@ -67,7 +67,7 @@ final class ComposerOrchestrator
 
         $this->logger->info($getVersionProcess->getCommandLine());
 
-        $getVersionProcess->run(env: $this->processFactory->getDefaultEnvVars());
+        $getVersionProcess->run();
 
         if (false === $getVersionProcess->isSuccessful()) {
             throw UndetectableComposerVersion::forFailedProcess($getVersionProcess);
@@ -108,6 +108,25 @@ final class ComposerOrchestrator
         }
     }
 
+    public function getVendorDir(): string
+    {
+        $vendorDirProcess = $this->processFactory->getVendorDirProcess();
+
+        $this->logger->info($vendorDirProcess->getCommandLine());
+
+        $vendorDirProcess->run();
+
+        if (false === $vendorDirProcess->isSuccessful()) {
+            throw new RuntimeException(
+                'Could not retrieve the vendor dir.',
+                0,
+                new ProcessFailedException($vendorDirProcess),
+            );
+        }
+
+        return trim($vendorDirProcess->getOutput());
+    }
+
     public function dumpAutoload(
         SymbolsRegistry $symbolsRegistry,
         string $prefix,
@@ -135,7 +154,7 @@ final class ComposerOrchestrator
 
         $this->logger->info($dumpAutoloadProcess->getCommandLine());
 
-        $dumpAutoloadProcess->run(env: $this->processFactory->getDefaultEnvVars());
+        $dumpAutoloadProcess->run();
 
         if (false === $dumpAutoloadProcess->isSuccessful()) {
             throw new RuntimeException(
@@ -165,20 +184,6 @@ final class ComposerOrchestrator
 
     private function retrieveAutoloadFile(): string
     {
-        $vendorDirProcess = $this->processFactory->getAutoloadFileProcess();
-
-        $this->logger->info($vendorDirProcess->getCommandLine());
-
-        $vendorDirProcess->run(env: $this->processFactory->getDefaultEnvVars());
-
-        if (false === $vendorDirProcess->isSuccessful()) {
-            throw new RuntimeException(
-                'Could not retrieve the vendor dir.',
-                0,
-                new ProcessFailedException($vendorDirProcess),
-            );
-        }
-
-        return trim($vendorDirProcess->getOutput()).'/autoload.php';
+        return $this->getVendorDir().'/autoload.php';
     }
 }
