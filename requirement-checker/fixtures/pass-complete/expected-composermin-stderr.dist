@@ -3,8 +3,7 @@ Box Requirements Checker
 ========================
 
 > Using PHP PHP_VERSION
-> PHP is using the following php.ini file:
-  WARNING: No configuration file (php.ini) used by PHP!
+> PHP is not using any php.ini file.
 
 > Checking Box requirements:
   ✔ The application requires a version matching ">=5.3".
