@@ -67,7 +67,7 @@ final class ComposerOrchestrator
 
         $this->logger->info($getVersionProcess->getCommandLine());
 
-        $getVersionProcess->run(env: $this->processFactory->getDefaultEnvVars());
+        $getVersionProcess->run();
 
         if (false === $getVersionProcess->isSuccessful()) {
             throw UndetectableComposerVersion::forFailedProcess($getVersionProcess);
@@ -154,7 +154,7 @@ final class ComposerOrchestrator
 
         $this->logger->info($dumpAutoloadProcess->getCommandLine());
 
-        $dumpAutoloadProcess->run(env: $this->processFactory->getDefaultEnvVars());
+        $dumpAutoloadProcess->run();
 
         if (false === $dumpAutoloadProcess->isSuccessful()) {
             throw new RuntimeException(

@@ -35,6 +35,7 @@ final class ComposerProcessFactory
             $composerExecutable ?? self::retrieveComposerExecutable(),
             self::retrieveSubProcessVerbosity($io),
             $io->isDecorated(),
+            self::getDefaultEnvVars(),
         );
     }
 
@@ -42,13 +43,14 @@ final class ComposerProcessFactory
         public readonly string $composerExecutable,
         private ?string $verbosity,
         private bool $ansi,
+        private array $defaultEnvironmentVariables,
     ) {
     }
 
     public function getVersionProcess(): Process
     {
         // Never use ANSI support here as we want to parse the raw output.
-        return new Process([
+        return $this->createProcess([
             $this->composerExecutable,
             '--version',
             '--no-ansi',
@@ -71,17 +73,28 @@ final class ComposerProcessFactory
             $composerCommand[] = '--ansi';
         }
 
-        return new Process($composerCommand);
+        return $this->createProcess($composerCommand);
     }
 
     public function getAutoloadFileProcess(): Process
     {
-        return new Process([
+        return $this->createProcess([
             $this->composerExecutable,
             'config',
             'vendor-dir',
             '--no-ansi',
         ]);
+    }
+
+    private function createProcess(array $command, array $environmentVariables = []): Process
+    {
+        return new Process(
+            $command,
+            env: [
+                ...$this->defaultEnvironmentVariables,
+                ...$environmentVariables,
+            ],
+        );
     }
 
     private static function retrieveSubProcessVerbosity(IO $io): ?string
@@ -97,7 +110,7 @@ final class ComposerProcessFactory
         return null;
     }
 
-    public function getDefaultEnvVars(): array
+    private static function getDefaultEnvVars(): array
     {
         $vars = [];
 
