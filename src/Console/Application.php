@@ -78,6 +78,8 @@ final class Application implements FidryApplication
     public function getCommands(): array
     {
         return [
+            new Command\Composer\ComposerCheckVersion(),
+            new Command\Composer\ComposerVendorDir(),
             new Command\Compile($this->getHeader()),
             new Command\Diff(),
             new Command\Info(),

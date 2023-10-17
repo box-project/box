@@ -1,0 +1,5 @@
+{
+  "$schema": "../../../../res/schema.json",
+
+  "composerBin": "./composer.phar"
+}
