@@ -75,7 +75,7 @@ final class ComposerOrchestrator
 
         $output = $getVersionProcess->getOutput();
 
-        if (1 !== preg_match('/^Composer version ([^\\s]+)/', $output, $match)) {
+        if (1 !== preg_match('/Composer version ([^\\s]+?) /', $output, $match)) {
             throw UndetectableComposerVersion::forOutput(
                 $getVersionProcess,
                 $output,

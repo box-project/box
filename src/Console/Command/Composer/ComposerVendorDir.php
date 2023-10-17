@@ -14,20 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command\Composer;
 
-use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
-use Fidry\FileSystem\FileSystem;
 use KevinGH\Box\Composer\ComposerOrchestrator;
-use KevinGH\Box\Composer\ComposerProcessFactory;
-use KevinGH\Box\Console\ConfigurationLoader;
-use KevinGH\Box\Console\ConfigurationLocator;
-use Psr\Log\LogLevel;
-use RuntimeException;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Logger\ConsoleLogger;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @private

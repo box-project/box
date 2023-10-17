@@ -16,25 +16,23 @@ namespace KevinGH\Box\Console\Command\Composer;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
-use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
 use Fidry\FileSystem\FileSystem;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 use KevinGH\Box\Composer\ComposerProcessFactory;
-use KevinGH\Box\Console\ConfigurationLoader;
-use KevinGH\Box\Console\ConfigurationLocator;
 use Psr\Log\LogLevel;
-use RuntimeException;
-use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Path;
+use function Safe\getcwd;
 
 /**
  * @private
  */
 abstract class ComposerCommand implements Command
 {
-    private const FILE_ARGUMENT = 'file';
+    private const COMPOSER_BIN_OPTION = 'composer-bin';
 
     private const VERBOSITY_LEVEL_MAP = [
         LogLevel::NOTICE => OutputInterface::VERBOSITY_NORMAL,
@@ -48,11 +46,13 @@ abstract class ComposerCommand implements Command
             'To configure.',
             'To configure.',
             'To configure.',
+            [],
             [
-                new InputArgument(
-                    self::FILE_ARGUMENT,
-                    InputArgument::OPTIONAL,
-                    'The configuration file. (default: box.json, box.json.dist)',
+                new InputOption(
+                    self::COMPOSER_BIN_OPTION,
+                    null,
+                    InputOption::VALUE_REQUIRED,
+                    'Composer executable to use.',
                 ),
             ],
         );
@@ -62,7 +62,7 @@ abstract class ComposerCommand implements Command
     {
         $composerOrchestrator = new ComposerOrchestrator(
             ComposerProcessFactory::create(
-                $this->getComposerExecutable($io),
+                self::getComposerExecutable($io),
                 $io,
             ),
             new ConsoleLogger($io->getOutput(), self::VERBOSITY_LEVEL_MAP),
@@ -74,18 +74,10 @@ abstract class ComposerCommand implements Command
 
     abstract protected function orchestrate(ComposerOrchestrator $composerOrchestrator, IO $io): int;
 
-    private function getComposerExecutable(IO $io): ?string
+    private static function getComposerExecutable(IO $io): ?string
     {
-        try {
-            $config = ConfigurationLoader::getConfig(
-                $io->getArgument(self::FILE_ARGUMENT)->asNullableNonEmptyString() ?? ConfigurationLocator::findDefaultPath(),
-                $io,
-                false,
-            );
+        $composerBin = $io->getOption(self::COMPOSER_BIN_OPTION)->asNullableNonEmptyString();
 
-            return $config->getComposerBin();
-        } catch (RuntimeException) {
-            return null;
-        }
+        return null === $composerBin ? null : Path::makeAbsolute($composerBin, getcwd());
     }
 }
