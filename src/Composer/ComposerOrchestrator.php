@@ -119,7 +119,7 @@ final class ComposerOrchestrator
             return;
         }
 
-        $autoloadFile = $this->retrieveAutoloadFile();
+        $autoloadFile = $this->getVendorDir().'/autoload.php';
 
         $autoloadContents = AutoloadDumper::generateAutoloadStatements(
             $symbolsRegistry,
@@ -127,6 +127,25 @@ final class ComposerOrchestrator
         );
 
         $this->fileSystem->dumpFile($autoloadFile, $autoloadContents);
+    }
+
+    public function getVendorDir(): string
+    {
+        $vendorDirProcess = $this->processFactory->getAutoloadFileProcess();
+
+        $this->logger->info($vendorDirProcess->getCommandLine());
+
+        $vendorDirProcess->run(env: $this->processFactory->getDefaultEnvVars());
+
+        if (false === $vendorDirProcess->isSuccessful()) {
+            throw new RuntimeException(
+                'Could not retrieve the vendor dir.',
+                0,
+                new ProcessFailedException($vendorDirProcess),
+            );
+        }
+
+        return trim($vendorDirProcess->getOutput());
     }
 
     private function dumpAutoloader(bool $noDev): void
@@ -161,24 +180,5 @@ final class ComposerOrchestrator
                 ['stderr' => $errorOutput],
             );
         }
-    }
-
-    private function retrieveAutoloadFile(): string
-    {
-        $vendorDirProcess = $this->processFactory->getAutoloadFileProcess();
-
-        $this->logger->info($vendorDirProcess->getCommandLine());
-
-        $vendorDirProcess->run();
-
-        if (false === $vendorDirProcess->isSuccessful()) {
-            throw new RuntimeException(
-                'Could not retrieve the vendor dir.',
-                0,
-                new ProcessFailedException($vendorDirProcess),
-            );
-        }
-
-        return trim($vendorDirProcess->getOutput()).'/autoload.php';
     }
 }
