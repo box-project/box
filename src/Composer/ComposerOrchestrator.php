@@ -131,7 +131,7 @@ final class ComposerOrchestrator
 
     public function getVendorDir(): string
     {
-        $vendorDirProcess = $this->processFactory->getAutoloadFileProcess();
+        $vendorDirProcess = $this->processFactory->getVendorDirProcess();
 
         $this->logger->info($vendorDirProcess->getCommandLine());
 
