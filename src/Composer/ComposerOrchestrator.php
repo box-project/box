@@ -75,7 +75,7 @@ final class ComposerOrchestrator
 
         $output = $getVersionProcess->getOutput();
 
-        if (1 !== preg_match('/Composer version ([^\\s]+?) /', $output, $match)) {
+        if (1 !== preg_match('/Composer version (\S+?) /', $output, $match)) {
             throw UndetectableComposerVersion::forOutput(
                 $getVersionProcess,
                 $output,
@@ -106,25 +106,6 @@ final class ComposerOrchestrator
         if (!Semver::satisfies($version, self::SUPPORTED_VERSION_CONSTRAINTS)) {
             throw IncompatibleComposerVersion::create($version, self::SUPPORTED_VERSION_CONSTRAINTS);
         }
-    }
-
-    public function getVendorDir(): string
-    {
-        $vendorDirProcess = $this->processFactory->getVendorDirProcess();
-
-        $this->logger->info($vendorDirProcess->getCommandLine());
-
-        $vendorDirProcess->run();
-
-        if (false === $vendorDirProcess->isSuccessful()) {
-            throw new RuntimeException(
-                'Could not retrieve the vendor dir.',
-                0,
-                new ProcessFailedException($vendorDirProcess),
-            );
-        }
-
-        return trim($vendorDirProcess->getOutput());
     }
 
     public function dumpAutoload(
