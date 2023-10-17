@@ -21,9 +21,10 @@ use Symfony\Component\Process\Process;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 
 /**
+ * @final
  * @private
  */
-final class ComposerProcessFactory
+class ComposerProcessFactory
 {
     public static function create(
         ?string $composerExecutable = null,
