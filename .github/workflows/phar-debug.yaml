@@ -27,8 +27,14 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
 
-      - name: Dump env
+      - name: regular check
         run: bin/box composer:check-version
 
-      - name: Dump env
+      - name: PHP + regular check
         run: php bin/box composer:check-version
+
+      - name: Test script
+        run: bin/box composer:check-version --composer-bin=composer-test.php
+
+      - name: PHP + Test script
+        run: php bin/box composer:check-version --composer-bin=composer-test.php

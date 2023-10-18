@@ -47,14 +47,6 @@ final class ComposerCheckVersion extends ComposerCommand
         check_php_settings($io);
         $composerOrchestrator->checkVersion();
 
-        if (!class_exists('Phar', false)) {
-            dd([
-                'get_declared_classes' => get_declared_classes(),
-                'phpversion' => phpversion(),
-                'get_loaded_extensions' => get_loaded_extensions(),
-            ]);
-        }
-
         return ExitCode::SUCCESS;
     }
 }
