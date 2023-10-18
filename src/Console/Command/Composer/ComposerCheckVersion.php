@@ -18,6 +18,8 @@ use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
 use KevinGH\Box\Composer\ComposerOrchestrator;
+use function ini_get;
+use function KevinGH\Box\check_php_settings;
 
 /**
  * @private
@@ -42,7 +44,16 @@ final class ComposerCheckVersion extends ComposerCommand
 
     protected function orchestrate(ComposerOrchestrator $composerOrchestrator, IO $io): int
     {
+        check_php_settings($io);
         $composerOrchestrator->checkVersion();
+
+        if (!class_exists('Phar', false)) {
+            dd([
+                'get_declared_classes' => get_declared_classes(),
+                'phpversion' => phpversion(),
+                'get_loaded_extensions' => get_loaded_extensions(),
+            ]);
+        }
 
         return ExitCode::SUCCESS;
     }
