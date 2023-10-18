@@ -38,3 +38,12 @@ jobs:
 
       - name: PHP + Test script
         run: php bin/box composer:check-version --composer-bin=composer-test.php
+
+      - name: Build PHAR
+        run: make bin/box.phar
+
+      - name: PHARBox + Test script
+        run: ./bin/box.phar composer:check-version --composer-bin=composer-test.php
+
+      - name: PHARBox + PHP + Test script
+        run: php bin/box.phar composer:check-version --composer-bin=composer-test.php
