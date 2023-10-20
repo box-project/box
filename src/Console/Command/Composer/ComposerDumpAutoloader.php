@@ -19,6 +19,8 @@ use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Composer\ComposerOrchestrator;
+use KevinGH\Box\Console\Php\PhpSettingsHandler;
+use function dd;
 use function ini_get;
 use function KevinGH\Box\check_php_settings;
 
@@ -46,6 +48,9 @@ final class ComposerDumpAutoloader extends ComposerCommand
     protected function orchestrate(ComposerOrchestrator $composerOrchestrator, IO $io): int
     {
         check_php_settings($io);
+        if (!class_exists('Phar')) {
+            die('no PHAR class');
+        }
 
         $composerOrchestrator->dumpAutoload(
             new SymbolsRegistry(),

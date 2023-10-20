@@ -23,7 +23,7 @@ jobs:
         run: composer install --prefer-dist --no-progress --no-scripts
 
       - name: regular check
-        run: bin/box composer:dump-autoload
+        run: bin/box composer:dump-autoload -vvv --composer-bin=tests/Console/Command/Composer/compatible-composer.phar
 
       - name: PHP + regular check
         run: php bin/box composer:dump-autoload

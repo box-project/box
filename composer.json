@@ -107,14 +107,14 @@
     },
     "scripts": {
         "auto-scripts": {
-            "./bin/box composer:check-version": "script",
-            "bin/box composer:check-version": "php-script",
+            "./bin/box composer:check-version --composer-bin=tests/Console/Command/Composer/compatible-composer.phar": "script",
+            "bin/box composer:check-version --composer-bin=tests/Console/Command/Composer/compatible-composer.phar": "php-script",
             "list --version": "symfony-cmd",
             "about": "symfony-cmd",
             "cache:clear": "symfony-cmd"
         },
         "post-autoload-dump": [
-            "@php bin/box composer:check-version",
+            "@php bin/box composer:check-version --composer-bin=tests/Console/Command/Composer/compatible-composer.phar",
             "@auto-scripts"
         ]
     },

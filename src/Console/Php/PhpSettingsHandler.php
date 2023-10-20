@@ -19,6 +19,7 @@ use Fidry\FileSystem\FS;
 use KevinGH\Box\Phar\PharPhpSettings;
 use Psr\Log\LoggerInterface;
 use Webmozart\Assert\Assert;
+use function dd;
 use function getenv;
 use function ini_get;
 use function ini_set;
