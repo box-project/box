@@ -109,6 +109,7 @@
     "scripts": {
         "auto-scripts": {
             "bin/console list -v": "script",
+            "php bin/console list -v": "script",
             "bin/console list -vv": "php-script",
             "list --version": "symfony-cmd"
         },

@@ -48,6 +48,13 @@ final class ComposerDumpAutoloader extends ComposerCommand
     protected function orchestrate(ComposerOrchestrator $composerOrchestrator, IO $io): int
     {
         check_php_settings($io);
+
+        dd(
+            PHP_BINARY,
+            $args = array_slice($_SERVER['argv'], 1),
+            PhpSettingsHandler::getRestartSettings(),
+        );
+
         if (!class_exists('Phar')) {
             die('no PHAR class');
         }

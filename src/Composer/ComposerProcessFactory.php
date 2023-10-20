@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Composer;
 
 use Fidry\Console\Input\IO;
+use KevinGH\Box\Console\Php\PhpSettingsHandler;
 use RuntimeException;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;

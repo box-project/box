@@ -74,6 +74,7 @@ final class PhpSettingsHandler extends XdebugHandler
     {
         // Disable phar.readonly if set
         $this->disablePharReadonly();
+        $this->setPersistent();
 
         parent::restart($command);
     }
