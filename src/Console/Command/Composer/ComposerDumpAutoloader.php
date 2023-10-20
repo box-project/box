@@ -58,6 +58,10 @@ final class ComposerDumpAutoloader extends ComposerCommand
             false,
         );
 
+        if (!class_exists('Phar')) {
+            throw new \Error('no PHAR class');
+        }
+
         return ExitCode::SUCCESS;
     }
 }

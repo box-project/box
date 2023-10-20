@@ -5,7 +5,7 @@ use App\Kernel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 
 if (!class_exists('Phar')) {
-    die('no PHAR class');
+    throw new \Error('no PHAR class');
 }
 
 if (!is_file(dirname(__DIR__).'/vendor/autoload_runtime.php')) {

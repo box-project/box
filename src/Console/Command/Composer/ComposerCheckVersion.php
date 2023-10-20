@@ -48,7 +48,7 @@ final class ComposerCheckVersion extends ComposerCommand
     {
         check_php_settings($io);
         if (!class_exists('Phar')) {
-            die('no PHAR class');
+            throw new \Error('no PHAR class');
         }
 
         $composerOrchestrator->checkVersion();
