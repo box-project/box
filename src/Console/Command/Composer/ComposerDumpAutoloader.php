@@ -49,13 +49,13 @@ final class ComposerDumpAutoloader extends ComposerCommand
     {
         check_php_settings($io);
 
-        dd(
-            PHP_BINARY,
-            $args = array_slice($_SERVER['argv'], 1),
-            PhpSettingsHandler::getRestartSettings(),
-        );
-
         if (!class_exists('Phar')) {
+            dump(
+                PHP_BINARY,
+                $args = array_slice($_SERVER['argv'], 1),
+                PhpSettingsHandler::getRestartSettings(),
+            );
+
             die('no PHAR class');
         }
 
