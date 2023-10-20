@@ -107,7 +107,7 @@
     },
     "scripts": {
         "auto-scripts": {
-            "cache:clear": "symfony-cmd"
+            "cache:clear": "bin/box composer:check-version"
         },
         "post-autoload-dump": [
             "@auto-scripts"
