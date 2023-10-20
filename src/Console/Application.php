@@ -80,6 +80,7 @@ final class Application implements FidryApplication
         return [
             new Command\Composer\ComposerCheckVersion(),
             new Command\Composer\ComposerVendorDir(),
+            new Command\Composer\ComposerDumpAutoloader(),
             new Command\Compile($this->getHeader()),
             new Command\Diff(),
             new Command\Info(),

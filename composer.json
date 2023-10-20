@@ -51,6 +51,7 @@
         "mikey179/vfsstream": "^1.6.11",
         "phpspec/prophecy-phpunit": "^2.0.1",
         "phpunit/phpunit": "^9.5.26",
+        "symfony/flex": "^2.3",
         "symfony/phpunit-bridge": "^6.1.6",
         "symfony/yaml": "^6.2",
         "webmozarts/strict-phpunit": "^7.6"
@@ -93,13 +94,22 @@
         "allow-plugins": {
             "bamarni/composer-bin-plugin": true,
             "composer/package-versions-deprecated": false,
-            "ergebnis/composer-normalize": true
+            "ergebnis/composer-normalize": true,
+            "symfony/flex": true
         },
         "platform": {
             "php": "8.1"
         },
         "platform-check": false,
         "sort-packages": true
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd"
+        },
+        "post-autoload-dump": [
+            "@auto-scripts"
+        ]
     },
     "extra": {
         "bamarni-bin": {

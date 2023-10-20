@@ -28,22 +28,22 @@ jobs:
         run: composer install --prefer-dist --no-progress
 
       - name: regular check
-        run: bin/box composer:check-version
+        run: bin/box composer:dump-autoload
 
       - name: PHP + regular check
-        run: php bin/box composer:check-version
+        run: php bin/box composer:dump-autoload
 
       - name: Test script
-        run: bin/box composer:check-version --composer-bin=composer-test.php
+        run: bin/box composer:dump-autoload --composer-bin=composer-test.php
 
       - name: PHP + Test script
-        run: php bin/box composer:check-version --composer-bin=composer-test.php
+        run: php bin/box composer:dump-autoload --composer-bin=composer-test.php
 
       - name: Build PHAR
         run: make bin/box.phar
 
       - name: PHARBox + Test script
-        run: ./bin/box.phar composer:check-version --composer-bin=composer-test.php
+        run: ./bin/box.phar composer:dump-autoload --composer-bin=composer-test.php
 
       - name: PHARBox + PHP + Test script
-        run: php bin/box.phar composer:check-version --composer-bin=composer-test.php
+        run: php bin/box.phar composer:dump-autoload --composer-bin=composer-test.php

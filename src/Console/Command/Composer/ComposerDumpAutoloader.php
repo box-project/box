@@ -17,6 +17,7 @@ namespace KevinGH\Box\Console\Command\Composer;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Input\IO;
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 use function ini_get;
 use function KevinGH\Box\check_php_settings;
@@ -24,18 +25,18 @@ use function KevinGH\Box\check_php_settings;
 /**
  * @private
  */
-final class ComposerCheckVersion extends ComposerCommand
+final class ComposerDumpAutoloader extends ComposerCommand
 {
     public function getConfiguration(): Configuration
     {
         $parentConfig = parent::getConfiguration();
 
         return new Configuration(
-            'composer:check-version',
-            '🎵  Checks if the Composer executable used is compatible with Box',
+            'composer:dump-autoload',
+            '🎵  Dumps the autoloader with Composer.',
             <<<'HELP'
                 The <info>%command.name%</info> command will look for the Composer binary (in the system if not configured
-                in the configuration file) and check if its version is compatible with Box.
+                in the configuration file) and dump the autoloader.
                 HELP,
             $parentConfig->getArguments(),
             $parentConfig->getOptions(),
@@ -46,7 +47,11 @@ final class ComposerCheckVersion extends ComposerCommand
     {
         check_php_settings($io);
 
-        $composerOrchestrator->checkVersion();
+        $composerOrchestrator->dumpAutoload(
+            new SymbolsRegistry(),
+            '',
+            false,
+        );
 
         return ExitCode::SUCCESS;
     }
