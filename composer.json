@@ -107,9 +107,14 @@
     },
     "scripts": {
         "auto-scripts": {
-            "cache:clear": "bin/box composer:check-version"
+            "./bin/box composer:check-version": "script",
+            "bin/box composer:check-version": "php-script",
+            "list --version": "symfony-cmd",
+            "about": "symfony-cmd",
+            "cache:clear": "symfony-cmd"
         },
         "post-autoload-dump": [
+            "@php bin/box composer:check-version",
             "@auto-scripts"
         ]
     },
