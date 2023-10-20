@@ -17,10 +17,10 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-progress --working-dir=fixtures/build/dir018
+        run: composer install --prefer-dist --no-progress --working-dir=fixtures/build/dir018 --no-scripts
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-progress
+        run: composer install --prefer-dist --no-progress --no-scripts
 
       - name: regular check
         run: bin/box composer:dump-autoload
