@@ -23,4 +23,4 @@ jobs:
         run: composer install --prefer-dist --no-progress --no-scripts
 
       - name: regular check
-        run: composer dump-autoload
+        run: bin/box composer:dump-autoload -vvv
