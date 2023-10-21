@@ -431,7 +431,8 @@ e2e_reproducible_build: $(SCOPED_BOX_BIN) $(E2E_REPRODUCIBLE_BUILD_BIN_DIR)/vend
 	# Build a first time
 	COMPOSER_ROOT_VERSION="1.0.0-dev" $(SCOPED_BOX) compile \
 		--working-dir=$(E2E_REPRODUCIBLE_BUILD_BIN_DIR) \
-		--config=box.json.dist
+		--config=box.json.dist \
+		--no-parallel
 	mv -fv $(E2E_REPRODUCIBLE_BUILD_BIN_DIR)/index.phar $(E2E_REPRODUCIBLE_BUILD_BIN_PHAR)
 	php $(E2E_REPRODUCIBLE_BUILD_BIN_DIR)/resign.php $(E2E_REPRODUCIBLE_BUILD_BIN_PHAR)
 	$(E2E_REPRODUCIBLE_BUILD_BIN_PHAR) \
@@ -447,7 +448,8 @@ e2e_reproducible_build: $(SCOPED_BOX_BIN) $(E2E_REPRODUCIBLE_BUILD_BIN_DIR)/vend
 	# Build a second time
 	COMPOSER_ROOT_VERSION="1.0.0-dev" $(SCOPED_BOX) compile \
     		--working-dir=$(E2E_REPRODUCIBLE_BUILD_BIN_DIR) \
-    		--config=box.json.dist
+    		--config=box.json.dist \
+			--no-parallel
 	mv -fv $(E2E_REPRODUCIBLE_BUILD_BIN_DIR)/index.phar $(E2E_REPRODUCIBLE_BUILD_BIN_PHAR)
 	php $(E2E_REPRODUCIBLE_BUILD_BIN_DIR)/resign.php $(E2E_REPRODUCIBLE_BUILD_BIN_PHAR)
 

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
+use Closure;
 use Fidry\Console\Input\IO;
 use RuntimeException;
 use Symfony\Component\Process\ExecutableFinder;
@@ -26,6 +27,8 @@ use const KevinGH\Box\BOX_ALLOW_XDEBUG;
  */
 class ComposerProcessFactory
 {
+    private string $composerExecutable;
+
     public static function create(
         ?string $composerExecutable = null,
         ?IO $io = null,
@@ -33,15 +36,20 @@ class ComposerProcessFactory
         $io ??= IO::createNull();
 
         return new self(
-            $composerExecutable ?? self::retrieveComposerExecutable(),
+            null === $composerExecutable
+                ? self::retrieveComposerExecutable(...)
+                : static fn () => $composerExecutable,
             self::retrieveSubProcessVerbosity($io),
             $io->isDecorated(),
             self::getDefaultEnvVars(),
         );
     }
 
+    /**
+     * @param Closure():string $composerExecutableFactory
+     */
     public function __construct(
-        public readonly string $composerExecutable,
+        private Closure $composerExecutableFactory,
         private ?string $verbosity,
         private bool $ansi,
         private array $defaultEnvironmentVariables,
@@ -52,7 +60,7 @@ class ComposerProcessFactory
     {
         return $this->createProcess(
             [
-                $this->composerExecutable,
+                $this->getComposerExecutable(),
                 '--version',
                 // Never use ANSI support here as we want to parse the raw output.
                 '--no-ansi',
@@ -65,7 +73,7 @@ class ComposerProcessFactory
 
     public function getDumpAutoloaderProcess(bool $noDev): Process
     {
-        $composerCommand = [$this->composerExecutable, 'dump-autoload', '--classmap-authoritative'];
+        $composerCommand = [$this->getComposerExecutable(), 'dump-autoload', '--classmap-authoritative'];
 
         if (true === $noDev) {
             $composerCommand[] = '--no-dev';
@@ -86,7 +94,7 @@ class ComposerProcessFactory
     {
         return $this->createProcess(
             [
-                $this->composerExecutable,
+                $this->getComposerExecutable(),
                 'config',
                 'vendor-dir',
                 // Never use ANSI support here as we want to parse the raw output.
@@ -107,6 +115,15 @@ class ComposerProcessFactory
                 ...$environmentVariables,
             ],
         );
+    }
+
+    private function getComposerExecutable(): string
+    {
+        if (!isset($this->composerExecutable)) {
+            $this->composerExecutable = ($this->composerExecutableFactory)();
+        }
+
+        return $this->composerExecutable;
     }
 
     private static function retrieveSubProcessVerbosity(IO $io): ?string
