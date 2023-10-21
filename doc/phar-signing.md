@@ -13,10 +13,10 @@
    1. [Verifying the PHAR signature](#verifying-the-phar-signature)
 1. [Automatically sign in GitHub Actions](#automatically-sign-in-github-actions)
 
-There is two canonical ways to secure a PHAR:
+There is two idiomatic ways to secure a PHAR:
 
-- Using the built-in PHAR signing API (NOT recommended).
-- Signing the PHAR as any other generic binary.
+- Using the built-in PHAR signing API (**not** recommended; read [Why it is bad](#why-it-is-bad) for the why).
+- Signing the PHAR as any other generic binary (see [Sign your PHAR](#sign-your-phar)).
 
 This doc entry goal is to show why the first method is to be avoided and how to do it "the right way".
 
@@ -107,7 +107,7 @@ password manager). In the end, you will end up with something like this:
 ```
 pub   ed25519 2023-10-21 [SC] [expires: 2026-10-20]
       96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
-uid                      Théo Fidry <theo.fidry+phar-signing-example@google.com>
+uid                      Théo Fidry <theo.fidry+phar-signing-example@example.com>
 sub   cv25519 2023-10-21 [E] [expires: 2026-10-20]
 ```
 
@@ -122,7 +122,7 @@ $ gpg --list-secret-keys --keyid-format=long
 #
 sec   ed25519/03B2F4DF7A20DF08 2023-10-21 [SC] [expires: 2026-10-20]
       96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
-uid                 [ultimate] Théo Fidry <theo.fidry+phar-signing-example@google.com>
+uid                 [ultimate] Théo Fidry <theo.fidry+phar-signing-example@example.com>
 ssb   cv25519/765C0E3CCBC7D7D3 2023-10-21 [E] [expires: 2026-10-20]
 ```
 
@@ -227,15 +227,23 @@ documentation:
 gpg --keyserver hkps://keys.openpgp.org --recv-keys 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
 ```
 
-Then you can verify the file directly:
+However not everyone expose what is their GPG key ID. So sometimes to avoid bad surprises, you
+can look up for similar issuers to the key ID given by the `.asc`:
 
 ```
+# Verify the signature
 $ gpg --verify bin/command.phar.asc bin/command.phar
 
 # Example of output:
 gpg: Signature made Sat 21 Oct 16:58:05 2023 CEST
 gpg:                using EDDSA key 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
-gpg: Good signature from "Théo Fidry <theo.fidry+phar-signing-example@google.com>" [ultimate]
+gpg: Good signature from "Théo Fidry <theo.fidry+phar-signing-example@example.com>" [ultimate]
+```
+
+If the key ID was not provided before, you can try to look it up to check it was properly registered to a keyserver:
+
+```
+$ gpg --keyserver https://keys.openpgp.org --search-keys "theo.fidry+phar-signing-example@example.com"
 ```
 
 
