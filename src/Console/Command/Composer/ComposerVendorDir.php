@@ -30,7 +30,7 @@ final class ComposerVendorDir extends ComposerCommand
 
         return new Configuration(
             'composer:vendor-dir',
-            '🎵  Shows the Composer vendor-dir configured',
+            'Shows the Composer vendor-dir configured',
             <<<'HELP'
                 The <info>%command.name%</info> command will look for the Composer binary (in the system if not configured
                 in the configuration file) and print the vendor-dir found.
