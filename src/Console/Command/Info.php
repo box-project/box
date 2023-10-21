@@ -212,6 +212,10 @@ final class Info implements Command
 
         $io->newLine();
 
+        PharInfoRenderer::renderTimestamp($pharInfo, $io);
+
+        $io->newLine();
+
         PharInfoRenderer::renderContentsSummary($pharInfo, $io);
     }
 
