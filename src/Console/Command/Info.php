@@ -196,12 +196,7 @@ final class Info implements Command
 
     private static function showPharMeta(PharInfo $pharInfo, IO $io): void
     {
-        $io->writeln(
-            sprintf(
-                '<comment>API Version:</comment> %s',
-                $pharInfo->getVersion(),
-            ),
-        );
+        PharInfoRenderer::renderVersion($pharInfo, $io);
 
         $io->newLine();
 
