@@ -423,6 +423,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#github" class="md-nav__link">
+    GitHub
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -653,6 +660,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#github" class="md-nav__link">
+    GitHub
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -674,6 +688,7 @@
 <li><a href="#phive">Phive</a></li>
 <li><a href="#composer">Composer</a></li>
 <li><a href="#homebrew">Homebrew</a></li>
+<li><a href="#github">GitHub</a></li>
 </ol>
 <h2 id="phar">PHAR</h2>
 <p>The preferred method of installation is to use the Box PHAR which can be downloaded from the most recent
@@ -706,6 +721,23 @@ $<span class="w"> </span>brew<span class="w"> </span>install<span class="w"> </s
 </code></pre></div>
 <p>To upgrade <code>box</code> use the following command:</p>
 <div class="highlight"><pre><span></span><code>$<span class="w"> </span>brew<span class="w"> </span>upgrade<span class="w"> </span>box
+</code></pre></div>
+<h2 id="github">GitHub</h2>
+<p>You may download the Box PHAR directly from the [GitHub release][github-release] directly.
+You should however beware that it is not as secure as downloading it from the other mediums.
+Hence, it is recommended to check the signature when doing so:</p>
+<div class="highlight"><pre><span></span><code># Do adjust the URL based on the latest release
+wget -O box.phar &quot;https://github.com/box-project/box/releases/download/4.4.0/box.phar&quot;
+wget -O box.phar.asc &quot;https://github.com/box-project/box/releases/download/4.4.0/box.phar.asc&quot;
+
+# Check that the signature matches
+gpg --verify box.phar.asc box.phar
+
+# Check the issuer (the ID can also be found from the previous command)
+gpg --keyserver hkps://keys.openpgp.org --recv-keys 41539BBD4020945DB378F98B2DF45277AEF09A2F
+
+rm box.phar.asc
+chmod +x box.phar
 </code></pre></div>
 <p><br /></p>
 <hr />
