@@ -245,7 +245,12 @@ class ConfigurationSigningTest extends ConfigurationTestCase
         self::assertFalse($this->config->promptForPrivateKey());
 
         self::assertSame([], $this->config->getRecommendations());
-        self::assertSame([], $this->config->getWarnings());
+        self::assertSame(
+            [
+                'Using an OpenSSL signature is deprecated and will be removed in 5.0.0. Please check https://github.com/box-project/box/blob/main/doc/phar-signing.md for alternatives.',
+            ],
+            $this->config->getWarnings(),
+        );
     }
 
     public function test_the_key_pass_can_be_configured(): void
@@ -263,7 +268,12 @@ class ConfigurationSigningTest extends ConfigurationTestCase
         self::assertTrue($this->config->promptForPrivateKey());
 
         self::assertSame([], $this->config->getRecommendations());
-        self::assertSame([], $this->config->getWarnings());
+        self::assertSame(
+            [
+                'Using an OpenSSL signature is deprecated and will be removed in 5.0.0. Please check https://github.com/box-project/box/blob/main/doc/phar-signing.md for alternatives.',
+            ],
+            $this->config->getWarnings(),
+        );
 
         foreach ([false, null] as $keyPass) {
             $this->setConfig([
@@ -283,7 +293,12 @@ class ConfigurationSigningTest extends ConfigurationTestCase
                 );
             }
 
-            self::assertSame([], $this->config->getWarnings());
+            self::assertSame(
+                [
+                    'Using an OpenSSL signature is deprecated and will be removed in 5.0.0. Please check https://github.com/box-project/box/blob/main/doc/phar-signing.md for alternatives.',
+                ],
+                $this->config->getWarnings(),
+            );
         }
 
         $this->setConfig([
@@ -297,7 +312,12 @@ class ConfigurationSigningTest extends ConfigurationTestCase
         self::assertFalse($this->config->promptForPrivateKey());
 
         self::assertSame([], $this->config->getRecommendations());
-        self::assertSame([], $this->config->getWarnings());
+        self::assertSame(
+            [
+                'Using an OpenSSL signature is deprecated and will be removed in 5.0.0. Please check https://github.com/box-project/box/blob/main/doc/phar-signing.md for alternatives.',
+            ],
+            $this->config->getWarnings(),
+        );
     }
 
     public static function passFileFreeSigningAlgorithmProvider(): iterable
