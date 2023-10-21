@@ -1,9 +1,11 @@
-# From 4.0 to 4.1.0
+# Upgrade guide
+
+## From 4.0 to 4.1.0
 
 - The requirements checker now logs its output to `stderr` instead of `stdout` per default. Set `BOX_REQUIREMENTS_CHECKER_LOG_TO_STDOUT=1` to restore the old behaviour.
 
 
-# From 3.x to 4.x
+## From 3.x to 4.x
 
 - Bump to PHP 8.1 #613
 - Remove the build command (#623): the `build` command has been deprecated since 3.0.0 in favour of `compile`.
@@ -16,7 +18,7 @@
 - Require sodium & Remove sodium compat layer (#628)
 
 
-# From 3.1.3 to 3.2.0
+## From 3.1.3 to 3.2.0
 
 - Changes to the `Php` compactor:
     - Invalid annotations are no longer recognised as annotations:
@@ -56,7 +58,7 @@
     ```
 
 
-# From 2.7 to 3.0
+## From 2.7 to 3.0
 
 The change from 2.x to 3.x is quite significant but should be really smooth for the user. The main changes are:
 

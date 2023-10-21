@@ -116,7 +116,7 @@ For the full documentation see https://box-project.github.io/box.
    2. [Detecting that you are inside a PHAR](doc/faq.md#detecting-that-you-are-inside-a-phar)
    3. [Building a PHAR with Box as a dependency](doc/faq.md#building-a-phar-with-box-as-a-dependency)
 1. [Contributing](#contributing)
-1. [Upgrade guide](UPGRADE.md#from-27-to-30)
+1. [Upgrade guide](UPGRADE.md#upgrade-guide)
 1. [Backward Compatibility Promise (BCP)](#backward-compatibility-promise-bcp)
 1. [Credits](#credits)
 
