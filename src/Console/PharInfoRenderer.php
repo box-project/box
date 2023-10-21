@@ -43,6 +43,16 @@ final class PharInfoRenderer
 
     private const INDENT_SIZE = 2;
 
+    public static function renderVersion(PharInfo $pharInfo, IO $io): void
+    {
+        $io->writeln(
+            sprintf(
+                '<comment>API Version:</comment> %s',
+                $pharInfo->getVersion(),
+            ),
+        );
+    }
+
     public static function renderCompression(PharInfo $pharInfo, IO $io): void
     {
         $io->writeln(
@@ -129,6 +139,20 @@ final class PharInfoRenderer
             $io->writeln('<comment>Metadata:</comment>');
             $io->writeln($metadata);
         }
+    }
+
+    public static function renderTimestamp(PharInfo $pharInfo, IO $io): void
+    {
+        $timestamp = $pharInfo->getTimestamp();
+        $dateTime = (new DateTimeImmutable())->setTimestamp($timestamp);
+
+        $io->writeln(
+            sprintf(
+                '<comment>Timestamp:</comment> %s (%s)',
+                $timestamp,
+                $dateTime->format(DateTimeImmutable::ATOM),
+            ),
+        );
     }
 
     public static function renderContentsSummary(PharInfo $pharInfo, IO $io): void
