@@ -116,18 +116,21 @@ class ApplicationTest extends TestCase
               -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 
             Available commands:
-              compile     🔨  Compiles an application into a PHAR
-              completion  Dump the shell completion script
-              diff        🕵  Displays the differences between all of the files in two PHARs
-              docker      🐳  Generates a Dockerfile for the given PHAR
-              extract     🚚  Extracts a given PHAR into a directory
-              help        Display help for a command
-              info        🔍  Displays information about the PHAR extension or file
-              list        List commands
-              namespace   Prints the first part of the command namespace
-              process     ⚡  Applies the registered compactors and replacement values on a file
-              validate    ⚙  Validates the configuration file
-              verify      🔐️  Verifies the PHAR signature
+              compile                 🔨  Compiles an application into a PHAR
+              completion              Dump the shell completion script
+              diff                    🕵  Displays the differences between all of the files in two PHARs
+              docker                  🐳  Generates a Dockerfile for the given PHAR
+              extract                 🚚  Extracts a given PHAR into a directory
+              help                    Display help for a command
+              info                    🔍  Displays information about the PHAR extension or file
+              list                    List commands
+              namespace               Prints the first part of the command namespace
+              process                 ⚡  Applies the registered compactors and replacement values on a file
+              validate                ⚙  Validates the configuration file
+              verify                  🔐️  Verifies the PHAR signature
+             composer
+              composer:check-version  Checks if the Composer executable used is compatible with Box
+              composer:vendor-dir     Shows the Composer vendor-dir configured
 
             EOF;
 
