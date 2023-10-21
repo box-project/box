@@ -47,6 +47,7 @@ final class PhpSettingsHandler extends XdebugHandler
         $this->logger = $logger;
 
         $this->pharReadonly = PharPhpSettings::isReadonly();
+        $this->setPersistent();
     }
 
     public function check(): void

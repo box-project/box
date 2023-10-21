@@ -141,7 +141,7 @@ class ComposerProcessFactory
 
     private static function getDefaultEnvVars(): array
     {
-        $vars = [];
+        $vars = ['COMPOSER_ORIGINAL_INIS' => ''];
 
         if ('1' === (string) getenv(BOX_ALLOW_XDEBUG)) {
             $vars['COMPOSER_ALLOW_XDEBUG'] = '1';
