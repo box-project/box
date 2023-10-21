@@ -39,7 +39,7 @@ use const SORT_LOCALE_STRING;
 final class PharMeta
 {
     /**
-     * @param non-empty-string|null                                                          $stub
+     * @param non-empty-string                                                          $stub
      * @param non-empty-string|null                                                          $version
      * @param non-empty-string|null                                                          $normalizedMetadata
      * @param non-empty-string|null                                                          $pubKeyContent
@@ -49,9 +49,10 @@ final class PharMeta
         public readonly CompressionAlgorithm $compression,
         #[ArrayShape(['hash' => 'string', 'hash_type' => 'string'])]
         public readonly ?array $signature,
-        public readonly ?string $stub,
+        public readonly string $stub,
         public readonly ?string $version,
         public readonly ?string $normalizedMetadata,
+        public readonly int $timestamp,
         public readonly ?string $pubKeyContent,
         public readonly array $filesMeta,
     ) {
@@ -64,6 +65,7 @@ final class PharMeta
         $stub = $phar->getStub();
         $version = $phar->getVersion();
         $metadata = $phar->getMetadata();
+        $timestamp = $phar->getMTime();
 
         return new self(
             false === $compression ? CompressionAlgorithm::NONE : CompressionAlgorithm::from($compression),
@@ -72,6 +74,7 @@ final class PharMeta
             '' === $version ? null : $version,
             // TODO: check $unserializeOptions here
             null === $metadata ? null : var_export($metadata, true),
+            $timestamp,
             $pubKeyContent,
             self::collectFilesMeta($phar),
         );
@@ -93,6 +96,7 @@ final class PharMeta
             $decodedJson['stub'],
             $decodedJson['version'],
             $decodedJson['normalizedMetadata'],
+            $decodedJson['timestamp'],
             $decodedJson['pubKeyContent'],
             $filesMeta,
         );
@@ -106,6 +110,7 @@ final class PharMeta
             'stub' => $this->stub,
             'version' => $this->version,
             'normalizedMetadata' => $this->normalizedMetadata,
+            'timestamp' => $this->timestamp,
             'pubKeyContent' => $this->pubKeyContent,
             'filesMeta' => $this->filesMeta,
         ]);

@@ -196,28 +196,19 @@ final class Info implements Command
 
     private static function showPharMeta(PharInfo $pharInfo, IO $io): void
     {
-        $io->writeln(
-            sprintf(
-                '<comment>API Version:</comment> %s',
-                $pharInfo->getVersion(),
-            ),
-        );
+        $methods = [
+            PharInfoRenderer::renderVersion(...),
+            PharInfoRenderer::renderCompression(...),
+            PharInfoRenderer::renderSignature(...),
+            PharInfoRenderer::renderMetadata(...),
+            PharInfoRenderer::renderTimestamp(...),
+            PharInfoRenderer::renderContentsSummary(...),
+        ];
 
-        $io->newLine();
-
-        PharInfoRenderer::renderCompression($pharInfo, $io);
-
-        $io->newLine();
-
-        PharInfoRenderer::renderSignature($pharInfo, $io);
-
-        $io->newLine();
-
-        PharInfoRenderer::renderMetadata($pharInfo, $io);
-
-        $io->newLine();
-
-        PharInfoRenderer::renderContentsSummary($pharInfo, $io);
+        foreach ($methods as $render) {
+            $render($pharInfo, $io);
+            $io->newLine();
+        }
     }
 
     private static function render(IO $io, array $attributes): void

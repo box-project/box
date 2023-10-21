@@ -21,11 +21,13 @@ use Fidry\Console\Input\IO;
 use Fidry\FileSystem\FS;
 use KevinGH\Box\Phar\InvalidPhar;
 use KevinGH\Box\Phar\PharFactory;
+use KevinGH\Box\Phar\PharInfo;
 use KevinGH\Box\Phar\PharMeta;
 use ParagonIE\ConstantTime\Hex;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Filesystem\Path;
 use Throwable;
 use function file_exists;
 use function KevinGH\Box\check_php_settings;
@@ -38,6 +40,7 @@ use const DIRECTORY_SEPARATOR;
  */
 final class Extract implements Command
 {
+    public const STUB_PATH = '.phar/stub.php';
     public const PHAR_META_PATH = '.phar_meta.json';
 
     private const PHAR_ARG = 'phar';
@@ -151,6 +154,7 @@ final class Extract implements Command
         $pubKey = $file.'.pubkey';
         $pubKeyContent = null;
         $tmpPubKey = $tmpFile.'.pubkey';
+        $stub = $tmpDir.DIRECTORY_SEPARATOR.self::STUB_PATH;
 
         try {
             FS::copy($file, $tmpFile, true);
@@ -164,6 +168,7 @@ final class Extract implements Command
             $pharMeta = PharMeta::fromPhar($phar, $pubKeyContent);
 
             $phar->extractTo($tmpDir);
+            FS::dumpFile($stub, $phar->getStub());
         } catch (Throwable $throwable) {
             FS::remove([$tmpFile, $tmpPubKey]);
 

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
+use DateTimeImmutable;
 use Fidry\Console\Input\IO;
 use KevinGH\Box\NotInstantiable;
 use KevinGH\Box\Phar\CompressionAlgorithm;
@@ -42,6 +43,16 @@ final class PharInfoRenderer
     use NotInstantiable;
 
     private const INDENT_SIZE = 2;
+
+    public static function renderVersion(PharInfo $pharInfo, IO $io): void
+    {
+        $io->writeln(
+            sprintf(
+                '<comment>API Version:</comment> %s',
+                $pharInfo->getVersion(),
+            ),
+        );
+    }
 
     public static function renderCompression(PharInfo $pharInfo, IO $io): void
     {
@@ -129,6 +140,20 @@ final class PharInfoRenderer
             $io->writeln('<comment>Metadata:</comment>');
             $io->writeln($metadata);
         }
+    }
+
+    public static function renderTimestamp(PharInfo $pharInfo, IO $io): void
+    {
+        $timestamp = $pharInfo->getTimestamp();
+        $dateTime = (new DateTimeImmutable())->setTimestamp($timestamp);
+
+        $io->writeln(
+            sprintf(
+                '<comment>Timestamp:</comment> %s (%s)',
+                $timestamp,
+                $dateTime->format(DateTimeImmutable::ATOM),
+            ),
+        );
     }
 
     public static function renderContentsSummary(PharInfo $pharInfo, IO $io): void

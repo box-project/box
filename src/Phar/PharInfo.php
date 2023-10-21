@@ -43,6 +43,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Phar;
 
+use DateTimeImmutable;
 use Fidry\FileSystem\FS;
 use KevinGH\Box\Console\Command\Extract;
 use OutOfBoundsException;
@@ -237,9 +238,19 @@ final class PharInfo
         return $this->meta->normalizedMetadata;
     }
 
+    public function getTimestamp(): int
+    {
+        return $this->meta->timestamp;
+    }
+
     public function getSignature(): ?array
     {
         return $this->meta->signature;
+    }
+
+    public function getStubPath(): string
+    {
+        return Extract::STUB_PATH;
     }
 
     public function getStubContent(): ?string
@@ -306,6 +317,7 @@ final class PharInfo
                 Finder::create()
                     ->files()
                     ->ignoreDotFiles(false)
+                    ->exclude('.phar')
                     ->in($tmp),
             ),
         );
