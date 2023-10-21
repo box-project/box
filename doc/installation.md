@@ -4,6 +4,7 @@
 1. [Phive](#phive)
 1. [Composer](#composer)
 1. [Homebrew](#homebrew)
+1. [GitHub](#github)
 
 
 ## PHAR
@@ -66,6 +67,28 @@ To upgrade `box` use the following command:
 $ brew upgrade box
 ```
 
+## GitHub
+
+You may download the Box PHAR directly from the [GitHub release][github-release] directly.
+You should however beware that it is not as secure as downloading it from the other mediums.
+Hence, it is recommended to check the signature when doing so:
+
+```
+# Do adjust the URL based on the latest release
+wget -O box.phar "https://github.com/box-project/box/releases/download/4.4.0/box.phar"
+wget -O box.phar.asc "https://github.com/box-project/box/releases/download/4.4.0/box.phar.asc"
+
+# Check that the signature matches
+gpg --verify box.phar.asc box.phar
+
+# Check the issuer (the ID can also be found from the previous command)
+gpg --keyserver hkps://keys.openpgp.org --recv-keys 41539BBD4020945DB378F98B2DF45277AEF09A2F
+
+rm box.phar.asc
+chmod +x box.phar
+```
+
+
 <br />
 <hr />
 
@@ -76,3 +99,4 @@ $ brew upgrade box
 [composer]: https://getcomposer.org
 [bamarni/composer-bin-plugin]: https://github.com/bamarni/composer-bin-plugin
 [phive]: https://github.com/phar-io/phive
+[github-release]: https://github.com/box-project/box/releases
