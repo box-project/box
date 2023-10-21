@@ -36,6 +36,7 @@ For the full documentation see https://box-project.github.io/box.
     1. [Phive](doc/installation.md#phive)
     1. [Composer](doc/installation.md#composer)
     1. [Homebrew](doc/installation.md#homebrew)
+    1. [GitHub](doc/installation.md#github)
 1. [Usage](#usage)
 1. [Configuration][the configuration documentation]
     1. [Base path (`base-path`)](doc/configuration.md#base-path-base-path)
