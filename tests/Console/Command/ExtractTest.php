@@ -84,6 +84,7 @@ class ExtractTest extends CommandTestCase
             $oldDefaultPharStub,
             '1.1.0',
             null,
+            1559806605,
             null,
             [
                 '.hidden' => [
@@ -128,6 +129,7 @@ class ExtractTest extends CommandTestCase
                         $oldDefaultPharStub,
                         '1.1.0',
                         null,
+                        1559807994,
                         null,
                         [
                             '.hidden' => [
@@ -160,6 +162,7 @@ class ExtractTest extends CommandTestCase
                     $sha512Stub,
                     '1.1.0',
                     null,
+                    1374531272,
                     null,
                     [
                         'index.php' => [
@@ -187,6 +190,7 @@ class ExtractTest extends CommandTestCase
                     $sha512Stub,
                     '1.1.0',
                     null,
+                    1374531313,
                     <<<'EOF'
                         -----BEGIN PUBLIC KEY-----
                         MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKuZkrHT54KtuBCTrR36+4tibd+2un9b

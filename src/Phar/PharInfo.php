@@ -237,6 +237,11 @@ final class PharInfo
         return $this->meta->normalizedMetadata;
     }
 
+    public function getTimestamp(): int
+    {
+        return $this->meta->timestamp;
+    }
+
     public function getSignature(): ?array
     {
         return $this->meta->signature;
