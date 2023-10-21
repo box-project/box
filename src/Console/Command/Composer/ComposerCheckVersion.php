@@ -30,7 +30,7 @@ final class ComposerCheckVersion extends ComposerCommand
 
         return new Configuration(
             'composer:check-version',
-            '🎵  Checks if the Composer executable used is compatible with Box',
+            'Checks if the Composer executable used is compatible with Box',
             <<<'HELP'
                 The <info>%command.name%</info> command will look for the Composer binary (in the system if not configured
                 in the configuration file) and check if its version is compatible with Box.
