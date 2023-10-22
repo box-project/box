@@ -20,7 +20,7 @@ namespace KevinGH\Box\RequirementChecker;
 final class Requirement
 {
     public function __construct(
-        private readonly string $type,
+        private readonly RequirementType $type,
         private readonly string $condition,
         private readonly string $message,
         private readonly string $helpMessage,
@@ -30,7 +30,7 @@ final class Requirement
     public static function forPHP(string $requiredPhpVersion, ?string $packageName): self
     {
         return new self(
-            'php',
+            RequirementType::PHP,
             $requiredPhpVersion,
             null === $packageName
                 ? sprintf(
@@ -58,7 +58,7 @@ final class Requirement
     public static function forRequiredExtension(string $extension, ?string $packageName): self
     {
         return new self(
-            'extension',
+            RequirementType::EXTENSION,
             $extension,
             null === $packageName
                 ? sprintf(
@@ -86,7 +86,7 @@ final class Requirement
     public static function forConflictingExtension(string $extension, ?string $packageName): self
     {
         return new self(
-            'extension-conflict',
+            RequirementType::EXTENSION_CONFLICT,
             $extension,
             null === $packageName
                 ? sprintf(
@@ -114,7 +114,7 @@ final class Requirement
     public function toArray(): array
     {
         return [
-            'type' => $this->type,
+            'type' => $this->type->value,
             'condition' => $this->condition,
             'message' => $this->message,
             'helpMessage' => $this->helpMessage,
