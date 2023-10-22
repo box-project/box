@@ -107,6 +107,8 @@ class InfoTest extends CommandTestCase
 
                 Timestamp: 1680285013 (2023-03-31T17:50:13+00:00)
 
+                RequirementChecker: Not found.
+
                 Contents: 1 file (6.62KB)
 
                  // Use the --list|-l option to list the content of the PHAR.
@@ -134,6 +136,8 @@ class InfoTest extends CommandTestCase
 
                     Timestamp: 1559807994 (2019-06-06T07:59:54+00:00)
 
+                    RequirementChecker: Not found.
+
                     Contents: 2 files (6.61KB)
 
                      // Use the --list|-l option to list the content of the PHAR.
@@ -159,6 +163,8 @@ class InfoTest extends CommandTestCase
                 Metadata: None
 
                 Timestamp: 1680284754 (2023-03-31T17:45:54+00:00)
+
+                RequirementChecker: Not found.
 
                 Contents: 1 file (2.00KB)
 
@@ -186,6 +192,8 @@ class InfoTest extends CommandTestCase
 
                 Timestamp: 1680284754 (2023-03-31T17:45:54+00:00)
 
+                RequirementChecker: Not found.
+
                 Contents: 1 file (2.00KB)
                 sample.txt [NONE] - 13.00B
 
@@ -209,6 +217,8 @@ class InfoTest extends CommandTestCase
                     Metadata: None
 
                     Timestamp: 1509920675 (2017-11-05T22:24:35+00:00)
+
+                    RequirementChecker: Not found.
 
                     Contents: 1 file (2.56KB)
 
@@ -237,6 +247,8 @@ class InfoTest extends CommandTestCase
 
                 Timestamp: 1680645848 (2023-04-04T22:04:08+00:00)
 
+                RequirementChecker: Not found.
+
                 Contents: 13 files (7.09KB)
 
                  // Use the --list|-l option to list the content of the PHAR.
@@ -264,6 +276,8 @@ class InfoTest extends CommandTestCase
                     Metadata: None
 
                     Timestamp: 1680645848 (2023-04-04T22:04:08+00:00)
+
+                    RequirementChecker: Not found.
 
                     Contents: 13 files (7.09KB)
                     fileX [NONE] - 0.00B
@@ -308,6 +322,8 @@ class InfoTest extends CommandTestCase
                     Metadata: None
 
                     Timestamp: 1680645848 (2023-04-04T22:04:08+00:00)
+
+                    RequirementChecker: Not found.
 
                     Contents: 13 files (7.09KB)
                     fileX [NONE] - 0.00B
@@ -356,6 +372,8 @@ class InfoTest extends CommandTestCase
 
                     Timestamp: 1680645848 (2023-04-04T22:04:08+00:00)
 
+                    RequirementChecker: Not found.
+
                     Contents: 13 files (7.09KB)
                     fileX [NONE] - 0.00B
                     .hidden-file [NONE] - 0.00B
@@ -386,6 +404,8 @@ class InfoTest extends CommandTestCase
                     Metadata: None
 
                     Timestamp: 1680645848 (2023-04-04T22:04:08+00:00)
+
+                    RequirementChecker: Not found.
 
                     Contents: 13 files (7.09KB)
                     fileX [NONE] - 0.00B
@@ -419,6 +439,8 @@ class InfoTest extends CommandTestCase
                     Metadata: None
 
                     Timestamp: 1680645848 (2023-04-04T22:04:08+00:00)
+
+                    RequirementChecker: Not found.
 
                     Contents: 13 files (7.09KB)
                     fileX [NONE] - 0.00B
@@ -457,6 +479,8 @@ class InfoTest extends CommandTestCase
                     Metadata: None
 
                     Timestamp: 1680645848 (2023-04-04T22:04:08+00:00)
+
+                    RequirementChecker: Not found.
 
                     Contents: 13 files (7.09KB)
                     fileX [NONE] - 0.00B
@@ -499,6 +523,8 @@ class InfoTest extends CommandTestCase
 
                     Timestamp: 1680645848 (2023-04-04T22:04:08+00:00)
 
+                    RequirementChecker: Not found.
+
                     Contents: 13 files (7.09KB)
                     fileX [NONE] - 0.00B
                     .hidden-file [NONE] - 0.00B
@@ -537,6 +563,8 @@ class InfoTest extends CommandTestCase
                     Metadata: None
 
                     Timestamp: 1680645848 (2023-04-04T22:04:08+00:00)
+
+                    RequirementChecker: Not found.
 
                     Contents: 13 files (7.09KB)
                     fileX [NONE] - 0.00B
@@ -583,6 +611,8 @@ class InfoTest extends CommandTestCase
 
                         Timestamp: 1527142573 (2018-05-24T06:16:13+00:00)
 
+                        RequirementChecker: Not found.
+
                         Contents: 3 files (6.75KB)
                         a/
                           bar.php [BZ2] - 60.00B
@@ -618,6 +648,8 @@ class InfoTest extends CommandTestCase
 
                         Timestamp: 1527142573 (2018-05-24T06:16:13+00:00)
 
+                        RequirementChecker: Not found.
+
                         Contents: 3 files (6.75KB)
                         b/
                           beta/
@@ -630,6 +662,205 @@ class InfoTest extends CommandTestCase
                 ];
             }
         }
+
+        yield 'PHAR with requirement checker; one format' => [
+            ['phar' => self::FIXTURES.'/req-checker-old-req.phar'],
+            <<<'OUTPUT'
+
+                API Version: 1.1.0
+
+                Archive Compression: None
+                Files Compression: None
+
+                Signature: SHA-1
+                Signature Hash: 92123D3800E1F6AD1CD1D4099B8D16BC51097A5C
+
+                Metadata: None
+
+                Timestamp: 1697988440 (2023-10-22T15:27:20+00:00)
+
+                RequirementChecker:
+                  Required:
+                  - PHP >=5.3 (root)
+                  - ext-phar (root)
+
+                Contents: 47 files (148.01KB)
+
+                 // Use the --list|-l option to list the content of the PHAR.
+
+
+                OUTPUT,
+        ];
+
+        yield 'PHAR with requirement checker; no requirements' => [
+            ['phar' => self::FIXTURES.'/req-checker-empty.phar'],
+            <<<'OUTPUT'
+
+                API Version: 1.1.0
+
+                Archive Compression: None
+                Files Compression: None
+
+                Signature: SHA-1
+                Signature Hash: 2FA961D2CC4B35B6E0574C1A5082F79E9D9625E7
+
+                Metadata: None
+
+                Timestamp: 1697977482 (2023-10-22T12:24:42+00:00)
+
+                RequirementChecker: No requirement found.
+
+                Contents: 44 files (146.01KB)
+
+                 // Use the --list|-l option to list the content of the PHAR.
+
+
+                OUTPUT,
+        ];
+
+        yield 'PHAR with requirement checker; one extension' => [
+            ['phar' => self::FIXTURES.'/req-checker-ext.phar'],
+            <<<'OUTPUT'
+
+                API Version: 1.1.0
+
+                Archive Compression: None
+                Files Compression: None
+
+                Signature: SHA-1
+                Signature Hash: A729D072C9F5B6242EBEE8DCFFFD2503C92B0AC3
+
+                Metadata: None
+
+                Timestamp: 1697989433 (2023-10-22T15:43:53+00:00)
+
+                RequirementChecker:
+                  Required:
+                  - ext-json (root)
+
+                Contents: 44 files (146.34KB)
+
+                 // Use the --list|-l option to list the content of the PHAR.
+
+
+                OUTPUT,
+        ];
+
+        yield 'PHAR with requirement checker; one PHP requirement' => [
+            ['phar' => self::FIXTURES.'/req-checker-php.phar'],
+            <<<'OUTPUT'
+
+                API Version: 1.1.0
+
+                Archive Compression: None
+                Files Compression: None
+
+                Signature: SHA-1
+                Signature Hash: 6A431D8295B875434CA97538366DE7E022BCF56F
+
+                Metadata: None
+
+                Timestamp: 1697989484 (2023-10-22T15:44:44+00:00)
+
+                RequirementChecker:
+                  Required:
+                  - PHP ^7.2 (root)
+
+                Contents: 45 files (147.25KB)
+
+                 // Use the --list|-l option to list the content of the PHAR.
+
+
+                OUTPUT,
+        ];
+
+        yield 'PHAR with requirement checker; one conflict requirement' => [
+            ['phar' => self::FIXTURES.'/req-checker-conflict.phar'],
+            <<<'OUTPUT'
+
+                API Version: 1.1.0
+
+                Archive Compression: None
+                Files Compression: None
+
+                Signature: SHA-1
+                Signature Hash: 6DCD58032AFFB47AA4DBE0B1CD96417E9CEFDF13
+
+                Metadata: None
+
+                Timestamp: 1697989373 (2023-10-22T15:42:53+00:00)
+
+                RequirementChecker:
+                  Conflict:
+                  - ext-aerospike (root)
+
+                Contents: 44 files (146.65KB)
+
+                 // Use the --list|-l option to list the content of the PHAR.
+
+
+                OUTPUT,
+        ];
+
+        yield 'PHAR with requirement checker; one PHP and extension requirement' => [
+            ['phar' => self::FIXTURES.'/req-checker-ext-and-php.phar'],
+            <<<'OUTPUT'
+
+                API Version: 1.1.0
+
+                Archive Compression: None
+                Files Compression: None
+
+                Signature: SHA-1
+                Signature Hash: C02F6BDF75EED4D5297ECB176E44EB202E29CF16
+
+                Metadata: None
+
+                Timestamp: 1697989464 (2023-10-22T15:44:24+00:00)
+
+                RequirementChecker:
+                  Required:
+                  - PHP ^7.2 (root)
+                  - ext-json (root)
+
+                Contents: 45 files (147.59KB)
+
+                 // Use the --list|-l option to list the content of the PHAR.
+
+
+                OUTPUT,
+        ];
+
+        yield 'PHAR with requirement checker; one PHP and extension and conflict requirement' => [
+            ['phar' => self::FIXTURES.'/req-checker-ext-and-php-and-conflict.phar'],
+            <<<'OUTPUT'
+
+                API Version: 1.1.0
+
+                Archive Compression: None
+                Files Compression: None
+
+                Signature: SHA-1
+                Signature Hash: 2882E27FCEE2268DB6E18A7BBB8B92906F286458
+
+                Metadata: None
+
+                Timestamp: 1697989559 (2023-10-22T15:45:59+00:00)
+
+                RequirementChecker:
+                  Required:
+                  - PHP ^7.2 (root)
+                  - ext-json (root)
+                  Conflict:
+                  - ext-aerospike (root)
+
+                Contents: 45 files (148.23KB)
+
+                 // Use the --list|-l option to list the content of the PHAR.
+
+
+                OUTPUT,
+        ];
     }
 
     public function test_it_cannot_provide_info_about_an_invalid_phar(): void

@@ -20,13 +20,20 @@ use Fidry\Console\Input\IO;
 use KevinGH\Box\NotInstantiable;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\PharInfo;
+use KevinGH\Box\RequirementChecker\Requirement;
+use KevinGH\Box\RequirementChecker\RequirementType;
 use SplFileInfo;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Path;
 use function array_filter;
 use function array_key_last;
+use function array_map;
+use function array_reduce;
 use function array_sum;
+use function array_values;
 use function count;
+use function implode;
+use function is_array;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\format_size as format_size1;
 use function KevinGH\Box\noop;
@@ -44,6 +51,7 @@ final class PharInfoRenderer
 {
     use NotInstantiable;
 
+    private const BOX_REQUIREMENTS = '.box/.requirements.php';
     private const INDENT_SIZE = 2;
 
     public static function renderShortSummary(
@@ -58,6 +66,7 @@ final class PharInfoRenderer
             self::renderSignature(...),
             self::renderMetadata(...),
             self::renderTimestamp(...),
+            self::renderRequirementChecker(...),
             self::renderContentsSummary(...),
         ];
 
@@ -184,6 +193,41 @@ final class PharInfoRenderer
         );
     }
 
+    public static function renderRequirementChecker(
+        PharInfo $pharInfo,
+        IO $io,
+    ): void {
+        $requirements = $pharInfo->getFiles()[self::BOX_REQUIREMENTS] ?? null;
+
+        if (null === $requirements) {
+            $io->writeln('<comment>RequirementChecker:</comment> Not found.');
+
+            return;
+        }
+
+        $evaluatedRequirements = require $requirements->getPathname();
+
+        if (!is_array($evaluatedRequirements)) {
+            $io->writeln('<comment>RequirementChecker:</comment> Could not be checked.');
+
+            return;
+        }
+
+        $io->write('<comment>RequirementChecker:</comment>');
+
+        if (0 === count($evaluatedRequirements)) {
+            $io->writeln(' No requirement found.');
+
+            return;
+        }
+        $io->writeln('');
+
+        [$required, $conflicting] = self::retrieveRequirements($evaluatedRequirements);
+
+        self::renderRequiredSection($required, $io);
+        self::renderConflictingSection($conflicting, $io);
+    }
+
     public static function renderContentsSummary(PharInfo $pharInfo, IO $io): void
     {
         $count = array_filter($pharInfo->getFilesCompressionCount());
@@ -250,6 +294,100 @@ final class PharInfoRenderer
                 $indent,
             );
         }
+    }
+
+    /**
+     * @return array{Requirement[], Requirement[]}
+     */
+    private static function retrieveRequirements(array $requirements): array
+    {
+        $evaluatedRequirements = array_map(
+            Requirement::fromArray(...),
+            $requirements,
+        );
+
+        [$required, $conflicting] = array_reduce(
+            $evaluatedRequirements,
+            static function ($carry, Requirement $requirement): array {
+                $hash = implode(
+                    ':',
+                    [
+                        $requirement->type->value,
+                        $requirement->condition,
+                        $requirement->source,
+                    ],
+                );
+
+                if (RequirementType::EXTENSION_CONFLICT === $requirement->type) {
+                    $carry[1][$hash] = $requirement;
+                } else {
+                    $carry[0][$hash] = $requirement;
+                }
+
+                return $carry;
+            },
+            [[], []],
+        );
+
+        return [
+            array_values($required),
+            array_values($conflicting),
+        ];
+    }
+
+    /**
+     * @param Requirement[] $required
+     */
+    private static function renderRequiredSection(
+        array $required,
+        IO $io,
+    ): void {
+        if (0 === count($required)) {
+            return;
+        }
+
+        $io->writeln('  <comment>Required:</comment>');
+        $io->writeln(
+            array_map(
+                static fn (Requirement $requirement) => match ($requirement->type) {
+                    RequirementType::PHP => sprintf(
+                        '  - PHP %s (%s)',
+                        $requirement->condition,
+                        $requirement->source ?? 'root',
+                    ),
+                    RequirementType::EXTENSION => sprintf(
+                        '  - ext-%s (%s)',
+                        $requirement->condition,
+                        $requirement->source ?? 'root',
+                    ),
+                },
+                $required,
+            ),
+        );
+    }
+
+    /**
+     * @param Requirement[] $conflicting
+     */
+    private static function renderConflictingSection(
+        array $conflicting,
+        IO $io,
+    ): void {
+        if (0 === count($conflicting)) {
+            return;
+        }
+
+        $io->writeln('  <comment>Conflict:</comment>');
+        $io->writeln(
+            array_map(
+                static fn (Requirement $requirement) => sprintf(
+                    '  - ext-%s (%s)',
+                    $requirement->condition,
+                    $requirement->source ?? 'root',
+                ),
+                $conflicting,
+            ),
+        );
     }
 
     private static function renderParentDirectoriesIfNecessary(
