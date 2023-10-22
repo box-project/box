@@ -686,6 +686,7 @@ class DiffTest extends CommandTestCase
                     Signature: SHA-1
                     Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
                     Metadata: None
+                    Timestamp: 1552839827 (2019-03-17T16:23:47+00:00)
                     Contents: 1 file (6.64KB)
 
                     Archive: simple-phar-baz.phar
@@ -694,6 +695,7 @@ class DiffTest extends CommandTestCase
                     Signature: SHA-1
                     Signature Hash: 122A636B8BB0348C9514833D70281EF6306A5BF5
                     Metadata: None
+                    Timestamp: 1552839693 (2019-03-17T16:21:33+00:00)
                     Contents: 1 file (6.61KB)
 
                     <diff-expected>--- PHAR A</diff-expected>
@@ -705,7 +707,9 @@ class DiffTest extends CommandTestCase
                     <diff-expected>-Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51</diff-expected>
                     <diff-actual>+Signature Hash: 122A636B8BB0348C9514833D70281EF6306A5BF5</diff-actual>
                      Metadata: None
+                    <diff-expected>-Timestamp: 1552839827 (2019-03-17T16:23:47+00:00)</diff-expected>
                     <diff-expected>-Contents: 1 file (6.64KB)</diff-expected>
+                    <diff-actual>+Timestamp: 1552839693 (2019-03-17T16:21:33+00:00)</diff-actual>
                     <diff-actual>+Contents: 1 file (6.61KB)</diff-actual>
 
                      // Comparing the two archives contents (gnu diff)...
