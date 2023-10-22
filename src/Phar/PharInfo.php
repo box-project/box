@@ -62,6 +62,7 @@ use function iter\mapKeys;
 use function iter\toArrayWithKeys;
 use function random_bytes;
 use function sprintf;
+use const DIRECTORY_SEPARATOR;
 
 /**
  * @private
@@ -321,7 +322,7 @@ final class PharInfo
             ),
         );
 
-        $meta = PharMeta::fromJson($dumpedFiles[Extract::PHAR_META_PATH]->getContents());
+        $meta = PharMeta::fromJson(FS::getFileContents($tmp.DIRECTORY_SEPARATOR.Extract::PHAR_META_PATH));
         unset($dumpedFiles[Extract::PHAR_META_PATH]);
 
         return [$meta, $dumpedFiles];

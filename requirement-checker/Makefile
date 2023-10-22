@@ -235,7 +235,7 @@ $(PHAR): $(PHAR_SRC_FILES) $(BOX_BIN) $(PHAR_PREFIX)
 
 $(PHAR_EXTRACT): $(PHAR) $(BOX_BIN)
 	$(BOX) extract $(PHAR) $(PHAR_EXTRACT)
-	rm -rf $(PHAR_EXTRACT)/.phar_meta.json
+	rm -rf $(PHAR_EXTRACT)/.phar
 	touch -c $@
 
 $(BOX_BIN):
