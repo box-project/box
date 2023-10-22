@@ -99,10 +99,10 @@ class ExtractTest extends CommandTestCase
         );
 
         $expectedSimplePharFiles = [
+            '.phar/meta.json' => $pharMeta->toJson(),
             '.phar/stub.php' => $oldDefaultPharStub,
             '.hidden' => 'baz',
             'foo' => 'bar',
-            '.phar_meta.json' => $pharMeta->toJson(),
         ];
 
         yield 'simple PHAR' => [
@@ -122,7 +122,7 @@ class ExtractTest extends CommandTestCase
                     '.phar/stub.php' => $oldDefaultPharStub,
                     '.hidden' => 'baz',
                     'foo' => 'bar',
-                    '.phar_meta.json' => (new PharMeta(
+                    '.phar/meta.json' => (new PharMeta(
                         CompressionAlgorithm::NONE,
                         [
                             'hash' => '3CCDA01B80C1CAC91494EA59BBAFA479E38CD120',
@@ -151,12 +151,7 @@ class ExtractTest extends CommandTestCase
         yield 'sha512 signed PHAR' => [
             self::FIXTURES_DIR.'/sha512.phar',
             [
-                '.phar/stub.php' => $sha512Stub,
-                'index.php' => <<<'PHP'
-                    <?php echo "Hello, world!\n";
-
-                    PHP,
-                '.phar_meta.json' => (new PharMeta(
+                '.phar/meta.json' => (new PharMeta(
                     CompressionAlgorithm::NONE,
                     [
                         'hash' => 'B4CAE177138A773283A748C8770A7142F0CC36D6EE88E37900BCF09A92D840D237CE3F3B47C2C7B39AC2D2C0F9A16D63FE70E1A455723DD36840B6E2E64E2130',
@@ -174,18 +169,18 @@ class ExtractTest extends CommandTestCase
                         ],
                     ],
                 ))->toJson(),
+                '.phar/stub.php' => $sha512Stub,
+                'index.php' => <<<'PHP'
+                    <?php echo "Hello, world!\n";
+
+                    PHP,
             ],
         ];
 
         yield 'OpenSSL signed PHAR' => [
             self::FIXTURES_DIR.'/openssl.phar',
             [
-                '.phar/stub.php' => $sha512Stub,
-                'index.php' => <<<'PHP'
-                    <?php echo "Hello, world!\n";
-
-                    PHP,
-                '.phar_meta.json' => (new PharMeta(
+                '.phar/meta.json' => (new PharMeta(
                     CompressionAlgorithm::NONE,
                     [
                         'hash' => '54AF1D4E5459D3A77B692E46FDB9C965D1C7579BD1F2AD2BECF4973677575444FE21E104B7655BA3D088090C28DF63D14876B277C423C8BFBCDB9E3E63F9D61A',
@@ -209,6 +204,11 @@ class ExtractTest extends CommandTestCase
                         ],
                     ],
                 ))->toJson(),
+                '.phar/stub.php' => $sha512Stub,
+                'index.php' => <<<'PHP'
+                    <?php echo "Hello, world!\n";
+
+                    PHP,
             ],
         ];
     }

@@ -724,7 +724,7 @@ class DiffTest extends CommandTestCase
                      // Comparing the two archives contents (gnu diff)...
 
                     Common subdirectories: simple-phar-bar.phar/.phar and simple-phar-baz.phar/.phar
-                    diff --exclude=.phar_meta.json simple-phar-bar.phar/bar.php simple-phar-baz.phar/bar.php
+                    diff --exclude=.phar/meta.json simple-phar-bar.phar/bar.php simple-phar-baz.phar/bar.php
                     3c3
                     < echo "Hello world!";
                     ---
@@ -770,7 +770,7 @@ class DiffTest extends CommandTestCase
                      // Comparing the two archives contents (gnu diff)...
 
                     Common subdirectories: simple-phar-bar.phar/.phar and simple-phar-baz.phar/.phar
-                    diff '--exclude=.phar_meta.json' simple-phar-bar.phar/bar.php simple-phar-baz.phar/bar.php
+                    diff '--exclude=.phar/meta.json' simple-phar-bar.phar/bar.php simple-phar-baz.phar/bar.php
                     3c3
                     < echo "Hello world!";
                     ---

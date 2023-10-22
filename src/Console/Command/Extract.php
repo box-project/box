@@ -39,7 +39,7 @@ use const DIRECTORY_SEPARATOR;
 final class Extract implements Command
 {
     public const STUB_PATH = '.phar/stub.php';
-    public const PHAR_META_PATH = '.phar_meta.json';
+    public const PHAR_META_PATH = '.phar/meta.json';
 
     private const PHAR_ARG = 'phar';
     private const OUTPUT_ARG = 'output';

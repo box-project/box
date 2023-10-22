@@ -61,9 +61,14 @@ final class PharInfoRenderer
             self::renderContentsSummary(...),
         ];
 
-        foreach ($methods as $method) {
+        $lastIndex = count($methods) - 1;
+
+        foreach ($methods as $index => $method) {
             $method($pharInfo, $io);
-            $separator();
+
+            if ($index !== $lastIndex) {
+                $separator();
+            }
         }
     }
 
