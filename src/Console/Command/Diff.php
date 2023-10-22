@@ -329,7 +329,7 @@ final class Diff implements Command
             ),
         );
 
-        self::renderShortSummary($pharInfo, $io);
+        PharInfoRenderer::renderShortSummary($pharInfo, $io);
     }
 
     private static function getShortSummary(PharInfo $pharInfo, IO $io): string
@@ -340,20 +340,11 @@ final class Diff implements Command
             clone $io->getOutput()->getFormatter(),
         );
 
-        self::renderShortSummary(
+        PharInfoRenderer::renderShortSummary(
             $pharInfo,
             $io->withOutput($output),
         );
 
         return $output->fetch();
-    }
-
-    private static function renderShortSummary(PharInfo $pharInfo, IO $io): void
-    {
-        PharInfoRenderer::renderCompression($pharInfo, $io);
-        PharInfoRenderer::renderSignature($pharInfo, $io);
-        PharInfoRenderer::renderMetadata($pharInfo, $io);
-        PharInfoRenderer::renderTimestamp($pharInfo, $io);
-        PharInfoRenderer::renderContentsSummary($pharInfo, $io);
     }
 }

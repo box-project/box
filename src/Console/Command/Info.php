@@ -200,23 +200,11 @@ final class Info implements Command
 
         $io->newLine();
 
-        PharInfoRenderer::renderCompression($pharInfo, $io);
-
-        $io->newLine();
-
-        PharInfoRenderer::renderSignature($pharInfo, $io);
-
-        $io->newLine();
-
-        PharInfoRenderer::renderMetadata($pharInfo, $io);
-
-        $io->newLine();
-
-        PharInfoRenderer::renderTimestamp($pharInfo, $io);
-
-        $io->newLine();
-
-        PharInfoRenderer::renderContentsSummary($pharInfo, $io);
+        PharInfoRenderer::renderShortSummary(
+            $pharInfo,
+            $io,
+            static fn () => $io->newLine(),
+        );
     }
 
     private static function render(IO $io, array $attributes): void
