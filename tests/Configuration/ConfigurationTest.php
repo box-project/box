@@ -24,6 +24,7 @@ use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\Phar\CompressionAlgorithm;
+use KevinGH\Box\Phar\SigningAlgorithm;
 use KevinGH\Box\VarDumperNormalizer;
 use Phar;
 use RuntimeException;
@@ -2932,7 +2933,7 @@ class ConfigurationTest extends ConfigurationTestCase
         self::assertNull($this->config->getPrivateKeyPath());
         self::assertSame([], $this->config->getReplacements());
         self::assertSame('#!/usr/bin/env php', $this->config->getShebang());
-        self::assertSame(Phar::SHA1, $this->config->getSigningAlgorithm());
+        self::assertSame(SigningAlgorithm::SHA1, $this->config->getSigningAlgorithm());
 
         $version = self::$version;
 

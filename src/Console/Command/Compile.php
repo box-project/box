@@ -763,7 +763,7 @@ final class Compile implements CommandAware
 
         if (null === $key) {
             $box->getPhar()->setSignatureAlgorithm(
-                $config->getSigningAlgorithm(),
+                $config->getSigningAlgorithm()->value,
             );
 
             return;

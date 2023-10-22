@@ -33,6 +33,7 @@ use KevinGH\Box\Composer\ComposerFiles;
 use KevinGH\Box\Json\Json;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\Phar\CompressionAlgorithm;
+use KevinGH\Box\Phar\SigningAlgorithm;
 use KevinGH\Box\PhpScoper\SerializableScoper;
 use Phar;
 use phpDocumentor\Reflection\DocBlockFactory;
@@ -58,7 +59,6 @@ use function array_values;
 use function array_walk;
 use function constant;
 use function current;
-use function defined;
 use function dirname;
 use function explode;
 use function file_exists;
@@ -77,7 +77,6 @@ use function iter\map;
 use function iter\toArray;
 use function iter\values;
 use function KevinGH\Box\get_box_version;
-use function KevinGH\Box\get_phar_signing_algorithms;
 use function KevinGH\Box\unique_id;
 use function krsort;
 use function preg_match;
@@ -110,7 +109,7 @@ final class Configuration
         'finder',
     ];
     private const PHP_SCOPER_CONFIG = 'scoper.inc.php';
-    private const DEFAULT_SIGNING_ALGORITHM = Phar::SHA1;
+    private const DEFAULT_SIGNING_ALGORITHM = SigningAlgorithm::SHA1;
     private const DEFAULT_ALIAS_PREFIX = 'box-auto-generated-alias-';
 
     private const DEFAULT_IGNORED_ANNOTATIONS = [
@@ -406,7 +405,7 @@ final class Configuration
      * @param bool                  $promptForPrivateKey   If the user should be prompted for the private key passphrase
      * @param array                 $processedReplacements The processed list of replacement placeholders and their values
      * @param null|non-empty-string $shebang               The shebang line
-     * @param int                   $signingAlgorithm      The PHAR siging algorithm. See \Phar constants
+     * @param SigningAlgorithm      $signingAlgorithm      The PHAR siging algorithm. See \Phar constants
      * @param null|string           $stubBannerContents    The stub banner comment
      * @param null|string           $stubBannerPath        The path to the stub banner comment file
      * @param null|string           $stubPath              The PHAR stub file path
@@ -443,7 +442,7 @@ final class Configuration
         private bool $promptForPrivateKey,
         private array $processedReplacements,
         private ?string $shebang,
-        private int|string $signingAlgorithm,
+        private SigningAlgorithm $signingAlgorithm,
         private ?string $stubBannerContents,
         private ?string $stubBannerPath,
         private ?string $stubPath,
@@ -650,7 +649,7 @@ final class Configuration
         return $this->shebang;
     }
 
-    public function getSigningAlgorithm(): int
+    public function getSigningAlgorithm(): SigningAlgorithm
     {
         return $this->signingAlgorithm;
     }
@@ -1929,10 +1928,10 @@ final class Configuration
     private static function retrievePrivateKeyPath(
         stdClass $raw,
         string $basePath,
-        int $signingAlgorithm,
+        SigningAlgorithm $signingAlgorithm,
         ConfigurationLogger $logger,
     ): ?string {
-        if (property_exists($raw, self::KEY_KEY) && Phar::OPENSSL !== $signingAlgorithm) {
+        if (property_exists($raw, self::KEY_KEY) && SigningAlgorithm::OPENSSL !== $signingAlgorithm) {
             if (null === $raw->{self::KEY_KEY}) {
                 $logger->addRecommendation(
                     'The setting "key" has been set but is unnecessary since the signing algorithm is not "OPENSSL".',
@@ -1948,7 +1947,7 @@ final class Configuration
 
         if (!isset($raw->{self::KEY_KEY})) {
             Assert::true(
-                Phar::OPENSSL !== $signingAlgorithm,
+                SigningAlgorithm::OPENSSL !== $signingAlgorithm,
                 'Expected to have a private key for OpenSSL signing but none have been provided.',
             );
 
@@ -1964,7 +1963,7 @@ final class Configuration
 
     private static function retrievePrivateKeyPassphrase(
         stdClass $raw,
-        int $algorithm,
+        SigningAlgorithm $algorithm,
         ConfigurationLogger $logger,
     ): ?string {
         self::checkIfDefaultValue($logger, $raw, self::KEY_PASS_KEY);
@@ -1976,7 +1975,7 @@ final class Configuration
         /** @var null|false|string $keyPass */
         $keyPass = $raw->{self::KEY_PASS_KEY};
 
-        if (Phar::OPENSSL !== $algorithm) {
+        if (SigningAlgorithm::OPENSSL !== $algorithm) {
             if (false === $keyPass || null === $keyPass) {
                 $logger->addRecommendation(
                     sprintf(
@@ -2264,7 +2263,7 @@ final class Configuration
         return $shebang;
     }
 
-    private static function retrieveSigningAlgorithm(stdClass $raw, ConfigurationLogger $logger): int
+    private static function retrieveSigningAlgorithm(stdClass $raw, ConfigurationLogger $logger): SigningAlgorithm
     {
         if (property_exists($raw, self::ALGORITHM_KEY) && null === $raw->{self::ALGORITHM_KEY}) {
             self::addRecommendationForDefaultValue($logger, self::ALGORITHM_KEY);
@@ -2274,19 +2273,8 @@ final class Configuration
             return self::DEFAULT_SIGNING_ALGORITHM;
         }
 
-        $algorithm = mb_strtoupper($raw->{self::ALGORITHM_KEY});
-
-        Assert::inArray($algorithm, array_keys(get_phar_signing_algorithms()));
-
-        Assert::true(
-            defined('Phar::'.$algorithm),
-            sprintf(
-                'The signing algorithm "%s" is not supported by your current PHAR version.',
-                $algorithm,
-            ),
-        );
-
-        $algorithm = constant('Phar::'.$algorithm);
+        $algorithmLabel = mb_strtoupper($raw->{self::ALGORITHM_KEY});
+        $algorithm = SigningAlgorithm::fromLabel($algorithmLabel);
 
         if (self::DEFAULT_SIGNING_ALGORITHM === $algorithm) {
             self::addRecommendationForDefaultValue($logger, self::ALGORITHM_KEY);
@@ -2424,11 +2412,11 @@ final class Configuration
 
     private static function retrievePromptForPrivateKey(
         stdClass $raw,
-        int $signingAlgorithm,
+        SigningAlgorithm $signingAlgorithm,
         ConfigurationLogger $logger,
     ): bool {
         if (isset($raw->{self::KEY_PASS_KEY}) && true === $raw->{self::KEY_PASS_KEY}) {
-            if (Phar::OPENSSL !== $signingAlgorithm) {
+            if (SigningAlgorithm::OPENSSL !== $signingAlgorithm) {
                 $logger->addWarning(
                     'A prompt for password for the private key has been requested but ignored since the signing '
                     .'algorithm used is not "OPENSSL.',

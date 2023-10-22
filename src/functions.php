@@ -71,8 +71,7 @@ function get_box_version(): string
 }
 
 /**
- * TODO: to remove once up update PHP-Scoper.
- *
+ * @deprecated since 4.3.0. Use \KevinGH\Box\Phar\CompressionAlgorithm instead.
  * @private
  *
  * @return array<string,int>
@@ -89,6 +88,8 @@ function get_phar_compression_algorithms(): array
 }
 
 /**
+ * @deprecated Since 4.5.0. Use \KevinGH\Box\Phar\SigningAlgorithm instead.
+ *
  * @private
  *
  * @return array<string,int>
