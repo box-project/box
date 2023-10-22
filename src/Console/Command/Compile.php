@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Amp\MultiReasonException;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\CommandAware;
 use Fidry\Console\Command\CommandAwareness;
@@ -41,7 +43,9 @@ use KevinGH\Box\RequirementChecker\DecodedComposerJson;
 use KevinGH\Box\RequirementChecker\DecodedComposerLock;
 use KevinGH\Box\RequirementChecker\RequirementsDumper;
 use KevinGH\Box\StubGenerator;
+use Phar;
 use RuntimeException;
+use Seld\PharUtils\Timestamps;
 use stdClass;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
@@ -70,6 +74,7 @@ use function microtime;
 use function putenv;
 use function Safe\getcwd;
 use function sprintf;
+use function str_replace;
 use function var_export;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 use const PHP_EOL;
@@ -244,7 +249,12 @@ final class Compile implements CommandAware
         IO $io,
         bool $debug,
     ): Box {
-        $box = Box::create($config->getTmpOutputPath());
+        $unsignedPharPath = str_replace(
+            '.phar',
+            '-unsigned.phar',
+            $config->getTmpOutputPath(),
+        );
+        $box = Box::create($unsignedPharPath);
         $composerOrchestrator = new ComposerOrchestrator(
             ComposerProcessFactory::create(
                 $config->getComposerBin(),
@@ -288,6 +298,12 @@ final class Compile implements CommandAware
             $io,
             $logger,
         );
+
+        self::correctTimestamp($unsignedPharPath, $logger);
+
+        unset($box);
+        FS::rename($unsignedPharPath, $config->getTmpOutputPath());
+        $box = Box::create($config->getTmpOutputPath());
 
         self::signPhar($config, $box, $config->getTmpOutputPath(), $io, $logger);
 
@@ -747,6 +763,22 @@ final class Compile implements CommandAware
         } finally {
             $restoreLimit();
         }
+    }
+
+    private static function correctTimestamp(string $unsignedPharPath, CompilerLogger $logger): void {
+        $timestamp = new DateTimeImmutable('2017-10-11 08:58:00+00:00');
+
+        $logger->log(
+            CompilerLogger::QUESTION_MARK_PREFIX,
+            sprintf(
+                'Correcting the timestamp to "%s".',
+                $timestamp->format(DateTimeInterface::ATOM),
+            ),
+        );
+
+        $util = new Timestamps($unsignedPharPath);
+        $util->updateTimestamps($timestamp);
+        $util->save($unsignedPharPath, Phar::SHA512);
     }
 
     private static function signPhar(
