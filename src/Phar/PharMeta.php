@@ -39,7 +39,7 @@ use const SORT_LOCALE_STRING;
 final class PharMeta
 {
     /**
-     * @param non-empty-string                                                          $stub
+     * @param non-empty-string|null                                                          $stub
      * @param non-empty-string|null                                                          $version
      * @param non-empty-string|null                                                          $normalizedMetadata
      * @param non-empty-string|null                                                          $pubKeyContent
@@ -49,7 +49,7 @@ final class PharMeta
         public readonly CompressionAlgorithm $compression,
         #[ArrayShape(['hash' => 'string', 'hash_type' => 'string'])]
         public readonly ?array $signature,
-        public readonly string $stub,
+        public readonly ?string $stub,
         public readonly ?string $version,
         public readonly ?string $normalizedMetadata,
         public readonly int $timestamp,

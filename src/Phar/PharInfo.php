@@ -43,7 +43,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Phar;
 
-use DateTimeImmutable;
 use Fidry\FileSystem\FS;
 use KevinGH\Box\Console\Command\Extract;
 use OutOfBoundsException;
