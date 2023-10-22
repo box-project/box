@@ -182,6 +182,8 @@ final class Info implements Command
 
         $io->newLine();
 
+        PharInfoRenderer::renderBoxVersion($pharInfo, $io);
+
         PharInfoRenderer::renderShortSummary(
             $pharInfo,
             $io,

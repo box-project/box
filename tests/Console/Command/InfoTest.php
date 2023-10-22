@@ -313,6 +313,8 @@ class InfoTest extends CommandTestCase
 
                     API Version: 1.1.0
 
+                    Built with Box: dev-main@b2c33cd
+
                     Archive Compression: None
                     Files Compression: None
 
@@ -669,6 +671,8 @@ class InfoTest extends CommandTestCase
 
                 API Version: 1.1.0
 
+                Built with Box: dev-main@b2c33cd
+
                 Archive Compression: None
                 Files Compression: None
 
@@ -698,6 +702,8 @@ class InfoTest extends CommandTestCase
 
                 API Version: 1.1.0
 
+                Built with Box: dev-main@b7472c2
+
                 Archive Compression: None
                 Files Compression: None
 
@@ -723,6 +729,8 @@ class InfoTest extends CommandTestCase
             <<<'OUTPUT'
 
                 API Version: 1.1.0
+
+                Built with Box: dev-main@b2c33cd
 
                 Archive Compression: None
                 Files Compression: None
@@ -752,6 +760,8 @@ class InfoTest extends CommandTestCase
 
                 API Version: 1.1.0
 
+                Built with Box: dev-main@b2c33cd
+
                 Archive Compression: None
                 Files Compression: None
 
@@ -779,6 +789,8 @@ class InfoTest extends CommandTestCase
             <<<'OUTPUT'
 
                 API Version: 1.1.0
+
+                Built with Box: dev-main@b2c33cd
 
                 Archive Compression: None
                 Files Compression: None
@@ -808,6 +820,8 @@ class InfoTest extends CommandTestCase
 
                 API Version: 1.1.0
 
+                Built with Box: dev-main@b2c33cd
+
                 Archive Compression: None
                 Files Compression: None
 
@@ -836,6 +850,8 @@ class InfoTest extends CommandTestCase
             <<<'OUTPUT'
 
                 API Version: 1.1.0
+
+                Built with Box: dev-main@b2c33cd
 
                 Archive Compression: None
                 Files Compression: None
