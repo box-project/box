@@ -178,7 +178,15 @@ final class Info implements Command
         bool $indent,
         IO $io,
     ): int {
-        self::showPharMeta($pharInfo, $io);
+        PharInfoRenderer::renderVersion($pharInfo, $io);
+
+        $io->newLine();
+
+        PharInfoRenderer::renderShortSummary(
+            $pharInfo,
+            $io,
+            static fn () => $io->newLine(),
+        );
 
         if ($content) {
             PharInfoRenderer::renderContent(
