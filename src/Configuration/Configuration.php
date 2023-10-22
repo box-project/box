@@ -2280,7 +2280,7 @@ final class Configuration
             self::addRecommendationForDefaultValue($logger, self::ALGORITHM_KEY);
         }
 
-        if (Phar::OPENSSL === $algorithm) {
+        if (SigningAlgorithm::OPENSSL === $algorithm) {
             $logger->addWarning(
                 'Using an OpenSSL signature is deprecated and will be removed in 5.0.0. Please check '
                 .'https://github.com/box-project/box/blob/main/doc/phar-signing.md for alternatives.',
