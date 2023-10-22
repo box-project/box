@@ -191,13 +191,9 @@ final class PharInfoRenderer
         );
     }
 
-    /**
-     * @param false|positive-int|0 $maxDepth
-     * @param false|int            $indent   Nbr of indent or `false`
-     */
     public static function renderRequirementChecker(
         PharInfo $pharInfo,
-        IO       $io,
+        IO $io,
     ): void {
         $requirements = $pharInfo->getFiles()[self::BOX_REQUIREMENTS] ?? null;
 
@@ -221,17 +217,17 @@ final class PharInfoRenderer
             $evaluatedRequirements,
         );
 
-        if (count($evaluatedRequirements) === 0) {
+        if (0 === count($evaluatedRequirements)) {
             $io->writeln(' No requirement found.');
+
             return;
-        } else {
-            $io->writeln('');
         }
+        $io->writeln('');
 
         [$required, $conflicting] = array_reduce(
             $evaluatedRequirements,
             static function ($carry, Requirement $requirement): array {
-                if ($requirement->type === RequirementType::EXTENSION_CONFLICT) {
+                if (RequirementType::EXTENSION_CONFLICT === $requirement->type) {
                     $carry[1][] = $requirement;
                 } else {
                     $carry[0][] = $requirement;
@@ -245,7 +241,7 @@ final class PharInfoRenderer
         $io->writeln('  <comment>Required:</comment>');
         $io->writeln(
             array_map(
-                static fn (Requirement $requirement) => match($requirement->type) {
+                static fn (Requirement $requirement) => match ($requirement->type) {
                     RequirementType::PHP => sprintf(
                         '  - PHP %s',
                         $requirement->condition,
