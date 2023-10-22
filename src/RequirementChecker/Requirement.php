@@ -20,11 +20,11 @@ namespace KevinGH\Box\RequirementChecker;
 final class Requirement
 {
     public function __construct(
-        private readonly RequirementType $type,
-        private readonly string $condition,
-        private readonly ?string $source,
-        private readonly string $message,
-        private readonly string $helpMessage,
+        public readonly RequirementType $type,
+        public readonly string $condition,
+        public readonly ?string $source,
+        public readonly string $message,
+        public readonly string $helpMessage,
     ) {
     }
 
@@ -112,6 +112,17 @@ final class Requirement
                     $packageName,
                     $extension,
                 ),
+        );
+    }
+
+    public static function fromArray(array $value): self
+    {
+        return new self(
+            RequirementType::from($value['type']),
+            $value['condition'],
+            $value['source'],
+            $value['message'],
+            $value['helpMessage'],
         );
     }
 
