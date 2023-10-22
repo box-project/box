@@ -281,7 +281,8 @@ class CompileTest extends FileSystemTestCase
             * Done.
 
             No recommendation found.
-            No warning found.
+            ⚠️  <warning>1 warning found:</warning>
+                - Using an OpenSSL signature is deprecated and will be removed in 5.0.0. Please check https://github.com/box-project/box/blob/main/doc/phar-signing.md for alternatives.
 
              // PHAR: {$numberOfFiles} files (100B)
              // You can inspect the generated PHAR with the "info" command.
@@ -897,7 +898,8 @@ class CompileTest extends FileSystemTestCase
             * Done.
 
             No recommendation found.
-            No warning found.
+            ⚠️  <warning>1 warning found:</warning>
+                - Using an OpenSSL signature is deprecated and will be removed in 5.0.0. Please check https://github.com/box-project/box/blob/main/doc/phar-signing.md for alternatives.
 
              // PHAR: {$expectedNumberOfFiles} files (100B)
              // You can inspect the generated PHAR with the "info" command.
@@ -1026,7 +1028,8 @@ class CompileTest extends FileSystemTestCase
             * Done.
 
             No recommendation found.
-            No warning found.
+            ⚠️  <warning>1 warning found:</warning>
+                - Using an OpenSSL signature is deprecated and will be removed in 5.0.0. Please check https://github.com/box-project/box/blob/main/doc/phar-signing.md for alternatives.
 
              // PHAR: {$expectedNumberOfFiles} files (100B)
              // You can inspect the generated PHAR with the "info" command.
