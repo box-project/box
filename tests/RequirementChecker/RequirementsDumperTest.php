@@ -134,6 +134,7 @@ class RequirementsDumperTest extends TestCase
                   array (
                     'type' => 'php',
                     'condition' => '^7.4',
+                    'source' => 'acme/foo',
                     'message' => 'The package "acme/foo" requires a version matching "^7.4".',
                     'helpMessage' => 'The package "acme/foo" requires a version matching "^7.4".',
                   ),
@@ -141,6 +142,7 @@ class RequirementsDumperTest extends TestCase
                   array (
                     'type' => 'extension',
                     'condition' => 'zlib',
+                    'source' => NULL,
                     'message' => 'The application requires the extension "zlib".',
                     'helpMessage' => 'The application requires the extension "zlib". You either need to enable it or request the application to be shipped with a polyfill for this extension.',
                   ),
@@ -148,6 +150,7 @@ class RequirementsDumperTest extends TestCase
                   array (
                     'type' => 'extension',
                     'condition' => 'json',
+                    'source' => 'acme/foo',
                     'message' => 'The package "acme/foo" requires the extension "json".',
                     'helpMessage' => 'The package "acme/foo" requires the extension "json". You either need to enable it or request the application to be shipped with a polyfill for this extension.',
                   ),

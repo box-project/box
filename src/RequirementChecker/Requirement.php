@@ -22,6 +22,7 @@ final class Requirement
     public function __construct(
         public readonly RequirementType $type,
         public readonly string $condition,
+        public readonly ?string $source,
         public readonly string $message,
         public readonly string $helpMessage,
     ) {
@@ -32,6 +33,7 @@ final class Requirement
         return new self(
             RequirementType::PHP,
             $requiredPhpVersion,
+            $packageName,
             null === $packageName
                 ? sprintf(
                     'The application requires a version matching "%s".',
@@ -60,6 +62,7 @@ final class Requirement
         return new self(
             RequirementType::EXTENSION,
             $extension,
+            $packageName,
             null === $packageName
                 ? sprintf(
                     'The application requires the extension "%s".',
@@ -88,6 +91,7 @@ final class Requirement
         return new self(
             RequirementType::EXTENSION_CONFLICT,
             $extension,
+            $packageName,
             null === $packageName
                 ? sprintf(
                     'The application conflicts with the extension "%s".',
@@ -116,6 +120,7 @@ final class Requirement
         return new self(
             RequirementType::from($value['type']),
             $value['condition'],
+            $value['source'],
             $value['message'],
             $value['helpMessage'],
         );
@@ -126,6 +131,7 @@ final class Requirement
         return [
             'type' => $this->type->value,
             'condition' => $this->condition,
+            'source' => $this->source,
             'message' => $this->message,
             'helpMessage' => $this->helpMessage,
         ];

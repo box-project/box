@@ -30,11 +30,15 @@ final class RequirementTest extends TestCase
         $expected = [
             'type' => 'php',
             'condition' => '^8.2',
+            'source' => null,
             'message' => 'The application requires a version matching "^8.2".',
             'helpMessage' => 'The application requires a version matching "^8.2".',
         ];
 
-        self::assertSame($expected, $requirement->toArray());
+        $actual = $requirement->toArray();
+
+        self::assertSame($expected, $actual);
+        self::assertItCanBeCreatedFromItsArrayForm($requirement, $actual);
     }
 
     public function test_it_can_be_created_for_a_php_version_for_a_package(): void
@@ -44,11 +48,15 @@ final class RequirementTest extends TestCase
         $expected = [
             'type' => 'php',
             'condition' => '^8.2',
+            'source' => 'box/test',
             'message' => 'The package "box/test" requires a version matching "^8.2".',
             'helpMessage' => 'The package "box/test" requires a version matching "^8.2".',
         ];
 
-        self::assertSame($expected, $requirement->toArray());
+        $actual = $requirement->toArray();
+
+        self::assertSame($expected, $actual);
+        self::assertItCanBeCreatedFromItsArrayForm($requirement, $actual);
     }
 
     public function test_it_can_be_created_for_an_extension_constraint(): void
@@ -58,11 +66,15 @@ final class RequirementTest extends TestCase
         $expected = [
             'type' => 'extension',
             'condition' => 'mbstring',
+            'source' => null,
             'message' => 'The application requires the extension "mbstring".',
             'helpMessage' => 'The application requires the extension "mbstring". You either need to enable it or request the application to be shipped with a polyfill for this extension.',
         ];
 
-        self::assertSame($expected, $requirement->toArray());
+        $actual = $requirement->toArray();
+
+        self::assertSame($expected, $actual);
+        self::assertItCanBeCreatedFromItsArrayForm($requirement, $actual);
     }
 
     public function test_it_can_be_created_for_an_extension_constraint_for_a_package(): void
@@ -72,11 +84,15 @@ final class RequirementTest extends TestCase
         $expected = [
             'type' => 'extension',
             'condition' => 'mbstring',
+            'source' => 'box/test',
             'message' => 'The package "box/test" requires the extension "mbstring".',
             'helpMessage' => 'The package "box/test" requires the extension "mbstring". You either need to enable it or request the application to be shipped with a polyfill for this extension.',
         ];
 
-        self::assertSame($expected, $requirement->toArray());
+        $actual = $requirement->toArray();
+
+        self::assertSame($expected, $actual);
+        self::assertItCanBeCreatedFromItsArrayForm($requirement, $actual);
     }
 
     public function test_it_can_be_created_for_a_conflicting_extension_constraint(): void
@@ -86,11 +102,15 @@ final class RequirementTest extends TestCase
         $expected = [
             'type' => 'extension-conflict',
             'condition' => 'mbstring',
+            'source' => null,
             'message' => 'The application conflicts with the extension "mbstring".',
             'helpMessage' => 'The application conflicts with the extension "mbstring". You need to disable it in order to run this application.',
         ];
 
-        self::assertSame($expected, $requirement->toArray());
+        $actual = $requirement->toArray();
+
+        self::assertSame($expected, $actual);
+        self::assertItCanBeCreatedFromItsArrayForm($requirement, $actual);
     }
 
     public function test_it_can_be_created_for_a_conflicting_extension_constraint_for_a_package(): void
@@ -100,10 +120,21 @@ final class RequirementTest extends TestCase
         $expected = [
             'type' => 'extension-conflict',
             'condition' => 'mbstring',
+            'source' => 'box/test',
             'message' => 'The package "box/test" conflicts with the extension "mbstring".',
             'helpMessage' => 'The package "box/test" conflicts with the extension "mbstring". You need to disable it in order to run this application.',
         ];
 
-        self::assertSame($expected, $requirement->toArray());
+        $actual = $requirement->toArray();
+
+        self::assertSame($expected, $actual);
+        self::assertItCanBeCreatedFromItsArrayForm($requirement, $actual);
+    }
+
+    private static function assertItCanBeCreatedFromItsArrayForm(Requirement $expected, array $arrayForm): void
+    {
+        $actual = Requirement::fromArray($arrayForm);
+
+        self::assertEquals($expected, $actual);
     }
 }
