@@ -105,6 +105,8 @@ class InfoTest extends CommandTestCase
 
                 Metadata: None
 
+                Timestamp: 1680285013 (2023-03-31T17:50:13+00:00)
+
                 Contents: 1 file (6.62KB)
 
                  // Use the --list|-l option to list the content of the PHAR.
@@ -130,6 +132,8 @@ class InfoTest extends CommandTestCase
 
                     Metadata: None
 
+                    Timestamp: 1559807994 (2019-06-06T07:59:54+00:00)
+
                     Contents: 2 files (6.61KB)
 
                      // Use the --list|-l option to list the content of the PHAR.
@@ -153,6 +157,8 @@ class InfoTest extends CommandTestCase
                 Signature unreadable
 
                 Metadata: None
+
+                Timestamp: 1680284754 (2023-03-31T17:45:54+00:00)
 
                 Contents: 1 file (2.00KB)
 
@@ -178,6 +184,8 @@ class InfoTest extends CommandTestCase
 
                 Metadata: None
 
+                Timestamp: 1680284754 (2023-03-31T17:45:54+00:00)
+
                 Contents: 1 file (2.00KB)
                 sample.txt [NONE] - 13.00B
 
@@ -199,6 +207,8 @@ class InfoTest extends CommandTestCase
                     Signature unreadable
 
                     Metadata: None
+
+                    Timestamp: 1509920675 (2017-11-05T22:24:35+00:00)
 
                     Contents: 1 file (2.56KB)
 
@@ -225,6 +235,8 @@ class InfoTest extends CommandTestCase
 
                 Metadata: None
 
+                Timestamp: 1680645848 (2023-04-04T22:04:08+00:00)
+
                 Contents: 13 files (7.09KB)
 
                  // Use the --list|-l option to list the content of the PHAR.
@@ -250,6 +262,8 @@ class InfoTest extends CommandTestCase
                     Signature Hash: 5FE61595A3D773538C3CE6006FBC3679272F6DF118B3229AFD606462B772C414
 
                     Metadata: None
+
+                    Timestamp: 1680645848 (2023-04-04T22:04:08+00:00)
 
                     Contents: 13 files (7.09KB)
                     fileX [NONE] - 0.00B
@@ -292,6 +306,8 @@ class InfoTest extends CommandTestCase
                     Signature Hash: 5FE61595A3D773538C3CE6006FBC3679272F6DF118B3229AFD606462B772C414
 
                     Metadata: None
+
+                    Timestamp: 1680645848 (2023-04-04T22:04:08+00:00)
 
                     Contents: 13 files (7.09KB)
                     fileX [NONE] - 0.00B
@@ -338,6 +354,8 @@ class InfoTest extends CommandTestCase
 
                     Metadata: None
 
+                    Timestamp: 1680645848 (2023-04-04T22:04:08+00:00)
+
                     Contents: 13 files (7.09KB)
                     fileX [NONE] - 0.00B
                     .hidden-file [NONE] - 0.00B
@@ -366,6 +384,8 @@ class InfoTest extends CommandTestCase
                     Signature Hash: 5FE61595A3D773538C3CE6006FBC3679272F6DF118B3229AFD606462B772C414
 
                     Metadata: None
+
+                    Timestamp: 1680645848 (2023-04-04T22:04:08+00:00)
 
                     Contents: 13 files (7.09KB)
                     fileX [NONE] - 0.00B
@@ -397,6 +417,8 @@ class InfoTest extends CommandTestCase
                     Signature Hash: 5FE61595A3D773538C3CE6006FBC3679272F6DF118B3229AFD606462B772C414
 
                     Metadata: None
+
+                    Timestamp: 1680645848 (2023-04-04T22:04:08+00:00)
 
                     Contents: 13 files (7.09KB)
                     fileX [NONE] - 0.00B
@@ -433,6 +455,8 @@ class InfoTest extends CommandTestCase
                     Signature Hash: 5FE61595A3D773538C3CE6006FBC3679272F6DF118B3229AFD606462B772C414
 
                     Metadata: None
+
+                    Timestamp: 1680645848 (2023-04-04T22:04:08+00:00)
 
                     Contents: 13 files (7.09KB)
                     fileX [NONE] - 0.00B
@@ -473,6 +497,8 @@ class InfoTest extends CommandTestCase
 
                     Metadata: None
 
+                    Timestamp: 1680645848 (2023-04-04T22:04:08+00:00)
+
                     Contents: 13 files (7.09KB)
                     fileX [NONE] - 0.00B
                     .hidden-file [NONE] - 0.00B
@@ -509,6 +535,8 @@ class InfoTest extends CommandTestCase
                     Signature Hash: 5FE61595A3D773538C3CE6006FBC3679272F6DF118B3229AFD606462B772C414
 
                     Metadata: None
+
+                    Timestamp: 1680645848 (2023-04-04T22:04:08+00:00)
 
                     Contents: 13 files (7.09KB)
                     fileX [NONE] - 0.00B
@@ -553,6 +581,8 @@ class InfoTest extends CommandTestCase
                           'test' => 123,
                         )
 
+                        Timestamp: 1527142573 (2018-05-24T06:16:13+00:00)
+
                         Contents: 3 files (6.75KB)
                         a/
                           bar.php [BZ2] - 60.00B
@@ -585,6 +615,8 @@ class InfoTest extends CommandTestCase
                         array (
                           'test' => 123,
                         )
+
+                        Timestamp: 1527142573 (2018-05-24T06:16:13+00:00)
 
                         Contents: 3 files (6.75KB)
                         b/
