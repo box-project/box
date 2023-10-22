@@ -18,6 +18,7 @@ use Fidry\Console\Input\IO;
 use KevinGH\Box\Phar\PharInfo;
 use UnexpectedValueException;
 use ValueError;
+use function hash;
 use function implode;
 
 final class ChecksumDiffer implements Differ
@@ -110,6 +111,11 @@ final class ChecksumDiffer implements Differ
         $hashFiles = [];
 
         try {
+            $hashFiles[$pharInfo->getStubPath()] = hash(
+                $algorithm,
+                $pharInfo->getStubContent(),
+            );
+
             foreach ($pharInfo->getFiles() as $file) {
                 $hashFiles[$file->getRelativePathname()] = hash_file(
                     $algorithm,

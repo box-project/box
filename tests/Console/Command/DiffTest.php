@@ -578,7 +578,60 @@ class DiffTest extends CommandTestCase
 
     public static function GNUDiffPharsProvider(): iterable
     {
-        yield from self::commonDiffPharsProvider(DiffMode::GNU);
+        foreach (self::commonDiffPharsProvider(DiffMode::GNU) as $label => $set) {
+            yield $label => 'different data; same content' === $label
+                ? [
+                    self::FIXTURES_DIR.'/simple-phar-bar.phar',
+                    self::FIXTURES_DIR.'/simple-phar-bar-compressed.phar',
+                    sprintf(
+                        <<<'OUTPUT'
+
+                             // Comparing the two archives...
+
+                            Archive: simple-phar-bar.phar
+                            Archive Compression: None
+                            Files Compression: None
+                            Signature: SHA-1
+                            Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51
+                            Metadata: None
+                            Timestamp: 1552839827 (2019-03-17T16:23:47+00:00)
+                            Contents: 1 file (6.64KB)
+
+                            Archive: simple-phar-bar-compressed.phar
+                            Archive Compression: None
+                            Files Compression: GZ
+                            Signature: SHA-1
+                            Signature Hash: 3A388D86C91C36659A043D52C2DEB64E8848DD1A
+                            Metadata: None
+                            Timestamp: 1552856416 (2019-03-17T21:00:16+00:00)
+                            Contents: 1 file (6.65KB)
+
+                            <diff-expected>--- PHAR A</diff-expected>
+                            <diff-actual>+++ PHAR B</diff-actual>
+                            @@ @@
+                             Archive Compression: None
+                            <diff-expected>-Files Compression: None</diff-expected>
+                            <diff-actual>+Files Compression: GZ</diff-actual>
+                             Signature: SHA-1
+                            <diff-expected>-Signature Hash: 9ADC09F73909EDF14F8A4ABF9758B6FFAD1BBC51</diff-expected>
+                            <diff-actual>+Signature Hash: 3A388D86C91C36659A043D52C2DEB64E8848DD1A</diff-actual>
+                             Metadata: None
+                            <diff-expected>-Timestamp: 1552839827 (2019-03-17T16:23:47+00:00)</diff-expected>
+                            <diff-expected>-Contents: 1 file (6.64KB)</diff-expected>
+                            <diff-actual>+Timestamp: 1552856416 (2019-03-17T21:00:16+00:00)</diff-actual>
+                            <diff-actual>+Contents: 1 file (6.65KB)</diff-actual>
+
+                             // Comparing the two archives contents (%s diff)...
+
+                            Common subdirectories: simple-phar-bar.phar/.phar and simple-phar-bar-compressed.phar/.phar
+
+                            OUTPUT,
+                        DiffMode::GNU->value,
+                    ),
+                    ExitCode::FAILURE,
+                ]
+                : $set;
+        }
 
         yield 'different files' => [
             self::FIXTURES_DIR.'/simple-phar-foo.phar',
@@ -620,6 +673,7 @@ class DiffTest extends CommandTestCase
 
                  // Comparing the two archives contents (gnu diff)...
 
+                Common subdirectories: simple-phar-foo.phar/.phar and simple-phar-bar.phar/.phar
                 Only in simple-phar-bar.phar: bar.php
                 Only in simple-phar-foo.phar: foo.php
 
@@ -669,6 +723,7 @@ class DiffTest extends CommandTestCase
 
                      // Comparing the two archives contents (gnu diff)...
 
+                    Common subdirectories: simple-phar-bar.phar/.phar and simple-phar-baz.phar/.phar
                     diff --exclude=.phar_meta.json simple-phar-bar.phar/bar.php simple-phar-baz.phar/bar.php
                     3c3
                     < echo "Hello world!";
@@ -714,6 +769,7 @@ class DiffTest extends CommandTestCase
 
                      // Comparing the two archives contents (gnu diff)...
 
+                    Common subdirectories: simple-phar-bar.phar/.phar and simple-phar-baz.phar/.phar
                     diff '--exclude=.phar_meta.json' simple-phar-bar.phar/bar.php simple-phar-baz.phar/bar.php
                     3c3
                     < echo "Hello world!";

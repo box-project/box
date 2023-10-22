@@ -38,6 +38,7 @@ use const DIRECTORY_SEPARATOR;
  */
 final class Extract implements Command
 {
+    public const STUB_PATH = '.phar/stub.php';
     public const PHAR_META_PATH = '.phar_meta.json';
 
     private const PHAR_ARG = 'phar';
@@ -151,6 +152,7 @@ final class Extract implements Command
         $pubKey = $file.'.pubkey';
         $pubKeyContent = null;
         $tmpPubKey = $tmpFile.'.pubkey';
+        $stub = $tmpDir.DIRECTORY_SEPARATOR.self::STUB_PATH;
 
         try {
             FS::copy($file, $tmpFile, true);
@@ -164,6 +166,7 @@ final class Extract implements Command
             $pharMeta = PharMeta::fromPhar($phar, $pubKeyContent);
 
             $phar->extractTo($tmpDir);
+            FS::dumpFile($stub, $phar->getStub());
         } catch (Throwable $throwable) {
             FS::remove([$tmpFile, $tmpPubKey]);
 

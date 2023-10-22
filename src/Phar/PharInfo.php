@@ -247,6 +247,11 @@ final class PharInfo
         return $this->meta->signature;
     }
 
+    public function getStubPath(): string
+    {
+        return Extract::STUB_PATH;
+    }
+
     public function getStubContent(): ?string
     {
         return $this->meta->stub;
@@ -311,6 +316,7 @@ final class PharInfo
                 Finder::create()
                     ->files()
                     ->ignoreDotFiles(false)
+                    ->exclude('.phar')
                     ->in($tmp),
             ),
         );

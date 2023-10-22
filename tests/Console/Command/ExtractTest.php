@@ -99,6 +99,7 @@ class ExtractTest extends CommandTestCase
         );
 
         $expectedSimplePharFiles = [
+            '.phar/stub.php' => $oldDefaultPharStub,
             '.hidden' => 'baz',
             'foo' => 'bar',
             '.phar_meta.json' => $pharMeta->toJson(),
@@ -118,6 +119,7 @@ class ExtractTest extends CommandTestCase
             yield 'GZ compressed simple PHAR' => [
                 self::FIXTURES_DIR.'/gz-compressed-phar.phar',
                 [
+                    '.phar/stub.php' => $oldDefaultPharStub,
                     '.hidden' => 'baz',
                     'foo' => 'bar',
                     '.phar_meta.json' => (new PharMeta(
@@ -149,6 +151,7 @@ class ExtractTest extends CommandTestCase
         yield 'sha512 signed PHAR' => [
             self::FIXTURES_DIR.'/sha512.phar',
             [
+                '.phar/stub.php' => $sha512Stub,
                 'index.php' => <<<'PHP'
                     <?php echo "Hello, world!\n";
 
@@ -177,6 +180,7 @@ class ExtractTest extends CommandTestCase
         yield 'OpenSSL signed PHAR' => [
             self::FIXTURES_DIR.'/openssl.phar',
             [
+                '.phar/stub.php' => $sha512Stub,
                 'index.php' => <<<'PHP'
                     <?php echo "Hello, world!\n";
 
