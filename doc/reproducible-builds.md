@@ -136,7 +136,7 @@ This is obviously not ideal and should be fixed by Box at some point (see https:
 <br />
 <hr />
 
-« [Symfony support](symfony.md#symfony-support) • [FAQ](faq.md#faq) »
+« [Symfony support](symfony.md#symfony-support) • [PHAR signing best practicies](phar-signing.md#phar-signing-best-practices) »
 
 
 [banner]: ./configuration.md#banner-banner
