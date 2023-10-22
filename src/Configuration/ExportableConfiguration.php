@@ -23,10 +23,8 @@ use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\SplFileInfo as SymfonySplFileInfo;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
-use function array_flip;
 use function array_map;
 use function iter\values;
-use function KevinGH\Box\get_phar_signing_algorithms;
 use function sort;
 use const SORT_STRING;
 
@@ -84,7 +82,7 @@ final class ExportableConfiguration
             $configuration->promptForPrivateKey(),
             $configuration->getReplacements(),
             $configuration->getShebang(),
-            array_flip(get_phar_signing_algorithms())[$configuration->getSigningAlgorithm()],
+            $configuration->getSigningAlgorithm()->name,
             $configuration->getStubBannerContents(),
             $normalizePath($configuration->getStubBannerPath()),
             $normalizePath($configuration->getStubPath()),

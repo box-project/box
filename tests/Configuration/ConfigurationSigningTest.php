@@ -16,7 +16,8 @@ namespace KevinGH\Box\Configuration;
 
 use Fidry\FileSystem\FS;
 use InvalidArgumentException;
-use Phar;
+use KevinGH\Box\Phar\SigningAlgorithm;
+use UnexpectedValueException;
 use function array_unshift;
 use function in_array;
 use const DIRECTORY_SEPARATOR;
@@ -33,7 +34,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
 {
     public function test_the_default_signing_is_sha1(): void
     {
-        self::assertSame(Phar::SHA1, $this->config->getSigningAlgorithm());
+        self::assertSame(SigningAlgorithm::SHA1, $this->config->getSigningAlgorithm());
 
         self::assertNull($this->config->getPrivateKeyPath());
         self::assertNull($this->config->getPrivateKeyPassphrase());
@@ -69,7 +70,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
     /**
      * @dataProvider passFileFreeSigningAlgorithmProvider
      */
-    public function test_the_signing_algorithm_can_be_configured(string $algorithm, int $expected): void
+    public function test_the_signing_algorithm_can_be_configured(string $algorithm, SigningAlgorithm $expected): void
     {
         $this->setConfig([
             'algorithm' => $algorithm,
@@ -85,18 +86,15 @@ class ConfigurationSigningTest extends ConfigurationTestCase
 
     public function test_the_signing_algorithm_provided_must_be_valid(): void
     {
-        try {
-            $this->setConfig([
-                'algorithm' => 'INVALID',
-            ]);
+        $this->expectExceptionObject(
+            new UnexpectedValueException(
+                'The signing algorithm "INVALID" is not supported by your current PHAR version.',
+            ),
+        );
 
-            self::fail('Expected exception to be thrown.');
-        } catch (InvalidArgumentException $exception) {
-            self::assertSame(
-                'Expected one of: "MD5", "SHA1", "SHA256", "SHA512", "OPENSSL". Got: "INVALID"',
-                $exception->getMessage(),
-            );
-        }
+        $this->setConfig([
+            'algorithm' => 'INVALID',
+        ]);
     }
 
     public function test_the_openssl_algorithm_requires_a_private_key(): void
@@ -302,9 +300,9 @@ class ConfigurationSigningTest extends ConfigurationTestCase
 
     public static function passFileFreeSigningAlgorithmProvider(): iterable
     {
-        yield ['MD5', Phar::MD5];
-        yield ['SHA1', Phar::SHA1];
-        yield ['SHA256', Phar::SHA256];
-        yield ['SHA512', Phar::SHA512];
+        yield ['MD5', SigningAlgorithm::MD5];
+        yield ['SHA1', SigningAlgorithm::SHA1];
+        yield ['SHA256', SigningAlgorithm::SHA256];
+        yield ['SHA512', SigningAlgorithm::SHA512];
     }
 }
