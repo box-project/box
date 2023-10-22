@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
+use Closure;
 use DateTimeImmutable;
 use Fidry\Console\Input\IO;
 use KevinGH\Box\NotInstantiable;
@@ -28,6 +29,7 @@ use function array_sum;
 use function count;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\format_size as format_size1;
+use function KevinGH\Box\noop;
 use function key;
 use function round;
 use function Safe\filesize;
@@ -43,6 +45,27 @@ final class PharInfoRenderer
     use NotInstantiable;
 
     private const INDENT_SIZE = 2;
+
+    public static function renderShortSummary(
+        PharInfo $pharInfo,
+        IO $io,
+        ?Closure $separator = null,
+    ): void {
+        $separator ??= noop();
+
+        $methods = [
+            self::renderCompression(...),
+            self::renderSignature(...),
+            self::renderMetadata(...),
+            self::renderTimestamp(...),
+            self::renderContentsSummary(...),
+        ];
+
+        foreach ($methods as $method) {
+            $method($pharInfo, $io);
+            $separator();
+        }
+    }
 
     public static function renderVersion(PharInfo $pharInfo, IO $io): void
     {
