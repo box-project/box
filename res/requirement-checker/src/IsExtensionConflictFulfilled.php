@@ -1,7 +1,7 @@
 <?php
 
 declare (strict_types=1);
-namespace HumbugBox440\KevinGH\RequirementChecker;
+namespace HumbugBox450\KevinGH\RequirementChecker;
 
 use function extension_loaded;
 final class IsExtensionConflictFulfilled implements IsFulfilled
