@@ -36,21 +36,21 @@ final class Requirement
             $packageName,
             null === $packageName
                 ? sprintf(
-                    'The application requires a version matching "%s".',
+                    'This application requires a PHP version matching "%s".',
                     $requiredPhpVersion,
                 )
                 : sprintf(
-                    'The package "%s" requires a version matching "%s".',
+                    'The package "%s" requires a PHP version matching "%s".',
                     $packageName,
                     $requiredPhpVersion,
                 ),
             null === $packageName
                 ? sprintf(
-                    'The application requires a version matching "%s".',
+                    'This application requires a PHP version matching "%s".',
                     $requiredPhpVersion,
                 )
                 : sprintf(
-                    'The package "%s" requires a version matching "%s".',
+                    'The package "%s" requires a PHP version matching "%s".',
                     $packageName,
                     $requiredPhpVersion,
                 ),
@@ -65,7 +65,7 @@ final class Requirement
             $packageName,
             null === $packageName
                 ? sprintf(
-                    'The application requires the extension "%s".',
+                    'This application requires the extension "%s".',
                     $extension,
                 )
                 : sprintf(
@@ -75,7 +75,7 @@ final class Requirement
                 ),
             null === $packageName
                 ? sprintf(
-                    'The application requires the extension "%s". You either need to enable it or request the application to be shipped with a polyfill for this extension.',
+                    'This application requires the extension "%s". You either need to enable it or request the application to be shipped with a polyfill for this extension.',
                     $extension,
                 )
                 : sprintf(
@@ -94,7 +94,7 @@ final class Requirement
             $packageName,
             null === $packageName
                 ? sprintf(
-                    'The application conflicts with the extension "%s".',
+                    'This application conflicts with the extension "%s".',
                     $extension,
                 )
                 : sprintf(
@@ -104,7 +104,7 @@ final class Requirement
                 ),
             null === $packageName
                 ? sprintf(
-                    'The application conflicts with the extension "%s". You need to disable it in order to run this application.',
+                    'This application conflicts with the extension "%s". You need to disable it in order to run this application.',
                     $extension,
                 )
                 : sprintf(
