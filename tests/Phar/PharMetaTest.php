@@ -413,7 +413,7 @@ final class PharMetaTest extends TestCase
                         null,
                         null,
                         null,
-                        1680284660,
+                        1680317060,
                         null,
                         [
                             'sample.txt' => [
