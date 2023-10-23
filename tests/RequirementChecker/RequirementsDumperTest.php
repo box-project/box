@@ -135,16 +135,16 @@ class RequirementsDumperTest extends TestCase
                     'type' => 'php',
                     'condition' => '^7.4',
                     'source' => 'acme/foo',
-                    'message' => 'The package "acme/foo" requires a version matching "^7.4".',
-                    'helpMessage' => 'The package "acme/foo" requires a version matching "^7.4".',
+                    'message' => 'The package "acme/foo" requires a PHP version matching "^7.4".',
+                    'helpMessage' => 'The package "acme/foo" requires a PHP version matching "^7.4".',
                   ),
                   1 =>
                   array (
                     'type' => 'extension',
                     'condition' => 'zlib',
                     'source' => NULL,
-                    'message' => 'The application requires the extension "zlib".',
-                    'helpMessage' => 'The application requires the extension "zlib". You either need to enable it or request the application to be shipped with a polyfill for this extension.',
+                    'message' => 'This application requires the extension "zlib".',
+                    'helpMessage' => 'This application requires the extension "zlib". You either need to enable it or request the application to be shipped with a polyfill for this extension.',
                   ),
                   2 =>
                   array (

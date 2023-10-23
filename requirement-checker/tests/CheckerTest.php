@@ -154,8 +154,8 @@ class CheckerTest extends TestCase
 
             $requirements->addRequirement(
                 new ConditionIsFulfilled(),
-                'The application requires the version "7.2.0" or greater.',
-                'The application requires the version "7.2.0" or greater. Got "7.2.2"',
+                'This application requires the PHP version "7.2.0" or greater.',
+                'This application requires the PHP version "7.2.0" or greater. Got "7.2.2"',
             );
             $requirements->addRequirement(
                 new class() implements IsFulfilled {
@@ -182,7 +182,7 @@ class CheckerTest extends TestCase
                       /path/to/php.ini
 
                     > Checking Box requirements:
-                      ✔ The application requires the version "7.2.0" or greater.
+                      ✔ This application requires the PHP version "7.2.0" or greater.
                       ✔ The package "acme/foo" requires the extension "random".
 
 
@@ -199,8 +199,8 @@ class CheckerTest extends TestCase
 
             $requirements->addRequirement(
                 new ConditionIsFulfilled(),
-                'The application requires the version "7.2.0" or greater. Got "7.2.2"',
-                'The application requires the version "7.2.0" or greater.'
+                'This application requires the PHP version "7.2.0" or greater. Got "7.2.2"',
+                'This application requires the PHP version "7.2.0" or greater.'
             );
             $requirements->addRequirement(
                 new ConditionIsFulfilled(),
@@ -239,8 +239,8 @@ class CheckerTest extends TestCase
 
                 $requirements->addRequirement(
                     new ConditionIsFulfilled(),
-                    'The application requires the version "7.2.0" or greater. Got "7.2.2"',
-                    'The application requires the version "7.2.0" or greater.'
+                    'This application requires the PHP version "7.2.0" or greater. Got "7.2.2"',
+                    'This application requires the PHP version "7.2.0" or greater.'
                 );
                 $requirements->addRequirement(
                     new ConditionIsFulfilled(),
@@ -262,8 +262,8 @@ class CheckerTest extends TestCase
 
             $requirements->addRequirement(
                 new ConditionIsFulfilled(),
-                'The application requires the version "7.2.0" or greater. Got "7.2.2"',
-                'The application requires the version "7.2.0" or greater.'
+                'This application requires the PHP version "7.2.0" or greater. Got "7.2.2"',
+                'This application requires the PHP version "7.2.0" or greater.'
             );
             $requirements->addRequirement(
                 new ConditionIsNotFulfilled(),
@@ -285,7 +285,7 @@ class CheckerTest extends TestCase
                       /path/to/php.ini
 
                     > Checking Box requirements:
-                      ✔ The application requires the version "7.2.0" or greater. Got "7.2.2"
+                      ✔ This application requires the PHP version "7.2.0" or greater. Got "7.2.2"
                       ✘ The package "acme/foo" requires the extension "random".
 
 
@@ -309,8 +309,8 @@ class CheckerTest extends TestCase
 
                 $requirements->addRequirement(
                     new ConditionIsFulfilled(),
-                    'The application requires the version "7.2.0" or greater. Got "7.2.2"',
-                    'The application requires the version "7.2.0" or greater.'
+                    'This application requires the PHP version "7.2.0" or greater. Got "7.2.2"',
+                    'This application requires the PHP version "7.2.0" or greater.'
                 );
                 $requirements->addRequirement(
                     new ConditionIsNotFulfilled(),
@@ -355,8 +355,8 @@ class CheckerTest extends TestCase
 
             $requirements->addRequirement(
                 new ConditionIsFulfilled(),
-                'The application requires the version "7.2.0" or greater. Got "7.2.2"',
-                'The application requires the version "7.2.0" or greater.'
+                'This application requires the PHP version "7.2.0" or greater. Got "7.2.2"',
+                'This application requires the PHP version "7.2.0" or greater.'
             );
             $requirements->addRequirement(
                 new ConditionIsNotFulfilled(),

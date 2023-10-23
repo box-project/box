@@ -31,8 +31,8 @@ final class RequirementTest extends TestCase
             'type' => 'php',
             'condition' => '^8.2',
             'source' => null,
-            'message' => 'The application requires a version matching "^8.2".',
-            'helpMessage' => 'The application requires a version matching "^8.2".',
+            'message' => 'This application requires a PHP version matching "^8.2".',
+            'helpMessage' => 'This application requires a PHP version matching "^8.2".',
         ];
 
         $actual = $requirement->toArray();
@@ -49,8 +49,8 @@ final class RequirementTest extends TestCase
             'type' => 'php',
             'condition' => '^8.2',
             'source' => 'box/test',
-            'message' => 'The package "box/test" requires a version matching "^8.2".',
-            'helpMessage' => 'The package "box/test" requires a version matching "^8.2".',
+            'message' => 'The package "box/test" requires a PHP version matching "^8.2".',
+            'helpMessage' => 'The package "box/test" requires a PHP version matching "^8.2".',
         ];
 
         $actual = $requirement->toArray();
@@ -67,8 +67,8 @@ final class RequirementTest extends TestCase
             'type' => 'extension',
             'condition' => 'mbstring',
             'source' => null,
-            'message' => 'The application requires the extension "mbstring".',
-            'helpMessage' => 'The application requires the extension "mbstring". You either need to enable it or request the application to be shipped with a polyfill for this extension.',
+            'message' => 'This application requires the extension "mbstring".',
+            'helpMessage' => 'This application requires the extension "mbstring". You either need to enable it or request the application to be shipped with a polyfill for this extension.',
         ];
 
         $actual = $requirement->toArray();
@@ -103,8 +103,8 @@ final class RequirementTest extends TestCase
             'type' => 'extension-conflict',
             'condition' => 'mbstring',
             'source' => null,
-            'message' => 'The application conflicts with the extension "mbstring".',
-            'helpMessage' => 'The application conflicts with the extension "mbstring". You need to disable it in order to run this application.',
+            'message' => 'This application conflicts with the extension "mbstring".',
+            'helpMessage' => 'This application conflicts with the extension "mbstring". You need to disable it in order to run this application.',
         ];
 
         $actual = $requirement->toArray();
