@@ -35,6 +35,7 @@ use KevinGH\Box\Composer\IncompatibleComposerVersion;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\Logger\CompilerLogger;
 use KevinGH\Box\Console\MessageRenderer;
+use KevinGH\Box\Cyclonedx\ManifestFactory;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\RequirementChecker\DecodedComposerJson;
@@ -64,6 +65,7 @@ use function KevinGH\Box\check_php_settings;
 use function KevinGH\Box\disable_parallel_processing;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\format_time;
+use function KevinGH\Box\get_box_version;
 use function memory_get_peak_usage;
 use function memory_get_usage;
 use function microtime;
@@ -267,6 +269,7 @@ final class Compile implements CommandAware
         $main = self::registerMainScript($config, $box, $logger);
 
         $check = self::registerRequirementsChecker($config, $box, $logger);
+        self::addSbom($config, $box, $logger);
 
         self::addFiles($config, $box, $logger, $io);
 
@@ -577,6 +580,36 @@ final class Compile implements CommandAware
         }
 
         return true;
+    }
+
+    private static function addSbom(Configuration $config, Box $box, CompilerLogger $logger): void
+    {
+        // TODO: add base on the config
+//        if (false === $config->checkRequirements()) {
+//            $logger->log(
+//                CompilerLogger::QUESTION_MARK_PREFIX,
+//                'Skip requirements checker',
+//            );
+//
+//            return false;
+//        }
+
+        $logger->log(
+            CompilerLogger::QUESTION_MARK_PREFIX,
+            'Adding the SBOM',
+        );
+
+        $manifestFactory = ManifestFactory::create(
+            // TODO: check if we don't already get the version somewhere else... Might be worth caching it otherwise
+            get_box_version(),
+        );
+
+        $sbom = $manifestFactory->generate(
+            $config->getDecodedComposerJsonContents() ?? [],
+            $config->getDecodedComposerLockContents() ?? [],
+        );
+
+        $box->addFile('.box/sbom.json', $sbom, true);
     }
 
     private static function registerStub(

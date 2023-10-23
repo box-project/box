@@ -26,6 +26,7 @@
         "amphp/parallel-functions": "^1.1",
         "composer/semver": "^3.3.2",
         "composer/xdebug-handler": "^3.0.3",
+        "cyclonedx/cyclonedx-php-composer": "^4.2",
         "fidry/console": "^0.5.3 || ^0.6.0",
         "fidry/filesystem": "^1.1",
         "humbug/php-scoper": "^0.18.3",
@@ -98,7 +99,8 @@
         "allow-plugins": {
             "bamarni/composer-bin-plugin": true,
             "composer/package-versions-deprecated": false,
-            "ergebnis/composer-normalize": true
+            "ergebnis/composer-normalize": true,
+            "cyclonedx/cyclonedx-php-composer": false
         },
         "platform": {
             "php": "8.1"
