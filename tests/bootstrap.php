@@ -27,3 +27,5 @@ $binBoxPath = Path::normalize(__DIR__.'/../bin/box');
 
 $_SERVER['BOX_BIN'] = $_ENV['BOX_BIN'] = $binBoxPath;
 putenv('BOX_BIN='.$binBoxPath);
+// Some tests depend on timezone: https://github.com/php/php-src/issues/12532
+putenv('TZ=GMT-2');
