@@ -415,7 +415,7 @@ final class PharMetaTest extends TestCase
                     null,
                     [
                         'sample.txt' => [
-                        'compression' => CompressionAlgorithm::GZ,
+                            'compression' => CompressionAlgorithm::GZ,
                             'compressedSize' => 15,
                         ],
                     ],
