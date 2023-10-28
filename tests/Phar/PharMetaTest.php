@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Phar;
 
-use KevinGH\Box\Platform;
 use Phar;
 use PHPUnit\Framework\TestCase;
 use function rtrim;
@@ -403,45 +402,25 @@ final class PharMetaTest extends TestCase
         }
 
         if (extension_loaded('zlib')) {
-            yield 'ZIP compressed simple tar' => Platform::isOSX()
-                ? [
-                    self::FIXTURES_DIR.'/../phar/simple.zip',
+            yield 'ZIP compressed simple tar' => [
+                self::FIXTURES_DIR.'/../phar/simple.zip',
+                null,
+                new PharMeta(
+                    CompressionAlgorithm::NONE,
                     null,
-                    new PharMeta(
-                        CompressionAlgorithm::NONE,
-                        null,
-                        null,
-                        null,
-                        null,
-                        1680284660,
-                        null,
-                        [
-                            'sample.txt' => [
-                                'compression' => CompressionAlgorithm::GZ,
-                                'compressedSize' => 15,
-                            ],
-                        ],
-                    ),
-                ]
-                : [
-                    self::FIXTURES_DIR.'/../phar/simple.zip',
                     null,
-                    new PharMeta(
-                        CompressionAlgorithm::NONE,
-                        null,
-                        null,
-                        null,
-                        null,
-                        1680291860,
-                        null,
-                        [
-                            'sample.txt' => [
-                                'compression' => CompressionAlgorithm::GZ,
-                                'compressedSize' => 15,
-                            ],
+                    null,
+                    null,
+                    1680284660,
+                    null,
+                    [
+                        'sample.txt' => [
+                            'compression' => CompressionAlgorithm::GZ,
+                            'compressedSize' => 15,
                         ],
-                    ),
-                ];
+                    ],
+                ),
+            ];
         }
 
         if (extension_loaded('bz2')) {
