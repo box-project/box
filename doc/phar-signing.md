@@ -90,7 +90,7 @@ there is ways to void the signature:
 
 - Injects code _before_ the stub, then this code will be executed before the signature check. The signature check can
   still fail if the signature was not adjusted, but this might be too late.
-- Replace the signature used. An OpenSSL one will only make it slightly harder as this require to change an external
+- Replace the signature used. An OpenSSL one will only make it slightly harder as this requires to change an external
   file (the public key), but in the context the attacker could inject code to the PHAR this is unlikely to be a real
   prevention measure.
 
