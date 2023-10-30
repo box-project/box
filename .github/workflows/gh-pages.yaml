@@ -19,7 +19,7 @@ env:
 
 jobs:
     deploy:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-latest
         name: Deploy website
         permissions:
             contents: write
