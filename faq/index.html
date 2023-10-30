@@ -746,7 +746,7 @@
                   
 
 
-<h1 id="faq">FAQ</h1>
+<h1 id="faq">FAQ<a class="headerlink" href="#faq" title="Permanent link">&para;</a></h1>
 <ol>
 <li><a href="#what-is-the-canonical-way-to-write-a-cli-entry-file">What is the canonical way to write a CLI entry file?</a></li>
 <li><a href="#the-shebang">The shebang</a></li>
@@ -755,7 +755,7 @@
 <li><a href="#detecting-that-you-are-inside-a-phar">Detecting that you are inside a PHAR</a></li>
 <li><a href="#building-a-phar-with-box-as-a-dependency">Building a PHAR with Box as a dependency</a></li>
 </ol>
-<h2 id="what-is-the-canonical-way-to-write-a-cli-entry-file">What is the canonical way to write a CLI entry file?</h2>
+<h2 id="what-is-the-canonical-way-to-write-a-cli-entry-file">What is the canonical way to write a CLI entry file?<a class="headerlink" href="#what-is-the-canonical-way-to-write-a-cli-entry-file" title="Permanent link">&para;</a></h2>
 <p>A conventional CLI entry file looks like this (see bellow for further explanations):</p>
 <div class="highlight"><pre><span></span><code><span class="x">#!/usr/bin/env php</span>
 <span class="cp">&lt;?php</span>
@@ -795,16 +795,16 @@
 
 <span class="c1">// Execute the application</span>
 </code></pre></div>
-<h3 id="the-shebang">The shebang</h3>
+<h3 id="the-shebang">The shebang<a class="headerlink" href="#the-shebang" title="Permanent link">&para;</a></h3>
 <p>The shebang <code>#!/usr/bin/env php</code> is required to the auto-detection of the type of the script. This allows to use it as
 follows:</p>
-<div class="highlight"><pre><span></span><code>$<span class="w"> </span>chmod<span class="w"> </span>+x<span class="w"> </span>bin/acme.php
-$<span class="w"> </span>./bin/acme.php
-$<span class="w"> </span>php<span class="w"> </span>bin/acme.php<span class="w"> </span><span class="c1"># still works</span>
+<div class="highlight"><pre><span></span><code>chmod<span class="w"> </span>+x<span class="w"> </span>bin/acme.php
+./bin/acme.php
+php<span class="w"> </span>bin/acme.php<span class="w"> </span><span class="c1"># still works</span>
 <span class="c1"># Without the shebang line, you can only use the latter</span>
 </code></pre></div>
 <p>In other words it is not necessary, but a nice to have if you want to make your file executable.</p>
-<h3 id="the-php_sapi-check">The PHP_SAPI check</h3>
+<h3 id="the-php_sapi-check">The PHP_SAPI check<a class="headerlink" href="#the-php_sapi-check" title="Permanent link">&para;</a></h3>
 <p>For PHP, available SAPIs are: Apache2 (mod_php), FPM, CGI, FastCGI and CLI. There is a few other variants but those are
 the most commons ones. For more information, see the <a href="https://www.php.net/manual/en/function.php-sapi-name.php">official PHP doc</a>.</p>
 <p>So the following:</p>
@@ -821,7 +821,7 @@ so prevents you to have to worry about web-server related vulnerabilities such a
 <li><code>phpdbg</code> when executing PHP with <a href="https://www.php.net/manual/en/intro.phpdbg.php">PHPDBG</a></li>
 <li><code>embed</code> if you compile the PHP/ZE into another program</li>
 </ul>
-<h3 id="autoloading-composer">Autoloading Composer</h3>
+<h3 id="autoloading-composer">Autoloading Composer<a class="headerlink" href="#autoloading-composer" title="Permanent link">&para;</a></h3>
 <p>When developing a CLI application, you generally only need to worry about your local autoloader:</p>
 <div class="highlight"><pre><span></span><code><span class="x">include_once __DIR__.&#39;/../vendor/autoload.php&#39;;</span>
 </code></pre></div>
@@ -832,12 +832,12 @@ location:</p>
 <p>In either cases however, it could be the autoloader file is missing (e.g. if the dependencies are not installed yet).
 So it is wise to wrap them in a <code>file_exist()</code> check and provide a user-friendly error when no autoloader could be
 found.</p>
-<h2 id="detecting-that-you-are-inside-a-phar">Detecting that you are inside a PHAR</h2>
+<h2 id="detecting-that-you-are-inside-a-phar">Detecting that you are inside a PHAR<a class="headerlink" href="#detecting-that-you-are-inside-a-phar" title="Permanent link">&para;</a></h2>
 <p>The easiest way to know if your script is executed from within a PHAR is to run the following:</p>
 <div class="highlight"><pre><span></span><code><span class="x">$isInPhar = &#39;&#39; !== Phar::running(false);</span>
 </code></pre></div>
 <p>See <a href="https://www.php.net/manual/en/phar.running.php">Phar::running()</a> for more information.</p>
-<h2 id="building-a-phar-with-box-as-a-dependency">Building a PHAR with Box as a dependency</h2>
+<h2 id="building-a-phar-with-box-as-a-dependency">Building a PHAR with Box as a dependency<a class="headerlink" href="#building-a-phar-with-box-as-a-dependency" title="Permanent link">&para;</a></h2>
 <p>If you need to include Box as part of your dependencies and include it within your PHAR, you will probably encounter
 the following issue when building your PHAR:</p>
 <div class="highlight"><pre><span></span><code>Could not dump the autoloader.
@@ -865,6 +865,8 @@ to be excluded (as it becomes an empty directory). To circumvent that, you will 
             </div>
           
           
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
         </div>
         
           <button type="button" class="md-top md-icon" data-md-component="top" hidden>
@@ -918,7 +920,7 @@ to be excluded (as it becomes an empty directory). To circumvent that, you will 
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link", "navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
       <script src="../assets/javascripts/bundle.aecac24b.min.js"></script>

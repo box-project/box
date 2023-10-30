@@ -1286,7 +1286,7 @@
                   
 
 
-<h1 id="configuration">Configuration</h1>
+<h1 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h1>
 <ol>
 <li><a href="#base-path-base-path">Base path</a></li>
 <li><a href="#main-main">Main</a></li>
@@ -1388,12 +1388,12 @@ to <code>null</code>, then its default value will be picked and is strictly equi
 <span class="w">    </span><span class="nt">&quot;stub&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="base-path-base-path">Base-path (<code>base-path</code>)</h2>
+<h2 id="base-path-base-path">Base-path (<code>base-path</code>)<a class="headerlink" href="#base-path-base-path" title="Permanent link">&para;</a></h2>
 <p>The <code>base-path</code> (<code>string</code>|<code>null</code>) setting is used to specify where all of the relative file paths should resolve to.
 This does not, however, alter where the built PHAR will be stored (see: <code>output</code>).</p>
 <p>If set to <code>null</code> or not specified, the base path used is the directory containing the configuration file when a specific
 configuration file is given or the current working directory otherwise.</p>
-<h2 id="main-main">Main (<code>main</code>)</h2>
+<h2 id="main-main">Main (<code>main</code>)<a class="headerlink" href="#main-main" title="Permanent link">&para;</a></h2>
 <p>The main (<code>string</code>|<code>false</code>|<code>null</code>) setting is used to specify the file (relative to <a href="#base-path-base-path"><code>base-path</code></a>) that will
 be run when the PHAR is executed from the command line (To not confuse with the <a href="#stub">stub</a> which is the PHAR
 bootstrapping file).</p>
@@ -1410,16 +1410,16 @@ will fallback on the <a href="https://secure.php.net/manual/en/class.phar.php">P
 <p>The main file contents is processed by the <a href="#compactors-compactors">compactors</a> as the other files. </p>
 <p>If the main file starts with a shebang line (<code>#!</code>), it will be automatically removed (the shebang line goes in the
 <a href="#stub">stub</a> for a PHAR and is configured by the <a href="#shebang-shebang">shebang</a> setting).</p>
-<h2 id="output-output">Output (<code>output</code>)</h2>
+<h2 id="output-output">Output (<code>output</code>)<a class="headerlink" href="#output-output" title="Permanent link">&para;</a></h2>
 <p>The output (<code>string</code>|<code>null</code>) setting specifies the file name and path of the newly built PHAR. If the value of the
 setting is not an absolute path, the path will be relative to the base path.</p>
 <p>If not provided or set to <code>null</code>, the default value used will based on the <a href="#main-main"><code>main</code></a>. For example if the main file
 is <code>bin/acme.php</code> or <code>bin/acme</code> then the output will be <code>bin/acme.phar</code>.</p>
-<h2 id="permissions-chmod">Permissions (<code>chmod</code>)</h2>
+<h2 id="permissions-chmod">Permissions (<code>chmod</code>)<a class="headerlink" href="#permissions-chmod" title="Permanent link">&para;</a></h2>
 <p>The chmod (<code>string</code>|<code>null</code>) setting is used to change the file permissions of the newly built PHAR. The string contains
 an octal value e.g. <code>0750</code>. By default the permissions of the created PHAR are unchanged so it should be <code>0644</code>.</p>
 <p>Check the following <a href="https://secure.php.net/manual/en/function.chmod.php">link</a> for more on the possible values.</p>
-<h2 id="check-requirements-check-requirements">Check requirements (<code>check-requirements</code>)</h2>
+<h2 id="check-requirements-check-requirements">Check requirements (<code>check-requirements</code>)<a class="headerlink" href="#check-requirements-check-requirements" title="Permanent link">&para;</a></h2>
 <p>The check requirements setting (<code>boolean</code>|<code>null</code>, default <code>true</code>) is used to allow the PHAR to check for the application
 constraint before running. See more information about it <a href="../requirement-checker/#requirements-checker">here</a>. If not set or set to <code>null</code>, then
 the requirement checker will be added. Note that this is true only if either the <code>composer.json</code>  or <code>composer.lock</code>
@@ -1430,7 +1430,7 @@ could have been found.</p>
 due to the compression algorithm is not loaded, a hard failure will still appear: the requirement 
 checker <em>cannot</em> be executed before that.</p>
 </div>
-<h2 id="including-files">Including files</h2>
+<h2 id="including-files">Including files<a class="headerlink" href="#including-files" title="Permanent link">&para;</a></h2>
 <p>There is two ways to include files. The first one is to not be picky about which files are shipped in the PHAR. If you
 omit any of the following options, <em>all</em> the files found. The base directory used to find the files is either the
 configuration file if one is used/specified or the current working directory otherwise. The <a href="#blacklist-blacklist"><code>blacklist</code></a>
@@ -1452,13 +1452,13 @@ or directory from a dev dependency, you can do so by adding it via one of the fo
 <p>binary files are added <em>before</em> regular files. As a result if a file is found in both regular files and
 binary files, the regular file will take precedence.</p>
 </div>
-<h3 id="force-auto-discovery-force-autodiscovery">Force auto-discovery (<code>force-autodiscovery</code>)</h3>
+<h3 id="force-auto-discovery-force-autodiscovery">Force auto-discovery (<code>force-autodiscovery</code>)<a class="headerlink" href="#force-auto-discovery-force-autodiscovery" title="Permanent link">&para;</a></h3>
 <p>The <code>force-autodiscovery</code> (<code>bool</code> default <code>false</code>) setting forces Box to attempt to find which files to include even
 though you are using the <a href="#directories-directories-and-directories-bin"><code>directories</code></a> or <a href="#finder-finder-and-finder-bin"><code>finder</code></a> setting.</p>
 <p>When Box tries to find which files to include, it may remove some files such as readmes or test files. If however you
 are using the <a href="#directories-directories-and-directories-bin"><code>directories</code></a> or <a href="#finder-finder-and-finder-bin"><code>finder</code></a>, Box will <em>append</em> the found files to the ones you 
 listed.</p>
-<h3 id="files-files-and-files-bin">Files (<code>files</code> and <code>files-bin</code>)</h3>
+<h3 id="files-files-and-files-bin">Files (<code>files</code> and <code>files-bin</code>)<a class="headerlink" href="#files-files-and-files-bin" title="Permanent link">&para;</a></h3>
 <p>The <code>files</code> (<code>string[]</code>|<code>null</code> default <code>[]</code>) setting is a list of files paths relative to <a href="#base-path-base-path"><code>base-path</code></a>
 unless absolute. Each file will be processed by the <a href="#compactors-compactors">compactors</a>, have their placeholder values replaced
 (see: <a href="#replaceable-placeholders"><code>replacements</code></a>) and added to the PHAR.</p>
@@ -1470,7 +1470,7 @@ such as images, those that contain binary data or simply a file you do not want 
 <p class="admonition-title">Warning</p>
 <p>Symlinks are not followed/supported.</p>
 </div>
-<h3 id="directories-directories-and-directories-bin">Directories (<code>directories</code> and <code>directories-bin</code>)</h3>
+<h3 id="directories-directories-and-directories-bin">Directories (<code>directories</code> and <code>directories-bin</code>)<a class="headerlink" href="#directories-directories-and-directories-bin" title="Permanent link">&para;</a></h3>
 <p>The directories (<code>string[]</code>|<code>null</code> default <code>[]</code>) setting is a list of directory paths relative to
 <a href="#base-path-base-path"><code>base-path</code></a>. All files will be processed by the <a href="#compactors-compactors">compactors</a>, have their placeholder values
 replaced (see: <a href="#replaceable-placeholders"><code>replacements</code></a>) and added to the PHAR.</p>
@@ -1500,7 +1500,7 @@ are a union of the directives.</p>
 <p class="admonition-title">Warning</p>
 <p>Symlinks are not followed/supported.</p>
 </div>
-<h3 id="finder-finder-and-finder-bin">Finder (<code>finder</code> and <code>finder-bin</code>)</h3>
+<h3 id="finder-finder-and-finder-bin">Finder (<code>finder</code> and <code>finder-bin</code>)<a class="headerlink" href="#finder-finder-and-finder-bin" title="Permanent link">&para;</a></h3>
 <p>The finder (<code>object[]</code>|<code>null</code> default <code>[]</code>) setting is a list of JSON objects. Each object (key, value) tuple is a
 (method, arguments) of the <a href="https://symfony.com/doc/current//components/finder.html">Symfony Finder</a> used by Box. If an array of values is provided for a single
 key, the method will be called once per value in the array.</p>
@@ -1546,7 +1546,7 @@ are a union of the directives.</p>
 <span class="w">    </span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
-<h3 id="blacklist-blacklist">Blacklist (<code>blacklist</code>)</h3>
+<h3 id="blacklist-blacklist">Blacklist (<code>blacklist</code>)<a class="headerlink" href="#blacklist-blacklist" title="Permanent link">&para;</a></h3>
 <p>The <code>blacklist</code> (<code>string[]</code>|<code>null</code> default <code>[]</code>) setting is a list of files that must not be added. The files
 blacklisted are the ones found using the other available configuration settings: <a href="#files-files-and-files-bin"><code>files</code></a>, <a href="#files-files-and-files-bin"><code>files-bin</code></a>,
 <a href="#directories-directories-and-directories-bin"><code>directories</code></a>, <a href="#directories-directories-and-directories-bin"><code>directories-bin</code></a>, <a href="#finder-finder-and-finder-bin"><code>finder</code></a>, <a href="#finder-finder-and-finder-bin"><code>finder-bin</code></a>.</p>
@@ -1581,11 +1581,11 @@ and `B/A resulting in the following files being collected:</p>
     └── B01
 </code></pre></div>
 <p>If you want a more granular blacklist leverage, use the <a href="#finder-finder-and-finder-bin">Finders configuration</a> instead.</p>
-<h3 id="excluding-the-composer-files-exclude-composer-files">Excluding the Composer files (<code>exclude-composer-files</code>)</h3>
+<h3 id="excluding-the-composer-files-exclude-composer-files">Excluding the Composer files (<code>exclude-composer-files</code>)<a class="headerlink" href="#excluding-the-composer-files-exclude-composer-files" title="Permanent link">&para;</a></h3>
 <p>The <code>exclude-composer-files</code> (<code>boolean</code>|<code>null</code>, default <code>true</code>) setting will result in removing the Composer files
 <code>composer.json</code>, <code>composer.lock</code> and <code>vendor/composer/installed.json</code> if they are found regardless of whether or not
 they were found by Box alone or explicitly included.</p>
-<h3 id="excluding-dev-files-exclude-dev-files">Excluding dev files (<code>exclude-dev-files</code>)</h3>
+<h3 id="excluding-dev-files-exclude-dev-files">Excluding dev files (<code>exclude-dev-files</code>)<a class="headerlink" href="#excluding-dev-files-exclude-dev-files" title="Permanent link">&para;</a></h3>
 <p>The <code>exclude-dev-files</code> (<code>bool</code> default <code>true</code>) setting will, when enabled, cause Box to attempt to exclude the files
 belonging to dev only packages. For example for the given project:</p>
 <details>
@@ -1608,7 +1608,7 @@ disabled, the <code>bamarni/composer-bin-plugin</code> package will be removed f
 <p>This setting will automatically be disabled when <a href="#dumping-the-composer-autoloader-dump-autoload"><code>dump-autoload</code></a> is disabled. Indeed, otherwise some
 files will not be shipped in the PHAR but may still appear in the Composer autoload classmap, resulting in an 
 autoloading error. </p>
-<h3 id="map-map">Map (<code>map</code>)</h3>
+<h3 id="map-map">Map (<code>map</code>)<a class="headerlink" href="#map-map" title="Permanent link">&para;</a></h3>
 <p>The map (<code>object[]</code> default <code>[]</code>) setting is used to change where some (or all) files are stored inside the PHAR. The key
 is a beginning of the relative path that will be matched against the file being added to the PHAR. If the key is a
 match, the matched segment will be replaced with the value. If the key is empty, the value will be prefixed to all paths
@@ -1633,11 +1633,11 @@ match, the matched segment will be replaced with the value. If the key is empty,
 <li><code>src/Test/some/other.php</code></li>
 <li><code>src/Another/my/test/another.php</code></li>
 </ul>
-<h2 id="stub">Stub</h2>
+<h2 id="stub">Stub<a class="headerlink" href="#stub" title="Permanent link">&para;</a></h2>
 <p>The <a href="https://secure.php.net/manual/en/phar.fileformat.stub.php">PHAR stub</a> file is the PHAR bootstrapping file, i.e. the very first file executed whenever
 the PHAR is executed. It usually contains things like the PHAR configuration and executing the <a href="#main-main">main script file</a>.</p>
 <p>The default PHAR stub file can be used but Box also propose a couple of options to customize the stub used. </p>
-<h3 id="stub-stub">Stub (<code>stub</code>)</h3>
+<h3 id="stub-stub">Stub (<code>stub</code>)<a class="headerlink" href="#stub-stub" title="Permanent link">&para;</a></h3>
 <p>The stub (<code>string</code>|<code>boolean</code>|<code>null</code> default <code>true</code>) setting is used to specify the location of a stub file or if one
 should be generated:
 - <code>string</code>: Path to the stub file will be used as is inside the PHAR
@@ -1645,16 +1645,16 @@ should be generated:
 - <code>false</code>: The default stub used by the PHAR class will be used</p>
 <p>If a custom stub file is provided, none of the other options (<a href="#shebang-shebang"><code>shebang</code></a>, <a href="#intercept-intercept"><code>intercept</code></a> and
 <a href="#alias-alias"><code>alias</code></a>) are used.</p>
-<h3 id="shebang-shebang">Shebang (<code>shebang</code>)</h3>
+<h3 id="shebang-shebang">Shebang (<code>shebang</code>)<a class="headerlink" href="#shebang-shebang" title="Permanent link">&para;</a></h3>
 <p>The shebang (<code>string</code>|<code>false</code>|<code>null</code>) setting is used to specify the shebang line used when generating a new stub. By
 default, this line is used:</p>
 <div class="highlight"><pre><span></span><code>#!/usr/bin/env php
 </code></pre></div>
 <p>The shebang line can be removed altogether if set to <code>false</code>.</p>
-<h3 id="intercept-intercept">Intercept (<code>intercept</code>)</h3>
+<h3 id="intercept-intercept">Intercept (<code>intercept</code>)<a class="headerlink" href="#intercept-intercept" title="Permanent link">&para;</a></h3>
 <p>The intercept (<code>boolean</code>|<code>null</code> default <code>false</code>) setting is used when generating a new stub. If setting is set to
 <code>true</code>, the <a href="https://secure.php.net/manual/en/phar.interceptfilefuncs.php">Phar::interceptFileFuncs()</a> method will be called in the stub.</p>
-<h3 id="alias-alias">Alias (<code>alias</code>)</h3>
+<h3 id="alias-alias">Alias (<code>alias</code>)<a class="headerlink" href="#alias-alias" title="Permanent link">&para;</a></h3>
 <p>The <code>alias</code> (<code>string</code>|<code>null</code>) setting is used when generating a new stub to call the <a href="https://secure.php.net/manual/en/phar.mapphar.php"><code>Phar::mapPhar()</code></a>.
 This makes it easier to refer to files in the PHAR and ensure the access to internal files will always work regardless
 of the location of the PHAR on the file system.</p>
@@ -1731,7 +1731,7 @@ might be an issue can be illustrated with box itself. For its end-to-end test, t
 <p>If an alias <code>box-alias.phar</code> was registered for both for example, the building would fail. Indeed when building the second
 PHAR, the first PHAR is loaded which loads the alias <code>box-alias.phar</code>. When creating the second PHAR, box would try to
 register the alias <code>box-alias.phar</code> to that new PHAR but as the alias is already used, an error will be thrown.</p>
-<h3 id="banner-banner">Banner (<code>banner</code>)</h3>
+<h3 id="banner-banner">Banner (<code>banner</code>)<a class="headerlink" href="#banner-banner" title="Permanent link">&para;</a></h3>
 <p>The banner (<code>string</code>|<code>string[]</code>|<code>false</code>|<code>null</code>) setting is the banner comment that will be used when a new stub is
 generated. The value of this setting must not already be enclosed within a comment block as it will be automatically
 done for you.</p>
@@ -1766,12 +1766,12 @@ done for you.</p>
 </code></pre></div>
 <p>By default, the Box banner is used. If set to <code>false</code>, no banner at all will be used.</p>
 <p>The content of this value is discarded if <a href="#banner-file-banner-file"><code>banner-file</code></a> is set.</p>
-<h3 id="banner-file-banner-file">Banner file (<code>banner-file</code>)</h3>
+<h3 id="banner-file-banner-file">Banner file (<code>banner-file</code>)<a class="headerlink" href="#banner-file-banner-file" title="Permanent link">&para;</a></h3>
 <p>The banner-file (<code>string</code>|<code>null</code> ignored by default) setting is like banner, except it is a path (relative to
 <a href="#base-path-base-path">the base path</a>) to the file that will contain the comment.</p>
 <p>Like banner, the comment must not already be enclosed in a comment block.</p>
 <p>If this parameter is set to a different value than <code>null</code>, then the value of <a href="#banner-banner"><code>banner</code></a> will be discarded.</p>
-<h2 id="dumping-the-composer-autoloader-dump-autoload">Dumping the Composer autoloader (<code>dump-autoload</code>)</h2>
+<h2 id="dumping-the-composer-autoloader-dump-autoload">Dumping the Composer autoloader (<code>dump-autoload</code>)<a class="headerlink" href="#dumping-the-composer-autoloader-dump-autoload" title="Permanent link">&para;</a></h2>
 <p>The <code>dump-autoload</code> (<code>boolean</code>|<code>null</code>, default <code>true</code>) setting will result in Box dump the Composer autoload with the
 <a href="https://getcomposer.org/doc/articles/autoloader-optimization.md#optimization-level-2-a-authoritative-class-maps">classmap authoritative mode</a> and the <a href="https://getcomposer.org/doc/03-cli.md#dump-autoload-dumpautoload-"><code>--no-dev</code> option</a> which
 disables the <code>autoload-dev</code> rules. This is however done only if a <code>composer.json</code> file could be found. If a
@@ -1779,7 +1779,7 @@ disables the <code>autoload-dev</code> rules. This is however done only if a <co
 <p>The dumping of the autoloader will be <em>ignored</em> if the <code>composer.json</code> file could not be found.</p>
 <p>The autoloader is dumped at the end of the process to ensure it will take into account the eventual modifications done
 by the <a href="#compactors-compactors">compactors</a> process.</p>
-<h2 id="compactors-compactors">Compactors (<code>compactors</code>)</h2>
+<h2 id="compactors-compactors">Compactors (<code>compactors</code>)<a class="headerlink" href="#compactors-compactors" title="Permanent link">&para;</a></h2>
 <p>The compactors (<code>string[]</code>|<code>null</code> default <code>[]</code>) setting is a list of file contents compacting classes that must be
 registered. A file compacting class is used to reduce the size of a specific file type. The following is a simple
 example:</p>
@@ -1812,7 +1812,7 @@ example:</p>
 </ul>
 <p>The effects of the <a href="#compactors-compactors">compactors</a> and <a href="#replaceable-placeholders">replacement values</a> can be tested with the <code>process</code>
 command ✨.</p>
-<h3 id="annotations-annotations">Annotations (<code>annotations</code>)</h3>
+<h3 id="annotations-annotations">Annotations (<code>annotations</code>)<a class="headerlink" href="#annotations-annotations" title="Permanent link">&para;</a></h3>
 <p>The annotations (<code>boolean</code>|<code>object</code>|<code>null</code> default <code>true</code>) setting is used to enable compacting annotations in PHP source
 code. </p>
 <p>This setting is only taken into consideration if the <a href="#compactors-compactors"><code>KevinGH\Box\Compactor\Php</code> compactor</a> is enabled.</p>
@@ -1886,12 +1886,12 @@ code and the code bundled in the PHAR.</p>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h3 id="php-scoper-php-scoper">PHP-Scoper (<code>php-scoper</code>)</h3>
+<h3 id="php-scoper-php-scoper">PHP-Scoper (<code>php-scoper</code>)<a class="headerlink" href="#php-scoper-php-scoper" title="Permanent link">&para;</a></h3>
 <p>The PHP-Scoper setting (<code>string</code>|<code>null</code> default <code>scoper.inc.php</code>) points to the path to the
 <a href="https://github.com/humbug/php-scoper#configuration">PHP-Scoper configuration</a> file. For more documentation regarding PHP-Scoper, you can head to
 <a href="../code-isolation/#phar-code-isolation">PHAR code isolation</a> or <a href="https://github.com/humbug/php-scoper">PHP-Scoper official documentation</a>.</p>
 <p>Note that this setting is used only if the compactor <code>KevinGH\Box\Compactor\PhpScoper</code> is registered.</p>
-<h2 id="compression-algorithm-compression">Compression algorithm (<code>compression</code>)</h2>
+<h2 id="compression-algorithm-compression">Compression algorithm (<code>compression</code>)<a class="headerlink" href="#compression-algorithm-compression" title="Permanent link">&para;</a></h2>
 <p>The compression (<code>string</code>|<code>null</code> default <code>'NONE'</code>) setting is the compression algorithm to use when the PHAR is built. The
 compression affects the individual files within the PHAR and not the PHAR as a whole
 (<a href="https://secure.php.net/manual/en/phar.compress.php"><code>Phar::compressFiles()</code></a>). The following is a list of the signature algorithms available:</p>
@@ -1906,8 +1906,8 @@ compression affects the individual files within the PHAR and not the PHAR as a w
 <code>GZ</code> and <a href="https://secure.php.net/manual/en/book.bzip2.php"><code>bz2</code></a> for <code>BZ2</code>) to execute the PHAR. Without it, PHP will <em>not</em> be able to open the PHAR
 at all.</p>
 </div>
-<h2 id="security">Security</h2>
-<h3 id="signing-algorithm-algorithm">Signing algorithm (<code>algorithm</code>)</h3>
+<h2 id="security">Security<a class="headerlink" href="#security" title="Permanent link">&para;</a></h2>
+<h3 id="signing-algorithm-algorithm">Signing algorithm (<code>algorithm</code>)<a class="headerlink" href="#signing-algorithm-algorithm" title="Permanent link">&para;</a></h3>
 <p>The algorithm (<code>string</code>|<code>null</code> default <code>SHA1</code>) setting is the signing algorithm to use when the PHAR is built
 (<a href="https://secure.php.net/manual/en/phar.setsignaturealgorithm.php"><code>Phar::setSignatureAlgorithm()</code></a>). The following is a list of the signature algorithms
 available:</p>
@@ -1916,21 +1916,26 @@ available:</p>
 <li><code>SHA1</code></li>
 <li><code>SHA256</code></li>
 <li><code>SHA512</code></li>
-<li><code>OPENSSL</code></li>
+<li><code>OPENSSL</code> (deprecated)</li>
 </ul>
-<p>By default PHARs are <code>SHA1</code> signed.</p>
+<p>By default, PHARs are <code>SHA1</code> signed.</p>
 <p>The <code>OPENSSL</code> algorithm will require to provide <a href="#the-private-key-key">a key</a>. </p>
-<h3 id="the-private-key-key">The private key (<code>key</code>)</h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The OpenSSL signature has been deprecated as of Box 4.4.0. If you are wondering why check out
+<a href="../phar-signing/#phar-signing-best-practices">the signing best practices</a>.</p>
+</div>
+<h3 id="the-private-key-key">The private key (<code>key</code>)<a class="headerlink" href="#the-private-key-key" title="Permanent link">&para;</a></h3>
 <p>The key (<code>string</code>|<code>null</code> default <code>null</code>) setting is used to specify the path to the private key file. The private key file
 will be used to sign the PHAR using the <code>OPENSSL</code> signature algorithm (see <a href="#signing-algorithm-algorithm">Signing algorithm</a>) and the
 setting will be completely ignored otherwise. If an absolute path is not provided, the path will be relative to the
 current working directory.</p>
-<h3 id="the-private-key-password-key-pass">The private key password (<code>key-pass</code>)</h3>
+<h3 id="the-private-key-password-key-pass">The private key password (<code>key-pass</code>)<a class="headerlink" href="#the-private-key-password-key-pass" title="Permanent link">&para;</a></h3>
 <p>The private key password  (<code>string</code>|<code>boolean</code>|<code>null</code> default <code>null</code>) setting is used to specify the pass-phrase for the
 private key. If a string is provided, it will be used as is as the pass-phrase. If <code>true</code> is provided, you will be
 prompted for the passphrase unless you are not in an interactive environment.</p>
 <p>This setting will be ignored if no <a href="#the-private-key-key">key</a> has been provided.</p>
-<h2 id="metadata-metadata">Metadata (<code>metadata</code>)</h2>
+<h2 id="metadata-metadata">Metadata (<code>metadata</code>)<a class="headerlink" href="#metadata-metadata" title="Permanent link">&para;</a></h2>
 <p>The metadata (<code>any</code> default none) setting can be any value. This value will be stored as metadata that can be retrieved
 from the built PHAR (<a href="https://secure.php.net/manual/en/phar.getmetadata.php">Phar::getMetadata()</a>).</p>
 <p>If you specify a callable (as a string), it will be evaluated without any arguments.</p>
@@ -1951,7 +1956,10 @@ from the built PHAR (<a href="https://secure.php.net/manual/en/phar.getmetadata.
 <span class="p">}</span>
 </code></pre></div>
 <p>Then the <code>Phar::getMetadata()</code> will return <code>['application_version' =&gt; '1.0.0-dev']</code> array.</p>
-<p><strong>CAUTION</strong>: Your callable function must be readable by your autoloader.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Your callable function must be readable by your autoloader.</p>
+</div>
 <p>That means, for Composer, in previous example, we require to have such kind of declaration in your <code>composer.json</code> file.</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;autoload&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -1959,7 +1967,7 @@ from the built PHAR (<a href="https://secure.php.net/manual/en/phar.getmetadata.
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="replaceable-placeholders">Replaceable placeholders</h2>
+<h2 id="replaceable-placeholders">Replaceable placeholders<a class="headerlink" href="#replaceable-placeholders" title="Permanent link">&para;</a></h2>
 <p>This feature allows you to set placeholders in your code which will be replaced by different values by Box when building
 the PHAR.</p>
 <p>For example, if you take the following code:</p>
@@ -1995,7 +2003,7 @@ which you can find bellow, but you can also specify any replacement value via th
 <a href="#replacements-replacements"><code>replacements</code> setting</a>.</p>
 <p>The effects of the <a href="#compactors-compactors">compactors</a> and <a href="#replaceable-placeholders">replacement values</a> can be tested with the <code>process</code>
 command ✨.</p>
-<h3 id="replacements-replacements">Replacements (<code>replacements</code>)</h3>
+<h3 id="replacements-replacements">Replacements (<code>replacements</code>)<a class="headerlink" href="#replacements-replacements" title="Permanent link">&para;</a></h3>
 <p>The replacements (<code>object</code>|<code>null</code>, default <code>{}</code>) setting is a map of placeholders (as keys) and their values. The
 placeholders are replaced in all <a href="#including-files">non-binary files</a> with the specified values.</p>
 <p>For example:</p>
@@ -2007,20 +2015,20 @@ placeholders are replaced in all <a href="#including-files">non-binary files</a>
 </code></pre></div>
 <p>Will result in the string <code>@foo@</code> in your code to be replaced by <code>'bar'</code>. The delimiter <code>@</code> being the
 <a href="#replacement-sigil-replacement-sigil">sigil</a>.</p>
-<h3 id="replacement-sigil-replacement-sigil">Replacement sigil (<code>replacement-sigil</code>)</h3>
+<h3 id="replacement-sigil-replacement-sigil">Replacement sigil (<code>replacement-sigil</code>)<a class="headerlink" href="#replacement-sigil-replacement-sigil" title="Permanent link">&para;</a></h3>
 <p>The replacement sigil (<code>string</code>|<code>null</code> default <code>@</code>) is the character or chain of characters used to delimit the
 placeholders. See the @<a href="#replacements-replacements">replacements</a> setting for examples of placeholders.</p>
-<h3 id="datetime-placeholder-datetime">Datetime placeholder (<code>datetime</code>)</h3>
+<h3 id="datetime-placeholder-datetime">Datetime placeholder (<code>datetime</code>)<a class="headerlink" href="#datetime-placeholder-datetime" title="Permanent link">&para;</a></h3>
 <p>The datetime (<code>string</code>|<code>null</code> default <code>null</code>) setting is the name of a placeholder value that will be replaced in all
 <a href="#including-files">non-binary files</a> by the current datetime. If no value is given (<code>null</code>) then this placeholder will
 be ignored.</p>
 <p>Example value the placeholder will be replaced with: <code>2015-01-28 14:55:23 CEST</code></p>
 <p>The format of the date used is defined by the <a href="#datetime-placeholder-format-datetime-format"><code>datetime-format</code> setting</a>.</p>
-<h3 id="datetime-placeholder-format-datetime-format">Datetime placeholder format (<code>datetime-format</code>)</h3>
+<h3 id="datetime-placeholder-format-datetime-format">Datetime placeholder format (<code>datetime-format</code>)<a class="headerlink" href="#datetime-placeholder-format-datetime-format" title="Permanent link">&para;</a></h3>
 <p>The datetime format placeholder (<code>string</code>|<code>null</code>, default <code>Y-m-d H:i:s T</code>) setting accepts a valid
 <a href="https://secure.php.net/manual/en/function.date.php">PHP date format</a>. It can be used to change the format for the
 <a href="#datetime-placeholder-datetime"><code>datetime</code></a> setting.</p>
-<h3 id="pretty-git-tag-placeholder-git">Pretty git tag placeholder (<code>git</code>)</h3>
+<h3 id="pretty-git-tag-placeholder-git">Pretty git tag placeholder (<code>git</code>)<a class="headerlink" href="#pretty-git-tag-placeholder-git" title="Permanent link">&para;</a></h3>
 <p>The git tag placeholder (<code>string</code>|<code>null</code> default <code>null</code>) setting is the name of a placeholder value that will be replaced
 in all <a href="#including-files">non-binary files</a> by the current git tag of the repository.</p>
 <p>Example of value the placeholder will be replaced with:</p>
@@ -2028,15 +2036,15 @@ in all <a href="#including-files">non-binary files</a> by the current git tag of
 <li><code>2.0.0</code> on an exact tag match</li>
 <li><code>2.0.0@e558e33</code> on a commit following a tag</li>
 </ul>
-<h3 id="git-commit-placeholder-git-commit">Git commit placeholder (<code>git-commit</code>)</h3>
+<h3 id="git-commit-placeholder-git-commit">Git commit placeholder (<code>git-commit</code>)<a class="headerlink" href="#git-commit-placeholder-git-commit" title="Permanent link">&para;</a></h3>
 <p>The git commit (<code>string</code>|<code>null</code> default <code>null</code>) setting is the name of a placeholder value that will be replaced in all
 <a href="#including-files">non-binary files</a> by the current git commit hash of the repository.</p>
 <p>Example of value the placeholder will be replaced with: <code>e558e335f1d165bc24d43fdf903cdadd3c3cbd03</code></p>
-<h3 id="short-git-commit-placeholder-git-commit-short">Short git commit placeholder (<code>git-commit-short</code>)</h3>
+<h3 id="short-git-commit-placeholder-git-commit-short">Short git commit placeholder (<code>git-commit-short</code>)<a class="headerlink" href="#short-git-commit-placeholder-git-commit-short" title="Permanent link">&para;</a></h3>
 <p>The short git commit (<code>string</code>|<code>null</code> default <code>null</code>) setting is the name of a placeholder value that will be replaced in
 all <a href="#including-files">non-binary files</a> by the current git short commit hash of the repository.</p>
 <p>Example of value the placeholder will be replaced with: <code>e558e33</code></p>
-<h3 id="git-tag-placeholder-git-tag">Git tag placeholder (<code>git-tag</code>)</h3>
+<h3 id="git-tag-placeholder-git-tag">Git tag placeholder (<code>git-tag</code>)<a class="headerlink" href="#git-tag-placeholder-git-tag" title="Permanent link">&para;</a></h3>
 <p>The git tag placeholder (<code>string</code>|<code>null</code> default <code>null</code>) setting is the name of a placeholder value that will be replaced
 in all <a href="#including-files">non-binary files</a> by the current git tag of the repository.</p>
 <p>Example of value the placeholder will be replaced with:</p>
@@ -2044,7 +2052,7 @@ in all <a href="#including-files">non-binary files</a> by the current git tag of
 <li><code>2.0.0</code> on an exact tag match</li>
 <li><code>2.0.0-2-ge558e33</code> on a commit following a tag</li>
 </ul>
-<h3 id="git-version-placeholder-git-version">Git version placeholder (<code>git-version</code>)</h3>
+<h3 id="git-version-placeholder-git-version">Git version placeholder (<code>git-version</code>)<a class="headerlink" href="#git-version-placeholder-git-version" title="Permanent link">&para;</a></h3>
 <p>The git version (<code>string</code>|<code>null</code> default <code>null</code>) setting is the name of a placeholder value that will be replaced in all
 <a href="#including-files">non-binary files</a> by the one of the following (in order):</p>
 <ul>
@@ -2066,6 +2074,8 @@ in all <a href="#including-files">non-binary files</a> by the current git tag of
             </div>
           
           
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
         </div>
         
           <button type="button" class="md-top md-icon" data-md-component="top" hidden>
@@ -2119,7 +2129,7 @@ in all <a href="#including-files">non-binary files</a> by the current git tag of
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link", "navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
       <script src="../assets/javascripts/bundle.aecac24b.min.js"></script>

@@ -694,13 +694,13 @@
                   
 
 
-<h1 id="phar-code-isolation">PHAR code isolation</h1>
+<h1 id="phar-code-isolation">PHAR code isolation<a class="headerlink" href="#phar-code-isolation" title="Permanent link">&para;</a></h1>
 <ol>
 <li><a href="#whyexplanation">Why/Explanation</a></li>
 <li><a href="#isolating-the-phar">Isolating the PHAR</a></li>
 <li><a href="#debugging-the-scoping">Debugging the scoping</a></li>
 </ol>
-<h2 id="whyexplanation">Why/Explanation</h2>
+<h2 id="whyexplanation">Why/Explanation<a class="headerlink" href="#whyexplanation" title="Permanent link">&para;</a></h2>
 <p>When bundling the code in a PHAR, it is equivalent to compacting all the code in a single file. However unlike in a 
 compiled language, the code does not change. This, when the PHAR <em>loads</em> external code, can lead to dependency
 conflicts.</p>
@@ -726,7 +726,7 @@ be from the wrong class!</strong></p>
   that the application is booting</li>
 <li>A piece of code that can be mixed with any code, such as a Wordpress plugin</li>
 </ul>
-<h2 id="isolating-the-phar">Isolating the PHAR</h2>
+<h2 id="isolating-the-phar">Isolating the PHAR<a class="headerlink" href="#isolating-the-phar" title="Permanent link">&para;</a></h2>
 <p>Box provides an integration with <a href="https://github.com/humbug/php-scoper">PHP-Scoper</a>. To use it, <a href="../configuration/#compactors-compactors">enable the <code>KevinGH\Box\Compactor\PhpScoper</code>
 compactor</a>.</p>
 <p>If you need an extra configuration for PHP-Scoper, you can create a <code>scoper.inc.php</code> file as
@@ -735,7 +735,7 @@ files to scope are already collected by Box.</p>
 <p>And that's it!</p>
 <p>Warning: keep in mind however that scoping is a very brittle process due to the nature of PHP. As such you will likely 
 need some adjustments in your code or the configuration.</p>
-<h2 id="debugging-the-scoping">Debugging the scoping</h2>
+<h2 id="debugging-the-scoping">Debugging the scoping<a class="headerlink" href="#debugging-the-scoping" title="Permanent link">&para;</a></h2>
 <p>As mentioned above, unless you have a very boring and predictable code (which is a good thing!), due to how dynamic
 PHP is, scoping will almost guaranteed never work on the first and will require adjustments. To help with the process,
 there is two recommendations:</p>
@@ -762,6 +762,8 @@ there is two recommendations:</p>
             </div>
           
           
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
         </div>
         
           <button type="button" class="md-top md-icon" data-md-component="top" hidden>
@@ -815,7 +817,7 @@ there is two recommendations:</p>
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link", "navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
       <script src="../assets/javascripts/bundle.aecac24b.min.js"></script>

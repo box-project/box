@@ -708,7 +708,7 @@
                   
 
 
-<h1 id="symfony-support">Symfony support</h1>
+<h1 id="symfony-support">Symfony support<a class="headerlink" href="#symfony-support" title="Permanent link">&para;</a></h1>
 <ol>
 <li><a href="#project-files">Project files</a></li>
 <li><a href="#project-directory">Project directory</a></li>
@@ -719,13 +719,13 @@
 <code>fixtures/build/dir018</code> (Symfony6 with the Runtime component).</p>
 <p>They may slightly vary to what you want to do since they are here for testing purposes, but they should be good enough
 to show-case a working scenario if this doc does not prove to be enough.</p>
-<h2 id="project-files">Project files</h2>
+<h2 id="project-files">Project files<a class="headerlink" href="#project-files" title="Permanent link">&para;</a></h2>
 <p>When working with a Symfony project, you usually have a few files that are necessary for the application to work but
 cannot be inferred from Composer. A non-exhaustive list: <code>.env</code>, <code>public</code>, <code>config</code>, <code>var</code>.</p>
 <p>As a result, you will likely need to add them via <code>directories</code>, <code>files</code> or their <code>*-bin</code> variant which may force you
 to use the <code>force-autodiscovery</code> setting. For more information you can find check the <a href="../configuration/#including-files">Including files</a>
 doc.</p>
-<h2 id="project-directory">Project directory</h2>
+<h2 id="project-directory">Project directory<a class="headerlink" href="#project-directory" title="Permanent link">&para;</a></h2>
 <p>Symfony 5.1+ defines the "project dir" as the directory where the composer.json file is. Because box deletes it during PHAR compilation, you need to redefine it in your Kernel. It is usually located in <code>src/Kernel.php</code> and can be defined as follow: </p>
 <div class="highlight"><pre><span></span><code><span class="cp">&lt;?php</span>
 
@@ -738,7 +738,7 @@ doc.</p>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="cache">Cache</h2>
+<h2 id="cache">Cache<a class="headerlink" href="#cache" title="Permanent link">&para;</a></h2>
 <p>What makes Symfony a bit special for shipping it into a PHAR is its compilation step. Indeed, the Symfony container can
 be dumped depending on multiple parameters such the application environment, whether it is in debug mode or not and if
 the cache is fresh.</p>
@@ -752,7 +752,7 @@ prevent the issue, you need to make sure of the following:</p>
 <ul>
 <li>Create the <code>.env.local.php</code> file by running the following command:</li>
 </ul>
-<div class="highlight"><pre><span></span><code>$ composer dump-env prod
+<div class="highlight"><pre><span></span><code>composer<span class="w"> </span>dump-env<span class="w"> </span>prod
 </code></pre></div>
 <p>This will ensure when loading the variables that your application is in production mode.</p>
 <ul>
@@ -787,7 +787,7 @@ prevent the issue, you need to make sure of the following:</p>
 <li>Trigger the auto-scripts, which includes the cache warming phase, on the Composer dump-autoload event</li>
 </ul>
 <p>This last part takes advantage of Box <a href="../configuration/#dumping-the-composer-autoloader-dump-autoload">dumping the autoloader</a> by default.</p>
-<h2 id="runtime-component">Runtime component</h2>
+<h2 id="runtime-component">Runtime component<a class="headerlink" href="#runtime-component" title="Permanent link">&para;</a></h2>
 <p>If you are using <a href="https://symfony.com/doc/current/components/runtime.html"><code>symfony/runtime</code></a>, you may end up into some errors (see https://github.com/symfony/symfony/issues/49443).</p>
 <p>To fix the issue, you need to create your own <code>autoload_runtime.template</code> file, for example:</p>
 <div class="highlight"><pre><span></span><code><span class="cp">&lt;?php</span>
@@ -843,6 +843,8 @@ this in order to fix the problem.</p>
             </div>
           
           
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
         </div>
         
           <button type="button" class="md-top md-icon" data-md-component="top" hidden>
@@ -896,7 +898,7 @@ this in order to fix the problem.</p>
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link", "navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
       <script src="../assets/javascripts/bundle.aecac24b.min.js"></script>

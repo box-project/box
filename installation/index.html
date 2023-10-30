@@ -722,7 +722,7 @@
                   
 
 
-<h1 id="installation">Installation</h1>
+<h1 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h1>
 <ol>
 <li><a href="#phar">PHAR</a></li>
 <li><a href="#phive">Phive</a></li>
@@ -730,54 +730,54 @@
 <li><a href="#homebrew">Homebrew</a></li>
 <li><a href="#github">GitHub</a></li>
 </ol>
-<h2 id="phar">PHAR</h2>
+<h2 id="phar">PHAR<a class="headerlink" href="#phar" title="Permanent link">&para;</a></h2>
 <p>The preferred method of installation is to use the Box PHAR which can be downloaded from the most recent
 <a href="https://github.com/humbug/box/releases">Github Release</a>. This method ensures you will not have any dependency conflict issue.</p>
-<h2 id="phive">Phive</h2>
+<h2 id="phive">Phive<a class="headerlink" href="#phive" title="Permanent link">&para;</a></h2>
 <p>You can install Box with <a href="https://github.com/phar-io/phive">Phive</a></p>
-<div class="highlight"><pre><span></span><code>$<span class="w"> </span>phive<span class="w"> </span>install<span class="w"> </span>humbug/box
+<div class="highlight"><pre><span></span><code>phive<span class="w"> </span>install<span class="w"> </span>humbug/box
 </code></pre></div>
 <p>To upgrade <code>box</code> use the following command:</p>
-<div class="highlight"><pre><span></span><code>$<span class="w"> </span>phive<span class="w"> </span>update<span class="w"> </span>humbug/box
+<div class="highlight"><pre><span></span><code>phive<span class="w"> </span>update<span class="w"> </span>humbug/box
 </code></pre></div>
-<h2 id="composer">Composer</h2>
+<h2 id="composer">Composer<a class="headerlink" href="#composer" title="Permanent link">&para;</a></h2>
 <p>You can install Box with <a href="https://getcomposer.org">Composer</a>:</p>
-<div class="highlight"><pre><span></span><code>$<span class="w"> </span>composer<span class="w"> </span>global<span class="w"> </span>require<span class="w"> </span>humbug/box
+<div class="highlight"><pre><span></span><code>composer<span class="w"> </span>global<span class="w"> </span>require<span class="w"> </span>humbug/box
 </code></pre></div>
 <p>If you cannot install it because of a dependency conflict or you prefer to install it for your project, we recommend
 you to take a look at <a href="https://github.com/bamarni/composer-bin-plugin">bamarni/composer-bin-plugin</a>. Example:</p>
-<div class="highlight"><pre><span></span><code>$<span class="w"> </span>composer<span class="w"> </span>require<span class="w"> </span>--dev<span class="w"> </span>bamarni/composer-bin-plugin
-$<span class="w"> </span>composer<span class="w"> </span>bin<span class="w"> </span>box<span class="w"> </span>require<span class="w"> </span>--dev<span class="w"> </span>humbug/box
+<div class="highlight"><pre><span></span><code>composer<span class="w"> </span>require<span class="w"> </span>--dev<span class="w"> </span>bamarni/composer-bin-plugin
+composer<span class="w"> </span>bin<span class="w"> </span>box<span class="w"> </span>require<span class="w"> </span>--dev<span class="w"> </span>humbug/box
 
-$<span class="w"> </span>vendor/bin/box
+vendor/bin/box
 </code></pre></div>
-<h2 id="homebrew">Homebrew</h2>
+<h2 id="homebrew">Homebrew<a class="headerlink" href="#homebrew" title="Permanent link">&para;</a></h2>
 <p>To install box using <a href="https://brew.sh">Homebrew</a>, you need to tap the box formula first</p>
-<div class="highlight"><pre><span></span><code>$<span class="w"> </span>brew<span class="w"> </span>tap<span class="w"> </span>box-project/box
-$<span class="w"> </span>brew<span class="w"> </span>install<span class="w"> </span>box
+<div class="highlight"><pre><span></span><code>brew<span class="w"> </span>tap<span class="w"> </span>box-project/box
+brew<span class="w"> </span>install<span class="w"> </span>box
 </code></pre></div>
 <p>The <code>box</code> command is now available to run from anywhere in the system:</p>
-<div class="highlight"><pre><span></span><code>$<span class="w"> </span>box<span class="w"> </span>-v
+<div class="highlight"><pre><span></span><code>box<span class="w"> </span>-v
 </code></pre></div>
 <p>To upgrade <code>box</code> use the following command:</p>
-<div class="highlight"><pre><span></span><code>$<span class="w"> </span>brew<span class="w"> </span>upgrade<span class="w"> </span>box
+<div class="highlight"><pre><span></span><code>brew<span class="w"> </span>upgrade<span class="w"> </span>box
 </code></pre></div>
-<h2 id="github">GitHub</h2>
+<h2 id="github">GitHub<a class="headerlink" href="#github" title="Permanent link">&para;</a></h2>
 <p>You may download the Box PHAR directly from the <a href="https://github.com/humbug/box/releases">GitHub release</a> directly.
 You should however beware that it is not as secure as downloading it from the other mediums.
 Hence, it is recommended to check the signature when doing so:</p>
-<div class="highlight"><pre><span></span><code># Do adjust the URL based on the latest release
-wget -O box.phar &quot;https://github.com/box-project/box/releases/download/4.4.0/box.phar&quot;
-wget -O box.phar.asc &quot;https://github.com/box-project/box/releases/download/4.4.0/box.phar.asc&quot;
+<div class="highlight"><pre><span></span><code><span class="c1"># Do adjust the URL based on the latest release</span>
+wget<span class="w"> </span>-O<span class="w"> </span>box.phar<span class="w"> </span><span class="s2">&quot;https://github.com/box-project/box/releases/download/4.4.0/box.phar&quot;</span>
+wget<span class="w"> </span>-O<span class="w"> </span>box.phar.asc<span class="w"> </span><span class="s2">&quot;https://github.com/box-project/box/releases/download/4.4.0/box.phar.asc&quot;</span>
 
-# Check that the signature matches
-gpg --verify box.phar.asc box.phar
+<span class="c1"># Check that the signature matches</span>
+gpg<span class="w"> </span>--verify<span class="w"> </span>box.phar.asc<span class="w"> </span>box.phar
 
-# Check the issuer (the ID can also be found from the previous command)
-gpg --keyserver hkps://keys.openpgp.org --recv-keys 41539BBD4020945DB378F98B2DF45277AEF09A2F
+<span class="c1"># Check the issuer (the ID can also be found from the previous command)</span>
+gpg<span class="w"> </span>--keyserver<span class="w"> </span>hkps://keys.openpgp.org<span class="w"> </span>--recv-keys<span class="w"> </span>41539BBD4020945DB378F98B2DF45277AEF09A2F
 
-rm box.phar.asc
-chmod +x box.phar
+rm<span class="w"> </span>box.phar.asc
+chmod<span class="w"> </span>+x<span class="w"> </span>box.phar
 </code></pre></div>
 <p><br /></p>
 <hr />
@@ -793,6 +793,8 @@ chmod +x box.phar
             </div>
           
           
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
         </div>
         
           <button type="button" class="md-top md-icon" data-md-component="top" hidden>
@@ -846,7 +848,7 @@ chmod +x box.phar
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link", "navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
       <script src="../assets/javascripts/bundle.aecac24b.min.js"></script>

@@ -844,19 +844,23 @@
                   
 
 
-<h1 id="phar-signing-best-practices">PHAR signing best practices</h1>
+<h1 id="phar-signing-best-practices">PHAR signing best practices<a class="headerlink" href="#phar-signing-best-practices" title="Permanent link">&para;</a></h1>
 <ol>
-<li><a href="#built-in-phar-api">Built-in PHAR API</a></li>
+<li><a href="#built-in-phar-api">Built-in PHAR API</a><ol>
 <li><a href="#how-to-sign-your-phar">How to sign your PHAR</a></li>
 <li><a href="#how-it-works">How it works</a></li>
 <li><a href="#why-it-is-bad">Why it is bad</a></li>
-<li><a href="#how-to-properly-sign-your-phar">How to (properly) sign your PHAR</a></li>
+</ol>
+</li>
+<li><a href="#how-to-properly-sign-your-phar">How to (properly) sign your PHAR</a><ol>
 <li><a href="#create-a-new-gpg-key">Create a new GPG-key</a></li>
 <li><a href="#manually-signing">Manually signing</a></li>
 <li><a href="#generate-the-encryption-key">Generate the encryption key</a></li>
 <li><a href="#secure-your-encryption-key">Secure your encryption key</a></li>
 <li><a href="#sign-your-phar">Sign your PHAR</a></li>
 <li><a href="#verifying-the-phar-signature">Verifying the PHAR signature</a></li>
+</ol>
+</li>
 <li><a href="#automatically-sign-in-github-actions">Automatically sign in GitHub Actions</a></li>
 </ol>
 <p>There is two idiomatic ways to secure a PHAR:</p>
@@ -865,15 +869,15 @@
 <li>Signing the PHAR as any other generic binary (see <a href="#sign-your-phar">Sign your PHAR</a>).</li>
 </ul>
 <p>This doc entry goal is to show why the first method is to be avoided and how to do it "the right way".</p>
-<h2 id="built-in-phar-api">Built-in PHAR API</h2>
-<h3 id="how-to-sign-your-phar">How to sign your PHAR</h3>
+<h2 id="built-in-phar-api">Built-in PHAR API<a class="headerlink" href="#built-in-phar-api" title="Permanent link">&para;</a></h2>
+<h3 id="how-to-sign-your-phar">How to sign your PHAR<a class="headerlink" href="#how-to-sign-your-phar" title="Permanent link">&para;</a></h3>
 <p>This is how a PHAR can be signed:</p>
 <div class="highlight"><pre><span></span><code><span class="x">// See https://www.php.net/manual/en/phar.setsignaturealgorithm.php</span>
 <span class="x">$phar-&gt;setSignatureAlgorithm($algo, $privateKey);</span>
 </code></pre></div>
 <p>There is various algorithm available. The most "secure" one would be <code>Phar::OPENSSL</code> with an
 OpenSSL private key. For instance:</p>
-<div class="highlight"><pre><span></span><code>$ openssl genrsa -des3 -out acme-phar-private.pem 4096
+<div class="highlight"><pre><span></span><code>openssl<span class="w"> </span>genrsa<span class="w"> </span>-des3<span class="w"> </span>-out<span class="w"> </span>acme-phar-private.pem<span class="w"> </span><span class="m">4096</span>
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><span class="x">// E.g. $privateKeyPath = &#39;acme-phar-private.pem&#39; with the example above</span>
 <span class="x">$privateKey = file_get_contents($privateKeyPath);</span>
@@ -891,7 +895,7 @@ OpenSSL private key. For instance:</p>
 </code></pre></div>
 <p>With the example above, you will end up with two files: your PHAR (e.g. <code>bin/command.phar</code>) and its
 public key (e.g. <code>bin/command.phar.pubkey</code>).</p>
-<h3 id="how-it-works">How it works</h3>
+<h3 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h3>
 <p>To give more background on how PHAR archives are constructed, they are PHP files that contain a mixture of code and
 other binary data. It is analogous to the <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/jar/jarGuide.html">JAR files</a>, and will require PHP to execute the PHARs. The content
 of a PHAR is as follows:</p>
@@ -905,7 +909,7 @@ of a PHAR is as follows:</p>
 <p>When PHP later reads the archive, it can determine the signature and type by reading the end of the archive. This way,
 if the content of the PHAR has been tempered with, e.g. code was injected in the archive, PHP will see that the content
 of the archive does not match the signature of the PHAR and will bail out.</p>
-<h3 id="why-it-is-bad">Why it is bad</h3>
+<h3 id="why-it-is-bad">Why it is bad<a class="headerlink" href="#why-it-is-bad" title="Permanent link">&para;</a></h3>
 <p>There is a few downsides from this signing mechanisms:</p>
 <ul>
 <li>You cannot run the PHAR without its associated public key file laying right next to it. As a result, if you were to
@@ -922,56 +926,58 @@ there is ways to void the signature:</p>
   file (the public key), but in the context the attacker could inject code to the PHAR this is unlikely to be a real
   prevention measure.</li>
 </ul>
-<p>So to conclude, <strong>this security mechanism CANNOT prevent modifications of the archive itself.</strong> It is NOT a reliable
+<p>So to conclude, <strong>this security mechanism CANNOT prevent modifications of the archive itself.</strong> It is <strong>NOT</strong> a reliable
 protection measure.</p>
 <p>The good news, there is a solution.</p>
-<h2 id="how-to-properly-sign-your-phar">How to (properly) sign your PHAR</h2>
-<h3 id="create-a-new-gpg-key">Create a new GPG-key</h3>
+<h2 id="how-to-properly-sign-your-phar">How to (properly) sign your PHAR<a class="headerlink" href="#how-to-properly-sign-your-phar" title="Permanent link">&para;</a></h2>
+<h3 id="create-a-new-gpg-key">Create a new GPG-key<a class="headerlink" href="#create-a-new-gpg-key" title="Permanent link">&para;</a></h3>
 <p>The first step is to create a new GPG-key. You can either do that via a GUI or via the CLI like this:</p>
-<div class="highlight"><pre><span></span><code>$ gpg --gen-key
+<div class="highlight"><pre><span></span><code>gpg<span class="w"> </span>--gen-key
 </code></pre></div>
 <p>It will ask for some questions. It is recommended to use a passphrase (ideally generated and managed by a reputable
 password manager). In the end, you will end up with something like this:</p>
-<div class="highlight"><pre><span></span><code>pub   ed25519 2023-10-21 [SC] [expires: 2026-10-20]
+<div class="highlight"><pre><span></span><code># $ gpg --gen-key output
+pub   ed25519 2023-10-21 [SC] [expires: 2026-10-20]
       96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
 uid                      Théo Fidry &lt;theo.fidry+phar-signing-example@example.com&gt;
 sub   cv25519 2023-10-21 [E] [expires: 2026-10-20]
 </code></pre></div>
 <p>In this case the interesting part is <code>96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08</code> which is the key ID. You can also check
 the list of your GPG keys like so:</p>
-<div class="highlight"><pre><span></span><code>$ gpg --list-secret-keys --keyid-format=long
+<div class="highlight"><pre><span></span><code>gpg<span class="w"> </span>--list-secret-keys<span class="w"> </span>--keyid-format<span class="o">=</span>long
 
-#
-# Other keys displayed too
-#
-sec   ed25519/03B2F4DF7A20DF08 2023-10-21 [SC] [expires: 2026-10-20]
-      96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
-uid                 [ultimate] Théo Fidry &lt;theo.fidry+phar-signing-example@example.com&gt;
-ssb   cv25519/765C0E3CCBC7D7D3 2023-10-21 [E] [expires: 2026-10-20]
+<span class="c1">#</span>
+<span class="c1"># Other keys displayed too</span>
+<span class="c1">#</span>
+sec<span class="w">   </span>ed25519/03B2F4DF7A20DF08<span class="w"> </span><span class="m">2023</span>-10-21<span class="w"> </span><span class="o">[</span>SC<span class="o">]</span><span class="w"> </span><span class="o">[</span>expires:<span class="w"> </span><span class="m">2026</span>-10-20<span class="o">]</span>
+<span class="w">      </span>96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
+uid<span class="w">                 </span><span class="o">[</span>ultimate<span class="o">]</span><span class="w"> </span>Théo<span class="w"> </span>Fidry<span class="w"> </span>&lt;theo.fidry+phar-signing-example@example.com&gt;
+ssb<span class="w">   </span>cv25519/765C0E3CCBC7D7D3<span class="w"> </span><span class="m">2023</span>-10-21<span class="w"> </span><span class="o">[</span>E<span class="o">]</span><span class="w"> </span><span class="o">[</span>expires:<span class="w"> </span><span class="m">2026</span>-10-20<span class="o">]</span>
 </code></pre></div>
-<p>The interesting part is the <code>96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08</code> which is the key-ID.</p>
-<p>To make the key accessible for others we should now send it to a keyserver†.</p>
-<div class="highlight"><pre><span></span><code>$ gpg --keyserver keys.openpgp.org --send-key 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
+<p>Like above, you see the key ID <code>96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08</code>.</p>
+<p>To make the key accessible for others we should now send it to a keyserver<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>.</p>
+<div class="highlight"><pre><span></span><code>gpg<span class="w"> </span>--keyserver<span class="w"> </span>keys.openpgp.org<span class="w"> </span>--send-key<span class="w"> </span>96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
 </code></pre></div>
-<p>†: There is several OpenPGP Keyservers. It is recommended to push your keys to <a href="https://keys.openpgp.org/about">keys.openpgp.org</a> <em>at least</em>, but you
-   can also push it to other servers if you wish to.</p>
 <p>You can also already generate a revocation certificate for the key. Should the key be compromised you can then send the
 revocation certificate to the keyserver to invalidate the signing key.</p>
-<div class="highlight"><pre><span></span><code>$ gpg --output revoke-96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08.asc --gen-revoke 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
+<div class="highlight"><pre><span></span><code>gpg<span class="w"> </span>--output<span class="w"> </span>revoke-96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08.asc<span class="w"> </span>--gen-revoke<span class="w"> </span>96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
 </code></pre></div>
 <p>This will leave you with a revocation certificate in the file <code>revoke-96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08.asc</code> 
 which can be added to your password manager.</p>
-<h3 id="manually-signing">Manually signing</h3>
+<h3 id="manually-signing">Manually signing<a class="headerlink" href="#manually-signing" title="Permanent link">&para;</a></h3>
 <p>For manually signing your PHAR (or any file actually), you will need to have an key containing both your public and
 private GPG key.</p>
-<h3 id="generate-the-encryption-key">Generate the encryption key</h3>
+<h3 id="generate-the-encryption-key">Generate the encryption key<a class="headerlink" href="#generate-the-encryption-key" title="Permanent link">&para;</a></h3>
 <p>In order to use the key to encrypt files, you need to first export it:</p>
-<div class="highlight"><pre><span></span><code>$ gpg --export --armor 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08 &gt; keys.asc
-$ gpg --export-secret-key --armor 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08 &gt;&gt; keys.asc
+<div class="highlight"><pre><span></span><code>gpg<span class="w"> </span>--export<span class="w"> </span>--armor<span class="w"> </span>96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08<span class="w"> </span>&gt;<span class="w"> </span>keys.asc
+gpg<span class="w"> </span>--export-secret-key<span class="w"> </span>--armor<span class="w"> </span>96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08<span class="w"> </span>&gt;&gt;<span class="w"> </span>keys.asc
 </code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
 <p>That will leave the public and private key in a single file. Anyone that has that file can sign on your behalf! So keep
-that file secure at all times and make sure it never accidentally shows up in your git repository!</p>
-<h3 id="secure-your-encryption-key">Secure your encryption key</h3>
+that file secure at all times and make sure it never accidentally shows up in your git repository.</p>
+</div>
+<h3 id="secure-your-encryption-key">Secure your encryption key<a class="headerlink" href="#secure-your-encryption-key" title="Permanent link">&para;</a></h3>
 <p>If your goal is to save this encryption key somewhere, for example your repository, you should first encrypt it:</p>
 <div class="highlight"><pre><span></span><code>gpg --symmetric keys.asc
 </code></pre></div>
@@ -980,69 +986,75 @@ ideally one generated and managed by a password manager.</p>
 <p>This leaves you with a file <code>keys.asc.gpg</code>. You can add this one to the repository and at this point you are probably
 better off <strong>deleting the <code>keys.asc</code> file</strong>. In order to do the actual signing, you will have to decrypt it again, but
 it is better to not keep that decrypted key around. </p>
-<h3 id="sign-your-phar">Sign your PHAR</h3>
+<h3 id="sign-your-phar">Sign your PHAR<a class="headerlink" href="#sign-your-phar" title="Permanent link">&para;</a></h3>
 <p>You first need to encrypt <code>keys.asc.gpg</code> into <code>keys.asc</code>:</p>
-<div class="highlight"><pre><span></span><code># If you are locally:
-$ gpg keys.asc.gpg
-# In another environment: CI or other. You should use an environment variable
-# or a temporary file to avoid printing the password in clear text.
-echo $DECRYPT_KEY_PASSPHRASE | gpg --passphrase-fd 0 keys.asc.gpg
-# or:
-cat $(.decrypt-key-passphrase) | gpg --passphrase-fd 0 keys.asc.gpg
+<div class="highlight"><pre><span></span><code><span class="c1"># If you are locally:</span>
+gpg<span class="w"> </span>keys.asc.gpg
+<span class="c1"># In another environment: CI or other. You should use an environment variable</span>
+<span class="c1"># or a temporary file to avoid printing the password in clear text.</span>
+<span class="nb">echo</span><span class="w"> </span><span class="nv">$DECRYPT_KEY_PASSPHRASE</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>gpg<span class="w"> </span>--passphrase-fd<span class="w"> </span><span class="m">0</span><span class="w"> </span>keys.asc.gpg
+<span class="c1"># or:</span>
+cat<span class="w"> </span><span class="k">$(</span>.decrypt-key-passphrase<span class="k">)</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>gpg<span class="w"> </span>--passphrase-fd<span class="w"> </span><span class="m">0</span><span class="w"> </span>keys.asc.gpg
 </code></pre></div>
 <p>Import the decrypted key if it is not already present on the machine:</p>
-<div class="highlight"><pre><span></span><code>$ gpg --batch --yes --import keys.asc
+<div class="highlight"><pre><span></span><code>gpg<span class="w"> </span>--batch<span class="w"> </span>--yes<span class="w"> </span>--import<span class="w"> </span>keys.asc
 </code></pre></div>
 <p>Sign your file:</p>
-<div class="highlight"><pre><span></span><code>$ gpg \
-   --batch \
-   --passphrase=&quot;$GPG_KEY_96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08_PASSPHRASE&quot; \
-   --local-user 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08 \
-   --armor \
-   --detach-sign \
-   bin/command.phar
-# Do not forget to remove keys.asc afterwards!
+<div class="highlight"><pre><span></span><code>gpg<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--batch<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--passphrase<span class="o">=</span><span class="s2">&quot;</span><span class="nv">$GPG_KEY_96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08_PASSPHRASE</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--local-user<span class="w"> </span>96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--armor<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--detach-sign<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>bin/command.phar
+<span class="c1"># Do not forget to remove keys.asc afterwards!</span>
 </code></pre></div>
 <p>You will now have a file <code>bin/command.phar.asc</code>.</p>
 <p>When publishing your archive, you should publish both <code>bin/command.phar</code> and <code>bin/command.phar.asc</code>.</p>
-<h3 id="verifying-the-phar-signature">Verifying the PHAR signature</h3>
+<h3 id="verifying-the-phar-signature">Verifying the PHAR signature<a class="headerlink" href="#verifying-the-phar-signature" title="Permanent link">&para;</a></h3>
 <p>First you should check the issuer's identity, usually it is provided from where you download it as part of the
 documentation:</p>
 <div class="highlight"><pre><span></span><code># If you are on the same machine as where you created the key, then this step is unnecessary.
 # You will need this however for when verifying a different key that you do not know of yet.
 gpg --keyserver hkps://keys.openpgp.org --recv-keys 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
 </code></pre></div>
-<p>However not everyone expose what is their GPG key ID. So sometimes to avoid bad surprises, you
+<p>However not everyone exposes what is their GPG key ID. So sometimes to avoid bad surprises, you
 can look up for similar issuers to the key ID given by the <code>.asc</code>:</p>
-<div class="highlight"><pre><span></span><code># Verify the signature
-$ gpg --verify bin/command.phar.asc bin/command.phar
+<div class="highlight"><pre><span></span><code><span class="c1"># Verify the signature</span>
+gpg<span class="w"> </span>--verify<span class="w"> </span>bin/command.phar.asc<span class="w"> </span>bin/command.phar
 
-# Example of output:
-gpg: Signature made Sat 21 Oct 16:58:05 2023 CEST
-gpg:                using EDDSA key 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
-gpg: Good signature from &quot;Théo Fidry &lt;theo.fidry+phar-signing-example@example.com&gt;&quot; [ultimate]
+<span class="c1"># Example of output:</span>
+gpg:<span class="w"> </span>Signature<span class="w"> </span>made<span class="w"> </span>Sat<span class="w"> </span><span class="m">21</span><span class="w"> </span>Oct<span class="w"> </span><span class="m">16</span>:58:05<span class="w"> </span><span class="m">2023</span><span class="w"> </span>CEST
+gpg:<span class="w">                </span>using<span class="w"> </span>EDDSA<span class="w"> </span>key<span class="w"> </span>96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
+gpg:<span class="w"> </span>Good<span class="w"> </span>signature<span class="w"> </span>from<span class="w"> </span><span class="s2">&quot;Théo Fidry &lt;theo.fidry+phar-signing-example@example.com&gt;&quot;</span><span class="w"> </span><span class="o">[</span>ultimate<span class="o">]</span>
 </code></pre></div>
 <p>If the key ID was not provided before, you can try to look it up to check it was properly registered to a keyserver:</p>
-<div class="highlight"><pre><span></span><code>$ gpg --keyserver https://keys.openpgp.org --search-keys &quot;theo.fidry+phar-signing-example@example.com&quot;
+<div class="highlight"><pre><span></span><code>gpg<span class="w"> </span>--keyserver<span class="w"> </span>https://keys.openpgp.org<span class="w"> </span>--search-keys<span class="w"> </span><span class="s2">&quot;theo.fidry+phar-signing-example@example.com&quot;</span>
 </code></pre></div>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
 <p>Also note that when dealing with PHARs, the above steps are automatically done for you by <a href="https://phar.io/">PHIVE</a>.</p>
-<h2 id="automatically-sign-in-github-actions">Automatically sign in GitHub Actions</h2>
+</div>
+<h2 id="automatically-sign-in-github-actions">Automatically sign in GitHub Actions<a class="headerlink" href="#automatically-sign-in-github-actions" title="Permanent link">&para;</a></h2>
 <p>The first step is to add <a href="https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions">environment secrets to your repository</a>:</p>
-<div class="highlight"><pre><span></span><code>$ gpg --export-secret-key --armor 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
-# Paste the content into a secret environment variable
+<div class="highlight"><pre><span></span><code>gpg<span class="w"> </span>--export-secret-key<span class="w"> </span>--armor<span class="w"> </span>96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
+<span class="c1"># Paste the content into a secret environment variable</span>
 GPG_KEY_96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
 
-# Add the corresponding passphrase enviroment variable:
+<span class="c1"># Add the corresponding passphrase enviroment variable:</span>
 GPG_KEY_96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08_PASSPHRASE
 </code></pre></div>
-<p>Then you need to:
-- Build your PHAR
-- Import the GPG key
-- Sign your PHAR
-- Publish your PHAR</p>
+<p>Then you need to:</p>
+<ul>
+<li>Build your PHAR</li>
+<li>Import the GPG key</li>
+<li>Sign your PHAR</li>
+<li>Publish your PHAR</li>
+</ul>
 <p>I highly recommend to build your PHAR as part of your regular workflows. Then the other steps can be enable on release
-only. The following is an example of GitHub workflow:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Release</span>
+only. The following is an example of <a href="https://docs.github.com/en/actions/using-workflows">GitHub workflow</a>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># .github/workflows/release.yaml</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Release</span>
 
 <span class="nt">on</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">push</span><span class="p">:</span>
@@ -1128,6 +1140,15 @@ only. The following is an example of GitHub workflow:</p>
 <li><a href="https://github.com/theseer">Arne Blankerts</a></li>
 <li><a href="https://blog.sucuri.net/2017/07/code-injection-in-phar-signed-php-archives.html">Jeff Channell, July 13, 2017, <em>Code Injection in Signed PHP Archives (Phar)</em></a></li>
 </ul>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>There is several OpenPGP Keyservers. It is recommended to push your keys to <a href="https://keys.openpgp.org/about">keys.openpgp.org</a> <em>at least</em>, but you
+can also push it to other servers if you wish to.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
 
 
 
@@ -1138,6 +1159,8 @@ only. The following is an example of GitHub workflow:</p>
             </div>
           
           
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
         </div>
         
           <button type="button" class="md-top md-icon" data-md-component="top" hidden>
@@ -1191,7 +1214,7 @@ only. The following is an example of GitHub workflow:</p>
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link", "navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
       <script src="../assets/javascripts/bundle.aecac24b.min.js"></script>
