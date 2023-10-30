@@ -24,7 +24,7 @@ permissions:
 
 jobs:
     docker-build:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-latest
         name: Publish the Docker image ${{ matrix.name }}
         # See https://github.com/phpstan/phpstan/commit/4a535193101975e50fbaeea92ca6eca8c7a349b1
         concurrency: docker-build-${{ github.ref }}-${{ matrix.docker-file }}

@@ -279,9 +279,9 @@ jobs:
                 run: exit 1
 
     update-requirement-checker:
-        name: "Update the RequirementChecker"
+        name: Update the RequirementChecker
         if: ${{ github.repository == 'box-project/box' && github.ref_name == 'main' }}
-        runs-on: "ubuntu-latest"
+        runs-on: ubuntu-latest
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3
