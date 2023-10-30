@@ -372,11 +372,12 @@ A more complete real-life example can be found in the [Box release workflow][box
 <hr />
 
 Credits:
+
 - [Andreas Heigl, January 19, 2017, _Encrypt a build-result – automaticaly_](https://andreas.heigl.org/2017/01/19/encrypt-a-build-result-automaticaly/)
 - [Arne Blankerts](https://github.com/theseer)
 - [Jeff Channell, July 13, 2017, _Code Injection in Signed PHP Archives (Phar)_](https://blog.sucuri.net/2017/07/code-injection-in-phar-signed-php-archives.html)
 
-[box-release-workflow]: https://github.com/box-project/box/blob/main/.github/workflows/release.yaml
+[box-release-workflow]: ./../.github/workflows/release.yaml
 [keys.openpgp.org]: https://keys.openpgp.org/about
 [github-environment-secrets]: https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions
 [phive]: https://phar.io/
