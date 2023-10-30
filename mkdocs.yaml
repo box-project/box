@@ -48,6 +48,8 @@ nav:
             -   'PHAR code isolation': code-isolation.md
             -   'Docker support': docker.md
             -   'Symfony support': symfony.md
+            -   'Reproducible builds': reproducible-builds.md
+            -   'PHAR signing best practices': phar-signing.md
             -   'FAQ': faq.md
 
 markdown_extensions:
