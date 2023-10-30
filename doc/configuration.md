@@ -770,11 +770,16 @@ available:
 - `SHA1`
 - `SHA256`
 - `SHA512`
-- `OPENSSL`
+- `OPENSSL` (deprecated)
 
-By default PHARs are `SHA1` signed.
+By default, PHARs are `SHA1` signed.
 
 The `OPENSSL` algorithm will require to provide [a key][key]. 
+
+!!! warning
+
+    The OpenSSL signature has been deprecated as of Box 4.4.0. If you are wondering why check out
+    [the signing best practices].
 
 
 ### The private key (`key`)
@@ -825,7 +830,9 @@ With the configuration excerpt:
 
 Then the `Phar::getMetadata()` will return `['application_version' => '1.0.0-dev']` array.
 
-**CAUTION**: Your callable function must be readable by your autoloader.
+!!! warning 
+
+    Your callable function must be readable by your autoloader.
 
 That means, for Composer, in previous example, we require to have such kind of declaration in your `composer.json` file.
 
@@ -1044,6 +1051,7 @@ The short commit hash will only be used if no tag is available.
 [requirement-checker]: requirement-checker.md#requirements-checker
 [security]: #security
 [shebang]: #shebang-shebang
+[the signing best practices]: ./phar-signing.md#phar-signing-best-practices
 [stub-stub]: #stub-stub
 [stub]: #stub
 [symfony-finder]: https://symfony.com/doc/current//components/finder.html

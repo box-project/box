@@ -2,12 +2,12 @@
 
 1. [PHP-Scoper](#php-scoper)
 1. [Composer](#composer)
-   1. [Composer root version](#composer-root-version)
-   1. [Composer autoload suffix](#composer-autoload-suffix)
+    1. [Composer root version](#composer-root-version)
+    1. [Composer autoload suffix](#composer-autoload-suffix)
 1. [Box](#box)
-   1. [PHAR alias](#phar-alias)
-   1. [Requirement Checker](#requirement-checker)
-   1. [Box banner](#box-banner)
+    1. [PHAR alias](#phar-alias)
+    1. [Requirement Checker](#requirement-checker)
+    1. [Box banner](#box-banner)
 1. [PHAR](#phar)
 
 
@@ -40,8 +40,8 @@ This is not ideal as the content of the PHAR could be identical for two differen
 this problem, you can leverage the [`COMPOSER_ROOT_VERSION`][composer-root-version]. Either by exporting it or passing
 it to Box when compiling it:
 
-```
-$ COMPOSER_ROOT_VERSION=1.0.0-dev box compile
+```shell
+COMPOSER_ROOT_VERSION=1.0.0-dev box compile
 ```
 
 ### Composer autoload suffix
@@ -50,13 +50,13 @@ By default, Box will dump the Composer autoloader which usually results in a dif
 exceptions to this, for example Composer tend to try to keep the known suffix if one already exist, but it is an exotic
 case that is not recommended to rely on. For this reason you need to configure the [Composer autoload prefix][composer-autoload-prefix]:
 
-```
-$ composer config autoloader-suffix AppChecksum
+```shell
+composer config autoloader-suffix AppChecksum
 ```
 
 Or configure it directly in your `composer.json`:
 
-```
+```json
 {
     "config": {
         "autoloader-suffix": "AppChecksum"
@@ -105,7 +105,7 @@ you add a PHAR to a file, it is changed to the time at when you added it).
 
 To fix this, you can leverage [Seldaek PHAR-Utils][phar-utils] with the following script:
 
-```
+```php
 // resign.php
 <?php declare(strict_types=1);
 
@@ -126,11 +126,11 @@ $util->save($file, Phar::SHA512);
 
 Then once your PHAR is built:
 
-```
-$ php resign.php app.phar
+```shell
+php resign.php app.phar
 ```
 
-This is obviously not ideal and should be fixed by Box at some point (see https://github.com/box-project/box/issues/1074).
+This is obviously not ideal and should be fixed by Box at some point (see [#1074](https://github.com/box-project/box/issues/1074)).
 
 
 <br />

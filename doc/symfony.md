@@ -55,8 +55,8 @@ To achieve this with the least amount of changes is to:
 
 - Create the `.env.local.php` file by running the following command:
 
-```
-$ composer dump-env prod
+```shell
+composer dump-env prod
 ```
 
 This will ensure when loading the variables that your application is in production mode.

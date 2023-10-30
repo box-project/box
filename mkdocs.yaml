@@ -33,6 +33,7 @@ theme:
         primary: brown
         accent: amber
     features:
+        - content.tabs.link
         - navigation.tabs
         - navigation.top
     custom_dir: doc/overrides
@@ -55,8 +56,11 @@ nav:
 markdown_extensions:
     - admonition
     - attr_list
+    - footnotes
     - pymdownx.highlight
     - pymdownx.superfences
+    - toc:
+        permalink: true
 
 extra_css:
     - assets/announce.css

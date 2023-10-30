@@ -130,8 +130,8 @@ When the requirement checker is shipped, you can always skip it by setting the e
 `BOX_REQUIREMENT_CHECKER` to `0`. For example if you are using the `box.phar` which ships a requirement checker and want 
 to skip it, you can run:
 
-```
-$ BOX_REQUIREMENT_CHECKER=0 php box.phar 
+```shell
+BOX_REQUIREMENT_CHECKER=0 php box.phar 
 ```
 
 
@@ -140,8 +140,8 @@ $ BOX_REQUIREMENT_CHECKER=0 php box.phar
 Since version 3.17.0, box logs the requirements checker output to `stderr` per default (see: [#678](https://github.com/box-project/box/issues/678)).
 The requirements checker can be configured to output to `stdout` instead by setting `BOX_REQUIREMENTS_CHECKER_LOG_TO_STDOUT=1`:
 
-```
-$ BOX_REQUIREMENTS_CHECKER_LOG_TO_STDOUT=1 php box.phar
+```shell
+BOX_REQUIREMENTS_CHECKER_LOG_TO_STDOUT=1 php box.phar
 ```
 
 

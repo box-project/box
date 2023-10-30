@@ -14,7 +14,7 @@ conflicts.
 To illustrate that issue with an example: we are building a console application `myapp.phar` which relies on the library
 Symfony YAML 2.8.0 which execute a given PHP script.
 
-```bash
+```shell
 # Usage of the application we are building
 myapp.phar myscript.php
 ```
