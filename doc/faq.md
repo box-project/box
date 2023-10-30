@@ -58,10 +58,10 @@ if (false === in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
 The shebang `#!/usr/bin/env php` is required to the auto-detection of the type of the script. This allows to use it as
 follows:
 
-```bash
-$ chmod +x bin/acme.php
-$ ./bin/acme.php
-$ php bin/acme.php # still works
+```shell
+chmod +x bin/acme.php
+./bin/acme.php
+php bin/acme.php # still works
 # Without the shebang line, you can only use the latter
 ```
 
