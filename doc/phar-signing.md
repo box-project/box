@@ -78,15 +78,24 @@ of the archive does not match the signature of the PHAR and will bail out.
 
 ### Why it is bad
 
-If a PHAR gets corrupted, the PHP interpreter will know from the signature and throw a `PharException`.
+There is a few downsides from this signing mechanisms:
 
-The first issue is the signature itself: if the PHAR gets corrupted, maybe the signature got corrupted too. Using an
-OpenSSL based signature will help to prevent this issue however.
+- You cannot run the PHAR without its associated public key file laying right next to it. As a result, if you were to
+  move your PHAR under `/usr/local/bin`, the PHAR would no longer work due to the missing public key file.
+- OpenSSL keys do not contain any identity information. So unless cleanly separated at distribution time, nobody knows
+  where the pub key came from or who generated it. Which (almost) kills the very idea of signing things.
 
-The second issue is the mechanism itself. Indeed, if one injects code _before_ the stub, then this code will be executed
-before the signature check.
+The real problem is the signature check itself. If the PHAR gets corrupted, maybe the signature got corrupted too. So
+there is ways to void the signature:
 
-**This security mechanism cannot prevent modifications of the archive itself.**  
+- Injects code _before_ the stub, then this code will be executed before the signature check. The signature check can
+  still fail if the signature was not adjusted, but this might be too late.
+- Replace the signature used. An OpenSSL one will only make it slightly harder as this require to change an external
+  file (the public key), but in the context the attacker could inject code to the PHAR this is unlikely to be a real
+  prevention measure.
+
+So to conclude, **this security mechanism CANNOT prevent modifications of the archive itself.** It is NOT a reliable
+protection measure.
 
 The good news, there is a solution.
 
@@ -128,11 +137,14 @@ ssb   cv25519/765C0E3CCBC7D7D3 2023-10-21 [E] [expires: 2026-10-20]
 
 The interesting part is the `96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08` which is the key-ID.
 
-To make the key accessible for others we should now send it to a keyserver.
+To make the key accessible for others we should now send it to a keyserver†.
 
 ```
-$ gpg --keyserver pgp.mit.edu --send-key 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
+$ gpg --keyserver keys.openpgp.org --send-key 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
 ```
+
+†: There is several OpenPGP Keyservers. It is recommended to push your keys to [keys.openpgp.org] _at least_, but you
+   can also push it to other servers if you wish to.
 
 You can also already generate a revocation certificate for the key. Should the key be compromised you can then send the
 revocation certificate to the keyserver to invalidate the signing key.
@@ -224,6 +236,8 @@ First you should check the issuer's identity, usually it is provided from where 
 documentation:
 
 ```
+# If you are on the same machine as where you created the key, then this step is unnecessary.
+# You will need this however for when verifying a different key that you do not know of yet.
 gpg --keyserver hkps://keys.openpgp.org --recv-keys 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
 ```
 
@@ -245,6 +259,8 @@ If the key ID was not provided before, you can try to look it up to check it was
 ```
 $ gpg --keyserver https://keys.openpgp.org --search-keys "theo.fidry+phar-signing-example@example.com"
 ```
+
+Also note that when dealing with PHARs, the above steps are automatically done for you by [PHIVE][phive].
 
 
 ## Automatically sign in GitHub Actions
@@ -356,9 +372,12 @@ A more complete real-life example can be found in the [Box release workflow][box
 <hr />
 
 Credits:
-- [Jeff Channell, July 13, 2017, _Code Injection in Signed PHP Archives (Phar)_](https://blog.sucuri.net/2017/07/code-injection-in-phar-signed-php-archives.html)
 - [Andreas Heigl, January 19, 2017, _Encrypt a build-result – automaticaly_](https://andreas.heigl.org/2017/01/19/encrypt-a-build-result-automaticaly/)
+- [Arne Blankerts](https://github.com/theseer)
+- [Jeff Channell, July 13, 2017, _Code Injection in Signed PHP Archives (Phar)_](https://blog.sucuri.net/2017/07/code-injection-in-phar-signed-php-archives.html)
 
 [box-release-workflow]: ./../.github/workflows/release.yaml
+[keys.openpgp.org]: https://keys.openpgp.org/about
 [github-environment-secrets]: https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions
+[phive]: https://phar.io/
 [jar]: https://docs.oracle.com/javase/8/docs/technotes/guides/jar/jarGuide.html
