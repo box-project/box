@@ -69,7 +69,7 @@ $ brew upgrade box
 
 ## GitHub
 
-You may download the Box PHAR directly from the [GitHub release][github-release] directly.
+You may download the Box PHAR directly from the [GitHub release][releases] directly.
 You should however beware that it is not as secure as downloading it from the other mediums.
 Hence, it is recommended to check the signature when doing so:
 
