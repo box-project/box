@@ -1,0 +1,1199 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Box: building and managing PHARs">
+      
+      
+      
+        <link rel="canonical" href="https://box-project.github.io/box/phar-signing/">
+      
+      
+        <link rel="prev" href="../reproducible-builds/">
+      
+      
+        <link rel="next" href="../faq/">
+      
+      
+      <link rel="icon" href="../img/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.7">
+    
+    
+      
+        <title>PHAR signing best practices - Box Project</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.4b4a2bd9.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.356b1318.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/announce.css">
+    
+      <link rel="stylesheet" href="../assets/docs.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="brown" data-md-color-accent="amber">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#phar-signing-best-practices" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+        <aside class="md-banner">
+          <div class="md-banner__inner md-grid md-typeset">
+            
+            
+    Consider supporting Box via
+    <span class="twemoji heart">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="m47.6 300.4 180.7 168.7c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9l180.7-168.7c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141-45.6-7.6-92 7.3-124.6 39.9l-12 12-12-12c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z"/></svg>
+    </span>
+    <a href="https://github.com/sponsors/theofidry" class="text-light">
+        <strong>Github sponsorship</strong>
+    </a>
+
+          </div>
+          
+        </aside>
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Box Project" class="md-header__button md-logo" aria-label="Box Project" data-md-component="logo">
+      
+  <img src="../img/favicon.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Box Project
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              PHAR signing best practices
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/box-project/box" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    box-project/box
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../installation/" class="md-tabs__link">
+          
+  
+  Documentation
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Box Project" class="md-nav__button md-logo" aria-label="Box Project" data-md-component="logo">
+      
+  <img src="../img/favicon.png" alt="logo">
+
+    </a>
+    Box Project
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/box-project/box" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    box-project/box
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+    
+    
+    
+    
+    
+      
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Documentation
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Documentation
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Usage
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Configuration
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../requirement-checker/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Requirements checker
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../optimizations/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Optimize your PHAR
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code-isolation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    PHAR code isolation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docker/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Docker support
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../symfony/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Symfony support
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reproducible-builds/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Reproducible builds
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    PHAR signing best practices
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    PHAR signing best practices
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#built-in-phar-api" class="md-nav__link">
+    Built-in PHAR API
+  </a>
+  
+    <nav class="md-nav" aria-label="Built-in PHAR API">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-to-sign-your-phar" class="md-nav__link">
+    How to sign your PHAR
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    How it works
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-is-bad" class="md-nav__link">
+    Why it is bad
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-properly-sign-your-phar" class="md-nav__link">
+    How to (properly) sign your PHAR
+  </a>
+  
+    <nav class="md-nav" aria-label="How to (properly) sign your PHAR">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-a-new-gpg-key" class="md-nav__link">
+    Create a new GPG-key
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#manually-signing" class="md-nav__link">
+    Manually signing
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generate-the-encryption-key" class="md-nav__link">
+    Generate the encryption key
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#secure-your-encryption-key" class="md-nav__link">
+    Secure your encryption key
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sign-your-phar" class="md-nav__link">
+    Sign your PHAR
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verifying-the-phar-signature" class="md-nav__link">
+    Verifying the PHAR signature
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#automatically-sign-in-github-actions" class="md-nav__link">
+    Automatically sign in GitHub Actions
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../faq/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    FAQ
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#built-in-phar-api" class="md-nav__link">
+    Built-in PHAR API
+  </a>
+  
+    <nav class="md-nav" aria-label="Built-in PHAR API">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-to-sign-your-phar" class="md-nav__link">
+    How to sign your PHAR
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    How it works
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-is-bad" class="md-nav__link">
+    Why it is bad
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-properly-sign-your-phar" class="md-nav__link">
+    How to (properly) sign your PHAR
+  </a>
+  
+    <nav class="md-nav" aria-label="How to (properly) sign your PHAR">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-a-new-gpg-key" class="md-nav__link">
+    Create a new GPG-key
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#manually-signing" class="md-nav__link">
+    Manually signing
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generate-the-encryption-key" class="md-nav__link">
+    Generate the encryption key
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#secure-your-encryption-key" class="md-nav__link">
+    Secure your encryption key
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sign-your-phar" class="md-nav__link">
+    Sign your PHAR
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verifying-the-phar-signature" class="md-nav__link">
+    Verifying the PHAR signature
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#automatically-sign-in-github-actions" class="md-nav__link">
+    Automatically sign in GitHub Actions
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="phar-signing-best-practices">PHAR signing best practices</h1>
+<ol>
+<li><a href="#built-in-phar-api">Built-in PHAR API</a></li>
+<li><a href="#how-to-sign-your-phar">How to sign your PHAR</a></li>
+<li><a href="#how-it-works">How it works</a></li>
+<li><a href="#why-it-is-bad">Why it is bad</a></li>
+<li><a href="#how-to-properly-sign-your-phar">How to (properly) sign your PHAR</a></li>
+<li><a href="#create-a-new-gpg-key">Create a new GPG-key</a></li>
+<li><a href="#manually-signing">Manually signing</a></li>
+<li><a href="#generate-the-encryption-key">Generate the encryption key</a></li>
+<li><a href="#secure-your-encryption-key">Secure your encryption key</a></li>
+<li><a href="#sign-your-phar">Sign your PHAR</a></li>
+<li><a href="#verifying-the-phar-signature">Verifying the PHAR signature</a></li>
+<li><a href="#automatically-sign-in-github-actions">Automatically sign in GitHub Actions</a></li>
+</ol>
+<p>There is two idiomatic ways to secure a PHAR:</p>
+<ul>
+<li>Using the built-in PHAR signing API (<strong>not</strong> recommended; read <a href="#why-it-is-bad">Why it is bad</a> for the why).</li>
+<li>Signing the PHAR as any other generic binary (see <a href="#sign-your-phar">Sign your PHAR</a>).</li>
+</ul>
+<p>This doc entry goal is to show why the first method is to be avoided and how to do it "the right way".</p>
+<h2 id="built-in-phar-api">Built-in PHAR API</h2>
+<h3 id="how-to-sign-your-phar">How to sign your PHAR</h3>
+<p>This is how a PHAR can be signed:</p>
+<div class="highlight"><pre><span></span><code><span class="x">// See https://www.php.net/manual/en/phar.setsignaturealgorithm.php</span>
+<span class="x">$phar-&gt;setSignatureAlgorithm($algo, $privateKey);</span>
+</code></pre></div>
+<p>There is various algorithm available. The most "secure" one would be <code>Phar::OPENSSL</code> with an
+OpenSSL private key. For instance:</p>
+<div class="highlight"><pre><span></span><code>$ openssl genrsa -des3 -out acme-phar-private.pem 4096
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="x">// E.g. $privateKeyPath = &#39;acme-phar-private.pem&#39; with the example above</span>
+<span class="x">$privateKey = file_get_contents($privateKeyPath);</span>
+
+<span class="x">$resource = openssl_pkey_get_private($key, $privateKeyPassword);</span>
+<span class="x">openssl_pkey_export($resource, $private);</span>
+<span class="x">$details = openssl_pkey_get_details($resource);</span>
+
+<span class="x">$phar-&gt;setSignatureAlgorithm(Phar::OPENSSL, $private);</span>
+
+<span class="x">file_put_contents(</span>
+<span class="x">    $phar-&gt;getPath().&#39;.pubkey&#39;,</span>
+<span class="x">    $details[&#39;key&#39;],</span>
+<span class="x">);</span>
+</code></pre></div>
+<p>With the example above, you will end up with two files: your PHAR (e.g. <code>bin/command.phar</code>) and its
+public key (e.g. <code>bin/command.phar.pubkey</code>).</p>
+<h3 id="how-it-works">How it works</h3>
+<p>To give more background on how PHAR archives are constructed, they are PHP files that contain a mixture of code and
+other binary data. It is analogous to the <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/jar/jarGuide.html">JAR files</a>, and will require PHP to execute the PHARs. The content
+of a PHAR is as follows:</p>
+<ol>
+<li>A stub: a piece of code that handles the extraction of resources.</li>
+<li>A binary manifest which allows the interpreter to understand the file structure of the embedded contents that follow.</li>
+<li>The actual content of the archive.</li>
+<li>The signature makes up the last section of the file. It is a 4-byte signature flag which tells what signature type
+   was used and then another 4-byte constant marks the file as having a signature.</li>
+</ol>
+<p>When PHP later reads the archive, it can determine the signature and type by reading the end of the archive. This way,
+if the content of the PHAR has been tempered with, e.g. code was injected in the archive, PHP will see that the content
+of the archive does not match the signature of the PHAR and will bail out.</p>
+<h3 id="why-it-is-bad">Why it is bad</h3>
+<p>There is a few downsides from this signing mechanisms:</p>
+<ul>
+<li>You cannot run the PHAR without its associated public key file laying right next to it. As a result, if you were to
+  move your PHAR under <code>/usr/local/bin</code>, the PHAR would no longer work due to the missing public key file.</li>
+<li>OpenSSL keys do not contain any identity information. So unless cleanly separated at distribution time, nobody knows
+  where the pub key came from or who generated it. Which (almost) kills the very idea of signing things.</li>
+</ul>
+<p>The real problem is the signature check itself. If the PHAR gets corrupted, maybe the signature got corrupted too. So
+there is ways to void the signature:</p>
+<ul>
+<li>Injects code <em>before</em> the stub, then this code will be executed before the signature check. The signature check can
+  still fail if the signature was not adjusted, but this might be too late.</li>
+<li>Replace the signature used. An OpenSSL one will only make it slightly harder as this require to change an external
+  file (the public key), but in the context the attacker could inject code to the PHAR this is unlikely to be a real
+  prevention measure.</li>
+</ul>
+<p>So to conclude, <strong>this security mechanism CANNOT prevent modifications of the archive itself.</strong> It is NOT a reliable
+protection measure.</p>
+<p>The good news, there is a solution.</p>
+<h2 id="how-to-properly-sign-your-phar">How to (properly) sign your PHAR</h2>
+<h3 id="create-a-new-gpg-key">Create a new GPG-key</h3>
+<p>The first step is to create a new GPG-key. You can either do that via a GUI or via the CLI like this:</p>
+<div class="highlight"><pre><span></span><code>$ gpg --gen-key
+</code></pre></div>
+<p>It will ask for some questions. It is recommended to use a passphrase (ideally generated and managed by a reputable
+password manager). In the end, you will end up with something like this:</p>
+<div class="highlight"><pre><span></span><code>pub   ed25519 2023-10-21 [SC] [expires: 2026-10-20]
+      96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
+uid                      Théo Fidry &lt;theo.fidry+phar-signing-example@example.com&gt;
+sub   cv25519 2023-10-21 [E] [expires: 2026-10-20]
+</code></pre></div>
+<p>In this case the interesting part is <code>96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08</code> which is the key ID. You can also check
+the list of your GPG keys like so:</p>
+<div class="highlight"><pre><span></span><code>$ gpg --list-secret-keys --keyid-format=long
+
+#
+# Other keys displayed too
+#
+sec   ed25519/03B2F4DF7A20DF08 2023-10-21 [SC] [expires: 2026-10-20]
+      96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
+uid                 [ultimate] Théo Fidry &lt;theo.fidry+phar-signing-example@example.com&gt;
+ssb   cv25519/765C0E3CCBC7D7D3 2023-10-21 [E] [expires: 2026-10-20]
+</code></pre></div>
+<p>The interesting part is the <code>96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08</code> which is the key-ID.</p>
+<p>To make the key accessible for others we should now send it to a keyserver†.</p>
+<div class="highlight"><pre><span></span><code>$ gpg --keyserver keys.openpgp.org --send-key 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
+</code></pre></div>
+<p>†: There is several OpenPGP Keyservers. It is recommended to push your keys to <a href="https://keys.openpgp.org/about">keys.openpgp.org</a> <em>at least</em>, but you
+   can also push it to other servers if you wish to.</p>
+<p>You can also already generate a revocation certificate for the key. Should the key be compromised you can then send the
+revocation certificate to the keyserver to invalidate the signing key.</p>
+<div class="highlight"><pre><span></span><code>$ gpg --output revoke-96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08.asc --gen-revoke 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
+</code></pre></div>
+<p>This will leave you with a revocation certificate in the file <code>revoke-96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08.asc</code> 
+which can be added to your password manager.</p>
+<h3 id="manually-signing">Manually signing</h3>
+<p>For manually signing your PHAR (or any file actually), you will need to have an key containing both your public and
+private GPG key.</p>
+<h3 id="generate-the-encryption-key">Generate the encryption key</h3>
+<p>In order to use the key to encrypt files, you need to first export it:</p>
+<div class="highlight"><pre><span></span><code>$ gpg --export --armor 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08 &gt; keys.asc
+$ gpg --export-secret-key --armor 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08 &gt;&gt; keys.asc
+</code></pre></div>
+<p>That will leave the public and private key in a single file. Anyone that has that file can sign on your behalf! So keep
+that file secure at all times and make sure it never accidentally shows up in your git repository!</p>
+<h3 id="secure-your-encryption-key">Secure your encryption key</h3>
+<p>If your goal is to save this encryption key somewhere, for example your repository, you should first encrypt it:</p>
+<div class="highlight"><pre><span></span><code>gpg --symmetric keys.asc
+</code></pre></div>
+<p>This will ask for a second passphrase. It is recommended to <strong>pick a different passphrase</strong> than for the key itself and
+ideally one generated and managed by a password manager.</p>
+<p>This leaves you with a file <code>keys.asc.gpg</code>. You can add this one to the repository and at this point you are probably
+better off <strong>deleting the <code>keys.asc</code> file</strong>. In order to do the actual signing, you will have to decrypt it again, but
+it is better to not keep that decrypted key around. </p>
+<h3 id="sign-your-phar">Sign your PHAR</h3>
+<p>You first need to encrypt <code>keys.asc.gpg</code> into <code>keys.asc</code>:</p>
+<div class="highlight"><pre><span></span><code># If you are locally:
+$ gpg keys.asc.gpg
+# In another environment: CI or other. You should use an environment variable
+# or a temporary file to avoid printing the password in clear text.
+echo $DECRYPT_KEY_PASSPHRASE | gpg --passphrase-fd 0 keys.asc.gpg
+# or:
+cat $(.decrypt-key-passphrase) | gpg --passphrase-fd 0 keys.asc.gpg
+</code></pre></div>
+<p>Import the decrypted key if it is not already present on the machine:</p>
+<div class="highlight"><pre><span></span><code>$ gpg --batch --yes --import keys.asc
+</code></pre></div>
+<p>Sign your file:</p>
+<div class="highlight"><pre><span></span><code>$ gpg \
+   --batch \
+   --passphrase=&quot;$GPG_KEY_96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08_PASSPHRASE&quot; \
+   --local-user 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08 \
+   --armor \
+   --detach-sign \
+   bin/command.phar
+# Do not forget to remove keys.asc afterwards!
+</code></pre></div>
+<p>You will now have a file <code>bin/command.phar.asc</code>.</p>
+<p>When publishing your archive, you should publish both <code>bin/command.phar</code> and <code>bin/command.phar.asc</code>.</p>
+<h3 id="verifying-the-phar-signature">Verifying the PHAR signature</h3>
+<p>First you should check the issuer's identity, usually it is provided from where you download it as part of the
+documentation:</p>
+<div class="highlight"><pre><span></span><code># If you are on the same machine as where you created the key, then this step is unnecessary.
+# You will need this however for when verifying a different key that you do not know of yet.
+gpg --keyserver hkps://keys.openpgp.org --recv-keys 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
+</code></pre></div>
+<p>However not everyone expose what is their GPG key ID. So sometimes to avoid bad surprises, you
+can look up for similar issuers to the key ID given by the <code>.asc</code>:</p>
+<div class="highlight"><pre><span></span><code># Verify the signature
+$ gpg --verify bin/command.phar.asc bin/command.phar
+
+# Example of output:
+gpg: Signature made Sat 21 Oct 16:58:05 2023 CEST
+gpg:                using EDDSA key 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
+gpg: Good signature from &quot;Théo Fidry &lt;theo.fidry+phar-signing-example@example.com&gt;&quot; [ultimate]
+</code></pre></div>
+<p>If the key ID was not provided before, you can try to look it up to check it was properly registered to a keyserver:</p>
+<div class="highlight"><pre><span></span><code>$ gpg --keyserver https://keys.openpgp.org --search-keys &quot;theo.fidry+phar-signing-example@example.com&quot;
+</code></pre></div>
+<p>Also note that when dealing with PHARs, the above steps are automatically done for you by <a href="https://phar.io/">PHIVE</a>.</p>
+<h2 id="automatically-sign-in-github-actions">Automatically sign in GitHub Actions</h2>
+<p>The first step is to add <a href="https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions">environment secrets to your repository</a>:</p>
+<div class="highlight"><pre><span></span><code>$ gpg --export-secret-key --armor 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
+# Paste the content into a secret environment variable
+GPG_KEY_96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
+
+# Add the corresponding passphrase enviroment variable:
+GPG_KEY_96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08_PASSPHRASE
+</code></pre></div>
+<p>Then you need to:
+- Build your PHAR
+- Import the GPG key
+- Sign your PHAR
+- Publish your PHAR</p>
+<p>I highly recommend to build your PHAR as part of your regular workflows. Then the other steps can be enable on release
+only. The following is an example of GitHub workflow:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Release</span>
+
+<span class="nt">on</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">push</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">branches</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">main</span><span class="w"> </span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">pull_request</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">~</span>
+<span class="w">    </span><span class="nt">schedule</span><span class="p">:</span>
+<span class="w">        </span><span class="c1"># Do not make it the first of the month and/or midnight since it is a very busy time</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">cron</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;*</span><span class="nv"> </span><span class="s">10</span><span class="nv"> </span><span class="s">6</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">*&quot;</span>
+<span class="w">    </span><span class="nt">release</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">types</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">created</span><span class="w"> </span><span class="p p-Indicator">]</span>
+
+<span class="c1"># See https://stackoverflow.com/a/72408109</span>
+<span class="nt">concurrency</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">group</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}</span>
+<span class="w">    </span><span class="nt">cancel-in-progress</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+
+<span class="nt">jobs</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">build-phar</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+<span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Build PHAR</span>
+<span class="w">        </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w">   </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Checkout</span>
+<span class="w">                </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v3</span>
+<span class="w">                </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">                    </span><span class="nt">fetch-depth</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w">   </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Setup PHP</span>
+<span class="w">                </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">shivammathur/setup-php@v2</span>
+<span class="w">                </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">                    </span><span class="nt">php-version</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;8.1&#39;</span>
+<span class="w">                    </span><span class="nt">ini-values</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">phar.readonly=0</span>
+<span class="w">                    </span><span class="nt">tools</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">composer</span>
+<span class="w">                    </span><span class="nt">coverage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">none</span>
+
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w">   </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Install Composer dependencies</span>
+<span class="w">                </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ramsey/composer-install@v2</span>
+
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w">   </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Build PHAR</span>
+<span class="w">                </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+
+<span class="w">            </span><span class="c1"># Smoke test.</span>
+<span class="w">            </span><span class="c1"># It is recommended ot have some sorts of tests for your PHAR.</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w">   </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Ensure the PHAR works</span>
+<span class="w">                </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bin/command.phar --version</span>
+
+<span class="w">            </span><span class="c1"># The following section is done only for releases</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w">   </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Import GPG key</span>
+<span class="w">                </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">github.event_name == &#39;release&#39;</span>
+<span class="w">                </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">crazy-max/ghaction-import-gpg@v5</span>
+<span class="w">                </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">                    </span><span class="nt">gpg_private_key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ secrets.GPG_KEY_96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08 }}</span>
+<span class="w">                    </span><span class="nt">passphrase</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ secrets.GPG_KEY_96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08_PASSPHRASE }}</span>
+
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w">   </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Sign the PHAR</span>
+<span class="w">                </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">github.event_name == &#39;release&#39;</span>
+<span class="w">                </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">                    </span><span class="no">gpg --local-user 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08 \</span>
+<span class="w">                        </span><span class="no">--batch \</span>
+<span class="w">                        </span><span class="no">--yes \</span>
+<span class="w">                        </span><span class="no">--passphrase=&quot;${{ secrets.GPG_KEY_96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08_PASSPHRASE }}&quot; \</span>
+<span class="w">                        </span><span class="no">--detach-sign \</span>
+<span class="w">                        </span><span class="no">--output bin/command.phar.asc \</span>
+<span class="w">                        </span><span class="no">bin/command.phar</span>
+
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w">   </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Upload PHAR to the release</span>
+<span class="w">                </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">softprops/action-gh-release@v1</span>
+<span class="w">                </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">                   </span><span class="nt">token</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ secrets.GITHUB_TOKEN }}</span>
+<span class="w">                   </span><span class="nt">files</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">                      </span><span class="no">box.phar</span>
+<span class="w">                      </span><span class="no">box.phar.asc</span>
+</code></pre></div>
+<p>A more complete real-life example can be found in the <a href="https://github.com/box-project/box/blob/main/.github/workflows/release.yaml">Box release workflow</a>.</p>
+<p><br /></p>
+<hr />
+
+<p>« <a href="../reproducible-builds/#reproducible-builds">Reproducible build</a> • <a href="../faq/#faq">FAQ</a> »</p>
+<hr />
+
+<p>Credits:
+- <a href="https://andreas.heigl.org/2017/01/19/encrypt-a-build-result-automaticaly/">Andreas Heigl, January 19, 2017, <em>Encrypt a build-result – automaticaly</em></a>
+- <a href="https://github.com/theseer">Arne Blankerts</a>
+- <a href="https://blog.sucuri.net/2017/07/code-injection-in-phar-signed-php-archives.html">Jeff Channell, July 13, 2017, <em>Code Injection in Signed PHP Archives (Phar)</em></a></p>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Box is licensed under <a href="https://github.com/box-project/box/blob/master/LICENSE">MIT license</a>
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/box-project" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M186.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1zM480 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2zm-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3zm-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.aecac24b.min.js"></script>
+      
+    
+  </body>
+</html>

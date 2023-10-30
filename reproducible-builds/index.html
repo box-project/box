@@ -13,10 +13,14 @@
         <link rel="canonical" href="https://box-project.github.io/box/reproducible-builds/">
       
       
+        <link rel="prev" href="../symfony/">
+      
+      
+        <link rel="next" href="../phar-signing/">
       
       
       <link rel="icon" href="../img/favicon.png">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.6">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.7">
     
     
       
@@ -24,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.35e1ed30.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.4b4a2bd9.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.356b1318.min.css">
@@ -219,10 +223,12 @@
         
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../installation/" class="md-tabs__link">
           
   
@@ -301,6 +307,8 @@
       
   
   
+    
+  
   
     
     
@@ -310,12 +318,12 @@
       
       
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
           <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
@@ -329,7 +337,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             Documentation
@@ -487,6 +495,161 @@
   
   <span class="md-ellipsis">
     Symfony support
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Reproducible builds
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Reproducible builds
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#php-scoper" class="md-nav__link">
+    PHP-Scoper
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#composer" class="md-nav__link">
+    Composer
+  </a>
+  
+    <nav class="md-nav" aria-label="Composer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#composer-root-version" class="md-nav__link">
+    Composer root version
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#composer-autoload-suffix" class="md-nav__link">
+    Composer autoload suffix
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#box" class="md-nav__link">
+    Box
+  </a>
+  
+    <nav class="md-nav" aria-label="Box">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phar-alias" class="md-nav__link">
+    PHAR Alias
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#requirement-checker" class="md-nav__link">
+    Requirement Checker
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#box-banner" class="md-nav__link">
+    Box banner
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phar" class="md-nav__link">
+    PHAR
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../phar-signing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    PHAR signing best practices
   </span>
   
 
@@ -730,7 +893,7 @@ $util-&gt;save($file, Phar::SHA512);
 <p><br /></p>
 <hr />
 
-<p>« <a href="../symfony/#symfony-support">Symfony support</a> • <a href="../faq/#faq">FAQ</a> »</p>
+<p>« <a href="../symfony/#symfony-support">Symfony support</a> • <a href="../phar-signing/#phar-signing-best-practices">PHAR signing best practicies</a> »</p>
 
 
 
