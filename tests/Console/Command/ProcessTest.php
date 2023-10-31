@@ -204,7 +204,7 @@ class ProcessTest extends CommandTestCase
 
             """
 
-            Whitelist:
+            Symbols Registry:
 
             """
             Humbug\\PhpScoper\\Symbol\\SymbolsRegistry {#140
