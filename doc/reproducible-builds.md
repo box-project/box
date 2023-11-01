@@ -1,14 +1,16 @@
 # Reproducible builds
 
-1. [PHP-Scoper](#php-scoper)
-1. [Composer](#composer)
-    1. [Composer root version](#composer-root-version)
-    1. [Composer autoload suffix](#composer-autoload-suffix)
-1. [Box](#box)
-    1. [PHAR alias](#phar-alias)
-    1. [Requirement Checker](#requirement-checker)
-    1. [Box banner](#box-banner)
-1. [PHAR](#phar)
+1. [Creating a reproducible PHAR](#creating-a-reproducible-phar)
+   1. [PHP-Scoper](#php-scoper)
+   1. [Composer](#composer)
+       1. [Composer root version](#composer-root-version)
+       1. [Composer autoload suffix](#composer-autoload-suffix)
+   1. [Box](#box)
+       1. [PHAR alias](#phar-alias)
+       1. [Requirement Checker](#requirement-checker)
+       1. [Box banner](#box-banner)
+   1. [PHAR](#phar)
+1.  [Usages](#usages)
 
 
 When building a PHAR, you sometimes want to have reproducible builds, i.e. no matter how many times you build the PHAR,
@@ -21,7 +23,10 @@ prefix if you are using PHP-Scoper.
 This documentation aims at walking you through the common elements to adjust in order to achieve reproducible builds. This
 is not an exhaustive piece of documentation as it will also depends on your own application too.
 
-## PHP-Scoper
+
+## Creating a reproducible PHAR
+
+### PHP-Scoper
 
 If you are using the [PHP-Scoper compactor][php-scoper-compactor], you will need to define a fixed prefix as otherwise a random
 one is generated.
@@ -29,9 +34,9 @@ one is generated.
 See the [PHP-Scoper prefix configuration doc][php-scoper-prefix-doc].
 
 
-## Composer
+### Composer
 
-### Composer root version
+#### Composer root version
 
 By default, the git commit of the current version is included in some places in the Composer generated files. At the time
 of writing, the current git reference can be found in `vendor/composer/installed.{json|php}` with the path `root.reference`.
@@ -44,7 +49,7 @@ it to Box when compiling it:
 COMPOSER_ROOT_VERSION=1.0.0-dev box compile
 ```
 
-### Composer autoload suffix
+#### Composer autoload suffix
 
 By default, Box will dump the Composer autoloader which usually results in a different autoloader classname. There is
 exceptions to this, for example Composer tend to try to keep the known suffix if one already exist, but it is an exotic
@@ -65,9 +70,9 @@ Or configure it directly in your `composer.json`:
 ```
 
 
-## Box
+### Box
 
-### PHAR Alias
+#### PHAR Alias
 
 By default, Box generates a random PHAR alias so you need to set a fixed value, e.g. `my-app-name`.
 
@@ -80,7 +85,7 @@ If not provided or set to `null`, the default value used will based on the [`mai
 is `bin/acme.php` or `bin/acme` then the output will be `bin/acme.phar`.
 
 
-### Requirement Checker
+#### Requirement Checker
 
 By default, Box includes its [Requirement Checker][requirement-checker]. It will not change from a PHAR to another, so
 this step should be skippable. However, the RequirementChecker shipped _does_ change based on the Box version. I.e.
@@ -92,13 +97,13 @@ difference will be the namespace.
 Note that this may change in the future: https://github.com/box-project/box/issues/1075.
 
 
-### Box banner
+#### Box banner
 
 By default, Box generates a [banner][banner]. This banners includes the Box version so building the same PHAR with two
 different Box versions will result in a different PHAR signature.
 
 
-## PHAR
+### PHAR
 
 The files unix timestamp are part of the PHAR signature, hence if they have a different timestamp (which they do as when
 you add a PHAR to a file, it is changed to the time at when you added it).
@@ -133,6 +138,22 @@ php resign.php app.phar
 This is obviously not ideal and should be fixed by Box at some point (see [#1074](https://github.com/box-project/box/issues/1074)).
 
 
+## Usages
+
+Deterministic builds are a highly desirable property to prevent targeted malware attacks. They also make it easier to
+detect if there is any real change. As non-exhaustive examples in the wild: [Composer][composer] and [PHPStan][phpstan].
+
+Another benefit of such builds is that it makes it easier to know if there was any change. You can know if two PHARs are
+identical by using the `box diff` command, or extract the signature out of the `box info` command:
+
+```shell
+box info app.phar | grep 'Signature Hash' | cut -d ' ' -f3
+```
+
+And re-use that signature later for comparison. You will loose the ability to do a detailed diff between the two PHARs,
+but it is enough to know if the PHARs are identical or not.
+
+
 <br />
 <hr />
 
@@ -141,9 +162,11 @@ This is obviously not ideal and should be fixed by Box at some point (see [#1074
 
 [banner]: ./configuration.md#banner-banner
 [box-alias]: ./configuration.md#alias-alias
+[composer]: https://github.com/composer/composer
 [composer-autoload-prefix]: https://getcomposer.org/doc/06-config.md#autoloader-suffix
 [composer-root-version]: https://getcomposer.org/doc/03-cli.md#composer-root-version
 [phar-utils]: https://github.com/Seldaek/phar-utils
+[phpstan]: https://github.com/phpstan/phpstan
 [php-scoper-compactor]: ./configuration.md#compactors-compactors
 [php-scoper-prefix-doc]: https://github.com/humbug/php-scoper/blob/main/docs/configuration.md#prefix
 [requirement-checker]: ./requirement-checker.md
