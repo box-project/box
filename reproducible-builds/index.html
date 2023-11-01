@@ -556,13 +556,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#creating-a-reproducible-phar" class="md-nav__link">
+    Creating a reproducible PHAR
+  </a>
+  
+    <nav class="md-nav" aria-label="Creating a reproducible PHAR">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#php-scoper" class="md-nav__link">
     PHP-Scoper
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#composer" class="md-nav__link">
     Composer
   </a>
@@ -588,8 +596,8 @@
     </nav>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#box" class="md-nav__link">
     Box
   </a>
@@ -622,10 +630,22 @@
     </nav>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#phar" class="md-nav__link">
     PHAR
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usages" class="md-nav__link">
+    Usages
   </a>
   
 </li>
@@ -713,13 +733,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#creating-a-reproducible-phar" class="md-nav__link">
+    Creating a reproducible PHAR
+  </a>
+  
+    <nav class="md-nav" aria-label="Creating a reproducible PHAR">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#php-scoper" class="md-nav__link">
     PHP-Scoper
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#composer" class="md-nav__link">
     Composer
   </a>
@@ -745,8 +773,8 @@
     </nav>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#box" class="md-nav__link">
     Box
   </a>
@@ -779,10 +807,22 @@
     </nav>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#phar" class="md-nav__link">
     PHAR
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usages" class="md-nav__link">
+    Usages
   </a>
   
 </li>
@@ -804,6 +844,7 @@
 
 <h1 id="reproducible-builds">Reproducible builds<a class="headerlink" href="#reproducible-builds" title="Permanent link">&para;</a></h1>
 <ol>
+<li><a href="#creating-a-reproducible-phar">Creating a reproducible PHAR</a></li>
 <li><a href="#php-scoper">PHP-Scoper</a></li>
 <li><a href="#composer">Composer</a><ol>
 <li><a href="#composer-root-version">Composer root version</a></li>
@@ -817,6 +858,7 @@
 </ol>
 </li>
 <li><a href="#phar">PHAR</a></li>
+<li><a href="#usages">Usages</a></li>
 </ol>
 <p>When building a PHAR, you sometimes want to have reproducible builds, i.e. no matter how many times you build the PHAR,
 as long as the source content is identical, then the resulting PHAR should not change.</p>
@@ -825,12 +867,13 @@ that are generated and will make the resulting PHAR different, for example the C
 prefix if you are using PHP-Scoper.</p>
 <p>This documentation aims at walking you through the common elements to adjust in order to achieve reproducible builds. This
 is not an exhaustive piece of documentation as it will also depends on your own application too.</p>
-<h2 id="php-scoper">PHP-Scoper<a class="headerlink" href="#php-scoper" title="Permanent link">&para;</a></h2>
+<h2 id="creating-a-reproducible-phar">Creating a reproducible PHAR<a class="headerlink" href="#creating-a-reproducible-phar" title="Permanent link">&para;</a></h2>
+<h3 id="php-scoper">PHP-Scoper<a class="headerlink" href="#php-scoper" title="Permanent link">&para;</a></h3>
 <p>If you are using the <a href="../configuration/#compactors-compactors">PHP-Scoper compactor</a>, you will need to define a fixed prefix as otherwise a random
 one is generated.</p>
 <p>See the <a href="https://github.com/humbug/php-scoper/blob/main/docs/configuration.md#prefix">PHP-Scoper prefix configuration doc</a>.</p>
-<h2 id="composer">Composer<a class="headerlink" href="#composer" title="Permanent link">&para;</a></h2>
-<h3 id="composer-root-version">Composer root version<a class="headerlink" href="#composer-root-version" title="Permanent link">&para;</a></h3>
+<h3 id="composer">Composer<a class="headerlink" href="#composer" title="Permanent link">&para;</a></h3>
+<h4 id="composer-root-version">Composer root version<a class="headerlink" href="#composer-root-version" title="Permanent link">&para;</a></h4>
 <p>By default, the git commit of the current version is included in some places in the Composer generated files. At the time
 of writing, the current git reference can be found in <code>vendor/composer/installed.{json|php}</code> with the path <code>root.reference</code>.</p>
 <p>This is not ideal as the content of the PHAR could be identical for two different git commits. In order to get rid of
@@ -838,7 +881,7 @@ this problem, you can leverage the <a href="https://getcomposer.org/doc/03-cli.m
 it to Box when compiling it:</p>
 <div class="highlight"><pre><span></span><code><span class="nv">COMPOSER_ROOT_VERSION</span><span class="o">=</span><span class="m">1</span>.0.0-dev<span class="w"> </span>box<span class="w"> </span>compile
 </code></pre></div>
-<h3 id="composer-autoload-suffix">Composer autoload suffix<a class="headerlink" href="#composer-autoload-suffix" title="Permanent link">&para;</a></h3>
+<h4 id="composer-autoload-suffix">Composer autoload suffix<a class="headerlink" href="#composer-autoload-suffix" title="Permanent link">&para;</a></h4>
 <p>By default, Box will dump the Composer autoloader which usually results in a different autoloader classname. There is
 exceptions to this, for example Composer tend to try to keep the known suffix if one already exist, but it is an exotic
 case that is not recommended to rely on. For this reason you need to configure the <a href="https://getcomposer.org/doc/06-config.md#autoloader-suffix">Composer autoload prefix</a>:</p>
@@ -851,25 +894,25 @@ case that is not recommended to rely on. For this reason you need to configure t
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="box">Box<a class="headerlink" href="#box" title="Permanent link">&para;</a></h2>
-<h3 id="phar-alias">PHAR Alias<a class="headerlink" href="#phar-alias" title="Permanent link">&para;</a></h3>
+<h3 id="box">Box<a class="headerlink" href="#box" title="Permanent link">&para;</a></h3>
+<h4 id="phar-alias">PHAR Alias<a class="headerlink" href="#phar-alias" title="Permanent link">&para;</a></h4>
 <p>By default, Box generates a random PHAR alias so you need to set a fixed value, e.g. <code>my-app-name</code>.</p>
 <p>See the <a href="../configuration/#alias-alias">Box alias setting</a>.</p>
 <p>The output (<code>string</code>|<code>null</code>) setting specifies the file name and path of the newly built PHAR. If the value of the
 setting is not an absolute path, the path will be relative to the base path.</p>
 <p>If not provided or set to <code>null</code>, the default value used will based on the [<code>main</code>][main]. For example if the main file
 is <code>bin/acme.php</code> or <code>bin/acme</code> then the output will be <code>bin/acme.phar</code>.</p>
-<h3 id="requirement-checker">Requirement Checker<a class="headerlink" href="#requirement-checker" title="Permanent link">&para;</a></h3>
+<h4 id="requirement-checker">Requirement Checker<a class="headerlink" href="#requirement-checker" title="Permanent link">&para;</a></h4>
 <p>By default, Box includes its <a href="../requirement-checker/">Requirement Checker</a>. It will not change from a PHAR to another, so
 this step should be skippable. However, the RequirementChecker shipped <em>does</em> change based on the Box version. I.e.
 building your PHAR with Box 4.3.8 will result in a different† requirement checker shipped than the one in 4.4.0.</p>
 <p>†: By different is meant the checksum is different. The behaviour and code may be the exact same. The most likely
 difference will be the namespace.</p>
 <p>Note that this may change in the future: https://github.com/box-project/box/issues/1075.</p>
-<h3 id="box-banner">Box banner<a class="headerlink" href="#box-banner" title="Permanent link">&para;</a></h3>
+<h4 id="box-banner">Box banner<a class="headerlink" href="#box-banner" title="Permanent link">&para;</a></h4>
 <p>By default, Box generates a <a href="../configuration/#banner-banner">banner</a>. This banners includes the Box version so building the same PHAR with two
 different Box versions will result in a different PHAR signature.</p>
-<h2 id="phar">PHAR<a class="headerlink" href="#phar" title="Permanent link">&para;</a></h2>
+<h3 id="phar">PHAR<a class="headerlink" href="#phar" title="Permanent link">&para;</a></h3>
 <p>The files unix timestamp are part of the PHAR signature, hence if they have a different timestamp (which they do as when
 you add a PHAR to a file, it is changed to the time at when you added it).</p>
 <p>To fix this, you can leverage <a href="https://github.com/Seldaek/phar-utils">Seldaek PHAR-Utils</a> with the following script:</p>
@@ -894,6 +937,15 @@ you add a PHAR to a file, it is changed to the time at when you added it).</p>
 <div class="highlight"><pre><span></span><code>php<span class="w"> </span>resign.php<span class="w"> </span>app.phar
 </code></pre></div>
 <p>This is obviously not ideal and should be fixed by Box at some point (see <a href="https://github.com/box-project/box/issues/1074">#1074</a>).</p>
+<h2 id="usages">Usages<a class="headerlink" href="#usages" title="Permanent link">&para;</a></h2>
+<p>Deterministic builds are a highly desirable property to prevent targeted malware attacks. They also make it easier to
+detect if there is any real change. As non-exhaustive examples in the wild: <a href="https://github.com/composer/composer">Composer</a> and <a href="https://github.com/phpstan/phpstan">PHPStan</a>.</p>
+<p>Another benefit of such builds is that it makes it easier to know if there was any change. You can know if two PHARs are
+identical by using the <code>box diff</code> command, or extract the signature out of the <code>box info</code> command:</p>
+<div class="highlight"><pre><span></span><code>box<span class="w"> </span>info<span class="w"> </span>app.phar<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;Signature Hash&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="w"> </span><span class="s1">&#39; &#39;</span><span class="w"> </span>-f3
+</code></pre></div>
+<p>And re-use that signature later for comparison. You will loose the ability to do a detailed diff between the two PHARs,
+but it is enough to know if the PHARs are identical or not.</p>
 <p><br /></p>
 <hr />
 
