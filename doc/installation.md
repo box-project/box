@@ -5,6 +5,7 @@
 1. [Composer](#composer)
 1. [Homebrew](#homebrew)
 1. [GitHub](#github)
+1. [Docker](#docker)
 
 
 ## PHAR
@@ -88,6 +89,14 @@ rm box.phar.asc
 chmod +x box.phar
 ```
 
+## Docker
+
+The official docker image for the project is [`boxproject/box`][docker-image]:
+
+```shell
+docker pull boxproject/box
+```
+
 
 <br />
 <hr />
@@ -97,6 +106,7 @@ chmod +x box.phar
 
 [releases]: https://github.com/humbug/box/releases
 [composer]: https://getcomposer.org
+[docker-image]: https://hub.docker.com/r/boxproject/box
 [bamarni/composer-bin-plugin]: https://github.com/bamarni/composer-bin-plugin
 [phive]: https://github.com/phar-io/phive
 [github-release]: https://github.com/box-project/box/releases
