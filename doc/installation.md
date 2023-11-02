@@ -1,17 +1,10 @@
 # Installation
 
-1. [PHAR](#phar)
 1. [Phive](#phive)
 1. [Composer](#composer)
 1. [Homebrew](#homebrew)
 1. [GitHub](#github)
 1. [Docker](#docker)
-
-
-## PHAR
-
-The preferred method of installation is to use the Box PHAR which can be downloaded from the most recent
-[Github Release][releases]. This method ensures you will not have any dependency conflict issue.
 
 
 ## Phive
