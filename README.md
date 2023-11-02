@@ -32,7 +32,6 @@ For the full documentation see https://box-project.github.io/box.
 ## Table of Contents
 
 1. [Installation](doc/installation.md#installation)
-    1. [PHAR](doc/installation.md#phar)
     1. [Phive](doc/installation.md#phive)
     1. [Composer](doc/installation.md#composer)
     1. [Homebrew](doc/installation.md#homebrew)
