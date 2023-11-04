@@ -33,7 +33,7 @@ final class SerializableScoper implements Scoper
     /**
      * @var list<string>
      */
-    private array $excludedFilePaths;
+    public array $excludedFilePaths;
 
     public function __construct(
         PhpScoperConfiguration $scoperConfig,
@@ -113,5 +113,10 @@ final class SerializableScoper implements Scoper
             $scoper,
             ...$this->excludedFilePaths,
         );
+    }
+
+    public function getExcludedFilePaths(): array
+    {
+        return $this->excludedFilePaths;
     }
 }

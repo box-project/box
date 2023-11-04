@@ -45,4 +45,9 @@ final class NullScoper implements Scoper
     {
         return '';
     }
+
+    public function getExcludedFilePaths(): array
+    {
+        return [];
+    }
 }

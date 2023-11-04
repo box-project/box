@@ -132,6 +132,7 @@ final class Box implements Countable
                 $dumpAutoload(
                     $this->scoper->getSymbolsRegistry(),
                     $this->scoper->getPrefix(),
+                    $this->scoper->getExcludedFilePaths(),
                 );
             }
 

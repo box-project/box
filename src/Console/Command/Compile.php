@@ -668,10 +668,11 @@ final class Compile implements CommandAware
 
         $box->endBuffering(
             $config->dumpAutoload()
-                ? static fn (SymbolsRegistry $symbolsRegistry, string $prefix) => $composerOrchestrator->dumpAutoload(
+                ? static fn (SymbolsRegistry $symbolsRegistry, string $prefix, array $excludeScoperFiles) => $composerOrchestrator->dumpAutoload(
                     $symbolsRegistry,
                     $prefix,
                     $excludeDevFiles,
+                    $excludeScoperFiles,
                 )
                 : null,
         );
