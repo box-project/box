@@ -1,11 +1,11 @@
 <?php
 
-namespace HumbugBox450\Composer\Semver;
+namespace HumbugBox451\Composer\Semver;
 
-use HumbugBox450\Composer\Semver\Constraint\ConstraintInterface;
-use HumbugBox450\Composer\Semver\Constraint\MatchAllConstraint;
-use HumbugBox450\Composer\Semver\Constraint\MultiConstraint;
-use HumbugBox450\Composer\Semver\Constraint\Constraint;
+use HumbugBox451\Composer\Semver\Constraint\ConstraintInterface;
+use HumbugBox451\Composer\Semver\Constraint\MatchAllConstraint;
+use HumbugBox451\Composer\Semver\Constraint\MultiConstraint;
+use HumbugBox451\Composer\Semver\Constraint\Constraint;
 /** @internal */
 class VersionParser
 {
