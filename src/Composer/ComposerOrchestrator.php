@@ -112,6 +112,7 @@ final class ComposerOrchestrator
         SymbolsRegistry $symbolsRegistry,
         string $prefix,
         bool $excludeDevFiles,
+        array $excludedComposerAutoloadFileHashes,
     ): void {
         $this->dumpAutoloader(true === $excludeDevFiles);
 
@@ -123,6 +124,7 @@ final class ComposerOrchestrator
 
         $autoloadContents = AutoloadDumper::generateAutoloadStatements(
             $symbolsRegistry,
+            $excludedComposerAutoloadFileHashes,
             $this->fileSystem->getFileContents($autoloadFile),
         );
 

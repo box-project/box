@@ -977,16 +977,16 @@
         },
         {
             "name": "humbug/php-scoper",
-            "version": "0.18.4",
+            "version": "0.18.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/humbug/php-scoper.git",
-                "reference": "d79c1486537280c21c907e9a8a610eceb391407f"
+                "reference": "cbef87b93065e40172d458b42480c9caf9b0a474"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/d79c1486537280c21c907e9a8a610eceb391407f",
-                "reference": "d79c1486537280c21c907e9a8a610eceb391407f",
+                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/cbef87b93065e40172d458b42480c9caf9b0a474",
+                "reference": "cbef87b93065e40172d458b42480c9caf9b0a474",
                 "shasum": ""
             },
             "require": {
@@ -1054,9 +1054,9 @@
             "description": "Prefixes all PHP namespaces in a file or directory.",
             "support": {
                 "issues": "https://github.com/humbug/php-scoper/issues",
-                "source": "https://github.com/humbug/php-scoper/tree/0.18.4"
+                "source": "https://github.com/humbug/php-scoper/tree/0.18.5"
             },
-            "time": "2023-10-20T17:14:04+00:00"
+            "time": "2023-11-04T10:04:25+00:00"
         },
         {
             "name": "jetbrains/phpstorm-stubs",
@@ -5785,5 +5785,5 @@
     "platform-overrides": {
         "php": "8.1"
     },
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.6.0"
 }
