@@ -1,6 +1,6 @@
 <?php
 
-namespace HumbugBox450\Composer\Semver\Constraint;
+namespace HumbugBox451\Composer\Semver\Constraint;
 
 /** @internal */
 class MultiConstraint implements ConstraintInterface

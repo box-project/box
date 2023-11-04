@@ -1,8 +1,8 @@
 <?php
 
-namespace HumbugBox450\Composer\Semver;
+namespace HumbugBox451\Composer\Semver;
 
-use HumbugBox450\Composer\Semver\Constraint\Constraint;
+use HumbugBox451\Composer\Semver\Constraint\Constraint;
 /** @internal */
 class Comparator
 {
