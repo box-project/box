@@ -500,10 +500,10 @@ class ComposerOrchestratorComposer22TestCase extends BaseComposerOrchestratorCom
                     if (file_exists(\$installedVersionsPath)) require_once \$installedVersionsPath;
 
                     // Restore the backup and ensure the excluded files are properly marked as loaded
-                    \$GLOBALS['__composer_autoload_files'] = [
+                    \$GLOBALS['__composer_autoload_files'] = \\array_merge(
                         ...\$existingComposerAutoloadFiles,
-                        ...array_fill_keys([], true),
-                    ];
+                        \\array_fill_keys([], true)
+                    );
 
                     return \$loader;
                 })();
@@ -552,10 +552,10 @@ class ComposerOrchestratorComposer22TestCase extends BaseComposerOrchestratorCom
                     if (file_exists(\$installedVersionsPath)) require_once \$installedVersionsPath;
 
                     // Restore the backup and ensure the excluded files are properly marked as loaded
-                    \$GLOBALS['__composer_autoload_files'] = [
+                    \$GLOBALS['__composer_autoload_files'] = \\array_merge(
                         ...\$existingComposerAutoloadFiles,
-                        ...array_fill_keys([], true),
-                    ];
+                        \\array_fill_keys([], true)
+                    );
 
                     return \$loader;
                 })();
@@ -601,10 +601,10 @@ class ComposerOrchestratorComposer22TestCase extends BaseComposerOrchestratorCom
                         if (file_exists(\$installedVersionsPath)) require_once \$installedVersionsPath;
 
                         // Restore the backup and ensure the excluded files are properly marked as loaded
-                        \$GLOBALS['__composer_autoload_files'] = [
+                        \$GLOBALS['__composer_autoload_files'] = \\array_merge(
                             ...\$existingComposerAutoloadFiles,
-                            ...array_fill_keys([], true),
-                        ];
+                            \\array_fill_keys([], true)
+                        );
 
                         return \$loader;
                     })();
@@ -662,10 +662,10 @@ class ComposerOrchestratorComposer22TestCase extends BaseComposerOrchestratorCom
                         if (file_exists(\$installedVersionsPath)) require_once \$installedVersionsPath;
 
                         // Restore the backup and ensure the excluded files are properly marked as loaded
-                        \$GLOBALS['__composer_autoload_files'] = [
+                        \$GLOBALS['__composer_autoload_files'] = \\array_merge(
                             ...\$existingComposerAutoloadFiles,
-                            ...array_fill_keys([], true),
-                        ];
+                            \\array_fill_keys([], true)
+                        );
 
                         return \$loader;
                     })();
