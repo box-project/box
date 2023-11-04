@@ -3,6 +3,7 @@
 namespace HumbugBox450\Composer\Semver;
 
 use HumbugBox450\Composer\Semver\Constraint\Constraint;
+/** @internal */
 class Semver
 {
     const SORT_ASC = 1;

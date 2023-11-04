@@ -6,6 +6,7 @@ use HumbugBox450\Composer\Semver\Constraint\ConstraintInterface;
 use HumbugBox450\Composer\Semver\Constraint\MatchAllConstraint;
 use HumbugBox450\Composer\Semver\Constraint\MultiConstraint;
 use HumbugBox450\Composer\Semver\Constraint\Constraint;
+/** @internal */
 class VersionParser
 {
     private static $modifierRegex = '[._-]?(?:(stable|beta|b|RC|alpha|a|patch|pl|p)((?:[.-]?\\d+)*+)?)?([.-]?dev)?';

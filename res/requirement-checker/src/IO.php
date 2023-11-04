@@ -16,6 +16,7 @@ use function str_replace;
 use function stream_isatty;
 use const DIRECTORY_SEPARATOR;
 use const STDOUT;
+/** @internal */
 final class IO
 {
     public const VERBOSITY_QUIET = 16;

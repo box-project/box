@@ -16,6 +16,7 @@ use function sapi_windows_vt100_support;
 use function stream_get_contents;
 use function trim;
 use const DIRECTORY_SEPARATOR;
+/** @internal */
 class Terminal
 {
     private static $width;

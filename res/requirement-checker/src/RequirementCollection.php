@@ -9,6 +9,7 @@ use IteratorAggregate;
 use Traversable;
 use function count;
 use function get_cfg_var;
+/** @internal */
 final class RequirementCollection implements IteratorAggregate, Countable
 {
     private $requirements = [];

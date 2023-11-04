@@ -3,6 +3,7 @@
 namespace HumbugBox450\Composer\Semver;
 
 use HumbugBox450\Composer\Semver\Constraint\Constraint;
+/** @internal */
 class Comparator
 {
     public static function greaterThan($version1, $version2)

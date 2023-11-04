@@ -3,6 +3,7 @@
 declare (strict_types=1);
 namespace HumbugBox450\KevinGH\RequirementChecker;
 
+/** @internal */
 final class Requirement
 {
     private $checkIsFulfilled;
