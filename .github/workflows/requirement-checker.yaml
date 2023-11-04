@@ -335,7 +335,7 @@ jobs:
 
             -   name: Check for changes
                 run: |
-                    if [ $(git status --porcelain | wc -l) -eq "0" ]; then
+                    if git diff --exit-code; then
                         echo "🟢 No change detected."
                         echo "requirement_checker_changed=false" >> $GITHUB_ENV
                     else
