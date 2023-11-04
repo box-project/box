@@ -2,6 +2,7 @@
 
 namespace HumbugBox450\Composer\Semver\Constraint;
 
+/** @internal */
 class Constraint implements ConstraintInterface
 {
     const OP_EQ = 0;

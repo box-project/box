@@ -4,6 +4,7 @@ namespace HumbugBox450\Composer;
 
 use HumbugBox450\Composer\Autoload\ClassLoader;
 use HumbugBox450\Composer\Semver\VersionParser;
+/** @internal */
 class InstalledVersions
 {
     /**
@@ -27,7 +28,7 @@ class InstalledVersions
         if (1 === \count($packages)) {
             return $packages[0];
         }
-        return \array_keys(\array_flip(\call_user_func_array('array_merge', $packages)));
+        return \array_keys(\array_flip(\call_user_func_array('HumbugBox450\\array_merge', $packages)));
     }
     /**
     @psalm-return

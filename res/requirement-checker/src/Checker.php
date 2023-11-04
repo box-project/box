@@ -6,6 +6,7 @@ namespace HumbugBox450\KevinGH\RequirementChecker;
 use InvalidArgumentException;
 use function count;
 use function sprintf;
+/** @internal */
 final class Checker
 {
     private static $requirementsConfig;

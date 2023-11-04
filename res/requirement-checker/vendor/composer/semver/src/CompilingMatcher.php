@@ -4,6 +4,7 @@ namespace HumbugBox450\Composer\Semver;
 
 use HumbugBox450\Composer\Semver\Constraint\Constraint;
 use HumbugBox450\Composer\Semver\Constraint\ConstraintInterface;
+/** @internal */
 class CompilingMatcher
 {
     /**

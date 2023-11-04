@@ -8,6 +8,7 @@ use function sprintf;
 use const PHP_MAJOR_VERSION;
 use const PHP_MINOR_VERSION;
 use const PHP_RELEASE_VERSION;
+/** @internal */
 final class IsPhpVersionFulfilled implements IsFulfilled
 {
     private $requiredPhpVersion;

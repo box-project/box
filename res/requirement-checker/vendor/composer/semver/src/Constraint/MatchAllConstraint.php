@@ -2,6 +2,7 @@
 
 namespace HumbugBox450\Composer\Semver\Constraint;
 
+/** @internal */
 class MatchAllConstraint implements ConstraintInterface
 {
     protected $prettyString;

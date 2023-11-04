@@ -3,6 +3,7 @@
 namespace HumbugBox450\Composer\Semver;
 
 use HumbugBox450\Composer\Semver\Constraint\Constraint;
+/** @internal */
 class Interval
 {
     private $start;

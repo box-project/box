@@ -2,6 +2,7 @@
 
 namespace HumbugBox450\Composer\Semver\Constraint;
 
+/** @internal */
 interface ConstraintInterface
 {
     public function matches(ConstraintInterface $provider);

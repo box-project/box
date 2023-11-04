@@ -4,6 +4,7 @@ declare (strict_types=1);
 namespace HumbugBox450\KevinGH\RequirementChecker;
 
 use function extension_loaded;
+/** @internal */
 final class IsExtensionConflictFulfilled implements IsFulfilled
 {
     private $conflictingExtension;
