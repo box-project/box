@@ -30,6 +30,14 @@ use function preg_replace;
  */
 class ComposerOrchestratorComposer24TestCase extends BaseComposerOrchestratorComposerTestCase
 {
+    protected function shouldSkip(string $composerVersion): array
+    {
+        return [
+            version_compare($composerVersion, '2.4.0', '<'),
+            '>=2.4.0',
+        ];
+    }
+
     /**
      * @dataProvider composerAutoloadProvider
      */
