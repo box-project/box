@@ -570,7 +570,7 @@ class ComposerOrchestratorComposer24TestCase extends BaseComposerOrchestratorCom
 
                     // Restore the backup and ensure the excluded files are properly marked as loaded
                     \$GLOBALS['__composer_autoload_files'] = \\array_merge(
-                        ...\$existingComposerAutoloadFiles,
+                        \$existingComposerAutoloadFiles,
                         \\array_fill_keys([], true)
                     );
 
@@ -638,7 +638,7 @@ class ComposerOrchestratorComposer24TestCase extends BaseComposerOrchestratorCom
 
                     // Restore the backup and ensure the excluded files are properly marked as loaded
                     \$GLOBALS['__composer_autoload_files'] = \\array_merge(
-                        ...\$existingComposerAutoloadFiles,
+                        \$existingComposerAutoloadFiles,
                         \\array_fill_keys([], true)
                     );
 
@@ -703,7 +703,7 @@ class ComposerOrchestratorComposer24TestCase extends BaseComposerOrchestratorCom
 
                         // Restore the backup and ensure the excluded files are properly marked as loaded
                         \$GLOBALS['__composer_autoload_files'] = \\array_merge(
-                            ...\$existingComposerAutoloadFiles,
+                            \$existingComposerAutoloadFiles,
                             \\array_fill_keys([], true)
                         );
 
@@ -780,7 +780,7 @@ class ComposerOrchestratorComposer24TestCase extends BaseComposerOrchestratorCom
 
                         // Restore the backup and ensure the excluded files are properly marked as loaded
                         \$GLOBALS['__composer_autoload_files'] = \\array_merge(
-                            ...\$existingComposerAutoloadFiles,
+                            \$existingComposerAutoloadFiles,
                             \\array_fill_keys([], true)
                         );
 
