@@ -20,6 +20,7 @@ use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use RuntimeException;
 use function file_get_contents;
 use function preg_replace;
+use function version_compare;
 
 /**
  * @covers \KevinGH\Box\Composer\AutoloadDumper
@@ -30,6 +31,14 @@ use function preg_replace;
  */
 class ComposerOrchestratorComposer22TestCase extends BaseComposerOrchestratorComposerTestCase
 {
+    protected function shouldSkip(string $composerVersion): array
+    {
+        return [
+            version_compare($composerVersion, '2.3.0', '>='),
+            '~2.2.0',
+        ];
+    }
+
     /**
      * @dataProvider composerAutoloadProvider
      */

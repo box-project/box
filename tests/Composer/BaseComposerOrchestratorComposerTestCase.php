@@ -21,7 +21,6 @@ use Symfony\Component\Finder\Finder;
 use function file_exists;
 use function iterator_to_array;
 use function sprintf;
-use function version_compare;
 
 abstract class BaseComposerOrchestratorComposerTestCase extends FileSystemTestCase
 {
@@ -29,30 +28,38 @@ abstract class BaseComposerOrchestratorComposerTestCase extends FileSystemTestCa
     protected const COMPOSER_AUTOLOADER_NAME = 'ComposerAutoloaderInit80c62b20a4a44fb21e8e102ccb92ff05';
 
     protected ComposerOrchestrator $composerOrchestrator;
-    protected string $composerVersion;
+
     protected bool $skip;
+    protected string $skipReason;
 
     protected function setUp(): void
     {
         $this->composerOrchestrator = ComposerOrchestrator::create();
 
-        if (!isset($this->skip)) {
-            $this->composerVersion = $this->composerOrchestrator->getVersion();
+        if (!isset($this->skip, $this->skipReason)) {
+            $composerVersion = $this->composerOrchestrator->getVersion();
 
-            $this->skip = version_compare($this->composerVersion, '2.3.0', '>=');
+            [$skip, $supportedConstraint] = $this->shouldSkip($composerVersion);
+
+            $this->skip = $skip;
+            $this->skipReason = sprintf(
+                'Can only be executed with Composer %s. Got "%s".',
+                $supportedConstraint,
+                $composerVersion,
+            );
         }
 
         if ($this->skip) {
-            self::markTestSkipped(
-                sprintf(
-                    'Can only be executed with Composer ~2.2.0. Got "%s".',
-                    $this->composerVersion,
-                ),
-            );
+            self::markTestSkipped($this->skipReason);
         }
 
         parent::setUp();
     }
+
+    /**
+     * @return array{bool, string}
+     */
+    abstract protected function shouldSkip(string $composerVersion): array;
 
     /**
      * @param array<array{string, string}> $recordedClasses
