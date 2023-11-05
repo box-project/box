@@ -22,11 +22,11 @@ use Fidry\FileSystem\FS;
 use KevinGH\Box\Phar\InvalidPhar;
 use KevinGH\Box\Phar\PharFactory;
 use KevinGH\Box\Phar\PharMeta;
-use ParagonIE\ConstantTime\Hex;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Throwable;
+use function bin2hex;
 use function file_exists;
 use function KevinGH\Box\check_php_settings;
 use function realpath;
@@ -188,7 +188,7 @@ final class Extract implements Command
     {
         $extension = self::getExtension($file);
 
-        return Hex::encode(random_bytes(16)).$extension;
+        return bin2hex(random_bytes(16)).$extension;
     }
 
     private static function getExtension(string $file): string
