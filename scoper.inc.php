@@ -14,15 +14,15 @@ declare(strict_types=1);
 
 use Isolated\Symfony\Component\Finder\Finder as IsolatedFinder;
 
-$polyfillFiles = require __DIR__.'/res/scoper-polyfills.php';
-$jetBrainStubFiles = require __DIR__.'/res/scoper-phpstorm-stubs.php';
-$jetBrainStubPatcher = require __DIR__.'/res/scoper-phpstorm-stubs-map-patcher.php';
+$jetBrainStubs = (require __DIR__.'/vendor/humbug/php-scoper/res/get-scoper-phpstorm-stubs.php')(
+    __DIR__.'/vendor/jetbrains/phpstorm-stubs',
+);
+$jetBrainStubsPatcher = (require __DIR__.'/vendor/humbug/php-scoper/res/create-scoper-phpstorm-stubs-map-patcher.php')(
+    stubsMapPath: __DIR__.'/vendor/jetbrains/phpstorm-stubs/PhpStormStubsMap.php',
+);
 
 return [
-    'exclude-files' => [
-        ...$polyfillFiles,
-        ...$jetBrainStubFiles,
-    ],
+    'exclude-files' => $jetBrainStubs,
     'exclude-namespaces' => [
         'Symfony\Polyfill'
     ],
@@ -33,8 +33,11 @@ return [
         // Symfony global constants
         '/^SYMFONY\_[\p{L}_]+$/',
     ],
-    'expose-functions' => [
-        'trigger_deprecation',
+    'exclude-functions' => [
+        // https://github.com/humbug/php-scoper/pull/894
+        'uv_poll_init_socket',
+        'uv_signal_init',
+        'uv_signal_start',
     ],
     'expose-classes' => [
         \Composer\Autoload\ClassLoader::class,
@@ -45,6 +48,6 @@ return [
         \KevinGH\Box\Compactor\PhpScoper::class,
     ],
     'patchers' => [
-        $jetBrainStubPatcher,
+        $jetBrainStubsPatcher,
     ]
 ];
