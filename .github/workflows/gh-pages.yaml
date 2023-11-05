@@ -8,6 +8,11 @@ on:
             - doc/**
             - mkdocs.yaml
             - .github/workflows/gh-pages.yaml
+    pull_request:
+        paths:
+            - doc/**
+            - mkdocs.yaml
+            - .github/workflows/gh-pages.yaml
 
 # See https://stackoverflow.com/a/72408109
 concurrency:
@@ -114,6 +119,7 @@ jobs:
         name: Deploy website
         permissions:
             contents: write
+        if: github.ref == 'refs/heads/main'
         steps:
             -   uses: actions/download-artifact@v3
                 with:
