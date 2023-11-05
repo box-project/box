@@ -24,37 +24,44 @@ env:
 
 jobs:
     check-markdown:
-        name: "Lint Markdown"
-        runs-on: "ubuntu-22.04"
+        name: Lint Markdown
+        runs-on: ubuntu-22.04
         timeout-minutes: 1
         steps:
-            -
-                name: "Checkout repository"
-                uses: "actions/checkout@v3.6.0"
-            -
-                name: "Check Markdown formatting"
-                uses: "DavidAnson/markdownlint-cli2-action@v13.0.0"
+            -   name: Checkout repository
+                uses: actions/checkout@v3
+
+            -   name: Check Markdown formatting
+                uses: DavidAnson/markdownlint-cli2-action@v13.0.0
                 with:
-                    globs: "**/*.md"
+                    globs: "*.md|docs/**/*.md"
 
     check-links:
-        name: "Lint Links"
-        runs-on: "ubuntu-22.04"
+        name: Lint Links
+        runs-on: ubuntu-22.04
         timeout-minutes: 10
         steps:
-            -
-                name: "Checkout repository"
-                uses: "actions/checkout@v3.6.0"
-            -
-                name: "Run Lychee"
-                uses: "lycheeverse/lychee-action@v1.8.0"
+            -   name: Checkout repository
+                uses: actions/checkout@v3
+
+            -   name: Restore lychee cache
+                uses: actions/cache@v3
                 with:
-                    output: "${{ runner.temp }}/lychee/out.md"
+                    path: .lycheecache
+                    key: cache-lychee-${{ github.sha }}
+                    restore-keys: cache-lychee-
+
+            -   name: Run Lychee
+                uses: lycheeverse/lychee-action@v1.8.0
+                with:
+                    # To keep in sync with Makefile#lychee
+                    args: "--verbose --no-progress '*.md' 'docs/**/*.md' --cache --max-cache-age 1d ."
+                    output: ${{ runner.temp }}/lychee/out.md
                     fail: true
 
     build:
         runs-on: ubuntu-latest
-        name: Deploy website
+        name: Build docs
         permissions:
             contents: write
         steps:

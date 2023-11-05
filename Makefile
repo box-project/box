@@ -284,6 +284,22 @@ blackfire: $(SCOPED_BOX_BIN)
 # Website rules
 #---------------------------------------------------------------------------
 
+.PHONY: website_check
+website_check:	## Runs various checks for the website
+website_check: markdownlint lychee website_build
+
+.PHONY: markdownlint
+markdownlint:
+	@echo "$(YELLOW_COLOR)Ensure you have the nodejs & npm installed. For more information, check:$(NO_COLOR)"
+	@# To keep in sync with .github/workflows/gh-pages.yaml#check-links
+	npx markdownlint-cli2 "*.md|docs/**/*.md"
+
+.PHONY: lychee
+lychee:
+	@echo "$(YELLOW_COLOR)Ensure you have the lychee command installed. For more information, check:$(NO_COLOR)"
+	@echo "https://github.com/lycheeverse/lychee"
+	@# To keep in sync with .github/workflows/gh-pages.yaml#check-links
+	lychee --verbose --no-progress '*.md' 'docs/**/*.md'
 
 .PHONY: website_build
 website_build:		 ## Builds the website
