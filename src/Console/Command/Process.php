@@ -141,7 +141,7 @@ final class Process implements Command
             if (null !== $symbolsRegistry) {
                 $io->writeln([
                     '',
-                    'Whitelist:',
+                    'Symbols Registry:',
                     '',
                     '<comment>"""</comment>',
                     self::exportSymbolsRegistry($symbolsRegistry, $io),

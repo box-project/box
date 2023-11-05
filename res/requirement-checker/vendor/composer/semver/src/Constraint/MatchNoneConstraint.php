@@ -1,7 +1,8 @@
 <?php
 
-namespace HumbugBox440\Composer\Semver\Constraint;
+namespace HumbugBox451\Composer\Semver\Constraint;
 
+/** @internal */
 class MatchNoneConstraint implements ConstraintInterface
 {
     protected $prettyString;

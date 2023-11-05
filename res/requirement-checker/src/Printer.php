@@ -1,7 +1,7 @@
 <?php
 
 declare (strict_types=1);
-namespace HumbugBox440\KevinGH\RequirementChecker;
+namespace HumbugBox451\KevinGH\RequirementChecker;
 
 use function array_shift;
 use function count;
@@ -15,6 +15,7 @@ use function strlen;
 use function trim;
 use function wordwrap;
 use const PHP_EOL;
+/** @internal */
 final class Printer
 {
     private $styles = ['reset' => "\x1b[0m", 'red' => "\x1b[31m", 'green' => "\x1b[32m", 'yellow' => "\x1b[33m", 'title' => "\x1b[33m", 'error' => "\x1b[37;41m", 'success' => "\x1b[30;42m"];

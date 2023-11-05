@@ -17,17 +17,20 @@ namespace KevinGH\Box;
 use Amp\MultiReasonException;
 use BadMethodCallException;
 use Countable;
+use DateTimeImmutable;
 use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
 use KevinGH\Box\Phar\CompressionAlgorithm;
+use KevinGH\Box\Phar\SigningAlgorithm;
 use KevinGH\Box\PhpScoper\NullScoper;
 use KevinGH\Box\PhpScoper\Scoper;
 use Phar;
 use RecursiveDirectoryIterator;
 use RuntimeException;
+use Seld\PharUtils\Timestamps;
 use SplFileInfo;
 use Webmozart\Assert\Assert;
 use function Amp\ParallelFunctions\parallelMap;
@@ -65,7 +68,7 @@ final class Box implements Countable
     private array $bufferedFiles = [];
 
     private function __construct(
-        private readonly Phar $phar,
+        private Phar $phar,
         private readonly string $pharFilePath,
     ) {
         $this->compactors = new Compactors();
@@ -132,6 +135,7 @@ final class Box implements Countable
                 $dumpAutoload(
                     $this->scoper->getSymbolsRegistry(),
                     $this->scoper->getPrefix(),
+                    $this->scoper->getExcludedFilePaths(),
                 );
             }
 
@@ -329,6 +333,25 @@ final class Box implements Countable
         return $this->phar;
     }
 
+    public function signWithTimestamps(
+        DateTimeImmutable $timestamp,
+        SigningAlgorithm $signingAlgorithm
+    ): void
+    {
+        $phar = $this->phar;
+        $phar->__destruct();
+        unset($this->phar);
+
+        $util = new Timestamps($this->pharFilePath);
+        $util->updateTimestamps($timestamp);
+        $util->save(
+            $this->pharFilePath,
+            $signingAlgorithm->value,
+        );
+
+        $this->phar = new Phar($this->pharFilePath);
+    }
+
     /**
      * Signs the PHAR using a private key file.
      *
@@ -337,7 +360,7 @@ final class Box implements Countable
      */
     public function signUsingFile(string $file, ?string $password = null): void
     {
-        $this->sign(FS::getFileContents($file), $password);
+        $this->signWithPrivateKey(FS::getFileContents($file), $password);
     }
 
     /**
@@ -346,7 +369,7 @@ final class Box implements Countable
      * @param string      $key      The private key
      * @param null|string $password The private key password
      */
-    public function sign(string $key, ?string $password): void
+    public function signWithPrivateKey(string $key, ?string $password): void
     {
         $pubKey = $this->pharFilePath.'.pubkey';
 

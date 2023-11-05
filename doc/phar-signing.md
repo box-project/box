@@ -1,16 +1,16 @@
 # PHAR signing best practices
 
 1. [Built-in PHAR API](#built-in-phar-api)
-   1. [How to sign your PHAR](#how-to-sign-your-phar)
-   1. [How it works](#how-it-works)
-   1. [Why it is bad](#why-it-is-bad)
+    1. [How to sign your PHAR](#how-to-sign-your-phar)
+    1. [How it works](#how-it-works)
+    1. [Why it is bad](#why-it-is-bad)
 1. [How to (properly) sign your PHAR](#how-to-properly-sign-your-phar)
-   1. [Create a new GPG-key](#create-a-new-gpg-key)
-   1. [Manually signing](#manually-signing)
-   1. [Generate the encryption key](#generate-the-encryption-key)
-   1. [Secure your encryption key](#secure-your-encryption-key)
-   1. [Sign your PHAR](#sign-your-phar)
-   1. [Verifying the PHAR signature](#verifying-the-phar-signature)
+    1. [Create a new GPG-key](#create-a-new-gpg-key)
+    1. [Manually signing](#manually-signing)
+    1. [Generate the encryption key](#generate-the-encryption-key)
+    1. [Secure your encryption key](#secure-your-encryption-key)
+    1. [Sign your PHAR](#sign-your-phar)
+    1. [Verifying the PHAR signature](#verifying-the-phar-signature)
 1. [Automatically sign in GitHub Actions](#automatically-sign-in-github-actions)
 
 There is two idiomatic ways to secure a PHAR:
@@ -35,8 +35,8 @@ $phar->setSignatureAlgorithm($algo, $privateKey);
 There is various algorithm available. The most "secure" one would be `Phar::OPENSSL` with an
 OpenSSL private key. For instance:
 
-```
-$ openssl genrsa -des3 -out acme-phar-private.pem 4096
+```shell
+openssl genrsa -des3 -out acme-phar-private.pem 4096
 ```
 
 ```php
@@ -78,15 +78,24 @@ of the archive does not match the signature of the PHAR and will bail out.
 
 ### Why it is bad
 
-If a PHAR gets corrupted, the PHP interpreter will know from the signature and throw a `PharException`.
+There is a few downsides from this signing mechanisms:
 
-The first issue is the signature itself: if the PHAR gets corrupted, maybe the signature got corrupted too. Using an
-OpenSSL based signature will help to prevent this issue however.
+- You cannot run the PHAR without its associated public key file laying right next to it. As a result, if you were to
+  move your PHAR under `/usr/local/bin`, the PHAR would no longer work due to the missing public key file.
+- OpenSSL keys do not contain any identity information. So unless cleanly separated at distribution time, nobody knows
+  where the pub key came from or who generated it. Which (almost) kills the very idea of signing things.
 
-The second issue is the mechanism itself. Indeed, if one injects code _before_ the stub, then this code will be executed
-before the signature check.
+The real problem is the signature check itself. If the PHAR gets corrupted, maybe the signature got corrupted too. So
+there is ways to void the signature:
 
-**This security mechanism cannot prevent modifications of the archive itself.**  
+- Injects code _before_ the stub, then this code will be executed before the signature check. The signature check can
+  still fail if the signature was not adjusted, but this might be too late.
+- Replace the signature used. An OpenSSL one will only make it slightly harder as this requires to change an external
+  file (the public key), but in the context the attacker could inject code to the PHAR this is unlikely to be a real
+  prevention measure.
+
+So to conclude, **this security mechanism CANNOT prevent modifications of the archive itself.** It is **NOT** a reliable
+protection measure.
 
 The good news, there is a solution.
 
@@ -97,14 +106,15 @@ The good news, there is a solution.
 
 The first step is to create a new GPG-key. You can either do that via a GUI or via the CLI like this:
 
-```
-$ gpg --gen-key
+```shell
+gpg --gen-key
 ```
 
 It will ask for some questions. It is recommended to use a passphrase (ideally generated and managed by a reputable
 password manager). In the end, you will end up with something like this:
 
 ```
+# $ gpg --gen-key output
 pub   ed25519 2023-10-21 [SC] [expires: 2026-10-20]
       96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
 uid                      Théo Fidry <theo.fidry+phar-signing-example@example.com>
@@ -114,8 +124,8 @@ sub   cv25519 2023-10-21 [E] [expires: 2026-10-20]
 In this case the interesting part is `96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08` which is the key ID. You can also check
 the list of your GPG keys like so:
 
-```
-$ gpg --list-secret-keys --keyid-format=long
+```shell
+gpg --list-secret-keys --keyid-format=long
 
 #
 # Other keys displayed too
@@ -126,19 +136,24 @@ uid                 [ultimate] Théo Fidry <theo.fidry+phar-signing-example@exam
 ssb   cv25519/765C0E3CCBC7D7D3 2023-10-21 [E] [expires: 2026-10-20]
 ```
 
-The interesting part is the `96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08` which is the key-ID.
+Like above, you see the key ID `96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08`.
 
-To make the key accessible for others we should now send it to a keyserver.
+To make the key accessible for others we should now send it to a keyserver[^1].
 
+```shell
+gpg --keyserver keys.openpgp.org --send-key 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
 ```
-$ gpg --keyserver pgp.mit.edu --send-key 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
-```
+
+[^1]:
+    
+    There is several OpenPGP Keyservers. It is recommended to push your keys to [keys.openpgp.org] _at least_, but you
+    can also push it to other servers if you wish to.
 
 You can also already generate a revocation certificate for the key. Should the key be compromised you can then send the
 revocation certificate to the keyserver to invalidate the signing key.
 
-```
-$ gpg --output revoke-96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08.asc --gen-revoke 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
+```shell
+gpg --output revoke-96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08.asc --gen-revoke 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
 ```
 
 This will leave you with a revocation certificate in the file `revoke-96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08.asc` 
@@ -155,13 +170,15 @@ private GPG key.
 
 In order to use the key to encrypt files, you need to first export it:
 
-```
-$ gpg --export --armor 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08 > keys.asc
-$ gpg --export-secret-key --armor 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08 >> keys.asc
+```shell
+gpg --export --armor 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08 > keys.asc
+gpg --export-secret-key --armor 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08 >> keys.asc
 ```
 
-That will leave the public and private key in a single file. Anyone that has that file can sign on your behalf! So keep
-that file secure at all times and make sure it never accidentally shows up in your git repository!
+!!! warning
+
+    That will leave the public and private key in a single file. Anyone that has that file can sign on your behalf! So keep
+    that file secure at all times and make sure it never accidentally shows up in your git repository.
 
 
 ### Secure your encryption key
@@ -184,9 +201,9 @@ it is better to not keep that decrypted key around.
 
 You first need to encrypt `keys.asc.gpg` into `keys.asc`:
 
-```
+```shell
 # If you are locally:
-$ gpg keys.asc.gpg
+gpg keys.asc.gpg
 # In another environment: CI or other. You should use an environment variable
 # or a temporary file to avoid printing the password in clear text.
 echo $DECRYPT_KEY_PASSPHRASE | gpg --passphrase-fd 0 keys.asc.gpg
@@ -196,14 +213,14 @@ cat $(.decrypt-key-passphrase) | gpg --passphrase-fd 0 keys.asc.gpg
 
 Import the decrypted key if it is not already present on the machine:
 
-```
-$ gpg --batch --yes --import keys.asc
+```shell
+gpg --batch --yes --import keys.asc
 ```
 
 Sign your file:
 
-```
-$ gpg \
+```shell
+gpg \
    --batch \
    --passphrase="$GPG_KEY_96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08_PASSPHRASE" \
    --local-user 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08 \
@@ -224,15 +241,17 @@ First you should check the issuer's identity, usually it is provided from where 
 documentation:
 
 ```
+# If you are on the same machine as where you created the key, then this step is unnecessary.
+# You will need this however for when verifying a different key that you do not know of yet.
 gpg --keyserver hkps://keys.openpgp.org --recv-keys 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
 ```
 
-However not everyone expose what is their GPG key ID. So sometimes to avoid bad surprises, you
+However not everyone exposes what is their GPG key ID. So sometimes to avoid bad surprises, you
 can look up for similar issuers to the key ID given by the `.asc`:
 
-```
+```shell
 # Verify the signature
-$ gpg --verify bin/command.phar.asc bin/command.phar
+gpg --verify bin/command.phar.asc bin/command.phar
 
 # Example of output:
 gpg: Signature made Sat 21 Oct 16:58:05 2023 CEST
@@ -242,17 +261,21 @@ gpg: Good signature from "Théo Fidry <theo.fidry+phar-signing-example@example.c
 
 If the key ID was not provided before, you can try to look it up to check it was properly registered to a keyserver:
 
+```shell
+gpg --keyserver https://keys.openpgp.org --search-keys "theo.fidry+phar-signing-example@example.com"
 ```
-$ gpg --keyserver https://keys.openpgp.org --search-keys "theo.fidry+phar-signing-example@example.com"
-```
+
+!!! info
+
+    Also note that when dealing with PHARs, the above steps are automatically done for you by [PHIVE][phive].
 
 
 ## Automatically sign in GitHub Actions
 
 The first step is to add [environment secrets to your repository][github-environment-secrets]:
 
-```
-$ gpg --export-secret-key --armor 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
+```shell
+gpg --export-secret-key --armor 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
 # Paste the content into a secret environment variable
 GPG_KEY_96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
 
@@ -261,15 +284,17 @@ GPG_KEY_96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08_PASSPHRASE
 ```
 
 Then you need to:
+
 - Build your PHAR
 - Import the GPG key
 - Sign your PHAR
 - Publish your PHAR
 
 I highly recommend to build your PHAR as part of your regular workflows. Then the other steps can be enable on release
-only. The following is an example of GitHub workflow:
+only. The following is an example of [GitHub workflow][github-workflow]:
 
 ```yaml
+# .github/workflows/release.yaml
 name: Release
 
 on:
@@ -356,9 +381,14 @@ A more complete real-life example can be found in the [Box release workflow][box
 <hr />
 
 Credits:
-- [Jeff Channell, July 13, 2017, _Code Injection in Signed PHP Archives (Phar)_](https://blog.sucuri.net/2017/07/code-injection-in-phar-signed-php-archives.html)
-- [Andreas Heigl, January 19, 2017, _Encrypt a build-result – automaticaly_](https://andreas.heigl.org/2017/01/19/encrypt-a-build-result-automaticaly/)
 
-[box-release-workflow]: ./../.github/workflows/release.yaml
+- [Andreas Heigl, January 19, 2017, _Encrypt a build-result – automaticaly_](https://andreas.heigl.org/2017/01/19/encrypt-a-build-result-automaticaly/)
+- [Arne Blankerts](https://github.com/theseer)
+- [Jeff Channell, July 13, 2017, _Code Injection in Signed PHP Archives (Phar)_](https://blog.sucuri.net/2017/07/code-injection-in-phar-signed-php-archives.html)
+
+[box-release-workflow]: https://github.com/box-project/box/blob/main/.github/workflows/release.yaml
+[keys.openpgp.org]: https://keys.openpgp.org/about
 [github-environment-secrets]: https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions
+[github-workflow]: https://docs.github.com/en/actions/using-workflows
+[phive]: https://phar.io/
 [jar]: https://docs.oracle.com/javase/8/docs/technotes/guides/jar/jarGuide.html

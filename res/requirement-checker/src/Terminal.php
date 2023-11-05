@@ -1,7 +1,7 @@
 <?php
 
 declare (strict_types=1);
-namespace HumbugBox440\KevinGH\RequirementChecker;
+namespace HumbugBox451\KevinGH\RequirementChecker;
 
 use function exec;
 use function fclose;
@@ -16,6 +16,7 @@ use function sapi_windows_vt100_support;
 use function stream_get_contents;
 use function trim;
 use const DIRECTORY_SEPARATOR;
+/** @internal */
 class Terminal
 {
     private static $width;

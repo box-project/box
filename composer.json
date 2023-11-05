@@ -21,19 +21,17 @@
         "ext-iconv": "*",
         "ext-mbstring": "*",
         "ext-phar": "*",
-        "ext-sodium": "*",
         "composer-plugin-api": "^2.2",
         "amphp/parallel-functions": "^1.1",
         "composer/semver": "^3.3.2",
         "composer/xdebug-handler": "^3.0.3",
         "fidry/console": "^0.5.3 || ^0.6.0",
         "fidry/filesystem": "^1.1",
-        "humbug/php-scoper": "^0.18.3",
+        "humbug/php-scoper": "^0.18.6",
         "justinrainbow/json-schema": "^5.2.12",
         "laravel/serializable-closure": "^1.2.2",
         "nikic/iter": "^2.2",
         "nikic/php-parser": "^4.15.2",
-        "paragonie/constant_time_encoding": "^2.6",
         "phpdocumentor/reflection-docblock": "^5.3",
         "phpdocumentor/type-resolver": "^1.7",
         "psr/log": "^3.0",
@@ -62,7 +60,6 @@
         "webmozarts/strict-phpunit": "^7.6"
     },
     "replace": {
-        "paragonie/sodium_compat": "*",
         "symfony/polyfill-php80": "*",
         "symfony/polyfill-php81": "*"
     },

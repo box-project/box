@@ -1,7 +1,7 @@
 <?php
 
 declare (strict_types=1);
-namespace HumbugBox440\KevinGH\RequirementChecker;
+namespace HumbugBox451\KevinGH\RequirementChecker;
 
 use function fstat;
 use function function_exists;
@@ -16,6 +16,7 @@ use function str_replace;
 use function stream_isatty;
 use const DIRECTORY_SEPARATOR;
 use const STDOUT;
+/** @internal */
 final class IO
 {
     public const VERBOSITY_QUIET = 16;

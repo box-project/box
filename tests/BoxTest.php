@@ -1437,7 +1437,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->configureHelloWorldPhar();
 
-        $this->box->sign($key, $password);
+        $this->box->signWithPrivateKey($key, $password);
 
         self::assertNotSame([], $phar->getSignature(), 'Expected the PHAR to be signed.');
         self::assertIsString($phar->getSignature()['hash'], 'Expected the PHAR signature hash to be a string.');
@@ -1462,7 +1462,7 @@ class BoxTest extends FileSystemTestCase
         $this->configureHelloWorldPhar();
 
         try {
-            $this->box->sign($key, $password);
+            $this->box->signWithPrivateKey($key, $password);
 
             self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -1482,7 +1482,7 @@ class BoxTest extends FileSystemTestCase
         $this->configureHelloWorldPhar();
 
         try {
-            $this->box->sign($key, $password);
+            $this->box->signWithPrivateKey($key, $password);
 
             self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {

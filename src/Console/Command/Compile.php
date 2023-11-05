@@ -249,12 +249,7 @@ final class Compile implements CommandAware
         IO $io,
         bool $debug,
     ): Box {
-        $unsignedPharPath = str_replace(
-            '.phar',
-            '-unsigned.phar',
-            $config->getTmpOutputPath(),
-        );
-        $box = Box::create($unsignedPharPath);
+        $box = Box::create($config->getTmpOutputPath());
         $composerOrchestrator = new ComposerOrchestrator(
             ComposerProcessFactory::create(
                 $config->getComposerBin(),
@@ -299,11 +294,8 @@ final class Compile implements CommandAware
             $logger,
         );
 
-        self::correctTimestamp($unsignedPharPath, $logger);
-
-        unset($box);
-        FS::rename($unsignedPharPath, $config->getTmpOutputPath());
-        $box = Box::create($config->getTmpOutputPath());
+        self::correctTimestamp($box, $logger);
+        exit;
 
         self::signPhar($config, $box, $config->getTmpOutputPath(), $io, $logger);
 
@@ -684,10 +676,11 @@ final class Compile implements CommandAware
 
         $box->endBuffering(
             $config->dumpAutoload()
-                ? static fn (SymbolsRegistry $symbolsRegistry, string $prefix) => $composerOrchestrator->dumpAutoload(
+                ? static fn (SymbolsRegistry $symbolsRegistry, string $prefix, array $excludeScoperFiles) => $composerOrchestrator->dumpAutoload(
                     $symbolsRegistry,
                     $prefix,
                     $excludeDevFiles,
+                    $excludeScoperFiles,
                 )
                 : null,
         );
@@ -765,7 +758,7 @@ final class Compile implements CommandAware
         }
     }
 
-    private static function correctTimestamp(string $unsignedPharPath, CompilerLogger $logger): void {
+    private static function correctTimestamp(Box $box, CompilerLogger $logger): void {
         $timestamp = new DateTimeImmutable('2017-10-11 08:58:00+00:00');
 
         $logger->log(
@@ -776,9 +769,7 @@ final class Compile implements CommandAware
             ),
         );
 
-        $util = new Timestamps($unsignedPharPath);
-        $util->updateTimestamps($timestamp);
-        $util->save($unsignedPharPath, Phar::SHA512);
+        $box->signWithTimestamps($timestamp);
     }
 
     private static function signPhar(

@@ -1,7 +1,7 @@
 <?php
 
 declare (strict_types=1);
-namespace HumbugBox440\KevinGH\RequirementChecker;
+namespace HumbugBox451\KevinGH\RequirementChecker;
 
 use ArrayIterator;
 use Countable;
@@ -9,6 +9,7 @@ use IteratorAggregate;
 use Traversable;
 use function count;
 use function get_cfg_var;
+/** @internal */
 final class RequirementCollection implements IteratorAggregate, Countable
 {
     private $requirements = [];

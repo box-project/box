@@ -1,11 +1,12 @@
 <?php
 
 declare (strict_types=1);
-namespace HumbugBox440\KevinGH\RequirementChecker;
+namespace HumbugBox451\KevinGH\RequirementChecker;
 
 use InvalidArgumentException;
 use function count;
 use function sprintf;
+/** @internal */
 final class Checker
 {
     private static $requirementsConfig;
