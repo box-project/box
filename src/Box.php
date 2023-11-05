@@ -201,7 +201,7 @@ final class Box implements Countable
 
         try {
             if (CompressionAlgorithm::NONE === $compressionAlgorithm) {
-                $this->getPhar()->decompressFiles();
+                $this->phar->decompressFiles();
             } else {
                 $this->phar->compressFiles($compressionAlgorithm->value);
             }
@@ -328,9 +328,45 @@ final class Box implements Countable
         return $local;
     }
 
+    /**
+     * @internal
+     */
     public function getPhar(): Phar
     {
         return $this->phar;
+    }
+
+    public function setAlias(string $alias): void
+    {
+        $aliasWasAdded = $this->phar->setAlias($alias);
+
+        Assert::true(
+            $aliasWasAdded,
+            sprintf(
+                'The alias "%s" is invalid. See Phar::setAlias() documentation for more information.',
+                $alias,
+            ),
+        );
+    }
+
+    public function setStub(string $stub): void
+    {
+        $this->phar->setStub($stub);
+    }
+
+    public function setDefaultStub(string $main): void
+    {
+        $this->phar->setDefaultStub($main);
+    }
+
+    public function setMetadata(mixed $metadata): void
+    {
+        $this->phar->setMetadata($metadata);
+    }
+
+    public function extractTo(string $directory, bool $overwrite = false): void
+    {
+        $this->phar->extractTo($directory, overwrite: $overwrite);
     }
 
     public function signWithTimestamps(
@@ -360,7 +396,7 @@ final class Box implements Countable
      */
     public function signUsingFile(string $file, ?string $password = null): void
     {
-        $this->signWithPrivateKey(FS::getFileContents($file), $password);
+        $this->signUsingKey(FS::getFileContents($file), $password);
     }
 
     /**
@@ -369,7 +405,7 @@ final class Box implements Countable
      * @param string      $key      The private key
      * @param null|string $password The private key password
      */
-    public function signWithPrivateKey(string $key, ?string $password): void
+    public function signUsingKey(string $key, ?string $password): void
     {
         $pubKey = $this->pharFilePath.'.pubkey';
 

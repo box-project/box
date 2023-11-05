@@ -52,7 +52,6 @@ use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Filesystem\Path;
-use Webmozart\Assert\Assert;
 use function array_map;
 use function array_shift;
 use function count;
@@ -283,7 +282,7 @@ final class Compile implements CommandAware
         self::checkComposerFiles($box, $config, $logger);
 
         if ($debug) {
-            $box->getPhar()->extractTo(self::DEBUG_DIR, null, true);
+            $box->extractTo(self::DEBUG_DIR, true);
         }
 
         self::configureCompressionAlgorithm(
@@ -602,7 +601,7 @@ final class Compile implements CommandAware
 
             $stub = self::createStub($config, $main, $checkRequirements, $logger);
 
-            $box->getPhar()->setStub($stub);
+            $box->setStub($stub);
 
             return;
         }
@@ -621,17 +620,8 @@ final class Compile implements CommandAware
             return;
         }
 
-        $aliasWasAdded = $box->getPhar()->setAlias($config->getAlias());
-
-        Assert::true(
-            $aliasWasAdded,
-            sprintf(
-                'The alias "%s" is invalid. See Phar::setAlias() documentation for more information.',
-                $config->getAlias(),
-            ),
-        );
-
-        $box->getPhar()->setDefaultStub($main);
+        $box->setAlias($config->getAlias());
+        $box->setDefaultStub($main);
 
         $logger->log(
             CompilerLogger::QUESTION_MARK_PREFIX,
@@ -656,7 +646,7 @@ final class Compile implements CommandAware
                 is_string($metadata) ? $metadata : var_export($metadata, true),
             );
 
-            $box->getPhar()->setMetadata($metadata);
+            $box->setMetadata($metadata);
         }
     }
 
@@ -785,9 +775,7 @@ final class Compile implements CommandAware
         $key = $config->getPrivateKeyPath();
 
         if (null === $key) {
-            $box->getPhar()->setSignatureAlgorithm(
-                $config->getSigningAlgorithm()->value,
-            );
+            $box->sign($config->getSigningAlgorithm());
 
             return;
         }
