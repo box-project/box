@@ -103,39 +103,12 @@ By default, Box generates a [banner][banner]. This banners includes the Box vers
 different Box versions will result in a different PHAR signature.
 
 
-### PHAR
+### Timestamp
 
 The files unix timestamp are part of the PHAR signature, hence if they have a different timestamp (which they do as when
 you add a PHAR to a file, it is changed to the time at when you added it).
 
-To fix this, you can leverage [Seldaek PHAR-Utils][phar-utils] with the following script:
-
-```php
-// resign.php
-<?php declare(strict_types=1);
-
-require_once __DIR__ . '/vendor/autoload.php';
-
-use Seld\PharUtils\Timestamps;
-
-$file = getcwd() . '/' . ($argv[1] ?? '');
-if (!is_file($file)) {
-    echo "File does not exist.\n";
-    exit(1);
-}
-
-$util = new Timestamps($file);
-$util->updateTimestamps(new DateTimeImmutable('2017-10-11 08:58:00'));
-$util->save($file, Phar::SHA512);
-```
-
-Then once your PHAR is built:
-
-```shell
-php resign.php app.phar
-```
-
-This is obviously not ideal and should be fixed by Box at some point (see [#1074](https://github.com/box-project/box/issues/1074)).
+To fix this, you can leverage configure the [timestamp].
 
 
 ## Usages
@@ -170,3 +143,4 @@ but it is enough to know if the PHARs are identical or not.
 [php-scoper-compactor]: ./configuration.md#compactors-compactors
 [php-scoper-prefix-doc]: https://github.com/humbug/php-scoper/blob/main/docs/configuration.md#prefix
 [requirement-checker]: ./requirement-checker.md
+[timestamp]: ./configuration.md#forcing-the-timestamp-timestamp
