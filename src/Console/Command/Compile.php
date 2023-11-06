@@ -39,13 +39,12 @@ use KevinGH\Box\Console\Logger\CompilerLogger;
 use KevinGH\Box\Console\MessageRenderer;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\Phar\CompressionAlgorithm;
+use KevinGH\Box\Phar\SigningAlgorithm;
 use KevinGH\Box\RequirementChecker\DecodedComposerJson;
 use KevinGH\Box\RequirementChecker\DecodedComposerLock;
 use KevinGH\Box\RequirementChecker\RequirementsDumper;
 use KevinGH\Box\StubGenerator;
-use Phar;
 use RuntimeException;
-use Seld\PharUtils\Timestamps;
 use stdClass;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
@@ -73,7 +72,6 @@ use function microtime;
 use function putenv;
 use function Safe\getcwd;
 use function sprintf;
-use function str_replace;
 use function var_export;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 use const PHP_EOL;
@@ -248,7 +246,8 @@ final class Compile implements CommandAware
         IO $io,
         bool $debug,
     ): Box {
-        $box = Box::create($config->getTmpOutputPath());
+        $tmpOutputPath = $config->getTmpOutputPath();
+        $box = Box::create($tmpOutputPath);
         $composerOrchestrator = new ComposerOrchestrator(
             ComposerProcessFactory::create(
                 $config->getComposerBin(),
@@ -293,13 +292,10 @@ final class Compile implements CommandAware
             $logger,
         );
 
-        self::correctTimestamp($box, $logger);
-        exit;
+        self::signPhar($config, $box, $tmpOutputPath, $io, $logger);
 
-        self::signPhar($config, $box, $config->getTmpOutputPath(), $io, $logger);
-
-        if ($config->getTmpOutputPath() !== $config->getOutputPath()) {
-            FS::rename($config->getTmpOutputPath(), $config->getOutputPath());
+        if ($tmpOutputPath !== $config->getOutputPath()) {
+            FS::rename($tmpOutputPath, $config->getOutputPath());
         }
 
         return $box;
@@ -748,20 +744,6 @@ final class Compile implements CommandAware
         }
     }
 
-    private static function correctTimestamp(Box $box, CompilerLogger $logger): void {
-        $timestamp = new DateTimeImmutable('2017-10-11 08:58:00+00:00');
-
-        $logger->log(
-            CompilerLogger::QUESTION_MARK_PREFIX,
-            sprintf(
-                'Correcting the timestamp to "%s".',
-                $timestamp->format(DateTimeInterface::ATOM),
-            ),
-        );
-
-        $box->signWithTimestamps($timestamp);
-    }
-
     private static function signPhar(
         Configuration $config,
         Box $box,
@@ -775,19 +757,57 @@ final class Compile implements CommandAware
         $key = $config->getPrivateKeyPath();
 
         if (null === $key) {
-            $box->sign($config->getSigningAlgorithm());
+            self::signPharWithoutPrivateKey(
+                $box,
+                $config->getSigningAlgorithm(),
+                $config->getTimestamp(),
+                $logger,
+            );
+        } else {
+            self::signPharWithPrivateKey(
+                $box,
+                $key,
+                $config->getPrivateKeyPassphrase(),
+                $config->promptForPrivateKey(),
+                $io,
+                $logger,
+            );
+        }
+    }
 
-            return;
+    private static function signPharWithoutPrivateKey(
+        Box $box,
+        SigningAlgorithm $signingAlgorithm,
+        ?DateTimeImmutable $timestamp,
+        CompilerLogger $logger,
+    ): void {
+        if (null !== $timestamp) {
+            $logger->log(
+                CompilerLogger::QUESTION_MARK_PREFIX,
+                sprintf(
+                    'Correcting the timestamp to "%s".',
+                    $timestamp->format(DateTimeInterface::ATOM),
+                ),
+            );
         }
 
+        $box->sign($signingAlgorithm, $timestamp);
+    }
+
+    private static function signPharWithPrivateKey(
+        Box $box,
+        string $key,
+        ?string $passphrase,
+        bool $prompt,
+        IO $io,
+        CompilerLogger $logger,
+    ): void {
         $logger->log(
             CompilerLogger::QUESTION_MARK_PREFIX,
             'Signing using a private key',
         );
 
-        $passphrase = $config->getPrivateKeyPassphrase();
-
-        if ($config->promptForPrivateKey()) {
+        if ($prompt) {
             if (false === $io->isInteractive()) {
                 throw new RuntimeException(
                     sprintf(

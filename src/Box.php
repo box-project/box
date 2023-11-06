@@ -369,11 +369,16 @@ final class Box implements Countable
         $this->phar->extractTo($directory, overwrite: $overwrite);
     }
 
-    public function signWithTimestamps(
-        DateTimeImmutable $timestamp,
-        SigningAlgorithm $signingAlgorithm
-    ): void
-    {
+    public function sign(
+        SigningAlgorithm $signingAlgorithm,
+        ?DateTimeImmutable $timestamp = null,
+    ): void {
+        if (null === $timestamp) {
+            $this->phar->setSignatureAlgorithm($signingAlgorithm->value);
+
+            return;
+        }
+
         $phar = $this->phar;
         $phar->__destruct();
         unset($this->phar);

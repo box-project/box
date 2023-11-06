@@ -209,6 +209,10 @@
         "stub": {
             "description": "The relative file path to the stub file, or the flag to use the default stub.",
             "type": ["boolean", "string", "null"]
+        },
+        "timestamp": {
+            "description": "The time at which the PHAR timestamp will be set.",
+            "type": ["string", "null"]
         }
     }
 }
