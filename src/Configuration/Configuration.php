@@ -345,7 +345,7 @@ final class Configuration
 
         $replacements = self::retrieveReplacements($raw, $file, $basePath, $logger);
 
-        $timestamp = self::retrieveTimestamp($raw, $logger);
+        $timestamp = self::retrieveTimestamp($raw, $signingAlgorithm, $logger);
 
         return new self(
             $file,
@@ -2077,18 +2077,33 @@ final class Configuration
 
     private static function retrieveTimestamp(
         stdClass $raw,
+        SigningAlgorithm $signingAlgorithm,
         ConfigurationLogger $logger,
     ): ?DateTimeImmutable {
         self::checkIfDefaultValue($logger, $raw, self::TIMESTAMP);
 
         $timestamp = $raw->{self::TIMESTAMP} ?? null;
 
-        return null === $timestamp
-            ? null
-            : new DateTimeImmutable(
-                $timestamp,
-                new DateTimeZone('UTC'),
+        if (null === $timestamp) {
+            return null;
+        }
+
+        if (SigningAlgorithm::OPENSSL === $signingAlgorithm) {
+            $logger->addWarning(
+                sprintf(
+                    'The "%s" setting has been set but has been ignored since an OpenSSL signature has been configured (setting "%s").',
+                    self::TIMESTAMP,
+                    self::ALGORITHM_KEY,
+                ),
             );
+
+            return null;
+        }
+
+        return new DateTimeImmutable(
+            $timestamp,
+            new DateTimeZone('UTC'),
+        );
     }
 
     private static function retrievePrettyGitPlaceholder(stdClass $raw, ConfigurationLogger $logger): ?string
