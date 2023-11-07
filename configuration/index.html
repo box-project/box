@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../img/favicon.png">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.7">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.8">
     
     
       
@@ -595,6 +595,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#forcing-the-timestamp-timestamp" class="md-nav__link">
+    Forcing the timestamp (timestamp)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#dumping-the-composer-autoloader-dump-autoload" class="md-nav__link">
     Dumping the Composer autoloader (dump-autoload)
   </a>
@@ -1114,6 +1121,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#forcing-the-timestamp-timestamp" class="md-nav__link">
+    Forcing the timestamp (timestamp)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#dumping-the-composer-autoloader-dump-autoload" class="md-nav__link">
     Dumping the Composer autoloader (dump-autoload)
   </a>
@@ -1312,6 +1326,7 @@
 <li><a href="#banner-file-banner-file">Banner file (<code>banner-file</code>)</a></li>
 </ol>
 </li>
+<li><a href="#forcing-the-timestamp-timestamp">Forcing the timestamp (<code>timestamp</code>)</a></li>
 <li><a href="#dumping-the-composer-autoloader-dump-autoload">Dumping the Composer autoloader (<code>dump-autoload</code>)</a></li>
 <li><a href="#compactors-compactors">Compactors (<code>compactors</code>)</a><ol>
 <li><a href="#annotations-annotations">Annotations (<code>annotations</code>)</a></li>
@@ -1385,7 +1400,8 @@ to <code>null</code>, then its default value will be picked and is strictly equi
 <span class="w">    </span><span class="nt">&quot;replacement-sigil&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;replacements&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;shebang&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;stub&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span>
+<span class="w">    </span><span class="nt">&quot;stub&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span>
 <span class="p">}</span>
 </code></pre></div>
 <h2 id="base-path-base-path">Base-path (<code>base-path</code>)<a class="headerlink" href="#base-path-base-path" title="Permanent link">&para;</a></h2>
@@ -1771,6 +1787,14 @@ done for you.</p>
 <a href="#base-path-base-path">the base path</a>) to the file that will contain the comment.</p>
 <p>Like banner, the comment must not already be enclosed in a comment block.</p>
 <p>If this parameter is set to a different value than <code>null</code>, then the value of <a href="#banner-banner"><code>banner</code></a> will be discarded.</p>
+<h2 id="forcing-the-timestamp-timestamp">Forcing the timestamp (<code>timestamp</code>)<a class="headerlink" href="#forcing-the-timestamp-timestamp" title="Permanent link">&para;</a></h2>
+<p>The <code>timestamp</code> (<code>string</code>|<code>null</code>, default <code>null</code>) setting will result in Box forcing the timestamp of the PHAR. By
+default, the timestamp of the PHAR is the one at which the PHAR was built. It may be useful to fix it for
+<a href="../reproducible-builds/#reproducible-builds">reproducible builds</a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Forcing the timestamp cannot be done when using an <a href="#signing-algorithm-algorithm">OpenSSL signature</a>.</p>
+</div>
 <h2 id="dumping-the-composer-autoloader-dump-autoload">Dumping the Composer autoloader (<code>dump-autoload</code>)<a class="headerlink" href="#dumping-the-composer-autoloader-dump-autoload" title="Permanent link">&para;</a></h2>
 <p>The <code>dump-autoload</code> (<code>boolean</code>|<code>null</code>, default <code>true</code>) setting will result in Box dump the Composer autoload with the
 <a href="https://getcomposer.org/doc/articles/autoloader-optimization.md#optimization-level-2-a-authoritative-class-maps">classmap authoritative mode</a> and the <a href="https://getcomposer.org/doc/03-cli.md#dump-autoload-dumpautoload-"><code>--no-dev</code> option</a> which
@@ -2132,7 +2156,7 @@ in all <a href="#including-files">non-binary files</a> by the current git tag of
     <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link", "navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.aecac24b.min.js"></script>
+      <script src="../assets/javascripts/bundle.81fa17fe.min.js"></script>
       
     
   </body>

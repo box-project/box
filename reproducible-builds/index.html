@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../img/favicon.png">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.7">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.8">
     
     
       
@@ -632,8 +632,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#phar" class="md-nav__link">
-    PHAR
+  <a href="#timestamp" class="md-nav__link">
+    Timestamp
   </a>
   
 </li>
@@ -809,8 +809,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#phar" class="md-nav__link">
-    PHAR
+  <a href="#timestamp" class="md-nav__link">
+    Timestamp
   </a>
   
 </li>
@@ -912,31 +912,10 @@ difference will be the namespace.</p>
 <h4 id="box-banner">Box banner<a class="headerlink" href="#box-banner" title="Permanent link">&para;</a></h4>
 <p>By default, Box generates a <a href="../configuration/#banner-banner">banner</a>. This banners includes the Box version so building the same PHAR with two
 different Box versions will result in a different PHAR signature.</p>
-<h3 id="phar">PHAR<a class="headerlink" href="#phar" title="Permanent link">&para;</a></h3>
+<h3 id="timestamp">Timestamp<a class="headerlink" href="#timestamp" title="Permanent link">&para;</a></h3>
 <p>The files unix timestamp are part of the PHAR signature, hence if they have a different timestamp (which they do as when
 you add a PHAR to a file, it is changed to the time at when you added it).</p>
-<p>To fix this, you can leverage <a href="https://github.com/Seldaek/phar-utils">Seldaek PHAR-Utils</a> with the following script:</p>
-<div class="highlight"><pre><span></span><code><span class="x">// resign.php</span>
-<span class="cp">&lt;?php</span> <span class="k">declare</span><span class="p">(</span><span class="nx">strict_types</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
-
-<span class="k">require_once</span> <span class="no">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/vendor/autoload.php&#39;</span><span class="p">;</span>
-
-<span class="k">use</span> <span class="nx">Seld\PharUtils\Timestamps</span><span class="p">;</span>
-
-<span class="nv">$file</span> <span class="o">=</span> <span class="nb">getcwd</span><span class="p">()</span> <span class="o">.</span> <span class="s1">&#39;/&#39;</span> <span class="o">.</span> <span class="p">(</span><span class="nv">$argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">??</span> <span class="s1">&#39;&#39;</span><span class="p">);</span>
-<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">is_file</span><span class="p">(</span><span class="nv">$file</span><span class="p">))</span> <span class="p">{</span>
-    <span class="k">echo</span> <span class="s2">&quot;File does not exist.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
-    <span class="k">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="nv">$util</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Timestamps</span><span class="p">(</span><span class="nv">$file</span><span class="p">);</span>
-<span class="nv">$util</span><span class="o">-&gt;</span><span class="na">updateTimestamps</span><span class="p">(</span><span class="k">new</span> <span class="nx">DateTimeImmutable</span><span class="p">(</span><span class="s1">&#39;2017-10-11 08:58:00&#39;</span><span class="p">));</span>
-<span class="nv">$util</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">(</span><span class="nv">$file</span><span class="p">,</span> <span class="nx">Phar</span><span class="o">::</span><span class="na">SHA512</span><span class="p">);</span>
-</code></pre></div>
-<p>Then once your PHAR is built:</p>
-<div class="highlight"><pre><span></span><code>php<span class="w"> </span>resign.php<span class="w"> </span>app.phar
-</code></pre></div>
-<p>This is obviously not ideal and should be fixed by Box at some point (see <a href="https://github.com/box-project/box/issues/1074">#1074</a>).</p>
+<p>To fix this, you can leverage configure the <a href="../configuration/#forcing-the-timestamp-timestamp">timestamp</a>.</p>
 <h2 id="usages">Usages<a class="headerlink" href="#usages" title="Permanent link">&para;</a></h2>
 <p>Deterministic builds are a highly desirable property to prevent targeted malware attacks. They also make it easier to
 detect if there is any real change. As non-exhaustive examples in the wild: <a href="https://github.com/composer/composer">Composer</a> and <a href="https://github.com/phpstan/phpstan">PHPStan</a>.</p>
@@ -1018,7 +997,7 @@ but it is enough to know if the PHARs are identical or not.</p>
     <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link", "navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.aecac24b.min.js"></script>
+      <script src="../assets/javascripts/bundle.81fa17fe.min.js"></script>
       
     
   </body>
