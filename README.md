@@ -59,6 +59,7 @@ For the full documentation see https://box-project.github.io/box.
         1. [Shebang (`shebang`)](doc/configuration.md#shebang-shebang)
         1. [Banner (`banner`)](doc/configuration.md#banner-banner)
         1. [Banner file (`banner-file`)](doc/configuration.md#banner-file-banner-file)
+    1. [Forcing the timestamp (`timestamp`)](doc/configuration.md#forcing-the-timestamp-timestamp)
     1. [Dumping the Composer autoloader (`dump-autoload`)](doc/configuration.md#dumping-the-composer-autoloader-dump-autoload)
     1. [Compactors (`compactors`)](doc/configuration.md#compactors-compactors)
         1. [Annotations (`annotations`)](doc/configuration.md#annotations-annotations)

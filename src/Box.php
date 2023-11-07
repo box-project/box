@@ -17,6 +17,7 @@ namespace KevinGH\Box;
 use Amp\MultiReasonException;
 use BadMethodCallException;
 use Countable;
+use DateTimeImmutable;
 use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Compactor\Compactors;
@@ -29,6 +30,7 @@ use KevinGH\Box\PhpScoper\Scoper;
 use Phar;
 use RecursiveDirectoryIterator;
 use RuntimeException;
+use Seld\PharUtils\Timestamps;
 use SplFileInfo;
 use Webmozart\Assert\Assert;
 use function Amp\ParallelFunctions\parallelMap;
@@ -66,7 +68,7 @@ final class Box implements Countable
     private array $bufferedFiles = [];
 
     private function __construct(
-        private readonly Phar $phar,
+        private Phar $phar,
         private readonly string $pharFilePath,
     ) {
         $this->compactors = new Compactors();
@@ -367,9 +369,28 @@ final class Box implements Countable
         $this->phar->extractTo($directory, overwrite: $overwrite);
     }
 
-    public function sign(SigningAlgorithm $signingAlgorithm): void
-    {
-        $this->phar->setSignatureAlgorithm($signingAlgorithm->value);
+    public function sign(
+        SigningAlgorithm $signingAlgorithm,
+        ?DateTimeImmutable $timestamp = null,
+    ): void {
+        if (null === $timestamp) {
+            $this->phar->setSignatureAlgorithm($signingAlgorithm->value);
+
+            return;
+        }
+
+        $phar = $this->phar;
+        $phar->__destruct();
+        unset($this->phar);
+
+        $util = new Timestamps($this->pharFilePath);
+        $util->updateTimestamps($timestamp);
+        $util->save(
+            $this->pharFilePath,
+            $signingAlgorithm->value,
+        );
+
+        $this->phar = new Phar($this->pharFilePath);
     }
 
     /**

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Configuration;
 
 use DateTimeImmutable;
+use DateTimeInterface;
 use Fidry\FileSystem\FS;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\DummyCompactor;
@@ -2896,6 +2897,58 @@ class ConfigurationTest extends ConfigurationTestCase
         );
     }
 
+    public function test_the_timestamp_can_be_configured(): void
+    {
+        $this->setConfig([
+            'timestamp' => '2020-10-20T10:01:11+00:00',
+        ]);
+
+        self::assertSame(
+            '2020-10-20T10:01:11+00:00',
+            $this->config->getTimestamp()?->format(DateTimeInterface::ATOM),
+        );
+
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_recommendation_is_given_if_the_timestamp_configured_is_the_default_value(): void
+    {
+        $this->setConfig([
+            'timestamp' => null,
+        ]);
+
+        self::assertNull($this->config->getTimestamp());
+
+        self::assertSame(
+            ['The "timestamp" setting can be omitted since is set to its default value'],
+            $this->config->getRecommendations(),
+        );
+        self::assertSame([], $this->config->getWarnings());
+    }
+
+    public function test_a_warning_is_given_if_the_timestamp_is_configured_with_an_openssl_signature(): void
+    {
+        FS::touch('private-key');
+
+        $this->setConfig([
+            'timestamp' => '2020-10-20T10:01:11+00:00',
+            'algorithm' => 'OPENSSL',
+            'key' => 'private-key',
+        ]);
+
+        self::assertNull($this->config->getTimestamp());
+
+        self::assertSame([], $this->config->getRecommendations());
+        self::assertSame(
+            [
+                'Using an OpenSSL signature is deprecated and will be removed in 5.0.0. Please check https://github.com/box-project/box/blob/main/doc/phar-signing.md for alternatives.',
+                'The "timestamp" setting has been set but has been ignored since an OpenSSL signature has been configured (setting "algorithm").',
+            ],
+            $this->config->getWarnings(),
+        );
+    }
+
     public function test_it_can_be_created_with_only_default_values(): void
     {
         $this->setConfig(
@@ -2951,6 +3004,7 @@ class ConfigurationTest extends ConfigurationTestCase
         self::assertFalse($this->config->isInterceptFileFuncs());
         self::assertFalse($this->config->promptForPrivateKey());
         self::assertTrue($this->config->isStubGenerated());
+        self::assertNull($this->config->getTimestamp());
     }
 
     public function test_it_can_be_exported(): void

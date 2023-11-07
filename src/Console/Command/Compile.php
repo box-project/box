@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Amp\MultiReasonException;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\CommandAware;
 use Fidry\Console\Command\CommandAwareness;
@@ -37,6 +39,7 @@ use KevinGH\Box\Console\Logger\CompilerLogger;
 use KevinGH\Box\Console\MessageRenderer;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\Phar\CompressionAlgorithm;
+use KevinGH\Box\Phar\SigningAlgorithm;
 use KevinGH\Box\RequirementChecker\DecodedComposerJson;
 use KevinGH\Box\RequirementChecker\DecodedComposerLock;
 use KevinGH\Box\RequirementChecker\RequirementsDumper;
@@ -243,7 +246,8 @@ final class Compile implements CommandAware
         IO $io,
         bool $debug,
     ): Box {
-        $box = Box::create($config->getTmpOutputPath());
+        $tmpOutputPath = $config->getTmpOutputPath();
+        $box = Box::create($tmpOutputPath);
         $composerOrchestrator = new ComposerOrchestrator(
             ComposerProcessFactory::create(
                 $config->getComposerBin(),
@@ -288,10 +292,10 @@ final class Compile implements CommandAware
             $logger,
         );
 
-        self::signPhar($config, $box, $config->getTmpOutputPath(), $io, $logger);
+        self::signPhar($config, $box, $tmpOutputPath, $io, $logger);
 
-        if ($config->getTmpOutputPath() !== $config->getOutputPath()) {
-            FS::rename($config->getTmpOutputPath(), $config->getOutputPath());
+        if ($tmpOutputPath !== $config->getOutputPath()) {
+            FS::rename($tmpOutputPath, $config->getOutputPath());
         }
 
         return $box;
@@ -753,19 +757,57 @@ final class Compile implements CommandAware
         $key = $config->getPrivateKeyPath();
 
         if (null === $key) {
-            $box->sign($config->getSigningAlgorithm());
+            self::signPharWithoutPrivateKey(
+                $box,
+                $config->getSigningAlgorithm(),
+                $config->getTimestamp(),
+                $logger,
+            );
+        } else {
+            self::signPharWithPrivateKey(
+                $box,
+                $key,
+                $config->getPrivateKeyPassphrase(),
+                $config->promptForPrivateKey(),
+                $io,
+                $logger,
+            );
+        }
+    }
 
-            return;
+    private static function signPharWithoutPrivateKey(
+        Box $box,
+        SigningAlgorithm $signingAlgorithm,
+        ?DateTimeImmutable $timestamp,
+        CompilerLogger $logger,
+    ): void {
+        if (null !== $timestamp) {
+            $logger->log(
+                CompilerLogger::QUESTION_MARK_PREFIX,
+                sprintf(
+                    'Correcting the timestamp to "%s".',
+                    $timestamp->format(DateTimeInterface::ATOM),
+                ),
+            );
         }
 
+        $box->sign($signingAlgorithm, $timestamp);
+    }
+
+    private static function signPharWithPrivateKey(
+        Box $box,
+        string $key,
+        ?string $passphrase,
+        bool $prompt,
+        IO $io,
+        CompilerLogger $logger,
+    ): void {
         $logger->log(
             CompilerLogger::QUESTION_MARK_PREFIX,
             'Signing using a private key',
         );
 
-        $passphrase = $config->getPrivateKeyPassphrase();
-
-        if ($config->promptForPrivateKey()) {
+        if ($prompt) {
             if (false === $io->isInteractive()) {
                 throw new RuntimeException(
                     sprintf(
