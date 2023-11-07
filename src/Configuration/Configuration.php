@@ -109,7 +109,7 @@ final class Configuration
         'finder',
     ];
     private const PHP_SCOPER_CONFIG = 'scoper.inc.php';
-    private const DEFAULT_SIGNING_ALGORITHM = SigningAlgorithm::SHA1;
+    private const DEFAULT_SIGNING_ALGORITHM = SigningAlgorithm::SHA512;
     private const DEFAULT_ALIAS_PREFIX = 'box-auto-generated-alias-';
 
     private const DEFAULT_IGNORED_ANNOTATIONS = [

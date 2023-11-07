@@ -2986,7 +2986,7 @@ class ConfigurationTest extends ConfigurationTestCase
         self::assertNull($this->config->getPrivateKeyPath());
         self::assertSame([], $this->config->getReplacements());
         self::assertSame('#!/usr/bin/env php', $this->config->getShebang());
-        self::assertSame(SigningAlgorithm::SHA1, $this->config->getSigningAlgorithm());
+        self::assertSame(SigningAlgorithm::SHA512, $this->config->getSigningAlgorithm());
 
         $version = self::$version;
 
@@ -3096,7 +3096,7 @@ class ConfigurationTest extends ConfigurationTestCase
               -promptForPrivateKey: false
               -processedReplacements: []
               -shebang: "#!/usr/bin/env php"
-              -signingAlgorithm: "SHA1"
+              -signingAlgorithm: "SHA512"
               -stubBannerContents: "My banner"
               -stubBannerPath: null
               -stubPath: null
