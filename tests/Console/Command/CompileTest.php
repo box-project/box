@@ -282,6 +282,7 @@ class CompileTest extends FileSystemTestCase
 
             No recommendation found.
             ⚠️  <warning>1 warning found:</warning>
+                - Using the "metadata" setting is deprecated and will be removed in 5.0.0.
                 - Using an OpenSSL signature is deprecated and will be removed in 5.0.0. Please check https://github.com/box-project/box/blob/main/doc/phar-signing.md for alternatives.
 
              // PHAR: {$numberOfFiles} files (100B)
@@ -899,6 +900,7 @@ class CompileTest extends FileSystemTestCase
 
             No recommendation found.
             ⚠️  <warning>1 warning found:</warning>
+                - Using the "metadata" setting is deprecated and will be removed in 5.0.0.
                 - Using an OpenSSL signature is deprecated and will be removed in 5.0.0. Please check https://github.com/box-project/box/blob/main/doc/phar-signing.md for alternatives.
 
              // PHAR: {$expectedNumberOfFiles} files (100B)
@@ -1029,6 +1031,7 @@ class CompileTest extends FileSystemTestCase
 
             No recommendation found.
             ⚠️  <warning>1 warning found:</warning>
+                - Using the "metadata" setting is deprecated and will be removed in 5.0.0.
                 - Using an OpenSSL signature is deprecated and will be removed in 5.0.0. Please check https://github.com/box-project/box/blob/main/doc/phar-signing.md for alternatives.
 
              // PHAR: {$expectedNumberOfFiles} files (100B)

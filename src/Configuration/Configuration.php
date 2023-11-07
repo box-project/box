@@ -1892,6 +1892,8 @@ final class Configuration
             return null;
         }
 
+        $logger->addWarning('Using the "metadata" setting is deprecated and will be removed in 5.0.0.');
+
         $metadata = $raw->{self::METADATA_KEY};
 
         return is_object($metadata) ? (array) $metadata : $metadata;

@@ -813,6 +813,10 @@ This setting will be ignored if no [key][key] has been provided.
 
 ## Metadata (`metadata`)
 
+!!! warning
+
+    The metadata setting has been deprecated as of Box 4.6.0. See [#1152].
+
 The metadata (`any` default none) setting can be any value. This value will be stored as metadata that can be retrieved
 from the built PHAR ([Phar::getMetadata()][phar.getmetadata]).
 
@@ -1070,3 +1074,4 @@ The short commit hash will only be used if no tag is available.
 [stub]: #stub
 [symfony-finder]: https://symfony.com/doc/current//components/finder.html
 [zlib-extension]: https://secure.php.net/manual/en/book.zlib.php
+[#1152]: https://github.com/box-project/box/issues/1152
