@@ -281,7 +281,7 @@ class CompileTest extends FileSystemTestCase
             * Done.
 
             No recommendation found.
-            ⚠️  <warning>1 warning found:</warning>
+            ⚠️  <warning>2 warnings found:</warning>
                 - Using the "metadata" setting is deprecated and will be removed in 5.0.0.
                 - Using an OpenSSL signature is deprecated and will be removed in 5.0.0. Please check https://github.com/box-project/box/blob/main/doc/phar-signing.md for alternatives.
 
@@ -899,7 +899,7 @@ class CompileTest extends FileSystemTestCase
             * Done.
 
             No recommendation found.
-            ⚠️  <warning>1 warning found:</warning>
+            ⚠️  <warning>2 warnings found:</warning>
                 - Using the "metadata" setting is deprecated and will be removed in 5.0.0.
                 - Using an OpenSSL signature is deprecated and will be removed in 5.0.0. Please check https://github.com/box-project/box/blob/main/doc/phar-signing.md for alternatives.
 
@@ -1030,7 +1030,7 @@ class CompileTest extends FileSystemTestCase
             * Done.
 
             No recommendation found.
-            ⚠️  <warning>1 warning found:</warning>
+            ⚠️  <warning>2 warnings found:</warning>
                 - Using the "metadata" setting is deprecated and will be removed in 5.0.0.
                 - Using an OpenSSL signature is deprecated and will be removed in 5.0.0. Please check https://github.com/box-project/box/blob/main/doc/phar-signing.md for alternatives.
 
@@ -2826,7 +2826,7 @@ class CompileTest extends FileSystemTestCase
 
             💡  <recommendation>1 recommendation found:</recommendation>
                 - The "check-requirements" setting can be omitted since is set to its default value
-            ⚠️  <warning>1 warning found:</warning>
+            ⚠️  <warning>2 warnings found:</warning>
                 - The requirement checker could not be used because the composer.json and composer.lock file could not be found.
 
              // PHAR: 1 file (100B)
