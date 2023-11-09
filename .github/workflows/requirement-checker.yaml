@@ -18,6 +18,7 @@ env:
     SLEEP_TIME_SEC: 60s
     #TERMINFO: /usr/lib/terminfo
     TERM: xterm
+    GH_TOKEN: ${{ github.token }}
 
 jobs:
     cs-lint:

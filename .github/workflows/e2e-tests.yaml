@@ -19,6 +19,7 @@ env:
     POLLING_INTERVALS_SEC: 30
     SLEEP_TIME_SEC: 60s
     TERM: xterm
+    GH_TOKEN: ${{ github.token }}
 
 jobs:
     wait-for-phar-and-docker-images:
