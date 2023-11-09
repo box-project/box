@@ -81,6 +81,9 @@ jobs:
                     - 'composer:2.4'
                     - 'composer'
         steps:
+            -   name: Check rate limit
+                run: gh api rate_limit
+
             -   name: Checkout
                 uses: actions/checkout@v3
                 with:

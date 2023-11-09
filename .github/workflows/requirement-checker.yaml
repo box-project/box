@@ -215,6 +215,9 @@ jobs:
                     -   command: _test_e2e_fail_conflict
                         docker-image: ghcr.io/box-project/box_php81
         steps:
+            -   name: Check rate limit
+                run: gh api rate_limit
+
             -   name: Checkout
                 uses: actions/checkout@v3
 
