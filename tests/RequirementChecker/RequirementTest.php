@@ -131,6 +131,26 @@ final class RequirementTest extends TestCase
         self::assertItCanBeCreatedFromItsArrayForm($requirement, $actual);
     }
 
+    public function test_it_can_be_created_for_a_legacy_requirement(): void
+    {
+        $expected = new Requirement(
+            RequirementType::EXTENSION_CONFLICT,
+            'mbstring',
+            null,
+            'The package "box/test" conflicts with the extension "mbstring".',
+            'The package "box/test" conflicts with the extension "mbstring". You need to disable it in order to run this application.',
+        );
+
+        $actual = Requirement::fromArray([
+            'type' => 'extension-conflict',
+            'condition' => 'mbstring',
+            'message' => 'The package "box/test" conflicts with the extension "mbstring".',
+            'helpMessage' => 'The package "box/test" conflicts with the extension "mbstring". You need to disable it in order to run this application.',
+        ]);
+
+        self::assertEquals($expected, $actual);
+    }
+
     private static function assertItCanBeCreatedFromItsArrayForm(Requirement $expected, array $arrayForm): void
     {
         $actual = Requirement::fromArray($arrayForm);
