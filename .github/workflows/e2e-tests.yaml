@@ -31,13 +31,7 @@ jobs:
                 shell: bash
 
             -   name: Check rate limit
-                run: |
-                    curl -L \
-                      -H "Accept: application/vnd.github+json" \
-                      -H "Authorization: Bearer {{ secrets.GITHUB_TOKEN }}" \
-                      -H "X-GitHub-Api-Version: 2022-11-28" \
-                      https://api.github.com/rate_limit
-                shell: bash
+                run: gh api rate_limit
 
             # I could not make this workflow work with a on.workflow_run. Hence instead of adding this
             # wait step for _every_ e2e job, which will block more runners, we wait in one and only one
@@ -57,6 +51,9 @@ jobs:
                     ref: ${{ github.event.pull_request.head.sha || github.sha }}
                     token: ${{ secrets.GITHUB_TOKEN }}
                     intervalSeconds: ${{ env.POLLING_INTERVALS_SEC }}
+
+            -   name: Check rate limit
+                run: gh api rate_limit
 
     e2e-tests:
         runs-on: ubuntu-latest
@@ -99,6 +96,9 @@ jobs:
             -   name: Allow Composer installation on future PHP versions
                 if: ${{ matrix.php == '8.3' }}
                 run: echo "COMPOSER_IGNORE_PLATFORM_REQ=--ignore-platform-req=php+" >> "$GITHUB_ENV"
+
+            -   name: Check rate limit
+                run: gh api rate_limit
 
             # We cannot use the regular actions/download-artifact here since the artifact is stored
             # in a different workflow.

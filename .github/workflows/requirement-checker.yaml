@@ -162,6 +162,9 @@ jobs:
                 run: sleep ${{ env.SLEEP_TIME_SEC }}
                 shell: bash
 
+            -   name: Check rate limit
+                run: gh api rate_limit
+
             # I could not make this workflow work with a on.workflow_run. Hence instead of adding this
             # wait step for _every_ e2e job, which will block more runners, we wait in one and only one
             # runner.
@@ -180,6 +183,9 @@ jobs:
                     ref: ${{ github.event.pull_request.head.sha || github.sha }}
                     token: ${{ secrets.GITHUB_TOKEN }}
                     intervalSeconds: ${{ env.POLLING_INTERVALS_SEC }}
+
+            -   name: Check rate limit
+                run: gh api rate_limit
 
     e2e-tests:
         runs-on: ubuntu-latest
@@ -217,6 +223,9 @@ jobs:
                     php-version: '8.1'
                     tools: composer
                     coverage: none
+
+            -   name: Check rate limit
+                run: gh api rate_limit
 
             # We cannot use the regular actions/download-artifact here since the artifact is stored
             # in a different workflow.
