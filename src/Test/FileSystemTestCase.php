@@ -21,6 +21,6 @@ abstract class FileSystemTestCase extends \Fidry\FileSystem\Test\FileSystemTestC
 {
     public static function getTmpDirNamespace(): string
     {
-        return 'Box';
+        return 'BoxTest';
     }
 }
