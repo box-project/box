@@ -1960,6 +1960,10 @@ private key. If a string is provided, it will be used as is as the pass-phrase. 
 prompted for the passphrase unless you are not in an interactive environment.</p>
 <p>This setting will be ignored if no <a href="#the-private-key-key">key</a> has been provided.</p>
 <h2 id="metadata-metadata">Metadata (<code>metadata</code>)<a class="headerlink" href="#metadata-metadata" title="Permanent link">&para;</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The metadata setting has been deprecated as of Box 4.6.0. See <a href="https://github.com/box-project/box/issues/1152">#1152</a>.</p>
+</div>
 <p>The metadata (<code>any</code> default none) setting can be any value. This value will be stored as metadata that can be retrieved
 from the built PHAR (<a href="https://secure.php.net/manual/en/phar.getmetadata.php">Phar::getMetadata()</a>).</p>
 <p>If you specify a callable (as a string), it will be evaluated without any arguments.</p>
