@@ -1136,7 +1136,12 @@ class ConfigurationTest extends ConfigurationTestCase
         self::assertSame(123, $this->config->getMetadata());
 
         self::assertSame([], $this->config->getRecommendations());
-        self::assertSame([], $this->config->getWarnings());
+        self::assertSame(
+            [
+                'Using the "metadata" setting is deprecated and will be removed in 5.0.0.',
+            ],
+            $this->config->getWarnings(),
+        );
     }
 
     public function test_a_recommendation_is_given_if_the_default_metadata_is_provided(): void
