@@ -32,9 +32,9 @@ use const DIRECTORY_SEPARATOR;
  */
 class ConfigurationSigningTest extends ConfigurationTestCase
 {
-    public function test_the_default_signing_is_sha1(): void
+    public function test_the_default_signing_is_sha512(): void
     {
-        self::assertSame(SigningAlgorithm::SHA1, $this->config->getSigningAlgorithm());
+        self::assertSame(SigningAlgorithm::SHA512, $this->config->getSigningAlgorithm());
 
         self::assertNull($this->config->getPrivateKeyPath());
         self::assertNull($this->config->getPrivateKeyPassphrase());
@@ -47,7 +47,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
     public function test_a_recommendation_is_given_if_the_configured_algorithm_is_the_default_value(): void
     {
         $this->setConfig([
-            'algorithm' => 'SHA1',
+            'algorithm' => 'SHA512',
         ]);
 
         self::assertSame(
@@ -78,7 +78,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
 
         self::assertSame($expected, $this->config->getSigningAlgorithm());
 
-        if (false === in_array($algorithm, ['SHA1', false], true)) {
+        if (false === in_array($algorithm, ['SHA512', false], true)) {
             self::assertSame([], $this->config->getRecommendations());
         }
         self::assertSame([], $this->config->getWarnings());
@@ -126,7 +126,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
         self::assertNull($this->config->getPrivateKeyPassphrase());
         self::assertFalse($this->config->promptForPrivateKey());
 
-        if (false === in_array($algorithm, ['SHA1', false], true)) {
+        if (false === in_array($algorithm, ['SHA512', false], true)) {
             self::assertSame([], $this->config->getRecommendations());
         }
         self::assertSame(
@@ -157,7 +157,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
                 );
             }
 
-            if (in_array($algorithm, ['SHA1', false], true)) {
+            if (in_array($algorithm, ['SHA512', false], true)) {
                 array_unshift(
                     $expectedRecommendation,
                     'The "algorithm" setting can be omitted since is set to its default value',
@@ -176,7 +176,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
         self::assertNull($this->config->getPrivateKeyPassphrase());
         self::assertFalse($this->config->promptForPrivateKey());
 
-        if (false === in_array($algorithm, ['SHA1', false], true)) {
+        if (false === in_array($algorithm, ['SHA512', false], true)) {
             self::assertSame([], $this->config->getRecommendations());
         }
         self::assertSame(
@@ -199,7 +199,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
 
         self::assertNull($this->config->getPrivateKeyPath());
 
-        if (false === in_array($algorithm, ['SHA1', false], true)) {
+        if (false === in_array($algorithm, ['SHA512', false], true)) {
             self::assertSame([], $this->config->getRecommendations());
         }
         self::assertSame(
@@ -218,7 +218,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
             'The setting "key" has been set but is unnecessary since the signing algorithm is not "OPENSSL".',
         ];
 
-        if (in_array($algorithm, ['SHA1', false], true)) {
+        if (in_array($algorithm, ['SHA512', false], true)) {
             array_unshift(
                 $expectedRecommendation,
                 'The "algorithm" setting can be omitted since is set to its default value',

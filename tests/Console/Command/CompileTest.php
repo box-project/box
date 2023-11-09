@@ -479,7 +479,7 @@ class CompileTest extends FileSystemTestCase
 
         $phar = new Phar('index.phar');
 
-        self::assertSame('SHA-1', $phar->getSignature()['hash_type']);
+        self::assertSame('SHA-512', $phar->getSignature()['hash_type']);
 
         // Check PHAR content
         $actualStub = self::normalizeStub($phar->getStub());
@@ -1230,7 +1230,7 @@ class CompileTest extends FileSystemTestCase
               -promptForPrivateKey: false
               -processedReplacements: []
               -shebang: "#!/usr/bin/env php"
-              -signingAlgorithm: "SHA1"
+              -signingAlgorithm: "SHA512"
               -stubBannerContents: ""
               -stubBannerPath: null
               -stubPath: null
