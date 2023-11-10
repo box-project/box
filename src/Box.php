@@ -24,6 +24,7 @@ use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
 use KevinGH\Box\Phar\CompressionAlgorithm;
+use KevinGH\Box\Phar\InvalidPhar;
 use KevinGH\Box\Phar\SigningAlgorithm;
 use KevinGH\Box\PhpScoper\NullScoper;
 use KevinGH\Box\PhpScoper\Scoper;
@@ -32,6 +33,9 @@ use RecursiveDirectoryIterator;
 use RuntimeException;
 use Seld\PharUtils\Timestamps;
 use SplFileInfo;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
 use function Amp\ParallelFunctions\parallelMap;
 use function Amp\Promise\wait;
@@ -44,6 +48,7 @@ use function extension_loaded;
 use function file_exists;
 use function getcwd;
 use function is_object;
+use function Safe\json_encode;
 use function openssl_pkey_export;
 use function openssl_pkey_get_details;
 use function openssl_pkey_get_private;
@@ -447,65 +452,15 @@ final class Box implements Countable
      */
     private function processContents(array $files): array
     {
-        $mapFile = $this->mapFile;
-        $compactors = $this->compactors;
-        $cwd = getcwd();
+        $processFiles = $this->scoper instanceof NullScoper || false === is_parallel_processing_enabled()
+            ? self::processFilesSynchronously(...)
+            : self::processFilesInParallel(...);
 
-        $processFile = static function (string $file) use ($cwd, $mapFile, $compactors): array {
-            chdir($cwd);
-
-            // Keep the fully qualified call here since this function may be executed without the right autoloading
-            // mechanism
-            \KevinGH\Box\register_aliases();
-            if (true === \KevinGH\Box\is_parallel_processing_enabled()) {
-                \KevinGH\Box\register_error_handler();
-            }
-
-            $contents = \Fidry\FileSystem\FS::getFileContents($file);
-
-            $local = $mapFile($file);
-
-            $processedContents = $compactors->compact($local, $contents);
-
-            return [$local, $processedContents, $compactors->getScoperSymbolsRegistry()];
-        };
-
-        if ($this->scoper instanceof NullScoper || false === is_parallel_processing_enabled()) {
-            return array_map($processFile, $files);
-        }
-
-        // In the case of parallel processing, an issue is caused due to the statefulness nature of the PhpScoper
-        // symbols registry.
-        //
-        // Indeed, the PhpScoper symbols registry stores the records of exposed/excluded classes and functions. If nothing is done,
-        // then the symbols registry retrieved in the end will here will be "blank" since the updated symbols registries are the ones
-        // from the workers used for the parallel processing.
-        //
-        // In order to avoid that, the symbols registries will be returned as a result as well in order to be able to merge
-        // all the symbols registries into one.
-        //
-        // This process is allowed thanks to the nature of the state of the symbols registries: having redundant classes or
-        // functions registered can easily be deal with so merging all those different states is actually
-        // straightforward.
-        $tuples = wait(parallelMap($files, $processFile));
-
-        if ([] === $tuples) {
-            return [];
-        }
-
-        $filesWithContents = [];
-        $symbolRegistries = [];
-
-        foreach ($tuples as [$local, $processedContents, $symbolRegistry]) {
-            $filesWithContents[] = [$local, $processedContents];
-            $symbolRegistries[] = $symbolRegistry;
-        }
-
-        $this->compactors->registerSymbolsRegistry(
-            SymbolsRegistry::createFromRegistries(array_filter($symbolRegistries)),
+        return $processFiles(
+            $files,
+            $this->mapFile,
+            $this->compactors,
         );
-
-        return $filesWithContents;
     }
 
     public function count(): int
@@ -513,5 +468,100 @@ final class Box implements Countable
         Assert::false($this->buffering, 'Cannot count the number of files in the PHAR when buffering');
 
         return $this->phar->count();
+    }
+
+    /**
+     * @param string[] $files
+     *
+     * @return list<array{string, string}>
+     */
+    private static function processFilesSynchronously(
+        array $files, MapFile $mapFile, Compactors $compactors,
+    ): array
+    {
+        $processFile = static function (string $file) use ($mapFile, $compactors): array {
+            $contents = FS::getFileContents($file);
+
+            $local = $mapFile($file);
+
+            $processedContents = $compactors->compact($local, $contents);
+
+            return [
+                $local,
+                $processedContents,
+                $compactors->getScoperSymbolsRegistry(),
+            ];
+        };
+
+        return array_map($processFile, $files);
+    }
+
+    /**
+     * @param string[] $files
+     *
+     * @return list<array{string, string}>
+     */
+    private static function processFilesInParallel(
+        array $files, MapFile $mapFile, Compactors $compactors): array
+    {
+        $config = json_encode([
+            'mapFile' => $mapFile,
+            'compactors' => $compactors,
+            'files' => $files,
+        ]);
+
+        $extractPharProcess = new Process([
+            self::getPhpExecutable(),
+            self::getBoxBin(),
+            'process:file',
+            $config,
+            '--no-interaction',
+            '--internal',
+        ]);
+        $extractPharProcess->run();
+
+        if (false === $extractPharProcess->isSuccessful()) {
+            throw new InvalidPhar(
+                $extractPharProcess->getErrorOutput(),
+                $extractPharProcess->getExitCode(),
+                new ProcessFailedException($extractPharProcess),
+            );
+        }
+
+        $output = $extractPharProcess->getOutput();
+        dd($output);
+
+        ['filesWithContents' => $filesWithContents, 'symbolRegistry' => $symbolRegistry] = json_decode(
+            FS::getFileContents($output),
+        );
+
+        $compactors->registerSymbolsRegistry($symbolRegistry);
+
+        return $filesWithContents;
+    }
+
+    // TODO: prob worth to put back in a static utility class; to check other usages
+    private static function getPhpExecutable(): string
+    {
+        if (isset(self::$phpExecutable)) {
+            return self::$phpExecutable;
+        }
+
+        $phpExecutable = (new PhpExecutableFinder())->find();
+
+        if (false === $phpExecutable) {
+            throw new RuntimeException('Could not find a PHP executable.');
+        }
+
+        self::$phpExecutable = $phpExecutable;
+
+        return self::$phpExecutable;
+    }
+
+    // TODO: check other usages; could be consolidated
+    private static function getBoxBin(): string
+    {
+        // TODO: move the constraint strings declaration in one place
+        return getenv('BOX_BIN') ?: $_SERVER['SCRIPT_NAME'];
     }
 }
