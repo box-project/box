@@ -19,7 +19,7 @@ great things:
 - 🔨 [PHAR isolation](doc/code-isolation.md#phar-code-isolation)
 - ⚙️ Zero configuration by default
 - 🚔 [Requirements checker](doc/requirement-checker.md#requirements-checker)
-- 🚨 Friendly error logging experience 
+- 🚨 Friendly error logging experience
 - 🔍 Retrieve information about the PHAR extension or a PHAR file and its contents (`box info` or `box diff`)
 - 🔐️ Verify the signature of an existing PHAR (`box verify`)
 - 📝 Use Git tags and short commit hashes for versioning
@@ -154,7 +154,7 @@ permissions:
 You can then find more advanced configuration settings in [the configuration documentation][configuration].
 For more information on which command or options is available, you can run:
 
-```
+```shell
 box help
 ```
 
@@ -172,7 +172,7 @@ make
 ## Backward Compatibility Promise (BCP)
 
 The policy is for the major part following the same as [Symfony's one][symfony-bc-policy]. Note that the code marked
-as `@private` or `@internal` are excluded from the BCP. 
+as `@private` or `@internal` are excluded from the BCP.
 
 The text displayed by the commands (e.g. `compile` or `info`) or the content of the error/exception messages are also not subject to the BCP.
 
@@ -183,6 +183,7 @@ Project originally created by: [Kevin Herrera] ([@kherge]) which has now been mo
 
 
 [box2]: https://github.com/box-project/box2
+[configuration]: doc/configuration.md#configuration
 [Kevin Herrera]: https://github.com/kherge
 [@kherge]: https://github.com/kherge
 [humbug]: https://github.com/humbug
