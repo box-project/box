@@ -120,7 +120,7 @@ final class Requirement
         return new self(
             RequirementType::from($value['type']),
             $value['condition'],
-            $value['source'],
+            $value['source'] ?? null,
             $value['message'],
             $value['helpMessage'],
         );

@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console\Command;
 
 use Amp\MultiReasonException;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\CommandAware;
 use Fidry\Console\Command\CommandAwareness;
@@ -37,6 +39,7 @@ use KevinGH\Box\Console\Logger\CompilerLogger;
 use KevinGH\Box\Console\MessageRenderer;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\Phar\CompressionAlgorithm;
+use KevinGH\Box\Phar\SigningAlgorithm;
 use KevinGH\Box\RequirementChecker\DecodedComposerJson;
 use KevinGH\Box\RequirementChecker\DecodedComposerLock;
 use KevinGH\Box\RequirementChecker\RequirementsDumper;
@@ -48,7 +51,6 @@ use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Filesystem\Path;
-use Webmozart\Assert\Assert;
 use function array_map;
 use function array_shift;
 use function count;
@@ -244,7 +246,8 @@ final class Compile implements CommandAware
         IO $io,
         bool $debug,
     ): Box {
-        $box = Box::create($config->getTmpOutputPath());
+        $tmpOutputPath = $config->getTmpOutputPath();
+        $box = Box::create($tmpOutputPath);
         $composerOrchestrator = new ComposerOrchestrator(
             ComposerProcessFactory::create(
                 $config->getComposerBin(),
@@ -278,7 +281,7 @@ final class Compile implements CommandAware
         self::checkComposerFiles($box, $config, $logger);
 
         if ($debug) {
-            $box->getPhar()->extractTo(self::DEBUG_DIR, null, true);
+            $box->extractTo(self::DEBUG_DIR, true);
         }
 
         self::configureCompressionAlgorithm(
@@ -289,10 +292,10 @@ final class Compile implements CommandAware
             $logger,
         );
 
-        self::signPhar($config, $box, $config->getTmpOutputPath(), $io, $logger);
+        self::signPhar($config, $box, $tmpOutputPath, $io, $logger);
 
-        if ($config->getTmpOutputPath() !== $config->getOutputPath()) {
-            FS::rename($config->getTmpOutputPath(), $config->getOutputPath());
+        if ($tmpOutputPath !== $config->getOutputPath()) {
+            FS::rename($tmpOutputPath, $config->getOutputPath());
         }
 
         return $box;
@@ -594,7 +597,7 @@ final class Compile implements CommandAware
 
             $stub = self::createStub($config, $main, $checkRequirements, $logger);
 
-            $box->getPhar()->setStub($stub);
+            $box->setStub($stub);
 
             return;
         }
@@ -613,17 +616,8 @@ final class Compile implements CommandAware
             return;
         }
 
-        $aliasWasAdded = $box->getPhar()->setAlias($config->getAlias());
-
-        Assert::true(
-            $aliasWasAdded,
-            sprintf(
-                'The alias "%s" is invalid. See Phar::setAlias() documentation for more information.',
-                $config->getAlias(),
-            ),
-        );
-
-        $box->getPhar()->setDefaultStub($main);
+        $box->setAlias($config->getAlias());
+        $box->setDefaultStub($main);
 
         $logger->log(
             CompilerLogger::QUESTION_MARK_PREFIX,
@@ -648,7 +642,7 @@ final class Compile implements CommandAware
                 is_string($metadata) ? $metadata : var_export($metadata, true),
             );
 
-            $box->getPhar()->setMetadata($metadata);
+            $box->setMetadata($metadata);
         }
     }
 
@@ -763,21 +757,57 @@ final class Compile implements CommandAware
         $key = $config->getPrivateKeyPath();
 
         if (null === $key) {
-            $box->getPhar()->setSignatureAlgorithm(
-                $config->getSigningAlgorithm()->value,
+            self::signPharWithoutPrivateKey(
+                $box,
+                $config->getSigningAlgorithm(),
+                $config->getTimestamp(),
+                $logger,
             );
+        } else {
+            self::signPharWithPrivateKey(
+                $box,
+                $key,
+                $config->getPrivateKeyPassphrase(),
+                $config->promptForPrivateKey(),
+                $io,
+                $logger,
+            );
+        }
+    }
 
-            return;
+    private static function signPharWithoutPrivateKey(
+        Box $box,
+        SigningAlgorithm $signingAlgorithm,
+        ?DateTimeImmutable $timestamp,
+        CompilerLogger $logger,
+    ): void {
+        if (null !== $timestamp) {
+            $logger->log(
+                CompilerLogger::QUESTION_MARK_PREFIX,
+                sprintf(
+                    'Correcting the timestamp to "%s".',
+                    $timestamp->format(DateTimeInterface::ATOM),
+                ),
+            );
         }
 
+        $box->sign($signingAlgorithm, $timestamp);
+    }
+
+    private static function signPharWithPrivateKey(
+        Box $box,
+        string $key,
+        ?string $passphrase,
+        bool $prompt,
+        IO $io,
+        CompilerLogger $logger,
+    ): void {
         $logger->log(
             CompilerLogger::QUESTION_MARK_PREFIX,
             'Signing using a private key',
         );
 
-        $passphrase = $config->getPrivateKeyPassphrase();
-
-        if ($config->promptForPrivateKey()) {
+        if ($prompt) {
             if (false === $io->isInteractive()) {
                 throw new RuntimeException(
                     sprintf(

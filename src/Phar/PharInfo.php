@@ -46,7 +46,6 @@ namespace KevinGH\Box\Phar;
 use Fidry\FileSystem\FS;
 use KevinGH\Box\Console\Command\Extract;
 use OutOfBoundsException;
-use ParagonIE\ConstantTime\Hex;
 use Phar;
 use RuntimeException;
 use Symfony\Component\Filesystem\Path;
@@ -55,6 +54,7 @@ use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
+use function bin2hex;
 use function file_exists;
 use function getenv;
 use function is_readable;
@@ -280,7 +280,7 @@ final class PharInfo
     private static function initStubFileName(): void
     {
         if (!isset(self::$stubfile)) {
-            self::$stubfile = Hex::encode(random_bytes(12)).'.pharstub';
+            self::$stubfile = bin2hex(random_bytes(12)).'.pharstub';
         }
     }
 

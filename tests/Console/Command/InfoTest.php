@@ -677,18 +677,18 @@ class InfoTest extends CommandTestCase
                 Files Compression: None
 
                 Signature: SHA-1
-                Signature Hash: 92123D3800E1F6AD1CD1D4099B8D16BC51097A5C
+                Signature Hash: EEA3F86AA1B61484EE961055F43AA61805071CB1
 
                 Metadata: None
 
-                Timestamp: 1697988440 (2023-10-22T15:27:20+00:00)
+                Timestamp: 1699390728 (2023-11-07T20:58:48+00:00)
 
                 RequirementChecker:
                   Required:
                   - PHP >=5.3 (root)
                   - ext-phar (root)
 
-                Contents: 47 files (148.01KB)
+                Contents: 47 files (147.97KB)
 
                  // Use the --list|-l option to list the content of the PHAR.
 
