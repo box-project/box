@@ -75,7 +75,7 @@ jobs:
                     - 'composer'
         steps:
             -   name: Checkout
-                uses: actions/checkout@v3
+                uses: actions/checkout@v4
                 with:
                     fetch-depth: 0
 
@@ -134,7 +134,7 @@ jobs:
                     - _e2e_php_settings_checker_memory_limit_higher
         steps:
             -   name: Checkout
-                uses: actions/checkout@v3
+                uses: actions/checkout@v4
                 with:
                     fetch-depth: 0
 
