@@ -148,7 +148,7 @@ jobs:
 
             -   name: Login to Docker Container Registry
                 if: github.event_name == 'release'
-                uses: docker/login-action@v2
+                uses: docker/login-action@v3
                 with:
                     username: ${{ env.DOCKERHUB_USERNAME }}
                     password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -168,7 +168,7 @@ jobs:
 
             -   name: Login to GitHub Container Registry
                 if: github.event_name != 'release'
-                uses: docker/login-action@v2
+                uses: docker/login-action@v3
                 with:
                     registry: ghcr.io
                     username: ${{ github.actor }}
