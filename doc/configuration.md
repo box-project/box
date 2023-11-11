@@ -20,7 +20,6 @@
     1. [Shebang (`shebang`)][shebang]
     1. [Banner (`banner`)][banner]
     1. [Banner file (`banner-file`)][banner-file]
-1. [Forcing the timestamp (`timestamp`)][timestamp]
 1. [Dumping the Composer autoloader (`dump-autoload`)][dump-autoload]
 1. [Compactors (`compactors`)][compactors]
     1. [Annotations (`annotations`)][annotations-compactor]
@@ -93,8 +92,7 @@ to `null`, then its default value will be picked and is strictly equivalent to n
     "replacement-sigil": "?",
     "replacements": "?",
     "shebang": "?",
-    "stub": "?",
-    "timestamp": "?"
+    "stub": "?"
 }
 ```
 
@@ -594,16 +592,6 @@ Like banner, the comment must not already be enclosed in a comment block.
 If this parameter is set to a different value than `null`, then the value of [`banner`][banner] will be discarded.
 
 
-## Forcing the timestamp (`timestamp`)
-
-The `timestamp` (`string`|`null`, default `null`) setting will result in Box forcing the timestamp of the PHAR. By
-default, the timestamp of the PHAR is the one at which the PHAR was built. It may be useful to fix it for
-[reproducible builds][reproducible-builds].
-
-!!! Warning
-    Forcing the timestamp cannot be done when using an [OpenSSL signature][algorithm].
-
-
 ## Dumping the Composer autoloader (`dump-autoload`)
 
 The `dump-autoload` (`boolean`|`null`, default `true`) setting will result in Box dump the Composer autoload with the
@@ -812,10 +800,6 @@ This setting will be ignored if no [key][key] has been provided.
 
 
 ## Metadata (`metadata`)
-
-!!! warning
-
-    The metadata setting has been deprecated as of Box 4.6.0. See [#1152].
 
 The metadata (`any` default none) setting can be any value. This value will be stored as metadata that can be retrieved
 from the built PHAR ([Phar::getMetadata()][phar.getmetadata]).
@@ -1064,14 +1048,11 @@ The short commit hash will only be used if no tag is available.
 [placeholders]: #replaceable-placeholders
 [replacement-sigil]: #replacement-sigil-replacement-sigil
 [replacements]: #replacements-replacements
-[reproducible-builds]: reproducible-builds.md#reproducible-builds
 [requirement-checker]: requirement-checker.md#requirements-checker
 [security]: #security
 [shebang]: #shebang-shebang
-[timestamp]: #forcing-the-timestamp-timestamp
 [the signing best practices]: ./phar-signing.md#phar-signing-best-practices
 [stub-stub]: #stub-stub
 [stub]: #stub
 [symfony-finder]: https://symfony.com/doc/current//components/finder.html
 [zlib-extension]: https://secure.php.net/manual/en/book.zlib.php
-[#1152]: https://github.com/box-project/box/issues/1152
