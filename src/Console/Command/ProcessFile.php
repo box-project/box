@@ -64,17 +64,24 @@ final class ProcessFile extends ParallelCommand
 
     private MapFile $mapFile;
     private Compactors $compactors;
-    private $filesWithContents = [];
+    private array $filesWithContents = [];
+
+    public function __construct()
+    {
+        parent::__construct('internal:process:files');
+    }
 
     public function configure(): void
     {
-        ParallelizationInput::configureCommand($this);
-
         $this->addArgument(
             self::CONFIG_ARGUMENT,
             InputArgument::REQUIRED,
             'Path to the file processing configuration.',
         );
+
+        ParallelizationInput::configureCommand($this);
+
+        $this->setHidden();
     }
 
     protected function fetchItems(InputInterface $input, OutputInterface $output): iterable

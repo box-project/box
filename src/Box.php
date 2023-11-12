@@ -61,6 +61,10 @@ use function sprintf;
  */
 final class Box implements Countable
 {
+    /**
+     * @var array|mixed|string|null
+     */
+    private static mixed $phpExecutable;
     private Compactors $compactors;
     private Placeholder $placeholderCompactor;
     private MapFile $mapFile;
@@ -509,26 +513,29 @@ final class Box implements Countable
             'compactors' => $compactors,
             'files' => $files,
         ]);
+        $configPath = FS::makeTmpDir('boxCompile', self::class) . '/tmp-config';
+        FS::dumpFile($configPath, $config);
 
-        $extractPharProcess = new Process([
+        $processFilesProcess = new Process([
             self::getPhpExecutable(),
             self::getBoxBin(),
-            'process:file',
-            $config,
+            'internal:process:files',
+            $configPath,
             '--no-interaction',
-            '--internal',
         ]);
-        $extractPharProcess->run();
+        $processFilesProcess->run();
 
-        if (false === $extractPharProcess->isSuccessful()) {
+        FS::remove($configPath);
+
+        if (false === $processFilesProcess->isSuccessful()) {
             throw new InvalidPhar(
-                $extractPharProcess->getErrorOutput(),
-                $extractPharProcess->getExitCode(),
-                new ProcessFailedException($extractPharProcess),
+                $processFilesProcess->getErrorOutput(),
+                $processFilesProcess->getExitCode(),
+                new ProcessFailedException($processFilesProcess),
             );
         }
 
-        $output = $extractPharProcess->getOutput();
+        $output = $processFilesProcess->getOutput();
         dd($output);
 
         ['filesWithContents' => $filesWithContents, 'symbolRegistry' => $symbolRegistry] = json_decode(
