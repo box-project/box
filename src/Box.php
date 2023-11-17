@@ -523,6 +523,7 @@ final class Box implements Countable
             $configPath,
             '--no-interaction',
         ]);
+        $processFilesProcess->setTimeout(600000);
         $processFilesProcess->run();
 
         FS::remove($configPath);
