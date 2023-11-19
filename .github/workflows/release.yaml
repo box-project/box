@@ -33,7 +33,7 @@ jobs:
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
                 with:
-                    php-version: '8.1'
+                    php-version: '8.2'
                     ini-values: phar.readonly=0
                     tools: composer
                     coverage: none
@@ -126,6 +126,11 @@ jobs:
         steps:
             -   name: Checkout
                 uses: actions/checkout@v4
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.2'
 
             -   uses: actions/download-artifact@v3
                 with:

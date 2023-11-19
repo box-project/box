@@ -17,7 +17,7 @@
         }
     ],
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "ext-iconv": "*",
         "ext-mbstring": "*",
         "ext-phar": "*",
@@ -98,7 +98,7 @@
             "ergebnis/composer-normalize": true
         },
         "platform": {
-            "php": "8.1"
+            "php": "8.2"
         },
         "platform-check": false,
         "sort-packages": true
