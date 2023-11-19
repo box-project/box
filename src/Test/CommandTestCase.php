@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Test;
 
 use Fidry\Console\Command\Command;
-use Fidry\Console\Command\SymfonyCommand;
+use Fidry\Console\Bridge\Command\SymfonyCommand;
 use Fidry\Console\Test\CommandTester;
 use Fidry\Console\Test\OutputAssertions;
 use Symfony\Component\Console\Application;

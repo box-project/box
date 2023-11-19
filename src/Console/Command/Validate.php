@@ -77,7 +77,7 @@ final class Validate implements Command
     {
         try {
             $config = ConfigurationLoader::getConfig(
-                $io->getArgument(self::FILE_ARGUMENT)->asNullableNonEmptyString() ?? ConfigurationLocator::findDefaultPath(),
+                $io->getTypedArgument(self::FILE_ARGUMENT)->asNullableNonEmptyString() ?? ConfigurationLocator::findDefaultPath(),
                 $io,
                 false,
             );
@@ -96,7 +96,7 @@ final class Validate implements Command
 
     private static function checkConfig(Configuration $config, IO $io): int
     {
-        $ignoreRecommendationsAndWarnings = $io->getOption(self::IGNORE_MESSAGES_OPTION)->asBoolean();
+        $ignoreRecommendationsAndWarnings = $io->getTypedOption(self::IGNORE_MESSAGES_OPTION)->asBoolean();
 
         $recommendations = $config->getRecommendations();
         $warnings = $config->getWarnings();

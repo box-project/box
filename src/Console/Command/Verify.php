@@ -97,7 +97,7 @@ final class Verify implements Command
     private static function getPharFilePath(IO $io): string
     {
         $pharPath = Path::canonicalize(
-            $io->getArgument(self::PHAR_ARG)->asNonEmptyString(),
+            $io->getTypedArgument(self::PHAR_ARG)->asNonEmptyString(),
         );
 
         Assert::file($pharPath);

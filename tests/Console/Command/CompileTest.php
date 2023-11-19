@@ -16,7 +16,7 @@ namespace KevinGH\Box\Console\Command;
 
 use DirectoryIterator;
 use Fidry\Console\Command\Command;
-use Fidry\Console\Command\SymfonyCommand;
+use Fidry\Console\Bridge\Command\SymfonyCommand;
 use Fidry\Console\DisplayNormalizer;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Test\CommandTester;

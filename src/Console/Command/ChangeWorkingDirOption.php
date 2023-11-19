@@ -43,7 +43,7 @@ final class ChangeWorkingDirOption
 
     public static function changeWorkingDirectory(IO $io): void
     {
-        $workingDir = $io->getOption(self::WORKING_DIR_OPT)->asNullableNonEmptyString();
+        $workingDir = $io->getTypedOption(self::WORKING_DIR_OPT)->asNullableNonEmptyString();
 
         if (null === $workingDir) {
             return;

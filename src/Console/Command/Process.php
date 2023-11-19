@@ -85,7 +85,7 @@ final class Process implements Command
 
     public function execute(IO $io): int
     {
-        if ($io->getOption(self::NO_RESTART_OPTION)->asBoolean()) {
+        if ($io->getTypedOption(self::NO_RESTART_OPTION)->asBoolean()) {
             putenv(BOX_ALLOW_XDEBUG.'=1');
         }
 
@@ -95,11 +95,11 @@ final class Process implements Command
 
         $io->newLine();
 
-        $config = $io->getOption(self::NO_CONFIG_OPTION)->asBoolean()
+        $config = $io->getTypedOption(self::NO_CONFIG_OPTION)->asBoolean()
             ? Configuration::create(null, new stdClass())
             : ConfigOption::getConfig($io, true);
 
-        $filePath = $io->getArgument(self::FILE_ARGUMENT)->asNonEmptyString();
+        $filePath = $io->getTypedArgument(self::FILE_ARGUMENT)->asNonEmptyString();
 
         $path = Path::makeRelative($filePath, $config->getBasePath());
 

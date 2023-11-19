@@ -76,7 +76,7 @@ abstract class ComposerCommand implements Command
 
     private static function getComposerExecutable(IO $io): ?string
     {
-        $composerBin = $io->getOption(self::COMPOSER_BIN_OPTION)->asNullableNonEmptyString();
+        $composerBin = $io->getTypedOption(self::COMPOSER_BIN_OPTION)->asNullableNonEmptyString();
 
         return null === $composerBin ? null : Path::makeAbsolute($composerBin, getcwd());
     }

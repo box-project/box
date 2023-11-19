@@ -154,8 +154,8 @@ final class Diff implements Command
     private static function getPaths(IO $io): array
     {
         $paths = [
-            $io->getArgument(self::FIRST_PHAR_ARG)->asNonEmptyString(),
-            $io->getArgument(self::SECOND_PHAR_ARG)->asNonEmptyString(),
+            $io->getTypedArgument(self::FIRST_PHAR_ARG)->asNonEmptyString(),
+            $io->getTypedArgument(self::SECOND_PHAR_ARG)->asNonEmptyString(),
         ];
 
         Assert::allFile($paths);
@@ -218,7 +218,7 @@ final class Diff implements Command
 
     private static function getDiffMode(IO $io): DiffMode
     {
-        if ($io->getOption(self::GNU_DIFF_OPTION)->asBoolean()) {
+        if ($io->getTypedOption(self::GNU_DIFF_OPTION)->asBoolean()) {
             $io->writeln(
                 sprintf(
                     '⚠️  <warning>Using the option "%s" is deprecated. Use "--%s=%s" instead.</warning>',
@@ -231,7 +231,7 @@ final class Diff implements Command
             return DiffMode::GNU;
         }
 
-        if ($io->getOption(self::GIT_DIFF_OPTION)->asBoolean()) {
+        if ($io->getTypedOption(self::GIT_DIFF_OPTION)->asBoolean()) {
             $io->writeln(
                 sprintf(
                     '⚠️  <warning>Using the option "%s" is deprecated. Use "--%s=%s" instead.</warning>',
@@ -244,7 +244,7 @@ final class Diff implements Command
             return DiffMode::GIT;
         }
 
-        if ($io->getOption(self::LIST_FILES_DIFF_OPTION)->asBoolean()) {
+        if ($io->getTypedOption(self::LIST_FILES_DIFF_OPTION)->asBoolean()) {
             $io->writeln(
                 sprintf(
                     '⚠️  <warning>Using the option "%s" is deprecated. Use "--%s=%s" instead.</warning>',
@@ -270,7 +270,7 @@ final class Diff implements Command
             return DiffMode::FILE_NAME;
         }
 
-        $rawDiffOption = $io->getOption(self::DIFF_OPTION)->asNonEmptyString();
+        $rawDiffOption = $io->getTypedOption(self::DIFF_OPTION)->asNonEmptyString();
 
         try {
             return DiffMode::from($rawDiffOption);
@@ -291,7 +291,7 @@ final class Diff implements Command
 
     private static function getChecksumAlgorithm(IO $io): string
     {
-        $checksumAlgorithm = $io->getOption(self::CHECK_OPTION)->asNullableNonEmptyString();
+        $checksumAlgorithm = $io->getTypedOption(self::CHECK_OPTION)->asNullableNonEmptyString();
 
         if (null !== $checksumAlgorithm) {
             $io->writeln(
@@ -305,7 +305,7 @@ final class Diff implements Command
             return $checksumAlgorithm;
         }
 
-        return $io->getOption(self::CHECKSUM_ALGORITHM_OPTION)->asNullableNonEmptyString() ?? self::DEFAULT_CHECKSUM_ALGO;
+        return $io->getTypedOption(self::CHECKSUM_ALGORITHM_OPTION)->asNullableNonEmptyString() ?? self::DEFAULT_CHECKSUM_ALGO;
     }
 
     private function renderContentsDiff(PharDiff $diff, DiffMode $diffMode, string $checksumAlgorithm, IO $io): void
