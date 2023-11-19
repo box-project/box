@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Phar\Differ;
 
-use Fidry\Console\Input\IO;
+use Fidry\Console\IO;
 use KevinGH\Box\Console\PharInfoRenderer;
 use KevinGH\Box\Phar\PharInfo;
 use SplFileInfo;

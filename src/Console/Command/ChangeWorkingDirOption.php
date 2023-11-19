@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use Fidry\Console\Input\IO;
+use Fidry\Console\IO;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputOption;
 use Webmozart\Assert\Assert;

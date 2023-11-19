@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Logger;
 
-use Fidry\Console\Input\IO;
+use Fidry\Console\IO;
 use InvalidArgumentException;
 use Symfony\Component\Console\Output\OutputInterface;
 use function sprintf;

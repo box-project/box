@@ -16,7 +16,7 @@ namespace KevinGH\Box\Console\Command\Composer;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
-use Fidry\Console\Input\IO;
+use Fidry\Console\IO;
 use Fidry\FileSystem\FileSystem;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 use KevinGH\Box\Composer\ComposerProcessFactory;
