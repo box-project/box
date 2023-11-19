@@ -806,6 +806,7 @@ final class Compile implements CommandAware
             CompilerLogger::QUESTION_MARK_PREFIX,
             'Signing using a private key',
         );
+        $io->newLine();
 
         if ($prompt) {
             if (false === $io->isInteractive()) {

@@ -88,6 +88,8 @@ final class FilenameDiffer implements Differ
         $io->newLine();
         self::renderPaths('+', $pharInfoB, $filesInBNotInA, $io);
 
+        $io->newLine(2);
+
         $io->error(
             sprintf(
                 '%d file(s) difference',

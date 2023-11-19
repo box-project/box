@@ -76,6 +76,7 @@ final class GenerateDockerFile implements CommandAware
                 $pharFilePath,
             ),
         );
+        $io->newLine();
 
         $requirementsFilePhar = 'phar://'.$pharFilePath.'/.box/.requirements.php';
 

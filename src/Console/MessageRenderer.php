@@ -72,5 +72,7 @@ final class MessageRenderer
                 array_map($renderMessage, $warnings),
             );
         }
+
+        $io->newLine();
     }
 }

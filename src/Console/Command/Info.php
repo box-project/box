@@ -198,6 +198,7 @@ final class Info implements Command
                 $indent,
             );
         } else {
+            $io->newLine();
             $io->comment('Use the <info>--list|-l</info> option to list the content of the PHAR.');
         }
 
