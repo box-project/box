@@ -16,7 +16,7 @@ namespace KevinGH\Box\Console;
 
 use Closure;
 use DateTimeImmutable;
-use Fidry\Console\Input\IO;
+use Fidry\Console\IO;
 use KevinGH\Box\NotInstantiable;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\PharInfo;

@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Composer;
 
 use Closure;
-use Fidry\Console\Input\IO;
+use Fidry\Console\IO;
 use RuntimeException;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;

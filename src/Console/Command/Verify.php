@@ -17,7 +17,7 @@ namespace KevinGH\Box\Console\Command;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
-use Fidry\Console\Input\IO;
+use Fidry\Console\IO;
 use KevinGH\Box\Phar\PharInfo;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Filesystem\Path;
@@ -97,7 +97,7 @@ final class Verify implements Command
     private static function getPharFilePath(IO $io): string
     {
         $pharPath = Path::canonicalize(
-            $io->getArgument(self::PHAR_ARG)->asNonEmptyString(),
+            $io->getTypedArgument(self::PHAR_ARG)->asNonEmptyString(),
         );
 
         Assert::file($pharPath);

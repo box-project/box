@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6dcfacaa1241091eca2295cd36eb29f3",
+    "content-hash": "3cba203db0b518d2e4a789aca01b9887",
     "packages": [
         {
             "name": "amphp/amp",
@@ -824,44 +824,45 @@
         },
         {
             "name": "fidry/console",
-            "version": "0.5.5",
+            "version": "0.6.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/theofidry/console.git",
-                "reference": "bc1fe03f600c63f12ec0a39c6b746c1a1fb77bf7"
+                "reference": "f77b0abe54fd6fea6ce8733c98817d82c07b6b8e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/theofidry/console/zipball/bc1fe03f600c63f12ec0a39c6b746c1a1fb77bf7",
-                "reference": "bc1fe03f600c63f12ec0a39c6b746c1a1fb77bf7",
+                "url": "https://api.github.com/repos/theofidry/console/zipball/f77b0abe54fd6fea6ce8733c98817d82c07b6b8e",
+                "reference": "f77b0abe54fd6fea6ce8733c98817d82c07b6b8e",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.4.0 || ^8.0.0",
-                "symfony/console": "^4.4 || ^5.4 || ^6.1",
-                "symfony/event-dispatcher-contracts": "^1.0 || ^2.5 || ^3.0",
-                "symfony/service-contracts": "^1.0 || ^2.5 || ^3.0",
-                "thecodingmachine/safe": "^1.3 || ^2.0",
+                "php": "^8.2",
+                "psr/log": "^3.0",
+                "symfony/console": "^6.3",
+                "symfony/event-dispatcher-contracts": "^2.5 || ^3.0",
+                "symfony/service-contracts": "^2.5 || ^3.0",
+                "thecodingmachine/safe": "^2.0",
                 "webmozart/assert": "^1.11"
             },
             "conflict": {
-                "symfony/dependency-injection": "<5.3.0",
-                "symfony/framework-bundle": "<5.3.0",
-                "symfony/http-kernel": "<5.3.0"
+                "symfony/dependency-injection": "<6.3.0",
+                "symfony/framework-bundle": "<6.3.0",
+                "symfony/http-kernel": "<6.3.0"
             },
             "require-dev": {
-                "bamarni/composer-bin-plugin": "^1.4",
-                "composer/semver": "^3.3",
-                "ergebnis/composer-normalize": "^2.28",
-                "infection/infection": "^0.26",
+                "bamarni/composer-bin-plugin": "^1.8.2",
+                "composer/semver": "^3.3.2",
+                "ergebnis/composer-normalize": "^2.33",
+                "fidry/makefile": "^0.2.1 || ^1.0.0",
+                "infection/infection": "^0.27",
                 "phpspec/prophecy-phpunit": "^2.0",
-                "phpunit/phpunit": "^9.4.3",
-                "symfony/dependency-injection": "^4.4 || ^5.4 || ^6.1",
-                "symfony/framework-bundle": "^4.4 || ^5.4 || ^6.1",
-                "symfony/http-kernel": "^4.4 || ^5.4 || ^6.1",
-                "symfony/phpunit-bridge": "^4.4.47 || ^5.4 || ^6.0",
-                "symfony/yaml": "^4.4 || ^5.4 || ^6.1",
-                "webmozarts/strict-phpunit": "^7.3"
+                "phpunit/phpunit": "^10.2",
+                "symfony/dependency-injection": "^6.3",
+                "symfony/flex": "^2.4.0",
+                "symfony/framework-bundle": "^6.3",
+                "symfony/http-kernel": "^6.3",
+                "symfony/yaml": "^6.3"
             },
             "type": "library",
             "extra": {
@@ -896,7 +897,7 @@
             ],
             "support": {
                 "issues": "https://github.com/theofidry/console/issues",
-                "source": "https://github.com/theofidry/console/tree/0.5.5"
+                "source": "https://github.com/theofidry/console/tree/0.6.8"
             },
             "funding": [
                 {
@@ -904,7 +905,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-12-18T10:49:34+00:00"
+            "time": "2023-11-18T22:57:23+00:00"
         },
         {
             "name": "fidry/filesystem",
@@ -977,24 +978,24 @@
         },
         {
             "name": "humbug/php-scoper",
-            "version": "0.18.7",
+            "version": "0.18.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/humbug/php-scoper.git",
-                "reference": "9386a0af946f175d7a1ebfb68851bc2bb8ad7858"
+                "reference": "eba4b11624c6064550d06b4ecd776fc61f969ad8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/9386a0af946f175d7a1ebfb68851bc2bb8ad7858",
-                "reference": "9386a0af946f175d7a1ebfb68851bc2bb8ad7858",
+                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/eba4b11624c6064550d06b4ecd776fc61f969ad8",
+                "reference": "eba4b11624c6064550d06b4ecd776fc61f969ad8",
                 "shasum": ""
             },
             "require": {
-                "fidry/console": "^0.5.0",
+                "fidry/console": "^0.6.6",
                 "fidry/filesystem": "^1.1",
                 "jetbrains/phpstorm-stubs": "^v2022.2",
                 "nikic/php-parser": "^4.12",
-                "php": "^8.1",
+                "php": "^8.2",
                 "symfony/console": "^5.2 || ^6.0",
                 "symfony/filesystem": "^5.2 || ^6.0",
                 "symfony/finder": "^5.2 || ^6.0",
@@ -1054,9 +1055,9 @@
             "description": "Prefixes all PHP namespaces in a file or directory.",
             "support": {
                 "issues": "https://github.com/humbug/php-scoper/issues",
-                "source": "https://github.com/humbug/php-scoper/tree/0.18.7"
+                "source": "https://github.com/humbug/php-scoper/tree/0.18.8"
             },
-            "time": "2023-11-04T18:01:12+00:00"
+            "time": "2023-11-18T23:13:18+00:00"
         },
         {
             "name": "jetbrains/phpstorm-stubs",
@@ -1514,16 +1515,16 @@
         },
         {
             "name": "phpstan/phpdoc-parser",
-            "version": "1.24.2",
+            "version": "1.24.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpdoc-parser.git",
-                "reference": "bcad8d995980440892759db0c32acae7c8e79442"
+                "reference": "12f01d214f1c73b9c91fdb3b1c415e4c70652083"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/bcad8d995980440892759db0c32acae7c8e79442",
-                "reference": "bcad8d995980440892759db0c32acae7c8e79442",
+                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/12f01d214f1c73b9c91fdb3b1c415e4c70652083",
+                "reference": "12f01d214f1c73b9c91fdb3b1c415e4c70652083",
                 "shasum": ""
             },
             "require": {
@@ -1555,9 +1556,9 @@
             "description": "PHPDoc parser with support for nullable, intersection and generic types",
             "support": {
                 "issues": "https://github.com/phpstan/phpdoc-parser/issues",
-                "source": "https://github.com/phpstan/phpdoc-parser/tree/1.24.2"
+                "source": "https://github.com/phpstan/phpdoc-parser/tree/1.24.3"
             },
-            "time": "2023-09-26T12:28:12+00:00"
+            "time": "2023-11-18T20:15:32+00:00"
         },
         {
             "name": "psr/container",
@@ -1982,7 +1983,7 @@
         },
         {
             "name": "symfony/deprecation-contracts",
-            "version": "v3.3.0",
+            "version": "v3.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/deprecation-contracts.git",
@@ -2029,7 +2030,7 @@
             "description": "A generic function and convention to trigger deprecation notices",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/deprecation-contracts/tree/v3.3.0"
+                "source": "https://github.com/symfony/deprecation-contracts/tree/v3.4.0"
             },
             "funding": [
                 {
@@ -2049,7 +2050,7 @@
         },
         {
             "name": "symfony/event-dispatcher-contracts",
-            "version": "v3.3.0",
+            "version": "v3.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/event-dispatcher-contracts.git",
@@ -2105,7 +2106,7 @@
                 "standards"
             ],
             "support": {
-                "source": "https://github.com/symfony/event-dispatcher-contracts/tree/v3.3.0"
+                "source": "https://github.com/symfony/event-dispatcher-contracts/tree/v3.4.0"
             },
             "funding": [
                 {
@@ -2726,16 +2727,16 @@
         },
         {
             "name": "symfony/service-contracts",
-            "version": "v3.3.0",
+            "version": "v3.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/service-contracts.git",
-                "reference": "40da9cc13ec349d9e4966ce18b5fbcd724ab10a4"
+                "reference": "b3313c2dbffaf71c8de2934e2ea56ed2291a3838"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/service-contracts/zipball/40da9cc13ec349d9e4966ce18b5fbcd724ab10a4",
-                "reference": "40da9cc13ec349d9e4966ce18b5fbcd724ab10a4",
+                "url": "https://api.github.com/repos/symfony/service-contracts/zipball/b3313c2dbffaf71c8de2934e2ea56ed2291a3838",
+                "reference": "b3313c2dbffaf71c8de2934e2ea56ed2291a3838",
                 "shasum": ""
             },
             "require": {
@@ -2788,7 +2789,7 @@
                 "standards"
             ],
             "support": {
-                "source": "https://github.com/symfony/service-contracts/tree/v3.3.0"
+                "source": "https://github.com/symfony/service-contracts/tree/v3.4.0"
             },
             "funding": [
                 {
@@ -2804,7 +2805,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-05-23T14:45:45+00:00"
+            "time": "2023-07-30T20:28:31+00:00"
         },
         {
             "name": "symfony/string",

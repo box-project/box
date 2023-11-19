@@ -16,7 +16,7 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Fidry\Console\Application\ApplicationRunner;
-use Fidry\Console\Input\IO;
+use Fidry\Console\IO;
 use KevinGH\Box\Console\Application;
 use KevinGH\Box\Console\OutputFormatterConfigurator;
 use RuntimeException;
