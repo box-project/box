@@ -17,7 +17,7 @@ namespace KevinGH\Box\Console\Command;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
-use Fidry\Console\Input\IO;
+use Fidry\Console\IO;
 use KevinGH\Box\Console\PharInfoRenderer;
 use KevinGH\Box\Phar\PharInfo;
 use Phar;
@@ -100,7 +100,7 @@ final class Info implements Command
     {
         $io->newLine();
 
-        $file = $io->getArgument(self::PHAR_ARG)->asNullableNonEmptyString();
+        $file = $io->getTypedArgument(self::PHAR_ARG)->asNullableNonEmptyString();
 
         if (null === $file) {
             return self::showGlobalInfo($io);
@@ -126,13 +126,13 @@ final class Info implements Command
     public static function showInfo(string $file, IO $io): int
     {
         $maxDepth = self::getMaxDepth($io);
-        $mode = $io->getOption(self::MODE_OPT)->asStringChoice(self::MODES);
+        $mode = $io->getTypedOption(self::MODE_OPT)->asStringChoice(self::MODES);
 
         $pharInfo = new PharInfo($file);
 
         return self::showPharInfo(
             $pharInfo,
-            $io->getOption(self::LIST_OPT)->asBoolean(),
+            $io->getTypedOption(self::LIST_OPT)->asBoolean(),
             -1 === $maxDepth ? false : $maxDepth,
             'indent' === $mode,
             $io,
@@ -144,7 +144,7 @@ final class Info implements Command
      */
     private static function getMaxDepth(IO $io): int
     {
-        $option = $io->getOption(self::DEPTH_OPT);
+        $option = $io->getTypedOption(self::DEPTH_OPT);
 
         return '-1' === $option->asRaw()
             ? -1
@@ -198,6 +198,7 @@ final class Info implements Command
                 $indent,
             );
         } else {
+            $io->newLine();
             $io->comment('Use the <info>--list|-l</info> option to list the content of the PHAR.');
         }
 

@@ -25,12 +25,12 @@ jobs:
         name: Lint CS
         steps:
             -   name: Checkout
-                uses: actions/checkout@v3
+                uses: actions/checkout@v4
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
                 with:
-                    php-version: '8.1'
+                    php-version: '8.2'
                     tools: composer
                     coverage: none
 
@@ -64,12 +64,12 @@ jobs:
         name: AutoReview Tests
         steps:
             -   name: Checkout
-                uses: actions/checkout@v3
+                uses: actions/checkout@v4
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
                 with:
-                    php-version: '8.1'
+                    php-version: '8.2'
                     tools: composer
                     coverage: none
 
@@ -93,26 +93,23 @@ jobs:
                 # The lowest dependency is tested via an e2e test rather than by executing the tests like so.
                 # The reason being using tools such as PHPUnit for a version as low as the lowest supported version
                 # is a serious strain for close to no benefits: the e2e test is simpler.
-                php: [ '8.1' ]
+                php: [ '8.2' ]
                 dependency: [ locked ]
-                composer-options: [ null ]
+                composer-options: [ '' ]
                 include:
-                    -   php: '8.1'
+                    -   php: '8.2'
                         dependency: lowest
-                        composer-options: ~
-                    -   php: '8.1'
-                        dependency: highest
-                        composer-options: ~
+                        composer-options: ''
                     -   php: '8.2'
                         dependency: highest
-                        composer-options: ~
+                        composer-options: ''
                     -   php: '8.3'
                         dependency: highest
                         composer-options: --ignore-platform-req=php+
 
         steps:
             -   name: Checkout
-                uses: actions/checkout@v3
+                uses: actions/checkout@v4
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
@@ -192,29 +189,29 @@ jobs:
                     -   command: _test_e2e_pass_no_config_min_composer_php
                         docker-image: ghcr.io/box-project/box_php725
                     -   command: _test_e2e_pass_no_config_min_box_php
-                        docker-image: ghcr.io/box-project/box_php81
+                        docker-image: ghcr.io/box-project/box_php82
                     -   command: _test_e2e_pass_complete_min_composer_php
                         docker-image: ghcr.io/box-project/box_php725
                     -   command: _test_e2e_pass_complete_min_box_php
-                        docker-image: ghcr.io/box-project/box_php81
+                        docker-image: ghcr.io/box-project/box_php82
                     -   command: _test_e2e_fail_complete_min_composer_php
                         docker-image: ghcr.io/box-project/box_php725
                     -   command: _test_e2e_fail_complete_min_box_php
-                        docker-image: ghcr.io/box-project/box_php81
+                        docker-image: ghcr.io/box-project/box_php82
                     -   command: _test_e2e_skip_min_composer_php
                         docker-image: ghcr.io/box-project/box_php725
                     -   command: _test_e2e_pass_complete_requirement_checker_not_disabled
                         docker-image: ghcr.io/box-project/box_php725
                     -   command: _test_e2e_fail_conflict
-                        docker-image: ghcr.io/box-project/box_php81
+                        docker-image: ghcr.io/box-project/box_php82
         steps:
             -   name: Checkout
-                uses: actions/checkout@v3
+                uses: actions/checkout@v4
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
                 with:
-                    php-version: '8.1'
+                    php-version: '8.2'
                     tools: composer
                     coverage: none
 
@@ -245,7 +242,7 @@ jobs:
                 run: bin/box.phar --ansi --version
 
             -   name: Login to GitHub Container Registry
-                uses: docker/login-action@v2
+                uses: docker/login-action@v3
                 with:
                     registry: ghcr.io
                     username: ${{ github.actor }}
@@ -284,7 +281,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             -   name: Checkout
-                uses: actions/checkout@v3
+                uses: actions/checkout@v4
                 with:
                     ref: ${{ github.head_ref }}
                     fetch-depth: '0'  # Ensures the tags are fetched
@@ -293,7 +290,7 @@ jobs:
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
                 with:
-                    php-version: '8.1'
+                    php-version: '8.2'
                     tools: composer
                     coverage: none
 
@@ -344,7 +341,7 @@ jobs:
 
             -   name: Create Pull Request
                 if: env.requirement_checker_changed == 'true'
-                uses: peter-evans/create-pull-request@v4
+                uses: peter-evans/create-pull-request@v5
                 with:
                     token: ${{ secrets.GITHUB_TOKEN }}
                     branch-suffix: random

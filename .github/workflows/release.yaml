@@ -26,14 +26,14 @@ jobs:
         name: Build PHAR
         steps:
             -   name: Checkout
-                uses: actions/checkout@v3
+                uses: actions/checkout@v4
                 with:
                     fetch-depth: 0
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
                 with:
-                    php-version: '8.1'
+                    php-version: '8.2'
                     ini-values: phar.readonly=0
                     tools: composer
                     coverage: none
@@ -56,7 +56,7 @@ jobs:
 
             -   name: Import GPG key
                 if: github.event_name == 'release'
-                uses: crazy-max/ghaction-import-gpg@v5
+                uses: crazy-max/ghaction-import-gpg@v6
                 with:
                     gpg_private_key: ${{ secrets.GPG_KEY_41539BBD4020945DB378F98B2DF45277AEF09A2F }}
                     passphrase: ${{ secrets.GPG_KEY_41539BBD4020945DB378F98B2DF45277AEF09A2F_PASSPHRASE }}
@@ -125,7 +125,12 @@ jobs:
             - build-phar
         steps:
             -   name: Checkout
-                uses: actions/checkout@v3
+                uses: actions/checkout@v4
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.2'
 
             -   uses: actions/download-artifact@v3
                 with:
@@ -141,14 +146,14 @@ jobs:
                     ./bin/box.phar --ansi --version
 
             -   name: Set up QEMU
-                uses: docker/setup-qemu-action@v2
+                uses: docker/setup-qemu-action@v3
 
             -   name: Set up Docker Buildx
-                uses: docker/setup-buildx-action@v2
+                uses: docker/setup-buildx-action@v3
 
             -   name: Login to Docker Container Registry
                 if: github.event_name == 'release'
-                uses: docker/login-action@v2
+                uses: docker/login-action@v3
                 with:
                     username: ${{ env.DOCKERHUB_USERNAME }}
                     password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -168,7 +173,7 @@ jobs:
 
             -   name: Login to GitHub Container Registry
                 if: github.event_name != 'release'
-                uses: docker/login-action@v2
+                uses: docker/login-action@v3
                 with:
                     registry: ghcr.io
                     username: ${{ github.actor }}
@@ -181,7 +186,7 @@ jobs:
                     echo "DOCKER_TEST_TAG=ghcr.io/box-project/box" >> $GITHUB_ENV
 
             -   name: Build and export to Docker
-                uses: docker/build-push-action@v3
+                uses: docker/build-push-action@v5
                 with:
                     context: .
                     file: ${{ env.DOCKERFILE }}
@@ -194,7 +199,7 @@ jobs:
 
             -   name: Build and push
                 if: github.event_name == 'release'
-                uses: docker/build-push-action@v3
+                uses: docker/build-push-action@v5
                 with:
                     context: .
                     file: ${{ env.DOCKERFILE }}

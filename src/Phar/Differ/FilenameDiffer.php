@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Phar\Differ;
 
-use Fidry\Console\Input\IO;
+use Fidry\Console\IO;
 use KevinGH\Box\Console\PharInfoRenderer;
 use KevinGH\Box\Phar\PharInfo;
 use SplFileInfo;
@@ -87,6 +87,8 @@ final class FilenameDiffer implements Differ
         self::renderPaths('-', $pharInfoA, $filesInANotInB, $io);
         $io->newLine();
         self::renderPaths('+', $pharInfoB, $filesInBNotInA, $io);
+
+        $io->newLine(2);
 
         $io->error(
             sprintf(

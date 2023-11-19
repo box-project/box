@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
-use Fidry\Console\Input\IO;
+use Fidry\Console\IO;
 use InvalidArgumentException;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Configuration\ConfigurationLoader as ConfigLoader;

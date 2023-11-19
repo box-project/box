@@ -34,7 +34,7 @@ Is this really an issue? The answer is it depends. Here as a few real life examp
 
 - A static analysis tool like [PHPStan][phpstan]
 - A test framework like [PHPUnit][phpunit]
-- A quality analysis tool like [SensioLabsInsight][sensiolabs-insight] which executes arbitrary code (e.g. to check)
+- A quality analysis tool like [SymfonyInsight][symfony-insight] which executes arbitrary code (e.g. to check)
   that the application is booting
 - A piece of code that can be mixed with any code, such as a Wordpress plugin
 
@@ -77,7 +77,7 @@ there is two recommendations:
 
 [phpstan]: https://github.com/phpstan/phpstan
 [phpunit]: https://github.com/sebastianbergmann/phpunit
-[sensiolabs-insight]: https://insight.sensiolabs.com
+[symfony-insight]: https://insight.symfony.com/
 [php-scoper]: https://github.com/humbug/php-scoper
 [php-scoper-compactor]: configuration.md#compactors-compactors
 [php-scoper-config]: https://github.com/humbug/php-scoper#configuration

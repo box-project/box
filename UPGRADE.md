@@ -10,7 +10,7 @@
 - Bump to PHP 8.1 #613
 - Remove the build command (#623): the `build` command has been deprecated since 3.0.0 in favour of `compile`.
 - Remove support for legacy compactors (#626). Here are the replacements:
-  - `Herrera\Box\Compactor\Json` -> `KevinGH\Box\Compactor\Json` 
+  - `Herrera\Box\Compactor\Json` -> `KevinGH\Box\Compactor\Json`
   - `Herrera\Box\Compactor\Php` -> `KevinGH\Box\Compactor\Php`
 - Drop PHP5.3 support for the RequirementChecker - new min is 7.2.4+ (#674). This is to align the project with Composer.
   It is technically possible to restore support for PHP5.3 but requires some work, see
@@ -22,21 +22,23 @@
 
 - Changes to the `Php` compactor:
     - Invalid annotations are no longer recognised as annotations:
+
         ```php
         /**
           * @Annotation ()
           * @Namespaced\ Annotation
           */
         ```
-        
+
         Will be transformed into:
-        
+
         ```php
         /**
           * @Annotation
           * @Namespaced
           */
         ```
+
 - The removal of common annotations is enabled by default
 - The setting `annotation#ignore` no longer accepts a `string` value, only `string[]` and `null` are allowed
 - Upon some annotation parsing failures, the error is thrown to the user in order to identify and fix those cases
@@ -48,9 +50,9 @@
       * \@NotEscaped
       */
     ```
-    
+
     Indeed it will be compacted to:
-    
+
     ```php
     /**
     @NotEscaped
@@ -69,7 +71,7 @@ The change from 2.x to 3.x is quite significant but should be really smooth for 
 - Automatically remove the dev dependencies
 - No longer requires a `phar.readonly` or `ulimit` setting change from the user
 - [Allows to scope the PHAR](doc/code-isolation.md#phar-code-isolation)
-- [Allows to ship with a requirements checker](doc/requirement-checker.md#requirements-checker) 
+- [Allows to ship with a requirements checker](doc/requirement-checker.md#requirements-checker)
 
 
 A few more features landed as well and a range of settings were added more, the whole list of BC breaks can be found

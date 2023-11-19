@@ -16,7 +16,7 @@ namespace KevinGH\Box\Console\Command\Composer;
 
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
-use Fidry\Console\Input\IO;
+use Fidry\Console\IO;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 
 /**

@@ -67,7 +67,7 @@ jobs:
                     - e2e_dockerfile_no_extension
                     - e2e_custom_composer_bin
                     - e2e_reproducible_build
-                php: [ '8.1', '8.2', '8.3' ]
+                php: [ '8.2', '8.3' ]
                 tools:
                     - 'composer:2.2'
                     - 'composer:2.3'
@@ -75,7 +75,7 @@ jobs:
                     - 'composer'
         steps:
             -   name: Checkout
-                uses: actions/checkout@v3
+                uses: actions/checkout@v4
                 with:
                     fetch-depth: 0
 
@@ -134,14 +134,14 @@ jobs:
                     - _e2e_php_settings_checker_memory_limit_higher
         steps:
             -   name: Checkout
-                uses: actions/checkout@v3
+                uses: actions/checkout@v4
                 with:
                     fetch-depth: 0
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
                 with:
-                    php-version: '8.1'
+                    php-version: '8.2'
                     ini-values: phar.readonly=0, display_errors=On, error_reporting=-1
                     tools: composer
                     coverage: pcov
@@ -173,7 +173,7 @@ jobs:
                 run: bin/box.phar --ansi --version
 
             -   name: Login to GitHub Container Registry
-                uses: docker/login-action@v2
+                uses: docker/login-action@v3
                 with:
                     registry: ghcr.io
                     username: ${{ github.actor }}
@@ -181,8 +181,8 @@ jobs:
 
             -   name: Pull the docker image
                 run: |
-                    docker pull ghcr.io/box-project/box_php81
-                    docker pull ghcr.io/box-project/box_php81_xdebug
+                    docker pull ghcr.io/box-project/box_php82
+                    docker pull ghcr.io/box-project/box_php82_xdebug
 
             -   run: make ${{ matrix.e2e }}
 

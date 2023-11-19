@@ -17,7 +17,7 @@ namespace KevinGH\Box;
 use Closure;
 use Composer\InstalledVersions;
 use ErrorException;
-use Fidry\Console\Input\IO;
+use Fidry\Console\IO;
 use KevinGH\Box\Console\Php\PhpSettingsHandler;
 use Phar;
 use Symfony\Component\Console\Helper\Helper;

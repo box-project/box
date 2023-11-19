@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Composer;
 
 use Composer\Semver\Semver;
-use Fidry\Console\Input\IO;
+use Fidry\Console\IO;
 use Fidry\FileSystem\FileSystem;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\NotInstantiable;

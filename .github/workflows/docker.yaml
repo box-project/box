@@ -35,31 +35,31 @@ jobs:
                     - name: PHP 7.2.5
                       docker-file: .docker/php725
                       image-tag: ghcr.io/box-project/box_php725
-                    - name: PHP 8.1
-                      docker-file: .docker/php81
-                      image-tag: ghcr.io/box-project/box_php81
-                    - name: PHP 8.1 (Xdebug)
-                      docker-file: .docker/php81_xdebug
-                      image-tag: ghcr.io/box-project/box_php81_xdebug
+                    - name: PHP 8.2
+                      docker-file: .docker/php82
+                      image-tag: ghcr.io/box-project/box_php82
+                    - name: PHP 8.2 (Xdebug)
+                      docker-file: .docker/php82_xdebug
+                      image-tag: ghcr.io/box-project/box_php82_xdebug
         steps:
             -   name: Checkout
-                uses: actions/checkout@v3
+                uses: actions/checkout@v4
 
             -   name: Set up QEMU
-                uses: docker/setup-qemu-action@v2
+                uses: docker/setup-qemu-action@v3
 
             -   name: Set up Docker Buildx
-                uses: docker/setup-buildx-action@v2
+                uses: docker/setup-buildx-action@v3
 
             -   name: Login to GitHub Container Registry
-                uses: docker/login-action@v2
+                uses: docker/login-action@v3
                 with:
                     registry: ghcr.io
                     username: ${{ github.actor }}
                     password: ${{ secrets.GITHUB_TOKEN }}
 
             -   name: Build and export to Docker
-                uses: docker/build-push-action@v3
+                uses: docker/build-push-action@v5
                 with:
                     context: .
                     file: ${{ matrix.docker-file }}
@@ -72,7 +72,7 @@ jobs:
 
             -   name: Build and push
                 if: ${{ github.ref_name == 'main' }}
-                uses: docker/build-push-action@v3
+                uses: docker/build-push-action@v5
                 with:
                     context: .
                     file: ${{ matrix.docker-file }}

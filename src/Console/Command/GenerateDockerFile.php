@@ -18,7 +18,7 @@ use Fidry\Console\Command\CommandAware;
 use Fidry\Console\Command\CommandAwareness;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
-use Fidry\Console\Input\IO;
+use Fidry\Console\IO;
 use Fidry\FileSystem\FS;
 use KevinGH\Box\DockerFileGenerator;
 use Symfony\Component\Console\Input\InputArgument;
@@ -76,6 +76,7 @@ final class GenerateDockerFile implements CommandAware
                 $pharFilePath,
             ),
         );
+        $io->newLine();
 
         $requirementsFilePhar = 'phar://'.$pharFilePath.'/.box/.requirements.php';
 
@@ -91,7 +92,7 @@ final class GenerateDockerFile implements CommandAware
      */
     private function getPharFilePath(IO $io): ?string
     {
-        $pharFilePath = $io->getArgument(self::PHAR_ARG)->asNullableNonEmptyString();
+        $pharFilePath = $io->getTypedArgument(self::PHAR_ARG)->asNullableNonEmptyString();
 
         if (null === $pharFilePath) {
             $pharFilePath = $this->guessPharPath($io);
