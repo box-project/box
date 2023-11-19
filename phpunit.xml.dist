@@ -12,7 +12,7 @@
 
     <php>
         <env name="BOX_ALLOW_XDEBUG" value="1"/>
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0" />
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled=1" />
 
         <!-- The width is matching the Travis one to avoid any issues with the CI -->
         <env name="COLUMNS" value="80" />
