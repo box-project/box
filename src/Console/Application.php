@@ -91,7 +91,7 @@ final class Application implements FidryApplication
             new Command\Verify(),
             new Command\GenerateDockerFile(),
             new Command\Namespace_(),
-            new ReversedSymfonyCommand(new ProcessFile()),
+            new ProcessFile(),
         ];
     }
 

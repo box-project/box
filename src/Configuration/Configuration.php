@@ -1670,22 +1670,24 @@ final class Configuration
         ?array $ignoredAnnotations,
         ConfigurationLogger $logger,
     ): array {
-        return array_map(
-            static function (string $class) use ($raw, $basePath, $logger, $ignoredAnnotations): Compactor {
-                Assert::classExists($class, 'The compactor class %s does not exist.');
-                Assert::isAOf($class, Compactor::class, sprintf('The class "%s" is not a compactor class.', $class));
+        return array_filter(
+            array_map(
+                static function (string $class) use ($raw, $basePath, $logger, $ignoredAnnotations): ?Compactor {
+                    Assert::classExists($class, 'The compactor class %s does not exist.');
+                    Assert::isAOf($class, Compactor::class, sprintf('The class "%s" is not a compactor class.', $class));
 
-                if (in_array($class, [PhpCompactor::class, 'KevinGH\Box\Compactor\Php'], true)) {
-                    return self::createPhpCompactor($ignoredAnnotations);
-                }
+                    if (in_array($class, [PhpCompactor::class, 'KevinGH\Box\Compactor\Php'], true)) {
+                        return self::createPhpCompactor($ignoredAnnotations);
+                    }
 
-                if (in_array($class, [PhpScoperCompactor::class, 'KevinGH\Box\Compactor\PhpScoper'], true)) {
-                    return self::createPhpScoperCompactor($raw, $basePath, $logger);
-                }
+                    if (in_array($class, [PhpScoperCompactor::class, 'KevinGH\Box\Compactor\PhpScoper'], true)) {
+                        return self::createPhpScoperCompactor($raw, $basePath, $logger);
+                    }
 
-                return new $class();
-            },
-            $compactorClasses,
+                    return new $class();
+                },
+                $compactorClasses,
+            ),
         );
     }
 
@@ -2561,7 +2563,7 @@ final class Configuration
         return self::createPhpScoperConfig($configFilePath);
     }
 
-    private static function createPhpScoperConfig(?string $filePath): PhpScoperConfiguration
+    public static function createPhpScoperConfig(?string $filePath): PhpScoperConfiguration
     {
         $configFactory = (new Container())->getConfigurationFactory();
 
@@ -2671,10 +2673,10 @@ final class Configuration
         return $ignored;
     }
 
-    private static function createPhpCompactor(?array $ignoredAnnotations): Compactor
+    private static function createPhpCompactor(?array $ignoredAnnotations): ?Compactor
     {
         if (null === $ignoredAnnotations) {
-            return new PhpCompactor(null);
+            return null;
         }
 
         $ignoredAnnotations = array_values(
@@ -2686,13 +2688,7 @@ final class Configuration
             ),
         );
 
-        return new PhpCompactor(
-            new DocblockAnnotationParser(
-                DocBlockFactory::createInstance(),
-                new CompactedFormatter(),
-                $ignoredAnnotations,
-            ),
-        );
+        return PhpCompactor::create($ignoredAnnotations);
     }
 
     private static function createPhpScoperCompactor(

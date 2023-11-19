@@ -33,6 +33,7 @@ use RecursiveDirectoryIterator;
 use RuntimeException;
 use Seld\PharUtils\Timestamps;
 use SplFileInfo;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
@@ -41,6 +42,7 @@ use function Amp\ParallelFunctions\parallelMap;
 use function Amp\Promise\wait;
 use function array_filter;
 use function array_map;
+use function array_merge;
 use function array_unshift;
 use function chdir;
 use function dirname;
@@ -48,10 +50,13 @@ use function extension_loaded;
 use function file_exists;
 use function getcwd;
 use function is_object;
+use function iter\toArray;
+use function json_decode;
 use function Safe\json_encode;
 use function openssl_pkey_export;
 use function openssl_pkey_get_details;
 use function openssl_pkey_get_private;
+use function serialize;
 use function sprintf;
 
 /**
@@ -508,25 +513,52 @@ final class Box implements Countable
     private static function processFilesInParallel(
         array $files, MapFile $mapFile, Compactors $compactors): array
     {
+
+        $compactorsArray = $compactors->toArray();
+
+        foreach ($compactorsArray as $compactor) {
+            echo PHP_EOL.$compactor::class.PHP_EOL;
+            serialize($compactor);
+        }
+
         $config = json_encode([
-            'mapFile' => $mapFile,
-            'compactors' => $compactors,
+            'mapFile' => serialize($mapFile),
+            'compactors' => serialize($compactors),
             'files' => $files,
         ]);
         $configPath = FS::makeTmpDir('boxCompile', self::class) . '/tmp-config';
         FS::dumpFile($configPath, $config);
+        FS::dumpFile(__DIR__.'/../tmp-config', $config);
+
+        $tmp = FS::makeTmpDir('BoxProcessFile', self::class);
+        $tmp = __DIR__.'/../dist/process-test';
 
         $processFilesProcess = new Process([
             self::getPhpExecutable(),
             self::getBoxBin(),
             'internal:process:files',
             $configPath,
+            $tmp,
             '--no-interaction',
         ]);
         $processFilesProcess->setTimeout(600000);
         $processFilesProcess->run();
 
-        FS::remove($configPath);
+        $filesWithContents = array_merge(
+            array_map(
+                static function (SplFileInfo $batchJsonFileInfo): array {
+                    return json_decode(FS::getFileContents($batchJsonFileInfo->getPathname()));
+                },
+                toArray(
+                    Finder::create()
+                        ->files()
+                        ->in($tmp)
+                        ->name('batch-*.json')
+                ),
+            )
+        );
+
+        FS::remove([$configPath, $tmp]);
 
         if (false === $processFilesProcess->isSuccessful()) {
             throw new InvalidPhar(
@@ -537,7 +569,7 @@ final class Box implements Countable
         }
 
         $output = $processFilesProcess->getOutput();
-        dd($output);
+        // TODO: log output
 
         ['filesWithContents' => $filesWithContents, 'symbolRegistry' => $symbolRegistry] = json_decode(
             FS::getFileContents($output),
@@ -567,7 +599,7 @@ final class Box implements Countable
     }
 
     // TODO: check other usages; could be consolidated
-    private static function getBoxBin(): string
+    public static function getBoxBin(): string
     {
         // TODO: move the constraint strings declaration in one place
         return getenv('BOX_BIN') ?: $_SERVER['SCRIPT_NAME'];

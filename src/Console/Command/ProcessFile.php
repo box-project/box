@@ -17,15 +17,22 @@ namespace KevinGH\Box\Console\Command;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration as ConsoleConfiguration;
 use Fidry\Console\ExitCode;
-use Fidry\Console\Input\IO;
+use Fidry\Console\IO;
 use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
+use KevinGH\Box\Annotation\DocblockAnnotationParser;
+use KevinGH\Box\Box;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Compactors;
+use KevinGH\Box\Compactor\FileExtensionCompactor;
+use KevinGH\Box\Compactor\Json;
+use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\MapFile;
+use KevinGH\Box\PhpScoper\SerializableScoper;
+use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use stdClass;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -50,21 +57,31 @@ use function array_map;
 use function array_shift;
 use function array_unshift;
 use function explode;
+use function json_encode;
+use function KevinGH\Box\unique_id;
+use function Safe\file_get_contents;
 use function getcwd;
 use function implode;
 use function KevinGH\Box\check_php_settings;
 use function putenv;
 use function sprintf;
+use function unserialize;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 use function Safe\json_decode;
 
 final class ProcessFile extends ParallelCommand
 {
     private const CONFIG_ARGUMENT = 'file';
+    private const CHILD_CONFIG_ARGUMENT = 'child-file';
+    private const TMP_DIR = 'tmp';
 
+    private string $tmp;
+    private string $serializedMapFile;
     private MapFile $mapFile;
+    private string $serializedCompactors;
     private Compactors $compactors;
-    private array $filesWithContents = [];
+    private array $originalFilePaths = [];
+    private array $processesFilesWithContents = [];
 
     public function __construct()
     {
@@ -78,6 +95,11 @@ final class ProcessFile extends ParallelCommand
             InputArgument::REQUIRED,
             'Path to the file processing configuration.',
         );
+        $this->addArgument(
+            self::TMP_DIR,
+            InputArgument::REQUIRED,
+            'Temporary directory that can be used for dumping artifacts that can be collected later.',
+        );
 
         ParallelizationInput::configureCommand($this);
 
@@ -86,12 +108,59 @@ final class ProcessFile extends ParallelCommand
 
     protected function fetchItems(InputInterface $input, OutputInterface $output): iterable
     {
-        $config = json_decode($input->getArgument(self::CONFIG_ARGUMENT));
+        return $this->originalFilePaths;
+    }
 
-        $this->mapFile = new MapFile($config['mapFile']);
-        $this->compactors = new MapFile($config['compactors']);
+    protected function configureParallelExecutableFactory(ParallelExecutorFactory $parallelExecutorFactory, InputInterface $input, OutputInterface $output): ParallelExecutorFactory
+    {
+        return $parallelExecutorFactory
+            ->withScriptPath(Box::getBoxBin())
+            ->withRunBeforeFirstCommand($this->runBeforeFirstCommand(...))
+            ->withRunBeforeBatch($this->runBeforeBatch(...))
+            ->withRunAfterBatch($this->runAfterBatch(...))
+            ->withBatchSize(100)
+            ->withSegmentSize(100);
+    }
 
-        return $config['files'];
+    private function runBeforeFirstCommand(InputInterface $input): void
+    {
+
+        $config = json_decode(
+            file_get_contents($input->getArgument(self::CONFIG_ARGUMENT)),
+            true,
+        );
+
+        $this->originalFilePaths = $config['files'];
+    }
+
+    private function runBeforeBatch(InputInterface $input): void
+    {
+        if (isset($this->mapFile, $this->compactors, $this->tmp)) {
+            return;
+        }
+
+        $config = json_decode(
+            file_get_contents($input->getArgument(self::CONFIG_ARGUMENT)),
+            true,
+        );
+
+        $this->mapFile = unserialize(
+            $config['mapFile'],
+            ['allowed_classes' => [MapFile::class]],
+        );
+        $this->compactors = unserialize(
+            $config['compactors'],
+            ['allowed_classes' => [
+                Compactors::class,
+                FileExtensionCompactor::class,
+                Json::class,
+                Php::class,
+                PhpScoper::class,
+                Placeholder::class,
+                SerializableScoper::class,
+            ]],
+        );
+        $this->tmp = $input->getArgument(self::TMP_DIR);
     }
 
     protected function runSingleCommand(string $file, InputInterface $input, OutputInterface $output): void
@@ -102,7 +171,16 @@ final class ProcessFile extends ParallelCommand
 
         $processedContents = $this->compactors->compact($local, $contents);
 
-        $this->filesWithContents[] = [$local, $processedContents];
+        $this->processesFilesWithContents[] = [$local, $processedContents];
+    }
+
+    private function runAfterBatch(): void
+    {
+        FS::dumpFile(
+            $this->tmp.'/'.unique_id('batch-').'.json',
+            json_encode($this->processesFilesWithContents),
+        );
+        unset($this->processesFilesWithContents);
     }
 
     protected function getItemName(?int $count): string

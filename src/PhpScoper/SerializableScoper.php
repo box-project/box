@@ -15,17 +15,28 @@ declare(strict_types=1);
 namespace KevinGH\Box\PhpScoper;
 
 use Humbug\PhpScoper\Configuration\Configuration as PhpScoperConfiguration;
+use Humbug\PhpScoper\Container;
 use Humbug\PhpScoper\Container as PhpScoperContainer;
 use Humbug\PhpScoper\Scoper\Scoper as PhpScoperScoper;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
+use InvalidArgumentException;
+use KevinGH\Box\Configuration\Configuration;
+use Serializable;
+use Symfony\Component\Filesystem\Path;
+use Throwable;
+use function array_keys;
+use function array_map;
+use function array_unique;
+use function array_values;
 use function count;
+use function sprintf;
 
 /**
  * @private
  */
 final class SerializableScoper implements Scoper
 {
-    private PhpScoperConfiguration $scoperConfig;
+   // private PhpScoperConfiguration $scoperConfig;
     private PhpScoperContainer $scoperContainer;
     private PhpScoperScoper $scoper;
     private SymbolsRegistry $symbolsRegistry;
@@ -36,12 +47,12 @@ final class SerializableScoper implements Scoper
     public array $excludedFilePaths;
 
     public function __construct(
-        PhpScoperConfiguration $scoperConfig,
+        private PhpScoperConfiguration $scoperConfig,
         string ...$excludedFilePaths,
     ) {
-        $this->scoperConfig = $scoperConfig->withPatcher(
-            PatcherFactory::createSerializablePatchers($scoperConfig->getPatcher())
-        );
+//        $this->scoperConfig = $scoperConfig->withPatcher(
+//            PatcherFactory::createSerializablePatchers($scoperConfig->getPatcher())
+//        );
         $this->excludedFilePaths = $excludedFilePaths;
         $this->symbolsRegistry = new SymbolsRegistry();
     }
@@ -118,5 +129,26 @@ final class SerializableScoper implements Scoper
     public function getExcludedFilePaths(): array
     {
         return $this->excludedFilePaths;
+    }
+
+    public function __serialize(): array
+    {
+        return [
+            $this->scoperConfig->getPath(),
+            $this->scoperConfig->getPrefix(),
+            $this->excludedFilePaths,
+        ];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        [$configPath, $configPrefix, $excludedFilePaths] = $data;
+
+        $config = Configuration::createPhpScoperConfig($configPath)->withPrefix($configPrefix);
+
+        $this->__construct(
+            $config,
+            ...$excludedFilePaths,
+        );
     }
 }

@@ -14,7 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
+use KevinGH\Box\Annotation\CompactedFormatter;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
+use phpDocumentor\Reflection\DocBlockFactory;
 use PhpToken;
 use RuntimeException;
 use Webmozart\Assert\Assert;
@@ -46,8 +48,23 @@ use const T_WHITESPACE;
  */
 final class Php extends FileExtensionCompactor
 {
-    public function __construct(
-        private ?DocblockAnnotationParser $annotationParser,
+    /**
+     * @param list<string> $ignoredAnnotations
+     */
+    public static function create(array $ignoredAnnotations): self
+    {
+        return new self(
+            self::createDocblockAnnotationParser($ignoredAnnotations),
+            $ignoredAnnotations,
+        );
+    }
+
+    /**
+     * @param list<string> $ignoredAnnotations
+     */
+    private function __construct(
+        private DocblockAnnotationParser $annotationParser,
+        private array $ignoredAnnotations,
         array $extensions = ['php'],
     ) {
         parent::__construct($extensions);
@@ -244,5 +261,30 @@ final class Php extends FileExtensionCompactor
         }
 
         return $subTokens;
+    }
+
+    public function __serialize(): array
+    {
+        return $this->ignoredAnnotations;
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->__construct(
+            self::createDocblockAnnotationParser($data),
+            $data,
+        );
+    }
+
+    /**
+     * @param list<string> $ignoredAnnotations
+     */
+    private static function createDocblockAnnotationParser(array $ignoredAnnotations): DocblockAnnotationParser
+    {
+        return new DocblockAnnotationParser(
+            DocBlockFactory::createInstance(),
+            new CompactedFormatter(),
+            $ignoredAnnotations,
+        );
     }
 }
