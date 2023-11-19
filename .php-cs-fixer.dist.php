@@ -32,7 +32,7 @@ $overriddenRules = [
     ],
 ];
 
-$config = new FidryConfig('', 81_000);
+$config = new FidryConfig('', 82_000);
 $config->addRules($overriddenRules);
 $config->setCacheFile(__DIR__.'/dist/.php-cs-fixer.cache');
 $config->setFinder($finder);
