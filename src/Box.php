@@ -40,6 +40,7 @@ use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
 use function Amp\ParallelFunctions\parallelMap;
 use function Amp\Promise\wait;
+use function array_column;
 use function array_filter;
 use function array_map;
 use function array_merge;
@@ -58,6 +59,7 @@ use function openssl_pkey_get_details;
 use function openssl_pkey_get_private;
 use function serialize;
 use function sprintf;
+use function unserialize;
 
 /**
  * Box is a utility class to generate a PHAR.
@@ -532,6 +534,7 @@ final class Box implements Countable
 
         $tmp = FS::makeTmpDir('BoxProcessFile', self::class);
         $tmp = __DIR__.'/../dist/process-test';
+        FS::mkdir($tmp);
 
         $processFilesProcess = new Process([
             self::getPhpExecutable(),
@@ -544,10 +547,13 @@ final class Box implements Countable
         $processFilesProcess->setTimeout(600000);
         $processFilesProcess->run();
 
-        $filesWithContents = array_merge(
+        $processedResults = array_filter(
             array_map(
-                static function (SplFileInfo $batchJsonFileInfo): array {
-                    return json_decode(FS::getFileContents($batchJsonFileInfo->getPathname()));
+                static function (SplFileInfo $batchJsonFileInfo): ?array {
+                    $fileContents = FS::getFileContents($batchJsonFileInfo->getPathname());
+
+                    $json_decode = json_decode($fileContents, true);
+                    return $json_decode;
                 },
                 toArray(
                     Finder::create()
@@ -555,7 +561,19 @@ final class Box implements Countable
                         ->in($tmp)
                         ->name('batch-*.json')
                 ),
-            )
+            ),
+            static fn (?array $result) => null !== $result,
+        );
+
+        $filesWithContents = array_merge(
+            ...array_column($processedResults, 'processedFilesWithContents'),
+        );
+
+        $mergedSymbolsRegistry = SymbolsRegistry::createFromRegistries(
+            array_map(
+                static fn (string $registry) => unserialize($registry, ['allowed_classes' => [SymbolsRegistry::class]]),
+                array_column($processedResults, 'symbolsRegistry'),
+            ),
         );
 
         FS::remove([$configPath, $tmp]);
@@ -568,14 +586,7 @@ final class Box implements Countable
             );
         }
 
-        $output = $processFilesProcess->getOutput();
-        // TODO: log output
-
-        ['filesWithContents' => $filesWithContents, 'symbolRegistry' => $symbolRegistry] = json_decode(
-            FS::getFileContents($output),
-        );
-
-        $compactors->registerSymbolsRegistry($symbolRegistry);
+        $compactors->registerSymbolsRegistry($mergedSymbolsRegistry);
 
         return $filesWithContents;
     }

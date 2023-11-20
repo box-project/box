@@ -53,10 +53,13 @@ use Webmozarts\Console\Parallelization\Logger\Logger;
 use Webmozarts\Console\Parallelization\Logger\StandardLogger;
 use Webmozarts\Console\Parallelization\ParallelCommand;
 use Webmozarts\Console\Parallelization\ParallelExecutorFactory;
+use function array_filter;
 use function array_map;
 use function array_shift;
 use function array_unshift;
+use function count;
 use function explode;
+use function in_array;
 use function json_encode;
 use function KevinGH\Box\unique_id;
 use function Safe\file_get_contents;
@@ -64,6 +67,7 @@ use function getcwd;
 use function implode;
 use function KevinGH\Box\check_php_settings;
 use function putenv;
+use function serialize;
 use function sprintf;
 use function unserialize;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
@@ -71,6 +75,8 @@ use function Safe\json_decode;
 
 final class ProcessFile extends ParallelCommand
 {
+    private const SEGMENT_SIZE = 100;
+
     private const CONFIG_ARGUMENT = 'file';
     private const CHILD_CONFIG_ARGUMENT = 'child-file';
     private const TMP_DIR = 'tmp';
@@ -116,10 +122,11 @@ final class ProcessFile extends ParallelCommand
         return $parallelExecutorFactory
             ->withScriptPath(Box::getBoxBin())
             ->withRunBeforeFirstCommand($this->runBeforeFirstCommand(...))
-            ->withRunBeforeBatch($this->runBeforeBatch(...))
-            ->withRunAfterBatch($this->runAfterBatch(...))
-            ->withBatchSize(100)
-            ->withSegmentSize(100);
+            // Ensure the batch & segment size are identical: we want the one and only one batch per process.
+            ->withBatchSize(self::SEGMENT_SIZE)
+            ->withSegmentSize(self::SEGMENT_SIZE)
+            ->withRunBeforeBatch($this->runBeforeFirstBatch(...))
+            ->withRunAfterBatch($this->runAfterLastBatch(...));
     }
 
     private function runBeforeFirstCommand(InputInterface $input): void
@@ -133,7 +140,7 @@ final class ProcessFile extends ParallelCommand
         $this->originalFilePaths = $config['files'];
     }
 
-    private function runBeforeBatch(InputInterface $input): void
+    private function runBeforeFirstBatch(InputInterface $input): void
     {
         if (isset($this->mapFile, $this->compactors, $this->tmp)) {
             return;
@@ -174,13 +181,30 @@ final class ProcessFile extends ParallelCommand
         $this->processesFilesWithContents[] = [$local, $processedContents];
     }
 
-    private function runAfterBatch(): void
+    private function runAfterLastBatch(): void
     {
+        $symbols = $this->compactors->getScoperSymbolsRegistry();
+        $processedFilesWithContents = $this->processesFilesWithContents;
+
+        if (count($processedFilesWithContents) === 0
+            && (null === $symbols || count($symbols) === 0)
+        ) {
+            return;
+        }
+
+        $content = json_encode([
+            'processedFilesWithContents' => $processedFilesWithContents,
+            'symbolsRegistry' => serialize($symbols),
+        ]);
+
         FS::dumpFile(
             $this->tmp.'/'.unique_id('batch-').'.json',
-            json_encode($this->processesFilesWithContents),
+            $content,
         );
-        unset($this->processesFilesWithContents);
+
+        // TODO: reset the temporary state
+        $this->processesFilesWithContents = [];
+        $this->compactors->registerSymbolsRegistry(new SymbolsRegistry());
     }
 
     protected function getItemName(?int $count): string
