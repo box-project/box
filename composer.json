@@ -72,7 +72,6 @@
             "KevinGH\\Box\\": "src"
         },
         "files": [
-            "src/consts.php",
             "src/functions.php"
         ],
         "exclude-from-classmap": [

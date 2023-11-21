@@ -14,13 +14,14 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-// Public constants pointing to environment variable names
-const BOX_MEMORY_LIMIT = 'BOX_MEMORY_LIMIT';
-const BOX_ALLOW_XDEBUG = 'BOX_ALLOW_XDEBUG';
+final class Constants
+{
+    use NotInstantiable;
 
-/**
- * @internal
- *
- * @private
- */
-const _NO_PARALLEL_PROCESSING = '_BOX_NO_PARALLEL_PROCESSING';
+    public const MEMORY_LIMIT = 'BOX_MEMORY_LIMIT';
+    public const ALLOW_XDEBUG = 'BOX_ALLOW_XDEBUG';
+    public const BIN = 'BOX_BIN';
+
+    /** @internal */
+    public const NO_PARALLEL_PROCESSING = '_BOX_NO_PARALLEL_PROCESSING';
+}
