@@ -74,7 +74,6 @@ use function putenv;
 use function Safe\getcwd;
 use function sprintf;
 use function var_export;
-use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 use const PHP_EOL;
 
 /**
