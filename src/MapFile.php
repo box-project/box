@@ -66,8 +66,7 @@ final class MapFile
         return $this->map;
     }
 
-    public function serialize()
+    public function serialize(): void
     {
-
     }
 }

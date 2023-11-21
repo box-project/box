@@ -14,63 +14,16 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Parallel;
 
-use Fidry\Console\Command\Command;
-use Fidry\Console\ExitCode;
-use Fidry\Console\IO;
 use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-use KevinGH\Box\Annotation\DocblockAnnotationParser;
-use KevinGH\Box\Box;
 use KevinGH\Box\ExecutableFinder;
-use KevinGH\Box\Compactor\Compactor;
-use KevinGH\Box\Compactor\Compactors;
-use KevinGH\Box\Compactor\FileExtensionCompactor;
-use KevinGH\Box\Compactor\Json;
-use KevinGH\Box\Compactor\Php;
-use KevinGH\Box\Compactor\PhpScoper;
-use KevinGH\Box\Compactor\Placeholder;
-use KevinGH\Box\MapFile;
-use KevinGH\Box\PhpScoper\SerializableScoper;
-use phpDocumentor\Reflection\DocBlockFactoryInterface;
-use stdClass;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Terminal;
-use Symfony\Component\Filesystem\Path;
-use Symfony\Component\VarDumper\Cloner\VarCloner;
-use Symfony\Component\VarDumper\Dumper\CliDumper;
-use Webmozart\Assert\Assert;
-use Webmozarts\Console\Parallelization\ErrorHandler\ErrorHandler;
-use Webmozarts\Console\Parallelization\ErrorHandler\LoggingErrorHandler;
-use Webmozarts\Console\Parallelization\ErrorHandler\ResetServiceErrorHandler;
-use Webmozarts\Console\Parallelization\ErrorHandler\ThrowableCodeErrorHandler;
 use Webmozarts\Console\Parallelization\Input\ParallelizationInput;
-use Webmozarts\Console\Parallelization\Logger\DebugProgressBarFactory;
-use Webmozarts\Console\Parallelization\Logger\Logger;
-use Webmozarts\Console\Parallelization\Logger\StandardLogger;
 use Webmozarts\Console\Parallelization\ParallelCommand;
 use Webmozarts\Console\Parallelization\ParallelExecutorFactory;
-use function array_filter;
-use function array_map;
-use function array_shift;
-use function array_unshift;
 use function count;
-use function explode;
-use function in_array;
-use function json_encode;
-use function KevinGH\Box\unique_id;
-use function Safe\file_get_contents;
-use function getcwd;
-use function implode;
-use function KevinGH\Box\check_php_settings;
-use function putenv;
-use function serialize;
-use function sprintf;
-use function unserialize;
-use const KevinGH\Box\BOX_ALLOW_XDEBUG;
-use function Safe\json_decode;
 
 final class ProcessFileCommand extends ParallelCommand
 {
@@ -155,8 +108,8 @@ final class ProcessFileCommand extends ParallelCommand
         $symbols = $this->configuration->compactors->getScoperSymbolsRegistry();
         $processedFilesWithContents = $this->processesFilesWithContents;
 
-        if (count($processedFilesWithContents) === 0
-            && (null === $symbols || count($symbols) === 0)
+        if (0 === count($processedFilesWithContents)
+            && (null === $symbols || 0 === count($symbols))
         ) {
             return;
         }

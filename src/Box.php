@@ -25,7 +25,6 @@ use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
 use KevinGH\Box\Parallel\ParallelFileProcessor;
 use KevinGH\Box\Phar\CompressionAlgorithm;
-use KevinGH\Box\Phar\InvalidPhar;
 use KevinGH\Box\Phar\SigningAlgorithm;
 use KevinGH\Box\PhpScoper\NullScoper;
 use KevinGH\Box\PhpScoper\Scoper;
@@ -34,17 +33,8 @@ use RecursiveDirectoryIterator;
 use RuntimeException;
 use Seld\PharUtils\Timestamps;
 use SplFileInfo;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\PhpExecutableFinder;
-use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
-use function Amp\ParallelFunctions\parallelMap;
-use function Amp\Promise\wait;
-use function array_column;
-use function array_filter;
 use function array_map;
-use function array_merge;
 use function array_unshift;
 use function chdir;
 use function dirname;
@@ -52,15 +42,10 @@ use function extension_loaded;
 use function file_exists;
 use function getcwd;
 use function is_object;
-use function iter\toArray;
-use function json_decode;
-use function Safe\json_encode;
 use function openssl_pkey_export;
 use function openssl_pkey_get_details;
 use function openssl_pkey_get_private;
-use function serialize;
 use function sprintf;
-use function unserialize;
 
 /**
  * Box is a utility class to generate a PHAR.
@@ -484,9 +469,10 @@ final class Box implements Countable
      * @return list<array{string, string}>
      */
     private static function processFilesSynchronously(
-        array $files, MapFile $mapFile, Compactors $compactors,
-    ): array
-    {
+        array $files,
+        MapFile $mapFile,
+        Compactors $compactors,
+    ): array {
         $processFile = static function (string $file) use ($mapFile, $compactors): array {
             $contents = FS::getFileContents($file);
 

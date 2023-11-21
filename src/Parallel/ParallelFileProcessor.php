@@ -2,20 +2,27 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Parallel;
 
 use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-use KevinGH\Box\ExecutableFinder;
 use KevinGH\Box\Compactor\Compactors;
+use KevinGH\Box\ExecutableFinder;
 use KevinGH\Box\MapFile;
-use KevinGH\Box\Phar\InvalidPhar;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use function iter\toArray;
-use function Safe\json_encode;
 
 final class ParallelFileProcessor
 {
@@ -25,11 +32,10 @@ final class ParallelFileProcessor
      * @return list<array{string, string}>
      */
     public static function processFilesInParallel(
-        array      $filePaths,
-        MapFile    $mapFile,
+        array $filePaths,
+        MapFile $mapFile,
         Compactors $compactors,
-    ): array
-    {
+    ): array {
         $tmp = FS::makeTmpDir('BoxProcessFile', self::class);
         FS::mkdir($tmp);
 
@@ -69,12 +75,11 @@ final class ParallelFileProcessor
      * @return list<array{string, string}>
      */
     private static function createConfig(
-        array      $filePaths,
-        MapFile    $mapFile,
+        array $filePaths,
+        MapFile $mapFile,
         Compactors $compactors,
         string $tmp
-    ): string
-    {
+    ): string {
         $config = new Configuration($filePaths, $mapFile, $compactors);
         $configPath = $tmp.'/config.json';
 
@@ -85,14 +90,11 @@ final class ParallelFileProcessor
 
     /**
      * @param array|string $configPath
-     * @param string $tmp
-     * @return Process
      */
     private static function createProcess(
         string $configPath,
         string $tmp,
-    ): Process
-    {
+    ): Process {
         $process = new Process([
             ExecutableFinder::findPhpExecutable(),
             ExecutableFinder::findBoxExecutable(),
@@ -108,8 +110,6 @@ final class ParallelFileProcessor
     }
 
     /**
-     * @param string $tmp
-     *
      * @return list<array{array{string, string}, SymbolsRegistry}>
      */
     public static function getProcessedResults(string $tmp): array

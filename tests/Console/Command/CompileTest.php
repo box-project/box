@@ -191,7 +191,7 @@ class CompileTest extends FileSystemTestCase
         FS::dumpFile('composer.lock', '{}');
         FS::dumpFile('vendor/composer/installed.json', '{}');
 
-        $shebang = CompileTest::getExpectedShebang();
+        $shebang = self::getExpectedShebang();
 
         $numberOfFiles = self::NUMBER_OF_FILES;
 
@@ -355,7 +355,7 @@ class CompileTest extends FileSystemTestCase
     {
         FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
-        $shebang = CompileTest::getExpectedShebang();
+        $shebang = self::getExpectedShebang();
 
         FS::dumpFile(
             'box.json',
@@ -788,7 +788,7 @@ class CompileTest extends FileSystemTestCase
 
         FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
-        $shebang = CompileTest::getExpectedShebang();
+        $shebang = self::getExpectedShebang();
 
         $expectedNumberOfClasses = 1;
         $expectedNumberOfFiles = self::NUMBER_OF_FILES;
@@ -915,7 +915,7 @@ class CompileTest extends FileSystemTestCase
 
         FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
-        $shebang = CompileTest::getExpectedShebang();
+        $shebang = self::getExpectedShebang();
 
         $expectedNumberOfClasses = 1;
         $expectedNumberOfFiles = self::NUMBER_OF_FILES;
@@ -1315,7 +1315,7 @@ class CompileTest extends FileSystemTestCase
     {
         FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
-        $shebang = CompileTest::getExpectedShebang();
+        $shebang = self::getExpectedShebang();
 
         FS::dumpFile(
             'box.json',
@@ -1382,7 +1382,7 @@ class CompileTest extends FileSystemTestCase
     {
         FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
-        $shebang = CompileTest::getExpectedShebang();
+        $shebang = self::getExpectedShebang();
 
         FS::dumpFile(
             'box.json',
@@ -1431,7 +1431,7 @@ class CompileTest extends FileSystemTestCase
     {
         FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
-        $shebang = CompileTest::getExpectedShebang();
+        $shebang = self::getExpectedShebang();
 
         FS::dumpFile(
             'custom_stub',
