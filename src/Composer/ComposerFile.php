@@ -18,8 +18,8 @@ use Webmozart\Assert\Assert;
 
 final class ComposerFile
 {
-    private ?string $path;
-    private array $contents;
+    private readonly ?string $path;
+    private readonly array $contents;
 
     public static function createEmpty(): self
     {

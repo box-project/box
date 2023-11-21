@@ -17,14 +17,14 @@ namespace KevinGH\Box\RequirementChecker;
 /**
  * @private
  */
-final class Requirement
+final readonly class Requirement
 {
     public function __construct(
-        public readonly RequirementType $type,
-        public readonly string $condition,
-        public readonly ?string $source,
-        public readonly string $message,
-        public readonly string $helpMessage,
+        public RequirementType $type,
+        public string $condition,
+        public ?string $source,
+        public string $message,
+        public string $helpMessage,
     ) {
     }
 

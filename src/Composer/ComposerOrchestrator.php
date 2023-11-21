@@ -48,9 +48,9 @@ final class ComposerOrchestrator
     }
 
     public function __construct(
-        private ComposerProcessFactory $processFactory,
-        private LoggerInterface $logger,
-        private FileSystem $fileSystem,
+        private readonly ComposerProcessFactory $processFactory,
+        private readonly LoggerInterface $logger,
+        private readonly FileSystem $fileSystem,
     ) {
     }
 

@@ -34,7 +34,6 @@ use function array_values;
 use function count;
 use function implode;
 use function is_array;
-use function KevinGH\Box\format_size;
 use function KevinGH\Box\format_size as format_size1;
 use function KevinGH\Box\noop;
 use function key;
@@ -256,7 +255,7 @@ final class PharInfoRenderer
             sprintf(
                 '<comment>Contents:</comment>%s (%s)',
                 1 === $totalCount ? ' 1 file' : " {$totalCount} files",
-                format_size(
+                format_size1(
                     filesize($pharInfo->getFile()),
                 ),
             ),

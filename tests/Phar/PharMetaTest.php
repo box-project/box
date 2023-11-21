@@ -47,7 +47,7 @@ final class PharMetaTest extends TestCase
                 null,
                 null,
                 null,
-                1509920675,
+                1_509_920_675,
                 null,
                 [],
             ),
@@ -64,7 +64,7 @@ final class PharMetaTest extends TestCase
                        'action' => 'sayHello',
                     )
                     EOL,
-                1509920675,
+                1_509_920_675,
                 <<<'EOF'
                     -----BEGIN PUBLIC KEY-----
                     MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKuZkrHT54KtuBCTrR36+4tibd+2un9b
@@ -123,7 +123,7 @@ final class PharMetaTest extends TestCase
                 $defaultStub,
                 '1.1.0',
                 null,
-                1680285013,
+                1_680_285_013,
                 null,
                 [
                     'sample.php' => [
@@ -146,7 +146,7 @@ final class PharMetaTest extends TestCase
                 $oldDefaultPharStub,
                 '1.1.0',
                 null,
-                1509920675,
+                1_509_920_675,
                 null,
                 [
                     'foo.php' => [
@@ -169,7 +169,7 @@ final class PharMetaTest extends TestCase
                 $defaultStub,
                 '1.1.0',
                 null,
-                1680680933,
+                1_680_680_933,
                 null,
                 [
                     'sample.php' => [
@@ -197,7 +197,7 @@ final class PharMetaTest extends TestCase
                     $defaultStub,
                     '1.1.0',
                     null,
-                    1680469485,
+                    1_680_469_485,
                     null,
                     [
                         'sample.php' => [
@@ -222,7 +222,7 @@ final class PharMetaTest extends TestCase
                     $defaultStub,
                     '1.1.0',
                     null,
-                    1680469504,
+                    1_680_469_504,
                     null,
                     [
                         'sample.php' => [
@@ -246,7 +246,7 @@ final class PharMetaTest extends TestCase
                 $sha512Stub,
                 '1.1.0',
                 null,
-                1374531272,
+                1_374_531_272,
                 null,
                 [
                     'index.php' => [
@@ -269,7 +269,7 @@ final class PharMetaTest extends TestCase
                 $sha512Stub,
                 '1.1.0',
                 null,
-                1374531313,
+                1_374_531_313,
                 <<<'EOF'
                     -----BEGIN PUBLIC KEY-----
                     MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKuZkrHT54KtuBCTrR36+4tibd+2un9b
@@ -298,7 +298,7 @@ final class PharMetaTest extends TestCase
                 $defaultStub,
                 '1.1.0',
                 "'Hello world!'",
-                1680366918,
+                1_680_366_918,
                 null,
                 [
                     'sample.php' => [
@@ -321,7 +321,7 @@ final class PharMetaTest extends TestCase
                 $defaultStub,
                 '1.1.0',
                 '-19.8',
-                1680366947,
+                1_680_366_947,
                 null,
                 [
                     'sample.php' => [
@@ -348,7 +348,7 @@ final class PharMetaTest extends TestCase
                        'action' => 'sayHello',
                     )
                     EOL,
-                1680367053,
+                1_680_367_053,
                 null,
                 [
                     'sample.php' => [
@@ -368,7 +368,7 @@ final class PharMetaTest extends TestCase
                 null,
                 null,
                 null,
-                1680284754,
+                1_680_284_754,
                 null,
                 [
                     'sample.txt' => [
@@ -389,7 +389,7 @@ final class PharMetaTest extends TestCase
                     null,
                     null,
                     null,
-                    1680284663,
+                    1_680_284_663,
                     null,
                     [
                         'sample.txt' => [
@@ -411,7 +411,7 @@ final class PharMetaTest extends TestCase
                     null,
                     null,
                     null,
-                    1680284660,
+                    1_680_284_660,
                     null,
                     [
                         'sample.txt' => [
@@ -433,7 +433,7 @@ final class PharMetaTest extends TestCase
                     null,
                     null,
                     null,
-                    1680284663,
+                    1_680_284_663,
                     null,
                     [
                         'sample.txt' => [
@@ -457,7 +457,7 @@ final class PharMetaTest extends TestCase
                 $defaultStub,
                 '1.1.0',
                 null,
-                1680645848,
+                1_680_645_848,
                 null,
                 [
                     '.hidden-dir/.hidden-file' => [

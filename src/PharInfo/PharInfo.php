@@ -27,7 +27,7 @@ use function str_replace;
  */
 final class PharInfo
 {
-    private NewPharInfo $decoratedPharInfo;
+    private readonly NewPharInfo $decoratedPharInfo;
 
     private PharData|Phar $phar;
 

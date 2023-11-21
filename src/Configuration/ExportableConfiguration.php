@@ -34,7 +34,7 @@ use const SORT_STRING;
  *
  * @internal
  */
-final class ExportableConfiguration
+final readonly class ExportableConfiguration
 {
     public static function create(Configuration $configuration): self
     {
@@ -114,40 +114,40 @@ final class ExportableConfiguration
 
     /** @noinspection PhpPropertyOnlyWrittenInspection */
     private function __construct(
-        private readonly ?string $file,
-        private readonly string $alias,
-        private readonly string $basePath,
-        private readonly ComposerFile $composerJson,
-        private readonly ComposerFile $composerLock,
-        private readonly array $files,
-        private readonly array $binaryFiles,
-        private readonly bool $autodiscoveredFiles,
-        private readonly bool $dumpAutoload,
-        private readonly bool $excludeComposerFiles,
-        private readonly bool $excludeDevFiles,
-        private readonly Compactors|array $compactors,
-        private readonly string $compressionAlgorithm,
-        private readonly int|string|null $fileMode,
-        private readonly ?string $mainScriptPath,
-        private readonly ?string $mainScriptContents,
-        private readonly MapFile $fileMapper,
-        private readonly mixed $metadata,
-        private readonly string $tmpOutputPath,
-        private readonly string $outputPath,
-        private readonly ?string $privateKeyPassphrase,
-        private readonly ?string $privateKeyPath,
-        private readonly bool $promptForPrivateKey,
-        private readonly array $processedReplacements,
-        private readonly ?string $shebang,
-        private readonly string $signingAlgorithm,
-        private readonly ?string $stubBannerContents,
-        private readonly ?string $stubBannerPath,
-        private readonly ?string $stubPath,
-        private readonly bool $isInterceptFileFuncs,
-        private readonly bool $isStubGenerated,
-        private readonly bool $checkRequirements,
-        private readonly array $warnings,
-        private readonly array $recommendations,
+        private ?string $file,
+        private string $alias,
+        private string $basePath,
+        private ComposerFile $composerJson,
+        private ComposerFile $composerLock,
+        private array $files,
+        private array $binaryFiles,
+        private bool $autodiscoveredFiles,
+        private bool $dumpAutoload,
+        private bool $excludeComposerFiles,
+        private bool $excludeDevFiles,
+        private Compactors|array $compactors,
+        private string $compressionAlgorithm,
+        private int|string|null $fileMode,
+        private ?string $mainScriptPath,
+        private ?string $mainScriptContents,
+        private MapFile $fileMapper,
+        private mixed $metadata,
+        private string $tmpOutputPath,
+        private string $outputPath,
+        private ?string $privateKeyPassphrase,
+        private ?string $privateKeyPath,
+        private bool $promptForPrivateKey,
+        private array $processedReplacements,
+        private ?string $shebang,
+        private string $signingAlgorithm,
+        private ?string $stubBannerContents,
+        private ?string $stubBannerPath,
+        private ?string $stubPath,
+        private bool $isInterceptFileFuncs,
+        private bool $isStubGenerated,
+        private bool $checkRequirements,
+        private array $warnings,
+        private array $recommendations,
     ) {
     }
 
