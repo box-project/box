@@ -86,6 +86,8 @@ jobs:
         needs:
             - build-phar
         if: github.event_name == 'release'
+        permissions:
+            contents: write
         steps:
             -   uses: actions/download-artifact@v3
                 with:
