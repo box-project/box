@@ -365,6 +365,9 @@ vendor-bin/php-cs-fixer/composer.lock: vendor-bin/php-cs-fixer/composer.json
 	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer bin php-cs-fixer update --lock && touch -c $(@)"
 
+.PHONY: rector_install
+rector_install: $(RECTOR_BIN)
+
 $(RECTOR_BIN): vendor-bin/rector/vendor
 	touch -c $@
 vendor-bin/rector/vendor: vendor-bin/rector/composer.lock $(COMPOSER_BIN_PLUGIN_VENDOR)

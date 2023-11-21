@@ -26,6 +26,9 @@ PHAR_EXTRACT = ../res/requirement-checker
 BOX_BIN = ../bin/box
 BOX = $(BOX_BIN)
 
+RECTOR_BIN = ../vendor-bin/rector/vendor/bin/rector
+RECTOR = $(RECTOR_BIN)
+
 DIFF = diff --strip-trailing-cr --ignore-all-space --side-by-side --suppress-common-lines
 
 
@@ -109,11 +112,11 @@ phpunit_autoreview: $(PHPUNIT_BIN) vendor
 
 .PHONY: cs
 cs:	 	## Fixes CS
-cs: gitignore_sort composer_normalize php_cs_fixer
+cs: gitignore_sort composer_normalize rector php_cs_fixer
 
 .PHONY: cs_lint
 cs_lint: 	## Checks CS
-cs_lint: composer_normalize_lint php_cs_fixer_lint
+cs_lint: composer_normalize_lint rector_lint php_cs_fixer_lint
 
 .PHONY: gitignore_sort
 gitignore_sort:
@@ -134,6 +137,28 @@ php_cs_fixer: $(PHP_CS_FIXER_BIN)
 .PHONY: php_cs_fixer_lint
 php_cs_fixer_lint: $(PHP_CS_FIXER_BIN)
 	$(PHP_CS_FIXER) fix --ansi --verbose --dry-run --diff
+
+.PHONY: rector
+rector: rector_src rector_tests
+
+.PHONY: rector_src
+rector_src: $(RECTOR_BIN)
+	$(RECTOR) --config=rector-src.php
+
+.PHONY: rector_tests
+rector_tests: $(RECTOR_BIN)
+	$(RECTOR) --config=rector-tests.php
+
+.PHONY: rector_lint
+rector_lint: rector_lint_src rector_lint_tests
+
+.PHONY: rector_lint_src
+rector_lint_src: $(RECTOR_BIN)
+	$(RECTOR) --config=rector-src.php --dry-run
+
+.PHONY: rector_lint_tests
+rector_lint_tests: $(RECTOR_BIN)
+	$(RECTOR) --config=rector-tests.php --dry-run
 
 
 #
@@ -240,3 +265,6 @@ $(PHAR_EXTRACT): $(PHAR) $(BOX_BIN)
 
 $(BOX_BIN):
 	cd ..; $(MAKE) --file=Makefile bin/box
+
+$(RECTOR_BIN):
+	cd ..; $(MAKE) --file=Makefile rector_install
