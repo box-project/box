@@ -28,7 +28,7 @@ final class ExecutableFinder
             return self::$boxExecutable;
         }
 
-        self::$boxExecutable = getenv(BOX_BIN) ?: $_SERVER['SCRIPT_NAME'];
+        self::$boxExecutable = getenv(Constants::BIN) ?: $_SERVER['SCRIPT_NAME'];
 
         return self::$boxExecutable;
     }
