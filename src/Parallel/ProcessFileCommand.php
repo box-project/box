@@ -73,8 +73,10 @@ use function unserialize;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 use function Safe\json_decode;
 
-final class ProcessFile extends ParallelCommand
+final class ProcessFileCommand extends ParallelCommand
 {
+    public const COMMAND_NAME = 'internal:process:files';
+
     private const SEGMENT_SIZE = 100;
 
     private const CONFIG_ARGUMENT = 'file';
@@ -91,7 +93,7 @@ final class ProcessFile extends ParallelCommand
 
     public function __construct()
     {
-        parent::__construct('internal:process:files');
+        parent::__construct(self::COMMAND_NAME);
     }
 
     public function configure(): void

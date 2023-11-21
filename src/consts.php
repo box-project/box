@@ -17,6 +17,7 @@ namespace KevinGH\Box;
 // Public constants pointing to environment variable names
 const BOX_MEMORY_LIMIT = 'BOX_MEMORY_LIMIT';
 const BOX_ALLOW_XDEBUG = 'BOX_ALLOW_XDEBUG';
+const BOX_BIN = 'BOX_BIN';
 
 /**
  * @internal

@@ -16,7 +16,7 @@ namespace KevinGH\Box\Console;
 
 use Fidry\Console\Application\Application as FidryApplication;
 use Fidry\Console\Command\ReversedSymfonyCommand;
-use KevinGH\Box\Console\Command\ProcessFile;
+use KevinGH\Box\Console\Command\ProcessFileCommand;
 use function KevinGH\Box\get_box_version;
 use function sprintf;
 use function trim;
@@ -91,7 +91,7 @@ final class Application implements FidryApplication
             new Command\Verify(),
             new Command\GenerateDockerFile(),
             new Command\Namespace_(),
-            new ProcessFile(),
+            new ProcessFileCommand(),
         ];
     }
 

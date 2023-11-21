@@ -23,6 +23,7 @@ use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
+use KevinGH\Box\Parallel\ParallelFileProcessor;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\InvalidPhar;
 use KevinGH\Box\Phar\SigningAlgorithm;
@@ -465,7 +466,7 @@ final class Box implements Countable
     {
         $processFiles = $this->scoper instanceof NullScoper || false === is_parallel_processing_enabled()
             ? self::processFilesSynchronously(...)
-            : self::processFilesInParallel(...);
+            : ParallelFileProcessor::processFilesInParallel(...);
 
         return $processFiles(
             $files,
@@ -505,114 +506,5 @@ final class Box implements Countable
         };
 
         return array_map($processFile, $files);
-    }
-
-    /**
-     * @param string[] $files
-     *
-     * @return list<array{string, string}>
-     */
-    private static function processFilesInParallel(
-        array $files, MapFile $mapFile, Compactors $compactors): array
-    {
-
-        $compactorsArray = $compactors->toArray();
-
-        foreach ($compactorsArray as $compactor) {
-            echo PHP_EOL.$compactor::class.PHP_EOL;
-            serialize($compactor);
-        }
-
-        $config = json_encode([
-            'mapFile' => serialize($mapFile),
-            'compactors' => serialize($compactors),
-            'files' => $files,
-        ]);
-        $configPath = FS::makeTmpDir('boxCompile', self::class) . '/tmp-config';
-        FS::dumpFile($configPath, $config);
-        FS::dumpFile(__DIR__.'/../tmp-config', $config);
-
-        $tmp = FS::makeTmpDir('BoxProcessFile', self::class);
-        $tmp = __DIR__.'/../dist/process-test';
-        FS::mkdir($tmp);
-
-        $processFilesProcess = new Process([
-            self::getPhpExecutable(),
-            self::getBoxBin(),
-            'internal:process:files',
-            $configPath,
-            $tmp,
-            '--no-interaction',
-        ]);
-        $processFilesProcess->setTimeout(600000);
-        $processFilesProcess->run();
-
-        $processedResults = array_filter(
-            array_map(
-                static function (SplFileInfo $batchJsonFileInfo): ?array {
-                    $fileContents = FS::getFileContents($batchJsonFileInfo->getPathname());
-
-                    $json_decode = json_decode($fileContents, true);
-                    return $json_decode;
-                },
-                toArray(
-                    Finder::create()
-                        ->files()
-                        ->in($tmp)
-                        ->name('batch-*.json')
-                ),
-            ),
-            static fn (?array $result) => null !== $result,
-        );
-
-        $filesWithContents = array_merge(
-            ...array_column($processedResults, 'processedFilesWithContents'),
-        );
-
-        $mergedSymbolsRegistry = SymbolsRegistry::createFromRegistries(
-            array_map(
-                static fn (string $registry) => unserialize($registry, ['allowed_classes' => [SymbolsRegistry::class]]),
-                array_column($processedResults, 'symbolsRegistry'),
-            ),
-        );
-
-        FS::remove([$configPath, $tmp]);
-
-        if (false === $processFilesProcess->isSuccessful()) {
-            throw new InvalidPhar(
-                $processFilesProcess->getErrorOutput(),
-                $processFilesProcess->getExitCode(),
-                new ProcessFailedException($processFilesProcess),
-            );
-        }
-
-        $compactors->registerSymbolsRegistry($mergedSymbolsRegistry);
-
-        return $filesWithContents;
-    }
-
-    // TODO: prob worth to put back in a static utility class; to check other usages
-    private static function getPhpExecutable(): string
-    {
-        if (isset(self::$phpExecutable)) {
-            return self::$phpExecutable;
-        }
-
-        $phpExecutable = (new PhpExecutableFinder())->find();
-
-        if (false === $phpExecutable) {
-            throw new RuntimeException('Could not find a PHP executable.');
-        }
-
-        self::$phpExecutable = $phpExecutable;
-
-        return self::$phpExecutable;
-    }
-
-    // TODO: check other usages; could be consolidated
-    public static function getBoxBin(): string
-    {
-        // TODO: move the constraint strings declaration in one place
-        return getenv('BOX_BIN') ?: $_SERVER['SCRIPT_NAME'];
     }
 }

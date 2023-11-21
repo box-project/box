@@ -191,7 +191,7 @@ class CompileTest extends FileSystemTestCase
         FS::dumpFile('composer.lock', '{}');
         FS::dumpFile('vendor/composer/installed.json', '{}');
 
-        $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
+        $shebang = CompileTest::getExpectedShebang();
 
         $numberOfFiles = self::NUMBER_OF_FILES;
 
@@ -355,7 +355,7 @@ class CompileTest extends FileSystemTestCase
     {
         FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
-        $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
+        $shebang = CompileTest::getExpectedShebang();
 
         FS::dumpFile(
             'box.json',
@@ -788,7 +788,7 @@ class CompileTest extends FileSystemTestCase
 
         FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
-        $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
+        $shebang = CompileTest::getExpectedShebang();
 
         $expectedNumberOfClasses = 1;
         $expectedNumberOfFiles = self::NUMBER_OF_FILES;
@@ -915,7 +915,7 @@ class CompileTest extends FileSystemTestCase
 
         FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
-        $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
+        $shebang = CompileTest::getExpectedShebang();
 
         $expectedNumberOfClasses = 1;
         $expectedNumberOfFiles = self::NUMBER_OF_FILES;
@@ -1315,7 +1315,7 @@ class CompileTest extends FileSystemTestCase
     {
         FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
-        $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
+        $shebang = CompileTest::getExpectedShebang();
 
         FS::dumpFile(
             'box.json',
@@ -1382,7 +1382,7 @@ class CompileTest extends FileSystemTestCase
     {
         FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
-        $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
+        $shebang = CompileTest::getExpectedShebang();
 
         FS::dumpFile(
             'box.json',
@@ -1431,7 +1431,7 @@ class CompileTest extends FileSystemTestCase
     {
         FS::mirror(self::FIXTURES_DIR.'/dir000', $this->tmp);
 
-        $shebang = sprintf('#!%s', (new PhpExecutableFinder())->find());
+        $shebang = CompileTest::getExpectedShebang();
 
         FS::dumpFile(
             'custom_stub',
@@ -3142,5 +3142,10 @@ class CompileTest extends FileSystemTestCase
         if (!file_exists(self::DEFAULT_STUB_PATH)) {
             self::markTestSkipped('The default stub file could not be found. Run the tests via the make commands or manually generate the stub file with `$ make generate_default_stub`.');
         }
+    }
+
+    private static function getExpectedShebang(): string
+    {
+        return sprintf('#!%s', (new PhpExecutableFinder())->find());
     }
 }
