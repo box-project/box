@@ -209,18 +209,6 @@ function unique_id(string $prefix): string
 /**
  * @private
  */
-function check_php_settings(IO $io): void
-{
-    (new PhpSettingsHandler(
-        new ConsoleLogger(
-            $io->getOutput(),
-        ),
-    ))->check();
-}
-
-/**
- * @private
- */
 function noop(): Closure
 {
     return static function (): void {};

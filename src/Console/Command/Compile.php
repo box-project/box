@@ -63,7 +63,6 @@ use function implode;
 use function is_callable;
 use function is_string;
 use function KevinGH\Box\bump_open_file_descriptor_limit;
-use function KevinGH\Box\check_php_settings;
 use function KevinGH\Box\disable_parallel_processing;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\format_time;
