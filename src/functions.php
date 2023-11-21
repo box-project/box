@@ -183,8 +183,8 @@ function register_aliases(): void
  */
 function disable_parallel_processing(): void
 {
-    if (false === defined(_NO_PARALLEL_PROCESSING)) {
-        define(_NO_PARALLEL_PROCESSING, true);
+    if (false === defined(Constants::NO_PARALLEL_PROCESSING)) {
+        define(Constants::NO_PARALLEL_PROCESSING, true);
     }
 }
 
@@ -193,7 +193,7 @@ function disable_parallel_processing(): void
  */
 function is_parallel_processing_enabled(): bool
 {
-    return false === defined(_NO_PARALLEL_PROCESSING) || false === constant(_NO_PARALLEL_PROCESSING);
+    return false === defined(Constants::NO_PARALLEL_PROCESSING) || false === constant(Constants::NO_PARALLEL_PROCESSING);
 }
 
 /**

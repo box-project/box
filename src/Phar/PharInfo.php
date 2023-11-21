@@ -45,7 +45,7 @@ namespace KevinGH\Box\Phar;
 
 use Fidry\FileSystem\FS;
 use KevinGH\Box\Console\Command\Extract;
-use KevinGH\Box\ExecutableFinder;
+use KevinGH\Box\Constants;
 use OutOfBoundsException;
 use Phar;
 use Symfony\Component\Filesystem\Path;
