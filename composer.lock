@@ -978,16 +978,16 @@
         },
         {
             "name": "humbug/php-scoper",
-            "version": "0.18.8",
+            "version": "0.18.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/humbug/php-scoper.git",
-                "reference": "eba4b11624c6064550d06b4ecd776fc61f969ad8"
+                "reference": "dd0a6721c38a26e18c1e36c0a718b6262350dd96"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/eba4b11624c6064550d06b4ecd776fc61f969ad8",
-                "reference": "eba4b11624c6064550d06b4ecd776fc61f969ad8",
+                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/dd0a6721c38a26e18c1e36c0a718b6262350dd96",
+                "reference": "dd0a6721c38a26e18c1e36c0a718b6262350dd96",
                 "shasum": ""
             },
             "require": {
@@ -1055,9 +1055,9 @@
             "description": "Prefixes all PHP namespaces in a file or directory.",
             "support": {
                 "issues": "https://github.com/humbug/php-scoper/issues",
-                "source": "https://github.com/humbug/php-scoper/tree/0.18.8"
+                "source": "https://github.com/humbug/php-scoper/tree/0.18.9"
             },
-            "time": "2023-11-18T23:13:18+00:00"
+            "time": "2023-11-21T21:00:48+00:00"
         },
         {
             "name": "jetbrains/phpstorm-stubs",
