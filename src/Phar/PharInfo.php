@@ -45,6 +45,7 @@ namespace KevinGH\Box\Phar;
 
 use Fidry\FileSystem\FS;
 use KevinGH\Box\Console\Command\Extract;
+use KevinGH\Box\Constants;
 use OutOfBoundsException;
 use Phar;
 use RuntimeException;
@@ -347,8 +348,7 @@ final class PharInfo
 
     private static function getBoxBin(): string
     {
-        // TODO: move the constraint strings declaration in one place
-        return getenv('BOX_BIN') ?: $_SERVER['SCRIPT_NAME'];
+        return getenv(Constants::BIN) ?: $_SERVER['SCRIPT_NAME'];
     }
 
     /**

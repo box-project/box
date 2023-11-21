@@ -16,6 +16,7 @@ namespace KevinGH\Box\Console\Php;
 
 use Composer\XdebugHandler\XdebugHandler;
 use Fidry\FileSystem\FS;
+use KevinGH\Box\Constants;
 use KevinGH\Box\Phar\PharPhpSettings;
 use Psr\Log\LoggerInterface;
 use Webmozart\Assert\Assert;
@@ -26,7 +27,6 @@ use function KevinGH\Box\format_size;
 use function KevinGH\Box\memory_to_bytes;
 use function sprintf;
 use function trim;
-use const KevinGH\Box\BOX_MEMORY_LIMIT;
 use const PHP_EOL;
 
 /**
@@ -128,7 +128,7 @@ final class PhpSettingsHandler extends XdebugHandler
                 sprintf(
                     'Changed the memory limit from "%s" to %s="%s"',
                     format_size($memoryLimitInBytes, 0),
-                    BOX_MEMORY_LIMIT,
+                    Constants::MEMORY_LIMIT,
                     format_size($userDefinedMemoryLimit, 0),
                 ),
             );
@@ -144,7 +144,7 @@ final class PhpSettingsHandler extends XdebugHandler
 
     private static function getUserDefinedMemoryLimit(): ?int
     {
-        $memoryLimit = getenv(BOX_MEMORY_LIMIT);
+        $memoryLimit = getenv(Constants::MEMORY_LIMIT);
 
         if (false === $memoryLimit) {
             $memoryLimitInBytes = null;
