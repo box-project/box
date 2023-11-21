@@ -37,6 +37,7 @@ use KevinGH\Box\Composer\IncompatibleComposerVersion;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\Logger\CompilerLogger;
 use KevinGH\Box\Console\MessageRenderer;
+use KevinGH\Box\Constants;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\SigningAlgorithm;
@@ -73,7 +74,6 @@ use function putenv;
 use function Safe\getcwd;
 use function sprintf;
 use function var_export;
-use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 use const PHP_EOL;
 
 /**
@@ -181,7 +181,7 @@ final class Compile implements CommandAware
     public function execute(IO $io): int
     {
         if ($io->getTypedOption(self::NO_RESTART_OPTION)->asBoolean()) {
-            putenv(BOX_ALLOW_XDEBUG.'=1');
+            putenv(Constants::ALLOW_XDEBUG.'=1');
         }
 
         $debug = $io->getTypedOption(self::DEBUG_OPTION)->asBoolean();
