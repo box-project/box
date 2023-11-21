@@ -37,6 +37,7 @@ use KevinGH\Box\Composer\IncompatibleComposerVersion;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\Logger\CompilerLogger;
 use KevinGH\Box\Console\MessageRenderer;
+use KevinGH\Box\Console\PhpSettingsChecker;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\SigningAlgorithm;
@@ -190,7 +191,7 @@ final class Compile implements CommandAware
             $io->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
         }
 
-        check_php_settings($io);
+        PhpSettingsChecker::check($io);
 
         if ($io->getTypedOption(self::NO_PARALLEL_PROCESSING_OPTION)->asBoolean()) {
             disable_parallel_processing();
