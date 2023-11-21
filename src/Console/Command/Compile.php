@@ -39,6 +39,7 @@ use KevinGH\Box\Console\Logger\CompilerLogger;
 use KevinGH\Box\Console\MessageRenderer;
 use KevinGH\Box\Constants;
 use KevinGH\Box\MapFile;
+use KevinGH\Box\Parallelization\ParallelizationSettings;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\SigningAlgorithm;
 use KevinGH\Box\RequirementChecker\DecodedComposerJson;
@@ -64,7 +65,6 @@ use function is_callable;
 use function is_string;
 use function KevinGH\Box\bump_open_file_descriptor_limit;
 use function KevinGH\Box\check_php_settings;
-use function KevinGH\Box\disable_parallel_processing;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\format_time;
 use function memory_get_peak_usage;
@@ -193,7 +193,7 @@ final class Compile implements CommandAware
         check_php_settings($io);
 
         if ($io->getTypedOption(self::NO_PARALLEL_PROCESSING_OPTION)->asBoolean()) {
-            disable_parallel_processing();
+            ParallelizationSettings::disableParallelProcessing();
             $io->writeln(
                 '<info>[debug] Disabled parallel processing</info>',
                 OutputInterface::VERBOSITY_DEBUG,

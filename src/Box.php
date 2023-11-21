@@ -23,6 +23,7 @@ use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
+use KevinGH\Box\Parallelization\ParallelizationSettings;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\SigningAlgorithm;
 use KevinGH\Box\PhpScoper\NullScoper;
@@ -457,7 +458,7 @@ final class Box implements Countable
             // Keep the fully qualified call here since this function may be executed without the right autoloading
             // mechanism
             \KevinGH\Box\register_aliases();
-            if (true === \KevinGH\Box\is_parallel_processing_enabled()) {
+            if (true === ParallelizationSettings::isParallelProcessingEnabled()) {
                 \KevinGH\Box\register_error_handler();
             }
 
@@ -470,7 +471,7 @@ final class Box implements Countable
             return [$local, $processedContents, $compactors->getScoperSymbolsRegistry()];
         };
 
-        if ($this->scoper instanceof NullScoper || false === is_parallel_processing_enabled()) {
+        if ($this->scoper instanceof NullScoper || false === ParallelizationSettings::isParallelProcessingEnabled()) {
             return array_map($processFile, $files);
         }
 

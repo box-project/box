@@ -27,9 +27,6 @@ use Webmozart\Assert\Assert;
 use function bin2hex;
 use function class_alias;
 use function class_exists;
-use function constant;
-use function define;
-use function defined;
 use function floor;
 use function function_exists;
 use function is_float;
@@ -176,24 +173,6 @@ function register_aliases(): void
     if (false === class_exists(\Isolated\Symfony\Component\Finder\Finder::class)) {
         class_alias(\Symfony\Component\Finder\Finder::class, \Isolated\Symfony\Component\Finder\Finder::class);
     }
-}
-
-/**
- * @private
- */
-function disable_parallel_processing(): void
-{
-    if (false === defined(Constants::NO_PARALLEL_PROCESSING)) {
-        define(Constants::NO_PARALLEL_PROCESSING, true);
-    }
-}
-
-/**
- * @private
- */
-function is_parallel_processing_enabled(): bool
-{
-    return false === defined(Constants::NO_PARALLEL_PROCESSING) || false === constant(Constants::NO_PARALLEL_PROCESSING);
 }
 
 /**
