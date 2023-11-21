@@ -28,6 +28,7 @@ use function Safe\json_encode;
 use function Safe\realpath;
 use function sprintf;
 use function var_export;
+use const JSON_THROW_ON_ERROR;
 use const SORT_LOCALE_STRING;
 
 /**
@@ -82,7 +83,7 @@ final class PharMeta
 
     public static function fromJson(string $json): self
     {
-        $decodedJson = json_decode($json, true);
+        $decodedJson = json_decode($json, true, flags: JSON_THROW_ON_ERROR);
 
         $filesMeta = $decodedJson['filesMeta'];
 

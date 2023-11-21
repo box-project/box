@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\RequirementChecker;
 
 use PHPUnit\Framework\TestCase;
-use function json_decode;
+use function Safe\json_decode;
 
 /**
  * @covers \KevinGH\Box\RequirementChecker\DecodedComposerLock

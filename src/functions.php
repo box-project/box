@@ -18,11 +18,13 @@ use Closure;
 use Composer\InstalledVersions;
 use ErrorException;
 use Fidry\Console\IO;
+use Isolated\Symfony\Component\Finder\Finder as IsolatedFinder;
 use KevinGH\Box\Console\Php\PhpSettingsHandler;
 use Phar;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Finder\Finder as SymfonyFinder;
 use Webmozart\Assert\Assert;
 use function bin2hex;
 use function class_alias;
@@ -173,8 +175,8 @@ function format_time(float $secs): string
 function register_aliases(): void
 {
     // Exposes the finder used by PHP-Scoper PHAR to allow its usage in the configuration file.
-    if (false === class_exists(\Isolated\Symfony\Component\Finder\Finder::class)) {
-        class_alias(\Symfony\Component\Finder\Finder::class, \Isolated\Symfony\Component\Finder\Finder::class);
+    if (false === class_exists(IsolatedFinder::class)) {
+        class_alias(SymfonyFinder::class, IsolatedFinder::class);
     }
 }
 

@@ -41,6 +41,9 @@ INFECTION_SRC := $(shell find src tests) phpunit.xml.dist
 PHP_CS_FIXER_BIN = vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
 PHP_CS_FIXER = $(PHP_CS_FIXER_BIN)
 
+RECTOR_BIN = vendor-bin/rector/vendor/bin/rector
+RECTOR = $(RECTOR_BIN)
+
 WEBSITE_SRC := mkdocs.yaml $(shell find doc)
 # This is defined in mkdocs.yaml#site_dir
 WEBSITE_OUTPUT = dist/website
@@ -157,7 +160,7 @@ cs:	 		 ## Fixes CS
 cs: root_cs requirement_checker_cs
 
 .PHONY: root_cs
-root_cs: gitignore_sort composer_normalize php_cs_fixer
+root_cs: gitignore_sort composer_normalize rector php_cs_fixer
 
 .PHONY: requirement_checker_cs
 requirement_checker_cs:
@@ -169,7 +172,7 @@ cs_lint: 	 	 ## Lints CS
 cs_lint: root_cs_lint requirement_checker_cs_lint
 
 .PHONY: root_cs_lint
-root_cs_lint: composer_normalize_lint php_cs_fixer_lint
+root_cs_lint: composer_normalize_lint rector_lint php_cs_fixer_lint
 
 .PHONY: requirement_checker_cs_lint
 requirement_checker_cs_lint:
@@ -182,6 +185,14 @@ php_cs_fixer: $(PHP_CS_FIXER_BIN) dist
 .PHONY: php_cs_fixer_lint
 php_cs_fixer_lint: $(PHP_CS_FIXER_BIN) dist
 	$(PHP_CS_FIXER) fix --ansi --verbose --dry-run --diff
+
+.PHONY: rector
+rector: $(RECTOR_BIN)
+	$(RECTOR)
+
+.PHONY: rector_lint
+rector_lint: $(RECTOR_BIN)
+	$(RECTOR) --dry-run
 
 .PHONY: composer_normalize
 composer_normalize: composer.json vendor
@@ -353,6 +364,15 @@ vendor-bin/php-cs-fixer/vendor: vendor-bin/php-cs-fixer/composer.lock $(COMPOSER
 vendor-bin/php-cs-fixer/composer.lock: vendor-bin/php-cs-fixer/composer.json
 	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer bin php-cs-fixer update --lock && touch -c $(@)"
+
+$(RECTOR_BIN): vendor-bin/rector/vendor
+	touch -c $@
+vendor-bin/rector/vendor: vendor-bin/rector/composer.lock $(COMPOSER_BIN_PLUGIN_VENDOR)
+	composer bin rector install
+	touch -c $@
+vendor-bin/rector/composer.lock: vendor-bin/rector/composer.json
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
+	@echo "$$ composer bin rector update --lock && touch -c $(@)"
 
 .PHONY: infection_install
 infection_install: $(INFECTION_BIN)
