@@ -7,11 +7,23 @@ namespace KevinGH\Box;
 use RuntimeException;
 use Symfony\Component\Process\PhpExecutableFinder as SymfonyPhpExecutableFinder;
 
-final class PhpExecutableFinder
+final class ExecutableFinder
 {
+    private static string $boxExecutable;
     private static string $phpExecutable;
 
-    public static function find(): string
+    public static function findBoxExecutable(): string
+    {
+        if (isset(self::$boxExecutable)) {
+            return self::$boxExecutable;
+        }
+
+        self::$boxExecutable = getenv(BOX_BIN) ?: $_SERVER['SCRIPT_NAME'];;
+
+        return self::$boxExecutable;
+    }
+
+    public static function findPhpExecutable(): string
     {
         if (isset(self::$phpExecutable)) {
             return self::$phpExecutable;

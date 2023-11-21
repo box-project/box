@@ -6,13 +6,12 @@ namespace KevinGH\Box\Parallel;
 
 use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-use KevinGH\Box\BoxExecutableFinder;
+use KevinGH\Box\ExecutableFinder;
 use KevinGH\Box\Compactor\Compactors;
-use KevinGH\Box\Console\Command\ProcessFileCommand;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\Phar\InvalidPhar;
-use KevinGH\Box\PhpExecutableFinder;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use function iter\toArray;
@@ -44,44 +43,20 @@ final class ParallelFileProcessor
         $processFilesProcess = self::createProcess($configPath, $tmp);
         $processFilesProcess->run();
 
-        $processedResults = array_filter(
-            array_map(
-                static function (SplFileInfo $batchJsonFileInfo): ?array {
-                    $fileContents = FS::getFileContents($batchJsonFileInfo->getPathname());
+        if (false === $processFilesProcess->isSuccessful()) {
+            throw new ProcessFailedException($processFilesProcess);
+        }
 
-                    $json_decode = json_decode($fileContents, true);
-                    return $json_decode;
-                },
-                toArray(
-                    Finder::create()
-                        ->files()
-                        ->in($tmp)
-                        ->name('batch-*.json')
-                ),
-            ),
-            static fn (?array $result) => null !== $result,
-        );
+        $processedResults = self::getProcessedResults($tmp);
 
         $filesWithContents = array_merge(
-            ...array_column($processedResults, 'processedFilesWithContents'),
+            ...array_column($processedResults, 0),
         );
-
         $mergedSymbolsRegistry = SymbolsRegistry::createFromRegistries(
-            array_map(
-                static fn (string $registry) => unserialize($registry, ['allowed_classes' => [SymbolsRegistry::class]]),
-                array_column($processedResults, 'symbolsRegistry'),
-            ),
+            array_column($processedResults, 1),
         );
 
-        FS::remove([$configPath, $tmp]);
-
-        if (false === $processFilesProcess->isSuccessful()) {
-            throw new InvalidPhar(
-                $processFilesProcess->getErrorOutput(),
-                $processFilesProcess->getExitCode(),
-                new ProcessFailedException($processFilesProcess),
-            );
-        }
+        FS::remove($tmp);
 
         $compactors->registerSymbolsRegistry($mergedSymbolsRegistry);
 
@@ -100,14 +75,10 @@ final class ParallelFileProcessor
         string $tmp
     ): string
     {
-        $config = json_encode([
-            'mapFile' => serialize($mapFile),
-            'compactors' => serialize($compactors),
-            'files' => $filePaths,
-        ]);
+        $config = new Configuration($filePaths, $mapFile, $compactors);
         $configPath = $tmp.'/config.json';
 
-        FS::dumpFile($configPath, $config);
+        FS::dumpFile($configPath, $config->serialize());
 
         return $configPath;
     }
@@ -123,8 +94,8 @@ final class ParallelFileProcessor
     ): Process
     {
         $process = new Process([
-            PhpExecutableFinder::find(),
-            BoxExecutableFinder::find(),
+            ExecutableFinder::findPhpExecutable(),
+            ExecutableFinder::findBoxExecutable(),
             ProcessFileCommand::COMMAND_NAME,
             $configPath,
             $tmp,
@@ -134,5 +105,19 @@ final class ParallelFileProcessor
         $process->setTimeout(3 * 60.);
 
         return $process;
+    }
+
+    /**
+     * @param string $tmp
+     *
+     * @return list<array{array{string, string}, SymbolsRegistry}>
+     */
+    public static function getProcessedResults(string $tmp): array
+    {
+        return array_map(
+            static fn (SplFileInfo $batchResultFileInfo) => BatchResult::unserialize($batchResultFileInfo->getContents())
+                ->toArray(),
+            toArray(BatchResults::collect($tmp)),
+        );
     }
 }

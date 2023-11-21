@@ -16,7 +16,7 @@ namespace KevinGH\Box\Console;
 
 use Fidry\Console\Application\Application as FidryApplication;
 use Fidry\Console\Command\ReversedSymfonyCommand;
-use KevinGH\Box\Console\Command\ProcessFileCommand;
+use KevinGH\Box\Parallel\ProcessFileCommand;
 use function KevinGH\Box\get_box_version;
 use function sprintf;
 use function trim;

@@ -44,7 +44,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Phar;
 
 use Fidry\FileSystem\FS;
-use KevinGH\Box\BoxExecutableFinder;
+use KevinGH\Box\ExecutableFinder;
 use KevinGH\Box\Console\Command\Extract;
 use KevinGH\Box\PhpExecutableFinder;
 use OutOfBoundsException;
@@ -287,8 +287,8 @@ final class PharInfo
     private static function dumpPhar(string $file, string $tmp): void
     {
         $extractPharProcess = new Process([
-            PhpExecutableFinder::find(),
-            BoxExecutableFinder::find(),
+            ExecutableFinder::findPhpExecutable(),
+            ExecutableFinder::findBoxExecutable(),
             'extract',
             $file,
             $tmp,

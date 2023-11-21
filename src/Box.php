@@ -69,10 +69,6 @@ use function unserialize;
  */
 final class Box implements Countable
 {
-    /**
-     * @var array|mixed|string|null
-     */
-    private static mixed $phpExecutable;
     private Compactors $compactors;
     private Placeholder $placeholderCompactor;
     private MapFile $mapFile;

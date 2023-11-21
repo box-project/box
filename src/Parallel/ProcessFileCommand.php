@@ -12,16 +12,16 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Console\Command;
+namespace KevinGH\Box\Parallel;
 
 use Fidry\Console\Command\Command;
-use Fidry\Console\Command\Configuration as ConsoleConfiguration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\IO;
 use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
 use KevinGH\Box\Box;
+use KevinGH\Box\ExecutableFinder;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\FileExtensionCompactor;
@@ -29,7 +29,6 @@ use KevinGH\Box\Compactor\Json;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
-use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\PhpScoper\SerializableScoper;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
@@ -80,15 +79,10 @@ final class ProcessFileCommand extends ParallelCommand
     private const SEGMENT_SIZE = 100;
 
     private const CONFIG_ARGUMENT = 'file';
-    private const CHILD_CONFIG_ARGUMENT = 'child-file';
     private const TMP_DIR = 'tmp';
 
+    private Configuration $configuration;
     private string $tmp;
-    private string $serializedMapFile;
-    private MapFile $mapFile;
-    private string $serializedCompactors;
-    private Compactors $compactors;
-    private array $originalFilePaths = [];
     private array $processesFilesWithContents = [];
 
     public function __construct()
@@ -116,14 +110,17 @@ final class ProcessFileCommand extends ParallelCommand
 
     protected function fetchItems(InputInterface $input, OutputInterface $output): iterable
     {
-        return $this->originalFilePaths;
+        if (!isset($this->configuration)) {
+            $this->configuration = self::getConfiguration($input);
+        }
+
+        return $this->configuration->filePaths;
     }
 
     protected function configureParallelExecutableFactory(ParallelExecutorFactory $parallelExecutorFactory, InputInterface $input, OutputInterface $output): ParallelExecutorFactory
     {
         return $parallelExecutorFactory
-            ->withScriptPath(Box::getBoxBin())
-            ->withRunBeforeFirstCommand($this->runBeforeFirstCommand(...))
+            ->withScriptPath(ExecutableFinder::findBoxExecutable())
             // Ensure the batch & segment size are identical: we want the one and only one batch per process.
             ->withBatchSize(self::SEGMENT_SIZE)
             ->withSegmentSize(self::SEGMENT_SIZE)
@@ -131,61 +128,31 @@ final class ProcessFileCommand extends ParallelCommand
             ->withRunAfterBatch($this->runAfterLastBatch(...));
     }
 
-    private function runBeforeFirstCommand(InputInterface $input): void
-    {
-
-        $config = json_decode(
-            file_get_contents($input->getArgument(self::CONFIG_ARGUMENT)),
-            true,
-        );
-
-        $this->originalFilePaths = $config['files'];
-    }
-
     private function runBeforeFirstBatch(InputInterface $input): void
     {
-        if (isset($this->mapFile, $this->compactors, $this->tmp)) {
-            return;
+        if (!isset($this->configuration)) {
+            $this->configuration = self::getConfiguration($input);
         }
 
-        $config = json_decode(
-            file_get_contents($input->getArgument(self::CONFIG_ARGUMENT)),
-            true,
-        );
-
-        $this->mapFile = unserialize(
-            $config['mapFile'],
-            ['allowed_classes' => [MapFile::class]],
-        );
-        $this->compactors = unserialize(
-            $config['compactors'],
-            ['allowed_classes' => [
-                Compactors::class,
-                FileExtensionCompactor::class,
-                Json::class,
-                Php::class,
-                PhpScoper::class,
-                Placeholder::class,
-                SerializableScoper::class,
-            ]],
-        );
-        $this->tmp = $input->getArgument(self::TMP_DIR);
+        if (!isset($this->tmp)) {
+            $this->tmp = $input->getArgument(self::TMP_DIR);
+        }
     }
 
     protected function runSingleCommand(string $file, InputInterface $input, OutputInterface $output): void
     {
         $contents = FS::getFileContents($file);
 
-        $local = ($this->mapFile)($file);
+        $local = ($this->configuration->mapFile)($file);
 
-        $processedContents = $this->compactors->compact($local, $contents);
+        $processedContents = $this->configuration->compactors->compact($local, $contents);
 
         $this->processesFilesWithContents[] = [$local, $processedContents];
     }
 
     private function runAfterLastBatch(): void
     {
-        $symbols = $this->compactors->getScoperSymbolsRegistry();
+        $symbols = $this->configuration->compactors->getScoperSymbolsRegistry();
         $processedFilesWithContents = $this->processesFilesWithContents;
 
         if (count($processedFilesWithContents) === 0
@@ -194,23 +161,36 @@ final class ProcessFileCommand extends ParallelCommand
             return;
         }
 
-        $content = json_encode([
-            'processedFilesWithContents' => $processedFilesWithContents,
-            'symbolsRegistry' => serialize($symbols),
-        ]);
-
-        FS::dumpFile(
-            $this->tmp.'/'.unique_id('batch-').'.json',
-            $content,
+        $batchResult = new BatchResult(
+            $processedFilesWithContents,
+            $symbols,
         );
 
-        // TODO: reset the temporary state
-        $this->processesFilesWithContents = [];
-        $this->compactors->registerSymbolsRegistry(new SymbolsRegistry());
+        FS::dumpFile(
+            $this->tmp.'/'.BatchResults::createFilename(),
+            $batchResult->serialize(),
+        );
+
+        $this->resetState();
     }
 
     protected function getItemName(?int $count): string
     {
         return 1 === $count ? 'file' : 'files';
+    }
+
+    private static function getConfiguration(InputInterface $input): Configuration
+    {
+        $configPath = $input->getArgument(self::CONFIG_ARGUMENT);
+
+        return Configuration::unserialize(
+            FS::getFileContents($configPath),
+        );
+    }
+
+    private function resetState(): void
+    {
+        $this->processesFilesWithContents = [];
+        $this->configuration->compactors->registerSymbolsRegistry(new SymbolsRegistry());
     }
 }
