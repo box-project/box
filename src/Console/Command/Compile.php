@@ -37,6 +37,7 @@ use KevinGH\Box\Composer\IncompatibleComposerVersion;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\Logger\CompilerLogger;
 use KevinGH\Box\Console\MessageRenderer;
+use KevinGH\Box\Console\OpenFileDescriptorLimiter;
 use KevinGH\Box\Constants;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\Phar\CompressionAlgorithm;
@@ -62,7 +63,6 @@ use function filesize;
 use function implode;
 use function is_callable;
 use function is_string;
-use function KevinGH\Box\bump_open_file_descriptor_limit;
 use function KevinGH\Box\check_php_settings;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\format_time;
@@ -221,7 +221,7 @@ final class Compile implements CommandAware
         // Adding files might result in opening a lot of files. Either because not parallelized or when creating the
         // workers for parallelization.
         // As a result, we bump the file descriptor to an arbitrary number to ensure this process can run correctly
-        $restoreLimit = bump_open_file_descriptor_limit(2048, $io);
+        $restoreLimit = OpenFileDescriptorLimiter::bumpLimit(2048, $io);
 
         try {
             $box = $this->createPhar($config, $logger, $io, $debug, $enableParallelization);
@@ -722,7 +722,7 @@ final class Compile implements CommandAware
             ),
         );
 
-        $restoreLimit = bump_open_file_descriptor_limit(count($box), $io);
+        $restoreLimit = OpenFileDescriptorLimiter::bumpLimit(count($box), $io);
 
         try {
             $extension = $box->compress($algorithm);
