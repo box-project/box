@@ -21,7 +21,4 @@ final class Constants
     public const MEMORY_LIMIT = 'BOX_MEMORY_LIMIT';
     public const ALLOW_XDEBUG = 'BOX_ALLOW_XDEBUG';
     public const BIN = 'BOX_BIN';
-
-    /** @internal */
-    public const NO_PARALLEL_PROCESSING = '_BOX_NO_PARALLEL_PROCESSING';
 }

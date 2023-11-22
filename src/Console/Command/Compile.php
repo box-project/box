@@ -39,7 +39,6 @@ use KevinGH\Box\Console\Logger\CompilerLogger;
 use KevinGH\Box\Console\MessageRenderer;
 use KevinGH\Box\Constants;
 use KevinGH\Box\MapFile;
-use KevinGH\Box\Parallelization\ParallelizationSettings;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\SigningAlgorithm;
 use KevinGH\Box\RequirementChecker\DecodedComposerJson;
@@ -192,8 +191,9 @@ final class Compile implements CommandAware
 
         check_php_settings($io);
 
-        if ($io->getTypedOption(self::NO_PARALLEL_PROCESSING_OPTION)->asBoolean()) {
-            ParallelizationSettings::disableParallelProcessing();
+        $enableParallelization = $io->getTypedOption(self::NO_PARALLEL_PROCESSING_OPTION)->asBoolean();
+
+        if ($enableParallelization) {
             $io->writeln(
                 '<info>[debug] Disabled parallel processing</info>',
                 OutputInterface::VERBOSITY_DEBUG,
@@ -224,7 +224,7 @@ final class Compile implements CommandAware
         $restoreLimit = bump_open_file_descriptor_limit(2048, $io);
 
         try {
-            $box = $this->createPhar($config, $logger, $io, $debug);
+            $box = $this->createPhar($config, $logger, $io, $debug, $enableParallelization);
         } finally {
             $restoreLimit();
         }
@@ -244,10 +244,11 @@ final class Compile implements CommandAware
         Configuration $config,
         CompilerLogger $logger,
         IO $io,
+        bool $enableParallelization,
         bool $debug,
     ): Box {
         $tmpOutputPath = $config->getTmpOutputPath();
-        $box = Box::create($tmpOutputPath);
+        $box = Box::create($tmpOutputPath, enableParallelization: $enableParallelization);
         $composerOrchestrator = new ComposerOrchestrator(
             ComposerProcessFactory::create(
                 $config->getComposerBin(),
