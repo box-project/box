@@ -285,7 +285,7 @@ blackfire: $(SCOPED_BOX_BIN)
 #---------------------------------------------------------------------------
 
 .PHONY: website_check
-website_check:	## Runs various checks for the website
+website_check:		 ## Runs various checks for the website
 website_check: markdownlint lychee website_build
 
 .PHONY: markdownlint
