@@ -279,6 +279,8 @@ jobs:
         name: Update the RequirementChecker
         if: ${{ github.repository == 'box-project/box' && github.ref_name == 'main' }}
         runs-on: ubuntu-latest
+        permissions:
+            pull-requests: write
         steps:
             -   name: Checkout
                 uses: actions/checkout@v4
