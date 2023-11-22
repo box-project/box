@@ -25,7 +25,7 @@ env:
 jobs:
     check-markdown:
         name: Lint Markdown
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-latest
         timeout-minutes: 1
         steps:
             -   name: Checkout repository
@@ -38,8 +38,8 @@ jobs:
 
     check-links:
         name: Lint Links
-        runs-on: ubuntu-22.04
-        timeout-minutes: 10
+        runs-on: ubuntu-latest
+        timeout-minutes: 1
         steps:
             -   name: Checkout repository
                 uses: actions/checkout@v3
