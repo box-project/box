@@ -68,6 +68,7 @@ final class Box implements Countable
     private function __construct(
         private Phar $phar,
         private readonly string $pharFilePath,
+        private readonly bool $enableParallelization,
     ) {
         $this->compactors = new Compactors();
         $this->placeholderCompactor = new Placeholder([]);
@@ -84,8 +85,12 @@ final class Box implements Countable
      *
      * @see RecursiveDirectoryIterator
      */
-    public static function create(string $pharFilePath, int $pharFlags = 0, ?string $pharAlias = null): self
-    {
+    public static function create(
+        string $pharFilePath,
+        int $pharFlags = 0,
+        ?string $pharAlias = null,
+        bool $enableParallelization = false,
+    ): self {
         // Ensure the parent directory of the PHAR file exists as `new \Phar()` does not create it and would fail
         // otherwise.
         FS::mkdir(dirname($pharFilePath));
@@ -93,6 +98,7 @@ final class Box implements Countable
         return new self(
             new Phar($pharFilePath, $pharFlags, $pharAlias),
             $pharFilePath,
+            $enableParallelization,
         );
     }
 
@@ -445,7 +451,7 @@ final class Box implements Countable
      */
     private function processContents(array $files): array
     {
-        $processFiles = $this->scoper instanceof NullScoper || false === is_parallel_processing_enabled()
+        $processFiles = $this->scoper instanceof NullScoper || !$this->enableParallelization
             ? self::processFilesSynchronously(...)
             : ParallelFileProcessor::processFilesInParallel(...);
 

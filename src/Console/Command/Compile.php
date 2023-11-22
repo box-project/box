@@ -37,6 +37,9 @@ use KevinGH\Box\Composer\IncompatibleComposerVersion;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\Logger\CompilerLogger;
 use KevinGH\Box\Console\MessageRenderer;
+use KevinGH\Box\Console\OpenFileDescriptorLimiter;
+use KevinGH\Box\Console\PhpSettingsChecker;
+use KevinGH\Box\Constants;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\SigningAlgorithm;
@@ -61,9 +64,6 @@ use function filesize;
 use function implode;
 use function is_callable;
 use function is_string;
-use function KevinGH\Box\bump_open_file_descriptor_limit;
-use function KevinGH\Box\check_php_settings;
-use function KevinGH\Box\disable_parallel_processing;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\format_time;
 use function memory_get_peak_usage;
@@ -73,7 +73,6 @@ use function putenv;
 use function Safe\getcwd;
 use function sprintf;
 use function var_export;
-use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 use const PHP_EOL;
 
 /**
@@ -181,7 +180,7 @@ final class Compile implements CommandAware
     public function execute(IO $io): int
     {
         if ($io->getTypedOption(self::NO_RESTART_OPTION)->asBoolean()) {
-            putenv(BOX_ALLOW_XDEBUG.'=1');
+            putenv(Constants::ALLOW_XDEBUG.'=1');
         }
 
         $debug = $io->getTypedOption(self::DEBUG_OPTION)->asBoolean();
@@ -190,10 +189,11 @@ final class Compile implements CommandAware
             $io->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
         }
 
-        check_php_settings($io);
+        PhpSettingsChecker::check($io);
 
-        if ($io->getTypedOption(self::NO_PARALLEL_PROCESSING_OPTION)->asBoolean()) {
-            disable_parallel_processing();
+        $enableParallelization = $io->getTypedOption(self::NO_PARALLEL_PROCESSING_OPTION)->asBoolean();
+
+        if ($enableParallelization) {
             $io->writeln(
                 '<info>[debug] Disabled parallel processing</info>',
                 OutputInterface::VERBOSITY_DEBUG,
@@ -221,10 +221,10 @@ final class Compile implements CommandAware
         // Adding files might result in opening a lot of files. Either because not parallelized or when creating the
         // workers for parallelization.
         // As a result, we bump the file descriptor to an arbitrary number to ensure this process can run correctly
-        $restoreLimit = bump_open_file_descriptor_limit(2048, $io);
+        $restoreLimit = OpenFileDescriptorLimiter::bumpLimit(2048, $io);
 
         try {
-            $box = $this->createPhar($config, $logger, $io, $debug);
+            $box = $this->createPhar($config, $logger, $io, $debug, $enableParallelization);
         } finally {
             $restoreLimit();
         }
@@ -244,10 +244,11 @@ final class Compile implements CommandAware
         Configuration $config,
         CompilerLogger $logger,
         IO $io,
+        bool $enableParallelization,
         bool $debug,
     ): Box {
         $tmpOutputPath = $config->getTmpOutputPath();
-        $box = Box::create($tmpOutputPath);
+        $box = Box::create($tmpOutputPath, enableParallelization: $enableParallelization);
         $composerOrchestrator = new ComposerOrchestrator(
             ComposerProcessFactory::create(
                 $config->getComposerBin(),
@@ -721,7 +722,7 @@ final class Compile implements CommandAware
             ),
         );
 
-        $restoreLimit = bump_open_file_descriptor_limit(count($box), $io);
+        $restoreLimit = OpenFileDescriptorLimiter::bumpLimit(count($box), $io);
 
         try {
             $extension = $box->compress($algorithm);

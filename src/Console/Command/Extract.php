@@ -19,6 +19,7 @@ use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\IO;
 use Fidry\FileSystem\FS;
+use KevinGH\Box\Console\PhpSettingsChecker;
 use KevinGH\Box\Phar\InvalidPhar;
 use KevinGH\Box\Phar\PharFactory;
 use KevinGH\Box\Phar\PharMeta;
@@ -28,7 +29,6 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Throwable;
 use function bin2hex;
 use function file_exists;
-use function KevinGH\Box\check_php_settings;
 use function realpath;
 use function sprintf;
 use const DIRECTORY_SEPARATOR;
@@ -76,7 +76,7 @@ final class Extract implements Command
 
     public function execute(IO $io): int
     {
-        check_php_settings($io);
+        PhpSettingsChecker::check($io);
 
         $pharPath = self::getPharFilePath($io);
         $outputDir = $io->getTypedArgument(self::OUTPUT_ARG)->asNonEmptyString();
