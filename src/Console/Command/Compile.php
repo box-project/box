@@ -38,6 +38,7 @@ use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\Logger\CompilerLogger;
 use KevinGH\Box\Console\MessageRenderer;
 use KevinGH\Box\Console\OpenFileDescriptorLimiter;
+use KevinGH\Box\Console\PhpSettingsChecker;
 use KevinGH\Box\Constants;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\Phar\CompressionAlgorithm;
@@ -63,7 +64,6 @@ use function filesize;
 use function implode;
 use function is_callable;
 use function is_string;
-use function KevinGH\Box\check_php_settings;
 use function KevinGH\Box\disable_parallel_processing;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\format_time;
@@ -190,7 +190,7 @@ final class Compile implements CommandAware
             $io->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
         }
 
-        check_php_settings($io);
+        PhpSettingsChecker::check($io);
 
         if ($io->getTypedOption(self::NO_PARALLEL_PROCESSING_OPTION)->asBoolean()) {
             disable_parallel_processing();

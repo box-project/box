@@ -16,11 +16,8 @@ namespace KevinGH\Box;
 
 use Composer\InstalledVersions;
 use ErrorException;
-use Fidry\Console\IO;
-use KevinGH\Box\Console\Php\PhpSettingsHandler;
 use Phar;
 use Symfony\Component\Console\Helper\Helper;
-use Symfony\Component\Console\Logger\ConsoleLogger;
 use Webmozart\Assert\Assert;
 use function bin2hex;
 use function class_alias;
@@ -197,18 +194,6 @@ function is_parallel_processing_enabled(): bool
 function unique_id(string $prefix): string
 {
     return $prefix.bin2hex(random_bytes(6));
-}
-
-/**
- * @private
- */
-function check_php_settings(IO $io): void
-{
-    (new PhpSettingsHandler(
-        new ConsoleLogger(
-            $io->getOutput(),
-        ),
-    ))->check();
 }
 
 /**
