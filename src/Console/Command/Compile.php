@@ -64,7 +64,6 @@ use function filesize;
 use function implode;
 use function is_callable;
 use function is_string;
-use function KevinGH\Box\disable_parallel_processing;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\format_time;
 use function memory_get_peak_usage;
@@ -192,8 +191,9 @@ final class Compile implements CommandAware
 
         PhpSettingsChecker::check($io);
 
-        if ($io->getTypedOption(self::NO_PARALLEL_PROCESSING_OPTION)->asBoolean()) {
-            disable_parallel_processing();
+        $enableParallelization = $io->getTypedOption(self::NO_PARALLEL_PROCESSING_OPTION)->asBoolean();
+
+        if ($enableParallelization) {
             $io->writeln(
                 '<info>[debug] Disabled parallel processing</info>',
                 OutputInterface::VERBOSITY_DEBUG,
@@ -224,7 +224,7 @@ final class Compile implements CommandAware
         $restoreLimit = OpenFileDescriptorLimiter::bumpLimit(2048, $io);
 
         try {
-            $box = $this->createPhar($config, $logger, $io, $debug);
+            $box = $this->createPhar($config, $logger, $io, $debug, $enableParallelization);
         } finally {
             $restoreLimit();
         }
@@ -244,10 +244,11 @@ final class Compile implements CommandAware
         Configuration $config,
         CompilerLogger $logger,
         IO $io,
+        bool $enableParallelization,
         bool $debug,
     ): Box {
         $tmpOutputPath = $config->getTmpOutputPath();
-        $box = Box::create($tmpOutputPath);
+        $box = Box::create($tmpOutputPath, enableParallelization: $enableParallelization);
         $composerOrchestrator = new ComposerOrchestrator(
             ComposerProcessFactory::create(
                 $config->getComposerBin(),

@@ -70,6 +70,7 @@ final class Box implements Countable
     private function __construct(
         private Phar $phar,
         private readonly string $pharFilePath,
+        private readonly bool $enableParallelization,
     ) {
         $this->compactors = new Compactors();
         $this->placeholderCompactor = new Placeholder([]);
@@ -86,8 +87,12 @@ final class Box implements Countable
      *
      * @see RecursiveDirectoryIterator
      */
-    public static function create(string $pharFilePath, int $pharFlags = 0, ?string $pharAlias = null): self
-    {
+    public static function create(
+        string $pharFilePath,
+        int $pharFlags = 0,
+        ?string $pharAlias = null,
+        bool $enableParallelization = false,
+    ): self {
         // Ensure the parent directory of the PHAR file exists as `new \Phar()` does not create it and would fail
         // otherwise.
         FS::mkdir(dirname($pharFilePath));
@@ -95,6 +100,7 @@ final class Box implements Countable
         return new self(
             new Phar($pharFilePath, $pharFlags, $pharAlias),
             $pharFilePath,
+            $enableParallelization,
         );
     }
 
@@ -450,14 +456,15 @@ final class Box implements Countable
         $mapFile = $this->mapFile;
         $compactors = $this->compactors;
         $cwd = getcwd();
+        $enableParallelization = $this->enableParallelization;
 
-        $processFile = static function (string $file) use ($cwd, $mapFile, $compactors): array {
+        $processFile = static function (string $file) use ($cwd, $mapFile, $compactors, $enableParallelization): array {
             chdir($cwd);
 
             // Keep the fully qualified call here since this function may be executed without the right autoloading
             // mechanism
             \KevinGH\Box\register_aliases();
-            if (true === \KevinGH\Box\is_parallel_processing_enabled()) {
+            if ($enableParallelization) {
                 \KevinGH\Box\register_error_handler();
             }
 
@@ -470,7 +477,7 @@ final class Box implements Countable
             return [$local, $processedContents, $compactors->getScoperSymbolsRegistry()];
         };
 
-        if ($this->scoper instanceof NullScoper || false === is_parallel_processing_enabled()) {
+        if ($this->scoper instanceof NullScoper || !$enableParallelization) {
             return array_map($processFile, $files);
         }
 
