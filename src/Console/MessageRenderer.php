@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
-use Fidry\Console\Input\IO;
+use Fidry\Console\IO;
 use KevinGH\Box\NotInstantiable;
 use Webmozart\Assert\Assert;
 use function array_map;
@@ -72,5 +72,7 @@ final class MessageRenderer
                 array_map($renderMessage, $warnings),
             );
         }
+
+        $io->newLine();
     }
 }

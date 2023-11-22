@@ -17,7 +17,7 @@ namespace KevinGH\Box\Console\Command;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration as ConsoleConfiguration;
 use Fidry\Console\ExitCode;
-use Fidry\Console\Input\IO;
+use Fidry\Console\IO;
 use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Compactor\Compactor;
@@ -25,6 +25,7 @@ use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
 use KevinGH\Box\Configuration\Configuration;
+use KevinGH\Box\Console\PhpSettingsChecker;
 use stdClass;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -38,7 +39,6 @@ use function array_unshift;
 use function explode;
 use function getcwd;
 use function implode;
-use function KevinGH\Box\check_php_settings;
 use function putenv;
 use function sprintf;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
@@ -85,21 +85,21 @@ final class Process implements Command
 
     public function execute(IO $io): int
     {
-        if ($io->getOption(self::NO_RESTART_OPTION)->asBoolean()) {
+        if ($io->getTypedOption(self::NO_RESTART_OPTION)->asBoolean()) {
             putenv(BOX_ALLOW_XDEBUG.'=1');
         }
 
-        check_php_settings($io);
+        PhpSettingsChecker::check($io);
 
         ChangeWorkingDirOption::changeWorkingDirectory($io);
 
         $io->newLine();
 
-        $config = $io->getOption(self::NO_CONFIG_OPTION)->asBoolean()
+        $config = $io->getTypedOption(self::NO_CONFIG_OPTION)->asBoolean()
             ? Configuration::create(null, new stdClass())
             : ConfigOption::getConfig($io, true);
 
-        $filePath = $io->getArgument(self::FILE_ARGUMENT)->asNonEmptyString();
+        $filePath = $io->getTypedArgument(self::FILE_ARGUMENT)->asNonEmptyString();
 
         $path = Path::makeRelative($filePath, $config->getBasePath());
 

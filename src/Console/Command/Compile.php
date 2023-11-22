@@ -22,7 +22,7 @@ use Fidry\Console\Command\CommandAware;
 use Fidry\Console\Command\CommandAwareness;
 use Fidry\Console\Command\Configuration as CommandConfiguration;
 use Fidry\Console\ExitCode;
-use Fidry\Console\Input\IO;
+use Fidry\Console\IO;
 use Fidry\FileSystem\FileSystem;
 use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
@@ -37,6 +37,9 @@ use KevinGH\Box\Composer\IncompatibleComposerVersion;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\Logger\CompilerLogger;
 use KevinGH\Box\Console\MessageRenderer;
+use KevinGH\Box\Console\OpenFileDescriptorLimiter;
+use KevinGH\Box\Console\PhpSettingsChecker;
+use KevinGH\Box\Constants;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\SigningAlgorithm;
@@ -61,8 +64,6 @@ use function filesize;
 use function implode;
 use function is_callable;
 use function is_string;
-use function KevinGH\Box\bump_open_file_descriptor_limit;
-use function KevinGH\Box\check_php_settings;
 use function KevinGH\Box\disable_parallel_processing;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\format_time;
@@ -73,7 +74,6 @@ use function putenv;
 use function Safe\getcwd;
 use function sprintf;
 use function var_export;
-use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 use const PHP_EOL;
 
 /**
@@ -180,19 +180,19 @@ final class Compile implements CommandAware
 
     public function execute(IO $io): int
     {
-        if ($io->getOption(self::NO_RESTART_OPTION)->asBoolean()) {
-            putenv(BOX_ALLOW_XDEBUG.'=1');
+        if ($io->getTypedOption(self::NO_RESTART_OPTION)->asBoolean()) {
+            putenv(Constants::ALLOW_XDEBUG.'=1');
         }
 
-        $debug = $io->getOption(self::DEBUG_OPTION)->asBoolean();
+        $debug = $io->getTypedOption(self::DEBUG_OPTION)->asBoolean();
 
         if ($debug) {
             $io->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
         }
 
-        check_php_settings($io);
+        PhpSettingsChecker::check($io);
 
-        if ($io->getOption(self::NO_PARALLEL_PROCESSING_OPTION)->asBoolean()) {
+        if ($io->getTypedOption(self::NO_PARALLEL_PROCESSING_OPTION)->asBoolean()) {
             disable_parallel_processing();
             $io->writeln(
                 '<info>[debug] Disabled parallel processing</info>',
@@ -204,7 +204,7 @@ final class Compile implements CommandAware
 
         $io->writeln($this->header);
 
-        $config = $io->getOption(self::NO_CONFIG_OPTION)->asBoolean()
+        $config = $io->getTypedOption(self::NO_CONFIG_OPTION)->asBoolean()
             ? Configuration::create(null, new stdClass())
             : ConfigOption::getConfig($io, true);
         $config->setComposerBin(self::getComposerBin($io));
@@ -221,7 +221,7 @@ final class Compile implements CommandAware
         // Adding files might result in opening a lot of files. Either because not parallelized or when creating the
         // workers for parallelization.
         // As a result, we bump the file descriptor to an arbitrary number to ensure this process can run correctly
-        $restoreLimit = bump_open_file_descriptor_limit(2048, $io);
+        $restoreLimit = OpenFileDescriptorLimiter::bumpLimit(2048, $io);
 
         try {
             $box = $this->createPhar($config, $logger, $io, $debug);
@@ -233,7 +233,7 @@ final class Compile implements CommandAware
 
         self::logEndBuilding($config, $logger, $io, $box, $path, $startTime);
 
-        if ($io->getOption(self::WITH_DOCKER_OPTION)->asBoolean()) {
+        if ($io->getTypedOption(self::WITH_DOCKER_OPTION)->asBoolean()) {
             return $this->generateDockerFile($io);
         }
 
@@ -287,7 +287,7 @@ final class Compile implements CommandAware
         self::configureCompressionAlgorithm(
             $config,
             $box,
-            $io->getOption(self::DEV_OPTION)->asBoolean(),
+            $io->getTypedOption(self::DEV_OPTION)->asBoolean(),
             $io,
             $logger,
         );
@@ -303,7 +303,7 @@ final class Compile implements CommandAware
 
     private static function getComposerBin(IO $io): ?string
     {
-        $composerBin = $io->getOption(self::COMPOSER_BIN_OPTION)->asNullableNonEmptyString();
+        $composerBin = $io->getTypedOption(self::COMPOSER_BIN_OPTION)->asNullableNonEmptyString();
 
         return null === $composerBin ? null : Path::makeAbsolute($composerBin, getcwd());
     }
@@ -364,7 +364,7 @@ final class Compile implements CommandAware
                 'Supported version detected',
             );
         } catch (IncompatibleComposerVersion $incompatibleComposerVersion) {
-            if ($io->getOption(self::ALLOW_COMPOSER_COMPOSER_CHECK_FAILURE_OPTION)->asBoolean()) {
+            if ($io->getTypedOption(self::ALLOW_COMPOSER_COMPOSER_CHECK_FAILURE_OPTION)->asBoolean()) {
                 $logger->log(
                     CompilerLogger::CHEVRON_PREFIX,
                     'Warning! Incompatible composer version detected: '.$incompatibleComposerVersion->getMessage(),
@@ -721,7 +721,7 @@ final class Compile implements CommandAware
             ),
         );
 
-        $restoreLimit = bump_open_file_descriptor_limit(count($box), $io);
+        $restoreLimit = OpenFileDescriptorLimiter::bumpLimit(count($box), $io);
 
         try {
             $extension = $box->compress($algorithm);
@@ -806,6 +806,7 @@ final class Compile implements CommandAware
             CompilerLogger::QUESTION_MARK_PREFIX,
             'Signing using a private key',
         );
+        $io->newLine();
 
         if ($prompt) {
             if (false === $io->isInteractive()) {

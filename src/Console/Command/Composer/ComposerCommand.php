@@ -16,7 +16,7 @@ namespace KevinGH\Box\Console\Command\Composer;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
-use Fidry\Console\Input\IO;
+use Fidry\Console\IO;
 use Fidry\FileSystem\FileSystem;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 use KevinGH\Box\Composer\ComposerProcessFactory;
@@ -76,7 +76,7 @@ abstract class ComposerCommand implements Command
 
     private static function getComposerExecutable(IO $io): ?string
     {
-        $composerBin = $io->getOption(self::COMPOSER_BIN_OPTION)->asNullableNonEmptyString();
+        $composerBin = $io->getTypedOption(self::COMPOSER_BIN_OPTION)->asNullableNonEmptyString();
 
         return null === $composerBin ? null : Path::makeAbsolute($composerBin, getcwd());
     }

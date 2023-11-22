@@ -1,7 +1,16 @@
 version: 2
 updates:
     -   package-ecosystem: "composer"
-        directory: "/"
+        directory: "."
+        schedule:
+            interval: "weekly"
+        groups:
+            dependencies:
+                patterns:
+                    - "*"
+
+    -   package-ecosystem: "composer"
+        directory: "requirement-checker"
         schedule:
             interval: "weekly"
         groups:
@@ -13,3 +22,7 @@ updates:
         directory: ".github/workflows"
         schedule:
             interval: "weekly"
+        groups:
+            dependencies:
+                patterns:
+                    - "*"

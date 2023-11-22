@@ -1,4 +1,4 @@
-FROM php:8.1-cli-alpine as build-stage
+FROM php:8.2-cli-alpine as build-stage
 
 RUN apk add --update make git
 
@@ -10,7 +10,7 @@ ADD . /opt/box-project/box
 RUN cd /opt/box-project/box && \
     make compile
 
-FROM php:8.1-cli-alpine
+FROM php:8.2-cli-alpine
 
 COPY --from=build-stage /opt/box-project/box/bin/box.phar /usr/bin/box
 

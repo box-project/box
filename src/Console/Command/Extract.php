@@ -17,8 +17,9 @@ namespace KevinGH\Box\Console\Command;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
-use Fidry\Console\Input\IO;
+use Fidry\Console\IO;
 use Fidry\FileSystem\FS;
+use KevinGH\Box\Console\PhpSettingsChecker;
 use KevinGH\Box\Phar\InvalidPhar;
 use KevinGH\Box\Phar\PharFactory;
 use KevinGH\Box\Phar\PharMeta;
@@ -28,7 +29,6 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Throwable;
 use function bin2hex;
 use function file_exists;
-use function KevinGH\Box\check_php_settings;
 use function realpath;
 use function sprintf;
 use const DIRECTORY_SEPARATOR;
@@ -76,11 +76,11 @@ final class Extract implements Command
 
     public function execute(IO $io): int
     {
-        check_php_settings($io);
+        PhpSettingsChecker::check($io);
 
         $pharPath = self::getPharFilePath($io);
-        $outputDir = $io->getArgument(self::OUTPUT_ARG)->asNonEmptyString();
-        $internal = $io->getOption(self::INTERNAL_OPT)->asBoolean();
+        $outputDir = $io->getTypedArgument(self::OUTPUT_ARG)->asNonEmptyString();
+        $internal = $io->getTypedOption(self::INTERNAL_OPT)->asBoolean();
 
         if (null === $pharPath) {
             return ExitCode::FAILURE;
@@ -124,7 +124,7 @@ final class Extract implements Command
 
     private static function getPharFilePath(IO $io): ?string
     {
-        $filePath = realpath($io->getArgument(self::PHAR_ARG)->asString());
+        $filePath = realpath($io->getTypedArgument(self::PHAR_ARG)->asString());
 
         if (false !== $filePath) {
             return $filePath;
@@ -133,7 +133,7 @@ final class Extract implements Command
         $io->error(
             sprintf(
                 'The file "%s" could not be found.',
-                $io->getArgument(self::PHAR_ARG)->asRaw(),
+                $io->getTypedArgument(self::PHAR_ARG)->asRaw(),
             ),
         );
 
