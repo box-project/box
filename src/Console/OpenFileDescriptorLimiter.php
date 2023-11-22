@@ -80,19 +80,16 @@ final class OpenFileDescriptorLimiter
         );
 
         return static function () use ($io, $softLimit, $hardLimit): void {
-            // TODO: this check looks redundant
-            if (function_exists('posix_setrlimit') && isset($softLimit, $hardLimit)) {
-                posix_setrlimit(
-                    POSIX_RLIMIT_NOFILE,
-                    $softLimit,
-                    'unlimited' === $hardLimit ? POSIX_RLIMIT_INFINITY : $hardLimit,
-                );
+            posix_setrlimit(
+                POSIX_RLIMIT_NOFILE,
+                $softLimit,
+                'unlimited' === $hardLimit ? POSIX_RLIMIT_INFINITY : $hardLimit,
+            );
 
-                $io->writeln(
-                    '<info>[debug] Restored the maximum number of open file descriptors</info>',
-                    OutputInterface::VERBOSITY_DEBUG,
-                );
-            }
+            $io->writeln(
+                '<info>[debug] Restored the maximum number of open file descriptors</info>',
+                OutputInterface::VERBOSITY_DEBUG,
+            );
         };
     }
 }
