@@ -21,8 +21,6 @@ use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Configuration\Configuration as PhpScoperConfiguration;
 use Humbug\PhpScoper\Container;
 use InvalidArgumentException;
-use KevinGH\Box\Annotation\CompactedFormatter;
-use KevinGH\Box\Annotation\DocblockAnnotationParser;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\Php as PhpCompactor;
@@ -36,7 +34,6 @@ use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\SigningAlgorithm;
 use KevinGH\Box\PhpScoper\SerializableScoper;
 use Phar;
-use phpDocumentor\Reflection\DocBlockFactory;
 use RuntimeException;
 use Seld\JsonLint\ParsingException;
 use SplFileInfo;
@@ -2686,13 +2683,7 @@ final class Configuration
             ),
         );
 
-        return new PhpCompactor(
-            new DocblockAnnotationParser(
-                DocBlockFactory::createInstance(),
-                new CompactedFormatter(),
-                $ignoredAnnotations,
-            ),
-        );
+        return PhpCompactor::create($ignoredAnnotations);
     }
 
     private static function createPhpScoperCompactor(

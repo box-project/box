@@ -14,7 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
+use KevinGH\Box\Annotation\CompactedFormatter;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
+use phpDocumentor\Reflection\DocBlockFactory;
 use PhpToken;
 use RuntimeException;
 use Webmozart\Assert\Assert;
@@ -46,6 +48,20 @@ use const T_WHITESPACE;
  */
 final class Php extends FileExtensionCompactor
 {
+    /**
+     * @param list<string> $ignoredAnnotations
+     */
+    public static function create(array $ignoredAnnotations): self
+    {
+        return new self(
+            new DocblockAnnotationParser(
+                DocBlockFactory::createInstance(),
+                new CompactedFormatter(),
+                $ignoredAnnotations,
+            ),
+        );
+    }
+
     public function __construct(
         private ?DocblockAnnotationParser $annotationParser,
         array $extensions = ['php'],
