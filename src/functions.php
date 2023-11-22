@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use Closure;
 use Composer\InstalledVersions;
 use ErrorException;
 use Fidry\Console\IO;
@@ -210,14 +209,6 @@ function check_php_settings(IO $io): void
             $io->getOutput(),
         ),
     ))->check();
-}
-
-/**
- * @private
- */
-function noop(): Closure
-{
-    return static function (): void {};
 }
 
 /**
