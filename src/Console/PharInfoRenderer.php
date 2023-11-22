@@ -17,6 +17,7 @@ namespace KevinGH\Box\Console;
 use Closure;
 use DateTimeImmutable;
 use Fidry\Console\IO;
+use KevinGH\Box\Noop;
 use KevinGH\Box\NotInstantiable;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\PharInfo;
@@ -36,7 +37,6 @@ use function implode;
 use function is_array;
 use function KevinGH\Box\format_size;
 use function KevinGH\Box\format_size as format_size1;
-use function KevinGH\Box\noop;
 use function key;
 use function preg_match;
 use function round;
@@ -61,7 +61,7 @@ final class PharInfoRenderer
         IO $io,
         ?Closure $separator = null,
     ): void {
-        $separator ??= noop();
+        $separator ??= Noop::create();
 
         $methods = [
             self::renderCompression(...),

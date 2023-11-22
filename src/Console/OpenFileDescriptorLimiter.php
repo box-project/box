@@ -16,6 +16,7 @@ namespace KevinGH\Box\Console;
 
 use Closure;
 use Fidry\Console\IO;
+use KevinGH\Box\Noop;
 use KevinGH\Box\NotInstantiable;
 use Symfony\Component\Console\Output\OutputInterface;
 use function function_exists;
@@ -50,15 +51,14 @@ final class OpenFileDescriptorLimiter
                 OutputInterface::VERBOSITY_DEBUG,
             );
 
-            // TODO: loverage noop
-            return static function (): void {};
+            return Noop::create();
         }
 
         $softLimit = posix_getrlimit()['soft openfiles'];
         $hardLimit = posix_getrlimit()['hard openfiles'];
 
         if ($softLimit >= $count) {
-            return static function (): void {};
+            return Noop::create();
         }
 
         $io->writeln(
