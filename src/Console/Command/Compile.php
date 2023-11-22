@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use Amp\MultiReasonException;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Fidry\Console\Command\Command;
@@ -26,7 +25,6 @@ use Fidry\Console\IO;
 use Fidry\FileSystem\FileSystem;
 use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-use KevinGH\Box\Amp\FailureCollector;
 use KevinGH\Box\Box;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Composer\CompilerPsrLogger;
@@ -484,7 +482,7 @@ final class Compile implements CommandAware
 
         $count = count($config->getFiles());
 
-        self::addFilesWithErrorHandling($config, $box, $io);
+        $box->addFiles($config->getFiles(), false);
 
         $logger->log(
             CompilerLogger::CHEVRON_PREFIX,
@@ -492,26 +490,6 @@ final class Compile implements CommandAware
                 ? 'No file found'
                 : sprintf('%d file(s)', $count),
         );
-    }
-
-    private static function addFilesWithErrorHandling(Configuration $config, Box $box, IO $io): void
-    {
-        try {
-            $box->addFiles($config->getFiles(), false);
-
-            return;
-        } catch (MultiReasonException $ampFailure) {
-            // Continue
-        }
-
-        // This exception is handled a different way to give me meaningful feedback to the user
-        $io->error([
-            'An Amp\Parallel error occurred. To diagnostic if it is an Amp error related, you may try again with "--no-parallel".',
-            'Reason(s) of the failure:',
-            ...FailureCollector::collectReasons($ampFailure),
-        ]);
-
-        throw $ampFailure;
     }
 
     private static function registerMainScript(Configuration $config, Box $box, CompilerLogger $logger): ?string
