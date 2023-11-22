@@ -28,11 +28,6 @@ final class BatchResults
         return unique_id('batch-').'.json';
     }
 
-    public static function createFileContent(): string
-    {
-        return unique_id('batch-').'.json';
-    }
-
     /**
      * @return iterable<SplFileInfo>
      */
