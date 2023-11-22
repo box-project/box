@@ -58,8 +58,11 @@ class PhpTest extends TestCase
     /**
      * @dataProvider phpContentProvider
      */
-    public function test_it_compacts_php_files(DocblockAnnotationParser $annotationParser, string $content, string $expected): void
-    {
+    public function test_it_compacts_php_files(
+        DocblockAnnotationParser $annotationParser,
+        string $content,
+        string $expected
+    ): void {
         $file = 'foo.php';
 
         $actual = (new Php($annotationParser))->compact($file, $content);
