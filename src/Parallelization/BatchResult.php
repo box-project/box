@@ -12,19 +12,18 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Parallel;
+namespace KevinGH\Box\Parallelization;
 
-use KevinGH\Box\Compactor\Compactors;
-use KevinGH\Box\MapFile;
-use function serialize;
-use function unserialize;
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 
-final readonly class Configuration
+final readonly class BatchResult
 {
+    /**
+     * @param array{string, string} $processedFilesWithContents
+     */
     public function __construct(
-        public array $filePaths,
-        public MapFile $mapFile,
-        public Compactors $compactors,
+        public array $processedFilesWithContents,
+        public SymbolsRegistry $symbolsRegistry,
     ) {
     }
 
@@ -39,5 +38,19 @@ final readonly class Configuration
     public static function unserialize(string $serialized): self
     {
         return unserialize($serialized);
+    }
+
+    /**
+     * @return array{
+     *     array{string, string},
+     *     SymbolsRegistry,
+     * }
+     */
+    public function toArray(): array
+    {
+        return [
+            $this->processedFilesWithContents,
+            $this->symbolsRegistry,
+        ];
     }
 }

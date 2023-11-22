@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Parallel;
+namespace KevinGH\Box\Parallelization;
 
 use KevinGH\Box\NotInstantiable;
 use Symfony\Component\Finder\Finder;
