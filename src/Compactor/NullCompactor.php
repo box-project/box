@@ -15,8 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Compactor;
 
 /**
- * Base compactor class providing a slightly simpler API to compact the content only if the file is supported.
- *
  * @private
  */
 final class NullCompactor implements Compactor
