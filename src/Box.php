@@ -285,8 +285,6 @@ final class Box implements Countable
 
     /**
      * @param array<SplFileInfo|string> $files
-     *
-     * @throws MultiReasonException
      */
     public function addFiles(array $files, bool $binary): void
     {
