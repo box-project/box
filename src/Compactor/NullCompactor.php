@@ -14,9 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-use function serialize;
-use function unserialize;
-
 /**
  * Base compactor class providing a slightly simpler API to compact the content only if the file is supported.
  *
@@ -27,15 +24,5 @@ final class NullCompactor implements Compactor
     public function compact(string $file, string $contents): string
     {
         return $contents;
-    }
-
-    public function serialize(): string
-    {
-        return serialize($this);
-    }
-
-    public static function unserialize(string $serializedCompactor): static
-    {
-        return unserialize($serializedCompactor, ['allowed_classes' => [self::class]]);
     }
 }

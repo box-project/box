@@ -22,14 +22,4 @@ class FakeCompactor implements Compactor
     {
         throw UnsupportedMethodCall::forMethod(__CLASS__, __METHOD__);
     }
-
-    public static function unserialize(string $serializedCompactor): static
-    {
-        throw UnsupportedMethodCall::forMethod(__CLASS__, __METHOD__);
-    }
-
-    public function serialize(): string
-    {
-        throw UnsupportedMethodCall::forMethod(__CLASS__, __METHOD__);
-    }
 }
