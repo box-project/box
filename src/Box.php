@@ -23,6 +23,7 @@ use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
 use KevinGH\Box\Parallelization\ParallelFileProcessor;
+use KevinGH\Box\Parallelization\ParallelizationDecider;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\SigningAlgorithm;
 use KevinGH\Box\PhpScoper\NullScoper;
@@ -36,6 +37,7 @@ use Webmozart\Assert\Assert;
 use function array_map;
 use function array_unshift;
 use function chdir;
+use function count;
 use function dirname;
 use function extension_loaded;
 use function file_exists;
@@ -446,9 +448,14 @@ final class Box implements Countable
      */
     private function processContents(array $files): array
     {
-        $processFiles = $this->scoper instanceof NullScoper || !$this->enableParallelization
-            ? self::processFilesSynchronously(...)
-            : ParallelFileProcessor::processFilesInParallel(...);
+        $shouldProcessFilesInParallel = $this->enableParallelization && ParallelizationDecider::shouldProcessFilesInParallel(
+            $this->scoper,
+            count($files),
+        );
+
+        $processFiles = $shouldProcessFilesInParallel
+            ? ParallelFileProcessor::processFilesInParallel(...)
+            : self::processFilesSynchronously(...);
 
         return $processFiles(
             $files,
