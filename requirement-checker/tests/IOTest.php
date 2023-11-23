@@ -61,7 +61,7 @@ class IOTest extends TestCase
         self::assertSame($verbosity, $io->getVerbosity());
     }
 
-    public function provideOptions(): iterable
+    public static function provideOptions(): iterable
     {
         yield [
             ['cli.php', '--foo'],
@@ -154,7 +154,7 @@ class IOTest extends TestCase
         ];
     }
 
-    public function provideOptionsWithShellVerbosity(): iterable
+    public static function provideOptionsWithShellVerbosity(): iterable
     {
         yield [
             ['cli.php', '--foo'],
