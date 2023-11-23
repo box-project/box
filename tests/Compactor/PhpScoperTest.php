@@ -17,19 +17,16 @@ namespace KevinGH\Box\Compactor;
 use Error;
 use KevinGH\Box\PhpScoper\FakeScoper;
 use KevinGH\Box\PhpScoper\Scoper;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
-use function serialize;
-use function unserialize;
 
 /**
  * @covers \KevinGH\Box\Compactor\PhpScoper
  *
  * @internal
  */
-class PhpScoperTest extends TestCase
+class PhpScoperTest extends CompactorTestCase
 {
     use ProphecyTrait;
 
@@ -86,13 +83,10 @@ class PhpScoperTest extends TestCase
         self::assertSame($scoper, $compactor->getScoper());
     }
 
-    public function test_it_is_serializable(): void
+    public static function compactorProvider(): iterable
     {
-        $compactor = new PhpScoper(new FakeScoper());
-
-        self::assertEquals(
-            $compactor,
-            unserialize(serialize($compactor)),
-        );
+        yield [
+            new PhpScoper(new FakeScoper()),
+        ];
     }
 }
