@@ -18,14 +18,13 @@ use Fidry\Console\DisplayNormalizer;
 use KevinGH\Box\Annotation\CompactedFormatter;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
 use phpDocumentor\Reflection\DocBlockFactory;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \KevinGH\Box\Compactor\Php
  *
  * @internal
  */
-class PhpTest extends TestCase
+class PhpTest extends CompactorTestCase
 {
     /**
      * @dataProvider filesProvider
@@ -58,8 +57,11 @@ class PhpTest extends TestCase
     /**
      * @dataProvider phpContentProvider
      */
-    public function test_it_compacts_php_files(DocblockAnnotationParser $annotationParser, string $content, string $expected): void
-    {
+    public function test_it_compacts_php_files(
+        DocblockAnnotationParser $annotationParser,
+        string $content,
+        string $expected
+    ): void {
         $file = 'foo.php';
 
         $actual = (new Php($annotationParser))->compact($file, $content);
@@ -69,20 +71,27 @@ class PhpTest extends TestCase
         self::assertSame($expected, $actual);
     }
 
-    public function test_it_is_serializable(): void
+    public static function compactorProvider(): iterable
     {
-        $compactor = new Php(
-            new DocblockAnnotationParser(
-                DocBlockFactory::createInstance(),
-                new CompactedFormatter(),
-                [],
+        yield 'empty' => [
+            new Php(
+                new DocblockAnnotationParser(
+                    DocBlockFactory::createInstance(),
+                    new CompactedFormatter(),
+                    [],
+                ),
             ),
-        );
+        ];
 
-        self::assertEquals(
-            $compactor,
-            unserialize(serialize($compactor)),
-        );
+        yield 'nominal' => [
+            new Php(
+                new DocblockAnnotationParser(
+                    DocBlockFactory::createInstance(),
+                    new CompactedFormatter(),
+                    ['@author'],
+                ),
+            ),
+        ];
     }
 
     public static function filesProvider(): iterable

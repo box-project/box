@@ -22,6 +22,8 @@ use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Prophecy\Prophet;
+use function serialize;
+use function unserialize;
 
 /**
  * @covers \KevinGH\Box\Compactor\Compactors
@@ -202,6 +204,34 @@ class CompactorsTest extends TestCase
                 self::createScoperCompactorWithChangeSymbolsRegistry($symbolsRegistry2),
             ],
             $symbolsRegistry1,
+        ];
+    }
+
+    /**
+     * @dataProvider compactorsProvider
+     */
+    public function test_it_can_be_serialized_and_deserialized(Compactors $compactors): void
+    {
+        $unserializedCompactors = unserialize(serialize($compactors));
+
+        self::assertEquals(
+            $compactors,
+            $unserializedCompactors,
+        );
+    }
+
+    public static function compactorsProvider(): iterable
+    {
+        yield 'empty compactor' => [
+            new Compactors(),
+        ];
+
+        yield 'compactor with PHP-Scoper' => [
+            new Compactors(
+                self::createScoperCompactor(
+                    new SymbolsRegistry(),
+                ),
+            ),
         ];
     }
 

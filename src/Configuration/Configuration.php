@@ -19,10 +19,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Configuration\Configuration as PhpScoperConfiguration;
-use Humbug\PhpScoper\Container;
 use InvalidArgumentException;
-use KevinGH\Box\Annotation\CompactedFormatter;
-use KevinGH\Box\Annotation\DocblockAnnotationParser;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\Php as PhpCompactor;
@@ -34,9 +31,9 @@ use KevinGH\Box\Json\Json;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\SigningAlgorithm;
+use KevinGH\Box\PhpScoper\ConfigurationFactory as PhpScoperConfigurationFactory;
 use KevinGH\Box\PhpScoper\SerializableScoper;
 use Phar;
-use phpDocumentor\Reflection\DocBlockFactory;
 use RuntimeException;
 use Seld\JsonLint\ParsingException;
 use SplFileInfo;
@@ -45,7 +42,6 @@ use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
-use Throwable;
 use Webmozart\Assert\Assert;
 use function array_diff;
 use function array_filter;
@@ -2546,7 +2542,7 @@ final class Configuration
             $configFilePath = Path::makeAbsolute(self::PHP_SCOPER_CONFIG, $basePath);
             $configFilePath = file_exists($configFilePath) ? $configFilePath : null;
 
-            return self::createPhpScoperConfig($configFilePath);
+            return PhpScoperConfigurationFactory::create($configFilePath);
         }
 
         $configFile = $raw->{self::PHP_SCOPER_KEY};
@@ -2558,26 +2554,7 @@ final class Configuration
         Assert::file($configFilePath);
         Assert::readable($configFilePath);
 
-        return self::createPhpScoperConfig($configFilePath);
-    }
-
-    public static function createPhpScoperConfig(?string $filePath): PhpScoperConfiguration
-    {
-        $configFactory = (new Container())->getConfigurationFactory();
-
-        try {
-            return $configFactory->create($filePath);
-        } catch (Throwable $throwable) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Could not create a PHP-Scoper config from the file "%s": %s',
-                    $filePath,
-                    $throwable->getMessage(),
-                ),
-                $throwable->getCode(),
-                $throwable,
-            );
-        }
+        return PhpScoperConfigurationFactory::create($configFilePath);
     }
 
     /**
@@ -2686,13 +2663,7 @@ final class Configuration
             ),
         );
 
-        return new PhpCompactor(
-            new DocblockAnnotationParser(
-                DocBlockFactory::createInstance(),
-                new CompactedFormatter(),
-                $ignoredAnnotations,
-            ),
-        );
+        return PhpCompactor::create($ignoredAnnotations);
     }
 
     private static function createPhpScoperCompactor(

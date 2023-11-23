@@ -14,7 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-class DummyCompactor implements Compactor
+/**
+ * @private
+ */
+final class NullCompactor implements Compactor
 {
     public function compact(string $file, string $contents): string
     {
