@@ -19,6 +19,9 @@ use KevinGH\Box\MapFile;
 use function serialize;
 use function unserialize;
 
+/**
+ * @private
+ */
 final readonly class Configuration
 {
     public function __construct(

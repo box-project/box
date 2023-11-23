@@ -43,7 +43,6 @@ use function putenv;
 use function sprintf;
 use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 
-// TODO
 // TODO: replace the PHP-Scoper compactor in order to warn the user about scoping errors
 final class Process implements Command
 {

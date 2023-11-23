@@ -25,6 +25,9 @@ use Webmozarts\Console\Parallelization\ParallelCommand;
 use Webmozarts\Console\Parallelization\ParallelExecutorFactory;
 use function count;
 
+/**
+ * @private
+ */
 final class ProcessFileCommand extends ParallelCommand
 {
     public const COMMAND_NAME = 'internal:process:files';

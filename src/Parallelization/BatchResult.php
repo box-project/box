@@ -16,6 +16,9 @@ namespace KevinGH\Box\Parallelization;
 
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 
+/**
+ * @private
+ */
 final readonly class BatchResult
 {
     /**

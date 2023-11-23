@@ -19,6 +19,9 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use function KevinGH\Box\unique_id;
 
+/**
+ * @private
+ */
 final class BatchResults
 {
     use NotInstantiable;
