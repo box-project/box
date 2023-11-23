@@ -14,14 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-use PHPUnit\Framework\TestCase;
-
 /**
  * @covers \KevinGH\Box\Compactor\Placeholder
  *
  * @internal
  */
-class PlaceholderTest extends TestCase
+class PlaceholderTest extends CompactorTestCase
 {
     /**
      * @dataProvider filesContentsProvider
@@ -33,14 +31,15 @@ class PlaceholderTest extends TestCase
         self::assertSame($expected, $actual);
     }
 
-    public function test_it_is_serializable(): void
+    public static function compactorProvider(): iterable
     {
-        $compactor = new Placeholder([]);
+        yield 'empty' => [
+            new Placeholder([]),
+        ];
 
-        self::assertEquals(
-            $compactor,
-            unserialize(serialize($compactor)),
-        );
+        yield 'nominal' => [
+            new Placeholder(['@foo@' => 'bar']),
+        ];
     }
 
     public static function filesContentsProvider(): iterable
