@@ -76,7 +76,6 @@ final class PharInfo
 {
     private static array $ALGORITHMS;
     private static string $stubfile;
-    private static string $phpExecutable;
 
     private PharMeta $meta;
     private string $tmp;
