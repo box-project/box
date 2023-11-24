@@ -1,5 +1,6 @@
 name: Benchmark Tests
 
+# To be aware it need to be the counter-part of benchmark-empty.yaml.
 on:
     pull_request: ~
 
