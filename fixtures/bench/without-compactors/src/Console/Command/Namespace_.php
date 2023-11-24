@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Console\Command;
+namespace BenchTest\Console\Command;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;

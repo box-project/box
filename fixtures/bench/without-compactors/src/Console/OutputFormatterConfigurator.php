@@ -12,10 +12,10 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Console;
+namespace BenchTest\Console;
 
 use Fidry\Console\IO;
-use KevinGH\Box\NotInstantiable;
+use BenchTest\NotInstantiable;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 

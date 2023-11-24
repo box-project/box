@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box;
+namespace BenchTest;
 
 use Amp\MultiReasonException;
 use BadMethodCallException;
@@ -20,13 +20,13 @@ use Countable;
 use DateTimeImmutable;
 use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-use KevinGH\Box\Compactor\Compactors;
-use KevinGH\Box\Compactor\PhpScoper;
-use KevinGH\Box\Compactor\Placeholder;
-use KevinGH\Box\Phar\CompressionAlgorithm;
-use KevinGH\Box\Phar\SigningAlgorithm;
-use KevinGH\Box\PhpScoper\NullScoper;
-use KevinGH\Box\PhpScoper\Scoper;
+use BenchTest\Compactor\Compactors;
+use BenchTest\Compactor\PhpScoper;
+use BenchTest\Compactor\Placeholder;
+use BenchTest\Phar\CompressionAlgorithm;
+use BenchTest\Phar\SigningAlgorithm;
+use BenchTest\PhpScoper\NullScoper;
+use BenchTest\PhpScoper\Scoper;
 use Phar;
 use RecursiveDirectoryIterator;
 use RuntimeException;
@@ -463,9 +463,9 @@ final class Box implements Countable
 
             // Keep the fully qualified call here since this function may be executed without the right autoloading
             // mechanism
-            \KevinGH\Box\register_aliases();
+            \BenchTest\register_aliases();
             if ($enableParallelization) {
-                \KevinGH\Box\register_error_handler();
+                \BenchTest\register_error_handler();
             }
 
             $contents = \Fidry\FileSystem\FS::getFileContents($file);

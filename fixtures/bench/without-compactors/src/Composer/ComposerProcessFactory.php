@@ -12,11 +12,11 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Composer;
+namespace BenchTest\Composer;
 
 use Closure;
 use Fidry\Console\IO;
-use KevinGH\Box\Constants;
+use BenchTest\Constants;
 use RuntimeException;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;

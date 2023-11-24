@@ -13,12 +13,12 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box;
+namespace BenchTest;
 
 use Fidry\Console\Application\ApplicationRunner;
 use Fidry\Console\IO;
-use KevinGH\Box\Console\Application;
-use KevinGH\Box\Console\OutputFormatterConfigurator;
+use BenchTest\Console\Application;
+use BenchTest\Console\OutputFormatterConfigurator;
 use RuntimeException;
 use function file_exists;
 use function in_array;

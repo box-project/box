@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Compactor;
+namespace BenchTest\Compactor;
 
 /**
  * A compactor is a class called to process a file contents before adding it to the PHAR. This make it possible to for

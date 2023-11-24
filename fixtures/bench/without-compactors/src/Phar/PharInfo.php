@@ -41,11 +41,11 @@ declare(strict_types=1);
  * SOFTWARE.
  */
 
-namespace KevinGH\Box\Phar;
+namespace BenchTest\Phar;
 
 use Fidry\FileSystem\FS;
-use KevinGH\Box\Console\Command\Extract;
-use KevinGH\Box\ExecutableFinder;
+use BenchTest\Console\Command\Extract;
+use BenchTest\ExecutableFinder;
 use OutOfBoundsException;
 use Phar;
 use Symfony\Component\Filesystem\Path;

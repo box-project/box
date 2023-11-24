@@ -12,15 +12,15 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Console;
+namespace BenchTest\Console;
 
 use Fidry\Console\IO;
 use InvalidArgumentException;
-use KevinGH\Box\Configuration\Configuration;
-use KevinGH\Box\Configuration\ConfigurationLoader as ConfigLoader;
-use KevinGH\Box\Configuration\NoConfigurationFound;
-use KevinGH\Box\Json\JsonValidationException;
-use KevinGH\Box\NotInstantiable;
+use BenchTest\Configuration\Configuration;
+use BenchTest\Configuration\ConfigurationLoader as ConfigLoader;
+use BenchTest\Configuration\NoConfigurationFound;
+use BenchTest\Json\JsonValidationException;
+use BenchTest\NotInstantiable;
 use function sprintf;
 
 /**

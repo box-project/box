@@ -12,9 +12,9 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Compactor;
+namespace BenchTest\Compactor;
 
-use KevinGH\Box\PhpScoper\Scoper;
+use BenchTest\PhpScoper\Scoper;
 use Throwable;
 
 /**

@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Configuration;
+namespace BenchTest\Configuration;
 
 use Closure;
 use DateTimeImmutable;
@@ -20,19 +20,19 @@ use DateTimeZone;
 use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Configuration\Configuration as PhpScoperConfiguration;
 use InvalidArgumentException;
-use KevinGH\Box\Compactor\Compactor;
-use KevinGH\Box\Compactor\Compactors;
-use KevinGH\Box\Compactor\Php as PhpCompactor;
-use KevinGH\Box\Compactor\PhpScoper as PhpScoperCompactor;
-use KevinGH\Box\Composer\ComposerConfiguration;
-use KevinGH\Box\Composer\ComposerFile;
-use KevinGH\Box\Composer\ComposerFiles;
-use KevinGH\Box\Json\Json;
-use KevinGH\Box\MapFile;
-use KevinGH\Box\Phar\CompressionAlgorithm;
-use KevinGH\Box\Phar\SigningAlgorithm;
-use KevinGH\Box\PhpScoper\ConfigurationFactory as PhpScoperConfigurationFactory;
-use KevinGH\Box\PhpScoper\SerializableScoper;
+use BenchTest\Compactor\Compactor;
+use BenchTest\Compactor\Compactors;
+use BenchTest\Compactor\Php as PhpCompactor;
+use BenchTest\Compactor\PhpScoper as PhpScoperCompactor;
+use BenchTest\Composer\ComposerConfiguration;
+use BenchTest\Composer\ComposerFile;
+use BenchTest\Composer\ComposerFiles;
+use BenchTest\Json\Json;
+use BenchTest\MapFile;
+use BenchTest\Phar\CompressionAlgorithm;
+use BenchTest\Phar\SigningAlgorithm;
+use BenchTest\PhpScoper\ConfigurationFactory as PhpScoperConfigurationFactory;
+use BenchTest\PhpScoper\SerializableScoper;
 use Phar;
 use RuntimeException;
 use Seld\JsonLint\ParsingException;
@@ -72,8 +72,8 @@ use function is_string;
 use function iter\map;
 use function iter\toArray;
 use function iter\values;
-use function KevinGH\Box\get_box_version;
-use function KevinGH\Box\unique_id;
+use function BenchTest\get_box_version;
+use function BenchTest\unique_id;
 use function krsort;
 use function preg_match;
 use function preg_replace;
@@ -1671,11 +1671,11 @@ final class Configuration
                 Assert::classExists($class, 'The compactor class %s does not exist.');
                 Assert::isAOf($class, Compactor::class, sprintf('The class "%s" is not a compactor class.', $class));
 
-                if (in_array($class, [PhpCompactor::class, 'KevinGH\Box\Compactor\Php'], true)) {
+                if (in_array($class, [PhpCompactor::class, 'BenchTest\Compactor\Php'], true)) {
                     return self::createPhpCompactor($ignoredAnnotations);
                 }
 
-                if (in_array($class, [PhpScoperCompactor::class, 'KevinGH\Box\Compactor\PhpScoper'], true)) {
+                if (in_array($class, [PhpScoperCompactor::class, 'BenchTest\Compactor\PhpScoper'], true)) {
                     return self::createPhpScoperCompactor($raw, $basePath, $logger);
                 }
 

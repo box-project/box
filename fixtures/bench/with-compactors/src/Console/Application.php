@@ -12,10 +12,10 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Console;
+namespace BenchTest\Console;
 
 use Fidry\Console\Application\Application as FidryApplication;
-use function KevinGH\Box\get_box_version;
+use function BenchTest\get_box_version;
 use function sprintf;
 use function trim;
 

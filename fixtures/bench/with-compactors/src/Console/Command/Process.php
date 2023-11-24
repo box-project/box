@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Console\Command;
+namespace BenchTest\Console\Command;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration as ConsoleConfiguration;
@@ -20,12 +20,12 @@ use Fidry\Console\ExitCode;
 use Fidry\Console\IO;
 use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-use KevinGH\Box\Compactor\Compactor;
-use KevinGH\Box\Compactor\Compactors;
-use KevinGH\Box\Compactor\PhpScoper;
-use KevinGH\Box\Compactor\Placeholder;
-use KevinGH\Box\Configuration\Configuration;
-use KevinGH\Box\Console\PhpSettingsChecker;
+use BenchTest\Compactor\Compactor;
+use BenchTest\Compactor\Compactors;
+use BenchTest\Compactor\PhpScoper;
+use BenchTest\Compactor\Placeholder;
+use BenchTest\Configuration\Configuration;
+use BenchTest\Console\PhpSettingsChecker;
 use stdClass;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -41,7 +41,7 @@ use function getcwd;
 use function implode;
 use function putenv;
 use function sprintf;
-use const KevinGH\Box\BOX_ALLOW_XDEBUG;
+use const BenchTest\BOX_ALLOW_XDEBUG;
 
 // TODO: replace the PHP-Scoper compactor in order to warn the user about scoping errors
 final class Process implements Command

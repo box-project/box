@@ -12,13 +12,13 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Console\Command;
+namespace BenchTest\Console\Command;
 
 use Fidry\Console\IO;
-use KevinGH\Box\Configuration\Configuration;
-use KevinGH\Box\Console\ConfigurationLoader;
-use KevinGH\Box\Json\JsonValidationException;
-use KevinGH\Box\NotInstantiable;
+use BenchTest\Configuration\Configuration;
+use BenchTest\Console\ConfigurationLoader;
+use BenchTest\Json\JsonValidationException;
+use BenchTest\NotInstantiable;
 use Symfony\Component\Console\Input\InputOption;
 
 /**

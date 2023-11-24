@@ -12,10 +12,10 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Console;
+namespace BenchTest\Console;
 
-use KevinGH\Box\Configuration\NoConfigurationFound;
-use KevinGH\Box\NotInstantiable;
+use BenchTest\Configuration\NoConfigurationFound;
+use BenchTest\NotInstantiable;
 use function file_exists;
 use function realpath;
 

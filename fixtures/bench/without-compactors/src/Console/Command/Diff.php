@@ -12,16 +12,16 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Console\Command;
+namespace BenchTest\Console\Command;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\IO;
-use KevinGH\Box\Console\PharInfoRenderer;
-use KevinGH\Box\Phar\DiffMode;
-use KevinGH\Box\Phar\PharDiff;
-use KevinGH\Box\Phar\PharInfo;
+use BenchTest\Console\PharInfoRenderer;
+use BenchTest\Phar\DiffMode;
+use BenchTest\Phar\PharDiff;
+use BenchTest\Phar\PharInfo;
 use SebastianBergmann\Diff\Differ;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 use Symfony\Component\Console\Exception\RuntimeException;

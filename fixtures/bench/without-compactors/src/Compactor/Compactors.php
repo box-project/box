@@ -12,11 +12,11 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Compactor;
+namespace BenchTest\Compactor;
 
 use Countable;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-use KevinGH\Box\PhpScoper\Scoper;
+use BenchTest\PhpScoper\Scoper;
 use function array_reduce;
 use function count;
 

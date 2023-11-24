@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Composer;
+namespace BenchTest\Composer;
 
 use Symfony\Component\Filesystem\Path;
 use function array_column;

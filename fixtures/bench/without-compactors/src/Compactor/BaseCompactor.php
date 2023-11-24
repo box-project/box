@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Compactor;
+namespace BenchTest\Compactor;
 
 /**
  * Base compactor class providing a slightly simpler API to compact the content only if the file is supported.

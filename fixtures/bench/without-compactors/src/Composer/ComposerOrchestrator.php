@@ -12,13 +12,13 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Composer;
+namespace BenchTest\Composer;
 
 use Composer\Semver\Semver;
 use Fidry\Console\IO;
 use Fidry\FileSystem\FileSystem;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-use KevinGH\Box\NotInstantiable;
+use BenchTest\NotInstantiable;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;

@@ -28,9 +28,9 @@ return [
     'expose-classes' => [
         \Composer\Autoload\ClassLoader::class,
 
-        \KevinGH\Box\Compactor\Compactor::class,
-        \KevinGH\Box\Compactor\Json::class,
-        \KevinGH\Box\Compactor\Php::class,
-        \KevinGH\Box\Compactor\PhpScoper::class,
+        \BenchTest\Compactor\Compactor::class,
+        \BenchTest\Compactor\Json::class,
+        \BenchTest\Compactor\Php::class,
+        \BenchTest\Compactor\PhpScoper::class,
     ],
 ];

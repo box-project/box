@@ -12,11 +12,11 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Phar\Differ;
+namespace BenchTest\Phar\Differ;
 
 use Fidry\Console\IO;
-use KevinGH\Box\Console\Command\Extract;
-use KevinGH\Box\Phar\PharInfo;
+use BenchTest\Console\Command\Extract;
+use BenchTest\Phar\PharInfo;
 use function array_filter;
 use function explode;
 use function implode;

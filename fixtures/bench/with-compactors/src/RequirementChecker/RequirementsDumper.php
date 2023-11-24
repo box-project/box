@@ -12,10 +12,10 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\RequirementChecker;
+namespace BenchTest\RequirementChecker;
 
 use Fidry\FileSystem\FS;
-use KevinGH\Box\Phar\CompressionAlgorithm;
+use BenchTest\Phar\CompressionAlgorithm;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;

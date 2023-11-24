@@ -12,10 +12,10 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Compactor;
+namespace BenchTest\Compactor;
 
-use KevinGH\Box\Annotation\CompactedFormatter;
-use KevinGH\Box\Annotation\DocblockAnnotationParser;
+use BenchTest\Annotation\CompactedFormatter;
+use BenchTest\Annotation\DocblockAnnotationParser;
 use phpDocumentor\Reflection\DocBlockFactory;
 use PhpToken;
 use RuntimeException;

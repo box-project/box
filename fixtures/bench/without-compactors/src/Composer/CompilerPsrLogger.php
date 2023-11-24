@@ -12,9 +12,9 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Composer;
+namespace BenchTest\Composer;
 
-use KevinGH\Box\Console\Logger\CompilerLogger;
+use BenchTest\Console\Logger\CompilerLogger;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LogLevel;
 use Stringable;

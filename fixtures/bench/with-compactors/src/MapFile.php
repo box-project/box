@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box;
+namespace BenchTest;
 
 use Symfony\Component\Filesystem\Path;
 use function preg_quote;

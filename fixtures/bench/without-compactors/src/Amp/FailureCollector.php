@@ -12,10 +12,10 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Amp;
+namespace BenchTest\Amp;
 
 use Amp\MultiReasonException;
-use KevinGH\Box\NotInstantiable;
+use BenchTest\NotInstantiable;
 use Throwable;
 use function array_map;
 use function array_unique;

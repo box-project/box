@@ -12,12 +12,12 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\PhpScoper;
+namespace BenchTest\PhpScoper;
 
 use Humbug\PhpScoper\Configuration\Configuration as PhpScoperConfiguration;
 use Humbug\PhpScoper\Container;
 use InvalidArgumentException;
-use KevinGH\Box\NotInstantiable;
+use BenchTest\NotInstantiable;
 use Throwable;
 use function sprintf;
 

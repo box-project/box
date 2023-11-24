@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Test;
+namespace BenchTest\Test;
 
 use Fidry\Console\Bridge\Command\SymfonyCommand;
 use Fidry\Console\Command\Command;

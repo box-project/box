@@ -12,19 +12,19 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Console\Php;
+namespace BenchTest\Console\Php;
 
 use Composer\XdebugHandler\XdebugHandler;
 use Fidry\FileSystem\FS;
-use KevinGH\Box\Constants;
-use KevinGH\Box\Phar\PharPhpSettings;
+use BenchTest\Constants;
+use BenchTest\Phar\PharPhpSettings;
 use Psr\Log\LoggerInterface;
 use Webmozart\Assert\Assert;
 use function getenv;
 use function ini_get;
 use function ini_set;
-use function KevinGH\Box\format_size;
-use function KevinGH\Box\memory_to_bytes;
+use function BenchTest\format_size;
+use function BenchTest\memory_to_bytes;
 use function sprintf;
 use function trim;
 use const PHP_EOL;

@@ -12,9 +12,9 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Configuration;
+namespace BenchTest\Configuration;
 
-use KevinGH\Box\Json\Json;
+use BenchTest\Json\Json;
 use stdClass;
 
 /**

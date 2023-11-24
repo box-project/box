@@ -12,14 +12,14 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Console\Command\Composer;
+namespace BenchTest\Console\Command\Composer;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\IO;
 use Fidry\FileSystem\FileSystem;
-use KevinGH\Box\Composer\ComposerOrchestrator;
-use KevinGH\Box\Composer\ComposerProcessFactory;
+use BenchTest\Composer\ComposerOrchestrator;
+use BenchTest\Composer\ComposerProcessFactory;
 use Psr\Log\LogLevel;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;

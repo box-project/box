@@ -12,17 +12,17 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Console;
+namespace BenchTest\Console;
 
 use Closure;
 use DateTimeImmutable;
 use Fidry\Console\IO;
-use KevinGH\Box\Noop;
-use KevinGH\Box\NotInstantiable;
-use KevinGH\Box\Phar\CompressionAlgorithm;
-use KevinGH\Box\Phar\PharInfo;
-use KevinGH\Box\RequirementChecker\Requirement;
-use KevinGH\Box\RequirementChecker\RequirementType;
+use BenchTest\Noop;
+use BenchTest\NotInstantiable;
+use BenchTest\Phar\CompressionAlgorithm;
+use BenchTest\Phar\PharInfo;
+use BenchTest\RequirementChecker\Requirement;
+use BenchTest\RequirementChecker\RequirementType;
 use SplFileInfo;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Path;
@@ -35,8 +35,8 @@ use function array_values;
 use function count;
 use function implode;
 use function is_array;
-use function KevinGH\Box\format_size;
-use function KevinGH\Box\format_size as format_size1;
+use function BenchTest\format_size;
+use function BenchTest\format_size as format_size1;
 use function key;
 use function preg_match;
 use function round;

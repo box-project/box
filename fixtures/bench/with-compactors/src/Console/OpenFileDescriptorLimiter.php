@@ -12,12 +12,12 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Console;
+namespace BenchTest\Console;
 
 use Closure;
 use Fidry\Console\IO;
-use KevinGH\Box\Noop;
-use KevinGH\Box\NotInstantiable;
+use BenchTest\Noop;
+use BenchTest\NotInstantiable;
 use Symfony\Component\Console\Output\OutputInterface;
 use function function_exists;
 use function posix_getrlimit;

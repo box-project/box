@@ -12,12 +12,12 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Console\Command\Composer;
+namespace BenchTest\Console\Command\Composer;
 
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\IO;
-use KevinGH\Box\Composer\ComposerOrchestrator;
+use BenchTest\Composer\ComposerOrchestrator;
 
 /**
  * @private

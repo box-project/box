@@ -12,10 +12,10 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Phar;
+namespace BenchTest\Phar;
 
 use Fidry\Console\IO;
-use KevinGH\Box\Phar\Differ\DifferFactory;
+use BenchTest\Phar\Differ\DifferFactory;
 use function array_map;
 
 /**

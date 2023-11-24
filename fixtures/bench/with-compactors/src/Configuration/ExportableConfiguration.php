@@ -12,12 +12,12 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Configuration;
+namespace BenchTest\Configuration;
 
 use Closure;
-use KevinGH\Box\Compactor\Compactors;
-use KevinGH\Box\Composer\ComposerFile;
-use KevinGH\Box\MapFile;
+use BenchTest\Compactor\Compactors;
+use BenchTest\Composer\ComposerFile;
+use BenchTest\MapFile;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\SplFileInfo as SymfonySplFileInfo;

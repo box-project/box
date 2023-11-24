@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Console\Logger;
+namespace BenchTest\Console\Logger;
 
 use Fidry\Console\IO;
 use InvalidArgumentException;

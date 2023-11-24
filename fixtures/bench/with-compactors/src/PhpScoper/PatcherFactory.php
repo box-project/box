@@ -12,11 +12,11 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\PhpScoper;
+namespace BenchTest\PhpScoper;
 
 use Humbug\PhpScoper\Patcher\Patcher;
 use Humbug\PhpScoper\Patcher\PatcherChain;
-use KevinGH\Box\NotInstantiable;
+use BenchTest\NotInstantiable;
 use Laravel\SerializableClosure\SerializableClosure;
 
 final class PatcherFactory

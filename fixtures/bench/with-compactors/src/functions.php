@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box;
+namespace BenchTest;
 
 use Composer\InstalledVersions;
 use ErrorException;
@@ -58,7 +58,7 @@ function get_box_version(): string
 }
 
 /**
- * @deprecated since 4.3.0. Use \KevinGH\Box\Phar\CompressionAlgorithm instead.
+ * @deprecated since 4.3.0. Use \BenchTest\Phar\CompressionAlgorithm instead.
  * @private
  *
  * @return array<string,int>
@@ -75,7 +75,7 @@ function get_phar_compression_algorithms(): array
 }
 
 /**
- * @deprecated Since 4.5.0. Use \KevinGH\Box\Phar\SigningAlgorithm instead.
+ * @deprecated Since 4.5.0. Use \BenchTest\Phar\SigningAlgorithm instead.
  *
  * @private
  *

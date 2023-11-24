@@ -12,20 +12,20 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\PharInfo;
+namespace BenchTest\PharInfo;
 
-use KevinGH\Box\Phar\CompressionAlgorithm;
+use BenchTest\Phar\CompressionAlgorithm;
 use Phar;
 use PharData;
 use PharFileInfo;
 use RecursiveIteratorIterator;
 use UnexpectedValueException;
-use function KevinGH\Box\unique_id;
+use function BenchTest\unique_id;
 use function realpath;
 use function str_replace;
 
 /**
- * @deprecated Deprecated since 4.4.1 in favour of \KevinGH\Box\Phar\PharInfo.
+ * @deprecated Deprecated since 4.4.1 in favour of \BenchTest\Phar\PharInfo.
  */
 final class PharInfo
 {

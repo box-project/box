@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Console\Command;
+namespace BenchTest\Console\Command;
 
 use Fidry\Console\Command\CommandAware;
 use Fidry\Console\Command\CommandAwareness;
@@ -20,7 +20,7 @@ use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\IO;
 use Fidry\FileSystem\FS;
-use KevinGH\Box\DockerFileGenerator;
+use BenchTest\DockerFileGenerator;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StringInput;

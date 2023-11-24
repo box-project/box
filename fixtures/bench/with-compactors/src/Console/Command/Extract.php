@@ -12,17 +12,17 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Console\Command;
+namespace BenchTest\Console\Command;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\IO;
 use Fidry\FileSystem\FS;
-use KevinGH\Box\Console\PhpSettingsChecker;
-use KevinGH\Box\Phar\InvalidPhar;
-use KevinGH\Box\Phar\PharFactory;
-use KevinGH\Box\Phar\PharMeta;
+use BenchTest\Console\PhpSettingsChecker;
+use BenchTest\Phar\InvalidPhar;
+use BenchTest\Phar\PharFactory;
+use BenchTest\Phar\PharMeta;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\ConfirmationQuestion;

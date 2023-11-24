@@ -12,16 +12,16 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Console\Command;
+namespace BenchTest\Console\Command;
 
 use DateTimeImmutable;
 use DateTimeZone;
-use KevinGH\Box\Configuration\Configuration;
-use KevinGH\Box\NotInstantiable;
+use BenchTest\Configuration\Configuration;
+use BenchTest\NotInstantiable;
 use function function_exists;
 use function get_loaded_extensions;
 use function implode;
-use function KevinGH\Box\get_box_version;
+use function BenchTest\get_box_version;
 use function php_uname;
 use const DATE_ATOM;
 use const PHP_OS;

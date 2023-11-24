@@ -12,9 +12,9 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\RequirementChecker;
+namespace BenchTest\RequirementChecker;
 
-use KevinGH\Box\Phar\CompressionAlgorithm;
+use BenchTest\Phar\CompressionAlgorithm;
 use function array_diff_key;
 use function array_filter;
 use function array_map;

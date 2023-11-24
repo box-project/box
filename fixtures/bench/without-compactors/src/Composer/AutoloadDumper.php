@@ -12,11 +12,11 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Composer;
+namespace BenchTest\Composer;
 
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-use KevinGH\Box\NotInstantiable;
+use BenchTest\NotInstantiable;
 use UnexpectedValueException;
 use function array_map;
 use function explode;

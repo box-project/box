@@ -12,11 +12,11 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Phar\Differ;
+namespace BenchTest\Phar\Differ;
 
 use Fidry\Console\IO;
-use KevinGH\Box\Console\PharInfoRenderer;
-use KevinGH\Box\Phar\PharInfo;
+use BenchTest\Console\PharInfoRenderer;
+use BenchTest\Phar\PharInfo;
 use SplFileInfo;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Finder\Finder;
