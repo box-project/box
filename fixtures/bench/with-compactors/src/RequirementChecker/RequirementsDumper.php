@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace BenchTest\RequirementChecker;
 
-use Fidry\FileSystem\FS;
 use BenchTest\Phar\CompressionAlgorithm;
+use Fidry\FileSystem\FS;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;

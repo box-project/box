@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace BenchTest\Console;
 
-use Fidry\Console\IO;
 use BenchTest\NotInstantiable;
+use Fidry\Console\IO;
 use Webmozart\Assert\Assert;
 use function array_map;
 use function count;

@@ -14,10 +14,10 @@ declare(strict_types=1);
 
 namespace BenchTest\Console;
 
-use Closure;
-use Fidry\Console\IO;
 use BenchTest\Noop;
 use BenchTest\NotInstantiable;
+use Closure;
+use Fidry\Console\IO;
 use Symfony\Component\Console\Output\OutputInterface;
 use function function_exists;
 use function posix_getrlimit;

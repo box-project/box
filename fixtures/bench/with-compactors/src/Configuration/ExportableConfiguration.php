@@ -14,10 +14,10 @@ declare(strict_types=1);
 
 namespace BenchTest\Configuration;
 
-use Closure;
 use BenchTest\Compactor\Compactors;
 use BenchTest\Composer\ComposerFile;
 use BenchTest\MapFile;
+use Closure;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\SplFileInfo as SymfonySplFileInfo;

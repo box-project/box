@@ -14,10 +14,10 @@ declare(strict_types=1);
 
 namespace BenchTest\Console\Command\Composer;
 
+use BenchTest\Composer\ComposerOrchestrator;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\IO;
-use BenchTest\Composer\ComposerOrchestrator;
 
 /**
  * @private

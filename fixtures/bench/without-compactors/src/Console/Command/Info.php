@@ -14,12 +14,12 @@ declare(strict_types=1);
 
 namespace BenchTest\Console\Command;
 
+use BenchTest\Console\PharInfoRenderer;
+use BenchTest\Phar\PharInfo;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\IO;
-use BenchTest\Console\PharInfoRenderer;
-use BenchTest\Phar\PharInfo;
 use Phar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;

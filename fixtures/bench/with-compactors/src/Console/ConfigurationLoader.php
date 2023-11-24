@@ -14,13 +14,13 @@ declare(strict_types=1);
 
 namespace BenchTest\Console;
 
-use Fidry\Console\IO;
-use InvalidArgumentException;
 use BenchTest\Configuration\Configuration;
 use BenchTest\Configuration\ConfigurationLoader as ConfigLoader;
 use BenchTest\Configuration\NoConfigurationFound;
 use BenchTest\Json\JsonValidationException;
 use BenchTest\NotInstantiable;
+use Fidry\Console\IO;
+use InvalidArgumentException;
 use function sprintf;
 
 /**

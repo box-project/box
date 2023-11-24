@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace BenchTest\Console;
 
-use Fidry\Console\IO;
 use BenchTest\Console\Php\PhpSettingsHandler;
 use BenchTest\NotInstantiable;
+use Fidry\Console\IO;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 
 /**

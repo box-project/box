@@ -14,13 +14,13 @@ declare(strict_types=1);
 
 namespace BenchTest\Console\Command;
 
+use BenchTest\DockerFileGenerator;
 use Fidry\Console\Command\CommandAware;
 use Fidry\Console\Command\CommandAwareness;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\IO;
 use Fidry\FileSystem\FS;
-use BenchTest\DockerFileGenerator;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StringInput;

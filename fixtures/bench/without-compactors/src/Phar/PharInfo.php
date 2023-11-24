@@ -43,9 +43,9 @@ declare(strict_types=1);
 
 namespace BenchTest\Phar;
 
-use Fidry\FileSystem\FS;
 use BenchTest\Console\Command\Extract;
 use BenchTest\ExecutableFinder;
+use Fidry\FileSystem\FS;
 use OutOfBoundsException;
 use Phar;
 use Symfony\Component\Filesystem\Path;

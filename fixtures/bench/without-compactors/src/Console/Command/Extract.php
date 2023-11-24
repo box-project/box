@@ -14,15 +14,15 @@ declare(strict_types=1);
 
 namespace BenchTest\Console\Command;
 
+use BenchTest\Console\PhpSettingsChecker;
+use BenchTest\Phar\InvalidPhar;
+use BenchTest\Phar\PharFactory;
+use BenchTest\Phar\PharMeta;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\IO;
 use Fidry\FileSystem\FS;
-use BenchTest\Console\PhpSettingsChecker;
-use BenchTest\Phar\InvalidPhar;
-use BenchTest\Phar\PharFactory;
-use BenchTest\Phar\PharMeta;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\ConfirmationQuestion;

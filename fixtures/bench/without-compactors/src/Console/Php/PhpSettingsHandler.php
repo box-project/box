@@ -14,17 +14,17 @@ declare(strict_types=1);
 
 namespace BenchTest\Console\Php;
 
-use Composer\XdebugHandler\XdebugHandler;
-use Fidry\FileSystem\FS;
 use BenchTest\Constants;
 use BenchTest\Phar\PharPhpSettings;
+use Composer\XdebugHandler\XdebugHandler;
+use Fidry\FileSystem\FS;
 use Psr\Log\LoggerInterface;
 use Webmozart\Assert\Assert;
+use function BenchTest\format_size;
+use function BenchTest\memory_to_bytes;
 use function getenv;
 use function ini_get;
 use function ini_set;
-use function BenchTest\format_size;
-use function BenchTest\memory_to_bytes;
 use function sprintf;
 use function trim;
 use const PHP_EOL;

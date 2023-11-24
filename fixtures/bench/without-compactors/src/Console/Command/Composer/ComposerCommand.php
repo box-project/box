@@ -14,12 +14,12 @@ declare(strict_types=1);
 
 namespace BenchTest\Console\Command\Composer;
 
+use BenchTest\Composer\ComposerOrchestrator;
+use BenchTest\Composer\ComposerProcessFactory;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\IO;
 use Fidry\FileSystem\FileSystem;
-use BenchTest\Composer\ComposerOrchestrator;
-use BenchTest\Composer\ComposerProcessFactory;
 use Psr\Log\LogLevel;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;

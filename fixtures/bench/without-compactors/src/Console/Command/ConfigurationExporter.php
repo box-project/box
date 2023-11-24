@@ -14,14 +14,14 @@ declare(strict_types=1);
 
 namespace BenchTest\Console\Command;
 
-use DateTimeImmutable;
-use DateTimeZone;
 use BenchTest\Configuration\Configuration;
 use BenchTest\NotInstantiable;
+use DateTimeImmutable;
+use DateTimeZone;
+use function BenchTest\get_box_version;
 use function function_exists;
 use function get_loaded_extensions;
 use function implode;
-use function BenchTest\get_box_version;
 use function php_uname;
 use const DATE_ATOM;
 use const PHP_OS;

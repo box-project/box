@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace BenchTest\Compactor;
 
+use BenchTest\PhpScoper\Scoper;
 use Countable;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-use BenchTest\PhpScoper\Scoper;
 use function array_reduce;
 use function count;
 

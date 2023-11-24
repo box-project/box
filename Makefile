@@ -255,7 +255,7 @@ _infection_ci: $(INFECTION_BIN) $(COVERAGE_XML_DIR) $(COVERAGE_JUNIT) vendor
 	$(INFECTION_CI)
 
 .PHONY: phpbench
-phpbench: 	## Runs PHPBench
+phpbench: 		 ## Runs PHPBench
 phpbench: $(PHPBENCH_BIN) $(PHPBENCH_WITH_COMPACTORS_VENDOR_DIR) $(PHPBENCH_WITHOUT_COMPACTORS_VENDOR_DIR)
 	$(MAKE) _phpbench
 
@@ -264,12 +264,12 @@ _phpbench:
 	$(PHPBENCH) run tests/Benchmark --report=benchmark --dump-file=dist/bench-result.xml
 	php bin/bench-test.php
 
-.PHONY: _phpbench
+.PHONY: phpbench_pr
 phpbench_pr: $(PHPBENCH_BIN) $(PHPBENCH_WITH_COMPACTORS_VENDOR_DIR) $(PHPBENCH_WITHOUT_COMPACTORS_VENDOR_DIR)
 	$(PHPBENCH) run tests/Benchmark --report=benchmark --dump-file=dist/bench-result.xml --ref=main
 	php bin/bench-test.php
 
-.PHONY: _phpbench_main
+.PHONY: phpbench_main
 phpbench_main: $(PHPBENCH_BIN) $(PHPBENCH_WITH_COMPACTORS_VENDOR_DIR) $(PHPBENCH_WITHOUT_COMPACTORS_VENDOR_DIR)
 	$(PHPBENCH) run tests/Benchmark --report=benchmark --tag=main
 

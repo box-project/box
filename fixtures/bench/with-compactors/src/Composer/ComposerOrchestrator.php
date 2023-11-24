@@ -14,11 +14,11 @@ declare(strict_types=1);
 
 namespace BenchTest\Composer;
 
+use BenchTest\NotInstantiable;
 use Composer\Semver\Semver;
 use Fidry\Console\IO;
 use Fidry\FileSystem\FileSystem;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-use BenchTest\NotInstantiable;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;

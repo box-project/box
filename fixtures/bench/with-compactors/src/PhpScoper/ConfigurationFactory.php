@@ -14,10 +14,10 @@ declare(strict_types=1);
 
 namespace BenchTest\PhpScoper;
 
+use BenchTest\NotInstantiable;
 use Humbug\PhpScoper\Configuration\Configuration as PhpScoperConfiguration;
 use Humbug\PhpScoper\Container;
 use InvalidArgumentException;
-use BenchTest\NotInstantiable;
 use Throwable;
 use function sprintf;
 

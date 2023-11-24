@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace BenchTest\Composer;
 
+use BenchTest\NotInstantiable;
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-use BenchTest\NotInstantiable;
 use UnexpectedValueException;
 use function array_map;
 use function explode;

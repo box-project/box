@@ -15,10 +15,10 @@ declare(strict_types=1);
 
 namespace BenchTest;
 
-use Fidry\Console\Application\ApplicationRunner;
-use Fidry\Console\IO;
 use BenchTest\Console\Application;
 use BenchTest\Console\OutputFormatterConfigurator;
+use Fidry\Console\Application\ApplicationRunner;
+use Fidry\Console\IO;
 use RuntimeException;
 use function file_exists;
 use function in_array;

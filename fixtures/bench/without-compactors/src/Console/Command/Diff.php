@@ -14,14 +14,14 @@ declare(strict_types=1);
 
 namespace BenchTest\Console\Command;
 
-use Fidry\Console\Command\Command;
-use Fidry\Console\Command\Configuration;
-use Fidry\Console\ExitCode;
-use Fidry\Console\IO;
 use BenchTest\Console\PharInfoRenderer;
 use BenchTest\Phar\DiffMode;
 use BenchTest\Phar\PharDiff;
 use BenchTest\Phar\PharInfo;
+use Fidry\Console\Command\Command;
+use Fidry\Console\Command\Configuration;
+use Fidry\Console\ExitCode;
+use Fidry\Console\IO;
 use SebastianBergmann\Diff\Differ;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 use Symfony\Component\Console\Exception\RuntimeException;

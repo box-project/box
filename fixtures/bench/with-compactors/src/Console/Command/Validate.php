@@ -14,15 +14,15 @@ declare(strict_types=1);
 
 namespace BenchTest\Console\Command;
 
-use Fidry\Console\Command\Command;
-use Fidry\Console\Command\Configuration as ConsoleConfiguration;
-use Fidry\Console\ExitCode;
-use Fidry\Console\IO;
 use BenchTest\Configuration\Configuration;
 use BenchTest\Console\ConfigurationLoader;
 use BenchTest\Console\ConfigurationLocator;
 use BenchTest\Console\MessageRenderer;
 use BenchTest\Json\JsonValidationException;
+use Fidry\Console\Command\Command;
+use Fidry\Console\Command\Configuration as ConsoleConfiguration;
+use Fidry\Console\ExitCode;
+use Fidry\Console\IO;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;

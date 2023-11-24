@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace BenchTest\Phar\Differ;
 
-use Fidry\Console\IO;
 use BenchTest\Console\Command\Extract;
 use BenchTest\Phar\PharInfo;
+use Fidry\Console\IO;
 use function array_filter;
 use function explode;
 use function implode;

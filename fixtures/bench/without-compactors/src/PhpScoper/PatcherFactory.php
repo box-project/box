@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace BenchTest\PhpScoper;
 
+use BenchTest\NotInstantiable;
 use Humbug\PhpScoper\Patcher\Patcher;
 use Humbug\PhpScoper\Patcher\PatcherChain;
-use BenchTest\NotInstantiable;
 use Laravel\SerializableClosure\SerializableClosure;
 
 final class PatcherFactory

@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace BenchTest\Phar\Differ;
 
-use Fidry\Console\IO;
 use BenchTest\Phar\PharInfo;
+use Fidry\Console\IO;
 
 interface Differ
 {

@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace BenchTest\Phar;
 
-use Fidry\Console\IO;
 use BenchTest\Phar\Differ\DifferFactory;
+use Fidry\Console\IO;
 use function array_map;
 
 /**

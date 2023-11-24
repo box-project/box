@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace BenchTest\Composer;
 
+use BenchTest\Constants;
 use Closure;
 use Fidry\Console\IO;
-use BenchTest\Constants;
 use RuntimeException;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;

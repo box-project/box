@@ -14,11 +14,11 @@ declare(strict_types=1);
 
 namespace BenchTest\Console\Command;
 
-use Fidry\Console\IO;
 use BenchTest\Configuration\Configuration;
 use BenchTest\Console\ConfigurationLoader;
 use BenchTest\Json\JsonValidationException;
 use BenchTest\NotInstantiable;
+use Fidry\Console\IO;
 use Symfony\Component\Console\Input\InputOption;
 
 /**

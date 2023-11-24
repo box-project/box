@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace BenchTest\Phar\Differ;
 
-use Fidry\Console\IO;
 use BenchTest\Console\PharInfoRenderer;
 use BenchTest\Phar\PharInfo;
+use Fidry\Console\IO;
 use SplFileInfo;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Finder\Finder;

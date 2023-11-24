@@ -14,18 +14,18 @@ declare(strict_types=1);
 
 namespace BenchTest\Console\Command;
 
-use Fidry\Console\Command\Command;
-use Fidry\Console\Command\Configuration as ConsoleConfiguration;
-use Fidry\Console\ExitCode;
-use Fidry\Console\IO;
-use Fidry\FileSystem\FS;
-use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use BenchTest\Compactor\Compactor;
 use BenchTest\Compactor\Compactors;
 use BenchTest\Compactor\PhpScoper;
 use BenchTest\Compactor\Placeholder;
 use BenchTest\Configuration\Configuration;
 use BenchTest\Console\PhpSettingsChecker;
+use Fidry\Console\Command\Command;
+use Fidry\Console\Command\Configuration as ConsoleConfiguration;
+use Fidry\Console\ExitCode;
+use Fidry\Console\IO;
+use Fidry\FileSystem\FS;
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use stdClass;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;

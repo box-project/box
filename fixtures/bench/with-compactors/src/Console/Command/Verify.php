@@ -14,11 +14,11 @@ declare(strict_types=1);
 
 namespace BenchTest\Console\Command;
 
+use BenchTest\Phar\PharInfo;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\IO;
-use BenchTest\Phar\PharInfo;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Filesystem\Path;
 use Throwable;
