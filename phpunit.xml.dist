@@ -21,11 +21,13 @@
     <testsuites>
         <testsuite name="AutoReviewTests">
             <directory>tests/AutoReview</directory>
+            <exclude>tests/Benchmark</exclude>
         </testsuite>
 
         <testsuite name="Tests">
             <directory>tests/</directory>
             <exclude>tests/AutoReview</exclude>
+            <exclude>tests/Benchmark</exclude>
         </testsuite>
     </testsuites>
 
