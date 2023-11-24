@@ -86,12 +86,47 @@ jobs:
             -   name: Ensure that the PHPBench make target is up to date
                 run: make phpbench_install
 
+            -   name: Run PHPBench
+                run: make phpbench
+
+    pr-main-bench-test:
+        runs-on: ubuntu-latest
+        name: Benchmark PR
+        needs: main-bench-test
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v4
+                with:
+                    fetch-depth: 0
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.2'
+                    ini-values: phar.readonly=0, display_errors=On, error_reporting=-1
+                    tools: composer
+                    coverage: none
+
+            -   name: Install Composer dependencies
+                uses: ramsey/composer-install@v2
+
+            -   name: Ensure that the make target is up to date
+                run: make _vendor_install
+
+            -   name: Install PHPBench
+                uses: ramsey/composer-install@v2
+                with:
+                    working-directory: vendor-bin/phpbench
+
+            -   name: Ensure that the PHPBench make target is up to date
+                run: make phpbench_install
+
             -   name: Download the Benchmark results of the main branch
                 uses: actions/download-artifact@v3
                 with:
                     name: bench-branch-main-result
 
-            -   name: Run PHPBench against PR branch
+            -   name: Run PHPBench for PR branch
                 run: make phpbench_pr
 
 
@@ -104,6 +139,7 @@ jobs:
         needs:
             - main-bench-test
             - pr-bench-test
+            - pr-main-bench-test
         if: always()
         steps:
             - name: Successful run
