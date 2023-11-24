@@ -34,7 +34,7 @@ jobs:
                     coverage: none
 
             -   name: Run PHPBench
-                run: make _phpbench_main
+                run: make phpbench_main
 
             -   uses: actions/upload-artifact@v3
                 name: Upload the Benchmark results
@@ -49,7 +49,6 @@ jobs:
         steps:
             -   name: Checkout
                 uses: actions/checkout@v4
-                if: ${{ matrix.branch == 'default' }}
                 with:
                     fetch-depth: 0
 
@@ -67,8 +66,8 @@ jobs:
                     name: bench-branch-main-result
 
             -   name: Run PHPBench against PR branch
-                if: matrix.branch == 'main'
                 run: make phpbench_pr
+
 
     # This is a "trick", a meta task which does not change, and we can use in
     # the protected branch rules as opposed to the tests one above which
