@@ -1,6 +1,17 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace HumbugBox451\KevinGH\RequirementChecker;
 
 use function exec;
@@ -16,46 +27,56 @@ use function sapi_windows_vt100_support;
 use function stream_get_contents;
 use function trim;
 use const DIRECTORY_SEPARATOR;
+use const false;
+use const true;
+
 /** @internal */
 class Terminal
 {
     private static $width;
     private static $height;
     private static $stty;
-    public function getWidth() : int
+
+    public function getWidth(): int
     {
         $width = getenv('COLUMNS');
-        if (\false !== $width) {
+        if (false !== $width) {
             return (int) trim($width);
         }
         if (!isset(self::$width)) {
             self::initDimensions();
         }
+
         return self::$width ?: 80;
     }
-    public function getHeight() : int
+
+    public function getHeight(): int
     {
         $height = getenv('LINES');
-        if (\false !== $height) {
+        if (false !== $height) {
             return (int) trim($height);
         }
         if (!isset(self::$height)) {
             self::initDimensions();
         }
+
         return self::$height ?: 50;
     }
-    public static function hasSttyAvailable() : bool
+
+    public static function hasSttyAvailable(): bool
     {
         if (isset(self::$stty)) {
             return self::$stty;
         }
         if (!function_exists('exec')) {
-            return \false;
+            return false;
         }
         exec('stty 2>&1', $output, $exitcode);
+
         return self::$stty = 0 === $exitcode;
     }
-    private static function initDimensions() : void
+
+    private static function initDimensions(): void
     {
         if ('\\' === DIRECTORY_SEPARATOR) {
             if (preg_match('/^(\\d+)x(\\d+)(?: \\((\\d+)x(\\d+)\\))?$/', trim(getenv('ANSICON') ?: ''), $matches)) {
@@ -71,11 +92,13 @@ class Terminal
             self::initDimensionsUsingStty();
         }
     }
-    private static function hasVt100Support() : bool
+
+    private static function hasVt100Support(): bool
     {
         return function_exists('sapi_windows_vt100_support') && sapi_windows_vt100_support(fopen('php://stdout', 'wb'));
     }
-    private static function initDimensionsUsingStty() : void
+
+    private static function initDimensionsUsingStty(): void
     {
         if ($sttyString = self::getSttyColumns()) {
             if (preg_match('/rows.(\\d+);.columns.(\\d+);/i', $sttyString, $matches)) {
@@ -87,25 +110,29 @@ class Terminal
             }
         }
     }
-    private static function getConsoleMode() : ?array
+
+    private static function getConsoleMode(): ?array
     {
         $info = self::readFromProcess('mode CON');
         if (null === $info || !preg_match('/--------+\\r?\\n.+?(\\d+)\\r?\\n.+?(\\d+)\\r?\\n/', $info, $matches)) {
             return null;
         }
+
         return [(int) $matches[2], (int) $matches[1]];
     }
-    private static function getSttyColumns() : ?string
+
+    private static function getSttyColumns(): ?string
     {
         return self::readFromProcess('stty -a | grep columns');
     }
-    private static function readFromProcess(string $command) : ?string
+
+    private static function readFromProcess(string $command): ?string
     {
         if (!function_exists('proc_open')) {
             return null;
         }
         $descriptorspec = [1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
-        $process = proc_open($command, $descriptorspec, $pipes, null, null, ['suppress_errors' => \true]);
+        $process = proc_open($command, $descriptorspec, $pipes, null, null, ['suppress_errors' => true]);
         if (!is_resource($process)) {
             return null;
         }
@@ -113,6 +140,7 @@ class Terminal
         fclose($pipes[1]);
         fclose($pipes[2]);
         proc_close($process);
+
         return $info;
     }
 }

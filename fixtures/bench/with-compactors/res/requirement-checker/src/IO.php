@@ -1,6 +1,17 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace HumbugBox451\KevinGH\RequirementChecker;
 
 use function fstat;
@@ -15,7 +26,10 @@ use function sprintf;
 use function str_replace;
 use function stream_isatty;
 use const DIRECTORY_SEPARATOR;
+use const false;
 use const STDOUT;
+use const true;
+
 /** @internal */
 final class IO
 {
@@ -28,6 +42,7 @@ final class IO
     private $verbosity = self::VERBOSITY_NORMAL;
     private $colorSupport;
     private $options;
+
     public function __construct()
     {
         $this->options = implode(' ', $_SERVER['argv']);
@@ -35,43 +50,51 @@ final class IO
         $this->interactive = $this->checkInteractivity($shellVerbosity);
         $this->colorSupport = $this->checkColorSupport();
     }
-    public function isInteractive() : bool
+
+    public function isInteractive(): bool
     {
         return $this->interactive;
     }
-    public function getVerbosity() : int
+
+    public function getVerbosity(): int
     {
         return $this->verbosity;
     }
-    public function hasColorSupport() : bool
+
+    public function hasColorSupport(): bool
     {
         return $this->colorSupport;
     }
-    public function hasParameter($values) : bool
+
+    public function hasParameter($values): bool
     {
         $values = (array) $values;
         foreach ($values as $value) {
             $regexp = sprintf('/\\s%s\\b/', str_replace(' ', '\\s+', preg_quote($value, '/')));
             if (1 === preg_match($regexp, $this->options)) {
-                return \true;
+                return true;
             }
         }
-        return \false;
+
+        return false;
     }
-    private function checkInteractivity(int $shellVerbosity) : bool
+
+    private function checkInteractivity(int $shellVerbosity): bool
     {
         if (-1 === $shellVerbosity) {
-            return \false;
+            return false;
         }
-        if (\true === $this->hasParameter(['--no-interaction', '-n'])) {
-            return \false;
+        if (true === $this->hasParameter(['--no-interaction', '-n'])) {
+            return false;
         }
-        if (function_exists('posix_isatty') && !@posix_isatty(STDOUT) && \false === getenv('SHELL_INTERACTIVE')) {
-            return \false;
+        if (function_exists('posix_isatty') && !@posix_isatty(STDOUT) && false === getenv('SHELL_INTERACTIVE')) {
+            return false;
         }
-        return \true;
+
+        return true;
     }
-    private function configureVerbosity() : int
+
+    private function configureVerbosity(): int
     {
         switch ($shellVerbosity = (int) getenv('SHELL_VERBOSITY')) {
             case -1:
@@ -103,18 +126,20 @@ final class IO
             $this->verbosity = self::VERBOSITY_VERBOSE;
             $shellVerbosity = 1;
         }
+
         return $shellVerbosity;
     }
-    private function checkColorSupport() : bool
+
+    private function checkColorSupport(): bool
     {
         if ($this->hasParameter(['--ansi'])) {
-            return \true;
+            return true;
         }
         if ($this->hasParameter(['--no-ansi'])) {
-            return \false;
+            return false;
         }
         if (DIRECTORY_SEPARATOR === '\\') {
-            return function_exists('sapi_windows_vt100_support') && sapi_windows_vt100_support(STDOUT) || \false !== getenv('ANSICON') || 'ON' === getenv('ConEmuANSI') || 'xterm' === getenv('TERM');
+            return function_exists('sapi_windows_vt100_support') && sapi_windows_vt100_support(STDOUT) || false !== getenv('ANSICON') || 'ON' === getenv('ConEmuANSI') || 'xterm' === getenv('TERM');
         }
         if (function_exists('stream_isatty')) {
             return stream_isatty(STDOUT);
@@ -123,6 +148,7 @@ final class IO
             return posix_isatty(STDOUT);
         }
         $stat = fstat(STDOUT);
-        return $stat ? 020000 === ($stat['mode'] & 0170000) : \false;
+
+        return $stat ? 0o20000 === ($stat['mode'] & 0o170000) : false;
     }
 }
