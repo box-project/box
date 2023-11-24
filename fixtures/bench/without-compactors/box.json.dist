@@ -3,7 +3,10 @@
 
     "main": "box.php",
     "output": "../../../dist/bench/box.phar",
-    "directories-bin": ["../../../res/requirement-checker"],
-    "datetime": "release-date",
-    "dump-autoload": false
+
+    "directories-bin": ["res"],
+    "force-autodiscovery": true,
+
+    "dump-autoload": false,
+    "datetime": "release-date"
 }

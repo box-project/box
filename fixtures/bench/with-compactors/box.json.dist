@@ -4,7 +4,7 @@
     "main": "box.php",
     "output": "../../../dist/bench/box.phar",
 
-    "directories-bin": ["../../../res/requirement-checker"],
+    "directories-bin": ["res"],
     "force-autodiscovery": true,
 
     "dump-autoload": false,
