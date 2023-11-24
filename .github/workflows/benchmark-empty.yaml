@@ -1,5 +1,5 @@
 # Fallback workflow to be able to have the branch protection enabled at all times.
-name: Benchmark Tests
+name: Empty Benchmark Tests
 
 on:
     # To be aware it need to be the counter-part of benchmark.yaml.
