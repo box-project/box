@@ -1,53 +1,36 @@
 <?php
 
-declare(strict_types=1);
-
-/*
- * This file is part of the box project.
- *
- * (c) Kevin Herrera <kevin@herrera.io>
- *     Théo Fidry <theo.fidry@gmail.com>
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
-
+declare (strict_types=1);
 namespace HumbugBox451\KevinGH\RequirementChecker;
 
 use InvalidArgumentException;
 use function count;
 use function sprintf;
-use const false;
-use const PHP_VERSION;
-
 /** @internal */
 final class Checker
 {
     private static $requirementsConfig;
-
-    public static function checkRequirements(): bool
+    public static function checkRequirements() : bool
     {
         $requirements = self::retrieveRequirements();
         $checkPassed = $requirements->evaluateRequirements();
         $io = new IO();
         self::printCheck($checkPassed, new Printer($io->getVerbosity(), $io->hasColorSupport()), $requirements);
-
         return $checkPassed;
     }
-
-    public static function printCheck($checkPassed, Printer $printer, RequirementCollection $requirements): void
+    public static function printCheck($checkPassed, Printer $printer, RequirementCollection $requirements) : void
     {
-        if (false === $checkPassed && IO::VERBOSITY_VERY_VERBOSE > $printer->getVerbosity()) {
+        if (\false === $checkPassed && IO::VERBOSITY_VERY_VERBOSE > $printer->getVerbosity()) {
             $printer->setVerbosity(IO::VERBOSITY_VERY_VERBOSE);
         }
         $verbosity = IO::VERBOSITY_VERY_VERBOSE;
         $iniPath = $requirements->getPhpIniPath();
         $printer->title('Box Requirements Checker', $verbosity);
         $printer->printv('> Using PHP ', $verbosity);
-        $printer->printvln(PHP_VERSION, $verbosity, 'green');
+        $printer->printvln(\PHP_VERSION, $verbosity, 'green');
         if ($iniPath) {
             $printer->printvln('> PHP is using the following php.ini file:', $verbosity);
-            $printer->printvln('  '.$iniPath, $verbosity, 'green');
+            $printer->printvln('  ' . $iniPath, $verbosity, 'green');
         } else {
             $printer->printvln('> PHP is not using any php.ini file.', $verbosity, 'yellow');
         }
@@ -62,18 +45,17 @@ final class Checker
         foreach ($requirements->getRequirements() as $requirement) {
             if ($errorMessage = $printer->getRequirementErrorMessage($requirement)) {
                 if (IO::VERBOSITY_DEBUG === $printer->getVerbosity()) {
-                    $printer->printvln('✘ '.$requirement->getTestMessage(), IO::VERBOSITY_DEBUG, 'red');
+                    $printer->printvln('✘ ' . $requirement->getTestMessage(), IO::VERBOSITY_DEBUG, 'red');
                     $printer->printv('  ', IO::VERBOSITY_DEBUG);
                     $errorMessages[] = $errorMessage;
                 } else {
                     $printer->printv('E', $verbosity, 'red');
                     $errorMessages[] = $errorMessage;
                 }
-
                 continue;
             }
             if (IO::VERBOSITY_DEBUG === $printer->getVerbosity()) {
-                $printer->printvln('✔ '.$requirement->getTestMessage(), IO::VERBOSITY_DEBUG, 'green');
+                $printer->printvln('✔ ' . $requirement->getTestMessage(), IO::VERBOSITY_DEBUG, 'green');
                 $printer->printv('  ', IO::VERBOSITY_DEBUG);
             } else {
                 $printer->printv('.', $verbosity, 'green');
@@ -88,27 +70,24 @@ final class Checker
             $printer->block('ERROR', 'Your system is not ready to run the application.', $verbosity, 'error');
             $printer->title('Fix the following mandatory requirements:', $verbosity, 'red');
             foreach ($errorMessages as $errorMessage) {
-                $printer->printv(' * '.$errorMessage, $verbosity);
+                $printer->printv(' * ' . $errorMessage, $verbosity);
             }
         }
         $printer->printvln('', $verbosity);
     }
-
-    private static function retrieveRequirements(): RequirementCollection
+    private static function retrieveRequirements() : RequirementCollection
     {
         if (null === self::$requirementsConfig) {
-            self::$requirementsConfig = __DIR__.'/../.requirements.php';
+            self::$requirementsConfig = __DIR__ . '/../.requirements.php';
         }
         $config = (require self::$requirementsConfig);
         $requirements = new RequirementCollection();
         foreach ($config as $constraint) {
             $requirements->addRequirement(self::createCondition($constraint['type'], $constraint['condition']), $constraint['message'], $constraint['helpMessage']);
         }
-
         return $requirements;
     }
-
-    private static function createCondition($type, $condition): IsFulfilled
+    private static function createCondition($type, $condition) : IsFulfilled
     {
         switch ($type) {
             case 'php':
