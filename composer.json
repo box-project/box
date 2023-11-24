@@ -46,6 +46,7 @@
         "webmozarts/console-parallelization": "^2.1"
     },
     "require-dev": {
+        "ext-xml": "*",
         "bamarni/composer-bin-plugin": "^1.8.2",
         "ergebnis/composer-normalize": "^2.29",
         "fidry/makefile": "^1.0.1",

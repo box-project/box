@@ -81,7 +81,7 @@ class PrinterTest extends TestCase
         self::assertSame($expected, $actual);
     }
 
-    public function provideTitles(): iterable
+    public static function provideTitles(): iterable
     {
         yield [
             IO::VERBOSITY_NORMAL,
@@ -170,7 +170,7 @@ class PrinterTest extends TestCase
         ];
     }
 
-    public function provideErrorRequirements(): iterable
+    public static function provideErrorRequirements(): iterable
     {
         yield [
             new Requirement(
@@ -215,7 +215,7 @@ class PrinterTest extends TestCase
         ];
     }
 
-    public function provideBlocks(): iterable
+    public static function provideBlocks(): iterable
     {
         yield [
             IO::VERBOSITY_NORMAL,

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a2eee253b385d11f803bf422a70c2845",
+    "content-hash": "6cc0cf89ef861f5992e68aeecb210e47",
     "packages": [
         {
             "name": "composer/pcre",
@@ -5388,20 +5388,20 @@
         },
         {
             "name": "webmozarts/strict-phpunit",
-            "version": "7.7.7",
+            "version": "7.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozarts/strict-phpunit.git",
-                "reference": "bec31848d596536af8119a37de61ba23e0599377"
+                "reference": "cb3fcea4e1978671db3870324734ad1db3c4d5e3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozarts/strict-phpunit/zipball/bec31848d596536af8119a37de61ba23e0599377",
-                "reference": "bec31848d596536af8119a37de61ba23e0599377",
+                "url": "https://api.github.com/repos/webmozarts/strict-phpunit/zipball/cb3fcea4e1978671db3870324734ad1db3c4d5e3",
+                "reference": "cb3fcea4e1978671db3870324734ad1db3c4d5e3",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.4.0",
+                "php": "^8.1",
                 "phpunit/phpunit": "^9.4.3"
             },
             "require-dev": {
@@ -5409,6 +5409,11 @@
                 "infection/infection": "^0.26.6"
             },
             "type": "library",
+            "extra": {
+                "symfony": {
+                    "require": "6.*.*"
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "Webmozarts\\StrictPHPUnit\\": "src"
@@ -5427,9 +5432,9 @@
             "description": "Enables type-safe comparisons of objects in PHPUnit",
             "support": {
                 "issues": "https://github.com/webmozarts/strict-phpunit/issues",
-                "source": "https://github.com/webmozarts/strict-phpunit/tree/7.7.7"
+                "source": "https://github.com/webmozarts/strict-phpunit/tree/7.8.0"
             },
-            "time": "2023-03-29T20:04:11+00:00"
+            "time": "2023-11-03T17:34:29+00:00"
         }
     ],
     "aliases": [],
@@ -5444,7 +5449,9 @@
         "ext-phar": "*",
         "composer-plugin-api": "^2.2"
     },
-    "platform-dev": [],
+    "platform-dev": {
+        "ext-xml": "*"
+    },
     "platform-overrides": {
         "php": "8.2"
     },
