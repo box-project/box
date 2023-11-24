@@ -14,7 +14,10 @@ $finder = Finder::create()
         'bin/box',
         'bin/generate_default_stub',
     ])
-    ->exclude('build/dir018/var')
+    ->exclude([
+        'bench',
+        'build/dir018/var',
+    ])
     ->notName('*-phar-stub.php');
 
 $overriddenRules = [
