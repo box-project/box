@@ -261,7 +261,7 @@ phpbench: $(PHPBENCH_BIN) $(PHPBENCH_WITH_COMPACTORS_VENDOR_DIR) $(PHPBENCH_WITH
 
 .PHONY: _phpbench
 _phpbench:
-	$(PHPBENCH) run tests/Benchmark --report=default
+	$(PHPBENCH) run tests/Benchmark --report=benchmark
 
 
 #---------------------------------------------------------------------------
