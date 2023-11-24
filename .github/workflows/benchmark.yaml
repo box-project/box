@@ -90,7 +90,7 @@ jobs:
 
     pr-main-bench-test:
         runs-on: ubuntu-latest
-        name: Benchmark PR
+        name: Benchmark PR compared to main
         needs: main-bench-test
         steps:
             -   name: Checkout
