@@ -9,6 +9,8 @@ use Fidry\Console\ExitCode;
 use Fidry\Console\IO;
 use Fidry\FileSystem\FS;
 use KevinGH\Box\Console\Application;
+use PhpBench\Attributes\AfterMethods;
+use PhpBench\Attributes\BeforeMethods;
 use PhpBench\Attributes\Iterations;
 use PhpBench\Attributes\ParamProviders;
 use PhpBench\Attributes\Revs;
@@ -36,15 +38,34 @@ final class CompileBench
         );
     }
 
-    #[Warmup(1)]
-    public function warmUp(): void
+    public function setUp(array $params): void
     {
-        FS::remove(
-            __DIR__.'/../../dist/bench/box.phar',
-        );
+        $workingDirectory = $params[0];
+
+        chdir($workingDirectory);
 
         self::removeOutputArtifact();
         self::assertVendorsAreInstalled();
+    }
+
+    public function tearDown(): void
+    {
+        self::removeOutputArtifact();
+    }
+
+    #[ParamProviders('parameterProvider')]
+    #[Iterations(10)]
+    #[BeforeMethods('setUp')]
+    #[AfterMethods('tearDown')]
+    public function bench(array $params): void
+    {
+        $enableParallelization = $params[1];
+
+        $exitCode = $this->runner->run(
+            self::createIO($enableParallelization),
+        );
+
+        Assert::assertSame(ExitCode::SUCCESS, $exitCode);
     }
 
     private static function removeOutputArtifact(): void
@@ -62,21 +83,6 @@ final class CompileBench
         foreach ($vendorDirs as $vendorDir) {
             Assert::assertDirectoryExists($vendorDir);
         }
-    }
-
-    #[ParamProviders('parameterProvider')]
-    #[Iterations(10)]
-    public function bench(array $params): void
-    {
-        [$workingDirectory, $enableParallelization] = $params;
-
-        chdir($workingDirectory);
-
-        $exitCode = $this->runner->run(
-            self::createIO($enableParallelization),
-        );
-
-        Assert::assertSame(ExitCode::SUCCESS, $exitCode);
     }
 
     public static function parameterProvider(): iterable
