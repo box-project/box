@@ -1,4 +1,4 @@
-name: GitHub-Pages
+name: Docs
 
 on:
     push:
@@ -7,12 +7,13 @@ on:
         paths:
             - doc/**
             - mkdocs.yaml
-            - .github/workflows/gh-pages.yaml
+            - .github/workflows/docs.yaml
+    # To be aware it need to be the counter-part of docs-empty.yaml.
     pull_request:
         paths:
             - doc/**
             - mkdocs.yaml
-            - .github/workflows/gh-pages.yaml
+            - .github/workflows/docs.yaml
 
 # See https://stackoverflow.com/a/72408109
 concurrency:

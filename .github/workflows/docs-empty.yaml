@@ -1,10 +1,13 @@
 # Fallback workflow to be able to have the branch protection enabled at all times.
-name: Empty Benchmark Tests
+name: Null Docs
 
 on:
-    # To be aware it need to be the counter-part of benchmark.yaml.
-    push:
-        branches: [ main ]
+    # To be aware it need to be the counter-part of docs.yaml.
+    pull_request:
+        paths-ignore:
+            - doc/**
+            - mkdocs.yaml
+            - .github/workflows/docs.yaml
 
 # See https://stackoverflow.com/a/72408109
 concurrency:
@@ -16,7 +19,7 @@ jobs:
     # the protected branch rules as opposed to the tests one above which
     # may change regularly.
     validate-tests:
-        name: Benchmark tests status
+        name: Docs status
         runs-on: ubuntu-latest
         steps:
             - name: Successful run
