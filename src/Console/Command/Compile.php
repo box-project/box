@@ -224,7 +224,7 @@ final class Compile implements CommandAware
         $restoreLimit = OpenFileDescriptorLimiter::bumpLimit(2048, $io);
 
         try {
-            $box = $this->createPhar($config, $logger, $io, $debug, !$disableParallelization);
+            $box = $this->createPhar($config, $logger, $io, !$disableParallelization, $debug);
         } finally {
             $restoreLimit();
         }
