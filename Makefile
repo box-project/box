@@ -261,7 +261,17 @@ phpbench: $(PHPBENCH_BIN) $(PHPBENCH_WITH_COMPACTORS_VENDOR_DIR) $(PHPBENCH_WITH
 
 .PHONY: _phpbench
 _phpbench:
-	$(PHPBENCH) run tests/Benchmark --report=benchmark
+	$(PHPBENCH) run tests/Benchmark --report=benchmark --dump-file=dist/bench-result.xml
+	php bin/bench-test.php
+
+.PHONY: _phpbench
+phpbench_pr: $(PHPBENCH_BIN) $(PHPBENCH_WITH_COMPACTORS_VENDOR_DIR) $(PHPBENCH_WITHOUT_COMPACTORS_VENDOR_DIR)
+	$(PHPBENCH) run tests/Benchmark --report=benchmark --dump-file=dist/bench-result.xml --ref=main
+	php bin/bench-test.php
+
+.PHONY: _phpbench_main
+phpbench_main: $(PHPBENCH_BIN) $(PHPBENCH_WITH_COMPACTORS_VENDOR_DIR) $(PHPBENCH_WITHOUT_COMPACTORS_VENDOR_DIR)
+	$(PHPBENCH) run tests/Benchmark --report=benchmark --tag=main
 
 
 #---------------------------------------------------------------------------

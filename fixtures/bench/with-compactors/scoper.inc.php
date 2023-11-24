@@ -16,7 +16,7 @@ use Isolated\Symfony\Component\Finder\Finder as IsolatedFinder;
 
 return [
     'exclude-namespaces' => [
-        'Symfony\Polyfill'
+        'Symfony\Polyfill',
     ],
     'exclude-classes' => [
         IsolatedFinder::class,
