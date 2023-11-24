@@ -191,9 +191,9 @@ final class Compile implements CommandAware
 
         PhpSettingsChecker::check($io);
 
-        $enableParallelization = !$io->getTypedOption(self::NO_PARALLEL_PROCESSING_OPTION)->asBoolean();
+        $enableParallelization = $io->getTypedOption(self::NO_PARALLEL_PROCESSING_OPTION)->asBoolean();
 
-        if (!$enableParallelization) {
+        if ($enableParallelization) {
             $io->writeln(
                 '<info>[debug] Disabled parallel processing</info>',
                 OutputInterface::VERBOSITY_DEBUG,

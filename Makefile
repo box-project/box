@@ -41,6 +41,11 @@ INFECTION_SRC := $(shell find src tests) phpunit.xml.dist
 PHP_CS_FIXER_BIN = vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
 PHP_CS_FIXER = $(PHP_CS_FIXER_BIN)
 
+PHPBENCH_BIN = vendor-bin/phpbench/vendor/bin/phpbench
+PHPBENCH = $(PHPBENCH_BIN)
+PHPBENCH_WITH_COMPACTORS_VENDOR_DIR = fixtures/bench/with-compactors/vendor
+PHPBENCH_WITHOUT_COMPACTORS_VENDOR_DIR = fixtures/bench/without-compactors/vendor
+
 WEBSITE_SRC := mkdocs.yaml $(shell find doc)
 # This is defined in mkdocs.yaml#site_dir
 WEBSITE_OUTPUT = dist/website
@@ -249,6 +254,15 @@ _infection: $(INFECTION_BIN) $(COVERAGE_XML_DIR) $(COVERAGE_JUNIT) vendor
 _infection_ci: $(INFECTION_BIN) $(COVERAGE_XML_DIR) $(COVERAGE_JUNIT) vendor
 	$(INFECTION_CI)
 
+.PHONY: phpbench
+phpbench: 	## Runs PHPBench
+phpbench: $(PHPBENCH_BIN) $(PHPBENCH_WITH_COMPACTORS_VENDOR_DIR) $(PHPBENCH_WITHOUT_COMPACTORS_VENDOR_DIR)
+	$(MAKE) _phpbench
+
+.PHONY: _phpbench
+_phpbench:
+	$(PHPBENCH) run tests/Benchmark --report=default
+
 
 #---------------------------------------------------------------------------
 
@@ -370,6 +384,18 @@ vendor-bin/php-cs-fixer/composer.lock: vendor-bin/php-cs-fixer/composer.json
 	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer bin php-cs-fixer update --lock && touch -c $(@)"
 
+.PHONY: phpbench_install
+phpbench_install: $(PHPBENCH_BIN)
+
+$(PHPBENCH_BIN): vendor-bin/phpbench/vendor
+	touch -c $@
+vendor-bin/phpbench/vendor: vendor-bin/phpbench/composer.lock $(COMPOSER_BIN_PLUGIN_VENDOR)
+	composer bin phpbench install
+	touch -c $@
+vendor-bin/phpbench/composer.lock: vendor-bin/phpbench/composer.json
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
+	@echo "$$ composer bin phpbench update --lock && touch -c $(@)"
+
 .PHONY: infection_install
 infection_install: $(INFECTION_BIN)
 
@@ -456,6 +482,14 @@ vendor-bin/requirement-checker/vendor: vendor-bin/requirement-checker/composer.l
 vendor-bin/requirement-checker/composer.lock: vendor-bin/requirement-checker/composer.json
 	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer bin requirement-checker update --lock && touch -c $(@)"
+
+$(PHPBENCH_WITH_COMPACTORS_VENDOR_DIR):
+	composer install --working-dir=$$(dirname $@)
+	touch -c $@
+
+$(PHPBENCH_WITHOUT_COMPACTORS_VENDOR_DIR):
+	composer install --working-dir=$$(dirname $@)
+	touch -c $@
 
 dist:
 	mkdir -p dist

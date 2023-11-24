@@ -1,0 +1,9 @@
+{
+    "$schema": "../../../res/schema.json",
+
+    "main": "box.php",
+    "output": "../../../dist/bench/box.phar",
+    "directories-bin": ["../../../res/requirement-checker"],
+    "datetime": "release-date",
+    "dump-autoload": false
+}
