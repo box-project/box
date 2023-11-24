@@ -191,9 +191,9 @@ final class Compile implements CommandAware
 
         PhpSettingsChecker::check($io);
 
-        $enableParallelization = $io->getTypedOption(self::NO_PARALLEL_PROCESSING_OPTION)->asBoolean();
+        $disableParallelization = $io->getTypedOption(self::NO_PARALLEL_PROCESSING_OPTION)->asBoolean();
 
-        if ($enableParallelization) {
+        if ($disableParallelization) {
             $io->writeln(
                 '<info>[debug] Disabled parallel processing</info>',
                 OutputInterface::VERBOSITY_DEBUG,
@@ -224,7 +224,7 @@ final class Compile implements CommandAware
         $restoreLimit = OpenFileDescriptorLimiter::bumpLimit(2048, $io);
 
         try {
-            $box = $this->createPhar($config, $logger, $io, $debug, $enableParallelization);
+            $box = $this->createPhar($config, $logger, $io, !$disableParallelization, $debug);
         } finally {
             $restoreLimit();
         }
