@@ -10,8 +10,6 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    POLLING_INTERVALS_SEC: 30
-    SLEEP_TIME_SEC: 60s
     TERM: xterm
 
 jobs:
@@ -32,6 +30,20 @@ jobs:
                     ini-values: phar.readonly=0, display_errors=On, error_reporting=-1
                     tools: composer
                     coverage: none
+
+            -   name: Install Composer dependencies
+                uses: ramsey/composer-install@v2
+
+            -   name: Ensure that the make target is up to date
+                run: make _vendor_install
+
+            -   name: Install PHPBench
+                uses: ramsey/composer-install@v2
+                with:
+                    working-directory: vendor-bin/phpbench
+
+            -   name: Ensure that the PHPBench make target is up to date
+                run: make phpbench_install
 
             -   name: Run PHPBench
                 run: make phpbench_main
@@ -59,6 +71,20 @@ jobs:
                     ini-values: phar.readonly=0, display_errors=On, error_reporting=-1
                     tools: composer
                     coverage: none
+
+            -   name: Install Composer dependencies
+                uses: ramsey/composer-install@v2
+
+            -   name: Ensure that the make target is up to date
+                run: make _vendor_install
+
+            -   name: Install PHPBench
+                uses: ramsey/composer-install@v2
+                with:
+                    working-directory: vendor-bin/phpbench
+
+            -   name: Ensure that the PHPBench make target is up to date
+                run: make phpbench_install
 
             -   name: Download the Benchmark results of the main branch
                 uses: actions/download-artifact@v3
