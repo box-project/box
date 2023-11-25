@@ -19,7 +19,7 @@ use function array_key_exists;
 /**
  * @private
  */
-final class PackageInfo
+final readonly class PackageInfo
 {
     private const EXTENSION_REGEX = '/^ext-(?<extension>.+)$/';
 
@@ -37,7 +37,7 @@ final class PackageInfo
 
     private const SYMFONY_POLYFILL_REGEX = '/symfony\/polyfill-(?<extension>.+)/';
 
-    public function __construct(private readonly array $packageInfo)
+    public function __construct(private array $packageInfo)
     {
     }
 

@@ -23,8 +23,8 @@ use Webmozart\Assert\Assert;
  */
 final class JsonValidationException extends UnexpectedValueException
 {
-    private ?string $validatedFile;
-    private array $errors;
+    private readonly ?string $validatedFile;
+    private readonly array $errors;
 
     /**
      * @param string[] $errors

@@ -36,7 +36,7 @@ use const SORT_LOCALE_STRING;
  *
  * @private
  */
-final class PharMeta
+final readonly class PharMeta
 {
     /**
      * @param non-empty-string|null                                                          $stub
@@ -46,15 +46,15 @@ final class PharMeta
      * @param array<string, array{'compression': CompressionAlgorithm, compressedSize: int}> $filesMeta
      */
     public function __construct(
-        public readonly CompressionAlgorithm $compression,
+        public CompressionAlgorithm $compression,
         #[ArrayShape(['hash' => 'string', 'hash_type' => 'string'])]
-        public readonly ?array $signature,
-        public readonly ?string $stub,
-        public readonly ?string $version,
-        public readonly ?string $normalizedMetadata,
-        public readonly int $timestamp,
-        public readonly ?string $pubKeyContent,
-        public readonly array $filesMeta,
+        public ?array $signature,
+        public ?string $stub,
+        public ?string $version,
+        public ?string $normalizedMetadata,
+        public int $timestamp,
+        public ?string $pubKeyContent,
+        public array $filesMeta,
     ) {
     }
 

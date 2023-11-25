@@ -28,7 +28,7 @@ use const JSON_ERROR_UTF8;
 /**
  * @private
  */
-final class Json
+final readonly class Json
 {
     private JsonParser $linter;
 

@@ -18,7 +18,7 @@ use Fidry\Console\IO;
 use KevinGH\Box\Phar\PharInfo;
 use Symfony\Component\Process\Process;
 
-final class ProcessCommandBasedDiffer implements Differ
+final readonly class ProcessCommandBasedDiffer implements Differ
 {
     public function __construct(private string $command)
     {

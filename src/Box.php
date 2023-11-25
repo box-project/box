@@ -463,12 +463,12 @@ final class Box implements Countable
 
             // Keep the fully qualified call here since this function may be executed without the right autoloading
             // mechanism
-            \KevinGH\Box\register_aliases();
+            register_aliases();
             if ($enableParallelization) {
-                \KevinGH\Box\register_error_handler();
+                register_error_handler();
             }
 
-            $contents = \Fidry\FileSystem\FS::getFileContents($file);
+            $contents = FS::getFileContents($file);
 
             $local = $mapFile($file);
 

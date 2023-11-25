@@ -22,7 +22,7 @@ use function sprintf;
 /**
  * @internal
  */
-final class CompilerLogger
+final readonly class CompilerLogger
 {
     public const QUESTION_MARK_PREFIX = '?';
     public const STAR_PREFIX = '*';
@@ -30,7 +30,7 @@ final class CompilerLogger
     public const MINUS_PREFIX = '-';
     public const CHEVRON_PREFIX = '>';
 
-    public function __construct(private readonly IO $io)
+    public function __construct(private IO $io)
     {
     }
 

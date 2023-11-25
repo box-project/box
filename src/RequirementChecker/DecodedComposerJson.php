@@ -19,12 +19,12 @@ use function array_keys;
 /**
  * @private
  */
-final class DecodedComposerJson
+final readonly class DecodedComposerJson
 {
     /**
      * @param array $composerJsonDecodedContents Decoded JSON contents of the `composer.json` file
      */
-    public function __construct(private readonly array $composerJsonDecodedContents)
+    public function __construct(private array $composerJsonDecodedContents)
     {
     }
 
