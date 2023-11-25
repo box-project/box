@@ -48,6 +48,14 @@ jobs:
             -   name: Ensure that the PHP-CS-Fixer make target is up to date
                 run: make php_cs_fixer_install
 
+            -   name: Install Rector
+                uses: ramsey/composer-install@v2
+                with:
+                    working-directory: vendor-bin/rector
+
+            -   name: Ensure that the PHP-CS-Fixer make target is up to date
+                run: make rector_install
+
             -   name: Install the Composer dependencies
                 uses: ramsey/composer-install@v2
                 with:
