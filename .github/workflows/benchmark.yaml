@@ -47,6 +47,9 @@ jobs:
             -   name: Run PHPBench
                 run: make phpbench_main
 
+            -   name: Debug
+                run: tree dist
+
             -   uses: actions/upload-artifact@v3
                 name: Upload the Benchmark results
                 with:
