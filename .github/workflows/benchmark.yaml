@@ -50,7 +50,7 @@ jobs:
             -   uses: actions/upload-artifact@v3
                 name: Upload the Benchmark results
                 with:
-                    name: bench-main-result
+                    name: bench-branch-main-result
                     path: dist/bench-branch-main-result.xml
 
     pr-bench-test:
