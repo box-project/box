@@ -124,6 +124,9 @@ jobs:
                 with:
                     name: bench-branch-main-result
 
+            -   name: Check history
+                run: vendor-bin/phpbench/vendor/bin/phpbench log
+
             -   name: Run PHPBench for PR branch
                 run: make phpbench_pr
 
