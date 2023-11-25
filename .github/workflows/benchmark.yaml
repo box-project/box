@@ -51,9 +51,7 @@ jobs:
                 name: Upload the Benchmark results
                 with:
                     name: bench-branch-main-result
-                    path: |
-                        dist/.phpbench/
-                        dist/bench/
+                    path: dist/bench/
 
     pr-bench-test:
         runs-on: ubuntu-latest
