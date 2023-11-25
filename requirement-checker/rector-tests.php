@@ -3,21 +3,23 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\Php74\Rector\Closure\ClosureToArrowFunctionRector;
 use Rector\Set\ValueObject\LevelSetList;
 
-return static function (RectorConfig $rectorConfig): void {
+$applyCommonConfig = require __DIR__.'/rector.php';
+
+return static function (RectorConfig $rectorConfig) use ($applyCommonConfig): void {
+    $applyCommonConfig($rectorConfig);
+
     $rectorConfig->paths([
         __DIR__ . '/tests',
     ]);
 
-    $rectorConfig->autoloadPaths([
-        __DIR__ . '/vendor/autoload.php',
-        __DIR__ . '/../vendor-bin/rector/vendor/autoload.php',
-    ]);
-
-    $rectorConfig->importNames();
-
     $rectorConfig->sets([
         LevelSetList::UP_TO_PHP_82,
+    ]);
+
+    $rectorConfig->skip([
+        ClosureToArrowFunctionRector::class
     ]);
 };
