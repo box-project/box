@@ -17,6 +17,6 @@ return static function (RectorConfig $rectorConfig) use ($applyCommonConfig): vo
 
     $rectorConfig->sets([
         LevelSetList::UP_TO_PHP_72,
-        // DowngradeLevelSetList::DOWN_TO_PHP_72,
+        DowngradeLevelSetList::DOWN_TO_PHP_72,
     ]);
 };
