@@ -170,8 +170,8 @@ final class Checker
                 throw new InvalidArgumentException(
                     sprintf(
                         'Unknown requirement type "%s".',
-                        $type,
-                    ),
+                        $type
+                    )
                 );
         }
     }
