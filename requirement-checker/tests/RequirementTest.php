@@ -57,7 +57,7 @@ class RequirementTest extends TestCase
             $requirement->isFulfilled();
 
             self::fail('Expected exception to be thrown.');
-        } catch (Error) {
+        } catch (Error $error) {
             self::assertTrue(true);
         }
     }

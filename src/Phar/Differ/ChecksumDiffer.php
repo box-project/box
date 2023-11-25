@@ -21,7 +21,7 @@ use ValueError;
 use function hash;
 use function implode;
 
-final readonly class ChecksumDiffer implements Differ
+final class ChecksumDiffer implements Differ
 {
     public function __construct(
         private string $checksumAlgorithm,

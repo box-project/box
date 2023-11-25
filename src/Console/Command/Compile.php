@@ -111,7 +111,7 @@ final class Compile implements CommandAware
 
     private const DEBUG_DIR = '.box_dump';
 
-    public function __construct(private readonly string $header)
+    public function __construct(private string $header)
     {
     }
 

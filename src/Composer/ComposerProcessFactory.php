@@ -49,10 +49,10 @@ class ComposerProcessFactory
      * @param Closure():string $composerExecutableFactory
      */
     public function __construct(
-        private readonly Closure $composerExecutableFactory,
+        private Closure $composerExecutableFactory,
         private ?string $verbosity,
-        private readonly bool $ansi,
-        private readonly array $defaultEnvironmentVariables,
+        private bool $ansi,
+        private array $defaultEnvironmentVariables,
     ) {
     }
 

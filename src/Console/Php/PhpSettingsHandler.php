@@ -34,8 +34,8 @@ use const PHP_EOL;
  */
 final class PhpSettingsHandler extends XdebugHandler
 {
-    private readonly LoggerInterface $logger;
-    private readonly bool $pharReadonly;
+    private LoggerInterface $logger;
+    private bool $pharReadonly;
 
     public function __construct(LoggerInterface $logger)
     {

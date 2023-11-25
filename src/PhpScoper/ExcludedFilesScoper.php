@@ -21,10 +21,10 @@ use function func_get_args;
 
 final class ExcludedFilesScoper implements PhpScoperScoper
 {
-    private readonly array $excludedFilePathsAsKeys;
+    private array $excludedFilePathsAsKeys;
 
     public function __construct(
-        private readonly PhpScoperScoper $decoratedScoper,
+        private PhpScoperScoper $decoratedScoper,
         string ...$excludedFilePaths,
     ) {
         $this->excludedFilePathsAsKeys = array_flip($excludedFilePaths);

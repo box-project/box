@@ -20,7 +20,7 @@ use Throwable;
 /**
  * @private
  */
-final readonly class PhpScoper implements Compactor
+final class PhpScoper implements Compactor
 {
     public function __construct(private Scoper $scoper)
     {

@@ -20,11 +20,11 @@ use stdClass;
 /**
  * @private
  */
-final readonly class ConfigurationLoader
+final class ConfigurationLoader
 {
     private const SCHEMA_FILE = __DIR__.'/../../res/schema.json';
 
-    public function __construct(private Json $json = new Json())
+    public function __construct(private readonly Json $json = new Json())
     {
     }
 

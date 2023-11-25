@@ -18,7 +18,7 @@ use function array_filter;
 use function array_map;
 use function array_values;
 
-final readonly class ComposerFiles
+final class ComposerFiles
 {
     public static function createEmpty(): self
     {
@@ -30,9 +30,9 @@ final readonly class ComposerFiles
     }
 
     public function __construct(
-        private ComposerFile $composerJson,
-        private ComposerFile $composerLock,
-        private ComposerFile $installedJson,
+        private readonly ComposerFile $composerJson,
+        private readonly ComposerFile $composerLock,
+        private readonly ComposerFile $installedJson,
     ) {
     }
 

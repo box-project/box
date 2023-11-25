@@ -22,13 +22,12 @@ use RecursiveDirectoryIterator;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Path;
 use UnexpectedValueException;
-use function json_decode;
 use function ksort;
+use function Safe\json_decode;
 use function Safe\json_encode;
 use function Safe\realpath;
 use function sprintf;
 use function var_export;
-use const JSON_THROW_ON_ERROR;
 use const SORT_LOCALE_STRING;
 
 /**
@@ -37,7 +36,7 @@ use const SORT_LOCALE_STRING;
  *
  * @private
  */
-final readonly class PharMeta
+final class PharMeta
 {
     /**
      * @param non-empty-string|null                                                          $stub
@@ -47,15 +46,15 @@ final readonly class PharMeta
      * @param array<string, array{'compression': CompressionAlgorithm, compressedSize: int}> $filesMeta
      */
     public function __construct(
-        public CompressionAlgorithm $compression,
+        public readonly CompressionAlgorithm $compression,
         #[ArrayShape(['hash' => 'string', 'hash_type' => 'string'])]
-        public ?array $signature,
-        public ?string $stub,
-        public ?string $version,
-        public ?string $normalizedMetadata,
-        public int $timestamp,
-        public ?string $pubKeyContent,
-        public array $filesMeta,
+        public readonly ?array $signature,
+        public readonly ?string $stub,
+        public readonly ?string $version,
+        public readonly ?string $normalizedMetadata,
+        public readonly int $timestamp,
+        public readonly ?string $pubKeyContent,
+        public readonly array $filesMeta,
     ) {
     }
 
@@ -83,7 +82,7 @@ final readonly class PharMeta
 
     public static function fromJson(string $json): self
     {
-        $decodedJson = json_decode($json, true, flags: JSON_THROW_ON_ERROR);
+        $decodedJson = json_decode($json, true);
 
         $filesMeta = $decodedJson['filesMeta'];
 
@@ -114,7 +113,7 @@ final readonly class PharMeta
             'timestamp' => $this->timestamp,
             'pubKeyContent' => $this->pubKeyContent,
             'filesMeta' => $this->filesMeta,
-        ], JSON_THROW_ON_ERROR);
+        ]);
     }
 
     /**

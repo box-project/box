@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use Isolated\Symfony\Component\Finder\Finder;
 use Composer\InstalledVersions;
 use ErrorException;
 use Phar;
@@ -161,8 +160,8 @@ function format_time(float $secs): string
 function register_aliases(): void
 {
     // Exposes the finder used by PHP-Scoper PHAR to allow its usage in the configuration file.
-    if (false === class_exists(Finder::class)) {
-        class_alias(\Symfony\Component\Finder\Finder::class, Finder::class);
+    if (false === class_exists(\Isolated\Symfony\Component\Finder\Finder::class)) {
+        class_alias(\Symfony\Component\Finder\Finder::class, \Isolated\Symfony\Component\Finder\Finder::class);
     }
 }
 

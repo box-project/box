@@ -22,7 +22,7 @@ use function func_get_args;
 /**
  * @var PatcherCallable = (string $filePath, string $prefix, string $contents): string
  */
-final readonly class SerializablePatcher implements Patcher
+final class SerializablePatcher implements Patcher
 {
     public static function create(callable $patcher): self
     {

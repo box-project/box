@@ -20,7 +20,7 @@ use function key;
 /**
  * @private
  */
-final readonly class RequiredItem
+final class RequiredItem
 {
     private const POLYFILL_MAP = [
         'paragonie/sodium_compat' => 'libsodium',
@@ -32,7 +32,7 @@ final readonly class RequiredItem
     /**
      * @param array<string, string> $packageInfo
      */
-    public function __construct(private array $packageInfo)
+    public function __construct(private readonly array $packageInfo)
     {
     }
 

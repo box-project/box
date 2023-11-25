@@ -28,7 +28,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use function Safe\chdir;
 
-final readonly class CompileBench
+final class CompileBench
 {
     private const WITHOUT_COMPACTORS_DIR = __DIR__.'/../../fixtures/bench/without-compactors';
     private const WITH_COMPACTORS_DIR = __DIR__.'/../../fixtures/bench/with-compactors';

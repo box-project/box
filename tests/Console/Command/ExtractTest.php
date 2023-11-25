@@ -84,7 +84,7 @@ class ExtractTest extends CommandTestCase
             $oldDefaultPharStub,
             '1.1.0',
             null,
-            1_559_806_605,
+            1559806605,
             null,
             [
                 '.hidden' => [
@@ -131,7 +131,7 @@ class ExtractTest extends CommandTestCase
                         $oldDefaultPharStub,
                         '1.1.0',
                         null,
-                        1_559_807_994,
+                        1559807994,
                         null,
                         [
                             '.hidden' => [
@@ -160,7 +160,7 @@ class ExtractTest extends CommandTestCase
                     $sha512Stub,
                     '1.1.0',
                     null,
-                    1_374_531_272,
+                    1374531272,
                     null,
                     [
                         'index.php' => [
@@ -189,7 +189,7 @@ class ExtractTest extends CommandTestCase
                     $sha512Stub,
                     '1.1.0',
                     null,
-                    1_374_531_313,
+                    1374531313,
                     <<<'EOF'
                         -----BEGIN PUBLIC KEY-----
                         MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKuZkrHT54KtuBCTrR36+4tibd+2un9b
@@ -324,7 +324,7 @@ class ExtractTest extends CommandTestCase
             );
 
             self::assertSame(ExitCode::FAILURE, $this->commandTester->getStatusCode());
-        } catch (InvalidPhar) {
+        } catch (InvalidPhar $exception) {
             // Continue
         }
 

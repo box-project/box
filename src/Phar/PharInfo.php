@@ -77,16 +77,16 @@ final class PharInfo
     private static array $ALGORITHMS;
     private static string $stubfile;
 
-    private readonly PharMeta $meta;
-    private readonly string $tmp;
-    private readonly string $file;
-    private readonly string $fileName;
+    private PharMeta $meta;
+    private string $tmp;
+    private string $file;
+    private string $fileName;
     private array $compressionCount;
 
     /**
      * @var array<string, SplFileInfo>
      */
-    private readonly array $files;
+    private array $files;
 
     public function __construct(string $file)
     {

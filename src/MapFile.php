@@ -23,7 +23,7 @@ use function preg_replace;
  *
  * @private
  */
-final readonly class MapFile
+final class MapFile
 {
     /**
      * @param string[][] $map

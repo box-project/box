@@ -28,7 +28,7 @@ final class Compactors implements Compactor, Countable
     /**
      * @var Compactor[]
      */
-    private readonly array $compactors;
+    private array $compactors;
 
     private ?PhpScoper $scoperCompactor = null;
 

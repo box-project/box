@@ -24,7 +24,7 @@ use function array_key_exists;
 final class CompilerPsrLogger extends AbstractLogger
 {
     public function __construct(
-        private readonly CompilerLogger $decoratedLogger,
+        private CompilerLogger $decoratedLogger,
     ) {
     }
 

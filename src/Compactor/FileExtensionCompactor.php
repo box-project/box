@@ -29,7 +29,7 @@ abstract class FileExtensionCompactor extends BaseCompactor
     /**
      * @var string[]
      */
-    private readonly array $extensions;
+    private array $extensions;
 
     /**
      * @param string[] $extensions the list of supported file extensions
