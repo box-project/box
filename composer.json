@@ -47,6 +47,7 @@
         "webmozart/assert": "^1.11"
     },
     "require-dev": {
+        "ext-xml": "*",
         "bamarni/composer-bin-plugin": "^1.8.2",
         "ergebnis/composer-normalize": "^2.29",
         "fidry/makefile": "^1.0.1",
@@ -72,7 +73,6 @@
             "KevinGH\\Box\\": "src"
         },
         "files": [
-            "src/consts.php",
             "src/functions.php"
         ],
         "exclude-from-classmap": [

@@ -14,9 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PharInfo;
 
-use KevinGH\Box\Phar\PharInfo as NewPharInfo;
+use KevinGH\Box\Phar\CompressionAlgorithm;
 use Phar;
 use PharData;
+use PharFileInfo;
+use RecursiveIteratorIterator;
 use UnexpectedValueException;
 use function KevinGH\Box\unique_id;
 use function realpath;
@@ -27,35 +29,56 @@ use function str_replace;
  */
 final class PharInfo
 {
-    private readonly NewPharInfo $decoratedPharInfo;
+    private static array $ALGORITHMS;
 
     private PharData|Phar $phar;
 
-    public function __construct(private readonly string $pharFile)
+    private ?array $compressionCount = null;
+    private ?string $hash = null;
+
+    public function __construct(string $pharFile)
     {
-        $this->decoratedPharInfo = new NewPharInfo($pharFile);
+        self::initAlgorithms();
+
+        try {
+            $this->phar = new Phar($pharFile);
+        } catch (UnexpectedValueException) {
+            $this->phar = new PharData($pharFile);
+        }
+    }
+
+    private static function initAlgorithms(): void
+    {
+        if (!isset(self::$ALGORITHMS)) {
+            self::$ALGORITHMS = [];
+
+            foreach (CompressionAlgorithm::cases() as $compressionAlgorithm) {
+                self::$ALGORITHMS[$compressionAlgorithm->value] = $compressionAlgorithm->name;
+            }
+        }
     }
 
     public function equals(self $pharInfo): bool
     {
-        return $this->decoratedPharInfo->equals($pharInfo->decoratedPharInfo);
+        return
+            $pharInfo->getCompressionCount() === $this->getCompressionCount()
+            && $pharInfo->getNormalizedMetadata() === $this->getNormalizedMetadata();
     }
 
     public function getCompressionCount(): array
     {
-        return $this->decoratedPharInfo->getFilesCompressionCount();
+        if (null === $this->compressionCount || $this->hash !== $this->getPharHash()) {
+            $this->compressionCount = $this->calculateCompressionCount();
+            $this->compressionCount['None'] = $this->compressionCount[CompressionAlgorithm::NONE->name];
+            unset($this->compressionCount[CompressionAlgorithm::NONE->name]);
+            $this->hash = $this->getPharHash();
+        }
+
+        return $this->compressionCount;
     }
 
     public function getPhar(): Phar|PharData
     {
-        if (!isset($this->phar)) {
-            try {
-                $this->phar = new Phar($this->pharFile);
-            } catch (UnexpectedValueException) {
-                $this->phar = new PharData($this->pharFile);
-            }
-        }
-
         return $this->phar;
     }
 
@@ -67,16 +90,60 @@ final class PharInfo
 
     public function getVersion(): string
     {
-        return $this->decoratedPharInfo->getVersion();
+        // Do not cache the result
+        return '' !== $this->phar->getVersion() ? $this->phar->getVersion() : 'No information found';
     }
 
     public function getNormalizedMetadata(): ?string
     {
-        return $this->decoratedPharInfo->getNormalizedMetadata();
+        // Do not cache the result
+        $metadata = var_export($this->phar->getMetadata(), true);
+
+        return 'NULL' === $metadata ? null : $metadata;
     }
 
     private function getPharHash(): string
     {
-        return $this->decoratedPharInfo->getSignature()['hash'] ?? unique_id('');
+        // If no signature is available (e.g. a tar.gz file), we generate a random hash to ensure
+        // it will always be invalidated
+        return $this->phar->getSignature()['hash'] ?? unique_id('');
+    }
+
+    private function calculateCompressionCount(): array
+    {
+        $count = array_fill_keys(
+            self::$ALGORITHMS,
+            0,
+        );
+
+        if ($this->phar instanceof PharData) {
+            $count[self::$ALGORITHMS[$this->phar->isCompressed()]] = 1;
+
+            return $count;
+        }
+
+        $countFile = static function (array $count, PharFileInfo $file): array {
+            if (false === $file->isCompressed()) {
+                ++$count[CompressionAlgorithm::NONE->name];
+
+                return $count;
+            }
+
+            foreach (self::$ALGORITHMS as $compressionAlgorithmCode => $compressionAlgorithmName) {
+                if ($file->isCompressed($compressionAlgorithmCode)) {
+                    ++$count[$compressionAlgorithmName];
+
+                    return $count;
+                }
+            }
+
+            return $count;
+        };
+
+        return array_reduce(
+            iterator_to_array(new RecursiveIteratorIterator($this->phar), true),
+            $countFile,
+            $count,
+        );
     }
 }

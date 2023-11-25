@@ -45,18 +45,16 @@ namespace KevinGH\Box\Phar;
 
 use Fidry\FileSystem\FS;
 use KevinGH\Box\Console\Command\Extract;
+use KevinGH\Box\ExecutableFinder;
 use OutOfBoundsException;
 use Phar;
-use RuntimeException;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 use function bin2hex;
 use function file_exists;
-use function getenv;
 use function is_readable;
 use function iter\mapKeys;
 use function iter\toArrayWithKeys;
@@ -78,7 +76,6 @@ final class PharInfo
 {
     private static array $ALGORITHMS;
     private static string $stubfile;
-    private static string $phpExecutable;
 
     private readonly PharMeta $meta;
     private readonly string $tmp;
@@ -287,8 +284,8 @@ final class PharInfo
     private static function dumpPhar(string $file, string $tmp): void
     {
         $extractPharProcess = new Process([
-            self::getPhpExecutable(),
-            self::getBoxBin(),
+            ExecutableFinder::findPhpExecutable(),
+            ExecutableFinder::findBoxExecutable(),
             'extract',
             $file,
             $tmp,
@@ -326,29 +323,6 @@ final class PharInfo
         unset($dumpedFiles[Extract::PHAR_META_PATH]);
 
         return [$meta, $dumpedFiles];
-    }
-
-    private static function getPhpExecutable(): string
-    {
-        if (isset(self::$phpExecutable)) {
-            return self::$phpExecutable;
-        }
-
-        $phpExecutable = (new PhpExecutableFinder())->find();
-
-        if (false === $phpExecutable) {
-            throw new RuntimeException('Could not find a PHP executable.');
-        }
-
-        self::$phpExecutable = $phpExecutable;
-
-        return self::$phpExecutable;
-    }
-
-    private static function getBoxBin(): string
-    {
-        // TODO: move the constraint strings declaration in one place
-        return getenv('BOX_BIN') ?: $_SERVER['SCRIPT_NAME'];
     }
 
     /**

@@ -1,0 +1,12 @@
+{
+    "$schema": "../../../res/schema.json",
+
+    "main": "box.php",
+    "output": "../../../dist/bench/box.phar",
+
+    "directories-bin": ["res"],
+    "force-autodiscovery": true,
+
+    "dump-autoload": false,
+    "datetime": "release-date"
+}

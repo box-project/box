@@ -16,10 +16,10 @@ namespace KevinGH\Box\Composer;
 
 use Closure;
 use Fidry\Console\IO;
+use KevinGH\Box\Constants;
 use RuntimeException;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
-use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 
 /**
  * @final
@@ -143,7 +143,7 @@ class ComposerProcessFactory
     {
         $vars = ['COMPOSER_ORIGINAL_INIS' => ''];
 
-        if ('1' === (string) getenv(BOX_ALLOW_XDEBUG)) {
+        if ('1' === (string) getenv(Constants::ALLOW_XDEBUG)) {
             $vars['COMPOSER_ALLOW_XDEBUG'] = '1';
         }
 

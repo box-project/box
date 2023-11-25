@@ -41,6 +41,11 @@ INFECTION_SRC := $(shell find src tests) phpunit.xml.dist
 PHP_CS_FIXER_BIN = vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
 PHP_CS_FIXER = $(PHP_CS_FIXER_BIN)
 
+PHPBENCH_BIN = vendor-bin/phpbench/vendor/bin/phpbench
+PHPBENCH = $(PHPBENCH_BIN)
+PHPBENCH_WITH_COMPACTORS_VENDOR_DIR = fixtures/bench/with-compactors/vendor
+PHPBENCH_WITHOUT_COMPACTORS_VENDOR_DIR = fixtures/bench/without-compactors/vendor
+
 RECTOR_BIN = vendor-bin/rector/vendor/bin/rector
 RECTOR = $(RECTOR_BIN)
 
@@ -260,6 +265,25 @@ _infection: $(INFECTION_BIN) $(COVERAGE_XML_DIR) $(COVERAGE_JUNIT) vendor
 _infection_ci: $(INFECTION_BIN) $(COVERAGE_XML_DIR) $(COVERAGE_JUNIT) vendor
 	$(INFECTION_CI)
 
+.PHONY: phpbench
+phpbench: 		 ## Runs PHPBench
+phpbench: $(PHPBENCH_BIN) $(PHPBENCH_WITH_COMPACTORS_VENDOR_DIR) $(PHPBENCH_WITHOUT_COMPACTORS_VENDOR_DIR)
+	$(MAKE) _phpbench
+
+.PHONY: _phpbench
+_phpbench:
+	$(PHPBENCH) run tests/Benchmark --report=benchmark --dump-file=dist/bench-result.xml
+	php bin/bench-test.php
+
+.PHONY: phpbench_pr
+phpbench_pr: $(PHPBENCH_BIN) $(PHPBENCH_WITH_COMPACTORS_VENDOR_DIR) $(PHPBENCH_WITHOUT_COMPACTORS_VENDOR_DIR)
+	$(PHPBENCH) run tests/Benchmark --report=benchmark --dump-file=dist/bench-result.xml --ref=main
+	php bin/bench-test.php
+
+.PHONY: phpbench_main
+phpbench_main: $(PHPBENCH_BIN) $(PHPBENCH_WITH_COMPACTORS_VENDOR_DIR) $(PHPBENCH_WITHOUT_COMPACTORS_VENDOR_DIR)
+	$(PHPBENCH) run tests/Benchmark --report=benchmark --tag=main
+
 
 #---------------------------------------------------------------------------
 
@@ -295,6 +319,22 @@ blackfire: $(SCOPED_BOX_BIN)
 # Website rules
 #---------------------------------------------------------------------------
 
+.PHONY: website_check
+website_check:		 ## Runs various checks for the website
+website_check: markdownlint lychee website_build
+
+.PHONY: markdownlint
+markdownlint:
+	@echo "$(YELLOW_COLOR)Ensure you have the nodejs & npm installed. For more information, check:$(NO_COLOR)"
+	@# To keep in sync with .github/workflows/gh-pages.yaml#check-links
+	npx markdownlint-cli2 "*.md|docs/**/*.md"
+
+.PHONY: lychee
+lychee:
+	@echo "$(YELLOW_COLOR)Ensure you have the lychee command installed. For more information, check:$(NO_COLOR)"
+	@echo "https://github.com/lycheeverse/lychee"
+	@# To keep in sync with .github/workflows/gh-pages.yaml#check-links
+	lychee --verbose --no-progress '*.md' 'docs/**/*.md'
 
 .PHONY: website_build
 website_build:		 ## Builds the website
@@ -364,6 +404,18 @@ vendor-bin/php-cs-fixer/vendor: vendor-bin/php-cs-fixer/composer.lock $(COMPOSER
 vendor-bin/php-cs-fixer/composer.lock: vendor-bin/php-cs-fixer/composer.json
 	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer bin php-cs-fixer update --lock && touch -c $(@)"
+
+.PHONY: phpbench_install
+phpbench_install: $(PHPBENCH_BIN)
+
+$(PHPBENCH_BIN): vendor-bin/phpbench/vendor
+	touch -c $@
+vendor-bin/phpbench/vendor: vendor-bin/phpbench/composer.lock $(COMPOSER_BIN_PLUGIN_VENDOR)
+	composer bin phpbench install
+	touch -c $@
+vendor-bin/phpbench/composer.lock: vendor-bin/phpbench/composer.json
+	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
+	@echo "$$ composer bin phpbench update --lock && touch -c $(@)"
 
 .PHONY: rector_install
 rector_install: $(RECTOR_BIN)
@@ -463,6 +515,14 @@ vendor-bin/requirement-checker/vendor: vendor-bin/requirement-checker/composer.l
 vendor-bin/requirement-checker/composer.lock: vendor-bin/requirement-checker/composer.json
 	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer bin requirement-checker update --lock && touch -c $(@)"
+
+$(PHPBENCH_WITH_COMPACTORS_VENDOR_DIR):
+	composer install --working-dir=$$(dirname $@)
+	touch -c $@
+
+$(PHPBENCH_WITHOUT_COMPACTORS_VENDOR_DIR):
+	composer install --working-dir=$$(dirname $@)
+	touch -c $@
 
 dist:
 	mkdir -p dist

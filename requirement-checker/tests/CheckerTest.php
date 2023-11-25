@@ -59,7 +59,7 @@ class CheckerTest extends TestCase
         self::assertSame($expectedResult, $actualResult);
     }
 
-    public function provideRequirements(): iterable
+    public static function provideRequirements(): iterable
     {
         $phpVersion = PHP_VERSION;
         $remainingVerbosities = ['verbosity=verbose' => IO::VERBOSITY_VERBOSE, 'verbosity=normal' => IO::VERBOSITY_NORMAL, 'verbosity=quiet' => IO::VERBOSITY_QUIET];

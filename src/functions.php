@@ -14,37 +14,22 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use Closure;
 use Composer\InstalledVersions;
 use ErrorException;
-use Fidry\Console\IO;
-use Isolated\Symfony\Component\Finder\Finder as IsolatedFinder;
-use KevinGH\Box\Console\Php\PhpSettingsHandler;
 use Phar;
 use Symfony\Component\Console\Helper\Helper;
-use Symfony\Component\Console\Logger\ConsoleLogger;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Finder\Finder as SymfonyFinder;
 use Webmozart\Assert\Assert;
 use function bin2hex;
 use function class_alias;
 use function class_exists;
-use function constant;
-use function define;
-use function defined;
 use function floor;
-use function function_exists;
 use function is_float;
 use function is_int;
 use function log;
 use function number_format;
-use function posix_getrlimit;
-use function posix_setrlimit;
 use function random_bytes;
 use function sprintf;
 use function str_replace;
-use const POSIX_RLIMIT_INFINITY;
-use const POSIX_RLIMIT_NOFILE;
 
 /**
  * @private
@@ -175,27 +160,9 @@ function format_time(float $secs): string
 function register_aliases(): void
 {
     // Exposes the finder used by PHP-Scoper PHAR to allow its usage in the configuration file.
-    if (false === class_exists(IsolatedFinder::class)) {
-        class_alias(SymfonyFinder::class, IsolatedFinder::class);
+    if (false === class_exists(\Isolated\Symfony\Component\Finder\Finder::class)) {
+        class_alias(\Symfony\Component\Finder\Finder::class, \Isolated\Symfony\Component\Finder\Finder::class);
     }
-}
-
-/**
- * @private
- */
-function disable_parallel_processing(): void
-{
-    if (false === defined(_NO_PARALLEL_PROCESSING)) {
-        define(_NO_PARALLEL_PROCESSING, true);
-    }
-}
-
-/**
- * @private
- */
-function is_parallel_processing_enabled(): bool
-{
-    return false === defined(_NO_PARALLEL_PROCESSING) || false === constant(_NO_PARALLEL_PROCESSING);
 }
 
 /**
@@ -206,26 +173,6 @@ function is_parallel_processing_enabled(): bool
 function unique_id(string $prefix): string
 {
     return $prefix.bin2hex(random_bytes(6));
-}
-
-/**
- * @private
- */
-function check_php_settings(IO $io): void
-{
-    (new PhpSettingsHandler(
-        new ConsoleLogger(
-            $io->getOutput(),
-        ),
-    ))->check();
-}
-
-/**
- * @private
- */
-function noop(): Closure
-{
-    return static function (): void {};
 }
 
 /**
@@ -242,64 +189,4 @@ function register_error_handler(): void
             }
         },
     );
-}
-
-/**
- * Bumps the maximum number of open file descriptor if necessary.
- *
- * @return Closure callable to call to restore the original maximum number of open files descriptors
- */
-function bump_open_file_descriptor_limit(int $count, IO $io): Closure
-{
-    $count += 128;  // Add a little extra for good measure
-
-    if (false === function_exists('posix_getrlimit') || false === function_exists('posix_setrlimit')) {
-        $io->writeln(
-            '<info>[debug] Could not check the maximum number of open file descriptors: the functions "posix_getrlimit()" and '
-            .'"posix_setrlimit" could not be found.</info>',
-            OutputInterface::VERBOSITY_DEBUG,
-        );
-
-        return static function (): void {};
-    }
-
-    $softLimit = posix_getrlimit()['soft openfiles'];
-    $hardLimit = posix_getrlimit()['hard openfiles'];
-
-    if ($softLimit >= $count) {
-        return static function (): void {};
-    }
-
-    $io->writeln(
-        sprintf(
-            '<info>[debug] Increased the maximum number of open file descriptors from ("%s", "%s") to ("%s", "%s")'
-            .'</info>',
-            $softLimit,
-            $hardLimit,
-            $count,
-            'unlimited',
-        ),
-        OutputInterface::VERBOSITY_DEBUG,
-    );
-
-    posix_setrlimit(
-        POSIX_RLIMIT_NOFILE,
-        $count,
-        'unlimited' === $hardLimit ? POSIX_RLIMIT_INFINITY : $hardLimit,
-    );
-
-    return static function () use ($io, $softLimit, $hardLimit): void {
-        if (function_exists('posix_setrlimit') && isset($softLimit, $hardLimit)) {
-            posix_setrlimit(
-                POSIX_RLIMIT_NOFILE,
-                $softLimit,
-                'unlimited' === $hardLimit ? POSIX_RLIMIT_INFINITY : $hardLimit,
-            );
-
-            $io->writeln(
-                '<info>[debug] Restored the maximum number of open file descriptors</info>',
-                OutputInterface::VERBOSITY_DEBUG,
-            );
-        }
-    };
 }

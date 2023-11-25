@@ -14,16 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
-use PHPUnit\Framework\TestCase;
-use function serialize;
-use function unserialize;
-
 /**
  * @covers \KevinGH\Box\Compactor\Json
  *
  * @internal
  */
-class JsonTest extends TestCase
+class JsonTest extends CompactorTestCase
 {
     private Compactor $compactor;
 
@@ -72,12 +68,9 @@ class JsonTest extends TestCase
         self::assertSame($expected, $actual);
     }
 
-    public function test_it_is_serializable(): void
+    public static function compactorProvider(): iterable
     {
-        self::assertEquals(
-            $this->compactor,
-            unserialize(serialize($this->compactor)),
-        );
+        yield [new Json()];
     }
 
     public static function filesProvider(): iterable

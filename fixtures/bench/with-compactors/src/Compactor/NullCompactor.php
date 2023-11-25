@@ -12,9 +12,12 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Compactor;
+namespace BenchTest\Compactor;
 
-class DummyCompactor implements Compactor
+/**
+ * @private
+ */
+final class NullCompactor implements Compactor
 {
     public function compact(string $file, string $contents): string
     {

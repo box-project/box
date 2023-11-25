@@ -110,7 +110,7 @@ class BoxTest extends FileSystemTestCase
     public function test_it_cannot_end_the_buffering_if_it_is_already_ended(): void
     {
         try {
-            $this->box->endBuffering(noop());
+            $this->box->endBuffering(Noop::create());
 
             self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -121,10 +121,10 @@ class BoxTest extends FileSystemTestCase
         }
 
         $this->box->startBuffering();
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         try {
-            $this->box->endBuffering(noop());
+            $this->box->endBuffering(Noop::create());
 
             self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -144,7 +144,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file);
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
@@ -159,7 +159,7 @@ class BoxTest extends FileSystemTestCase
     public function test_it_ensures_a_phar_cannot_be_empty(): void
     {
         $this->box->startBuffering();
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         $expectedPharPath = 'phar://test.phar/.box_empty';
 
@@ -173,7 +173,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file0, $file0Contents);
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         $expectedContents = $file0Contents;
         $expectedPharPath = 'phar://test.phar/'.$file0;
@@ -189,7 +189,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file1, $file1Contents);
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         $expectedContents = $file1Contents;
         $expectedPharPath = 'phar://test.phar/'.$file1;
@@ -227,7 +227,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file, $contents);
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
@@ -248,7 +248,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file, $contents);
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
@@ -267,7 +267,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file, $contents, true);
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
@@ -288,7 +288,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file, $contents, true);
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
@@ -310,7 +310,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file);
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$relativePath;
@@ -341,7 +341,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file);
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$localPath;
@@ -364,7 +364,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file, null, true);
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$file;
@@ -395,7 +395,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file, null, true);
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         $expectedContents = $contents;
         $expectedPharPath = 'phar://test.phar/'.$localPath;
@@ -440,7 +440,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file);
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         $expectedContents = $secondCompactorOutput;
         $expectedPharPath = 'phar://test.phar/'.$file;
@@ -479,7 +479,7 @@ class BoxTest extends FileSystemTestCase
 
             $this->box->startBuffering();
             $local = $this->box->addFile($file);
-            $this->box->endBuffering(noop());
+            $this->box->endBuffering(Noop::create());
 
             self::assertSame($expectedLocal, $local);
 
@@ -525,7 +525,7 @@ class BoxTest extends FileSystemTestCase
         try {
             $this->box->startBuffering();
             $this->box->addFile($file);
-            $this->box->endBuffering(noop());
+            $this->box->endBuffering(Noop::create());
 
             self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
@@ -568,7 +568,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFile($file, $contents);
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         $expectedContents = $secondCompactorOutput;
         $expectedPharPath = 'phar://test.phar/'.$file;
@@ -596,7 +596,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFiles(['foo', 'bar'], false);
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         foreach ($files as $file => $contents) {
             $expectedContents = $contents;
@@ -643,7 +643,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFiles([$f1, $f2], false);
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         foreach ($files as $file => $contents) {
             $expectedContents = $contents;
@@ -685,7 +685,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFiles(['foo', 'bar'], false);
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         foreach ($files as $file => $item) {
             $expectedContents = $item['contents'];
@@ -781,7 +781,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFiles(array_keys($files), true);
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         foreach ($files as $file => $contents) {
             self::assertFileExists('phar://test.phar/'.$file);
@@ -814,7 +814,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFiles(array_keys($files), true);
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         foreach ($files as $file => $contents) {
             self::assertFileExists('phar://test.phar/'.$file);
@@ -850,7 +850,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFiles(array_keys($files), true);
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         foreach ($files as $file => $contents) {
             self::assertFileExists('phar://test.phar/lib/'.$file);
@@ -919,7 +919,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFiles(['foo', 'bar'], true);
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         foreach ($files as $file => $contents) {
             $expectedContents = $contents;
@@ -961,7 +961,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFiles(['foo', 'bar'], true);
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         foreach ($files as $file => $item) {
             $expectedContents = $item['contents'];
@@ -998,7 +998,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFiles(array_keys($files), false);
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         $expected = [
             'foo' => 'foo_value',
@@ -1041,7 +1041,7 @@ class BoxTest extends FileSystemTestCase
 
         $this->box->startBuffering();
         $this->box->addFiles(array_keys($files), true);
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         foreach ($files as $expectedLocal) {
             self::assertFileExists(
@@ -1365,7 +1365,7 @@ class BoxTest extends FileSystemTestCase
                 PHP,
         );
 
-        $this->box->endBuffering(noop());
+        $this->box->endBuffering(Noop::create());
 
         self::assertCount(2, $this->box);
 

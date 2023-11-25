@@ -12,15 +12,15 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box;
-
-// Public constants pointing to environment variable names
-const BOX_MEMORY_LIMIT = 'BOX_MEMORY_LIMIT';
-const BOX_ALLOW_XDEBUG = 'BOX_ALLOW_XDEBUG';
+namespace BenchTest\Compactor;
 
 /**
- * @internal
- *
  * @private
  */
-const _NO_PARALLEL_PROCESSING = '_BOX_NO_PARALLEL_PROCESSING';
+final class NullCompactor implements Compactor
+{
+    public function compact(string $file, string $contents): string
+    {
+        return $contents;
+    }
+}

@@ -50,7 +50,9 @@ final class MakefileTest extends BaseMakefileTestCase
             [33mtest:[0m		  	  Runs all the tests
             [33mphpunit_coverage_html:[0m       Runs PHPUnit with code coverage with HTML report
             [33mphpunit_coverage_infection:[0m  Runs PHPUnit tests with test coverage
+            [33mphpbench:[0m 		  Runs PHPBench
             [33mblackfire:[0m		  Profiles the compile step
+            [33mwebsite_check:[0m		  Runs various checks for the website
             [33mwebsite_build:[0m		  Builds the website
             [33mwebsite_serve:[0m		  Serves the website locally
 

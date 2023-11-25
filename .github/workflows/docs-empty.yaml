@@ -1,0 +1,26 @@
+# Fallback workflow to be able to have the branch protection enabled at all times.
+name: Null Docs
+
+on:
+    # To be aware it need to be the counter-part of docs.yaml.
+    pull_request:
+        paths-ignore:
+            - doc/**
+            - mkdocs.yaml
+            - .github/workflows/docs.yaml
+
+# See https://stackoverflow.com/a/72408109
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    # This is a "trick", a meta task which does not change, and we can use in
+    # the protected branch rules as opposed to the tests one above which
+    # may change regularly.
+    validate-tests:
+        name: Docs status
+        runs-on: ubuntu-latest
+        steps:
+            - name: Successful run
+              run: exit 0

@@ -18,8 +18,8 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Fidry\FileSystem\FS;
 use InvalidArgumentException;
-use KevinGH\Box\Compactor\DummyCompactor;
 use KevinGH\Box\Compactor\InvalidCompactor;
+use KevinGH\Box\Compactor\NullCompactor;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Json\JsonValidationException;
@@ -565,14 +565,14 @@ class ConfigurationTest extends ConfigurationTestCase
             'files' => [self::DEFAULT_FILE],
             'compactors' => [
                 Php::class,
-                DummyCompactor::class,
+                NullCompactor::class,
             ],
         ]);
 
         $compactors = $this->config->getCompactors()->toArray();
 
         self::assertInstanceOf(Php::class, $compactors[0]);
-        self::assertInstanceOf(DummyCompactor::class, $compactors[1]);
+        self::assertInstanceOf(NullCompactor::class, $compactors[1]);
         self::assertCount(2, $compactors);
 
         self::assertSame([], $this->config->getRecommendations());
