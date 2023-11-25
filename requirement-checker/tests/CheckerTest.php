@@ -64,81 +64,89 @@ class CheckerTest extends TestCase
         $phpVersion = PHP_VERSION;
         $remainingVerbosities = ['verbosity=verbose' => IO::VERBOSITY_VERBOSE, 'verbosity=normal' => IO::VERBOSITY_NORMAL, 'verbosity=quiet' => IO::VERBOSITY_QUIET];
 
-        yield 'no requirement; verbosity=debug' => (static fn () => [
-            new RequirementCollection(),
-            IO::VERBOSITY_DEBUG,
-            true,
-            <<<EOF
+        yield 'no requirement; verbosity=debug' => (static function () use ($phpVersion) {
+            return [
+                new RequirementCollection(),
+                IO::VERBOSITY_DEBUG,
+                true,
+                <<<EOF
 
-                Box Requirements Checker
-                ========================
+                    Box Requirements Checker
+                    ========================
 
-                > Using PHP {$phpVersion}
-                > PHP is using the following php.ini file:
-                  /path/to/php.ini
+                    > Using PHP {$phpVersion}
+                    > PHP is using the following php.ini file:
+                      /path/to/php.ini
 
-                > No requirements found.
-
-
-                 [OK] Your system is ready to run the application.
+                    > No requirements found.
 
 
-
-                EOF
-        ])();
-
-        yield 'no requirement + no ini path; verbosity=debug' => (static fn () => [
-            new RequirementCollection(false),
-            IO::VERBOSITY_DEBUG,
-            true,
-            <<<EOF
-
-                Box Requirements Checker
-                ========================
-
-                > Using PHP {$phpVersion}
-                > PHP is not using any php.ini file.
-
-                > No requirements found.
-
-
-                 [OK] Your system is ready to run the application.
+                     [OK] Your system is ready to run the application.
 
 
 
-                EOF
-        ])();
+                    EOF
+            ];
+        })();
 
-        yield 'no requirement; verbosity=very verbose' => (static fn () => [
-            new RequirementCollection(),
-            IO::VERBOSITY_VERY_VERBOSE,
-            true,
-            <<<EOF
+        yield 'no requirement + no ini path; verbosity=debug' => (static function () use ($phpVersion) {
+            return [
+                new RequirementCollection(false),
+                IO::VERBOSITY_DEBUG,
+                true,
+                <<<EOF
 
-                Box Requirements Checker
-                ========================
+                    Box Requirements Checker
+                    ========================
 
-                > Using PHP {$phpVersion}
-                > PHP is using the following php.ini file:
-                  /path/to/php.ini
+                    > Using PHP {$phpVersion}
+                    > PHP is not using any php.ini file.
 
-                > No requirements found.
-
-
-                 [OK] Your system is ready to run the application.
+                    > No requirements found.
 
 
+                     [OK] Your system is ready to run the application.
 
-                EOF
-        ])();
+
+
+                    EOF
+            ];
+        })();
+
+        yield 'no requirement; verbosity=very verbose' => (static function () use ($phpVersion) {
+            return [
+                new RequirementCollection(),
+                IO::VERBOSITY_VERY_VERBOSE,
+                true,
+                <<<EOF
+
+                    Box Requirements Checker
+                    ========================
+
+                    > Using PHP {$phpVersion}
+                    > PHP is using the following php.ini file:
+                      /path/to/php.ini
+
+                    > No requirements found.
+
+
+                     [OK] Your system is ready to run the application.
+
+
+
+                    EOF
+            ];
+        })();
 
         foreach ($remainingVerbosities as $label => $verbosity) {
-            yield 'no requirements; '.$label => (static fn () => [
-                new RequirementCollection(),
-                $verbosity,
-                true,
-                '',
-            ])();
+            yield 'no requirements; '.$label => (static function () use ($verbosity) {
+                return [
+                    new RequirementCollection(),
+                    $verbosity,
+                    true,
+                    '',
+                ];
+            })();
         }
 
         yield 'requirements; check passes; verbosity=debug' => (static function () use ($phpVersion) {
