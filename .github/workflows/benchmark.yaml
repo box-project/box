@@ -47,14 +47,13 @@ jobs:
             -   name: Run PHPBench
                 run: make phpbench_main
 
-            -   name: Debug
-                run: tree dist
-
             -   uses: actions/upload-artifact@v3
                 name: Upload the Benchmark results
                 with:
                     name: bench-branch-main-result
-                    path: dist/.phpbench/
+                    path: |
+                        dist/.phpbench/
+                        dist/bench/
 
     pr-bench-test:
         runs-on: ubuntu-latest
