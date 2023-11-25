@@ -33,14 +33,14 @@ final class DocblockAnnotationParser
     /**
      * @var array<string, mixed>
      */
-    private array $ignoredAnnotationsAsKeys;
+    private readonly array $ignoredAnnotationsAsKeys;
 
     /**
      * @param string[] $ignoredAnnotations
      */
     public function __construct(
-        private DocBlockFactoryInterface $factory,
-        private Formatter $tagsFormatter,
+        private readonly DocBlockFactoryInterface $factory,
+        private readonly Formatter $tagsFormatter,
         array $ignoredAnnotations,
     ) {
         $this->ignoredAnnotationsAsKeys = array_flip($ignoredAnnotations);

@@ -19,12 +19,12 @@ use function array_map;
 /**
  * @private
  */
-final class DecodedComposerLock
+final readonly class DecodedComposerLock
 {
     /**
      * @param array $composerLockDecodedContents Decoded JSON contents of the `composer.lock` file
      */
-    public function __construct(private readonly array $composerLockDecodedContents)
+    public function __construct(private array $composerLockDecodedContents)
     {
     }
 

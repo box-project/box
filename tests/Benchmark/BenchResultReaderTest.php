@@ -220,9 +220,9 @@ final class BenchResultReaderTest extends TestCase
         yield [
             $xml,
             [
-                'no compactors' => 2638316.8,
-                'with compactors; no parallel processing' => 2612822.4,
-                'with compactors; parallel processing' => 2967538.1,
+                'no compactors' => 2_638_316.8,
+                'with compactors; no parallel processing' => 2_612_822.4,
+                'with compactors; parallel processing' => 2_967_538.1,
             ],
         ];
     }

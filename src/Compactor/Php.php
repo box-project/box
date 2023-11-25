@@ -63,7 +63,7 @@ final class Php extends FileExtensionCompactor
     }
 
     public function __construct(
-        private ?DocblockAnnotationParser $annotationParser,
+        private readonly ?DocblockAnnotationParser $annotationParser,
         array $extensions = ['php'],
     ) {
         parent::__construct($extensions);

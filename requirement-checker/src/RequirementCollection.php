@@ -45,9 +45,7 @@ final class RequirementCollection implements IteratorAggregate, Countable
      */
     public function __construct($phpIniPath = null)
     {
-        $this->phpIniPath = null === $phpIniPath
-            ? get_cfg_var('cfg_file_path')
-            : $phpIniPath;
+        $this->phpIniPath = $phpIniPath ?? get_cfg_var('cfg_file_path');
     }
 
     /**

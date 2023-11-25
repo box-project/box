@@ -25,7 +25,7 @@ use function count;
  */
 final class SerializableScoper implements Scoper
 {
-    private PhpScoperConfiguration $scoperConfig;
+    private readonly PhpScoperConfiguration $scoperConfig;
     private PhpScoperContainer $scoperContainer;
     private PhpScoperScoper $scoper;
     private SymbolsRegistry $symbolsRegistry;

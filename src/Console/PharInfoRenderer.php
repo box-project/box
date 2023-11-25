@@ -36,7 +36,6 @@ use function count;
 use function implode;
 use function is_array;
 use function KevinGH\Box\format_size;
-use function KevinGH\Box\format_size as format_size1;
 use function key;
 use function preg_match;
 use function round;
@@ -307,7 +306,7 @@ final class PharInfoRenderer
                         ? $splFileInfo->getFilename()
                         : $splFileInfo->getRelativePathname(),
                     $compressionLine,
-                    format_size1($compressionSize),
+                    format_size($compressionSize),
                 ),
                 $depth,
                 $indent,
