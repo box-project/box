@@ -26,6 +26,7 @@ jobs:
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: '8.2'
+                    extensions: xml
                     ini-values: phar.readonly=0, display_errors=On, error_reporting=-1
                     tools: composer
                     coverage: none
@@ -50,8 +51,8 @@ jobs:
             -   uses: actions/upload-artifact@v3
                 name: Upload the Benchmark results
                 with:
-                    name: bench-main-result
-                    path: dist/bench-branch-main-result.xml
+                    name: bench-branch-main-result
+                    path: dist/
 
     pr-bench-test:
         runs-on: ubuntu-latest
@@ -66,6 +67,7 @@ jobs:
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: '8.2'
+                    extensions: xml
                     ini-values: phar.readonly=0, display_errors=On, error_reporting=-1
                     tools: composer
                     coverage: none
@@ -101,6 +103,7 @@ jobs:
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: '8.2'
+                    extensions: xml
                     ini-values: phar.readonly=0, display_errors=On, error_reporting=-1
                     tools: composer
                     coverage: none
@@ -123,6 +126,9 @@ jobs:
                 uses: actions/download-artifact@v3
                 with:
                     name: bench-branch-main-result
+
+            -   name: Check history
+                run: vendor-bin/phpbench/vendor/bin/phpbench log
 
             -   name: Run PHPBench for PR branch
                 run: make phpbench_pr

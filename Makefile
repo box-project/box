@@ -282,7 +282,7 @@ phpbench_pr: $(PHPBENCH_BIN) $(PHPBENCH_WITH_COMPACTORS_VENDOR_DIR) $(PHPBENCH_W
 
 .PHONY: phpbench_main
 phpbench_main: $(PHPBENCH_BIN) $(PHPBENCH_WITH_COMPACTORS_VENDOR_DIR) $(PHPBENCH_WITHOUT_COMPACTORS_VENDOR_DIR)
-	$(PHPBENCH) run tests/Benchmark --report=benchmark --tag=main
+	$(PHPBENCH) run tests/Benchmark --report=benchmark --tag=main -vvv
 
 
 #---------------------------------------------------------------------------
