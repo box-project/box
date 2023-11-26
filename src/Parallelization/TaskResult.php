@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Parallelization;
 
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
+use function array_merge;
 
 /**
  * @private
@@ -35,7 +36,7 @@ final readonly class TaskResult
         }
 
         return new self(
-            $filesWithContents,
+            array_merge(...$filesWithContents),
             SymbolsRegistry::createFromRegistries($symbolsRegistries),
         );
     }

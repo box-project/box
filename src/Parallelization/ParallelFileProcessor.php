@@ -53,8 +53,6 @@ final class ParallelFileProcessor
             $compactors,
         );
 
-        $workerPool->shutdown();
-
         $compactors->registerSymbolsRegistry($result->symbolsRegistry);
 
         return $result->filesWithContents;
