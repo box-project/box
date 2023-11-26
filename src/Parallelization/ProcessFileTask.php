@@ -21,7 +21,6 @@ use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\MapFile;
-use Symfony\Component\Process\Process;
 use function array_map;
 use function KevinGH\Box\register_aliases;
 use function KevinGH\Box\register_error_handler;
@@ -39,7 +38,7 @@ final readonly class ProcessFileTask implements Task
         private string $cwd,
         private MapFile $mapFile,
         private Compactors $compactors,
-    ){
+    ) {
     }
 
     public function run(Channel $channel, Cancellation $cancellation): TaskResult

@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Parallelization;
 
 use Amp\Parallel\Worker\Execution;
-use Amp\Parallel\Worker\WorkerPool;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\MapFile;
