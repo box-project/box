@@ -429,9 +429,9 @@ final class Configuration
         private readonly bool $dumpAutoload,
         private readonly bool $excludeComposerFiles,
         private readonly bool $excludeDevFiles,
-        private readonly Compactors|array $compactors,
+        private readonly array|Compactors $compactors,
         private readonly CompressionAlgorithm $compressionAlgorithm,
-        private readonly int|string|null $fileMode,
+        private readonly null|int|string $fileMode,
         ?string $mainScriptPath,
         ?string $mainScriptContents,
         private readonly MapFile $fileMapper,
@@ -1224,7 +1224,7 @@ final class Configuration
         array $filesToAppend,
         array $excludedPaths,
     ): array {
-        $toString = static fn (string|SplFileInfo $file): string => (string) $file;
+        $toString = static fn (SplFileInfo|string $file): string => (string) $file;
 
         if (null !== $decodedJsonContents && array_key_exists('vendor-dir', $decodedJsonContents)) {
             $vendorDir = self::normalizePath($decodedJsonContents['vendor-dir'], $basePath);

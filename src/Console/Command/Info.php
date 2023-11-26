@@ -174,7 +174,7 @@ final class Info implements Command
     private static function showPharInfo(
         PharInfo $pharInfo,
         bool $content,
-        int|false $maxDepth,
+        false|int $maxDepth,
         bool $indent,
         IO $io,
     ): int {
