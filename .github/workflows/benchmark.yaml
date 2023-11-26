@@ -51,7 +51,7 @@ jobs:
                 name: Upload the Benchmark results
                 with:
                     name: bench-branch-main-result
-                    path: dist/bench/
+                    path: dist/
 
     pr-bench-test:
         runs-on: ubuntu-latest
