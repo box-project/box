@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Amp;
+namespace KevinGH\Box\Parallelization;
 
 use Amp\MultiReasonException;
 use KevinGH\Box\NotInstantiable;
@@ -20,7 +20,7 @@ use Throwable;
 use function array_map;
 use function array_unique;
 
-final class FailureCollector
+final class AmpFailureCollector
 {
     use NotInstantiable;
 

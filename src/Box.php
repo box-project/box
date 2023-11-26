@@ -23,6 +23,8 @@ use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
+use KevinGH\Box\Parallelization\ParallelFileProcessor;
+use KevinGH\Box\Parallelization\ParallelizationDecider;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\SigningAlgorithm;
 use KevinGH\Box\PhpScoper\NullScoper;
@@ -33,9 +35,6 @@ use RuntimeException;
 use Seld\PharUtils\Timestamps;
 use SplFileInfo;
 use Webmozart\Assert\Assert;
-use function Amp\ParallelFunctions\parallelMap;
-use function Amp\Promise\wait;
-use function array_filter;
 use function array_map;
 use function array_unshift;
 use function chdir;
@@ -453,66 +452,50 @@ final class Box implements Countable
      */
     private function processContents(array $files): array
     {
-        $mapFile = $this->mapFile;
-        $compactors = $this->compactors;
         $cwd = getcwd();
-        $enableParallelization = $this->enableParallelization;
 
-        $processFile = static function (string $file) use ($cwd, $mapFile, $compactors, $enableParallelization): array {
-            chdir($cwd);
+        $shouldProcessFilesInParallel = $this->enableParallelization && ParallelizationDecider::shouldProcessFilesInParallel(
+            $this->scoper,
+            count($files),
+        );
 
-            // Keep the fully qualified call here since this function may be executed without the right autoloading
-            // mechanism
-            register_aliases();
-            if ($enableParallelization) {
-                register_error_handler();
-            }
+        $processFiles = $shouldProcessFilesInParallel
+            ? ParallelFileProcessor::processFilesInParallel(...)
+            : self::processFilesSynchronously(...);
 
+        return $processFiles(
+            $files,
+            $cwd,
+            $this->mapFile,
+            $this->compactors,
+        );
+    }
+
+    /**
+     * @param string[] $files
+     *
+     * @return list<array{string, string}>
+     */
+    private static function processFilesSynchronously(
+        array $files,
+        string $_cwd,
+        MapFile $mapFile,
+        Compactors $compactors,
+    ): array {
+        $processFile = static function (string $file) use ($mapFile, $compactors): array {
             $contents = FS::getFileContents($file);
 
             $local = $mapFile($file);
 
             $processedContents = $compactors->compact($local, $contents);
 
-            return [$local, $processedContents, $compactors->getScoperSymbolsRegistry()];
+            return [
+                $local,
+                $processedContents,
+            ];
         };
 
-        if ($this->scoper instanceof NullScoper || !$enableParallelization) {
-            return array_map($processFile, $files);
-        }
-
-        // In the case of parallel processing, an issue is caused due to the statefulness nature of the PhpScoper
-        // symbols registry.
-        //
-        // Indeed, the PhpScoper symbols registry stores the records of exposed/excluded classes and functions. If nothing is done,
-        // then the symbols registry retrieved in the end will here will be "blank" since the updated symbols registries are the ones
-        // from the workers used for the parallel processing.
-        //
-        // In order to avoid that, the symbols registries will be returned as a result as well in order to be able to merge
-        // all the symbols registries into one.
-        //
-        // This process is allowed thanks to the nature of the state of the symbols registries: having redundant classes or
-        // functions registered can easily be deal with so merging all those different states is actually
-        // straightforward.
-        $tuples = wait(parallelMap($files, $processFile));
-
-        if ([] === $tuples) {
-            return [];
-        }
-
-        $filesWithContents = [];
-        $symbolRegistries = [];
-
-        foreach ($tuples as [$local, $processedContents, $symbolRegistry]) {
-            $filesWithContents[] = [$local, $processedContents];
-            $symbolRegistries[] = $symbolRegistry;
-        }
-
-        $this->compactors->registerSymbolsRegistry(
-            SymbolsRegistry::createFromRegistries(array_filter($symbolRegistries)),
-        );
-
-        return $filesWithContents;
+        return array_map($processFile, $files);
     }
 
     public function count(): int

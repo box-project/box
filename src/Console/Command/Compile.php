@@ -26,7 +26,6 @@ use Fidry\Console\IO;
 use Fidry\FileSystem\FileSystem;
 use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-use KevinGH\Box\Amp\FailureCollector;
 use KevinGH\Box\Box;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Composer\CompilerPsrLogger;
@@ -41,6 +40,7 @@ use KevinGH\Box\Console\OpenFileDescriptorLimiter;
 use KevinGH\Box\Console\PhpSettingsChecker;
 use KevinGH\Box\Constants;
 use KevinGH\Box\MapFile;
+use KevinGH\Box\Parallelization\AmpFailureCollector;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\SigningAlgorithm;
 use KevinGH\Box\RequirementChecker\DecodedComposerJson;
@@ -508,7 +508,7 @@ final class Compile implements CommandAware
         $io->error([
             'An Amp\Parallel error occurred. To diagnostic if it is an Amp error related, you may try again with "--no-parallel".',
             'Reason(s) of the failure:',
-            ...FailureCollector::collectReasons($ampFailure),
+            ...AmpFailureCollector::collectReasons($ampFailure),
         ]);
 
         throw $ampFailure;
