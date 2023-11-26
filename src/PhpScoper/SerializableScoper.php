@@ -25,7 +25,6 @@ use function count;
  */
 final class SerializableScoper implements Scoper
 {
-    private readonly PhpScoperConfiguration $scoperConfig;
     private PhpScoperContainer $scoperContainer;
     private PhpScoperScoper $scoper;
     private SymbolsRegistry $symbolsRegistry;
@@ -36,12 +35,9 @@ final class SerializableScoper implements Scoper
     public array $excludedFilePaths;
 
     public function __construct(
-        PhpScoperConfiguration $scoperConfig,
+        private readonly PhpScoperConfiguration $scoperConfig,
         string ...$excludedFilePaths,
     ) {
-        $this->scoperConfig = $scoperConfig->withPatcher(
-            PatcherFactory::createSerializablePatchers($scoperConfig->getPatcher())
-        );
         $this->excludedFilePaths = $excludedFilePaths;
         $this->symbolsRegistry = new SymbolsRegistry();
     }
@@ -86,16 +82,6 @@ final class SerializableScoper implements Scoper
         return $this->scoper;
     }
 
-    public function __wakeup(): void
-    {
-        // We need to make sure that a fresh Scoper & PHP-Parser Parser/Lexer
-        // is used within a sub-process.
-        // Otherwise, there is a risk of data corruption or that a compatibility
-        // layer of some sorts (such as the tokens for PHP-Paser) is not
-        // triggered in the sub-process resulting in obscure errors
-        unset($this->scoper, $this->scoperContainer);
-    }
-
     private function createScoper(): PhpScoperScoper
     {
         $scoper = $this->scoperContainer
@@ -118,5 +104,26 @@ final class SerializableScoper implements Scoper
     public function getExcludedFilePaths(): array
     {
         return $this->excludedFilePaths;
+    }
+
+    public function __serialize(): array
+    {
+        return [
+            $this->scoperConfig->getPath(),
+            $this->scoperConfig->getPrefix(),
+            $this->excludedFilePaths,
+        ];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        [$configPath, $configPrefix, $excludedFilePaths] = $data;
+
+        $config = ConfigurationFactory::create($configPath)->withPrefix($configPrefix);
+
+        $this->__construct(
+            $config,
+            ...$excludedFilePaths,
+        );
     }
 }
