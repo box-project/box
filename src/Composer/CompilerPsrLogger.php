@@ -28,7 +28,7 @@ final class CompilerPsrLogger extends AbstractLogger
     ) {
     }
 
-    public function log($level, Stringable|string $message, array $context = []): void
+    public function log($level, string|Stringable $message, array $context = []): void
     {
         $verbosity = self::getVerbosity($level);
         $output = self::getOutput($context);

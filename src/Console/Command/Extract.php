@@ -98,7 +98,7 @@ final class Extract implements Command
 
             if ($canDelete) {
                 FS::remove($outputDir);
-                // Continue
+            // Continue
             } else {
                 // Do nothing
                 return ExitCode::FAILURE;

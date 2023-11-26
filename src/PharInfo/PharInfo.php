@@ -31,7 +31,7 @@ final class PharInfo
 {
     private static array $ALGORITHMS;
 
-    private PharData|Phar $phar;
+    private Phar|PharData $phar;
 
     private ?array $compressionCount = null;
     private ?string $hash = null;

@@ -269,7 +269,7 @@ final class PharInfoRenderer
     public static function renderContent(
         OutputInterface $output,
         PharInfo $pharInfo,
-        int|false $maxDepth,
+        false|int $maxDepth,
         bool $indent,
     ): void {
         $depth = 0;
