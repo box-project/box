@@ -49,6 +49,7 @@ use KevinGH\Box\RequirementChecker\RequirementsDumper;
 use KevinGH\Box\StubGenerator;
 use RuntimeException;
 use stdClass;
+use Symfony\Component\Console\Exception\RuntimeException as ConsoleRuntimeException;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -501,17 +502,19 @@ final class Compile implements CommandAware
 
             return;
         } catch (MultiReasonException $ampFailure) {
-            // Continue
+            throw new ConsoleRuntimeException(
+                sprintf(
+                    'An Amp\Parallel error occurred. To diagnostic if it is an Amp error related, you may try again with "--no-parallel".'
+                    .'Reason(s) of the failure:%s%s',
+                    PHP_EOL,
+                    implode(
+                        PHP_EOL,
+                        AmpFailureCollector::collectReasons($ampFailure),
+                    ),
+                ),
+                previous: $ampFailure,
+            );
         }
-
-        // This exception is handled a different way to give me meaningful feedback to the user
-        $io->error([
-            'An Amp\Parallel error occurred. To diagnostic if it is an Amp error related, you may try again with "--no-parallel".',
-            'Reason(s) of the failure:',
-            ...AmpFailureCollector::collectReasons($ampFailure),
-        ]);
-
-        throw $ampFailure;
     }
 
     private static function registerMainScript(Configuration $config, Box $box, CompilerLogger $logger): ?string
