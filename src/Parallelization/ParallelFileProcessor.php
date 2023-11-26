@@ -20,6 +20,8 @@ use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\MapFile;
 use Symfony\Component\Process\Process;
+use function Amp\ParallelFunctions\parallelMap;
+use function Amp\Promise\wait;
 use function KevinGH\Box\register_aliases;
 use function KevinGH\Box\register_error_handler;
 
