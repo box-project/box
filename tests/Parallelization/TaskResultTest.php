@@ -1,14 +1,26 @@
 <?php
 
-namespace KevinGH\RequirementChecker\Parallelization;
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+namespace KevinGH\Box\Parallelization;
 
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-use KevinGH\Box\Parallelization\TaskResult;
 use PhpParser\Node\Name\FullyQualified;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \KevinGH\Box\Parallelization\TaskResult
+ * @internal
  */
 final class TaskResultTest extends TestCase
 {
@@ -18,8 +30,7 @@ final class TaskResultTest extends TestCase
     public function test_it_can_aggregate_results(
         array $results,
         TaskResult $expected,
-    ): void
-    {
+    ): void {
         $actual = TaskResult::aggregate($results);
 
         self::assertEquals($expected, $actual);
