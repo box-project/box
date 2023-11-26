@@ -478,6 +478,7 @@ final class Box implements Countable
      */
     private static function processFilesSynchronously(
         array $files,
+        string $_cwd,
         MapFile $mapFile,
         Compactors $compactors,
     ): array {
