@@ -458,6 +458,7 @@ final class Box implements Countable
             $this->scoper,
             count($files),
         );
+        dd($this->scoper);
 
         $processFiles = $shouldProcessFilesInParallel
             ? ParallelFileProcessor::processFilesInParallel(...)
