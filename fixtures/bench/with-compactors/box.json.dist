@@ -8,5 +8,11 @@
     "force-autodiscovery": true,
 
     "dump-autoload": false,
-    "datetime": "release-date"
+    "datetime": "release-date",
+
+    "compactors": [
+        "KevinGH\\Box\\Compactor\\Php",
+        "KevinGH\\Box\\Compactor\\PhpScoper",
+        "KevinGH\\Box\\Compactor\\Json"
+    ]
 }
