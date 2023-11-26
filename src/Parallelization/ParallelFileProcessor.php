@@ -15,13 +15,13 @@ declare(strict_types=1);
 namespace KevinGH\Box\Parallelization;
 
 use Amp\Parallel\Worker\Execution;
-use Humbug\PhpScoper\Symbol\SymbolsRegistry;
+use Amp\Parallel\Worker\TaskFailureThrowable;
+use Amp\Parallel\Worker\WorkerPool;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\MapFile;
 use function Amp\Future\await;
 use function Amp\Parallel\Worker\workerPool;
 use function array_chunk;
-use function array_merge;
 
 /**
  * @private
@@ -33,7 +33,7 @@ final class ParallelFileProcessor
     /**
      * @param string[] $filePaths
      *
-     * @throws MultiReasonException
+     * @throws TaskFailureThrowable
      *
      * @return list<array{string, string}>
      */
@@ -45,6 +45,33 @@ final class ParallelFileProcessor
     ): array {
         $workerPool = workerPool();
 
+        $result = self::queueAndWaitForTasks(
+            $filePaths,
+            $workerPool,
+            $cwd,
+            $mapFile,
+            $compactors,
+        );
+
+        $workerPool->shutdown();
+
+        $compactors->registerSymbolsRegistry($result->symbolsRegistry);
+
+        return $result->filesWithContents;
+    }
+
+    /**
+     * @param string[] $filePaths
+     *
+     * @throws TaskFailureThrowable
+     */
+    public static function queueAndWaitForTasks(
+        array $filePaths,
+        WorkerPool $workerPool,
+        string $cwd,
+        MapFile $mapFile,
+        Compactors $compactors,
+    ): TaskResult {
         $executions = [];
 
         foreach (array_chunk($filePaths, self::FILE_CHUNK_SIZE) as $filePathsChunk) {
@@ -65,18 +92,6 @@ final class ParallelFileProcessor
             ),
         );
 
-        $filesWithContents = [];
-        $symbolsRegistries = [];
-
-        foreach ($results as $result) {
-            $filesWithContents[] = $result->filesWithContents;
-            $symbolsRegistries[] = $result->symbolsRegistry;
-        }
-
-        $compactors->registerSymbolsRegistry(
-            SymbolsRegistry::createFromRegistries($symbolsRegistries),
-        );
-
-        return array_merge(...$filesWithContents);
+        return TaskResult::aggregate($results);
     }
 }

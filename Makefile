@@ -487,7 +487,8 @@ $(REQUIREMENT_CHECKER_EXTRACT):
 
 $(SCOPED_BOX_BIN): $(SCOPED_BOX_DEPS)
 	@echo "$(YELLOW_COLOR)Compile Box.$(NO_COLOR)"
-	$(BOX) compile --ansi --no-parallel
+	@# Use parallelization
+	$(BOX) compile --ansi
 
 	rm $(TMP_SCOPED_BOX_BIN) || true
 	mv -v bin/box.phar $(TMP_SCOPED_BOX_BIN)

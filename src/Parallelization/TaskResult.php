@@ -22,6 +22,25 @@ use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 final readonly class TaskResult
 {
     /**
+     * @param self[] $results
+     */
+    public static function aggregate(array $results): self
+    {
+        $filesWithContents = [];
+        $symbolsRegistries = [];
+
+        foreach ($results as $result) {
+            $filesWithContents[] = $result->filesWithContents;
+            $symbolsRegistries[] = $result->symbolsRegistry;
+        }
+
+        return new self(
+            $filesWithContents,
+            SymbolsRegistry::createFromRegistries($symbolsRegistries),
+        );
+    }
+
+    /**
      * @param list<array{string, string}> $filesWithContents
      */
     public function __construct(

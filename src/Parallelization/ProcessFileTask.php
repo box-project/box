@@ -21,9 +21,11 @@ use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\MapFile;
+use RuntimeException;
 use function array_map;
 use function KevinGH\Box\register_aliases;
 use function KevinGH\Box\register_error_handler;
+use function sleep;
 
 /**
  * @private
@@ -48,6 +50,9 @@ final readonly class ProcessFileTask implements Task
         register_aliases();
         register_error_handler();
 
+        sleep(1);
+
+        throw new RuntimeException('something happened');
         $mapFile = $this->mapFile;
         $compactors = $this->compactors;
 
