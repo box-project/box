@@ -94,15 +94,15 @@ final readonly class CompileBench
 
     public static function parameterProvider(): iterable
     {
-//        yield 'no compactors' => [
-//            self::WITHOUT_COMPACTORS_DIR,
-//            false,
-//        ];
-//
-//        yield 'with compactors; no parallel processing' => [
-//            self::WITH_COMPACTORS_DIR,
-//            false,
-//        ];
+        yield 'no compactors' => [
+            self::WITHOUT_COMPACTORS_DIR,
+            false,
+        ];
+
+        yield 'with compactors; no parallel processing' => [
+            self::WITH_COMPACTORS_DIR,
+            false,
+        ];
 
         yield 'with compactors; parallel processing' => [
             self::WITH_COMPACTORS_DIR,
