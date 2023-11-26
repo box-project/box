@@ -18,6 +18,15 @@ updates:
                 patterns:
                     - "*"
 
+    -   package-ecosystem: "composer"
+        directory: "vendor-bin/*/"
+        schedule:
+            interval: "weekly"
+        groups:
+            dependencies:
+                patterns:
+                    - "*"
+
     -   package-ecosystem: "github-actions"
         directory: ".github/workflows"
         schedule:
