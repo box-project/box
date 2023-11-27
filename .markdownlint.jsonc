@@ -8,6 +8,5 @@
     "MD034": false,
     "MD041": false,
     "MD046": false,
-    // https://github.com/DavidAnson/markdownlint-cli2/issues/243
     "MD053": false,
 }
