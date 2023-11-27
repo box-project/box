@@ -27,7 +27,7 @@ use function implode;
 
 /**
  * @covers \KevinGH\Box\Console\Command\Info
- * @covers \KevinGH\Box\Console\Command\PharInfoRenderer
+ * @covers \KevinGH\Box\Console\PharInfoRenderer
  *
  * @internal
  */
