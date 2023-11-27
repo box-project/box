@@ -102,4 +102,3 @@ docker pull boxproject/box
 [docker-image]: https://hub.docker.com/r/boxproject/box
 [bamarni/composer-bin-plugin]: https://github.com/bamarni/composer-bin-plugin
 [phive]: https://github.com/phar-io/phive
-[github-release]: https://github.com/box-project/box/releases

@@ -24,7 +24,7 @@ doc.
 
 ## Project directory
 
-Symfony 5.1+ defines the "project dir" as the directory where the composer.json file is. Because box deletes it during PHAR compilation, you need to redefine it in your Kernel. It is usually located in `src/Kernel.php` and can be defined as follow: 
+Symfony 5.1+ defines the "project dir" as the directory where the composer.json file is. Because box deletes it during PHAR compilation, you need to redefine it in your Kernel. It is usually located in `src/Kernel.php` and can be defined as follow:
 
 ```php
 <?php

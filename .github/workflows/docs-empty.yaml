@@ -4,10 +4,10 @@ name: Null Docs
 on:
     # To be aware it need to be the counter-part of docs.yaml.
     pull_request:
-        paths-ignore:
-            - doc/**
-            - mkdocs.yaml
-            - .github/workflows/docs.yaml
+        paths:
+            - '!doc/**'
+            - '!mkdocs.yaml'
+            - '!.github/workflows/docs.yaml'
 
 # See https://stackoverflow.com/a/72408109
 concurrency:
