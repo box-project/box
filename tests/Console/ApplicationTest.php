@@ -131,6 +131,9 @@ class ApplicationTest extends TestCase
              composer
               composer:check-version  Checks if the Composer executable used is compatible with Box
               composer:vendor-dir     Shows the Composer vendor-dir configured
+             info
+              info:general            🔍  Displays information about the PHAR extension or file
+              info:signature          Displays the hash of the signature
 
             EOF;
 
