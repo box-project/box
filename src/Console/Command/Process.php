@@ -26,6 +26,7 @@ use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\PhpSettingsChecker;
+use KevinGH\Box\Constants;
 use stdClass;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -41,7 +42,6 @@ use function getcwd;
 use function implode;
 use function putenv;
 use function sprintf;
-use const KevinGH\Box\BOX_ALLOW_XDEBUG;
 
 // TODO: replace the PHP-Scoper compactor in order to warn the user about scoping errors
 final class Process implements Command
@@ -86,7 +86,7 @@ final class Process implements Command
     public function execute(IO $io): int
     {
         if ($io->getTypedOption(self::NO_RESTART_OPTION)->asBoolean()) {
-            putenv(BOX_ALLOW_XDEBUG.'=1');
+            putenv(Constants::ALLOW_XDEBUG.'=1');
         }
 
         PhpSettingsChecker::check($io);
