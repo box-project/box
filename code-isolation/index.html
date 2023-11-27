@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../img/favicon.png">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.8">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.14">
     
     
       
@@ -28,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.4b4a2bd9.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.fad675c6.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.356b1318.min.css">
@@ -289,6 +289,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href=".." class="md-nav__link">
         
@@ -308,6 +309,7 @@
   
   
     
+  
   
   
     
@@ -349,6 +351,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../installation/" class="md-nav__link">
         
@@ -366,6 +369,7 @@
             
               
                 
+  
   
   
   
@@ -389,6 +393,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../configuration/" class="md-nav__link">
         
@@ -406,6 +411,7 @@
             
               
                 
+  
   
   
   
@@ -429,6 +435,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../optimizations/" class="md-nav__link">
         
@@ -449,6 +456,7 @@
   
   
     
+  
   
   
     <li class="md-nav__item md-nav__item--active">
@@ -497,21 +505,27 @@
       
         <li class="md-nav__item">
   <a href="#whyexplanation" class="md-nav__link">
-    Why/Explanation
+    <span class="md-ellipsis">
+      Why/Explanation
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#isolating-the-phar" class="md-nav__link">
-    Isolating the PHAR
+    <span class="md-ellipsis">
+      Isolating the PHAR
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#debugging-the-scoping" class="md-nav__link">
-    Debugging the scoping
+    <span class="md-ellipsis">
+      Debugging the scoping
+    </span>
   </a>
   
 </li>
@@ -527,6 +541,7 @@
             
               
                 
+  
   
   
   
@@ -550,6 +565,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../symfony/" class="md-nav__link">
         
@@ -567,6 +583,7 @@
             
               
                 
+  
   
   
   
@@ -590,6 +607,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../phar-signing/" class="md-nav__link">
         
@@ -607,6 +625,7 @@
             
               
                 
+  
   
   
   
@@ -660,21 +679,27 @@
       
         <li class="md-nav__item">
   <a href="#whyexplanation" class="md-nav__link">
-    Why/Explanation
+    <span class="md-ellipsis">
+      Why/Explanation
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#isolating-the-phar" class="md-nav__link">
-    Isolating the PHAR
+    <span class="md-ellipsis">
+      Isolating the PHAR
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#debugging-the-scoping" class="md-nav__link">
-    Debugging the scoping
+    <span class="md-ellipsis">
+      Debugging the scoping
+    </span>
   </a>
   
 </li>
@@ -701,7 +726,7 @@
 <li><a href="#debugging-the-scoping">Debugging the scoping</a></li>
 </ol>
 <h2 id="whyexplanation">Why/Explanation<a class="headerlink" href="#whyexplanation" title="Permanent link">&para;</a></h2>
-<p>When bundling the code in a PHAR, it is equivalent to compacting all the code in a single file. However unlike in a 
+<p>When bundling the code in a PHAR, it is equivalent to compacting all the code in a single file. However unlike in a
 compiled language, the code does not change. This, when the PHAR <em>loads</em> external code, can lead to dependency
 conflicts.</p>
 <p>To illustrate that issue with an example: we are building a console application <code>myapp.phar</code> which relies on the library
@@ -712,7 +737,7 @@ myapp.phar<span class="w"> </span>myscript.php
 <p>For the sake of the example, <code>myapp.phar</code> is using Composer and loads the YAML component right away when starting, i.e.
 when running <code>myapp.phar</code>, the class <code>Symfony\Yaml\Yaml</code> <em>from the PHAR</em> is going to be loaded. Now what <code>myapp.phar</code>
 is actually going to do is scan the whole file given, and do some reflection work on each classes found. I.e. for each
-class <code>$class</code> found, it will do <code>new \ReflectionClass($class)</code>. </p>
+class <code>$class</code> found, it will do <code>new \ReflectionClass($class)</code>.</p>
 <p>Now if <code>myscript.php</code> is using the Symfony YAML 4.0.0 component with some new features added in 4.0.0 that are
 non-existent in 2.8.0, when doing <code>new \ReflectionClass('Symfony\Yaml\Yaml')</code>, the class <code>Symfony\Yaml\Yaml</code> will be
 loaded (yes, doing reflection on a class loads it!). BUT, it turns out the class <code>Symfony\Yaml\Yaml</code> is <em>already</em>
@@ -730,10 +755,10 @@ be from the wrong class!</strong></p>
 <p>Box provides an integration with <a href="https://github.com/humbug/php-scoper">PHP-Scoper</a>. To use it, <a href="../configuration/#compactors-compactors">enable the <code>KevinGH\Box\Compactor\PhpScoper</code>
 compactor</a>.</p>
 <p>If you need an extra configuration for PHP-Scoper, you can create a <code>scoper.inc.php</code> file as
-<a href="https://github.com/humbug/php-scoper#configuration">per the documentation</a>. The only difference is that you can ignore the <code>finders</code> setting as the 
+<a href="https://github.com/humbug/php-scoper#configuration">per the documentation</a>. The only difference is that you can ignore the <code>finders</code> setting as the
 files to scope are already collected by Box.</p>
 <p>And that's it!</p>
-<p>Warning: keep in mind however that scoping is a very brittle process due to the nature of PHP. As such you will likely 
+<p>Warning: keep in mind however that scoping is a very brittle process due to the nature of PHP. As such you will likely
 need some adjustments in your code or the configuration.</p>
 <h2 id="debugging-the-scoping">Debugging the scoping<a class="headerlink" href="#debugging-the-scoping" title="Permanent link">&para;</a></h2>
 <p>As mentioned above, unless you have a very boring and predictable code (which is a good thing!), due to how dynamic
@@ -820,7 +845,7 @@ there is two recommendations:</p>
     <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link", "navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.81fa17fe.min.js"></script>
+      <script src="../assets/javascripts/bundle.cd18aaf1.min.js"></script>
       
     
   </body>
