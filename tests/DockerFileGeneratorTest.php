@@ -14,8 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use KevinGH\Box\RequirementChecker\Requirement;
 use PHPUnit\Framework\TestCase;
 use UnexpectedValueException;
+use function sprintf;
+use const PHP_MAJOR_VERSION;
+use const PHP_MINOR_VERSION;
 
 /**
  * @covers \KevinGH\Box\DockerFileGenerator
@@ -309,6 +313,31 @@ class DockerFileGeneratorTest extends TestCase
 
                 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
                 RUN install-php-extensions zlib filter
+
+                COPY box.phar /box.phar
+
+                ENTRYPOINT ["/box.phar"]
+
+                Dockerfile,
+        ];
+
+        yield 'new non-known PHP constraints' => [
+            [
+                Requirement::forPHP(
+                    sprintf(
+                        '~%s.%s.0',
+                        PHP_MAJOR_VERSION,
+                        PHP_MINOR_VERSION,
+                    ),
+                    null,
+                )
+                    ->toArray(),
+            ],
+            'box.phar',
+            <<<'Dockerfile'
+                FROM php:to-define-manually
+
+                COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
                 COPY box.phar /box.phar
 
