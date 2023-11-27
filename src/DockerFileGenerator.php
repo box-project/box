@@ -53,6 +53,7 @@ final class DockerFileGenerator
         '7.2.0' => '7.2-cli-alpine',
         '7.1.0' => '7.1-cli-alpine',
         '7.0.0' => '7-cli-alpine',
+        '*' => 'to-define-manually',
     ];
 
     private readonly string $image;
@@ -128,6 +129,10 @@ final class DockerFileGenerator
 
         foreach (self::PHP_DOCKER_IMAGES as $php => $image) {
             foreach ($conditions as $condition) {
+                if ('*' === $php) {
+                    return $image;
+                }
+
                 if (false === Semver::satisfies($php, $condition)) {
                     continue 2;
                 }
