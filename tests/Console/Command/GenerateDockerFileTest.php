@@ -16,6 +16,7 @@ namespace KevinGH\Box\Console\Command;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
+use Fidry\FileSystem\FS;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use function Safe\realpath;
@@ -64,6 +65,33 @@ class GenerateDockerFileTest extends CommandTestCase
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
         self::assertFileExists($this->tmp.'/Dockerfile');
+    }
+
+    public function test_it_can_generate_a_dockerfile_for_a_given_phar_from_a_different_working_directory(): void
+    {
+        $workDir = $this->tmp.'/workdir';
+        FS::mkdir($workDir);
+
+        $this->commandTester->execute([
+            'command' => 'docker',
+            'phar' => $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar.phar'),
+            '--working-dir' => $workDir,
+        ]);
+
+        $expected = <<<OUTPUT
+
+            🐳  Generating a Dockerfile for the PHAR "{$pharPath}"
+
+             [OK] Done
+
+            You can now inspect your Dockerfile file or build your container with:
+            $ docker build .
+
+            OUTPUT;
+
+        $this->assertSameOutput($expected, ExitCode::SUCCESS);
+
+        self::assertFileExists($workDir.'/Dockerfile');
     }
 
     public function test_it_cannot_generate_a_dockerfile_for_a_phar_without_requirements(): void
