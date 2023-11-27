@@ -17,6 +17,8 @@ namespace KevinGH\Box\Console;
 use function array_map;
 use function explode;
 use function implode;
+use function preg_match_all;
+use function str_replace;
 
 final class DisplayNormalizer
 {
@@ -66,5 +68,30 @@ final class DisplayNormalizer
             'Box version x.x-dev@151e40a',
             $output,
         );
+    }
+
+    public static function removeBlockLineReturn(string $value): string
+    {
+        // Note: this is far from being robust enough for all scenarios but since it is for
+        // a specific case this will do for now and be adjusted as needed.
+        $regex = '/\n( \[\p{L}+\] .*\n(?:\s{9}.+\n)+?)\n/u';
+
+        if (1 !== preg_match_all($regex, $value, $matches)) {
+            return $value;
+        }
+
+        unset($matches[0]);
+
+        foreach ($matches as [$match]) {
+            $lines = explode("\n        ", $match);
+
+            $value = str_replace(
+                $match,
+                implode('', $lines),
+                $value,
+            );
+        }
+
+        return $value;
     }
 }

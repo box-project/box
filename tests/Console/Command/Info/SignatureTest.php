@@ -17,6 +17,7 @@ namespace KevinGH\Box\Console\Command\Info;
 use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Test\OutputAssertions;
+use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Phar\InvalidPhar;
 use KevinGH\Box\Test\CommandTestCase;
 use Symfony\Component\Filesystem\Path;
@@ -83,13 +84,13 @@ class SignatureTest extends CommandTestCase
         OutputAssertions::assertSameOutput(
             <<<EOF
 
-                 [ERROR] The file "{$expectedFilePath}" is
-                         not a PHAR.
+                 [ERROR] The file "{$expectedFilePath}" is not a PHAR.
 
 
                 EOF,
             ExitCode::FAILURE,
             $this->commandTester,
+            DisplayNormalizer::removeBlockLineReturn(...),
         );
     }
 
