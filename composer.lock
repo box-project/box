@@ -6359,16 +6359,16 @@
         },
         {
             "name": "theseer/tokenizer",
-            "version": "1.2.1",
+            "version": "1.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/theseer/tokenizer.git",
-                "reference": "34a41e998c2183e22995f158c581e7b5e755ab9e"
+                "reference": "b2ad5003ca10d4ee50a12da31de12a5774ba6b96"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/theseer/tokenizer/zipball/34a41e998c2183e22995f158c581e7b5e755ab9e",
-                "reference": "34a41e998c2183e22995f158c581e7b5e755ab9e",
+                "url": "https://api.github.com/repos/theseer/tokenizer/zipball/b2ad5003ca10d4ee50a12da31de12a5774ba6b96",
+                "reference": "b2ad5003ca10d4ee50a12da31de12a5774ba6b96",
                 "shasum": ""
             },
             "require": {
@@ -6397,7 +6397,7 @@
             "description": "A small library for converting tokenized PHP source code into XML and potentially other formats",
             "support": {
                 "issues": "https://github.com/theseer/tokenizer/issues",
-                "source": "https://github.com/theseer/tokenizer/tree/1.2.1"
+                "source": "https://github.com/theseer/tokenizer/tree/1.2.2"
             },
             "funding": [
                 {
@@ -6405,24 +6405,24 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-07-28T10:34:58+00:00"
+            "time": "2023-11-20T00:12:19+00:00"
         },
         {
             "name": "webmozarts/strict-phpunit",
-            "version": "7.7.7",
+            "version": "7.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozarts/strict-phpunit.git",
-                "reference": "bec31848d596536af8119a37de61ba23e0599377"
+                "reference": "cb3fcea4e1978671db3870324734ad1db3c4d5e3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozarts/strict-phpunit/zipball/bec31848d596536af8119a37de61ba23e0599377",
-                "reference": "bec31848d596536af8119a37de61ba23e0599377",
+                "url": "https://api.github.com/repos/webmozarts/strict-phpunit/zipball/cb3fcea4e1978671db3870324734ad1db3c4d5e3",
+                "reference": "cb3fcea4e1978671db3870324734ad1db3c4d5e3",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.4.0",
+                "php": "^8.1",
                 "phpunit/phpunit": "^9.4.3"
             },
             "require-dev": {
@@ -6430,6 +6430,11 @@
                 "infection/infection": "^0.26.6"
             },
             "type": "library",
+            "extra": {
+                "symfony": {
+                    "require": "6.*.*"
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "Webmozarts\\StrictPHPUnit\\": "src"
@@ -6448,9 +6453,9 @@
             "description": "Enables type-safe comparisons of objects in PHPUnit",
             "support": {
                 "issues": "https://github.com/webmozarts/strict-phpunit/issues",
-                "source": "https://github.com/webmozarts/strict-phpunit/tree/7.7.7"
+                "source": "https://github.com/webmozarts/strict-phpunit/tree/7.8.0"
             },
-            "time": "2023-03-29T20:04:11+00:00"
+            "time": "2023-11-03T17:34:29+00:00"
         }
     ],
     "aliases": [],
