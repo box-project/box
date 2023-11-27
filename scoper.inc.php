@@ -23,9 +23,6 @@ $jetBrainStubsPatcher = (require __DIR__.'/vendor/humbug/php-scoper/res/create-s
 
 return [
     'exclude-files' => $jetBrainStubs,
-    'exclude-namespaces' => [
-        'Symfony\Polyfill'
-    ],
     'exclude-classes' => [
         IsolatedFinder::class,
     ],
