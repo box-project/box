@@ -21,7 +21,6 @@ use Fidry\Console\IO;
 use KevinGH\Box\Phar\PharInfo;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Filesystem\Path;
-use function realpath;
 use function sprintf;
 
 /**
@@ -35,7 +34,7 @@ final class Signature implements Command
     {
         return new Configuration(
             'info:signature',
-            '🔍  Displays the hash of the signature',
+            'Displays the hash of the signature',
             <<<'HELP'
                 The <info>%command.name%</info> command will display the hash of the signature. This may
                 be useful for some external tools that wishes to act base on the signature, e.g. to invalidate
@@ -56,7 +55,6 @@ final class Signature implements Command
         $file = $io->getTypedArgument(self::PHAR_ARG)->asNonEmptyString();
 
         $file = Path::canonicalize($file);
-        $fileRealPath = realpath($file);
 
         $pharInfo = new PharInfo($file);
         $signature = $pharInfo->getSignature();
