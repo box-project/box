@@ -94,6 +94,8 @@ final class Application implements FidryApplication
             new Compile($this->getHeader()),
             new Diff(),
             new Info(),
+            new Info('info:general'),
+            new Info\Signature(),
             new Process(),
             new Extract(),
             new Validate(),

@@ -44,10 +44,14 @@ final class Info implements Command
         'flat',
     ];
 
+    public function __construct(private string $commandName = 'info')
+    {
+    }
+
     public function getConfiguration(): Configuration
     {
         return new Configuration(
-            'info',
+            $this->commandName,
             '🔍  Displays information about the PHAR extension or file',
             <<<'HELP'
                 The <info>%command.name%</info> command will display information about the Phar extension,

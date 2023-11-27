@@ -117,10 +117,10 @@ Deterministic builds are a highly desirable property to prevent targeted malware
 detect if there is any real change. As non-exhaustive examples in the wild: [Composer][composer] and [PHPStan][phpstan].
 
 Another benefit of such builds is that it makes it easier to know if there was any change. You can know if two PHARs are
-identical by using the `box diff` command, or extract the signature out of the `box info` command:
+identical by using the `box diff` command, or extract the signature out of the `box info:signature` command:
 
 ```shell
-box info app.phar | grep 'Signature Hash' | cut -d ' ' -f3
+box info:signature app.phar
 ```
 
 And re-use that signature later for comparison. You will loose the ability to do a detailed diff between the two PHARs,
