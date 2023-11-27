@@ -60,7 +60,7 @@ final class DisplayNormalizerTest extends TestCase
                 EOF,
             <<<'EOF'
 
-                 [ERROR] Error message......and the other piece here.
+                 [ERROR] Error message... ...and the other piece here.
 
 
                 EOF,
@@ -77,7 +77,7 @@ final class DisplayNormalizerTest extends TestCase
                 EOF,
             <<<'EOF'
 
-                 [ERROR] Error message......and the other piece here. And one more.
+                 [ERROR] Error message... ...and the other piece here.  And one more.
 
 
                 EOF,
