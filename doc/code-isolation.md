@@ -7,7 +7,7 @@
 
 ## Why/Explanation
 
-When bundling the code in a PHAR, it is equivalent to compacting all the code in a single file. However unlike in a 
+When bundling the code in a PHAR, it is equivalent to compacting all the code in a single file. However unlike in a
 compiled language, the code does not change. This, when the PHAR _loads_ external code, can lead to dependency
 conflicts.
 
@@ -22,7 +22,7 @@ myapp.phar myscript.php
 For the sake of the example, `myapp.phar` is using Composer and loads the YAML component right away when starting, i.e.
 when running `myapp.phar`, the class `Symfony\Yaml\Yaml` _from the PHAR_ is going to be loaded. Now what `myapp.phar`
 is actually going to do is scan the whole file given, and do some reflection work on each classes found. I.e. for each
-class `$class` found, it will do `new \ReflectionClass($class)`. 
+class `$class` found, it will do `new \ReflectionClass($class)`.
 
 Now if `myscript.php` is using the Symfony YAML 4.0.0 component with some new features added in 4.0.0 that are
 non-existent in 2.8.0, when doing `new \ReflectionClass('Symfony\Yaml\Yaml')`, the class `Symfony\Yaml\Yaml` will be
@@ -45,12 +45,12 @@ Box provides an integration with [PHP-Scoper][php-scoper]. To use it, [enable th
 compactor][php-scoper-compactor].
 
 If you need an extra configuration for PHP-Scoper, you can create a `scoper.inc.php` file as
-[per the documentation][php-scoper-config]. The only difference is that you can ignore the `finders` setting as the 
+[per the documentation][php-scoper-config]. The only difference is that you can ignore the `finders` setting as the
 files to scope are already collected by Box.
 
 And that's it!
 
-Warning: keep in mind however that scoping is a very brittle process due to the nature of PHP. As such you will likely 
+Warning: keep in mind however that scoping is a very brittle process due to the nature of PHP. As such you will likely
 need some adjustments in your code or the configuration.
 
 

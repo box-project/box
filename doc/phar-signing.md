@@ -145,7 +145,7 @@ gpg --keyserver keys.openpgp.org --send-key 96C8013A3CC293C465EE3FBB03B2F4DF7A20
 ```
 
 [^1]:
-    
+
     There is several OpenPGP Keyservers. It is recommended to push your keys to [keys.openpgp.org] _at least_, but you
     can also push it to other servers if you wish to.
 
@@ -156,7 +156,7 @@ revocation certificate to the keyserver to invalidate the signing key.
 gpg --output revoke-96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08.asc --gen-revoke 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
 ```
 
-This will leave you with a revocation certificate in the file `revoke-96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08.asc` 
+This will leave you with a revocation certificate in the file `revoke-96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08.asc`
 which can be added to your password manager.
 
 
@@ -194,7 +194,7 @@ ideally one generated and managed by a password manager.
 
 This leaves you with a file `keys.asc.gpg`. You can add this one to the repository and at this point you are probably
 better off **deleting the `keys.asc` file**. In order to do the actual signing, you will have to decrypt it again, but
-it is better to not keep that decrypted key around. 
+it is better to not keep that decrypted key around.
 
 
 ### Sign your PHAR
@@ -390,5 +390,4 @@ Credits:
 [keys.openpgp.org]: https://keys.openpgp.org/about
 [github-environment-secrets]: https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions
 [github-workflow]: https://docs.github.com/en/actions/using-workflows
-[phive]: https://phar.io/
 [jar]: https://docs.oracle.com/javase/8/docs/technotes/guides/jar/jarGuide.html

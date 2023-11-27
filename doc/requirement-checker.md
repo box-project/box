@@ -23,14 +23,14 @@ requirements are passing on the right in debug verbosity.
 
 !!! Warning
      this check is still done within the PHAR. As a result, if [the required extension to open the PHAR][compression]
-     due to the compression algorithm is not loaded, a hard failure will still appear: 
+     due to the compression algorithm is not loaded, a hard failure will still appear:
      the requirement checker _cannot_ be executed before that.
 
 
 ## Configuration
 
 Box will retrieve all the (non-dev) requirements including the ones of the dependencies if there is any. When a
-`composer.lock` file is present, it will take the information from it. If not found, it will fallback on the 
+`composer.lock` file is present, it will take the information from it. If not found, it will fallback on the
 `composer.json` but that it will not be able to retrieve any information regarding the dependencies requirements in this
 case.
 
@@ -126,8 +126,8 @@ PHP 7.2.5+ compatible, it will fail before the requirements are being checked.
 
 ## Skipping the requirement checker
 
-When the requirement checker is shipped, you can always skip it by setting the environment variable 
-`BOX_REQUIREMENT_CHECKER` to `0`. For example if you are using the `box.phar` which ships a requirement checker and want 
+When the requirement checker is shipped, you can always skip it by setting the environment variable
+`BOX_REQUIREMENT_CHECKER` to `0`. For example if you are using the `box.phar` which ships a requirement checker and want
 to skip it, you can run:
 
 ```shell
