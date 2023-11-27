@@ -153,7 +153,6 @@ BOX_REQUIREMENTS_CHECKER_LOG_TO_STDOUT=1 php box.phar
 
 [composer]: https://getcomposer.org/
 [compression]: configuration.md#compression-algorithm-compression
-[check-requirements]: configuration.md#check-requirements-check-requirements
 [composer-platform-php]: https://getcomposer.org/doc/06-config.md#platform
 [paragonie sodium_compat]: https://github.com/paragonie/sodium_compat
 [phpseclib mcrypt_compat]: https://github.com/phpseclib/mcrypt_compat

@@ -307,7 +307,7 @@ blacklisted are the ones found using the other available configuration settings:
 Note that all the blacklisted paths are relative to the settings configured above. For example if you have the following
 file structure:
 
-```
+```text
 project/
 ├── box.json.dist
 ├── A/
@@ -335,7 +335,7 @@ With:
 Box will try to collect all the files found in `project` (cf. [Including files][including-files]) but will exclude `A/`
 and `B/A resulting in the following files being collected:
 
-```
+```text
 project/
 ├── box.json.dist
 └── B/
@@ -372,6 +372,7 @@ belonging to dev only packages. For example for the given project:
     }
 }
 ```
+
 </details>
 
 The `vendor` directory will have `beberlei/assert` and `bamarni/composer-bin-plugin`. If `exclude-dev-files` is not
@@ -427,6 +428,7 @@ The default PHAR stub file can be used but Box also propose a couple of options 
 
 The stub (`string`|`boolean`|`null` default `true`) setting is used to specify the location of a stub file or if one
 should be generated:
+
 - `string`: Path to the stub file will be used as is inside the PHAR
 - `true` (default): A new stub will be generated
 - `false`: The default stub used by the PHAR class will be used
@@ -440,7 +442,7 @@ If a custom stub file is provided, none of the other options ([`shebang`][sheban
 The shebang (`string`|`false`|`null`) setting is used to specify the shebang line used when generating a new stub. By
 default, this line is used:
 
-```
+```sh
 #!/usr/bin/env php
 ```
 
@@ -543,7 +545,7 @@ done for you.
 
 For example `Custom banner` will result in the stub file:
 
-```
+```php
 /*
  * Custom banner
  */
@@ -689,6 +691,7 @@ function foo($x, $y): int {
     return $x <=> $y;
 }
 ```
+
 </details>
 
 <details>
@@ -715,6 +718,7 @@ function foo($x, $y): int {
  return $x <=> $y;
 }
 ```
+
 </details>
 
 
@@ -1037,7 +1041,6 @@ The short commit hash will only be used if no tag is available.
 [git-commit-short]: #short-git-commit-placeholder-git-commit-short
 [git-tag-placeholder]: #git-tag-placeholder-git-tag
 [git-version-placeholder]: #git-version-placeholder-git-version
-[herrera-io/php-annotations]: https://github.com/herrera-io/php-annotations
 [including-files]: #including-files
 [intercept]: #intercept-intercept
 [key-pass]: #the-private-key-password-key-pass
@@ -1055,7 +1058,6 @@ The short commit hash will only be used if no tag is available.
 [phar.mapphar]: https://secure.php.net/manual/en/phar.mapphar.php
 [phar.setalias]: https://secure.php.net/manual/en/phar.setalias.php
 [phar.setsignaturealgorithm]: https://secure.php.net/manual/en/phar.setsignaturealgorithm.php
-[phar.webphar]: https://secure.php.net/manual/en/phar.webphar.php
 [php-date-format]: https://secure.php.net/manual/en/function.date.php
 [php-scoper-compactor]: #php-scoper-php-scoper
 [php-scoper-configuration]: https://github.com/humbug/php-scoper#configuration
