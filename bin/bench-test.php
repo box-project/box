@@ -29,8 +29,8 @@ Assert::fileExists($benchmarkResultPath);
 $xml = FS::getFileContents($benchmarkResultPath);
 $meanTimes = BenchResultReader::readMeanTimes($xml);
 
-$parallelTime = $meanTimes['with compactors; no parallel processing'];
-$noParallelTime = $meanTimes['with compactors; parallel processing'];
+$parallelTime = $meanTimes['with compactors; parallel processing'];
+$noParallelTime = $meanTimes['with compactors; no parallel processing'];
 
 $formatMeanTime = static fn (float $mean) => number_format($mean).'µs';
 
@@ -45,6 +45,7 @@ echo 'Max parallelization target: '.$formatMeanTime($maxParallelTimeTarget).PHP_
 
 if ($parallelTime <= $maxParallelTimeTarget) {
     echo 'OK.'.PHP_EOL;
+
     exit(0);
 }
 
