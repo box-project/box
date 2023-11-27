@@ -22,6 +22,7 @@ use KevinGH\Box\Console\Command\Diff;
 use KevinGH\Box\Console\Command\Extract;
 use KevinGH\Box\Console\Command\GenerateDockerFile;
 use KevinGH\Box\Console\Command\Info;
+use KevinGH\Box\Console\Command\Info\Signature;
 use KevinGH\Box\Console\Command\Namespace_;
 use KevinGH\Box\Console\Command\Process;
 use KevinGH\Box\Console\Command\Validate;
@@ -95,7 +96,7 @@ final class Application implements FidryApplication
             new Diff(),
             new Info(),
             new Info('info:general'),
-            new Info\Signature(),
+            new Signature(),
             new Process(),
             new Extract(),
             new Validate(),

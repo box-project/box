@@ -32,7 +32,7 @@ use function sprintf;
 /**
  * @private
  */
-final class Info implements Command
+final readonly class Info implements Command
 {
     private const PHAR_ARG = 'phar';
     private const LIST_OPT = 'list';
