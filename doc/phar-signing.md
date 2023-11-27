@@ -113,7 +113,7 @@ gpg --gen-key
 It will ask for some questions. It is recommended to use a passphrase (ideally generated and managed by a reputable
 password manager). In the end, you will end up with something like this:
 
-```
+```shell
 # $ gpg --gen-key output
 pub   ed25519 2023-10-21 [SC] [expires: 2026-10-20]
       96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
@@ -145,7 +145,7 @@ gpg --keyserver keys.openpgp.org --send-key 96C8013A3CC293C465EE3FBB03B2F4DF7A20
 ```
 
 [^1]:
-    
+
     There is several OpenPGP Keyservers. It is recommended to push your keys to [keys.openpgp.org] _at least_, but you
     can also push it to other servers if you wish to.
 
@@ -156,7 +156,7 @@ revocation certificate to the keyserver to invalidate the signing key.
 gpg --output revoke-96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08.asc --gen-revoke 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
 ```
 
-This will leave you with a revocation certificate in the file `revoke-96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08.asc` 
+This will leave you with a revocation certificate in the file `revoke-96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08.asc`
 which can be added to your password manager.
 
 
@@ -185,7 +185,7 @@ gpg --export-secret-key --armor 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08 >> keys
 
 If your goal is to save this encryption key somewhere, for example your repository, you should first encrypt it:
 
-```
+```shell
 gpg --symmetric keys.asc
 ```
 
@@ -194,7 +194,7 @@ ideally one generated and managed by a password manager.
 
 This leaves you with a file `keys.asc.gpg`. You can add this one to the repository and at this point you are probably
 better off **deleting the `keys.asc` file**. In order to do the actual signing, you will have to decrypt it again, but
-it is better to not keep that decrypted key around. 
+it is better to not keep that decrypted key around.
 
 
 ### Sign your PHAR
@@ -240,7 +240,7 @@ When publishing your archive, you should publish both `bin/command.phar` and `bi
 First you should check the issuer's identity, usually it is provided from where you download it as part of the
 documentation:
 
-```
+```shell
 # If you are on the same machine as where you created the key, then this step is unnecessary.
 # You will need this however for when verifying a different key that you do not know of yet.
 gpg --keyserver hkps://keys.openpgp.org --recv-keys 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08

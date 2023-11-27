@@ -9,8 +9,8 @@
        1. [PHAR alias](#phar-alias)
        1. [Requirement Checker](#requirement-checker)
        1. [Box banner](#box-banner)
-   1. [PHAR](#phar)
-1.  [Usages](#usages)
+       1. [Timestamp](#timestamp)
+1. [Usages](#usages)
 
 
 When building a PHAR, you sometimes want to have reproducible builds, i.e. no matter how many times you build the PHAR,
@@ -138,7 +138,7 @@ but it is enough to know if the PHARs are identical or not.
 [composer]: https://github.com/composer/composer
 [composer-autoload-prefix]: https://getcomposer.org/doc/06-config.md#autoloader-suffix
 [composer-root-version]: https://getcomposer.org/doc/03-cli.md#composer-root-version
-[phar-utils]: https://github.com/Seldaek/phar-utils
+[main]: configuration.md#main-main
 [phpstan]: https://github.com/phpstan/phpstan
 [php-scoper-compactor]: ./configuration.md#compactors-compactors
 [php-scoper-prefix-doc]: https://github.com/humbug/php-scoper/blob/main/docs/configuration.md#prefix

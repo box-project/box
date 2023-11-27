@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="doc/img/box.png" width=900 />
+    <img src="doc/img/box.png" width=900 alt="Box logo" />
 </p>
 
 

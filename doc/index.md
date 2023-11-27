@@ -45,7 +45,7 @@ permissions:
 You can then find more advanced configuration settings in [the configuration documentation][configuration].
 For more information on which command or options is available, you can run:
 
-```
+```shell
 box help
 ```
 
@@ -73,7 +73,7 @@ The text displayed by the commands (e.g. `compile` or `info`) or the content of 
 Project originally created by: [Kevin Herrera] ([@kherge]) which has now been moved under the [Humbug umbrella][humbug].
 
 
-[box2]: https://github.com/box-project/box2
+[configuration]: configuration.md
 [Kevin Herrera]: https://github.com/kherge
 [@kherge]: https://github.com/kherge
 [humbug]: https://github.com/humbug

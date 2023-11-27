@@ -128,7 +128,7 @@ When the parameter is not given or set to `null`, Box tries to guess the binary 
 `composer.json` file. If the [Composer `bin`][composer-bin] is set, Box will pick the first value provided. Otherwise it
 will fallback on the [PHAR][phar class] default file used which is `index.php`.
 
-The main file contents is processed by the [compactors][compactors] as the other files. 
+The main file contents is processed by the [compactors][compactors] as the other files.
 
 If the main file starts with a shebang line (`#!`), it will be automatically removed (the shebang line goes in the
 [stub][stub] for a PHAR and is configured by the [shebang][shebang] setting).
@@ -158,9 +158,9 @@ constraint before running. See more information about it [here][requirement-chec
 the requirement checker will be added. Note that this is true only if either the `composer.json`  or `composer.lock`
 could have been found.
 
-!!! Warning 
+!!! Warning
     this check is still done within the PHAR. As a result, if [the required extension to open the PHAR][compression]
-    due to the compression algorithm is not loaded, a hard failure will still appear: the requirement 
+    due to the compression algorithm is not loaded, a hard failure will still appear: the requirement
     checker _cannot_ be executed before that.
 
 
@@ -196,7 +196,7 @@ The `force-autodiscovery` (`bool` default `false`) setting forces Box to attempt
 though you are using the [`directories`][directories] or [`finder`][finder] setting.
 
 When Box tries to find which files to include, it may remove some files such as readmes or test files. If however you
-are using the [`directories`][directories] or [`finder`][finder], Box will _append_ the found files to the ones you 
+are using the [`directories`][directories] or [`finder`][finder], Box will _append_ the found files to the ones you
 listed.
 
 
@@ -228,7 +228,7 @@ Files listed in the [`blacklist`][blacklist] will not be added to the PHAR.
 the files such as images, those that contain binary data or simply a file you do not want to alter at all despite using
 compactors.
 
-!!! Warning 
+!!! Warning
     Setting the key `directories` (regardless of its value), will disable the file auto-discovery. If you want
     to keep it, check the [force the auto-discovery][force-autodiscovery] setting.
 
@@ -243,7 +243,7 @@ compactors.
     included in `directories` (respectively `directories-bin`), the those files **will be included**. The files included
     are a union of the directives.
 
-!!! Warning 
+!!! Warning
     Symlinks are not followed/supported.
 
 
@@ -252,7 +252,7 @@ compactors.
 The finder (`object[]`|`null` default `[]`) setting is a list of JSON objects. Each object (key, value) tuple is a
 (method, arguments) of the [Symfony Finder][symfony-finder] used by Box. If an array of values is provided for a single
 key, the method will be called once per value in the array.
- 
+
 Note that the paths specified for the `in` method are relative to [`base-path`][base-path] and that the finder will
 account for the files registered in the [`blacklist`][blacklist].
 
@@ -307,7 +307,7 @@ blacklisted are the ones found using the other available configuration settings:
 Note that all the blacklisted paths are relative to the settings configured above. For example if you have the following
 file structure:
 
-```
+```text
 project/
 ├── box.json.dist
 ├── A/
@@ -335,7 +335,7 @@ With:
 Box will try to collect all the files found in `project` (cf. [Including files][including-files]) but will exclude `A/`
 and `B/A resulting in the following files being collected:
 
-```
+```text
 project/
 ├── box.json.dist
 └── B/
@@ -372,14 +372,15 @@ belonging to dev only packages. For example for the given project:
     }
 }
 ```
+
 </details>
 
 The `vendor` directory will have `beberlei/assert` and `bamarni/composer-bin-plugin`. If `exclude-dev-files` is not
 disabled, the `bamarni/composer-bin-plugin` package will be removed from the PHAR.
 
 This setting will automatically be disabled when [`dump-autoload`][dump-autoload] is disabled. Indeed, otherwise some
-files will not be shipped in the PHAR but may still appear in the Composer autoload classmap, resulting in an 
-autoloading error. 
+files will not be shipped in the PHAR but may still appear in the Composer autoload classmap, resulting in an
+autoloading error.
 
 
 ### Map (`map`)
@@ -420,13 +421,14 @@ the above files will be stored with the following paths in the PHAR:
 The [PHAR stub][phar.fileformat.stub] file is the PHAR bootstrapping file, i.e. the very first file executed whenever
 the PHAR is executed. It usually contains things like the PHAR configuration and executing the [main script file][main].
 
-The default PHAR stub file can be used but Box also propose a couple of options to customize the stub used. 
+The default PHAR stub file can be used but Box also propose a couple of options to customize the stub used.
 
 
 ### Stub (`stub`)
 
 The stub (`string`|`boolean`|`null` default `true`) setting is used to specify the location of a stub file or if one
 should be generated:
+
 - `string`: Path to the stub file will be used as is inside the PHAR
 - `true` (default): A new stub will be generated
 - `false`: The default stub used by the PHAR class will be used
@@ -440,7 +442,7 @@ If a custom stub file is provided, none of the other options ([`shebang`][sheban
 The shebang (`string`|`false`|`null`) setting is used to specify the shebang line used when generating a new stub. By
 default, this line is used:
 
-```
+```sh
 #!/usr/bin/env php
 ```
 
@@ -543,7 +545,7 @@ done for you.
 
 For example `Custom banner` will result in the stub file:
 
-```
+```php
 /*
  * Custom banner
  */
@@ -659,7 +661,7 @@ command ✨.
 ### Annotations (`annotations`)
 
 The annotations (`boolean`|`object`|`null` default `true`) setting is used to enable compacting annotations in PHP source
-code. 
+code.
 
 This setting is only taken into consideration if the [`KevinGH\Box\Compactor\Php` compactor][compactors] is enabled.
 
@@ -689,6 +691,7 @@ function foo($x, $y): int {
     return $x <=> $y;
 }
 ```
+
 </details>
 
 <details>
@@ -715,6 +718,7 @@ function foo($x, $y): int {
  return $x <=> $y;
 }
 ```
+
 </details>
 
 
@@ -786,7 +790,7 @@ available:
 
 By default, PHARs are `SHA1` signed.
 
-The `OPENSSL` algorithm will require to provide [a key][key]. 
+The `OPENSSL` algorithm will require to provide [a key][key].
 
 !!! warning
 
@@ -846,7 +850,7 @@ With the configuration excerpt:
 
 Then the `Phar::getMetadata()` will return `['application_version' => '1.0.0-dev']` array.
 
-!!! warning 
+!!! warning
 
     Your callable function must be readable by your autoloader.
 
@@ -1037,7 +1041,6 @@ The short commit hash will only be used if no tag is available.
 [git-commit-short]: #short-git-commit-placeholder-git-commit-short
 [git-tag-placeholder]: #git-tag-placeholder-git-tag
 [git-version-placeholder]: #git-version-placeholder-git-version
-[herrera-io/php-annotations]: https://github.com/herrera-io/php-annotations
 [including-files]: #including-files
 [intercept]: #intercept-intercept
 [key-pass]: #the-private-key-password-key-pass
@@ -1055,7 +1058,6 @@ The short commit hash will only be used if no tag is available.
 [phar.mapphar]: https://secure.php.net/manual/en/phar.mapphar.php
 [phar.setalias]: https://secure.php.net/manual/en/phar.setalias.php
 [phar.setsignaturealgorithm]: https://secure.php.net/manual/en/phar.setsignaturealgorithm.php
-[phar.webphar]: https://secure.php.net/manual/en/phar.webphar.php
 [php-date-format]: https://secure.php.net/manual/en/function.date.php
 [php-scoper-compactor]: #php-scoper-php-scoper
 [php-scoper-configuration]: https://github.com/humbug/php-scoper#configuration

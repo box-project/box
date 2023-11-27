@@ -327,7 +327,7 @@ website_check: markdownlint lychee website_build
 markdownlint:
 	@echo "$(YELLOW_COLOR)Ensure you have the nodejs & npm installed. For more information, check:$(NO_COLOR)"
 	@# To keep in sync with .github/workflows/gh-pages.yaml#check-links
-	npx markdownlint-cli2 "*.md|docs/**/*.md"
+	npx markdownlint-cli2 "*.md|doc/**/*.md"
 
 .PHONY: lychee
 lychee:

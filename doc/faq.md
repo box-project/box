@@ -127,7 +127,7 @@ See [Phar::running()][phar-running] for more information.
 If you need to include Box as part of your dependencies and include it within your PHAR, you will probably encounter
 the following issue when building your PHAR:
 
-```
+```text
 Could not dump the autoloader.
 [...]
 Could not scan for classes inside "/path/to/vendor/humbug/php-scoper/vendor-hotfix/" which does not appear to be a file nor a folder

@@ -12,7 +12,7 @@ permissions:
 You can then find more advanced configuration settings in [the configuration documentation](configuration.md).
 For more information on which command or options is available, you can run:
 
-```
+```shell
 box help
 ```
 
