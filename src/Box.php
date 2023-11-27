@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Amp\MultiReasonException;
+use Amp\Parallel\Worker\TaskFailureThrowable;
 use BadMethodCallException;
 use Countable;
 use DateTimeImmutable;
@@ -288,7 +289,7 @@ final class Box implements Countable
     /**
      * @param array<SplFileInfo|string> $files
      *
-     * @throws MultiReasonException
+     * @throws TaskFailureThrowable
      */
     public function addFiles(array $files, bool $binary): void
     {

@@ -14,26 +14,26 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Parallelization;
 
-use Amp\MultiReasonException;
-use Fidry\FileSystem\FS;
-use Humbug\PhpScoper\Symbol\SymbolsRegistry;
+use Amp\Parallel\Worker\Execution;
+use Amp\Parallel\Worker\TaskFailureThrowable;
+use Amp\Parallel\Worker\WorkerPool;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\MapFile;
-use Symfony\Component\Process\Process;
-use function Amp\ParallelFunctions\parallelMap;
-use function Amp\Promise\wait;
-use function KevinGH\Box\register_aliases;
-use function KevinGH\Box\register_error_handler;
+use function Amp\Future\await;
+use function Amp\Parallel\Worker\workerPool;
+use function array_chunk;
 
 /**
  * @private
  */
 final class ParallelFileProcessor
 {
+    public const FILE_CHUNK_SIZE = 100;
+
     /**
      * @param string[] $filePaths
      *
-     * @throws MultiReasonException
+     * @throws TaskFailureThrowable
      *
      * @return list<array{string, string}>
      */
@@ -43,54 +43,53 @@ final class ParallelFileProcessor
         MapFile $mapFile,
         Compactors $compactors,
     ): array {
-        $processFile = static function (string $file) use ($cwd, $mapFile, $compactors): array {
-            chdir($cwd);
+        $workerPool = workerPool();
 
-            // Keep the fully qualified call here since this function may be executed without the right autoloading
-            // mechanism
-            register_aliases();
-            register_error_handler();
-
-            $contents = FS::getFileContents($file);
-
-            $local = $mapFile($file);
-
-            $processedContents = $compactors->compact($local, $contents);
-
-            return [$local, $processedContents, $compactors->getScoperSymbolsRegistry()];
-        };
-
-        // In the case of parallel processing, an issue is caused due to the statefulness nature of the PhpScoper
-        // symbols registry.
-        //
-        // Indeed, the PhpScoper symbols registry stores the records of exposed/excluded classes and functions. If nothing is done,
-        // then the symbols registry retrieved in the end will here will be "blank" since the updated symbols registries are the ones
-        // from the workers used for the parallel processing.
-        //
-        // In order to avoid that, the symbols registries will be returned as a result as well in order to be able to merge
-        // all the symbols registries into one.
-        //
-        // This process is allowed thanks to the nature of the state of the symbols registries: having redundant classes or
-        // functions registered can easily be deal with so merging all those different states is actually
-        // straightforward.
-        $tuples = wait(parallelMap($filePaths, $processFile));
-
-        if ([] === $tuples) {
-            return [];
-        }
-
-        $filesWithContents = [];
-        $symbolRegistries = [];
-
-        foreach ($tuples as [$local, $processedContents, $symbolRegistry]) {
-            $filesWithContents[] = [$local, $processedContents];
-            $symbolRegistries[] = $symbolRegistry;
-        }
-
-        $compactors->registerSymbolsRegistry(
-            SymbolsRegistry::createFromRegistries(array_filter($symbolRegistries)),
+        $result = self::queueAndWaitForTasks(
+            $filePaths,
+            $workerPool,
+            $cwd,
+            $mapFile,
+            $compactors,
         );
 
-        return $filesWithContents;
+        $compactors->registerSymbolsRegistry($result->symbolsRegistry);
+
+        return $result->filesWithContents;
+    }
+
+    /**
+     * @param string[] $filePaths
+     *
+     * @throws TaskFailureThrowable
+     */
+    public static function queueAndWaitForTasks(
+        array $filePaths,
+        WorkerPool $workerPool,
+        string $cwd,
+        MapFile $mapFile,
+        Compactors $compactors,
+    ): TaskResult {
+        $executions = [];
+
+        foreach (array_chunk($filePaths, self::FILE_CHUNK_SIZE) as $filePathsChunk) {
+            $executions[] = $workerPool->submit(
+                new ProcessFileTask(
+                    $filePathsChunk,
+                    $cwd,
+                    $mapFile,
+                    $compactors,
+                ),
+            );
+        }
+
+        $results = await(
+            array_map(
+                static fn (Execution $execution) => $execution->getFuture(),
+                $executions,
+            ),
+        );
+
+        return TaskResult::aggregate($results);
     }
 }

@@ -45,6 +45,7 @@ echo 'Max parallelization target: '.$formatMeanTime($maxParallelTimeTarget).PHP_
 
 if ($parallelTime <= $maxParallelTimeTarget) {
     echo 'OK.'.PHP_EOL;
+
     exit(0);
 }
 
@@ -59,5 +60,5 @@ if ($relativeDifference >= 0) {
 
 echo 'Failed!'.PHP_EOL;
 echo 'Missed the target by '.$relativeDifference.'%'.PHP_EOL;
-// TODO: https://github.com/box-project/box/issues/552
-exit(0);
+
+exit(1);

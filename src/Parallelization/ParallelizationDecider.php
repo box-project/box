@@ -25,7 +25,7 @@ final class ParallelizationDecider
 {
     use NotInstantiable;
 
-    private const MIN_FILE_COUNT = 500;
+    private const MIN_FILE_COUNT = 5 * ParallelFileProcessor::FILE_CHUNK_SIZE;
 
     public static function shouldProcessFilesInParallel(
         Scoper $scoper,

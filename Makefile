@@ -487,18 +487,19 @@ $(REQUIREMENT_CHECKER_EXTRACT):
 
 $(SCOPED_BOX_BIN): $(SCOPED_BOX_DEPS)
 	@echo "$(YELLOW_COLOR)Compile Box.$(NO_COLOR)"
-	$(BOX) compile --ansi --no-parallel
+	@# Use parallelization
+	$(BOX) compile --ansi
 
 	rm $(TMP_SCOPED_BOX_BIN) || true
 	mv -v bin/box.phar $(TMP_SCOPED_BOX_BIN)
 
 	@echo "$(YELLOW_COLOR)Compile Box with the isolated Box PHAR.$(NO_COLOR)"
-	php $(TMP_SCOPED_BOX_BIN) compile --ansi --no-parallel
+	php $(TMP_SCOPED_BOX_BIN) compile --ansi
 
 	mv -fv bin/box.phar box
 
 	@echo "$(YELLOW_COLOR)Test the PHAR which has been created by the isolated PHAR.$(NO_COLOR)"
-	./box compile --ansi --no-parallel
+	./box compile --ansi
 
 	mv -fv box bin/box.phar
 	rm $(TMP_SCOPED_BOX_BIN)

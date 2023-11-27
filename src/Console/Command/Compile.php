@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
-use Amp\MultiReasonException;
+use Amp\Parallel\Worker\TaskFailureThrowable;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Fidry\Console\Command\Command;
@@ -40,7 +40,6 @@ use KevinGH\Box\Console\OpenFileDescriptorLimiter;
 use KevinGH\Box\Console\PhpSettingsChecker;
 use KevinGH\Box\Constants;
 use KevinGH\Box\MapFile;
-use KevinGH\Box\Parallelization\AmpFailureCollector;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\SigningAlgorithm;
 use KevinGH\Box\RequirementChecker\DecodedComposerJson;
@@ -501,16 +500,12 @@ final class Compile implements CommandAware
             $box->addFiles($config->getFiles(), false);
 
             return;
-        } catch (MultiReasonException $ampFailure) {
+        } catch (TaskFailureThrowable $ampFailure) {
             throw new ConsoleRuntimeException(
                 sprintf(
                     'An Amp\Parallel error occurred. To diagnostic if it is an Amp error related, you may try again with "--no-parallel".'
-                    .'Reason(s) of the failure:%s%s',
-                    PHP_EOL,
-                    implode(
-                        PHP_EOL,
-                        AmpFailureCollector::collectReasons($ampFailure),
-                    ),
+                    .'Reason(s) of the failure: %s',
+                    $ampFailure->getMessage(),
                 ),
                 previous: $ampFailure,
             );
