@@ -128,6 +128,8 @@ class ApplicationTest extends TestCase
               process                 ⚡  Applies the registered compactors and replacement values on a file
               validate                ⚙  Validates the configuration file
               verify                  🔐️  Verifies the PHAR signature
+             check
+              check:signature         Checks the hash of the signature
              composer
               composer:check-version  Checks if the Composer executable used is compatible with Box
               composer:vendor-dir     Shows the Composer vendor-dir configured
