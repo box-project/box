@@ -1,0 +1,7 @@
+req. PHP ^8.2
+req. ext-zlib
+req. ext-phar
+req. ext-filter
+req. ext-openssl
+req. ext-tokenizer
+confl. ext-psr

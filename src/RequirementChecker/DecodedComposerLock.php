@@ -17,6 +17,7 @@ namespace KevinGH\Box\RequirementChecker;
 use function array_map;
 
 /**
+ * TODO: move it under the Composer namespace
  * @private
  */
 final readonly class DecodedComposerLock

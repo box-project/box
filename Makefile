@@ -18,6 +18,7 @@ SCOPED_BOX_BIN = bin/box.phar
 TMP_SCOPED_BOX_BIN = bin/_box.phar
 SCOPED_BOX = $(SCOPED_BOX_BIN)
 SCOPED_BOX_DEPS = bin/box bin/box.bat $(shell find src res) box.json.dist scoper.inc.php vendor
+BOX_EXPECTED_REQUIREMENTS = tests/Build/expected-box-requirements.txt
 
 DEFAULT_STUB = dist/default_stub.php
 
@@ -489,6 +490,8 @@ $(SCOPED_BOX_BIN): $(SCOPED_BOX_DEPS)
 	@echo "$(YELLOW_COLOR)Compile Box.$(NO_COLOR)"
 	@# Use parallelization
 	$(BOX) compile --ansi
+
+	$(BOX) check:requirements bin/box.phar $(BOX_EXPECTED_REQUIREMENTS)
 
 	rm $(TMP_SCOPED_BOX_BIN) || true
 	mv -v bin/box.phar $(TMP_SCOPED_BOX_BIN)

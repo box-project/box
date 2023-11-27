@@ -29,7 +29,7 @@ use function sprintf;
 final class Signature implements Command
 {
     private const PHAR_ARG = 'phar';
-    private const HASH = 'hash';
+    private const HASH = 'expected-hash';
 
     public function getConfiguration(): Configuration
     {

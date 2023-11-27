@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Console\Command;
+namespace KevinGH\Box\Console\Command\Generate;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
@@ -21,15 +21,15 @@ use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use function Safe\realpath;
 
 /**
- * @covers \KevinGH\Box\Console\Command\GenerateDockerFile
+ * @covers \KevinGH\Box\Console\Command\Generate\DockerFile
  *
  * @internal
  */
-class GenerateDockerFileTest extends CommandTestCase
+class DockerFileTest extends CommandTestCase
 {
     use RequiresPharReadonlyOff;
 
-    private const FIXTURES_DIR = __DIR__.'/../../../fixtures/docker';
+    private const FIXTURES_DIR = __DIR__.'/../../../../fixtures/docker';
 
     protected function setUp(): void
     {
@@ -40,7 +40,7 @@ class GenerateDockerFileTest extends CommandTestCase
 
     protected function getCommand(): Command
     {
-        return new GenerateDockerFile();
+        return new DockerFile();
     }
 
     public function test_it_generates_a_dockerfile_for_a_given_phar(): void

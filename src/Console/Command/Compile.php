@@ -34,6 +34,7 @@ use KevinGH\Box\Composer\ComposerOrchestrator;
 use KevinGH\Box\Composer\ComposerProcessFactory;
 use KevinGH\Box\Composer\IncompatibleComposerVersion;
 use KevinGH\Box\Configuration\Configuration;
+use KevinGH\Box\Console\Command\Generate\DockerFile;
 use KevinGH\Box\Console\Logger\CompilerLogger;
 use KevinGH\Box\Console\MessageRenderer;
 use KevinGH\Box\Console\OpenFileDescriptorLimiter;
@@ -986,6 +987,6 @@ final class Compile implements CommandAware
 
     private function getDockerCommand(): Command
     {
-        return $this->getCommandRegistry()->findCommand(GenerateDockerFile::NAME);
+        return $this->getCommandRegistry()->findCommand(DockerFile::NAME);
     }
 }

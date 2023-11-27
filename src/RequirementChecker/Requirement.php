@@ -136,4 +136,18 @@ final readonly class Requirement
             'helpMessage' => $this->helpMessage,
         ];
     }
+
+    /**
+     * @return string Represents what this requirement is about omitting the source and remedies.
+     */
+    public function toSuccinctDescription(): string
+    {
+        $type = match($this->type) {
+            RequirementType::PHP => 'req. PHP ',
+            RequirementType::EXTENSION => 'req. ext-',
+            RequirementType::EXTENSION_CONFLICT => 'confl. ext-',
+        };
+
+        return $type.$this->condition;
+    }
 }
