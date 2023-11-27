@@ -8,7 +8,7 @@
 
 
 Unlike when installing a library with [Composer][composer], no constraint check is done by default with a PHAR. As a
-result, if you are using a PHAR of an application compatible with PHP 7.2 in PHP 7.0 or a PHP environment which does not
+result, if you are using a PHAR of an application compatible with PHP 8.2 in PHP 7.4 or a PHP environment which does not
 have a required extension, it will simply break with a non-friendly error.
 
 By default, when building your PHAR, Box will look up for the PHP versions and extensions required to execute your
@@ -33,6 +33,9 @@ Box will retrieve all the (non-dev) requirements including the ones of the depen
 `composer.lock` file is present, it will take the information from it. If not found, it will fallback on the
 `composer.json` but that it will not be able to retrieve any information regarding the dependencies requirements in this
 case.
+
+This behaviour can be forcefully enabled or disabled via the [check requirements] setting.
+
 
 ### PHP version requirements
 
@@ -62,9 +65,9 @@ the following example:
 }
 ```
 
-In the above example, Composer will emulate PHP 7.1.10 environment. This makes sure that when installing the
-dependencies, they will be compatible with 7.1.10+. It will however not affect the application requirements and as a
-result Box will pick `^7.1` as the PHP requirement.
+Composer will emulate PHP 7.1.10 environment. This makes sure that when installing the dependencies, they will be
+compatible with 7.1.10+. It will however not affect the application requirements and as a result Box will pick `^7.1` as
+the PHP requirement.
 
 
 ### Extension configuration requirements
@@ -104,8 +107,6 @@ For example, if you have the following configuration:
 
 Then the `mbstring` extension will not be required since its polyfill has been found.
 
-Functions requirements/polyfills are not supported at the moment, see [#131][#131].
-
 
 ## Integration with a custom stub
 
@@ -131,7 +132,7 @@ When the requirement checker is shipped, you can always skip it by setting the e
 to skip it, you can run:
 
 ```shell
-BOX_REQUIREMENT_CHECKER=0 php box.phar 
+BOX_REQUIREMENT_CHECKER=0 php acme.phar 
 ```
 
 
@@ -141,7 +142,7 @@ Since version 3.17.0, box logs the requirements checker output to `stderr` per d
 The requirements checker can be configured to output to `stdout` instead by setting `BOX_REQUIREMENTS_CHECKER_LOG_TO_STDOUT=1`:
 
 ```shell
-BOX_REQUIREMENTS_CHECKER_LOG_TO_STDOUT=1 php box.phar
+BOX_REQUIREMENTS_CHECKER_LOG_TO_STDOUT=1 php acme.phar
 ```
 
 
@@ -151,9 +152,9 @@ BOX_REQUIREMENTS_CHECKER_LOG_TO_STDOUT=1 php box.phar
 « [Configuration](configuration.md#configuration) • [Optimize your PHAR](optimizations.md#optimize-your-phar) »
 
 
+[check requirements]: configuration.md#check-requirements-check-requirements
 [composer]: https://getcomposer.org/
 [compression]: configuration.md#compression-algorithm-compression
 [composer-platform-php]: https://getcomposer.org/doc/06-config.md#platform
 [paragonie sodium_compat]: https://github.com/paragonie/sodium_compat
 [phpseclib mcrypt_compat]: https://github.com/phpseclib/mcrypt_compat
-[#131]: https://github.com/humbug/box/issues/131
