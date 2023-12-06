@@ -12,8 +12,10 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\RequirementChecker;
+namespace KevinGH\Box\Composer;
 
+use KevinGH\Box\RequirementChecker\PackageInfo;
+use KevinGH\Box\RequirementChecker\RequiredItem;
 use function array_keys;
 
 /**

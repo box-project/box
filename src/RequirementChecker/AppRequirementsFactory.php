@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
+use KevinGH\Box\Composer\DecodedComposerJson;
+use KevinGH\Box\Composer\DecodedComposerLock;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use function array_diff_key;
 use function array_filter;
