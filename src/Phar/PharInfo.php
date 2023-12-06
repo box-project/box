@@ -46,6 +46,10 @@ namespace KevinGH\Box\Phar;
 use Fidry\FileSystem\FS;
 use KevinGH\Box\Console\Command\Extract;
 use KevinGH\Box\ExecutableFinder;
+use KevinGH\Box\RequirementChecker\InvalidRequirements;
+use KevinGH\Box\RequirementChecker\NoRequirementsFound;
+use KevinGH\Box\RequirementChecker\Requirement;
+use KevinGH\Box\RequirementChecker\Requirements;
 use OutOfBoundsException;
 use Phar;
 use Symfony\Component\Filesystem\Path;
@@ -53,6 +57,9 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
+use Throwable;
+use function array_key_exists;
+use function array_map;
 use function bin2hex;
 use function file_exists;
 use function is_readable;
@@ -74,6 +81,8 @@ use const DIRECTORY_SEPARATOR;
  */
 final class PharInfo
 {
+    public const BOX_REQUIREMENTS = '.box/.requirements.php';
+
     private static array $ALGORITHMS;
     private static string $stubfile;
 
@@ -261,6 +270,43 @@ final class PharInfo
     public function getFiles(): array
     {
         return $this->files;
+    }
+
+    /**
+     * @throws NoRequirementsFound
+     * @throws InvalidRequirements
+     */
+    public function getRequirements(): Requirements
+    {
+        $file = $this->getFileName();
+
+        if (!array_key_exists(self::BOX_REQUIREMENTS, $this->files)) {
+            throw NoRequirementsFound::forFile($file);
+        }
+
+        $evaluatedRequirements = require $this->files[self::BOX_REQUIREMENTS]->getPathname();
+
+        if (!is_array($evaluatedRequirements)) {
+            throw InvalidRequirements::forRequirements($file, $evaluatedRequirements);
+        }
+
+        try {
+            return new Requirements(
+                array_map(
+                    Requirement::fromArray(...),
+                    $evaluatedRequirements,
+                ),
+            );
+        } catch (Throwable $throwable) {
+            throw new InvalidRequirements(
+                sprintf(
+                    'Could not interpret Box\'s RequirementChecker shipped in "%s": %s',
+                    $file,
+                    $throwable->getMessage(),
+                ),
+                previous: $throwable,
+            );
+        }
     }
 
     private static function initAlgorithms(): void
