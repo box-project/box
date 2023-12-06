@@ -156,6 +156,7 @@ function format_time(float $secs): string
     );
 }
 
+// TODO: move to a Bootstrap class
 /**
  * @private
  */

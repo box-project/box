@@ -45,6 +45,7 @@ final readonly class ProcessFileTask implements Task
     {
         chdir($this->cwd);
 
+        // TODO: check if it is necessary
         register_aliases();
         register_error_handler();
 
