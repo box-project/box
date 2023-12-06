@@ -16,6 +16,9 @@ namespace KevinGH\Box;
 
 use KevinGH\Box\RequirementChecker\Requirement;
 use PHPUnit\Framework\TestCase;
+use function sprintf;
+use const PHP_MAJOR_VERSION;
+use const PHP_MINOR_VERSION;
 
 /**
  * @covers \KevinGH\Box\DockerFileGenerator
@@ -325,6 +328,34 @@ class DockerFileGeneratorTest extends TestCase
             'box.phar',
             <<<'Dockerfile'
                 FROM php:to-define-manually
+
+                COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+
+                COPY box.phar /box.phar
+
+                ENTRYPOINT ["/box.phar"]
+
+                Dockerfile,
+        ];
+
+        $currentPhpMajorVersion = PHP_MAJOR_VERSION;
+        $currentPhpMinorVersion = PHP_MINOR_VERSION;
+
+        yield 'current PHP constraints' => [
+            [
+                Requirement::forPHP(
+                    sprintf(
+                        '~%s.%s.0',
+                        $currentPhpMajorVersion,
+                        $currentPhpMinorVersion,
+                    ),
+                    null,
+                )
+                    ->toArray(),
+            ],
+            'box.phar',
+            <<<Dockerfile
+                FROM php:{$currentPhpMajorVersion}.{$currentPhpMinorVersion}-cli-alpine
 
                 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
