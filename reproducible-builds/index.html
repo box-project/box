@@ -977,8 +977,8 @@ you add a PHAR to a file, it is changed to the time at when you added it).</p>
 <p>Deterministic builds are a highly desirable property to prevent targeted malware attacks. They also make it easier to
 detect if there is any real change. As non-exhaustive examples in the wild: <a href="https://github.com/composer/composer">Composer</a> and <a href="https://github.com/phpstan/phpstan">PHPStan</a>.</p>
 <p>Another benefit of such builds is that it makes it easier to know if there was any change. You can know if two PHARs are
-identical by using the <code>box diff</code> command, or extract the signature out of the <code>box info</code> command:</p>
-<div class="highlight"><pre><span></span><code>box<span class="w"> </span>info<span class="w"> </span>app.phar<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;Signature Hash&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="w"> </span><span class="s1">&#39; &#39;</span><span class="w"> </span>-f3
+identical by using the <code>box diff</code> command, or extract the signature out of the <code>box info:signature</code> command:</p>
+<div class="highlight"><pre><span></span><code>box<span class="w"> </span>info:signature<span class="w"> </span>app.phar
 </code></pre></div>
 <p>And re-use that signature later for comparison. You will loose the ability to do a detailed diff between the two PHARs,
 but it is enough to know if the PHARs are identical or not.</p>
