@@ -12,9 +12,8 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Composer;
+namespace KevinGH\Box\Composer;
 
-use KevinGH\Box\Composer\DecodedComposerJson;
 use KevinGH\Box\RequirementChecker\RequiredItem;
 use PHPUnit\Framework\TestCase;
 use function json_decode;
