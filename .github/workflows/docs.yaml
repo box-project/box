@@ -69,7 +69,7 @@ jobs:
                 run: pip --version
 
             -   name: Install dependencies
-                run: python3 --mod pip install mkdocs mkdocs-material
+                run: python3 -m pip install mkdocs mkdocs-material
 
             -   name: Rebuild website
                 run: make _website_build
