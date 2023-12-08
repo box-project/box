@@ -195,6 +195,7 @@ class StubGeneratorTest extends TestCase
 
                 require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 
+                $_SERVER['SCRIPT_FILENAME'] = 'phar://' . __FILE__ . '/acme.php';
                 require 'phar://' . __FILE__ . '/acme.php';
 
                 __HALT_COMPILER(); ?>
@@ -210,6 +211,7 @@ class StubGeneratorTest extends TestCase
             <<<'STUB'
                 <?php
 
+                $_SERVER['SCRIPT_FILENAME'] = 'phar://' . __FILE__ . '/acme.php';
                 require 'phar://' . __FILE__ . '/acme.php';
 
                 __HALT_COMPILER(); ?>
@@ -274,6 +276,7 @@ class StubGeneratorTest extends TestCase
 
                 require 'phar://test.phar/.box/bin/check-requirements.php';
 
+                $_SERVER['SCRIPT_FILENAME'] = 'phar://test.phar/index.php';
                 require 'phar://test.phar/index.php';
 
                 __HALT_COMPILER(); ?>
@@ -307,6 +310,7 @@ class StubGeneratorTest extends TestCase
                 Phar::mapPhar('test.phar');
                 Phar::interceptFileFuncs();
 
+                $_SERVER['SCRIPT_FILENAME'] = 'phar://test.phar/index.php';
                 require 'phar://test.phar/index.php';
 
                 __HALT_COMPILER(); ?>

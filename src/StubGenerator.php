@@ -156,9 +156,12 @@ final class StubGenerator
                 $stub[] = '';
             }
 
-            $stub[] = null === $alias
-                ? "require 'phar://' . __FILE__ . '/{$index}';"
-                : "require 'phar://{$alias}/{$index}';";
+            $indexPath = null === $alias
+                ? "'phar://' . __FILE__ . '/{$index}';"
+                : "'phar://{$alias}/{$index}';";
+
+            $stub[] = "\$_SERVER['SCRIPT_FILENAME'] = {$indexPath}";
+            $stub[] = "require {$indexPath}";
         }
 
         if ([] === $stub) {
