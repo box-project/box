@@ -139,30 +139,30 @@ final class AppRequirementsFactory
         DecodedComposerLock $composerLock,
         CompressionAlgorithm $compressionAlgorithm,
     ): array {
-        $requirements = [];
+        $extensions = new ExtensionRegistry();
 
         $compressionAlgorithmRequiredExtension = $compressionAlgorithm->getRequiredExtension();
 
         if (null !== $compressionAlgorithmRequiredExtension) {
-            $requirements[$compressionAlgorithmRequiredExtension] = [self::SELF_PACKAGE];
+            $extensions->addRequiredExtension(
+                new Extension($compressionAlgorithmRequiredExtension),
+                self::SELF_PACKAGE,
+            );
         }
 
         foreach ($composerLock->getPlatformExtensions() as $extension) {
-            $requirements[$extension] = [self::SELF_PACKAGE];
+            $extensions->addRequiredExtension($extension, self::SELF_PACKAGE);
         }
 
         // If the lock is present it is the authority. If not fallback on the .json. It is pointless to check both
         // since they will contain redundant information.
-        [$polyfills, $requirements, $conflicts] = $composerLock->isEmpty()
-            ? self::collectComposerJsonExtensionRequirements($composerJson, $requirements)
-            : self::collectComposerLockExtensionRequirements($composerLock, $requirements);
+        // TODO: to check but I think we should check the installed.json file instead
+        // This would allow to avoid to have to care about the case where the .lock may
+        // not be present for whatever reason.
+        self::collectComposerLockExtensionRequirements($composerLock, $extensions);
+        self::collectComposerJsonExtensionRequirements($composerJson, $extensions);
 
-        $jsonConflicts = self::collectComposerJsonExtensionRequirements($composerJson, $requirements)[2];
-
-        return [
-            array_diff_key($requirements, $polyfills),
-            array_merge_recursive($conflicts, $jsonConflicts),
-        ];
+        return $extensions;
     }
 
     /**
@@ -172,7 +172,7 @@ final class AppRequirementsFactory
      */
     private static function collectComposerJsonExtensionRequirements(
         DecodedComposerJson $composerJson,
-        array $requirements,
+        ExtensionRegistry $extensionRegistry,
     ): array {
         $polyfills = [];
         $conflicts = [];
@@ -209,18 +209,21 @@ final class AppRequirementsFactory
      */
     private static function collectComposerLockExtensionRequirements(
         DecodedComposerLock $composerLock,
-        array $requirements,
+        ExtensionRegistry $extensions,
     ): array {
-        $polyfills = [];
-        $conflicts = [];
-
         foreach ($composerLock->getPackages() as $packageInfo) {
             foreach ($packageInfo->getPolyfilledExtensions() as $polyfilledExtension) {
-                $polyfills[$polyfilledExtension] = true;
+                $extensions->addProvidedExtension(
+                    $polyfilledExtension,
+                    $packageInfo->getName(),
+                );
             }
 
             foreach ($packageInfo->getRequiredExtensions() as $extension) {
-                $requirements[$extension][] = $packageInfo->getName();
+                $extensions->addRequiredExtension(
+                    $extension,
+                    $packageInfo->getName(),
+                );
             }
 
             foreach ($packageInfo->getConflictingExtensions() as $extension) {

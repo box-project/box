@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
+use KevinGH\Box\RequirementChecker\Extension;
 use KevinGH\Box\RequirementChecker\PackageInfo;
 use function array_map;
 
@@ -45,7 +46,7 @@ final readonly class DecodedComposerLock
     }
 
     /**
-     * @return list<string>
+     * @return list<Extension>
      */
     public function getPlatformExtensions(): array
     {

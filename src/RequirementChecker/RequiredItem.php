@@ -42,19 +42,19 @@ final readonly class RequiredItem
     }
 
     /**
-     * @return list<string>
+     * @return list<Extension>
      */
     public function getRequiredExtensions(): array
     {
         return PackageInfo::parseExtensions($this->packageInfo);
     }
 
-    public function getPolyfilledExtension(): ?string
+    public function getPolyfilledExtension(): ?Extension
     {
         $name = $this->getName();
 
         if (array_key_exists($name, self::POLYFILL_MAP)) {
-            return self::POLYFILL_MAP[$name];
+            return new Extension(self::POLYFILL_MAP[$name]);
         }
 
         if (1 !== preg_match(self::SYMFONY_POLYFILL_REGEX, $name, $matches)) {
@@ -63,6 +63,8 @@ final readonly class RequiredItem
 
         $extension = $matches['extension'];
 
-        return str_starts_with($extension, 'php') ? null : $extension;
+        return str_starts_with($extension, 'php')
+            ? null
+            : new Extension($extension);
     }
 }

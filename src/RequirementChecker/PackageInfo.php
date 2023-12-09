@@ -15,8 +15,11 @@ declare(strict_types=1);
 namespace KevinGH\Box\RequirementChecker;
 
 use function array_key_exists;
+use function iter\toArray;
+use function Pipeline\map;
 
 /**
+ * TODO: move to under Composer
  * @private
  */
 final readonly class PackageInfo
@@ -65,6 +68,7 @@ final readonly class PackageInfo
     }
 
     /**
+     * TODO: rename polyfilled to provided
      * @return list<string>
      */
     public function getPolyfilledExtensions(): array
@@ -90,7 +94,7 @@ final readonly class PackageInfo
     }
 
     /**
-     * @return list<string>
+     * @return list<Extension>
      */
     public function getConflictingExtensions(): array
     {
@@ -102,17 +106,15 @@ final readonly class PackageInfo
     /**
      * @param array<string, string> $constraints
      *
-     * @return list<string>
+     * @return list<Extension>
      */
     public static function parseExtensions(array $constraints): array
     {
         $extensions = [];
 
         foreach ($constraints as $package => $constraint) {
-            if (preg_match(self::EXTENSION_REGEX, $package, $matches)) {
-                $extension = $matches['extension'];
-
-                $extensions[] = self::EXTENSION_NAME_MAP[$extension] ?? $extension;
+            if (Extension::isExtension($package)) {
+                $extensions[] = Extension::parse($package, $constraint);
             }
         }
 

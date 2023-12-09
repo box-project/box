@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
+use KevinGH\Box\RequirementChecker\Extension;
 use KevinGH\Box\RequirementChecker\PackageInfo;
 use KevinGH\Box\RequirementChecker\RequiredItem;
 use function array_keys;
@@ -54,7 +55,7 @@ final readonly class DecodedComposerJson
     }
 
     /**
-     * @return list<string>
+     * @return list<Extension>
      */
     public function getConflictingExtensions(): array
     {
