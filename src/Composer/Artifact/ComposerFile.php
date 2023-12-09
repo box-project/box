@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Composer\Artficact;
+namespace KevinGH\Box\Composer\Artifact;
 
 use Webmozart\Assert\Assert;
 

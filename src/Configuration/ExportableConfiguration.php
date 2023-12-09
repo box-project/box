@@ -16,7 +16,7 @@ namespace KevinGH\Box\Configuration;
 
 use Closure;
 use KevinGH\Box\Compactor\Compactors;
-use KevinGH\Box\Composer\Artficact\ComposerFile;
+use KevinGH\Box\Composer\Artifact\ComposerFile;
 use KevinGH\Box\MapFile;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Path;

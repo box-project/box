@@ -14,13 +14,12 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer\Artifact;
 
-use KevinGH\Box\Composer\Artficact\DecodedComposerLock;
 use KevinGH\Box\Composer\Package\PackageInfo;
 use PHPUnit\Framework\TestCase;
 use function json_decode;
 
 /**
- * @covers \KevinGH\Box\Composer\Artficact\DecodedComposerLock
+ * @covers \KevinGH\Box\Composer\Artifact\DecodedComposerLock
  *
  * @internal
  */

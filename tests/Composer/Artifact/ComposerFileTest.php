@@ -15,12 +15,11 @@ declare(strict_types=1);
 namespace KevinGH\Box\Composer\Artifact;
 
 use Closure;
-use KevinGH\Box\Composer\Artficact\ComposerFile;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \KevinGH\Box\Composer\Artficact\ComposerFile
+ * @covers \KevinGH\Box\Composer\Artifact\ComposerFile
  *
  * @internal
  */
