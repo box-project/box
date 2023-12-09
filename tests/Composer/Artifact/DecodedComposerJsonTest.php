@@ -12,14 +12,15 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Composer;
+namespace KevinGH\Box\Composer\Artifact;
 
-use KevinGH\Box\RequirementChecker\RequiredItem;
+use KevinGH\Box\Composer\Artficact\DecodedComposerJson;
+use KevinGH\Box\Composer\Package\RequiredItem;
 use PHPUnit\Framework\TestCase;
 use function json_decode;
 
 /**
- * @covers \KevinGH\Box\Composer\DecodedComposerJson
+ * @covers \KevinGH\Box\Composer\Artficact\DecodedComposerJson
  *
  * @internal
  */

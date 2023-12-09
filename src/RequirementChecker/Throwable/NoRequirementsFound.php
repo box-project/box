@@ -12,24 +12,22 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\RequirementChecker;
+namespace KevinGH\Box\RequirementChecker\Throwable;
 
 use RuntimeException;
-use function get_debug_type;
 use function sprintf;
 
 /**
  * @private
  */
-final class InvalidRequirements extends RuntimeException
+final class NoRequirementsFound extends RuntimeException
 {
-    public static function forRequirements(string $file, mixed $value): self
+    public static function forFile(string $file): self
     {
         return new self(
             sprintf(
-                'Could not interpret Box\'s RequirementChecker shipped in "%s". Expected an array got "%s".',
+                'Could not find Box\'s RequirementChecker in "%s".',
                 $file,
-                get_debug_type($value),
             ),
         );
     }

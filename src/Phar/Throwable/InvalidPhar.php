@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Phar;
+namespace KevinGH\Box\Phar\Throwable;
 
 use Throwable;
 use UnexpectedValueException;

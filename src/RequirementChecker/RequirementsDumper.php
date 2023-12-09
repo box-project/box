@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace KevinGH\Box\RequirementChecker;
 
 use Fidry\FileSystem\FS;
-use KevinGH\Box\Composer\DecodedComposerJson;
-use KevinGH\Box\Composer\DecodedComposerLock;
+use KevinGH\Box\Composer\Artficact\DecodedComposerJson;
+use KevinGH\Box\Composer\Artficact\DecodedComposerLock;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;

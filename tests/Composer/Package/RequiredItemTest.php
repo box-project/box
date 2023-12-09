@@ -12,12 +12,12 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\RequirementChecker;
+namespace KevinGH\Box\Composer\Package;
 
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \KevinGH\Box\RequirementChecker\RequiredItem
+ * @covers \KevinGH\Box\Composer\Package\RequiredItem
  *
  * @internal
  */

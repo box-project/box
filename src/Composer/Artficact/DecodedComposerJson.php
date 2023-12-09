@@ -12,10 +12,10 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Composer;
+namespace KevinGH\Box\Composer\Artficact;
 
-use KevinGH\Box\RequirementChecker\PackageInfo;
-use KevinGH\Box\RequirementChecker\RequiredItem;
+use KevinGH\Box\Composer\Package\PackageInfo;
+use KevinGH\Box\Composer\Package\RequiredItem;
 use function array_keys;
 
 /**
@@ -41,7 +41,7 @@ final readonly class DecodedComposerJson
     }
 
     /**
-     * @return list<RequiredItem>
+     * @return RequiredItem
      */
     public function getRequiredItems(): array
     {

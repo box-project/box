@@ -12,9 +12,9 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Composer;
+namespace KevinGH\Box\Composer\Artficact;
 
-use KevinGH\Box\RequirementChecker\PackageInfo;
+use KevinGH\Box\Composer\Package\PackageInfo;
 use function array_map;
 
 /**
@@ -53,7 +53,7 @@ final readonly class DecodedComposerLock
     }
 
     /**
-     * @return list<PackageInfo>
+     * @return PackageInfo
      */
     public function getPackages(): array
     {

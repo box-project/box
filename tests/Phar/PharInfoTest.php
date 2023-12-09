@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Phar;
 
+use KevinGH\Box\Phar\Throwable\InvalidPhar;
 use PHPUnit\Framework\TestCase;
 use function array_keys;
 use function basename;

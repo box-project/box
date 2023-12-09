@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Composer;
 
 use Fidry\FileSystem\FileSystem;
+use KevinGH\Box\Composer\Throwable\UndetectableComposerVersion;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
