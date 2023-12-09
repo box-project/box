@@ -18,7 +18,7 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Test\OutputAssertions;
 use KevinGH\Box\Console\DisplayNormalizer;
-use KevinGH\Box\Phar\InvalidPhar;
+use KevinGH\Box\Phar\Throwable\InvalidPhar;
 use KevinGH\Box\Test\CommandTestCase;
 use Symfony\Component\Filesystem\Path;
 

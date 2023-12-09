@@ -18,6 +18,8 @@ use Composer\Semver\Semver;
 use Fidry\Console\IO;
 use Fidry\FileSystem\FileSystem;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
+use KevinGH\Box\Composer\Throwable\IncompatibleComposerVersion;
+use KevinGH\Box\Composer\Throwable\UndetectableComposerVersion;
 use KevinGH\Box\NotInstantiable;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;

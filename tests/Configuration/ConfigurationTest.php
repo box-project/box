@@ -3050,7 +3050,7 @@ class ConfigurationTest extends ConfigurationTestCase
               -file: "box.json"
               -alias: "test.phar"
               -basePath: "/path/to"
-              -composerJson: KevinGH\Box\Composer\ComposerFile {#100
+              -composerJson: KevinGH\Box\Composer\Artifact\ComposerFile {#100
                 -path: "composer.json"
                 -contents: array:1 [
                   "config" => array:3 [
@@ -3062,7 +3062,7 @@ class ConfigurationTest extends ConfigurationTestCase
                   ]
                 ]
               }
-              -composerLock: KevinGH\Box\Composer\ComposerFile {#100
+              -composerLock: KevinGH\Box\Composer\Artifact\ComposerFile {#100
                 -path: "composer.lock"
                 -contents: []
               }

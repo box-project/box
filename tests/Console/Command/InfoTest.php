@@ -17,7 +17,7 @@ namespace KevinGH\Box\Console\Command;
 use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
 use InvalidArgumentException;
-use KevinGH\Box\Phar\InvalidPhar;
+use KevinGH\Box\Phar\Throwable\InvalidPhar;
 use KevinGH\Box\Platform;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
