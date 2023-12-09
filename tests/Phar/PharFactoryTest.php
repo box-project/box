@@ -24,8 +24,8 @@ use function extension_loaded;
 use const DIRECTORY_SEPARATOR;
 
 /**
- * @covers \KevinGH\Box\Phar\Throwable\InvalidPhar
  * @covers \KevinGH\Box\Phar\PharFactory
+ * @covers \KevinGH\Box\Phar\Throwable\InvalidPhar
  *
  * @internal
  */

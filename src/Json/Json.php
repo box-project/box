@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Json;
 
-use Fidry\FileSystem\FS;g
+use Fidry\FileSystem\FS;
 use JsonSchema\Validator;
 use Seld\JsonLint\JsonParser;
 use Seld\JsonLint\ParsingException;
