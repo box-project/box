@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\AutoReview;
 
 use PHPUnit\Framework\Attributes\CoversNothing;
-use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 use function array_filter;
@@ -27,7 +27,7 @@ use const PHP_EOL;
 /**
  * @internal
  */
-#[RunInSeparateProcess]
+#[RunTestsInSeparateProcesses]
 #[CoversNothing]
 class PhpUnitAnnotationsTest extends TestCase
 {

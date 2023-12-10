@@ -34,7 +34,7 @@
         "phpdocumentor/reflection-docblock": "^5.3",
         "phpdocumentor/type-resolver": "^1.7",
         "psr/log": "^3.0",
-        "sebastian/diff": "^4.0",
+        "sebastian/diff": "^5.0",
         "seld/jsonlint": "^1.9",
         "seld/phar-utils": "^1.2",
         "symfony/filesystem": "^6.1.5",
@@ -53,7 +53,7 @@
         "mikey179/vfsstream": "^1.6.11",
         "phpspec/prophecy": "^1.17",
         "phpspec/prophecy-phpunit": "^2.0.2",
-        "phpunit/phpunit": "^9.5.26",
+        "phpunit/phpunit": "^10.0",
         "symfony/yaml": "^6.2"
     },
     "replace": {

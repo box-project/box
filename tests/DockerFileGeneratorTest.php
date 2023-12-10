@@ -118,7 +118,7 @@ class DockerFileGeneratorTest extends TestCase
                 Dockerfile,
         ];
 
-        yield 'multple extensions' => [
+        yield 'multiple extensions' => [
             '7.2-cli-alpine',
             ['phar', 'gzip'],
             'box.phar',

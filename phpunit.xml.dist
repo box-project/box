@@ -12,10 +12,10 @@
 
     <php>
         <env name="BOX_ALLOW_XDEBUG" value="1"/>
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0" />
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0"/>
 
         <!-- The width is matching the Travis one to avoid any issues with the CI -->
-        <env name="COLUMNS" value="80" />
+        <env name="COLUMNS" value="80"/>
     </php>
 
     <testsuites>
@@ -31,9 +31,9 @@
         </testsuite>
     </testsuites>
 
-    <coverage>
+    <source>
         <include>
-            <directory suffix=".php">src/</directory>
+            <directory>src/</directory>
         </include>
         <exclude>
             <file>src/bootstrap.php</file>
@@ -46,5 +46,5 @@
             <directory>src/FileSystem</directory>
             <directory>src/Test</directory>
         </exclude>
-      </coverage>
+    </source>
 </phpunit>

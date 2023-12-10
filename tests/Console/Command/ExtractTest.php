@@ -66,7 +66,7 @@ class ExtractTest extends CommandTestCase
         self::assertEqualsCanonicalizing($expectedFiles, $actualFiles);
     }
 
-    private static function pharProvider(): iterable
+    public static function pharProvider(): iterable
     {
         $pharPath = self::FIXTURES_DIR.'/simple-phar.phar';
 

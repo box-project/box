@@ -14,10 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Phar;
 
-use Phar;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 use function rtrim;
 use function Safe\file_get_contents;
@@ -26,6 +25,7 @@ use function Safe\file_get_contents;
  * @internal
  */
 #[CoversClass(PharMeta::class)]
+#[RunTestsInSeparateProcesses]
 final class PharMetaTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__.'/../../fixtures/extract';
@@ -83,7 +83,6 @@ final class PharMetaTest extends TestCase
     }
 
     #[DataProvider('pharProvider')]
-    #[RunInSeparateProcess]
     public function test_it_can_be_created_from_phars(
         string $file,
         ?string $pubKey,

@@ -110,9 +110,6 @@ class CompactorsTest extends TestCase
         array $compactors,
         ?SymbolsRegistry $newSymbolsRegistry,
     ): void {
-        // We need to do this here since we use a prophet in the data provider
-        $this->recordDoubledType(Scoper::class);
-
         $compactorsAggregate = new Compactors(...$compactors);
 
         if (null !== $newSymbolsRegistry) {
