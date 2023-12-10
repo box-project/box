@@ -15,21 +15,20 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use KevinGH\Box\RequirementChecker\Requirement;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 use const PHP_MAJOR_VERSION;
 use const PHP_MINOR_VERSION;
 
 /**
- * @covers \KevinGH\Box\DockerFileGenerator
- *
  * @internal
  */
+#[CoversClass(DockerFileGenerator::class)]
 class DockerFileGeneratorTest extends TestCase
 {
-    /**
-     * @dataProvider generatorDataProvider
-     */
+    #[DataProvider('generatorDataProvider')]
     public function test_it_can_generate_a_dockerfile_contents(
         string $image,
         array $extensions,
@@ -41,9 +40,7 @@ class DockerFileGeneratorTest extends TestCase
         self::assertSame($expected, $actual);
     }
 
-    /**
-     * @dataProvider generatorRequirementsProvider
-     */
+    #[DataProvider('generatorRequirementsProvider')]
     public function test_it_can_generate_a_dockerfile_contents_from_requirements(
         array $requirements,
         string $sourcePhar,

@@ -14,21 +14,20 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function array_merge;
 use function array_values;
 
 /**
- * @covers \KevinGH\Box\StubGenerator
- *
  * @internal
  */
+#[CoversClass(StubGenerator::class)]
 class StubGeneratorTest extends TestCase
 {
-    /**
-     * @dataProvider valuesProvider
-     */
+    #[DataProvider('valuesProvider')]
     public function test_it_can_generate_a_stub(
         ?string $alias,
         ?string $banner,

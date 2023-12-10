@@ -16,17 +16,17 @@ namespace KevinGH\Box\Composer;
 
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use PhpParser\Node\Name\FullyQualified;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversNothing
  * @internal
  */
+#[CoversNothing]
 final class AutoloadDumperTest extends TestCase
 {
-    /**
-     * @dataProvider autoloadProvider
-     */
+    #[DataProvider('autoloadProvider')]
     public function test_it_can_generate_the_autoload(
         SymbolsRegistry $symbolsRegistry,
         array $excludedComposerAutoloadFileHashes,

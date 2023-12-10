@@ -14,13 +14,13 @@ declare(strict_types=1);
 
 namespace KevinGH\RequirementChecker\AutoReview;
 
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversNothing
- *
  * @internal
  */
+#[CoversNothing]
 final class GAE2ETest extends TestCase
 {
     public function test_github_actions_executes_all_the_e2e_tests(): void

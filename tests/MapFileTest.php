@@ -14,20 +14,19 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function serialize;
 use function unserialize;
 
 /**
- * @covers \KevinGH\Box\MapFile
- *
  * @internal
  */
+#[CoversClass(MapFile::class)]
 class MapFileTest extends TestCase
 {
-    /**
-     * @dataProvider mapsProvider
-     */
+    #[DataProvider('mapsProvider')]
     public function test_it_can_map_files(string $basePath, array $map, string $file, string $expected): void
     {
         $mapFile = new MapFile($basePath, $map);
@@ -37,9 +36,7 @@ class MapFileTest extends TestCase
         self::assertSame($expected, $actual);
     }
 
-    /**
-     * @dataProvider mapFilesProvider
-     */
+    #[DataProvider('mapFilesProvider')]
     public function test_it_serializable(MapFile $mapFile): void
     {
         self::assertEquals(

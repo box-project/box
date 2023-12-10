@@ -16,20 +16,22 @@ namespace KevinGH\Box\Configuration;
 
 use Fidry\FileSystem\FS;
 use InvalidArgumentException;
+use KevinGH\Box\MapFile;
 use KevinGH\Box\Phar\SigningAlgorithm;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use UnexpectedValueException;
 use function array_unshift;
 use function in_array;
 use const DIRECTORY_SEPARATOR;
 
 /**
- * @covers \KevinGH\Box\Configuration\Configuration
- * @covers \KevinGH\Box\MapFile
- *
- * @group config
- *
  * @internal
  */
+#[CoversClass(Configuration::class)]
+#[CoversClass(MapFile::class)]
+#[Group('config')]
 class ConfigurationSigningTest extends ConfigurationTestCase
 {
     public function test_the_default_signing_is_sha512(): void
@@ -67,9 +69,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
         self::assertSame([], $this->config->getWarnings());
     }
 
-    /**
-     * @dataProvider passFileFreeSigningAlgorithmProvider
-     */
+    #[DataProvider('passFileFreeSigningAlgorithmProvider')]
     public function test_the_signing_algorithm_can_be_configured(string $algorithm, SigningAlgorithm $expected): void
     {
         $this->setConfig([
@@ -113,9 +113,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
         }
     }
 
-    /**
-     * @dataProvider passFileFreeSigningAlgorithmProvider
-     */
+    #[DataProvider('passFileFreeSigningAlgorithmProvider')]
     public function test_it_generates_a_warning_when_a_key_pass_is_provided_but_the_algorithm_is_not__open_ssl(string $algorithm): void
     {
         $this->setConfig([
@@ -185,9 +183,7 @@ class ConfigurationSigningTest extends ConfigurationTestCase
         );
     }
 
-    /**
-     * @dataProvider passFileFreeSigningAlgorithmProvider
-     */
+    #[DataProvider('passFileFreeSigningAlgorithmProvider')]
     public function test_it_generates_a_warning_when_a_key_path_is_provided_but_the_algorithm_is_not__open_ssl(string $algorithm): void
     {
         FS::touch('key-file');

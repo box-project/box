@@ -14,17 +14,17 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \KevinGH\Box\Console\DisplayNormalizer
  * @internal
  */
+#[CoversClass(DisplayNormalizer::class)]
 final class DisplayNormalizerTest extends TestCase
 {
-    /**
-     * @dataProvider blockProvider
-     */
+    #[DataProvider('blockProvider')]
     public static function test_it_can_remove_the_line_returns_from_blocks(
         string $value,
         ?string $expected,

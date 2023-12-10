@@ -16,16 +16,17 @@ namespace KevinGH\Box\Configuration;
 
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Php;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use stdClass;
 use function current;
 
 /**
- * @covers \KevinGH\Box\Configuration\Configuration
- *
- * @group config
- *
  * @internal
  */
+#[CoversClass(Configuration::class)]
+#[Group('config')]
 class ConfigurationPhpCompactorTest extends ConfigurationTestCase
 {
     public function test_the_php_compactor_can_be_registered(): void
@@ -98,9 +99,7 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
         }
     }
 
-    /**
-     * @dataProvider annotationConfigurationsWithoutPhpCompactorRegisteredProvider
-     */
+    #[DataProvider('annotationConfigurationsWithoutPhpCompactorRegisteredProvider')]
     public function test_a_warning_is_given_if_the_php_compactor_annotations_are_configured_but_no_php_compactor_is_registered(
         mixed $annotationValue,
         array $expectedRecommendations,
@@ -140,9 +139,7 @@ class ConfigurationPhpCompactorTest extends ConfigurationTestCase
         );
     }
 
-    /**
-     * @dataProvider phpContentsToCompactProvider
-     */
+    #[DataProvider('phpContentsToCompactProvider')]
     public function test_ignored_annotations_are_provided_to_the_php_compactor(
         array $config,
         string $contents,

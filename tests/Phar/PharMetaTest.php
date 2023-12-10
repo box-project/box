@@ -15,22 +15,22 @@ declare(strict_types=1);
 namespace KevinGH\Box\Phar;
 
 use Phar;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use function rtrim;
 use function Safe\file_get_contents;
 
 /**
- * @covers \KevinGH\Box\Phar\PharMeta
- *
  * @internal
  */
+#[CoversClass(PharMeta::class)]
 final class PharMetaTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__.'/../../fixtures/extract';
 
-    /**
-     * @dataProvider pharMetaProvider
-     */
+    #[DataProvider('pharMetaProvider')]
     public function test_it_can_be_serialized_and_deserialized(PharMeta $pharMeta): void
     {
         $newPharMeta = PharMeta::fromJson($pharMeta->toJson());
@@ -82,10 +82,8 @@ final class PharMetaTest extends TestCase
         ];
     }
 
-    /**
-     * @runInSeparateProcess
-     * @dataProvider pharProvider
-     */
+    #[DataProvider('pharProvider')]
+    #[RunInSeparateProcess]
     public function test_it_can_be_created_from_phars(
         string $file,
         ?string $pubKey,

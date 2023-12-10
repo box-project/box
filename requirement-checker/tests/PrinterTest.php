@@ -14,20 +14,19 @@ declare(strict_types=1);
 
 namespace KevinGH\RequirementChecker;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function ob_get_clean;
 use function ob_start;
 
 /**
- * @covers \KevinGH\RequirementChecker\Printer
- *
  * @internal
  */
+#[CoversClass(Printer::class)]
 class PrinterTest extends TestCase
 {
-    /**
-     * @dataProvider provideTitles
-     */
+    #[DataProvider('provideTitles')]
     public function test_it_can_print_a_title(
         int $verbosity,
         bool $colors,
@@ -45,9 +44,7 @@ class PrinterTest extends TestCase
         self::assertSame($expected, $actual);
     }
 
-    /**
-     * @dataProvider provideErrorRequirements
-     */
+    #[DataProvider('provideErrorRequirements')]
     public function test_it_can_provide_an_error_requirement_message(
         Requirement $requirement,
         int $verbosity,
@@ -60,9 +57,7 @@ class PrinterTest extends TestCase
         self::assertSame($expected, $actual);
     }
 
-    /**
-     * @dataProvider provideBlocks
-     */
+    #[DataProvider('provideBlocks')]
     public function test_it_can_print_a_block(
         int $verbosity,
         bool $colors,

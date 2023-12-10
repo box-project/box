@@ -17,16 +17,16 @@ namespace KevinGH\Box\Configuration;
 use Fidry\FileSystem\FS;
 use InvalidArgumentException;
 use KevinGH\Box\Platform;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use function natcasesort;
 use function symlink;
 
 /**
- * @covers \KevinGH\Box\Configuration\Configuration
- *
- * @group config
- *
  * @internal
  */
+#[CoversClass(Configuration::class)]
+#[Group('config')]
 class ConfigurationFileNoConfigTest extends ConfigurationTestCase
 {
     public function test_all_the_files_found_in_the_composer_json_are_taken_by_default_with_no_config_file_is_used(): void

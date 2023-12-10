@@ -20,6 +20,9 @@ use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\PharMeta;
 use KevinGH\Box\Phar\Throwable\InvalidPhar;
 use KevinGH\Box\Test\CommandTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -28,13 +31,10 @@ use function rtrim;
 use function Safe\file_get_contents;
 
 /**
- * @covers \KevinGH\Box\Console\Command\Extract
- *
- * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
- *                              can create undesirable side-effects.
- *
  * @internal
  */
+#[CoversClass(Extract::class)]
+#[RunTestsInSeparateProcesses]
 class ExtractTest extends CommandTestCase
 {
     private const FIXTURES_DIR = __DIR__.'/../../../fixtures/extract';
@@ -44,9 +44,7 @@ class ExtractTest extends CommandTestCase
         return new Extract();
     }
 
-    /**
-     * @dataProvider pharProvider
-     */
+    #[DataProvider('pharProvider')]
     public function test_it_can_extract_a_phar(
         string $pharPath,
         array $expectedFiles,
@@ -213,9 +211,7 @@ class ExtractTest extends CommandTestCase
         ];
     }
 
-    /**
-     * @dataProvider confirmationQuestionProvider
-     */
+    #[DataProvider('confirmationQuestionProvider')]
     public function test_it_asks_confirmation_before_deleting_the_output_dir(
         bool $outputDirExists,
         bool $internal,
@@ -307,9 +303,7 @@ class ExtractTest extends CommandTestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidPharPath
-     */
+    #[DataProvider('invalidPharPath')]
     public function test_it_cannot_extract_an_invalid_phar(string $pharPath): void
     {
         try {

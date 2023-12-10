@@ -18,12 +18,12 @@ use Error;
 use Fidry\FileSystem\FS;
 use InvalidArgumentException;
 use KevinGH\Box\Test\FileSystemTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
- * @covers \KevinGH\Box\Json\JsonValidationException
- *
  * @internal
  */
+#[CoversClass(JsonValidationException::class)]
 class JsonValidationExceptionTest extends FileSystemTestCase
 {
     public function test_it_cannot_be_created_with_a_non_existent_file(): void
