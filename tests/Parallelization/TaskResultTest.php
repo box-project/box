@@ -16,17 +16,17 @@ namespace KevinGH\Box\Parallelization;
 
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use PhpParser\Node\Name\FullyQualified;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \KevinGH\Box\Parallelization\TaskResult
  * @internal
  */
+#[CoversClass(TaskResult::class)]
 final class TaskResultTest extends TestCase
 {
-    /**
-     * @dataProvider resultsProvider
-     */
+    #[DataProvider('resultsProvider')]
     public function test_it_can_aggregate_results(
         array $results,
         TaskResult $expected,

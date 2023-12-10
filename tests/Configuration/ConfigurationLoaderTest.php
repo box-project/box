@@ -17,12 +17,12 @@ namespace KevinGH\Box\Configuration;
 use Fidry\FileSystem\FS;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\Test\FileSystemTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
- * @covers \KevinGH\Box\Configuration\ConfigurationLoader
- *
  * @internal
  */
+#[CoversClass(ConfigurationLoader::class)]
 class ConfigurationLoaderTest extends FileSystemTestCase
 {
     private ConfigurationLoader $loader;

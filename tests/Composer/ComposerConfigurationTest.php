@@ -16,13 +16,14 @@ namespace KevinGH\Box\Composer;
 
 use Fidry\FileSystem\FS;
 use KevinGH\Box\Test\FileSystemTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use function json_decode;
 
 /**
- * @covers \KevinGH\Box\Composer\ComposerConfiguration
- *
  * @internal
  */
+#[CoversClass(ComposerConfiguration::class)]
 class ComposerConfigurationTest extends FileSystemTestCase
 {
     private const COMPOSER_LOCK_SAMPLE = <<<'JSON'
@@ -219,9 +220,7 @@ class ComposerConfigurationTest extends FileSystemTestCase
         }
         JSON;
 
-    /**
-     * @dataProvider excludeDevFilesSettingProvider
-     */
+    #[DataProvider('excludeDevFilesSettingProvider')]
     public function test_it_returns_an_empty_list_when_trying_to_retrieve_the_list_of_dev_packages_when_no_composer_json_file_is_found(bool $excludeDevPackages): void
     {
         self::assertSame(
@@ -245,9 +244,7 @@ class ComposerConfigurationTest extends FileSystemTestCase
         );
     }
 
-    /**
-     * @dataProvider excludeDevFilesSettingProvider
-     */
+    #[DataProvider('excludeDevFilesSettingProvider')]
     public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file(): void
     {
         $decodedComposerJson = [];

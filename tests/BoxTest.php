@@ -29,6 +29,8 @@ use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use Phar;
 use PharFileInfo;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -57,13 +59,10 @@ use const PHP_EOL;
 use const STDOUT;
 
 /**
- * @covers \KevinGH\Box\Box
- *
- * @runTestsInSeparateProcesses There is side-effects caused by generating PHARs as a result it is necessary to scope it
- *                              in separate processes.
- *
  * @internal
  */
+#[CoversClass(Box::class)]
+#[RunTestsInSeparateProcesses]
 class BoxTest extends FileSystemTestCase
 {
     use ProphecyTrait;

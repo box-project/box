@@ -26,11 +26,15 @@ use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Console\Application;
 use KevinGH\Box\Console\DisplayNormalizer as BoxDisplayNormalizer;
+use KevinGH\Box\Console\MessageRenderer;
 use KevinGH\Box\Test\FileSystemTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use KevinGH\Box\VarDumperNormalizer;
 use Phar;
 use PharFileInfo;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
@@ -67,14 +71,11 @@ use const PHP_OS;
 use const PHP_VERSION;
 
 /**
- * @covers \KevinGH\Box\Console\Command\Compile
- * @covers \KevinGH\Box\Console\MessageRenderer
- *
- * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
- *                              can create undesirable side-effects.
- *
  * @internal
  */
+#[CoversClass(Compile::class)]
+#[CoversClass(MessageRenderer::class)]
+#[RunTestsInSeparateProcesses]
 class CompileTest extends FileSystemTestCase
 {
     use RequiresPharReadonlyOff;
@@ -2359,9 +2360,7 @@ class CompileTest extends FileSystemTestCase
         );
     }
 
-    /**
-     * @dataProvider aliasConfigProvider
-     */
+    #[DataProvider('aliasConfigProvider')]
     public function test_it_configures_the_phar_alias(bool $stub): void
     {
         $this->skipIfDefaultStubNotFound();

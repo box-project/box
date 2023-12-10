@@ -17,6 +17,8 @@ namespace KevinGH\Box\Json;
 use Fidry\FileSystem\FS;
 use KevinGH\Box\Test\FileSystemTestCase;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Seld\JsonLint\ParsingException;
 use stdClass;
 use Throwable;
@@ -26,12 +28,10 @@ use function json_decode;
 use function mb_convert_encoding;
 
 /**
- * @covers \KevinGH\Box\Json\Json
- *
  * @requires extension mbstring
- *
  * @internal
  */
+#[CoversClass(Json::class)]
 class JsonTest extends FileSystemTestCase
 {
     private Json $json;
@@ -43,9 +43,7 @@ class JsonTest extends FileSystemTestCase
         $this->json = new Json();
     }
 
-    /**
-     * @dataProvider jsonToLintProvider
-     */
+    #[DataProvider('jsonToLintProvider')]
     public function test_it_can_lint_a_json_string(string $json, ?Throwable $expectedThrowable): void
     {
         try {
@@ -68,9 +66,7 @@ class JsonTest extends FileSystemTestCase
         self::assertTrue(true);
     }
 
-    /**
-     * @dataProvider jsonToDecodeProvider
-     */
+    #[DataProvider('jsonToDecodeProvider')]
     public function test_it_can_decode_a_json_string(string $json, bool $assoc, mixed $expected, ?Throwable $expectedThrowable): void
     {
         if (null === $expected) {

@@ -26,7 +26,8 @@ jobs:
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: '8.2'
-                    ini-values: phar.readonly=0, display_errors=On, error_reporting=-1
+                    ini-values: phar.readonly=0
+                    extensions: opcache
                     tools: composer
                     coverage: none
 
@@ -66,7 +67,8 @@ jobs:
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: '8.2'
-                    ini-values: phar.readonly=0, display_errors=On, error_reporting=-1
+                    ini-values: phar.readonly=0
+                    extensions: opcache
                     tools: composer
                     coverage: none
 

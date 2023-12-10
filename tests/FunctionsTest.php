@@ -15,18 +15,17 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Phar;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversNothing
- *
  * @internal
  */
+#[CoversNothing]
 class FunctionsTest extends TestCase
 {
-    /**
-     * @dataProvider bytesProvider
-     */
+    #[DataProvider('bytesProvider')]
     public function test_it_can_format_bytes(float|int $bytes, string $expected): void
     {
         $actual = format_size($bytes);
@@ -34,9 +33,7 @@ class FunctionsTest extends TestCase
         self::assertSame($expected, $actual);
     }
 
-    /**
-     * @dataProvider memoryProvider
-     */
+    #[DataProvider('memoryProvider')]
     public function test_it_can_convert_a_memory_limit_amount_to_bytes(string $memory, float|int $expected): void
     {
         $actual = memory_to_bytes($memory);

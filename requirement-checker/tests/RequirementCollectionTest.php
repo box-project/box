@@ -14,14 +14,14 @@ declare(strict_types=1);
 
 namespace KevinGH\RequirementChecker;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use function iterator_to_array;
 
 /**
- * @covers \KevinGH\RequirementChecker\RequirementCollection
- *
  * @internal
  */
+#[CoversClass(RequirementCollection::class)]
 class RequirementCollectionTest extends TestCase
 {
     public function test_it_is_empty_by_default(): void

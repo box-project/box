@@ -15,12 +15,12 @@ declare(strict_types=1);
 namespace KevinGH\Box\AutoReview;
 
 use Fidry\Makefile\Test\BaseMakefileTestCase;
+use PHPUnit\Framework\Attributes\CoversNothing;
 
 /**
- * @coversNothing
- *
  * @internal
  */
+#[CoversNothing]
 final class MakefileTest extends BaseMakefileTestCase
 {
     public const MAKEFILE_PATH = __DIR__.'/../../Makefile';

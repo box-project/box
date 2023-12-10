@@ -16,6 +16,8 @@ namespace KevinGH\Box\Composer;
 
 use Fidry\FileSystem\FileSystem;
 use KevinGH\Box\Composer\Throwable\UndetectableComposerVersion;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -23,9 +25,9 @@ use Psr\Log\NullLogger;
 use Symfony\Component\Process\Process;
 
 /**
- * @covers \KevinGH\Box\Composer\ComposerOrchestrator
  * @internal
  */
+#[CoversClass(ComposerOrchestrator::class)]
 final class ComposerOrchestratorTest extends TestCase
 {
     use ProphecyTrait;
@@ -48,9 +50,7 @@ final class ComposerOrchestratorTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider outputProvider
-     */
+    #[DataProvider('outputProvider')]
     public function test_it_can_detect_the_version_from_the_process_output(
         string $output,
         string|UndetectableComposerVersion $expected,

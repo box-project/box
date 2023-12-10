@@ -20,13 +20,13 @@ use Fidry\Console\Test\OutputAssertions;
 use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Phar\Throwable\InvalidPhar;
 use KevinGH\Box\Test\CommandTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\Filesystem\Path;
 
 /**
- * @covers \KevinGH\Box\Console\Command\Info\Signature
- *
  * @internal
  */
+#[CoversClass(Signature::class)]
 class SignatureTest extends CommandTestCase
 {
     private const FIXTURES = __DIR__.'/../../../../fixtures/phar';

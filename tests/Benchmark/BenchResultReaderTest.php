@@ -14,17 +14,17 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Benchmark;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \KevinGH\Box\Benchmark\BenchResultReader
  * @internal
  */
+#[CoversClass(BenchResultReader::class)]
 final class BenchResultReaderTest extends TestCase
 {
-    /**
-     * @dataProvider xmlProvider
-     */
+    #[DataProvider('xmlProvider')]
     public function test_it_can_read_parameter_set_mean_time(
         string $xml,
         array $expected,

@@ -14,15 +14,14 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function serialize;
 use function unserialize;
 
 abstract class CompactorTestCase extends TestCase
 {
-    /**
-     * @dataProvider compactorProvider
-     */
+    #[DataProvider('compactorProvider')]
     public function test_it_is_serializable(Compactor $compactor): void
     {
         $unserializedCompactor = unserialize(serialize($compactor));

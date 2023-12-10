@@ -19,13 +19,13 @@ use Fidry\Console\ExitCode;
 use Fidry\FileSystem\FS;
 use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Test\CommandTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * @covers \KevinGH\Box\Console\Command\Process
- *
  * @internal
  */
+#[CoversClass(Process::class)]
 class ProcessTest extends CommandTestCase
 {
     protected function getCommand(): Command
