@@ -4,8 +4,14 @@
          bootstrap="tests/bootstrap.php"
          beStrictAboutChangesToGlobalState="true"
          beStrictAboutOutputDuringTests="true"
+         failOnWarning="true"
          colors="true"
          executionOrder="random"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
+         displayDetailsOnTestsThatTriggerNotices="true"
+         displayDetailsOnTestsThatTriggerWarnings="true"
+         displayDetailsOnTestsThatTriggerErrors="true"
+         cacheDirectory="dist/.phpunit-cache"
          cacheResultFile="dist/.phpunit.result.cache">
 
     <php>
