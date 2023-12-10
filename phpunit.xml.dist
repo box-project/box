@@ -37,13 +37,11 @@
         </include>
         <exclude>
             <file>src/bootstrap.php</file>
-            <file>src/consts.php</file>
             <file>src/functions.php</file>
             <file>src/Console/Command/Build.php</file>
             <file>src/Console/Command/ChangeableWorkingDirectory.php</file>
             <file>src/PhpSettingsHandler.php</file>
             <directory>src/Console/Logger</directory>
-            <directory>src/FileSystem</directory>
             <directory>src/Test</directory>
         </exclude>
       </coverage>
