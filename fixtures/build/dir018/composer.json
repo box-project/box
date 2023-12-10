@@ -60,9 +60,6 @@
         "symfony": {
             "allow-contrib": false,
             "require": "6.2.*"
-        },
-        "runtime": {
-            "autoload_template": "autoload_runtime.template"
         }
     }
 }
