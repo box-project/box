@@ -320,6 +320,7 @@ class CompileTest extends FileSystemTestCase
 
             require 'phar://alias-test.phar/.box/bin/check-requirements.php';
 
+            \$_SERVER['SCRIPT_FILENAME'] = 'phar://alias-test.phar/run.php';
             require 'phar://alias-test.phar/run.php';
 
             __HALT_COMPILER(); ?>
@@ -499,6 +500,7 @@ class CompileTest extends FileSystemTestCase
 
             require 'phar://box-auto-generated-alias-__uniqid__.phar/.box/bin/check-requirements.php';
 
+            \$_SERVER['SCRIPT_FILENAME'] = 'phar://box-auto-generated-alias-__uniqid__.phar/index.php';
             require 'phar://box-auto-generated-alias-__uniqid__.phar/index.php';
 
             __HALT_COMPILER(); ?>
@@ -674,6 +676,7 @@ class CompileTest extends FileSystemTestCase
 
             Phar::mapPhar('alias-test.phar');
 
+            \$_SERVER['SCRIPT_FILENAME'] = 'phar://alias-test.phar/run.php';
             require 'phar://alias-test.phar/run.php';
 
             __HALT_COMPILER(); ?>
@@ -772,6 +775,7 @@ class CompileTest extends FileSystemTestCase
 
             Phar::mapPhar('box-auto-generated-alias-__uniqid__.phar');
 
+            \$_SERVER['SCRIPT_FILENAME'] = 'phar://box-auto-generated-alias-__uniqid__.phar/run.php';
             require 'phar://box-auto-generated-alias-__uniqid__.phar/run.php';
 
             __HALT_COMPILER(); ?>
