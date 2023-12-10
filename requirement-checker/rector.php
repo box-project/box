@@ -15,6 +15,4 @@ return static function (RectorConfig $rectorConfig): void {
     ]);
 
     $rectorConfig->importNames();
-
-    $rectorConfig->sets([PHPUnitSetList::PHPUNIT_100]);
 };
