@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d674542ba02d85d2f4adbd91e17455c4",
+    "content-hash": "e640c26ac4e44b0db86fbb618b94614f",
     "packages": [
         {
             "name": "amphp/amp",
@@ -1326,16 +1326,16 @@
         },
         {
             "name": "humbug/php-scoper",
-            "version": "0.18.9",
+            "version": "0.18.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/humbug/php-scoper.git",
-                "reference": "dd0a6721c38a26e18c1e36c0a718b6262350dd96"
+                "reference": "dc2120a1ddd2fb290349a80db56928fd9e6b1d85"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/dd0a6721c38a26e18c1e36c0a718b6262350dd96",
-                "reference": "dd0a6721c38a26e18c1e36c0a718b6262350dd96",
+                "url": "https://api.github.com/repos/humbug/php-scoper/zipball/dc2120a1ddd2fb290349a80db56928fd9e6b1d85",
+                "reference": "dc2120a1ddd2fb290349a80db56928fd9e6b1d85",
                 "shasum": ""
             },
             "require": {
@@ -1403,9 +1403,9 @@
             "description": "Prefixes all PHP namespaces in a file or directory.",
             "support": {
                 "issues": "https://github.com/humbug/php-scoper/issues",
-                "source": "https://github.com/humbug/php-scoper/tree/0.18.9"
+                "source": "https://github.com/humbug/php-scoper/tree/0.18.10"
             },
-            "time": "2023-11-21T21:00:48+00:00"
+            "time": "2023-12-07T11:04:39+00:00"
         },
         {
             "name": "jetbrains/phpstorm-stubs",
