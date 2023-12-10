@@ -17,6 +17,9 @@ namespace KevinGH\Box\Configuration;
 use Fidry\FileSystem\FS;
 use InvalidArgumentException;
 use KevinGH\Box\Json\JsonValidationException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Filesystem\Path;
 use function chdir;
 use function file_get_contents;
@@ -25,12 +28,10 @@ use function sprintf;
 use const DIRECTORY_SEPARATOR;
 
 /**
- * @covers \KevinGH\Box\Configuration\Configuration
- *
- * @group config
- *
  * @internal
  */
+#[CoversClass(Configuration::class)]
+#[Group('config')]
 class ConfigurationFileTest extends ConfigurationTestCase
 {
     private const FIXTURES_DIR = __DIR__.'/../../fixtures/configuration';
@@ -137,9 +138,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
         self::assertCount(0, $this->config->getBinaryFiles());
     }
 
-    /**
-     * @dataProvider configWithMainScriptProvider
-     */
+    #[DataProvider('configWithMainScriptProvider')]
     public function test_the_main_script_file_is_always_ignored(callable $setUp, array $config, array $expectedFiles, array $expectedBinFiles): void
     {
         $setUp();
@@ -153,9 +152,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
         self::assertSame($expectedBinFiles, $actualBinFiles);
     }
 
-    /**
-     * @dataProvider configWithGeneratedArtefactProvider
-     */
+    #[DataProvider('configWithGeneratedArtefactProvider')]
     public function test_the_generated_artefact_is_always_ignored(callable $setUp, array $config, array $expectedFiles, array $expectedBinFiles): void
     {
         $setUp();
@@ -1114,9 +1111,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
         self::assertSame([], $this->config->getWarnings());
     }
 
-    /**
-     * @dataProvider jsonValidNonStringArrayProvider
-     */
+    #[DataProvider('jsonValidNonStringArrayProvider')]
     public function test_blacklist_value_must_be_an_array_of_strings(mixed $value): void
     {
         try {
@@ -1172,9 +1167,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
         self::assertSame($expected, $actual);
     }
 
-    /**
-     * @dataProvider jsonValidNonStringArrayProvider
-     */
+    #[DataProvider('jsonValidNonStringArrayProvider')]
     public function test_files_value_must_be_an_array_of_strings(mixed $value): void
     {
         try {
@@ -1204,9 +1197,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
         self::assertSame([], $this->config->getWarnings());
     }
 
-    /**
-     * @dataProvider jsonValidNonStringArrayProvider
-     */
+    #[DataProvider('jsonValidNonStringArrayProvider')]
     public function test_bin_files_value_must_be_an_array_of_strings(mixed $value): void
     {
         try {
@@ -1249,9 +1240,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
         );
     }
 
-    /**
-     * @dataProvider jsonValidNonStringArrayProvider
-     */
+    #[DataProvider('jsonValidNonStringArrayProvider')]
     public function test_directories_value_must_be_an_array_of_strings(mixed $value): void
     {
         try {
@@ -1281,9 +1270,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
         self::assertSame([], $this->config->getWarnings());
     }
 
-    /**
-     * @dataProvider jsonValidNonStringArrayProvider
-     */
+    #[DataProvider('jsonValidNonStringArrayProvider')]
     public function test_bin_directories_value_must_be_an_array_of_strings(mixed $value): void
     {
         try {
@@ -1327,9 +1314,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
         );
     }
 
-    /**
-     * @dataProvider jsonValidNonObjectArrayProvider
-     */
+    #[DataProvider('jsonValidNonObjectArrayProvider')]
     public function test_finder_value_must_be_an_array_of_objects(mixed $value): void
     {
         try {
@@ -1565,9 +1550,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
         self::assertTrue($this->config->hasAutodiscoveredFiles());
     }
 
-    /**
-     * @dataProvider filesAutodiscoveryConfigProvider
-     */
+    #[DataProvider('filesAutodiscoveryConfigProvider')]
     public function test_files_are_autodiscovered_unless_directory_or_finder_config_is_provided(
         callable $setUp,
         array $config,

@@ -21,13 +21,13 @@ use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Configuration\NoConfigurationFound;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\Test\CommandTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
- * @covers \KevinGH\Box\Console\Command\ConfigOption
- *
  * @internal
  */
+#[CoversClass(ConfigOption::class)]
 class ConfigOptionTest extends CommandTestCase
 {
     protected function getCommand(): Command

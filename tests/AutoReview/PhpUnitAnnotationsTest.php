@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\AutoReview;
 
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 use function array_filter;
@@ -23,12 +25,10 @@ use function shell_exec;
 use const PHP_EOL;
 
 /**
- * @runInSeparateProcess
- *
- * @coversNothing
- *
  * @internal
  */
+#[RunTestsInSeparateProcesses]
+#[CoversNothing]
 class PhpUnitAnnotationsTest extends TestCase
 {
     public function test_there_is_no_commented_phpunit_run_tests_in_separate_processes_annotations_commented(): void

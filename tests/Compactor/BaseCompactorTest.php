@@ -15,13 +15,13 @@ declare(strict_types=1);
 namespace KevinGH\Box\Compactor;
 
 use KevinGH\Box\UnsupportedMethodCall;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \KevinGH\Box\Compactor\BaseCompactor
- *
  * @internal
  */
+#[CoversClass(BaseCompactor::class)]
 class BaseCompactorTest extends TestCase
 {
     public function test_it_returns_the_contents_unchanged_if_does_not_support_the_file(): void

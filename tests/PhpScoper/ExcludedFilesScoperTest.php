@@ -14,13 +14,13 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\PhpScoper;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \KevinGH\Box\PhpScoper\ExcludedFilesScoper
- *
  * @internal
  */
+#[CoversClass(ExcludedFilesScoper::class)]
 final class ExcludedFilesScoperTest extends TestCase
 {
     private CallRecorderScoper $decoratedScoper;

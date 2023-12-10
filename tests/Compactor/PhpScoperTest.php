@@ -17,15 +17,15 @@ namespace KevinGH\Box\Compactor;
 use Error;
 use KevinGH\Box\PhpScoper\FakeScoper;
 use KevinGH\Box\PhpScoper\Scoper;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**
- * @covers \KevinGH\Box\Compactor\PhpScoper
- *
  * @internal
  */
+#[CoversClass(PhpScoper::class)]
 class PhpScoperTest extends CompactorTestCase
 {
     use ProphecyTrait;

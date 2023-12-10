@@ -17,13 +17,13 @@ namespace KevinGH\Box\Console;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Test\AppTester;
 use Fidry\Console\Test\OutputAssertions;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \KevinGH\Box\Console\Application
- *
  * @internal
  */
+#[CoversClass(Application::class)]
 class ApplicationTest extends TestCase
 {
     public function test_it_can_display_the_version_when_no_specific_version_is_given(): void

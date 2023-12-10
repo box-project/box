@@ -19,13 +19,13 @@ use Fidry\Console\ExitCode;
 use Fidry\FileSystem\FS;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
+use PHPUnit\Framework\Attributes\CoversClass;
 use function Safe\realpath;
 
 /**
- * @covers \KevinGH\Box\Console\Command\GenerateDockerFile
- *
  * @internal
  */
+#[CoversClass(GenerateDockerFile::class)]
 class GenerateDockerFileTest extends CommandTestCase
 {
     use RequiresPharReadonlyOff;

@@ -14,18 +14,17 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer\Package;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \KevinGH\Box\Composer\Package\RequiredItem
- *
  * @internal
  */
+#[CoversClass(RequiredItem::class)]
 final class RequiredItemTest extends TestCase
 {
-    /**
-     * @dataProvider packageInfoProvider
-     */
+    #[DataProvider('packageInfoProvider')]
     public function test_it_can_parse_the_decoded_data(
         array $rawPackageInfo,
         string $expectedName,

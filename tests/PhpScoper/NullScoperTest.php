@@ -15,15 +15,15 @@ declare(strict_types=1);
 namespace KevinGH\Box\PhpScoper;
 
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use function serialize;
 use function unserialize;
 
 /**
- * @covers \KevinGH\Box\PhpScoper\NullScoper
- *
  * @internal
  */
+#[CoversClass(NullScoper::class)]
 class NullScoperTest extends TestCase
 {
     private Scoper $scoper;

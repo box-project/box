@@ -17,6 +17,8 @@ namespace KevinGH\Box\Compactor;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\PhpScoper\NullScoper;
 use KevinGH\Box\PhpScoper\Scoper;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -26,10 +28,9 @@ use function serialize;
 use function unserialize;
 
 /**
- * @covers \KevinGH\Box\Compactor\Compactors
- *
  * @internal
  */
+#[CoversClass(Compactors::class)]
 class CompactorsTest extends TestCase
 {
     use ProphecyTrait;
@@ -89,10 +90,9 @@ class CompactorsTest extends TestCase
     }
 
     /**
-     * @dataProvider compactorsForFirstSymbolsRegistryCheckProvider
-     *
      * @param list<Compactor> $compactors
      */
+    #[DataProvider('compactorsForFirstSymbolsRegistryCheckProvider')]
     public function test_it_provides_the_first_scoper_compactor_symbols_registry_when_there_is_one(
         array $compactors,
         ?SymbolsRegistry $expected,
@@ -103,17 +103,13 @@ class CompactorsTest extends TestCase
     }
 
     /**
-     * @dataProvider compactorsForFirstSymbolsRegistryChangeProvider
-     *
      * @param list<Compactor> $compactors
      */
+    #[DataProvider('compactorsForFirstSymbolsRegistryChangeProvider')]
     public function test_it_can_change_the_first_scoper_compactor_symbols_registry(
         array $compactors,
         ?SymbolsRegistry $newSymbolsRegistry,
     ): void {
-        // We need to do this here since we use a prophet in the data provider
-        $this->recordDoubledType(Scoper::class);
-
         $compactorsAggregate = new Compactors(...$compactors);
 
         if (null !== $newSymbolsRegistry) {
@@ -207,9 +203,7 @@ class CompactorsTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider compactorsProvider
-     */
+    #[DataProvider('compactorsProvider')]
     public function test_it_can_be_serialized_and_deserialized(Compactors $compactors): void
     {
         $unserializedCompactors = unserialize(serialize($compactors));

@@ -17,6 +17,8 @@ namespace KevinGH\Box\Console\Command\Composer;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Test\CommandTester;
 use Fidry\Console\Test\OutputAssertions;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Path;
@@ -24,10 +26,9 @@ use function Safe\chdir;
 use function Safe\getcwd;
 
 /**
- * @covers \KevinGH\Box\Console\Command\Composer\ComposerVendorDir
- *
  * @internal
  */
+#[CoversClass(ComposerVendorDir::class)]
 class ComposerVendorDirTest extends TestCase
 {
     private CommandTester $commandTester;
@@ -46,9 +47,7 @@ class ComposerVendorDirTest extends TestCase
         chdir($this->cwd);
     }
 
-    /**
-     * @dataProvider composerExecutableProvider
-     */
+    #[DataProvider('composerExecutableProvider')]
     public function test_it_retrieves_the_vendor_bin_directory_path(
         array $input,
         array $options,

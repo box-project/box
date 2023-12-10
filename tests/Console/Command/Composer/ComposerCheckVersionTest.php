@@ -19,6 +19,8 @@ use Fidry\Console\ExitCode;
 use Fidry\Console\Test\CommandTester;
 use Fidry\Console\Test\OutputAssertions;
 use KevinGH\Box\Composer\Throwable\IncompatibleComposerVersion;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Path;
@@ -26,10 +28,9 @@ use function Safe\chdir;
 use function Safe\getcwd;
 
 /**
- * @covers \KevinGH\Box\Console\Command\Composer\ComposerCheckVersion
- *
  * @internal
  */
+#[CoversClass(ComposerCheckVersion::class)]
 class ComposerCheckVersionTest extends TestCase
 {
     private CommandTester $commandTester;
@@ -48,9 +49,7 @@ class ComposerCheckVersionTest extends TestCase
         chdir($this->cwd);
     }
 
-    /**
-     * @dataProvider compatibleComposerExecutableProvider
-     */
+    #[DataProvider('compatibleComposerExecutableProvider')]
     public function test_it_succeeds_the_check_when_the_composer_version_is_compatible(
         array $input,
         array $options,
@@ -102,9 +101,7 @@ class ComposerCheckVersionTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider incompatibleComposerExecutableProvider
-     */
+    #[DataProvider('incompatibleComposerExecutableProvider')]
     public function test_it_fails_the_check_when_the_composer_version_is_incompatible(
         array $input,
         array $options,

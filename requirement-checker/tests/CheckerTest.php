@@ -14,20 +14,19 @@ declare(strict_types=1);
 
 namespace KevinGH\RequirementChecker;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function preg_replace;
 use const PHP_VERSION;
 
 /**
- * @covers \KevinGH\RequirementChecker\Checker
- *
  * @internal
  */
+#[CoversClass(Checker::class)]
 class CheckerTest extends TestCase
 {
-    /**
-     * @dataProvider provideRequirements
-     */
+    #[DataProvider('provideRequirements')]
     public function test_it_can_check_requirements(
         RequirementCollection $requirements,
         int $verbosity,
