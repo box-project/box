@@ -1182,11 +1182,11 @@ class CompileTest extends FileSystemTestCase
               -file: "box.json"
               -alias: "index.phar"
               -basePath: "/path/to"
-              -composerJson: KevinGH\Box\Composer\ComposerFile {#140
+              -composerJson: KevinGH\Box\Composer\Artifact\ComposerFile {#140
                 -path: null
                 -contents: []
               }
-              -composerLock: KevinGH\Box\Composer\ComposerFile {#140
+              -composerLock: KevinGH\Box\Composer\Artifact\ComposerFile {#140
                 -path: null
                 -contents: []
               }

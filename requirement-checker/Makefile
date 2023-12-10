@@ -184,8 +184,7 @@ phpunit: $(PHPUNIT_BIN) vendor
 
 .PHONY: terminal_copy
 terminal_copy: $(ACTUAL_TERMINAL_DIFF)
-	# Disable it for now.
-	#$(DIFF) $(EXPECTED_TERMINAL_DIFF) $(ACTUAL_TERMINAL_DIFF)
+	$(DIFF) $(EXPECTED_TERMINAL_DIFF) $(ACTUAL_TERMINAL_DIFF)
 
 
 #
@@ -228,7 +227,7 @@ $(PHPUNIT_BIN): composer.lock
 	touch -c $@
 
 $(ACTUAL_TERMINAL_DIFF): src/Terminal.php vendor $(ORIGINAL_TERMINAL)
-	(diff --ignore-all-space --side-by-side --suppress-common-lines $(ORIGINAL_TERMINAL) src/Terminal.php || true) > $@
+	$(DIFF) $(ORIGINAL_TERMINAL) src/Terminal.php > $@ || true
 	touch -c $@
 
 $(ORIGINAL_TERMINAL):

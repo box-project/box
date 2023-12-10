@@ -25,7 +25,7 @@ use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
 use KevinGH\Box\Configuration\Configuration;
-use KevinGH\Box\Console\PhpSettingsChecker;
+use KevinGH\Box\Console\Php\PhpSettingsChecker;
 use KevinGH\Box\Constants;
 use stdClass;
 use Symfony\Component\Console\Input\InputArgument;

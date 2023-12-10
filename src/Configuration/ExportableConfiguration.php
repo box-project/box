@@ -16,7 +16,7 @@ namespace KevinGH\Box\Configuration;
 
 use Closure;
 use KevinGH\Box\Compactor\Compactors;
-use KevinGH\Box\Composer\ComposerFile;
+use KevinGH\Box\Composer\Artifact\ComposerFile;
 use KevinGH\Box\MapFile;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Path;
@@ -24,7 +24,6 @@ use Symfony\Component\Finder\SplFileInfo as SymfonySplFileInfo;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use function array_map;
-use function iter\values;
 use function sort;
 use const SORT_STRING;
 

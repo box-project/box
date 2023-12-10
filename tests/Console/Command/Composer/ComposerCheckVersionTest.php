@@ -18,7 +18,7 @@ use Exception;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Test\CommandTester;
 use Fidry\Console\Test\OutputAssertions;
-use KevinGH\Box\Composer\IncompatibleComposerVersion;
+use KevinGH\Box\Composer\Throwable\IncompatibleComposerVersion;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Path;

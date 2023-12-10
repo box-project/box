@@ -12,13 +12,13 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Composer;
+namespace KevinGH\Box\Composer\Artifact;
 
 use Closure;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \KevinGH\Box\Composer\ComposerFiles
+ * @covers \KevinGH\Box\Composer\Artifact\ComposerFiles
  *
  * @internal
  */
