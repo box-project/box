@@ -307,6 +307,8 @@ blacklisted are the ones found using the other available configuration settings:
 Note that all the blacklisted paths are relative to the settings configured above. For example if you have the following
 file structure:
 
+TODO: to check if it indeed removes A/, I am not sure it still does.
+
 ```text
 project/
 ├── box.json.dist
@@ -333,7 +335,7 @@ With:
 ```
 
 Box will try to collect all the files found in `project` (cf. [Including files][including-files]) but will exclude `A/`
-and `B/A resulting in the following files being collected:
+and `B/A` resulting in the following files being collected:
 
 ```text
 project/

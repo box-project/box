@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Parallelization;
 
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
+use function array_map;
 use function array_merge;
 
 /**
@@ -27,25 +28,17 @@ final readonly class TaskResult
      */
     public static function aggregate(array $results): self
     {
-        $filesWithContents = [];
-        $symbolsRegistries = [];
-
-        foreach ($results as $result) {
-            $filesWithContents[] = $result->filesWithContents;
-            $symbolsRegistries[] = $result->symbolsRegistry;
-        }
-
         return new self(
-            array_merge(...$filesWithContents),
-            SymbolsRegistry::createFromRegistries($symbolsRegistries),
+            SymbolsRegistry::createFromRegistries(
+                array_map(
+                    static fn (self $result) => $result->symbolsRegistry,
+                    $results,
+                ),
+            ),
         );
     }
 
-    /**
-     * @param list<array{string, string}> $filesWithContents
-     */
     public function __construct(
-        public array $filesWithContents,
         public SymbolsRegistry $symbolsRegistry,
     ) {
     }

@@ -110,6 +110,39 @@ final class ComposerOrchestrator
         }
     }
 
+    public function installNoDev(string $workingDirectory): void {
+        $installNoDev = $this->processFactory->getInstallNoDevProcess($workingDirectory);
+
+        $this->logger->info($installNoDev->getCommandLine());
+
+        $installNoDev->run();
+
+        if (false === $installNoDev->isSuccessful()) {
+            throw new RuntimeException(
+                'Could not remove the dev dependencies with Composer.',
+                0,
+                new ProcessFailedException($installNoDev),
+            );
+        }
+
+        $output = $installNoDev->getOutput();
+        $errorOutput = $installNoDev->getErrorOutput();
+
+        if ('' !== $output) {
+            $this->logger->info(
+                'STDOUT output:'.PHP_EOL.$output,
+                ['stdout' => $output],
+            );
+        }
+
+        if ('' !== $errorOutput) {
+            $this->logger->info(
+                'STDERR output:'.PHP_EOL.$errorOutput,
+                ['stderr' => $errorOutput],
+            );
+        }
+    }
+
     public function dumpAutoload(
         SymbolsRegistry $symbolsRegistry,
         string $prefix,

@@ -1,0 +1,14 @@
+{
+  "$schema": "../../../res/schema.json",
+
+  "alias": "e20-app",
+  "compactors": [
+    "KevinGH\\Box\\Compactor\\PhpScoper"
+  ],
+  "timestamp": "2020-10-20 10:01:11",
+  "scripts": [
+    "@composer config autoloader-suffix @prefix",
+    "@composer config autoloader-suffix @{prefix}CheckSum",
+    "@composer config platform.php --unset"
+  ]
+}

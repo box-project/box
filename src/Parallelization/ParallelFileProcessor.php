@@ -19,6 +19,7 @@ use Amp\Parallel\Worker\TaskFailureThrowable;
 use Amp\Parallel\Worker\WorkerPool;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\MapFile;
+use SplFileInfo;
 use function Amp\Future\await;
 use function Amp\Parallel\Worker\workerPool;
 use function array_chunk;
@@ -34,15 +35,13 @@ final class ParallelFileProcessor
      * @param string[] $filePaths
      *
      * @throws TaskFailureThrowable
-     *
-     * @return list<array{string, string}>
      */
     public static function processFilesInParallel(
         array $filePaths,
         string $cwd,
         MapFile $mapFile,
         Compactors $compactors,
-    ): array {
+    ): void {
         $workerPool = workerPool();
 
         $result = self::queueAndWaitForTasks(
@@ -54,8 +53,6 @@ final class ParallelFileProcessor
         );
 
         $compactors->registerSymbolsRegistry($result->symbolsRegistry);
-
-        return $result->filesWithContents;
     }
 
     /**
