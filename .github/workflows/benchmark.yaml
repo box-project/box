@@ -27,6 +27,7 @@ jobs:
                 with:
                     php-version: '8.2'
                     ini-values: phar.readonly=0, display_errors=On, error_reporting=-1
+                    extensions: opcache
                     tools: composer
                     coverage: none
 
