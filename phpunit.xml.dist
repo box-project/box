@@ -4,8 +4,6 @@
          bootstrap="tests/bootstrap.php"
          beStrictAboutChangesToGlobalState="true"
          beStrictAboutOutputDuringTests="true"
-         beStrictAboutResourceUsageDuringSmallTests="true"
-         convertDeprecationsToExceptions="true"
          colors="true"
          executionOrder="random"
          cacheResultFile="dist/.phpunit.result.cache">
