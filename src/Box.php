@@ -127,7 +127,7 @@ final class Box implements Countable
 
         if ([] === $this->bufferedFiles) {
             $this->bufferedFiles = [
-a                '.box_empty' => 'A PHAR cannot be empty so Box adds this file to ensure the PHAR is created still.',
+                '.box_empty' => 'A PHAR cannot be empty so Box adds this file to ensure the PHAR is created still.',
             ];
         }
 
