@@ -37,7 +37,6 @@ use function array_sum;
 use function array_values;
 use function count;
 use function implode;
-use function is_array;
 use function iter\toArray;
 use function KevinGH\Box\format_size;
 use function key;
@@ -218,7 +217,6 @@ final class PharInfoRenderer
         PharInfo $pharInfo,
         IO $io,
     ): void {
-
         try {
             $requirements = $pharInfo->getRequirements();
         } catch (NoRequirementsFound) {

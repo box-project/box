@@ -14,11 +14,13 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+
 /**
- * @covers \KevinGH\Box\Compactor\Json
- *
  * @internal
  */
+#[CoversClass(Json::class)]
 class JsonTest extends CompactorTestCase
 {
     private Compactor $compactor;
@@ -28,9 +30,7 @@ class JsonTest extends CompactorTestCase
         $this->compactor = new Json();
     }
 
-    /**
-     * @dataProvider filesProvider
-     */
+    #[DataProvider('filesProvider')]
     public function test_it_supports_json_files(string $file, bool $supports): void
     {
         $contents = <<<'JSON'
@@ -44,9 +44,7 @@ class JsonTest extends CompactorTestCase
         self::assertSame($supports, $contents !== $actual);
     }
 
-    /**
-     * @dataProvider jsonContentProvider
-     */
+    #[DataProvider('jsonContentProvider')]
     public function test_it_compacts_json_files(string $content, string $expected): void
     {
         $file = 'file.json';
@@ -56,9 +54,7 @@ class JsonTest extends CompactorTestCase
         self::assertSame($expected, $actual);
     }
 
-    /**
-     * @dataProvider jsonContentProvider
-     */
+    #[DataProvider('jsonContentProvider')]
     public function test_it_compacts__composer_lock_files(string $content, string $expected): void
     {
         $file = 'composer.lock';

@@ -21,14 +21,11 @@ use Fidry\Console\IO;
 use Fidry\FileSystem\FS;
 use KevinGH\Box\Phar\PharInfo;
 use KevinGH\Box\RequirementChecker\SuccinctRequirementListFactory;
-use SebastianBergmann\Diff\Diff;
 use SebastianBergmann\Diff\Differ;
-use SebastianBergmann\Diff\Output\StrictUnifiedDiffOutputBuilder;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Filesystem\Path;
 use function implode;
-use function sprintf;
 use function trim;
 
 /**
@@ -49,12 +46,12 @@ final class Requirements implements Command
                 matches the list of provided requirements.
                 The purpose of this command is to check that the PHAR ships the requirement checker and to keep
                 track of the extensions required.
-                
+
                 If what you want to do is check if the current environment satisfies the PHAR
                 requirements simply execute the PHAR instead.
 
                 The requirements should be listed in the file as follows:
-                
+
                 ```
                 PHP ^7.2
                 ext-phar

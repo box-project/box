@@ -14,13 +14,13 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \KevinGH\Box\RequirementChecker\Requirement
- *
  * @internal
  */
+#[CoversClass(Requirement::class)]
 final class RequirementTest extends TestCase
 {
     public function test_it_can_be_created_for_a_php_version(): void

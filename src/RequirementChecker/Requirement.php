@@ -142,7 +142,7 @@ final readonly class Requirement
      */
     public function toSuccinctDescription(): string
     {
-        $type = match($this->type) {
+        $type = match ($this->type) {
             RequirementType::PHP => 'req. PHP ',
             RequirementType::EXTENSION => 'req. ext-',
             RequirementType::EXTENSION_CONFLICT => 'confl. ext-',

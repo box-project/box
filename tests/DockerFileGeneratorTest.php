@@ -14,19 +14,21 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use KevinGH\Box\RequirementChecker\Requirement;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use UnexpectedValueException;
+use function sprintf;
+use const PHP_MAJOR_VERSION;
+use const PHP_MINOR_VERSION;
 
 /**
- * @covers \KevinGH\Box\DockerFileGenerator
- *
  * @internal
  */
+#[CoversClass(DockerFileGenerator::class)]
 class DockerFileGeneratorTest extends TestCase
 {
-    /**
-     * @dataProvider generatorDataProvider
-     */
+    #[DataProvider('generatorDataProvider')]
     public function test_it_can_generate_a_dockerfile_contents(
         string $image,
         array $extensions,
@@ -38,9 +40,7 @@ class DockerFileGeneratorTest extends TestCase
         self::assertSame($expected, $actual);
     }
 
-    /**
-     * @dataProvider generatorRequirementsProvider
-     */
+    #[DataProvider('generatorRequirementsProvider')]
     public function test_it_can_generate_a_dockerfile_contents_from_requirements(
         array $requirements,
         string $sourcePhar,
@@ -49,22 +49,6 @@ class DockerFileGeneratorTest extends TestCase
         $actual = DockerFileGenerator::createForRequirements($requirements, $sourcePhar)->generateStub();
 
         self::assertSame($expected, $actual);
-    }
-
-    public function test_throws_an_error_if_cannot_find_a_suitable_php_image(): void
-    {
-        $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('Could not find a suitable Docker base image for the PHP constraint(s) "^5.3". Images available: "8.2-cli-alpine", "8.1-cli-alpine", "8.0-cli-alpine", "7.4-cli-alpine", "7.3-cli-alpine", "7.2-cli-alpine", "7.1-cli-alpine", "7-cli-alpine".');
-
-        DockerFileGenerator::createForRequirements(
-            [
-                [
-                    'type' => 'php',
-                    'condition' => '^5.3',
-                ],
-            ],
-            'path/to/phar',
-        );
     }
 
     public static function generatorDataProvider(): iterable
@@ -134,7 +118,7 @@ class DockerFileGeneratorTest extends TestCase
                 Dockerfile,
         ];
 
-        yield 'multple extensions' => [
+        yield 'multiple extensions' => [
             '7.2-cli-alpine',
             ['phar', 'gzip'],
             'box.phar',
@@ -309,6 +293,68 @@ class DockerFileGeneratorTest extends TestCase
 
                 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
                 RUN install-php-extensions zlib filter
+
+                COPY box.phar /box.phar
+
+                ENTRYPOINT ["/box.phar"]
+
+                Dockerfile,
+        ];
+
+        yield 'old PHP constraints (no existent PHP official image)' => [
+            [
+                Requirement::forPHP('^5.3', null)->toArray(),
+            ],
+            'box.phar',
+            <<<'Dockerfile'
+                FROM php:to-define-manually
+
+                COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+
+                COPY box.phar /box.phar
+
+                ENTRYPOINT ["/box.phar"]
+
+                Dockerfile,
+        ];
+
+        yield 'new non-known PHP constraints' => [
+            [
+                Requirement::forPHP('^999.0', null)->toArray(),
+            ],
+            'box.phar',
+            <<<'Dockerfile'
+                FROM php:to-define-manually
+
+                COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+
+                COPY box.phar /box.phar
+
+                ENTRYPOINT ["/box.phar"]
+
+                Dockerfile,
+        ];
+
+        $currentPhpMajorVersion = PHP_MAJOR_VERSION;
+        $currentPhpMinorVersion = PHP_MINOR_VERSION;
+
+        yield 'current PHP constraints' => [
+            [
+                Requirement::forPHP(
+                    sprintf(
+                        '~%s.%s.0',
+                        $currentPhpMajorVersion,
+                        $currentPhpMinorVersion,
+                    ),
+                    null,
+                )
+                    ->toArray(),
+            ],
+            'box.phar',
+            <<<Dockerfile
+                FROM php:{$currentPhpMajorVersion}.{$currentPhpMinorVersion}-cli-alpine
+
+                COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
                 COPY box.phar /box.phar
 

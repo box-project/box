@@ -18,18 +18,10 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\IO;
-use KevinGH\Box\Phar\InvalidPhar;
 use KevinGH\Box\Phar\PharInfo;
-use KevinGH\Box\RequirementChecker\Requirement;
-use KevinGH\Box\RequirementChecker\RequirementType;
 use KevinGH\Box\RequirementChecker\SuccinctRequirementListFactory;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Filesystem\Path;
-use function array_map;
-use function array_unique;
-use function ksort;
-use function sprintf;
-use const SORT_STRING;
 
 /**
  * @private
@@ -46,10 +38,10 @@ final class Requirements implements Command
             <<<'HELP'
                 The <info>%command.name%</info> command will generate a succinct list of the requirements of the PHAR
                 if it ships the Box's RequirementChecker.
-                
+
                 This command is mostly to generate a list to be able to use it with <info>check:requirements</info> to
                 keep track of the PHAR requirements.
-                
+
                 If what you want to do is check the more detailed list of the requirements of your PHAR use the
                 <info>info</info>> command instead.
                 HELP,

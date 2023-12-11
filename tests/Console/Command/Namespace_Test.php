@@ -18,12 +18,12 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
 use Fidry\FileSystem\FS;
 use KevinGH\Box\Test\CommandTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
- * @covers \KevinGH\Box\Console\Command\Namespace_
- *
  * @internal
  */
+#[CoversClass(Namespace_::class)]
 class Namespace_Test extends CommandTestCase
 {
     protected function getCommand(): Command

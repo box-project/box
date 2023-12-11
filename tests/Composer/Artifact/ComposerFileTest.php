@@ -12,22 +12,21 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Composer;
+namespace KevinGH\Box\Composer\Artifact;
 
 use Closure;
 use LogicException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \KevinGH\Box\Composer\ComposerFile
- *
  * @internal
  */
+#[CoversClass(ComposerFile::class)]
 class ComposerFileTest extends TestCase
 {
-    /**
-     * @dataProvider validInstantiatorsProvider
-     */
+    #[DataProvider('validInstantiatorsProvider')]
     public function test_it_can_be_created(Closure $create, ?string $expectedPath, array $expectedContents): void
     {
         /** @var ComposerFile $actual */
@@ -39,9 +38,7 @@ class ComposerFileTest extends TestCase
         self::assertSame($expectedContents, $actual->getDecodedContents());
     }
 
-    /**
-     * @dataProvider invalidInstantiatorsProvider
-     */
+    #[DataProvider('invalidInstantiatorsProvider')]
     public function test_it_cannot_be_created_with_invalid_values(Closure $create, string $errorMessage): void
     {
         try {

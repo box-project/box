@@ -12,21 +12,21 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\RequirementChecker;
+namespace KevinGH\Box\Composer\Artifact;
 
+use KevinGH\Box\Composer\Package\PackageInfo;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function json_decode;
 
 /**
- * @covers \KevinGH\Box\RequirementChecker\DecodedComposerLock
- *
  * @internal
  */
+#[CoversClass(DecodedComposerLock::class)]
 class DecodedComposerLockTest extends TestCase
 {
-    /**
-     * @dataProvider composerLockProvider
-     */
+    #[DataProvider('composerLockProvider')]
     public function test_it_can_interpret_a_decoded_composer_json_file(
         string $composerJsonContents,
         bool $expectedIsEmpty,

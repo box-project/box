@@ -15,13 +15,13 @@ declare(strict_types=1);
 namespace KevinGH\Box\Compactor;
 
 use KevinGH\Box\UnsupportedMethodCall;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \KevinGH\Box\Compactor\FileExtensionCompactor
- *
  * @internal
  */
+#[CoversClass(FileExtensionCompactor::class)]
 class FileExtensionCompactorTest extends TestCase
 {
     public function test_it_does_not_support_files_with_unknown_extension(): void

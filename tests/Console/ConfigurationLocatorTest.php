@@ -17,13 +17,13 @@ namespace KevinGH\Box\Console;
 use Fidry\FileSystem\FS;
 use KevinGH\Box\Configuration\NoConfigurationFound;
 use KevinGH\Box\Test\FileSystemTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use const DIRECTORY_SEPARATOR;
 
 /**
- * @covers \KevinGH\Box\Console\ConfigurationLocator
- *
  * @internal
  */
+#[CoversClass(ConfigurationLocator::class)]
 class ConfigurationLocatorTest extends FileSystemTestCase
 {
     public function test_it_finds_the_default_path(): void

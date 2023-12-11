@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Phar;
 
+use KevinGH\Box\Phar\Throwable\InvalidPhar;
 use Phar;
 use PharData;
 use Symfony\Component\Filesystem\Path;

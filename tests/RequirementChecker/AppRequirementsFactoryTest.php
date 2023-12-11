@@ -14,21 +14,22 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
+use KevinGH\Box\Composer\Artifact\DecodedComposerJson;
+use KevinGH\Box\Composer\Artifact\DecodedComposerLock;
 use KevinGH\Box\Phar\CompressionAlgorithm;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function json_decode;
 use const JSON_THROW_ON_ERROR;
 
 /**
- * @covers \KevinGH\Box\RequirementChecker\AppRequirementsFactory
- *
  * @internal
  */
+#[CoversClass(AppRequirementsFactory::class)]
 class AppRequirementsFactoryTest extends TestCase
 {
-    /**
-     * @dataProvider lockContentsProvider
-     */
+    #[DataProvider('lockContentsProvider')]
     public function test_it_can_generate_and_serialized_requirements_from_a_composer_lock_file(
         ?string $composerJsonContents,
         ?string $composerLockContents,

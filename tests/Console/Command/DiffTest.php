@@ -18,19 +18,20 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
 use InvalidArgumentException;
 use KevinGH\Box\Phar\DiffMode;
-use KevinGH\Box\Phar\InvalidPhar;
+use KevinGH\Box\Phar\Throwable\InvalidPhar;
 use KevinGH\Box\Platform;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Console\Output\OutputInterface;
 use function array_splice;
 use function Safe\realpath;
 
 /**
- * @covers \KevinGH\Box\Console\Command\Diff
- *
  * @internal
  */
+#[CoversClass(Diff::class)]
 class DiffTest extends CommandTestCase
 {
     use RequiresPharReadonlyOff;
@@ -49,9 +50,7 @@ class DiffTest extends CommandTestCase
         return new Diff();
     }
 
-    /**
-     * @dataProvider diffPharsProvider
-     */
+    #[DataProvider('diffPharsProvider')]
     public function test_it_can_display_the_diff_of_two_phar_files(
         string $pharAPath,
         string $pharBPath,

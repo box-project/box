@@ -64,12 +64,17 @@ final class DockerFile implements CommandAware
                     'The PHAR file',
                 ),
             ],
-            [ConfigOption::getOptionInput()],
+            [
+                ConfigOption::getOptionInput(),
+                ChangeWorkingDirOption::getOptionInput(),
+            ],
         );
     }
 
     public function execute(IO $io): int
     {
+        ChangeWorkingDirOption::changeWorkingDirectory($io);
+
         $pharFilePath = $this->getPharFilePath($io);
 
         if (null === $pharFilePath) {

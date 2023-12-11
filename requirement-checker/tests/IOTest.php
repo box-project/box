@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\RequirementChecker;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function function_exists;
 use function getenv;
@@ -21,10 +23,9 @@ use function posix_isatty;
 use function putenv;
 
 /**
- * @covers \KevinGH\RequirementChecker\IO
- *
  * @internal
  */
+#[CoversClass(IO::class)]
 class IOTest extends TestCase
 {
     private static function getDefaultInteractive(): bool
@@ -34,9 +35,7 @@ class IOTest extends TestCase
             && false === getenv('SHELL_INTERACTIVE'));
     }
 
-    /**
-     * @dataProvider provideOptions
-     */
+    #[DataProvider('provideOptions')]
     public function test_it_can_parse_the_options(array $argv, bool $interactive, int $verbosity): void
     {
         $_SERVER['argv'] = $argv;
@@ -47,9 +46,7 @@ class IOTest extends TestCase
         self::assertSame($verbosity, $io->getVerbosity());
     }
 
-    /**
-     * @dataProvider provideOptionsWithShellVerbosity
-     */
+    #[DataProvider('provideOptionsWithShellVerbosity')]
     public function test_it_uses_the_shell_verbosity_environment_variable_over_the_options(array $argv, string $putenv, bool $interactive, int $verbosity): void
     {
         $_SERVER['argv'] = $argv;

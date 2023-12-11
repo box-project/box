@@ -14,22 +14,23 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
+use KevinGH\Box\Composer\Artifact\DecodedComposerJson;
+use KevinGH\Box\Composer\Artifact\DecodedComposerLock;
 use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Phar\CompressionAlgorithm;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function array_column;
 use function sort;
 
 /**
- * @covers \KevinGH\Box\RequirementChecker\RequirementsDumper
- *
  * @internal
  */
+#[CoversClass(RequirementsDumper::class)]
 class RequirementsDumperTest extends TestCase
 {
-    /**
-     * @dataProvider jsonAndLockContentsProvider
-     */
+    #[DataProvider('jsonAndLockContentsProvider')]
     public function test_it_dumps_the_requirement_checker_files(
         DecodedComposerJson $decodedComposerJsonContents,
         DecodedComposerLock $decodedComposerLockContents,

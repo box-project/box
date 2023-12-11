@@ -20,14 +20,15 @@ use InvalidArgumentException;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Console\Output\OutputInterface;
 use function Safe\realpath;
 
 /**
- * @covers \KevinGH\Box\Console\Command\Verify
- *
  * @internal
  */
+#[CoversClass(Verify::class)]
 class VerifyTest extends CommandTestCase
 {
     use RequiresPharReadonlyOff;
@@ -46,9 +47,7 @@ class VerifyTest extends CommandTestCase
         return new Verify();
     }
 
-    /**
-     * @dataProvider passingPharPathsProvider
-     */
+    #[DataProvider('passingPharPathsProvider')]
     public function test_it_verifies_the_signature_of_the_given_file_using_the_phar_extension(string $pharPath): void
     {
         $signature = (new Phar($pharPath))->getSignature();
@@ -93,9 +92,7 @@ class VerifyTest extends CommandTestCase
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
     }
 
-    /**
-     * @dataProvider passingPharPathsProvider
-     */
+    #[DataProvider('passingPharPathsProvider')]
     public function test_it_verifies_the_signature_of_the_given_file_in_debug_mode(string $pharPath): void
     {
         $signature = (new Phar($pharPath))->getSignature();
@@ -136,9 +133,7 @@ class VerifyTest extends CommandTestCase
         );
     }
 
-    /**
-     * @dataProvider failingPharPathsProvider
-     */
+    #[DataProvider('failingPharPathsProvider')]
     public function test_a_corrupted_phar_fails_the_verification(string $pharPath): void
     {
         $this->commandTester->execute([

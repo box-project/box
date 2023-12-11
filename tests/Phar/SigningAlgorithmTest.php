@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Phar;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionEnum;
 use ReflectionEnumBackedCase;
@@ -21,15 +23,12 @@ use UnexpectedValueException;
 use function array_map;
 
 /**
- * @covers \KevinGH\Box\Phar\SigningAlgorithm
- *
  * @internal
  */
+#[CoversClass(SigningAlgorithm::class)]
 final class SigningAlgorithmTest extends TestCase
 {
-    /**
-     * @dataProvider signingAlgorithmLabelsProvider
-     */
+    #[DataProvider('signingAlgorithmLabelsProvider')]
     public function test_it_can_tell_be_created_from_its_label(
         ?string $label,
         SigningAlgorithm $expected

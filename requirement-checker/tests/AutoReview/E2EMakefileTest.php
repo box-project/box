@@ -16,12 +16,12 @@ namespace KevinGH\RequirementChecker\AutoReview;
 
 use Fidry\Makefile\Rule;
 use Fidry\Makefile\Test\BaseMakefileTestCase;
+use PHPUnit\Framework\Attributes\CoversNothing;
 
 /**
- * @coversNothing
- *
  * @internal
  */
+#[CoversNothing]
 final class E2EMakefileTest extends BaseMakefileTestCase
 {
     public const MAKEFILE_PATH = __DIR__.'/../../Makefile.e2e';

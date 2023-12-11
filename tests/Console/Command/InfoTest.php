@@ -17,20 +17,22 @@ namespace KevinGH\Box\Console\Command;
 use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
 use InvalidArgumentException;
-use KevinGH\Box\Phar\InvalidPhar;
+use KevinGH\Box\Console\PharInfoRenderer;
+use KevinGH\Box\Phar\Throwable\InvalidPhar;
 use KevinGH\Box\Platform;
 use KevinGH\Box\Test\CommandTestCase;
 use Phar;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Console\Output\OutputInterface;
 use function extension_loaded;
 use function implode;
 
 /**
- * @covers \KevinGH\Box\Console\Command\Info
- * @covers \KevinGH\Box\Console\PharInfoRenderer
- *
  * @internal
  */
+#[CoversClass(Info::class)]
+#[CoversClass(PharInfoRenderer::class)]
 class InfoTest extends CommandTestCase
 {
     private const FIXTURES = __DIR__.'/../../../fixtures/info';
@@ -49,9 +51,7 @@ class InfoTest extends CommandTestCase
         return new Info();
     }
 
-    /**
-     * @dataProvider inputProvider
-     */
+    #[DataProvider('inputProvider')]
     public function test_it_provides_info_about_the_phar_extension_or_the_given_phar_archive(
         array $input,
         string $expected,

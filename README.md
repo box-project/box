@@ -99,7 +99,6 @@ For the full documentation see https://box-project.github.io/box.
    1. [Project files](doc/symfony.md#project-files)
    1. [Project directory](doc/symfony.md#project-directory)
    2. [Cache](doc/symfony.md#cache)
-   3. [Runtime component](doc/symfony.md#runtime-component)
 1. [Reproducible builds](doc/reproducible-builds.md#reproducible-builds)
    1. [Creating a reproducible PHAR](doc/reproducible-builds.md#creating-a-reproducible-phar)
       1. [PHP-Scoper](doc/reproducible-builds.md#php-scoper)

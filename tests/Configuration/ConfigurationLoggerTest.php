@@ -15,13 +15,14 @@ declare(strict_types=1);
 namespace KevinGH\Box\Configuration;
 
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \KevinGH\Box\Configuration\ConfigurationLogger
- *
  * @internal
  */
+#[CoversClass(ConfigurationLogger::class)]
 class ConfigurationLoggerTest extends TestCase
 {
     private ConfigurationLogger $logs;
@@ -37,9 +38,7 @@ class ConfigurationLoggerTest extends TestCase
         self::assertSame([], $this->logs->getWarnings());
     }
 
-    /**
-     * @dataProvider emptyMessageProvider
-     */
+    #[DataProvider('emptyMessageProvider')]
     public function test_it_cannot_accept_an_empty_message(string $message): void
     {
         try {

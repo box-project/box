@@ -12,12 +12,13 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\RequirementChecker;
+namespace KevinGH\Box\Composer\Artifact;
 
+use KevinGH\Box\Composer\Package\PackageInfo;
 use function array_map;
 
 /**
- * TODO: move it under the Composer namespace
+ * TODO: move it under the Composer namespace.
  * @private
  */
 final readonly class DecodedComposerLock
@@ -53,7 +54,7 @@ final readonly class DecodedComposerLock
     }
 
     /**
-     * @return list<PackageInfo>
+     * @return PackageInfo
      */
     public function getPackages(): array
     {

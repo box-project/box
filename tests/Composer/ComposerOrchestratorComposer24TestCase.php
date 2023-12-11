@@ -17,17 +17,18 @@ namespace KevinGH\Box\Composer;
 use Fidry\Console\DisplayNormalizer;
 use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use function file_get_contents;
 use function preg_replace;
 
 /**
- * @covers \KevinGH\Box\Composer\AutoloadDumper
- * @covers \KevinGH\Box\Composer\ComposerOrchestrator
- * @covers \KevinGH\Box\Composer\ComposerProcessFactory
- *
  * @internal
  */
+#[CoversClass(AutoloadDumper::class)]
+#[CoversClass(ComposerOrchestrator::class)]
+#[CoversClass(ComposerProcessFactory::class)]
 class ComposerOrchestratorComposer24TestCase extends BaseComposerOrchestratorComposerTestCase
 {
     protected function shouldSkip(string $composerVersion): array
@@ -38,9 +39,7 @@ class ComposerOrchestratorComposer24TestCase extends BaseComposerOrchestratorCom
         ];
     }
 
-    /**
-     * @dataProvider composerAutoloadProvider
-     */
+    #[DataProvider('composerAutoloadProvider')]
     public function test_it_can_dump_the_autoloader_with_an_empty_composer_json(
         SymbolsRegistry $symbolsRegistry,
         string $prefix,
@@ -96,9 +95,7 @@ class ComposerOrchestratorComposer24TestCase extends BaseComposerOrchestratorCom
         );
     }
 
-    /**
-     * @dataProvider composerAutoloadProvider
-     */
+    #[DataProvider('composerAutoloadProvider')]
     public function test_it_cannot_dump_the_autoloader_with_an_invalid_composer_json(
         SymbolsRegistry $symbolsRegistry,
         string $prefix,
@@ -205,9 +202,7 @@ class ComposerOrchestratorComposer24TestCase extends BaseComposerOrchestratorCom
         );
     }
 
-    /**
-     * @dataProvider composerAutoloadProvider
-     */
+    #[DataProvider('composerAutoloadProvider')]
     public function test_it_cannot_dump_the_autoloader_if_the_composer_json_file_is_missing(
         SymbolsRegistry $symbolsRegistry,
         string $prefix,
@@ -231,9 +226,7 @@ class ComposerOrchestratorComposer24TestCase extends BaseComposerOrchestratorCom
         }
     }
 
-    /**
-     * @dataProvider composerAutoloadProvider
-     */
+    #[DataProvider('composerAutoloadProvider')]
     public function test_it_can_dump_the_autoloader_with_a_composer_json_lock_and_installed_with_a_dependency(
         SymbolsRegistry $SymbolsRegistry,
         string $prefix,
@@ -412,9 +405,7 @@ class ComposerOrchestratorComposer24TestCase extends BaseComposerOrchestratorCom
         );
     }
 
-    /**
-     * @dataProvider composerAutoloadProvider
-     */
+    #[DataProvider('composerAutoloadProvider')]
     public function test_it_can_dump_the_autoloader_with_a_composer_json_and_lock_with_a_dependency(
         SymbolsRegistry $symbolsRegistry,
         string $prefix,
