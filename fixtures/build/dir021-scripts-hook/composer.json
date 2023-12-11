@@ -2,7 +2,7 @@
     "bin": "index.php",
     "autoload": {
         "psr-4": {
-            "FixedPrefix\\FixedPrefix\\FixedPrefix\\FixedPrefix\\FixedPrefix\\App\\": [
+            "FixedPrefix\\FixedPrefix\\FixedPrefix\\FixedPrefix\\FixedPrefix\\FixedPrefix\\FixedPrefix\\App\\": [
                 "src\/"
             ]
         }

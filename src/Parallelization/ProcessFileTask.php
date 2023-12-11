@@ -49,16 +49,18 @@ final readonly class ProcessFileTask implements Task
         register_aliases();
         register_error_handler();
 
+        $cwd = $this->cwd;
         $mapFile = $this->mapFile;
         $compactors = $this->compactors;
 
-        $processFile = static function (string $file) use ($mapFile, $compactors): ?SymbolsRegistry {
+        $processFile = static function (string $file) use ($cwd, $mapFile, $compactors): ?SymbolsRegistry {
             $contents = FS::getFileContents($file);
 
             $local = $mapFile($file);
             $processedContents = $compactors->compact($local, $contents);
 
-            FS::dumpFile($local, $processedContents);
+            $path = $cwd.'/'.$local;
+            FS::dumpFile($path, $processedContents);
 
             return $compactors->getScoperSymbolsRegistry();
         };

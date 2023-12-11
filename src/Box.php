@@ -447,12 +447,11 @@ final class Box implements Countable
      */
     public function executeCompactors(array $files): void
     {
-        $cwd = getcwd();
-
         $shouldProcessFilesInParallel = $this->enableParallelization && ParallelizationDecider::shouldProcessFilesInParallel(
             $this->scoper,
             count($files),
         );
+        $shouldProcessFilesInParallel = true;
 
         $filePaths = array_map(strval(...), $files);
 
@@ -462,7 +461,7 @@ final class Box implements Countable
 
         $processFiles(
             $filePaths,
-            $cwd,
+            $this->bufferingDirectory,
             $this->mapFile,
             $this->compactors,
         );
@@ -474,9 +473,9 @@ final class Box implements Countable
      * @return list<array{string, string}>
      */
     private static function processFilesSynchronously(
-        array $files,
-        string $_cwd,
-        MapFile $mapFile,
+        array      $files,
+        string     $cwd,
+        MapFile    $mapFile,
         Compactors $compactors,
     ): void {
         foreach ($files as $file) {
@@ -484,9 +483,10 @@ final class Box implements Countable
 
             $local = $mapFile($file);
 
+            $path = $cwd .'/'.$local;
             $processedContents = $compactors->compact($local, $contents);
 
-            FS::dumpFile($local, $processedContents);
+            FS::dumpFile($path, $processedContents);
         }
     }
 
