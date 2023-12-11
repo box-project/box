@@ -40,8 +40,7 @@
             <directory>src/</directory>
         </include>
         <exclude>
-            <file>src/bootstrap.php</file>
-            <file>src/consts.php</file>
+            <file>src/Bootstrap.php</file>
             <file>src/functions.php</file>
             <file>src/Console/Command/Build.php</file>
             <file>src/Console/Command/ChangeableWorkingDirectory.php</file>

@@ -50,8 +50,8 @@ if (false === in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed', 'micro'], true)) {
     throw new RuntimeException('Unable to find the Composer autoloader.');
 })();
 
-register_aliases();
-register_error_handler();
+Bootstrap::registerAliases();
+Bootstrap::registerErrorHandler();
 
 $io = IO::createDefault();
 OutputFormatterConfigurator::configure($io);
