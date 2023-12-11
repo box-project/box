@@ -172,6 +172,7 @@ final class Configuration
     private const BANNER_KEY = 'banner';
     private const BANNER_FILE_KEY = 'banner-file';
     private const BASE_PATH_KEY = 'base-path';
+    // TODO: rename blacklist
     private const BLACKLIST_KEY = 'blacklist';
     private const CHECK_REQUIREMENTS_KEY = 'check-requirements';
     private const CHMOD_KEY = 'chmod';
@@ -219,6 +220,7 @@ final class Configuration
         $basePath = self::retrieveBasePath($file, $raw, $logger);
 
         $composerFiles = self::retrieveComposerFiles($basePath);
+        // TODO: require composer.lock file to be present
 
         $dumpAutoload = self::retrieveDumpAutoload($raw, $composerFiles, $logger);
 
@@ -267,6 +269,7 @@ final class Configuration
             $composerFiles->getComposerLock()->getDecodedContents(),
             $excludeDevPackages,
         );
+        $devPackages = [];
 
         /**
          * @var string[] $excludedPaths
@@ -346,6 +349,7 @@ final class Configuration
             $file,
             $alias,
             $basePath,
+            // Maybe composerFiles could be passed directly there
             $composerFiles->getComposerJson(),
             $composerFiles->getComposerLock(),
             $filesAggregate,

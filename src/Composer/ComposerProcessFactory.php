@@ -71,6 +71,27 @@ class ComposerProcessFactory
         );
     }
 
+    public function getInstallNoDevProcess(string $workingDirectory): Process
+    {
+        $composerCommand = [
+            $this->getComposerExecutable(),
+            'install',
+            '--no-dev',
+            '--no-autoloader',
+            '--working-dir='.$workingDirectory,
+        ];
+
+        if (null !== $this->verbosity) {
+            $composerCommand[] = $this->verbosity;
+        }
+
+        if ($this->ansi) {
+            $composerCommand[] = '--ansi';
+        }
+
+        return $this->createProcess($composerCommand);
+    }
+
     public function getDumpAutoloaderProcess(bool $noDev): Process
     {
         $composerCommand = [$this->getComposerExecutable(), 'dump-autoload', '--classmap-authoritative'];

@@ -56,6 +56,7 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Filesystem\Path;
 use function array_map;
 use function array_shift;
+use function chdir;
 use function count;
 use function decoct;
 use function explode;
@@ -272,7 +273,7 @@ final class Compile implements CommandAware
 
         $check = self::registerRequirementsChecker($config, $box, $logger);
 
-        self::addFiles($config, $box, $logger, $io);
+        self::addFiles($config, $box, $composerOrchestrator, $logger, $io);
 
         self::registerStub($config, $box, $main, $check, $logger);
         self::configureMetadata($config, $box, $logger);
@@ -451,13 +452,14 @@ final class Compile implements CommandAware
         $box->registerFileMapping($fileMapper);
     }
 
-    private static function addFiles(Configuration $config, Box $box, CompilerLogger $logger, IO $io): void
+    private static function addFiles(
+        Configuration $config, Box $box, ComposerOrchestrator $composerOrchestrator, CompilerLogger $logger, IO $io): void
     {
         $logger->log(CompilerLogger::QUESTION_MARK_PREFIX, 'Adding binary files');
 
         $count = count($config->getBinaryFiles());
 
-        $box->addFiles($config->getBinaryFiles(), true);
+        $box->addFiles($config->getBinaryFiles());
 
         $logger->log(
             CompilerLogger::CHEVRON_PREFIX,
@@ -473,6 +475,16 @@ final class Compile implements CommandAware
                 $config->hasAutodiscoveredFiles() ? 'Yes' : 'No',
             ),
         );
+
+        $logger->log(CompilerLogger::QUESTION_MARK_PREFIX, 'Adding files');
+        $box->addFiles($config->getFiles());
+        $logger->log(
+            CompilerLogger::CHEVRON_PREFIX,
+            0 === $count
+                ? 'No file found'
+                : sprintf('%d file(s)', $count),
+        );
+
         $logger->log(
             CompilerLogger::QUESTION_MARK_PREFIX,
             sprintf(
@@ -480,26 +492,17 @@ final class Compile implements CommandAware
                 $config->excludeDevFiles() ? 'Yes' : 'No',
             ),
         );
-        $logger->log(CompilerLogger::QUESTION_MARK_PREFIX, 'Adding files');
+        $composerOrchestrator->installNoDev($box->getBufferingDirectory());
 
-        $count = count($config->getFiles());
+        $logger->log(CompilerLogger::QUESTION_MARK_PREFIX, 'Processing files');
 
-        self::addFilesWithErrorHandling($config, $box, $io);
-
-        $logger->log(
-            CompilerLogger::CHEVRON_PREFIX,
-            0 === $count
-                ? 'No file found'
-                : sprintf('%d file(s)', $count),
-        );
+        self::processFilesWithErrorHandling($config, $box, $io);
     }
 
-    private static function addFilesWithErrorHandling(Configuration $config, Box $box, IO $io): void
+    private static function processFilesWithErrorHandling(Configuration $config, Box $box): void
     {
         try {
-            $box->addFiles($config->getFiles(), false);
-
-            return;
+            $box->executeCompactors($config->getFiles());
         } catch (TaskFailureThrowable $ampFailure) {
             throw new ConsoleRuntimeException(
                 sprintf(

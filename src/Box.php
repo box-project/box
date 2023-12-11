@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use Amp\MultiReasonException;
 use Amp\Parallel\Worker\TaskFailureThrowable;
 use BadMethodCallException;
 use Countable;
@@ -48,6 +47,7 @@ use function openssl_pkey_export;
 use function openssl_pkey_get_details;
 use function openssl_pkey_get_private;
 use function sprintf;
+use function strval;
 
 /**
  * Box is a utility class to generate a PHAR.
@@ -61,11 +61,7 @@ final class Box implements Countable
     private MapFile $mapFile;
     private Scoper $scoper;
     private bool $buffering = false;
-
-    /**
-     * @var array<string, string> Relative file path as key and file contents as value
-     */
-    private array $bufferedFiles = [];
+    private ?string $bufferingDirectory = null;
 
     private function __construct(
         private Phar $phar,
@@ -76,6 +72,13 @@ final class Box implements Countable
         $this->placeholderCompactor = new Placeholder([]);
         $this->mapFile = new MapFile(getcwd(), []);
         $this->scoper = new NullScoper();
+    }
+
+    public function __destruct()
+    {
+        if (null !== $this->bufferingDirectory) {
+            FS::remove($this->bufferingDirectory);
+        }
     }
 
     /**
@@ -109,6 +112,7 @@ final class Box implements Countable
         Assert::false($this->buffering, 'The buffering must be ended before starting it again');
 
         $this->buffering = true;
+        $this->bufferingDirectory = FS::makeTmpDir('box', self::class);
 
         $this->phar->startBuffering();
     }
@@ -123,19 +127,19 @@ final class Box implements Countable
         $dumpAutoload ??= static fn () => null;
         $cwd = getcwd();
 
-        $tmp = FS::makeTmpDir('box', self::class);
+        $tmp = $this->bufferingDirectory;
         chdir($tmp);
 
-        if ([] === $this->bufferedFiles) {
-            $this->bufferedFiles = [
-                '.box_empty' => 'A PHAR cannot be empty so Box adds this file to ensure the PHAR is created still.',
-            ];
-        }
+//        if ([] === $this->bufferedFiles) {
+//            $this->bufferedFiles = [
+//                '.box_empty' => 'A PHAR cannot be empty so Box adds this file to ensure the PHAR is created still.',
+//            ];
+//        }
 
         try {
-            foreach ($this->bufferedFiles as $file => $contents) {
-                FS::dumpFile($file, $contents);
-            }
+//            foreach ($this->bufferedFiles as $file => $contents) {
+//                FS::dumpFile($file, $contents);
+//            }
 
             if (null !== $dumpAutoload) {
                 $dumpAutoload(
@@ -168,6 +172,7 @@ final class Box implements Countable
             'composer.json',
             'composer.lock',
             $normalizedVendorDir.'/composer/installed.json',
+            $normalizedVendorDir.'/composer/installed.php',
         ];
 
         $this->phar->startBuffering();
@@ -288,25 +293,13 @@ final class Box implements Countable
 
     /**
      * @param array<SplFileInfo|string> $files
-     *
-     * @throws TaskFailureThrowable
      */
-    public function addFiles(array $files, bool $binary): void
+    public function addFiles(array $files): void
     {
         Assert::true($this->buffering, 'Cannot add files if the buffering has not started.');
 
-        $files = array_map('strval', $files);
-
-        if ($binary) {
-            foreach ($files as $file) {
-                $this->addFile($file, null, true);
-            }
-
-            return;
-        }
-
-        foreach ($this->processContents($files) as [$file, $contents]) {
-            $this->bufferedFiles[$file] = $contents;
+        foreach ($files as $file) {
+            $this->addFile((string) $file, null, true);
         }
     }
 
@@ -328,8 +321,12 @@ final class Box implements Countable
         }
 
         $local = ($this->mapFile)($file);
+        $path = $this->bufferingDirectory.'/'.$local;
 
-        $this->bufferedFiles[$local] = $binary ? $contents : $this->compactors->compact($local, $contents);
+        FS::dumpFile(
+            $path,
+            $binary ? $contents : $this->compactors->compact($local, $contents),
+        );
 
         return $local;
     }
@@ -444,14 +441,11 @@ final class Box implements Countable
     }
 
     /**
-     * @param string[] $files
+     * @param SplFileInfo[] $files
      *
-     * @throws MultiReasonException
-     *
-     * @return array array of tuples where the first element is the local file path (path inside the PHAR) and the
-     *               second element is the processed contents
+     * @throws TaskFailureThrowable
      */
-    private function processContents(array $files): array
+    public function executeCompactors(array $files): void
     {
         $cwd = getcwd();
 
@@ -460,12 +454,14 @@ final class Box implements Countable
             count($files),
         );
 
+        $filePaths = array_map(strval(...), $files);
+
         $processFiles = $shouldProcessFilesInParallel
             ? ParallelFileProcessor::processFilesInParallel(...)
             : self::processFilesSynchronously(...);
 
-        return $processFiles(
-            $files,
+        $processFiles(
+            $filePaths,
             $cwd,
             $this->mapFile,
             $this->compactors,
@@ -482,21 +478,16 @@ final class Box implements Countable
         string $_cwd,
         MapFile $mapFile,
         Compactors $compactors,
-    ): array {
-        $processFile = static function (string $file) use ($mapFile, $compactors): array {
+    ): void {
+        foreach ($files as $file) {
             $contents = FS::getFileContents($file);
 
             $local = $mapFile($file);
 
             $processedContents = $compactors->compact($local, $contents);
 
-            return [
-                $local,
-                $processedContents,
-            ];
-        };
-
-        return array_map($processFile, $files);
+            FS::dumpFile($local, $processedContents);
+        }
     }
 
     public function count(): int
@@ -504,5 +495,12 @@ final class Box implements Countable
         Assert::false($this->buffering, 'Cannot count the number of files in the PHAR when buffering');
 
         return $this->phar->count();
+    }
+
+    public function getBufferingDirectory(): string
+    {
+        // TODO: throw if not null
+
+        return $this->bufferingDirectory;
     }
 }

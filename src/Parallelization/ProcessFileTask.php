@@ -45,34 +45,27 @@ final readonly class ProcessFileTask implements Task
     {
         chdir($this->cwd);
 
+        // TODO: check if still necessary
         register_aliases();
         register_error_handler();
 
         $mapFile = $this->mapFile;
         $compactors = $this->compactors;
 
-        $processFile = static function (string $file) use ($mapFile, $compactors): array {
+        $processFile = static function (string $file) use ($mapFile, $compactors): ?SymbolsRegistry {
             $contents = FS::getFileContents($file);
 
             $local = $mapFile($file);
-
             $processedContents = $compactors->compact($local, $contents);
 
-            return [$local, $processedContents, $compactors->getScoperSymbolsRegistry()];
+            FS::dumpFile($local, $processedContents);
+
+            return $compactors->getScoperSymbolsRegistry();
         };
 
-        $tuples = array_map($processFile, $this->filePaths);
-
-        $filesWithContents = [];
-        $symbolRegistries = [];
-
-        foreach ($tuples as [$local, $processedContents, $symbolRegistry]) {
-            $filesWithContents[] = [$local, $processedContents];
-            $symbolRegistries[] = $symbolRegistry;
-        }
+        $symbolRegistries = array_map($processFile, $this->filePaths);
 
         return new TaskResult(
-            $filesWithContents,
             SymbolsRegistry::createFromRegistries(array_filter($symbolRegistries)),
         );
     }
