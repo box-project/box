@@ -19,11 +19,10 @@ use Amp\Parallel\Worker\Task;
 use Amp\Sync\Channel;
 use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
+use KevinGH\Box\Bootstrap;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\MapFile;
 use function array_map;
-use function KevinGH\Box\register_aliases;
-use function KevinGH\Box\register_error_handler;
 
 /**
  * @private
@@ -45,8 +44,8 @@ final readonly class ProcessFileTask implements Task
     {
         chdir($this->cwd);
 
-        register_aliases();
-        register_error_handler();
+        Bootstrap::registerAliases();
+        Bootstrap::registerErrorHandler();
 
         $mapFile = $this->mapFile;
         $compactors = $this->compactors;
