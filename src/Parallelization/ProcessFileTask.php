@@ -19,7 +19,6 @@ use Amp\Parallel\Worker\Task;
 use Amp\Sync\Channel;
 use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-use KevinGH\Box\Bootstrap;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\MapFile;
 use function array_map;
@@ -43,9 +42,6 @@ final readonly class ProcessFileTask implements Task
     public function run(Channel $channel, Cancellation $cancellation): TaskResult
     {
         chdir($this->cwd);
-
-        Bootstrap::registerAliases();
-        Bootstrap::registerErrorHandler();
 
         $mapFile = $this->mapFile;
         $compactors = $this->compactors;
