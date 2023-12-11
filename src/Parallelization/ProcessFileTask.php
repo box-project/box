@@ -22,8 +22,6 @@ use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\MapFile;
 use function array_map;
-use function KevinGH\Box\register_aliases;
-use function KevinGH\Box\register_error_handler;
 
 /**
  * @private
@@ -44,9 +42,6 @@ final readonly class ProcessFileTask implements Task
     public function run(Channel $channel, Cancellation $cancellation): TaskResult
     {
         chdir($this->cwd);
-
-        register_aliases();
-        register_error_handler();
 
         $mapFile = $this->mapFile;
         $compactors = $this->compactors;
