@@ -16,13 +16,8 @@ namespace KevinGH\Box\RequirementChecker;
 
 use KevinGH\Box\Composer\Artifact\DecodedComposerJson;
 use KevinGH\Box\Composer\Artifact\DecodedComposerLock;
-use KevinGH\Box\Composer\Package\PackageInfo;
+use KevinGH\Box\Composer\Package\Extension;
 use KevinGH\Box\Phar\CompressionAlgorithm;
-use function array_diff_key;
-use function array_filter;
-use function array_map;
-use function array_merge_recursive;
-use function array_values;
 
 /**
  * Collect the list of requirements for running the application.
@@ -31,201 +26,140 @@ use function array_values;
  */
 final class AppRequirementsFactory
 {
-    private const SELF_PACKAGE = '__APPLICATION__';
+    private const SELF_PACKAGE = null;
 
     public static function create(
         DecodedComposerJson $composerJson,
         DecodedComposerLock $composerLock,
         CompressionAlgorithm $compressionAlgorithm,
     ): Requirements {
-        return self::configureExtensionRequirements(
-            self::retrievePhpVersionRequirements($composerJson, $composerLock),
-            $composerJson,
-            $composerLock,
-            $compressionAlgorithm,
-        );
+        $requirementsBuilder = new RequirementsBuilder();
+
+        self::retrievePhpVersionRequirements($requirementsBuilder, $composerJson, $composerLock);
+        self::collectExtensionRequirementsFromCompressionAlgorithm($requirementsBuilder, $compressionAlgorithm);
+        self::collectComposerLockExtensionRequirements($composerLock, $requirementsBuilder);
+        self::collectComposerJsonExtensionRequirements($composerJson, $requirementsBuilder);
+
+        return $requirementsBuilder->build();
     }
 
-    /**
-     * @return list<Requirement>
-     */
     private static function retrievePhpVersionRequirements(
+        RequirementsBuilder $requirementsBuilder,
         DecodedComposerJson $composerJson,
         DecodedComposerLock $composerLock,
-    ): array {
+    ): void {
         // If the application has a constraint on the PHP version, it is the authority.
-        return $composerLock->hasRequiredPhpVersion() || $composerJson->hasRequiredPhpVersion()
-            ? self::retrievePHPRequirementFromPlatform($composerJson, $composerLock)
-            : self::retrievePHPRequirementFromPackages($composerLock);
+        $composerLock->hasRequiredPhpVersion() || $composerJson->hasRequiredPhpVersion()
+            ? self::retrievePHPRequirementFromPlatform($requirementsBuilder, $composerJson, $composerLock)
+            : self::retrievePHPRequirementFromPackages($requirementsBuilder, $composerLock);
     }
 
-    /**
-     * @return list<Requirement>
-     */
     private static function retrievePHPRequirementFromPlatform(
+        RequirementsBuilder $requirementsBuilder,
         DecodedComposerJson $composerJson,
         DecodedComposerLock $composerLock,
-    ): array {
+    ): void {
         $requiredPhpVersion = $composerLock->getRequiredPhpVersion() ?? $composerJson->getRequiredPhpVersion();
 
-        return null === $requiredPhpVersion ? [] : [Requirement::forPHP($requiredPhpVersion, null)];
+        if (null !== $requiredPhpVersion) {
+            $requirementsBuilder->addRequirement(
+                Requirement::forPHP($requiredPhpVersion, self::SELF_PACKAGE),
+            );
+        }
     }
 
-    /**
-     * @return list<Requirement>
-     */
-    private static function retrievePHPRequirementFromPackages(DecodedComposerLock $composerLock): array
-    {
-        return array_values(
-            array_map(
-                static fn (PackageInfo $packageInfo) => Requirement::forPHP(
-                    $packageInfo->getRequiredPhpVersion(),
-                    $packageInfo->getName(),
-                ),
-                array_filter(
-                    $composerLock->getPackages(),
-                    static fn (PackageInfo $packageInfo) => $packageInfo->hasRequiredPhpVersion(),
-                ),
-            ),
-        );
-    }
-
-    /**
-     * @param list<Requirement> $requirements
-     */
-    private static function configureExtensionRequirements(
-        array $requirements,
-        DecodedComposerJson $composerJson,
+    private static function retrievePHPRequirementFromPackages(
+        RequirementsBuilder $requirementsBuilder,
         DecodedComposerLock $composerLock,
-        CompressionAlgorithm $compressionAlgorithm,
-    ): Requirements {
-        [$extensionRequirements, $extensionConflicts] = self::collectExtensionRequirements(
-            $composerJson,
-            $composerLock,
-            $compressionAlgorithm,
-        );
-
-        foreach ($extensionRequirements as $extension => $packages) {
-            foreach ($packages as $package) {
-                $requirements[] = Requirement::forRequiredExtension(
-                    $extension,
-                    self::SELF_PACKAGE === $package ? null : $package,
+    ): void {
+        foreach ($composerLock->getPackages() as $packageInfo) {
+            if ($packageInfo->hasRequiredPhpVersion()) {
+                $requirementsBuilder->addRequirement(
+                    Requirement::forPHP(
+                        $packageInfo->getRequiredPhpVersion(),
+                        $packageInfo->getName(),
+                    ),
                 );
             }
         }
-
-        foreach ($extensionConflicts as $extension => $packages) {
-            foreach ($packages as $package) {
-                $requirements[] = Requirement::forConflictingExtension(
-                    $extension,
-                    self::SELF_PACKAGE === $package ? null : $package,
-                );
-            }
-        }
-
-        return new Requirements($requirements);
     }
 
     /**
      * Collects the extension required. It also accounts for the polyfills, i.e. if the polyfill
      * `symfony/polyfill-mbstring` is provided then the extension `ext-mbstring` will not be required.
-     *
-     * @return array{array<string, list<string>>, array<string, list<string>>}
      */
-    private static function collectExtensionRequirements(
-        DecodedComposerJson $composerJson,
-        DecodedComposerLock $composerLock,
+    private static function collectExtensionRequirementsFromCompressionAlgorithm(
+        RequirementsBuilder $requirementsBuilder,
         CompressionAlgorithm $compressionAlgorithm,
-    ): array {
-        $requirements = [];
-
+    ): void {
         $compressionAlgorithmRequiredExtension = $compressionAlgorithm->getRequiredExtension();
 
         if (null !== $compressionAlgorithmRequiredExtension) {
-            $requirements[$compressionAlgorithmRequiredExtension] = [self::SELF_PACKAGE];
+            $requirementsBuilder->addRequiredExtension(
+                new Extension($compressionAlgorithmRequiredExtension),
+                self::SELF_PACKAGE,
+            );
         }
-
-        foreach ($composerLock->getPlatformExtensions() as $extension) {
-            $requirements[(string) $extension] = [self::SELF_PACKAGE];
-        }
-
-        // If the lock is present it is the authority. If not fallback on the .json. It is pointless to check both
-        // since they will contain redundant information.
-        [$polyfills, $requirements, $conflicts] = $composerLock->isEmpty()
-            ? self::collectComposerJsonExtensionRequirements($composerJson, $requirements)
-            : self::collectComposerLockExtensionRequirements($composerLock, $requirements);
-
-        $jsonConflicts = self::collectComposerJsonExtensionRequirements($composerJson, $requirements)[2];
-
-        return [
-            array_diff_key($requirements, $polyfills),
-            array_merge_recursive($conflicts, $jsonConflicts),
-        ];
     }
 
-    /**
-     * @param array<string, list<string>> $requirements The key is the extension name and the value the list of sources (app literal string or the package name).
-     *
-     * @return array{array<string, true>, array<string, list<string>>, array<string, list<string>>}
-     */
     private static function collectComposerJsonExtensionRequirements(
         DecodedComposerJson $composerJson,
-        array $requirements,
-    ): array {
-        $polyfills = [];
-        $conflicts = [];
-
+        RequirementsBuilder $requirementsBuilder,
+    ): void {
         foreach ($composerJson->getRequiredItems() as $packageInfo) {
             $polyfilledExtension = $packageInfo->getPolyfilledExtension();
 
             if (null !== $polyfilledExtension) {
-                $polyfills[(string) $polyfilledExtension] = true;
+                $requirementsBuilder->addProvidedExtension($polyfilledExtension, self::SELF_PACKAGE);
 
                 continue;
             }
 
             foreach ($packageInfo->getRequiredExtensions() as $extension) {
-                $requirements[(string) $extension] = [self::SELF_PACKAGE];
+                $requirementsBuilder->addRequiredExtension(
+                    $extension,
+                    self::SELF_PACKAGE,
+                );
             }
         }
 
         foreach ($composerJson->getConflictingExtensions() as $extension) {
-            $conflicts[(string) $extension] = [self::SELF_PACKAGE];
+            $requirementsBuilder->addConflictingExtension(
+                $extension,
+                self::SELF_PACKAGE,
+            );
         }
-
-        return [
-            $polyfills,
-            $requirements,
-            $conflicts,
-        ];
     }
 
-    /**
-     * @param array<string, list<string>> $requirements The key is the extension name and the value the list of sources (app literal string or the package name).
-     *
-     * @return array{array<string, true>, array<string, list<string>>, array<string, list<string>>}
-     */
     private static function collectComposerLockExtensionRequirements(
         DecodedComposerLock $composerLock,
-        array $requirements,
-    ): array {
-        $polyfills = [];
-        $conflicts = [];
+        RequirementsBuilder $requirementsBuilder,
+    ): void {
+        foreach ($composerLock->getPlatformExtensions() as $extension) {
+            $requirementsBuilder->addRequiredExtension($extension, self::SELF_PACKAGE);
+        }
 
         foreach ($composerLock->getPackages() as $packageInfo) {
             foreach ($packageInfo->getPolyfilledExtensions() as $polyfilledExtension) {
-                $polyfills[(string) $polyfilledExtension] = true;
+                $requirementsBuilder->addProvidedExtension(
+                    $polyfilledExtension,
+                    $packageInfo->getName(),
+                );
             }
 
             foreach ($packageInfo->getRequiredExtensions() as $extension) {
-                $requirements[(string) $extension][] = $packageInfo->getName();
+                $requirementsBuilder->addRequiredExtension(
+                    $extension,
+                    $packageInfo->getName(),
+                );
             }
 
             foreach ($packageInfo->getConflictingExtensions() as $extension) {
-                $conflicts[(string) $extension][] = $packageInfo->getName();
+                $requirementsBuilder->addConflictingExtension(
+                    $extension,
+                    $packageInfo->getName(),
+                );
             }
         }
-
-        return [$polyfills, $requirements, $conflicts];
     }
 }

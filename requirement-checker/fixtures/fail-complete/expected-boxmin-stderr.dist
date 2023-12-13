@@ -7,9 +7,10 @@ Box Requirements Checker
 
 > Checking Box requirements:
   ✘ This application requires a PHP version matching "^10".
-  ✔ This application requires the extension "phar".
   ✔ The package "package-with-extensions" requires the extension "json".
   ✘ The package "package-with-extensions" requires the extension "ldap".
+  ✘ This application requires the extension "pdo_dblib".
+  ✔ This application requires the extension "phar".
   ✔ The package "package-with-extensions" requires the extension "random".
   
                                                                                 
@@ -23,4 +24,7 @@ Fix the following mandatory requirements:
  * The package "package-with-extensions" requires the extension "ldap". You
    either need to enable it or request the application to be shipped with a
    polyfill for this extension.
+ * This application requires the extension "pdo_dblib". You either need to
+   enable it or request the application to be shipped with a polyfill for this
+   extension.
 
