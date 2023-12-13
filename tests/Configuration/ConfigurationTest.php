@@ -28,6 +28,9 @@ use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\Phar\SigningAlgorithm;
 use KevinGH\Box\VarDumperNormalizer;
 use Phar;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use RuntimeException;
 use Seld\JsonLint\ParsingException;
 use stdClass;
@@ -48,13 +51,11 @@ use const DIRECTORY_SEPARATOR;
 use const JSON_THROW_ON_ERROR;
 
 /**
- * @covers \KevinGH\Box\Configuration\Configuration
- * @covers \KevinGH\Box\MapFile
- *
- * @group config
- *
  * @internal
  */
+#[CoversClass(Configuration::class)]
+#[CoversClass(MapFile::class)]
+#[Group('config')]
 class ConfigurationTest extends ConfigurationTestCase
 {
     private static string $version;
@@ -311,9 +312,7 @@ class ConfigurationTest extends ConfigurationTestCase
         self::assertSame([], $this->config->getWarnings());
     }
 
-    /**
-     * @dataProvider jsonFilesProvider
-     */
+    #[DataProvider('jsonFilesProvider')]
     public function test_it_attempts_to_get_and_decode_the_json_and_lock_files(
         callable $setup,
         ?string $expectedJson,
@@ -772,9 +771,7 @@ class ConfigurationTest extends ConfigurationTestCase
         self::assertSame([], $this->config->getWarnings());
     }
 
-    /**
-     * @dataProvider invalidCompressionAlgorithmsProvider
-     */
+    #[DataProvider('invalidCompressionAlgorithmsProvider')]
     public function test_the_compression_algorithm_cannot_be_an_invalid_algorithm(mixed $compression, string $errorMessage): void
     {
         try {
@@ -1543,9 +1540,7 @@ class ConfigurationTest extends ConfigurationTestCase
         }
     }
 
-    /**
-     * @group legacy
-     */
+    #[Group('legacy')]
     public function test_the_new_datetime_format_setting_takes_precedence_over_the_old_one(): void
     {
         $this->setConfig([
@@ -2029,9 +2024,7 @@ class ConfigurationTest extends ConfigurationTestCase
         self::assertSame([], $this->config->getWarnings());
     }
 
-    /**
-     * @dataProvider customBannerProvider
-     */
+    #[DataProvider('customBannerProvider')]
     public function test_a_custom_banner_can_be_registered(string $banner): void
     {
         $this->setConfig([
@@ -2119,9 +2112,7 @@ class ConfigurationTest extends ConfigurationTestCase
         }
     }
 
-    /**
-     * @dataProvider unormalizedCustomBannerProvider
-     */
+    #[DataProvider('unormalizedCustomBannerProvider')]
     public function test_the_content_of_the_banner_is_normalized(string $banner, string $expected): void
     {
         $this->setConfig([
@@ -3050,7 +3041,7 @@ class ConfigurationTest extends ConfigurationTestCase
               -file: "box.json"
               -alias: "test.phar"
               -basePath: "/path/to"
-              -composerJson: KevinGH\Box\Composer\ComposerFile {#100
+              -composerJson: KevinGH\Box\Composer\Artifact\ComposerFile {#100
                 -path: "composer.json"
                 -contents: array:1 [
                   "config" => array:3 [
@@ -3062,7 +3053,7 @@ class ConfigurationTest extends ConfigurationTestCase
                   ]
                 ]
               }
-              -composerLock: KevinGH\Box\Composer\ComposerFile {#100
+              -composerLock: KevinGH\Box\Composer\Artifact\ComposerFile {#100
                 -path: "composer.lock"
                 -contents: []
               }

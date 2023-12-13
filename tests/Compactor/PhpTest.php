@@ -18,17 +18,16 @@ use Fidry\Console\DisplayNormalizer;
 use KevinGH\Box\Annotation\CompactedFormatter;
 use KevinGH\Box\Annotation\DocblockAnnotationParser;
 use phpDocumentor\Reflection\DocBlockFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
- * @covers \KevinGH\Box\Compactor\Php
- *
  * @internal
  */
+#[CoversClass(Php::class)]
 class PhpTest extends CompactorTestCase
 {
-    /**
-     * @dataProvider filesProvider
-     */
+    #[DataProvider('filesProvider')]
     public function test_it_supports_php_files(string $file, bool $supports): void
     {
         $compactor = new Php(
@@ -54,9 +53,7 @@ class PhpTest extends CompactorTestCase
         self::assertSame($supports, $contents !== $actual);
     }
 
-    /**
-     * @dataProvider phpContentProvider
-     */
+    #[DataProvider('phpContentProvider')]
     public function test_it_compacts_php_files(
         DocblockAnnotationParser $annotationParser,
         string $content,
@@ -666,9 +663,7 @@ class PhpTest extends CompactorTestCase
         ];
     }
 
-    /**
-     * @dataProvider phpContentWithAnnotationsDisabledProvider
-     */
+    #[DataProvider('phpContentWithAnnotationsDisabledProvider')]
     public function test_it_does_not_touch_the_doc_blocks_if_disabled(string $content, string $expected): void
     {
         $file = 'foo.php';

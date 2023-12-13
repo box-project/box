@@ -14,14 +14,14 @@ declare(strict_types=1);
 
 namespace KevinGH\RequirementChecker\AutoReview;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use function count;
 
 /**
- * @covers \KevinGH\Box\AutoReview\GAE2ECollector
- *
  * @internal
  */
+#[CoversClass(\KevinGH\Box\AutoReview\GAE2ECollector::class)]
 class GAE2ECollectorTest extends TestCase
 {
     public function test_it_collects_the_e2e_test_names(): void

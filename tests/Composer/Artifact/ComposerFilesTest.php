@@ -12,21 +12,20 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Composer;
+namespace KevinGH\Box\Composer\Artifact;
 
 use Closure;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \KevinGH\Box\Composer\ComposerFiles
- *
  * @internal
  */
+#[CoversClass(ComposerFiles::class)]
 class ComposerFilesTest extends TestCase
 {
-    /**
-     * @dataProvider validInstantiatorsProvider
-     */
+    #[DataProvider('validInstantiatorsProvider')]
     public function test_it_can_be_created(
         Closure $create,
         ComposerFile $expectedComposerJson,

@@ -12,21 +12,20 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\RequirementChecker;
+namespace KevinGH\Box\Composer\Package;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function json_decode;
 
 /**
- * @covers \KevinGH\Box\RequirementChecker\PackageInfo
- *
  * @internal
  */
+#[CoversClass(PackageInfo::class)]
 final class PackageInfoTest extends TestCase
 {
-    /**
-     * @dataProvider packageInfoProvider
-     */
+    #[DataProvider('packageInfoProvider')]
     public function test_it_can_parse_the_decoded_data(
         array $rawPackageInfo,
         string $expectedName,
@@ -310,8 +309,8 @@ final class PackageInfoTest extends TestCase
         self::assertSame($expectedName, $actual->getName());
         self::assertSame($expectedRequiredPhpVersion, $actual->getRequiredPhpVersion());
         self::assertSame($expectedHasRequiredPhpVersion, $actual->hasRequiredPhpVersion());
-        self::assertSame($expectedRequiredExtensions, $actual->getRequiredExtensions());
-        self::assertSame($expectedPolyfilledExtensions, $actual->getPolyfilledExtensions());
-        self::assertSame($expectedConflictingExtensions, $actual->getConflictingExtensions());
+        ExtensionsAssertion::assertEqual($expectedRequiredExtensions, $actual->getRequiredExtensions());
+        ExtensionsAssertion::assertEqual($expectedPolyfilledExtensions, $actual->getPolyfilledExtensions());
+        ExtensionsAssertion::assertEqual($expectedConflictingExtensions, $actual->getConflictingExtensions());
     }
 }

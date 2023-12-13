@@ -12,9 +12,8 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\RequirementChecker;
+namespace KevinGH\Box\Composer\Package;
 
-use function array_key_exists;
 use function key;
 
 /**
@@ -41,10 +40,7 @@ final readonly class RequiredItem
         return key($this->packageInfo);
     }
 
-    /**
-     * @return list<Extension>
-     */
-    public function getRequiredExtensions(): array
+    public function getRequiredExtensions(): Extensions
     {
         return PackageInfo::parseExtensions($this->packageInfo);
     }
@@ -53,18 +49,6 @@ final readonly class RequiredItem
     {
         $name = $this->getName();
 
-        if (array_key_exists($name, self::POLYFILL_MAP)) {
-            return new Extension(self::POLYFILL_MAP[$name]);
-        }
-
-        if (1 !== preg_match(self::SYMFONY_POLYFILL_REGEX, $name, $matches)) {
-            return null;
-        }
-
-        $extension = $matches['extension'];
-
-        return str_starts_with($extension, 'php')
-            ? null
-            : new Extension($extension);
+        return Extension::tryToParsePolyfill($name);
     }
 }

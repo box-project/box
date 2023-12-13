@@ -12,22 +12,22 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Composer;
+namespace KevinGH\Box\Composer\Artifact;
 
-use KevinGH\Box\RequirementChecker\RequiredItem;
+use KevinGH\Box\Composer\Package\ExtensionsAssertion;
+use KevinGH\Box\Composer\Package\RequiredItem;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function json_decode;
 
 /**
- * @covers \KevinGH\Box\Composer\DecodedComposerJson
- *
  * @internal
  */
+#[CoversClass(DecodedComposerJson::class)]
 class DecodedComposerJsonTest extends TestCase
 {
-    /**
-     * @dataProvider composerJsonProvider
-     */
+    #[DataProvider('composerJsonProvider')]
     public function test_it_can_interpret_a_decoded_composer_json_file(
         string $composerJsonContents,
         ?string $expectedRequiredPhpVersion,
@@ -166,6 +166,6 @@ class DecodedComposerJsonTest extends TestCase
         self::assertSame($expectedRequiredPhpVersion, $composerJson->getRequiredPhpVersion());
         self::assertSame($expectedHasRequiredPhpVersion, $composerJson->hasRequiredPhpVersion());
         self::assertEquals($expectedRequiredItems, $composerJson->getRequiredItems());
-        self::assertSame($expectedConflictingExtensions, $composerJson->getConflictingExtensions());
+        ExtensionsAssertion::assertEqual($expectedConflictingExtensions, $composerJson->getConflictingExtensions());
     }
 }

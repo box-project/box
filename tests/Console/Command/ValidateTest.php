@@ -18,17 +18,18 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
 use Fidry\FileSystem\FS;
 use KevinGH\Box\Console\DisplayNormalizer;
+use KevinGH\Box\Console\MessageRenderer;
 use KevinGH\Box\Test\CommandTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 use function str_replace;
 
 /**
- * @covers \KevinGH\Box\Console\Command\Validate
- * @covers \KevinGH\Box\Console\MessageRenderer
- *
  * @internal
  */
+#[CoversClass(Validate::class)]
+#[CoversClass(MessageRenderer::class)]
 class ValidateTest extends CommandTestCase
 {
     protected function getCommand(): Command

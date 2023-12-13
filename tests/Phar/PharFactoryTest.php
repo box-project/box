@@ -14,20 +14,22 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Phar;
 
+use KevinGH\Box\Phar\Throwable\InvalidPhar;
 use KevinGH\Box\Platform;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use Phar;
 use PharData;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function extension_loaded;
 use const DIRECTORY_SEPARATOR;
 
 /**
- * @covers \KevinGH\Box\Phar\InvalidPhar
- * @covers \KevinGH\Box\Phar\PharFactory
- *
  * @internal
  */
+#[CoversClass(PharFactory::class)]
+#[CoversClass(InvalidPhar::class)]
 final class PharFactoryTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__.'/../../fixtures/phar';
@@ -41,9 +43,7 @@ final class PharFactoryTest extends TestCase
         parent::setUp();
     }
 
-    /**
-     * @dataProvider validPharProvider
-     */
+    #[DataProvider('validPharProvider')]
     public function test_it_can_create_phar_instance(string $file): void
     {
         $phar = PharFactory::createPhar($file);
@@ -51,9 +51,7 @@ final class PharFactoryTest extends TestCase
         self::assertSame(Phar::class, $phar::class);
     }
 
-    /**
-     * @dataProvider validPharDataProvider
-     */
+    #[DataProvider('validPharDataProvider')]
     public function test_it_can_create_phar_data_instance(string $file): void
     {
         $pharData = PharFactory::createPharData($file);
@@ -61,9 +59,7 @@ final class PharFactoryTest extends TestCase
         self::assertSame(PharData::class, $pharData::class);
     }
 
-    /**
-     * @dataProvider validPharAndPharDataProvider
-     */
+    #[DataProvider('validPharAndPharDataProvider')]
     public function test_it_can_create_phar_or_phar_data_instance(string $file): void
     {
         PharFactory::create($file);
@@ -71,9 +67,7 @@ final class PharFactoryTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @dataProvider invalidPharProvider
-     */
+    #[DataProvider('invalidPharProvider')]
     public function test_it_fails_with_a_comprehensive_error_when_cannot_create_a_phar(
         string $file,
         string $expectedExceptionMessageRegex,
@@ -97,9 +91,7 @@ final class PharFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider invalidPharDataProvider
-     */
+    #[DataProvider('invalidPharDataProvider')]
     public function test_it_fails_with_a_comprehensive_error_when_cannot_create_a_phar_data(
         string $file,
         string $expectedExceptionMessageRegex,

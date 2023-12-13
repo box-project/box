@@ -14,21 +14,20 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Phar;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionEnum;
 use ReflectionEnumBackedCase;
 use function array_map;
 
 /**
- * @covers \KevinGH\Box\Phar\CompressionAlgorithm
- *
  * @internal
  */
+#[CoversClass(CompressionAlgorithm::class)]
 final class CompressionAlgorithmTest extends TestCase
 {
-    /**
-     * @dataProvider compressionAlgorithmLabelsProvider
-     */
+    #[DataProvider('compressionAlgorithmLabelsProvider')]
     public function test_it_can_tell_be_created_from_its_label(
         ?string $label,
         CompressionAlgorithm $expected
@@ -73,9 +72,7 @@ final class CompressionAlgorithmTest extends TestCase
         self::assertSame($expected, $actual);
     }
 
-    /**
-     * @dataProvider compressionAlgorithmProvider
-     */
+    #[DataProvider('compressionAlgorithmProvider')]
     public function test_it_can_tell_what_php_extension_is_required_for_a_given_compression_algorithm(
         CompressionAlgorithm $compressionAlgorithm
     ): void {

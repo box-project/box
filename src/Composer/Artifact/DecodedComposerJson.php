@@ -12,11 +12,11 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Composer;
+namespace KevinGH\Box\Composer\Artifact;
 
-use KevinGH\Box\RequirementChecker\Extension;
-use KevinGH\Box\RequirementChecker\PackageInfo;
-use KevinGH\Box\RequirementChecker\RequiredItem;
+use KevinGH\Box\Composer\Package\Extensions;
+use KevinGH\Box\Composer\Package\PackageInfo;
+use KevinGH\Box\Composer\Package\RequiredItem;
 use function array_keys;
 
 /**
@@ -42,7 +42,7 @@ final readonly class DecodedComposerJson
     }
 
     /**
-     * @return list<RequiredItem>
+     * @return RequiredItem
      */
     public function getRequiredItems(): array
     {
@@ -54,10 +54,7 @@ final readonly class DecodedComposerJson
         );
     }
 
-    /**
-     * @return list<Extension>
-     */
-    public function getConflictingExtensions(): array
+    public function getConflictingExtensions(): Extensions
     {
         return PackageInfo::parseExtensions(
             $this->composerJsonDecodedContents['conflict'] ?? [],

@@ -15,13 +15,14 @@ declare(strict_types=1);
 namespace KevinGH\Box\Annotation;
 
 use phpDocumentor\Reflection\DocBlockFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \KevinGH\Box\Annotation\DocblockAnnotationParser
- *
  * @internal
  */
+#[CoversClass(DocblockAnnotationParser::class)]
 class DocblockAnnotationParserTest extends TestCase
 {
     private DocblockAnnotationParser $annotationParser;
@@ -35,9 +36,7 @@ class DocblockAnnotationParserTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider docblocksProvider
-     */
+    #[DataProvider('docblocksProvider')]
     public function test_it_can_parse_php_docblocks(string $docblock, array $expected): void
     {
         $actual = $this->annotationParser->parse($docblock);

@@ -14,21 +14,20 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function array_merge;
 use function array_values;
 
 /**
- * @covers \KevinGH\Box\StubGenerator
- *
  * @internal
  */
+#[CoversClass(StubGenerator::class)]
 class StubGeneratorTest extends TestCase
 {
-    /**
-     * @dataProvider valuesProvider
-     */
+    #[DataProvider('valuesProvider')]
     public function test_it_can_generate_a_stub(
         ?string $alias,
         ?string $banner,
@@ -195,6 +194,7 @@ class StubGeneratorTest extends TestCase
 
                 require 'phar://' . __FILE__ . '/.box/bin/check-requirements.php';
 
+                $_SERVER['SCRIPT_FILENAME'] = 'phar://' . __FILE__ . '/acme.php';
                 require 'phar://' . __FILE__ . '/acme.php';
 
                 __HALT_COMPILER(); ?>
@@ -210,6 +210,7 @@ class StubGeneratorTest extends TestCase
             <<<'STUB'
                 <?php
 
+                $_SERVER['SCRIPT_FILENAME'] = 'phar://' . __FILE__ . '/acme.php';
                 require 'phar://' . __FILE__ . '/acme.php';
 
                 __HALT_COMPILER(); ?>
@@ -274,6 +275,7 @@ class StubGeneratorTest extends TestCase
 
                 require 'phar://test.phar/.box/bin/check-requirements.php';
 
+                $_SERVER['SCRIPT_FILENAME'] = 'phar://test.phar/index.php';
                 require 'phar://test.phar/index.php';
 
                 __HALT_COMPILER(); ?>
@@ -307,6 +309,7 @@ class StubGeneratorTest extends TestCase
                 Phar::mapPhar('test.phar');
                 Phar::interceptFileFuncs();
 
+                $_SERVER['SCRIPT_FILENAME'] = 'phar://test.phar/index.php';
                 require 'phar://test.phar/index.php';
 
                 __HALT_COMPILER(); ?>

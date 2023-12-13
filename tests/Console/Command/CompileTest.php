@@ -26,11 +26,15 @@ use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Console\Application;
 use KevinGH\Box\Console\DisplayNormalizer as BoxDisplayNormalizer;
+use KevinGH\Box\Console\MessageRenderer;
 use KevinGH\Box\Test\FileSystemTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use KevinGH\Box\VarDumperNormalizer;
 use Phar;
 use PharFileInfo;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
@@ -67,14 +71,11 @@ use const PHP_OS;
 use const PHP_VERSION;
 
 /**
- * @covers \KevinGH\Box\Console\Command\Compile
- * @covers \KevinGH\Box\Console\MessageRenderer
- *
- * @runTestsInSeparateProcesses This is necessary as instantiating a PHAR in memory may load/autoload some stuff which
- *                              can create undesirable side-effects.
- *
  * @internal
  */
+#[CoversClass(Compile::class)]
+#[CoversClass(MessageRenderer::class)]
+#[RunTestsInSeparateProcesses]
 class CompileTest extends FileSystemTestCase
 {
     use RequiresPharReadonlyOff;
@@ -319,6 +320,7 @@ class CompileTest extends FileSystemTestCase
 
             require 'phar://alias-test.phar/.box/bin/check-requirements.php';
 
+            \$_SERVER['SCRIPT_FILENAME'] = 'phar://alias-test.phar/run.php';
             require 'phar://alias-test.phar/run.php';
 
             __HALT_COMPILER(); ?>
@@ -498,6 +500,7 @@ class CompileTest extends FileSystemTestCase
 
             require 'phar://box-auto-generated-alias-__uniqid__.phar/.box/bin/check-requirements.php';
 
+            \$_SERVER['SCRIPT_FILENAME'] = 'phar://box-auto-generated-alias-__uniqid__.phar/index.php';
             require 'phar://box-auto-generated-alias-__uniqid__.phar/index.php';
 
             __HALT_COMPILER(); ?>
@@ -673,6 +676,7 @@ class CompileTest extends FileSystemTestCase
 
             Phar::mapPhar('alias-test.phar');
 
+            \$_SERVER['SCRIPT_FILENAME'] = 'phar://alias-test.phar/run.php';
             require 'phar://alias-test.phar/run.php';
 
             __HALT_COMPILER(); ?>
@@ -771,6 +775,7 @@ class CompileTest extends FileSystemTestCase
 
             Phar::mapPhar('box-auto-generated-alias-__uniqid__.phar');
 
+            \$_SERVER['SCRIPT_FILENAME'] = 'phar://box-auto-generated-alias-__uniqid__.phar/run.php';
             require 'phar://box-auto-generated-alias-__uniqid__.phar/run.php';
 
             __HALT_COMPILER(); ?>
@@ -1182,11 +1187,11 @@ class CompileTest extends FileSystemTestCase
               -file: "box.json"
               -alias: "index.phar"
               -basePath: "/path/to"
-              -composerJson: KevinGH\Box\Composer\ComposerFile {#140
+              -composerJson: KevinGH\Box\Composer\Artifact\ComposerFile {#140
                 -path: null
                 -contents: []
               }
-              -composerLock: KevinGH\Box\Composer\ComposerFile {#140
+              -composerLock: KevinGH\Box\Composer\Artifact\ComposerFile {#140
                 -path: null
                 -contents: []
               }
@@ -2359,9 +2364,7 @@ class CompileTest extends FileSystemTestCase
         );
     }
 
-    /**
-     * @dataProvider aliasConfigProvider
-     */
+    #[DataProvider('aliasConfigProvider')]
     public function test_it_configures_the_phar_alias(bool $stub): void
     {
         $this->skipIfDefaultStubNotFound();

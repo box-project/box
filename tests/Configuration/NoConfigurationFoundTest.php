@@ -15,13 +15,13 @@ declare(strict_types=1);
 namespace KevinGH\Box\Configuration;
 
 use Error;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \KevinGH\Box\Configuration\NoConfigurationFound
- *
  * @internal
  */
+#[CoversClass(NoConfigurationFound::class)]
 class NoConfigurationFoundTest extends TestCase
 {
     public function test_it_can_be_created_with_a_default_error_message(): void

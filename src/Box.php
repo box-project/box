@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box;
 
-use Amp\MultiReasonException;
 use Amp\Parallel\Worker\TaskFailureThrowable;
 use BadMethodCallException;
 use Countable;
@@ -445,8 +444,6 @@ final class Box implements Countable
 
     /**
      * @param string[] $files
-     *
-     * @throws MultiReasonException
      *
      * @return array array of tuples where the first element is the local file path (path inside the PHAR) and the
      *               second element is the processed contents

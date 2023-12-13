@@ -14,16 +14,16 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Compactor;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+
 /**
- * @covers \KevinGH\Box\Compactor\Placeholder
- *
  * @internal
  */
+#[CoversClass(Placeholder::class)]
 class PlaceholderTest extends CompactorTestCase
 {
-    /**
-     * @dataProvider filesContentsProvider
-     */
+    #[DataProvider('filesContentsProvider')]
     public function test_it_replaces_the_placeholders(array $placeholders, string $contents, string $expected): void
     {
         $actual = (new Placeholder($placeholders))->compact('random file', $contents);

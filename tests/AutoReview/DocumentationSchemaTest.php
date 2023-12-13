@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\AutoReview;
 
 use Fidry\FileSystem\FS;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Webmozart\Assert\Assert;
 use function array_diff;
@@ -30,10 +31,9 @@ use function sort;
 use const JSON_THROW_ON_ERROR;
 
 /**
- * @coversNothing
- *
  * @internal
  */
+#[CoversNothing]
 class DocumentationSchemaTest extends TestCase
 {
     private const CONFIGURATION_DOC_PATH = __DIR__.'/../../doc/configuration.md';

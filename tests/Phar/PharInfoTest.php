@@ -14,6 +14,9 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Phar;
 
+use KevinGH\Box\Phar\Throwable\InvalidPhar;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function array_keys;
 use function basename;
@@ -22,17 +25,14 @@ use function Safe\file_get_contents;
 use function Safe\realpath;
 
 /**
- * @covers \KevinGH\Box\Phar\PharInfo
- *
  * @internal
  */
+#[CoversClass(PharInfo::class)]
 final class PharInfoTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__.'/../../fixtures';
 
-    /**
-     * @dataProvider fileProvider
-     */
+    #[DataProvider('fileProvider')]
     public function test_it_can_be_instantiated(
         string $file,
         ?string $expectedVersion,
@@ -196,9 +196,7 @@ final class PharInfoTest extends TestCase
         new PharInfo($file);
     }
 
-    /**
-     * @dataProvider equalProvider
-     */
+    #[DataProvider('equalProvider')]
     public function test_it_can_test_if_two_phars_are_equal(
         string $fileA,
         string $fileB,
