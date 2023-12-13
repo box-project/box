@@ -536,7 +536,7 @@ $(PHPBENCH_WITHOUT_COMPACTORS_VENDOR_DIR):
 	touch -c $@
 
 $(PHPBENCH_REQUIREMENT_CHECKER_VENDOR_DIR):
-	composer install --working-dir=$$(dirname $@)
+	composer install --working-dir=$$(dirname $@) --ignore-platform-reqs
 	touch -c $@
 
 dist:
