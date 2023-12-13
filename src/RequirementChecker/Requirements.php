@@ -18,6 +18,8 @@ use ArrayIterator;
 use Countable;
 use IteratorAggregate;
 use Traversable;
+use function array_map;
+use function array_values;
 use function count;
 
 final readonly class Requirements implements Countable, IteratorAggregate
@@ -37,5 +39,15 @@ final readonly class Requirements implements Countable, IteratorAggregate
     public function count(): int
     {
         return count($this->requirements);
+    }
+
+    public function toArray(): array
+    {
+        return array_values(
+            array_map(
+                static fn (Requirement $requirement) => $requirement->toArray(),
+                $this->requirements,
+            ),
+        );
     }
 }
